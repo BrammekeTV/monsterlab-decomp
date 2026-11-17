@@ -27,28 +27,28 @@ body {
     linear-gradient(var(--bg), var(--bg2));
   min-height: 100vh;
 }
-.wrap { max-width: 1060px; margin: 0 auto; padding: 28px 16px 60px; }
+.wrap { max-width: 1060px; margin: 0 auto; padding: 18px 16px 60px; }
 
 /* ---------- title ---------- */
-header { text-align: center; margin-bottom: 30px; position: relative; }
-h1.logo { margin: 0 auto; max-width: 600px; line-height: 0; }
-h1.logo svg { width: 100%; height: auto; overflow: visible; filter: drop-shadow(0 14px 18px rgba(0,0,0,.55)); }
+header { text-align: center; margin-bottom: 8px; position: relative; }
+h1.logo { margin: 0 auto; max-width: 320px; line-height: 0; }
+h1.logo svg { width: 100%; height: auto; overflow: visible; filter: drop-shadow(0 8px 10px rgba(0,0,0,.55)); }
 .sr { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
 .tape {
-  display: inline-block; margin-top: 10px; padding: 6px 18px; transform: rotate(-1.5deg);
+  display: inline-block; margin-top: 4px; padding: 4px 12px; transform: rotate(-1.5deg);
   background: repeating-linear-gradient(-45deg, var(--yellow) 0 14px, #1d1209 14px 28px);
-  border: 3px solid var(--outline); box-shadow: 0 5px 0 var(--outline);
+  border: 2px solid var(--outline); box-shadow: 0 3px 0 var(--outline);
 }
 .tape span {
   display: block; padding: 2px 18px 0; background: #1d1209; color: var(--yellow);
-  font: 400 clamp(24px, 5vw, 34px)/1.15 Bangers, Impact, sans-serif; letter-spacing: .18em;
+  font: 400 20px/1.15 Bangers, Impact, sans-serif; letter-spacing: .18em;
 }
-.tag { color: var(--muted); margin: 18px auto 0; max-width: 560px; }
-.meta { font: 12px "JetBrains Mono", monospace; color: var(--dim); margin-top: 8px; }
+.tag { color: var(--muted); margin: 10px auto 0; max-width: 560px; font-size: 14px; }
+.meta { font: 12px "JetBrains Mono", monospace; color: var(--dim); margin-top: 2px; }
 
 /* ---------- shelf + panels ---------- */
 .shelf {
-  height: 18px; margin: 22px -8px; border-radius: 4px; position: relative;
+  height: 16px; margin: 18px -8px; border-radius: 4px; position: relative;
   background:
     repeating-linear-gradient(90deg, rgba(0,0,0,.12) 0 1px, transparent 1px 37px),
     linear-gradient(var(--wood-hi), var(--wood) 55%, var(--wood-lo));
