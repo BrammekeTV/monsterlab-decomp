@@ -9,13 +9,29 @@
 
 #define PART_TIERS 4
 
+enum PartSlot { PART_SLOT_HEAD = 0, PART_SLOT_LEGS = 1, PART_SLOT_ARM = 2, PART_SLOT_TORSO = 4 };
+enum PartDiscipline { PART_MECH = 0, PART_BIO = 1, PART_ALCHEMY = 2 };
+
+// Action (0x14 bytes), table at gGameDb->data + 0x430, indexed by PartDef::action1/2.
+struct PartAction {
+    u32 key;                    // 0x00
+    s32 type;                   // 0x04: index into the action type table
+    u32 unk08, unk0C, unk10;
+};
+// Action type (0x24 bytes), table at gGameDb->data + 0x08.
+struct PartActionType {
+    u32 unk00[4];
+    u32 nameHash;               // 0x10: text key of the action name
+    u32 unk14[4];
+};
+
 // Part definition, 0x50 bytes. Table: gGameDb->data + 0x5B78 (count at +0x5B7C, 186 entries).
 struct PartDef {
     s32 index;                  // 0x00
     u32 tierName[PART_TIERS];   // 0x04: text-key hashes, e.g. Chimp/Ape/Gorilla/Kong Arm
     s32 action1;                // 0x14: action id (-1 = none; then action2 is used for both)
-    s32 unk18;                  // 0x18
-    s32 unk1C;                  // 0x1C
+    s32 slot;                   // 0x18: PartSlot
+    s32 discipline;             // 0x1C: PartDiscipline
     s32 unk20;                  // 0x20
     s32 unk24;                  // 0x24
     s32 unk28;                  // 0x28
@@ -49,7 +65,8 @@ struct PartInstance {
 // Game database (global_binary.sir header slot 0xDC8).
 struct GameDb {
     u8  pad00[0xC];
-    u8* data;                   // 0x0C: +0x5B78 PartDef*, +0x5B7C count, ...
+    u8* data;                   // 0x0C: +0x08 PartActionType*, +0x430 PartAction*,
+                                //       +0x5B78 PartDef*, +0x5B7C count
 };
 extern GameDb* gGameDb;         // 0x805FBBC0
 

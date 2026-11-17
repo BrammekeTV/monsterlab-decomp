@@ -1,31 +1,31 @@
 {
  "game_id": "RM7P4F",
- "generated": "2026-11-17T20:13:07+00:00",
- "commit": "442f351",
- "commit_date": "2026-11-17T21:08:30+01:00",
+ "generated": "2026-11-17T20:15:32+00:00",
+ "commit": "088bf82",
+ "commit_date": "2026-11-17T21:13:23+01:00",
  "game": {
   "functions": 8559,
   "bytes": 2277304,
-  "named": 2348,
-  "named_bytes": 363828,
-  "decompiled": 325,
-  "decompiled_bytes": 50560
+  "named": 2349,
+  "named_bytes": 365296,
+  "decompiled": 330,
+  "decompiled_bytes": 51444
  },
  "library": {
   "functions": 4028,
   "bytes": 1127624,
-  "named": 448,
-  "named_bytes": 92868,
+  "named": 449,
+  "named_bytes": 92884,
   "decompiled": 0,
   "decompiled_bytes": 0
  },
  "all": {
   "functions": 12587,
   "bytes": 3404928,
-  "named": 2796,
-  "named_bytes": 456696,
-  "decompiled": 325,
-  "decompiled_bytes": 50560
+  "named": 2798,
+  "named_bytes": 458180,
+  "decompiled": 330,
+  "decompiled_bytes": 51444
  },
  "game_range": [
   "80006B40",
@@ -477,11 +477,11 @@
    0.999
   ],
   [
-   0.073,
+   0.133,
    1.0
   ],
   [
-   0.0,
+   0.009,
    0.146
   ],
   [
@@ -1018,7 +1018,7 @@
   ],
   [
    0.007,
-   0.041
+   0.208
   ],
   [
    0.0,
@@ -1163,8 +1163,8 @@
    "end": "8033F400",
    "functions": 399,
    "bytes": 114196,
-   "named": 50,
-   "named_bytes": 14172,
+   "named": 51,
+   "named_bytes": 14188,
    "decompiled": 0,
    "decompiled_bytes": 0
   },
@@ -2485,9 +2485,34 @@
      "size": 24
     },
     {
+     "name": "PartQuery_GetActionName",
+     "addr": "800F9B44",
+     "size": 312
+    },
+    {
+     "name": "PartQuery_GetActionCost",
+     "addr": "800F9E0C",
+     "size": 224
+    },
+    {
      "name": "PartQuery_GetTexture",
      "addr": "800FA350",
      "size": 8
+    },
+    {
+     "name": "PartQuery_PartIsMech",
+     "addr": "800FA358",
+     "size": 116
+    },
+    {
+     "name": "PartQuery_PartIsBio",
+     "addr": "800FA3CC",
+     "size": 116
+    },
+    {
+     "name": "PartQuery_PartIsAlchemy",
+     "addr": "800FA440",
+     "size": 116
     },
     {
      "name": "TextIdFromHash",

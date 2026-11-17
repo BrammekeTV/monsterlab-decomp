@@ -18,6 +18,7 @@ static void*         sQueryMonster;           ORIG(0x805FB1FC)
 static void*         sQueryTexture;           ORIG(0x805FB200)
 
 #define TEXT_UNKNOWN_PART 0x475
+#define TEXT_NONE         0x557
 
 // Sorted (hash, text id) pairs for every text key (0x10B2 entries).
 struct TextKey { u32 hash; s32 id; };
@@ -142,4 +143,64 @@ s32 PartQuery_GetHealth(void) {
 // 0x800FA350
 void* PartQuery_GetTexture(void) {
     return sQueryTexture;
+}
+
+extern "C" {
+f32 PartComputeActionCost(PartInstance* p, u32 actionKey, void* monster);   // 0x8021E6EC
+s32 __cvt_fp2signed(f32 v);                                                   // 0x80332ED0
+}
+
+static inline PartAction* ActionTable(void) {
+    return *(PartAction**)(gGameDb->data + 0x430);
+}
+
+static inline PartActionType* ActionTypeTable(void) {
+    return *(PartActionType**)(gGameDb->data + 0x08);
+}
+
+// 0x800F9B44
+// Text id of action `which` (0 or 1) of the queried part.
+s32 PartQuery_GetActionName(u32 which) {
+    if (which >= 2) return 0;
+    if (sQueryPart == NULL) return TEXT_NONE;
+    PartDef def;
+    PartDbGetDef(&def, gGameDb, sQueryPart->defIndex);
+    s32 action = which == 0 ? def.action1 : def.action2;
+    PartAction a = ActionTable()[action];
+    PartActionType t = ActionTypeTable()[a.type];
+    return TextIdFromHash(t.nameHash);
+}
+
+// 0x800F9E0C
+// Energy cost of action `which` for the queried part (on sQueryMonster, if set).
+s32 PartQuery_GetActionCost(u32 which) {
+    if (which >= 2) return 0;
+    if (sQueryPart == NULL) return 0;
+    PartDef def;
+    PartDbGetDef(&def, gGameDb, sQueryPart->defIndex);
+    s32 action = which == 0 ? def.action1 : def.action2;
+    PartAction a = ActionTable()[action];
+    return __cvt_fp2signed(PartComputeActionCost(sQueryPart, a.key, sQueryMonster));
+}
+
+static inline BOOL QueryDisciplineIs(s32 discipline) {
+    if (sQueryPart == NULL) return FALSE;
+    PartDef def;
+    PartDbGetDef(&def, gGameDb, sQueryPart->defIndex);
+    return def.discipline == discipline;
+}
+
+// 0x800FA358
+BOOL PartQuery_PartIsMech(void) {
+    return QueryDisciplineIs(PART_MECH);
+}
+
+// 0x800FA3CC
+BOOL PartQuery_PartIsBio(void) {
+    return QueryDisciplineIs(PART_BIO);
+}
+
+// 0x800FA440
+BOOL PartQuery_PartIsAlchemy(void) {
+    return QueryDisciplineIs(PART_ALCHEMY);
 }
