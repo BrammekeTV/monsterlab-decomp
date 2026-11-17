@@ -6,7 +6,7 @@
 <title>Monster Lab Decomp</title>
 <meta name="description" content="Progress of the Monster Lab (Wii) decompilation and Windows port.">
 <link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=Bangers&family=Rubik:wght@400;500;700&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Bangers&family=Bowlby+One+SC&family=Rubik:wght@400;500;700&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
 <style>
 :root {
   --bg: #13201c; --bg2: #0d1714;
@@ -31,32 +31,18 @@ body {
 
 /* ---------- title ---------- */
 header { text-align: center; margin-bottom: 30px; position: relative; }
-.logo { display: inline-block; position: relative; transform: rotate(-2deg); }
-.logo h1 {
-  margin: 0; font: 400 clamp(56px, 13vw, 112px)/.9 Bangers, Impact, sans-serif; letter-spacing: .04em;
-  filter: drop-shadow(0 5px 0 var(--outline)) drop-shadow(0 10px 18px rgba(0,0,0,.6));
+h1.logo { margin: 0 auto; max-width: 600px; line-height: 0; }
+h1.logo svg { width: 100%; height: auto; overflow: visible; filter: drop-shadow(0 14px 18px rgba(0,0,0,.55)); }
+.sr { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
+.tape {
+  display: inline-block; margin-top: 10px; padding: 6px 18px; transform: rotate(-1.5deg);
+  background: repeating-linear-gradient(-45deg, var(--yellow) 0 14px, #1d1209 14px 28px);
+  border: 3px solid var(--outline); box-shadow: 0 5px 0 var(--outline);
 }
-.logo h1 span {
-  display: inline-block;
-  background: linear-gradient(180deg, var(--yellow) 10%, var(--orange) 55%, var(--red) 100%);
-  -webkit-background-clip: text; background-clip: text; color: transparent;
-  -webkit-text-stroke: 3px var(--outline);
+.tape span {
+  display: block; padding: 2px 18px 0; background: #1d1209; color: var(--yellow);
+  font: 400 clamp(24px, 5vw, 34px)/1.15 Bangers, Impact, sans-serif; letter-spacing: .18em;
 }
-.logo h1 span:nth-child(odd) { transform: translateY(-4px) rotate(-3deg); }
-.logo h1 span:nth-child(3n) { transform: translateY(5px) rotate(4deg); }
-.plate {
-  display: inline-block; margin-top: -6px; padding: 4px 26px 2px; position: relative;
-  font: 400 clamp(26px, 5vw, 40px)/1.1 Bangers, Impact, sans-serif; letter-spacing: .12em; color: var(--slime);
-  -webkit-text-stroke: 1.5px var(--outline); text-shadow: 0 0 14px var(--glow);
-  background: linear-gradient(var(--metal-hi), var(--metal) 45%, var(--metal-lo));
-  border: 3px solid var(--outline); border-radius: 12px; transform: rotate(1.5deg);
-  box-shadow: inset 0 2px 0 rgba(255,255,255,.18), 0 6px 0 var(--outline);
-}
-.plate::before, .plate::after {
-  content: ""; position: absolute; top: 50%; width: 9px; height: 9px; margin-top: -4px; border-radius: 50%;
-  background: radial-gradient(circle at 35% 35%, #d9e2df, var(--rivet) 45%, #333 100%);
-}
-.plate::before { left: 8px; } .plate::after { right: 8px; }
 .tag { color: var(--muted); margin: 18px auto 0; max-width: 560px; }
 .meta { font: 12px "JetBrains Mono", monospace; color: var(--dim); margin-top: 8px; }
 
@@ -169,10 +155,58 @@ footer { margin-top: 34px; text-align: center; color: var(--dim); font-size: 13p
 <body>
 <div class="wrap">
   <header>
-    <div class="logo">
-      <h1 aria-label="Monster"><span>M</span><span>o</span><span>n</span><span>s</span><span>t</span><span>e</span><span>r</span></h1>
-      <div class="plate">Lab Decomp</div>
-    </div>
+    <h1 class="logo"><span class="sr">Monster Lab Decomp</span>
+      <svg viewBox="0 -20 640 326" aria-hidden="true">
+        <defs>
+          <linearGradient id="mFill" x1="0" y1="0" x2="0" y2="1">
+            <stop offset="0" stop-color="#fff57e"/><stop offset=".3" stop-color="#ffc61a"/>
+            <stop offset=".65" stop-color="#ff8400"/><stop offset="1" stop-color="#cf3d0c"/>
+          </linearGradient>
+          <linearGradient id="capFill" x1="0" y1="0" x2="0" y2="1">
+            <stop offset="0" stop-color="#a9d877"/><stop offset=".35" stop-color="#5f9c30"/>
+            <stop offset=".75" stop-color="#2f5f19"/><stop offset="1" stop-color="#1b3a0e"/>
+          </linearGradient>
+          <linearGradient id="ringFill" x1="0" y1="0" x2="0" y2="1">
+            <stop offset="0" stop-color="#c9d3cf"/><stop offset=".4" stop-color="#7d8a86"/><stop offset="1" stop-color="#2e3634"/>
+          </linearGradient>
+          <linearGradient id="labFill" x1="0" y1="0" x2="0" y2="1">
+            <stop offset="0" stop-color="#fff0b0"/><stop offset=".45" stop-color="#ffae3b"/><stop offset="1" stop-color="#b8500e"/>
+          </linearGradient>
+          <filter id="rough" x="-5%" y="-10%" width="110%" height="120%">
+            <feTurbulence type="fractalNoise" baseFrequency="0.06" numOctaves="3" seed="7"/>
+            <feDisplacementMap in="SourceGraphic" scale="7"/>
+          </filter>
+          <text id="mText" x="320" y="168" text-anchor="middle" textLength="600" lengthAdjust="spacingAndGlyphs"
+                font-family="'Bowlby One SC', Impact, sans-serif" font-size="118"
+                rotate="-8 6 -5 8 -6 5 -9" stroke-linejoin="round">MONSTER</text>
+          <text id="lText" x="320" y="238" text-anchor="middle" textLength="132" lengthAdjust="spacingAndGlyphs"
+                font-family="'Bowlby One SC', Impact, sans-serif" font-size="62" stroke-linejoin="round">LAB</text>
+        </defs>
+        <g transform="rotate(-3 320 150)">
+          <!-- LAB capsule (behind MONSTER) -->
+          <g filter="url(#rough)" transform="translate(0 26)">
+            <rect x="196" y="160" width="248" height="100" rx="50" fill="#120905" transform="translate(0 7)"/>
+            <rect x="196" y="160" width="248" height="100" rx="50" fill="url(#capFill)" stroke="#120905" stroke-width="7"/>
+            <rect x="222" y="168" width="196" height="16" rx="8" fill="#fff" opacity=".22"/>
+            <rect x="204" y="166" width="30" height="88" rx="14" fill="url(#ringFill)" stroke="#120905" stroke-width="5"/>
+            <rect x="406" y="166" width="30" height="88" rx="14" fill="url(#ringFill)" stroke="#120905" stroke-width="5"/>
+            <circle cx="219" cy="210" r="5" fill="#e6ece9" stroke="#120905" stroke-width="2.5"/>
+            <circle cx="421" cy="210" r="5" fill="#e6ece9" stroke="#120905" stroke-width="2.5"/>
+            <use href="#lText" fill="#120905" stroke="#120905" stroke-width="12" transform="translate(0 4)"/>
+            <use href="#lText" fill="url(#labFill)" stroke="#5a1f06" stroke-width="3" paint-order="stroke"/>
+          </g>
+          <!-- MONSTER -->
+          <g filter="url(#rough)" transform="translate(0 168) scale(1 1.32) translate(0 -168)">
+            <use href="#mText" fill="#120905" stroke="#120905" stroke-width="20" transform="translate(0 9)"/>
+            <use href="#mText" fill="#2a0d04" stroke="#2a0d04" stroke-width="16"/>
+            <use href="#mText" fill="#a3300a" stroke="#a3300a" stroke-width="6"/>
+            <use href="#mText" fill="url(#mFill)"/>
+            <use href="#mText" fill="none" stroke="#fffbd0" stroke-width="1.5" opacity=".55" transform="translate(-1.5 -2)"/>
+          </g>
+        </g>
+      </svg>
+    </h1>
+    <div class="tape"><span>Decomp</span></div>
     <p class="tag">Rebuilding the Wii game (PAL, RM7P4F) as readable C++ and porting it to Windows. One specimen at a time.</p>
     <div class="meta" id="updated">loading…</div>
   </header>
