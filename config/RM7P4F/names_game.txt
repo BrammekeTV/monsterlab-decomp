@@ -403,3 +403,5 @@ lbl_805FB2FC sNextCullTime
 lbl_805FB304 sLastCullTime
 fn_80071BB4 CreateEntityByType
 fn_801D4414 ObjAlloc
+fn_801078F4 InitNameHashes
+lbl_80369908 gLevelTable
