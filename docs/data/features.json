@@ -57,7 +57,7 @@
     },
     {
       "title": "Mod support",
-      "detail": "Virtual file system: mods/<name>/files/ overrides any disc file; load order via mods.ini, toggled in the settings GUI.",
+      "detail": "Mods folder overriding any game file, plus new content in open formats: monster parts as glTF models, PNG textures and JSON/text stats, with no .sir editing needed.",
       "status": "todo"
     },
     {

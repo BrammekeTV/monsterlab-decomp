@@ -79,6 +79,19 @@ These live in the platform layer (`src/platform/`) that replaces the Wii SDK, so
 - **1080p and higher, widescreen.** The GX → OpenGL/Vulkan backend renders at any output resolution (1080p, 1440p, 4K) with an internal resolution scale, instead of the Wii's 640×480 framebuffer. The game already supports 16:9: `ViewCreate` picks the aspect ratio from `SCGetAspectRatio`, so on PC that returns widescreen. 2D UI, which uses fixed 640×480 coordinates, gets scaled or pillarboxed.
 - **Settings GUI.** An in-game overlay (Dear ImGui, toggled with F1) plus a `config.ini`. Options: resolution, window/borderless/fullscreen, V-sync, frame-rate cap (it maps onto the game's own `gFrameLimitEnabled` / `gTargetFps`), internal render scale, MSAA, texture filtering, audio volume and controls (pointer = mouse).
 - **Mod support.** A virtual file system sits between the game and the disc files: `mods/<ModName>/files/...` overrides any original file (`.sir`, `.bik`, `.dsp`, text). Load order and enabled mods come from `mods.ini` and can be toggled in the settings GUI. Later: documented `.sir` formats and tools for editing them, plus code hooks for script mods.
+- **Content mods in open formats (no `.sir` needed).** An importer builds the game's in-memory data from standard files, so new content (starting with monster parts) can be added without touching `.sir`:
+
+  ```
+  mods/LaserArm/
+    mod.json                 name, author, version
+    parts/laser_arm/
+      part.json              slot (arm/leg/head/torso), stats, actions, damage, cost
+      model.glb              glTF model + skin weights (Blender export)
+      texture.png, icon.png
+      text/en.txt, nl.txt…   name and description per language
+  ```
+
+  Stats are served through the game's own part queries (`PartQuery_GetHealth`, `PartQuery_GetActionDamage`, ...), and text is added to the string table. New parts reuse the existing monster skeletons and sockets. The mod loader gives mod parts their own ids, and saves cope with a removed mod. An exporter turns an original part into glTF + PNG + JSON as a starting point for modders. Depends on decompiling the part definition, attachment, save and menu code.
 
 ### Priorities
 
