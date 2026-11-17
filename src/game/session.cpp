@@ -148,9 +148,9 @@ f32 GetOne(void) {
 extern "C" {
 struct ObjRef { u8 data[0x404]; };                      // opaque object handle (copied by value)
 ObjRef* ObjDbLookup(void* db, s32 id);                  // 0x800D39BC
-u32   ObjRefGetState(ObjRef* ref);                      // 0x800D5944
+u32   PathGetNodeType(ObjRef* ref);                      // 0x800D5944
 void  ObjRefSetState(ObjRef* ref, u32 state);           // 0x800D59F4
-u32   ObjRefGetId(void* ref);                           // 0x800D56F8
+u32   PathGetNodeId(void* ref);                           // 0x800D56F8
 void  ObjRefDtor(ObjRef* ref, s32 flags);               // 0x800D50D0
 void  ObjSetEnabled(s32 id, BOOL on);                   // 0x800F058C
 void  CharacterSetTarget(void* chr, void* target);      // 0x80016FD0
@@ -170,7 +170,7 @@ void SessionDisableFor(u8* s, s32 id, f32 time) {
     BOOL disabled = FALSE;
     if (gObjDb != NULL) {
         ObjRef ref = *ObjDbLookup(gObjDb, id);
-        if (ObjRefGetState(&ref) == 2) {
+        if (PathGetNodeType(&ref) == 2) {
             disabled = TRUE;
             ObjRefSetState(&ref, 0);
             ObjSetEnabled(id, FALSE);
@@ -205,7 +205,7 @@ void SessionReenable(u8* s, s32 id) {
             u8* player = *(u8**)(gGame + 0xD614);
             if ((*(u32*)(*(u8**)(player + 4) + 0x1C) & 0x10) && player != NULL) {
                 void* target = *(void**)(player + 0xA00);
-                if (target != NULL && ObjRefGetId(&ref) == ObjRefGetId(target)) CharacterSetTarget(player, NULL);
+                if (target != NULL && PathGetNodeId(&ref) == PathGetNodeId(target)) CharacterSetTarget(player, NULL);
             }
             ObjRefDtor(&ref, -1);
         }

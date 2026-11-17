@@ -9,8 +9,8 @@ extern "C" {
 void  EventSend(void* mgr, void* target, void* from, u32 event, int a, int b, int c, int d);   // 0x801BA190
 s32   WorldGetPhase(void* world);                       // 0x800D83A8
 BOOL  fn_800E6BD4(void);
-void  fn_80016FD0(Character* c, int a);
-void  fn_80016EA0(int);
+void  fn_80016FD0(Character* c, int animate);
+void  ExplorationPromptClear(BOOL animate);            // 0x80016EA0
 void  GameFlowSignal(s32 id, s32 a, s32 b);             // 0x8000C7F4
 void  PlayCharacterAnimation(Character* c, int a, u32 anim, int loop);
 void  SpeedUpNISCameraAnimation_8005100C(void);
@@ -35,6 +35,8 @@ extern u8*   gBattle;              ORIG(0x805FBBB8)
 extern u8*   lbl_805FBBC8;
 extern u8*   gSaveSystem;          // 0x805FBBE0
 extern void* gObjDb;               // 0x805FB180
+
+typedef void* (*GetFighterFn)(Character*);
 
 #define WORLD       (gGame + 0xD5F0)
 #define PLAYER      ((Character*)*(void**)(gGame + 0xD614))
@@ -115,7 +117,7 @@ void character_exploration_move_entry(ScriptCtx* ctx) {
         PathSetMoving(c->path, FALSE);
     }
     if (c == PLAYER) {
-        fn_80016EA0(0);
+        ExplorationPromptClear(FALSE);
         c->unkC80 = 0;
     }
 }
@@ -239,7 +241,6 @@ void CharacterCombatActionEntry(ScriptCtx* ctx) {
     if (!CharacterStartAttack(c, 0)) Send(c, EV_ACTION_DONE);
 }
 
-typedef void* (*GetFighterFn)(Character*);
 
 // 0x80018AC4
 // Tell the opponent (the other fighter in gBattle) that our action finished.
@@ -379,7 +380,7 @@ void character_race_entry(ScriptCtx* ctx) {
     ControlsLock(c, 0);
     *((u8*)c + 0xC81) = 1;                       // racing
     PathSetSpeed(c->path, 0.0f);
-    fn_80016EA0(0);
+    ExplorationPromptClear(FALSE);
     if (c->pathSpeed > 0.0f) PlayCharacterAnimation(c, 1, 0xF5770040 /* "explore1" */, 1);
 
     UIScreen_Push(0xE5BF8E82);
@@ -428,14 +429,205 @@ void character_exploration_move_exit(ScriptCtx* ctx) {
     }
 }
 
+extern "C" {
+u32   PathGetChallengeId(PathFollower* p);              // 0x800D5984: hashed challenge name at the node
+u32   StringHash(const char* s);                        // 0x801EB704
+void  HudShowConversation(void* hud, s32 conversation); // 0x8001B0B8
+}
+
+// 0x80017D28
+// Start the challenge configured on the current path node (a node value of "1" means the
+// default challenge).
+void character_challenge_entry(ScriptCtx* ctx) {
+    Character* c = ctx->chr;
+    if (c == NULL) return;
+    u32 challenge = PathGetChallengeId(c->path);
+    if (challenge == StringHash("1")) GameFlowSignal(0xBA5FF08B, 0, 0);
+    else if (challenge != 0)          GameFlowSignal(challenge, 0, 0);
+    *(s32*)(gSaveSystem + 0x130) = PathGetNodeId(c->path);
+    ExplorationPromptClear(FALSE);
+    PauseOtherCharacters();
+}
+
+// 0x80018044
+void character_Interaction_entry(ScriptCtx* ctx) {
+    Character* c = ctx->chr;
+    if (c == NULL) return;
+    s32 conversation = (s32)PathIsInConversation(c->path);
+    if (conversation == 0) {
+        c->eventTarget = 0;
+        EventSend(gEventMgr, c, c, 0x2524AD6Du, 0, 0, 0, 0);
+        return;
+    }
+    c->eventTarget = 1;          // remembered so the exit fades the HUD back in
+    HudShowConversation(*(void**)(gGame + 0xD634), conversation);
+    PauseOtherCharacters();
+}
+
+extern "C" {
+void* ScreenSetsCurrent(void* sets);                    // 0x8018D1E4
+void* ScreenSetFindWidget(void* set, u32 hash);         // 0x80198E34
+BOOL  ScreenSetWidgetVisible(void* set, void* widget);  // 0x80198C34
+BOOL  UIElement_IsUIAnimPlaying(u32 hash);
+void  ExplorationHudSetFighter(void* set, void* fighter, int a);   // 0x80045138
+}
+extern void* gScreenSets;          // 0x805FB654
+
+// 0x80017454
+void character_exploration_move_update(ScriptCtx* ctx) {
+    Character* c = ctx->chr;
+    if (c == NULL) return;
+
+    void* set = ScreenSetsCurrent(gScreenSets);
+    if (set != NULL) {
+        void* w = ScreenSetFindWidget(set, 0xDB1E4D0C /* "exploration_screen" */);
+        if (w != NULL && ScreenSetWidgetVisible(set, w)) {
+            u8* pending = (u8*)c + 0x9F8;
+            if (*pending) {
+                fn_80016FD0(c, 1);
+                *pending = 0;
+            }
+            if (c == PLAYER && !UIElement_IsUIAnimPlaying(0x664BFF35)) {
+                ExplorationHudSetFighter(set, VCALL(c, 0xF0, GetFighterFn)(c), 0);
+            }
+        }
+    }
+
+    c->waitTimer += c->dt;
+    if (c->path == NULL) return;
+    Vec3 dir = PathGetDirection(c->path);
+    dir.z = 0.0f;
+    if (PathAtWaypoint(c->path) || Vec3LengthSq(dir) <= 0.01f) return;
+
+    c->def->pos = *PathGetPosition(c->path);
+    Vec3 face = PathGetDirection(c->path);
+    CharacterFaceDirection(c, &face, FALSE);
+    c->def->stateFlags |= 0x8000;
+    c->def->stateFlags |= 0x10000000;
+    c->def->stateFlags |= 0x4000;
+    c->def->stateFlags |= 0x10000000;
+}
+
+// ---------------------------------------------------------------- exploration prompt
+// The exploration screen shows a two-line prompt (header + text) for the node the player
+// stands on: a challenge, a shop, a door, ...
+
+extern "C" {
+void  UIElement_PlayUIAnim(u32 element, u32 anim);
+void  UIEvent_SendToScreen(u32 event, u32 screen);
+void  UIText_SetString_TextID(u32 hash, s32 textId);
+void* UIWidgetFindChild(void* widget, u32 hash);        // 0x80199AEC
+const char* UITextGetString(void* text);                // 0x8019F3AC
+s32   PathGetNodeType(PathFollower* p);                 // 0x800D5944
+s32   PathGetNodeText(PathFollower* p);                 // 0x800D581C: explicit text id, or 0
+void  fn_80044F20(void);
+int   strcmp(const char* a, const char* b);
+}
+
+#define UI_EXPLORATION_SCREEN 0xDB1E4D0Cu   // "exploration_screen"
+#define UI_PROMPT_TEXT        0x640078E4u
+#define UI_PROMPT_HEADER      0x9E8A6F47u   // "header"
+#define UI_PROMPT_ANIM_TARGET 0x664BFF35u
+#define TEXT_NONE             0x557
+
+enum { NODE_CHALLENGE = 2, NODE_TYPE_4 = 4, NODE_TYPE_8 = 8, NODE_TYPE_16 = 16 };
+
+// 0x80016EA0
+// Clear the prompt (optionally with the hide animation).
+extern "C" void ExplorationPromptClear(BOOL animate) {
+    void* set = ScreenSetsCurrent(gScreenSets);
+    if (set == NULL) return;
+    void* w = ScreenSetFindWidget(set, UI_EXPLORATION_SCREEN);
+    if (w != NULL && animate) UIElement_PlayUIAnim(UI_PROMPT_ANIM_TARGET, 0x784097C0);
+    if (!ScreenSetWidgetVisible(set, w)) return;
+
+    void* text = UIWidgetFindChild(w, UI_PROMPT_TEXT);
+    void* header = UIWidgetFindChild(w, UI_PROMPT_HEADER);
+    BOOL shown = (text != NULL && strcmp(UITextGetString(text), "") != 0) ||
+                 (header != NULL && strcmp(UITextGetString(header), "") != 0);
+    if (!shown) return;
+
+    UIEvent_SendToScreen(0x798F99BC, UI_EXPLORATION_SCREEN);
+    UIText_SetString_TextID(UI_PROMPT_TEXT, TEXT_NONE);
+    UIText_SetString_TextID(UI_PROMPT_HEADER, TEXT_NONE);
+}
+
+// Prompt text per challenge (StringHash of the challenge id stored on the node).
+static inline s32 ChallengePromptText(u32 challenge) {
+    switch (challenge) {
+    case 0xA41D84B9: return 0x3CB;
+    case 0xC4CE4FC3: return 0x3C1;
+    case 0x711A757D: return 0x3C5;
+    case 0x0144CE0D: return 0x3D1;
+    case 0x1EF3AA63: return 0x3C3;
+    case 0xF3CC643A: return 0x3CD;
+    case 0x01C00E16: return 0x3DC;
+    case 0x4B9FE6EB: return 0x3C2;
+    case 0xBAC3287F: return 0x3D6;
+    case 0x5D664B82: return 0x3DA;
+    }
+    return TEXT_NONE;
+}
+
+// 0x80016FD0
+// Show the prompt for the node `c` is on. If the exploration screen isn't up yet, remember
+// to do it later (character_exploration_move_update picks the flag up).
+extern "C" void fn_80016FD0(Character* c, int animate) {
+    if (c == NULL || fn_800E6BD4()) return;
+
+    void* set = ScreenSetsCurrent(gScreenSets);
+    if (set != NULL) {
+        void* w = ScreenSetFindWidget(set, UI_EXPLORATION_SCREEN);
+        if (w == NULL || !ScreenSetWidgetVisible(set, w)) {
+            *((u8*)c + 0x9F8) = 1;
+            return;
+        }
+        if (animate) {
+            fn_80044F20();
+            UIElement_PlayUIAnim(UI_PROMPT_ANIM_TARGET, 0x4A4CBE89);
+        }
+    }
+    if (c->path == NULL) return;
+
+    s32 text = TEXT_NONE, header = TEXT_NONE;
+    BOOL show = FALSE;
+    switch (PathGetNodeType(c->path)) {
+    case NODE_TYPE_8:
+        text = 0x3CC;
+        show = TRUE;
+        break;
+    case NODE_CHALLENGE:
+        header = 0x567;
+        text = ChallengePromptText((u32)PathGetChallengeId(c->path));
+        show = TRUE;
+        break;
+    case NODE_TYPE_4:
+        text = 0x3D8;
+        show = TRUE;
+        break;
+    case NODE_TYPE_16:
+        text = 0x3D3;
+        show = TRUE;
+        break;
+    }
+    if (!PathIsAtJunction(c->path)) show = FALSE;
+    if (PathGetNodeText(c->path) != 0) {
+        text = PathGetNodeText(c->path);
+        header = TEXT_NONE;
+        show = TRUE;
+    }
+    if (!show) return;
+
+    UIEvent_SendToScreen(0xFE181559, UI_EXPLORATION_SCREEN);
+    UIText_SetString_TextID(UI_PROMPT_TEXT, text);
+    UIText_SetString_TextID(UI_PROMPT_HEADER, header);
+}
+
 // Not yet decompiled callbacks.
 BOOL target_node_selected(ScriptCtx* ctx);
 BOOL target_node_changed(ScriptCtx* ctx);
 void character_exploration_idle_update(ScriptCtx* ctx);
-void character_exploration_move_update(ScriptCtx* ctx);
 void character_race_update(ScriptCtx* ctx);
-void character_challenge_entry(ScriptCtx* ctx);
-void character_Interaction_entry(ScriptCtx* ctx);
 
 // 0x80016400
 void RegisterCharacterStateCallbacks(void) {

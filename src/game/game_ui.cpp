@@ -14,7 +14,7 @@ void  EventMgrCtor(void* mgr);                         // 0x801B9C0C
 void  ScreenMgrLoad(void* screens);                     // 0x801BC574
 void  HudFadeOut(void* hud);                            // 0x8001B128
 void  HudFadeIn(void* hud);                             // 0x8001B164
-void  HudSetMode(void* hud, s32 mode);                  // 0x8001B0B8
+void  HudShowConversation(void* hud, s32 conversation);  // 0x8001B0B8
 void  HudInit(void* hud, void* screens);                // 0x8001AFB4
 void  HudReset(void* hud);                              // 0x8001AFCC
 BOOL  InputIsBusy(void* input);                         // 0x801432FC
@@ -147,7 +147,7 @@ void GameFlowSleep(void) {
 
 // 0x8000C95C
 void GameFlowPush(s32 mode) {
-    HudSetMode(SIR_HUD, mode);
+    HudShowConversation(SIR_HUD, mode);
 }
 
 // 0x8000C970

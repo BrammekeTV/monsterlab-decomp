@@ -8,6 +8,7 @@ import json
 import subprocess
 import sys
 import time
+import urllib.error
 import urllib.request
 
 REPO = "BrammekeTV/monsterlab-decomp"
@@ -15,10 +16,20 @@ API = f"https://api.github.com/repos/{REPO}"
 
 
 def get(url):
+    """GET with the anonymous API limit (60/hour) in mind: on 403/429 wait for the reset."""
     req = urllib.request.Request(url, headers={"Accept": "application/vnd.github+json",
                                                "User-Agent": "ci-status-script"})
-    with urllib.request.urlopen(req, timeout=30) as r:
-        return json.load(r)
+    while True:
+        try:
+            with urllib.request.urlopen(req, timeout=30) as r:
+                return json.load(r)
+        except urllib.error.HTTPError as e:
+            if e.code not in (403, 429):
+                raise
+            reset = int(e.headers.get("X-RateLimit-Reset", time.time() + 60))
+            wait = max(10, min(900, reset - time.time() + 2))
+            print(f"rate limited; waiting {int(wait)} s", flush=True)
+            time.sleep(wait)
 
 
 def main():
@@ -37,7 +48,7 @@ def main():
         if time.time() > deadline:
             print("timeout; runs:", [(r["name"], r["status"]) for r in runs])
             return 2
-        time.sleep(15)
+        time.sleep(60)
 
     failed = False
     for r in runs:

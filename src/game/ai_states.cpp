@@ -414,7 +414,7 @@ BOOL  IsOpponentPreparing_800E75E0(void);
 void* RemoteInputGet(void* table, int idx);              // 0x80021550
 void  RemoteInputUpdate(void* input, f32 dt);            // 0x80020070
 f32   RemoteInputShake(void* input);                     // 0x80020068
-void  fn_80016EA0(int);
+void  ExplorationPromptClear(BOOL animate);            // 0x80016EA0
 void  UIScreen_Push(u32 hash);
 void  UIText_SetString_TextID(u32 hash, s32 textId);
 void  UIElement_SetColor_Floats(u32 hash, f32 r, f32 g, f32 b, f32 a);
@@ -474,7 +474,7 @@ void PumpkinShakeEntry(ScriptCtx* ctx) {
     Vec3 target = c->def->pos;
     CharacterFaceDirection(player, &target, FALSE);
     PauseAllExplorationCharacters();
-    fn_80016EA0(0);
+    ExplorationPromptClear(0);
     UIScreen_Push(UI_SHAKE_SCREEN_A);
     UIScreen_Push(UI_SHAKE_SCREEN_B);
     UIElement_SetVisibleFlag(UI_SHAKE_PROMPT, TRUE);
@@ -525,7 +525,7 @@ void ObstacleShakeEntry(ScriptCtx* ctx) {
     ControlsLock(player, 0);
     player->hazardTimer = 0.0f;           // used as the meter here
     player->waitTimer = 0.0f;
-    fn_80016EA0(0);
+    ExplorationPromptClear(0);
     UIElement_SetVisibleFlag(UI_SHAKE_PROMPT, TRUE);
     UIScreen_Push(UI_SHAKE_SCREEN_A);
     UIScreen_Push(UI_SHAKE_SCREEN_B);
