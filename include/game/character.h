@@ -1,6 +1,7 @@
 #pragma once
 // Characters / scripted entities (partial layout, grown as functions are decompiled).
 #include "engine/math.h"
+#include "revolution.h"   // Mtx
 
 // Path follower used by patrolling characters (Character::path).
 struct PathState {

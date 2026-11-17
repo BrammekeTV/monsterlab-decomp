@@ -2,9 +2,11 @@
 
     python tools/ci_status.py [sha] [--timeout SECONDS]
 
-Uses the public GitHub API (no token needed for this public repo).
+Uses the GitHub CLI (gh) when installed and logged in; otherwise the anonymous API
+(60 requests/hour, or GITHUB_TOKEN if set).
 """
 import json
+import os
 import subprocess
 import sys
 import time
@@ -15,10 +17,33 @@ REPO = "BrammekeTV/monsterlab-decomp"
 API = f"https://api.github.com/repos/{REPO}"
 
 
+def _gh_get(url):
+    """Use the GitHub CLI when it is installed and logged in (gh auth login): 5000 requests/hour."""
+    import shutil
+    gh = shutil.which("gh")
+    default = r"C:\Program Files\GitHub CLI\gh.exe"
+    if gh is None and os.path.exists(default):
+        gh = default
+    if gh is None:
+        return None
+    path = url.replace("https://api.github.com/", "")
+    r = subprocess.run([gh, "api", path], capture_output=True, text=True, encoding="utf-8")
+    if r.returncode != 0:
+        return None
+    return json.loads(r.stdout)
+
+
 def get(url):
-    """GET with the anonymous API limit (60/hour) in mind: on 403/429 wait for the reset."""
-    req = urllib.request.Request(url, headers={"Accept": "application/vnd.github+json",
-                                               "User-Agent": "ci-status-script"})
+    """GET a GitHub API url: via gh if available, else anonymously (60 requests/hour; on
+    403/429 wait for the reset). GITHUB_TOKEN is used for anonymous calls when set."""
+    data = _gh_get(url)
+    if data is not None:
+        return data
+    headers = {"Accept": "application/vnd.github+json", "User-Agent": "ci-status-script"}
+    token = os.environ.get("GITHUB_TOKEN")
+    if token:
+        headers["Authorization"] = f"Bearer {token}"
+    req = urllib.request.Request(url, headers=headers)
     while True:
         try:
             with urllib.request.urlopen(req, timeout=30) as r:
