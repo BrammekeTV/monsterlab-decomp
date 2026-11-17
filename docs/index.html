@@ -290,7 +290,7 @@ async function load() {
   $('ms').innerHTML = feat.milestones.map(m =>
     `<li><span class="jar ${m.status}"></span><div><strong>${esc(m.title)}</strong><span class="st ${m.status}">${STATUS[m.status] || ''}</span><p>${esc(m.detail)}</p></div></li>`).join('');
   $('log').innerHTML = feat.changelog.slice(0, 8).map(c =>
-    `<li><time>${esc(c.date)}</time>${esc(c.text)}</li>`).join('');
+    `<li><time datetime="${esc(c.date)}${c.time ? 'T' + esc(c.time) + '+01:00' : ''}">${esc(c.date)}${c.time ? ' · ' + esc(c.time) + ' CET' : ''}</time>${esc(c.text)}</li>`).join('');
 
   $('libs').innerHTML = '<tr><th>Library</th><th class="num">Functions</th><th>Identified</th></tr>' +
     prog.library_regions.map(r => {

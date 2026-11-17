@@ -69,35 +69,48 @@
   "changelog": [
     {
       "date": "2026-11-17",
-      "text": "Decompiled the UI glue (screen manager, per-zone screen sets from ui/ScreenSets/ScreenSets.csv), the full mode-transition logic, the loading screen, language selection (EN/FR/DE/IT/ES/NL from the Wii system language), the movie queue, background-music requests and the 3D audio listener. 116 game functions decompiled."
+      "time": "20:20",
+      "text": "Decompiled the disc-error screens (no disc / wrong disc / unreadable, with reset and power handling while they are shown), helper-entity spawning and target-lead prediction. Lab notes now show the time of each entry."
     },
     {
       "date": "2026-11-17",
-      "text": "Decompiled the renderer core: a dedicated render thread with a 64-entry command queue, a ring of 17 display-list buffers (144 KB each) recorded by redirecting the GX FIFO, frame-buffer flips and frame pacing on TV retrace, plus RendInit. This is the layer the PC port will replace with a modern GPU backend for 1080p and widescreen."
+      "text": "Decompiled the UI glue (screen manager, per-zone screen sets from ui/ScreenSets/ScreenSets.csv), the full mode-transition logic, the loading screen, language selection (EN/FR/DE/IT/ES/NL from the Wii system language), the movie queue, background-music requests and the 3D audio listener. 116 game functions decompiled.",
+      "time": "20:04"
     },
     {
       "date": "2026-11-17",
-      "text": "Decompiled the top-level game-mode state machine (GameUpdate), including in-game Bink movie playback from fmv/ and fmv_PAL/. Added memory/core init, suspend/resume, view objects and game shutdown. Windows build now runs on GitHub Actions (MSVC)."
+      "text": "Decompiled the renderer core: a dedicated render thread with a 64-entry command queue, a ring of 17 display-list buffers (144 KB each) recorded by redirecting the GX FIFO, frame-buffer flips and frame pacing on TV retrace, plus RendInit. This is the layer the PC port will replace with a modern GPU backend for 1080p and widescreen.",
+      "time": "19:57"
     },
     {
       "date": "2026-11-17",
-      "text": "Decompiled the engine lifecycle (EngineInit, EngineFrame, memory callbacks for the REND and SG modules) and game startup (GameInit, GameStart, which loads global_binary.sir). Planned 1080p, a settings GUI and mod support."
+      "text": "Decompiled the top-level game-mode state machine (GameUpdate), including in-game Bink movie playback from fmv/ and fmv_PAL/. Added memory/core init, suspend/resume, view objects and game shutdown. Windows build now runs on GitHub Actions (MSVC).",
+      "time": "16:19"
     },
     {
       "date": "2026-11-17",
-      "text": "Progress site restyled as a mad-scientist lab: riveted metal panels, wooden shelves, slime-filled test tubes."
+      "text": "Decompiled the engine lifecycle (EngineInit, EngineFrame, memory callbacks for the REND and SG modules) and game startup (GameInit, GameStart, which loads global_binary.sir). Planned 1080p, a settings GUI and mod support.",
+      "time": "16:13"
     },
     {
       "date": "2026-11-17",
-      "text": "Decompiled the boot path (main, SysInit, crash handler, exit handling) and the top-level game loop."
+      "text": "Progress site restyled as a mad-scientist lab: riveted metal panels, wooden shelves, slime-filled test tubes.",
+      "time": "16:02"
     },
     {
       "date": "2026-11-17",
-      "text": "Identified 50+ SDK functions from error strings and call patterns; fixed dtk re-analysis (.sbss2, computed-jump entries)."
+      "text": "Decompiled the boot path (main, SysInit, crash handler, exit handling) and the top-level game loop.",
+      "time": "15:55"
     },
     {
       "date": "2026-11-17",
-      "text": "Project set up: disc extracted, main.dol split with decomp-toolkit, progress site launched."
+      "text": "Identified 50+ SDK functions from error strings and call patterns; fixed dtk re-analysis (.sbss2, computed-jump entries).",
+      "time": "15:55"
+    },
+    {
+      "date": "2026-11-17",
+      "text": "Project set up: disc extracted, main.dol split with decomp-toolkit, progress site launched.",
+      "time": "15:43"
     }
   ]
 }
