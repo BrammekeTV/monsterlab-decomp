@@ -69,6 +69,11 @@
   "changelog": [
     {
       "date": "2026-11-17",
+      "time": "22:36",
+      "text": "Decompiled the level table setup (the hashed name, world, number and weapon-parts keys of every level and arena) and the world memory layout: one 32-byte-aligned block holding every zone record and its entity slots, where some zones get a single slot and the others get the full count."
+    },
+    {
+      "date": "2026-11-17",
       "time": "22:32",
       "text": "Generated the entity factory that builds a level's scripted objects from their names (e.g. the saw paths of the buzz-saw experiment, the grow-juice tubes, castle braziers): 159 object names mapped to 48 object classes. The largest graphics-only functions (material parameter tables, render clears) are deferred, since the PC renderer replaces that layer."
     },

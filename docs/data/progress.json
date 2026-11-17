@@ -1,15 +1,15 @@
 {
  "game_id": "RM7P4F",
- "generated": "2026-11-17T21:32:30+00:00",
- "commit": "9bc30ee",
- "commit_date": "2026-11-17T22:27:35+01:00",
+ "generated": "2026-11-17T21:36:13+00:00",
+ "commit": "33b2a18",
+ "commit_date": "2026-11-17T22:36:02+01:00",
  "game": {
   "functions": 8548,
   "bytes": 2265988,
-  "named": 2380,
-  "named_bytes": 467716,
-  "decompiled": 338,
-  "decompiled_bytes": 138992
+  "named": 2382,
+  "named_bytes": 476396,
+  "decompiled": 340,
+  "decompiled_bytes": 147672
  },
  "library": {
   "functions": 4039,
@@ -22,10 +22,10 @@
  "all": {
   "functions": 12587,
   "bytes": 3404928,
-  "named": 2838,
-  "named_bytes": 571860,
-  "decompiled": 338,
-  "decompiled_bytes": 138992
+  "named": 2840,
+  "named_bytes": 580540,
+  "decompiled": 340,
+  "decompiled_bytes": 147672
  },
  "game_range": [
   "80006B40",
@@ -505,8 +505,8 @@
    1.0
   ],
   [
-   0.0,
-   0.395
+   0.488,
+   0.883
   ],
   [
    0.0,
@@ -937,8 +937,8 @@
    0.068
   ],
   [
-   0.0,
-   0.019
+   0.459,
+   0.478
   ],
   [
    0.0,
@@ -2458,6 +2458,16 @@
    ]
   },
   {
+   "path": "src/game/level_table.cpp",
+   "functions": [
+    {
+     "name": "InitNameHashes",
+     "addr": "801078F4",
+     "size": 4044
+    }
+   ]
+  },
+  {
    "path": "src/game/part_query.cpp",
    "functions": [
     {
@@ -2874,6 +2884,16 @@
      "name": "GetOne",
      "addr": "80014208",
      "size": 8
+    }
+   ]
+  },
+  {
+   "path": "src/game/world_alloc.cpp",
+   "functions": [
+    {
+     "name": "WorldDataCreate",
+     "addr": "801F0704",
+     "size": 4636
     }
    ]
   },
