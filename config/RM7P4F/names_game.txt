@@ -405,3 +405,7 @@ fn_80071BB4 CreateEntityByType
 fn_801D4414 ObjAlloc
 fn_801078F4 InitNameHashes
 lbl_80369908 gLevelTable
+fn_801F0704 WorldDataCreate
+lbl_805FB944 sWorldParams
+lbl_805FB94C gZoneResourceSize
+lbl_805FB940 sEntitySlotBytes
