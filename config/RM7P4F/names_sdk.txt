@@ -49,3 +49,6 @@ fn_8024AF24 GXFlush
 fn_8032FA98 __cvt_ull_flt
 fn_8025394C DVDGetDriveStatus
 fn_80272E3C WPADControlMotor
+fn_80268194 NANDCheck
+fn_80338910 strcmp
+fn_80336E38 snprintf

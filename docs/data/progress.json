@@ -1,31 +1,31 @@
 {
  "game_id": "RM7P4F",
- "generated": "2026-11-17T19:07:30+00:00",
- "commit": "6cfebe9",
- "commit_date": "2026-11-17T20:04:15+01:00",
+ "generated": "2026-11-17T19:11:22+00:00",
+ "commit": "f8f327f",
+ "commit_date": "2026-11-17T20:07:40+01:00",
  "game": {
   "functions": 8559,
   "bytes": 2277304,
-  "named": 189,
-  "named_bytes": 50308,
-  "decompiled": 130,
-  "decompiled_bytes": 19228
+  "named": 209,
+  "named_bytes": 57940,
+  "decompiled": 141,
+  "decompiled_bytes": 22420
  },
  "library": {
   "functions": 4028,
   "bytes": 1127624,
-  "named": 443,
-  "named_bytes": 91676,
+  "named": 446,
+  "named_bytes": 92440,
   "decompiled": 0,
   "decompiled_bytes": 0
  },
  "all": {
   "functions": 12587,
   "bytes": 3404928,
-  "named": 632,
-  "named_bytes": 141984,
-  "decompiled": 130,
-  "decompiled_bytes": 19228
+  "named": 655,
+  "named_bytes": 150380,
+  "decompiled": 141,
+  "decompiled_bytes": 22420
  },
  "game_range": [
   "80006B40",
@@ -49,12 +49,12 @@
    0.509
   ],
   [
-   0.339,
-   0.49
+   0.619,
+   0.77
   ],
   [
-   0.0,
-   0.0
+   0.089,
+   0.319
   ],
   [
    0.0,
@@ -734,7 +734,7 @@
   ],
   [
    0.0,
-   0.0
+   0.013
   ],
   [
    0.0,
@@ -890,7 +890,7 @@
   ],
   [
    0.0,
-   0.054
+   0.102
   ],
   [
    0.0,
@@ -974,7 +974,7 @@
   ],
   [
    0.0,
-   0.0
+   0.187
   ],
   [
    0.0,
@@ -1130,8 +1130,8 @@
    "end": "8026E000",
    "functions": 211,
    "bytes": 41096,
-   "named": 46,
-   "named_bytes": 9484,
+   "named": 47,
+   "named_bytes": 9748,
    "decompiled": 0,
    "decompiled_bytes": 0
   },
@@ -1163,8 +1163,8 @@
    "end": "8033F400",
    "functions": 399,
    "bytes": 114196,
-   "named": 46,
-   "named_bytes": 13244,
+   "named": 48,
+   "named_bytes": 13744,
    "decompiled": 0,
    "decompiled_bytes": 0
   },
@@ -1783,6 +1783,66 @@
      "name": "GameUpdate",
      "addr": "8000D9EC",
      "size": 2140
+    }
+   ]
+  },
+  {
+   "path": "src/game/save.cpp",
+   "functions": [
+    {
+     "name": "SaveResetBanner",
+     "addr": "80011018",
+     "size": 12
+    },
+    {
+     "name": "SaveGameWrite",
+     "addr": "80011024",
+     "size": 936
+    },
+    {
+     "name": "SaveGameRead",
+     "addr": "800113CC",
+     "size": 592
+    },
+    {
+     "name": "SaveInit",
+     "addr": "8001161C",
+     "size": 312
+    },
+    {
+     "name": "SaveInitDefault",
+     "addr": "80011754",
+     "size": 12
+    },
+    {
+     "name": "DrawLoadingImage",
+     "addr": "80011760",
+     "size": 356
+    },
+    {
+     "name": "SaveSetupBanner",
+     "addr": "800118C4",
+     "size": 156
+    },
+    {
+     "name": "SaveFileExists",
+     "addr": "80011960",
+     "size": 168
+    },
+    {
+     "name": "fn_80011A08",
+     "addr": "80011A08",
+     "size": 4
+    },
+    {
+     "name": "SaveSetNames",
+     "addr": "80011A0C",
+     "size": 436
+    },
+    {
+     "name": "SaveSelectBannerLayout",
+     "addr": "80011BC0",
+     "size": 208
     }
    ]
   },

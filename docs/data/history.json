@@ -4,16 +4,16 @@
   "game": {
    "functions": 8559,
    "bytes": 2277304,
-   "named": 189,
-   "named_bytes": 50308,
-   "decompiled": 130,
-   "decompiled_bytes": 19228
+   "named": 209,
+   "named_bytes": 57940,
+   "decompiled": 141,
+   "decompiled_bytes": 22420
   },
   "library": {
    "functions": 4028,
    "bytes": 1127624,
-   "named": 443,
-   "named_bytes": 91676,
+   "named": 446,
+   "named_bytes": 92440,
    "decompiled": 0,
    "decompiled_bytes": 0
   }
