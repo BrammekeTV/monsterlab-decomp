@@ -50,6 +50,52 @@ void*  OSInitAlloc(void* lo, void* hi, int maxHeaps);
 int    OSCreateHeap(void* lo, void* hi);
 int    OSSetCurrentHeap(int heap);
 
+void   DCFlushRange(void* addr, u32 size);
+void   DCInvalidateRange(void* addr, u32 size);
+
+// Threads and semaphores
+typedef struct OSThreadQueue { struct OSThread* head; struct OSThread* tail; } OSThreadQueue;
+typedef struct OSThread { u8 opaque[0x318]; } OSThread;
+typedef struct OSSemaphore { s32 count; OSThreadQueue queue; } OSSemaphore;   // 0xC bytes
+typedef void* (*OSThreadFunc)(void* arg);
+enum { OS_THREAD_ATTR_DETACH = 1 };
+
+BOOL   OSCreateThread(OSThread* thread, OSThreadFunc func, void* param, void* stackTop,
+                      u32 stackSize, s32 priority, u16 attr);
+s32    OSResumeThread(OSThread* thread);
+void   OSInitSemaphore(OSSemaphore* sem, s32 count);
+s32    OSWaitSemaphore(OSSemaphore* sem);
+s32    OSSignalSemaphore(OSSemaphore* sem);
+s32    OSGetSemaphoreCount(OSSemaphore* sem);
+
+// ---- VI ----
+typedef void (*VIRetraceCallback)(u32 retraceCount);
+void   VIInit(void);
+VIRetraceCallback VISetPreRetraceCallback(VIRetraceCallback cb);
+VIRetraceCallback VISetPostRetraceCallback(VIRetraceCallback cb);
+void   VISetNextFrameBuffer(void* fb);
+void   VISetBlack(BOOL black);
+void   VIFlush(void);
+u32    VIGetTvFormat(void);
+
+// ---- GX ----
+typedef struct GXFifoObj { u8 pad[0x80]; } GXFifoObj;
+// Write-gather pipe (0xCC008000 on hardware); the platform layer provides a recorder.
+typedef union PPCWGPipe { u8 _u8; u16 _u16; u32 _u32; s32 _s32; f32 _f32; } PPCWGPipe;
+extern volatile PPCWGPipe GXWGFifo;
+typedef f32 Mtx[3][4];
+enum { GX_PTTEXMTX0 = 64, GX_MTX3x4 = 0 };
+void   GXInitFifoBase(GXFifoObj* fifo, void* base, u32 size);
+void   GXInitFifoPtrs(GXFifoObj* fifo, void* readPtr, void* writePtr);
+void   GXGetFifoPtrs(GXFifoObj* fifo, void** readPtr, void** writePtr);
+void   GXSetCPUFifo(GXFifoObj* fifo);
+void   GXSetGPFifo(GXFifoObj* fifo);
+void   GXSaveCPUFifo(GXFifoObj* fifo);
+void   GXSaveGPFifo(GXFifoObj* fifo);
+void   GXGetGPStatus(u8* overhi, u8* underlow, u8* readIdle, u8* cmdIdle, u8* brkpt);
+void   GXFlush(void);
+void   GXLoadTexMtxImm(const Mtx m, u32 id, int type);
+
 #define OS_TIMER_CLOCK (OSGetBusClock() / 4)
 #define OSTicksToMicroseconds(ticks) (((ticks) * 8) / (OS_TIMER_CLOCK / 125000))
 

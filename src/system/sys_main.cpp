@@ -12,8 +12,8 @@ extern "C" void fn_80264F70(void);
 
 // ---- data ----
 static BOOL        sInitialized;               ORIG(0x805FB460)
-static MEMAllocator sDefaultAllocator;         ORIG(0x803F2870) // MEM1 OS heap
-static MEMAllocator sMEM2Allocator;            ORIG(0x803F2880) // MEM2 expanded heap
+MEMAllocator       gSysAllocator;              ORIG(0x803F2870) // MEM1 OS heap
+MEMAllocator       gSygSysMEM2Allocator;          ORIG(0x803F2880) // MEM2 expanded heap
 static SysExitMode sExitMode;                  ORIG(0x805FB45C) // requested by reset/power
 u8                 gSysExitEnabled = 1;        ORIG(0x805F90F0)
 SysEventCallback   gSysEventCallback;          ORIG(0x805F90F4)
@@ -28,12 +28,12 @@ static const char* const sErrorNames[] = {     ORIG(0x80375D98)
 
 // 0x801429CC
 void* SysAllocMEM2(u32 size) {
-    return MEMAllocFromAllocator(&sMEM2Allocator, size);
+    return MEMAllocFromAllocator(&gSysMEM2Allocator, size);
 }
 
 // 0x801429DC
 BOOL SysFreeMEM2(void* ptr) {
-    MEMFreeToAllocator(&sMEM2Allocator, ptr);
+    MEMFreeToAllocator(&gSysMEM2Allocator, ptr);
     return TRUE;
 }
 
@@ -107,14 +107,14 @@ void SysInit(void) {
     OSSetMEM1ArenaHi(hi);
     int heap = OSCreateHeap(lo, hi);
     OSSetCurrentHeap(heap);
-    MEMInitAllocatorForOSHeap(&sDefaultAllocator, heap);
+    MEMInitAllocatorForOSHeap(&gSysAllocator, heap);
 
     // MEM2: one expanded heap; also used by WPAD.
     u8* lo2 = (u8*)OSGetMEM2ArenaLo();
     u8* hi2 = (u8*)OSGetMEM2ArenaHi();
     MEMHeapHandle heap2 = MEMCreateExpHeapEx(lo2, (u32)(hi2 - lo2), 0);
     OSSetMEM2ArenaLo(hi2);
-    MEMInitAllocatorForExpHeap(&sMEM2Allocator, heap2, 32);
+    MEMInitAllocatorForExpHeap(&gSysMEM2Allocator, heap2, 32);
 
     WPADRegisterAllocator(SysAllocMEM2, SysFreeMEM2);
     KPADInit();

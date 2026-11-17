@@ -1,95 +1,99 @@
 {
- "milestones": [
-  {
-   "title": "Disc extracted",
-   "detail": "main.dol + 2.5 GB of game data pulled from the PAL disc (RM7P4F).",
-   "status": "done"
-  },
-  {
-   "title": "Executable split & analysed",
-   "detail": "decomp-toolkit finds 12,580 functions in 707 objects; game code at 0x80006B40–0x80232AF8.",
-   "status": "done"
-  },
-  {
-   "title": "Tooling",
-   "detail": "Cross-reference, renaming and progress scripts; this site updates on every push.",
-   "status": "done"
-  },
-  {
-   "title": "Boot path decompiled",
-   "detail": "main(), SDK init, heaps, reset/power handling, crash screen, top-level game loop.",
-   "status": "done"
-  },
-  {
-   "title": "Engine & game systems",
-   "detail": "Engine init/frame/shutdown and game startup done; next: renderer, scene graph, UI engine, task system, world, monsters, battles.",
-   "status": "in_progress"
-  },
-  {
-   "title": "PC build compiles",
-   "detail": "CMake + MSVC build on GitHub Actions. All decompiled sources compile; linking waits on the platform layer.",
-   "status": "in_progress"
-  },
-  {
-   "title": "Platform layer",
-   "detail": "Replace the Wii SDK: GX→OpenGL/Vulkan, AX→SDL audio, WPAD→gamepad + mouse pointer, DVD/NAND→files.",
-   "status": "todo"
-  },
-  {
-   "title": "Asset formats",
-   "detail": ".sir containers (PNP0), DSP-ADPCM audio, Bink video, MIDI + wavetable music.",
-   "status": "todo"
-  },
-  {
-   "title": "Boots to title screen",
-   "detail": "First visible frame on Windows.",
-   "status": "todo"
-  },
-  {
-   "title": "1080p & widescreen",
-   "detail": "Render at any resolution (1080p, 1440p, 4K) with internal resolution scaling; native 16:9 using the game's own widescreen support.",
-   "status": "todo"
-  },
-  {
-   "title": "Settings GUI",
-   "detail": "In-game options overlay (F1) + config.ini: resolution, fullscreen, V-sync, FPS cap, render scale, MSAA, texture filtering, audio, controls.",
-   "status": "todo"
-  },
-  {
-   "title": "Mod support",
-   "detail": "Virtual file system: mods/<name>/files/ overrides any disc file; load order via mods.ini, toggled in the settings GUI.",
-   "status": "todo"
-  },
-  {
-   "title": "Playable",
-   "detail": "Full game playable from start to finish on PC.",
-   "status": "todo"
-  }
- ],
- "changelog": [
-  {
-   "date": "2026-11-17",
-   "text": "Decompiled the top-level game-mode state machine (GameUpdate), including in-game Bink movie playback from fmv/ and fmv_PAL/. Added memory/core init, suspend/resume, view objects and game shutdown. Windows build now runs on GitHub Actions (MSVC)."
-  },
-  {
-   "date": "2026-11-17",
-   "text": "Decompiled the engine lifecycle (EngineInit, EngineFrame, memory callbacks for the REND and SG modules) and game startup (GameInit, GameStart, which loads global_binary.sir). Planned 1080p, a settings GUI and mod support."
-  },
-  {
-   "date": "2026-11-17",
-   "text": "Progress site restyled as a mad-scientist lab: riveted metal panels, wooden shelves, slime-filled test tubes."
-  },
-  {
-   "date": "2026-11-17",
-   "text": "Decompiled the boot path (main, SysInit, crash handler, exit handling) and the top-level game loop."
-  },
-  {
-   "date": "2026-11-17",
-   "text": "Identified 50+ SDK functions from error strings and call patterns; fixed dtk re-analysis (.sbss2, computed-jump entries)."
-  },
-  {
-   "date": "2026-11-17",
-   "text": "Project set up: disc extracted, main.dol split with decomp-toolkit, progress site launched."
-  }
- ]
+  "milestones": [
+    {
+      "title": "Disc extracted",
+      "detail": "main.dol + 2.5 GB of game data pulled from the PAL disc (RM7P4F).",
+      "status": "done"
+    },
+    {
+      "title": "Executable split & analysed",
+      "detail": "decomp-toolkit finds 12,580 functions in 707 objects; game code at 0x80006B40–0x80232AF8.",
+      "status": "done"
+    },
+    {
+      "title": "Tooling",
+      "detail": "Cross-reference, renaming and progress scripts; this site updates on every push.",
+      "status": "done"
+    },
+    {
+      "title": "Boot path decompiled",
+      "detail": "main(), SDK init, heaps, reset/power handling, crash screen, top-level game loop.",
+      "status": "done"
+    },
+    {
+      "title": "Engine & game systems",
+      "detail": "Engine init/frame/shutdown, game startup, mode state machine and the renderer core (render thread, display lists, frame pacing) done; next: GX state, render targets, scene graph, UI, world, monsters, battles.",
+      "status": "in_progress"
+    },
+    {
+      "title": "PC build compiles",
+      "detail": "CMake + MSVC build on GitHub Actions. All decompiled sources compile; linking waits on the platform layer.",
+      "status": "in_progress"
+    },
+    {
+      "title": "Platform layer",
+      "detail": "Replace the Wii SDK: GX→OpenGL/Vulkan, AX→SDL audio, WPAD→gamepad + mouse pointer, DVD/NAND→files.",
+      "status": "todo"
+    },
+    {
+      "title": "Asset formats",
+      "detail": ".sir containers (PNP0), DSP-ADPCM audio, Bink video, MIDI + wavetable music.",
+      "status": "todo"
+    },
+    {
+      "title": "Boots to title screen",
+      "detail": "First visible frame on Windows.",
+      "status": "todo"
+    },
+    {
+      "title": "1080p & widescreen",
+      "detail": "Render at any resolution (1080p, 1440p, 4K) with internal resolution scaling; native 16:9 using the game's own widescreen support.",
+      "status": "todo"
+    },
+    {
+      "title": "Settings GUI",
+      "detail": "In-game options overlay (F1) + config.ini: resolution, fullscreen, V-sync, FPS cap, render scale, MSAA, texture filtering, audio, controls.",
+      "status": "todo"
+    },
+    {
+      "title": "Mod support",
+      "detail": "Virtual file system: mods/<name>/files/ overrides any disc file; load order via mods.ini, toggled in the settings GUI.",
+      "status": "todo"
+    },
+    {
+      "title": "Playable",
+      "detail": "Full game playable from start to finish on PC.",
+      "status": "todo"
+    }
+  ],
+  "changelog": [
+    {
+      "date": "2026-11-17",
+      "text": "Decompiled the renderer core: a dedicated render thread with a 64-entry command queue, a ring of 17 display-list buffers (144 KB each) recorded by redirecting the GX FIFO, frame-buffer flips and frame pacing on TV retrace, plus RendInit. This is the layer the PC port will replace with a modern GPU backend for 1080p and widescreen."
+    },
+    {
+      "date": "2026-11-17",
+      "text": "Decompiled the top-level game-mode state machine (GameUpdate), including in-game Bink movie playback from fmv/ and fmv_PAL/. Added memory/core init, suspend/resume, view objects and game shutdown. Windows build now runs on GitHub Actions (MSVC)."
+    },
+    {
+      "date": "2026-11-17",
+      "text": "Decompiled the engine lifecycle (EngineInit, EngineFrame, memory callbacks for the REND and SG modules) and game startup (GameInit, GameStart, which loads global_binary.sir). Planned 1080p, a settings GUI and mod support."
+    },
+    {
+      "date": "2026-11-17",
+      "text": "Progress site restyled as a mad-scientist lab: riveted metal panels, wooden shelves, slime-filled test tubes."
+    },
+    {
+      "date": "2026-11-17",
+      "text": "Decompiled the boot path (main, SysInit, crash handler, exit handling) and the top-level game loop."
+    },
+    {
+      "date": "2026-11-17",
+      "text": "Identified 50+ SDK functions from error strings and call patterns; fixed dtk re-analysis (.sbss2, computed-jump entries)."
+    },
+    {
+      "date": "2026-11-17",
+      "text": "Project set up: disc extracted, main.dol split with decomp-toolkit, progress site launched."
+    }
+  ]
 }

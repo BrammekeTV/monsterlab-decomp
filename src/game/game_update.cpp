@@ -8,6 +8,7 @@
 
 #include "engine/engine.h"
 #include "engine/view.h"
+#include "engine/rend.h"
 #include "game/game.h"
 
 extern "C" {
@@ -23,7 +24,7 @@ void  fn_8020A680(void); void fn_8020A69C(int); void fn_8000FACC(void); void fn_
 s32   AcquireZoneSlot(void);                            // 0x80131A20 ("lock_available_zone_slot waiting...")
 void  ReleaseZoneSlot(void);                            // 0x80131C28
 void  GameLog(int level, int category, const char* fmt, ...);   // 0x8000B2F0
-s32   VideoIsPal50(void* video);                         // 0x8015DE24: video height == 520
+s32   VideoIsPal50(RendVideo* video);                    // 0x8015DE24: video height == 520
 void  AudioSetPaused(void* audio, int paused);           // 0x801FF708 (provisional)
 void  MoviePlay(void* player, const char* path, int a, u32 b, s32 moreQueued, u32 duration, u32 c, int d);   // 0x802049E0
 void  fn_8000B6A0(void*, int);
@@ -51,7 +52,6 @@ extern u8         gIsReturningPlayer;   ORIG(0x805FAEA8)
 extern u8         gWorldState[];        ORIG(0x803E6D00)
 extern View*      gMainView;            ORIG(0x805FB75C)
 extern u8         lbl_8047C7D8[], lbl_8047C7F0[], lbl_805FAEB0[], lbl_803C4298[];
-extern u8         gVideo[];             ORIG(0x805FB558)
 extern u8         gMoviePlayer[];       ORIG(0x805FB7E8)
 extern s32        gAudioOverride;       ORIG(0x805FBA30)
 extern u32        lbl_805FAEB8;
@@ -161,7 +161,7 @@ static void PlayQueuedMovies(void) {
 
         if (entry->name[0] != '\0') {
             char path[0xC0];
-            strcpy(path, VideoIsPal50(gVideo) ? "./fmv_PAL/" : "./fmv/");
+            strcpy(path, VideoIsPal50(&gVideo) ? "./fmv_PAL/" : "./fmv/");
             strcat(path, entry->name);
             strcat(path, ".bik");
             BOOL moreQueued = !MovieQueueIsEmpty(&gMovieQueue);

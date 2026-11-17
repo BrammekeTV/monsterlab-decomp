@@ -29,17 +29,17 @@ extern "C" {
 void* MEMAllocFromAllocator(struct MEMAllocator* allocator, u32 size);
 void  MEMFreeToAllocator(struct MEMAllocator* allocator, void* block);
 }
-extern struct MEMAllocator* const gSysMEM2Allocator;   // &sMEM2Allocator (0x803F2880)
+
 
 // 0x801FAEB0
 // Duplicate of SysAllocMEM2 compiled into this translation unit.
 extern "C" void* SysAllocMEM2Block(u32 size) {
-    return MEMAllocFromAllocator(gSysMEM2Allocator, size);
+    return MEMAllocFromAllocator(&gSysMEM2Allocator, size);
 }
 
 // 0x801FAEC0
 extern "C" void SysFreeMEM2Block(void* ptr) {
-    MEMFreeToAllocator(gSysMEM2Allocator, ptr);
+    MEMFreeToAllocator(&gSysMEM2Allocator, ptr);
 }
 
 // 0x801FAED0

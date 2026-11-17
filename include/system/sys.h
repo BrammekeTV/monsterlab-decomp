@@ -1,5 +1,6 @@
 #pragma once
 #include "types.h"
+#include "revolution.h"
 
 enum SysExitMode {
     SYS_EXIT_NONE = 0,
@@ -26,3 +27,7 @@ SysExitMode SysGetExitMode(void);
 SysExitMode SysGetRequestedExitMode(void);
 
 int GameMain(int argc, char** argv);
+
+// System heaps (sys_main.cpp)
+extern MEMAllocator gSysAllocator;       // 0x803F2870: MEM1 OS heap
+extern MEMAllocator gSysMEM2Allocator;   // 0x803F2880: MEM2 expanded heap

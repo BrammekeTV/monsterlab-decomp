@@ -1,31 +1,31 @@
 {
  "game_id": "RM7P4F",
- "generated": "2026-11-17T15:19:47+00:00",
- "commit": "4d6c6a1",
- "commit_date": "2026-11-17T16:17:04+01:00",
+ "generated": "2026-11-17T18:57:37+00:00",
+ "commit": "9287a45",
+ "commit_date": "2026-11-17T16:19:55+01:00",
  "game": {
   "functions": 8559,
   "bytes": 2277304,
-  "named": 83,
-  "named_bytes": 28032,
-  "decompiled": 45,
-  "decompiled_bytes": 7592
+  "named": 112,
+  "named_bytes": 36988,
+  "decompiled": 63,
+  "decompiled_bytes": 11424
  },
  "library": {
   "functions": 4028,
   "bytes": 1127624,
-  "named": 420,
-  "named_bytes": 86728,
+  "named": 439,
+  "named_bytes": 91048,
   "decompiled": 0,
   "decompiled_bytes": 0
  },
  "all": {
   "functions": 12587,
   "bytes": 3404928,
-  "named": 503,
-  "named_bytes": 114760,
-  "decompiled": 45,
-  "decompiled_bytes": 7592
+  "named": 551,
+  "named_bytes": 128036,
+  "decompiled": 63,
+  "decompiled_bytes": 11424
  },
  "game_range": [
   "80006B40",
@@ -626,15 +626,15 @@
   ],
   [
    0.0,
-   0.0
+   0.053
   ],
   [
    0.0,
    0.0
   ],
   [
-   0.0,
-   0.132
+   0.156,
+   0.158
   ],
   [
    0.0,
@@ -654,19 +654,19 @@
   ],
   [
    0.0,
-   0.0
+   0.071
   ],
   [
-   0.0,
-   0.0
+   0.058,
+   0.058
   ],
   [
-   0.0,
-   0.0
+   0.067,
+   0.622
   ],
   [
-   0.0,
-   0.002
+   0.156,
+   0.162
   ],
   [
    0.0,
@@ -882,7 +882,7 @@
   ],
   [
    0.009,
-   0.365
+   0.383
   ],
   [
    0.012,
@@ -1064,8 +1064,8 @@
    "end": "80241000",
    "functions": 289,
    "bytes": 58912,
-   "named": 157,
-   "named_bytes": 30084,
+   "named": 163,
+   "named_bytes": 31672,
    "decompiled": 0,
    "decompiled_bytes": 0
   },
@@ -1097,8 +1097,8 @@
    "end": "80253000",
    "functions": 243,
    "bytes": 63088,
-   "named": 19,
-   "named_bytes": 7464,
+   "named": 31,
+   "named_bytes": 10036,
    "decompiled": 0,
    "decompiled_bytes": 0
   },
@@ -1163,8 +1163,8 @@
    "end": "8033F400",
    "functions": 399,
    "bytes": 114196,
-   "named": 44,
-   "named_bytes": 13016,
+   "named": 45,
+   "named_bytes": 13176,
    "decompiled": 0,
    "decompiled_bytes": 0
   },
@@ -1298,6 +1298,111 @@
      "name": "CoreShutdown",
      "addr": "801D5674",
      "size": 48
+    }
+   ]
+  },
+  {
+   "path": "src/engine/rend_dl.cpp",
+   "functions": [
+    {
+     "name": "RendDLCreate",
+     "addr": "8015B998",
+     "size": 96
+    },
+    {
+     "name": "RendDLBegin",
+     "addr": "8015B9F8",
+     "size": 56
+    },
+    {
+     "name": "RendDLEnd",
+     "addr": "8015BA4C",
+     "size": 364
+    },
+    {
+     "name": "RendDLGetBase",
+     "addr": "8015BBB8",
+     "size": 8
+    },
+    {
+     "name": "VideoRunDL",
+     "addr": "8015D2EC",
+     "size": 192
+    },
+    {
+     "name": "VideoInitDLFifo",
+     "addr": "8015D3AC",
+     "size": 152
+    },
+    {
+     "name": "VideoBeginCapture",
+     "addr": "8015D444",
+     "size": 120
+    },
+    {
+     "name": "VideoEndCapture",
+     "addr": "8015D4BC",
+     "size": 116
+    }
+   ]
+  },
+  {
+   "path": "src/engine/rend_init.cpp",
+   "functions": [
+    {
+     "name": "RendDLPoolInit",
+     "addr": "8014DD84",
+     "size": 228
+    },
+    {
+     "name": "RendInit",
+     "addr": "8014E664",
+     "size": 1128
+    }
+   ]
+  },
+  {
+   "path": "src/engine/rend_thread.cpp",
+   "functions": [
+    {
+     "name": "RendThreadMain",
+     "addr": "8015E1E0",
+     "size": 520
+    },
+    {
+     "name": "RendThreadEntry",
+     "addr": "8015E3E8",
+     "size": 36
+    },
+    {
+     "name": "RendRetraceCallback",
+     "addr": "8015E40C",
+     "size": 192
+    },
+    {
+     "name": "RendThreadInit",
+     "addr": "8015E4CC",
+     "size": 260
+    },
+    {
+     "name": "RendThreadSubmitDL",
+     "addr": "8015E5D0",
+     "size": 132
+    },
+    {
+     "name": "RendThreadSync",
+     "addr": "8015E930",
+     "size": 168
+    },
+    {
+     "name": "RendWaitFreeDL",
+     "addr": "8015EA34",
+     "size": 12
+    },
+    {
+     "name": "RendHasFreeDL",
+     "addr": "8015EAF4",
+     "size": 52
     }
    ]
   },
