@@ -1,15 +1,15 @@
 {
  "game_id": "RM7P4F",
- "generated": "2026-11-17T19:21:35+00:00",
- "commit": "3948764",
- "commit_date": "2026-11-17T20:16:26+01:00",
+ "generated": "2026-11-17T19:25:56+00:00",
+ "commit": "7405793",
+ "commit_date": "2026-11-17T20:21:37+01:00",
  "game": {
   "functions": 8559,
   "bytes": 2277304,
-  "named": 2257,
-  "named_bytes": 342784,
-  "decompiled": 169,
-  "decompiled_bytes": 26172
+  "named": 2268,
+  "named_bytes": 344060,
+  "decompiled": 192,
+  "decompiled_bytes": 28764
  },
  "library": {
   "functions": 4028,
@@ -22,10 +22,10 @@
  "all": {
   "functions": 12587,
   "bytes": 3404928,
-  "named": 2703,
-  "named_bytes": 435224,
-  "decompiled": 169,
-  "decompiled_bytes": 26172
+  "named": 2714,
+  "named_bytes": 436500,
+  "decompiled": 192,
+  "decompiled_bytes": 28764
  },
  "game_range": [
   "80006B40",
@@ -57,12 +57,12 @@
    0.732
   ],
   [
-   0.045,
-   0.745
+   0.335,
+   0.828
   ],
   [
-   0.0,
-   0.73
+   0.014,
+   0.744
   ],
   [
    0.0,
@@ -414,11 +414,11 @@
   ],
   [
    0.0,
-   0.007
+   0.028
   ],
   [
    0.0,
-   0.05
+   0.061
   ],
   [
    0.0,
@@ -898,7 +898,7 @@
   ],
   [
    0.0,
-   0.155
+   0.165
   ],
   [
    0.0,
@@ -1418,6 +1418,126 @@
      "name": "ViewDestroy",
      "addr": "801704D8",
      "size": 16
+    }
+   ]
+  },
+  {
+   "path": "src/game/ai_states.cpp",
+   "functions": [
+    {
+     "name": "RegisterAiStateCallbacks",
+     "addr": "80014350",
+     "size": 704
+    },
+    {
+     "name": "PatrolIdleEntry",
+     "addr": "80014610",
+     "size": 292
+    },
+    {
+     "name": "EntityReverseDirection",
+     "addr": "80014E0C",
+     "size": 100
+    },
+    {
+     "name": "EntityWaitEntry",
+     "addr": "80014E70",
+     "size": 108
+    },
+    {
+     "name": "EntityWaitExit",
+     "addr": "80014EDC",
+     "size": 36
+    },
+    {
+     "name": "EntityWaitUpdate",
+     "addr": "80014F00",
+     "size": 4
+    },
+    {
+     "name": "MovingChallengeGameEntry",
+     "addr": "80015020",
+     "size": 92
+    },
+    {
+     "name": "MovingChallengeGameExit",
+     "addr": "8001507C",
+     "size": 120
+    },
+    {
+     "name": "PumpkinWaitEntry",
+     "addr": "800150F4",
+     "size": 76
+    },
+    {
+     "name": "PumpkinWaitUpdate",
+     "addr": "80015140",
+     "size": 80
+    },
+    {
+     "name": "PumpkinFreezeEntry",
+     "addr": "80015190",
+     "size": 104
+    },
+    {
+     "name": "PumpkinFreezeExit",
+     "addr": "800151F8",
+     "size": 28
+    },
+    {
+     "name": "PumpkinEscapeEntry",
+     "addr": "80015638",
+     "size": 84
+    },
+    {
+     "name": "PumpkinEscapeExit",
+     "addr": "8001568C",
+     "size": 60
+    },
+    {
+     "name": "PumpkinDeathEntry",
+     "addr": "80015760",
+     "size": 36
+    },
+    {
+     "name": "PumpkinDeathExit",
+     "addr": "80015784",
+     "size": 124
+    },
+    {
+     "name": "fn_80015800",
+     "addr": "80015800",
+     "size": 4
+    },
+    {
+     "name": "PumpkinDeathUpdate",
+     "addr": "80015804",
+     "size": 116
+    },
+    {
+     "name": "ObstacleShakeExit",
+     "addr": "8001595C",
+     "size": 88
+    },
+    {
+     "name": "HazardDeathEntry",
+     "addr": "80015B70",
+     "size": 48
+    },
+    {
+     "name": "HazardPoisonGasUpdate",
+     "addr": "80015BA0",
+     "size": 80
+    },
+    {
+     "name": "HazardDustCloudUpdate",
+     "addr": "80015BF0",
+     "size": 80
+    },
+    {
+     "name": "CharacterStartIdleAction",
+     "addr": "80016204",
+     "size": 128
     }
    ]
   },

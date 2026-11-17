@@ -68,11 +68,25 @@ def registrations():
                 if ins.startswith("bl ") and ins.split()[1] in REG_NAMES:
                     n, ty, fn = regs.get("r3"), regs.get("r4"), regs.get("r5")
                     if n and fn and n[0] == "sym" and fn[0] == "sym":
-                        t_ = chr(ty[1]) if ty and ty[0] == "imm" else "?"
+                        t_ = ty[1] if ty and ty[0] == "imm" else -1
                         out.append((fn[1], cstr(n[1], n[2]), t_, fm.group(1)))
     return out
 
 
+def gen(registrar, func_name, addr):
+    """Print C++ for a registration function (python tools/script_funcs.py gen <asm name> <new name> <addr>)."""
+    rows = [r for r in registrations() if r[3] == registrar]
+    print(f"// {addr}")
+    print(f"void {func_name}(void) {{")
+    for fn, name, ty, _ in rows:
+        print(f'    RegisterScriptFunc("{name}", 0x{ty:X}, (void*){fn});')
+    print("}")
+
+
 if __name__ == "__main__":
-    for fn, name, ty, reg in registrations():
-        print(f"{fn:28} {name:40} {ty} {reg}")
+    import sys
+    if len(sys.argv) > 1 and sys.argv[1] == "gen":
+        gen(sys.argv[2], sys.argv[3], sys.argv[4])
+    else:
+        for fn, name, ty, reg in registrations():
+            print(f"{fn:28} {name:40} 0x{ty:X} {reg}")

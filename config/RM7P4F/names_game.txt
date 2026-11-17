@@ -173,8 +173,8 @@ fn_8018D1E4 ScreenSetsCurrent
 fn_8018D1EC ScreenSetsFind
 fn_8018DCA4 ScreenSetsFlush
 fn_801091B4 ScreenSetsLoadCsv
-fn_801BA190 ScreenMgrShow
-fn_801B9C0C ScreenMgrCtor
+fn_801BA190 EventSend
+fn_801B9C0C EventMgrCtor
 fn_8012F408 ZoneIsLoaded
 fn_80132098 ZoneLoadAsync
 fn_80338854 strncpy
@@ -182,7 +182,7 @@ fn_800D83A8 WorldGetPhase
 lbl_805FAED4 gGameFlags
 lbl_803C44E0 gMovieQueue
 lbl_805FB654 gScreenSets
-lbl_805FB6C8 gScreenMgr
+lbl_805FB6C8 gEventMgr
 lbl_805F81B4 gTextLanguage
 lbl_805F81B8 gLanguage
 lbl_803E6D00 gWorldState
@@ -259,3 +259,14 @@ fn_801F3918 EventPost
 fn_800D39BC ObjDbLookup
 fn_800D50D0 ObjRefDtor
 lbl_805FB180 gObjDb
+fn_80014350 RegisterAiStateCallbacks
+fn_80016204 CharacterStartIdleAction
+fn_800D5D5C PathSetMoving
+fn_800D5DA4 PathSetPaused
+fn_800D5DCC PathIsPaused
+fn_800D6A00 PathReverse
+fn_800D6A18 PathSetSpeed
+fn_800D5718 PathGetPosition
+fn_800D87EC WorldSendEvent
+fn_800D8854 WorldSetFocus
+fn_801DC91C RegisterScriptFunc

@@ -8,9 +8,9 @@
 
 extern "C" {
 void  fn_80074D60(int);
-void  ScreenMgrShow(void* mgr, void* screens, int a, s32 id, s32 b, s32 c, int d, int e);   // 0x801BA190
+void  EventSend(void* mgr, void* screens, int a, s32 id, s32 b, s32 c, int d, int e);   // 0x801BA190
 void  ScreenMgrUpdate(void* screens, f32 dt);           // 0x801BB5BC
-void  ScreenMgrCtor(void* mgr);                         // 0x801B9C0C
+void  EventMgrCtor(void* mgr);                         // 0x801B9C0C
 void  ScreenMgrLoad(void* screens);                     // 0x801BC574
 void  HudFadeOut(void* hud);                            // 0x8001B128
 void  HudFadeIn(void* hud);                             // 0x8001B164
@@ -72,7 +72,7 @@ s32          gPendingScreenId;                  ORIG(0x805FAE94)
 s32          gPendingScreenArg1;                ORIG(0x805FAE98)
 s32          gPendingScreenArg2;                ORIG(0x805FAE9C)
 f32          gPendingScreenTimer;               ORIG(0x805FAEA0)
-void*        gScreenMgr;                        ORIG(0x805FB6C8)
+void*        gEventMgr;                        ORIG(0x805FB6C8)
 void*        gScreenSets;                       ORIG(0x805FB654)
 extern void* lbl_805FB658; extern void* lbl_805FB660; extern void* lbl_805FB670;
 extern u32   gGlobalBinaryField844;             // 0x805FB888
@@ -106,7 +106,7 @@ void GameFlowDelayedSignal(s32 id, s32 arg1, s32 arg2, f32 delay) {
 
 // 0x8000C7F4
 void GameFlowSignal(s32 id, s32 arg1, s32 arg2) {
-    ScreenMgrShow(gScreenMgr, SIR_SCREENS, 0, id, arg1, arg2, 0, 0);
+    EventSend(gEventMgr, SIR_SCREENS, 0, id, arg1, arg2, 0, 0);
 }
 
 // 0x8000C820
@@ -125,7 +125,7 @@ void UiUpdate(f32 dt) {
         if (gPendingScreenTimer > kZero) {
             gPendingScreenTimer -= dt;
             if (gPendingScreenTimer <= kZero) {
-                ScreenMgrShow(gScreenMgr, SIR_SCREENS, 0, gPendingScreenId, 0, 0, 0, 0);
+                EventSend(gEventMgr, SIR_SCREENS, 0, gPendingScreenId, 0, 0, 0, 0);
                 gPendingScreenTimer = kZero;
             }
         }
@@ -164,8 +164,8 @@ BOOL IsPlayerLoaded(void) {
 
 // 0x8000C9E8
 void UiInit(void) {
-    gScreenMgr = MemAllocDefault(0xC2C);
-    if (gScreenMgr != NULL) ScreenMgrCtor(gScreenMgr);
+    gEventMgr = MemAllocDefault(0xC2C);
+    if (gEventMgr != NULL) EventMgrCtor(gEventMgr);
 
     GameStateInit(gGame);
     fn_8019EA7C(lbl_80359420);

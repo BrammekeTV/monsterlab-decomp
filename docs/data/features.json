@@ -69,6 +69,11 @@
   "changelog": [
     {
       "date": "2026-11-17",
+      "time": "20:25",
+      "text": "Decompiled the first AI state callbacks under their original names (PatrolIdleEntry, PumpkinWait/Freeze/Escape/Death, HazardPoisonGas/DustCloud, MovingChallengeGame...) and their registration table. Added a hash resolver: object and UI ids in the code are CRC-32 hashes of names, and 390 of them now resolve (e.g. \"Projectile\", \"exploration_screen\", \"timer_group\")."
+    },
+    {
+      "date": "2026-11-17",
       "time": "20:21",
       "text": "Recovered about 2,000 original function names from the game's script-callback tables (e.g. PumpkinShakeUpdate, DiggingPlayThrustAnim, PuzzleMovePiece, InterpolateQuaternionTask::Update_SLERP). Named game functions jumped from 240 to 2,257, and about 20 earlier guessed names were corrected to the real ones."
     },
