@@ -401,13 +401,188 @@ BOOL PlayerInCombatRange(ScriptCtx* ctx) {
     return inRange;
 }
 
+// ---------------------------------------------------------------- shake mini-games
+// The player shakes the Wii Remote to fill a meter. In two-player mode the shake comes from
+// the other player's input stream (IsOpponentPreparing), otherwise from the local gesture
+// detector.
+
+extern "C" {
+void  ControlsLock(void* player, int a);                 // 0x8004CD28
+void  ControlsUnlock(void* player);                      // 0x8004CE44
+u8*   GetGestureDetector(void* player, int idx);         // 0x8004CED8
+BOOL  IsOpponentPreparing_800E75E0(void);
+void* RemoteInputGet(void* table, int idx);              // 0x80021550
+void  RemoteInputUpdate(void* input, f32 dt);            // 0x80020070
+f32   RemoteInputShake(void* input);                     // 0x80020068
+void  fn_80016EA0(int);
+void  UIScreen_Push(u32 hash);
+void  UIText_SetString_TextID(u32 hash, s32 textId);
+void  UIElement_SetColor_Floats(u32 hash, f32 r, f32 g, f32 b, f32 a);
+void  UIElement_SetColor_Ints(u32 hash, int r, int g, int b, int a);
+void  UISlider_SetValue(u32 hash, f32 value);
+}
+
+#define UI_SHAKE_SCREEN_A   0x2CFF8941u
+#define UI_SHAKE_SCREEN_B   0xE5BF8E82u
+#define UI_SHAKE_PROMPT     0x552FC6C7u
+#define UI_SHAKE_TEXT       0x314B749Cu
+#define UI_SHAKE_METER      0xA90A6046u
+#define TEXT_SHAKE_HINT     0x3D7
+#define EVENT_SHAKE_DONE    0x0C591BF4u
+#define SHAKE_DECAY         3.0f        // meter units lost per second
+
+static inline BOOL DetectShake(Character* player) {
+    if (IsOpponentPreparing_800E75E0()) {
+        Character* p = (Character*)PLAYER;
+        void* table = *(void**)(sSirHeader + 0xDC4);
+        RemoteInputUpdate(RemoteInputGet(table, 0x1C), p->dt);
+        return RemoteInputShake(RemoteInputGet(table, 0x1C)) > 0.0f;
+    }
+    if (GetGestureDetector(player, 0) == NULL) return FALSE;
+    u8* g = GetGestureDetector(player, 0);
+    if (g[0x90] && *(f32*)(g + 0x94) > 0.0f) *(f32*)(g + 0x8) = *(f32*)(g + 0x94);
+    return g[0x90];
+}
+
+static inline void ShowShakeIcons(void) {
+    UIElement_SetVisibleFlag(0xC4E94BB0, FALSE);
+    UIElement_SetVisibleFlag(0xB2601D05, FALSE);
+    UIElement_SetVisibleFlag(0x1A9EE60F, TRUE);
+    UIElement_SetVisibleFlag(0x8D6D65B1, FALSE);
+    UIText_SetString_TextID(UI_SHAKE_TEXT, TEXT_SHAKE_HINT);
+}
+
+static inline void MeterSetVisible(BOOL on) {
+    UIElement* meter = (UIElement*)UIFindElement(UI_SHAKE_METER);
+    if (meter != NULL) ((UIStateFn)meter->vtbl2[(on ? 0x2C : 0x30) / 4])(meter, 0x80000);
+}
+
+static inline void BlinkPrompt(Character* player) {
+    if (ShakePromptBlink(0, player->waitTimer)) player->waitTimer = 0.0f;
+}
+
+// 0x80015214
+void PumpkinShakeEntry(ScriptCtx* ctx) {
+    Character* c = ctx->chr;
+    if (c == NULL) return;
+    Character* player = (Character*)PLAYER;
+    ControlsLock(player, 0);
+    player->unkC40 = 0.0f;
+    player->waitTimer = 0.0f;
+    player->eventTarget = 0;              // used as the shake count here
+    PathSetMoving(c->path, TRUE);
+    Vec3 target = c->def->pos;
+    CharacterFaceDirection(player, &target, FALSE);
+    PauseAllExplorationCharacters();
+    fn_80016EA0(0);
+    UIScreen_Push(UI_SHAKE_SCREEN_A);
+    UIScreen_Push(UI_SHAKE_SCREEN_B);
+    UIElement_SetVisibleFlag(UI_SHAKE_PROMPT, TRUE);
+    ShowShakeIcons();
+    UIElement_SetColor_Floats(UI_SHAKE_TEXT, 1.0f, 1.0f, 1.0f, 1.0f);
+    MeterSetVisible(TRUE);
+}
+
+// 0x80015378
+void PumpkinShakeExit(ScriptCtx* ctx) {
+    if (ctx->chr == NULL) return;
+    ControlsUnlock(PLAYER);
+    UIElement_SetVisibleFlag(UI_SHAKE_PROMPT, FALSE);
+    UIScreen_PopScreen(UI_SHAKE_SCREEN_B);
+    UIScreen_PopScreen(UI_SHAKE_SCREEN_A);
+    MeterSetVisible(FALSE);
+}
+
+#define PUMPKIN_SHAKES   10
+#define PUMPKIN_TIMEOUT  5.0f
+
+// 0x80015404
+// Shake 10 times within 5 seconds to catch the pumpkin.
+void PumpkinShakeUpdate(ScriptCtx* ctx) {
+    Character* c = ctx->chr;
+    if (c == NULL) return;
+    Character* player = (Character*)PLAYER;
+    player->unkC40 += c->dt;
+    player->waitTimer += c->dt;
+
+    BOOL shook = DetectShake(player);
+    if (player->unkC40 > PUMPKIN_TIMEOUT) {
+        if (c->unk87C == 0) SendSelf(c, 0xD7E36EF2);
+        else                SendSelf(c, 0x9BEE735B);
+    } else if (shook) {
+        player->waitTimer += 0.5f;
+        if (++player->eventTarget >= PUMPKIN_SHAKES) SendSelf(c, 0x5069BF6E);
+    }
+
+    UISlider_SetValue(UI_SHAKE_METER, (f32)player->eventTarget / 10.0f);
+    BlinkPrompt(player);
+}
+
+// 0x80015878
+void ObstacleShakeEntry(ScriptCtx* ctx) {
+    (void)ctx;
+    Character* player = (Character*)PLAYER;
+    ControlsLock(player, 0);
+    player->hazardTimer = 0.0f;           // used as the meter here
+    player->waitTimer = 0.0f;
+    fn_80016EA0(0);
+    UIElement_SetVisibleFlag(UI_SHAKE_PROMPT, TRUE);
+    UIScreen_Push(UI_SHAKE_SCREEN_A);
+    UIScreen_Push(UI_SHAKE_SCREEN_B);
+    ShowShakeIcons();
+    UIElement_SetColor_Ints(UI_SHAKE_TEXT, 0xFF, 0xFF, 0xFF, 0xFF);
+}
+
+// Fill-the-meter update shared by obstacles (goal 10) and generators (goal 6).
+static inline BOOL ShakeMeterStep(Character* player, f32 goal) {
+    BOOL done = FALSE;
+    if (DetectShake(player)) {
+        player->waitTimer += 0.5f;
+        player->hazardTimer += 1.0f;
+        if (player->hazardTimer >= goal) done = TRUE;
+    }
+    if (player->hazardTimer < 0.0f) player->hazardTimer = 0.0f;
+    UISlider_SetValue(UI_SHAKE_METER, player->hazardTimer / goal);
+    BlinkPrompt(player);
+    return done;
+}
+
+// 0x800159B4
+void ObstacleShakeUpdate(ScriptCtx* ctx) {
+    Character* c = ctx->chr;
+    if (c == NULL) return;
+    Character* player = (Character*)PLAYER;
+    player->hazardTimer -= SHAKE_DECAY * player->dt;
+    if (ShakeMeterStep(player, 10.0f)) SendSelf(c, EVENT_SHAKE_DONE);
+}
+
+// 0x80015D70
+void GeneratorShakeEntry(ScriptCtx* ctx) {
+    EventSend(gEventMgr, PLAYER, NULL, 0x4F9213C1, 0, 0, 0, 0);
+    ObstacleShakeEntry(ctx);
+}
+
+// 0x80015E80
+void GeneratorShakeExit(ScriptCtx* ctx) {
+    (void)ctx;
+    EventSend(gEventMgr, PLAYER, NULL, 0x33EE55C6, 0, 0, 0, 0);
+    ControlsUnlock(PLAYER);
+    UIElement_SetVisibleFlag(UI_SHAKE_PROMPT, FALSE);
+    UIScreen_PopScreen(UI_SHAKE_SCREEN_A);
+    UIScreen_PopScreen(UI_SHAKE_SCREEN_B);
+}
+
+// 0x80015F0C
+void GeneratorShakeUpdate(ScriptCtx* ctx) {
+    (void)ctx;
+    Character* player = (Character*)PLAYER;
+    player->waitTimer += player->dt;
+    player->hazardTimer -= SHAKE_DECAY * player->dt;
+    if (ShakeMeterStep(player, 6.0f)) WorldSendEvent(WORLD, EVENT_SHAKE_DONE, 0, 0, 0);
+}
+
 // Not yet decompiled callbacks.
 void PatrolIdleExit(ScriptCtx* ctx);
-void PumpkinShakeEntry(ScriptCtx* ctx);
-void PumpkinShakeExit(ScriptCtx* ctx);
-void PumpkinShakeUpdate(ScriptCtx* ctx);
-void ObstacleShakeEntry(ScriptCtx* ctx);
-void ObstacleShakeUpdate(ScriptCtx* ctx);
 
 // 0x80014350
 void RegisterAiStateCallbacks(void) {

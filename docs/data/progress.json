@@ -1,15 +1,15 @@
 {
  "game_id": "RM7P4F",
- "generated": "2026-11-17T19:28:36+00:00",
- "commit": "7d49138",
- "commit_date": "2026-11-17T20:25:58+01:00",
+ "generated": "2026-11-17T19:31:19+00:00",
+ "commit": "d0e857b",
+ "commit_date": "2026-11-17T20:28:36+01:00",
  "game": {
   "functions": 8559,
   "bytes": 2277304,
-  "named": 2272,
-  "named_bytes": 345672,
-  "decompiled": 200,
-  "decompiled_bytes": 30804
+  "named": 2278,
+  "named_bytes": 346800,
+  "decompiled": 208,
+  "decompiled_bytes": 33388
  },
  "library": {
   "functions": 4028,
@@ -22,10 +22,10 @@
  "all": {
   "functions": 12587,
   "bytes": 3404928,
-  "named": 2718,
-  "named_bytes": 438112,
-  "decompiled": 200,
-  "decompiled_bytes": 30804
+  "named": 2724,
+  "named_bytes": 439240,
+  "decompiled": 208,
+  "decompiled_bytes": 33388
  },
  "game_range": [
   "80006B40",
@@ -57,11 +57,11 @@
    0.732
   ],
   [
-   0.538,
+   0.774,
    0.863
   ],
   [
-   0.05,
+   0.115,
    0.744
   ],
   [
@@ -78,11 +78,11 @@
   ],
   [
    0.0,
-   0.434
+   0.515
   ],
   [
    0.0,
-   0.032
+   0.036
   ],
   [
    0.0,
@@ -162,7 +162,7 @@
   ],
   [
    0.0,
-   0.043
+   0.099
   ],
   [
    0.0,
@@ -1510,6 +1510,21 @@
      "size": 28
     },
     {
+     "name": "PumpkinShakeEntry",
+     "addr": "80015214",
+     "size": 356
+    },
+    {
+     "name": "PumpkinShakeExit",
+     "addr": "80015378",
+     "size": 140
+    },
+    {
+     "name": "PumpkinShakeUpdate",
+     "addr": "80015404",
+     "size": 564
+    },
+    {
      "name": "PumpkinEscapeEntry",
      "addr": "80015638",
      "size": 84
@@ -1545,9 +1560,19 @@
      "size": 116
     },
     {
+     "name": "ObstacleShakeEntry",
+     "addr": "80015878",
+     "size": 228
+    },
+    {
      "name": "ObstacleShakeExit",
      "addr": "8001595C",
      "size": 88
+    },
+    {
+     "name": "ObstacleShakeUpdate",
+     "addr": "800159B4",
+     "size": 444
     },
     {
      "name": "HazardDeathEntry",
@@ -1568,6 +1593,21 @@
      "name": "ShakePromptBlink",
      "addr": "80015C40",
      "size": 304
+    },
+    {
+     "name": "GeneratorShakeEntry",
+     "addr": "80015D70",
+     "size": 272
+    },
+    {
+     "name": "GeneratorShakeExit",
+     "addr": "80015E80",
+     "size": 140
+    },
+    {
+     "name": "GeneratorShakeUpdate",
+     "addr": "80015F0C",
+     "size": 440
     },
     {
      "name": "PlayerInCombatRange",

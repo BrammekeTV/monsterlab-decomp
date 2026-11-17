@@ -274,3 +274,9 @@ fn_80015C40 ShakePromptBlink
 fn_800D56E0 PathAtWaypoint
 fn_80195464 UIFindElement
 fn_8005B650 CharacterFaceDirection
+fn_8004CD28 ControlsLock
+fn_8004CE44 ControlsUnlock
+fn_8004CED8 GetGestureDetector
+fn_80021550 RemoteInputGet
+fn_80020070 RemoteInputUpdate
+fn_80020068 RemoteInputShake

@@ -69,6 +69,11 @@
   "changelog": [
     {
       "date": "2026-11-17",
+      "time": "20:31",
+      "text": "Decompiled the Wii Remote shake mini-games: catching a pumpkin (10 shakes within 5 seconds), clearing obstacles (fill a meter to 10) and powering generators (meter to 6), both draining at 3 units per second, plus combat start when an enemy gets close to the player."
+    },
+    {
+      "date": "2026-11-17",
       "time": "20:25",
       "text": "Decompiled the first AI state callbacks under their original names (PatrolIdleEntry, PumpkinWait/Freeze/Escape/Death, HazardPoisonGas/DustCloud, MovingChallengeGame...) and their registration table. Added a hash resolver: object and UI ids in the code are CRC-32 hashes of names, and 390 of them now resolve (e.g. \"Projectile\", \"exploration_screen\", \"timer_group\")."
     },
