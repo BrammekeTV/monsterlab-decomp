@@ -1,15 +1,15 @@
 {
  "game_id": "RM7P4F",
- "generated": "2026-11-17T19:13:39+00:00",
- "commit": "8a07195",
- "commit_date": "2026-11-17T20:11:24+01:00",
+ "generated": "2026-11-17T19:16:24+00:00",
+ "commit": "0a4486d",
+ "commit_date": "2026-11-17T20:13:41+01:00",
  "game": {
   "functions": 8559,
   "bytes": 2277304,
-  "named": 220,
-  "named_bytes": 60204,
-  "decompiled": 153,
-  "decompiled_bytes": 23908
+  "named": 240,
+  "named_bytes": 65200,
+  "decompiled": 169,
+  "decompiled_bytes": 26172
  },
  "library": {
   "functions": 4028,
@@ -22,10 +22,10 @@
  "all": {
   "functions": 12587,
   "bytes": 3404928,
-  "named": 666,
-  "named_bytes": 152644,
-  "decompiled": 153,
-  "decompiled_bytes": 23908
+  "named": 686,
+  "named_bytes": 157640,
+  "decompiled": 169,
+  "decompiled_bytes": 26172
  },
  "game_range": [
   "80006B40",
@@ -53,12 +53,12 @@
    0.77
   ],
   [
-   0.089,
-   0.319
+   0.314,
+   0.732
   ],
   [
-   0.023,
-   0.022
+   0.045,
+   0.044
   ],
   [
    0.0,
@@ -410,11 +410,11 @@
   ],
   [
    0.0,
-   0.0
+   0.036
   ],
   [
    0.0,
-   0.0
+   0.007
   ],
   [
    0.0,
@@ -938,7 +938,7 @@
   ],
   [
    0.0,
-   0.0
+   0.076
   ],
   [
    0.0,
@@ -1888,6 +1888,91 @@
      "name": "SaveSelectBannerLayout",
      "addr": "80011BC0",
      "size": 208
+    }
+   ]
+  },
+  {
+   "path": "src/game/session.cpp",
+   "functions": [
+    {
+     "name": "SessionRestoreZoneObjects",
+     "addr": "80012534",
+     "size": 364
+    },
+    {
+     "name": "SessionDisableFor",
+     "addr": "80012820",
+     "size": 268
+    },
+    {
+     "name": "SessionResetSlots",
+     "addr": "8001292C",
+     "size": 168
+    },
+    {
+     "name": "SessionReenable",
+     "addr": "800129D4",
+     "size": 392
+    },
+    {
+     "name": "SessionUpdateDisabled",
+     "addr": "80012B5C",
+     "size": 208
+    },
+    {
+     "name": "SessionSetTimer",
+     "addr": "80012C2C",
+     "size": 12
+    },
+    {
+     "name": "SessionStopTimer",
+     "addr": "80012C38",
+     "size": 120
+    },
+    {
+     "name": "SessionAddTime",
+     "addr": "80012F50",
+     "size": 32
+    },
+    {
+     "name": "SessionGetTimer",
+     "addr": "80012F70",
+     "size": 8
+    },
+    {
+     "name": "RegisterMovingCharacter",
+     "addr": "80012F78",
+     "size": 368
+    },
+    {
+     "name": "SessionStart",
+     "addr": "8001360C",
+     "size": 120
+    },
+    {
+     "name": "SessionResetUnk204",
+     "addr": "80013684",
+     "size": 12
+    },
+    {
+     "name": "GetSignFlip11",
+     "addr": "80013F54",
+     "size": 28
+    },
+    {
+     "name": "GetSign10",
+     "addr": "80013F70",
+     "size": 28
+    },
+    {
+     "name": "GameSetOption3",
+     "addr": "80014188",
+     "size": 128
+    },
+    {
+     "name": "GetOne",
+     "addr": "80014208",
+     "size": 8
     }
    ]
   },

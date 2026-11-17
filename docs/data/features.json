@@ -69,6 +69,11 @@
   "changelog": [
     {
       "date": "2026-11-17",
+      "time": "20:16",
+      "text": "Decompiled the play-session block: restoring saved object states into a zone, temporarily disabled objects that re-enable on a timer, the session timer, and the moving-character registry (max 20 per level, tracking the player and enemy indices)."
+    },
+    {
+      "date": "2026-11-17",
       "time": "20:13",
       "text": "Decompiled the core game-state block (reset, two-player turn timers with a 6-second hand-over, world update, camera follow reset) and the build info: this disc is EU build 519 from Aug 28 2008 (14:30)."
     },

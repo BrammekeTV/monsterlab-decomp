@@ -7,7 +7,7 @@ extern "C" {
 void  ScreenMgrLoad(void* screens);                 // 0x801BC574
 void  HudReset(void* hud);                          // 0x8001AFCC
 BOOL  fn_801F5220(void);
-void* SoundFind(s32 id, s32 a);                     // 0x801F3918 (provisional)
+void* EventPost(s32 id, s32 flags);                 // 0x801F3918: returns payload
 void  ScriptAdvanceTurn(void* script);              // 0x800084B8 (provisional)
 void  fn_8001360C(void* p);
 void  WorldUpdate(void* world, int a, f32 dt);      // 0x800D83C8
@@ -113,7 +113,7 @@ void GameUpdateTurnTimers(GameState* g, f32 dt) {
     if (!expired[cur] && !expired[other]) return;
 
     if (!gFlag805FB948 || (running[cur] && running[other])) {
-        u8* s = (u8*)SoundFind(0x22, 0);
+        u8* s = (u8*)EventPost(0x22, 0);
         if (s != NULL) *(s32*)(s + 4) = 0;
         ScriptAdvanceTurn(gScriptCtx);
         fn_8001360C(gGame + 0x5C8);
@@ -123,7 +123,7 @@ void GameUpdateTurnTimers(GameState* g, f32 dt) {
         ScriptAdvanceTurn(gScriptCtx);
         g->turnTimer[cur] = -1.0f;
     } else if (running[other]) {
-        u8* s = (u8*)SoundFind(0x22, 0);
+        u8* s = (u8*)EventPost(0x22, 0);
         if (s != NULL) *(s32*)(s + 4) = 1;
         g->turnTimer[other] = -1.0f;
     }
