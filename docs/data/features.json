@@ -69,6 +69,11 @@
  "changelog": [
   {
    "date": "2026-11-17",
+   "time": "23:20",
+   "text": "Added two tools to speed things up. tools/decomp.py makes a first C draft of any function with m2c. tools/gen_leaf.py translates small straight-line functions (getters, setters, constant returns, empty stubs, bitfield and float accessors) instruction by instruction: 1590 of them are now in src/leaf/. They are exact but unnamed; they get proper names and types as the code around them is decompiled."
+  },
+  {
+   "date": "2026-11-17",
    "time": "23:06",
    "text": "Decompiled the system alert boxes (41 disc, controller, save and network messages), the online matchup screen (monster previews, ready panels, countdown, and building the opponent's monster from the received parts), the battle attack playback (impact reactions, ability particle effects, limb loss and the battle camera), and zone activation when a level area finishes loading."
   },

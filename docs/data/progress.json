@@ -1,15 +1,15 @@
 {
  "game_id": "RM7P4F",
- "generated": "2026-11-17T22:05:59+00:00",
- "commit": "4891952",
- "commit_date": "2026-11-17T22:56:41+01:00",
+ "generated": "2026-11-17T22:20:16+00:00",
+ "commit": "a983700",
+ "commit_date": "2026-11-17T23:18:53+01:00",
  "game": {
   "functions": 8548,
   "bytes": 2265988,
   "named": 2457,
   "named_bytes": 512392,
-  "decompiled": 349,
-  "decompiled_bytes": 176968
+  "decompiled": 1939,
+  "decompiled_bytes": 195432
  },
  "library": {
   "functions": 4039,
@@ -24,8 +24,8 @@
   "bytes": 3404928,
   "named": 2915,
   "named_bytes": 616536,
-  "decompiled": 349,
-  "decompiled_bytes": 176968
+  "decompiled": 1939,
+  "decompiled_bytes": 195432
  },
  "game_range": [
   "80006B40",
@@ -37,11 +37,11 @@
    0.696
   ],
   [
-   0.0,
+   0.005,
    0.0
   ],
   [
-   0.44,
+   0.459,
    0.435
   ],
   [
@@ -69,23 +69,23 @@
    0.921
   ],
   [
-   0.0,
+   0.008,
    0.858
   ],
   [
-   0.0,
+   0.004,
    0.665
   ],
   [
-   0.0,
+   0.023,
    0.645
   ],
   [
-   0.0,
+   0.024,
    0.029
   ],
   [
-   0.0,
+   0.004,
    0.199
   ],
   [
@@ -93,15 +93,15 @@
    0.32
   ],
   [
-   0.0,
+   0.003,
    0.044
   ],
   [
-   0.0,
+   0.007,
    0.0
   ],
   [
-   0.0,
+   0.008,
    0.049
   ],
   [
@@ -109,15 +109,15 @@
    0.031
   ],
   [
-   0.0,
+   0.005,
    0.0
   ],
   [
-   0.0,
+   0.003,
    0.014
   ],
   [
-   0.0,
+   0.002,
    0.0
   ],
   [
@@ -129,55 +129,59 @@
    0.0
   ],
   [
-   0.0,
+   0.002,
    0.0
   ],
   [
-   0.0,
+   0.002,
    0.006
   ],
   [
-   0.0,
+   0.009,
    0.019
   ],
   [
-   0.0,
+   0.014,
    0.03
   ],
   [
-   0.347,
+   0.361,
    0.398
   ],
   [
-   0.0,
+   0.003,
    0.687
   ],
   [
-   0.288,
+   0.292,
    0.736
   ],
   [
-   0.0,
+   0.005,
    0.101
   ],
   [
-   0.0,
+   0.003,
    0.13
   ],
   [
-   0.0,
+   0.005,
    0.233
   ],
   [
-   0.0,
+   0.024,
    0.378
   ],
   [
-   0.0,
+   0.057,
    0.014
   ],
   [
-   0.0,
+   0.041,
+   0.0
+  ],
+  [
+   0.014,
    0.0
   ],
   [
@@ -185,15 +189,11 @@
    0.0
   ],
   [
-   0.0,
-   0.0
-  ],
-  [
-   0.0,
+   0.013,
    0.247
   ],
   [
-   0.0,
+   0.002,
    0.0
   ],
   [
@@ -201,15 +201,15 @@
    0.0
   ],
   [
-   0.0,
+   0.004,
    0.003
   ],
   [
-   0.0,
+   0.013,
    0.0
   ],
   [
-   0.0,
+   0.004,
    0.0
   ],
   [
@@ -217,59 +217,59 @@
    0.155
   ],
   [
-   0.0,
+   0.003,
    0.078
   ],
   [
-   0.0,
+   0.007,
    0.052
   ],
   [
-   0.0,
+   0.011,
    0.125
   ],
   [
-   0.582,
+   0.586,
    0.725
   ],
   [
-   0.0,
+   0.014,
    0.312
   ],
   [
-   0.0,
+   0.004,
    0.115
   ],
   [
-   0.0,
+   0.007,
    0.049
   ],
   [
-   0.0,
+   0.036,
    0.034
   ],
   [
-   0.0,
+   0.02,
    0.0
   ],
   [
-   0.0,
+   0.004,
    0.009
   ],
   [
-   0.0,
+   0.003,
    0.092
   ],
   [
-   0.0,
+   0.047,
    0.136
   ],
   [
-   0.0,
+   0.009,
    0.482
   ],
   [
-   0.0,
+   0.01,
    0.089
   ],
   [
@@ -277,35 +277,35 @@
    0.0
   ],
   [
-   0.0,
+   0.024,
    0.03
   ],
   [
-   0.0,
+   0.027,
    0.139
   ],
   [
-   0.0,
+   0.001,
    0.0
   ],
   [
-   0.0,
+   0.01,
    0.252
   ],
   [
-   0.0,
+   0.004,
    0.241
   ],
   [
-   0.0,
+   0.004,
    0.008
   ],
   [
-   0.0,
+   0.013,
    0.106
   ],
   [
-   0.0,
+   0.011,
    0.004
   ],
   [
@@ -313,15 +313,15 @@
    0.0
   ],
   [
-   0.0,
+   0.007,
    0.052
   ],
   [
-   0.0,
+   0.007,
    0.005
   ],
   [
-   0.0,
+   0.003,
    0.0
   ],
   [
@@ -333,123 +333,123 @@
    0.0
   ],
   [
-   0.0,
+   0.002,
    0.0
   ],
   [
-   0.0,
+   0.001,
    0.139
   ],
   [
-   0.0,
+   0.004,
    0.31
   ],
   [
-   0.0,
+   0.006,
    0.113
   ],
   [
-   0.0,
+   0.003,
    0.047
   ],
   [
-   0.0,
+   0.015,
    0.0
   ],
   [
-   0.0,
+   0.023,
    0.135
   ],
   [
-   0.0,
+   0.006,
    0.001
   ],
   [
-   0.0,
+   0.003,
    0.0
   ],
   [
-   0.0,
+   0.004,
    0.069
   ],
   [
-   0.0,
+   0.005,
    0.018
   ],
   [
-   0.0,
+   0.02,
    0.0
   ],
   [
-   0.0,
+   0.001,
    0.0
   ],
   [
-   0.0,
+   0.015,
    0.051
   ],
   [
-   0.0,
+   0.012,
    0.0
   ],
   [
-   0.0,
+   0.014,
    0.0
   ],
   [
-   0.0,
+   0.002,
    0.072
   ],
   [
-   0.0,
+   0.006,
    0.0
   ],
   [
-   0.0,
+   0.008,
    0.0
   ],
   [
-   0.0,
+   0.007,
    0.041
   ],
   [
-   0.0,
+   0.007,
    0.099
   ],
   [
-   0.0,
+   0.003,
    0.201
   ],
   [
-   0.0,
+   0.007,
    0.012
   ],
   [
-   0.0,
+   0.002,
    0.0
   ],
   [
-   0.0,
+   0.032,
    0.001
   ],
   [
-   0.0,
+   0.002,
    0.0
   ],
   [
-   0.0,
+   0.01,
    0.009
   ],
   [
-   0.0,
+   0.009,
    0.142
   ],
   [
-   0.0,
+   0.004,
    0.155
   ],
   [
-   0.0,
+   0.011,
    1.0
   ],
   [
@@ -457,11 +457,11 @@
    0.843
   ],
   [
-   0.0,
+   0.005,
    0.541
   ],
   [
-   0.0,
+   0.011,
    0.97
   ],
   [
@@ -469,23 +469,23 @@
    0.957
   ],
   [
-   0.0,
+   0.001,
    0.931
   ],
   [
-   0.0,
+   0.003,
    0.99
   ],
   [
-   0.0,
+   0.005,
    1.0
   ],
   [
-   0.182,
+   0.187,
    0.929
   ],
   [
-   0.919,
+   0.939,
    0.992
   ],
   [
@@ -497,35 +497,35 @@
    0.0
   ],
   [
-   0.0,
+   0.047,
    1.0
   ],
   [
-   0.978,
+   0.985,
    1.0
   ],
   [
-   0.488,
+   0.491,
    0.883
   ],
   [
-   0.0,
+   0.004,
    0.224
   ],
   [
-   0.0,
+   0.025,
    0.058
   ],
   [
-   0.813,
+   0.817,
    0.865
   ],
   [
-   0.0,
+   0.006,
    0.801
   ],
   [
-   0.0,
+   0.001,
    1.0
   ],
   [
@@ -533,39 +533,39 @@
    0.955
   ],
   [
-   0.0,
+   0.006,
    0.853
   ],
   [
-   0.0,
+   0.006,
    0.0
   ],
   [
-   0.0,
+   0.026,
    0.0
   ],
   [
-   0.0,
+   0.035,
    0.0
   ],
   [
-   0.0,
+   0.015,
    0.0
   ],
   [
-   0.012,
+   0.042,
    0.11
   ],
   [
-   0.0,
+   0.001,
    0.55
   ],
   [
-   0.0,
+   0.009,
    0.196
   ],
   [
-   0.0,
+   0.001,
    0.013
   ],
   [
@@ -573,19 +573,19 @@
    0.0
   ],
   [
-   0.903,
+   0.908,
    0.911
   ],
   [
-   0.0,
+   0.001,
    0.565
   ],
   [
-   0.0,
+   0.004,
    0.229
   ],
   [
-   0.0,
+   0.007,
    0.367
   ],
   [
@@ -601,35 +601,35 @@
    0.0
   ],
   [
-   0.0,
+   0.005,
    0.54
   ],
   [
-   0.369,
+   0.37,
    0.952
   ],
   [
-   0.0,
+   0.031,
    0.676
   ],
   [
-   0.388,
+   0.414,
    0.833
   ],
   [
-   0.14,
+   0.157,
    0.425
   ],
   [
-   0.0,
+   0.004,
    0.173
   ],
   [
-   0.0,
+   0.027,
    0.089
   ],
   [
-   0.0,
+   0.013,
    0.0
   ],
   [
@@ -637,7 +637,7 @@
    0.0
   ],
   [
-   0.123,
+   0.129,
    0.404
   ],
   [
@@ -649,27 +649,27 @@
    0.307
   ],
   [
-   0.0,
+   0.001,
    0.0
   ],
   [
-   0.0,
+   0.006,
    0.076
   ],
   [
-   0.0,
+   0.012,
    0.0
   ],
   [
-   0.041,
+   0.045,
    0.42
   ],
   [
-   0.317,
+   0.331,
    0.327
   ],
   [
-   0.042,
+   0.062,
    0.042
   ],
   [
@@ -677,39 +677,39 @@
    0.0
   ],
   [
-   0.0,
+   0.007,
    0.0
   ],
   [
-   0.0,
+   0.007,
    0.0
   ],
   [
-   0.0,
+   0.005,
    0.0
   ],
   [
-   0.0,
+   0.004,
    0.022
   ],
   [
-   0.0,
+   0.007,
    0.0
   ],
   [
-   0.0,
+   0.026,
    0.078
   ],
   [
-   0.035,
+   0.036,
    0.035
   ],
   [
-   0.0,
+   0.004,
    0.0
   ],
   [
-   0.0,
+   0.034,
    0.071
   ],
   [
@@ -717,7 +717,7 @@
    0.0
   ],
   [
-   0.0,
+   0.003,
    0.0
   ],
   [
@@ -733,11 +733,11 @@
    0.0
   ],
   [
-   0.0,
+   0.002,
    0.0
   ],
   [
-   0.0,
+   0.001,
    0.014
   ],
   [
@@ -745,19 +745,19 @@
    0.0
   ],
   [
-   0.0,
+   0.001,
    0.0
   ],
   [
-   0.0,
+   0.001,
    0.0
   ],
   [
-   0.0,
+   0.009,
    0.257
   ],
   [
-   0.0,
+   0.002,
    0.543
   ],
   [
@@ -769,35 +769,35 @@
    1.0
   ],
   [
-   0.0,
+   0.002,
    0.399
   ],
   [
-   0.0,
+   0.01,
    0.0
   ],
   [
-   0.0,
+   0.008,
    0.02
   ],
   [
-   0.0,
+   0.003,
    0.004
   ],
   [
-   0.0,
+   0.002,
    0.1
   ],
   [
-   0.0,
+   0.005,
    0.018
   ],
   [
-   0.0,
+   0.005,
    0.0
   ],
   [
-   0.0,
+   0.015,
    0.013
   ],
   [
@@ -805,47 +805,47 @@
    0.0
   ],
   [
-   0.0,
+   0.004,
    0.0
   ],
   [
-   0.0,
+   0.03,
    0.004
   ],
   [
-   0.0,
+   0.007,
    0.041
   ],
   [
-   0.0,
+   0.001,
    0.0
   ],
   [
-   0.0,
+   0.002,
    0.0
   ],
   [
-   0.0,
+   0.009,
    0.094
   ],
   [
-   0.0,
+   0.009,
    0.103
   ],
   [
-   0.0,
+   0.005,
    0.241
   ],
   [
-   0.0,
+   0.011,
    0.179
   ],
   [
-   0.0,
+   0.008,
    0.093
   ],
   [
-   0.0,
+   0.005,
    0.0
   ],
   [
@@ -853,35 +853,35 @@
    0.0
   ],
   [
-   0.0,
+   0.001,
    0.0
   ],
   [
-   0.0,
+   0.004,
    0.0
   ],
   [
-   0.0,
+   0.011,
    0.03
   ],
   [
-   0.0,
+   0.01,
    0.0
   ],
   [
-   0.0,
+   0.01,
    0.0
   ],
   [
-   0.0,
+   0.046,
    0.0
   ],
   [
-   0.0,
+   0.058,
    0.0
   ],
   [
-   0.167,
+   0.168,
    0.168
   ],
   [
@@ -889,83 +889,83 @@
    0.452
   ],
   [
-   0.012,
+   0.021,
    0.141
   ],
   [
-   0.0,
+   0.01,
    0.102
   ],
   [
-   0.0,
+   0.007,
    0.2
   ],
   [
-   0.526,
+   0.53,
    0.916
   ],
   [
-   0.793,
+   0.797,
    0.864
   ],
   [
-   0.665,
+   0.669,
    0.749
   ],
   [
-   0.0,
+   0.006,
    0.0
   ],
   [
-   0.0,
+   0.008,
    0.107
   ],
   [
-   0.0,
+   0.001,
    0.067
   ],
   [
-   0.0,
+   0.001,
    0.302
   ],
   [
-   0.0,
+   0.002,
    0.068
   ],
   [
-   0.0,
+   0.006,
    0.068
   ],
   [
-   0.459,
+   0.466,
    0.478
   ],
   [
-   0.0,
+   0.006,
    0.274
   ],
   [
-   0.0,
+   0.028,
    0.097
   ],
   [
-   0.0,
+   0.005,
    0.0
   ],
   [
-   0.0,
+   0.001,
    0.0
   ],
   [
-   0.049,
+   0.056,
    0.214
   ],
   [
-   0.0,
+   0.006,
    0.0
   ],
   [
-   0.0,
+   0.003,
    0.056
   ],
   [
@@ -973,15 +973,15 @@
    0.0
   ],
   [
-   0.0,
+   0.013,
    0.178
   ],
   [
-   0.0,
+   0.001,
    0.234
   ],
   [
-   0.0,
+   0.014,
    0.0
   ],
   [
@@ -993,7 +993,7 @@
    0.0
   ],
   [
-   0.0,
+   0.032,
    0.035
   ],
   [
@@ -1001,19 +1001,19 @@
    0.364
   ],
   [
-   0.0,
+   0.006,
    0.206
   ],
   [
-   0.0,
+   0.013,
    0.201
   ],
   [
-   0.019,
+   0.031,
    0.06
   ],
   [
-   0.0,
+   0.008,
    0.024
   ],
   [
@@ -1021,39 +1021,39 @@
    0.0
   ],
   [
-   0.0,
+   0.005,
    0.529
   ],
   [
-   0.007,
+   0.041,
    0.048
   ],
   [
-   0.0,
+   0.011,
    0.528
   ],
   [
-   0.0,
+   0.002,
    0.0
   ],
   [
-   0.0,
+   0.013,
    0.155
   ],
   [
-   0.324,
+   0.326,
    0.324
   ],
   [
-   0.0,
+   0.005,
    0.0
   ],
   [
-   0.0,
+   0.006,
    0.0
   ],
   [
-   0.0,
+   0.006,
    0.045
   ]
  ],
@@ -2974,6 +2974,9176 @@
      "name": "WorldOnZoneLoaded",
      "addr": "801369C8",
      "size": 3260
+    }
+   ]
+  },
+  {
+   "path": "src/leaf/auto_03_80007A8C_text.cpp",
+   "functions": [
+    {
+     "name": "fn_8000849C",
+     "addr": "8000849C",
+     "size": 4
+    },
+    {
+     "name": "fn_80009728",
+     "addr": "80009728",
+     "size": 4
+    },
+    {
+     "name": "fn_8000972C",
+     "addr": "8000972C",
+     "size": 4
+    },
+    {
+     "name": "fn_80009730",
+     "addr": "80009730",
+     "size": 4
+    },
+    {
+     "name": "fn_80009734",
+     "addr": "80009734",
+     "size": 4
+    },
+    {
+     "name": "fn_80009738",
+     "addr": "80009738",
+     "size": 4
+    },
+    {
+     "name": "fn_8000973C",
+     "addr": "8000973C",
+     "size": 8
+    },
+    {
+     "name": "fn_80009744",
+     "addr": "80009744",
+     "size": 4
+    },
+    {
+     "name": "fn_80009BDC",
+     "addr": "80009BDC",
+     "size": 4
+    },
+    {
+     "name": "fn_8000B880",
+     "addr": "8000B880",
+     "size": 8
+    },
+    {
+     "name": "fn_8000B888",
+     "addr": "8000B888",
+     "size": 12
+    },
+    {
+     "name": "fn_8000B894",
+     "addr": "8000B894",
+     "size": 12
+    },
+    {
+     "name": "ScriptIsPaused",
+     "addr": "8000B8A0",
+     "size": 12
+    },
+    {
+     "name": "ScriptIsStopped",
+     "addr": "8000B8AC",
+     "size": 12
+    },
+    {
+     "name": "fn_8000B8CC",
+     "addr": "8000B8CC",
+     "size": 8
+    },
+    {
+     "name": "fn_8000B924",
+     "addr": "8000B924",
+     "size": 36
+    },
+    {
+     "name": "fn_8000B948",
+     "addr": "8000B948",
+     "size": 28
+    },
+    {
+     "name": "fn_8000B97C",
+     "addr": "8000B97C",
+     "size": 16
+    },
+    {
+     "name": "fn_8000BD68",
+     "addr": "8000BD68",
+     "size": 16
+    },
+    {
+     "name": "fn_8000C30C",
+     "addr": "8000C30C",
+     "size": 8
+    }
+   ]
+  },
+  {
+   "path": "src/leaf/auto_03_8001A17C_text.cpp",
+   "functions": [
+    {
+     "name": "fn_8001A240",
+     "addr": "8001A240",
+     "size": 4
+    },
+    {
+     "name": "fn_8001A2FC",
+     "addr": "8001A2FC",
+     "size": 4
+    },
+    {
+     "name": "fn_8001A3E4",
+     "addr": "8001A3E4",
+     "size": 4
+    }
+   ]
+  },
+  {
+   "path": "src/leaf/auto_03_8001AFB4_text.cpp",
+   "functions": [
+    {
+     "name": "fn_8001AFB4",
+     "addr": "8001AFB4",
+     "size": 24
+    },
+    {
+     "name": "fn_8001B094",
+     "addr": "8001B094",
+     "size": 8
+    },
+    {
+     "name": "fn_8001B09C",
+     "addr": "8001B09C",
+     "size": 28
+    }
+   ]
+  },
+  {
+   "path": "src/leaf/auto_03_8001B20C_text_cb.cpp",
+   "functions": [
+    {
+     "name": "CanCreateNewMonster",
+     "addr": "8001DFE0",
+     "size": 32
+    },
+    {
+     "name": "IsPartLoaded",
+     "addr": "8001EE1C",
+     "size": 12
+    }
+   ]
+  },
+  {
+   "path": "src/leaf/auto_03_8001EE48_text_cb.cpp",
+   "functions": [
+    {
+     "name": "Troublescope_GetPartID",
+     "addr": "8001FB78",
+     "size": 8
+    },
+    {
+     "name": "Troublescope_GetPartInventoryPos",
+     "addr": "8001FB80",
+     "size": 8
+    },
+    {
+     "name": "Troublescope_IsMonsterLoaded",
+     "addr": "8001FC7C",
+     "size": 12
+    }
+   ]
+  },
+  {
+   "path": "src/leaf/auto_03_8001FCA8_text.cpp",
+   "functions": [
+    {
+     "name": "fn_80020040",
+     "addr": "80020040",
+     "size": 40
+    },
+    {
+     "name": "RemoteInputShake",
+     "addr": "80020068",
+     "size": 8
+    },
+    {
+     "name": "fn_800202EC",
+     "addr": "800202EC",
+     "size": 16
+    },
+    {
+     "name": "fn_800202FC",
+     "addr": "800202FC",
+     "size": 16
+    },
+    {
+     "name": "fn_80020458",
+     "addr": "80020458",
+     "size": 8
+    }
+   ]
+  },
+  {
+   "path": "src/leaf/auto_03_80020480_text.cpp",
+   "functions": [
+    {
+     "name": "fn_800204BC",
+     "addr": "800204BC",
+     "size": 20
+    },
+    {
+     "name": "fn_80020794",
+     "addr": "80020794",
+     "size": 20
+    },
+    {
+     "name": "fn_800208A0",
+     "addr": "800208A0",
+     "size": 32
+    },
+    {
+     "name": "fn_80020A40",
+     "addr": "80020A40",
+     "size": 36
+    },
+    {
+     "name": "fn_80020D64",
+     "addr": "80020D64",
+     "size": 36
+    },
+    {
+     "name": "fn_80021168",
+     "addr": "80021168",
+     "size": 32
+    },
+    {
+     "name": "fn_8002127C",
+     "addr": "8002127C",
+     "size": 32
+    },
+    {
+     "name": "fn_80021390",
+     "addr": "80021390",
+     "size": 20
+    }
+   ]
+  },
+  {
+   "path": "src/leaf/auto_03_80021594_text.cpp",
+   "functions": [
+    {
+     "name": "fn_800217A8",
+     "addr": "800217A8",
+     "size": 8
+    },
+    {
+     "name": "fn_800222F0",
+     "addr": "800222F0",
+     "size": 4
+    },
+    {
+     "name": "fn_8002238C",
+     "addr": "8002238C",
+     "size": 4
+    },
+    {
+     "name": "fn_80022390",
+     "addr": "80022390",
+     "size": 4
+    },
+    {
+     "name": "fn_800223D4",
+     "addr": "800223D4",
+     "size": 4
+    },
+    {
+     "name": "fn_800223D8",
+     "addr": "800223D8",
+     "size": 4
+    },
+    {
+     "name": "fn_800223DC",
+     "addr": "800223DC",
+     "size": 12
+    },
+    {
+     "name": "fn_800223E8",
+     "addr": "800223E8",
+     "size": 4
+    },
+    {
+     "name": "fn_800223EC",
+     "addr": "800223EC",
+     "size": 4
+    },
+    {
+     "name": "fn_80022608",
+     "addr": "80022608",
+     "size": 8
+    },
+    {
+     "name": "fn_80022E0C",
+     "addr": "80022E0C",
+     "size": 4
+    },
+    {
+     "name": "fn_8002327C",
+     "addr": "8002327C",
+     "size": 4
+    },
+    {
+     "name": "fn_80023280",
+     "addr": "80023280",
+     "size": 4
+    }
+   ]
+  },
+  {
+   "path": "src/leaf/auto_03_80021594_text_cb.cpp",
+   "functions": [
+    {
+     "name": "ChallengeCheckDebugCheat",
+     "addr": "80022D08",
+     "size": 8
+    }
+   ]
+  },
+  {
+   "path": "src/leaf/auto_03_800232A4_text.cpp",
+   "functions": [
+    {
+     "name": "PrintIdle",
+     "addr": "800237F4",
+     "size": 4
+    }
+   ]
+  },
+  {
+   "path": "src/leaf/auto_03_80023884_text.cpp",
+   "functions": [
+    {
+     "name": "fn_80024D98",
+     "addr": "80024D98",
+     "size": 12
+    }
+   ]
+  },
+  {
+   "path": "src/leaf/auto_03_80028038_text.cpp",
+   "functions": [
+    {
+     "name": "ResetCounter",
+     "addr": "8002931C",
+     "size": 24
+    }
+   ]
+  },
+  {
+   "path": "src/leaf/auto_03_800293C8_text.cpp",
+   "functions": [
+    {
+     "name": "fn_800294B4",
+     "addr": "800294B4",
+     "size": 8
+    },
+    {
+     "name": "fn_8002A178",
+     "addr": "8002A178",
+     "size": 8
+    },
+    {
+     "name": "fn_8002A7F8",
+     "addr": "8002A7F8",
+     "size": 28
+    },
+    {
+     "name": "fn_8002A8CC",
+     "addr": "8002A8CC",
+     "size": 12
+    }
+   ]
+  },
+  {
+   "path": "src/leaf/auto_03_8002AB00_text.cpp",
+   "functions": [
+    {
+     "name": "fn_8002AC70",
+     "addr": "8002AC70",
+     "size": 8
+    },
+    {
+     "name": "fn_8002B094",
+     "addr": "8002B094",
+     "size": 4
+    }
+   ]
+  },
+  {
+   "path": "src/leaf/auto_03_8002BFDC_text.cpp",
+   "functions": [
+    {
+     "name": "fn_8002C428",
+     "addr": "8002C428",
+     "size": 28
+    },
+    {
+     "name": "fn_8002C614",
+     "addr": "8002C614",
+     "size": 8
+    }
+   ]
+  },
+  {
+   "path": "src/leaf/auto_03_8002C63C_text.cpp",
+   "functions": [
+    {
+     "name": "MachineIsOn",
+     "addr": "8002D538",
+     "size": 20
+    },
+    {
+     "name": "HighlightSelected",
+     "addr": "8002D6D4",
+     "size": 4
+    },
+    {
+     "name": "FieldRepairParticleOn",
+     "addr": "8002D6D8",
+     "size": 4
+    },
+    {
+     "name": "FieldRepairParticleUpdate",
+     "addr": "8002D6DC",
+     "size": 4
+    },
+    {
+     "name": "FieldRepairParticleOff",
+     "addr": "8002D6E0",
+     "size": 4
+    }
+   ]
+  },
+  {
+   "path": "src/leaf/auto_03_80030228_text.cpp",
+   "functions": [
+    {
+     "name": "fn_80030568",
+     "addr": "80030568",
+     "size": 4
+    }
+   ]
+  },
+  {
+   "path": "src/leaf/auto_03_80030604_text.cpp",
+   "functions": [
+    {
+     "name": "fn_80030A98",
+     "addr": "80030A98",
+     "size": 8
+    },
+    {
+     "name": "fn_80030AA0",
+     "addr": "80030AA0",
+     "size": 8
+    }
+   ]
+  },
+  {
+   "path": "src/leaf/auto_03_8003107C_text.cpp",
+   "functions": [
+    {
+     "name": "fn_8003107C",
+     "addr": "8003107C",
+     "size": 20
+    }
+   ]
+  },
+  {
+   "path": "src/leaf/auto_03_800314F8_text.cpp",
+   "functions": [
+    {
+     "name": "CheckResult",
+     "addr": "800320A4",
+     "size": 16
+    }
+   ]
+  },
+  {
+   "path": "src/leaf/auto_03_80032208_text.cpp",
+   "functions": [
+    {
+     "name": "fn_80032EB0",
+     "addr": "80032EB0",
+     "size": 12
+    }
+   ]
+  },
+  {
+   "path": "src/leaf/auto_03_80034084_text.cpp",
+   "functions": [
+    {
+     "name": "fn_800359F4",
+     "addr": "800359F4",
+     "size": 16
+    }
+   ]
+  },
+  {
+   "path": "src/leaf/auto_03_8003CA78_text.cpp",
+   "functions": [
+    {
+     "name": "fn_8003CB08",
+     "addr": "8003CB08",
+     "size": 20
+    },
+    {
+     "name": "fn_8003CF14",
+     "addr": "8003CF14",
+     "size": 12
+    }
+   ]
+  },
+  {
+   "path": "src/leaf/auto_03_8003CF40_text.cpp",
+   "functions": [
+    {
+     "name": "fn_8003E39C",
+     "addr": "8003E39C",
+     "size": 8
+    },
+    {
+     "name": "fn_8003F8D4",
+     "addr": "8003F8D4",
+     "size": 8
+    }
+   ]
+  },
+  {
+   "path": "src/leaf/auto_03_8003CF40_text_cb.cpp",
+   "functions": [
+    {
+     "name": "GetCombatWinner",
+     "addr": "8003F8DC",
+     "size": 32
+    }
+   ]
+  },
+  {
+   "path": "src/leaf/auto_03_8003FB24_text.cpp",
+   "functions": [
+    {
+     "name": "fn_8003FF7C",
+     "addr": "8003FF7C",
+     "size": 40
+    }
+   ]
+  },
+  {
+   "path": "src/leaf/auto_03_80040824_text.cpp",
+   "functions": [
+    {
+     "name": "fn_80041810",
+     "addr": "80041810",
+     "size": 28
+    },
+    {
+     "name": "fn_8004182C",
+     "addr": "8004182C",
+     "size": 16
+    },
+    {
+     "name": "fn_8004183C",
+     "addr": "8004183C",
+     "size": 24
+    }
+   ]
+  },
+  {
+   "path": "src/leaf/auto_03_80041874_text.cpp",
+   "functions": [
+    {
+     "name": "fn_80041874",
+     "addr": "80041874",
+     "size": 12
+    }
+   ]
+  },
+  {
+   "path": "src/leaf/auto_03_800418E0_text.cpp",
+   "functions": [
+    {
+     "name": "fn_80041990",
+     "addr": "80041990",
+     "size": 4
+    },
+    {
+     "name": "fn_80041A8C",
+     "addr": "80041A8C",
+     "size": 8
+    }
+   ]
+  },
+  {
+   "path": "src/leaf/auto_03_80041AB4_text.cpp",
+   "functions": [
+    {
+     "name": "fn_800428B8",
+     "addr": "800428B8",
+     "size": 8
+    },
+    {
+     "name": "fn_80042BE8",
+     "addr": "80042BE8",
+     "size": 16
+    }
+   ]
+  },
+  {
+   "path": "src/leaf/auto_03_800444FC_text.cpp",
+   "functions": [
+    {
+     "name": "fn_80044598",
+     "addr": "80044598",
+     "size": 24
+    },
+    {
+     "name": "fn_800445B0",
+     "addr": "800445B0",
+     "size": 16
+    },
+    {
+     "name": "fn_800445C0",
+     "addr": "800445C0",
+     "size": 4
+    }
+   ]
+  },
+  {
+   "path": "src/leaf/auto_03_800445E4_text.cpp",
+   "functions": [
+    {
+     "name": "fn_800445E4",
+     "addr": "800445E4",
+     "size": 16
+    },
+    {
+     "name": "fn_80044694",
+     "addr": "80044694",
+     "size": 40
+    },
+    {
+     "name": "fn_80044C0C",
+     "addr": "80044C0C",
+     "size": 44
+    }
+   ]
+  },
+  {
+   "path": "src/leaf/auto_03_80044C58_text.cpp",
+   "functions": [
+    {
+     "name": "fn_80044C58",
+     "addr": "80044C58",
+     "size": 36
+    }
+   ]
+  },
+  {
+   "path": "src/leaf/auto_03_80044CDC_text.cpp",
+   "functions": [
+    {
+     "name": "fn_80046F54",
+     "addr": "80046F54",
+     "size": 8
+    },
+    {
+     "name": "fn_8004935C",
+     "addr": "8004935C",
+     "size": 8
+    },
+    {
+     "name": "fn_80049364",
+     "addr": "80049364",
+     "size": 8
+    },
+    {
+     "name": "fn_8004936C",
+     "addr": "8004936C",
+     "size": 8
+    }
+   ]
+  },
+  {
+   "path": "src/leaf/auto_03_80044CDC_text_cb.cpp",
+   "functions": [
+    {
+     "name": "isPartLocked",
+     "addr": "80046B9C",
+     "size": 8
+    },
+    {
+     "name": "SupressHUD",
+     "addr": "80048A80",
+     "size": 12
+    },
+    {
+     "name": "SetInTargetedPartTutorial",
+     "addr": "80048AAC",
+     "size": 12
+    }
+   ]
+  },
+  {
+   "path": "src/leaf/auto_03_8004B498_text.cpp",
+   "functions": [
+    {
+     "name": "fn_8004B570",
+     "addr": "8004B570",
+     "size": 4
+    },
+    {
+     "name": "fn_8004B574",
+     "addr": "8004B574",
+     "size": 8
+    },
+    {
+     "name": "fn_8004B57C",
+     "addr": "8004B57C",
+     "size": 8
+    },
+    {
+     "name": "fn_8004B584",
+     "addr": "8004B584",
+     "size": 8
+    }
+   ]
+  },
+  {
+   "path": "src/leaf/auto_03_8004B5EC_text.cpp",
+   "functions": [
+    {
+     "name": "fn_8004CB10",
+     "addr": "8004CB10",
+     "size": 8
+    },
+    {
+     "name": "GetGestureDetector",
+     "addr": "8004CED8",
+     "size": 16
+    },
+    {
+     "name": "fn_8004E2E4",
+     "addr": "8004E2E4",
+     "size": 28
+    }
+   ]
+  },
+  {
+   "path": "src/leaf/auto_03_8004E58C_text.cpp",
+   "functions": [
+    {
+     "name": "fn_8004E8CC",
+     "addr": "8004E8CC",
+     "size": 8
+    },
+    {
+     "name": "fn_80050588",
+     "addr": "80050588",
+     "size": 8
+    },
+    {
+     "name": "fn_80050590",
+     "addr": "80050590",
+     "size": 8
+    },
+    {
+     "name": "fn_80050598",
+     "addr": "80050598",
+     "size": 8
+    },
+    {
+     "name": "fn_800505A0",
+     "addr": "800505A0",
+     "size": 8
+    },
+    {
+     "name": "fn_800505A8",
+     "addr": "800505A8",
+     "size": 8
+    },
+    {
+     "name": "fn_800505B0",
+     "addr": "800505B0",
+     "size": 16
+    }
+   ]
+  },
+  {
+   "path": "src/leaf/auto_03_8004E58C_text_cb.cpp",
+   "functions": [
+    {
+     "name": "CreateEntityPartCallback",
+     "addr": "8004FE38",
+     "size": 8
+    }
+   ]
+  },
+  {
+   "path": "src/leaf/auto_03_800505E0_text.cpp",
+   "functions": [
+    {
+     "name": "fn_800508D0",
+     "addr": "800508D0",
+     "size": 8
+    },
+    {
+     "name": "GetTalkingToCharacterEntity",
+     "addr": "80050F1C",
+     "size": 8
+    },
+    {
+     "name": "IsConversationPopupVisible",
+     "addr": "8005191C",
+     "size": 8
+    },
+    {
+     "name": "SetConversationReady",
+     "addr": "80051EB8",
+     "size": 20
+    }
+   ]
+  },
+  {
+   "path": "src/leaf/auto_03_800505E0_text_cb.cpp",
+   "functions": [
+    {
+     "name": "SendChatTargetSignal",
+     "addr": "80050F7C",
+     "size": 4
+    },
+    {
+     "name": "NotDebugging",
+     "addr": "80051648",
+     "size": 8
+    },
+    {
+     "name": "SetNPCDefaultAnimation",
+     "addr": "80051650",
+     "size": 8
+    }
+   ]
+  },
+  {
+   "path": "src/leaf/auto_03_80051EEC_text.cpp",
+   "functions": [
+    {
+     "name": "fn_80051EEC",
+     "addr": "80051EEC",
+     "size": 8
+    },
+    {
+     "name": "fn_80051EF4",
+     "addr": "80051EF4",
+     "size": 8
+    }
+   ]
+  },
+  {
+   "path": "src/leaf/auto_03_8005230C_text.cpp",
+   "functions": [
+    {
+     "name": "fn_80052384",
+     "addr": "80052384",
+     "size": 20
+    }
+   ]
+  },
+  {
+   "path": "src/leaf/auto_03_80052504_text.cpp",
+   "functions": [
+    {
+     "name": "fn_80052504",
+     "addr": "80052504",
+     "size": 44
+    },
+    {
+     "name": "fn_80052638",
+     "addr": "80052638",
+     "size": 4
+    },
+    {
+     "name": "fn_8005263C",
+     "addr": "8005263C",
+     "size": 4
+    },
+    {
+     "name": "fn_80052640",
+     "addr": "80052640",
+     "size": 28
+    },
+    {
+     "name": "fn_800526D0",
+     "addr": "800526D0",
+     "size": 4
+    },
+    {
+     "name": "fn_800526D4",
+     "addr": "800526D4",
+     "size": 8
+    },
+    {
+     "name": "fn_800526DC",
+     "addr": "800526DC",
+     "size": 8
+    },
+    {
+     "name": "fn_800531A8",
+     "addr": "800531A8",
+     "size": 20
+    },
+    {
+     "name": "fn_800531E4",
+     "addr": "800531E4",
+     "size": 36
+    },
+    {
+     "name": "fn_80053208",
+     "addr": "80053208",
+     "size": 28
+    },
+    {
+     "name": "fn_80053224",
+     "addr": "80053224",
+     "size": 44
+    },
+    {
+     "name": "fn_80053250",
+     "addr": "80053250",
+     "size": 8
+    },
+    {
+     "name": "fn_80053324",
+     "addr": "80053324",
+     "size": 40
+    },
+    {
+     "name": "fn_8005334C",
+     "addr": "8005334C",
+     "size": 8
+    },
+    {
+     "name": "fn_80053354",
+     "addr": "80053354",
+     "size": 28
+    },
+    {
+     "name": "fn_800533A4",
+     "addr": "800533A4",
+     "size": 12
+    },
+    {
+     "name": "fn_800533C8",
+     "addr": "800533C8",
+     "size": 36
+    },
+    {
+     "name": "fn_800533EC",
+     "addr": "800533EC",
+     "size": 36
+    },
+    {
+     "name": "fn_80053410",
+     "addr": "80053410",
+     "size": 8
+    },
+    {
+     "name": "fn_80053550",
+     "addr": "80053550",
+     "size": 8
+    },
+    {
+     "name": "fn_80053ACC",
+     "addr": "80053ACC",
+     "size": 28
+    },
+    {
+     "name": "fn_80053AE8",
+     "addr": "80053AE8",
+     "size": 16
+    },
+    {
+     "name": "fn_800544B8",
+     "addr": "800544B8",
+     "size": 20
+    },
+    {
+     "name": "fn_800544CC",
+     "addr": "800544CC",
+     "size": 12
+    },
+    {
+     "name": "fn_800545EC",
+     "addr": "800545EC",
+     "size": 48
+    },
+    {
+     "name": "fn_80054828",
+     "addr": "80054828",
+     "size": 8
+    },
+    {
+     "name": "fn_80054830",
+     "addr": "80054830",
+     "size": 8
+    },
+    {
+     "name": "fn_80054838",
+     "addr": "80054838",
+     "size": 8
+    },
+    {
+     "name": "fn_80054840",
+     "addr": "80054840",
+     "size": 12
+    },
+    {
+     "name": "fn_800548EC",
+     "addr": "800548EC",
+     "size": 8
+    },
+    {
+     "name": "fn_80054988",
+     "addr": "80054988",
+     "size": 24
+    },
+    {
+     "name": "fn_800549A0",
+     "addr": "800549A0",
+     "size": 8
+    },
+    {
+     "name": "fn_800549A8",
+     "addr": "800549A8",
+     "size": 24
+    },
+    {
+     "name": "fn_800549F4",
+     "addr": "800549F4",
+     "size": 8
+    },
+    {
+     "name": "fn_80054A30",
+     "addr": "80054A30",
+     "size": 12
+    },
+    {
+     "name": "fn_80054A3C",
+     "addr": "80054A3C",
+     "size": 44
+    },
+    {
+     "name": "fn_80054A68",
+     "addr": "80054A68",
+     "size": 12
+    },
+    {
+     "name": "fn_80054A74",
+     "addr": "80054A74",
+     "size": 20
+    },
+    {
+     "name": "fn_80054A88",
+     "addr": "80054A88",
+     "size": 8
+    },
+    {
+     "name": "fn_80054A90",
+     "addr": "80054A90",
+     "size": 36
+    },
+    {
+     "name": "fn_800553C0",
+     "addr": "800553C0",
+     "size": 28
+    },
+    {
+     "name": "fn_800554D4",
+     "addr": "800554D4",
+     "size": 8
+    },
+    {
+     "name": "fn_80055D64",
+     "addr": "80055D64",
+     "size": 28
+    },
+    {
+     "name": "fn_80055D80",
+     "addr": "80055D80",
+     "size": 28
+    },
+    {
+     "name": "fn_80055E2C",
+     "addr": "80055E2C",
+     "size": 12
+    },
+    {
+     "name": "fn_80056208",
+     "addr": "80056208",
+     "size": 8
+    },
+    {
+     "name": "fn_8005678C",
+     "addr": "8005678C",
+     "size": 24
+    },
+    {
+     "name": "fn_800567FC",
+     "addr": "800567FC",
+     "size": 28
+    },
+    {
+     "name": "fn_80056818",
+     "addr": "80056818",
+     "size": 28
+    },
+    {
+     "name": "fn_800570F8",
+     "addr": "800570F8",
+     "size": 48
+    },
+    {
+     "name": "fn_80058214",
+     "addr": "80058214",
+     "size": 20
+    },
+    {
+     "name": "fn_80058228",
+     "addr": "80058228",
+     "size": 8
+    },
+    {
+     "name": "fn_80058230",
+     "addr": "80058230",
+     "size": 8
+    },
+    {
+     "name": "fn_80058238",
+     "addr": "80058238",
+     "size": 8
+    },
+    {
+     "name": "fn_80058240",
+     "addr": "80058240",
+     "size": 12
+    },
+    {
+     "name": "fn_800584C8",
+     "addr": "800584C8",
+     "size": 8
+    },
+    {
+     "name": "fn_80058BD4",
+     "addr": "80058BD4",
+     "size": 20
+    },
+    {
+     "name": "fn_8005B648",
+     "addr": "8005B648",
+     "size": 8
+    },
+    {
+     "name": "fn_8005C148",
+     "addr": "8005C148",
+     "size": 16
+    }
+   ]
+  },
+  {
+   "path": "src/leaf/auto_03_80052504_text_cb.cpp",
+   "functions": [
+    {
+     "name": "SetGroundFriction",
+     "addr": "8005C3F0",
+     "size": 8
+    },
+    {
+     "name": "SetGroundFrictionToDefault",
+     "addr": "8005C3F8",
+     "size": 12
+    },
+    {
+     "name": "SetAirFriction",
+     "addr": "8005C404",
+     "size": 8
+    },
+    {
+     "name": "SetAirFrictionToDefault",
+     "addr": "8005C40C",
+     "size": 12
+    },
+    {
+     "name": "ChooseFlailingLand",
+     "addr": "8005C478",
+     "size": 8
+    },
+    {
+     "name": "SetMinimumKnockbackVel",
+     "addr": "8005C64C",
+     "size": 8
+    },
+    {
+     "name": "SetMinimumDamage",
+     "addr": "8005C654",
+     "size": 8
+    },
+    {
+     "name": "SetMinimumHitstun",
+     "addr": "8005C65C",
+     "size": 8
+    },
+    {
+     "name": "GetLastHitstunTaken",
+     "addr": "8005C814",
+     "size": 8
+    },
+    {
+     "name": "GetLastDamageAmountTaken",
+     "addr": "8005C81C",
+     "size": 8
+    },
+    {
+     "name": "GetLastDamageTypeTaken",
+     "addr": "8005C824",
+     "size": 8
+    }
+   ]
+  },
+  {
+   "path": "src/leaf/auto_03_8005CBC4_text.cpp",
+   "functions": [
+    {
+     "name": "fn_8005E120",
+     "addr": "8005E120",
+     "size": 8
+    },
+    {
+     "name": "fn_8005E128",
+     "addr": "8005E128",
+     "size": 8
+    },
+    {
+     "name": "fn_80062C38",
+     "addr": "80062C38",
+     "size": 8
+    }
+   ]
+  },
+  {
+   "path": "src/leaf/auto_03_80062C7C_text.cpp",
+   "functions": [
+    {
+     "name": "fn_80062C7C",
+     "addr": "80062C7C",
+     "size": 4
+    }
+   ]
+  },
+  {
+   "path": "src/leaf/auto_03_800636A0_text.cpp",
+   "functions": [
+    {
+     "name": "fn_800636A0",
+     "addr": "800636A0",
+     "size": 4
+    },
+    {
+     "name": "fn_800645AC",
+     "addr": "800645AC",
+     "size": 28
+    },
+    {
+     "name": "fn_800651C8",
+     "addr": "800651C8",
+     "size": 28
+    },
+    {
+     "name": "fn_800651E4",
+     "addr": "800651E4",
+     "size": 28
+    },
+    {
+     "name": "fn_800653E8",
+     "addr": "800653E8",
+     "size": 12
+    },
+    {
+     "name": "fn_800655D0",
+     "addr": "800655D0",
+     "size": 8
+    },
+    {
+     "name": "fn_80065FE4",
+     "addr": "80065FE4",
+     "size": 12
+    },
+    {
+     "name": "fn_80066800",
+     "addr": "80066800",
+     "size": 12
+    },
+    {
+     "name": "fn_800676D4",
+     "addr": "800676D4",
+     "size": 12
+    },
+    {
+     "name": "fn_80067844",
+     "addr": "80067844",
+     "size": 8
+    }
+   ]
+  },
+  {
+   "path": "src/leaf/auto_03_800636A0_text_cb.cpp",
+   "functions": [
+    {
+     "name": "Projectile_Set_Dead",
+     "addr": "800636A4",
+     "size": 24
+    }
+   ]
+  },
+  {
+   "path": "src/leaf/auto_03_80069028_text.cpp",
+   "functions": [
+    {
+     "name": "fn_8006C65C",
+     "addr": "8006C65C",
+     "size": 8
+    },
+    {
+     "name": "fn_8006C664",
+     "addr": "8006C664",
+     "size": 8
+    },
+    {
+     "name": "fn_8006CB54",
+     "addr": "8006CB54",
+     "size": 36
+    }
+   ]
+  },
+  {
+   "path": "src/leaf/auto_03_80069028_text_cb.cpp",
+   "functions": [
+    {
+     "name": "GetNumPropStates",
+     "addr": "8006BB1C",
+     "size": 8
+    },
+    {
+     "name": "GetPropCurrentState",
+     "addr": "8006BB24",
+     "size": 12
+    },
+    {
+     "name": "GetPropPreviousState",
+     "addr": "8006BB30",
+     "size": 12
+    }
+   ]
+  },
+  {
+   "path": "src/leaf/auto_03_8006CFA4_text.cpp",
+   "functions": [
+    {
+     "name": "fn_8006D248",
+     "addr": "8006D248",
+     "size": 8
+    }
+   ]
+  },
+  {
+   "path": "src/leaf/auto_03_8006FA44_text.cpp",
+   "functions": [
+    {
+     "name": "fn_8006FA44",
+     "addr": "8006FA44",
+     "size": 24
+    },
+    {
+     "name": "fn_8006FA5C",
+     "addr": "8006FA5C",
+     "size": 24
+    },
+    {
+     "name": "fn_8006FBFC",
+     "addr": "8006FBFC",
+     "size": 8
+    },
+    {
+     "name": "fn_8007043C",
+     "addr": "8007043C",
+     "size": 12
+    },
+    {
+     "name": "fn_80070448",
+     "addr": "80070448",
+     "size": 8
+    },
+    {
+     "name": "fn_80070450",
+     "addr": "80070450",
+     "size": 8
+    },
+    {
+     "name": "fn_80070458",
+     "addr": "80070458",
+     "size": 8
+    },
+    {
+     "name": "fn_800712B4",
+     "addr": "800712B4",
+     "size": 4
+    },
+    {
+     "name": "fn_800712B8",
+     "addr": "800712B8",
+     "size": 4
+    },
+    {
+     "name": "fn_80071BA0",
+     "addr": "80071BA0",
+     "size": 8
+    },
+    {
+     "name": "fn_80071BB0",
+     "addr": "80071BB0",
+     "size": 4
+    },
+    {
+     "name": "fn_800743D4",
+     "addr": "800743D4",
+     "size": 4
+    },
+    {
+     "name": "fn_800747B4",
+     "addr": "800747B4",
+     "size": 8
+    }
+   ]
+  },
+  {
+   "path": "src/leaf/auto_03_8006FA44_text_cb.cpp",
+   "functions": [
+    {
+     "name": "ClearExperimentSounds",
+     "addr": "80070F40",
+     "size": 12
+    },
+    {
+     "name": "SetDefaultExperimentScore",
+     "addr": "80071A9C",
+     "size": 4
+    },
+    {
+     "name": "TestRestartInput",
+     "addr": "80071BA8",
+     "size": 8
+    },
+    {
+     "name": "ShouldShowExperimentFailureMovie",
+     "addr": "800743D8",
+     "size": 8
+    }
+   ]
+  },
+  {
+   "path": "src/leaf/auto_03_800747DC_text_cb.cpp",
+   "functions": [
+    {
+     "name": "RunIngredientsSelection",
+     "addr": "800747DC",
+     "size": 8
+    },
+    {
+     "name": "StringHashValid",
+     "addr": "800747E4",
+     "size": 16
+    }
+   ]
+  },
+  {
+   "path": "src/leaf/auto_03_80074CC8_text.cpp",
+   "functions": [
+    {
+     "name": "fn_80074D48",
+     "addr": "80074D48",
+     "size": 8
+    },
+    {
+     "name": "fn_80074D50",
+     "addr": "80074D50",
+     "size": 8
+    },
+    {
+     "name": "fn_80074D58",
+     "addr": "80074D58",
+     "size": 8
+    },
+    {
+     "name": "fn_80074D60",
+     "addr": "80074D60",
+     "size": 8
+    },
+    {
+     "name": "fn_80074D74",
+     "addr": "80074D74",
+     "size": 12
+    },
+    {
+     "name": "fn_80075264",
+     "addr": "80075264",
+     "size": 8
+    }
+   ]
+  },
+  {
+   "path": "src/leaf/auto_03_80074CC8_text_cb.cpp",
+   "functions": [
+    {
+     "name": "minigame_gameflow_control_pause_transition",
+     "addr": "80074D68",
+     "size": 12
+    }
+   ]
+  },
+  {
+   "path": "src/leaf/auto_03_800756E0_text.cpp",
+   "functions": [
+    {
+     "name": "fn_80076384",
+     "addr": "80076384",
+     "size": 4
+    },
+    {
+     "name": "fn_8007657C",
+     "addr": "8007657C",
+     "size": 4
+    },
+    {
+     "name": "fn_80076580",
+     "addr": "80076580",
+     "size": 4
+    },
+    {
+     "name": "fn_80076A64",
+     "addr": "80076A64",
+     "size": 8
+    }
+   ]
+  },
+  {
+   "path": "src/leaf/auto_03_80076AB8_text.cpp",
+   "functions": [
+    {
+     "name": "fn_80076B9C",
+     "addr": "80076B9C",
+     "size": 8
+    }
+   ]
+  },
+  {
+   "path": "src/leaf/auto_03_80076D38_text.cpp",
+   "functions": [
+    {
+     "name": "fn_8007739C",
+     "addr": "8007739C",
+     "size": 48
+    }
+   ]
+  },
+  {
+   "path": "src/leaf/auto_03_80077B50_text.cpp",
+   "functions": [
+    {
+     "name": "WeldingOverDangerZone",
+     "addr": "80077C48",
+     "size": 8
+    }
+   ]
+  },
+  {
+   "path": "src/leaf/auto_03_80077D1C_text.cpp",
+   "functions": [
+    {
+     "name": "fn_80078BB0",
+     "addr": "80078BB0",
+     "size": 8
+    },
+    {
+     "name": "fn_80079E14",
+     "addr": "80079E14",
+     "size": 4
+    },
+    {
+     "name": "fn_80079E1C",
+     "addr": "80079E1C",
+     "size": 4
+    },
+    {
+     "name": "fn_8007A2AC",
+     "addr": "8007A2AC",
+     "size": 4
+    },
+    {
+     "name": "fn_8007A2B0",
+     "addr": "8007A2B0",
+     "size": 4
+    },
+    {
+     "name": "fn_8007A2B4",
+     "addr": "8007A2B4",
+     "size": 4
+    },
+    {
+     "name": "fn_8007A2B8",
+     "addr": "8007A2B8",
+     "size": 4
+    },
+    {
+     "name": "fn_8007A2BC",
+     "addr": "8007A2BC",
+     "size": 4
+    },
+    {
+     "name": "fn_8007A2C0",
+     "addr": "8007A2C0",
+     "size": 8
+    },
+    {
+     "name": "fn_8007A2C8",
+     "addr": "8007A2C8",
+     "size": 4
+    },
+    {
+     "name": "fn_8007A2CC",
+     "addr": "8007A2CC",
+     "size": 8
+    },
+    {
+     "name": "fn_8007A2D4",
+     "addr": "8007A2D4",
+     "size": 8
+    },
+    {
+     "name": "fn_8007A2DC",
+     "addr": "8007A2DC",
+     "size": 4
+    },
+    {
+     "name": "fn_8007A2E0",
+     "addr": "8007A2E0",
+     "size": 8
+    },
+    {
+     "name": "fn_8007A2E8",
+     "addr": "8007A2E8",
+     "size": 4
+    },
+    {
+     "name": "fn_8007A2EC",
+     "addr": "8007A2EC",
+     "size": 8
+    },
+    {
+     "name": "fn_8007A2F4",
+     "addr": "8007A2F4",
+     "size": 4
+    },
+    {
+     "name": "fn_8007A2F8",
+     "addr": "8007A2F8",
+     "size": 8
+    },
+    {
+     "name": "fn_8007A300",
+     "addr": "8007A300",
+     "size": 4
+    },
+    {
+     "name": "fn_8007A304",
+     "addr": "8007A304",
+     "size": 8
+    },
+    {
+     "name": "fn_8007A30C",
+     "addr": "8007A30C",
+     "size": 4
+    },
+    {
+     "name": "fn_8007A310",
+     "addr": "8007A310",
+     "size": 8
+    },
+    {
+     "name": "fn_8007A318",
+     "addr": "8007A318",
+     "size": 8
+    },
+    {
+     "name": "fn_8007A320",
+     "addr": "8007A320",
+     "size": 4
+    },
+    {
+     "name": "fn_8007A324",
+     "addr": "8007A324",
+     "size": 8
+    },
+    {
+     "name": "fn_8007A32C",
+     "addr": "8007A32C",
+     "size": 4
+    },
+    {
+     "name": "fn_8007A330",
+     "addr": "8007A330",
+     "size": 4
+    },
+    {
+     "name": "fn_8007A334",
+     "addr": "8007A334",
+     "size": 4
+    },
+    {
+     "name": "fn_8007A338",
+     "addr": "8007A338",
+     "size": 8
+    },
+    {
+     "name": "fn_8007A340",
+     "addr": "8007A340",
+     "size": 8
+    },
+    {
+     "name": "fn_8007A348",
+     "addr": "8007A348",
+     "size": 4
+    }
+   ]
+  },
+  {
+   "path": "src/leaf/auto_03_80077D1C_text_cb.cpp",
+   "functions": [
+    {
+     "name": "WeldingPS2WeldButtonJustPressed",
+     "addr": "8007A29C",
+     "size": 8
+    },
+    {
+     "name": "WeldingPS2WeldButtonReleased",
+     "addr": "8007A2A4",
+     "size": 8
+    }
+   ]
+  },
+  {
+   "path": "src/leaf/auto_03_8007A394_text.cpp",
+   "functions": [
+    {
+     "name": "fn_8007A394",
+     "addr": "8007A394",
+     "size": 32
+    },
+    {
+     "name": "fn_8007A3F4",
+     "addr": "8007A3F4",
+     "size": 36
+    },
+    {
+     "name": "fn_8007A418",
+     "addr": "8007A418",
+     "size": 20
+    },
+    {
+     "name": "fn_8007A42C",
+     "addr": "8007A42C",
+     "size": 20
+    }
+   ]
+  },
+  {
+   "path": "src/leaf/auto_03_8007A680_text.cpp",
+   "functions": [
+    {
+     "name": "fn_8007A680",
+     "addr": "8007A680",
+     "size": 12
+    }
+   ]
+  },
+  {
+   "path": "src/leaf/auto_03_8007AFC4_text.cpp",
+   "functions": [
+    {
+     "name": "fn_8007B318",
+     "addr": "8007B318",
+     "size": 8
+    },
+    {
+     "name": "fn_8007BED8",
+     "addr": "8007BED8",
+     "size": 12
+    },
+    {
+     "name": "fn_8007C110",
+     "addr": "8007C110",
+     "size": 12
+    },
+    {
+     "name": "fn_8007C11C",
+     "addr": "8007C11C",
+     "size": 8
+    },
+    {
+     "name": "fn_8007C124",
+     "addr": "8007C124",
+     "size": 8
+    },
+    {
+     "name": "fn_8007C12C",
+     "addr": "8007C12C",
+     "size": 12
+    },
+    {
+     "name": "fn_8007C138",
+     "addr": "8007C138",
+     "size": 8
+    }
+   ]
+  },
+  {
+   "path": "src/leaf/auto_03_8007C4AC_text.cpp",
+   "functions": [
+    {
+     "name": "fn_8007C4AC",
+     "addr": "8007C4AC",
+     "size": 32
+    },
+    {
+     "name": "fn_8007C5B4",
+     "addr": "8007C5B4",
+     "size": 36
+    },
+    {
+     "name": "fn_8007C5D8",
+     "addr": "8007C5D8",
+     "size": 12
+    },
+    {
+     "name": "fn_8007C5E4",
+     "addr": "8007C5E4",
+     "size": 24
+    }
+   ]
+  },
+  {
+   "path": "src/leaf/auto_03_8007CED8_text.cpp",
+   "functions": [
+    {
+     "name": "fn_8007CF94",
+     "addr": "8007CF94",
+     "size": 16
+    },
+    {
+     "name": "fn_8007CFA4",
+     "addr": "8007CFA4",
+     "size": 8
+    },
+    {
+     "name": "fn_8007D2BC",
+     "addr": "8007D2BC",
+     "size": 8
+    },
+    {
+     "name": "fn_8007D2C4",
+     "addr": "8007D2C4",
+     "size": 4
+    }
+   ]
+  },
+  {
+   "path": "src/leaf/auto_03_8007D4DC_text.cpp",
+   "functions": [
+    {
+     "name": "fn_8007E0B8",
+     "addr": "8007E0B8",
+     "size": 20
+    },
+    {
+     "name": "fn_8007E344",
+     "addr": "8007E344",
+     "size": 4
+    },
+    {
+     "name": "fn_8007E940",
+     "addr": "8007E940",
+     "size": 4
+    },
+    {
+     "name": "fn_8007E964",
+     "addr": "8007E964",
+     "size": 4
+    },
+    {
+     "name": "fn_80080FC0",
+     "addr": "80080FC0",
+     "size": 8
+    },
+    {
+     "name": "fn_80080FC8",
+     "addr": "80080FC8",
+     "size": 8
+    }
+   ]
+  },
+  {
+   "path": "src/leaf/auto_03_8007D4DC_text_cb.cpp",
+   "functions": [
+    {
+     "name": "BrainTossRumbleOnMiss",
+     "addr": "800819FC",
+     "size": 8
+    }
+   ]
+  },
+  {
+   "path": "src/leaf/auto_03_80081AF4_text.cpp",
+   "functions": [
+    {
+     "name": "fn_80082114",
+     "addr": "80082114",
+     "size": 12
+    },
+    {
+     "name": "fn_8008236C",
+     "addr": "8008236C",
+     "size": 16
+    },
+    {
+     "name": "fn_8008294C",
+     "addr": "8008294C",
+     "size": 8
+    },
+    {
+     "name": "fn_80082A04",
+     "addr": "80082A04",
+     "size": 8
+    },
+    {
+     "name": "fn_80082A20",
+     "addr": "80082A20",
+     "size": 12
+    },
+    {
+     "name": "fn_80082A2C",
+     "addr": "80082A2C",
+     "size": 12
+    },
+    {
+     "name": "fn_80082A38",
+     "addr": "80082A38",
+     "size": 12
+    },
+    {
+     "name": "fn_80082A44",
+     "addr": "80082A44",
+     "size": 12
+    },
+    {
+     "name": "fn_80082A50",
+     "addr": "80082A50",
+     "size": 36
+    },
+    {
+     "name": "fn_80082B88",
+     "addr": "80082B88",
+     "size": 8
+    },
+    {
+     "name": "fn_80082BE0",
+     "addr": "80082BE0",
+     "size": 36
+    },
+    {
+     "name": "fn_80082F0C",
+     "addr": "80082F0C",
+     "size": 20
+    },
+    {
+     "name": "fn_80082F20",
+     "addr": "80082F20",
+     "size": 28
+    },
+    {
+     "name": "fn_80082F3C",
+     "addr": "80082F3C",
+     "size": 8
+    },
+    {
+     "name": "fn_80082F44",
+     "addr": "80082F44",
+     "size": 36
+    }
+   ]
+  },
+  {
+   "path": "src/leaf/auto_03_80081AF4_text_cb.cpp",
+   "functions": [
+    {
+     "name": "BrainChunkIsInUse",
+     "addr": "8008237C",
+     "size": 8
+    },
+    {
+     "name": "BrainChunkGetHitType",
+     "addr": "8008246C",
+     "size": 8
+    },
+    {
+     "name": "BrainChunkUpdateSplat",
+     "addr": "80083458",
+     "size": 4
+    },
+    {
+     "name": "BrainChunkBounceWasLeft",
+     "addr": "8008363C",
+     "size": 8
+    },
+    {
+     "name": "BrainChunkSplatOnWall",
+     "addr": "80083644",
+     "size": 8
+    },
+    {
+     "name": "BrainChunkGetChunkType",
+     "addr": "80083660",
+     "size": 8
+    }
+   ]
+  },
+  {
+   "path": "src/leaf/auto_03_800836A0_text.cpp",
+   "functions": [
+    {
+     "name": "fn_80083770",
+     "addr": "80083770",
+     "size": 28
+    },
+    {
+     "name": "fn_8008378C",
+     "addr": "8008378C",
+     "size": 12
+    }
+   ]
+  },
+  {
+   "path": "src/leaf/auto_03_800836A0_text_cb.cpp",
+   "functions": [
+    {
+     "name": "BrainTargetWait",
+     "addr": "800837A8",
+     "size": 28
+    },
+    {
+     "name": "BrainTargetSetStateTime",
+     "addr": "800837F4",
+     "size": 8
+    },
+    {
+     "name": "BrainTargetSetWaiting",
+     "addr": "8008380C",
+     "size": 20
+    },
+    {
+     "name": "BrainTargetGetReceivedChunk",
+     "addr": "80083820",
+     "size": 8
+    },
+    {
+     "name": "BrainTargetSetReceivedChunk",
+     "addr": "80083828",
+     "size": 8
+    }
+   ]
+  },
+  {
+   "path": "src/leaf/auto_03_80083A6C_text_cb.cpp",
+   "functions": [
+    {
+     "name": "BrainHeadSetEating",
+     "addr": "80084D04",
+     "size": 20
+    },
+    {
+     "name": "BrainHeadFreebieIsNext",
+     "addr": "80084D2C",
+     "size": 8
+    },
+    {
+     "name": "BrainHeadMovingSideways",
+     "addr": "80084D34",
+     "size": 8
+    },
+    {
+     "name": "BrainHeadIsEating",
+     "addr": "80084E6C",
+     "size": 8
+    }
+   ]
+  },
+  {
+   "path": "src/leaf/auto_03_80084E94_text.cpp",
+   "functions": [
+    {
+     "name": "fn_80085398",
+     "addr": "80085398",
+     "size": 28
+    },
+    {
+     "name": "fn_80085414",
+     "addr": "80085414",
+     "size": 16
+    }
+   ]
+  },
+  {
+   "path": "src/leaf/auto_03_80084E94_text_cb.cpp",
+   "functions": [
+    {
+     "name": "BrainPowerUpGetNextPowerUpType",
+     "addr": "80086758",
+     "size": 8
+    }
+   ]
+  },
+  {
+   "path": "src/leaf/auto_03_80086780_text_cb.cpp",
+   "functions": [
+    {
+     "name": "BrainHandGetTossStrength",
+     "addr": "8008682C",
+     "size": 8
+    },
+    {
+     "name": "BrainHandSetHeldChunk",
+     "addr": "80086834",
+     "size": 16
+    },
+    {
+     "name": "BrainHandGetHeldChunk",
+     "addr": "80086844",
+     "size": 8
+    }
+   ]
+  },
+  {
+   "path": "src/leaf/auto_03_80086BE8_text.cpp",
+   "functions": [
+    {
+     "name": "fn_80087EA8",
+     "addr": "80087EA8",
+     "size": 4
+    },
+    {
+     "name": "fn_80087EAC",
+     "addr": "80087EAC",
+     "size": 12
+    },
+    {
+     "name": "fn_80087EEC",
+     "addr": "80087EEC",
+     "size": 4
+    },
+    {
+     "name": "fn_80087EF0",
+     "addr": "80087EF0",
+     "size": 12
+    },
+    {
+     "name": "fn_80087F30",
+     "addr": "80087F30",
+     "size": 4
+    },
+    {
+     "name": "fn_80087FF4",
+     "addr": "80087FF4",
+     "size": 8
+    },
+    {
+     "name": "fn_80087FFC",
+     "addr": "80087FFC",
+     "size": 8
+    }
+   ]
+  },
+  {
+   "path": "src/leaf/auto_03_8008B430_text.cpp",
+   "functions": [
+    {
+     "name": "fn_8008B9EC",
+     "addr": "8008B9EC",
+     "size": 40
+    },
+    {
+     "name": "fn_8008C104",
+     "addr": "8008C104",
+     "size": 36
+    },
+    {
+     "name": "fn_8008C128",
+     "addr": "8008C128",
+     "size": 32
+    },
+    {
+     "name": "fn_8008C414",
+     "addr": "8008C414",
+     "size": 8
+    },
+    {
+     "name": "fn_8008C8C8",
+     "addr": "8008C8C8",
+     "size": 28
+    },
+    {
+     "name": "fn_8008C8E4",
+     "addr": "8008C8E4",
+     "size": 8
+    }
+   ]
+  },
+  {
+   "path": "src/leaf/auto_03_8008B430_text_cb.cpp",
+   "functions": [
+    {
+     "name": "BrazierWandSetIdle",
+     "addr": "8008C9CC",
+     "size": 12
+    }
+   ]
+  },
+  {
+   "path": "src/leaf/auto_03_8008C9F8_text.cpp",
+   "functions": [
+    {
+     "name": "fn_8008CAA4",
+     "addr": "8008CAA4",
+     "size": 20
+    },
+    {
+     "name": "fn_8008CAB8",
+     "addr": "8008CAB8",
+     "size": 4
+    },
+    {
+     "name": "fn_8008CABC",
+     "addr": "8008CABC",
+     "size": 4
+    }
+   ]
+  },
+  {
+   "path": "src/leaf/auto_03_8008CBB0_text.cpp",
+   "functions": [
+    {
+     "name": "fn_8008CE28",
+     "addr": "8008CE28",
+     "size": 16
+    },
+    {
+     "name": "fn_8008CE38",
+     "addr": "8008CE38",
+     "size": 12
+    },
+    {
+     "name": "fn_8008D234",
+     "addr": "8008D234",
+     "size": 16
+    },
+    {
+     "name": "fn_8008D244",
+     "addr": "8008D244",
+     "size": 8
+    },
+    {
+     "name": "fn_8008D24C",
+     "addr": "8008D24C",
+     "size": 8
+    },
+    {
+     "name": "fn_8008D254",
+     "addr": "8008D254",
+     "size": 8
+    },
+    {
+     "name": "fn_8008D25C",
+     "addr": "8008D25C",
+     "size": 28
+    },
+    {
+     "name": "fn_8008D278",
+     "addr": "8008D278",
+     "size": 28
+    },
+    {
+     "name": "fn_8008D294",
+     "addr": "8008D294",
+     "size": 8
+    },
+    {
+     "name": "fn_8008D670",
+     "addr": "8008D670",
+     "size": 12
+    },
+    {
+     "name": "fn_8008D698",
+     "addr": "8008D698",
+     "size": 8
+    },
+    {
+     "name": "fn_8008D6A0",
+     "addr": "8008D6A0",
+     "size": 28
+    },
+    {
+     "name": "fn_8008D7B0",
+     "addr": "8008D7B0",
+     "size": 8
+    },
+    {
+     "name": "fn_8008D7B8",
+     "addr": "8008D7B8",
+     "size": 8
+    },
+    {
+     "name": "fn_8008D7C0",
+     "addr": "8008D7C0",
+     "size": 8
+    },
+    {
+     "name": "fn_8008E5E0",
+     "addr": "8008E5E0",
+     "size": 8
+    },
+    {
+     "name": "fn_8008E878",
+     "addr": "8008E878",
+     "size": 8
+    }
+   ]
+  },
+  {
+   "path": "src/leaf/auto_03_8008CBB0_text_cb.cpp",
+   "functions": [
+    {
+     "name": "BrazierSymbolDestroyed",
+     "addr": "8008E8B8",
+     "size": 12
+    },
+    {
+     "name": "BrazierSymbolSetSymbolOccupied",
+     "addr": "8008EC30",
+     "size": 12
+    },
+    {
+     "name": "BrazierSymbolIsThrowTrailAttached",
+     "addr": "8008ED10",
+     "size": 8
+    }
+   ]
+  },
+  {
+   "path": "src/leaf/auto_03_8008ED38_text.cpp",
+   "functions": [
+    {
+     "name": "fn_80090150",
+     "addr": "80090150",
+     "size": 4
+    },
+    {
+     "name": "fn_80090244",
+     "addr": "80090244",
+     "size": 4
+    },
+    {
+     "name": "fn_80090338",
+     "addr": "80090338",
+     "size": 4
+    }
+   ]
+  },
+  {
+   "path": "src/leaf/auto_03_80091D04_text.cpp",
+   "functions": [
+    {
+     "name": "fn_80091D04",
+     "addr": "80091D04",
+     "size": 36
+    },
+    {
+     "name": "fn_80091F18",
+     "addr": "80091F18",
+     "size": 16
+    }
+   ]
+  },
+  {
+   "path": "src/leaf/auto_03_8009210C_text.cpp",
+   "functions": [
+    {
+     "name": "fn_800925A4",
+     "addr": "800925A4",
+     "size": 12
+    },
+    {
+     "name": "fn_800925B0",
+     "addr": "800925B0",
+     "size": 16
+    }
+   ]
+  },
+  {
+   "path": "src/leaf/auto_03_800940BC_text.cpp",
+   "functions": [
+    {
+     "name": "fn_80094F88",
+     "addr": "80094F88",
+     "size": 16
+    },
+    {
+     "name": "fn_80094F98",
+     "addr": "80094F98",
+     "size": 8
+    },
+    {
+     "name": "fn_80094FA0",
+     "addr": "80094FA0",
+     "size": 8
+    },
+    {
+     "name": "fn_8009515C",
+     "addr": "8009515C",
+     "size": 4
+    },
+    {
+     "name": "fn_80095A38",
+     "addr": "80095A38",
+     "size": 4
+    },
+    {
+     "name": "fn_80095BE8",
+     "addr": "80095BE8",
+     "size": 4
+    }
+   ]
+  },
+  {
+   "path": "src/leaf/auto_03_80097574_text.cpp",
+   "functions": [
+    {
+     "name": "fn_80097574",
+     "addr": "80097574",
+     "size": 28
+    },
+    {
+     "name": "fn_80097BCC",
+     "addr": "80097BCC",
+     "size": 48
+    },
+    {
+     "name": "fn_80098560",
+     "addr": "80098560",
+     "size": 8
+    },
+    {
+     "name": "fn_8009863C",
+     "addr": "8009863C",
+     "size": 8
+    }
+   ]
+  },
+  {
+   "path": "src/leaf/auto_03_80097574_text_cb.cpp",
+   "functions": [
+    {
+     "name": "ReactorFastenerIsDecoy",
+     "addr": "800980B8",
+     "size": 8
+    },
+    {
+     "name": "ReactorFastenerAdjustmentsRequired",
+     "addr": "800980C0",
+     "size": 8
+    }
+   ]
+  },
+  {
+   "path": "src/leaf/auto_03_80098BC0_text_cb.cpp",
+   "functions": [
+    {
+     "name": "ReactorLeakIdleNearHeart",
+     "addr": "80098BD0",
+     "size": 8
+    }
+   ]
+  },
+  {
+   "path": "src/leaf/auto_03_80098DA8_text_cb.cpp",
+   "functions": [
+    {
+     "name": "ReactorHeartGetTargetLeak",
+     "addr": "800999A4",
+     "size": 8
+    },
+    {
+     "name": "ReactorHeartGetMagnetLight",
+     "addr": "800999AC",
+     "size": 8
+    },
+    {
+     "name": "ReactorHeartResetTimer",
+     "addr": "80099A90",
+     "size": 12
+    },
+    {
+     "name": "ReactorHeartUpdateTimer",
+     "addr": "80099A9C",
+     "size": 28
+    }
+   ]
+  },
+  {
+   "path": "src/leaf/auto_03_80099AD8_text.cpp",
+   "functions": [
+    {
+     "name": "fn_8009A634",
+     "addr": "8009A634",
+     "size": 8
+    },
+    {
+     "name": "fn_8009A63C",
+     "addr": "8009A63C",
+     "size": 8
+    },
+    {
+     "name": "fn_8009A644",
+     "addr": "8009A644",
+     "size": 8
+    },
+    {
+     "name": "fn_8009ABBC",
+     "addr": "8009ABBC",
+     "size": 12
+    },
+    {
+     "name": "fn_8009ABFC",
+     "addr": "8009ABFC",
+     "size": 4
+    },
+    {
+     "name": "fn_8009AC00",
+     "addr": "8009AC00",
+     "size": 12
+    },
+    {
+     "name": "fn_8009AC40",
+     "addr": "8009AC40",
+     "size": 4
+    }
+   ]
+  },
+  {
+   "path": "src/leaf/auto_03_8009E818_text.cpp",
+   "functions": [
+    {
+     "name": "fn_8009EC0C",
+     "addr": "8009EC0C",
+     "size": 28
+    },
+    {
+     "name": "fn_8009EC28",
+     "addr": "8009EC28",
+     "size": 8
+    },
+    {
+     "name": "fn_8009F594",
+     "addr": "8009F594",
+     "size": 8
+    },
+    {
+     "name": "fn_8009F59C",
+     "addr": "8009F59C",
+     "size": 8
+    },
+    {
+     "name": "fn_8009F5A4",
+     "addr": "8009F5A4",
+     "size": 4
+    },
+    {
+     "name": "fn_8009F5A8",
+     "addr": "8009F5A8",
+     "size": 8
+    }
+   ]
+  },
+  {
+   "path": "src/leaf/auto_03_8009F66C_text.cpp",
+   "functions": [
+    {
+     "name": "fn_800A1BE8",
+     "addr": "800A1BE8",
+     "size": 4
+    },
+    {
+     "name": "fn_800A1F04",
+     "addr": "800A1F04",
+     "size": 4
+    },
+    {
+     "name": "fn_800A22E4",
+     "addr": "800A22E4",
+     "size": 4
+    },
+    {
+     "name": "fn_800A22E8",
+     "addr": "800A22E8",
+     "size": 12
+    },
+    {
+     "name": "fn_800A2328",
+     "addr": "800A2328",
+     "size": 4
+    },
+    {
+     "name": "fn_800A23E4",
+     "addr": "800A23E4",
+     "size": 8
+    }
+   ]
+  },
+  {
+   "path": "src/leaf/auto_03_8009F66C_text_cb.cpp",
+   "functions": [
+    {
+     "name": "SetSawInput",
+     "addr": "800A1998",
+     "size": 24
+    }
+   ]
+  },
+  {
+   "path": "src/leaf/auto_03_800A34C0_text.cpp",
+   "functions": [
+    {
+     "name": "fn_800A3818",
+     "addr": "800A3818",
+     "size": 4
+    }
+   ]
+  },
+  {
+   "path": "src/leaf/auto_03_800A38F4_text.cpp",
+   "functions": [
+    {
+     "name": "fn_800A43A8",
+     "addr": "800A43A8",
+     "size": 24
+    }
+   ]
+  },
+  {
+   "path": "src/leaf/auto_03_800A79A0_text.cpp",
+   "functions": [
+    {
+     "name": "fn_800A8ED0",
+     "addr": "800A8ED0",
+     "size": 4
+    },
+    {
+     "name": "fn_800A968C",
+     "addr": "800A968C",
+     "size": 4
+    },
+    {
+     "name": "fn_800A97FC",
+     "addr": "800A97FC",
+     "size": 4
+    },
+    {
+     "name": "fn_800A9B94",
+     "addr": "800A9B94",
+     "size": 8
+    }
+   ]
+  },
+  {
+   "path": "src/leaf/auto_03_800ABE10_text.cpp",
+   "functions": [
+    {
+     "name": "fn_800AC5EC",
+     "addr": "800AC5EC",
+     "size": 12
+    }
+   ]
+  },
+  {
+   "path": "src/leaf/auto_03_800AD844_text.cpp",
+   "functions": [
+    {
+     "name": "fn_800AE3A8",
+     "addr": "800AE3A8",
+     "size": 16
+    },
+    {
+     "name": "fn_800AEF38",
+     "addr": "800AEF38",
+     "size": 16
+    }
+   ]
+  },
+  {
+   "path": "src/leaf/auto_03_800AF568_text.cpp",
+   "functions": [
+    {
+     "name": "fn_800B0104",
+     "addr": "800B0104",
+     "size": 20
+    }
+   ]
+  },
+  {
+   "path": "src/leaf/auto_03_800B068C_text.cpp",
+   "functions": [
+    {
+     "name": "fn_800B0CFC",
+     "addr": "800B0CFC",
+     "size": 12
+    }
+   ]
+  },
+  {
+   "path": "src/leaf/auto_03_800B1498_text.cpp",
+   "functions": [
+    {
+     "name": "fn_800B154C",
+     "addr": "800B154C",
+     "size": 24
+    },
+    {
+     "name": "fn_800B1D90",
+     "addr": "800B1D90",
+     "size": 8
+    }
+   ]
+  },
+  {
+   "path": "src/leaf/auto_03_800B1EDC_text.cpp",
+   "functions": [
+    {
+     "name": "fn_800B1F80",
+     "addr": "800B1F80",
+     "size": 8
+    },
+    {
+     "name": "fn_800B1F88",
+     "addr": "800B1F88",
+     "size": 12
+    }
+   ]
+  },
+  {
+   "path": "src/leaf/auto_03_800B2384_text.cpp",
+   "functions": [
+    {
+     "name": "fn_800B4310",
+     "addr": "800B4310",
+     "size": 4
+    },
+    {
+     "name": "fn_800B48FC",
+     "addr": "800B48FC",
+     "size": 12
+    },
+    {
+     "name": "fn_800B493C",
+     "addr": "800B493C",
+     "size": 4
+    },
+    {
+     "name": "fn_800B4940",
+     "addr": "800B4940",
+     "size": 12
+    },
+    {
+     "name": "fn_800B4980",
+     "addr": "800B4980",
+     "size": 4
+    }
+   ]
+  },
+  {
+   "path": "src/leaf/auto_03_800B5990_text.cpp",
+   "functions": [
+    {
+     "name": "fn_800B5990",
+     "addr": "800B5990",
+     "size": 24
+    },
+    {
+     "name": "fn_800B5B20",
+     "addr": "800B5B20",
+     "size": 16
+    },
+    {
+     "name": "fn_800B5B30",
+     "addr": "800B5B30",
+     "size": 20
+    },
+    {
+     "name": "fn_800B5B44",
+     "addr": "800B5B44",
+     "size": 8
+    },
+    {
+     "name": "fn_800B5B4C",
+     "addr": "800B5B4C",
+     "size": 8
+    }
+   ]
+  },
+  {
+   "path": "src/leaf/auto_03_800B5E64_text.cpp",
+   "functions": [
+    {
+     "name": "fn_800B6328",
+     "addr": "800B6328",
+     "size": 16
+    },
+    {
+     "name": "fn_800B66D0",
+     "addr": "800B66D0",
+     "size": 8
+    },
+    {
+     "name": "fn_800B66D8",
+     "addr": "800B66D8",
+     "size": 8
+    },
+    {
+     "name": "fn_800B66E0",
+     "addr": "800B66E0",
+     "size": 16
+    },
+    {
+     "name": "fn_800B6848",
+     "addr": "800B6848",
+     "size": 8
+    },
+    {
+     "name": "fn_800B68B8",
+     "addr": "800B68B8",
+     "size": 8
+    },
+    {
+     "name": "fn_800B7198",
+     "addr": "800B7198",
+     "size": 8
+    },
+    {
+     "name": "fn_800B71A0",
+     "addr": "800B71A0",
+     "size": 8
+    },
+    {
+     "name": "fn_800B71A8",
+     "addr": "800B71A8",
+     "size": 8
+    },
+    {
+     "name": "fn_800B7380",
+     "addr": "800B7380",
+     "size": 8
+    },
+    {
+     "name": "fn_800B7388",
+     "addr": "800B7388",
+     "size": 8
+    },
+    {
+     "name": "fn_800B7390",
+     "addr": "800B7390",
+     "size": 8
+    },
+    {
+     "name": "fn_800B7398",
+     "addr": "800B7398",
+     "size": 8
+    },
+    {
+     "name": "fn_800B7400",
+     "addr": "800B7400",
+     "size": 20
+    },
+    {
+     "name": "fn_800B7414",
+     "addr": "800B7414",
+     "size": 20
+    },
+    {
+     "name": "fn_800B7464",
+     "addr": "800B7464",
+     "size": 8
+    }
+   ]
+  },
+  {
+   "path": "src/leaf/auto_03_800B7934_text.cpp",
+   "functions": [
+    {
+     "name": "fn_800B79D8",
+     "addr": "800B79D8",
+     "size": 16
+    }
+   ]
+  },
+  {
+   "path": "src/leaf/auto_03_800B7A08_text.cpp",
+   "functions": [
+    {
+     "name": "fn_800B7C64",
+     "addr": "800B7C64",
+     "size": 16
+    }
+   ]
+  },
+  {
+   "path": "src/leaf/auto_03_800B7E34_text_cb.cpp",
+   "functions": [
+    {
+     "name": "ArmWrestleMechArmIsWhichArm",
+     "addr": "800B8C2C",
+     "size": 8
+    }
+   ]
+  },
+  {
+   "path": "src/leaf/auto_03_800B8C54_text.cpp",
+   "functions": [
+    {
+     "name": "fn_800B964C",
+     "addr": "800B964C",
+     "size": 8
+    },
+    {
+     "name": "fn_800B990C",
+     "addr": "800B990C",
+     "size": 8
+    },
+    {
+     "name": "fn_800B9914",
+     "addr": "800B9914",
+     "size": 8
+    },
+    {
+     "name": "fn_800B998C",
+     "addr": "800B998C",
+     "size": 8
+    },
+    {
+     "name": "fn_800B9994",
+     "addr": "800B9994",
+     "size": 8
+    },
+    {
+     "name": "fn_800B9A78",
+     "addr": "800B9A78",
+     "size": 8
+    }
+   ]
+  },
+  {
+   "path": "src/leaf/auto_03_800B9AA0_text.cpp",
+   "functions": [
+    {
+     "name": "fn_800BA984",
+     "addr": "800BA984",
+     "size": 4
+    },
+    {
+     "name": "fn_800BB41C",
+     "addr": "800BB41C",
+     "size": 4
+    },
+    {
+     "name": "fn_800BB51C",
+     "addr": "800BB51C",
+     "size": 4
+    },
+    {
+     "name": "fn_800BB61C",
+     "addr": "800BB61C",
+     "size": 4
+    },
+    {
+     "name": "fn_800BB650",
+     "addr": "800BB650",
+     "size": 8
+    }
+   ]
+  },
+  {
+   "path": "src/leaf/auto_03_800BC99C_text.cpp",
+   "functions": [
+    {
+     "name": "fn_800BCC10",
+     "addr": "800BCC10",
+     "size": 20
+    }
+   ]
+  },
+  {
+   "path": "src/leaf/auto_03_800BD894_text.cpp",
+   "functions": [
+    {
+     "name": "fn_800BD978",
+     "addr": "800BD978",
+     "size": 12
+    }
+   ]
+  },
+  {
+   "path": "src/leaf/auto_03_800BE308_text.cpp",
+   "functions": [
+    {
+     "name": "fn_800BE3A4",
+     "addr": "800BE3A4",
+     "size": 4
+    },
+    {
+     "name": "fn_800BF180",
+     "addr": "800BF180",
+     "size": 12
+    }
+   ]
+  },
+  {
+   "path": "src/leaf/auto_03_800BF654_text.cpp",
+   "functions": [
+    {
+     "name": "fn_800BF6FC",
+     "addr": "800BF6FC",
+     "size": 4
+    },
+    {
+     "name": "fn_800BF700",
+     "addr": "800BF700",
+     "size": 16
+    },
+    {
+     "name": "fn_800BF870",
+     "addr": "800BF870",
+     "size": 8
+    }
+   ]
+  },
+  {
+   "path": "src/leaf/auto_03_800BF97C_text.cpp",
+   "functions": [
+    {
+     "name": "fn_800C09C0",
+     "addr": "800C09C0",
+     "size": 24
+    },
+    {
+     "name": "fn_800C121C",
+     "addr": "800C121C",
+     "size": 48
+    }
+   ]
+  },
+  {
+   "path": "src/leaf/auto_03_800C13D8_text.cpp",
+   "functions": [
+    {
+     "name": "fn_800C15D8",
+     "addr": "800C15D8",
+     "size": 16
+    },
+    {
+     "name": "fn_800C1768",
+     "addr": "800C1768",
+     "size": 4
+    },
+    {
+     "name": "fn_800C176C",
+     "addr": "800C176C",
+     "size": 44
+    },
+    {
+     "name": "fn_800C20FC",
+     "addr": "800C20FC",
+     "size": 16
+    },
+    {
+     "name": "fn_800C2174",
+     "addr": "800C2174",
+     "size": 12
+    },
+    {
+     "name": "fn_800C2618",
+     "addr": "800C2618",
+     "size": 16
+    }
+   ]
+  },
+  {
+   "path": "src/leaf/auto_03_800C2670_text.cpp",
+   "functions": [
+    {
+     "name": "fn_800C2EDC",
+     "addr": "800C2EDC",
+     "size": 4
+    },
+    {
+     "name": "fn_800C2EE0",
+     "addr": "800C2EE0",
+     "size": 4
+    }
+   ]
+  },
+  {
+   "path": "src/leaf/auto_03_800C52B4_text.cpp",
+   "functions": [
+    {
+     "name": "fn_800C5450",
+     "addr": "800C5450",
+     "size": 8
+    }
+   ]
+  },
+  {
+   "path": "src/leaf/auto_03_800C5E90_text.cpp",
+   "functions": [
+    {
+     "name": "fn_800C5F44",
+     "addr": "800C5F44",
+     "size": 12
+    },
+    {
+     "name": "fn_800C5F50",
+     "addr": "800C5F50",
+     "size": 12
+    },
+    {
+     "name": "fn_800C5F5C",
+     "addr": "800C5F5C",
+     "size": 4
+    },
+    {
+     "name": "fn_800C5F60",
+     "addr": "800C5F60",
+     "size": 4
+    }
+   ]
+  },
+  {
+   "path": "src/leaf/auto_03_800C5F84_text.cpp",
+   "functions": [
+    {
+     "name": "fn_800C6A0C",
+     "addr": "800C6A0C",
+     "size": 28
+    }
+   ]
+  },
+  {
+   "path": "src/leaf/auto_03_800C5F84_text_cb.cpp",
+   "functions": [
+    {
+     "name": "Stitching_Bug_PositionToHide",
+     "addr": "800C6A58",
+     "size": 4
+    }
+   ]
+  },
+  {
+   "path": "src/leaf/auto_03_800C6C88_text.cpp",
+   "functions": [
+    {
+     "name": "fn_800C6C88",
+     "addr": "800C6C88",
+     "size": 28
+    },
+    {
+     "name": "fn_800C6EFC",
+     "addr": "800C6EFC",
+     "size": 28
+    },
+    {
+     "name": "fn_800C72B4",
+     "addr": "800C72B4",
+     "size": 16
+    }
+   ]
+  },
+  {
+   "path": "src/leaf/auto_03_800C82BC_text.cpp",
+   "functions": [
+    {
+     "name": "fn_800C82BC",
+     "addr": "800C82BC",
+     "size": 4
+    },
+    {
+     "name": "fn_800C8300",
+     "addr": "800C8300",
+     "size": 28
+    },
+    {
+     "name": "fn_800C831C",
+     "addr": "800C831C",
+     "size": 4
+    },
+    {
+     "name": "fn_800C8320",
+     "addr": "800C8320",
+     "size": 20
+    },
+    {
+     "name": "fn_800C8A5C",
+     "addr": "800C8A5C",
+     "size": 8
+    },
+    {
+     "name": "fn_800C8A64",
+     "addr": "800C8A64",
+     "size": 16
+    }
+   ]
+  },
+  {
+   "path": "src/leaf/auto_03_800C8C8C_text.cpp",
+   "functions": [
+    {
+     "name": "fn_800C9244",
+     "addr": "800C9244",
+     "size": 8
+    },
+    {
+     "name": "fn_800C9FB8",
+     "addr": "800C9FB8",
+     "size": 8
+    },
+    {
+     "name": "fn_800CA288",
+     "addr": "800CA288",
+     "size": 8
+    },
+    {
+     "name": "fn_800CA8F0",
+     "addr": "800CA8F0",
+     "size": 16
+    },
+    {
+     "name": "fn_800CA900",
+     "addr": "800CA900",
+     "size": 28
+    },
+    {
+     "name": "fn_800CA91C",
+     "addr": "800CA91C",
+     "size": 8
+    },
+    {
+     "name": "fn_800CA924",
+     "addr": "800CA924",
+     "size": 8
+    },
+    {
+     "name": "fn_800CA92C",
+     "addr": "800CA92C",
+     "size": 8
+    },
+    {
+     "name": "fn_800CA98C",
+     "addr": "800CA98C",
+     "size": 36
+    },
+    {
+     "name": "fn_800CAAC4",
+     "addr": "800CAAC4",
+     "size": 28
+    }
+   ]
+  },
+  {
+   "path": "src/leaf/auto_03_800CC108_text.cpp",
+   "functions": [
+    {
+     "name": "fn_800CD010",
+     "addr": "800CD010",
+     "size": 4
+    },
+    {
+     "name": "fn_800CD014",
+     "addr": "800CD014",
+     "size": 4
+    },
+    {
+     "name": "fn_800CD018",
+     "addr": "800CD018",
+     "size": 8
+    }
+   ]
+  },
+  {
+   "path": "src/leaf/auto_03_800CD43C_text.cpp",
+   "functions": [
+    {
+     "name": "fn_800CD9A4",
+     "addr": "800CD9A4",
+     "size": 12
+    }
+   ]
+  },
+  {
+   "path": "src/leaf/auto_03_800CE480_text.cpp",
+   "functions": [
+    {
+     "name": "fn_800CF224",
+     "addr": "800CF224",
+     "size": 4
+    },
+    {
+     "name": "fn_800CF228",
+     "addr": "800CF228",
+     "size": 4
+    },
+    {
+     "name": "fn_800CF2EC",
+     "addr": "800CF2EC",
+     "size": 12
+    },
+    {
+     "name": "fn_800CF4FC",
+     "addr": "800CF4FC",
+     "size": 4
+    },
+    {
+     "name": "fn_800CF500",
+     "addr": "800CF500",
+     "size": 12
+    },
+    {
+     "name": "fn_800CF710",
+     "addr": "800CF710",
+     "size": 4
+    }
+   ]
+  },
+  {
+   "path": "src/leaf/auto_03_800D00B4_text.cpp",
+   "functions": [
+    {
+     "name": "fn_800D01C0",
+     "addr": "800D01C0",
+     "size": 24
+    },
+    {
+     "name": "fn_800D0290",
+     "addr": "800D0290",
+     "size": 8
+    },
+    {
+     "name": "fn_800D0298",
+     "addr": "800D0298",
+     "size": 8
+    }
+   ]
+  },
+  {
+   "path": "src/leaf/auto_03_800D02C0_text.cpp",
+   "functions": [
+    {
+     "name": "fn_800D1634",
+     "addr": "800D1634",
+     "size": 4
+    },
+    {
+     "name": "fn_800D1638",
+     "addr": "800D1638",
+     "size": 4
+    },
+    {
+     "name": "fn_800D1C7C",
+     "addr": "800D1C7C",
+     "size": 4
+    },
+    {
+     "name": "fn_800D1C80",
+     "addr": "800D1C80",
+     "size": 12
+    },
+    {
+     "name": "fn_800D1CC0",
+     "addr": "800D1CC0",
+     "size": 4
+    },
+    {
+     "name": "fn_800D1CC4",
+     "addr": "800D1CC4",
+     "size": 12
+    },
+    {
+     "name": "fn_800D1D04",
+     "addr": "800D1D04",
+     "size": 4
+    },
+    {
+     "name": "fn_800D33D8",
+     "addr": "800D33D8",
+     "size": 8
+    }
+   ]
+  },
+  {
+   "path": "src/leaf/auto_03_800D3428_text.cpp",
+   "functions": [
+    {
+     "name": "fn_800D3930",
+     "addr": "800D3930",
+     "size": 12
+    },
+    {
+     "name": "fn_800D3D50",
+     "addr": "800D3D50",
+     "size": 28
+    },
+    {
+     "name": "fn_800D4B68",
+     "addr": "800D4B68",
+     "size": 12
+    }
+   ]
+  },
+  {
+   "path": "src/leaf/auto_03_800D50C4_text.cpp",
+   "functions": [
+    {
+     "name": "fn_800D50C4",
+     "addr": "800D50C4",
+     "size": 12
+    },
+    {
+     "name": "PathAtWaypoint",
+     "addr": "800D56E0",
+     "size": 24
+    },
+    {
+     "name": "PathGetPosition",
+     "addr": "800D5718",
+     "size": 12
+    },
+    {
+     "name": "PathSetSpeed",
+     "addr": "800D6A18",
+     "size": 12
+    }
+   ]
+  },
+  {
+   "path": "src/leaf/auto_03_800D7F24_text.cpp",
+   "functions": [
+    {
+     "name": "WorldGetPhase",
+     "addr": "800D83A8",
+     "size": 8
+    },
+    {
+     "name": "fn_800D83B0",
+     "addr": "800D83B0",
+     "size": 8
+    },
+    {
+     "name": "WorldSetFocus",
+     "addr": "800D8854",
+     "size": 8
+    }
+   ]
+  },
+  {
+   "path": "src/leaf/auto_03_800D887C_text.cpp",
+   "functions": [
+    {
+     "name": "fn_800D8F70",
+     "addr": "800D8F70",
+     "size": 32
+    },
+    {
+     "name": "fn_800D8F90",
+     "addr": "800D8F90",
+     "size": 16
+    },
+    {
+     "name": "fn_800D9180",
+     "addr": "800D9180",
+     "size": 8
+    }
+   ]
+  },
+  {
+   "path": "src/leaf/auto_03_800DB9A4_text.cpp",
+   "functions": [
+    {
+     "name": "fn_800DC504",
+     "addr": "800DC504",
+     "size": 8
+    },
+    {
+     "name": "fn_800DC50C",
+     "addr": "800DC50C",
+     "size": 8
+    },
+    {
+     "name": "fn_800DD3BC",
+     "addr": "800DD3BC",
+     "size": 12
+    },
+    {
+     "name": "fn_800DD3C8",
+     "addr": "800DD3C8",
+     "size": 12
+    },
+    {
+     "name": "fn_800DD564",
+     "addr": "800DD564",
+     "size": 28
+    },
+    {
+     "name": "fn_800DD580",
+     "addr": "800DD580",
+     "size": 12
+    },
+    {
+     "name": "fn_800DD8A0",
+     "addr": "800DD8A0",
+     "size": 20
+    },
+    {
+     "name": "fn_800DE28C",
+     "addr": "800DE28C",
+     "size": 32
+    },
+    {
+     "name": "fn_800DE4B8",
+     "addr": "800DE4B8",
+     "size": 8
+    },
+    {
+     "name": "fn_800DE4C0",
+     "addr": "800DE4C0",
+     "size": 8
+    },
+    {
+     "name": "fn_800DE4C8",
+     "addr": "800DE4C8",
+     "size": 12
+    },
+    {
+     "name": "fn_800DE4D4",
+     "addr": "800DE4D4",
+     "size": 8
+    },
+    {
+     "name": "fn_800DE4E4",
+     "addr": "800DE4E4",
+     "size": 8
+    },
+    {
+     "name": "fn_800DE4EC",
+     "addr": "800DE4EC",
+     "size": 8
+    },
+    {
+     "name": "fn_800DE4F4",
+     "addr": "800DE4F4",
+     "size": 8
+    },
+    {
+     "name": "fn_800DE4FC",
+     "addr": "800DE4FC",
+     "size": 12
+    },
+    {
+     "name": "fn_800DE508",
+     "addr": "800DE508",
+     "size": 8
+    },
+    {
+     "name": "fn_800DE510",
+     "addr": "800DE510",
+     "size": 4
+    },
+    {
+     "name": "fn_800DE514",
+     "addr": "800DE514",
+     "size": 8
+    },
+    {
+     "name": "fn_800DE51C",
+     "addr": "800DE51C",
+     "size": 4
+    },
+    {
+     "name": "fn_800DE520",
+     "addr": "800DE520",
+     "size": 4
+    },
+    {
+     "name": "fn_800DE584",
+     "addr": "800DE584",
+     "size": 8
+    },
+    {
+     "name": "fn_800DE58C",
+     "addr": "800DE58C",
+     "size": 4
+    },
+    {
+     "name": "fn_800DE590",
+     "addr": "800DE590",
+     "size": 4
+    }
+   ]
+  },
+  {
+   "path": "src/leaf/auto_03_800DB9A4_text_cb.cpp",
+   "functions": [
+    {
+     "name": "ForceCameraRotateMode",
+     "addr": "800DD1E4",
+     "size": 8
+    }
+   ]
+  },
+  {
+   "path": "src/leaf/auto_03_800DEC28_text.cpp",
+   "functions": [
+    {
+     "name": "fn_800DEF90",
+     "addr": "800DEF90",
+     "size": 8
+    }
+   ]
+  },
+  {
+   "path": "src/leaf/auto_03_800DF204_text.cpp",
+   "functions": [
+    {
+     "name": "fn_800DF204",
+     "addr": "800DF204",
+     "size": 4
+    }
+   ]
+  },
+  {
+   "path": "src/leaf/auto_03_800DFFA4_text.cpp",
+   "functions": [
+    {
+     "name": "fn_800DFFA4",
+     "addr": "800DFFA4",
+     "size": 4
+    }
+   ]
+  },
+  {
+   "path": "src/leaf/auto_03_800E02A8_text.cpp",
+   "functions": [
+    {
+     "name": "fn_800E2DEC",
+     "addr": "800E2DEC",
+     "size": 8
+    }
+   ]
+  },
+  {
+   "path": "src/leaf/auto_03_800E2EBC_text.cpp",
+   "functions": [
+    {
+     "name": "CIWaypointPath_StaticSetPosition",
+     "addr": "800E2F88",
+     "size": 28
+    },
+    {
+     "name": "CIWaypointPath_StaticSetOrientation",
+     "addr": "800E2FA4",
+     "size": 36
+    }
+   ]
+  },
+  {
+   "path": "src/leaf/auto_03_800E2FE8_text.cpp",
+   "functions": [
+    {
+     "name": "fn_800E303C",
+     "addr": "800E303C",
+     "size": 4
+    }
+   ]
+  },
+  {
+   "path": "src/leaf/auto_03_800E3300_text.cpp",
+   "functions": [
+    {
+     "name": "fn_800E3300",
+     "addr": "800E3300",
+     "size": 4
+    },
+    {
+     "name": "fn_800E36C4",
+     "addr": "800E36C4",
+     "size": 8
+    }
+   ]
+  },
+  {
+   "path": "src/leaf/auto_03_800E374C_text.cpp",
+   "functions": [
+    {
+     "name": "fn_800E374C",
+     "addr": "800E374C",
+     "size": 4
+    },
+    {
+     "name": "fn_800E37AC",
+     "addr": "800E37AC",
+     "size": 8
+    }
+   ]
+  },
+  {
+   "path": "src/leaf/auto_03_800E3834_text.cpp",
+   "functions": [
+    {
+     "name": "fn_800E3834",
+     "addr": "800E3834",
+     "size": 4
+    },
+    {
+     "name": "fn_800E3894",
+     "addr": "800E3894",
+     "size": 8
+    }
+   ]
+  },
+  {
+   "path": "src/leaf/auto_03_800E391C_text.cpp",
+   "functions": [
+    {
+     "name": "fn_800E391C",
+     "addr": "800E391C",
+     "size": 4
+    },
+    {
+     "name": "fn_800E3C64",
+     "addr": "800E3C64",
+     "size": 8
+    },
+    {
+     "name": "fn_800E3C6C",
+     "addr": "800E3C6C",
+     "size": 8
+    }
+   ]
+  },
+  {
+   "path": "src/leaf/auto_03_800E3CF4_text.cpp",
+   "functions": [
+    {
+     "name": "fn_800E3CF4",
+     "addr": "800E3CF4",
+     "size": 4
+    },
+    {
+     "name": "fn_800E4260",
+     "addr": "800E4260",
+     "size": 8
+    }
+   ]
+  },
+  {
+   "path": "src/leaf/auto_03_800E42E8_text.cpp",
+   "functions": [
+    {
+     "name": "fn_800E4BF4",
+     "addr": "800E4BF4",
+     "size": 8
+    }
+   ]
+  },
+  {
+   "path": "src/leaf/auto_03_800E5550_text.cpp",
+   "functions": [
+    {
+     "name": "fn_800E567C",
+     "addr": "800E567C",
+     "size": 8
+    }
+   ]
+  },
+  {
+   "path": "src/leaf/auto_03_800E75B0_text.cpp",
+   "functions": [
+    {
+     "name": "fn_800E75E8",
+     "addr": "800E75E8",
+     "size": 4
+    },
+    {
+     "name": "fn_800F5F70",
+     "addr": "800F5F70",
+     "size": 4
+    },
+    {
+     "name": "fn_800F5FD4",
+     "addr": "800F5FD4",
+     "size": 8
+    },
+    {
+     "name": "fn_800FB438",
+     "addr": "800FB438",
+     "size": 12
+    },
+    {
+     "name": "fn_800FB444",
+     "addr": "800FB444",
+     "size": 12
+    },
+    {
+     "name": "fn_800FB450",
+     "addr": "800FB450",
+     "size": 12
+    },
+    {
+     "name": "fn_800FB45C",
+     "addr": "800FB45C",
+     "size": 12
+    }
+   ]
+  },
+  {
+   "path": "src/leaf/auto_03_800E75B0_text_cb.cpp",
+   "functions": [
+    {
+     "name": "IsPS2",
+     "addr": "800E75E0",
+     "size": 8
+    },
+    {
+     "name": "UIScreen_SetPS2SnapToEnabled",
+     "addr": "800E75EC",
+     "size": 4
+    },
+    {
+     "name": "IsCoopGame",
+     "addr": "800E7660",
+     "size": 8
+    },
+    {
+     "name": "TestWire",
+     "addr": "800E76C8",
+     "size": 4
+    },
+    {
+     "name": "SkipFrameRender",
+     "addr": "800E7860",
+     "size": 8
+    },
+    {
+     "name": "Pause",
+     "addr": "800E8238",
+     "size": 4
+    },
+    {
+     "name": "Unpause",
+     "addr": "800E823C",
+     "size": 4
+    },
+    {
+     "name": "SetEntityHealth",
+     "addr": "800E8424",
+     "size": 12
+    },
+    {
+     "name": "GetCurAnimDef",
+     "addr": "800E8714",
+     "size": 12
+    },
+    {
+     "name": "PrintTest",
+     "addr": "800E9658",
+     "size": 4
+    },
+    {
+     "name": "GetCurrentController",
+     "addr": "800E965C",
+     "size": 16
+    },
+    {
+     "name": "ResetSpawnDelay",
+     "addr": "800E9720",
+     "size": 28
+    },
+    {
+     "name": "SetSpawnPriority",
+     "addr": "800E973C",
+     "size": 8
+    },
+    {
+     "name": "CheckPoint",
+     "addr": "800EC458",
+     "size": 4
+    },
+    {
+     "name": "ForceStrafeMode",
+     "addr": "800EC7D4",
+     "size": 4
+    },
+    {
+     "name": "FreezePlayerInput",
+     "addr": "800EC7D8",
+     "size": 20
+    },
+    {
+     "name": "PropSetActiveTarget",
+     "addr": "800ECCC4",
+     "size": 8
+    },
+    {
+     "name": "PlayerSetOverrideTarget",
+     "addr": "800ED34C",
+     "size": 4
+    },
+    {
+     "name": "PlayerClearOverrideTarget",
+     "addr": "800ED350",
+     "size": 4
+    },
+    {
+     "name": "PrintText",
+     "addr": "800ED354",
+     "size": 4
+    },
+    {
+     "name": "GetLastRandomZeroToMax",
+     "addr": "800ED3F8",
+     "size": 8
+    },
+    {
+     "name": "IsCharacter",
+     "addr": "800EF7F4",
+     "size": 16
+    },
+    {
+     "name": "IsProp",
+     "addr": "800EF804",
+     "size": 16
+    },
+    {
+     "name": "SetCharacterPerformanceCapToDefault",
+     "addr": "800EF844",
+     "size": 12
+    },
+    {
+     "name": "MegaChunkSentCallback",
+     "addr": "800EF878",
+     "size": 4
+    },
+    {
+     "name": "MegaChunkReceivedCallback",
+     "addr": "800EF87C",
+     "size": 4
+    },
+    {
+     "name": "MoveCursorToContinueButtonPS2",
+     "addr": "800EFCD0",
+     "size": 4
+    },
+    {
+     "name": "StateFinished",
+     "addr": "800EFEB4",
+     "size": 8
+    },
+    {
+     "name": "GetIsPlaytest",
+     "addr": "800F0160",
+     "size": 8
+    },
+    {
+     "name": "CombatTestOn",
+     "addr": "800F455C",
+     "size": 8
+    },
+    {
+     "name": "prop_selected",
+     "addr": "800F6060",
+     "size": 4
+    },
+    {
+     "name": "IsCameraMoving",
+     "addr": "800F656C",
+     "size": 8
+    },
+    {
+     "name": "PopFSM",
+     "addr": "800F764C",
+     "size": 28
+    },
+    {
+     "name": "GetPlayerAvatarEntity",
+     "addr": "800F78EC",
+     "size": 20
+    },
+    {
+     "name": "EnableMainMenuDebugOptions",
+     "addr": "800FA9C4",
+     "size": 8
+    },
+    {
+     "name": "IsFinalBuild",
+     "addr": "800FA9CC",
+     "size": 8
+    },
+    {
+     "name": "GetOptionsMusicVolume",
+     "addr": "800FAB38",
+     "size": 12
+    },
+    {
+     "name": "GetOptionsSfxVolume",
+     "addr": "800FACB4",
+     "size": 12
+    },
+    {
+     "name": "GetOptionsVoiceVolume",
+     "addr": "800FAE68",
+     "size": 12
+    },
+    {
+     "name": "GetOptionsBrightness",
+     "addr": "800FB24C",
+     "size": 12
+    },
+    {
+     "name": "SetOptionsRumble",
+     "addr": "800FB410",
+     "size": 28
+    },
+    {
+     "name": "GetOptionsRumble",
+     "addr": "800FB42C",
+     "size": 12
+    },
+    {
+     "name": "ActivateListEntry",
+     "addr": "800FB6EC",
+     "size": 4
+    },
+    {
+     "name": "CheckIsCurrentCollisionEntity",
+     "addr": "800FB6F0",
+     "size": 8
+    },
+    {
+     "name": "CheckIsCurrentCollisionEntityByName",
+     "addr": "800FB6F8",
+     "size": 8
+    },
+    {
+     "name": "CreateDoubleTransitionToScreen",
+     "addr": "800FB700",
+     "size": 4
+    },
+    {
+     "name": "CreateDoubleTransitionToFrontEndScreen",
+     "addr": "800FB704",
+     "size": 4
+    },
+    {
+     "name": "CreateDoubleTransitionToScreenAndSetDisplayEnvironment",
+     "addr": "800FB708",
+     "size": 4
+    },
+    {
+     "name": "CreateTransitionToScreen",
+     "addr": "800FB70C",
+     "size": 4
+    },
+    {
+     "name": "DeactivateListEntry",
+     "addr": "800FB710",
+     "size": 4
+    },
+    {
+     "name": "DefineStateOnEnemy",
+     "addr": "800FB714",
+     "size": 4
+    },
+    {
+     "name": "DefineStateOnEnemyByThis",
+     "addr": "800FB718",
+     "size": 4
+    },
+    {
+     "name": "DefineStateOnPlayer",
+     "addr": "800FB71C",
+     "size": 4
+    },
+    {
+     "name": "DefineStateOnProp",
+     "addr": "800FB720",
+     "size": 4
+    },
+    {
+     "name": "DespawnEntity",
+     "addr": "800FB724",
+     "size": 4
+    },
+    {
+     "name": "DespawnEntityByName",
+     "addr": "800FB728",
+     "size": 4
+    },
+    {
+     "name": "DisablePlayerControls",
+     "addr": "800FB72C",
+     "size": 4
+    },
+    {
+     "name": "DS_AdjustExplorationTimer",
+     "addr": "800FB730",
+     "size": 4
+    },
+    {
+     "name": "DS_AreAllSaveSlotsCorrupt",
+     "addr": "800FB734",
+     "size": 8
+    },
+    {
+     "name": "DS_AnySaveSlotsPlayable",
+     "addr": "800FB73C",
+     "size": 8
+    },
+    {
+     "name": "DS_AssociateFlagWithComponent",
+     "addr": "800FB744",
+     "size": 4
+    },
+    {
+     "name": "DS_DeleteOperatingTableMonster",
+     "addr": "800FB748",
+     "size": 4
+    },
+    {
+     "name": "DS_DeleteCorruptSaveSlots",
+     "addr": "800FB74C",
+     "size": 8
+    },
+    {
+     "name": "DS_DisplayNISText",
+     "addr": "800FB754",
+     "size": 4
+    },
+    {
+     "name": "DS_DoesFSMPopMatchFSMPush",
+     "addr": "800FB758",
+     "size": 8
+    },
+    {
+     "name": "DS_DoesSaveDataDiffer",
+     "addr": "800FB760",
+     "size": 8
+    },
+    {
+     "name": "DS_EnableFieldRepair",
+     "addr": "800FB768",
+     "size": 4
+    },
+    {
+     "name": "DS_ExplorationPrepareForTransition",
+     "addr": "800FB76C",
+     "size": 4
+    },
+    {
+     "name": "DS_GameFlowPopTo",
+     "addr": "800FB770",
+     "size": 4
+    },
+    {
+     "name": "DS_GetLastPDAScreen",
+     "addr": "800FB774",
+     "size": 8
+    },
+    {
+     "name": "DS_IsGlobalSaveSlotCorrupt",
+     "addr": "800FB77C",
+     "size": 8
+    },
+    {
+     "name": "DS_SetLastPDAScreen",
+     "addr": "800FB784",
+     "size": 4
+    },
+    {
+     "name": "DS_HandleEnemyFledCombat",
+     "addr": "800FB788",
+     "size": 4
+    },
+    {
+     "name": "DS_HandlePlayerFledCombat",
+     "addr": "800FB78C",
+     "size": 4
+    },
+    {
+     "name": "DS_HandlePlayerLostCombat",
+     "addr": "800FB790",
+     "size": 4
+    },
+    {
+     "name": "DS_HandlePlayerWonCombat",
+     "addr": "800FB794",
+     "size": 4
+    },
+    {
+     "name": "DS_HasExperimentSecondary",
+     "addr": "800FB798",
+     "size": 8
+    },
+    {
+     "name": "DS_HasExperimentKey",
+     "addr": "800FB7A0",
+     "size": 8
+    },
+    {
+     "name": "DS_IsEepromNotLoaded",
+     "addr": "800FB7A8",
+     "size": 8
+    },
+    {
+     "name": "DS_IsKeyIngredientSelected",
+     "addr": "800FB7B0",
+     "size": 8
+    },
+    {
+     "name": "DS_IsNewestSaveSlotCorrupt",
+     "addr": "800FB7B8",
+     "size": 8
+    },
+    {
+     "name": "DS_IsOperatingTableMonsterValid",
+     "addr": "800FB7C0",
+     "size": 8
+    },
+    {
+     "name": "DS_IsOperatingTableMonsterLoaded",
+     "addr": "800FB7C8",
+     "size": 8
+    },
+    {
+     "name": "DS_IsOperatingTableMonsterTooMad",
+     "addr": "800FB7D0",
+     "size": 8
+    },
+    {
+     "name": "DS_IsPlayerMadEnoughForCurrentRecipe",
+     "addr": "800FB7D8",
+     "size": 8
+    },
+    {
+     "name": "DS_IsSecondaryIngredientSelected",
+     "addr": "800FB7E0",
+     "size": 8
+    },
+    {
+     "name": "DS_IsSaveSlotPlayable",
+     "addr": "800FB7E8",
+     "size": 8
+    },
+    {
+     "name": "DS_IsSaveSlotCorrupt",
+     "addr": "800FB7F0",
+     "size": 8
+    },
+    {
+     "name": "DS_KillEnemy",
+     "addr": "800FB7F8",
+     "size": 4
+    },
+    {
+     "name": "DS_LoadDatabaseTable",
+     "addr": "800FB7FC",
+     "size": 4
+    },
+    {
+     "name": "DS_LoadSavedGame",
+     "addr": "800FB800",
+     "size": 4
+    },
+    {
+     "name": "DS_LoadSavedGamesFromEeprom",
+     "addr": "800FB804",
+     "size": 4
+    },
+    {
+     "name": "DS_MonsterConstructorMonsterHasChanged",
+     "addr": "800FB808",
+     "size": 8
+    },
+    {
+     "name": "DS_PlayNISMovie",
+     "addr": "800FB810",
+     "size": 4
+    },
+    {
+     "name": "DS_PlayNISFromXML",
+     "addr": "800FB814",
+     "size": 4
+    },
+    {
+     "name": "DS_PopDisplayScreenComponent",
+     "addr": "800FB818",
+     "size": 4
+    },
+    {
+     "name": "DS_PositionPlayerAtSafeNode",
+     "addr": "800FB81C",
+     "size": 4
+    },
+    {
+     "name": "DS_PushConversationFSM",
+     "addr": "800FB820",
+     "size": 4
+    },
+    {
+     "name": "DS_PushDisplayScreenComponent",
+     "addr": "800FB824",
+     "size": 4
+    },
+    {
+     "name": "DS_RemoveExperimentIngredients",
+     "addr": "800FB828",
+     "size": 4
+    },
+    {
+     "name": "DS_SaveOptionsSettings",
+     "addr": "800FB82C",
+     "size": 4
+    },
+    {
+     "name": "DS_SendEntityNameAsSignal",
+     "addr": "800FB830",
+     "size": 4
+    },
+    {
+     "name": "DS_SendObjectNameAsSignalByThis",
+     "addr": "800FB834",
+     "size": 4
+    },
+    {
+     "name": "DS_SendSignalToEnemy",
+     "addr": "800FB838",
+     "size": 4
+    },
+    {
+     "name": "DS_SetAppropriateExplorationLocation",
+     "addr": "800FB83C",
+     "size": 4
+    },
+    {
+     "name": "DS_SetCanPause",
+     "addr": "800FB840",
+     "size": 4
+    },
+    {
+     "name": "DS_SetHazardCollision",
+     "addr": "800FB844",
+     "size": 4
+    },
+    {
+     "name": "DS_SetHazardCollisionByThis",
+     "addr": "800FB848",
+     "size": 4
+    },
+    {
+     "name": "DS_SetHazardIdleTime",
+     "addr": "800FB84C",
+     "size": 4
+    },
+    {
+     "name": "DS_SetHazardRepeatCount",
+     "addr": "800FB850",
+     "size": 4
+    },
+    {
+     "name": "DS_SetKeyIngredient",
+     "addr": "800FB854",
+     "size": 4
+    },
+    {
+     "name": "DS_SetNextExperiment",
+     "addr": "800FB858",
+     "size": 4
+    },
+    {
+     "name": "DS_SetChallengeNodeInactiveTime",
+     "addr": "800FB85C",
+     "size": 4
+    },
+    {
+     "name": "DS_SetPausedQuestFSM",
+     "addr": "800FB860",
+     "size": 4
+    },
+    {
+     "name": "DS_SetupOperatingTable",
+     "addr": "800FB864",
+     "size": 4
+    },
+    {
+     "name": "DS_SetScreenShake",
+     "addr": "800FB868",
+     "size": 4
+    },
+    {
+     "name": "DS_SetSpriteIdleAnim",
+     "addr": "800FB86C",
+     "size": 4
+    },
+    {
+     "name": "DS_SetStateSpriteIdleAnim",
+     "addr": "800FB870",
+     "size": 4
+    },
+    {
+     "name": "DS_SetButtonPulsing",
+     "addr": "800FB874",
+     "size": 4
+    },
+    {
+     "name": "DS_StartCurrentExperiment",
+     "addr": "800FB878",
+     "size": 4
+    },
+    {
+     "name": "DS_StartStoredNISFSM",
+     "addr": "800FB87C",
+     "size": 4
+    },
+    {
+     "name": "DS_StartWiiMoteMiniGame",
+     "addr": "800FB880",
+     "size": 4
+    },
+    {
+     "name": "DS_StartWiiMoteMiniGameWithEntity",
+     "addr": "800FB884",
+     "size": 4
+    },
+    {
+     "name": "DS_EndWiiMoteMiniGame",
+     "addr": "800FB888",
+     "size": 4
+    },
+    {
+     "name": "DS_ReversePlayerDirection",
+     "addr": "800FB88C",
+     "size": 4
+    },
+    {
+     "name": "DS_SetWiimoteSequenceInput",
+     "addr": "800FB890",
+     "size": 4
+    },
+    {
+     "name": "DS_StoreAndTransitionToNISFSM",
+     "addr": "800FB894",
+     "size": 4
+    },
+    {
+     "name": "DS_StoreLastButtonPressed",
+     "addr": "800FB898",
+     "size": 4
+    },
+    {
+     "name": "DS_StoreLastNISConvFSMPop",
+     "addr": "800FB89C",
+     "size": 4
+    },
+    {
+     "name": "DS_TeleportPlayerToNode",
+     "addr": "800FB8A0",
+     "size": 4
+    },
+    {
+     "name": "DS_UnlockAllCastle",
+     "addr": "800FB8A4",
+     "size": 4
+    },
+    {
+     "name": "GetLastCombatResult",
+     "addr": "800FB8A8",
+     "size": 8
+    },
+    {
+     "name": "HideMessageBox",
+     "addr": "800FB8B0",
+     "size": 4
+    },
+    {
+     "name": "IsLastCombatResult",
+     "addr": "800FB8B4",
+     "size": 8
+    },
+    {
+     "name": "IsPlayerOffJunction",
+     "addr": "800FB8BC",
+     "size": 8
+    },
+    {
+     "name": "InitPlayerData",
+     "addr": "800FB8C4",
+     "size": 4
+    },
+    {
+     "name": "PanCameraToEntity",
+     "addr": "800FB8C8",
+     "size": 4
+    },
+    {
+     "name": "PanCameraToPlayer",
+     "addr": "800FB8CC",
+     "size": 4
+    },
+    {
+     "name": "PauseGame",
+     "addr": "800FB8D0",
+     "size": 4
+    },
+    {
+     "name": "PlayAnimation",
+     "addr": "800FB8D4",
+     "size": 4
+    },
+    {
+     "name": "PlayStateOnEnemy",
+     "addr": "800FB8D8",
+     "size": 4
+    },
+    {
+     "name": "PlayStateOnEnemyByThis",
+     "addr": "800FB8DC",
+     "size": 4
+    },
+    {
+     "name": "PlayStateOnPlayer",
+     "addr": "800FB8E0",
+     "size": 4
+    },
+    {
+     "name": "PlayStateOnProp",
+     "addr": "800FB8E4",
+     "size": 4
+    },
+    {
+     "name": "PlayStateOnPropByThis",
+     "addr": "800FB8E8",
+     "size": 4
+    },
+    {
+     "name": "PrintHash",
+     "addr": "800FB8EC",
+     "size": 4
+    },
+    {
+     "name": "SetEntityAI",
+     "addr": "800FB8F0",
+     "size": 4
+    },
+    {
+     "name": "SetEntityCollisionOnOff",
+     "addr": "800FB8F4",
+     "size": 4
+    },
+    {
+     "name": "SetEntityCollisionOnOffByName",
+     "addr": "800FB8F8",
+     "size": 4
+    },
+    {
+     "name": "SetEntityVisible",
+     "addr": "800FB8FC",
+     "size": 4
+    },
+    {
+     "name": "SetJunctionSpriteVisible",
+     "addr": "800FB900",
+     "size": 4
+    },
+    {
+     "name": "SetNodeHighlightVisible",
+     "addr": "800FB904",
+     "size": 4
+    },
+    {
+     "name": "SetPlayerBaseSpeed",
+     "addr": "800FB908",
+     "size": 4
+    },
+    {
+     "name": "SetPlayerCollisionEnabled",
+     "addr": "800FB90C",
+     "size": 4
+    },
+    {
+     "name": "SetPlayerMovementAI",
+     "addr": "800FB910",
+     "size": 4
+    },
+    {
+     "name": "SetPlayerPathRunMode",
+     "addr": "800FB914",
+     "size": 4
+    },
+    {
+     "name": "SetTappingObjectSFX",
+     "addr": "800FB918",
+     "size": 4
+    },
+    {
+     "name": "SetTappingObjectSFXByThis",
+     "addr": "800FB91C",
+     "size": 4
+    },
+    {
+     "name": "SetTappingObjectSpriteEffect",
+     "addr": "800FB920",
+     "size": 4
+    },
+    {
+     "name": "SetTappingObjectSpriteEffectByThis",
+     "addr": "800FB924",
+     "size": 4
+    },
+    {
+     "name": "ShowMessageBox",
+     "addr": "800FB928",
+     "size": 4
+    },
+    {
+     "name": "SpawnDatabaseMonsterAtNodeGroup",
+     "addr": "800FB92C",
+     "size": 4
+    },
+    {
+     "name": "SpawnProjectileAtLocationAndFireAtTarget",
+     "addr": "800FB930",
+     "size": 4
+    },
+    {
+     "name": "StartEngine",
+     "addr": "800FB934",
+     "size": 4
+    }
+   ]
+  },
+  {
+   "path": "src/leaf/auto_03_800FB958_text_cb.cpp",
+   "functions": [
+    {
+     "name": "EnterName_EnteringPlayerName",
+     "addr": "80103610",
+     "size": 20
+    },
+    {
+     "name": "SaveManager_CanContinue",
+     "addr": "801038A0",
+     "size": 16
+    },
+    {
+     "name": "SaveManager_GetContinueSlot",
+     "addr": "801038B0",
+     "size": 8
+    },
+    {
+     "name": "SaveManager_GetCurrentSlot",
+     "addr": "801038B8",
+     "size": 8
+    },
+    {
+     "name": "SaveManager_IsInOverwriteScreen",
+     "addr": "801038C0",
+     "size": 8
+    },
+    {
+     "name": "SaveManager_SetContinueSlot",
+     "addr": "801038C8",
+     "size": 8
+    },
+    {
+     "name": "SaveManager_SetCurrentSlot",
+     "addr": "801038D0",
+     "size": 8
+    },
+    {
+     "name": "SaveManager_SetInOverwriteScreen",
+     "addr": "801038D8",
+     "size": 8
+    },
+    {
+     "name": "SetCurrentTutorialConversation",
+     "addr": "801038E0",
+     "size": 8
+    },
+    {
+     "name": "SetInBasicTutorialFlag",
+     "addr": "80103908",
+     "size": 16
+    },
+    {
+     "name": "SetRenderObjectAttachPoint",
+     "addr": "8010394C",
+     "size": 12
+    }
+   ]
+  },
+  {
+   "path": "src/leaf/auto_03_8010711C_text.cpp",
+   "functions": [
+    {
+     "name": "fn_8010711C",
+     "addr": "8010711C",
+     "size": 4
+    }
+   ]
+  },
+  {
+   "path": "src/leaf/auto_03_8010711C_text_cb.cpp",
+   "functions": [
+    {
+     "name": "IsLevelRoamable",
+     "addr": "80107234",
+     "size": 8
+    },
+    {
+     "name": "IsCurrentLevel",
+     "addr": "8010723C",
+     "size": 8
+    }
+   ]
+  },
+  {
+   "path": "src/leaf/auto_03_80108FB4_text.cpp",
+   "functions": [
+    {
+     "name": "ScreenSetsLoadCsv",
+     "addr": "801091B4",
+     "size": 24
+    }
+   ]
+  },
+  {
+   "path": "src/leaf/auto_03_80109BE0_text.cpp",
+   "functions": [
+    {
+     "name": "fn_8010A3B0",
+     "addr": "8010A3B0",
+     "size": 4
+    },
+    {
+     "name": "fn_8010A3B4",
+     "addr": "8010A3B4",
+     "size": 4
+    },
+    {
+     "name": "fn_8010A3B8",
+     "addr": "8010A3B8",
+     "size": 8
+    },
+    {
+     "name": "fn_8010A42C",
+     "addr": "8010A42C",
+     "size": 8
+    }
+   ]
+  },
+  {
+   "path": "src/leaf/auto_03_80109BE0_text_cb.cpp",
+   "functions": [
+    {
+     "name": "StartLobbyCallback",
+     "addr": "8010A1C4",
+     "size": 4
+    },
+    {
+     "name": "SavedGameMCSentCallback",
+     "addr": "8010A380",
+     "size": 12
+    }
+   ]
+  },
+  {
+   "path": "src/leaf/auto_03_8010A76C_text.cpp",
+   "functions": [
+    {
+     "name": "fn_8010A9F4",
+     "addr": "8010A9F4",
+     "size": 24
+    },
+    {
+     "name": "fn_8010AAE0",
+     "addr": "8010AAE0",
+     "size": 44
+    },
+    {
+     "name": "fn_8010AB0C",
+     "addr": "8010AB0C",
+     "size": 48
+    }
+   ]
+  },
+  {
+   "path": "src/leaf/auto_03_8010B16C_text.cpp",
+   "functions": [
+    {
+     "name": "fn_8010B16C",
+     "addr": "8010B16C",
+     "size": 24
+    }
+   ]
+  },
+  {
+   "path": "src/leaf/auto_03_8010B4AC_text.cpp",
+   "functions": [
+    {
+     "name": "fn_8010B4AC",
+     "addr": "8010B4AC",
+     "size": 20
+    },
+    {
+     "name": "fn_8010BB54",
+     "addr": "8010BB54",
+     "size": 16
+    }
+   ]
+  },
+  {
+   "path": "src/leaf/auto_03_8010C750_text_cb.cpp",
+   "functions": [
+    {
+     "name": "CloneRenderObjectCallback",
+     "addr": "8010C750",
+     "size": 8
+    },
+    {
+     "name": "CreatePooledEntityCallback",
+     "addr": "8010C810",
+     "size": 8
+    },
+    {
+     "name": "DeallocPooledEntityCallback",
+     "addr": "8010C8B4",
+     "size": 20
+    },
+    {
+     "name": "CloneFSMCallback",
+     "addr": "8010CC98",
+     "size": 8
+    },
+    {
+     "name": "DemolishFSMCallback",
+     "addr": "8010CCA0",
+     "size": 8
+    },
+    {
+     "name": "DeallocFSMPoolCallback",
+     "addr": "8010CCA8",
+     "size": 8
+    }
+   ]
+  },
+  {
+   "path": "src/leaf/auto_03_8010FA48_text.cpp",
+   "functions": [
+    {
+     "name": "fn_8010FA48",
+     "addr": "8010FA48",
+     "size": 4
+    }
+   ]
+  },
+  {
+   "path": "src/leaf/auto_03_8010FD14_text.cpp",
+   "functions": [
+    {
+     "name": "fn_8010FD14",
+     "addr": "8010FD14",
+     "size": 24
+    }
+   ]
+  },
+  {
+   "path": "src/leaf/auto_03_8010FDA4_text_cb.cpp",
+   "functions": [
+    {
+     "name": "LockInput",
+     "addr": "801116FC",
+     "size": 8
+    },
+    {
+     "name": "PartInfo_GetTexture",
+     "addr": "80116848",
+     "size": 8
+    },
+    {
+     "name": "PartInfo_GetEnhanceDefectTexture",
+     "addr": "80116850",
+     "size": 8
+    },
+    {
+     "name": "PartInfo_GetEnhanceDefectDesc",
+     "addr": "80116858",
+     "size": 8
+    }
+   ]
+  },
+  {
+   "path": "src/leaf/auto_03_80116BE8_text.cpp",
+   "functions": [
+    {
+     "name": "fn_80116BE8",
+     "addr": "80116BE8",
+     "size": 28
+    }
+   ]
+  },
+  {
+   "path": "src/leaf/auto_03_80117090_text.cpp",
+   "functions": [
+    {
+     "name": "fn_80117264",
+     "addr": "80117264",
+     "size": 4
+    },
+    {
+     "name": "fn_80117268",
+     "addr": "80117268",
+     "size": 4
+    },
+    {
+     "name": "fn_801179C0",
+     "addr": "801179C0",
+     "size": 8
+    },
+    {
+     "name": "fn_80117ABC",
+     "addr": "80117ABC",
+     "size": 8
+    }
+   ]
+  },
+  {
+   "path": "src/leaf/auto_03_80117AE4_text.cpp",
+   "functions": [
+    {
+     "name": "fn_80118138",
+     "addr": "80118138",
+     "size": 4
+    },
+    {
+     "name": "fn_80118BD4",
+     "addr": "80118BD4",
+     "size": 8
+    },
+    {
+     "name": "fn_80118F3C",
+     "addr": "80118F3C",
+     "size": 8
+    },
+    {
+     "name": "fn_801191C0",
+     "addr": "801191C0",
+     "size": 8
+    },
+    {
+     "name": "fn_80119538",
+     "addr": "80119538",
+     "size": 20
+    },
+    {
+     "name": "fn_801195F8",
+     "addr": "801195F8",
+     "size": 8
+    },
+    {
+     "name": "fn_80119630",
+     "addr": "80119630",
+     "size": 20
+    },
+    {
+     "name": "fn_80119644",
+     "addr": "80119644",
+     "size": 20
+    },
+    {
+     "name": "fn_80119658",
+     "addr": "80119658",
+     "size": 20
+    }
+   ]
+  },
+  {
+   "path": "src/leaf/auto_03_801196F4_text.cpp",
+   "functions": [
+    {
+     "name": "fn_80119788",
+     "addr": "80119788",
+     "size": 4
+    },
+    {
+     "name": "fn_8011978C",
+     "addr": "8011978C",
+     "size": 4
+    },
+    {
+     "name": "fn_80119790",
+     "addr": "80119790",
+     "size": 4
+    },
+    {
+     "name": "fn_80119794",
+     "addr": "80119794",
+     "size": 4
+    },
+    {
+     "name": "fn_80119C58",
+     "addr": "80119C58",
+     "size": 20
+    },
+    {
+     "name": "fn_80119FF4",
+     "addr": "80119FF4",
+     "size": 8
+    },
+    {
+     "name": "fn_80119FFC",
+     "addr": "80119FFC",
+     "size": 8
+    },
+    {
+     "name": "fn_8011A004",
+     "addr": "8011A004",
+     "size": 8
+    },
+    {
+     "name": "fn_8011A00C",
+     "addr": "8011A00C",
+     "size": 8
+    },
+    {
+     "name": "fn_8011A014",
+     "addr": "8011A014",
+     "size": 8
+    },
+    {
+     "name": "fn_8011A01C",
+     "addr": "8011A01C",
+     "size": 12
+    },
+    {
+     "name": "fn_8011A028",
+     "addr": "8011A028",
+     "size": 12
+    },
+    {
+     "name": "fn_8011A034",
+     "addr": "8011A034",
+     "size": 8
+    },
+    {
+     "name": "fn_8011A03C",
+     "addr": "8011A03C",
+     "size": 8
+    },
+    {
+     "name": "fn_8011A044",
+     "addr": "8011A044",
+     "size": 8
+    }
+   ]
+  },
+  {
+   "path": "src/leaf/auto_03_8011A3BC_text.cpp",
+   "functions": [
+    {
+     "name": "fn_8011A520",
+     "addr": "8011A520",
+     "size": 4
+    },
+    {
+     "name": "fn_8011A57C",
+     "addr": "8011A57C",
+     "size": 4
+    },
+    {
+     "name": "fn_8011A580",
+     "addr": "8011A580",
+     "size": 4
+    }
+   ]
+  },
+  {
+   "path": "src/leaf/auto_03_8011A778_text.cpp",
+   "functions": [
+    {
+     "name": "fn_8011AD84",
+     "addr": "8011AD84",
+     "size": 4
+    },
+    {
+     "name": "fn_8011AEE0",
+     "addr": "8011AEE0",
+     "size": 8
+    },
+    {
+     "name": "fn_8011BA48",
+     "addr": "8011BA48",
+     "size": 20
+    },
+    {
+     "name": "fn_8011BA5C",
+     "addr": "8011BA5C",
+     "size": 16
+    },
+    {
+     "name": "fn_8011BA74",
+     "addr": "8011BA74",
+     "size": 8
+    },
+    {
+     "name": "fn_8011BA7C",
+     "addr": "8011BA7C",
+     "size": 20
+    },
+    {
+     "name": "fn_8011BA90",
+     "addr": "8011BA90",
+     "size": 20
+    },
+    {
+     "name": "fn_8011BAA4",
+     "addr": "8011BAA4",
+     "size": 20
+    },
+    {
+     "name": "fn_8011BB20",
+     "addr": "8011BB20",
+     "size": 8
+    },
+    {
+     "name": "fn_8011C1D0",
+     "addr": "8011C1D0",
+     "size": 40
+    },
+    {
+     "name": "fn_8011C20C",
+     "addr": "8011C20C",
+     "size": 8
+    },
+    {
+     "name": "fn_8011C214",
+     "addr": "8011C214",
+     "size": 24
+    }
+   ]
+  },
+  {
+   "path": "src/leaf/auto_03_8011C460_text.cpp",
+   "functions": [
+    {
+     "name": "fn_8011CC58",
+     "addr": "8011CC58",
+     "size": 4
+    },
+    {
+     "name": "fn_8011CD10",
+     "addr": "8011CD10",
+     "size": 8
+    },
+    {
+     "name": "fn_8011D030",
+     "addr": "8011D030",
+     "size": 8
+    }
+   ]
+  },
+  {
+   "path": "src/leaf/auto_03_8011D1C0_text.cpp",
+   "functions": [
+    {
+     "name": "fn_8011D32C",
+     "addr": "8011D32C",
+     "size": 12
+    },
+    {
+     "name": "fn_8011D398",
+     "addr": "8011D398",
+     "size": 4
+    },
+    {
+     "name": "fn_8011D39C",
+     "addr": "8011D39C",
+     "size": 4
+    }
+   ]
+  },
+  {
+   "path": "src/leaf/auto_03_8011D5C4_text.cpp",
+   "functions": [
+    {
+     "name": "fn_8011D670",
+     "addr": "8011D670",
+     "size": 32
+    },
+    {
+     "name": "fn_8011D690",
+     "addr": "8011D690",
+     "size": 4
+    },
+    {
+     "name": "fn_8011D694",
+     "addr": "8011D694",
+     "size": 4
+    },
+    {
+     "name": "fn_8011D698",
+     "addr": "8011D698",
+     "size": 4
+    },
+    {
+     "name": "fn_8011D71C",
+     "addr": "8011D71C",
+     "size": 12
+    },
+    {
+     "name": "fn_8011D97C",
+     "addr": "8011D97C",
+     "size": 12
+    },
+    {
+     "name": "fn_8011D988",
+     "addr": "8011D988",
+     "size": 12
+    },
+    {
+     "name": "fn_8011D994",
+     "addr": "8011D994",
+     "size": 12
+    },
+    {
+     "name": "fn_8011D9A0",
+     "addr": "8011D9A0",
+     "size": 8
+    },
+    {
+     "name": "fn_8011D9A8",
+     "addr": "8011D9A8",
+     "size": 12
+    },
+    {
+     "name": "fn_8011D9B4",
+     "addr": "8011D9B4",
+     "size": 12
+    },
+    {
+     "name": "fn_8011E9B0",
+     "addr": "8011E9B0",
+     "size": 8
+    }
+   ]
+  },
+  {
+   "path": "src/leaf/auto_03_8011EA20_text.cpp",
+   "functions": [
+    {
+     "name": "fn_8011ECC4",
+     "addr": "8011ECC4",
+     "size": 4
+    },
+    {
+     "name": "fn_8011ECC8",
+     "addr": "8011ECC8",
+     "size": 4
+    },
+    {
+     "name": "fn_8011EFE0",
+     "addr": "8011EFE0",
+     "size": 28
+    },
+    {
+     "name": "fn_8011F1C4",
+     "addr": "8011F1C4",
+     "size": 20
+    },
+    {
+     "name": "fn_8011F1D8",
+     "addr": "8011F1D8",
+     "size": 8
+    }
+   ]
+  },
+  {
+   "path": "src/leaf/auto_03_8011F410_text.cpp",
+   "functions": [
+    {
+     "name": "fn_8011FF24",
+     "addr": "8011FF24",
+     "size": 4
+    },
+    {
+     "name": "fn_80120054",
+     "addr": "80120054",
+     "size": 24
+    },
+    {
+     "name": "fn_8012006C",
+     "addr": "8012006C",
+     "size": 24
+    },
+    {
+     "name": "fn_80120084",
+     "addr": "80120084",
+     "size": 20
+    },
+    {
+     "name": "fn_801203F0",
+     "addr": "801203F0",
+     "size": 40
+    },
+    {
+     "name": "fn_8012078C",
+     "addr": "8012078C",
+     "size": 44
+    },
+    {
+     "name": "fn_801207D0",
+     "addr": "801207D0",
+     "size": 12
+    },
+    {
+     "name": "fn_8012096C",
+     "addr": "8012096C",
+     "size": 12
+    },
+    {
+     "name": "fn_80120984",
+     "addr": "80120984",
+     "size": 12
+    },
+    {
+     "name": "fn_80120A84",
+     "addr": "80120A84",
+     "size": 8
+    }
+   ]
+  },
+  {
+   "path": "src/leaf/auto_03_80120AAC_text_cb.cpp",
+   "functions": [
+    {
+     "name": "EnterName_GetName",
+     "addr": "80120CBC",
+     "size": 8
+    }
+   ]
+  },
+  {
+   "path": "src/leaf/auto_03_80120DC0_text.cpp",
+   "functions": [
+    {
+     "name": "fn_80120FD4",
+     "addr": "80120FD4",
+     "size": 4
+    }
+   ]
+  },
+  {
+   "path": "src/leaf/auto_03_801210E4_text.cpp",
+   "functions": [
+    {
+     "name": "fn_80121434",
+     "addr": "80121434",
+     "size": 12
+    },
+    {
+     "name": "fn_8012145C",
+     "addr": "8012145C",
+     "size": 16
+    }
+   ]
+  },
+  {
+   "path": "src/leaf/auto_03_8012148C_text.cpp",
+   "functions": [
+    {
+     "name": "fn_8012148C",
+     "addr": "8012148C",
+     "size": 4
+    },
+    {
+     "name": "fn_80121490",
+     "addr": "80121490",
+     "size": 4
+    },
+    {
+     "name": "fn_80121494",
+     "addr": "80121494",
+     "size": 4
+    },
+    {
+     "name": "fn_801214DC",
+     "addr": "801214DC",
+     "size": 4
+    }
+   ]
+  },
+  {
+   "path": "src/leaf/auto_03_80121508_text.cpp",
+   "functions": [
+    {
+     "name": "DebugPing",
+     "addr": "80121898",
+     "size": 4
+    },
+    {
+     "name": "fn_801219F0",
+     "addr": "801219F0",
+     "size": 4
+    }
+   ]
+  },
+  {
+   "path": "src/leaf/auto_03_80121C90_text.cpp",
+   "functions": [
+    {
+     "name": "fn_801229D0",
+     "addr": "801229D0",
+     "size": 4
+    }
+   ]
+  },
+  {
+   "path": "src/leaf/auto_03_80122B5C_text.cpp",
+   "functions": [
+    {
+     "name": "fn_80122B98",
+     "addr": "80122B98",
+     "size": 4
+    }
+   ]
+  },
+  {
+   "path": "src/leaf/auto_03_801230DC_text_cb.cpp",
+   "functions": [
+    {
+     "name": "SaveManager_GetPlayerNameFromTmp",
+     "addr": "801242D0",
+     "size": 20
+    },
+    {
+     "name": "SaveManager_GetPlayerRankFromTmp",
+     "addr": "801242E4",
+     "size": 20
+    },
+    {
+     "name": "SaveManager_GetPlayerTimeHourFromTmp",
+     "addr": "801242F8",
+     "size": 20
+    },
+    {
+     "name": "SaveManager_GetPlayerTimeMinFromTmp",
+     "addr": "8012430C",
+     "size": 20
+    }
+   ]
+  },
+  {
+   "path": "src/leaf/auto_03_8012570C_text.cpp",
+   "functions": [
+    {
+     "name": "fn_8012670C",
+     "addr": "8012670C",
+     "size": 12
+    }
+   ]
+  },
+  {
+   "path": "src/leaf/auto_03_801268C8_text.cpp",
+   "functions": [
+    {
+     "name": "fn_8012A748",
+     "addr": "8012A748",
+     "size": 12
+    },
+    {
+     "name": "fn_8012A754",
+     "addr": "8012A754",
+     "size": 8
+    },
+    {
+     "name": "fn_8012A76C",
+     "addr": "8012A76C",
+     "size": 16
+    },
+    {
+     "name": "fn_8012A77C",
+     "addr": "8012A77C",
+     "size": 4
+    },
+    {
+     "name": "fn_8012A790",
+     "addr": "8012A790",
+     "size": 12
+    },
+    {
+     "name": "fn_8012CDF0",
+     "addr": "8012CDF0",
+     "size": 8
+    },
+    {
+     "name": "fn_8012CDF8",
+     "addr": "8012CDF8",
+     "size": 4
+    },
+    {
+     "name": "fn_8012F33C",
+     "addr": "8012F33C",
+     "size": 4
+    },
+    {
+     "name": "fn_8012F62C",
+     "addr": "8012F62C",
+     "size": 16
+    },
+    {
+     "name": "fn_8012F63C",
+     "addr": "8012F63C",
+     "size": 16
+    }
+   ]
+  },
+  {
+   "path": "src/leaf/auto_03_8013022C_text.cpp",
+   "functions": [
+    {
+     "name": "WorldRefreshZones",
+     "addr": "80131A14",
+     "size": 4
+    },
+    {
+     "name": "fn_80132094",
+     "addr": "80132094",
+     "size": 4
+    },
+    {
+     "name": "fn_8013244C",
+     "addr": "8013244C",
+     "size": 12
+    },
+    {
+     "name": "fn_80132BC0",
+     "addr": "80132BC0",
+     "size": 4
+    },
+    {
+     "name": "fn_80132BC4",
+     "addr": "80132BC4",
+     "size": 20
+    },
+    {
+     "name": "fn_801330D4",
+     "addr": "801330D4",
+     "size": 16
+    }
+   ]
+  },
+  {
+   "path": "src/leaf/auto_03_80133A84_text.cpp",
+   "functions": [
+    {
+     "name": "fn_80135220",
+     "addr": "80135220",
+     "size": 4
+    }
+   ]
+  },
+  {
+   "path": "src/leaf/auto_03_801399E8_text.cpp",
+   "functions": [
+    {
+     "name": "fn_801399E8",
+     "addr": "801399E8",
+     "size": 4
+    },
+    {
+     "name": "fn_8013A004",
+     "addr": "8013A004",
+     "size": 12
+    },
+    {
+     "name": "fn_8013A010",
+     "addr": "8013A010",
+     "size": 12
+    }
+   ]
+  },
+  {
+   "path": "src/leaf/auto_03_801399E8_text_cb.cpp",
+   "functions": [
+    {
+     "name": "FriendCodeInputDeInit",
+     "addr": "80139B0C",
+     "size": 4
+    }
+   ]
+  },
+  {
+   "path": "src/leaf/auto_03_8013A03C_text_cb.cpp",
+   "functions": [
+    {
+     "name": "FriendListDisableAutoScroll",
+     "addr": "8013B984",
+     "size": 12
+    },
+    {
+     "name": "GetMultiplayerLevel",
+     "addr": "8013BE74",
+     "size": 8
+    }
+   ]
+  },
+  {
+   "path": "src/leaf/auto_03_8013CA74_text.cpp",
+   "functions": [
+    {
+     "name": "fn_8013E3D0",
+     "addr": "8013E3D0",
+     "size": 8
+    },
+    {
+     "name": "fn_8013E3D8",
+     "addr": "8013E3D8",
+     "size": 8
+    },
+    {
+     "name": "fn_8013E3E0",
+     "addr": "8013E3E0",
+     "size": 8
+    },
+    {
+     "name": "fn_8013E3E8",
+     "addr": "8013E3E8",
+     "size": 8
+    },
+    {
+     "name": "fn_8013E3F0",
+     "addr": "8013E3F0",
+     "size": 12
+    },
+    {
+     "name": "fn_8013E3FC",
+     "addr": "8013E3FC",
+     "size": 8
+    },
+    {
+     "name": "fn_8013E404",
+     "addr": "8013E404",
+     "size": 8
+    },
+    {
+     "name": "fn_8013E40C",
+     "addr": "8013E40C",
+     "size": 8
+    },
+    {
+     "name": "fn_8013E414",
+     "addr": "8013E414",
+     "size": 8
+    },
+    {
+     "name": "fn_8013E41C",
+     "addr": "8013E41C",
+     "size": 8
+    },
+    {
+     "name": "fn_8013E424",
+     "addr": "8013E424",
+     "size": 8
+    },
+    {
+     "name": "fn_8013E42C",
+     "addr": "8013E42C",
+     "size": 8
+    },
+    {
+     "name": "fn_8013E434",
+     "addr": "8013E434",
+     "size": 8
+    },
+    {
+     "name": "fn_8013E43C",
+     "addr": "8013E43C",
+     "size": 8
+    },
+    {
+     "name": "fn_8013E444",
+     "addr": "8013E444",
+     "size": 8
+    },
+    {
+     "name": "fn_8013E44C",
+     "addr": "8013E44C",
+     "size": 8
+    },
+    {
+     "name": "fn_8013E454",
+     "addr": "8013E454",
+     "size": 8
+    },
+    {
+     "name": "fn_8013E45C",
+     "addr": "8013E45C",
+     "size": 8
+    },
+    {
+     "name": "fn_8013E464",
+     "addr": "8013E464",
+     "size": 8
+    }
+   ]
+  },
+  {
+   "path": "src/leaf/auto_03_8013CA74_text_cb.cpp",
+   "functions": [
+    {
+     "name": "WeArePostMatchupScreen",
+     "addr": "8013E2D4",
+     "size": 8
+    }
+   ]
+  },
+  {
+   "path": "src/leaf/auto_03_8013E4D0_text.cpp",
+   "functions": [
+    {
+     "name": "fn_8013E774",
+     "addr": "8013E774",
+     "size": 12
+    }
+   ]
+  },
+  {
+   "path": "src/leaf/auto_03_8013E4D0_text_cb.cpp",
+   "functions": [
+    {
+     "name": "SetMyMonsterHitpoints",
+     "addr": "8013E744",
+     "size": 8
+    },
+    {
+     "name": "SetMyMonsterEnergy",
+     "addr": "8013E74C",
+     "size": 8
+    },
+    {
+     "name": "SetMyMonsterAttack",
+     "addr": "8013E754",
+     "size": 8
+    },
+    {
+     "name": "SetMyMonsterDefense",
+     "addr": "8013E75C",
+     "size": 8
+    }
+   ]
+  },
+  {
+   "path": "src/leaf/auto_03_8013EB1C_text_cb.cpp",
+   "functions": [
+    {
+     "name": "CheckPlayerName",
+     "addr": "8013EB1C",
+     "size": 32
+    },
+    {
+     "name": "EnterScientistNameDeInit",
+     "addr": "8013EC58",
+     "size": 12
+    },
+    {
+     "name": "MPNameInput",
+     "addr": "8013EF6C",
+     "size": 8
+    }
+   ]
+  },
+  {
+   "path": "src/leaf/auto_03_8013F034_text.cpp",
+   "functions": [
+    {
+     "name": "AlertGetScreenSets",
+     "addr": "8013F38C",
+     "size": 8
+    },
+    {
+     "name": "MatchupIsActive",
+     "addr": "801409FC",
+     "size": 8
+    },
+    {
+     "name": "fn_80140B30",
+     "addr": "80140B30",
+     "size": 12
+    },
+    {
+     "name": "AlertGetLastError",
+     "addr": "80140B58",
+     "size": 8
+    },
+    {
+     "name": "fn_80140B7C",
+     "addr": "80140B7C",
+     "size": 16
+    },
+    {
+     "name": "fn_80140CE0",
+     "addr": "80140CE0",
+     "size": 8
+    }
+   ]
+  },
+  {
+   "path": "src/leaf/auto_03_8013F034_text_cb.cpp",
+   "functions": [
+    {
+     "name": "InitRematchFlow",
+     "addr": "8013FC10",
+     "size": 12
+    },
+    {
+     "name": "DisableHomeButton",
+     "addr": "801403A0",
+     "size": 20
+    },
+    {
+     "name": "ReturnHomeButton",
+     "addr": "801403B4",
+     "size": 12
+    },
+    {
+     "name": "SetErrorType",
+     "addr": "80140828",
+     "size": 8
+    },
+    {
+     "name": "GetErrorType",
+     "addr": "80140830",
+     "size": 8
+    },
+    {
+     "name": "ScreenIsOpen",
+     "addr": "801409F0",
+     "size": 12
+    },
+    {
+     "name": "SetHomeButtonGone",
+     "addr": "80140A04",
+     "size": 12
+    },
+    {
+     "name": "SetInviteTimeout",
+     "addr": "80140B3C",
+     "size": 12
+    },
+    {
+     "name": "SetInterlabLink",
+     "addr": "80140B48",
+     "size": 8
+    },
+    {
+     "name": "SetMPSection",
+     "addr": "80140B50",
+     "size": 8
+    },
+    {
+     "name": "SetResponse",
+     "addr": "80140CC4",
+     "size": 8
+    },
+    {
+     "name": "GotResponse",
+     "addr": "80140CCC",
+     "size": 20
+    },
+    {
+     "name": "DummyFunctionVV1",
+     "addr": "801420BC",
+     "size": 4
+    },
+    {
+     "name": "DummyFunctionVV2",
+     "addr": "801420C0",
+     "size": 4
+    },
+    {
+     "name": "DummyFunctionVU1",
+     "addr": "801420C4",
+     "size": 4
+    },
+    {
+     "name": "DummyFunctionVU2",
+     "addr": "801420C8",
+     "size": 4
+    }
+   ]
+  },
+  {
+   "path": "src/leaf/auto_03_801420EC_text.cpp",
+   "functions": [
+    {
+     "name": "fn_801420EC",
+     "addr": "801420EC",
+     "size": 32
+    },
+    {
+     "name": "AlertGetTimer",
+     "addr": "80142460",
+     "size": 8
+    },
+    {
+     "name": "fn_80142468",
+     "addr": "80142468",
+     "size": 8
+    },
+    {
+     "name": "fn_80142470",
+     "addr": "80142470",
+     "size": 32
+    }
+   ]
+  },
+  {
+   "path": "src/leaf/auto_03_801420EC_text_cb.cpp",
+   "functions": [
+    {
+     "name": "IsShowingError",
+     "addr": "80142490",
+     "size": 8
+    }
+   ]
+  },
+  {
+   "path": "src/leaf/auto_03_80142500_text.cpp",
+   "functions": [
+    {
+     "name": "fn_80142870",
+     "addr": "80142870",
+     "size": 8
+    }
+   ]
+  },
+  {
+   "path": "src/leaf/auto_03_80142E94_text.cpp",
+   "functions": [
+    {
+     "name": "fn_80142E94",
+     "addr": "80142E94",
+     "size": 20
+    },
+    {
+     "name": "fn_80142EA8",
+     "addr": "80142EA8",
+     "size": 20
+    },
+    {
+     "name": "fn_80142EBC",
+     "addr": "80142EBC",
+     "size": 20
+    },
+    {
+     "name": "fn_80142ED4",
+     "addr": "80142ED4",
+     "size": 12
+    },
+    {
+     "name": "fn_80142EE0",
+     "addr": "80142EE0",
+     "size": 8
+    },
+    {
+     "name": "fn_80142EE8",
+     "addr": "80142EE8",
+     "size": 4
+    },
+    {
+     "name": "fn_80142EF4",
+     "addr": "80142EF4",
+     "size": 4
+    },
+    {
+     "name": "fn_80144F78",
+     "addr": "80144F78",
+     "size": 20
+    },
+    {
+     "name": "fn_801467D4",
+     "addr": "801467D4",
+     "size": 4
+    }
+   ]
+  },
+  {
+   "path": "src/leaf/auto_03_801467F8_text.cpp",
+   "functions": [
+    {
+     "name": "fn_801467F8",
+     "addr": "801467F8",
+     "size": 8
+    },
+    {
+     "name": "fn_80146800",
+     "addr": "80146800",
+     "size": 8
+    },
+    {
+     "name": "fn_80146A78",
+     "addr": "80146A78",
+     "size": 4
+    },
+    {
+     "name": "fn_80146B18",
+     "addr": "80146B18",
+     "size": 16
+    },
+    {
+     "name": "fn_80146FB8",
+     "addr": "80146FB8",
+     "size": 32
+    },
+    {
+     "name": "fn_80147130",
+     "addr": "80147130",
+     "size": 32
+    },
+    {
+     "name": "fn_80147988",
+     "addr": "80147988",
+     "size": 8
+    },
+    {
+     "name": "fn_801483BC",
+     "addr": "801483BC",
+     "size": 16
+    },
+    {
+     "name": "fn_801483CC",
+     "addr": "801483CC",
+     "size": 48
+    },
+    {
+     "name": "fn_80148770",
+     "addr": "80148770",
+     "size": 44
+    },
+    {
+     "name": "fn_8014879C",
+     "addr": "8014879C",
+     "size": 24
+    },
+    {
+     "name": "fn_801487B4",
+     "addr": "801487B4",
+     "size": 24
+    },
+    {
+     "name": "fn_80148D70",
+     "addr": "80148D70",
+     "size": 36
+    },
+    {
+     "name": "fn_80149094",
+     "addr": "80149094",
+     "size": 24
+    },
+    {
+     "name": "fn_80149464",
+     "addr": "80149464",
+     "size": 4
+    },
+    {
+     "name": "fn_8014977C",
+     "addr": "8014977C",
+     "size": 4
+    },
+    {
+     "name": "fn_80149780",
+     "addr": "80149780",
+     "size": 44
+    },
+    {
+     "name": "fn_801497AC",
+     "addr": "801497AC",
+     "size": 4
+    },
+    {
+     "name": "RendSetCallbackA",
+     "addr": "8014DD74",
+     "size": 8
+    },
+    {
+     "name": "RendSetCallbackB",
+     "addr": "8014DD7C",
+     "size": 8
+    },
+    {
+     "name": "fn_8014E2D8",
+     "addr": "8014E2D8",
+     "size": 12
+    },
+    {
+     "name": "fn_8014EACC",
+     "addr": "8014EACC",
+     "size": 40
+    },
+    {
+     "name": "fn_8015428C",
+     "addr": "8015428C",
+     "size": 4
+    },
+    {
+     "name": "fn_80154290",
+     "addr": "80154290",
+     "size": 4
+    },
+    {
+     "name": "fn_80156894",
+     "addr": "80156894",
+     "size": 4
+    },
+    {
+     "name": "fn_80156A80",
+     "addr": "80156A80",
+     "size": 8
+    },
+    {
+     "name": "fn_80156A88",
+     "addr": "80156A88",
+     "size": 8
+    }
+   ]
+  },
+  {
+   "path": "src/leaf/auto_03_80156AAC_text.cpp",
+   "functions": [
+    {
+     "name": "fn_80156AAC",
+     "addr": "80156AAC",
+     "size": 16
+    },
+    {
+     "name": "fn_80156ABC",
+     "addr": "80156ABC",
+     "size": 4
+    },
+    {
+     "name": "fn_80156CD8",
+     "addr": "80156CD8",
+     "size": 4
+    },
+    {
+     "name": "fn_80156F3C",
+     "addr": "80156F3C",
+     "size": 4
+    },
+    {
+     "name": "fn_80157320",
+     "addr": "80157320",
+     "size": 4
+    },
+    {
+     "name": "fn_80158E64",
+     "addr": "80158E64",
+     "size": 36
+    },
+    {
+     "name": "fn_80159058",
+     "addr": "80159058",
+     "size": 44
+    },
+    {
+     "name": "fn_80159084",
+     "addr": "80159084",
+     "size": 28
+    },
+    {
+     "name": "fn_8015A58C",
+     "addr": "8015A58C",
+     "size": 24
+    },
+    {
+     "name": "fn_8015BA30",
+     "addr": "8015BA30",
+     "size": 28
+    },
+    {
+     "name": "VideoGetWidth",
+     "addr": "8015DE48",
+     "size": 8
+    },
+    {
+     "name": "VideoGetHeight",
+     "addr": "8015DE50",
+     "size": 8
+    },
+    {
+     "name": "fn_8015DE58",
+     "addr": "8015DE58",
+     "size": 28
+    },
+    {
+     "name": "fn_8015DE74",
+     "addr": "8015DE74",
+     "size": 28
+    },
+    {
+     "name": "fn_8015EB28",
+     "addr": "8015EB28",
+     "size": 20
+    },
+    {
+     "name": "fn_8015EC78",
+     "addr": "8015EC78",
+     "size": 36
+    },
+    {
+     "name": "fn_8015EC9C",
+     "addr": "8015EC9C",
+     "size": 4
+    },
+    {
+     "name": "fn_8015ECA0",
+     "addr": "8015ECA0",
+     "size": 8
+    },
+    {
+     "name": "fn_8015EF5C",
+     "addr": "8015EF5C",
+     "size": 8
+    },
+    {
+     "name": "fn_8015FD0C",
+     "addr": "8015FD0C",
+     "size": 36
+    },
+    {
+     "name": "fn_8015FD30",
+     "addr": "8015FD30",
+     "size": 24
+    },
+    {
+     "name": "fn_80160030",
+     "addr": "80160030",
+     "size": 36
+    },
+    {
+     "name": "fn_801604F4",
+     "addr": "801604F4",
+     "size": 4
+    }
+   ]
+  },
+  {
+   "path": "src/leaf/auto_03_80162D4C_text.cpp",
+   "functions": [
+    {
+     "name": "fn_80162D4C",
+     "addr": "80162D4C",
+     "size": 36
+    },
+    {
+     "name": "fn_80163750",
+     "addr": "80163750",
+     "size": 40
+    },
+    {
+     "name": "fn_80166034",
+     "addr": "80166034",
+     "size": 12
+    },
+    {
+     "name": "fn_80166314",
+     "addr": "80166314",
+     "size": 40
+    },
+    {
+     "name": "fn_80168100",
+     "addr": "80168100",
+     "size": 28
+    },
+    {
+     "name": "fn_8016834C",
+     "addr": "8016834C",
+     "size": 4
+    },
+    {
+     "name": "fn_80168350",
+     "addr": "80168350",
+     "size": 12
+    },
+    {
+     "name": "fn_8016A768",
+     "addr": "8016A768",
+     "size": 32
+    },
+    {
+     "name": "fn_8016B704",
+     "addr": "8016B704",
+     "size": 32
+    },
+    {
+     "name": "fn_8016B894",
+     "addr": "8016B894",
+     "size": 4
+    },
+    {
+     "name": "fn_8016C28C",
+     "addr": "8016C28C",
+     "size": 4
+    },
+    {
+     "name": "fn_8016C290",
+     "addr": "8016C290",
+     "size": 28
+    },
+    {
+     "name": "fn_8016D814",
+     "addr": "8016D814",
+     "size": 4
+    },
+    {
+     "name": "fn_8016DAE8",
+     "addr": "8016DAE8",
+     "size": 12
+    }
+   ]
+  },
+  {
+   "path": "src/leaf/auto_03_8016E304_text.cpp",
+   "functions": [
+    {
+     "name": "fn_8016EB0C",
+     "addr": "8016EB0C",
+     "size": 20
+    },
+    {
+     "name": "fn_8016EB20",
+     "addr": "8016EB20",
+     "size": 4
+    },
+    {
+     "name": "fn_8016EB24",
+     "addr": "8016EB24",
+     "size": 16
+    },
+    {
+     "name": "fn_8016EB34",
+     "addr": "8016EB34",
+     "size": 12
+    },
+    {
+     "name": "fn_8016EB40",
+     "addr": "8016EB40",
+     "size": 12
+    },
+    {
+     "name": "fn_8016EB4C",
+     "addr": "8016EB4C",
+     "size": 8
+    },
+    {
+     "name": "fn_8016EB54",
+     "addr": "8016EB54",
+     "size": 12
+    },
+    {
+     "name": "fn_8016EB60",
+     "addr": "8016EB60",
+     "size": 12
+    },
+    {
+     "name": "fn_8016F6F0",
+     "addr": "8016F6F0",
+     "size": 12
+    },
+    {
+     "name": "fn_8016F718",
+     "addr": "8016F718",
+     "size": 40
+    },
+    {
+     "name": "fn_8016F75C",
+     "addr": "8016F75C",
+     "size": 28
+    },
+    {
+     "name": "fn_8016F778",
+     "addr": "8016F778",
+     "size": 12
+    },
+    {
+     "name": "fn_8016F784",
+     "addr": "8016F784",
+     "size": 20
+    },
+    {
+     "name": "fn_8016F848",
+     "addr": "8016F848",
+     "size": 12
+    },
+    {
+     "name": "fn_801704E8",
+     "addr": "801704E8",
+     "size": 12
+    },
+    {
+     "name": "fn_801704F4",
+     "addr": "801704F4",
+     "size": 4
+    },
+    {
+     "name": "fn_801731C0",
+     "addr": "801731C0",
+     "size": 4
+    },
+    {
+     "name": "fn_801731C4",
+     "addr": "801731C4",
+     "size": 4
+    },
+    {
+     "name": "fn_801736E4",
+     "addr": "801736E4",
+     "size": 4
+    },
+    {
+     "name": "fn_801736E8",
+     "addr": "801736E8",
+     "size": 4
+    },
+    {
+     "name": "fn_80173874",
+     "addr": "80173874",
+     "size": 4
+    },
+    {
+     "name": "fn_80173878",
+     "addr": "80173878",
+     "size": 4
+    },
+    {
+     "name": "fn_80174A1C",
+     "addr": "80174A1C",
+     "size": 4
+    },
+    {
+     "name": "fn_80174A20",
+     "addr": "80174A20",
+     "size": 4
+    },
+    {
+     "name": "fn_80174A60",
+     "addr": "80174A60",
+     "size": 16
+    },
+    {
+     "name": "fn_80174A70",
+     "addr": "80174A70",
+     "size": 16
+    },
+    {
+     "name": "fn_801759A8",
+     "addr": "801759A8",
+     "size": 40
+    },
+    {
+     "name": "fn_80175B60",
+     "addr": "80175B60",
+     "size": 44
+    },
+    {
+     "name": "fn_80175B8C",
+     "addr": "80175B8C",
+     "size": 44
+    },
+    {
+     "name": "fn_80175BB8",
+     "addr": "80175BB8",
+     "size": 44
+    },
+    {
+     "name": "fn_80175BE4",
+     "addr": "80175BE4",
+     "size": 44
+    },
+    {
+     "name": "fn_80175C10",
+     "addr": "80175C10",
+     "size": 20
+    },
+    {
+     "name": "fn_80175C24",
+     "addr": "80175C24",
+     "size": 36
+    },
+    {
+     "name": "fn_801785A0",
+     "addr": "801785A0",
+     "size": 8
+    },
+    {
+     "name": "fn_8017A0EC",
+     "addr": "8017A0EC",
+     "size": 4
+    },
+    {
+     "name": "fn_8017A0F0",
+     "addr": "8017A0F0",
+     "size": 4
+    },
+    {
+     "name": "fn_8017A564",
+     "addr": "8017A564",
+     "size": 8
+    },
+    {
+     "name": "fn_8017A614",
+     "addr": "8017A614",
+     "size": 4
+    },
+    {
+     "name": "fn_80182A14",
+     "addr": "80182A14",
+     "size": 8
+    },
+    {
+     "name": "fn_80182AB8",
+     "addr": "80182AB8",
+     "size": 4
+    },
+    {
+     "name": "fn_80183F60",
+     "addr": "80183F60",
+     "size": 4
+    },
+    {
+     "name": "fn_80184260",
+     "addr": "80184260",
+     "size": 4
+    },
+    {
+     "name": "fn_80184264",
+     "addr": "80184264",
+     "size": 4
+    },
+    {
+     "name": "fn_80185C94",
+     "addr": "80185C94",
+     "size": 4
+    },
+    {
+     "name": "fn_80188ED4",
+     "addr": "80188ED4",
+     "size": 8
+    },
+    {
+     "name": "fn_8018A3E4",
+     "addr": "8018A3E4",
+     "size": 8
+    },
+    {
+     "name": "fn_8018C47C",
+     "addr": "8018C47C",
+     "size": 16
+    },
+    {
+     "name": "fn_8018C8E4",
+     "addr": "8018C8E4",
+     "size": 8
+    },
+    {
+     "name": "fn_8018C8EC",
+     "addr": "8018C8EC",
+     "size": 8
+    },
+    {
+     "name": "ScreenSetsCurrent",
+     "addr": "8018D1E4",
+     "size": 8
+    },
+    {
+     "name": "ScreenSetsFind",
+     "addr": "8018D1EC",
+     "size": 16
+    },
+    {
+     "name": "fn_8018D524",
+     "addr": "8018D524",
+     "size": 16
+    },
+    {
+     "name": "fn_8018DEE0",
+     "addr": "8018DEE0",
+     "size": 20
+    }
+   ]
+  },
+  {
+   "path": "src/leaf/auto_03_8016E304_text_cb.cpp",
+   "functions": [
+    {
+     "name": "DefaultAnimLoopCallback",
+     "addr": "8018A944",
+     "size": 4
+    }
+   ]
+  },
+  {
+   "path": "src/leaf/auto_03_8018E0CC_text.cpp",
+   "functions": [
+    {
+     "name": "fn_8019555C",
+     "addr": "8019555C",
+     "size": 8
+    },
+    {
+     "name": "fn_80196668",
+     "addr": "80196668",
+     "size": 16
+    },
+    {
+     "name": "fn_80196B10",
+     "addr": "80196B10",
+     "size": 20
+    },
+    {
+     "name": "fn_80196C88",
+     "addr": "80196C88",
+     "size": 20
+    },
+    {
+     "name": "fn_80196D04",
+     "addr": "80196D04",
+     "size": 8
+    },
+    {
+     "name": "fn_80197FD8",
+     "addr": "80197FD8",
+     "size": 8
+    },
+    {
+     "name": "fn_80198290",
+     "addr": "80198290",
+     "size": 12
+    },
+    {
+     "name": "fn_8019829C",
+     "addr": "8019829C",
+     "size": 12
+    },
+    {
+     "name": "fn_80198E20",
+     "addr": "80198E20",
+     "size": 20
+    },
+    {
+     "name": "fn_8019956C",
+     "addr": "8019956C",
+     "size": 8
+    },
+    {
+     "name": "fn_80199574",
+     "addr": "80199574",
+     "size": 8
+    },
+    {
+     "name": "fn_801999CC",
+     "addr": "801999CC",
+     "size": 8
+    },
+    {
+     "name": "fn_8019A9D4",
+     "addr": "8019A9D4",
+     "size": 24
+    },
+    {
+     "name": "fn_8019B880",
+     "addr": "8019B880",
+     "size": 8
+    },
+    {
+     "name": "fn_8019C710",
+     "addr": "8019C710",
+     "size": 12
+    },
+    {
+     "name": "fn_8019CBE4",
+     "addr": "8019CBE4",
+     "size": 8
+    },
+    {
+     "name": "fn_8019CE50",
+     "addr": "8019CE50",
+     "size": 8
+    },
+    {
+     "name": "fn_8019DC48",
+     "addr": "8019DC48",
+     "size": 8
+    },
+    {
+     "name": "fn_8019DC50",
+     "addr": "8019DC50",
+     "size": 8
+    },
+    {
+     "name": "UITextGetString",
+     "addr": "8019F3AC",
+     "size": 8
+    },
+    {
+     "name": "fn_801A0DF0",
+     "addr": "801A0DF0",
+     "size": 8
+    },
+    {
+     "name": "fn_801A0DF8",
+     "addr": "801A0DF8",
+     "size": 16
+    },
+    {
+     "name": "fn_801A0E08",
+     "addr": "801A0E08",
+     "size": 8
+    },
+    {
+     "name": "UISetTexture",
+     "addr": "801A11FC",
+     "size": 12
+    },
+    {
+     "name": "fn_801A2380",
+     "addr": "801A2380",
+     "size": 8
+    },
+    {
+     "name": "fn_801A2538",
+     "addr": "801A2538",
+     "size": 8
+    },
+    {
+     "name": "fn_801A2540",
+     "addr": "801A2540",
+     "size": 8
+    },
+    {
+     "name": "fn_801A2E84",
+     "addr": "801A2E84",
+     "size": 8
+    },
+    {
+     "name": "fn_801A2E8C",
+     "addr": "801A2E8C",
+     "size": 8
+    },
+    {
+     "name": "fn_801A3908",
+     "addr": "801A3908",
+     "size": 8
+    },
+    {
+     "name": "fn_801A4018",
+     "addr": "801A4018",
+     "size": 28
+    },
+    {
+     "name": "fn_801A4034",
+     "addr": "801A4034",
+     "size": 8
+    },
+    {
+     "name": "fn_801A403C",
+     "addr": "801A403C",
+     "size": 12
+    },
+    {
+     "name": "fn_801A4048",
+     "addr": "801A4048",
+     "size": 8
+    },
+    {
+     "name": "fn_801A4050",
+     "addr": "801A4050",
+     "size": 12
+    },
+    {
+     "name": "fn_801A405C",
+     "addr": "801A405C",
+     "size": 8
+    },
+    {
+     "name": "fn_801A4064",
+     "addr": "801A4064",
+     "size": 12
+    },
+    {
+     "name": "fn_801A4070",
+     "addr": "801A4070",
+     "size": 8
+    },
+    {
+     "name": "fn_801A4078",
+     "addr": "801A4078",
+     "size": 12
+    },
+    {
+     "name": "fn_801A4084",
+     "addr": "801A4084",
+     "size": 8
+    },
+    {
+     "name": "fn_801A511C",
+     "addr": "801A511C",
+     "size": 8
+    },
+    {
+     "name": "fn_801A7DB8",
+     "addr": "801A7DB8",
+     "size": 8
+    },
+    {
+     "name": "fn_801A81D8",
+     "addr": "801A81D8",
+     "size": 8
+    },
+    {
+     "name": "fn_801A8AF4",
+     "addr": "801A8AF4",
+     "size": 8
+    },
+    {
+     "name": "fn_801A9E28",
+     "addr": "801A9E28",
+     "size": 8
+    },
+    {
+     "name": "fn_801AA1D4",
+     "addr": "801AA1D4",
+     "size": 4
+    },
+    {
+     "name": "fn_801AA728",
+     "addr": "801AA728",
+     "size": 8
+    },
+    {
+     "name": "fn_801AA730",
+     "addr": "801AA730",
+     "size": 48
+    },
+    {
+     "name": "fn_801AA760",
+     "addr": "801AA760",
+     "size": 36
+    },
+    {
+     "name": "fn_801AA784",
+     "addr": "801AA784",
+     "size": 8
+    },
+    {
+     "name": "fn_801AA78C",
+     "addr": "801AA78C",
+     "size": 8
+    },
+    {
+     "name": "fn_801AA794",
+     "addr": "801AA794",
+     "size": 8
+    },
+    {
+     "name": "fn_801AAEE4",
+     "addr": "801AAEE4",
+     "size": 48
+    },
+    {
+     "name": "fn_801AB3CC",
+     "addr": "801AB3CC",
+     "size": 16
+    },
+    {
+     "name": "fn_801AB7D4",
+     "addr": "801AB7D4",
+     "size": 20
+    },
+    {
+     "name": "fn_801AB7E8",
+     "addr": "801AB7E8",
+     "size": 8
+    },
+    {
+     "name": "fn_801AB7F0",
+     "addr": "801AB7F0",
+     "size": 8
+    },
+    {
+     "name": "fn_801AB7F8",
+     "addr": "801AB7F8",
+     "size": 12
+    },
+    {
+     "name": "fn_801AB804",
+     "addr": "801AB804",
+     "size": 8
+    },
+    {
+     "name": "fn_801AB80C",
+     "addr": "801AB80C",
+     "size": 12
+    },
+    {
+     "name": "fn_801AB818",
+     "addr": "801AB818",
+     "size": 8
+    },
+    {
+     "name": "fn_801ABD48",
+     "addr": "801ABD48",
+     "size": 8
+    },
+    {
+     "name": "fn_801ABD50",
+     "addr": "801ABD50",
+     "size": 8
+    }
+   ]
+  },
+  {
+   "path": "src/leaf/auto_03_801ACB98_text.cpp",
+   "functions": [
+    {
+     "name": "fn_801ACCEC",
+     "addr": "801ACCEC",
+     "size": 4
+    },
+    {
+     "name": "fn_801ACCF0",
+     "addr": "801ACCF0",
+     "size": 8
+    },
+    {
+     "name": "fn_801ACCF8",
+     "addr": "801ACCF8",
+     "size": 8
+    },
+    {
+     "name": "fn_801ACD00",
+     "addr": "801ACD00",
+     "size": 8
+    },
+    {
+     "name": "fn_801ADF4C",
+     "addr": "801ADF4C",
+     "size": 8
+    },
+    {
+     "name": "fn_801ADF54",
+     "addr": "801ADF54",
+     "size": 8
+    },
+    {
+     "name": "fn_801ADF5C",
+     "addr": "801ADF5C",
+     "size": 8
+    },
+    {
+     "name": "fn_801ADF64",
+     "addr": "801ADF64",
+     "size": 8
+    },
+    {
+     "name": "fn_801B01A0",
+     "addr": "801B01A0",
+     "size": 8
+    },
+    {
+     "name": "fn_801B0E2C",
+     "addr": "801B0E2C",
+     "size": 8
+    },
+    {
+     "name": "fn_801B2480",
+     "addr": "801B2480",
+     "size": 4
+    },
+    {
+     "name": "fn_801B2484",
+     "addr": "801B2484",
+     "size": 4
+    },
+    {
+     "name": "fn_801B2E04",
+     "addr": "801B2E04",
+     "size": 4
+    },
+    {
+     "name": "fn_801B2E08",
+     "addr": "801B2E08",
+     "size": 4
+    },
+    {
+     "name": "fn_801B2E0C",
+     "addr": "801B2E0C",
+     "size": 4
+    }
+   ]
+  },
+  {
+   "path": "src/leaf/auto_03_801B313C_text.cpp",
+   "functions": [
+    {
+     "name": "fn_801B3308",
+     "addr": "801B3308",
+     "size": 8
+    },
+    {
+     "name": "fn_801B3430",
+     "addr": "801B3430",
+     "size": 36
+    },
+    {
+     "name": "fn_801B3738",
+     "addr": "801B3738",
+     "size": 4
+    },
+    {
+     "name": "fn_801B3938",
+     "addr": "801B3938",
+     "size": 8
+    },
+    {
+     "name": "fn_801B4028",
+     "addr": "801B4028",
+     "size": 4
+    },
+    {
+     "name": "fn_801B432C",
+     "addr": "801B432C",
+     "size": 8
+    },
+    {
+     "name": "fn_801B5334",
+     "addr": "801B5334",
+     "size": 4
+    },
+    {
+     "name": "fn_801B62C8",
+     "addr": "801B62C8",
+     "size": 12
+    },
+    {
+     "name": "fn_801B62D4",
+     "addr": "801B62D4",
+     "size": 4
+    },
+    {
+     "name": "fn_801B6420",
+     "addr": "801B6420",
+     "size": 4
+    },
+    {
+     "name": "fn_801B6424",
+     "addr": "801B6424",
+     "size": 4
+    },
+    {
+     "name": "fn_801B6428",
+     "addr": "801B6428",
+     "size": 4
+    },
+    {
+     "name": "fn_801B642C",
+     "addr": "801B642C",
+     "size": 4
+    },
+    {
+     "name": "fn_801B6430",
+     "addr": "801B6430",
+     "size": 4
+    },
+    {
+     "name": "fn_801B6434",
+     "addr": "801B6434",
+     "size": 4
+    },
+    {
+     "name": "fn_801B6438",
+     "addr": "801B6438",
+     "size": 4
+    },
+    {
+     "name": "fn_801B643C",
+     "addr": "801B643C",
+     "size": 4
+    },
+    {
+     "name": "fn_801B6440",
+     "addr": "801B6440",
+     "size": 4
+    },
+    {
+     "name": "fn_801B6ACC",
+     "addr": "801B6ACC",
+     "size": 8
+    },
+    {
+     "name": "fn_801B6E74",
+     "addr": "801B6E74",
+     "size": 8
+    },
+    {
+     "name": "fn_801B6E7C",
+     "addr": "801B6E7C",
+     "size": 8
+    },
+    {
+     "name": "fn_801B6E84",
+     "addr": "801B6E84",
+     "size": 8
+    },
+    {
+     "name": "fn_801B6E8C",
+     "addr": "801B6E8C",
+     "size": 8
+    },
+    {
+     "name": "EntityIsFrozen",
+     "addr": "801B70E8",
+     "size": 16
+    },
+    {
+     "name": "fn_801B9C94",
+     "addr": "801B9C94",
+     "size": 20
+    },
+    {
+     "name": "fn_801B9CA8",
+     "addr": "801B9CA8",
+     "size": 20
+    },
+    {
+     "name": "fn_801B9E7C",
+     "addr": "801B9E7C",
+     "size": 48
+    },
+    {
+     "name": "fn_801BA9BC",
+     "addr": "801BA9BC",
+     "size": 8
+    },
+    {
+     "name": "fn_801BB3CC",
+     "addr": "801BB3CC",
+     "size": 8
+    },
+    {
+     "name": "fn_801BBE38",
+     "addr": "801BBE38",
+     "size": 4
+    },
+    {
+     "name": "fn_801BBE3C",
+     "addr": "801BBE3C",
+     "size": 4
+    },
+    {
+     "name": "fn_801BBEDC",
+     "addr": "801BBEDC",
+     "size": 8
+    },
+    {
+     "name": "fn_801BBFC8",
+     "addr": "801BBFC8",
+     "size": 8
+    },
+    {
+     "name": "fn_801BC788",
+     "addr": "801BC788",
+     "size": 4
+    },
+    {
+     "name": "fn_801BC78C",
+     "addr": "801BC78C",
+     "size": 4
+    },
+    {
+     "name": "fn_801BC790",
+     "addr": "801BC790",
+     "size": 8
+    },
+    {
+     "name": "fn_801BC798",
+     "addr": "801BC798",
+     "size": 4
+    },
+    {
+     "name": "fn_801BC79C",
+     "addr": "801BC79C",
+     "size": 4
+    },
+    {
+     "name": "fn_801BC7A0",
+     "addr": "801BC7A0",
+     "size": 8
+    },
+    {
+     "name": "fn_801BC868",
+     "addr": "801BC868",
+     "size": 8
+    },
+    {
+     "name": "fn_801BF36C",
+     "addr": "801BF36C",
+     "size": 44
+    },
+    {
+     "name": "fn_801C37EC",
+     "addr": "801C37EC",
+     "size": 8
+    },
+    {
+     "name": "fn_801C3E94",
+     "addr": "801C3E94",
+     "size": 16
+    },
+    {
+     "name": "fn_801C5C60",
+     "addr": "801C5C60",
+     "size": 20
+    },
+    {
+     "name": "fn_801C6604",
+     "addr": "801C6604",
+     "size": 20
+    }
+   ]
+  },
+  {
+   "path": "src/leaf/auto_03_801B313C_text_cb.cpp",
+   "functions": [
+    {
+     "name": "EntityWaypointTaskCompleteCallback",
+     "addr": "801B8724",
+     "size": 16
+    }
+   ]
+  },
+  {
+   "path": "src/leaf/auto_03_801C7264_text.cpp",
+   "functions": [
+    {
+     "name": "fn_801C7614",
+     "addr": "801C7614",
+     "size": 40
+    },
+    {
+     "name": "fn_801C911C",
+     "addr": "801C911C",
+     "size": 44
+    },
+    {
+     "name": "fn_801C9148",
+     "addr": "801C9148",
+     "size": 48
+    },
+    {
+     "name": "fn_801CAD70",
+     "addr": "801CAD70",
+     "size": 16
+    },
+    {
+     "name": "fn_801CB938",
+     "addr": "801CB938",
+     "size": 8
+    },
+    {
+     "name": "fn_801CB940",
+     "addr": "801CB940",
+     "size": 4
+    },
+    {
+     "name": "fn_801CB944",
+     "addr": "801CB944",
+     "size": 8
+    },
+    {
+     "name": "fn_801CB94C",
+     "addr": "801CB94C",
+     "size": 8
+    },
+    {
+     "name": "fn_801CB954",
+     "addr": "801CB954",
+     "size": 8
+    },
+    {
+     "name": "fn_801CB95C",
+     "addr": "801CB95C",
+     "size": 16
+    },
+    {
+     "name": "fn_801CBD28",
+     "addr": "801CBD28",
+     "size": 8
+    },
+    {
+     "name": "fn_801CBD30",
+     "addr": "801CBD30",
+     "size": 8
+    },
+    {
+     "name": "fn_801CBD38",
+     "addr": "801CBD38",
+     "size": 8
+    },
+    {
+     "name": "fn_801CC8A4",
+     "addr": "801CC8A4",
+     "size": 8
+    },
+    {
+     "name": "fn_801CC8E0",
+     "addr": "801CC8E0",
+     "size": 4
+    },
+    {
+     "name": "fn_801CC8E4",
+     "addr": "801CC8E4",
+     "size": 8
+    },
+    {
+     "name": "fn_801CC8EC",
+     "addr": "801CC8EC",
+     "size": 8
+    },
+    {
+     "name": "fn_801CCDBC",
+     "addr": "801CCDBC",
+     "size": 8
+    },
+    {
+     "name": "fn_801CCFAC",
+     "addr": "801CCFAC",
+     "size": 12
+    },
+    {
+     "name": "fn_801CCFB8",
+     "addr": "801CCFB8",
+     "size": 12
+    },
+    {
+     "name": "fn_801CCFC4",
+     "addr": "801CCFC4",
+     "size": 28
+    },
+    {
+     "name": "fn_801CD680",
+     "addr": "801CD680",
+     "size": 20
+    },
+    {
+     "name": "fn_801CD694",
+     "addr": "801CD694",
+     "size": 20
+    }
+   ]
+  },
+  {
+   "path": "src/leaf/auto_03_801CD790_text.cpp",
+   "functions": [
+    {
+     "name": "fn_801CE2BC",
+     "addr": "801CE2BC",
+     "size": 8
+    },
+    {
+     "name": "fn_801CE2C4",
+     "addr": "801CE2C4",
+     "size": 8
+    },
+    {
+     "name": "fn_801CE2CC",
+     "addr": "801CE2CC",
+     "size": 8
+    },
+    {
+     "name": "fn_801CE2FC",
+     "addr": "801CE2FC",
+     "size": 12
+    },
+    {
+     "name": "fn_801CE308",
+     "addr": "801CE308",
+     "size": 8
+    },
+    {
+     "name": "fn_801CE310",
+     "addr": "801CE310",
+     "size": 8
+    },
+    {
+     "name": "fn_801CE318",
+     "addr": "801CE318",
+     "size": 8
+    },
+    {
+     "name": "fn_801CE320",
+     "addr": "801CE320",
+     "size": 8
+    },
+    {
+     "name": "fn_801CE328",
+     "addr": "801CE328",
+     "size": 8
+    },
+    {
+     "name": "fn_801CE380",
+     "addr": "801CE380",
+     "size": 8
+    },
+    {
+     "name": "fn_801CE388",
+     "addr": "801CE388",
+     "size": 8
+    },
+    {
+     "name": "fn_801CE390",
+     "addr": "801CE390",
+     "size": 8
+    },
+    {
+     "name": "fn_801CE398",
+     "addr": "801CE398",
+     "size": 8
+    },
+    {
+     "name": "fn_801CE3A0",
+     "addr": "801CE3A0",
+     "size": 8
+    },
+    {
+     "name": "fn_801CE3A8",
+     "addr": "801CE3A8",
+     "size": 8
+    },
+    {
+     "name": "fn_801CE3C8",
+     "addr": "801CE3C8",
+     "size": 8
+    },
+    {
+     "name": "fn_801CE414",
+     "addr": "801CE414",
+     "size": 8
+    },
+    {
+     "name": "fn_801CE41C",
+     "addr": "801CE41C",
+     "size": 8
+    },
+    {
+     "name": "fn_801CE478",
+     "addr": "801CE478",
+     "size": 8
+    },
+    {
+     "name": "fn_801CE480",
+     "addr": "801CE480",
+     "size": 8
+    },
+    {
+     "name": "fn_801CE488",
+     "addr": "801CE488",
+     "size": 12
+    },
+    {
+     "name": "fn_801CE494",
+     "addr": "801CE494",
+     "size": 8
+    },
+    {
+     "name": "fn_801CE49C",
+     "addr": "801CE49C",
+     "size": 8
+    },
+    {
+     "name": "fn_801CE53C",
+     "addr": "801CE53C",
+     "size": 8
+    },
+    {
+     "name": "fn_801CE544",
+     "addr": "801CE544",
+     "size": 8
+    },
+    {
+     "name": "fn_801CE6D0",
+     "addr": "801CE6D0",
+     "size": 8
+    },
+    {
+     "name": "fn_801CE718",
+     "addr": "801CE718",
+     "size": 8
+    },
+    {
+     "name": "fn_801CE740",
+     "addr": "801CE740",
+     "size": 36
+    },
+    {
+     "name": "fn_801CE764",
+     "addr": "801CE764",
+     "size": 8
+    },
+    {
+     "name": "fn_801CE78C",
+     "addr": "801CE78C",
+     "size": 20
+    },
+    {
+     "name": "fn_801CFEE4",
+     "addr": "801CFEE4",
+     "size": 8
+    },
+    {
+     "name": "fn_801CFEEC",
+     "addr": "801CFEEC",
+     "size": 8
+    },
+    {
+     "name": "fn_801D0040",
+     "addr": "801D0040",
+     "size": 8
+    },
+    {
+     "name": "fn_801D0048",
+     "addr": "801D0048",
+     "size": 8
+    },
+    {
+     "name": "fn_801D0050",
+     "addr": "801D0050",
+     "size": 8
+    },
+    {
+     "name": "fn_801D0058",
+     "addr": "801D0058",
+     "size": 36
+    },
+    {
+     "name": "fn_801D007C",
+     "addr": "801D007C",
+     "size": 8
+    },
+    {
+     "name": "fn_801D010C",
+     "addr": "801D010C",
+     "size": 8
+    },
+    {
+     "name": "fn_801D0200",
+     "addr": "801D0200",
+     "size": 36
+    },
+    {
+     "name": "fn_801D0224",
+     "addr": "801D0224",
+     "size": 8
+    },
+    {
+     "name": "fn_801D0338",
+     "addr": "801D0338",
+     "size": 8
+    },
+    {
+     "name": "fn_801D0368",
+     "addr": "801D0368",
+     "size": 8
+    },
+    {
+     "name": "fn_801D0370",
+     "addr": "801D0370",
+     "size": 8
+    },
+    {
+     "name": "fn_801D0378",
+     "addr": "801D0378",
+     "size": 8
+    },
+    {
+     "name": "fn_801D0380",
+     "addr": "801D0380",
+     "size": 8
+    },
+    {
+     "name": "fn_801D0388",
+     "addr": "801D0388",
+     "size": 8
+    },
+    {
+     "name": "fn_801D0390",
+     "addr": "801D0390",
+     "size": 8
+    },
+    {
+     "name": "fn_801D04A8",
+     "addr": "801D04A8",
+     "size": 8
+    },
+    {
+     "name": "fn_801D04B0",
+     "addr": "801D04B0",
+     "size": 8
+    },
+    {
+     "name": "fn_801D04B8",
+     "addr": "801D04B8",
+     "size": 8
+    },
+    {
+     "name": "fn_801D0504",
+     "addr": "801D0504",
+     "size": 8
+    },
+    {
+     "name": "fn_801D050C",
+     "addr": "801D050C",
+     "size": 12
+    },
+    {
+     "name": "fn_801D0518",
+     "addr": "801D0518",
+     "size": 12
+    },
+    {
+     "name": "fn_801D0524",
+     "addr": "801D0524",
+     "size": 12
+    },
+    {
+     "name": "fn_801D0530",
+     "addr": "801D0530",
+     "size": 8
+    },
+    {
+     "name": "fn_801D0538",
+     "addr": "801D0538",
+     "size": 36
+    },
+    {
+     "name": "fn_801D055C",
+     "addr": "801D055C",
+     "size": 36
+    },
+    {
+     "name": "fn_801D089C",
+     "addr": "801D089C",
+     "size": 8
+    },
+    {
+     "name": "fn_801D08A4",
+     "addr": "801D08A4",
+     "size": 36
+    },
+    {
+     "name": "fn_801D08C8",
+     "addr": "801D08C8",
+     "size": 8
+    },
+    {
+     "name": "fn_801D08D0",
+     "addr": "801D08D0",
+     "size": 12
+    },
+    {
+     "name": "fn_801D0954",
+     "addr": "801D0954",
+     "size": 8
+    },
+    {
+     "name": "fn_801D095C",
+     "addr": "801D095C",
+     "size": 8
+    },
+    {
+     "name": "fn_801D0964",
+     "addr": "801D0964",
+     "size": 8
+    },
+    {
+     "name": "fn_801D096C",
+     "addr": "801D096C",
+     "size": 8
+    },
+    {
+     "name": "fn_801D0974",
+     "addr": "801D0974",
+     "size": 36
+    },
+    {
+     "name": "fn_801D0998",
+     "addr": "801D0998",
+     "size": 8
+    },
+    {
+     "name": "fn_801D09A0",
+     "addr": "801D09A0",
+     "size": 8
+    },
+    {
+     "name": "fn_801D09A8",
+     "addr": "801D09A8",
+     "size": 8
+    }
+   ]
+  },
+  {
+   "path": "src/leaf/auto_03_801D0C04_text.cpp",
+   "functions": [
+    {
+     "name": "EngineRequestSuspend",
+     "addr": "801D1830",
+     "size": 8
+    }
+   ]
+  },
+  {
+   "path": "src/leaf/auto_03_801D2BB8_text.cpp",
+   "functions": [
+    {
+     "name": "GetGlobalSettings",
+     "addr": "801D2BF8",
+     "size": 8
+    },
+    {
+     "name": "fn_801D55F0",
+     "addr": "801D55F0",
+     "size": 4
+    },
+    {
+     "name": "fn_801D55F4",
+     "addr": "801D55F4",
+     "size": 4
+    }
+   ]
+  },
+  {
+   "path": "src/leaf/auto_03_801D5D0C_text.cpp",
+   "functions": [
+    {
+     "name": "fn_801D5D0C",
+     "addr": "801D5D0C",
+     "size": 8
+    },
+    {
+     "name": "fn_801D65B4",
+     "addr": "801D65B4",
+     "size": 12
+    },
+    {
+     "name": "fn_801D65C0",
+     "addr": "801D65C0",
+     "size": 12
+    }
+   ]
+  },
+  {
+   "path": "src/leaf/auto_03_801D5D0C_text_cb.cpp",
+   "functions": [
+    {
+     "name": "UpdateFader",
+     "addr": "801D664C",
+     "size": 4
+    }
+   ]
+  },
+  {
+   "path": "src/leaf/auto_03_801D66B4_text.cpp",
+   "functions": [
+    {
+     "name": "fn_801D66B4",
+     "addr": "801D66B4",
+     "size": 8
+    },
+    {
+     "name": "fn_801D66BC",
+     "addr": "801D66BC",
+     "size": 8
+    },
+    {
+     "name": "fn_801D6790",
+     "addr": "801D6790",
+     "size": 12
+    },
+    {
+     "name": "fn_801D6808",
+     "addr": "801D6808",
+     "size": 12
+    },
+    {
+     "name": "fn_801D7900",
+     "addr": "801D7900",
+     "size": 36
+    },
+    {
+     "name": "CameraSetFov",
+     "addr": "801D8ACC",
+     "size": 8
+    },
+    {
+     "name": "fn_801D8AD4",
+     "addr": "801D8AD4",
+     "size": 8
+    },
+    {
+     "name": "fn_801D8BB0",
+     "addr": "801D8BB0",
+     "size": 4
+    },
+    {
+     "name": "fn_801D8D7C",
+     "addr": "801D8D7C",
+     "size": 4
+    }
+   ]
+  },
+  {
+   "path": "src/leaf/auto_03_801D9028_text.cpp",
+   "functions": [
+    {
+     "name": "fn_801D9028",
+     "addr": "801D9028",
+     "size": 16
+    },
+    {
+     "name": "fn_801D9160",
+     "addr": "801D9160",
+     "size": 4
+    },
+    {
+     "name": "fn_801D9648",
+     "addr": "801D9648",
+     "size": 4
+    },
+    {
+     "name": "fn_801D9AD4",
+     "addr": "801D9AD4",
+     "size": 16
+    },
+    {
+     "name": "fn_801DA344",
+     "addr": "801DA344",
+     "size": 8
+    },
+    {
+     "name": "fn_801DA750",
+     "addr": "801DA750",
+     "size": 8
+    },
+    {
+     "name": "fn_801DA780",
+     "addr": "801DA780",
+     "size": 8
+    },
+    {
+     "name": "fn_801DA7C0",
+     "addr": "801DA7C0",
+     "size": 8
+    },
+    {
+     "name": "fn_801DA8CC",
+     "addr": "801DA8CC",
+     "size": 4
+    },
+    {
+     "name": "fn_801DC574",
+     "addr": "801DC574",
+     "size": 8
+    },
+    {
+     "name": "fn_801DC57C",
+     "addr": "801DC57C",
+     "size": 8
+    },
+    {
+     "name": "fn_801DC584",
+     "addr": "801DC584",
+     "size": 8
+    },
+    {
+     "name": "fn_801DC58C",
+     "addr": "801DC58C",
+     "size": 8
+    },
+    {
+     "name": "fn_801DC594",
+     "addr": "801DC594",
+     "size": 8
+    },
+    {
+     "name": "fn_801DFAC0",
+     "addr": "801DFAC0",
+     "size": 32
+    },
+    {
+     "name": "fn_801E0318",
+     "addr": "801E0318",
+     "size": 8
+    },
+    {
+     "name": "fn_801E0320",
+     "addr": "801E0320",
+     "size": 8
+    },
+    {
+     "name": "fn_801E0328",
+     "addr": "801E0328",
+     "size": 8
+    }
+   ]
+  },
+  {
+   "path": "src/leaf/auto_03_801D9028_text_cb.cpp",
+   "functions": [
+    {
+     "name": "Noop",
+     "addr": "801DB490",
+     "size": 4
+    },
+    {
+     "name": "GetResultRegister",
+     "addr": "801E1B94",
+     "size": 8
+    },
+    {
+     "name": "SetResultRegister",
+     "addr": "801E1B9C",
+     "size": 8
+    }
+   ]
+  },
+  {
+   "path": "src/leaf/auto_03_801E27C8_text.cpp",
+   "functions": [
+    {
+     "name": "fn_801E27C8",
+     "addr": "801E27C8",
+     "size": 8
+    },
+    {
+     "name": "fn_801E28DC",
+     "addr": "801E28DC",
+     "size": 4
+    },
+    {
+     "name": "fn_801E29C8",
+     "addr": "801E29C8",
+     "size": 12
+    },
+    {
+     "name": "fn_801E3CCC",
+     "addr": "801E3CCC",
+     "size": 20
+    }
+   ]
+  },
+  {
+   "path": "src/leaf/auto_03_801E47D8_text.cpp",
+   "functions": [
+    {
+     "name": "fn_801E5478",
+     "addr": "801E5478",
+     "size": 8
+    },
+    {
+     "name": "fn_801E5480",
+     "addr": "801E5480",
+     "size": 8
+    }
+   ]
+  },
+  {
+   "path": "src/leaf/auto_03_801E54A4_text.cpp",
+   "functions": [
+    {
+     "name": "fn_801E65A0",
+     "addr": "801E65A0",
+     "size": 24
+    },
+    {
+     "name": "fn_801E6EB0",
+     "addr": "801E6EB0",
+     "size": 8
+    }
+   ]
+  },
+  {
+   "path": "src/leaf/auto_03_801E73E4_text.cpp",
+   "functions": [
+    {
+     "name": "InterpolateVector3Task_DefaultSetVector3Callback",
+     "addr": "801E9E4C",
+     "size": 4
+    },
+    {
+     "name": "InterpolateQuaternionTask_DefaultSetQuaternionCallback",
+     "addr": "801EA598",
+     "size": 4
+    },
+    {
+     "name": "fn_801EBD1C",
+     "addr": "801EBD1C",
+     "size": 16
+    },
+    {
+     "name": "fn_801EE144",
+     "addr": "801EE144",
+     "size": 28
+    },
+    {
+     "name": "fn_801EE38C",
+     "addr": "801EE38C",
+     "size": 8
+    },
+    {
+     "name": "fn_801EE4FC",
+     "addr": "801EE4FC",
+     "size": 8
+    },
+    {
+     "name": "fn_801EE504",
+     "addr": "801EE504",
+     "size": 8
+    },
+    {
+     "name": "fn_801EFB44",
+     "addr": "801EFB44",
+     "size": 4
+    },
+    {
+     "name": "fn_801EFC28",
+     "addr": "801EFC28",
+     "size": 4
+    }
+   ]
+  },
+  {
+   "path": "src/leaf/auto_03_801EFC74_text.cpp",
+   "functions": [
+    {
+     "name": "fn_801EFC74",
+     "addr": "801EFC74",
+     "size": 8
+    },
+    {
+     "name": "fn_801F004C",
+     "addr": "801F004C",
+     "size": 4
+    },
+    {
+     "name": "fn_801F0050",
+     "addr": "801F0050",
+     "size": 12
+    },
+    {
+     "name": "fn_801F0560",
+     "addr": "801F0560",
+     "size": 4
+    },
+    {
+     "name": "fn_801F0650",
+     "addr": "801F0650",
+     "size": 8
+    },
+    {
+     "name": "fn_801F0658",
+     "addr": "801F0658",
+     "size": 16
+    },
+    {
+     "name": "fn_801F06FC",
+     "addr": "801F06FC",
+     "size": 8
+    },
+    {
+     "name": "fn_801F31A4",
+     "addr": "801F31A4",
+     "size": 4
+    },
+    {
+     "name": "fn_801F3384",
+     "addr": "801F3384",
+     "size": 4
+    },
+    {
+     "name": "fn_801F3578",
+     "addr": "801F3578",
+     "size": 4
+    },
+    {
+     "name": "fn_801F38E8",
+     "addr": "801F38E8",
+     "size": 8
+    },
+    {
+     "name": "fn_801F38F0",
+     "addr": "801F38F0",
+     "size": 8
+    },
+    {
+     "name": "fn_801F43A8",
+     "addr": "801F43A8",
+     "size": 8
+    },
+    {
+     "name": "fn_801F4874",
+     "addr": "801F4874",
+     "size": 8
+    },
+    {
+     "name": "fn_801F521C",
+     "addr": "801F521C",
+     "size": 4
+    },
+    {
+     "name": "fn_801F525C",
+     "addr": "801F525C",
+     "size": 20
+    },
+    {
+     "name": "fn_801F5270",
+     "addr": "801F5270",
+     "size": 36
+    },
+    {
+     "name": "fn_801F5408",
+     "addr": "801F5408",
+     "size": 12
+    },
+    {
+     "name": "fn_801F5524",
+     "addr": "801F5524",
+     "size": 4
+    },
+    {
+     "name": "fn_801F5528",
+     "addr": "801F5528",
+     "size": 12
+    },
+    {
+     "name": "WorldIdleTick",
+     "addr": "801F5534",
+     "size": 12
+    },
+    {
+     "name": "fn_801F56FC",
+     "addr": "801F56FC",
+     "size": 24
+    },
+    {
+     "name": "fn_801F5724",
+     "addr": "801F5724",
+     "size": 16
+    },
+    {
+     "name": "fn_801F5790",
+     "addr": "801F5790",
+     "size": 4
+    },
+    {
+     "name": "fn_801F5794",
+     "addr": "801F5794",
+     "size": 16
+    },
+    {
+     "name": "fn_801F57A4",
+     "addr": "801F57A4",
+     "size": 8
+    },
+    {
+     "name": "fn_801F57AC",
+     "addr": "801F57AC",
+     "size": 12
+    },
+    {
+     "name": "fn_801F57B8",
+     "addr": "801F57B8",
+     "size": 12
+    },
+    {
+     "name": "fn_801F5814",
+     "addr": "801F5814",
+     "size": 8
+    }
+   ]
+  },
+  {
+   "path": "src/leaf/auto_03_801EFC74_text_cb.cpp",
+   "functions": [
+    {
+     "name": "SetSpawningMode",
+     "addr": "801F2B1C",
+     "size": 16
+    },
+    {
+     "name": "ResetSpawningMode",
+     "addr": "801F2B2C",
+     "size": 20
+    }
+   ]
+  },
+  {
+   "path": "src/leaf/auto_03_801F59A4_text.cpp",
+   "functions": [
+    {
+     "name": "fn_801F59A4",
+     "addr": "801F59A4",
+     "size": 12
+    },
+    {
+     "name": "fn_801F5B30",
+     "addr": "801F5B30",
+     "size": 20
+    }
+   ]
+  },
+  {
+   "path": "src/leaf/auto_03_801F5D34_text.cpp",
+   "functions": [
+    {
+     "name": "fn_801F5E3C",
+     "addr": "801F5E3C",
+     "size": 8
+    },
+    {
+     "name": "fn_801F5E44",
+     "addr": "801F5E44",
+     "size": 4
+    },
+    {
+     "name": "fn_801F5E48",
+     "addr": "801F5E48",
+     "size": 4
+    },
+    {
+     "name": "fn_801F5E4C",
+     "addr": "801F5E4C",
+     "size": 4
+    },
+    {
+     "name": "fn_801F9164",
+     "addr": "801F9164",
+     "size": 8
+    },
+    {
+     "name": "fn_801FA0A0",
+     "addr": "801FA0A0",
+     "size": 8
+    }
+   ]
+  },
+  {
+   "path": "src/leaf/auto_03_801FB098_text.cpp",
+   "functions": [
+    {
+     "name": "fn_801FBE38",
+     "addr": "801FBE38",
+     "size": 48
+    },
+    {
+     "name": "fn_801FC1E4",
+     "addr": "801FC1E4",
+     "size": 8
+    },
+    {
+     "name": "fn_801FCA24",
+     "addr": "801FCA24",
+     "size": 20
+    }
+   ]
+  },
+  {
+   "path": "src/leaf/auto_03_801FCD9C_text.cpp",
+   "functions": [
+    {
+     "name": "fn_801FD8EC",
+     "addr": "801FD8EC",
+     "size": 24
+    },
+    {
+     "name": "fn_801FFC48",
+     "addr": "801FFC48",
+     "size": 8
+    },
+    {
+     "name": "fn_801FFC50",
+     "addr": "801FFC50",
+     "size": 8
+    },
+    {
+     "name": "fn_801FFF1C",
+     "addr": "801FFF1C",
+     "size": 8
+    },
+    {
+     "name": "fn_80202CA8",
+     "addr": "80202CA8",
+     "size": 4
+    }
+   ]
+  },
+  {
+   "path": "src/leaf/auto_03_8020415C_text.cpp",
+   "functions": [
+    {
+     "name": "fn_8020415C",
+     "addr": "8020415C",
+     "size": 48
+    },
+    {
+     "name": "fn_8020418C",
+     "addr": "8020418C",
+     "size": 36
+    },
+    {
+     "name": "fn_8020441C",
+     "addr": "8020441C",
+     "size": 20
+    },
+    {
+     "name": "fn_802044B4",
+     "addr": "802044B4",
+     "size": 4
+    },
+    {
+     "name": "fn_802044B8",
+     "addr": "802044B8",
+     "size": 8
+    },
+    {
+     "name": "SaveSetParams",
+     "addr": "80206AA0",
+     "size": 4
+    },
+    {
+     "name": "fn_80207164",
+     "addr": "80207164",
+     "size": 8
+    },
+    {
+     "name": "fn_80207A28",
+     "addr": "80207A28",
+     "size": 4
+    },
+    {
+     "name": "fn_80208324",
+     "addr": "80208324",
+     "size": 4
+    },
+    {
+     "name": "fn_80208328",
+     "addr": "80208328",
+     "size": 4
+    },
+    {
+     "name": "fn_80208524",
+     "addr": "80208524",
+     "size": 8
+    },
+    {
+     "name": "fn_802085BC",
+     "addr": "802085BC",
+     "size": 12
+    },
+    {
+     "name": "fn_80208904",
+     "addr": "80208904",
+     "size": 8
+    },
+    {
+     "name": "fn_80208A28",
+     "addr": "80208A28",
+     "size": 12
+    },
+    {
+     "name": "fn_80208A34",
+     "addr": "80208A34",
+     "size": 4
+    },
+    {
+     "name": "fn_80208A38",
+     "addr": "80208A38",
+     "size": 28
+    },
+    {
+     "name": "fn_80208C04",
+     "addr": "80208C04",
+     "size": 24
+    },
+    {
+     "name": "fn_80208CA4",
+     "addr": "80208CA4",
+     "size": 4
+    },
+    {
+     "name": "fn_80208CD0",
+     "addr": "80208CD0",
+     "size": 4
+    },
+    {
+     "name": "fn_80208CD4",
+     "addr": "80208CD4",
+     "size": 4
+    },
+    {
+     "name": "fn_80208CD8",
+     "addr": "80208CD8",
+     "size": 4
+    }
+   ]
+  },
+  {
+   "path": "src/leaf/auto_03_80208CE8_text.cpp",
+   "functions": [
+    {
+     "name": "fn_80208CE8",
+     "addr": "80208CE8",
+     "size": 8
+    },
+    {
+     "name": "fn_80209810",
+     "addr": "80209810",
+     "size": 4
+    }
+   ]
+  },
+  {
+   "path": "src/leaf/auto_03_8020BCEC_text.cpp",
+   "functions": [
+    {
+     "name": "fn_8020E30C",
+     "addr": "8020E30C",
+     "size": 4
+    },
+    {
+     "name": "fn_8020E650",
+     "addr": "8020E650",
+     "size": 24
+    },
+    {
+     "name": "fn_8020E710",
+     "addr": "8020E710",
+     "size": 4
+    },
+    {
+     "name": "fn_8020E9CC",
+     "addr": "8020E9CC",
+     "size": 20
+    },
+    {
+     "name": "fn_8020EA34",
+     "addr": "8020EA34",
+     "size": 16
+    },
+    {
+     "name": "fn_8020EA84",
+     "addr": "8020EA84",
+     "size": 16
+    },
+    {
+     "name": "fn_8020F228",
+     "addr": "8020F228",
+     "size": 20
+    },
+    {
+     "name": "fn_8020F2A4",
+     "addr": "8020F2A4",
+     "size": 16
+    },
+    {
+     "name": "fn_8020F2F4",
+     "addr": "8020F2F4",
+     "size": 8
+    },
+    {
+     "name": "fn_8020F2FC",
+     "addr": "8020F2FC",
+     "size": 8
+    },
+    {
+     "name": "fn_8020F304",
+     "addr": "8020F304",
+     "size": 4
+    },
+    {
+     "name": "fn_8020F308",
+     "addr": "8020F308",
+     "size": 4
+    },
+    {
+     "name": "fn_8020F30C",
+     "addr": "8020F30C",
+     "size": 16
+    },
+    {
+     "name": "fn_8020F35C",
+     "addr": "8020F35C",
+     "size": 4
+    },
+    {
+     "name": "fn_8020F360",
+     "addr": "8020F360",
+     "size": 4
+    },
+    {
+     "name": "fn_8020F364",
+     "addr": "8020F364",
+     "size": 8
+    },
+    {
+     "name": "fn_8020F36C",
+     "addr": "8020F36C",
+     "size": 24
+    },
+    {
+     "name": "fn_8020F384",
+     "addr": "8020F384",
+     "size": 16
+    },
+    {
+     "name": "fn_8020F46C",
+     "addr": "8020F46C",
+     "size": 40
+    },
+    {
+     "name": "fn_8020F494",
+     "addr": "8020F494",
+     "size": 4
+    },
+    {
+     "name": "fn_8020F554",
+     "addr": "8020F554",
+     "size": 12
+    },
+    {
+     "name": "fn_8020F560",
+     "addr": "8020F560",
+     "size": 4
+    }
+   ]
+  },
+  {
+   "path": "src/leaf/auto_03_8020F8E0_text.cpp",
+   "functions": [
+    {
+     "name": "fn_80213130",
+     "addr": "80213130",
+     "size": 32
+    },
+    {
+     "name": "fn_80213150",
+     "addr": "80213150",
+     "size": 8
+    },
+    {
+     "name": "fn_80213810",
+     "addr": "80213810",
+     "size": 8
+    },
+    {
+     "name": "fn_80213F84",
+     "addr": "80213F84",
+     "size": 8
+    },
+    {
+     "name": "RoundGetAttacker",
+     "addr": "80214F48",
+     "size": 8
+    },
+    {
+     "name": "fn_8021529C",
+     "addr": "8021529C",
+     "size": 24
+    },
+    {
+     "name": "RoundNoteAbility",
+     "addr": "802152B4",
+     "size": 24
+    },
+    {
+     "name": "fn_802152CC",
+     "addr": "802152CC",
+     "size": 24
+    },
+    {
+     "name": "fn_802152E4",
+     "addr": "802152E4",
+     "size": 24
+    },
+    {
+     "name": "fn_802161DC",
+     "addr": "802161DC",
+     "size": 36
+    },
+    {
+     "name": "fn_80216304",
+     "addr": "80216304",
+     "size": 20
+    },
+    {
+     "name": "fn_80216360",
+     "addr": "80216360",
+     "size": 16
+    },
+    {
+     "name": "fn_8021659C",
+     "addr": "8021659C",
+     "size": 4
+    },
+    {
+     "name": "fn_80216C60",
+     "addr": "80216C60",
+     "size": 32
+    },
+    {
+     "name": "fn_802186D0",
+     "addr": "802186D0",
+     "size": 8
+    },
+    {
+     "name": "fn_802188A8",
+     "addr": "802188A8",
+     "size": 16
+    },
+    {
+     "name": "fn_802188B8",
+     "addr": "802188B8",
+     "size": 20
+    },
+    {
+     "name": "fn_80218AF4",
+     "addr": "80218AF4",
+     "size": 8
+    },
+    {
+     "name": "fn_80218B8C",
+     "addr": "80218B8C",
+     "size": 16
+    },
+    {
+     "name": "fn_80218B9C",
+     "addr": "80218B9C",
+     "size": 8
+    },
+    {
+     "name": "fn_80218BA4",
+     "addr": "80218BA4",
+     "size": 12
+    },
+    {
+     "name": "fn_8021C888",
+     "addr": "8021C888",
+     "size": 16
+    },
+    {
+     "name": "fn_8021D310",
+     "addr": "8021D310",
+     "size": 8
+    },
+    {
+     "name": "fn_8021D318",
+     "addr": "8021D318",
+     "size": 8
+    },
+    {
+     "name": "PartSetDefect",
+     "addr": "8021DA80",
+     "size": 8
+    },
+    {
+     "name": "PartSetEnhancement",
+     "addr": "8021DA88",
+     "size": 8
+    },
+    {
+     "name": "fn_8021EE94",
+     "addr": "8021EE94",
+     "size": 8
+    },
+    {
+     "name": "fn_8021EF68",
+     "addr": "8021EF68",
+     "size": 8
+    },
+    {
+     "name": "fn_8021EF70",
+     "addr": "8021EF70",
+     "size": 16
+    },
+    {
+     "name": "fn_8021EFE8",
+     "addr": "8021EFE8",
+     "size": 8
+    },
+    {
+     "name": "fn_8021F32C",
+     "addr": "8021F32C",
+     "size": 12
+    },
+    {
+     "name": "fn_8021F35C",
+     "addr": "8021F35C",
+     "size": 12
+    },
+    {
+     "name": "fn_8021F448",
+     "addr": "8021F448",
+     "size": 12
+    },
+    {
+     "name": "fn_8021F454",
+     "addr": "8021F454",
+     "size": 16
+    },
+    {
+     "name": "fn_8021F9B8",
+     "addr": "8021F9B8",
+     "size": 8
+    },
+    {
+     "name": "fn_8021FA50",
+     "addr": "8021FA50",
+     "size": 48
+    },
+    {
+     "name": "fn_8021FB28",
+     "addr": "8021FB28",
+     "size": 8
+    },
+    {
+     "name": "fn_8021FF78",
+     "addr": "8021FF78",
+     "size": 28
+    },
+    {
+     "name": "fn_8021FF94",
+     "addr": "8021FF94",
+     "size": 8
+    },
+    {
+     "name": "fn_8021FF9C",
+     "addr": "8021FF9C",
+     "size": 8
+    },
+    {
+     "name": "fn_8022014C",
+     "addr": "8022014C",
+     "size": 16
+    },
+    {
+     "name": "fn_8022015C",
+     "addr": "8022015C",
+     "size": 12
+    },
+    {
+     "name": "fn_80220168",
+     "addr": "80220168",
+     "size": 8
+    },
+    {
+     "name": "fn_80220170",
+     "addr": "80220170",
+     "size": 8
+    },
+    {
+     "name": "fn_80220178",
+     "addr": "80220178",
+     "size": 16
+    },
+    {
+     "name": "fn_802209D0",
+     "addr": "802209D0",
+     "size": 8
+    },
+    {
+     "name": "fn_80220A0C",
+     "addr": "80220A0C",
+     "size": 8
+    },
+    {
+     "name": "fn_80220A14",
+     "addr": "80220A14",
+     "size": 8
+    },
+    {
+     "name": "fn_80220A1C",
+     "addr": "80220A1C",
+     "size": 8
+    },
+    {
+     "name": "fn_80220A24",
+     "addr": "80220A24",
+     "size": 8
+    },
+    {
+     "name": "fn_80220A2C",
+     "addr": "80220A2C",
+     "size": 8
+    },
+    {
+     "name": "fn_80220A34",
+     "addr": "80220A34",
+     "size": 24
+    },
+    {
+     "name": "fn_80222994",
+     "addr": "80222994",
+     "size": 8
+    },
+    {
+     "name": "fn_8022299C",
+     "addr": "8022299C",
+     "size": 12
+    },
+    {
+     "name": "fn_802233CC",
+     "addr": "802233CC",
+     "size": 8
+    },
+    {
+     "name": "fn_802239C8",
+     "addr": "802239C8",
+     "size": 8
+    },
+    {
+     "name": "fn_802255F0",
+     "addr": "802255F0",
+     "size": 12
+    },
+    {
+     "name": "fn_80225654",
+     "addr": "80225654",
+     "size": 8
+    },
+    {
+     "name": "fn_8022565C",
+     "addr": "8022565C",
+     "size": 8
+    },
+    {
+     "name": "fn_80225664",
+     "addr": "80225664",
+     "size": 16
+    },
+    {
+     "name": "fn_80225C10",
+     "addr": "80225C10",
+     "size": 12
+    },
+    {
+     "name": "fn_80225F60",
+     "addr": "80225F60",
+     "size": 8
+    },
+    {
+     "name": "fn_80225F68",
+     "addr": "80225F68",
+     "size": 8
+    },
+    {
+     "name": "fn_80226C1C",
+     "addr": "80226C1C",
+     "size": 8
+    },
+    {
+     "name": "fn_80226C24",
+     "addr": "80226C24",
+     "size": 8
+    },
+    {
+     "name": "fn_80226C2C",
+     "addr": "80226C2C",
+     "size": 8
+    },
+    {
+     "name": "fn_80226C34",
+     "addr": "80226C34",
+     "size": 8
+    },
+    {
+     "name": "fn_80226C3C",
+     "addr": "80226C3C",
+     "size": 16
+    },
+    {
+     "name": "fn_802285FC",
+     "addr": "802285FC",
+     "size": 8
+    },
+    {
+     "name": "fn_80229028",
+     "addr": "80229028",
+     "size": 8
+    },
+    {
+     "name": "fn_80229544",
+     "addr": "80229544",
+     "size": 8
+    },
+    {
+     "name": "fn_8022A904",
+     "addr": "8022A904",
+     "size": 8
+    },
+    {
+     "name": "fn_8022AE68",
+     "addr": "8022AE68",
+     "size": 8
+    },
+    {
+     "name": "fn_8022B384",
+     "addr": "8022B384",
+     "size": 8
+    },
+    {
+     "name": "fn_8022B8A0",
+     "addr": "8022B8A0",
+     "size": 8
+    },
+    {
+     "name": "fn_8022BDD4",
+     "addr": "8022BDD4",
+     "size": 8
+    },
+    {
+     "name": "fn_8022BDDC",
+     "addr": "8022BDDC",
+     "size": 8
+    },
+    {
+     "name": "fn_8022C7E8",
+     "addr": "8022C7E8",
+     "size": 8
+    },
+    {
+     "name": "fn_8022CD2C",
+     "addr": "8022CD2C",
+     "size": 8
+    },
+    {
+     "name": "fn_8022D93C",
+     "addr": "8022D93C",
+     "size": 16
+    },
+    {
+     "name": "fn_8022DE78",
+     "addr": "8022DE78",
+     "size": 12
+    },
+    {
+     "name": "fn_8022DE84",
+     "addr": "8022DE84",
+     "size": 8
+    },
+    {
+     "name": "fn_8022E170",
+     "addr": "8022E170",
+     "size": 8
+    },
+    {
+     "name": "fn_8022E3DC",
+     "addr": "8022E3DC",
+     "size": 4
+    },
+    {
+     "name": "fn_8022E430",
+     "addr": "8022E430",
+     "size": 8
+    },
+    {
+     "name": "fn_8022E438",
+     "addr": "8022E438",
+     "size": 8
+    }
+   ]
+  },
+  {
+   "path": "src/leaf/auto_03_8020F8E0_text_cb.cpp",
+   "functions": [
+    {
+     "name": "AddPlayerMonster",
+     "addr": "802215B8",
+     "size": 4
+    },
+    {
+     "name": "IsRegionComplete",
+     "addr": "80221B5C",
+     "size": 8
+    },
+    {
+     "name": "SetRegionComplete",
+     "addr": "80221BD4",
+     "size": 4
+    },
+    {
+     "name": "Is_WiiBuild",
+     "addr": "80221E28",
+     "size": 8
+    },
+    {
+     "name": "Is_DSBuild",
+     "addr": "80221E30",
+     "size": 8
+    },
+    {
+     "name": "GetGameProgressMarker",
+     "addr": "80221E90",
+     "size": 12
+    },
+    {
+     "name": "SetGameProgressMarker",
+     "addr": "80221E9C",
+     "size": 12
+    },
+    {
+     "name": "SetQuestGiverIcon",
+     "addr": "80222000",
+     "size": 4
+    }
+   ]
+  },
+  {
+   "path": "src/leaf/auto_fn_801604F8_text.cpp",
+   "functions": [
+    {
+     "name": "fn_801604F8",
+     "addr": "801604F8",
+     "size": 4
+    }
+   ]
+  },
+  {
+   "path": "src/leaf/auto_fn_80160BD0_text.cpp",
+   "functions": [
+    {
+     "name": "fn_80160BD0",
+     "addr": "80160BD0",
+     "size": 4
+    }
+   ]
+  },
+  {
+   "path": "src/leaf/auto_fn_801C7244_text.cpp",
+   "functions": [
+    {
+     "name": "fn_801C7244",
+     "addr": "801C7244",
+     "size": 32
+    }
+   ]
+  },
+  {
+   "path": "src/leaf/auto_fn_801D0C00_text.cpp",
+   "functions": [
+    {
+     "name": "fn_801D0C00",
+     "addr": "801D0C00",
+     "size": 4
+    }
+   ]
+  },
+  {
+   "path": "src/leaf/auto_fn_801D5D08_text.cpp",
+   "functions": [
+    {
+     "name": "fn_801D5D08",
+     "addr": "801D5D08",
+     "size": 4
+    }
+   ]
+  },
+  {
+   "path": "src/leaf/auto_fn_801D9024_text.cpp",
+   "functions": [
+    {
+     "name": "fn_801D9024",
+     "addr": "801D9024",
+     "size": 4
+    }
+   ]
+  },
+  {
+   "path": "src/leaf/auto_fn_801E27BC_text.cpp",
+   "functions": [
+    {
+     "name": "fn_801E27BC",
+     "addr": "801E27BC",
+     "size": 12
+    }
+   ]
+  },
+  {
+   "path": "src/leaf/auto_fn_801E47BC_text.cpp",
+   "functions": [
+    {
+     "name": "fn_801E47BC",
+     "addr": "801E47BC",
+     "size": 28
     }
    ]
   },
