@@ -69,6 +69,11 @@
   "changelog": [
     {
       "date": "2026-11-17",
+      "time": "22:27",
+      "text": "Decompiled the per-frame world update (8.8 KB): queued entity removals, the short wait before a freshly loaded zone goes live, activating and culling entities within a budget, moving entities between loaded zones (and despawning those that leave the map, with effects), slow motion that leaves the player at full speed, late updates and the particle systems of every loaded zone."
+    },
+    {
+      "date": "2026-11-17",
       "time": "22:22",
       "text": "Identified zlib 1.2.3 (11 KB, the decompressor used for compressed data) at the end of what was counted as game code. It is now counted as a library: the PC port will use real zlib instead of decompiling it."
     },
