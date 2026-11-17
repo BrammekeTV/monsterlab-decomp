@@ -1,15 +1,15 @@
 {
  "game_id": "RM7P4F",
- "generated": "2026-11-17T22:31:32+00:00",
- "commit": "91acfd8",
- "commit_date": "2026-11-17T23:22:43+01:00",
+ "generated": "2026-11-17T23:46:32+00:00",
+ "commit": "4b57f19",
+ "commit_date": "2026-11-17T23:31:34+01:00",
  "game": {
   "functions": 8548,
   "bytes": 2265988,
-  "named": 2514,
-  "named_bytes": 527688,
-  "decompiled": 1951,
-  "decompiled_bytes": 202692
+  "named": 2519,
+  "named_bytes": 534576,
+  "decompiled": 1952,
+  "decompiled_bytes": 205916
  },
  "library": {
   "functions": 4039,
@@ -22,10 +22,10 @@
  "all": {
   "functions": 12587,
   "bytes": 3404928,
-  "named": 2972,
-  "named_bytes": 631832,
-  "decompiled": 1951,
-  "decompiled_bytes": 202692
+  "named": 2977,
+  "named_bytes": 638720,
+  "decompiled": 1952,
+  "decompiled_bytes": 205916
  },
  "game_range": [
   "80006B40",
@@ -565,8 +565,8 @@
    0.196
   ],
   [
-   0.001,
-   0.013
+   0.381,
+   0.749
   ],
   [
    0.0,
@@ -582,7 +582,7 @@
   ],
   [
    0.004,
-   0.229
+   0.287
   ],
   [
    0.007,
@@ -922,7 +922,7 @@
   ],
   [
    0.001,
-   0.067
+   0.068
   ],
   [
    0.001,
@@ -942,7 +942,7 @@
   ],
   [
    0.006,
-   0.274
+   0.292
   ],
   [
    0.028,
@@ -3120,6 +3120,11 @@
   {
    "path": "src/game/world_alloc.cpp",
    "functions": [
+    {
+     "name": "WorldStateInit",
+     "addr": "80127680",
+     "size": 3224
+    },
     {
      "name": "WorldDataCreate",
      "addr": "801F0704",
@@ -11101,7 +11106,7 @@
      "size": 24
     },
     {
-     "name": "fn_801E6EB0",
+     "name": "IdPoolNext",
      "addr": "801E6EB0",
      "size": 8
     }

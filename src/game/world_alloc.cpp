@@ -123,3 +123,91 @@ void WorldDataCreate(WorldParams* params) {
 
     *params->out = w;
 }
+
+// ---------------------------------------------------------------- world state setup
+
+extern "C" {
+void  WorldLoadLevelZones(s32 level);              // 0x80126AB0
+void  ZoneSlotInit(void* slot);                    // 0x801F2B40
+void  WorldResetQueues(void* world);               // 0x8013022C
+void* IdPoolNext(void* pool);                      // 0x801E6EB0
+void  SetCharacterPerformanceCapToDefault(void);
+void* memset(void* p, int c, size_t n);
+}
+extern u8   gGame[];                                // 0x803B53A0
+extern u8   gLevelFlags[];                          // 0x80369D60: 0x20 bytes per level
+extern u8   gIdPool[];                              // 0x8048A8F0
+static s32  sZoneBudget;                            ORIG(0x805FB30C)
+static u8   sZonesDirty;                            ORIG(0x805FB310)
+
+// Eight growable arrays { data, count, owned } shared by all zones, 0x18 bytes apart.
+extern u8   gZoneLists[];                           // 0x803E9FD4
+
+static inline s32 SlotCountAll(void) {
+    s32 n = 0;
+    for (u32 off = 0x34; off <= 0x64; off += 4) n += S(off);
+    return n;
+}
+
+static inline void ArrayAlloc(u8* w, u32 off, s32 count, u32 elem) {
+    *(s32*)(w + off + 8) = 1;
+    *(s32*)(w + off + 4) = count;
+    *(void**)(w + off) = MemAllocDefault(count * elem);
+}
+
+// 0x80127680
+// Reset the world state for `level`: clear the game's per-level tables, allocate the zone
+// slot array, the zone tables and the six shared zone lists, and reset the event queues.
+void WorldStateInit(u8* w, s32 level) {
+    // Levels flagged small only get half the slot budget.
+    sZoneBudget = (gLevelFlags[(u8)level * 0x20 + 0x18] >> 2) & 1 ? S(0x34) / 2 : S(0x34);
+    *(f32*)(w + 8) = 0.0f;
+    *(f32*)(w + 0xC) = 0.0f;
+
+    *(s32*)(gGame + 0x1C0) = 0;
+    for (u8 i = 0; i != 0xFF; i++) ((s32*)(gGame + 0x1C4))[i] = 0;
+    *(s32*)(gGame + 0x13C) = 0;
+    for (u8 i = 0; i != 0x20; i++) ((s32*)(gGame + 0x140))[i] = 0;
+    sZonesDirty = 0;
+    WorldLoadLevelZones(level);
+    *(s32*)(w + 0x10) = 0;
+
+    // Zone slots (0x30 each).
+    ArrayAlloc(w, 0xB0, SlotCountAll(), 0x30);
+    for (s32 i = 0; i < *(s32*)(w + 0xB4); i++) {
+        u8* slot = *(u8**)(w + 0xB0) + i * 0x30;
+        if (slot != NULL) {
+            *(s32*)slot = 0;
+            ZoneSlotInit(slot);
+        }
+    }
+
+    ArrayAlloc(w, 0x284, SlotCountAll(), 0x10);
+    memset(*(void**)(w + 0x284), 0, *(s32*)(w + 0x288) * 0x10);
+    WorldResetQueues(w);
+    w[0x121] = 0;
+    w[0x120] = 0;
+    w[0x122] = 0;
+    w[0x123] = 0;
+    *(void**)(w + 0x118) = IdPoolNext(gIdPool);
+    *(void**)(w + 0x11C) = IdPoolNext(gIdPool);
+
+    ArrayAlloc(w, 0xC8, ZoneCount(), 4);
+    for (s32 i = 0; i < *(s32*)(w + 0xCC); i++) ((void**)*(void**)(w + 0xC8))[i] = NULL;
+    ArrayAlloc(w, 0xD4, ZoneCount(), 4);
+    for (s32 i = 0; i < *(s32*)(w + 0xD8); i++) ((void**)*(void**)(w + 0xD4))[i] = NULL;
+
+    static const u32 kListElem[8] = { 0x10, 0x10, 0x10, 0xC, 4, 4, 4, 4 };
+    for (s32 l = 0; l < 8; l++) ArrayAlloc(gZoneLists, l * 0x18, ZoneCount(), kListElem[l]);
+
+    *(s32*)(w + 0x10C) = 0;
+    w[4] = 1;
+    w[5] = 0;
+    u8* data = *(u8**)w;
+    *(s32*)(data + 0x10) = 0;
+    *(s32*)(data + 0x14) = 0;
+    *(s32*)(data + 8) = 0;
+    *(s32*)(data + 0xC) = 0;
+    *(u32*)(w + 0x3294) = 0;
+    SetCharacterPerformanceCapToDefault();
+}

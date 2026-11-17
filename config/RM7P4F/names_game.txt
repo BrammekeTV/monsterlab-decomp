@@ -548,3 +548,10 @@ fn_80055CD8 RayHitInit
 fn_80055D64 RayQuerySetStart
 fn_80055D80 RayQuerySetDir
 fn_801B203C RayQueryCast
+fn_80127680 WorldStateInit
+fn_80126AB0 WorldLoadLevelZones
+fn_801F2B40 ZoneSlotInit
+fn_8013022C WorldResetQueues
+fn_801E6EB0 IdPoolNext
+lbl_803E9FD4 gZoneLists
+lbl_8048A8F0 gIdPool
