@@ -7,10 +7,10 @@
 
 // 0x800B1F80
 extern "C" void fn_800B1F80(u8* a3, s32 a4) {
-    *(u32*)(a3 + 612) = (u32)((u32)(uintptr_t)(a4));
+    *(u32*)(((u8*)(uintptr_t)(a3)) + 612) = (u32)((u32)(uintptr_t)(a4));
 }
 
 // 0x800B1F88
 extern "C" void fn_800B1F88(u8* a3) {
-    *(u32*)(a3 + 612) = (u32)((u32)(0));
+    *(u32*)(((u8*)(uintptr_t)(a3)) + 612) = (u32)((u32)(0));
 }

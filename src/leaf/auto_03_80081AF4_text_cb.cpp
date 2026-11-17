@@ -8,13 +8,13 @@
 
 // 0x8008237C
 u32 BrainChunkIsInUse(u32 a3) {
-    u8 t0 = *(u8*)(a3 + 616);
+    u8 t0 = *(u8*)(((u8*)(uintptr_t)(a3)) + 616);
     return (u32)(t0);
 }
 
 // 0x8008246C
 s32 BrainChunkGetHitType(u32 a3) {
-    s32 t0 = *(s32*)(a3 + 696);
+    s32 t0 = *(s32*)(((u8*)(uintptr_t)(a3)) + 696);
     return (s32)(t0);
 }
 
@@ -24,18 +24,18 @@ void BrainChunkUpdateSplat(u32 a3) {
 
 // 0x8008363C
 u32 BrainChunkBounceWasLeft(u32 a3) {
-    u8 t0 = *(u8*)(a3 + 700);
+    u8 t0 = *(u8*)(((u8*)(uintptr_t)(a3)) + 700);
     return (u32)(t0);
 }
 
 // 0x80083644
 u32 BrainChunkSplatOnWall(u32 a3) {
-    u8 t0 = *(u8*)(a3 + 701);
+    u8 t0 = *(u8*)(((u8*)(uintptr_t)(a3)) + 701);
     return (u32)(t0);
 }
 
 // 0x80083660
 u32 BrainChunkGetChunkType(u32 a3) {
-    s32 t0 = *(s32*)(a3 + 612);
+    s32 t0 = *(s32*)(((u8*)(uintptr_t)(a3)) + 612);
     return (u32)(t0);
 }

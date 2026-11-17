@@ -8,5 +8,5 @@
 
 // 0x8008C9CC
 void BrazierWandSetIdle(void* a3) {
-    *(u32*)(a3 + 612) = (u32)((u32)(0));
+    *(u32*)(((u8*)(uintptr_t)(a3)) + 612) = (u32)((u32)(0));
 }

@@ -24,10 +24,10 @@ extern "C" void fn_801F5E4C(void) {
 
 // 0x801F9164
 extern "C" void fn_801F9164(u8* a3, f32 f1) {
-    *(f32*)(a3 + 1012) = (f32)(f1);
+    *(f32*)(((u8*)(uintptr_t)(a3)) + 1012) = (f32)(f1);
 }
 
 // 0x801FA0A0
 extern "C" void fn_801FA0A0(u8* a3, f32 f1) {
-    *(f32*)(a3 + 248) = (f32)(f1);
+    *(f32*)(((u8*)(uintptr_t)(a3)) + 248) = (f32)(f1);
 }

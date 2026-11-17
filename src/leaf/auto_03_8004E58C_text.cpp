@@ -7,7 +7,7 @@
 
 // 0x8004E8CC
 extern "C" s32 fn_8004E8CC(u8* a3) {
-    s32 t0 = *(s32*)(a3 + 616);
+    s32 t0 = *(s32*)(((u8*)(uintptr_t)(a3)) + 616);
     return (s32)(t0);
 }
 
@@ -33,13 +33,13 @@ extern "C" s32 fn_800505A0(void) {
 
 // 0x800505A8
 extern "C" u8* fn_800505A8(u8* a3) {
-    u8* t0 = a3 + 456;
+    u8* t0 = ((u8*)(uintptr_t)(a3)) + 456;
     return (u8*)(t0);
 }
 
 // 0x800505B0
 extern "C" void fn_800505B0(u8* a3) {
-    s32 t0 = *(s32*)(a3 + 348);
+    s32 t0 = *(s32*)(((u8*)(uintptr_t)(a3)) + 348);
     u32 t1 = (u32)(t0) | 0x400000u;
-    *(u32*)(a3 + 348) = (u32)((u32)(t1));
+    *(u32*)(((u8*)(uintptr_t)(a3)) + 348) = (u32)((u32)(t1));
 }

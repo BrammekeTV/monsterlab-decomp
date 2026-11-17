@@ -9,7 +9,7 @@ extern u8 lbl_803589B8[];
 
 // 0x800445E4
 extern "C" void fn_800445E4(u8* a3) {
-    *(u32*)(a3 + 0) = (u32)((u32)(uintptr_t)((u8*)lbl_803589B8));
+    *(u32*)(((u8*)(uintptr_t)(a3)) + 0) = (u32)((u32)(uintptr_t)((u8*)lbl_803589B8));
 }
 
 // 0x80044694

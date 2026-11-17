@@ -10,7 +10,7 @@ extern u8 lbl_805FDE08[];
 
 // 0x8009EC0C
 extern "C" u8* fn_8009EC0C(u8* a3) {
-    *(u32*)(a3 + 88) = (u32)((u32)(0));
+    *(u32*)(((u8*)(uintptr_t)(a3)) + 88) = (u32)((u32)(0));
     u8* t0 = *(u8**)((u8*)lbl_803C4298 + 4);
     *(u8*)(t0 + 252) = (u8)((u32)(0));
     return (u8*)(t0);
@@ -39,6 +39,6 @@ extern "C" void fn_8009F5A4(void) {
 
 // 0x8009F5A8
 extern "C" f32 fn_8009F5A8(u8* a3) {
-    f32 t0 = *(f32*)(a3 + 68);
+    f32 t0 = *(f32*)(((u8*)(uintptr_t)(a3)) + 68);
     return (f32)(t0);
 }

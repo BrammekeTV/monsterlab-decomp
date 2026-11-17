@@ -7,14 +7,14 @@
 
 // 0x8003CB08
 extern "C" u8 fn_8003CB08(u8* a3) {
-    u8 t0 = *(u8*)(a3 + 0);
-    *(u8*)(a3 + 0) = (u8)((u32)(0));
+    u8 t0 = *(u8*)(((u8*)(uintptr_t)(a3)) + 0);
+    *(u8*)(((u8*)(uintptr_t)(a3)) + 0) = (u8)((u32)(0));
     return (u8)(t0);
 }
 
 // 0x8003CF14
 extern "C" u32 fn_8003CF14(u8* a3) {
-    s32 t0 = *(s32*)(a3 + 8);
+    s32 t0 = *(s32*)(((u8*)(uintptr_t)(a3)) + 8);
     u32 t1 = (u32)(t0) + 104u;
     return (u32)(t1);
 }

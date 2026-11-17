@@ -11,14 +11,14 @@ extern u8 lbl_805FDB60[];
 // 0x80094F88
 extern "C" f32 fn_80094F88(u8* a3) {
     f32 t0 = *(f32*)((u8*)lbl_805FDB60);
-    f32 t1 = *(f32*)(a3 + 860);
+    f32 t1 = *(f32*)(((u8*)(uintptr_t)(a3)) + 860);
     f32 t2 = (f32)(t0 * t1);
     return (f32)(t2);
 }
 
 // 0x80094F98
 extern "C" f32 fn_80094F98(u8* a3) {
-    f32 t0 = *(f32*)(a3 + 860);
+    f32 t0 = *(f32*)(((u8*)(uintptr_t)(a3)) + 860);
     return (f32)(t0);
 }
 

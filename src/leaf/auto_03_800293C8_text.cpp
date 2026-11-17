@@ -14,15 +14,15 @@ extern "C" s32 fn_800294B4(void) {
 
 // 0x8002A178
 extern "C" void fn_8002A178(u8* a3, s32 a4) {
-    *(u32*)(a3 + 284) = (u32)((u32)(uintptr_t)(a4));
+    *(u32*)(((u8*)(uintptr_t)(a3)) + 284) = (u32)((u32)(uintptr_t)(a4));
 }
 
 // 0x8002A7F8
 extern "C" u32 fn_8002A7F8(u8* a3, s32 a4) {
-    s32 t0 = *(s32*)(a3 + 272);
+    s32 t0 = *(s32*)(((u8*)(uintptr_t)(a3)) + 272);
     u32 t1 = (u32)(t0) + 1u;
     u32 t2 = (((u32)(t1) << 2) | ((u32)(t1) >> 30)) & 0xfffffffcu;
-    *(u32*)(a3 + 272) = (u32)((u32)(t1));
+    *(u32*)(((u8*)(uintptr_t)(a3)) + 272) = (u32)((u32)(t1));
     u32 t3 = (u32)(uintptr_t)(a3) + (u32)(t2);
     *(u32*)((u8*)(uintptr_t)(t3) + 260) = (u32)((u32)(uintptr_t)(a4));
     return (u32)(t3);

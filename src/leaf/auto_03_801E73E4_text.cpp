@@ -15,34 +15,34 @@ extern "C" void InterpolateQuaternionTask_DefaultSetQuaternionCallback(void) {
 
 // 0x801EBD1C
 extern "C" void fn_801EBD1C(u8* a3, s32 a4) {
-    *(u32*)(a3 + 4) = (u32)((u32)(uintptr_t)(a4));
-    *(u32*)(a3 + 0) = (u32)((u32)(0));
+    *(u32*)(((u8*)(uintptr_t)(a3)) + 4) = (u32)((u32)(uintptr_t)(a4));
+    *(u32*)(((u8*)(uintptr_t)(a3)) + 0) = (u32)((u32)(0));
 }
 
 // 0x801EE144
 extern "C" void fn_801EE144(u8* a3) {
-    *(u32*)(a3 + 4) = (u32)((u32)(0));
-    *(u32*)(a3 + 16) = (u32)((u32)(0));
-    *(u8*)(a3 + 0) = (u8)((u32)(0));
-    *(u32*)(a3 + 8) = (u32)((u32)(0));
-    *(u32*)(a3 + 12) = (u32)((u32)(0));
+    *(u32*)(((u8*)(uintptr_t)(a3)) + 4) = (u32)((u32)(0));
+    *(u32*)(((u8*)(uintptr_t)(a3)) + 16) = (u32)((u32)(0));
+    *(u8*)(((u8*)(uintptr_t)(a3)) + 0) = (u8)((u32)(0));
+    *(u32*)(((u8*)(uintptr_t)(a3)) + 8) = (u32)((u32)(0));
+    *(u32*)(((u8*)(uintptr_t)(a3)) + 12) = (u32)((u32)(0));
 }
 
 // 0x801EE38C
 extern "C" s32 fn_801EE38C(u8* a3) {
-    s32 t0 = *(s32*)(a3 + 8);
+    s32 t0 = *(s32*)(((u8*)(uintptr_t)(a3)) + 8);
     return (s32)(t0);
 }
 
 // 0x801EE4FC
 extern "C" s32 fn_801EE4FC(u8* a3) {
-    s32 t0 = *(s32*)(a3 + 4);
+    s32 t0 = *(s32*)(((u8*)(uintptr_t)(a3)) + 4);
     return (s32)(t0);
 }
 
 // 0x801EE504
 extern "C" s32 fn_801EE504(u8* a3) {
-    s32 t0 = *(s32*)(a3 + 8);
+    s32 t0 = *(s32*)(((u8*)(uintptr_t)(a3)) + 8);
     return (s32)(t0);
 }
 

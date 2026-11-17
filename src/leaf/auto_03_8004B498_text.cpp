@@ -21,6 +21,6 @@ extern "C" s32 fn_8004B57C(void) {
 
 // 0x8004B584
 extern "C" u8* fn_8004B584(u8* a3) {
-    u8* t0 = a3 + 1752;
+    u8* t0 = ((u8*)(uintptr_t)(a3)) + 1752;
     return (u8*)(t0);
 }

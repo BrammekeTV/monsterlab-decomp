@@ -14,12 +14,12 @@ extern "C" void fn_800BF6FC(void) {
 // 0x800BF700
 extern "C" void fn_800BF700(u8* a3) {
     f32 t0 = *(f32*)((u8*)lbl_805FE338);
-    *(f32*)(a3 + 612) = (f32)(t0);
-    *(f32*)(a3 + 616) = (f32)(t0);
+    *(f32*)(((u8*)(uintptr_t)(a3)) + 612) = (f32)(t0);
+    *(f32*)(((u8*)(uintptr_t)(a3)) + 616) = (f32)(t0);
 }
 
 // 0x800BF870
 extern "C" f32 fn_800BF870(u8* a3) {
-    f32 t0 = *(f32*)(a3 + 612);
+    f32 t0 = *(f32*)(((u8*)(uintptr_t)(a3)) + 612);
     return (f32)(t0);
 }

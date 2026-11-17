@@ -8,18 +8,18 @@
 
 // 0x8008682C
 s32 BrainHandGetTossStrength(u32 a3) {
-    s32 t0 = *(s32*)(a3 + 616);
+    s32 t0 = *(s32*)(((u8*)(uintptr_t)(a3)) + 616);
     return (s32)(t0);
 }
 
 // 0x80086834
 void BrainHandSetHeldChunk(void* a3, void* a4) {
-    *(u32*)(a3 + 612) = (u32)((u32)(uintptr_t)(a4));
-    *(u32*)(a3 + 616) = (u32)((u32)(-1));
+    *(u32*)(((u8*)(uintptr_t)(a3)) + 612) = (u32)((u32)(uintptr_t)(a4));
+    *(u32*)(((u8*)(uintptr_t)(a3)) + 616) = (u32)((u32)(-1));
 }
 
 // 0x80086844
 u32 BrainHandGetHeldChunk(u32 a3) {
-    s32 t0 = *(s32*)(a3 + 612);
+    s32 t0 = *(s32*)(((u8*)(uintptr_t)(a3)) + 612);
     return (u32)(t0);
 }

@@ -39,5 +39,5 @@ extern "C" void fn_80074D74(void) {
 
 // 0x80075264
 extern "C" void fn_80075264(u8* a3, s32 a4) {
-    *(u32*)(a3 + 88) = (u32)((u32)(uintptr_t)(a4));
+    *(u32*)(((u8*)(uintptr_t)(a3)) + 88) = (u32)((u32)(uintptr_t)(a4));
 }

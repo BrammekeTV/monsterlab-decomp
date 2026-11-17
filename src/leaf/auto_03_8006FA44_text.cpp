@@ -12,16 +12,16 @@ extern u8 lbl_805FD630[];
 
 // 0x8006FA44
 extern "C" void fn_8006FA44(u8* a3, s32 a4, s32 a5, s32 a6, s32 a7, s32 a8) {
-    *(u32*)(a3 + 0) = (u32)((u32)(uintptr_t)(a4));
-    *(u32*)(a3 + 4) = (u32)((u32)(uintptr_t)(a6));
-    *(u32*)(a3 + 8) = (u32)((u32)(uintptr_t)(a7));
-    *(u32*)(a3 + 12) = (u32)((u32)(uintptr_t)(a8));
-    *(u32*)(a3 + 16) = (u32)((u32)(uintptr_t)(a5));
+    *(u32*)(((u8*)(uintptr_t)(a3)) + 0) = (u32)((u32)(uintptr_t)(a4));
+    *(u32*)(((u8*)(uintptr_t)(a3)) + 4) = (u32)((u32)(uintptr_t)(a6));
+    *(u32*)(((u8*)(uintptr_t)(a3)) + 8) = (u32)((u32)(uintptr_t)(a7));
+    *(u32*)(((u8*)(uintptr_t)(a3)) + 12) = (u32)((u32)(uintptr_t)(a8));
+    *(u32*)(((u8*)(uintptr_t)(a3)) + 16) = (u32)((u32)(uintptr_t)(a5));
 }
 
 // 0x8006FA5C
 extern "C" u32 fn_8006FA5C(u8* a3, s32 a4) {
-    s32 t0 = *(s32*)(a3 + 16);
+    s32 t0 = *(s32*)(((u8*)(uintptr_t)(a3)) + 16);
     u32 t1 = (u32)(t0) & (u32)(uintptr_t)(a4);
     u32 t2 = 0u - (u32)(t1);
     u32 t3 = (u32)(t2) | (u32)(t1);
@@ -31,7 +31,7 @@ extern "C" u32 fn_8006FA5C(u8* a3, s32 a4) {
 
 // 0x8006FBFC
 extern "C" s32 fn_8006FBFC(u8* a3) {
-    s32 t0 = *(s32*)(a3 + 104);
+    s32 t0 = *(s32*)(((u8*)(uintptr_t)(a3)) + 104);
     return (s32)(t0);
 }
 

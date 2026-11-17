@@ -19,5 +19,5 @@ extern "C" u8 fn_8011CD10(void) {
 
 // 0x8011D030
 extern "C" void fn_8011D030(u8* a3, s32 a4) {
-    *(u32*)(a3 + 4912) = (u32)((u32)(uintptr_t)(a4));
+    *(u32*)(((u8*)(uintptr_t)(a3)) + 4912) = (u32)((u32)(uintptr_t)(a4));
 }

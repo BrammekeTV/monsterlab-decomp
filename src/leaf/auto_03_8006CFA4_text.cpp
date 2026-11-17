@@ -7,5 +7,5 @@
 
 // 0x8006D248
 extern "C" void fn_8006D248(u8* a3, s32 a4) {
-    *(u32*)(a3 + 616) = (u32)((u32)(uintptr_t)(a4));
+    *(u32*)(((u8*)(uintptr_t)(a3)) + 616) = (u32)((u32)(uintptr_t)(a4));
 }

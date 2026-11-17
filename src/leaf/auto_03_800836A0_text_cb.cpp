@@ -10,15 +10,15 @@ extern u8 gWorldState[];
 
 // 0x800837A8
 void BrainTargetWait(u32 a3) {
-    f32 t0 = *(f32*)(a3 + 616);
+    f32 t0 = *(f32*)(((u8*)(uintptr_t)(a3)) + 616);
     f32 t1 = *(f32*)((u8*)gWorldState + 12);
     f32 t2 = (f32)(t0 + t1);
-    *(f32*)(a3 + 616) = (f32)(t2);
+    *(f32*)(((u8*)(uintptr_t)(a3)) + 616) = (f32)(t2);
 }
 
 // 0x800837F4
 void BrainTargetSetStateTime(u32 a3, f32 f1) {
-    *(f32*)(a3 + 616) = (f32)(f1);
+    *(f32*)(((u8*)(uintptr_t)(a3)) + 616) = (f32)(f1);
 }
 
 // 0x8008380C
@@ -26,16 +26,16 @@ void BrainTargetSetWaiting(u32 a3, u32 a4) {
     u32 t0 = 0u - (u32)(uintptr_t)(a4);
     u32 t1 = (u32)(t0) | (u32)(uintptr_t)(a4);
     u32 t2 = (((u32)(t1) << 1) | ((u32)(t1) >> 31)) & 0x1u;
-    *(u8*)(a3 + 624) = (u8)((u32)(t2));
+    *(u8*)(((u8*)(uintptr_t)(a3)) + 624) = (u8)((u32)(t2));
 }
 
 // 0x80083820
 u32 BrainTargetGetReceivedChunk(u32 a3) {
-    s32 t0 = *(s32*)(a3 + 640);
+    s32 t0 = *(s32*)(((u8*)(uintptr_t)(a3)) + 640);
     return (u32)(t0);
 }
 
 // 0x80083828
 void BrainTargetSetReceivedChunk(void* a3, void* a4) {
-    *(u32*)(a3 + 640) = (u32)((u32)(uintptr_t)(a4));
+    *(u32*)(((u8*)(uintptr_t)(a3)) + 640) = (u32)((u32)(uintptr_t)(a4));
 }

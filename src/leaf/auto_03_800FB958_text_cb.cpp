@@ -76,6 +76,6 @@ void SetInBasicTutorialFlag(void) {
 
 // 0x8010394C
 void SetRenderObjectAttachPoint(u32 a3, u32 a4) {
-    s32 t0 = *(s32*)(a4 + 0);
-    *(u32*)(a3 + 3112) = (u32)((u32)(t0));
+    s32 t0 = *(s32*)(((u8*)(uintptr_t)(a4)) + 0);
+    *(u32*)(((u8*)(uintptr_t)(a3)) + 3112) = (u32)((u32)(t0));
 }

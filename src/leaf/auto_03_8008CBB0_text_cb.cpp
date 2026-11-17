@@ -8,16 +8,16 @@
 
 // 0x8008E8B8
 void BrazierSymbolDestroyed(void* a3) {
-    *(u32*)(a3 + 612) = (u32)((u32)(7));
+    *(u32*)(((u8*)(uintptr_t)(a3)) + 612) = (u32)((u32)(7));
 }
 
 // 0x8008EC30
 void BrazierSymbolSetSymbolOccupied(void* a3) {
-    *(u32*)(a3 + 612) = (u32)((u32)(2));
+    *(u32*)(((u8*)(uintptr_t)(a3)) + 612) = (u32)((u32)(2));
 }
 
 // 0x8008ED10
 s32 BrazierSymbolIsThrowTrailAttached(void* a3) {
-    u8 t0 = *(u8*)(a3 + 784);
+    u8 t0 = *(u8*)(((u8*)(uintptr_t)(a3)) + 784);
     return (s32)(t0);
 }

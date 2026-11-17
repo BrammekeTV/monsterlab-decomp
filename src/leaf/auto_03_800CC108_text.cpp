@@ -15,5 +15,5 @@ extern "C" void fn_800CD014(void) {
 
 // 0x800CD018
 extern "C" void fn_800CD018(u8* a3, f32 f1) {
-    *(f32*)(a3 + 2000) = (f32)(f1);
+    *(f32*)(((u8*)(uintptr_t)(a3)) + 2000) = (f32)(f1);
 }

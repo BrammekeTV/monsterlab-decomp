@@ -11,26 +11,26 @@ extern u8 lbl_805FDC28[];
 
 // 0x800999A4
 void* ReactorHeartGetTargetLeak(void* a3) {
-    s32 t0 = *(s32*)(a3 + 616);
+    s32 t0 = *(s32*)(((u8*)(uintptr_t)(a3)) + 616);
     return (void*)(uintptr_t)(t0);
 }
 
 // 0x800999AC
 void* ReactorHeartGetMagnetLight(void* a3) {
-    s32 t0 = *(s32*)(a3 + 620);
+    s32 t0 = *(s32*)(((u8*)(uintptr_t)(a3)) + 620);
     return (void*)(uintptr_t)(t0);
 }
 
 // 0x80099A90
 void ReactorHeartResetTimer(void* a3) {
     f32 t0 = *(f32*)((u8*)lbl_805FDC28);
-    *(f32*)(a3 + 624) = (f32)(t0);
+    *(f32*)(((u8*)(uintptr_t)(a3)) + 624) = (f32)(t0);
 }
 
 // 0x80099A9C
 void ReactorHeartUpdateTimer(void* a3) {
-    f32 t0 = *(f32*)(a3 + 624);
+    f32 t0 = *(f32*)(((u8*)(uintptr_t)(a3)) + 624);
     f32 t1 = *(f32*)((u8*)gWorldState + 12);
     f32 t2 = (f32)(t0 + t1);
-    *(f32*)(a3 + 624) = (f32)(t2);
+    *(f32*)(((u8*)(uintptr_t)(a3)) + 624) = (f32)(t2);
 }

@@ -39,7 +39,7 @@ extern "C" void fn_801F004C(void) {
 
 // 0x801F0050
 extern "C" void fn_801F0050(u8* a3) {
-    *(u32*)(a3 + 8) = (u32)((u32)(0));
+    *(u32*)(((u8*)(uintptr_t)(a3)) + 8) = (u32)((u32)(0));
 }
 
 // 0x801F0560

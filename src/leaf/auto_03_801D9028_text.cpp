@@ -17,7 +17,7 @@ extern u8 lbl_805FB898[];
 
 // 0x801D9028
 extern "C" void fn_801D9028(u8* a3) {
-    *(u32*)(a3 + 0) = (u32)((u32)(uintptr_t)((u8*)lbl_80384430));
+    *(u32*)(((u8*)(uintptr_t)(a3)) + 0) = (u32)((u32)(uintptr_t)((u8*)lbl_80384430));
 }
 
 // 0x801D9160
@@ -30,29 +30,29 @@ extern "C" void fn_801D9648(void) {
 
 // 0x801D9AD4
 extern "C" void fn_801D9AD4(u8* a3) {
-    *(u32*)(a3 + 72) = (u32)((u32)(0));
-    *(u8*)(a3 + 80) = (u8)((u32)(0));
+    *(u32*)(((u8*)(uintptr_t)(a3)) + 72) = (u32)((u32)(0));
+    *(u8*)(((u8*)(uintptr_t)(a3)) + 80) = (u8)((u32)(0));
 }
 
 // 0x801DA344
 extern "C" void fn_801DA344(u8* a3, s32 a4) {
-    *(u32*)(a3 + 72) = (u32)((u32)(uintptr_t)(a4));
+    *(u32*)(((u8*)(uintptr_t)(a3)) + 72) = (u32)((u32)(uintptr_t)(a4));
 }
 
 // 0x801DA750
 extern "C" void fn_801DA750(u8* a3, s32 a4) {
-    *(u32*)(a3 + 80) = (u32)((u32)(uintptr_t)(a4));
+    *(u32*)(((u8*)(uintptr_t)(a3)) + 80) = (u32)((u32)(uintptr_t)(a4));
 }
 
 // 0x801DA780
 extern "C" s32 fn_801DA780(u8* a3) {
-    s32 t0 = *(s32*)(a3 + 84);
+    s32 t0 = *(s32*)(((u8*)(uintptr_t)(a3)) + 84);
     return (s32)(t0);
 }
 
 // 0x801DA7C0
 extern "C" s32 fn_801DA7C0(u8* a3) {
-    s32 t0 = *(s32*)(a3 + 76);
+    s32 t0 = *(s32*)(((u8*)(uintptr_t)(a3)) + 76);
     return (s32)(t0);
 }
 
@@ -87,12 +87,12 @@ extern "C" void fn_801DC594(s32 a3) {
 
 // 0x801DFAC0
 extern "C" void fn_801DFAC0(u8* a3, s32 a4, s32 a5) {
-    *(u32*)(a3 + 0) = (u32)((u32)(uintptr_t)(a4));
-    *(u32*)(a3 + 4) = (u32)((u32)(uintptr_t)(a5));
-    *(u32*)(a3 + 8) = (u32)((u32)(uintptr_t)(a5));
-    *(u32*)(a3 + 12) = (u32)((u32)(uintptr_t)(a5));
-    *(u32*)(a3 + 16) = (u32)((u32)(uintptr_t)(a5));
-    *(u32*)(a3 + 20) = (u32)((u32)(0));
+    *(u32*)(((u8*)(uintptr_t)(a3)) + 0) = (u32)((u32)(uintptr_t)(a4));
+    *(u32*)(((u8*)(uintptr_t)(a3)) + 4) = (u32)((u32)(uintptr_t)(a5));
+    *(u32*)(((u8*)(uintptr_t)(a3)) + 8) = (u32)((u32)(uintptr_t)(a5));
+    *(u32*)(((u8*)(uintptr_t)(a3)) + 12) = (u32)((u32)(uintptr_t)(a5));
+    *(u32*)(((u8*)(uintptr_t)(a3)) + 16) = (u32)((u32)(uintptr_t)(a5));
+    *(u32*)(((u8*)(uintptr_t)(a3)) + 20) = (u32)((u32)(0));
 }
 
 // 0x801E0318

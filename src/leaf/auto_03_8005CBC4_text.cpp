@@ -7,18 +7,18 @@
 
 // 0x8005E120
 extern "C" u8* fn_8005E120(u8* a3) {
-    u8* t0 = a3 + 24;
+    u8* t0 = ((u8*)(uintptr_t)(a3)) + 24;
     return (u8*)(t0);
 }
 
 // 0x8005E128
 extern "C" u8* fn_8005E128(u8* a3) {
-    u8* t0 = a3 + 24;
+    u8* t0 = ((u8*)(uintptr_t)(a3)) + 24;
     return (u8*)(t0);
 }
 
 // 0x80062C38
 extern "C" s32 fn_80062C38(u8* a3) {
-    s32 t0 = *(s32*)(a3 + 3132);
+    s32 t0 = *(s32*)(((u8*)(uintptr_t)(a3)) + 3132);
     return (s32)(t0);
 }

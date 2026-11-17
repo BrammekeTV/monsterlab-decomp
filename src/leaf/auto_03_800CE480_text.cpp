@@ -18,7 +18,7 @@ extern "C" void fn_800CF228(void) {
 // 0x800CF2EC
 extern "C" void fn_800CF2EC(u8* a3) {
     f32 t0 = *(f32*)((u8*)lbl_805FE558);
-    *(f32*)(a3 + 140) = (f32)(t0);
+    *(f32*)(((u8*)(uintptr_t)(a3)) + 140) = (f32)(t0);
 }
 
 // 0x800CF4FC
@@ -28,7 +28,7 @@ extern "C" void fn_800CF4FC(void) {
 // 0x800CF500
 extern "C" void fn_800CF500(u8* a3) {
     f32 t0 = *(f32*)((u8*)lbl_805FE558);
-    *(f32*)(a3 + 140) = (f32)(t0);
+    *(f32*)(((u8*)(uintptr_t)(a3)) + 140) = (f32)(t0);
 }
 
 // 0x800CF710

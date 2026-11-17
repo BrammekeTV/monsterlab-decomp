@@ -14,15 +14,15 @@ extern "C" u32 fn_8012A748(s32 a3) {
 
 // 0x8012A754
 extern "C" s32 fn_8012A754(u8* a3) {
-    s32 t0 = *(s32*)(a3 + 36);
+    s32 t0 = *(s32*)(((u8*)(uintptr_t)(a3)) + 36);
     return (s32)(t0);
 }
 
 // 0x8012A76C
 extern "C" void fn_8012A76C(u8* a3, s32 a4) {
-    s32 t0 = *(s32*)(a3 + 60);
+    s32 t0 = *(s32*)(((u8*)(uintptr_t)(a3)) + 60);
     u32 t1 = (u32)(t0) | (u32)(uintptr_t)(a4);
-    *(u32*)(a3 + 60) = (u32)((u32)(t1));
+    *(u32*)(((u8*)(uintptr_t)(a3)) + 60) = (u32)((u32)(t1));
 }
 
 // 0x8012A77C
@@ -31,13 +31,13 @@ extern "C" void fn_8012A77C(void) {
 
 // 0x8012A790
 extern "C" void fn_8012A790(u8* a3, u8* a4) {
-    s32 t0 = *(s32*)(a4 + 0);
-    *(u32*)(a3 + 0) = (u32)((u32)(t0));
+    s32 t0 = *(s32*)(((u8*)(uintptr_t)(a4)) + 0);
+    *(u32*)(((u8*)(uintptr_t)(a3)) + 0) = (u32)((u32)(t0));
 }
 
 // 0x8012CDF0
 extern "C" u8 fn_8012CDF0(u8* a3) {
-    u8 t0 = *(u8*)(a3 + 289);
+    u8 t0 = *(u8*)(((u8*)(uintptr_t)(a3)) + 289);
     return (u8)(t0);
 }
 
@@ -51,7 +51,7 @@ extern "C" void fn_8012F33C(void) {
 
 // 0x8012F62C
 extern "C" u32 fn_8012F62C(u8* a3, s32 a4) {
-    s32 t0 = *(s32*)(a3 + 0);
+    s32 t0 = *(s32*)(((u8*)(uintptr_t)(a3)) + 0);
     u32 t1 = (((u32)(uintptr_t)(a4) << 2) | ((u32)(uintptr_t)(a4) >> 30)) & 0xfffffffcu;
     u32 t2 = (u32)(t0) + (u32)(t1);
     return (u32)(t2);
@@ -59,7 +59,7 @@ extern "C" u32 fn_8012F62C(u8* a3, s32 a4) {
 
 // 0x8012F63C
 extern "C" u32 fn_8012F63C(u8* a3, s32 a4) {
-    s32 t0 = *(s32*)(a3 + 0);
+    s32 t0 = *(s32*)(((u8*)(uintptr_t)(a3)) + 0);
     u32 t1 = (((u32)(uintptr_t)(a4) << 2) | ((u32)(uintptr_t)(a4) >> 30)) & 0xfffffffcu;
     u32 t2 = (u32)(t0) + (u32)(t1);
     return (u32)(t2);

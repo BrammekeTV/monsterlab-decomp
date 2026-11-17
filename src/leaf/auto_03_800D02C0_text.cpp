@@ -22,7 +22,7 @@ extern "C" void fn_800D1C7C(void) {
 // 0x800D1C80
 extern "C" void fn_800D1C80(u8* a3) {
     f32 t0 = *(f32*)((u8*)lbl_805FE5B8);
-    *(f32*)(a3 + 380) = (f32)(t0);
+    *(f32*)(((u8*)(uintptr_t)(a3)) + 380) = (f32)(t0);
 }
 
 // 0x800D1CC0
@@ -32,7 +32,7 @@ extern "C" void fn_800D1CC0(void) {
 // 0x800D1CC4
 extern "C" void fn_800D1CC4(u8* a3) {
     f32 t0 = *(f32*)((u8*)lbl_805FE5B8);
-    *(f32*)(a3 + 380) = (f32)(t0);
+    *(f32*)(((u8*)(uintptr_t)(a3)) + 380) = (f32)(t0);
 }
 
 // 0x800D1D04

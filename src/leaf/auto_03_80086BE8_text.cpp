@@ -15,7 +15,7 @@ extern "C" void fn_80087EA8(void) {
 // 0x80087EAC
 extern "C" void fn_80087EAC(u8* a3) {
     f32 t0 = *(f32*)((u8*)lbl_805FD928);
-    *(f32*)(a3 + 140) = (f32)(t0);
+    *(f32*)(((u8*)(uintptr_t)(a3)) + 140) = (f32)(t0);
 }
 
 // 0x80087EEC
@@ -25,7 +25,7 @@ extern "C" void fn_80087EEC(void) {
 // 0x80087EF0
 extern "C" void fn_80087EF0(u8* a3) {
     f32 t0 = *(f32*)((u8*)lbl_805FD928);
-    *(f32*)(a3 + 140) = (f32)(t0);
+    *(f32*)(((u8*)(uintptr_t)(a3)) + 140) = (f32)(t0);
 }
 
 // 0x80087F30
@@ -34,7 +34,7 @@ extern "C" void fn_80087F30(void) {
 
 // 0x80087FF4
 extern "C" f32 fn_80087FF4(u8* a3) {
-    f32 t0 = *(f32*)(a3 + 1156);
+    f32 t0 = *(f32*)(((u8*)(uintptr_t)(a3)) + 1156);
     return (f32)(t0);
 }
 

@@ -19,6 +19,6 @@ extern "C" void fn_80076580(void) {
 
 // 0x80076A64
 extern "C" f32 fn_80076A64(u8* a3) {
-    f32 t0 = *(f32*)(a3 + 1724);
+    f32 t0 = *(f32*)(((u8*)(uintptr_t)(a3)) + 1724);
     return (f32)(t0);
 }

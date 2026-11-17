@@ -11,5 +11,5 @@ extern "C" void fn_800BE3A4(void) {
 
 // 0x800BF180
 extern "C" void fn_800BF180(u8* a3) {
-    *(u32*)(a3 + 656) = (u32)((u32)(2));
+    *(u32*)(((u8*)(uintptr_t)(a3)) + 656) = (u32)((u32)(2));
 }

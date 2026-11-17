@@ -7,6 +7,6 @@
 
 // 0x80032EB0
 extern "C" void fn_80032EB0(u8* a3, s32 a4, s32 a5) {
-    *(u32*)(a3 + 24) = (u32)((u32)(uintptr_t)(a5));
-    *(u32*)(a3 + 28) = (u32)((u32)(uintptr_t)(a4));
+    *(u32*)(((u8*)(uintptr_t)(a3)) + 24) = (u32)((u32)(uintptr_t)(a5));
+    *(u32*)(((u8*)(uintptr_t)(a3)) + 28) = (u32)((u32)(uintptr_t)(a4));
 }

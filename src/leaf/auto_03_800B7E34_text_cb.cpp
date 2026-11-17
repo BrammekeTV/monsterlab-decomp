@@ -8,6 +8,6 @@
 
 // 0x800B8C2C
 s32 ArmWrestleMechArmIsWhichArm(void* a3) {
-    s32 t0 = *(s32*)(a3 + 736);
+    s32 t0 = *(s32*)(((u8*)(uintptr_t)(a3)) + 736);
     return (s32)(t0);
 }

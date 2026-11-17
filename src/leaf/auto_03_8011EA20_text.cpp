@@ -15,7 +15,7 @@ extern "C" void fn_8011ECC8(void) {
 
 // 0x8011EFE0
 extern "C" u32 fn_8011EFE0(u8* a3, s32 a4) {
-    s32 t0 = *(s32*)(a3 + 44);
+    s32 t0 = *(s32*)(((u8*)(uintptr_t)(a3)) + 44);
     u32 t1 = (u32)(t0) ^ (u32)(uintptr_t)(a4);
     u32 t2 = (u32)((s32)(u32)(t1) >> 1);
     u32 t3 = (u32)(t1) & (u32)(t0);
@@ -26,7 +26,7 @@ extern "C" u32 fn_8011EFE0(u8* a3, s32 a4) {
 
 // 0x8011F1C4
 extern "C" u32 fn_8011F1C4(u8* a3) {
-    s32 t0 = *(s32*)(a3 + 48);
+    s32 t0 = *(s32*)(((u8*)(uintptr_t)(a3)) + 48);
     u32 t1 = 0u - (u32)(t0);
     u32 t2 = (u32)(t1) | (u32)(t0);
     u32 t3 = (((u32)(t2) << 1) | ((u32)(t2) >> 31)) & 0x1u;
@@ -35,6 +35,6 @@ extern "C" u32 fn_8011F1C4(u8* a3) {
 
 // 0x8011F1D8
 extern "C" s32 fn_8011F1D8(u8* a3) {
-    s32 t0 = *(s32*)(a3 + 48);
+    s32 t0 = *(s32*)(((u8*)(uintptr_t)(a3)) + 48);
     return (s32)(t0);
 }

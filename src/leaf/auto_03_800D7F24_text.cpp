@@ -7,17 +7,17 @@
 
 // 0x800D83A8
 extern "C" s32 WorldGetPhase(u8* a3) {
-    s32 t0 = *(s32*)(a3 + 40);
+    s32 t0 = *(s32*)(((u8*)(uintptr_t)(a3)) + 40);
     return (s32)(t0);
 }
 
 // 0x800D83B0
 extern "C" s32 fn_800D83B0(u8* a3) {
-    s32 t0 = *(s32*)(a3 + 44);
+    s32 t0 = *(s32*)(((u8*)(uintptr_t)(a3)) + 44);
     return (s32)(t0);
 }
 
 // 0x800D8854
 extern "C" void WorldSetFocus(u8* a3, s32 a4) {
-    *(u32*)(a3 + 52) = (u32)((u32)(uintptr_t)(a4));
+    *(u32*)(((u8*)(uintptr_t)(a3)) + 52) = (u32)((u32)(uintptr_t)(a4));
 }

@@ -8,6 +8,6 @@
 
 // 0x80086758
 s32 BrainPowerUpGetNextPowerUpType(u32 a3) {
-    s32 t0 = *(s32*)(a3 + 644);
+    s32 t0 = *(s32*)(((u8*)(uintptr_t)(a3)) + 644);
     return (s32)(t0);
 }

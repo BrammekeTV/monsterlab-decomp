@@ -15,12 +15,12 @@ extern "C" void fn_80117268(void) {
 
 // 0x801179C0
 extern "C" s32 fn_801179C0(u8* a3) {
-    s32 t0 = *(s32*)(a3 + 56);
+    s32 t0 = *(s32*)(((u8*)(uintptr_t)(a3)) + 56);
     return (s32)(t0);
 }
 
 // 0x80117ABC
 extern "C" s32 fn_80117ABC(u8* a3) {
-    s32 t0 = *(s32*)(a3 + 44);
+    s32 t0 = *(s32*)(((u8*)(uintptr_t)(a3)) + 44);
     return (s32)(t0);
 }

@@ -107,7 +107,7 @@ class Gen:
             return e
         if t.startswith("ARG"):
             self.args[t[4:]] = "ptr"
-            return e
+            return f"((u8*)(uintptr_t)({e}))"
         if e in self.loads:
             i = self.loads.pop(e)
             self.lines[i] = self.lines[i].replace(f"s32 {e} = *(s32*)", f"u8* {e} = *(u8**)")

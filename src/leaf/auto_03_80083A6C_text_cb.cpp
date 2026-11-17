@@ -11,23 +11,23 @@ void BrainHeadSetEating(u32 a3, u32 a4) {
     u32 t0 = 0u - (u32)(uintptr_t)(a4);
     u32 t1 = (u32)(t0) | (u32)(uintptr_t)(a4);
     u32 t2 = (((u32)(t1) << 1) | ((u32)(t1) >> 31)) & 0x1u;
-    *(u8*)(a3 + 644) = (u8)((u32)(t2));
+    *(u8*)(((u8*)(uintptr_t)(a3)) + 644) = (u8)((u32)(t2));
 }
 
 // 0x80084D2C
 u32 BrainHeadFreebieIsNext(u32 a3) {
-    u8 t0 = *(u8*)(a3 + 645);
+    u8 t0 = *(u8*)(((u8*)(uintptr_t)(a3)) + 645);
     return (u32)(t0);
 }
 
 // 0x80084D34
 u32 BrainHeadMovingSideways(u32 a3) {
-    u8 t0 = *(u8*)(a3 + 652);
+    u8 t0 = *(u8*)(((u8*)(uintptr_t)(a3)) + 652);
     return (u32)(t0);
 }
 
 // 0x80084E6C
 u32 BrainHeadIsEating(u32 a3) {
-    u8 t0 = *(u8*)(a3 + 644);
+    u8 t0 = *(u8*)(((u8*)(uintptr_t)(a3)) + 644);
     return (u32)(t0);
 }

@@ -7,6 +7,6 @@
 
 // 0x8007A680
 extern "C" void fn_8007A680(u8* a3, s32 a4, s32 a5) {
-    *(u32*)(a3 + 0) = (u32)((u32)(uintptr_t)(a4));
-    *(u32*)(a3 + 4) = (u32)((u32)(uintptr_t)(a5));
+    *(u32*)(((u8*)(uintptr_t)(a3)) + 0) = (u32)((u32)(uintptr_t)(a4));
+    *(u32*)(((u8*)(uintptr_t)(a3)) + 4) = (u32)((u32)(uintptr_t)(a5));
 }

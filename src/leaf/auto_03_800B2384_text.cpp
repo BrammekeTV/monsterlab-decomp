@@ -14,7 +14,7 @@ extern "C" void fn_800B4310(void) {
 // 0x800B48FC
 extern "C" void fn_800B48FC(u8* a3) {
     f32 t0 = *(f32*)((u8*)lbl_805FE108);
-    *(f32*)(a3 + 140) = (f32)(t0);
+    *(f32*)(((u8*)(uintptr_t)(a3)) + 140) = (f32)(t0);
 }
 
 // 0x800B493C
@@ -24,7 +24,7 @@ extern "C" void fn_800B493C(void) {
 // 0x800B4940
 extern "C" void fn_800B4940(u8* a3) {
     f32 t0 = *(f32*)((u8*)lbl_805FE108);
-    *(f32*)(a3 + 140) = (f32)(t0);
+    *(f32*)(((u8*)(uintptr_t)(a3)) + 140) = (f32)(t0);
 }
 
 // 0x800B4980

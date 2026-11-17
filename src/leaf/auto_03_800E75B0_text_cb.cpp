@@ -51,13 +51,13 @@ void Unpause(void) {
 
 // 0x800E8424
 void SetEntityHealth(void* a3, f32 f1) {
-    u8* t0 = *(u8**)(a3 + 4);
+    u8* t0 = *(u8**)(((u8*)(uintptr_t)(a3)) + 4);
     *(f32*)(t0 + 36) = (f32)(f1);
 }
 
 // 0x800E8714
 u32 GetCurAnimDef(u32 a3) {
-    u8* t0 = *(u8**)(a3 + 132);
+    u8* t0 = *(u8**)(((u8*)(uintptr_t)(a3)) + 132);
     s32 t1 = *(s32*)(t0 + 44);
     return (u32)(t1);
 }
@@ -80,7 +80,7 @@ void ResetSpawnDelay(void) {
 
 // 0x800E973C
 void SetSpawnPriority(u32 a3, BOOL a4) {
-    *(u32*)(a3 + 2148) = (u32)((u32)(uintptr_t)(a4));
+    *(u32*)(((u8*)(uintptr_t)(a3)) + 2148) = (u32)((u32)(uintptr_t)(a4));
 }
 
 // 0x800EC458
@@ -101,7 +101,7 @@ void FreezePlayerInput(s32 a3) {
 
 // 0x800ECCC4
 void PropSetActiveTarget(u32 a3, void* a4) {
-    *(u32*)(a3 + 396) = (u32)((u32)(uintptr_t)(a4));
+    *(u32*)(((u8*)(uintptr_t)(a3)) + 396) = (u32)((u32)(uintptr_t)(a4));
 }
 
 // 0x800ED34C
@@ -124,7 +124,7 @@ s32 GetLastRandomZeroToMax(void) {
 
 // 0x800EF7F4
 u32 IsCharacter(void* a3) {
-    u8* t0 = *(u8**)(a3 + 4);
+    u8* t0 = *(u8**)(((u8*)(uintptr_t)(a3)) + 4);
     s32 t1 = *(s32*)(t0 + 28);
     u32 t2 = (((u32)(t1) << 28) | ((u32)(t1) >> 4)) & 0x1u;
     return (u32)(t2);
@@ -132,7 +132,7 @@ u32 IsCharacter(void* a3) {
 
 // 0x800EF804
 u32 IsProp(void* a3) {
-    u8* t0 = *(u8**)(a3 + 4);
+    u8* t0 = *(u8**)(((u8*)(uintptr_t)(a3)) + 4);
     s32 t1 = *(s32*)(t0 + 28);
     u32 t2 = (((u32)(t1) << 26) | ((u32)(t1) >> 6)) & 0x1u;
     return (u32)(t2);

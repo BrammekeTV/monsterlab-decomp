@@ -19,15 +19,15 @@ extern "C" u8 fn_8011AEE0(void) {
 
 // 0x8011BA48
 extern "C" void fn_8011BA48(u8* a3, s32 a4) {
-    s32 t0 = *(s32*)(a3 + 9632);
+    s32 t0 = *(s32*)(((u8*)(uintptr_t)(a3)) + 9632);
     u32 t1 = (((u32)(t0) << 2) | ((u32)(t0) >> 30)) & 0xfffffffcu;
     u32 t2 = (u32)(uintptr_t)(a4) + (u32)(t1);
-    *(u32*)(a3 + 9628) = (u32)((u32)(t2));
+    *(u32*)(((u8*)(uintptr_t)(a3)) + 9628) = (u32)((u32)(t2));
 }
 
 // 0x8011BA5C
 extern "C" u32 fn_8011BA5C(u8* a3) {
-    s32 t0 = *(s32*)(a3 + 9628);
+    s32 t0 = *(s32*)(((u8*)(uintptr_t)(a3)) + 9628);
     u32 t1 = (((u32)(t0) << 2) | ((u32)(t0) >> 30)) & 0xfffffffcu;
     u32 t2 = (u32)(t0) - (u32)(t1);
     return (u32)(t2);
@@ -35,12 +35,12 @@ extern "C" u32 fn_8011BA5C(u8* a3) {
 
 // 0x8011BA74
 extern "C" void fn_8011BA74(u8* a3, s32 a4) {
-    *(u32*)(a3 + 11468) = (u32)((u32)(uintptr_t)(a4));
+    *(u32*)(((u8*)(uintptr_t)(a3)) + 11468) = (u32)((u32)(uintptr_t)(a4));
 }
 
 // 0x8011BA7C
 extern "C" u32 fn_8011BA7C(u8* a3) {
-    s32 t0 = *(s32*)(a3 + 9632);
+    s32 t0 = *(s32*)(((u8*)(uintptr_t)(a3)) + 9632);
     u32 t1 = (((u32)(t0) << 4) | ((u32)(t0) >> 28)) & 0xfffffff0u;
     u32 t2 = (u32)(uintptr_t)(a3) + (u32)(t1);
     u32 t3 = (u32)(t2) + 10088u;
@@ -49,7 +49,7 @@ extern "C" u32 fn_8011BA7C(u8* a3) {
 
 // 0x8011BA90
 extern "C" u32 fn_8011BA90(u8* a3) {
-    s32 t0 = *(s32*)(a3 + 9632);
+    s32 t0 = *(s32*)(((u8*)(uintptr_t)(a3)) + 9632);
     u32 t1 = (((u32)(t0) << 4) | ((u32)(t0) >> 28)) & 0xfffffff0u;
     u32 t2 = (u32)(uintptr_t)(a3) + (u32)(t1);
     u32 t3 = (u32)(t2) + 10536u;
@@ -58,7 +58,7 @@ extern "C" u32 fn_8011BA90(u8* a3) {
 
 // 0x8011BAA4
 extern "C" u32 fn_8011BAA4(u8* a3) {
-    s32 t0 = *(s32*)(a3 + 9632);
+    s32 t0 = *(s32*)(((u8*)(uintptr_t)(a3)) + 9632);
     u32 t1 = (((u32)(t0) << 4) | ((u32)(t0) >> 28)) & 0xfffffff0u;
     u32 t2 = (u32)(uintptr_t)(a3) + (u32)(t1);
     u32 t3 = (u32)(t2) + 10984u;
@@ -67,14 +67,14 @@ extern "C" u32 fn_8011BAA4(u8* a3) {
 
 // 0x8011BB20
 extern "C" s32 fn_8011BB20(u8* a3) {
-    s32 t0 = *(s32*)(a3 + 11436);
+    s32 t0 = *(s32*)(((u8*)(uintptr_t)(a3)) + 11436);
     return (s32)(t0);
 }
 
 // 0x8011C1D0
 extern "C" u32 fn_8011C1D0(u8* a3, s32 a4) {
-    s32 t0 = *(s32*)(a3 + 9632);
-    s32 t1 = *(s32*)(a3 + 11432);
+    s32 t0 = *(s32*)(((u8*)(uintptr_t)(a3)) + 9632);
+    s32 t1 = *(s32*)(((u8*)(uintptr_t)(a3)) + 11432);
     u32 t2 = (((u32)(t0) << 2) | ((u32)(t0) >> 30)) & 0xfffffffcu;
     u32 t3 = (u32)(uintptr_t)(a4) + (u32)(t2);
     u32 t4 = (u32)(t1) ^ (u32)(t3);
@@ -87,12 +87,12 @@ extern "C" u32 fn_8011C1D0(u8* a3, s32 a4) {
 
 // 0x8011C20C
 extern "C" void fn_8011C20C(u8* a3, s32 a4) {
-    *(u32*)(a3 + 11748) = (u32)((u32)(uintptr_t)(a4));
+    *(u32*)(((u8*)(uintptr_t)(a3)) + 11748) = (u32)((u32)(uintptr_t)(a4));
 }
 
 // 0x8011C214
 extern "C" s32 fn_8011C214(u8* a3) {
-    s32 t0 = *(s32*)(a3 + 9628);
+    s32 t0 = *(s32*)(((u8*)(uintptr_t)(a3)) + 9628);
     u32 t1 = (((u32)(t0) << 2) | ((u32)(t0) >> 30)) & 0xfffffffcu;
     u32 t2 = (u32)(uintptr_t)(a3) + (u32)(t1);
     u8* t3 = *(u8**)((u8*)(uintptr_t)(t2) + 9640);

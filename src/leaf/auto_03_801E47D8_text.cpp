@@ -7,10 +7,10 @@
 
 // 0x801E5478
 extern "C" void fn_801E5478(u8* a3, s32 a4) {
-    *(u32*)(a3 + 36) = (u32)((u32)(uintptr_t)(a4));
+    *(u32*)(((u8*)(uintptr_t)(a3)) + 36) = (u32)((u32)(uintptr_t)(a4));
 }
 
 // 0x801E5480
 extern "C" void fn_801E5480(u8* a3, s32 a4) {
-    *(u32*)(a3 + 40) = (u32)((u32)(uintptr_t)(a4));
+    *(u32*)(((u8*)(uintptr_t)(a3)) + 40) = (u32)((u32)(uintptr_t)(a4));
 }

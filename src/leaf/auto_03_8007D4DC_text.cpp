@@ -10,7 +10,7 @@ extern u8 gZoneResourceSize[];
 // 0x8007E0B8
 extern "C" u32 fn_8007E0B8(u8* a3, s32 a4) {
     s32 t0 = *(s32*)((u8*)gZoneResourceSize);
-    s32 t1 = *(s32*)(a3 + 0);
+    s32 t1 = *(s32*)(((u8*)(uintptr_t)(a3)) + 0);
     u32 t2 = (u32)(uintptr_t)(a4) * (u32)(t0);
     u32 t3 = (u32)(t1) + (u32)(t2);
     return (u32)(t3);
@@ -30,12 +30,12 @@ extern "C" void fn_8007E964(void) {
 
 // 0x80080FC0
 extern "C" f32 fn_80080FC0(u8* a3) {
-    f32 t0 = *(f32*)(a3 + 808);
+    f32 t0 = *(f32*)(((u8*)(uintptr_t)(a3)) + 808);
     return (f32)(t0);
 }
 
 // 0x80080FC8
 extern "C" f32 fn_80080FC8(u8* a3) {
-    f32 t0 = *(f32*)(a3 + 808);
+    f32 t0 = *(f32*)(((u8*)(uintptr_t)(a3)) + 808);
     return (f32)(t0);
 }

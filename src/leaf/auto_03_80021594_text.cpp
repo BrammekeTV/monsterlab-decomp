@@ -10,7 +10,7 @@ extern u8 lbl_805FC8E0[];
 
 // 0x800217A8
 extern "C" s32 fn_800217A8(u8* a3) {
-    s32 t0 = *(s32*)(a3 + 124);
+    s32 t0 = *(s32*)(((u8*)(uintptr_t)(a3)) + 124);
     return (s32)(t0);
 }
 
@@ -37,7 +37,7 @@ extern "C" void fn_800223D8(void) {
 // 0x800223DC
 extern "C" void fn_800223DC(u8* a3) {
     f32 t0 = *(f32*)((u8*)lbl_805FC8E0);
-    *(f32*)(a3 + 112) = (f32)(t0);
+    *(f32*)(((u8*)(uintptr_t)(a3)) + 112) = (f32)(t0);
 }
 
 // 0x800223E8

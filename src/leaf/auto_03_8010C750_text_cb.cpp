@@ -18,8 +18,8 @@ u32 CreatePooledEntityCallback(u32 a3, u32 a4) {
 
 // 0x8010C8B4
 u32 DeallocPooledEntityCallback(u32 a3, u32 a4) {
-    u8* t0 = *(u8**)(a3 + 0);
-    s32 t1 = *(s32*)(a4 + 32);
+    u8* t0 = *(u8**)(((u8*)(uintptr_t)(a3)) + 0);
+    s32 t1 = *(s32*)(((u8*)(uintptr_t)(a4)) + 32);
     *(u32*)(t0 + 4) = (u32)((u32)(t1));
     return (u32)(1);
 }

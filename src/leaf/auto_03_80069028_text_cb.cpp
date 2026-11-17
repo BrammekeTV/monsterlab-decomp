@@ -8,20 +8,20 @@
 
 // 0x8006BB1C
 BOOL GetNumPropStates(u32 a3) {
-    s32 t0 = *(s32*)(a3 + 420);
+    s32 t0 = *(s32*)(((u8*)(uintptr_t)(a3)) + 420);
     return (BOOL)(t0);
 }
 
 // 0x8006BB24
 BOOL GetPropCurrentState(u32 a3) {
-    u8* t0 = *(u8**)(a3 + 4);
+    u8* t0 = *(u8**)(((u8*)(uintptr_t)(a3)) + 4);
     u8 t1 = *(u8*)(t0 + 53);
     return (BOOL)(t1);
 }
 
 // 0x8006BB30
 BOOL GetPropPreviousState(u32 a3) {
-    u8* t0 = *(u8**)(a3 + 4);
+    u8* t0 = *(u8**)(((u8*)(uintptr_t)(a3)) + 4);
     u8 t1 = *(u8*)(t0 + 54);
     return (BOOL)(t1);
 }

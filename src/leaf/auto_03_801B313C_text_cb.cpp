@@ -8,6 +8,6 @@
 
 // 0x801B8724
 void EntityWaypointTaskCompleteCallback(u32 a3, u32 a4) {
-    u8* t0 = *(u8**)(a3 + 4);
+    u8* t0 = *(u8**)(((u8*)(uintptr_t)(a3)) + 4);
     *(u8*)(t0 + 58) = (u8)((u32)(255));
 }

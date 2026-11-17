@@ -8,12 +8,12 @@
 
 // 0x800980B8
 u32 ReactorFastenerIsDecoy(void* a3) {
-    u8 t0 = *(u8*)(a3 + 621);
+    u8 t0 = *(u8*)(((u8*)(uintptr_t)(a3)) + 621);
     return (u32)(t0);
 }
 
 // 0x800980C0
 s32 ReactorFastenerAdjustmentsRequired(void* a3) {
-    u8 t0 = *(u8*)(a3 + 620);
+    u8 t0 = *(u8*)(((u8*)(uintptr_t)(a3)) + 620);
     return (s32)(t0);
 }

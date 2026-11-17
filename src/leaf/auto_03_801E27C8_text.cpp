@@ -19,7 +19,7 @@ extern "C" void fn_801E28DC(void) {
 
 // 0x801E29C8
 extern "C" u32 fn_801E29C8(u8* a3) {
-    s32 t0 = *(s32*)(a3 + 0);
+    s32 t0 = *(s32*)(((u8*)(uintptr_t)(a3)) + 0);
     u32 t1 = (u32)(t0) & 0x2u;
     return (u32)(t1);
 }
@@ -27,7 +27,7 @@ extern "C" u32 fn_801E29C8(u8* a3) {
 // 0x801E3CCC
 extern "C" void fn_801E3CCC(u8* a3, f32 f1) {
     f32 t0 = *(f32*)((u8*)lbl_805FFFD0);
-    *(f32*)(a3 + 4) = (f32)(f1);
-    *(f32*)(a3 + 0) = (f32)(t0);
-    *(f32*)(a3 + 8) = (f32)(t0);
+    *(f32*)(((u8*)(uintptr_t)(a3)) + 4) = (f32)(f1);
+    *(f32*)(((u8*)(uintptr_t)(a3)) + 0) = (f32)(t0);
+    *(f32*)(((u8*)(uintptr_t)(a3)) + 8) = (f32)(t0);
 }

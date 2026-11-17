@@ -16,6 +16,6 @@ extern "C" void fn_800AE3A8(f32 f1) {
 
 // 0x800AEF38
 extern "C" s32 fn_800AEF38(u8* a3) {
-    *(u32*)(a3 + 180) = (u32)((u32)(0));
+    *(u32*)(((u8*)(uintptr_t)(a3)) + 180) = (u32)((u32)(0));
     return (s32)(1);
 }

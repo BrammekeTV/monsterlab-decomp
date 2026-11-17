@@ -7,7 +7,7 @@
 
 // 0x80030A98
 extern "C" void fn_80030A98(u8* a3, s32 a4) {
-    *(u32*)(a3 + 56) = (u32)((u32)(uintptr_t)(a4));
+    *(u32*)(((u8*)(uintptr_t)(a3)) + 56) = (u32)((u32)(uintptr_t)(a4));
 }
 
 // 0x80030AA0

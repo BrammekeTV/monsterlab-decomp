@@ -11,6 +11,6 @@ extern "C" void fn_800E3CF4(void) {
 
 // 0x800E4260
 extern "C" f32 fn_800E4260(u8* a3) {
-    f32 t0 = *(f32*)(a3 + 92);
+    f32 t0 = *(f32*)(((u8*)(uintptr_t)(a3)) + 92);
     return (f32)(t0);
 }

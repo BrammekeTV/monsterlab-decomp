@@ -26,25 +26,25 @@ extern "C" s32 fn_801ACD00(void) {
 
 // 0x801ADF4C
 extern "C" u8* fn_801ADF4C(u8* a3) {
-    u8* t0 = a3 + 60;
+    u8* t0 = ((u8*)(uintptr_t)(a3)) + 60;
     return (u8*)(t0);
 }
 
 // 0x801ADF54
 extern "C" u8* fn_801ADF54(u8* a3) {
-    u8* t0 = a3 + 72;
+    u8* t0 = ((u8*)(uintptr_t)(a3)) + 72;
     return (u8*)(t0);
 }
 
 // 0x801ADF5C
 extern "C" u8* fn_801ADF5C(u8* a3) {
-    u8* t0 = a3 + 60;
+    u8* t0 = ((u8*)(uintptr_t)(a3)) + 60;
     return (u8*)(t0);
 }
 
 // 0x801ADF64
 extern "C" u8* fn_801ADF64(u8* a3) {
-    u8* t0 = a3 + 72;
+    u8* t0 = ((u8*)(uintptr_t)(a3)) + 72;
     return (u8*)(t0);
 }
 

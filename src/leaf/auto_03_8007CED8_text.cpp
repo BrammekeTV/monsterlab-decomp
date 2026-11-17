@@ -9,7 +9,7 @@ extern u8 lbl_805FD750[];
 
 // 0x8007CF94
 extern "C" f32 fn_8007CF94(u8* a3) {
-    f32 t0 = *(f32*)(a3 + 20);
+    f32 t0 = *(f32*)(((u8*)(uintptr_t)(a3)) + 20);
     f32 t1 = *(f32*)((u8*)lbl_805FD750);
     f32 t2 = (f32)(t0 / t1);
     return (f32)(t2);
@@ -17,13 +17,13 @@ extern "C" f32 fn_8007CF94(u8* a3) {
 
 // 0x8007CFA4
 extern "C" f32 fn_8007CFA4(u8* a3) {
-    f32 t0 = *(f32*)(a3 + 20);
+    f32 t0 = *(f32*)(((u8*)(uintptr_t)(a3)) + 20);
     return (f32)(t0);
 }
 
 // 0x8007D2BC
 extern "C" void fn_8007D2BC(u8* a3, f32 f1) {
-    *(f32*)(a3 + 0) = (f32)(f1);
+    *(f32*)(((u8*)(uintptr_t)(a3)) + 0) = (f32)(f1);
 }
 
 // 0x8007D2C4
