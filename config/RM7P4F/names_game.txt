@@ -555,3 +555,9 @@ fn_8013022C WorldResetQueues
 fn_801E6EB0 IdPoolNext
 lbl_803E9FD4 gZoneLists
 lbl_8048A8F0 gIdPool
+fn_8007FE30 AimMinigame_Update
+fn_80143CA8 MtxFromLocatorRotation
+fn_801456E4 QuatFromMtx
+fn_80145EE8 QuatFromAxisAngle
+fn_801453BC QuatGetAxisXY
+fn_80070458 RaySceneTest

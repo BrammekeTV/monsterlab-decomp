@@ -68,6 +68,11 @@
  ],
  "changelog": [
   {
+   "date": "2026-11-18",
+   "time": "00:59",
+   "text": "Decompiled the world reset that runs when a level loads (zone slot budget, zone tables and shared lists) and the aiming mini-game (a tool on a turntable turned with the pointer, a ray test against the scene and a target circle, and rumble while on target). Builds are now checked locally with MSVC before every push."
+  },
+  {
    "date": "2026-11-17",
    "time": "23:31",
    "text": "First functions written from the new m2c drafts: the catch mini-game (two lanes of falling objects, a pointer-driven grabber, shaking objects loose, ten catches to win), the character contact response (standing on moving platforms, pushing entities, sliding along walls, landing on boxes and rotated boxes), and the 29 small vector helpers the movement code uses."

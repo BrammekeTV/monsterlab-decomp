@@ -1,15 +1,15 @@
 {
  "game_id": "RM7P4F",
- "generated": "2026-11-17T23:46:32+00:00",
- "commit": "4b57f19",
- "commit_date": "2026-11-17T23:31:34+01:00",
+ "generated": "2026-11-17T23:59:33+00:00",
+ "commit": "57a077c",
+ "commit_date": "2026-11-18T00:56:08+01:00",
  "game": {
   "functions": 8548,
   "bytes": 2265988,
-  "named": 2519,
-  "named_bytes": 534576,
-  "decompiled": 1952,
-  "decompiled_bytes": 205916
+  "named": 2525,
+  "named_bytes": 540264,
+  "decompiled": 1953,
+  "decompiled_bytes": 208884
  },
  "library": {
   "functions": 4039,
@@ -22,10 +22,10 @@
  "all": {
   "functions": 12587,
   "bytes": 3404928,
-  "named": 2977,
-  "named_bytes": 638720,
-  "decompiled": 1952,
-  "decompiled_bytes": 205916
+  "named": 2983,
+  "named_bytes": 644408,
+  "decompiled": 1953,
+  "decompiled_bytes": 208884
  },
  "game_range": [
   "80006B40",
@@ -257,8 +257,8 @@
    0.009
   ],
   [
-   0.003,
-   0.092
+   0.359,
+   0.448
   ],
   [
    0.047,
@@ -618,11 +618,11 @@
   ],
   [
    0.157,
-   0.425
+   0.631
   ],
   [
    0.004,
-   0.173
+   0.275
   ],
   [
    0.027,
@@ -1784,6 +1784,16 @@
      "name": "CharacterSetMode",
      "addr": "80016284",
      "size": 348
+    }
+   ]
+  },
+  {
+   "path": "src/game/aim_minigame.cpp",
+   "functions": [
+    {
+     "name": "AimMinigame_Update",
+     "addr": "8007FE30",
+     "size": 2968
     }
    ]
   },
@@ -4481,7 +4491,7 @@
      "size": 8
     },
     {
-     "name": "fn_80070458",
+     "name": "RaySceneTest",
      "addr": "80070458",
      "size": 8
     },
