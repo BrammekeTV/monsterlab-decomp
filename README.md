@@ -58,6 +58,10 @@ Each `.sir` section is a memory image the game copies to a fixed address in MEM2
 
 On PC the files stay in their original format, which keeps mods simple. The loader either reserves these address ranges or relocates the pointers in each section as it loads.
 
+### Monster part data
+
+Part types live in `global_binary.sir`. Header slot `0xDC8` points to the game database (`gGameDb`), and its data block holds the part definition table at `+0x5B78` (186 entries of 0x50 bytes; 180 are used, 180–185 are empty). Each definition (`PartDef` in `include/game/part.h`) has four tier names, e.g. *Chimp Arm → Ape Arm → Gorilla Arm → Kong Arm*. The names are stored as hashed text keys, which the table at `0x8036D370` in `main.dol` maps to text ids, and text id *N* is line *N+1* of `files/text/str_<lang>.txt` (plain text). After the names come two action ids and the stats. Parts the player owns are `PartInstance`s: definition index, tier, quality, defect, enhancement, health. `python tools/parts.py` dumps the table from your own disc into `build/`.
+
 ## Plan
 
 1. **Split & disassemble.** `dtk dol split config/RM7P4F/config.yml build/RM7P4F` gives per-object assembly and builds up `symbols.txt` and `splits.txt`.

@@ -1,15 +1,15 @@
 {
  "game_id": "RM7P4F",
- "generated": "2026-11-17T19:55:39+00:00",
- "commit": "4661fe5",
- "commit_date": "2026-11-17T20:53:26+01:00",
+ "generated": "2026-11-17T20:13:07+00:00",
+ "commit": "442f351",
+ "commit_date": "2026-11-17T21:08:30+01:00",
  "game": {
   "functions": 8559,
   "bytes": 2277304,
-  "named": 2338,
-  "named_bytes": 362052,
-  "decompiled": 310,
-  "decompiled_bytes": 49572
+  "named": 2348,
+  "named_bytes": 363828,
+  "decompiled": 325,
+  "decompiled_bytes": 50560
  },
  "library": {
   "functions": 4028,
@@ -22,10 +22,10 @@
  "all": {
   "functions": 12587,
   "bytes": 3404928,
-  "named": 2786,
-  "named_bytes": 454920,
-  "decompiled": 310,
-  "decompiled_bytes": 49572
+  "named": 2796,
+  "named_bytes": 456696,
+  "decompiled": 325,
+  "decompiled_bytes": 50560
  },
  "game_range": [
   "80006B40",
@@ -74,7 +74,7 @@
   ],
   [
    0.0,
-   0.703
+   0.706
   ],
   [
    0.0,
@@ -477,7 +477,7 @@
    0.999
   ],
   [
-   0.0,
+   0.073,
    1.0
   ],
   [
@@ -534,7 +534,7 @@
   ],
   [
    0.0,
-   0.02
+   0.127
   ],
   [
    0.0,
@@ -549,8 +549,8 @@
    0.0
   ],
   [
-   0.0,
-   0.095
+   0.012,
+   0.107
   ],
   [
    0.0,
@@ -1005,20 +1005,20 @@
    0.0
   ],
   [
+   0.018,
+   0.018
+  ],
+  [
    0.0,
-   0.0
+   0.027
   ],
   [
    0.0,
    0.0
   ],
   [
-   0.0,
-   0.0
-  ],
-  [
-   0.0,
-   0.0
+   0.007,
+   0.041
   ],
   [
    0.0,
@@ -2433,6 +2433,86 @@
      "name": "GameUpdate",
      "addr": "8000D9EC",
      "size": 2140
+    }
+   ]
+  },
+  {
+   "path": "src/game/part_query.cpp",
+   "functions": [
+    {
+     "name": "PartQuery_SetPart",
+     "addr": "800F9790",
+     "size": 88
+    },
+    {
+     "name": "PartQuery_SetInventoryPartByIndex",
+     "addr": "800F97E8",
+     "size": 116
+    },
+    {
+     "name": "PartQuery_SetLightningTowerMonster",
+     "addr": "800F985C",
+     "size": 36
+    },
+    {
+     "name": "PartQuery_GetMadness",
+     "addr": "800F9880",
+     "size": 56
+    },
+    {
+     "name": "PartQuery_GetQuality",
+     "addr": "800F98B8",
+     "size": 56
+    },
+    {
+     "name": "PartQuery_GetName",
+     "addr": "800F98F0",
+     "size": 196
+    },
+    {
+     "name": "PartQuery_GetDefectTexture",
+     "addr": "800F9AE4",
+     "size": 36
+    },
+    {
+     "name": "PartQuery_GetEnhancementTexture",
+     "addr": "800F9B08",
+     "size": 36
+    },
+    {
+     "name": "PartQuery_GetHealth",
+     "addr": "800F9B2C",
+     "size": 24
+    },
+    {
+     "name": "PartQuery_GetTexture",
+     "addr": "800FA350",
+     "size": 8
+    },
+    {
+     "name": "TextIdFromHash",
+     "addr": "80120D34",
+     "size": 108
+    },
+    {
+     "name": "PartDbGetDef",
+     "addr": "80216838",
+     "size": 164
+    },
+    {
+     "name": "PartGetTier",
+     "addr": "8021EF58",
+     "size": 8
+    },
+    {
+     "name": "PartGetQuality",
+     "addr": "8021EF60",
+     "size": 8
+    },
+    {
+     "name": "PartGetMadness",
+     "addr": "8021EF80",
+     "size": 48
     }
    ]
   },

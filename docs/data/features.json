@@ -69,6 +69,11 @@
   "changelog": [
     {
       "date": "2026-11-17",
+      "time": "21:13",
+      "text": "Started on monster parts. Found and decoded the part database inside global_binary.sir: 186 definition slots (180 used, 6 spare), each with four tier names (Chimp Arm, Ape Arm, Gorilla Arm, Kong Arm), two actions and stats. The game text turns out to already be plain .txt files. Decompiled the database lookup, the text-key lookup and the first PartQuery functions (name, quality, madness, health, defect and enhancement textures). This is the format the planned open-format part mods will plug into."
+    },
+    {
+      "date": "2026-11-17",
       "time": "21:06",
       "text": "Mapped every .sir archive with the .sir decoder: about 6,100 textures and 6,500 meshes, and the fixed memory addresses each file loads to (global data at 0x90400000, the current level at 0x90540000/0x90980000, 432 monster parts streamed into slots from 0x91240000, UI screens). Since these files are memory images full of absolute pointers, the PC loader will relocate them on load so the original files (and mods) can be used as-is."
     },
