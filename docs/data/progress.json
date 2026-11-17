@@ -1,31 +1,31 @@
 {
  "game_id": "RM7P4F",
- "generated": "2026-11-17T14:55:02+00:00",
- "commit": "6faf8f9",
- "commit_date": "2026-11-17T15:43:54+01:00",
+ "generated": "2026-11-17T15:12:41+00:00",
+ "commit": "1f60db4",
+ "commit_date": "2026-11-17T16:07:48+01:00",
  "game": {
   "functions": 8559,
   "bytes": 2277304,
-  "named": 22,
-  "named_bytes": 4904,
-  "decompiled": 11,
-  "decompiled_bytes": 1604
+  "named": 66,
+  "named_bytes": 14092,
+  "decompiled": 34,
+  "decompiled_bytes": 4036
  },
  "library": {
   "functions": 4028,
   "bytes": 1127624,
-  "named": 416,
-  "named_bytes": 86560,
+  "named": 418,
+  "named_bytes": 86600,
   "decompiled": 0,
   "decompiled_bytes": 0
  },
  "all": {
   "functions": 12587,
   "bytes": 3404928,
-  "named": 438,
-  "named_bytes": 91464,
-  "decompiled": 11,
-  "decompiled_bytes": 1604
+  "named": 484,
+  "named_bytes": 100692,
+  "decompiled": 34,
+  "decompiled_bytes": 4036
  },
  "game_range": [
   "80006B40",
@@ -45,8 +45,8 @@
    0.0
   ],
   [
-   0.0,
-   0.081
+   0.111,
+   0.18
   ],
   [
    0.0,
@@ -613,8 +613,8 @@
    0.0
   ],
   [
-   0.146,
-   0.163
+   0.147,
+   0.169
   ],
   [
    0.0,
@@ -634,7 +634,7 @@
   ],
   [
    0.0,
-   0.0
+   0.132
   ],
   [
    0.0,
@@ -642,7 +642,7 @@
   ],
   [
    0.0,
-   0.001
+   0.002
   ],
   [
    0.0,
@@ -686,7 +686,7 @@
   ],
   [
    0.0,
-   0.0
+   0.019
   ],
   [
    0.0,
@@ -694,11 +694,11 @@
   ],
   [
    0.0,
-   0.0
+   0.09
   ],
   [
    0.0,
-   0.0
+   0.041
   ],
   [
    0.0,
@@ -877,8 +877,20 @@
    0.0
   ],
   [
+   0.183,
+   0.184
+  ],
+  [
    0.0,
-   0.113
+   0.334
+  ],
+  [
+   0.0,
+   0.077
+  ],
+  [
+   0.0,
+   0.043
   ],
   [
    0.0,
@@ -902,7 +914,11 @@
   ],
   [
    0.0,
-   0.0
+   0.064
+  ],
+  [
+   0.0,
+   0.06
   ],
   [
    0.0,
@@ -918,23 +934,7 @@
   ],
   [
    0.0,
-   0.0
-  ],
-  [
-   0.0,
-   0.0
-  ],
-  [
-   0.0,
-   0.0
-  ],
-  [
-   0.0,
-   0.0
-  ],
-  [
-   0.0,
-   0.0
+   0.004
   ],
   [
    0.0,
@@ -954,7 +954,7 @@
   ],
   [
    0.049,
-   0.226
+   0.228
   ],
   [
    0.0,
@@ -1163,8 +1163,8 @@
    "end": "8033F400",
    "functions": 399,
    "bytes": 114196,
-   "named": 41,
-   "named_bytes": 12932,
+   "named": 43,
+   "named_bytes": 12972,
    "decompiled": 0,
    "decompiled_bytes": 0
   },
@@ -1181,6 +1181,126 @@
   }
  ],
  "files": [
+  {
+   "path": "src/engine/engine.cpp",
+   "functions": [
+    {
+     "name": "EngineStartup",
+     "addr": "801D1504",
+     "size": 52
+    },
+    {
+     "name": "EngineCleanup",
+     "addr": "801D1538",
+     "size": 44
+    },
+    {
+     "name": "SgMemAlloc",
+     "addr": "801D1564",
+     "size": 120
+    },
+    {
+     "name": "SgMemFree",
+     "addr": "801D15DC",
+     "size": 16
+    },
+    {
+     "name": "EngineMemAllocTemp",
+     "addr": "801D15EC",
+     "size": 20
+    },
+    {
+     "name": "EngineMemRealloc",
+     "addr": "801D1600",
+     "size": 8
+    },
+    {
+     "name": "EngineMemFree",
+     "addr": "801D1608",
+     "size": 16
+    },
+    {
+     "name": "RendMemAlloc",
+     "addr": "801D1618",
+     "size": 184
+    },
+    {
+     "name": "RendMemFree",
+     "addr": "801D16D0",
+     "size": 16
+    },
+    {
+     "name": "EngineInit",
+     "addr": "801D16E0",
+     "size": 284
+    },
+    {
+     "name": "EngineShutdown",
+     "addr": "801D17FC",
+     "size": 44
+    },
+    {
+     "name": "EngineSetFrameCallback",
+     "addr": "801D1828",
+     "size": 8
+    },
+    {
+     "name": "EngineFrame",
+     "addr": "801D1838",
+     "size": 432
+    },
+    {
+     "name": "EngineIsSuspended",
+     "addr": "801D1AA0",
+     "size": 8
+    },
+    {
+     "name": "EngineSuspendedTick",
+     "addr": "801D1AA8",
+     "size": 84
+    },
+    {
+     "name": "WorldGetField0C",
+     "addr": "801D1BAC",
+     "size": 8
+    },
+    {
+     "name": "EngineRunFrameCallback",
+     "addr": "801D1BB4",
+     "size": 24
+    },
+    {
+     "name": "EngineGetGameSettings",
+     "addr": "801D2B44",
+     "size": 8
+    },
+    {
+     "name": "EngineSetGameSettings",
+     "addr": "801D2B4C",
+     "size": 8
+    }
+   ]
+  },
+  {
+   "path": "src/game/game_init.cpp",
+   "functions": [
+    {
+     "name": "GameSysEventCallback",
+     "addr": "8000EE4C",
+     "size": 64
+    },
+    {
+     "name": "GameInit",
+     "addr": "8000EE8C",
+     "size": 120
+    },
+    {
+     "name": "GameStart",
+     "addr": "8000EF04",
+     "size": 856
+    }
+   ]
+  },
   {
    "path": "src/game/game_main.cpp",
    "functions": [
@@ -1237,6 +1357,11 @@
     {
      "name": "SysGetRequestedExitMode",
      "addr": "80142DE0",
+     "size": 8
+    },
+    {
+     "name": "SysRequestExit",
+     "addr": "80142DE8",
      "size": 8
     },
     {

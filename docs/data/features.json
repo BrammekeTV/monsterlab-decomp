@@ -22,7 +22,7 @@
   },
   {
    "title": "Engine & game systems",
-   "detail": "Engine init/frame/shutdown, UI engine, task system, world, monsters, battles.",
+   "detail": "Engine init/frame/shutdown and game startup done; next: renderer, scene graph, UI engine, task system, world, monsters, battles.",
    "status": "in_progress"
   },
   {
@@ -46,12 +46,31 @@
    "status": "todo"
   },
   {
+   "title": "1080p & widescreen",
+   "detail": "Render at any resolution (1080p, 1440p, 4K) with internal resolution scaling; native 16:9 using the game's own widescreen support.",
+   "status": "todo"
+  },
+  {
+   "title": "Settings GUI",
+   "detail": "In-game options overlay (F1) + config.ini: resolution, fullscreen, V-sync, FPS cap, render scale, MSAA, texture filtering, audio, controls.",
+   "status": "todo"
+  },
+  {
+   "title": "Mod support",
+   "detail": "Virtual file system: mods/<name>/files/ overrides any disc file; load order via mods.ini, toggled in the settings GUI.",
+   "status": "todo"
+  },
+  {
    "title": "Playable",
    "detail": "Full game playable from start to finish on PC.",
    "status": "todo"
   }
  ],
  "changelog": [
+  {
+   "date": "2026-11-17",
+   "text": "Decompiled the engine lifecycle (EngineInit, EngineFrame, memory callbacks for the REND and SG modules) and game startup (GameInit, GameStart, which loads global_binary.sir). Planned 1080p, a settings GUI and mod support."
+  },
   {
    "date": "2026-11-17",
    "text": "Progress site restyled as a mad-scientist lab: riveted metal panels, wooden shelves, slime-filled test tubes."

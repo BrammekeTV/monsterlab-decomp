@@ -56,6 +56,14 @@ DOL sections:
 
 **Chosen approach: decompile by hand, then port.** The decomp is functional rather than byte-matching: game code is rewritten as portable C/C++, and the Nintendo SDK layer is replaced instead of decompiled. Static recompilation was considered and rejected.
 
+### PC port features (planned)
+
+These live in the platform layer (`src/platform/`) that replaces the Wii SDK, so the decompiled game code stays mostly untouched.
+
+- **1080p and higher, widescreen.** The GX → OpenGL/Vulkan backend renders at any output resolution (1080p, 1440p, 4K) with an internal resolution scale, instead of the Wii's 640×480 framebuffer. The game already supports 16:9: `ViewCreate` picks the aspect ratio from `SCGetAspectRatio`, so on PC that returns widescreen. 2D UI, which uses fixed 640×480 coordinates, gets scaled or pillarboxed.
+- **Settings GUI.** An in-game overlay (Dear ImGui, toggled with F1) plus a `config.ini`. Options: resolution, window/borderless/fullscreen, V-sync, frame-rate cap (it maps onto the game's own `gFrameLimitEnabled` / `gTargetFps`), internal render scale, MSAA, texture filtering, audio volume and controls (pointer = mouse).
+- **Mod support.** A virtual file system sits between the game and the disc files: `mods/<ModName>/files/...` overrides any original file (`.sir`, `.bik`, `.dsp`, text). Load order and enabled mods come from `mods.ini` and can be toggled in the settings GUI. Later: documented `.sir` formats and tools for editing them, plus code hooks for script mods.
+
 ### Priorities
 
 - Game code (`main` is at `0x80142DF0`; game code sits roughly at `0x80006B40`–`0x80232000`) is the real work.

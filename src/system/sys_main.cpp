@@ -145,6 +145,12 @@ SysExitMode SysGetRequestedExitMode(void) {
     return sExitMode;
 }
 
+// 0x80142DE8
+// Same as SysSetExitMode; a second copy the linker kept from another translation unit.
+extern "C" void SysRequestExit(int mode) {
+    sExitMode = (SysExitMode)mode;
+}
+
 // 0x80142DF0
 int main(int argc, char** argv) {
     SysInit();
