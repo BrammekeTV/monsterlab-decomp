@@ -1,15 +1,15 @@
 {
  "game_id": "RM7P4F",
- "generated": "2026-11-17T20:26:29+00:00",
- "commit": "3b460ed",
- "commit_date": "2026-11-17T21:23:09+01:00",
+ "generated": "2026-11-17T20:28:47+00:00",
+ "commit": "ccf2717",
+ "commit_date": "2026-11-17T21:26:31+01:00",
  "game": {
   "functions": 8559,
   "bytes": 2277304,
-  "named": 2357,
-  "named_bytes": 432296,
-  "decompiled": 335,
-  "decompiled_bytes": 117720
+  "named": 2358,
+  "named_bytes": 438416,
+  "decompiled": 336,
+  "decompiled_bytes": 123840
  },
  "library": {
   "functions": 4028,
@@ -22,10 +22,10 @@
  "all": {
   "functions": 12587,
   "bytes": 3404928,
-  "named": 2806,
-  "named_bytes": 525180,
-  "decompiled": 335,
-  "decompiled_bytes": 117720
+  "named": 2807,
+  "named_bytes": 531300,
+  "decompiled": 336,
+  "decompiled_bytes": 123840
  },
  "game_range": [
   "80006B40",
@@ -905,8 +905,8 @@
    0.331
   ],
   [
-   0.0,
-   0.007
+   0.663,
+   0.67
   ],
   [
    0.0,
@@ -2733,6 +2733,11 @@
      "name": "ScriptDispatch",
      "addr": "8010CD1C",
      "size": 10856
+    },
+    {
+     "name": "ScriptDispatchEngine",
+     "addr": "801E03AC",
+     "size": 6120
     }
    ]
   },

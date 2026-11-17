@@ -69,6 +69,11 @@
   "changelog": [
     {
       "date": "2026-11-17",
+      "time": "21:28",
+      "text": "Generated the engine's own script dispatcher as well (137 more cases), so every script call in the game now goes through decompiled code. Over 5% of the game code is decompiled."
+    },
+    {
+      "date": "2026-11-17",
       "time": "21:26",
       "text": "Generated the script call dispatcher: one case per game signature (246 of them) that passes script arguments to the called function as integers, floats or pointers and stores the result. Each case was checked against its assembly, so every argument goes exactly where the original put it."
     },
