@@ -1,15 +1,15 @@
 {
  "game_id": "RM7P4F",
- "generated": "2026-11-17T19:50:49+00:00",
- "commit": "ab7ab3f",
- "commit_date": "2026-11-17T20:50:07+01:00",
+ "generated": "2026-11-17T19:51:32+00:00",
+ "commit": "b1de24c",
+ "commit_date": "2026-11-17T20:50:52+01:00",
  "game": {
   "functions": 8559,
   "bytes": 2277304,
-  "named": 2323,
-  "named_bytes": 356784,
-  "decompiled": 285,
-  "decompiled_bytes": 46324
+  "named": 2326,
+  "named_bytes": 358144,
+  "decompiled": 287,
+  "decompiled_bytes": 47152
  },
  "library": {
   "functions": 4028,
@@ -22,10 +22,10 @@
  "all": {
   "functions": 12587,
   "bytes": 3404928,
-  "named": 2769,
-  "named_bytes": 449224,
-  "decompiled": 285,
-  "decompiled_bytes": 46324
+  "named": 2772,
+  "named_bytes": 450584,
+  "decompiled": 287,
+  "decompiled_bytes": 47152
  },
  "game_range": [
   "80006B40",
@@ -65,7 +65,7 @@
    0.918
   ],
   [
-   0.481,
+   0.574,
    0.817
   ],
   [
@@ -570,7 +570,7 @@
   ],
   [
    0.0,
-   0.0
+   0.007
   ],
   [
    0.0,
@@ -618,7 +618,7 @@
   ],
   [
    0.0,
-   0.031
+   0.173
   ],
   [
    0.0,
@@ -1713,6 +1713,16 @@
      "name": "force_fixed_camera_return",
      "addr": "800190C8",
      "size": 28
+    },
+    {
+     "name": "set_camera_location",
+     "addr": "800190E4",
+     "size": 388
+    },
+    {
+     "name": "set_camera_location_from_sensor_param",
+     "addr": "80019268",
+     "size": 440
     },
     {
      "name": "end_trigger_camera",

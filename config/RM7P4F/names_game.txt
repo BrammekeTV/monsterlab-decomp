@@ -330,3 +330,6 @@ fn_801BA2FC EventSendTo
 fn_801BBAEC RequestSend
 fn_801BBB0C RequestComplete
 fn_80121898 DebugPing
+fn_8012AA50 WorldFindLocator
+fn_80145B00 EulerToQuat
+fn_801454CC QuatGetForward

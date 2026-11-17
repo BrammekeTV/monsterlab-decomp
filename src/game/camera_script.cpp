@@ -279,3 +279,67 @@ BOOL special_camera_done_slerping(ScriptCtx* ctx) {
     (void)ctx;
     return lbl_805FB1A1 == 0;
 }
+
+// ---------------------------------------------------------------- camera placement
+
+extern "C" {
+struct Locator;
+Locator* WorldFindLocator(void* world, u32 hash);        // 0x8012AA50
+void  EulerToQuat(Quat* out, const Vec3* euler);         // 0x80145B00
+void  QuatGetForward(Vec3* out, const Quat* q);          // 0x801454CC
+}
+extern u8 gWorldState[];           // 0x803E6D00
+
+// Named locator placed in a level (0x20 bytes).
+struct Locator {
+    u32  hash;     // 0x00
+    u32  unk04;
+    Vec3 pos;      // 0x08
+    Vec3 rot;      // 0x14: euler angles
+};
+
+typedef void (*CamLookFn)(CameraCtl*, const Vec3* eye, const Vec3* target);
+typedef void (*CamSetPosFn)(CameraCtl*, const Vec3* eye);
+#define CAM_LOOK(c, e, t)  ((CamLookFn)(c)->vtbl[0x2C / 4])((c), (e), (t))
+#define CAM_SET_POS(c, e)  ((CamSetPosFn)(c)->vtbl[0x1C / 4])((c), (e))
+
+// Put the camera at locator `from`, looking at locator `to` (or along `from`'s facing).
+// Without a valid `from`, look at the player from where the camera is.
+static inline void PlaceCamera(u32 fromId, u32 toId) {
+    Locator* from = WorldFindLocator(gWorldState, fromId);
+    Locator* to = toId != 0 ? WorldFindLocator(gWorldState, toId) : NULL;
+    CameraCtl* cam = CAMERA();
+
+    if (from == NULL) {
+        u8* player = *(u8**)(*(u8**)gWorldState + 0x8);
+        const Vec3* eye = *(const Vec3**)((u8*)cam + 0x4);
+        CAM_LOOK(cam, eye, *(const Vec3**)(player + 0x4));
+        CAM_SET_POS(cam, *(const Vec3**)((u8*)CAMERA() + 0x4));
+        return;
+    }
+    if (to != NULL) {
+        CAM_LOOK(cam, &from->pos, &to->pos);
+    } else {
+        Quat q;
+        Vec3 fwd;
+        EulerToQuat(&q, &from->rot);
+        QuatGetForward(&fwd, &q);
+        Vec3 target = { fwd.x + from->pos.x, fwd.y + from->pos.y, fwd.z + from->pos.z };
+        CAM_LOOK(cam, &from->pos, &target);
+    }
+    CAM_SET_POS(CAMERA(), &from->pos);
+}
+
+// 0x800190E4
+void set_camera_location(ScriptCtx* ctx) {
+    PlaceCamera(SCRIPT_ARG(ctx), SCRIPT_ARG2(ctx));
+}
+
+// 0x80019268
+// Camera sensors carry the locators (+0x16C, +0x170) and a blend time (+0x164).
+void set_camera_location_from_sensor_param(ScriptCtx* ctx) {
+    u8* sensor = (u8*)ctx->chr;
+    if (sensor == NULL) return;
+    PlaceCamera(*(u32*)(sensor + 0x16C), *(u32*)(sensor + 0x170));
+    CAM_SET_INTERP(CAMERA(), *(f32*)(sensor + 0x164));
+}
