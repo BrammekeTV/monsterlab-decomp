@@ -392,8 +392,13 @@ def main():
             lines.append('#include "game/script_callbacks.h"')
         lines.append("")
         globs = sorted(set().union(*[g for _, _, _, g in fns]))
+        heads = {n: c[0][:-2] for _, n, c, _ in fns}
         for gname in globs:
-            if gname in defined or (cb and gname in hnames):
+            if gname in defined:
+                if gname in funcs and not (cb and gname in hnames):
+                    lines.append(heads[gname] + ";")
+                continue
+            if cb and gname in hnames:
                 continue
             if gname in funcs:
                 lines.append(f'extern "C" void {gname}(void);')
