@@ -370,3 +370,5 @@ fn_801DC7D4 ScriptSigDefine
 fn_801DC59C ScriptSigsInit
 fn_801DC658 ScriptSigFinalize
 lbl_8047D6B8 gScriptSigs
+fn_8010CD1C ScriptDispatch
+lbl_80484230 gScriptFuncs

@@ -1,15 +1,15 @@
 {
  "game_id": "RM7P4F",
- "generated": "2026-11-17T20:23:07+00:00",
- "commit": "c682a40",
- "commit_date": "2026-11-17T21:20:17+01:00",
+ "generated": "2026-11-17T20:26:29+00:00",
+ "commit": "3b460ed",
+ "commit_date": "2026-11-17T21:23:09+01:00",
  "game": {
   "functions": 8559,
   "bytes": 2277304,
-  "named": 2356,
-  "named_bytes": 421440,
-  "decompiled": 334,
-  "decompiled_bytes": 106864
+  "named": 2357,
+  "named_bytes": 432296,
+  "decompiled": 335,
+  "decompiled_bytes": 117720
  },
  "library": {
   "functions": 4028,
@@ -22,10 +22,10 @@
  "all": {
   "functions": 12587,
   "bytes": 3404928,
-  "named": 2805,
-  "named_bytes": 514324,
-  "decompiled": 334,
-  "decompiled_bytes": 106864
+  "named": 2806,
+  "named_bytes": 525180,
+  "decompiled": 335,
+  "decompiled_bytes": 117720
  },
  "game_range": [
   "80006B40",
@@ -513,8 +513,8 @@
    0.212
   ],
   [
-   0.0,
-   0.041
+   0.644,
+   0.685
   ],
   [
    0.0,
@@ -2723,6 +2723,16 @@
      "name": "SaveSelectBannerLayout",
      "addr": "80011BC0",
      "size": 208
+    }
+   ]
+  },
+  {
+   "path": "src/game/script_dispatch.cpp",
+   "functions": [
+    {
+     "name": "ScriptDispatch",
+     "addr": "8010CD1C",
+     "size": 10856
     }
    ]
   },
