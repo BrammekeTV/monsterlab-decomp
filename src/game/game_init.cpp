@@ -57,6 +57,64 @@ extern u8         gIsReturningPlayer;       ORIG(0x805FAEA8)
 
 #define MEM2_GLOBAL_BINARY ((void*)0x90400000)   // fixed load address right after the engine pool
 
+// ---- shutdown ----
+extern "C" {
+void GameUpdate(void);                       // 0x8000D9EC
+void fn_801210F8(void*); void fn_801F0560(void); void fn_802044B4(void*);
+void fn_80132BD8(void*); void fn_80128C20(void*); void fn_801ABD58(void);
+void fn_801F1920(void);  void fn_801D2E9C(void);
+void BufferFree(void* data);                 // 0x801D4980
+void SirLoaderShutdown(void* loader);        // 0x801E5AE0
+}
+extern u8 lbl_805FB7E8[];
+extern u8 gWorldState[];                     ORIG(0x803E6D00)
+extern u8 gGameRunning;                      ORIG(0x805FB211)
+
+// Loaded data buffers released at shutdown (0x18 bytes each, only the first 3 fields used here).
+struct LoadedBuffer {
+    void* data;
+    u32   size;
+    s32   kind;     // 1 or 2 = owned by us, must be freed
+    u8    pad[0xC];
+};
+extern LoadedBuffer gBuffer803C73EC, gBuffer803C7404, gBuffer803C741C, gBuffer803C7434,
+                    gBuffer803C744C, gBuffer803C7464, gBuffer803C747C;
+
+static inline void ReleaseBuffer(LoadedBuffer& b) {
+    if (b.data != NULL && (b.kind == 2 || b.kind == 1)) BufferFree(b.data);
+    b.data = NULL;
+    b.size = 0;
+    b.kind = 0;
+}
+
+// 0x8000F5BC
+extern "C" void GameFrameCallback(void) {
+    GameUpdate();
+}
+
+// 0x8000F5C0
+void GameShutdown(void) {
+    fn_801210F8(lbl_805FAEB0);
+    fn_801F0560();
+    fn_802044B4(lbl_805FB7E8);
+    fn_80132BD8(gWorldState);
+    fn_80128C20(gWorldState);
+    fn_801ABD58();
+    fn_801F1920();
+    fn_801D2E9C();
+    gGameRunning = 0;
+
+    ReleaseBuffer(gBuffer803C73EC);
+    ReleaseBuffer(gBuffer803C741C);
+    ReleaseBuffer(gBuffer803C7434);
+    ReleaseBuffer(gBuffer803C744C);
+    ReleaseBuffer(gBuffer803C7404);
+    ReleaseBuffer(gBuffer803C7464);
+    ReleaseBuffer(gBuffer803C747C);
+
+    SirLoaderShutdown(gSirLoader);
+}
+
 // 0x8000EE4C
 // Installed as gSysEventCallback: escalate the pending exit request (reset < power).
 static void GameSysEventCallback(int event) {

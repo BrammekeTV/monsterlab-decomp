@@ -3,23 +3,26 @@
 #include <string.h>
 
 #include "engine/engine.h"
+#include "engine/view.h"
 #include "system/sys.h"
 
 int SysSprintf(char* buf, const char* fmt, ...);
 
 // ---- not yet decompiled ----
 extern "C" {
-void  MemInit(void);                         // 0x801D4094: carves a 0x3380000-byte pool out of MEM2
-void  CoreInit(void* ctx);                   // 0x801D5638
-void  CoreShutdown(void* ctx);               // 0x801D5674
+void* SysAllocMEM2Block(u32 size);          // 0x801FAEB0
 void  SysFreeMEM2Block(void* ptr);           // 0x801FAEC0
+void  HeapInit(void* heap, void* start, u32 size);   // 0x801EF8DC
+void  fn_80146A74(void);  void fn_8014826C(void);  void fn_80148308(void);  void fn_80146A78(void);
+void  CameraInit(void* camera);              // 0x801D8B50
+void  fn_801B402C(void*); void fn_801FD1F0(void*);
+void  fn_80151014(void);  void fn_80151244(void);
+void  RendClear(int flags, int a, int b, f32 depth);   // 0x801534F0
 void  RendInit(EngineMemCallbacks* mem);     // 0x8014E664
 void  RendSetFlagA(int on);                  // 0x8015124C
 void  SetRenderEnabled(int on);              // 0x80151258
 void  SgInit(EngineMemCallbacks* mem);       // 0x801695A4
 void  SgShutdown(void);                      // 0x80169604
-void* ViewCreate(void);                      // 0x80170374: identity matrices, aspect from SCGetAspectRatio
-void  ViewDestroy(void* view);               // 0x801704D8
 void  CameraSetFov(void* camera, f32 fov);   // 0x801D8ACC
 void  CameraUpdate(void* camera);            // 0x801D8C04
 void  CameraEndFrame(void* camera);          // 0x801D8D48
@@ -27,10 +30,12 @@ void  GameStart(int argc, char** argv);      // 0x8000EF04 (src/game/game_init.c
 void  DebugDrawStats(void);                  // 0x8016DAF4: "FPS=%.1f/%d (%.2fmsec)"
 
 void  fn_80162C1C(void);   void  fn_80162C28(void);
-void  fn_8014F0A0(void);   void  fn_801FBE04(void);
+void  RendBeginFrame(void); // 0x8014F0A0
+void  RendEndFrame(void);   // 0x801508AC: present
+void  fn_801FBE04(void);
 void  fn_80150014(void);   void  fn_8014855C(void);
-void  fn_801508AC(void);   void  fn_801FBE68(void);
-void  fn_801D19E8(void);   void  fn_800446BC(void*, int);
+void  fn_801FBE68(void);
+void  fn_800446BC(void*, int);
 void  fn_80170044(void*);  void  fn_801D1AFC(void);
 void  fn_8000F298(void);   void  fn_8016FB20(void*);
 void  fn_801D1BCC(void* out, void* view);
@@ -58,9 +63,12 @@ extern u8                  lbl_80401108[];
 s32                        gRendInitialized;     ORIG(0x805F9610)
 s32                        gRendTexelsInMEM2;    ORIG(0x805F95F8) // >= 0: texels/CLUTs get flag 0x80
 s32                        gUseAltRenderSetup;   ORIG(0x805F9214)
-void*                      gMainView;            ORIG(0x805FB75C)
+View*                      gMainView;            ORIG(0x805FB75C)
 static EngineFrameCallback sFrameCallback;       ORIG(0x805FB784)
 static s32                 sEngineSuspended;     ORIG(0x805FB788)
+static s32                 sEngineSuspendRequest; ORIG(0x805FB78C)
+u8                         gMainHeap[0x40];      ORIG(0x8047CAC0) // size unknown
+extern u8                  lbl_8047C7D8[], lbl_8047C7F0[];
 static s32                 sPendingWorldReset;   ORIG(0x805FB790)
 static GameSettings*       sGameSettings;        ORIG(0x805FB794)
 extern s32                 gHomeMenuOpen;        ORIG(0x805FB51C)
@@ -87,6 +95,34 @@ static const char* const sRendMemoryNames[] = {  ORIG(0x80384370)
 
 enum { REND_MEMORY_TEXELS = 6, REND_MEMORY_CLUT = 7 };
 enum { MEM_FLAG_0x80 = 0x80 };   // allocation flag, purpose not yet known (likely "MEM2 / GPU visible")
+
+#define MEM2_POOL_END 0x90400000u
+
+// 0x801D4094
+void MemInit(void) {
+    if (sMemPool == NULL) {
+        sMemPool = SysAllocMEM2Block(0x3380000);
+        // The heap runs up to the fixed address global_binary.sir is loaded at.
+        HeapInit(gMainHeap, sMemPool, MEM2_POOL_END - (u32)(uintptr_t)sMemPool);
+    }
+}
+
+// 0x801D5638
+void CoreInit(void* ctx) {
+    (void)ctx;
+    fn_80146A74();
+    fn_8014826C();
+    CameraInit(gCamera);
+    fn_801B402C(lbl_8047C7D8);
+}
+
+// 0x801D5674
+void CoreShutdown(void* ctx) {
+    (void)ctx;
+    fn_801FD1F0(lbl_8047C7F0);
+    fn_80148308();
+    fn_80146A78();
+}
 
 // 0x801D1504
 void EngineStartup(void* ctx) {
@@ -164,13 +200,13 @@ void EngineInit(void) {
     CameraSetFov(gCamera, 0.9272953f);   // atan(4/3): 53.13 degrees
     lbl_8040D500[0] = 1;                  // via an inlined identity getter (0x8015EC9C)
     SetRenderEnabled(TRUE);
-    fn_8014F0A0();
+    RendBeginFrame();
     fn_801FBE04();
     if (gUseAltRenderSetup) fn_80150014();
     else                    fn_8014855C();
 
     GameStart(gArgc, gArgv);
-    fn_801508AC();
+    RendEndFrame();
 }
 
 // 0x801D17FC
@@ -183,6 +219,30 @@ void EngineShutdown(void) {
 // 0x801D1828
 void EngineSetFrameCallback(EngineFrameCallback cb) {
     sFrameCallback = cb;
+}
+
+// 0x801D19E8
+// Applies a pending suspend/resume request. On resume, renders four cleared frames
+// so stale framebuffer contents never reach the screen.
+static void EngineApplySuspend(void) {
+    if (sEngineSuspended == sEngineSuspendRequest) return;
+
+    if (sEngineSuspendRequest == 1) {
+        fn_80151014();
+        fn_80151244();
+        RendBeginFrame();
+    } else {
+        for (int i = 0; i < 4; i++) {
+            if (i > 0) RendBeginFrame();
+            RendClear(7, 0, 0, 1.0f);
+            fn_80150014();
+            fn_801D603C();
+            fn_801FC0A0();
+            fn_801FC1EC();
+            RendEndFrame();
+        }
+    }
+    sEngineSuspended = sEngineSuspendRequest;
 }
 
 // 0x801D1AA0
@@ -211,10 +271,10 @@ static void EngineRunFrameCallback(void) {
 // 0x801D1838
 void EngineFrame(void) {
     if (!gHomeMenuOpen) fn_801FBE68();
-    fn_801D19E8();
+    EngineApplySuspend();
 
     if (!EngineIsSuspended()) {
-        fn_8014F0A0();
+        RendBeginFrame();
         CameraUpdate(gCamera);
 
         if (gWorldState[0xF5]) {
@@ -261,7 +321,7 @@ void EngineFrame(void) {
         fn_801D603C();
         fn_801FC0A0();
         fn_801FC1EC();
-        fn_801508AC();
+        RendEndFrame();
     } else {
         fn_8000F298();
         EngineRunFrameCallback();
