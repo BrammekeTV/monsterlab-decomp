@@ -21,7 +21,7 @@ void  PadResume(s32 chan);                              // 0x801B2D98
 void  SleepMicroseconds(int unused, u32 us);            // 0x80142818
 f32   TimerGetSeconds(void* timer);                     // 0x80142538
 void  TimerReset(void* timer);                          // 0x80142680
-BOOL  fn_8001425C(void);                                // region check (true on NTSC-U?)
+s32   GetRegion(void);                                // 0x8001425C: 0 = NA, 1 = EU
 BOOL  fn_801F56FC(s32);  void fn_801F38E8(s32); void fn_8013BD7C(void); void fn_801F5724(s32);
 void  ShowSystemMessage(const char* msg, BOOL (*poll)(void));   // 0x801EE588
 s32   GameHasSysEvent(void);                            // 0x8000CF8C
@@ -110,7 +110,7 @@ static BOOL NeverClose(void) {
 
 static inline const char* PickMessage(int kind) {
     const char* msg = sDiscErrorMessages[kind][gTextLanguage];
-    fn_8001425C();
+    GetRegion();
     if (msg == NULL) msg = sDiscErrorMessages[kind][0];
     if (msg == NULL) msg = sEmptyString;
     return msg;
@@ -156,7 +156,7 @@ static void DiscErrorHandler(void) {
             break;
         case DVD_STATE_RETRY: {
             const char* msg = sDiscErrorMessages[2][gTextLanguage];
-            if (fn_8001425C() && gTextLanguage == 0) msg = sDiscReadErrorAltEN;
+            if (GetRegion() && gTextLanguage == 0) msg = sDiscReadErrorAltEN;
             if (msg == NULL) msg = sDiscErrorMessages[2][0];
             if (msg == NULL) msg = sEmptyString;
             ShowSystemMessage(msg, DiscErrorPoll);

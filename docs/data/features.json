@@ -69,6 +69,11 @@
   "changelog": [
     {
       "date": "2026-11-17",
+      "time": "20:13",
+      "text": "Decompiled the core game-state block (reset, two-player turn timers with a 6-second hand-over, world update, camera follow reset) and the build info: this disc is EU build 519 from Aug 28 2008 (14:30)."
+    },
+    {
+      "date": "2026-11-17",
       "time": "20:11",
       "text": "Decompiled the save system: Wii NAND save file game.msa, save banner and icon setup (the banner defaults still name the engine's previous game, Death Jr. 2), read/write with NAND error codes, and the loading picture shown while saving."
     },

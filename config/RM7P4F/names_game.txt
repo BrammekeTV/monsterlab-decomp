@@ -225,3 +225,16 @@ fn_80184028 TextureRelease
 lbl_803C4A74 gLoadingImage
 lbl_805FB910 gStringTable
 lbl_805FB90C gStringTable2
+fn_80006B60 HudReload
+fn_80006BB4 GameStateReset
+fn_80006CA8 GameStateInit
+fn_80006CD4 GameUpdateTurnTimers
+fn_80006EF4 GameUpdateWorld
+fn_8000733C CameraFollowReset
+fn_801452A8 QuatGetAxisY
+fn_800D83C8 WorldUpdate
+fn_80014230 GetBuildDate
+fn_8001425C GetRegion
+fn_8001426C GetBuildString
+lbl_805FB948 gFlag805FB948
+lbl_803B53A0 gGame

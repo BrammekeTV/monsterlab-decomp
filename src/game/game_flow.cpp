@@ -11,7 +11,7 @@
 extern "C" {
 void  GameLog(int level, int category, const char* fmt, ...);   // 0x8000B2F0
 u8    SCGetLanguage(void);
-BOOL  fn_8001425C(void);
+s32   GetRegion(void);                         // 0x8001425C: 0 = NA, 1 = EU
 BOOL  fn_80147554(s32);
 void  fn_801FCA38(f32, f32);
 s64   TimerElapsed(void* timer);               // 0x801425DC
@@ -262,8 +262,9 @@ void GameInitLanguage(void) {
     case 4: gLanguage = gTextLanguage = LANG_ES; break;   // SC_LANG_SPANISH
     case 5: gLanguage = gTextLanguage = LANG_IT; break;   // SC_LANG_ITALIAN
     case 6:                                               // SC_LANG_DUTCH
-        if (!fn_8001425C()) { gTextLanguage = LANG_EN; gLanguage = LANG_NL; }
-        else                { gTextLanguage = LANG_NL; gLanguage = LANG_NL; }
+        // NA builds have no Dutch text, so it falls back to English.
+        if (GetRegion() == 0) { gTextLanguage = LANG_EN; gLanguage = LANG_NL; }
+        else                  { gTextLanguage = LANG_NL; gLanguage = LANG_NL; }
         break;
     default: gLanguage = gTextLanguage = LANG_EN; break;
     }
@@ -387,7 +388,6 @@ void MusicRequestStop(void) {
 
 // ---------------------------------------------------------------- audio listener
 
-struct Transform { Vec3 pos; f32 rot[9]; };
 struct PlayerObj { u8 pad[4]; Transform* xform; };
 
 // 0x8001011C
@@ -404,8 +404,8 @@ void AudioUpdateListener(void) {
         WorldGetPhase(world) == 2 && !lbl_805FB0E1) {
         Transform* xf = player->xform;
         pos = xf->pos;
-        MtxGetForward(xf->rot, &fwd);
-        up = MtxGetUp(player->xform->rot);
+        MtxGetForward((const f32*)&xf->rot, &fwd);
+        up = MtxGetUp((const f32*)&player->xform->rot);
     }
 
     AudioSetListenerPos(0, &pos);

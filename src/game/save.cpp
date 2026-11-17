@@ -81,7 +81,7 @@ u32         gBannerRect[8];            ORIG(0x805FAEFC)   // active layout
 static u32  sBannerUnk;                ORIG(0x805FAF1C)
 static u32  sBannerRectA[8];           ORIG(0x805FAF20)
 static u32  sBannerRectB[8];           ORIG(0x805FAF40)
-extern u8   gWidescreen;               ORIG(0x805FB948)
+extern u8   gFlag805FB948;               ORIG(0x805FB948)
 extern StringTable* gStringTable;      // 0x805FB910
 extern StringTable* gStringTable2;     ORIG(0x805FB90C)
 extern u8*  gSaveSystem;               ORIG(0x805FBBE0)
@@ -332,5 +332,5 @@ void SaveSelectBannerLayout(void) {
         sBannerUnk = 0;
         sBannerInit = 1;
     }
-    memcpy(gBannerRect, gWidescreen ? sBannerRectB : sBannerRectA, sizeof(gBannerRect));
+    memcpy(gBannerRect, gFlag805FB948 ? sBannerRectB : sBannerRectA, sizeof(gBannerRect));
 }
