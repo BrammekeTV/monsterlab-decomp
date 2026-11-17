@@ -1,15 +1,15 @@
 {
  "game_id": "RM7P4F",
- "generated": "2026-11-17T19:25:56+00:00",
- "commit": "7405793",
- "commit_date": "2026-11-17T20:21:37+01:00",
+ "generated": "2026-11-17T19:28:36+00:00",
+ "commit": "7d49138",
+ "commit_date": "2026-11-17T20:25:58+01:00",
  "game": {
   "functions": 8559,
   "bytes": 2277304,
-  "named": 2268,
-  "named_bytes": 344060,
-  "decompiled": 192,
-  "decompiled_bytes": 28764
+  "named": 2272,
+  "named_bytes": 345672,
+  "decompiled": 200,
+  "decompiled_bytes": 30804
  },
  "library": {
   "functions": 4028,
@@ -22,10 +22,10 @@
  "all": {
   "functions": 12587,
   "bytes": 3404928,
-  "named": 2714,
-  "named_bytes": 436500,
-  "decompiled": 192,
-  "decompiled_bytes": 28764
+  "named": 2718,
+  "named_bytes": 438112,
+  "decompiled": 200,
+  "decompiled_bytes": 30804
  },
  "game_range": [
   "80006B40",
@@ -57,11 +57,11 @@
    0.732
   ],
   [
-   0.335,
-   0.828
+   0.538,
+   0.863
   ],
   [
-   0.014,
+   0.05,
    0.744
   ],
   [
@@ -186,7 +186,7 @@
   ],
   [
    0.0,
-   0.0
+   0.126
   ],
   [
    0.0,
@@ -414,7 +414,7 @@
   ],
   [
    0.0,
-   0.028
+   0.03
   ],
   [
    0.0,
@@ -766,7 +766,7 @@
   ],
   [
    0.0,
-   0.479
+   0.493
   ],
   [
    0.0,
@@ -1435,6 +1435,26 @@
      "size": 292
     },
     {
+     "name": "PatrolIdleUpdate",
+     "addr": "80014A38",
+     "size": 284
+    },
+    {
+     "name": "CombatPlaceholderEntry",
+     "addr": "80014B54",
+     "size": 208
+    },
+    {
+     "name": "CombatPlaceholderExit",
+     "addr": "80014C24",
+     "size": 312
+    },
+    {
+     "name": "CombatPlaceholderUpdate",
+     "addr": "80014D5C",
+     "size": 176
+    },
+    {
      "name": "EntityReverseDirection",
      "addr": "80014E0C",
      "size": 100
@@ -1453,6 +1473,11 @@
      "name": "EntityWaitUpdate",
      "addr": "80014F00",
      "size": 4
+    },
+    {
+     "name": "MovingChallengeFaceCamera",
+     "addr": "80014F04",
+     "size": 284
     },
     {
      "name": "MovingChallengeGameEntry",
@@ -1495,6 +1520,11 @@
      "size": 60
     },
     {
+     "name": "PumpkinEscapeUpdate",
+     "addr": "800156C8",
+     "size": 152
+    },
+    {
      "name": "PumpkinDeathEntry",
      "addr": "80015760",
      "size": 36
@@ -1533,6 +1563,16 @@
      "name": "HazardDustCloudUpdate",
      "addr": "80015BF0",
      "size": 80
+    },
+    {
+     "name": "ShakePromptBlink",
+     "addr": "80015C40",
+     "size": 304
+    },
+    {
+     "name": "PlayerInCombatRange",
+     "addr": "800160C4",
+     "size": 320
     },
     {
      "name": "CharacterStartIdleAction",

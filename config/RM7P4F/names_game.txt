@@ -270,3 +270,7 @@ fn_800D5718 PathGetPosition
 fn_800D87EC WorldSendEvent
 fn_800D8854 WorldSetFocus
 fn_801DC91C RegisterScriptFunc
+fn_80015C40 ShakePromptBlink
+fn_800D56E0 PathAtWaypoint
+fn_80195464 UIFindElement
+fn_8005B650 CharacterFaceDirection

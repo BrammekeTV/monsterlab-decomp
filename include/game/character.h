@@ -15,10 +15,12 @@ struct PathFollower {
     PathState* s;
 };
 
+// Scene node of a character (Character::def).
 struct CharacterDef {
-    u8  pad00[0x1C];
-    u32 flags;         // 0x1C: 0x10 = moving character, 0x1000, 0x2000 = has AI, ...
-    u32 stateFlags;    // 0x20: 0x80 = dead/removed, 0x400000 = boss
+    Vec3 pos;          // 0x00
+    Quat rot;          // 0x0C
+    u32  flags;        // 0x1C: 0x10 = moving character, 0x2000 = animated, 0x4000 = combat-only, ...
+    u32  stateFlags;   // 0x20: 0x1 = active, 0x80 = dead/removed, 0x400000 = boss
 };
 
 struct Character {
@@ -35,7 +37,11 @@ struct Character {
     u32           flags838;      // 0x838
     u8            pad83C[8];
     Vec3          velocity;      // 0x844
-    u8            pad850[0x188];
+    u8            pad850[0x2C];
+    s32           unk87C;        // 0x87C
+    u8            pad880[0x15];
+    u8            unk895;        // 0x895
+    u8            pad896[0x142];
     s32           unk9D8;        // 0x9D8
     u8            pad9DC[8];
     f32           waitTimer;     // 0x9E4
@@ -43,9 +49,15 @@ struct Character {
     f32           pathSpeed;     // 0x9F4
     u8            pad9F8[8];
     PathFollower* path;          // 0xA00
-    u8            padA04[0x23C];
+    u8            padA04[0x1DB];
+    u8            unkBDF;        // 0xBDF
+    u8            padBE0[0x60];
     f32           unkC40;        // 0xC40
     f32           unkC44;        // 0xC44
+    u8            padC48[0x38];
+    u8            unkC80;        // 0xC80
+    u8            padC81;
+    u8            unkC82;        // 0xC82
 };
 
 // Context passed to every script/AI state callback; the entity is at +0x10.
@@ -66,4 +78,5 @@ BOOL PathIsPaused(PathFollower* p);                   // 0x800D5DCC
 void PathReverse(PathFollower* p);                    // 0x800D6A00
 void PathSetSpeed(PathFollower* p, f32 speed);        // 0x800D6A18
 Vec3* PathGetPosition(PathFollower* p);               // 0x800D5718
+BOOL PathAtWaypoint(PathFollower* p);                 // 0x800D56E0
 }

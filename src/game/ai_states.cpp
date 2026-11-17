@@ -22,6 +22,13 @@ void  fn_8004CE44(void* player);
 void  UIElement_SetVisibleFlag(u32 hash, BOOL on);
 void  UIScreen_PopScreen(u32 hash);
 s32   RegisterScriptFunc(const char* name, s32 type, void* fn);  // 0x801DC91C
+BOOL  fn_800E6BD4(void);
+s32   WorldGetPhase(void* world);                                 // 0x800D83A8
+void  PauseAllExplorationEnemies(void);
+void* UIFindElement(u32 hash);                                    // 0x80195464
+void  CharacterFaceDirection(Character* c, const Vec3* dir, BOOL now);   // 0x8005B650
+BOOL  fn_8004D170(void* chr);
+BOOL  fn_80050F88(void);
 }
 
 extern void* gEventMgr;              // 0x805FB6C8
@@ -29,6 +36,7 @@ extern void* gObjDb;                 // 0x805FB180
 extern u8*   gSaveSystem;            // 0x805FBBE0
 extern u8*   lbl_805FBBC8;
 extern u8    gGame[];                // 0x803B53A0
+extern u8    gScriptCtx[];           // 0x803C4298
 
 #define WORLD           (gGame + 0xD5F0)
 #define PLAYER          (*(void**)(gGame + 0xD614))
@@ -74,7 +82,7 @@ void EntityReverseDirection(ScriptCtx* ctx) {
     Character* c = ctx->chr;
     if (c == NULL || c->path == NULL) return;
     PathReverse(c->path);
-    *(Vec3*)c->def = *PathGetPosition(c->path);   // def->+0x00: spawn position
+    c->def->pos = *PathGetPosition(c->path);
 }
 
 // 0x80014E70
@@ -236,20 +244,170 @@ void CharacterStartIdleAction(ScriptCtx* ctx) {
     }
 }
 
+void PatrolIdleExit(ScriptCtx* ctx);
+void character_exploration_move_update(ScriptCtx* ctx);
+
+// 0x80014A38
+void PatrolIdleUpdate(ScriptCtx* ctx) {
+    Character* c = ctx->chr;
+    if (c == NULL) return;
+
+    if (!c->unk895) {
+        if (fn_800E6BD4() || *(s32*)(gSaveSystem + 0xA1C) != 0 || WorldGetPhase(WORLD) != 2) {
+            SendSelf(c, 0x4F9213C1);
+            return;
+        }
+    }
+    if (c->unk87C == 0) return;
+
+    if (c->path != NULL && (!PathAtWaypoint(c->path) || c->unkC40 > c->unkC44)) {
+        PathSetMoving(c->path, FALSE);
+        SendSelf(c, 0x705B8B52);
+    } else {
+        c->unkC40 += c->dt;
+    }
+}
+
+#define EVENT_START_COMBAT 0xDDE9264F
+
+// 0x80014B54
+void CombatPlaceholderEntry(ScriptCtx* ctx) {
+    Character* c = ctx->chr;
+    if (c == NULL) return;
+
+    Character* player = (Character*)PLAYER;
+    if (c == player) {
+        GameFlowSignal(EVENT_START_COMBAT, 0, 0);
+        PauseAllExplorationEnemies();
+    } else {
+        if (player != NULL) EventSend(gEventMgr, player, c, EVENT_START_COMBAT, 0, 0, 0, 0);
+        c->def->stateFlags |= CHAR_BOSS;
+        *(s32*)(gSaveSystem + 0x130) = c->id;
+    }
+    if (c->path != NULL) PathSetMoving(c->path, TRUE);
+    c->unkC82 = 0;
+    c->waitTimer = 0.0f;
+}
+
+// 0x80014D5C
+void CombatPlaceholderUpdate(ScriptCtx* ctx) {
+    Character* c = ctx->chr;
+    if (c == NULL) return;
+
+    Character* player = (Character*)PLAYER;
+    if (c != player) {
+        if (player != NULL) EventSend(gEventMgr, player, c, EVENT_START_COMBAT, 0, 0, 0, 0);
+        return;
+    }
+    c->waitTimer += c->dt;
+    if (c->waitTimer > 1.0f) {
+        GameFlowSignal(EVENT_START_COMBAT, 0, 0);
+        c->waitTimer = 0.0f;
+    }
+}
+
+// 0x800156C8
+void PumpkinEscapeUpdate(ScriptCtx* ctx) {
+    Character* c = ctx->chr;
+    if (c == NULL) return;
+    if (PathAtWaypoint(c->path)) {
+        if (c->waitTimer > 2.0f) SendSelf(c, 0x33EE55C6);
+        else                     PatrolIdleExit(ctx);
+    }
+    character_exploration_move_update(ctx);
+}
+
+// UI element (secondary vtable at +0x138; CodeWarrior multiple inheritance).
+struct UIElement { u8 pad[0x64]; u32 flags; u8 pad68[0xD0]; void** vtbl2; };
+typedef void (*UIStateFn)(UIElement*, int);
+
+// 0x80015C40
+// Blink the "shake" prompt: swap which of two button icons is lit (player 1 uses its own pair).
+BOOL ShakePromptBlink(s32 player, f32 phase) {
+    UIElement_SetVisibleFlag(0x552FC6C7, TRUE);
+    if (!(phase > 0.5f)) return FALSE;
+
+    UIElement* a = (UIElement*)UIFindElement(0x1A9EE60F);
+    UIElement* b = (UIElement*)UIFindElement(0x8D6D65B1);
+    if (player == 1) {
+        a = (UIElement*)UIFindElement(0xC4E94BB0);
+        b = (UIElement*)UIFindElement(0xB2601D05);
+    }
+    if (a != NULL && b != NULL) {
+        if (a->flags & 2) {
+            ((UIStateFn)a->vtbl2[0x30 / 4])(a, 2);
+            ((UIStateFn)b->vtbl2[0x2C / 4])(b, 2);
+        } else {
+            ((UIStateFn)a->vtbl2[0x2C / 4])(a, 2);
+            ((UIStateFn)b->vtbl2[0x30 / 4])(b, 2);
+        }
+    }
+    return TRUE;
+}
+
+// 0x80014C24
+// Leaving combat: combat-only characters disappear; everyone else in the level is told
+// whether this one stopped at a waypoint.
+void CombatPlaceholderExit(ScriptCtx* ctx) {
+    Character* c = ctx->chr;
+    if (c == NULL) return;
+    c->unkC82 = 1;
+    if (c->path == NULL) return;
+    PathSetMoving(c->path, FALSE);
+
+    if (c->def->flags & 0x4000) {
+        Kill(c);
+        return;
+    }
+    Character** chars = (Character**)(gGame + 0x140);
+    for (int i = 0; i < 32; i++) {
+        Character* e = chars[i];
+        if (e == NULL || !(e->def->stateFlags & 1) || !(e->def->flags & 0x4000)) continue;
+        if (PathAtWaypoint(c->path)) EventSend(gEventMgr, e, NULL, 0x33EE55C6, 0, 0, 0, 0);
+        else                         EventSend(gEventMgr, e, NULL, 0x00F4D7AB, 0, 0, 0, 0);
+    }
+}
+
+// 0x80014F04
+void MovingChallengeFaceCamera(ScriptCtx* ctx) {
+    Character* c = ctx->chr;
+    if (c == NULL) return;
+    const Vec3* cam = *(Vec3**)(*(u8**)(gScriptCtx + 4) + 4);
+    Vec3 d = { cam->x - c->def->pos.x, cam->y - c->def->pos.y, cam->z - c->def->pos.z };
+    Vec3 dir = Vec3Normalized(d);
+    CharacterFaceDirection(c, &dir, TRUE);
+}
+
+// 0x800160C4
+// Combat starts when an active enemy comes within sqrt(2) units of the exploring player.
+BOOL PlayerInCombatRange(ScriptCtx* ctx) {
+    BOOL inRange = FALSE;
+    Character* c = ctx->chr;
+    Character* player = (Character*)PLAYER;
+    if (c == NULL || player == NULL) return FALSE;
+    if (fn_8004D170(player) || !c->unkBDF || fn_800E6BD4() || !fn_80050F88()) return FALSE;
+    if (WorldGetPhase(WORLD) != 2) return FALSE;
+
+    u32 f = c->def->stateFlags;
+    if ((f & (CHAR_BOSS | CHAR_DEAD)) || !(f & 1)) return FALSE;
+
+    const Vec3& p = player->def->pos;
+    Vec3 d = { p.x - c->def->pos.x, p.y - c->def->pos.y, p.z - c->def->pos.z };
+    if (Vec3LengthSq(d) < 2.0f) {
+        *(s32*)(gSaveSystem + 0x138) = -1;
+        player->unkC80 = 1;
+        inRange = TRUE;
+    }
+    return inRange;
+}
+
 // Not yet decompiled callbacks.
 void PatrolIdleExit(ScriptCtx* ctx);
-void PatrolIdleUpdate(ScriptCtx* ctx);
-void CombatPlaceholderEntry(ScriptCtx* ctx);
-void CombatPlaceholderExit(ScriptCtx* ctx);
-void CombatPlaceholderUpdate(ScriptCtx* ctx);
 void PumpkinShakeEntry(ScriptCtx* ctx);
 void PumpkinShakeExit(ScriptCtx* ctx);
 void PumpkinShakeUpdate(ScriptCtx* ctx);
 void ObstacleShakeEntry(ScriptCtx* ctx);
 void ObstacleShakeUpdate(ScriptCtx* ctx);
-void PumpkinEscapeUpdate(ScriptCtx* ctx);
-void MovingChallengeFaceCamera(ScriptCtx* ctx);
-BOOL PlayerInCombatRange(ScriptCtx* ctx);
 
 // 0x80014350
 void RegisterAiStateCallbacks(void) {
