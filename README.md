@@ -106,6 +106,7 @@ These live in the platform layer (`src/platform/`) that replaces the Wii SDK, so
 
 - `python tools/xref.py func <name|addr>` shows a function's calls, referenced strings and callers. `python tools/xref.py strings <regex>` finds functions by the strings they use.
 - `python tools/decomp.py <name|0xADDR>...` writes an automatic C draft of a function to `build/m2c/` using [m2c](https://github.com/matt-kempster/m2c) (one-time setup: `git clone https://github.com/matt-kempster/m2c tools/m2c` and `pip install "graphviz~=0.20.1"`). The draft is only a starting point; types, names and logic are fixed by hand before code goes into `src/`.
+- `python tools/gen_leaf.py` regenerates `src/leaf/`: small straight-line functions (getters, setters, constant returns, empty stubs, bitfield and float accessors) translated instruction by instruction. To decompile one of them properly, write it in a normal source file with its `// 0xADDRESS` marker and re-run the script; it skips functions that are already decompiled.
 - `sh tools/fn.sh <name>` prints a function's asm. `sh tools/dump.sh <name>...` prints a compact version.
 - `python tools/todo.py <object>` lists an object's functions, their size and whether they're decompiled.
 - `python tools/script_funcs.py` lists every script callback the game registers by name (`RegisterScriptFunc`); this is where most original function names come from.
