@@ -20,7 +20,7 @@ extern u8   gFlag805FB948;                   ORIG(0x805FB948)  // two-player mod
 extern u8*  gSaveSystem;                     // 0x805FBBE0
 extern u8*  lbl_805FBBC8;
 extern f32  lbl_805F95A0, lbl_805FB314, lbl_805FB300;
-extern u8   gCameraFlag, lbl_805FB1A1, lbl_805FB1A0;     // gCameraFlag: camera_script.cpp
+extern u8   gIgcMode, lbl_805FB1A1, lbl_805FB1A0;     // gIgcMode: camera_script.cpp
 extern s32  gCameraLocks;
 extern void* gCameraOwner;
 
@@ -73,7 +73,7 @@ void GameStateReset(GameState* g) {
     g->turnTimer[1] = -1.0f;
     lbl_805F95A0 = 1.0f;
     lbl_805FB314 = 0.0f;
-    gCameraFlag = 0;
+    gIgcMode = 0;
     lbl_805FB1A1 = 0;
     gCameraLocks = 0;
     gCameraOwner = 0;

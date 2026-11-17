@@ -41,7 +41,7 @@ typedef void (*CamSetTimeFn)(CameraCtl*, f32);
 enum { CAM_MODE_FREE = 5, CAM_MODE_FIXED = 6, CAM_MODE_7 = 7 };
 
 Character*        gCameraOwner;    ORIG(0x805FAF60)
-u8                gCameraFlag;     ORIG(0x805FAF64)
+u8                gIgcMode;        ORIG(0x805FAF64) // in-game cutscene mode
 s32               gCameraLocks;    ORIG(0x805FAF68)
 
 // Animation component (Character + 0xA0).
@@ -121,7 +121,7 @@ void acquire_camera_semaphore(ScriptCtx* ctx) {
 void release_camera_semaphore(ScriptCtx* ctx) {
     if (gCameraOwner == ctx->chr) gCameraOwner = NULL;
     if (--gCameraLocks < 0) gCameraLocks = 0;
-    if (gCameraLocks <= 0) gCameraFlag = 0;
+    if (gCameraLocks <= 0) gIgcMode = 0;
 }
 
 // 0x80018EB4
@@ -187,4 +187,95 @@ void fn_800190C4(void) {
 void force_fixed_camera_return(ScriptCtx* ctx) {
     (void)ctx;
     CAM_RETURN_FIXED(CAMERA());
+}
+
+// ---------------------------------------------------------------- triggers and IGC mode
+
+extern "C" {
+void  TriggerEndCamera(Character* trigger, int a);      // 0x8006D3C8
+void  EventSendTo(void* mgr, u32 event, void* from, u32 arg, int a, int b);   // 0x801BA2FC
+void  RequestSend(void* ctx, u32 request, u32 arg);     // 0x801BBAEC
+void  RequestComplete(void* ctx, u32 request, u32 arg); // 0x801BBB0C
+void  DebugPing(const char* msg, u32 color);            // 0x80121898 (empty in release)
+}
+extern void* gEventMgr;            // 0x805FB6C8
+extern u8    lbl_805FB1A1;
+
+#define SCRIPT_ARG2(ctx) (*(u32*)((u8*)(ctx) + 0x20))
+
+// 0x80019420
+void end_trigger_camera(ScriptCtx* ctx) {
+    if (ctx->chr == NULL) return;
+    TriggerEndCamera(ctx->chr, 0);
+}
+
+// 0x80019438
+void send_event(ScriptCtx* ctx) {
+    EventSendTo(gEventMgr, SCRIPT_ARG(ctx), ctx->chr, SCRIPT_ARG2(ctx), 0, 0);
+}
+
+// 0x80019458
+void send_request(ScriptCtx* ctx) {
+    RequestSend(ctx, SCRIPT_ARG(ctx), SCRIPT_ARG2(ctx));
+}
+
+// 0x80019464
+void send_request_complete_80019464(ScriptCtx* ctx) {
+    RequestComplete(ctx, SCRIPT_ARG(ctx), SCRIPT_ARG2(ctx));
+}
+
+// 0x80019470
+void send_request_complete_80019470(void) {
+    DebugPing("ping", 0x00A4FFFF);
+}
+
+// 0x80019480
+// Trigger timeout (seconds) from the sensor's parameter, clamped to 0..30.
+void set_timeout_from_sensor_param(ScriptCtx* ctx) {
+    Character* sensor = ctx->chr;
+    if (sensor == NULL) return;
+    f32 t = *(f32*)((u8*)sensor + 0x158);
+    if (t > 30.0f) t = 30.0f;
+    if (t < 0.0f) t = 0.0f;
+    *(f32*)((u8*)ctx + 0x4C) = t;
+    *(f32*)((u8*)ctx + 0x50) = t;
+}
+
+// 0x800194BC
+// A finished trigger broadcasts its two configured "on done" events.
+void broadcast_on_done_event(ScriptCtx* ctx) {
+    u8* t = (u8*)ctx->chr;
+    if (t == NULL) return;
+    u32 arg = *(u32*)(t + 0x15C);
+    if (arg == 0) return;
+    u32 ev1 = *(u32*)(t + 0x184);
+    if (ev1 != 0) EventSendTo(gEventMgr, ev1, t, arg, 0, 0);
+    u32 ev2 = *(u32*)(t + 0x188);
+    if (ev2 != 0) EventSendTo(gEventMgr, ev2, t, arg, 0, 0);
+}
+
+// 0x80019548
+void set_igc_mode(ScriptCtx* ctx) {
+    (void)ctx;
+    gIgcMode = 1;
+}
+
+// 0x80019554
+void set_igc_mode_from_sensor_param(ScriptCtx* ctx) {
+    Character* sensor = ctx->chr;
+    if (sensor == NULL) return;
+    if (*(f32*)((u8*)sensor + 0x160) != 0.0f) gIgcMode = 1;
+}
+
+// 0x8001957C
+void clear_igc_mode(ScriptCtx* ctx) {
+    (void)ctx;
+    if (gCameraLocks > 0) return;
+    gIgcMode = 0;
+}
+
+// 0x80019594
+BOOL special_camera_done_slerping(ScriptCtx* ctx) {
+    (void)ctx;
+    return lbl_805FB1A1 == 0;
 }

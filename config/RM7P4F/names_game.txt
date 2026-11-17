@@ -323,5 +323,10 @@ fn_8018BE78 AnimGetTime
 fn_8018C07C AnimGetLength
 fn_801B9BC4 PadConsumeButtons
 lbl_805FAF60 gCameraOwner
-lbl_805FAF64 gCameraFlag
+lbl_805FAF64 gIgcMode
 lbl_805FAF68 gCameraLocks
+fn_8006D3C8 TriggerEndCamera
+fn_801BA2FC EventSendTo
+fn_801BBAEC RequestSend
+fn_801BBB0C RequestComplete
+fn_80121898 DebugPing

@@ -1,15 +1,15 @@
 {
  "game_id": "RM7P4F",
- "generated": "2026-11-17T19:50:05+00:00",
- "commit": "8af4cc0",
- "commit_date": "2026-11-17T20:48:31+01:00",
+ "generated": "2026-11-17T19:50:49+00:00",
+ "commit": "ab7ab3f",
+ "commit_date": "2026-11-17T20:50:07+01:00",
  "game": {
   "functions": 8559,
   "bytes": 2277304,
-  "named": 2318,
-  "named_bytes": 356028,
-  "decompiled": 274,
-  "decompiled_bytes": 45936
+  "named": 2323,
+  "named_bytes": 356784,
+  "decompiled": 285,
+  "decompiled_bytes": 46324
  },
  "library": {
   "functions": 4028,
@@ -22,10 +22,10 @@
  "all": {
   "functions": 12587,
   "bytes": 3404928,
-  "named": 2764,
-  "named_bytes": 448468,
-  "decompiled": 274,
-  "decompiled_bytes": 45936
+  "named": 2769,
+  "named_bytes": 449224,
+  "decompiled": 285,
+  "decompiled_bytes": 46324
  },
  "game_range": [
   "80006B40",
@@ -65,7 +65,7 @@
    0.918
   ],
   [
-   0.437,
+   0.481,
    0.817
   ],
   [
@@ -222,7 +222,7 @@
   ],
   [
    0.0,
-   0.004
+   0.052
   ],
   [
    0.0,
@@ -554,7 +554,7 @@
   ],
   [
    0.0,
-   0.195
+   0.196
   ],
   [
    0.0,
@@ -834,11 +834,11 @@
   ],
   [
    0.0,
-   0.097
+   0.12
   ],
   [
    0.0,
-   0.08
+   0.093
   ],
   [
    0.0,
@@ -1713,6 +1713,61 @@
      "name": "force_fixed_camera_return",
      "addr": "800190C8",
      "size": 28
+    },
+    {
+     "name": "end_trigger_camera",
+     "addr": "80019420",
+     "size": 24
+    },
+    {
+     "name": "send_event",
+     "addr": "80019438",
+     "size": 32
+    },
+    {
+     "name": "send_request",
+     "addr": "80019458",
+     "size": 12
+    },
+    {
+     "name": "send_request_complete_80019464",
+     "addr": "80019464",
+     "size": 12
+    },
+    {
+     "name": "send_request_complete_80019470",
+     "addr": "80019470",
+     "size": 16
+    },
+    {
+     "name": "set_timeout_from_sensor_param",
+     "addr": "80019480",
+     "size": 60
+    },
+    {
+     "name": "broadcast_on_done_event",
+     "addr": "800194BC",
+     "size": 140
+    },
+    {
+     "name": "set_igc_mode",
+     "addr": "80019548",
+     "size": 12
+    },
+    {
+     "name": "set_igc_mode_from_sensor_param",
+     "addr": "80019554",
+     "size": 40
+    },
+    {
+     "name": "clear_igc_mode",
+     "addr": "8001957C",
+     "size": 24
+    },
+    {
+     "name": "special_camera_done_slerping",
+     "addr": "80019594",
+     "size": 16
     }
    ]
   },
