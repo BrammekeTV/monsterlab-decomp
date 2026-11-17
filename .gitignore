@@ -16,3 +16,4 @@ objdiff.json
 compile_commands.json
 
 out/
+tools/m2c/
