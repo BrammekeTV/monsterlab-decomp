@@ -4,8 +4,8 @@
   "game": {
    "functions": 8559,
    "bytes": 2277304,
-   "named": 240,
-   "named_bytes": 65200,
+   "named": 2257,
+   "named_bytes": 342784,
    "decompiled": 169,
    "decompiled_bytes": 26172
   },

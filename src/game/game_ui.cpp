@@ -96,7 +96,7 @@ void fn_8000C7C8(void) {
 
 // 0x8000C7D0
 // Queue a screen to show after `delay` seconds.
-void UiQueueScreen(s32 id, s32 arg1, s32 arg2, f32 delay) {
+void GameFlowDelayedSignal(s32 id, s32 arg1, s32 arg2, f32 delay) {
     gPendingScreenId = id;
     gPendingScreenArg1 = arg1;
     gPendingScreens = SIR_SCREENS;
@@ -105,17 +105,17 @@ void UiQueueScreen(s32 id, s32 arg1, s32 arg2, f32 delay) {
 }
 
 // 0x8000C7F4
-void UiShowScreen(s32 id, s32 arg1, s32 arg2) {
+void GameFlowSignal(s32 id, s32 arg1, s32 arg2) {
     ScreenMgrShow(gScreenMgr, SIR_SCREENS, 0, id, arg1, arg2, 0, 0);
 }
 
 // 0x8000C820
-void UiRequestQuit(s32 quit) {
+void SetWorldRender(s32 quit) {
     gUiQuitRequested = quit;
 }
 
 // 0x8000C828
-BOOL UiIsInactive(void) {
+BOOL GameFlowStopped(void) {
     return gUiActive == 0;
 }
 
@@ -141,22 +141,22 @@ void UiUpdate(f32 dt) {
 }
 
 // 0x8000C940
-void UiSetScreensFlag200(void) {
+void GameFlowSleep(void) {
     ((ScreenList*)SIR_SCREENS)->flags |= 0x200;
 }
 
 // 0x8000C95C
-void UiSetHudMode(s32 mode) {
+void GameFlowPush(s32 mode) {
     HudSetMode(SIR_HUD, mode);
 }
 
 // 0x8000C970
-void UiHudFadeIn(void) {
+void GameFlowPop(void) {
     ((u8*)SIR_HUD)[0x430] = 1;
 }
 
 // 0x8000C988
-BOOL UiCanOpenMenu(void) {
+BOOL IsPlayerLoaded(void) {
     if (*(s32*)(gScriptCtx + 0x18) != 5) return FALSE;
     if (WorldGetPhase(gGame + 0x10000 - 0x2A10) == 6) return fn_8003CF40();
     return TRUE;
@@ -249,7 +249,7 @@ void fn_8000CD8C(void) {
 }
 
 // 0x8000CD90
-BOOL UiIsScreenSetLoaded(s32 id) {
+BOOL IsUISlotActive(s32 id) {
     BOOL loaded = FALSE;
     u8* set = (u8*)ScreenSetsFind(gScreenSets, id);
     if (set != NULL) loaded = ZoneIsLoaded(gWorldState, *(s32*)(set + 4));
@@ -272,43 +272,43 @@ void fn_8000CE0C(void) {
 }
 
 // 0x8000CE20
-BOOL GameIsInMode2(void) {
+BOOL GameFlowQuitGameDone(void) {
     return gGameMode == 2;
 }
 
 // 0x8000CE34
-void ScriptSetVar4(s32 value) {
+void GameFlowPauseGame(s32 value) {
     ScriptSetVar(gScriptCtx, 4, value);
 }
 
 // 0x8000CE48
-s32 ScriptGetVar4(void) {
+s32 GameFlowResumeGame(void) {
     return ScriptGetVar(gScriptCtx, 4);
 }
 
 // 0x8000CE58
-void UiPushScreenSet(s32 id) {
+void SetCursor(s32 id) {
     ScreenSetsPush(gScreenSets, id);
 }
 
 // 0x8000CE64
-void UiPopScreenSet(s32 id) {
+void ShowCursor(s32 id) {
     ScreenSetsPop(gScreenSets, id);
 }
 
 // 0x8000CE70
-void UiFlushScreenSets(void) {
+void DeleteCursor(void) {
     ScreenSetsFlush(gScreenSets);
 }
 
 // 0x8000CE78
-s32 UiScreenSetCount(void) {
+s32 GetCursorPos(void) {
     if (gScreenSets == NULL) return 0;
     return ScreenSetsCount(gScreenSets);
 }
 
 // 0x8000CE90
-BOOL UiIsCurrentScreen(s32 id) {
+BOOL IfCurrentGameFlowStateIs(s32 id) {
     ScreenList* list = (ScreenList*)SIR_SCREENS;
     u8* entry = (list->current > -1) ? list->table->entries + list->current * 0x30 : NULL;
     s32 cur = entry ? *(s32*)(entry + 4) : 0;
@@ -316,11 +316,11 @@ BOOL UiIsCurrentScreen(s32 id) {
 }
 
 // 0x8000CEE4
-BOOL IsActivePlayer1(s32 player) {
+BOOL IfTestTypeIs(s32 player) {
     return PlayerIndexOf(InputGetPlayer(gInput)) == player;
 }
 
 // 0x8000CF28
-BOOL IsActivePlayer2(s32 player) {
+BOOL IfTestNameIs(s32 player) {
     return PlayerIndexOf(InputGetPlayer2(gInput)) == player;
 }

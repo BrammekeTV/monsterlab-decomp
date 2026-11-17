@@ -28,8 +28,8 @@ void* StringsLookup(void* strings, s32 id);    // 0x80199AEC
 struct LoadingAnim* LoadingAnimCreate(void* lines[6]);   // 0x80120FD8
 u32   StringHash(const char* s);               // 0x801EB704
 void  MusicPlay(const char* name, u8 loop, f32 volume);  // 0x8020AA94
-void  MusicStop(void);                         // 0x8020AF2C
-void  MusicSetPaused(BOOL paused);             // 0x8020AFB0
+void  StopMusic(void);                         // 0x8020AF2C
+void  PauseMusic(BOOL paused);             // 0x8020AFB0
 s32   WorldGetPhase(void* world);              // 0x800D83A8
 void  Vec3Zero(Vec3* v);                       // 0x800DB944
 void  Vec3Forward(Vec3* v);                    // 0x800DB888
@@ -240,7 +240,7 @@ extern "C" s32 LoadingScreenTick2(int unused, f32 dt) {
 
 // 0x8000E394
 // Set up the loading animation with six lines of text from the current screen set.
-void LoadingScreenBegin(s32 s0, s32 s1, s32 s2, s32 s3, s32 s4, s32 s5) {
+void InitLoadProgressProjectile(s32 s0, s32 s1, s32 s2, s32 s3, s32 s4, s32 s5) {
     s32 ids[6] = { s0, s1, s2, s3, s4, s5 };
     void* lines[6];
     for (int i = 0; i < 6; i++) {
@@ -357,7 +357,7 @@ extern "C" void MusicUpdate(void) {
 
     u32 state = flags & MUSIC_STATE_MASK;
     if (flags & MUSIC_REQ_STOP) {
-        MusicStop();
+        StopMusic();
         state &= ~(MUSIC_PLAYING | MUSIC_PAUSED);
     } else if (flags & MUSIC_REQ_PLAY) {
         if (sMusicName[0] != '\0') {
@@ -366,12 +366,12 @@ extern "C" void MusicUpdate(void) {
         }
     } else if (flags & MUSIC_REQ_PAUSE) {
         if (state & MUSIC_PLAYING) {
-            MusicSetPaused(TRUE);
+            PauseMusic(TRUE);
             state = (state | MUSIC_PAUSED) & ~MUSIC_PLAYING;
         }
     } else if (flags & MUSIC_REQ_RESUME) {
         if (state & MUSIC_PAUSED) {
-            MusicSetPaused(FALSE);
+            PauseMusic(FALSE);
             state = (state & ~MUSIC_PAUSED) | MUSIC_PLAYING;
         }
     }

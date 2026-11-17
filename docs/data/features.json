@@ -69,6 +69,11 @@
   "changelog": [
     {
       "date": "2026-11-17",
+      "time": "20:21",
+      "text": "Recovered about 2,000 original function names from the game's script-callback tables (e.g. PumpkinShakeUpdate, DiggingPlayThrustAnim, PuzzleMovePiece, InterpolateQuaternionTask::Update_SLERP). Named game functions jumped from 240 to 2,257, and about 20 earlier guessed names were corrected to the real ones."
+    },
+    {
+      "date": "2026-11-17",
       "time": "20:16",
       "text": "Decompiled the play-session block: restoring saved object states into a zone, temporarily disabled objects that re-enable on a timer, the session timer, and the moving-character registry (max 20 per level, tracking the player and enemy indices)."
     },
