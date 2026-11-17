@@ -58,3 +58,23 @@ fn_801EFC7C StringTableInit
 fn_801427F0 GetRandomSeed
 fn_80337170 srand
 fn_80337150 rand
+# game_update.cpp / misc
+fn_8000D9EC GameUpdate
+fn_801D1830 EngineRequestSuspend
+fn_80131A20 AcquireZoneSlot
+fn_80131C28 ReleaseZoneSlot
+fn_8000B2F0 GameLog
+fn_8015DE24 VideoIsPal50
+fn_801FF708 AudioSetPaused
+fn_802049E0 MoviePlay
+fn_801534F0 RendClear
+fn_8014F0A0 RendBeginFrame
+fn_801508AC RendEndFrame
+fn_801D19E8 EngineApplySuspend
+fn_801FAEB0 SysAllocMEM2Block
+fn_801EF8DC HeapInit
+fn_801D8B50 CameraInit
+fn_8026A9D8 SCGetAspectRatio
+fn_801D4980 BufferFree
+fn_801E5AE0 SirLoaderShutdown
+fn_80338898 strcat

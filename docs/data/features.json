@@ -27,8 +27,8 @@
   },
   {
    "title": "PC build compiles",
-   "detail": "CMake + MSVC/Clang build of the decompiled code for Windows x64.",
-   "status": "todo"
+   "detail": "CMake + MSVC build on GitHub Actions. All decompiled sources compile; linking waits on the platform layer.",
+   "status": "in_progress"
   },
   {
    "title": "Platform layer",
@@ -67,6 +67,10 @@
   }
  ],
  "changelog": [
+  {
+   "date": "2026-11-17",
+   "text": "Decompiled the top-level game-mode state machine (GameUpdate), including in-game Bink movie playback from fmv/ and fmv_PAL/. Added memory/core init, suspend/resume, view objects and game shutdown. Windows build now runs on GitHub Actions (MSVC)."
+  },
   {
    "date": "2026-11-17",
    "text": "Decompiled the engine lifecycle (EngineInit, EngineFrame, memory callbacks for the REND and SG modules) and game startup (GameInit, GameStart, which loads global_binary.sir). Planned 1080p, a settings GUI and mod support."

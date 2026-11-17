@@ -1,31 +1,31 @@
 {
  "game_id": "RM7P4F",
- "generated": "2026-11-17T15:12:41+00:00",
- "commit": "1f60db4",
- "commit_date": "2026-11-17T16:07:48+01:00",
+ "generated": "2026-11-17T15:19:47+00:00",
+ "commit": "4d6c6a1",
+ "commit_date": "2026-11-17T16:17:04+01:00",
  "game": {
   "functions": 8559,
   "bytes": 2277304,
-  "named": 66,
-  "named_bytes": 14092,
-  "decompiled": 34,
-  "decompiled_bytes": 4036
+  "named": 83,
+  "named_bytes": 28032,
+  "decompiled": 45,
+  "decompiled_bytes": 7592
  },
  "library": {
   "functions": 4028,
   "bytes": 1127624,
-  "named": 418,
-  "named_bytes": 86600,
+  "named": 420,
+  "named_bytes": 86728,
   "decompiled": 0,
   "decompiled_bytes": 0
  },
  "all": {
   "functions": 12587,
   "bytes": 3404928,
-  "named": 484,
-  "named_bytes": 100692,
-  "decompiled": 34,
-  "decompiled_bytes": 4036
+  "named": 503,
+  "named_bytes": 114760,
+  "decompiled": 45,
+  "decompiled_bytes": 7592
  },
  "game_range": [
   "80006B40",
@@ -42,11 +42,11 @@
   ],
   [
    0.0,
-   0.0
+   0.009
   ],
   [
-   0.111,
-   0.18
+   0.408,
+   0.408
   ],
   [
    0.0,
@@ -582,7 +582,7 @@
   ],
   [
    0.0,
-   0.0
+   0.052
   ],
   [
    0.0,
@@ -638,7 +638,7 @@
   ],
   [
    0.0,
-   0.0
+   0.492
   ],
   [
    0.0,
@@ -646,7 +646,7 @@
   ],
   [
    0.0,
-   0.0
+   0.398
   ],
   [
    0.0,
@@ -666,7 +666,7 @@
   ],
   [
    0.0,
-   0.0
+   0.002
   ],
   [
    0.0,
@@ -697,7 +697,7 @@
    0.09
   ],
   [
-   0.0,
+   0.041,
    0.041
   ],
   [
@@ -877,20 +877,20 @@
    0.0
   ],
   [
-   0.183,
-   0.184
+   0.207,
+   0.209
   ],
   [
-   0.0,
-   0.334
+   0.009,
+   0.365
   ],
   [
-   0.0,
+   0.012,
    0.077
   ],
   [
    0.0,
-   0.043
+   0.054
   ],
   [
    0.0,
@@ -914,7 +914,7 @@
   ],
   [
    0.0,
-   0.064
+   0.104
   ],
   [
    0.0,
@@ -934,7 +934,7 @@
   ],
   [
    0.0,
-   0.004
+   0.022
   ],
   [
    0.0,
@@ -953,8 +953,8 @@
    0.0
   ],
   [
-   0.049,
-   0.228
+   0.053,
+   0.23
   ],
   [
    0.0,
@@ -962,7 +962,7 @@
   ],
   [
    0.0,
-   0.0
+   0.065
   ],
   [
    0.0,
@@ -970,7 +970,7 @@
   ],
   [
    0.0,
-   0.0
+   0.187
   ],
   [
    0.0,
@@ -1130,8 +1130,8 @@
    "end": "8026E000",
    "functions": 211,
    "bytes": 41096,
-   "named": 45,
-   "named_bytes": 9400,
+   "named": 46,
+   "named_bytes": 9484,
    "decompiled": 0,
    "decompiled_bytes": 0
   },
@@ -1163,8 +1163,8 @@
    "end": "8033F400",
    "functions": 399,
    "bytes": 114196,
-   "named": 43,
-   "named_bytes": 12972,
+   "named": 44,
+   "named_bytes": 13016,
    "decompiled": 0,
    "decompiled_bytes": 0
   },
@@ -1250,6 +1250,11 @@
      "size": 432
     },
     {
+     "name": "EngineApplySuspend",
+     "addr": "801D19E8",
+     "size": 184
+    },
+    {
      "name": "EngineIsSuspended",
      "addr": "801D1AA0",
      "size": 8
@@ -1278,6 +1283,36 @@
      "name": "EngineSetGameSettings",
      "addr": "801D2B4C",
      "size": 8
+    },
+    {
+     "name": "MemInit",
+     "addr": "801D4094",
+     "size": 76
+    },
+    {
+     "name": "CoreInit",
+     "addr": "801D5638",
+     "size": 60
+    },
+    {
+     "name": "CoreShutdown",
+     "addr": "801D5674",
+     "size": 48
+    }
+   ]
+  },
+  {
+   "path": "src/engine/view.cpp",
+   "functions": [
+    {
+     "name": "ViewCreate",
+     "addr": "80170374",
+     "size": 356
+    },
+    {
+     "name": "ViewDestroy",
+     "addr": "801704D8",
+     "size": 16
     }
    ]
   },
@@ -1298,6 +1333,16 @@
      "name": "GameStart",
      "addr": "8000EF04",
      "size": 856
+    },
+    {
+     "name": "GameFrameCallback",
+     "addr": "8000F5BC",
+     "size": 4
+    },
+    {
+     "name": "GameShutdown",
+     "addr": "8000F5C0",
+     "size": 640
     }
    ]
   },
@@ -1305,9 +1350,29 @@
    "path": "src/game/game_main.cpp",
    "functions": [
     {
+     "name": "SysAllocMEM2Block",
+     "addr": "801FAEB0",
+     "size": 16
+    },
+    {
+     "name": "SysFreeMEM2Block",
+     "addr": "801FAEC0",
+     "size": 16
+    },
+    {
      "name": "GameMain",
      "addr": "801FAED0",
      "size": 392
+    }
+   ]
+  },
+  {
+   "path": "src/game/game_update.cpp",
+   "functions": [
+    {
+     "name": "GameUpdate",
+     "addr": "8000D9EC",
+     "size": 2140
     }
    ]
   },

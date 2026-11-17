@@ -29,4 +29,6 @@ jobs:
               Write-Output "::error file=$f,line=$($matches[2])::$($matches[4])"
             } else { Write-Output "::error::$l" }
           }
+          $objs = (Get-ChildItem out -Recurse -Filter *.obj).Count
+          Write-Output "::notice::Compiled $objs source files"
           exit $code

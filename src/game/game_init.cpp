@@ -5,6 +5,7 @@
 
 #include "engine/engine.h"
 #include "system/sys.h"
+#include "game/game.h"
 
 // ---- not yet decompiled ----
 extern "C" {
@@ -34,15 +35,14 @@ u32   GetRandomSeed(void);                       // 0x801427F0
 void  fn_8012148C(void); void fn_801230DC(void);
 }
 
-struct StateEntry { s32 id; s32 a, b, c; };
 typedef void* (*AllocFn)(u32 size, const char* name);
 
 // ---- data ----
 extern u8         gGame[];                  ORIG(0x803B53A0) // start of .bss; large game state block
-static StateEntry sStateTable[10];          ORIG(0x803C4400)
-s32               gStateCount = 4;          ORIG(0x805F81C0)
-s32               gStartState = 9;          ORIG(0x805F81C4)
-static u8         sSirHeader[0x1000];       ORIG(0x803C2A20) // first 4 KB of global_binary.sir
+ModeState         sModeTable[GAME_MODE_COUNT]; ORIG(0x803C4400)
+s32               gGameMode = 4;            ORIG(0x805F81C0)
+s32               gNextGameMode = 9;        ORIG(0x805F81C4)
+u8                sSirHeader[0x1000];       ORIG(0x803C2A20) // first 4 KB of global_binary.sir
 extern u8         gSirLoader[];             ORIG(0x8048A8F0)
 extern u8         gCamera[];                ORIG(0x8047C640)
 extern u8         lbl_805FAEB0[];
@@ -151,11 +151,11 @@ void GameStart(int argc, char** argv) {
     fn_801210E4(lbl_805FAEB0);
 
     for (int i = 0; i < 10; i++) {
-        sStateTable[i].id = i;
-        sStateTable[i].a = sStateTable[i].b = sStateTable[i].c = 0;
+        sModeTable[i].id = i;
+        sModeTable[i].sub = sModeTable[i].unk8 = sModeTable[i].unkC = 0;
     }
-    gStateCount = 4;
-    gStartState = 9;
+    gGameMode = 4;
+    gNextGameMode = 9;
 
     fn_801F052C();
     fn_801F2BCC();
@@ -197,9 +197,9 @@ void GameStart(int argc, char** argv) {
     if (rand() % 2 == 0) { flip[0] = 0; flip[1] = 1; }
     else                 { flip[0] = 1; flip[1] = 0; }
 
-    if (gStartState != 8) {
-        if (EngineGetGameSettings()->field_0x38 == 1 && gIsReturningPlayer) gStartState = 6;
-        else                                                                gStartState = 2;
+    if (gNextGameMode != 8) {
+        if (EngineGetGameSettings()->field_0x38 == 1 && gIsReturningPlayer) gNextGameMode = 6;
+        else                                                                gNextGameMode = 2;
     }
 
     fn_8012148C();
