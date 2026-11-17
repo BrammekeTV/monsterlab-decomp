@@ -1,0 +1,77 @@
+# Monster Lab (Wii) — decompilation / PC port
+
+Target: **RM7P4F** (PAL), `main.dol` SHA-1 `50f6e9b94dbe4df6f663541493106d19e0a40c72`.
+
+Bring your own disc: the extracted game lives in `orig/RM7P4F/` and is git-ignored.
+
+## Layout
+
+| Path | Contents |
+|---|---|
+| `orig/RM7P4F/sys/main.dol` | Game executable (the only code binary; there are no RELs) |
+| `orig/RM7P4F/files/` | Game data (2.5 GB) |
+| `config/RM7P4F/` | decomp-toolkit config, symbols, splits, target hash |
+| `src/`, `include/` | Decompiled C/C++ |
+| `tools/` | Helper scripts |
+
+## What's in the binary
+
+- Compiler: Metrowerks CodeWarrior (PowerPC), MSL runtime + "Metrowerks Target Resident Kernel".
+- SDK: RVL_SDK **RevoEX 2.1plus**, build `080313085908`: OS, GX, AX/AI/DSP, DVD, NAND, WPAD/KPAD, HBM (Home menu), SC, VI, plus the networking stack (DWC, NHTTP, SSL, SOCKET, NWC24).
+- Third-party: **Bink** video (RAD Game Tools).
+- Engine: an in-house cross-platform engine with `Is_WiiBuild` / `Is_DSBuild` / `IsFinalBuild` flags and a `SOUNDENGINE_*` audio layer. Data is stored in `.sir` containers (magic `PNP0`).
+- No symbol map ships on the disc, so all symbols have to be recovered (SDK signatures first).
+
+DOL sections:
+
+| Section | Address | Size |
+|---|---|---|
+| .init (T0) | 0x80004000 | 0x24E0 |
+| .text (T1) | 0x80006B40 | 0x33EFA0 |
+| D0–D7 | 0x800064E0 – 0x80600FE0 | — |
+| .bss | 0x803B5380 | 0x24BD98 |
+| Entry point | 0x8000403C | |
+
+## Data formats
+
+| Ext | Count | Format | PC replacement |
+|---|---|---|---|
+| `.bik` | 78 | Bink video | Bink SDK for PC, or FFmpeg (`libavcodec` decodes Bink 1) |
+| `.dsp` | 89 | Nintendo DSP-ADPCM audio | Decode to PCM (vgmstream or a small decoder) |
+| `.sir` | 60 | Engine container, magic `PNP0` | Needs reverse-engineering |
+| `.arc` / `.tpl` | 10 | Nintendo U8 archives / textures (Home Button menu) | Not needed on PC |
+| `.mid`, `.wt`, `.pcm` | — | MIDI music + wavetable | Software synth |
+
+## Plan
+
+1. **Split & disassemble.** `dtk dol split config/RM7P4F/config.yml build/RM7P4F` gives per-object assembly and builds up `symbols.txt` and `splits.txt`.
+2. **Recover symbols.** Apply RVL SDK / MSL / Bink signatures (for example from other RevoEX-2.1 decomps) so that roughly a third of `.text` gets names.
+3. **Decompile.** Use Ghidra or IDA with a Wii loader, plus m2c, to produce C. Check it against the original with objdiff (matching decomp) or skip matching (functional decomp).
+4. **PC port.** Build the game code natively for x86-64 and replace the Nintendo SDK layer:
+   - GX → OpenGL/Vulkan backend (or a GX emulation layer)
+   - AX/DSP → SDL audio + DSP-ADPCM decoder
+   - WPAD/KPAD → SDL gamepad + mouse as the pointer
+   - DVD/NAND → host filesystem
+   - Fix endianness (all data is big-endian).
+
+**Chosen approach: decompile by hand, then port.** The decomp is functional rather than byte-matching: game code is rewritten as portable C/C++, and the Nintendo SDK layer is replaced instead of decompiled. Static recompilation was considered and rejected.
+
+### Priorities
+
+- Game code (`main` is at `0x80142DF0`; game code sits roughly at `0x80006B40`–`0x80232000`) is the real work.
+- SDK, MSL and Bink code (from about `0x80232AF8`) only needs to be **identified** so that it can be stubbed or reimplemented on PC. It does not need to be decompiled.
+
+## Status
+
+- `dtk dol split` runs cleanly: 12,580 functions, 707 objects, assembly in `build/RM7P4F/asm/`.
+- 365 functions have names (CRT/startup, `main`, PPC intrinsics). The other ~12,200 are still `fn_XXXXXXXX`.
+- `splits.txt` has no per-file splits yet. Next: mark the SDK library boundaries and import SDK symbol names.
+
+## Tools
+
+- DolphinTool (already on this machine), used for disc extraction:
+  `DolphinTool extract -i "RM7P4F - Monster Lab.iso" -o orig/RM7P4F -g`
+- `tools/bin/dtk.exe`: decomp-toolkit v1.9.1. Re-split with
+  `tools/bin/dtk.exe dol split config/RM7P4F/config.yml build/RM7P4F`
+- `tools/bin/objdiff.exe` / `objdiff-cli.exe`: objdiff v3.8.3, for comparing decompiled functions against the original assembly.
+- Still to install: Ghidra plus a Wii/GameCube loader (main decompiler), m2c (asm → C helper), and CMake + SDL3 for the PC build.

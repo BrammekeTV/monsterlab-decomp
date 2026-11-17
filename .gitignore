@@ -1,0 +1,16 @@
+# Copyrighted game data — never commit
+*.iso
+*.wbfs
+*.rvz
+orig/*/*
+!orig/*/.gitkeep
+
+# Build output / tools
+build/
+tools/bin/
+*.exe
+__pycache__/
+.ninja_*
+build.ninja
+objdiff.json
+compile_commands.json
