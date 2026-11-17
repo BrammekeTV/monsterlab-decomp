@@ -1,15 +1,15 @@
 {
  "game_id": "RM7P4F",
- "generated": "2026-11-17T19:35:42+00:00",
- "commit": "7f0a55a",
- "commit_date": "2026-11-17T20:31:21+01:00",
+ "generated": "2026-11-17T19:40:04+00:00",
+ "commit": "627ab06",
+ "commit_date": "2026-11-17T20:35:44+01:00",
  "game": {
   "functions": 8559,
   "bytes": 2277304,
-  "named": 2278,
-  "named_bytes": 346800,
-  "decompiled": 208,
-  "decompiled_bytes": 33388
+  "named": 2293,
+  "named_bytes": 351384,
+  "decompiled": 240,
+  "decompiled_bytes": 37592
  },
  "library": {
   "functions": 4028,
@@ -22,10 +22,10 @@
  "all": {
   "functions": 12587,
   "bytes": 3404928,
-  "named": 2724,
-  "named_bytes": 439240,
-  "decompiled": 208,
-  "decompiled_bytes": 33388
+  "named": 2739,
+  "named_bytes": 443824,
+  "decompiled": 240,
+  "decompiled_bytes": 37592
  },
  "game_range": [
   "80006B40",
@@ -57,15 +57,15 @@
    0.732
   ],
   [
-   0.774,
+   0.865,
    0.863
   ],
   [
-   0.115,
-   0.744
+   0.45,
+   0.884
   ],
   [
-   0.0,
+   0.049,
    0.803
   ],
   [
@@ -162,7 +162,7 @@
   ],
   [
    0.0,
-   0.099
+   0.129
   ],
   [
    0.0,
@@ -414,7 +414,7 @@
   ],
   [
    0.0,
-   0.03
+   0.195
   ],
   [
    0.0,
@@ -446,7 +446,7 @@
   ],
   [
    0.0,
-   0.58
+   0.611
   ],
   [
    0.0,
@@ -614,7 +614,7 @@
   ],
   [
    0.147,
-   0.346
+   0.502
   ],
   [
    0.0,
@@ -834,7 +834,7 @@
   ],
   [
    0.0,
-   0.079
+   0.084
   ],
   [
    0.0,
@@ -1435,6 +1435,11 @@
      "size": 292
     },
     {
+     "name": "PatrolIdleExit",
+     "addr": "80014734",
+     "size": 772
+    },
+    {
      "name": "PatrolIdleUpdate",
      "addr": "80014A38",
      "size": 284
@@ -1618,6 +1623,166 @@
      "name": "CharacterStartIdleAction",
      "addr": "80016204",
      "size": 128
+    },
+    {
+     "name": "CharacterSetMode",
+     "addr": "80016284",
+     "size": 348
+    }
+   ]
+  },
+  {
+   "path": "src/game/character_states.cpp",
+   "functions": [
+    {
+     "name": "RegisterCharacterStateCallbacks",
+     "addr": "80016400",
+     "size": 904
+    },
+    {
+     "name": "character_combat_idle_entry",
+     "addr": "80016788",
+     "size": 336
+    },
+    {
+     "name": "character_combat_idle_exit",
+     "addr": "800168D8",
+     "size": 4
+    },
+    {
+     "name": "character_combat_idle_update",
+     "addr": "800168DC",
+     "size": 132
+    },
+    {
+     "name": "character_exploration_idle_entry",
+     "addr": "80016960",
+     "size": 64
+    },
+    {
+     "name": "character_exploration_idle_exit",
+     "addr": "800169A0",
+     "size": 4
+    },
+    {
+     "name": "character_exploration_move_entry",
+     "addr": "80017290",
+     "size": 120
+    },
+    {
+     "name": "character_exploration_exit_entry",
+     "addr": "80017620",
+     "size": 228
+    },
+    {
+     "name": "character_exploration_wait_entry",
+     "addr": "80017704",
+     "size": 108
+    },
+    {
+     "name": "character_exploration_wait_exit",
+     "addr": "80017770",
+     "size": 132
+    },
+    {
+     "name": "character_exploration_injure_entry",
+     "addr": "800177F4",
+     "size": 36
+    },
+    {
+     "name": "character_exploration_injure_exit",
+     "addr": "80017818",
+     "size": 84
+    },
+    {
+     "name": "character_challenge_instruction_entry",
+     "addr": "8001786C",
+     "size": 4
+    },
+    {
+     "name": "character_challenge_instruction_exit",
+     "addr": "80017870",
+     "size": 4
+    },
+    {
+     "name": "character_challenge_instruction_update",
+     "addr": "80017874",
+     "size": 188
+    },
+    {
+     "name": "character_challenge_update",
+     "addr": "80017F14",
+     "size": 4
+    },
+    {
+     "name": "character_conversation_entry",
+     "addr": "80017F18",
+     "size": 276
+    },
+    {
+     "name": "character_conversation_exit",
+     "addr": "8001802C",
+     "size": 20
+    },
+    {
+     "name": "character_conversation_update",
+     "addr": "80018040",
+     "size": 4
+    },
+    {
+     "name": "CharacterCombatIdleEntry",
+     "addr": "80018A34",
+     "size": 24
+    },
+    {
+     "name": "CharacterCombatIdleExit",
+     "addr": "80018A4C",
+     "size": 4
+    },
+    {
+     "name": "CharacterCombatIdleUpdate",
+     "addr": "80018A50",
+     "size": 4
+    },
+    {
+     "name": "CharacterCombatWaitForActionUpdate",
+     "addr": "80018A54",
+     "size": 4
+    },
+    {
+     "name": "CharacterCombatActionEntry",
+     "addr": "80018A58",
+     "size": 108
+    },
+    {
+     "name": "CharacterCombatActionExit",
+     "addr": "80018AC4",
+     "size": 128
+    },
+    {
+     "name": "CharacterCombatActionUpdate",
+     "addr": "80018B44",
+     "size": 104
+    },
+    {
+     "name": "CharacterCombatReactionEntry",
+     "addr": "80018BAC",
+     "size": 24
+    },
+    {
+     "name": "CharacterCombatReactionUpdate",
+     "addr": "80018BC4",
+     "size": 4
+    },
+    {
+     "name": "CharacterPreviewerActionDone",
+     "addr": "80018BC8",
+     "size": 24
+    },
+    {
+     "name": "CharacterPreviewerIdleEntry",
+     "addr": "80018BE0",
+     "size": 4
     }
    ]
   },

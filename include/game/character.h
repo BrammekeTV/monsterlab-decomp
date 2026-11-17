@@ -38,8 +38,13 @@ struct Character {
     u8            pad83C[8];
     Vec3          velocity;      // 0x844
     u8            pad850[0x2C];
-    s32           unk87C;        // 0x87C
-    u8            pad880[0x15];
+    s32           patrolMode;    // 0x87C: 0 = off, 3 = follow target node, 4 = follow character, else route
+    s32           routeLoop;     // 0x880: 0 = loop, 1 = ping-pong, 2 = once, 3 = random at junctions
+    s32*          route;         // 0x884: up to 64 junction exits, -1 terminated
+    s32           patrolTarget;  // 0x888
+    s32           routeIndex;    // 0x88C
+    s32           routeLength;   // 0x890
+    u8            routeForward;  // 0x894
     u8            unk895;        // 0x895
     u8            pad896[0x142];
     s32           unk9D8;        // 0x9D8
@@ -79,4 +84,9 @@ void PathReverse(PathFollower* p);                    // 0x800D6A00
 void PathSetSpeed(PathFollower* p, f32 speed);        // 0x800D6A18
 Vec3* PathGetPosition(PathFollower* p);               // 0x800D5718
 BOOL PathAtWaypoint(PathFollower* p);                 // 0x800D56E0
+u32  PathGetExits(PathFollower* p, int a);            // 0x800D5850: bitmask of usable exits (4)
+BOOL PathExitBlocked(PathFollower* p, s32 exit);      // 0x800D6998
+void PathTakeExit(PathFollower* p, s32 exit, int a);  // 0x800D675C
+s32  PathFindNode(PathFollower* p, s32 node, int a);  // 0x800D648C
+s32  PathFindToward(PathFollower* p, PathFollower* other, int a);   // 0x800D6534
 }

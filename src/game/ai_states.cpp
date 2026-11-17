@@ -258,7 +258,7 @@ void PatrolIdleUpdate(ScriptCtx* ctx) {
             return;
         }
     }
-    if (c->unk87C == 0) return;
+    if (c->patrolMode == 0) return;
 
     if (c->path != NULL && (!PathAtWaypoint(c->path) || c->unkC40 > c->unkC44)) {
         PathSetMoving(c->path, FALSE);
@@ -507,7 +507,7 @@ void PumpkinShakeUpdate(ScriptCtx* ctx) {
 
     BOOL shook = DetectShake(player);
     if (player->unkC40 > PUMPKIN_TIMEOUT) {
-        if (c->unk87C == 0) SendSelf(c, 0xD7E36EF2);
+        if (c->patrolMode == 0) SendSelf(c, 0xD7E36EF2);
         else                SendSelf(c, 0x9BEE735B);
     } else if (shook) {
         player->waitTimer += 0.5f;
@@ -581,8 +581,136 @@ void GeneratorShakeUpdate(ScriptCtx* ctx) {
     if (ShakeMeterStep(player, 6.0f)) WorldSendEvent(WORLD, EVENT_SHAKE_DONE, 0, 0, 0);
 }
 
+extern "C" u32   RandomU32(void);                       // 0x80143460
+extern "C" void* CharacterFind(s32 id);                 // 0x800E876C
+
+enum { ROUTE_LOOP = 0, ROUTE_PINGPONG = 1, ROUTE_ONCE = 2, ROUTE_RANDOM = 3 };
+#define ROUTE_MAX 64
+
+// Exits are numbered 0..3 around a junction; walking a route backwards uses the opposite one.
+static inline s32 OppositeExit(s32 e) {
+    switch (e) {
+    case 0: return 2;
+    case 1: return 3;
+    case 2: return 0;
+    case 3: return 1;
+    }
+    return e;
+}
+
+// 0x80014734
+// Leaving the idle state at a junction: pick where to walk next.
+void PatrolIdleExit(ScriptCtx* ctx) {
+    Character* c = ctx->chr;
+    if (c == NULL || c->patrolMode == 0 || c->path == NULL) return;
+    PathSetSpeed(c->path, c->pathSpeed);
+
+    if (c->routeLoop == ROUTE_RANDOM) {
+        s32 exit = RandomU32() & 3;
+        u32 exits = PathGetExits(c->path, 0);
+        if (exits == 0) return;
+        for (int tries = 0;;) {
+            if ((exits & (1u << exit)) && !PathExitBlocked(c->path, exit)) {
+                PathTakeExit(c->path, exit, 0);
+                return;
+            }
+            if (++tries >= 4) {
+                c->patrolMode = 0;
+                return;
+            }
+            exit = (exit + 1) & 3;
+        }
+    }
+
+    if (c->patrolMode == 3 || c->patrolMode == 4) {
+        s32 exit = -1;
+        if (c->patrolTarget != 0 && c->patrolMode == 3) {
+            exit = PathFindNode(c->path, c->patrolTarget, 0);
+        } else {
+            Character* t = (Character*)PLAYER;
+            if (c->patrolTarget != 0 && c->patrolMode == 4) t = (Character*)CharacterFind(c->patrolTarget);
+            if (t != NULL) exit = PathFindToward(c->path, t->path, 0);
+        }
+        if (exit != -1) PathTakeExit(c->path, exit, 0);
+        return;
+    }
+
+    if (c->route == NULL) return;
+    s32 exit = c->route[c->routeIndex];
+    if (!c->routeForward) exit = OppositeExit(exit);
+    if (c->routeLength <= 0) {
+        c->patrolMode = 0;
+        return;
+    }
+    PathTakeExit(c->path, exit, 0);
+
+    if (c->routeForward) {
+        c->routeIndex++;
+    } else if (--c->routeIndex < 0) {
+        if (c->routeLoop == ROUTE_PINGPONG) {
+            c->routeIndex = 1;
+            c->routeForward = 1;
+        } else if (c->routeLoop == ROUTE_LOOP) {
+            c->routeIndex = c->routeLength - 1;
+        }
+    }
+
+    if (c->routeIndex >= ROUTE_MAX || c->route[c->routeIndex] == -1) {
+        switch (c->routeLoop) {
+        case ROUTE_LOOP:
+            c->routeIndex = 0;
+            break;
+        case ROUTE_PINGPONG:
+            c->routeIndex = c->routeLength - 1;
+            c->routeForward = 0;
+            break;
+        case ROUTE_ONCE:
+            c->routeIndex = c->routeLength;
+            c->patrolMode = 0;
+            SendSelf(c, 0xFE0A9838);   // route finished
+            break;
+        }
+    }
+}
+
+// Character render/collision modes selected by name hash.
+struct CharacterMode {
+    u32 hash;
+    u32 setNodeFlags;
+    u32 clearNodeFlags;
+    u32 setFlags838;
+    u32 clearFlags838;
+};
+static const CharacterMode sCharacterModes[2] = {         ORIG(0x80354B48)
+    { 0, 0, 0, 0, 0 },
+    { 0xE1C807EF /* "composite_character" */, 0, 0, 0, 0 },
+};
+
+typedef u8* (*GetVisualFn)(Character*);
+
+// 0x80016284
+void CharacterSetMode(Character* c, u32 hash) {
+    for (int i = 0; i < 2; i++) {
+        const CharacterMode& m = sCharacterModes[i];
+        if (hash != m.hash) continue;
+
+        *(s32*)((u8*)c + 0x158) = i;
+        c->flags838 |= m.setFlags838;
+        c->flags838 &= ~m.clearFlags838;
+
+        u32 set = m.setNodeFlags;
+        if ((set & 2) && VCALL(c, 0xC, GetVisualFn)(c) != NULL) *(u32*)(VCALL(c, 0xC, GetVisualFn)(c) + 8) |= 2;
+        c->def->stateFlags |= set;
+
+        u32 clear = m.clearNodeFlags;
+        if ((clear & 2) && VCALL(c, 0xC, GetVisualFn)(c) != NULL) *(u32*)(VCALL(c, 0xC, GetVisualFn)(c) + 8) &= ~2u;
+        c->def->stateFlags &= ~clear;
+        return;
+    }
+    *(s32*)((u8*)c + 0x158) = 0;
+}
+
 // Not yet decompiled callbacks.
-void PatrolIdleExit(ScriptCtx* ctx);
 
 // 0x80014350
 void RegisterAiStateCallbacks(void) {

@@ -69,6 +69,11 @@
   "changelog": [
     {
       "date": "2026-11-17",
+      "time": "20:40",
+      "text": "Decompiled patrol routing (routes that loop, ping-pong, run once or pick random exits at junctions, and following a target) and 29 character state callbacks: combat idle, exploration idle/move/wait/injure, challenge instructions (A accepts and the challenger steps aside for 65 seconds, B declines), conversations and combat actions."
+    },
+    {
+      "date": "2026-11-17",
       "time": "20:35",
       "text": "Added the project owner's .sir decoder (textures, meshes, skeletons) to tools/. It confirmed how global_binary.sir boots: a 4 KB pointer table plus a memory image that must load at 0x90400000, holding e.g. the \"HOME Menu not available\" icon and the fallback \"Generic_box\" model. Name lookup now also scans the large archives (shared_ui.sir etc.)."
     },
