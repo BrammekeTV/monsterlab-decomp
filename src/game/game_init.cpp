@@ -15,10 +15,10 @@ void  SetCallback_80146800(void (*cb)(void));   // 0x80146800: stores to 0x805FB
 void  SetCallback_80207164(void (*cb)(void));   // 0x80207164: stores to 0x805FBB24
 void  fn_80010F64(void);
 void  fn_80010F88(void);
-void  RendSetCallbackA(void (*cb)(void));       // 0x8014DD74: stores to 0x805FB4F0
-void  RendSetCallbackB(void (*cb)(void));       // 0x8014DD7C
-void  fn_8000CFA8(void);
-void  fn_8000CFD0(void);
+void  RendSetCallbackA(BOOL (*cb)(void));       // 0x8014DD74: stores to 0x805FB4F0
+void  RendSetCallbackB(u8 (*cb)(void));       // 0x8014DD7C
+BOOL  fn_8000CFA8(void);
+u8    fn_8000CFD0(void);
 void  GameFrameCallback(void);                  // 0x8000F5BC
 void  fn_801210E4(void*);
 void  fn_801F052C(void);  void fn_801F2BCC(void); void fn_8000E488(void); void fn_801D6780(void);
@@ -27,8 +27,8 @@ void* SirLoad(void* loader, const char* path, void* dst, u32 size, s32 flags);  
 void  SirFinishLoad(void* loader, void** handle);           // 0x801E6C44
 u32*  GetGlobalBinarySize(void);                // 0x801D2BF8: returns 0x805FB7A4
 void  fn_800214D4(u32); void fn_801FC038(u32); void fn_801D5D0C(u32);
-void  fn_80011018(void); void fn_8010F794(void); void fn_801F2EB8(void); void fn_8000C9E8(void);
-void  fn_80013D54(void*); void fn_80013F8C(void*); void fn_8000ED5C(void);
+void  fn_80011018(void); void fn_8010F794(void); void fn_801F2EB8(void); void UiInit(void);
+void  fn_80013D54(void*); void fn_80013F8C(void*); void GameInitLanguage(void);
 void  StringTableInit(void* table, u32 a, void* b);          // 0x801EFC7C
 void  fn_80011A08(void); void fn_8010711C(void);
 u32   GetRandomSeed(void);                       // 0x801427F0
@@ -50,8 +50,8 @@ u32               gGlobalBinaryField844;    ORIG(0x805FB888)
 extern AllocFn    gStringTableAllocVtbl[];  ORIG(0x80385F00)
 AllocFn*          gStringTableAlloc;        ORIG(0x805FB914)
 void*             gStringTable;             ORIG(0x805FB910)
-extern u32        lbl_805F81B4;
 extern u8         lbl_805F81DC[];
+extern s32        gTextLanguage;            ORIG(0x805F81B4)
 s32               gLastSysEvent;            ORIG(0x805FAEAC)
 extern u8         gIsReturningPlayer;       ORIG(0x805FAEA8)
 
@@ -70,13 +70,6 @@ extern u8 lbl_805FB7E8[];
 extern u8 gWorldState[];                     ORIG(0x803E6D00)
 extern u8 gGameRunning;                      ORIG(0x805FB211)
 
-// Loaded data buffers released at shutdown (0x18 bytes each, only the first 3 fields used here).
-struct LoadedBuffer {
-    void* data;
-    u32   size;
-    s32   kind;     // 1 or 2 = owned by us, must be freed
-    u8    pad[0xC];
-};
 extern LoadedBuffer gBuffer803C73EC, gBuffer803C7404, gBuffer803C741C, gBuffer803C7434,
                     gBuffer803C744C, gBuffer803C7464, gBuffer803C747C;
 
@@ -152,7 +145,7 @@ void GameStart(int argc, char** argv) {
 
     for (int i = 0; i < 10; i++) {
         sModeTable[i].id = i;
-        sModeTable[i].sub = sModeTable[i].unk8 = sModeTable[i].unkC = 0;
+        sModeTable[i].sub = sModeTable[i].request = sModeTable[i].unkC = 0;
     }
     gGameMode = 4;
     gNextGameMode = 9;
@@ -179,14 +172,14 @@ void GameStart(int argc, char** argv) {
     fn_80011018();
     fn_8010F794();
     fn_801F2EB8();
-    fn_8000C9E8();
+    UiInit();
     fn_80013D54(gGame + 0xC448);
     fn_80013F8C(gGame + 0xC448);
-    fn_8000ED5C();
+    GameInitLanguage();
 
     gStringTableAlloc = gStringTableAllocVtbl;
     gStringTable = gStringTableAlloc[0](0x14, "String Table");
-    StringTableInit(gStringTable, lbl_805F81B4, lbl_805F81DC);
+    StringTableInit(gStringTable, gTextLanguage, lbl_805F81DC);
 
     fn_80011A08();
     fn_8010711C();

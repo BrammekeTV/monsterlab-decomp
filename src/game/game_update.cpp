@@ -17,10 +17,10 @@ void  fn_8016FB20(void*);  void fn_80170044(void*);
 void  fn_801B42B4(void*);  void fn_801B420C(void*);
 void  fn_8010A374(void);
 void  EngineRequestSuspend(int on);                     // 0x801D1830
-s32   fn_8000E254(int, f32);
+s32   LoadingScreenTick(int, f32);                       // 0x8000E254
 void  fn_80121254(void*);
 s32   fn_801F525C(void); void fn_801F357C(void); void fn_801F3BB8(void); void fn_801F401C(void);
-void  fn_8020A680(void); void fn_8020A69C(int); void fn_8000FACC(void); void fn_8020AF2C(void);
+void  fn_8020A680(void); void fn_8020A69C(int); void MusicUpdate(void); void fn_8020AF2C(void);
 s32   AcquireZoneSlot(void);                            // 0x80131A20 ("lock_available_zone_slot waiting...")
 void  ReleaseZoneSlot(void);                            // 0x80131C28
 void  GameLog(int level, int category, const char* fmt, ...);   // 0x8000B2F0
@@ -30,22 +30,7 @@ void  MoviePlay(void* player, const char* path, int a, u32 b, s32 moreQueued, u3
 void  fn_8000B6A0(void*, int);
 }
 
-#define MOVIE_NAME_LEN 0x80
-struct MovieEntry {
-    char name[MOVIE_NAME_LEN];   // 0x00: file name without directory/extension
-    u32  duration;               // 0x80
-};
 
-// Ring buffer of in-game movies to play (head == -1 / tail == -1 when empty).
-struct MovieQueue {
-    u8          unk0[8];
-    s32         head;            // 0x08
-    s32         tail;            // 0x0C
-    s32         capacity;        // 0x10
-    MovieEntry* entries;         // 0x14
-};
-
-extern MovieQueue gMovieQueue;          ORIG(0x803C44E0)
 s32               gMovieZoneSlot = -1;  ORIG(0x805F81C8)
 extern u32        gGameFlags;           ORIG(0x805FAED4)
 extern u8         gIsReturningPlayer;   ORIG(0x805FAEA8)
@@ -90,7 +75,7 @@ static void DrawWorld(void) {
 static void UpdateMode1(ModeState* st) {
     switch (st->sub) {
     case 1:
-        if (fn_8000E254(0, -1.0f) == 0) st->sub = 3;
+        if (LoadingScreenTick(0, -1.0f) == 0) st->sub = 3;
         break;
     case 3:
         st->sub = 5;
@@ -178,7 +163,7 @@ static void UpdateMovieMode(ModeState* st) {
     if (st->sub == 1) {
         fn_8020A680();
         fn_8020A69C(1);
-        fn_8000FACC();
+        MusicUpdate();
         gGameFlags |= GAMEFLAG_IN_MOVIE;
         if (gGameFlags & GAMEFLAG_100) gGameFlags = (gGameFlags | 1) & ~(GAMEFLAG_100 | GAMEFLAG_200);
         fn_8020AF2C();
@@ -222,7 +207,7 @@ static void UpdateMovieMode(ModeState* st) {
         }
 
         gGameFlags &= ~GAMEFLAG_IN_MOVIE;
-        fn_8000FACC();
+        MusicUpdate();
         fn_8020A69C(0);
     }
 }
@@ -253,5 +238,5 @@ extern "C" void GameUpdate(void) {
         default: break;
         }
     }
-    fn_8000FACC();
+    MusicUpdate();
 }

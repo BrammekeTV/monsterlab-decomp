@@ -69,6 +69,10 @@
   "changelog": [
     {
       "date": "2026-11-17",
+      "text": "Decompiled the UI glue (screen manager, per-zone screen sets from ui/ScreenSets/ScreenSets.csv), the full mode-transition logic, the loading screen, language selection (EN/FR/DE/IT/ES/NL from the Wii system language), the movie queue, background-music requests and the 3D audio listener. 116 game functions decompiled."
+    },
+    {
+      "date": "2026-11-17",
       "text": "Decompiled the renderer core: a dedicated render thread with a 64-entry command queue, a ring of 17 display-list buffers (144 KB each) recorded by redirecting the GX FIFO, frame-buffer flips and frame pacing on TV retrace, plus RendInit. This is the layer the PC port will replace with a modern GPU backend for 1080p and widescreen."
     },
     {
