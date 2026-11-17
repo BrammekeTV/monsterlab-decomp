@@ -7,7 +7,7 @@
   },
   {
    "title": "Executable split & analysed",
-   "detail": "decomp-toolkit finds 12,580 functions in 707 objects; game code at 0x80006B40\u00e2\u20ac\u201c0x80232AF8.",
+   "detail": "decomp-toolkit finds 12,580 functions in 707 objects; game code at 0x80006B40–0x80232AF8.",
    "status": "done"
   },
   {
@@ -32,7 +32,7 @@
   },
   {
    "title": "Platform layer",
-   "detail": "Replace the Wii SDK: GX\u00e2\u2020\u2019OpenGL/Vulkan, AX\u00e2\u2020\u2019SDL audio, WPAD\u00e2\u2020\u2019gamepad + mouse pointer, DVD/NAND\u00e2\u2020\u2019files.",
+   "detail": "Replace the Wii SDK: GX→OpenGL/Vulkan, AX→SDL audio, WPAD→gamepad + mouse pointer, DVD/NAND→files.",
    "status": "todo"
   },
   {
