@@ -150,7 +150,7 @@ static void PlayQueuedMovies(void) {
             strcat(path, entry->name);
             strcat(path, ".bik");
             BOOL moreQueued = !MovieQueueIsEmpty(&gMovieQueue);
-            MoviePlay(gMoviePlayer, path, 0, ((u32*)sSirHeader)[0x824 / 4], moreQueued, duration, lbl_805FAEB8, 0);
+            MoviePlay(gMoviePlayer, path, 0, ((u32*)sSirHeader)[0x824 / 4] /* HOME-unavailable icon */, moreQueued, duration, lbl_805FAEB8, 0);
         }
 
         AudioSetPaused(lbl_8047C7F0, FALSE);

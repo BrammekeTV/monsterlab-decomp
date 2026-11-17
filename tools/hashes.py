@@ -30,11 +30,16 @@ def build():
     names = set()
     names.update(strings_in(open("orig/RM7P4F/sys/main.dol", "rb").read()))
     for f in glob.glob("orig/RM7P4F/files/**/*", recursive=True):
-        if os.path.isfile(f) and os.path.getsize(f) < 64 * 1024 * 1024:
-            try:
-                names.update(strings_in(open(f, "rb").read(), 4))
-            except OSError:
-                pass
+        if os.path.isfile(f):
+            # stream large archives in overlapping chunks
+            with open(f, "rb") as fh:
+                prev = b""
+                while True:
+                    chunk = fh.read(32 * 1024 * 1024)
+                    if not chunk:
+                        break
+                    names.update(strings_in(prev + chunk, 4))
+                    prev = chunk[-256:]
         # file names themselves are hashed too (paths without extension)
         base = os.path.relpath(f, "orig/RM7P4F/files").replace("/", "\\")
         names.add(base)

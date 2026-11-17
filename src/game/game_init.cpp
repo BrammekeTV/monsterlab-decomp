@@ -158,7 +158,8 @@ void GameStart(int argc, char** argv) {
     static const f32 kIdentity[3][4] = { {1, 0, 0, 0}, {0, 1, 0, 0}, {0, 0, 1, 0} };
     CameraSetMatrix(gCamera, kIdentity);
 
-    // global_binary.sir: read the 4 KB header, then the whole file into MEM2.
+    // global_binary.sir: section 0 is a 4 KB header (pointer table into section 1), section 1
+    // is a memory image that must sit at 0x90400000 (see tools/sir_decoder.py).
     SirLoad(gSirLoader, "global_binary.sir", sSirHeader, 0x1000, -1);
     void* handle = SirLoad(gSirLoader, "global_binary.sir", MEM2_GLOBAL_BINARY, *GetGlobalBinarySize(), 0);
     SirFinishLoad(gSirLoader, &handle);
@@ -166,8 +167,8 @@ void GameStart(int argc, char** argv) {
     const u32* hdr = (const u32*)sSirHeader;
     gGlobalBinaryField844 = hdr[0x844 / 4];
     fn_800214D4(hdr[0xDC4 / 4]);
-    fn_801FC038(hdr[0x824 / 4]);
-    fn_801D5D0C(hdr[0x828 / 4]);
+    fn_801FC038(hdr[0x824 / 4]);     // texture "Icon-HomeButtonMenu_is_not_available"
+    fn_801D5D0C(hdr[0x828 / 4]);     // fallback model "Generic_box"
 
     fn_80011018();
     fn_8010F794();

@@ -12,7 +12,7 @@
     },
     {
       "title": "Tooling",
-      "detail": "Cross-reference, renaming and progress scripts; this site updates on every push.",
+      "detail": "Cross-reference, renaming, progress, script-callback, name-hash and .sir decoding tools; this site updates on every push.",
       "status": "done"
     },
     {
@@ -67,6 +67,11 @@
     }
   ],
   "changelog": [
+    {
+      "date": "2026-11-17",
+      "time": "20:35",
+      "text": "Added the project owner's .sir decoder (textures, meshes, skeletons) to tools/. It confirmed how global_binary.sir boots: a 4 KB pointer table plus a memory image that must load at 0x90400000, holding e.g. the \"HOME Menu not available\" icon and the fallback \"Generic_box\" model. Name lookup now also scans the large archives (shared_ui.sir etc.)."
+    },
     {
       "date": "2026-11-17",
       "time": "20:31",

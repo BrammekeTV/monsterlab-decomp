@@ -72,7 +72,11 @@ These live in the platform layer (`src/platform/`) that replaces the Wii SDK, so
 ## Workflow
 
 - `python tools/xref.py func <name|addr>` shows a function's calls, referenced strings and callers. `python tools/xref.py strings <regex>` finds functions by the strings they use.
-- `sh tools/fn.sh <name>` prints a function's asm.
+- `sh tools/fn.sh <name>` prints a function's asm. `sh tools/dump.sh <name>...` prints a compact version.
+- `python tools/todo.py <object>` lists an object's functions, their size and whether they're decompiled.
+- `python tools/script_funcs.py` lists every script callback the game registers by name (`RegisterScriptFunc`); this is where most original function names come from.
+- `python tools/hashes.py build`, then `python tools/hashes.py <0xHASH>` or `scan`: names behind `StringHash` ids (CRC-32 of the upper-cased name) found in the code.
+- `python tools/sir_decoder.py <file.sir>` extracts textures, meshes and skeletons from `.sir` archives (contributed by the project owner; see `tools/sir_decoder.md`).
 - `python tools/rename.py OLD NEW` (or `-f file`) renames symbols in `symbols.txt`. The `config/RM7P4F/names_*.txt` files keep a record of names and where they came from. Re-run the dtk split afterwards.
 - **Decompiled-function marker:** put a line containing only `// 0xADDRESS` directly above each function definition in `src/`. `tools/progress.py` counts these.
 - `python tools/progress.py --record` updates `docs/data/progress.json` and `history.json`. Milestones and the changelog live in `docs/data/features.json`.

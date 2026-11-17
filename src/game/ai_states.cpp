@@ -327,8 +327,8 @@ BOOL ShakePromptBlink(s32 player, f32 phase) {
     UIElement_SetVisibleFlag(0x552FC6C7, TRUE);
     if (!(phase > 0.5f)) return FALSE;
 
-    UIElement* a = (UIElement*)UIFindElement(0x1A9EE60F);
-    UIElement* b = (UIElement*)UIFindElement(0x8D6D65B1);
+    UIElement* a = (UIElement*)UIFindElement(0x1A9EE60F /* "Wiimote_down" */);
+    UIElement* b = (UIElement*)UIFindElement(0x8D6D65B1 /* "Wiimote_up" */);
     if (player == 1) {
         a = (UIElement*)UIFindElement(0xC4E94BB0);
         b = (UIElement*)UIFindElement(0xB2601D05);
