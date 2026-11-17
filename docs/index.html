@@ -6,141 +6,229 @@
 <title>Monster Lab Decomp</title>
 <meta name="description" content="Progress of the Monster Lab (Wii) decompilation and Windows port.">
 <link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;700&family=JetBrains+Mono:wght@400;600&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Bangers&family=Rubik:wght@400;500;700&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
 <style>
 :root {
-  --bg: #f4f2ec; --panel: #ffffff; --ink: #1d1b22; --muted: #6b6775; --line: #e2ded4;
-  --accent: #3f9b4f; --accent-soft: #b9dcbc; --warn: #c9822b; --empty: #e6e2d8;
-  --shadow: 0 1px 2px rgba(20,16,30,.06), 0 6px 24px rgba(20,16,30,.05);
-}
-@media (prefers-color-scheme: dark) {
-  :root:not([data-theme="light"]) {
-    --bg: #121118; --panel: #1b1a22; --ink: #ecebf1; --muted: #9a97a6; --line: #2b2935;
-    --accent: #6fd47f; --accent-soft: #2f5a36; --warn: #e3a253; --empty: #26242f;
-    --shadow: none;
-  }
-}
-:root[data-theme="dark"] {
-  --bg: #121118; --panel: #1b1a22; --ink: #ecebf1; --muted: #9a97a6; --line: #2b2935;
-  --accent: #6fd47f; --accent-soft: #2f5a36; --warn: #e3a253; --empty: #26242f; --shadow: none;
+  --bg: #13201c; --bg2: #0d1714;
+  --metal-hi: #5d6b68; --metal: #3d4846; --metal-lo: #262e2d; --rivet: #8d9a96;
+  --wood-hi: #9a6a3a; --wood: #6e4622; --wood-lo: #3f2611;
+  --slime: #8be23a; --slime-dk: #3f7d14; --glow: rgba(139, 226, 58, .55);
+  --orange: #ff9a1f; --yellow: #ffd23f; --red: #e2412b; --purple: #9b5de5;
+  --ink: #f1ead7; --muted: #b6b29f; --dim: #7f7c6d; --glass: rgba(170, 220, 210, .08);
+  --outline: #1a0f08;
 }
 * { box-sizing: border-box; }
-body { margin: 0; background: var(--bg); color: var(--ink); font: 15px/1.55 Inter, system-ui, sans-serif; }
-.wrap { max-width: 1040px; margin: 0 auto; padding: 40px 16px 80px; }
-header { display: flex; flex-wrap: wrap; align-items: end; justify-content: space-between; gap: 16px; margin-bottom: 32px; }
-h1 { font: 700 40px/1.05 "Space Grotesk", sans-serif; margin: 0; letter-spacing: -.02em; }
-h1 span { color: var(--accent); }
-.sub { color: var(--muted); margin-top: 8px; }
-.meta { font: 12px "JetBrains Mono", monospace; color: var(--muted); text-align: right; }
-h2 { font: 700 18px "Space Grotesk", sans-serif; margin: 0 0 14px; }
-.grid { display: grid; gap: 16px; }
-.stats { grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); margin-bottom: 16px; }
-.card { background: var(--panel); border: 1px solid var(--line); border-radius: 14px; padding: 20px; box-shadow: var(--shadow); min-width: 0; }
-.big { font: 700 34px "Space Grotesk", sans-serif; font-variant-numeric: tabular-nums; }
-.label { color: var(--muted); font-size: 13px; }
-.bar { height: 8px; border-radius: 99px; background: var(--empty); overflow: hidden; margin-top: 12px; display: flex; }
-.bar i { display: block; height: 100%; background: var(--accent); }
-.bar i.soft { background: var(--accent-soft); }
-.small { font-size: 13px; color: var(--muted); margin-top: 8px; font-variant-numeric: tabular-nums; }
-section { margin-top: 16px; }
-.map { display: grid; grid-template-columns: repeat(64, 1fr); gap: 2px; }
-.map div { aspect-ratio: 1; border-radius: 2px; background: var(--empty); }
-.legend { display: flex; gap: 16px; flex-wrap: wrap; font-size: 13px; color: var(--muted); margin-top: 12px; }
-.legend b { display: inline-block; width: 10px; height: 10px; border-radius: 2px; margin-right: 6px; vertical-align: -1px; }
+html { background: var(--bg2); }
+body {
+  margin: 0; color: var(--ink); font: 15px/1.55 Rubik, system-ui, sans-serif;
+  background:
+    radial-gradient(1200px 500px at 50% -10%, rgba(139,226,58,.12), transparent 70%),
+    repeating-linear-gradient(90deg, rgba(255,255,255,.015) 0 2px, transparent 2px 120px),
+    linear-gradient(var(--bg), var(--bg2));
+  min-height: 100vh;
+}
+.wrap { max-width: 1060px; margin: 0 auto; padding: 28px 16px 60px; }
+
+/* ---------- title ---------- */
+header { text-align: center; margin-bottom: 30px; position: relative; }
+.logo { display: inline-block; position: relative; transform: rotate(-2deg); }
+.logo h1 {
+  margin: 0; font: 400 clamp(56px, 13vw, 112px)/.9 Bangers, Impact, sans-serif; letter-spacing: .04em;
+  filter: drop-shadow(0 5px 0 var(--outline)) drop-shadow(0 10px 18px rgba(0,0,0,.6));
+}
+.logo h1 span {
+  display: inline-block;
+  background: linear-gradient(180deg, var(--yellow) 10%, var(--orange) 55%, var(--red) 100%);
+  -webkit-background-clip: text; background-clip: text; color: transparent;
+  -webkit-text-stroke: 3px var(--outline);
+}
+.logo h1 span:nth-child(odd) { transform: translateY(-4px) rotate(-3deg); }
+.logo h1 span:nth-child(3n) { transform: translateY(5px) rotate(4deg); }
+.plate {
+  display: inline-block; margin-top: -6px; padding: 4px 26px 2px; position: relative;
+  font: 400 clamp(26px, 5vw, 40px)/1.1 Bangers, Impact, sans-serif; letter-spacing: .12em; color: var(--slime);
+  -webkit-text-stroke: 1.5px var(--outline); text-shadow: 0 0 14px var(--glow);
+  background: linear-gradient(var(--metal-hi), var(--metal) 45%, var(--metal-lo));
+  border: 3px solid var(--outline); border-radius: 12px; transform: rotate(1.5deg);
+  box-shadow: inset 0 2px 0 rgba(255,255,255,.18), 0 6px 0 var(--outline);
+}
+.plate::before, .plate::after {
+  content: ""; position: absolute; top: 50%; width: 9px; height: 9px; margin-top: -4px; border-radius: 50%;
+  background: radial-gradient(circle at 35% 35%, #d9e2df, var(--rivet) 45%, #333 100%);
+}
+.plate::before { left: 8px; } .plate::after { right: 8px; }
+.tag { color: var(--muted); margin: 18px auto 0; max-width: 560px; }
+.meta { font: 12px "JetBrains Mono", monospace; color: var(--dim); margin-top: 8px; }
+
+/* ---------- shelf + panels ---------- */
+.shelf {
+  height: 18px; margin: 22px -8px; border-radius: 4px; position: relative;
+  background:
+    repeating-linear-gradient(90deg, rgba(0,0,0,.12) 0 1px, transparent 1px 37px),
+    linear-gradient(var(--wood-hi), var(--wood) 55%, var(--wood-lo));
+  box-shadow: 0 8px 14px rgba(0,0,0,.55), inset 0 1px 0 rgba(255,255,255,.2);
+  border: 2px solid var(--outline);
+}
+.grid { display: grid; gap: 18px; }
+.stats { grid-template-columns: repeat(auto-fit, minmax(230px, 1fr)); }
 .two { grid-template-columns: 1fr 1fr; }
-@media (max-width: 760px) { .two { grid-template-columns: 1fr; } h1 { font-size: 32px; } .map { grid-template-columns: repeat(32, 1fr); } }
+@media (max-width: 760px) { .two { grid-template-columns: 1fr; } }
+.panel {
+  position: relative; min-width: 0; padding: 22px 22px 20px; border-radius: 14px;
+  background:
+    radial-gradient(circle at 12px 12px, var(--rivet) 2.5px, transparent 3.5px),
+    radial-gradient(circle at calc(100% - 12px) 12px, var(--rivet) 2.5px, transparent 3.5px),
+    radial-gradient(circle at 12px calc(100% - 12px), var(--rivet) 2.5px, transparent 3.5px),
+    radial-gradient(circle at calc(100% - 12px) calc(100% - 12px), var(--rivet) 2.5px, transparent 3.5px),
+    repeating-linear-gradient(100deg, rgba(255,255,255,.025) 0 2px, transparent 2px 6px),
+    linear-gradient(160deg, var(--metal-hi), var(--metal) 35%, var(--metal-lo));
+  border: 3px solid var(--outline);
+  box-shadow: inset 0 2px 0 rgba(255,255,255,.12), inset 0 -3px 0 rgba(0,0,0,.35), 0 6px 0 var(--outline);
+}
+h2 {
+  margin: 0 0 14px; font: 400 26px/1 Bangers, Impact, sans-serif; letter-spacing: .06em; color: var(--yellow);
+  -webkit-text-stroke: 1px var(--outline); text-shadow: 0 3px 0 var(--outline);
+}
+.label { font: 400 20px/1.1 Bangers, Impact, sans-serif; letter-spacing: .06em; color: var(--muted); }
+.big {
+  font: 400 52px/1 Bangers, Impact, sans-serif; letter-spacing: .03em; color: var(--slime);
+  -webkit-text-stroke: 1.5px var(--outline); text-shadow: 0 0 18px var(--glow), 0 4px 0 var(--outline);
+  font-variant-numeric: tabular-nums; margin: 6px 0 2px;
+}
+.small { font-size: 13px; color: var(--muted); font-variant-numeric: tabular-nums; }
+
+/* ---------- test-tube bars ---------- */
+.tube {
+  position: relative; height: 22px; margin: 12px 0 10px; border-radius: 12px; overflow: hidden;
+  background: linear-gradient(rgba(255,255,255,.14), rgba(255,255,255,.03) 45%, rgba(0,0,0,.25)), #10201b;
+  border: 2px solid var(--outline); box-shadow: inset 0 0 0 1px rgba(255,255,255,.08);
+}
+.tube i {
+  position: absolute; inset: 0 auto 0 0; display: block; border-radius: 10px 0 0 10px;
+  background:
+    radial-gradient(circle at 20% 60%, rgba(255,255,255,.55) 1.5px, transparent 2.5px) 0 0/22px 22px,
+    linear-gradient(#c3ff7a, var(--slime) 45%, var(--slime-dk));
+  box-shadow: 0 0 12px var(--glow); animation: bubble 3s linear infinite;
+}
+.tube::after {
+  content: ""; position: absolute; left: 8px; right: 8px; top: 3px; height: 4px; border-radius: 4px;
+  background: rgba(255,255,255,.25);
+}
+.tube.orange i { background: radial-gradient(circle at 20% 60%, rgba(255,255,255,.5) 1.5px, transparent 2.5px) 0 0/22px 22px, linear-gradient(#ffd27a, var(--orange) 50%, #a04e00); box-shadow: 0 0 12px rgba(255,154,31,.5); }
+.tube.purple i { background: radial-gradient(circle at 20% 60%, rgba(255,255,255,.5) 1.5px, transparent 2.5px) 0 0/22px 22px, linear-gradient(#d7b8ff, var(--purple) 50%, #4b1f86); box-shadow: 0 0 12px rgba(155,93,229,.5); }
+@keyframes bubble { to { background-position: 0 -22px, 0 0; } }
+@media (prefers-reduced-motion: reduce) { .tube i { animation: none; } }
+
+/* ---------- specimen grid ---------- */
+.map {
+  display: grid; grid-template-columns: repeat(64, 1fr); gap: 2px; padding: 10px; border-radius: 10px;
+  background: #0b1512; border: 2px solid var(--outline); box-shadow: inset 0 0 22px rgba(0,0,0,.7);
+}
+.map div { aspect-ratio: 1; border-radius: 2px; background: #1e2c27; }
+@media (max-width: 760px) { .map { grid-template-columns: repeat(32, 1fr); } }
+.legend { display: flex; gap: 16px; flex-wrap: wrap; font-size: 13px; color: var(--muted); margin-top: 12px; align-items: center; }
+.legend b { display: inline-block; width: 11px; height: 11px; border-radius: 3px; margin-right: 6px; vertical-align: -1px; border: 1px solid var(--outline); }
+
+/* ---------- milestones ---------- */
 ul.ms { list-style: none; margin: 0; padding: 0; }
-ul.ms li { display: grid; grid-template-columns: 22px 1fr; gap: 10px; padding: 10px 0; border-top: 1px solid var(--line); }
+ul.ms li { display: grid; grid-template-columns: 30px 1fr; gap: 10px; padding: 10px 0; border-top: 1px dashed rgba(255,255,255,.12); }
 ul.ms li:first-child { border-top: 0; padding-top: 0; }
-.dot { width: 14px; height: 14px; border-radius: 50%; border: 2px solid var(--muted); margin-top: 4px; }
-.dot.done { background: var(--accent); border-color: var(--accent); }
-.dot.in_progress { border-color: var(--warn); background: linear-gradient(90deg, var(--warn) 50%, transparent 50%); }
-.ms strong { font-weight: 600; }
+.jar {
+  width: 22px; height: 26px; margin-top: 1px; border: 2px solid var(--outline); border-radius: 4px 4px 7px 7px;
+  background: linear-gradient(90deg, rgba(255,255,255,.18), rgba(255,255,255,.04)); position: relative; overflow: hidden;
+}
+.jar::before { content: ""; position: absolute; left: -2px; right: -2px; top: -2px; height: 6px; background: var(--metal-hi); border-bottom: 2px solid var(--outline); }
+.jar::after { content: ""; position: absolute; left: 0; right: 0; bottom: 0; height: 0; }
+.jar.done::after { height: 80%; background: linear-gradient(#c3ff7a, var(--slime-dk)); box-shadow: 0 0 10px var(--glow); }
+.jar.in_progress::after { height: 45%; background: linear-gradient(#ffd27a, #b25a00); }
+.ms strong { font-weight: 700; }
 .ms p { margin: 2px 0 0; color: var(--muted); font-size: 13px; }
+.ms .st { font: 400 13px Bangers, Impact, sans-serif; letter-spacing: .08em; margin-left: 6px; }
+.st.done { color: var(--slime); } .st.in_progress { color: var(--orange); } .st.todo { color: var(--dim); }
+
+/* ---------- log, table, files ---------- */
+.log { margin: 0; padding: 0; list-style: none; }
+.log li { padding: 9px 0 9px 14px; border-left: 3px solid var(--slime-dk); margin-bottom: 8px; font-size: 14px; background: rgba(0,0,0,.18); border-radius: 0 8px 8px 0; padding-right: 10px; }
+.log time { font: 12px "JetBrains Mono", monospace; color: var(--yellow); display: block; }
 table { width: 100%; border-collapse: collapse; font-size: 13px; }
-td, th { text-align: left; padding: 7px 4px; border-top: 1px solid var(--line); }
+td, th { text-align: left; padding: 7px 4px; border-top: 1px dashed rgba(255,255,255,.12); }
 th { color: var(--muted); font-weight: 500; border-top: 0; }
 td.num { text-align: right; font-variant-numeric: tabular-nums; white-space: nowrap; }
-.mini { width: 90px; } .mini .bar { margin: 0; height: 6px; }
-.log { margin: 0; padding: 0; list-style: none; }
-.log li { padding: 8px 0; border-top: 1px solid var(--line); font-size: 14px; }
-.log li:first-child { border-top: 0; padding-top: 0; }
-.log time { font: 12px "JetBrains Mono", monospace; color: var(--muted); display: block; }
-code, .mono { font: 12.5px "JetBrains Mono", monospace; }
-details { border-top: 1px solid var(--line); padding: 8px 0; }
+.mini { width: 100px; } .mini .tube { margin: 0; height: 12px; border-width: 1.5px; } .mini .tube::after { display: none; }
+code, .mono { font: 12.5px "JetBrains Mono", monospace; color: #cde8c0; }
+details { border-top: 1px dashed rgba(255,255,255,.12); padding: 8px 0; }
 details:first-of-type { border-top: 0; }
-summary { cursor: pointer; font-weight: 500; }
-.fnlist { columns: 2 220px; margin: 8px 0 0; padding: 0 0 0 4px; list-style: none; color: var(--muted); }
-#chart svg { width: 100%; height: 160px; display: block; }
-.empty { color: var(--muted); font-size: 14px; }
-footer { margin-top: 40px; color: var(--muted); font-size: 13px; }
-.toggle { background: none; border: 1px solid var(--line); color: var(--muted); border-radius: 8px; padding: 4px 10px; cursor: pointer; font: inherit; font-size: 12px; margin-top: 8px; }
+summary { cursor: pointer; }
+.fnlist { columns: 2 200px; margin: 8px 0 0; padding: 0 0 0 4px; list-style: none; }
+#chart svg { width: 100%; height: 170px; display: block; border-radius: 10px; background: #0b1512; border: 2px solid var(--outline); }
+.empty { color: var(--muted); font-size: 14px; margin: 0; }
+.sub-note { margin: -6px 0 12px; }
+footer { margin-top: 34px; text-align: center; color: var(--dim); font-size: 13px; }
 </style>
 </head>
 <body>
 <div class="wrap">
   <header>
-    <div>
-      <h1>Monster Lab <span>Decomp</span></h1>
-      <div class="sub">Rebuilding the Wii game (PAL, RM7P4F) as readable C++ and porting it to Windows.</div>
+    <div class="logo">
+      <h1 aria-label="Monster"><span>M</span><span>o</span><span>n</span><span>s</span><span>t</span><span>e</span><span>r</span></h1>
+      <div class="plate">Lab Decomp</div>
     </div>
-    <div class="meta"><div id="updated">loading…</div><button class="toggle" id="theme">Toggle theme</button></div>
+    <p class="tag">Rebuilding the Wii game (PAL, RM7P4F) as readable C++ and porting it to Windows. One specimen at a time.</p>
+    <div class="meta" id="updated">loading…</div>
   </header>
 
+  <div class="shelf"></div>
+
   <div class="grid stats">
-    <div class="card"><div class="label">Game code decompiled</div><div class="big" id="s-decomp">–</div><div class="bar"><i id="b-decomp"></i></div><div class="small" id="s-decomp-sub"></div></div>
-    <div class="card"><div class="label">Game functions named</div><div class="big" id="s-named">–</div><div class="bar"><i id="b-named"></i></div><div class="small" id="s-named-sub"></div></div>
-    <div class="card"><div class="label">SDK &amp; libraries identified</div><div class="big" id="s-lib">–</div><div class="bar"><i id="b-lib"></i></div><div class="small" id="s-lib-sub"></div></div>
+    <div class="panel"><div class="label">Game code decompiled</div><div class="big" id="s-decomp">–</div><div class="tube"><i id="b-decomp"></i></div><div class="small" id="s-decomp-sub"></div></div>
+    <div class="panel"><div class="label">Game functions named</div><div class="big" id="s-named">–</div><div class="tube orange"><i id="b-named"></i></div><div class="small" id="s-named-sub"></div></div>
+    <div class="panel"><div class="label">SDK &amp; libraries identified</div><div class="big" id="s-lib">–</div><div class="tube purple"><i id="b-lib"></i></div><div class="small" id="s-lib-sub"></div></div>
   </div>
 
-  <section class="card">
-    <h2>Game code map</h2>
+  <div class="shelf"></div>
+
+  <section class="panel">
+    <h2>Specimen map: game code</h2>
     <div class="map" id="map" role="img" aria-label="Map of the game code region"></div>
     <div class="legend">
-      <span><b style="background:var(--accent)"></b>Decompiled</span>
-      <span><b style="background:var(--accent-soft)"></b>Named</span>
-      <span><b style="background:var(--empty)"></b>Not started</span>
+      <span><b style="background:var(--slime)"></b>Decompiled</span>
+      <span><b style="background:var(--orange)"></b>Named</span>
+      <span><b style="background:#1e2c27"></b>Not started</span>
       <span class="mono" id="range"></span>
     </div>
   </section>
 
-  <div class="grid two">
-    <section class="card"><h2>Milestones</h2><ul class="ms" id="ms"></ul></section>
-    <section class="card"><h2>Recent changes</h2><ul class="log" id="log"></ul></section>
-  </div>
-
-  <section class="card" id="chart"><h2>Progress over time</h2></section>
+  <div class="shelf"></div>
 
   <div class="grid two">
-    <section class="card"><h2>Library code</h2><p class="small" style="margin-top:-6px">Replaced on PC, not decompiled. It only needs identifying.</p><table id="libs"></table></section>
-    <section class="card"><h2>Decompiled source files</h2><div id="files"></div></section>
+    <section class="panel"><h2>Experiments</h2><ul class="ms" id="ms"></ul></section>
+    <section class="panel"><h2>Lab notes</h2><ul class="log" id="log"></ul></section>
   </div>
 
-  <footer>No game assets are hosted here. You need your own copy of the disc to build.</footer>
+  <div class="shelf"></div>
+
+  <section class="panel" id="chart"><h2>Growth chart</h2></section>
+
+  <div class="shelf"></div>
+
+  <div class="grid two">
+    <section class="panel"><h2>Library code</h2><p class="small sub-note">Replaced on PC, not decompiled. It only needs identifying.</p><table id="libs"></table></section>
+    <section class="panel"><h2>Decompiled source files</h2><div id="files"></div></section>
+  </div>
+
+  <footer>A fan project. No game assets are hosted here. You need your own copy of the disc to build.</footer>
 </div>
 <script>
 const $ = id => document.getElementById(id);
 const pct = (a, b) => b ? (100 * a / b) : 0;
 const fmt = n => n.toLocaleString('en-US');
 const esc = s => String(s).replace(/[&<>"]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
-
-try {
-  const saved = localStorage.getItem('theme');
-  if (saved) document.documentElement.dataset.theme = saved;
-} catch (e) {}
-$('theme').onclick = () => {
-  const dark = document.documentElement.dataset.theme
-    ? document.documentElement.dataset.theme === 'dark'
-    : matchMedia('(prefers-color-scheme: dark)').matches;
-  const next = dark ? 'light' : 'dark';
-  document.documentElement.dataset.theme = next;
-  try { localStorage.setItem('theme', next); } catch (e) {}
-};
+const STATUS = { done: 'Alive!', in_progress: 'Brewing', todo: 'On the shelf' };
 
 function stat(key, done, total, sub) {
   const p = pct(done, total);
   $('s-' + key).textContent = p.toFixed(p < 10 ? 2 : 1) + '%';
-  $('b-' + key).style.width = Math.max(p, done ? 0.4 : 0) + '%';
+  $('b-' + key).style.width = Math.max(p, done ? 2 : 0) + '%';
   $('s-' + key + '-sub').textContent = sub;
 }
 
@@ -160,21 +248,20 @@ async function load() {
 
   $('range').textContent = '0x' + prog.game_range[0] + ' – 0x' + prog.game_range[1];
   $('map').innerHTML = prog.memory_map.map(([d, n]) => {
-    let bg = 'var(--empty)';
-    if (d > 0) bg = `color-mix(in srgb, var(--accent) ${Math.round(30 + 70 * d)}%, var(--empty))`;
-    else if (n > 0) bg = `color-mix(in srgb, var(--accent-soft) ${Math.round(40 + 60 * n)}%, var(--empty))`;
-    return `<div style="background:${bg}"></div>`;
+    if (d > 0) return `<div style="background:color-mix(in srgb, var(--slime) ${Math.round(40 + 60 * d)}%, #1e2c27);box-shadow:0 0 6px var(--glow)"></div>`;
+    if (n > 0) return `<div style="background:color-mix(in srgb, var(--orange) ${Math.round(35 + 65 * n)}%, #1e2c27)"></div>`;
+    return '<div></div>';
   }).join('');
 
   $('ms').innerHTML = feat.milestones.map(m =>
-    `<li><span class="dot ${m.status}"></span><div><strong>${esc(m.title)}</strong><p>${esc(m.detail)}</p></div></li>`).join('');
+    `<li><span class="jar ${m.status}"></span><div><strong>${esc(m.title)}</strong><span class="st ${m.status}">${STATUS[m.status] || ''}</span><p>${esc(m.detail)}</p></div></li>`).join('');
   $('log').innerHTML = feat.changelog.slice(0, 8).map(c =>
     `<li><time>${esc(c.date)}</time>${esc(c.text)}</li>`).join('');
 
   $('libs').innerHTML = '<tr><th>Library</th><th class="num">Functions</th><th>Identified</th></tr>' +
     prog.library_regions.map(r => {
       const p = pct(r.named_bytes, r.bytes);
-      return `<tr><td>${esc(r.name)}</td><td class="num">${fmt(r.functions)}</td><td class="mini"><div class="bar"><i style="width:${p}%"></i></div></td></tr>`;
+      return `<tr><td>${esc(r.name)}</td><td class="num">${fmt(r.functions)}</td><td class="mini"><div class="tube purple"><i style="width:${p}%"></i></div></td></tr>`;
     }).join('');
 
   $('files').innerHTML = prog.files.length ? prog.files.map(f =>
@@ -191,15 +278,15 @@ function drawChart(hist) {
     box.insertAdjacentHTML('beforeend', '<p class="empty">The chart appears once there are two or more days of history.</p>');
     return;
   }
-  const W = 1000, H = 160, P = 8;
+  const W = 1000, H = 170, P = 10;
   const ys = hist.map(h => pct(h.game.decompiled_bytes, h.game.bytes));
   const max = Math.max(1, ...ys) * 1.1;
   const pts = ys.map((y, i) => [P + i * (W - 2 * P) / (ys.length - 1), H - P - (y / max) * (H - 2 * P)]);
   const line = pts.map(p => p.join(',')).join(' ');
   const area = `${P},${H - P} ${line} ${W - P},${H - P}`;
   box.insertAdjacentHTML('beforeend', `<svg viewBox="0 0 ${W} ${H}" preserveAspectRatio="none" aria-label="Decompiled percentage over time">
-    <polygon points="${area}" fill="var(--accent-soft)" opacity=".6"/>
-    <polyline points="${line}" fill="none" stroke="var(--accent)" stroke-width="2.5" vector-effect="non-scaling-stroke"/></svg>
+    <polygon points="${area}" fill="#8be23a" opacity=".22"/>
+    <polyline points="${line}" fill="none" stroke="#8be23a" stroke-width="3" vector-effect="non-scaling-stroke"/></svg>
     <div class="legend"><span>${esc(hist[0].date)}</span><span style="margin-left:auto">${esc(hist[hist.length-1].date)} · ${ys[ys.length-1].toFixed(2)}%</span></div>`);
 }
 
