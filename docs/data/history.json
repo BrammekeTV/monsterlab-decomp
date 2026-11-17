@@ -2,18 +2,18 @@
  {
   "date": "2026-11-17",
   "game": {
-   "functions": 8559,
-   "bytes": 2277304,
+   "functions": 8548,
+   "bytes": 2265988,
    "named": 2358,
    "named_bytes": 438416,
    "decompiled": 336,
    "decompiled_bytes": 123840
   },
   "library": {
-   "functions": 4028,
-   "bytes": 1127624,
-   "named": 449,
-   "named_bytes": 92884,
+   "functions": 4039,
+   "bytes": 1138940,
+   "named": 458,
+   "named_bytes": 104144,
    "decompiled": 0,
    "decompiled_bytes": 0
   }

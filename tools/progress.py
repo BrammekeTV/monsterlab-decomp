@@ -20,11 +20,12 @@ ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 SYMS = os.path.join(ROOT, "config", "RM7P4F", "symbols.txt")
 OUT_DIR = os.path.join(ROOT, "docs", "data")
 
-GAME_START, GAME_END = 0x80006B40, 0x80232AF8   # game code; SDK/MSL/TRK after GAME_END
+GAME_START, GAME_END = 0x80006B40, 0x8022FEC4   # game code; zlib, SDK/MSL/TRK after GAME_END
 TEXT_END = 0x80345AE0
 
 # Coarse map of the library half of .text, from identified SDK symbols.
 LIB_REGIONS = [
+    (0x8022FEC4, 0x80232AF8, "zlib 1.2.3"),
     (0x80232AF8, 0x80241000, "OS"), (0x80241000, 0x80243400, "EXI/SI"),
     (0x80243400, 0x80244000, "DB"), (0x80244000, 0x80253000, "GX"),
     (0x80253000, 0x80257700, "DVD"), (0x80257700, 0x80264000, "AI/AX/MEM"),

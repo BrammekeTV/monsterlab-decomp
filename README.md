@@ -99,7 +99,7 @@ These live in the platform layer (`src/platform/`) that replaces the Wii SDK, so
 
 ### Priorities
 
-- Game code (`main` is at `0x80142DF0`; game code sits roughly at `0x80006B40`–`0x80232000`) is the real work.
+- Game code (`main` is at `0x80142DF0`; game code sits at `0x80006B40`–`0x8022FEC4`) is the real work. zlib 1.2.3 follows at `0x8022FEC4`–`0x80232AF8` (the PC port links real zlib).
 - SDK, MSL and Bink code (from about `0x80232AF8`) only needs to be **identified** so that it can be stubbed or reimplemented on PC. It does not need to be decompiled.
 
 ## Workflow
