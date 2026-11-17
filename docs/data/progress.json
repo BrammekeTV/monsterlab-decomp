@@ -1,15 +1,15 @@
 {
  "game_id": "RM7P4F",
- "generated": "2026-11-17T22:20:16+00:00",
- "commit": "a983700",
- "commit_date": "2026-11-17T23:18:53+01:00",
+ "generated": "2026-11-17T22:31:32+00:00",
+ "commit": "91acfd8",
+ "commit_date": "2026-11-17T23:22:43+01:00",
  "game": {
   "functions": 8548,
   "bytes": 2265988,
-  "named": 2457,
-  "named_bytes": 512392,
-  "decompiled": 1939,
-  "decompiled_bytes": 195432
+  "named": 2514,
+  "named_bytes": 527688,
+  "decompiled": 1951,
+  "decompiled_bytes": 202692
  },
  "library": {
   "functions": 4039,
@@ -22,10 +22,10 @@
  "all": {
   "functions": 12587,
   "bytes": 3404928,
-  "named": 2915,
-  "named_bytes": 616536,
-  "decompiled": 1939,
-  "decompiled_bytes": 195432
+  "named": 2972,
+  "named_bytes": 631832,
+  "decompiled": 1951,
+  "decompiled_bytes": 202692
  },
  "game_range": [
   "80006B40",
@@ -82,7 +82,7 @@
   ],
   [
    0.024,
-   0.029
+   0.059
   ],
   [
    0.004,
@@ -105,12 +105,12 @@
    0.049
   ],
   [
-   0.0,
-   0.031
+   0.345,
+   0.598
   ],
   [
    0.005,
-   0.0
+   0.061
   ],
   [
    0.003,
@@ -173,24 +173,24 @@
    0.378
   ],
   [
-   0.057,
-   0.014
+   0.077,
+   0.078
   ],
   [
-   0.041,
-   0.0
+   0.06,
+   0.06
   ],
   [
-   0.014,
-   0.0
+   0.412,
+   0.409
   ],
   [
    0.0,
-   0.0
+   0.13
   ],
   [
    0.013,
-   0.247
+   0.324
   ],
   [
    0.002,
@@ -626,7 +626,7 @@
   ],
   [
    0.027,
-   0.089
+   0.1
   ],
   [
    0.013,
@@ -782,7 +782,7 @@
   ],
   [
    0.003,
-   0.004
+   0.017
   ],
   [
    0.002,
@@ -822,7 +822,7 @@
   ],
   [
    0.002,
-   0.0
+   0.19
   ],
   [
    0.009,
@@ -986,7 +986,7 @@
   ],
   [
    0.0,
-   0.224
+   0.377
   ],
   [
    0.0,
@@ -1418,6 +1418,151 @@
    ]
   },
   {
+   "path": "src/engine/vecmath.cpp",
+   "functions": [
+    {
+     "name": "Vec3Copy",
+     "addr": "80052640",
+     "size": 28
+    },
+    {
+     "name": "Vec3SetZero",
+     "addr": "800531A8",
+     "size": 20
+    },
+    {
+     "name": "Vec3MulScalar",
+     "addr": "80053224",
+     "size": 44
+    },
+    {
+     "name": "ScalarSet",
+     "addr": "80053250",
+     "size": 8
+    },
+    {
+     "name": "Vec3Negate",
+     "addr": "80053324",
+     "size": 40
+    },
+    {
+     "name": "Vec3Assign",
+     "addr": "80053354",
+     "size": 28
+    },
+    {
+     "name": "Vec3Sub",
+     "addr": "80053370",
+     "size": 52
+    },
+    {
+     "name": "ScalarLess",
+     "addr": "800533B0",
+     "size": 24
+    },
+    {
+     "name": "Vec3AddTo",
+     "addr": "800544FC",
+     "size": 52
+    },
+    {
+     "name": "Vec3SubFrom",
+     "addr": "8005461C",
+     "size": 52
+    },
+    {
+     "name": "Vec3GetX",
+     "addr": "80054828",
+     "size": 8
+    },
+    {
+     "name": "Vec3GetY",
+     "addr": "80054830",
+     "size": 8
+    },
+    {
+     "name": "Vec3GetZ",
+     "addr": "80054838",
+     "size": 8
+    },
+    {
+     "name": "Vec3SetZ",
+     "addr": "800549A0",
+     "size": 8
+    },
+    {
+     "name": "Vec3SetUnitZ",
+     "addr": "800549A8",
+     "size": 24
+    },
+    {
+     "name": "Vec3Dot",
+     "addr": "800549C0",
+     "size": 52
+    },
+    {
+     "name": "Vec3ScaleBy",
+     "addr": "80054A3C",
+     "size": 44
+    },
+    {
+     "name": "Vec3LengthSqOf",
+     "addr": "80054A90",
+     "size": 36
+    },
+    {
+     "name": "Vec3NormalizeTo",
+     "addr": "80055D9C",
+     "size": 144
+    },
+    {
+     "name": "ScalarZero",
+     "addr": "80055E2C",
+     "size": 12
+    },
+    {
+     "name": "Vec3Length",
+     "addr": "80057128",
+     "size": 120
+    },
+    {
+     "name": "ScalarMul",
+     "addr": "80058214",
+     "size": 20
+    },
+    {
+     "name": "Vec3SetX",
+     "addr": "80058230",
+     "size": 8
+    },
+    {
+     "name": "Vec3SetY",
+     "addr": "80058238",
+     "size": 8
+    },
+    {
+     "name": "FloatAbs",
+     "addr": "80058240",
+     "size": 12
+    },
+    {
+     "name": "Vec3ToLocal",
+     "addr": "8005824C",
+     "size": 216
+    },
+    {
+     "name": "Vec3RotateNormalized",
+     "addr": "80058324",
+     "size": 296
+    },
+    {
+     "name": "Vec3Rotate",
+     "addr": "8005844C",
+     "size": 124
+    }
+   ]
+  },
+  {
    "path": "src/engine/view.cpp",
    "functions": [
     {
@@ -1809,6 +1954,26 @@
      "name": "special_camera_done_slerping",
      "addr": "80019594",
      "size": 16
+    }
+   ]
+  },
+  {
+   "path": "src/game/catch_minigame.cpp",
+   "functions": [
+    {
+     "name": "CatchMinigame_Update",
+     "addr": "8002E388",
+     "size": 3012
+    }
+   ]
+  },
+  {
+   "path": "src/game/char_contact.cpp",
+   "functions": [
+    {
+     "name": "CharacterOnContact",
+     "addr": "800575E8",
+     "size": 3116
     }
    ]
   },
@@ -3271,7 +3436,7 @@
      "size": 12
     },
     {
-     "name": "fn_800223E8",
+     "name": "CatchMinigame_UpdatePointer",
      "addr": "800223E8",
      "size": 4
     },
@@ -3441,7 +3606,7 @@
    "path": "src/leaf/auto_03_80030604_text.cpp",
    "functions": [
     {
-     "name": "fn_80030A98",
+     "name": "CatchObject_Release",
      "addr": "80030A98",
      "size": 8
     },
@@ -3881,11 +4046,6 @@
      "size": 4
     },
     {
-     "name": "fn_80052640",
-     "addr": "80052640",
-     "size": 28
-    },
-    {
      "name": "fn_800526D0",
      "addr": "800526D0",
      "size": 4
@@ -3901,11 +4061,6 @@
      "size": 8
     },
     {
-     "name": "fn_800531A8",
-     "addr": "800531A8",
-     "size": 20
-    },
-    {
      "name": "fn_800531E4",
      "addr": "800531E4",
      "size": 36
@@ -3916,29 +4071,9 @@
      "size": 28
     },
     {
-     "name": "fn_80053224",
-     "addr": "80053224",
-     "size": 44
-    },
-    {
-     "name": "fn_80053250",
-     "addr": "80053250",
-     "size": 8
-    },
-    {
-     "name": "fn_80053324",
-     "addr": "80053324",
-     "size": 40
-    },
-    {
      "name": "fn_8005334C",
      "addr": "8005334C",
      "size": 8
-    },
-    {
-     "name": "fn_80053354",
-     "addr": "80053354",
-     "size": 28
     },
     {
      "name": "fn_800533A4",
@@ -3946,12 +4081,12 @@
      "size": 12
     },
     {
-     "name": "fn_800533C8",
+     "name": "CharacterSetMoved",
      "addr": "800533C8",
      "size": 36
     },
     {
-     "name": "fn_800533EC",
+     "name": "CharacterSetRotated",
      "addr": "800533EC",
      "size": 36
     },
@@ -3991,21 +4126,6 @@
      "size": 48
     },
     {
-     "name": "fn_80054828",
-     "addr": "80054828",
-     "size": 8
-    },
-    {
-     "name": "fn_80054830",
-     "addr": "80054830",
-     "size": 8
-    },
-    {
-     "name": "fn_80054838",
-     "addr": "80054838",
-     "size": 8
-    },
-    {
      "name": "fn_80054840",
      "addr": "80054840",
      "size": 12
@@ -4021,16 +4141,6 @@
      "size": 24
     },
     {
-     "name": "fn_800549A0",
-     "addr": "800549A0",
-     "size": 8
-    },
-    {
-     "name": "fn_800549A8",
-     "addr": "800549A8",
-     "size": 24
-    },
-    {
      "name": "fn_800549F4",
      "addr": "800549F4",
      "size": 8
@@ -4039,11 +4149,6 @@
      "name": "fn_80054A30",
      "addr": "80054A30",
      "size": 12
-    },
-    {
-     "name": "fn_80054A3C",
-     "addr": "80054A3C",
-     "size": 44
     },
     {
      "name": "fn_80054A68",
@@ -4061,11 +4166,6 @@
      "size": 8
     },
     {
-     "name": "fn_80054A90",
-     "addr": "80054A90",
-     "size": 36
-    },
-    {
      "name": "fn_800553C0",
      "addr": "800553C0",
      "size": 28
@@ -4076,19 +4176,14 @@
      "size": 8
     },
     {
-     "name": "fn_80055D64",
+     "name": "RayQuerySetStart",
      "addr": "80055D64",
      "size": 28
     },
     {
-     "name": "fn_80055D80",
+     "name": "RayQuerySetDir",
      "addr": "80055D80",
      "size": 28
-    },
-    {
-     "name": "fn_80055E2C",
-     "addr": "80055E2C",
-     "size": 12
     },
     {
      "name": "fn_80056208",
@@ -4116,32 +4211,12 @@
      "size": 48
     },
     {
-     "name": "fn_80058214",
-     "addr": "80058214",
-     "size": 20
-    },
-    {
      "name": "fn_80058228",
      "addr": "80058228",
      "size": 8
     },
     {
-     "name": "fn_80058230",
-     "addr": "80058230",
-     "size": 8
-    },
-    {
-     "name": "fn_80058238",
-     "addr": "80058238",
-     "size": 8
-    },
-    {
-     "name": "fn_80058240",
-     "addr": "80058240",
-     "size": 12
-    },
-    {
-     "name": "fn_800584C8",
+     "name": "CharacterSetFallTimer",
      "addr": "800584C8",
      "size": 8
     },
