@@ -69,6 +69,11 @@
   "changelog": [
     {
       "date": "2026-11-17",
+      "time": "21:23",
+      "text": "Switched to decompiling the largest functions first. The four biggest turned out to be the script system's tables: the 1,812-entry list of functions the level and UI scripts can call, and the 392 call signatures saying what each one takes and returns (void, int, bool, hashed name, float, entity, script context). Both were generated straight from the originals, and every script callback now has typed parameters. Decompiled game code jumped from 2.3% to about 5%."
+    },
+    {
+      "date": "2026-11-17",
       "time": "21:13",
       "text": "Started on monster parts. Found and decoded the part database inside global_binary.sir: 186 definition slots (180 used, 6 spare), each with four tier names (Chimp Arm, Ape Arm, Gorilla Arm, Kong Arm), two actions and stats. The game text turns out to already be plain .txt files. Decompiled the database lookup, the text-key lookup and the first PartQuery functions (name, quality, madness, health, defect and enhancement textures). This is the format the planned open-format part mods will plug into."
     },

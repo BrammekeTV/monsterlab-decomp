@@ -364,3 +364,9 @@ fn_8021E6EC PartComputeActionCost
 fn_80332ED0 __cvt_fp2signed
 fn_800FB958 RegisterGameScriptFuncs
 fn_801DC9F4 RegisterEngineScriptFuncs
+fn_801039C0 RegisterGameScriptSigs
+fn_801DDF58 RegisterEngineScriptSigs
+fn_801DC7D4 ScriptSigDefine
+fn_801DC59C ScriptSigsInit
+fn_801DC658 ScriptSigFinalize
+lbl_8047D6B8 gScriptSigs

@@ -1,15 +1,15 @@
 {
  "game_id": "RM7P4F",
- "generated": "2026-11-17T20:20:16+00:00",
- "commit": "239bebf",
- "commit_date": "2026-11-17T21:16:53+01:00",
+ "generated": "2026-11-17T20:23:07+00:00",
+ "commit": "c682a40",
+ "commit_date": "2026-11-17T21:20:17+01:00",
  "game": {
   "functions": 8559,
   "bytes": 2277304,
-  "named": 2351,
-  "named_bytes": 401760,
-  "decompiled": 332,
-  "decompiled_bytes": 87908
+  "named": 2356,
+  "named_bytes": 421440,
+  "decompiled": 334,
+  "decompiled_bytes": 106864
  },
  "library": {
   "functions": 4028,
@@ -22,10 +22,10 @@
  "all": {
   "functions": 12587,
   "bytes": 3404928,
-  "named": 2800,
-  "named_bytes": 494644,
-  "decompiled": 332,
-  "decompiled_bytes": 87908
+  "named": 2805,
+  "named_bytes": 514324,
+  "decompiled": 334,
+  "decompiled_bytes": 106864
  },
  "game_range": [
   "80006B40",
@@ -497,8 +497,8 @@
    0.0
   ],
   [
-   0.0,
-   0.08
+   0.92,
+   1.0
   ],
   [
    0.0,
@@ -897,8 +897,8 @@
    0.271
   ],
   [
-   0.295,
-   0.46
+   0.742,
+   0.953
   ],
   [
    0.0,
@@ -2738,6 +2738,21 @@
      "name": "RegisterEngineScriptFuncs",
      "addr": "801DC9F4",
      "size": 4628
+    }
+   ]
+  },
+  {
+   "path": "src/game/script_signatures.cpp",
+   "functions": [
+    {
+     "name": "RegisterGameScriptSigs",
+     "addr": "801039C0",
+     "size": 11940
+    },
+    {
+     "name": "RegisterEngineScriptSigs",
+     "addr": "801DDF58",
+     "size": 7016
     }
    ]
   },
