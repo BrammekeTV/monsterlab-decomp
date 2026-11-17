@@ -69,6 +69,11 @@
   "changelog": [
     {
       "date": "2026-11-17",
+      "time": "20:48",
+      "text": "Finished all 43 character state callbacks: pressing A on a node (challenges and other node actions, which level scripts can override), and steering at junctions with the d-pad or Nunchuk stick relative to the camera (holding back for half a second turns around)."
+    },
+    {
+      "date": "2026-11-17",
       "time": "20:46",
       "text": "Decompiled the exploration prompt (the header and text shown for the node the player stands on, with a prompt per challenge), challenge and interaction entry, walking between waypoints, and races (each waypoint takes the next route exit, the speed meter runs to 11)."
     },

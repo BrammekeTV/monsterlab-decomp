@@ -310,3 +310,8 @@ fn_80199AEC UIWidgetFindChild
 fn_8019F3AC UITextGetString
 fn_800D5944 PathGetNodeType
 fn_800D581C PathGetNodeText
+fn_801B9B98 PadGetHeld
+fn_80147704 StickRead
+fn_80122BD8 NunchukUpdate
+fn_80122E2C NunchukGetStick
+fn_801243B8 MtxMultVec

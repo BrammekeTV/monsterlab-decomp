@@ -38,6 +38,8 @@ extern void* gObjDb;               // 0x805FB180
 
 typedef void* (*GetFighterFn)(Character*);
 
+extern u8 lbl_8047C7D8[];
+
 #define WORLD       (gGame + 0xD5F0)
 #define PLAYER      ((Character*)*(void**)(gGame + 0xD614))
 #define CHARACTERS  ((Character**)(gGame + 0x140))     // 32 slots
@@ -668,10 +670,205 @@ void character_race_update(ScriptCtx* ctx) {
     CharacterFaceDirection(c, &face, FALSE);
 }
 
+extern "C" void PauseAllExplorationCharacters(void);
+extern "C" BOOL fn_8004D170(Character* c);
+extern u8 lbl_805FB0E4;
+
+// 0x800169A4
+// Standing on a node while exploring: pressing A uses the node (challenge, type 8 / 4 / 16
+// actions); a world script can take over the press by setting save+0x100.
+void character_exploration_idle_update(ScriptCtx* ctx) {
+    Character* c = ctx->chr;
+    if (c == NULL) return;
+
+    void* set = ScreenSetsCurrent(gScreenSets);
+    if (set != NULL) {
+        void* w = ScreenSetFindWidget(set, UI_EXPLORATION_SCREEN);
+        if (w != NULL && ScreenSetWidgetVisible(set, w)) {
+            u8* pending = (u8*)c + 0x9F8;
+            if (*pending) {
+                fn_80016FD0(c, 1);
+                *pending = 0;
+            }
+            if (c == PLAYER && !UIElement_IsUIAnimPlaying(UI_PROMPT_ANIM_TARGET)) {
+                ExplorationHudSetFighter(set, VCALL(c, 0xF0, GetFighterFn)(c), 0);
+            }
+        }
+    }
+
+    if (fn_800E6BD4() || *(s32*)(gSaveSystem + 0xA1C) != 0 || WorldGetPhase(WORLD) == WORLD_PHASE_4) {
+        PauseAllExplorationCharacters();
+        return;
+    }
+
+    if (c->path != NULL) {
+        c->def->pos = *PathGetPosition(c->path);
+        if (!PathAtWaypoint(c->path)) {
+            // Still between nodes: face the way we go and start walking.
+            Vec3 dir = PathGetDirection(c->path);
+            CharacterFaceDirection(c, &dir, FALSE);
+            PathSetMoving(c->path, FALSE);
+            Send(c, 0x705B8B52);
+            return;
+        }
+    }
+
+    if (!(PadGetButtons(*(void**)(gScriptCtx + 0x38)) & PAD_BUTTON_A)) return;
+    if (lbl_8047C7D8[0] || fn_800E6BD4() || !lbl_805FB0E4 || fn_8004D170(c) || c->path == NULL) return;
+
+    *(s32*)(gSaveSystem + 0x100) = 0;
+    WorldSendEvent(WORLD, 0xAE2DA05D, PathGetNodeId(c->path), 0, 1);
+    if (*(s32*)(gSaveSystem + 0x100) != 0) return;     // handled by a script
+    if (!PathIsAtJunction(c->path)) return;
+
+    switch (PathGetNodeType(c->path)) {
+    case NODE_TYPE_8:
+        Send(c, 0xD0354B85);
+        break;
+    case NODE_CHALLENGE:
+        Send(c, 0x74027504);
+        break;
+    case NODE_TYPE_4:
+        Send(c, 0x8AD54581);
+        break;
+    case NODE_TYPE_16:
+        Send(c, 0x06B0A31C);
+        *(s32*)(gSaveSystem + 0x104) = 9;
+        break;
+    }
+}
+
+// ---------------------------------------------------------------- choosing a path at a node
+// The player steers with the d-pad or the Nunchuk stick. Input is rotated into world space by
+// the camera matrix; exits are numbered 0 = up, 1 = right, 2 = down, 3 = left on screen.
+
+extern "C" {
+u32   PadGetHeld(s32 chan);                                      // 0x801B9B98
+void  StickRead(s32 channel, f32* x, f32* y);                    // 0x80147704
+void  NunchukUpdate(void* nunchuk);                              // 0x80122BD8
+void  NunchukGetStick(void* nunchuk, Vec3* out, f32* deadzone);  // 0x80122E2C
+void  MtxMultVec(const Mtx m, const Vec3* in, Vec3* out);       // 0x801243B8
+}
+extern u8 lbl_805FB1A4[];          // [1] != 0: stick input disabled
+
+#define PAD_LEFT  0x1
+#define PAD_RIGHT 0x2
+#define PAD_DOWN  0x4
+#define PAD_UP    0x8
+
+typedef void (*GetViewMtxFn)(void* camera, Mtx out);
+
+static inline void* SceneCamera(void) {
+    return *(void**)(gScriptCtx + 0x4);
+}
+
+static inline BOOL IsNearZero(const Vec3& v) {
+    return v.x <= 0.0001f && v.x >= -0.0001f &&
+           v.y <= 0.0001f && v.y >= -0.0001f &&
+           v.z <= 0.0001f && v.z >= -0.0001f;
+}
+
+static inline Vec3 DpadVector(u32 held, f32 amount) {
+    Vec3 v = { 0.0f, 0.0f, 0.0f };
+    if (held & PAD_RIGHT)     v.y = -amount;
+    else if (held & PAD_LEFT) v.y = amount;
+    if (held & PAD_DOWN)      v.x = -amount;
+    else if (held & PAD_UP)   v.x = amount;
+    return v;
+}
+
+static inline void Negate(Vec3& v) {
+    v.x *= -1.0f;
+    v.y *= -1.0f;
+    v.z *= -1.0f;
+}
+
+// 0x800182A4
+// Returns TRUE when the player picked a direction (and the matching exit was taken).
+BOOL target_node_selected(ScriptCtx* ctx) {
+    s32 chan = *(s32*)(gScriptCtx + 0x38);
+    u32 held = PadGetHeld(chan);
+    Character* c = ctx->chr;
+    BOOL selected = FALSE;
+    if (c == NULL || lbl_8047C7D8[0] || fn_800E6BD4() || *(s32*)(gSaveSystem + 0xA1C) != 0) return FALSE;
+    if (fn_8004D170(c) || WorldGetPhase(WORLD) != WORLD_PHASE_EXPLORE) return FALSE;
+
+    Mtx view;
+    void* cam = SceneCamera();
+    ((GetViewMtxFn)(*(void***)cam)[0x38 / 4])(cam, view);
+
+    Vec3 stick = { 0.0f, 0.0f, 0.0f };
+    if (!lbl_805FB1A4[1]) {
+        StickRead(chan * 16 + 14, &stick.x, &stick.y);
+        if (stick.x > -0.1f && stick.x < 0.1f) stick.x = 0.0f;
+        if (stick.y > -0.1f && stick.y < 0.1f) stick.y = 0.0f;
+    }
+    u32 exits = c->path != NULL ? PathGetExits(c->path, 0) : 0xFFFFFFFF;
+
+    if ((held & 0xF) == 0 && IsNearZero(stick)) return FALSE;
+    selected = TRUE;
+
+    Vec3 dpad = DpadVector(held, 1.0f);
+    if (*(s32*)((u8*)c + 0x9D4) != 0) {    // controls mirrored
+        Negate(dpad);
+        Negate(stick);
+    }
+    MtxMultVec(view, &dpad, &dpad);
+    dpad.z = 0.0f;
+    MtxMultVec(view, &stick, &stick);
+    stick.z = 0.0f;
+
+    if ((dpad.y < -0.5f && dpad.y < dpad.x) || (stick.y < -0.5f && stick.y < stick.x)) {
+        if (c->path != NULL && (exits & 4)) PathTakeExit(c->path, 2, 0);
+    } else if ((dpad.y > 0.5f && dpad.y > dpad.x) || (stick.y > 0.5f && stick.y > stick.x)) {
+        if (c->path != NULL && (exits & 1)) PathTakeExit(c->path, 0, 0);
+    } else if (dpad.x < -0.5f || stick.x < -0.5f) {
+        if (c->path != NULL && (exits & 8)) PathTakeExit(c->path, 3, 0);
+    } else if (dpad.x > 0.5f || stick.x > 0.5f) {
+        if (c->path != NULL && (exits & 2)) PathTakeExit(c->path, 1, 0);
+    }
+
+    // Only counts if we actually left the node.
+    if (c->path == NULL || PathAtWaypoint(c->path)) selected = FALSE;
+    return selected;
+}
+
+// 0x8001879C
+// While walking, pressing back (against the facing direction) for half a second turns around.
+BOOL target_node_changed(ScriptCtx* ctx) {
+    u32 held = PadGetHeld(*(s32*)(gScriptCtx + 0x38));
+    Character* c = ctx->chr;
+    if (c == NULL || !(c->waitTimer > 0.5f)) return FALSE;
+
+    Vec3 facing = QuatGetAxisY(&c->def->rot);
+    Mtx view;
+    void* cam = SceneCamera();
+    ((GetViewMtxFn)(*(void***)cam)[0x38 / 4])(cam, view);
+
+    Vec3 stick = { 0.0f, 0.0f, 0.0f };
+    f32 deadzone = 0.8f;
+    if (!lbl_805FB1A4[1]) {
+        NunchukUpdate(gScriptCtx + 0x20);
+        NunchukGetStick(gScriptCtx + 0x20, &stick, &deadzone);
+    }
+    if ((held & 0xF) == 0 && IsNearZero(stick)) return FALSE;
+
+    Vec3 dpad = DpadVector(held, 3.0f);
+    if (*(s32*)((u8*)c + 0x9D4) != 0) {
+        Negate(dpad);
+        Negate(stick);
+    }
+    MtxMultVec(view, &dpad, &dpad);
+    dpad.z = 0.0f;
+    MtxMultVec(view, &stick, &stick);
+    stick.z = 0.0f;
+
+    f32 dDpad = facing.x * dpad.x + facing.y * dpad.y + facing.z * dpad.z;
+    f32 dStick = facing.x * stick.x + facing.y * stick.y + facing.z * 0.0f;
+    return dDpad <= -0.7f || dStick <= -0.7f;
+}
+
 // Not yet decompiled callbacks.
-BOOL target_node_selected(ScriptCtx* ctx);
-BOOL target_node_changed(ScriptCtx* ctx);
-void character_exploration_idle_update(ScriptCtx* ctx);
 
 // 0x80016400
 void RegisterCharacterStateCallbacks(void) {
