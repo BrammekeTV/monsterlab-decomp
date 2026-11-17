@@ -623,11 +623,55 @@ extern "C" void fn_80016FD0(Character* c, int animate) {
     UIText_SetString_TextID(UI_PROMPT_HEADER, header);
 }
 
+extern "C" BOOL ShakePromptBlink(s32 player, f32 phase);   // 0x80015C40
+
+#define RACE_MAX_SPEED 11.0f      // full speed meter
+
+// 0x80017AE0
+// Racing along the route: each waypoint reached takes the next route exit; at the end of the
+// route the racer stops. The speed meter shows pathSpeed (driven by shaking) out of 11.
+void character_race_update(ScriptCtx* ctx) {
+    Character* c = ctx->chr;
+    if (c == NULL) return;
+
+    void* set = ScreenSetsCurrent(gScreenSets);
+    ExplorationHudSetFighter(set, VCALL(c, 0xF0, GetFighterFn)(c), 0);
+    c->waitTimer += c->dt;
+
+    if (PathAtWaypoint(c->path)) {
+        WorldSendEvent(WORLD, 0x6E9F46BC, 0, 0, 1);
+        BOOL atEnd = c->routeLength <= 0 || c->route[c->routeIndex] == -1;
+        if (atEnd) {
+            if (c->pathSpeed > 0.0f) {
+                PlayCharacterAnimation(c, 1, 0xE3712F44 /* "IdleReg" */, 1);
+                c->pathSpeed = 0.0f;
+                c->def->pos = *PathGetPosition(c->path);
+                CharacterSetBlend(c, 1.0f);
+            }
+            return;
+        }
+        if (c->route != NULL) {
+            PathTakeExit(c->path, c->route[c->routeIndex], 0);
+            c->routeIndex++;
+        }
+    }
+
+    UIElement_SetVisibleFlag(0x552FC6C7, TRUE);
+    UISlider_SetValue(0xA90A6046, c->pathSpeed / RACE_MAX_SPEED);
+    if (ShakePromptBlink(0, c->waitTimer) && ShakePromptBlink(1, c->waitTimer)) c->waitTimer = 0.0f;
+
+    Vec3 dir = PathGetDirection(c->path);
+    dir.z = 0.0f;
+    if (c->path == NULL || PathAtWaypoint(c->path) || Vec3LengthSq(dir) <= 0.01f) return;
+    c->def->pos = *PathGetPosition(c->path);
+    Vec3 face = PathGetDirection(c->path);
+    CharacterFaceDirection(c, &face, FALSE);
+}
+
 // Not yet decompiled callbacks.
 BOOL target_node_selected(ScriptCtx* ctx);
 BOOL target_node_changed(ScriptCtx* ctx);
 void character_exploration_idle_update(ScriptCtx* ctx);
-void character_race_update(ScriptCtx* ctx);
 
 // 0x80016400
 void RegisterCharacterStateCallbacks(void) {

@@ -1,15 +1,15 @@
 {
  "game_id": "RM7P4F",
- "generated": "2026-11-17T19:46:17+00:00",
- "commit": "85de17d",
- "commit_date": "2026-11-17T20:42:50+01:00",
+ "generated": "2026-11-17T19:46:45+00:00",
+ "commit": "bd6af93",
+ "commit_date": "2026-11-17T20:46:24+01:00",
  "game": {
   "functions": 8559,
   "bytes": 2277304,
   "named": 2306,
   "named_bytes": 353720,
-  "decompiled": 254,
-  "decompiled_bytes": 41556
+  "decompiled": 255,
+  "decompiled_bytes": 42140
  },
  "library": {
   "functions": 4028,
@@ -24,8 +24,8 @@
   "bytes": 3404928,
   "named": 2752,
   "named_bytes": 446160,
-  "decompiled": 254,
-  "decompiled_bytes": 41556
+  "decompiled": 255,
+  "decompiled_bytes": 42140
  },
  "game_range": [
   "80006B40",
@@ -61,7 +61,7 @@
    0.863
   ],
   [
-   0.837,
+   0.903,
    0.918
   ],
   [
@@ -1748,6 +1748,11 @@
      "name": "character_race_exit",
      "addr": "80017A44",
      "size": 156
+    },
+    {
+     "name": "character_race_update",
+     "addr": "80017AE0",
+     "size": 584
     },
     {
      "name": "character_challenge_entry",
