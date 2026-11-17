@@ -69,6 +69,11 @@
   "changelog": [
     {
       "date": "2026-11-17",
+      "time": "20:50",
+      "text": "Decompiled the camera and animation script functions: \"free\" and \"fixed\" camera modes, camera locks held by in-game cutscenes, skipping cutscenes with a button, and animation queries (finished, past the impact frame, in the last second)."
+    },
+    {
+      "date": "2026-11-17",
       "time": "20:48",
       "text": "Finished all 43 character state callbacks: pressing A on a node (challenges and other node actions, which level scripts can override), and steering at junctions with the d-pad or Nunchuk stick relative to the camera (holding back for half a second turns around)."
     },

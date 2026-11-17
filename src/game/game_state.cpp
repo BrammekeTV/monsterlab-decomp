@@ -20,8 +20,9 @@ extern u8   gFlag805FB948;                   ORIG(0x805FB948)  // two-player mod
 extern u8*  gSaveSystem;                     // 0x805FBBE0
 extern u8*  lbl_805FBBC8;
 extern f32  lbl_805F95A0, lbl_805FB314, lbl_805FB300;
-extern u8   lbl_805FAF64, lbl_805FB1A1, lbl_805FB1A0;
-extern s32  lbl_805FAF68, lbl_805FAF60;
+extern u8   gCameraFlag, lbl_805FB1A1, lbl_805FB1A0;     // gCameraFlag: camera_script.cpp
+extern s32  gCameraLocks;
+extern void* gCameraOwner;
 
 // Partial layout of gGame.
 struct GameState {
@@ -72,10 +73,10 @@ void GameStateReset(GameState* g) {
     g->turnTimer[1] = -1.0f;
     lbl_805F95A0 = 1.0f;
     lbl_805FB314 = 0.0f;
-    lbl_805FAF64 = 0;
+    gCameraFlag = 0;
     lbl_805FB1A1 = 0;
-    lbl_805FAF68 = 0;
-    lbl_805FAF60 = 0;
+    gCameraLocks = 0;
+    gCameraOwner = 0;
     lbl_805FB1A0 = 0;
     g->unk13C = 0;
     for (int i = 0; i < 0x20; i++) g->unk140[i] = 0;

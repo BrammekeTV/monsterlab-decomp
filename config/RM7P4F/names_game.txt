@@ -315,3 +315,13 @@ fn_80147704 StickRead
 fn_80122BD8 NunchukUpdate
 fn_80122E2C NunchukGetStick
 fn_801243B8 MtxMultVec
+fn_80018C04 RegisterScriptFunctions
+fn_801AC2FC AnimSetFindClip
+fn_801AC164 AnimSetGetClip
+fn_8018C014 AnimGetFrame
+fn_8018BE78 AnimGetTime
+fn_8018C07C AnimGetLength
+fn_801B9BC4 PadConsumeButtons
+lbl_805FAF60 gCameraOwner
+lbl_805FAF64 gCameraFlag
+lbl_805FAF68 gCameraLocks

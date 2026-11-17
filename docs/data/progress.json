@@ -1,15 +1,15 @@
 {
  "game_id": "RM7P4F",
- "generated": "2026-11-17T19:48:29+00:00",
- "commit": "fda4ec0",
- "commit_date": "2026-11-17T20:46:47+01:00",
+ "generated": "2026-11-17T19:50:05+00:00",
+ "commit": "8af4cc0",
+ "commit_date": "2026-11-17T20:48:31+01:00",
  "game": {
   "functions": 8559,
   "bytes": 2277304,
-  "named": 2311,
-  "named_bytes": 355304,
-  "decompiled": 258,
-  "decompiled_bytes": 44720
+  "named": 2318,
+  "named_bytes": 356028,
+  "decompiled": 274,
+  "decompiled_bytes": 45936
  },
  "library": {
   "functions": 4028,
@@ -22,10 +22,10 @@
  "all": {
   "functions": 12587,
   "bytes": 3404928,
-  "named": 2757,
-  "named_bytes": 447744,
-  "decompiled": 258,
-  "decompiled_bytes": 44720
+  "named": 2764,
+  "named_bytes": 448468,
+  "decompiled": 274,
+  "decompiled_bytes": 45936
  },
  "game_range": [
   "80006B40",
@@ -65,8 +65,8 @@
    0.918
   ],
   [
-   0.3,
-   0.803
+   0.437,
+   0.817
   ],
   [
    0.0,
@@ -750,7 +750,7 @@
   ],
   [
    0.0,
-   0.029
+   0.044
   ],
   [
    0.0,
@@ -810,7 +810,7 @@
   ],
   [
    0.0,
-   0.0
+   0.042
   ],
   [
    0.0,
@@ -834,7 +834,7 @@
   ],
   [
    0.0,
-   0.089
+   0.097
   ],
   [
    0.0,
@@ -1628,6 +1628,91 @@
      "name": "CharacterSetMode",
      "addr": "80016284",
      "size": 348
+    }
+   ]
+  },
+  {
+   "path": "src/game/camera_script.cpp",
+   "functions": [
+    {
+     "name": "RegisterScriptFunctions",
+     "addr": "80018C04",
+     "size": 128
+    },
+    {
+     "name": "anim_done",
+     "addr": "80018C84",
+     "size": 44
+    },
+    {
+     "name": "anim_past_impact_frame",
+     "addr": "80018CB0",
+     "size": 180
+    },
+    {
+     "name": "anim_past_preload_time",
+     "addr": "80018D64",
+     "size": 124
+    },
+    {
+     "name": "should_igc_abort",
+     "addr": "80018E00",
+     "size": 84
+    },
+    {
+     "name": "acquire_camera_semaphore",
+     "addr": "80018E54",
+     "size": 24
+    },
+    {
+     "name": "release_camera_semaphore",
+     "addr": "80018E6C",
+     "size": 72
+    },
+    {
+     "name": "SetCameraMode",
+     "addr": "80018EB4",
+     "size": 140
+    },
+    {
+     "name": "set_camera_mode_from_sensor_type",
+     "addr": "80018F40",
+     "size": 116
+    },
+    {
+     "name": "clear_camera_mode",
+     "addr": "80018FB4",
+     "size": 52
+    },
+    {
+     "name": "fn_80018FE8",
+     "addr": "80018FE8",
+     "size": 4
+    },
+    {
+     "name": "set_interp_timer",
+     "addr": "80018FEC",
+     "size": 84
+    },
+    {
+     "name": "fn_80019040",
+     "addr": "80019040",
+     "size": 4
+    },
+    {
+     "name": "fixed_camera_return",
+     "addr": "80019044",
+     "size": 128
+    },
+    {
+     "name": "fn_800190C4",
+     "addr": "800190C4",
+     "size": 4
+    },
+    {
+     "name": "force_fixed_camera_return",
+     "addr": "800190C8",
+     "size": 28
     }
    ]
   },
