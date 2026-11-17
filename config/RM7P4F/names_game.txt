@@ -401,3 +401,5 @@ lbl_805FB2F2 sReadyRequested
 lbl_805FB2F4 sWorldSuspended
 lbl_805FB2FC sNextCullTime
 lbl_805FB304 sLastCullTime
+fn_80071BB4 CreateEntityByType
+fn_801D4414 ObjAlloc
