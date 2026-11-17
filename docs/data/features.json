@@ -69,6 +69,11 @@
   "changelog": [
     {
       "date": "2026-11-17",
+      "time": "22:22",
+      "text": "Identified zlib 1.2.3 (11 KB, the decompressor used for compressed data) at the end of what was counted as game code. It is now counted as a library: the PC port will use real zlib instead of decompiling it."
+    },
+    {
+      "date": "2026-11-17",
       "time": "21:28",
       "text": "Generated the engine's own script dispatcher as well (137 more cases), so every script call in the game now goes through decompiled code. Over 5% of the game code is decompiled."
     },
