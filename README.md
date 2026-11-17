@@ -38,9 +38,25 @@ DOL sections:
 |---|---|---|---|
 | `.bik` | 78 | Bink video | Bink SDK for PC, or FFmpeg (`libavcodec` decodes Bink 1) |
 | `.dsp` | 89 | Nintendo DSP-ADPCM audio | Decode to PCM (vgmstream or a small decoder) |
-| `.sir` | 60 | Engine container, magic `PNP0` | Needs reverse-engineering |
+| `.sir` | 60 | Engine container, magic `PNP0`: sections that are raw memory images (see below) | Load as-is; pointers fixed up on load |
 | `.arc` / `.tpl` | 10 | Nintendo U8 archives / textures (Home Button menu) | Not needed on PC |
 | `.mid`, `.wt`, `.pcm` | — | MIDI music + wavetable | Software synth |
+
+### `.sir` memory layout
+
+Each `.sir` section is a memory image the game copies to a fixed address in MEM2; pointers inside are absolute Wii addresses. Load addresses found with `tools/sir_decoder.py --list` over every archive:
+
+| Address | Contents |
+|---|---|
+| `0x90400000` | `global_binary.sir` section 1 (about 1 MB, always loaded). Section 0 is a 4 KB pointer table read into `sSirHeader`. |
+| `0x90540000` | Current level/arena, section 0 (`*_level`, `*_arena`, `castle_*`, `trouble_scope_map`) |
+| `0x90980000` | Current level/arena, section 1 (textures and geometry) |
+| `0x91240000` – `0x922C0000` | `shared_parts.sir`: 432 monster-part sections streamed into fixed slots |
+| `0x91B80000`, `0x924C0000`, `0x92940000` | `shared_ui.sir` screens |
+
+`castle_*C.sir` (no placed sections), `shared_texture.sir` (607 sections) and `shared_voice.sir` (5,168 sections) use other layouts and still need looking at.
+
+On PC the files stay in their original format, which keeps mods simple. The loader either reserves these address ranges or relocates the pointers in each section as it loads.
 
 ## Plan
 

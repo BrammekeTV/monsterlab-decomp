@@ -69,6 +69,11 @@
   "changelog": [
     {
       "date": "2026-11-17",
+      "time": "21:06",
+      "text": "Mapped every .sir archive with the .sir decoder: about 6,100 textures and 6,500 meshes, and the fixed memory addresses each file loads to (global data at 0x90400000, the current level at 0x90540000/0x90980000, 432 monster parts streamed into slots from 0x91240000, UI screens). Since these files are memory images full of absolute pointers, the PC loader will relocate them on load so the original files (and mods) can be used as-is."
+    },
+    {
+      "date": "2026-11-17",
       "time": "20:55",
       "text": "Fixed the name-recovery tool: one script table stores some names through offsets the tool did not follow, which had given 255 functions the wrong name. All 2,047 script callbacks now carry their correct names. One correction shows the code is shared with the PS2 version: the shake check is IsPS2, where shaking reads the analog controller. Also decompiled the delayed zone events and the projectile lob formula."
     },
