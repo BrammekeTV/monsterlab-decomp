@@ -1,231 +1,236 @@
 {
-  "milestones": [
-    {
-      "title": "Disc extracted",
-      "detail": "main.dol + 2.5 GB of game data pulled from the PAL disc (RM7P4F).",
-      "status": "done"
-    },
-    {
-      "title": "Executable split & analysed",
-      "detail": "decomp-toolkit finds 12,580 functions in 707 objects; game code at 0x80006B40–0x80232AF8.",
-      "status": "done"
-    },
-    {
-      "title": "Tooling",
-      "detail": "Cross-reference, renaming, progress, script-callback, name-hash and .sir decoding tools; this site updates on every push.",
-      "status": "done"
-    },
-    {
-      "title": "Boot path decompiled",
-      "detail": "main(), SDK init, heaps, reset/power handling, crash screen, top-level game loop.",
-      "status": "done"
-    },
-    {
-      "title": "Engine & game systems",
-      "detail": "Engine init/frame/shutdown, game startup, mode state machine and the renderer core (render thread, display lists, frame pacing) done; next: GX state, render targets, scene graph, UI, world, monsters, battles.",
-      "status": "in_progress"
-    },
-    {
-      "title": "PC build compiles",
-      "detail": "CMake + MSVC build on GitHub Actions. All decompiled sources compile; linking waits on the platform layer.",
-      "status": "in_progress"
-    },
-    {
-      "title": "Platform layer",
-      "detail": "Replace the Wii SDK: GX→OpenGL/Vulkan, AX→SDL audio, WPAD→gamepad + mouse pointer, DVD/NAND→files.",
-      "status": "todo"
-    },
-    {
-      "title": "Asset formats",
-      "detail": ".sir containers (PNP0), DSP-ADPCM audio, Bink video, MIDI + wavetable music.",
-      "status": "todo"
-    },
-    {
-      "title": "Boots to title screen",
-      "detail": "First visible frame on Windows.",
-      "status": "todo"
-    },
-    {
-      "title": "1080p & widescreen",
-      "detail": "Render at any resolution (1080p, 1440p, 4K) with internal resolution scaling; native 16:9 using the game's own widescreen support.",
-      "status": "todo"
-    },
-    {
-      "title": "Settings GUI",
-      "detail": "In-game options overlay (F1) + config.ini: resolution, fullscreen, V-sync, FPS cap, render scale, MSAA, texture filtering, audio, controls.",
-      "status": "todo"
-    },
-    {
-      "title": "Mod support",
-      "detail": "Mods folder overriding any game file, plus new content in open formats: monster parts as glTF models, PNG textures and JSON/text stats, with no .sir editing needed.",
-      "status": "todo"
-    },
-    {
-      "title": "Playable",
-      "detail": "Full game playable from start to finish on PC.",
-      "status": "todo"
-    }
-  ],
-  "changelog": [
-    {
-      "date": "2026-11-17",
-      "time": "22:36",
-      "text": "Decompiled the level table setup (the hashed name, world, number and weapon-parts keys of every level and arena) and the world memory layout: one 32-byte-aligned block holding every zone record and its entity slots, where some zones get a single slot and the others get the full count."
-    },
-    {
-      "date": "2026-11-17",
-      "time": "22:32",
-      "text": "Generated the entity factory that builds a level's scripted objects from their names (e.g. the saw paths of the buzz-saw experiment, the grow-juice tubes, castle braziers): 159 object names mapped to 48 object classes. The largest graphics-only functions (material parameter tables, render clears) are deferred, since the PC renderer replaces that layer."
-    },
-    {
-      "date": "2026-11-17",
-      "time": "22:27",
-      "text": "Decompiled the per-frame world update (8.8 KB): queued entity removals, the short wait before a freshly loaded zone goes live, activating and culling entities within a budget, moving entities between loaded zones (and despawning those that leave the map, with effects), slow motion that leaves the player at full speed, late updates and the particle systems of every loaded zone."
-    },
-    {
-      "date": "2026-11-17",
-      "time": "22:22",
-      "text": "Identified zlib 1.2.3 (11 KB, the decompressor used for compressed data) at the end of what was counted as game code. It is now counted as a library: the PC port will use real zlib instead of decompiling it."
-    },
-    {
-      "date": "2026-11-17",
-      "time": "21:28",
-      "text": "Generated the engine's own script dispatcher as well (137 more cases), so every script call in the game now goes through decompiled code. Over 5% of the game code is decompiled."
-    },
-    {
-      "date": "2026-11-17",
-      "time": "21:26",
-      "text": "Generated the script call dispatcher: one case per game signature (246 of them) that passes script arguments to the called function as integers, floats or pointers and stores the result. Each case was checked against its assembly, so every argument goes exactly where the original put it."
-    },
-    {
-      "date": "2026-11-17",
-      "time": "21:23",
-      "text": "Switched to decompiling the largest functions first. The four biggest turned out to be the script system's tables: the 1,812-entry list of functions the level and UI scripts can call, and the 392 call signatures saying what each one takes and returns (void, int, bool, hashed name, float, entity, script context). Both were generated straight from the originals, and every script callback now has typed parameters. Decompiled game code jumped from 2.3% to 4.7%."
-    },
-    {
-      "date": "2026-11-17",
-      "time": "21:13",
-      "text": "Started on monster parts. Found and decoded the part database inside global_binary.sir: 186 definition slots (180 used, 6 spare), each with four tier names (Chimp Arm, Ape Arm, Gorilla Arm, Kong Arm), two actions and stats. The game text turns out to already be plain .txt files. Decompiled the database lookup, the text-key lookup and the first PartQuery functions (name, quality, madness, health, defect and enhancement textures). This is the format the planned open-format part mods will plug into."
-    },
-    {
-      "date": "2026-11-17",
-      "time": "21:06",
-      "text": "Mapped every .sir archive with the .sir decoder: about 6,100 textures and 6,500 meshes, and the fixed memory addresses each file loads to (global data at 0x90400000, the current level at 0x90540000/0x90980000, 432 monster parts streamed into slots from 0x91240000, UI screens). Since these files are memory images full of absolute pointers, the PC loader will relocate them on load so the original files (and mods) can be used as-is."
-    },
-    {
-      "date": "2026-11-17",
-      "time": "20:55",
-      "text": "Fixed the name-recovery tool: one script table stores some names through offsets the tool did not follow, which had given 255 functions the wrong name. All 2,047 script callbacks now carry their correct names. One correction shows the code is shared with the PS2 version: the shake check is IsPS2, where shaking reads the analog controller. Also decompiled the delayed zone events and the projectile lob formula."
-    },
-    {
-      "date": "2026-11-17",
-      "time": "20:52",
-      "text": "Decompiled level triggers and props: placing the camera at named locators (or along a locator's facing), camera sensors with blend times, in-game cutscene mode, trigger events and requests, hazard props that alternate idle and attack phases on timers, prop animations and effects, death counters and waypoint-following props."
-    },
-    {
-      "date": "2026-11-17",
-      "time": "20:50",
-      "text": "Decompiled the camera and animation script functions: \"free\" and \"fixed\" camera modes, camera locks held by in-game cutscenes, skipping cutscenes with a button, and animation queries (finished, past the impact frame, in the last second)."
-    },
-    {
-      "date": "2026-11-17",
-      "time": "20:48",
-      "text": "Finished all 43 character state callbacks: pressing A on a node (challenges and other node actions, which level scripts can override), and steering at junctions with the d-pad or Nunchuk stick relative to the camera (holding back for half a second turns around)."
-    },
-    {
-      "date": "2026-11-17",
-      "time": "20:46",
-      "text": "Decompiled the exploration prompt (the header and text shown for the node the player stands on, with a prompt per challenge), challenge and interaction entry, walking between waypoints, and races (each waypoint takes the next route exit, the speed meter runs to 11)."
-    },
-    {
-      "date": "2026-11-17",
-      "time": "20:42",
-      "text": "Decompiled more character states: pausing and resuming every exploring character, challenge results reported to the world, interactions, arriving at waypoints (with footsteps and HUD updates), and the start/end of races (the racer starts at speed 0 and walks at 6 afterwards)."
-    },
-    {
-      "date": "2026-11-17",
-      "time": "20:40",
-      "text": "Decompiled patrol routing (routes that loop, ping-pong, run once or pick random exits at junctions, and following a target) and 29 character state callbacks: combat idle, exploration idle/move/wait/injure, challenge instructions (A accepts and the challenger steps aside for 65 seconds, B declines), conversations and combat actions."
-    },
-    {
-      "date": "2026-11-17",
-      "time": "20:35",
-      "text": "Added the project owner's .sir decoder (textures, meshes, skeletons) to tools/. It confirmed how global_binary.sir boots: a 4 KB pointer table plus a memory image that must load at 0x90400000, holding e.g. the \"HOME Menu not available\" icon and the fallback \"Generic_box\" model. Name lookup now also scans the large archives (shared_ui.sir etc.)."
-    },
-    {
-      "date": "2026-11-17",
-      "time": "20:31",
-      "text": "Decompiled the Wii Remote shake mini-games: catching a pumpkin (10 shakes within 5 seconds), clearing obstacles (fill a meter to 10) and powering generators (meter to 6), both draining at 3 units per second, plus combat start when an enemy gets close to the player."
-    },
-    {
-      "date": "2026-11-17",
-      "time": "20:25",
-      "text": "Decompiled the first AI state callbacks under their original names (PatrolIdleEntry, PumpkinWait/Freeze/Escape/Death, HazardPoisonGas/DustCloud, MovingChallengeGame...) and their registration table. Added a hash resolver: object and UI ids in the code are CRC-32 hashes of names, and 390 of them now resolve (e.g. \"Projectile\", \"exploration_screen\", \"timer_group\")."
-    },
-    {
-      "date": "2026-11-17",
-      "time": "20:21",
-      "text": "Recovered about 2,000 original function names from the game's script-callback tables (e.g. PumpkinShakeUpdate, DiggingPlayThrustAnim, PuzzleMovePiece, InterpolateQuaternionTask::Update_SLERP). Named game functions jumped from 240 to 2,257, and about 20 earlier guessed names were corrected to the real ones."
-    },
-    {
-      "date": "2026-11-17",
-      "time": "20:16",
-      "text": "Decompiled the play-session block: restoring saved object states into a zone, temporarily disabled objects that re-enable on a timer, the session timer, and the moving-character registry (max 20 per level, tracking the player and enemy indices)."
-    },
-    {
-      "date": "2026-11-17",
-      "time": "20:13",
-      "text": "Decompiled the core game-state block (reset, two-player turn timers with a 6-second hand-over, world update, camera follow reset) and the build info: this disc is EU build 519 from Aug 28 2008 (14:30)."
-    },
-    {
-      "date": "2026-11-17",
-      "time": "20:11",
-      "text": "Decompiled the save system: Wii NAND save file game.msa, save banner and icon setup (the banner defaults still name the engine's previous game, Death Jr. 2), read/write with NAND error codes, and the loading picture shown while saving."
-    },
-    {
-      "date": "2026-11-17",
-      "time": "20:20",
-      "text": "Decompiled the disc-error screens (no disc / wrong disc / unreadable, with reset and power handling while they are shown), helper-entity spawning and target-lead prediction. Lab notes now show the time of each entry."
-    },
-    {
-      "date": "2026-11-17",
-      "text": "Decompiled the UI glue (screen manager, per-zone screen sets from ui/ScreenSets/ScreenSets.csv), the full mode-transition logic, the loading screen, language selection (EN/FR/DE/IT/ES/NL from the Wii system language), the movie queue, background-music requests and the 3D audio listener. 116 game functions decompiled.",
-      "time": "20:04"
-    },
-    {
-      "date": "2026-11-17",
-      "text": "Decompiled the renderer core: a dedicated render thread with a 64-entry command queue, a ring of 17 display-list buffers (144 KB each) recorded by redirecting the GX FIFO, frame-buffer flips and frame pacing on TV retrace, plus RendInit. This is the layer the PC port will replace with a modern GPU backend for 1080p and widescreen.",
-      "time": "19:57"
-    },
-    {
-      "date": "2026-11-17",
-      "text": "Decompiled the top-level game-mode state machine (GameUpdate), including in-game Bink movie playback from fmv/ and fmv_PAL/. Added memory/core init, suspend/resume, view objects and game shutdown. Windows build now runs on GitHub Actions (MSVC).",
-      "time": "16:19"
-    },
-    {
-      "date": "2026-11-17",
-      "text": "Decompiled the engine lifecycle (EngineInit, EngineFrame, memory callbacks for the REND and SG modules) and game startup (GameInit, GameStart, which loads global_binary.sir). Planned 1080p, a settings GUI and mod support.",
-      "time": "16:13"
-    },
-    {
-      "date": "2026-11-17",
-      "text": "Progress site restyled as a mad-scientist lab: riveted metal panels, wooden shelves, slime-filled test tubes.",
-      "time": "16:02"
-    },
-    {
-      "date": "2026-11-17",
-      "text": "Decompiled the boot path (main, SysInit, crash handler, exit handling) and the top-level game loop.",
-      "time": "15:55"
-    },
-    {
-      "date": "2026-11-17",
-      "text": "Identified 50+ SDK functions from error strings and call patterns; fixed dtk re-analysis (.sbss2, computed-jump entries).",
-      "time": "15:55"
-    },
-    {
-      "date": "2026-11-17",
-      "text": "Project set up: disc extracted, main.dol split with decomp-toolkit, progress site launched.",
-      "time": "15:43"
-    }
-  ]
+ "milestones": [
+  {
+   "title": "Disc extracted",
+   "detail": "main.dol + 2.5 GB of game data pulled from the PAL disc (RM7P4F).",
+   "status": "done"
+  },
+  {
+   "title": "Executable split & analysed",
+   "detail": "decomp-toolkit finds 12,580 functions in 707 objects; game code at 0x80006B40–0x80232AF8.",
+   "status": "done"
+  },
+  {
+   "title": "Tooling",
+   "detail": "Cross-reference, renaming, progress, script-callback, name-hash and .sir decoding tools; this site updates on every push.",
+   "status": "done"
+  },
+  {
+   "title": "Boot path decompiled",
+   "detail": "main(), SDK init, heaps, reset/power handling, crash screen, top-level game loop.",
+   "status": "done"
+  },
+  {
+   "title": "Engine & game systems",
+   "detail": "Engine init/frame/shutdown, game startup, mode state machine and the renderer core (render thread, display lists, frame pacing) done; next: GX state, render targets, scene graph, UI, world, monsters, battles.",
+   "status": "in_progress"
+  },
+  {
+   "title": "PC build compiles",
+   "detail": "CMake + MSVC build on GitHub Actions. All decompiled sources compile; linking waits on the platform layer.",
+   "status": "in_progress"
+  },
+  {
+   "title": "Platform layer",
+   "detail": "Replace the Wii SDK: GX→OpenGL/Vulkan, AX→SDL audio, WPAD→gamepad + mouse pointer, DVD/NAND→files.",
+   "status": "todo"
+  },
+  {
+   "title": "Asset formats",
+   "detail": ".sir containers (PNP0), DSP-ADPCM audio, Bink video, MIDI + wavetable music.",
+   "status": "todo"
+  },
+  {
+   "title": "Boots to title screen",
+   "detail": "First visible frame on Windows.",
+   "status": "todo"
+  },
+  {
+   "title": "1080p & widescreen",
+   "detail": "Render at any resolution (1080p, 1440p, 4K) with internal resolution scaling; native 16:9 using the game's own widescreen support.",
+   "status": "todo"
+  },
+  {
+   "title": "Settings GUI",
+   "detail": "In-game options overlay (F1) + config.ini: resolution, fullscreen, V-sync, FPS cap, render scale, MSAA, texture filtering, audio, controls.",
+   "status": "todo"
+  },
+  {
+   "title": "Mod support",
+   "detail": "Mods folder overriding any game file, plus new content in open formats: monster parts as glTF models, PNG textures and JSON/text stats, with no .sir editing needed.",
+   "status": "todo"
+  },
+  {
+   "title": "Playable",
+   "detail": "Full game playable from start to finish on PC.",
+   "status": "todo"
+  }
+ ],
+ "changelog": [
+  {
+   "date": "2026-11-17",
+   "time": "22:51",
+   "text": "Decompiled the combat HUD part card (health, discipline, name for the part's tier, both actions with their stat rows, defect/enhancement icons with their first-time tutorials, and which actions you can afford), the game session state machine that loads, runs and unloads each level and draws the frame, and the field-repair record that unlocks three achievements and awards XP and rank-ups."
+  },
+  {
+   "date": "2026-11-17",
+   "time": "22:36",
+   "text": "Decompiled the level table setup (the hashed name, world, number and weapon-parts keys of every level and arena) and the world memory layout: one 32-byte-aligned block holding every zone record and its entity slots, where some zones get a single slot and the others get the full count."
+  },
+  {
+   "date": "2026-11-17",
+   "time": "22:32",
+   "text": "Generated the entity factory that builds a level's scripted objects from their names (e.g. the saw paths of the buzz-saw experiment, the grow-juice tubes, castle braziers): 159 object names mapped to 48 object classes. The largest graphics-only functions (material parameter tables, render clears) are deferred, since the PC renderer replaces that layer."
+  },
+  {
+   "date": "2026-11-17",
+   "time": "22:27",
+   "text": "Decompiled the per-frame world update (8.8 KB): queued entity removals, the short wait before a freshly loaded zone goes live, activating and culling entities within a budget, moving entities between loaded zones (and despawning those that leave the map, with effects), slow motion that leaves the player at full speed, late updates and the particle systems of every loaded zone."
+  },
+  {
+   "date": "2026-11-17",
+   "time": "22:22",
+   "text": "Identified zlib 1.2.3 (11 KB, the decompressor used for compressed data) at the end of what was counted as game code. It is now counted as a library: the PC port will use real zlib instead of decompiling it."
+  },
+  {
+   "date": "2026-11-17",
+   "time": "21:28",
+   "text": "Generated the engine's own script dispatcher as well (137 more cases), so every script call in the game now goes through decompiled code. Over 5% of the game code is decompiled."
+  },
+  {
+   "date": "2026-11-17",
+   "time": "21:26",
+   "text": "Generated the script call dispatcher: one case per game signature (246 of them) that passes script arguments to the called function as integers, floats or pointers and stores the result. Each case was checked against its assembly, so every argument goes exactly where the original put it."
+  },
+  {
+   "date": "2026-11-17",
+   "time": "21:23",
+   "text": "Switched to decompiling the largest functions first. The four biggest turned out to be the script system's tables: the 1,812-entry list of functions the level and UI scripts can call, and the 392 call signatures saying what each one takes and returns (void, int, bool, hashed name, float, entity, script context). Both were generated straight from the originals, and every script callback now has typed parameters. Decompiled game code jumped from 2.3% to 4.7%."
+  },
+  {
+   "date": "2026-11-17",
+   "time": "21:13",
+   "text": "Started on monster parts. Found and decoded the part database inside global_binary.sir: 186 definition slots (180 used, 6 spare), each with four tier names (Chimp Arm, Ape Arm, Gorilla Arm, Kong Arm), two actions and stats. The game text turns out to already be plain .txt files. Decompiled the database lookup, the text-key lookup and the first PartQuery functions (name, quality, madness, health, defect and enhancement textures). This is the format the planned open-format part mods will plug into."
+  },
+  {
+   "date": "2026-11-17",
+   "time": "21:06",
+   "text": "Mapped every .sir archive with the .sir decoder: about 6,100 textures and 6,500 meshes, and the fixed memory addresses each file loads to (global data at 0x90400000, the current level at 0x90540000/0x90980000, 432 monster parts streamed into slots from 0x91240000, UI screens). Since these files are memory images full of absolute pointers, the PC loader will relocate them on load so the original files (and mods) can be used as-is."
+  },
+  {
+   "date": "2026-11-17",
+   "time": "20:55",
+   "text": "Fixed the name-recovery tool: one script table stores some names through offsets the tool did not follow, which had given 255 functions the wrong name. All 2,047 script callbacks now carry their correct names. One correction shows the code is shared with the PS2 version: the shake check is IsPS2, where shaking reads the analog controller. Also decompiled the delayed zone events and the projectile lob formula."
+  },
+  {
+   "date": "2026-11-17",
+   "time": "20:52",
+   "text": "Decompiled level triggers and props: placing the camera at named locators (or along a locator's facing), camera sensors with blend times, in-game cutscene mode, trigger events and requests, hazard props that alternate idle and attack phases on timers, prop animations and effects, death counters and waypoint-following props."
+  },
+  {
+   "date": "2026-11-17",
+   "time": "20:50",
+   "text": "Decompiled the camera and animation script functions: \"free\" and \"fixed\" camera modes, camera locks held by in-game cutscenes, skipping cutscenes with a button, and animation queries (finished, past the impact frame, in the last second)."
+  },
+  {
+   "date": "2026-11-17",
+   "time": "20:48",
+   "text": "Finished all 43 character state callbacks: pressing A on a node (challenges and other node actions, which level scripts can override), and steering at junctions with the d-pad or Nunchuk stick relative to the camera (holding back for half a second turns around)."
+  },
+  {
+   "date": "2026-11-17",
+   "time": "20:46",
+   "text": "Decompiled the exploration prompt (the header and text shown for the node the player stands on, with a prompt per challenge), challenge and interaction entry, walking between waypoints, and races (each waypoint takes the next route exit, the speed meter runs to 11)."
+  },
+  {
+   "date": "2026-11-17",
+   "time": "20:42",
+   "text": "Decompiled more character states: pausing and resuming every exploring character, challenge results reported to the world, interactions, arriving at waypoints (with footsteps and HUD updates), and the start/end of races (the racer starts at speed 0 and walks at 6 afterwards)."
+  },
+  {
+   "date": "2026-11-17",
+   "time": "20:40",
+   "text": "Decompiled patrol routing (routes that loop, ping-pong, run once or pick random exits at junctions, and following a target) and 29 character state callbacks: combat idle, exploration idle/move/wait/injure, challenge instructions (A accepts and the challenger steps aside for 65 seconds, B declines), conversations and combat actions."
+  },
+  {
+   "date": "2026-11-17",
+   "time": "20:35",
+   "text": "Added the project owner's .sir decoder (textures, meshes, skeletons) to tools/. It confirmed how global_binary.sir boots: a 4 KB pointer table plus a memory image that must load at 0x90400000, holding e.g. the \"HOME Menu not available\" icon and the fallback \"Generic_box\" model. Name lookup now also scans the large archives (shared_ui.sir etc.)."
+  },
+  {
+   "date": "2026-11-17",
+   "time": "20:31",
+   "text": "Decompiled the Wii Remote shake mini-games: catching a pumpkin (10 shakes within 5 seconds), clearing obstacles (fill a meter to 10) and powering generators (meter to 6), both draining at 3 units per second, plus combat start when an enemy gets close to the player."
+  },
+  {
+   "date": "2026-11-17",
+   "time": "20:25",
+   "text": "Decompiled the first AI state callbacks under their original names (PatrolIdleEntry, PumpkinWait/Freeze/Escape/Death, HazardPoisonGas/DustCloud, MovingChallengeGame...) and their registration table. Added a hash resolver: object and UI ids in the code are CRC-32 hashes of names, and 390 of them now resolve (e.g. \"Projectile\", \"exploration_screen\", \"timer_group\")."
+  },
+  {
+   "date": "2026-11-17",
+   "time": "20:21",
+   "text": "Recovered about 2,000 original function names from the game's script-callback tables (e.g. PumpkinShakeUpdate, DiggingPlayThrustAnim, PuzzleMovePiece, InterpolateQuaternionTask::Update_SLERP). Named game functions jumped from 240 to 2,257, and about 20 earlier guessed names were corrected to the real ones."
+  },
+  {
+   "date": "2026-11-17",
+   "time": "20:16",
+   "text": "Decompiled the play-session block: restoring saved object states into a zone, temporarily disabled objects that re-enable on a timer, the session timer, and the moving-character registry (max 20 per level, tracking the player and enemy indices)."
+  },
+  {
+   "date": "2026-11-17",
+   "time": "20:13",
+   "text": "Decompiled the core game-state block (reset, two-player turn timers with a 6-second hand-over, world update, camera follow reset) and the build info: this disc is EU build 519 from Aug 28 2008 (14:30)."
+  },
+  {
+   "date": "2026-11-17",
+   "time": "20:11",
+   "text": "Decompiled the save system: Wii NAND save file game.msa, save banner and icon setup (the banner defaults still name the engine's previous game, Death Jr. 2), read/write with NAND error codes, and the loading picture shown while saving."
+  },
+  {
+   "date": "2026-11-17",
+   "time": "20:20",
+   "text": "Decompiled the disc-error screens (no disc / wrong disc / unreadable, with reset and power handling while they are shown), helper-entity spawning and target-lead prediction. Lab notes now show the time of each entry."
+  },
+  {
+   "date": "2026-11-17",
+   "text": "Decompiled the UI glue (screen manager, per-zone screen sets from ui/ScreenSets/ScreenSets.csv), the full mode-transition logic, the loading screen, language selection (EN/FR/DE/IT/ES/NL from the Wii system language), the movie queue, background-music requests and the 3D audio listener. 116 game functions decompiled.",
+   "time": "20:04"
+  },
+  {
+   "date": "2026-11-17",
+   "text": "Decompiled the renderer core: a dedicated render thread with a 64-entry command queue, a ring of 17 display-list buffers (144 KB each) recorded by redirecting the GX FIFO, frame-buffer flips and frame pacing on TV retrace, plus RendInit. This is the layer the PC port will replace with a modern GPU backend for 1080p and widescreen.",
+   "time": "19:57"
+  },
+  {
+   "date": "2026-11-17",
+   "text": "Decompiled the top-level game-mode state machine (GameUpdate), including in-game Bink movie playback from fmv/ and fmv_PAL/. Added memory/core init, suspend/resume, view objects and game shutdown. Windows build now runs on GitHub Actions (MSVC).",
+   "time": "16:19"
+  },
+  {
+   "date": "2026-11-17",
+   "text": "Decompiled the engine lifecycle (EngineInit, EngineFrame, memory callbacks for the REND and SG modules) and game startup (GameInit, GameStart, which loads global_binary.sir). Planned 1080p, a settings GUI and mod support.",
+   "time": "16:13"
+  },
+  {
+   "date": "2026-11-17",
+   "text": "Progress site restyled as a mad-scientist lab: riveted metal panels, wooden shelves, slime-filled test tubes.",
+   "time": "16:02"
+  },
+  {
+   "date": "2026-11-17",
+   "text": "Decompiled the boot path (main, SysInit, crash handler, exit handling) and the top-level game loop.",
+   "time": "15:55"
+  },
+  {
+   "date": "2026-11-17",
+   "text": "Identified 50+ SDK functions from error strings and call patterns; fixed dtk re-analysis (.sbss2, computed-jump entries).",
+   "time": "15:55"
+  },
+  {
+   "date": "2026-11-17",
+   "text": "Project set up: disc extracted, main.dol split with decomp-toolkit, progress site launched.",
+   "time": "15:43"
+  }
+ ]
 }

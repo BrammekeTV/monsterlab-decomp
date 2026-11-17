@@ -58,7 +58,7 @@ extern u8    lbl_8047C760[];         // effect manager
 extern u32   lbl_805FB9A4;
 
 static u32   sLoadFrames;            ORIG(0x805FB2F8)
-static u8    sWorldReady;            ORIG(0x805FB2F0)
+u8           sWorldReady;            ORIG(0x805FB2F0)
 static u8    sReadyPending;          ORIG(0x805FB2F1)
 static u8    sReadyRequested;        ORIG(0x805FB2F2)
 static u8    sWorldSuspended;        ORIG(0x805FB2F4)
