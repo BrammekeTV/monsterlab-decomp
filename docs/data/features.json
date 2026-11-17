@@ -69,6 +69,11 @@
  "changelog": [
   {
    "date": "2026-11-17",
+   "time": "23:06",
+   "text": "Decompiled the system alert boxes (41 disc, controller, save and network messages), the online matchup screen (monster previews, ready panels, countdown, and building the opponent's monster from the received parts), the battle attack playback (impact reactions, ability particle effects, limb loss and the battle camera), and zone activation when a level area finishes loading."
+  },
+  {
+   "date": "2026-11-17",
    "time": "22:56",
    "text": "Decompiled the battle damage resolver: per-limb damage from the part's action, strong/weak part matchups, abilities that boost damage against a discipline or hit every limb, charged attacks, blocking with return damage and resistances, tutorial and boss protection, and the battle log lines (\"%s: %d HP %+d Base %s = %d HP\", \"Incapacitated!\")."
   },

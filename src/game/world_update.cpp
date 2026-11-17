@@ -489,3 +489,125 @@ void WorldTick(WorldState* w, f32 dt) {
         }
     }
 }
+
+// ---------------------------------------------------------------- zone activation
+
+extern "C" void WorldSetZoneActive(void* world, s32 zone);          // 0x80132344
+extern "C" void WorldRefreshZones(void* world);                     // 0x80131A14
+extern "C" void WorldBroadcastToZone(void* world, u32 type, s32 a, s32 b, s32 c, s32 zone, s32 d);   // 0x8012E93C
+
+// Number of zones: the 13 per-category counters (+0x68 .. +0x98) plus zone 0.
+static inline s32 ZoneCountAll(void) {
+    s32 n = 1;
+    for (u32 off = 0x68; off <= 0x98; off += 4) n += *(s32*)(GetGlobalSettings() + off);
+    return n;
+}
+
+// Placed particle effect of a zone (zone +0x80 list, count +0x9C).
+struct ZoneEffect {
+    void* effect;           // 0x00
+    f32   pos[3];           // 0x04
+    f32   dir[3];           // 0x10: (0,0,0) = default up
+    u8*   instance;         // 0x1C: filled by SpawnEffectAt
+};
+
+static inline BOOL NearZero(f32 v) { return v <= 0.0001f && v >= -0.0001f; }
+
+static inline void SetEmitterDirections(u8* inst, const f32 d[4]) {
+    for (s32 j = 0; j < *(s32*)(inst + 0xC); j++) {
+        f32* e = *(f32**)(inst + 0x14 + j * 4);
+        if (e == NULL) continue;
+        e[0xC] = d[0]; e[0xD] = d[1]; e[0xE] = d[2]; e[0xF] = d[3];
+    }
+}
+
+// 0x801369C8
+// A zone slot finished loading (type 4): start its placed effects, mark it active (type 6) and
+// move entities whose home zone changed. Entities that ended up nowhere (-1) are despawned,
+// except the player, who is respawned.
+void WorldOnZoneLoaded(WorldState* w, s32 slotIndex) {
+    if (slotIndex < 0 || slotIndex >= ZoneSlotCount()) return;
+    ZoneSlot* slot = &w->slots[slotIndex];
+    if (slot->type != 4) return;
+    s32 zone = slot->zone;
+    if (zone < 0 || zone >= ZoneCountAll()) return;
+    u8* z = w->data->zones + zone * gZoneResourceSize;
+    if (*(s32*)(z + 0x18) != zone) return;
+
+    typedef void* (*SpawnFn)(void*, void*, const f32*, u8**);
+    for (u32 i = 0; i < *(u32*)(z + 0x9C); i++) {
+        ZoneEffect* fx = (*(ZoneEffect***)(z + 0x80))[i];
+        if (fx == NULL) continue;
+        f32 pos[4] = { fx->pos[0], fx->pos[1], fx->pos[2], 0.0f };
+        if (((SpawnFn)SpawnEffectAt)(lbl_8047C760, fx->effect, pos, &fx->instance) == NULL) continue;
+        f32 dir[4] = { fx->dir[0], fx->dir[1], fx->dir[2], 0.0f };
+        if (NearZero(dir[0]) && NearZero(dir[1]) && NearZero(dir[2]) && NearZero(dir[3])) {
+            static const f32 kUp[4] = { 0.0f, 0.0f, 1.0f, 0.0f };
+            SetEmitterDirections(fx->instance, kUp);
+        } else {
+            SetEmitterDirections(fx->instance, dir);
+        }
+    }
+
+    slot->type = 6;
+    WorldSetZoneActive(w, zone);
+    WorldRefreshZones(w);
+    u32* slotFlags = (u32*)((u8*)slot + 0xC);
+    if (!(*slotFlags & 1)) {
+        WorldBroadcastToZone(w, ENTITY_TYPE_NO_EVENTS, 0, 0, 0, zone, 0);
+        *slotFlags |= 1;
+    }
+    if (zone < 0) return;
+
+    u8* zi = ZoneInfo(zone);
+    s32 count = ZoneStaticCount(zi) + ZoneDynamicCount(zi);
+    for (s32 i = 0; i < count; i++) {
+        CharacterDef* rec;
+        Character* e = ZoneEntity(ZoneInfo(zone), i, &rec);
+        if (!(rec->stateFlags & 1) || e == NULL || e->def == NULL) continue;
+        CharacterDef* def = e->def;
+        u16 home = *(u16*)((u8*)def + 0x30);
+        if (!(def->stateFlags & 3) || home == 0 || (def->flags & 0x400)) continue;
+
+        s32 ez = WorldGetEntityZone(w, e);
+        if (ez > 0 && ez <= w->data->zoneCount && *(void**)((u8*)e + 0x90) != NULL) {
+            u16 other = *(u16*)((u8*)def + 0x32);
+            if (home == ez && ZoneIsLoaded(w, other)) continue;
+            ScopedLock lock;
+            ScopedLockCtor(&lock);
+            if (ZoneIsLoaded(w, ez) && ZoneIsLoaded(w, other)) {
+                VCALL(e, 0x18, VoidIntFn)(e, 0);
+                *(u16*)((u8*)def + 0x30) = (u16)ez;
+                VCALL(e, 0x14, VoidIntFn)(e, 1);
+            } else if (def->flags & 0x20) {
+                SpawnDespawnEffect(e);
+                VCALL(e, 0x18, VoidIntFn)(e, 1);
+                if (!(def->stateFlags & 0x04000000)) {
+                    s32* ev = (s32*)EventPost(0x64, e);
+                    if (ev != NULL) ev[1] = 1;
+                }
+                MarkDespawned(e);
+                (*(s32*)((u8*)def + 0x28))++;
+            }
+            ScopedLockDtor(&lock, -1);
+        } else if (ez == -1) {
+            if ((void*)e == w->data->player) {
+                typedef void (*RespawnFn)(Character*, s32, s32, s32, f32);
+                VCALL(e, 0x50, RespawnFn)(e, 7, 0, 0, 10.0f * *(f32*)((u8*)def + 0x24));
+            } else if (fn_801F5220() && (def->flags & 0x20)) {
+                SpawnDespawnEffect(e);
+                SetHidden(e, 2);
+                if (!(def->stateFlags & 0x04000000)) {
+                    s32* ev = (s32*)EventPost(0x64, e);
+                    if (ev != NULL) ev[1] = 0;
+                }
+                MarkDespawned(e);
+                s32* respawns = (s32*)((u8*)def + 0x28);
+                if (*respawns > 1000) {
+                    (*respawns)++;
+                    if (def->flags & 0x10) w->despawned++;
+                }
+            }
+        }
+    }
+}
