@@ -61,11 +61,22 @@ DOL sections:
 - Game code (`main` is at `0x80142DF0`; game code sits roughly at `0x80006B40`–`0x80232000`) is the real work.
 - SDK, MSL and Bink code (from about `0x80232AF8`) only needs to be **identified** so that it can be stubbed or reimplemented on PC. It does not need to be decompiled.
 
+## Workflow
+
+- `python tools/xref.py func <name|addr>` shows a function's calls, referenced strings and callers. `python tools/xref.py strings <regex>` finds functions by the strings they use.
+- `sh tools/fn.sh <name>` prints a function's asm.
+- `python tools/rename.py OLD NEW` (or `-f file`) renames symbols in `symbols.txt`. The `config/RM7P4F/names_*.txt` files keep a record of names and where they came from. Re-run the dtk split afterwards.
+- **Decompiled-function marker:** put a line containing only `// 0xADDRESS` directly above each function definition in `src/`. `tools/progress.py` counts these.
+- `python tools/progress.py --record` updates `docs/data/progress.json` and `history.json`. Milestones and the changelog live in `docs/data/features.json`.
+- **Progress site:** <https://brammeketv.github.io/monsterlab-decomp/> rebuilds on every push to `master` (`.github/workflows/pages.yml`).
+
 ## Status
 
 - `dtk dol split` runs cleanly: 12,580 functions, 707 objects, assembly in `build/RM7P4F/asm/`.
-- 365 functions have names (CRT/startup, `main`, PPC intrinsics). The other ~12,200 are still `fn_XXXXXXXX`.
-- `splits.txt` has no per-file splits yet. Next: mark the SDK library boundaries and import SDK symbol names.
+- About 440 functions are named, most of them SDK functions. Library regions are mapped in `tools/progress.py`.
+- Decompiled so far: the boot path (`src/system/sys_main.cpp`) and the top-level loop (`src/game/game_main.cpp`).
+- Re-analysis fixes: the second `.sbss` became `.sbss2`, and the computed-jump entries at `0x802E5A08` were declared as functions.
+- No C++ compiler is installed yet, so the sources have not been compile-checked.
 
 ## Tools
 

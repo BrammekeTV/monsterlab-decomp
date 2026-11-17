@@ -1,0 +1,12 @@
+# Game functions named during decompilation
+fn_801D1504 EngineStartup
+fn_8000EE8C GameInit
+fn_801D16E0 EngineInit
+fn_801FB87C HomeButtonInit
+fn_80151258 SetRenderEnabled
+fn_801D1838 EngineFrame
+fn_801B2B94 ControllerReset
+fn_8000F5C0 GameShutdown
+fn_801D17FC EngineShutdown
+fn_801D1538 EngineCleanup
+fn_8032F678 __div2i

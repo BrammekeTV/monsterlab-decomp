@@ -1,0 +1,30 @@
+# SDK functions identified by call pattern / location (manual)
+fn_80234A7C OSInitAlloc
+fn_80234AEC OSCreateHeap
+fn_80234A6C OSSetCurrentHeap
+fn_80260544 MEMCreateExpHeapEx
+fn_8026077C MEMInitAllocatorForOSHeap
+fn_80260760 MEMInitAllocatorForExpHeap
+fn_80260724 MEMAllocFromAllocator
+fn_80260734 MEMFreeToAllocator
+fn_802715E4 WPADRegisterAllocator
+fn_8027FC30 KPADInit
+fn_802577E4 AIInit
+fn_80257C34 AXInit
+fn_8023DD90 OSSetResetCallback
+fn_8023DE7C OSSetPowerCallback
+fn_80336DB8 vsprintf
+fn_8023AE30 OSRestart
+fn_8023AD14 OSShutdownSystem
+# game: system layer (src/system/main.cpp)
+fn_801429CC SysAllocMEM2
+fn_801429DC SysFreeMEM2
+fn_80142A0C SysSetExitMode
+fn_80142A14 SysResetCallback
+fn_80142A30 SysPowerCallback
+fn_80142A4C SysErrorHandler
+fn_80142BBC SysInit
+fn_80142DC4 SysGetExitMode
+fn_80142DE0 SysGetRequestedExitMode
+fn_80142EF8 sprintf
+fn_801FAED0 GameMain
