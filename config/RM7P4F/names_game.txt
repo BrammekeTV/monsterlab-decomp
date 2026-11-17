@@ -362,3 +362,5 @@ lbl_805FB1FC sQueryMonster
 lbl_805FB200 sQueryTexture
 fn_8021E6EC PartComputeActionCost
 fn_80332ED0 __cvt_fp2signed
+fn_800FB958 RegisterGameScriptFuncs
+fn_801DC9F4 RegisterEngineScriptFuncs

@@ -4,10 +4,10 @@
   "game": {
    "functions": 8559,
    "bytes": 2277304,
-   "named": 2349,
-   "named_bytes": 365296,
-   "decompiled": 330,
-   "decompiled_bytes": 51444
+   "named": 2351,
+   "named_bytes": 401760,
+   "decompiled": 332,
+   "decompiled_bytes": 87908
   },
   "library": {
    "functions": 4028,
