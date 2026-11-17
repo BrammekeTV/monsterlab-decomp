@@ -60,12 +60,16 @@ def main():
     data = word(db + 0xC)
     table, count = word(data + 0x5B78), word(data + 0x5B7C)
 
-    rows = ["index\ttier1\ttier2\ttier3\ttier4\taction1\taction2\traw (+0x18..+0x4F)"]
+    slots = {0: "head", 1: "legs", 2: "arm", 4: "torso"}
+    disciplines = {0: "mech", 1: "bio", 2: "alchemy"}
+    rows = ["index\ttier1\ttier2\ttier3\ttier4\tslot\tdiscipline\taction1\taction2\traw (+0x20..+0x4F)"]
     for i in range(count):
         r = struct.unpack_from(">20I", sec, table - BASE + i * 0x50)
         names = [text(h) for h in r[1:5]]
-        raw = " ".join(f"{x:08x}" for x in r[6:])
-        rows.append(f"{r[0]}\t" + "\t".join(names) + f"\t{r[5]}\t{r[11]}\t{raw}")
+        slot = slots.get(r[6], str(r[6]))
+        disc = disciplines.get(r[7], str(r[7]))
+        raw = " ".join(f"{x:08x}" for x in r[8:])
+        rows.append(f"{r[0]}\t" + "\t".join(names) + f"\t{slot}\t{disc}\t{r[5]}\t{r[11]}\t{raw}")
     out = f"build/parts_{lang}.tsv"
     open(out, "w", encoding="utf-8").write("\n".join(rows) + "\n")
     print(f"{count} part definitions -> {out}")
