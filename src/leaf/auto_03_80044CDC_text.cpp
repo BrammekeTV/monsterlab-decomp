@@ -5,7 +5,7 @@
 
 #include "types.h"
 
-extern u8 lbl_805F8650[];
+extern u8 gSelectedPart[];
 extern u8 lbl_805F865D[];
 extern u8 lbl_805FB099[];
 extern u8 lbl_805FB0BE[];
@@ -18,7 +18,7 @@ extern "C" u8 fn_80046F54(void) {
 
 // 0x8004935C
 extern "C" s32 fn_8004935C(void) {
-    s32 t0 = *(s32*)((u8*)lbl_805F8650);
+    s32 t0 = *(s32*)((u8*)gSelectedPart);
     return (s32)(t0);
 }
 

@@ -17,6 +17,66 @@ M2C = os.path.join(ROOT, "tools", "m2c", "m2c.py")
 SYMBOLS = os.path.join(ROOT, "config", "RM7P4F", "symbols.txt")
 OUT = os.path.join(ROOT, "build", "m2c")
 DATA = ["*_rodata.s", "*_sdata.s", "*_sdata2.s", "*_data.s"]
+CONTEXT = os.path.join(ROOT, "tools", "m2c_context.h")
+CALLBACKS = os.path.join(ROOT, "include", "game", "script_callbacks.h")
+BASIC = {"void", "s8", "s16", "s32", "s64", "u8", "u16", "u32", "u64", "f32", "f64", "BOOL", "char", "int"}
+
+
+def build_context():
+    """tools/m2c_context.h plus the script callback prototypes, made C-compatible."""
+    base = open(CONTEXT, encoding="utf-8").read()
+    known = set(re.findall(r"\b(\w+)\s*\(", base)) | set(re.findall(r"typedef struct \w+ \{.*?\} (\w+);", base, re.S))
+    types = BASIC | set(re.findall(r"\} (\w+);", base))
+
+    def ctype(s):
+        s = re.sub(r"/\*.*?\*/", "", s).strip()
+        s = s.replace("const ", "")
+        m = re.match(r"(\w+)\s*(\**)", s)
+        if not m:
+            return None
+        base_t, stars = m.group(1), m.group(2)
+        if base_t not in types:
+            return "void *"
+        return base_t + (" " + stars if stars else "")
+
+    extra = []
+    # Prototypes we wrote in extern "C" blocks of the decompiled sources (first one wins).
+    lines = []
+    for p in sorted(glob.glob(os.path.join(ROOT, "include", "**", "*.h"), recursive=True)) + \
+             sorted(glob.glob(os.path.join(ROOT, "src", "**", "*.cpp"), recursive=True)):
+        if os.sep + "leaf" + os.sep in p:
+            continue
+        inside = False
+        for line in open(p, encoding="utf-8", errors="replace"):
+            s = line.strip()
+            if s.startswith('extern "C" {'):
+                inside = True
+                continue
+            if inside and s.startswith("}"):
+                inside = False
+                continue
+            if s.startswith('extern "C" ') and s.endswith(";"):
+                lines.append(s[len('extern "C" '):])
+            elif inside:
+                lines += [x.strip() + ";" for x in re.sub(r"//.*", "", s).split(";") if "(" in x]
+    lines += list(open(CALLBACKS, encoding="utf-8"))
+    for line in lines:
+        if "(*" in line or "operator" in line:
+            continue
+        m = re.match(r"^(.+?)\b(\w+)\((.*)\);", line)
+        if not m or line.startswith("extern") or m.group(2) in known:
+            continue
+        ret = ctype(m.group(1))
+        params = re.sub(r"/\*.*?\*/", "", m.group(3)).strip()
+        ps = [] if params in ("", "void") else [ctype(re.sub(r"\s*\b\w+$", "", p.strip())) for p in params.split(",")]
+        if ret is None or None in ps:
+            continue
+        extra.append(f"{ret} {m.group(2)}({', '.join(ps) or 'void'});")
+        known.add(m.group(2))
+    path = os.path.join(OUT, "_context.h")
+    os.makedirs(OUT, exist_ok=True)
+    open(path, "w", encoding="utf-8").write(base + "\n/* script callbacks */\n" + "\n".join(extra) + "\n")
+    return path
 
 
 def load_symbols():
@@ -51,6 +111,7 @@ def main():
     by_addr, by_name = load_symbols()
     data = sorted({p for g in DATA for p in glob.glob(os.path.join(ASM, g))})
     os.makedirs(OUT, exist_ok=True)
+    ctx = build_context()
 
     def rename(m):
         return by_addr.get(m.group(2).upper(), m.group(0))
@@ -68,7 +129,7 @@ def main():
         if asm is None:
             print(f"{a}: function not found in asm", file=sys.stderr)
             continue
-        r = subprocess.run([sys.executable, M2C, "-t", "ppc-mwcc-c", "-f", fn, asm, *data],
+        r = subprocess.run([sys.executable, M2C, "-t", "ppc-mwcc-c", "--context", ctx, "-f", fn, asm, *data],
                            capture_output=True, text=True)
         src = r.stdout if r.returncode == 0 else r.stdout + r.stderr
         src = re.sub(r"\b(fn|lbl)_([0-9A-Fa-f]{8})\b", rename, src)

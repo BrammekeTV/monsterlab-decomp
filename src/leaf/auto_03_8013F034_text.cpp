@@ -14,13 +14,13 @@ extern u8 lbl_805FB438[];
 extern u8 lbl_805FEFEC[];
 
 // 0x8013F38C
-extern "C" s32 fn_8013F38C(void) {
+extern "C" s32 AlertGetScreenSets(void) {
     s32 t0 = *(s32*)((u8*)gScreenSets);
     return (s32)(t0);
 }
 
 // 0x801409FC
-extern "C" u8 fn_801409FC(void) {
+extern "C" u8 MatchupIsActive(void) {
     u8 t0 = *(u8*)((u8*)lbl_805FB41C);
     return (u8)(t0);
 }
@@ -32,7 +32,7 @@ extern "C" void fn_80140B30(void) {
 }
 
 // 0x80140B58
-extern "C" s32 fn_80140B58(void) {
+extern "C" s32 AlertGetLastError(void) {
     s32 t0 = *(s32*)((u8*)lbl_805F90D8);
     return (s32)(t0);
 }

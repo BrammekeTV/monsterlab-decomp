@@ -154,7 +154,7 @@ extern "C" f32 fn_801A0E08(u8* a3) {
 }
 
 // 0x801A11FC
-extern "C" s32 fn_801A11FC(u8* a3, s32 a4) {
+extern "C" s32 UISetTexture(u8* a3, s32 a4) {
     *(u32*)(((u8*)(uintptr_t)(a3)) + 324) = (u32)((u32)(uintptr_t)(a4));
     return (s32)(0);
 }

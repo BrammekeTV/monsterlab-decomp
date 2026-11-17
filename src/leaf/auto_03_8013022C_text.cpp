@@ -6,7 +6,7 @@
 #include "types.h"
 
 // 0x80131A14
-extern "C" void fn_80131A14(void) {
+extern "C" void WorldRefreshZones(void) {
 }
 
 // 0x80132094

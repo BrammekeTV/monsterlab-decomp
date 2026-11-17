@@ -37,7 +37,7 @@ extern "C" void fn_80213F84(u8* a3, s32 a4) {
 }
 
 // 0x80214F48
-extern "C" s32 fn_80214F48(u8* a3) {
+extern "C" s32 RoundGetAttacker(u8* a3) {
     s32 t0 = *(s32*)(((u8*)(uintptr_t)(a3)) + 124);
     return (s32)(t0);
 }
@@ -53,7 +53,7 @@ extern "C" s32 fn_8021529C(s32 a3, s32 a4, s32 a5) {
 }
 
 // 0x802152B4
-extern "C" u32 fn_802152B4(s32 a3, s32 a4, s32 a5, s32 a6) {
+extern "C" u32 RoundNoteAbility(s32 a3, s32 a4, s32 a5, s32 a6) {
     u32 t0 = (u32)((s32)(u32)(uintptr_t)(a4) * 20);
     u32 t1 = (((u32)(uintptr_t)(a5) << 2) | ((u32)(uintptr_t)(a5) >> 30)) & 0xfffffffcu;
     u32 t2 = (u32)(uintptr_t)(a3) + (u32)(t0);
@@ -182,12 +182,12 @@ extern "C" u8 fn_8021D318(u8* a3) {
 }
 
 // 0x8021DA80
-extern "C" void fn_8021DA80(u8* a3, s32 a4) {
+extern "C" void PartSetDefect(u8* a3, s32 a4) {
     *(u32*)(((u8*)(uintptr_t)(a3)) + 4) = (u32)((u32)(uintptr_t)(a4));
 }
 
 // 0x8021DA88
-extern "C" void fn_8021DA88(u8* a3, s32 a4) {
+extern "C" void PartSetEnhancement(u8* a3, s32 a4) {
     *(u32*)(((u8*)(uintptr_t)(a3)) + 8) = (u32)((u32)(uintptr_t)(a4));
 }
 

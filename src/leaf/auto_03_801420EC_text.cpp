@@ -23,7 +23,7 @@ extern "C" void fn_801420EC(void) {
 }
 
 // 0x80142460
-extern "C" s32 fn_80142460(void) {
+extern "C" s32 AlertGetTimer(void) {
     s32 t0 = *(s32*)((u8*)lbl_805FB448);
     return (s32)(t0);
 }
