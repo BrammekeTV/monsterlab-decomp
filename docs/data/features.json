@@ -69,6 +69,11 @@
   "changelog": [
     {
       "date": "2026-11-17",
+      "time": "20:52",
+      "text": "Decompiled level triggers and props: placing the camera at named locators (or along a locator's facing), camera sensors with blend times, in-game cutscene mode, trigger events and requests, hazard props that alternate idle and attack phases on timers, prop animations and effects, death counters and waypoint-following props."
+    },
+    {
+      "date": "2026-11-17",
       "time": "20:50",
       "text": "Decompiled the camera and animation script functions: \"free\" and \"fixed\" camera modes, camera locks held by in-game cutscenes, skipping cutscenes with a button, and animation queries (finished, past the impact frame, in the last second)."
     },

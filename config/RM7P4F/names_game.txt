@@ -333,3 +333,12 @@ fn_80121898 DebugPing
 fn_8012AA50 WorldFindLocator
 fn_80145B00 EulerToQuat
 fn_801454CC QuatGetForward
+fn_800197A8 RegisterPropScriptFuncs
+fn_8006ED68 TriggerShowProximityText
+fn_80069350 PropPlayAnim
+fn_801254F8 PropPlayFx
+fn_80069FDC PropIncrementState
+fn_801E0054 TriggerDoAction
+fn_801F5384 ScopedLockCtor
+fn_801F53B0 ScopedLockDtor
+fn_801ED314 WaypointParamsInit
