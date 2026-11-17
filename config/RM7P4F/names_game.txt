@@ -342,3 +342,5 @@ fn_801E0054 TriggerDoAction
 fn_801F5384 ScopedLockCtor
 fn_801F53B0 ScopedLockDtor
 fn_801ED314 WaypointParamsInit
+fn_80019CC8 RegisterDelayedEventFuncs
+fn_8006EBC4 TriggerSendToZone

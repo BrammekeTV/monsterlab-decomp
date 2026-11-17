@@ -1,5 +1,5 @@
 // Prop and hazard-prop script functions (prop_*, hazard_prop_*, *_deathcount, triggers).
-// Original object: .text 0x800197A8 - 0x80019CC8
+// Original objects: .text 0x800197A8 - 0x80019F90
 #include "game/character.h"
 #include "game/game.h"
 
@@ -202,4 +202,83 @@ void RegisterPropScriptFuncs(void) {
     RegisterScriptFunc("hazard_prop_attack_entry", 0x4E, (void*)hazard_prop_attack_entry);
     RegisterScriptFunc("hazard_prop_attack_exit", 0x4E, (void*)hazard_prop_attack_exit);
     RegisterScriptFunc("hazard_prop_attack_update", 0x4E, (void*)hazard_prop_attack_update);
+}
+
+// ---------------------------------------------------------------- delayed zone events
+// A trigger can send up to three events to its zone, each after its own delay.
+
+extern "C" void TriggerSendToZone(void* trigger, u32 event);   // 0x8006EBC4
+
+struct DelayedTrigger {
+    void** vtbl;
+    CharacterDef* def;       // 0x004
+    u8   pad008[0x20];
+    f32  now;                // 0x028: trigger clock
+    u8   pad02C[0x78];
+    u8** stateMachine;       // 0x0A4
+    u8   pad0A8[0xB0];
+    f32  delay[3];           // 0x158
+    f32  fireAt;             // 0x164
+    u32  event[3];           // 0x168
+    s32  stage;              // 0x174
+};
+
+#define EV_DEACTIVATE   0xF5A9CE6Cu   // "Deactivate"
+#define STATE_DISABLED  0xBD1B1FC9u
+
+static inline u32 CurrentStateId(DelayedTrigger* t) {
+    struct Machine { struct { u8* entries; }* table; s32 current; };
+    Machine* m = (Machine*)*t->stateMachine;
+    u8* entry = (m->current > -1) ? m->table->entries + m->current * 0x30 : NULL;
+    return entry ? *(u32*)(entry + 4) : 0;
+}
+
+// 0x80019D30
+BOOL check_delayed_timer(DelayedTrigger* t) {
+    if (t == NULL || !(t->def->flags & 0x100)) return FALSE;
+    if (t->stateMachine != NULL && *t->stateMachine != NULL && CurrentStateId(t) == STATE_DISABLED) return FALSE;
+    return t->fireAt < t->now;
+}
+
+static inline void SignalDone(DelayedTrigger* t) {
+    if (t->stateMachine != NULL && *t->stateMachine != NULL) EventSend(gEventMgr, t, t, EV_DEACTIVATE, 0, 0, 1, 0);
+}
+
+// 0x80019DCC
+void send_delayed_event_to_zone(DelayedTrigger* t) {
+    if (t == NULL || !(t->def->flags & 0x100)) return;
+    switch (t->stage) {
+    case 0:
+        TriggerSendToZone(t, t->event[0]);
+        t->stage = 1;
+        t->fireAt = t->delay[1] + t->now;
+        if (t->event[1] == 0) SignalDone(t);
+        break;
+    case 1:
+        TriggerSendToZone(t, t->event[1]);
+        t->stage = 2;
+        t->fireAt = t->delay[2] + t->now;
+        if (t->event[2] == 0) SignalDone(t);
+        break;
+    case 2:
+        TriggerSendToZone(t, t->event[2]);
+        t->stage = 3;
+        SignalDone(t);
+        break;
+    }
+}
+
+// 0x80019F68
+void reset_trigger_send_delayed_events(ScriptCtx* ctx) {
+    DelayedTrigger* t = (DelayedTrigger*)ctx->chr;
+    if (t == NULL) return;
+    t->fireAt = t->delay[0] + t->now;
+    t->stage = 0;
+}
+
+// 0x80019CC8
+void RegisterDelayedEventFuncs(void) {
+    RegisterScriptFunc("check_delayed_timer", 0x16, (void*)check_delayed_timer);
+    RegisterScriptFunc("send_delayed_event_to_zone", 0x2F, (void*)send_delayed_event_to_zone);
+    RegisterScriptFunc("reset_trigger_send_delayed_events", 0x4E, (void*)reset_trigger_send_delayed_events);
 }

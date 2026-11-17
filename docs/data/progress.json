@@ -1,15 +1,15 @@
 {
  "game_id": "RM7P4F",
- "generated": "2026-11-17T19:52:35+00:00",
- "commit": "8bfb2c0",
- "commit_date": "2026-11-17T20:51:33+01:00",
+ "generated": "2026-11-17T19:53:25+00:00",
+ "commit": "edd1d27",
+ "commit_date": "2026-11-17T20:52:37+01:00",
  "game": {
   "functions": 8559,
   "bytes": 2277304,
-  "named": 2335,
-  "named_bytes": 361352,
-  "decompiled": 305,
-  "decompiled_bytes": 48432
+  "named": 2337,
+  "named_bytes": 361624,
+  "decompiled": 309,
+  "decompiled_bytes": 49144
  },
  "library": {
   "functions": 4028,
@@ -22,10 +22,10 @@
  "all": {
   "functions": 12587,
   "bytes": 3404928,
-  "named": 2781,
-  "named_bytes": 453792,
-  "decompiled": 305,
-  "decompiled_bytes": 48432
+  "named": 2783,
+  "named_bytes": 454064,
+  "decompiled": 309,
+  "decompiled_bytes": 49144
  },
  "game_range": [
   "80006B40",
@@ -65,8 +65,8 @@
    0.918
   ],
   [
-   0.718,
-   0.862
+   0.798,
+   0.873
   ],
   [
    0.0,
@@ -222,7 +222,7 @@
   ],
   [
    0.0,
-   0.111
+   0.13
   ],
   [
    0.0,
@@ -2528,6 +2528,26 @@
      "name": "prop_anim_done_80019C18",
      "addr": "80019C18",
      "size": 144
+    },
+    {
+     "name": "RegisterDelayedEventFuncs",
+     "addr": "80019CC8",
+     "size": 104
+    },
+    {
+     "name": "check_delayed_timer",
+     "addr": "80019D30",
+     "size": 156
+    },
+    {
+     "name": "send_delayed_event_to_zone",
+     "addr": "80019DCC",
+     "size": 412
+    },
+    {
+     "name": "reset_trigger_send_delayed_events",
+     "addr": "80019F68",
+     "size": 40
     }
    ]
   },
