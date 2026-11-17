@@ -220,12 +220,12 @@ void send_request(ScriptCtx* ctx) {
 }
 
 // 0x80019464
-void send_request_complete_80019464(ScriptCtx* ctx) {
+void send_request_complete(ScriptCtx* ctx) {
     RequestComplete(ctx, SCRIPT_ARG(ctx), SCRIPT_ARG2(ctx));
 }
 
 // 0x80019470
-void send_request_complete_80019470(void) {
+void ping(void) {
     DebugPing("ping", 0x00A4FFFF);
 }
 

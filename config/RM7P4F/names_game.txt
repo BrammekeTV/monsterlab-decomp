@@ -5,7 +5,7 @@ fn_801D16E0 EngineInit
 fn_801FB87C HomeButtonInit
 fn_80151258 SetRenderEnabled
 fn_801D1838 EngineFrame
-fn_801B2B94 ControllerReset
+fn_801B2B94 StopRumble
 fn_8000F5C0 GameShutdown
 fn_801D17FC EngineShutdown
 fn_801D1538 EngineCleanup
@@ -125,10 +125,10 @@ fn_8000C95C GameFlowPush
 fn_8000C970 GameFlowPop
 fn_8000C988 IsPlayerLoaded
 fn_8000C9E8 UiInit
-fn_8000CB20 UiSelectScreenSet
+fn_8000CB20 UIEngine_ActivateUIScreenSet
 fn_8000CB90 OnZoneScreensLoaded
 fn_8000CC30 ZoneLog
-fn_8000CC80 UiLoadScreenSet
+fn_8000CC80 UIEngine_LoadUIScreenSet
 fn_8000CD90 IsUISlotActive
 fn_8000CE20 GameFlowQuitGameDone
 fn_8000CE34 GameFlowPauseGame
@@ -155,7 +155,7 @@ fn_8000F840 MovieQueueIsEmpty
 fn_8000F86C QueueMovie
 fn_8000FA04 MusicRequest
 fn_8000FACC MusicUpdate
-fn_80010100 MusicRequestStop
+fn_80010100 app_StopMusic
 fn_8001011C AudioUpdateListener
 fn_80010228 UpdateAllZoneEntities
 fn_800108B8 UpdateZoneEntities
@@ -296,7 +296,7 @@ fn_8004D2B8 CharacterSetInCombat
 fn_8004D520 CharacterStartAttack
 fn_8004D5BC CharacterAttackDone
 lbl_805FBBB8 gBattle
-SpeedUpNISCameraAnimation_80016DB0 ResumeAllExplorationCharacters
+SpeedUpNISCameraAnimation_80016DB0 UnPauseAllExplorationEnemies
 fn_800D5724 PathGetDirection
 fn_800534C0 CharacterResetRace
 fn_8004D248 CharacterSetBlend
@@ -344,3 +344,4 @@ fn_801F53B0 ScopedLockDtor
 fn_801ED314 WaypointParamsInit
 fn_80019CC8 RegisterDelayedEventFuncs
 fn_8006EBC4 TriggerSendToZone
+fn_80019FB0 ComputeLobSpeed

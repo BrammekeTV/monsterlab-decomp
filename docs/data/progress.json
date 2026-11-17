@@ -1,31 +1,31 @@
 {
  "game_id": "RM7P4F",
- "generated": "2026-11-17T19:53:25+00:00",
- "commit": "edd1d27",
- "commit_date": "2026-11-17T20:52:37+01:00",
+ "generated": "2026-11-17T19:55:39+00:00",
+ "commit": "4661fe5",
+ "commit_date": "2026-11-17T20:53:26+01:00",
  "game": {
   "functions": 8559,
   "bytes": 2277304,
-  "named": 2337,
-  "named_bytes": 361624,
-  "decompiled": 309,
-  "decompiled_bytes": 49144
+  "named": 2338,
+  "named_bytes": 362052,
+  "decompiled": 310,
+  "decompiled_bytes": 49572
  },
  "library": {
   "functions": 4028,
   "bytes": 1127624,
-  "named": 446,
-  "named_bytes": 92440,
+  "named": 448,
+  "named_bytes": 92868,
   "decompiled": 0,
   "decompiled_bytes": 0
  },
  "all": {
   "functions": 12587,
   "bytes": 3404928,
-  "named": 2783,
-  "named_bytes": 454064,
-  "decompiled": 309,
-  "decompiled_bytes": 49144
+  "named": 2786,
+  "named_bytes": 454920,
+  "decompiled": 310,
+  "decompiled_bytes": 49572
  },
  "game_range": [
   "80006B40",
@@ -65,8 +65,8 @@
    0.918
   ],
   [
-   0.798,
-   0.873
+   0.846,
+   0.921
   ],
   [
    0.0,
@@ -1163,8 +1163,8 @@
    "end": "8033F400",
    "functions": 399,
    "bytes": 114196,
-   "named": 48,
-   "named_bytes": 13744,
+   "named": 50,
+   "named_bytes": 14172,
    "decompiled": 0,
    "decompiled_bytes": 0
   },
@@ -1740,12 +1740,12 @@
      "size": 12
     },
     {
-     "name": "send_request_complete_80019464",
+     "name": "send_request_complete",
      "addr": "80019464",
      "size": 12
     },
     {
-     "name": "send_request_complete_80019470",
+     "name": "ping",
      "addr": "80019470",
      "size": 16
     },
@@ -1825,7 +1825,7 @@
      "size": 196
     },
     {
-     "name": "ResumeAllExplorationCharacters",
+     "name": "UnPauseAllExplorationEnemies",
      "addr": "80016DB0",
      "size": 240
     },
@@ -2075,7 +2075,7 @@
      "size": 136
     },
     {
-     "name": "Loading_SetHomeButtonGone_8000E248",
+     "name": "Loading_SetHomeButtonGone",
      "addr": "8000E248",
      "size": 12
     },
@@ -2125,7 +2125,7 @@
      "size": 212
     },
     {
-     "name": "MusicRequestStop",
+     "name": "app_StopMusic",
      "addr": "80010100",
      "size": 28
     },
@@ -2330,7 +2330,7 @@
      "size": 312
     },
     {
-     "name": "UiSelectScreenSet",
+     "name": "UIEngine_ActivateUIScreenSet",
      "addr": "8000CB20",
      "size": 112
     },
@@ -2345,12 +2345,12 @@
      "size": 80
     },
     {
-     "name": "UiLoadScreenSet",
+     "name": "UIEngine_LoadUIScreenSet",
      "addr": "8000CC80",
      "size": 268
     },
     {
-     "name": "SpeedUpNISCameraAnimation_8000CD8C",
+     "name": "UIEngine_UnloadUISlot",
      "addr": "8000CD8C",
      "size": 4
     },
@@ -2437,6 +2437,16 @@
    ]
   },
   {
+   "path": "src/game/projectile_math.cpp",
+   "functions": [
+    {
+     "name": "ComputeLobSpeed",
+     "addr": "80019FB0",
+     "size": 428
+    }
+   ]
+  },
+  {
    "path": "src/game/props.cpp",
    "functions": [
     {
@@ -2500,7 +2510,7 @@
      "size": 92
     },
     {
-     "name": "prop_anim_done_80019B60",
+     "name": "prop_anim_done",
      "addr": "80019B60",
      "size": 64
     },
@@ -2525,7 +2535,7 @@
      "size": 44
     },
     {
-     "name": "prop_anim_done_80019C18",
+     "name": "NavTest",
      "addr": "80019C18",
      "size": 144
     },

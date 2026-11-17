@@ -12,7 +12,7 @@ void EngineInit(void);            // 0x801D16E0
 void HomeButtonInit(void);        // 0x801FB87C (loads HomeButton2/homeBtn.arc)
 void SetRenderEnabled(int on);    // 0x80151258
 void EngineFrame(void);           // 0x801D1838 (update + draw one frame)
-void ControllerReset(int chan);   // 0x801B2B94
+void StopRumble(int chan);   // 0x801B2B94
 void GameShutdown(void);          // 0x8000F5C0
 void EngineShutdown(void);        // 0x801D17FC
 void EngineCleanup(void* ctx);    // 0x801D1538
@@ -80,7 +80,7 @@ int GameMain(int argc, char** argv) {
     }
 
     for (int chan = 0; chan < 4; chan++) {
-        ControllerReset(chan);
+        StopRumble(chan);
     }
     GameShutdown();
     EngineShutdown();

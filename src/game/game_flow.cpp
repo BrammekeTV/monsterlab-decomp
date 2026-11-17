@@ -381,7 +381,7 @@ extern "C" void MusicUpdate(void) {
 }
 
 // 0x80010100
-void MusicRequestStop(void) {
+void app_StopMusic(void) {
     if ((gGameFlags & MUSIC_STATE_MASK) == 0) return;
     gGameFlags = (gGameFlags | MUSIC_REQ_STOP) & ~MUSIC_REQ_PLAY;
 }

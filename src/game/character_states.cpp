@@ -13,7 +13,7 @@ void  fn_80016FD0(Character* c, int animate);
 void  ExplorationPromptClear(BOOL animate);            // 0x80016EA0
 void  GameFlowSignal(s32 id, s32 a, s32 b);             // 0x8000C7F4
 void  PlayCharacterAnimation(Character* c, int a, u32 anim, int loop);
-void  SpeedUpNISCameraAnimation_8005100C(void);
+void  StartConversationID(void);
 BOOL  PathIsInConversation(PathFollower* p);            // 0x800D5964
 u32   PadGetButtons(void* pad);                         // 0x801B9B40
 s32   PathGetNodeId(PathFollower* p);                   // 0x800D56F8
@@ -24,7 +24,7 @@ BOOL  CharacterAttackDone(Character* c);                // 0x8004D5BC
 void  WorldSendEvent(void* world, u32 event, s32 from, s32 arg, BOOL queue);   // 0x800D87EC
 Vec3  PathGetDirection(PathFollower* p);                // 0x800D5724
 void  CharacterFaceDirection(Character* c, const Vec3* dir, BOOL now);   // 0x8005B650
-void  ResumeAllExplorationCharacters(void);             // 0x80016DB0
+void  UnPauseAllExplorationEnemies(void);             // 0x80016DB0
 s32   RegisterScriptFunc(const char* name, s32 type, void* fn);   // 0x801DC91C
 }
 
@@ -200,14 +200,14 @@ void character_conversation_entry(ScriptCtx* ctx) {
         EventSend(gEventMgr, c, c, 0x6877205Cu, 0, 0, 0, 0);
         return;
     }
-    SpeedUpNISCameraAnimation_8005100C();
+    StartConversationID();
     PauseOtherCharacters();
 }
 
 // 0x8001802C
 void character_conversation_exit(ScriptCtx* ctx) {
     if (ctx->chr == NULL) return;
-    ResumeAllExplorationCharacters();
+    UnPauseAllExplorationEnemies();
 }
 
 // 0x80018040
@@ -296,7 +296,7 @@ extern "C" void PauseAllExplorationEnemies(void) {
 // 0x80016DB0
 // Resume every paused moving character: those standing on a waypoint go back to idling,
 // the others continue walking.
-extern "C" void ResumeAllExplorationCharacters(void) {
+extern "C" void UnPauseAllExplorationEnemies(void) {
     for (int i = 0; i < 32; i++) {
         Character* e = CHARACTERS[i];
         if (e == NULL || !(e->def->stateFlags & 1) || !(e->def->flags & 0x10)) continue;
@@ -312,7 +312,7 @@ void character_challenge_exit(ScriptCtx* ctx) {
     if (c == NULL) return;
     if (lbl_805FBBC8[0x6C]) WorldSendEvent(WORLD, 0xACA6B62Cu, 0, 0, 0);   // challenge won
     else                    WorldSendEvent(WORLD, 0xADCA036Fu, 0, 0, 0);   // challenge lost
-    ResumeAllExplorationCharacters();
+    UnPauseAllExplorationEnemies();
     GameFlowSignal(0xACE44170, 0, 0);
     fn_80016FD0(c, 1);
 }
@@ -321,7 +321,7 @@ void character_challenge_exit(ScriptCtx* ctx) {
 void character_Interaction_exit(ScriptCtx* ctx) {
     Character* c = ctx->chr;
     if (c == NULL) return;
-    ResumeAllExplorationCharacters();
+    UnPauseAllExplorationEnemies();
     fn_80016FD0(c, 0);
     if (c->eventTarget != 0) {
         u8* hud = *(u8**)(gGame + 0xD634);

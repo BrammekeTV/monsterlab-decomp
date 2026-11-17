@@ -69,6 +69,11 @@
   "changelog": [
     {
       "date": "2026-11-17",
+      "time": "20:55",
+      "text": "Fixed the name-recovery tool: one script table stores some names through offsets the tool did not follow, which had given 255 functions the wrong name. All 2,047 script callbacks now carry their correct names. One correction shows the code is shared with the PS2 version: the shake check is IsPS2, where shaking reads the analog controller. Also decompiled the delayed zone events and the projectile lob formula."
+    },
+    {
+      "date": "2026-11-17",
       "time": "20:52",
       "text": "Decompiled level triggers and props: placing the camera at named locators (or along a locator's facing), camera sensors with blend times, in-game cutscene mode, trigger events and requests, hazard props that alternate idle and attack phases on timers, prop animations and effects, death counters and waypoint-following props."
     },

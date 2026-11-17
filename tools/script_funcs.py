@@ -56,6 +56,24 @@ def registrations():
                     base[m.group(1)] = (m.group(3), 0)
                     regs[m.group(1)] = ("sym", m.group(3), 0)
                     continue
+                m = re.match(r"addis (r\d+), (r\d+), (-?0x[0-9a-f]+|\d+)$", ins)
+                if m:
+                    if m.group(2) in base:
+                        s, o = base[m.group(2)]
+                        base[m.group(1)] = (s, o + (int(m.group(3), 0) << 16))
+                    else:
+                        base.pop(m.group(1), None)
+                    regs.pop(m.group(1), None)
+                    continue
+                m = re.match(r"subi (r\d+), (r\d+), (-?0x[0-9a-f]+|\d+)$", ins)
+                if m and m.group(2) in base:
+                    s, o = base[m.group(2)]
+                    regs[m.group(1)] = ("sym", s, o - int(m.group(3), 0))
+                    continue
+                m = re.match(r"li (r\d+), (\w+)@sda21$", ins)
+                if m:
+                    regs[m.group(1)] = ("sym", m.group(2), 0)
+                    continue
                 m = re.match(r"addi (r\d+), (r\d+), (-?0x[0-9a-f]+|\d+)$", ins)
                 if m and m.group(2) in base:
                     s, o = base[m.group(2)]
@@ -65,6 +83,10 @@ def registrations():
                 if m:
                     regs[m.group(1)] = ("imm", int(m.group(2), 0))
                     continue
+                m = re.match(r"(?:lwz|lbz|lhz|mr|li|add|addi|subi|or|and|lis|subis)\.? (r\d+),", ins)
+                if m and not ins.startswith("bl "):
+                    regs.pop(m.group(1), None)
+                    base.pop(m.group(1), None)
                 if ins.startswith("bl ") and ins.split()[1] in REG_NAMES:
                     n, ty, fn = regs.get("r3"), regs.get("r4"), regs.get("r5")
                     if n and fn and n[0] == "sym" and fn[0] == "sym":

@@ -129,7 +129,7 @@ void prop_deactivate(ScriptCtx* ctx) {
 }
 
 // 0x80019B60
-BOOL prop_anim_done_80019B60(ScriptCtx* ctx) {
+BOOL prop_anim_done(ScriptCtx* ctx) {
     Prop* p = PROP(ctx);
     if (p == NULL || p->anim == NULL || !(*(u32*)(p->anim + 0xF0) & 0x10)) return FALSE;
     p->doneFlags |= 1;
@@ -170,7 +170,7 @@ struct WaypointParams {
 
 // 0x80019C18
 // Second "prop_anim_done" registration: start following the prop's waypoint path at speed 2.
-void prop_anim_done_80019C18(ScriptCtx* ctx) {
+void NavTest(ScriptCtx* ctx) {
     Prop* p = PROP(ctx);
     WaypointParams wp;
     wp.start = 0xFFFF;
@@ -189,8 +189,8 @@ void RegisterPropScriptFuncs(void) {
     RegisterScriptFunc("prop_deactivate", 0x4E, (void*)prop_deactivate);
     RegisterScriptFunc("prop_counting_down", 0x4E, (void*)prop_counting_down);
     RegisterScriptFunc("prop_check_timer", 0x1D, (void*)prop_check_timer);
-    RegisterScriptFunc("prop_anim_done", 0x1D, (void*)prop_anim_done_80019B60);
-    RegisterScriptFunc("prop_anim_done", 0x4E, (void*)prop_anim_done_80019C18);
+    RegisterScriptFunc("prop_anim_done", 0x1D, (void*)prop_anim_done);
+    RegisterScriptFunc("prop_anim_done", 0x4E, (void*)NavTest);
     RegisterScriptFunc("reset_deathcount", 0x4E, (void*)reset_deathcount);
     RegisterScriptFunc("increment_deathcount", 0x4E, (void*)increment_deathcount);
     RegisterScriptFunc("increment_entity_state", 0x4E, (void*)increment_entity_state);

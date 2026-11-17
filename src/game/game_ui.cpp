@@ -198,7 +198,7 @@ void UiInit(void) {
 }
 
 // 0x8000CB20
-void UiSelectScreenSet(s32 id) {
+void UIEngine_ActivateUIScreenSet(s32 id) {
     void* prev = ScreenSetsCurrent(gScreenSets);
     ScreenSetsSelect(gScreenSets, id);
     if (prev != ScreenSetsCurrent(gScreenSets)) {
@@ -224,7 +224,7 @@ static void OnZoneScreensLoaded(void* zoneInfo, void* arg) {
 }
 
 // 0x8000CC80
-void UiLoadScreenSet(s32 id) {
+void UIEngine_LoadUIScreenSet(s32 id) {
     u8* res = (u8*)ResourceFind(*(void**)((u8*)gResourceDb + 0x20), id, 0);
     if (res == NULL) return;
 

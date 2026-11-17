@@ -17,7 +17,7 @@ BOOL  IsMonsterAttackAnimationDone(void* player);
 void  PauseAllExplorationCharacters(void);
 void  GameFlowSignal(s32 id, s32 a, s32 b);                       // 0x8000C7F4
 void  fn_80219004(void* p, s32 v);
-void  SpeedUpNISCameraAnimation_800F6BBC(void);
+void  UnPauseAllExplorationCharacters(void);
 void  fn_8004CE44(void* player);
 void  UIElement_SetVisibleFlag(u32 hash, BOOL on);
 void  UIScreen_PopScreen(u32 hash);
@@ -168,7 +168,7 @@ void PumpkinEscapeEntry(ScriptCtx* ctx) {
 void PumpkinEscapeExit(ScriptCtx* ctx) {
     Character* c = ctx->chr;
     if (c == NULL) return;
-    SpeedUpNISCameraAnimation_800F6BBC();
+    UnPauseAllExplorationCharacters();
     c->unkC44 = 0.5f;
 }
 
@@ -182,7 +182,7 @@ void PumpkinDeathEntry(ScriptCtx* ctx) {
 void PumpkinDeathExit(ScriptCtx* ctx) {
     Character* c = ctx->chr;
     if (c != NULL) Kill(c);
-    SpeedUpNISCameraAnimation_800F6BBC();
+    UnPauseAllExplorationCharacters();
     WorldSendEvent(WORLD, c->id, 0, 0, 0);
 }
 
@@ -402,15 +402,15 @@ BOOL PlayerInCombatRange(ScriptCtx* ctx) {
 }
 
 // ---------------------------------------------------------------- shake mini-games
-// The player shakes the Wii Remote to fill a meter. In two-player mode the shake comes from
-// the other player's input stream (IsOpponentPreparing), otherwise from the local gesture
-// detector.
+// The player shakes the Wii Remote to fill a meter. The code is shared with the PS2 version:
+// there (IsPS2) a "shake" is read from the analog controller; on Wii it comes from the
+// Wii Remote gesture detector.
 
 extern "C" {
 void  ControlsLock(void* player, int a);                 // 0x8004CD28
 void  ControlsUnlock(void* player);                      // 0x8004CE44
 u8*   GetGestureDetector(void* player, int idx);         // 0x8004CED8
-BOOL  IsOpponentPreparing_800E75E0(void);
+BOOL  IsPS2(void);
 void* RemoteInputGet(void* table, int idx);              // 0x80021550
 void  RemoteInputUpdate(void* input, f32 dt);            // 0x80020070
 f32   RemoteInputShake(void* input);                     // 0x80020068
@@ -432,7 +432,7 @@ void  UISlider_SetValue(u32 hash, f32 value);
 #define SHAKE_DECAY         3.0f        // meter units lost per second
 
 static inline BOOL DetectShake(Character* player) {
-    if (IsOpponentPreparing_800E75E0()) {
+    if (IsPS2()) {
         Character* p = (Character*)PLAYER;
         void* table = *(void**)(sSirHeader + 0xDC4);
         RemoteInputUpdate(RemoteInputGet(table, 0x1C), p->dt);

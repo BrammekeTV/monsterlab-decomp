@@ -52,3 +52,5 @@ fn_80272E3C WPADControlMotor
 fn_80268194 NANDCheck
 fn_80338910 strcmp
 fn_80336E38 snprintf
+fn_8033EC98 cosf
+fn_8033F0A4 sinf
