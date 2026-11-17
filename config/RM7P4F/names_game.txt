@@ -434,3 +434,13 @@ fn_8004533C SetPartSelected
 fn_8022954C SaveGetFieldRepairRecord
 fn_80229554 SaveSetFieldRepairRecord
 fn_8022DF3C NoticePosted
+fn_80211180 BattleResolveAttack
+fn_80213F8C FighterFromStats
+fn_8020E7B4 PartSlotName
+fn_80213988 PartMatchup
+fn_802152B4 RoundNoteAbility
+fn_80215F68 PartMatchupText
+fn_802207A0 BattleLogAdd
+fn_802126DC BattleAfterAttack
+fn_8021605C DamageRecordInit
+fn_8021DA90 PartActionStat2

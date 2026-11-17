@@ -69,6 +69,11 @@
  "changelog": [
   {
    "date": "2026-11-17",
+   "time": "22:56",
+   "text": "Decompiled the battle damage resolver: per-limb damage from the part's action, strong/weak part matchups, abilities that boost damage against a discipline or hit every limb, charged attacks, blocking with return damage and resistances, tutorial and boss protection, and the battle log lines (\"%s: %d HP %+d Base %s = %d HP\", \"Incapacitated!\")."
+  },
+  {
+   "date": "2026-11-17",
    "time": "22:51",
    "text": "Decompiled the combat HUD part card (health, discipline, name for the part's tier, both actions with their stat rows, defect/enhancement icons with their first-time tutorials, and which actions you can afford), the game session state machine that loads, runs and unloads each level and draws the frame, and the field-repair record that unlocks three achievements and awards XP and rank-ups."
   },

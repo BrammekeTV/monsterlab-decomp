@@ -1,15 +1,15 @@
 {
  "game_id": "RM7P4F",
- "generated": "2026-11-17T21:51:15+00:00",
- "commit": "c05977c",
- "commit_date": "2026-11-17T22:36:15+01:00",
+ "generated": "2026-11-17T21:56:39+00:00",
+ "commit": "ad58897",
+ "commit_date": "2026-11-17T22:52:47+01:00",
  "game": {
   "functions": 8548,
   "bytes": 2265988,
-  "named": 2403,
-  "named_bytes": 490340,
-  "decompiled": 344,
-  "decompiled_bytes": 160220
+  "named": 2413,
+  "named_bytes": 495884,
+  "decompiled": 345,
+  "decompiled_bytes": 163828
  },
  "library": {
   "functions": 4039,
@@ -22,10 +22,10 @@
  "all": {
   "functions": 12587,
   "bytes": 3404928,
-  "named": 2861,
-  "named_bytes": 594484,
-  "decompiled": 344,
-  "decompiled_bytes": 160220
+  "named": 2871,
+  "named_bytes": 600028,
+  "decompiled": 345,
+  "decompiled_bytes": 163828
  },
  "game_range": [
   "80006B40",
@@ -994,23 +994,23 @@
   ],
   [
    0.0,
-   0.004
+   0.006
+  ],
+  [
+   0.364,
+   0.364
   ],
   [
    0.0,
-   0.0
+   0.134
   ],
   [
    0.0,
-   0.0
-  ],
-  [
-   0.0,
-   0.026
+   0.066
   ],
   [
    0.019,
-   0.032
+   0.042
   ],
   [
    0.0,
@@ -1022,11 +1022,11 @@
   ],
   [
    0.0,
-   0.369
+   0.407
   ],
   [
    0.007,
-   0.038
+   0.048
   ],
   [
    0.0,
@@ -1639,6 +1639,16 @@
      "name": "CharacterSetMode",
      "addr": "80016284",
      "size": 348
+    }
+   ]
+  },
+  {
+   "path": "src/game/battle_damage.cpp",
+   "functions": [
+    {
+     "name": "BattleResolveAttack",
+     "addr": "80211180",
+     "size": 3608
     }
    ]
   },
