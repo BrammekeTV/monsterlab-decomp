@@ -1,15 +1,15 @@
 {
  "game_id": "RM7P4F",
- "generated": "2026-11-17T19:40:04+00:00",
- "commit": "627ab06",
- "commit_date": "2026-11-17T20:35:44+01:00",
+ "generated": "2026-11-17T19:42:47+00:00",
+ "commit": "bfccda5",
+ "commit_date": "2026-11-17T20:40:07+01:00",
  "game": {
   "functions": 8559,
   "bytes": 2277304,
-  "named": 2293,
-  "named_bytes": 351384,
-  "decompiled": 240,
-  "decompiled_bytes": 37592
+  "named": 2298,
+  "named_bytes": 352612,
+  "decompiled": 249,
+  "decompiled_bytes": 39476
  },
  "library": {
   "functions": 4028,
@@ -22,10 +22,10 @@
  "all": {
   "functions": 12587,
   "bytes": 3404928,
-  "named": 2739,
-  "named_bytes": 443824,
-  "decompiled": 240,
-  "decompiled_bytes": 37592
+  "named": 2744,
+  "named_bytes": 445052,
+  "decompiled": 249,
+  "decompiled_bytes": 39476
  },
  "game_range": [
   "80006B40",
@@ -61,11 +61,11 @@
    0.863
   ],
   [
-   0.45,
+   0.605,
    0.884
   ],
   [
-   0.049,
+   0.105,
    0.803
   ],
   [
@@ -162,7 +162,7 @@
   ],
   [
    0.0,
-   0.129
+   0.143
   ],
   [
    0.0,
@@ -174,7 +174,7 @@
   ],
   [
    0.0,
-   0.0
+   0.014
   ],
   [
    0.0,
@@ -414,7 +414,7 @@
   ],
   [
    0.0,
-   0.195
+   0.223
   ],
   [
    0.0,
@@ -838,7 +838,7 @@
   ],
   [
    0.0,
-   0.0
+   0.08
   ],
   [
    0.0,
@@ -1665,9 +1665,24 @@
      "size": 4
     },
     {
+     "name": "PauseAllExplorationEnemies",
+     "addr": "80016CEC",
+     "size": 196
+    },
+    {
+     "name": "ResumeAllExplorationCharacters",
+     "addr": "80016DB0",
+     "size": 240
+    },
+    {
      "name": "character_exploration_move_entry",
      "addr": "80017290",
      "size": 120
+    },
+    {
+     "name": "character_exploration_move_exit",
+     "addr": "80017308",
+     "size": 332
     },
     {
      "name": "character_exploration_exit_entry",
@@ -1710,6 +1725,21 @@
      "size": 188
     },
     {
+     "name": "character_race_entry",
+     "addr": "80017930",
+     "size": 276
+    },
+    {
+     "name": "character_race_exit",
+     "addr": "80017A44",
+     "size": 156
+    },
+    {
+     "name": "character_challenge_exit",
+     "addr": "80017E5C",
+     "size": 184
+    },
+    {
      "name": "character_challenge_update",
      "addr": "80017F14",
      "size": 4
@@ -1728,6 +1758,21 @@
      "name": "character_conversation_update",
      "addr": "80018040",
      "size": 4
+    },
+    {
+     "name": "character_Interaction_exit",
+     "addr": "80018174",
+     "size": 108
+    },
+    {
+     "name": "character_Interaction_update",
+     "addr": "800181E0",
+     "size": 196
+    },
+    {
+     "name": "target_node_reached",
+     "addr": "800186D8",
+     "size": 196
     },
     {
      "name": "CharacterCombatIdleEntry",

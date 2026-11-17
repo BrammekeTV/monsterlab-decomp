@@ -69,6 +69,11 @@
   "changelog": [
     {
       "date": "2026-11-17",
+      "time": "20:42",
+      "text": "Decompiled more character states: pausing and resuming every exploring character, challenge results reported to the world, interactions, arriving at waypoints (with footsteps and HUD updates), and the start/end of races (the racer starts at speed 0 and walks at 6 afterwards)."
+    },
+    {
+      "date": "2026-11-17",
       "time": "20:40",
       "text": "Decompiled patrol routing (routes that loop, ping-pong, run once or pick random exits at junctions, and following a target) and 29 character state callbacks: combat idle, exploration idle/move/wait/injure, challenge instructions (A accepts and the challenger steps aside for 65 seconds, B declines), conversations and combat actions."
     },

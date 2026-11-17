@@ -13,7 +13,6 @@ void  fn_80016FD0(Character* c, int a);
 void  fn_80016EA0(int);
 void  GameFlowSignal(s32 id, s32 a, s32 b);             // 0x8000C7F4
 void  PlayCharacterAnimation(Character* c, int a, u32 anim, int loop);
-void  SpeedUpNISCameraAnimation_80016DB0(Character* c);
 void  SpeedUpNISCameraAnimation_8005100C(void);
 BOOL  PathIsInConversation(PathFollower* p);            // 0x800D5964
 u32   PadGetButtons(void* pad);                         // 0x801B9B40
@@ -22,6 +21,10 @@ void  SessionDisableFor(void* session, s32 id, f32 time);   // 0x80012820
 void  CharacterSetInCombat(Character* c, BOOL on);      // 0x8004D2B8
 BOOL  CharacterStartAttack(Character* c, int a);        // 0x8004D520
 BOOL  CharacterAttackDone(Character* c);                // 0x8004D5BC
+void  WorldSendEvent(void* world, u32 event, s32 from, s32 arg, BOOL queue);   // 0x800D87EC
+Vec3  PathGetDirection(PathFollower* p);                // 0x800D5724
+void  CharacterFaceDirection(Character* c, const Vec3* dir, BOOL now);   // 0x8005B650
+void  ResumeAllExplorationCharacters(void);             // 0x80016DB0
 s32   RegisterScriptFunc(const char* name, s32 type, void* fn);   // 0x801DC91C
 }
 
@@ -29,6 +32,9 @@ extern void* gEventMgr;            // 0x805FB6C8
 extern u8    gGame[];              // 0x803B53A0
 extern u8    gScriptCtx[];         // 0x803C4298
 extern u8*   gBattle;              ORIG(0x805FBBB8)
+extern u8*   lbl_805FBBC8;
+extern u8*   gSaveSystem;          // 0x805FBBE0
+extern void* gObjDb;               // 0x805FB180
 
 #define WORLD       (gGame + 0xD5F0)
 #define PLAYER      ((Character*)*(void**)(gGame + 0xD614))
@@ -197,7 +203,7 @@ void character_conversation_entry(ScriptCtx* ctx) {
 // 0x8001802C
 void character_conversation_exit(ScriptCtx* ctx) {
     if (ctx->chr == NULL) return;
-    SpeedUpNISCameraAnimation_80016DB0(ctx->chr);
+    ResumeAllExplorationCharacters();
 }
 
 // 0x80018040
@@ -277,21 +283,159 @@ void CharacterPreviewerIdleEntry(ScriptCtx* ctx) {
     (void)ctx;
 }
 
+#define EV_RESUME_MOVE 0x00F4D7ABu
+
+// 0x80016CEC
+extern "C" void PauseAllExplorationEnemies(void) {
+    PauseOtherCharacters();
+}
+
+// 0x80016DB0
+// Resume every paused moving character: those standing on a waypoint go back to idling,
+// the others continue walking.
+extern "C" void ResumeAllExplorationCharacters(void) {
+    for (int i = 0; i < 32; i++) {
+        Character* e = CHARACTERS[i];
+        if (e == NULL || !(e->def->stateFlags & 1) || !(e->def->flags & 0x10)) continue;
+        if (e == PLAYER || e->path == NULL) continue;
+        if (PathAtWaypoint(e->path)) Send(e, EV_RESUME);
+        else                         Send(e, EV_RESUME_MOVE);
+    }
+}
+
+// 0x80017E5C
+void character_challenge_exit(ScriptCtx* ctx) {
+    Character* c = ctx->chr;
+    if (c == NULL) return;
+    if (lbl_805FBBC8[0x6C]) WorldSendEvent(WORLD, 0xACA6B62Cu, 0, 0, 0);   // challenge won
+    else                    WorldSendEvent(WORLD, 0xADCA036Fu, 0, 0, 0);   // challenge lost
+    ResumeAllExplorationCharacters();
+    GameFlowSignal(0xACE44170, 0, 0);
+    fn_80016FD0(c, 1);
+}
+
+// 0x80018174
+void character_Interaction_exit(ScriptCtx* ctx) {
+    Character* c = ctx->chr;
+    if (c == NULL) return;
+    ResumeAllExplorationCharacters();
+    fn_80016FD0(c, 0);
+    if (c->eventTarget != 0) {
+        u8* hud = *(u8**)(gGame + 0xD634);
+        hud[0x430] = 1;      // fade the HUD back in
+        c->eventTarget = 0;
+    }
+}
+
+// 0x800181E0
+// While walking between waypoints, keep facing the walking direction.
+void character_Interaction_update(ScriptCtx* ctx) {
+    Character* c = ctx->chr;
+    if (c == NULL || c->path == NULL || PathAtWaypoint(c->path)) return;
+    c->def->pos = *PathGetPosition(c->path);
+    Vec3 dir = PathGetDirection(c->path);
+    if (dir.x * dir.x + dir.y * dir.y + 0.0f * 0.0f > 0.01f) {
+        Vec3 d = PathGetDirection(c->path);
+        CharacterFaceDirection(c, &d, FALSE);
+    }
+}
+
+// 0x800186D8
+BOOL target_node_reached(ScriptCtx* ctx) {
+    BOOL reached = FALSE;
+    Character* c = ctx->chr;
+    if (c == NULL) return FALSE;
+    Vec3 d = { c->targetPos.x - c->def->pos.x, c->targetPos.y - c->def->pos.y, c->targetPos.z - c->def->pos.z };
+    if (c->path != NULL) reached = PathAtWaypoint(c->path);
+    if (gObjDb == NULL && Vec3LengthSq(d) <= 0.01f) reached = TRUE;
+    return reached;
+}
+
+extern "C" {
+void  ControlsLock(void* player, int a);                // 0x8004CD28
+void  ControlsUnlock(void* player);                     // 0x8004CE44
+void  CharacterResetRace(Character* c);                 // 0x800534C0
+void  CharacterSetBlend(Character* c, f32 t);           // 0x8004D248
+void  UIScreen_Push(u32 hash);
+void  UIScreen_PopScreen(u32 hash);
+void  UIElement_SetVisibleFlag(u32 hash, BOOL on);
+void  UISlider_SetValue(u32 hash, f32 value);
+BOOL  PathIsAtJunction(PathFollower* p);                // 0x800D5924
+void  HudUpdateScreens(void* screens, f32 dt);          // 0x801BB5BC
+void  PlayFootStepSound(void* sfx);
+}
+
+#define RACE_WALK_SPEED 6.0f
+
+// 0x80017930
+// Races start from a standstill: the player (Wii Remote driven) begins at speed 0.
+void character_race_entry(ScriptCtx* ctx) {
+    Character* c = ctx->chr;
+    if (c == NULL) return;
+    CharacterResetRace(c);
+    c->pathSpeed = 0.0f;
+    *(s32*)(**(u8***)((u8*)c + 0xA4) + 0x2C) = 0;
+    c->waitTimer = 0.0f;
+    ControlsLock(c, 0);
+    *((u8*)c + 0xC81) = 1;                       // racing
+    PathSetSpeed(c->path, 0.0f);
+    fn_80016EA0(0);
+    if (c->pathSpeed > 0.0f) PlayCharacterAnimation(c, 1, 0xF5770040 /* "explore1" */, 1);
+
+    UIScreen_Push(0xE5BF8E82);
+    UIElement_SetVisibleFlag(0x552FC6C7, TRUE);
+    UIElement_SetVisibleFlag(0xC4E94BB0, FALSE);
+    UIElement_SetVisibleFlag(0xB2601D05, FALSE);
+    UIElement_SetVisibleFlag(0x1A9EE60F /* "Wiimote_down" */, TRUE);
+    UIElement_SetVisibleFlag(0x8D6D65B1 /* "Wiimote_up" */, FALSE);
+}
+
+// 0x80017A44
+void character_race_exit(ScriptCtx* ctx) {
+    Character* c = ctx->chr;
+    if (c == NULL) return;
+    c->pathSpeed = RACE_WALK_SPEED;
+    ControlsUnlock(c);
+    *((u8*)c + 0xC81) = 0;
+    CharacterSetBlend(c, 1.0f);
+    PathSetSpeed(c->path, RACE_WALK_SPEED);
+    UISlider_SetValue(0xA90A6046, 0.0f);
+    UIElement_SetVisibleFlag(0x552FC6C7, FALSE);
+    UIScreen_PopScreen(0xE5BF8E82);
+}
+
+// 0x80017308
+// Arriving at a waypoint: report it to the world (the player's arrival also updates the HUD),
+// snap to the node and play a footstep.
+void character_exploration_move_exit(ScriptCtx* ctx) {
+    Character* c = ctx->chr;
+    if (c == NULL || c->path == NULL || !PathAtWaypoint(c->path)) return;
+
+    if (c == PLAYER) {
+        if (PathIsAtJunction(c->path)) fn_80016FD0(c, 0);
+        *(s32*)(gSaveSystem + 0x100) = 0;
+        WorldSendEvent(WORLD, 0x6E9F46BC, c->id, PathGetNodeId(c->path), 1);
+        u8* hud = *(u8**)(gGame + 0xD634);
+        HudUpdateScreens(*(void**)(hud + 0x434), c->dt);
+    } else {
+        WorldSendEvent(WORLD, 0x00C72F9E, c->id, PathGetNodeId(c->path), 1);
+    }
+
+    c->def->pos = *PathGetPosition(c->path);
+    if ((c->def->flags & 0x2000) && c != NULL) {
+        void* sfx = *(void**)((u8*)c + 0xC54);
+        if (sfx != NULL) PlayFootStepSound(sfx);
+    }
+}
+
 // Not yet decompiled callbacks.
 BOOL target_node_selected(ScriptCtx* ctx);
 BOOL target_node_changed(ScriptCtx* ctx);
-BOOL target_node_reached(ScriptCtx* ctx);
 void character_exploration_idle_update(ScriptCtx* ctx);
-void character_exploration_move_exit(ScriptCtx* ctx);
 void character_exploration_move_update(ScriptCtx* ctx);
-void character_race_entry(ScriptCtx* ctx);
-void character_race_exit(ScriptCtx* ctx);
 void character_race_update(ScriptCtx* ctx);
 void character_challenge_entry(ScriptCtx* ctx);
-void character_challenge_exit(ScriptCtx* ctx);
 void character_Interaction_entry(ScriptCtx* ctx);
-void character_Interaction_exit(ScriptCtx* ctx);
-void character_Interaction_update(ScriptCtx* ctx);
 
 // 0x80016400
 void RegisterCharacterStateCallbacks(void) {

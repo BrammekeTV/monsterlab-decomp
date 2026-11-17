@@ -296,3 +296,9 @@ fn_8004D2B8 CharacterSetInCombat
 fn_8004D520 CharacterStartAttack
 fn_8004D5BC CharacterAttackDone
 lbl_805FBBB8 gBattle
+SpeedUpNISCameraAnimation_80016DB0 ResumeAllExplorationCharacters
+fn_800D5724 PathGetDirection
+fn_800534C0 CharacterResetRace
+fn_8004D248 CharacterSetBlend
+fn_800D5924 PathIsAtJunction
+fn_801BB5BC HudUpdateScreens

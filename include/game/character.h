@@ -50,7 +50,7 @@ struct Character {
     s32           unk9D8;        // 0x9D8
     u8            pad9DC[8];
     f32           waitTimer;     // 0x9E4
-    u8            pad9E8[0xC];
+    Vec3          targetPos;     // 0x9E8
     f32           pathSpeed;     // 0x9F4
     u8            pad9F8[8];
     PathFollower* path;          // 0xA00
