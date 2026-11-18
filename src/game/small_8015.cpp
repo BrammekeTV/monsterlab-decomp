@@ -58,7 +58,7 @@ extern "C" void fn_801542DC(void) {
 extern "C" void fn_80154318(void);
 // 0x80154318
 // Sets lbl_805F9232 to 1; if the flag is set, sends two BP writes.
-void fn_80154318(void) {
+extern "C" void fn_80154318(void) {
     u8 flag = lbl_805F9231;
     lbl_805F9232 = 1;
     if (flag == 0) return;

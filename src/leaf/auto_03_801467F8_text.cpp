@@ -33,6 +33,7 @@ extern "C" void fn_80151264(void);
 extern "C" void fn_8015E838(u8*, s32);
 extern "C" void fn_8015E8B4(u8*, s32);
 extern "C" void fn_8015EA90(u8*);
+extern "C" void* fn_80330D80(s32);
 extern "C" void fn_80330E20(void*);
 
 // 0x801467F8
@@ -119,6 +120,11 @@ extern "C" void fn_801483CC(u8* a3) {
 // 0x80148540
 extern "C" void RendDefaultFree(u8* a3) {
     MEMFreeToAllocator((u8*)&lbl_803F2880, (void*)(((u8*)(uintptr_t)(a3))));
+}
+
+// 0x80148550
+extern "C" void* RendDefaultAllocTemp(s32 a3) {
+    return (void*)(fn_80330D80((s32)((u32)(uintptr_t)(a3))));
 }
 
 // 0x80148558

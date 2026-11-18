@@ -94,6 +94,11 @@
  "changelog": [
   {
    "date": "2026-11-18",
+   "time": "23:36",
+   "text": "The progress site now shows the linker's missing-symbols list. First round from it: 41 of the most-referenced missing functions, including the event system (EventSend, EventPost, EventSendTo), the allocators (MemAllocDefault, MemAllocSmall, BufferFree, operator delete), script registration, string/debug logging, audio pause, prop and character animation, UI screen push/pop and set-text, and trigger actions."
+  },
+  {
+   "date": "2026-11-18",
    "time": "23:17",
    "text": "PC build is now 32-bit and CI has a link step: the linker's unresolved symbols become a ranked missing-symbols report (about 1,390 game functions, 1,100 globals, 100 SDK functions). The link also exposed 60 symbols declared with a different type or C/C++ linkage than their definitions; all fixed."
   },

@@ -22,7 +22,8 @@ extern "C" void MEMFreeToAllocator(u8*, void*);
 extern "C" void fn_80184314(s32, s32, s32);
 extern "C" void fn_80184490(s32, s32, s32);
 extern "C" void fn_8018979C(s32, s32, s32, s32);
-extern "C" void fn_801EF070(u8*, s32);
+extern "C" void fn_801EF070(u8*, void*);
+extern "C" void* fn_80330D80(s32);
 extern "C" void fn_80330E20(void*);
 
 // 0x8016EB0C
@@ -151,6 +152,11 @@ extern "C" void* fn_80173284(s32 a3) {
 // 0x80173294
 extern "C" void fn_80173294(u8* a3) {
     MEMFreeToAllocator((u8*)&lbl_803F2880, (void*)(((u8*)(uintptr_t)(a3))));
+}
+
+// 0x801732A4
+extern "C" void* fn_801732A4(s32 a3) {
+    return (void*)(fn_80330D80((s32)((u32)(uintptr_t)(a3))));
 }
 
 // 0x801732AC
@@ -458,7 +464,7 @@ extern "C" s32 ScreenSetsFind(s32 a3, s32 a4) {
 extern "C" void fn_8018D4CC(u8* a3) {
     s32 t0 = *(s32*)((u8*)&lbl_805F95F8);
     if ((s32)(u32)(t0) <= 0) {
-        fn_801EF070((u8*)&lbl_80412BF8, (s32)((u32)(uintptr_t)(a3)));
+        fn_801EF070((u8*)&lbl_80412BF8, (void*)(((u8*)(uintptr_t)(a3))));
         return;
     }
     BufferFree((void*)(((u8*)(uintptr_t)(a3))));

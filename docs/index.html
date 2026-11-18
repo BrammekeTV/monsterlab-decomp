@@ -245,6 +245,8 @@ footer { margin-top: 34px; text-align: center; color: var(--dim); font-size: 13p
 
   <div class="shelf"></div>
 
+  <section class="panel" id="missing" hidden><h2>Missing symbols</h2><p class="small sub-note" id="miss-sub"></p><table id="miss"></table></section>
+
   <div class="grid two">
     <section class="panel"><h2>Library code</h2><p class="small sub-note">Replaced on PC, not decompiled. It only needs identifying.</p><table id="libs"></table></section>
     <section class="panel"><h2>Decompiled source files</h2><div id="files"></div></section>
@@ -292,6 +294,16 @@ async function load() {
   $('log').innerHTML = feat.changelog.slice(0, 8).map(c =>
     `<li><time datetime="${esc(c.date)}${c.time ? 'T' + esc(c.time) + '+01:00' : ''}">${esc(c.date)}${c.time ? ' · ' + esc(c.time) + ' CET' : ''}</time>${esc(c.text)}</li>`).join('');
 
+  try {
+    const m = await fetch('data/missing.json').then(r => r.ok ? r.json() : null);
+    if (m) {
+      const c = m.counts || {};
+      $('miss-sub').textContent = `What the linker still cannot find: ${fmt(c.game || 0)} game functions (${fmt(m.game_bytes)} bytes), ${fmt(c.library || 0)} SDK/library functions, ${fmt(c.global || 0)} globals. Top game functions by references:`;
+      $('miss').innerHTML = '<tr><th>Function</th><th>Address</th><th class="num">Size</th><th class="num">Refs</th></tr>' +
+        m.game.slice(0, 20).map(e => `<tr><td>${e.name}</td><td>${e.addr}</td><td class="num">${fmt(e.size)}</td><td class="num">${fmt(e.refs)}</td></tr>`).join('');
+      $('missing').hidden = false;
+    }
+  } catch (e) {}
   $('libs').innerHTML = '<tr><th>Library</th><th class="num">Functions</th><th>Identified</th></tr>' +
     prog.library_regions.map(r => {
       const p = pct(r.named_bytes, r.bytes);

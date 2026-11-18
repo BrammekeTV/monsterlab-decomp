@@ -81,7 +81,7 @@ static void SysErrorHandler(OSError error, OSContext* context, u32 dsisr, u32 da
 
 
 // 0x80142BBC
-void SysInit(void) {
+extern "C" void SysInit(void) {
     if (sInitialized) return;
     sInitialized = TRUE;
 

@@ -6,7 +6,7 @@
 #include "types.h"
 
 extern u8 lbl_805FB2B0[];
-extern "C" void fn_80116D40(s32);
+extern "C" void fn_80116D40(u8*, u32, u32);
 
 // 0x8011FF24
 extern "C" void fn_8011FF24(void) {
@@ -198,11 +198,10 @@ extern "C" s32 fn_8012096C(s32 a3) {
 }
 
 // 0x80120978
-extern "C" void fn_80120978(s32 a3) {
-    // tail-call arguments inferred from the registers set before the call
+extern "C" void fn_80120978(s32 a3, s32 a4, s32 a5) {
     u32 t0 = (u32)(uintptr_t)(a3) + 65536u;
     u32 t1 = (u32)(t0) - 22952u;
-    fn_80116D40((s32)((u32)(t1)));
+    fn_80116D40((u8*)(uintptr_t)(t1), (u32)((u32)(uintptr_t)(a4)), (u32)((u32)(uintptr_t)(a5)));
 }
 
 // 0x80120984
