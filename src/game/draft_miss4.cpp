@@ -31,7 +31,7 @@ void   fn_8006A764(u8* prop, f32 t);                             // 0x8006A764
 void   fn_8006B244(u8* prop);                                    // 0x8006B244
 void   fn_8006C068(u8* prop, f32 t);                             // 0x8006C068
 void   fn_8006F67C(u8* p, f32 t, s32 flag);                      // 0x8006F67C
-s32    fn_800D5C48(u8* ref, s32 a);                              // 0x800D5C48
+void fn_800D5C48(u8* arg0, s32 arg1);                              // 0x800D5C48
 void   fn_80126808(void);                                        // 0x80126808
 s32    fn_801478C8(u8* table, s32 idx);                          // 0x801478C8
 void   fn_8016A3F8(u8* p);                                       // 0x8016A3F8

@@ -26,7 +26,7 @@ void  EventSendTo(void* mgr, u32 event, void* from, u32 arg, int a, int b);     
 void* EventPost(s32 id, void* sender);                                                      // 0x801F3918
 void  TriggerSendToZone(void* trigger, u32 event);                                          // 0x8006EBC4
 void* SpawnHelper(void* owner, s32 arg);                                                    // 0x8000C478
-void  fn_80065200(void* spawned, u8* pos, Vec3* dir, u8* owner, s32 a7, s32 a8, s32 a9);    // 0x80065200
+s32 fn_80065200(u8* arg0, u8* arg1, void* arg2, u8* arg3, s32 arg4, s32 arg5, s32 arg6);    // 0x80065200
 void  fn_800ECCCC(void* a0, u32 a1, void* a2, void* a3, s32 a4, s32 a5, f32 a6);            // 0x800ECCCC
 u8*   CharacterGetGround(u8* c);                                                            // 0x8005A520
 s32   fn_80074D48(void);                                                                    // 0x80074D48
@@ -145,7 +145,7 @@ extern "C" void FireProjectileUp(void* a0, u32 a1) {
         dir.x = lbl_805FEB0C;
         dir.y = lbl_805FEB0C;
         dir.z = lbl_805FEB04;
-        fn_80065200(spawned, self + 0x18, &dir, self, 0, 0, 0);
+        fn_80065200((u8*)spawned, self + 0x18, &dir, self, 0, 0, 0);
     }
 }
 

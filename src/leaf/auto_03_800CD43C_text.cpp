@@ -8,7 +8,7 @@
 extern u8 lbl_803C6ED8[];
 extern u8 lbl_805F8C88[];
 extern "C" void fn_800C2180(u8*, u8*, s32);
-extern "C" void fn_800C253C(s32, s32);
+extern "C" u8* fn_800C253C(u8**, s32);
 
 // 0x800CD490
 extern "C" void fn_800CD490(u8* a3, s32 a4) {
@@ -20,15 +20,13 @@ extern "C" void fn_800CD490(u8* a3, s32 a4) {
 }
 
 // 0x800CD778
-extern "C" void fn_800CD778(s32 a3) {
-    // tail-call arguments inferred from the registers set before the call
-    fn_800C253C((s32)((u32)(uintptr_t)(a3)), (s32)((u32)(0)));
+extern "C" u8* fn_800CD778(u8* a3) {
+    return (u8*)(fn_800C253C((u8**)(((u8*)(uintptr_t)(a3))), (s32)((u32)(0))));
 }
 
 // 0x800CD780
-extern "C" void fn_800CD780(s32 a3) {
-    // tail-call arguments inferred from the registers set before the call
-    fn_800C253C((s32)((u32)(uintptr_t)(a3)), (s32)((u32)(4)));
+extern "C" u8* fn_800CD780(u8* a3) {
+    return (u8*)(fn_800C253C((u8**)(((u8*)(uintptr_t)(a3))), (s32)((u32)(4))));
 }
 
 // 0x800CD7C0

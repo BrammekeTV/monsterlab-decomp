@@ -51,7 +51,7 @@ void* fn_801D40E0(s32 n);                                         // 0x801D40E0
 s32   fn_800E2F10(u8* p, f32 dt);                                 // 0x800E2F10
 s32   fn_801E7460(u8* table, u16* handle);                        // 0x801E7460 (is the handle live?)
 void  fn_801E8D74(void* out, void* list, void* owner, void* anim);  // 0x801E8D74
-void  fn_801E9678(void* p, void* data);                           // 0x801E9678
+s32 fn_801E9678(void* list, void* handle);                           // 0x801E9678
 void* fn_801E9D18(void* p, u32 hash, s32 size);                   // 0x801E9D18
 void  fn_801EAA5C(u8* anim);                                      // 0x801EAA5C
 void  fn_801EAAEC(u8* anim, u8* rec, u8* obj, u8* col, s32 a5, s32 a6, s32 a7, s32 a8,

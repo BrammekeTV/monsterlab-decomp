@@ -50,7 +50,7 @@ void* ScreenSetsCurrent(void* sets);                        // 0x8018D1E4
 void* ScreenSetFindElement(void* set, u32 hash);            // 0x80198F18
 void  SessionResetUnk204(u8* s);                            // 0x80013684
 void* SpawnHelper(void* owner, s32 arg);                    // 0x8000C478
-void  fn_80065200(void* spawned, u8* pos, Vec3* dir, u8* owner, s32 a7, s32 a8, s32 a9); // 0x80065200
+s32 fn_80065200(u8* arg0, u8* arg1, void* arg2, u8* arg3, s32 arg4, s32 arg5, s32 arg6); // 0x80065200
 u8*   fn_800E4D7C(u32 a0);                                  // 0x800E4D7C
 u8*   fn_800E4BFC(u8* p);                                   // 0x800E4BFC (returns a value here; small_800Eb.cpp declares void)
 void  EventSend(void* mgr, void* target, void* from, u32 event, int a, int b, int c, int d); // 0x801BA190
@@ -74,7 +74,7 @@ void SpawnProjectile(void* a0, u32 a1) {
     Vec3 dir = QuatGetAxisY(q);
     void* spawned = SpawnHelper((void*)(uintptr_t)a1, 0);
     if (spawned != 0) {
-        fn_80065200(spawned, p + 0x18, &dir, p, 0, 0, 0);
+        fn_80065200((u8*)spawned, p + 0x18, &dir, p, 0, 0, 0);
     }
 }
 

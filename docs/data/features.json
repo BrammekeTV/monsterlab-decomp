@@ -94,6 +94,11 @@
  "changelog": [
   {
    "date": "2026-11-19",
+   "time": "01:30",
+   "text": "Fourth round from the missing-symbols list: 39 more functions, including animation length and playback, camera animation, UI colour and looped widget animation, video frame buffer, button-pressed checks, the lab experiment table switch, combat HUD action refresh and a batch of prop, zone and entity helpers. Older prototypes were corrected where the asm returns a value."
+  },
+  {
+   "date": "2026-11-19",
    "time": "00:50",
    "text": "Third round from the missing-symbols list: 41 more functions, including heap init, string copy, controller button reads, the timer reset, step sounds, prop effects, screen-set flushing, waypoint path following, exploration HUD and lightning tower inventory helpers. The linker report is clean of duplicates and mismatches; several older prototypes were corrected to match the asm."
   },

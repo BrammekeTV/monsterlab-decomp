@@ -12,7 +12,7 @@ extern u8 lbl_805FBBD9[];
 extern u8 lbl_80600610[];
 extern u8 lbl_80600614[];
 extern "C" u32 RngNext(void*);
-extern "C" void StrCopy(char*, char*);
+extern "C" char* StrCopy(char*, char*);
 
 // 0x80212E10
 extern "C" u32 fn_80212E10(u8* a3) {
@@ -633,8 +633,8 @@ extern "C" u32 fn_8022E330(s32 a3, s32 a4, s32 a5) {
 }
 
 // 0x8022E3D8
-extern "C" void fn_8022E3D8(u8* a3, u8* a4) {
-    StrCopy((char*)(((u8*)(uintptr_t)(a3))), (char*)(((u8*)(uintptr_t)(a4))));
+extern "C" char* fn_8022E3D8(u8* a3, u8* a4) {
+    return (char*)(StrCopy((char*)(((u8*)(uintptr_t)(a3))), (char*)(((u8*)(uintptr_t)(a4)))));
 }
 
 // 0x8022E3DC

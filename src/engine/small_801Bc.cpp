@@ -19,7 +19,7 @@ void  fn_801EB748(void* p);                                           // 0x801EB
 u8*  fn_801EB7A4(void* p, s32 a4, s32 a5, s32 a6, s32 a7);           // 0x801EB7A4
 void  fn_801EBA20(void* list, void* item);                            // 0x801EBA20 (asm reads r3 and r4)
 void* fn_801E9D18(void* p, u32 hash, s32 size);                       // 0x801E9D18
-void  fn_801E9678(void* p, void* data);                               // 0x801E9678
+s32 fn_801E9678(void* list, void* handle);                               // 0x801E9678
 void  TextureRelease(void* tex);                                      // 0x80184028
 void  BufferFree(void* p);                                            // 0x801D4980
 void* MemAllocDefault(u32 size);                                      // 0x801D4650

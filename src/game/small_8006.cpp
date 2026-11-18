@@ -22,7 +22,7 @@ u8*     fn_801B44AC(u8* p, s32 del);                                           /
 void     fn_801B4334(u8* p);                                                    // 0x801B4334 (base ctor)
 void     fn_801B4944(u8* p);                                                    // 0x801B4944
 void     fn_80122B00(void* a, u8* b);                                           // 0x80122B00
-void     fn_8006F61C(u8* p);                                                    // 0x8006F61C
+u8* fn_8006F61C(u8* arg0);                                                    // 0x8006F61C
 void     fn_8006F67C(u8* p, f32 t, s32 flag);                                   // 0x8006F67C (leaf version takes only p)
 void     fn_8005CA88(u8* p);                                                    // 0x8005CA88
 void     fn_8005CB40(u8* p, f32 t, s32 flag);                                   // 0x8005CB40

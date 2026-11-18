@@ -29,7 +29,7 @@ typedef void* (*GetShotFn)(void* self);
 extern "C" {
 void  operator_delete(void* p);                                 // 0x801D426C
 u8*  fn_800DE5E4(u8* p, s32 del);                              // 0x800DE5E4
-void  fn_800DEC78(u8* p, s32 a);                                // 0x800DEC78
+u8* fn_800DEC78(u8* arg0, s32 arg1);                                // 0x800DEC78
 void  fn_800E03F0(void* p, int a);                              // 0x800E03F0
 void  fn_800E4E80(u8* p, s32 clip);                             // 0x800E4E80
 u8*   fn_800E4D7C(u32 a0);                                      // 0x800E4D7C

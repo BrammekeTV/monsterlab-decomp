@@ -9,7 +9,7 @@ extern f32 lbl_805FDE40;
 extern f32 lbl_805FDE50;
 extern "C" void app_PlayMusic(u32, f32);
 extern "C" void fn_800704AC(u8*);
-extern "C" void fn_800C253C(s32, s32);
+extern "C" u8* fn_800C253C(u8**, s32);
 
 // 0x800A19B0
 extern "C" void fn_800A19B0(void) {
@@ -52,13 +52,11 @@ extern "C" f32 fn_800A23E4(u8* a3) {
 }
 
 // 0x800A23EC
-extern "C" void fn_800A23EC(s32 a3) {
-    // tail-call arguments inferred from the registers set before the call
-    fn_800C253C((s32)((u32)(uintptr_t)(a3)), (s32)((u32)(2)));
+extern "C" u8* fn_800A23EC(u8* a3) {
+    return (u8*)(fn_800C253C((u8**)(((u8*)(uintptr_t)(a3))), (s32)((u32)(2))));
 }
 
 // 0x800A23F4
-extern "C" void fn_800A23F4(s32 a3) {
-    // tail-call arguments inferred from the registers set before the call
-    fn_800C253C((s32)((u32)(uintptr_t)(a3)), (s32)((u32)(1)));
+extern "C" u8* fn_800A23F4(u8* a3) {
+    return (u8*)(fn_800C253C((u8**)(((u8*)(uintptr_t)(a3))), (s32)((u32)(1))));
 }

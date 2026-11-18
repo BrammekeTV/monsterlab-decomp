@@ -28,15 +28,15 @@ void  fn_80044F20(void);
 s32  fn_8004D3F8(void* c, const char* name, s32 a, s32 b);
 void  fn_8004D760(u8* c, u8* monster);
 s32   fn_8004DAF8(void* c, s32 a, s32 b);
-s32   fn_80053418(void* c);
+void fn_80053418(u8* arg0);
 void  fn_800D3428(void);
 s32   fn_800D3930(void* db);
 u8*   fn_800D393C(void* db, s32 i);
 u8*   fn_800D5838(u8* ref, s32 text);
 void* fn_800D59A4(u8* ref, s32 i);
 s32   fn_800D59F4(void* pathOrRef, s32 state);
-s32   fn_800D5C48(u8* ref, s32 a);
-void  fn_800D68CC(void* ref, s32 a, s32 b);
+void fn_800D5C48(u8* arg0, s32 arg1);
+s32 fn_800D68CC(u8* arg0, s32 arg1, s32 arg2);
 s32   fn_800D6B44(void);
 extern u8   gGame[];                                      // 0x803B53A0
 extern void* gObjDb;                                      // 0x805FB180
@@ -61,7 +61,7 @@ void LockJunctionPath(u32 a0, BOOL a1, u32 a2) {
     (void)a2;
     if (WorldGetPhase(WORLD) == 2) {
         ObjRefBuf ref = *(ObjRefBuf*)ObjDbLookup(gObjDb, (s32)a0);
-        fn_800D68CC(&ref, a1, 1);
+        fn_800D68CC((u8*)&ref, a1, 1);
         ObjRefDtor((u8*)&ref, -1);
     }
 }
@@ -71,7 +71,7 @@ void LockJunctionPath(u32 a0, BOOL a1, u32 a2) {
 void UnlockJunctionPath(u32 a0, BOOL a1) {
     if (WorldGetPhase(WORLD) == 2) {
         ObjRefBuf ref = *(ObjRefBuf*)ObjDbLookup(gObjDb, (s32)a0);
-        fn_800D68CC(&ref, a1, 0);
+        fn_800D68CC((u8*)&ref, a1, 0);
         ObjRefDtor((u8*)&ref, -1);
     }
 }

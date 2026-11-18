@@ -20,7 +20,7 @@ void*  ScreenSetsCurrent(void* sets);                            // 0x8018D1E4
 void   SysInit(void);
 void*  SysAllocMEM2Block(u32 size);                              // 0x801FAEB0
 BOOL   ZoneIsLoaded(void* world, s32 zone);                      // 0x8012F408
-void   fn_8006F61C(u8* p);                                       // 0x8006F61C
+u8* fn_8006F61C(u8* arg0);                                       // 0x8006F61C
 void   fn_8008CE28(u8* vec, f32 v);                              // 0x8008CE28
 void   fn_8018D2B8(const char* fmt, ...);                        // 0x8018D2B8 (debug log)
 void   fn_8018D370(const char* fmt, ...);                        // 0x8018D370 (debug log)

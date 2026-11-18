@@ -58,7 +58,7 @@ extern "C" void fn_8006CD70(u8*, s32);
 extern "C" void fn_8006CE08(u8*);
 extern "C" void fn_800D68CC(void*, s32, s32);
 extern "C" void fn_800E69EC(s32);
-extern "C" u32 fn_8010720C(s32);
+extern "C" u32 fn_8010720C(u32);
 extern "C" void fn_8012636C(s32, s32);
 extern "C" void fn_8012660C(s32);
 extern "C" void fn_80126684(s32);
@@ -588,7 +588,7 @@ s32 StateFinished(void) {
 // 0x800F0044
 u32 GetCurrentLevelId(void) {
     u8 t0 = *(u8*)((u8*)&lbl_803C4298 + 28);
-    return (u32)(fn_8010720C((s32)((u32)(t0))));
+    return (u32)(fn_8010720C((u32)((u32)(t0))));
 }
 
 // 0x800F0160
