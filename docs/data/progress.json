@@ -1,15 +1,15 @@
 {
  "game_id": "RM7P4F",
- "generated": "2026-11-18T15:59:43+00:00",
- "commit": "70900f4",
- "commit_date": "2026-11-18T16:48:25+01:00",
+ "generated": "2026-11-18T16:01:11+00:00",
+ "commit": "a59721c",
+ "commit_date": "2026-11-18T16:59:44+01:00",
  "game": {
   "functions": 8548,
   "bytes": 2265988,
   "named": 2740,
   "named_bytes": 612440,
-  "decompiled": 2995,
-  "decompiled_bytes": 303420
+  "decompiled": 3015,
+  "decompiled_bytes": 304932
  },
  "library": {
   "functions": 4039,
@@ -24,8 +24,8 @@
   "bytes": 3404928,
   "named": 3203,
   "named_bytes": 717188,
-  "decompiled": 2996,
-  "decompiled_bytes": 303540
+  "decompiled": 3016,
+  "decompiled_bytes": 305052
  },
  "game_range": [
   "80006B40",
@@ -225,19 +225,19 @@
    0.052
   ],
   [
-   0.027,
+   0.058,
    0.125
   ],
   [
-   0.59,
+   0.622,
    0.725
   ],
   [
-   0.016,
+   0.064,
    0.312
   ],
   [
-   0.023,
+   0.089,
    0.115
   ],
   [
@@ -4718,6 +4718,111 @@
     {
      "name": "fn_8003174C",
      "addr": "8003174C",
+     "size": 84
+    }
+   ]
+  },
+  {
+   "path": "src/game/small_8007.cpp",
+   "functions": [
+    {
+     "name": "CommentTimerPastThreshold",
+     "addr": "80070104",
+     "size": 48
+    },
+    {
+     "name": "fn_8007015C",
+     "addr": "8007015C",
+     "size": 72
+    },
+    {
+     "name": "fn_80070400",
+     "addr": "80070400",
+     "size": 60
+    },
+    {
+     "name": "fn_80070460",
+     "addr": "80070460",
+     "size": 76
+    },
+    {
+     "name": "fn_80070F4C",
+     "addr": "80070F4C",
+     "size": 96
+    },
+    {
+     "name": "SetSuccessExperimentScore",
+     "addr": "80071AA0",
+     "size": 88
+    },
+    {
+     "name": "GetExperimentQuality",
+     "addr": "80071AF8",
+     "size": 84
+    },
+    {
+     "name": "GetExperimentScore",
+     "addr": "80071B4C",
+     "size": 84
+    },
+    {
+     "name": "fn_80073454",
+     "addr": "80073454",
+     "size": 96
+    },
+    {
+     "name": "PushExperimentLoadingScreen",
+     "addr": "80074BD8",
+     "size": 56
+    },
+    {
+     "name": "StartExperimentLoadingMusic",
+     "addr": "80074C38",
+     "size": 52
+    },
+    {
+     "name": "RestartExperiment",
+     "addr": "80074C6C",
+     "size": 52
+    },
+    {
+     "name": "fn_80074DA4",
+     "addr": "80074DA4",
+     "size": 88
+    },
+    {
+     "name": "fn_80075298",
+     "addr": "80075298",
+     "size": 92
+    },
+    {
+     "name": "fn_800752F4",
+     "addr": "800752F4",
+     "size": 56
+    },
+    {
+     "name": "ClearScoreTracker",
+     "addr": "80075434",
+     "size": 68
+    },
+    {
+     "name": "AddTrackableScore",
+     "addr": "80075478",
+     "size": 88
+    },
+    {
+     "name": "fn_80075680",
+     "addr": "80075680",
+     "size": 96
+    },
+    {
+     "name": "fn_80076584",
+     "addr": "80076584",
+     "size": 76
+    },
+    {
+     "name": "ReleaseDanceAnimation",
+     "addr": "80076864",
      "size": 84
     }
    ]
