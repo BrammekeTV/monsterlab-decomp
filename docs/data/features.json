@@ -69,6 +69,11 @@
  "changelog": [
   {
    "date": "2026-11-18",
+   "time": "12:29",
+   "text": "Decompiled the battle turn loop: the turn passes to the next side that can still act (an action is blocked by two status effects), and when neither can, the round ends: the round counter goes up, the winner is paid after the final round, energy regenerates up to what the torso holds, effects tick down, and limbs with the regeneration enhancement heal by a tuned share of their max HP."
+  },
+  {
+   "date": "2026-11-18",
    "time": "12:27",
    "text": "Decompiled battle effects and records: effect durations (two tuned effect kinds), applying and expiring effects (the round is told which limb lost it), the damage/effect record constructors and destructors, and the table that picks which stat rows the combat HUD shows for an action."
   },

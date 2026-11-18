@@ -742,3 +742,6 @@ fn_80213C68 ValueBoxCreate
 fn_80213CE0 ValueBoxDestroy
 fn_802152CC RoundNoteEffectEnd
 lbl_805FA098 gDefaultActionDisplay
+fn_80213818 BattleActionUsable
+fn_8021223C BattleNextTurn
+fn_80213428 BattleAwardWin

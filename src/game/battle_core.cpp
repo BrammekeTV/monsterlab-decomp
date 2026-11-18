@@ -392,3 +392,98 @@ extern "C" ActionDisplay PartDbGetActionDisplay(GameDb* db, u32 key) {
         if (t[i].key == key) return t[i];
     return t[gDefaultActionDisplay];
 }
+
+// ---------------------------------------------------------------- turns
+
+extern "C" {
+u32  BattleIsFinalRound(u8* b);                           // 0x80212BE4
+void BattleAwardWin(u8* b);                               // 0x80213428
+}
+
+static inline s32 ActionKindOf(u32 action) {
+    const u8* a = (const u8*)*(PartAction**)(gGameDb->data + 0x430) + action * 0x14;
+    s32 type = *(const s32*)(a + 4);
+    return *(const s32*)(*(u8**)(gGameDb->data + 0x08) + type * 0x24 + 8);
+}
+
+extern "C" {
+
+// 0x80213818
+// Can the side use its chosen action: not an "all energy" action under effect 14, and the limb
+// is not disabled (effect 13).
+BOOL BattleActionUsable(u8* b, s32 side) {
+    u8* stats = ((u8**)(b + 0xA00))[side] + 0x20;
+    if (stats == NULL) return TRUE;
+    u32 action = *(u32*)(stats + 0x18);
+    u8** field = FighterStatsGetPart(stats, *(s32*)(stats + 0x20));
+    if (FighterStatsHasEffect(stats, 0xE) && ActionKindOf(action) == 3) return FALSE;
+    if (field != NULL && FighterStatsHasStatus(field, 0xD)) return FALSE;
+    return TRUE;
+}
+
+// 0x8021223C
+// Hand the turn to the next side that can still act. When neither can, the round ends:
+// round counter up, the winner is paid if this was the final round, energy regenerates
+// (capped by the torso), effects tick, and limbs with the regeneration enhancement (7) heal.
+BOOL BattleNextTurn(u8* b) {
+    s32 tries = 0;
+    for (;;) {
+        s32 side = *(s32*)(b + 0xA08);
+        s32 left = --*(s32*)(b + 0x9E8 + side * 4);
+        if (left >= 0 && BattleCommitAction(b, side) && BattleActionUsable(b, side)) return TRUE;
+        side = *(s32*)(b + 0xA08);
+        if (b[0x9FC + side] != 0) break;
+        tries++;
+        *(s32*)(b + 0xA08) = 1 - side;
+        if (tries >= 2) break;
+    }
+
+    for (s32 s = 0; s < 2; s++) *(u32*)(*(u8**)(((u8**)(b + 0xA00))[s] + 0x20) + 4) = 0;
+    *(s32*)(b + 0xA18) = 7;
+    (*(s32*)(b + 0xA10))++;
+    if (BattleIsFinalRound(b) == 1) {
+        BattleAwardWin(b);
+        u8* ui = *(u8**)(b + 0xA34);
+        *(s32*)(b + 0xA18) = 8;
+        (*(void (**)(u8*))(*(u8**)ui + 0x14))(ui);
+    }
+
+    for (s32 s = 0; s < 2; s++) {
+        u8* f = ((u8**)(b + 0xA00))[s];
+        u8* stats = f + 0x20;
+        s32 regen = FighterStatsGet(stats, 5);
+        s32 e = FighterStatsGet(stats, 3) + regen;
+        s32 max = PartGetBattleEnergy(*(PartInstance**)((u8**)f)[4], (u8**)f);
+        if (e > max) e = max;
+        if (e < 0)   e = 0;
+        (*(s32**)(((u8**)(b + 0xA00))[s] + 0x24))[3] = e;
+        FighterTickEffects(((u8**)(b + 0xA00))[s] + 0x20);
+    }
+
+    s32 healed[2][5];
+    for (s32 s = 0; s < 2; s++) {
+        for (s32 i = 0; i < 5; i++) {
+            healed[s][i] = 0;
+            u8* bp = ((u8**)((u8**)(b + 0xA00))[s])[i];
+            if (bp == NULL || **(s32**)(bp + 0x28) <= 0) continue;
+            u8* gbp = ((u8**)((u8**)(gBattle + 0xA00))[s])[i];
+            if (gbp == NULL) continue;
+            s32* st = *(s32**)(gbp + 0x28);
+            if (st[8] != 7) continue;
+            s32 hp = st[0], max = st[1];
+            s32 now = hp + (s32)(*(f32*)(b + 0xAA8) * (f32)max);
+            s32 gain = now - hp;
+            if (now > max) {
+                now = max;
+                gain = max - hp;
+            }
+            st[0] = now;
+            healed[s][i] = gain;
+        }
+    }
+    u8* hud = *(u8**)(b + 0xA38);
+    (*(void (**)(u8*, s32*))(*(u8**)hud + 0x10))(hud, &healed[0][0]);
+    return FALSE;
+}
+
+}  // extern "C"

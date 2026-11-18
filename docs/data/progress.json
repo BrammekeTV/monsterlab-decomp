@@ -1,15 +1,15 @@
 {
  "game_id": "RM7P4F",
- "generated": "2026-11-18T11:27:05+00:00",
- "commit": "12b13e7",
- "commit_date": "2026-11-18T12:24:44+01:00",
+ "generated": "2026-11-18T11:29:14+00:00",
+ "commit": "253f79b",
+ "commit_date": "2026-11-18T12:27:06+01:00",
  "game": {
   "functions": 8548,
   "bytes": 2265988,
-  "named": 2680,
-  "named_bytes": 585364,
-  "decompiled": 2181,
-  "decompiled_bytes": 258404
+  "named": 2683,
+  "named_bytes": 586996,
+  "decompiled": 2183,
+  "decompiled_bytes": 259468
  },
  "library": {
   "functions": 4039,
@@ -22,10 +22,10 @@
  "all": {
   "functions": 12587,
   "bytes": 3404928,
-  "named": 3142,
-  "named_bytes": 689992,
-  "decompiled": 2181,
-  "decompiled_bytes": 258404
+  "named": 3145,
+  "named_bytes": 691624,
+  "decompiled": 2183,
+  "decompiled_bytes": 259468
  },
  "game_range": [
   "80006B40",
@@ -1001,8 +1001,8 @@
    0.364
   ],
   [
-   0.175,
-   0.372
+   0.313,
+   0.583
   ],
   [
    0.234,
@@ -1816,9 +1816,19 @@
      "size": 676
     },
     {
+     "name": "BattleNextTurn",
+     "addr": "8021223C",
+     "size": 696
+    },
+    {
      "name": "BattleReset",
      "addr": "80213090",
      "size": 160
+    },
+    {
+     "name": "BattleActionUsable",
+     "addr": "80213818",
+     "size": 368
     },
     {
      "name": "PartMatchup",
