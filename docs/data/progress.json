@@ -1,15 +1,15 @@
 {
  "game_id": "RM7P4F",
- "generated": "2026-11-18T11:32:01+00:00",
- "commit": "5568fd4",
- "commit_date": "2026-11-18T12:29:14+01:00",
+ "generated": "2026-11-18T11:33:54+00:00",
+ "commit": "fbe6b08",
+ "commit_date": "2026-11-18T12:32:02+01:00",
  "game": {
   "functions": 8548,
   "bytes": 2265988,
-  "named": 2688,
-  "named_bytes": 590196,
-  "decompiled": 2186,
-  "decompiled_bytes": 260580
+  "named": 2693,
+  "named_bytes": 592148,
+  "decompiled": 2187,
+  "decompiled_bytes": 261148
  },
  "library": {
   "functions": 4039,
@@ -22,10 +22,10 @@
  "all": {
   "functions": 12587,
   "bytes": 3404928,
-  "named": 3150,
-  "named_bytes": 694824,
-  "decompiled": 2186,
-  "decompiled_bytes": 260580
+  "named": 3155,
+  "named_bytes": 696776,
+  "decompiled": 2187,
+  "decompiled_bytes": 261148
  },
  "game_range": [
   "80006B40",
@@ -614,7 +614,7 @@
   ],
   [
    0.414,
-   0.833
+   0.834
   ],
   [
    0.157,
@@ -1001,7 +1001,7 @@
    0.364
   ],
   [
-   0.453,
+   0.526,
    0.651
   ],
   [
@@ -1014,7 +1014,7 @@
   ],
   [
    0.687,
-   0.736
+   0.779
   ],
   [
    1.0,
@@ -1038,7 +1038,7 @@
   ],
   [
    0.285,
-   0.678
+   0.838
   ],
   [
    0.326,
@@ -1839,6 +1839,11 @@
      "name": "BattleReset",
      "addr": "80213090",
      "size": 160
+    },
+    {
+     "name": "BattleAwardWin",
+     "addr": "80213428",
+     "size": 568
     },
     {
      "name": "BattleActionUsable",

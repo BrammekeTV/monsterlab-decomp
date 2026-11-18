@@ -750,3 +750,8 @@ fn_80213F84 FighterStatsSetOwner
 fn_8022B8A8 SaveCountBattleResult
 fn_802271BC SaveRecordBattleLoss
 fn_80220A24 IsOnlineBattle
+fn_80226C4C SaveRecordBattleWin
+fn_802255FC SaveCurrentScoreSlot
+fn_80140320 OnlineRecordWin
+fn_80140324 OnlineRecordLoss
+fn_802186D8 LabShowBattleResult

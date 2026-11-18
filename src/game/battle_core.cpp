@@ -595,3 +595,75 @@ void BattleSetFighter(u8* b, s32 side, u8* f, u32 owner) {
 }
 
 }  // extern "C"
+
+extern "C" {
+s32  SaveRollChallengeReward(u8* s, s32 table, u8* monster);  // 0x802262E0: returns the MSP given
+void SaveRecordBattleWin(u8* s, s32 a);                       // 0x80226C4C
+void SaveAddBadge(u8* s, s32 badge);                          // 0x802233D4
+void SaveAddMSP(u8* s, s32 amount);                           // 0x80225F70
+void SaveRecordBestScore(u8* s, s32 i, u32 score);            // 0x80225C5C
+s32  SaveCurrentScoreSlot(u8* s);                             // 0x802255FC
+void OnlineRecordWin(s32 count, u8* s);                       // 0x80140320
+void OnlineRecordLoss(s32 count, u8* s);                      // 0x80140324
+void LabShowBattleResult(void* lab, const void* result);      // 0x802186D8
+}
+extern void* gLab;      // 0x805FBBC8
+
+// Battle result shown on the results screen.
+struct BattleResult {
+    u8  won;            // 0x00
+    u8  pad[3];
+    s32 unk04;          // 0x04
+    s32 unk08;          // 0x08
+    u32 msp;            // 0x0C
+    s32 unk10;          // 0x10
+};
+
+extern "C" {
+
+// 0x80213428
+// After the final round: on a win, roll the opponent's loot (or the online table), award the
+// "only the torso left" / "only the torso broken" badges, add MSP and show the result; on a
+// real loss (not fleeing or time-out), count it.
+void BattleAwardWin(u8* b) {
+    if (*(s32*)(b + 0xAD0) == MODE_TIMED) return;
+    u8* p1 = ((u8**)(b + 0xA00))[0];
+    if (*(u8**)(b + 0xA4C) == p1) {
+        s32 msp = 0;
+        if (!IsOnlineBattle()) {
+            u8* opp = ((u8**)(b + 0xA00))[1];
+            msp = SaveRollChallengeReward(gSaveSystem, *(s32*)(opp + 0x14), opp);
+            SaveRecordBattleWin(gSaveSystem, 1);
+            s32 hp[5];
+            for (s32 i = 0; i < 5; i++) {
+                u8** f = FighterGetSlot(((u8**)(b + 0xA00))[1], i);
+                hp[i] = f != NULL ? **(s32**)f : 0;
+            }
+            if (hp[0] > 0 && hp[2] > 0 && hp[3] > 0 && hp[1] > 0 && hp[4] <= 0) SaveAddBadge(gSaveSystem, 0x59);
+            if (hp[0] <= 0 && hp[2] <= 0 && hp[3] <= 0 && hp[1] <= 0 && hp[4] > 0) SaveAddBadge(gSaveSystem, 0x5A);
+        } else {
+            SaveRollChallengeReward(gSaveSystem, 0x39, NULL);
+            OnlineRecordWin((*(s32*)(gSaveSystem + 0xA28))++, gSaveSystem);
+        }
+        BattleResult r;
+        r.won = 1;
+        r.unk04 = 0;
+        r.unk10 = 0;
+        if (msp != 0) {
+            r.msp = (u32)msp;
+        } else {
+            r.msp = *(u32*)(b + 0xAB8);
+            SaveAddMSP(gSaveSystem, *(s32*)(b + 0xAB8));
+        }
+        LabShowBattleResult(gLab, &r);
+        if (!IsOnlineBattle()) SaveRecordBestScore(gSaveSystem, SaveCurrentScoreSlot(gSaveSystem), r.msp);
+    } else if (b[0xA5C] == 0) {
+        if (!IsOnlineBattle()) {
+            if (*(s32*)(b + 0xAD0) != MODE_TUTORIAL) SaveRecordBattleLoss(gSaveSystem, 1);
+        } else {
+            OnlineRecordLoss((*(s32*)(gSaveSystem + 0xA2C))++, gSaveSystem);
+        }
+    }
+}
+
+}  // extern "C"

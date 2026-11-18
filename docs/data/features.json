@@ -69,6 +69,11 @@
  "changelog": [
   {
    "date": "2026-11-18",
+   "time": "12:33",
+   "text": "Decompiled the end-of-battle payout: on a win the opponent's loot is rolled (or the online table), two badges reward beating an opponent by breaking only its torso or everything but its torso, MSP is added and the results screen is shown; real losses (not fleeing or time-outs) are counted."
+  },
+  {
+   "date": "2026-11-18",
    "time": "12:32",
    "text": "Decompiled the battle-over check (a side loses when its torso breaks or all four other limbs do; fleeing on working legs hands the win over; timed battles end after their round limit) and putting a fighter into a battle, including the opponent's MSP reward from its madness and average quality, 9999 HP tutorial opponents and scaled timed-battle HP."
   },
