@@ -10,8 +10,8 @@ extern u8 lbl_8040E5F0[];
 extern u8 lbl_805F9980[];
 extern u8 lbl_805FB89C[];
 extern "C" s32 PlaySound(u32, s32, s32, s32, s32, s32);
-extern "C" void PlaySoundAt(void*, int, u8*, int);
-extern "C" void TriggerDoAction(void*, s32);
+extern "C" void PlaySoundAt(void*, int, void*, int);
+extern "C" void TriggerDoAction(void*, void*, void*);
 extern "C" void fn_801629D0(void*, s32);
 extern "C" void fn_80162A70(u8*);
 extern "C" void fn_801B6878(s32, s32, s32);
@@ -54,18 +54,18 @@ u32 IsHost(void) {
 
 // 0x801DC19C
 void TestScriptCallback(void* a3, u32 a4, void* a5) {
-    TriggerDoAction((void*)(((u8*)(uintptr_t)(a4))), (s32)((u32)(uintptr_t)(a3)));
+    TriggerDoAction((void*)(((u8*)(uintptr_t)(a4))), (void*)(((u8*)(uintptr_t)(a3))), (void*)(((u8*)(uintptr_t)(a5))));
 }
 
 // 0x801DC1AC
 void PlayGlobalSound(u32 a3) {
-    PlaySoundAt((void*)(((u8*)(uintptr_t)(a3))), (int)((u32)(0)), (u8*)(uintptr_t)(0), (int)((u32)(0)));
+    PlaySoundAt((void*)(((u8*)(uintptr_t)(a3))), (int)((u32)(0)), (void*)((u8*)(uintptr_t)(0)), (int)((u32)(0)));
 }
 
 // 0x801DC1BC
 void PlayGlobalSoundWithEffect(u32 a3, s32 a4) {
     *(u8*)(((u8*)(uintptr_t)(a3)) + 46) = (u8)((u32)(uintptr_t)(a4));
-    PlaySoundAt((void*)(((u8*)(uintptr_t)(a3))), (int)((u32)(0)), (u8*)(uintptr_t)(0), (int)((u32)(0)));
+    PlaySoundAt((void*)(((u8*)(uintptr_t)(a3))), (int)((u32)(0)), (void*)((u8*)(uintptr_t)(0)), (int)((u32)(0)));
 }
 
 // 0x801DC224

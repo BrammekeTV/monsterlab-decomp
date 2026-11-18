@@ -13,7 +13,7 @@ void  fn_801B75AC(void* p);                                           // 0x801B7
 void  fn_801B7B60(void* anim, s32 mode, f32 rate);                    // 0x801B7B60
 void  fn_801B7D5C(void* anim, u32 a3, f32 a1, f32 a2);                // 0x801B7D5C
 void  fn_801E8D74(void* out, void* list, void* owner, void* anim);    // 0x801E8D74
-void* fn_801DC9B0(void* p);                                           // 0x801DC9B0
+s32   fn_801DC9B0(void* p);                                           // 0x801DC9B0
 void* EventPost(s32 id, void* sender);                                // 0x801F3918
 void  fn_801EB748(void* p);                                           // 0x801EB748
 void  fn_801EB7A4(void* p, s32 a4, s32 a5, s32 a6, s32 a7);           // 0x801EB7A4
@@ -153,7 +153,7 @@ void fn_801B7A00(void* p) {
 void fn_801B8550(void) {
     for (s32 i = 0; i < 4; i++) {
         void* in = *(void**)(lbl_80383E38 + i * 4);
-        *(void**)(lbl_80413400 + i * 4) = fn_801DC9B0(in);
+        *(s32*)(lbl_80413400 + i * 4) = fn_801DC9B0(in);
     }
 }
 

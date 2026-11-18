@@ -1,15 +1,15 @@
 {
  "game_id": "RM7P4F",
- "generated": "2026-11-18T18:09:19+00:00",
- "commit": "86e2e4f",
- "commit_date": "2026-11-18T19:04:21+01:00",
+ "generated": "2026-11-18T18:14:39+00:00",
+ "commit": "59f95be",
+ "commit_date": "2026-11-18T19:09:20+01:00",
  "game": {
   "functions": 8548,
   "bytes": 2265988,
   "named": 2748,
   "named_bytes": 616800,
-  "decompiled": 4281,
-  "decompiled_bytes": 429104
+  "decompiled": 4334,
+  "decompiled_bytes": 433536
  },
  "library": {
   "functions": 4039,
@@ -24,8 +24,8 @@
   "bytes": 3404928,
   "named": 3211,
   "named_bytes": 721548,
-  "decompiled": 4282,
-  "decompiled_bytes": 429224
+  "decompiled": 4335,
+  "decompiled_bytes": 433656
  },
  "game_range": [
   "80006B40",
@@ -617,7 +617,7 @@
    0.834
   ],
   [
-   0.213,
+   0.236,
    0.631
   ],
   [
@@ -625,11 +625,11 @@
    0.275
   ],
   [
-   0.035,
+   0.135,
    0.1
   ],
   [
-   0.013,
+   0.042,
    0.0
   ],
   [
@@ -897,15 +897,15 @@
    0.102
   ],
   [
-   0.241,
+   0.249,
    0.2
   ],
   [
-   0.548,
+   0.719,
    0.916
   ],
   [
-   0.813,
+   0.827,
    0.864
   ],
   [
@@ -993,7 +993,7 @@
    0.0
   ],
   [
-   0.121,
+   0.276,
    0.096
   ],
   [
@@ -1418,6 +1418,96 @@
     {
      "name": "RendHasFreeDL",
      "addr": "8015EAF4",
+     "size": 52
+    }
+   ]
+  },
+  {
+   "path": "src/engine/small_8014c.cpp",
+   "functions": [
+    {
+     "name": "FilenameTimestamp",
+     "addr": "8014308C",
+     "size": 68
+    },
+    {
+     "name": "LineTimestamp",
+     "addr": "801430D0",
+     "size": 68
+    },
+    {
+     "name": "LogAutoDelete",
+     "addr": "80143114",
+     "size": 68
+    },
+    {
+     "name": "fn_80146930",
+     "addr": "80146930",
+     "size": 92
+    },
+    {
+     "name": "fn_8014698C",
+     "addr": "8014698C",
+     "size": 112
+    },
+    {
+     "name": "fn_801469FC",
+     "addr": "801469FC",
+     "size": 92
+    },
+    {
+     "name": "fn_80146D98",
+     "addr": "80146D98",
+     "size": 64
+    },
+    {
+     "name": "fn_80146EEC",
+     "addr": "80146EEC",
+     "size": 100
+    },
+    {
+     "name": "fn_80146F50",
+     "addr": "80146F50",
+     "size": 104
+    },
+    {
+     "name": "PadButtonHeld",
+     "addr": "801474EC",
+     "size": 104
+    },
+    {
+     "name": "fn_801478C8",
+     "addr": "801478C8",
+     "size": 100
+    },
+    {
+     "name": "fn_8014792C",
+     "addr": "8014792C",
+     "size": 92
+    },
+    {
+     "name": "fn_80148228",
+     "addr": "80148228",
+     "size": 68
+    },
+    {
+     "name": "fn_80149428",
+     "addr": "80149428",
+     "size": 60
+    },
+    {
+     "name": "fn_80149468",
+     "addr": "80149468",
+     "size": 76
+    },
+    {
+     "name": "fn_801494B4",
+     "addr": "801494B4",
+     "size": 88
+    },
+    {
+     "name": "fn_8014950C",
+     "addr": "8014950C",
      "size": 52
     }
    ]
@@ -2349,6 +2439,111 @@
      "name": "FrameFxBlurAndTint",
      "addr": "801DB9CC",
      "size": 112
+    }
+   ]
+  },
+  {
+   "path": "src/engine/small_801Dc.cpp",
+   "functions": [
+    {
+     "name": "FrameFxBlurBulge",
+     "addr": "801DBA3C",
+     "size": 72
+    },
+    {
+     "name": "FrameFxVortex",
+     "addr": "801DBA84",
+     "size": 84
+    },
+    {
+     "name": "FrameFxTunnel",
+     "addr": "801DBAD8",
+     "size": 80
+    },
+    {
+     "name": "StartChallengeFrameFx",
+     "addr": "801DBB28",
+     "size": 80
+    },
+    {
+     "name": "StopChallengeFrameFx",
+     "addr": "801DBB78",
+     "size": 72
+    },
+    {
+     "name": "StopNISFrameFx",
+     "addr": "801DBC4C",
+     "size": 76
+    },
+    {
+     "name": "StopNISTVStaticFrameFx",
+     "addr": "801DBD74",
+     "size": 64
+    },
+    {
+     "name": "IntervalRandomInt",
+     "addr": "801DBDD0",
+     "size": 80
+    },
+    {
+     "name": "IntervalRandomFloat",
+     "addr": "801DBE20",
+     "size": 116
+    },
+    {
+     "name": "Entity_SleepFSM",
+     "addr": "801DBE94",
+     "size": 60
+    },
+    {
+     "name": "SpawnParticleAt",
+     "addr": "801DBED4",
+     "size": 104
+    },
+    {
+     "name": "PlayGlobalSoundSynced",
+     "addr": "801DC1D0",
+     "size": 84
+    },
+    {
+     "name": "PlayGlobalLoopingGroupSound_NoLoad",
+     "addr": "801DC23C",
+     "size": 92
+    },
+    {
+     "name": "SetGlobalMusicVolume",
+     "addr": "801DC2C8",
+     "size": 84
+    },
+    {
+     "name": "GetGlobalMusicVolume",
+     "addr": "801DC320",
+     "size": 68
+    },
+    {
+     "name": "GetGlobalSfxVolume",
+     "addr": "801DC364",
+     "size": 68
+    },
+    {
+     "name": "fn_801DC9B0",
+     "addr": "801DC9B0",
+     "size": 68
+    },
+    {
+     "name": "CallActivateHandler",
+     "addr": "801DDC08",
+     "size": 112
+    },
+    {
+     "name": "CallDeactivateHandler",
+     "addr": "801DDC78",
+     "size": 112
+    },
+    {
+     "name": "CosInterp",
+     "addr": "801DDCE8",
+     "size": 124
     }
    ]
   },
@@ -11549,6 +11744,91 @@
      "name": "fn_8020E4E8",
      "addr": "8020E4E8",
      "size": 72
+    }
+   ]
+  },
+  {
+   "path": "src/game/small_8020c.cpp",
+   "functions": [
+    {
+     "name": "fn_8020E530",
+     "addr": "8020E530",
+     "size": 108
+    },
+    {
+     "name": "fn_8020E59C",
+     "addr": "8020E59C",
+     "size": 116
+    },
+    {
+     "name": "fn_8020E610",
+     "addr": "8020E610",
+     "size": 64
+    },
+    {
+     "name": "fn_8020E7EC",
+     "addr": "8020E7EC",
+     "size": 120
+    },
+    {
+     "name": "fn_8020E950",
+     "addr": "8020E950",
+     "size": 124
+    },
+    {
+     "name": "fn_8020E9E0",
+     "addr": "8020E9E0",
+     "size": 64
+    },
+    {
+     "name": "fn_8020EA44",
+     "addr": "8020EA44",
+     "size": 64
+    },
+    {
+     "name": "fn_8020EA94",
+     "addr": "8020EA94",
+     "size": 64
+    },
+    {
+     "name": "fn_8020EB44",
+     "addr": "8020EB44",
+     "size": 116
+    },
+    {
+     "name": "fn_8020EDAC",
+     "addr": "8020EDAC",
+     "size": 68
+    },
+    {
+     "name": "fn_8020F188",
+     "addr": "8020F188",
+     "size": 104
+    },
+    {
+     "name": "fn_8020F1F0",
+     "addr": "8020F1F0",
+     "size": 56
+    },
+    {
+     "name": "fn_8020F23C",
+     "addr": "8020F23C",
+     "size": 64
+    },
+    {
+     "name": "fn_8020F2B4",
+     "addr": "8020F2B4",
+     "size": 64
+    },
+    {
+     "name": "fn_8020F31C",
+     "addr": "8020F31C",
+     "size": 64
+    },
+    {
+     "name": "ChoiceDestroy",
+     "addr": "8020F394",
+     "size": 64
     }
    ]
   },

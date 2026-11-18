@@ -8,7 +8,7 @@
 
 extern u8 gEventMgr[];
 extern "C" void EventSendTo(void*, u32, void*, u32, int, int);
-extern "C" void TriggerDoAction(void*, s32);
+extern "C" void TriggerDoAction(void*, void*, void*);
 
 // 0x801B6D80
 void BroadcastToDstGroup(void* a3, u32 a4) {
@@ -34,7 +34,7 @@ void EntityReachedWaypointCallback(u32 a3, u32 a4, u32 a5) {
         return;
     }
     u8* t2 = ((u8*)(uintptr_t)(a3)) + 64;
-    TriggerDoAction((void*)(t2), (s32)((u32)(uintptr_t)(a4)));
+    TriggerDoAction((void*)(t2), (void*)(((u8*)(uintptr_t)(a4))), (void*)((u8*)(uintptr_t)(0)));
 }
 
 // 0x801B8724

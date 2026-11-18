@@ -14,7 +14,7 @@ extern "C" void BufferFree(void*);
 extern "C" void InterpolateQuaternionTask_Update_SLERP(void);
 extern "C" void InterpolateVector3Task_Update_LERP(void);
 extern "C" void* MemAllocDefault(u32);
-extern "C" void TriggerDoAction(void*, s32);
+extern "C" void TriggerDoAction(void*, void*, void*);
 extern "C" void fn_801EE2C4(u8*);
 
 // 0x801E9E4C
@@ -57,7 +57,7 @@ extern "C" void InterpolateToNextWaypointTask_DefaultReachedWaypointCallback(u8*
         return;
     }
     u8* t2 = ((u8*)(uintptr_t)(a3)) + 64;
-    TriggerDoAction((void*)(t2), (s32)((u32)(0)));
+    TriggerDoAction((void*)(t2), (void*)((u8*)(uintptr_t)(0)), (void*)((u8*)(uintptr_t)(0)));
 }
 
 // 0x801EBD1C

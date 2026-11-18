@@ -407,7 +407,7 @@ void FSM_SetFloat(ScriptCtx* a0, u32 /*0x27*/ a1, f32 a2);  // type 0x134 (from 
 void FSM_SetInt(ScriptCtx* a3, u32 a4, s32 a5);                        // src/leaf/auto_03_80106AA8_text_cb.cpp
 s32 FaderFinished(void);                                               // src/leaf/auto_03_801D5D0C_text_cb.cpp
 void FaderSetTargetColour(f32 a0, f32 a1, f32 a2);                     // src/engine/small_801D.cpp
-void FilenameTimestamp(BOOL a0);  // type 0x8C (from signature table)
+void FilenameTimestamp(BOOL a0);                                       // src/engine/small_8014c.cpp
 void FireLightningAtTarget(void* a0, u32 /*0x30*/ a1, u32 a2, u32 /*0x38*/ a3, f32 a4, f32 a5, u32 /*0x17*/ a6);  // type 0xFF (from signature table)
 void FireRocketAtEntity(void* a0);  // type 0x2F (from signature table)
 void FireShot(void* a0, u32 /*0x30*/ a1, u32 /*0x38*/ a2, f32 a3, f32 a4);  // type 0xFA (from signature table)
@@ -813,7 +813,7 @@ void LightningTowerResetAnim(void);                                    // src/le
 void LightningTowerSetSelectingMonster(s32 a3);                        // src/leaf/auto_03_8001B20C_text_cb.cpp
 void LightningTowerSetSelectingPart(s32 a3);                           // src/leaf/auto_03_8001B20C_text_cb.cpp
 void LightningTowerShowMonster(u32 /*0x06*/ a0);  // type 0x67 (from signature table)
-void LineTimestamp(BOOL a0);  // type 0x8C (from signature table)
+void LineTimestamp(BOOL a0);                                           // src/engine/small_8014c.cpp
 void LoadChallengeUI(void);                                            // src/leaf/auto_03_800E75B0_text_cb.cpp
 void LoadDefaultLevel(void);  // type 0x8F (from signature table)
 void LoadExperiment(void);  // type 0x8F (from signature table)
@@ -828,7 +828,7 @@ void LockCurrentJunctionPath(BOOL a3, u32 a4);                         // src/le
 void LockInput(s32 a3);                                                // src/leaf/auto_03_8010FDA4_text_cb.cpp
 void LockJunctionPath(u32 a0, BOOL a1, u32 a2);  // type 0x17D (from signature table)
 void LockPartSelected(void);                                           // src/game/small_8004b.cpp
-void LogAutoDelete(BOOL a0);  // type 0x8C (from signature table)
+void LogAutoDelete(BOOL a0);                                           // src/engine/small_8014c.cpp
 void LoginPoller(void);  // type 0x8F (from signature table)
 void LostOpponent(void);  // type 0x8F (from signature table)
 void MPNameAddLetter(s32 a0);  // type 0x83 (from signature table)
@@ -1572,18 +1572,18 @@ s32 reg0_gt_0(void* a0);                                               // src/ga
 void set_reg(BOOL a3, s32 a4);                                         // src/leaf/auto_03_800E75B0_text_cb.cpp
 void set_reg0(void* a3, s32 a4);                                       // src/leaf/auto_03_800E75B0_text_cb.cpp
 void BroadcastToDstGroup(void* a3, u32 a4);                            // src/leaf/auto_03_801B313C_text_cb.cpp
-void CallActivateHandler(void* a0);  // type 0x2F (from signature table)
-void CallDeactivateHandler(void* a0);  // type 0x2F (from signature table)
-f32 CosInterp(f32 a0, f32 a1, f32 a2);  // type 0xF (from signature table)
+void CallActivateHandler(void* a0);                                    // src/engine/small_801Dc.cpp
+void CallDeactivateHandler(void* a0);                                  // src/engine/small_801Dc.cpp
+f32 CosInterp(f32 a0, f32 a1, f32 a2);                                 // src/engine/small_801Dc.cpp
 void DefaultAnimLoopCallback(u32 a3);                                  // src/leaf/auto_03_8016E304_text_cb.cpp
 void EntityReachedWaypointCallback(u32 a3, u32 a4, u32 a5);            // src/leaf/auto_03_801B313C_text_cb.cpp
 void EntityWaypointTaskCompleteCallback(u32 a3, u32 a4);               // src/leaf/auto_03_801B313C_text_cb.cpp
-void Entity_SleepFSM(void* a0);  // type 0x2F (from signature table)
+void Entity_SleepFSM(void* a0);                                        // src/engine/small_801Dc.cpp
 void FadeToOverlayAlpha(void* a0, f32 a1, f32 a2, u32 a3);             // src/engine/small_801Bc.cpp
 void FollowWaypointPath(void* a0, u32 /*0x17*/ a1, f32 a2);  // type 0x36 (from signature table)
 void FrameFxBlur(s32 a0, f32 a1, f32 a2);  // type 0x86 (from signature table)
 void FrameFxBlurAndTint(f32 a0, f32 a1, f32 a2, f32 a3, f32 a4);       // src/engine/small_801Db.cpp
-void FrameFxBlurBulge(f32 a0, f32 a1, f32 a2, f32 a3, s32 a4);  // type 0x6F (from signature table)
+void FrameFxBlurBulge(f32 a0, f32 a1, f32 a2, f32 a3, s32 a4);         // src/engine/small_801Dc.cpp
 void FrameFxEggcrate(f32 a0, f32 a1, f32 a2);                          // src/engine/small_801Db.cpp
 void FrameFxFlash(f32 a0, f32 a1, f32 a2);                             // src/engine/small_801D.cpp
 void FrameFxPlay(u32 /*0x1D*/ a0);  // type 0x70 (from signature table)
@@ -1591,15 +1591,15 @@ void FrameFxRipple(f32 a0, f32 a1, f32 a2);                            // src/en
 void FrameFxStop(u32 a3);                                              // src/leaf/auto_03_801D9028_text_cb.cpp
 void FrameFxStopAll(void);                                             // src/leaf/auto_03_801D9028_text_cb.cpp
 void FrameFxTint(f32 a0, f32 a1, f32 a2, f32 a3, f32 a4, f32 a5, f32 a6); // src/engine/small_801Db.cpp
-void FrameFxTunnel(f32 a0, f32 a1, f32 a2, f32 a3, f32 a4, f32 a5, s32 a6);  // type 0x6D (from signature table)
-void FrameFxVortex(f32 a0, f32 a1, f32 a2, f32 a3, f32 a4, s32 a5);  // type 0x6E (from signature table)
+void FrameFxTunnel(f32 a0, f32 a1, f32 a2, f32 a3, f32 a4, f32 a5, s32 a6); // src/engine/small_801Dc.cpp
+void FrameFxVortex(f32 a0, f32 a1, f32 a2, f32 a3, f32 a4, s32 a5);    // src/engine/small_801Dc.cpp
 u32 GetCurrentStateID(ScriptCtx* a0);  // type 0x13 (from signature table)
-f32 GetGlobalMusicVolume(void);  // type 0x12 (from signature table)
-f32 GetGlobalSfxVolume(void);  // type 0x12 (from signature table)
+f32 GetGlobalMusicVolume(void);                                        // src/engine/small_801Dc.cpp
+f32 GetGlobalSfxVolume(void);                                          // src/engine/small_801Dc.cpp
 u32 GetHash(u32 a0);  // type 0x14 (from signature table)
 void InterpolateTo(void* a0, u32 /*0x17*/ a1, f32 a2, u32 /*0x06*/ a3);  // type 0x37 (from signature table)
-f32 IntervalRandomFloat(f32 a0, f32 a1);  // type 0xE (from signature table)
-s32 IntervalRandomInt(s32 a0, s32 a1);  // type 0x20 (from signature table)
+f32 IntervalRandomFloat(f32 lo, f32 hi);                               // src/engine/small_801Dc.cpp
+s32 IntervalRandomInt(s32 lo, s32 hi);                                 // src/engine/small_801Dc.cpp
 u32 IsHost(void);                                                      // src/leaf/auto_03_801D9028_text_cb.cpp
 u32 /*0x06*/ IsRumbling(s32 a0);  // type 0x6 (from signature table)
 void LightSetColor(u8* light, f32 r, f32 g, f32 b);                    // src/game/lab_books_g.cpp
@@ -1614,9 +1614,9 @@ void PauseRumble(s32 a0);  // type 0x83 (from signature table)
 void PauseSFX(u32 a3);                                                 // src/leaf/auto_03_80208CE8_text_cb.cpp
 void PlayGlobalGroupSound_NoLoad(u32 a3);                              // src/leaf/auto_03_801D9028_text_cb.cpp
 void PlayGlobalGroupSoundWithEffect_NoLoad(u32 a3, s32 a4);            // src/leaf/auto_03_801D9028_text_cb.cpp
-void PlayGlobalLoopingGroupSound_NoLoad(u32 /*0x0C*/ a0);  // type 0x5F (from signature table)
+void PlayGlobalLoopingGroupSound_NoLoad(u32 a0);                       // src/engine/small_801Dc.cpp
 void PlayGlobalSound(u32 a3);                                          // src/leaf/auto_03_801D9028_text_cb.cpp
-void PlayGlobalSoundSynced(u32 /*0x0B*/ a0);  // type 0x5E (from signature table)
+void PlayGlobalSoundSynced(u32 a0);                                    // src/engine/small_801Dc.cpp
 void PlayGlobalSoundWithEffect(u32 a3, s32 a4);                        // src/leaf/auto_03_801D9028_text_cb.cpp
 void PlayLoopingSoundFX(void* a3, u32 a4, s32 a5);                     // src/leaf/auto_03_801D9028_text_cb.cpp
 void PlayLoopingSoundFXWithEffect(void* a0, u32 /*0x0B*/ a1, s32 a2, s32 a3);  // type 0x3D (from signature table)
@@ -1638,7 +1638,7 @@ void ResumeFollowingWaypointPath(void* a0);  // type 0x2F (from signature table)
 s32 Return(s32 a0);  // type 0x1F (from signature table)
 void SetEntityOrientationCallback(u32 /*0x13*/ a0, u32 /*0x08*/ a1, u32 /*0x14*/ a2);  // type 0x8A (from signature table)
 void SetEntityPositionCallback(u32 /*0x12*/ a0, u32 /*0x08*/ a1, u32 /*0x14*/ a2);  // type 0x90 (from signature table)
-void SetGlobalMusicVolume(f32 a0);  // type 0x69 (from signature table)
+void SetGlobalMusicVolume(f32 a0);                                     // src/engine/small_801Dc.cpp
 void SetGlobalSfxVolume(f32 f1);                                       // src/leaf/auto_03_801D9028_text_cb.cpp
 void SetOverlayAlpha(void* a0, f32 a1);                                // src/engine/small_801Bc.cpp
 void SetRenderFlag(void* a0, u32 /*0x06*/ a1);  // type 0x3E (from signature table)
@@ -1653,22 +1653,22 @@ void ShaderSetOverlayAlphaFromDistance(void* a0, u32 /*0x17*/ a1, u32 /*0x1A*/ a
 void ShaderStartBouncingOverlayAlpha(u32 /*0x17*/ a0, u32 /*0x1A*/ a1, f32 a2, f32 a3, f32 a4);  // type 0x5D (from signature table)
 void ShaderStopBouncingOverlayAlpha(u32 /*0x17*/ a0, u32 /*0x1A*/ a1);  // type 0x5B (from signature table)
 void SpawnAttachedParticle(void* a0, u32 a1, u32 /*0x1C*/ a2);  // type 0x44 (from signature table)
-void SpawnParticleAt(u32 a0, u32 /*0x17*/ a1);  // type 0x72 (from signature table)
+void SpawnParticleAt(u32 a0, u32 a1);                                  // src/engine/small_801Dc.cpp
 void StartBouncingOverlayAlpha(void* a0, f32 a1);                      // src/engine/small_801Bc.cpp
-void StartChallengeFrameFx(void);  // type 0x8F (from signature table)
+void StartChallengeFrameFx(void);                                      // src/engine/small_801Dc.cpp
 void StartNISFrameFx(void);  // type 0x8F (from signature table)
 void StartNISTVStaticFrameFx(void);  // type 0x8F (from signature table)
 void StartRumble(s32 a0, u32 /*0x2A*/ a1);  // type 0x84 (from signature table)
 void StopAllSFX(void);  // type 0x8F (from signature table)
 void StopBouncingOverlayAlpha(void* a0);                               // src/engine/small_801Bb.cpp
-void StopChallengeFrameFx(void);  // type 0x8F (from signature table)
+void StopChallengeFrameFx(void);                                       // src/engine/small_801Dc.cpp
 void StopFollowingWaypointPath(void* a0);                              // src/engine/small_801Bc.cpp
 void StopGlobalLoopingGroupSound(void);                                // src/leaf/auto_03_801D9028_text_cb.cpp
 void StopLoopingSoundFX(void* a3);                                     // src/leaf/auto_03_801D9028_text_cb.cpp
 void StopLoopingSoundGroupFX(void* a3);                                // src/leaf/auto_03_801D9028_text_cb.cpp
 void StopMusic(void);  // type 0x8F (from signature table)
-void StopNISFrameFx(void);  // type 0x8F (from signature table)
-void StopNISTVStaticFrameFx(void);  // type 0x8F (from signature table)
+void StopNISFrameFx(void);                                             // src/engine/small_801Dc.cpp
+void StopNISTVStaticFrameFx(void);                                     // src/engine/small_801Dc.cpp
 void StopVoiceSFX(u32 a3);                                             // src/leaf/auto_03_800E75B0_text_cb.cpp
 void SuspendSFX(u32 a3);                                               // src/leaf/auto_03_80208CE8_text_cb.cpp
 void TestScriptCallback(void* a3, u32 a4, void* a5);                   // src/leaf/auto_03_801D9028_text_cb.cpp
