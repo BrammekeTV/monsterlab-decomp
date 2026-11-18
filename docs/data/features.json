@@ -69,6 +69,11 @@
  "changelog": [
   {
    "date": "2026-11-18",
+   "time": "12:45",
+   "text": "Decompiled what happens after an attack: damage records are applied to the defender's limbs (counting broken limbs and the best single hit in the player's statistics), on-hit effects of the attacking limb (the disable-limb enhancement hits every damaged limb, the drain enhancement adds its effect once anything was hit), return damage, and the dodge/block counters."
+  },
+  {
+   "date": "2026-11-18",
    "time": "12:41",
    "text": "Decompiled how a battle round is decided: the action's target limbs (attacks on broken limbs go to the torso, a blocking defender takes everything on the blocking limb), then a 1-100 to-hit roll adjusted for fleeing, the accuracy enhancement, dodging and the defender's enhancements and defects decides hit, block, dodge or miss, with the 'Roll to hit' line in the battle log."
   },

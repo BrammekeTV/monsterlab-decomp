@@ -1,15 +1,15 @@
 {
  "game_id": "RM7P4F",
- "generated": "2026-11-18T11:41:54+00:00",
- "commit": "6e6b3da",
- "commit_date": "2026-11-18T12:39:02+01:00",
+ "generated": "2026-11-18T11:45:33+00:00",
+ "commit": "e89e150",
+ "commit_date": "2026-11-18T12:41:54+01:00",
  "game": {
   "functions": 8548,
   "bytes": 2265988,
-  "named": 2701,
-  "named_bytes": 597112,
-  "decompiled": 2193,
-  "decompiled_bytes": 264636
+  "named": 2712,
+  "named_bytes": 604548,
+  "decompiled": 2194,
+  "decompiled_bytes": 265440
  },
  "library": {
   "functions": 4039,
@@ -22,10 +22,10 @@
  "all": {
   "functions": 12587,
   "bytes": 3404928,
-  "named": 3163,
-  "named_bytes": 701740,
-  "decompiled": 2193,
-  "decompiled_bytes": 264636
+  "named": 3174,
+  "named_bytes": 709176,
+  "decompiled": 2194,
+  "decompiled_bytes": 265440
  },
  "game_range": [
   "80006B40",
@@ -1001,12 +1001,12 @@
    0.539
   ],
   [
-   0.745,
+   0.849,
    0.87
   ],
   [
    0.234,
-   0.378
+   0.479
   ],
   [
    0.187,
@@ -1046,11 +1046,11 @@
   ],
   [
    0.005,
-   0.199
+   0.995
   ],
   [
    0.006,
-   0.0
+   0.149
   ],
   [
    0.006,
@@ -1834,6 +1834,11 @@
      "name": "BattleStartRound",
      "addr": "802124F4",
      "size": 488
+    },
+    {
+     "name": "BattleAfterAttack",
+     "addr": "802126DC",
+     "size": 804
     },
     {
      "name": "BattleAdvance",
@@ -13301,7 +13306,7 @@
      "size": 8
     },
     {
-     "name": "fn_8022BDDC",
+     "name": "SaveGetBestHit",
      "addr": "8022BDDC",
      "size": 8
     },

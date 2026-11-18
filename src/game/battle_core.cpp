@@ -977,3 +977,92 @@ s32 BattleDecideRound(u8* b, u8* att, u8* def) {
 }
 
 }  // extern "C"
+
+// ---------------------------------------------------------------- after an attack
+
+extern "C" {
+s32  RoundGetAttacker(void* round);                        // 0x80214F48
+void LimbApplyDamage(u8** field, void* value);             // 0x80214C5C
+void FighterOnHit(u8* att, u8* def);                       // 0x8021477C
+void LimbOnHit(u8** attField, u8* def);                    // 0x80214E7C
+void LimbAddEffect(u8** field, u8* stats, s32 id);         // 0x80214D1C
+void FighterAddEffect(u8* stats, s32 id);                  // 0x80214508
+void SaveCountDodges(u8* s, s32 n);                        // 0x8022B38C
+void SaveCountBlocks(u8* s, s32 n);                        // 0x8022AE70
+void SaveCountLimbsBroken(u8* s, s32 n);                   // 0x8022A90C
+void SaveCountLimbsLost(u8* s, s32 n);                     // 0x8022A3D8
+u32  SaveGetBestHit(u8* s);                                // 0x8022BDDC
+void SaveSetBestHit(u8* s, u32 dmg);                       // 0x8022BDE4
+}
+
+enum { ENH_DISABLE_LIMB = 0xD, ENH_DRAIN = 0xE };
+
+extern "C" {
+
+// 0x802126DC
+// Apply the round's damage records: damage to the defender's limbs (counting broken limbs and
+// the best single hit for the player's statistics), effects from the attacker's records, on-hit
+// effects of the attacking limb (its "disable limb" enhancement hits each damaged limb), and
+// return damage. A "drain" enhancement adds its fighter effect once something was hit.
+void BattleAfterAttack(u8* b, u8* att, u8* def) {
+    u8* round = *(u8**)(b + 0xA0C);
+    if (*(s32*)round == 4 && RoundGetAttacker(round) == 1)      SaveCountDodges(gSaveSystem, 1);
+    else if (*(s32*)*(u8**)(b + 0xA0C) == 5 && RoundGetAttacker(*(u8**)(b + 0xA0C)) == 1) SaveCountBlocks(gSaveSystem, 1);
+
+    s32 side = *(s32*)(b + 0xA08);
+    s32 attLimb = *(s32*)(*(u8**)(b + 0xA0C) + side * 0x38 + 0x38);
+    u8** attField = FighterStatsGetPart(att, attLimb);
+    s32 enh = attField != NULL ? (*(s32**)attField)[8] : -1;
+    s32 defOfs = (1 - side) * 0x38;
+
+    BOOL anyHit = FALSE;
+    for (s32 i = 0; i < 5; i++) {
+        u8* rec = *(u8**)(*(u8**)(b + 0xA0C) + defOfs + 4 + i * 4);
+        if (rec != NULL && rec[0] == 1) {
+            s32 before = **(s32**)FighterStatsGetPart(def, i);
+            LimbApplyDamage(FighterStatsGetPart(def, i), *(void**)(rec + 4));
+            s32 after = **(s32**)FighterStatsGetPart(def, i);
+            if (before > 0 && after <= 0) {
+                if (RoundGetAttacker(*(u8**)(b + 0xA0C)) == 0) SaveCountLimbsBroken(gSaveSystem, 1);
+                else                                           SaveCountLimbsLost(gSaveSystem, 1);
+            }
+            s32** value = *(s32***)(rec + 4);
+            if (value != NULL) {
+                u32 dealt = (u32)-**value;
+                if (RoundGetAttacker(*(u8**)(b + 0xA0C)) == 0 && dealt > SaveGetBestHit(gSaveSystem))
+                    SaveSetBestHit(gSaveSystem, dealt);
+            }
+        }
+        u8* own = *(u8**)(*(u8**)(b + 0xA0C) + *(s32*)(b + 0xA08) * 0x38 + 0x18 + i * 4);
+        if (own != NULL && own[0] == 1) LimbApplyDamage(FighterStatsGetPart(att, i), *(void**)(own + 0x14));
+
+        if (rec != NULL && !(*(u32*)(rec + 8) & 2)) {
+            anyHit = TRUE;
+            FighterOnHit(att, def);
+            if (attField != NULL) {
+                LimbOnHit(attField, def);
+                if (enh == ENH_DISABLE_LIMB && i != 4) {
+                    u8** f = FighterStatsGetPart(def, i);
+                    if (f != NULL) {
+                        LimbAddEffect(f, def, enh);
+                        RoundNoteAbility(*(u8**)(b + 0xA0C), *(s32*)(b + 0xA08), attLimb, enh);
+                    }
+                }
+            }
+        }
+
+        u8* back = *(u8**)(*(u8**)(b + 0xA0C) + *(s32*)(b + 0xA08) * 0x38 + 4 + i * 4);
+        if (back != NULL && back[0] == 1) {
+            LimbApplyDamage(FighterStatsGetPart(att, i), *(void**)(back + 4));
+            s32 defLimb = *(s32*)(*(u8**)(b + 0xA0C) + defOfs + 0x38);
+            FighterOnHit(def, att);
+            LimbOnHit(FighterStatsGetPart(def, defLimb), att);
+        }
+    }
+    if (enh == ENH_DRAIN && anyHit) {
+        FighterAddEffect(def, enh);
+        RoundNoteAbility(*(u8**)(b + 0xA0C), *(s32*)(b + 0xA08), attLimb, enh);
+    }
+}
+
+}  // extern "C"

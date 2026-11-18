@@ -763,3 +763,14 @@ fn_802124F4 BattleStartRound
 fn_80213308 BattleTakeChoice
 fn_80213158 BattleOnListenerDone
 fn_8020F27C ListenerStart
+fn_80214C5C LimbApplyDamage
+fn_8021477C FighterOnHit
+fn_80214E7C LimbOnHit
+fn_80214D1C LimbAddEffect
+fn_80214508 FighterAddEffect
+fn_8022B38C SaveCountDodges
+fn_8022AE70 SaveCountBlocks
+fn_8022A90C SaveCountLimbsBroken
+fn_8022A3D8 SaveCountLimbsLost
+fn_8022BDDC SaveGetBestHit
+fn_8022BDE4 SaveSetBestHit
