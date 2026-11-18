@@ -46,6 +46,11 @@
    "status": "todo"
   },
   {
+   "title": "SDK functions identified",
+   "detail": "Apply RVL SDK / MSL / Bink signatures (decomp-toolkit, signatures from other RevoEX-2.1 decomps) to name more of the ~4,000 library functions, so the platform layer knows exactly which Nintendo SDK calls to replace.",
+   "status": "todo"
+  },
+  {
    "title": "Platform layer",
    "detail": "Replace the Wii SDK: GX→OpenGL/Vulkan, AX→SDL audio, WPAD→gamepad + mouse pointer, DVD/NAND→files.",
    "status": "todo"
@@ -87,6 +92,11 @@
   }
  ],
  "changelog": [
+  {
+   "date": "2026-11-18",
+   "time": "23:00",
+   "text": "Roadmap: added SDK signature matching (via decomp-toolkit) to identify more Nintendo SDK, MSL and Bink functions ahead of the platform layer."
+  },
   {
    "date": "2026-11-18",
    "time": "22:56",
