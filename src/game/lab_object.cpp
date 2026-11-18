@@ -544,3 +544,62 @@ BOOL fn_80217134(void* unused, s32 id, f32* a, f32* b, f32* c, f32* d) {
 }
 
 }  // extern "C"
+
+// ---------------------------------------------------------------- battle result
+
+extern "C" {
+void fn_8022CF24(u8* s, s32 amount);          // 0x8022CF24
+void fn_8022D94C(u8* s, s32 amount);          // 0x8022D94C
+u32  fn_8022CD34(u8* s, s32 idx);             // 0x8022CD34: record at +0x928
+void fn_8022CD54(u8* s, s32 idx, u32 value);  // 0x8022CD54
+void fn_802276F4(u8* s, s32 amount);          // 0x802276F4
+void fn_8022DE78(u8* s);                      // 0x8022DE78: clears +0x9D0
+void fn_80227C20(u8* s, s32 idx, s32 amount); // 0x80227C20
+u32  fn_8022D93C(u8* s, s32 idx);             // 0x8022D93C: record at +0x980
+void fn_8022D460(u8* s, s32 idx, s32 value);  // 0x8022D460
+void fn_802280D0(u8* s, s32 amount);          // 0x802280D0
+void LabCalcExperimentMSP(u8* lab);           // 0x80218BB0
+
+// 0x802186D8
+// Record the outcome of a battle (`r`: +0 won flag, +4..+0x10 stats) in the lab and update the save's
+// statistics. After an experiment fight (+0x48 an ingredient): a win bumps two counters and
+// raises the ingredient's best MSP; a loss bumps a counter and clears another. After a challenge
+// fight (+0x4C a challenge, not 8; 9 only counts while +0x64 is -1 or 0): a win bumps the
+// challenge's counters/records and takes the MSP from its table row; a loss bumps a counter.
+void LabShowBattleResult(u8* lab, const u8* r) {
+    u8 won = r[0];
+    lab[0x6C] = won;
+    *(u32*)(lab + 0x70) = *(const u32*)(r + 4);
+    *(u32*)(lab + 0x74) = *(const u32*)(r + 8);
+    *(u32*)(lab + 0x78) = *(const u32*)(r + 0xC);
+    *(u32*)(lab + 0x7C) = *(const u32*)(r + 0x10);
+    s32 ing = *(s32*)(lab + 0x48);
+    if (ing != -1 && won) {
+        fn_8022CF24(gSaveSystem, 1);
+        fn_8022D94C(gSaveSystem, 1);
+        LabCalcExperimentMSP(lab);
+        u32 msp = *(u32*)(lab + 0x78);
+        if (fn_8022CD34(gSaveSystem, *(s32*)(lab + 0x48)) < msp)
+            fn_8022CD54(gSaveSystem, *(s32*)(lab + 0x48), msp);
+    } else if (ing != -1) {
+        fn_802276F4(gSaveSystem, 1);
+        fn_8022DE78(gSaveSystem);
+    } else {
+        s32 ch = *(s32*)(lab + 0x4C);
+        if (ch == -1) return;
+        BOOL counts = (ch != 9) || ((u32)(*(s32*)(lab + 0x64) + 1) <= 1);
+        if (won) {
+            if (counts) {
+                fn_80227C20(gSaveSystem, ch, 1);
+                u32 rec = *(u32*)(lab + 0x7C);
+                if (fn_8022D93C(gSaveSystem, ch) < rec) fn_8022D460(gSaveSystem, ch, (s32)rec);
+            }
+            const u8* row = *(const u8**)(Db() + 0x80E0) + *(s32*)((u8*)gLab + 0x4C) * 0x4C;
+            *(s32*)(lab + 0x78) = (s32)*(const f32*)(row + 0x48);
+        } else if (ch != 8 && counts) {
+            fn_802280D0(gSaveSystem, 1);
+        }
+    }
+}
+
+}  // extern "C"

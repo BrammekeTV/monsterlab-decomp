@@ -6,7 +6,7 @@
 #include "types.h"
 
 extern u8 lbl_805FDBA0[];
-extern "C" void fn_801EC8C4(s32, s32, s32);
+extern "C" void fn_801EC8C4(u8*, u32, u32);
 extern "C" void fn_801ECFA0(s32, s32);
 
 // 0x80097574
@@ -46,7 +46,7 @@ extern "C" void fn_800980C8(u8* a3, s32 a4) {
     s32 t4 = *(s32*)(((u8*)(uintptr_t)(a3)) + 616);
     u32 t5 = (u32)(0xc3220000) + 26819u;
     u32 t6 = (u32)(t3) + 148u;
-    fn_801EC8C4((s32)((u32)(t6)), (s32)((u32)(t4)), (s32)((u32)(t5)));
+    fn_801EC8C4((u8*)(uintptr_t)(t6), (u32)((u32)(t4)), (u32)((u32)(t5)));
 }
 
 // 0x80098560

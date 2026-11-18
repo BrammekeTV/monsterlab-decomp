@@ -69,6 +69,11 @@
   "changelog": [
     {
       "date": "2026-11-18",
+      "time": "16:23",
+      "text": "Decompiled the statistic counters that unlock badges (experiments, wins, per-challenge records) and the lab's battle-result bookkeeping (win/loss stats, best experiment MSP, challenge MSP)."
+    },
+    {
+      "date": "2026-11-18",
       "time": "16:19",
       "text": "Decompiled three small lab tuning lookups (difficulty flag, factor and item float values)."
     },

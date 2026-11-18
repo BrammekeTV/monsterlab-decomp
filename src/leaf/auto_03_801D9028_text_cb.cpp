@@ -18,7 +18,7 @@ extern "C" void fn_801B69F8(s32);
 extern "C" void fn_801B6AA4(s32);
 extern "C" void fn_801B6EC8(s32, s32);
 extern "C" BOOL fn_801F5220(void);
-extern "C" void fn_8020A398(void);
+extern "C" void fn_8020A398(s32);
 
 // 0x801DB490
 void Noop(void) {
@@ -68,12 +68,11 @@ void PlayGlobalGroupSound_NoLoad(u32 a3) {
 
 // 0x801DC298
 void StopGlobalLoopingGroupSound(void) {
-    // tail-call arguments inferred from the registers set before the call
     s32 t0 = *(s32*)((u8*)lbl_805F9980);
     if ((s32)(u32)(t0) == -1) {
         return;
     }
-    fn_8020A398();
+    fn_8020A398((s32)((u32)(t0)));
 }
 
 // 0x801DC2AC

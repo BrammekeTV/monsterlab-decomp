@@ -722,3 +722,96 @@ void SaveRewardExperiment(SaveProgress* s, s32 quest, s32 quality) {
 }
 
 }  // extern "C"
+
+// ---------------------------------------------------------------- statistic counters and badges
+//
+// Several save statistics are counters (or per-index counters) that unlock badges at thresholds
+// from the tuning table at db+0x99D0 (8-byte rows, float at +4).
+
+static inline u32 TuningThreshold(u32 row) {
+    return (u32)*(const f32*)(*(u8**)(Db() + 0x99D0) + row * 8 + 4);
+}
+
+// Add `amount` to the counter at `ofs`, then award the badge `badges[i]` for every i (last
+// first) whose threshold (tuning row `rows[i]`) the counter has reached.
+static void CountAndAward(u8* s, u32 ofs, s32 amount, const u32* rows, const u32* badges, s32 n) {
+    s32 total = *(s32*)(s + ofs) + amount;
+    *(s32*)(s + ofs) = total;
+    for (s32 i = n - 1; i >= 0; i--) {
+        if (SaveHasBadge(s, badges[i])) continue;
+        if (total < (s32)*(const f32*)(*(u8**)(Db() + 0x99D0) + rows[i] * 8 + 4)) continue;
+        SaveAddBadge((SaveProgress*)s, (s32)badges[i]);
+    }
+}
+
+extern "C" {
+
+// 0x8022CF24
+void fn_8022CF24(u8* s, s32 amount) {
+    static const u32 rows[4] = { 0x52, 0x53, 0x54, 0x55 }, badges[4] = { 0x30, 0x31, 0x32, 0x33 };
+    CountAndAward(s, 0x908, amount, rows, badges, 4);
+}
+
+// 0x8022D94C
+void fn_8022D94C(u8* s, s32 amount) {
+    static const u32 rows[3] = { 0x56, 0x57, 0x58 }, badges[3] = { 0x34, 0x35, 0x36 };
+    CountAndAward(s, 0x9D0, amount, rows, badges, 3);
+}
+
+// 0x802276F4
+void fn_802276F4(u8* s, s32 amount) {
+    static const u32 rows[3] = { 0x93, 0x94, 0x95 }, badges[3] = { 0x8A, 0x8B, 0x8C };
+    CountAndAward(s, 0x90C, amount, rows, badges, 3);
+}
+
+// 0x802280D0
+void fn_802280D0(u8* s, s32 amount) {
+    static const u32 rows[3] = { 0x90, 0x91, 0x92 }, badges[3] = { 0x87, 0x88, 0x89 };
+    CountAndAward(s, 0xA00, amount, rows, badges, 3);
+}
+
+// 0x80227C20
+// Per-index counter at +0x958 (index `idx`, -1 = none); one badge per index.
+void fn_80227C20(u8* s, s32 idx, s32 amount) {
+    static const s32 badges[10] = { 0x6C, 0x6B, 0x6F, 0x6E, 0x70, 0x72, 0x71, 0x73, -1, 0x6D };
+    if (idx == -1) return;
+    u32* c = (u32*)(s + 0x958 + idx * 4);
+    *c += amount;
+    u32 thr = (u32)*(const f32*)(*(u8**)(Db() + 0x99D0) + 0x284);
+    if (*c < thr) return;
+    SaveAddBadge((SaveProgress*)s, badges[idx]);
+}
+
+// 0x8022D460
+// Per-index record at +0x980 (set, not added); one badge per index once it reaches the row's value.
+void fn_8022D460(u8* s, s32 idx, s32 value) {
+    static const u32 rows[10] = { 0x81, 0x80, 0x84, 0x83, 0x85, 0x87, 0x86, 0x88, 0x00, 0x82 };
+    static const s32 badges[10] = { 0x75, 0x74, 0x78, 0x77, 0x79, 0x7B, 0x7A, 0x7C, -1, 0x76 };
+    if (idx == -1) return;
+    u32* c = (u32*)(s + 0x980 + idx * 4);
+    *c = value;
+    if (*c < TuningThreshold(rows[idx])) return;
+    SaveAddBadge((SaveProgress*)s, badges[idx]);
+}
+
+// 0x8022CD54
+// Per-index record at +0x928 (set); reaching the tuning thresholds 0x4D < 0x4E < 0x4F < 0xA2 awards
+// 1, 2, 3 or 4 of the index's four badges (12 groups).
+void fn_8022CD54(u8* s, s32 idx, u32 value) {
+    static const s32 badges[48] = {
+        0x00, 0x0C, 0x18, 0x24, 0x04, 0x10, 0x1C, 0x28, 0x05, 0x11, 0x1D, 0x29,
+        0x06, 0x12, 0x1E, 0x2A, 0x07, 0x13, 0x1F, 0x2B, 0x08, 0x14, 0x20, 0x2C,
+        0x09, 0x15, 0x21, 0x2D, 0x0A, 0x16, 0x22, 0x2E, 0x01, 0x0D, 0x19, 0x25,
+        0x02, 0x0E, 0x1A, 0x26, 0x0B, 0x17, 0x23, 0x2F, 0x03, 0x0F, 0x1B, 0x27,
+    };
+    if (idx == -1) return;
+    *(u32*)(s + 0x928 + idx * 4) = value;
+    SaveProgress* sp = (SaveProgress*)s;
+    const s32* b = badges + idx * 4;
+    if (value >= TuningThreshold(0xA2)) { for (s32 k = 0; k < 4; k++) SaveAddBadge(sp, b[k]); }
+    if (value >= TuningThreshold(0x4F)) { for (s32 k = 0; k < 3; k++) SaveAddBadge(sp, b[k]); return; }
+    if (value >= TuningThreshold(0x4E)) { for (s32 k = 0; k < 2; k++) SaveAddBadge(sp, b[k]); return; }
+    if (value >= TuningThreshold(0x4D)) SaveAddBadge(sp, b[0]);
+}
+
+}  // extern "C"

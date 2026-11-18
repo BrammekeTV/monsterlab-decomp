@@ -1,15 +1,15 @@
 {
  "game_id": "RM7P4F",
- "generated": "2026-11-18T16:19:23+00:00",
- "commit": "e4feb38",
- "commit_date": "2026-11-18T17:19:09+01:00",
+ "generated": "2026-11-18T16:23:34+00:00",
+ "commit": "8b1b650",
+ "commit_date": "2026-11-18T17:19:24+01:00",
  "game": {
   "functions": 8548,
   "bytes": 2265988,
   "named": 2748,
   "named_bytes": 616800,
-  "decompiled": 3178,
-  "decompiled_bytes": 326232
+  "decompiled": 3227,
+  "decompiled_bytes": 337636
  },
  "library": {
   "functions": 4039,
@@ -24,8 +24,8 @@
   "bytes": 3404928,
   "named": 3211,
   "named_bytes": 721548,
-  "decompiled": 3179,
-  "decompiled_bytes": 326352
+  "decompiled": 3228,
+  "decompiled_bytes": 337756
  },
  "game_range": [
   "80006B40",
@@ -201,7 +201,7 @@
    0.0
   ],
   [
-   0.004,
+   0.006,
    0.003
   ],
   [
@@ -345,19 +345,19 @@
    0.31
   ],
   [
-   0.025,
+   0.084,
    0.113
   ],
   [
-   0.003,
+   0.043,
    0.047
   ],
   [
-   0.02,
+   0.061,
    0.0
   ],
   [
-   0.023,
+   0.04,
    0.135
   ],
   [
@@ -877,11 +877,11 @@
    0.0
   ],
   [
-   0.058,
+   0.066,
    0.0
   ],
   [
-   0.168,
+   0.175,
    0.168
   ],
   [
@@ -889,15 +889,15 @@
    0.477
   ],
   [
-   0.034,
+   0.058,
    0.141
   ],
   [
-   0.015,
+   0.031,
    0.102
   ],
   [
-   0.01,
+   0.112,
    0.2
   ],
   [
@@ -1013,7 +1013,7 @@
    0.212
   ],
   [
-   0.957,
+   1.0,
    0.932
   ],
   [
@@ -1041,7 +1041,7 @@
    0.838
   ],
   [
-   0.329,
+   0.661,
    0.435
   ],
   [
@@ -1049,7 +1049,7 @@
    0.995
   ],
   [
-   0.01,
+   0.533,
    0.149
   ],
   [
@@ -1414,6 +1414,111 @@
      "name": "RendHasFreeDL",
      "addr": "8015EAF4",
      "size": 52
+    }
+   ]
+  },
+  {
+   "path": "src/engine/small_801D.cpp",
+   "functions": [
+    {
+     "name": "fn_801D04C0",
+     "addr": "801D04C0",
+     "size": 68
+    },
+    {
+     "name": "fn_801D2BB8",
+     "addr": "801D2BB8",
+     "size": 64
+    },
+    {
+     "name": "fn_801D55F8",
+     "addr": "801D55F8",
+     "size": 64
+    },
+    {
+     "name": "fn_801D57FC",
+     "addr": "801D57FC",
+     "size": 84
+    },
+    {
+     "name": "FaderSetTargetColour",
+     "addr": "801D65F8",
+     "size": 68
+    },
+    {
+     "name": "fn_801D8BB4",
+     "addr": "801D8BB4",
+     "size": 80
+    },
+    {
+     "name": "fn_801D94CC",
+     "addr": "801D94CC",
+     "size": 60
+    },
+    {
+     "name": "fn_801D9A24",
+     "addr": "801D9A24",
+     "size": 60
+    },
+    {
+     "name": "fn_801D9AE4",
+     "addr": "801D9AE4",
+     "size": 80
+    },
+    {
+     "name": "fn_801DA1CC",
+     "addr": "801DA1CC",
+     "size": 60
+    },
+    {
+     "name": "fn_801DA7C8",
+     "addr": "801DA7C8",
+     "size": 84
+    },
+    {
+     "name": "fn_801DA81C",
+     "addr": "801DA81C",
+     "size": 60
+    },
+    {
+     "name": "fn_801DA8D0",
+     "addr": "801DA8D0",
+     "size": 76
+    },
+    {
+     "name": "fn_801DAA40",
+     "addr": "801DAA40",
+     "size": 52
+    },
+    {
+     "name": "fn_801DB160",
+     "addr": "801DB160",
+     "size": 52
+    },
+    {
+     "name": "fn_801DB2E4",
+     "addr": "801DB2E4",
+     "size": 72
+    },
+    {
+     "name": "RegisterHooks",
+     "addr": "801DB460",
+     "size": 48
+    },
+    {
+     "name": "ShaderSetOverlayAlpha",
+     "addr": "801DB4C4",
+     "size": 84
+    },
+    {
+     "name": "FrameFxRipple",
+     "addr": "801DB89C",
+     "size": 64
+    },
+    {
+     "name": "FrameFxFlash",
+     "addr": "801DB8DC",
+     "size": 64
     }
    ]
   },
@@ -3246,6 +3351,11 @@
      "size": 328
     },
     {
+     "name": "LabShowBattleResult",
+     "addr": "802186D8",
+     "size": 464
+    },
+    {
      "name": "fn_802188CC",
      "addr": "802188CC",
      "size": 24
@@ -4306,6 +4416,21 @@
      "size": 864
     },
     {
+     "name": "fn_802276F4",
+     "addr": "802276F4",
+     "size": 1324
+    },
+    {
+     "name": "fn_80227C20",
+     "addr": "80227C20",
+     "size": 1168
+    },
+    {
+     "name": "fn_802280D0",
+     "addr": "802280D0",
+     "size": 1324
+    },
+    {
      "name": "SaveGetFieldRepairRecord",
      "addr": "8022954C",
      "size": 8
@@ -4314,6 +4439,26 @@
      "name": "SaveSetFieldRepairRecord",
      "addr": "80229554",
      "size": 3716
+    },
+    {
+     "name": "fn_8022CD54",
+     "addr": "8022CD54",
+     "size": 464
+    },
+    {
+     "name": "fn_8022CF24",
+     "addr": "8022CF24",
+     "size": 1340
+    },
+    {
+     "name": "fn_8022D460",
+     "addr": "8022D460",
+     "size": 1244
+    },
+    {
+     "name": "fn_8022D94C",
+     "addr": "8022D94C",
+     "size": 1324
     }
    ]
   },
@@ -5504,6 +5649,111 @@
      "name": "fn_80098BD8",
      "addr": "80098BD8",
      "size": 88
+    }
+   ]
+  },
+  {
+   "path": "src/game/small_800B.cpp",
+   "functions": [
+    {
+     "name": "GrowJuiceWeapon_PlayStruckEffect",
+     "addr": "800B026C",
+     "size": 84
+    },
+    {
+     "name": "fn_800B0530",
+     "addr": "800B0530",
+     "size": 92
+    },
+    {
+     "name": "fn_800B0CB4",
+     "addr": "800B0CB4",
+     "size": 72
+    },
+    {
+     "name": "fn_800B1498",
+     "addr": "800B1498",
+     "size": 84
+    },
+    {
+     "name": "fn_800B14EC",
+     "addr": "800B14EC",
+     "size": 96
+    },
+    {
+     "name": "fn_800B1564",
+     "addr": "800B1564",
+     "size": 80
+    },
+    {
+     "name": "GrowJuiceHeart_StartHeartbeat",
+     "addr": "800B1964",
+     "size": 68
+    },
+    {
+     "name": "GrowJuiceHeart_StopHeartbeat",
+     "addr": "800B19A8",
+     "size": 52
+    },
+    {
+     "name": "GrowJuiceHeart_StartGooBubble",
+     "addr": "800B19DC",
+     "size": 68
+    },
+    {
+     "name": "fn_800B1EDC",
+     "addr": "800B1EDC",
+     "size": 68
+    },
+    {
+     "name": "fn_800B1F20",
+     "addr": "800B1F20",
+     "size": 96
+    },
+    {
+     "name": "fn_800B2054",
+     "addr": "800B2054",
+     "size": 80
+    },
+    {
+     "name": "fn_800B4908",
+     "addr": "800B4908",
+     "size": 52
+    },
+    {
+     "name": "fn_800B494C",
+     "addr": "800B494C",
+     "size": 52
+    },
+    {
+     "name": "fn_800B4984",
+     "addr": "800B4984",
+     "size": 52
+    },
+    {
+     "name": "fn_800B5944",
+     "addr": "800B5944",
+     "size": 76
+    },
+    {
+     "name": "fn_800B59A8",
+     "addr": "800B59A8",
+     "size": 64
+    },
+    {
+     "name": "fn_800B73A0",
+     "addr": "800B73A0",
+     "size": 48
+    },
+    {
+     "name": "fn_800B73D0",
+     "addr": "800B73D0",
+     "size": 48
+    },
+    {
+     "name": "fn_800B7428",
+     "addr": "800B7428",
+     "size": 60
     }
    ]
   },
@@ -7924,6 +8174,16 @@
      "name": "fn_80062C7C",
      "addr": "80062C7C",
      "size": 4
+    }
+   ]
+  },
+  {
+   "path": "src/leaf/auto_03_8006307C_text.cpp",
+   "functions": [
+    {
+     "name": "fn_80063520",
+     "addr": "80063520",
+     "size": 16
     }
    ]
   },
