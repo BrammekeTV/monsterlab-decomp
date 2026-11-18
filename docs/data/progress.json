@@ -1,15 +1,15 @@
 {
  "game_id": "RM7P4F",
- "generated": "2026-11-18T11:37:06+00:00",
- "commit": "cb9f832",
- "commit_date": "2026-11-18T12:33:55+01:00",
+ "generated": "2026-11-18T11:39:02+00:00",
+ "commit": "21e7f88",
+ "commit_date": "2026-11-18T12:37:07+01:00",
  "game": {
   "functions": 8548,
   "bytes": 2265988,
-  "named": 2700,
-  "named_bytes": 597092,
-  "decompiled": 2191,
-  "decompiled_bytes": 262416
+  "named": 2701,
+  "named_bytes": 597112,
+  "decompiled": 2192,
+  "decompiled_bytes": 262900
  },
  "library": {
   "functions": 4039,
@@ -22,10 +22,10 @@
  "all": {
   "functions": 12587,
   "bytes": 3404928,
-  "named": 3162,
-  "named_bytes": 701720,
-  "decompiled": 2191,
-  "decompiled_bytes": 262416
+  "named": 3163,
+  "named_bytes": 701740,
+  "decompiled": 2192,
+  "decompiled_bytes": 262900
  },
  "game_range": [
   "80006B40",
@@ -994,14 +994,14 @@
   ],
   [
    0.036,
-   0.045
+   0.047
   ],
   [
    0.364,
    0.539
   ],
   [
-   0.683,
+   0.745,
    0.87
   ],
   [
@@ -1829,6 +1829,11 @@
      "name": "BattleStartRound",
      "addr": "802124F4",
      "size": 488
+    },
+    {
+     "name": "BattleAdvance",
+     "addr": "80212A00",
+     "size": 484
     },
     {
      "name": "BattleIsFinalRound",

@@ -69,6 +69,11 @@
  "changelog": [
   {
    "date": "2026-11-18",
+   "time": "12:39",
+   "text": "Decompiled the battle phase machine: choose, start the turn, play the round (start the animation listeners, let the AI react or resolve the attack straight away), wait for the animations, end the round, and the battle-over state."
+  },
+  {
+   "date": "2026-11-18",
    "time": "12:37",
    "text": "Decompiled more of the battle round flow: starting a round (both choices stored, the round kind decided, shown on the HUD), taking a side's choice from its AI controller, and the end of the round's animations, where the second-strike enhancement can grant another attack with a tuned chance."
   },

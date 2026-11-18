@@ -765,3 +765,80 @@ void BattleOnListenerDone(u8* b, u32 who) {
 }
 
 }  // extern "C"
+
+extern "C" {
+void BattleResolveAttack(u8* b);                          // 0x80211180
+void RoundNoteAbility(void* round, s32 side, s32 limb, s32 ability);   // 0x802152B4
+void ListenerStart(u32 listener, void* round);            // 0x8020F27C
+}
+
+// Battle phases (+0xA18).
+enum {
+    PHASE_START, PHASE_CHOOSE, PHASE_RESOLVE, PHASE_TURN_START, PHASE_TURN, PHASE_ANIMATING,
+    PHASE_PLAY_ROUND, PHASE_ROUND_END, PHASE_OVER,
+};
+
+extern "C" {
+
+// 0x80212A00
+// Step the battle phase machine.
+void BattleAdvance(u8* b) {
+    s32* phase = (s32*)(b + 0xA18);
+    u8** ais = (u8**)(b + 0xA54);
+    switch (*phase) {
+    case PHASE_START:      *phase = PHASE_CHOOSE; break;
+    case PHASE_CHOOSE:     *phase = PHASE_TURN_START; break;
+    case PHASE_TURN_START: *phase = PHASE_TURN; break;
+    case PHASE_TURN:
+        // A second strike shows its ability on the attacking limb.
+        if (*(s32*)(b + 0xAEC) != 0) {
+            s32 att = *(s32*)(b + 0xA08);
+            u8* round = *(u8**)(b + 0xA0C);
+            s32 limb = *(s32*)(round + att * 0x38 + 0x38);
+            u8** st = FighterGetSlot(((u8**)(gBattle + 0xA00))[att], limb);
+            RoundNoteAbility(*(u8**)(b + 0xA0C), *(s32*)(b + 0xA08), limb, (*(s32**)st)[8]);
+            *(s32*)(b + 0xAEC) = 0;
+        }
+        *phase = PHASE_PLAY_ROUND;
+        break;
+    case PHASE_PLAY_ROUND: {
+        for (s32 i = 0; i < *(s32*)(b + 0xA30); i++) {
+            ListenerStart(*(u32*)(b + 0xA1C + i * 4), *(void**)(b + 0xA0C));
+            b[0xA2C + i] = 0;
+        }
+        u8* ai = ais[*(s32*)(b + 0xA08)];
+        if (**(s32**)(b + 0xA0C) != 6) {
+            if (ai != NULL) {
+                (*(void (**)(u8*))(*(u8**)ai + 0x10))(ai);
+                *phase = PHASE_RESOLVE;
+                break;
+            }
+        } else if (ai != NULL) {
+            ai[0x44] = 1;
+        }
+        BattleResolveAttack(b);
+        *phase = PHASE_ANIMATING;
+        break;
+    }
+    case PHASE_RESOLVE:
+        BattleResolveAttack(b);
+        *phase = PHASE_ANIMATING;
+        break;
+    case PHASE_ANIMATING: {
+        b[0xACC] = 0;
+        u8* ai = ais[*(s32*)(b + 0xA08)];
+        if (ai != NULL) ai[0x44] = 0;
+        *phase = PHASE_TURN;
+        break;
+    }
+    case PHASE_ROUND_END:
+        *phase = PHASE_CHOOSE;
+        b[0x9FE] = 0;
+        b[0x9FF] = 0;
+        break;
+    case PHASE_OVER:
+        break;
+    }
+}
+
+}  // extern "C"

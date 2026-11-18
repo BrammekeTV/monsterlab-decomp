@@ -762,3 +762,4 @@ fn_80221240 RngBelow
 fn_802124F4 BattleStartRound
 fn_80213308 BattleTakeChoice
 fn_80213158 BattleOnListenerDone
+fn_8020F27C ListenerStart
