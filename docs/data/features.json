@@ -69,6 +69,11 @@
   "changelog": [
     {
       "date": "2026-11-18",
+      "time": "16:08",
+      "text": "Decompiled the list of actions a fighter can use this turn (working limbs, energy cost, blocked while an effect is active) and the computer opponent's random action pick, plus the cleanup of fighter and limb status objects."
+    },
+    {
+      "date": "2026-11-18",
       "time": "16:03",
       "text": "Decompiled the main fighter reaction picker (hit, dodge, block or idle for the round) and the block animation names, which add a suffix for the kind of block (radioactive, acidic, celestial, explosive, fake)."
     },

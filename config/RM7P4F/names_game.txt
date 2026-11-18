@@ -806,3 +806,6 @@ fn_802157A0 ReactionBuildForAction
 fn_80215848 ReactionBuildInjure
 fn_80215AE8 ReactionBuildDodge
 fn_80215C5C ReactionBuildBlock
+fn_80213DC4 FighterStatsDestroy
+fn_8021415C BattleListActions
+fn_802147E0 BattleAiPickAction

@@ -1,15 +1,15 @@
 {
  "game_id": "RM7P4F",
- "generated": "2026-11-18T16:03:08+00:00",
- "commit": "affec4c",
- "commit_date": "2026-11-18T17:01:11+01:00",
+ "generated": "2026-11-18T16:08:20+00:00",
+ "commit": "eb86f07",
+ "commit_date": "2026-11-18T17:05:11+01:00",
  "game": {
   "functions": 8548,
   "bytes": 2265988,
-  "named": 2743,
-  "named_bytes": 613852,
-  "decompiled": 3022,
-  "decompiled_bytes": 306404
+  "named": 2746,
+  "named_bytes": 615336,
+  "decompiled": 3026,
+  "decompiled_bytes": 308060
  },
  "library": {
   "functions": 4039,
@@ -22,10 +22,10 @@
  "all": {
   "functions": 12587,
   "bytes": 3404928,
-  "named": 3206,
-  "named_bytes": 718600,
-  "decompiled": 3023,
-  "decompiled_bytes": 306524
+  "named": 3209,
+  "named_bytes": 720084,
+  "decompiled": 3027,
+  "decompiled_bytes": 308180
  },
  "game_range": [
   "80006B40",
@@ -1005,8 +1005,8 @@
    0.979
   ],
   [
-   0.799,
-   0.776
+   0.986,
+   0.944
   ],
   [
    0.187,
@@ -1804,6 +1804,31 @@
      "name": "AttackSequence_Update",
      "addr": "80049928",
      "size": 3244
+    }
+   ]
+  },
+  {
+   "path": "src/game/battle_ai.cpp",
+   "functions": [
+    {
+     "name": "FighterStatsDestroy",
+     "addr": "80213DC4",
+     "size": 176
+    },
+    {
+     "name": "BattleListActions",
+     "addr": "8021415C",
+     "size": 940
+    },
+    {
+     "name": "BattleAiPickAction",
+     "addr": "802147E0",
+     "size": 368
+    },
+    {
+     "name": "fn_802149AC",
+     "addr": "802149AC",
+     "size": 172
     }
    ]
   },
