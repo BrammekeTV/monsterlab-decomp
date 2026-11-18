@@ -1,15 +1,15 @@
 {
  "game_id": "RM7P4F",
- "generated": "2026-11-18T11:47:22+00:00",
- "commit": "76f3abf",
- "commit_date": "2026-11-18T12:45:34+01:00",
+ "generated": "2026-11-18T11:49:08+00:00",
+ "commit": "aca4037",
+ "commit_date": "2026-11-18T12:47:23+01:00",
  "game": {
   "functions": 8548,
   "bytes": 2265988,
-  "named": 2714,
-  "named_bytes": 604572,
-  "decompiled": 2200,
-  "decompiled_bytes": 266464
+  "named": 2720,
+  "named_bytes": 605280,
+  "decompiled": 2205,
+  "decompiled_bytes": 267080
  },
  "library": {
   "functions": 4039,
@@ -22,10 +22,10 @@
  "all": {
   "functions": 12587,
   "bytes": 3404928,
-  "named": 3176,
-  "named_bytes": 709200,
-  "decompiled": 2200,
-  "decompiled_bytes": 266464
+  "named": 3182,
+  "named_bytes": 709908,
+  "decompiled": 2205,
+  "decompiled_bytes": 267080
  },
  "game_range": [
   "80006B40",
@@ -886,7 +886,7 @@
   ],
   [
    0.009,
-   0.452
+   0.477
   ],
   [
    0.021,
@@ -994,15 +994,15 @@
   ],
   [
    0.036,
-   0.047
+   0.057
   ],
   [
    0.539,
    0.539
   ],
   [
-   0.849,
-   0.87
+   0.929,
+   0.923
   ],
   [
    0.35,
@@ -1816,6 +1816,11 @@
      "size": 32
     },
     {
+     "name": "ChoiceInit",
+     "addr": "8020F36C",
+     "size": 24
+    },
+    {
      "name": "BattleDecideRound",
      "addr": "80210AB8",
      "size": 1736
@@ -1889,6 +1894,31 @@
      "name": "PartDefCycleSameSlot",
      "addr": "80213A6C",
      "size": 240
+    },
+    {
+     "name": "RoundSideInit",
+     "addr": "80213B5C",
+     "size": 112
+    },
+    {
+     "name": "RoundSideDestroy",
+     "addr": "80213BCC",
+     "size": 156
+    },
+    {
+     "name": "ValueBoxCreate",
+     "addr": "80213C68",
+     "size": 120
+    },
+    {
+     "name": "ValueBoxDestroy",
+     "addr": "80213CE0",
+     "size": 88
+    },
+    {
+     "name": "FighterStatsInit",
+     "addr": "80213D38",
+     "size": 140
     },
     {
      "name": "FighterInitStats",
@@ -12934,11 +12964,6 @@
      "name": "fn_8020F364",
      "addr": "8020F364",
      "size": 8
-    },
-    {
-     "name": "fn_8020F36C",
-     "addr": "8020F36C",
-     "size": 24
     },
     {
      "name": "fn_8020F384",

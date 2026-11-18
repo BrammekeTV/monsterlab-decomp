@@ -1147,3 +1147,79 @@ void FighterAddEffect(u8* stats, s32 id) {
 }
 
 }  // extern "C"
+
+// ---------------------------------------------------------------- value boxes and records
+
+extern "C" {
+void* MemAllocSmall(u32 size);                            // 0x801D41CC
+void  MemFreeSmall(void* p);                              // 0x801D4340
+void* ChoiceDestroy(void* c, s32 del);                    // 0x8020F394
+}
+
+extern "C" {
+
+// 0x8020F36C
+// An empty action choice: no action, not charged, no limb.
+void ChoiceInit(u8* c) {
+    *(s32*)c = -1;
+    c[4] = 0;
+    *(s32*)(c + 8) = -1;
+}
+
+// 0x80213C68
+// A small array of `count` ints, all set to `fill`.
+void* ValueBoxCreate(void* box, s32 count, s32 fill) {
+    *(s32*)((u8*)box + 4) = count;
+    *(s32**)box = NULL;
+    s32* data = (s32*)MemAllocSmall(count * 4);
+    *(s32**)box = data;
+    for (s32 i = 0; i < *(s32*)((u8*)box + 4); i++) data[i] = fill;
+    return box;
+}
+
+// 0x80213CE0
+void ValueBoxDestroy(void* box, s32 del) {
+    if (box == NULL) return;
+    MemFreeSmall(*(void**)box);
+    if (del > 0) operator_delete(box);
+}
+
+// 0x80213D38
+// Fighter stats: owner, two 7-stat boxes (current and base), the chosen action, side, and
+// eight empty effect slots.
+u8* FighterStatsInit(u8* s, u32 owner, s32 side) {
+    *(u32*)s = owner;
+    ValueBoxCreate(s + 4, 7, 0);
+    ValueBoxCreate(s + 0xC, 7, 0);
+    ChoiceInit(s + 0x18);
+    *(s32*)(s + 0x24) = side;
+    for (s32 i = 0; i < 8; i++) *(u32*)(s + 0x28 + i * 4) = 0;
+    return s;
+}
+
+// 0x80213B5C
+// One side of a round record: no damage records, no attacker records, empty choice.
+u8* RoundSideInit(u8* r) {
+    *(u32*)(r + 0x28) = 0;
+    ChoiceInit(r + 0x2C);
+    for (s32 i = 0; i < 5; i++) {
+        *(u32*)(r + i * 4) = 0;
+        *(u32*)(r + 0x14 + i * 4) = 0;
+    }
+    *(u32*)(r + 0x28) = 0;
+    return r;
+}
+
+// 0x80213BCC
+u8* RoundSideDestroy(u8* r, s32 del) {
+    if (r == NULL) return r;
+    for (s32 i = 0; i < 5; i++) {
+        DamageRecordDestroy(*(u8**)(r + i * 4), 1);
+        EffectRecordDestroy(*(u8**)(r + 0x14 + i * 4), 1);
+    }
+    ChoiceDestroy(r + 0x2C, -1);
+    if (del > 0) operator_delete(r);
+    return r;
+}
+
+}  // extern "C"

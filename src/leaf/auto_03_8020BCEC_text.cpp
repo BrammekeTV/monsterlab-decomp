@@ -93,13 +93,6 @@ extern "C" s32 fn_8020F364(void) {
     return (s32)(1);
 }
 
-// 0x8020F36C
-extern "C" void fn_8020F36C(u8* a3) {
-    *(u32*)(((u8*)(uintptr_t)(a3)) + 0) = (u32)((u32)(-1));
-    *(u8*)(((u8*)(uintptr_t)(a3)) + 4) = (u8)((u32)(0));
-    *(u32*)(((u8*)(uintptr_t)(a3)) + 8) = (u32)((u32)(-1));
-}
-
 // 0x8020F384
 extern "C" void fn_8020F384(u8* a3, s32 a4, s32 a5, s32 a6) {
     *(u32*)(((u8*)(uintptr_t)(a3)) + 0) = (u32)((u32)(uintptr_t)(a4));

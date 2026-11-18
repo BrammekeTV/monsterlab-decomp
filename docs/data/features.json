@@ -69,6 +69,11 @@
  "changelog": [
   {
    "date": "2026-11-18",
+   "time": "12:49",
+   "text": "Decompiled the small battle building blocks: value boxes (the int arrays used for stats and damage), fighter stats setup (two 7-stat boxes, chosen action, side, eight effect slots), empty action choices, and the round-side records with their constructors and destructors."
+  },
+  {
+   "date": "2026-11-18",
    "time": "12:47",
    "text": "Decompiled the effect slots: adding an effect to a limb (3 slots) or fighter (8 slots) refreshes it if already present or fills the last free slot, limb effects tick down and expire, on-hit hooks run, and damage is applied to a limb as a list of stat changes."
   },
