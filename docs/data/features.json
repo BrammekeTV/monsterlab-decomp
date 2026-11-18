@@ -69,6 +69,11 @@
  "changelog": [
   {
    "date": "2026-11-18",
+   "time": "11:56",
+   "text": "Decompiled 48 script callbacks for the player's save: quest flags and levels, badges (what I had been calling achievements are the game's badges), adding and removing monsters, parts and ingredients, the 128 quest items, quest/challenge/experiment/combat rewards, and regions and locations. Each one forwards to the save object."
+  },
+  {
+   "date": "2026-11-18",
    "time": "11:43",
    "text": "Parts pipeline, part 6: fitting and removing parts on a monster (keeping its total power up to date), monster names (16 characters, stored offset by 0x20), finding which lab monster a part belongs to, and the part and spec power helpers."
   },

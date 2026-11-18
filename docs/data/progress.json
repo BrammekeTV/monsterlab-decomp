@@ -1,31 +1,31 @@
 {
  "game_id": "RM7P4F",
- "generated": "2026-11-18T10:43:13+00:00",
- "commit": "55ed428",
- "commit_date": "2026-11-18T11:36:57+01:00",
+ "generated": "2026-11-18T10:56:54+00:00",
+ "commit": "7a96956",
+ "commit_date": "2026-11-18T11:43:14+01:00",
  "game": {
   "functions": 8548,
   "bytes": 2265988,
-  "named": 2594,
-  "named_bytes": 566272,
-  "decompiled": 2033,
-  "decompiled_bytes": 240664
+  "named": 2613,
+  "named_bytes": 571432,
+  "decompiled": 2081,
+  "decompiled_bytes": 243172
  },
  "library": {
   "functions": 4039,
   "bytes": 1138940,
-  "named": 459,
-  "named_bytes": 104464,
+  "named": 461,
+  "named_bytes": 104536,
   "decompiled": 0,
   "decompiled_bytes": 0
  },
  "all": {
   "functions": 12587,
   "bytes": 3404928,
-  "named": 3053,
-  "named_bytes": 670736,
-  "decompiled": 2033,
-  "decompiled_bytes": 240664
+  "named": 3074,
+  "named_bytes": 675968,
+  "decompiled": 2081,
+  "decompiled_bytes": 243172
  },
  "game_range": [
   "80006B40",
@@ -1029,16 +1029,16 @@
    0.195
   ],
   [
-   0.011,
-   0.529
+   0.348,
+   0.606
   ],
   [
    0.002,
-   0.108
+   0.514
   ],
   [
    0.013,
-   0.155
+   0.244
   ],
   [
    0.326,
@@ -1054,7 +1054,7 @@
   ],
   [
    0.006,
-   0.045
+   0.055
   ]
  ],
  "library_regions": [
@@ -1174,8 +1174,8 @@
    "end": "8033F400",
    "functions": 399,
    "bytes": 114196,
-   "named": 52,
-   "named_bytes": 14508,
+   "named": 54,
+   "named_bytes": 14580,
    "decompiled": 0,
    "decompiled_bytes": 0
   },
@@ -3214,6 +3214,251 @@
      "name": "PartGetMadness",
      "addr": "8021EF80",
      "size": 48
+    }
+   ]
+  },
+  {
+   "path": "src/game/player_api.cpp",
+   "functions": [
+    {
+     "name": "GetNumBattlesLostConsecutively",
+     "addr": "802212C8",
+     "size": 28
+    },
+    {
+     "name": "SetQuestFlag",
+     "addr": "802212E4",
+     "size": 44
+    },
+    {
+     "name": "SetQuestLevel",
+     "addr": "80221310",
+     "size": 36
+    },
+    {
+     "name": "GetQuestFlag",
+     "addr": "80221334",
+     "size": 44
+    },
+    {
+     "name": "GetQuestLevel",
+     "addr": "80221360",
+     "size": 36
+    },
+    {
+     "name": "IsQuestAtLevel",
+     "addr": "80221384",
+     "size": 116
+    },
+    {
+     "name": "IsQuestFlagTrue",
+     "addr": "802213F8",
+     "size": 96
+    },
+    {
+     "name": "IsQuestFlagFalse",
+     "addr": "80221458",
+     "size": 96
+    },
+    {
+     "name": "IsActiveQuest",
+     "addr": "802214B8",
+     "size": 88
+    },
+    {
+     "name": "QueueGameEvent",
+     "addr": "80221510",
+     "size": 48
+    },
+    {
+     "name": "AddBadge",
+     "addr": "80221540",
+     "size": 28
+    },
+    {
+     "name": "RemoveBadge",
+     "addr": "8022155C",
+     "size": 28
+    },
+    {
+     "name": "HasBadge",
+     "addr": "80221578",
+     "size": 36
+    },
+    {
+     "name": "GetNumBadges",
+     "addr": "8022159C",
+     "size": 28
+    },
+    {
+     "name": "RemovePlayerMonster",
+     "addr": "802215BC",
+     "size": 28
+    },
+    {
+     "name": "GetPlayerMonster",
+     "addr": "802215D8",
+     "size": 36
+    },
+    {
+     "name": "AddPartToPlayerInventory",
+     "addr": "802215FC",
+     "size": 160
+    },
+    {
+     "name": "AddPlayerPart",
+     "addr": "8022169C",
+     "size": 76
+    },
+    {
+     "name": "RemovePlayerPart",
+     "addr": "802216E8",
+     "size": 28
+    },
+    {
+     "name": "GetPlayerPart",
+     "addr": "80221704",
+     "size": 36
+    },
+    {
+     "name": "GetNumPlayerMonsters",
+     "addr": "80221728",
+     "size": 28
+    },
+    {
+     "name": "GetNumPlayerParts",
+     "addr": "80221744",
+     "size": 28
+    },
+    {
+     "name": "IsPlayerPartInventoryFull",
+     "addr": "80221760",
+     "size": 48
+    },
+    {
+     "name": "AddPlayerKeyIngredient",
+     "addr": "80221790",
+     "size": 40
+    },
+    {
+     "name": "RemovePlayerKeyIngredient",
+     "addr": "802217B8",
+     "size": 36
+    },
+    {
+     "name": "PlayerHasKeyIngredient",
+     "addr": "802217DC",
+     "size": 44
+    },
+    {
+     "name": "AddPlayerSecondaryIngredient",
+     "addr": "80221808",
+     "size": 40
+    },
+    {
+     "name": "RemovePlayerSecondaryIngredient",
+     "addr": "80221830",
+     "size": 36
+    },
+    {
+     "name": "PlayerHasPart",
+     "addr": "80221854",
+     "size": 96
+    },
+    {
+     "name": "PlayerHasSecondaryIngredient",
+     "addr": "802218B4",
+     "size": 44
+    },
+    {
+     "name": "AddPlayerQuestItem",
+     "addr": "802218E0",
+     "size": 152
+    },
+    {
+     "name": "RemovePlayerQuestItem",
+     "addr": "80221978",
+     "size": 168
+    },
+    {
+     "name": "PlayerHasQuestItem",
+     "addr": "80221A20",
+     "size": 124
+    },
+    {
+     "name": "GetNumPlayerQuestItems",
+     "addr": "80221A9C",
+     "size": 28
+    },
+    {
+     "name": "AddPlayerQuestReward",
+     "addr": "80221AB8",
+     "size": 28
+    },
+    {
+     "name": "GivePlayerQuestReward",
+     "addr": "80221AD4",
+     "size": 12
+    },
+    {
+     "name": "RewardPlayerQuest",
+     "addr": "80221AE0",
+     "size": 12
+    },
+    {
+     "name": "RemovePlayerQuestReward",
+     "addr": "80221AEC",
+     "size": 28
+    },
+    {
+     "name": "RewardPlayerChallenge",
+     "addr": "80221B08",
+     "size": 28
+    },
+    {
+     "name": "RewardPlayerExperiment",
+     "addr": "80221B24",
+     "size": 36
+    },
+    {
+     "name": "RewardPlayerCombat",
+     "addr": "80221B48",
+     "size": 20
+    },
+    {
+     "name": "IsRegionReached",
+     "addr": "80221B64",
+     "size": 40
+    },
+    {
+     "name": "IsRegionLocked",
+     "addr": "80221B8C",
+     "size": 72
+    },
+    {
+     "name": "SetRegionReached",
+     "addr": "80221BD8",
+     "size": 52
+    },
+    {
+     "name": "SetNextLocation",
+     "addr": "80221C0C",
+     "size": 20
+    },
+    {
+     "name": "SetCurrentLocation",
+     "addr": "80221C20",
+     "size": 52
+    },
+    {
+     "name": "GetNextLocation",
+     "addr": "80221C54",
+     "size": 52
+    },
+    {
+     "name": "GetNextRegion",
+     "addr": "80221C88",
+     "size": 28
     }
    ]
   },
@@ -12376,7 +12621,7 @@
      "size": 12
     },
     {
-     "name": "fn_802233CC",
+     "name": "SaveCountBadges",
      "addr": "802233CC",
      "size": 8
     },
@@ -12386,12 +12631,12 @@
      "size": 8
     },
     {
-     "name": "fn_802255F0",
+     "name": "SaveRewardCombat",
      "addr": "802255F0",
      "size": 12
     },
     {
-     "name": "fn_80225654",
+     "name": "SaveGetNextRegion",
      "addr": "80225654",
      "size": 8
     },

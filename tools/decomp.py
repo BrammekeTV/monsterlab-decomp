@@ -89,7 +89,25 @@ def load_symbols():
     return by_addr, by_name
 
 
+_FN_INDEX = None
+
+
+def fn_index():
+    """Map function start address -> (asm file, function name), built once per run."""
+    global _FN_INDEX
+    if _FN_INDEX is None:
+        _FN_INDEX = {}
+        for f in glob.glob(os.path.join(ASM, "*_text.s")) + glob.glob(os.path.join(ASM, "*init*.s")):
+            text = open(f, encoding="utf-8", errors="replace").read()
+            for m in re.finditer(r"^\.fn (\S+), \w+\n(?:[^\n]*\n)*?/\* ([0-9A-F]{8}) ", text, re.M):
+                _FN_INDEX.setdefault(m.group(2), (f, m.group(1)))
+    return _FN_INDEX
+
+
 def find_asm(addr, names):
+    hit = fn_index().get(addr)
+    if hit:
+        return hit
     for f in glob.glob(os.path.join(ASM, "*_text.s")) + glob.glob(os.path.join(ASM, "*init*.s")):
         text = open(f, encoding="utf-8", errors="replace").read()
         for n in names:

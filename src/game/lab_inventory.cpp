@@ -12,8 +12,8 @@ void  operator_delete(void* p);                                 // 0x801D4980
 void  PartInit(PartInstance* p);                                // 0x8021D320
 void  PartDestroy(PartInstance* p, s32 del);                    // 0x8021D374
 void  PartClear(PartInstance* p);                               // 0x8021D408
-void  SaveUnlockAchievement(u8* save, s32 id);                  // 0x802233D4
-void  SaveUnlockTieredAchievements(u8* save, s32 value, s32 n, const s32* ids, const s32* thresholds);  // 0x80228604
+void  SaveAddBadge(u8* save, s32 id);                  // 0x802233D4
+void  SaveAddTieredBadges(u8* save, s32 value, s32 n, const s32* ids, const s32* thresholds);  // 0x80228604
 BOOL  fn_8022E170(u8* save);
 }
 extern u8* gSaveSystem;            // 0x805FBBE0 (+0x114 = current monster)
@@ -174,7 +174,7 @@ u8* LabAllocMonster(LabInventory* inv) {
         if (m != NULL) {
             ((MonsterVFn)MVT(m, 0xC))(m);
             if (!fn_8022E170(gSaveSystem)) *(u8**)(gSaveSystem + 0x114) = m;
-            if (++inv->monsterCount == MAX_MONSTERS) SaveUnlockAchievement(gSaveSystem, 0x40);   // full lab
+            if (++inv->monsterCount == MAX_MONSTERS) SaveAddBadge(gSaveSystem, 0x40);   // full lab
         }
     }
     return m;
@@ -226,7 +226,7 @@ BOOL LabAddMaterial(LabInventory* inv, s32 index, s32 kind, s32 amount, BOOL not
                 if (inv->materials[i].count != 0) owned++;
             static const s32 kIds[3] = { 0x89, 0x8A, 0x8B };         // 0x803497D8
             static const s32 kThresholds[3] = { 0x7D, 0x7E, 0x7F };   // 0x803497E4
-            SaveUnlockTieredAchievements(gSaveSystem, owned, 3, kIds, kThresholds);
+            SaveAddTieredBadges(gSaveSystem, owned, 3, kIds, kThresholds);
         } else if (kind == 1) {
             s32 g1 = 0, g2 = 0, g3 = 0;
             for (s32 i = MATERIALS_A; i < MATERIALS; i++) {
@@ -235,9 +235,9 @@ BOOL LabAddMaterial(LabInventory* inv, s32 index, s32 kind, s32 amount, BOOL not
                 else if (i >= 65 && i < 85) g2++;
                 else if (i >= 85 && i < 105) g3++;
             }
-            if (g1 >= 20) SaveUnlockAchievement(gSaveSystem, 0x82);
-            if (g2 >= 20) SaveUnlockAchievement(gSaveSystem, 0x80);
-            if (g3 >= 20) SaveUnlockAchievement(gSaveSystem, 0x81);
+            if (g1 >= 20) SaveAddBadge(gSaveSystem, 0x82);
+            if (g2 >= 20) SaveAddBadge(gSaveSystem, 0x80);
+            if (g3 >= 20) SaveAddBadge(gSaveSystem, 0x81);
         }
     }
     return ok;
