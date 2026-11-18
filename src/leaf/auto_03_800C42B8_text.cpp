@@ -41,7 +41,6 @@ extern "C" void fn_800C4498(s32 a3, u8* a4) {
 
 // 0x800C44A0
 extern "C" void fn_800C44A0(u8* a3, u8* a4) {
-    // tail-call arguments inferred from the registers set before the call
     if (a4 == 0) {
         return;
     }

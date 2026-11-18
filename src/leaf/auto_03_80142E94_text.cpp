@@ -9,6 +9,7 @@ extern u8 lbl_80375E24[];
 extern u8 lbl_80375E4C[];
 extern u8 lbl_803F2890[];
 extern "C" void DCFlushRange(void*, u32);
+extern "C" void fn_80330E20(void*);
 
 // 0x80142E94
 extern "C" void fn_80142E94(u8* a3, s32 a4) {
@@ -51,6 +52,11 @@ extern "C" s32 fn_80142EE0(void) {
 
 // 0x80142EE8
 extern "C" void fn_80142EE8(void) {
+}
+
+// 0x80142EF0
+extern "C" void fn_80142EF0(u8* a3) {
+    fn_80330E20((void*)(((u8*)(uintptr_t)(a3))));
 }
 
 // 0x80142EF4

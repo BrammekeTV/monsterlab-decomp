@@ -23,6 +23,7 @@ extern "C" void fn_80184314(s32, s32, s32);
 extern "C" void fn_80184490(s32, s32, s32);
 extern "C" void fn_8018979C(s32, s32, s32, s32);
 extern "C" void fn_801EF070(u8*, s32);
+extern "C" void fn_80330E20(void*);
 
 // 0x8016EB0C
 extern "C" void fn_8016EB0C(u8* a3, f32 f1, f32 f2) {
@@ -150,6 +151,11 @@ extern "C" void* fn_80173284(s32 a3) {
 // 0x80173294
 extern "C" void fn_80173294(u8* a3) {
     MEMFreeToAllocator((u8*)lbl_803F2880, (void*)(((u8*)(uintptr_t)(a3))));
+}
+
+// 0x801732AC
+extern "C" void fn_801732AC(u8* a3) {
+    fn_80330E20((void*)(((u8*)(uintptr_t)(a3))));
 }
 
 // 0x801736E4

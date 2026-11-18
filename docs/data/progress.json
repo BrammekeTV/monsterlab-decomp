@@ -1,15 +1,15 @@
 {
  "game_id": "RM7P4F",
- "generated": "2026-11-18T17:51:53+00:00",
- "commit": "22a700c",
- "commit_date": "2026-11-18T18:45:30+01:00",
+ "generated": "2026-11-18T17:58:08+00:00",
+ "commit": "885cf9c",
+ "commit_date": "2026-11-18T18:51:55+01:00",
  "game": {
   "functions": 8548,
   "bytes": 2265988,
   "named": 2748,
   "named_bytes": 616800,
-  "decompiled": 4103,
-  "decompiled_bytes": 413916
+  "decompiled": 4165,
+  "decompiled_bytes": 419152
  },
  "library": {
   "functions": 4039,
@@ -24,8 +24,8 @@
   "bytes": 3404928,
   "named": 3211,
   "named_bytes": 721548,
-  "decompiled": 4104,
-  "decompiled_bytes": 414036
+  "decompiled": 4166,
+  "decompiled_bytes": 419272
  },
  "game_range": [
   "80006B40",
@@ -497,7 +497,7 @@
    0.0
   ],
   [
-   0.513,
+   0.644,
    1.0
   ],
   [
@@ -505,19 +505,19 @@
    1.0
   ],
   [
-   0.662,
+   0.732,
    0.883
   ],
   [
-   0.081,
+   0.129,
    0.224
   ],
   [
-   0.027,
+   0.119,
    0.058
   ],
   [
-   0.819,
+   0.823,
    0.865
   ],
   [
@@ -705,7 +705,7 @@
    0.035
   ],
   [
-   0.008,
+   0.009,
    0.0
   ],
   [
@@ -733,11 +733,11 @@
    0.0
   ],
   [
-   0.002,
+   0.018,
    0.0
   ],
   [
-   0.014,
+   0.098,
    0.014
   ],
   [
@@ -745,15 +745,15 @@
    0.0
   ],
   [
-   0.005,
+   0.052,
    0.0
   ],
   [
-   0.001,
+   0.006,
    0.0
   ],
   [
-   0.026,
+   0.062,
    0.257
   ],
   [
@@ -937,7 +937,7 @@
    0.068
   ],
   [
-   0.47,
+   0.483,
    0.478
   ],
   [
@@ -945,19 +945,19 @@
    0.292
   ],
   [
-   0.066,
+   0.119,
    0.097
   ],
   [
-   0.082,
+   0.094,
    0.0
   ],
   [
-   0.049,
+   0.139,
    0.0
   ],
   [
-   0.056,
+   0.106,
    0.214
   ],
   [
@@ -1524,6 +1524,111 @@
      "name": "SgInit",
      "addr": "801695A4",
      "size": 96
+    }
+   ]
+  },
+  {
+   "path": "src/engine/small_8018.cpp",
+   "functions": [
+    {
+     "name": "fn_80181D84",
+     "addr": "80181D84",
+     "size": 92
+    },
+    {
+     "name": "fn_80183F20",
+     "addr": "80183F20",
+     "size": 64
+    },
+    {
+     "name": "fn_80183F64",
+     "addr": "80183F64",
+     "size": 60
+    },
+    {
+     "name": "fn_80183FCC",
+     "addr": "80183FCC",
+     "size": 92
+    },
+    {
+     "name": "TextureRelease",
+     "addr": "80184028",
+     "size": 116
+    },
+    {
+     "name": "fn_8018409C",
+     "addr": "8018409C",
+     "size": 72
+    },
+    {
+     "name": "fn_80184278",
+     "addr": "80184278",
+     "size": 56
+    },
+    {
+     "name": "fn_80184414",
+     "addr": "80184414",
+     "size": 116
+    },
+    {
+     "name": "fn_80184590",
+     "addr": "80184590",
+     "size": 116
+    },
+    {
+     "name": "fn_80187D18",
+     "addr": "80187D18",
+     "size": 56
+    },
+    {
+     "name": "fn_80187D50",
+     "addr": "80187D50",
+     "size": 104
+    },
+    {
+     "name": "fn_80188E14",
+     "addr": "80188E14",
+     "size": 72
+    },
+    {
+     "name": "fn_80188E5C",
+     "addr": "80188E5C",
+     "size": 120
+    },
+    {
+     "name": "fn_801894B8",
+     "addr": "801894B8",
+     "size": 60
+    },
+    {
+     "name": "fn_8018A3EC",
+     "addr": "8018A3EC",
+     "size": 48
+    },
+    {
+     "name": "fn_8018BDE0",
+     "addr": "8018BDE0",
+     "size": 80
+    },
+    {
+     "name": "fn_8018BE30",
+     "addr": "8018BE30",
+     "size": 72
+    },
+    {
+     "name": "AnimGetFrame",
+     "addr": "8018C014",
+     "size": 48
+    },
+    {
+     "name": "fn_8018C044",
+     "addr": "8018C044",
+     "size": 56
+    },
+    {
+     "name": "fn_8018C39C",
+     "addr": "8018C39C",
+     "size": 52
     }
    ]
   },
@@ -2356,6 +2461,11 @@
    "path": "src/engine/small_801F.cpp",
    "functions": [
     {
+     "name": "fn_801F005C",
+     "addr": "801F005C",
+     "size": 128
+    },
+    {
      "name": "fn_801F2BCC",
      "addr": "801F2BCC",
      "size": 68
@@ -2371,6 +2481,26 @@
      "size": 64
     },
     {
+     "name": "fn_801F5294",
+     "addr": "801F5294",
+     "size": 116
+    },
+    {
+     "name": "fn_801F5308",
+     "addr": "801F5308",
+     "size": 124
+    },
+    {
+     "name": "ScopedLockDtor",
+     "addr": "801F53B0",
+     "size": 88
+    },
+    {
+     "name": "fn_801F5414",
+     "addr": "801F5414",
+     "size": 112
+    },
+    {
      "name": "fn_801F5734",
      "addr": "801F5734",
      "size": 92
@@ -2384,6 +2514,11 @@
      "name": "fn_801F59B0",
      "addr": "801F59B0",
      "size": 64
+    },
+    {
+     "name": "fn_801F5A14",
+     "addr": "801F5A14",
+     "size": 124
     },
     {
      "name": "fn_801F5B44",
@@ -2441,13 +2576,78 @@
      "size": 68
     },
     {
+     "name": "fn_801F8F34",
+     "addr": "801F8F34",
+     "size": 108
+    },
+    {
+     "name": "fn_801F8FA0",
+     "addr": "801F8FA0",
+     "size": 108
+    },
+    {
      "name": "fn_801F900C",
      "addr": "801F900C",
      "size": 48
     },
     {
+     "name": "fn_801F94B0",
+     "addr": "801F94B0",
+     "size": 60
+    },
+    {
      "name": "fn_801F94EC",
      "addr": "801F94EC",
+     "size": 88
+    },
+    {
+     "name": "fn_801F9544",
+     "addr": "801F9544",
+     "size": 84
+    },
+    {
+     "name": "fn_801F9598",
+     "addr": "801F9598",
+     "size": 88
+    },
+    {
+     "name": "fn_801F9C2C",
+     "addr": "801F9C2C",
+     "size": 76
+    },
+    {
+     "name": "fn_801F9C78",
+     "addr": "801F9C78",
+     "size": 88
+    },
+    {
+     "name": "fn_801F9CD0",
+     "addr": "801F9CD0",
+     "size": 108
+    },
+    {
+     "name": "fn_801FA048",
+     "addr": "801FA048",
+     "size": 88
+    },
+    {
+     "name": "fn_801FA7CC",
+     "addr": "801FA7CC",
+     "size": 96
+    },
+    {
+     "name": "fn_801FA82C",
+     "addr": "801FA82C",
+     "size": 88
+    },
+    {
+     "name": "fn_801FA884",
+     "addr": "801FA884",
+     "size": 68
+    },
+    {
+     "name": "fn_801FA8C8",
+     "addr": "801FA8C8",
      "size": 88
     }
    ]
@@ -9766,6 +9966,11 @@
      "size": 56
     },
     {
+     "name": "PlayEffect",
+     "addr": "801037DC",
+     "size": 100
+    },
+    {
      "name": "PlayEffectTransient",
      "addr": "80103840",
      "size": 88
@@ -9774,6 +9979,16 @@
      "name": "fn_801068A8",
      "addr": "801068A8",
      "size": 88
+    },
+    {
+     "name": "fn_80106920",
+     "addr": "80106920",
+     "size": 104
+    },
+    {
+     "name": "fn_801069B0",
+     "addr": "801069B0",
+     "size": 124
     },
     {
      "name": "fn_80106A2C",
@@ -9809,6 +10024,21 @@
      "name": "Level_PrintFloat",
      "addr": "80106DDC",
      "size": 92
+    },
+    {
+     "name": "FSM_PrintBit",
+     "addr": "80106F58",
+     "size": 116
+    },
+    {
+     "name": "FSM_PrintInt",
+     "addr": "80106FCC",
+     "size": 116
+    },
+    {
+     "name": "FSM_PrintFloat",
+     "addr": "80107040",
+     "size": 112
     },
     {
      "name": "fn_801070B0",
@@ -9854,6 +10084,76 @@
      "name": "fn_80109134",
      "addr": "80109134",
      "size": 64
+    },
+    {
+     "name": "fn_80109174",
+     "addr": "80109174",
+     "size": 64
+    },
+    {
+     "name": "fn_80109BA4",
+     "addr": "80109BA4",
+     "size": 60
+    },
+    {
+     "name": "fn_80109BE0",
+     "addr": "80109BE0",
+     "size": 100
+    },
+    {
+     "name": "GameNetObserveChunkCallback",
+     "addr": "80109C44",
+     "size": 84
+    },
+    {
+     "name": "GetHelloPayloadCallback",
+     "addr": "8010A1C8",
+     "size": 84
+    },
+    {
+     "name": "ProcessHelloPayloadCallback",
+     "addr": "8010A21C",
+     "size": 112
+    },
+    {
+     "name": "GameNetStartHostGame",
+     "addr": "8010A3C0",
+     "size": 108
+    },
+    {
+     "name": "GameNetStartClientGame",
+     "addr": "8010A434",
+     "size": 104
+    },
+    {
+     "name": "fn_8010AB3C",
+     "addr": "8010AB3C",
+     "size": 52
+    },
+    {
+     "name": "fn_8010AB70",
+     "addr": "8010AB70",
+     "size": 56
+    },
+    {
+     "name": "fn_8010B184",
+     "addr": "8010B184",
+     "size": 124
+    },
+    {
+     "name": "fn_8010B4C0",
+     "addr": "8010B4C0",
+     "size": 76
+    },
+    {
+     "name": "fn_8010BF6C",
+     "addr": "8010BF6C",
+     "size": 76
+    },
+    {
+     "name": "RenderObjectZoneUnloadCallback",
+     "addr": "8010C784",
+     "size": 60
     }
    ]
   },
@@ -19646,6 +19946,11 @@
      "size": 4
     },
     {
+     "name": "fn_80142EF0",
+     "addr": "80142EF0",
+     "size": 4
+    },
+    {
      "name": "fn_80142EF4",
      "addr": "80142EF4",
      "size": 4
@@ -19754,6 +20059,11 @@
      "name": "RendDefaultFree",
      "addr": "80148540",
      "size": 16
+    },
+    {
+     "name": "RendDefaultFreeAny",
+     "addr": "80148558",
+     "size": 4
     },
     {
      "name": "fn_80148770",
@@ -20214,6 +20524,11 @@
      "name": "fn_80173294",
      "addr": "80173294",
      "size": 16
+    },
+    {
+     "name": "fn_801732AC",
+     "addr": "801732AC",
+     "size": 4
     },
     {
      "name": "fn_801736E4",

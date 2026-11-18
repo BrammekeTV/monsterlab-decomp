@@ -11,7 +11,7 @@ u8*     fn_801B3604(u8* p, s32 del);                                 // 0x801B36
 void    fn_80146F50(u8* p, s32 a);                                   // 0x80146F50 (base dtor)
 void    fn_80146FD8(u8* p, s32 a);                                   // 0x80146FD8 (base dtor)
 void    fn_80147150(u8* p, s32 a);                                   // 0x80147150 (base dtor)
-void    fn_801FA82C(u8* p, s32 a);                                   // 0x801FA82C (base dtor)
+u8*     fn_801FA82C(u8* p, s32 del);                                 // 0x801FA82C (deleting dtor)
 s32     fn_801F5294(s32 idx);                                        // 0x801F5294
 void    fn_801F5E3C(void* a, const void* b, s32 c);                  // 0x801F5E3C (leaf in src/leaf, takes args here)
 }
@@ -215,6 +215,225 @@ void fn_801F900C(u8* p, const u8* src) {
 u8* fn_801F94EC(u8* p, s32 del) {
     if (p) {
         fn_801F858C(p, 0);
+        if (del > 0) operator_delete(p);
+    }
+    return p;
+}
+
+// Helpers and globals used by the functions below.
+struct ScriptFunc { u32 type; void* fn; u32 hash; };   // 0xC bytes (as in script_dispatch.cpp)
+struct ScopedLock { u8 pad[4]; };                       // as in props.cpp
+
+extern ScriptFunc gScriptFuncs[];                       // 0x80484230
+extern s32 lbl_805F9800;                                // script function index for the fallback call
+extern s32 lbl_80386064[];                              // 0x80386064 table (read at idx - 0x5F)
+extern u8  lbl_80386338[];                              // 0x80386338 (vtable)
+extern u8  lbl_80386390[];                              // 0x80386390 (vtable)
+extern u8  lbl_803863D8[];                              // 0x803863D8 (vtable)
+extern u8  lbl_80386478[];                              // 0x80386478 (vtable)
+extern u8  lbl_80386490[];                              // 0x80386490 (vtable)
+extern u8  lbl_804FB5E0[];                              // 0x804FB5E0 (object passed to fn_801F5E4C / fn_801F5E48)
+extern const char lbl_805F9714[];                       // 0x805F9714 (scan format for fn_8033861C)
+extern u32 lbl_805FB9A4;                                // 0x805FB9A4 (lock flag, see world_update.cpp)
+extern s32 lbl_805FB9D8;                                // 0x805FB9D8
+extern void* lbl_805FB968;                              // 0x805FB968 (current target pointer)
+extern f32 lbl_80600080;                                // 0x80600080 (default float)
+extern f32 lbl_80600220;                                // 0x80600220
+extern f32 lbl_80600224;                                // 0x80600224
+extern f32 lbl_80600228;                                // 0x80600228
+extern f32 lbl_80600248;                                // 0x80600248 (1.0 numerator in fn_801F9CD0)
+extern f32 lbl_8060024C;                                // 0x8060024C
+extern f32 lbl_80600250;                                // 0x80600250
+extern f32 lbl_80600278;                                // 0x80600278
+
+// Callees not defined in this file.
+s32     fn_8033861C(const char* s, const char* fmt, f32* out);      // 0x8033861C (scan)
+void    fn_801F5E4C(void* a, s32 b);                                 // 0x801F5E4C (leaf in src/leaf, takes args here)
+void    fn_801F5E48(void* a, s32 b);                                 // 0x801F5E48 (leaf in src/leaf, takes args here)
+void    fn_801F8238(u8* p, s32 a4);                                  // 0x801F8238
+void    fn_801F95F0(u8* p, s32 a4, f32 dt);                          // 0x801F95F0
+u8*     fn_801B365C(u8* p, s32 a4);                                  // 0x801B365C (small_801B.cpp)
+u8*     fn_801B36A8(u8* p, s32 del);                                 // 0x801B36A8 (small_801B.cpp)
+u8*     fn_801FA7CC(u8* p, s32 a4);                                  // 0x801FA7CC (defined below)
+u8*     fn_801F9544(u8* p, s32 a4);                                  // 0x801F9544 (defined below)
+u8*     fn_801FA82C(u8* p, s32 del);                                 // 0x801FA82C (defined below)
+
+// 0x801F005C
+// Reads a float from the text at s (skipping leading spaces and '=') into the record at +0x8.
+// Keeps the default value when the scan fails.
+void fn_801F005C(u8* p, const char* s) {
+    while (*s == ' ' || *s == '=') s++;
+    f32 v = lbl_80600080;
+    fn_8033861C(s, lbl_805F9714, &v);
+    *(f32*)(p + 0x8) = v;
+}
+
+// 0x801F5294
+// Resolves a 7-bit id: 0x5F-0x7F read the static table at lbl_80386064; anything else calls the
+// registered script function at index lbl_805F9800 with idx.
+s32 fn_801F5294(s32 idx) {
+    u32 u = (u32)idx;
+    if (u >= 0x5f && u <= 0x7f) return lbl_80386064[u - 0x5f];
+    ScriptFunc* f = &gScriptFuncs[lbl_805F9800];
+    return ((s32 (*)(s32))f->fn)(idx);
+}
+
+// 0x801F5308
+// Reads the 7-bit id in bits 5-11 of the word at p and resolves it with fn_801F5294.
+s32 fn_801F5308(u8* p) {
+    u32 w = *(u32*)p;
+    return fn_801F5294((s32)((w >> 20) & 0x7f));
+}
+
+// 0x801F53B0
+// Deleting destructor for a scoped lock: clears the lock flag when the lock's first word is 0,
+// then frees the object if flags > 0.
+void ScopedLockDtor(ScopedLock* l, s32 flags) {
+    if (l) {
+        if (*(s32*)l == 0) lbl_805FB9A4 = 0;
+        if (flags > 0) operator_delete(l);
+    }
+}
+
+// 0x801F5414
+// While the movie player flag lbl_805FB970 is set, records p as the current target and runs the
+// lbl_804FB5E0 setup calls when no slot is set (lbl_805FB9D8 is re-read after the first call).
+void fn_801F5414(u8* p) {
+    if (lbl_805FB970 == 0) return;
+    if (lbl_805FB9D8 == 0) fn_801F5E4C(lbl_804FB5E0, 6);
+    lbl_805FB968 = p;
+    if (lbl_805FB9D8 == 0) fn_801F5E48(lbl_804FB5E0, 6);
+}
+
+// 0x801F5A14
+// Returns the end of the entry at q (q + fn_801F5308(q)) when it is a valid entry, else 0.
+// An id of 0x6F ends the list; an entry whose end lies at or past p + the limit at +0x10 is rejected.
+u8* fn_801F5A14(u8* p, u8* q) {
+    if (q == 0) return 0;
+    s32 size = fn_801F5308(q);
+    u32 w = *(u32*)q;
+    u8* next = q + size;
+    if (((w >> 20) & 0x7f) == 0x6f) return 0;
+    if ((u32)(next - p) < *(u32*)(p + 0x10)) return next;
+    return 0;
+}
+
+// 0x801F8F34
+// Sets the 26 floats from +0x1E4 to +0x248 to v.
+void fn_801F8F34(u8* p, f32 v) {
+    for (s32 off = 0x1e4; off <= 0x248; off += 4) *(f32*)(p + off) = v;
+}
+
+// 0x801F8FA0
+// Sets the 26 floats from +0x24C to +0x2B0 to v.
+void fn_801F8FA0(u8* p, f32 v) {
+    for (s32 off = 0x24c; off <= 0x2b0; off += 4) *(f32*)(p + off) = v;
+}
+
+// 0x801F94B0
+// Base init: runs fn_801F8238 on p (the second argument passes through), then sets the vtable.
+void fn_801F94B0(u8* p, s32 a4) {
+    fn_801F8238(p, a4);
+    *(void**)p = lbl_80386338;
+}
+
+// 0x801F9544
+// Base init: runs fn_801FA7CC, then sets the vtable and three floats at +0xA8..+0xB0.
+u8* fn_801F9544(u8* p, s32 a4) {
+    fn_801FA7CC(p, a4);
+    *(void**)p = lbl_80386390;
+    *(f32*)(p + 0xa8) = lbl_80600220;
+    *(f32*)(p + 0xac) = lbl_80600224;
+    *(f32*)(p + 0xb0) = lbl_80600228;
+    return p;
+}
+
+// 0x801F9598
+// Deleting destructor: base dtor fn_801FA82C with 0, then frees if del > 0.
+u8* fn_801F9598(u8* p, s32 del) {
+    if (p) {
+        fn_801FA82C(p, 0);
+        if (del > 0) operator_delete(p);
+    }
+    return p;
+}
+
+// 0x801F9C2C
+// Init: runs fn_801F9544, then sets the vtable and two floats at +0xB4 and +0xB8.
+u8* fn_801F9C2C(u8* p, s32 a4) {
+    fn_801F9544(p, a4);
+    *(void**)p = lbl_803863D8;
+    *(f32*)(p + 0xb4) = lbl_80600248;
+    *(f32*)(p + 0xb8) = lbl_8060024C;
+    return p;
+}
+
+// 0x801F9C78
+// Deleting destructor: base dtor fn_801F9598 with 0, then frees if del > 0.
+u8* fn_801F9C78(u8* p, s32 del) {
+    if (p) {
+        fn_801F9598(p, 0);
+        if (del > 0) operator_delete(p);
+    }
+    return p;
+}
+
+// 0x801F9CD0
+// Advances the timer at +0xB8 by dt, then calls fn_801F95F0. The timer is held at lbl_80600250
+// while the flag at +0x90 is set. The flag is set once the timer drops below 1 / (+0xB4).
+void fn_801F9CD0(u8* p, s32 a4, f32 dt) {
+    *(f32*)(p + 0xb8) = *(f32*)(p + 0xb8) + dt;
+    fn_801F95F0(p, a4, dt);
+    if (*(u8*)(p + 0x90) != 0) *(f32*)(p + 0xb8) = lbl_80600250;
+    if (*(f32*)(p + 0xb8) < lbl_80600248 / *(f32*)(p + 0xb4)) *(u8*)(p + 0x90) = 1;
+}
+
+// 0x801FA048
+// Deleting destructor: base dtor fn_801FA82C with 0, then frees if del > 0.
+u8* fn_801FA048(u8* p, s32 del) {
+    if (p) {
+        fn_801FA82C(p, 0);
+        if (del > 0) operator_delete(p);
+    }
+    return p;
+}
+
+// 0x801FA7CC
+// Base init: runs fn_801B365C, sets the vtable, clears the int at +0x98 and three floats at +0x9C..+0xA4.
+u8* fn_801FA7CC(u8* p, s32 a4) {
+    fn_801B365C(p, a4);
+    *(void**)p = lbl_80386478;
+    *(s32*)(p + 0x98) = 0;
+    *(f32*)(p + 0x9c) = lbl_80600278;
+    *(f32*)(p + 0xa0) = lbl_80600278;
+    *(f32*)(p + 0xa4) = lbl_80600278;
+    return p;
+}
+
+// 0x801FA82C
+// Deleting destructor: base dtor fn_801B36A8 with 0, then frees if del > 0.
+u8* fn_801FA82C(u8* p, s32 del) {
+    if (p) {
+        fn_801B36A8(p, 0);
+        if (del > 0) operator_delete(p);
+    }
+    return p;
+}
+
+// 0x801FA884
+// Init: runs fn_801FA7CC, clears the int at +0xA8 and sets the vtable.
+u8* fn_801FA884(u8* p, s32 a4) {
+    fn_801FA7CC(p, a4);
+    *(s32*)(p + 0xa8) = 0;
+    *(void**)p = lbl_80386490;
+    return p;
+}
+
+// 0x801FA8C8
+// Deleting destructor: base dtor fn_801FA82C with 0, then frees if del > 0.
+u8* fn_801FA8C8(u8* p, s32 del) {
+    if (p) {
+        fn_801FA82C(p, 0);
         if (del > 0) operator_delete(p);
     }
     return p;
