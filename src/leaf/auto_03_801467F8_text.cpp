@@ -17,7 +17,7 @@ extern u8 lbl_805FB47C[];
 extern u8 lbl_805FB480[];
 extern void* lbl_805FB498;
 extern u8 lbl_805FB4A0[];
-extern u8 lbl_805FB4E0[];
+extern s32 lbl_805FB4E0;
 extern u8 lbl_805FB4F0[];
 extern u8 lbl_805FB4F4[];
 extern u8 lbl_805FB518[];

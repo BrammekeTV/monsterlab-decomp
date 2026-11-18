@@ -30,7 +30,7 @@ ScriptValue fn_801E1BD4(u8* a, u8* b, s32 word);                 // 0x801E1BD4
 const char* fn_801EB708(u32 hash);                               // 0x801EB708 (hash -> name for logs)
 void*  fn_801EEB20(u8* heap, u32 size);                          // 0x801EEB20 (heap alloc)
 void   fn_801EF070(u8* heap, void* p);                           // 0x801EF070 (heap free)
-void   fn_801F2C10(s32 code);                                    // 0x801F2C10
+u32 fn_801F2C10(u32 key);                                    // 0x801F2C10
 void   fn_801F357C(void);                                        // 0x801F357C
 void   fn_801F3BB8(void);                                        // 0x801F3BB8
 void   fn_801F401C(void);                                        // 0x801F401C

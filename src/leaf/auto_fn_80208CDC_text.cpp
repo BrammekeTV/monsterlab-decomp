@@ -6,10 +6,9 @@
 #include "types.h"
 
 extern u8 lbl_80556AE0[];
-extern "C" void fn_801EF894(u8*);
+extern "C" u8* fn_801EF894(u8*);
 
 // 0x80208CDC
-extern "C" void fn_80208CDC(void) {
-    // tail-call arguments inferred from the registers set before the call
-    fn_801EF894((u8*)&lbl_80556AE0);
+extern "C" u8* fn_80208CDC(void) {
+    return (u8*)(fn_801EF894((u8*)&lbl_80556AE0));
 }

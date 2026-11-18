@@ -37,7 +37,7 @@ s32    fn_8001B094(u8* hud);                                              // 0x8
 u8*    fn_8001B044(u8* hud, u32 key);                                     // 0x8001B044
 void   fn_8001B128(void* hud);                                            // 0x8001B128
 void   fn_8001B164(u8* hud);                                              // 0x8001B164
-void   fn_8004EED0(u8* limb, u32 reactionHash, s32 a);                    // 0x8004EED0
+s32 fn_8004EED0(u8* arg0, u32 arg1, s32 arg2);                    // 0x8004EED0
 u8*    fn_80062C80(u8* p);                                                // 0x80062C80
 s32    fn_80063D6C(u8* self, u8* a, void* pos, u8* b, s32 c, s32 d, s32 e);   // 0x80063D6C
 void   fn_800645C8(u8* self, void* pos);                                  // 0x800645C8

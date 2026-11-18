@@ -22,7 +22,7 @@ void   fn_80195570(u8* list, s32 index);                     // 0x80195570 (list
 void   fn_8019600C(void* gx);                                // 0x8019600C
 void   fn_80196678(void* gx, void* p, f32 t);                // 0x80196678
 s32    fn_80196B10(u8* a3);                                  // 0x80196B10 (leaf)
-void   fn_8019B6CC(void* obj, f32 t);                        // 0x8019B6CC (UI element base update)
+s32 fn_8019B6CC(u8* arg0, f32 farg0);                        // 0x8019B6CC (UI element base update)
 void   fn_8019C348(void* obj);                               // 0x8019C348
 u8*    fn_8019F9B8(s32 kind);                                // 0x8019F9B8 (UI element factory)
 f32    fn_801A0DF0(u8* a3);                                  // 0x801A0DF0 (leaf)

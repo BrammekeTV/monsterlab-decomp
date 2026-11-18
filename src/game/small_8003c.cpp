@@ -27,7 +27,7 @@ void  fn_80039440(u8* p);                                   // 0x80039440
 void  fn_8003107C(u8* p);                                   // 0x8003107C (clears three words at +0, +4, +8)
 void  fn_80031090(u8* p, s32 del);                          // 0x80031090 (base destructor)
 void  fn_801A8654(u8* obj, s32 a1);                         // 0x801A8654
-void  fn_801A8AFC(void* obj);                               // 0x801A8AFC (defined in small_8019c)
+s32 fn_801A8AFC(u8* p);                               // 0x801A8AFC (defined in small_8019c)
 void  fn_8020A398(s32 handle);                              // 0x8020A398 (defined in small_8019c)
 u8*   fn_801B3308(void);                                    // 0x801B3308 (defined in small_8002b)
 void  fn_801B3378(u8* p, u8* key);                          // 0x801B3378 (defined in small_801Bb)
@@ -160,7 +160,7 @@ void fn_80039C48(u8* p) {
     fn_800222F4(p);
     if (*(u8**)(p + 0xA0) != 0) {
         fn_801A8654(*(u8**)(p + 0xA0), 0);
-        fn_801A8AFC(*(void**)(p + 0xA0));
+        fn_801A8AFC(*(u8**)(p + 0xA0));
     }
 }
 
@@ -170,7 +170,7 @@ void fn_80039C90(u8* p) {
     fn_80022394();
     if (*(u8**)(p + 0xA0) != 0) {
         fn_801A8654(*(u8**)(p + 0xA0), 0);
-        fn_801A8AFC(*(void**)(p + 0xA0));
+        fn_801A8AFC(*(u8**)(p + 0xA0));
     }
 }
 

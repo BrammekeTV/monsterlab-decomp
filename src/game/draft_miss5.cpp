@@ -42,8 +42,8 @@ void  fn_80041810(u8* dst, u8* src);                              // 0x80041810 
 void* fn_80109330(const char* name);                              // 0x80109330 (texture lookup by name)
 void  fn_8018D370(const char* fmt, ...);                          // 0x8018D370 (debug log)
 void* fn_80198F1C(void* set, u32 hash);                           // 0x80198F1C
-void  fn_8019BBA4(void* el, void* anim, s32 level);               // 0x8019BBA4
-void  fn_8019CC7C(void* el, u32 flag);                            // 0x8019CC7C
+s32 fn_8019BBA4(u8* arg0, u8* arg1, s32 arg2);               // 0x8019BBA4
+s32 fn_8019CC7C(void* el, u32 flag);                            // 0x8019CC7C
 u8*   fn_801B3308(void);                                          // 0x801B3308
 void  fn_801B3310(u8* p, u8* q);                                  // 0x801B3310
 void* fn_801B7198(void* anim, s32 a);                             // 0x801B7198
@@ -177,7 +177,7 @@ s32 fn_8019BD18(u8* arg0, u32* arg1) {
             if (anim == NULL) {
                 fn_8018D370("UIElement : unable to find anim hash 0x%x descriptor ... \n", hash);
             }
-            fn_8019BBA4(arg0, anim, 10);
+            fn_8019BBA4(arg0, (u8*)anim, 10);
             break;
         }
     }

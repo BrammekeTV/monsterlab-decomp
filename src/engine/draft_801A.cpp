@@ -19,12 +19,12 @@ void*  fn_8018D428(s32 size, const char* file, void* tag, s32 line); // 0x8018D4
 void   fn_80195A58(void* gx, void* a, u8* b, u8* c);            // 0x80195A58
 void   fn_80196678(void* gx, void* p, f32 t);                   // 0x80196678
 s32    fn_80196B10(u8* a3);                                     // 0x80196B10 (leaf)
-void   fn_80196B4C(void* gx, void* p, f32 t);                   // 0x80196B4C
+s32 fn_80196B4C(u8* arg0, const f32* arg1);                   // 0x80196B4C
 s32    fn_80196C88(u8* a3);                                     // 0x80196C88 (leaf)
 s32    fn_8019AD6C(u8* a3);                                     // 0x8019AD6C (leaf)
 u32    fn_8019AC00(void* obj, s32 index);                       // 0x8019AC00
 void   fn_8019B2F4(void* obj);                                  // 0x8019B2F4 (UI element base init)
-void   fn_8019B6CC(void* obj, f32 t);                           // 0x8019B6CC (UI element base update)
+s32 fn_8019B6CC(u8* arg0, f32 farg0);                           // 0x8019B6CC (UI element base update)
 s32    fn_8019B7D8(void* obj);                                  // 0x8019B7D8
 u8*    fn_8019F9B8(s32 kind);                                   // 0x8019F9B8 (UI element factory)
 void*  fn_801B7198(void* anim, s32 a);                          // 0x801B7198
@@ -198,7 +198,7 @@ s32 fn_801A1F40(u8* arg0, f32 farg0) {
         (*(VFnI*)(*(u8**)(arg0 + 0x138) + 0x30))(arg0, 0x20);
     }
     fn_80196678(lbl_805FB658, arg0 + 0xF0, farg0);
-    fn_80196B4C(lbl_805FB658, arg0 + 0x80, farg0);
+    fn_80196B4C((u8*)lbl_805FB658, (const f32*)(arg0 + 0x80));
     for (s32 i = 0; i < 2; i++) {
         u8* ch;
         if (flags != 0) {

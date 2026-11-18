@@ -32,8 +32,8 @@ u32    StringHash(const char* s);                                // 0x80143A5C
 s32    fn_8000C30C(u8* ctx);                                     // 0x8000C30C
 s32    fn_8003F8D4(void);                                        // 0x8003F8D4
 void   fn_8004C718(u8* p, s32 idx, void* elem);                  // 0x8004C718
-void   fn_8004EED0(void* limb, u32 hash, s32 flag);              // 0x8004EED0
-void   fn_8005CAE8(u8* p, s32 del);                              // 0x8005CAE8
+s32 fn_8004EED0(u8* arg0, u32 arg1, s32 arg2);              // 0x8004EED0
+u8* fn_8005CAE8(u8* arg0, s32 arg1);                              // 0x8005CAE8
 u8     fn_8006C65C(u8* obj);                                     // 0x8006C65C
 s32    fn_8006C664(u8* obj);                                     // 0x8006C664
 void   fn_8006C66C(u8* obj, s32 state);                          // 0x8006C66C
@@ -47,13 +47,13 @@ u8*    fn_8015EC9C(u8* tbl, f32 a, f32 b);                       // 0x8015EC9C
 void   fn_8018D2B8(const char* fmt, ...);                        // 0x8018D2B8
 void   fn_8018D370(const char* fmt, ...);                        // 0x8018D370
 void*  fn_80198F1C(void* set, u32 hash);                         // 0x80198F1C
-void   fn_8019BBA4(void* el, void* anim, s32 level);             // 0x8019BBA4
-void   fn_8019BC80(void* el, u32 anim);                          // 0x8019BC80
+s32 fn_8019BBA4(u8* arg0, u8* arg1, s32 arg2);             // 0x8019BBA4
+s32 fn_8019BC80(u8* arg0, u32 arg1);                          // 0x8019BC80
 u32    fn_801B94F8(void* obj, u32 flags);                        // 0x801B94F8
 void   fn_801D6780(void);                                        // 0x801D6780
 void   fn_801E93EC(void* list, void* entry);                     // 0x801E93EC
 const char* fn_801EB708(u32 hash);                               // 0x801EB708
-void   fn_801F2C10(s32 code);                                    // 0x801F2C10
+u32 fn_801F2C10(u32 key);                                    // 0x801F2C10
 void   fn_801F357C(void);                                        // 0x801F357C
 void   fn_801F3BB8(void);                                        // 0x801F3BB8
 BOOL   fn_801F5220(void);                                        // 0x801F5220
@@ -190,7 +190,7 @@ f32 AnimGetLength(void* anim) {
 // 0x8004F398
 // Plays the named reaction on the limb.
 void LimbPlayReaction(void* limb, const char* name, BOOL special) {
-    fn_8004EED0(limb, StringHash(name), special);
+    fn_8004EED0((u8*)limb, StringHash(name), special);
 }
 
 // 0x800F4EB4
@@ -268,7 +268,7 @@ void UIWidgetPlayAnimLoop(void* arg0, u32 arg1, s32 arg2) {
     if (anim == NULL) {
         fn_8018D370(lbl_80382AB4, arg1);
     }
-    fn_8019BBA4(arg0, anim, (s32)(s8)arg2);
+    fn_8019BBA4((u8*)arg0, (u8*)anim, (s32)(s8)arg2);
 }
 
 // 0x8015DE38
@@ -448,7 +448,7 @@ u8* fn_80030368(u8* arg0) {
     *(void**)(arg0 + 0x8) = NULL;
     *(void**)(arg0 + 0xC) = NULL;
     *(u8*)(arg0 + 0x20) = 0;
-    fn_8019BC80(*(void**)(arg0 + 0x4), 0);
+    fn_8019BC80(*(u8**)(arg0 + 0x4), 0);
     *(f32*)(*(u8**)(arg0 + 0x4) + 0x68) = 690.0f;
     u8* el = *(u8**)(arg0 + 0x4);
     (*(VFnI*)(*(u8**)(el + 0x138) + 0x2C))(el, 0x18);

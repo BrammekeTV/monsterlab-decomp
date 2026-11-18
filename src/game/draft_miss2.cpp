@@ -58,7 +58,7 @@ void  fn_8019E27C(void* el);                                     // 0x8019E27C
 s32   fn_8019EAA4(const char* text);                             // 0x8019EAA4
 s32   fn_8019EB94(void* el);                                     // 0x8019EB94
 void  fn_8019F5A8(void* el, void* sets);                         // 0x8019F5A8
-void  fn_801AC51C(u8* clip, u8* a, u8* obj);                     // 0x801AC51C
+s32 fn_801AC51C(u8* p, u8* obj, u8* target);                     // 0x801AC51C
 void  fn_801ACB98(void* p);                                      // 0x801ACB98
 void  fn_801B1668(void* p);                                      // 0x801B1668
 void  fn_801C83AC(u8* mgr, u8* item);                            // 0x801C83AC

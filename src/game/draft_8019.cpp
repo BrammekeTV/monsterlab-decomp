@@ -13,10 +13,10 @@ const char* fn_801EB708(u32 hash);                         // 0x801EB708 (hash -
 void        UIWidgetPlayAnimLoop(void* w, u32 anim, s32 n);  // 0x8019BB1C
 void        fn_8019B888(void* el, u32 anim, s32 n);        // 0x8019B888
 void        fn_8019B94C(void* el, u32 anim, s32 n);        // 0x8019B94C
-void        fn_8019BC80(void* el, u32 anim);               // 0x8019BC80
+s32 fn_8019BC80(u8* arg0, u32 arg1);               // 0x8019BC80
 void        fn_801AB80C(f32 rate);                         // 0x801AB80C
-void        fn_801AB748(void* h);                          // 0x801AB748
-void        fn_801AB7F0(void* h);                          // 0x801AB7F0
+s32 fn_801AB748(u8* p, f32 v);                          // 0x801AB748
+f32         fn_801AB7F0(void* h);                          // 0x801AB7F0
 
 extern "C++" void* gScreenSets;                  // 0x805FB654
 extern const char lbl_80381868[];          // 0x80381868 (string block)
@@ -137,11 +137,11 @@ void UIElement_PlayUIAnimAtRate(u32 a0, u32 a1, f32 a2) {
         }
         fn_801AB80C(a2);
         if (a2 >= lbl_805FF8A0) {
-            fn_801AB748(*(void**)(el + 0x10));
+            fn_801AB748(*(u8**)(el + 0x10), a2);  // f1 still holds a2
             return;
         }
-        fn_801AB7F0(*(void**)(el + 0x10));
-        fn_801AB748(*(void**)(el + 0x10));
+        f32 rate = fn_801AB7F0(*(u8**)(el + 0x10));
+        fn_801AB748(*(u8**)(el + 0x10), rate);
     }
 }
 

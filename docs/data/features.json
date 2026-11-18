@@ -94,6 +94,11 @@
  "changelog": [
   {
    "date": "2026-11-19",
+   "time": "02:10",
+   "text": "Fifth round from the missing-symbols list: 40 more functions, including UI widget animation and conversation HUD, the jump-table dispatchers behind two HUD updates, debug text printing, UI graphic and animation handles, the work-queue helper and a group of render-thread setup calls. Several older prototypes were corrected to match the asm."
+  },
+  {
+   "date": "2026-11-19",
    "time": "01:30",
    "text": "Fourth round from the missing-symbols list: 39 more functions, including animation length and playback, camera animation, UI colour and looped widget animation, video frame buffer, button-pressed checks, the lab experiment table switch, combat HUD action refresh and a batch of prop, zone and entity helpers. Older prototypes were corrected where the asm returns a value."
   },

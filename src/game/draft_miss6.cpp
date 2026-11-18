@@ -102,7 +102,7 @@ s32    fn_801478C8(u8* table, s32 idx);                          // 0x801478C8
 void   fn_8018D2B8(const char* fmt, ...);                        // 0x8018D2B8 (debug log)
 void   fn_8018D370(const char* fmt, ...);                        // 0x8018D370 (debug log)
 void   fn_8019AA10(u8* widget, u32 a);                           // 0x8019AA10
-void   fn_8019BC80(void* el, u32 anim);                          // 0x8019BC80
+s32 fn_8019BC80(u8* arg0, u32 arg1);                          // 0x8019BC80
 u8*    fn_8019BF64(u8* container, u32 hash);                     // 0x8019BF64
 u8*    fn_801B3308(void);                                        // 0x801B3308
 void   fn_801B3378(u8* p, u32 key);                              // 0x801B3378

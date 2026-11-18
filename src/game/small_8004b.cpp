@@ -31,7 +31,7 @@ void  fn_8000B8FC(u8* p, s32 a2);                               // 0x8000B8FC
 void  fn_8000B964(u8* p, s32 a2);                               // 0x8000B964
 void* fn_801D40E0(s32 n);                                       // 0x801D40E0
 void* fn_80044CDC(void* p);                                     // 0x80044CDC
-void  fn_8019CC7C(void* el, s32 a2);                            // 0x8019CC7C
+s32 fn_8019CC7C(void* el, u32 flag);                            // 0x8019CC7C
 void* ScreenSetsCurrent(void* sets);                            // 0x8018D1E4
 void* ScreenSetFindElement(void* set, u32 hash);                // 0x80198F18
 void  ExplorationHudSetFighter(void* set, void* fighter, int a); // 0x80045138

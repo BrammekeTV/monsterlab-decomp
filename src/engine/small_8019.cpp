@@ -23,7 +23,7 @@ void*   TextureLoad(const char* name);                          // 0x801D8E80
 s32 fn_8019BD18(u8* arg0, u32* arg1);                     // 0x8019BD18 (routes event to widget)
 void    UIWidgetPlayAnim(void* w, u32 anim);                    // 0x80199B38
 void    fn_801BA8C8(void* p);                                   // 0x801BA8C8
-void*   fn_801BA930(void* a3, void* a4, u32 a5, u32 a6, u32 a7, u32 a8, void* a9); // 0x801BA930
+void* fn_801BA930(u8* a0, u8* str, u32 a2, u32 a3, u32 a4, u32 a5); // 0x801BA930
 s32     fn_801994E0(void* a, void* obj);                        // 0x801994E0 (object setup callback)
 }
 
@@ -116,7 +116,7 @@ void* fn_80196FCC(void* obj, void* a4, f32* vec, u32 a6, u32 a7, u32 a8, u32 a9,
         vec[2] *= k;
         vec[3] *= k;
     }
-    return fn_801BA930(*(void**)((u8*)obj + 0x8), a4, a6, a7, a8, a9, vec);
+    return fn_801BA930(*(u8**)((u8*)obj + 0x8), (u8*)a4, a6, a7, a8, a9);
 }
 
 // 0x8019702C

@@ -7,7 +7,7 @@ typedef void (*VFnF32)(void*, f32);
 typedef s32  (*VFnF32Ret)(void*, f32);
 
 extern "C" {
-void    fn_801A8AFC(void* obj);                                 // 0x801A8AFC
+s32 fn_801A8AFC(u8* p);                                 // 0x801A8AFC
 void    fn_8020A398(s32 handle);                                // 0x8020A398
 void    fn_80199E80(void* p);                                   // 0x80199E80
 s32     fn_80199DD4(void* obj);                                 // 0x80199DD4
@@ -19,7 +19,7 @@ void    fn_8018D2B8(const char* fmt, ...);                      // 0x8018D2B8
 u32     StringHash(const char* s);                              // 0x801EB704
 void    operator_delete(void* p);                               // 0x801D426C
 void    fn_80196678(void* gx, void* p, f32 t);                  // 0x80196678 (f1 passed through)
-void    fn_80196B4C(void* gx, void* p, f32 t);                  // 0x80196B4C (f1 passed through)
+s32 fn_80196B4C(u8* arg0, const f32* arg1);                  // 0x80196B4C (f1 passed through)
 void    fn_80199534(u8* a3);                                    // 0x80199534 (leaf)
 s32     fn_80196B10(u8* a3);                                    // 0x80196B10 (leaf)
 s32     fn_80196C88(u8* a3);                                    // 0x80196C88 (leaf)
@@ -47,7 +47,7 @@ s32 fn_80199094(void* obj) {
     u8* o = (u8*)obj;
     (*(VFnVoid*)(*(u8**)(o + 0x138) + 0x10))(obj);
     if (*(s32*)(o + 0x60) == 2 && *(s32*)(o + 0x13C) == 3) {
-        fn_801A8AFC(obj);
+        fn_801A8AFC((u8*)obj);
     }
     return 0;
 }
@@ -60,7 +60,7 @@ s32 fn_80199100(void* obj) {
     }
     u8* o = (u8*)obj;
     if (*(s32*)(o + 0x60) == 2 && *(s32*)(o + 0x13C) == 3) {
-        fn_801A8AFC(obj);
+        fn_801A8AFC((u8*)obj);
     }
     return 0;
 }
@@ -171,7 +171,7 @@ s32 fn_80199C74(void* obj, f32* t) {
     u8* o = (u8*)obj;
     s32 r = (*(VFnF32Ret*)(*(u8**)(o + 0x138) + 0x18))(obj, v);
     fn_80196678(lbl_805FB658, o + 0xF0, v);
-    fn_80196B4C(lbl_805FB658, o + 0x80, v);
+    fn_80196B4C((u8*)lbl_805FB658, (const f32*)(o + 0x80));
     return r;
 }
 

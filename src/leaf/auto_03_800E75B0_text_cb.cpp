@@ -56,7 +56,7 @@ extern "C" void fn_8006B974(u8*);
 extern "C" s32 fn_8006B9CC(u8*);
 extern "C" void fn_8006CD70(u8*, s32);
 extern "C" void fn_8006CE08(u8*);
-extern "C" void fn_800D68CC(void*, s32, s32);
+extern "C" s32 fn_800D68CC(u8*, s32, s32);
 extern "C" void fn_800E69EC(s32);
 extern "C" u32 fn_8010720C(u32);
 extern "C" void fn_8012636C(s32, s32);
@@ -64,9 +64,9 @@ extern "C" void fn_8012660C(s32);
 extern "C" void fn_80126684(s32);
 extern "C" s32 fn_8012670C(void);
 extern "C" void fn_801AC7F0(s32, u8*);
-extern "C" void fn_801B69F8(s32);
+extern "C" void fn_801B69F8(u8*);
 extern "C" void fn_801C9D74(u8*);
-extern "C" void fn_801D5D14(s32, f32);
+extern "C" void fn_801D5D14(u8, f32);
 extern "C" void fn_801FC1E4(s32);
 extern "C" void fn_8020A474(u8*);
 extern "C" void fn_8022DE8C(s32, s32, s32);
@@ -222,8 +222,7 @@ s32 IsEntityOfSubtype(void* a3, u32 a4) {
 
 // 0x800E95BC
 void StopEntityLoopingSoundFX(void* a3) {
-    // tail-call arguments inferred from the registers set before the call
-    fn_801B69F8((s32)((u32)(uintptr_t)(a3)));
+    fn_801B69F8(((u8*)(uintptr_t)(a3)));
 }
 
 // 0x800E9638
@@ -643,7 +642,7 @@ void LockCurrentJunctionPath(BOOL a3, u32 a4) {
         return;
     }
     u8* t2 = *(u8**)(t1 + 2560);
-    fn_800D68CC((void*)(t2), (s32)((u32)(uintptr_t)(a3)), (s32)((u32)(uintptr_t)(a4)));
+    fn_800D68CC(t2, (s32)((u32)(uintptr_t)(a3)), (s32)((u32)(uintptr_t)(a4)));
 }
 
 // 0x800F032C
@@ -654,7 +653,7 @@ void UnlockCurrentJunctionPath(BOOL a3) {
         return;
     }
     u8* t2 = *(u8**)(t1 + 2560);
-    fn_800D68CC((void*)(t2), (s32)((u32)(uintptr_t)(a3)), (s32)((u32)(0)));
+    fn_800D68CC(t2, (s32)((u32)(uintptr_t)(a3)), (s32)((u32)(0)));
 }
 
 // 0x800F11E4
@@ -682,12 +681,11 @@ void SetEnemyIdleTime(void* a3, f32 f1) {
 
 // 0x800F1A10
 void InitPreloadFader(s32 a3) {
-    // tail-call arguments inferred from the registers set before the call
     u32 t0 = 0u - (u32)(uintptr_t)(a3);
     f32 t1 = *(f32*)((u8*)&lbl_805FEB04);
     u32 t2 = (u32)(t0) | (u32)(uintptr_t)(a3);
     u32 t3 = (((u32)(t2) << 1) | ((u32)(t2) >> 31)) & 0x1u;
-    fn_801D5D14((s32)((u32)(t3)), (f32)(t1));
+    fn_801D5D14((u8)((u32)(t3)), (f32)(t1));
 }
 
 // 0x800F4558

@@ -15,7 +15,7 @@ extern "C" void TriggerDoAction(void*, void*, void*);
 extern "C" void fn_801629D0(void*, s32);
 extern "C" void fn_80162A70(u8*);
 extern "C" void fn_801B6878(s32, s32, s32);
-extern "C" void fn_801B69F8(s32);
+extern "C" void fn_801B69F8(u8*);
 extern "C" void fn_801B6AA4(s32);
 extern "C" void fn_801B6EC8(void*, s32);
 extern "C" BOOL fn_801F5220(void);
@@ -127,20 +127,18 @@ void SetTimeout(ScriptCtx* a3, f32 f1) {
 
 // 0x801DDF38
 void StopLoopingSoundFX(void* a3) {
-    // tail-call arguments inferred from the registers set before the call
     if (a3 == 0) {
         return;
     }
-    fn_801B69F8((s32)((u32)(uintptr_t)(a3)));
+    fn_801B69F8(((u8*)(uintptr_t)(a3)));
 }
 
 // 0x801DDF48
 void StopLoopingSoundGroupFX(void* a3) {
-    // tail-call arguments inferred from the registers set before the call
     if (a3 == 0) {
         return;
     }
-    fn_801B69F8((s32)((u32)(uintptr_t)(a3)));
+    fn_801B69F8(((u8*)(uintptr_t)(a3)));
 }
 
 // 0x801E1B94
