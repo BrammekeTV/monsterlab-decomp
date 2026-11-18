@@ -1,15 +1,15 @@
 {
  "game_id": "RM7P4F",
- "generated": "2026-11-18T17:01:17+00:00",
- "commit": "7a19063",
- "commit_date": "2026-11-18T17:54:56+01:00",
+ "generated": "2026-11-18T17:07:36+00:00",
+ "commit": "e7154f0",
+ "commit_date": "2026-11-18T18:01:17+01:00",
  "game": {
   "functions": 8548,
   "bytes": 2265988,
   "named": 2748,
   "named_bytes": 616800,
-  "decompiled": 3641,
-  "decompiled_bytes": 376764
+  "decompiled": 3699,
+  "decompiled_bytes": 382348
  },
  "library": {
   "functions": 4039,
@@ -24,8 +24,8 @@
   "bytes": 3404928,
   "named": 3211,
   "named_bytes": 721548,
-  "decompiled": 3642,
-  "decompiled_bytes": 376884
+  "decompiled": 3700,
+  "decompiled_bytes": 382468
  },
  "game_range": [
   "80006B40",
@@ -461,23 +461,23 @@
    0.541
   ],
   [
-   0.061,
+   0.094,
    0.97
   ],
   [
-   0.163,
+   0.266,
    0.957
   ],
   [
-   0.012,
+   0.025,
    0.931
   ],
   [
-   0.166,
+   0.255,
    0.99
   ],
   [
-   0.022,
+   0.034,
    1.0
   ],
   [
@@ -613,11 +613,11 @@
    0.676
   ],
   [
-   0.445,
+   0.57,
    0.834
   ],
   [
-   0.171,
+   0.213,
    0.631
   ],
   [
@@ -877,11 +877,11 @@
    0.0
   ],
   [
-   0.066,
+   0.08,
    0.0
   ],
   [
-   0.175,
+   0.186,
    0.168
   ],
   [
@@ -889,15 +889,15 @@
    0.477
   ],
   [
-   0.058,
+   0.081,
    0.141
   ],
   [
-   0.031,
+   0.1,
    0.102
   ],
   [
-   0.112,
+   0.228,
    0.2
   ],
   [
@@ -1724,6 +1724,106 @@
      "name": "FrameFxFlash",
      "addr": "801DB8DC",
      "size": 64
+    }
+   ]
+  },
+  {
+   "path": "src/engine/small_801Db.cpp",
+   "functions": [
+    {
+     "name": "fn_801D08DC",
+     "addr": "801D08DC",
+     "size": 120
+    },
+    {
+     "name": "fn_801D2B54",
+     "addr": "801D2B54",
+     "size": 100
+    },
+    {
+     "name": "fn_801D5584",
+     "addr": "801D5584",
+     "size": 108
+    },
+    {
+     "name": "fn_801D679C",
+     "addr": "801D679C",
+     "size": 108
+    },
+    {
+     "name": "fn_801D7E9C",
+     "addr": "801D7E9C",
+     "size": 124
+    },
+    {
+     "name": "fn_801D8ADC",
+     "addr": "801D8ADC",
+     "size": 116
+    },
+    {
+     "name": "CameraInit",
+     "addr": "801D8B50",
+     "size": 96
+    },
+    {
+     "name": "CameraEndFrame",
+     "addr": "801D8D48",
+     "size": 52
+    },
+    {
+     "name": "fn_801D9038",
+     "addr": "801D9038",
+     "size": 104
+    },
+    {
+     "name": "fn_801D9508",
+     "addr": "801D9508",
+     "size": 116
+    },
+    {
+     "name": "fn_801D99BC",
+     "addr": "801D99BC",
+     "size": 104
+    },
+    {
+     "name": "fn_801D9A60",
+     "addr": "801D9A60",
+     "size": 116
+    },
+    {
+     "name": "fn_801DA20C",
+     "addr": "801DA20C",
+     "size": 116
+    },
+    {
+     "name": "fn_801DA858",
+     "addr": "801DA858",
+     "size": 116
+    },
+    {
+     "name": "fn_801DA9C8",
+     "addr": "801DA9C8",
+     "size": 120
+    },
+    {
+     "name": "HashTableFind",
+     "addr": "801DB32C",
+     "size": 108
+    },
+    {
+     "name": "FrameFxTint",
+     "addr": "801DB91C",
+     "size": 112
+    },
+    {
+     "name": "FrameFxEggcrate",
+     "addr": "801DB98C",
+     "size": 64
+    },
+    {
+     "name": "FrameFxBlurAndTint",
+     "addr": "801DB9CC",
+     "size": 112
     }
    ]
   },
@@ -8013,6 +8113,106 @@
    ]
   },
   {
+   "path": "src/game/small_800Fc.cpp",
+   "functions": [
+    {
+     "name": "IsCurrentLevelLoaded",
+     "addr": "800F0054",
+     "size": 104
+    },
+    {
+     "name": "SpawnProjectile",
+     "addr": "800F00EC",
+     "size": 116
+    },
+    {
+     "name": "IsCurrentJunctionID",
+     "addr": "800F050C",
+     "size": 128
+    },
+    {
+     "name": "IsCurrentJunctionActive",
+     "addr": "800F0ADC",
+     "size": 108
+    },
+    {
+     "name": "IsPlayerAtJunction",
+     "addr": "800F19A4",
+     "size": 108
+    },
+    {
+     "name": "SetupGame",
+     "addr": "800F1A24",
+     "size": 100
+    },
+    {
+     "name": "DeactivateEntity",
+     "addr": "800F1B2C",
+     "size": 108
+    },
+    {
+     "name": "PartIsMech",
+     "addr": "800F1CD4",
+     "size": 120
+    },
+    {
+     "name": "PartIsBio",
+     "addr": "800F1D4C",
+     "size": 120
+    },
+    {
+     "name": "PartIsAlchemy",
+     "addr": "800F1DC4",
+     "size": 120
+    },
+    {
+     "name": "PartGetEnhancementTexture",
+     "addr": "800F40F0",
+     "size": 120
+    },
+    {
+     "name": "StartQuest",
+     "addr": "800F48D4",
+     "size": 108
+    },
+    {
+     "name": "EndQuest",
+     "addr": "800F4940",
+     "size": 108
+    },
+    {
+     "name": "RemoveSpecificAttachedParticleEffectAtEmitter",
+     "addr": "800F4E00",
+     "size": 100
+    },
+    {
+     "name": "SetPerformFieldRepair",
+     "addr": "800F5A78",
+     "size": 120
+    },
+    {
+     "name": "VSHACKSetFightTextVisible",
+     "addr": "800F5E70",
+     "size": 104
+    },
+    {
+     "name": "IsMultiPlayer",
+     "addr": "800F5FDC",
+     "size": 108
+    },
+    {
+     "name": "SendEventToNISCamera",
+     "addr": "800F6574",
+     "size": 116
+    },
+    {
+     "name": "StopNISFSM",
+     "addr": "800F6CE0",
+     "size": 104
+    }
+   ]
+  },
+  {
    "path": "src/game/small_8010.cpp",
    "functions": [
     {
@@ -8219,6 +8419,111 @@
      "name": "fn_80119B38",
      "addr": "80119B38",
      "size": 64
+    }
+   ]
+  },
+  {
+   "path": "src/game/small_8014.cpp",
+   "functions": [
+    {
+     "name": "KillMatchConnection",
+     "addr": "8014034C",
+     "size": 84
+    },
+    {
+     "name": "IsOpponentLoading",
+     "addr": "801403CC",
+     "size": 48
+    },
+    {
+     "name": "DidOpponentCloseConnection",
+     "addr": "80140408",
+     "size": 80
+    },
+    {
+     "name": "DidNetworkStall",
+     "addr": "80140458",
+     "size": 64
+    },
+    {
+     "name": "DidWeLoseConnection",
+     "addr": "801404A0",
+     "size": 84
+    },
+    {
+     "name": "ClearLostConnection",
+     "addr": "801407C0",
+     "size": 52
+    },
+    {
+     "name": "ClearDiscError",
+     "addr": "801407F4",
+     "size": 52
+    },
+    {
+     "name": "WasThereADiscError",
+     "addr": "80140838",
+     "size": 68
+    },
+    {
+     "name": "WasThereANetError",
+     "addr": "8014087C",
+     "size": 68
+    },
+    {
+     "name": "ClearNetError",
+     "addr": "801408C0",
+     "size": 56
+    },
+    {
+     "name": "HandleHomeButtonIcon",
+     "addr": "80140A10",
+     "size": 68
+    },
+    {
+     "name": "DidWeConnectToOpponent",
+     "addr": "80140A70",
+     "size": 116
+    },
+    {
+     "name": "SendResponse",
+     "addr": "80140CE8",
+     "size": 84
+    },
+    {
+     "name": "fn_80141C38",
+     "addr": "80141C38",
+     "size": 108
+    },
+    {
+     "name": "NotStreamingMatchScreenParts",
+     "addr": "80142080",
+     "size": 60
+    },
+    {
+     "name": "IsSpecialAlertBox",
+     "addr": "8014242C",
+     "size": 52
+    },
+    {
+     "name": "fn_801424B8",
+     "addr": "801424B8",
+     "size": 72
+    },
+    {
+     "name": "fn_80142500",
+     "addr": "80142500",
+     "size": 56
+    },
+    {
+     "name": "SleepMicroseconds",
+     "addr": "80142818",
+     "size": 88
+    },
+    {
+     "name": "fn_80142970",
+     "addr": "80142970",
+     "size": 92
     }
    ]
   },

@@ -36,10 +36,10 @@ u8* fn_800E435C(u8* p, s32 del) {
 }
 
 // 0x800E4BFC
-// Calls the sub-chain at +0x58 (result passed through a stack slot, second value 0).
-void fn_800E4BFC(u8* p) {
+// Looks up the handle at +0x58 and resolves it (returns fn_801B7198's result).
+u8* fn_800E4BFC(u8* p) {
     s32 h = fn_801ED538(p + 0x58);
-    fn_801B7198(&h, 0);
+    return (u8*)fn_801B7198(&h, 0);
 }
 
 // 0x800E4C30

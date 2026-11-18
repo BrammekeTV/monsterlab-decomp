@@ -69,6 +69,11 @@
  "changelog": [
   {
    "date": "2026-11-18",
+   "time": "18:07",
+   "text": "Decompiled 59 more small functions: junction, part discipline, quest start/end, field repair and NIS camera script callbacks (0x800F), engine camera init/end-frame, hash table lookup and frame tint/eggcrate/blur effects (0x801D), and online match connection, disc/net error flags and sleep helpers (0x8014). Written by low-cost helper agents and reviewed."
+  },
+  {
+   "date": "2026-11-18",
    "time": "18:01",
    "text": "Decompiled 61 more small functions: UI image frame cycling, crystal pickup check and other helpers (0x8003), stitching bug sounds and assorted object helpers (0x800C), and player input, health, entity signal, attack-animation, voice and particle script callbacks (0x800E). Written by low-cost helper agents and reviewed."
   },
