@@ -18,7 +18,6 @@ extern "C" void fn_800433F8(void) {
 
 // 0x80043800
 extern "C" void fn_80043800(u8* a3) {
-    // tail-call arguments inferred from the registers set before the call
     u8* t0 = *(u8**)(((u8*)(uintptr_t)(a3)) + 212);
     s32 t1 = *(s32*)((u8*)gBattle);
     s32 t2 = *(s32*)(t0 + 4);

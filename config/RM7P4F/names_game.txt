@@ -809,3 +809,4 @@ fn_80215C5C ReactionBuildBlock
 fn_80213DC4 FighterStatsDestroy
 fn_8021415C BattleListActions
 fn_802147E0 BattleAiPickAction
+fn_8021828C LabExperimentGrade

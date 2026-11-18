@@ -1,15 +1,15 @@
 {
  "game_id": "RM7P4F",
- "generated": "2026-11-18T16:08:20+00:00",
- "commit": "eb86f07",
- "commit_date": "2026-11-18T17:05:11+01:00",
+ "generated": "2026-11-18T16:13:54+00:00",
+ "commit": "c5cd410",
+ "commit_date": "2026-11-18T17:08:22+01:00",
  "game": {
   "functions": 8548,
   "bytes": 2265988,
-  "named": 2746,
-  "named_bytes": 615336,
-  "decompiled": 3026,
-  "decompiled_bytes": 308060
+  "named": 2747,
+  "named_bytes": 616100,
+  "decompiled": 3084,
+  "decompiled_bytes": 314524
  },
  "library": {
   "functions": 4039,
@@ -22,10 +22,10 @@
  "all": {
   "functions": 12587,
   "bytes": 3404928,
-  "named": 3209,
-  "named_bytes": 720084,
-  "decompiled": 3027,
-  "decompiled_bytes": 308180
+  "named": 3210,
+  "named_bytes": 720848,
+  "decompiled": 3085,
+  "decompiled_bytes": 314644
  },
  "game_range": [
   "80006B40",
@@ -137,15 +137,15 @@
    0.006
   ],
   [
-   0.015,
+   0.052,
    0.019
   ],
   [
-   0.018,
+   0.064,
    0.03
   ],
   [
-   0.369,
+   0.433,
    0.398
   ],
   [
@@ -821,15 +821,15 @@
    0.0
   ],
   [
-   0.002,
+   0.076,
    0.19
   ],
   [
-   0.012,
+   0.102,
    0.094
   ],
   [
-   0.024,
+   0.032,
    0.103
   ],
   [
@@ -1005,16 +1005,16 @@
    0.979
   ],
   [
-   0.986,
+   0.994,
    0.944
   ],
   [
-   0.187,
+   0.401,
    0.212
   ],
   [
-   0.704,
-   0.796
+   0.854,
+   0.867
   ],
   [
    1.0,
@@ -3018,6 +3018,51 @@
    ]
   },
   {
+   "path": "src/game/gamedb_lookup.cpp",
+   "functions": [
+    {
+     "name": "fn_80214960",
+     "addr": "80214960",
+     "size": 76
+    },
+    {
+     "name": "DamageRecordInit",
+     "addr": "8021605C",
+     "size": 92
+    },
+    {
+     "name": "fn_80216658",
+     "addr": "80216658",
+     "size": 84
+    },
+    {
+     "name": "fn_80216700",
+     "addr": "80216700",
+     "size": 84
+    },
+    {
+     "name": "AbilityEffect",
+     "addr": "8021679C",
+     "size": 72
+    },
+    {
+     "name": "AbilityEffectForLimb",
+     "addr": "802167E4",
+     "size": 84
+    },
+    {
+     "name": "fn_80216B94",
+     "addr": "80216B94",
+     "size": 92
+    },
+    {
+     "name": "fn_80216BF0",
+     "addr": "80216BF0",
+     "size": 112
+    }
+   ]
+  },
+  {
    "path": "src/game/lab_inventory.cpp",
    "functions": [
     {
@@ -3109,6 +3154,66 @@
      "name": "MemCopy",
      "addr": "802209C8",
      "size": 4
+    }
+   ]
+  },
+  {
+   "path": "src/game/lab_object.cpp",
+   "functions": [
+    {
+     "name": "fn_802168DC",
+     "addr": "802168DC",
+     "size": 696
+    },
+    {
+     "name": "fn_80218060",
+     "addr": "80218060",
+     "size": 140
+    },
+    {
+     "name": "fn_802180EC",
+     "addr": "802180EC",
+     "size": 160
+    },
+    {
+     "name": "fn_8021818C",
+     "addr": "8021818C",
+     "size": 192
+    },
+    {
+     "name": "fn_8021824C",
+     "addr": "8021824C",
+     "size": 64
+    },
+    {
+     "name": "LabExperimentGrade",
+     "addr": "8021828C",
+     "size": 764
+    },
+    {
+     "name": "fn_80218588",
+     "addr": "80218588",
+     "size": 328
+    },
+    {
+     "name": "fn_802188CC",
+     "addr": "802188CC",
+     "size": 24
+    },
+    {
+     "name": "LabQuestFinished",
+     "addr": "80218998",
+     "size": 72
+    },
+    {
+     "name": "fn_802189E0",
+     "addr": "802189E0",
+     "size": 276
+    },
+    {
+     "name": "LabOnMaterialReward",
+     "addr": "80218AFC",
+     "size": 144
     }
    ]
   },
@@ -4758,6 +4863,111 @@
    ]
   },
   {
+   "path": "src/game/small_8004.cpp",
+   "functions": [
+    {
+     "name": "fn_80040028",
+     "addr": "80040028",
+     "size": 72
+    },
+    {
+     "name": "fn_80040090",
+     "addr": "80040090",
+     "size": 68
+    },
+    {
+     "name": "fn_800400D4",
+     "addr": "800400D4",
+     "size": 88
+    },
+    {
+     "name": "fn_800407A8",
+     "addr": "800407A8",
+     "size": 92
+    },
+    {
+     "name": "fn_80041880",
+     "addr": "80041880",
+     "size": 64
+    },
+    {
+     "name": "fn_800418E0",
+     "addr": "800418E0",
+     "size": 88
+    },
+    {
+     "name": "fn_80041938",
+     "addr": "80041938",
+     "size": 88
+    },
+    {
+     "name": "fn_80041B1C",
+     "addr": "80041B1C",
+     "size": 88
+    },
+    {
+     "name": "fn_8004287C",
+     "addr": "8004287C",
+     "size": 60
+    },
+    {
+     "name": "fn_800434C8",
+     "addr": "800434C8",
+     "size": 56
+    },
+    {
+     "name": "fn_80043500",
+     "addr": "80043500",
+     "size": 56
+    },
+    {
+     "name": "fn_80043910",
+     "addr": "80043910",
+     "size": 84
+    },
+    {
+     "name": "fn_80044010",
+     "addr": "80044010",
+     "size": 76
+    },
+    {
+     "name": "fn_80044098",
+     "addr": "80044098",
+     "size": 72
+    },
+    {
+     "name": "fn_80044498",
+     "addr": "80044498",
+     "size": 68
+    },
+    {
+     "name": "fn_800444FC",
+     "addr": "800444FC",
+     "size": 68
+    },
+    {
+     "name": "fn_80044540",
+     "addr": "80044540",
+     "size": 88
+    },
+    {
+     "name": "fn_800445F4",
+     "addr": "800445F4",
+     "size": 64
+    },
+    {
+     "name": "fn_80044634",
+     "addr": "80044634",
+     "size": 96
+    },
+    {
+     "name": "fn_80044C7C",
+     "addr": "80044C7C",
+     "size": 64
+    }
+   ]
+  },
+  {
    "path": "src/game/small_8007.cpp",
    "functions": [
     {
@@ -5204,6 +5414,106 @@
      "name": "InventoryGetPartQuality",
      "addr": "800F2018",
      "size": 88
+    }
+   ]
+  },
+  {
+   "path": "src/game/small_801B.cpp",
+   "functions": [
+    {
+     "name": "fn_801B161C",
+     "addr": "801B161C",
+     "size": 76
+    },
+    {
+     "name": "fn_801B1724",
+     "addr": "801B1724",
+     "size": 84
+    },
+    {
+     "name": "fn_801B1988",
+     "addr": "801B1988",
+     "size": 60
+    },
+    {
+     "name": "fn_801B2488",
+     "addr": "801B2488",
+     "size": 84
+    },
+    {
+     "name": "fn_801B24DC",
+     "addr": "801B24DC",
+     "size": 84
+    },
+    {
+     "name": "fn_801B2530",
+     "addr": "801B2530",
+     "size": 84
+    },
+    {
+     "name": "fn_801B2584",
+     "addr": "801B2584",
+     "size": 64
+    },
+    {
+     "name": "fn_801B2ED0",
+     "addr": "801B2ED0",
+     "size": 64
+    },
+    {
+     "name": "fn_801B2FAC",
+     "addr": "801B2FAC",
+     "size": 68
+    },
+    {
+     "name": "fn_801B33F4",
+     "addr": "801B33F4",
+     "size": 60
+    },
+    {
+     "name": "fn_801B3454",
+     "addr": "801B3454",
+     "size": 64
+    },
+    {
+     "name": "fn_801B35C8",
+     "addr": "801B35C8",
+     "size": 60
+    },
+    {
+     "name": "fn_801B3604",
+     "addr": "801B3604",
+     "size": 88
+    },
+    {
+     "name": "fn_801B365C",
+     "addr": "801B365C",
+     "size": 76
+    },
+    {
+     "name": "fn_801B36A8",
+     "addr": "801B36A8",
+     "size": 88
+    },
+    {
+     "name": "fn_801B3700",
+     "addr": "801B3700",
+     "size": 56
+    },
+    {
+     "name": "fn_801B37C4",
+     "addr": "801B37C4",
+     "size": 88
+    },
+    {
+     "name": "fn_801B42B4",
+     "addr": "801B42B4",
+     "size": 84
+    },
+    {
+     "name": "fn_801B50B0",
+     "addr": "801B50B0",
+     "size": 76
     }
    ]
   },
