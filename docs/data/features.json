@@ -69,6 +69,11 @@
  "changelog": [
   {
    "date": "2026-11-18",
+   "time": "15:05",
+   "text": "Decompiled the two material-reward rolls used by challenge rewards: one picks a material matching a part (or a random one the player has unlocked enough for), the other picks a rarity and level and then a random fitting material, retrying at lower levels."
+  },
+  {
+   "date": "2026-11-18",
    "time": "14:52",
    "text": "Decompiled a loot roll that picks a random suitable table row for a part (torso parts and other limbs use different eligibility flags)."
   },

@@ -506,3 +506,100 @@ s32 fn_8022515C(void* unused, u8* part) {
 }
 
 }  // extern "C"
+
+
+extern "C" {
+
+// 0x8022667C
+// Roll a kind-0 material reward. `parts` (5 part pointers, may be NULL) is scanned from a random
+// start for the first part whose id is set; the material whose table row (0x24 bytes at
+// db+0x6C18) carries that id is given. With no match, a random material (of 45) whose
+// threshold (s16 at +8 of 0x10-byte rows at db+0x4F00) is within the save's value at +0x118 is
+// drawn instead. Amount is uniform in the spec's s16 range at +0xE..+0x10.
+void fn_8022667C(u8* s, const u8* spec, void** parts) {
+    s32 id = -1, mat = -1;
+    if (parts != NULL) {
+        s32 start = RandomUpTo(4);
+        for (s32 i = 0; i < 5; i++) {
+            void* p = parts[(start + i) % 5];
+            if (p == NULL || *(void**)p == NULL) continue;
+            id = **(s32**)p;
+            if (id != -1) break;
+        }
+    }
+    if (id != -1) {
+        // Two rows per iteration, 78 iterations (the original reads that far if nothing matches).
+        const u8* tab = *(u8**)(Db() + 0x6C18);
+        for (s32 k = 0; k < 156; k++) {
+            const u8* row = tab + k * 0x24;
+            if (*(const s32*)(row + 0x20) == id) { mat = *(const s32*)(row + 0x10); break; }
+        }
+    }
+    while (mat == -1) {
+        s32 r = RandomUpTo(0x2C);
+        mat = r;
+        const u8* row = *(u8**)(Db() + 0x4F00) + r * 0x10;
+        if ((u32)(s32)*(const s16*)(row + 8) > *(u32*)(s + 0x118)) mat = -1;
+    }
+    s32 n = *(const s16*)(spec + 0xE) + RandomUpTo(*(const s16*)(spec + 0x10) - *(const s16*)(spec + 0xE));
+    LabOnMaterialReward(gLab, mat, 0, (u8)n);
+    LabAddMaterial(s + 0xA30, mat, 0, (u8)n, TRUE);
+}
+
+// 0x802268BC
+// Roll a kind-1 material reward: first a category (weights at spec +0x16/+0x1A/+0x18 -> 1, 2, 0),
+// then a level 1..4 (weights at +0x1E/+0x20/+0x22/+0x24; +0x1C is the fallback). Rows of the
+// 0x18-byte table at db+0x5328 whose level (low byte of +0x10) equals the level and whose
+// threshold (s16 at +0x10) is below gSaveSystem+0x118 are candidates; if none, the level drops
+// by one and it retries. A candidate of the rolled category (next category if none) is picked.
+void fn_802268BC(u8* s, const u8* spec) {
+    s32 a = *(const s16*)(spec + 0x16), b = *(const s16*)(spec + 0x1A), c = *(const s16*)(spec + 0x18);
+    s32 r = RandomUpTo(a + b + c - 1);
+    s32 cat = (r < a) ? 1 : (r < a + b ? 2 : 0);
+
+    s32 lvl = *(const s16*)(spec + 0x1C);
+    s32 d = *(const s16*)(spec + 0x1E), e = *(const s16*)(spec + 0x20);
+    s32 f = *(const s16*)(spec + 0x22), g = *(const s16*)(spec + 0x24);
+    if (g + f + d + e != 0) {
+        r = RandomUpTo(g + f + d + e - 1);
+        if (r < d) lvl = 1;
+        else if (r < d + e) lvl = 2;
+        else lvl = (r < d + e + f) ? 3 : 4;
+    }
+
+    const u8* tab = *(u8**)(Db() + 0x5328);
+    u32 limit = *(u32*)((u8*)gSaveSystem + 0x118);
+    s32 cand[64];
+    s32 cnt[3];
+    s32 n;
+    for (;;) {
+        cnt[0] = cnt[1] = cnt[2] = 0;
+        n = 0;
+        for (s32 k = 0; k < 60; k++) {
+            const u8* row = tab + k * 0x18;
+            u32 w10 = *(const u32*)(row + 0x10);
+            if ((s32)(s8)(w10 & 0xFF) == lvl && (u32)(s32)(s16)(w10 >> 16) < limit) {
+                cand[n++] = *(const s32*)row;
+                cnt[*(const s32*)(row + 0xC)]++;
+            }
+        }
+        if (lvl <= 1) break;
+        lvl--;
+        if (n != 0) break;
+    }
+    if (n <= 0) return;
+    while (cnt[cat] <= 0) cat = (cat + 1) % 3;
+    s32 k = RandomUpTo(cnt[cat] - 1);
+    s32 mat = -1;
+    for (s32 j = 0; j < n; j++) {
+        if (*(const s32*)(tab + cand[j] * 0x18 + 0xC) == cat) {
+            if (k == 0) { mat = cand[j]; break; }
+            k--;
+        }
+    }
+    s32 q = *(const s16*)(spec + 0x12) + RandomUpTo(*(const s16*)(spec + 0x14) - *(const s16*)(spec + 0x12));
+    LabOnMaterialReward(gLab, mat, 1, (u8)q);
+    LabAddMaterial(s + 0xA30, mat, 1, (u8)q, TRUE);
+}
+
+}  // extern "C"
