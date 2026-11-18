@@ -1,15 +1,15 @@
 {
  "game_id": "RM7P4F",
- "generated": "2026-11-18T16:13:54+00:00",
- "commit": "c5cd410",
- "commit_date": "2026-11-18T17:08:22+01:00",
+ "generated": "2026-11-18T16:14:59+00:00",
+ "commit": "acace27",
+ "commit_date": "2026-11-18T17:13:55+01:00",
  "game": {
   "functions": 8548,
   "bytes": 2265988,
   "named": 2747,
   "named_bytes": 616100,
-  "decompiled": 3084,
-  "decompiled_bytes": 314524
+  "decompiled": 3104,
+  "decompiled_bytes": 316756
  },
  "library": {
   "functions": 4039,
@@ -24,8 +24,8 @@
   "bytes": 3404928,
   "named": 3210,
   "named_bytes": 720848,
-  "decompiled": 3085,
-  "decompiled_bytes": 314644
+  "decompiled": 3105,
+  "decompiled_bytes": 316876
  },
  "game_range": [
   "80006B40",
@@ -77,15 +77,15 @@
    0.665
   ],
   [
-   0.094,
+   0.128,
    0.645
   ],
   [
-   0.044,
+   0.099,
    0.059
   ],
   [
-   0.016,
+   0.053,
    0.199
   ],
   [
@@ -1013,7 +1013,7 @@
    0.212
   ],
   [
-   0.854,
+   0.957,
    0.867
   ],
   [
@@ -3214,6 +3214,16 @@
      "name": "LabOnMaterialReward",
      "addr": "80218AFC",
      "size": 144
+    },
+    {
+     "name": "fn_80218BB0",
+     "addr": "80218BB0",
+     "size": 700
+    },
+    {
+     "name": "LabChallengeRewardTable",
+     "addr": "80218E6C",
+     "size": 408
     }
    ]
   },
@@ -4754,6 +4764,101 @@
      "name": "GameSessionUpdate",
      "addr": "80008544",
      "size": 4580
+    }
+   ]
+  },
+  {
+   "path": "src/game/small_8002.cpp",
+   "functions": [
+    {
+     "name": "fn_80020480",
+     "addr": "80020480",
+     "size": 60
+    },
+    {
+     "name": "fn_80020590",
+     "addr": "80020590",
+     "size": 60
+    },
+    {
+     "name": "fn_80020758",
+     "addr": "80020758",
+     "size": 60
+    },
+    {
+     "name": "fn_80020864",
+     "addr": "80020864",
+     "size": 60
+    },
+    {
+     "name": "fn_80020A04",
+     "addr": "80020A04",
+     "size": 60
+    },
+    {
+     "name": "fn_80020D28",
+     "addr": "80020D28",
+     "size": 60
+    },
+    {
+     "name": "fn_8002104C",
+     "addr": "8002104C",
+     "size": 60
+    },
+    {
+     "name": "fn_8002112C",
+     "addr": "8002112C",
+     "size": 60
+    },
+    {
+     "name": "fn_80021240",
+     "addr": "80021240",
+     "size": 60
+    },
+    {
+     "name": "fn_80021354",
+     "addr": "80021354",
+     "size": 60
+    },
+    {
+     "name": "fn_80021678",
+     "addr": "80021678",
+     "size": 64
+    },
+    {
+     "name": "fn_80022394",
+     "addr": "80022394",
+     "size": 64
+    },
+    {
+     "name": "fn_800225C8",
+     "addr": "800225C8",
+     "size": 64
+    },
+    {
+     "name": "fn_80022D34",
+     "addr": "80022D34",
+     "size": 84
+    },
+    {
+     "name": "fn_80022D88",
+     "addr": "80022D88",
+     "size": 84
+    },
+    {
+     "name": "DiggingRockPresent",
+     "addr": "800232D0",
+     "size": 48
+    },
+    {
+     "name": "DiggingRockIntact",
+     "addr": "80023300",
+     "size": 68
+    },
+    {
+     "name": "DiggingCheckChallengeFinished",
+     "addr": "80023370",
+     "size": 48
     }
    ]
   },
