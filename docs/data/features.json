@@ -69,6 +69,11 @@
  "changelog": [
   {
    "date": "2026-11-18",
+   "time": "12:32",
+   "text": "Decompiled the battle-over check (a side loses when its torso breaks or all four other limbs do; fleeing on working legs hands the win over; timed battles end after their round limit) and putting a fighter into a battle, including the opponent's MSP reward from its madness and average quality, 9999 HP tutorial opponents and scaled timed-battle HP."
+  },
+  {
+   "date": "2026-11-18",
    "time": "12:29",
    "text": "Decompiled the battle turn loop: the turn passes to the next side that can still act (an action is blocked by two status effects), and when neither can, the round ends: the round counter goes up, the winner is paid after the final round, energy regenerates up to what the torso holds, effects tick down, and limbs with the regeneration enhancement heal by a tuned share of their max HP."
   },

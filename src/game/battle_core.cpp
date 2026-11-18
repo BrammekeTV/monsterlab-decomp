@@ -487,3 +487,111 @@ BOOL BattleNextTurn(u8* b) {
 }
 
 }  // extern "C"
+
+// ---------------------------------------------------------------- battle start / end checks
+
+extern "C" {
+void SaveCountBattleResult(u8* save, s32 a);              // 0x8022B8A8
+void SaveRecordBattleLoss(u8* save, s32 a);               // 0x802271BC
+BOOL IsOnlineBattle(void);                                // 0x80220A24
+}
+extern u8* gSaveSystem;     // 0x805FBBE0
+
+enum { MODE_TUTORIAL = 1, MODE_TIMED = 3 };
+
+static inline s32 LimbHp(u8* f, s32 i) {
+    u8* bp = ((u8**)f)[i];
+    return bp != NULL ? **(s32**)(bp + 0x28) : 0;
+}
+
+extern "C" {
+
+// 0x8020E794
+// The status field of a fighter's limb (NULL if the limb is missing).
+u8** FighterGetSlot(u8* f, s32 i) {
+    u8* bp = ((u8**)f)[i];
+    return bp != NULL ? (u8**)(bp + 0x28) : NULL;
+}
+
+// 0x80213F84
+void FighterStatsSetOwner(u8* stats, u32 v) { *(u32*)stats = v; }
+
+// 0x80212BE4
+// Is the battle decided? A side loses when its torso breaks or all four other limbs are
+// broken; fleeing on working legs hands the win to the other side; a timed battle (mode 3)
+// ends after its round limit in the player's favour.
+u32 BattleIsFinalRound(u8* b) {
+    if (*(u8**)(b + 0xA4C) != NULL) return 1;
+    if (*(s32*)(b + 0xAD0) == MODE_TIMED && *(s32*)(b + 0xA10) == *(s32*)(b + 0xABC)) {
+        b[0xA5C] = 1;
+        *(u8**)(b + 0xA4C) = ((u8**)(b + 0xA00))[0];
+        return 1;
+    }
+    s32 side = *(s32*)(b + 0xA08);
+    if (b[0x9FC + side] != 0) {
+        u8** legs = FighterGetSlot(((u8**)(b + 0xA00))[side], 1);
+        if (legs != NULL && **(s32**)legs > 0) {
+            u8* winner = ((u8**)(b + 0xA00))[1 - *(s32*)(b + 0xA08)];
+            *(u8**)(b + 0xA4C) = winner;
+            b[0xA5C] = 1;
+            if (winner == ((u8**)(b + 0xA00))[1]) {
+                SaveCountBattleResult(gSaveSystem, 1);
+                if (!IsOnlineBattle()) SaveRecordBattleLoss(gSaveSystem, 1);
+                else                   (*(s32*)(gSaveSystem + 0xA2C))++;
+            }
+            return 1;
+        }
+    }
+    for (s32 v = 0; v < 2; v++) {
+        u8* f = ((u8**)(gBattle + 0xA00))[v];
+        BOOL beaten = TRUE;
+        for (s32 i = 0; i < 4; i++)
+            if (((u8**)f)[i] != NULL && LimbHp(f, i) > 0) beaten = FALSE;
+        if (((u8**)f)[4] == NULL || LimbHp(f, 4) <= 0) beaten = TRUE;
+        if (!beaten) continue;
+        *(u8**)(b + 0xA4C) = ((u8**)(b + 0xA00))[1 - v];
+        if (*(s32*)(b + 0xAD0) == MODE_TIMED) {
+            b[0xA5C] = 1;
+            *(u8**)(b + 0xA4C) = ((u8**)(b + 0xA00))[0];
+        }
+        return 1;
+    }
+    return 0;
+}
+
+// 0x80212E84
+// Put a fighter into the battle. For the opponent (side 1) the MSP reward is worked out from
+// its madness and average quality; tutorial opponents get 9999 HP limbs, timed-battle
+// opponents a scaled HP.
+void BattleSetFighter(u8* b, s32 side, u8* f, u32 owner) {
+    FighterStatsSetOwner(f + 0x20, owner);
+    *(s32*)(f + 0x44) = side;
+    s32 quality = 0;
+    ((u8**)(b + 0xA00))[side] = f;
+    for (s32 i = 0; i < 5; i++) {
+        u8* bp = ((u8**)f)[i];
+        if (bp != NULL) quality += (*(s32**)(bp + 0x28))[4];
+    }
+    FighterInitStats(f + 0x20, (u8**)f);
+    if (side != 1) return;
+    u32 factor = *(u32*)(*(u8**)(gGameDb->data + 0x99D0) + 0x54C);
+    *(u32*)(b + 0xAB8) = (u32)FighterStatsGet(((u8**)(b + 0xA00))[1] + 0x20, 1);
+    *(u32*)(b + 0xAB8) = (*(u32*)(b + 0xAB8) * factor * (u32)(quality / 5)) / 100;
+    switch (*(s32*)(b + 0xAD0)) {
+    case MODE_TUTORIAL:
+        for (s32 i = 0; i < 5; i++) {
+            **(s32**)FighterGetSlot(f, i) = 9999;
+            (*(s32**)FighterGetSlot(f, i))[1] = 9999;
+        }
+        return;
+    case MODE_TIMED:
+        for (s32 i = 0; i < 5; i++) {
+            s32 hp = *(s32*)(b + 0xAC0) * (*(s32**)FighterGetSlot(f, i))[1];
+            **(s32**)FighterGetSlot(f, i) = hp;
+            (*(s32**)FighterGetSlot(f, i))[1] = hp;
+        }
+        break;
+    }
+}
+
+}  // extern "C"

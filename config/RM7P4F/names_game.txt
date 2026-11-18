@@ -745,3 +745,8 @@ lbl_805FA098 gDefaultActionDisplay
 fn_80213818 BattleActionUsable
 fn_8021223C BattleNextTurn
 fn_80213428 BattleAwardWin
+fn_80212E84 BattleSetFighter
+fn_80213F84 FighterStatsSetOwner
+fn_8022B8A8 SaveCountBattleResult
+fn_802271BC SaveRecordBattleLoss
+fn_80220A24 IsOnlineBattle

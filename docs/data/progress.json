@@ -1,15 +1,15 @@
 {
  "game_id": "RM7P4F",
- "generated": "2026-11-18T11:29:14+00:00",
- "commit": "253f79b",
- "commit_date": "2026-11-18T12:27:06+01:00",
+ "generated": "2026-11-18T11:32:01+00:00",
+ "commit": "5568fd4",
+ "commit_date": "2026-11-18T12:29:14+01:00",
  "game": {
   "functions": 8548,
   "bytes": 2265988,
-  "named": 2683,
-  "named_bytes": 586996,
-  "decompiled": 2183,
-  "decompiled_bytes": 259468
+  "named": 2688,
+  "named_bytes": 590196,
+  "decompiled": 2186,
+  "decompiled_bytes": 260580
  },
  "library": {
   "functions": 4039,
@@ -22,10 +22,10 @@
  "all": {
   "functions": 12587,
   "bytes": 3404928,
-  "named": 3145,
-  "named_bytes": 691624,
-  "decompiled": 2183,
-  "decompiled_bytes": 259468
+  "named": 3150,
+  "named_bytes": 694824,
+  "decompiled": 2186,
+  "decompiled_bytes": 260580
  },
  "game_range": [
   "80006B40",
@@ -993,7 +993,7 @@
    0.0
   ],
   [
-   0.032,
+   0.036,
    0.045
   ],
   [
@@ -1001,12 +1001,12 @@
    0.364
   ],
   [
-   0.313,
-   0.583
+   0.453,
+   0.651
   ],
   [
    0.234,
-   0.377
+   0.378
   ],
   [
    0.187,
@@ -1038,7 +1038,7 @@
   ],
   [
    0.285,
-   0.533
+   0.678
   ],
   [
    0.326,
@@ -1046,7 +1046,7 @@
   ],
   [
    0.005,
-   0.0
+   0.199
   ],
   [
    0.006,
@@ -1811,6 +1811,11 @@
    "path": "src/game/battle_core.cpp",
    "functions": [
     {
+     "name": "FighterGetSlot",
+     "addr": "8020E794",
+     "size": 32
+    },
+    {
      "name": "BattleCommitAction",
      "addr": "80211F98",
      "size": 676
@@ -1819,6 +1824,16 @@
      "name": "BattleNextTurn",
      "addr": "8021223C",
      "size": 696
+    },
+    {
+     "name": "BattleIsFinalRound",
+     "addr": "80212BE4",
+     "size": 556
+    },
+    {
+     "name": "BattleSetFighter",
+     "addr": "80212E84",
+     "size": 524
     },
     {
      "name": "BattleReset",
@@ -1844,6 +1859,11 @@
      "name": "FighterInitStats",
      "addr": "80213E74",
      "size": 272
+    },
+    {
+     "name": "FighterStatsSetOwner",
+     "addr": "80213F84",
+     "size": 8
     },
     {
      "name": "FighterFromStats",
@@ -12896,11 +12916,6 @@
      "size": 8
     },
     {
-     "name": "fn_80213F84",
-     "addr": "80213F84",
-     "size": 8
-    },
-    {
      "name": "RoundGetAttacker",
      "addr": "80214F48",
      "size": 8
@@ -13116,7 +13131,7 @@
      "size": 8
     },
     {
-     "name": "fn_80220A24",
+     "name": "IsOnlineBattle",
      "addr": "80220A24",
      "size": 8
     },

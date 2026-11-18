@@ -31,11 +31,6 @@ extern "C" void fn_80213810(u8* a3, s32 a4) {
     *(u32*)(((u8*)(uintptr_t)(a3)) + 2616) = (u32)((u32)(uintptr_t)(a4));
 }
 
-// 0x80213F84
-extern "C" void fn_80213F84(u8* a3, s32 a4) {
-    *(u32*)(((u8*)(uintptr_t)(a3)) + 0) = (u32)((u32)(uintptr_t)(a4));
-}
-
 // 0x80214F48
 extern "C" s32 RoundGetAttacker(u8* a3) {
     s32 t0 = *(s32*)(((u8*)(uintptr_t)(a3)) + 124);
@@ -63,7 +58,7 @@ extern "C" u32 RoundNoteAbility(s32 a3, s32 a4, s32 a5, s32 a6) {
 }
 
 // 0x802152CC
-extern "C" u32 fn_802152CC(s32 a3, s32 a4, s32 a5, s32 a6) {
+extern "C" u32 RoundNoteEffectEnd(s32 a3, s32 a4, s32 a5, s32 a6) {
     u32 t0 = (u32)((s32)(u32)(uintptr_t)(a4) * 20);
     u32 t1 = (((u32)(uintptr_t)(a5) << 2) | ((u32)(uintptr_t)(a5) >> 30)) & 0xfffffffcu;
     u32 t2 = (u32)(uintptr_t)(a3) + (u32)(t0);
