@@ -365,3 +365,119 @@ void SaveRemoveQuestReward(u8* s, u32 id) {
 }
 
 }  // extern "C"
+
+extern "C" {
+void LabQuestFinished(void* lab, s32 id);                         // 0x80218998
+s32  LabChallengeRewardTable(void* lab, u32 challenge);           // 0x80218E6C
+void SaveRollChallengeReward(u8* s, s32 table, s32 a);            // 0x802262E0
+u8*  LabAllocMonster(u8* inv);                                    // 0x80219FC4
+void MonsterBuildPreset(u8* m, s32 preset);                       // 0x8021A164
+}
+
+static inline const u8* RewardRec(s32 i) { return *(u8**)(Db() + 0x8D58) + i * 0x3C; }
+
+static void GainMSP(SaveProgress* s, u32 amount) {
+    s->msp += amount;
+    if (s->msp > MAX_MSP) s->msp = MAX_MSP;
+    if ((s32)s->rank >= MAX_RANK) return;
+    const RankDef* ranks = *(RankDef**)(Db() + 0x63C8);
+    BOOL gained = FALSE;
+    for (u32 k = s->rank + 1; k <= MAX_RANK && ranks[k].xpRequired < (f32)s->msp; k++) {
+        s->rank = k;
+        gained = TRUE;
+    }
+    if (gained) PushNotice(s, NOTICE_RANK_UP, s->rank);
+}
+
+extern "C" {
+
+// 0x80224818
+// Grant every reward (of the 53) that belongs to this quest, each with a quest-reward notice.
+void SaveRewardQuest(SaveProgress* s, u32 quest) {
+    LabQuestFinished(gLab, (s32)quest);
+    for (s32 i = 0; i < 0x35; i++) {
+        u8 rec[0x3C];
+        memcpy(rec, RewardRec(i), sizeof(rec));
+        if (*(s32*)(rec + 0xC) != (s32)quest) continue;
+        SaveUnlockReward(s, rec, TRUE);
+        PostNotice6(s, NOTICE_QUEST_REWARD, (s32)quest, *(s32*)(rec + 0x18));
+    }
+}
+
+// 0x8022497C
+void SaveGiveQuestReward(SaveProgress* s, u32 reward) {
+    u8 rec[0x3C];
+    memcpy(rec, RewardRec((s32)reward), sizeof(rec));
+    SaveUnlockReward(s, rec, TRUE);
+}
+
+// 0x802252D4
+// A challenge was won: pay out the matching pending reward (for this monster or any), or
+// else the minigame score as MSP and a random reward from the challenge's table.
+void SaveRewardChallenge(SaveProgress* s, u32 challenge) {
+    u8* raw = (u8*)s;
+    LabQuestFinished(gLab, (s32)challenge);
+    BOOL paid = FALSE;
+    for (s32 i = 0; i < raw[0x124]; i++) {
+        u8 rec[0x3C];
+        memcpy(rec, RewardRec(((s32*)(raw + 0x6BC))[i]), sizeof(rec));
+        u32 who = *(u32*)(rec + 0x14);
+        if (*(s32*)(rec + 4) != (s32)challenge || (who != *(u32*)(raw + 0x130) && who != 0)) continue;
+        SaveUnlockReward(s, rec, FALSE);
+        u8 n = raw[0x124];
+        if ((u32)i < n) {
+            ((s32*)(raw + 0x6BC))[i] = ((s32*)(raw + 0x6BC))[n - 1];
+            ((s32*)(raw + 0x6BC))[raw[0x124] - 1] = -1;
+            raw[0x124]--;
+        }
+        paid = TRUE;
+        break;
+    }
+    if (paid) return;
+    GainMSP(s, *(u32*)((u8*)gLab + 0x78));
+    SaveRollChallengeReward(raw, LabChallengeRewardTable(gLab, challenge), 0);
+}
+
+// 0x802260FC
+// Jump to the rank and MSP a quest sets, and give its preset monster (full quality and health),
+// which becomes the current monster.
+void SaveSetRankFromQuest(SaveProgress* s, u32 quest) {
+    u8* raw = (u8*)s;
+    const u8* q = *(u8**)(Db() + 0x8508) + quest * 0x1C;
+    s32 rank = *(const s32*)(q + 0x10);
+    s->rank = (u32)rank;
+    const RankDef* ranks = *(RankDef**)(Db() + 0x63C8);
+    s->msp = (u32)ranks[rank].xpRequired;
+    s32 preset = *(const s32*)(q + 0x14);
+    if (preset == -1) return;
+    u8* m = LabAllocMonster(raw + 0xA30);
+    if (m != NULL) {
+        MonsterBuildPreset(m, preset);
+        m[0x4A] = 1;
+        for (s32 i = 0; i < 5; i++) {
+            PartInstance* p = ((PartInstance**)(m + 4))[i];
+            if (p == NULL) continue;
+            PartSetQuality(p, 100);
+            PartSetHealth(p, PartGetMaxHealth(p));
+        }
+    }
+    if (m != NULL) *(u8**)(raw + 0x114) = m;
+}
+
+// 0x80225C1C
+// Best (lowest non-zero) time for one of 10 records.
+void SaveRecordBestTime(u8* s, s32 i, u32 t) {
+    if (i < 0 || i >= 10) return;
+    u32* slot = (u32*)(s + 0x9A8) + i;
+    if (t != 0 && (t < *slot || *slot == 0)) *slot = t;
+}
+
+// 0x80225C5C
+// Best (highest) score for one of 6 records.
+void SaveRecordBestScore(u8* s, s32 i, u32 score) {
+    if (score == 0) return;
+    u32* slot = (u32*)(s + 0xA04) + i;
+    if (score > *slot && i != -1 && i < 6) *slot = score;
+}
+
+}  // extern "C"

@@ -713,3 +713,7 @@ fn_80218B9C LabOnMSPReward
 fn_802241D0 TuningGetPair
 fn_802241F0 SavePartTierOwned
 fn_8032F400 __cvt_fp2unsigned
+fn_80218E6C LabChallengeRewardTable
+fn_802262E0 SaveRollChallengeReward
+fn_80225C1C SaveRecordBestTime
+fn_80225C5C SaveRecordBestScore

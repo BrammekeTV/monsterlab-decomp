@@ -128,7 +128,7 @@ extern "C" void fn_802188B8(u8* a3, s32 a4) {
 }
 
 // 0x80218AF4
-extern "C" void fn_80218AF4(u8* a3, s32 a4) {
+extern "C" void LabOnPartReward(u8* a3, s32 a4) {
     *(u32*)(((u8*)(uintptr_t)(a3)) + 60) = (u32)((u32)(uintptr_t)(a4));
 }
 
@@ -141,12 +141,12 @@ extern "C" u32 fn_80218B8C(s32 a3, s32 a4) {
 }
 
 // 0x80218B9C
-extern "C" void fn_80218B9C(u8* a3, s32 a4) {
+extern "C" void LabOnMSPReward(u8* a3, s32 a4) {
     *(u32*)(((u8*)(uintptr_t)(a3)) + 68) = (u32)((u32)(uintptr_t)(a4));
 }
 
 // 0x80218BA4
-extern "C" void fn_80218BA4(u8* a3, s32 a4, s32 a5) {
+extern "C" void LabOnDiscoveryReward(u8* a3, s32 a4, s32 a5) {
     *(u32*)(((u8*)(uintptr_t)(a3)) + 0) = (u32)((u32)(uintptr_t)(a4));
     *(u32*)(((u8*)(uintptr_t)(a3)) + 4) = (u32)((u32)(uintptr_t)(a5));
 }

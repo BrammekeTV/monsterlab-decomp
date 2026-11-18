@@ -69,6 +69,11 @@
  "changelog": [
   {
    "date": "2026-11-18",
+   "time": "12:14",
+   "text": "Decompiled quest and challenge payouts: finishing a quest grants all of its reward records; winning a challenge pays the matching pending reward (for this monster or any), otherwise the minigame score as MSP plus a random reward from the challenge's table. Also setting the rank, MSP and preset monster from a quest, and the best time/score records."
+  },
+  {
+   "date": "2026-11-18",
    "time": "12:10",
    "text": "Decompiled reward handling in the save: a reward record can give a part (at a set tier and quality, fully healed), key and secondary ingredients, a part-type discovery and MSP, each with its notice. What I had called experience is the game's MSP (Mad Scientist Points), capped at 99,999,999 and driving the 50 ranks. Also: healing every lab monster on returning to the castle and the pending quest reward list."
   },

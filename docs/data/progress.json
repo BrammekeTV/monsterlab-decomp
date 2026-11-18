@@ -1,15 +1,15 @@
 {
  "game_id": "RM7P4F",
- "generated": "2026-11-18T11:10:46+00:00",
- "commit": "dbae823",
- "commit_date": "2026-11-18T12:06:53+01:00",
+ "generated": "2026-11-18T11:14:22+00:00",
+ "commit": "dcfa122",
+ "commit_date": "2026-11-18T12:10:47+01:00",
  "game": {
   "functions": 8548,
   "bytes": 2265988,
-  "named": 2652,
-  "named_bytes": 579976,
-  "decompiled": 2152,
-  "decompiled_bytes": 252244
+  "named": 2656,
+  "named_bytes": 581424,
+  "decompiled": 2158,
+  "decompiled_bytes": 254032
  },
  "library": {
   "functions": 4039,
@@ -22,10 +22,10 @@
  "all": {
   "functions": 12587,
   "bytes": 3404928,
-  "named": 3114,
-  "named_bytes": 684604,
-  "decompiled": 2152,
-  "decompiled_bytes": 252244
+  "named": 3118,
+  "named_bytes": 686052,
+  "decompiled": 2158,
+  "decompiled_bytes": 254032
  },
  "game_range": [
   "80006B40",
@@ -1014,7 +1014,7 @@
   ],
   [
    0.687,
-   0.698
+   0.736
   ],
   [
    1.0,
@@ -1033,12 +1033,12 @@
    0.958
   ],
   [
-   0.472,
+   0.531,
    0.958
   ],
   [
-   0.15,
-   0.421
+   0.285,
+   0.533
   ],
   [
    0.326,
@@ -3716,6 +3716,31 @@
      "size": 1296
     },
     {
+     "name": "SaveRewardQuest",
+     "addr": "80224818",
+     "size": 356
+    },
+    {
+     "name": "SaveGiveQuestReward",
+     "addr": "8022497C",
+     "size": 184
+    },
+    {
+     "name": "SaveRewardChallenge",
+     "addr": "802252D4",
+     "size": 796
+    },
+    {
+     "name": "SaveRecordBestTime",
+     "addr": "80225C1C",
+     "size": 64
+    },
+    {
+     "name": "SaveRecordBestScore",
+     "addr": "80225C5C",
+     "size": 52
+    },
+    {
      "name": "SaveCheckProgressFlag",
      "addr": "80225C90",
      "size": 108
@@ -3739,6 +3764,11 @@
      "name": "SaveAddMSP",
      "addr": "80225F70",
      "size": 396
+    },
+    {
+     "name": "SaveSetRankFromQuest",
+     "addr": "802260FC",
+     "size": 336
     },
     {
      "name": "SaveReturnToCastle",
