@@ -5,14 +5,13 @@
 
 #include "types.h"
 
-extern "C" void fn_8004B754(u8*);
+extern "C" void fn_8004B754(u8*, s32);
 extern "C" void fn_801ED1F8(u8*);
 
 // 0x8004E58C
-extern "C" void fn_8004E58C(u8* a3) {
-    // tail-call arguments inferred from the registers set before the call
+extern "C" void fn_8004E58C(u8* a3, s32 a4) {
     u8* t0 = ((u8*)(uintptr_t)(a3)) + -3144;
-    fn_8004B754(t0);
+    fn_8004B754(t0, (s32)((u32)(uintptr_t)(a4)));
 }
 
 // 0x8004E8CC

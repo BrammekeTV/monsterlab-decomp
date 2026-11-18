@@ -9,16 +9,15 @@ extern "C" s32 fn_8004CB10(u8* a3);
 extern u8 lbl_805F86F8[];
 extern "C" s32 PartGetCurrentHealth(u8*);
 extern "C" s32 PartGetMaxHealth(u8*);
-extern "C" void fn_8004B500(u8*);
-extern "C" void fn_8004CAB4(u8*);
+extern "C" u8* fn_8004B500(u8*, s32);
+extern "C" void fn_8004CAB4(u8*, s32, void*);
 extern "C" void fn_8004D3F8(s32, u8*, s32, s32);
 extern "C" void fn_8020E668(s32);
 
 // 0x8004B5EC
-extern "C" void fn_8004B5EC(u8* a3) {
-    // tail-call arguments inferred from the registers set before the call
+extern "C" void fn_8004B5EC(u8* a3, s32 a4, u8* a5) {
     u8* t0 = ((u8*)(uintptr_t)(a3)) + -3144;
-    fn_8004CAB4(t0);
+    fn_8004CAB4(t0, (s32)((u32)(uintptr_t)(a4)), (void*)(((u8*)(uintptr_t)(a5))));
 }
 
 // 0x8004B5F4
@@ -28,10 +27,9 @@ extern "C" s32 fn_8004B5F4(u8* a3) {
 }
 
 // 0x8004B5FC
-extern "C" void fn_8004B5FC(u8* a3) {
-    // tail-call arguments inferred from the registers set before the call
+extern "C" u8* fn_8004B5FC(u8* a3, s32 a4) {
     u8* t0 = ((u8*)(uintptr_t)(a3)) + -3144;
-    fn_8004B500(t0);
+    return (u8*)(fn_8004B500(t0, (s32)((u32)(uintptr_t)(a4))));
 }
 
 // 0x8004C710

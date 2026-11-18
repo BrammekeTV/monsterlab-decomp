@@ -69,6 +69,11 @@
  "changelog": [
   {
    "date": "2026-11-18",
+   "time": "19:04",
+   "text": "Decompiled 60 more small functions: character animation and blend helpers (0x8004), welding gun and dance animation updates (0x8007), and stitching reticle, vector and constructor/destructor helpers (0x800C). Written by low-cost helper agents and reviewed."
+  },
+  {
+   "date": "2026-11-18",
    "time": "18:58",
    "text": "Decompiled 62 more small functions: multiplayer hello/start callbacks, effect and FSM print helpers (0x8010), texture, anim and list helpers (0x8018), and engine lock, list and object helpers (0x801F). Written by low-cost helper agents and reviewed."
   },

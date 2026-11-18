@@ -278,7 +278,6 @@ void SetSpawnPriority(u32 a3, BOOL a4) {
 
 // 0x800E9A30
 void RemoveAllParticles(void) {
-    // tail-call arguments inferred from the registers set before the call
     fn_801C9D74((u8*)lbl_8047C760);
 }
 

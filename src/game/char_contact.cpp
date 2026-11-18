@@ -103,7 +103,7 @@ static inline void NudgeBody(u8* c, const Vec3* d) {
 }
 
 // 0x800575E8
-BOOL CharacterOnContact(u8* c, u8* ct) {
+extern "C" BOOL CharacterOnContact(u8* c, u8* ct) {
     Vec3 vel;
     CharacterGetTotalVelocity(&vel, c);
     u8* other = CT_ENTITY(ct);

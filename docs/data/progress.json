@@ -1,15 +1,15 @@
 {
  "game_id": "RM7P4F",
- "generated": "2026-11-18T17:58:08+00:00",
- "commit": "885cf9c",
- "commit_date": "2026-11-18T18:51:55+01:00",
+ "generated": "2026-11-18T18:04:20+00:00",
+ "commit": "4417926",
+ "commit_date": "2026-11-18T18:58:23+01:00",
  "game": {
   "functions": 8548,
   "bytes": 2265988,
   "named": 2748,
   "named_bytes": 616800,
-  "decompiled": 4165,
-  "decompiled_bytes": 419152
+  "decompiled": 4225,
+  "decompiled_bytes": 424608
  },
  "library": {
   "functions": 4039,
@@ -24,8 +24,8 @@
   "bytes": 3404928,
   "named": 3211,
   "named_bytes": 721548,
-  "decompiled": 4166,
-  "decompiled_bytes": 419272
+  "decompiled": 4226,
+  "decompiled_bytes": 424728
  },
  "game_range": [
   "80006B40",
@@ -153,19 +153,19 @@
    0.687
   ],
   [
-   0.353,
+   0.361,
    0.736
   ],
   [
-   0.012,
+   0.138,
    0.101
   ],
   [
-   0.005,
+   0.097,
    0.13
   ],
   [
-   0.013,
+   0.035,
    0.233
   ],
   [
@@ -237,7 +237,7 @@
    0.312
   ],
   [
-   0.138,
+   0.153,
    0.115
   ],
   [
@@ -245,11 +245,11 @@
    0.049
   ],
   [
-   0.084,
+   0.24,
    0.034
   ],
   [
-   0.02,
+   0.041,
    0.0
   ],
   [
@@ -389,15 +389,15 @@
    0.051
   ],
   [
-   0.116,
+   0.127,
    0.0
   ],
   [
-   0.014,
+   0.072,
    0.0
   ],
   [
-   0.02,
+   0.187,
    0.072
   ],
   [
@@ -7638,6 +7638,111 @@
    ]
   },
   {
+   "path": "src/game/small_8004c.cpp",
+   "functions": [
+    {
+     "name": "fn_800498D0",
+     "addr": "800498D0",
+     "size": 88
+    },
+    {
+     "name": "fn_8004AC68",
+     "addr": "8004AC68",
+     "size": 100
+    },
+    {
+     "name": "fn_8004ACCC",
+     "addr": "8004ACCC",
+     "size": 88
+    },
+    {
+     "name": "fn_8004B498",
+     "addr": "8004B498",
+     "size": 104
+    },
+    {
+     "name": "fn_8004B500",
+     "addr": "8004B500",
+     "size": 88
+    },
+    {
+     "name": "fn_8004B6E8",
+     "addr": "8004B6E8",
+     "size": 108
+    },
+    {
+     "name": "fn_8004B82C",
+     "addr": "8004B82C",
+     "size": 80
+    },
+    {
+     "name": "fn_8004BAFC",
+     "addr": "8004BAFC",
+     "size": 104
+    },
+    {
+     "name": "fn_8004BD68",
+     "addr": "8004BD68",
+     "size": 104
+    },
+    {
+     "name": "fn_8004BDD0",
+     "addr": "8004BDD0",
+     "size": 104
+    },
+    {
+     "name": "fn_8004CAB4",
+     "addr": "8004CAB4",
+     "size": 92
+    },
+    {
+     "name": "fn_8004D170",
+     "addr": "8004D170",
+     "size": 48
+    },
+    {
+     "name": "CharacterSetBlend",
+     "addr": "8004D248",
+     "size": 112
+    },
+    {
+     "name": "fn_8004D39C",
+     "addr": "8004D39C",
+     "size": 92
+    },
+    {
+     "name": "CharacterAttackDone",
+     "addr": "8004D5BC",
+     "size": 72
+    },
+    {
+     "name": "CharacterAnimationDone",
+     "addr": "8004D700",
+     "size": 96
+    },
+    {
+     "name": "fn_8004D760",
+     "addr": "8004D760",
+     "size": 128
+    },
+    {
+     "name": "fn_8004DCEC",
+     "addr": "8004DCEC",
+     "size": 68
+    },
+    {
+     "name": "fn_8004E300",
+     "addr": "8004E300",
+     "size": 112
+    },
+    {
+     "name": "fn_8004E370",
+     "addr": "8004E370",
+     "size": 96
+    }
+   ]
+  },
+  {
    "path": "src/game/small_8005.cpp",
    "functions": [
     {
@@ -8149,6 +8254,111 @@
      "name": "fn_80079E20",
      "addr": "80079E20",
      "size": 108
+    }
+   ]
+  },
+  {
+   "path": "src/game/small_8007c.cpp",
+   "functions": [
+    {
+     "name": "UpdateDanceAnimation",
+     "addr": "800767E8",
+     "size": 124
+    },
+    {
+     "name": "fn_80079E8C",
+     "addr": "80079E8C",
+     "size": 108
+    },
+    {
+     "name": "fn_80079EF8",
+     "addr": "80079EF8",
+     "size": 52
+    },
+    {
+     "name": "fn_80079F2C",
+     "addr": "80079F2C",
+     "size": 52
+    },
+    {
+     "name": "fn_80079F68",
+     "addr": "80079F68",
+     "size": 84
+    },
+    {
+     "name": "fn_80079FD4",
+     "addr": "80079FD4",
+     "size": 108
+    },
+    {
+     "name": "UpdateWeldingGunIntroPos",
+     "addr": "8007A040",
+     "size": 68
+    },
+    {
+     "name": "UpdateWeldingGunOutroPos",
+     "addr": "8007A084",
+     "size": 68
+    },
+    {
+     "name": "InterpolateGunFromIntroPosition",
+     "addr": "8007A0C8",
+     "size": 72
+    },
+    {
+     "name": "InterpolateGunToOutroPosition",
+     "addr": "8007A110",
+     "size": 72
+    },
+    {
+     "name": "fn_8007A158",
+     "addr": "8007A158",
+     "size": 120
+    },
+    {
+     "name": "fn_8007A34C",
+     "addr": "8007A34C",
+     "size": 72
+    },
+    {
+     "name": "fn_8007A3B4",
+     "addr": "8007A3B4",
+     "size": 64
+    },
+    {
+     "name": "fn_8007A440",
+     "addr": "8007A440",
+     "size": 116
+    },
+    {
+     "name": "fn_8007B0D0",
+     "addr": "8007B0D0",
+     "size": 128
+    },
+    {
+     "name": "fn_8007B150",
+     "addr": "8007B150",
+     "size": 68
+    },
+    {
+     "name": "fn_8007B194",
+     "addr": "8007B194",
+     "size": 120
+    },
+    {
+     "name": "fn_8007C080",
+     "addr": "8007C080",
+     "size": 76
+    },
+    {
+     "name": "fn_8007C0CC",
+     "addr": "8007C0CC",
+     "size": 68
+    },
+    {
+     "name": "fn_8007C4CC",
+     "addr": "8007C4CC",
+     "size": 64
     }
    ]
   },
@@ -9269,6 +9479,111 @@
      "name": "fn_800C8DF8",
      "addr": "800C8DF8",
      "size": 88
+    }
+   ]
+  },
+  {
+   "path": "src/game/small_800Cc.cpp",
+   "functions": [
+    {
+     "name": "fn_800C8E54",
+     "addr": "800C8E54",
+     "size": 96
+    },
+    {
+     "name": "fn_800C94B0",
+     "addr": "800C94B0",
+     "size": 80
+    },
+    {
+     "name": "fn_800C9500",
+     "addr": "800C9500",
+     "size": 76
+    },
+    {
+     "name": "fn_800C98A8",
+     "addr": "800C98A8",
+     "size": 80
+    },
+    {
+     "name": "fn_800CA938",
+     "addr": "800CA938",
+     "size": 84
+    },
+    {
+     "name": "fn_800CA9B0",
+     "addr": "800CA9B0",
+     "size": 80
+    },
+    {
+     "name": "fn_800CAA00",
+     "addr": "800CAA00",
+     "size": 112
+    },
+    {
+     "name": "fn_800CAA70",
+     "addr": "800CAA70",
+     "size": 84
+    },
+    {
+     "name": "fn_800CC108",
+     "addr": "800CC108",
+     "size": 96
+    },
+    {
+     "name": "fn_800CC168",
+     "addr": "800CC168",
+     "size": 96
+    },
+    {
+     "name": "fn_800CC1C8",
+     "addr": "800CC1C8",
+     "size": 116
+    },
+    {
+     "name": "fn_800CC23C",
+     "addr": "800CC23C",
+     "size": 96
+    },
+    {
+     "name": "Stitching_Reticle_GetLastStapleQuality",
+     "addr": "800CC680",
+     "size": 120
+    },
+    {
+     "name": "fn_800CC7D4",
+     "addr": "800CC7D4",
+     "size": 128
+    },
+    {
+     "name": "fn_800CCA88",
+     "addr": "800CCA88",
+     "size": 108
+    },
+    {
+     "name": "fn_800CD43C",
+     "addr": "800CD43C",
+     "size": 84
+    },
+    {
+     "name": "fn_800CD4B4",
+     "addr": "800CD4B4",
+     "size": 52
+    },
+    {
+     "name": "fn_800CD4E8",
+     "addr": "800CD4E8",
+     "size": 52
+    },
+    {
+     "name": "fn_800CD51C",
+     "addr": "800CD51C",
+     "size": 128
+    },
+    {
+     "name": "fn_800CD67C",
+     "addr": "800CD67C",
+     "size": 100
     }
    ]
   },
