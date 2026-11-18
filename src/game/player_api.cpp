@@ -261,3 +261,199 @@ s32 GetNextLocation(void) {
 
 // 0x80221C88
 s32 GetNextRegion(void) { return S == NULL ? 0 : SaveGetNextRegion(S); }
+
+// ---------------------------------------------------------------- locations, quest ints, progress
+
+extern "C" {
+void SaveSetNextRegion(u8* s, u32 region);                 // 0x8022565C
+u32  SaveIsVerticalSlice(u8* s);                           // 0x80225F60
+void SaveSetVerticalSlice(u8* s, BOOL on);                 // 0x80225F68
+void SaveReturnToCastle(u8* s);                            // 0x8022624C
+void SaveStartSubQuest(u8* s, u32 quest);                  // 0x80222DAC
+void SaveResetSubQuest(u8* s, u32 quest);                  // 0x80222E48
+void SaveSetQuestInt(u8* s, u32 quest, s32 v);             // 0x80222ECC
+s32  SaveGetQuestInt(u8* s, u32 quest);                    // 0x80222EF0
+void SaveSetQuestIntBits(u8* s, u32 quest, BOOL which, s32 v);   // 0x80222F18
+s32  SaveGetQuestIntBits(u8* s, u32 quest, BOOL which);    // 0x80222F58
+void SaveSetQuestDescription(u8* s, u32 text);             // 0x80226C1C
+u32  SaveCheckProgressFlag(u8* s, u32 flag);               // 0x80225C90
+void SaveSetProgressFlag(u8* s, u32 flag, BOOL on);        // 0x80225CFC
+u8*  SaveGetCurrentMonster(u8* s);                         // 0x8022E170
+BOOL MonsterHasPartDef(u8* m, s32 def, BOOL checkTier);    // 0x8021CA88
+s32  PartGetCurrentHealth(const PartInstance* p);          // 0x8021EF68
+void SaveAddMSP(u8* s, BOOL amount);                       // 0x80225F70
+void SaveSetRankFromQuest(u8* s, u32 quest);               // 0x802260FC
+void LabReleaseMonsterAt(u8* inv, s32 index);              // 0x8021998C
+void SaveSetNextQuestLocation(u8* s, u32 text);            // 0x80226C34
+void SaveReset(u8* s);                                     // 0x80222300
+void* LabInventoryCtor(u8* inv);                           // 0x8021957C
+void* LabInventoryDtor(u8* inv, s32 del);                  // 0x8021984C
+void  operator_delete(void* p);                            // 0x801D4980
+void* memset(void* p, int c, size_t n);
+}
+extern u8* gLab;     // 0x805FBBC8: lab screen state (+0x6C won last minigame, +0x78 score)
+
+static inline s32 CastleIndex(s32 loc) { return (loc < 7 || loc > 12) ? 0 : loc - 7; }
+
+// 0x80221CA4
+void SetNextRegion(u32 r) { if (S != NULL) SaveSetNextRegion(S, r); }
+
+// 0x80221CC0
+u32 GetCurrentLocation(void) { return S == NULL ? (u32)-1 : *(u32*)(S + 0x108); }
+
+// 0x80221CDC
+s32 GetCurrentCastleLocation(void) { return S == NULL ? -1 : CastleIndex(*(s32*)(S + 0x108)); }
+
+// 0x80221D10
+s32 GetPreviousCastleLocation(void) { return S == NULL ? -1 : CastleIndex(*(s32*)(S + 0x10C)); }
+
+// 0x80221D44
+s32 IsCurrentLocation(u32 loc) { return (S == NULL ? (u32)-1 : *(u32*)(S + 0x108)) == loc; }
+
+// 0x80221D6C
+s32 IsPreviousLocation(u32 loc) { return (S == NULL ? (u32)-1 : *(u32*)(S + 0x10C)) == loc; }
+
+// 0x80221D94
+// Locations 0..6 and 29..35 are exploration and combat areas.
+u32 IsPreviousLocationExplorationOrCombat(void) {
+    s32 loc = S == NULL ? -1 : *(s32*)(S + 0x10C);
+    if (loc >= 0 && loc <= 6) return 1;
+    return loc >= 0x1D && loc <= 0x23;
+}
+
+// 0x80221DD8
+u32 GetQuestJunctionInterrupt(void) { return S == NULL ? 1 : *(u32*)(S + 0x100); }
+
+// 0x80221DF4
+void SetQuestJunctionInterrupt(u32 v) { if (S != NULL) *(u32*)(S + 0x100) = v; }
+
+// 0x80221E08
+s32 GetNumFreeMonsterSlots(void) { return S == NULL ? 0 : 10 - *(s32*)(S + 0x10E8); }
+
+// 0x80221E38
+u32 GetWonLastMinigame(void) { return gLab == NULL ? 0 : gLab[0x6C]; }
+
+// 0x80221E54
+s32 GetLastMinigameScore(void) { return gLab == NULL ? 0 : *(s32*)(gLab + 0x78); }
+
+// 0x80221E70
+u32 CheckGameProgressMarker(BOOL marker) { return *(u32*)(S + 0x118) >= (u32)marker; }
+
+// 0x80221EA8
+u32 IsVerticalSlice(void) { return S == NULL ? 0 : SaveIsVerticalSlice(S); }
+
+// 0x80221EC0
+void SetVerticalSlice(u32 on) { SaveSetVerticalSlice(S, on != 0); }
+
+// 0x80221EE0
+void HandleReturnToCastle(void) { SaveReturnToCastle(S); }
+
+// 0x80221EE8
+void StartSubQuest(u32 q) { SaveStartSubQuest(S, q); }
+
+// 0x80221EF4
+void ResetSubQuest(u32 q) { SaveResetSubQuest(S, q); }
+
+// 0x80221F00
+s32 GetQuestInt(u32 q) { return SaveGetQuestInt(S, q); }
+
+// 0x80221F0C
+void SetQuestInt(u32 q, s32 v) { SaveSetQuestInt(S, q, v); }
+
+// 0x80221F20
+void SetTwoBitsOfQuestInt(u32 q, BOOL which, s32 v) { SaveSetQuestIntBits(S, q, which, v); }
+
+// 0x80221F3C
+s32 GetTwoBitsOfQuestInt(u32 q, BOOL which) { return SaveGetQuestIntBits(S, q, which); }
+
+// 0x80221F50
+void DecrementQuestIntBy(u32 q, s32 n) { SaveSetQuestInt(S, q, SaveGetQuestInt(S, q) - n); }
+
+// 0x80221FA0
+void IncrementQuestIntBy(u32 q, s32 n) { SaveSetQuestInt(S, q, n + SaveGetQuestInt(S, q)); }
+
+// 0x80221FF4
+void SetQuestDescriptionString(u32 text) { SaveSetQuestDescription(S, text); }
+
+// 0x80222004
+u32 CheckGameProgressBitFlag(u32 flag) { return SaveCheckProgressFlag(S, flag); }
+
+// 0x80222010
+void SetGameProgressBitFlag(u32 flag, u32 on) { SaveSetProgressFlag(S, flag, on != 0); }
+
+// 0x80222034
+u32 DoesPlayerMonsterUsePart(u32 def, s32 tier) {
+    if (S == NULL) return 0;
+    u8* m = SaveGetCurrentMonster(S);
+    return m != NULL && MonsterHasPartDef(m, (s32)def, (u8)tier);
+}
+
+// 0x802220AC
+// Any lab monster has a part with this definition.
+u32 IsPartOnMonster(u32 def, s32 tier) {
+    BOOL found = FALSE;
+    if (S == NULL) return found;
+    for (s32 i = 0; i < *(s32*)(S + 0x10E8); i++) {
+        u8* m = *(u8**)(S + 0xA30 + i * 4);
+        if (m != NULL && MonsterHasPartDef(m, (s32)def, (u8)tier)) found = TRUE;
+    }
+    return found;
+}
+
+// 0x80222140
+// The current monster has at least one working arm.
+u32 DoesPlayerMonsterHaveAnArm(void) {
+    if (S == NULL) return 0;
+    u8* m = SaveGetCurrentMonster(S);
+    BOOL left = FALSE, right = FALSE;
+    if (m != NULL) {
+        PartInstance* a = ((PartInstance**)(m + 4))[2];
+        if (a != NULL && PartGetCurrentHealth(a) > 0) left = TRUE;
+        PartInstance* b = ((PartInstance**)(m + 4))[3];
+        if (b != NULL && PartGetCurrentHealth(b) > 0) right = TRUE;
+    }
+    return left || right;
+}
+
+// 0x802221F4
+void AddPlayerMSP(BOOL amount) { SaveAddMSP(S, amount); }
+
+// 0x80222200
+void SetPlayerRankAccordingToQuestTable(u32 q) { SaveSetRankFromQuest(S, q); }
+
+// 0x8022220C
+void RemoveMonsterAndItsPartsByIndex(BOOL index) { LabReleaseMonsterAt(S + 0xA30, index); }
+
+// 0x8022221C
+void SetNextQuestLocationString(u32 text) { SaveSetNextQuestLocation(S, text); }
+
+extern "C" {
+
+// 0x80222228
+u8* SaveCtor(u8* s) {
+    for (u8* n = s + 0x744; n < s + 0x8E8; n += 0x1C) {
+        *(u32*)(n + 0x0) = 0;
+        *(u32*)(n + 0xC) = 0;
+        *(u32*)(n + 0x10) = 0;
+        *(u32*)(n + 0x4) = 0;
+        *(u32*)(n + 0x8) = 0;
+    }
+    LabInventoryCtor(s + 0xA30);
+    SaveReset(s);
+    memset(s, 0, 0x10);
+    return s;
+}
+
+// 0x802222A0
+u8* SaveDtor(u8* s, s32 del) {
+    if (s != NULL) {
+        LabInventoryDtor(s + 0xA30, -1);
+        if (del > 0) operator_delete(s);
+    }
+    return s;
+}
+
+// 0x802222FC
+void SaveResetAlias(u8* s) { SaveReset(s); }
+
+}  // extern "C"

@@ -69,6 +69,11 @@
  "changelog": [
   {
    "date": "2026-11-18",
+   "time": "11:59",
+   "text": "Decompiled 37 more save callbacks: current/previous/castle locations, sub-quests and quest integers (including the two-bit fields), game progress markers and flags, the vertical-slice switch, whether the current monster uses a part or still has a working arm, MSP and rank rewards, plus the save object's constructor and destructor."
+  },
+  {
+   "date": "2026-11-18",
    "time": "11:56",
    "text": "Decompiled 48 script callbacks for the player's save: quest flags and levels, badges (what I had been calling achievements are the game's badges), adding and removing monsters, parts and ingredients, the 128 quest items, quest/challenge/experiment/combat rewards, and regions and locations. Each one forwards to the save object."
   },

@@ -352,7 +352,7 @@ extern "C" void fn_8022299C(u8* a3, s32 a4, s32 a5) {
 }
 
 // 0x802233CC
-extern "C" s32 fn_802233CC(u8* a3) {
+extern "C" s32 SaveCountBadges(u8* a3) {
     s32 t0 = *(s32*)(((u8*)(uintptr_t)(a3)) + 288);
     return (s32)(t0);
 }
@@ -364,12 +364,12 @@ extern "C" s32 fn_802239C8(u8* a3) {
 }
 
 // 0x802255F0
-extern "C" void fn_802255F0(u8* a3) {
+extern "C" void SaveRewardCombat(u8* a3) {
     *(u32*)(((u8*)(uintptr_t)(a3)) + 312) = (u32)((u32)(0));
 }
 
 // 0x80225654
-extern "C" s32 fn_80225654(u8* a3) {
+extern "C" s32 SaveGetNextRegion(u8* a3) {
     s32 t0 = *(s32*)(((u8*)(uintptr_t)(a3)) + 272);
     return (s32)(t0);
 }
