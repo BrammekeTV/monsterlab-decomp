@@ -1,15 +1,15 @@
 {
  "game_id": "RM7P4F",
- "generated": "2026-11-18T16:44:48+00:00",
- "commit": "3ce0574",
- "commit_date": "2026-11-18T17:38:00+01:00",
+ "generated": "2026-11-18T16:49:36+00:00",
+ "commit": "2d6dc3d",
+ "commit_date": "2026-11-18T17:44:49+01:00",
  "game": {
   "functions": 8548,
   "bytes": 2265988,
   "named": 2748,
   "named_bytes": 616800,
-  "decompiled": 3464,
-  "decompiled_bytes": 360700
+  "decompiled": 3523,
+  "decompiled_bytes": 365896
  },
  "library": {
   "functions": 4039,
@@ -24,8 +24,8 @@
   "bytes": 3404928,
   "named": 3211,
   "named_bytes": 721548,
-  "decompiled": 3465,
-  "decompiled_bytes": 360820
+  "decompiled": 3524,
+  "decompiled_bytes": 366016
  },
  "game_range": [
   "80006B40",
@@ -197,19 +197,19 @@
    0.0
   ],
   [
-   0.0,
+   0.022,
    0.0
   ],
   [
-   0.006,
+   0.131,
    0.003
   ],
   [
-   0.013,
+   0.021,
    0.0
   ],
   [
-   0.007,
+   0.034,
    0.0
   ],
   [
@@ -769,15 +769,15 @@
    1.0
   ],
   [
-   0.009,
+   0.055,
    0.399
   ],
   [
-   0.034,
+   0.103,
    0.0
   ],
   [
-   0.014,
+   0.076,
    0.02
   ],
   [
@@ -821,15 +821,15 @@
    0.0
   ],
   [
-   0.076,
+   0.093,
    0.19
   ],
   [
-   0.102,
+   0.224,
    0.094
   ],
   [
-   0.032,
+   0.113,
    0.103
   ],
   [
@@ -1414,6 +1414,211 @@
      "name": "RendHasFreeDL",
      "addr": "8015EAF4",
      "size": 52
+    }
+   ]
+  },
+  {
+   "path": "src/engine/small_8019.cpp",
+   "functions": [
+    {
+     "name": "UIEvent_SendToTopScreen",
+     "addr": "801951AC",
+     "size": 120
+    },
+    {
+     "name": "fn_801953E4",
+     "addr": "801953E4",
+     "size": 128
+    },
+    {
+     "name": "UIFindElement",
+     "addr": "80195464",
+     "size": 128
+    },
+    {
+     "name": "fn_801954E4",
+     "addr": "801954E4",
+     "size": 72
+    },
+    {
+     "name": "fn_80196CCC",
+     "addr": "80196CCC",
+     "size": 56
+    },
+    {
+     "name": "fn_80196FCC",
+     "addr": "80196FCC",
+     "size": 96
+    },
+    {
+     "name": "fn_8019702C",
+     "addr": "8019702C",
+     "size": 120
+    },
+    {
+     "name": "fn_801970D4",
+     "addr": "801970D4",
+     "size": 68
+    },
+    {
+     "name": "fn_80197FE0",
+     "addr": "80197FE0",
+     "size": 52
+    },
+    {
+     "name": "fn_801982A8",
+     "addr": "801982A8",
+     "size": 60
+    },
+    {
+     "name": "fn_801982E4",
+     "addr": "801982E4",
+     "size": 60
+    },
+    {
+     "name": "fn_80198320",
+     "addr": "80198320",
+     "size": 48
+    },
+    {
+     "name": "fn_80198C34",
+     "addr": "80198C34",
+     "size": 68
+    },
+    {
+     "name": "fn_80198DE4",
+     "addr": "80198DE4",
+     "size": 60
+    },
+    {
+     "name": "ScreenSetFindWidget",
+     "addr": "80198E34",
+     "size": 52
+    },
+    {
+     "name": "fn_80198F1C",
+     "addr": "80198F1C",
+     "size": 88
+    },
+    {
+     "name": "fn_80198F74",
+     "addr": "80198F74",
+     "size": 88
+    },
+    {
+     "name": "fn_80198FCC",
+     "addr": "80198FCC",
+     "size": 88
+    },
+    {
+     "name": "fn_80199024",
+     "addr": "80199024",
+     "size": 48
+    },
+    {
+     "name": "fn_80199054",
+     "addr": "80199054",
+     "size": 64
+    }
+   ]
+  },
+  {
+   "path": "src/engine/small_801Bb.cpp",
+   "functions": [
+    {
+     "name": "RayQueryInit",
+     "addr": "801B11DC",
+     "size": 116
+    },
+    {
+     "name": "StopRumble",
+     "addr": "801B2B94",
+     "size": 116
+    },
+    {
+     "name": "UnpauseRumble",
+     "addr": "801B2D98",
+     "size": 68
+    },
+    {
+     "name": "fn_801B30C4",
+     "addr": "801B30C4",
+     "size": 120
+    },
+    {
+     "name": "fn_801B3310",
+     "addr": "801B3310",
+     "size": 104
+    },
+    {
+     "name": "fn_801B3378",
+     "addr": "801B3378",
+     "size": 124
+    },
+    {
+     "name": "fn_801B38BC",
+     "addr": "801B38BC",
+     "size": 124
+    },
+    {
+     "name": "fn_801B402C",
+     "addr": "801B402C",
+     "size": 100
+    },
+    {
+     "name": "fn_801B4090",
+     "addr": "801B4090",
+     "size": 84
+    },
+    {
+     "name": "fn_801B40E4",
+     "addr": "801B40E4",
+     "size": 124
+    },
+    {
+     "name": "fn_801B44AC",
+     "addr": "801B44AC",
+     "size": 116
+    },
+    {
+     "name": "fn_801B503C",
+     "addr": "801B503C",
+     "size": 116
+    },
+    {
+     "name": "fn_801B50FC",
+     "addr": "801B50FC",
+     "size": 48
+    },
+    {
+     "name": "fn_801B51E0",
+     "addr": "801B51E0",
+     "size": 104
+    },
+    {
+     "name": "fn_801B5248",
+     "addr": "801B5248",
+     "size": 100
+    },
+    {
+     "name": "fn_801B52AC",
+     "addr": "801B52AC",
+     "size": 52
+    },
+    {
+     "name": "fn_801B52E0",
+     "addr": "801B52E0",
+     "size": 84
+    },
+    {
+     "name": "fn_801B55A8",
+     "addr": "801B55A8",
+     "size": 76
+    },
+    {
+     "name": "StopBouncingOverlayAlpha",
+     "addr": "801B6C48",
+     "size": 128
     }
    ]
   },
@@ -6009,6 +6214,111 @@
      "name": "fn_80044C7C",
      "addr": "80044C7C",
      "size": 64
+    }
+   ]
+  },
+  {
+   "path": "src/game/small_8006.cpp",
+   "functions": [
+    {
+     "name": "fn_800609E0",
+     "addr": "800609E0",
+     "size": 72
+    },
+    {
+     "name": "fn_80060FA8",
+     "addr": "80060FA8",
+     "size": 124
+    },
+    {
+     "name": "fn_80061A64",
+     "addr": "80061A64",
+     "size": 52
+    },
+    {
+     "name": "fn_80062398",
+     "addr": "80062398",
+     "size": 60
+    },
+    {
+     "name": "fn_80062C40",
+     "addr": "80062C40",
+     "size": 60
+    },
+    {
+     "name": "fn_80062C80",
+     "addr": "80062C80",
+     "size": 96
+    },
+    {
+     "name": "fn_80062CE0",
+     "addr": "80062CE0",
+     "size": 88
+    },
+    {
+     "name": "fn_80062F58",
+     "addr": "80062F58",
+     "size": 80
+    },
+    {
+     "name": "fn_8006307C",
+     "addr": "8006307C",
+     "size": 100
+    },
+    {
+     "name": "fn_800630E0",
+     "addr": "800630E0",
+     "size": 88
+    },
+    {
+     "name": "fn_80063318",
+     "addr": "80063318",
+     "size": 112
+    },
+    {
+     "name": "fn_80063388",
+     "addr": "80063388",
+     "size": 76
+    },
+    {
+     "name": "fn_800634D0",
+     "addr": "800634D0",
+     "size": 80
+    },
+    {
+     "name": "fn_80063530",
+     "addr": "80063530",
+     "size": 108
+    },
+    {
+     "name": "fn_80063624",
+     "addr": "80063624",
+     "size": 92
+    },
+    {
+     "name": "fn_800636BC",
+     "addr": "800636BC",
+     "size": 96
+    },
+    {
+     "name": "fn_80064568",
+     "addr": "80064568",
+     "size": 68
+    },
+    {
+     "name": "fn_80065CB0",
+     "addr": "80065CB0",
+     "size": 108
+    },
+    {
+     "name": "fn_80065EC8",
+     "addr": "80065EC8",
+     "size": 120
+    },
+    {
+     "name": "fn_800677A0",
+     "addr": "800677A0",
+     "size": 48
     }
    ]
   },
