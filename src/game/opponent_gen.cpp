@@ -1,5 +1,5 @@
 // Opponent monsters: build a random monster from an opponent template whose total part power
-// fits a window around the player's rank, then give it defects, enhancements and madness.
+// fits a window around the player's rank, then give it defects, enhancements and a quality per limb.
 // Original: MonsterGenerateOpponent 0x8021A1D0 (auto_03_8020F8E0_text.s)
 #include <string.h>
 
@@ -147,8 +147,8 @@ struct OpponentTemplate {
     s16 maxPower;           // 0x1C
     s16 defectsMax;         // 0x1E
     s16 defectsMin;         // 0x20
-    s16 madnessMin;         // 0x22
-    s16 madnessMax;         // 0x24
+    s16 qualityMin;         // 0x22
+    s16 qualityMax;         // 0x24
     s16 enhanceMin;         // 0x26
     s16 enhanceMax;         // 0x28
     s16 rankLow;            // 0x2A: added to the rank power for the window
@@ -236,9 +236,9 @@ void MonsterGenerateOpponent(void* builder, s32 tmplIndex) {
         for (s32 i = 0; i < n; i++) MonsterSpecAddModifier(builder, spec, 1, RandomRoll());
     }
 
-    // Madness per limb.
-    static const u8 kLimbMadness[LIMBS] = { 0x35, 0x42, 0x3D, 0x38, 0x34 };
-    for (s32 i = 0; i < LIMBS; i++) spec[kLimbMadness[i]] = (u8)RandomRangeS8(t.madnessMin, t.madnessMax);
+    // Quality per limb.
+    static const u8 kLimbQuality[LIMBS] = { 0x35, 0x42, 0x3D, 0x38, 0x34 };
+    for (s32 i = 0; i < LIMBS; i++) spec[kLimbQuality[i]] = (u8)RandomRangeS8(t.qualityMin, t.qualityMax);
 
     (*(void (**)(void*, u8*))(*(u8**)builder + 0x10))(builder, spec);
 }

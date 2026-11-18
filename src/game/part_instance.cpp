@@ -247,10 +247,10 @@ s32  PartActionStat2(PartInstance* p, u32 actionKey);        // 0x8021DA90
 s8   PartGetMadness(const PartInstance* p);                  // 0x8021EF80
 s32  PartGetCurrentHealth(const PartInstance* p);            // 0x8021EF68
 u8   PartGetTier(const PartInstance* p);                     // 0x8021EF58
-BOOL PartCollectionHas(void* coll, s32 defIndex, s32 tier);  // 0x802191CC
+BOOL PartAllowedAtRank(void* coll, s32 defIndex, s32 tier);  // 0x802191CC
 }
 extern u8*  gSaveSystem;          // 0x805FBBE0 (+0x128 = rank)
-extern void* gPartCollection;     ORIG(0x805FBBC8)
+extern void* gLab;     ORIG(0x805FBBC8)
 
 #define MONSTER_LIMBS 5
 #define MONSTER_PART(m, i) (((PartInstance**)((u8*)(m) + 4))[i])
@@ -325,12 +325,12 @@ f32 MonsterRateMadness(u8* m) {
 }
 
 // 0x8021D02C
-// Every part's definition and tier is in the player's collection.
-BOOL MonsterPartsAllCollected(u8* m) {
+// Every part is within the power limit of the player's rank.
+BOOL MonsterPartsAllowedAtRank(u8* m) {
     for (s32 i = 0; i < MONSTER_LIMBS; i++) {
         PartInstance* p = MONSTER_PART(m, i);
-        if (p != NULL && gPartCollection != NULL &&
-            !PartCollectionHas(gPartCollection, MONSTER_PART(m, i)->defIndex, PartGetTier(p) - 1))
+        if (p != NULL && gLab != NULL &&
+            !PartAllowedAtRank(gLab, MONSTER_PART(m, i)->defIndex, PartGetTier(p) - 1))
             return FALSE;
     }
     return TRUE;

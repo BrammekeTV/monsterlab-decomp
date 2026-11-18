@@ -1,15 +1,15 @@
 {
  "game_id": "RM7P4F",
- "generated": "2026-11-18T00:39:28+00:00",
- "commit": "e89b3f2",
- "commit_date": "2026-11-18T01:31:37+01:00",
+ "generated": "2026-11-18T00:49:50+00:00",
+ "commit": "47d2cd1",
+ "commit_date": "2026-11-18T01:39:29+01:00",
  "game": {
   "functions": 8548,
   "bytes": 2265988,
-  "named": 2560,
-  "named_bytes": 555296,
-  "decompiled": 1998,
-  "decompiled_bytes": 231288
+  "named": 2564,
+  "named_bytes": 558284,
+  "decompiled": 2005,
+  "decompiled_bytes": 234812
  },
  "library": {
   "functions": 4039,
@@ -22,10 +22,10 @@
  "all": {
   "functions": 12587,
   "bytes": 3404928,
-  "named": 3019,
-  "named_bytes": 659760,
-  "decompiled": 1998,
-  "decompiled_bytes": 231288
+  "named": 3023,
+  "named_bytes": 662748,
+  "decompiled": 2005,
+  "decompiled_bytes": 234812
  },
  "game_range": [
   "80006B40",
@@ -1013,12 +1013,12 @@
    0.094
   ],
   [
-   0.263,
-   0.301
+   0.404,
+   0.392
   ],
   [
-   0.457,
-   0.457
+   0.738,
+   0.738
   ],
   [
    0.917,
@@ -2698,6 +2698,46 @@
    ]
   },
   {
+   "path": "src/game/monster.cpp",
+   "functions": [
+    {
+     "name": "fn_80219004",
+     "addr": "80219004",
+     "size": 44
+    },
+    {
+     "name": "EntryAllowedAtRank",
+     "addr": "80219030",
+     "size": 412
+    },
+    {
+     "name": "PartAllowedAtRank",
+     "addr": "802191CC",
+     "size": 236
+    },
+    {
+     "name": "EntryComputeRequiredRank",
+     "addr": "802192B8",
+     "size": 452
+    },
+    {
+     "name": "PartComputeRequiredRank",
+     "addr": "8021947C",
+     "size": 256
+    },
+    {
+     "name": "PartInventoryAlloc",
+     "addr": "80219AE8",
+     "size": 112
+    },
+    {
+     "name": "MonsterBuildFromSpec",
+     "addr": "8021BE28",
+     "size": 2012
+    }
+   ]
+  },
+  {
    "path": "src/game/opponent_gen.cpp",
    "functions": [
     {
@@ -2796,7 +2836,7 @@
      "size": 236
     },
     {
-     "name": "MonsterPartsAllCollected",
+     "name": "MonsterPartsAllowedAtRank",
      "addr": "8021D02C",
      "size": 140
     },

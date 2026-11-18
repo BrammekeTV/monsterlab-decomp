@@ -69,6 +69,11 @@
  "changelog": [
   {
    "date": "2026-11-18",
+   "time": "01:49",
+   "text": "Parts pipeline, part 4: building a monster from a generated spec (parts taken from the player's 100-slot part inventory, set to their definition, quality, tier, defect and enhancement, then fully healed) and the rank limits: each of the 50 ranks allows parts up to a power limit, which decides whether a part can be used and which rank a shop or reward entry needs. Correction: what the opponent generator rolls per limb is quality, not madness."
+  },
+  {
+   "date": "2026-11-18",
    "time": "01:39",
    "text": "Parts pipeline, part 3: part action stats and energy costs. Damage and defence are the action's base values scaled by the part's quality and tier (and its attack modifier), split over the target limbs when an action hits several; costs scale with the tier and the cost modifier, and two special action kinds cost all or a tuned share of the monster's energy. Target limbs are unpacked from a 4-bit-per-limb mask, mirrored for the other side."
   },
@@ -85,7 +90,7 @@
   {
    "date": "2026-11-18",
    "time": "01:12",
-   "text": "Decompiled opponent generation: a random monster is built from an opponent template and re-rolled until its total part power (each part's base power times its tier multiplier) fits a window around the player's rank, then it gets defects, enhancements and madness per limb. Also the debris that scatters over every collision shape of a broken object (more pieces for bigger shapes, up to 20)."
+   "text": "Decompiled opponent generation: a random monster is built from an opponent template and re-rolled until its total part power (each part's base power times its tier multiplier) fits a window around the player's rank, then it gets defects, enhancements and a quality per limb. Also the debris that scatters over every collision shape of a broken object (more pieces for bigger shapes, up to 20)."
   },
   {
    "date": "2026-11-18",

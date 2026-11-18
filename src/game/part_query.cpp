@@ -5,7 +5,7 @@
 #include "game/part.h"
 
 extern "C" {
-void  PartPrepare(void* lab, s32 defIndex, s32 tierIndex);   // 0x8021947C
+void  PartComputeRequiredRank(void* lab, s32 defIndex, s32 tierIndex);   // 0x8021947C
 void* LightningTowerGetMonster(void);                        // 0x8001E020
 void* DefectGetTexture(s32 defect);                          // 0x80116A20
 void* EnhancementGetTexture(s32 enhancement);                // 0x80116870
@@ -78,7 +78,7 @@ extern "C" s8 PartGetMadness(const PartInstance* p) {
 void PartQuery_SetPart(void) {
     PartInstance* p = lbl_805FBBC8 ? *(PartInstance**)(lbl_805FBBC8 + 0x3C) : NULL;
     sQueryPart = p;
-    if (p != NULL) PartPrepare(lbl_805FBBC8, p->defIndex, p->tier - 1);
+    if (p != NULL) PartComputeRequiredRank(lbl_805FBBC8, p->defIndex, p->tier - 1);
     sQueryMonster = NULL;
 }
 
@@ -88,7 +88,7 @@ void PartQuery_SetInventoryPartByIndex(s32 index) {
     PartInstance* p = NULL;
     if (index >= 0 && index < *(s32*)(gSaveSystem + 0x10EC)) p = ((PartInstance**)(gSaveSystem + 0xA58))[index];
     sQueryPart = p;
-    if (p != NULL) PartPrepare(lbl_805FBBC8, p->defIndex, p->tier - 1);
+    if (p != NULL) PartComputeRequiredRank(lbl_805FBBC8, p->defIndex, p->tier - 1);
     sQueryMonster = NULL;
 }
 

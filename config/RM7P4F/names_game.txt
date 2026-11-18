@@ -609,3 +609,11 @@ fn_80216240 TargetListDecode
 fn_8021DF18 PartActionCostOf
 fn_80220998 CeilToInt
 fn_8033EB2C ceil_
+fn_8021BE28 MonsterBuildFromSpec
+fn_80219AE8 PartInventoryAlloc
+PartCollectionHas PartAllowedAtRank
+MonsterPartsAllCollected MonsterPartsAllowedAtRank
+gPartCollection gLab
+PartPrepare PartComputeRequiredRank
+fn_80219030 EntryAllowedAtRank
+fn_802192B8 EntryComputeRequiredRank
