@@ -5,11 +5,15 @@
 #include "types.h"
 #include "game/part.h"
 
+extern u8* gBattle;     // 0x805FBBB8
+
 struct TargetList5 { s32 limbs[5]; s32 count; };
 
 extern "C" {
 int   SysSprintf(char* buf, const char* fmt, ...);        // 0x80142EFC
 u8**  FighterGetSlot(u8* f, s32 i);                       // 0x8020E794
+void  fn_80041810(u8* dst, u8* src);                      // copy a choice (action, limb flag, limb)
+void* ChoiceDestroy(void* c, s32 del);                    // 0x8020F394
 void  TargetListInit(void* t);                            // 0x802161DC
 void  TargetListDecode(void* t, const u32* mask, s32 side);   // 0x80216240
 void* TargetListDestroy(void* t, s32 del);                // 0x80216200
@@ -265,6 +269,107 @@ void fn_80215AE8(char* out, u8* round, void** fighter) {
     const char* name = (t.limbs[0] == 1) ? "dodgejump" : "dodgeduck";
     for (s32 i = 0; i < 5; i++, out += 0x100) ReactionBuildOne(out, 4, fighter[i], name);
     TargetListDestroy(&t, -1);
+}
+
+// Block-reaction suffix per kind of block (index 5: none).
+static const char* const kBlockSuffix[6] = { "_radioactive", "_acidic", "_celestial", "_explosive", "_fake", "" };
+static const s32 kDisciplineSlot[3] = { 0, 1, 6 };
+
+// 0x80215C5C
+// Block animation names for the limb in choice `c` (+0x00 action, +0x08 limb): the reaction of
+// the action plus a suffix for the kind of block ("_fake" by default; none when the round is
+// kind 5 and the fighter has its own head animations; otherwise picked from how the opponent's
+// chosen limb and the defending part's disciplines match up).
+void fn_80215C5C(char* out, u8* c, void** fighter) {
+    s32 sfx = 4;
+    if (*(s32*)(*(u8**)(gBattle + 0xA0C)) == 5) {
+        sfx = 5;
+        if (!FighterHasOwnHeadAnims(fighter)) {
+            u8* opp = ((u8**)(gBattle + 0xA00))[0];
+            if ((void**)opp == fighter) opp = ((u8**)(gBattle + 0xA00))[1];
+            u8 oc[12];
+            fn_80041810(oc, opp + 0x20);
+            u8* oppLimb = ((u8**)opp)[*(s32*)(oc + 8)];
+            ChoiceDestroy(oc, -1);
+            u8* myLimb = (u8*)fighter[*(s32*)(c + 8)];
+            if (oppLimb != NULL && myLimb != NULL) {
+                s32 oppSlot = *(s32*)(*(u8**)(oppLimb + 0x28) + 0x20);
+                s32 mySlot  = *(s32*)(*(u8**)(myLimb + 0x28) + 0x20);
+                if (oppSlot == 3) {
+                    sfx = 3;
+                } else {
+                    PartDef od, md;
+                    PartDbGetDef(&od, gGameDb, **(s32**)oppLimb);
+                    PartDbGetDef(&md, gGameDb, **(s32**)myLimb);
+                    if (oppSlot == kDisciplineSlot[md.discipline]) sfx = md.discipline;
+                    else if (mySlot == kDisciplineSlot[od.discipline]) sfx = od.discipline;
+                }
+            }
+        }
+    }
+    PartAction a = (*(PartAction**)(gGameDb->data + 0x430))[*(s32*)c];
+    char name[0x40];
+    memset(name, 0, sizeof name);
+    strncpy(name, ReactionName(a.type), 0x40);
+    name[0x3F] = 0;
+    strncat(name, kBlockSuffix[sfx], 0x40);
+    name[0x3F] = 0;
+    s32 limb = *(s32*)(c + 8);
+    for (s32 i = 0; i < 5; i++, out += 0x100) ReactionBuildOne(out, limb, fighter[i], name);
+}
+
+// 0x80214F5C
+// Animation names for how `side`'s fighter reacts in this round: struck (injure), dodging,
+// blocking, or idle. The round kind (+0x00) and the action's type (kinds 6/7 are remapped to 5
+// or 4 by it) pick the case; round +0x78 is the battle, +0x7C the attacking side.
+void ReactionBuildHit(u8* round, char* out, s32 side) {
+    s32 kind = *(s32*)round;
+    u8* battle = *(u8**)(round + 0x78);
+    u8* fighter = ((u8**)(battle + 0xA00))[side];
+    u8 ch[12];
+    fn_80041810(ch, fighter + 0x20);
+    s32 action = *(s32*)ch;
+    ChoiceDestroy(ch, -1);
+    const u8* tab = *(u8**)(gGameDb->data + 0x430);
+    const u8* types = *(u8**)(gGameDb->data + 0x08);
+    s32 kindOfType = *(const s32*)(types + *(const s32*)(tab + action * 0x14 + 4) * 0x24 + 8);
+    s32 att = *(s32*)(round + 0x7C);
+
+    BOOL block = FALSE;
+    if ((u32)(kind - 6) > 1) block = TRUE;
+    else if (kindOfType == 3 || kindOfType == 5) block = TRUE;
+    else if (kindOfType == 2) kind = 4;
+    else if (kindOfType == 1) kind = 5;
+
+    u8* rec = round + side * 0x38;          // this side's record: choice at +0x30
+    if (block && side == att && round[0x74 + att] == 0) {
+        u8 c[12];
+        *(s32*)c = *(s32*)(rec + 0x30);
+        c[4] = rec[0x34];
+        *(s32*)(c + 8) = *(s32*)(rec + 0x38);
+        s32 ctype = *(const s32*)(tab + *(s32*)c * 0x14 + 4);
+        if (*(const s32*)(types + ctype * 0x24 + 8) == 5) *(s32*)(c + 8) = 4;
+        ReactionBuildForAction(out, *(s32*)(c + 8), (void**)fighter, *(s32*)c);
+        ChoiceDestroy(c, -1);
+        return;
+    }
+    u8* attRec = round + att * 0x38 + 4;
+    switch (kind) {
+    case 0: case 1: case 2: fn_80215848(out, attRec, (void**)fighter); break;
+    case 3: ReactionBuildDodgeBack(out, (void**)fighter); break;
+    case 4: fn_80215AE8(out, attRec, (void**)fighter); break;
+    case 5: {
+        u8 c[12], c2[12];
+        *(s32*)c2 = *(s32*)c = *(s32*)(rec + 0x30);
+        c2[4] = c[4] = rec[0x34];
+        *(s32*)(c2 + 8) = *(s32*)(c + 8) = *(s32*)(rec + 0x38);
+        fn_80215C5C(out, c, (void**)fighter);
+        ChoiceDestroy(c, -1);
+        ChoiceDestroy(c2, -1);
+        break;
+    }
+    default: ReactionBuildRecover(out, (void**)fighter); break;
+    }
 }
 
 }  // extern "C"

@@ -1,15 +1,15 @@
 {
  "game_id": "RM7P4F",
- "generated": "2026-11-18T16:01:11+00:00",
- "commit": "a59721c",
- "commit_date": "2026-11-18T16:59:44+01:00",
+ "generated": "2026-11-18T16:03:08+00:00",
+ "commit": "affec4c",
+ "commit_date": "2026-11-18T17:01:11+01:00",
  "game": {
   "functions": 8548,
   "bytes": 2265988,
-  "named": 2740,
-  "named_bytes": 612440,
-  "decompiled": 3015,
-  "decompiled_bytes": 304932
+  "named": 2743,
+  "named_bytes": 613852,
+  "decompiled": 3022,
+  "decompiled_bytes": 306404
  },
  "library": {
   "functions": 4039,
@@ -22,10 +22,10 @@
  "all": {
   "functions": 12587,
   "bytes": 3404928,
-  "named": 3203,
-  "named_bytes": 717188,
-  "decompiled": 3016,
-  "decompiled_bytes": 305052
+  "named": 3206,
+  "named_bytes": 718600,
+  "decompiled": 3023,
+  "decompiled_bytes": 306524
  },
  "game_range": [
   "80006B40",
@@ -109,7 +109,7 @@
    0.598
   ],
   [
-   0.191,
+   0.193,
    0.061
   ],
   [
@@ -1005,8 +1005,8 @@
    0.979
   ],
   [
-   0.635,
-   0.617
+   0.799,
+   0.776
   ],
   [
    0.187,
@@ -4281,6 +4281,11 @@
      "size": 52
     },
     {
+     "name": "ReactionBuildHit",
+     "addr": "80214F5C",
+     "size": 792
+    },
+    {
      "name": "PartAnimKey",
      "addr": "802152FC",
      "size": 288
@@ -4311,7 +4316,7 @@
      "size": 168
     },
     {
-     "name": "fn_80215848",
+     "name": "ReactionBuildInjure",
      "addr": "80215848",
      "size": 380
     },
@@ -4321,9 +4326,14 @@
      "size": 292
     },
     {
-     "name": "fn_80215AE8",
+     "name": "ReactionBuildDodge",
      "addr": "80215AE8",
      "size": 372
+    },
+    {
+     "name": "ReactionBuildBlock",
+     "addr": "80215C5C",
+     "size": 660
     },
     {
      "name": "ReactionBuildDodgeBack",
@@ -6056,13 +6066,28 @@
      "size": 4
     },
     {
+     "name": "fn_80030750",
+     "addr": "80030750",
+     "size": 4
+    },
+    {
      "name": "fn_8003089C",
      "addr": "8003089C",
      "size": 4
     },
     {
+     "name": "fn_800308A0",
+     "addr": "800308A0",
+     "size": 4
+    },
+    {
      "name": "fn_800309EC",
      "addr": "800309EC",
+     "size": 4
+    },
+    {
+     "name": "fn_800309F0",
+     "addr": "800309F0",
      "size": 4
     },
     {
@@ -6079,6 +6104,11 @@
      "name": "fn_80030B48",
      "addr": "80030B48",
      "size": 32
+    },
+    {
+     "name": "fn_80030B68",
+     "addr": "80030B68",
+     "size": 4
     }
    ]
   },
@@ -10000,6 +10030,11 @@
   {
    "path": "src/leaf/auto_03_800D02C0_text.cpp",
    "functions": [
+    {
+     "name": "fn_800D162C",
+     "addr": "800D162C",
+     "size": 4
+    },
     {
      "name": "fn_800D1634",
      "addr": "800D1634",

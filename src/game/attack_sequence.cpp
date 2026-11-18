@@ -17,7 +17,7 @@ s32   RoundGetAttacker(void* round);                       // 0x80214F48
 f32   AnimGetFrame(void* anim, f32 fps);                   // 0x8018C014
 BOOL  CharacterAttackDone(void* ch);                       // 0x8004D5BC
 void  ReactionBuild(u8* out, s32 a, void* fighter, const char* anim);   // 0x80215648
-void  ReactionBuildHit(void* round, u8* out);              // 0x80214F5C
+void  ReactionBuildHit(void* round, u8* out, s32 side);             // 0x80214F5C
 void  ReactionBuildRecover(u8* out, void* fighter);        // 0x802159C4
 void  LimbPlayReaction(void* limb, u8* reaction, BOOL special);   // 0x8004F398
 void  CharacterStartReaction(void* ch);                    // 0x8004E3D0
@@ -195,7 +195,7 @@ void AttackSequence_Update(AttackSequence* a, f32 dt) {
             ReactionBuild(reaction, 0, def, "bodyshake");
             special = TRUE;
         } else {
-            ReactionBuildHit(a->round, reaction);
+            ReactionBuildHit(a->round, reaction, 1 - a->side);
         }
         PlayReactions(def, reaction, special);
     }
