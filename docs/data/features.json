@@ -69,6 +69,11 @@
  "changelog": [
   {
    "date": "2026-11-18",
+   "time": "11:36",
+   "text": "Parts pipeline, part 5: the lab inventory, which holds up to 10 monsters, 100 parts and 105 material counters (capped at 99). Covers allocating and releasing monsters and parts (released objects move to the end of the list to be reused), the material add/take/has checks, the collection achievements (three tiers for kind-0 materials, one per group of 20 for kind 1, one for a full lab), and the monster object itself: reset, constructor and building from preset specs."
+  },
+  {
+   "date": "2026-11-18",
    "time": "01:49",
    "text": "Parts pipeline, part 4: building a monster from a generated spec (parts taken from the player's 100-slot part inventory, set to their definition, quality, tier, defect and enhancement, then fully healed) and the rank limits: each of the 50 ranks allows parts up to a power limit, which decides whether a part can be used and which rank a shop or reward entry needs. Correction: what the opponent generator rolls per limb is quality, not madness."
   },

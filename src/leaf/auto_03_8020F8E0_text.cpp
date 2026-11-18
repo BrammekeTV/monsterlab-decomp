@@ -151,14 +151,6 @@ extern "C" void fn_80218BA4(u8* a3, s32 a4, s32 a5) {
     *(u32*)(((u8*)(uintptr_t)(a3)) + 4) = (u32)((u32)(uintptr_t)(a5));
 }
 
-// 0x8021C888
-extern "C" s32 fn_8021C888(s32 a3, s32 a4) {
-    u32 t0 = (((u32)(uintptr_t)(a4) << 2) | ((u32)(uintptr_t)(a4) >> 30)) & 0xfffffffcu;
-    u32 t1 = (u32)(uintptr_t)(a3) + (u32)(t0);
-    s32 t2 = *(s32*)((u8*)(uintptr_t)(t1) + 4);
-    return (s32)(t2);
-}
-
 // 0x8021D310
 extern "C" u8 fn_8021D310(u8* a3) {
     u8 t0 = *(u8*)(((u8*)(uintptr_t)(a3)) + 73);

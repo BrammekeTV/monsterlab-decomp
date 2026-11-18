@@ -1,6 +1,6 @@
 // Monsters: building a monster from a generated spec (opponents and rewards), and the part
 // inventory its parts come from.
-// Original: MonsterBuildFromSpec 0x8021BE28, PartInventoryAlloc 0x80219AE8
+// Original: MonsterBuildFromSpec 0x8021BE28
 // (auto_03_8020F8E0_text.s)
 #include "types.h"
 #include "game/part.h"
@@ -14,6 +14,7 @@ void PartSetHealth(PartInstance* p, s32 hp);  // 0x8021D8EC
 void PartSetQuality(PartInstance* p, s32 q);  // 0x8021DA40
 void PartSetTier(PartInstance* p, u8 tier);   // 0x8021DA68
 void PartSetDef(PartInstance* p, s32 def);    // 0x8021D43C
+PartInstance* PartInventoryAlloc(u8* inv);   // 0x80219AE8 (lab_inventory.cpp)
 }
 extern u8* gSaveSystem;      // 0x805FBBE0 (+0xA30 = part inventory)
 
@@ -36,18 +37,6 @@ static const SpecLimb kSpecLimbs[LIMBS] = {
 
 extern "C" {
 
-// 0x80219AE8
-// Take the next unused part from the inventory (100 slots, pointers at +0x28) and clear it.
-PartInstance* PartInventoryAlloc(u8* inv) {
-    PartInstance* p = NULL;
-    s32 used = *(s32*)(inv + 0x6BC);
-    if (used < INVENTORY_PARTS) {
-        p = ((PartInstance**)(inv + 0x28))[used];
-        PartClear(p);                         // virtual call, vtable slot 2
-        *(s32*)(inv + 0x6BC) = used + 1;
-    }
-    return p;
-}
 
 static s32 SpecPartPower(s32 defIndex, s8 tier) {
     if (defIndex == -1) return 0;
