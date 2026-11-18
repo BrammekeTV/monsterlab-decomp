@@ -1,15 +1,15 @@
 {
  "game_id": "RM7P4F",
- "generated": "2026-11-18T15:46:02+00:00",
- "commit": "865ee00",
- "commit_date": "2026-11-18T16:44:45+01:00",
+ "generated": "2026-11-18T15:48:24+00:00",
+ "commit": "d8124d3",
+ "commit_date": "2026-11-18T16:46:02+01:00",
  "game": {
   "functions": 8548,
   "bytes": 2265988,
-  "named": 2731,
-  "named_bytes": 610828,
-  "decompiled": 2939,
-  "decompiled_bytes": 297428
+  "named": 2737,
+  "named_bytes": 612052,
+  "decompiled": 2946,
+  "decompiled_bytes": 298756
  },
  "library": {
   "functions": 4039,
@@ -22,10 +22,10 @@
  "all": {
   "functions": 12587,
   "bytes": 3404928,
-  "named": 3194,
-  "named_bytes": 715576,
-  "decompiled": 2940,
-  "decompiled_bytes": 297548
+  "named": 3200,
+  "named_bytes": 716800,
+  "decompiled": 2947,
+  "decompiled_bytes": 298876
  },
  "game_range": [
   "80006B40",
@@ -993,8 +993,8 @@
    0.0
   ],
   [
-   0.043,
-   0.057
+   0.066,
+   0.081
   ],
   [
    1.0,
@@ -1005,8 +1005,8 @@
    0.979
   ],
   [
-   0.35,
-   0.479
+   0.471,
+   0.588
   ],
   [
    0.187,
@@ -1029,8 +1029,8 @@
    0.385
   ],
   [
-   0.831,
-   0.967
+   0.839,
+   0.975
   ],
   [
    1.0,
@@ -4249,6 +4249,46 @@
      "name": "reset_trigger_send_delayed_events",
      "addr": "80019F68",
      "size": 40
+    }
+   ]
+  },
+  {
+   "path": "src/game/reaction_names.cpp",
+   "functions": [
+    {
+     "name": "ReactionName",
+     "addr": "8020E310",
+     "size": 96
+    },
+    {
+     "name": "AnimSetName",
+     "addr": "8020E370",
+     "size": 104
+    },
+    {
+     "name": "PartAnimKey",
+     "addr": "802152FC",
+     "size": 288
+    },
+    {
+     "name": "ReactionBuildOne",
+     "addr": "8021541C",
+     "size": 556
+    },
+    {
+     "name": "ReactionBuild",
+     "addr": "80215648",
+     "size": 104
+    },
+    {
+     "name": "ReactionBuildDodgeBack",
+     "addr": "80215EF0",
+     "size": 120
+    },
+    {
+     "name": "StrToLower",
+     "addr": "8022128C",
+     "size": 60
     }
    ]
   },

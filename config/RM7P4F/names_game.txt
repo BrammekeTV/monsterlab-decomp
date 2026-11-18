@@ -794,3 +794,9 @@ fn_80210060 BattleUpdate
 fn_802102DC BattleTickFighters
 fn_80210634 BattleSpeedRoll
 fn_802188E4 LabTickReset
+fn_8020E310 ReactionName
+fn_8020E370 AnimSetName
+fn_8022128C StrToLower
+fn_8021541C ReactionBuildOne
+fn_802152FC PartAnimKey
+fn_80215EF0 ReactionBuildDodgeBack
