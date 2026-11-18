@@ -1,15 +1,15 @@
 {
  "game_id": "RM7P4F",
- "generated": "2026-11-18T11:39:02+00:00",
- "commit": "21e7f88",
- "commit_date": "2026-11-18T12:37:07+01:00",
+ "generated": "2026-11-18T11:41:54+00:00",
+ "commit": "6e6b3da",
+ "commit_date": "2026-11-18T12:39:02+01:00",
  "game": {
   "functions": 8548,
   "bytes": 2265988,
   "named": 2701,
   "named_bytes": 597112,
-  "decompiled": 2192,
-  "decompiled_bytes": 262900
+  "decompiled": 2193,
+  "decompiled_bytes": 264636
  },
  "library": {
   "functions": 4039,
@@ -24,8 +24,8 @@
   "bytes": 3404928,
   "named": 3163,
   "named_bytes": 701740,
-  "decompiled": 2192,
-  "decompiled_bytes": 262900
+  "decompiled": 2193,
+  "decompiled_bytes": 264636
  },
  "game_range": [
   "80006B40",
@@ -997,7 +997,7 @@
    0.047
   ],
   [
-   0.364,
+   0.539,
    0.539
   ],
   [
@@ -1814,6 +1814,11 @@
      "name": "FighterGetSlot",
      "addr": "8020E794",
      "size": 32
+    },
+    {
+     "name": "BattleDecideRound",
+     "addr": "80210AB8",
+     "size": 1736
     },
     {
      "name": "BattleCommitAction",

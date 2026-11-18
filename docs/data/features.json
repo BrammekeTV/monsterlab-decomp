@@ -69,6 +69,11 @@
  "changelog": [
   {
    "date": "2026-11-18",
+   "time": "12:41",
+   "text": "Decompiled how a battle round is decided: the action's target limbs (attacks on broken limbs go to the torso, a blocking defender takes everything on the blocking limb), then a 1-100 to-hit roll adjusted for fleeing, the accuracy enhancement, dodging and the defender's enhancements and defects decides hit, block, dodge or miss, with the 'Roll to hit' line in the battle log."
+  },
+  {
+   "date": "2026-11-18",
    "time": "12:39",
    "text": "Decompiled the battle phase machine: choose, start the turn, play the round (start the animation listeners, let the AI react or resolve the attack straight away), wait for the animations, end the round, and the battle-over state."
   },

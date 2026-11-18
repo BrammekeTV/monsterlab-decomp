@@ -842,3 +842,138 @@ void BattleAdvance(u8* b) {
 }
 
 }  // extern "C"
+
+// ---------------------------------------------------------------- deciding a round
+
+extern "C" {
+void  SysSprintf(char* buf, const char* fmt, ...);        // 0x80142EFC
+void  BattleLogAdd(void* log, const char* text);          // 0x802207A0
+void  DamageRecordInit(u8* r);                            // 0x8021605C
+void  TargetListInit(void* t);                            // 0x802161DC
+void  TargetListDecode(void* t, const u32* mask, s32 side);   // 0x80216240
+void* TargetListDestroy(void* t, s32 del);                // 0x80216200
+}
+
+enum {
+    ROUND_HIT_ONE = 0, ROUND_HIT_MANY = 1, ROUND_MISS = 3, ROUND_DODGED = 4, ROUND_BLOCKED = 5,
+    ROUND_NO_ATTACK = 6, ROUND_SPECIAL = 8,
+};
+enum { ACTION_TYPE_REST = 0x24, ACTION_TYPE_SPECIAL = 0x28, ENH_ACCURACY = 9 };
+
+static inline void EnsureDamageRecord(u8* b, s32 side, s32 limb) {
+    u8** slot = (u8**)(*(u8**)(b + 0xA0C) + side * 0x38 + 4 + limb * 4);
+    if (*slot != NULL) return;
+    u8* r = (u8*)operator_new(0xC);
+    if (r != NULL) DamageRecordInit(r);
+    *slot = r;
+}
+
+static inline BOOL LimbBroken(u8* stats, s32 limb) {
+    u8** f = FighterStatsGetPart(stats, limb);
+    return f == NULL || **(s32**)f <= 0;
+}
+
+struct TargetList5 { s32 limbs[5]; s32 count; };
+
+extern "C" {
+
+// 0x80210AB8
+// Decide how the attacker's action lands: which limbs are hit (broken targets are redirected to
+// the torso), and whether it hits, is blocked, dodged or misses. The to-hit roll (1..100) is
+// adjusted for fleeing, the accuracy enhancement, dodging and the defender's enhancements
+// and defects, then compared with the tuned threshold.
+s32 BattleDecideRound(u8* b, u8* att, u8* def) {
+    u32 actionId = *(u32*)(att + 0x18);
+    const u8* action = (const u8*)*(PartAction**)(gGameDb->data + 0x430) + actionId * 0x14;
+    s32 type = *(const s32*)(action + 4);
+    s32 attLimb = *(s32*)(att + 0x20);
+    s32 defLimb = *(s32*)(def + 0x20);
+    s32 attSide = *(s32*)(att + 0x24), defSide = *(s32*)(def + 0x24);
+
+    if (type == ACTION_TYPE_REST || b[0x9FE + attSide] != 0) return ROUND_NO_ATTACK;
+    if (type == ACTION_TYPE_SPECIAL) return ROUND_SPECIAL;
+
+    TargetList5 t;
+    TargetListInit(&t);
+    u32 mask = *(const u32*)(action + 8);
+    TargetListDecode(&t, &mask, attLimb);
+    if (t.count == 0) {
+        TargetListDestroy(&t, -1);
+        return ROUND_NO_ATTACK;
+    }
+
+    s32 target = 4;
+    if (b[0x9F2 + defSide] != 0) {
+        // Blocking: everything goes to the blocking limb.
+        target = defLimb;
+        EnsureDamageRecord(b, defSide, target);
+    } else {
+        b[0xA5D] = 0;
+        *(f32*)(b + 0xAB4) = 0.0f;
+        for (s32 i = t.count - 1; i >= 0; i--) {
+            target = t.limbs[i];
+            if (target == 4) *(f32*)(b + 0xAB4) = (f32)((f64)*(f32*)(b + 0xAB4) + 1.0);
+            if (LimbBroken(def, target)) {
+                b[0xA5D] = 1;
+                *(f32*)(b + 0xAB4) += *(f32*)(b + 0xA80);
+            }
+        }
+        for (s32 i = t.count - 1; i >= 0; i--) {
+            target = t.limbs[i];
+            if (!LimbBroken(def, target)) EnsureDamageRecord(b, defSide, target);
+        }
+        if (b[0xA5D] != 0) {
+            target = 4;
+            EnsureDamageRecord(b, defSide, 4);
+        }
+    }
+
+    u8* attPart = ((u8**)FighterFromStats(att))[attLimb];
+    u8* defPart = ((u8**)FighterFromStats(def))[target];
+    u8** attStatus = FighterStatsGetPart(att, attLimb);
+    s32 enh = (*(s32**)attStatus)[8];
+
+    s32 roll = (s32)RngBelow(b + 4, 99) + 1;
+    s32 acc = roll;
+    if (b[0x9FC + defSide] != 0) acc += *(s32*)(b + 0xA84);
+    if (enh == ENH_ACCURACY) acc += *(s32*)(b + 0xA94);
+    if (b[0x9F0 + defSide] != 0) {
+        acc -= *(s32*)(b + 0xA64);
+        for (s32 i = 0; i < 5; i++) {
+            u8** f = FighterStatsGetPart(def, i);
+            if (f == NULL) continue;
+            s32 e = (*(s32**)f)[8], d = (*(s32**)f)[9];
+            if (e != -1) acc -= *(const s16*)(*(u8**)(gGameDb->data + 0x3610) + e * 0x24 + 0x16);
+            if (d != -1) acc += *(const s16*)(*(u8**)(gGameDb->data + 0x31E8) + d * 0x20 + 0x12);
+        }
+    }
+
+    s32 attIdx = *(s32*)(b + 0xA08);
+    BOOL hit = acc > *(s32*)(b + 0xA6C) || b[0x9F2 + defSide] != 0 || *(s32*)(b + 0xAD4 + attIdx * 4) != 0;
+    *(s32*)(b + 0xAD4 + *(s32*)(b + 0xA08) * 4) = 0;
+
+    char word[8], line[0x80];
+    if (hit)                          SysSprintf(word, "HIT");
+    else if (b[0x9F0 + defSide] != 0) SysSprintf(word, "DODGE");
+    else                              SysSprintf(word, "MISS");
+    if (attPart != NULL && *(void**)attPart != NULL && *(void**)defPart != NULL) {
+        SysSprintf(line, "Roll to hit: %d Modified: %d : %s", roll, acc, word);
+        BattleLogAdd(*(void**)(gBattle + 0xA3C + attSide * 4), line);
+    }
+
+    s32 kind;
+    if (hit) {
+        if (b[0x9F2 + defSide] != 0) kind = ROUND_BLOCKED;
+        else if (t.count == 1)       kind = ROUND_HIT_ONE;
+        else                         kind = ROUND_HIT_MANY;
+    } else if (b[0x9F0 + defSide] != 0) {
+        kind = ROUND_DODGED;
+    } else {
+        (*(s32*)(b + 0xB00))++;
+        kind = ROUND_MISS;
+    }
+    TargetListDestroy(&t, -1);
+    return kind;
+}
+
+}  // extern "C"
