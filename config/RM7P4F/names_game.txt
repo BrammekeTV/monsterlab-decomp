@@ -603,3 +603,9 @@ lbl_805FBBC8 gPartCollection
 fn_8021B730 PartPoolGet
 fn_8021B8D4 PartPoolPick
 fn_80220804 RandomUpTo
+fn_802161DC TargetListInit
+fn_80216200 TargetListDestroy
+fn_80216240 TargetListDecode
+fn_8021DF18 PartActionCostOf
+fn_80220998 CeilToInt
+fn_8033EB2C ceil_

@@ -1,31 +1,31 @@
 {
  "game_id": "RM7P4F",
- "generated": "2026-11-18T00:31:35+00:00",
- "commit": "b47f9fb",
- "commit_date": "2026-11-18T01:25:54+01:00",
+ "generated": "2026-11-18T00:39:28+00:00",
+ "commit": "e89b3f2",
+ "commit_date": "2026-11-18T01:31:37+01:00",
  "game": {
   "functions": 8548,
   "bytes": 2265988,
-  "named": 2555,
-  "named_bytes": 554080,
-  "decompiled": 1989,
-  "decompiled_bytes": 226348
+  "named": 2560,
+  "named_bytes": 555296,
+  "decompiled": 1998,
+  "decompiled_bytes": 231288
  },
  "library": {
   "functions": 4039,
   "bytes": 1138940,
-  "named": 458,
-  "named_bytes": 104144,
+  "named": 459,
+  "named_bytes": 104464,
   "decompiled": 0,
   "decompiled_bytes": 0
  },
  "all": {
   "functions": 12587,
   "bytes": 3404928,
-  "named": 3013,
-  "named_bytes": 658224,
-  "decompiled": 1989,
-  "decompiled_bytes": 226348
+  "named": 3019,
+  "named_bytes": 659760,
+  "decompiled": 1998,
+  "decompiled_bytes": 231288
  },
  "game_range": [
   "80006B40",
@@ -1009,8 +1009,8 @@
    0.201
   ],
   [
-   0.031,
-   0.06
+   0.061,
+   0.094
   ],
   [
    0.263,
@@ -1021,12 +1021,12 @@
    0.457
   ],
   [
-   0.416,
-   0.834
+   0.917,
+   0.928
   ],
   [
-   0.203,
-   0.173
+   0.208,
+   0.178
   ],
   [
    0.011,
@@ -1174,8 +1174,8 @@
    "end": "8033F400",
    "functions": 399,
    "bytes": 114196,
-   "named": 51,
-   "named_bytes": 14188,
+   "named": 52,
+   "named_bytes": 14508,
    "decompiled": 0,
    "decompiled_bytes": 0
   },
@@ -2751,6 +2751,21 @@
    "path": "src/game/part_instance.cpp",
    "functions": [
     {
+     "name": "TargetListInit",
+     "addr": "802161DC",
+     "size": 36
+    },
+    {
+     "name": "TargetListDestroy",
+     "addr": "80216200",
+     "size": 64
+    },
+    {
+     "name": "TargetListDecode",
+     "addr": "80216240",
+     "size": 196
+    },
+    {
      "name": "MonsterRateHealth",
      "addr": "8021CB98",
      "size": 172
@@ -2841,6 +2856,36 @@
      "size": 24
     },
     {
+     "name": "PartActionStat2",
+     "addr": "8021DA90",
+     "size": 344
+    },
+    {
+     "name": "PartActionStat0",
+     "addr": "8021DBE8",
+     "size": 552
+    },
+    {
+     "name": "PartActionStat1",
+     "addr": "8021DE10",
+     "size": 264
+    },
+    {
+     "name": "PartActionCostOf",
+     "addr": "8021DF18",
+     "size": 872
+    },
+    {
+     "name": "PartActionCost",
+     "addr": "8021E280",
+     "size": 1132
+    },
+    {
+     "name": "PartComputeActionCost",
+     "addr": "8021E6EC",
+     "size": 1468
+    },
+    {
      "name": "PartGetEnergy",
      "addr": "8021ECA8",
      "size": 232
@@ -2869,6 +2914,11 @@
      "name": "PartGetMaxHealth",
      "addr": "8021F168",
      "size": 300
+    },
+    {
+     "name": "CeilToInt",
+     "addr": "80220998",
+     "size": 48
     }
    ]
   },
@@ -11919,11 +11969,6 @@
      "name": "fn_802152E4",
      "addr": "802152E4",
      "size": 24
-    },
-    {
-     "name": "fn_802161DC",
-     "addr": "802161DC",
-     "size": 36
     },
     {
      "name": "fn_80216304",

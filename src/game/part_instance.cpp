@@ -343,3 +343,179 @@ f32 PlayerRankFraction(void) {
 }
 
 }  // extern "C"
+
+// ---------------------------------------------------------------- action stats
+
+// Limbs an action hits, unpacked from the action's target mask (one nibble per limb, a nibble
+// of 0xF or >= 5 ends the list).
+struct TargetList {
+    s32 limbs[5];
+    s32 count;      // 0x14
+};
+
+extern "C" {
+
+// 0x802161DC
+void TargetListInit(TargetList* t) {
+    t->count = 0;
+    for (s32 i = 0; i < 5; i++) t->limbs[i] = -1;
+}
+
+// 0x80216200
+TargetList* TargetListDestroy(TargetList* t, s32 del) {
+    if (t != NULL && del > 0) operator_delete(t);
+    return t;
+}
+
+// 0x80216240
+// side == 3 mirrors the two arm limbs (2 <-> 3).
+void TargetListDecode(TargetList* t, const u32* mask, s32 side) {
+    u32 m = *mask;
+    t->count = 0;
+    for (s32 i = 0; i < 5; i++) t->limbs[i] = (s32)((m >> (i * 4)) & 0xF);
+    for (s32 i = 0; i < 5; i++) {
+        if (t->limbs[i] == -1 || t->limbs[i] >= 5) {
+            t->limbs[i] = -1;
+            return;
+        }
+        t->count = i + 1;
+        if (side == 3) {
+            if (t->limbs[i] == 3)      t->limbs[i] = 2;
+            else if (t->limbs[i] == 2) t->limbs[i] = 3;
+        }
+    }
+}
+
+}  // extern "C"
+
+static inline const u8* Action(u32 id) { return (const u8*)*(PartAction**)(gGameDb->data + 0x430) + id * 0x14; }
+
+// Quality (blended between the tuned low/high factors) times the tier's scale.
+static inline f32 ActionScale(const PartInstance* p) {
+    f32 hi = Tuning(0x6AC), lo = Tuning(0x6B4);
+    f32 q = ((100.0f * lo) + (f32)p->quality * (hi - lo)) / 10000.0f;
+    return ((f32)p->tierScale[p->tier - 1] * q) / 100.0f;
+}
+
+extern "C" {
+
+// 0x8021DBE8
+// Damage of an action: base damage scaled by quality/tier and the part's attack modifier (stat 0),
+// split over the targets when it hits more than one limb. Broken parts do base damage.
+s32 PartActionStat0(PartInstance* p, u32 action) {
+    s16 dmg = *(const s16*)(Action(action) + 0xE);
+    if (p->health > 0) {
+        s32 d = (s32)((f32)dmg * ActionScale(p));
+        dmg = (s16)((d * (PartGetStatModifier(p, 0) + 100)) / 100);
+    }
+    TargetList t;
+    TargetListInit(&t);
+    u32 mask = *(const u32*)(Action(action) + 8);
+    TargetListDecode(&t, &mask, -1);
+    if (t.count > 1) dmg = (s16)(((f32)dmg * Tuning(0x8C)) / (f32)t.count);
+    TargetListDestroy(&t, -1);
+    return dmg;
+}
+
+// 0x8021DE10
+// Defence of an action: base defence scaled by quality/tier.
+s32 PartActionStat1(PartInstance* p, u32 action) {
+    return (s32)((f32)*(const s16*)(Action(action) + 0xC) * ActionScale(p));
+}
+
+// 0x8021DA90
+// Damage before it is split over targets (used for ratings and return damage).
+s32 PartActionStat2(PartInstance* p, u32 action) {
+    s16 dmg = *(const s16*)(Action(action) + 0xE);
+    if (p->health > 0) {
+        s32 d = (s32)((f32)dmg * ActionScale(p));
+        dmg = (s16)((d * (PartGetStatModifier(p, 0) + 100)) / 100);
+    }
+    return dmg;
+}
+
+}  // extern "C"
+
+// ---------------------------------------------------------------- action energy cost
+
+extern "C" f64 ceil_(f64 x);    // 0x8033EB2C (MSL ceil)
+
+extern "C" {
+
+// 0x80220998
+s32 CeilToInt(f32 v) { return (s32)(f32)ceil_(v); }
+
+}  // extern "C"
+
+enum { ACTION_ENERGY_SCALED = 2, ACTION_ENERGY_ALL = 3 };   // action type +0x08
+
+static inline s32 ActionKind(const u8* action) {
+    s32 type = *(const s32*)(action + 4);
+    return *(const s32*)(*(u8**)(gGameDb->data + 0x08) + type * 0x24 + 8);
+}
+
+// Base cost: the action's cost byte scaled by the tier, and by the part's cost modifier (stat 3)
+// while the part works.
+static inline s32 BaseCost(const PartInstance* p, const u8* action) {
+    s32 c = ((s8)action[0x10] * p->tierScale[p->tier - 1]) / 100;
+    if (p->health > 0) c = (c * (PartGetStatModifier(p, 3) + 100)) / 100;
+    return c;
+}
+
+extern "C" {
+
+// 0x8021DF18
+// Cost of an action record. "Scaled" actions instead cost a tuned fraction of the part's first
+// action (recursively, if that one is scaled too).
+s32 PartActionCostOf(PartInstance* p, const u8* action) {
+    s32 c = BaseCost(p, action);
+    if (ActionKind(action) != ACTION_ENERGY_SCALED) return c;
+    PartDef d;
+    PartDbGetDef(&d, gGameDb, p->defIndex);
+    const u8* first = Action((u32)d.action1);
+    s32 c1 = BaseCost(p, first);
+    if (ActionKind(first) == ACTION_ENERGY_SCALED) {
+        PartDbGetDef(&d, gGameDb, p->defIndex);
+        u8 rec[0x14];
+        for (s32 i = 0; i < 0x14; i++) rec[i] = Action((u32)d.action1)[i];
+        c1 = -CeilToInt((f32)-PartActionCostOf(p, rec) * Tuning(0x1BC));
+    }
+    return -CeilToInt((f32)-c1 * Tuning(0x1BC));
+}
+
+// 0x8021E280
+// Energy an action costs in battle. Actions of kind 3 use all the monster's energy, kind 2 a
+// tuned share of it; others cost their own amount.
+s32 PartActionCost(PartInstance* p, u32 action, u8** limbs) {
+    const u8* a = Action(action);
+    if (limbs != NULL) {
+        s32 kind = ActionKind(a);
+        if (kind == ACTION_ENERGY_ALL) return -PartGetBattleEnergy(p, limbs);
+        if (kind == ACTION_ENERGY_SCALED) {
+            s32 r = CeilToInt((f32)PartGetBattleEnergy(p, limbs) * Tuning(0x1BC));
+            return r - r * 2;
+        }
+    }
+    u8 rec[0x14];
+    for (s32 i = 0; i < 0x14; i++) rec[i] = a[i];
+    return PartActionCostOf(p, rec);
+}
+
+// 0x8021E6EC
+// Same outside battle, with the monster's inventory parts.
+s32 PartComputeActionCost(PartInstance* p, u32 action, u8* monster) {
+    const u8* a = Action(action);
+    if (monster != NULL) {
+        s32 kind = ActionKind(a);
+        if (kind == ACTION_ENERGY_ALL) return -PartGetEnergy(p, monster);
+        if (kind == ACTION_ENERGY_SCALED) {
+            s32 r = CeilToInt((f32)PartGetEnergy(p, monster) * Tuning(0x1BC));
+            return r - r * 2;
+        }
+    }
+    u8 rec[0x14];
+    for (s32 i = 0; i < 0x14; i++) rec[i] = a[i];
+    return PartActionCostOf(p, rec);
+}
+
+}  // extern "C"
