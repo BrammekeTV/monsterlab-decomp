@@ -6,7 +6,7 @@
 #include "types.h"
 #include "game/part.h"
 
-extern "C" void operator_delete(void* p);         // 0x801D4980
+extern "C" void operator_delete(void* p);         // 0x801D426C
 extern u8  gPartVtable[];                         // 0x80389120: { rtti, 0, PartClear }
 static s32 sNextPartUid;                          ORIG(0x805FA0A0)
 

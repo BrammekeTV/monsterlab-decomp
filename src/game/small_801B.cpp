@@ -2,7 +2,7 @@
 #include "types.h"
 
 extern "C" {
-void  operator_delete(void* p);                                 // 0x801D4980
+void  operator_delete(void* p);                                 // 0x801D426C
 void  BufferFree(void* p);                                      // 0x801D4980
 void  WPADControlMotor(s32 chan, u32 command);                  // 0x80272E3C
 void  fn_80234418(void* p);                                     // 0x80234418

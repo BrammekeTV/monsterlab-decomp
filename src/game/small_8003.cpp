@@ -2,7 +2,7 @@
 #include "types.h"
 
 extern "C" {
-void  operator_delete(void* p);                                 // 0x801D4980
+void  operator_delete(void* p);                                 // 0x801D426C
 void  fn_80022E10(void);                                        // 0x80022E10
 void  fn_80022F28(void);                                        // 0x80022F28
 void  fn_80021ECC(u8* p);                                       // 0x80021ECC

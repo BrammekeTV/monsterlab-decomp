@@ -5,7 +5,7 @@ extern "C" {
 void  EventSend(void* mgr, void* target, void* from, u32 event, int a, int b, int c, int d);   // 0x801BA190
 void  GameFlowSignal(s32 id, s32 a, s32 b);                       // 0x8000C7F4
 extern void* gEventMgr;                                           // 0x805FB6C8
-void  operator_delete(void* p);                                   // 0x801D4980
+void  operator_delete(void* p);                                   // 0x801D426C
 u8*   fn_8006FBDC(void);                                          // 0x8006FBDC
 s32   fn_8006FBFC(u8* obj);                                       // 0x8006FBFC
 void  fn_8006FA44(u8* a3, s32 a4, s32 a5, s32 a6, s32 a7, s32 a8); // 0x8006FA44

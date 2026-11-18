@@ -24,7 +24,7 @@ extern f32 lbl_805FD878;           // 0x805FD878 (float constant)
 extern f32 lbl_805FD8D0;           // 0x805FD8D0 (float constant)
 
 extern "C" {
-void  operator_delete(void* p);                                   // 0x801D4980
+void  operator_delete(void* p);                                   // 0x801D426C
 u8*   fn_8006FBDC(void);                                          // 0x8006FBDC
 void  fn_8006FA44(u8* a3, s32 a4, s32 a5, s32 a6, s32 a7, s32 a8); // 0x8006FA44
 void  fn_80062CE0(u8* p, s32 del);                                // 0x80062CE0 (base dtor)

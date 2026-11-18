@@ -288,7 +288,7 @@ void SaveSetNextQuestLocation(u8* s, u32 text);            // 0x80226C34
 void SaveReset(u8* s);                                     // 0x80222300
 void* LabInventoryCtor(u8* inv);                           // 0x8021957C
 void* LabInventoryDtor(u8* inv, s32 del);                  // 0x8021984C
-void  operator_delete(void* p);                            // 0x801D4980
+void  operator_delete(void* p);                            // 0x801D426C
 void* memset(void* p, int c, size_t n);
 }
 extern u8* gLab;     // 0x805FBBC8: lab screen state (+0x6C won last minigame, +0x78 score)

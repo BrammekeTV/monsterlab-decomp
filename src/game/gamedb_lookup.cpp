@@ -6,7 +6,7 @@
 extern "C" {
 void* ValueBoxCreate(void* box, s32 a, s32 b);   // 0x80213C68
 void* operator_new(u32 size);                    // 0x801D40E0
-void  operator_delete(void* p);                  // 0x801D4980
+void  operator_delete(void* p);                  // 0x801D426C
 }
 
 static inline u8* DbData(GameDb* db) { return db->data; }

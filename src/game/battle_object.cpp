@@ -5,7 +5,7 @@
 #include "game/part.h"
 
 extern "C" {
-void  operator_delete(void* p);                         // 0x801D4980
+void  operator_delete(void* p);                         // 0x801D426C
 void* operator_new(u32 size);                           // 0x801D40E0
 void* MemAllocSmall(u32 size);                          // 0x801D41CC
 void  MemFreeSmall(void* p);                            // 0x801D4340

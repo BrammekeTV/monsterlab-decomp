@@ -290,7 +290,7 @@ void FighterTickEffects(u8* stats) {
 // ---------------------------------------------------------------- effects and records
 
 extern "C" {
-void  operator_delete(void* p);                                   // 0x801D4980
+void  operator_delete(void* p);                                   // 0x801D426C
 void* operator_new(u32 size);                                     // 0x801D40E0
 void* ValueBoxCreate(void* mem, s32 kind, s32 v);                 // 0x80213C68
 void  ValueBoxDestroy(void* box, s32 del);                        // 0x80213CE0

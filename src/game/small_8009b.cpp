@@ -3,7 +3,7 @@
 
 extern "C" {
 void  GameFlowSignal(s32 id, s32 a, s32 b);                       // 0x8000C7F4
-void  operator_delete(void* p);                                   // 0x801D4980
+void  operator_delete(void* p);                                   // 0x801D426C
 void  TextureRelease(void* tex);                                  // 0x80184028
 void  fn_800690D4(u8* p, s32 a, void* params, s32 b);             // 0x800690D4 (base ctor)
 void  fn_80062CE0(u8* p, s32 del);                                // 0x80062CE0 (base dtor)

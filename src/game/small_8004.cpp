@@ -7,7 +7,7 @@ int  SysSprintf(char* buf, const char* fmt, ...);               // src/engine/en
 s32  PartDefCycleSameSlot(s32 def, BOOL backwards);             // 0x80213A6C
 
 extern "C" {
-void  operator_delete(void* p);                                 // 0x801D4980
+void  operator_delete(void* p);                                 // 0x801D426C
 void  fn_801B40E4(u8* p);                                       // 0x801B40E4
 void  fn_8020F3D4(u8* p, s32 a2);                               // 0x8020F3D4
 void  fn_8020F42C(u8* p, s32 del);                              // 0x8020F42C

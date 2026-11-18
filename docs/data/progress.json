@@ -1,15 +1,15 @@
 {
  "game_id": "RM7P4F",
- "generated": "2026-11-18T16:24:49+00:00",
- "commit": "d380a1f",
- "commit_date": "2026-11-18T17:23:35+01:00",
+ "generated": "2026-11-18T16:29:42+00:00",
+ "commit": "dc3c1f7",
+ "commit_date": "2026-11-18T17:24:50+01:00",
  "game": {
   "functions": 8548,
   "bytes": 2265988,
   "named": 2748,
   "named_bytes": 616800,
-  "decompiled": 3247,
-  "decompiled_bytes": 339072
+  "decompiled": 3306,
+  "decompiled_bytes": 343556
  },
  "library": {
   "functions": 4039,
@@ -24,8 +24,8 @@
   "bytes": 3404928,
   "named": 3211,
   "named_bytes": 721548,
-  "decompiled": 3248,
-  "decompiled_bytes": 339192
+  "decompiled": 3307,
+  "decompiled_bytes": 343676
  },
  "game_range": [
   "80006B40",
@@ -465,19 +465,19 @@
    0.97
   ],
   [
-   0.14,
+   0.163,
    0.957
   ],
   [
-   0.001,
+   0.012,
    0.931
   ],
   [
-   0.035,
+   0.166,
    0.99
   ],
   [
-   0.016,
+   0.022,
    1.0
   ],
   [
@@ -497,7 +497,7 @@
    0.0
   ],
   [
-   0.23,
+   0.513,
    1.0
   ],
   [
@@ -505,11 +505,11 @@
    1.0
   ],
   [
-   0.55,
+   0.649,
    0.883
   ],
   [
-   0.004,
+   0.081,
    0.224
   ],
   [
@@ -941,19 +941,19 @@
    0.478
   ],
   [
-   0.006,
+   0.022,
    0.292
   ],
   [
-   0.042,
+   0.066,
    0.097
   ],
   [
-   0.009,
+   0.082,
    0.0
   ],
   [
-   0.001,
+   0.049,
    0.0
   ],
   [
@@ -1519,6 +1519,106 @@
      "name": "FrameFxFlash",
      "addr": "801DB8DC",
      "size": 64
+    }
+   ]
+  },
+  {
+   "path": "src/engine/small_801F.cpp",
+   "functions": [
+    {
+     "name": "fn_801F2BCC",
+     "addr": "801F2BCC",
+     "size": 68
+    },
+    {
+     "name": "fn_801F3388",
+     "addr": "801F3388",
+     "size": 64
+    },
+    {
+     "name": "fn_801F51DC",
+     "addr": "801F51DC",
+     "size": 64
+    },
+    {
+     "name": "fn_801F5734",
+     "addr": "801F5734",
+     "size": 92
+    },
+    {
+     "name": "fn_801F57E0",
+     "addr": "801F57E0",
+     "size": 52
+    },
+    {
+     "name": "fn_801F59B0",
+     "addr": "801F59B0",
+     "size": 64
+    },
+    {
+     "name": "fn_801F5B44",
+     "addr": "801F5B44",
+     "size": 80
+    },
+    {
+     "name": "fn_801F5D34",
+     "addr": "801F5D34",
+     "size": 88
+    },
+    {
+     "name": "fn_801F5D8C",
+     "addr": "801F5D8C",
+     "size": 88
+    },
+    {
+     "name": "fn_801F5DE4",
+     "addr": "801F5DE4",
+     "size": 88
+    },
+    {
+     "name": "fn_801F5E50",
+     "addr": "801F5E50",
+     "size": 68
+    },
+    {
+     "name": "fn_801F6238",
+     "addr": "801F6238",
+     "size": 88
+    },
+    {
+     "name": "fn_801F69B8",
+     "addr": "801F69B8",
+     "size": 88
+    },
+    {
+     "name": "fn_801F71E8",
+     "addr": "801F71E8",
+     "size": 88
+    },
+    {
+     "name": "fn_801F81E0",
+     "addr": "801F81E0",
+     "size": 88
+    },
+    {
+     "name": "fn_801F858C",
+     "addr": "801F858C",
+     "size": 88
+    },
+    {
+     "name": "fn_801F85E4",
+     "addr": "801F85E4",
+     "size": 68
+    },
+    {
+     "name": "fn_801F900C",
+     "addr": "801F900C",
+     "size": 48
+    },
+    {
+     "name": "fn_801F94EC",
+     "addr": "801F94EC",
+     "size": 88
     }
    ]
   },
@@ -6124,6 +6224,216 @@
      "name": "InventoryGetPartQuality",
      "addr": "800F2018",
      "size": 88
+    }
+   ]
+  },
+  {
+   "path": "src/game/small_800Fb.cpp",
+   "functions": [
+    {
+     "name": "InventoryGetPartHealth",
+     "addr": "800F2070",
+     "size": 56
+    },
+    {
+     "name": "InventoryPartHasEnhancement",
+     "addr": "800F20A8",
+     "size": 72
+    },
+    {
+     "name": "InventoryPartHasDefect",
+     "addr": "800F20F0",
+     "size": 72
+    },
+    {
+     "name": "InventoryPartGetInstalled",
+     "addr": "800F2428",
+     "size": 96
+    },
+    {
+     "name": "IsCastleGameContext",
+     "addr": "800F4888",
+     "size": 76
+    },
+    {
+     "name": "AddTimetoQuestTimer",
+     "addr": "800F4A80",
+     "size": 72
+    },
+    {
+     "name": "IsQuestTimerDone",
+     "addr": "800F4AC8",
+     "size": 64
+    },
+    {
+     "name": "RemoveAttachedParticleEffectAtEmitter",
+     "addr": "800F4D64",
+     "size": 80
+    },
+    {
+     "name": "RemoveAllAttachedParticleEffectAtEmitter",
+     "addr": "800F4DB4",
+     "size": 76
+    },
+    {
+     "name": "RemoveAttachedParticleEffectAtEmitterImmediate",
+     "addr": "800F4E64",
+     "size": 80
+    },
+    {
+     "name": "PlayBossCameraAnimation",
+     "addr": "800F4F4C",
+     "size": 72
+    },
+    {
+     "name": "fn_800F4FB0",
+     "addr": "800F4FB0",
+     "size": 76
+    },
+    {
+     "name": "StoreFOV",
+     "addr": "800F58C0",
+     "size": 52
+    },
+    {
+     "name": "SendSignalCombatExitLocation",
+     "addr": "800F5DF0",
+     "size": 84
+    },
+    {
+     "name": "InitNetwork",
+     "addr": "800F5EF0",
+     "size": 64
+    },
+    {
+     "name": "HostGame",
+     "addr": "800F5F30",
+     "size": 64
+    },
+    {
+     "name": "JoinGame",
+     "addr": "800F5F74",
+     "size": 96
+    },
+    {
+     "name": "LockCameraToEntity",
+     "addr": "800F6348",
+     "size": 76
+    },
+    {
+     "name": "InstantLockCameraToEntity",
+     "addr": "800F6394",
+     "size": 96
+    },
+    {
+     "name": "StopWiiInputGame",
+     "addr": "800F6E28",
+     "size": 64
+    }
+   ]
+  },
+  {
+   "path": "src/game/small_8010.cpp",
+   "functions": [
+    {
+     "name": "ExplodeIfDead",
+     "addr": "80103624",
+     "size": 72
+    },
+    {
+     "name": "JumpToPlatform",
+     "addr": "80103710",
+     "size": 56
+    },
+    {
+     "name": "PlayEffectTransient",
+     "addr": "80103840",
+     "size": 88
+    },
+    {
+     "name": "fn_801068A8",
+     "addr": "801068A8",
+     "size": 88
+    },
+    {
+     "name": "fn_80106A2C",
+     "addr": "80106A2C",
+     "size": 92
+    },
+    {
+     "name": "PrintBit",
+     "addr": "80106B54",
+     "size": 96
+    },
+    {
+     "name": "PrintInt",
+     "addr": "80106BB4",
+     "size": 96
+    },
+    {
+     "name": "PrintFloat",
+     "addr": "80106C14",
+     "size": 92
+    },
+    {
+     "name": "Level_PrintBit",
+     "addr": "80106D1C",
+     "size": 96
+    },
+    {
+     "name": "Level_PrintInt",
+     "addr": "80106D7C",
+     "size": 96
+    },
+    {
+     "name": "Level_PrintFloat",
+     "addr": "80106DDC",
+     "size": 92
+    },
+    {
+     "name": "fn_801070B0",
+     "addr": "801070B0",
+     "size": 76
+    },
+    {
+     "name": "fn_801088C0",
+     "addr": "801088C0",
+     "size": 48
+    },
+    {
+     "name": "fn_80108FB4",
+     "addr": "80108FB4",
+     "size": 64
+    },
+    {
+     "name": "fn_80108FF4",
+     "addr": "80108FF4",
+     "size": 64
+    },
+    {
+     "name": "fn_80109034",
+     "addr": "80109034",
+     "size": 64
+    },
+    {
+     "name": "fn_80109074",
+     "addr": "80109074",
+     "size": 64
+    },
+    {
+     "name": "fn_801090B4",
+     "addr": "801090B4",
+     "size": 64
+    },
+    {
+     "name": "fn_801090F4",
+     "addr": "801090F4",
+     "size": 64
+    },
+    {
+     "name": "fn_80109134",
+     "addr": "80109134",
+     "size": 64
     }
    ]
   },

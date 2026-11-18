@@ -24,7 +24,7 @@ extern "C" {
 void  fn_800202FC(u8* a3);                                  // 0x800202FC (defined in leaf)
 u8*   fn_80021750(void);                                    // 0x80021750 (defined in leaf)
 void  LabShowBattleResult(void* lab, const void* result);   // 0x802186D8
-void  operator_delete(void* p);                             // 0x801D4980
+void  operator_delete(void* p);                             // 0x801D426C
 void* ScreenSetsCurrent(void* sets);                        // 0x8018D1E4
 void  ScreenSetsActivate(void* sets, u32 hash);             // 0x8018D70C
 void  ScreenSetsFlush(void* sets);                          // 0x8018DCA4

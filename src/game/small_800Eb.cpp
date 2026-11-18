@@ -16,7 +16,7 @@ extern "C" {
 }
 
 extern "C" {
-void  operator_delete(void* p);                                 // 0x801D4980
+void  operator_delete(void* p);                                 // 0x801D426C
 void  fn_800DE5E4(u8* p, s32 del);                              // 0x800DE5E4
 void  EventSend(void* mgr, void* target, void* from, u32 event, int a, int b, int c, int d);   // 0x801BA190
 void* CharacterFind(s32 id);                                    // 0x800E876C

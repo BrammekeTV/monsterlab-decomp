@@ -8,7 +8,7 @@ extern "C" {
 }
 
 extern "C" {
-void     operator_delete(void* p);                               // 0x801D4980
+void     operator_delete(void* p);                               // 0x801D426C
 void     SysSprintf(char* buf, const char* fmt, ...);            // 0x80142EFC
 void     MonsterGetName(u8* m, char* out, s32 size);             // 0x8021C968
 BOOL     EntryAllowedAtRank(u8* e);                              // 0x80219030

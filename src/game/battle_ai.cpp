@@ -5,7 +5,7 @@
 #include "game/part.h"
 
 extern "C" {
-void  operator_delete(void* p);                           // 0x801D4980
+void  operator_delete(void* p);                           // 0x801D426C
 void* ChoiceDestroy(void* c, s32 del);                    // 0x8020F394
 void  ValueBoxDestroy(void* box, s32 del);                // 0x80213CE0
 void  EffectDestroy(u8* e, s32 del);                      // 0x80216318

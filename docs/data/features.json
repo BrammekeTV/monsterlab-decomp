@@ -69,6 +69,11 @@
  "changelog": [
   {
    "date": "2026-11-18",
+   "time": "17:29",
+   "text": "Decompiled 60 more small functions: inventory part queries, quest timer, particle, boss camera, network and camera-lock script callbacks (0x800F), entity/level script callbacks and debug prints (0x8010), and engine helpers (0x801F). Written by low-cost helper agents and reviewed; also fixed a stale address comment for operator_delete."
+  },
+  {
+   "date": "2026-11-18",
    "time": "17:24",
    "text": "Decompiled 61 more small functions: grow juice experiment callbacks (heartbeat, goo bubbles, struck effects; 0x800B), page/section text helpers and list windows (0x8011), and engine fader, shader overlay and frame effect (ripple, flash) helpers (0x801D). Added tools/small_fn_brief.md, the shared brief for low-cost helper agents."
   },
