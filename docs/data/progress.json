@@ -1,15 +1,15 @@
 {
  "game_id": "RM7P4F",
- "generated": "2026-11-18T11:01:52+00:00",
- "commit": "a9664d1",
- "commit_date": "2026-11-18T11:59:13+01:00",
+ "generated": "2026-11-18T11:06:52+00:00",
+ "commit": "a82a06b",
+ "commit_date": "2026-11-18T12:01:53+01:00",
  "game": {
   "functions": 8548,
   "bytes": 2265988,
-  "named": 2640,
-  "named_bytes": 576880,
-  "decompiled": 2133,
-  "decompiled_bytes": 246880
+  "named": 2645,
+  "named_bytes": 577620,
+  "decompiled": 2145,
+  "decompiled_bytes": 250092
  },
  "library": {
   "functions": 4039,
@@ -22,10 +22,10 @@
  "all": {
   "functions": 12587,
   "bytes": 3404928,
-  "named": 3101,
-  "named_bytes": 681416,
-  "decompiled": 2133,
-  "decompiled_bytes": 246880
+  "named": 3106,
+  "named_bytes": 682156,
+  "decompiled": 2145,
+  "decompiled_bytes": 250092
  },
  "game_range": [
   "80006B40",
@@ -1033,12 +1033,12 @@
    0.958
   ],
   [
-   0.021,
-   0.675
+   0.295,
+   0.717
   ],
   [
-   0.013,
-   0.382
+   0.091,
+   0.421
   ],
   [
    0.326,
@@ -3650,6 +3650,66 @@
   {
    "path": "src/game/progress.cpp",
    "functions": [
+    {
+     "name": "SaveCopyDiscoveries",
+     "addr": "80223004",
+     "size": 152
+    },
+    {
+     "name": "SaveSetDiscoveries",
+     "addr": "8022309C",
+     "size": 152
+    },
+    {
+     "name": "SaveIsRegionReached",
+     "addr": "80223134",
+     "size": 108
+    },
+    {
+     "name": "SaveSetRegionReached",
+     "addr": "802231A0",
+     "size": 360
+    },
+    {
+     "name": "SaveHasBadge",
+     "addr": "80223308",
+     "size": 196
+    },
+    {
+     "name": "SaveAddBadge",
+     "addr": "802233D4",
+     "size": 984
+    },
+    {
+     "name": "SaveRemoveBadge",
+     "addr": "802237AC",
+     "size": 464
+    },
+    {
+     "name": "SavePartTierSeen",
+     "addr": "8022397C",
+     "size": 76
+    },
+    {
+     "name": "SaveCheckProgressFlag",
+     "addr": "80225C90",
+     "size": 108
+    },
+    {
+     "name": "SaveSetProgressFlag",
+     "addr": "80225CFC",
+     "size": 252
+    },
+    {
+     "name": "SaveCheckFlag2",
+     "addr": "80225DF8",
+     "size": 108
+    },
+    {
+     "name": "SaveSetFlag2",
+     "addr": "80225E64",
+     "size": 252
+    },
     {
      "name": "SaveGetFieldRepairRecord",
      "addr": "8022954C",

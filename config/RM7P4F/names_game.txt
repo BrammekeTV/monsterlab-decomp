@@ -698,3 +698,8 @@ fn_80222F8C SaveGetQuestRecord
 fn_80222FB4 SaveSetQuestRecord
 fn_80218998 LabQuestFinished
 fn_80224308 SaveUnlockReward
+fn_8022397C SavePartTierSeen
+fn_80225DF8 SaveCheckFlag2
+fn_80225E64 SaveSetFlag2
+fn_80223004 SaveCopyDiscoveries
+fn_8022309C SaveSetDiscoveries

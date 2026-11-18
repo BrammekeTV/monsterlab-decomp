@@ -69,6 +69,11 @@
  "changelog": [
   {
    "date": "2026-11-18",
+   "time": "12:06",
+   "text": "Decompiled the save's bit sets: 256 badges (awarding one counts it, posts a notice and grants its XP, which can raise the rank), 128 regions (marked once), two sets of 128 progress flags, which part types have been seen at which tier, and the discovery block copy helpers."
+  },
+  {
+   "date": "2026-11-18",
    "time": "12:01",
    "text": "Decompiled quest storage in the save: 47 quest records with 128 flags, a level and an integer each (sub-quests from 21 on also get a scratch block), the active quest, and ending a quest: abandoning clears it, finishing it hands out every reward tied to it, posts the notices and marks it done."
   },
