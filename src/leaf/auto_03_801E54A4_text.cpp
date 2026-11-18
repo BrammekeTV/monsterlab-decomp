@@ -19,7 +19,7 @@ extern "C" s32 fn_801E65A0(void) {
 }
 
 // 0x801E6EB0
-extern "C" s32 fn_801E6EB0(void) {
+extern "C" s32 IdPoolNext(void) {
     s32 t0 = *(s32*)((u8*)lbl_805F969C);
     return (s32)(t0);
 }

@@ -53,7 +53,7 @@ extern "C" void fn_80070450(s32 a3) {
 }
 
 // 0x80070458
-extern "C" s32 fn_80070458(void) {
+extern "C" s32 RaySceneTest(void) {
     s32 t0 = *(s32*)((u8*)lbl_805FB124);
     return (s32)(t0);
 }

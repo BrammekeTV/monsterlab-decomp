@@ -83,7 +83,7 @@ extern "C" u32 fn_800533A4(u8* a3) {
 }
 
 // 0x800533C8
-extern "C" u8* fn_800533C8(u8* a3) {
+extern "C" u8* CharacterSetMoved(u8* a3) {
     u8* t0 = *(u8**)(((u8*)(uintptr_t)(a3)) + 4);
     s32 t1 = *(s32*)(t0 + 32);
     u32 t2 = (u32)(t1) | 0x8000u;
@@ -96,7 +96,7 @@ extern "C" u8* fn_800533C8(u8* a3) {
 }
 
 // 0x800533EC
-extern "C" u8* fn_800533EC(u8* a3) {
+extern "C" u8* CharacterSetRotated(u8* a3) {
     u8* t0 = *(u8**)(((u8*)(uintptr_t)(a3)) + 4);
     s32 t1 = *(s32*)(t0 + 32);
     u32 t2 = (u32)(t1) | 0x4000u;
@@ -243,7 +243,7 @@ extern "C" u8* fn_800554D4(u8* a3) {
 }
 
 // 0x80055D64
-extern "C" void fn_80055D64(u8* a3, u8* a4) {
+extern "C" void RayQuerySetStart(u8* a3, u8* a4) {
     f32 t0 = *(f32*)(((u8*)(uintptr_t)(a4)) + 0);
     *(f32*)(((u8*)(uintptr_t)(a3)) + 60) = (f32)(t0);
     f32 t1 = *(f32*)(((u8*)(uintptr_t)(a4)) + 4);
@@ -253,7 +253,7 @@ extern "C" void fn_80055D64(u8* a3, u8* a4) {
 }
 
 // 0x80055D80
-extern "C" f32 fn_80055D80(u8* a3, u8* a4) {
+extern "C" f32 RayQuerySetDir(u8* a3, u8* a4) {
     f32 t0 = *(f32*)(((u8*)(uintptr_t)(a4)) + 0);
     f32 t1 = *(f32*)(((u8*)(uintptr_t)(a4)) + 4);
     f32 t2 = *(f32*)(((u8*)(uintptr_t)(a4)) + 8);
@@ -319,7 +319,7 @@ extern "C" s32 fn_80058228(u8* a3) {
 }
 
 // 0x800584C8
-extern "C" void fn_800584C8(u8* a3, f32 f1) {
+extern "C" void CharacterSetFallTimer(u8* a3, f32 f1) {
     *(f32*)(((u8*)(uintptr_t)(a3)) + 2008) = (f32)(f1);
 }
 

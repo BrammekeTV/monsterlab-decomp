@@ -41,7 +41,7 @@ extern "C" void fn_800223DC(u8* a3) {
 }
 
 // 0x800223E8
-extern "C" void fn_800223E8(void) {
+extern "C" void CatchMinigame_UpdatePointer(void) {
 }
 
 // 0x800223EC

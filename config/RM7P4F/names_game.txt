@@ -561,3 +561,8 @@ fn_801456E4 QuatFromMtx
 fn_80145EE8 QuatFromAxisAngle
 fn_801453BC QuatGetAxisXY
 fn_80070458 RaySceneTest
+lbl_803C7434 gZoneBase
+lbl_803C744C gZoneLoaded
+lbl_803C7464 gZoneState
+lbl_805FB7E0 gLevelSingleBank
+lbl_80369D60 gLevelFlags

@@ -211,3 +211,58 @@ void WorldStateInit(u8* w, s32 level) {
     *(u32*)(w + 0x3294) = 0;
     SetCharacterPerformanceCapToDefault();
 }
+
+// ---------------------------------------------------------------- zone memory map
+
+extern u32* gZoneBase;        ORIG(0x803C7434)   // MEM2 load address per zone
+extern u8*  gZoneLoaded;      ORIG(0x803C744C)
+extern u32* gZoneState;       ORIG(0x803C7464)
+u8          gLevelSingleBank; ORIG(0x805FB7E0)   // level flag: one bank of zone memory
+
+#define MEM2_ZONES 0x90400000u
+
+// First zone index of each category; categories are laid out in this order.
+static inline s32 CatStart(u32 off) {
+    static const u32 kOrder[] = { 0x68, 0x6C, 0x70, 0x74, 0x78, 0x7C, 0x80, 0x84, 0x88 };
+    s32 n = 1;
+    for (u32 i = 0; kOrder[i] != off; i++) n += S(kOrder[i]);
+    return n;
+}
+
+// 0x80126AB0
+// Assign every zone the MEM2 address its .sir data is loaded to. Zone 0 and the first category
+// share the start of the area; the five streamed categories alternate between two banks
+// (one bank if the level is flagged for it).
+void WorldLoadLevelZones(s32 level) {
+    gLevelSingleBank = (gLevelFlags[(u8)level * 0x20 + 0x18] >> 3) & 1;
+    for (s32 i = 0; i < ZoneCount(); i++) {
+        gZoneLoaded[i] = 0;
+        gZoneState[i] = 0;
+        gZoneBase[i] = 0;
+    }
+
+    const u32 base = (u32)S(0x00) + MEM2_ZONES;
+    const u32 slots = base + (u32)(S(0x34) * S(0x08) + S(0x04));
+    const u32 sizes = (u32)(S(0x1C) + (S(0x18) + (S(0x14) + (S(0x0C) + S(0x10)))));
+
+    gZoneBase[0] = base;
+    for (s32 i = 1; i <= S(0x68); i++)
+        gZoneBase[i] = S(0x34) > 0 ? base + (u32)(S(0x08) * ((i - 1) % S(0x34)) + S(0x04)) : base + (u32)S(0x04);
+
+    for (s32 i = CatStart(0x80); i < CatStart(0x80) + S(0x80); i++) gZoneBase[i] = sizes + slots + (u32)(S(0x24) * S(0x50));
+    for (s32 i = CatStart(0x84); i < CatStart(0x84) + S(0x84); i++) gZoneBase[i] = sizes + slots;
+    for (s32 i = CatStart(0x88); i < CatStart(0x88) + S(0x88); i++) gZoneBase[i] = slots;
+
+    // Streamed categories: each has its own block inside a bank of `sizes` bytes.
+    const s32 step = gLevelSingleBank ? 1 : 2;
+    static const u32 kCats[5] = { 0x6C, 0x70, 0x74, 0x78, 0x7C };
+    u32 blockOfs = 0;
+    for (s32 c = 0; c < 5; c++) {
+        s32 first = CatStart(kCats[c]);
+        for (s32 i = first; i <= first + S(kCats[c]) - 1; i += step) {
+            s32 bank = (i - first) % 2;
+            gZoneBase[i] = blockOfs + (slots - (u32)(bank * (s32)sizes));
+        }
+        blockOfs += (u32)S(0x0C + c * 4);
+    }
+}
