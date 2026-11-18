@@ -12,6 +12,8 @@ extern void* gLab;          // 0x805FBBC8
 extern "C" {
 void LabTickReset(u8* lab);   // 0x802188E4
 void operator_delete(void* p);
+s32  RandomUpTo(s32 max);
+s32  RandomRoll(void);        // raw 32-bit random (used unsigned)
 }
 
 static inline const u8* Db() { return gGameDb->data; }
@@ -229,6 +231,280 @@ s32 LabChallengeRewardTable(u8* lab, s32 idx) {
     s32 sub = *(s32*)(lab + 0x60);
     s32 off = (sub == 1) ? 1 : (sub == 0) ? 2 : (sub == 2) ? 3 : 0;
     return row[2 + cat * 4 + off];
+}
+
+}  // extern "C"
+
+// ---------------------------------------------------------------- experiment generator
+//
+// The lab object also holds the tuning for the current difficulty (+0x80..+0xA8, copied from the
+// 0x28-byte rows at db+0xAA70) and the experiment being built: a current record at +0x60 and
+// three candidate slots (+0x0C + 0x1C * k, occupied flag at +0x08 + k).
+// A record is 0x1C bytes: four key words (kind, bucket, option, item), a value, a factor, a word.
+
+struct ExpRec { s32 key[4]; s32 value; f32 factor; s32 word; };
+
+static inline s16 LabS16(const u8* lab, u32 ofs) { return *(const s16*)(lab + ofs); }
+
+// First random pick: three weights at +0xA2, +0x8C, +0x8E give 0, 1, 2 (-1 if the roll overshoots).
+static s32 PickKind(u8* lab) {
+    s32 r = RandomUpTo(LabS16(lab, 0x8C) + (LabS16(lab, 0x8E) + LabS16(lab, 0xA2)));
+    if (r <= LabS16(lab, 0xA2)) return 0;
+    r -= LabS16(lab, 0xA2);
+    if (r <= LabS16(lab, 0x8C)) return 1;
+    r -= LabS16(lab, 0x8C);
+    return (r <= LabS16(lab, 0x8E)) ? 2 : -1;
+}
+
+extern "C" {
+
+// 0x80217E90
+// Pick one of six buckets from a roll, with weights s16 at +0x90, +0x92, +0x94, +0x96, +0x98,
+// +0x9A; -1 if the roll is past the last.
+s32 fn_80217E90(u8* lab, s32 r) {
+    static const u32 w[6] = { 0x90, 0x92, 0x94, 0x96, 0x98, 0x9A };
+    for (s32 i = 0; i < 6; i++) {
+        if (r <= LabS16(lab, w[i])) return i;
+        r -= LabS16(lab, w[i]);
+    }
+    return -1;
+}
+
+}  // extern "C"
+
+static s32 PickBucket(u8* lab) {
+    s32 total = LabS16(lab, 0x9A) + LabS16(lab, 0x98) +
+                (LabS16(lab, 0x96) + LabS16(lab, 0x94) + (LabS16(lab, 0x90) + LabS16(lab, 0x92)));
+    return fn_80217E90(lab, RandomUpTo(total));
+}
+
+static inline s32 Rand3() { return (s32)((u32)RandomRoll() % 3u); }
+
+extern "C" {
+
+// 0x802171A0
+// Load the tuning for `level` into the lab: the last row (db+0xAA70, 0x28 bytes) whose id
+// matches +0x04 and whose s16 at +0x1C is <= level. 0 if level <= 0 or nothing fits.
+BOOL fn_802171A0(u8* lab, s32 level) {
+    if (level <= 0) return FALSE;
+    if (level == *(s32*)(lab + 0xA8)) return TRUE;
+    s32 n = *(const s32*)(Db() + 0xAA74);
+    s32 found = -1;
+    for (s32 i = 0; i < n; i++) {
+        const u8* row = *(const u8**)(Db() + 0xAA70) + i * 0x28;
+        if (*(const s32*)row == *(s32*)(lab + 4) && *(const s16*)(row + 0x1C) <= level) found = i;
+    }
+    if (found == -1) return FALSE;
+    const u8* row = *(const u8**)(Db() + 0xAA70) + found * 0x28;
+    *(s32*)(lab + 0xA8) = level;
+    *(s32*)(lab + 0x80) = *(const s32*)row;
+    *(f32*)(lab + 0x84) = *(const f32*)(row + 4);
+    *(f32*)(lab + 0x88) = *(const f32*)(row + 8);
+    for (s32 k = 0; k < 12; k++) *(s16*)(lab + 0x8C + k * 2) = *(const s16*)(row + 0xC + k * 2);
+    lab[0xA4] = row[0x24];
+    return TRUE;
+}
+
+// 0x80217F20
+// Pick a random item (row id at +0 of the 0x18-byte rows at db+0xA220) among the rows with a
+// level (+0x14) not below the lab's +0x04 whose match with `x` (fn_80218060) is within the lab's
+// limit (+0x84). -1 if none.
+s32 fn_80217F20(u8* lab, s32 x) {
+    const u8* db = Db();
+    s32 n = *(const s32*)(db + 0xA224);
+    s32 count = 0;
+    for (s32 i = 0; i < n; i++) {
+        const u8* row = *(const u8**)(db + 0xA220) + i * 0x18;
+        s32 lvl = *(const s32*)(row + 0x14);
+        if (lvl == -1 || lvl < *(s32*)(lab + 4)) continue;
+        if (fn_80218060(lab, x, *(const s32*)row) <= *(const f32*)(lab + 0x84)) count++;
+    }
+    if (count == 0) return -1;
+    u32 k = (u32)RandomRoll() % (u32)count;
+    for (s32 i = 0; i < n; i++) {
+        const u8* row = *(const u8**)(db + 0xA220) + i * 0x18;
+        s32 lvl = *(const s32*)(row + 0x14);
+        if (lvl == -1 || lvl < *(s32*)(lab + 4)) continue;
+        if (fn_80218060(lab, x, *(const s32*)row) <= *(const f32*)(lab + 0x84)) {
+            if (k == 0) return *(const s32*)row;
+            k--;
+        }
+    }
+    return -1;
+}
+
+}  // extern "C"
+
+static inline BOOL Key2Eq(const s32* a, const s32* b) { return a[0] == b[0] && a[1] == b[1]; }
+static inline BOOL Key3Eq(const s32* a, const s32* b) { return Key2Eq(a, b) && a[2] == b[2]; }
+static inline BOOL Key4Eq(const s32* a, const s32* b) { return Key3Eq(a, b) && a[3] == b[3]; }
+// kind, bucket and item (not the option) equal
+static inline BOOL KeyEqNo2(const s32* a, const s32* b) { return Key2Eq(a, b) && a[3] == b[3]; }
+
+// Find the row (db+0x9DF8, 0x18 bytes) with the record's four keys and a value (s16 +0x14)
+// not -1; store the value in the record.
+static BOOL FindRecordValue(ExpRec* r) {
+    s32 n = *(const s32*)(Db() + 0x9DFC);
+    for (s32 i = 0; i < n; i++) {
+        const u8* row = *(const u8**)(Db() + 0x9DF8) + i * 0x18;
+        s32 v = *(const s16*)(row + 0x14);
+        if (v == -1) continue;
+        if (*(const s32*)row == r->key[0] && *(const s32*)(row + 4) == r->key[1] &&
+            *(const s32*)(row + 8) == r->key[2] && *(const s32*)(row + 0xC) == r->key[3]) {
+            r->value = v;
+            return TRUE;
+        }
+    }
+    return FALSE;
+}
+
+extern "C" {
+
+// 0x802172C4
+// Make a new record `out`: with the lab's +0x9E percent chance it keeps the current record's
+// kind and bucket (and then half the time its option, with a fresh item), otherwise it rolls
+// kind and bucket until they differ from the current record's. Then looks up its value.
+BOOL fn_802172C4(u8* lab, ExpRec* out) {
+    const ExpRec* cur = (const ExpRec*)(lab + 0x60);
+    s32 kind, bucket;
+    if (RandomUpTo(99) < LabS16(lab, 0x9E)) {
+        kind = cur->key[0];
+        bucket = cur->key[1];
+    } else {
+        do {
+            kind = PickKind(lab);
+            bucket = PickBucket(lab);
+        } while (kind == cur->key[0] && bucket == cur->key[1]);
+    }
+    s32 option, item;
+    if (kind == cur->key[0] && bucket == cur->key[1]) {
+        if (RandomUpTo(1) == 0) {
+            option = cur->key[2];
+            item = fn_80217F20(lab, cur->key[3]);
+        } else {
+            option = Rand3();
+            item = cur->key[3];
+        }
+    } else {
+        option = Rand3();
+        item = cur->key[3];
+    }
+    return fn_802180EC(lab, (s32*)out, kind, bucket, option, item);
+}
+
+// 0x80217468
+// Make two new records A and B for the current experiment. With the lab's +0x9E percent chance
+// both copy the current record's kind and bucket, otherwise each rolls its own until it differs
+// from the current. Option and item are then rolled so that A differs from the current record
+// and B differs from both A and the current. Returns whether both have a value in the table.
+BOOL fn_80217468(u8* lab, ExpRec* a, ExpRec* b) {
+    const ExpRec* cur = (const ExpRec*)(lab + 0x60);
+    if (RandomUpTo(99) < LabS16(lab, 0x9E)) {
+        a->key[0] = cur->key[0]; a->key[1] = cur->key[1];
+        b->key[0] = cur->key[0]; b->key[1] = cur->key[1];
+    } else {
+        do {
+            a->key[0] = PickKind(lab);
+            a->key[1] = PickBucket(lab);
+        } while (Key2Eq(a->key, cur->key));
+        do {
+            b->key[0] = PickKind(lab);
+            b->key[1] = PickBucket(lab);
+        } while (Key2Eq(b->key, cur->key));
+    }
+    do {
+        a->key[2] = Rand3();
+        a->key[3] = fn_80217F20(lab, cur->key[3]);
+    } while (Key4Eq(a->key, cur->key));
+    do {
+        b->key[2] = Rand3();
+        b->key[3] = fn_80217F20(lab, cur->key[3]);
+    } while (Key4Eq(b->key, cur->key) || Key4Eq(b->key, a->key));
+    if (!FindRecordValue(a)) return FALSE;
+    return FindRecordValue(b);
+}
+
+// 0x80217908
+// Like the above, for the case where a first new record `x` already exists: A and B must also
+// differ from `x` (and B from A), and from the current record in the ways the checks below spell
+// out (first three keys equal, or kind/bucket/item equal).
+BOOL fn_80217908(u8* lab, ExpRec* x, ExpRec* a, ExpRec* b) {
+    const ExpRec* cur = (const ExpRec*)(lab + 0x60);
+    do {
+        a->key[0] = PickKind(lab);
+        a->key[1] = PickBucket(lab);
+    } while (Key2Eq(a->key, cur->key));
+    do {
+        b->key[0] = PickKind(lab);
+        b->key[1] = PickBucket(lab);
+    } while (Key2Eq(b->key, cur->key));
+    for (;;) {
+        a->key[2] = Rand3();
+        a->key[3] = fn_80217F20(lab, cur->key[3]);
+        if (Key4Eq(a->key, x->key)) continue;
+        if (Key3Eq(a->key, cur->key) || KeyEqNo2(a->key, cur->key)) continue;
+        break;
+    }
+    for (;;) {
+        b->key[2] = Rand3();
+        b->key[3] = fn_80217F20(lab, cur->key[3]);
+        if (Key4Eq(b->key, x->key)) continue;
+        if (Key4Eq(b->key, a->key)) continue;
+        if (Key3Eq(b->key, cur->key) || KeyEqNo2(b->key, cur->key)) continue;
+        break;
+    }
+    if (!FindRecordValue(a)) return FALSE;
+    return FindRecordValue(b);
+}
+
+}  // extern "C"
+
+static void ExpRecClear(ExpRec* r) {
+    r->key[0] = r->key[1] = r->key[2] = r->key[3] = -1;
+    r->value = 0;
+    r->factor = -1.0f;
+    r->word = 0;
+}
+
+// Put a record into a random free candidate slot (+0x0C + 0x1C * k) and mark it occupied.
+static s32 PlaceRecord(u8* lab, const ExpRec* r) {
+    s32 k = Rand3();
+    while (lab[8 + k] == 1) k = Rand3();
+    *(ExpRec*)(lab + 0xC + k * 0x1C) = *r;
+    lab[8 + k] = 1;
+    return k;
+}
+
+extern "C" {
+
+// 0x80216C80
+// Generate the three candidate records of an experiment at difficulty `level`. Returns 0 if
+// the difficulty tuning or any record can't be found. The first record is X (a fresh one, or a
+// copy of the current record), then A and B; they go into random distinct slots, and X's slot is
+// remembered at +0x7C.
+BOOL fn_80216C80(u8* lab, s32 level) {
+    lab[8] = lab[9] = lab[0xA] = 0;
+    if (!fn_802171A0(lab, level)) return FALSE;
+    s32 kind = PickKind(lab);
+    s32 bucket = PickBucket(lab);
+    s32 option = Rand3();
+    s32 item = fn_80217F20(lab, -1);
+    if (!fn_802180EC(lab, (s32*)(lab + 0x60), kind, bucket, option, item)) return FALSE;
+    ExpRec x, a, b;
+    ExpRecClear(&x);
+    ExpRecClear(&a);
+    ExpRecClear(&b);
+    if (RandomUpTo(99) < LabS16(lab, 0xA0)) {
+        if (!fn_802172C4(lab, &x)) return FALSE;
+        if (!fn_80217908(lab, &x, &a, &b)) return FALSE;
+    } else {
+        x = *(const ExpRec*)(lab + 0x60);
+        if (!fn_80217468(lab, &a, &b)) return FALSE;
+    }
+    *(s32*)(lab + 0x7C) = PlaceRecord(lab, &x);
+    PlaceRecord(lab, &a);
+    PlaceRecord(lab, &b);
+    return TRUE;
 }
 
 }  // extern "C"

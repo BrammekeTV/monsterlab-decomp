@@ -69,6 +69,11 @@
   "changelog": [
     {
       "date": "2026-11-18",
+      "time": "16:18",
+      "text": "Decompiled the lab experiment generator: it loads the difficulty tuning, then rolls the three candidate experiments (kind, bucket, option, item) so that none repeats the current one, and looks up each one's value."
+    },
+    {
+      "date": "2026-11-18",
       "time": "16:15",
       "text": "Decompiled the experiment MSP calculation and the challenge reward table lookup in the lab."
     },

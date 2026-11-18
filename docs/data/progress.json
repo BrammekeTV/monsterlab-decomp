@@ -1,15 +1,15 @@
 {
  "game_id": "RM7P4F",
- "generated": "2026-11-18T16:15:45+00:00",
- "commit": "5f3f810",
- "commit_date": "2026-11-18T17:15:00+01:00",
+ "generated": "2026-11-18T16:18:45+00:00",
+ "commit": "9576dc5",
+ "commit_date": "2026-11-18T17:15:46+01:00",
  "game": {
   "functions": 8548,
   "bytes": 2265988,
   "named": 2748,
   "named_bytes": 616800,
-  "decompiled": 3110,
-  "decompiled_bytes": 316780
+  "decompiled": 3175,
+  "decompiled_bytes": 325964
  },
  "library": {
   "functions": 4039,
@@ -24,8 +24,8 @@
   "bytes": 3404928,
   "named": 3211,
   "named_bytes": 721548,
-  "decompiled": 3111,
-  "decompiled_bytes": 316900
+  "decompiled": 3176,
+  "decompiled_bytes": 326084
  },
  "game_range": [
   "80006B40",
@@ -257,15 +257,15 @@
    0.009
   ],
   [
-   0.359,
+   0.399,
    0.448
   ],
   [
-   0.06,
+   0.163,
    0.136
   ],
   [
-   0.022,
+   0.057,
    0.482
   ],
   [
@@ -289,19 +289,19 @@
    0.0
   ],
   [
-   0.146,
+   0.181,
    0.252
   ],
   [
-   0.01,
+   0.063,
    0.241
   ],
   [
-   0.004,
+   0.039,
    0.008
   ],
   [
-   0.018,
+   0.058,
    0.106
   ],
   [
@@ -441,15 +441,15 @@
    0.009
   ],
   [
-   0.094,
+   0.132,
    0.142
   ],
   [
-   0.014,
+   0.049,
    0.155
   ],
   [
-   0.043,
+   0.125,
    1.0
   ],
   [
@@ -1009,7 +1009,7 @@
    0.944
   ],
   [
-   0.401,
+   0.952,
    0.212
   ],
   [
@@ -3166,6 +3166,41 @@
      "size": 696
     },
     {
+     "name": "fn_80216C80",
+     "addr": "80216C80",
+     "size": 1044
+    },
+    {
+     "name": "fn_802171A0",
+     "addr": "802171A0",
+     "size": 292
+    },
+    {
+     "name": "fn_802172C4",
+     "addr": "802172C4",
+     "size": 420
+    },
+    {
+     "name": "fn_80217468",
+     "addr": "80217468",
+     "size": 1184
+    },
+    {
+     "name": "fn_80217908",
+     "addr": "80217908",
+     "size": 1416
+    },
+    {
+     "name": "fn_80217E90",
+     "addr": "80217E90",
+     "size": 144
+    },
+    {
+     "name": "fn_80217F20",
+     "addr": "80217F20",
+     "size": 320
+    },
+    {
      "name": "fn_80218060",
      "addr": "80218060",
      "size": 140
@@ -5178,6 +5213,111 @@
    ]
   },
   {
+   "path": "src/game/small_8008.cpp",
+   "functions": [
+    {
+     "name": "BrainTossGetPowerUp",
+     "addr": "80080BEC",
+     "size": 56
+    },
+    {
+     "name": "BrainTossGetAvailableChunks",
+     "addr": "80080C24",
+     "size": 56
+    },
+    {
+     "name": "BrainTossUpdateScore",
+     "addr": "80080FD0",
+     "size": 52
+    },
+    {
+     "name": "fn_8008133C",
+     "addr": "8008133C",
+     "size": 96
+    },
+    {
+     "name": "fn_80081AA8",
+     "addr": "80081AA8",
+     "size": 76
+    },
+    {
+     "name": "fn_80081E24",
+     "addr": "80081E24",
+     "size": 96
+    },
+    {
+     "name": "fn_80082A74",
+     "addr": "80082A74",
+     "size": 80
+    },
+    {
+     "name": "fn_80082AC4",
+     "addr": "80082AC4",
+     "size": 92
+    },
+    {
+     "name": "fn_80082B90",
+     "addr": "80082B90",
+     "size": 80
+    },
+    {
+     "name": "fn_80082F68",
+     "addr": "80082F68",
+     "size": 52
+    },
+    {
+     "name": "fn_80083668",
+     "addr": "80083668",
+     "size": 56
+    },
+    {
+     "name": "fn_80083710",
+     "addr": "80083710",
+     "size": 96
+    },
+    {
+     "name": "fn_80083A6C",
+     "addr": "80083A6C",
+     "size": 84
+    },
+    {
+     "name": "fn_80083AC0",
+     "addr": "80083AC0",
+     "size": 88
+    },
+    {
+     "name": "fn_80083B18",
+     "addr": "80083B18",
+     "size": 188
+    },
+    {
+     "name": "fn_80084E94",
+     "addr": "80084E94",
+     "size": 64
+    },
+    {
+     "name": "fn_80084ED4",
+     "addr": "80084ED4",
+     "size": 64
+    },
+    {
+     "name": "fn_80084FA4",
+     "addr": "80084FA4",
+     "size": 64
+    },
+    {
+     "name": "fn_80084FE4",
+     "addr": "80084FE4",
+     "size": 60
+    },
+    {
+     "name": "fn_80085020",
+     "addr": "80085020",
+     "size": 88
+    }
+   ]
+  },
+  {
    "path": "src/game/small_8009.cpp",
    "functions": [
     {
@@ -5254,6 +5394,101 @@
      "name": "fn_8009215C",
      "addr": "8009215C",
      "size": 84
+    }
+   ]
+  },
+  {
+   "path": "src/game/small_8009b.cpp",
+   "functions": [
+    {
+     "name": "fn_800929D8",
+     "addr": "800929D8",
+     "size": 88
+    },
+    {
+     "name": "RobotEvolutionExperiment_RobotReadyToLaunch",
+     "addr": "80092E40",
+     "size": 96
+    },
+    {
+     "name": "RobotEvolutionExperiment_RobotStartFleeCycle",
+     "addr": "80093168",
+     "size": 96
+    },
+    {
+     "name": "fn_800938A4",
+     "addr": "800938A4",
+     "size": 60
+    },
+    {
+     "name": "fn_800938E0",
+     "addr": "800938E0",
+     "size": 84
+    },
+    {
+     "name": "fn_80093CF0",
+     "addr": "80093CF0",
+     "size": 76
+    },
+    {
+     "name": "RobotEvolutionExperiment_SmasherIdling",
+     "addr": "80093D3C",
+     "size": 96
+    },
+    {
+     "name": "RobotEvolutionExperiment_SmasherDropping",
+     "addr": "80093D9C",
+     "size": 96
+    },
+    {
+     "name": "RobotEvolutionExperiment_SmasherRaising",
+     "addr": "80093DFC",
+     "size": 96
+    },
+    {
+     "name": "fn_8009584C",
+     "addr": "8009584C",
+     "size": 64
+    },
+    {
+     "name": "fn_80095A04",
+     "addr": "80095A04",
+     "size": 52
+    },
+    {
+     "name": "fn_80095BB4",
+     "addr": "80095BB4",
+     "size": 52
+    },
+    {
+     "name": "fn_80097530",
+     "addr": "80097530",
+     "size": 68
+    },
+    {
+     "name": "fn_80097590",
+     "addr": "80097590",
+     "size": 64
+    },
+    {
+     "name": "fn_80097B78",
+     "addr": "80097B78",
+     "size": 84
+    },
+    {
+     "name": "fn_80098664",
+     "addr": "80098664",
+     "size": 60
+    },
+    {
+     "name": "fn_800986A0",
+     "addr": "800986A0",
+     "size": 96
+    },
+    {
+     "name": "fn_80098BD8",
+     "addr": "80098BD8",
+     "size": 88
     }
    ]
   },
@@ -5439,6 +5674,111 @@
      "name": "fn_800E4268",
      "addr": "800E4268",
      "size": 96
+    }
+   ]
+  },
+  {
+   "path": "src/game/small_800Eb.cpp",
+   "functions": [
+    {
+     "name": "fn_800E435C",
+     "addr": "800E435C",
+     "size": 96
+    },
+    {
+     "name": "fn_800E4BFC",
+     "addr": "800E4BFC",
+     "size": 52
+    },
+    {
+     "name": "fn_800E4C30",
+     "addr": "800E4C30",
+     "size": 64
+    },
+    {
+     "name": "fn_800E4C70",
+     "addr": "800E4C70",
+     "size": 64
+    },
+    {
+     "name": "CIAnimatedPropGetProp",
+     "addr": "800E4E48",
+     "size": 56
+    },
+    {
+     "name": "CIPannerAtZero",
+     "addr": "800E61B0",
+     "size": 88
+    },
+    {
+     "name": "fn_800E6228",
+     "addr": "800E6228",
+     "size": 56
+    },
+    {
+     "name": "ChallengeGame_EnterPauseScreen",
+     "addr": "800E75F0",
+     "size": 56
+    },
+    {
+     "name": "ChallengeGame_ExitPauseScreen",
+     "addr": "800E7628",
+     "size": 56
+    },
+    {
+     "name": "IsDifficultyLevel",
+     "addr": "800E7668",
+     "size": 56
+    },
+    {
+     "name": "IsMovieDone",
+     "addr": "800E7810",
+     "size": 80
+    },
+    {
+     "name": "FSMSetRegInt",
+     "addr": "800E7CA0",
+     "size": 64
+    },
+    {
+     "name": "FSMGetRegInt",
+     "addr": "800E7CE0",
+     "size": 80
+    },
+    {
+     "name": "FSMAddRegInt",
+     "addr": "800E7D30",
+     "size": 72
+    },
+    {
+     "name": "SpawnEntity",
+     "addr": "800E8240",
+     "size": 56
+    },
+    {
+     "name": "SetEntityHealthPercent",
+     "addr": "800E866C",
+     "size": 80
+    },
+    {
+     "name": "GetEntityHealthPercent",
+     "addr": "800E86BC",
+     "size": 88
+    },
+    {
+     "name": "Wii_PlayEntityAnimationSlot",
+     "addr": "800E88FC",
+     "size": 72
+    },
+    {
+     "name": "CheckMonsterDead",
+     "addr": "800E9324",
+     "size": 72
+    },
+    {
+     "name": "IsLocalPlayerOfSubtype",
+     "addr": "800E966C",
+     "size": 52
     }
    ]
   },
