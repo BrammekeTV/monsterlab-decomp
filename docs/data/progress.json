@@ -1,15 +1,15 @@
 {
  "game_id": "RM7P4F",
- "generated": "2026-11-18T00:06:35+00:00",
- "commit": "1272ce3",
- "commit_date": "2026-11-18T01:01:21+01:00",
+ "generated": "2026-11-18T00:12:12+00:00",
+ "commit": "f81d409",
+ "commit_date": "2026-11-18T01:06:37+01:00",
  "game": {
   "functions": 8548,
   "bytes": 2265988,
-  "named": 2525,
-  "named_bytes": 540264,
-  "decompiled": 1954,
-  "decompiled_bytes": 211908
+  "named": 2534,
+  "named_bytes": 548600,
+  "decompiled": 1957,
+  "decompiled_bytes": 217712
  },
  "library": {
   "functions": 4039,
@@ -22,10 +22,10 @@
  "all": {
   "functions": 12587,
   "bytes": 3404928,
-  "named": 2983,
-  "named_bytes": 644408,
-  "decompiled": 1954,
-  "decompiled_bytes": 211908
+  "named": 2992,
+  "named_bytes": 652744,
+  "decompiled": 1957,
+  "decompiled_bytes": 217712
  },
  "game_range": [
   "80006B40",
@@ -561,8 +561,8 @@
    0.55
   ],
   [
-   0.009,
-   0.196
+   0.36,
+   0.547
   ],
   [
    0.738,
@@ -862,7 +862,7 @@
   ],
   [
    0.011,
-   0.03
+   0.088
   ],
   [
    0.01,
@@ -1013,12 +1013,12 @@
    0.06
   ],
   [
-   0.008,
-   0.024
+   0.263,
+   0.279
   ],
   [
    0.0,
-   0.0
+   0.276
   ],
   [
    0.005,
@@ -1026,7 +1026,7 @@
   ],
   [
    0.041,
-   0.048
+   0.057
   ],
   [
    0.011,
@@ -2243,6 +2243,21 @@
    ]
   },
   {
+   "path": "src/game/debris.cpp",
+   "functions": [
+    {
+     "name": "DebrisLongestAxis",
+     "addr": "80124900",
+     "size": 196
+    },
+    {
+     "name": "DebrisSpawnForCollider",
+     "addr": "801249C4",
+     "size": 2868
+    }
+   ]
+  },
+  {
    "path": "src/game/entity_factory.cpp",
    "functions": [
     {
@@ -2679,6 +2694,16 @@
      "name": "MatchupUpdate",
      "addr": "8013CFA8",
      "size": 3244
+    }
+   ]
+  },
+  {
+   "path": "src/game/opponent_gen.cpp",
+   "functions": [
+    {
+     "name": "MonsterGenerateOpponent",
+     "addr": "8021A1D0",
+     "size": 2740
     }
    ]
   },

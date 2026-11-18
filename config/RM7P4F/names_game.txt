@@ -566,3 +566,15 @@ lbl_803C744C gZoneLoaded
 lbl_803C7464 gZoneState
 lbl_805FB7E0 gLevelSingleBank
 lbl_80369D60 gLevelFlags
+fn_801249C4 DebrisSpawnForCollider
+fn_80124900 DebrisLongestAxis
+fn_801C81D8 SpawnEffectAtPos
+lbl_805FB2DC gDebrisVolumeUnit
+lbl_805FB2E0 gDebrisVolume
+lbl_805FB2E4 gDebrisEffect
+fn_8021A1D0 MonsterGenerateOpponent
+fn_8021AC84 MonsterSpecRandomize
+fn_8021AF54 MonsterSpecReroll
+fn_8021BC44 MonsterSpecAddModifier
+fn_80220800 RandomRoll
+fn_80220840 RandomRangeS8
