@@ -69,6 +69,11 @@
  "changelog": [
   {
    "date": "2026-11-18",
+   "time": "12:01",
+   "text": "Decompiled quest storage in the save: 47 quest records with 128 flags, a level and an integer each (sub-quests from 21 on also get a scratch block), the active quest, and ending a quest: abandoning clears it, finishing it hands out every reward tied to it, posts the notices and marks it done."
+  },
+  {
+   "date": "2026-11-18",
    "time": "11:59",
    "text": "Decompiled 37 more save callbacks: current/previous/castle locations, sub-quests and quest integers (including the two-bit fields), game progress markers and flags, the vertical-slice switch, whether the current monster uses a part or still has a working arm, MSP and rank rewards, plus the save object's constructor and destructor."
   },

@@ -375,7 +375,7 @@ extern "C" s32 SaveGetNextRegion(u8* a3) {
 }
 
 // 0x8022565C
-extern "C" void fn_8022565C(u8* a3, s32 a4) {
+extern "C" void SaveSetNextRegion(u8* a3, s32 a4) {
     *(u32*)(((u8*)(uintptr_t)(a3)) + 272) = (u32)((u32)(uintptr_t)(a4));
 }
 
@@ -393,18 +393,18 @@ extern "C" void fn_80225C10(u8* a3, s32 a4, s32 a5, s32 a6) {
 }
 
 // 0x80225F60
-extern "C" u8 fn_80225F60(u8* a3) {
+extern "C" u8 SaveIsVerticalSlice(u8* a3) {
     u8 t0 = *(u8*)(((u8*)(uintptr_t)(a3)) + 2596);
     return (u8)(t0);
 }
 
 // 0x80225F68
-extern "C" void fn_80225F68(u8* a3, s32 a4) {
+extern "C" void SaveSetVerticalSlice(u8* a3, s32 a4) {
     *(u8*)(((u8*)(uintptr_t)(a3)) + 2596) = (u8)((u32)(uintptr_t)(a4));
 }
 
 // 0x80226C1C
-extern "C" void fn_80226C1C(u8* a3, s32 a4) {
+extern "C" void SaveSetQuestDescription(u8* a3, s32 a4) {
     *(u32*)(((u8*)(uintptr_t)(a3)) + 1716) = (u32)((u32)(uintptr_t)(a4));
 }
 
@@ -421,7 +421,7 @@ extern "C" s32 fn_80226C2C(u8* a3) {
 }
 
 // 0x80226C34
-extern "C" void fn_80226C34(u8* a3, s32 a4) {
+extern "C" void SaveSetNextQuestLocation(u8* a3, s32 a4) {
     *(u32*)(((u8*)(uintptr_t)(a3)) + 1720) = (u32)((u32)(uintptr_t)(a4));
 }
 
@@ -518,7 +518,7 @@ extern "C" s32 fn_8022DE84(u8* a3) {
 }
 
 // 0x8022E170
-extern "C" s32 fn_8022E170(u8* a3) {
+extern "C" s32 SaveGetCurrentMonster(u8* a3) {
     s32 t0 = *(s32*)(((u8*)(uintptr_t)(a3)) + 276);
     return (s32)(t0);
 }

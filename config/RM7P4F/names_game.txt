@@ -692,3 +692,9 @@ fn_80222300 SaveReset
 fn_80222228 SaveCtor
 fn_802222A0 SaveDtor
 fn_802222FC SaveResetAlias
+fn_802229A8 SaveSetActiveQuest
+fn_802229D8 SaveEndQuest
+fn_80222F8C SaveGetQuestRecord
+fn_80222FB4 SaveSetQuestRecord
+fn_80218998 LabQuestFinished
+fn_80224308 SaveUnlockReward

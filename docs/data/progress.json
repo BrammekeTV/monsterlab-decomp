@@ -1,15 +1,15 @@
 {
  "game_id": "RM7P4F",
- "generated": "2026-11-18T10:59:12+00:00",
- "commit": "4123fae",
- "commit_date": "2026-11-18T11:56:55+01:00",
+ "generated": "2026-11-18T11:01:52+00:00",
+ "commit": "a9664d1",
+ "commit_date": "2026-11-18T11:59:13+01:00",
  "game": {
   "functions": 8548,
   "bytes": 2265988,
-  "named": 2634,
-  "named_bytes": 574444,
-  "decompiled": 2118,
-  "decompiled_bytes": 244756
+  "named": 2640,
+  "named_bytes": 576880,
+  "decompiled": 2133,
+  "decompiled_bytes": 246880
  },
  "library": {
   "functions": 4039,
@@ -22,10 +22,10 @@
  "all": {
   "functions": 12587,
   "bytes": 3404928,
-  "named": 3095,
-  "named_bytes": 678980,
-  "decompiled": 2118,
-  "decompiled_bytes": 244756
+  "named": 3101,
+  "named_bytes": 681416,
+  "decompiled": 2133,
+  "decompiled_bytes": 246880
  },
  "game_range": [
   "80006B40",
@@ -1014,7 +1014,7 @@
   ],
   [
    0.687,
-   0.675
+   0.682
   ],
   [
    1.0,
@@ -1029,12 +1029,12 @@
    0.195
   ],
   [
-   0.56,
-   0.83
+   0.822,
+   0.958
   ],
   [
-   0.002,
-   0.52
+   0.021,
+   0.675
   ],
   [
    0.013,
@@ -3844,6 +3844,86 @@
      "name": "SaveSelectBannerLayout",
      "addr": "80011BC0",
      "size": 208
+    }
+   ]
+  },
+  {
+   "path": "src/game/save_quests.cpp",
+   "functions": [
+    {
+     "name": "SaveSetQuestFlag",
+     "addr": "802227A4",
+     "size": 304
+    },
+    {
+     "name": "SaveSetQuestLevel",
+     "addr": "802228D4",
+     "size": 24
+    },
+    {
+     "name": "SaveGetQuestFlag",
+     "addr": "802228EC",
+     "size": 136
+    },
+    {
+     "name": "SaveGetQuestLevel",
+     "addr": "80222974",
+     "size": 32
+    },
+    {
+     "name": "SaveSetActiveQuest",
+     "addr": "802229A8",
+     "size": 48
+    },
+    {
+     "name": "SaveEndQuest",
+     "addr": "802229D8",
+     "size": 900
+    },
+    {
+     "name": "SaveIsQuestActive",
+     "addr": "80222D5C",
+     "size": 80
+    },
+    {
+     "name": "SaveStartSubQuest",
+     "addr": "80222DAC",
+     "size": 156
+    },
+    {
+     "name": "SaveResetSubQuest",
+     "addr": "80222E48",
+     "size": 132
+    },
+    {
+     "name": "SaveSetQuestInt",
+     "addr": "80222ECC",
+     "size": 36
+    },
+    {
+     "name": "SaveGetQuestInt",
+     "addr": "80222EF0",
+     "size": 40
+    },
+    {
+     "name": "SaveSetQuestIntBits",
+     "addr": "80222F18",
+     "size": 64
+    },
+    {
+     "name": "SaveGetQuestIntBits",
+     "addr": "80222F58",
+     "size": 52
+    },
+    {
+     "name": "SaveGetQuestRecord",
+     "addr": "80222F8C",
+     "size": 40
+    },
+    {
+     "name": "SaveSetQuestRecord",
+     "addr": "80222FB4",
+     "size": 80
     }
    ]
   },
