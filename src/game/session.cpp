@@ -186,7 +186,7 @@ extern "C" void SessionDisableFor(u8* s, s32 id, f32 time) {
 
 // 0x800129D4
 // Re-enable object `id` and drop its slot (swap with the last one).
-void SessionReenable(u8* s, s32 id) {
+extern "C" void SessionReenable(u8* s, s32 id) {
     u32 count = SLOT_COUNT(s);
     for (u32 i = 0; i < count; i++) {
         if (SLOTS(s)[i].id != id) continue;

@@ -1,15 +1,15 @@
 {
  "game_id": "RM7P4F",
- "generated": "2026-11-18T18:21:31+00:00",
- "commit": "3dfeb7f",
- "commit_date": "2026-11-18T19:14:40+01:00",
+ "generated": "2026-11-18T21:05:52+00:00",
+ "commit": "f11145d",
+ "commit_date": "2026-11-18T21:57:55+01:00",
  "game": {
   "functions": 8548,
   "bytes": 2265988,
   "named": 2748,
   "named_bytes": 616800,
-  "decompiled": 4334,
-  "decompiled_bytes": 433536
+  "decompiled": 4363,
+  "decompiled_bytes": 442320
  },
  "library": {
   "functions": 4039,
@@ -24,8 +24,8 @@
   "bytes": 3404928,
   "named": 3211,
   "named_bytes": 721548,
-  "decompiled": 4335,
-  "decompiled_bytes": 433656
+  "decompiled": 4364,
+  "decompiled_bytes": 442440
  },
  "game_range": [
   "80006B40",
@@ -257,11 +257,11 @@
    0.009
   ],
   [
-   0.432,
+   0.873,
    0.448
   ],
   [
-   0.202,
+   0.261,
    0.136
   ],
   [
@@ -465,7 +465,7 @@
    0.97
   ],
   [
-   0.266,
+   0.545,
    0.957
   ],
   [
@@ -761,7 +761,7 @@
    0.543
   ],
   [
-   0.001,
+   0.236,
    0.968
   ],
   [
@@ -4024,6 +4024,166 @@
      "name": "DebrisSpawnForCollider",
      "addr": "801249C4",
      "size": 2868
+    }
+   ]
+  },
+  {
+   "path": "src/game/draft_8008.cpp",
+   "functions": [
+    {
+     "name": "BrainTossReloadBrainChunk",
+     "addr": "800809C8",
+     "size": 548
+    },
+    {
+     "name": "fn_80080C5C",
+     "addr": "80080C5C",
+     "size": 356
+    },
+    {
+     "name": "fn_80080DC0",
+     "addr": "80080DC0",
+     "size": 512
+    },
+    {
+     "name": "fn_80081004",
+     "addr": "80081004",
+     "size": 524
+    },
+    {
+     "name": "fn_80081210",
+     "addr": "80081210",
+     "size": 300
+    },
+    {
+     "name": "fn_80081404",
+     "addr": "80081404",
+     "size": 624
+    },
+    {
+     "name": "fn_80081AF4",
+     "addr": "80081AF4",
+     "size": 220
+    },
+    {
+     "name": "fn_80081BD0",
+     "addr": "80081BD0",
+     "size": 224
+    },
+    {
+     "name": "fn_80081CB0",
+     "addr": "80081CB0",
+     "size": 372
+    },
+    {
+     "name": "fn_80081F04",
+     "addr": "80081F04",
+     "size": 528
+    }
+   ]
+  },
+  {
+   "path": "src/game/draft_800F.cpp",
+   "functions": [
+    {
+     "name": "LockJunctionPath",
+     "addr": "800F0358",
+     "size": 180
+    },
+    {
+     "name": "UnlockJunctionPath",
+     "addr": "800F040C",
+     "size": 180
+    },
+    {
+     "name": "fn_800F058C",
+     "addr": "800F058C",
+     "size": 384
+    },
+    {
+     "name": "SetCurrentJunctionState",
+     "addr": "800F070C",
+     "size": 196
+    },
+    {
+     "name": "SetJunctionState",
+     "addr": "800F07D0",
+     "size": 340
+    },
+    {
+     "name": "SetJunctionText",
+     "addr": "800F0924",
+     "size": 228
+    },
+    {
+     "name": "ClearJunctionText",
+     "addr": "800F0A08",
+     "size": 212
+    },
+    {
+     "name": "ExplorationPreInit",
+     "addr": "800F0C7C",
+     "size": 164
+    },
+    {
+     "name": "ExplorationInit",
+     "addr": "800F0D20",
+     "size": 588
+    }
+   ]
+  },
+  {
+   "path": "src/game/draft_8019.cpp",
+   "functions": [
+    {
+     "name": "UIElement_SetColor_Ints",
+     "addr": "80190074",
+     "size": 356
+    },
+    {
+     "name": "UIElement_SetRot",
+     "addr": "801901D8",
+     "size": 236
+    },
+    {
+     "name": "UIElement_SetRot_Floats",
+     "addr": "801902C4",
+     "size": 264
+    },
+    {
+     "name": "UIElement_PlayUIAnim",
+     "addr": "801903CC",
+     "size": 160
+    },
+    {
+     "name": "UIElement_PlayUIAnimFromSamePosition",
+     "addr": "8019046C",
+     "size": 160
+    },
+    {
+     "name": "UIElement_PlayUIAnimFromReversePosition",
+     "addr": "8019050C",
+     "size": 160
+    },
+    {
+     "name": "UIElement_PlayUIAnimWithPriority",
+     "addr": "801905AC",
+     "size": 172
+    },
+    {
+     "name": "UIElement_PlayUIAnimAtRate",
+     "addr": "80190658",
+     "size": 280
+    },
+    {
+     "name": "UIElement_StopUIAnim",
+     "addr": "80190770",
+     "size": 156
+    },
+    {
+     "name": "UIElement_IsUIAnimPlaying",
+     "addr": "8019080C",
+     "size": 160
     }
    ]
   },

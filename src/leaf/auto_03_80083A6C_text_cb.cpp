@@ -6,7 +6,7 @@
 #include "types.h"
 #include "game/script_callbacks.h"
 
-extern "C" u32 fn_80080C5C(s32);
+extern "C" u8* fn_80080C5C(u8*);
 extern "C" void fn_80083C80(s32);
 
 // 0x80083D64
@@ -17,12 +17,11 @@ void BrainHeadGoToTrapDoor(u32 a3) {
 
 // 0x80084638
 u32 BrainHeadGetTrackedChunk(u32 a3) {
-    // tail-call arguments inferred from the registers set before the call
-    s32 t0 = *(s32*)(((u8*)(uintptr_t)(a3)) + 612);
+    u8* t0 = *(u8**)(((u8*)(uintptr_t)(a3)) + 612);
     if (t0 == 0) {
         return (u32)(0);
     }
-    return (u32)(fn_80080C5C((s32)((u32)(t0))));
+    return (u32)(uintptr_t)(fn_80080C5C(t0));
 }
 
 // 0x80084D04

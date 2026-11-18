@@ -55,7 +55,7 @@ extern "C" void fn_8006B974(u8*);
 extern "C" s32 fn_8006B9CC(u8*);
 extern "C" void fn_8006CD70(u8*, s32);
 extern "C" void fn_8006CE08(u8*);
-extern "C" void fn_800D68CC(s32, s32, s32);
+extern "C" void fn_800D68CC(void*, s32, s32);
 extern "C" void fn_800E69EC(s32);
 extern "C" u32 fn_8010720C(s32);
 extern "C" void fn_8012636C(s32, s32);
@@ -631,26 +631,24 @@ void set_reg0(void* a3, s32 a4) {
 
 // 0x800F02FC
 void LockCurrentJunctionPath(BOOL a3, u32 a4) {
-    // tail-call arguments inferred from the registers set before the call
     u32 t0 = (u32)(uintptr_t)((u8*)gGame) + 65536u;
     u8* t1 = *(u8**)((u8*)(uintptr_t)(t0) + -10732);
     if (t1 == 0) {
         return;
     }
-    s32 t2 = *(s32*)(t1 + 2560);
-    fn_800D68CC((s32)((u32)(t2)), (s32)((u32)(uintptr_t)(a3)), (s32)((u32)(uintptr_t)(a4)));
+    u8* t2 = *(u8**)(t1 + 2560);
+    fn_800D68CC((void*)(t2), (s32)((u32)(uintptr_t)(a3)), (s32)((u32)(uintptr_t)(a4)));
 }
 
 // 0x800F032C
 void UnlockCurrentJunctionPath(BOOL a3) {
-    // tail-call arguments inferred from the registers set before the call
     u32 t0 = (u32)(uintptr_t)((u8*)gGame) + 65536u;
     u8* t1 = *(u8**)((u8*)(uintptr_t)(t0) + -10732);
     if (t1 == 0) {
         return;
     }
-    s32 t2 = *(s32*)(t1 + 2560);
-    fn_800D68CC((s32)((u32)(t2)), (s32)((u32)(uintptr_t)(a3)), (s32)((u32)(0)));
+    u8* t2 = *(u8**)(t1 + 2560);
+    fn_800D68CC((void*)(t2), (s32)((u32)(uintptr_t)(a3)), (s32)((u32)(0)));
 }
 
 // 0x800F11E4

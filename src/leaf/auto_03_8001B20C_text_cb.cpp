@@ -18,7 +18,7 @@ extern "C" f32 MonsterRateMadness(u8*);
 extern "C" f32 PlayerRankFraction(void);
 extern "C" void fn_8001D4FC(void);
 extern "C" void fn_8001E508(s32);
-extern "C" void fn_8004D3F8(s32, u8*, s32, s32);
+extern "C" void fn_8004D3F8(void*, char*, s32, s32);
 
 // 0x8001BF78
 s32 LT_GetShowingPartsInformation(void) {
@@ -146,16 +146,15 @@ BOOL GetCurrentMonster(void) {
 
 // 0x8001E3A4
 void LightningTowerResetAnim(void) {
-    // tail-call arguments inferred from the registers set before the call
     u8* t0 = *(u8**)((u8*)lbl_805FAF78);
     if (t0 == 0) {
         return;
     }
-    s32 t1 = *(s32*)(t0 + 0);
+    u8* t1 = *(u8**)(t0 + 0);
     if (t1 == 0) {
         return;
     }
-    fn_8004D3F8((s32)((u32)(t1)), (u8*)lbl_805F8270, (s32)((u32)(0)), (s32)((u32)(1)));
+    fn_8004D3F8((void*)(t1), (char*)((u8*)lbl_805F8270), (s32)((u32)(0)), (s32)((u32)(1)));
 }
 
 // 0x8001E3D0

@@ -11,7 +11,7 @@ extern "C" s32 PartGetCurrentHealth(u8*);
 extern "C" s32 PartGetMaxHealth(u8*);
 extern "C" u8* fn_8004B500(u8*, s32);
 extern "C" void fn_8004CAB4(u8*, s32, void*);
-extern "C" void fn_8004D3F8(s32, u8*, s32, s32);
+extern "C" void fn_8004D3F8(void*, char*, s32, s32);
 extern "C" void fn_8020E668(s32);
 
 // 0x8004B5EC
@@ -54,9 +54,8 @@ extern "C" s32 GetGestureDetector(s32 a3, s32 a4) {
 }
 
 // 0x8004D2B8
-extern "C" void CharacterSetInCombat(s32 a3) {
-    // tail-call arguments inferred from the registers set before the call
-    fn_8004D3F8((s32)((u32)(uintptr_t)(a3)), (u8*)lbl_805F86F8, (s32)((u32)(1)), (s32)((u32)(1)));
+extern "C" void CharacterSetInCombat(u8* a3) {
+    fn_8004D3F8((void*)(((u8*)(uintptr_t)(a3))), (char*)((u8*)lbl_805F86F8), (s32)((u32)(1)), (s32)((u32)(1)));
 }
 
 // 0x8004E2A4

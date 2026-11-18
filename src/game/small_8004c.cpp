@@ -19,7 +19,7 @@ void  fn_80053558(u8* p);                                       // 0x80053558
 void  fn_8020E59C(u8* p, s32 del);                              // 0x8020E59C
 void  fn_8005E11C(u8* p);                                       // 0x8005E11C
 void  fn_8004C718(u8* p, s32 idx, void* elem);                  // 0x8004C718
-void  fn_8020ECB0(u8* p, s32 b);                                // 0x8020ECB0
+void  fn_8020ECB0(u8* p, u8* b);                                // 0x8020ECB0
 void  LimbStatusInit(u8** field, PartInstance** part);          // 0x80214A58
 s32   PartGetCurrentHealth(u8* p);                              // 0x8021EF68
 BOOL  CharacterOnContact(u8* c, u8* ct);                        // 0x800575E8
@@ -226,7 +226,7 @@ BOOL CharacterAnimationDone(u8* c) {
 // Picks the value at +0x9F4 from the object's flag 0x4000 (one of two constants). With b set,
 // runs fn_8020ECB0 on the embedded object at +0x898, flags +0xC84 and reads the current health
 // of the part at +0x8AC; with b clear, clears the flag at +0xC84.
-void fn_8004D760(u8* p, s32 b) {
+void fn_8004D760(u8* p, u8* b) {
     u8* obj = *(u8**)(p + 0x4);
     if (*(u32*)(obj + 0x1c) & 0x4000) {
         *(f32*)(p + 0x9f4) = lbl_805FD268;

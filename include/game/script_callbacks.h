@@ -181,7 +181,7 @@ void CleanupSplashScreen(BOOL a0);  // type 0x8C (from signature table)
 void ClearBattleRequest(void);                                         // src/leaf/auto_03_8013F034_text_cb.cpp
 void ClearDiscError(void);                                             // src/game/small_8014.cpp
 void ClearExperimentSounds(void);                                      // src/leaf/auto_03_8006FA44_text_cb.cpp
-void ClearJunctionText(u32 a0);  // type 0x71 (from signature table)
+void ClearJunctionText(u32 a0);                                        // src/game/draft_800F.cpp
 s32 ClearLineToTarget(u32 a3, f32 f1);                                 // src/leaf/auto_03_800FB958_text_cb.cpp
 void ClearLostConnection(void);                                        // src/game/small_8014.cpp
 void ClearMonster(void);  // type 0x8F (from signature table)
@@ -388,8 +388,8 @@ void EnterScientistNameInit(void);  // type 0x8F (from signature table)
 u32 /*0x06*/ EntityPartZoneUnloadCallback(u32 /*0x08*/ a0, u32 /*0x08*/ a1);  // type 0x7 (from signature table)
 void Explode(void* a0);  // type 0x2F (from signature table)
 void ExplodeIfDead(u32 a0);                                            // src/game/small_8010.cpp
-void ExplorationInit(void);  // type 0x8F (from signature table)
-void ExplorationPreInit(u32 /*0x4A*/ a0);  // type 0x165 (from signature table)
+void ExplorationInit(void);                                            // src/game/draft_800F.cpp
+void ExplorationPreInit(u32 /*0x4A*/ a0);                              // src/game/draft_800F.cpp
 void ExplorationShutdown(void);                                        // src/game/small_800F.cpp
 void FSMAddRegInt(void* a0, BOOL a1, s32 a2);                          // src/game/small_800Eb.cpp
 s32 FSMGetRegInt(void* a0, BOOL a1);                                   // src/game/small_800Eb.cpp
@@ -826,7 +826,7 @@ void LobWarningShot(void* a0, u32 /*0x30*/ a1, u32 /*0x38*/ a2, f32 a3, f32 a4);
 void LockCameraToEntity(u32 a0);                                       // src/game/small_800Fb.cpp
 void LockCurrentJunctionPath(BOOL a3, u32 a4);                         // src/leaf/auto_03_800E75B0_text_cb.cpp
 void LockInput(s32 a3);                                                // src/leaf/auto_03_8010FDA4_text_cb.cpp
-void LockJunctionPath(u32 a0, BOOL a1, u32 a2);  // type 0x17D (from signature table)
+void LockJunctionPath(u32 a0, BOOL a1, u32 a2);                        // src/game/draft_800F.cpp
 void LockPartSelected(void);                                           // src/game/small_8004b.cpp
 void LogAutoDelete(BOOL a0);                                           // src/engine/small_8014c.cpp
 void LoginPoller(void);  // type 0x8F (from signature table)
@@ -1198,7 +1198,7 @@ void SetCharacterPerformanceCap(f32 f1);                               // src/le
 void SetCharacterPerformanceCapToDefault(void);                        // src/leaf/auto_03_800E75B0_text_cb.cpp
 void SetClosingConnection(void);                                       // src/leaf/auto_03_8013F034_text_cb.cpp
 void SetCoffinLanded(void* a0);                                        // src/game/small_800Fd.cpp
-void SetCurrentJunctionState(u32 /*0x06*/ a0);  // type 0x67 (from signature table)
+void SetCurrentJunctionState(u32 /*0x06*/ a0);                         // src/game/draft_800F.cpp
 void SetCurrentLocation(u32 loc);                                      // src/game/player_api.cpp
 void SetCurrentMPMonster(void);  // type 0x8F (from signature table)
 void SetCurrentMonster(void);  // type 0x8F (from signature table)
@@ -1252,8 +1252,8 @@ void SetInt(u32 a3, s32 a4);                                           // src/le
 void SetInterlabLink(BOOL a3);                                         // src/leaf/auto_03_8013F034_text_cb.cpp
 void SetInviteTimeout(void);                                           // src/leaf/auto_03_8013F034_text_cb.cpp
 void SetJunctionSpriteVisible(u32 a3, u32 a4, u32 a5);                 // src/leaf/auto_03_800E75B0_text_cb.cpp
-void SetJunctionState(u32 a0, u32 /*0x06*/ a1);  // type 0x74 (from signature table)
-void SetJunctionText(u32 a0, u32 /*0x11*/ a1);  // type 0x73 (from signature table)
+void SetJunctionState(u32 a0, u32 /*0x06*/ a1);                        // src/game/draft_800F.cpp
+void SetJunctionText(u32 a0, u32 /*0x11*/ a1);                         // src/game/draft_800F.cpp
 void SetKnockbackSpeed(u32 /*0x2E*/ a0, f32 a1);  // type 0xF3 (from signature table)
 void SetLocalStringTable(void);                                        // src/game/small_8005.cpp
 void SetMPSection(u32 a3);                                             // src/leaf/auto_03_8013F034_text_cb.cpp
@@ -1498,7 +1498,7 @@ void UIPlayGlobalGroupSound(u32 a0);  // type 0x71 (from signature table)
 void UIScreen_SetPS2SnapToEnabled(u32 a3);                             // src/leaf/auto_03_800E75B0_text_cb.cpp
 void UnPauseAllExplorationCharacters(void);  // type 0x8F (from signature table)
 void UnlockCurrentJunctionPath(BOOL a3);                               // src/leaf/auto_03_800E75B0_text_cb.cpp
-void UnlockJunctionPath(u32 a0, BOOL a1);  // type 0x81 (from signature table)
+void UnlockJunctionPath(u32 a0, BOOL a1);                              // src/game/draft_800F.cpp
 void Unpause(void);                                                    // src/leaf/auto_03_800E75B0_text_cb.cpp
 void UnspawnAttachedParticleAtChild(void* a0, u32 /*0x30*/ a1);  // type 0xF8 (from signature table)
 void UpdateCombatHUD(f32 a0);  // type 0x69 (from signature table)
@@ -1681,28 +1681,28 @@ s32 UIElement_GetVisibleFlag(u32 a0);  // type 0x1E (from signature table)
 f32 UIElement_GetXAtPercent(u32 a0, f32 a1);  // type 0x11 (from signature table)
 s32 UIElement_IsCursorOverItem(u32 a0);  // type 0x1E (from signature table)
 u32 /*0x06*/ UIElement_IsUIAnimPlaying(u32 a0);  // type 0x5 (from signature table)
-void UIElement_PlayUIAnim(u32 a0, u32 a1);  // type 0x7A (from signature table)
-void UIElement_PlayUIAnimAtRate(u32 a0, u32 a1, f32 a2);  // type 0x7B (from signature table)
-void UIElement_PlayUIAnimFromReversePosition(u32 a0, u32 a1);  // type 0x7A (from signature table)
-void UIElement_PlayUIAnimFromSamePosition(u32 a0, u32 a1);  // type 0x7A (from signature table)
-void UIElement_PlayUIAnimWithPriority(u32 a0, u32 a1, s32 a2);  // type 0x7C (from signature table)
+void UIElement_PlayUIAnim(u32 a0, u32 a1);                             // src/game/draft_8019.cpp
+void UIElement_PlayUIAnimAtRate(u32 a0, u32 a1, f32 a2);               // src/game/draft_8019.cpp
+void UIElement_PlayUIAnimFromReversePosition(u32 a0, u32 a1);          // src/game/draft_8019.cpp
+void UIElement_PlayUIAnimFromSamePosition(u32 a0, u32 a1);             // src/game/draft_8019.cpp
+void UIElement_PlayUIAnimWithPriority(u32 a0, u32 a1, s32 a2);         // src/game/draft_8019.cpp
 void UIElement_Reset(u32 a0);  // type 0x71 (from signature table)
 void UIElement_RestoreZ(u32 a0);  // type 0x71 (from signature table)
 void UIElement_SetColor(u32 a0, BOOL a1);  // type 0x81 (from signature table)
 void UIElement_SetColor_Floats(u32 a0, f32 a1, f32 a2, f32 a3, f32 a4);  // type 0x78 (from signature table)
-void UIElement_SetColor_Ints(u32 a0, BOOL a1, BOOL a2, BOOL a3, BOOL a4);  // type 0x82 (from signature table)
+void UIElement_SetColor_Ints(u32 a0, BOOL a1, BOOL a2, BOOL a3, BOOL a4); // src/game/draft_8019.cpp
 void UIElement_SetDoHitTest(u32 a0, u32 /*0x06*/ a1);  // type 0x74 (from signature table)
 void UIElement_SetEnableFlag(u32 a0, u32 /*0x06*/ a1);  // type 0x74 (from signature table)
 void UIElement_SetPos(u32 a0, BOOL a1);  // type 0x81 (from signature table)
 void UIElement_SetPos_Floats(u32 a0, f32 a1, f32 a2, f32 a3);  // type 0x77 (from signature table)
-void UIElement_SetRot(u32 a0, BOOL a1);  // type 0x81 (from signature table)
-void UIElement_SetRot_Floats(u32 a0, f32 a1, f32 a2, f32 a3);  // type 0x77 (from signature table)
+void UIElement_SetRot(u32 a0, void* a1);                               // src/game/draft_8019.cpp
+void UIElement_SetRot_Floats(u32 a0, f32 a1, f32 a2, f32 a3);          // src/game/draft_8019.cpp
 void UIElement_SetSize(u32 a0, BOOL a1);  // type 0x81 (from signature table)
 void UIElement_SetSize_Floats(u32 a0, f32 a1, f32 a2, f32 a3);  // type 0x77 (from signature table)
 void UIElement_SetUIAnimPlaybackRate(u32 a0, f32 a1);  // type 0x76 (from signature table)
 void UIElement_SetVisibleFlag(u32 a0, u32 /*0x06*/ a1);  // type 0x74 (from signature table)
 void UIElement_SetX(u32 a0, f32 a1);  // type 0x76 (from signature table)
-void UIElement_StopUIAnim(u32 a0, u32 /*0x06*/ a1);  // type 0x74 (from signature table)
+void UIElement_StopUIAnim(u32 a0, u32 /*0x06*/ a1);                    // src/game/draft_8019.cpp
 void UIEntity_SetEntity(u32 a0, BOOL a1);  // type 0x81 (from signature table)
 void UIEntity_SetOffsetBone(u32 a0, u32 a1);  // type 0x7A (from signature table)
 void UIEvent_SendToAllScreens(u32 a0);  // type 0x71 (from signature table)
