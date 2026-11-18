@@ -69,6 +69,11 @@
  "changelog": [
   {
    "date": "2026-11-18",
+   "time": "12:20",
+   "text": "Decompiled battle basics: fighter and limb status lookup, status effects on fighters (8) and limbs (3), the discipline triangle (alchemy beats mech, mech beats bio, bio beats alchemy), the battle log's matchup text, cycling to the next part for the same slot, and committing a chosen action (working limb and torso required, energy paid and capped by the torso)."
+  },
+  {
+   "date": "2026-11-18",
    "time": "12:14",
    "text": "Decompiled quest and challenge payouts: finishing a quest grants all of its reward records; winning a challenge pays the matching pending reward (for this monster or any), otherwise the minigame score as MSP plus a random reward from the challenge's table. Also setting the rank, MSP and preset monster from a quest, and the best time/score records."
   },

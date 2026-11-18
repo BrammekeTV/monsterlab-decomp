@@ -717,3 +717,9 @@ fn_80218E6C LabChallengeRewardTable
 fn_802262E0 SaveRollChallengeReward
 fn_80225C1C SaveRecordBestTime
 fn_80225C5C SaveRecordBestScore
+fn_80213A6C PartDefCycleSameSlot
+fn_80214050 FighterStatsHasEffect
+fn_80211F98 BattleCommitAction
+fn_8020E498 DisciplineLetter
+fn_8022127C StrCopy
+fn_80221280 StrNCopy
