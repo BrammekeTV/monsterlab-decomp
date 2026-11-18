@@ -1,15 +1,15 @@
 {
  "game_id": "RM7P4F",
- "generated": "2026-11-18T18:04:20+00:00",
- "commit": "4417926",
- "commit_date": "2026-11-18T18:58:23+01:00",
+ "generated": "2026-11-18T18:09:19+00:00",
+ "commit": "86e2e4f",
+ "commit_date": "2026-11-18T19:04:21+01:00",
  "game": {
   "functions": 8548,
   "bytes": 2265988,
   "named": 2748,
   "named_bytes": 616800,
-  "decompiled": 4225,
-  "decompiled_bytes": 424608
+  "decompiled": 4281,
+  "decompiled_bytes": 429104
  },
  "library": {
   "functions": 4039,
@@ -24,8 +24,8 @@
   "bytes": 3404928,
   "named": 3211,
   "named_bytes": 721548,
-  "decompiled": 4226,
-  "decompiled_bytes": 424728
+  "decompiled": 4282,
+  "decompiled_bytes": 429224
  },
  "game_range": [
   "80006B40",
@@ -173,23 +173,23 @@
    0.378
   ],
   [
-   0.12,
+   0.133,
    0.078
   ],
   [
-   0.061,
+   0.132,
    0.06
   ],
   [
-   0.416,
+   0.433,
    0.409
   ],
   [
-   0.0,
+   0.044,
    0.13
   ],
   [
-   0.025,
+   0.073,
    0.324
   ],
   [
@@ -457,11 +457,11 @@
    0.843
   ],
   [
-   0.045,
+   0.151,
    0.541
   ],
   [
-   0.094,
+   0.132,
    0.97
   ],
   [
@@ -477,11 +477,11 @@
    0.99
   ],
   [
-   0.034,
+   0.169,
    1.0
   ],
   [
-   0.241,
+   0.254,
    0.929
   ],
   [
@@ -901,7 +901,7 @@
    0.2
   ],
   [
-   0.547,
+   0.548,
    0.916
   ],
   [
@@ -7843,6 +7843,111 @@
    ]
   },
   {
+   "path": "src/game/small_8005c.cpp",
+   "functions": [
+    {
+     "name": "fn_80053BF0",
+     "addr": "80053BF0",
+     "size": 60
+    },
+    {
+     "name": "fn_80054484",
+     "addr": "80054484",
+     "size": 52
+    },
+    {
+     "name": "fn_800549FC",
+     "addr": "800549FC",
+     "size": 52
+    },
+    {
+     "name": "fn_80054AC0",
+     "addr": "80054AC0",
+     "size": 120
+    },
+    {
+     "name": "fn_8005535C",
+     "addr": "8005535C",
+     "size": 100
+    },
+    {
+     "name": "fn_800557B4",
+     "addr": "800557B4",
+     "size": 116
+    },
+    {
+     "name": "RayQueryDestroy",
+     "addr": "80055C80",
+     "size": 88
+    },
+    {
+     "name": "fn_80056210",
+     "addr": "80056210",
+     "size": 124
+    },
+    {
+     "name": "fn_800567A4",
+     "addr": "800567A4",
+     "size": 88
+    },
+    {
+     "name": "fn_80056834",
+     "addr": "80056834",
+     "size": 48
+    },
+    {
+     "name": "CharacterGetTotalVelocity",
+     "addr": "800571A0",
+     "size": 52
+    },
+    {
+     "name": "fn_80058B5C",
+     "addr": "80058B5C",
+     "size": 120
+    },
+    {
+     "name": "fn_8005979C",
+     "addr": "8005979C",
+     "size": 116
+    },
+    {
+     "name": "fn_800598E8",
+     "addr": "800598E8",
+     "size": 104
+    },
+    {
+     "name": "fn_8005A200",
+     "addr": "8005A200",
+     "size": 68
+    },
+    {
+     "name": "fn_8005BE70",
+     "addr": "8005BE70",
+     "size": 88
+    },
+    {
+     "name": "fn_8005BEC8",
+     "addr": "8005BEC8",
+     "size": 108
+    },
+    {
+     "name": "fn_8005BF34",
+     "addr": "8005BF34",
+     "size": 72
+    },
+    {
+     "name": "fn_8005BF7C",
+     "addr": "8005BF7C",
+     "size": 100
+    },
+    {
+     "name": "fn_8005BFE0",
+     "addr": "8005BFE0",
+     "size": 64
+    }
+   ]
+  },
+  {
    "path": "src/game/small_8006.cpp",
    "functions": [
     {
@@ -9983,6 +10088,101 @@
    ]
   },
   {
+   "path": "src/game/small_800Ed.cpp",
+   "functions": [
+    {
+     "name": "TurretHasTarget",
+     "addr": "800EC3B8",
+     "size": 100
+    },
+    {
+     "name": "TurretReload",
+     "addr": "800EC41C",
+     "size": 60
+    },
+    {
+     "name": "SendNISSignal",
+     "addr": "800EC6B0",
+     "size": 52
+    },
+    {
+     "name": "SendConversationSignal",
+     "addr": "800EC6E4",
+     "size": 52
+    },
+    {
+     "name": "Wii_SetCameraInfluenceState",
+     "addr": "800EC718",
+     "size": 92
+    },
+    {
+     "name": "IsOnRealGround",
+     "addr": "800EC794",
+     "size": 64
+    },
+    {
+     "name": "BroadcastEvent",
+     "addr": "800ECBE0",
+     "size": 80
+    },
+    {
+     "name": "FireProjectileUp",
+     "addr": "800ECC58",
+     "size": 108
+    },
+    {
+     "name": "FireProjectileAtEntity",
+     "addr": "800ED198",
+     "size": 52
+    },
+    {
+     "name": "EnemyFireProjectileAtActiveTarget",
+     "addr": "800ED310",
+     "size": 60
+    },
+    {
+     "name": "RandomPercent",
+     "addr": "800ED358",
+     "size": 96
+    },
+    {
+     "name": "RandomZeroToMax",
+     "addr": "800ED3B8",
+     "size": 64
+    },
+    {
+     "name": "EnableCameraInfluence",
+     "addr": "800ED400",
+     "size": 120
+    },
+    {
+     "name": "DisableCameraInfluence",
+     "addr": "800ED478",
+     "size": 120
+    },
+    {
+     "name": "StartChallenge",
+     "addr": "800EF99C",
+     "size": 72
+    },
+    {
+     "name": "GetNextInstructionsString",
+     "addr": "800EFC94",
+     "size": 60
+    },
+    {
+     "name": "GetPreviousInstructionsString",
+     "addr": "800EFCD4",
+     "size": 60
+    },
+    {
+     "name": "SetInstructionsHeaderString",
+     "addr": "800EFD10",
+     "size": 60
+    }
+   ]
+  },
+  {
    "path": "src/game/small_800F.cpp",
    "functions": [
     {
@@ -10264,6 +10464,96 @@
      "name": "StopNISFSM",
      "addr": "800F6CE0",
      "size": 104
+    }
+   ]
+  },
+  {
+   "path": "src/game/small_800Fd.cpp",
+   "functions": [
+    {
+     "name": "SpeedUpNISCameraAnimation",
+     "addr": "800F7668",
+     "size": 116
+    },
+    {
+     "name": "SetCoffinLanded",
+     "addr": "800F78B0",
+     "size": 60
+    },
+    {
+     "name": "Wii_SetConversationEntity",
+     "addr": "800F7900",
+     "size": 56
+    },
+    {
+     "name": "Wii_StopConversationFX",
+     "addr": "800F7E70",
+     "size": 64
+    },
+    {
+     "name": "CheckCastleAccess",
+     "addr": "800F81E4",
+     "size": 68
+    },
+    {
+     "name": "IsCastleAccessBlocked",
+     "addr": "800F8228",
+     "size": 68
+    },
+    {
+     "name": "AddCharacterParticleEffect",
+     "addr": "800F85C0",
+     "size": 52
+    },
+    {
+     "name": "AddEntityParticleEffect",
+     "addr": "800F860C",
+     "size": 84
+    },
+    {
+     "name": "RemoveEntityParticleEffect",
+     "addr": "800F8660",
+     "size": 68
+    },
+    {
+     "name": "SetEntityAsQuestGiver",
+     "addr": "800F86A4",
+     "size": 48
+    },
+    {
+     "name": "StartPrimaryAuxEffect",
+     "addr": "800F86D4",
+     "size": 92
+    },
+    {
+     "name": "StopPrimaryAuxEffect",
+     "addr": "800F8730",
+     "size": 76
+    },
+    {
+     "name": "StartSecondaryAuxEffect",
+     "addr": "800F877C",
+     "size": 92
+    },
+    {
+     "name": "StopSecondaryAuxEffect",
+     "addr": "800F87D8",
+     "size": 76
+    },
+    {
+     "name": "DisableHazardCollision",
+     "addr": "800F89BC",
+     "size": 116
+    },
+    {
+     "name": "EnableHazardCollision",
+     "addr": "800F8A30",
+     "size": 116
+    },
+    {
+     "name": "DamagePlayerMonster",
+     "addr": "800F8E9C",
+     "size": 116
     }
    ]
   },
@@ -22704,6 +22994,11 @@
      "name": "PrintFResult",
      "addr": "801DB4C0",
      "size": 4
+    },
+    {
+     "name": "FrameFxStop",
+     "addr": "801DBDB4",
+     "size": 16
     },
     {
      "name": "FrameFxStopAll",

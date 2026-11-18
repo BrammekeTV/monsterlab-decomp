@@ -12,6 +12,7 @@ extern u8 lbl_805FB89C[];
 extern "C" s32 PlaySound(u32, s32, s32, s32, s32, s32);
 extern "C" void PlaySoundAt(void*, int, u8*, int);
 extern "C" void TriggerDoAction(void*, s32);
+extern "C" void fn_801629D0(void*, s32);
 extern "C" void fn_80162A70(u8*);
 extern "C" void fn_801B6878(s32, s32, s32);
 extern "C" void fn_801B69F8(s32);
@@ -33,6 +34,11 @@ void PrintResult(void) {
 // 0x801DB4C0
 void PrintFResult(void) {
     fGetResultRegister();
+}
+
+// 0x801DBDB4
+void FrameFxStop(u32 a3) {
+    fn_801629D0((void*)((u8*)lbl_8040E5F0), (s32)((u32)(uintptr_t)(a3)));
 }
 
 // 0x801DBDC4

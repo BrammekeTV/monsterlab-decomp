@@ -48,8 +48,8 @@ extern "C" void fn_80022D1C(void);
 extern "C" void fn_80022D34(void);
 extern "C" void fn_80022D88(void);
 extern "C" u8 fn_8004936C(void);
-extern "C" void fn_800598E8(s32, s32);
-extern "C" void fn_8005BF7C(s32, s32, s32);
+extern "C" void fn_800598E8(u8*, s32);
+extern "C" void fn_8005BF7C(u8*, s32, s32);
 extern "C" void fn_8006AD84(u8*);
 extern "C" void fn_8006B974(u8*);
 extern "C" s32 fn_8006B9CC(u8*);
@@ -422,11 +422,10 @@ s32 GetLastRandomZeroToMax(void) {
 
 // 0x800ED58C
 void PlayAnimUB(u32 a3, u32 a4, u32 a5) {
-    // tail-call arguments inferred from the registers set before the call
     if (a3 == 0) {
         return;
     }
-    fn_8005BF7C((s32)((u32)(uintptr_t)(a3)), (s32)((u32)(uintptr_t)(a4)), (s32)((u32)(uintptr_t)(a5)));
+    fn_8005BF7C(((u8*)(uintptr_t)(a3)), (s32)((u32)(uintptr_t)(a4)), (s32)((u32)(uintptr_t)(a5)));
 }
 
 // 0x800EF7D4
@@ -857,12 +856,11 @@ u32 IsWiiSelectorActive(void) {
 
 // 0x800F85F4
 void RemoveCharacterParticleEffect(u32 a3, u32 a4) {
-    // tail-call arguments inferred from the registers set before the call
     if (a4 == 0) {
-        fn_800598E8((s32)((u32)(uintptr_t)(a3)), (s32)((u32)(0)));
+        fn_800598E8(((u8*)(uintptr_t)(a3)), (s32)((u32)(0)));
         return;
     }
-    fn_800598E8((s32)((u32)(uintptr_t)(a3)), (s32)((u32)(1)));
+    fn_800598E8(((u8*)(uintptr_t)(a3)), (s32)((u32)(1)));
 }
 
 // 0x800F8E5C

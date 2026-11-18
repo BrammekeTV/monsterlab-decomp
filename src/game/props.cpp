@@ -10,7 +10,7 @@ void  TriggerShowProximityText(void* trigger, s32 textId);        // 0x8006ED68
 void  PropPlayAnim(void* prop, int a, int b, BOOL once);          // 0x80069350
 void  PropPlayFx(void* prop, void* fx);                           // 0x801254F8
 void  PropIncrementState(void* prop);                             // 0x80069FDC
-void  TriggerDoAction(void* action, s32 param);                   // 0x801E0054
+void  TriggerDoAction(void* action, void* a4, void* a5);                   // 0x801E0054
 void  FollowWaypointPath(void* prop, void* params, f32 speed);
 struct ScopedLock { u8 pad[4]; };
 void  ScopedLockCtor(ScopedLock* l);                              // 0x801F5384
@@ -158,7 +158,7 @@ void increment_deathcount(ScriptCtx* ctx) {
 void do_trigger_action(ScriptCtx* ctx) {
     Prop* p = PROP(ctx);
     if (p == NULL || !(p->def->flags & 0x100)) return;
-    TriggerDoAction(p->action, p->actionParam);
+    TriggerDoAction(p->action, (void*)(intptr_t)p->actionParam, 0);  // r5 not set by the original
 }
 
 // Waypoint-follow parameters built on the stack (4 bytes).

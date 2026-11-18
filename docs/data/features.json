@@ -69,6 +69,11 @@
  "changelog": [
   {
    "date": "2026-11-18",
+   "time": "19:09",
+   "text": "Decompiled 57 more functions: character ray queries and velocity helpers (0x8005), turret, projectile, camera-influence and instruction-page script callbacks (0x800E), and NIS, particle-effect and castle-access script callbacks (0x800F). Written by low-cost helper agents and reviewed."
+  },
+  {
+   "date": "2026-11-18",
    "time": "19:04",
    "text": "Decompiled 60 more small functions: character animation and blend helpers (0x8004), welding gun and dance animation updates (0x8007), and stitching reticle, vector and constructor/destructor helpers (0x800C). Written by low-cost helper agents and reviewed."
   },

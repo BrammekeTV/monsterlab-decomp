@@ -72,7 +72,7 @@ s32    WorldGetPhase(void* world);                       // 0x800D83A8
 Locator* WorldFindLocator(void* world, u32 hash);        // 0x8012AA50
 void   WorldPreUpdate(void* world);                      // 0x80130418
 void*  CharacterFind(s32 id);                            // 0x800E876C
-void   TriggerDoAction(void* action, s32 param);         // 0x801E0054
+void   TriggerDoAction(void* action, void* a4, void* a5);        // 0x801E0054
 void   SessionBegin(void* session);                      // 0x80013690
 void   GameSetNextMode(s32 mode);                        // 0x8000CFD8
 void*  ScreenSetsCurrent(void* sets);                    // 0x8018D1E4
@@ -367,9 +367,9 @@ void GameSessionUpdate(GameSession* s, f32 a, f32 dt) {
             if (!fn_802728A4(0, &status) && !fn_80272B64(0, info) && *(s32*)(info + 0xC) != 0)
                 s->unk154 = 1;
             if (WorldGetPhase(WORLD) == 2) SessionBegin(gGame + 0x5C8);
-            TriggerDoAction(WORLD_DATA() + 0x94, 0);
-            TriggerDoAction(WORLD_DATA() + 0x98, 0);
-            TriggerDoAction(WORLD_DATA() + 0x9C, 0);
+            TriggerDoAction(WORLD_DATA() + 0x94, 0, 0);
+            TriggerDoAction(WORLD_DATA() + 0x98, 0, 0);
+            TriggerDoAction(WORLD_DATA() + 0x9C, 0, 0);
             s->flags &= ~SFLAG_ENTERED;
             fn_800D8280(WORLD);
             if (WorldGetPhase(WORLD) == 2 || WorldGetPhase(WORLD) == 1) *(s32*)(gGame + 0xFE0) = 0;
