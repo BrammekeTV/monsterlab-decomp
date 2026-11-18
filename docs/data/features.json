@@ -69,6 +69,11 @@
  "changelog": [
   {
    "date": "2026-11-18",
+   "time": "14:35",
+   "text": "Decompiled the battle object itself: its constructor (default rules plus tuning values from the game database), destructor, clear-between-battles, and the per-frame update that runs the battle phases (intro, choosing, new round, attack playback, outro). Also its random number generator setup, block pools, and the runtime array-destroy helper."
+  },
+  {
+   "date": "2026-11-18",
    "time": "13:27",
    "text": "The leaf generator now also writes forwarding wrappers (functions that pass their arguments on to another function, often only when a save is loaded) and small compare-and-return functions (range checks, flag tests, 'is this zero' idioms). About 670 more small functions are now covered automatically."
   },

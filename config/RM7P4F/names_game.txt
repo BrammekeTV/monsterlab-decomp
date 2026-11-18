@@ -782,3 +782,12 @@ fn_8020F394 ChoiceDestroy
 fn_80213D38 FighterStatsInit
 fn_80213B5C RoundSideInit
 fn_80213BCC RoundSideDestroy
+fn_8032F2E0 __destroy_arr
+fn_80220A34 RngInit
+fn_80220A4C RngDestroy
+fn_80220688 BlockPoolCreate
+fn_8022070C BlockPoolDestroy
+fn_80213660 BattleClear
+fn_8020F8E0 BattleCtor
+fn_8020FEEC BattleDtor
+fn_80210060 BattleUpdate

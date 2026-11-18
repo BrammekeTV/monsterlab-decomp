@@ -1,31 +1,31 @@
 {
  "game_id": "RM7P4F",
- "generated": "2026-11-18T12:26:42+00:00",
- "commit": "af5920c",
- "commit_date": "2026-11-18T12:49:09+01:00",
+ "generated": "2026-11-18T13:35:27+00:00",
+ "commit": "502b986",
+ "commit_date": "2026-11-18T13:26:56+01:00",
  "game": {
   "functions": 8548,
   "bytes": 2265988,
-  "named": 2720,
-  "named_bytes": 605280,
-  "decompiled": 2879,
-  "decompiled_bytes": 282620
+  "named": 2728,
+  "named_bytes": 608636,
+  "decompiled": 2886,
+  "decompiled_bytes": 285952
  },
  "library": {
   "functions": 4039,
   "bytes": 1138940,
-  "named": 462,
-  "named_bytes": 104628,
-  "decompiled": 0,
-  "decompiled_bytes": 0
+  "named": 463,
+  "named_bytes": 104748,
+  "decompiled": 1,
+  "decompiled_bytes": 120
  },
  "all": {
   "functions": 12587,
   "bytes": 3404928,
-  "named": 3182,
-  "named_bytes": 709908,
-  "decompiled": 2879,
-  "decompiled_bytes": 282620
+  "named": 3191,
+  "named_bytes": 713384,
+  "decompiled": 2887,
+  "decompiled_bytes": 286072
  },
  "game_range": [
   "80006B40",
@@ -997,12 +997,12 @@
    0.057
   ],
   [
-   0.539,
-   0.539
+   0.797,
+   0.797
   ],
   [
-   0.932,
-   0.923
+   0.988,
+   0.979
   ],
   [
    0.35,
@@ -1025,8 +1025,8 @@
    0.998
   ],
   [
-   0.245,
-   0.347
+   0.281,
+   0.385
   ],
   [
    0.831,
@@ -1174,10 +1174,10 @@
    "end": "8033F400",
    "functions": 399,
    "bytes": 114196,
-   "named": 55,
-   "named_bytes": 14672,
-   "decompiled": 0,
-   "decompiled_bytes": 0
+   "named": 56,
+   "named_bytes": 14792,
+   "decompiled": 1,
+   "decompiled_bytes": 120
   },
   {
    "name": "MetroTRK",
@@ -2064,6 +2064,56 @@
      "name": "BattleResolveAttack",
      "addr": "80211180",
      "size": 3608
+    }
+   ]
+  },
+  {
+   "path": "src/game/battle_object.cpp",
+   "functions": [
+    {
+     "name": "BattleCtor",
+     "addr": "8020F8E0",
+     "size": 1548
+    },
+    {
+     "name": "BattleDtor",
+     "addr": "8020FEEC",
+     "size": 372
+    },
+    {
+     "name": "BattleUpdate",
+     "addr": "80210060",
+     "size": 636
+    },
+    {
+     "name": "BattleClear",
+     "addr": "80213660",
+     "size": 432
+    },
+    {
+     "name": "BlockPoolCreate",
+     "addr": "80220688",
+     "size": 132
+    },
+    {
+     "name": "BlockPoolDestroy",
+     "addr": "8022070C",
+     "size": 148
+    },
+    {
+     "name": "RngInit",
+     "addr": "80220A34",
+     "size": 24
+    },
+    {
+     "name": "RngDestroy",
+     "addr": "80220A4C",
+     "size": 64
+    },
+    {
+     "name": "__destroy_arr",
+     "addr": "8032F2E0",
+     "size": 120
     }
    ]
   },
@@ -16764,11 +16814,6 @@
      "name": "fn_80220A2C",
      "addr": "80220A2C",
      "size": 8
-    },
-    {
-     "name": "fn_80220A34",
-     "addr": "80220A34",
-     "size": 24
     },
     {
      "name": "fn_8022123C",
