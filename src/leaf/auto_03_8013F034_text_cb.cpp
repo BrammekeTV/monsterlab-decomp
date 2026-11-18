@@ -71,7 +71,6 @@ void CancelConnect(void) {
 
 // 0x80140498
 void ClearNetworkStall(void) {
-    // tail-call arguments inferred from the registers set before the call
     fn_801F5714((s32)((u32)(0x10000)));
 }
 
@@ -122,7 +121,6 @@ BOOL BattleRequestNoMonsters(void) {
 
 // 0x80140AEC
 void ClearNoMonstersFlag(void) {
-    // tail-call arguments inferred from the registers set before the call
     fn_801F5714((s32)((u32)(1024)));
 }
 
@@ -133,7 +131,6 @@ BOOL BattleRequestOk(void) {
 
 // 0x80140AFC
 void ClearBattleRequest(void) {
-    // tail-call arguments inferred from the registers set before the call
     fn_801F5714((s32)((u32)(2048)));
 }
 

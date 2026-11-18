@@ -35,7 +35,6 @@ extern "C" void fn_80119794(void) {
 
 // 0x80119AE0
 extern "C" void fn_80119AE0(void) {
-    // tail-call arguments inferred from the registers set before the call
     *(u32*)((u8*)lbl_803E6B28 + 4) = (u32)((u32)(-1));
     *(u32*)((u8*)lbl_803E6B34 + 4) = (u32)((u32)(-1));
     fn_8011A04C();

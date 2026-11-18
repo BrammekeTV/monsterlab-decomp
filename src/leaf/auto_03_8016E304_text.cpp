@@ -450,7 +450,6 @@ extern "C" s32 ScreenSetsFind(s32 a3, s32 a4) {
 
 // 0x8018D4CC
 extern "C" void fn_8018D4CC(u8* a3) {
-    // tail-call arguments inferred from the registers set before the call
     s32 t0 = *(s32*)((u8*)lbl_805F95F8);
     if ((s32)(u32)(t0) <= 0) {
         fn_801EF070((u8*)lbl_80412BF8, (s32)((u32)(uintptr_t)(a3)));

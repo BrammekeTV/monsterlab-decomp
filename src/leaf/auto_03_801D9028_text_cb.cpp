@@ -19,6 +19,7 @@ extern "C" void fn_801B6AA4(s32);
 extern "C" void fn_801B6EC8(s32, s32);
 extern "C" BOOL fn_801F5220(void);
 extern "C" void fn_8020A398(s32);
+extern "C" void fn_8020B078(f32);
 
 // 0x801DB490
 void Noop(void) {
@@ -79,6 +80,11 @@ void StopGlobalLoopingGroupSound(void) {
 void PlayGlobalGroupSoundWithEffect_NoLoad(u32 a3, s32 a4) {
     u32 t0 = (u32)(uintptr_t)(a4) & 0xffu;
     PlaySound((u32)((u32)(uintptr_t)(a3)), (s32)((u32)(0)), (s32)((u32)(0)), (s32)((u32)(0)), (s32)((u32)(0)), (s32)((u32)(t0)));
+}
+
+// 0x801DC31C
+void SetGlobalSfxVolume(f32 f1) {
+    fn_8020B078((f32)(f1));
 }
 
 // 0x801DDDCC

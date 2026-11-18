@@ -10,7 +10,6 @@ extern "C" void fn_8020A474(s32);
 
 // 0x8010FCE0
 void StopSoundEffect(u32 a3) {
-    // tail-call arguments inferred from the registers set before the call
     if (a3 == 0) {
         return;
     }

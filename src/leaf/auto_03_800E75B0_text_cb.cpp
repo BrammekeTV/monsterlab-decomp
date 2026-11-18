@@ -42,6 +42,7 @@ extern "C" s32 VideoIsPal50(u8*);
 extern "C" void WorldSendEvent(void*, s32, int, int, int);
 extern "C" void fn_80013340(u8*);
 extern "C" s32 fn_80021DAC(void);
+extern "C" s32 fn_80021DD0(void);
 extern "C" void fn_80022D10(void);
 extern "C" void fn_80022D1C(void);
 extern "C" void fn_80022D34(void);
@@ -228,7 +229,6 @@ void StopEntityLoopingSoundFX(void* a3) {
 
 // 0x800E9638
 void StopVoiceSFX(u32 a3) {
-    // tail-call arguments inferred from the registers set before the call
     if (a3 == 0) {
         return;
     }
@@ -591,6 +591,11 @@ s32 IsTimerCountdown(void) {
     return (s32)(fn_80021DAC());
 }
 
+// 0x800EFE4C
+s32 HasMonsterVoice(void) {
+    return (s32)(fn_80021DD0());
+}
+
 // 0x800EFEB4
 s32 StateFinished(void) {
     return (s32)(1);
@@ -598,7 +603,6 @@ s32 StateFinished(void) {
 
 // 0x800F0044
 u32 GetCurrentLevelId(void) {
-    // tail-call arguments inferred from the registers set before the call
     u8 t0 = *(u8*)((u8*)lbl_803C4298 + 28);
     return (u32)(fn_8010720C((s32)((u32)(t0))));
 }

@@ -9,6 +9,7 @@ extern u8 lbl_805FDB38[];
 extern u8 lbl_805FDB60[];
 extern u8 lbl_805FDB64[];
 extern "C" void app_PlayMusic(u32, f32);
+extern "C" void fn_800704AC(u8*);
 
 // 0x80094F88
 extern "C" f32 fn_80094F88(u8* a3) {
@@ -35,6 +36,11 @@ extern "C" void fn_80094FA8(void) {
     f32 t0 = *(f32*)((u8*)lbl_805FDB64);
     u32 t1 = (u32)(0xec230000) - 16738u;
     app_PlayMusic((u32)((u32)(t1)), (f32)(t0));
+}
+
+// 0x80095158
+extern "C" void fn_80095158(u8* a3) {
+    fn_800704AC(((u8*)(uintptr_t)(a3)));
 }
 
 // 0x8009515C

@@ -8,6 +8,12 @@
 extern u8 lbl_805FCCCC[];
 extern "C" void* fn_80030368(u8*);
 extern "C" void fn_80030554(u8*, f32);
+extern "C" void fn_8003056C(u8*);
+
+// 0x800306DC
+extern "C" void fn_800306DC(u8* a3) {
+    fn_8003056C(((u8*)(uintptr_t)(a3)));
+}
 
 // 0x8003074C
 extern "C" void fn_8003074C(u8* a3, f32 f1) {
@@ -19,6 +25,11 @@ extern "C" void* fn_80030750(u8* a3) {
     return (void*)(fn_80030368(((u8*)(uintptr_t)(a3))));
 }
 
+// 0x8003082C
+extern "C" void fn_8003082C(u8* a3) {
+    fn_8003056C(((u8*)(uintptr_t)(a3)));
+}
+
 // 0x8003089C
 extern "C" void fn_8003089C(u8* a3, f32 f1) {
     fn_80030554(((u8*)(uintptr_t)(a3)), (f32)(f1));
@@ -27,6 +38,11 @@ extern "C" void fn_8003089C(u8* a3, f32 f1) {
 // 0x800308A0
 extern "C" void* fn_800308A0(u8* a3) {
     return (void*)(fn_80030368(((u8*)(uintptr_t)(a3))));
+}
+
+// 0x8003097C
+extern "C" void fn_8003097C(u8* a3) {
+    fn_8003056C(((u8*)(uintptr_t)(a3)));
 }
 
 // 0x800309EC
@@ -47,6 +63,11 @@ extern "C" void CatchObject_Release(u8* a3, s32 a4) {
 // 0x80030AA0
 extern "C" s32 fn_80030AA0(void) {
     return (s32)(0);
+}
+
+// 0x80030AA8
+extern "C" void fn_80030AA8(u8* a3) {
+    fn_8003056C(((u8*)(uintptr_t)(a3)));
 }
 
 // 0x80030B48

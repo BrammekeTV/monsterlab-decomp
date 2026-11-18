@@ -5,6 +5,7 @@
 
 #include "types.h"
 
+extern "C" void fn_80021F2C(u8*, f32);
 extern "C" void fn_800222F0(void);
 extern "C" void fn_8002238C(void);
 extern "C" void fn_80022390(void);
@@ -15,6 +16,11 @@ extern "C" void fn_80023044(void);
 // 0x8003A09C
 extern "C" void fn_8003A09C(void) {
     fn_80022390();
+}
+
+// 0x8003A1C8
+extern "C" void fn_8003A1C8(u8* a3, f32 f1) {
+    fn_80021F2C(((u8*)(uintptr_t)(a3)), (f32)(f1));
 }
 
 // 0x8003A268

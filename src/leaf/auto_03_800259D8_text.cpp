@@ -7,8 +7,14 @@
 
 extern u8 lbl_805F8310[];
 extern u8 lbl_805FAFBC[];
+extern "C" void fn_80021F2C(u8*, f32);
 extern "C" void fn_80022390(void);
 extern "C" void fn_80022E10(void);
+
+// 0x80027954
+extern "C" void fn_80027954(u8* a3, f32 f1) {
+    fn_80021F2C(((u8*)(uintptr_t)(a3)), (f32)(f1));
+}
 
 // 0x80027CD8
 extern "C" void fn_80027CD8(void) {

@@ -12,7 +12,6 @@ extern "C" void fn_8020A348(s32, u8*);
 
 // 0x800A660C
 extern "C" void fn_800A660C(u8* a3) {
-    // tail-call arguments inferred from the registers set before the call
     s32 t0 = *(s32*)(((u8*)(uintptr_t)(a3)) + 348);
     *(u32*)(((u8*)(uintptr_t)(a3)) + 652) = (u32)((u32)(-1));
     u32 t1 = (u32)(t0) | 0x600000u;

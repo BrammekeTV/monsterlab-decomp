@@ -102,7 +102,6 @@ extern "C" s32 fn_800DE4D4(void) {
 
 // 0x800DE4DC
 extern "C" void fn_800DE4DC(u8* a3) {
-    // tail-call arguments inferred from the registers set before the call
     u8* t0 = ((u8*)(uintptr_t)(a3)) + 104;
     fn_800E04CC(t0);
 }

@@ -7,6 +7,7 @@
 
 extern "C" void fn_800C15D8(u8*);
 extern "C" void fn_800C1768(void);
+extern "C" void fn_800C1D44(u8*);
 
 // 0x8009B234
 extern "C" void fn_8009B234(u8* a3) {
@@ -16,4 +17,9 @@ extern "C" void fn_8009B234(u8* a3) {
 // 0x8009B238
 extern "C" void fn_8009B238(void) {
     fn_800C1768();
+}
+
+// 0x8009B240
+extern "C" void fn_8009B240(u8* a3) {
+    fn_800C1D44(((u8*)(uintptr_t)(a3)));
 }

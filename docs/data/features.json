@@ -69,6 +69,11 @@
  "changelog": [
   {
    "date": "2026-11-18",
+   "time": "18:34",
+   "text": "Script callbacks now return a pointer-sized ScriptValue instead of BOOL, so string/texture getters no longer truncate on x64; decompiled the quest log, recipes, badges and creatures string getters and LightSetColor."
+  },
+  {
+   "date": "2026-11-18",
    "time": "18:26",
    "text": "Decompiled 59 more small functions: engine handle tables, script dispatch fallback, waypoint callbacks and compressed-stream helpers (0x801E), arm wrestle and grow juice helpers (0x800B), and low-level graphics register writes and render setup (0x8015). Written by low-cost helper agents and reviewed."
   },

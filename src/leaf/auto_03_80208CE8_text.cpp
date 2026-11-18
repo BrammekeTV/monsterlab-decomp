@@ -16,7 +16,7 @@ extern "C" f32 fn_801FFC48(void);
 extern "C" void fn_801FFC50(s32, s32);
 extern "C" f32 fn_801FFF1C(void);
 extern "C" void fn_802005EC(u8*);
-extern "C" void fn_802014D4(u8*);
+extern "C" void fn_802014D4(u8*, s32);
 
 // 0x80208CE8
 extern "C" s32 fn_80208CE8(void) {
@@ -78,7 +78,6 @@ extern "C" void fn_8020B1C8(void) {
 }
 
 // 0x8020B1D4
-extern "C" void fn_8020B1D4(void) {
-    // tail-call arguments inferred from the registers set before the call
-    fn_802014D4((u8*)gAudio);
+extern "C" void fn_8020B1D4(s32 a3, s32 a4) {
+    fn_802014D4((u8*)gAudio, (s32)((u32)(uintptr_t)(a4)));
 }

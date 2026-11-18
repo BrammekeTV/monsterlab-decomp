@@ -177,11 +177,12 @@ s32 fn_8011CFF4(u8* p, s32 a) {
 
 // 0x8011D150
 // Formats the two values of the current pair (at +0x12F8/+0x12FC, indexed by +0x12F4)
-// into the text buffer at +0x1344.
-void fn_8011D150(u8* p) {
+// into the text buffer at +0x1344 and returns the buffer.
+char* fn_8011D150(u8* p) {
     s32 k = *(s32*)(p + 0x12F4);
     u8* e = p + k * 8;
     SysSprintf((char*)(p + 0x1344), lbl_805F8F54, *(s32*)(e + 0x12FC), *(s32*)(e + 0x12F8));
+    return (char*)(p + 0x1344);
 }
 
 // 0x8011D338

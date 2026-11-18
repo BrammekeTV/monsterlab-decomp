@@ -6,6 +6,7 @@
 #include "types.h"
 
 extern u8 lbl_805FAFB0[];
+extern "C" void fn_80021F2C(u8*, f32);
 extern "C" void fn_8002238C(void);
 extern "C" void fn_80022390(void);
 extern "C" void fn_80022394(void);
@@ -13,6 +14,11 @@ extern "C" void fn_800223D4(void);
 extern "C" void fn_800223D8(void);
 extern "C" void fn_80022E10(void);
 extern "C" void fn_80022F28(void);
+
+// 0x80023D70
+extern "C" void fn_80023D70(u8* a3, f32 f1) {
+    fn_80021F2C(((u8*)(uintptr_t)(a3)), (f32)(f1));
+}
 
 // 0x80024BC8
 extern "C" void fn_80024BC8(void) {

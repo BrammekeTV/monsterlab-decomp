@@ -14,7 +14,7 @@ extern "C" void fn_8019914C(s32, u8*);
 extern "C" void fn_8019B808(void);
 extern "C" void fn_8019DB40(void);
 extern "C" void fn_801BA68C(s32);
-extern "C" void fn_801BA930(s32, s32, s32, s32, s32, s32, s32);
+extern "C" void* fn_801BA930(void*, void*, u32, u32, u32, u32, void*);
 
 // 0x8019552C
 extern "C" u32 fn_8019552C(u8* a3, s32 a4) {
@@ -114,10 +114,9 @@ extern "C" s32 fn_80196E7C(u8* a3, s32 a4) {
 }
 
 // 0x80196FB0
-extern "C" void fn_80196FB0(u8* a3, s32 a4, s32 a5, s32 a6, s32 a7, s32 a8, s32 a9) {
-    // tail-call arguments inferred from the registers set before the call
-    s32 t0 = *(s32*)(((u8*)(uintptr_t)(a3)) + 8);
-    fn_801BA930((s32)((u32)(t0)), (s32)((u32)(uintptr_t)(a4)), (s32)((u32)(uintptr_t)(a6)), (s32)((u32)(uintptr_t)(a7)), (s32)((u32)(uintptr_t)(a8)), (s32)((u32)(uintptr_t)(a9)), (s32)((u32)(0)));
+extern "C" void* fn_80196FB0(u8* a3, u8* a4, s32 a5, s32 a6, s32 a7, s32 a8, s32 a9) {
+    u8* t0 = *(u8**)(((u8*)(uintptr_t)(a3)) + 8);
+    return (void*)(fn_801BA930((void*)(t0), (void*)(((u8*)(uintptr_t)(a4))), (u32)((u32)(uintptr_t)(a6)), (u32)((u32)(uintptr_t)(a7)), (u32)((u32)(uintptr_t)(a8)), (u32)((u32)(uintptr_t)(a9)), (void*)((u8*)(uintptr_t)(0))));
 }
 
 // 0x801970A4

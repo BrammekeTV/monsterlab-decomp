@@ -15,7 +15,8 @@ extern u8 lbl_805FB878[];
 extern u8 lbl_805FB890[];
 extern u8 lbl_805FB894[];
 extern u8 lbl_805FB898[];
-extern "C" s32 fn_801EB94C(void);
+extern "C" void fn_801D9164(u8*, void*);
+extern "C" void* fn_801EB94C(void*);
 
 // 0x801D9028
 extern "C" void fn_801D9028(u8* a3) {
@@ -55,6 +56,11 @@ extern "C" void fn_801D9AD4(u8* a3) {
     *(u8*)(((u8*)(uintptr_t)(a3)) + 80) = (u8)((u32)(0));
 }
 
+// 0x801DA208
+extern "C" void fn_801DA208(u8* a3, u8* a4) {
+    fn_801D9164(((u8*)(uintptr_t)(a3)), (void*)(((u8*)(uintptr_t)(a4))));
+}
+
 // 0x801DA344
 extern "C" void fn_801DA344(u8* a3, s32 a4) {
     *(u32*)(((u8*)(uintptr_t)(a3)) + 72) = (u32)((u32)(uintptr_t)(a4));
@@ -82,13 +88,12 @@ extern "C" void fn_801DA8CC(void) {
 }
 
 // 0x801DB194
-extern "C" s32 fn_801DB194(u8* a3) {
-    // tail-call arguments inferred from the registers set before the call
-    s32 t0 = *(s32*)(((u8*)(uintptr_t)(a3)) + 4);
+extern "C" void* fn_801DB194(u8* a3) {
+    u8* t0 = *(u8**)(((u8*)(uintptr_t)(a3)) + 4);
     if (t0 == 0) {
-        return (s32)(0);
+        return (void*)(uintptr_t)(0);
     }
-    return (s32)(fn_801EB94C());
+    return (void*)(fn_801EB94C((void*)(t0)));
 }
 
 // 0x801DC574

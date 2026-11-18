@@ -11,7 +11,11 @@ extern u8 lbl_805FB250[];
 extern u8 lbl_805FB254[];
 extern u8 lbl_805FB258[];
 extern u8 lbl_805FB25C[];
-extern "C" void fn_80119798(s32);
+extern "C" void fn_80119798(u8*);
+extern "C" BOOL fn_80119B00(void);
+extern "C" BOOL fn_80119B38(void);
+extern "C" void fn_80119BA8(void);
+extern "C" void fn_80119BFC(void);
 extern "C" s32 fn_80119C58(void);
 extern "C" s32 fn_80119FFC(void);
 extern "C" s32 fn_8011A004(void);
@@ -37,8 +41,27 @@ s32 CanProcessInput(void) {
 
 // 0x80111A70
 void StartIngredientsSelection(u32 a3) {
-    // tail-call arguments inferred from the registers set before the call
-    fn_80119798((s32)((u32)(uintptr_t)(a3)));
+    fn_80119798(((u8*)(uintptr_t)(a3)));
+}
+
+// 0x801124A4
+s32 SelectedIngredientsValid(void) {
+    return (s32)(fn_80119B00());
+}
+
+// 0x801124A8
+s32 SelectedIngredientsMadnessTooHigh(void) {
+    return (s32)(fn_80119B38());
+}
+
+// 0x801124B4
+void CancelIngredientSelection(void) {
+    fn_80119BA8();
+}
+
+// 0x801124B8
+void ConfirmIngredientSelection(void) {
+    fn_80119BFC();
 }
 
 // 0x801124BC

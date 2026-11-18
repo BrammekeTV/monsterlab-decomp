@@ -21,9 +21,9 @@ extern "C" void fn_80060198(s32, s32);
 extern "C" void fn_8006023C(s32, s32, s32);
 extern "C" void fn_8006066C(s32, s32);
 extern "C" void fn_80060920(s32);
-extern "C" void fn_800609E0(s32, s32, s32);
+extern "C" void fn_800609E0(u8*, s32, s32);
 extern "C" s32 fn_80060C90(s32);
-extern "C" s32 fn_80060FA8(s32);
+extern "C" s32 fn_80060FA8(u8*, f32);
 extern "C" s32 fn_80061024(s32);
 extern "C" s32 fn_800612B8(s32);
 extern "C" s32 fn_80061770(s32);
@@ -32,7 +32,7 @@ extern "C" void fn_800619A4(s32);
 extern "C" void fn_80061CC0(s32);
 extern "C" void fn_80061FDC(s32, s32, s32);
 extern "C" s32 fn_80062174(s32);
-extern "C" s32 fn_80062398(s32);
+extern "C" s32 fn_80062398(u8*);
 extern "C" s32 fn_800623D4(s32);
 extern "C" s32 fn_80062470(s32);
 extern "C" s32 fn_800629E8(s32);
@@ -132,8 +132,7 @@ s32 NavTargetIsLeft(u32 a3) {
 
 // 0x80103898
 s32 RequestMeleeAttack(u32 a3, f32 f1) {
-    // tail-call arguments inferred from the registers set before the call
-    return (s32)(fn_80062398((s32)((u32)(uintptr_t)(a3))));
+    return (s32)(fn_80062398(((u8*)(uintptr_t)(a3))));
 }
 
 // 0x8010389C
@@ -246,9 +245,8 @@ void SetRenderObjectAttachPoint(u32 a3, u32 a4) {
 
 // 0x80103958
 void SetRival(u32 a3, u32 a4, s32 a5) {
-    // tail-call arguments inferred from the registers set before the call
     u32 t0 = (u32)(uintptr_t)(a5) & 0xffu;
-    fn_800609E0((s32)((u32)(uintptr_t)(a3)), (s32)((u32)(uintptr_t)(a4)), (s32)((u32)(t0)));
+    fn_800609E0(((u8*)(uintptr_t)(a3)), (s32)((u32)(uintptr_t)(a4)), (s32)((u32)(t0)));
 }
 
 // 0x80103960
@@ -309,6 +307,5 @@ s32 WithinJumpRange(u32 a3) {
 
 // 0x801039BC
 s32 WithinRangeOfTarget(u32 a3, f32 f1) {
-    // tail-call arguments inferred from the registers set before the call
-    return (s32)(fn_80060FA8((s32)((u32)(uintptr_t)(a3))));
+    return (s32)(fn_80060FA8(((u8*)(uintptr_t)(a3)), (f32)(f1)));
 }

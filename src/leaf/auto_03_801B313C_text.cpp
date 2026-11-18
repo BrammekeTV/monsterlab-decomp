@@ -17,9 +17,9 @@ extern u8 lbl_805FB704[];
 extern u8 lbl_805FFB08[];
 extern "C" void EventSend(void*, void*, void*, u32, int, int, int, int);
 extern "C" void EventSendTo(void*, u32, void*, u32, int, int);
-extern "C" void fn_801B1778(s32, s32);
+extern "C" void fn_801B1778(void*, s32);
 extern "C" void fn_801BB530(s32, s32);
-extern "C" void fn_801EBA20(s32);
+extern "C" void fn_801EBA20(void*);
 extern "C" void fn_801EBBE0(s32, u8*, s32);
 
 // 0x801B3308
@@ -175,7 +175,6 @@ extern "C" s32 fn_801B6E8C(void) {
 
 // 0x801B7020
 extern "C" void fn_801B7020(u8* a3) {
-    // tail-call arguments inferred from the registers set before the call
     s32 t0 = *(s32*)(((u8*)(uintptr_t)(a3)) + 140);
     if (t0 == 0) {
         return;
@@ -184,8 +183,8 @@ extern "C" void fn_801B7020(u8* a3) {
     s32 t2 = *(s32*)(t1 + 32);
     u32 t3 = (u32)(t2) | 0x4000u;
     *(u32*)(t1 + 32) = (u32)((u32)(t3));
-    s32 t4 = *(s32*)(((u8*)(uintptr_t)(a3)) + 140);
-    fn_801B1778((s32)((u32)(t4)), (s32)((u32)(1)));
+    u8* t4 = *(u8**)(((u8*)(uintptr_t)(a3)) + 140);
+    fn_801B1778((void*)(t4), (s32)((u32)(1)));
 }
 
 // 0x801B70E8
@@ -345,18 +344,16 @@ extern "C" void fn_801C37EC(s32 a3) {
 
 // 0x801C3E7C
 extern "C" void fn_801C3E7C(s32 a3, u8* a4) {
-    // tail-call arguments inferred from the registers set before the call
     u8* t0 = *(u8**)(((u8*)(uintptr_t)(a4)) + 0);
-    s32 t1 = *(s32*)(t0 + 120);
-    fn_801EBA20((s32)((u32)(t1)));
+    u8* t1 = *(u8**)(t0 + 120);
+    fn_801EBA20((void*)(t1));
 }
 
 // 0x801C3E88
 extern "C" void fn_801C3E88(s32 a3, u8* a4) {
-    // tail-call arguments inferred from the registers set before the call
     u8* t0 = *(u8**)(((u8*)(uintptr_t)(a4)) + 0);
-    s32 t1 = *(s32*)(t0 + 124);
-    fn_801EBA20((s32)((u32)(t1)));
+    u8* t1 = *(u8**)(t0 + 124);
+    fn_801EBA20((void*)(t1));
 }
 
 // 0x801C3E94

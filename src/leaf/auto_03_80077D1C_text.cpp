@@ -7,6 +7,7 @@
 
 extern u8 lbl_805FB140[];
 extern "C" void app_StopMusic(void);
+extern "C" void fn_800704AC(u8*);
 extern "C" f32 fn_8007CF94(u8*);
 extern "C" f32 fn_8007CFA4(u8*);
 extern "C" void fn_8007CFAC(s32);
@@ -27,6 +28,11 @@ extern "C" f32 fn_80079190(void) {
 
 // 0x80079E14
 extern "C" void fn_80079E14(void) {
+}
+
+// 0x80079E18
+extern "C" void fn_80079E18(u8* a3) {
+    fn_800704AC(((u8*)(uintptr_t)(a3)));
 }
 
 // 0x80079E1C

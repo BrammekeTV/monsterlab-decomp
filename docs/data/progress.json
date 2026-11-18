@@ -1,15 +1,15 @@
 {
  "game_id": "RM7P4F",
- "generated": "2026-11-18T17:26:22+00:00",
- "commit": "e17c03c",
- "commit_date": "2026-11-18T18:21:37+01:00",
+ "generated": "2026-11-18T17:32:47+00:00",
+ "commit": "4d1d094",
+ "commit_date": "2026-11-18T18:31:13+01:00",
  "game": {
   "functions": 8548,
   "bytes": 2265988,
   "named": 2748,
   "named_bytes": 616800,
-  "decompiled": 3935,
-  "decompiled_bytes": 402532
+  "decompiled": 3976,
+  "decompiled_bytes": 404320
  },
  "library": {
   "functions": 4039,
@@ -24,8 +24,8 @@
   "bytes": 3404928,
   "named": 3211,
   "named_bytes": 721548,
-  "decompiled": 3936,
-  "decompiled_bytes": 402652
+  "decompiled": 3977,
+  "decompiled_bytes": 404440
  },
  "game_range": [
   "80006B40",
@@ -85,7 +85,7 @@
    0.059
   ],
   [
-   0.081,
+   0.082,
    0.199
   ],
   [
@@ -93,7 +93,7 @@
    0.32
   ],
   [
-   0.128,
+   0.129,
    0.044
   ],
   [
@@ -109,7 +109,7 @@
    0.598
   ],
   [
-   0.27,
+   0.272,
    0.061
   ],
   [
@@ -245,7 +245,7 @@
    0.049
   ],
   [
-   0.083,
+   0.084,
    0.034
   ],
   [
@@ -253,7 +253,7 @@
    0.0
   ],
   [
-   0.024,
+   0.025,
    0.009
   ],
   [
@@ -305,7 +305,7 @@
    0.106
   ],
   [
-   0.102,
+   0.103,
    0.004
   ],
   [
@@ -505,7 +505,7 @@
    1.0
   ],
   [
-   0.649,
+   0.662,
    0.883
   ],
   [
@@ -525,15 +525,15 @@
    0.801
   ],
   [
-   0.401,
+   0.403,
    1.0
   ],
   [
-   0.713,
+   0.8,
    0.955
   ],
   [
-   0.149,
+   0.231,
    0.853
   ],
   [
@@ -897,11 +897,11 @@
    0.102
   ],
   [
-   0.228,
+   0.241,
    0.2
   ],
   [
-   0.546,
+   0.547,
    0.916
   ],
   [
@@ -1053,7 +1053,7 @@
    0.149
   ],
   [
-   0.01,
+   0.011,
    0.056
   ]
  ],
@@ -4318,6 +4318,76 @@
     {
      "name": "fn_8011D608",
      "addr": "8011D608",
+     "size": 104
+    }
+   ]
+  },
+  {
+   "path": "src/game/lab_books_g.cpp",
+   "functions": [
+    {
+     "name": "Creatures_GetMonsterName",
+     "addr": "80113710",
+     "size": 124
+    },
+    {
+     "name": "QuestLog_GetQuestName",
+     "addr": "80114568",
+     "size": 124
+    },
+    {
+     "name": "QuestLog_GetQuestDescription",
+     "addr": "801145E4",
+     "size": 124
+    },
+    {
+     "name": "QuestLog_GetNextQuestLocationString",
+     "addr": "80114A90",
+     "size": 124
+    },
+    {
+     "name": "Recipes_GetBodyPartSlotName",
+     "addr": "80114B88",
+     "size": 124
+    },
+    {
+     "name": "Recipes_GetSelectedName",
+     "addr": "80114C04",
+     "size": 124
+    },
+    {
+     "name": "Recipes_GetTextureList",
+     "addr": "80114F04",
+     "size": 124
+    },
+    {
+     "name": "Badges_GetBadgeTexture",
+     "addr": "80115B68",
+     "size": 128
+    },
+    {
+     "name": "Badges_GetBadgeName",
+     "addr": "80115BE8",
+     "size": 128
+    },
+    {
+     "name": "Badges_GetBadgeDescription",
+     "addr": "80115C68",
+     "size": 128
+    },
+    {
+     "name": "Badges_GetCurrentTypeName",
+     "addr": "80115DD8",
+     "size": 112
+    },
+    {
+     "name": "Badges_GetBadgesEarned",
+     "addr": "80115E48",
+     "size": 112
+    },
+    {
+     "name": "LightSetColor",
+     "addr": "801DB6E0",
      "size": 104
     }
    ]
@@ -10601,6 +10671,11 @@
    "path": "src/leaf/auto_03_80023884_text.cpp",
    "functions": [
     {
+     "name": "fn_80023D70",
+     "addr": "80023D70",
+     "size": 4
+    },
+    {
      "name": "fn_80024BC8",
      "addr": "80024BC8",
      "size": 4
@@ -10645,6 +10720,11 @@
   {
    "path": "src/leaf/auto_03_800259D8_text.cpp",
    "functions": [
+    {
+     "name": "fn_80027954",
+     "addr": "80027954",
+     "size": 4
+    },
     {
      "name": "fn_80027CD8",
      "addr": "80027CD8",
@@ -10846,6 +10926,11 @@
    "path": "src/leaf/auto_03_80030604_text.cpp",
    "functions": [
     {
+     "name": "fn_800306DC",
+     "addr": "800306DC",
+     "size": 4
+    },
+    {
      "name": "fn_8003074C",
      "addr": "8003074C",
      "size": 4
@@ -10856,6 +10941,11 @@
      "size": 4
     },
     {
+     "name": "fn_8003082C",
+     "addr": "8003082C",
+     "size": 4
+    },
+    {
      "name": "fn_8003089C",
      "addr": "8003089C",
      "size": 4
@@ -10863,6 +10953,11 @@
     {
      "name": "fn_800308A0",
      "addr": "800308A0",
+     "size": 4
+    },
+    {
+     "name": "fn_8003097C",
+     "addr": "8003097C",
      "size": 4
     },
     {
@@ -10884,6 +10979,11 @@
      "name": "fn_80030AA0",
      "addr": "80030AA0",
      "size": 8
+    },
+    {
+     "name": "fn_80030AA8",
+     "addr": "80030AA8",
+     "size": 4
     },
     {
      "name": "fn_80030B48",
@@ -10910,6 +11010,11 @@
   {
    "path": "src/leaf/auto_03_800314F8_text.cpp",
    "functions": [
+    {
+     "name": "fn_800317A0",
+     "addr": "800317A0",
+     "size": 4
+    },
     {
      "name": "fn_800317A4",
      "addr": "800317A4",
@@ -10981,6 +11086,11 @@
      "size": 4
     },
     {
+     "name": "fn_80034390",
+     "addr": "80034390",
+     "size": 4
+    },
+    {
      "name": "fn_800344B0",
      "addr": "800344B0",
      "size": 4
@@ -11008,6 +11118,11 @@
     {
      "name": "fn_8003A09C",
      "addr": "8003A09C",
+     "size": 4
+    },
+    {
+     "name": "fn_8003A1C8",
+     "addr": "8003A1C8",
      "size": 4
     },
     {
@@ -12286,6 +12401,11 @@
    "path": "src/leaf/auto_03_800756E0_text.cpp",
    "functions": [
     {
+     "name": "fn_80076274",
+     "addr": "80076274",
+     "size": 4
+    },
+    {
      "name": "fn_80076278",
      "addr": "80076278",
      "size": 20
@@ -12458,6 +12578,11 @@
     {
      "name": "fn_80079E14",
      "addr": "80079E14",
+     "size": 4
+    },
+    {
+     "name": "fn_80079E18",
+     "addr": "80079E18",
      "size": 4
     },
     {
@@ -12789,6 +12914,11 @@
      "name": "fn_8007E0CC",
      "addr": "8007E0CC",
      "size": 16
+    },
+    {
+     "name": "fn_8007E340",
+     "addr": "8007E340",
+     "size": 4
     },
     {
      "name": "fn_8007E344",
@@ -13511,6 +13641,11 @@
      "size": 16
     },
     {
+     "name": "fn_80095158",
+     "addr": "80095158",
+     "size": 4
+    },
+    {
      "name": "fn_8009515C",
      "addr": "8009515C",
      "size": 4
@@ -13631,6 +13766,11 @@
      "size": 16
     },
     {
+     "name": "fn_8009A7C0",
+     "addr": "8009A7C0",
+     "size": 4
+    },
+    {
      "name": "fn_8009A9B0",
      "addr": "8009A9B0",
      "size": 20
@@ -13673,6 +13813,11 @@
     {
      "name": "fn_8009B238",
      "addr": "8009B238",
+     "size": 4
+    },
+    {
+     "name": "fn_8009B240",
+     "addr": "8009B240",
      "size": 4
     }
    ]
@@ -13719,6 +13864,11 @@
      "name": "fn_800A19B0",
      "addr": "800A19B0",
      "size": 16
+    },
+    {
+     "name": "fn_800A1BE4",
+     "addr": "800A1BE4",
+     "size": 4
     },
     {
      "name": "fn_800A1BE8",
@@ -14836,6 +14986,11 @@
      "size": 4
     },
     {
+     "name": "fn_800D1630",
+     "addr": "800D1630",
+     "size": 4
+    },
+    {
      "name": "fn_800D1634",
      "addr": "800D1634",
      "size": 4
@@ -15743,6 +15898,11 @@
     {
      "name": "IsTimerCountdown",
      "addr": "800EFE48",
+     "size": 4
+    },
+    {
+     "name": "HasMonsterVoice",
+     "addr": "800EFE4C",
      "size": 4
     },
     {
@@ -16976,6 +17136,11 @@
      "size": 20
     },
     {
+     "name": "FSM_GetBit",
+     "addr": "80106E5C",
+     "size": 36
+    },
+    {
      "name": "FSM_SetInt",
      "addr": "80106E80",
      "size": 36
@@ -16983,6 +17148,16 @@
     {
      "name": "FSM_GetInt",
      "addr": "80106EA4",
+     "size": 36
+    },
+    {
+     "name": "FSM_GetFloat",
+     "addr": "80106EEC",
+     "size": 36
+    },
+    {
+     "name": "FSM_AddToFloat",
+     "addr": "80106F34",
      "size": 36
     }
    ]
@@ -17213,6 +17388,26 @@
     {
      "name": "StartIngredientsSelection",
      "addr": "80111A70",
+     "size": 4
+    },
+    {
+     "name": "SelectedIngredientsValid",
+     "addr": "801124A4",
+     "size": 4
+    },
+    {
+     "name": "SelectedIngredientsMadnessTooHigh",
+     "addr": "801124A8",
+     "size": 4
+    },
+    {
+     "name": "CancelIngredientSelection",
+     "addr": "801124B4",
+     "size": 4
+    },
+    {
+     "name": "ConfirmIngredientSelection",
+     "addr": "801124B8",
      "size": 4
     },
     {
@@ -21076,6 +21271,11 @@
      "size": 16
     },
     {
+     "name": "fn_801DA208",
+     "addr": "801DA208",
+     "size": 4
+    },
+    {
      "name": "fn_801DA344",
      "addr": "801DA344",
      "size": 8
@@ -21244,6 +21444,11 @@
      "name": "PlayGlobalGroupSoundWithEffect_NoLoad",
      "addr": "801DC2AC",
      "size": 28
+    },
+    {
+     "name": "SetGlobalSfxVolume",
+     "addr": "801DC31C",
+     "size": 4
     },
     {
      "name": "PlayLoopingSoundFX",
@@ -22514,6 +22719,11 @@
      "name": "fn_8022E330",
      "addr": "8022E330",
      "size": 36
+    },
+    {
+     "name": "fn_8022E3D8",
+     "addr": "8022E3D8",
+     "size": 4
     },
     {
      "name": "fn_8022E3DC",
