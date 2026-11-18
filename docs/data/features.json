@@ -69,6 +69,11 @@
  "changelog": [
   {
    "date": "2026-11-18",
+   "time": "01:31",
+   "text": "Parts pipeline, part 2: opponent monsters are now decompiled end to end. Each limb is picked from a weighted part pool (26 parts per pool) named by the opponent template, tiers are random within the template's range and nudged one step at a time until the monster's power fits, and defects or enhancements go to random free limbs."
+  },
+  {
+   "date": "2026-11-18",
    "time": "01:25",
    "text": "Parts pipeline, part 1: the part instance class (XInventoryPart): constructor, reset, copy, setting a part from its definition, quality/tier setters, current and maximum health (base health scaled by quality, tier and enhancement/defect), torso energy in the lab and in battle, the five stat modifiers of enhancements and defects, and the monster ratings shown in the lab (health, attack, defence, energy, madness) with the tuned rating curve."
   },

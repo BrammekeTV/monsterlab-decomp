@@ -600,3 +600,6 @@ fn_8021D0B8 PlayerRankFraction
 fn_8021EF68 PartGetCurrentHealth
 fn_802191CC PartCollectionHas
 lbl_805FBBC8 gPartCollection
+fn_8021B730 PartPoolGet
+fn_8021B8D4 PartPoolPick
+fn_80220804 RandomUpTo

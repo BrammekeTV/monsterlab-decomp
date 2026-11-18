@@ -1,15 +1,15 @@
 {
  "game_id": "RM7P4F",
- "generated": "2026-11-18T00:25:53+00:00",
- "commit": "bc2e6b3",
- "commit_date": "2026-11-18T01:12:14+01:00",
+ "generated": "2026-11-18T00:31:35+00:00",
+ "commit": "b47f9fb",
+ "commit_date": "2026-11-18T01:25:54+01:00",
  "game": {
   "functions": 8548,
   "bytes": 2265988,
-  "named": 2552,
-  "named_bytes": 552720,
-  "decompiled": 1981,
-  "decompiled_bytes": 222924
+  "named": 2555,
+  "named_bytes": 554080,
+  "decompiled": 1989,
+  "decompiled_bytes": 226348
  },
  "library": {
   "functions": 4039,
@@ -22,10 +22,10 @@
  "all": {
   "functions": 12587,
   "bytes": 3404928,
-  "named": 3010,
-  "named_bytes": 656864,
-  "decompiled": 1981,
-  "decompiled_bytes": 222924
+  "named": 3013,
+  "named_bytes": 658224,
+  "decompiled": 1989,
+  "decompiled_bytes": 226348
  },
  "game_range": [
   "80006B40",
@@ -1017,16 +1017,16 @@
    0.301
   ],
   [
-   0.0,
-   0.276
+   0.457,
+   0.457
   ],
   [
    0.416,
    0.834
   ],
   [
-   0.188,
-   0.167
+   0.203,
+   0.173
   ],
   [
    0.011,
@@ -2704,6 +2704,46 @@
      "name": "MonsterGenerateOpponent",
      "addr": "8021A1D0",
      "size": 2740
+    },
+    {
+     "name": "MonsterSpecRandomize",
+     "addr": "8021AC84",
+     "size": 720
+    },
+    {
+     "name": "MonsterSpecReroll",
+     "addr": "8021AF54",
+     "size": 776
+    },
+    {
+     "name": "PartPoolGet",
+     "addr": "8021B730",
+     "size": 420
+    },
+    {
+     "name": "PartPoolPick",
+     "addr": "8021B8D4",
+     "size": 880
+    },
+    {
+     "name": "MonsterSpecAddModifier",
+     "addr": "8021BC44",
+     "size": 484
+    },
+    {
+     "name": "RandomRoll",
+     "addr": "80220800",
+     "size": 4
+    },
+    {
+     "name": "RandomUpTo",
+     "addr": "80220804",
+     "size": 60
+    },
+    {
+     "name": "RandomRangeS8",
+     "addr": "80220840",
+     "size": 80
     }
    ]
   },

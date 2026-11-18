@@ -198,7 +198,7 @@ extern "C" u8 fn_8021EE94(u8* a3) {
 }
 
 // 0x8021EF68
-extern "C" s32 fn_8021EF68(u8* a3) {
+extern "C" s32 PartGetCurrentHealth(u8* a3) {
     s32 t0 = *(s32*)(((u8*)(uintptr_t)(a3)) + 40);
     return (s32)(t0);
 }
