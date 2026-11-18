@@ -30,7 +30,7 @@ void*  ScreenSetFindElement(void* set, u32 hash);                     // 0x80198
 void   UISetText(void* el, const char* text, s32 a);           // 0x8019EFC8
 void   UISetNumber(void* el, s32 n);                           // 0x8019F2A8
 void   UISetNegativeNumber(void* el, s32 n);                   // 0x8019F2F4
-void   UISetTexture(void* el, BOOL tex);                       // 0x801A11FC
+s32    UISetTexture(void* el, BOOL tex);                       // 0x801A11FC
 void   UIPlayAnim(void* el, u32 anim);                         // 0x8019BE40
 s32   SysSprintf(char* buf, const char* fmt, ...);            // 0x80142EFC
 void*  FighterGetSlot(void* fighter, s32 slot);                // 0x8020E794

@@ -586,12 +586,12 @@ void GrowJuiceTentacle_SetVisibleComponents(void* a3, u32 a4);         // src/le
 s32 GrowJuiceTentacle_ShouldAttackPlayer(void* a0);  // type 0x16 (from signature table)
 s32 GrowJuiceTentacle_ShouldGoBerserk(void* a0);  // type 0x16 (from signature table)
 s32 GrowJuiceTentacle_ShouldReactToPlayer(void* a0);  // type 0x16 (from signature table)
-void GrowJuiceWeaponBase_AttemptReload(void* a0);  // type 0x2F (from signature table)
+void GrowJuiceWeaponBase_AttemptReload(void* a0);                      // src/game/draft_800B.cpp
 void GrowJuiceWeaponBase_LoadedInSlot(void* a3, void* a4, s32 a5);     // src/leaf/auto_03_800B068C_text_cb.cpp
-void GrowJuiceWeapon_LoadIntoChamber(void* a0);  // type 0x2F (from signature table)
+void GrowJuiceWeapon_LoadIntoChamber(void* a0);                        // src/game/draft_800B.cpp
 void GrowJuiceWeapon_LoadedIntoChamber(void* a3, void* a4);            // src/leaf/auto_03_800AF568_text_cb.cpp
 void GrowJuiceWeapon_PlayStruckEffect(void* a0);                       // src/game/small_800B.cpp
-void GrowJuiceWeapon_RoundDoneFlight(void* a0, void* a1);  // type 0x30 (from signature table)
+void GrowJuiceWeapon_RoundDoneFlight(void* a0, void* a1);              // src/game/draft_800B.cpp
 void GrowJuiceWeapon_RoundInFlight(void* a3, void* a4);                // src/leaf/auto_03_800AF568_text_cb.cpp
 void HandleHomeButtonIcon(void);                                       // src/game/small_8014.cpp
 void HandleReturnToCastle(void);                                       // src/game/player_api.cpp

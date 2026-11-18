@@ -69,7 +69,7 @@ void fn_80091DAC(void) {
 // 0x8009253C
 // Counts the timer at +0x38 down by dt while enabled; when it reaches zero (and +0x08 is 0),
 // clears the enable flag and sends event 0xDC155FBA to the object at +0x04.
-void fn_8009253C(u8* p, f32 dt) {
+extern "C" void fn_8009253C(u8* p, f32 dt) {
     if (*(u8*)(p + 0x34) == 0) return;
     f32 t = *(f32*)(p + 0x38) - dt;
     *(f32*)(p + 0x38) = t;

@@ -100,7 +100,7 @@ void fn_80091E88(u8* p, f32 dt) {
 
 // 0x80091F28
 // Sends event 0xCF9DDB47 for the object at p. The state==2 early-out in the original asm is unreachable.
-void fn_80091F28(u8* p) {
+void fn_80091F28(u8* p, s32 /*unused*/) {
     EventSend(gEventMgr, *(void**)p, NULL, 0xCF9DDB47u, 0, 0, 1, 0);
 }
 

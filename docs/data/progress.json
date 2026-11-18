@@ -1,15 +1,15 @@
 {
  "game_id": "RM7P4F",
- "generated": "2026-11-18T21:05:52+00:00",
- "commit": "f11145d",
- "commit_date": "2026-11-18T21:57:55+01:00",
+ "generated": "2026-11-18T21:15:35+00:00",
+ "commit": "9edd8d4",
+ "commit_date": "2026-11-18T22:06:49+01:00",
  "game": {
   "functions": 8548,
   "bytes": 2265988,
   "named": 2748,
   "named_bytes": 616800,
-  "decompiled": 4363,
-  "decompiled_bytes": 442320
+  "decompiled": 4403,
+  "decompiled_bytes": 456788
  },
  "library": {
   "functions": 4039,
@@ -24,8 +24,8 @@
   "bytes": 3404928,
   "named": 3211,
   "named_bytes": 721548,
-  "decompiled": 4364,
-  "decompiled_bytes": 442440
+  "decompiled": 4404,
+  "decompiled_bytes": 456908
  },
  "game_range": [
   "80006B40",
@@ -285,11 +285,11 @@
    0.139
   ],
   [
-   0.028,
+   0.354,
    0.0
   ],
   [
-   0.231,
+   0.322,
    0.252
   ],
   [
@@ -317,11 +317,11 @@
    0.052
   ],
   [
-   0.054,
+   0.434,
    0.005
   ],
   [
-   0.048,
+   0.223,
    0.0
   ],
   [
@@ -345,7 +345,7 @@
    0.31
   ],
   [
-   0.098,
+   0.415,
    0.113
   ],
   [
@@ -789,11 +789,11 @@
    0.1
   ],
   [
-   0.029,
+   0.054,
    0.018
   ],
   [
-   0.106,
+   0.444,
    0.0
   ],
   [
@@ -1192,6 +1192,56 @@
   }
  ],
  "files": [
+  {
+   "path": "src/engine/draft_801A.cpp",
+   "functions": [
+    {
+     "name": "fn_801A0D04",
+     "addr": "801A0D04",
+     "size": 236
+    },
+    {
+     "name": "fn_801A1B64",
+     "addr": "801A1B64",
+     "size": 612
+    },
+    {
+     "name": "fn_801A1DC8",
+     "addr": "801A1DC8",
+     "size": 256
+    },
+    {
+     "name": "fn_801A1F40",
+     "addr": "801A1F40",
+     "size": 652
+    },
+    {
+     "name": "fn_801A21CC",
+     "addr": "801A21CC",
+     "size": 356
+    },
+    {
+     "name": "fn_801A23F8",
+     "addr": "801A23F8",
+     "size": 280
+    },
+    {
+     "name": "fn_801A2588",
+     "addr": "801A2588",
+     "size": 308
+    },
+    {
+     "name": "fn_801A2D10",
+     "addr": "801A2D10",
+     "size": 140
+    },
+    {
+     "name": "fn_801A2DDC",
+     "addr": "801A2DDC",
+     "size": 132
+    }
+   ]
+  },
   {
    "path": "src/engine/engine.cpp",
    "functions": [
@@ -4079,6 +4129,171 @@
      "name": "fn_80081F04",
      "addr": "80081F04",
      "size": 528
+    }
+   ]
+  },
+  {
+   "path": "src/game/draft_8009.cpp",
+   "functions": [
+    {
+     "name": "fn_80090040",
+     "addr": "80090040",
+     "size": 272
+    },
+    {
+     "name": "fn_80090154",
+     "addr": "80090154",
+     "size": 188
+    },
+    {
+     "name": "fn_80090248",
+     "addr": "80090248",
+     "size": 188
+    },
+    {
+     "name": "fn_8009033C",
+     "addr": "8009033C",
+     "size": 432
+    },
+    {
+     "name": "fn_800904EC",
+     "addr": "800904EC",
+     "size": 348
+    },
+    {
+     "name": "fn_800906EC",
+     "addr": "800906EC",
+     "size": 532
+    },
+    {
+     "name": "fn_80090900",
+     "addr": "80090900",
+     "size": 512
+    },
+    {
+     "name": "fn_80090B00",
+     "addr": "80090B00",
+     "size": 548
+    },
+    {
+     "name": "fn_800917FC",
+     "addr": "800917FC",
+     "size": 340
+    },
+    {
+     "name": "fn_80091950",
+     "addr": "80091950",
+     "size": 400
+    }
+   ]
+  },
+  {
+   "path": "src/game/draft_800A.cpp",
+   "functions": [
+    {
+     "name": "fn_800A0FB4",
+     "addr": "800A0FB4",
+     "size": 576
+    },
+    {
+     "name": "fn_800A1850",
+     "addr": "800A1850",
+     "size": 312
+    },
+    {
+     "name": "fn_800A19C0",
+     "addr": "800A19C0",
+     "size": 548
+    },
+    {
+     "name": "fn_800A1C2C",
+     "addr": "800A1C2C",
+     "size": 728
+    },
+    {
+     "name": "fn_800A1F08",
+     "addr": "800A1F08",
+     "size": 280
+    },
+    {
+     "name": "fn_800A2020",
+     "addr": "800A2020",
+     "size": 708
+    },
+    {
+     "name": "fn_800A232C",
+     "addr": "800A232C",
+     "size": 184
+    },
+    {
+     "name": "fn_800A29BC",
+     "addr": "800A29BC",
+     "size": 304
+    },
+    {
+     "name": "fn_800A2E70",
+     "addr": "800A2E70",
+     "size": 696
+    },
+    {
+     "name": "fn_800A3188",
+     "addr": "800A3188",
+     "size": 656
+    }
+   ]
+  },
+  {
+   "path": "src/game/draft_800B.cpp",
+   "functions": [
+    {
+     "name": "fn_800B0118",
+     "addr": "800B0118",
+     "size": 340
+    },
+    {
+     "name": "GrowJuiceWeapon_LoadIntoChamber",
+     "addr": "800B02C0",
+     "size": 416
+    },
+    {
+     "name": "GrowJuiceWeapon_RoundDoneFlight",
+     "addr": "800B04A8",
+     "size": 136
+    },
+    {
+     "name": "fn_800B058C",
+     "addr": "800B058C",
+     "size": 224
+    },
+    {
+     "name": "fn_800B068C",
+     "addr": "800B068C",
+     "size": 236
+    },
+    {
+     "name": "fn_800B0B88",
+     "addr": "800B0B88",
+     "size": 300
+    },
+    {
+     "name": "fn_800B10BC",
+     "addr": "800B10BC",
+     "size": 496
+    },
+    {
+     "name": "GrowJuiceWeaponBase_AttemptReload",
+     "addr": "800B12AC",
+     "size": 228
+    },
+    {
+     "name": "fn_800B13B8",
+     "addr": "800B13B8",
+     "size": 172
+    },
+    {
+     "name": "fn_800B15B4",
+     "addr": "800B15B4",
+     "size": 192
     }
    ]
   },
@@ -14179,6 +14394,16 @@
      "name": "PropSetAnimUpdate",
      "addr": "8006CC7C",
      "size": 40
+    }
+   ]
+  },
+  {
+   "path": "src/leaf/auto_03_8006CCC4_text.cpp",
+   "functions": [
+    {
+     "name": "fn_8006CD6C",
+     "addr": "8006CD6C",
+     "size": 4
     }
    ]
   },

@@ -69,6 +69,11 @@
  "changelog": [
   {
    "date": "2026-11-18",
+   "time": "22:15",
+   "text": "Second draft-pipeline round: 40 more functions (junction tracks and gauges in 0x8009, saw/track movement and tree frees in 0x800A, grow-juice weapon chamber and reload in 0x800B, UI element constructors and updates in 0x801A), rewritten and checked against the asm by Sonnet helpers."
+  },
+  {
+   "date": "2026-11-18",
    "time": "22:06",
    "text": "First draft-pipeline round: 29 functions (UI element animation and colour callbacks, junction and exploration setup, brain-toss helpers) drafted with m2c, then rewritten and checked against the asm by Sonnet helpers."
   },
