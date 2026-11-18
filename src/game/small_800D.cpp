@@ -5,7 +5,7 @@
 extern "C" {
 void  operator_delete(void* p);                                        // 0x801D426C
 void  fn_800DEC78(u8* p, s32 a);                                       // 0x800DEC78
-void  fn_800DE5E4(u8* p, s32 del);                                     // 0x800DE5E4
+u8*  fn_800DE5E4(u8* p, s32 del);                                     // 0x800DE5E4
 void  fn_8006FA44(u8* a3, s32 a4, s32 a5, s32 a6, s32 a7, s32 a8);     // 0x8006FA44
 void  GameFlowSignal(s32 id, s32 arg1, s32 arg2);                      // 0x8000C7F4
 void  fn_800D14F0(u8* p);                                              // 0x800D14F0

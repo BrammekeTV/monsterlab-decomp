@@ -20,7 +20,7 @@ extern s32 lbl_805FBA30;
 extern u8 lbl_805FEFF0[];
 extern "C" void* EventPost(s32, void*);
 extern "C" BOOL fn_801F56FC(s32);
-extern "C" void fn_801F5714(s32);
+extern "C" void fn_801F5714(u32);
 extern "C" void fn_801F5724(u32);
 extern "C" void fn_801F5814(s32);
 
@@ -71,7 +71,7 @@ void CancelConnect(void) {
 
 // 0x80140498
 void ClearNetworkStall(void) {
-    fn_801F5714((s32)((u32)(0x10000)));
+    fn_801F5714((u32)((u32)(0x10000)));
 }
 
 // 0x80140828
@@ -121,7 +121,7 @@ BOOL BattleRequestNoMonsters(void) {
 
 // 0x80140AEC
 void ClearNoMonstersFlag(void) {
-    fn_801F5714((s32)((u32)(1024)));
+    fn_801F5714((u32)((u32)(1024)));
 }
 
 // 0x80140AF4
@@ -131,7 +131,7 @@ BOOL BattleRequestOk(void) {
 
 // 0x80140AFC
 void ClearBattleRequest(void) {
-    fn_801F5714((s32)((u32)(2048)));
+    fn_801F5714((u32)((u32)(2048)));
 }
 
 // 0x80140B04

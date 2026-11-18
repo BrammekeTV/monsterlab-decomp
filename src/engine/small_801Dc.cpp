@@ -14,7 +14,7 @@ extern "C" {
 extern "C" {
 // Callees (prototypes copied from their definitions or callers).
 u32   RandomU32(void);                                              // 0x80143460
-void  fn_8016195C(void* p, s32 a, s32 b, void* c);                  // 0x8016195C
+s32  fn_8016195C(void* p, s32 a, s32 b, void* c);                  // 0x8016195C
 s32   fn_80162B6C(void* obj, s32 n);                                // 0x80162B6C
 void  fn_801629D0(void* obj, s32 n);                                // 0x801629D0
 void  fn_801ED788(f32* out, u32 a1);                                // 0x801ED788

@@ -6,7 +6,7 @@ extern "C" {
 void  BufferFree(void* p);                                             // buffer free
 void* MemAllocDefault(u32 size);                                       // 0x801D4650
 void  fn_801EB748(void* p);                                            // 0x801EB748
-void  fn_801EB7A4(void* p, s32 a4, s32 a5, s32 a6, s32 a7);            // 0x801EB7A4
+u8*  fn_801EB7A4(void* p, s32 a4, s32 a5, s32 a6, s32 a7);            // 0x801EB7A4
 void  fn_801EBA20(void* list, void* item);                             // 0x801EBA20
 void* memset(void* p, int c, unsigned long n);
 

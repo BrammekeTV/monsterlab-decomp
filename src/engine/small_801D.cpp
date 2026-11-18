@@ -15,7 +15,7 @@ void  fn_80173164(void* p);                                      // 0x80173164
 void  fn_80185B4C(void* p);                                      // 0x80185B4C
 void  fn_80184488(void* a, void* b);                             // 0x80184488
 void  fn_801842E0(void* a, s32 b, s32 c);                        // 0x801842E0
-void  fn_8016195C(void* p, s32 a, s32 b, void* c);               // 0x8016195C
+s32  fn_8016195C(void* p, s32 a, s32 b, void* c);               // 0x8016195C
 void  fn_801DA34C(void);                                         // 0x801DA34C (callback stored by fn_801DA7C8)
 void  RegisterEngineScriptFuncs(void);                           // 0x801DC9F4
 void  fn_801E9DB8(void);                                         // 0x801E9DB8

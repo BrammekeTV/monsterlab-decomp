@@ -19,7 +19,7 @@ void  fn_80172E84(u8* obj);                                      // 0x80172E84
 void  fn_80184414(void* a, void* b);                             // 0x80184414
 void* fn_801DA758(void* v);                                      // 0x801DA758
 void* fn_801EB94C(void* p);                                      // 0x801EB94C
-void  fn_8016195C(void* p, s32 a, s32 b, void* c);               // 0x8016195C
+s32  fn_8016195C(void* p, s32 a, s32 b, void* c);               // 0x8016195C
 void* ObjAlloc(u32 size);                                        // 0x801D4414
 int   SysSprintf(char* buf, const char* fmt, ...);
 u32   RandomU32(void);                                           // 0x80143460

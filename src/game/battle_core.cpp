@@ -847,7 +847,7 @@ void BattleAdvance(u8* b) {
 
 extern "C" {
 s32  SysSprintf(char* buf, const char* fmt, ...);        // 0x80142EFC
-void  BattleLogAdd(void* log, const char* text);          // 0x802207A0
+s32  BattleLogAdd(void* log, const char* text);          // 0x802207A0
 u8*  DamageRecordInit(u8* r);                            // 0x8021605C
 void  TargetListInit(void* t);                            // 0x802161DC
 void  TargetListDecode(void* t, const u32* mask, s32 side);   // 0x80216240

@@ -16,7 +16,7 @@ void  fn_801E8D74(void* out, void* list, void* owner, void* anim);    // 0x801E8
 s32   fn_801DC9B0(void* p);                                           // 0x801DC9B0
 void* EventPost(s32 id, void* sender);                                // 0x801F3918
 void  fn_801EB748(void* p);                                           // 0x801EB748
-void  fn_801EB7A4(void* p, s32 a4, s32 a5, s32 a6, s32 a7);           // 0x801EB7A4
+u8*  fn_801EB7A4(void* p, s32 a4, s32 a5, s32 a6, s32 a7);           // 0x801EB7A4
 void  fn_801EBA20(void* list, void* item);                            // 0x801EBA20 (asm reads r3 and r4)
 void* fn_801E9D18(void* p, u32 hash, s32 size);                       // 0x801E9D18
 void  fn_801E9678(void* p, void* data);                               // 0x801E9678

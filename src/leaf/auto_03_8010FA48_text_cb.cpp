@@ -6,13 +6,13 @@
 #include "types.h"
 #include "game/script_callbacks.h"
 
-extern "C" void fn_8020A474(s32);
+extern "C" void fn_8020A474(u8*);
 
 // 0x8010FCE0
 void StopSoundEffect(u32 a3) {
     if (a3 == 0) {
         return;
     }
-    s32 t0 = *(s32*)(((u8*)(uintptr_t)(a3)) + 0);
-    fn_8020A474((s32)((u32)(t0)));
+    u8* t0 = *(u8**)(((u8*)(uintptr_t)(a3)) + 0);
+    fn_8020A474(t0);
 }

@@ -10,7 +10,7 @@ extern u8* gBattle;
 extern u8 lbl_805FB02C[];
 extern u8* lbl_805FB2B8;
 extern u8 lbl_805FB2C8[];
-extern u8 lbl_805FB2CC[];
+extern s32 lbl_805FB2CC;
 extern u8 lbl_805FB2D4[];
 extern "C" void fn_8005B648(u8*, f32);
 extern "C" void fn_8005F4F8(s32, s32);

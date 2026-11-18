@@ -9,7 +9,7 @@ extern void* lbl_805FB5F8;
 extern u8 lbl_805FB728[];
 extern u8 lbl_805FB72C[];
 extern u8 lbl_805FFD54[];
-extern "C" void fn_801C7E9C(s32, s32);
+extern "C" void fn_801C7E9C(u8*, u8*);
 
 // 0x801C7614
 extern "C" void fn_801C7614(u8* a3) {
@@ -24,9 +24,8 @@ extern "C" void fn_801C7614(u8* a3) {
 }
 
 // 0x801C85E0
-extern "C" void fn_801C85E0(s32 a3, s32 a4) {
-    // tail-call arguments inferred from the registers set before the call
-    fn_801C7E9C((s32)((u32)(uintptr_t)(a4)), (s32)((u32)(uintptr_t)(a3)));
+extern "C" void fn_801C85E0(u8* a3, u8* a4) {
+    fn_801C7E9C(((u8*)(uintptr_t)(a4)), ((u8*)(uintptr_t)(a3)));
 }
 
 // 0x801C911C

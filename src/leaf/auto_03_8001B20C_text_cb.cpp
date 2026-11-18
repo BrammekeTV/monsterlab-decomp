@@ -18,7 +18,7 @@ extern "C" f32 MonsterRateMadness(u8*);
 extern "C" f32 PlayerRankFraction(void);
 extern "C" void fn_8001D4FC(void);
 extern "C" void fn_8001E508(s32);
-extern "C" void fn_8004D3F8(void*, char*, s32, s32);
+extern "C" s32 fn_8004D3F8(void*, char*, s32, s32);
 
 // 0x8001BF78
 s32 LT_GetShowingPartsInformation(void) {

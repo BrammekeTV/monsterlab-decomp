@@ -68,7 +68,7 @@ extern "C" void fn_801B69F8(s32);
 extern "C" void fn_801C9D74(u8*);
 extern "C" void fn_801D5D14(s32, f32);
 extern "C" void fn_801FC1E4(s32);
-extern "C" void fn_8020A474(s32);
+extern "C" void fn_8020A474(u8*);
 extern "C" void fn_8022DE8C(s32, s32, s32);
 extern "C" void fn_8022E178(u8*, s32, s32, s32, s32, s32);
 extern "C" void fn_8022E2A4(s32, s32, s32, s32);
@@ -236,8 +236,8 @@ void StopVoiceSFX(u32 a3) {
     if (t1 != 0) {
         return;
     }
-    s32 t2 = *(s32*)(((u8*)(uintptr_t)(a3)) + 0);
-    fn_8020A474((s32)((u32)(t2)));
+    u8* t2 = *(u8**)(((u8*)(uintptr_t)(a3)) + 0);
+    fn_8020A474(t2);
 }
 
 // 0x800E9658

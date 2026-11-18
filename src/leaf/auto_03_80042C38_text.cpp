@@ -8,7 +8,7 @@
 extern u8* gBattle;
 extern "C" void BattleReset(u8*);
 extern "C" void fn_80043D84(s32, s32);
-extern "C" void fn_801B4308(u8*, s32);
+extern "C" void fn_801B4308(u8*, char*);
 
 // 0x800433F8
 extern "C" void fn_800433F8(void) {
@@ -26,7 +26,7 @@ extern "C" void fn_80043800(u8* a3) {
     u8* t5 = *(u8**)((u8*)(uintptr_t)(t4) + 2560);
     s32 t6 = *(s32*)(t5 + 32);
     u32 t7 = (u32)(t6) + 12u;
-    fn_801B4308(((u8*)(uintptr_t)(a3)), (s32)((u32)(t7)));
+    fn_801B4308(((u8*)(uintptr_t)(a3)), (char*)((u8*)(uintptr_t)(t7)));
 }
 
 // 0x80043CE8

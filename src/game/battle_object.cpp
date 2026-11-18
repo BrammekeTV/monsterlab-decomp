@@ -34,7 +34,7 @@ s32   fn_80220A2C(void);
 u32   fn_80220890(u8* data, s32 len);                   // CRC-32
 void  fn_802209F4(u8* data, s32 len);                   // debug record finish hook
 s32  SysSprintf(char* buf, const char* fmt, ...);      // 0x80142EFC
-void  BattleLogAdd(void* log, const char* text);        // 0x802207A0
+s32  BattleLogAdd(void* log, const char* text);        // 0x802207A0
 void* memset(void* p, int c, unsigned long n);
 }
 extern u8* gBattle;         // 0x805FBBB8

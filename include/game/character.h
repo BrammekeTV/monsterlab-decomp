@@ -87,7 +87,7 @@ Vec3* PathGetPosition(PathFollower* p);               // 0x800D5718
 BOOL PathAtWaypoint(PathFollower* p);                 // 0x800D56E0
 u32  PathGetExits(PathFollower* p, int a);            // 0x800D5850: bitmask of usable exits (4)
 BOOL PathExitBlocked(PathFollower* p, s32 exit);      // 0x800D6998
-void PathTakeExit(PathFollower* p, s32 exit, int a);  // 0x800D675C
+s32 PathTakeExit(PathFollower* p, s32 exit, int a);  // 0x800D675C
 s32  PathFindNode(PathFollower* p, s32 node, int a);  // 0x800D648C
 s32  PathFindToward(PathFollower* p, PathFollower* other, int a);   // 0x800D6534
 }

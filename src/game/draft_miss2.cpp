@@ -30,7 +30,7 @@ u32   StringHash(const char* s);                                 // 0x801EB704
 int   SysSprintf(char* buf, const char* fmt, ...);               // 0x80142EFC
 void  TriggerDoAction(void* action, void* a4, void* a5);         // 0x801E0054
 BOOL  ZoneIsLoaded(void* world, s32 zone);                       // 0x8012F408
-void  fn_8004D3F8(void* c, const char* name, s32 a, s32 b);      // 0x8004D3F8
+s32  fn_8004D3F8(void* c, const char* name, s32 a, s32 b);      // 0x8004D3F8
 void  fn_8004F310(void* slot, s32 idx, s32 a, s32 b);            // 0x8004F310
 void  fn_800699E4(u8* prop, u32 state, f32 t);                   // 0x800699E4
 void  fn_80069EEC(u8* prop);                                     // 0x80069EEC

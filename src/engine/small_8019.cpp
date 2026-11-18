@@ -196,7 +196,7 @@ u32 fn_80198320(void* obj) {
 
 // 0x80198C34
 // Returns 1 when widget w is in the screen-set stack (entries at +0x40, count at +0x60), else 0.
-BOOL fn_80198C34(void* set, void* w) {
+extern "C" BOOL fn_80198C34(void* set, void* w) {
     u8* s = (u8*)set;
     s32 count = *(s32*)(s + 0x60);
     s32 j = 0;

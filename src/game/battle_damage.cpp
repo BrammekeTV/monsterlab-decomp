@@ -108,7 +108,7 @@ const char* PartSlotName(s32 slot);                              // 0x8020E7B4
 s32         PartMatchup(s32 defA, s32 defB);                     // 0x80213988: 0 strong, 1 weak
 void        RoundNoteAbility(Round* r, s32 side, s32 slot, s32 ability);   // 0x802152B4
 void        PartMatchupText(char* out, s32 defA, s32 defB);       // 0x80215F68
-void        BattleLogAdd(void* log, const char* text);           // 0x802207A0
+s32        BattleLogAdd(void* log, const char* text);           // 0x802207A0
 void        BattleAfterAttack(struct Battle* b, FighterStats* att, FighterStats* def);   // 0x802126DC
 s32         PartActionStat0(PartInstance* p, u32 actionKey);     // 0x8021DBE8: damage
 s32         PartActionStat2(PartInstance* p, u32 actionKey);     // 0x8021DA90

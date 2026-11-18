@@ -15,7 +15,7 @@ extern u8 lbl_805FBA48[];
 extern u8 lbl_805FBA4C[];
 extern u8 lbl_805FBA50[];
 extern u8 lbl_805FBA54[];
-extern u8 lbl_805FBA70[];
+extern s32 lbl_805FBA70;
 
 // 0x801FBE38
 extern "C" void fn_801FBE38(s32 a3, s32 a4, s32 a5, s32 a6, s32 a7, s32 a8) {

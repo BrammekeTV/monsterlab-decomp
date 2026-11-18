@@ -14,7 +14,7 @@ void  fn_801DA798(void* p);                                      // 0x801DA798
 void  fn_801E7BC4(void* p, s32 n);                               // 0x801E7BC4
 void  fn_801E9678(void* p, void* data);                          // 0x801E9678
 void* fn_801E9D18(void* p, u32 hash, s32 size);                  // 0x801E9D18
-void  fn_801EB7A4(void* p, s32 a4, s32 a5, s32 a6, s32 a7);      // 0x801EB7A4
+u8*  fn_801EB7A4(void* p, s32 a4, s32 a5, s32 a6, s32 a7);      // 0x801EB7A4
 void* fn_801EB94C(void* p);                                      // 0x801EB94C
 void  fn_801EBA20(void* list, void* item);                                     // 0x801EBA20
 void* MemAllocDefault(u32 size);                                 // 0x801D4650

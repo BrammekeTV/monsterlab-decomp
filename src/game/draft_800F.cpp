@@ -25,7 +25,7 @@ void  SessionReenable(u8* session, s32 id);
 s32   WorldGetPhase(void* world);                         // 0x800D83A8
 void  fn_80016FD0(void* c, int animate);
 void  fn_80044F20(void);
-void  fn_8004D3F8(void* c, const char* name, s32 a, s32 b);
+s32  fn_8004D3F8(void* c, const char* name, s32 a, s32 b);
 void  fn_8004D760(u8* c, u8* monster);
 s32   fn_8004DAF8(void* c, s32 a, s32 b);
 s32   fn_80053418(void* c);

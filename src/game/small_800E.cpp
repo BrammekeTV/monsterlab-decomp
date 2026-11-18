@@ -3,7 +3,7 @@
 
 extern "C" {
 void  operator_delete(void* p);                                 // 0x801D426C
-void  fn_800DE5E4(u8* p, s32 del);                              // 0x800DE5E4
+u8*  fn_800DE5E4(u8* p, s32 del);                              // 0x800DE5E4
 void  fn_800DEC28(u8* p, void* arg);                            // 0x800DEC28
 void* fn_800DECD8(u8* p);                                       // 0x800DECD8
 s32   RegisterScriptFunc(const char* name, s32 type, void* fn); // 0x801DC91C

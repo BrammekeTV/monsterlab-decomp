@@ -49,7 +49,7 @@ BOOL   fn_80132C50(void* world);                        // still unloading?
 BOOL   fn_80147554(s32 button);                         // button pressed
 void   fn_80150148(void);  void fn_801514F0(void);
 void   fn_801542DC(void);  void fn_80154318(void);
-void   fn_8016195C(void* p, s32 a, s32 b, s32 c);
+s32   fn_8016195C(void* p, s32 a, s32 b, s32 c);
 void   fn_8016FB20(void* view);  void fn_80170044(void* view);
 void   fn_8018CE64(void* sets, void* camPos, void* camData);
 void   fn_8018DEF4(void* sets);

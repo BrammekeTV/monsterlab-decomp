@@ -93,6 +93,11 @@
  ],
  "changelog": [
   {
+   "date": "2026-11-19",
+   "time": "00:05",
+   "text": "Second round from the missing-symbols list: 42 more functions, including debug logging, object pool allocation, exploration pause/unpause, path exits, UI numbers and events, conversation start, world locator lookup and event sending, and options saving. Several older declarations were corrected where the asm returns a value."
+  },
+  {
    "date": "2026-11-18",
    "time": "23:36",
    "text": "The progress site now shows the linker's missing-symbols list. First round from it: 41 of the most-referenced missing functions, including the event system (EventSend, EventPost, EventSendTo), the allocators (MemAllocDefault, MemAllocSmall, BufferFree, operator delete), script registration, string/debug logging, audio pause, prop and character animation, UI screen push/pop and set-text, and trigger actions."
