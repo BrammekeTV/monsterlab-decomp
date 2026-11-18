@@ -33,7 +33,7 @@ def changed():
 
 
 def main():
-    files = [os.path.abspath(f) for f in sys.argv[1:]] or changed()
+    files = [os.path.abspath(f) for f in sys.argv[1:] if not f.startswith('--')] or changed()
     if not files:
         print("nothing to check")
         return 0
@@ -55,6 +55,18 @@ def main():
     if r.returncode != 0 and not errors:
         print("\n".join(out_lines[-20:]))
     print(f"{len(files)} files, {len(errors)} errors")
+    if not errors and r.returncode == 0 and "--no-lint" not in sys.argv:
+        # Review lint (pointer casts, dropped tail-call returns, markers, scratch files) and
+        # prototype consistency: warnings, they do not change the exit code.
+        here = os.path.dirname(os.path.abspath(__file__))
+        src = [f for f in files if os.sep + "leaf" + os.sep not in f]
+        for tool, extra in (("lint_decomp.py", src), ("check_protos.py", [])):
+            if tool == "lint_decomp.py" and not extra:
+                continue
+            res = subprocess.run([sys.executable, os.path.join(here, tool), *extra], capture_output=True, text=True)
+            lines = [l for l in res.stdout.splitlines() if l.strip()]
+            if res.returncode != 0:
+                print(chr(10).join(lines[:60]))
     return 1 if errors or r.returncode != 0 else 0
 
 

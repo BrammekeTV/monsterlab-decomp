@@ -51,6 +51,13 @@ a PC port. Read this whole file before making changes. Human contributors: see
 - `python tools/rename.py -f config/RM7P4F/names_game.txt`: apply names, then re-run
   `tools/bin/dtk.exe dol split config/RM7P4F/config.yml build/RM7P4F` so asm and m2c see them.
 - `python tools/gen_leaf.py`: regenerate `src/leaf/` (drops functions that are now done).
+- `python tools/draft_batch.py --size 0x80 0x300 --region 0x8019 --count 15 --name draft_8019`: runs m2c
+  over a batch of undecompiled functions, cleans the output into compilable C++ and reports per function
+  OK / FIX / ASM in `build/drafts/` (staging, not committed). Hand the drafts to a subagent with
+  `tools/draft_fix_brief.md`; every function is still verified against the asm before it goes into `src/`.
+- `python tools/lint_decomp.py [files|--all]`: flags pointer-truncating casts, dropped tail-call return values,
+  base-constructor argument pass-through, `// 0xADDR` markers not alone on their line and scratch files
+  (file:line; `lint:ok` comment suppresses an intentional one). `tools/check.py` runs it after compiling.
 - `python tools/check_protos.py [names]`: reports functions declared with different return types,
   parameter counts or C/C++ linkage across `src/` and `include/` (run it before pushing; all game
   functions use C linkage). Pointer-returning script callbacks return `ScriptValue`.

@@ -62,6 +62,9 @@ game can be ported to PC. The code does not have to compile back to identical Po
    generated leaf files drop anything you just decompiled.
    Then `python tools/check_protos.py` to catch a function declared with a different return
    type, parameter count or linkage in two files.
+   `tools/check.py` also runs `tools/lint_decomp.py` (pointer casts, dropped tail-call returns, marker
+   format, scratch files). For bigger batches: `python tools/draft_batch.py` drafts functions with m2c into
+   `build/drafts/` and `tools/draft_fix_brief.md` is the brief for a helper that fixes them.
 5. Commit and open a pull request. CI must be green.
 
 ## Pull requests

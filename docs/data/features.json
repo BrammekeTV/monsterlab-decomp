@@ -69,6 +69,11 @@
  "changelog": [
   {
    "date": "2026-11-18",
+   "time": "21:57",
+   "text": "Added tools/draft_batch.py (m2c drafts cleaned into compilable C++ and graded OK/FIX/ASM), tools/draft_fix_brief.md for helper agents, and tools/lint_decomp.py (pointer-truncating casts, dropped tail-call returns, constructor argument pass-through, marker format, scratch files), run from check.py."
+  },
+  {
+   "date": "2026-11-18",
    "time": "19:14",
    "text": "Decompiled 55 more functions: frame effects, random-interval, volume and sound script callbacks (0x801D), part and slot helpers (0x8020), and log timestamps and GX register writes (0x8014). Written by low-cost helper agents and reviewed."
   },
