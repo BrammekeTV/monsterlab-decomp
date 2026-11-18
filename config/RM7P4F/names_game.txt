@@ -774,3 +774,5 @@ fn_8022A90C SaveCountLimbsBroken
 fn_8022A3D8 SaveCountLimbsLost
 fn_8022BDDC SaveGetBestHit
 fn_8022BDE4 SaveSetBestHit
+fn_8021659C EffectOnHit
+fn_80216304 EffectInit

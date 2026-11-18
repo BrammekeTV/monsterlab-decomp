@@ -476,7 +476,7 @@ extern "C" s32 fn_8022BDD4(u8* a3) {
 }
 
 // 0x8022BDDC
-extern "C" s32 fn_8022BDDC(u8* a3) {
+extern "C" s32 SaveGetBestHit(u8* a3) {
     s32 t0 = *(s32*)(((u8*)(uintptr_t)(a3)) + 2548);
     return (s32)(t0);
 }

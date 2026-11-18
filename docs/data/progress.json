@@ -1,15 +1,15 @@
 {
  "game_id": "RM7P4F",
- "generated": "2026-11-18T11:45:33+00:00",
- "commit": "e89e150",
- "commit_date": "2026-11-18T12:41:54+01:00",
+ "generated": "2026-11-18T11:47:22+00:00",
+ "commit": "76f3abf",
+ "commit_date": "2026-11-18T12:45:34+01:00",
  "game": {
   "functions": 8548,
   "bytes": 2265988,
-  "named": 2712,
-  "named_bytes": 604548,
-  "decompiled": 2194,
-  "decompiled_bytes": 265440
+  "named": 2714,
+  "named_bytes": 604572,
+  "decompiled": 2200,
+  "decompiled_bytes": 266464
  },
  "library": {
   "functions": 4039,
@@ -22,10 +22,10 @@
  "all": {
   "functions": 12587,
   "bytes": 3404928,
-  "named": 3174,
-  "named_bytes": 709176,
-  "decompiled": 2194,
-  "decompiled_bytes": 265440
+  "named": 3176,
+  "named_bytes": 709200,
+  "decompiled": 2200,
+  "decompiled_bytes": 266464
  },
  "game_range": [
   "80006B40",
@@ -1005,12 +1005,12 @@
    0.87
   ],
   [
-   0.234,
+   0.35,
    0.479
   ],
   [
    0.187,
-   0.209
+   0.212
   ],
   [
    0.687,
@@ -1916,9 +1916,19 @@
      "size": 268
     },
     {
+     "name": "FighterAddEffect",
+     "addr": "80214508",
+     "size": 364
+    },
+    {
      "name": "FighterTickEffects",
      "addr": "80214674",
      "size": 264
+    },
+    {
+     "name": "FighterOnHit",
+     "addr": "8021477C",
+     "size": 100
     },
     {
      "name": "FighterStatsGet",
@@ -1931,9 +1941,29 @@
      "size": 516
     },
     {
+     "name": "LimbApplyDamage",
+     "addr": "80214C5C",
+     "size": 60
+    },
+    {
+     "name": "LimbTickEffects",
+     "addr": "80214C98",
+     "size": 132
+    },
+    {
+     "name": "LimbAddEffect",
+     "addr": "80214D1C",
+     "size": 268
+    },
+    {
      "name": "LimbApplyEffects",
      "addr": "80214E28",
      "size": 84
+    },
+    {
+     "name": "LimbOnHit",
+     "addr": "80214E7C",
+     "size": 100
     },
     {
      "name": "FighterStatsHasStatus",
@@ -12981,7 +13011,7 @@
      "size": 24
     },
     {
-     "name": "fn_80216304",
+     "name": "EffectInit",
      "addr": "80216304",
      "size": 20
     },
@@ -12991,7 +13021,7 @@
      "size": 16
     },
     {
-     "name": "fn_8021659C",
+     "name": "EffectOnHit",
      "addr": "8021659C",
      "size": 4
     },

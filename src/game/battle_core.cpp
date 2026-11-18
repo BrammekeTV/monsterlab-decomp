@@ -1066,3 +1066,84 @@ void BattleAfterAttack(u8* b, u8* att, u8* def) {
 }
 
 }  // extern "C"
+
+// ---------------------------------------------------------------- effect slots
+
+extern "C" {
+void EffectOnHit(u8* e, u8* target);                      // 0x8021659C (does nothing)
+u8*  EffectInit(u8* e, u8* stats, s32 id);                // 0x80216304
+void EffectResetDuration(u8* e);                          // 0x80216370
+}
+
+// Add an effect into a set of slots: an effect already present just has its duration reset,
+// otherwise it goes into the last free slot (if any).
+static void AddEffectToSlots(u8** slots, s32 n, u8* stats, s32 id) {
+    s32 freeSlot = -1;
+    for (s32 i = 0; i < n; i++) {
+        if (slots[i] == NULL) {
+            freeSlot = i;
+        } else if (*(s32*)(slots[i] + 8) == id) {
+            EffectResetDuration(slots[i]);
+            return;
+        }
+    }
+    if (freeSlot == -1) return;
+    u8* e = (u8*)operator_new(0xC);
+    if (e != NULL) e = EffectInit(e, stats, id);
+    slots[freeSlot] = e;
+    EffectApply(e);
+}
+
+extern "C" {
+
+// 0x80214C5C
+// Add a value box (a list of stat deltas) onto a limb's status, element by element.
+void LimbApplyDamage(u8** field, void* value) {
+    s32* st = *(s32**)field;
+    const s32* d = *(const s32**)value;
+    s32 n = *(const s32*)((u8*)value + 4);
+    for (s32 i = 0; i < n; i++) st[i] += d[i];
+}
+
+// 0x8021477C
+void FighterOnHit(u8* stats, u8* target) {
+    for (s32 i = 0; i < 8; i++) {
+        u8* e = ((u8**)(stats + 0x28))[i];
+        if (e != NULL) EffectOnHit(e, target);
+    }
+}
+
+// 0x80214E7C
+void LimbOnHit(u8** field, u8* target) {
+    for (s32 i = 0; i < 3; i++) {
+        u8* e = ((u8**)((u8*)field + 8))[i];
+        if (e != NULL) EffectOnHit(e, target);
+    }
+}
+
+// 0x80214C98
+void LimbTickEffects(u8** field) {
+    for (s32 i = 0; i < 3; i++) {
+        u8** slot = (u8**)((u8*)field + 8) + i;
+        if (*slot == NULL) continue;
+        EffectTick(*slot);
+        if (*(s32*)(*slot + 4) <= 0) {
+            EffectExpire(*slot);
+            EffectDestroy(*slot, 1);
+            *slot = NULL;
+        }
+    }
+}
+
+// 0x80214D1C
+void LimbAddEffect(u8** field, u8* stats, s32 id) {
+    if (id == -1) return;
+    AddEffectToSlots((u8**)((u8*)field + 8), 3, stats, id);
+}
+
+// 0x80214508
+void FighterAddEffect(u8* stats, s32 id) {
+    AddEffectToSlots((u8**)(stats + 0x28), 8, stats, id);
+}
+
+}  // extern "C"

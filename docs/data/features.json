@@ -69,6 +69,11 @@
  "changelog": [
   {
    "date": "2026-11-18",
+   "time": "12:47",
+   "text": "Decompiled the effect slots: adding an effect to a limb (3 slots) or fighter (8 slots) refreshes it if already present or fills the last free slot, limb effects tick down and expire, on-hit hooks run, and damage is applied to a limb as a list of stat changes."
+  },
+  {
+   "date": "2026-11-18",
    "time": "12:45",
    "text": "Decompiled what happens after an attack: damage records are applied to the defender's limbs (counting broken limbs and the best single hit in the player's statistics), on-hit effects of the attacking limb (the disable-limb enhancement hits every damaged limb, the drain enhancement adds its effect once anything was hit), return damage, and the dodge/block counters."
   },
