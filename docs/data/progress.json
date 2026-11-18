@@ -1,15 +1,15 @@
 {
  "game_id": "RM7P4F",
- "generated": "2026-11-18T16:54:55+00:00",
- "commit": "6e1c17d",
- "commit_date": "2026-11-18T17:49:36+01:00",
+ "generated": "2026-11-18T17:01:17+00:00",
+ "commit": "7a19063",
+ "commit_date": "2026-11-18T17:54:56+01:00",
  "game": {
   "functions": 8548,
   "bytes": 2265988,
   "named": 2748,
   "named_bytes": 616800,
-  "decompiled": 3581,
-  "decompiled_bytes": 371016
+  "decompiled": 3641,
+  "decompiled_bytes": 376764
  },
  "library": {
   "functions": 4039,
@@ -24,8 +24,8 @@
   "bytes": 3404928,
   "named": 3211,
   "named_bytes": 721548,
-  "decompiled": 3582,
-  "decompiled_bytes": 371136
+  "decompiled": 3642,
+  "decompiled_bytes": 376884
  },
  "game_range": [
   "80006B40",
@@ -109,15 +109,15 @@
    0.598
   ],
   [
-   0.194,
+   0.27,
    0.061
   ],
   [
-   0.008,
+   0.094,
    0.014
   ],
   [
-   0.003,
+   0.037,
    0.0
   ],
   [
@@ -377,19 +377,19 @@
    0.018
   ],
   [
-   0.065,
+   0.116,
    0.0
   ],
   [
-   0.063,
+   0.087,
    0.0
   ],
   [
-   0.097,
+   0.132,
    0.051
   ],
   [
-   0.021,
+   0.116,
    0.0
   ],
   [
@@ -433,31 +433,31 @@
    0.001
   ],
   [
-   0.028,
+   0.041,
    0.0
   ],
   [
-   0.056,
+   0.072,
    0.009
   ],
   [
-   0.132,
+   0.169,
    0.142
   ],
   [
-   0.049,
+   0.127,
    0.155
   ],
   [
-   0.125,
+   0.2,
    1.0
   ],
   [
-   0.001,
+   0.015,
    0.843
   ],
   [
-   0.038,
+   0.048,
    0.541
   ],
   [
@@ -6113,6 +6113,111 @@
    ]
   },
   {
+   "path": "src/game/small_8003b.cpp",
+   "functions": [
+    {
+     "name": "fn_800304DC",
+     "addr": "800304DC",
+     "size": 120
+    },
+    {
+     "name": "fn_8003056C",
+     "addr": "8003056C",
+     "size": 120
+    },
+    {
+     "name": "fn_800306E0",
+     "addr": "800306E0",
+     "size": 108
+    },
+    {
+     "name": "fn_80030830",
+     "addr": "80030830",
+     "size": 108
+    },
+    {
+     "name": "fn_80030980",
+     "addr": "80030980",
+     "size": 108
+    },
+    {
+     "name": "fn_80031E98",
+     "addr": "80031E98",
+     "size": 108
+    },
+    {
+     "name": "fn_80031F1C",
+     "addr": "80031F1C",
+     "size": 104
+    },
+    {
+     "name": "GainCrystal",
+     "addr": "800320B4",
+     "size": 68
+    },
+    {
+     "name": "fn_80032124",
+     "addr": "80032124",
+     "size": 60
+    },
+    {
+     "name": "fn_80032160",
+     "addr": "80032160",
+     "size": 60
+    },
+    {
+     "name": "fn_8003219C",
+     "addr": "8003219C",
+     "size": 76
+    },
+    {
+     "name": "fn_80032574",
+     "addr": "80032574",
+     "size": 100
+    },
+    {
+     "name": "fn_80032A48",
+     "addr": "80032A48",
+     "size": 80
+    },
+    {
+     "name": "fn_80032E44",
+     "addr": "80032E44",
+     "size": 108
+    },
+    {
+     "name": "fn_80032F7C",
+     "addr": "80032F7C",
+     "size": 64
+    },
+    {
+     "name": "fn_80033958",
+     "addr": "80033958",
+     "size": 80
+    },
+    {
+     "name": "fn_80034394",
+     "addr": "80034394",
+     "size": 72
+    },
+    {
+     "name": "fn_800343DC",
+     "addr": "800343DC",
+     "size": 80
+    },
+    {
+     "name": "fn_8003442C",
+     "addr": "8003442C",
+     "size": 80
+    },
+    {
+     "name": "fn_8003447C",
+     "addr": "8003447C",
+     "size": 52
+    }
+   ]
+  },
+  {
    "path": "src/game/small_8004.cpp",
    "functions": [
     {
@@ -7328,6 +7433,111 @@
    ]
   },
   {
+   "path": "src/game/small_800Cb.cpp",
+   "functions": [
+    {
+     "name": "fn_800C0AE8",
+     "addr": "800C0AE8",
+     "size": 108
+    },
+    {
+     "name": "fn_800C1798",
+     "addr": "800C1798",
+     "size": 116
+    },
+    {
+     "name": "fn_800C1D44",
+     "addr": "800C1D44",
+     "size": 124
+    },
+    {
+     "name": "fn_800C210C",
+     "addr": "800C210C",
+     "size": 104
+    },
+    {
+     "name": "fn_800C4224",
+     "addr": "800C4224",
+     "size": 116
+    },
+    {
+     "name": "fn_800C42FC",
+     "addr": "800C42FC",
+     "size": 104
+    },
+    {
+     "name": "Stitching_Bug_StopSkitterSound",
+     "addr": "800C6AF8",
+     "size": 68
+    },
+    {
+     "name": "Stitching_Bug_StopEatingSound",
+     "addr": "800C6BC4",
+     "size": 68
+    },
+    {
+     "name": "fn_800C6C08",
+     "addr": "800C6C08",
+     "size": 96
+    },
+    {
+     "name": "fn_800C6CA4",
+     "addr": "800C6CA4",
+     "size": 64
+    },
+    {
+     "name": "fn_800C7408",
+     "addr": "800C7408",
+     "size": 116
+    },
+    {
+     "name": "fn_800C75E8",
+     "addr": "800C75E8",
+     "size": 56
+    },
+    {
+     "name": "fn_800C7928",
+     "addr": "800C7928",
+     "size": 76
+    },
+    {
+     "name": "fn_800C7974",
+     "addr": "800C7974",
+     "size": 76
+    },
+    {
+     "name": "fn_800C82C0",
+     "addr": "800C82C0",
+     "size": 64
+    },
+    {
+     "name": "fn_800C8860",
+     "addr": "800C8860",
+     "size": 112
+    },
+    {
+     "name": "fn_800C88D0",
+     "addr": "800C88D0",
+     "size": 48
+    },
+    {
+     "name": "fn_800C8984",
+     "addr": "800C8984",
+     "size": 108
+    },
+    {
+     "name": "fn_800C89F0",
+     "addr": "800C89F0",
+     "size": 108
+    },
+    {
+     "name": "fn_800C8DF8",
+     "addr": "800C8DF8",
+     "size": 88
+    }
+   ]
+  },
+  {
    "path": "src/game/small_800E.cpp",
    "functions": [
     {
@@ -7509,6 +7719,111 @@
      "name": "IsLocalPlayerOfSubtype",
      "addr": "800E966C",
      "size": 52
+    }
+   ]
+  },
+  {
+   "path": "src/game/small_800Ec.cpp",
+   "functions": [
+    {
+     "name": "fn_800E04CC",
+     "addr": "800E04CC",
+     "size": 128
+    },
+    {
+     "name": "fn_800E2F10",
+     "addr": "800E2F10",
+     "size": 120
+    },
+    {
+     "name": "fn_800E42E8",
+     "addr": "800E42E8",
+     "size": 116
+    },
+    {
+     "name": "CIAnimatedPropEnable",
+     "addr": "800E507C",
+     "size": 108
+    },
+    {
+     "name": "CIAnimatedPropEnableByID",
+     "addr": "800E50E8",
+     "size": 108
+    },
+    {
+     "name": "fn_800E5608",
+     "addr": "800E5608",
+     "size": 116
+    },
+    {
+     "name": "EnablePlayerInput",
+     "addr": "800E6260",
+     "size": 112
+    },
+    {
+     "name": "DisablePlayerInput",
+     "addr": "800E62D0",
+     "size": 112
+    },
+    {
+     "name": "QuestCounterUpdateNumber",
+     "addr": "800E68BC",
+     "size": 120
+    },
+    {
+     "name": "fn_800E6C60",
+     "addr": "800E6C60",
+     "size": 112
+    },
+    {
+     "name": "fn_800E7530",
+     "addr": "800E7530",
+     "size": 128
+    },
+    {
+     "name": "AddHealth",
+     "addr": "800E83B4",
+     "size": 112
+    },
+    {
+     "name": "SendSignalToEntity",
+     "addr": "800E8880",
+     "size": 124
+    },
+    {
+     "name": "IsPlayerAttackAnimationDone",
+     "addr": "800E9420",
+     "size": 116
+    },
+    {
+     "name": "IsMonsterAttackAnimationDone",
+     "addr": "800E9538",
+     "size": 100
+    },
+    {
+     "name": "PlayVoiceSFX",
+     "addr": "800E95C0",
+     "size": 120
+    },
+    {
+     "name": "IsPlayerActive",
+     "addr": "800E96D0",
+     "size": 80
+    },
+    {
+     "name": "SpawnParticleOnBone",
+     "addr": "800E9DD4",
+     "size": 128
+    },
+    {
+     "name": "IsFalling",
+     "addr": "800EBE3C",
+     "size": 56
+    },
+    {
+     "name": "TurretSetRotateMode",
+     "addr": "800EC30C",
+     "size": 56
     }
    ]
   },

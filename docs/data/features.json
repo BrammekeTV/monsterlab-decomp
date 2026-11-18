@@ -69,6 +69,11 @@
  "changelog": [
   {
    "date": "2026-11-18",
+   "time": "18:01",
+   "text": "Decompiled 61 more small functions: UI image frame cycling, crystal pickup check and other helpers (0x8003), stitching bug sounds and assorted object helpers (0x800C), and player input, health, entity signal, attack-animation, voice and particle script callbacks (0x800E). Written by low-cost helper agents and reviewed."
+  },
+  {
+   "date": "2026-11-18",
    "time": "17:54",
    "text": "Decompiled 59 more small functions: combat HUD paper doll, part lock and limb-lost display plus combat results pause/resume (0x8004), experiment sounds, dance animation and welding experiment checks (0x8007), and conversation/dialogue script callbacks and character race reset (0x8005). Written by low-cost helper agents and reviewed."
   },
