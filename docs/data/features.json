@@ -69,6 +69,11 @@
  "changelog": [
   {
    "date": "2026-11-18",
+   "time": "12:10",
+   "text": "Decompiled reward handling in the save: a reward record can give a part (at a set tier and quality, fully healed), key and secondary ingredients, a part-type discovery and MSP, each with its notice. What I had called experience is the game's MSP (Mad Scientist Points), capped at 99,999,999 and driving the 50 ranks. Also: healing every lab monster on returning to the castle and the pending quest reward list."
+  },
+  {
+   "date": "2026-11-18",
    "time": "12:06",
    "text": "Decompiled the save's bit sets: 256 badges (awarding one counts it, posts a notice and grants its XP, which can raise the rank), 128 regions (marked once), two sets of 128 progress flags, which part types have been seen at which tier, and the discovery block copy helpers."
   },

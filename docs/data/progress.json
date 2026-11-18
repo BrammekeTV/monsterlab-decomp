@@ -1,31 +1,31 @@
 {
  "game_id": "RM7P4F",
- "generated": "2026-11-18T11:06:52+00:00",
- "commit": "a82a06b",
- "commit_date": "2026-11-18T12:01:53+01:00",
+ "generated": "2026-11-18T11:10:46+00:00",
+ "commit": "dbae823",
+ "commit_date": "2026-11-18T12:06:53+01:00",
  "game": {
   "functions": 8548,
   "bytes": 2265988,
-  "named": 2645,
-  "named_bytes": 577620,
-  "decompiled": 2145,
-  "decompiled_bytes": 250092
+  "named": 2652,
+  "named_bytes": 579976,
+  "decompiled": 2152,
+  "decompiled_bytes": 252244
  },
  "library": {
   "functions": 4039,
   "bytes": 1138940,
-  "named": 461,
-  "named_bytes": 104536,
+  "named": 462,
+  "named_bytes": 104628,
   "decompiled": 0,
   "decompiled_bytes": 0
  },
  "all": {
   "functions": 12587,
   "bytes": 3404928,
-  "named": 3106,
-  "named_bytes": 682156,
-  "decompiled": 2145,
-  "decompiled_bytes": 250092
+  "named": 3114,
+  "named_bytes": 684604,
+  "decompiled": 2152,
+  "decompiled_bytes": 252244
  },
  "game_range": [
   "80006B40",
@@ -1014,7 +1014,7 @@
   ],
   [
    0.687,
-   0.682
+   0.698
   ],
   [
    1.0,
@@ -1033,11 +1033,11 @@
    0.958
   ],
   [
-   0.295,
-   0.717
+   0.472,
+   0.958
   ],
   [
-   0.091,
+   0.15,
    0.421
   ],
   [
@@ -1174,8 +1174,8 @@
    "end": "8033F400",
    "functions": 399,
    "bytes": 114196,
-   "named": 54,
-   "named_bytes": 14580,
+   "named": 55,
+   "named_bytes": 14672,
    "decompiled": 0,
    "decompiled_bytes": 0
   },
@@ -3651,12 +3651,12 @@
    "path": "src/game/progress.cpp",
    "functions": [
     {
-     "name": "SaveCopyDiscoveries",
+     "name": "SaveCopyQuestRewards",
      "addr": "80223004",
      "size": 152
     },
     {
-     "name": "SaveSetDiscoveries",
+     "name": "SaveSetQuestRewards",
      "addr": "8022309C",
      "size": 152
     },
@@ -3691,6 +3691,31 @@
      "size": 76
     },
     {
+     "name": "TuningGetPair",
+     "addr": "802241D0",
+     "size": 32
+    },
+    {
+     "name": "SavePartTierOwned",
+     "addr": "802241F0",
+     "size": 104
+    },
+    {
+     "name": "SaveAddQuestReward",
+     "addr": "80224258",
+     "size": 48
+    },
+    {
+     "name": "SaveRemoveQuestReward",
+     "addr": "80224288",
+     "size": 128
+    },
+    {
+     "name": "SaveUnlockReward",
+     "addr": "80224308",
+     "size": 1296
+    },
+    {
      "name": "SaveCheckProgressFlag",
      "addr": "80225C90",
      "size": 108
@@ -3709,6 +3734,16 @@
      "name": "SaveSetFlag2",
      "addr": "80225E64",
      "size": 252
+    },
+    {
+     "name": "SaveAddMSP",
+     "addr": "80225F70",
+     "size": 396
+    },
+    {
+     "name": "SaveReturnToCastle",
+     "addr": "8022624C",
+     "size": 148
     },
     {
      "name": "SaveGetFieldRepairRecord",
@@ -12766,7 +12801,7 @@
      "size": 20
     },
     {
-     "name": "fn_80218AF4",
+     "name": "LabOnPartReward",
      "addr": "80218AF4",
      "size": 8
     },
@@ -12776,12 +12811,12 @@
      "size": 16
     },
     {
-     "name": "fn_80218B9C",
+     "name": "LabOnMSPReward",
      "addr": "80218B9C",
      "size": 8
     },
     {
-     "name": "fn_80218BA4",
+     "name": "LabOnDiscoveryReward",
      "addr": "80218BA4",
      "size": 12
     },

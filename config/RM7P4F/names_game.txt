@@ -703,3 +703,13 @@ fn_80225DF8 SaveCheckFlag2
 fn_80225E64 SaveSetFlag2
 fn_80223004 SaveCopyDiscoveries
 fn_8022309C SaveSetDiscoveries
+SaveCopyDiscoveries SaveCopyQuestRewards
+SaveSetDiscoveries SaveSetQuestRewards
+fn_802239D0 SaveDiscoverPart
+fn_80218AF4 LabOnPartReward
+fn_80218AFC LabOnMaterialReward
+fn_80218BA4 LabOnDiscoveryReward
+fn_80218B9C LabOnMSPReward
+fn_802241D0 TuningGetPair
+fn_802241F0 SavePartTierOwned
+fn_8032F400 __cvt_fp2unsigned
