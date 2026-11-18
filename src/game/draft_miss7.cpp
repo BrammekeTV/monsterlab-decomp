@@ -68,7 +68,7 @@ void   operator_delete(void* p);                                 // 0x801D426C
 
 extern u8*  gBattle;                  // 0x805FBBB8
 extern u8   gGame[];                  // 0x803B53A0
-extern s32  gPartSlotState[];         // 0x803C52E0 (2 sides x 5 slots of 0x14 bytes' worth: last state per slot)
+extern "C++" s32  gPartSlotState[];         // 0x803C52E0 (2 sides x 5 slots of 0x14 bytes' worth: last state per slot)
 extern u8   gWorldState[];            // 0x803E6D00 (first word: pointer to the world tuning record)
 extern const char lbl_80381868[];     // 0x80381868 (UI script log strings)
 extern const char lbl_80382AB4[];     // 0x80382AB4 (log string)

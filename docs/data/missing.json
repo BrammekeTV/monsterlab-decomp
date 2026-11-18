@@ -4,8 +4,7 @@
   "global": 1169,
   "game": 1313,
   "unknown": 117,
-  "library": 105,
-  "mismatch": 1
+  "library": 105
  },
  "game_bytes": 543848,
  "duplicates": [],
@@ -7170,16 +7169,7 @@
    "kind": "global"
   }
  ],
- "mismatch": [
-  {
-   "name": "gPartSlotState",
-   "refs": 1,
-   "files": 1,
-   "used_as": "_gPartSlotState",
-   "kind": "mismatch",
-   "defined_as": "int * gPartSlotState"
-  }
- ],
+ "mismatch": [],
  "unknown": [
   {
    "name": "gSaveSystem",
