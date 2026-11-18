@@ -69,6 +69,11 @@
  "changelog": [
   {
    "date": "2026-11-18",
+   "time": "18:26",
+   "text": "Decompiled 59 more small functions: engine handle tables, script dispatch fallback, waypoint callbacks and compressed-stream helpers (0x801E), arm wrestle and grow juice helpers (0x800B), and low-level graphics register writes and render setup (0x8015). Written by low-cost helper agents and reviewed."
+  },
+  {
+   "date": "2026-11-18",
    "time": "18:21",
    "text": "Decompiled 59 more small functions: more robot evolution experiment helpers (0x8009), brain toss and brain head minigame helpers (0x8008), and the online friends list (update, server connect, online/busy checks, scrolling, challenges) and matchup teardown (0x8013). Written by low-cost helper agents and reviewed."
   },
