@@ -1,15 +1,15 @@
 {
  "game_id": "RM7P4F",
- "generated": "2026-11-18T13:39:00+00:00",
- "commit": "50011a8",
- "commit_date": "2026-11-18T14:35:32+01:00",
+ "generated": "2026-11-18T13:41:10+00:00",
+ "commit": "dcee154",
+ "commit_date": "2026-11-18T14:39:07+01:00",
  "game": {
   "functions": 8548,
   "bytes": 2265988,
   "named": 2731,
   "named_bytes": 610828,
-  "decompiled": 2889,
-  "decompiled_bytes": 288144
+  "decompiled": 2890,
+  "decompiled_bytes": 288520
  },
  "library": {
   "functions": 4039,
@@ -24,8 +24,8 @@
   "bytes": 3404928,
   "named": 3194,
   "named_bytes": 715576,
-  "decompiled": 2890,
-  "decompiled_bytes": 288264
+  "decompiled": 2891,
+  "decompiled_bytes": 288640
  },
  "game_range": [
   "80006B40",
@@ -1033,7 +1033,7 @@
    0.967
   ],
   [
-   0.531,
+   0.573,
    0.958
   ],
   [
@@ -4039,6 +4039,11 @@
      "name": "SaveGiveQuestReward",
      "addr": "8022497C",
      "size": 184
+    },
+    {
+     "name": "fn_8022515C",
+     "addr": "8022515C",
+     "size": 376
     },
     {
      "name": "SaveRewardChallenge",

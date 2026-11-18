@@ -481,3 +481,28 @@ void SaveRecordBestScore(u8* s, s32 i, u32 score) {
 }
 
 }  // extern "C"
+
+// ---------------------------------------------------------------- loot rolls
+
+extern "C" {
+s32 RandomUpTo(s32 max);   // 0x80220C8C-based helper, see opponent_gen.cpp
+
+// 0x8022515C
+// Pick a random row of the 4-row table at db+0x31E8 that suits the part (`part` is a part
+// instance whose first word is its definition). Torso parts take rows whose byte +0x1A is set,
+// every other slot takes rows whose byte +0x1B is set. Returns the row index, or -1 if none fit.
+s32 fn_8022515C(void* unused, u8* part) {
+    (void)unused;
+    PartDef def;
+    PartDbGetDef(&def, gGameDb, *(s32*)part);
+    const u8* row = *(u8**)(Db() + 0x31E8);
+    s32 fit[4];
+    s32 n = 0;
+    for (s32 k = 0; k < 4; k++, row += 0x20) {
+        bool ok = (def.slot == 4) ? row[0x1A] != 0 : row[0x1B] != 0;
+        if (ok) fit[n++] = k;
+    }
+    return n > 0 ? fit[RandomUpTo(n - 1)] : -1;
+}
+
+}  // extern "C"
