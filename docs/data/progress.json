@@ -1,15 +1,15 @@
 {
  "game_id": "RM7P4F",
- "generated": "2026-11-18T16:23:34+00:00",
- "commit": "8b1b650",
- "commit_date": "2026-11-18T17:19:24+01:00",
+ "generated": "2026-11-18T16:24:49+00:00",
+ "commit": "d380a1f",
+ "commit_date": "2026-11-18T17:23:35+01:00",
  "game": {
   "functions": 8548,
   "bytes": 2265988,
   "named": 2748,
   "named_bytes": 616800,
-  "decompiled": 3227,
-  "decompiled_bytes": 337636
+  "decompiled": 3247,
+  "decompiled_bytes": 339072
  },
  "library": {
   "functions": 4039,
@@ -24,8 +24,8 @@
   "bytes": 3404928,
   "named": 3211,
   "named_bytes": 721548,
-  "decompiled": 3228,
-  "decompiled_bytes": 337756
+  "decompiled": 3248,
+  "decompiled_bytes": 339192
  },
  "game_range": [
   "80006B40",
@@ -521,7 +521,7 @@
    0.865
   ],
   [
-   0.014,
+   0.04,
    0.801
   ],
   [
@@ -533,15 +533,15 @@
    0.955
   ],
   [
-   0.01,
+   0.042,
    0.853
   ],
   [
-   0.033,
+   0.084,
    0.0
   ],
   [
-   0.04,
+   0.101,
    0.0
   ],
   [
@@ -6124,6 +6124,111 @@
      "name": "InventoryGetPartQuality",
      "addr": "800F2018",
      "size": 88
+    }
+   ]
+  },
+  {
+   "path": "src/game/small_8011.cpp",
+   "functions": [
+    {
+     "name": "SetSection",
+     "addr": "80110048",
+     "size": 60
+    },
+    {
+     "name": "GetPageString",
+     "addr": "801102A0",
+     "size": 56
+    },
+    {
+     "name": "fn_80116C04",
+     "addr": "80116C04",
+     "size": 64
+    },
+    {
+     "name": "fn_80116C44",
+     "addr": "80116C44",
+     "size": 68
+    },
+    {
+     "name": "fn_80116CA8",
+     "addr": "80116CA8",
+     "size": 88
+    },
+    {
+     "name": "fn_80116D00",
+     "addr": "80116D00",
+     "size": 64
+    },
+    {
+     "name": "fn_80117090",
+     "addr": "80117090",
+     "size": 68
+    },
+    {
+     "name": "fn_801170D4",
+     "addr": "801170D4",
+     "size": 88
+    },
+    {
+     "name": "fn_80117970",
+     "addr": "80117970",
+     "size": 80
+    },
+    {
+     "name": "fn_80117F34",
+     "addr": "80117F34",
+     "size": 92
+    },
+    {
+     "name": "fn_80118BDC",
+     "addr": "80118BDC",
+     "size": 72
+    },
+    {
+     "name": "fn_80118E88",
+     "addr": "80118E88",
+     "size": 76
+    },
+    {
+     "name": "fn_801194E0",
+     "addr": "801194E0",
+     "size": 88
+    },
+    {
+     "name": "fn_8011966C",
+     "addr": "8011966C",
+     "size": 60
+    },
+    {
+     "name": "fn_801196F4",
+     "addr": "801196F4",
+     "size": 60
+    },
+    {
+     "name": "fn_80119730",
+     "addr": "80119730",
+     "size": 88
+    },
+    {
+     "name": "fn_80119810",
+     "addr": "80119810",
+     "size": 72
+    },
+    {
+     "name": "fn_80119858",
+     "addr": "80119858",
+     "size": 72
+    },
+    {
+     "name": "fn_80119B00",
+     "addr": "80119B00",
+     "size": 56
+    },
+    {
+     "name": "fn_80119B38",
+     "addr": "80119B38",
+     "size": 64
     }
    ]
   },

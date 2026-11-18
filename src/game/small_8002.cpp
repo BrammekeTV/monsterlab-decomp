@@ -40,7 +40,7 @@ extern "C" {
 void* fn_80020480(void* a0) {
     u8* p = (u8*)a0;
     fn_800202FC(p);
-    *(u32*)(p + 0x4C) = (u32)(uintptr_t)lbl_803558F8;
+    *(void**)(p + 0x4C) = (void*)lbl_803558F8;
     return a0;
 }
 
@@ -49,7 +49,7 @@ void* fn_80020480(void* a0) {
 void* fn_80020590(void* a0) {
     u8* p = (u8*)a0;
     fn_800202FC(p);
-    *(u32*)(p + 0x4C) = (u32)(uintptr_t)lbl_80355870;
+    *(void**)(p + 0x4C) = (void*)lbl_80355870;
     return a0;
 }
 
@@ -58,7 +58,7 @@ void* fn_80020590(void* a0) {
 void* fn_80020758(void* a0) {
     u8* p = (u8*)a0;
     fn_800202FC(p);
-    *(u32*)(p + 0x4C) = (u32)(uintptr_t)lbl_803558B0;
+    *(void**)(p + 0x4C) = (void*)lbl_803558B0;
     return a0;
 }
 
@@ -67,7 +67,7 @@ void* fn_80020758(void* a0) {
 void* fn_80020864(void* a0) {
     u8* p = (u8*)a0;
     fn_800202FC(p);
-    *(u32*)(p + 0x4C) = (u32)(uintptr_t)lbl_80355828;
+    *(void**)(p + 0x4C) = (void*)lbl_80355828;
     return a0;
 }
 
@@ -76,7 +76,7 @@ void* fn_80020864(void* a0) {
 void* fn_80020A04(void* a0) {
     u8* p = (u8*)a0;
     fn_800202FC(p);
-    *(u32*)(p + 0x4C) = (u32)(uintptr_t)lbl_803557E8;
+    *(void**)(p + 0x4C) = (void*)lbl_803557E8;
     return a0;
 }
 
@@ -85,7 +85,7 @@ void* fn_80020A04(void* a0) {
 void* fn_80020D28(void* a0) {
     u8* p = (u8*)a0;
     fn_800202FC(p);
-    *(u32*)(p + 0x4C) = (u32)(uintptr_t)lbl_803557A8;
+    *(void**)(p + 0x4C) = (void*)lbl_803557A8;
     return a0;
 }
 
@@ -94,7 +94,7 @@ void* fn_80020D28(void* a0) {
 void* fn_8002104C(void* a0) {
     u8* p = (u8*)a0;
     fn_800202FC(p);
-    *(u32*)(p + 0x4C) = (u32)(uintptr_t)lbl_80355760;
+    *(void**)(p + 0x4C) = (void*)lbl_80355760;
     return a0;
 }
 
@@ -103,7 +103,7 @@ void* fn_8002104C(void* a0) {
 void* fn_8002112C(void* a0) {
     u8* p = (u8*)a0;
     fn_800202FC(p);
-    *(u32*)(p + 0x4C) = (u32)(uintptr_t)lbl_80355718;
+    *(void**)(p + 0x4C) = (void*)lbl_80355718;
     return a0;
 }
 
@@ -112,7 +112,7 @@ void* fn_8002112C(void* a0) {
 void* fn_80021240(void* a0) {
     u8* p = (u8*)a0;
     fn_800202FC(p);
-    *(u32*)(p + 0x4C) = (u32)(uintptr_t)lbl_803556D0;
+    *(void**)(p + 0x4C) = (void*)lbl_803556D0;
     return a0;
 }
 
@@ -121,7 +121,7 @@ void* fn_80021240(void* a0) {
 void* fn_80021354(void* a0) {
     u8* p = (u8*)a0;
     fn_800202FC(p);
-    *(u32*)(p + 0x4C) = (u32)(uintptr_t)lbl_80355690;
+    *(void**)(p + 0x4C) = (void*)lbl_80355690;
     return a0;
 }
 
