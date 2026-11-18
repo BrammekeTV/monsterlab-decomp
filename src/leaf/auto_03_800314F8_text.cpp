@@ -8,6 +8,7 @@
 extern u8 lbl_805FAFE8[];
 extern "C" void fn_80021F2C(u8*, f32);
 extern "C" void fn_800222F0(void);
+extern "C" void fn_800222F4(u8*);
 extern "C" void fn_8002238C(void);
 extern "C" void fn_80022390(void);
 extern "C" void fn_80022394(void);
@@ -22,6 +23,11 @@ extern "C" void fn_800317A0(u8* a3, f32 f1) {
 // 0x800317A4
 extern "C" void fn_800317A4(void) {
     fn_800222F0();
+}
+
+// 0x80031F04
+extern "C" void fn_80031F04(u8* a3) {
+    fn_800222F4(((u8*)(uintptr_t)(a3)));
 }
 
 // 0x80031F08

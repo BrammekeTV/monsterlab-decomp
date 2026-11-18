@@ -109,7 +109,9 @@ s32 QuestLog_HasNextQuestLocationString(void) {
     return fn_8011F2FC(obj);
 }
 
-// 0x80114E14 (not in the script table; the return type is assumed from fn_801203C0)
+// 0x80114E14
+
+// (not in the script table; the return type is assumed from fn_801203C0)
 u32 fn_80114E14(void) {
     u8* obj = SubQuery(kHashRecipes);
     if (obj == 0) return 0;

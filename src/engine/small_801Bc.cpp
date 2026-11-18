@@ -43,7 +43,9 @@ static void* CallVirtualSlotC(void* obj) {
 
 extern "C" {
 
-// 0x801B6BDC  Script callback StartBouncingOverlayAlpha: starts a bouncing alpha tween on the
+// 0x801B6BDC
+
+// Script callback StartBouncingOverlayAlpha: starts a bouncing alpha tween on the
 // overlay. The duration is clamped to at least lbl_805FFB44 and turned into a rate.
 void StartBouncingOverlayAlpha(void* a0, f32 a1) {
     if (a0 == NULL) return;
@@ -56,7 +58,9 @@ void StartBouncingOverlayAlpha(void* a0, f32 a1) {
     fn_801E8D74(tween, (u8*)a0 + 0xfc, a0, anim);
 }
 
-// 0x801B6CC8  Script callback FadeToOverlayAlpha: starts a fade of the overlay alpha.
+// 0x801B6CC8
+
+// Script callback FadeToOverlayAlpha: starts a fade of the overlay alpha.
 void FadeToOverlayAlpha(void* a0, f32 a1, f32 a2, u32 a3) {
     if (a0 == NULL) return;
     u8 tween[8];
@@ -65,7 +69,9 @@ void FadeToOverlayAlpha(void* a0, f32 a1, f32 a2, u32 a3) {
     fn_801E8D74(tween, (u8*)a0 + 0xfc, a0, anim);
 }
 
-// 0x801B6D14  Script callback SetOverlayAlpha: sets the alpha (+0x30) of the sub-object
+// 0x801B6D14
+
+// Script callback SetOverlayAlpha: sets the alpha (+0x30) of the sub-object
 // returned by the object's slot-0x0C getter.
 void SetOverlayAlpha(void* a0, f32 a1) {
     if (a0 == NULL) return;
@@ -75,14 +81,18 @@ void SetOverlayAlpha(void* a0, f32 a1) {
     *(f32*)((u8*)target + 0x30) = a1;
 }
 
-// 0x801B6E94  Script callback WasEntityDrawnLastFrame: refreshes the entity via slot 0x0C,
+// 0x801B6E94
+
+// Script callback WasEntityDrawnLastFrame: refreshes the entity via slot 0x0C,
 // then returns bit 5 of the flag word at +0x8 of the returned sub-object.
 u32 WasEntityDrawnLastFrame(void* a0) {
     void* sub = CallVirtualSlotC(a0);
     return (*(u32*)((u8*)sub + 0x8) >> 5) & 1u;
 }
 
-// 0x801B6EC8  Posts event 0x62 for obj unless flag 0x4 of obj's sub-object (+0x4) is set,
+// 0x801B6EC8
+
+// Posts event 0x62 for obj unless flag 0x4 of obj's sub-object (+0x4) is set,
 // and stores value in the posted event (+0x4) and in the sub-object (+0x28).
 void fn_801B6EC8(void* self, s32 value) {
     u8* s = (u8*)self;
@@ -94,19 +104,25 @@ void fn_801B6EC8(void* self, s32 value) {
     if (sub != NULL) *(s32*)(sub + 0x28) = value;
 }
 
-// 0x801B7128  Sets flag 0x80 in the flag word (+0x8) of the slot-0x0C sub-object.
+// 0x801B7128
+
+// Sets flag 0x80 in the flag word (+0x8) of the slot-0x0C sub-object.
 void fn_801B7128(void* self) {
     void* sub = CallVirtualSlotC(self);
     *(u32*)((u8*)sub + 0x8) |= 0x80u;
 }
 
-// 0x801B7160  Clears flag 0x80 in the flag word (+0x8) of the slot-0x0C sub-object.
+// 0x801B7160
+
+// Clears flag 0x80 in the flag word (+0x8) of the slot-0x0C sub-object.
 void fn_801B7160(void* self) {
     void* sub = CallVirtualSlotC(self);
     *(u32*)((u8*)sub + 0x8) &= ~0x80u;
 }
 
-// 0x801B7410  Initialises an object from a position (3 floats) and an integer, then runs
+// 0x801B7410
+
+// Initialises an object from a position (3 floats) and an integer, then runs
 // the common setup. Does nothing when p4 is NULL.
 void fn_801B7410(void* self, void* p4, void* p5, s32 p6, f32* pos) {
     u8* s = (u8*)self;
@@ -119,7 +135,9 @@ void fn_801B7410(void* self, void* p4, void* p5, s32 p6, f32* pos) {
     fn_801B75AC(self);
 }
 
-// 0x801B7A00  Frees the buffer at +0x0 (if any) and clears the three words at +0x4..+0xC.
+// 0x801B7A00
+
+// Frees the buffer at +0x0 (if any) and clears the three words at +0x4..+0xC.
 void fn_801B7A00(void* p) {
     u8* s = (u8*)p;
     void* buf = *(void**)s;
@@ -129,7 +147,9 @@ void fn_801B7A00(void* p) {
     *(u32*)(s + 0xc) = 0;
 }
 
-// 0x801B8550  Fills the 4-entry table lbl_80413400 with fn_801DC9B0 applied to lbl_80383E38.
+// 0x801B8550
+
+// Fills the 4-entry table lbl_80413400 with fn_801DC9B0 applied to lbl_80383E38.
 void fn_801B8550(void) {
     for (s32 i = 0; i < 4; i++) {
         void* in = *(void**)(lbl_80383E38 + i * 4);
@@ -137,7 +157,9 @@ void fn_801B8550(void) {
     }
 }
 
-// 0x801B8A04  Script callback StopFollowingWaypointPath: looks up the path entry with hash
+// 0x801B8A04
+
+// Script callback StopFollowingWaypointPath: looks up the path entry with hash
 // 0x80B4120F, copies its 16-bit value at +0x7C into fn_801E9678, and sets byte +0x3A of the
 // owner's sub-object (+0x4) to 0xFF.
 void StopFollowingWaypointPath(void* a0) {
@@ -151,7 +173,9 @@ void StopFollowingWaypointPath(void* a0) {
     }
 }
 
-// 0x801B9BC4  Clears the given bits (mask) in the pad button words of channel chan.
+// 0x801B9BC4
+
+// Clears the given bits (mask) in the pad button words of channel chan.
 // Channels outside 0..3 are ignored.
 void PadConsumeButtons(s32 chan, u32 mask) {
     if (chan < 0 || chan >= 4) return;
@@ -160,7 +184,9 @@ void PadConsumeButtons(s32 chan, u32 mask) {
     lbl_80413410[chan] &= keep;
 }
 
-// 0x801B9C0C  Sets the EventMgr vtable and clears its queue fields.
+// 0x801B9C0C
+
+// Sets the EventMgr vtable and clears its queue fields.
 void EventMgrCtor(void* mgr) {
     u8* m = (u8*)mgr;
     *(void**)m = lbl_80383ED0;
@@ -176,7 +202,9 @@ void EventMgrCtor(void* mgr) {
     *(u32*)(m + 0xc28) = 0;
 }
 
-// 0x801B9C48  EventMgr deleting destructor: resets the vtable, frees the object when del > 0,
+// 0x801B9C48
+
+// EventMgr deleting destructor: resets the vtable, frees the object when del > 0,
 // and returns the pointer.
 void* fn_801B9C48(void* p, s32 del) {
     if (p != NULL) {
@@ -186,7 +214,9 @@ void* fn_801B9C48(void* p, s32 del) {
     return p;
 }
 
-// 0x801B9EAC  Clears every queued entry equal to value in the event ring: 64 entries of
+// 0x801B9EAC
+
+// Clears every queued entry equal to value in the event ring: 64 entries of
 // 16 bytes at +0x10, head index at +0x4, tail index at +0x8. Walks from head to tail.
 void fn_801B9EAC(void* p, u32 value) {
     u8* q = (u8*)p;
@@ -205,7 +235,9 @@ void fn_801B9EAC(void* p, u32 value) {
     }
 }
 
-// 0x801BA3C4  Initialises an object: clears the buffer pointer at +0x0, allocates 0x2C bytes
+// 0x801BA3C4
+
+// Initialises an object: clears the buffer pointer at +0x0, allocates 0x2C bytes
 // for it and sets up that buffer with fn_801EB7A4. Returns the object.
 void* fn_801BA3C4(void* obj) {
     u8* o = (u8*)obj;
@@ -216,7 +248,9 @@ void* fn_801BA3C4(void* obj) {
     return obj;
 }
 
-// 0x801BA424  Releases the buffer at +0x0 of an object (through fn_801EB748) and clears it.
+// 0x801BA424
+
+// Releases the buffer at +0x0 of an object (through fn_801EB748) and clears it.
 void fn_801BA424(void* obj) {
     u8* o = (u8*)obj;
     if (*(void**)o != NULL) {
@@ -226,14 +260,18 @@ void fn_801BA424(void* obj) {
     }
 }
 
-// 0x801BA470  List visitor callback: removes item (second argument) from the list given as
+// 0x801BA470
+
+// List visitor callback: removes item (second argument) from the list given as
 // the first argument via fn_801EBA20, then returns 1 to keep iterating.
 s32 fn_801BA470(void* a, void* b) {
     fn_801EBA20(b, a);
     return 1;
 }
 
-// 0x801BA638  Initialises a texture slot: sets the float at +0x0 to lbl_805FFBB0 and clears
+// 0x801BA638
+
+// Initialises a texture slot: sets the float at +0x0 to lbl_805FFBB0 and clears
 // the pointer at +0x4 and the words at +0x8 and +0xC.
 // The asm has an unreachable tail at 0x801BA660..0x801BA678 (a texture-release fragment that
 // nothing branches to); it is not implemented.
@@ -245,7 +283,9 @@ void fn_801BA638(void* p) {
     *(u32*)(o + 0xc) = 0;
 }
 
-// 0x801BA68C  Drops one reference on the texture at +0x4 of an object; releases the texture
+// 0x801BA68C
+
+// Drops one reference on the texture at +0x4 of an object; releases the texture
 // when the count reaches zero, then clears the pointer.
 void fn_801BA68C(void* p) {
     u8* o = (u8*)p;

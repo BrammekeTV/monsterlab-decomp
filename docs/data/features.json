@@ -69,6 +69,11 @@
  "changelog": [
   {
    "date": "2026-11-18",
+   "time": "18:51",
+   "text": "Decompiled 57 more small functions: enter-name and input helpers (0x8012), handle pools and view-system setup (0x8016), and entity, UI and script helpers (0x8003). Written by low-cost helper agents and reviewed."
+  },
+  {
+   "date": "2026-11-18",
    "time": "18:45",
    "text": "Decompiled 58 more small functions: engine overlay fades, event manager and pad helpers (0x801B), UI widget lookups and animation helpers (0x8019), and projectile and entity helpers (0x8006). Written by low-cost helper agents and reviewed."
   },

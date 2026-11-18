@@ -13,7 +13,7 @@ list of small PowerPC functions, into ONE NEW file named in your task.
   include the header and match exactly. Declared in another .cpp → copy that prototype.
   A function in your list already DEFINED elsewhere → skip it. Otherwise add an
   `extern "C"` prototype with a `// 0xADDR` comment. File-scope helpers must be `static`.
-- Above each function: `// 0xADDR` (uppercase hex) + optional one-line description.
+- Above each function: `// 0xADDR` ALONE on its own line (uppercase hex, nothing after it; a trailing description makes the counter skip it), optionally a description comment on the next line.
   Keep original names.
 - PowerPC: args r3..r10 / f1..f8, return r3/f1. `bl X` = call. Trailing `b X` = tail call:
   `return X(...)` with a matching return type. If a call (e.g. base constructor) happens

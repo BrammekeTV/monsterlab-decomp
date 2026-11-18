@@ -9,6 +9,7 @@ extern "C" void fn_8002FD5C(void);
 extern u8 lbl_80357950[];
 extern "C" s32 RegisterScriptFunc(char*, s32, void*);
 extern "C" void fn_800222F0(void);
+extern "C" void fn_800222F4(u8*);
 extern "C" void fn_80022394(void);
 extern "C" void fn_800223EC(void);
 
@@ -31,6 +32,11 @@ extern "C" void fn_8002FCB4(u8* a3) {
     }
     *(u32*)(t0 + 60) = (u32)((u32)(0));
     fn_800223EC();
+}
+
+// 0x8002FCCC
+extern "C" void fn_8002FCCC(u8* a3) {
+    fn_800222F4(((u8*)(uintptr_t)(a3)));
 }
 
 // 0x8002FCD0

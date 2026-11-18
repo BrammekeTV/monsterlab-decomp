@@ -228,7 +228,7 @@ s32 SaveInit(const char* name) {
 }
 
 // 0x80011754
-s32 SaveInitDefault(void) {
+extern "C" s32 SaveInitDefault(void) {
     return SaveInit(kSaveFile);
 }
 

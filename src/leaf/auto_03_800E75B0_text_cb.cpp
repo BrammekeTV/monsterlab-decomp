@@ -1036,7 +1036,6 @@ void SetEnableHomeButtonDisableIcon(u32 a3) {
 
 // 0x800FA9FC
 void SetSpecialGameEvent(u32 a3) {
-    // tail-call arguments inferred from the registers set before the call
     if (a3 == 0) {
         fn_800E69EC((s32)((u32)(0)));
         return;

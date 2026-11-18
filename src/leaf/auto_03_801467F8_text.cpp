@@ -26,7 +26,6 @@ extern u8 lbl_805FB594[];
 extern u8 lbl_805FF0E4[];
 extern u8 lbl_805FF0EC[];
 extern "C" BOOL DVDInit(void);
-extern "C" void* MEMAllocFromAllocator(u8*, u32);
 extern "C" void MEMFreeToAllocator(u8*, void*);
 extern "C" void* VideoGetFrameBuffer(u8*, int);
 extern "C" void fn_80142898(u8*);
@@ -115,11 +114,6 @@ extern "C" void fn_801483CC(u8* a3) {
     *(u32*)(((u8*)(uintptr_t)(a3)) + 20) = (u32)((u32)(0));
     *(u32*)(((u8*)(uintptr_t)(a3)) + 24) = (u32)((u32)(1));
     *(u32*)(((u8*)(uintptr_t)(a3)) + 0) = (u32)((u32)(uintptr_t)((u8*)lbl_80376138));
-}
-
-// 0x80148530
-extern "C" void* RendDefaultAlloc(s32 a3) {
-    return (void*)(MEMAllocFromAllocator((u8*)lbl_803F2880, (u32)((u32)(uintptr_t)(a3))));
 }
 
 // 0x80148540

@@ -35,7 +35,9 @@ static s32  sDLBalance;        ORIG(0x805FB4EC)
 static s32  sUnk518;           ORIG(0x805FB518)
 static s32  sUnk51C;           ORIG(0x805FB51C)
 
-// 0x80148530 - 0x80148558: fallbacks when the engine passes no callbacks.
+// 0x80148530
+
+// - 0x80148558: fallbacks when the engine passes no callbacks.
 static void* DefaultAlloc(u32 size, u32, int, const char*, u32) {
     return MEMAllocFromAllocator(&gSysMEM2Allocator, size);
 }
