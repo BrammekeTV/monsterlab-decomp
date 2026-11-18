@@ -189,4 +189,46 @@ u8* fn_802168DC(u8* r) {
     return r;
 }
 
+// 0x80218BB0
+// Work out the MSP the current experiment will give (stored at +0x78): the result part's quality
+// value (as in the grade) times a factor from the ingredient's tuning row (db+0x99D0 + 8 * (0xB0 +
+// 2 * ingredient)) times the lab's count at +0x74, divided by 100. 0 if there is no result.
+void LabCalcExperimentMSP(u8* lab) {
+    const u8* cur = (const u8*)gLab;
+    s32 q = 0;
+    if (*(const s32*)(cur + 0x58) != -1) {
+        const u8* row = *(const u8**)(Db() + 0x6C18) + *(const s32*)(cur + 0x58) * 0x24;
+        PartDef def;
+        PartDbGetDef(&def, gGameDb, *(const s32*)(row + 0x20));
+        const u8* exp = *(const u8**)(Db() + 0x5328) + *(const s32*)(lab + 0x54) * 0x18;
+        s32 base = 100;
+        switch ((s8)exp[0x13]) {
+        case 1: base = (s16)def.unk44; break;
+        case 2: base = (s16)def.unk42; break;
+        case 3: base = (s16)def.unk40; break;
+        case 4: base = *(const s16*)&def.unk48[0]; break;
+        default: break;
+        }
+        q = ((s32)(s8)def.unk4C[0] * base) / 100;
+    }
+    u32 ing = *(const u32*)(cur + 0x48);
+    s32 idx = (ing <= 11) ? (s32)(0xB0 + ing * 2) : -1;
+    const u8* t = *(const u8**)(Db() + 0x99D0) + idx * 8;
+    f32 f = ((f32)*(const s32*)(lab + 0x74)) * *(const f32*)(t + 4);
+    *(s32*)(lab + 0x78) = (s32)((f32)q * f) / 100;
+}
+
+// 0x80218E6C
+// Reward id of challenge row `idx` (0x4C bytes at db+0x80E0) for the lab's current choice:
+// category at +0x5C (0..3, else 0) picks a group of four words starting at word 2 + 4 * category,
+// and +0x60 picks inside it (1 -> +1, 0 -> +2, 2 -> +3, anything else -> +0).
+s32 LabChallengeRewardTable(u8* lab, s32 idx) {
+    const s32* row = (const s32*)(*(const u8**)(Db() + 0x80E0) + idx * 0x4C);
+    s32 cat = *(s32*)(lab + 0x5C);
+    if (cat < 0 || cat > 3) cat = 0;
+    s32 sub = *(s32*)(lab + 0x60);
+    s32 off = (sub == 1) ? 1 : (sub == 0) ? 2 : (sub == 2) ? 3 : 0;
+    return row[2 + cat * 4 + off];
+}
+
 }  // extern "C"

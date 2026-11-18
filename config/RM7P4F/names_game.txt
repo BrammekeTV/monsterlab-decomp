@@ -810,3 +810,4 @@ fn_80213DC4 FighterStatsDestroy
 fn_8021415C BattleListActions
 fn_802147E0 BattleAiPickAction
 fn_8021828C LabExperimentGrade
+fn_80218BB0 LabCalcExperimentMSP

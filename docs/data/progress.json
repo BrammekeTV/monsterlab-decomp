@@ -1,15 +1,15 @@
 {
  "game_id": "RM7P4F",
- "generated": "2026-11-18T16:14:59+00:00",
- "commit": "acace27",
- "commit_date": "2026-11-18T17:13:55+01:00",
+ "generated": "2026-11-18T16:15:45+00:00",
+ "commit": "5f3f810",
+ "commit_date": "2026-11-18T17:15:00+01:00",
  "game": {
   "functions": 8548,
   "bytes": 2265988,
-  "named": 2747,
-  "named_bytes": 616100,
-  "decompiled": 3104,
-  "decompiled_bytes": 316756
+  "named": 2748,
+  "named_bytes": 616800,
+  "decompiled": 3110,
+  "decompiled_bytes": 316780
  },
  "library": {
   "functions": 4039,
@@ -22,10 +22,10 @@
  "all": {
   "functions": 12587,
   "bytes": 3404928,
-  "named": 3210,
-  "named_bytes": 720848,
-  "decompiled": 3105,
-  "decompiled_bytes": 316876
+  "named": 3211,
+  "named_bytes": 721548,
+  "decompiled": 3111,
+  "decompiled_bytes": 316900
  },
  "game_range": [
   "80006B40",
@@ -85,7 +85,7 @@
    0.059
   ],
   [
-   0.053,
+   0.054,
    0.199
   ],
   [
@@ -109,7 +109,7 @@
    0.598
   ],
   [
-   0.193,
+   0.194,
    0.061
   ],
   [
@@ -461,7 +461,7 @@
    0.541
   ],
   [
-   0.06,
+   0.061,
    0.97
   ],
   [
@@ -1014,7 +1014,7 @@
   ],
   [
    0.957,
-   0.867
+   0.932
   ],
   [
    1.0,
@@ -3216,7 +3216,7 @@
      "size": 144
     },
     {
-     "name": "fn_80218BB0",
+     "name": "LabCalcExperimentMSP",
      "addr": "80218BB0",
      "size": 700
     },
@@ -6271,6 +6271,11 @@
    "path": "src/leaf/auto_03_80023884_text.cpp",
    "functions": [
     {
+     "name": "fn_80024BC8",
+     "addr": "80024BC8",
+     "size": 4
+    },
+    {
      "name": "fn_80024BCC",
      "addr": "80024BCC",
      "size": 4
@@ -6348,6 +6353,11 @@
     {
      "name": "fn_8002916C",
      "addr": "8002916C",
+     "size": 4
+    },
+    {
+     "name": "fn_80029170",
+     "addr": "80029170",
      "size": 4
     },
     {
@@ -6474,6 +6484,11 @@
      "name": "fn_8002FCB4",
      "addr": "8002FCB4",
      "size": 24
+    },
+    {
+     "name": "fn_8002FCD0",
+     "addr": "8002FCD0",
+     "size": 4
     }
    ]
   },
@@ -6568,6 +6583,11 @@
     {
      "name": "fn_800317A4",
      "addr": "800317A4",
+     "size": 4
+    },
+    {
+     "name": "fn_80031F08",
+     "addr": "80031F08",
      "size": 4
     },
     {
@@ -11363,6 +11383,16 @@
     {
      "name": "PlayChallengeMusic",
      "addr": "800EFE28",
+     "size": 4
+    },
+    {
+     "name": "SetChallengeCursor",
+     "addr": "800EFE2C",
+     "size": 4
+    },
+    {
+     "name": "DeleteChallengeCursor",
+     "addr": "800EFE30",
      "size": 4
     },
     {

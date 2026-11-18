@@ -8,10 +8,16 @@
 extern u8 lbl_805FAFB0[];
 extern "C" void fn_8002238C(void);
 extern "C" void fn_80022390(void);
+extern "C" void fn_80022394(void);
 extern "C" void fn_800223D4(void);
 extern "C" void fn_800223D8(void);
 extern "C" void fn_80022E10(void);
 extern "C" void fn_80022F28(void);
+
+// 0x80024BC8
+extern "C" void fn_80024BC8(void) {
+    fn_80022394();
+}
 
 // 0x80024BCC
 extern "C" void fn_80024BCC(void) {

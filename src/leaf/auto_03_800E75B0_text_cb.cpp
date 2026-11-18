@@ -44,6 +44,8 @@ extern "C" void fn_80013340(u8*);
 extern "C" s32 fn_80021DAC(void);
 extern "C" void fn_80022D10(void);
 extern "C" void fn_80022D1C(void);
+extern "C" void fn_80022D34(void);
+extern "C" void fn_80022D88(void);
 extern "C" u8 fn_8004936C(void);
 extern "C" void fn_800598E8(s32, s32);
 extern "C" void fn_8005BF7C(s32, s32, s32);
@@ -563,6 +565,16 @@ void LoadChallengeUI(void) {
 // 0x800EFE28
 void PlayChallengeMusic(void) {
     fn_80022D1C();
+}
+
+// 0x800EFE2C
+void SetChallengeCursor(void) {
+    fn_80022D34();
+}
+
+// 0x800EFE30
+void DeleteChallengeCursor(void) {
+    fn_80022D88();
 }
 
 // 0x800EFE34
