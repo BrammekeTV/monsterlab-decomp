@@ -10,8 +10,8 @@ u8*   fn_8006FBDC(void);                                          // 0x8006FBDC
 s32   fn_8006FBFC(u8* obj);                                       // 0x8006FBFC
 void  fn_8006FA44(u8* a3, s32 a4, s32 a5, s32 a6, s32 a7, s32 a8); // 0x8006FA44
 void  fn_800923DC(u8* p);                                         // 0x800923DC
-void  fn_800927B0(s32 x);                                         // 0x800927B0
-s32   fn_80092CC4(u8* obj);                                       // 0x80092CC4
+void  fn_800927B0(u8* x);                                         // 0x800927B0
+u8*   fn_80092CC4(u8* obj);                                       // 0x80092CC4
 extern f32 lbl_805FDA90;                                          // 0x805FDA90 (float)
 extern f32 lbl_805FDAA0;                                          // 0x805FDAA0 (float)
 extern f32 lbl_805FDAA8;                                          // 0x805FDAA8 (float)
@@ -51,7 +51,7 @@ void RobotEvolutionExperiment_IntroSmasherDone(void) {
 // 0x80091C3C
 // Intro robot countdown: passes the object at +0x10 to fn_80092CC4, then fn_800927B0 if that returns nonzero.
 void RobotEvolutionExperiment_IntroRobotShowCountdown(u8* p) {
-    s32 x = fn_80092CC4(*(u8**)(p + 0x10));
+    u8* x = fn_80092CC4(*(u8**)(p + 0x10));
     if (x != 0) fn_800927B0(x);
 }
 

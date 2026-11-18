@@ -69,6 +69,11 @@
  "changelog": [
   {
    "date": "2026-11-18",
+   "time": "17:34",
+   "text": "Decompiled 57 more functions: the lab books screens (current screen checks and the ingredients list: types, filters, selection, icons and names), more of the robot evolution experiment (robot positions, taunts, flee/cheer, smasher impact checks), and a block around the save file close (0x8020). Added tools/small_candidates.py to pick helper batches."
+  },
+  {
+   "date": "2026-11-18",
    "time": "17:29",
    "text": "Decompiled 60 more small functions: inventory part queries, quest timer, particle, boss camera, network and camera-lock script callbacks (0x800F), entity/level script callbacks and debug prints (0x8010), and engine helpers (0x801F). Written by low-cost helper agents and reviewed; also fixed a stale address comment for operator_delete."
   },

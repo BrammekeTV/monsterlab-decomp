@@ -1,15 +1,15 @@
 {
  "game_id": "RM7P4F",
- "generated": "2026-11-18T16:29:42+00:00",
- "commit": "dc3c1f7",
- "commit_date": "2026-11-18T17:24:50+01:00",
+ "generated": "2026-11-18T16:34:35+00:00",
+ "commit": "f10a750",
+ "commit_date": "2026-11-18T17:29:43+01:00",
  "game": {
   "functions": 8548,
   "bytes": 2265988,
   "named": 2748,
   "named_bytes": 616800,
-  "decompiled": 3306,
-  "decompiled_bytes": 343556
+  "decompiled": 3362,
+  "decompiled_bytes": 349392
  },
  "library": {
   "functions": 4039,
@@ -24,8 +24,8 @@
   "bytes": 3404928,
   "named": 3211,
   "named_bytes": 721548,
-  "decompiled": 3307,
-  "decompiled_bytes": 343676
+  "decompiled": 3363,
+  "decompiled_bytes": 349512
  },
  "game_range": [
   "80006B40",
@@ -285,23 +285,23 @@
    0.139
   ],
   [
-   0.015,
+   0.028,
    0.0
   ],
   [
-   0.181,
+   0.231,
    0.252
   ],
   [
-   0.063,
+   0.203,
    0.241
   ],
   [
-   0.039,
+   0.051,
    0.008
   ],
   [
-   0.058,
+   0.086,
    0.106
   ],
   [
@@ -521,11 +521,11 @@
    0.865
   ],
   [
-   0.04,
+   0.161,
    0.801
   ],
   [
-   0.008,
+   0.2,
    1.0
   ],
   [
@@ -969,19 +969,19 @@
    0.056
   ],
   [
-   0.0,
+   0.008,
    0.0
   ],
   [
-   0.017,
+   0.046,
    0.178
   ],
   [
-   0.001,
+   0.07,
    0.234
   ],
   [
-   0.021,
+   0.069,
    0.0
   ],
   [
@@ -3263,6 +3263,111 @@
     {
      "name": "fn_80216BF0",
      "addr": "80216BF0",
+     "size": 112
+    }
+   ]
+  },
+  {
+   "path": "src/game/lab_books_a.cpp",
+   "functions": [
+    {
+     "name": "CurrentScreen_Ingredients",
+     "addr": "80110084",
+     "size": 108
+    },
+    {
+     "name": "CurrentScreen_Parts",
+     "addr": "801100F0",
+     "size": 108
+    },
+    {
+     "name": "CurrentScreen_Creatures",
+     "addr": "8011015C",
+     "size": 108
+    },
+    {
+     "name": "CurrentScreen_Recipes",
+     "addr": "801101C8",
+     "size": 108
+    },
+    {
+     "name": "CurrentScreen_Badges",
+     "addr": "80110234",
+     "size": 108
+    },
+    {
+     "name": "LabBooks_Ingredients_GetCurrentType",
+     "addr": "801108F4",
+     "size": 112
+    },
+    {
+     "name": "LabBooks_Ingredients_GetTypeName",
+     "addr": "80110964",
+     "size": 112
+    },
+    {
+     "name": "LabBooks_Ingredients_IncrementType",
+     "addr": "801109D4",
+     "size": 120
+    },
+    {
+     "name": "LabBooks_Ingredients_IncrementRow",
+     "addr": "80110A4C",
+     "size": 120
+    },
+    {
+     "name": "LabBooks_Ingredients_ShowIngredientFilters",
+     "addr": "80110AC4",
+     "size": 112
+    },
+    {
+     "name": "LabBooks_Ingredients_RenderList_Generate",
+     "addr": "80110B34",
+     "size": 104
+    },
+    {
+     "name": "LabBooks_Ingredients_RenderList_SetSelectedItem",
+     "addr": "80110B9C",
+     "size": 120
+    },
+    {
+     "name": "LabBooks_Ingredients_RenderList_IncSelectedItem",
+     "addr": "80110C14",
+     "size": 120
+    },
+    {
+     "name": "LabBooks_Ingredients_RenderList_GetSelectedItem",
+     "addr": "80110C8C",
+     "size": 112
+    },
+    {
+     "name": "LabBooks_Ingredients_RenderList_GetTextureList",
+     "addr": "80110CFC",
+     "size": 112
+    },
+    {
+     "name": "Ingredients_IsValidIngredient",
+     "addr": "80110D6C",
+     "size": 128
+    },
+    {
+     "name": "LabBooks_Ingredients_RenderList_GetNumberList",
+     "addr": "80110DEC",
+     "size": 112
+    },
+    {
+     "name": "LabBooks_Ingredients_RenderList_GetIconList",
+     "addr": "80110E5C",
+     "size": 112
+    },
+    {
+     "name": "LabBooks_Ingredients_RenderList_GetSelectedName",
+     "addr": "80110ECC",
+     "size": 112
+    },
+    {
+     "name": "Ingredients_RenderList_GetSelectedImage",
+     "addr": "80110F3C",
      "size": 112
     }
    ]
@@ -5753,6 +5858,111 @@
    ]
   },
   {
+   "path": "src/game/small_8009c.cpp",
+   "functions": [
+    {
+     "name": "fn_80090674",
+     "addr": "80090674",
+     "size": 120
+    },
+    {
+     "name": "fn_80091DAC",
+     "addr": "80091DAC",
+     "size": 124
+    },
+    {
+     "name": "fn_8009253C",
+     "addr": "8009253C",
+     "size": 104
+    },
+    {
+     "name": "fn_80092CC4",
+     "addr": "80092CC4",
+     "size": 76
+    },
+    {
+     "name": "RobotEvolutionExperiment_RobotGetLastRandom",
+     "addr": "80093278",
+     "size": 104
+    },
+    {
+     "name": "RobotEvolutionExperiment_RobotIsLeft",
+     "addr": "800932E0",
+     "size": 112
+    },
+    {
+     "name": "RobotEvolutionExperiment_RobotIsCenter",
+     "addr": "80093350",
+     "size": 112
+    },
+    {
+     "name": "RobotEvolutionExperiment_RobotIsRight",
+     "addr": "800933C0",
+     "size": 112
+    },
+    {
+     "name": "RobotEvolutionExperiment_RobotTaunts",
+     "addr": "80093430",
+     "size": 112
+    },
+    {
+     "name": "RobotEvolutionExperiment_RobotFleesLeft",
+     "addr": "800934A0",
+     "size": 112
+    },
+    {
+     "name": "RobotEvolutionExperiment_RobotFleesRight",
+     "addr": "80093510",
+     "size": 112
+    },
+    {
+     "name": "RobotEvolutionExperiment_RobotGameWonCheer",
+     "addr": "80093608",
+     "size": 112
+    },
+    {
+     "name": "RobotEvolutionExperiment_RobotGameLostFlee",
+     "addr": "80093678",
+     "size": 112
+    },
+    {
+     "name": "RobotEvolutionExperiment_RobotIsCorrectRobot",
+     "addr": "800936E8",
+     "size": 112
+    },
+    {
+     "name": "RobotEvolutionExperiment_RobotSetLoopingAnimSound",
+     "addr": "80093758",
+     "size": 104
+    },
+    {
+     "name": "RobotEvolutionExperiment_SmasherCheckImpactFrame",
+     "addr": "80093FBC",
+     "size": 112
+    },
+    {
+     "name": "RobotEvolutionExperiment_SmasherHitSomething",
+     "addr": "8009402C",
+     "size": 112
+    },
+    {
+     "name": "fn_80097750",
+     "addr": "80097750",
+     "size": 108
+    },
+    {
+     "name": "fn_8009803C",
+     "addr": "8009803C",
+     "size": 124
+    },
+    {
+     "name": "fn_8009848C",
+     "addr": "8009848C",
+     "size": 112
+    }
+   ]
+  },
+  {
    "path": "src/game/small_800B.cpp",
    "functions": [
     {
@@ -6639,6 +6849,91 @@
      "name": "fn_801B50B0",
      "addr": "801B50B0",
      "size": 76
+    }
+   ]
+  },
+  {
+   "path": "src/game/small_8020.cpp",
+   "functions": [
+    {
+     "name": "fn_802014D4",
+     "addr": "802014D4",
+     "size": 72
+    },
+    {
+     "name": "fn_80202FA4",
+     "addr": "80202FA4",
+     "size": 88
+    },
+    {
+     "name": "fn_802041B0",
+     "addr": "802041B0",
+     "size": 68
+    },
+    {
+     "name": "fn_80204430",
+     "addr": "80204430",
+     "size": 64
+    },
+    {
+     "name": "fn_80204478",
+     "addr": "80204478",
+     "size": 60
+    },
+    {
+     "name": "fn_8020506C",
+     "addr": "8020506C",
+     "size": 68
+    },
+    {
+     "name": "fn_80206308",
+     "addr": "80206308",
+     "size": 116
+    },
+    {
+     "name": "fn_8020637C",
+     "addr": "8020637C",
+     "size": 104
+    },
+    {
+     "name": "fn_802063E4",
+     "addr": "802063E4",
+     "size": 80
+    },
+    {
+     "name": "fn_80206434",
+     "addr": "80206434",
+     "size": 64
+    },
+    {
+     "name": "SaveClose",
+     "addr": "802067BC",
+     "size": 96
+    },
+    {
+     "name": "fn_802077B8",
+     "addr": "802077B8",
+     "size": 92
+    },
+    {
+     "name": "fn_80207814",
+     "addr": "80207814",
+     "size": 120
+    },
+    {
+     "name": "fn_8020788C",
+     "addr": "8020788C",
+     "size": 92
+    },
+    {
+     "name": "fn_80207BE4",
+     "addr": "80207BE4",
+     "size": 120
+    },
+    {
+     "name": "fn_80208140",
+     "addr": "80208140",
+     "size": 64
     }
    ]
   },
