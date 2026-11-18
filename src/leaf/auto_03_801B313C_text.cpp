@@ -19,7 +19,7 @@ extern "C" void EventSend(void*, void*, void*, u32, int, int, int, int);
 extern "C" void EventSendTo(void*, u32, void*, u32, int, int);
 extern "C" void fn_801B1778(void*, s32);
 extern "C" void fn_801BB530(s32, s32);
-extern "C" void fn_801EBA20(void*);
+extern "C" void fn_801EBA20(void*, void*);
 extern "C" void fn_801EBBE0(s32, u8*, s32);
 
 // 0x801B3308
@@ -346,14 +346,14 @@ extern "C" void fn_801C37EC(s32 a3) {
 extern "C" void fn_801C3E7C(s32 a3, u8* a4) {
     u8* t0 = *(u8**)(((u8*)(uintptr_t)(a4)) + 0);
     u8* t1 = *(u8**)(t0 + 120);
-    fn_801EBA20((void*)(t1));
+    fn_801EBA20((void*)(t1), (void*)(((u8*)(uintptr_t)(a4))));
 }
 
 // 0x801C3E88
 extern "C" void fn_801C3E88(s32 a3, u8* a4) {
     u8* t0 = *(u8**)(((u8*)(uintptr_t)(a4)) + 0);
     u8* t1 = *(u8**)(t0 + 124);
-    fn_801EBA20((void*)(t1));
+    fn_801EBA20((void*)(t1), (void*)(((u8*)(uintptr_t)(a4))));
 }
 
 // 0x801C3E94

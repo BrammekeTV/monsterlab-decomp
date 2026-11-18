@@ -5,7 +5,7 @@
 
 #include "types.h"
 
-extern "C" void fn_8006C3FC(void);
+extern "C" void fn_8006C3FC(u8*);
 
 // 0x8006B9CC
 extern "C" s32 fn_8006B9CC(u8* a3) {
@@ -36,10 +36,9 @@ extern "C" s32 fn_8006C664(u8* a3) {
 
 // 0x8006C6AC
 extern "C" void fn_8006C6AC(u8* a3) {
-    // tail-call arguments inferred from the registers set before the call
     *(u8*)(((u8*)(uintptr_t)(a3)) + 544) = (u8)((u32)(0));
     *(u32*)(((u8*)(uintptr_t)(a3)) + 548) = (u32)((u32)(-1));
-    fn_8006C3FC();
+    fn_8006C3FC(((u8*)(uintptr_t)(a3)));
 }
 
 // 0x8006CB54

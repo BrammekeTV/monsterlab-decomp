@@ -1,15 +1,15 @@
 {
  "game_id": "RM7P4F",
- "generated": "2026-11-18T17:38:27+00:00",
- "commit": "11a7687",
- "commit_date": "2026-11-18T18:33:01+01:00",
+ "generated": "2026-11-18T17:45:23+00:00",
+ "commit": "74f8165",
+ "commit_date": "2026-11-18T18:38:30+01:00",
  "game": {
   "functions": 8548,
   "bytes": 2265988,
   "named": 2748,
   "named_bytes": 616800,
-  "decompiled": 3976,
-  "decompiled_bytes": 404320
+  "decompiled": 4018,
+  "decompiled_bytes": 407700
  },
  "library": {
   "functions": 4039,
@@ -24,8 +24,8 @@
   "bytes": 3404928,
   "named": 3211,
   "named_bytes": 721548,
-  "decompiled": 3977,
-  "decompiled_bytes": 404440
+  "decompiled": 4019,
+  "decompiled_bytes": 407820
  },
  "game_range": [
   "80006B40",
@@ -189,7 +189,7 @@
    0.13
   ],
   [
-   0.024,
+   0.025,
    0.324
   ],
   [
@@ -201,7 +201,7 @@
    0.0
   ],
   [
-   0.131,
+   0.132,
    0.003
   ],
   [
@@ -209,19 +209,19 @@
    0.0
   ],
   [
-   0.034,
+   0.058,
    0.0
   ],
   [
-   0.0,
+   0.097,
    0.155
   ],
   [
-   0.012,
+   0.034,
    0.078
   ],
   [
-   0.013,
+   0.082,
    0.052
   ],
   [
@@ -457,7 +457,7 @@
    0.843
   ],
   [
-   0.048,
+   0.045,
    0.541
   ],
   [
@@ -777,11 +777,11 @@
    0.0
   ],
   [
-   0.076,
+   0.213,
    0.02
   ],
   [
-   0.008,
+   0.044,
    0.017
   ],
   [
@@ -1519,6 +1519,106 @@
      "name": "fn_80199054",
      "addr": "80199054",
      "size": 64
+    }
+   ]
+  },
+  {
+   "path": "src/engine/small_8019c.cpp",
+   "functions": [
+    {
+     "name": "fn_80199094",
+     "addr": "80199094",
+     "size": 108
+    },
+    {
+     "name": "fn_80199100",
+     "addr": "80199100",
+     "size": 76
+    },
+    {
+     "name": "fn_80199420",
+     "addr": "80199420",
+     "size": 64
+    },
+    {
+     "name": "fn_80199460",
+     "addr": "80199460",
+     "size": 64
+    },
+    {
+     "name": "fn_801994A0",
+     "addr": "801994A0",
+     "size": 64
+    },
+    {
+     "name": "fn_801994E0",
+     "addr": "801994E0",
+     "size": 84
+    },
+    {
+     "name": "fn_80199618",
+     "addr": "80199618",
+     "size": 108
+    },
+    {
+     "name": "fn_80199ABC",
+     "addr": "80199ABC",
+     "size": 48
+    },
+    {
+     "name": "UIWidgetFindChild",
+     "addr": "80199AEC",
+     "size": 76
+    },
+    {
+     "name": "UIWidgetPlayAnim",
+     "addr": "80199B38",
+     "size": 48
+    },
+    {
+     "name": "fn_80199C30",
+     "addr": "80199C30",
+     "size": 68
+    },
+    {
+     "name": "fn_80199C74",
+     "addr": "80199C74",
+     "size": 116
+    },
+    {
+     "name": "fn_80199DA4",
+     "addr": "80199DA4",
+     "size": 48
+    },
+    {
+     "name": "fn_80199E40",
+     "addr": "80199E40",
+     "size": 64
+    },
+    {
+     "name": "fn_8019A994",
+     "addr": "8019A994",
+     "size": 64
+    },
+    {
+     "name": "fn_8019AC00",
+     "addr": "8019AC00",
+     "size": 120
+    },
+    {
+     "name": "fn_8019AD84",
+     "addr": "8019AD84",
+     "size": 120
+    },
+    {
+     "name": "fn_8019AF88",
+     "addr": "8019AF88",
+     "size": 128
+    },
+    {
+     "name": "fn_8019B008",
+     "addr": "8019B008",
+     "size": 128
     }
    ]
   },
@@ -7218,6 +7318,111 @@
    ]
   },
   {
+   "path": "src/game/small_8006c.cpp",
+   "functions": [
+    {
+     "name": "fn_800677D0",
+     "addr": "800677D0",
+     "size": 116
+    },
+    {
+     "name": "fn_80067BB0",
+     "addr": "80067BB0",
+     "size": 128
+    },
+    {
+     "name": "fn_80068AE0",
+     "addr": "80068AE0",
+     "size": 112
+    },
+    {
+     "name": "fn_80068DF0",
+     "addr": "80068DF0",
+     "size": 56
+    },
+    {
+     "name": "FixUpProjectileEntityCallback",
+     "addr": "80068F78",
+     "size": 92
+    },
+    {
+     "name": "DemolishProjectileEntityCallback",
+     "addr": "80068FD4",
+     "size": 52
+    },
+    {
+     "name": "fn_80069028",
+     "addr": "80069028",
+     "size": 104
+    },
+    {
+     "name": "fn_80069090",
+     "addr": "80069090",
+     "size": 68
+    },
+    {
+     "name": "fn_80069538",
+     "addr": "80069538",
+     "size": 96
+    },
+    {
+     "name": "fn_80069598",
+     "addr": "80069598",
+     "size": 88
+    },
+    {
+     "name": "fn_800695F0",
+     "addr": "800695F0",
+     "size": 72
+    },
+    {
+     "name": "fn_8006B974",
+     "addr": "8006B974",
+     "size": 88
+    },
+    {
+     "name": "fn_8006BFF8",
+     "addr": "8006BFF8",
+     "size": 112
+    },
+    {
+     "name": "fn_8006C66C",
+     "addr": "8006C66C",
+     "size": 64
+    },
+    {
+     "name": "fn_8006CC14",
+     "addr": "8006CC14",
+     "size": 104
+    },
+    {
+     "name": "fn_8006CCC4",
+     "addr": "8006CCC4",
+     "size": 96
+    },
+    {
+     "name": "fn_8006CD24",
+     "addr": "8006CD24",
+     "size": 72
+    },
+    {
+     "name": "fn_8006CE08",
+     "addr": "8006CE08",
+     "size": 72
+    },
+    {
+     "name": "fn_8006CE50",
+     "addr": "8006CE50",
+     "size": 112
+    },
+    {
+     "name": "fn_8006CEC0",
+     "addr": "8006CEC0",
+     "size": 100
+    }
+   ]
+  },
+  {
    "path": "src/game/small_8007.cpp",
    "functions": [
     {
@@ -11983,6 +12188,16 @@
    ]
   },
   {
+   "path": "src/leaf/auto_03_8005CA88_text.cpp",
+   "functions": [
+    {
+     "name": "fn_8005CBA0",
+     "addr": "8005CBA0",
+     "size": 4
+    }
+   ]
+  },
+  {
    "path": "src/leaf/auto_03_8005CBC4_text.cpp",
    "functions": [
     {
@@ -12014,6 +12229,11 @@
      "name": "fn_80062C7C",
      "addr": "80062C7C",
      "size": 4
+    },
+    {
+     "name": "fn_80063058",
+     "addr": "80063058",
+     "size": 4
     }
    ]
   },
@@ -12024,6 +12244,11 @@
      "name": "fn_80063520",
      "addr": "80063520",
      "size": 16
+    },
+    {
+     "name": "fn_80063620",
+     "addr": "80063620",
+     "size": 4
     }
    ]
   },
@@ -12199,6 +12424,11 @@
      "name": "fn_8006F67C",
      "addr": "8006F67C",
      "size": 28
+    },
+    {
+     "name": "fn_8006F698",
+     "addr": "8006F698",
+     "size": 4
     }
    ]
   },
@@ -15779,11 +16009,6 @@
      "name": "PropHasAttachedProjectile",
      "addr": "800ED1FC",
      "size": 4
-    },
-    {
-     "name": "Explode",
-     "addr": "800ED2EC",
-     "size": 36
     },
     {
      "name": "PlayerSetOverrideTarget",

@@ -15,7 +15,7 @@ void    operator_delete(void* p);                                // 0x801D426C
 void    fn_8018D2B8(const char* fmt, ...);                       // 0x8018D2B8 (debug log)
 void    fn_8018D4CC(void* p);                                    // 0x8018D4CC (free)
 s32     fn_801954E4(void* p);                                    // 0x801954E4 (frees child at +0x10, then obj)
-void*   fn_8019B008(void* a);                                    // 0x8019B008
+void*   fn_8019B008(void* obj, char* name, u32 arg);                                   // 0x8019B008
 u32     fn_801A65A0(void* obj);                                  // 0x801A65A0
 u32     fn_801A665C(void* obj);                                  // 0x801A665C
 }
@@ -177,7 +177,7 @@ s32 fn_801A26BC(void* obj) {
 s32 fn_801A270C(void* obj) {
     u8* sets = (u8*)gScreenSets;
     void* sub = *(void**)(sets + 0x10);
-    *(void**)((u8*)obj + 0x140) = fn_8019B008(sub);
+    *(void**)((u8*)obj + 0x140) = fn_8019B008(sub, 0, 0);  // r4/r5 are not set by the original; unused leftovers
     return 0;
 }
 

@@ -5,6 +5,13 @@
 
 #include "types.h"
 
+extern "C" void fn_801B4520(u8*);
+
 // 0x80062C7C
 extern "C" void fn_80062C7C(void) {
+}
+
+// 0x80063058
+extern "C" void fn_80063058(u8* a3) {
+    fn_801B4520(((u8*)(uintptr_t)(a3)));
 }

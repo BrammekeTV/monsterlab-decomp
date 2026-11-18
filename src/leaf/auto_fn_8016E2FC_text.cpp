@@ -6,9 +6,9 @@
 #include "types.h"
 
 extern u8 lbl_805FB5F0[];
-extern "C" void fn_80142500(void*);
+extern "C" u8* fn_80142500(void*);
 
 // 0x8016E2FC
-extern "C" void fn_8016E2FC(void) {
-    fn_80142500((void*)((u8*)lbl_805FB5F0));
+extern "C" u8* fn_8016E2FC(void) {
+    return (u8*)(fn_80142500((void*)((u8*)lbl_805FB5F0)));
 }

@@ -16,7 +16,7 @@ void  fn_801E9678(void* p, void* data);                          // 0x801E9678
 void* fn_801E9D18(void* p, u32 hash, s32 size);                  // 0x801E9D18
 void  fn_801EB7A4(void* p, s32 a4, s32 a5, s32 a6, s32 a7);      // 0x801EB7A4
 void* fn_801EB94C(void* p);                                      // 0x801EB94C
-void  fn_801EBA20(void* p);                                      // 0x801EBA20
+void  fn_801EBA20(void* list, void* item);                                     // 0x801EBA20
 void* MemAllocDefault(u32 size);                                 // 0x801D4650
 void* ObjAlloc(u32 size);                                        // 0x801D4414
 void  operator_delete(void* p);                                  // 0x801D426C
@@ -131,7 +131,7 @@ void fn_801B38BC(u8* p) {
     while (cur) {
         u8* next = *(u8**)(cur - 4);
         next = next ? next + 8 : NULL;
-        fn_801EBA20(*(u8**)(p + 0x60));
+        fn_801EBA20(*(u8**)(p + 0x60), 0);  // r4 left over in the original
         cur = next;
     }
 }
@@ -169,7 +169,7 @@ extern "C" void fn_801B40E4(u8* p) {
     }
     u8* next = *(u8**)(node - 0x4);
     next = next ? next + 8 : NULL;
-    fn_801EBA20(*(u8**)(p + 0x8));
+    fn_801EBA20(*(u8**)(p + 0x8), 0);  // r4 left over in the original
     *(u8**)(p + 0x4) = next;
     if (!next) *(u8*)(p + 0x0) = 0;
 }

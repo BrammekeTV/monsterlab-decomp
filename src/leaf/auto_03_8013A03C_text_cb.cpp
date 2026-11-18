@@ -8,7 +8,7 @@
 
 extern u8 lbl_805FB23C[];
 extern u8 lbl_805FB350[];
-extern "C" void* EventPost(s32, s32);
+extern "C" void* EventPost(s32, void*);
 
 // 0x8013B984
 void FriendListDisableAutoScroll(void) {
@@ -17,12 +17,12 @@ void FriendListDisableAutoScroll(void) {
 
 // 0x8013BC5C
 void FriendsListSendAccept(void) {
-    EventPost((s32)((u32)(56)), (s32)((u32)(0)));
+    EventPost((s32)((u32)(56)), (void*)((u8*)(uintptr_t)(0)));
 }
 
 // 0x8013BE0C
 void MultiplayerLevelLoaded(void) {
-    EventPost((s32)((u32)(59)), (s32)((u32)(0)));
+    EventPost((s32)((u32)(59)), (void*)((u8*)(uintptr_t)(0)));
 }
 
 // 0x8013BE74

@@ -69,6 +69,11 @@
  "changelog": [
   {
    "date": "2026-11-18",
+   "time": "18:45",
+   "text": "Decompiled 58 more small functions: engine overlay fades, event manager and pad helpers (0x801B), UI widget lookups and animation helpers (0x8019), and projectile and entity helpers (0x8006). Written by low-cost helper agents and reviewed."
+  },
+  {
+   "date": "2026-11-18",
    "time": "18:52",
    "text": "Added tools/check_protos.py, which flags the same function declared with different return types, parameter counts or C/C++ linkage; fixed about 70 linkage mismatches and 20 wrong prototypes (e.g. destructors and getters that return pointers)."
   },

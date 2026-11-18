@@ -50,10 +50,8 @@ extern "C" void fn_80022D88(void);
 extern "C" u8 fn_8004936C(void);
 extern "C" void fn_800598E8(s32, s32);
 extern "C" void fn_8005BF7C(s32, s32, s32);
-extern "C" void fn_8005F204(u8*);
-extern "C" void fn_80069090(u8*);
 extern "C" void fn_8006AD84(u8*);
-extern "C" void fn_8006B974(s32);
+extern "C" void fn_8006B974(u8*);
 extern "C" s32 fn_8006B9CC(u8*);
 extern "C" void fn_8006CD70(u8*, s32);
 extern "C" void fn_8006CE08(u8*);
@@ -397,30 +395,12 @@ void PropSetActiveTarget(u32 a3, void* a4) {
 
 // 0x800ED1F8
 void PropRemoveAttachedProjectile(u32 a3) {
-    // tail-call arguments inferred from the registers set before the call
-    fn_8006B974((s32)((u32)(uintptr_t)(a3)));
+    fn_8006B974(((u8*)(uintptr_t)(a3)));
 }
 
 // 0x800ED1FC
 u32 PropHasAttachedProjectile(u32 a3) {
     return (u32)(fn_8006B9CC(((u8*)(uintptr_t)(a3))));
-}
-
-// 0x800ED2EC
-void Explode(void* a3) {
-    // tail-call arguments inferred from the registers set before the call
-    u8* t0 = *(u8**)(((u8*)(uintptr_t)(a3)) + 4);
-    s32 t1 = *(s32*)(t0 + 28);
-    u32 t2 = (u32)(t1) & 0x40u;
-    if (t2 == 0) {
-        u32 t3 = (u32)(t1) & 0x20u;
-        if (t3 == 0) {
-            return;
-        }
-        fn_8005F204(((u8*)(uintptr_t)(a3)));
-        return;
-    }
-    fn_80069090(((u8*)(uintptr_t)(a3)));
 }
 
 // 0x800ED34C
@@ -928,7 +908,6 @@ void StartHazardEffect(void* a3, u32 a4) {
 
 // 0x800F8F28
 void StopHazardEffect(void* a3) {
-    // tail-call arguments inferred from the registers set before the call
     u8* t0 = *(u8**)(((u8*)(uintptr_t)(a3)) + 4);
     s32 t1 = *(s32*)(t0 + 28);
     u32 t2 = (u32)(t1) & 0x8000u;

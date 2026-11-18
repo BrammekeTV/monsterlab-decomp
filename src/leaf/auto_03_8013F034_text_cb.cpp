@@ -18,7 +18,7 @@ extern u8 lbl_805FB438[];
 extern u8 lbl_805FB964[];
 extern u8 lbl_805FBA30[];
 extern u8 lbl_805FEFF0[];
-extern "C" void* EventPost(s32, s32);
+extern "C" void* EventPost(s32, void*);
 extern "C" BOOL fn_801F56FC(s32);
 extern "C" void fn_801F5714(s32);
 extern "C" void fn_801F5724(u32);
@@ -31,7 +31,7 @@ void InitRematchFlow(void) {
 
 // 0x8013FDEC
 void SendRematchAccepted(void) {
-    EventPost((s32)((u32)(71)), (s32)((u32)(0)));
+    EventPost((s32)((u32)(71)), (void*)((u8*)(uintptr_t)(0)));
 }
 
 // 0x80140328
@@ -61,7 +61,7 @@ void ReturnHomeButton(void) {
 
 // 0x801403C0
 void SendMonsterChangeCancel(void) {
-    EventPost((s32)((u32)(73)), (s32)((u32)(0)));
+    EventPost((s32)((u32)(73)), (void*)((u8*)(uintptr_t)(0)));
 }
 
 // 0x801403FC

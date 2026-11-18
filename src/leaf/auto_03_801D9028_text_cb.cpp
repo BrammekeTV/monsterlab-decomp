@@ -9,14 +9,14 @@
 extern u8 lbl_8040E5F0[];
 extern u8 lbl_805F9980[];
 extern u8 lbl_805FB89C[];
-extern "C" void PlaySound(u32, s32, s32, s32, s32, s32);
+extern "C" s32 PlaySound(u32, s32, s32, s32, s32, s32);
 extern "C" void PlaySoundAt(void*, int, u8*, int);
 extern "C" void TriggerDoAction(void*, s32);
 extern "C" void fn_80162A70(u8*);
 extern "C" void fn_801B6878(s32, s32, s32);
 extern "C" void fn_801B69F8(s32);
 extern "C" void fn_801B6AA4(s32);
-extern "C" void fn_801B6EC8(s32, s32);
+extern "C" void fn_801B6EC8(void*, s32);
 extern "C" BOOL fn_801F5220(void);
 extern "C" void fn_8020A398(s32);
 extern "C" void fn_8020B078(f32);
@@ -107,8 +107,7 @@ void PrintPosition(void* a3) {
 
 // 0x801DDF20
 void SetSpawnCount(void* a3, s32 a4) {
-    // tail-call arguments inferred from the registers set before the call
-    fn_801B6EC8((s32)((u32)(uintptr_t)(a3)), (s32)((u32)(uintptr_t)(a4)));
+    fn_801B6EC8((void*)(((u8*)(uintptr_t)(a3))), (s32)((u32)(uintptr_t)(a4)));
 }
 
 // 0x801DDF24

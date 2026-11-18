@@ -6,6 +6,7 @@
 #include "types.h"
 
 extern "C" void fn_80173164(void*);
+extern "C" void fn_801B4520(u8*);
 
 // 0x80063520
 extern "C" void fn_80063520(u8* a3) {
@@ -13,4 +14,9 @@ extern "C" void fn_80063520(u8* a3) {
         return;
     }
     fn_80173164((void*)(((u8*)(uintptr_t)(a3))));
+}
+
+// 0x80063620
+extern "C" void fn_80063620(u8* a3) {
+    fn_801B4520(((u8*)(uintptr_t)(a3)));
 }
