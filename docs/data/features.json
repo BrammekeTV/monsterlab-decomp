@@ -69,6 +69,11 @@
   "changelog": [
     {
       "date": "2026-11-18",
+      "time": "15:59",
+      "text": "Decompiled the hit, idle and dodge animation pickers for fighters: which reaction a limb plays when struck (heavy or light injury depending on its health), the idle animation afterwards (hurt, tired or regular) and the dodge style (back, jump or duck)."
+    },
+    {
+      "date": "2026-11-18",
       "time": "15:48",
       "text": "Decompiled the fighter animation-name builders: the strings (limb, body type, attack/dodge/idle reaction, e.g. \"legs_..._uppercut\") that the character system looks animations up by, plus the part model key and the reaction and body-type name tables."
     },

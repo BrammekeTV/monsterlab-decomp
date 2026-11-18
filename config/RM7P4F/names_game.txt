@@ -800,3 +800,6 @@ fn_8022128C StrToLower
 fn_8021541C ReactionBuildOne
 fn_802152FC PartAnimKey
 fn_80215EF0 ReactionBuildDodgeBack
+fn_802156B0 ReactionBuildNamed
+fn_8020E714 FighterHasOwnHeadAnims
+fn_802157A0 ReactionBuildForAction

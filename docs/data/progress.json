@@ -1,15 +1,15 @@
 {
  "game_id": "RM7P4F",
- "generated": "2026-11-18T15:48:24+00:00",
- "commit": "d8124d3",
- "commit_date": "2026-11-18T16:46:02+01:00",
+ "generated": "2026-11-18T15:59:43+00:00",
+ "commit": "70900f4",
+ "commit_date": "2026-11-18T16:48:25+01:00",
  "game": {
   "functions": 8548,
   "bytes": 2265988,
-  "named": 2737,
-  "named_bytes": 612052,
-  "decompiled": 2946,
-  "decompiled_bytes": 298756
+  "named": 2740,
+  "named_bytes": 612440,
+  "decompiled": 2995,
+  "decompiled_bytes": 303420
  },
  "library": {
   "functions": 4039,
@@ -22,10 +22,10 @@
  "all": {
   "functions": 12587,
   "bytes": 3404928,
-  "named": 3200,
-  "named_bytes": 716800,
-  "decompiled": 2947,
-  "decompiled_bytes": 298876
+  "named": 3203,
+  "named_bytes": 717188,
+  "decompiled": 2996,
+  "decompiled_bytes": 303540
  },
  "game_range": [
   "80006B40",
@@ -109,7 +109,7 @@
    0.598
   ],
   [
-   0.019,
+   0.191,
    0.061
   ],
   [
@@ -377,15 +377,15 @@
    0.018
   ],
   [
-   0.02,
+   0.065,
    0.0
   ],
   [
-   0.008,
+   0.063,
    0.0
   ],
   [
-   0.029,
+   0.097,
    0.051
   ],
   [
@@ -993,20 +993,20 @@
    0.0
   ],
   [
-   0.066,
-   0.081
+   0.081,
+   0.096
   ],
   [
    1.0,
    1.0
   ],
   [
-   0.988,
+   1.0,
    0.979
   ],
   [
-   0.471,
-   0.588
+   0.635,
+   0.617
   ],
   [
    0.187,
@@ -4266,6 +4266,21 @@
      "size": 104
     },
     {
+     "name": "FighterHasOwnHeadAnims",
+     "addr": "8020E714",
+     "size": 128
+    },
+    {
+     "name": "fn_80212E28",
+     "addr": "80212E28",
+     "size": 40
+    },
+    {
+     "name": "fn_80212E50",
+     "addr": "80212E50",
+     "size": 52
+    },
+    {
      "name": "PartAnimKey",
      "addr": "802152FC",
      "size": 288
@@ -4279,6 +4294,36 @@
      "name": "ReactionBuild",
      "addr": "80215648",
      "size": 104
+    },
+    {
+     "name": "ReactionBuildNamed",
+     "addr": "802156B0",
+     "size": 92
+    },
+    {
+     "name": "fn_8021570C",
+     "addr": "8021570C",
+     "size": 148
+    },
+    {
+     "name": "ReactionBuildForAction",
+     "addr": "802157A0",
+     "size": 168
+    },
+    {
+     "name": "fn_80215848",
+     "addr": "80215848",
+     "size": 380
+    },
+    {
+     "name": "ReactionBuildRecover",
+     "addr": "802159C4",
+     "size": 292
+    },
+    {
+     "name": "fn_80215AE8",
+     "addr": "80215AE8",
+     "size": 372
     },
     {
      "name": "ReactionBuildDodgeBack",
@@ -4573,6 +4618,111 @@
    ]
   },
   {
+   "path": "src/game/small_8003.cpp",
+   "functions": [
+    {
+     "name": "fn_800300E0",
+     "addr": "800300E0",
+     "size": 76
+    },
+    {
+     "name": "fn_8003012C",
+     "addr": "8003012C",
+     "size": 88
+    },
+    {
+     "name": "fn_80030228",
+     "addr": "80030228",
+     "size": 72
+    },
+    {
+     "name": "fn_80030270",
+     "addr": "80030270",
+     "size": 64
+    },
+    {
+     "name": "fn_80030604",
+     "addr": "80030604",
+     "size": 68
+    },
+    {
+     "name": "fn_80030648",
+     "addr": "80030648",
+     "size": 88
+    },
+    {
+     "name": "fn_800306A0",
+     "addr": "800306A0",
+     "size": 60
+    },
+    {
+     "name": "fn_80030754",
+     "addr": "80030754",
+     "size": 68
+    },
+    {
+     "name": "fn_80030798",
+     "addr": "80030798",
+     "size": 88
+    },
+    {
+     "name": "fn_800307F0",
+     "addr": "800307F0",
+     "size": 60
+    },
+    {
+     "name": "fn_800308A4",
+     "addr": "800308A4",
+     "size": 68
+    },
+    {
+     "name": "fn_800308E8",
+     "addr": "800308E8",
+     "size": 88
+    },
+    {
+     "name": "fn_80030940",
+     "addr": "80030940",
+     "size": 60
+    },
+    {
+     "name": "fn_800309F4",
+     "addr": "800309F4",
+     "size": 76
+    },
+    {
+     "name": "fn_80030A40",
+     "addr": "80030A40",
+     "size": 88
+    },
+    {
+     "name": "fn_80030B6C",
+     "addr": "80030B6C",
+     "size": 92
+    },
+    {
+     "name": "fn_80030BC8",
+     "addr": "80030BC8",
+     "size": 88
+    },
+    {
+     "name": "fn_80030EF4",
+     "addr": "80030EF4",
+     "size": 52
+    },
+    {
+     "name": "fn_80031004",
+     "addr": "80031004",
+     "size": 88
+    },
+    {
+     "name": "fn_8003174C",
+     "addr": "8003174C",
+     "size": 84
+    }
+   ]
+  },
+  {
    "path": "src/game/small_8009.cpp",
    "functions": [
     {
@@ -4649,6 +4799,111 @@
      "name": "fn_8009215C",
      "addr": "8009215C",
      "size": 84
+    }
+   ]
+  },
+  {
+   "path": "src/game/small_800C.cpp",
+   "functions": [
+    {
+     "name": "fn_800C0B54",
+     "addr": "800C0B54",
+     "size": 80
+    },
+    {
+     "name": "fn_800C11A4",
+     "addr": "800C11A4",
+     "size": 76
+    },
+    {
+     "name": "fn_800C13D8",
+     "addr": "800C13D8",
+     "size": 84
+    },
+    {
+     "name": "fn_800C142C",
+     "addr": "800C142C",
+     "size": 96
+    },
+    {
+     "name": "fn_800C2720",
+     "addr": "800C2720",
+     "size": 64
+    },
+    {
+     "name": "fn_800C407C",
+     "addr": "800C407C",
+     "size": 68
+    },
+    {
+     "name": "fn_800C40C0",
+     "addr": "800C40C0",
+     "size": 88
+    },
+    {
+     "name": "fn_800C42B8",
+     "addr": "800C42B8",
+     "size": 68
+    },
+    {
+     "name": "fn_800C444C",
+     "addr": "800C444C",
+     "size": 52
+    },
+    {
+     "name": "fn_800C44C0",
+     "addr": "800C44C0",
+     "size": 80
+    },
+    {
+     "name": "fn_800C4530",
+     "addr": "800C4530",
+     "size": 60
+    },
+    {
+     "name": "fn_800C456C",
+     "addr": "800C456C",
+     "size": 88
+    },
+    {
+     "name": "fn_800C52B4",
+     "addr": "800C52B4",
+     "size": 60
+    },
+    {
+     "name": "fn_800C52F0",
+     "addr": "800C52F0",
+     "size": 88
+    },
+    {
+     "name": "fn_800C5348",
+     "addr": "800C5348",
+     "size": 52
+    },
+    {
+     "name": "fn_800C537C",
+     "addr": "800C537C",
+     "size": 52
+    },
+    {
+     "name": "fn_800C5458",
+     "addr": "800C5458",
+     "size": 72
+    },
+    {
+     "name": "fn_800C5E90",
+     "addr": "800C5E90",
+     "size": 84
+    },
+    {
+     "name": "fn_800C5EE4",
+     "addr": "800C5EE4",
+     "size": 96
+    },
+    {
+     "name": "fn_800C5F84",
+     "addr": "800C5F84",
+     "size": 68
     }
    ]
   },

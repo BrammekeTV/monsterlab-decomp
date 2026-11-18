@@ -5,8 +5,14 @@
 #include "types.h"
 #include "game/part.h"
 
+struct TargetList5 { s32 limbs[5]; s32 count; };
+
 extern "C" {
-int SysSprintf(char* buf, const char* fmt, ...);   // 0x80142EFC
+int   SysSprintf(char* buf, const char* fmt, ...);        // 0x80142EFC
+u8**  FighterGetSlot(u8* f, s32 i);                       // 0x8020E794
+void  TargetListInit(void* t);                            // 0x802161DC
+void  TargetListDecode(void* t, const u32* mask, s32 side);   // 0x80216240
+void* TargetListDestroy(void* t, s32 del);                // 0x80216200
 }
 
 // ---------------------------------------------------------------- name tables
@@ -160,6 +166,105 @@ void ReactionBuild(char* out, s32 limb, void** sets, const char* reaction) {
 // The "dodgeback" animation name of the torso for each of the 5 part sets.
 void ReactionBuildDodgeBack(char* out, void** sets) {
     for (s32 i = 0; i < 5; i++, out += 0x100) ReactionBuildOne(out, 4, sets[i], "dodgeback");
+}
+
+// 0x8020E714
+// Whether the fighter's main part has its own head animation set (not "sharedhead", set 8).
+BOOL FighterHasOwnHeadAnims(void** fighter) {
+    s32** set = (s32**)fighter[0];
+    if (set == NULL) return FALSE;
+    s32* part = set[0];
+    if (part == NULL) return FALSE;
+    PartDef def;
+    PartDbGetDef(&def, gGameDb, *part);
+    return def.unk34 != 8;
+}
+
+// 0x80212E28
+// A limb slot is out of action (hp <= 0); a missing slot counts as out of action.
+BOOL fn_80212E28(u8** slot) {
+    if (slot == NULL) return TRUE;
+    return **(s32**)slot <= 0;
+}
+
+// 0x80212E50
+// A limb slot is at or below half health (twice hp <= max hp); a missing slot counts too.
+BOOL fn_80212E50(u8** slot) {
+    if (slot == NULL) return TRUE;
+    s32* st = *(s32**)slot;
+    return st[0] * 2 <= st[1];
+}
+
+// 0x802156B0
+void ReactionBuildNamed(char* out, s32 limb, void* fighter, s32 reaction) {
+    ReactionBuildOne(out, limb, fighter, ReactionName(reaction));
+}
+
+// 0x8021570C
+// Same, for the reaction id of an action (row of the 0x14-byte table at db+0x430, `action`).
+void fn_8021570C(char* out, s32 limb, void* fighter, s32 action) {
+    PartAction a = (*(PartAction**)(gGameDb->data + 0x430))[action];
+    ReactionBuildOne(out, limb, fighter, ReactionName(a.type));
+}
+
+// 0x802157A0
+void ReactionBuildForAction(char* out, s32 limb, void** fighter, s32 action) {
+    PartAction a = (*(PartAction**)(gGameDb->data + 0x430))[action];
+    const char* name = ReactionName(a.type);
+    for (s32 i = 0; i < 5; i++, out += 0x100) ReactionBuildOne(out, limb, fighter[i], name);
+}
+
+// 0x80215848
+// Animation names for being hit by `round` (action at +0x2C, attacker limb at +0x34): the limb
+// that was hit (the torso if it can't be told) plays "injureheavy" if it is at or below half
+// health, else "injurelight".
+void fn_80215848(char* out, u8* round, void** fighter) {
+    PartAction a = (*(PartAction**)(gGameDb->data + 0x430))[*(s32*)(round + 0x2C)];
+    TargetList5 t;
+    TargetListInit(&t);
+    u32 mask = a.unk08;
+    TargetListDecode(&t, &mask, *(s32*)(round + 0x34));
+    s32 limb = t.limbs[0];
+    if (limb <= -1 || limb >= 5 || FighterHasOwnHeadAnims(fighter) || fighter == NULL ||
+        fn_80212E28(FighterGetSlot((u8*)fighter, limb))) {
+        limb = 4;
+    }
+    const char* name = fn_80212E50(FighterGetSlot((u8*)fighter, limb)) ? "injureheavy" : "injurelight";
+    for (s32 i = 0; i < 5; i++, out += 0x100) ReactionBuildOne(out, limb, fighter[i], name);
+    TargetListDestroy(&t, -1);
+}
+
+// 0x802159C4
+// Idle animation after a hit: "idlehurt" if the legs are broken, "idletired" if the torso is at
+// half health or less, else "idlereg"; played on the legs.
+void ReactionBuildRecover(char* out, void** fighter) {
+    const char* name = "idlereg";
+    u8** legs = FighterGetSlot((u8*)fighter, 1);
+    if (legs != NULL && fn_80212E28(legs)) {
+        name = "idlehurt";
+    } else {
+        u8** torso = FighterGetSlot((u8*)fighter, 4);
+        if (torso != NULL && fn_80212E50(torso)) name = "idletired";
+    }
+    for (s32 i = 0; i < 5; i++, out += 0x100) ReactionBuildOne(out, 1, fighter[i], name);
+}
+
+// 0x80215AE8
+// Dodge animation names: "dodgeback" if the main part has its own head animations; otherwise
+// "dodgejump" when the action targets the legs, else "dodgeduck". Played on the torso.
+void fn_80215AE8(char* out, u8* round, void** fighter) {
+    if (FighterHasOwnHeadAnims(fighter)) {
+        for (s32 i = 0; i < 5; i++, out += 0x100) ReactionBuildOne(out, 4, fighter[i], "dodgeback");
+        return;
+    }
+    PartAction a = (*(PartAction**)(gGameDb->data + 0x430))[*(s32*)(round + 0x2C)];
+    TargetList5 t;
+    TargetListInit(&t);
+    u32 mask = a.unk08;
+    TargetListDecode(&t, &mask, *(s32*)(round + 0x34));
+    const char* name = (t.limbs[0] == 1) ? "dodgejump" : "dodgeduck";
+    for (s32 i = 0; i < 5; i++, out += 0x100) ReactionBuildOne(out, 4, fighter[i], name);
+    TargetListDestroy(&t, -1);
 }
 
 }  // extern "C"
