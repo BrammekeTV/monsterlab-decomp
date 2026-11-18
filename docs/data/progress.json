@@ -1,15 +1,15 @@
 {
  "game_id": "RM7P4F",
- "generated": "2026-11-18T21:30:58+00:00",
- "commit": "950e517",
- "commit_date": "2026-11-18T22:24:56+01:00",
+ "generated": "2026-11-18T21:36:18+00:00",
+ "commit": "5338070",
+ "commit_date": "2026-11-18T22:31:08+01:00",
  "game": {
   "functions": 8548,
   "bytes": 2265988,
   "named": 2748,
   "named_bytes": 616800,
-  "decompiled": 4490,
-  "decompiled_bytes": 483688
+  "decompiled": 4536,
+  "decompiled_bytes": 495948
  },
  "library": {
   "functions": 4039,
@@ -24,8 +24,8 @@
   "bytes": 3404928,
   "named": 3211,
   "named_bytes": 721548,
-  "decompiled": 4491,
-  "decompiled_bytes": 483808
+  "decompiled": 4537,
+  "decompiled_bytes": 496068
  },
  "game_range": [
   "80006B40",
@@ -229,11 +229,11 @@
    0.125
   ],
   [
-   0.746,
+   1.0,
    0.725
   ],
   [
-   0.081,
+   0.114,
    0.312
   ],
   [
@@ -465,7 +465,7 @@
    0.97
   ],
   [
-   0.545,
+   0.798,
    0.957
   ],
   [
@@ -525,11 +525,11 @@
    0.801
   ],
   [
-   0.648,
+   0.79,
    1.0
   ],
   [
-   0.8,
+   0.857,
    0.955
   ],
   [
@@ -761,7 +761,7 @@
    0.543
   ],
   [
-   0.497,
+   0.771,
    0.968
   ],
   [
@@ -821,11 +821,11 @@
    0.0
   ],
   [
-   0.435,
+   0.705,
    0.19
   ],
   [
-   0.224,
+   0.324,
    0.094
   ],
   [
@@ -1248,6 +1248,61 @@
    ]
   },
   {
+   "path": "src/engine/draft_8019c.cpp",
+   "functions": [
+    {
+     "name": "UIText_SetString_Int",
+     "addr": "801911C8",
+     "size": 204
+    },
+    {
+     "name": "UIText_SetString_Float",
+     "addr": "80191294",
+     "size": 220
+    },
+    {
+     "name": "UIText_ForceTypeout",
+     "addr": "80191370",
+     "size": 236
+    },
+    {
+     "name": "UIText_IsTypeoutDone",
+     "addr": "8019145C",
+     "size": 264
+    },
+    {
+     "name": "UIText_IsOnLastPage",
+     "addr": "80191564",
+     "size": 200
+    },
+    {
+     "name": "UIText_SetWrapLength",
+     "addr": "8019162C",
+     "size": 204
+    },
+    {
+     "name": "UIText_GetRightXPos",
+     "addr": "801916F8",
+     "size": 380
+    },
+    {
+     "name": "UIEntity_SetEntity",
+     "addr": "80191874",
+     "size": 244
+    },
+    {
+     "name": "UIEntity_SetOffsetBone",
+     "addr": "80191968",
+     "size": 244
+    },
+    {
+     "name": "UIParticleEffect_SetActive",
+     "addr": "80191A6C",
+     "size": 252
+    }
+   ]
+  },
+  {
    "path": "src/engine/draft_801A.cpp",
    "functions": [
     {
@@ -1349,6 +1404,61 @@
      "name": "fn_801B1778",
      "addr": "801B1778",
      "size": 200
+    }
+   ]
+  },
+  {
+   "path": "src/engine/draft_801Bc.cpp",
+   "functions": [
+    {
+     "name": "PhysicsBodyGet",
+     "addr": "801B1840",
+     "size": 164
+    },
+    {
+     "name": "fn_801B18E4",
+     "addr": "801B18E4",
+     "size": 164
+    },
+    {
+     "name": "fn_801B1DD4",
+     "addr": "801B1DD4",
+     "size": 616
+    },
+    {
+     "name": "fn_801B25C4",
+     "addr": "801B25C4",
+     "size": 560
+    },
+    {
+     "name": "fn_801B27F4",
+     "addr": "801B27F4",
+     "size": 208
+    },
+    {
+     "name": "fn_801B28C4",
+     "addr": "801B28C4",
+     "size": 236
+    },
+    {
+     "name": "fn_801B29B0",
+     "addr": "801B29B0",
+     "size": 276
+    },
+    {
+     "name": "StartRumble",
+     "addr": "801B2AC4",
+     "size": 208
+    },
+    {
+     "name": "TimedRumble",
+     "addr": "801B2C08",
+     "size": 220
+    },
+    {
+     "name": "PauseRumble",
+     "addr": "801B2CE4",
+     "size": 180
     }
    ]
   },
@@ -4338,6 +4448,46 @@
    ]
   },
   {
+   "path": "src/game/draft_8007c.cpp",
+   "functions": [
+    {
+     "name": "fn_80070FD8",
+     "addr": "80070FD8",
+     "size": 732
+    },
+    {
+     "name": "fn_800712BC",
+     "addr": "800712BC",
+     "size": 764
+    },
+    {
+     "name": "fn_800715B8",
+     "addr": "800715B8",
+     "size": 280
+    },
+    {
+     "name": "fn_800716D0",
+     "addr": "800716D0",
+     "size": 360
+    },
+    {
+     "name": "fn_80071838",
+     "addr": "80071838",
+     "size": 360
+    },
+    {
+     "name": "SetFinalExperimentScore",
+     "addr": "800719A0",
+     "size": 252
+    },
+    {
+     "name": "fn_80073A7C",
+     "addr": "80073A7C",
+     "size": 236
+    }
+   ]
+  },
+  {
    "path": "src/game/draft_8008.cpp",
    "functions": [
     {
@@ -4663,6 +4813,56 @@
    ]
   },
   {
+   "path": "src/game/draft_800Fc.cpp",
+   "functions": [
+    {
+     "name": "GotoCastleLocation",
+     "addr": "800F0FBC",
+     "size": 136
+    },
+    {
+     "name": "SetEntityMoveInNIS",
+     "addr": "800F10DC",
+     "size": 264
+    },
+    {
+     "name": "SetEntityMovementAI",
+     "addr": "800F1204",
+     "size": 384
+    },
+    {
+     "name": "GetPlayerDistanceToJunction",
+     "addr": "800F139C",
+     "size": 360
+    },
+    {
+     "name": "TeleportPlayerTo",
+     "addr": "800F1504",
+     "size": 268
+    },
+    {
+     "name": "TeleportPlayerToJunction",
+     "addr": "800F1610",
+     "size": 360
+    },
+    {
+     "name": "CheckNoGameEventsActive",
+     "addr": "800F17B4",
+     "size": 184
+    },
+    {
+     "name": "MovePlayerDirection",
+     "addr": "800F18BC",
+     "size": 144
+    },
+    {
+     "name": "ActivateEntity",
+     "addr": "800F1AA4",
+     "size": 136
+    }
+   ]
+  },
+  {
    "path": "src/game/draft_8011b.cpp",
    "functions": [
     {
@@ -4714,6 +4914,61 @@
      "name": "HasSecondaryForRecipe",
      "addr": "80111E28",
      "size": 708
+    }
+   ]
+  },
+  {
+   "path": "src/game/draft_8011c.cpp",
+   "functions": [
+    {
+     "name": "HasValidKeyIngredient",
+     "addr": "801120EC",
+     "size": 140
+    },
+    {
+     "name": "SelectKeyIngredient",
+     "addr": "80112178",
+     "size": 132
+    },
+    {
+     "name": "HasValidSecondaryIngredient",
+     "addr": "801121FC",
+     "size": 140
+    },
+    {
+     "name": "SelectSecondaryIngredient",
+     "addr": "80112288",
+     "size": 132
+    },
+    {
+     "name": "UpdateSelectedIngredients",
+     "addr": "8011230C",
+     "size": 144
+    },
+    {
+     "name": "UpdateSelectedRecipe",
+     "addr": "8011239C",
+     "size": 160
+    },
+    {
+     "name": "GetActivePartID",
+     "addr": "80112A3C",
+     "size": 420
+    },
+    {
+     "name": "GetCurrentInventoryPart",
+     "addr": "80112BE0",
+     "size": 228
+    },
+    {
+     "name": "fn_80112FFC",
+     "addr": "80112FFC",
+     "size": 132
+    },
+    {
+     "name": "Creatures_IncCreature",
+     "addr": "80113238",
+     "size": 132
     }
    ]
   },

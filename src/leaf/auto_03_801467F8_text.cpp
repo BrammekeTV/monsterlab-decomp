@@ -94,7 +94,6 @@ extern "C" void fn_80147988(s32 a3) {
 
 // 0x80148308
 extern "C" void fn_80148308(void) {
-    // tail-call arguments inferred from the registers set before the call
     fn_80142898((u8*)(uintptr_t)&fn_80148228);
 }
 

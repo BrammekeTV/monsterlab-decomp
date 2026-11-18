@@ -69,6 +69,11 @@
  "changelog": [
   {
    "date": "2026-11-18",
+   "time": "22:36",
+   "text": "Fifth draft-pipeline round: 46 more functions (UI text, entity and particle setters in 0x8019, physics body lookup and rumble in 0x801B, ingredient and recipe selection in 0x8011, junction teleport and movement callbacks in 0x800F, experiment HUD and scoring in 0x8007), rewritten and checked against the asm by Sonnet helpers."
+  },
+  {
+   "date": "2026-11-18",
    "time": "22:31",
    "text": "Fourth draft-pipeline round: 47 more functions (lab-book science and recipe queries in 0x8011, UI animation rate and text helpers in 0x8019, shape-collision tests in 0x801B, experiment sound table in 0x8007, remote input and camera helpers in 0x8002), rewritten and checked against the asm by Sonnet helpers."
   },
