@@ -59,15 +59,19 @@ typedef struct PartInstance {
     s32 defIndex;
     s32 defect;
     s32 enhancement;
-    u8 pad0C[4];
+    s32 uid;
     s8 quality;
     u8 tier;
-    u8 tierMadness[4];
-    u8 pad16[6];
+    u8 tierScale[4];
+    u8 pad16[2];
+    void *vtable;
     s8 madnessBase;
-    u8 pad1D[7];
+    s8 unk1D;
+    u8 unk1E, unk1F;
+    s32 unk20;
     s32 unk24;
     s32 health;
+    s32 unk2C;
 } PartInstance;
 
 typedef struct GameDbData {
@@ -152,7 +156,8 @@ void PartDbGetDef(PartDef *out, GameDb *db, s32 index);
 s32 TextIdFromHash(u32 hash);
 u8 PartGetTier(PartInstance *p);
 s8 PartGetQuality(PartInstance *p);
-s32 PartGetHealth(PartInstance *p);
+s32 PartGetMaxHealth(PartInstance *p);
+s16 PartGetStatModifier(PartInstance *p, s32 stat);
 const char *GetText(s32 id);
 u32 StringHash(const char *s);
 void SysSprintf(char *buf, const char *fmt, ...);

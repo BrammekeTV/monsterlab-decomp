@@ -46,20 +46,24 @@ struct PartDef {
     u8  unk4C[4];               // 0x4C
 };
 
-// A part the player owns (inventory entry). Partial.
+// A part the player owns (inventory entry; class "XInventoryPart", 0x30 bytes).
 struct PartInstance {
-    s32 defIndex;               // 0x00: index into the PartDef table
+    s32 defIndex;               // 0x00: index into the PartDef table, -1 = empty
     s32 defect;                 // 0x04: defect id, -1 = none
     s32 enhancement;            // 0x08: enhancement id, -1 = none
-    u8  pad0C[4];
-    s8  quality;                // 0x10
+    s32 uid;                    // 0x0C: unique id from a global counter
+    s8  quality;                // 0x10: 0..100
     u8  tier;                   // 0x11: 1..4
-    u8  tierMadness[PART_TIERS];// 0x12: madness percentage per tier
-    u8  pad16[6];
+    u8  tierScale[PART_TIERS];  // 0x12: per-tier percentage (health, power and madness scale)
+    u8  pad16[2];
+    u32 vtable;                 // 0x18: vtable (0x80389120: rtti, 0, Clear)
     s8  madnessBase;            // 0x1C
-    u8  pad1D[7];
+    s8  unk1D;                  // 0x1D
+    u8  unk1E, unk1F;           // 0x1E
+    s32 unk20;                  // 0x20
     s32 unk24;                  // 0x24
     s32 health;                 // 0x28
+    s32 unk2C;                  // 0x2C
 };
 
 // Game database (global_binary.sir header slot 0xDC8).
@@ -76,5 +80,5 @@ s32  TextIdFromHash(u32 hash);                            // 0x80120D34: -1 if u
 u8   PartGetTier(const PartInstance* p);                  // 0x8021EF58
 s8   PartGetQuality(const PartInstance* p);               // 0x8021EF60
 s8   PartGetMadness(const PartInstance* p);               // 0x8021EF80
-s32  PartGetHealth(PartInstance* p);                      // 0x8021F168
+s32  PartGetMaxHealth(PartInstance* p);                   // 0x8021F168: also clamps health
 }

@@ -1,15 +1,15 @@
 {
  "game_id": "RM7P4F",
- "generated": "2026-11-18T00:12:12+00:00",
- "commit": "f81d409",
- "commit_date": "2026-11-18T01:06:37+01:00",
+ "generated": "2026-11-18T00:25:53+00:00",
+ "commit": "bc2e6b3",
+ "commit_date": "2026-11-18T01:12:14+01:00",
  "game": {
   "functions": 8548,
   "bytes": 2265988,
-  "named": 2534,
-  "named_bytes": 548600,
-  "decompiled": 1957,
-  "decompiled_bytes": 217712
+  "named": 2552,
+  "named_bytes": 552720,
+  "decompiled": 1981,
+  "decompiled_bytes": 222924
  },
  "library": {
   "functions": 4039,
@@ -22,10 +22,10 @@
  "all": {
   "functions": 12587,
   "bytes": 3404928,
-  "named": 2992,
-  "named_bytes": 652744,
-  "decompiled": 1957,
-  "decompiled_bytes": 217712
+  "named": 3010,
+  "named_bytes": 656864,
+  "decompiled": 1981,
+  "decompiled_bytes": 222924
  },
  "game_range": [
   "80006B40",
@@ -1014,19 +1014,19 @@
   ],
   [
    0.263,
-   0.279
+   0.301
   ],
   [
    0.0,
    0.276
   ],
   [
-   0.005,
-   0.529
+   0.416,
+   0.834
   ],
   [
-   0.041,
-   0.057
+   0.188,
+   0.167
   ],
   [
    0.011,
@@ -2704,6 +2704,131 @@
      "name": "MonsterGenerateOpponent",
      "addr": "8021A1D0",
      "size": 2740
+    }
+   ]
+  },
+  {
+   "path": "src/game/part_instance.cpp",
+   "functions": [
+    {
+     "name": "MonsterRateHealth",
+     "addr": "8021CB98",
+     "size": 172
+    },
+    {
+     "name": "MonsterIsFullyHealed",
+     "addr": "8021CC44",
+     "size": 124
+    },
+    {
+     "name": "MonsterRateAttack",
+     "addr": "8021CCC0",
+     "size": 256
+    },
+    {
+     "name": "MonsterRateDefence",
+     "addr": "8021CDC0",
+     "size": 256
+    },
+    {
+     "name": "MonsterRateEnergy",
+     "addr": "8021CEC0",
+     "size": 128
+    },
+    {
+     "name": "MonsterRateMadness",
+     "addr": "8021CF40",
+     "size": 236
+    },
+    {
+     "name": "MonsterPartsAllCollected",
+     "addr": "8021D02C",
+     "size": 140
+    },
+    {
+     "name": "PlayerRankFraction",
+     "addr": "8021D0B8",
+     "size": 200
+    },
+    {
+     "name": "PartRatingFromFraction",
+     "addr": "8021D180",
+     "size": 400
+    },
+    {
+     "name": "PartInit",
+     "addr": "8021D320",
+     "size": 84
+    },
+    {
+     "name": "PartDestroy",
+     "addr": "8021D374",
+     "size": 64
+    },
+    {
+     "name": "PartReset",
+     "addr": "8021D3B4",
+     "size": 84
+    },
+    {
+     "name": "PartClear",
+     "addr": "8021D408",
+     "size": 52
+    },
+    {
+     "name": "PartSetDef",
+     "addr": "8021D43C",
+     "size": 716
+    },
+    {
+     "name": "PartSetFromDef",
+     "addr": "8021D708",
+     "size": 484
+    },
+    {
+     "name": "PartSetHealth",
+     "addr": "8021D8EC",
+     "size": 340
+    },
+    {
+     "name": "PartSetQuality",
+     "addr": "8021DA40",
+     "size": 40
+    },
+    {
+     "name": "PartSetTier",
+     "addr": "8021DA68",
+     "size": 24
+    },
+    {
+     "name": "PartGetEnergy",
+     "addr": "8021ECA8",
+     "size": 232
+    },
+    {
+     "name": "PartGetBattleEnergy",
+     "addr": "8021ED90",
+     "size": 260
+    },
+    {
+     "name": "PartCopy",
+     "addr": "8021EE9C",
+     "size": 188
+    },
+    {
+     "name": "fn_8021EFB0",
+     "addr": "8021EFB0",
+     "size": 56
+    },
+    {
+     "name": "PartGetStatModifier",
+     "addr": "8021EFF0",
+     "size": 376
+    },
+    {
+     "name": "PartGetMaxHealth",
+     "addr": "8021F168",
+     "size": 300
     }
    ]
   },
@@ -11846,7 +11971,7 @@
      "size": 8
     },
     {
-     "name": "fn_8021EF68",
+     "name": "PartGetCurrentHealth",
      "addr": "8021EF68",
      "size": 8
     },

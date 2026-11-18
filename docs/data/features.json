@@ -69,6 +69,11 @@
  "changelog": [
   {
    "date": "2026-11-18",
+   "time": "01:25",
+   "text": "Parts pipeline, part 1: the part instance class (XInventoryPart): constructor, reset, copy, setting a part from its definition, quality/tier setters, current and maximum health (base health scaled by quality, tier and enhancement/defect), torso energy in the lab and in battle, the five stat modifiers of enhancements and defects, and the monster ratings shown in the lab (health, attack, defence, energy, madness) with the tuned rating curve."
+  },
+  {
+   "date": "2026-11-18",
    "time": "01:12",
    "text": "Decompiled opponent generation: a random monster is built from an opponent template and re-rolled until its total part power (each part's base power times its tier multiplier) fits a window around the player's rank, then it gets defects, enhancements and madness per limb. Also the debris that scatters over every collision shape of a broken object (more pieces for bigger shapes, up to 20)."
   },

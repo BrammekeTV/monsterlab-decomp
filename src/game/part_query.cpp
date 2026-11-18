@@ -69,7 +69,7 @@ extern "C" s8 PartGetQuality(const PartInstance* p) {
 // 0x8021EF80
 // Madness the part adds to a monster: base madness scaled by the current tier's percentage.
 extern "C" s8 PartGetMadness(const PartInstance* p) {
-    u32 scaled = (u32)((s32)p->madnessBase * (s32)p->tierMadness[p->tier - 1]);
+    u32 scaled = (u32)((s32)p->madnessBase * (s32)p->tierScale[p->tier - 1]);
     return (s8)(u8)(scaled / 100);
 }
 
@@ -137,7 +137,7 @@ void* PartQuery_GetEnhancementTexture(void) {
 // 0x800F9B2C
 s32 PartQuery_GetHealth(void) {
     if (sQueryPart == NULL) return 0;
-    return PartGetHealth(sQueryPart);
+    return PartGetMaxHealth(sQueryPart);
 }
 
 // 0x800FA350
