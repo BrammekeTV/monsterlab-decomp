@@ -734,3 +734,11 @@ fn_80216360 EffectTick
 fn_802164A8 EffectExpire
 fn_8021640C EffectApply
 fn_80214C98 LimbTickEffects
+fn_802160B8 DamageRecordDestroy
+fn_80216114 EffectRecordInit
+fn_80216180 EffectRecordDestroy
+fn_80216370 EffectResetDuration
+fn_80213C68 ValueBoxCreate
+fn_80213CE0 ValueBoxDestroy
+fn_802152CC RoundNoteEffectEnd
+lbl_805FA098 gDefaultActionDisplay

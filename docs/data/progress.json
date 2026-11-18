@@ -1,15 +1,15 @@
 {
  "game_id": "RM7P4F",
- "generated": "2026-11-18T11:24:43+00:00",
- "commit": "59381b2",
- "commit_date": "2026-11-18T12:20:45+01:00",
+ "generated": "2026-11-18T11:27:05+00:00",
+ "commit": "12b13e7",
+ "commit_date": "2026-11-18T12:24:44+01:00",
  "game": {
   "functions": 8548,
   "bytes": 2265988,
-  "named": 2673,
-  "named_bytes": 584684,
-  "decompiled": 2172,
-  "decompiled_bytes": 257300
+  "named": 2680,
+  "named_bytes": 585364,
+  "decompiled": 2181,
+  "decompiled_bytes": 258404
  },
  "library": {
   "functions": 4039,
@@ -22,10 +22,10 @@
  "all": {
   "functions": 12587,
   "bytes": 3404928,
-  "named": 3135,
-  "named_bytes": 689312,
-  "decompiled": 2172,
-  "decompiled_bytes": 257300
+  "named": 3142,
+  "named_bytes": 689992,
+  "decompiled": 2181,
+  "decompiled_bytes": 258404
  },
  "game_range": [
   "80006B40",
@@ -1002,15 +1002,15 @@
   ],
   [
    0.175,
-   0.345
+   0.372
   ],
   [
    0.234,
-   0.374
+   0.377
   ],
   [
-   0.061,
-   0.158
+   0.187,
+   0.209
   ],
   [
    0.687,
@@ -1879,6 +1879,51 @@
      "name": "PartMatchupText",
      "addr": "80215F68",
      "size": 244
+    },
+    {
+     "name": "DamageRecordDestroy",
+     "addr": "802160B8",
+     "size": 92
+    },
+    {
+     "name": "EffectRecordInit",
+     "addr": "80216114",
+     "size": 108
+    },
+    {
+     "name": "EffectRecordDestroy",
+     "addr": "80216180",
+     "size": 92
+    },
+    {
+     "name": "EffectDestroy",
+     "addr": "80216318",
+     "size": 72
+    },
+    {
+     "name": "EffectResetDuration",
+     "addr": "80216370",
+     "size": 156
+    },
+    {
+     "name": "EffectApply",
+     "addr": "8021640C",
+     "size": 156
+    },
+    {
+     "name": "EffectExpire",
+     "addr": "802164A8",
+     "size": 244
+    },
+    {
+     "name": "LimbEffectDestroy",
+     "addr": "802165A0",
+     "size": 72
+    },
+    {
+     "name": "PartDbGetActionDisplay",
+     "addr": "802165E8",
+     "size": 112
     }
    ]
   },
@@ -12861,7 +12906,7 @@
      "size": 24
     },
     {
-     "name": "fn_802152CC",
+     "name": "RoundNoteEffectEnd",
      "addr": "802152CC",
      "size": 24
     },

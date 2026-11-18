@@ -286,3 +286,109 @@ void FighterTickEffects(u8* stats) {
 }
 
 }  // extern "C"
+
+// ---------------------------------------------------------------- effects and records
+
+extern "C" {
+void  operator_delete(void* p);                                   // 0x801D4980
+void* operator_new(u32 size);                                     // 0x801D40E0
+void* ValueBoxCreate(void* mem, s32 kind, s32 v);                 // 0x80213C68
+void  ValueBoxDestroy(void* box, s32 del);                        // 0x80213CE0
+void  RoundNoteEffectEnd(void* round, s32 side, s32 limb, s32 id);   // 0x802152CC
+}
+extern s32 gDefaultActionDisplay;   // 0x805FA098
+
+// Effect: +0 owner stats, +4 turns left, +8 id. Ids 13 and 14 have tuned durations.
+static inline s32 EffectDuration(s32 id) {
+    const u8* t = *(u8**)(gGameDb->data + 0x99D0);
+    return (s32)*(const f32*)(t + (id == 0xE ? 0x214 : 0x204)) + 1;
+}
+
+extern "C" {
+
+// 0x802160B8
+void* DamageRecordDestroy(u8* r, s32 del) {
+    if (r != NULL) {
+        ValueBoxDestroy(*(void**)(r + 4), 1);
+        if (del > 0) operator_delete(r);
+    }
+    return r;
+}
+
+// 0x80216114
+// A 0x18-byte record: flag, four ids (-1) and a value box.
+u8* EffectRecordInit(u8* r) {
+    r[0] = 0;
+    for (s32 i = 0; i < 4; i++) *(s32*)(r + 4 + i * 4) = -1;
+    *(void**)(r + 0x14) = NULL;
+    void* box = operator_new(8);
+    if (box != NULL) box = ValueBoxCreate(box, 0xB, 0);
+    *(void**)(r + 0x14) = box;
+    return r;
+}
+
+// 0x80216180
+void* EffectRecordDestroy(u8* r, s32 del) {
+    if (r != NULL) {
+        ValueBoxDestroy(*(void**)(r + 0x14), 1);
+        if (del > 0) operator_delete(r);
+    }
+    return r;
+}
+
+// 0x80216318
+void EffectDestroy(u8* e, s32 del) {
+    if (e != NULL) {
+        *(u32*)e = 0;
+        if (del > 0) operator_delete(e);
+    }
+}
+
+// 0x802165A0
+void LimbEffectDestroy(u8* e, s32 del) {
+    if (e != NULL) {
+        *(u32*)e = 0;
+        if (del > 0) operator_delete(e);
+    }
+}
+
+// 0x80216370
+void EffectResetDuration(u8* e) {
+    s32 id = *(s32*)(e + 8);
+    if (id == 0xD || id == 0xE) *(s32*)(e + 4) = EffectDuration(id);
+}
+
+// 0x8021640C
+void EffectApply(u8* e) {
+    s32 id = *(s32*)(e + 8);
+    if (id == 0xD || id == 0xE) *(s32*)(e + 4) = EffectDuration(id);
+}
+
+// 0x802164A8
+// Tell the round which limb (and side) lost the effect.
+void EffectExpire(u8* e) {
+    u8* stats = *(u8**)e;
+    s32 side = ((u8**)(gBattle + 0xA00))[0] != FighterFromStats(stats) ? 1 : 0;
+    s32 limb = -1;
+    for (s32 i = 0; i < 5 && limb == -1; i++) {
+        u8** field = FighterStatsGetPart(stats, i);
+        if (field == NULL) continue;
+        u8** slots = (u8**)((u8*)field + 8);
+        if (slots == NULL) continue;
+        if (slots[0] == e || slots[1] == e || slots[2] == e) limb = i;
+    }
+    if (limb != -1) RoundNoteEffectEnd(*(void**)(gBattle + 0xA0C), side, limb, *(s32*)(e + 8));
+}
+
+}  // extern "C"
+
+// 0x802165E8
+// Which stat rows the combat HUD shows for an action kind (table at db + 0x2148).
+struct ActionDisplay { u32 key; u8 show[4]; };
+extern "C" ActionDisplay PartDbGetActionDisplay(GameDb* db, u32 key) {
+    const ActionDisplay* t = *(const ActionDisplay**)(db->data + 0x2148);
+    s32 n = *(s32*)(db->data + 0x214C);
+    for (s32 i = 0; i < n; i++)
+        if (t[i].key == key) return t[i];
+    return t[gDefaultActionDisplay];
+}

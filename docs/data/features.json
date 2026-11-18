@@ -69,6 +69,11 @@
  "changelog": [
   {
    "date": "2026-11-18",
+   "time": "12:27",
+   "text": "Decompiled battle effects and records: effect durations (two tuned effect kinds), applying and expiring effects (the round is told which limb lost it), the damage/effect record constructors and destructors, and the table that picks which stat rows the combat HUD shows for an action."
+  },
+  {
+   "date": "2026-11-18",
    "time": "12:24",
    "text": "Decompiled battle setup and status: building each limb's battle status from its part (hp, max hp, madness, quality, enhancement, defect), a fighter's totals and starting energy, resetting a battle to round 1, and the end-of-turn tick of fighter and limb effects (expired effects are removed)."
   },

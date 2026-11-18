@@ -90,7 +90,7 @@ extern "C" void fn_80216304(u8* a3, s32 a4, s32 a5) {
 }
 
 // 0x80216360
-extern "C" void fn_80216360(u8* a3) {
+extern "C" void EffectTick(u8* a3) {
     s32 t0 = *(s32*)(((u8*)(uintptr_t)(a3)) + 4);
     u32 t1 = (u32)(t0) - 1u;
     *(u32*)(((u8*)(uintptr_t)(a3)) + 4) = (u32)((u32)(t1));
