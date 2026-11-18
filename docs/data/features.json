@@ -1,471 +1,476 @@
 {
-  "milestones": [
-    {
-      "title": "Disc extracted",
-      "detail": "main.dol + 2.5 GB of game data pulled from the PAL disc (RM7P4F).",
-      "status": "done"
-    },
-    {
-      "title": "Executable split & analysed",
-      "detail": "decomp-toolkit finds 12,580 functions in 707 objects; game code at 0x80006B40–0x80232AF8.",
-      "status": "done"
-    },
-    {
-      "title": "Tooling",
-      "detail": "Cross-reference, renaming, progress, script-callback, name-hash and .sir decoding tools; this site updates on every push.",
-      "status": "done"
-    },
-    {
-      "title": "Boot path decompiled",
-      "detail": "main(), SDK init, heaps, reset/power handling, crash screen, top-level game loop.",
-      "status": "done"
-    },
-    {
-      "title": "Engine & game systems",
-      "detail": "Engine init/frame/shutdown, game startup, mode state machine and the renderer core (render thread, display lists, frame pacing) done; next: GX state, render targets, scene graph, UI, world, monsters, battles.",
-      "status": "in_progress"
-    },
-    {
-      "title": "PC build compiles",
-      "detail": "CMake + MSVC build on GitHub Actions. All decompiled sources compile; linking waits on the platform layer.",
-      "status": "in_progress"
-    },
-    {
-      "title": "Platform layer",
-      "detail": "Replace the Wii SDK: GX→OpenGL/Vulkan, AX→SDL audio, WPAD→gamepad + mouse pointer, DVD/NAND→files.",
-      "status": "todo"
-    },
-    {
-      "title": "Asset formats",
-      "detail": ".sir containers (PNP0), DSP-ADPCM audio, Bink video, MIDI + wavetable music.",
-      "status": "todo"
-    },
-    {
-      "title": "Boots to title screen",
-      "detail": "First visible frame on Windows.",
-      "status": "todo"
-    },
-    {
-      "title": "1080p & widescreen",
-      "detail": "Render at any resolution (1080p, 1440p, 4K) with internal resolution scaling; native 16:9 using the game's own widescreen support.",
-      "status": "todo"
-    },
-    {
-      "title": "Settings GUI",
-      "detail": "In-game options overlay (F1) + config.ini: resolution, fullscreen, V-sync, FPS cap, render scale, MSAA, texture filtering, audio, controls.",
-      "status": "todo"
-    },
-    {
-      "title": "Mod support",
-      "detail": "Mods folder overriding any game file, plus new content in open formats: monster parts as glTF models, PNG textures and JSON/text stats, with no .sir editing needed.",
-      "status": "todo"
-    },
-    {
-      "title": "Playable",
-      "detail": "Full game playable from start to finish on PC.",
-      "status": "todo"
-    }
-  ],
-  "changelog": [
-    {
-      "date": "2026-11-18",
-      "time": "16:18",
-      "text": "Decompiled the lab experiment generator: it loads the difficulty tuning, then rolls the three candidate experiments (kind, bucket, option, item) so that none repeats the current one, and looks up each one's value."
-    },
-    {
-      "date": "2026-11-18",
-      "time": "16:15",
-      "text": "Decompiled the experiment MSP calculation and the challenge reward table lookup in the lab."
-    },
-    {
-      "date": "2026-11-18",
-      "time": "17:15",
-      "text": "Decompiled 57 more small functions: digging challenge callbacks and lab result display helpers (0x8002), entity constructors, tables and pools (0x8004), and timers, destructors and small state helpers (0x801B). Written by low-cost helper agents and reviewed."
-    },
-    {
-      "date": "2026-11-18",
-      "time": "16:13",
-      "text": "Decompiled the lab's experiment bookkeeping (experiment result grade from part quality and rank, reward list, material reward counting) and a set of game-database table lookups (ability effects and others)."
-    },
-    {
-      "date": "2026-11-18",
-      "time": "16:08",
-      "text": "Decompiled the list of actions a fighter can use this turn (working limbs, energy cost, blocked while an effect is active) and the computer opponent's random action pick, plus the cleanup of fighter and limb status objects."
-    },
-    {
-      "date": "2026-11-18",
-      "time": "16:03",
-      "text": "Decompiled the main fighter reaction picker (hit, dodge, block or idle for the round) and the block animation names, which add a suffix for the kind of block (radioactive, acidic, celestial, explosive, fake)."
-    },
-    {
-      "date": "2026-11-18",
-      "time": "17:01",
-      "text": "Decompiled 59 more small functions: experiment scoring, loading screens, restart and dance-animation helpers (0x8007), entity constructors and small vector helpers (0x800C), and a block of state, vector and destructor helpers (0x8003). Written by low-cost helper agents and reviewed; a few constructor signatures were corrected during review."
-    },
-    {
-      "date": "2026-11-18",
-      "time": "15:59",
-      "text": "Decompiled the hit, idle and dodge animation pickers for fighters: which reaction a limb plays when struck (heavy or light injury depending on its health), the idle animation afterwards (hurt, tired or regular) and the dodge style (back, jump or duck)."
-    },
-    {
-      "date": "2026-11-18",
-      "time": "15:48",
-      "text": "Decompiled the fighter animation-name builders: the strings (limb, body type, attack/dodge/idle reaction, e.g. \"legs_..._uppercut\") that the character system looks animations up by, plus the part model key and the reaction and body-type name tables."
-    },
-    {
-      "date": "2026-11-18",
-      "time": "16:46",
-      "text": "Decompiled 47 small functions in three areas: the robot evolution experiment (intro timers, door states, countdown), exploration script callbacks (script registers, junction and enemy movement, player confusion, inventory part quality/madness), and a block of small destructors, resets and running averages around 0x800E. Written by low-cost helper agents and reviewed."
-    },
-    {
-      "date": "2026-11-18",
-      "time": "15:44",
-      "text": "Decompiled part discovery (first sighting of a part tier gives MSP, rank-ups and the 'parts discovered' badges) and the experiment reward (quest unlock, MSP, new-part discovery notices, and the reward part with its enhancement or random defect)."
-    },
-    {
-      "date": "2026-11-18",
-      "time": "15:05",
-      "text": "Decompiled the two material-reward rolls used by challenge rewards: one picks a material matching a part (or a random one the player has unlocked enough for), the other picks a rarity and level and then a random fitting material, retrying at lower levels."
-    },
-    {
-      "date": "2026-11-18",
-      "time": "14:52",
-      "text": "Decompiled a loot roll that picks a random suitable table row for a part (torso parts and other limbs use different eligibility flags)."
-    },
-    {
-      "date": "2026-11-18",
-      "time": "14:40",
-      "text": "Decompiled the battle's fighter-turn phase (both sides' owners act until they finish, then the choices are recorded) and the speed roll (each fighter rolls 1-49 plus limb bonuses, ties broken by a coin flip, results written to the battle log), plus the lab state reset."
-    },
-    {
-      "date": "2026-11-18",
-      "time": "14:35",
-      "text": "Decompiled the battle object itself: its constructor (default rules plus tuning values from the game database), destructor, clear-between-battles, and the per-frame update that runs the battle phases (intro, choosing, new round, attack playback, outro). Also its random number generator setup, block pools, and the runtime array-destroy helper."
-    },
-    {
-      "date": "2026-11-18",
-      "time": "13:27",
-      "text": "The leaf generator now also writes forwarding wrappers (functions that pass their arguments on to another function, often only when a save is loaded) and small compare-and-return functions (range checks, flag tests, 'is this zero' idioms). About 670 more small functions are now covered automatically."
-    },
-    {
-      "date": "2026-11-18",
-      "time": "12:49",
-      "text": "Decompiled the small battle building blocks: value boxes (the int arrays used for stats and damage), fighter stats setup (two 7-stat boxes, chosen action, side, eight effect slots), empty action choices, and the round-side records with their constructors and destructors."
-    },
-    {
-      "date": "2026-11-18",
-      "time": "12:47",
-      "text": "Decompiled the effect slots: adding an effect to a limb (3 slots) or fighter (8 slots) refreshes it if already present or fills the last free slot, limb effects tick down and expire, on-hit hooks run, and damage is applied to a limb as a list of stat changes."
-    },
-    {
-      "date": "2026-11-18",
-      "time": "12:45",
-      "text": "Decompiled what happens after an attack: damage records are applied to the defender's limbs (counting broken limbs and the best single hit in the player's statistics), on-hit effects of the attacking limb (the disable-limb enhancement hits every damaged limb, the drain enhancement adds its effect once anything was hit), return damage, and the dodge/block counters."
-    },
-    {
-      "date": "2026-11-18",
-      "time": "12:41",
-      "text": "Decompiled how a battle round is decided: the action's target limbs (attacks on broken limbs go to the torso, a blocking defender takes everything on the blocking limb), then a 1-100 to-hit roll adjusted for fleeing, the accuracy enhancement, dodging and the defender's enhancements and defects decides hit, block, dodge or miss, with the 'Roll to hit' line in the battle log."
-    },
-    {
-      "date": "2026-11-18",
-      "time": "12:39",
-      "text": "Decompiled the battle phase machine: choose, start the turn, play the round (start the animation listeners, let the AI react or resolve the attack straight away), wait for the animations, end the round, and the battle-over state."
-    },
-    {
-      "date": "2026-11-18",
-      "time": "12:37",
-      "text": "Decompiled more of the battle round flow: starting a round (both choices stored, the round kind decided, shown on the HUD), taking a side's choice from its AI controller, and the end of the round's animations, where the second-strike enhancement can grant another attack with a tuned chance."
-    },
-    {
-      "date": "2026-11-18",
-      "time": "12:33",
-      "text": "Decompiled the end-of-battle payout: on a win the opponent's loot is rolled (or the online table), two badges reward beating an opponent by breaking only its torso or everything but its torso, MSP is added and the results screen is shown; real losses (not fleeing or time-outs) are counted."
-    },
-    {
-      "date": "2026-11-18",
-      "time": "12:32",
-      "text": "Decompiled the battle-over check (a side loses when its torso breaks or all four other limbs do; fleeing on working legs hands the win over; timed battles end after their round limit) and putting a fighter into a battle, including the opponent's MSP reward from its madness and average quality, 9999 HP tutorial opponents and scaled timed-battle HP."
-    },
-    {
-      "date": "2026-11-18",
-      "time": "12:29",
-      "text": "Decompiled the battle turn loop: the turn passes to the next side that can still act (an action is blocked by two status effects), and when neither can, the round ends: the round counter goes up, the winner is paid after the final round, energy regenerates up to what the torso holds, effects tick down, and limbs with the regeneration enhancement heal by a tuned share of their max HP."
-    },
-    {
-      "date": "2026-11-18",
-      "time": "12:27",
-      "text": "Decompiled battle effects and records: effect durations (two tuned effect kinds), applying and expiring effects (the round is told which limb lost it), the damage/effect record constructors and destructors, and the table that picks which stat rows the combat HUD shows for an action."
-    },
-    {
-      "date": "2026-11-18",
-      "time": "12:24",
-      "text": "Decompiled battle setup and status: building each limb's battle status from its part (hp, max hp, madness, quality, enhancement, defect), a fighter's totals and starting energy, resetting a battle to round 1, and the end-of-turn tick of fighter and limb effects (expired effects are removed)."
-    },
-    {
-      "date": "2026-11-18",
-      "time": "12:20",
-      "text": "Decompiled battle basics: fighter and limb status lookup, status effects on fighters (8) and limbs (3), the discipline triangle (alchemy beats mech, mech beats bio, bio beats alchemy), the battle log's matchup text, cycling to the next part for the same slot, and committing a chosen action (working limb and torso required, energy paid and capped by the torso)."
-    },
-    {
-      "date": "2026-11-18",
-      "time": "12:14",
-      "text": "Decompiled quest and challenge payouts: finishing a quest grants all of its reward records; winning a challenge pays the matching pending reward (for this monster or any), otherwise the minigame score as MSP plus a random reward from the challenge's table. Also setting the rank, MSP and preset monster from a quest, and the best time/score records."
-    },
-    {
-      "date": "2026-11-18",
-      "time": "12:10",
-      "text": "Decompiled reward handling in the save: a reward record can give a part (at a set tier and quality, fully healed), key and secondary ingredients, a part-type discovery and MSP, each with its notice. What I had called experience is the game's MSP (Mad Scientist Points), capped at 99,999,999 and driving the 50 ranks. Also: healing every lab monster on returning to the castle and the pending quest reward list."
-    },
-    {
-      "date": "2026-11-18",
-      "time": "12:06",
-      "text": "Decompiled the save's bit sets: 256 badges (awarding one counts it, posts a notice and grants its XP, which can raise the rank), 128 regions (marked once), two sets of 128 progress flags, which part types have been seen at which tier, and the discovery block copy helpers."
-    },
-    {
-      "date": "2026-11-18",
-      "time": "12:01",
-      "text": "Decompiled quest storage in the save: 47 quest records with 128 flags, a level and an integer each (sub-quests from 21 on also get a scratch block), the active quest, and ending a quest: abandoning clears it, finishing it hands out every reward tied to it, posts the notices and marks it done."
-    },
-    {
-      "date": "2026-11-18",
-      "time": "11:59",
-      "text": "Decompiled 37 more save callbacks: current/previous/castle locations, sub-quests and quest integers (including the two-bit fields), game progress markers and flags, the vertical-slice switch, whether the current monster uses a part or still has a working arm, MSP and rank rewards, plus the save object's constructor and destructor."
-    },
-    {
-      "date": "2026-11-18",
-      "time": "11:56",
-      "text": "Decompiled 48 script callbacks for the player's save: quest flags and levels, badges (what I had been calling achievements are the game's badges), adding and removing monsters, parts and ingredients, the 128 quest items, quest/challenge/experiment/combat rewards, and regions and locations. Each one forwards to the save object."
-    },
-    {
-      "date": "2026-11-18",
-      "time": "11:43",
-      "text": "Parts pipeline, part 6: fitting and removing parts on a monster (keeping its total power up to date), monster names (16 characters, stored offset by 0x20), finding which lab monster a part belongs to, and the part and spec power helpers."
-    },
-    {
-      "date": "2026-11-18",
-      "time": "11:36",
-      "text": "Parts pipeline, part 5: the lab inventory, which holds up to 10 monsters, 100 parts and 105 material counters (capped at 99). Covers allocating and releasing monsters and parts (released objects move to the end of the list to be reused), the material add/take/has checks, the collection achievements (three tiers for kind-0 materials, one per group of 20 for kind 1, one for a full lab), and the monster object itself: reset, constructor and building from preset specs."
-    },
-    {
-      "date": "2026-11-18",
-      "time": "01:49",
-      "text": "Parts pipeline, part 4: building a monster from a generated spec (parts taken from the player's 100-slot part inventory, set to their definition, quality, tier, defect and enhancement, then fully healed) and the rank limits: each of the 50 ranks allows parts up to a power limit, which decides whether a part can be used and which rank a shop or reward entry needs. Correction: what the opponent generator rolls per limb is quality, not madness."
-    },
-    {
-      "date": "2026-11-18",
-      "time": "01:39",
-      "text": "Parts pipeline, part 3: part action stats and energy costs. Damage and defence are the action's base values scaled by the part's quality and tier (and its attack modifier), split over the target limbs when an action hits several; costs scale with the tier and the cost modifier, and two special action kinds cost all or a tuned share of the monster's energy. Target limbs are unpacked from a 4-bit-per-limb mask, mirrored for the other side."
-    },
-    {
-      "date": "2026-11-18",
-      "time": "01:31",
-      "text": "Parts pipeline, part 2: opponent monsters are now decompiled end to end. Each limb is picked from a weighted part pool (26 parts per pool) named by the opponent template, tiers are random within the template's range and nudged one step at a time until the monster's power fits, and defects or enhancements go to random free limbs."
-    },
-    {
-      "date": "2026-11-18",
-      "time": "01:25",
-      "text": "Parts pipeline, part 1: the part instance class (XInventoryPart): constructor, reset, copy, setting a part from its definition, quality/tier setters, current and maximum health (base health scaled by quality, tier and enhancement/defect), torso energy in the lab and in battle, the five stat modifiers of enhancements and defects, and the monster ratings shown in the lab (health, attack, defence, energy, madness) with the tuned rating curve."
-    },
-    {
-      "date": "2026-11-18",
-      "time": "01:12",
-      "text": "Decompiled opponent generation: a random monster is built from an opponent template and re-rolled until its total part power (each part's base power times its tier multiplier) fits a window around the player's rank, then it gets defects, enhancements and a quality per limb. Also the debris that scatters over every collision shape of a broken object (more pieces for bigger shapes, up to 20)."
-    },
-    {
-      "date": "2026-11-18",
-      "time": "01:06",
-      "text": "Decompiled the zone memory map: where in MEM2 each zone's .sir data is loaded. Zone 0 and the first category share the start of the area, three categories get fixed blocks, and the five streamed categories alternate between two banks (one bank for levels flagged for it)."
-    },
-    {
-      "date": "2026-11-18",
-      "time": "00:59",
-      "text": "Decompiled the world reset that runs when a level loads (zone slot budget, zone tables and shared lists) and the aiming mini-game (a tool on a turntable turned with the pointer, a ray test against the scene and a target circle, and rumble while on target). Builds are now checked locally with MSVC before every push."
-    },
-    {
-      "date": "2026-11-17",
-      "time": "23:31",
-      "text": "First functions written from the new m2c drafts: the catch mini-game (two lanes of falling objects, a pointer-driven grabber, shaking objects loose, ten catches to win), the character contact response (standing on moving platforms, pushing entities, sliding along walls, landing on boxes and rotated boxes), and the 29 small vector helpers the movement code uses."
-    },
-    {
-      "date": "2026-11-17",
-      "time": "23:20",
-      "text": "Added two tools to speed things up. tools/decomp.py makes a first C draft of any function with m2c. tools/gen_leaf.py translates small straight-line functions (getters, setters, constant returns, empty stubs, bitfield and float accessors) instruction by instruction: 1590 of them are now in src/leaf/. They are exact but unnamed; they get proper names and types as the code around them is decompiled."
-    },
-    {
-      "date": "2026-11-17",
-      "time": "23:06",
-      "text": "Decompiled the system alert boxes (41 disc, controller, save and network messages), the online matchup screen (monster previews, ready panels, countdown, and building the opponent's monster from the received parts), the battle attack playback (impact reactions, ability particle effects, limb loss and the battle camera), and zone activation when a level area finishes loading."
-    },
-    {
-      "date": "2026-11-17",
-      "time": "22:56",
-      "text": "Decompiled the battle damage resolver: per-limb damage from the part's action, strong/weak part matchups, abilities that boost damage against a discipline or hit every limb, charged attacks, blocking with return damage and resistances, tutorial and boss protection, and the battle log lines (\"%s: %d HP %+d Base %s = %d HP\", \"Incapacitated!\")."
-    },
-    {
-      "date": "2026-11-17",
-      "time": "22:51",
-      "text": "Decompiled the combat HUD part card (health, discipline, name for the part's tier, both actions with their stat rows, defect/enhancement icons with their first-time tutorials, and which actions you can afford), the game session state machine that loads, runs and unloads each level and draws the frame, and the field-repair record that unlocks three achievements and awards XP and rank-ups."
-    },
-    {
-      "date": "2026-11-17",
-      "time": "22:36",
-      "text": "Decompiled the level table setup (the hashed name, world, number and weapon-parts keys of every level and arena) and the world memory layout: one 32-byte-aligned block holding every zone record and its entity slots, where some zones get a single slot and the others get the full count."
-    },
-    {
-      "date": "2026-11-17",
-      "time": "22:32",
-      "text": "Generated the entity factory that builds a level's scripted objects from their names (e.g. the saw paths of the buzz-saw experiment, the grow-juice tubes, castle braziers): 159 object names mapped to 48 object classes. The largest graphics-only functions (material parameter tables, render clears) are deferred, since the PC renderer replaces that layer."
-    },
-    {
-      "date": "2026-11-17",
-      "time": "22:27",
-      "text": "Decompiled the per-frame world update (8.8 KB): queued entity removals, the short wait before a freshly loaded zone goes live, activating and culling entities within a budget, moving entities between loaded zones (and despawning those that leave the map, with effects), slow motion that leaves the player at full speed, late updates and the particle systems of every loaded zone."
-    },
-    {
-      "date": "2026-11-17",
-      "time": "22:22",
-      "text": "Identified zlib 1.2.3 (11 KB, the decompressor used for compressed data) at the end of what was counted as game code. It is now counted as a library: the PC port will use real zlib instead of decompiling it."
-    },
-    {
-      "date": "2026-11-17",
-      "time": "21:28",
-      "text": "Generated the engine's own script dispatcher as well (137 more cases), so every script call in the game now goes through decompiled code. Over 5% of the game code is decompiled."
-    },
-    {
-      "date": "2026-11-17",
-      "time": "21:26",
-      "text": "Generated the script call dispatcher: one case per game signature (246 of them) that passes script arguments to the called function as integers, floats or pointers and stores the result. Each case was checked against its assembly, so every argument goes exactly where the original put it."
-    },
-    {
-      "date": "2026-11-17",
-      "time": "21:23",
-      "text": "Switched to decompiling the largest functions first. The four biggest turned out to be the script system's tables: the 1,812-entry list of functions the level and UI scripts can call, and the 392 call signatures saying what each one takes and returns (void, int, bool, hashed name, float, entity, script context). Both were generated straight from the originals, and every script callback now has typed parameters. Decompiled game code jumped from 2.3% to 4.7%."
-    },
-    {
-      "date": "2026-11-17",
-      "time": "21:13",
-      "text": "Started on monster parts. Found and decoded the part database inside global_binary.sir: 186 definition slots (180 used, 6 spare), each with four tier names (Chimp Arm, Ape Arm, Gorilla Arm, Kong Arm), two actions and stats. The game text turns out to already be plain .txt files. Decompiled the database lookup, the text-key lookup and the first PartQuery functions (name, quality, madness, health, defect and enhancement textures). This is the format the planned open-format part mods will plug into."
-    },
-    {
-      "date": "2026-11-17",
-      "time": "21:06",
-      "text": "Mapped every .sir archive with the .sir decoder: about 6,100 textures and 6,500 meshes, and the fixed memory addresses each file loads to (global data at 0x90400000, the current level at 0x90540000/0x90980000, 432 monster parts streamed into slots from 0x91240000, UI screens). Since these files are memory images full of absolute pointers, the PC loader will relocate them on load so the original files (and mods) can be used as-is."
-    },
-    {
-      "date": "2026-11-17",
-      "time": "20:55",
-      "text": "Fixed the name-recovery tool: one script table stores some names through offsets the tool did not follow, which had given 255 functions the wrong name. All 2,047 script callbacks now carry their correct names. One correction shows the code is shared with the PS2 version: the shake check is IsPS2, where shaking reads the analog controller. Also decompiled the delayed zone events and the projectile lob formula."
-    },
-    {
-      "date": "2026-11-17",
-      "time": "20:52",
-      "text": "Decompiled level triggers and props: placing the camera at named locators (or along a locator's facing), camera sensors with blend times, in-game cutscene mode, trigger events and requests, hazard props that alternate idle and attack phases on timers, prop animations and effects, death counters and waypoint-following props."
-    },
-    {
-      "date": "2026-11-17",
-      "time": "20:50",
-      "text": "Decompiled the camera and animation script functions: \"free\" and \"fixed\" camera modes, camera locks held by in-game cutscenes, skipping cutscenes with a button, and animation queries (finished, past the impact frame, in the last second)."
-    },
-    {
-      "date": "2026-11-17",
-      "time": "20:48",
-      "text": "Finished all 43 character state callbacks: pressing A on a node (challenges and other node actions, which level scripts can override), and steering at junctions with the d-pad or Nunchuk stick relative to the camera (holding back for half a second turns around)."
-    },
-    {
-      "date": "2026-11-17",
-      "time": "20:46",
-      "text": "Decompiled the exploration prompt (the header and text shown for the node the player stands on, with a prompt per challenge), challenge and interaction entry, walking between waypoints, and races (each waypoint takes the next route exit, the speed meter runs to 11)."
-    },
-    {
-      "date": "2026-11-17",
-      "time": "20:42",
-      "text": "Decompiled more character states: pausing and resuming every exploring character, challenge results reported to the world, interactions, arriving at waypoints (with footsteps and HUD updates), and the start/end of races (the racer starts at speed 0 and walks at 6 afterwards)."
-    },
-    {
-      "date": "2026-11-17",
-      "time": "20:40",
-      "text": "Decompiled patrol routing (routes that loop, ping-pong, run once or pick random exits at junctions, and following a target) and 29 character state callbacks: combat idle, exploration idle/move/wait/injure, challenge instructions (A accepts and the challenger steps aside for 65 seconds, B declines), conversations and combat actions."
-    },
-    {
-      "date": "2026-11-17",
-      "time": "20:35",
-      "text": "Added the project owner's .sir decoder (textures, meshes, skeletons) to tools/. It confirmed how global_binary.sir boots: a 4 KB pointer table plus a memory image that must load at 0x90400000, holding e.g. the \"HOME Menu not available\" icon and the fallback \"Generic_box\" model. Name lookup now also scans the large archives (shared_ui.sir etc.)."
-    },
-    {
-      "date": "2026-11-17",
-      "time": "20:31",
-      "text": "Decompiled the Wii Remote shake mini-games: catching a pumpkin (10 shakes within 5 seconds), clearing obstacles (fill a meter to 10) and powering generators (meter to 6), both draining at 3 units per second, plus combat start when an enemy gets close to the player."
-    },
-    {
-      "date": "2026-11-17",
-      "time": "20:25",
-      "text": "Decompiled the first AI state callbacks under their original names (PatrolIdleEntry, PumpkinWait/Freeze/Escape/Death, HazardPoisonGas/DustCloud, MovingChallengeGame...) and their registration table. Added a hash resolver: object and UI ids in the code are CRC-32 hashes of names, and 390 of them now resolve (e.g. \"Projectile\", \"exploration_screen\", \"timer_group\")."
-    },
-    {
-      "date": "2026-11-17",
-      "time": "20:21",
-      "text": "Recovered about 2,000 original function names from the game's script-callback tables (e.g. PumpkinShakeUpdate, DiggingPlayThrustAnim, PuzzleMovePiece, InterpolateQuaternionTask::Update_SLERP). Named game functions jumped from 240 to 2,257, and about 20 earlier guessed names were corrected to the real ones."
-    },
-    {
-      "date": "2026-11-17",
-      "time": "20:16",
-      "text": "Decompiled the play-session block: restoring saved object states into a zone, temporarily disabled objects that re-enable on a timer, the session timer, and the moving-character registry (max 20 per level, tracking the player and enemy indices)."
-    },
-    {
-      "date": "2026-11-17",
-      "time": "20:13",
-      "text": "Decompiled the core game-state block (reset, two-player turn timers with a 6-second hand-over, world update, camera follow reset) and the build info: this disc is EU build 519 from Aug 28 2008 (14:30)."
-    },
-    {
-      "date": "2026-11-17",
-      "time": "20:11",
-      "text": "Decompiled the save system: Wii NAND save file game.msa, save banner and icon setup (the banner defaults still name the engine's previous game, Death Jr. 2), read/write with NAND error codes, and the loading picture shown while saving."
-    },
-    {
-      "date": "2026-11-17",
-      "time": "20:20",
-      "text": "Decompiled the disc-error screens (no disc / wrong disc / unreadable, with reset and power handling while they are shown), helper-entity spawning and target-lead prediction. Lab notes now show the time of each entry."
-    },
-    {
-      "date": "2026-11-17",
-      "text": "Decompiled the UI glue (screen manager, per-zone screen sets from ui/ScreenSets/ScreenSets.csv), the full mode-transition logic, the loading screen, language selection (EN/FR/DE/IT/ES/NL from the Wii system language), the movie queue, background-music requests and the 3D audio listener. 116 game functions decompiled.",
-      "time": "20:04"
-    },
-    {
-      "date": "2026-11-17",
-      "text": "Decompiled the renderer core: a dedicated render thread with a 64-entry command queue, a ring of 17 display-list buffers (144 KB each) recorded by redirecting the GX FIFO, frame-buffer flips and frame pacing on TV retrace, plus RendInit. This is the layer the PC port will replace with a modern GPU backend for 1080p and widescreen.",
-      "time": "19:57"
-    },
-    {
-      "date": "2026-11-17",
-      "text": "Decompiled the top-level game-mode state machine (GameUpdate), including in-game Bink movie playback from fmv/ and fmv_PAL/. Added memory/core init, suspend/resume, view objects and game shutdown. Windows build now runs on GitHub Actions (MSVC).",
-      "time": "16:19"
-    },
-    {
-      "date": "2026-11-17",
-      "text": "Decompiled the engine lifecycle (EngineInit, EngineFrame, memory callbacks for the REND and SG modules) and game startup (GameInit, GameStart, which loads global_binary.sir). Planned 1080p, a settings GUI and mod support.",
-      "time": "16:13"
-    },
-    {
-      "date": "2026-11-17",
-      "text": "Progress site restyled as a mad-scientist lab: riveted metal panels, wooden shelves, slime-filled test tubes.",
-      "time": "16:02"
-    },
-    {
-      "date": "2026-11-17",
-      "text": "Decompiled the boot path (main, SysInit, crash handler, exit handling) and the top-level game loop.",
-      "time": "15:55"
-    },
-    {
-      "date": "2026-11-17",
-      "text": "Identified 50+ SDK functions from error strings and call patterns; fixed dtk re-analysis (.sbss2, computed-jump entries).",
-      "time": "15:55"
-    },
-    {
-      "date": "2026-11-17",
-      "text": "Project set up: disc extracted, main.dol split with decomp-toolkit, progress site launched.",
-      "time": "15:43"
-    }
-  ]
+ "milestones": [
+  {
+   "title": "Disc extracted",
+   "detail": "main.dol + 2.5 GB of game data pulled from the PAL disc (RM7P4F).",
+   "status": "done"
+  },
+  {
+   "title": "Executable split & analysed",
+   "detail": "decomp-toolkit finds 12,580 functions in 707 objects; game code at 0x80006B40–0x80232AF8.",
+   "status": "done"
+  },
+  {
+   "title": "Tooling",
+   "detail": "Cross-reference, renaming, progress, script-callback, name-hash and .sir decoding tools; this site updates on every push.",
+   "status": "done"
+  },
+  {
+   "title": "Boot path decompiled",
+   "detail": "main(), SDK init, heaps, reset/power handling, crash screen, top-level game loop.",
+   "status": "done"
+  },
+  {
+   "title": "Engine & game systems",
+   "detail": "Engine init/frame/shutdown, game startup, mode state machine and the renderer core (render thread, display lists, frame pacing) done; next: GX state, render targets, scene graph, UI, world, monsters, battles.",
+   "status": "in_progress"
+  },
+  {
+   "title": "PC build compiles",
+   "detail": "CMake + MSVC build on GitHub Actions. All decompiled sources compile; linking waits on the platform layer.",
+   "status": "in_progress"
+  },
+  {
+   "title": "Platform layer",
+   "detail": "Replace the Wii SDK: GX→OpenGL/Vulkan, AX→SDL audio, WPAD→gamepad + mouse pointer, DVD/NAND→files.",
+   "status": "todo"
+  },
+  {
+   "title": "Asset formats",
+   "detail": ".sir containers (PNP0), DSP-ADPCM audio, Bink video, MIDI + wavetable music.",
+   "status": "todo"
+  },
+  {
+   "title": "Boots to title screen",
+   "detail": "First visible frame on Windows.",
+   "status": "todo"
+  },
+  {
+   "title": "1080p & widescreen",
+   "detail": "Render at any resolution (1080p, 1440p, 4K) with internal resolution scaling; native 16:9 using the game's own widescreen support.",
+   "status": "todo"
+  },
+  {
+   "title": "Settings GUI",
+   "detail": "In-game options overlay (F1) + config.ini: resolution, fullscreen, V-sync, FPS cap, render scale, MSAA, texture filtering, audio, controls.",
+   "status": "todo"
+  },
+  {
+   "title": "Mod support",
+   "detail": "Mods folder overriding any game file, plus new content in open formats: monster parts as glTF models, PNG textures and JSON/text stats, with no .sir editing needed.",
+   "status": "todo"
+  },
+  {
+   "title": "Playable",
+   "detail": "Full game playable from start to finish on PC.",
+   "status": "todo"
+  }
+ ],
+ "changelog": [
+  {
+   "date": "2026-11-18",
+   "time": "17:19",
+   "text": "Decompiled 57 more small functions: brain toss minigame callbacks and helpers (0x8008), more of the robot evolution experiment (smasher and robot states, 0x8009), and prop, state-machine register, entity spawn/health and pause-screen script callbacks (0x800E). Written by low-cost helper agents and reviewed."
+  },
+  {
+   "date": "2026-11-18",
+   "time": "16:18",
+   "text": "Decompiled the lab experiment generator: it loads the difficulty tuning, then rolls the three candidate experiments (kind, bucket, option, item) so that none repeats the current one, and looks up each one's value."
+  },
+  {
+   "date": "2026-11-18",
+   "time": "16:15",
+   "text": "Decompiled the experiment MSP calculation and the challenge reward table lookup in the lab."
+  },
+  {
+   "date": "2026-11-18",
+   "time": "17:15",
+   "text": "Decompiled 57 more small functions: digging challenge callbacks and lab result display helpers (0x8002), entity constructors, tables and pools (0x8004), and timers, destructors and small state helpers (0x801B). Written by low-cost helper agents and reviewed."
+  },
+  {
+   "date": "2026-11-18",
+   "time": "16:13",
+   "text": "Decompiled the lab's experiment bookkeeping (experiment result grade from part quality and rank, reward list, material reward counting) and a set of game-database table lookups (ability effects and others)."
+  },
+  {
+   "date": "2026-11-18",
+   "time": "16:08",
+   "text": "Decompiled the list of actions a fighter can use this turn (working limbs, energy cost, blocked while an effect is active) and the computer opponent's random action pick, plus the cleanup of fighter and limb status objects."
+  },
+  {
+   "date": "2026-11-18",
+   "time": "16:03",
+   "text": "Decompiled the main fighter reaction picker (hit, dodge, block or idle for the round) and the block animation names, which add a suffix for the kind of block (radioactive, acidic, celestial, explosive, fake)."
+  },
+  {
+   "date": "2026-11-18",
+   "time": "17:01",
+   "text": "Decompiled 59 more small functions: experiment scoring, loading screens, restart and dance-animation helpers (0x8007), entity constructors and small vector helpers (0x800C), and a block of state, vector and destructor helpers (0x8003). Written by low-cost helper agents and reviewed; a few constructor signatures were corrected during review."
+  },
+  {
+   "date": "2026-11-18",
+   "time": "15:59",
+   "text": "Decompiled the hit, idle and dodge animation pickers for fighters: which reaction a limb plays when struck (heavy or light injury depending on its health), the idle animation afterwards (hurt, tired or regular) and the dodge style (back, jump or duck)."
+  },
+  {
+   "date": "2026-11-18",
+   "time": "15:48",
+   "text": "Decompiled the fighter animation-name builders: the strings (limb, body type, attack/dodge/idle reaction, e.g. \"legs_..._uppercut\") that the character system looks animations up by, plus the part model key and the reaction and body-type name tables."
+  },
+  {
+   "date": "2026-11-18",
+   "time": "16:46",
+   "text": "Decompiled 47 small functions in three areas: the robot evolution experiment (intro timers, door states, countdown), exploration script callbacks (script registers, junction and enemy movement, player confusion, inventory part quality/madness), and a block of small destructors, resets and running averages around 0x800E. Written by low-cost helper agents and reviewed."
+  },
+  {
+   "date": "2026-11-18",
+   "time": "15:44",
+   "text": "Decompiled part discovery (first sighting of a part tier gives MSP, rank-ups and the 'parts discovered' badges) and the experiment reward (quest unlock, MSP, new-part discovery notices, and the reward part with its enhancement or random defect)."
+  },
+  {
+   "date": "2026-11-18",
+   "time": "15:05",
+   "text": "Decompiled the two material-reward rolls used by challenge rewards: one picks a material matching a part (or a random one the player has unlocked enough for), the other picks a rarity and level and then a random fitting material, retrying at lower levels."
+  },
+  {
+   "date": "2026-11-18",
+   "time": "14:52",
+   "text": "Decompiled a loot roll that picks a random suitable table row for a part (torso parts and other limbs use different eligibility flags)."
+  },
+  {
+   "date": "2026-11-18",
+   "time": "14:40",
+   "text": "Decompiled the battle's fighter-turn phase (both sides' owners act until they finish, then the choices are recorded) and the speed roll (each fighter rolls 1-49 plus limb bonuses, ties broken by a coin flip, results written to the battle log), plus the lab state reset."
+  },
+  {
+   "date": "2026-11-18",
+   "time": "14:35",
+   "text": "Decompiled the battle object itself: its constructor (default rules plus tuning values from the game database), destructor, clear-between-battles, and the per-frame update that runs the battle phases (intro, choosing, new round, attack playback, outro). Also its random number generator setup, block pools, and the runtime array-destroy helper."
+  },
+  {
+   "date": "2026-11-18",
+   "time": "13:27",
+   "text": "The leaf generator now also writes forwarding wrappers (functions that pass their arguments on to another function, often only when a save is loaded) and small compare-and-return functions (range checks, flag tests, 'is this zero' idioms). About 670 more small functions are now covered automatically."
+  },
+  {
+   "date": "2026-11-18",
+   "time": "12:49",
+   "text": "Decompiled the small battle building blocks: value boxes (the int arrays used for stats and damage), fighter stats setup (two 7-stat boxes, chosen action, side, eight effect slots), empty action choices, and the round-side records with their constructors and destructors."
+  },
+  {
+   "date": "2026-11-18",
+   "time": "12:47",
+   "text": "Decompiled the effect slots: adding an effect to a limb (3 slots) or fighter (8 slots) refreshes it if already present or fills the last free slot, limb effects tick down and expire, on-hit hooks run, and damage is applied to a limb as a list of stat changes."
+  },
+  {
+   "date": "2026-11-18",
+   "time": "12:45",
+   "text": "Decompiled what happens after an attack: damage records are applied to the defender's limbs (counting broken limbs and the best single hit in the player's statistics), on-hit effects of the attacking limb (the disable-limb enhancement hits every damaged limb, the drain enhancement adds its effect once anything was hit), return damage, and the dodge/block counters."
+  },
+  {
+   "date": "2026-11-18",
+   "time": "12:41",
+   "text": "Decompiled how a battle round is decided: the action's target limbs (attacks on broken limbs go to the torso, a blocking defender takes everything on the blocking limb), then a 1-100 to-hit roll adjusted for fleeing, the accuracy enhancement, dodging and the defender's enhancements and defects decides hit, block, dodge or miss, with the 'Roll to hit' line in the battle log."
+  },
+  {
+   "date": "2026-11-18",
+   "time": "12:39",
+   "text": "Decompiled the battle phase machine: choose, start the turn, play the round (start the animation listeners, let the AI react or resolve the attack straight away), wait for the animations, end the round, and the battle-over state."
+  },
+  {
+   "date": "2026-11-18",
+   "time": "12:37",
+   "text": "Decompiled more of the battle round flow: starting a round (both choices stored, the round kind decided, shown on the HUD), taking a side's choice from its AI controller, and the end of the round's animations, where the second-strike enhancement can grant another attack with a tuned chance."
+  },
+  {
+   "date": "2026-11-18",
+   "time": "12:33",
+   "text": "Decompiled the end-of-battle payout: on a win the opponent's loot is rolled (or the online table), two badges reward beating an opponent by breaking only its torso or everything but its torso, MSP is added and the results screen is shown; real losses (not fleeing or time-outs) are counted."
+  },
+  {
+   "date": "2026-11-18",
+   "time": "12:32",
+   "text": "Decompiled the battle-over check (a side loses when its torso breaks or all four other limbs do; fleeing on working legs hands the win over; timed battles end after their round limit) and putting a fighter into a battle, including the opponent's MSP reward from its madness and average quality, 9999 HP tutorial opponents and scaled timed-battle HP."
+  },
+  {
+   "date": "2026-11-18",
+   "time": "12:29",
+   "text": "Decompiled the battle turn loop: the turn passes to the next side that can still act (an action is blocked by two status effects), and when neither can, the round ends: the round counter goes up, the winner is paid after the final round, energy regenerates up to what the torso holds, effects tick down, and limbs with the regeneration enhancement heal by a tuned share of their max HP."
+  },
+  {
+   "date": "2026-11-18",
+   "time": "12:27",
+   "text": "Decompiled battle effects and records: effect durations (two tuned effect kinds), applying and expiring effects (the round is told which limb lost it), the damage/effect record constructors and destructors, and the table that picks which stat rows the combat HUD shows for an action."
+  },
+  {
+   "date": "2026-11-18",
+   "time": "12:24",
+   "text": "Decompiled battle setup and status: building each limb's battle status from its part (hp, max hp, madness, quality, enhancement, defect), a fighter's totals and starting energy, resetting a battle to round 1, and the end-of-turn tick of fighter and limb effects (expired effects are removed)."
+  },
+  {
+   "date": "2026-11-18",
+   "time": "12:20",
+   "text": "Decompiled battle basics: fighter and limb status lookup, status effects on fighters (8) and limbs (3), the discipline triangle (alchemy beats mech, mech beats bio, bio beats alchemy), the battle log's matchup text, cycling to the next part for the same slot, and committing a chosen action (working limb and torso required, energy paid and capped by the torso)."
+  },
+  {
+   "date": "2026-11-18",
+   "time": "12:14",
+   "text": "Decompiled quest and challenge payouts: finishing a quest grants all of its reward records; winning a challenge pays the matching pending reward (for this monster or any), otherwise the minigame score as MSP plus a random reward from the challenge's table. Also setting the rank, MSP and preset monster from a quest, and the best time/score records."
+  },
+  {
+   "date": "2026-11-18",
+   "time": "12:10",
+   "text": "Decompiled reward handling in the save: a reward record can give a part (at a set tier and quality, fully healed), key and secondary ingredients, a part-type discovery and MSP, each with its notice. What I had called experience is the game's MSP (Mad Scientist Points), capped at 99,999,999 and driving the 50 ranks. Also: healing every lab monster on returning to the castle and the pending quest reward list."
+  },
+  {
+   "date": "2026-11-18",
+   "time": "12:06",
+   "text": "Decompiled the save's bit sets: 256 badges (awarding one counts it, posts a notice and grants its XP, which can raise the rank), 128 regions (marked once), two sets of 128 progress flags, which part types have been seen at which tier, and the discovery block copy helpers."
+  },
+  {
+   "date": "2026-11-18",
+   "time": "12:01",
+   "text": "Decompiled quest storage in the save: 47 quest records with 128 flags, a level and an integer each (sub-quests from 21 on also get a scratch block), the active quest, and ending a quest: abandoning clears it, finishing it hands out every reward tied to it, posts the notices and marks it done."
+  },
+  {
+   "date": "2026-11-18",
+   "time": "11:59",
+   "text": "Decompiled 37 more save callbacks: current/previous/castle locations, sub-quests and quest integers (including the two-bit fields), game progress markers and flags, the vertical-slice switch, whether the current monster uses a part or still has a working arm, MSP and rank rewards, plus the save object's constructor and destructor."
+  },
+  {
+   "date": "2026-11-18",
+   "time": "11:56",
+   "text": "Decompiled 48 script callbacks for the player's save: quest flags and levels, badges (what I had been calling achievements are the game's badges), adding and removing monsters, parts and ingredients, the 128 quest items, quest/challenge/experiment/combat rewards, and regions and locations. Each one forwards to the save object."
+  },
+  {
+   "date": "2026-11-18",
+   "time": "11:43",
+   "text": "Parts pipeline, part 6: fitting and removing parts on a monster (keeping its total power up to date), monster names (16 characters, stored offset by 0x20), finding which lab monster a part belongs to, and the part and spec power helpers."
+  },
+  {
+   "date": "2026-11-18",
+   "time": "11:36",
+   "text": "Parts pipeline, part 5: the lab inventory, which holds up to 10 monsters, 100 parts and 105 material counters (capped at 99). Covers allocating and releasing monsters and parts (released objects move to the end of the list to be reused), the material add/take/has checks, the collection achievements (three tiers for kind-0 materials, one per group of 20 for kind 1, one for a full lab), and the monster object itself: reset, constructor and building from preset specs."
+  },
+  {
+   "date": "2026-11-18",
+   "time": "01:49",
+   "text": "Parts pipeline, part 4: building a monster from a generated spec (parts taken from the player's 100-slot part inventory, set to their definition, quality, tier, defect and enhancement, then fully healed) and the rank limits: each of the 50 ranks allows parts up to a power limit, which decides whether a part can be used and which rank a shop or reward entry needs. Correction: what the opponent generator rolls per limb is quality, not madness."
+  },
+  {
+   "date": "2026-11-18",
+   "time": "01:39",
+   "text": "Parts pipeline, part 3: part action stats and energy costs. Damage and defence are the action's base values scaled by the part's quality and tier (and its attack modifier), split over the target limbs when an action hits several; costs scale with the tier and the cost modifier, and two special action kinds cost all or a tuned share of the monster's energy. Target limbs are unpacked from a 4-bit-per-limb mask, mirrored for the other side."
+  },
+  {
+   "date": "2026-11-18",
+   "time": "01:31",
+   "text": "Parts pipeline, part 2: opponent monsters are now decompiled end to end. Each limb is picked from a weighted part pool (26 parts per pool) named by the opponent template, tiers are random within the template's range and nudged one step at a time until the monster's power fits, and defects or enhancements go to random free limbs."
+  },
+  {
+   "date": "2026-11-18",
+   "time": "01:25",
+   "text": "Parts pipeline, part 1: the part instance class (XInventoryPart): constructor, reset, copy, setting a part from its definition, quality/tier setters, current and maximum health (base health scaled by quality, tier and enhancement/defect), torso energy in the lab and in battle, the five stat modifiers of enhancements and defects, and the monster ratings shown in the lab (health, attack, defence, energy, madness) with the tuned rating curve."
+  },
+  {
+   "date": "2026-11-18",
+   "time": "01:12",
+   "text": "Decompiled opponent generation: a random monster is built from an opponent template and re-rolled until its total part power (each part's base power times its tier multiplier) fits a window around the player's rank, then it gets defects, enhancements and a quality per limb. Also the debris that scatters over every collision shape of a broken object (more pieces for bigger shapes, up to 20)."
+  },
+  {
+   "date": "2026-11-18",
+   "time": "01:06",
+   "text": "Decompiled the zone memory map: where in MEM2 each zone's .sir data is loaded. Zone 0 and the first category share the start of the area, three categories get fixed blocks, and the five streamed categories alternate between two banks (one bank for levels flagged for it)."
+  },
+  {
+   "date": "2026-11-18",
+   "time": "00:59",
+   "text": "Decompiled the world reset that runs when a level loads (zone slot budget, zone tables and shared lists) and the aiming mini-game (a tool on a turntable turned with the pointer, a ray test against the scene and a target circle, and rumble while on target). Builds are now checked locally with MSVC before every push."
+  },
+  {
+   "date": "2026-11-17",
+   "time": "23:31",
+   "text": "First functions written from the new m2c drafts: the catch mini-game (two lanes of falling objects, a pointer-driven grabber, shaking objects loose, ten catches to win), the character contact response (standing on moving platforms, pushing entities, sliding along walls, landing on boxes and rotated boxes), and the 29 small vector helpers the movement code uses."
+  },
+  {
+   "date": "2026-11-17",
+   "time": "23:20",
+   "text": "Added two tools to speed things up. tools/decomp.py makes a first C draft of any function with m2c. tools/gen_leaf.py translates small straight-line functions (getters, setters, constant returns, empty stubs, bitfield and float accessors) instruction by instruction: 1590 of them are now in src/leaf/. They are exact but unnamed; they get proper names and types as the code around them is decompiled."
+  },
+  {
+   "date": "2026-11-17",
+   "time": "23:06",
+   "text": "Decompiled the system alert boxes (41 disc, controller, save and network messages), the online matchup screen (monster previews, ready panels, countdown, and building the opponent's monster from the received parts), the battle attack playback (impact reactions, ability particle effects, limb loss and the battle camera), and zone activation when a level area finishes loading."
+  },
+  {
+   "date": "2026-11-17",
+   "time": "22:56",
+   "text": "Decompiled the battle damage resolver: per-limb damage from the part's action, strong/weak part matchups, abilities that boost damage against a discipline or hit every limb, charged attacks, blocking with return damage and resistances, tutorial and boss protection, and the battle log lines (\"%s: %d HP %+d Base %s = %d HP\", \"Incapacitated!\")."
+  },
+  {
+   "date": "2026-11-17",
+   "time": "22:51",
+   "text": "Decompiled the combat HUD part card (health, discipline, name for the part's tier, both actions with their stat rows, defect/enhancement icons with their first-time tutorials, and which actions you can afford), the game session state machine that loads, runs and unloads each level and draws the frame, and the field-repair record that unlocks three achievements and awards XP and rank-ups."
+  },
+  {
+   "date": "2026-11-17",
+   "time": "22:36",
+   "text": "Decompiled the level table setup (the hashed name, world, number and weapon-parts keys of every level and arena) and the world memory layout: one 32-byte-aligned block holding every zone record and its entity slots, where some zones get a single slot and the others get the full count."
+  },
+  {
+   "date": "2026-11-17",
+   "time": "22:32",
+   "text": "Generated the entity factory that builds a level's scripted objects from their names (e.g. the saw paths of the buzz-saw experiment, the grow-juice tubes, castle braziers): 159 object names mapped to 48 object classes. The largest graphics-only functions (material parameter tables, render clears) are deferred, since the PC renderer replaces that layer."
+  },
+  {
+   "date": "2026-11-17",
+   "time": "22:27",
+   "text": "Decompiled the per-frame world update (8.8 KB): queued entity removals, the short wait before a freshly loaded zone goes live, activating and culling entities within a budget, moving entities between loaded zones (and despawning those that leave the map, with effects), slow motion that leaves the player at full speed, late updates and the particle systems of every loaded zone."
+  },
+  {
+   "date": "2026-11-17",
+   "time": "22:22",
+   "text": "Identified zlib 1.2.3 (11 KB, the decompressor used for compressed data) at the end of what was counted as game code. It is now counted as a library: the PC port will use real zlib instead of decompiling it."
+  },
+  {
+   "date": "2026-11-17",
+   "time": "21:28",
+   "text": "Generated the engine's own script dispatcher as well (137 more cases), so every script call in the game now goes through decompiled code. Over 5% of the game code is decompiled."
+  },
+  {
+   "date": "2026-11-17",
+   "time": "21:26",
+   "text": "Generated the script call dispatcher: one case per game signature (246 of them) that passes script arguments to the called function as integers, floats or pointers and stores the result. Each case was checked against its assembly, so every argument goes exactly where the original put it."
+  },
+  {
+   "date": "2026-11-17",
+   "time": "21:23",
+   "text": "Switched to decompiling the largest functions first. The four biggest turned out to be the script system's tables: the 1,812-entry list of functions the level and UI scripts can call, and the 392 call signatures saying what each one takes and returns (void, int, bool, hashed name, float, entity, script context). Both were generated straight from the originals, and every script callback now has typed parameters. Decompiled game code jumped from 2.3% to 4.7%."
+  },
+  {
+   "date": "2026-11-17",
+   "time": "21:13",
+   "text": "Started on monster parts. Found and decoded the part database inside global_binary.sir: 186 definition slots (180 used, 6 spare), each with four tier names (Chimp Arm, Ape Arm, Gorilla Arm, Kong Arm), two actions and stats. The game text turns out to already be plain .txt files. Decompiled the database lookup, the text-key lookup and the first PartQuery functions (name, quality, madness, health, defect and enhancement textures). This is the format the planned open-format part mods will plug into."
+  },
+  {
+   "date": "2026-11-17",
+   "time": "21:06",
+   "text": "Mapped every .sir archive with the .sir decoder: about 6,100 textures and 6,500 meshes, and the fixed memory addresses each file loads to (global data at 0x90400000, the current level at 0x90540000/0x90980000, 432 monster parts streamed into slots from 0x91240000, UI screens). Since these files are memory images full of absolute pointers, the PC loader will relocate them on load so the original files (and mods) can be used as-is."
+  },
+  {
+   "date": "2026-11-17",
+   "time": "20:55",
+   "text": "Fixed the name-recovery tool: one script table stores some names through offsets the tool did not follow, which had given 255 functions the wrong name. All 2,047 script callbacks now carry their correct names. One correction shows the code is shared with the PS2 version: the shake check is IsPS2, where shaking reads the analog controller. Also decompiled the delayed zone events and the projectile lob formula."
+  },
+  {
+   "date": "2026-11-17",
+   "time": "20:52",
+   "text": "Decompiled level triggers and props: placing the camera at named locators (or along a locator's facing), camera sensors with blend times, in-game cutscene mode, trigger events and requests, hazard props that alternate idle and attack phases on timers, prop animations and effects, death counters and waypoint-following props."
+  },
+  {
+   "date": "2026-11-17",
+   "time": "20:50",
+   "text": "Decompiled the camera and animation script functions: \"free\" and \"fixed\" camera modes, camera locks held by in-game cutscenes, skipping cutscenes with a button, and animation queries (finished, past the impact frame, in the last second)."
+  },
+  {
+   "date": "2026-11-17",
+   "time": "20:48",
+   "text": "Finished all 43 character state callbacks: pressing A on a node (challenges and other node actions, which level scripts can override), and steering at junctions with the d-pad or Nunchuk stick relative to the camera (holding back for half a second turns around)."
+  },
+  {
+   "date": "2026-11-17",
+   "time": "20:46",
+   "text": "Decompiled the exploration prompt (the header and text shown for the node the player stands on, with a prompt per challenge), challenge and interaction entry, walking between waypoints, and races (each waypoint takes the next route exit, the speed meter runs to 11)."
+  },
+  {
+   "date": "2026-11-17",
+   "time": "20:42",
+   "text": "Decompiled more character states: pausing and resuming every exploring character, challenge results reported to the world, interactions, arriving at waypoints (with footsteps and HUD updates), and the start/end of races (the racer starts at speed 0 and walks at 6 afterwards)."
+  },
+  {
+   "date": "2026-11-17",
+   "time": "20:40",
+   "text": "Decompiled patrol routing (routes that loop, ping-pong, run once or pick random exits at junctions, and following a target) and 29 character state callbacks: combat idle, exploration idle/move/wait/injure, challenge instructions (A accepts and the challenger steps aside for 65 seconds, B declines), conversations and combat actions."
+  },
+  {
+   "date": "2026-11-17",
+   "time": "20:35",
+   "text": "Added the project owner's .sir decoder (textures, meshes, skeletons) to tools/. It confirmed how global_binary.sir boots: a 4 KB pointer table plus a memory image that must load at 0x90400000, holding e.g. the \"HOME Menu not available\" icon and the fallback \"Generic_box\" model. Name lookup now also scans the large archives (shared_ui.sir etc.)."
+  },
+  {
+   "date": "2026-11-17",
+   "time": "20:31",
+   "text": "Decompiled the Wii Remote shake mini-games: catching a pumpkin (10 shakes within 5 seconds), clearing obstacles (fill a meter to 10) and powering generators (meter to 6), both draining at 3 units per second, plus combat start when an enemy gets close to the player."
+  },
+  {
+   "date": "2026-11-17",
+   "time": "20:25",
+   "text": "Decompiled the first AI state callbacks under their original names (PatrolIdleEntry, PumpkinWait/Freeze/Escape/Death, HazardPoisonGas/DustCloud, MovingChallengeGame...) and their registration table. Added a hash resolver: object and UI ids in the code are CRC-32 hashes of names, and 390 of them now resolve (e.g. \"Projectile\", \"exploration_screen\", \"timer_group\")."
+  },
+  {
+   "date": "2026-11-17",
+   "time": "20:21",
+   "text": "Recovered about 2,000 original function names from the game's script-callback tables (e.g. PumpkinShakeUpdate, DiggingPlayThrustAnim, PuzzleMovePiece, InterpolateQuaternionTask::Update_SLERP). Named game functions jumped from 240 to 2,257, and about 20 earlier guessed names were corrected to the real ones."
+  },
+  {
+   "date": "2026-11-17",
+   "time": "20:16",
+   "text": "Decompiled the play-session block: restoring saved object states into a zone, temporarily disabled objects that re-enable on a timer, the session timer, and the moving-character registry (max 20 per level, tracking the player and enemy indices)."
+  },
+  {
+   "date": "2026-11-17",
+   "time": "20:13",
+   "text": "Decompiled the core game-state block (reset, two-player turn timers with a 6-second hand-over, world update, camera follow reset) and the build info: this disc is EU build 519 from Aug 28 2008 (14:30)."
+  },
+  {
+   "date": "2026-11-17",
+   "time": "20:11",
+   "text": "Decompiled the save system: Wii NAND save file game.msa, save banner and icon setup (the banner defaults still name the engine's previous game, Death Jr. 2), read/write with NAND error codes, and the loading picture shown while saving."
+  },
+  {
+   "date": "2026-11-17",
+   "time": "20:20",
+   "text": "Decompiled the disc-error screens (no disc / wrong disc / unreadable, with reset and power handling while they are shown), helper-entity spawning and target-lead prediction. Lab notes now show the time of each entry."
+  },
+  {
+   "date": "2026-11-17",
+   "text": "Decompiled the UI glue (screen manager, per-zone screen sets from ui/ScreenSets/ScreenSets.csv), the full mode-transition logic, the loading screen, language selection (EN/FR/DE/IT/ES/NL from the Wii system language), the movie queue, background-music requests and the 3D audio listener. 116 game functions decompiled.",
+   "time": "20:04"
+  },
+  {
+   "date": "2026-11-17",
+   "text": "Decompiled the renderer core: a dedicated render thread with a 64-entry command queue, a ring of 17 display-list buffers (144 KB each) recorded by redirecting the GX FIFO, frame-buffer flips and frame pacing on TV retrace, plus RendInit. This is the layer the PC port will replace with a modern GPU backend for 1080p and widescreen.",
+   "time": "19:57"
+  },
+  {
+   "date": "2026-11-17",
+   "text": "Decompiled the top-level game-mode state machine (GameUpdate), including in-game Bink movie playback from fmv/ and fmv_PAL/. Added memory/core init, suspend/resume, view objects and game shutdown. Windows build now runs on GitHub Actions (MSVC).",
+   "time": "16:19"
+  },
+  {
+   "date": "2026-11-17",
+   "text": "Decompiled the engine lifecycle (EngineInit, EngineFrame, memory callbacks for the REND and SG modules) and game startup (GameInit, GameStart, which loads global_binary.sir). Planned 1080p, a settings GUI and mod support.",
+   "time": "16:13"
+  },
+  {
+   "date": "2026-11-17",
+   "text": "Progress site restyled as a mad-scientist lab: riveted metal panels, wooden shelves, slime-filled test tubes.",
+   "time": "16:02"
+  },
+  {
+   "date": "2026-11-17",
+   "text": "Decompiled the boot path (main, SysInit, crash handler, exit handling) and the top-level game loop.",
+   "time": "15:55"
+  },
+  {
+   "date": "2026-11-17",
+   "text": "Identified 50+ SDK functions from error strings and call patterns; fixed dtk re-analysis (.sbss2, computed-jump entries).",
+   "time": "15:55"
+  },
+  {
+   "date": "2026-11-17",
+   "text": "Project set up: disc extracted, main.dol split with decomp-toolkit, progress site launched.",
+   "time": "15:43"
+  }
+ ]
 }
