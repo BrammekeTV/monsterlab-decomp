@@ -1,15 +1,15 @@
 {
  "game_id": "RM7P4F",
- "generated": "2026-11-18T17:16:47+00:00",
- "commit": "eeacb68",
- "commit_date": "2026-11-18T18:11:56+01:00",
+ "generated": "2026-11-18T17:21:36+00:00",
+ "commit": "0a2fff5",
+ "commit_date": "2026-11-18T18:16:47+01:00",
  "game": {
   "functions": 8548,
   "bytes": 2265988,
   "named": 2748,
   "named_bytes": 616800,
-  "decompiled": 3815,
-  "decompiled_bytes": 391972
+  "decompiled": 3875,
+  "decompiled_bytes": 397032
  },
  "library": {
   "functions": 4039,
@@ -24,8 +24,8 @@
   "bytes": 3404928,
   "named": 3211,
   "named_bytes": 721548,
-  "decompiled": 3816,
-  "decompiled_bytes": 392092
+  "decompiled": 3876,
+  "decompiled_bytes": 397152
  },
  "game_range": [
   "80006B40",
@@ -257,15 +257,15 @@
    0.009
   ],
   [
-   0.399,
+   0.432,
    0.448
   ],
   [
-   0.163,
+   0.202,
    0.136
   ],
   [
-   0.057,
+   0.181,
    0.482
   ],
   [
@@ -301,15 +301,15 @@
    0.008
   ],
   [
-   0.086,
+   0.193,
    0.106
   ],
   [
-   0.017,
+   0.102,
    0.004
   ],
   [
-   0.0,
+   0.009,
    0.0
   ],
   [
@@ -585,11 +585,11 @@
    0.287
   ],
   [
-   0.007,
+   0.028,
    0.367
   ],
   [
-   0.0,
+   0.021,
    0.0
   ],
   [
@@ -601,11 +601,11 @@
    0.0
   ],
   [
-   0.011,
+   0.053,
    0.54
   ],
   [
-   0.381,
+   0.468,
    0.952
   ],
   [
@@ -7353,6 +7353,111 @@
    ]
   },
   {
+   "path": "src/game/small_8008b.cpp",
+   "functions": [
+    {
+     "name": "fn_8008139C",
+     "addr": "8008139C",
+     "size": 104
+    },
+    {
+     "name": "BrainTossFreebieDuration",
+     "addr": "80081A04",
+     "size": 48
+    },
+    {
+     "name": "fn_80081A34",
+     "addr": "80081A34",
+     "size": 116
+    },
+    {
+     "name": "fn_80081E84",
+     "addr": "80081E84",
+     "size": 128
+    },
+    {
+     "name": "fn_80082B20",
+     "addr": "80082B20",
+     "size": 104
+    },
+    {
+     "name": "fn_800836A0",
+     "addr": "800836A0",
+     "size": 112
+    },
+    {
+     "name": "BrainHeadEatMeat",
+     "addr": "800846F0",
+     "size": 120
+    },
+    {
+     "name": "fn_80084D3C",
+     "addr": "80084D3C",
+     "size": 108
+    },
+    {
+     "name": "fn_8008513C",
+     "addr": "8008513C",
+     "size": 64
+    },
+    {
+     "name": "fn_80085340",
+     "addr": "80085340",
+     "size": 88
+    },
+    {
+     "name": "fn_800853B4",
+     "addr": "800853B4",
+     "size": 96
+    },
+    {
+     "name": "fn_80085424",
+     "addr": "80085424",
+     "size": 64
+    },
+    {
+     "name": "fn_80085494",
+     "addr": "80085494",
+     "size": 64
+    },
+    {
+     "name": "fn_800856B8",
+     "addr": "800856B8",
+     "size": 64
+    },
+    {
+     "name": "fn_800856F8",
+     "addr": "800856F8",
+     "size": 112
+    },
+    {
+     "name": "fn_80085768",
+     "addr": "80085768",
+     "size": 64
+    },
+    {
+     "name": "fn_80085AD8",
+     "addr": "80085AD8",
+     "size": 76
+    },
+    {
+     "name": "fn_80085B24",
+     "addr": "80085B24",
+     "size": 88
+    },
+    {
+     "name": "fn_80085B7C",
+     "addr": "80085B7C",
+     "size": 108
+    },
+    {
+     "name": "fn_80085BE8",
+     "addr": "80085BE8",
+     "size": 76
+    }
+   ]
+  },
+  {
    "path": "src/game/small_8009.cpp",
    "functions": [
     {
@@ -7629,6 +7734,111 @@
      "name": "fn_8009848C",
      "addr": "8009848C",
      "size": 112
+    }
+   ]
+  },
+  {
+   "path": "src/game/small_8009d.cpp",
+   "functions": [
+    {
+     "name": "fn_800984FC",
+     "addr": "800984FC",
+     "size": 100
+    },
+    {
+     "name": "fn_80098568",
+     "addr": "80098568",
+     "size": 112
+    },
+    {
+     "name": "fn_800985D8",
+     "addr": "800985D8",
+     "size": 100
+    },
+    {
+     "name": "fn_80098700",
+     "addr": "80098700",
+     "size": 92
+    },
+    {
+     "name": "fn_80098C30",
+     "addr": "80098C30",
+     "size": 120
+    },
+    {
+     "name": "fn_80098D2C",
+     "addr": "80098D2C",
+     "size": 52
+    },
+    {
+     "name": "fn_80098DA8",
+     "addr": "80098DA8",
+     "size": 108
+    },
+    {
+     "name": "fn_80098E14",
+     "addr": "80098E14",
+     "size": 96
+    },
+    {
+     "name": "fn_80099874",
+     "addr": "80099874",
+     "size": 112
+    },
+    {
+     "name": "fn_8009A304",
+     "addr": "8009A304",
+     "size": 80
+    },
+    {
+     "name": "fn_8009ABC8",
+     "addr": "8009ABC8",
+     "size": 52
+    },
+    {
+     "name": "fn_8009AC0C",
+     "addr": "8009AC0C",
+     "size": 52
+    },
+    {
+     "name": "fn_8009B138",
+     "addr": "8009B138",
+     "size": 100
+    },
+    {
+     "name": "fn_8009B19C",
+     "addr": "8009B19C",
+     "size": 60
+    },
+    {
+     "name": "fn_8009B1D8",
+     "addr": "8009B1D8",
+     "size": 88
+    },
+    {
+     "name": "fn_8009B264",
+     "addr": "8009B264",
+     "size": 72
+    },
+    {
+     "name": "fn_8009B2AC",
+     "addr": "8009B2AC",
+     "size": 116
+    },
+    {
+     "name": "fn_8009B654",
+     "addr": "8009B654",
+     "size": 72
+    },
+    {
+     "name": "fn_8009BB8C",
+     "addr": "8009BB8C",
+     "size": 64
+    },
+    {
+     "name": "fn_8009BE14",
+     "addr": "8009BE14",
+     "size": 84
     }
    ]
   },
@@ -8939,6 +9149,111 @@
      "name": "fn_80119B38",
      "addr": "80119B38",
      "size": 64
+    }
+   ]
+  },
+  {
+   "path": "src/game/small_8013.cpp",
+   "functions": [
+    {
+     "name": "fn_80132BD8",
+     "addr": "80132BD8",
+     "size": 120
+    },
+    {
+     "name": "fn_801330E4",
+     "addr": "801330E4",
+     "size": 80
+    },
+    {
+     "name": "fn_80135300",
+     "addr": "80135300",
+     "size": 64
+    },
+    {
+     "name": "fn_80135340",
+     "addr": "80135340",
+     "size": 64
+    },
+    {
+     "name": "fn_80135380",
+     "addr": "80135380",
+     "size": 64
+    },
+    {
+     "name": "fn_801399AC",
+     "addr": "801399AC",
+     "size": 60
+    },
+    {
+     "name": "fn_8013A03C",
+     "addr": "8013A03C",
+     "size": 104
+    },
+    {
+     "name": "FriendListUpdate",
+     "addr": "8013B434",
+     "size": 116
+    },
+    {
+     "name": "ServerConnect",
+     "addr": "8013B990",
+     "size": 88
+    },
+    {
+     "name": "FriendsListSendDecline",
+     "addr": "8013BC2C",
+     "size": 48
+    },
+    {
+     "name": "FriendsListIsPlayerOnline",
+     "addr": "8013BC68",
+     "size": 52
+    },
+    {
+     "name": "FriendsListIsPlayerBusy",
+     "addr": "8013BC9C",
+     "size": 76
+    },
+    {
+     "name": "TransmitMe",
+     "addr": "8013BE18",
+     "size": 92
+    },
+    {
+     "name": "AggressorDeclined",
+     "addr": "8013BE7C",
+     "size": 48
+    },
+    {
+     "name": "IsListFull",
+     "addr": "8013BEAC",
+     "size": 116
+    },
+    {
+     "name": "FriendListScrollUp",
+     "addr": "8013BF20",
+     "size": 56
+    },
+    {
+     "name": "FriendListScrollDown",
+     "addr": "8013BF58",
+     "size": 60
+    },
+    {
+     "name": "FriendListChallenge",
+     "addr": "8013C16C",
+     "size": 56
+    },
+    {
+     "name": "fn_8013C59C",
+     "addr": "8013C59C",
+     "size": 100
+    },
+    {
+     "name": "MatchupDeInit",
+     "addr": "8013CF6C",
+     "size": 60
     }
    ]
   },
