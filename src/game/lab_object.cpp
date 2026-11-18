@@ -508,3 +508,39 @@ BOOL fn_80216C80(u8* lab, s32 level) {
 }
 
 }  // extern "C"
+
+extern "C" {
+
+// 0x80217094
+// Is the tuning for `level` loaded (loading it if needed) and its flag byte (+0xA4) clear?
+BOOL fn_80217094(u8* lab, s32 level) {
+    if (level != *(s32*)(lab + 0xA8) && !fn_802171A0(lab, level)) return FALSE;
+    return lab[0xA4] == 0;
+}
+
+// 0x802170E8
+// The factor (+0x88) of the tuning for `level`; 0 if it can't be loaded.
+f32 fn_802170E8(u8* lab, s32 level) {
+    if (level != *(s32*)(lab + 0xA8) && !fn_802171A0(lab, level)) return 0.0f;
+    return *(f32*)(lab + 0x88);
+}
+
+// 0x80217134
+// Four floats (+4, +8, +0xC, +0x10) of the item row (db+0xA220) with this id; FALSE if none.
+BOOL fn_80217134(void* unused, s32 id, f32* a, f32* b, f32* c, f32* d) {
+    (void)unused;
+    s32 n = *(const s32*)(Db() + 0xA224);
+    for (s32 i = 0; i < n; i++) {
+        const u8* row = *(const u8**)(Db() + 0xA220) + i * 0x18;
+        if (*(const s32*)row == id) {
+            *a = *(const f32*)(row + 4);
+            *b = *(const f32*)(row + 8);
+            *c = *(const f32*)(row + 0xC);
+            *d = *(const f32*)(row + 0x10);
+            return TRUE;
+        }
+    }
+    return FALSE;
+}
+
+}  // extern "C"

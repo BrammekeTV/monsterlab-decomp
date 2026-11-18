@@ -1,15 +1,15 @@
 {
  "game_id": "RM7P4F",
- "generated": "2026-11-18T16:19:08+00:00",
- "commit": "021658f",
- "commit_date": "2026-11-18T17:18:45+01:00",
+ "generated": "2026-11-18T16:19:23+00:00",
+ "commit": "e4feb38",
+ "commit_date": "2026-11-18T17:19:09+01:00",
  "game": {
   "functions": 8548,
   "bytes": 2265988,
   "named": 2748,
   "named_bytes": 616800,
-  "decompiled": 3175,
-  "decompiled_bytes": 325964
+  "decompiled": 3178,
+  "decompiled_bytes": 326232
  },
  "library": {
   "functions": 4039,
@@ -24,8 +24,8 @@
   "bytes": 3404928,
   "named": 3211,
   "named_bytes": 721548,
-  "decompiled": 3176,
-  "decompiled_bytes": 326084
+  "decompiled": 3179,
+  "decompiled_bytes": 326352
  },
  "game_range": [
   "80006B40",
@@ -1009,7 +1009,7 @@
    0.944
   ],
   [
-   0.952,
+   0.982,
    0.212
   ],
   [
@@ -3169,6 +3169,21 @@
      "name": "fn_80216C80",
      "addr": "80216C80",
      "size": 1044
+    },
+    {
+     "name": "fn_80217094",
+     "addr": "80217094",
+     "size": 84
+    },
+    {
+     "name": "fn_802170E8",
+     "addr": "802170E8",
+     "size": 76
+    },
+    {
+     "name": "fn_80217134",
+     "addr": "80217134",
+     "size": 108
     },
     {
      "name": "fn_802171A0",
