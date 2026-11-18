@@ -9,7 +9,8 @@ typedef void (*VoidFn)(u8* obj);       // slot 0x10: deactivate
 extern "C" int SysSprintf(char* buf, const char* fmt, ...);
 
 extern "C" {
-extern void* gStringTable;             // 0x805FB910 (string table pointer)
+struct StringTable;
+extern "C++" StringTable* gStringTable;             // 0x805FB910 (string table pointer)
 extern u8    lbl_805FBBE0[];           // 0x805FBBE0 (save block pointer)
 extern const char lbl_805F8200[];      // 0x805F8200 (default format string)
 extern const char lbl_805F8F54[];      // 0x805F8F54 (format string)

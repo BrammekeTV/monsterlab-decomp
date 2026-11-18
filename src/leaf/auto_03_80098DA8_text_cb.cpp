@@ -6,8 +6,8 @@
 #include "types.h"
 #include "game/script_callbacks.h"
 
-extern u8 gWorldState[];
-extern u8 lbl_805FDC28[];
+extern "C" u8* gWorldState;
+extern "C" f32 lbl_805FDC28;
 
 // 0x800999A4
 void* ReactorHeartGetTargetLeak(void* a3) {
@@ -23,14 +23,14 @@ void* ReactorHeartGetMagnetLight(void* a3) {
 
 // 0x80099A90
 void ReactorHeartResetTimer(void* a3) {
-    f32 t0 = *(f32*)((u8*)lbl_805FDC28);
+    f32 t0 = *(f32*)((u8*)&lbl_805FDC28);
     *(f32*)(((u8*)(uintptr_t)(a3)) + 624) = (f32)(t0);
 }
 
 // 0x80099A9C
 void ReactorHeartUpdateTimer(void* a3) {
     f32 t0 = *(f32*)(((u8*)(uintptr_t)(a3)) + 624);
-    f32 t1 = *(f32*)((u8*)gWorldState + 12);
+    f32 t1 = *(f32*)((u8*)&gWorldState + 12);
     f32 t2 = (f32)(t0 + t1);
     *(f32*)(((u8*)(uintptr_t)(a3)) + 624) = (f32)(t2);
 }

@@ -5,13 +5,13 @@
 
 #include "types.h"
 
-extern u8 lbl_805FDAA0[];
+extern "C" f32 lbl_805FDAA0;
 extern "C" void app_PlayMusic(u32, f32);
 extern "C" void fn_8009133C(s32, s32);
 
 // 0x8008F908
 extern "C" void fn_8008F908(void) {
-    f32 t0 = *(f32*)((u8*)lbl_805FDAA0);
+    f32 t0 = *(f32*)((u8*)&lbl_805FDAA0);
     u32 t1 = (u32)(0x74b90000) + 15810u;
     app_PlayMusic((u32)((u32)(t1)), (f32)(t0));
 }

@@ -75,6 +75,7 @@ void SessionSetTimer(u8* s, f32 time, u8 flag) {
     s[0x208] = flag;
 }
 
+extern "C" void SessionStopTimer(u8* s);
 // 0x80012C38
 void SessionStopTimer(u8* s) {
     s[0x208] = 0;

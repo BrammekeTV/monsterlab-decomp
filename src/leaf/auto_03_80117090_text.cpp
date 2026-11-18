@@ -5,8 +5,8 @@
 
 #include "types.h"
 
-extern u8 lbl_805FBBE0[];
-extern u8 lbl_805FECE0[];
+extern "C" u8* lbl_805FBBE0;
+extern "C" u8 lbl_805FECE0[];
 extern "C" f32 MonsterRateAttack(u8*);
 extern "C" f32 MonsterRateDefence(u8*);
 extern "C" f32 MonsterRateEnergy(u8*);
@@ -26,7 +26,7 @@ extern "C" void fn_80117268(void) {
 extern "C" f32 fn_801173A0(u8* a3) {
     u8* t0 = *(u8**)(((u8*)(uintptr_t)(a3)) + 32);
     if (t0 == 0) {
-        f32 t1 = *(f32*)((u8*)lbl_805FECE0);
+        f32 t1 = *(f32*)((u8*)&lbl_805FECE0);
         return (f32)(t1);
     }
     return (f32)(MonsterRateAttack(t0));
@@ -36,7 +36,7 @@ extern "C" f32 fn_801173A0(u8* a3) {
 extern "C" f32 fn_801173B8(u8* a3) {
     u8* t0 = *(u8**)(((u8*)(uintptr_t)(a3)) + 32);
     if (t0 == 0) {
-        f32 t1 = *(f32*)((u8*)lbl_805FECE0);
+        f32 t1 = *(f32*)((u8*)&lbl_805FECE0);
         return (f32)(t1);
     }
     return (f32)(MonsterRateDefence(t0));
@@ -46,7 +46,7 @@ extern "C" f32 fn_801173B8(u8* a3) {
 extern "C" f32 fn_801173D0(u8* a3) {
     u8* t0 = *(u8**)(((u8*)(uintptr_t)(a3)) + 32);
     if (t0 == 0) {
-        f32 t1 = *(f32*)((u8*)lbl_805FECE0);
+        f32 t1 = *(f32*)((u8*)&lbl_805FECE0);
         return (f32)(t1);
     }
     return (f32)(MonsterRateEnergy(t0));
@@ -56,7 +56,7 @@ extern "C" f32 fn_801173D0(u8* a3) {
 extern "C" f32 fn_801173E8(u8* a3) {
     u8* t0 = *(u8**)(((u8*)(uintptr_t)(a3)) + 32);
     if (t0 == 0) {
-        f32 t1 = *(f32*)((u8*)lbl_805FECE0);
+        f32 t1 = *(f32*)((u8*)&lbl_805FECE0);
         return (f32)(t1);
     }
     return (f32)(MonsterRateHealth(t0));
@@ -66,7 +66,7 @@ extern "C" f32 fn_801173E8(u8* a3) {
 extern "C" f32 fn_80117400(u8* a3) {
     u8* t0 = *(u8**)(((u8*)(uintptr_t)(a3)) + 32);
     if (t0 == 0) {
-        f32 t1 = *(f32*)((u8*)lbl_805FECE0);
+        f32 t1 = *(f32*)((u8*)&lbl_805FECE0);
         return (f32)(t1);
     }
     return (f32)(MonsterRateMadness(t0));
@@ -76,7 +76,7 @@ extern "C" f32 fn_80117400(u8* a3) {
 extern "C" f32 fn_80117418(u8* a3) {
     s32 t0 = *(s32*)(((u8*)(uintptr_t)(a3)) + 32);
     if (t0 == 0) {
-        f32 t1 = *(f32*)((u8*)lbl_805FECE0);
+        f32 t1 = *(f32*)((u8*)&lbl_805FECE0);
         return (f32)(t1);
     }
     return (f32)(PlayerRankFraction());
@@ -84,7 +84,7 @@ extern "C" f32 fn_80117418(u8* a3) {
 
 // 0x80117948
 extern "C" s32 fn_80117948(void) {
-    u8* t0 = *(u8**)((u8*)lbl_805FBBE0);
+    u8* t0 = *(u8**)((u8*)&lbl_805FBBE0);
     if (t0 == 0) {
         return (s32)(0);
     }

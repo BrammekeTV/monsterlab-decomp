@@ -5,10 +5,10 @@
 
 #include "types.h"
 
-extern u8 lbl_805FB5F8[];
-extern u8 lbl_805FB728[];
-extern u8 lbl_805FB72C[];
-extern u8 lbl_805FFD54[];
+extern "C" void* lbl_805FB5F8;
+extern "C" u8 lbl_805FB728[];
+extern "C" u8 lbl_805FB72C[];
+extern "C" u8 lbl_805FFD54[];
 extern "C" void fn_801C7E9C(s32, s32);
 
 // 0x801C7614
@@ -33,7 +33,7 @@ extern "C" void fn_801C85E0(s32 a3, s32 a4) {
 extern "C" f32 fn_801C911C(u8* a3, u8* a4, f32 f1) {
     f32 t0 = *(f32*)(((u8*)(uintptr_t)(a3)) + 8);
     f32 t1 = *(f32*)(((u8*)(uintptr_t)(a3)) + 4);
-    f32 t2 = *(f32*)((u8*)lbl_805FFD54);
+    f32 t2 = *(f32*)((u8*)&lbl_805FFD54);
     f32 t3 = (f32)(t0 - t1);
     *(f32*)(((u8*)(uintptr_t)(a4)) + 0) = (f32)(t3);
     f32 t4 = *(f32*)(((u8*)(uintptr_t)(a3)) + 0);
@@ -48,7 +48,7 @@ extern "C" f32 fn_801C911C(u8* a3, u8* a4, f32 f1) {
 extern "C" void fn_801C9148(u8* a3, u8* a4, f32 f1) {
     f32 t0 = *(f32*)(((u8*)(uintptr_t)(a3)) + 12);
     f32 t1 = *(f32*)(((u8*)(uintptr_t)(a3)) + 8);
-    f32 t2 = *(f32*)((u8*)lbl_805FFD54);
+    f32 t2 = *(f32*)((u8*)&lbl_805FFD54);
     f32 t3 = (f32)(t0 - t1);
     *(f32*)(((u8*)(uintptr_t)(a4)) + 0) = (f32)(t3);
     f32 t4 = *(f32*)(((u8*)(uintptr_t)(a3)) + 0);
@@ -61,13 +61,13 @@ extern "C" void fn_801C9148(u8* a3, u8* a4, f32 f1) {
 
 // 0x801CAD70
 extern "C" void fn_801CAD70(void) {
-    *(u32*)((u8*)lbl_805FB728) = (u32)((u32)(0));
-    *(u32*)((u8*)lbl_805FB72C) = (u32)((u32)(0));
+    *(u32*)((u8*)&lbl_805FB728) = (u32)((u32)(0));
+    *(u32*)((u8*)&lbl_805FB72C) = (u32)((u32)(0));
 }
 
 // 0x801CB938
 extern "C" s32 fn_801CB938(void) {
-    s32 t0 = *(s32*)((u8*)lbl_805FB5F8);
+    s32 t0 = *(s32*)((u8*)&lbl_805FB5F8);
     return (s32)(t0);
 }
 

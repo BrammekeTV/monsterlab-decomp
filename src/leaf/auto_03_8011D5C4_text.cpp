@@ -5,7 +5,7 @@
 
 #include "types.h"
 
-extern u8 lbl_805FBBE0[];
+extern "C" u8* lbl_805FBBE0;
 extern "C" void fn_80116D40(u8*);
 extern "C" void fn_80116EF0(u8*, s32);
 
@@ -47,28 +47,28 @@ extern "C" void fn_8011D708(u8* a3) {
 
 // 0x8011D71C
 extern "C" s32 fn_8011D71C(void) {
-    u8* t0 = *(u8**)((u8*)lbl_805FBBE0);
+    u8* t0 = *(u8**)((u8*)&lbl_805FBBE0);
     s32 t1 = *(s32*)(t0 + 300);
     return (s32)(t1);
 }
 
 // 0x8011D97C
 extern "C" s32 fn_8011D97C(void) {
-    u8* t0 = *(u8**)((u8*)lbl_805FBBE0);
+    u8* t0 = *(u8**)((u8*)&lbl_805FBBE0);
     s32 t1 = *(s32*)(t0 + 2284);
     return (s32)(t1);
 }
 
 // 0x8011D988
 extern "C" s32 fn_8011D988(void) {
-    u8* t0 = *(u8**)((u8*)lbl_805FBBE0);
+    u8* t0 = *(u8**)((u8*)&lbl_805FBBE0);
     s32 t1 = *(s32*)(t0 + 2288);
     return (s32)(t1);
 }
 
 // 0x8011D994
 extern "C" s32 fn_8011D994(void) {
-    u8* t0 = *(u8**)((u8*)lbl_805FBBE0);
+    u8* t0 = *(u8**)((u8*)&lbl_805FBBE0);
     s32 t1 = *(s32*)(t0 + 2292);
     return (s32)(t1);
 }
@@ -80,14 +80,14 @@ extern "C" s32 fn_8011D9A0(void) {
 
 // 0x8011D9A8
 extern "C" s32 fn_8011D9A8(void) {
-    u8* t0 = *(u8**)((u8*)lbl_805FBBE0);
+    u8* t0 = *(u8**)((u8*)&lbl_805FBBE0);
     s32 t1 = *(s32*)(t0 + 2312);
     return (s32)(t1);
 }
 
 // 0x8011D9B4
 extern "C" s32 fn_8011D9B4(void) {
-    u8* t0 = *(u8**)((u8*)lbl_805FBBE0);
+    u8* t0 = *(u8**)((u8*)&lbl_805FBBE0);
     s32 t1 = *(s32*)(t0 + 2316);
     return (s32)(t1);
 }

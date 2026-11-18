@@ -6,9 +6,9 @@
 #include "types.h"
 #include "game/script_callbacks.h"
 
-extern u8 lbl_8040E5F0[];
-extern u8 lbl_805F9980[];
-extern u8 lbl_805FB89C[];
+extern "C" u8 lbl_8040E5F0[];
+extern "C" s32 lbl_805F9980;
+extern "C" u8 lbl_805FB89C[];
 extern "C" s32 PlaySound(u32, s32, s32, s32, s32, s32);
 extern "C" s32 PlaySoundAt(void*, int, void*, int);
 extern "C" void TriggerDoAction(void*, void*, void*);
@@ -38,13 +38,13 @@ void PrintFResult(void) {
 
 // 0x801DBDB4
 void FrameFxStop(u32 a3) {
-    fn_801629D0((void*)((u8*)lbl_8040E5F0), (s32)((u32)(uintptr_t)(a3)));
+    fn_801629D0((void*)((u8*)&lbl_8040E5F0), (s32)((u32)(uintptr_t)(a3)));
 }
 
 // 0x801DBDC4
 void FrameFxStopAll(void) {
     // tail-call arguments inferred from the registers set before the call
-    fn_80162A70((u8*)lbl_8040E5F0);
+    fn_80162A70((u8*)&lbl_8040E5F0);
 }
 
 // 0x801DBED0
@@ -75,7 +75,7 @@ void PlayGlobalGroupSound_NoLoad(u32 a3) {
 
 // 0x801DC298
 void StopGlobalLoopingGroupSound(void) {
-    s32 t0 = *(s32*)((u8*)lbl_805F9980);
+    s32 t0 = *(s32*)((u8*)&lbl_805F9980);
     if ((s32)(u32)(t0) == -1) {
         return;
     }
@@ -145,11 +145,11 @@ void StopLoopingSoundGroupFX(void* a3) {
 
 // 0x801E1B94
 s32 GetResultRegister(void) {
-    s32 t0 = *(s32*)((u8*)lbl_805FB89C);
+    s32 t0 = *(s32*)((u8*)&lbl_805FB89C);
     return (s32)(t0);
 }
 
 // 0x801E1B9C
 void SetResultRegister(s32 a3) {
-    *(u32*)((u8*)lbl_805FB89C) = (u32)((u32)(uintptr_t)(a3));
+    *(u32*)((u8*)&lbl_805FB89C) = (u32)((u32)(uintptr_t)(a3));
 }

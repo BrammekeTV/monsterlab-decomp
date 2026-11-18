@@ -5,10 +5,10 @@
 
 #include "types.h"
 
-extern u8 lbl_805FEA54[];
+extern "C" u8 lbl_805FEA54[];
 
 // 0x800E4BF4
 extern "C" f32 fn_800E4BF4(void) {
-    f32 t0 = *(f32*)((u8*)lbl_805FEA54);
+    f32 t0 = *(f32*)((u8*)&lbl_805FEA54);
     return (f32)(t0);
 }

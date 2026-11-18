@@ -5,11 +5,11 @@
 
 #include "types.h"
 
-extern u8 lbl_805FEC70[];
+extern "C" u8 lbl_805FEC70[];
 
 // 0x8010B4AC
 extern "C" void fn_8010B4AC(u8* a3) {
-    f32 t0 = *(f32*)((u8*)lbl_805FEC70);
+    f32 t0 = *(f32*)((u8*)&lbl_805FEC70);
     *(u32*)(((u8*)(uintptr_t)(a3)) + 4) = (u32)((u32)(0));
     *(f32*)(((u8*)(uintptr_t)(a3)) + 0) = (f32)(t0);
 }

@@ -6,10 +6,10 @@
 #include "types.h"
 #include "game/script_callbacks.h"
 
-extern u8 lbl_805FB3E0[];
+extern "C" u8 lbl_805FB3E0[];
 
 // 0x8013E2D4
 s32 WeArePostMatchupScreen(void) {
-    s32 t0 = *(s32*)((u8*)lbl_805FB3E0);
+    s32 t0 = *(s32*)((u8*)&lbl_805FB3E0);
     return (s32)(t0);
 }

@@ -5,17 +5,17 @@
 
 #include "types.h"
 
-extern u8 lbl_803F2880[];
-extern u8 lbl_80412BC0[];
-extern u8 lbl_80412BF8[];
-extern u8 lbl_805F95F8[];
-extern u8 lbl_805FB5FC[];
-extern u8 lbl_805FB638[];
-extern u8 lbl_805FB648[];
-extern u8 lbl_805FB650[];
-extern u8 lbl_805FB854[];
-extern u8 lbl_805FF618[];
-extern u8 lbl_805FF630[];
+extern "C" u8 lbl_803F2880[];
+extern "C" u8 lbl_80412BC0[];
+extern "C" u8 lbl_80412BF8[];
+extern "C" u8 lbl_805F95F8[];
+extern "C" u8 lbl_805FB5FC[];
+extern "C" u8 lbl_805FB638[];
+extern "C" u8 lbl_805FB648[];
+extern "C" u8 lbl_805FB650[];
+extern "C" u32 lbl_805FB854;
+extern "C" u8 lbl_805FF618[];
+extern "C" u8 lbl_805FF630[];
 extern "C" void BufferFree(void*);
 extern "C" void* MEMAllocFromAllocator(u8*, u32);
 extern "C" void MEMFreeToAllocator(u8*, void*);
@@ -27,7 +27,7 @@ extern "C" void fn_80330E20(void*);
 
 // 0x8016EB0C
 extern "C" void fn_8016EB0C(u8* a3, f32 f1, f32 f2) {
-    f32 t0 = *(f32*)((u8*)lbl_805FF618);
+    f32 t0 = *(f32*)((u8*)&lbl_805FF618);
     *(f32*)(((u8*)(uintptr_t)(a3)) + 0) = (f32)(f1);
     *(f32*)(((u8*)(uintptr_t)(a3)) + 4) = (f32)(f2);
     *(f32*)(((u8*)(uintptr_t)(a3)) + 8) = (f32)(t0);
@@ -64,7 +64,7 @@ extern "C" u8* fn_8016EB4C(u8* a3) {
 
 // 0x8016EB54
 extern "C" void fn_8016EB54(u8* a3) {
-    f32 t0 = *(f32*)((u8*)lbl_805FF630);
+    f32 t0 = *(f32*)((u8*)&lbl_805FF630);
     *(f32*)(((u8*)(uintptr_t)(a3)) + 0) = (f32)(t0);
 }
 
@@ -128,7 +128,7 @@ extern "C" void fn_8016F848(u8* a3, u8* a4) {
 
 // 0x801704E8
 extern "C" void fn_801704E8(void) {
-    *(u32*)((u8*)lbl_805FB5FC) = (u32)((u32)(0));
+    *(u32*)((u8*)&lbl_805FB5FC) = (u32)((u32)(0));
 }
 
 // 0x801704F4
@@ -145,12 +145,12 @@ extern "C" void fn_801731C4(void) {
 
 // 0x80173284
 extern "C" void* fn_80173284(s32 a3) {
-    return (void*)(MEMAllocFromAllocator((u8*)lbl_803F2880, (u32)((u32)(uintptr_t)(a3))));
+    return (void*)(MEMAllocFromAllocator((u8*)&lbl_803F2880, (u32)((u32)(uintptr_t)(a3))));
 }
 
 // 0x80173294
 extern "C" void fn_80173294(u8* a3) {
-    MEMFreeToAllocator((u8*)lbl_803F2880, (void*)(((u8*)(uintptr_t)(a3))));
+    MEMFreeToAllocator((u8*)&lbl_803F2880, (void*)(((u8*)(uintptr_t)(a3))));
 }
 
 // 0x801732AC
@@ -366,19 +366,19 @@ extern "C" void fn_80185C94(void) {
 
 // 0x80188ED4
 extern "C" void fn_80188ED4(s32 a3) {
-    *(u32*)((u8*)lbl_805FB638) = (u32)((u32)(uintptr_t)(a3));
+    *(u32*)((u8*)&lbl_805FB638) = (u32)((u32)(uintptr_t)(a3));
 }
 
 // 0x80188EDC
 extern "C" void fn_80188EDC(s32 a3, s32 a4, s32 a5) {
     // tail-call arguments inferred from the registers set before the call
-    s32 t0 = *(s32*)((u8*)lbl_80412BC0 + 16);
+    s32 t0 = *(s32*)((u8*)&lbl_80412BC0 + 16);
     fn_8018979C((s32)((u32)(t0)), (s32)((u32)(uintptr_t)(a3)), (s32)((u32)(uintptr_t)(a4)), (s32)((u32)(uintptr_t)(a5)));
 }
 
 // 0x8018A3E4
 extern "C" void fn_8018A3E4(s32 a3) {
-    *(u32*)((u8*)lbl_805FB648) = (u32)((u32)(uintptr_t)(a3));
+    *(u32*)((u8*)&lbl_805FB648) = (u32)((u32)(uintptr_t)(a3));
 }
 
 // 0x8018C47C
@@ -410,7 +410,7 @@ extern "C" void fn_8018C4D8(u8* a3) {
 // 0x8018C8CC
 extern "C" u32 fn_8018C8CC(u8* a3) {
     s32 t0 = *(s32*)(((u8*)(uintptr_t)(a3)) + 188);
-    s32 t1 = *(s32*)((u8*)lbl_805FB854);
+    s32 t1 = *(s32*)((u8*)&lbl_805FB854);
     u32 t2 = (u32)(t1) - (u32)(t0);
     u32 t3 = (u32)(t2 == 0);
     return (u32)(t3);
@@ -418,13 +418,13 @@ extern "C" u32 fn_8018C8CC(u8* a3) {
 
 // 0x8018C8E4
 extern "C" s32 fn_8018C8E4(void) {
-    s32 t0 = *(s32*)((u8*)lbl_805FB650);
+    s32 t0 = *(s32*)((u8*)&lbl_805FB650);
     return (s32)(t0);
 }
 
 // 0x8018C8EC
 extern "C" void fn_8018C8EC(s32 a3) {
-    *(u32*)((u8*)lbl_805FB650) = (u32)((u32)(uintptr_t)(a3));
+    *(u32*)((u8*)&lbl_805FB650) = (u32)((u32)(uintptr_t)(a3));
 }
 
 // 0x8018C9DC
@@ -456,9 +456,9 @@ extern "C" s32 ScreenSetsFind(s32 a3, s32 a4) {
 
 // 0x8018D4CC
 extern "C" void fn_8018D4CC(u8* a3) {
-    s32 t0 = *(s32*)((u8*)lbl_805F95F8);
+    s32 t0 = *(s32*)((u8*)&lbl_805F95F8);
     if ((s32)(u32)(t0) <= 0) {
-        fn_801EF070((u8*)lbl_80412BF8, (s32)((u32)(uintptr_t)(a3)));
+        fn_801EF070((u8*)&lbl_80412BF8, (s32)((u32)(uintptr_t)(a3)));
         return;
     }
     BufferFree((void*)(((u8*)(uintptr_t)(a3))));

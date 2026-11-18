@@ -22,7 +22,8 @@ extern u8*  lbl_805FBBC8;
 extern f32  lbl_805F95A0, lbl_805FB314, lbl_805FB300;
 extern u8   gIgcMode, lbl_805FB1A1, lbl_805FB1A0;     // gIgcMode: camera_script.cpp
 extern s32  gCameraLocks;
-extern void* gCameraOwner;
+struct Character;
+extern Character* gCameraOwner;
 
 // Partial layout of gGame.
 struct GameState {

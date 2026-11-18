@@ -5,25 +5,25 @@
 
 #include "types.h"
 
-extern u8 lbl_803C4298[];
-extern u8 lbl_805FE5B0[];
-extern u8 lbl_805FE5B4[];
+extern "C" u8 lbl_803C4298[];
+extern "C" f32 lbl_805FE5B0;
+extern "C" f32 lbl_805FE5B4;
 
 // 0x800D01C0
 extern "C" u8* fn_800D01C0(void) {
-    u8* t0 = *(u8**)((u8*)lbl_803C4298 + 4);
+    u8* t0 = *(u8**)((u8*)&lbl_803C4298 + 4);
     *(u8*)(t0 + 252) = (u8)((u32)(0));
     return (u8*)(t0);
 }
 
 // 0x800D0290
 extern "C" f32 fn_800D0290(void) {
-    f32 t0 = *(f32*)((u8*)lbl_805FE5B0);
+    f32 t0 = *(f32*)((u8*)&lbl_805FE5B0);
     return (f32)(t0);
 }
 
 // 0x800D0298
 extern "C" f32 fn_800D0298(void) {
-    f32 t0 = *(f32*)((u8*)lbl_805FE5B4);
+    f32 t0 = *(f32*)((u8*)&lbl_805FE5B4);
     return (f32)(t0);
 }

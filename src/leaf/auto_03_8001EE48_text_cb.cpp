@@ -6,12 +6,12 @@
 #include "types.h"
 #include "game/script_callbacks.h"
 
-extern u8 lbl_805F8288[];
-extern u8 lbl_805FAF80[];
-extern u8 lbl_805FAF84[];
-extern u8 lbl_805FAF88[];
-extern u8 lbl_805FBBE0[];
-extern u8 lbl_805FC8B0[];
+extern "C" u8 lbl_805F8288[];
+extern "C" u8 lbl_805FAF80[];
+extern "C" u8 lbl_805FAF84[];
+extern "C" u8 lbl_805FAF88[];
+extern "C" u8* lbl_805FBBE0;
+extern "C" u8 lbl_805FC8B0[];
 extern "C" f32 MonsterRateAttack(u8*);
 extern "C" f32 MonsterRateDefence(u8*);
 extern "C" f32 MonsterRateEnergy(u8*);
@@ -21,14 +21,14 @@ extern "C" f32 PlayerRankFraction(void);
 
 // 0x8001F5CC
 f32 Troublescope_GetCurrentAttack(void) {
-    u8* t0 = *(u8**)((u8*)lbl_805FAF80);
+    u8* t0 = *(u8**)((u8*)&lbl_805FAF80);
     if (t0 == 0) {
-        f32 t1 = *(f32*)((u8*)lbl_805FC8B0);
+        f32 t1 = *(f32*)((u8*)&lbl_805FC8B0);
         return (f32)(t1);
     }
     u8* t2 = *(u8**)(t0 + 4);
     if (t2 == 0) {
-        f32 t3 = *(f32*)((u8*)lbl_805FC8B0);
+        f32 t3 = *(f32*)((u8*)&lbl_805FC8B0);
         return (f32)(t3);
     }
     return (f32)(MonsterRateAttack(t2));
@@ -36,14 +36,14 @@ f32 Troublescope_GetCurrentAttack(void) {
 
 // 0x8001F5F0
 f32 Troublescope_GetCurrentDefense(void) {
-    u8* t0 = *(u8**)((u8*)lbl_805FAF80);
+    u8* t0 = *(u8**)((u8*)&lbl_805FAF80);
     if (t0 == 0) {
-        f32 t1 = *(f32*)((u8*)lbl_805FC8B0);
+        f32 t1 = *(f32*)((u8*)&lbl_805FC8B0);
         return (f32)(t1);
     }
     u8* t2 = *(u8**)(t0 + 4);
     if (t2 == 0) {
-        f32 t3 = *(f32*)((u8*)lbl_805FC8B0);
+        f32 t3 = *(f32*)((u8*)&lbl_805FC8B0);
         return (f32)(t3);
     }
     return (f32)(MonsterRateDefence(t2));
@@ -51,14 +51,14 @@ f32 Troublescope_GetCurrentDefense(void) {
 
 // 0x8001F614
 f32 Troublescope_GetCurrentEnergy(void) {
-    u8* t0 = *(u8**)((u8*)lbl_805FAF80);
+    u8* t0 = *(u8**)((u8*)&lbl_805FAF80);
     if (t0 == 0) {
-        f32 t1 = *(f32*)((u8*)lbl_805FC8B0);
+        f32 t1 = *(f32*)((u8*)&lbl_805FC8B0);
         return (f32)(t1);
     }
     u8* t2 = *(u8**)(t0 + 4);
     if (t2 == 0) {
-        f32 t3 = *(f32*)((u8*)lbl_805FC8B0);
+        f32 t3 = *(f32*)((u8*)&lbl_805FC8B0);
         return (f32)(t3);
     }
     return (f32)(MonsterRateEnergy(t2));
@@ -66,14 +66,14 @@ f32 Troublescope_GetCurrentEnergy(void) {
 
 // 0x8001F638
 f32 Troublescope_GetCurrentHP(void) {
-    u8* t0 = *(u8**)((u8*)lbl_805FAF80);
+    u8* t0 = *(u8**)((u8*)&lbl_805FAF80);
     if (t0 == 0) {
-        f32 t1 = *(f32*)((u8*)lbl_805FC8B0);
+        f32 t1 = *(f32*)((u8*)&lbl_805FC8B0);
         return (f32)(t1);
     }
     u8* t2 = *(u8**)(t0 + 4);
     if (t2 == 0) {
-        f32 t3 = *(f32*)((u8*)lbl_805FC8B0);
+        f32 t3 = *(f32*)((u8*)&lbl_805FC8B0);
         return (f32)(t3);
     }
     return (f32)(MonsterRateHealth(t2));
@@ -81,14 +81,14 @@ f32 Troublescope_GetCurrentHP(void) {
 
 // 0x8001F65C
 f32 Troublescope_GetCurrentMadness(void) {
-    u8* t0 = *(u8**)((u8*)lbl_805FAF80);
+    u8* t0 = *(u8**)((u8*)&lbl_805FAF80);
     if (t0 == 0) {
-        f32 t1 = *(f32*)((u8*)lbl_805FC8B0);
+        f32 t1 = *(f32*)((u8*)&lbl_805FC8B0);
         return (f32)(t1);
     }
     u8* t2 = *(u8**)(t0 + 4);
     if (t2 == 0) {
-        f32 t3 = *(f32*)((u8*)lbl_805FC8B0);
+        f32 t3 = *(f32*)((u8*)&lbl_805FC8B0);
         return (f32)(t3);
     }
     return (f32)(MonsterRateMadness(t2));
@@ -96,14 +96,14 @@ f32 Troublescope_GetCurrentMadness(void) {
 
 // 0x8001F680
 f32 Troublescope_GetMaxMadness(void) {
-    u8* t0 = *(u8**)((u8*)lbl_805FAF80);
+    u8* t0 = *(u8**)((u8*)&lbl_805FAF80);
     if (t0 == 0) {
-        f32 t1 = *(f32*)((u8*)lbl_805FC8B0);
+        f32 t1 = *(f32*)((u8*)&lbl_805FC8B0);
         return (f32)(t1);
     }
     s32 t2 = *(s32*)(t0 + 4);
     if (t2 == 0) {
-        f32 t3 = *(f32*)((u8*)lbl_805FC8B0);
+        f32 t3 = *(f32*)((u8*)&lbl_805FC8B0);
         return (f32)(t3);
     }
     return (f32)(PlayerRankFraction());
@@ -111,7 +111,7 @@ f32 Troublescope_GetMaxMadness(void) {
 
 // 0x8001F794
 s32 Troublescope_MonstersInInventory(void) {
-    u8* t0 = *(u8**)((u8*)lbl_805FBBE0);
+    u8* t0 = *(u8**)((u8*)&lbl_805FBBE0);
     if (t0 == 0) {
         return (s32)(0);
     }
@@ -124,7 +124,7 @@ s32 Troublescope_MonstersInInventory(void) {
 
 // 0x8001F80C
 s32 Troublescope_GetCreatureLoaded(void) {
-    u8* t0 = *(u8**)((u8*)lbl_805FAF80);
+    u8* t0 = *(u8**)((u8*)&lbl_805FAF80);
     if (t0 == 0) {
         return (s32)(0);
     }
@@ -134,12 +134,12 @@ s32 Troublescope_GetCreatureLoaded(void) {
 
 // 0x8001F828
 BOOL Troublescope_SetCurrentMonster(void) {
-    u8* t0 = *(u8**)((u8*)lbl_805FAF80);
+    u8* t0 = *(u8**)((u8*)&lbl_805FAF80);
     if (t0 == 0) {
         return (BOOL)(uintptr_t)(t0);
     }
     s32 t1 = *(s32*)(t0 + 16);
-    s32 t2 = *(s32*)((u8*)lbl_805FBBE0);
+    s32 t2 = *(s32*)((u8*)&lbl_805FBBE0);
     u32 t3 = (((u32)(t1) << 2) | ((u32)(t1) >> 30)) & 0xfffffffcu;
     u32 t4 = (u32)(t2) + (u32)(t3);
     s32 t5 = *(s32*)((u8*)(uintptr_t)(t4) + 2608);
@@ -149,7 +149,7 @@ BOOL Troublescope_SetCurrentMonster(void) {
 
 // 0x8001F850
 BOOL Troublescope_GetInventoryPosString(void) {
-    s32 t0 = *(s32*)((u8*)lbl_805FAF80);
+    s32 t0 = *(s32*)((u8*)&lbl_805FAF80);
     if (t0 == 0) {
         return (BOOL)(0);
     }
@@ -159,19 +159,19 @@ BOOL Troublescope_GetInventoryPosString(void) {
 
 // 0x8001FB78
 s32 Troublescope_GetPartID(void) {
-    s32 t0 = *(s32*)((u8*)lbl_805F8288);
+    s32 t0 = *(s32*)((u8*)&lbl_805F8288);
     return (s32)(t0);
 }
 
 // 0x8001FB80
 s32 Troublescope_GetPartInventoryPos(void) {
-    s32 t0 = *(s32*)((u8*)lbl_805FAF84);
+    s32 t0 = *(s32*)((u8*)&lbl_805FAF84);
     return (s32)(t0);
 }
 
 // 0x8001FC68
 BOOL Troublescope_GetPartImage(void) {
-    s32 t0 = *(s32*)((u8*)lbl_805FAF88);
+    s32 t0 = *(s32*)((u8*)&lbl_805FAF88);
     if (t0 != 0) {
         return (BOOL)(t0);
     }
@@ -180,7 +180,7 @@ BOOL Troublescope_GetPartImage(void) {
 
 // 0x8001FC7C
 u32 Troublescope_IsMonsterLoaded(void) {
-    u8* t0 = *(u8**)((u8*)lbl_805FAF80);
+    u8* t0 = *(u8**)((u8*)&lbl_805FAF80);
     s32 t1 = *(s32*)(t0 + 28);
     return (u32)(t1);
 }

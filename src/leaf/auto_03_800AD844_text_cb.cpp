@@ -6,7 +6,7 @@
 #include "types.h"
 #include "game/script_callbacks.h"
 
-extern u8 lbl_805FE03C[];
+extern "C" u8 lbl_805FE03C[];
 extern "C" void fn_800ADDB8(s32, s32);
 extern "C" void fn_800AE200(s32, s32);
 
@@ -33,7 +33,7 @@ void GrowJuiceTentacle_ClearStageTimeout(void* a3) {
     if (a3 == 0) {
         return;
     }
-    f32 t0 = *(f32*)((u8*)lbl_805FE03C);
+    f32 t0 = *(f32*)((u8*)&lbl_805FE03C);
     *(u8*)(((u8*)(uintptr_t)(a3)) + 868) = (u8)((u32)(0));
     *(f32*)(((u8*)(uintptr_t)(a3)) + 876) = (f32)(t0);
     *(f32*)(((u8*)(uintptr_t)(a3)) + 872) = (f32)(t0);

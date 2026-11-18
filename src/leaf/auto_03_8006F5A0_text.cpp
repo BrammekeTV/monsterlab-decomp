@@ -6,10 +6,10 @@
 #include "types.h"
 
 extern "C" void fn_8006F5B8(void);
-extern u8 lbl_8035A4B8[];
+extern "C" u8 lbl_8035A4B8[];
 extern "C" s32 RegisterScriptFunc(char*, s32, void*);
 
 // 0x8006F5A0
 extern "C" s32 fn_8006F5A0(void) {
-    return (s32)(RegisterScriptFunc((char*)((u8*)lbl_8035A4B8), (s32)((u32)(22)), (void*)((u8*)(uintptr_t)&fn_8006F5B8)));
+    return (s32)(RegisterScriptFunc((char*)((u8*)&lbl_8035A4B8), (s32)((u32)(22)), (void*)((u8*)(uintptr_t)&fn_8006F5B8)));
 }

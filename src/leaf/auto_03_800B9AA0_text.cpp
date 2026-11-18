@@ -5,16 +5,16 @@
 
 #include "types.h"
 
-extern u8 lbl_805FE230[];
-extern u8 lbl_805FE238[];
-extern u8 lbl_805FE244[];
-extern u8 lbl_805FE268[];
+extern "C" u8 lbl_805FE230[];
+extern "C" u8 lbl_805FE238[];
+extern "C" u8 lbl_805FE244[];
+extern "C" u8 lbl_805FE268[];
 extern "C" void app_PlayMusic(u32, f32);
 extern "C" f32 fn_800BF870(u8*);
 
 // 0x800BA680
 extern "C" void fn_800BA680(void) {
-    f32 t0 = *(f32*)((u8*)lbl_805FE238);
+    f32 t0 = *(f32*)((u8*)&lbl_805FE238);
     u32 t1 = (u32)(0x5f60000) + 3523u;
     app_PlayMusic((u32)((u32)(t1)), (f32)(t0));
 }
@@ -39,7 +39,7 @@ extern "C" void fn_800BB61C(void) {
 extern "C" f32 fn_800BB620(u8* a3) {
     u8* t0 = *(u8**)(((u8*)(uintptr_t)(a3)) + 568);
     if (t0 == 0) {
-        f32 t1 = *(f32*)((u8*)lbl_805FE268);
+        f32 t1 = *(f32*)((u8*)&lbl_805FE268);
         return (f32)(t1);
     }
     return (f32)(fn_800BF870(t0));
@@ -49,7 +49,7 @@ extern "C" f32 fn_800BB620(u8* a3) {
 extern "C" f32 fn_800BB638(u8* a3) {
     u8* t0 = *(u8**)(((u8*)(uintptr_t)(a3)) + 568);
     if (t0 == 0) {
-        f32 t1 = *(f32*)((u8*)lbl_805FE230);
+        f32 t1 = *(f32*)((u8*)&lbl_805FE230);
         return (f32)(t1);
     }
     return (f32)(fn_800BF870(t0));
@@ -57,6 +57,6 @@ extern "C" f32 fn_800BB638(u8* a3) {
 
 // 0x800BB650
 extern "C" f32 fn_800BB650(void) {
-    f32 t0 = *(f32*)((u8*)lbl_805FE244);
+    f32 t0 = *(f32*)((u8*)&lbl_805FE244);
     return (f32)(t0);
 }

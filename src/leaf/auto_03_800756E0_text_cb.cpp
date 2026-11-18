@@ -6,7 +6,7 @@
 #include "types.h"
 #include "game/script_callbacks.h"
 
-extern u8 lbl_805FB138[];
+extern "C" u8 lbl_805FB138[];
 extern "C" BOOL PadButtonHeld(s32);
 extern "C" void fn_80076BA4(u8*, f32);
 extern "C" void fn_8007739C(u8*, s32, s32);
@@ -21,7 +21,7 @@ void TokenUpdate(ScriptCtx* a3) {
 
 // 0x80075F98
 void RegisterMidiLoop(u32 a3, u32 a4) {
-    u8* t0 = *(u8**)((u8*)lbl_805FB138);
+    u8* t0 = *(u8**)((u8*)&lbl_805FB138);
     u8* t1 = *(u8**)(t0 + 1740);
     fn_8007739C(t1, (s32)((u32)(uintptr_t)(a3)), (s32)((u32)(uintptr_t)(a4)));
 }

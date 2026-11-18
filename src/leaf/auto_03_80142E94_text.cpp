@@ -5,9 +5,9 @@
 
 #include "types.h"
 
-extern u8 lbl_80375E24[];
-extern u8 lbl_80375E4C[];
-extern u8 lbl_803F2890[];
+extern "C" u8 lbl_80375E24[];
+extern "C" u8 lbl_80375E4C[];
+extern "C" u8 lbl_803F2890[];
 extern "C" void DCFlushRange(void*, u32);
 extern "C" void fn_80330E20(void*);
 
@@ -42,7 +42,7 @@ extern "C" void fn_80142ED0(u8* a3, s32 a4) {
 
 // 0x80142ED4
 extern "C" u8* fn_80142ED4(void) {
-    return (u8*)((u8*)lbl_803F2890);
+    return (u8*)((u8*)&lbl_803F2890);
 }
 
 // 0x80142EE0
@@ -76,7 +76,7 @@ extern "C" u8* fn_80143310(u8* a3) {
     u8 t0 = *(u8*)(((u8*)(uintptr_t)(a3)) + 4);
     u32 t1 = (u32)(s32)(s8)(u32)(t0);
     if (t1 == 0) {
-        return (u8*)((u8*)lbl_80375E24);
+        return (u8*)((u8*)&lbl_80375E24);
     }
     u8* t2 = ((u8*)(uintptr_t)(a3)) + 4;
     return (u8*)(t2);
@@ -87,7 +87,7 @@ extern "C" u8* fn_80143330(u8* a3) {
     u8 t0 = *(u8*)(((u8*)(uintptr_t)(a3)) + 260);
     u32 t1 = (u32)(s32)(s8)(u32)(t0);
     if (t1 == 0) {
-        return (u8*)((u8*)lbl_80375E4C);
+        return (u8*)((u8*)&lbl_80375E4C);
     }
     u8* t2 = ((u8*)(uintptr_t)(a3)) + 260;
     return (u8*)(t2);

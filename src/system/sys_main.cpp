@@ -79,6 +79,7 @@ static void SysErrorHandler(OSError error, OSContext* context, u32 dsisr, u32 da
     OSFatal(gSysFatalFg, gSysFatalBg, msg);
 }
 
+
 // 0x80142BBC
 void SysInit(void) {
     if (sInitialized) return;

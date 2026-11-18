@@ -6,7 +6,7 @@
 #include "types.h"
 
 extern "C" s32 fn_8004CB10(u8* a3);
-extern u8 lbl_805F86F8[];
+extern "C" u8 lbl_805F86F8[];
 extern "C" s32 PartGetCurrentHealth(u8*);
 extern "C" s32 PartGetMaxHealth(u8*);
 extern "C" u8* fn_8004B500(u8*, s32);
@@ -55,7 +55,7 @@ extern "C" s32 GetGestureDetector(s32 a3, s32 a4) {
 
 // 0x8004D2B8
 extern "C" void CharacterSetInCombat(u8* a3) {
-    fn_8004D3F8((void*)(((u8*)(uintptr_t)(a3))), (char*)((u8*)lbl_805F86F8), (s32)((u32)(1)), (s32)((u32)(1)));
+    fn_8004D3F8((void*)(((u8*)(uintptr_t)(a3))), (char*)((u8*)&lbl_805F86F8), (s32)((u32)(1)), (s32)((u32)(1)));
 }
 
 // 0x8004E2A4

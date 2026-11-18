@@ -18,7 +18,7 @@ def vcvars():
     path = subprocess.run([VSWHERE, "-latest", "-products", "*", "-requires",
                            "Microsoft.VisualStudio.Component.VC.Tools.x86.x64", "-property", "installationPath"],
                           capture_output=True, text=True).stdout.strip()
-    bat = os.path.join(path, "VC", "Auxiliary", "Build", "vcvars64.bat")
+    bat = os.path.join(path, "VC", "Auxiliary", "Build", "vcvars32.bat")
     if not path or not os.path.exists(bat):
         sys.exit("MSVC C++ tools not found (install the 'Desktop development with C++' workload)")
     return bat

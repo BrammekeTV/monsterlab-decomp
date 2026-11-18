@@ -99,8 +99,8 @@ These live in the platform layer (`src/platform/`) that replaces the Wii SDK, so
 
 ### Roadmap (next steps)
 
-1. **32-bit build first.** The decompiled code reads game structures at their original offsets with 4-byte pointer slots, which is only layout-correct in a 32-bit (Win32) build.
-2. **Link step + missing-symbols report.** CI links everything and lists unresolved functions/globals; that list drives the remaining decompilation.
+1. **32-bit build first (done).** The decompiled code reads game structures at their original offsets with 4-byte pointer slots, which is only layout-correct in a 32-bit (Win32) build.
+2. **Link step + missing-symbols report (done).** `tools/link_check.py` + `tools/missing_symbols.py`; CI links everything and lists unresolved functions/globals; that list drives the remaining decompilation.
 3. **Big-endian data loader.** Convert game data (game database, part definitions, saves) at load time.
 4. **Identify more SDK code.** Apply RVL SDK / MSL / Bink signatures with decomp-toolkit so the platform layer knows exactly which Nintendo SDK functions to replace (about 460 of ~4,000 library functions are named so far).
 5. **Boot to the title screen**, then compare self-contained functions against the original (differential tests).

@@ -5,14 +5,14 @@
 
 #include "types.h"
 
-extern u8 lbl_80355658[];
-extern u8 lbl_805FC8B8[];
-extern u8 lbl_805FC8BC[];
+extern "C" u8 lbl_80355658[];
+extern "C" u8 lbl_805FC8B8[];
+extern "C" u8 lbl_805FC8BC[];
 
 // 0x80020040
 extern "C" f32 fn_80020040(u8* a3) {
-    f32 t0 = *(f32*)((u8*)lbl_805FC8BC);
-    f32 t1 = *(f32*)((u8*)lbl_805FC8B8);
+    f32 t0 = *(f32*)((u8*)&lbl_805FC8BC);
+    f32 t1 = *(f32*)((u8*)&lbl_805FC8B8);
     *(f32*)(((u8*)(uintptr_t)(a3)) + 64) = (f32)(t0);
     *(f32*)(((u8*)(uintptr_t)(a3)) + 68) = (f32)(t1);
     *(u32*)(((u8*)(uintptr_t)(a3)) + 60) = (u32)((u32)(0));
@@ -30,14 +30,14 @@ extern "C" f32 RemoteInputShake(u8* a3) {
 
 // 0x800202EC
 extern "C" void fn_800202EC(u8* a3) {
-    f32 t0 = *(f32*)((u8*)lbl_805FC8BC);
+    f32 t0 = *(f32*)((u8*)&lbl_805FC8BC);
     *(f32*)(((u8*)(uintptr_t)(a3)) + 4) = (f32)(t0);
     *(f32*)(((u8*)(uintptr_t)(a3)) + 0) = (f32)(t0);
 }
 
 // 0x800202FC
 extern "C" void fn_800202FC(u8* a3) {
-    *(u32*)(((u8*)(uintptr_t)(a3)) + 76) = (u32)((u32)(uintptr_t)((u8*)lbl_80355658));
+    *(u32*)(((u8*)(uintptr_t)(a3)) + 76) = (u32)((u32)(uintptr_t)((u8*)&lbl_80355658));
 }
 
 // 0x8002030C
@@ -48,15 +48,15 @@ extern "C" f32 fn_8002030C(u8* a3, f32 f1) {
         if (!(f1 > t1)) {
             return (f32)(f1);
         }
-        f32 t2 = *(f32*)((u8*)lbl_805FC8BC);
+        f32 t2 = *(f32*)((u8*)&lbl_805FC8BC);
         return (f32)(t2);
     }
-    f32 t3 = *(f32*)((u8*)lbl_805FC8BC);
+    f32 t3 = *(f32*)((u8*)&lbl_805FC8BC);
     return (f32)(t3);
 }
 
 // 0x80020458
 extern "C" f32 fn_80020458(void) {
-    f32 t0 = *(f32*)((u8*)lbl_805FC8BC);
+    f32 t0 = *(f32*)((u8*)&lbl_805FC8BC);
     return (f32)(t0);
 }

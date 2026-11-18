@@ -5,11 +5,11 @@
 
 #include "types.h"
 
-extern u8 lbl_803839F0[];
-extern u8 lbl_805FD300[];
-extern u8 lbl_805FD304[];
-extern u8 lbl_805FD378[];
-extern u8 lbl_805FD37C[];
+extern "C" u8 lbl_803839F0[];
+extern "C" f32 lbl_805FD300;
+extern "C" f32 lbl_805FD304;
+extern "C" u8 lbl_805FD378[];
+extern "C" u8 lbl_805FD37C[];
 extern "C" void fn_801C4B90(u8*, s32, s32, s32, s32, s32);
 
 // 0x80052504
@@ -76,8 +76,8 @@ extern "C" f32 fn_800531E4(u8* a3, u8* a4) {
 
 // 0x80053208
 extern "C" f32 fn_80053208(u8* a3) {
-    f32 t0 = *(f32*)((u8*)lbl_805FD300);
-    f32 t1 = *(f32*)((u8*)lbl_805FD304);
+    f32 t0 = *(f32*)((u8*)&lbl_805FD300);
+    f32 t1 = *(f32*)((u8*)&lbl_805FD304);
     *(f32*)(((u8*)(uintptr_t)(a3)) + 8) = (f32)(t0);
     *(f32*)(((u8*)(uintptr_t)(a3)) + 4) = (f32)(t0);
     *(f32*)(((u8*)(uintptr_t)(a3)) + 0) = (f32)(t0);
@@ -173,7 +173,7 @@ extern "C" f32 fn_800544B8(u8* a3, u8* a4, u8* a5) {
 
 // 0x800544CC
 extern "C" void fn_800544CC(u8* a3) {
-    f32 t0 = *(f32*)((u8*)lbl_805FD304);
+    f32 t0 = *(f32*)((u8*)&lbl_805FD304);
     *(f32*)(((u8*)(uintptr_t)(a3)) + 0) = (f32)(t0);
 }
 
@@ -304,7 +304,7 @@ extern "C" s32 fn_80056208(void) {
 // 0x8005678C
 extern "C" void fn_8005678C(u8* a3) {
     *(u32*)(((u8*)(uintptr_t)(a3)) + 4) = (u32)((u32)(0));
-    *(u32*)(((u8*)(uintptr_t)(a3)) + 0) = (u32)((u32)(uintptr_t)((u8*)lbl_803839F0));
+    *(u32*)(((u8*)(uintptr_t)(a3)) + 0) = (u32)((u32)(uintptr_t)((u8*)&lbl_803839F0));
 }
 
 // 0x800567FC
@@ -358,7 +358,7 @@ extern "C" void CharacterSetFallTimer(u8* a3, f32 f1) {
 
 // 0x80058BD4
 extern "C" f32 fn_80058BD4(u8* a3, u8* a4) {
-    f32 t0 = *(f32*)((u8*)lbl_805FD304);
+    f32 t0 = *(f32*)((u8*)&lbl_805FD304);
     f32 t1 = *(f32*)(((u8*)(uintptr_t)(a4)) + 0);
     f32 t2 = (f32)(t0 / t1);
     *(f32*)(((u8*)(uintptr_t)(a3)) + 0) = (f32)(t2);
@@ -367,11 +367,11 @@ extern "C" f32 fn_80058BD4(u8* a3, u8* a4) {
 
 // 0x80058C00
 extern "C" s32 fn_80058C00(f32 f1) {
-    f32 t0 = *(f32*)((u8*)lbl_805FD37C);
+    f32 t0 = *(f32*)((u8*)&lbl_805FD37C);
     if (!(f1 > t0)) {
         return (s32)(0);
     }
-    f32 t1 = *(f32*)((u8*)lbl_805FD378);
+    f32 t1 = *(f32*)((u8*)&lbl_805FD378);
     if (!(f1 < t1)) {
         return (s32)(0);
     }

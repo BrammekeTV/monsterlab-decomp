@@ -5,13 +5,13 @@
 
 #include "types.h"
 
-extern u8 gEventMgr[];
-extern u8 lbl_805FE280[];
+extern "C" void* gEventMgr;
+extern "C" u8 lbl_805FE280[];
 extern "C" void EventSend(void*, void*, void*, u32, int, int, int, int);
 
 // 0x800BCC10
 extern "C" void fn_800BCC10(u8* a3) {
-    f32 t0 = *(f32*)((u8*)lbl_805FE280);
+    f32 t0 = *(f32*)((u8*)&lbl_805FE280);
     *(u32*)(((u8*)(uintptr_t)(a3)) + 612) = (u32)((u32)(0));
     *(f32*)(((u8*)(uintptr_t)(a3)) + 616) = (f32)(t0);
 }
@@ -19,13 +19,13 @@ extern "C" void fn_800BCC10(u8* a3) {
 // 0x800BD440
 extern "C" void fn_800BD440(u8* a3) {
     u32 t0 = (u32)(0xc6820000) + 32125u;
-    u8* t1 = *(u8**)((u8*)gEventMgr);
+    u8* t1 = *(u8**)((u8*)&gEventMgr);
     EventSend((void*)(t1), (void*)(((u8*)(uintptr_t)(a3))), (void*)((u8*)(uintptr_t)(0)), (u32)((u32)(t0)), (int)((u32)(0)), (int)((u32)(0)), (int)((u32)(1)), (int)((u32)(0)));
 }
 
 // 0x800BD468
 extern "C" void fn_800BD468(u8* a3) {
     u32 t0 = (u32)(0x88df0000) - 19759u;
-    u8* t1 = *(u8**)((u8*)gEventMgr);
+    u8* t1 = *(u8**)((u8*)&gEventMgr);
     EventSend((void*)(t1), (void*)(((u8*)(uintptr_t)(a3))), (void*)((u8*)(uintptr_t)(0)), (u32)((u32)(t0)), (int)((u32)(0)), (int)((u32)(0)), (int)((u32)(1)), (int)((u32)(0)));
 }

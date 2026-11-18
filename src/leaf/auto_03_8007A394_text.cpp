@@ -5,11 +5,11 @@
 
 #include "types.h"
 
-extern u8 lbl_805FD6C4[];
+extern "C" u8 lbl_805FD6C4[];
 
 // 0x8007A394
 extern "C" void fn_8007A394(u8* a3) {
-    f32 t0 = *(f32*)((u8*)lbl_805FD6C4);
+    f32 t0 = *(f32*)((u8*)&lbl_805FD6C4);
     *(u32*)(((u8*)(uintptr_t)(a3)) + 0) = (u32)((u32)(0));
     *(u32*)(((u8*)(uintptr_t)(a3)) + 4) = (u32)((u32)(0));
     *(u32*)(((u8*)(uintptr_t)(a3)) + 8) = (u32)((u32)(0));

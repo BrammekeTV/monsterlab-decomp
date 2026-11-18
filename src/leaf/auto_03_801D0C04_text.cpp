@@ -5,9 +5,9 @@
 
 #include "types.h"
 
-extern u8 lbl_805FB78C[];
+extern "C" u8 lbl_805FB78C[];
 
 // 0x801D1830
 extern "C" void EngineRequestSuspend(s32 a3) {
-    *(u32*)((u8*)lbl_805FB78C) = (u32)((u32)(uintptr_t)(a3));
+    *(u32*)((u8*)&lbl_805FB78C) = (u32)((u32)(uintptr_t)(a3));
 }

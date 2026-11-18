@@ -5,16 +5,16 @@
 
 #include "types.h"
 
-extern u8 gEventMgr[];
-extern u8 lbl_805FD928[];
-extern u8 lbl_805FD934[];
-extern u8 lbl_805FD958[];
+extern "C" void* gEventMgr;
+extern "C" u8 lbl_805FD928[];
+extern "C" u8 lbl_805FD934[];
+extern "C" u8 lbl_805FD958[];
 extern "C" void EventSendTo(void*, u32, void*, u32, int, int);
 extern "C" void app_PlayMusic(u32, f32);
 
 // 0x80087ADC
 extern "C" void fn_80087ADC(void) {
-    f32 t0 = *(f32*)((u8*)lbl_805FD934);
+    f32 t0 = *(f32*)((u8*)&lbl_805FD934);
     u32 t1 = (u32)(0x82c90000) + 7170u;
     app_PlayMusic((u32)((u32)(t1)), (f32)(t0));
 }
@@ -22,7 +22,7 @@ extern "C" void fn_80087ADC(void) {
 // 0x80087BD4
 extern "C" void fn_80087BD4(void) {
     u32 t0 = (u32)(0xf1590000) + 6310u;
-    u8* t1 = *(u8**)((u8*)gEventMgr);
+    u8* t1 = *(u8**)((u8*)&gEventMgr);
     u32 t2 = (u32)(0x16a0000) + 14501u;
     EventSendTo((void*)(t1), (u32)((u32)(t2)), (void*)((u8*)(uintptr_t)(0)), (u32)((u32)(t0)), (int)((u32)(0)), (int)((u32)(0)));
 }
@@ -33,7 +33,7 @@ extern "C" void fn_80087EA8(void) {
 
 // 0x80087EAC
 extern "C" void fn_80087EAC(u8* a3) {
-    f32 t0 = *(f32*)((u8*)lbl_805FD928);
+    f32 t0 = *(f32*)((u8*)&lbl_805FD928);
     *(f32*)(((u8*)(uintptr_t)(a3)) + 140) = (f32)(t0);
 }
 
@@ -43,7 +43,7 @@ extern "C" void fn_80087EEC(void) {
 
 // 0x80087EF0
 extern "C" void fn_80087EF0(u8* a3) {
-    f32 t0 = *(f32*)((u8*)lbl_805FD928);
+    f32 t0 = *(f32*)((u8*)&lbl_805FD928);
     *(f32*)(((u8*)(uintptr_t)(a3)) + 140) = (f32)(t0);
 }
 
@@ -59,6 +59,6 @@ extern "C" f32 fn_80087FF4(u8* a3) {
 
 // 0x80087FFC
 extern "C" f32 fn_80087FFC(void) {
-    f32 t0 = *(f32*)((u8*)lbl_805FD958);
+    f32 t0 = *(f32*)((u8*)&lbl_805FD958);
     return (f32)(t0);
 }

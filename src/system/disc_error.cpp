@@ -44,7 +44,8 @@ extern const char        sEmptyString[];               ORIG(0x805F81F8)
 extern u8   gAudio[];                ORIG(0x8047C7F0)  // +0x2AC: audio running
 extern s32  gTextLanguage;           // 0x805F81B4
 extern s32  lbl_805FB970, lbl_805FBB64;
-extern void* gStringTable;           // 0x805FB910
+struct StringTable;
+extern StringTable* gStringTable;           // 0x805FB910
 extern const char lbl_805F8200[];
 static volatile s32 sRetraceFlag;    ORIG(0x805FBA88)   // set by the retrace interrupt
 

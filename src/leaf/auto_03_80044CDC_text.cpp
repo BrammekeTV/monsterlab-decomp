@@ -5,39 +5,39 @@
 
 #include "types.h"
 
-extern u8 gSelectedPart[];
-extern u8 lbl_803C4298[];
-extern u8 lbl_805F865D[];
-extern u8 lbl_805FB099[];
-extern u8 lbl_805FB0BE[];
+extern "C" s32 gSelectedPart;
+extern "C" u8 lbl_803C4298[];
+extern "C" u8 lbl_805F865D[];
+extern "C" u8 lbl_805FB099[];
+extern "C" u8 lbl_805FB0BE[];
 extern "C" void fn_8000B924(u8*, s32, s32);
 
 // 0x80046F54
 extern "C" u8 fn_80046F54(void) {
-    u8 t0 = *(u8*)((u8*)lbl_805FB099);
+    u8 t0 = *(u8*)((u8*)&lbl_805FB099);
     return (u8)(t0);
 }
 
 // 0x8004935C
 extern "C" s32 fn_8004935C(void) {
-    s32 t0 = *(s32*)((u8*)gSelectedPart);
+    s32 t0 = *(s32*)((u8*)&gSelectedPart);
     return (s32)(t0);
 }
 
 // 0x80049364
 extern "C" u8 fn_80049364(void) {
-    u8 t0 = *(u8*)((u8*)lbl_805FB0BE);
+    u8 t0 = *(u8*)((u8*)&lbl_805FB0BE);
     return (u8)(t0);
 }
 
 // 0x8004936C
 extern "C" u8 fn_8004936C(void) {
-    u8 t0 = *(u8*)((u8*)lbl_805F865D);
+    u8 t0 = *(u8*)((u8*)&lbl_805F865D);
     return (u8)(t0);
 }
 
 // 0x8004947C
 extern "C" void fn_8004947C(void) {
     u32 t0 = (u32)(0x20ce0000) + 20573u;
-    fn_8000B924((u8*)lbl_803C4298, (s32)((u32)(16)), (s32)((u32)(t0)));
+    fn_8000B924((u8*)&lbl_803C4298, (s32)((u32)(16)), (s32)((u32)(t0)));
 }

@@ -41,7 +41,7 @@ typedef void (*CamSetTimeFn)(CameraCtl*, f32);
 enum { CAM_MODE_FREE = 5, CAM_MODE_FIXED = 6, CAM_MODE_7 = 7 };
 
 Character*        gCameraOwner;    ORIG(0x805FAF60)
-u8                gIgcMode;        ORIG(0x805FAF64) // in-game cutscene mode
+extern "C" { u8                gIgcMode;        ORIG(0x805FAF64) } // in-game cutscene mode
 s32               gCameraLocks;    ORIG(0x805FAF68)
 
 // Animation component (Character + 0xA0).

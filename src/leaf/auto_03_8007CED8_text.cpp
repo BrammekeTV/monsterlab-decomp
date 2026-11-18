@@ -5,12 +5,12 @@
 
 #include "types.h"
 
-extern u8 lbl_805FD750[];
+extern "C" u8 lbl_805FD750[];
 
 // 0x8007CF94
 extern "C" f32 fn_8007CF94(u8* a3) {
     f32 t0 = *(f32*)(((u8*)(uintptr_t)(a3)) + 20);
-    f32 t1 = *(f32*)((u8*)lbl_805FD750);
+    f32 t1 = *(f32*)((u8*)&lbl_805FD750);
     f32 t2 = (f32)(t0 / t1);
     return (f32)(t2);
 }

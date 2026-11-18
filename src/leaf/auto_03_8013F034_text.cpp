@@ -5,18 +5,18 @@
 
 #include "types.h"
 
-extern u8 gScreenSets[];
-extern u8 lbl_805F90D8[];
-extern u8 lbl_805FB418[];
-extern u8 lbl_805FB41C[];
-extern u8 lbl_805FB424[];
-extern u8 lbl_805FB438[];
-extern u8 lbl_805FEFEC[];
+extern "C" void* gScreenSets;
+extern "C" u8 lbl_805F90D8[];
+extern "C" s32 lbl_805FB418;
+extern "C" u8 lbl_805FB41C[];
+extern "C" u8 lbl_805FB424[];
+extern "C" s32 lbl_805FB438;
+extern "C" u8 lbl_805FEFEC[];
 extern "C" void SaveManager_SaveOptions(void);
 
 // 0x8013F38C
 extern "C" s32 AlertGetScreenSets(void) {
-    s32 t0 = *(s32*)((u8*)gScreenSets);
+    s32 t0 = *(s32*)((u8*)&gScreenSets);
     return (s32)(t0);
 }
 
@@ -32,31 +32,31 @@ extern "C" void OnlineRecordLoss(void) {
 
 // 0x801409FC
 extern "C" u8 MatchupIsActive(void) {
-    u8 t0 = *(u8*)((u8*)lbl_805FB41C);
+    u8 t0 = *(u8*)((u8*)&lbl_805FB41C);
     return (u8)(t0);
 }
 
 // 0x80140B30
 extern "C" void fn_80140B30(void) {
-    f32 t0 = *(f32*)((u8*)lbl_805FEFEC);
-    *(f32*)((u8*)lbl_805FB424) = (f32)(t0);
+    f32 t0 = *(f32*)((u8*)&lbl_805FEFEC);
+    *(f32*)((u8*)&lbl_805FB424) = (f32)(t0);
 }
 
 // 0x80140B58
 extern "C" s32 AlertGetLastError(void) {
-    s32 t0 = *(s32*)((u8*)lbl_805F90D8);
+    s32 t0 = *(s32*)((u8*)&lbl_805F90D8);
     return (s32)(t0);
 }
 
 // 0x80140B7C
 extern "C" void fn_80140B7C(s32 a3) {
-    s32 t0 = *(s32*)((u8*)lbl_805FB418);
+    s32 t0 = *(s32*)((u8*)&lbl_805FB418);
     u32 t1 = (u32)(t0) | (u32)(uintptr_t)(a3);
-    *(u32*)((u8*)lbl_805FB418) = (u32)((u32)(t1));
+    *(u32*)((u8*)&lbl_805FB418) = (u32)((u32)(t1));
 }
 
 // 0x80140CE0
 extern "C" s32 fn_80140CE0(void) {
-    s32 t0 = *(s32*)((u8*)lbl_805FB438);
+    s32 t0 = *(s32*)((u8*)&lbl_805FB438);
     return (s32)(t0);
 }

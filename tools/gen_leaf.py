@@ -153,6 +153,26 @@ def source_protos(funcs):
     return protos
 
 
+PRIM_RE = re.compile(r"^(?:[us](?:8|16|32|64)|f32|f64|BOOL|void\s*\*|u8\s*\*)$")
+GLOB_RE = re.compile(r"^(?:extern\s+)?([A-Za-z_][\w \t\*]*?)\s*\b((?:g[A-Z]|lbl_)\w*)\s*(?:;|=)")
+
+
+def global_types():
+    """Scalar/pointer types of globals declared or defined in hand-written sources, so the leaf
+    files declare them with the same type (the linker needs identical C++ decorated names)."""
+    types = {}
+    for p in sorted(glob.glob(os.path.join(ROOT, "src", "**", "*.cpp"), recursive=True)):
+        if os.path.normpath(p).startswith(os.path.normpath(OUT)):
+            continue
+        for line in open(p, encoding="utf-8", errors="replace"):
+            if line[:1] in " 	/#":
+                continue
+            m = GLOB_RE.match(line)
+            if m and PRIM_RE.match(re.sub(r"\s+", " ", m.group(1)).replace(" *", "*").strip()):
+                types.setdefault(m.group(2), re.sub(r"\s+", " ", m.group(1)).replace(" *", "*").strip())
+    return types
+
+
 def head_proto(head):
     m = re.match(r'^extern "C" (.+?)\b(\w+)\((.*)\)$', head)
     return norm_proto(m.group(1).strip(), split_params(m.group(3))) if m else None
@@ -264,7 +284,7 @@ class Gen:
         m = re.match(r"(\w+)@sda21\(r0\)$", mem)
         if m:
             self.globals.add(m.group(1))
-            return f"(u8*){m.group(1)}"
+            return f"(u8*)&{m.group(1)}"
         raise Skip("addr " + mem)
 
     def imm(self, s):
@@ -293,7 +313,7 @@ class Gen:
         elif op == "li":
             v, sym = self.imm(a[1])
             if sym:
-                self.set(a[0], f"(u8*){sym}", "u8*")
+                self.set(a[0], f"(u8*)&{sym}", "u8*")
             else:
                 self.set(a[0], str(v), "s32")
         elif op == "lis":
@@ -308,7 +328,7 @@ class Gen:
                 if self.regs.get(a[1], (None, None))[1] != "HA":
                     raise Skip("@l without @ha")
                 self.globals.add(m.group(1))
-                self.set(a[0], f"(u8*){m.group(1)}", "u8*")
+                self.set(a[0], f"(u8*)&{m.group(1)}", "u8*")
                 return
             k = int(a[2], 0)
             if op in ("subi", "subis"):
@@ -802,6 +822,7 @@ def main():
             lines.append('#include "game/script_callbacks.h"')
         lines.append("")
         globs = sorted(set().union(*[g for _, _, _, g, _ in fns]))
+        gtypes = global_types()
         calls = {}
         for _, _, _, _, c in fns:
             for t, d in c.items():
@@ -824,7 +845,7 @@ def main():
             if gname in funcs:
                 lines.append(f'extern "C" void {gname}(void);')
             else:
-                lines.append(f"extern u8 {gname}[];")
+                lines.append(f'extern "C" {gtypes.get(gname, "u8")} {gname}{"" if gname in gtypes else "[]"};')
         for t in sorted(calls):
             ret, ps = calls[t]
             lines.append(f'extern "C" {ret} {t}({", ".join(ps) or "void"});')
@@ -838,7 +859,7 @@ def main():
         # function symbols are referenced by address
         for gname in globs:
             if gname in funcs:
-                src = src.replace(f"(u8*){gname}", f"(u8*)(uintptr_t)&{gname}")
+                src = src.replace(f"(u8*)&{gname}", f"(u8*)(uintptr_t)&{gname}")
         open(os.path.join(OUT, key + ".cpp"), "w", encoding="utf-8").write(src)
 
 

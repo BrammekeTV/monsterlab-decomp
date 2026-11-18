@@ -6,11 +6,11 @@
 #include "types.h"
 #include "game/script_callbacks.h"
 
-extern u8 lbl_805FB24D[];
-extern u8 lbl_805FB250[];
-extern u8 lbl_805FB254[];
-extern u8 lbl_805FB258[];
-extern u8 lbl_805FB25C[];
+extern "C" u8 lbl_805FB24D[];
+extern "C" u8 lbl_805FB250[];
+extern "C" u8 lbl_805FB254[];
+extern "C" u8 lbl_805FB258[];
+extern "C" u8 lbl_805FB25C[];
 extern "C" void fn_80119798(u8*);
 extern "C" BOOL fn_80119B00(void);
 extern "C" BOOL fn_80119B38(void);
@@ -29,12 +29,12 @@ extern "C" s32 fn_8011A044(void);
 
 // 0x801116FC
 void LockInput(s32 a3) {
-    *(u32*)((u8*)lbl_805FB25C) = (u32)((u32)(uintptr_t)(a3));
+    *(u32*)((u8*)&lbl_805FB25C) = (u32)((u32)(uintptr_t)(a3));
 }
 
 // 0x80111704
 s32 CanProcessInput(void) {
-    s32 t0 = *(s32*)((u8*)lbl_805FB25C);
+    s32 t0 = *(s32*)((u8*)&lbl_805FB25C);
     u32 t1 = (u32)(t0 == 0);
     return (s32)(t1);
 }
@@ -116,25 +116,25 @@ s32 IngredientSelectionIsErrorTransition(void) {
 
 // 0x80116848
 BOOL PartInfo_GetTexture(void) {
-    s32 t0 = *(s32*)((u8*)lbl_805FB250);
+    s32 t0 = *(s32*)((u8*)&lbl_805FB250);
     return (BOOL)(t0);
 }
 
 // 0x80116850
 BOOL PartInfo_GetEnhanceDefectTexture(void) {
-    s32 t0 = *(s32*)((u8*)lbl_805FB254);
+    s32 t0 = *(s32*)((u8*)&lbl_805FB254);
     return (BOOL)(t0);
 }
 
 // 0x80116858
 BOOL PartInfo_GetEnhanceDefectDesc(void) {
-    s32 t0 = *(s32*)((u8*)lbl_805FB258);
+    s32 t0 = *(s32*)((u8*)&lbl_805FB258);
     return (BOOL)(t0);
 }
 
 // 0x80116860
 s32 PartInfo_PlayerNeedsMoreRanks(void) {
-    u8 t0 = *(u8*)((u8*)lbl_805FB24D);
+    u8 t0 = *(u8*)((u8*)&lbl_805FB24D);
     u32 t1 = (u32)(t0 == 0);
     return (s32)(t1);
 }

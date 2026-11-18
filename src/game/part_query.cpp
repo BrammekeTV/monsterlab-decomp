@@ -73,6 +73,7 @@ extern "C" s8 PartGetMadness(const PartInstance* p) {
     return (s8)(u8)(scaled / 100);
 }
 
+extern "C" void PartQuery_SetPart(void);
 // 0x800F9790
 // Query the part currently selected in the lab.
 void PartQuery_SetPart(void) {
@@ -82,6 +83,7 @@ void PartQuery_SetPart(void) {
     sQueryMonster = NULL;
 }
 
+extern "C" void PartQuery_SetInventoryPartByIndex(s32 index);
 // 0x800F97E8
 // Query inventory slot `index`.
 void PartQuery_SetInventoryPartByIndex(s32 index) {
@@ -92,21 +94,25 @@ void PartQuery_SetInventoryPartByIndex(s32 index) {
     sQueryMonster = NULL;
 }
 
+extern "C" void PartQuery_SetLightningTowerMonster(void);
 // 0x800F985C
 void PartQuery_SetLightningTowerMonster(void) {
     sQueryMonster = LightningTowerGetMonster();
 }
 
+extern "C" s32 PartQuery_GetMadness(void);
 // 0x800F9880
 s32 PartQuery_GetMadness(void) {
     return sQueryPart ? PartGetMadness(sQueryPart) : 0;
 }
 
+extern "C" s32 PartQuery_GetQuality(void);
 // 0x800F98B8
 s32 PartQuery_GetQuality(void) {
     return sQueryPart ? PartGetQuality(sQueryPart) : 0;
 }
 
+extern "C" s32 PartQuery_GetName(void);
 // 0x800F98F0
 // Text id of the part's name for its tier (e.g. "Gorilla Arm" for tier 3 of part 0).
 s32 PartQuery_GetName(void) {
@@ -122,24 +128,28 @@ s32 PartQuery_GetName(void) {
     return TEXT_UNKNOWN_PART;
 }
 
+extern "C" void* PartQuery_GetDefectTexture(void);
 // 0x800F9AE4
 void* PartQuery_GetDefectTexture(void) {
     if (sQueryPart == NULL || sQueryPart->defect == -1) return NULL;
     return DefectGetTexture(sQueryPart->defect);
 }
 
+extern "C" void* PartQuery_GetEnhancementTexture(void);
 // 0x800F9B08
 void* PartQuery_GetEnhancementTexture(void) {
     if (sQueryPart == NULL || sQueryPart->enhancement == -1) return NULL;
     return EnhancementGetTexture(sQueryPart->enhancement);
 }
 
+extern "C" s32 PartQuery_GetHealth(void);
 // 0x800F9B2C
 s32 PartQuery_GetHealth(void) {
     if (sQueryPart == NULL) return 0;
     return PartGetMaxHealth(sQueryPart);
 }
 
+extern "C" void* PartQuery_GetTexture(void);
 // 0x800FA350
 void* PartQuery_GetTexture(void) {
     return sQueryTexture;
@@ -158,6 +168,7 @@ static inline PartActionType* ActionTypeTable(void) {
     return *(PartActionType**)(gGameDb->data + 0x08);
 }
 
+extern "C" s32 PartQuery_GetActionName(u32 which);
 // 0x800F9B44
 // Text id of action `which` (0 or 1) of the queried part.
 s32 PartQuery_GetActionName(u32 which) {
@@ -171,6 +182,7 @@ s32 PartQuery_GetActionName(u32 which) {
     return TextIdFromHash(t.nameHash);
 }
 
+extern "C" s32 PartQuery_GetActionCost(u32 which);
 // 0x800F9E0C
 // Energy cost of action `which` for the queried part (on sQueryMonster, if set).
 s32 PartQuery_GetActionCost(u32 which) {
@@ -190,16 +202,19 @@ static inline BOOL QueryDisciplineIs(s32 discipline) {
     return def.discipline == discipline;
 }
 
+extern "C" BOOL PartQuery_PartIsMech(void);
 // 0x800FA358
 BOOL PartQuery_PartIsMech(void) {
     return QueryDisciplineIs(PART_MECH);
 }
 
+extern "C" BOOL PartQuery_PartIsBio(void);
 // 0x800FA3CC
 BOOL PartQuery_PartIsBio(void) {
     return QueryDisciplineIs(PART_BIO);
 }
 
+extern "C" BOOL PartQuery_PartIsAlchemy(void);
 // 0x800FA440
 BOOL PartQuery_PartIsAlchemy(void) {
     return QueryDisciplineIs(PART_ALCHEMY);

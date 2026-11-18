@@ -58,7 +58,7 @@ extern StringTable* gStringTable2;   ORIG(0x805FB90C)
 // ---- data ----
 static u8  sHudLocked;                    ORIG(0x805FB099)
 static u8  sHudEnabled = 1;               ORIG(0x805F865C)
-s32        gSelectedPart = -1;            ORIG(0x805F8650)
+extern "C" { s32        gSelectedPart = -1;            ORIG(0x805F8650) }
 s32        gHighlightedAction = -1;       ORIG(0x805F8654)
 static u8  sDefectShown;                  ORIG(0x805FB0BC)
 static u8  sEnhancementShown;             ORIG(0x805FB0BD)

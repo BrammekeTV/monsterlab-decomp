@@ -5,11 +5,11 @@
 
 #include "types.h"
 
-extern u8 gGlobalSettings[];
+extern "C" u8 gGlobalSettings[];
 
 // 0x801D2BF8
 extern "C" s32 GetGlobalSettings(void) {
-    s32 t0 = *(s32*)((u8*)gGlobalSettings);
+    s32 t0 = *(s32*)((u8*)&gGlobalSettings);
     return (s32)(t0);
 }
 

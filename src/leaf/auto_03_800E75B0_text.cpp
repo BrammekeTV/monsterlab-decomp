@@ -5,7 +5,7 @@
 
 #include "types.h"
 
-extern u8 lbl_805FBBE0[];
+extern "C" u8* lbl_805FBBE0;
 
 // 0x800E75E8
 extern "C" void fn_800E75E8(void) {
@@ -22,26 +22,26 @@ extern "C" s32 fn_800F5FD4(void) {
 
 // 0x800FB438
 extern "C" void fn_800FB438(s32 a3) {
-    u8* t0 = *(u8**)((u8*)lbl_805FBBE0);
+    u8* t0 = *(u8**)((u8*)&lbl_805FBBE0);
     *(u32*)(t0 + 2600) = (u32)((u32)(uintptr_t)(a3));
 }
 
 // 0x800FB444
 extern "C" s32 fn_800FB444(void) {
-    u8* t0 = *(u8**)((u8*)lbl_805FBBE0);
+    u8* t0 = *(u8**)((u8*)&lbl_805FBBE0);
     s32 t1 = *(s32*)(t0 + 2600);
     return (s32)(t1);
 }
 
 // 0x800FB450
 extern "C" void fn_800FB450(s32 a3) {
-    u8* t0 = *(u8**)((u8*)lbl_805FBBE0);
+    u8* t0 = *(u8**)((u8*)&lbl_805FBBE0);
     *(u32*)(t0 + 2604) = (u32)((u32)(uintptr_t)(a3));
 }
 
 // 0x800FB45C
 extern "C" s32 fn_800FB45C(void) {
-    u8* t0 = *(u8**)((u8*)lbl_805FBBE0);
+    u8* t0 = *(u8**)((u8*)&lbl_805FBBE0);
     s32 t1 = *(s32*)(t0 + 2604);
     return (s32)(t1);
 }

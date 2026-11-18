@@ -6,12 +6,12 @@
 #include "types.h"
 #include "game/script_callbacks.h"
 
-extern u8 lbl_805FB2D0[];
+extern "C" u8 lbl_805FB2D0[];
 
 // 0x801242D0
 BOOL SaveManager_GetPlayerNameFromTmp(s32 a3) {
     u32 t0 = (u32)((s32)(u32)(uintptr_t)(a3) * 2440);
-    s32 t1 = *(s32*)((u8*)lbl_805FB2D0);
+    s32 t1 = *(s32*)((u8*)&lbl_805FB2D0);
     u32 t2 = (u32)(t1) + (u32)(t0);
     u32 t3 = (u32)(t2) + 3584u;
     return (BOOL)(t3);
@@ -20,7 +20,7 @@ BOOL SaveManager_GetPlayerNameFromTmp(s32 a3) {
 // 0x801242E4
 s32 SaveManager_GetPlayerRankFromTmp(s32 a3) {
     u32 t0 = (u32)((s32)(u32)(uintptr_t)(a3) * 2440);
-    s32 t1 = *(s32*)((u8*)lbl_805FB2D0);
+    s32 t1 = *(s32*)((u8*)&lbl_805FB2D0);
     u32 t2 = (u32)(t1) + (u32)(t0);
     s32 t3 = *(s32*)((u8*)(uintptr_t)(t2) + 3100);
     return (s32)(t3);
@@ -29,7 +29,7 @@ s32 SaveManager_GetPlayerRankFromTmp(s32 a3) {
 // 0x801242F8
 s32 SaveManager_GetPlayerTimeHourFromTmp(s32 a3) {
     u32 t0 = (u32)((s32)(u32)(uintptr_t)(a3) * 2440);
-    s32 t1 = *(s32*)((u8*)lbl_805FB2D0);
+    s32 t1 = *(s32*)((u8*)&lbl_805FB2D0);
     u32 t2 = (u32)(t1) + (u32)(t0);
     s32 t3 = *(s32*)((u8*)(uintptr_t)(t2) + 3052);
     return (s32)(t3);
@@ -38,7 +38,7 @@ s32 SaveManager_GetPlayerTimeHourFromTmp(s32 a3) {
 // 0x8012430C
 s32 SaveManager_GetPlayerTimeMinFromTmp(s32 a3) {
     u32 t0 = (u32)((s32)(u32)(uintptr_t)(a3) * 2440);
-    s32 t1 = *(s32*)((u8*)lbl_805FB2D0);
+    s32 t1 = *(s32*)((u8*)&lbl_805FB2D0);
     u32 t2 = (u32)(t1) + (u32)(t0);
     s32 t3 = *(s32*)((u8*)(uintptr_t)(t2) + 3052);
     return (s32)(t3);
@@ -47,7 +47,7 @@ s32 SaveManager_GetPlayerTimeMinFromTmp(s32 a3) {
 // 0x80124320
 u32 SaveManager_CheckIfSlotEmptyFromTmp(s32 a3) {
     u32 t0 = (u32)((s32)(u32)(uintptr_t)(a3) * 2440);
-    s32 t1 = *(s32*)((u8*)lbl_805FB2D0);
+    s32 t1 = *(s32*)((u8*)&lbl_805FB2D0);
     u32 t2 = (u32)(t1) + (u32)(t0);
     u8 t3 = *(u8*)((u8*)(uintptr_t)(t2) + 3584);
     u32 t4 = (u32)(s32)(s8)(u32)(t3);

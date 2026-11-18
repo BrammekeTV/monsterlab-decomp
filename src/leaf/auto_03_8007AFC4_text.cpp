@@ -5,7 +5,7 @@
 
 #include "types.h"
 
-extern u8 lbl_805FD6F0[];
+extern "C" f32 lbl_805FD6F0;
 
 // 0x8007B318
 extern "C" s32 fn_8007B318(u8* a3) {
@@ -15,7 +15,7 @@ extern "C" s32 fn_8007B318(u8* a3) {
 
 // 0x8007BED8
 extern "C" void fn_8007BED8(u8* a3) {
-    f32 t0 = *(f32*)((u8*)lbl_805FD6F0);
+    f32 t0 = *(f32*)((u8*)&lbl_805FD6F0);
     *(f32*)(((u8*)(uintptr_t)(a3)) + 912) = (f32)(t0);
 }
 
@@ -38,7 +38,7 @@ extern "C" u8 fn_8007C124(u8* a3) {
 
 // 0x8007C12C
 extern "C" void fn_8007C12C(u8* a3) {
-    f32 t0 = *(f32*)((u8*)lbl_805FD6F0);
+    f32 t0 = *(f32*)((u8*)&lbl_805FD6F0);
     *(f32*)(((u8*)(uintptr_t)(a3)) + 664) = (f32)(t0);
 }
 

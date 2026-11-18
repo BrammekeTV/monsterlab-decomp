@@ -5,7 +5,7 @@
 
 #include "types.h"
 
-extern u8 lbl_805FB2A4[];
+extern "C" u8 lbl_805FB2A4[];
 extern "C" void fn_80116D40(u8*);
 
 // 0x8011AD84
@@ -14,7 +14,7 @@ extern "C" void fn_8011AD84(void) {
 
 // 0x8011AEE0
 extern "C" u8 fn_8011AEE0(void) {
-    u8 t0 = *(u8*)((u8*)lbl_805FB2A4);
+    u8 t0 = *(u8*)((u8*)&lbl_805FB2A4);
     return (u8)(t0);
 }
 

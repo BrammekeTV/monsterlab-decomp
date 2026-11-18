@@ -5,17 +5,17 @@
 
 #include "types.h"
 
-extern u8 lbl_805FB010[];
-extern u8 lbl_805FB030[];
+extern "C" u8 lbl_805FB010[];
+extern "C" u8 lbl_805FB030[];
 
 // 0x8003E39C
 extern "C" s32 fn_8003E39C(void) {
-    s32 t0 = *(s32*)((u8*)lbl_805FB010);
+    s32 t0 = *(s32*)((u8*)&lbl_805FB010);
     return (s32)(t0);
 }
 
 // 0x8003F8D4
 extern "C" u8 fn_8003F8D4(void) {
-    u8 t0 = *(u8*)((u8*)lbl_805FB030);
+    u8 t0 = *(u8*)((u8*)&lbl_805FB030);
     return (u8)(t0);
 }

@@ -5,11 +5,11 @@
 
 #include "types.h"
 
-extern u8 lbl_80412BF8[];
+extern "C" u8 lbl_80412BF8[];
 extern "C" void fn_801EF894(u8*);
 
 // 0x8018E0C0
 extern "C" void fn_8018E0C0(void) {
     // tail-call arguments inferred from the registers set before the call
-    fn_801EF894((u8*)lbl_80412BF8);
+    fn_801EF894((u8*)&lbl_80412BF8);
 }

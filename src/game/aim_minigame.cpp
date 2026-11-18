@@ -75,6 +75,7 @@ static inline Quat QuatMul(const Quat& a, const Quat& b) {
     return r;
 }
 
+extern "C" void AimMinigame_Update(u8* g);
 // 0x8007FE30
 void AimMinigame_Update(u8* g) {
     u8* table = FindLocator(TURNTABLE_LOCATOR);

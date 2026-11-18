@@ -17,3 +17,12 @@ if(MSVC)
 else()
   target_compile_options(game PRIVATE -Wall -Wno-unused-variable -Wno-unused-function)
 endif()
+
+# Link check: links every object into an exe so the linker lists what is still missing
+# (unresolved functions/globals, duplicate definitions, linkage mismatches). The exe is not
+# runnable. CI feeds the linker output to tools/missing_symbols.py; the link may fail.
+add_executable(monsterlab_link $<TARGET_OBJECTS:game>)
+set_target_properties(monsterlab_link PROPERTIES LINKER_LANGUAGE CXX)
+if(MSVC)
+  target_link_options(monsterlab_link PRIVATE /NOLOGO)
+endif()

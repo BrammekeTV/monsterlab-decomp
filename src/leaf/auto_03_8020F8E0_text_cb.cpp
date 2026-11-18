@@ -6,7 +6,7 @@
 #include "types.h"
 #include "game/script_callbacks.h"
 
-extern u8 lbl_805FBBE0[];
+extern "C" u8* lbl_805FBBE0;
 
 // 0x802215B8
 void AddPlayerMonster(u32 a3, u32 a4, u32 a5, u32 a6, u32 a7) {
@@ -33,14 +33,14 @@ u32 Is_DSBuild(void) {
 
 // 0x80221E90
 BOOL GetGameProgressMarker(void) {
-    u8* t0 = *(u8**)((u8*)lbl_805FBBE0);
+    u8* t0 = *(u8**)((u8*)&lbl_805FBBE0);
     s32 t1 = *(s32*)(t0 + 280);
     return (BOOL)(t1);
 }
 
 // 0x80221E9C
 void SetGameProgressMarker(BOOL a3) {
-    u8* t0 = *(u8**)((u8*)lbl_805FBBE0);
+    u8* t0 = *(u8**)((u8*)&lbl_805FBBE0);
     *(u32*)(t0 + 280) = (u32)((u32)(uintptr_t)(a3));
 }
 

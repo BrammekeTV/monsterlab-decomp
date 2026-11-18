@@ -6,10 +6,10 @@
 #include "types.h"
 #include "game/script_callbacks.h"
 
-extern u8 lbl_805FB3F0[];
-extern u8 lbl_805FB3F4[];
-extern u8 lbl_805FB3F8[];
-extern u8 lbl_805FB3FC[];
+extern "C" u8 lbl_805FB3F0[];
+extern "C" u8 lbl_805FB3F4[];
+extern "C" u8 lbl_805FB3F8[];
+extern "C" u8 lbl_805FB3FC[];
 
 // 0x8013E734
 void MonsterSelectDeInit(void) {
@@ -19,20 +19,20 @@ void MonsterSelectDeInit(void) {
 
 // 0x8013E744
 void SetMyMonsterHitpoints(f32 f1) {
-    *(f32*)((u8*)lbl_805FB3F0) = (f32)(f1);
+    *(f32*)((u8*)&lbl_805FB3F0) = (f32)(f1);
 }
 
 // 0x8013E74C
 void SetMyMonsterEnergy(f32 f1) {
-    *(f32*)((u8*)lbl_805FB3F4) = (f32)(f1);
+    *(f32*)((u8*)&lbl_805FB3F4) = (f32)(f1);
 }
 
 // 0x8013E754
 void SetMyMonsterAttack(f32 f1) {
-    *(f32*)((u8*)lbl_805FB3F8) = (f32)(f1);
+    *(f32*)((u8*)&lbl_805FB3F8) = (f32)(f1);
 }
 
 // 0x8013E75C
 void SetMyMonsterDefense(f32 f1) {
-    *(f32*)((u8*)lbl_805FB3FC) = (f32)(f1);
+    *(f32*)((u8*)&lbl_805FB3FC) = (f32)(f1);
 }

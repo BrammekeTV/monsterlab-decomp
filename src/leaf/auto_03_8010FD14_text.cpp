@@ -5,10 +5,10 @@
 
 #include "types.h"
 
-extern u8 lbl_8036CF40[];
+extern "C" u8 lbl_8036CF40[];
 
 // 0x8010FD14
 extern "C" void fn_8010FD14(u8* a3) {
     *(u32*)(((u8*)(uintptr_t)(a3)) + 4) = (u32)((u32)(0));
-    *(u32*)(((u8*)(uintptr_t)(a3)) + 0) = (u32)((u32)(uintptr_t)((u8*)lbl_8036CF40));
+    *(u32*)(((u8*)(uintptr_t)(a3)) + 0) = (u32)((u32)(uintptr_t)((u8*)&lbl_8036CF40));
 }

@@ -5,8 +5,8 @@
 
 #include "types.h"
 
-extern u8 lbl_805FDA1C[];
-extern u8 lbl_805FDA28[];
+extern "C" u8 lbl_805FDA1C[];
+extern "C" u8 lbl_805FDA28[];
 
 // 0x8008CDFC
 extern "C" f32 fn_8008CDFC(u8* a3, s32 a4, f32 f1) {
@@ -16,7 +16,7 @@ extern "C" f32 fn_8008CDFC(u8* a3, s32 a4, f32 f1) {
             return (f32)(f1);
         }
         f32 t1 = *(f32*)(((u8*)(uintptr_t)(a3)) + 692);
-        f32 t2 = *(f32*)((u8*)lbl_805FDA28);
+        f32 t2 = *(f32*)((u8*)&lbl_805FDA28);
         f32 t3 = (f32)(t1 * t2);
         *(f32*)(((u8*)(uintptr_t)(a3)) + 692) = (f32)(t3);
         return (f32)(t1);
@@ -27,7 +27,7 @@ extern "C" f32 fn_8008CDFC(u8* a3, s32 a4, f32 f1) {
         return (f32)(f1);
     }
     f32 t5 = *(f32*)(((u8*)(uintptr_t)(a3)) + 692);
-    f32 t6 = *(f32*)((u8*)lbl_805FDA28);
+    f32 t6 = *(f32*)((u8*)&lbl_805FDA28);
     f32 t7 = (f32)(t5 * t6);
     *(f32*)(((u8*)(uintptr_t)(a3)) + 692) = (f32)(t7);
     return (f32)(t5);
@@ -95,7 +95,7 @@ extern "C" void fn_8008D294(u8* a3, s32 a4) {
 
 // 0x8008D670
 extern "C" void fn_8008D670(u8* a3) {
-    f32 t0 = *(f32*)((u8*)lbl_805FDA1C);
+    f32 t0 = *(f32*)((u8*)&lbl_805FDA1C);
     *(f32*)(((u8*)(uintptr_t)(a3)) + 776) = (f32)(t0);
 }
 

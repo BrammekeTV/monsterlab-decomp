@@ -6,8 +6,8 @@
 #include "types.h"
 #include "game/script_callbacks.h"
 
-extern u8 lbl_805FDFC0[];
-extern u8 lbl_805FDFC8[];
+extern "C" u8 lbl_805FDFC0[];
+extern "C" u8 lbl_805FDFC8[];
 
 // 0x800AC714
 void GrowJuiceSeed_FireSeed(void* a3) {
@@ -23,7 +23,7 @@ s32 GrowJuiceSeed_HitGround(void* a3) {
         return (s32)(0);
     }
     u8* t0 = *(u8**)(((u8*)(uintptr_t)(a3)) + 4);
-    f32 t1 = *(f32*)((u8*)lbl_805FDFC0);
+    f32 t1 = *(f32*)((u8*)&lbl_805FDFC0);
     f32 t2 = *(f32*)(t0 + 8);
     if (!(t2 <= t1)) {
         return (s32)(0);
@@ -37,7 +37,7 @@ s32 GrowJuiceSeed_OffTopOfScreen(void* a3) {
         return (s32)(0);
     }
     u8* t0 = *(u8**)(((u8*)(uintptr_t)(a3)) + 4);
-    f32 t1 = *(f32*)((u8*)lbl_805FDFC8);
+    f32 t1 = *(f32*)((u8*)&lbl_805FDFC8);
     f32 t2 = *(f32*)(t0 + 8);
     if (!(t2 >= t1)) {
         return (s32)(0);

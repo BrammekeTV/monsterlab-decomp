@@ -5,23 +5,23 @@
 
 #include "types.h"
 
-extern u8 lbl_805F8740[];
-extern u8 lbl_805F8744[];
-extern u8 lbl_805FBBE0[];
+extern "C" u8 lbl_805F8740[];
+extern "C" u8 lbl_805F8744[];
+extern "C" u8* lbl_805FBBE0;
 extern "C" void fn_8022E3DC(void);
 
 // 0x80051EEC
 extern "C" u8* fn_80051EEC(void) {
-    return (u8*)((u8*)lbl_805F8740);
+    return (u8*)((u8*)&lbl_805F8740);
 }
 
 // 0x80051EF4
 extern "C" u8* fn_80051EF4(void) {
-    return (u8*)((u8*)lbl_805F8744);
+    return (u8*)((u8*)&lbl_805F8744);
 }
 
 // 0x80051EFC
 extern "C" void fn_80051EFC(void) {
-    s32 t0 = *(s32*)((u8*)lbl_805FBBE0);
+    s32 t0 = *(s32*)((u8*)&lbl_805FBBE0);
     fn_8022E3DC();
 }

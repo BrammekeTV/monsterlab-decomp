@@ -5,11 +5,11 @@
 
 #include "types.h"
 
-extern u8 lbl_805FAFD8[];
+extern "C" u8 lbl_805FAFD8[];
 
 // 0x8002D538
 extern "C" u32 MachineIsOn(void) {
-    s32 t0 = *(s32*)((u8*)lbl_805FAFD8);
+    s32 t0 = *(s32*)((u8*)&lbl_805FAFD8);
     u32 t1 = 0u - (u32)(t0);
     u32 t2 = (u32)(t1) | (u32)(t0);
     u32 t3 = (((u32)(t2) << 1) | ((u32)(t2) >> 31)) & 0x1u;

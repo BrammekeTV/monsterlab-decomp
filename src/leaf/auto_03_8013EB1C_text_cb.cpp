@@ -6,12 +6,12 @@
 #include "types.h"
 #include "game/script_callbacks.h"
 
-extern u8 lbl_80556E80[];
-extern u8 lbl_805FB40C[];
+extern "C" u8 lbl_80556E80[];
+extern "C" u8 lbl_805FB40C[];
 
 // 0x8013EB1C
 BOOL CheckPlayerName(void) {
-    u8 t0 = *(u8*)((u8*)lbl_80556E80 + 2880);
+    u8 t0 = *(u8*)((u8*)&lbl_80556E80 + 2880);
     u32 t1 = (u32)(s32)(s8)(u32)(t0);
     u32 t2 = 0u - (u32)(t1);
     u32 t3 = (u32)(t2) | (u32)(t1);
@@ -21,11 +21,11 @@ BOOL CheckPlayerName(void) {
 
 // 0x8013EC58
 void EnterScientistNameDeInit(void) {
-    *(u32*)((u8*)lbl_805FB40C) = (u32)((u32)(0));
+    *(u32*)((u8*)&lbl_805FB40C) = (u32)((u32)(0));
 }
 
 // 0x8013EF6C
 BOOL MPNameInput(void) {
-    s32 t0 = *(s32*)((u8*)lbl_805FB40C);
+    s32 t0 = *(s32*)((u8*)&lbl_805FB40C);
     return (BOOL)(t0);
 }

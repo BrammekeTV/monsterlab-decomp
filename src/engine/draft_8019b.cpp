@@ -24,7 +24,8 @@ int         strcmp(const char* a, const char* b);
 void fn_80190D28(u32 hash, const char* text, s32 v);       // 0x80190D28 (defined below)
 
 extern void* gScreenSets;                  // 0x805FB654
-extern void* gStringTable;                 // 0x805FB910
+struct StringTable;
+extern "C++" StringTable* gStringTable;                 // 0x805FB910
 extern void* gStringTable2;                // 0x805FB90C
 extern const char lbl_80381868[];          // 0x80381868 (string block)
 extern const char lbl_803818A8[];          // 0x803818A8 (string)

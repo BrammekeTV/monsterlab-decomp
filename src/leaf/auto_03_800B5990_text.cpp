@@ -5,11 +5,11 @@
 
 #include "types.h"
 
-extern u8 lbl_805FE170[];
+extern "C" u8 lbl_805FE170[];
 
 // 0x800B5990
 extern "C" void fn_800B5990(u8* a3) {
-    f32 t0 = *(f32*)((u8*)lbl_805FE170);
+    f32 t0 = *(f32*)((u8*)&lbl_805FE170);
     *(u32*)(((u8*)(uintptr_t)(a3)) + 0) = (u32)((u32)(0));
     *(f32*)(((u8*)(uintptr_t)(a3)) + 44) = (f32)(t0);
     *(u32*)(((u8*)(uintptr_t)(a3)) + 48) = (u32)((u32)(0));
@@ -23,7 +23,7 @@ extern "C" void fn_800B5B20(u8* a3, f32 f1) {
 
 // 0x800B5B30
 extern "C" void fn_800B5B30(u8* a3) {
-    f32 t0 = *(f32*)((u8*)lbl_805FE170);
+    f32 t0 = *(f32*)((u8*)&lbl_805FE170);
     *(u32*)(((u8*)(uintptr_t)(a3)) + 0) = (u32)((u32)(0));
     *(f32*)(((u8*)(uintptr_t)(a3)) + 44) = (f32)(t0);
 }

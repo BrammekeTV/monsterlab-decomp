@@ -49,7 +49,8 @@ extern u8         lbl_805FAEB0[];
 u32               gGlobalBinaryField844;    ORIG(0x805FB888)
 extern AllocFn    gStringTableAllocVtbl[];  ORIG(0x80385F00)
 AllocFn*          gStringTableAlloc;        ORIG(0x805FB914)
-void*             gStringTable;             ORIG(0x805FB910)
+struct StringTable;
+StringTable*      gStringTable;             ORIG(0x805FB910)
 extern u8         lbl_805F81DC[];
 extern s32        gTextLanguage;            ORIG(0x805F81B4)
 s32               gLastSysEvent;            ORIG(0x805FAEAC)
@@ -179,7 +180,7 @@ extern "C" void GameStart(int argc, char** argv) {
     GameInitLanguage();
 
     gStringTableAlloc = gStringTableAllocVtbl;
-    gStringTable = gStringTableAlloc[0](0x14, "String Table");
+    gStringTable = (StringTable*)gStringTableAlloc[0](0x14, "String Table");
     StringTableInit(gStringTable, gTextLanguage, lbl_805F81DC);
 
     fn_80011A08();

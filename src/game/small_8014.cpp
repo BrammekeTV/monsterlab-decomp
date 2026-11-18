@@ -198,6 +198,7 @@ extern "C" void SleepMicroseconds(s32 hi, u32 us) {
     fn_8023D3C8((s32)(ticks >> 32), (u32)ticks);
 }
 
+extern "C" void fn_80142970(void);
 // 0x80142970
 // Calls every registered function in the table (count in lbl_805FB458), in order.
 void fn_80142970(void) {

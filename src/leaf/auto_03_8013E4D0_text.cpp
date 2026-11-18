@@ -5,13 +5,13 @@
 
 #include "types.h"
 
-extern u8 lbl_803F2210[];
+extern "C" u8 lbl_803F2210[];
 extern "C" void UIGroup_DisableHitTest(u32);
 extern "C" void UIGroup_EnableHitTest(u32);
 
 // 0x8013E774
 extern "C" u8* fn_8013E774(void) {
-    return (u8*)((u8*)lbl_803F2210);
+    return (u8*)((u8*)&lbl_803F2210);
 }
 
 // 0x8013EADC

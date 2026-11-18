@@ -6,17 +6,17 @@
 #include "types.h"
 #include "game/script_callbacks.h"
 
-extern u8 lbl_805FB2B8[];
+extern "C" u8* lbl_805FB2B8;
 
 // 0x80120CBC
 BOOL EnterName_GetName(void) {
-    s32 t0 = *(s32*)((u8*)lbl_805FB2B8);
+    s32 t0 = *(s32*)((u8*)&lbl_805FB2B8);
     return (BOOL)(t0);
 }
 
 // 0x80120D00
 void EnterName_NameInputDone(u32 a3) {
-    u8* t0 = *(u8**)((u8*)lbl_805FB2B8);
+    u8* t0 = *(u8**)((u8*)&lbl_805FB2B8);
     if (t0 == 0) {
         return;
     }

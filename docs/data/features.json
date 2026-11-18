@@ -27,13 +27,13 @@
   },
   {
    "title": "PC build compiles",
-   "detail": "CMake + MSVC build on GitHub Actions. All decompiled sources compile; linking waits on the platform layer. Next: switch the build to 32-bit (Win32) so the decompiled code, which uses the original 4-byte pointer layout, is correct as written.",
-   "status": "in_progress"
+   "detail": "CMake + MSVC build on GitHub Actions, now 32-bit (Win32) so the decompiled code, which uses the original 4-byte pointer layout, is correct as written. All decompiled sources compile; x64 comes later, after named structs and a data loader.",
+   "status": "done"
   },
   {
    "title": "PC build links",
-   "detail": "Add a link step to CI and generate a missing-symbols report (functions and globals still undecompiled or unstubbed); that report becomes the decompilation to-do list.",
-   "status": "todo"
+   "detail": "CI now links every object and writes a missing-symbols report (tools/missing_symbols.py, docs/data/missing.json): unresolved game functions ranked by references, library functions by SDK region, globals, duplicates and linkage mismatches (none left). The link itself still fails until the platform layer and the remaining ~1,390 game functions exist.",
+   "status": "in_progress"
   },
   {
    "title": "Big-endian data loader",
@@ -92,6 +92,11 @@
   }
  ],
  "changelog": [
+  {
+   "date": "2026-11-18",
+   "time": "23:17",
+   "text": "PC build is now 32-bit and CI has a link step: the linker's unresolved symbols become a ranked missing-symbols report (about 1,390 game functions, 1,100 globals, 100 SDK functions). The link also exposed 60 symbols declared with a different type or C/C++ linkage than their definitions; all fixed."
+  },
   {
    "date": "2026-11-18",
    "time": "23:00",

@@ -5,15 +5,15 @@
 
 #include "types.h"
 
-extern u8 lbl_805FB0D4[];
-extern u8 lbl_805FB0D8[];
-extern u8 lbl_805FB0DC[];
-extern u8 lbl_805FB0E0[];
-extern u8 lbl_805FB0E1[];
-extern u8 lbl_805FB0E3[];
-extern u8 lbl_805FB0E4[];
-extern u8 lbl_805FB0E8[];
-extern u8 lbl_805FB0F8[];
+extern "C" u8 lbl_805FB0D4[];
+extern "C" s32 lbl_805FB0D8;
+extern "C" void* lbl_805FB0DC;
+extern "C" u8 lbl_805FB0E0[];
+extern "C" u8 lbl_805FB0E1;
+extern "C" u8 lbl_805FB0E3[];
+extern "C" u8 lbl_805FB0E4;
+extern "C" u8 lbl_805FB0E8[];
+extern "C" u8 lbl_805FB0F8[];
 extern "C" void UIText_SetString_TextID(u32, u32);
 extern "C" void fn_8004E7D4(u8*);
 extern "C" s32 fn_8004E8CC(u8*);
@@ -33,60 +33,60 @@ extern "C" void fn_800505E8(u8* a3) {
 
 // 0x800508D0
 extern "C" s32 fn_800508D0(void) {
-    s32 t0 = *(s32*)((u8*)lbl_805FB0D8);
+    s32 t0 = *(s32*)((u8*)&lbl_805FB0D8);
     return (s32)(t0);
 }
 
 // 0x800508D8
 extern "C" void SetPlayerLineID(s32 a3) {
-    *(u32*)((u8*)lbl_805FB0D4) = (u32)((u32)(uintptr_t)(a3));
+    *(u32*)((u8*)&lbl_805FB0D4) = (u32)((u32)(uintptr_t)(a3));
     u32 t0 = (u32)(0xf8f00000) + 8172u;
     UIText_SetString_TextID((u32)((u32)(t0)), (u32)((u32)(uintptr_t)(a3)));
 }
 
 // 0x80050F08
 extern "C" void fn_80050F08(s32 a3) {
-    s32 t0 = *(s32*)((u8*)lbl_805FB0DC);
+    s32 t0 = *(s32*)((u8*)&lbl_805FB0DC);
     if ((u32)(t0) == (u32)(uintptr_t)(a3)) {
         return;
     }
-    *(u32*)((u8*)lbl_805FB0DC) = (u32)((u32)(uintptr_t)(a3));
+    *(u32*)((u8*)&lbl_805FB0DC) = (u32)((u32)(uintptr_t)(a3));
 }
 
 // 0x80050F1C
 extern "C" s32 GetTalkingToCharacterEntity(void) {
-    s32 t0 = *(s32*)((u8*)lbl_805FB0DC);
+    s32 t0 = *(s32*)((u8*)&lbl_805FB0DC);
     return (s32)(t0);
 }
 
 // 0x800512D0
 extern "C" void fn_800512D0(void) {
-    s32 t0 = *(s32*)((u8*)lbl_805FB0DC);
+    s32 t0 = *(s32*)((u8*)&lbl_805FB0DC);
     if (t0 == 0) {
-        *(u8*)((u8*)lbl_805FB0E0) = (u8)((u32)(0));
-        *(u8*)((u8*)lbl_805FB0E1) = (u8)((u32)(0));
-        *(u32*)((u8*)lbl_805FB0F8) = (u32)((u32)(0));
-        *(u32*)((u8*)lbl_805FB0E8) = (u32)((u32)(0));
+        *(u8*)((u8*)&lbl_805FB0E0) = (u8)((u32)(0));
+        *(u8*)((u8*)&lbl_805FB0E1) = (u8)((u32)(0));
+        *(u32*)((u8*)&lbl_805FB0F8) = (u32)((u32)(0));
+        *(u32*)((u8*)&lbl_805FB0E8) = (u32)((u32)(0));
         return;
     }
-    *(u32*)((u8*)lbl_805FB0DC) = (u32)((u32)(0));
-    *(u8*)((u8*)lbl_805FB0E0) = (u8)((u32)(0));
-    *(u8*)((u8*)lbl_805FB0E1) = (u8)((u32)(0));
-    *(u32*)((u8*)lbl_805FB0F8) = (u32)((u32)(0));
-    *(u32*)((u8*)lbl_805FB0E8) = (u32)((u32)(0));
+    *(u32*)((u8*)&lbl_805FB0DC) = (u32)((u32)(0));
+    *(u8*)((u8*)&lbl_805FB0E0) = (u8)((u32)(0));
+    *(u8*)((u8*)&lbl_805FB0E1) = (u8)((u32)(0));
+    *(u32*)((u8*)&lbl_805FB0F8) = (u32)((u32)(0));
+    *(u32*)((u8*)&lbl_805FB0E8) = (u32)((u32)(0));
 }
 
 // 0x800517C0
 extern "C" s32 fn_800517C0(void) {
-    u8 t0 = *(u8*)((u8*)lbl_805FB0E0);
+    u8 t0 = *(u8*)((u8*)&lbl_805FB0E0);
     if (t0 != 0) {
         return (s32)(1);
     }
-    u8 t1 = *(u8*)((u8*)lbl_805FB0E1);
+    u8 t1 = *(u8*)((u8*)&lbl_805FB0E1);
     if (t1 != 0) {
         return (s32)(1);
     }
-    u8 t2 = *(u8*)((u8*)lbl_805FB0E3);
+    u8 t2 = *(u8*)((u8*)&lbl_805FB0E3);
     if (t2 == 0) {
         return (s32)(0);
     }
@@ -95,7 +95,7 @@ extern "C" s32 fn_800517C0(void) {
 
 // 0x8005191C
 extern "C" u8 IsConversationPopupVisible(void) {
-    u8 t0 = *(u8*)((u8*)lbl_805FB0E3);
+    u8 t0 = *(u8*)((u8*)&lbl_805FB0E3);
     return (u8)(t0);
 }
 
@@ -104,5 +104,5 @@ extern "C" void SetConversationReady(s32 a3) {
     u32 t0 = 0u - (u32)(uintptr_t)(a3);
     u32 t1 = (u32)(t0) | (u32)(uintptr_t)(a3);
     u32 t2 = (((u32)(t1) << 1) | ((u32)(t1) >> 31)) & 0x1u;
-    *(u8*)((u8*)lbl_805FB0E4) = (u8)((u32)(t2));
+    *(u8*)((u8*)&lbl_805FB0E4) = (u8)((u32)(t2));
 }

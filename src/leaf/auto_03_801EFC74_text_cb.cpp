@@ -6,15 +6,15 @@
 #include "types.h"
 #include "game/script_callbacks.h"
 
-extern u8 gWorldState[];
+extern "C" u8* gWorldState;
 
 // 0x801F2B1C
 void SetSpawningMode(u32 a3) {
-    *(u32*)((u8*)gWorldState + 256) = (u32)((u32)(uintptr_t)(a3));
+    *(u32*)((u8*)&gWorldState + 256) = (u32)((u32)(uintptr_t)(a3));
 }
 
 // 0x801F2B2C
 void ResetSpawningMode(void) {
-    s32 t0 = *(s32*)((u8*)gWorldState + 260);
-    *(u32*)((u8*)gWorldState + 256) = (u32)((u32)(t0));
+    s32 t0 = *(s32*)((u8*)&gWorldState + 260);
+    *(u32*)((u8*)&gWorldState + 256) = (u32)((u32)(t0));
 }

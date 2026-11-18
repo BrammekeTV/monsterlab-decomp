@@ -5,12 +5,12 @@
 
 #include "types.h"
 
-extern u8 gGameDb[];
-extern u8 lbl_803C2A20[];
+extern "C" u8 gGameDb[];
+extern "C" u8 lbl_803C2A20[];
 
 // 0x80052384
 extern "C" u8* fn_80052384(void) {
-    s32 t0 = *(s32*)((u8*)lbl_803C2A20 + 3528);
-    *(u32*)((u8*)gGameDb) = (u32)((u32)(t0));
-    return (u8*)((u8*)lbl_803C2A20);
+    s32 t0 = *(s32*)((u8*)&lbl_803C2A20 + 3528);
+    *(u32*)((u8*)&gGameDb) = (u32)((u32)(t0));
+    return (u8*)((u8*)&lbl_803C2A20);
 }

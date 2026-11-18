@@ -6,8 +6,8 @@
 #include "types.h"
 #include "game/script_callbacks.h"
 
-extern u8 lbl_805FD300[];
-extern u8 lbl_805FD318[];
+extern "C" f32 lbl_805FD300;
+extern "C" u8 lbl_805FD318[];
 
 // 0x8005C3F0
 void SetGroundFriction(u32 a3, f32 f1) {
@@ -16,7 +16,7 @@ void SetGroundFriction(u32 a3, f32 f1) {
 
 // 0x8005C3F8
 void SetGroundFrictionToDefault(u32 a3) {
-    f32 t0 = *(f32*)((u8*)lbl_805FD318);
+    f32 t0 = *(f32*)((u8*)&lbl_805FD318);
     *(f32*)(((u8*)(uintptr_t)(a3)) + 2144) = (f32)(t0);
 }
 
@@ -27,7 +27,7 @@ void SetAirFriction(u32 a3, f32 f1) {
 
 // 0x8005C40C
 void SetAirFrictionToDefault(u32 a3) {
-    f32 t0 = *(f32*)((u8*)lbl_805FD300);
+    f32 t0 = *(f32*)((u8*)&lbl_805FD300);
     *(f32*)(((u8*)(uintptr_t)(a3)) + 2140) = (f32)(t0);
 }
 

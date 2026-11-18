@@ -6,21 +6,21 @@
 #include "types.h"
 #include "game/script_callbacks.h"
 
-extern u8 gAudio[];
-extern u8 lbl_805FBBB1[];
-extern u8 lbl_805FBBB2[];
+extern "C" u8 gAudio[];
+extern "C" u8 lbl_805FBBB1[];
+extern "C" u8 lbl_805FBBB2[];
 extern "C" void AudioSetPaused(void*, int);
 extern "C" void fn_801FF908(u8*, s32);
 
 // 0x8020A69C
 void PauseSFX(u32 a3) {
-    *(u8*)((u8*)lbl_805FBBB1) = (u8)((u32)(uintptr_t)(a3));
-    AudioSetPaused((void*)((u8*)gAudio), (int)((u32)(uintptr_t)(a3)));
+    *(u8*)((u8*)&lbl_805FBBB1) = (u8)((u32)(uintptr_t)(a3));
+    AudioSetPaused((void*)((u8*)&gAudio), (int)((u32)(uintptr_t)(a3)));
 }
 
 // 0x8020A6B0
 void SuspendSFX(u32 a3) {
-    *(u8*)((u8*)lbl_805FBBB1) = (u8)((u32)(uintptr_t)(a3));
-    *(u8*)((u8*)lbl_805FBBB2) = (u8)((u32)(uintptr_t)(a3));
-    fn_801FF908((u8*)gAudio, (s32)((u32)(uintptr_t)(a3)));
+    *(u8*)((u8*)&lbl_805FBBB1) = (u8)((u32)(uintptr_t)(a3));
+    *(u8*)((u8*)&lbl_805FBBB2) = (u8)((u32)(uintptr_t)(a3));
+    fn_801FF908((u8*)&gAudio, (s32)((u32)(uintptr_t)(a3)));
 }

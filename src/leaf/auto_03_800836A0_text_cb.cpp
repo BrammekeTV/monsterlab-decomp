@@ -6,13 +6,13 @@
 #include "types.h"
 #include "game/script_callbacks.h"
 
-extern u8 gWorldState[];
-extern u8 lbl_805FD848[];
+extern "C" u8* gWorldState;
+extern "C" f32 lbl_805FD848;
 
 // 0x800837A8
 void BrainTargetWait(u32 a3) {
     f32 t0 = *(f32*)(((u8*)(uintptr_t)(a3)) + 616);
-    f32 t1 = *(f32*)((u8*)gWorldState + 12);
+    f32 t1 = *(f32*)((u8*)&gWorldState + 12);
     f32 t2 = (f32)(t0 + t1);
     *(f32*)(((u8*)(uintptr_t)(a3)) + 616) = (f32)(t2);
 }
@@ -24,7 +24,7 @@ u32 BrainTargetWaitTimedOut(u32 a3) {
     if (!(t0 >= t1)) {
         return (u32)(0);
     }
-    f32 t2 = *(f32*)((u8*)lbl_805FD848);
+    f32 t2 = *(f32*)((u8*)&lbl_805FD848);
     *(f32*)(((u8*)(uintptr_t)(a3)) + 616) = (f32)(t2);
     return (u32)(1);
 }

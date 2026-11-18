@@ -5,13 +5,13 @@
 
 #include "types.h"
 
-extern u8 lbl_805FDBA0[];
+extern "C" f32 lbl_805FDBA0;
 extern "C" void fn_801EC8C4(u8*, u32, u32);
 extern "C" void fn_801ECFA0(u8*, s32);
 
 // 0x80097574
 extern "C" void fn_80097574(u8* a3) {
-    f32 t0 = *(f32*)((u8*)lbl_805FDBA0);
+    f32 t0 = *(f32*)((u8*)&lbl_805FDBA0);
     *(u32*)(((u8*)(uintptr_t)(a3)) + 0) = (u32)((u32)(0));
     *(u32*)(((u8*)(uintptr_t)(a3)) + 4) = (u32)((u32)(-1));
     *(f32*)(((u8*)(uintptr_t)(a3)) + 28) = (f32)(t0);

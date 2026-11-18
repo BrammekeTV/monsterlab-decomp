@@ -17,7 +17,8 @@ extern u8  lbl_805FBBE0[];                   // 0x805FBBE0 (save block pointer)
 extern u8  lbl_803E6B28[];                   // 0x803E6B28 (list entry record: +0 kind, +4 index)
 extern u8  lbl_803E6B34[];                   // 0x803E6B34 (list entry record: +0 kind, +4 index)
 extern const char lbl_805F8200[];            // 0x805F8200 (empty string, fallback text)
-extern void* gStringTable;                   // 0x805FB910
+struct StringTable;
+extern "C++" StringTable* gStringTable;                   // 0x805FB910
 extern void* gLab;                           // 0x805FBBC8
 
 void     operator_delete(void* p);           // 0x801D426C

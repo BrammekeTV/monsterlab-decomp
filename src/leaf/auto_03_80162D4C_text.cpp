@@ -5,17 +5,17 @@
 
 #include "types.h"
 
-extern u8 lbl_805FB630[];
-extern u8 lbl_805FF380[];
-extern u8 lbl_805FF3B0[];
-extern u8 lbl_805FF490[];
-extern u8 lbl_805FF4C8[];
-extern u8 lbl_805FF530[];
+extern "C" s32 lbl_805FB630;
+extern "C" u8 lbl_805FF380[];
+extern "C" u8 lbl_805FF3B0[];
+extern "C" u8 lbl_805FF490[];
+extern "C" u8 lbl_805FF4C8[];
+extern "C" u8 lbl_805FF530[];
 
 // 0x80162D4C
 extern "C" f32 fn_80162D4C(s32 a3, u8* a4, u8* a5) {
     s32 t0 = *(s32*)(((u8*)(uintptr_t)(a5)) + 0);
-    f32 t1 = *(f32*)((u8*)lbl_805FF380);
+    f32 t1 = *(f32*)((u8*)&lbl_805FF380);
     *(u32*)(((u8*)(uintptr_t)(a4)) + 0) = (u32)((u32)(t0));
     f32 t2 = *(f32*)(((u8*)(uintptr_t)(a5)) + 4);
     *(f32*)(((u8*)(uintptr_t)(a4)) + 4) = (f32)(t2);
@@ -28,7 +28,7 @@ extern "C" f32 fn_80162D4C(s32 a3, u8* a4, u8* a5) {
 // 0x80163750
 extern "C" f32 fn_80163750(s32 a3, u8* a4, u8* a5) {
     f32 t0 = *(f32*)(((u8*)(uintptr_t)(a5)) + 0);
-    f32 t1 = *(f32*)((u8*)lbl_805FF3B0);
+    f32 t1 = *(f32*)((u8*)&lbl_805FF3B0);
     *(f32*)(((u8*)(uintptr_t)(a4)) + 0) = (f32)(t0);
     f32 t2 = *(f32*)(((u8*)(uintptr_t)(a5)) + 4);
     *(f32*)(((u8*)(uintptr_t)(a4)) + 4) = (f32)(t2);
@@ -41,14 +41,14 @@ extern "C" f32 fn_80163750(s32 a3, u8* a4, u8* a5) {
 
 // 0x80166034
 extern "C" void fn_80166034(s32 a3, u8* a4) {
-    f32 t0 = *(f32*)((u8*)lbl_805FF490);
+    f32 t0 = *(f32*)((u8*)&lbl_805FF490);
     *(f32*)(((u8*)(uintptr_t)(a4)) + 0) = (f32)(t0);
 }
 
 // 0x80166314
 extern "C" f32 fn_80166314(s32 a3, u8* a4, u8* a5) {
     f32 t0 = *(f32*)(((u8*)(uintptr_t)(a5)) + 0);
-    f32 t1 = *(f32*)((u8*)lbl_805FF4C8);
+    f32 t1 = *(f32*)((u8*)&lbl_805FF4C8);
     *(f32*)(((u8*)(uintptr_t)(a4)) + 0) = (f32)(t0);
     f32 t2 = *(f32*)(((u8*)(uintptr_t)(a5)) + 4);
     *(f32*)(((u8*)(uintptr_t)(a4)) + 4) = (f32)(t2);
@@ -75,7 +75,7 @@ extern "C" void fn_8016834C(void) {
 
 // 0x80168350
 extern "C" void fn_80168350(s32 a3, u8* a4) {
-    f32 t0 = *(f32*)((u8*)lbl_805FF530);
+    f32 t0 = *(f32*)((u8*)&lbl_805FF530);
     *(f32*)(((u8*)(uintptr_t)(a4)) + 0) = (f32)(t0);
 }
 
@@ -150,5 +150,5 @@ extern "C" void fn_8016D814(void) {
 
 // 0x8016DAE8
 extern "C" void fn_8016DAE8(void) {
-    *(u32*)((u8*)lbl_805FB630) = (u32)((u32)(-1));
+    *(u32*)((u8*)&lbl_805FB630) = (u32)((u32)(-1));
 }

@@ -5,12 +5,12 @@
 
 #include "types.h"
 
-extern u8 lbl_8040E5F0[];
+extern "C" u8 lbl_8040E5F0[];
 
 // 0x80162D20
 extern "C" u8* fn_80162D20(void) {
-    u8* t0 = (u8*)lbl_8040E5F0 + 216;
-    u8* t1 = (u8*)lbl_8040E5F0 + 13824;
+    u8* t0 = (u8*)&lbl_8040E5F0 + 216;
+    u8* t1 = (u8*)&lbl_8040E5F0 + 13824;
     if ((u32)(uintptr_t)(t0) >= (u32)(uintptr_t)(t1)) {
         return (u8*)(t0);
     }

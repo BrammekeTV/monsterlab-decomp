@@ -55,6 +55,7 @@ extern "C" void fn_801542DC(void) {
     GxBpWrite(0x40000000);
 }
 
+extern "C" void fn_80154318(void);
 // 0x80154318
 // Sets lbl_805F9232 to 1; if the flag is set, sends two BP writes.
 void fn_80154318(void) {

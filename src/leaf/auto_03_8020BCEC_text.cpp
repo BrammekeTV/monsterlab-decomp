@@ -5,13 +5,13 @@
 
 #include "types.h"
 
-extern u8 gBattle[];
-extern u8 lbl_80388D88[];
-extern u8 lbl_80388D98[];
-extern u8 lbl_80388DB0[];
-extern u8 lbl_80388E18[];
-extern u8 lbl_80388E30[];
-extern u8 lbl_80388E50[];
+extern "C" u8* gBattle;
+extern "C" u8 lbl_80388D88[];
+extern "C" u8 lbl_80388D98[];
+extern "C" u8 lbl_80388DB0[];
+extern "C" u8 lbl_80388E18[];
+extern "C" u8 lbl_80388E30[];
+extern "C" u8 lbl_80388E50[];
 extern "C" void BattleOnListenerDone(u8*, u32);
 
 // 0x8020E30C
@@ -35,35 +35,35 @@ extern "C" void fn_8020E710(void) {
 // 0x8020E9CC
 extern "C" void fn_8020E9CC(u8* a3, s32 a4) {
     *(u32*)(((u8*)(uintptr_t)(a3)) + 4) = (u32)((u32)(uintptr_t)(a4));
-    *(u32*)(((u8*)(uintptr_t)(a3)) + 0) = (u32)((u32)(uintptr_t)((u8*)lbl_80388D88));
+    *(u32*)(((u8*)(uintptr_t)(a3)) + 0) = (u32)((u32)(uintptr_t)((u8*)&lbl_80388D88));
 }
 
 // 0x8020EA34
 extern "C" void fn_8020EA34(u8* a3) {
-    *(u32*)(((u8*)(uintptr_t)(a3)) + 0) = (u32)((u32)(uintptr_t)((u8*)lbl_80388D98));
+    *(u32*)(((u8*)(uintptr_t)(a3)) + 0) = (u32)((u32)(uintptr_t)((u8*)&lbl_80388D98));
 }
 
 // 0x8020EA84
 extern "C" void fn_8020EA84(u8* a3) {
-    *(u32*)(((u8*)(uintptr_t)(a3)) + 0) = (u32)((u32)(uintptr_t)((u8*)lbl_80388DB0));
+    *(u32*)(((u8*)(uintptr_t)(a3)) + 0) = (u32)((u32)(uintptr_t)((u8*)&lbl_80388DB0));
 }
 
 // 0x8020F228
 extern "C" void fn_8020F228(u8* a3, s32 a4) {
     *(u32*)(((u8*)(uintptr_t)(a3)) + 8) = (u32)((u32)(uintptr_t)(a4));
-    *(u32*)(((u8*)(uintptr_t)(a3)) + 0) = (u32)((u32)(uintptr_t)((u8*)lbl_80388E18));
+    *(u32*)(((u8*)(uintptr_t)(a3)) + 0) = (u32)((u32)(uintptr_t)((u8*)&lbl_80388E18));
 }
 
 // 0x8020F290
 extern "C" void fn_8020F290(u8* a3) {
     *(u32*)(((u8*)(uintptr_t)(a3)) + 4) = (u32)((u32)(0));
-    u8* t0 = *(u8**)((u8*)gBattle);
+    u8* t0 = *(u8**)((u8*)&gBattle);
     BattleOnListenerDone(t0, (u32)((u32)(uintptr_t)(a3)));
 }
 
 // 0x8020F2A4
 extern "C" void fn_8020F2A4(u8* a3) {
-    *(u32*)(((u8*)(uintptr_t)(a3)) + 0) = (u32)((u32)(uintptr_t)((u8*)lbl_80388E30));
+    *(u32*)(((u8*)(uintptr_t)(a3)) + 0) = (u32)((u32)(uintptr_t)((u8*)&lbl_80388E30));
 }
 
 // 0x8020F2F4
@@ -86,7 +86,7 @@ extern "C" void fn_8020F308(void) {
 
 // 0x8020F30C
 extern "C" void fn_8020F30C(u8* a3) {
-    *(u32*)(((u8*)(uintptr_t)(a3)) + 0) = (u32)((u32)(uintptr_t)((u8*)lbl_80388E50));
+    *(u32*)(((u8*)(uintptr_t)(a3)) + 0) = (u32)((u32)(uintptr_t)((u8*)&lbl_80388E50));
 }
 
 // 0x8020F35C

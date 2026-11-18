@@ -5,42 +5,42 @@
 
 #include "types.h"
 
-extern u8 lbl_804CD0C8[];
-extern u8 lbl_805F969C[];
-extern u8 lbl_805FB8CC[];
-extern u8 lbl_805FB8D0[];
+extern "C" u8 lbl_804CD0C8[];
+extern "C" u32 lbl_805F969C;
+extern "C" u8 lbl_805FB8CC[];
+extern "C" u8 lbl_805FB8D0[];
 
 // 0x801E6570
 extern "C" u8* fn_801E6570(s32 a3, s32 a4, s32 a5) {
-    s32 t0 = *(s32*)((u8*)lbl_805FB8CC);
+    s32 t0 = *(s32*)((u8*)&lbl_805FB8CC);
     u32 t1 = (u32)(uintptr_t)(a4) * (u32)(uintptr_t)(a5);
     if (t0 != 0) {
-        s32 t2 = *(s32*)((u8*)lbl_805FB8D0);
+        s32 t2 = *(s32*)((u8*)&lbl_805FB8D0);
         u32 t3 = (u32)(t0) + (u32)(t1);
-        *(u32*)((u8*)lbl_805FB8CC) = (u32)((u32)(t3));
+        *(u32*)((u8*)&lbl_805FB8CC) = (u32)((u32)(t3));
         u32 t4 = (u32)(t2) + 1u;
-        *(u32*)((u8*)lbl_805FB8D0) = (u32)((u32)(t4));
+        *(u32*)((u8*)&lbl_805FB8D0) = (u32)((u32)(t4));
         return (u8*)(uintptr_t)(t0);
     }
-    s32 t5 = *(s32*)((u8*)lbl_805FB8D0);
-    u32 t6 = (u32)(uintptr_t)((u8*)lbl_804CD0C8) + (u32)(t1);
-    *(u32*)((u8*)lbl_805FB8CC) = (u32)((u32)(t6));
+    s32 t5 = *(s32*)((u8*)&lbl_805FB8D0);
+    u32 t6 = (u32)(uintptr_t)((u8*)&lbl_804CD0C8) + (u32)(t1);
+    *(u32*)((u8*)&lbl_805FB8CC) = (u32)((u32)(t6));
     u32 t7 = (u32)(t5) + 1u;
-    *(u32*)((u8*)lbl_805FB8D0) = (u32)((u32)(t7));
-    return (u8*)((u8*)lbl_804CD0C8);
+    *(u32*)((u8*)&lbl_805FB8D0) = (u32)((u32)(t7));
+    return (u8*)((u8*)&lbl_804CD0C8);
 }
 
 // 0x801E65A0
 extern "C" s32 fn_801E65A0(void) {
-    s32 t0 = *(s32*)((u8*)lbl_805FB8D0);
-    *(u32*)((u8*)lbl_805FB8CC) = (u32)((u32)(0));
+    s32 t0 = *(s32*)((u8*)&lbl_805FB8D0);
+    *(u32*)((u8*)&lbl_805FB8CC) = (u32)((u32)(0));
     u32 t1 = (u32)(t0) - 1u;
-    *(u32*)((u8*)lbl_805FB8D0) = (u32)((u32)(t1));
+    *(u32*)((u8*)&lbl_805FB8D0) = (u32)((u32)(t1));
     return (s32)(t0);
 }
 
 // 0x801E6EB0
 extern "C" s32 IdPoolNext(void) {
-    s32 t0 = *(s32*)((u8*)lbl_805F969C);
+    s32 t0 = *(s32*)((u8*)&lbl_805F969C);
     return (s32)(t0);
 }

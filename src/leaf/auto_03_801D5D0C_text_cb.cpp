@@ -6,9 +6,9 @@
 #include "types.h"
 #include "game/script_callbacks.h"
 
-extern u8 lbl_805F960C[];
-extern u8 lbl_805FB7F0[];
-extern u8 lbl_805FB7F4[];
+extern "C" u8 lbl_805F960C[];
+extern "C" u8 lbl_805FB7F0[];
+extern "C" u8 lbl_805FB7F4[];
 extern "C" void fn_801D5D14(s32);
 
 // 0x801D663C
@@ -26,12 +26,12 @@ void UpdateFader(void) {
 
 // 0x801D6650
 s32 FaderFinished(void) {
-    u8 t0 = *(u8*)((u8*)lbl_805FB7F0);
+    u8 t0 = *(u8*)((u8*)&lbl_805FB7F0);
     if (t0 == 0) {
         return (s32)(1);
     }
-    f32 t1 = *(f32*)((u8*)lbl_805FB7F4);
-    f32 t2 = *(f32*)((u8*)lbl_805F960C);
+    f32 t1 = *(f32*)((u8*)&lbl_805FB7F4);
+    f32 t2 = *(f32*)((u8*)&lbl_805F960C);
     if (!(t1 >= t2)) {
         return (s32)(0);
     }
@@ -40,9 +40,9 @@ s32 FaderFinished(void) {
 
 // 0x801D667C
 void ReleaseFader(void) {
-    u8 t0 = *(u8*)((u8*)lbl_805FB7F0);
+    u8 t0 = *(u8*)((u8*)&lbl_805FB7F0);
     if (t0 == 0) {
         return;
     }
-    *(u8*)((u8*)lbl_805FB7F0) = (u8)((u32)(0));
+    *(u8*)((u8*)&lbl_805FB7F0) = (u8)((u32)(0));
 }

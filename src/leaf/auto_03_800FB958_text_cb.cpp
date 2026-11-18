@@ -6,12 +6,12 @@
 #include "types.h"
 #include "game/script_callbacks.h"
 
-extern u8 gBattle[];
-extern u8 lbl_805FB02C[];
-extern u8 lbl_805FB2B8[];
-extern u8 lbl_805FB2C8[];
-extern u8 lbl_805FB2CC[];
-extern u8 lbl_805FB2D4[];
+extern "C" u8* gBattle;
+extern "C" u8 lbl_805FB02C[];
+extern "C" u8* lbl_805FB2B8;
+extern "C" u8 lbl_805FB2C8[];
+extern "C" u8 lbl_805FB2CC[];
+extern "C" u8 lbl_805FB2D4[];
 extern "C" void fn_8005B648(u8*, f32);
 extern "C" void fn_8005F4F8(s32, s32);
 extern "C" void fn_8005F81C(s32, s32);
@@ -64,7 +64,7 @@ s32 ClearLineToTarget(u32 a3, f32 f1) {
 
 // 0x80103610
 u32 EnterName_EnteringPlayerName(void) {
-    s32 t0 = *(s32*)((u8*)lbl_805FB2B8);
+    s32 t0 = *(s32*)((u8*)&lbl_805FB2B8);
     u32 t1 = 0u - (u32)(t0);
     u32 t2 = (u32)(t1) | (u32)(t0);
     u32 t3 = (((u32)(t2) << 1) | ((u32)(t2) >> 31)) & 0x1u;
@@ -82,7 +82,7 @@ s32 GetIntProperty(u32 a3, u32 a4) {
 
 // 0x801036A8
 u32 IsCombatTutorialActive(void) {
-    u8* t0 = *(u8**)((u8*)gBattle);
+    u8* t0 = *(u8**)((u8*)&gBattle);
     if (t0 == 0) {
         return (u32)(0);
     }
@@ -94,7 +94,7 @@ u32 IsCombatTutorialActive(void) {
 
 // 0x801036D0
 u32 IsCurrentTutorialConversation(s32 a3) {
-    s32 t0 = *(s32*)((u8*)lbl_805FB02C);
+    s32 t0 = *(s32*)((u8*)&lbl_805FB02C);
     u32 t1 = (u32)(uintptr_t)(a3) - (u32)(t0);
     u32 t2 = (u32)(t1 == 0);
     return (u32)(t2);
@@ -143,7 +143,7 @@ s32 RequestRangedAttack(u32 a3, f32 f1) {
 
 // 0x801038A0
 u32 SaveManager_CanContinue(void) {
-    s32 t0 = *(s32*)((u8*)lbl_805FB2CC);
+    s32 t0 = *(s32*)((u8*)&lbl_805FB2CC);
     u32 t1 = (((u32)(t0) << 1) | ((u32)(t0) >> 31)) & 0x1u;
     u32 t2 = (u32)(t1) ^ 0x1u;
     return (u32)(t2);
@@ -151,40 +151,40 @@ u32 SaveManager_CanContinue(void) {
 
 // 0x801038B0
 s32 SaveManager_GetContinueSlot(void) {
-    s32 t0 = *(s32*)((u8*)lbl_805FB2CC);
+    s32 t0 = *(s32*)((u8*)&lbl_805FB2CC);
     return (s32)(t0);
 }
 
 // 0x801038B8
 s32 SaveManager_GetCurrentSlot(void) {
-    s32 t0 = *(s32*)((u8*)lbl_805FB2C8);
+    s32 t0 = *(s32*)((u8*)&lbl_805FB2C8);
     return (s32)(t0);
 }
 
 // 0x801038C0
 s32 SaveManager_IsInOverwriteScreen(void) {
-    u8 t0 = *(u8*)((u8*)lbl_805FB2D4);
+    u8 t0 = *(u8*)((u8*)&lbl_805FB2D4);
     return (s32)(t0);
 }
 
 // 0x801038C8
 void SaveManager_SetContinueSlot(s32 a3) {
-    *(u32*)((u8*)lbl_805FB2CC) = (u32)((u32)(uintptr_t)(a3));
+    *(u32*)((u8*)&lbl_805FB2CC) = (u32)((u32)(uintptr_t)(a3));
 }
 
 // 0x801038D0
 void SaveManager_SetCurrentSlot(s32 a3) {
-    *(u32*)((u8*)lbl_805FB2C8) = (u32)((u32)(uintptr_t)(a3));
+    *(u32*)((u8*)&lbl_805FB2C8) = (u32)((u32)(uintptr_t)(a3));
 }
 
 // 0x801038D8
 void SaveManager_SetInOverwriteScreen(u32 a3) {
-    *(u8*)((u8*)lbl_805FB2D4) = (u8)((u32)(uintptr_t)(a3));
+    *(u8*)((u8*)&lbl_805FB2D4) = (u8)((u32)(uintptr_t)(a3));
 }
 
 // 0x801038E0
 void SetCurrentTutorialConversation(s32 a3) {
-    *(u32*)((u8*)lbl_805FB02C) = (u32)((u32)(uintptr_t)(a3));
+    *(u32*)((u8*)&lbl_805FB02C) = (u32)((u32)(uintptr_t)(a3));
 }
 
 // 0x801038E8
@@ -221,7 +221,7 @@ void SetGuardGoal(u32 a3, void* a4, f32 f1, f32 f2) {
 
 // 0x80103908
 void SetInBasicTutorialFlag(void) {
-    u8* t0 = *(u8**)((u8*)gBattle);
+    u8* t0 = *(u8**)((u8*)&gBattle);
     *(u32*)(t0 + 2768) = (u32)((u32)(4));
 }
 

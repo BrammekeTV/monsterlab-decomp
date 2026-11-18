@@ -5,7 +5,7 @@
 
 #include "types.h"
 
-extern u8 lbl_805FAFC0[];
+extern "C" u8 lbl_805FAFC0[];
 extern "C" void fn_800222F0(void);
 extern "C" void fn_800222F4(u8*);
 extern "C" void fn_8002238C(void);
@@ -63,9 +63,9 @@ extern "C" void fn_80029178(void) {
 
 // 0x8002931C
 extern "C" u8* ResetCounter(void) {
-    u8* t0 = *(u8**)((u8*)lbl_805FAFC0);
+    u8* t0 = *(u8**)((u8*)&lbl_805FAFC0);
     *(u32*)(t0 + 240) = (u32)((u32)(0));
-    u8* t1 = *(u8**)((u8*)lbl_805FAFC0);
+    u8* t1 = *(u8**)((u8*)&lbl_805FAFC0);
     *(u32*)(t1 + 236) = (u32)((u32)(0));
     return (u8*)(t1);
 }

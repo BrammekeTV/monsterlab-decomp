@@ -5,9 +5,9 @@
 
 #include "types.h"
 
-extern u8 lbl_805F90F0[];
+extern "C" u8 lbl_805F90F0[];
 
 // 0x80142870
 extern "C" void fn_80142870(s32 a3) {
-    *(u8*)((u8*)lbl_805F90F0) = (u8)((u32)(uintptr_t)(a3));
+    *(u8*)((u8*)&lbl_805F90F0) = (u8)((u32)(uintptr_t)(a3));
 }

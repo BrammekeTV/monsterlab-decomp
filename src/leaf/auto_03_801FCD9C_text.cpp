@@ -5,9 +5,9 @@
 
 #include "types.h"
 
-extern u8 lbl_805F98C4[];
-extern u8 lbl_805F98C8[];
-extern u8 lbl_805F98E0[];
+extern "C" u8 lbl_805F98C4[];
+extern "C" u8 lbl_805F98C8[];
+extern "C" u8 lbl_805F98E0[];
 extern "C" void AudioSetPaused(void*, int);
 
 // 0x801FD8EC
@@ -26,18 +26,18 @@ extern "C" void fn_801FF908(u8* a3, s32 a4) {
 
 // 0x801FFC48
 extern "C" f32 fn_801FFC48(void) {
-    f32 t0 = *(f32*)((u8*)lbl_805F98C4);
+    f32 t0 = *(f32*)((u8*)&lbl_805F98C4);
     return (f32)(t0);
 }
 
 // 0x801FFC50
 extern "C" void fn_801FFC50(s32 a3, s32 a4) {
-    *(u32*)((u8*)lbl_805F98E0) = (u32)((u32)(uintptr_t)(a4));
+    *(u32*)((u8*)&lbl_805F98E0) = (u32)((u32)(uintptr_t)(a4));
 }
 
 // 0x801FFF1C
 extern "C" f32 fn_801FFF1C(void) {
-    f32 t0 = *(f32*)((u8*)lbl_805F98C8);
+    f32 t0 = *(f32*)((u8*)&lbl_805F98C8);
     return (f32)(t0);
 }
 

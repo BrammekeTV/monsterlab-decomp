@@ -5,15 +5,15 @@
 
 #include "types.h"
 
-extern u8 lbl_805FDF18[];
-extern u8 lbl_805FDF1C[];
+extern "C" u8 lbl_805FDF18[];
+extern "C" u8 lbl_805FDF1C[];
 extern "C" void app_PlayMusic(u32, f32);
 extern "C" void fn_800B170C(s32);
 extern "C" f32 fn_800B1D90(u8*);
 
 // 0x800A8AEC
 extern "C" void fn_800A8AEC(void) {
-    f32 t0 = *(f32*)((u8*)lbl_805FDF1C);
+    f32 t0 = *(f32*)((u8*)&lbl_805FDF1C);
     u32 t1 = (u32)(0x2e00000) - 15495u;
     app_PlayMusic((u32)((u32)(t1)), (f32)(t0));
 }
@@ -34,7 +34,7 @@ extern "C" void fn_800A97FC(void) {
 extern "C" f32 fn_800A9B7C(u8* a3) {
     u8* t0 = *(u8**)(((u8*)(uintptr_t)(a3)) + 148);
     if (t0 == 0) {
-        f32 t1 = *(f32*)((u8*)lbl_805FDF18);
+        f32 t1 = *(f32*)((u8*)&lbl_805FDF18);
         return (f32)(t1);
     }
     return (f32)(fn_800B1D90(t0));
@@ -42,7 +42,7 @@ extern "C" f32 fn_800A9B7C(u8* a3) {
 
 // 0x800A9B94
 extern "C" f32 fn_800A9B94(void) {
-    f32 t0 = *(f32*)((u8*)lbl_805FDF1C);
+    f32 t0 = *(f32*)((u8*)&lbl_805FDF1C);
     return (f32)(t0);
 }
 

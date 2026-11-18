@@ -5,21 +5,21 @@
 
 #include "types.h"
 
-extern u8 gBattle[];
+extern "C" u8* gBattle;
 extern "C" void BattleReset(u8*);
 extern "C" void fn_80043D84(s32, s32);
 extern "C" void fn_801B4308(u8*, s32);
 
 // 0x800433F8
 extern "C" void fn_800433F8(void) {
-    u8* t0 = *(u8**)((u8*)gBattle);
+    u8* t0 = *(u8**)((u8*)&gBattle);
     BattleReset(t0);
 }
 
 // 0x80043800
 extern "C" void fn_80043800(u8* a3) {
     u8* t0 = *(u8**)(((u8*)(uintptr_t)(a3)) + 212);
-    s32 t1 = *(s32*)((u8*)gBattle);
+    s32 t1 = *(s32*)((u8*)&gBattle);
     s32 t2 = *(s32*)(t0 + 4);
     u32 t3 = (((u32)(t2) << 2) | ((u32)(t2) >> 30)) & 0xfffffffcu;
     u32 t4 = (u32)(t1) + (u32)(t3);

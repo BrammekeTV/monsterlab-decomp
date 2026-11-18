@@ -5,10 +5,10 @@
 
 #include "types.h"
 
-extern u8 gZoneResourceSize[];
-extern u8 lbl_803C4298[];
-extern u8 lbl_805FD788[];
-extern u8 lbl_805FD790[];
+extern "C" s32 gZoneResourceSize;
+extern "C" u8 lbl_803C4298[];
+extern "C" f32 lbl_805FD788;
+extern "C" u8 lbl_805FD790[];
 extern "C" void AimMinigame_Update(u8*);
 extern "C" void StartRumble(s32, u32);
 extern "C" void app_PlayMusic(u32, f32);
@@ -32,7 +32,7 @@ extern "C" u32 fn_8007DD0C(u8* a3, s32 a4) {
 
 // 0x8007E0B8
 extern "C" u32 fn_8007E0B8(u8* a3, s32 a4) {
-    s32 t0 = *(s32*)((u8*)gZoneResourceSize);
+    s32 t0 = *(s32*)((u8*)&gZoneResourceSize);
     s32 t1 = *(s32*)(((u8*)(uintptr_t)(a3)) + 0);
     u32 t2 = (u32)(uintptr_t)(a4) * (u32)(t0);
     u32 t3 = (u32)(t1) + (u32)(t2);
@@ -41,7 +41,7 @@ extern "C" u32 fn_8007E0B8(u8* a3, s32 a4) {
 
 // 0x8007E0CC
 extern "C" void fn_8007E0CC(void) {
-    f32 t0 = *(f32*)((u8*)lbl_805FD788);
+    f32 t0 = *(f32*)((u8*)&lbl_805FD788);
     u32 t1 = (u32)(0xa4310000) - 30585u;
     app_PlayMusic((u32)((u32)(t1)), (f32)(t0));
 }
@@ -68,7 +68,7 @@ extern "C" void fn_8007E8FC(u8* a3) {
     if (t0 == 0) {
         return;
     }
-    s32 t1 = *(s32*)((u8*)lbl_803C4298 + 56);
+    s32 t1 = *(s32*)((u8*)&lbl_803C4298 + 56);
     StartRumble((s32)((u32)(t1)), (u32)((u32)(0)));
 }
 
@@ -82,7 +82,7 @@ extern "C" void fn_8007E920(s32 a3) {
 // 0x8007E92C
 extern "C" void fn_8007E92C(u8* a3) {
     f32 t0 = *(f32*)(((u8*)(uintptr_t)(a3)) + 168);
-    f32 t1 = *(f32*)((u8*)lbl_805FD790);
+    f32 t1 = *(f32*)((u8*)&lbl_805FD790);
     f32 t2 = (f32)(t0 * t1);
     *(f32*)(((u8*)(uintptr_t)(a3)) + 168) = (f32)(t2);
     AimMinigame_Update(((u8*)(uintptr_t)(a3)));
@@ -102,7 +102,7 @@ extern "C" void fn_8007E944(s32 a3) {
 // 0x8007E950
 extern "C" void fn_8007E950(u8* a3) {
     f32 t0 = *(f32*)(((u8*)(uintptr_t)(a3)) + 168);
-    f32 t1 = *(f32*)((u8*)lbl_805FD790);
+    f32 t1 = *(f32*)((u8*)&lbl_805FD790);
     f32 t2 = (f32)(t0 * t1);
     *(f32*)(((u8*)(uintptr_t)(a3)) + 168) = (f32)(t2);
     AimMinigame_Update(((u8*)(uintptr_t)(a3)));

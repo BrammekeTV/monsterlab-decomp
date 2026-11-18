@@ -6,10 +6,10 @@
 #include "types.h"
 #include "game/script_callbacks.h"
 
-extern u8 lbl_805F8270[];
-extern u8 lbl_805FAF78[];
-extern u8 lbl_805FBBE0[];
-extern u8 lbl_805FC890[];
+extern "C" u8 lbl_805F8270[];
+extern "C" u8 lbl_805FAF78[];
+extern "C" u8* lbl_805FBBE0;
+extern "C" u8 lbl_805FC890[];
 extern "C" f32 MonsterRateAttack(u8*);
 extern "C" f32 MonsterRateDefence(u8*);
 extern "C" f32 MonsterRateEnergy(u8*);
@@ -22,7 +22,7 @@ extern "C" void fn_8004D3F8(void*, char*, s32, s32);
 
 // 0x8001BF78
 s32 LT_GetShowingPartsInformation(void) {
-    u8* t0 = *(u8**)((u8*)lbl_805FAF78);
+    u8* t0 = *(u8**)((u8*)&lbl_805FAF78);
     if (t0 == 0) {
         return (s32)(0);
     }
@@ -35,7 +35,7 @@ s32 LT_GetShowingPartsInformation(void) {
 
 // 0x8001BFA0
 void LT_TogglePartsMonsterInformation(void) {
-    u8* t0 = *(u8**)((u8*)lbl_805FAF78);
+    u8* t0 = *(u8**)((u8*)&lbl_805FAF78);
     if (t0 == 0) {
         return;
     }
@@ -52,7 +52,7 @@ void LT_ForceSelectPart(u32 a3) {
 
 // 0x8001C3B0
 u32 LT_GetMarkedBodyPart(void) {
-    u8* t0 = *(u8**)((u8*)lbl_805FAF78);
+    u8* t0 = *(u8**)((u8*)&lbl_805FAF78);
     if (t0 == 0) {
         return (u32)(-1);
     }
@@ -62,7 +62,7 @@ u32 LT_GetMarkedBodyPart(void) {
 
 // 0x8001C4D0
 s32 LT_IsHoveringOverEnhancementDefect(void) {
-    u8* t0 = *(u8**)((u8*)lbl_805FAF78);
+    u8* t0 = *(u8**)((u8*)&lbl_805FAF78);
     if (t0 == 0) {
         return (s32)(0);
     }
@@ -72,7 +72,7 @@ s32 LT_IsHoveringOverEnhancementDefect(void) {
 
 // 0x8001C4EC
 void LT_SetHoveringOverEnhancementDefect(s32 a3) {
-    u8* t0 = *(u8**)((u8*)lbl_805FAF78);
+    u8* t0 = *(u8**)((u8*)&lbl_805FAF78);
     if (t0 == 0) {
         return;
     }
@@ -81,14 +81,14 @@ void LT_SetHoveringOverEnhancementDefect(s32 a3) {
 
 // 0x8001CDE4
 void SetMonsterInventoryPos(s32 a3) {
-    u8* t0 = *(u8**)((u8*)lbl_805FAF78);
+    u8* t0 = *(u8**)((u8*)&lbl_805FAF78);
     if (t0 == 0) {
         return;
     }
     if ((s32)(u32)(uintptr_t)(a3) < 0) {
         return;
     }
-    u8* t1 = *(u8**)((u8*)lbl_805FBBE0);
+    u8* t1 = *(u8**)((u8*)&lbl_805FBBE0);
     s32 t2 = *(s32*)(t1 + 4328);
     if ((s32)(u32)(uintptr_t)(a3) >= (s32)(u32)(t2)) {
         return;
@@ -98,12 +98,12 @@ void SetMonsterInventoryPos(s32 a3) {
 
 // 0x8001D2A8
 void NameClear(void) {
-    u8* t0 = *(u8**)((u8*)lbl_805FAF78);
+    u8* t0 = *(u8**)((u8*)&lbl_805FAF78);
     if (t0 == 0) {
         return;
     }
     *(u32*)(t0 + 3064) = (u32)((u32)(0));
-    u8* t1 = *(u8**)((u8*)lbl_805FAF78);
+    u8* t1 = *(u8**)((u8*)&lbl_805FAF78);
     s32 t2 = *(s32*)(t1 + 3064);
     u32 t3 = (u32)(uintptr_t)(t1) + (u32)(t2);
     *(u8*)((u8*)(uintptr_t)(t3) + 2792) = (u8)((u32)(0));
@@ -112,7 +112,7 @@ void NameClear(void) {
 // 0x8001D4E8
 void LT_UpdateHighlight(void) {
     // tail-call arguments inferred from the registers set before the call
-    s32 t0 = *(s32*)((u8*)lbl_805FAF78);
+    s32 t0 = *(s32*)((u8*)&lbl_805FAF78);
     if (t0 == 0) {
         return;
     }
@@ -121,7 +121,7 @@ void LT_UpdateHighlight(void) {
 
 // 0x8001DFE0
 s32 CanCreateNewMonster(void) {
-    u8* t0 = *(u8**)((u8*)lbl_805FBBE0);
+    u8* t0 = *(u8**)((u8*)&lbl_805FBBE0);
     s32 t1 = *(s32*)(t0 + 4328);
     u32 t2 = (u32)(t1) ^ 0xau;
     u32 t3 = (u32)(t2) & 0xau;
@@ -133,7 +133,7 @@ s32 CanCreateNewMonster(void) {
 
 // 0x8001E000
 BOOL GetCurrentMonster(void) {
-    u8* t0 = *(u8**)((u8*)lbl_805FAF78);
+    u8* t0 = *(u8**)((u8*)&lbl_805FAF78);
     if (t0 == 0) {
         return (BOOL)(0);
     }
@@ -146,7 +146,7 @@ BOOL GetCurrentMonster(void) {
 
 // 0x8001E3A4
 void LightningTowerResetAnim(void) {
-    u8* t0 = *(u8**)((u8*)lbl_805FAF78);
+    u8* t0 = *(u8**)((u8*)&lbl_805FAF78);
     if (t0 == 0) {
         return;
     }
@@ -154,12 +154,12 @@ void LightningTowerResetAnim(void) {
     if (t1 == 0) {
         return;
     }
-    fn_8004D3F8((void*)(t1), (char*)((u8*)lbl_805F8270), (s32)((u32)(0)), (s32)((u32)(1)));
+    fn_8004D3F8((void*)(t1), (char*)((u8*)&lbl_805F8270), (s32)((u32)(0)), (s32)((u32)(1)));
 }
 
 // 0x8001E3D0
 void LightningTowerSetSelectingMonster(s32 a3) {
-    u8* t0 = *(u8**)((u8*)lbl_805FAF78);
+    u8* t0 = *(u8**)((u8*)&lbl_805FAF78);
     if (t0 == 0) {
         return;
     }
@@ -168,7 +168,7 @@ void LightningTowerSetSelectingMonster(s32 a3) {
 
 // 0x8001E3E4
 s32 LightningTowerGetSelectingMonster(void) {
-    u8* t0 = *(u8**)((u8*)lbl_805FAF78);
+    u8* t0 = *(u8**)((u8*)&lbl_805FAF78);
     if (t0 == 0) {
         return (s32)(0);
     }
@@ -178,7 +178,7 @@ s32 LightningTowerGetSelectingMonster(void) {
 
 // 0x8001E400
 void LightningTowerSetSelectingPart(s32 a3) {
-    u8* t0 = *(u8**)((u8*)lbl_805FAF78);
+    u8* t0 = *(u8**)((u8*)&lbl_805FAF78);
     if (t0 == 0) {
         return;
     }
@@ -187,7 +187,7 @@ void LightningTowerSetSelectingPart(s32 a3) {
 
 // 0x8001E414
 s32 LighthingTowerGetSelectingPart(void) {
-    u8* t0 = *(u8**)((u8*)lbl_805FAF78);
+    u8* t0 = *(u8**)((u8*)&lbl_805FAF78);
     if (t0 == 0) {
         return (s32)(0);
     }
@@ -197,7 +197,7 @@ s32 LighthingTowerGetSelectingPart(void) {
 
 // 0x8001E430
 s32 LightningTowerGetOnOperatingTable(void) {
-    u8* t0 = *(u8**)((u8*)lbl_805FAF78);
+    u8* t0 = *(u8**)((u8*)&lbl_805FAF78);
     if (t0 == 0) {
         return (s32)(0);
     }
@@ -207,7 +207,7 @@ s32 LightningTowerGetOnOperatingTable(void) {
 
 // 0x8001E6F0
 void SetNameScreen(u32 a3) {
-    u8* t0 = *(u8**)((u8*)lbl_805FAF78);
+    u8* t0 = *(u8**)((u8*)&lbl_805FAF78);
     if (t0 == 0) {
         return;
     }
@@ -216,8 +216,8 @@ void SetNameScreen(u32 a3) {
 
 // 0x8001E7AC
 f32 GetMonsterHP(void) {
-    s32 t0 = *(s32*)((u8*)lbl_805FAF78);
-    f32 t1 = *(f32*)((u8*)lbl_805FC890);
+    s32 t0 = *(s32*)((u8*)&lbl_805FAF78);
+    f32 t1 = *(f32*)((u8*)&lbl_805FC890);
     if (t0 == 0) {
         return (f32)(t1);
     }
@@ -227,8 +227,8 @@ f32 GetMonsterHP(void) {
 
 // 0x8001E7C8
 f32 GetMonsterEnergy(void) {
-    s32 t0 = *(s32*)((u8*)lbl_805FAF78);
-    f32 t1 = *(f32*)((u8*)lbl_805FC890);
+    s32 t0 = *(s32*)((u8*)&lbl_805FAF78);
+    f32 t1 = *(f32*)((u8*)&lbl_805FC890);
     if (t0 == 0) {
         return (f32)(t1);
     }
@@ -238,8 +238,8 @@ f32 GetMonsterEnergy(void) {
 
 // 0x8001E7E4
 f32 GetMonsterAttack(void) {
-    s32 t0 = *(s32*)((u8*)lbl_805FAF78);
-    f32 t1 = *(f32*)((u8*)lbl_805FC890);
+    s32 t0 = *(s32*)((u8*)&lbl_805FAF78);
+    f32 t1 = *(f32*)((u8*)&lbl_805FC890);
     if (t0 == 0) {
         return (f32)(t1);
     }
@@ -249,8 +249,8 @@ f32 GetMonsterAttack(void) {
 
 // 0x8001E800
 f32 GetMonsterDefense(void) {
-    s32 t0 = *(s32*)((u8*)lbl_805FAF78);
-    f32 t1 = *(f32*)((u8*)lbl_805FC890);
+    s32 t0 = *(s32*)((u8*)&lbl_805FAF78);
+    f32 t1 = *(f32*)((u8*)&lbl_805FC890);
     if (t0 == 0) {
         return (f32)(t1);
     }
@@ -260,8 +260,8 @@ f32 GetMonsterDefense(void) {
 
 // 0x8001E81C
 f32 GetMonsterMadness(void) {
-    s32 t0 = *(s32*)((u8*)lbl_805FAF78);
-    f32 t1 = *(f32*)((u8*)lbl_805FC890);
+    s32 t0 = *(s32*)((u8*)&lbl_805FAF78);
+    f32 t1 = *(f32*)((u8*)&lbl_805FC890);
     if (t0 == 0) {
         return (f32)(t1);
     }
@@ -271,8 +271,8 @@ f32 GetMonsterMadness(void) {
 
 // 0x8001E838
 f32 GetMaxPlayerMadness(void) {
-    s32 t0 = *(s32*)((u8*)lbl_805FAF78);
-    f32 t1 = *(f32*)((u8*)lbl_805FC890);
+    s32 t0 = *(s32*)((u8*)&lbl_805FAF78);
+    f32 t1 = *(f32*)((u8*)&lbl_805FC890);
     if (t0 == 0) {
         return (f32)(t1);
     }
@@ -282,7 +282,7 @@ f32 GetMaxPlayerMadness(void) {
 
 // 0x8001EDE4
 void SetMonsterSelected(s32 a3) {
-    u8* t0 = *(u8**)((u8*)lbl_805FAF78);
+    u8* t0 = *(u8**)((u8*)&lbl_805FAF78);
     if (t0 == 0) {
         return;
     }
@@ -294,7 +294,7 @@ void SetMonsterSelected(s32 a3) {
 
 // 0x8001EE00
 s32 GetMonsterSelected(void) {
-    u8* t0 = *(u8**)((u8*)lbl_805FAF78);
+    u8* t0 = *(u8**)((u8*)&lbl_805FAF78);
     if (t0 == 0) {
         return (s32)(0);
     }
@@ -304,7 +304,7 @@ s32 GetMonsterSelected(void) {
 
 // 0x8001EE1C
 u32 IsPartLoaded(void) {
-    u8* t0 = *(u8**)((u8*)lbl_805FAF78);
+    u8* t0 = *(u8**)((u8*)&lbl_805FAF78);
     u8 t1 = *(u8*)(t0 + 2700);
     return (u32)(t1);
 }

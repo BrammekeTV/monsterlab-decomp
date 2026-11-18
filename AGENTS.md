@@ -61,6 +61,13 @@ a PC port. Read this whole file before making changes. Human contributors: see
 - `python tools/check_protos.py [names]`: reports functions declared with different return types,
   parameter counts or C/C++ linkage across `src/` and `include/` (run it before pushing; all game
   functions use C linkage). Pointer-returning script callbacks return `ScriptValue`.
+- `python tools/link_check.py` then `python tools/missing_symbols.py`: compile (Win32) and link every object;
+  the linker output becomes the to-do list: `docs/data/missing.json` plus a summary of unresolved game
+  functions (most-referenced first, with address and size), library functions by SDK region, globals,
+  symbols unknown to `symbols.txt`, duplicate definitions and **mismatches** (a symbol defined with another
+  type or C/C++ linkage: fix these, they are never missing code). CI runs the same after the compile and
+  fails only on duplicates/mismatches. Declare globals with the type of their definition; `tools/gen_leaf.py`
+  copies those types into `src/leaf/`.
 - `python tools/check.py [files]`: compile with MSVC using the CI flags (no args = changed files).
 - `python tools/progress.py`: progress numbers.
 
@@ -115,7 +122,7 @@ a PC port. Read this whole file before making changes. Human contributors: see
 ## Conventions
 
 - C++17, MSVC and GCC/Clang. Use `types.h` (`u8`, `s32`, `f32`, `BOOL`, ...).
-- Pointers in game data are 32-bit on the Wii; the port will handle that later. Access raw
+- Pointers in game data are 32-bit on the Wii, so the PC build is **32-bit (Win32)** for now (`types.h` asserts it; x64 comes after named structs and a loader). Access raw
   fields with `*(T*)(p + 0xOFF)` until a struct is known; define structs in `include/` once a
   layout is solid and reused.
 - Comment *what* the code does in game terms (what the player experiences), not how the asm did it.

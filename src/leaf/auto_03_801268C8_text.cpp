@@ -5,8 +5,8 @@
 
 #include "types.h"
 
-extern u8 lbl_803C4298[];
-extern u8 lbl_805FB2F3[];
+extern "C" u8 lbl_803C4298[];
+extern "C" u8 lbl_805FB2F3[];
 extern "C" void fn_8010FA48(void);
 
 // 0x8012A748
@@ -41,12 +41,12 @@ extern "C" void fn_8012A790(u8* a3, u8* a4) {
 
 // 0x8012AAD8
 extern "C" void fn_8012AAD8(void) {
-    u8 t0 = *(u8*)((u8*)lbl_805FB2F3);
+    u8 t0 = *(u8*)((u8*)&lbl_805FB2F3);
     if (t0 != 0) {
         return;
     }
-    *(u8*)((u8*)lbl_805FB2F3) = (u8)((u32)(1));
-    u8 t1 = *(u8*)((u8*)lbl_803C4298 + 28);
+    *(u8*)((u8*)&lbl_805FB2F3) = (u8)((u32)(1));
+    u8 t1 = *(u8*)((u8*)&lbl_803C4298 + 28);
     fn_8010FA48();
 }
 

@@ -88,6 +88,7 @@ static const AlertDef kAlerts[] = {
 
 static inline const char* PlayerName(u32 i) { return (const char*)(gPlayerNames + 0x340 + i * 32); }
 
+extern "C" void ShowAlertBox(u32 hash);
 // 0x80140EF8
 void ShowAlertBox(u32 hash) {
     fn_801D659C();

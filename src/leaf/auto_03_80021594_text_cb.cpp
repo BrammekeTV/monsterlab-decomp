@@ -6,7 +6,7 @@
 #include "types.h"
 #include "game/script_callbacks.h"
 
-extern u8 lbl_805FB134[];
+extern "C" u8* lbl_805FB134;
 
 // 0x80022D08
 s32 ChallengeCheckDebugCheat(void) {
@@ -15,7 +15,7 @@ s32 ChallengeCheckDebugCheat(void) {
 
 // 0x80022DDC
 void SetQuitPauseGame(void) {
-    u8* t0 = *(u8**)((u8*)lbl_805FB134);
+    u8* t0 = *(u8**)((u8*)&lbl_805FB134);
     if (t0 == 0) {
         if (t0 == 0) {
             return;

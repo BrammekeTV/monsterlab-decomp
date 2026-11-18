@@ -5,7 +5,7 @@
 
 #include "types.h"
 
-extern u8 lbl_803C4298[];
+extern "C" u8 lbl_803C4298[];
 extern "C" void fn_8000C314(u8*);
 
 // 0x800D83A8
@@ -24,7 +24,7 @@ extern "C" s32 fn_800D83B0(u8* a3) {
 extern "C" void fn_800D83B8(u8* a3, s32 a4) {
     // tail-call arguments inferred from the registers set before the call
     *(u32*)(((u8*)(uintptr_t)(a3)) + 40) = (u32)((u32)(uintptr_t)(a4));
-    fn_8000C314((u8*)lbl_803C4298);
+    fn_8000C314((u8*)&lbl_803C4298);
 }
 
 // 0x800D8854

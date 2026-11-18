@@ -115,6 +115,7 @@ u8* fn_800389A4(u8* p) {
     return p;
 }
 
+extern "C" void fn_80038AA4(void);
 // 0x80038AA4
 // Script callback (id 143): runs once (guarded by the byte at +0x68C). Copies the source record at +0x90
 // into the global object's +0x690..+0x698, adding the constants lbl_805FCF40 / lbl_805FCF44 to x and y.

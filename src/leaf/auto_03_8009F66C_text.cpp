@@ -5,15 +5,15 @@
 
 #include "types.h"
 
-extern u8 lbl_805FDE40[];
-extern u8 lbl_805FDE50[];
+extern "C" f32 lbl_805FDE40;
+extern "C" f32 lbl_805FDE50;
 extern "C" void app_PlayMusic(u32, f32);
 extern "C" void fn_800704AC(u8*);
 extern "C" void fn_800C253C(s32, s32);
 
 // 0x800A19B0
 extern "C" void fn_800A19B0(void) {
-    f32 t0 = *(f32*)((u8*)lbl_805FDE50);
+    f32 t0 = *(f32*)((u8*)&lbl_805FDE50);
     u32 t1 = (u32)(0x8d4c0000) - 25340u;
     app_PlayMusic((u32)((u32)(t1)), (f32)(t0));
 }
@@ -37,7 +37,7 @@ extern "C" void fn_800A22E4(void) {
 
 // 0x800A22E8
 extern "C" void fn_800A22E8(u8* a3) {
-    f32 t0 = *(f32*)((u8*)lbl_805FDE40);
+    f32 t0 = *(f32*)((u8*)&lbl_805FDE40);
     *(f32*)(((u8*)(uintptr_t)(a3)) + 3328) = (f32)(t0);
 }
 

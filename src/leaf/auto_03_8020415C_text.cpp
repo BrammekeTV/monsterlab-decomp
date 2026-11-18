@@ -5,13 +5,13 @@
 
 #include "types.h"
 
-extern u8 lbl_805FBB10[];
-extern u8 lbl_805FBB11[];
-extern u8 lbl_805FBB24[];
-extern u8 lbl_805FBB54[];
-extern u8 lbl_805FBB58[];
-extern u8 lbl_805FBB5C[];
-extern u8 lbl_806003F0[];
+extern "C" u8 lbl_805FBB10[];
+extern "C" u8 lbl_805FBB11[];
+extern "C" u8 lbl_805FBB24[];
+extern "C" u8 lbl_805FBB54[];
+extern "C" u8 lbl_805FBB58[];
+extern "C" u8 lbl_805FBB5C[];
+extern "C" u8 lbl_806003F0[];
 extern "C" void BufferFree(void*);
 extern "C" void* MemAllocDefault(u32);
 
@@ -42,16 +42,16 @@ extern "C" void fn_8020418C(u8* a3) {
 // 0x802041F4
 extern "C" void fn_802041F4(s32 a3) {
     if ((s32)(u32)(uintptr_t)(a3) != -1) {
-        *(u8*)((u8*)lbl_805FBB10) = (u8)((u32)(0));
+        *(u8*)((u8*)&lbl_805FBB10) = (u8)((u32)(0));
         return;
     }
-    *(u8*)((u8*)lbl_805FBB11) = (u8)((u32)(1));
-    *(u8*)((u8*)lbl_805FBB10) = (u8)((u32)(0));
+    *(u8*)((u8*)&lbl_805FBB11) = (u8)((u32)(1));
+    *(u8*)((u8*)&lbl_805FBB10) = (u8)((u32)(0));
 }
 
 // 0x8020441C
 extern "C" void fn_8020441C(u8* a3) {
-    f32 t0 = *(f32*)((u8*)lbl_806003F0);
+    f32 t0 = *(f32*)((u8*)&lbl_806003F0);
     *(u32*)(((u8*)(uintptr_t)(a3)) + 4) = (u32)((u32)(0));
     *(f32*)(((u8*)(uintptr_t)(a3)) + 0) = (f32)(t0);
 }
@@ -81,7 +81,7 @@ extern "C" void SaveSetParams(void) {
 
 // 0x80207164
 extern "C" void fn_80207164(s32 a3) {
-    *(u32*)((u8*)lbl_805FBB24) = (u32)((u32)(uintptr_t)(a3));
+    *(u32*)((u8*)&lbl_805FBB24) = (u32)((u32)(uintptr_t)(a3));
 }
 
 // 0x80207A28
@@ -126,16 +126,16 @@ extern "C" void fn_80208A38(u8* a3) {
     *(u32*)(((u8*)(uintptr_t)(a3)) + 184) = (u32)((u32)(0));
     *(u32*)(((u8*)(uintptr_t)(a3)) + 188) = (u32)((u32)(-1));
     *(u32*)(((u8*)(uintptr_t)(a3)) + 192) = (u32)((u32)(0));
-    *(u8*)((u8*)lbl_805FBB54) = (u8)((u32)(0));
+    *(u8*)((u8*)&lbl_805FBB54) = (u8)((u32)(0));
 }
 
 // 0x80208C04
 extern "C" u8 fn_80208C04(s32 a3, u8* a4, u8* a5) {
-    s32 t0 = *(s32*)((u8*)lbl_805FBB5C);
+    s32 t0 = *(s32*)((u8*)&lbl_805FBB5C);
     *(u32*)(((u8*)(uintptr_t)(a4)) + 0) = (u32)((u32)(t0));
-    s32 t1 = *(s32*)((u8*)lbl_805FBB58);
+    s32 t1 = *(s32*)((u8*)&lbl_805FBB58);
     *(u32*)(((u8*)(uintptr_t)(a5)) + 0) = (u32)((u32)(t1));
-    u8 t2 = *(u8*)((u8*)lbl_805FBB54);
+    u8 t2 = *(u8*)((u8*)&lbl_805FBB54);
     return (u8)(t2);
 }
 

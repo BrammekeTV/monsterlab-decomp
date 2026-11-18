@@ -5,7 +5,7 @@
 
 #include "types.h"
 
-extern u8 lbl_803C4298[];
+extern "C" u8 lbl_803C4298[];
 extern "C" BOOL ScriptDispatch(s32, u32, u32*, u32*);
 extern "C" void fn_8000B6A0(void*, int);
 
@@ -16,5 +16,5 @@ extern "C" BOOL fn_8010CD18(s32 a3, s32 a4, u8* a5, u8* a6) {
 
 // 0x8010F784
 extern "C" void fn_8010F784(s32 a3) {
-    fn_8000B6A0((void*)((u8*)lbl_803C4298), (int)((u32)(uintptr_t)(a3)));
+    fn_8000B6A0((void*)((u8*)&lbl_803C4298), (int)((u32)(uintptr_t)(a3)));
 }

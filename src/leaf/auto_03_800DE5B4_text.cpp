@@ -5,13 +5,13 @@
 
 #include "types.h"
 
-extern u8 lbl_8035FDE0[];
-extern u8 lbl_805F95F8[];
+extern "C" u8 lbl_8035FDE0[];
+extern "C" u8 lbl_805F95F8[];
 
 // 0x800DE5B4
 extern "C" void fn_800DE5B4(u8* a3) {
-    *(u32*)(((u8*)(uintptr_t)(a3)) + 16) = (u32)((u32)(uintptr_t)((u8*)lbl_8035FDE0));
-    s32 t0 = *(s32*)((u8*)lbl_805F95F8);
+    *(u32*)(((u8*)(uintptr_t)(a3)) + 16) = (u32)((u32)(uintptr_t)((u8*)&lbl_8035FDE0));
+    s32 t0 = *(s32*)((u8*)&lbl_805F95F8);
     if ((s32)(u32)(t0) == -1) {
         return;
     }

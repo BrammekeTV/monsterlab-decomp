@@ -6,37 +6,37 @@
 #include "types.h"
 #include "game/script_callbacks.h"
 
-extern u8 lbl_805FB098[];
-extern u8 lbl_805FB0A8[];
-extern u8 lbl_805FB0A9[];
-extern u8 lbl_805FB0AA[];
+extern "C" u8 lbl_805FB098[];
+extern "C" u8 lbl_805FB0A8[];
+extern "C" u8 lbl_805FB0A9[];
+extern "C" u8 lbl_805FB0AA[];
 extern "C" void fn_800493A8(s32);
 
 // 0x80046B9C
 u32 isPartLocked(void) {
-    u8 t0 = *(u8*)((u8*)lbl_805FB098);
+    u8 t0 = *(u8*)((u8*)&lbl_805FB098);
     return (u32)(t0);
 }
 
 // 0x80048A80
 void SupressHUD(void) {
-    *(u8*)((u8*)lbl_805FB0A8) = (u8)((u32)(1));
+    *(u8*)((u8*)&lbl_805FB0A8) = (u8)((u32)(1));
 }
 
 // 0x80048A8C
 void ReleaseHUD(void) {
-    u8 t0 = *(u8*)((u8*)lbl_805FB0A9);
-    *(u8*)((u8*)lbl_805FB0A8) = (u8)((u32)(0));
+    u8 t0 = *(u8*)((u8*)&lbl_805FB0A9);
+    *(u8*)((u8*)&lbl_805FB0A8) = (u8)((u32)(0));
     if (t0 == 0) {
         return;
     }
-    *(u8*)((u8*)lbl_805FB0A9) = (u8)((u32)(0));
+    *(u8*)((u8*)&lbl_805FB0A9) = (u8)((u32)(0));
     ShowSelectionHUD();
 }
 
 // 0x80048AAC
 void SetInTargetedPartTutorial(void) {
-    *(u8*)((u8*)lbl_805FB0AA) = (u8)((u32)(1));
+    *(u8*)((u8*)&lbl_805FB0AA) = (u8)((u32)(1));
 }
 
 // 0x80049374

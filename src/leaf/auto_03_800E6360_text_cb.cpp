@@ -6,11 +6,11 @@
 #include "types.h"
 #include "game/script_callbacks.h"
 
-extern u8 lbl_805FB1C8[];
+extern "C" void* lbl_805FB1C8;
 
 // 0x800E6934
 void HideQuestCounter(void) {
-    u8* t0 = *(u8**)((u8*)lbl_805FB1C8);
+    u8* t0 = *(u8**)((u8*)&lbl_805FB1C8);
     u8 t1 = *(u8*)(t0 + 29);
     if (t1 == 0) {
         return;

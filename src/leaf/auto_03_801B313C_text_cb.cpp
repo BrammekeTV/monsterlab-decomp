@@ -6,7 +6,7 @@
 #include "types.h"
 #include "game/script_callbacks.h"
 
-extern u8 gEventMgr[];
+extern "C" void* gEventMgr;
 extern "C" void EventSendTo(void*, u32, void*, u32, int, int);
 extern "C" void TriggerDoAction(void*, void*, void*);
 
@@ -19,7 +19,7 @@ void BroadcastToDstGroup(void* a3, u32 a4) {
     if (t0 == 0) {
         return;
     }
-    u8* t1 = *(u8**)((u8*)gEventMgr);
+    u8* t1 = *(u8**)((u8*)&gEventMgr);
     EventSendTo((void*)(t1), (u32)((u32)(t0)), (void*)(((u8*)(uintptr_t)(a3))), (u32)((u32)(uintptr_t)(a4)), (int)((u32)(0)), (int)((u32)(0)));
 }
 

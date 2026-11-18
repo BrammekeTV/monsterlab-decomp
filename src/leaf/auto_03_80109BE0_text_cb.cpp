@@ -6,7 +6,7 @@
 #include "types.h"
 #include "game/script_callbacks.h"
 
-extern u8 lbl_805FB238[];
+extern "C" u8 lbl_805FB238[];
 
 // 0x8010A1C4
 void StartLobbyCallback(void) {
@@ -14,5 +14,5 @@ void StartLobbyCallback(void) {
 
 // 0x8010A380
 void SavedGameMCSentCallback(u32 a3) {
-    *(u8*)((u8*)lbl_805FB238) = (u8)((u32)(0));
+    *(u8*)((u8*)&lbl_805FB238) = (u8)((u32)(0));
 }

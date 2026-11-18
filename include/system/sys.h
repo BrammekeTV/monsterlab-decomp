@@ -19,7 +19,7 @@ typedef void (*SysEventCallback)(int event);
 extern u8 gSysExitEnabled;
 extern SysEventCallback gSysEventCallback;
 
-void        SysInit(void);
+extern "C" void SysInit(void);
 void*       SysAllocMEM2(u32 size);
 BOOL        SysFreeMEM2(void* ptr);
 void        SysSetExitMode(SysExitMode mode);

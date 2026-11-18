@@ -72,3 +72,7 @@ game can be ported to PC. The code does not have to compile back to identical Po
 Describe in the PR what the functions do in game terms (what the player sees), list the
 addresses, and mention anything you were unsure of. Reviewers compare against the asm, so
 keep code readable: named fields and constants beat raw offsets where the meaning is known.
+
+## Link check
+
+The PC build is 32-bit (Win32). `python tools/link_check.py` compiles and links everything and `python tools/missing_symbols.py` turns the linker output into `docs/data/missing.json` and a ranked list of unresolved game functions and globals. Link errors about duplicate definitions or a symbol defined with another type/linkage must be fixed; plain unresolved symbols are the remaining work.

@@ -321,6 +321,7 @@ void PumpkinEscapeUpdate(ScriptCtx* ctx) {
 struct UIElement { u8 pad[0x64]; u32 flags; u8 pad68[0xD0]; void** vtbl2; };
 typedef void (*UIStateFn)(UIElement*, int);
 
+extern "C" BOOL ShakePromptBlink(s32 player, f32 phase);
 // 0x80015C40
 // Blink the "shake" prompt: swap which of two button icons is lit (player 1 uses its own pair).
 BOOL ShakePromptBlink(s32 player, f32 phase) {
@@ -556,12 +557,14 @@ void ObstacleShakeUpdate(ScriptCtx* ctx) {
     if (ShakeMeterStep(player, 10.0f)) SendSelf(c, EVENT_SHAKE_DONE);
 }
 
+extern "C" void GeneratorShakeEntry(ScriptCtx* ctx);
 // 0x80015D70
 void GeneratorShakeEntry(ScriptCtx* ctx) {
     EventSend(gEventMgr, PLAYER, NULL, 0x4F9213C1, 0, 0, 0, 0);
     ObstacleShakeEntry(ctx);
 }
 
+extern "C" void GeneratorShakeExit(ScriptCtx* ctx);
 // 0x80015E80
 void GeneratorShakeExit(ScriptCtx* ctx) {
     (void)ctx;
@@ -572,6 +575,7 @@ void GeneratorShakeExit(ScriptCtx* ctx) {
     UIScreen_PopScreen(UI_SHAKE_SCREEN_B);
 }
 
+extern "C" void GeneratorShakeUpdate(ScriptCtx* ctx);
 // 0x80015F0C
 void GeneratorShakeUpdate(ScriptCtx* ctx) {
     (void)ctx;

@@ -238,6 +238,7 @@ extern "C" s32 LoadingScreenTick2(int unused, f32 dt) {
     return LoadingScreenTick(unused, dt);
 }
 
+extern "C" void InitLoadProgressProjectile(s32 s0, s32 s1, s32 s2, s32 s3, s32 s4, s32 s5);
 // 0x8000E394
 // Set up the loading animation with six lines of text from the current screen set.
 void InitLoadProgressProjectile(s32 s0, s32 s1, s32 s2, s32 s3, s32 s4, s32 s5) {
@@ -252,6 +253,7 @@ void InitLoadProgressProjectile(s32 s0, s32 s1, s32 s2, s32 s3, s32 s4, s32 s5) 
 
 // ---------------------------------------------------------------- language
 
+extern "C" void GameInitLanguage(void);
 // 0x8000ED5C
 void GameInitLanguage(void) {
     gIsReturningPlayer = 0;
@@ -380,6 +382,7 @@ extern "C" void MusicUpdate(void) {
     gGameFlags = state;
 }
 
+extern "C" void app_StopMusic(void);
 // 0x80010100
 void app_StopMusic(void) {
     if ((gGameFlags & MUSIC_STATE_MASK) == 0) return;

@@ -6,11 +6,11 @@
 #include "types.h"
 
 extern "C" s32 fn_8021FB28(void);
-extern u8 lbl_805FBBD0[];
-extern u8 lbl_805FBBD8[];
-extern u8 lbl_805FBBD9[];
-extern u8 lbl_80600610[];
-extern u8 lbl_80600614[];
+extern "C" u8 lbl_805FBBD0[];
+extern "C" u8 lbl_805FBBD8[];
+extern "C" u8 lbl_805FBBD9[];
+extern "C" u8 lbl_80600610[];
+extern "C" u8 lbl_80600614[];
 extern "C" u32 RngNext(void*);
 extern "C" void StrCopy(char*, char*);
 
@@ -364,11 +364,11 @@ extern "C" void fn_80220178(u8* a3) {
 
 // 0x80220974
 extern "C" s32 fn_80220974(f32 f1) {
-    f32 t0 = *(f32*)((u8*)lbl_80600610);
+    f32 t0 = *(f32*)((u8*)&lbl_80600610);
     if (!(t0 < f1)) {
         return (s32)(0);
     }
-    f32 t1 = *(f32*)((u8*)lbl_80600614);
+    f32 t1 = *(f32*)((u8*)&lbl_80600614);
     if (!(f1 < t1)) {
         return (s32)(0);
     }
@@ -377,28 +377,28 @@ extern "C" s32 fn_80220974(f32 f1) {
 
 // 0x802209D0
 extern "C" void fn_802209D0(s32 a3) {
-    *(u32*)((u8*)lbl_805FBBD0) = (u32)((u32)(uintptr_t)(a3));
+    *(u32*)((u8*)&lbl_805FBBD0) = (u32)((u32)(uintptr_t)(a3));
 }
 
 // 0x80220A0C
 extern "C" void fn_80220A0C(s32 a3) {
-    *(u8*)((u8*)lbl_805FBBD8) = (u8)((u32)(uintptr_t)(a3));
+    *(u8*)((u8*)&lbl_805FBBD8) = (u8)((u32)(uintptr_t)(a3));
 }
 
 // 0x80220A14
 extern "C" u8 fn_80220A14(void) {
-    u8 t0 = *(u8*)((u8*)lbl_805FBBD8);
+    u8 t0 = *(u8*)((u8*)&lbl_805FBBD8);
     return (u8)(t0);
 }
 
 // 0x80220A1C
 extern "C" void fn_80220A1C(s32 a3) {
-    *(u8*)((u8*)lbl_805FBBD9) = (u8)((u32)(uintptr_t)(a3));
+    *(u8*)((u8*)&lbl_805FBBD9) = (u8)((u32)(uintptr_t)(a3));
 }
 
 // 0x80220A24
 extern "C" u8 IsOnlineBattle(void) {
-    u8 t0 = *(u8*)((u8*)lbl_805FBBD9);
+    u8 t0 = *(u8*)((u8*)&lbl_805FBBD9);
     return (u8)(t0);
 }
 

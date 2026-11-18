@@ -6,11 +6,11 @@
 #include "types.h"
 #include "game/script_callbacks.h"
 
-extern u8 gBattle[];
+extern "C" u8* gBattle;
 
 // 0x8003F8DC
 s32 GetCombatWinner(void) {
-    u8* t0 = *(u8**)((u8*)gBattle);
+    u8* t0 = *(u8**)((u8*)&gBattle);
     s32 t1 = *(s32*)(t0 + 2636);
     s32 t2 = *(s32*)(t0 + 2560);
     u32 t3 = (u32)(t2) - (u32)(t1);

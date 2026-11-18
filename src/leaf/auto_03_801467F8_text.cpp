@@ -6,25 +6,25 @@
 #include "types.h"
 
 extern "C" void fn_80148228(void);
-extern u8 gVideo[];
-extern u8 lbl_80376138[];
-extern u8 lbl_803F2880[];
-extern u8 lbl_805F91E0[];
-extern u8 lbl_805F9234[];
-extern u8 lbl_805F9238[];
-extern u8 lbl_805FB470[];
-extern u8 lbl_805FB47C[];
-extern u8 lbl_805FB480[];
-extern u8 lbl_805FB498[];
-extern u8 lbl_805FB4A0[];
-extern u8 lbl_805FB4E0[];
-extern u8 lbl_805FB4F0[];
-extern u8 lbl_805FB4F4[];
-extern u8 lbl_805FB518[];
-extern u8 lbl_805FB524[];
-extern u8 lbl_805FB594[];
-extern u8 lbl_805FF0E4[];
-extern u8 lbl_805FF0EC[];
+extern "C" u8 gVideo[];
+extern "C" u8 lbl_80376138[];
+extern "C" u8 lbl_803F2880[];
+extern "C" u8 lbl_805F91E0[];
+extern "C" u8 lbl_805F9234[];
+extern "C" u8 lbl_805F9238[];
+extern "C" u8 lbl_805FB470[];
+extern "C" u8 lbl_805FB47C[];
+extern "C" u8 lbl_805FB480[];
+extern "C" void* lbl_805FB498;
+extern "C" u8 lbl_805FB4A0[];
+extern "C" u8 lbl_805FB4E0[];
+extern "C" u8 lbl_805FB4F0[];
+extern "C" u8 lbl_805FB4F4[];
+extern "C" u8 lbl_805FB518[];
+extern "C" u8 lbl_805FB524[];
+extern "C" s32 lbl_805FB594;
+extern "C" u8 lbl_805FF0E4[];
+extern "C" u8 lbl_805FF0EC[];
 extern "C" BOOL DVDInit(void);
 extern "C" void MEMFreeToAllocator(u8*, void*);
 extern "C" void* VideoGetFrameBuffer(u8*, int);
@@ -37,12 +37,12 @@ extern "C" void fn_80330E20(void*);
 
 // 0x801467F8
 extern "C" void fn_801467F8(s32 a3) {
-    *(u32*)((u8*)lbl_805F91E0) = (u32)((u32)(uintptr_t)(a3));
+    *(u32*)((u8*)&lbl_805F91E0) = (u32)((u32)(uintptr_t)(a3));
 }
 
 // 0x80146800
 extern "C" void fn_80146800(s32 a3) {
-    *(u32*)((u8*)lbl_805FB470) = (u32)((u32)(uintptr_t)(a3));
+    *(u32*)((u8*)&lbl_805FB470) = (u32)((u32)(uintptr_t)(a3));
 }
 
 // 0x80146A58
@@ -67,8 +67,8 @@ extern "C" void fn_80146A78(void) {
 
 // 0x80146B18
 extern "C" void fn_80146B18(s32 a3) {
-    *(u32*)((u8*)lbl_805FB480) = (u32)((u32)(uintptr_t)(a3));
-    *(u32*)((u8*)lbl_805FB47C) = (u32)((u32)(0));
+    *(u32*)((u8*)&lbl_805FB480) = (u32)((u32)(uintptr_t)(a3));
+    *(u32*)((u8*)&lbl_805FB47C) = (u32)((u32)(0));
 }
 
 // 0x80146FB8
@@ -89,7 +89,7 @@ extern "C" void fn_80147130(u8* a3) {
 
 // 0x80147988
 extern "C" void fn_80147988(s32 a3) {
-    *(u32*)((u8*)lbl_805FB498) = (u32)((u32)(uintptr_t)(a3));
+    *(u32*)((u8*)&lbl_805FB498) = (u32)((u32)(uintptr_t)(a3));
 }
 
 // 0x80148308
@@ -100,7 +100,7 @@ extern "C" void fn_80148308(void) {
 // 0x801483BC
 extern "C" u32 fn_801483BC(s32 a3) {
     u32 t0 = (u32)((s32)(u32)(uintptr_t)(a3) * 28);
-    s32 t1 = *(s32*)((u8*)lbl_805FB4A0);
+    s32 t1 = *(s32*)((u8*)&lbl_805FB4A0);
     u32 t2 = (u32)(t1) + (u32)(t0);
     return (u32)(t2);
 }
@@ -113,12 +113,12 @@ extern "C" void fn_801483CC(u8* a3) {
     *(u32*)(((u8*)(uintptr_t)(a3)) + 16) = (u32)((u32)(0));
     *(u32*)(((u8*)(uintptr_t)(a3)) + 20) = (u32)((u32)(0));
     *(u32*)(((u8*)(uintptr_t)(a3)) + 24) = (u32)((u32)(1));
-    *(u32*)(((u8*)(uintptr_t)(a3)) + 0) = (u32)((u32)(uintptr_t)((u8*)lbl_80376138));
+    *(u32*)(((u8*)(uintptr_t)(a3)) + 0) = (u32)((u32)(uintptr_t)((u8*)&lbl_80376138));
 }
 
 // 0x80148540
 extern "C" void RendDefaultFree(u8* a3) {
-    MEMFreeToAllocator((u8*)lbl_803F2880, (void*)(((u8*)(uintptr_t)(a3))));
+    MEMFreeToAllocator((u8*)&lbl_803F2880, (void*)(((u8*)(uintptr_t)(a3))));
 }
 
 // 0x80148558
@@ -139,7 +139,7 @@ extern "C" void fn_80148770(s32 a3) {
 
 // 0x8014879C
 extern "C" void fn_8014879C(u8* a3) {
-    f32 t0 = *(f32*)((u8*)lbl_805FF0EC);
+    f32 t0 = *(f32*)((u8*)&lbl_805FF0EC);
     *(f32*)(((u8*)(uintptr_t)(a3)) + 0) = (f32)(t0);
     *(f32*)(((u8*)(uintptr_t)(a3)) + 4) = (f32)(t0);
     *(f32*)(((u8*)(uintptr_t)(a3)) + 8) = (f32)(t0);
@@ -148,7 +148,7 @@ extern "C" void fn_8014879C(u8* a3) {
 
 // 0x801487B4
 extern "C" void fn_801487B4(u8* a3) {
-    f32 t0 = *(f32*)((u8*)lbl_805FF0E4);
+    f32 t0 = *(f32*)((u8*)&lbl_805FF0E4);
     *(f32*)(((u8*)(uintptr_t)(a3)) + 0) = (f32)(t0);
     *(f32*)(((u8*)(uintptr_t)(a3)) + 4) = (f32)(t0);
     *(f32*)(((u8*)(uintptr_t)(a3)) + 8) = (f32)(t0);
@@ -170,8 +170,8 @@ extern "C" f32 fn_80148D70(u8* a3, u8* a4) {
 
 // 0x80149094
 extern "C" f32 fn_80149094(u8* a3) {
-    f32 t0 = *(f32*)((u8*)lbl_805FF0EC);
-    f32 t1 = *(f32*)((u8*)lbl_805FF0E4);
+    f32 t0 = *(f32*)((u8*)&lbl_805FF0EC);
+    f32 t1 = *(f32*)((u8*)&lbl_805FF0E4);
     *(f32*)(((u8*)(uintptr_t)(a3)) + 8) = (f32)(t0);
     *(f32*)(((u8*)(uintptr_t)(a3)) + 4) = (f32)(t0);
     *(f32*)(((u8*)(uintptr_t)(a3)) + 0) = (f32)(t1);
@@ -203,17 +203,17 @@ extern "C" void fn_801497AC(void) {
 
 // 0x8014DD74
 extern "C" void RendSetCallbackA(s32 a3) {
-    *(u32*)((u8*)lbl_805FB4F0) = (u32)((u32)(uintptr_t)(a3));
+    *(u32*)((u8*)&lbl_805FB4F0) = (u32)((u32)(uintptr_t)(a3));
 }
 
 // 0x8014DD7C
 extern "C" void RendSetCallbackB(s32 a3) {
-    *(u32*)((u8*)lbl_805FB4F4) = (u32)((u32)(uintptr_t)(a3));
+    *(u32*)((u8*)&lbl_805FB4F4) = (u32)((u32)(uintptr_t)(a3));
 }
 
 // 0x8014E2D8
 extern "C" void fn_8014E2D8(void) {
-    *(u32*)((u8*)lbl_805FB4E0) = (u32)((u32)(0));
+    *(u32*)((u8*)&lbl_805FB4E0) = (u32)((u32)(0));
 }
 
 // 0x8014EACC
@@ -230,49 +230,49 @@ extern "C" u32 fn_8014EACC(s32 a3, s32 a4, s32 a5, u8* a6) {
 
 // 0x80150DD4
 extern "C" void* fn_80150DD4(void) {
-    s32 t0 = *(s32*)((u8*)lbl_805FB518);
+    s32 t0 = *(s32*)((u8*)&lbl_805FB518);
     u32 t1 = (u32)(t0) & 0x1u;
     u32 t2 = (u32)(t1 == 0);
-    return (void*)(VideoGetFrameBuffer((u8*)gVideo, (int)((u32)(t2))));
+    return (void*)(VideoGetFrameBuffer((u8*)&gVideo, (int)((u32)(t2))));
 }
 
 // 0x80151244
 extern "C" void fn_80151244(void) {
     // tail-call arguments inferred from the registers set before the call
-    fn_8015EA90((u8*)lbl_805FB594);
+    fn_8015EA90((u8*)&lbl_805FB594);
 }
 
 // 0x8015124C
 extern "C" void RendSetFlagA(s32 a3) {
     // tail-call arguments inferred from the registers set before the call
-    fn_8015E838((u8*)lbl_805FB594, (s32)((u32)(uintptr_t)(a3)));
+    fn_8015E838((u8*)&lbl_805FB594, (s32)((u32)(uintptr_t)(a3)));
 }
 
 // 0x80151258
 extern "C" void SetRenderEnabled(s32 a3) {
     // tail-call arguments inferred from the registers set before the call
-    fn_8015E8B4((u8*)lbl_805FB594, (s32)((u32)(uintptr_t)(a3)));
+    fn_8015E8B4((u8*)&lbl_805FB594, (s32)((u32)(uintptr_t)(a3)));
 }
 
 // 0x801514D4
 extern "C" void fn_801514D4(void) {
     // tail-call arguments inferred from the registers set before the call
-    u8 t0 = *(u8*)((u8*)lbl_805FB524);
+    u8 t0 = *(u8*)((u8*)&lbl_805FB524);
     if (t0 != 0) {
         return;
     }
-    *(u8*)((u8*)lbl_805FB524) = (u8)((u32)(1));
+    *(u8*)((u8*)&lbl_805FB524) = (u8)((u32)(1));
     fn_80151264();
 }
 
 // 0x801514F0
 extern "C" void fn_801514F0(void) {
     // tail-call arguments inferred from the registers set before the call
-    u8 t0 = *(u8*)((u8*)lbl_805FB524);
+    u8 t0 = *(u8*)((u8*)&lbl_805FB524);
     if (t0 == 0) {
         return;
     }
-    *(u8*)((u8*)lbl_805FB524) = (u8)((u32)(0));
+    *(u8*)((u8*)&lbl_805FB524) = (u8)((u32)(0));
     fn_80151264();
 }
 
@@ -290,12 +290,12 @@ extern "C" void fn_80156894(void) {
 
 // 0x80156A80
 extern "C" s32 fn_80156A80(void) {
-    s32 t0 = *(s32*)((u8*)lbl_805F9234);
+    s32 t0 = *(s32*)((u8*)&lbl_805F9234);
     return (s32)(t0);
 }
 
 // 0x80156A88
 extern "C" s32 fn_80156A88(void) {
-    s32 t0 = *(s32*)((u8*)lbl_805F9238);
+    s32 t0 = *(s32*)((u8*)&lbl_805F9238);
     return (s32)(t0);
 }

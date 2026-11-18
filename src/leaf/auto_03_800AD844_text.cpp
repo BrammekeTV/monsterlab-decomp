@@ -5,13 +5,13 @@
 
 #include "types.h"
 
-extern u8 lbl_805FB174[];
+extern "C" u8 lbl_805FB174[];
 
 // 0x800AE3A8
 extern "C" void fn_800AE3A8(f32 f1) {
-    f32 t0 = *(f32*)((u8*)lbl_805FB174);
+    f32 t0 = *(f32*)((u8*)&lbl_805FB174);
     f32 t1 = (f32)(t0 - f1);
-    *(f32*)((u8*)lbl_805FB174) = (f32)(t1);
+    *(f32*)((u8*)&lbl_805FB174) = (f32)(t1);
 }
 
 // 0x800AEF38

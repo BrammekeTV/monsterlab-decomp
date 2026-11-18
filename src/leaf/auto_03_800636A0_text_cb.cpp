@@ -6,12 +6,12 @@
 #include "types.h"
 #include "game/script_callbacks.h"
 
-extern u8 lbl_805FD468[];
+extern "C" f32 lbl_805FD468;
 
 // 0x800636A4
 void Projectile_Set_Dead(u32 a3) {
     s32 t0 = *(s32*)(((u8*)(uintptr_t)(a3)) + 580);
-    f32 t1 = *(f32*)((u8*)lbl_805FD468);
+    f32 t1 = *(f32*)((u8*)&lbl_805FD468);
     u32 t2 = (u32)(t0) | 0x80000000u;
     *(u32*)(((u8*)(uintptr_t)(a3)) + 580) = (u32)((u32)(t2));
     *(f32*)(((u8*)(uintptr_t)(a3)) + 560) = (f32)(t1);

@@ -6,7 +6,7 @@
 #include "types.h"
 
 extern "C" void fn_8002FD5C(void);
-extern u8 lbl_80357950[];
+extern "C" u8 lbl_80357950[];
 extern "C" s32 RegisterScriptFunc(char*, s32, void*);
 extern "C" void fn_800222F0(void);
 extern "C" void fn_800222F4(u8*);
@@ -15,7 +15,7 @@ extern "C" void fn_800223EC(void);
 
 // 0x8002E370
 extern "C" s32 fn_8002E370(void) {
-    return (s32)(RegisterScriptFunc((char*)((u8*)lbl_80357950), (s32)((u32)(143)), (void*)((u8*)(uintptr_t)&fn_8002FD5C)));
+    return (s32)(RegisterScriptFunc((char*)((u8*)&lbl_80357950), (s32)((u32)(143)), (void*)((u8*)(uintptr_t)&fn_8002FD5C)));
 }
 
 // 0x8002FA64

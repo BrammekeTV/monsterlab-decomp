@@ -15,11 +15,11 @@ jobs:
     steps:
       - uses: actions/checkout@v7
       - name: Configure
-        run: cmake -S . -B out -A x64
+        run: cmake -S . -B out -A Win32
       - name: Compile
         shell: pwsh
         run: |
-          cmake --build out --config Release -- /m /nologo /v:minimal 2>&1 | Tee-Object -FilePath build.log
+          cmake --build out --config Release --target game -- /m /nologo /v:minimal 2>&1 | Tee-Object -FilePath build.log
           $code = $LASTEXITCODE
           # Surface compiler errors as annotations (readable without downloading logs).
           Select-String -Path build.log -Pattern ': (fatal )?error ' | Select-Object -First 40 | ForEach-Object {
@@ -32,3 +32,22 @@ jobs:
           $objs = (Get-ChildItem out -Recurse -Filter *.obj).Count
           Write-Output "::notice::Compiled $objs source files"
           exit $code
+      - name: Link check (missing symbols)
+        # Linking is expected to fail until the platform layer exists; the linker output is the
+        # to-do list. This step reports it and only fails on duplicate definitions or mismatches.
+        shell: pwsh
+        run: |
+          cmake --build out --config Release --target monsterlab_link -- /nologo /v:minimal 2>&1 | Tee-Object -FilePath link.log
+          python tools/missing_symbols.py link.log | Tee-Object -FilePath missing.txt
+          Get-Content missing.txt | Select-Object -First 4 | ForEach-Object { Write-Output "::notice::$_" }
+          Get-Content missing.txt | Add-Content $env:GITHUB_STEP_SUMMARY
+          $bad = Select-String -Path link.log -Pattern 'LNK2005|could potentially match'
+          if ($bad) { $bad | Select-Object -First 20 | ForEach-Object { Write-Output "::error::$($_.Line.Trim())" }; exit 1 }
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: missing-symbols
+          path: |
+            link.log
+            missing.txt
+            docs/data/missing.json

@@ -5,22 +5,22 @@
 
 #include "types.h"
 
-extern u8 gVideoDrawDone[];
-extern u8 lbl_805FB528[];
-extern u8 lbl_805FB550[];
-extern u8 lbl_805FB554[];
-extern u8 lbl_805FB580[];
-extern u8 lbl_805FB590[];
-extern u8 lbl_805FF20C[];
-extern u8 lbl_805FF210[];
-extern u8 lbl_805FF228[];
-extern u8 lbl_805FF22C[];
+extern "C" u8 gVideoDrawDone[];
+extern "C" u8 lbl_805FB528[];
+extern "C" u8 lbl_805FB550[];
+extern "C" u8 lbl_805FB554[];
+extern "C" u8 lbl_805FB580[];
+extern "C" u8 lbl_805FB590[];
+extern "C" u8 lbl_805FF20C[];
+extern "C" u8 lbl_805FF210[];
+extern "C" u8 lbl_805FF228[];
+extern "C" u8 lbl_805FF22C[];
 extern "C" s32 OSSignalSemaphore(u8*);
 
 // 0x80156AAC
 extern "C" s32 fn_80156AAC(u8* a3) {
     *(u32*)(((u8*)(uintptr_t)(a3)) + 0) = (u32)((u32)(48));
-    s32 t0 = *(s32*)((u8*)lbl_805FB528);
+    s32 t0 = *(s32*)((u8*)&lbl_805FB528);
     return (s32)(t0);
 }
 
@@ -106,12 +106,12 @@ extern "C" u32 fn_8015BA30(u8* a3) {
 
 // 0x8015D2E0
 extern "C" s32 fn_8015D2E0(void) {
-    return (s32)(OSSignalSemaphore((u8*)gVideoDrawDone));
+    return (s32)(OSSignalSemaphore((u8*)&gVideoDrawDone));
 }
 
 // 0x8015DE24
 extern "C" u32 VideoIsPal50(void) {
-    s32 t0 = *(s32*)((u8*)lbl_805FB554);
+    s32 t0 = *(s32*)((u8*)&lbl_805FB554);
     u32 t1 = (u32)(t0) - 520u;
     u32 t2 = (u32)(t1 == 0);
     return (u32)(t2);
@@ -119,20 +119,20 @@ extern "C" u32 VideoIsPal50(void) {
 
 // 0x8015DE48
 extern "C" s32 VideoGetWidth(void) {
-    s32 t0 = *(s32*)((u8*)lbl_805FB550);
+    s32 t0 = *(s32*)((u8*)&lbl_805FB550);
     return (s32)(t0);
 }
 
 // 0x8015DE50
 extern "C" s32 VideoGetHeight(void) {
-    s32 t0 = *(s32*)((u8*)lbl_805FB554);
+    s32 t0 = *(s32*)((u8*)&lbl_805FB554);
     return (s32)(t0);
 }
 
 // 0x8015DE58
 extern "C" f32 fn_8015DE58(s32 a3, u8* a4, u8* a5, u8* a6, u8* a7) {
-    f32 t0 = *(f32*)((u8*)lbl_805FF20C);
-    f32 t1 = *(f32*)((u8*)lbl_805FF210);
+    f32 t0 = *(f32*)((u8*)&lbl_805FF20C);
+    f32 t1 = *(f32*)((u8*)&lbl_805FF210);
     *(f32*)(((u8*)(uintptr_t)(a4)) + 0) = (f32)(t0);
     *(f32*)(((u8*)(uintptr_t)(a5)) + 0) = (f32)(t1);
     *(f32*)(((u8*)(uintptr_t)(a6)) + 0) = (f32)(t1);
@@ -142,9 +142,9 @@ extern "C" f32 fn_8015DE58(s32 a3, u8* a4, u8* a5, u8* a6, u8* a7) {
 
 // 0x8015DE74
 extern "C" s32 fn_8015DE74(s32 a3, u8* a4, u8* a5, u8* a6) {
-    s32 t0 = *(s32*)((u8*)lbl_805FB550);
+    s32 t0 = *(s32*)((u8*)&lbl_805FB550);
     *(u32*)(((u8*)(uintptr_t)(a5)) + 0) = (u32)((u32)(t0));
-    s32 t1 = *(s32*)((u8*)lbl_805FB554);
+    s32 t1 = *(s32*)((u8*)&lbl_805FB554);
     *(u32*)(((u8*)(uintptr_t)(a6)) + 0) = (u32)((u32)(t1));
     *(u32*)(((u8*)(uintptr_t)(a4)) + 0) = (u32)((u32)(16));
     return (s32)(t1);
@@ -152,9 +152,9 @@ extern "C" s32 fn_8015DE74(s32 a3, u8* a4, u8* a5, u8* a6) {
 
 // 0x8015EB28
 extern "C" void fn_8015EB28(s32 a3, u8* a4, u8* a5) {
-    f32 t0 = *(f32*)((u8*)lbl_805FB590);
+    f32 t0 = *(f32*)((u8*)&lbl_805FB590);
     *(f32*)(((u8*)(uintptr_t)(a4)) + 0) = (f32)(t0);
-    f32 t1 = *(f32*)((u8*)lbl_805FB580);
+    f32 t1 = *(f32*)((u8*)&lbl_805FB580);
     *(f32*)(((u8*)(uintptr_t)(a5)) + 0) = (f32)(t1);
 }
 
@@ -212,9 +212,9 @@ extern "C" void fn_8015FD30(u8* a3, u8* a4) {
 // 0x8015FD74
 extern "C" f64 fn_8015FD74(u8* a3, u8* a4) {
     f32 t0 = *(f32*)(((u8*)(uintptr_t)(a4)) + 0);
-    f32 t1 = *(f32*)((u8*)lbl_805FF22C);
+    f32 t1 = *(f32*)((u8*)&lbl_805FF22C);
     if (!(t0 < t1)) {
-        f32 t2 = *(f32*)((u8*)lbl_805FF228);
+        f32 t2 = *(f32*)((u8*)&lbl_805FF228);
         if (!(t0 > t2)) {
             *(f32*)(((u8*)(uintptr_t)(a3)) + 0) = (f32)(t0);
             return (f64)(t0);

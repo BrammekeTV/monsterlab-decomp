@@ -5,14 +5,14 @@
 
 #include "types.h"
 
-extern u8 gEventMgr[];
+extern "C" void* gEventMgr;
 extern "C" void EventSend(void*, void*, void*, u32, int, int, int, int);
 
 // 0x800C69DC
 extern "C" void fn_800C69DC(u8* a3) {
     *(u32*)(((u8*)(uintptr_t)(a3)) + 616) = (u32)((u32)(-1));
     u32 t0 = (u32)(0x22450000) - 11858u;
-    u8* t1 = *(u8**)((u8*)gEventMgr);
+    u8* t1 = *(u8**)((u8*)&gEventMgr);
     EventSend((void*)(t1), (void*)(((u8*)(uintptr_t)(a3))), (void*)((u8*)(uintptr_t)(0)), (u32)((u32)(t0)), (int)((u32)(0)), (int)((u32)(0)), (int)((u32)(0)), (int)((u32)(0)));
 }
 
@@ -31,6 +31,6 @@ extern "C" f32 fn_800C6A0C(u8* a3, u8* a4) {
 extern "C" void fn_800C6A28(u8* a3) {
     *(u32*)(((u8*)(uintptr_t)(a3)) + 616) = (u32)((u32)(4));
     u32 t0 = (u32)(0xfc4c0000) + 21758u;
-    u8* t1 = *(u8**)((u8*)gEventMgr);
+    u8* t1 = *(u8**)((u8*)&gEventMgr);
     EventSend((void*)(t1), (void*)(((u8*)(uintptr_t)(a3))), (void*)((u8*)(uintptr_t)(0)), (u32)((u32)(t0)), (int)((u32)(0)), (int)((u32)(0)), (int)((u32)(0)), (int)((u32)(0)));
 }
