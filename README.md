@@ -121,10 +121,13 @@ These live in the platform layer (`src/platform/`) that replaces the Wii SDK, so
 ## Status
 
 - `dtk dol split` runs cleanly: 12,580 functions, 707 objects, assembly in `build/RM7P4F/asm/`.
-- About 440 functions are named, most of them SDK functions. Library regions are mapped in `tools/progress.py`.
-- Decompiled so far: the boot path (`src/system/sys_main.cpp`) and the top-level loop (`src/game/game_main.cpp`).
-- Re-analysis fixes: the second `.sbss` became `.sbss2`, and the computed-jump entries at `0x802E5A08` were declared as functions.
-- No C++ compiler is installed yet, so the sources have not been compile-checked.
+- Progress (functions, bytes, names) is on the [progress site](https://brammeketv.github.io/monsterlab-decomp/).
+- Every push is compiled by GitHub CI (MSVC); `tools/check.py` runs the same check locally.
+
+## Contributing
+
+Want to help, by hand or with your own AI agent? See [CONTRIBUTING.md](CONTRIBUTING.md) for setup
+and workflow, and point your agent at [AGENTS.md](AGENTS.md).
 
 ## Tools
 
