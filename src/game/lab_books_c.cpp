@@ -17,7 +17,7 @@ void fn_8011C20C(u8* p, s32 a);           // 0x8011C20C
 s32  fn_8011C22C(u8* p);                  // 0x8011C22C (return type assumed, value passed through)
 s32  fn_8011C2B4(u8* p);                  // 0x8011C2B4 (return type assumed, value passed through)
 u8   fn_8011AEE0(void);                   // 0x8011AEE0
-s32  fn_8011AFEC(u8* p);                  // 0x8011AFEC (return type assumed, value passed through)
+u8*  fn_8011AFEC(u8* p);                  // 0x8011AFEC (returns the delete-string buffer)
 f32  fn_801173E8(u8* p);                  // 0x801173E8
 f32  fn_801173D0(u8* p);                  // 0x801173D0
 f32  fn_801173A0(u8* p);                  // 0x801173A0
@@ -105,7 +105,7 @@ s32 Parts_IsTextureAsyncLoaded(void) {
 s32 Parts_GetDeleteString(void) {
     u8* obj = PartsObj();
     if (obj == 0) return 0;
-    return fn_8011AFEC(obj);
+    return (BOOL)(uintptr_t)fn_8011AFEC(obj);  // TODO: header return type cannot hold a pointer on x64
 }
 
 // 0x80113160

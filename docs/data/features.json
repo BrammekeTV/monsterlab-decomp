@@ -69,6 +69,11 @@
  "changelog": [
   {
    "date": "2026-11-18",
+   "time": "17:44",
+   "text": "Decompiled 47 more lab books functions: experiment page slider, quest log checks, recipes list, badges list, and the page objects behind the lab books (selection, page lookup by name, destructors). Callbacks that return text pointers are left for later: their script signatures need widening for the 64-bit PC build."
+  },
+  {
+   "date": "2026-11-18",
    "time": "17:37",
    "text": "Decompiled 61 lab books screen callbacks: ingredient actions, the parts page (lists, slots, names, images, recipes, delete), the creatures page (current HP, energy, attack, defense, madness, monster images), and the statistics page (rank, MSP, battles, experiments, best times and high scores). Written by low-cost helper agents and reviewed."
   },

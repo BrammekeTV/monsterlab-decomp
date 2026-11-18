@@ -11,7 +11,7 @@ extern "C" {
 extern u8  lbl_805FB248[];                // 0x805FB248 (lab books section table pointer)
 
 s32  fn_80118F3C(u8* p);                  // 0x80118F3C
-s32  fn_80118F44(u8* p);                  // 0x80118F44
+const char* fn_80118F44(u8* p);                 // 0x80118F44
 void fn_80118FC0(u8* p, s32 a);           // 0x80118FC0
 void fn_801190E8(u8* p, s32 a);           // 0x801190E8
 u32  fn_801191AC(u8* p);                  // 0x801191AC
@@ -107,7 +107,7 @@ BOOL LabBooks_Ingredients_GetCurrentType(void) {
 BOOL LabBooks_Ingredients_GetTypeName(void) {
     u8* p = IngredientsObj();
     if (p == 0) return 0;
-    return fn_80118F44(p);
+    return (BOOL)(uintptr_t)fn_80118F44(p);  // TODO: header return type cannot hold a pointer on x64
 }
 
 // 0x801109D4

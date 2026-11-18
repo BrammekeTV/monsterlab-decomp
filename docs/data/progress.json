@@ -1,15 +1,15 @@
 {
  "game_id": "RM7P4F",
- "generated": "2026-11-18T16:37:59+00:00",
- "commit": "a878bcd",
- "commit_date": "2026-11-18T17:34:36+01:00",
+ "generated": "2026-11-18T16:44:48+00:00",
+ "commit": "3ce0574",
+ "commit_date": "2026-11-18T17:38:00+01:00",
  "game": {
   "functions": 8548,
   "bytes": 2265988,
   "named": 2748,
   "named_bytes": 616800,
-  "decompiled": 3421,
-  "decompiled_bytes": 356376
+  "decompiled": 3464,
+  "decompiled_bytes": 360700
  },
  "library": {
   "functions": 4039,
@@ -24,8 +24,8 @@
   "bytes": 3404928,
   "named": 3211,
   "named_bytes": 721548,
-  "decompiled": 3422,
-  "decompiled_bytes": 356496
+  "decompiled": 3465,
+  "decompiled_bytes": 360820
  },
  "game_range": [
   "80006B40",
@@ -529,23 +529,23 @@
    1.0
   ],
   [
-   0.601,
+   0.713,
    0.955
   ],
   [
-   0.042,
+   0.149,
    0.853
   ],
   [
-   0.084,
+   0.133,
    0.0
   ],
   [
-   0.101,
+   0.185,
    0.0
   ],
   [
-   0.083,
+   0.232,
    0.0
   ],
   [
@@ -3574,6 +3574,236 @@
      "name": "fn_801138F8",
      "addr": "801138F8",
      "size": 124
+    }
+   ]
+  },
+  {
+   "path": "src/game/lab_books_d.cpp",
+   "functions": [
+    {
+     "name": "Statistics_ExperimentPageUp",
+     "addr": "80114390",
+     "size": 116
+    },
+    {
+     "name": "Statistics_ExperimentPageDown",
+     "addr": "80114404",
+     "size": 116
+    },
+    {
+     "name": "Statistics_SetupExperimentSlider",
+     "addr": "80114478",
+     "size": 116
+    },
+    {
+     "name": "QuestLog_HasQuest",
+     "addr": "801144EC",
+     "size": 124
+    },
+    {
+     "name": "QuestLog_GetQuestJournalEntry",
+     "addr": "80114660",
+     "size": 124
+    },
+    {
+     "name": "QuestLog_HasMainIcon",
+     "addr": "8011490C",
+     "size": 124
+    },
+    {
+     "name": "QuestLog_GetMainIcon",
+     "addr": "80114988",
+     "size": 124
+    },
+    {
+     "name": "QuestLog_HasNextQuestLocationString",
+     "addr": "80114B0C",
+     "size": 124
+    },
+    {
+     "name": "Recipes_SetupRenderList",
+     "addr": "80114E90",
+     "size": 116
+    },
+    {
+     "name": "Recipes_GetImage",
+     "addr": "80114F80",
+     "size": 124
+    },
+    {
+     "name": "Recipes_RenderList_GetSelectedItem",
+     "addr": "80114FFC",
+     "size": 124
+    },
+    {
+     "name": "Recipes_IsTextureAsyncLoaded",
+     "addr": "80115A04",
+     "size": 124
+    }
+   ]
+  },
+  {
+   "path": "src/game/lab_books_e.cpp",
+   "functions": [
+    {
+     "name": "Badges_BadgeList_Generate",
+     "addr": "80115A80",
+     "size": 104
+    },
+    {
+     "name": "Badges_DoesBadgeExist",
+     "addr": "80115AE8",
+     "size": 128
+    },
+    {
+     "name": "Badges_IncRow",
+     "addr": "80115CE8",
+     "size": 120
+    },
+    {
+     "name": "Badges_IsTextureAsyncLoaded",
+     "addr": "80115EB8",
+     "size": 112
+    },
+    {
+     "name": "fn_80117320",
+     "addr": "80117320",
+     "size": 128
+    },
+    {
+     "name": "fn_80117ECC",
+     "addr": "80117ECC",
+     "size": 104
+    },
+    {
+     "name": "fn_80118ED4",
+     "addr": "80118ED4",
+     "size": 104
+    },
+    {
+     "name": "fn_80118F44",
+     "addr": "80118F44",
+     "size": 124
+    },
+    {
+     "name": "fn_80119798",
+     "addr": "80119798",
+     "size": 120
+    },
+    {
+     "name": "fn_80119BA8",
+     "addr": "80119BA8",
+     "size": 84
+    },
+    {
+     "name": "fn_80119BFC",
+     "addr": "80119BFC",
+     "size": 92
+    },
+    {
+     "name": "fn_8011A524",
+     "addr": "8011A524",
+     "size": 88
+    }
+   ]
+  },
+  {
+   "path": "src/game/lab_books_f.cpp",
+   "functions": [
+    {
+     "name": "fn_8011A6BC",
+     "addr": "8011A6BC",
+     "size": 72
+    },
+    {
+     "name": "fn_8011A704",
+     "addr": "8011A704",
+     "size": 84
+    },
+    {
+     "name": "fn_8011A978",
+     "addr": "8011A978",
+     "size": 104
+    },
+    {
+     "name": "fn_8011AFEC",
+     "addr": "8011AFEC",
+     "size": 116
+    },
+    {
+     "name": "fn_8011BAB8",
+     "addr": "8011BAB8",
+     "size": 104
+    },
+    {
+     "name": "fn_8011BE4C",
+     "addr": "8011BE4C",
+     "size": 56
+    },
+    {
+     "name": "fn_8011C130",
+     "addr": "8011C130",
+     "size": 56
+    },
+    {
+     "name": "fn_8011C168",
+     "addr": "8011C168",
+     "size": 104
+    },
+    {
+     "name": "fn_8011C2B4",
+     "addr": "8011C2B4",
+     "size": 100
+    },
+    {
+     "name": "fn_8011C738",
+     "addr": "8011C738",
+     "size": 104
+    },
+    {
+     "name": "fn_8011CF8C",
+     "addr": "8011CF8C",
+     "size": 52
+    },
+    {
+     "name": "fn_8011CFC0",
+     "addr": "8011CFC0",
+     "size": 52
+    },
+    {
+     "name": "fn_8011CFF4",
+     "addr": "8011CFF4",
+     "size": 52
+    },
+    {
+     "name": "fn_8011D150",
+     "addr": "8011D150",
+     "size": 80
+    },
+    {
+     "name": "fn_8011D338",
+     "addr": "8011D338",
+     "size": 96
+    },
+    {
+     "name": "fn_8011D508",
+     "addr": "8011D508",
+     "size": 84
+    },
+    {
+     "name": "fn_8011D55C",
+     "addr": "8011D55C",
+     "size": 72
+    },
+    {
+     "name": "fn_8011D5C4",
+     "addr": "8011D5C4",
+     "size": 68
+    },
+    {
+     "name": "fn_8011D608",
+     "addr": "8011D608",
+     "size": 104
     }
    ]
   },
