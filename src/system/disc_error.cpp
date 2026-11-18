@@ -20,7 +20,7 @@ void  PadSuspend(s32 chan);                             // 0x801B2CE4
 void  PadResume(s32 chan);                              // 0x801B2D98
 void  SleepMicroseconds(int unused, u32 us);            // 0x80142818
 f32   TimerGetSeconds(void* timer);                     // 0x80142538
-void  TimerReset(void* timer);                          // 0x80142680
+f32 TimerReset(u8* timer);                          // 0x80142680
 s32   GetRegion(void);                                // 0x8001425C: 0 = NA, 1 = EU
 BOOL  fn_801F56FC(s32);  void fn_801F38E8(s32); void fn_8013BD7C(void); void fn_801F5724(s32);
 void  ShowSystemMessage(const char* msg, BOOL (*poll)(void));   // 0x801EE588

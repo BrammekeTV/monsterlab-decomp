@@ -1,15 +1,15 @@
 {
  "game_id": "RM7P4F",
- "generated": "2026-11-18T22:48:45+00:00",
- "commit": "0ea5f3c",
- "commit_date": "2026-11-18T23:36:09+01:00",
+ "generated": "2026-11-18T23:05:05+00:00",
+ "commit": "82b0fda",
+ "commit_date": "2026-11-18T23:48:47+01:00",
  "game": {
   "functions": 8548,
   "bytes": 2265988,
   "named": 2748,
   "named_bytes": 616800,
-  "decompiled": 4668,
-  "decompiled_bytes": 527864
+  "decompiled": 4708,
+  "decompiled_bytes": 539708
  },
  "library": {
   "functions": 4039,
@@ -24,8 +24,8 @@
   "bytes": 3404928,
   "named": 3211,
   "named_bytes": 721548,
-  "decompiled": 4669,
-  "decompiled_bytes": 527984
+  "decompiled": 4709,
+  "decompiled_bytes": 539828
  },
  "game_range": [
   "80006B40",
@@ -73,7 +73,7 @@
    0.858
   ],
   [
-   0.044,
+   0.065,
    0.665
   ],
   [
@@ -145,15 +145,15 @@
    0.03
   ],
   [
-   0.484,
+   0.526,
    0.398
   ],
   [
-   0.038,
+   0.303,
    0.687
   ],
   [
-   0.361,
+   0.412,
    0.736
   ],
   [
@@ -161,15 +161,15 @@
    0.101
   ],
   [
-   0.176,
+   0.208,
    0.13
   ],
   [
-   0.035,
+   0.078,
    0.233
   ],
   [
-   0.286,
+   0.305,
    0.378
   ],
   [
@@ -185,7 +185,7 @@
    0.409
   ],
   [
-   0.044,
+   0.092,
    0.13
   ],
   [
@@ -213,7 +213,7 @@
    0.0
   ],
   [
-   0.165,
+   0.237,
    0.155
   ],
   [
@@ -221,11 +221,11 @@
    0.078
   ],
   [
-   0.082,
+   0.13,
    0.052
   ],
   [
-   0.152,
+   0.172,
    0.125
   ],
   [
@@ -413,7 +413,7 @@
    0.041
   ],
   [
-   0.156,
+   0.18,
    0.099
   ],
   [
@@ -449,7 +449,7 @@
    0.155
   ],
   [
-   0.232,
+   0.25,
    1.0
   ],
   [
@@ -473,7 +473,7 @@
    0.931
   ],
   [
-   0.255,
+   0.337,
    0.99
   ],
   [
@@ -533,7 +533,7 @@
    0.955
   ],
   [
-   0.276,
+   0.324,
    0.853
   ],
   [
@@ -557,11 +557,11 @@
    0.11
   ],
   [
-   0.112,
+   0.147,
    0.55
   ],
   [
-   0.363,
+   0.421,
    0.547
   ],
   [
@@ -613,11 +613,11 @@
    0.676
   ],
   [
-   0.57,
+   0.575,
    0.834
   ],
   [
-   0.253,
+   0.275,
    0.631
   ],
   [
@@ -625,7 +625,7 @@
    0.275
   ],
   [
-   0.159,
+   0.244,
    0.1
   ],
   [
@@ -753,11 +753,11 @@
    0.0
   ],
   [
-   0.128,
+   0.196,
    0.257
   ],
   [
-   0.084,
+   0.129,
    0.543
   ],
   [
@@ -781,7 +781,7 @@
    0.02
   ],
   [
-   0.048,
+   0.077,
    0.017
   ],
   [
@@ -833,11 +833,11 @@
    0.103
   ],
   [
-   0.124,
+   0.205,
    0.241
   ],
   [
-   0.157,
+   0.167,
    0.179
   ],
   [
@@ -861,7 +861,7 @@
    0.0
   ],
   [
-   0.042,
+   0.099,
    0.088
   ],
   [
@@ -893,7 +893,7 @@
    0.141
   ],
   [
-   0.1,
+   0.147,
    0.102
   ],
   [
@@ -937,7 +937,7 @@
    0.068
   ],
   [
-   0.483,
+   0.499,
    0.478
   ],
   [
@@ -985,7 +985,7 @@
    0.0
   ],
   [
-   0.215,
+   0.231,
    0.377
   ],
   [
@@ -993,7 +993,7 @@
    0.0
   ],
   [
-   0.276,
+   0.294,
    0.096
   ],
   [
@@ -1029,7 +1029,7 @@
    0.385
   ],
   [
-   0.839,
+   0.84,
    0.975
   ],
   [
@@ -5809,6 +5809,216 @@
      "name": "fn_8020A474",
      "addr": "8020A474",
      "size": 296
+    }
+   ]
+  },
+  {
+   "path": "src/game/draft_miss5.cpp",
+   "functions": [
+    {
+     "name": "LightningGetInventoryPos",
+     "addr": "8001E44C",
+     "size": 80
+    },
+    {
+     "name": "LightningGetInventoryPartID",
+     "addr": "8001E49C",
+     "size": 108
+    },
+    {
+     "name": "ExplorationHudSetFighter",
+     "addr": "80045138",
+     "size": 516
+    },
+    {
+     "name": "HideSelectionHUD",
+     "addr": "80046E00",
+     "size": 304
+    },
+    {
+     "name": "CombatHUDDisableInput",
+     "addr": "800486A0",
+     "size": 580
+    },
+    {
+     "name": "ControlsLock",
+     "addr": "8004CD28",
+     "size": 284
+    },
+    {
+     "name": "CharacterStartReaction",
+     "addr": "8004E3D0",
+     "size": 412
+    },
+    {
+     "name": "ConversationShowHUDInfo",
+     "addr": "800515A8",
+     "size": 160
+    },
+    {
+     "name": "CharacterGetGround",
+     "addr": "8005A520",
+     "size": 316
+    },
+    {
+     "name": "PathGetExits",
+     "addr": "800D5850",
+     "size": 212
+    },
+    {
+     "name": "EnhancementGetTexture",
+     "addr": "80116870",
+     "size": 432
+    },
+    {
+     "name": "IsThisPAL",
+     "addr": "801409A8",
+     "size": 44
+    },
+    {
+     "name": "fn_8019BD18",
+     "addr": "8019BD18",
+     "size": 296
+    },
+    {
+     "name": "FollowWaypointPath",
+     "addr": "801B8734",
+     "size": 720
+    },
+    {
+     "name": "PadGetButtons",
+     "addr": "801B9B40",
+     "size": 44
+    },
+    {
+     "name": "PadGetHeld",
+     "addr": "801B9B98",
+     "size": 44
+    },
+    {
+     "name": "HeapInit",
+     "addr": "801EF8DC",
+     "size": 164
+    },
+    {
+     "name": "fn_8020F3D4",
+     "addr": "8020F3D4",
+     "size": 88
+    },
+    {
+     "name": "fn_8020F42C",
+     "addr": "8020F42C",
+     "size": 64
+    },
+    {
+     "name": "StrCopy",
+     "addr": "8022127C",
+     "size": 4
+    }
+   ]
+  },
+  {
+   "path": "src/game/draft_miss6.cpp",
+   "functions": [
+    {
+     "name": "ShowSelectionHUD",
+     "addr": "80046BA4",
+     "size": 604
+    },
+    {
+     "name": "SetActiveAction",
+     "addr": "80046FE4",
+     "size": 588
+    },
+    {
+     "name": "PropIncrementState",
+     "addr": "80069FDC",
+     "size": 548
+    },
+    {
+     "name": "TriggerEndCamera",
+     "addr": "8006D3C8",
+     "size": 428
+    },
+    {
+     "name": "TriggerSendToZone",
+     "addr": "8006EBC4",
+     "size": 168
+    },
+    {
+     "name": "PlayMonsterAttackAnimation",
+     "addr": "800E9494",
+     "size": 164
+    },
+    {
+     "name": "PlayAttachedParticleEffectAtEmitter",
+     "addr": "800F4C9C",
+     "size": 200
+    },
+    {
+     "name": "PlayFootStepSound",
+     "addr": "800F5294",
+     "size": 504
+    },
+    {
+     "name": "SaveManager_GetNumBlocksNeededToBeFreed",
+     "addr": "8012341C",
+     "size": 128
+    },
+    {
+     "name": "SaveManager_HasEnoughFreeMemory",
+     "addr": "8012349C",
+     "size": 180
+    },
+    {
+     "name": "PropPlayFx",
+     "addr": "801254F8",
+     "size": 500
+    },
+    {
+     "name": "TimerReset",
+     "addr": "80142680",
+     "size": 196
+    },
+    {
+     "name": "StickRead",
+     "addr": "80147704",
+     "size": 252
+    },
+    {
+     "name": "RendSetDefaultState",
+     "addr": "8014855C",
+     "size": 532
+    },
+    {
+     "name": "ScreenSetsFlush",
+     "addr": "8018DCA4",
+     "size": 572
+    },
+    {
+     "name": "UIActivationGrid_SetEnabled",
+     "addr": "8018F2BC",
+     "size": 236
+    },
+    {
+     "name": "UIElement_Reset",
+     "addr": "8018F580",
+     "size": 152
+    },
+    {
+     "name": "SpawnEffectAtPos",
+     "addr": "801C81D8",
+     "size": 468
+    },
+    {
+     "name": "TextureLoad",
+     "addr": "801D8E80",
+     "size": 420
+    },
+    {
+     "name": "StopMusic",
+     "addr": "8020AF2C",
+     "size": 132
     }
    ]
   },

@@ -94,6 +94,11 @@
  "changelog": [
   {
    "date": "2026-11-19",
+   "time": "00:50",
+   "text": "Third round from the missing-symbols list: 41 more functions, including heap init, string copy, controller button reads, the timer reset, step sounds, prop effects, screen-set flushing, waypoint path following, exploration HUD and lightning tower inventory helpers. The linker report is clean of duplicates and mismatches; several older prototypes were corrected to match the asm."
+  },
+  {
+   "date": "2026-11-19",
    "time": "00:05",
    "text": "Second round from the missing-symbols list: 42 more functions, including debug logging, object pool allocation, exploration pause/unpause, path exits, UI numbers and events, conversation start, world locator lookup and event sending, and options saving. Several older declarations were corrected where the asm returns a value."
   },

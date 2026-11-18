@@ -15,7 +15,7 @@ extern "C++" s32   gZoneResourceSize;  // 0x805FB94C
 extern "C" {
 void   GameLog(int level, int category, const char* fmt, ...);   // 0x8000B2F0
 u8*    GetGlobalSettings(void);                                  // 0x801D2BF8
-void   HeapInit(void* heap, void* start, u32 size);              // 0x801EF8DC
+s32 HeapInit(u8* arg0, u8* arg1, u32 arg2);              // 0x801EF8DC
 void*  ScreenSetsCurrent(void* sets);                            // 0x8018D1E4
 void   SysInit(void);
 void*  SysAllocMEM2Block(u32 size);                              // 0x801FAEB0
@@ -181,7 +181,7 @@ void* fn_801D40E0(s32 size) {
         if (*(void**)lbl_805FB7A8 == NULL) {
             void* base = SysAllocMEM2Block(0x03380000);
             *(void**)lbl_805FB7A8 = base;
-            HeapInit(lbl_8047CAC0, base, (u32)((u8*)0x90400000 - (u8*)base));
+            HeapInit((u8*)lbl_8047CAC0, (u8*)base, (u32)((u8*)0x90400000 - (u8*)base));
         }
         return fn_80330D80(size);
     }

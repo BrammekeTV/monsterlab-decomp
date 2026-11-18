@@ -7,7 +7,7 @@
 #include "game/script_callbacks.h"
 
 extern u8 lbl_805F8270[];
-extern u8 lbl_805FAF78[];
+extern u8* lbl_805FAF78;
 extern u8* lbl_805FBBE0;
 extern u8 lbl_805FC890[];
 extern "C" f32 MonsterRateAttack(u8*);

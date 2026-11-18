@@ -73,7 +73,7 @@ void  fn_801ED130(void* p);                                      // 0x801ED130
 void  fn_8020A398(s32 handle);                                   // 0x8020A398
 u32   fn_8020A9A8(s32 handle);                                   // 0x8020A9A8
 void* fn_80209814(void* v);                                      // 0x80209814
-void* SpawnEffectAtPos(void* fxMgr, void* effect, const f32 pos[4], s32 a);   // 0x801C81D8
+BOOL SpawnEffectAtPos(u8* mgr, u8* effect, const f32* pos, u8** owner);   // 0x801C81D8
 
 extern "C++" void* gScreenSets;        // 0x805FB654
 extern "C++" s32   gZoneResourceSize;  // 0x805FB94C
@@ -736,7 +736,7 @@ void SpawnEffectAt(void* fxMgr, u32 effect, const f32 pos[4], int a) {
     u8* rec = NULL;
     if (found >= 0) rec = *(u8**)(db + 0x10) + found * 0xEC;
     if (rec == NULL) return;
-    SpawnEffectAtPos(fxMgr, rec, pos, a);   // lint:ok tail call; the original returns its result (callers ignore it)
+    SpawnEffectAtPos((u8*)fxMgr, (u8*)rec, pos, (u8**)a);   // lint:ok tail call; the original returns its result (callers ignore it)
 }
 
 // 0x801F5220

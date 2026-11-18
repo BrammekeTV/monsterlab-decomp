@@ -14,9 +14,9 @@ extern "C" {
 // Callee prototypes (C linkage, matching their definitions in other files).
 extern "C" {
 void  operator_delete(void* p);                                 // 0x801D426C
-void  fn_8020F3D4(u8* p, s32 a2);                               // 0x8020F3D4
+u8* fn_8020F3D4(u8* arg0, s32 arg1);                               // 0x8020F3D4
 void  fn_8020F2A4(u8* p);                                       // 0x8020F2A4
-void  fn_8020F42C(u8* p, s32 del);                              // 0x8020F42C
+u8* fn_8020F42C(u8* arg0, s32 arg1);                              // 0x8020F42C
 void  fn_8020F4F0(u8* p, s32 del);                              // 0x8020F4F0
 void  fn_8020F46C(u8* p, u8* choice);                           // 0x8020F46C: commits a choice into p (+0x38)
 void  fn_8020E9CC(u8* p, s32 a2);                               // 0x8020E9CC

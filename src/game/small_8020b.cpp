@@ -12,13 +12,13 @@ extern "C" {
 // Callee prototypes (C linkage, matching their definitions elsewhere or the asm call shape).
 void  operator_delete(void* p);                                  // 0x801D426C
 void* fn_801D40E0(s32 n);                                        // 0x801D40E0
-void  fn_8020F3D4(u8* p, s32 a2);                                // 0x8020F3D4
-void  fn_8020F42C(u8* p, s32 del);                               // 0x8020F42C
+u8* fn_8020F3D4(u8* arg0, s32 arg1);                                // 0x8020F3D4
+u8* fn_8020F42C(u8* arg0, s32 arg1);                               // 0x8020F42C
 void  fn_8020F46C(u8* p, u8* choice);                            // 0x8020F46C
 void* ChoiceDestroy(void* c, s32 del);                           // 0x8020F394
 void* fn_8020BE20(void* obj, s32 a2);                            // 0x8020BE20 (return type assumed: the object)
 void  fn_8020BFBC(u8* out, u8* src);                             // 0x8020BFBC (argument types assumed)
-void  StrCopy(char* dst, const char* src);                       // 0x8022127C
+char* StrCopy(char* dst, const char* src);                       // 0x8022127C
 void  fn_801FD8EC(u8* audio);                                    // 0x801FD8EC
 void  fn_801FD904(u8* audio);                                    // 0x801FD904
 s32   fn_801FF620(u8* audio, s32 id);                            // 0x801FF620 (return type assumed)

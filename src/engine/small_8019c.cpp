@@ -12,7 +12,7 @@ void    fn_8020A398(s32 handle);                                // 0x8020A398
 void    fn_80199E80(void* p);                                   // 0x80199E80
 s32     fn_80199DD4(void* obj);                                 // 0x80199DD4
 void    fn_8019BFF8(void* obj, void* cb, void* arg);            // 0x8019BFF8
-void    fn_8019BD18(void* widget, u32* ev);                     // 0x8019BD18
+s32 fn_8019BD18(u8* arg0, u32* arg1);                     // 0x8019BD18
 void*   fn_8019B088(void* obj, s32 kind, char* name, u32 arg);  // 0x8019B088
 void*   fn_8018E8D8(void* table, u32 hash);                     // 0x8018E8D8
 void    fn_8018D2B8(const char* fmt, ...);                      // 0x8018D2B8

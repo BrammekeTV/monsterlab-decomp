@@ -9,8 +9,8 @@ extern "C" s32  PartDefCycleSameSlot(s32 def, BOOL backwards);             // 0x
 extern "C" {
 void  operator_delete(void* p);                                 // 0x801D426C
 void  fn_801B40E4(u8* p);                                       // 0x801B40E4
-void  fn_8020F3D4(u8* p, s32 a2);                               // 0x8020F3D4
-void  fn_8020F42C(u8* p, s32 del);                              // 0x8020F42C
+u8* fn_8020F3D4(u8* arg0, s32 arg1);                               // 0x8020F3D4
+u8* fn_8020F42C(u8* arg0, s32 arg1);                              // 0x8020F42C
 void  fn_8020F23C(u8* p, s32 del);                              // 0x8020F23C
 void  fn_8020F2B4(u8* p, s32 del);                              // 0x8020F2B4
 void  fn_8020F228(u8* p, s32 a2);                               // 0x8020F228

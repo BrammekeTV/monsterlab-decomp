@@ -20,7 +20,7 @@ void    fn_8018E2F4(void* table, void* cb);                     // 0x8018E2F4 (w
 const char* fn_801EB708(u32 hash);                              // 0x801EB708 (hash -> name for logs)
 u32     StringHash(const char* s);                              // 0x801EB704
 void*   TextureLoad(const char* name);                          // 0x801D8E80
-void    fn_8019BD18(void* widget, u32* ev);                     // 0x8019BD18 (routes event to widget)
+s32 fn_8019BD18(u8* arg0, u32* arg1);                     // 0x8019BD18 (routes event to widget)
 void    UIWidgetPlayAnim(void* w, u32 anim);                    // 0x80199B38
 void    fn_801BA8C8(void* p);                                   // 0x801BA8C8
 void*   fn_801BA930(void* a3, void* a4, u32 a5, u32 a6, u32 a7, u32 a8, void* a9); // 0x801BA930
@@ -49,7 +49,7 @@ void UIEvent_SendToTopScreen(u32 a0) {
     if (count > 0) {
         void* top = *(void**)(set + 0x3C + count * 4);
         u32 ev = a0;
-        fn_8019BD18(top, &ev);
+        fn_8019BD18((u8*)top, &ev);
         UIWidgetPlayAnim(top, ev);
     }
 }

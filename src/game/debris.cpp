@@ -6,7 +6,7 @@
 #include "engine/math.h"
 
 extern "C" {
-void* SpawnEffectAtPos(void* fxMgr, void* effect, const f32 pos[4], s32 a);   // 0x801C81D8
+BOOL SpawnEffectAtPos(u8* mgr, u8* effect, const f32* pos, u8** owner);   // 0x801C81D8
 u32   RandomU32(void);
 }
 

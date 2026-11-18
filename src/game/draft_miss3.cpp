@@ -18,7 +18,7 @@ void  EventSend(void* mgr, void* target, void* from, u32 event, int a, int b, in
 u8*   GetGlobalSettings(void);                                    // 0x801D2BF8
 void* MemAllocDefault(u32 size);                                  // 0x801D4650
 BOOL  PathAtWaypoint(void* p);                                    // 0x800D56E0
-void  StrCopy(char* dst, const char* src);
+char* StrCopy(char* dst, const char* src);
 int   SysSprintf(char* buf, const char* fmt, ...);                // 0x80142EFC
 void  UISetText(void* el, const char* text, s32 a);
 s32   WorldGetPhase(void* world);                                 // 0x800D83A8

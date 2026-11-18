@@ -40,7 +40,7 @@ void   fn_8016A788(u8* p);                                       // 0x8016A788
 void   fn_8018D2B8(const char* fmt, ...);                        // 0x8018D2B8 (debug log)
 void   fn_8018D370(const char* fmt, ...);                        // 0x8018D370 (debug log)
 void   fn_8018DEF4(void* sets);                                  // 0x8018DEF4
-void   fn_8019BD18(void* widget, u32* ev);                       // 0x8019BD18 (routes event to widget)
+s32 fn_8019BD18(u8* arg0, u32* arg1);                       // 0x8019BD18 (routes event to widget)
 BOOL   fn_80198C34(void* set, void* w);                          // 0x80198C34
 void   fn_801BBB68(void* mgr, s32 id, int a, int b);             // 0x801BBB68
 void   fn_801C83AC(u8* mgr, u8* item);                           // 0x801C83AC
@@ -202,7 +202,7 @@ void UIEvent_SendToScreen(u32 a0, u32 a1) {
 // Sends a play-animation event (the animation hash) to the widget.
 void UIPlayAnim(void* w, u32 anim) {
     u32 ev = anim;
-    fn_8019BD18(w, &ev);
+    fn_8019BD18((u8*)w, &ev);
 }
 
 // 0x8018EE3C

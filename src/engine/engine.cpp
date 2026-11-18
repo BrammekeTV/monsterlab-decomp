@@ -12,7 +12,7 @@ extern "C" int SysSprintf(char* buf, const char* fmt, ...);
 extern "C" {
 void* SysAllocMEM2Block(u32 size);          // 0x801FAEB0
 void  SysFreeMEM2Block(void* ptr);           // 0x801FAEC0
-void  HeapInit(void* heap, void* start, u32 size);   // 0x801EF8DC
+s32 HeapInit(u8* arg0, u8* arg1, u32 arg2);   // 0x801EF8DC
 void  fn_80146A74(void);  void fn_8014826C(void);  void fn_80148308(void);  void fn_80146A78(void);
 void  CameraInit(void* camera);              // 0x801D8B50
 void  fn_801B402C(void*); void fn_801FD1F0(void*);
@@ -103,7 +103,7 @@ void MemInit(void) {
     if (sMemPool == NULL) {
         sMemPool = SysAllocMEM2Block(0x3380000);
         // The heap runs up to the fixed address global_binary.sir is loaded at.
-        HeapInit(gMainHeap, sMemPool, MEM2_POOL_END - (u32)(uintptr_t)sMemPool);
+        HeapInit((u8*)gMainHeap, (u8*)sMemPool, MEM2_POOL_END - (u32)(uintptr_t)sMemPool);
     }
 }
 
