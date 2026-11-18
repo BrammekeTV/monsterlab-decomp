@@ -69,6 +69,11 @@
  "changelog": [
   {
    "date": "2026-11-18",
+   "time": "22:24",
+   "text": "Third draft-pipeline round: 51 more functions (sequencer events and notices in 0x8021/0x8022, object database and ring buffers in 0x800D, box and segment geometry in 0x801C); fn_8032F1E8 prototype corrected to five arguments in four files."
+  },
+  {
+   "date": "2026-11-18",
    "time": "22:15",
    "text": "Second draft-pipeline round: 40 more functions (junction tracks and gauges in 0x8009, saw/track movement and tree frees in 0x800A, grow-juice weapon chamber and reload in 0x800B, UI element constructors and updates in 0x801A), rewritten and checked against the asm by Sonnet helpers."
   },

@@ -234,7 +234,7 @@ void     BufferFree(void* p);                              // 0x801D4980
 u8*      fn_801F5408(void);                               // 0x801F5408
 void     fn_80132094(void);                                // 0x80132094 (bare blr in this build)
 void     fn_8012AAA4(u8* world);                           // 0x8012AAA4
-void     fn_8032F1E8(u8* obj, void (*cb)(void), s32 a, s32 b, s32 c, f32 t); // 0x8032F1E8
+void     fn_8032F1E8(u8* obj, void (*cb)(void), s32 a, s32 b, s32 c); // 0x8032F1E8
 void*    fn_80109BE0(void* obj);                           // 0x80109BE0
 }
 
@@ -333,7 +333,7 @@ void fn_80109BA4(void) {
     *(f32*)(lbl_803E69C8 + 0x0) = a;
     *(f32*)(lbl_803E69C8 + 0x4) = b;
     *(f32*)(lbl_803E69C8 + 0x8) = a;
-    fn_8032F1E8(lbl_803C75C8, (void (*)(void))fn_80109BE0, 0, 0x40, 0x7D0, a);
+    fn_8032F1E8(lbl_803C75C8, (void (*)(void))fn_80109BE0, 0, 0x40, 0x7D0);
 }
 
 // 0x80109BE0

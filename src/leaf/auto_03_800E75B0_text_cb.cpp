@@ -69,12 +69,12 @@ extern "C" void fn_801D5D14(s32, f32);
 extern "C" void fn_801FC1E4(s32);
 extern "C" void fn_8020A474(s32);
 extern "C" void fn_8022DE8C(s32, s32, s32);
-extern "C" void fn_8022E178(s32, s32, s32, s32, s32, s32);
+extern "C" void fn_8022E178(u8*, s32, s32, s32, s32, s32);
 extern "C" void fn_8022E2A4(s32, s32, s32, s32);
 extern "C" u32 fn_8022E330(s32, s32, s32);
-extern "C" void fn_8022E354(s32, s32);
+extern "C" void fn_8022E354(u8*, s32);
 extern "C" void fn_8022E3E0(s32, s32);
-extern "C" u32 fn_8022E440(s32, s32);
+extern "C" s32 fn_8022E440(u8*, s32);
 extern "C" void fn_8022E658(s32);
 
 // 0x800E75D8
@@ -926,16 +926,14 @@ s32 GetPropInstanceData(void* a3) {
 
 // 0x800F969C
 void AddJournalEntry(u32 a3, u32 a4, u32 a5, s32 a6) {
-    // tail-call arguments inferred from the registers set before the call
-    s32 t0 = *(s32*)((u8*)lbl_805FBBE0);
-    fn_8022E178((s32)((u32)(t0)), (s32)((u32)(uintptr_t)(a3)), (s32)((u32)(uintptr_t)(a4)), (s32)((u32)(uintptr_t)(a5)), (s32)((u32)(uintptr_t)(a6)), (s32)((u32)(1)));
+    u8* t0 = *(u8**)((u8*)lbl_805FBBE0);
+    fn_8022E178(t0, (s32)((u32)(uintptr_t)(a3)), (s32)((u32)(uintptr_t)(a4)), (s32)((u32)(uintptr_t)(a5)), (s32)((u32)(uintptr_t)(a6)), (s32)((u32)(1)));
 }
 
 // 0x800F96C4
 void AddJournalEntryNoPopup(u32 a3, u32 a4, u32 a5, s32 a6) {
-    // tail-call arguments inferred from the registers set before the call
-    s32 t0 = *(s32*)((u8*)lbl_805FBBE0);
-    fn_8022E178((s32)((u32)(t0)), (s32)((u32)(uintptr_t)(a3)), (s32)((u32)(uintptr_t)(a4)), (s32)((u32)(uintptr_t)(a5)), (s32)((u32)(uintptr_t)(a6)), (s32)((u32)(0)));
+    u8* t0 = *(u8**)((u8*)lbl_805FBBE0);
+    fn_8022E178(t0, (s32)((u32)(uintptr_t)(a3)), (s32)((u32)(uintptr_t)(a4)), (s32)((u32)(uintptr_t)(a5)), (s32)((u32)(uintptr_t)(a6)), (s32)((u32)(0)));
 }
 
 // 0x800F96EC
@@ -958,9 +956,8 @@ void UpdateJournalEntryIcon(u32 a3, u32 a4) {
 
 // 0x800F9730
 void CompleteJournalEntryStep(u32 a3) {
-    // tail-call arguments inferred from the registers set before the call
-    s32 t0 = *(s32*)((u8*)lbl_805FBBE0);
-    fn_8022E354((s32)((u32)(t0)), (s32)((u32)(uintptr_t)(a3)));
+    u8* t0 = *(u8**)((u8*)lbl_805FBBE0);
+    fn_8022E354(t0, (s32)((u32)(uintptr_t)(a3)));
 }
 
 // 0x800FA504
@@ -979,9 +976,8 @@ s32 GetRewardedItemId(void) {
 
 // 0x800FA5E8
 u32 InitializeMerchantIngredients(s32 a3) {
-    // tail-call arguments inferred from the registers set before the call
-    s32 t0 = *(s32*)((u8*)lbl_805FBBE0);
-    return (u32)(fn_8022E440((s32)((u32)(t0)), (s32)((u32)(uintptr_t)(a3))));
+    u8* t0 = *(u8**)((u8*)lbl_805FBBE0);
+    return (u32)(fn_8022E440(t0, (s32)((u32)(uintptr_t)(a3))));
 }
 
 // 0x800FA5F4

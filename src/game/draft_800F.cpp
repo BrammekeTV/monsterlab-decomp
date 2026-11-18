@@ -29,7 +29,7 @@ void  fn_8004D3F8(void* c, const char* name, s32 a, s32 b);
 void  fn_8004D760(u8* c, u8* monster);
 s32   fn_8004DAF8(void* c, s32 a, s32 b);
 s32   fn_80053418(void* c);
-s32   fn_800D3428(void);
+void  fn_800D3428(void);
 s32   fn_800D3930(void* db);
 u8*   fn_800D393C(void* db, s32 i);
 u8*   fn_800D5838(u8* ref, s32 text);

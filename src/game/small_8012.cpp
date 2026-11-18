@@ -38,7 +38,7 @@ u32     fn_801B94F8(void* obj, u32 flags);                       // 0x801B94F8
 u32     fn_801B9B6C(s32 chan);                                   // 0x801B9B6C
 u32     PadGetHeld(s32 chan);                                    // 0x801B9B98
 void    fn_801229D0(void);                                       // 0x801229D0
-void    fn_8032F1E8(u8* obj, void (*cb)(void), s32 a, s32 b, s32 c, f32 t); // 0x8032F1E8
+void    fn_8032F1E8(u8* obj, void (*cb)(void), s32 a, s32 b, s32 c); // 0x8032F1E8
 void    __destroy_arr(void* arr, void (*dtor)(void*, s32), u32 size, u32 count); // 0x8032F2E0
 void    fn_8022ED98(void* obj, s32 del);                         // 0x8022ED98
 s32     SaveInitDefault(void);                                   // 0x80011754
@@ -146,7 +146,7 @@ void fn_801229D4(void) {
     lbl_803E6C90[0] = lbl_805FEDB8;
     lbl_803E6C90[1] = lbl_805FEDD0;
     lbl_803E6C90[2] = lbl_805FEDB8;
-    fn_8032F1E8(lbl_803E6C20, fn_801229D0, 0, 0x1C, 4, lbl_805FEDB8);
+    fn_8032F1E8(lbl_803E6C20, fn_801229D0, 0, 0x1C, 4);
 }
 
 // 0x80122B00

@@ -16,7 +16,7 @@ void  fn_801F5714(s32 flags);                                    // 0x801F5714
 void  fn_801F5734(void* arg);                                    // 0x801F5734
 void  fn_801F51DC(s32 flag);                                     // 0x801F51DC
 void* EventPost(s32 id, s32 flags);                              // 0x801F3918
-void  fn_8032F1E8(u8* obj, void (*cb)(void), s32 a, s32 b, s32 c, f32 t); // 0x8032F1E8
+void  fn_8032F1E8(u8* obj, void (*cb)(void), s32 a, s32 b, s32 c); // 0x8032F1E8
 void  fn_801399E8(void);                                         // 0x801399E8
 void  fn_8013ADD8(s32 step);                                     // 0x8013ADD8 (friends list scroll step)
 void  fn_8018CF1C(void* sets, void* widget);                     // 0x8018CF1C
@@ -120,7 +120,7 @@ void fn_801399AC(void) {
     lbl_803F0CD0[0] = lbl_805FEF6C;
     lbl_803F0CD0[1] = lbl_805FEF68;
     lbl_803F0CD0[2] = lbl_805FEF6C;
-    fn_8032F1E8(lbl_803EA0D0, fn_801399E8, 0, 0x48, 0x180, lbl_805FEF6C);
+    fn_8032F1E8(lbl_803EA0D0, fn_801399E8, 0, 0x48, 0x180);
 }
 
 // 0x8013A03C
