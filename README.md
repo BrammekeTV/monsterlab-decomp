@@ -67,7 +67,7 @@ Part types live in `global_binary.sir`. Header slot `0xDC8` points to the game d
 1. **Split & disassemble.** `dtk dol split config/RM7P4F/config.yml build/RM7P4F` gives per-object assembly and builds up `symbols.txt` and `splits.txt`.
 2. **Recover symbols.** Apply RVL SDK / MSL / Bink signatures (for example from other RevoEX-2.1 decomps) so that roughly a third of `.text` gets names.
 3. **Decompile.** Use Ghidra or IDA with a Wii loader, plus m2c, to produce C. Check it against the original with objdiff (matching decomp) or skip matching (functional decomp).
-4. **PC port.** Build the game code natively for x86-64 and replace the Nintendo SDK layer:
+4. **PC port.** Build the game code natively for PC (32-bit first, see Roadmap) and replace the Nintendo SDK layer:
    - GX → OpenGL/Vulkan backend (or a GX emulation layer)
    - AX/DSP → SDL audio + DSP-ADPCM decoder
    - WPAD/KPAD → SDL gamepad + mouse as the pointer
@@ -96,6 +96,14 @@ These live in the platform layer (`src/platform/`) that replaces the Wii SDK, so
   ```
 
   Stats are served through the game's own part queries (`PartQuery_GetHealth`, `PartQuery_GetActionDamage`, ...), and text is added to the string table. New parts reuse the existing monster skeletons and sockets. The mod loader gives mod parts their own ids, and saves cope with a removed mod. An exporter turns an original part into glTF + PNG + JSON as a starting point for modders. Depends on decompiling the part definition, attachment, save and menu code.
+
+### Roadmap (next steps)
+
+1. **32-bit build first.** The decompiled code reads game structures at their original offsets with 4-byte pointer slots, which is only layout-correct in a 32-bit (Win32) build.
+2. **Link step + missing-symbols report.** CI links everything and lists unresolved functions/globals; that list drives the remaining decompilation.
+3. **Big-endian data loader.** Convert game data (game database, part definitions, saves) at load time.
+4. **Boot to the title screen**, then compare self-contained functions against the original (differential tests).
+5. **64-bit later.** Only after named structs and a loader replace raw offsets; not needed for 1080p, the settings GUI or mods.
 
 ### Priorities
 

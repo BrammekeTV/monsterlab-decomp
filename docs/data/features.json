@@ -27,8 +27,23 @@
   },
   {
    "title": "PC build compiles",
-   "detail": "CMake + MSVC build on GitHub Actions. All decompiled sources compile; linking waits on the platform layer.",
+   "detail": "CMake + MSVC build on GitHub Actions. All decompiled sources compile; linking waits on the platform layer. Next: switch the build to 32-bit (Win32) so the decompiled code, which uses the original 4-byte pointer layout, is correct as written.",
    "status": "in_progress"
+  },
+  {
+   "title": "PC build links",
+   "detail": "Add a link step to CI and generate a missing-symbols report (functions and globals still undecompiled or unstubbed); that report becomes the decompilation to-do list.",
+   "status": "todo"
+  },
+  {
+   "title": "Big-endian data loader",
+   "detail": "Convert game data (game database, part definitions, saves) from the Wii's big-endian format at load time.",
+   "status": "todo"
+  },
+  {
+   "title": "Tested against the original",
+   "detail": "Compare self-contained functions (math, part stats, opponent generation, loot rolls) with the original code on the same inputs.",
+   "status": "todo"
   },
   {
    "title": "Platform layer",
@@ -64,9 +79,19 @@
    "title": "Playable",
    "detail": "Full game playable from start to finish on PC.",
    "status": "todo"
+  },
+  {
+   "title": "64-bit build",
+   "detail": "After named structs and a loader replace raw offsets into game data. Not needed for 1080p, the settings GUI or mods.",
+   "status": "todo"
   }
  ],
  "changelog": [
+  {
+   "date": "2026-11-18",
+   "time": "22:56",
+   "text": "Roadmap update: the PC build moves to 32-bit first (the decompiled code uses the original 4-byte pointer layout), then CI gets a link step whose missing-symbols report drives the remaining decompilation. 64-bit comes later, after named structs and a data loader replace raw offsets."
+  },
   {
    "date": "2026-11-18",
    "time": "22:44",
