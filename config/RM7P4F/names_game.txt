@@ -723,3 +723,14 @@ fn_80211F98 BattleCommitAction
 fn_8020E498 DisciplineLetter
 fn_8022127C StrCopy
 fn_80221280 StrNCopy
+fn_80214A58 LimbStatusInit
+fn_80214E28 LimbApplyEffects
+fn_80213E74 FighterInitStats
+fn_80213090 BattleReset
+fn_80214674 FighterTickEffects
+fn_80216318 EffectDestroy
+fn_802165A0 LimbEffectDestroy
+fn_80216360 EffectTick
+fn_802164A8 EffectExpire
+fn_8021640C EffectApply
+fn_80214C98 LimbTickEffects

@@ -143,3 +143,146 @@ BOOL BattleCommitAction(u8* battle, s32 side) {
 }
 
 }  // extern "C"
+
+// ---------------------------------------------------------------- limb and fighter status
+
+extern "C" {
+s32  PartGetMaxHealth(PartInstance* p);                   // 0x8021F168
+s32  PartGetCurrentHealth(const PartInstance* p);         // 0x8021EF68
+s8   PartGetQuality(const PartInstance* p);               // 0x8021EF60
+s8   PartGetMadness(const PartInstance* p);               // 0x8021EF80
+s8   fn_8021EFB0(const PartInstance* p);
+void EffectDestroy(u8* e, s32 del);                       // 0x80216318
+void LimbEffectDestroy(u8* e, s32 del);                   // 0x802165A0
+void EffectTick(u8* e);                                   // 0x80216360
+void EffectExpire(u8* e);                                 // 0x802164A8
+void EffectApply(u8* e);                                  // 0x8021640C
+void LimbTickEffects(u8** status);                        // 0x80214C98
+}
+
+// Limb status (BattlePart + 0x28 points at it, 0x2C bytes): +0 hp, +4 max hp, +8 madness,
+// +0x10 quality, +0x14 scaled unk1D, +0x18/+0x1C, +0x20 enhancement, +0x24 defect.
+// The status field is followed by three effect slots (+8) and one more effect (+0x14).
+
+extern "C" {
+
+// 0x80214A58
+// Rebuild a limb's battle status from its part (or from the definition alone if the part
+// has no health), dropping all effects.
+void LimbStatusInit(u8** field, PartInstance** part) {
+    PartInstance* p = *part;
+    s32 def = p != NULL ? p->defIndex : -1;
+    for (s32 i = 0; i < 3; i++) {
+        u8** e = (u8**)((u8*)field + 8) + i;
+        if (*e != NULL) {
+            EffectDestroy(*e, 1);
+            *e = NULL;
+        }
+    }
+    u8** extra = (u8**)((u8*)field + 0x14);
+    if (*extra != NULL) {
+        LimbEffectDestroy(*extra, 1);
+        *extra = NULL;
+    }
+    s32* st = *(s32**)field;
+    for (s32 i = 0; i < 11; i++) st[i] = 0;
+    if (def == -1) return;
+    if (PartGetMaxHealth(p) != 0) {
+        st[1] = PartGetMaxHealth(p);
+        st[4] = PartGetQuality(p);
+        st[8] = p->enhancement;
+        st[9] = p->defect;
+        st[0] = PartGetCurrentHealth(p);
+        st[2] = PartGetMadness(p);
+        st[5] = fn_8021EFB0(p);
+        return;
+    }
+    PartDef d;
+    PartDbGetDef(&d, gGameDb, def);
+    const u8* raw = (const u8*)&d;
+    st[0] = *(const s16*)(raw + 0x46);
+    st[1] = *(const s16*)(raw + 0x46);
+    st[2] = (s8)raw[0x4C];
+    st[4] = -1;
+    st[6] = -1;
+    st[7] = -1;
+    st[8] = -1;
+    st[9] = -1;
+}
+
+// 0x80214E28
+void LimbApplyEffects(u8** field) {
+    for (s32 i = 0; i < 3; i++) {
+        u8* e = ((u8**)((u8*)field + 8))[i];
+        if (e != NULL) EffectApply(e);
+    }
+}
+
+// 0x80213E74
+// Fill a fighter's battle stats from its limbs: totals of hp, madness, +0xC and +0x14, and
+// energy from the torso.
+void FighterInitStats(u8* stats, u8** limbs) {
+    s32 hp = 0, madness = 0, c = 0, d = 0;
+    for (s32 i = 0; i < 5; i++) {
+        u8* bp = limbs[i];
+        if (bp == NULL) continue;
+        u8** field = (u8**)(bp + 0x28);
+        LimbStatusInit(field, (PartInstance**)bp);
+        s32* st = *(s32**)field;
+        hp += st[0];
+        madness += st[2];
+        c += st[3];
+        d += st[5];
+    }
+    s32* out = *(s32**)(stats + 4);
+    out[0] = hp;
+    out[1] = madness;
+    out[2] = c;
+    out[6] = d;
+    PartInstance* torso = *(PartInstance**)limbs[4];
+    if (torso != NULL) {
+        s32 e = PartGetBattleEnergy(torso, limbs);
+        out[4] = e;
+        out[3] = e;
+    }
+    for (s32 i = 0; i < 5; i++)
+        if (limbs[i] != NULL) LimbApplyEffects((u8**)(limbs[i] + 0x28));
+}
+
+// 0x80213090
+// Start a battle: fresh stats for both fighters, round 1.
+void BattleReset(u8* b) {
+    for (s32 side = 0; side < 2; side++) {
+        u8* f = ((u8**)(b + 0xA00))[side];
+        FighterInitStats(f + 0x20, (u8**)f);
+        b[0x9FC + side] = 0;
+    }
+    *(s32*)(b + 0xA10) = 1;
+    *(u32*)(b + 0xA4C) = 0;
+    b[0xA5C] = 0;
+    b[0xACD] = 0;
+    *(s32*)(b + 0xA18) = 0;
+    for (s32 i = 0; i < 5; i++) *(u32*)(b + 0xAF0 + i * 4) = 0;
+}
+
+// 0x80214674
+// End-of-turn: tick the fighter's eight effects (removing expired ones), then each limb's.
+void FighterTickEffects(u8* stats) {
+    for (s32 i = 0; i < 8; i++) {
+        u8** slot = (u8**)(stats + 0x28) + i;
+        if (*slot == NULL) continue;
+        EffectTick(*slot);
+        if (*(s32*)(*slot + 4) <= 0) {
+            EffectExpire(*slot);
+            EffectDestroy(*slot, 1);
+            *slot = NULL;
+        }
+    }
+    for (s32 i = 0; i < 5; i++) {
+        u8* f = FighterFromStats(stats);
+        u8* bp = ((u8**)f)[i];
+        if (bp != NULL) LimbTickEffects((u8**)(bp + 0x28));
+    }
+}
+
+}  // extern "C"

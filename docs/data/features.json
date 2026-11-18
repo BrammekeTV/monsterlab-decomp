@@ -69,6 +69,11 @@
  "changelog": [
   {
    "date": "2026-11-18",
+   "time": "12:24",
+   "text": "Decompiled battle setup and status: building each limb's battle status from its part (hp, max hp, madness, quality, enhancement, defect), a fighter's totals and starting energy, resetting a battle to round 1, and the end-of-turn tick of fighter and limb effects (expired effects are removed)."
+  },
+  {
+   "date": "2026-11-18",
    "time": "12:20",
    "text": "Decompiled battle basics: fighter and limb status lookup, status effects on fighters (8) and limbs (3), the discipline triangle (alchemy beats mech, mech beats bio, bio beats alchemy), the battle log's matchup text, cycling to the next part for the same slot, and committing a chosen action (working limb and torso required, energy paid and capped by the torso)."
   },
