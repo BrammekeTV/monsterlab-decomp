@@ -43,7 +43,7 @@ extern f32 lbl_805FD68C;           // float
 extern u8  lbl_805FB124[];         // index into lbl_803474B8 (s32 value)
 extern u8  lbl_805FB140[];         // welding state pointer
 extern u8  lbl_803474B8[];         // float table
-extern void* gEventMgr;            // 0x805FB6C8
+extern "C++" void* gEventMgr;            // 0x805FB6C8
 
 extern "C" {
 

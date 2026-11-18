@@ -6,7 +6,7 @@
 #include "types.h"
 #include "game/script_callbacks.h"
 
-extern "C" u8* gWorldState;
+extern u8* gWorldState;
 extern "C" s32 fn_8008BF04(s32, u8*);
 extern "C" void fn_8008CE44(u8*, u8*, s32, s32, f32, f32);
 extern "C" void fn_8008D7C8(s32, f32);

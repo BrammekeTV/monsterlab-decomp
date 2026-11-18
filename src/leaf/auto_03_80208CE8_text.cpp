@@ -5,11 +5,11 @@
 
 #include "types.h"
 
-extern "C" u8 gAudio[];
-extern "C" u8 lbl_805F996C[];
-extern "C" u8 lbl_805FBBA0[];
-extern "C" u8 lbl_80600488[];
-extern "C" u8 lbl_8060048C[];
+extern u8 gAudio[];
+extern u8 lbl_805F996C[];
+extern u8 lbl_805FBBA0[];
+extern u8 lbl_80600488[];
+extern u8 lbl_8060048C[];
 extern "C" void fn_801FCFB4(u8*);
 extern "C" void fn_801FF500(u8*);
 extern "C" f32 fn_801FFC48(void);

@@ -6,7 +6,7 @@
 #include "types.h"
 #include "game/script_callbacks.h"
 
-extern "C" u8 lbl_805FB138[];
+extern u8 lbl_805FB138[];
 extern "C" BOOL PadButtonHeld(s32);
 extern "C" void fn_80076BA4(u8*, f32);
 extern "C" void fn_8007739C(u8*, s32, s32);

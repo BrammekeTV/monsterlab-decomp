@@ -5,20 +5,20 @@
 
 #include "types.h"
 
-extern "C" u8 lbl_803F2088[];
-extern "C" u8 lbl_805FB398[];
-extern "C" u8 lbl_805FB39C[];
-extern "C" u8 lbl_805FB3A0[];
-extern "C" u8 lbl_805FB3A4[];
-extern "C" u8 lbl_805FB3A8[];
-extern "C" u8 lbl_805FB3AC[];
-extern "C" u8 lbl_805FB3B3[];
-extern "C" u8 lbl_805FB3B5[];
-extern "C" u8 lbl_805FB3B8[];
-extern "C" u8 lbl_805FB3C4[];
-extern "C" u8 lbl_805FB3CC[];
-extern "C" u8 lbl_805FB3DC[];
-extern "C" u8 lbl_805FB3DD[];
+extern u8 lbl_803F2088[];
+extern u8 lbl_805FB398[];
+extern u8 lbl_805FB39C[];
+extern u8 lbl_805FB3A0[];
+extern u8 lbl_805FB3A4[];
+extern u8 lbl_805FB3A8[];
+extern u8 lbl_805FB3AC[];
+extern u8 lbl_805FB3B3[];
+extern u8 lbl_805FB3B5[];
+extern u8 lbl_805FB3B8[];
+extern u8 lbl_805FB3C4[];
+extern u8 lbl_805FB3CC[];
+extern u8 lbl_805FB3DC[];
+extern u8 lbl_805FB3DD[];
 
 // 0x8013E3D0
 extern "C" void fn_8013E3D0(f32 f1) {

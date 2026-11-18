@@ -6,7 +6,7 @@
 #include "types.h"
 #include "game/script_callbacks.h"
 
-extern "C" u8* gWorldState;
+extern u8* gWorldState;
 
 // 0x801F2B1C
 void SetSpawningMode(u32 a3) {

@@ -21,7 +21,7 @@ extern "C" void RobotEvolutionExperiment_DoorOpen(u8* p);
 extern "C" void RobotEvolutionExperiment_DoorClosing(u8* p);
 extern "C" void RobotEvolutionExperiment_DoorClosed(u8* p);
 
-extern void* gEventMgr;                                           // 0x805FB6C8
+extern "C++" void* gEventMgr;                                           // 0x805FB6C8
 extern u8    lbl_8035BD58[];                                      // registration name block
 extern u8    lbl_8035C3F0[];                                      // vtable
 extern u8*   lbl_803C6A70[3];                                     // robot table (key at +4)

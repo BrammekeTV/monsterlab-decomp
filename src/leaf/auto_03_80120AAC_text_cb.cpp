@@ -6,7 +6,7 @@
 #include "types.h"
 #include "game/script_callbacks.h"
 
-extern "C" u8* lbl_805FB2B8;
+extern u8* lbl_805FB2B8;
 
 // 0x80120CBC
 BOOL EnterName_GetName(void) {

@@ -5,8 +5,8 @@
 
 #include "types.h"
 
-extern "C" u8 lbl_803C2A20[];
-extern "C" u8 lbl_805FB218[];
+extern u8 lbl_803C2A20[];
+extern u8 lbl_805FB218[];
 
 // 0x801091B4
 extern "C" s32 ScreenSetsLoadCsv(void) {

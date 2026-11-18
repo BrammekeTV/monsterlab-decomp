@@ -5,7 +5,7 @@
 
 #include "types.h"
 
-extern "C" u8 lbl_80556AE0[];
+extern u8 lbl_80556AE0[];
 extern "C" void fn_801EF894(u8*);
 
 // 0x80208CDC

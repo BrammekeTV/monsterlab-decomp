@@ -5,8 +5,8 @@
 
 #include "types.h"
 
-extern "C" void* gEventMgr;
-extern "C" f32 lbl_805FE108;
+extern void* gEventMgr;
+extern f32 lbl_805FE108;
 extern "C" void EventSendTo(void*, u32, void*, u32, int, int);
 
 // 0x800B42EC

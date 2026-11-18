@@ -5,7 +5,7 @@
 
 #include "types.h"
 
-extern "C" f32 lbl_805FE5B8;
+extern f32 lbl_805FE5B8;
 extern "C" void fn_80070460(u8*);
 extern "C" void fn_800704AC(u8*);
 

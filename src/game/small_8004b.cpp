@@ -41,7 +41,7 @@ void  ExplorationHudSetFighter(void* set, void* fighter, int a); // 0x80045138
 extern "C" void fn_801B3378(u8* p, u8* key);                               // 0x801B3378: removes key from the list p
 
 // Globals used here (defined elsewhere, or below).
-extern void*  gScreenSets;                                      // 0x805FB654
+extern "C++" void*  gScreenSets;                                      // 0x805FB654
 extern u8*    gBattle;                                          // 0x805FBBB8
 extern f32    lbl_805FD150;                                     // 0x805FD150 (float constant)
 extern u8     lbl_803C4298[];                                   // 0x803C4298 (level info block)
@@ -59,7 +59,7 @@ extern const char lbl_805F85C0[];                               // 0x805F85C0 (t
 s32   lbl_803C5268[13] ORIG(0x803C5268);     // part-slot entries (10 used), reset to -1
 s32   lbl_805FB090     ORIG(0x805FB090);     // call counter for fn_80044F54
 void* lbl_805FB094     ORIG(0x805FB094);     // cached pointer for fn_80044F54
-extern "C" { u8    lbl_805FB098     ORIG(0x805FB098); } // set once the part selection is locked
+u8    lbl_805FB098     ORIG(0x805FB098); // set once the part selection is locked
 u8    lbl_8047C730[0x30] ORIG(0x8047C730);  // combat results state; +0x20 is set by CombatResultsPauseGame
 
 extern "C" {

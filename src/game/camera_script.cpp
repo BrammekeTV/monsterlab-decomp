@@ -41,7 +41,7 @@ typedef void (*CamSetTimeFn)(CameraCtl*, f32);
 enum { CAM_MODE_FREE = 5, CAM_MODE_FIXED = 6, CAM_MODE_7 = 7 };
 
 Character*        gCameraOwner;    ORIG(0x805FAF60)
-extern "C" { u8                gIgcMode;        ORIG(0x805FAF64) } // in-game cutscene mode
+u8                gIgcMode;        ORIG(0x805FAF64) // in-game cutscene mode
 s32               gCameraLocks;    ORIG(0x805FAF68)
 
 // Animation component (Character + 0xA0).
@@ -198,7 +198,7 @@ void  RequestSend(void* ctx, u32 request, u32 arg);     // 0x801BBAEC
 void  RequestComplete(void* ctx, u32 request, u32 arg); // 0x801BBB0C
 void  DebugPing(const char* msg, u32 color);            // 0x80121898 (empty in release)
 }
-extern void* gEventMgr;            // 0x805FB6C8
+extern "C++" void* gEventMgr;            // 0x805FB6C8
 extern u8    lbl_805FB1A1;
 
 #define SCRIPT_ARG2(ctx) (*(u32*)((u8*)(ctx) + 0x20))

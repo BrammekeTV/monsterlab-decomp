@@ -5,7 +5,7 @@
 
 #include "types.h"
 
-extern "C" u8 gFlag805FB948;
+extern u8 gFlag805FB948;
 extern "C" void fn_801F31A8(void);
 
 // 0x8010A374

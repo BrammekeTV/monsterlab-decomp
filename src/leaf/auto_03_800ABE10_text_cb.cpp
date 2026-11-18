@@ -6,8 +6,8 @@
 #include "types.h"
 #include "game/script_callbacks.h"
 
-extern "C" u8 lbl_805FDFC0[];
-extern "C" u8 lbl_805FDFC8[];
+extern u8 lbl_805FDFC0[];
+extern u8 lbl_805FDFC8[];
 
 // 0x800AC714
 void GrowJuiceSeed_FireSeed(void* a3) {

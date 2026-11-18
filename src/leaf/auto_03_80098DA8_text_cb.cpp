@@ -6,8 +6,8 @@
 #include "types.h"
 #include "game/script_callbacks.h"
 
-extern "C" u8* gWorldState;
-extern "C" f32 lbl_805FDC28;
+extern u8* gWorldState;
+extern f32 lbl_805FDC28;
 
 // 0x800999A4
 void* ReactorHeartGetTargetLeak(void* a3) {

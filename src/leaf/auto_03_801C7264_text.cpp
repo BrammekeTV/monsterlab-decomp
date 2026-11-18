@@ -5,10 +5,10 @@
 
 #include "types.h"
 
-extern "C" void* lbl_805FB5F8;
-extern "C" u8 lbl_805FB728[];
-extern "C" u8 lbl_805FB72C[];
-extern "C" u8 lbl_805FFD54[];
+extern void* lbl_805FB5F8;
+extern u8 lbl_805FB728[];
+extern u8 lbl_805FB72C[];
+extern u8 lbl_805FFD54[];
 extern "C" void fn_801C7E9C(s32, s32);
 
 // 0x801C7614

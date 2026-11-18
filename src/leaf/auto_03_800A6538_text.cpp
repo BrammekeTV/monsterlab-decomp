@@ -6,7 +6,7 @@
 #include "types.h"
 
 extern "C" void fn_800A7960(void);
-extern "C" void* gEventMgr;
+extern void* gEventMgr;
 extern "C" void EventSend(void*, void*, void*, u32, int, int, int, int);
 extern "C" void fn_8020A348(s32, u8*);
 

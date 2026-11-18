@@ -48,7 +48,7 @@ void   RayQuerySetDir(u8* q, const Vec3* d);                     // 0x80055D80
 BOOL   RayQueryCast(u8* q, void* world, u32 filter, u8* hit, u8* hit2);   // 0x801B203C
 void   EventSend(void* mgr, void* from, void* to, u32 id, s32 a, s32 b, s32 c, s32 d);
 }
-extern void* gEventMgr;     // 0x805FB6C8
+extern "C++" void* gEventMgr;     // 0x805FB6C8
 
 // Contact record.
 #define CT_NORMAL(ct)    ((Vec3*)((ct) + 0x0C))

@@ -19,7 +19,7 @@ s32         fn_801A3010(void* obj, void* data);            // 0x801A3010
 s32         fn_801A30C0(void* el, u32 bone);               // 0x801A30C0
 void        fn_801A8654(u8* obj, s32 a1);                  // 0x801A8654
 
-extern void* gScreenSets;                  // 0x805FB654
+extern "C++" void* gScreenSets;                  // 0x805FB654
 extern const char lbl_80381868[];          // 0x80381868 (string block)
 extern f32 lbl_805F9408;                   // 0x805F9408
 extern f32 lbl_805FF8A0;                   // 0x805FF8A0 (0.0f)

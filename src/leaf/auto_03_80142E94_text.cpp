@@ -5,9 +5,9 @@
 
 #include "types.h"
 
-extern "C" u8 lbl_80375E24[];
-extern "C" u8 lbl_80375E4C[];
-extern "C" u8 lbl_803F2890[];
+extern u8 lbl_80375E24[];
+extern u8 lbl_80375E4C[];
+extern u8 lbl_803F2890[];
 extern "C" void DCFlushRange(void*, u32);
 extern "C" void fn_80330E20(void*);
 

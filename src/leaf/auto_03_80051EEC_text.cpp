@@ -5,9 +5,9 @@
 
 #include "types.h"
 
-extern "C" u8 lbl_805F8740[];
-extern "C" u8 lbl_805F8744[];
-extern "C" u8* lbl_805FBBE0;
+extern u8 lbl_805F8740[];
+extern u8 lbl_805F8744[];
+extern u8* lbl_805FBBE0;
 extern "C" void fn_8022E3DC(void);
 
 // 0x80051EEC

@@ -6,15 +6,15 @@
 #include "types.h"
 
 extern "C" void fn_801BA470(void);
-extern "C" void* gEventMgr;
-extern "C" u8 lbl_80383C68[];
-extern "C" u8 lbl_805FB6A0[];
-extern "C" u8 lbl_805FB6A8[];
-extern "C" u8 lbl_805FB6E0[];
-extern "C" u8 lbl_805FB6E8[];
-extern "C" u8 lbl_805FB6F0[];
-extern "C" u8 lbl_805FB704[];
-extern "C" u8 lbl_805FFB08[];
+extern void* gEventMgr;
+extern u8 lbl_80383C68[];
+extern u8 lbl_805FB6A0[];
+extern u8 lbl_805FB6A8[];
+extern u8 lbl_805FB6E0[];
+extern u8 lbl_805FB6E8[];
+extern u8 lbl_805FB6F0[];
+extern u8 lbl_805FB704[];
+extern u8 lbl_805FFB08[];
 extern "C" void EventSend(void*, void*, void*, u32, int, int, int, int);
 extern "C" void EventSendTo(void*, u32, void*, u32, int, int);
 extern "C" void fn_801B1778(u8*, s32);

@@ -27,7 +27,7 @@ void*   fn_801BA930(void* a3, void* a4, u32 a5, u32 a6, u32 a7, u32 a8, void* a9
 s32     fn_801994E0(void* a, void* obj);                        // 0x801994E0 (object setup callback)
 }
 
-extern void* gScreenSets;                       // 0x805FB654
+extern "C++" void* gScreenSets;                       // 0x805FB654
 extern f32   lbl_805FF8E8;                      // 0x805FF8E8 (float constant)
 extern const char lbl_803818A8[];               // 0x803818A8 (string)
 extern const char lbl_803818D0[];               // 0x803818D0 (string)

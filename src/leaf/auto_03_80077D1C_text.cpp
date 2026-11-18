@@ -5,7 +5,7 @@
 
 #include "types.h"
 
-extern "C" u8 lbl_805FB140[];
+extern u8 lbl_805FB140[];
 extern "C" void app_StopMusic(void);
 extern "C" void fn_800704AC(u8*);
 extern "C" f32 fn_8007CF94(u8*);

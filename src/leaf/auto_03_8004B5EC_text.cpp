@@ -6,7 +6,7 @@
 #include "types.h"
 
 extern "C" s32 fn_8004CB10(u8* a3);
-extern "C" u8 lbl_805F86F8[];
+extern u8 lbl_805F86F8[];
 extern "C" s32 PartGetCurrentHealth(u8*);
 extern "C" s32 PartGetMaxHealth(u8*);
 extern "C" u8* fn_8004B500(u8*, s32);

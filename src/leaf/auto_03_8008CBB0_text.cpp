@@ -5,8 +5,8 @@
 
 #include "types.h"
 
-extern "C" u8 lbl_805FDA1C[];
-extern "C" u8 lbl_805FDA28[];
+extern u8 lbl_805FDA1C[];
+extern u8 lbl_805FDA28[];
 
 // 0x8008CDFC
 extern "C" f32 fn_8008CDFC(u8* a3, s32 a4, f32 f1) {

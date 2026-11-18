@@ -5,9 +5,9 @@
 
 #include "types.h"
 
-extern "C" u8 lbl_805FDB38[];
-extern "C" u8 lbl_805FDB60[];
-extern "C" f32 lbl_805FDB64;
+extern u8 lbl_805FDB38[];
+extern u8 lbl_805FDB60[];
+extern f32 lbl_805FDB64;
 extern "C" void app_PlayMusic(u32, f32);
 extern "C" void fn_800704AC(u8*);
 

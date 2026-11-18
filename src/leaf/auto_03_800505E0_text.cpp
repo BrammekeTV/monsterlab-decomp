@@ -5,15 +5,15 @@
 
 #include "types.h"
 
-extern "C" u8 lbl_805FB0D4[];
-extern "C" s32 lbl_805FB0D8;
-extern "C" void* lbl_805FB0DC;
-extern "C" u8 lbl_805FB0E0[];
-extern "C" u8 lbl_805FB0E1;
-extern "C" u8 lbl_805FB0E3[];
-extern "C" u8 lbl_805FB0E4;
-extern "C" u8 lbl_805FB0E8[];
-extern "C" u8 lbl_805FB0F8[];
+extern u8 lbl_805FB0D4[];
+extern s32 lbl_805FB0D8;
+extern void* lbl_805FB0DC;
+extern u8 lbl_805FB0E0[];
+extern u8 lbl_805FB0E1;
+extern u8 lbl_805FB0E3[];
+extern u8 lbl_805FB0E4;
+extern u8 lbl_805FB0E8[];
+extern u8 lbl_805FB0F8[];
 extern "C" void UIText_SetString_TextID(u32, u32);
 extern "C" void fn_8004E7D4(u8*);
 extern "C" s32 fn_8004E8CC(u8*);

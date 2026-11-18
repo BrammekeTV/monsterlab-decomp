@@ -6,10 +6,10 @@
 #include "types.h"
 #include "game/script_callbacks.h"
 
-extern "C" u8 lbl_805FB098[];
-extern "C" u8 lbl_805FB0A8[];
-extern "C" u8 lbl_805FB0A9[];
-extern "C" u8 lbl_805FB0AA[];
+extern u8 lbl_805FB098;
+extern u8 lbl_805FB0A8[];
+extern u8 lbl_805FB0A9[];
+extern u8 lbl_805FB0AA[];
 extern "C" void fn_800493A8(s32);
 
 // 0x80046B9C

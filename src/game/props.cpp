@@ -17,7 +17,7 @@ void  ScopedLockCtor(ScopedLock* l);                              // 0x801F5384
 void  ScopedLockDtor(ScopedLock* l, s32 flags);                   // 0x801F53B0
 void  WaypointParamsInit(void* params, int a);                    // 0x801ED314
 }
-extern void* gEventMgr;            // 0x805FB6C8
+extern "C++" void* gEventMgr;            // 0x805FB6C8
 
 // Script context timer (seconds) used by prop_counting_down / prop_check_timer.
 #define CTX_TIMER(ctx) (*(f32*)((u8*)(ctx) + 0x2C))

@@ -5,9 +5,9 @@
 
 #include "types.h"
 
-extern "C" void* gEventMgr;
-extern "C" f32 lbl_805FE558;
-extern "C" f32 lbl_805FE598;
+extern void* gEventMgr;
+extern f32 lbl_805FE558;
+extern f32 lbl_805FE598;
 extern "C" void EventSendTo(void*, u32, void*, u32, int, int);
 extern "C" void app_PlayMusic(u32, f32);
 extern "C" f32 fn_800C8A5C(u8*);

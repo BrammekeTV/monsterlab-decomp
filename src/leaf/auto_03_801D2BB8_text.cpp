@@ -5,7 +5,7 @@
 
 #include "types.h"
 
-extern "C" u8 gGlobalSettings[];
+extern u8 gGlobalSettings[];
 
 // 0x801D2BF8
 extern "C" s32 GetGlobalSettings(void) {

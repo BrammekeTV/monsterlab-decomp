@@ -19,7 +19,7 @@ struct WorldParams {
 };
 
 static WorldParams* sWorldParams;       ORIG(0x805FB944)
-extern "C" { s32                 gZoneResourceSize;  ORIG(0x805FB94C) } // bytes per zone record
+s32                 gZoneResourceSize;  ORIG(0x805FB94C) // bytes per zone record
 static u32          sEntitySlotBytes;   ORIG(0x805FB940)
 
 static inline s32 S(u32 off) {

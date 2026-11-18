@@ -4,7 +4,7 @@
 #include "types.h"
 
 extern void* gLab;                   // 0x805FBBC8
-extern void* gScreenSets;            // 0x805FB654
+extern "C++" void* gScreenSets;            // 0x805FB654
 extern u8  lbl_803558F8[];           // 0x803558F8 vtable-like table (0x18)
 extern u8  lbl_80355870[];           // 0x80355870
 extern u8  lbl_803558B0[];           // 0x803558B0

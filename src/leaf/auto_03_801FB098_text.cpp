@@ -5,17 +5,17 @@
 
 #include "types.h"
 
-extern "C" u8 lbl_805F98B0[];
-extern "C" u8 lbl_805F98B8[];
-extern "C" u8 lbl_805FBA38[];
-extern "C" u8 lbl_805FBA3C[];
-extern "C" u8 lbl_805FBA40[];
-extern "C" u8 lbl_805FBA44[];
-extern "C" u8 lbl_805FBA48[];
-extern "C" u8 lbl_805FBA4C[];
-extern "C" u8 lbl_805FBA50[];
-extern "C" u8 lbl_805FBA54[];
-extern "C" u8 lbl_805FBA70[];
+extern u8 lbl_805F98B0[];
+extern u8 lbl_805F98B8[];
+extern u8 lbl_805FBA38[];
+extern u8 lbl_805FBA3C[];
+extern u8 lbl_805FBA40[];
+extern u8 lbl_805FBA44[];
+extern u8 lbl_805FBA48[];
+extern u8 lbl_805FBA4C[];
+extern u8 lbl_805FBA50[];
+extern u8 lbl_805FBA54[];
+extern u8 lbl_805FBA70[];
 
 // 0x801FBE38
 extern "C" void fn_801FBE38(s32 a3, s32 a4, s32 a5, s32 a6, s32 a7, s32 a8) {

@@ -5,13 +5,13 @@
 
 #include "types.h"
 
-extern "C" u8* gBattle;
-extern "C" u8 lbl_80388D88[];
-extern "C" u8 lbl_80388D98[];
-extern "C" u8 lbl_80388DB0[];
-extern "C" u8 lbl_80388E18[];
-extern "C" u8 lbl_80388E30[];
-extern "C" u8 lbl_80388E50[];
+extern u8* gBattle;
+extern u8 lbl_80388D88[];
+extern u8 lbl_80388D98[];
+extern u8 lbl_80388DB0[];
+extern u8 lbl_80388E18[];
+extern u8 lbl_80388E30[];
+extern u8 lbl_80388E50[];
 extern "C" void BattleOnListenerDone(u8*, u32);
 
 // 0x8020E30C

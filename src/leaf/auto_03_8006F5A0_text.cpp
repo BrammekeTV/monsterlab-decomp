@@ -6,7 +6,7 @@
 #include "types.h"
 
 extern "C" void fn_8006F5B8(void);
-extern "C" u8 lbl_8035A4B8[];
+extern u8 lbl_8035A4B8[];
 extern "C" s32 RegisterScriptFunc(char*, s32, void*);
 
 // 0x8006F5A0

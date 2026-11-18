@@ -26,7 +26,7 @@ void* fn_800E60BC(void);                                                 // 0x80
 BOOL  fn_800E6BD4(void);
 s32   fn_801D5F6C(void);                                                 // 0x801D5F6C
 
-extern void* gEventMgr;     // 0x805FB6C8
+extern "C++" void* gEventMgr;     // 0x805FB6C8
 extern u8    gGame[];       // 0x803B53A0
 extern void* gObjDb;        // 0x805FB180
 extern u8    lbl_805FB0E1;  // 0x805FB0E1

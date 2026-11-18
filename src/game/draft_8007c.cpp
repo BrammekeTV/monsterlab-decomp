@@ -24,7 +24,7 @@ void  fn_8020A398(s32 handle);                                      // 0x8020A39
 
 extern void* gLab;                // 0x805FBBC8
 extern s32 gScreenHeight;         // 0x805F938C
-extern void* gScreenSets;         // 0x805FB654
+extern "C++" void* gScreenSets;         // 0x805FB654
 extern s32 gScreenWidth;          // 0x805F9388
 extern u8 gWorldState[];          // 0x803E6D00 (+0xC frame delta)
 extern u8 lbl_803C4298[];         // 0x803C4298 (+4: camera object with vtable)

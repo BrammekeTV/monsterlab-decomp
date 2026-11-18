@@ -5,7 +5,7 @@
 
 #include "types.h"
 
-extern "C" u8 lbl_805FAFD8[];
+extern u8 lbl_805FAFD8[];
 
 // 0x8002D538
 extern "C" u32 MachineIsOn(void) {

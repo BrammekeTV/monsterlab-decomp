@@ -46,7 +46,7 @@ BOOL   CanAffordAction(s32 cost, s32 energy, u32 typeKey);     // 0x80048AB8
 void   CombatHudRefreshActions(void);                          // 0x800476D8
 }
 
-extern void*        gScreenSets;     // 0x805FB654
+extern "C++" void*        gScreenSets;     // 0x805FB654
 extern u8*          gBattle;         ORIG(0x805FBBB8)
 extern u8*          gSaveSystem;     ORIG(0x805FBBE0)
 extern StringTable* gStringTable;    // 0x805FB910
@@ -58,7 +58,7 @@ extern StringTable* gStringTable2;   ORIG(0x805FB90C)
 // ---- data ----
 static u8  sHudLocked;                    ORIG(0x805FB099)
 static u8  sHudEnabled = 1;               ORIG(0x805F865C)
-extern "C" { s32        gSelectedPart = -1;            ORIG(0x805F8650) }
+s32        gSelectedPart = -1;            ORIG(0x805F8650)
 s32        gHighlightedAction = -1;       ORIG(0x805F8654)
 static u8  sDefectShown;                  ORIG(0x805FB0BC)
 static u8  sEnhancementShown;             ORIG(0x805FB0BD)

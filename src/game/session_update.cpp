@@ -84,9 +84,9 @@ extern u8     gScriptCtx[];        // 0x803C4298 (the session)
 extern u8     gGame[];             // 0x803B53A0
 extern u8     gWorldState[];       ORIG(0x803E6D00)
 extern u8     gAudio[];
-extern void*  gScreenSets;         // 0x805FB654
+extern "C++" void*  gScreenSets;         // 0x805FB654
 extern u8*    gSaveSystem;         ORIG(0x805FBBE0)
-extern View*  gMainView;           ORIG(0x805FB75C)
+extern "C++" View*  gMainView;           ORIG(0x805FB75C)
 extern s32    gAudioOverride;      ORIG(0x805FBA30)
 extern s32    gGameMode;           // 0x805F81C0
 extern u8     sWorldReady;         // 0x805FB2F0

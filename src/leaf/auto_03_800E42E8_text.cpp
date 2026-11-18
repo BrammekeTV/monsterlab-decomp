@@ -5,7 +5,7 @@
 
 #include "types.h"
 
-extern "C" u8 lbl_805FEA54[];
+extern u8 lbl_805FEA54[];
 
 // 0x800E4BF4
 extern "C" f32 fn_800E4BF4(void) {

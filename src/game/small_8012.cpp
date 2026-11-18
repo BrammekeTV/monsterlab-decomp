@@ -17,7 +17,7 @@ extern u8    lbl_805FB2D5;        // 0x805FB2D5 save error flag
 extern void* lbl_805F8FD0;        // 0x805F8FD0 save-related pointer
 extern u8    lbl_803C4298[];      // 0x803C4298 level info block
 extern u8    gGame[];             // 0x803B53A0
-extern u8    gIgcMode;            // 0x805FAF64 in-game cutscene mode
+extern "C++" u8    gIgcMode;            // 0x805FAF64 in-game cutscene mode
 extern u8    lbl_803E6C20[];      // 0x803E6C20 object block
 extern f32   lbl_803E6C90[];      // 0x803E6C90 three floats
 extern f32   lbl_805FEDB8;        // 0x805FEDB8 float constant

@@ -26,7 +26,7 @@ void   operator_delete(void* p);                                 // 0x801D426C
 
 extern u8   gAudio[];
 extern u8   gGame[];
-extern void* gScreenSets;
+extern "C++" void* gScreenSets;
 extern u8*  gWorldState;                // first word is a pointer to the world block
 extern u8   lbl_80355940[];             // 0x80355940 (4 ints, reset to -1)
 extern u8   lbl_80355970[];             // 0x80355970

@@ -28,7 +28,7 @@ void  UnPauseAllExplorationEnemies(void);             // 0x80016DB0
 s32   RegisterScriptFunc(const char* name, s32 type, void* fn);   // 0x801DC91C
 }
 
-extern void* gEventMgr;            // 0x805FB6C8
+extern "C++" void* gEventMgr;            // 0x805FB6C8
 extern u8    gGame[];              // 0x803B53A0
 extern u8    gScriptCtx[];         // 0x803C4298
 extern u8*   gBattle;              ORIG(0x805FBBB8)
@@ -473,7 +473,7 @@ BOOL  ScreenSetWidgetVisible(void* set, void* widget);  // 0x80198C34
 BOOL  UIElement_IsUIAnimPlaying(u32 hash);
 void  ExplorationHudSetFighter(void* set, void* fighter, int a);   // 0x80045138
 }
-extern void* gScreenSets;          // 0x805FB654
+extern "C++" void* gScreenSets;          // 0x805FB654
 
 // 0x80017454
 void character_exploration_move_update(ScriptCtx* ctx) {

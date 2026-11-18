@@ -6,7 +6,7 @@
 #include "types.h"
 #include "game/script_callbacks.h"
 
-extern "C" u8 lbl_805FB1A8[];
+extern u8 lbl_805FB1A8[];
 
 // 0x800DD1E4
 void ForceCameraRotateMode(u32 a3) {

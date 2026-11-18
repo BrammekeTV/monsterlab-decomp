@@ -5,9 +5,9 @@
 
 #include "types.h"
 
-extern "C" u8 lbl_805FB7F0[];
-extern "C" u8 lbl_805FB7F8[];
-extern "C" u8 lbl_805FB7FC[];
+extern u8 lbl_805FB7F0[];
+extern u8 lbl_805FB7F8[];
+extern u8 lbl_805FB7FC[];
 
 // 0x801D5D0C
 extern "C" void fn_801D5D0C(s32 a3) {

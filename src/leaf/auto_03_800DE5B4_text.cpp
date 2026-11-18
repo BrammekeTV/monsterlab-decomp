@@ -5,8 +5,8 @@
 
 #include "types.h"
 
-extern "C" u8 lbl_8035FDE0[];
-extern "C" u8 lbl_805F95F8[];
+extern u8 lbl_8035FDE0[];
+extern u8 lbl_805F95F8[];
 
 // 0x800DE5B4
 extern "C" void fn_800DE5B4(u8* a3) {

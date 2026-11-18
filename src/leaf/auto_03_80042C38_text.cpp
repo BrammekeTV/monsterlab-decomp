@@ -5,7 +5,7 @@
 
 #include "types.h"
 
-extern "C" u8* gBattle;
+extern u8* gBattle;
 extern "C" void BattleReset(u8*);
 extern "C" void fn_80043D84(s32, s32);
 extern "C" void fn_801B4308(u8*, s32);

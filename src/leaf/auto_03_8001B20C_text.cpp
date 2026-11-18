@@ -5,7 +5,7 @@
 
 #include "types.h"
 
-extern "C" u8 lbl_805FAF78[];
+extern u8 lbl_805FAF78[];
 
 // 0x8001E020
 extern "C" u32 LightningTowerGetMonster(void) {

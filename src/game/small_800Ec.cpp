@@ -6,7 +6,7 @@
 extern u8  gGame[];                 // 0x803B53A0
 extern u8  gWorldState[];           // 0x803E6D00 (holds a pointer to the world block)
 extern u8  gFlag805FB948;           // 0x805FB948 (two-player mode flag)
-extern void* gEventMgr;             // 0x805FB6C8
+extern "C++" void* gEventMgr;             // 0x805FB6C8
 extern u8  lbl_803C4298[];          // 0x803C4298
 extern u8  lbl_803C7110[];          // 0x803C7110 (three floats)
 extern u8  lbl_803601B8[];          // 0x803601B8 (vtable)

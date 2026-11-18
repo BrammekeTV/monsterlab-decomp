@@ -17,7 +17,7 @@ import progress as P
 ROOT = P.ROOT
 UNRES = re.compile(r"^(?:.*[\/])?(\S+?)\.obj : error LNK(2019|2001): unresolved external symbol (.+?)(?: referenced in function (.+))?$")
 DUP = re.compile(r"^(?:.*[\/])?(\S+?)\.obj : error LNK2005: (.+?) already defined in (?:.*[\/])?(\S+?)\.obj")
-HINT = re.compile(r'^\s+"(.+)" \((\?.+)\)\s*$')
+HINT = re.compile(r'^\s+(?:"(.+)" \((\?.+)\)|(_\S+))\s*$')
 DECOR = re.compile(r"\((\?[^)]*)\)\s*$")
 SYMLINE = re.compile(r"^(\S+) = (\.\w+):0x([0-9A-Fa-f]+); // type:(\w+) size:0x([0-9A-Fa-f]+)")
 
@@ -71,7 +71,7 @@ def main():
             continue
         m = HINT.match(l)
         if m and cur:
-            hints.setdefault(cur, m.group(1))
+            hints.setdefault(cur, m.group(1) or (m.group(3) + " (C linkage)"))
 
     entries = []
     for name, rs in refs.items():

@@ -6,7 +6,7 @@
 #include "types.h"
 #include "game/script_callbacks.h"
 
-extern "C" u8 lbl_805FD8C8[];
+extern u8 lbl_805FD8C8[];
 
 // 0x80086170
 void BrainPowerUpSetActive(u32 a3, u32 a4) {

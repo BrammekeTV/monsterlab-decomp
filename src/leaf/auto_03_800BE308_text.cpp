@@ -5,7 +5,7 @@
 
 #include "types.h"
 
-extern "C" void* gEventMgr;
+extern void* gEventMgr;
 extern "C" void EventSend(void*, void*, void*, u32, int, int, int, int);
 
 // 0x800BE3A4

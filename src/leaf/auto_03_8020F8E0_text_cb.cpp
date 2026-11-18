@@ -6,7 +6,7 @@
 #include "types.h"
 #include "game/script_callbacks.h"
 
-extern "C" u8* lbl_805FBBE0;
+extern u8* lbl_805FBBE0;
 
 // 0x802215B8
 void AddPlayerMonster(u32 a3, u32 a4, u32 a5, u32 a6, u32 a7) {

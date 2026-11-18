@@ -5,17 +5,17 @@
 
 #include "types.h"
 
-extern "C" u8 lbl_803F2880[];
-extern "C" u8 lbl_80412BC0[];
-extern "C" u8 lbl_80412BF8[];
-extern "C" u8 lbl_805F95F8[];
-extern "C" u8 lbl_805FB5FC[];
-extern "C" u8 lbl_805FB638[];
-extern "C" u8 lbl_805FB648[];
-extern "C" u8 lbl_805FB650[];
-extern "C" u32 lbl_805FB854;
-extern "C" u8 lbl_805FF618[];
-extern "C" u8 lbl_805FF630[];
+extern u8 lbl_803F2880[];
+extern u8 lbl_80412BC0[];
+extern u8 lbl_80412BF8[];
+extern u8 lbl_805F95F8[];
+extern u8 lbl_805FB5FC[];
+extern u8 lbl_805FB638[];
+extern u8 lbl_805FB648[];
+extern u8 lbl_805FB650[];
+extern u32 lbl_805FB854;
+extern u8 lbl_805FF618[];
+extern u8 lbl_805FF630[];
 extern "C" void BufferFree(void*);
 extern "C" void* MEMAllocFromAllocator(u8*, u32);
 extern "C" void MEMFreeToAllocator(u8*, void*);

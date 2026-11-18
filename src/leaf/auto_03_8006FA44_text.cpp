@@ -5,12 +5,12 @@
 
 #include "types.h"
 
-extern "C" s32 lbl_805FB124;
-extern "C" u8 lbl_805FB128[];
-extern "C" u8* lbl_805FB134;
-extern "C" f32 lbl_805FD5D8;
-extern "C" u8 lbl_805FD5F0[];
-extern "C" u8 lbl_805FD630[];
+extern s32 lbl_805FB124;
+extern u8 lbl_805FB128[];
+extern u8* lbl_805FB134;
+extern f32 lbl_805FD5D8;
+extern u8 lbl_805FD5F0[];
+extern u8 lbl_805FD630[];
 
 // 0x8006FA44
 extern "C" void fn_8006FA44(u8* a3, s32 a4, s32 a5, s32 a6, s32 a7, s32 a8) {

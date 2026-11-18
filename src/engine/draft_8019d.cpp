@@ -21,7 +21,7 @@ void        fn_801A23F8(u8* el);                           // 0x801A23F8
 void        fn_801A2510(u8* el);                           // 0x801A2510
 void        fn_801A2524(u8* el);                           // 0x801A2524
 
-extern void* gScreenSets;                  // 0x805FB654
+extern "C++" void* gScreenSets;                  // 0x805FB654
 extern const char lbl_80381868[];          // 0x80381868 (string block)
 }
 

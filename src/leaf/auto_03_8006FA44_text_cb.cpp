@@ -6,9 +6,9 @@
 #include "types.h"
 #include "game/script_callbacks.h"
 
-extern "C" s32 lbl_805FB12C;
-extern "C" u8* lbl_805FB134;
-extern "C" f32 lbl_805FD5D8;
+extern s32 lbl_805FB12C;
+extern u8* lbl_805FB134;
+extern f32 lbl_805FD5D8;
 
 // 0x80070134
 void ResetCommentTimer(void) {

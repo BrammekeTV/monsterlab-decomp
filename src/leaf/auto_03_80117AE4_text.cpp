@@ -5,7 +5,7 @@
 
 #include "types.h"
 
-extern "C" u8 lbl_805FB260[];
+extern u8 lbl_805FB260[];
 extern "C" void fn_80116D40(u8*);
 
 // 0x80118138

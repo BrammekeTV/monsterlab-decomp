@@ -37,7 +37,7 @@ void  fn_8007A440(u8* p);                                               // 0x800
 u8*   fn_8007A3B4(u8* p, s32 del);                                      // 0x8007A3B4
 }
 
-extern void* gEventMgr;                 // 0x805FB6C8
+extern "C++" void* gEventMgr;                 // 0x805FB6C8
 extern u8    gWorldState[];             // 0x803E6D00 (+0xC: frame delta)
 extern u8    lbl_805FB138[];            // dance object pointer block
 extern u8    lbl_805FB140[];            // welding state pointer block

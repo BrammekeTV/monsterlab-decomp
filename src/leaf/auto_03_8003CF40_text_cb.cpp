@@ -6,7 +6,7 @@
 #include "types.h"
 #include "game/script_callbacks.h"
 
-extern "C" u8* gBattle;
+extern u8* gBattle;
 
 // 0x8003F8DC
 s32 GetCombatWinner(void) {

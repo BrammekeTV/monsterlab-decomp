@@ -5,7 +5,7 @@
 
 #include "types.h"
 
-extern "C" f32 lbl_805FD6F0;
+extern f32 lbl_805FD6F0;
 
 // 0x8007B318
 extern "C" s32 fn_8007B318(u8* a3) {

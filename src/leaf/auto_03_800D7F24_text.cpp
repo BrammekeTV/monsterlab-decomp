@@ -5,7 +5,7 @@
 
 #include "types.h"
 
-extern "C" u8 lbl_803C4298[];
+extern u8 lbl_803C4298[];
 extern "C" void fn_8000C314(u8*);
 
 // 0x800D83A8

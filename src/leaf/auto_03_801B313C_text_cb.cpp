@@ -6,7 +6,7 @@
 #include "types.h"
 #include "game/script_callbacks.h"
 
-extern "C" void* gEventMgr;
+extern void* gEventMgr;
 extern "C" void EventSendTo(void*, u32, void*, u32, int, int);
 extern "C" void TriggerDoAction(void*, void*, void*);
 

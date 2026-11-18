@@ -6,9 +6,9 @@
 #include "types.h"
 #include "game/script_callbacks.h"
 
-extern "C" u8 lbl_8040E5F0[];
-extern "C" s32 lbl_805F9980;
-extern "C" u8 lbl_805FB89C[];
+extern u8 lbl_8040E5F0[];
+extern s32 lbl_805F9980;
+extern u8 lbl_805FB89C[];
 extern "C" s32 PlaySound(u32, s32, s32, s32, s32, s32);
 extern "C" s32 PlaySoundAt(void*, int, void*, int);
 extern "C" void TriggerDoAction(void*, void*, void*);

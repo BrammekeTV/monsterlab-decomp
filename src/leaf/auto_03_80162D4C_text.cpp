@@ -5,12 +5,12 @@
 
 #include "types.h"
 
-extern "C" s32 lbl_805FB630;
-extern "C" u8 lbl_805FF380[];
-extern "C" u8 lbl_805FF3B0[];
-extern "C" u8 lbl_805FF490[];
-extern "C" u8 lbl_805FF4C8[];
-extern "C" u8 lbl_805FF530[];
+extern s32 lbl_805FB630;
+extern u8 lbl_805FF380[];
+extern u8 lbl_805FF3B0[];
+extern u8 lbl_805FF490[];
+extern u8 lbl_805FF4C8[];
+extern u8 lbl_805FF530[];
 
 // 0x80162D4C
 extern "C" f32 fn_80162D4C(s32 a3, u8* a4, u8* a5) {

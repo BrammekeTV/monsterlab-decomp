@@ -5,10 +5,10 @@
 
 #include "types.h"
 
-extern "C" void* gEventMgr;
-extern "C" u8 lbl_805FD928[];
-extern "C" u8 lbl_805FD934[];
-extern "C" u8 lbl_805FD958[];
+extern void* gEventMgr;
+extern u8 lbl_805FD928[];
+extern u8 lbl_805FD934[];
+extern u8 lbl_805FD958[];
 extern "C" void EventSendTo(void*, u32, void*, u32, int, int);
 extern "C" void app_PlayMusic(u32, f32);
 

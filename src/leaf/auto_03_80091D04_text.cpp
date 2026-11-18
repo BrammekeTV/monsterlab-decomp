@@ -5,8 +5,8 @@
 
 #include "types.h"
 
-extern "C" void* gEventMgr;
-extern "C" f32 lbl_805FDB00;
+extern void* gEventMgr;
+extern f32 lbl_805FDB00;
 extern "C" void EventSend(void*, void*, void*, u32, int, int, int, int);
 
 // 0x80091D04

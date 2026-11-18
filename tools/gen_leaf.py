@@ -154,7 +154,7 @@ def source_protos(funcs):
 
 
 PRIM_RE = re.compile(r"^(?:[us](?:8|16|32|64)|f32|f64|BOOL|void\s*\*|u8\s*\*)$")
-GLOB_RE = re.compile(r"^(?:extern\s+)?([A-Za-z_][\w \t\*]*?)\s*\b((?:g[A-Z]|lbl_)\w*)\s*(?:;|=)")
+GLOB_RE = re.compile(r"^(?:extern\s+)?([A-Za-z_][\w \t\*]*?)\s*\b((?:g[A-Z]|lbl_)\w*)\s*(?:;|=|ORIG\()")
 
 
 def global_types():
@@ -845,7 +845,7 @@ def main():
             if gname in funcs:
                 lines.append(f'extern "C" void {gname}(void);')
             else:
-                lines.append(f'extern "C" {gtypes.get(gname, "u8")} {gname}{"" if gname in gtypes else "[]"};')
+                lines.append(f'extern {gtypes.get(gname, "u8")} {gname}{"" if gname in gtypes else "[]"};')
         for t in sorted(calls):
             ret, ps = calls[t]
             lines.append(f'extern "C" {ret} {t}({", ".join(ps) or "void"});')

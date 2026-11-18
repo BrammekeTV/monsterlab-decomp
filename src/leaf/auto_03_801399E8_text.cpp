@@ -5,10 +5,10 @@
 
 #include "types.h"
 
-extern "C" u8 lbl_803F0CF0[];
-extern "C" u8 lbl_805FB340[];
-extern "C" u8 lbl_805FB348[];
-extern "C" u8 lbl_805FB34C[];
+extern u8 lbl_803F0CF0[];
+extern u8 lbl_805FB340[];
+extern u8 lbl_805FB348[];
+extern u8 lbl_805FB34C[];
 extern "C" void UIGroup_DisableHitTest(u32);
 extern "C" void UIGroup_EnableHitTest(u32);
 

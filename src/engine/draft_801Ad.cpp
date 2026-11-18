@@ -43,9 +43,9 @@ extern const char lbl_803831F0[];   // 0x803831F0 (string)
 extern const char lbl_8038321C[];   // 0x8038321C (string)
 extern const char lbl_80383248[];   // 0x80383248 (string)
 extern u8 lbl_8047C640[];           // 0x8047C640 (camera)
-extern void* gScreenSets;           // 0x805FB654
+extern "C++" void* gScreenSets;           // 0x805FB654
 struct View;
-extern View* gMainView;             // 0x805FB75C
+extern "C++" View* gMainView;             // 0x805FB75C
 extern void* lbl_805FB658;          // 0x805FB658 (global render object)
 extern f32 lbl_805FF9EC;            // 0x805FF9EC (0.999999f)
 

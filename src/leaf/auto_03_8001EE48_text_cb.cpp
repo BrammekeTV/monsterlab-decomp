@@ -6,12 +6,12 @@
 #include "types.h"
 #include "game/script_callbacks.h"
 
-extern "C" u8 lbl_805F8288[];
-extern "C" u8 lbl_805FAF80[];
-extern "C" u8 lbl_805FAF84[];
-extern "C" u8 lbl_805FAF88[];
-extern "C" u8* lbl_805FBBE0;
-extern "C" u8 lbl_805FC8B0[];
+extern u8 lbl_805F8288[];
+extern u8 lbl_805FAF80[];
+extern u8 lbl_805FAF84[];
+extern u8 lbl_805FAF88[];
+extern u8* lbl_805FBBE0;
+extern u8 lbl_805FC8B0[];
 extern "C" f32 MonsterRateAttack(u8*);
 extern "C" f32 MonsterRateDefence(u8*);
 extern "C" f32 MonsterRateEnergy(u8*);

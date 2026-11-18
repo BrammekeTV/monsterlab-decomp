@@ -21,7 +21,7 @@ u32   RandomU32(void);                                                  // 0x801
 void  EventSend(void* mgr, void* target, void* from, u32 event, int a, int b, int c, int d); // 0x801BA190
 }
 
-extern void* gEventMgr;             // 0x805FB6C8
+extern "C++" void* gEventMgr;             // 0x805FB6C8
 extern u8  lbl_8035DE40[];          // 0x8035DE40 (vtable)
 extern u8  lbl_8035E470[];          // 0x8035E470 (vtable)
 extern u8  lbl_8035E568[];          // 0x8035E568 (vtable)

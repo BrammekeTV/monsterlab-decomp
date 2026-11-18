@@ -54,9 +54,9 @@ void* fn_80209814(void* v);                                                     
 BOOL  fn_80216C80(u8* lab, s32 level);                                            // 0x80216C80
 f32   fn_802170E8(u8* lab, s32 level);                                            // 0x802170E8
 
-extern void* gEventMgr;            // 0x805FB6C8
+extern "C++" void* gEventMgr;            // 0x805FB6C8
 extern u8    gWorldState[];        // 0x803E6D00
-extern s32   gZoneResourceSize;    // 0x805FB94C
+extern "C++" s32   gZoneResourceSize;    // 0x805FB94C
 extern s32   lbl_803471B0[];       // 0x803471B0 (tables indexed by the RaySceneTest result)
 extern s32   lbl_803471D0[];       // 0x803471D0
 extern s32   lbl_803471E0[];       // 0x803471E0

@@ -5,12 +5,12 @@
 
 #include "types.h"
 
-extern "C" u8 lbl_805FB440[];
-extern "C" u8 lbl_805FB444[];
-extern "C" u8 lbl_805FB448[];
-extern "C" u8 lbl_805FB44C[];
-extern "C" u8 lbl_805FB450[];
-extern "C" u8 lbl_805FB454[];
+extern u8 lbl_805FB440[];
+extern u8 lbl_805FB444[];
+extern u8 lbl_805FB448[];
+extern u8 lbl_805FB44C[];
+extern u8 lbl_805FB450[];
+extern u8 lbl_805FB454[];
 
 // 0x801420EC
 extern "C" void fn_801420EC(void) {

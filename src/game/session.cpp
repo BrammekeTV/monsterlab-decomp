@@ -15,9 +15,9 @@ void* EventPost(s32 id, s32 flags);                     // 0x801F3918: returns t
 void  SessionBegin(void* session);                      // 0x80013690
 }
 
-extern void* gScreenSets;                // 0x805FB654
+extern "C++" void* gScreenSets;                // 0x805FB654
 extern u8    gWorldState[];              // 0x803E6D00
-extern s32   gZoneResourceSize;          // 0x805FB94C
+extern "C++" s32   gZoneResourceSize;          // 0x805FB94C
 extern u8    gFlag805FB948;              // 0x805FB948
 
 // Per-object saved state copied back into a zone (0x40 bytes).

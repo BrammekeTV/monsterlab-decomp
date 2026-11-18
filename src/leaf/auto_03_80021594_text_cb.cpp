@@ -6,7 +6,7 @@
 #include "types.h"
 #include "game/script_callbacks.h"
 
-extern "C" u8* lbl_805FB134;
+extern u8* lbl_805FB134;
 
 // 0x80022D08
 s32 ChallengeCheckDebugCheat(void) {

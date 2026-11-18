@@ -5,7 +5,7 @@
 
 #include "types.h"
 
-extern "C" u8 lbl_805FB2B0[];
+extern u8 lbl_805FB2B0[];
 extern "C" void fn_80116D40(s32);
 
 // 0x8011FF24

@@ -46,8 +46,8 @@ extern "C" void ScopedLockDtor(ScopedLock* l, s32 flags);       // 0x801F53B0
 extern u8    gWorldState[];          // 0x803E6D00
 extern u8    gGame[];                // 0x803B53A0
 extern u8    gScriptCtx[];           // 0x803C4298
-extern void* gEventMgr;              // 0x805FB6C8
-extern s32   gZoneResourceSize;      // 0x805FB94C
+extern "C++" void* gEventMgr;              // 0x805FB6C8
+extern "C++" s32   gZoneResourceSize;      // 0x805FB94C
 extern u8    gFlag805FB948;          // 0x805FB948
 extern f32   lbl_805F95A0;           // time scale (slow motion < 1)
 extern f32   lbl_805FB300;           // cull budget

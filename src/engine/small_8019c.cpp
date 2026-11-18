@@ -28,7 +28,7 @@ u32     fn_8019552C(u8* a3, s32 a4);                            // 0x8019552C (l
 char*   fn_801D8ADC(char* s);                                   // 0x801D8ADC (path name tail)
 }
 
-extern void* gScreenSets;                                       // 0x805FB654
+extern "C++" void* gScreenSets;                                       // 0x805FB654
 extern f32   lbl_805FF930;                                      // float constant
 extern void* lbl_805FB658;                                      // global object pointer
 extern u8    lbl_80382778[];                                    // vtable (second, +0x138)

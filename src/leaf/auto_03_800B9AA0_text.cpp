@@ -5,10 +5,10 @@
 
 #include "types.h"
 
-extern "C" u8 lbl_805FE230[];
-extern "C" u8 lbl_805FE238[];
-extern "C" u8 lbl_805FE244[];
-extern "C" u8 lbl_805FE268[];
+extern u8 lbl_805FE230[];
+extern u8 lbl_805FE238[];
+extern u8 lbl_805FE244[];
+extern u8 lbl_805FE268[];
 extern "C" void app_PlayMusic(u32, f32);
 extern "C" f32 fn_800BF870(u8*);
 

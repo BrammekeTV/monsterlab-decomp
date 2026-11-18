@@ -5,16 +5,16 @@
 
 #include "types.h"
 
-extern "C" u8 gScriptSigs[];
-extern "C" u8 lbl_80384430[];
-extern "C" u8 lbl_805FB868[];
-extern "C" u8 lbl_805FB86C[];
-extern "C" u8 lbl_805FB870[];
-extern "C" u8 lbl_805FB874[];
-extern "C" u8 lbl_805FB878[];
-extern "C" u8 lbl_805FB890[];
-extern "C" u8 lbl_805FB894[];
-extern "C" u8 lbl_805FB898[];
+extern u8 gScriptSigs[];
+extern u8 lbl_80384430[];
+extern u8 lbl_805FB868[];
+extern u8 lbl_805FB86C[];
+extern u8 lbl_805FB870[];
+extern u8 lbl_805FB874[];
+extern u8 lbl_805FB878[];
+extern u8 lbl_805FB890[];
+extern u8 lbl_805FB894[];
+extern u8 lbl_805FB898[];
 extern "C" void fn_801D9164(u8*, void*);
 extern "C" void* fn_801EB94C(void*);
 

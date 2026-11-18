@@ -5,7 +5,7 @@
 
 #include "types.h"
 
-extern "C" u8 lbl_803C4298[];
+extern u8 lbl_803C4298[];
 extern "C" BOOL ScriptDispatch(s32, u32, u32*, u32*);
 extern "C" void fn_8000B6A0(void*, int);
 

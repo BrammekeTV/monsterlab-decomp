@@ -5,7 +5,7 @@ extern "C" {
 #include "game/script_callbacks.h"
 }
 
-extern void* gEventMgr;              // 0x805FB6C8
+extern "C++" void* gEventMgr;              // 0x805FB6C8
 extern void* lbl_805FBBAC;           // 0x805FBBAC (voice SFX handle)
 extern void* lbl_805FAFB8;           // 0x805FAFB8 (global object, +0x6C / +0x78 floats)
 extern s32   lbl_805FAFBC;           // 0x805FAFBC (toggle counter, -1 or 0)

@@ -6,7 +6,7 @@
 #include "types.h"
 #include "game/script_callbacks.h"
 
-extern "C" void* lbl_805FB1C8;
+extern void* lbl_805FB1C8;
 
 // 0x800E6934
 void HideQuestCounter(void) {

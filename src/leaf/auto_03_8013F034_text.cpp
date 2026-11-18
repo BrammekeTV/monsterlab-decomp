@@ -5,13 +5,13 @@
 
 #include "types.h"
 
-extern "C" void* gScreenSets;
-extern "C" u8 lbl_805F90D8[];
-extern "C" s32 lbl_805FB418;
-extern "C" u8 lbl_805FB41C[];
-extern "C" u8 lbl_805FB424[];
-extern "C" s32 lbl_805FB438;
-extern "C" u8 lbl_805FEFEC[];
+extern void* gScreenSets;
+extern u8 lbl_805F90D8[];
+extern s32 lbl_805FB418;
+extern u8 lbl_805FB41C[];
+extern u8 lbl_805FB424[];
+extern s32 lbl_805FB438;
+extern u8 lbl_805FEFEC[];
 extern "C" void SaveManager_SaveOptions(void);
 
 // 0x8013F38C

@@ -5,30 +5,30 @@
 
 #include "types.h"
 
-extern "C" void* gStringTable2;
-extern "C" u8 lbl_804FB5F8[];
-extern "C" u8 lbl_805F97F0[];
-extern "C" s32 lbl_805F9800;
-extern "C" u8 lbl_805F9804[];
-extern "C" u8 lbl_805F9808[];
-extern "C" u8 lbl_805F980C[];
-extern "C" u8 lbl_805F9810[];
-extern "C" u8 lbl_805F9814[];
-extern "C" u8 lbl_805F9818[];
-extern "C" u8 lbl_805F981C[];
-extern "C" f32 lbl_805F9820;
-extern "C" u8 lbl_805FB908[];
-extern "C" u8 lbl_805FB95C[];
-extern "C" u8 lbl_805FB978[];
-extern "C" s32 lbl_805FB97C;
-extern "C" u32 lbl_805FB9A4;
-extern "C" u8 lbl_805FB9D0[];
-extern "C" u8 lbl_805FB9DC[];
-extern "C" u8 lbl_805FB9E0[];
-extern "C" u8 lbl_805FB9EC[];
-extern "C" u8 lbl_806000B4[];
-extern "C" u8 lbl_806000D0[];
-extern "C" u8 sWorldParams[];
+extern void* gStringTable2;
+extern u8 lbl_804FB5F8[];
+extern u8 lbl_805F97F0[];
+extern s32 lbl_805F9800;
+extern u8 lbl_805F9804[];
+extern u8 lbl_805F9808[];
+extern u8 lbl_805F980C[];
+extern u8 lbl_805F9810[];
+extern u8 lbl_805F9814[];
+extern u8 lbl_805F9818[];
+extern u8 lbl_805F981C[];
+extern f32 lbl_805F9820;
+extern u8 lbl_805FB908[];
+extern u8 lbl_805FB95C[];
+extern u8 lbl_805FB978[];
+extern s32 lbl_805FB97C;
+extern u32 lbl_805FB9A4;
+extern u8 lbl_805FB9D0[];
+extern u8 lbl_805FB9DC[];
+extern u8 lbl_805FB9E0[];
+extern u8 lbl_805FB9EC[];
+extern u8 lbl_806000B4[];
+extern u8 lbl_806000D0[];
+extern u8 sWorldParams[];
 extern "C" void fn_801EFC9C(void);
 
 // 0x801EFC74

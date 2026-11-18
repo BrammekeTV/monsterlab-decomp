@@ -18,7 +18,7 @@ void        fn_801AB80C(f32 rate);                         // 0x801AB80C
 void        fn_801AB748(void* h);                          // 0x801AB748
 void        fn_801AB7F0(void* h);                          // 0x801AB7F0
 
-extern void* gScreenSets;                  // 0x805FB654
+extern "C++" void* gScreenSets;                  // 0x805FB654
 extern const char lbl_80381868[];          // 0x80381868 (string block)
 extern const char lbl_803818A8[];          // 0x803818A8 (string)
 extern const char lbl_80381AA0[];          // 0x80381AA0 (string)

@@ -5,10 +5,10 @@
 
 #include "types.h"
 
-extern "C" s32 gZoneResourceSize;
-extern "C" u8 lbl_803C4298[];
-extern "C" f32 lbl_805FD788;
-extern "C" u8 lbl_805FD790[];
+extern s32 gZoneResourceSize;
+extern u8 lbl_803C4298[];
+extern f32 lbl_805FD788;
+extern u8 lbl_805FD790[];
 extern "C" void AimMinigame_Update(u8*);
 extern "C" void StartRumble(s32, u32);
 extern "C" void app_PlayMusic(u32, f32);

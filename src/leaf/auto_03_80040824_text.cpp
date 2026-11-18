@@ -5,10 +5,10 @@
 
 #include "types.h"
 
-extern "C" u8 lbl_805FB05C[];
-extern "C" u8 lbl_805FB060[];
-extern "C" u8 lbl_805FB064[];
-extern "C" u8 lbl_805FD118[];
+extern u8 lbl_805FB05C[];
+extern u8 lbl_805FB060[];
+extern u8 lbl_805FB064[];
+extern u8 lbl_805FD118[];
 
 // 0x80041810
 extern "C" void fn_80041810(u8* a3, u8* a4) {

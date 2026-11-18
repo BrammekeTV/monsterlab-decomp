@@ -3,7 +3,7 @@
 
 extern u8  gWorldState[];          // 0x803E6D00 (holds a pointer to the world block)
 extern u8  gGame[];                // 0x803B53A0
-extern void* gEventMgr;            // 0x805FB6C8
+extern "C++" void* gEventMgr;            // 0x805FB6C8
 extern u32 lbl_805F81C0;           // movie state word
 extern f32 lbl_805FEAE4;           // float constant (lower bound)
 extern f32 lbl_805FEAE8;           // float constant (upper bound)

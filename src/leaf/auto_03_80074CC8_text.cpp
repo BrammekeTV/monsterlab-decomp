@@ -5,9 +5,9 @@
 
 #include "types.h"
 
-extern "C" u8 lbl_805FB130[];
-extern "C" u8 lbl_805FB131[];
-extern "C" u8* lbl_805FB134;
+extern u8 lbl_805FB130[];
+extern u8 lbl_805FB131[];
+extern u8* lbl_805FB134;
 
 // 0x80074D48
 extern "C" s32 fn_80074D48(void) {

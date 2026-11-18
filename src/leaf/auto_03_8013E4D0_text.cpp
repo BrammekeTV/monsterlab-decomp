@@ -5,7 +5,7 @@
 
 #include "types.h"
 
-extern "C" u8 lbl_803F2210[];
+extern u8 lbl_803F2210[];
 extern "C" void UIGroup_DisableHitTest(u32);
 extern "C" void UIGroup_EnableHitTest(u32);
 

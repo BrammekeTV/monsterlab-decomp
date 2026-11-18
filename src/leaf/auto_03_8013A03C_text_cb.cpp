@@ -6,8 +6,8 @@
 #include "types.h"
 #include "game/script_callbacks.h"
 
-extern "C" u8 lbl_805FB23C[];
-extern "C" s32 lbl_805FB350;
+extern u8 lbl_805FB23C[];
+extern s32 lbl_805FB350;
 extern "C" void* EventPost(s32, void*);
 
 // 0x8013B984

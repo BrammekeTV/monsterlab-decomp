@@ -16,8 +16,8 @@ extern u8   lbl_805FB0E1[];         // 0x805FB0E1 (global byte, cleared in StopN
 extern s32  lbl_805FB970;           // 0x805FB970
 extern void* lbl_805FB964;          // 0x805FB964 (network object)
 extern s32  lbl_805FB974;           // 0x805FB974
-extern void* gEventMgr;             // 0x805FB6C8 (ai_states.cpp)
-extern void* gScreenSets;           // 0x805FB654 (small_8019.cpp)
+extern "C++" void* gEventMgr;             // 0x805FB6C8 (ai_states.cpp)
+extern "C++" void* gScreenSets;           // 0x805FB654 (small_8019.cpp)
 
 // ScopedLock is a 4-byte RAII guard (see props.cpp / world_update.cpp).
 struct ScopedLock { u8 pad[4]; };

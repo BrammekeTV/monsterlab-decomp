@@ -31,7 +31,7 @@ BOOL  fn_8004D170(void* chr);
 BOOL  fn_80050F88(void);
 }
 
-extern void* gEventMgr;              // 0x805FB6C8
+extern "C++" void* gEventMgr;              // 0x805FB6C8
 extern void* gObjDb;                 // 0x805FB180
 extern u8*   gSaveSystem;            // 0x805FBBE0
 extern u8*   lbl_805FBBC8;

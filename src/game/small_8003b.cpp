@@ -5,7 +5,7 @@
 extern u8  lbl_80357C10[];   // 0x80357C10 (script registration names)
 extern u8  lbl_805FAFE8[];   // 0x805FAFE8 (global object pointer)
 extern s32 lbl_805FAFF0;     // 0x805FAFF0 (global value)
-extern void* gEventMgr;      // 0x805FB6C8
+extern "C++" void* gEventMgr;      // 0x805FB6C8
 extern f32 lbl_805FCCA0;     // 0x805FCCA0
 extern f32 lbl_805FCD08;     // 0x805FCD08
 extern f32 lbl_805FCD30;     // 0x805FCD30

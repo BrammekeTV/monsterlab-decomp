@@ -66,7 +66,7 @@ f32          gLoadingProgress;               ORIG(0x805FAED0)
 u8           gLoadingTimer[8];               ORIG(0x805FAEC0)
 extern s32   gAudioOverride;                 // 0x805FBA30
 extern f32   lbl_805FBA80, lbl_806002D8;
-extern void* gScreenSets;                    // 0x805FB654
+extern "C++" void* gScreenSets;                    // 0x805FB654
 u32          gGameFlags;                     ORIG(0x805FAED4)
 static u32   sMusicHash;                     ORIG(0x805FAED8)
 static u8    sMusicLoop;                     ORIG(0x805FAEDC)
@@ -74,7 +74,7 @@ static char  sMusicName[0x80];               ORIG(0x803C4918)
 extern u8    gGame[];                        // 0x803B53A0
 extern u8    lbl_805FB0E1;
 extern u8    gWorldState[];                  // 0x803E6D00
-extern s32   gZoneResourceSize;              // 0x805FB94C
+extern "C++" s32   gZoneResourceSize;              // 0x805FB94C
 
 // Game languages (gTextLanguage / gLanguage).
 enum { LANG_EN = 0, LANG_FR = 1, LANG_DE = 2, LANG_IT = 3, LANG_ES = 4, LANG_NL = 5 };

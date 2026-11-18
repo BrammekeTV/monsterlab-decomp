@@ -14,7 +14,7 @@ extern "C" void* memset(void* p, int c, unsigned long n);
 extern u8    gGame[];                 // 0x803B53A0
 extern void* gLab;                    // 0x805FBBC8
 extern u8    gWorldState[];           // 0x803E6D00
-extern void* gEventMgr;               // 0x805FB6C8
+extern "C++" void* gEventMgr;               // 0x805FB6C8
 extern void* gStringTable2;           // 0x805FB90C
 extern u8    lbl_803C2A20[];          // block holding the GameDb pointer at +0xDC8
 extern u8    lbl_803C4298[];          // level info block

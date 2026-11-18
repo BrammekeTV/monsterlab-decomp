@@ -14,7 +14,7 @@ u32    fn_801EC880(u8* p, u32 hash);                                  // 0x801EC
 // r7/r8 receive the two parameters, returns the squared distance in f1.
 f32    fn_801BFE38(u8* a, f32* b, u8* c, u8* d, f32* outT0, f32* outT1);
 extern u8  gWorldState[];       // 0x803E6D00
-extern s32 gZoneResourceSize;   // 0x805FB94C
+extern "C++" s32 gZoneResourceSize;   // 0x805FB94C
 }
 
 // "Start" / "end" node hashes.

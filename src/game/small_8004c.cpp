@@ -27,7 +27,7 @@ BOOL  CharacterOnContact(u8* c, u8* ct);                        // 0x800575E8
 extern u8  lbl_80358D18[];   // 0x80358D18 (vtable)
 extern u8  lbl_80358D80[];   // 0x80358D80 (vtable)
 extern u8  gGame[];          // 0x803B53A0
-extern s32 gZoneResourceSize;// 0x805FB94C
+extern "C++" s32 gZoneResourceSize;// 0x805FB94C
 extern u8  gWorldState[];    // 0x803E6D00
 extern f32 lbl_805FD228;     // 0x805FD228
 extern f32 lbl_805FD240;     // 0x805FD240

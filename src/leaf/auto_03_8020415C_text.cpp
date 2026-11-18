@@ -5,13 +5,13 @@
 
 #include "types.h"
 
-extern "C" u8 lbl_805FBB10[];
-extern "C" u8 lbl_805FBB11[];
-extern "C" u8 lbl_805FBB24[];
-extern "C" u8 lbl_805FBB54[];
-extern "C" u8 lbl_805FBB58[];
-extern "C" u8 lbl_805FBB5C[];
-extern "C" u8 lbl_806003F0[];
+extern u8 lbl_805FBB10[];
+extern u8 lbl_805FBB11[];
+extern u8 lbl_805FBB24[];
+extern u8 lbl_805FBB54[];
+extern u8 lbl_805FBB58[];
+extern u8 lbl_805FBB5C[];
+extern u8 lbl_806003F0[];
 extern "C" void BufferFree(void*);
 extern "C" void* MemAllocDefault(u32);
 

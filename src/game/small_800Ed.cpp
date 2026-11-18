@@ -15,8 +15,8 @@ typedef ScriptValue (*VirtStrSelf)(u8* self);
 extern "C" {
 extern u8   gGame[];                // 0x803B53A0
 extern u8   gWorldState[];          // 0x803E6D00 (holds a pointer to the world state)
-extern s32  gZoneResourceSize;      // 0x805FB94C
-extern void* gEventMgr;             // 0x805FB6C8
+extern "C++" s32  gZoneResourceSize;      // 0x805FB94C
+extern "C++" void* gEventMgr;             // 0x805FB6C8
 extern s32  lbl_805FB1E8;           // 0x805FB1E8 (last random roll)
 extern f32  lbl_805FEB04;           // 0x805FEB04 (float constant, projectile up component)
 extern f32  lbl_805FEB0C;           // 0x805FEB0C (float constant, zero)

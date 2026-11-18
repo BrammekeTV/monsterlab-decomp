@@ -20,7 +20,7 @@ u32     fn_801A65A0(void* obj);                                  // 0x801A65A0
 u32     fn_801A665C(void* obj);                                  // 0x801A665C
 }
 
-extern void* gScreenSets;                       // 0x805FB654
+extern "C++" void* gScreenSets;                       // 0x805FB654
 extern u8    lbl_805FB50C;                      // 0x805FB50C (GX shadow flags byte)
 extern u8    lbl_805F9212;                      // 0x805F9212 (copy filter value)
 extern const char lbl_80383190[];               // 0x80383190 (string)

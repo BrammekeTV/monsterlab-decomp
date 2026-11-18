@@ -6,7 +6,7 @@
 #include "types.h"
 #include "game/script_callbacks.h"
 
-extern "C" u8 lbl_805FB2D0[];
+extern u8 lbl_805FB2D0[];
 
 // 0x801242D0
 BOOL SaveManager_GetPlayerNameFromTmp(s32 a3) {

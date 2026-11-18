@@ -5,9 +5,9 @@
 
 #include "types.h"
 
-extern "C" u8 lbl_8047D2E8[];
-extern "C" u8 lbl_8047D318[];
-extern "C" u8 lbl_805FB800[];
+extern u8 lbl_8047D2E8[];
+extern u8 lbl_8047D318[];
+extern u8 lbl_805FB800[];
 extern "C" void fn_801D66C4(f32, f32);
 
 // 0x801D66B4

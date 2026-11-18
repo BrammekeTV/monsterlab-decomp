@@ -5,11 +5,11 @@
 
 #include "types.h"
 
-extern "C" u8 lbl_803839F0[];
-extern "C" f32 lbl_805FD300;
-extern "C" f32 lbl_805FD304;
-extern "C" u8 lbl_805FD378[];
-extern "C" u8 lbl_805FD37C[];
+extern u8 lbl_803839F0[];
+extern f32 lbl_805FD300;
+extern f32 lbl_805FD304;
+extern u8 lbl_805FD378[];
+extern u8 lbl_805FD37C[];
 extern "C" void fn_801C4B90(u8*, s32, s32, s32, s32, s32);
 
 // 0x80052504

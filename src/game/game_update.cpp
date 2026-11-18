@@ -35,7 +35,7 @@ s32               gMovieZoneSlot = -1;  ORIG(0x805F81C8)
 extern u32        gGameFlags;           ORIG(0x805FAED4)
 extern u8         gIsReturningPlayer;   ORIG(0x805FAEA8)
 extern u8         gWorldState[];        ORIG(0x803E6D00)
-extern View*      gMainView;            ORIG(0x805FB75C)
+extern "C++" View*      gMainView;            ORIG(0x805FB75C)
 extern u8         lbl_8047C7D8[], lbl_8047C7F0[], lbl_805FAEB0[], lbl_803C4298[];
 extern u8         gMoviePlayer[];       ORIG(0x805FB7E8)
 extern s32        gAudioOverride;       ORIG(0x805FBA30)

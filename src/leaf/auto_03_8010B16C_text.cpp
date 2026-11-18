@@ -5,7 +5,7 @@
 
 #include "types.h"
 
-extern "C" f32 lbl_805FEC50;
+extern f32 lbl_805FEC50;
 
 // 0x8010B16C
 extern "C" void fn_8010B16C(u8* a3) {

@@ -5,8 +5,8 @@
 
 #include "types.h"
 
-extern "C" u8 lbl_805FAFC8[];
-extern "C" u8 lbl_805FCAAC[];
+extern u8 lbl_805FAFC8[];
+extern u8 lbl_805FCAAC[];
 
 // 0x800294B4
 extern "C" s32 fn_800294B4(void) {

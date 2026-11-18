@@ -6,7 +6,7 @@
 #include "types.h"
 #include "game/script_callbacks.h"
 
-extern "C" u8 lbl_805FB238[];
+extern u8 lbl_805FB238[];
 
 // 0x8010A1C4
 void StartLobbyCallback(void) {

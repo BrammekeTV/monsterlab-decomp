@@ -5,13 +5,13 @@
 
 #include "types.h"
 
-extern "C" s32 lbl_805FAF90;
-extern "C" u8 lbl_805FAF98;
-extern "C" s32 lbl_805FAF9C;
-extern "C" s32 lbl_805FAFA0;
-extern "C" u8* lbl_805FB134;
-extern "C" f32 lbl_805FC8E0;
-extern "C" f32 lbl_805FC8F4;
+extern s32 lbl_805FAF90;
+extern u8 lbl_805FAF98;
+extern s32 lbl_805FAF9C;
+extern s32 lbl_805FAFA0;
+extern u8* lbl_805FB134;
+extern f32 lbl_805FC8E0;
+extern f32 lbl_805FC8F4;
 extern "C" void UIEngine_LoadUIScreenSet(s32);
 extern "C" void app_PlayMusic(u32, f32);
 

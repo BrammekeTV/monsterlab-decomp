@@ -5,7 +5,7 @@
 
 #include "types.h"
 
-extern "C" f32 lbl_805FE8B0;
+extern f32 lbl_805FE8B0;
 
 // 0x800E2DEC
 extern "C" f32 fn_800E2DEC(void) {

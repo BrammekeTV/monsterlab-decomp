@@ -5,9 +5,9 @@
 
 #include "types.h"
 
-extern "C" u8 lbl_805F98C4[];
-extern "C" u8 lbl_805F98C8[];
-extern "C" u8 lbl_805F98E0[];
+extern u8 lbl_805F98C4[];
+extern u8 lbl_805F98C8[];
+extern u8 lbl_805F98E0[];
 extern "C" void AudioSetPaused(void*, int);
 
 // 0x801FD8EC

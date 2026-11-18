@@ -6,18 +6,18 @@
 #include "types.h"
 #include "game/script_callbacks.h"
 
-extern "C" u8 lbl_805F90D8[];
-extern "C" s32 lbl_805FB418;
-extern "C" u8 lbl_805FB41C[];
-extern "C" u8 lbl_805FB41D[];
-extern "C" u8 lbl_805FB420[];
-extern "C" u8 lbl_805FB428[];
-extern "C" u8 lbl_805FB42C[];
-extern "C" u8 lbl_805FB434[];
-extern "C" s32 lbl_805FB438;
-extern "C" void* lbl_805FB964;
-extern "C" s32 lbl_805FBA30;
-extern "C" u8 lbl_805FEFF0[];
+extern u8 lbl_805F90D8[];
+extern s32 lbl_805FB418;
+extern u8 lbl_805FB41C[];
+extern u8 lbl_805FB41D[];
+extern u8 lbl_805FB420[];
+extern u8 lbl_805FB428[];
+extern u8 lbl_805FB42C[];
+extern u8 lbl_805FB434[];
+extern s32 lbl_805FB438;
+extern void* lbl_805FB964;
+extern s32 lbl_805FBA30;
+extern u8 lbl_805FEFF0[];
 extern "C" void* EventPost(s32, void*);
 extern "C" BOOL fn_801F56FC(s32);
 extern "C" void fn_801F5714(s32);

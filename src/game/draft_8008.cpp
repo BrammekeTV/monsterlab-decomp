@@ -29,7 +29,7 @@ void* fn_80209814(void* v);                                                     
 f32   fn_8033F1FC(f32 y, f32 x);                                                              // 0x8033F1FC
 void  operator_delete(void* p);                                                               // 0x801D426C
 
-extern void* gEventMgr;            // 0x805FB6C8
+extern "C++" void* gEventMgr;            // 0x805FB6C8
 extern u8    gWorldState[];        // 0x803E6D00
 extern u8    lbl_8035B068[];       // 0x8035B068 (vtable)
 extern s32   lbl_80346520[];       // 0x80346520

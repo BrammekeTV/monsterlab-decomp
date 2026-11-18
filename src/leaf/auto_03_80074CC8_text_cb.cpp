@@ -6,7 +6,7 @@
 #include "types.h"
 #include "game/script_callbacks.h"
 
-extern "C" u8 lbl_805FB131[];
+extern u8 lbl_805FB131[];
 
 // 0x80074D68
 void minigame_gameflow_control_pause_transition(void) {

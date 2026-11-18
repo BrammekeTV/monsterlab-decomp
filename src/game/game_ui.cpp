@@ -72,8 +72,8 @@ s32          gPendingScreenId;                  ORIG(0x805FAE94)
 s32          gPendingScreenArg1;                ORIG(0x805FAE98)
 s32          gPendingScreenArg2;                ORIG(0x805FAE9C)
 f32          gPendingScreenTimer;               ORIG(0x805FAEA0)
-extern "C" { void*        gEventMgr;                        ORIG(0x805FB6C8) }
-extern "C" { void*        gScreenSets;                       ORIG(0x805FB654) }
+void*        gEventMgr;                        ORIG(0x805FB6C8)
+void*        gScreenSets;                       ORIG(0x805FB654)
 extern void* lbl_805FB658; extern void* lbl_805FB660; extern void* lbl_805FB670;
 extern u32   gGlobalBinaryField844;             // 0x805FB888
 struct StringTable;
@@ -85,7 +85,7 @@ extern u8    gSirLoader[];                      // 0x8048A8F0
 extern u8    gInput[];                          ORIG(0x803F22D8)
 extern u8    gScriptCtx[];                      ORIG(0x803C4298)
 extern u8    lbl_80359420[];
-extern s32   gZoneResourceSize;                 ORIG(0x805FB94C)
+extern "C++" s32   gZoneResourceSize;                 ORIG(0x805FB94C)
 extern void* gResourceDb;                       ORIG(0x805FB218)
 
 static const f32 kZero = 0.0f;                  ORIG(0x805FC690)

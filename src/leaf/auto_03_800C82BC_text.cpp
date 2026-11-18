@@ -5,9 +5,9 @@
 
 #include "types.h"
 
-extern "C" u8 lbl_805FE478[];
-extern "C" f32 lbl_805FE47C;
-extern "C" f32 lbl_805FE488;
+extern u8 lbl_805FE478[];
+extern f32 lbl_805FE47C;
+extern f32 lbl_805FE488;
 
 // 0x800C82BC
 extern "C" void fn_800C82BC(void) {

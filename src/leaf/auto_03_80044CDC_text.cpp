@@ -5,11 +5,11 @@
 
 #include "types.h"
 
-extern "C" s32 gSelectedPart;
-extern "C" u8 lbl_803C4298[];
-extern "C" u8 lbl_805F865D[];
-extern "C" u8 lbl_805FB099[];
-extern "C" u8 lbl_805FB0BE[];
+extern s32 gSelectedPart;
+extern u8 lbl_803C4298[];
+extern u8 lbl_805F865D[];
+extern u8 lbl_805FB099[];
+extern u8 lbl_805FB0BE[];
 extern "C" void fn_8000B924(u8*, s32, s32);
 
 // 0x80046F54

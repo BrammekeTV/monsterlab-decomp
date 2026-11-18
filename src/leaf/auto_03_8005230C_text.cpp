@@ -5,8 +5,8 @@
 
 #include "types.h"
 
-extern "C" u8 gGameDb[];
-extern "C" u8 lbl_803C2A20[];
+extern u8 gGameDb[];
+extern u8 lbl_803C2A20[];
 
 // 0x80052384
 extern "C" u8* fn_80052384(void) {

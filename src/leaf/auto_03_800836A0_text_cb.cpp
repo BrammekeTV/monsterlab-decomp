@@ -6,8 +6,8 @@
 #include "types.h"
 #include "game/script_callbacks.h"
 
-extern "C" u8* gWorldState;
-extern "C" f32 lbl_805FD848;
+extern u8* gWorldState;
+extern f32 lbl_805FD848;
 
 // 0x800837A8
 void BrainTargetWait(u32 a3) {

@@ -25,7 +25,7 @@ void  fn_80009840(u8* p);                                         // 0x80009840
 s32   fn_8007532C(u8* p);                                         // 0x8007532C
 void  fn_8007043C(void);                                          // 0x8007043C
 u8*   fn_8006FBDC(void);                                          // 0x8006FBDC
-extern void* gScreenSets;                                         // 0x805FB654
+extern "C++" void* gScreenSets;                                         // 0x805FB654
 extern void* gLab;                                                // 0x805FBBC8
 extern u8  lbl_805FB134[];                                        // experiment object pointer
 extern u8  lbl_805FBBE0[];                                        // save block pointer

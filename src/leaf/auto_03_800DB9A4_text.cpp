@@ -5,10 +5,10 @@
 
 #include "types.h"
 
-extern "C" u8 lbl_805FB1A0[];
-extern "C" u8 lbl_805FB1A1;
-extern "C" u8 lbl_805FB1A4[];
-extern "C" u8 lbl_805FE70C[];
+extern u8 lbl_805FB1A0[];
+extern u8 lbl_805FB1A1;
+extern u8 lbl_805FB1A4[];
+extern u8 lbl_805FE70C[];
 extern "C" void fn_800E04CC(u8*);
 
 // 0x800DC504

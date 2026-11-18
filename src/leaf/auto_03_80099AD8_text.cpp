@@ -5,9 +5,9 @@
 
 #include "types.h"
 
-extern "C" f32 lbl_805FDC50;
-extern "C" f32 lbl_805FDC58;
-extern "C" u8 lbl_805FDC64[];
+extern f32 lbl_805FDC50;
+extern f32 lbl_805FDC58;
+extern u8 lbl_805FDC64[];
 extern "C" void PlayExperimentSound(void*, u32, s32);
 extern "C" void StopExperimentSound(void*, u32);
 extern "C" void app_PlayMusic(u32, f32);

@@ -6,12 +6,12 @@
 #include "types.h"
 #include "game/script_callbacks.h"
 
-extern "C" u8* gBattle;
-extern "C" u8 lbl_805FB02C[];
-extern "C" u8* lbl_805FB2B8;
-extern "C" u8 lbl_805FB2C8[];
-extern "C" u8 lbl_805FB2CC[];
-extern "C" u8 lbl_805FB2D4[];
+extern u8* gBattle;
+extern u8 lbl_805FB02C[];
+extern u8* lbl_805FB2B8;
+extern u8 lbl_805FB2C8[];
+extern u8 lbl_805FB2CC[];
+extern u8 lbl_805FB2D4[];
 extern "C" void fn_8005B648(u8*, f32);
 extern "C" void fn_8005F4F8(s32, s32);
 extern "C" void fn_8005F81C(s32, s32);

@@ -6,9 +6,9 @@
 #include "types.h"
 
 extern "C" s32 fn_8019555C(u8* a3);
-extern "C" u8 lbl_805FB688[];
-extern "C" u8 lbl_805FB698[];
-extern "C" u8 lbl_805FFA3C[];
+extern u8 lbl_805FB688[];
+extern u8 lbl_805FB698[];
+extern u8 lbl_805FFA3C[];
 extern "C" void fn_80195608(u8*, s32, s32);
 extern "C" void fn_8019914C(s32, u8*);
 extern "C" void fn_8019B808(void);

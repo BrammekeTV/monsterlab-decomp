@@ -5,10 +5,10 @@
 
 #include "types.h"
 
-extern "C" u8 lbl_804CD0C8[];
-extern "C" u32 lbl_805F969C;
-extern "C" u8 lbl_805FB8CC[];
-extern "C" u8 lbl_805FB8D0[];
+extern u8 lbl_804CD0C8[];
+extern u32 lbl_805F969C;
+extern u8 lbl_805FB8CC[];
+extern u8 lbl_805FB8D0[];
 
 // 0x801E6570
 extern "C" u8* fn_801E6570(s32 a3, s32 a4, s32 a5) {

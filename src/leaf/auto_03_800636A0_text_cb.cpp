@@ -6,7 +6,7 @@
 #include "types.h"
 #include "game/script_callbacks.h"
 
-extern "C" f32 lbl_805FD468;
+extern f32 lbl_805FD468;
 
 // 0x800636A4
 void Projectile_Set_Dead(u32 a3) {

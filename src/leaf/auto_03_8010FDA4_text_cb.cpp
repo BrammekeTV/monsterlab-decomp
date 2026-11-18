@@ -6,11 +6,11 @@
 #include "types.h"
 #include "game/script_callbacks.h"
 
-extern "C" u8 lbl_805FB24D[];
-extern "C" u8 lbl_805FB250[];
-extern "C" u8 lbl_805FB254[];
-extern "C" u8 lbl_805FB258[];
-extern "C" u8 lbl_805FB25C[];
+extern u8 lbl_805FB24D[];
+extern u8 lbl_805FB250[];
+extern u8 lbl_805FB254[];
+extern u8 lbl_805FB258[];
+extern u8 lbl_805FB25C[];
 extern "C" void fn_80119798(u8*);
 extern "C" BOOL fn_80119B00(void);
 extern "C" BOOL fn_80119B38(void);

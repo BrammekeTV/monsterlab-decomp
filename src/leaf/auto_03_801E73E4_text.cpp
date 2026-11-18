@@ -5,11 +5,11 @@
 
 #include "types.h"
 
-extern "C" u8 gScriptFuncs[];
-extern "C" u8 lbl_804DD0C8[];
-extern "C" u8 lbl_804DD0D4[];
-extern "C" u8 lbl_804DD100[];
-extern "C" s32 lbl_805FB6B8;
+extern u8 gScriptFuncs[];
+extern u8 lbl_804DD0C8[];
+extern u8 lbl_804DD0D4[];
+extern u8 lbl_804DD100[];
+extern s32 lbl_805FB6B8;
 extern "C" void BufferFree(void*);
 extern "C" void InterpolateQuaternionTask_Update_SLERP(void);
 extern "C" void InterpolateVector3Task_Update_LERP(void);

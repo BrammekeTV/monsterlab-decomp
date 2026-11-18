@@ -26,7 +26,7 @@ void  fn_80116CA8(u8* p);                                        // 0x80116CA8
 u8*   fn_80116D00(u8* p, s32 del);                               // 0x80116D00
 void  __register_global_object(void* obj, void (*dtor)(void*), void* handle); // 0x8032EFC8
 
-extern void* gScreenSets;           // 0x805FB654
+extern "C++" void* gScreenSets;           // 0x805FB654
 extern f32   gFrameTime;            // 0x805FB918
 extern u8    lbl_80556AB0[];        // 0x80556AB0 (connection lock object)
 extern u8    lbl_80556AC8[];        // 0x80556AC8 (lock object)

@@ -39,7 +39,7 @@ void   MonsterSetName(void* monster, const char* name);    // 0x8021C8E0
 void   MonsterCopyName(void* dst, void* src);              // 0x8020EBB8
 }
 
-extern void*  gScreenSets;          // 0x805FB654
+extern "C++" void*  gScreenSets;          // 0x805FB654
 extern u8     gGame[];              // 0x803B53A0
 extern u8     gPlayerNames[];       // 0x80556E80 (+0x340: 32-byte names)
 extern u32    gAlertPlayerWord;     ORIG(0x805F9030)

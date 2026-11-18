@@ -43,7 +43,7 @@ void  operator_delete(void* p);                                  // 0x801D426C
 
 extern u8   gWorldState[];          // 0x803E6D00 (holds a pointer to the world block; +0xC frame delta)
 extern u8   __files[];              // 0x803B4978
-extern s32  gZoneResourceSize;      // 0x805FB94C
+extern "C++" s32  gZoneResourceSize;      // 0x805FB94C
 extern f32  lbl_80346A58[];         // 0x80346A58 (f32 table indexed by RaySceneTest)
 extern f32  lbl_80346B18[];         // 0x80346B18 (vec3 offset)
 extern f32  lbl_80346B28[];         // 0x80346B28 (f32 table indexed by RaySceneTest)

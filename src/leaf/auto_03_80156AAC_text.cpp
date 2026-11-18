@@ -5,16 +5,16 @@
 
 #include "types.h"
 
-extern "C" u8 gVideoDrawDone[];
-extern "C" u8 lbl_805FB528[];
-extern "C" u8 lbl_805FB550[];
-extern "C" u8 lbl_805FB554[];
-extern "C" u8 lbl_805FB580[];
-extern "C" u8 lbl_805FB590[];
-extern "C" u8 lbl_805FF20C[];
-extern "C" u8 lbl_805FF210[];
-extern "C" u8 lbl_805FF228[];
-extern "C" u8 lbl_805FF22C[];
+extern u8 gVideoDrawDone[];
+extern u8 lbl_805FB528[];
+extern u8 lbl_805FB550[];
+extern u8 lbl_805FB554[];
+extern u8 lbl_805FB580[];
+extern u8 lbl_805FB590[];
+extern u8 lbl_805FF20C[];
+extern u8 lbl_805FF210[];
+extern u8 lbl_805FF228[];
+extern u8 lbl_805FF22C[];
 extern "C" s32 OSSignalSemaphore(u8*);
 
 // 0x80156AAC

@@ -63,7 +63,7 @@ extern u8                  lbl_80401108[];
 s32                        gRendInitialized;     ORIG(0x805F9610)
 s32                        gRendTexelsInMEM2;    ORIG(0x805F95F8) // >= 0: texels/CLUTs get flag 0x80
 s32                        gUseAltRenderSetup;   ORIG(0x805F9214)
-extern "C" { View*                      gMainView;            ORIG(0x805FB75C) }
+View*                      gMainView;            ORIG(0x805FB75C)
 static EngineFrameCallback sFrameCallback;       ORIG(0x805FB784)
 static s32                 sEngineSuspended;     ORIG(0x805FB788)
 static s32                 sEngineSuspendRequest; ORIG(0x805FB78C)
