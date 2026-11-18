@@ -40,7 +40,6 @@ extern "C" void fn_80024D98(u8* a3) {
 
 // 0x800258C0
 extern "C" void fn_800258C0(void) {
-    // tail-call arguments inferred from the registers set before the call
     u8* t0 = *(u8**)((u8*)lbl_805FAFB0);
     s32 t1 = *(s32*)(t0 + 196);
     u32 t2 = (((u32)(t1) << 1) | ((u32)(t1) >> 31)) & 0x1u;
@@ -58,7 +57,6 @@ extern "C" void fn_800258C0(void) {
 
 // 0x800258EC
 extern "C" void fn_800258EC(void) {
-    // tail-call arguments inferred from the registers set before the call
     u8* t0 = *(u8**)((u8*)lbl_805FAFB0);
     s32 t1 = *(s32*)(t0 + 2800);
     u32 t2 = (((u32)(t1) << 1) | ((u32)(t1) >> 31)) & 0x1u;

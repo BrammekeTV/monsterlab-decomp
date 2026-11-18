@@ -6,6 +6,7 @@
 #include "types.h"
 
 extern u8 lbl_805FCCCC[];
+extern "C" void* fn_80030368(u8*);
 extern "C" void fn_80030554(u8*, f32);
 
 // 0x8003074C
@@ -13,14 +14,29 @@ extern "C" void fn_8003074C(u8* a3, f32 f1) {
     fn_80030554(((u8*)(uintptr_t)(a3)), (f32)(f1));
 }
 
+// 0x80030750
+extern "C" void* fn_80030750(u8* a3) {
+    return (void*)(fn_80030368(((u8*)(uintptr_t)(a3))));
+}
+
 // 0x8003089C
 extern "C" void fn_8003089C(u8* a3, f32 f1) {
     fn_80030554(((u8*)(uintptr_t)(a3)), (f32)(f1));
 }
 
+// 0x800308A0
+extern "C" void* fn_800308A0(u8* a3) {
+    return (void*)(fn_80030368(((u8*)(uintptr_t)(a3))));
+}
+
 // 0x800309EC
 extern "C" void fn_800309EC(u8* a3, f32 f1) {
     fn_80030554(((u8*)(uintptr_t)(a3)), (f32)(f1));
+}
+
+// 0x800309F0
+extern "C" void* fn_800309F0(u8* a3) {
+    return (void*)(fn_80030368(((u8*)(uintptr_t)(a3))));
 }
 
 // 0x80030A98
@@ -42,4 +58,9 @@ extern "C" void fn_80030B48(u8* a3, f32 f1) {
     *(f32*)(t1 + 112) = (f32)(t0);
     *(f32*)(((u8*)(uintptr_t)(a3)) + 24) = (f32)(t2);
     fn_80030554(((u8*)(uintptr_t)(a3)), (f32)(f1));
+}
+
+// 0x80030B68
+extern "C" void* fn_80030B68(u8* a3) {
+    return (void*)(fn_80030368(((u8*)(uintptr_t)(a3))));
 }

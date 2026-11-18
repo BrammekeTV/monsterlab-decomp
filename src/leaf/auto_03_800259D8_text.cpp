@@ -17,7 +17,6 @@ extern "C" void fn_80027CD8(void) {
 
 // 0x80027D38
 extern "C" void fn_80027D38(void) {
-    // tail-call arguments inferred from the registers set before the call
     s32 t0 = *(s32*)((u8*)lbl_805FAFBC);
     *(u8*)((u8*)lbl_805F8310) = (u8)((u32)(0));
     if ((s32)(u32)(t0) > 0) {
