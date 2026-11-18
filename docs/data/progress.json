@@ -1,15 +1,15 @@
 {
  "game_id": "RM7P4F",
- "generated": "2026-11-18T16:34:35+00:00",
- "commit": "f10a750",
- "commit_date": "2026-11-18T17:29:43+01:00",
+ "generated": "2026-11-18T16:37:59+00:00",
+ "commit": "a878bcd",
+ "commit_date": "2026-11-18T17:34:36+01:00",
  "game": {
   "functions": 8548,
   "bytes": 2265988,
   "named": 2748,
   "named_bytes": 616800,
-  "decompiled": 3362,
-  "decompiled_bytes": 349392
+  "decompiled": 3421,
+  "decompiled_bytes": 356376
  },
  "library": {
   "functions": 4039,
@@ -24,8 +24,8 @@
   "bytes": 3404928,
   "named": 3211,
   "named_bytes": 721548,
-  "decompiled": 3363,
-  "decompiled_bytes": 349512
+  "decompiled": 3422,
+  "decompiled_bytes": 356496
  },
  "game_range": [
   "80006B40",
@@ -525,11 +525,11 @@
    0.801
   ],
   [
-   0.2,
+   0.401,
    1.0
   ],
   [
-   0.0,
+   0.601,
    0.955
   ],
   [
@@ -3369,6 +3369,316 @@
      "name": "Ingredients_RenderList_GetSelectedImage",
      "addr": "80110F3C",
      "size": 112
+    }
+   ]
+  },
+  {
+   "path": "src/game/lab_books_b.cpp",
+   "functions": [
+    {
+     "name": "Ingredients_SciencePlayOffAnim",
+     "addr": "80111928",
+     "size": 112
+    },
+    {
+     "name": "Ingredients_RemoveCurrentIngredient",
+     "addr": "80111998",
+     "size": 104
+    },
+    {
+     "name": "Ingredients_IsTextureAsyncLoaded",
+     "addr": "80111A00",
+     "size": 112
+    },
+    {
+     "name": "UpdateSelectedIngredientsRecipe",
+     "addr": "8011243C",
+     "size": 104
+    },
+    {
+     "name": "Parts_SetupRenderList",
+     "addr": "801124E4",
+     "size": 104
+    },
+    {
+     "name": "Parts_RenderList_GetSelectedItem",
+     "addr": "8011254C",
+     "size": 112
+    },
+    {
+     "name": "Parts_RenderList_SetSelectedItem",
+     "addr": "801125BC",
+     "size": 120
+    },
+    {
+     "name": "Parts_GetInfoImages",
+     "addr": "80112634",
+     "size": 104
+    },
+    {
+     "name": "Parts_GetTextureList",
+     "addr": "8011269C",
+     "size": 112
+    },
+    {
+     "name": "Parts_GetModificationList",
+     "addr": "8011270C",
+     "size": 112
+    },
+    {
+     "name": "Parts_GetOnMonsterList",
+     "addr": "8011277C",
+     "size": 112
+    },
+    {
+     "name": "Parts_IncrementBodyPart",
+     "addr": "801127EC",
+     "size": 120
+    },
+    {
+     "name": "Parts_IncrementRow",
+     "addr": "80112864",
+     "size": 120
+    },
+    {
+     "name": "Parts_GetBodyPartSlotName",
+     "addr": "801128DC",
+     "size": 112
+    },
+    {
+     "name": "Parts_GetSelectedName",
+     "addr": "8011294C",
+     "size": 112
+    },
+    {
+     "name": "Parts_GetNameByIndex",
+     "addr": "801129BC",
+     "size": 128
+    },
+    {
+     "name": "Parts_GetCurrentPart",
+     "addr": "80112CC4",
+     "size": 112
+    },
+    {
+     "name": "Parts_GetImage",
+     "addr": "80112D34",
+     "size": 112
+    },
+    {
+     "name": "Parts_HasRecipe",
+     "addr": "80112DA4",
+     "size": 112
+    },
+    {
+     "name": "Parts_CanDelete",
+     "addr": "80112E14",
+     "size": 112
+    }
+   ]
+  },
+  {
+   "path": "src/game/lab_books_c.cpp",
+   "functions": [
+    {
+     "name": "Parts_IsValidPart",
+     "addr": "80112E84",
+     "size": 128
+    },
+    {
+     "name": "Parts_IsPartPopupOn",
+     "addr": "80112F04",
+     "size": 128
+    },
+    {
+     "name": "Parts_SetPartPopup",
+     "addr": "80112F84",
+     "size": 120
+    },
+    {
+     "name": "Parts_IsTextureAsyncLoaded",
+     "addr": "80113080",
+     "size": 112
+    },
+    {
+     "name": "Parts_GetDeleteString",
+     "addr": "801130F0",
+     "size": 112
+    },
+    {
+     "name": "Parts_RemoveCurrentPart",
+     "addr": "80113160",
+     "size": 104
+    },
+    {
+     "name": "Parts_IsCurrentPartOnMonster",
+     "addr": "801131C8",
+     "size": 112
+    },
+    {
+     "name": "Creatures_GetCurrentHP",
+     "addr": "80113340",
+     "size": 124
+    },
+    {
+     "name": "Creatures_GetCurrentEnergy",
+     "addr": "801133BC",
+     "size": 124
+    },
+    {
+     "name": "Creatures_GetCurrentAttack",
+     "addr": "80113438",
+     "size": 124
+    },
+    {
+     "name": "Creatures_GetCurrentDefense",
+     "addr": "801134B4",
+     "size": 124
+    },
+    {
+     "name": "Creatures_GetCurrentMadness",
+     "addr": "80113530",
+     "size": 124
+    },
+    {
+     "name": "Creatures_GetMaxMadness",
+     "addr": "801135AC",
+     "size": 124
+    },
+    {
+     "name": "Creatures_InitEntityData",
+     "addr": "80113628",
+     "size": 116
+    },
+    {
+     "name": "Creatures_UpdateMonsterImage",
+     "addr": "8011369C",
+     "size": 116
+    },
+    {
+     "name": "Creatures_MonstersInInventory",
+     "addr": "8011378C",
+     "size": 124
+    },
+    {
+     "name": "Creatures_GetCreatureLoaded",
+     "addr": "80113808",
+     "size": 124
+    },
+    {
+     "name": "Creatures_AdjustPositionForLegs",
+     "addr": "80113884",
+     "size": 116
+    },
+    {
+     "name": "fn_801138F8",
+     "addr": "801138F8",
+     "size": 124
+    }
+   ]
+  },
+  {
+   "path": "src/game/lab_books_stats.cpp",
+   "functions": [
+    {
+     "name": "MatchupGetRemoteData",
+     "addr": "80113974",
+     "size": 124
+    },
+    {
+     "name": "Statistics_GetPlayerRank",
+     "addr": "80113A74",
+     "size": 124
+    },
+    {
+     "name": "Statistics_GetPlayerMSP",
+     "addr": "80113AF0",
+     "size": 124
+    },
+    {
+     "name": "Statistics_GetPlayerNextMSP",
+     "addr": "80113B6C",
+     "size": 124
+    },
+    {
+     "name": "Statistics_GetPartMadness",
+     "addr": "80113BE8",
+     "size": 124
+    },
+    {
+     "name": "Statistics_GetMonsterMadness",
+     "addr": "80113C64",
+     "size": 124
+    },
+    {
+     "name": "Statistics_GetMonstersBuilt",
+     "addr": "80113CE0",
+     "size": 124
+    },
+    {
+     "name": "Statistics_GetBattlesWon",
+     "addr": "80113D5C",
+     "size": 124
+    },
+    {
+     "name": "Statistics_GetBattlesLost",
+     "addr": "80113DD8",
+     "size": 124
+    },
+    {
+     "name": "Statistics_GetMonstersGoneMad",
+     "addr": "80113E54",
+     "size": 124
+    },
+    {
+     "name": "Statistics_GetExperimentSuccess",
+     "addr": "80113ED0",
+     "size": 124
+    },
+    {
+     "name": "Statistics_GetExperimentFailure",
+     "addr": "80113F4C",
+     "size": 124
+    },
+    {
+     "name": "Statistics_SetupChallengeBestTimes",
+     "addr": "80113FC8",
+     "size": 116
+    },
+    {
+     "name": "Statistics_SetupExperimentHighScores",
+     "addr": "8011403C",
+     "size": 116
+    },
+    {
+     "name": "Statistics_SetupRegionCombatMSP",
+     "addr": "801140B0",
+     "size": 116
+    },
+    {
+     "name": "Statistics_GetDisplayScientistStats",
+     "addr": "80114124",
+     "size": 124
+    },
+    {
+     "name": "Statistics_GetDisplayExperimentStats",
+     "addr": "801141A0",
+     "size": 124
+    },
+    {
+     "name": "Statistics_GetDisplayChallengeStats",
+     "addr": "8011421C",
+     "size": 124
+    },
+    {
+     "name": "Statistics_GetDisplayCombatStats",
+     "addr": "80114298",
+     "size": 124
+    },
+    {
+     "name": "Statistics_GetExperimentPage1",
+     "addr": "80114314",
+     "size": 124
     }
    ]
   },
