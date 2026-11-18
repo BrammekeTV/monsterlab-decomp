@@ -69,6 +69,11 @@
  "changelog": [
   {
    "date": "2026-11-18",
+   "time": "18:11",
+   "text": "Decompiled 59 more small functions: the minigame game-flow states (intro, gameplay, success/failure outros, quit, pause) and conversation HUD helpers (0x8001), score accumulators, tree lookups, constructors and destructors (0x800A), and object references and path movement/blocking checks (0x800D). Written by low-cost helper agents and reviewed."
+  },
+  {
+   "date": "2026-11-18",
    "time": "18:07",
    "text": "Decompiled 59 more small functions: junction, part discipline, quest start/end, field repair and NIS camera script callbacks (0x800F), engine camera init/end-frame, hash table lookup and frame tint/eggcrate/blur effects (0x801D), and online match connection, disc/net error flags and sleep helpers (0x8014). Written by low-cost helper agents and reviewed."
   },

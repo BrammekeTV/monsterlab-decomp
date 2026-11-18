@@ -1,15 +1,15 @@
 {
  "game_id": "RM7P4F",
- "generated": "2026-11-18T17:07:36+00:00",
- "commit": "e7154f0",
- "commit_date": "2026-11-18T18:01:17+01:00",
+ "generated": "2026-11-18T17:11:55+00:00",
+ "commit": "3da5b21",
+ "commit_date": "2026-11-18T18:07:37+01:00",
  "game": {
   "functions": 8548,
   "bytes": 2265988,
   "named": 2748,
   "named_bytes": 616800,
-  "decompiled": 3699,
-  "decompiled_bytes": 382348
+  "decompiled": 3759,
+  "decompiled_bytes": 387552
  },
  "library": {
   "functions": 4039,
@@ -24,8 +24,8 @@
   "bytes": 3404928,
   "named": 3211,
   "named_bytes": 721548,
-  "decompiled": 3700,
-  "decompiled_bytes": 382468
+  "decompiled": 3760,
+  "decompiled_bytes": 387672
  },
  "game_range": [
   "80006B40",
@@ -53,7 +53,7 @@
    0.936
   ],
   [
-   0.325,
+   0.335,
    0.737
   ],
   [
@@ -65,11 +65,11 @@
    0.917
   ],
   [
-   0.892,
+   0.923,
    0.921
   ],
   [
-   0.025,
+   0.184,
    0.858
   ],
   [
@@ -317,15 +317,15 @@
    0.052
   ],
   [
-   0.012,
+   0.054,
    0.005
   ],
   [
-   0.003,
+   0.048,
    0.0
   ],
   [
-   0.012,
+   0.134,
    0.0
   ],
   [
@@ -405,19 +405,19 @@
    0.0
   ],
   [
-   0.008,
+   0.053,
    0.0
   ],
   [
-   0.007,
+   0.038,
    0.041
   ],
   [
-   0.06,
+   0.156,
    0.099
   ],
   [
-   0.008,
+   0.02,
    0.201
   ],
   [
@@ -4458,6 +4458,111 @@
    ]
   },
   {
+   "path": "src/game/minigame_flow.cpp",
+   "functions": [
+    {
+     "name": "fn_800124DC",
+     "addr": "800124DC",
+     "size": 88
+    },
+    {
+     "name": "minigame_gameflow_control_intro_entry",
+     "addr": "8001A17C",
+     "size": 76
+    },
+    {
+     "name": "minigame_gameflow_control_intro_update",
+     "addr": "8001A1C8",
+     "size": 120
+    },
+    {
+     "name": "minigame_gameflow_control_intro_exit",
+     "addr": "8001A244",
+     "size": 76
+    },
+    {
+     "name": "minigame_gameflow_control_gameplay_entry",
+     "addr": "8001A290",
+     "size": 108
+    },
+    {
+     "name": "minigame_gameflow_control_gameplay_update",
+     "addr": "8001A300",
+     "size": 120
+    },
+    {
+     "name": "minigame_gameflow_control_gameplay_exit",
+     "addr": "8001A378",
+     "size": 108
+    },
+    {
+     "name": "minigame_gameflow_control_success_outro_entry",
+     "addr": "8001A3E8",
+     "size": 76
+    },
+    {
+     "name": "minigame_gameflow_control_failure_outro_entry",
+     "addr": "8001A434",
+     "size": 76
+    },
+    {
+     "name": "minigame_gameflow_control_success_outro_update",
+     "addr": "8001A480",
+     "size": 120
+    },
+    {
+     "name": "minigame_gameflow_control_failure_outro_update",
+     "addr": "8001A4F8",
+     "size": 120
+    },
+    {
+     "name": "minigame_gameflow_control_quit",
+     "addr": "8001A570",
+     "size": 56
+    },
+    {
+     "name": "minigame_gameflow_control_success_outro_exit",
+     "addr": "8001A5A8",
+     "size": 76
+    },
+    {
+     "name": "minigame_gameflow_control_failure_outro_exit",
+     "addr": "8001A5F4",
+     "size": 76
+    },
+    {
+     "name": "minigame_gameflow_control_pause_update",
+     "addr": "8001A640",
+     "size": 56
+    },
+    {
+     "name": "minigame_gameflow_control_success_fail_screen_update",
+     "addr": "8001A678",
+     "size": 56
+    },
+    {
+     "name": "fn_8001AFCC",
+     "addr": "8001AFCC",
+     "size": 120
+    },
+    {
+     "name": "fn_8001B044",
+     "addr": "8001B044",
+     "size": 80
+    },
+    {
+     "name": "HudShowConversation",
+     "addr": "8001B0B8",
+     "size": 112
+    },
+    {
+     "name": "fn_8001B128",
+     "addr": "8001B128",
+     "size": 60
+    }
+   ]
+  },
+  {
    "path": "src/game/monster.cpp",
    "functions": [
     {
@@ -7323,6 +7428,111 @@
    ]
   },
   {
+   "path": "src/game/small_800A.cpp",
+   "functions": [
+    {
+     "name": "fn_800A1758",
+     "addr": "800A1758",
+     "size": 72
+    },
+    {
+     "name": "fn_800A17A0",
+     "addr": "800A17A0",
+     "size": 88
+    },
+    {
+     "name": "fn_800A17F8",
+     "addr": "800A17F8",
+     "size": 88
+    },
+    {
+     "name": "fn_800A1BEC",
+     "addr": "800A1BEC",
+     "size": 64
+    },
+    {
+     "name": "fn_800A22F4",
+     "addr": "800A22F4",
+     "size": 52
+    },
+    {
+     "name": "fn_800A3128",
+     "addr": "800A3128",
+     "size": 96
+    },
+    {
+     "name": "fn_800A34C0",
+     "addr": "800A34C0",
+     "size": 68
+    },
+    {
+     "name": "fn_800A3504",
+     "addr": "800A3504",
+     "size": 88
+    },
+    {
+     "name": "fn_800A38F4",
+     "addr": "800A38F4",
+     "size": 80
+    },
+    {
+     "name": "fn_800A3944",
+     "addr": "800A3944",
+     "size": 96
+    },
+    {
+     "name": "fn_800A5AEC",
+     "addr": "800A5AEC",
+     "size": 96
+    },
+    {
+     "name": "fn_800A5B4C",
+     "addr": "800A5B4C",
+     "size": 96
+    },
+    {
+     "name": "fn_800A5BCC",
+     "addr": "800A5BCC",
+     "size": 96
+    },
+    {
+     "name": "fn_800A5CB4",
+     "addr": "800A5CB4",
+     "size": 120
+    },
+    {
+     "name": "fn_800A5F8C",
+     "addr": "800A5F8C",
+     "size": 124
+    },
+    {
+     "name": "fn_800A63B4",
+     "addr": "800A63B4",
+     "size": 56
+    },
+    {
+     "name": "fn_800A63EC",
+     "addr": "800A63EC",
+     "size": 100
+    },
+    {
+     "name": "fn_800A6450",
+     "addr": "800A6450",
+     "size": 100
+    },
+    {
+     "name": "fn_800A64B4",
+     "addr": "800A64B4",
+     "size": 100
+    },
+    {
+     "name": "fn_800A6538",
+     "addr": "800A6538",
+     "size": 116
+    }
+   ]
+  },
+  {
    "path": "src/game/small_800B.cpp",
    "functions": [
     {
@@ -7634,6 +7844,111 @@
      "name": "fn_800C8DF8",
      "addr": "800C8DF8",
      "size": 88
+    }
+   ]
+  },
+  {
+   "path": "src/game/small_800D.cpp",
+   "functions": [
+    {
+     "name": "fn_800D0068",
+     "addr": "800D0068",
+     "size": 76
+    },
+    {
+     "name": "fn_800D00B4",
+     "addr": "800D00B4",
+     "size": 64
+    },
+    {
+     "name": "fn_800D00F4",
+     "addr": "800D00F4",
+     "size": 128
+    },
+    {
+     "name": "fn_800D0174",
+     "addr": "800D0174",
+     "size": 76
+    },
+    {
+     "name": "fn_800D1C8C",
+     "addr": "800D1C8C",
+     "size": 52
+    },
+    {
+     "name": "fn_800D1CD0",
+     "addr": "800D1CD0",
+     "size": 52
+    },
+    {
+     "name": "fn_800D1D08",
+     "addr": "800D1D08",
+     "size": 52
+    },
+    {
+     "name": "fn_800D33E0",
+     "addr": "800D33E0",
+     "size": 72
+    },
+    {
+     "name": "fn_800D393C",
+     "addr": "800D393C",
+     "size": 128
+    },
+    {
+     "name": "fn_800D41F4",
+     "addr": "800D41F4",
+     "size": 88
+    },
+    {
+     "name": "fn_800D46B0",
+     "addr": "800D46B0",
+     "size": 128
+    },
+    {
+     "name": "fn_800D4B74",
+     "addr": "800D4B74",
+     "size": 64
+    },
+    {
+     "name": "fn_800D4BB4",
+     "addr": "800D4BB4",
+     "size": 52
+    },
+    {
+     "name": "fn_800D4BE8",
+     "addr": "800D4BE8",
+     "size": 92
+    },
+    {
+     "name": "ObjRefDtor",
+     "addr": "800D50D0",
+     "size": 64
+    },
+    {
+     "name": "fn_800D5110",
+     "addr": "800D5110",
+     "size": 100
+    },
+    {
+     "name": "fn_800D59A4",
+     "addr": "800D59A4",
+     "size": 48
+    },
+    {
+     "name": "fn_800D5BD4",
+     "addr": "800D5BD4",
+     "size": 116
+    },
+    {
+     "name": "PathSetMoving",
+     "addr": "800D5D5C",
+     "size": 72
+    },
+    {
+     "name": "PathExitBlocked",
+     "addr": "800D6998",
+     "size": 104
     }
    ]
   },
