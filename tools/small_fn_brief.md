@@ -23,7 +23,8 @@ list of small PowerPC functions, into ONE NEW file named in your task.
   dtor with -1, `operator_delete(p)` if del > 0, return p. Store pointers (vtables, tables)
   as `*(void**)(p + off) = ptr;`, never via `(u32)` casts (the PC build is x64). `fcmpo` + `cror eq,gt,eq` = `>=`,
   `cror eq,lt,eq` = `<=`. Float constants may be `extern f32 lbl_X;`.
-- Skip anything unclear rather than guess.
+- Skip anything unclear rather than guess. Do not write any file other than your own
+  new source file (no scratch/dump files anywhere); read asm straight from tools/dump.sh output.
 - `python tools/check.py 2>&1 | tail -15`: fix errors in YOUR file only (others edit
   concurrently). Edit only your file. No git commit, no config/ edits, no dtk/rename/progress.
 

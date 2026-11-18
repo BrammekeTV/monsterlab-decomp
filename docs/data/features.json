@@ -69,6 +69,11 @@
  "changelog": [
   {
    "date": "2026-11-18",
+   "time": "17:54",
+   "text": "Decompiled 59 more small functions: combat HUD paper doll, part lock and limb-lost display plus combat results pause/resume (0x8004), experiment sounds, dance animation and welding experiment checks (0x8007), and conversation/dialogue script callbacks and character race reset (0x8005). Written by low-cost helper agents and reviewed."
+  },
+  {
+   "date": "2026-11-18",
    "time": "17:49",
    "text": "Decompiled 58 more small functions: engine ray queries, rumble and overlay helpers (0x801B), UI screen-set and widget lookup functions (0x8019), and entity base helpers (child state flags, effect spawning, ranges; 0x8006). Written by low-cost helper agents and reviewed."
   },

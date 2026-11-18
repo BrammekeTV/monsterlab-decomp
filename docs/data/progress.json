@@ -1,15 +1,15 @@
 {
  "game_id": "RM7P4F",
- "generated": "2026-11-18T16:49:36+00:00",
- "commit": "2d6dc3d",
- "commit_date": "2026-11-18T17:44:49+01:00",
+ "generated": "2026-11-18T16:54:55+00:00",
+ "commit": "6e1c17d",
+ "commit_date": "2026-11-18T17:49:36+01:00",
  "game": {
   "functions": 8548,
   "bytes": 2265988,
   "named": 2748,
   "named_bytes": 616800,
-  "decompiled": 3523,
-  "decompiled_bytes": 365896
+  "decompiled": 3581,
+  "decompiled_bytes": 371016
  },
  "library": {
   "functions": 4039,
@@ -24,8 +24,8 @@
   "bytes": 3404928,
   "named": 3211,
   "named_bytes": 721548,
-  "decompiled": 3524,
-  "decompiled_bytes": 366016
+  "decompiled": 3582,
+  "decompiled_bytes": 371136
  },
  "game_range": [
   "80006B40",
@@ -137,23 +137,23 @@
    0.006
   ],
   [
-   0.052,
+   0.096,
    0.019
   ],
   [
-   0.064,
+   0.076,
    0.03
   ],
   [
-   0.433,
+   0.484,
    0.398
   ],
   [
-   0.003,
+   0.038,
    0.687
   ],
   [
-   0.298,
+   0.353,
    0.736
   ],
   [
@@ -169,11 +169,11 @@
    0.233
   ],
   [
-   0.054,
+   0.208,
    0.378
   ],
   [
-   0.084,
+   0.12,
    0.078
   ],
   [
@@ -229,23 +229,23 @@
    0.125
   ],
   [
-   0.622,
+   0.632,
    0.725
   ],
   [
-   0.064,
+   0.081,
    0.312
   ],
   [
-   0.089,
+   0.138,
    0.115
   ],
   [
-   0.017,
+   0.082,
    0.049
   ],
   [
-   0.039,
+   0.083,
    0.034
   ],
   [
@@ -6218,6 +6218,211 @@
    ]
   },
   {
+   "path": "src/game/small_8004b.cpp",
+   "functions": [
+    {
+     "name": "fn_80040638",
+     "addr": "80040638",
+     "size": 128
+    },
+    {
+     "name": "fn_800406B8",
+     "addr": "800406B8",
+     "size": 116
+    },
+    {
+     "name": "fn_8004072C",
+     "addr": "8004072C",
+     "size": 124
+    },
+    {
+     "name": "fn_80041AB4",
+     "addr": "80041AB4",
+     "size": 104
+    },
+    {
+     "name": "fn_800440E0",
+     "addr": "800440E0",
+     "size": 124
+    },
+    {
+     "name": "fn_800442CC",
+     "addr": "800442CC",
+     "size": 128
+    },
+    {
+     "name": "fn_80044F20",
+     "addr": "80044F20",
+     "size": 52
+    },
+    {
+     "name": "fn_80044F54",
+     "addr": "80044F54",
+     "size": 80
+    },
+    {
+     "name": "fn_8004504C",
+     "addr": "8004504C",
+     "size": 116
+    },
+    {
+     "name": "CombatHUD_UpdatePlayersPaperDoll",
+     "addr": "800450C0",
+     "size": 120
+    },
+    {
+     "name": "LockPartSelected",
+     "addr": "80046B48",
+     "size": 84
+    },
+    {
+     "name": "BattleHudLimbLost",
+     "addr": "800477DC",
+     "size": 112
+    },
+    {
+     "name": "fn_80049494",
+     "addr": "80049494",
+     "size": 64
+    },
+    {
+     "name": "CombatResultsPauseGame",
+     "addr": "800494D4",
+     "size": 80
+    },
+    {
+     "name": "CombatResultsResumeGame",
+     "addr": "80049524",
+     "size": 80
+    },
+    {
+     "name": "fn_80049628",
+     "addr": "80049628",
+     "size": 60
+    },
+    {
+     "name": "fn_80049664",
+     "addr": "80049664",
+     "size": 88
+    },
+    {
+     "name": "fn_800496DC",
+     "addr": "800496DC",
+     "size": 76
+    },
+    {
+     "name": "fn_80049728",
+     "addr": "80049728",
+     "size": 104
+    },
+    {
+     "name": "fn_80049790",
+     "addr": "80049790",
+     "size": 68
+    }
+   ]
+  },
+  {
+   "path": "src/game/small_8005.cpp",
+   "functions": [
+    {
+     "name": "set_conversation_reg",
+     "addr": "8005070C",
+     "size": 128
+    },
+    {
+     "name": "SetPlayerOption",
+     "addr": "8005078C",
+     "size": 60
+    },
+    {
+     "name": "Conversation_reg_eq",
+     "addr": "800507C8",
+     "size": 72
+    },
+    {
+     "name": "SetNpcLineID",
+     "addr": "80050810",
+     "size": 116
+    },
+    {
+     "name": "SetNameID",
+     "addr": "80050884",
+     "size": 76
+    },
+    {
+     "name": "fn_80050EB0",
+     "addr": "80050EB0",
+     "size": 88
+    },
+    {
+     "name": "ConversationStopVoiceSFX",
+     "addr": "80051298",
+     "size": 56
+    },
+    {
+     "name": "ConversationPlayAnim",
+     "addr": "80051658",
+     "size": 76
+    },
+    {
+     "name": "ConversationEnqueAnim",
+     "addr": "800516A4",
+     "size": 128
+    },
+    {
+     "name": "SetLocalStringTable",
+     "addr": "80051744",
+     "size": 72
+    },
+    {
+     "name": "ConversationSignal",
+     "addr": "8005178C",
+     "size": 52
+    },
+    {
+     "name": "ShowEventPopup",
+     "addr": "800517F0",
+     "size": 68
+    },
+    {
+     "name": "fn_80051F04",
+     "addr": "80051F04",
+     "size": 64
+    },
+    {
+     "name": "fn_80052200",
+     "addr": "80052200",
+     "size": 76
+    },
+    {
+     "name": "fn_8005224C",
+     "addr": "8005224C",
+     "size": 108
+    },
+    {
+     "name": "fn_800522B8",
+     "addr": "800522B8",
+     "size": 52
+    },
+    {
+     "name": "fn_8005265C",
+     "addr": "8005265C",
+     "size": 116
+    },
+    {
+     "name": "fn_80053258",
+     "addr": "80053258",
+     "size": 72
+    },
+    {
+     "name": "CharacterResetRace",
+     "addr": "800534C0",
+     "size": 124
+    }
+   ]
+  },
+  {
    "path": "src/game/small_8006.cpp",
    "functions": [
     {
@@ -6424,6 +6629,106 @@
      "name": "ReleaseDanceAnimation",
      "addr": "80076864",
      "size": 84
+    }
+   ]
+  },
+  {
+   "path": "src/game/small_8007b.cpp",
+   "functions": [
+    {
+     "name": "StopAllExperimentSounds",
+     "addr": "80070ED0",
+     "size": 112
+    },
+    {
+     "name": "fn_80074CC8",
+     "addr": "80074CC8",
+     "size": 128
+    },
+    {
+     "name": "PlayDanceAnimation",
+     "addr": "800768B8",
+     "size": 112
+    },
+    {
+     "name": "fn_80076A6C",
+     "addr": "80076A6C",
+     "size": 76
+    },
+    {
+     "name": "fn_80076AB8",
+     "addr": "80076AB8",
+     "size": 68
+    },
+    {
+     "name": "fn_80076AFC",
+     "addr": "80076AFC",
+     "size": 96
+    },
+    {
+     "name": "fn_80076B5C",
+     "addr": "80076B5C",
+     "size": 64
+    },
+    {
+     "name": "fn_80077544",
+     "addr": "80077544",
+     "size": 96
+    },
+    {
+     "name": "fn_80077A90",
+     "addr": "80077A90",
+     "size": 92
+    },
+    {
+     "name": "fn_80077AEC",
+     "addr": "80077AEC",
+     "size": 68
+    },
+    {
+     "name": "WeldingGunOffUpdate",
+     "addr": "80077B50",
+     "size": 56
+    },
+    {
+     "name": "WeldingGunOnUpdate",
+     "addr": "80077B88",
+     "size": 56
+    },
+    {
+     "name": "WeldingOverTrench",
+     "addr": "80077BF4",
+     "size": 84
+    },
+    {
+     "name": "WeldingBadWeld",
+     "addr": "80077C50",
+     "size": 56
+    },
+    {
+     "name": "WeldingShakeThresholdBeaten",
+     "addr": "80077C88",
+     "size": 56
+    },
+    {
+     "name": "fn_80079C78",
+     "addr": "80079C78",
+     "size": 68
+    },
+    {
+     "name": "fn_80079D40",
+     "addr": "80079D40",
+     "size": 104
+    },
+    {
+     "name": "fn_80079DA8",
+     "addr": "80079DA8",
+     "size": 108
+    },
+    {
+     "name": "fn_80079E20",
+     "addr": "80079E20",
+     "size": 108
     }
    ]
   },
