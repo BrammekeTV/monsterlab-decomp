@@ -168,3 +168,105 @@ void EntryComputeRequiredRank(u8* e) {
 }
 
 }  // extern "C"
+
+// ---------------------------------------------------------------- monster parts and name
+
+extern "C" {
+s32  PartPower(s32 defIndex, s32 tier);                  // 0x8021B650 (opponent_gen.cpp)
+u8   PartGetTier(const PartInstance* p);                 // 0x8021EF58
+s32  PartGetEnergy(const PartInstance* torso, u8* m);    // 0x8021ECA8
+u32  StrLength(const char* s);                           // 0x80221284
+}
+
+#define MONSTER_POWER(m)    (*(s32*)((m) + 0x18))
+#define MONSTER_NAME_LEN(m) (*(u16*)((m) + 0x20))
+#define MONSTER_NAME(m)     ((u16*)((m) + 0x22))     // characters stored minus 0x20
+#define NAME_MAX            16
+
+extern "C" {
+
+// 0x8021C754
+// Monster vtable slot 0x18: take the part out of `slot`.
+void MonsterDetachPart(u8* m, s32 slot) {
+    if (slot == -1) return;
+    PartInstance* p = MONSTER_PART(m, slot);
+    if (p == NULL) return;
+    p->unk2C = 0;
+    s32 tier = PartGetTier(MONSTER_PART(m, slot));
+    MONSTER_POWER(m) -= PartPower(MONSTER_PART(m, slot)->defIndex, tier);
+    MONSTER_PART(m, slot) = NULL;
+}
+
+// 0x8021C604
+// Put `p` into `slot`, first removing whatever is there.
+void MonsterAttachPart(u8* m, s32 slot, PartInstance* p) {
+    if (slot == -1) return;
+    if (MONSTER_PART(m, slot) != NULL) ((void (*)(u8*, s32))(*(void**)(*(u8**)m + 0x18)))(m, slot);
+    if (p == NULL) return;
+    s32 tier = PartGetTier(p);
+    MONSTER_POWER(m) += PartPower(p->defIndex, tier);
+    MONSTER_PART(m, slot) = p;
+    p->unk2C = 1;
+}
+
+// 0x8021C898
+void MonsterSetNameChars(u8* m, const u16* chars, u16 len) {
+    MONSTER_NAME_LEN(m) = len > NAME_MAX ? NAME_MAX : len;
+    for (u16 i = 0; i < MONSTER_NAME_LEN(m); i++) MONSTER_NAME(m)[i] = chars[i];
+}
+
+// 0x8021C8E0
+void MonsterSetName(u8* m, const char* name) {
+    u16 len = (u16)StrLength(name);
+    MONSTER_NAME_LEN(m) = len > NAME_MAX ? NAME_MAX : len;
+    for (s32 i = 0; i < MONSTER_NAME_LEN(m); i++) MONSTER_NAME(m)[i] = (u16)((u8)name[i] - 0x20);
+}
+
+// 0x8021C968
+void MonsterGetName(u8* m, char* out, s32 size) {
+    s32 n = size - 1;
+    if (n > MONSTER_NAME_LEN(m)) n = MONSTER_NAME_LEN(m);
+    s32 i = 0;
+    for (; i < n; i++) out[i] = (char)(MONSTER_NAME(m)[i] + 0x20);
+    out[i] = 0;
+}
+
+// 0x8021CA88
+BOOL MonsterHasPartDef(u8* m, s32 defIndex, BOOL checkTier) {
+    for (s32 i = 0; i < 5; i++) {
+        PartInstance* p = MONSTER_PART(m, i);
+        if (p == NULL || p->defIndex != defIndex) continue;
+        if (checkTier) PartGetTier(MONSTER_PART(m, i));    // result unused in the original
+        return TRUE;
+    }
+    return FALSE;
+}
+
+// 0x8021CB08
+BOOL MonsterHasPart(u8* m, const PartInstance* p) {
+    for (s32 i = 0; i < 5; i++)
+        if (MONSTER_PART(m, i) == p) return TRUE;
+    return FALSE;
+}
+
+// 0x8021CB78
+s32 MonsterGetEnergy(u8* m) {
+    if (MONSTER_PART(m, 4) == NULL) return 0;
+    return PartGetEnergy(MONSTER_PART(m, 4), m);
+}
+
+// 0x8021F294
+// The lab monster a part is fitted to (NULL if the part is not in use).
+u8* PartFindOwner(PartInstance* p) {
+    if (p->unk2C == 0) return NULL;
+    u8** monsters = (u8**)(gSaveSystem + 0xA30);
+    s32 count = *(s32*)(gSaveSystem + 0xA30 + 0x6B8);
+    for (s32 i = 0; i < count; i++)
+        if (monsters[i] != NULL && MonsterHasPart(monsters[i], p)) return monsters[i];
+    return NULL;
+}
+
+// 0x80221284
+u32 StrLength(const char* s) { u32 n = 0; while (s[n]) n++; return n; }
+
+}  // extern "C"

@@ -161,7 +161,8 @@ struct OpponentTemplate {
 
 
 // A part's power: the definition's base power scaled by the multiplier for its tier.
-static s32 PartPower(s32 defIndex, s8 tier) {
+// 0x8021B650
+extern "C" s32 PartPower(s32 defIndex, s32 tier) {
     if (defIndex == -1) return 0;
     PartDef def;
     PartDbGetDef(&def, gGameDb, defIndex);
@@ -176,7 +177,8 @@ static s32 PartPower(s32 defIndex, s8 tier) {
     return p / 100;
 }
 
-static s32 SpecPower(const u8* spec) {
+// 0x8021B25C
+extern "C" s32 SpecPower(const u8* spec) {
     s32 total = 0;
     for (s32 i = 0; i < LIMBS; i++) total += PartPower(*(const s32*)(spec + kLimbDef[i]), (s8)spec[kLimbTier[i]]);
     return total;

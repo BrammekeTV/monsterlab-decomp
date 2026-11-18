@@ -637,3 +637,14 @@ fn_8021C888 MonsterGetPart
 fn_802233D4 SaveUnlockAchievement
 fn_80228604 SaveUnlockTieredAchievements
 lbl_80389100 gMonsterVtable
+fn_8021B25C SpecPower
+fn_8021B650 PartPower
+fn_8021C604 MonsterAttachPart
+fn_8021C754 MonsterDetachPart
+fn_8021C898 MonsterSetNameChars
+fn_8021C968 MonsterGetName
+fn_8021CA88 MonsterHasPartDef
+fn_8021CB08 MonsterHasPart
+fn_8021CB78 MonsterGetEnergy
+fn_8021F294 PartFindOwner
+fn_80221284 StrLength

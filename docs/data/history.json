@@ -23,10 +23,10 @@
   "game": {
    "functions": 8548,
    "bytes": 2265988,
-   "named": 2583,
-   "named_bytes": 563604,
-   "decompiled": 2021,
-   "decompiled_bytes": 237860
+   "named": 2594,
+   "named_bytes": 566272,
+   "decompiled": 2033,
+   "decompiled_bytes": 240664
   },
   "library": {
    "functions": 4039,
