@@ -317,7 +317,7 @@ extern "C" void fn_80220A1C(s32 a3) {
 }
 
 // 0x80220A24
-extern "C" u8 fn_80220A24(void) {
+extern "C" u8 IsOnlineBattle(void) {
     u8 t0 = *(u8*)((u8*)lbl_805FBBD9);
     return (u8)(t0);
 }

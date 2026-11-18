@@ -667,3 +667,101 @@ void BattleAwardWin(u8* b) {
 }
 
 }  // extern "C"
+
+// ---------------------------------------------------------------- round flow
+
+extern "C" {
+void BattleAdvance(u8* b);                                // 0x80212A00 (battle state machine)
+s32  BattleDecideRound(u8* b, u8* att, u8* def);          // 0x80210AB8: returns the round kind
+u8*  EffectRecordInit(u8* r);                             // 0x80216114
+u32  RngNext(void* rng);                                  // 0x80220C8C
+}
+
+static inline void CopyChoice(u8* dst, const u8* stats) {
+    *(u32*)(dst + 0) = *(const u32*)(stats + 0x18);   // action
+    dst[4] = stats[0x1C];                              // charged
+    *(s32*)(dst + 8) = *(const s32*)(stats + 0x20);   // limb
+}
+
+extern "C" {
+
+// 0x80221240
+u32 RngBelow(void* rng, u32 max) { return RngNext(rng) % (max + 1); }
+
+// 0x802124F4
+// Start resolving a round once a side has acted (or a round is forced): store both choices
+// in the round record, decide what kind of round it is, show it and advance the battle.
+void BattleStartRound(u8* b) {
+    if (!(b[0xA50] != 0 || b[0xACC] != 0 || BattleNextTurn(b))) return;
+    for (s32 i = 0; i < 4; i++) *(u32*)(*(u8**)(b + 0xA3C + i * 4) + 8) = 0;
+    u8* round = *(u8**)(b + 0xA0C);
+    *(s32*)(round + 0x7C) = *(s32*)(b + 0xA08);
+    for (s32 s = 0; s < 2; s++) CopyChoice(round + s * 0x38 + 0x30, ((u8**)(b + 0xA00))[s] + 0x20);
+
+    if (b[0xA50] != 0) {
+        *(s32*)round = 7;
+        b[0xA50] = 0;
+    } else {
+        s32 att = *(s32*)(b + 0xA08);
+        u8* attStats = ((u8**)(gBattle + 0xA00))[att] + 0x20;
+        u8* defFighter = ((u8**)(gBattle + 0xA00))[1 - att];
+        u8* rec = (u8*)operator_new(0x18);
+        if (rec != NULL) rec = EffectRecordInit(rec);
+        rec[0] = 0;
+        s32 limb = *(s32*)(attStats + 0x20);
+        *(u8**)(round + *(s32*)(attStats + 0x24) * 0x38 + limb * 4 + 0x18) = rec;
+        round[0x74] = b[0x9FE];
+        round[0x75] = b[0x9FF];
+        *(s32*)round = BattleDecideRound(b, attStats, defFighter + 0x20);
+    }
+    u8* hud = *(u8**)(b + 0xA38);
+    (*(void (**)(u8*, u8*))(*(u8**)hud + 0xC))(hud, *(u8**)(b + 0xA0C));
+    BattleAdvance(b);
+}
+
+// 0x80213308
+// Take the acting side's choice: from its AI controller once it has decided (the result is
+// the charge flag), or straight away (no charge) for a side without one.
+void BattleTakeChoice(u8* b) {
+    s32 att = *(s32*)(b + 0xA08);
+    u8* ai = *(u8**)(b + 0xA54 + att * 4);
+    u8* stats = ((u8**)(gBattle + 0xA00))[*(s32*)(b + 0xA08)] + 0x20;
+    if (ai != NULL) {
+        u8 charged = (u8)(*(s32 (**)(u8*))(*(u8**)ai + 0xC))(ai);
+        if ((*(u8**)(b + 0xA54 + *(s32*)(b + 0xA08) * 4))[0x44] == 0) return;
+        stats = ((u8**)(gBattle + 0xA00))[*(s32*)(b + 0xA08)] + 0x20;
+        stats[0x1C] = charged;
+    } else {
+        stats[0x1C] = 0;
+    }
+    BattleAdvance(b);
+}
+
+// 0x80213158
+// An animation listener finished. When all are done: the attacking limb's "second strike"
+// enhancement (5) may grant another attack (tuned chance), which cancels the defender's block
+// after a block round; then the battle advances.
+void BattleOnListenerDone(u8* b, u32 who) {
+    BOOL all = TRUE;
+    for (s32 i = 0; i < *(s32*)(b + 0xA30); i++) {
+        if (*(u32*)(b + 0xA1C + i * 4) == who) b[0xA2C + i] = 1;
+        all = all && b[0xA2C + i] != 0;
+    }
+    if (!all) return;
+    if (b[0xACC] == 0) {
+        b[0xACC] = 1;
+        u8* f = ((u8**)(b + 0xA00))[*(s32*)(b + 0xA08)];
+        u8** st = FighterGetSlot(f, *(s32*)(f + 0x20 + 0x20));
+        if ((*(s32**)st)[8] == 5 && BattleIsFinalRound(b) == 0) {
+            BOOL broken = st == NULL || **(s32**)st <= 0;
+            if (!broken && (f32)(RngBelow(b + 4, 99) + 1) < 100.0f * *(f32*)(b + 0xAA4)) {
+                *(s32*)(b + 0xA18) = 3;
+                *(s32*)(b + 0xAEC) = 1;
+                if (**(s32**)(b + 0xA0C) == 5) b[0x9F2 + (1 - *(s32*)(b + 0xA08))] = 0;
+            }
+        }
+    }
+    BattleAdvance(b);
+}
+
+}  // extern "C"

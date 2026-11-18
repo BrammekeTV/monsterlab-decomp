@@ -1,15 +1,15 @@
 {
  "game_id": "RM7P4F",
- "generated": "2026-11-18T11:33:54+00:00",
- "commit": "fbe6b08",
- "commit_date": "2026-11-18T12:32:02+01:00",
+ "generated": "2026-11-18T11:37:06+00:00",
+ "commit": "cb9f832",
+ "commit_date": "2026-11-18T12:33:55+01:00",
  "game": {
   "functions": 8548,
   "bytes": 2265988,
-  "named": 2693,
-  "named_bytes": 592148,
-  "decompiled": 2187,
-  "decompiled_bytes": 261148
+  "named": 2700,
+  "named_bytes": 597092,
+  "decompiled": 2191,
+  "decompiled_bytes": 262416
  },
  "library": {
   "functions": 4039,
@@ -22,10 +22,10 @@
  "all": {
   "functions": 12587,
   "bytes": 3404928,
-  "named": 3155,
-  "named_bytes": 696776,
-  "decompiled": 2187,
-  "decompiled_bytes": 261148
+  "named": 3162,
+  "named_bytes": 701720,
+  "decompiled": 2191,
+  "decompiled_bytes": 262416
  },
  "game_range": [
   "80006B40",
@@ -998,11 +998,11 @@
   ],
   [
    0.364,
-   0.364
+   0.539
   ],
   [
-   0.526,
-   0.651
+   0.683,
+   0.87
   ],
   [
    0.234,
@@ -1026,11 +1026,11 @@
   ],
   [
    0.224,
-   0.195
+   0.347
   ],
   [
-   0.822,
-   0.959
+   0.83,
+   0.967
   ],
   [
    0.531,
@@ -1826,6 +1826,11 @@
      "size": 696
     },
     {
+     "name": "BattleStartRound",
+     "addr": "802124F4",
+     "size": 488
+    },
+    {
      "name": "BattleIsFinalRound",
      "addr": "80212BE4",
      "size": 556
@@ -1839,6 +1844,16 @@
      "name": "BattleReset",
      "addr": "80213090",
      "size": 160
+    },
+    {
+     "name": "BattleOnListenerDone",
+     "addr": "80213158",
+     "size": 432
+    },
+    {
+     "name": "BattleTakeChoice",
+     "addr": "80213308",
+     "size": 288
     },
     {
      "name": "BattleAwardWin",
@@ -1959,6 +1974,11 @@
      "name": "PartDbGetActionDisplay",
      "addr": "802165E8",
      "size": 112
+    },
+    {
+     "name": "RngBelow",
+     "addr": "80221240",
+     "size": 60
     }
    ]
   },

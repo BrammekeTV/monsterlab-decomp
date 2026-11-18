@@ -755,3 +755,10 @@ fn_802255FC SaveCurrentScoreSlot
 fn_80140320 OnlineRecordWin
 fn_80140324 OnlineRecordLoss
 fn_802186D8 LabShowBattleResult
+fn_80212A00 BattleAdvance
+fn_80210AB8 BattleDecideRound
+fn_80220C8C RngNext
+fn_80221240 RngBelow
+fn_802124F4 BattleStartRound
+fn_80213308 BattleTakeChoice
+fn_80213158 BattleOnListenerDone
