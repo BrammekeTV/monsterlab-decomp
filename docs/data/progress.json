@@ -1,15 +1,15 @@
 {
  "game_id": "RM7P4F",
- "generated": "2026-11-18T17:11:55+00:00",
- "commit": "3da5b21",
- "commit_date": "2026-11-18T18:07:37+01:00",
+ "generated": "2026-11-18T17:16:47+00:00",
+ "commit": "eeacb68",
+ "commit_date": "2026-11-18T18:11:56+01:00",
  "game": {
   "functions": 8548,
   "bytes": 2265988,
   "named": 2748,
   "named_bytes": 616800,
-  "decompiled": 3759,
-  "decompiled_bytes": 387552
+  "decompiled": 3815,
+  "decompiled_bytes": 391972
  },
  "library": {
   "functions": 4039,
@@ -24,8 +24,8 @@
   "bytes": 3404928,
   "named": 3211,
   "named_bytes": 721548,
-  "decompiled": 3760,
-  "decompiled_bytes": 387672
+  "decompiled": 3816,
+  "decompiled_bytes": 392092
  },
  "game_range": [
   "80006B40",
@@ -81,19 +81,19 @@
    0.645
   ],
   [
-   0.099,
+   0.134,
    0.059
   ],
   [
-   0.054,
+   0.081,
    0.199
   ],
   [
-   0.009,
+   0.018,
    0.32
   ],
   [
-   0.012,
+   0.128,
    0.044
   ],
   [
@@ -789,19 +789,19 @@
    0.1
   ],
   [
-   0.013,
+   0.029,
    0.018
   ],
   [
-   0.008,
+   0.106,
    0.0
   ],
   [
-   0.017,
+   0.06,
    0.013
   ],
   [
-   0.0,
+   0.015,
    0.0
   ],
   [
@@ -985,15 +985,15 @@
    0.0
   ],
   [
-   0.021,
+   0.099,
    0.377
   ],
   [
-   0.0,
+   0.042,
    0.0
   ],
   [
-   0.081,
+   0.121,
    0.096
   ],
   [
@@ -1519,6 +1519,111 @@
      "name": "fn_80199054",
      "addr": "80199054",
      "size": 64
+    }
+   ]
+  },
+  {
+   "path": "src/engine/small_801A.cpp",
+   "functions": [
+    {
+     "name": "fn_801A01A4",
+     "addr": "801A01A4",
+     "size": 92
+    },
+    {
+     "name": "fn_801A11C4",
+     "addr": "801A11C4",
+     "size": 56
+    },
+    {
+     "name": "fn_801A1ABC",
+     "addr": "801A1ABC",
+     "size": 48
+    },
+    {
+     "name": "fn_801A1AEC",
+     "addr": "801A1AEC",
+     "size": 64
+    },
+    {
+     "name": "fn_801A1B2C",
+     "addr": "801A1B2C",
+     "size": 56
+    },
+    {
+     "name": "fn_801A1EC8",
+     "addr": "801A1EC8",
+     "size": 120
+    },
+    {
+     "name": "fn_801A2330",
+     "addr": "801A2330",
+     "size": 80
+    },
+    {
+     "name": "fn_801A2388",
+     "addr": "801A2388",
+     "size": 92
+    },
+    {
+     "name": "fn_801A2548",
+     "addr": "801A2548",
+     "size": 64
+    },
+    {
+     "name": "fn_801A26BC",
+     "addr": "801A26BC",
+     "size": 80
+    },
+    {
+     "name": "fn_801A270C",
+     "addr": "801A270C",
+     "size": 60
+    },
+    {
+     "name": "fn_801A2D9C",
+     "addr": "801A2D9C",
+     "size": 64
+    },
+    {
+     "name": "fn_801A3710",
+     "addr": "801A3710",
+     "size": 64
+    },
+    {
+     "name": "fn_801A3750",
+     "addr": "801A3750",
+     "size": 72
+    },
+    {
+     "name": "UISetProgress",
+     "addr": "801A3FA0",
+     "size": 120
+    },
+    {
+     "name": "fn_801A46D8",
+     "addr": "801A46D8",
+     "size": 64
+    },
+    {
+     "name": "fn_801A4718",
+     "addr": "801A4718",
+     "size": 64
+    },
+    {
+     "name": "fn_801A4758",
+     "addr": "801A4758",
+     "size": 64
+    },
+    {
+     "name": "fn_801A6518",
+     "addr": "801A6518",
+     "size": 68
+    },
+    {
+     "name": "fn_801A655C",
+     "addr": "801A655C",
+     "size": 68
     }
    ]
   },
@@ -6213,6 +6318,106 @@
    ]
   },
   {
+   "path": "src/game/small_8002b.cpp",
+   "functions": [
+    {
+     "name": "fn_800214D4",
+     "addr": "800214D4",
+     "size": 124
+    },
+    {
+     "name": "fn_80021DD0",
+     "addr": "80021DD0",
+     "size": 96
+    },
+    {
+     "name": "fn_80021ECC",
+     "addr": "80021ECC",
+     "size": 96
+    },
+    {
+     "name": "DiggingDecrementScoop",
+     "addr": "800233A0",
+     "size": 56
+    },
+    {
+     "name": "DiggingDecrementRock",
+     "addr": "800233D8",
+     "size": 60
+    },
+    {
+     "name": "fn_80023D38",
+     "addr": "80023D38",
+     "size": 56
+    },
+    {
+     "name": "fn_80024B7C",
+     "addr": "80024B7C",
+     "size": 72
+    },
+    {
+     "name": "fn_800259D8",
+     "addr": "800259D8",
+     "size": 80
+    },
+    {
+     "name": "fn_80027958",
+     "addr": "80027958",
+     "size": 84
+    },
+    {
+     "name": "fn_800279AC",
+     "addr": "800279AC",
+     "size": 84
+    },
+    {
+     "name": "fn_80027A00",
+     "addr": "80027A00",
+     "size": 104
+    },
+    {
+     "name": "fn_80027BAC",
+     "addr": "80027BAC",
+     "size": 84
+    },
+    {
+     "name": "fn_80027C00",
+     "addr": "80027C00",
+     "size": 108
+    },
+    {
+     "name": "fn_80027C70",
+     "addr": "80027C70",
+     "size": 104
+    },
+    {
+     "name": "fn_80027CDC",
+     "addr": "80027CDC",
+     "size": 92
+    },
+    {
+     "name": "fn_80027D60",
+     "addr": "80027D60",
+     "size": 64
+    },
+    {
+     "name": "fn_80027DA0",
+     "addr": "80027DA0",
+     "size": 92
+    },
+    {
+     "name": "fn_80027DFC",
+     "addr": "80027DFC",
+     "size": 84
+    },
+    {
+     "name": "fn_80028928",
+     "addr": "80028928",
+     "size": 68
+    }
+   ]
+  },
+  {
    "path": "src/game/small_8003.cpp",
    "functions": [
     {
@@ -9024,6 +9229,96 @@
      "name": "fn_80208140",
      "addr": "80208140",
      "size": 64
+    }
+   ]
+  },
+  {
+   "path": "src/game/small_8020b.cpp",
+   "functions": [
+    {
+     "name": "fn_8020A348",
+     "addr": "8020A348",
+     "size": 80
+    },
+    {
+     "name": "fn_8020A958",
+     "addr": "8020A958",
+     "size": 80
+    },
+    {
+     "name": "fn_8020A9A8",
+     "addr": "8020A9A8",
+     "size": 92
+    },
+    {
+     "name": "AudioSetListenerPos",
+     "addr": "8020AA04",
+     "size": 56
+    },
+    {
+     "name": "PauseMusic",
+     "addr": "8020AFB0",
+     "size": 116
+    },
+    {
+     "name": "fn_8020B024",
+     "addr": "8020B024",
+     "size": 56
+    },
+    {
+     "name": "fn_8020B078",
+     "addr": "8020B078",
+     "size": 52
+    },
+    {
+     "name": "fn_8020B160",
+     "addr": "8020B160",
+     "size": 52
+    },
+    {
+     "name": "fn_8020B194",
+     "addr": "8020B194",
+     "size": 52
+    },
+    {
+     "name": "fn_8020BCEC",
+     "addr": "8020BCEC",
+     "size": 116
+    },
+    {
+     "name": "fn_8020BD60",
+     "addr": "8020BD60",
+     "size": 116
+    },
+    {
+     "name": "fn_8020BDD4",
+     "addr": "8020BDD4",
+     "size": 76
+    },
+    {
+     "name": "fn_8020BF7C",
+     "addr": "8020BF7C",
+     "size": 64
+    },
+    {
+     "name": "fn_8020E3D8",
+     "addr": "8020E3D8",
+     "size": 96
+    },
+    {
+     "name": "fn_8020E438",
+     "addr": "8020E438",
+     "size": 96
+    },
+    {
+     "name": "DisciplineLetter",
+     "addr": "8020E498",
+     "size": 80
+    },
+    {
+     "name": "fn_8020E4E8",
+     "addr": "8020E4E8",
+     "size": 72
     }
    ]
   },

@@ -23,7 +23,7 @@ void*  ScreenSetFindWidget(void* set, u32 hash);           // 0x80198E34
 void*  UIWidgetFindChild(void* w, u32 hash);
 void   UIWidgetPlayAnim(void* w, u32 anim);                // 0x80199B38
 void   UISetText(void* el, const char* text, s32 a);       // 0x8019EFC8
-void   UISetProgress(f32 t);                               // 0x801A3FA0
+void   UISetProgress(void* widget, f32 t);                 // 0x801A3FA0
 void   fn_801F5724(u32 button);
 void   SysSprintf(char* buf, const char* fmt, ...);
 void*  EventPost(s32 id, void* target);                    // 0x801F3918
@@ -268,10 +268,11 @@ void MatchupUpdate(void) {
     void* panel = ScreenSetFindWidget(set, W_PANEL);
     if (panel == NULL || UIWidgetFindChild(panel, W_PANEL_ROOT) == NULL) return;
 
+    void* bar;
     if (sConnecting == 1 && UIWidgetFindChild(panel, 0xDE4906B0) != NULL &&
-        UIWidgetFindChild(panel, 0x25E15199) != NULL) {
+        (bar = UIWidgetFindChild(panel, 0x25E15199)) != NULL) {
         sConnectTime += gFrameTime;
-        UISetProgress(sConnectTime / CONNECT_SECONDS);
+        UISetProgress(bar, sConnectTime / CONNECT_SECONDS);
         if (sConnectTime / CONNECT_SECONDS >= 1.0f && !IsShowingError()) BuildMonsters();
     }
 

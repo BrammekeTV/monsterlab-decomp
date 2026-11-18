@@ -69,6 +69,11 @@
  "changelog": [
   {
    "date": "2026-11-18",
+   "time": "18:16",
+   "text": "Decompiled 54 more small functions: audio listener position, music pause and discipline letter helpers (0x8020), the rest of the digging challenge (scoop/rock counters, random rolls, HUD visibility; 0x8002), and UI engine widgets and progress bars (0x801A). Fixed the matchup screen's connection progress bar call, which was missing its widget argument."
+  },
+  {
+   "date": "2026-11-18",
    "time": "18:11",
    "text": "Decompiled 59 more small functions: the minigame game-flow states (intro, gameplay, success/failure outros, quit, pause) and conversation HUD helpers (0x8001), score accumulators, tree lookups, constructors and destructors (0x800A), and object references and path movement/blocking checks (0x800D). Written by low-cost helper agents and reviewed."
   },
