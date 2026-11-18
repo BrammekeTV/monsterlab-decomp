@@ -1,15 +1,15 @@
 {
  "game_id": "RM7P4F",
- "generated": "2026-11-18T15:44:37+00:00",
- "commit": "7875a2b",
- "commit_date": "2026-11-18T15:54:57+01:00",
+ "generated": "2026-11-18T15:46:02+00:00",
+ "commit": "865ee00",
+ "commit_date": "2026-11-18T16:44:45+01:00",
  "game": {
   "functions": 8548,
   "bytes": 2265988,
   "named": 2731,
   "named_bytes": 610828,
-  "decompiled": 2924,
-  "decompiled_bytes": 296268
+  "decompiled": 2939,
+  "decompiled_bytes": 297428
  },
  "library": {
   "functions": 4039,
@@ -24,8 +24,8 @@
   "bytes": 3404928,
   "named": 3194,
   "named_bytes": 715576,
-  "decompiled": 2925,
-  "decompiled_bytes": 296388
+  "decompiled": 2940,
+  "decompiled_bytes": 297548
  },
  "game_range": [
   "80006B40",
@@ -285,11 +285,11 @@
    0.139
   ],
   [
-   0.004,
+   0.015,
    0.0
   ],
   [
-   0.016,
+   0.146,
    0.252
   ],
   [
@@ -4529,6 +4529,86 @@
      "name": "GameSessionUpdate",
      "addr": "80008544",
      "size": 4580
+    }
+   ]
+  },
+  {
+   "path": "src/game/small_8009.cpp",
+   "functions": [
+    {
+     "name": "fn_80090210",
+     "addr": "80090210",
+     "size": 52
+    },
+    {
+     "name": "fn_80090304",
+     "addr": "80090304",
+     "size": 52
+    },
+    {
+     "name": "RobotEvolutionExperiment_IntroSmasherDone",
+     "addr": "80091BF0",
+     "size": 76
+    },
+    {
+     "name": "RobotEvolutionExperiment_IntroRobotShowCountdown",
+     "addr": "80091C3C",
+     "size": 48
+    },
+    {
+     "name": "RobotEvolutionExperiment_IntroRobotDone",
+     "addr": "80091C6C",
+     "size": 76
+    },
+    {
+     "name": "fn_80091CB8",
+     "addr": "80091CB8",
+     "size": 76
+    },
+    {
+     "name": "fn_80091E44",
+     "addr": "80091E44",
+     "size": 68
+    },
+    {
+     "name": "fn_80091E88",
+     "addr": "80091E88",
+     "size": 96
+    },
+    {
+     "name": "fn_80091F28",
+     "addr": "80091F28",
+     "size": 68
+    },
+    {
+     "name": "RobotEvolutionExperiment_DoorOpenning",
+     "addr": "80091F6C",
+     "size": 96
+    },
+    {
+     "name": "RobotEvolutionExperiment_DoorOpen",
+     "addr": "80091FCC",
+     "size": 96
+    },
+    {
+     "name": "RobotEvolutionExperiment_DoorClosing",
+     "addr": "8009202C",
+     "size": 96
+    },
+    {
+     "name": "RobotEvolutionExperiment_DoorClosed",
+     "addr": "8009208C",
+     "size": 96
+    },
+    {
+     "name": "fn_8009210C",
+     "addr": "8009210C",
+     "size": 80
+    },
+    {
+     "name": "fn_8009215C",
+     "addr": "8009215C",
+     "size": 84
     }
    ]
   },
