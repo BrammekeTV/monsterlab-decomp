@@ -8,7 +8,7 @@ typedef u8* (*VFnRetPtr)(u8* self);
 extern "C" {
 void  operator_delete(void* p);                                  // 0x801D426C
 s32   RaySceneTest(void* ray);                                   // 0x80070458
-void  PlaySound(u32 hash, s32 a, s32 b, s32 c, s32 d, s32 e);    // 0x80209E70
+s32  PlaySound(u32 hash, s32 a, s32 b, s32 c, s32 d, s32 e);    // 0x80209E70
 u8*   fn_8006FBDC(void);                                         // 0x8006FBDC
 u8*   fn_80062CE0(u8* p, s32 del);                               // 0x80062CE0 (deleting dtor)
 u8*   fn_800C40C0(u8* p, s32 del);                               // 0x800C40C0 (deleting dtor)

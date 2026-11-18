@@ -60,7 +60,7 @@ void SessionRestoreZoneObjects(u8* s) {
 }
 
 // 0x8001292C
-void SessionResetSlots(u8* s) {
+extern "C" void SessionResetSlots(u8* s) {
     ValueSlot* slots = (ValueSlot*)(s + 0x20C);
     for (int i = 0; i < 0x100; i++) {
         slots[i].id = 0;
@@ -86,14 +86,14 @@ void SessionStopTimer(u8* s) {
 }
 
 // 0x80012F50
-void SessionAddTime(u8* s, f32 dt) {
+extern "C" void SessionAddTime(u8* s, f32 dt) {
     f32 t = *(f32*)(s + 0x200) + dt;
     *(f32*)(s + 0x200) = t;
     if (t < 0.0f) *(f32*)(s + 0x200) = 0.0f;
 }
 
 // 0x80012F70
-f32 SessionGetTimer(u8* s) {
+extern "C" f32 SessionGetTimer(u8* s) {
     return *(f32*)(s + 0x200);
 }
 
@@ -112,7 +112,7 @@ void SessionStart(u8* s) {
 }
 
 // 0x80013684
-void SessionResetUnk204(u8* s) {
+extern "C" void SessionResetUnk204(u8* s) {
     *(f32*)(s + 0x204) = 0.5f;
 }
 
@@ -151,7 +151,7 @@ ObjRef* ObjDbLookup(void* db, s32 id);                  // 0x800D39BC
 u32   PathGetNodeType(ObjRef* ref);                      // 0x800D5944
 void  ObjRefSetState(ObjRef* ref, u32 state);           // 0x800D59F4
 u32   PathGetNodeId(void* ref);                           // 0x800D56F8
-void  ObjRefDtor(ObjRef* ref, s32 flags);               // 0x800D50D0
+u8*  ObjRefDtor(ObjRef* ref, s32 flags);               // 0x800D50D0
 void  ObjSetEnabled(s32 id, BOOL on);                   // 0x800F058C
 void  CharacterSetTarget(void* chr, void* target);      // 0x80016FD0
 BOOL  fn_800E6BD4(void);
@@ -165,7 +165,7 @@ extern u8    gScriptCtx[];               // 0x803C4298
 
 // 0x80012820
 // Disable object `id` (if it is in state 2) and schedule it to come back after `time`.
-void SessionDisableFor(u8* s, s32 id, f32 time) {
+extern "C" void SessionDisableFor(u8* s, s32 id, f32 time) {
     if (id == 0) return;
     BOOL disabled = FALSE;
     if (gObjDb != NULL) {

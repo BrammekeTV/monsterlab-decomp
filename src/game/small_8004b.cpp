@@ -38,7 +38,7 @@ void  ExplorationHudSetFighter(void* set, void* fighter, int a); // 0x80045138
 }
 
 // Copied from their definition (C++ linkage).
-void fn_801B3378(u8* p, u8* key);                               // 0x801B3378: removes key from the list p
+extern "C" void fn_801B3378(u8* p, u8* key);                               // 0x801B3378: removes key from the list p
 
 // Globals used here (defined elsewhere, or below).
 extern void*  gScreenSets;                                      // 0x805FB654

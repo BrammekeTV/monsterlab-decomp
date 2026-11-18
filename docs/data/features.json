@@ -69,6 +69,11 @@
  "changelog": [
   {
    "date": "2026-11-18",
+   "time": "18:52",
+   "text": "Added tools/check_protos.py, which flags the same function declared with different return types, parameter counts or C/C++ linkage; fixed about 70 linkage mismatches and 20 wrong prototypes (e.g. destructors and getters that return pointers)."
+  },
+  {
+   "date": "2026-11-18",
    "time": "18:34",
    "text": "Script callbacks now return a pointer-sized ScriptValue instead of BOOL, so string/texture getters no longer truncate on x64; decompiled the quest log, recipes, badges and creatures string getters and LightSetColor."
   },

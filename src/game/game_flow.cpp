@@ -40,7 +40,7 @@ void  AudioSetListenerPos(int id, const Vec3* v);  // 0x8020AA04
 void  AudioSetListenerFwd(int id, const Vec3* v);  // 0x8020AA3C
 void  AudioSetListenerUp(int id, const Vec3* v);   // 0x8020AA68
 BOOL  ZoneIsLoaded(void* world, s32 zone);     // 0x8012F408
-BOOL  fn_801DA758(void* v);
+void*  fn_801DA758(void* v);
 void  EntityUpdate(void* entity);              // 0x80010298
 }
 
@@ -95,12 +95,12 @@ enum {
 // ---------------------------------------------------------------- system event / mode queries
 
 // 0x8000CF8C
-BOOL GameHasSysEvent(void) {
+extern "C" BOOL GameHasSysEvent(void) {
     return gLastSysEvent != 0;
 }
 
 // 0x8000CFA0
-s32 GameGetSysEvent(void) {
+extern "C" s32 GameGetSysEvent(void) {
     return gLastSysEvent;
 }
 
@@ -450,7 +450,7 @@ static void UpdateZoneEntities(s32 zone) {
             update = FALSE;
             if ((*(u32*)(e->def + 0x1C) & 0x1000) && e->unk9C != 0) {
                 typedef void* (*GetFn)(Entity*);
-                update = fn_801DA758(((GetFn)e->vtbl[3])(e));
+                update = fn_801DA758(((GetFn)e->vtbl[3])(e)) != NULL;
             }
         }
         if (update) EntityUpdate(e);

@@ -5,7 +5,7 @@ extern "C" {
 void  operator_delete(void* p);                                 // 0x801D426C
 void  fn_80022E10(void);                                        // 0x80022E10
 void  fn_80022F28(void);                                        // 0x80022F28
-void  fn_80021ECC(u8* p);                                       // 0x80021ECC
+void  fn_80021ECC(void);                                       // 0x80021ECC
 void  fn_800223F0(u8* p, f32 v);                                // 0x800223F0
 void* fn_80030368(u8* p);                                       // 0x80030368 (tail-called, returns through)
 void  fn_80030554(u8* p, f32 f1);                               // 0x80030554
@@ -218,7 +218,7 @@ void fn_80031004(u8* p, f32 f1) {
 // 0x8003174C
 // Calls fn_80021ECC, then fn_800223F0 with the signed integer at +0x98 converted to float.
 void fn_8003174C(u8* p) {
-    fn_80021ECC(p);
+    fn_80021ECC();
     f32 v = (f32)*(s32*)(p + 0x98);
     fn_800223F0(p, v);
 }

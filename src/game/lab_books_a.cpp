@@ -26,8 +26,8 @@ s32  fn_801196A8(u8* p);                  // 0x801196A8
 }
 
 // Defined in small_8011.cpp with C++ linkage.
-void fn_801194E0(u8* p, s32 a);           // 0x801194E0
-u8*  fn_8011966C(u8* p);                  // 0x8011966C
+extern "C" void fn_801194E0(u8* p, s32 a);           // 0x801194E0
+extern "C" u8*  fn_8011966C(u8* p);                  // 0x8011966C
 
 extern "C" {
 

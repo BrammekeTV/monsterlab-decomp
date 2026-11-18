@@ -25,7 +25,7 @@ void   UIWidgetPlayAnim(void* w, u32 anim);                // 0x80199B38
 void   UISetText(void* el, const char* text, s32 a);       // 0x8019EFC8
 void   UISetProgress(void* widget, f32 t);                 // 0x801A3FA0
 void   fn_801F5724(u32 button);
-void   SysSprintf(char* buf, const char* fmt, ...);
+s32   SysSprintf(char* buf, const char* fmt, ...);
 void*  EventPost(s32 id, void* target);                    // 0x801F3918
 void   PartInit(PartInstance* p);                          // 0x8021D320
 void   PartDestroy(PartInstance* p, s32 del);              // 0x8021D374

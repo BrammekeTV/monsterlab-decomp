@@ -99,9 +99,9 @@ struct AbilityDef    { u8 pad[0x14]; s16 percent; u8 pad16[0xE]; };   // 0x24, d
 struct ResistanceDef { u8 pad[0x10]; s16 percent; u8 pad12[0xE]; };   // 0x20, db +0x31E8
 
 extern "C" {
-void        SysSprintf(char* buf, const char* fmt, ...);        // 0x80142EFC
+s32        SysSprintf(char* buf, const char* fmt, ...);        // 0x80142EFC
 void*       operator_new(u32 size);                              // 0x801D40E0
-void        DamageRecordInit(DamageRecord* r);                   // 0x8021605C
+u8*        DamageRecordInit(DamageRecord* r);                   // 0x8021605C
 Fighter*    FighterFromStats(FighterStats* stats);               // 0x80213F8C
 PartInstance** FighterStatsGetPart(FighterStats* stats, s32 slot);   // 0x80213FE0
 const char* PartSlotName(s32 slot);                              // 0x8020E7B4
@@ -161,7 +161,7 @@ static inline s32 CeilDamage(f32 v) {
 }
 
 // 0x80211180
-void BattleResolveAttack(Battle* b) {
+extern "C" void BattleResolveAttack(Battle* b) {
     FighterStats* att = &b->fighters[b->attacker]->stats;
     FighterStats* def = &b->fighters[1 - b->attacker]->stats;
     char text[0x100];

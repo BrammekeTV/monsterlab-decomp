@@ -9,7 +9,7 @@ extern "C" {
 }
 
 // memset is declared the same way as in small_8007.cpp.
-void* memset(void* p, int c, unsigned long n);
+extern "C" void* memset(void* p, int c, unsigned long n);
 
 extern u8    gGame[];                 // 0x803B53A0
 extern void* gLab;                    // 0x805FBBC8

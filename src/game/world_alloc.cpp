@@ -233,7 +233,7 @@ static inline s32 CatStart(u32 off) {
 // Assign every zone the MEM2 address its .sir data is loaded to. Zone 0 and the first category
 // share the start of the area; the five streamed categories alternate between two banks
 // (one bank if the level is flagged for it).
-void WorldLoadLevelZones(s32 level) {
+extern "C" void WorldLoadLevelZones(s32 level) {
     gLevelSingleBank = (gLevelFlags[(u8)level * 0x20 + 0x18] >> 3) & 1;
     for (s32 i = 0; i < ZoneCount(); i++) {
         gZoneLoaded[i] = 0;

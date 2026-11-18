@@ -56,7 +56,7 @@ void  UIText_SetString(u32 hash, const char* text);             // 0x80190E48
 s32   AnimSetFindClip(void* set, s32 anim);                     // 0x801AC2FC
 }
 
-int SysSprintf(char* buf, const char* fmt, ...);                // 0x80142EFC (C++ linkage, as in engine.cpp)
+extern "C" int SysSprintf(char* buf, const char* fmt, ...);                // 0x80142EFC (C++ linkage, as in engine.cpp)
 
 extern "C" {
 

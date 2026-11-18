@@ -370,7 +370,7 @@ void SaveRemoveQuestReward(u8* s, u32 id) {
 extern "C" {
 void LabQuestFinished(void* lab, s32 id);                         // 0x80218998
 s32  LabChallengeRewardTable(void* lab, u32 challenge);           // 0x80218E6C
-void SaveRollChallengeReward(u8* s, s32 table, s32 a);            // 0x802262E0
+s32 SaveRollChallengeReward(u8* s, s32 table, s32 a);            // 0x802262E0
 u8*  LabAllocMonster(u8* inv);                                    // 0x80219FC4
 void MonsterBuildPreset(u8* m, s32 preset);                       // 0x8021A164
 }

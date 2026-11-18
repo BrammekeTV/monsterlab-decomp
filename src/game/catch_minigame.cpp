@@ -18,7 +18,7 @@ void  CatchObject_Launch(void* obj, const f32 target[3], f32 speed); // 0x800304
 void  CatchObject_Release(void* obj, s32 a);                         // 0x80030A98
 BOOL  PadButtonHeld(s32 button);                                     // 0x801474EC
 void  UIWidgetPlayAnimLoop(void* w, u32 anim, s32 n);                // 0x8019BB1C
-void  PlaySound(u32 hash, s32 a, s32 b, s32 c, s32 d, s32 e);        // 0x80209E70
+s32  PlaySound(u32 hash, s32 a, s32 b, s32 c, s32 d, s32 e);        // 0x80209E70
 u32   RandomU32(void);
 }
 

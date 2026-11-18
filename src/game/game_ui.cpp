@@ -105,7 +105,7 @@ void GameFlowDelayedSignal(s32 id, s32 arg1, s32 arg2, f32 delay) {
 }
 
 // 0x8000C7F4
-void GameFlowSignal(s32 id, s32 arg1, s32 arg2) {
+extern "C" void GameFlowSignal(s32 id, s32 arg1, s32 arg2) {
     EventSend(gEventMgr, SIR_SCREENS, 0, id, arg1, arg2, 0, 0);
 }
 

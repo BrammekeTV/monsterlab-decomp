@@ -181,7 +181,7 @@ void fn_801424B8(void) {
 
 // 0x80142500
 // Stores the current OS time (high word at +0, low word at +4) into the struct and returns it.
-u8* fn_80142500(u8* p) {
+extern "C" u8* fn_80142500(u8* p) {
     OSTime t = OSGetTime();
     *(u32*)(p + 0x0) = (u32)((u64)t >> 32);
     *(u32*)(p + 0x4) = (u32)t;
@@ -191,7 +191,7 @@ u8* fn_80142500(u8* p) {
 // 0x80142818
 // Sleeps for a 64-bit microsecond count (hi:us): converts it to timebase ticks
 // (bus clock / 4) and forwards the result to the sleep primitive.
-void SleepMicroseconds(s32 hi, u32 us) {
+extern "C" void SleepMicroseconds(s32 hi, u32 us) {
     u64 micros = ((u64)(u32)hi << 32) | us;
     u64 tb = (u64)(OSGetBusClock() >> 2);
     u64 ticks = micros * tb / 1000000;

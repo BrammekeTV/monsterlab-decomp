@@ -33,7 +33,7 @@ u8    fn_80220A14(void);                                // debug flag: swap spee
 s32   fn_80220A2C(void);
 u32   fn_80220890(u8* data, s32 len);                   // CRC-32
 void  fn_802209F4(u8* data, s32 len);                   // debug record finish hook
-void  SysSprintf(char* buf, const char* fmt, ...);      // 0x80142EFC
+s32  SysSprintf(char* buf, const char* fmt, ...);      // 0x80142EFC
 void  BattleLogAdd(void* log, const char* text);        // 0x802207A0
 void* memset(void* p, int c, unsigned long n);
 }

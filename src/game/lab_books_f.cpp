@@ -6,7 +6,7 @@ typedef s32  (*SelIndexFn)(u8* obj);   // slot 0x1C: current selection index (-1
 typedef void (*VoidFn)(u8* obj);       // slot 0x10: deactivate
 
 // SysSprintf is defined in engine.cpp with C++ linkage.
-int SysSprintf(char* buf, const char* fmt, ...);
+extern "C" int SysSprintf(char* buf, const char* fmt, ...);
 
 extern "C" {
 extern void* gStringTable;             // 0x805FB910 (string table pointer)

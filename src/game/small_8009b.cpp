@@ -6,7 +6,7 @@ void  GameFlowSignal(s32 id, s32 a, s32 b);                       // 0x8000C7F4
 void  operator_delete(void* p);                                   // 0x801D426C
 void  TextureRelease(void* tex);                                  // 0x80184028
 void  fn_800690D4(u8* p, s32 a, void* params, s32 b);             // 0x800690D4 (base ctor)
-void  fn_80062CE0(u8* p, s32 del);                                // 0x80062CE0 (base dtor)
+u8*  fn_80062CE0(u8* p, s32 del);                                // 0x80062CE0 (base dtor)
 void  fn_8006FA44(u8* a3, s32 a4, s32 a5, s32 a6, s32 a7, s32 a8); // 0x8006FA44
 void  fn_80093A88(u8* p);                                         // 0x80093A88 (base dtor)
 void  fn_800980F8(u8* p, s32 b);                                  // 0x800980F8

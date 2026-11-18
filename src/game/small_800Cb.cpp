@@ -21,7 +21,7 @@ s32   RaySceneTest(void* ray);                                  // 0x80070458
 
 // Defined in small_800C.cpp without an extern "C" block, so they have C++ linkage.
 u8* fn_800C2720(u8* p, s32 del);                                // 0x800C2720
-u8* fn_800C40C0(u8* p, s32 del);                                // 0x800C40C0
+extern "C" u8* fn_800C40C0(u8* p, s32 del);                                // 0x800C40C0
 
 extern u8  lbl_8035ED08[];  // 0x8035ED08 (vtable)
 extern s32 lbl_805FB178;    // 0x805FB178 (skitter sound user count)

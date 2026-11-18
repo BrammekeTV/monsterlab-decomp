@@ -18,7 +18,7 @@ extern "C" {
 void     operator_delete(void* p);                                              // 0x801D426C
 void     SpawnEffectAt(void* fxMgr, void* effect, const f32 posAndScale[4], int a); // 0x801C80E0
 void     fn_80061A98(u8* p, s32* a, s32 v);                                     // 0x80061A98
-void     fn_801B44AC(u8* p, s32 del);                                           // 0x801B44AC (base dtor)
+u8*     fn_801B44AC(u8* p, s32 del);                                           // 0x801B44AC (base dtor)
 void     fn_801B4334(u8* p);                                                    // 0x801B4334 (base ctor)
 void     fn_801B4944(u8* p);                                                    // 0x801B4944
 void     fn_80122B00(void* a, u8* b);                                           // 0x80122B00

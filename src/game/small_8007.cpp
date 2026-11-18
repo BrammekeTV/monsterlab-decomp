@@ -7,7 +7,7 @@ extern "C" {
 }
 
 // memset is declared the same way as in battle_object.cpp.
-void* memset(void* p, int c, unsigned long n);
+extern "C" void* memset(void* p, int c, unsigned long n);
 
 extern "C" {
 void* ScreenSetsCurrent(void* sets);                              // 0x8018D1E4

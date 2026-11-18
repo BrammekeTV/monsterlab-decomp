@@ -4,6 +4,7 @@
 // the others get the types from the script signature table (run tools/gen_sigs.py first).
 #include "game/character.h"
 
+extern "C" {
 u32 /*0x06*/ ActionSelectable(s32 a0);  // type 0x6 (from signature table)
 void ActivateCurrentJunction(u32 /*0x06*/ a0);  // type 0x67 (from signature table)
 void ActivateEntity(void* a0);  // type 0x2F (from signature table)
@@ -462,7 +463,6 @@ BOOL GameFlowQuitGameDone(void);                                       // src/ga
 void GameFlowQuitToMainMenu(void);  // type 0x8F (from signature table)
 s32 GameFlowResumeGame(void);                                          // src/game/game_ui.cpp
 void GameFlowSetControlFlowActive(void);  // type 0x8F (from signature table)
-void GameFlowSignal(s32 id, s32 arg1, s32 arg2);                       // src/game/game_ui.cpp
 void GameFlowSleep(void);                                              // src/game/game_ui.cpp
 BOOL GameFlowStopped(void);                                            // src/game/game_ui.cpp
 u32 /*0x06*/ GameNetDistributeChunkCallback(u32 /*0x18*/ a0);  // type 0x4 (from signature table)
@@ -1689,7 +1689,6 @@ void StopLoopingSoundGroupFX(void* a3);                                // src/le
 void StopMusic(void);  // type 0x8F (from signature table)
 void StopNISFrameFx(void);  // type 0x8F (from signature table)
 void StopNISTVStaticFrameFx(void);  // type 0x8F (from signature table)
-void StopRumble(s32 chan);                                             // src/engine/small_801Bb.cpp
 void StopVoiceSFX(u32 a3);                                             // src/leaf/auto_03_800E75B0_text_cb.cpp
 void SuspendSFX(u32 a3);                                               // src/leaf/auto_03_80208CE8_text_cb.cpp
 void TestScriptCallback(void* a3, u32 a4, void* a5);                   // src/leaf/auto_03_801D9028_text_cb.cpp
@@ -1817,7 +1816,8 @@ void UnspawnAttachedParticle(void* a0, u32 /*0x06*/ a1);  // type 0x3E (from sig
 f32 fGetResultRegister(void);  // type 0x12 (from signature table)
 void fSetResultRegister(f32 a0);  // type 0x69 (from signature table)
 
-extern "C" {
+void GameFlowSignal(s32 id, s32 arg1, s32 arg2);                       // src/game/game_ui.cpp
 void PauseAllExplorationEnemies(void);                                 // src/game/character_states.cpp
 void UnPauseAllExplorationEnemies(void);                               // src/game/character_states.cpp
+void StopRumble(s32 chan);                                             // src/engine/small_801Bb.cpp
 }

@@ -3,8 +3,8 @@
 #include "game/script_callbacks.h"
 
 // Copied from their definitions (C++ linkage, so declared outside extern "C").
-int  SysSprintf(char* buf, const char* fmt, ...);               // src/engine/engine.cpp
-s32  PartDefCycleSameSlot(s32 def, BOOL backwards);             // 0x80213A6C
+extern "C" int  SysSprintf(char* buf, const char* fmt, ...);               // src/engine/engine.cpp
+extern "C" s32  PartDefCycleSameSlot(s32 def, BOOL backwards);             // 0x80213A6C
 
 extern "C" {
 void  operator_delete(void* p);                                 // 0x801D426C
@@ -18,7 +18,7 @@ void  fn_8020F498(u8* p, s32 a2);                               // 0x8020F498
 void  fn_8020F4F0(u8* p, s32 del);                              // 0x8020F4F0
 void  fn_8014E3EC(s32 n);                                       // 0x8014E3EC
 void  fn_801B3310(u8* p, u8* q);                                // 0x801B3310
-s32   fn_801B3308(void);                                        // 0x801B3308
+u8*   fn_801B3308(void);                                        // 0x801B3308
 void  fn_801B4308(u8*, s32);                                    // 0x801B4308
 
 extern u8  lbl_8047C7D8[];   // 0x8047C7D8

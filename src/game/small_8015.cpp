@@ -48,7 +48,7 @@ void fn_80154294(void) {
 
 // 0x801542DC
 // Clears the flag and, if it was set, sends two BP writes that reset the display state.
-void fn_801542DC(void) {
+extern "C" void fn_801542DC(void) {
     if (lbl_805F9231 == 0) return;
     lbl_805F9231 = 0;
     GxBpWrite(0xFE000011);
@@ -186,7 +186,7 @@ void fn_8015A368(u8* p, u32 flush) {
 
 // 0x8015B7D4
 // Zeroes the two 8-word tables lbl_8040ADF0 and lbl_8040AE10.
-void fn_8015B7D4(void) {
+extern "C" void fn_8015B7D4(void) {
     for (s32 i = 0; i < 8; i++) {
         lbl_8040ADF0[i] = 0;
         lbl_8040AE10[i] = 0;

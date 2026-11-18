@@ -713,7 +713,7 @@ void CharacterSetMode(Character* c, u32 hash) {
 // Not yet decompiled callbacks.
 
 // 0x80014350
-void RegisterAiStateCallbacks(void) {
+extern "C" void RegisterAiStateCallbacks(void) {
     RegisterScriptFunc("PatrolIdleEntry", 0x4E, (void*)PatrolIdleEntry);
     RegisterScriptFunc("PatrolIdleExit", 0x4E, (void*)PatrolIdleExit);
     RegisterScriptFunc("PatrolIdleUpdate", 0x4E, (void*)PatrolIdleUpdate);

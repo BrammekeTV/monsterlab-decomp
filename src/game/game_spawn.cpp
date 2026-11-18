@@ -51,7 +51,7 @@ static inline SpawnedEntity* FindHelper(void* owner, s32 arg) {
 }
 
 // 0x8000C478
-void* SpawnHelper(void* owner, s32 arg) {
+extern "C" void* SpawnHelper(void* owner, s32 arg) {
     return FindHelper(owner, arg);
 }
 

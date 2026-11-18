@@ -32,9 +32,9 @@ void   UISetNumber(void* el, s32 n);                           // 0x8019F2A8
 void   UISetNegativeNumber(void* el, s32 n);                   // 0x8019F2F4
 void   UISetTexture(void* el, BOOL tex);                       // 0x801A11FC
 void   UIPlayAnim(void* el, u32 anim);                         // 0x8019BE40
-void   SysSprintf(char* buf, const char* fmt, ...);            // 0x80142EFC
+s32   SysSprintf(char* buf, const char* fmt, ...);            // 0x80142EFC
 void*  FighterGetSlot(void* fighter, s32 slot);                // 0x8020E794
-BOOL   fn_80212E28(void);
+BOOL   fn_80212E28(u8* p);
 PartInstance** FighterStatsGetPart(void* stats, s32 slot);     // 0x80213FE0
 s32    FighterStatsGet(void* stats, s32 stat);                 // 0x80214950: 3 = energy
 BOOL   FighterStatsHasStatus(PartInstance** p, s32 status);    // 0x80214EE0
@@ -136,8 +136,7 @@ BOOL SetPartSelected(s32 slot) {
     u8* fighter = *(u8**)(gBattle + 0xA00);
     void* stats = fighter + 0x20;
     if (fighter == NULL || stats == NULL || ((u32*)fighter)[slot] == 0) return FALSE;
-    FighterGetSlot(fighter, slot);
-    if (fn_80212E28()) return FALSE;
+    if (fn_80212E28((u8*)FighterGetSlot(fighter, slot))) return FALSE;
     if (!sHudEnabled) return FALSE;
 
     gSelectedPart = slot;

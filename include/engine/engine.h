@@ -22,11 +22,11 @@ struct GameSettings {
 typedef void (*EngineFrameCallback)(void);
 
 // engine.cpp
-void  EngineStartup(void* ctx);
-void  EngineInit(void);
-void  EngineFrame(void);
-void  EngineShutdown(void);
-void  EngineCleanup(void* ctx);
+extern "C" void  EngineStartup(void* ctx);
+extern "C" void  EngineInit(void);
+extern "C" void  EngineFrame(void);
+extern "C" void  EngineShutdown(void);
+extern "C" void  EngineCleanup(void* ctx);
 void  EngineSetFrameCallback(EngineFrameCallback cb);
 GameSettings* EngineGetGameSettings(void);
 void  EngineSetGameSettings(GameSettings* settings);

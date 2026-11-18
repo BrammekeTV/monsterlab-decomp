@@ -72,7 +72,7 @@ void* fn_801953E4(u32 hash) {
 
 // 0x801954E4
 // Frees the child at +0x10 (if any), then the object itself. Returns 0.
-s32 fn_801954E4(void* p) {
+extern "C" s32 fn_801954E4(void* p) {
     void* child = *(void**)((u8*)p + 0x10);
     if (child != NULL) {
         fn_8018D4CC(child);
@@ -83,7 +83,7 @@ s32 fn_801954E4(void* p) {
 
 // 0x80195464
 // Finds an element by hash in the current screen set. Logs and returns NULL when missing.
-void* UIFindElement(u32 hash) {
+extern "C" void* UIFindElement(u32 hash) {
     void* set = ScreenSetsCurrent(gScreenSets);
     if (set == NULL) {
         fn_8018D370(lbl_803818A8);
@@ -227,7 +227,7 @@ BOOL fn_80198DE4(void* p) {
 
 // 0x80198E34
 // Looks up a widget by hash in the table at set+0x28. Returns NULL when missing.
-void* ScreenSetFindWidget(void* set, u32 hash) {
+extern "C" void* ScreenSetFindWidget(void* set, u32 hash) {
     void* table = *(void**)((u8*)set + 0x28);
     return fn_8018E8D8(table, hash);
 }

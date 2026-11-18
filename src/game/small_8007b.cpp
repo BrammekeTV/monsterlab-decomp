@@ -8,7 +8,7 @@ extern "C" {
 
 extern "C" {
 void  fn_8020A398(s32 handle);                                          // 0x8020A398
-void  fn_80062CE0(u8* p, s32 del);                                      // 0x80062CE0 (base dtor)
+u8*  fn_80062CE0(u8* p, s32 del);                                      // 0x80062CE0 (base dtor)
 void  fn_800690D4(u8* p, s32 a, void* params, s32 b);                   // 0x800690D4 (base ctor)
 void  operator_delete(void* p);                                         // 0x801D426C
 void  fn_8006FA44(u8* a3, s32 a4, s32 a5, s32 a6, s32 a7, s32 a8);      // 0x8006FA44

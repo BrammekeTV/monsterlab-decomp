@@ -146,7 +146,7 @@ void* PartQuery_GetTexture(void) {
 }
 
 extern "C" {
-f32 PartComputeActionCost(PartInstance* p, u32 actionKey, void* monster);   // 0x8021E6EC
+s32 PartComputeActionCost(PartInstance* p, u32 actionKey, void* monster);   // 0x8021E6EC
 s32 __cvt_fp2signed(f32 v);                                                   // 0x80332ED0
 }
 
@@ -180,7 +180,7 @@ s32 PartQuery_GetActionCost(u32 which) {
     PartDbGetDef(&def, gGameDb, sQueryPart->defIndex);
     s32 action = which == 0 ? def.action1 : def.action2;
     PartAction a = ActionTable()[action];
-    return __cvt_fp2signed(PartComputeActionCost(sQueryPart, a.key, sQueryMonster));
+    return PartComputeActionCost(sQueryPart, a.key, sQueryMonster);
 }
 
 static inline BOOL QueryDisciplineIs(s32 discipline) {

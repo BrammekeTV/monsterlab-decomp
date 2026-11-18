@@ -86,7 +86,7 @@ extern "C" void GameFrameCallback(void) {
 }
 
 // 0x8000F5C0
-void GameShutdown(void) {
+extern "C" void GameShutdown(void) {
     fn_801210F8(lbl_805FAEB0);
     fn_801F0560();
     fn_802044B4(lbl_805FB7E8);
@@ -118,7 +118,7 @@ static void GameSysEventCallback(int event) {
 }
 
 // 0x8000EE8C
-void GameInit(void) {
+extern "C" void GameInit(void) {
     GameSettings* settings = (GameSettings*)MemAllocDefault(sizeof(GameSettings));
     memset(settings, 0, sizeof(GameSettings));
     settings->skipDebugOverlay = 1;
@@ -131,7 +131,7 @@ void GameInit(void) {
 }
 
 // 0x8000EF04
-void GameStart(int argc, char** argv) {
+extern "C" void GameStart(int argc, char** argv) {
     (void)argv;
     RendSetCallbackA(fn_8000CFA8);
     RendSetCallbackB(fn_8000CFD0);

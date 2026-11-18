@@ -9,7 +9,7 @@ extern "C" {
 extern "C" {
 void  operator_delete(void* p);                                         // 0x801D426C
 void  fn_800690D4(u8* p, s32 a, void* params, s32 b);                   // 0x800690D4 (base ctor)
-void  fn_80062CE0(u8* p, s32 del);                                      // 0x80062CE0 (base dtor)
+u8*  fn_80062CE0(u8* p, s32 del);                                      // 0x80062CE0 (base dtor)
 void  fn_800B0B88(u8* p);                                               // 0x800B0B88
 void  fn_800704AC(u8* p);                                               // 0x800704AC
 void  fn_800B82E0(u8* child, f32 delta);                                // 0x800B82E0

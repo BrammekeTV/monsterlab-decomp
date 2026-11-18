@@ -7,7 +7,7 @@
 extern "C" s32 RegisterScriptFunc(const char* name, s32 type, void* fn);   // 0x801DC91C
 
 // 0x800FB958
-void RegisterGameScriptFuncs(void) {
+extern "C" void RegisterGameScriptFuncs(void) {
     RegisterScriptFunc("ActionSelectable", 0x6, (void*)ActionSelectable);
     RegisterScriptFunc("ActivateCurrentJunction", 0x67, (void*)ActivateCurrentJunction);
     RegisterScriptFunc("ActivateEntity", 0x2F, (void*)ActivateEntity);
@@ -1600,7 +1600,7 @@ void RegisterGameScriptFuncs(void) {
 }
 
 // 0x801DC9F4
-void RegisterEngineScriptFuncs(void) {
+extern "C" void RegisterEngineScriptFuncs(void) {
     RegisterScriptFunc("BroadcastToDstGroup", 0x42, (void*)BroadcastToDstGroup);
     RegisterScriptFunc("CallActivateHandler", 0x2F, (void*)CallActivateHandler);
     RegisterScriptFunc("CallDeactivateHandler", 0x2F, (void*)CallDeactivateHandler);

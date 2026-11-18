@@ -6,7 +6,7 @@
 #include "engine/view.h"
 #include "system/sys.h"
 
-int SysSprintf(char* buf, const char* fmt, ...);
+extern "C" int SysSprintf(char* buf, const char* fmt, ...);
 
 // ---- not yet decompiled ----
 extern "C" {
@@ -125,13 +125,13 @@ void CoreShutdown(void* ctx) {
 }
 
 // 0x801D1504
-void EngineStartup(void* ctx) {
+extern "C" void EngineStartup(void* ctx) {
     if (sMemPool == NULL) MemInit();
     CoreInit(ctx);
 }
 
 // 0x801D1538
-void EngineCleanup(void* ctx) {
+extern "C" void EngineCleanup(void* ctx) {
     CoreShutdown(ctx);
     SysFreeMEM2Block(sMemPool);
 }
@@ -178,7 +178,7 @@ static void RendMemFree(void* ptr) {
 }
 
 // 0x801D16E0
-void EngineInit(void) {
+extern "C" void EngineInit(void) {
     sRendMemCallbacks.alloc     = RendMemAlloc;
     sRendMemCallbacks.free      = RendMemFree;
     sRendMemCallbacks.allocTemp = EngineMemAllocTemp;
@@ -210,7 +210,7 @@ void EngineInit(void) {
 }
 
 // 0x801D17FC
-void EngineShutdown(void) {
+extern "C" void EngineShutdown(void) {
     ViewDestroy(gMainView);
     SgShutdown();
     fn_80162C28();
@@ -269,7 +269,7 @@ static void EngineRunFrameCallback(void) {
 }
 
 // 0x801D1838
-void EngineFrame(void) {
+extern "C" void EngineFrame(void) {
     if (!gHomeMenuOpen) fn_801FBE68();
     EngineApplySuspend();
 

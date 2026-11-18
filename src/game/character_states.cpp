@@ -13,7 +13,7 @@ void  fn_80016FD0(Character* c, int animate);
 void  ExplorationPromptClear(BOOL animate);            // 0x80016EA0
 void  GameFlowSignal(s32 id, s32 a, s32 b);             // 0x8000C7F4
 void  PlayCharacterAnimation(Character* c, int a, u32 anim, int loop);
-void  StartConversationID(void);
+void  StartConversationID(u32 a0);
 BOOL  PathIsInConversation(PathFollower* p);            // 0x800D5964
 u32   PadGetButtons(void* pad);                         // 0x801B9B40
 s32   PathGetNodeId(PathFollower* p);                   // 0x800D56F8
@@ -200,7 +200,7 @@ void character_conversation_entry(ScriptCtx* ctx) {
         EventSend(gEventMgr, c, c, 0x6877205Cu, 0, 0, 0, 0);
         return;
     }
-    StartConversationID();
+    StartConversationID(1);  // r3 still holds the (non-zero) PathIsInConversation result
     PauseOtherCharacters();
 }
 

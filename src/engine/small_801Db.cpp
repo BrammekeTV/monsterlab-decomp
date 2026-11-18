@@ -14,7 +14,7 @@ u8*   fn_801D55F8(u8* p, s32 del);                               // 0x801D55F8 (
 u8*   fn_801D2BB8(u8* p, s32 del);                               // 0x801D2BB8 (deleting dtor)
 u8*   fn_801D9038(u8* p, s32 del);                               // 0x801D9038 (base deleting dtor, defined below)
 void  fn_801D9164(u8* p, void* v);                               // 0x801D9164
-void  fn_80142500(void* p);                                      // 0x80142500
+u8*  fn_80142500(void* p);                                      // 0x80142500
 void  fn_80172E84(u8* obj);                                      // 0x80172E84
 void  fn_80184414(void* a, void* b);                             // 0x80184414
 void* fn_801DA758(void* v);                                      // 0x801DA758

@@ -60,6 +60,8 @@ game can be ported to PC. The code does not have to compile back to identical Po
    run `python tools/rename.py -f config/RM7P4F/names_game.txt` and re-run the dtk split.
 4. Check: `python tools/check.py` (local compile), then `python tools/gen_leaf.py` so the
    generated leaf files drop anything you just decompiled.
+   Then `python tools/check_protos.py` to catch a function declared with a different return
+   type, parameter count or linkage in two files.
 5. Commit and open a pull request. CI must be green.
 
 ## Pull requests

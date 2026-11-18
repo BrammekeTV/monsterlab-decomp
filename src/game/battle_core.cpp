@@ -846,9 +846,9 @@ void BattleAdvance(u8* b) {
 // ---------------------------------------------------------------- deciding a round
 
 extern "C" {
-void  SysSprintf(char* buf, const char* fmt, ...);        // 0x80142EFC
+s32  SysSprintf(char* buf, const char* fmt, ...);        // 0x80142EFC
 void  BattleLogAdd(void* log, const char* text);          // 0x802207A0
-void  DamageRecordInit(u8* r);                            // 0x8021605C
+u8*  DamageRecordInit(u8* r);                            // 0x8021605C
 void  TargetListInit(void* t);                            // 0x802161DC
 void  TargetListDecode(void* t, const u32* mask, s32 side);   // 0x80216240
 void* TargetListDestroy(void* t, s32 del);                // 0x80216200

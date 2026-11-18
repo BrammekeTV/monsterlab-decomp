@@ -2,7 +2,7 @@
 // Original object: .text 0x80014230 - 0x80014330
 #include "types.h"
 
-extern "C" void SysSprintf(char* buf, const char* fmt, ...);   // 0x80142EFC
+extern "C" s32 SysSprintf(char* buf, const char* fmt, ...);   // 0x80142EFC
 
 static const char kBuildDate[] = "Aug 28 2008 (14:30)";       ORIG(0x803476A8)
 
@@ -31,7 +31,7 @@ extern "C" s32 GetRegion(void) {
 
 // 0x8001426C
 // e.g. "EU 519: Aug 28 2008 (14:30)@142835 (REL)"
-void GetBuildString(char* out) {
+extern "C" void GetBuildString(char* out) {
     const char* region;
     switch (sBuildRegion.region) {
     case REGION_NA: region = "NA"; break;

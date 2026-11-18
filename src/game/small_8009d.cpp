@@ -11,7 +11,7 @@ void  operator_delete(void* p);                                   // 0x801D426C
 void  MemFreeSmall(void* p);                                      // 0x801D4340
 s32   RaySceneTest(void* ray);                                    // 0x80070458
 void  fn_800690D4(u8* p, s32 a, void* params, s32 b);             // 0x800690D4 (base ctor)
-void  fn_80062CE0(u8* p, s32 del);                                // 0x80062CE0 (base dtor)
+u8*  fn_80062CE0(u8* p, s32 del);                                // 0x80062CE0 (base dtor)
 void  fn_8006FA44(u8* a3, s32 a4, s32 a5, s32 a6, s32 a7, s32 a8); // 0x8006FA44
 u8*   fn_800C4530(u8* p, s32 a, void* params, s32 b);             // 0x800C4530 (ctor)
 u8*   fn_800C456C(u8* p, s32 del);                                // 0x800C456C (deleting dtor)

@@ -57,7 +57,7 @@ void HudReload(u8* obj) {
 }
 
 // 0x80006BB4
-void GameStateReset(GameState* g) {
+extern "C" void GameStateReset(GameState* g) {
     g->unk000[2] = 0;
     g->unk000[0] = 0;
     g->unk000[1] = 0;
@@ -131,7 +131,7 @@ void GameUpdateTurnTimers(GameState* g, f32 dt) {
 }
 
 // 0x80006EF4
-void GameUpdateWorld(GameState* g, f32 dt) {
+extern "C" void GameUpdateWorld(GameState* g, f32 dt) {
     GameUpdateTurnTimers(g, dt);
     WorldUpdate((u8*)g + 0xD5F0, 0, dt);
 }
@@ -141,7 +141,7 @@ void fn_80006F40(void) {
 }
 
 // 0x80006F44
-void fn_80006F44(void) {
+extern "C" void fn_80006F44(void) {
 }
 
 struct CameraFollow {
@@ -158,7 +158,7 @@ struct CameraFollow {
 struct SceneObj { u8 pad[4]; Transform* xform; };
 
 // 0x8000733C
-void CameraFollowReset(CameraFollow* c) {
+extern "C" void CameraFollowReset(CameraFollow* c) {
     SceneObj* player = *(SceneObj**)(*(u8**)gWorldState + 0x8);
     if (player != NULL) {
         Vec3 y = QuatGetAxisY(&player->xform->rot);

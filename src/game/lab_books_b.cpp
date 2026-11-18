@@ -32,7 +32,7 @@ s32  fn_8011C168(u8* p);                  // 0x8011C168
 }
 
 // Defined in small_8011.cpp with C++ linkage.
-void fn_80118BDC(u8* s);                  // 0x80118BDC
+extern "C" void fn_80118BDC(u8* s);                  // 0x80118BDC
 
 extern "C" {
 

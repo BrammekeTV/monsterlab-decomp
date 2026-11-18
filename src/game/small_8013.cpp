@@ -64,7 +64,7 @@ extern f32   lbl_805FEF9C;          // 0x805FEF9C (float constant)
 // 0x80132BD8
 // Clears the three screen-set widgets listed at obj+0x14 (each entry's widget at +0x100),
 // then resets the three screen sets.
-void fn_80132BD8(u8* p) {
+extern "C" void fn_80132BD8(u8* p) {
     for (s32 i = 0; i < 3; i++) {
         u8* slot = *(u8**)(p + 0x14 + i * 4);
         if (slot != 0) {

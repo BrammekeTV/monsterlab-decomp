@@ -123,7 +123,7 @@ void SaveSetQuestRecord(u8* s, s32 q, const QuestRecord* r) {
 extern "C" {
 void NoticePosted(u8* s);                              // 0x8022DF3C
 void LabQuestFinished(void* lab, s32 a);               // 0x80218998
-void SaveUnlockReward(u8* s, const u8* reward, BOOL notify);   // 0x80224308
+s32 SaveUnlockReward(u8* s, const u8* reward, BOOL notify);   // 0x80224308
 }
 extern void* gLab;     // 0x805FBBC8
 

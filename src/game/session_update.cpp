@@ -25,7 +25,7 @@ struct Locator { u8 pad[8]; f32 pos[3]; };
 
 extern "C" {
 void   GameStateReset(void* g);                         // 0x80006BB4
-void   fn_80006F44(void* g);
+void   fn_80006F44(void);
 void   fn_80009748(void* s, u8 level);                  // level teardown
 void   fn_800098F4(void* s, f32 a, f32 dt);             // world render
 void   fn_8000A6AC(void* s);                            // world draw
@@ -300,7 +300,7 @@ void GameSessionUpdate(GameSession* s, f32 a, f32 dt) {
             lbl_8047C790[2] = 0;
             s->unk4C = 0;
             if (s->flags & SFLAG_RESET_GAME) {
-                fn_80006F44(gGame);
+                fn_80006F44();
                 s->flags &= ~SFLAG_RESET_GAME;
             }
             GameStateReset(gGame);

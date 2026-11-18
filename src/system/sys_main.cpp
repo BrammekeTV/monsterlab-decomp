@@ -53,7 +53,7 @@ static void SysPowerCallback(void) {
 }
 
 // 0x80142EF8
-int SysSprintf(char* buf, const char* fmt, ...);
+extern "C" int SysSprintf(char* buf, const char* fmt, ...);
 
 // 0x80142A4C
 // Fatal exception handler: dumps the context and shows a red/blue OSFatal screen

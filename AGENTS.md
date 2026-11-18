@@ -51,6 +51,9 @@ a PC port. Read this whole file before making changes. Human contributors: see
 - `python tools/rename.py -f config/RM7P4F/names_game.txt`: apply names, then re-run
   `tools/bin/dtk.exe dol split config/RM7P4F/config.yml build/RM7P4F` so asm and m2c see them.
 - `python tools/gen_leaf.py`: regenerate `src/leaf/` (drops functions that are now done).
+- `python tools/check_protos.py [names]`: reports functions declared with different return types,
+  parameter counts or C/C++ linkage across `src/` and `include/` (run it before pushing; all game
+  functions use C linkage). Pointer-returning script callbacks return `ScriptValue`.
 - `python tools/check.py [files]`: compile with MSVC using the CI flags (no args = changed files).
 - `python tools/progress.py`: progress numbers.
 

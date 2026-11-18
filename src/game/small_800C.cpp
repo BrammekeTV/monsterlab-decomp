@@ -4,7 +4,7 @@
 extern "C" {
 void  operator_delete(void* p);                                 // 0x801D426C
 void  fn_800690D4(u8* p, s32 a, void* params, s32 b);                                       // 0x800690D4 (base ctor)
-void  fn_80062CE0(u8* p, s32 del);                              // 0x80062CE0 (base dtor)
+u8*  fn_80062CE0(u8* p, s32 del);                              // 0x80062CE0 (base dtor)
 void  fn_800C2670(u8* p);                                       // 0x800C2670
 void  fn_800C2760(u8* p);                                       // 0x800C2760
 void  fn_800C28C4(u8* p);                                       // 0x800C28C4
@@ -86,7 +86,7 @@ u8* fn_800C2720(u8* p, s32 del) {
 
 // 0x800C407C
 // Constructor: base init, sets vtable and clears the field at +0x2A0.
-u8* fn_800C407C(u8* p, s32 a, void* params, s32 b) {
+extern "C" u8* fn_800C407C(u8* p, s32 a, void* params, s32 b) {
     fn_800C13D8(p, a, params, b);
     *(u8**)(p + 0x0)   = lbl_8035EE40;
     *(s32*)(p + 0x2a0) = 0;
@@ -95,7 +95,7 @@ u8* fn_800C407C(u8* p, s32 a, void* params, s32 b) {
 
 // 0x800C40C0
 // Deleting destructor: base dtor (fn_800C142C) on p, then free if del > 0.
-u8* fn_800C40C0(u8* p, s32 del) {
+extern "C" u8* fn_800C40C0(u8* p, s32 del) {
     if (p) {
         fn_800C142C(p, 0);
         if (del > 0) operator_delete(p);
@@ -130,7 +130,7 @@ void fn_800C44C0(u8* p, u8* src, void* arg) {
 
 // 0x800C4530
 // Constructor: base init, then sets vtable.
-u8* fn_800C4530(u8* p, s32 a, void* params, s32 b) {
+extern "C" u8* fn_800C4530(u8* p, s32 a, void* params, s32 b) {
     fn_800C13D8(p, a, params, b);
     *(u8**)(p + 0x0) = lbl_8035EF58;
     return p;
@@ -138,7 +138,7 @@ u8* fn_800C4530(u8* p, s32 a, void* params, s32 b) {
 
 // 0x800C456C
 // Deleting destructor: base dtor (fn_800C142C) on p, then free if del > 0.
-u8* fn_800C456C(u8* p, s32 del) {
+extern "C" u8* fn_800C456C(u8* p, s32 del) {
     if (p) {
         fn_800C142C(p, 0);
         if (del > 0) operator_delete(p);
@@ -148,7 +148,7 @@ u8* fn_800C456C(u8* p, s32 del) {
 
 // 0x800C52B4
 // Constructor: base init (fn_800C2670), then sets vtable at +0xD4.
-u8* fn_800C52B4(u8* p) {
+extern "C" u8* fn_800C52B4(u8* p) {
     fn_800C2670(p);
     *(u8**)(p + 0xd4) = lbl_8035F038;
     return p;
@@ -211,7 +211,7 @@ u8* fn_800C5EE4(u8* p, s32 del) {
 
 // 0x800C5F84
 // Constructor: base init, sets vtable and the int at +0x268 to -1.
-u8* fn_800C5F84(u8* p, s32 a, void* params, s32 b) {
+extern "C" u8* fn_800C5F84(u8* p, s32 a, void* params, s32 b) {
     fn_800690D4(p, a, params, b);
     *(u8**)(p + 0x0)   = lbl_8035F148;
     *(s32*)(p + 0x268) = -1;

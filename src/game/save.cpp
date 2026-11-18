@@ -23,7 +23,7 @@ s32   SaveRead(s32 handle, void* buf, u32 size);             // 0x8020681C
 s32   SaveWriteData(s32 handle, const void* buf, u32 size);  // 0x8020690C
 s32   SaveClose(s32 handle);                                 // 0x802067BC
 void  SaveSetup(const char* name);                           // 0x802069CC
-void  SysSprintf(char* buf, const char* fmt, ...);           // 0x80142EFC
+s32  SysSprintf(char* buf, const char* fmt, ...);           // 0x80142EFC
 void  BufferFree(void* p);                                   // 0x801D4980
 void* TextureLoad(const char* name);                         // 0x801D8E80
 void  TextureRelease(void* tex);                             // 0x80184028
@@ -295,7 +295,7 @@ BOOL SaveFileExists(const char* dir, const char* file) {
 }
 
 // 0x80011A08
-void fn_80011A08(void) {
+extern "C" void fn_80011A08(void) {
 }
 
 static inline void ToUpper(char* s) {

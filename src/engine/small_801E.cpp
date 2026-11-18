@@ -16,7 +16,7 @@ s32     inflate(void* strm, s32 flush);                                  // 0x80
 s32     inflateEnd(void* strm);                                          // 0x80232120
 }
 
-int SysSprintf(char* buf, const char* fmt, ...);                         // 0x80142EF8
+extern "C" int SysSprintf(char* buf, const char* fmt, ...);                         // 0x80142EF8
 
 extern u8  lbl_805FB894[];      // 0x805FB894 (fallback handler pointer for ScriptDispatchEngine)
 extern u8  lbl_805FB8C8[];      // 0x805FB8C8 (zlib stream-active flag byte)

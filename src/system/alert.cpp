@@ -12,8 +12,8 @@ const char* GetText(s32 id);                                  // 0x801401FC
 u32         AlertGetLastError(void);                           // 0x80140B58
 void        AlertShowScreen(const char* title, const char* body, s32 style);   // 0x80141CA4
 f32         AlertGetTimer(void);                               // 0x80142460
-void        SysSprintf(char* buf, const char* fmt, ...);       // 0x80142EFC
-BOOL        IsThisPAL(void);
+s32        SysSprintf(char* buf, const char* fmt, ...);       // 0x80142EFC
+ScriptValue IsThisPAL(void);
 BOOL        IsShowingError(void);
 void        UIPlayAnim(void* el, u32 anim);                    // 0x8019BE40
 void        ScreenSetsActivate(void* sets, u32 hash);          // 0x8018D70C

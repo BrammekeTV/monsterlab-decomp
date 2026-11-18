@@ -22,7 +22,7 @@ void  fn_800223EC(void);                                        // 0x800223EC
 void  fn_80022E10(void);                                        // 0x80022E10
 void  fn_80022F28(void);                                        // 0x80022F28
 void  fn_80023160(void);                                        // 0x80023160
-void  fn_80021ECC(u8* p);                                       // 0x80021ECC
+void  fn_80021ECC(void);                                       // 0x80021ECC
 void  fn_800223F0(u8* p, f32 v);                                // 0x800223F0
 void  fn_8003451C(u8* p);                                       // 0x8003451C
 s32   fn_800304DC(u8* p, const f32* v);                         // 0x800304DC
@@ -218,7 +218,7 @@ void fn_80033958(u8* p) {
 // 0x80034394
 // Runs fn_80021ECC, sets the value with fn_800223F0 to lbl_805FCE24, then shows UI element 0x0CAF9C6F.
 void fn_80034394(u8* p) {
-    fn_80021ECC(p);
+    fn_80021ECC();
     fn_800223F0(p, lbl_805FCE24);
     UIElement_SetVisibleFlag(0x0CAF9C6F, 1);
 }

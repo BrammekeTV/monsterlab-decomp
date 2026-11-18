@@ -16,10 +16,10 @@ void  fn_800999B4(u8* obj, f32 v);                                // 0x800999B4
 }
 
 // Door callbacks defined in small_8009.cpp (C++ linkage).
-void RobotEvolutionExperiment_DoorOpenning(u8* p);
-void RobotEvolutionExperiment_DoorOpen(u8* p);
-void RobotEvolutionExperiment_DoorClosing(u8* p);
-void RobotEvolutionExperiment_DoorClosed(u8* p);
+extern "C" void RobotEvolutionExperiment_DoorOpenning(u8* p);
+extern "C" void RobotEvolutionExperiment_DoorOpen(u8* p);
+extern "C" void RobotEvolutionExperiment_DoorClosing(u8* p);
+extern "C" void RobotEvolutionExperiment_DoorClosed(u8* p);
 
 extern void* gEventMgr;                                           // 0x805FB6C8
 extern u8    lbl_8035BD58[];                                      // registration name block
@@ -81,7 +81,7 @@ void fn_8009253C(u8* p, f32 dt) {
 
 // 0x80092CC4
 // Returns the robot table entry whose key at +4 equals the argument, or NULL.
-u8* fn_80092CC4(u8* key) {
+extern "C" u8* fn_80092CC4(u8* key) {
     return RobotEntryFind(key);
 }
 
@@ -222,7 +222,7 @@ void fn_8009803C(u8* p, f32 dt) {
 // Constructor: runs the base constructor, sets the vtable and the initial state fields
 // (+0x264 = 0, +0x268 = -1, flags at +0x26C/+0x26D/+0x26E = 0/0/1, timers +0x270/+0x274 = 0.0,
 // +0x278 = lbl_805FDBC8), and returns the object.
-void* fn_8009848C(void* obj, s32 a, void* params, s32 b) {
+extern "C" void* fn_8009848C(void* obj, s32 a, void* params, s32 b) {
     u8* p = (u8*)obj;
     fn_800690D4(p, a, params, b);
     *(void**)(p + 0x0) = (void*)lbl_8035C3F0;

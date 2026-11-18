@@ -41,7 +41,7 @@ void  fn_801B3310(u8* p, u8* q);                            // 0x801B3310
 void* fn_801D40E0(s32 n);                                   // 0x801D40E0
 void* fn_80209814(void* v);                                 // 0x80209814
 void  fn_80028A84(u8* p, f32 v);                            // 0x80028A84
-void  PlaySound(u32 hash, s32 a, s32 b, s32 c, s32 d, s32 e); // 0x80209E70
+s32  PlaySound(u32 hash, s32 a, s32 b, s32 c, s32 d, s32 e); // 0x80209E70
 void  EventSend(void* mgr, void* target, void* from, u32 event, int a, int b, int c, int d);
 u32   RandomU32(void);                                      // 0x80143460
 u32   StringHash(const char* s);                            // 0x801EB704

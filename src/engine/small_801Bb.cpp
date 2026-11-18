@@ -41,7 +41,7 @@ static u8* RumbleSlot(s32 chan) {
 
 // 0x801B11DC
 // Initializes a ray query: vtable, zeroed results, default hit state.
-void RayQueryInit(u8* q) {
+extern "C" void RayQueryInit(u8* q) {
     *(u8**)(q + 0x0) = lbl_803839A8;
     *(s32*)(q + 0x4) = 0;
     *(s32*)(q + 0x8) = 0;
@@ -60,7 +60,7 @@ void RayQueryInit(u8* q) {
 
 // 0x801B2B94
 // Stops the rumble on a channel: calls the slot's virtual stop (+0x14), then clears its flags and intensity.
-void StopRumble(s32 chan) {
+extern "C" void StopRumble(s32 chan) {
     u8* p = RumbleSlot(chan);
     if (p) {
         (*(void (**)(u8*))(*(u8**)p + 0x14))(p);
@@ -96,7 +96,7 @@ void fn_801B30C4(void) {
 
 // 0x801B3310
 // Appends a pointer to the pointer list (count at +0, array at +4, capacity 0x20) unless it is already there.
-void fn_801B3310(u8* p, u8* q) {
+extern "C" void fn_801B3310(u8* p, u8* q) {
     s32 count = *(s32*)(p + 0x0);
     if (count >= 0x20) return;
     u8* arr = *(u8**)(p + 0x4);
@@ -109,7 +109,7 @@ void fn_801B3310(u8* p, u8* q) {
 
 // 0x801B3378
 // Removes the first occurrence of a pointer from the pointer list, shifting later entries down.
-void fn_801B3378(u8* p, u8* key) {
+extern "C" void fn_801B3378(u8* p, u8* key) {
     s32 count = *(s32*)(p + 0x0);
     u8* arr = *(u8**)(p + 0x4);
     s32 found = 0;
@@ -139,7 +139,7 @@ void fn_801B38BC(u8* p) {
 // 0x801B402C
 // Initializes a lab object: clears the flag at +4, allocates a 0x2C-byte buffer into +8, and sets up its
 // helper; the flag byte at +0 is cleared.
-void fn_801B402C(void* obj) {
+extern "C" void fn_801B402C(void* obj) {
     u8* p = (u8*)obj;
     *(s32*)(p + 0x4) = 0;
     u8* buf = (u8*)MemAllocDefault(0x2c);
@@ -161,7 +161,7 @@ void fn_801B4090(u8* p, u8* val) {
 
 // 0x801B40E4
 // Advances the node cursor at +4 along its link (node - 4), releasing the object at +8; clears the active flag at the end.
-void fn_801B40E4(u8* p) {
+extern "C" void fn_801B40E4(u8* p) {
     u8* node = *(u8**)(p + 0x4);
     if (!node) {
         *(u8*)(p + 0x0) = 0;
@@ -176,7 +176,7 @@ void fn_801B40E4(u8* p) {
 
 // 0x801B44AC
 // Deleting destructor: sets the vtable, calls its shutdown slot (+0x40), tears down the member at +0xFC, frees if del > 0.
-u8* fn_801B44AC(u8* p, s32 del) {
+extern "C" u8* fn_801B44AC(u8* p, s32 del) {
     if (p) {
         *(u8**)p = lbl_80383D68;
         (*(void (**)(u8*))(lbl_80383D68 + 0x40))(p);

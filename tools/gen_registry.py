@@ -76,7 +76,7 @@ def main():
         if not entries:
             continue
         out_cpp.append(f"// {addr}")
-        out_cpp.append(f"void {func_name}(void) {{")
+        out_cpp.append(f"extern \"C\" void {func_name}(void) {{")
         for fn, name, ty, _ in entries:
             out_cpp.append(f'    RegisterScriptFunc("{name}", 0x{ty:X}, (void*){fn});')
             if fn in seen_decl:
@@ -96,8 +96,10 @@ def main():
          "// the others get the types from the script signature table (run tools/gen_sigs.py first).",
          '#include "game/character.h"',
          ""]
+    # Everything is C linkage (tools/check_protos.py flags mixed linkage).
+    h += ['extern "C" {']
     h += [d for k, d in out_h if k == "CPP"]
-    h += ["", 'extern "C" {']
+    h += [""]
     h += [d for k, d in out_h if k == "C"]
     h += ["}", ""]
     open("include/game/script_callbacks.h", "w", encoding="utf-8").write("\n".join(h))
