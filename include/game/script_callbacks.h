@@ -233,9 +233,9 @@ void Creatures_IncCreature(s32 a0);  // type 0x83 (from signature table)
 void Creatures_InitEntityData(void);                                   // src/game/lab_books_c.cpp
 s32 Creatures_MonstersInInventory(void);                               // src/game/lab_books_c.cpp
 void Creatures_UpdateMonsterImage(void);                               // src/game/lab_books_c.cpp
-s32 CurrentScience_Alchemy(void);  // type 0x22 (from signature table)
-s32 CurrentScience_Biological(void);  // type 0x22 (from signature table)
-s32 CurrentScience_Mechanical(void);  // type 0x22 (from signature table)
+s32 CurrentScience_Alchemy(void);                                      // src/game/draft_8011b.cpp
+s32 CurrentScience_Biological(void);                                   // src/game/draft_8011b.cpp
+s32 CurrentScience_Mechanical(void);                                   // src/game/draft_8011b.cpp
 s32 CurrentScreen_Badges(void);                                        // src/game/lab_books_a.cpp
 s32 CurrentScreen_Creatures(void);                                     // src/game/lab_books_a.cpp
 s32 CurrentScreen_Ingredients(void);                                   // src/game/lab_books_a.cpp
@@ -598,11 +598,11 @@ void HandleReturnToCastle(void);                                       // src/ga
 u32 HasActiveQuest(void);                                              // src/leaf/auto_03_800E75B0_text_cb.cpp
 u32 HasBadge(u32 badge);                                               // src/game/player_api.cpp
 s32 HasMonsterVoice(void);                                             // src/leaf/auto_03_800E75B0_text_cb.cpp
-s32 HasPrimaryForRecipe(void);  // type 0x22 (from signature table)
-s32 HasSecondaryForRecipe(void);  // type 0x22 (from signature table)
+s32 HasPrimaryForRecipe(void);                                         // src/game/draft_8011b.cpp
+s32 HasSecondaryForRecipe(void);                                       // src/game/draft_8011b.cpp
 s32 HasTimePressure(void);  // type 0x22 (from signature table)
 s32 HasValidKeyIngredient(void);  // type 0x22 (from signature table)
-s32 HasValidRecipe(void);  // type 0x22 (from signature table)
+s32 HasValidRecipe(void);                                              // src/game/draft_8011b.cpp
 s32 HasValidSecondaryIngredient(void);  // type 0x22 (from signature table)
 ScriptValue HeadToFriendslist(void);  // type 0x2E (from signature table)
 void HideAlertBox(void);  // type 0x8F (from signature table)
@@ -750,7 +750,7 @@ void KillMatchConnection(void);                                        // src/ga
 void KillParticleAtJunction(u32 a0, u32 a1);  // type 0x7A (from signature table)
 void KillPersistentGoal(u32 a3, u32 a4);                               // src/leaf/auto_03_800FB958_text_cb.cpp
 void KillProp(u32 /*0x31*/ a0);  // type 0x127 (from signature table)
-s32 KnowsSecondaryForRecipe(void);  // type 0x22 (from signature table)
+s32 KnowsSecondaryForRecipe(void);                                     // src/game/draft_8011b.cpp
 s32 LT_AllPartsForStickTutorialSelected(void);  // type 0x22 (from signature table)
 void LT_ClearTutorialText(void);  // type 0x8F (from signature table)
 void LT_ConversationStopVoiceSFX(void);  // type 0x8F (from signature table)
@@ -788,8 +788,8 @@ BOOL LabBooks_Ingredients_RenderList_GetTextureList(void);             // src/ga
 void LabBooks_Ingredients_RenderList_IncSelectedItem(s32 a0);          // src/game/lab_books_a.cpp
 void LabBooks_Ingredients_RenderList_SetSelectedItem(BOOL a0);         // src/game/lab_books_a.cpp
 s32 LabBooks_Ingredients_ShowIngredientFilters(void);                  // src/game/lab_books_a.cpp
-void LabBooks_SetCurrentScience(u32 a0);  // type 0x71 (from signature table)
-void LabBooks_UpdateLabBooks(void);  // type 0x8F (from signature table)
+void LabBooks_SetCurrentScience(u32 a0);                               // src/game/draft_8011b.cpp
+void LabBooks_UpdateLabBooks(void);                                    // src/game/draft_8011b.cpp
 ScriptValue LeaveInterlabLink(void);  // type 0x2E (from signature table)
 void Level_AddToFloat(u32 a3, f32 f1);                                 // src/leaf/auto_03_80106AA8_text_cb.cpp
 void Level_AddToInt(u32 a3, s32 a4);                                   // src/leaf/auto_03_80106AA8_text_cb.cpp
@@ -981,9 +981,9 @@ void PlayDanceAnimation(void* a0, u32 a1);                             // src/ga
 void PlayEffect(void* a0, u32 a1);                                     // src/game/small_8010.cpp
 void PlayEffectTransient(void* a0, u32 a1);                            // src/game/small_8010.cpp
 void PlayEntitySoundGroupFX(void* a0, u32 a1, u32 /*0x06*/ a2);  // type 0x10C (from signature table)
-void PlayExperimentSound(void* a0, u32 a1, s32 a2);  // type 0x46 (from signature table)
-void PlayExperimentSoundAtPropLocation(void* a0, u32 a1, s32 a2);  // type 0x46 (from signature table)
-void PlayExperimentSoundAttached(void* a0, u32 a1, s32 a2);  // type 0x46 (from signature table)
+void PlayExperimentSound(void* owner, u32 id, s32 vol);                // src/game/draft_8007b.cpp
+void PlayExperimentSoundAtPropLocation(void* owner, u32 id, s32 vol);  // src/game/draft_8007b.cpp
+void PlayExperimentSoundAttached(void* owner, u32 id, s32 vol);        // src/game/draft_8007b.cpp
 void PlayFootStepEffect(void* a0);  // type 0x2F (from signature table)
 void PlayFootStepSound(void* a0);  // type 0x2F (from signature table)
 void PlayInjuredAnimation(void* a0);  // type 0x2F (from signature table)
@@ -1083,7 +1083,7 @@ s32 Recipes_RenderList_GetSelectedItem(void);                          // src/ga
 void Recipes_RenderList_SetSelectedItem(s32 a0);  // type 0x83 (from signature table)
 void Recipes_SetRecipePopup(s32 a0);  // type 0x83 (from signature table)
 void Recipes_SetupRenderList(void);                                    // src/game/lab_books_d.cpp
-void RegisterExperimentSound(void* a0, u32 /*0x0B*/ a1, u32 a2);  // type 0x3B (from signature table)
+void RegisterExperimentSound(void* owner, u32 sound, u32 id);          // src/game/draft_8007b.cpp
 void RegisterHooks(void);                                              // src/engine/small_801D.cpp
 void RegisterMidiLoop(u32 a3, u32 a4);                                 // src/leaf/auto_03_800756E0_text_cb.cpp
 void ReleaseDanceAnimation(void* a0);                                  // src/game/small_8007.cpp
@@ -1162,7 +1162,7 @@ void SavedGameMCSentCallback(u32 a3);                                  // src/le
 void ScreenIsOpen(void);                                               // src/leaf/auto_03_8013F034_text_cb.cpp
 s32 GetResultRegister(void);                                           // src/leaf/auto_03_801D9028_text_cb.cpp
 void SelectKeyIngredient(void);  // type 0x8F (from signature table)
-void SelectRecipe(void);  // type 0x8F (from signature table)
+void SelectRecipe(void);                                               // src/game/draft_8011b.cpp
 void SelectSecondaryIngredient(void);  // type 0x8F (from signature table)
 s32 SelectedIngredientsMadnessTooHigh(void);                           // src/leaf/auto_03_8010FDA4_text_cb.cpp
 s32 SelectedIngredientsValid(void);                                    // src/leaf/auto_03_8010FDA4_text_cb.cpp
@@ -1436,7 +1436,7 @@ void StopAllExperimentSounds(void);                                    // src/ga
 void StopBackgroundSFX(u32 /*0x0B*/ a0, u32 /*0x0B*/ a1);  // type 0x145 (from signature table)
 void StopConversation(void);  // type 0x8F (from signature table)
 void StopEntityLoopingSoundFX(void* a3);                               // src/leaf/auto_03_800E75B0_text_cb.cpp
-void StopExperimentSound(void* a0, u32 a1);  // type 0x42 (from signature table)
+void StopExperimentSound(void* owner, u32 id);                         // src/game/draft_8007b.cpp
 void StopHazardEffect(void* a3);                                       // src/leaf/auto_03_800E75B0_text_cb.cpp
 void StopLaser(void* a0, s32 a1);  // type 0x48 (from signature table)
 void StopNISFSM(void);                                                 // src/game/small_800Fc.cpp
@@ -1676,10 +1676,10 @@ void TimedRumble(s32 a0, f32 a1, u32 /*0x2A*/ a2);  // type 0x85 (from signature
 s32 UIActivationGrid_GetCurrentIndex(void);  // type 0x22 (from signature table)
 void UIActivationGrid_SetCurrentIndex(s32 a0);  // type 0x83 (from signature table)
 void UIActivationGrid_SetEnabled(u32 /*0x06*/ a0);  // type 0x67 (from signature table)
-f32 UIElement_GetUIAnimCurrentTime(u32 a0);  // type 0x10 (from signature table)
+f32 UIElement_GetUIAnimCurrentTime(u32 a0);                            // src/engine/draft_8019b.cpp
 s32 UIElement_GetVisibleFlag(u32 a0);  // type 0x1E (from signature table)
 f32 UIElement_GetXAtPercent(u32 a0, f32 a1);  // type 0x11 (from signature table)
-s32 UIElement_IsCursorOverItem(u32 a0);  // type 0x1E (from signature table)
+s32 UIElement_IsCursorOverItem(u32 a0);                                // src/engine/draft_8019b.cpp
 u32 /*0x06*/ UIElement_IsUIAnimPlaying(u32 a0);  // type 0x5 (from signature table)
 void UIElement_PlayUIAnim(u32 a0, u32 a1);                             // src/game/draft_8019.cpp
 void UIElement_PlayUIAnimAtRate(u32 a0, u32 a1, f32 a2);               // src/game/draft_8019.cpp
@@ -1691,7 +1691,7 @@ void UIElement_RestoreZ(u32 a0);  // type 0x71 (from signature table)
 void UIElement_SetColor(u32 a0, BOOL a1);  // type 0x81 (from signature table)
 void UIElement_SetColor_Floats(u32 a0, f32 a1, f32 a2, f32 a3, f32 a4);  // type 0x78 (from signature table)
 void UIElement_SetColor_Ints(u32 a0, BOOL a1, BOOL a2, BOOL a3, BOOL a4); // src/game/draft_8019.cpp
-void UIElement_SetDoHitTest(u32 a0, u32 /*0x06*/ a1);  // type 0x74 (from signature table)
+void UIElement_SetDoHitTest(u32 a0, u32 /*0x06*/ a1);                  // src/engine/draft_8019b.cpp
 void UIElement_SetEnableFlag(u32 a0, u32 /*0x06*/ a1);  // type 0x74 (from signature table)
 void UIElement_SetPos(u32 a0, BOOL a1);  // type 0x81 (from signature table)
 void UIElement_SetPos_Floats(u32 a0, f32 a1, f32 a2, f32 a3);  // type 0x77 (from signature table)
@@ -1699,7 +1699,7 @@ void UIElement_SetRot(u32 a0, void* a1);                               // src/ga
 void UIElement_SetRot_Floats(u32 a0, f32 a1, f32 a2, f32 a3);          // src/game/draft_8019.cpp
 void UIElement_SetSize(u32 a0, BOOL a1);  // type 0x81 (from signature table)
 void UIElement_SetSize_Floats(u32 a0, f32 a1, f32 a2, f32 a3);  // type 0x77 (from signature table)
-void UIElement_SetUIAnimPlaybackRate(u32 a0, f32 a1);  // type 0x76 (from signature table)
+void UIElement_SetUIAnimPlaybackRate(u32 a0, f32 a1);                  // src/engine/draft_8019b.cpp
 void UIElement_SetVisibleFlag(u32 a0, u32 /*0x06*/ a1);  // type 0x74 (from signature table)
 void UIElement_SetX(u32 a0, f32 a1);  // type 0x76 (from signature table)
 void UIElement_StopUIAnim(u32 a0, u32 /*0x06*/ a1);                    // src/game/draft_8019.cpp
@@ -1732,8 +1732,8 @@ void UIGrid_SetIgnoreAlphaPixels(u32 a0, u32 /*0x06*/ a1);  // type 0x74 (from s
 void UIGrid_SetImageList(u32 a0, BOOL a1);  // type 0x81 (from signature table)
 void UIGrid_SetTextColorList(u32 a0, BOOL a1);  // type 0x81 (from signature table)
 void UIGrid_SetTextList(u32 a0, BOOL a1);  // type 0x81 (from signature table)
-void UIGroup_DisableHitTest(u32 a0);  // type 0x71 (from signature table)
-void UIGroup_EnableHitTest(u32 a0);  // type 0x71 (from signature table)
+void UIGroup_DisableHitTest(u32 a0);                                   // src/engine/draft_8019b.cpp
+void UIGroup_EnableHitTest(u32 a0);                                    // src/engine/draft_8019b.cpp
 ScriptValue UIImage_GetTexture(u32 a0);  // type 0x25 (from signature table)
 void UIImage_SetIgnoreAlphaPixels(u32 a0, u32 /*0x06*/ a1);  // type 0x74 (from signature table)
 void UIImage_SetTexture(u32 a0, BOOL a1);  // type 0x81 (from signature table)
@@ -1778,14 +1778,14 @@ void UISoundList_PlaySfx(u32 a0, u32 a1);  // type 0x7A (from signature table)
 void UISoundList_PlayVoiceSfx(u32 a0, u32 a1);  // type 0x7A (from signature table)
 void UIText_ForceTypeout(u32 a0);  // type 0x71 (from signature table)
 f32 UIText_GetRightXPos(u32 a0);  // type 0x10 (from signature table)
-ScriptValue UIText_GetString(u32 a0);  // type 0x25 (from signature table)
+ScriptValue UIText_GetString(u32 a0);                                  // src/engine/draft_8019b.cpp
 u32 /*0x06*/ UIText_IsOnLastPage(u32 a0);  // type 0x5 (from signature table)
 u32 /*0x06*/ UIText_IsTypeoutDone(u32 a0);  // type 0x5 (from signature table)
-void UIText_RefreshText(u32 a0);  // type 0x71 (from signature table)
+void UIText_RefreshText(u32 a0);                                       // src/engine/draft_8019b.cpp
 void UIText_SetString(u32 a3, BOOL a4);                                // src/leaf/auto_03_8018E0CC_text_cb.cpp
 void UIText_SetString_Float(u32 a0, f32 a1, BOOL a2);  // type 0x79 (from signature table)
 void UIText_SetString_Int(u32 a0, s32 a1);  // type 0x7E (from signature table)
-void UIText_SetString_TextID(u32 a0, u32 /*0x11*/ a1);  // type 0x73 (from signature table)
+void UIText_SetString_TextID(u32 a0, u32 /*0x11*/ a1);                 // src/engine/draft_8019b.cpp
 void UIText_SetWrapLength(u32 a0, s32 a1);  // type 0x7E (from signature table)
 ScriptValue UITextureList_GetNextTexture(u32 a0, BOOL a1);  // type 0x27 (from signature table)
 ScriptValue UITextureList_GetTexture(u32 a0, s32 a1);  // type 0x26 (from signature table)

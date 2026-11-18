@@ -69,6 +69,11 @@
  "changelog": [
   {
    "date": "2026-11-18",
+   "time": "22:31",
+   "text": "Fourth draft-pipeline round: 47 more functions (lab-book science and recipe queries in 0x8011, UI animation rate and text helpers in 0x8019, shape-collision tests in 0x801B, experiment sound table in 0x8007, remote input and camera helpers in 0x8002), rewritten and checked against the asm by Sonnet helpers."
+  },
+  {
+   "date": "2026-11-18",
    "time": "22:24",
    "text": "Third draft-pipeline round: 51 more functions (sequencer events and notices in 0x8021/0x8022, object database and ring buffers in 0x800D, box and segment geometry in 0x801C); fn_8032F1E8 prototype corrected to five arguments in four files."
   },

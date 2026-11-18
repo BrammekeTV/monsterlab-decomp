@@ -22,7 +22,7 @@ void  EntityRefreshLinks(void* entity);                         // 0x8012CDFC
 s32   WorldGetEntityZone(void* world, void* entity);            // 0x80132458
 BOOL  ZoneIsLoaded(void* world, s32 zone);                      // 0x8012F408
 void  SpawnEffectAt(void* fxMgr, void* effect, const f32 posAndScale[4], int a);   // 0x801C80E0
-void  PlaySoundAt(void* sound, int a, const Vec3* pos, int b);  // 0x80209ABC
+s32   PlaySoundAt(void* sound, int a, const Vec3* pos, int b);  // 0x80209ABC
 BOOL  ScriptIsPaused(void* script);                             // 0x8000B8A0
 BOOL  ScriptIsStopped(void* script);                            // 0x8000B8AC
 BOOL  EntityIsFrozen(void* entity);                             // 0x801B70E8

@@ -17,7 +17,7 @@ extern u8 lbl_805FB704[];
 extern u8 lbl_805FFB08[];
 extern "C" void EventSend(void*, void*, void*, u32, int, int, int, int);
 extern "C" void EventSendTo(void*, u32, void*, u32, int, int);
-extern "C" void fn_801B1778(void*, s32);
+extern "C" void fn_801B1778(u8*, s32);
 extern "C" void fn_801BB530(s32, s32);
 extern "C" void fn_801EBA20(void*, void*);
 extern "C" void fn_801EBBE0(s32, u8*, s32);
@@ -184,7 +184,7 @@ extern "C" void fn_801B7020(u8* a3) {
     u32 t3 = (u32)(t2) | 0x4000u;
     *(u32*)(t1 + 32) = (u32)((u32)(t3));
     u8* t4 = *(u8**)(((u8*)(uintptr_t)(a3)) + 140);
-    fn_801B1778((void*)(t4), (s32)((u32)(1)));
+    fn_801B1778(t4, (s32)((u32)(1)));
 }
 
 // 0x801B70E8

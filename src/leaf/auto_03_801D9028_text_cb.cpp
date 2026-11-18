@@ -10,7 +10,7 @@ extern u8 lbl_8040E5F0[];
 extern u8 lbl_805F9980[];
 extern u8 lbl_805FB89C[];
 extern "C" s32 PlaySound(u32, s32, s32, s32, s32, s32);
-extern "C" void PlaySoundAt(void*, int, void*, int);
+extern "C" s32 PlaySoundAt(void*, int, void*, int);
 extern "C" void TriggerDoAction(void*, void*, void*);
 extern "C" void fn_801629D0(void*, s32);
 extern "C" void fn_80162A70(u8*);

@@ -20,7 +20,7 @@ void  fn_801629D0(void* obj, s32 n);                                // 0x801629D
 void  fn_801ED788(f32* out, u32 a1);                                // 0x801ED788
 void  SpawnEffectAt(void* fxMgr, u32 effect, const f32 posAndScale[4], int a); // 0x801C80E0
 void* EventPost(s32 id, void* sender);                              // 0x801F3918
-void  PlaySoundAt(void* sound, int a, const void* pos, int b);      // 0x80209ABC
+s32   PlaySoundAt(void* sound, int a, const void* pos, int b);      // 0x80209ABC
 s32   PlaySound(u32 hash, s32 a, s32 b, s32 c, s32 d, s32 e);       // 0x80209E70
 void  fn_8020A398(s32 handle);                                      // 0x8020A398
 void* fn_801D40E0(s32 n);                                           // 0x801D40E0

@@ -43,7 +43,7 @@ void  fn_801E839C(u8* p);                                       // 0x801E839C
 void  ZoneEffectsUpdate(void* effects, f32 dt);                 // 0x801E97FC
 void* fn_801D40E0(s32 n);                                       // 0x801D40E0
 void* fn_80209814(void* v);                                     // 0x80209814
-void  PlaySoundAt(void* sound, int a, const Vec3* pos, int b);  // 0x80209ABC
+s32   PlaySoundAt(void* sound, int a, const Vec3* pos, int b);  // 0x80209ABC
 void  fn_801B55F4(u8* obj, u8* out, s32 idx);                   // 0x801B55F4
 void  SpawnEffectAt(void* fxMgr, u32 effect, const f32 posAndScale[4], int a); // 0x801C80E0
 void* CharacterFind(s32 id);                                    // 0x800E876C

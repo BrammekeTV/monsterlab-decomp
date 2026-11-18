@@ -1,15 +1,15 @@
 {
  "game_id": "RM7P4F",
- "generated": "2026-11-18T21:24:55+00:00",
- "commit": "6f75df0",
- "commit_date": "2026-11-18T22:15:52+01:00",
+ "generated": "2026-11-18T21:30:58+00:00",
+ "commit": "950e517",
+ "commit_date": "2026-11-18T22:24:56+01:00",
  "game": {
   "functions": 8548,
   "bytes": 2265988,
   "named": 2748,
   "named_bytes": 616800,
-  "decompiled": 4443,
-  "decompiled_bytes": 469772
+  "decompiled": 4490,
+  "decompiled_bytes": 483688
  },
  "library": {
   "functions": 4039,
@@ -24,8 +24,8 @@
   "bytes": 3404928,
   "named": 3211,
   "named_bytes": 721548,
-  "decompiled": 4444,
-  "decompiled_bytes": 469892
+  "decompiled": 4491,
+  "decompiled_bytes": 483808
  },
  "game_range": [
   "80006B40",
@@ -77,11 +77,11 @@
    0.665
   ],
   [
-   0.128,
+   0.288,
    0.645
   ],
   [
-   0.134,
+   0.332,
    0.059
   ],
   [
@@ -225,11 +225,11 @@
    0.052
   ],
   [
-   0.058,
+   0.152,
    0.125
   ],
   [
-   0.632,
+   0.746,
    0.725
   ],
   [
@@ -521,11 +521,11 @@
    0.865
   ],
   [
-   0.161,
+   0.512,
    0.801
   ],
   [
-   0.403,
+   0.648,
    1.0
   ],
   [
@@ -761,7 +761,7 @@
    0.543
   ],
   [
-   0.236,
+   0.497,
    0.968
   ],
   [
@@ -817,11 +817,11 @@
    0.041
   ],
   [
-   0.001,
+   0.018,
    0.0
   ],
   [
-   0.093,
+   0.435,
    0.19
   ],
   [
@@ -1193,6 +1193,61 @@
  ],
  "files": [
   {
+   "path": "src/engine/draft_8019b.cpp",
+   "functions": [
+    {
+     "name": "UIElement_SetUIAnimPlaybackRate",
+     "addr": "801908AC",
+     "size": 236
+    },
+    {
+     "name": "UIElement_GetUIAnimCurrentTime",
+     "addr": "80190998",
+     "size": 200
+    },
+    {
+     "name": "UIElement_SetDoHitTest",
+     "addr": "80190A60",
+     "size": 156
+    },
+    {
+     "name": "UIGroup_DisableHitTest",
+     "addr": "80190AFC",
+     "size": 204
+    },
+    {
+     "name": "UIGroup_EnableHitTest",
+     "addr": "80190BC8",
+     "size": 204
+    },
+    {
+     "name": "UIElement_IsCursorOverItem",
+     "addr": "80190C94",
+     "size": 148
+    },
+    {
+     "name": "fn_80190D28",
+     "addr": "80190D28",
+     "size": 288
+    },
+    {
+     "name": "UIText_SetString_TextID",
+     "addr": "80190E50",
+     "size": 500
+    },
+    {
+     "name": "UIText_GetString",
+     "addr": "80191044",
+     "size": 200
+    },
+    {
+     "name": "UIText_RefreshText",
+     "addr": "8019110C",
+     "size": 188
+    }
+   ]
+  },
+  {
    "path": "src/engine/draft_801A.cpp",
    "functions": [
     {
@@ -1239,6 +1294,61 @@
      "name": "fn_801A2DDC",
      "addr": "801A2DDC",
      "size": 132
+    }
+   ]
+  },
+  {
+   "path": "src/engine/draft_801Bb.cpp",
+   "functions": [
+    {
+     "name": "fn_801B00EC",
+     "addr": "801B00EC",
+     "size": 180
+    },
+    {
+     "name": "fn_801B0D7C",
+     "addr": "801B0D7C",
+     "size": 176
+    },
+    {
+     "name": "fn_801B0E34",
+     "addr": "801B0E34",
+     "size": 160
+    },
+    {
+     "name": "fn_801B0ED4",
+     "addr": "801B0ED4",
+     "size": 584
+    },
+    {
+     "name": "fn_801B111C",
+     "addr": "801B111C",
+     "size": 192
+    },
+    {
+     "name": "fn_801B1250",
+     "addr": "801B1250",
+     "size": 584
+    },
+    {
+     "name": "fn_801B1498",
+     "addr": "801B1498",
+     "size": 180
+    },
+    {
+     "name": "fn_801B154C",
+     "addr": "801B154C",
+     "size": 208
+    },
+    {
+     "name": "fn_801B1668",
+     "addr": "801B1668",
+     "size": 188
+    },
+    {
+     "name": "fn_801B1778",
+     "addr": "801B1778",
+     "size": 200
     }
    ]
   },
@@ -4133,6 +4243,101 @@
    ]
   },
   {
+   "path": "src/game/draft_8002b.cpp",
+   "functions": [
+    {
+     "name": "RemoteInputUpdate",
+     "addr": "80020070",
+     "size": 636
+    },
+    {
+     "name": "fn_800204D0",
+     "addr": "800204D0",
+     "size": 192
+    },
+    {
+     "name": "fn_800205CC",
+     "addr": "800205CC",
+     "size": 396
+    },
+    {
+     "name": "fn_800207A8",
+     "addr": "800207A8",
+     "size": 188
+    },
+    {
+     "name": "fn_80020A64",
+     "addr": "80020A64",
+     "size": 708
+    },
+    {
+     "name": "fn_80020D88",
+     "addr": "80020D88",
+     "size": 708
+    },
+    {
+     "name": "fn_80021088",
+     "addr": "80021088",
+     "size": 164
+    },
+    {
+     "name": "fn_80021188",
+     "addr": "80021188",
+     "size": 184
+    }
+   ]
+  },
+  {
+   "path": "src/game/draft_8007b.cpp",
+   "functions": [
+    {
+     "name": "fn_80070270",
+     "addr": "80070270",
+     "size": 400
+    },
+    {
+     "name": "fn_80070884",
+     "addr": "80070884",
+     "size": 244
+    },
+    {
+     "name": "RegisterExperimentSound",
+     "addr": "80070978",
+     "size": 132
+    },
+    {
+     "name": "PlayExperimentSoundAttached",
+     "addr": "800709FC",
+     "size": 284
+    },
+    {
+     "name": "PlayExperimentSoundAtPropLocation",
+     "addr": "80070B18",
+     "size": 280
+    },
+    {
+     "name": "PlayExperimentSound",
+     "addr": "80070C30",
+     "size": 208
+    },
+    {
+     "name": "StopExperimentSound",
+     "addr": "80070D00",
+     "size": 136
+    },
+    {
+     "name": "fn_80070D88",
+     "addr": "80070D88",
+     "size": 168
+    },
+    {
+     "name": "fn_80070E30",
+     "addr": "80070E30",
+     "size": 160
+    }
+   ]
+  },
+  {
    "path": "src/game/draft_8008.cpp",
    "functions": [
     {
@@ -4454,6 +4659,61 @@
      "name": "ExplorationInit",
      "addr": "800F0D20",
      "size": 588
+    }
+   ]
+  },
+  {
+   "path": "src/game/draft_8011b.cpp",
+   "functions": [
+    {
+     "name": "CurrentScience_Alchemy",
+     "addr": "801102D8",
+     "size": 408
+    },
+    {
+     "name": "CurrentScience_Biological",
+     "addr": "80110470",
+     "size": 408
+    },
+    {
+     "name": "CurrentScience_Mechanical",
+     "addr": "80110608",
+     "size": 408
+    },
+    {
+     "name": "LabBooks_SetCurrentScience",
+     "addr": "801107A0",
+     "size": 340
+    },
+    {
+     "name": "LabBooks_UpdateLabBooks",
+     "addr": "80111714",
+     "size": 532
+    },
+    {
+     "name": "HasValidRecipe",
+     "addr": "80111A74",
+     "size": 148
+    },
+    {
+     "name": "SelectRecipe",
+     "addr": "80111B08",
+     "size": 144
+    },
+    {
+     "name": "KnowsSecondaryForRecipe",
+     "addr": "80111B98",
+     "size": 188
+    },
+    {
+     "name": "HasPrimaryForRecipe",
+     "addr": "80111C54",
+     "size": 468
+    },
+    {
+     "name": "HasSecondaryForRecipe",
+     "addr": "80111E28",
+     "size": 708
     }
    ]
   },
