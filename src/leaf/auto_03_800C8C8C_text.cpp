@@ -6,6 +6,12 @@
 #include "types.h"
 
 extern u8 lbl_805FE4B8[];
+extern "C" void fn_800C4118(u8*);
+
+// 0x800C8E50
+extern "C" void fn_800C8E50(u8* a3) {
+    fn_800C4118(((u8*)(uintptr_t)(a3)));
+}
 
 // 0x800C9244
 extern "C" s32 fn_800C9244(u8* a3) {

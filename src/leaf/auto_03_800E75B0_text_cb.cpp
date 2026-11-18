@@ -43,6 +43,7 @@ extern "C" void WorldSendEvent(void*, s32, int, int, int);
 extern "C" void fn_80013340(u8*);
 extern "C" s32 fn_80021DAC(void);
 extern "C" s32 fn_80021DD0(void);
+extern "C" s32 fn_80021E30(void);
 extern "C" void fn_80022D10(void);
 extern "C" void fn_80022D1C(void);
 extern "C" void fn_80022D34(void);
@@ -572,6 +573,11 @@ s32 IsTimerCountdown(void) {
 // 0x800EFE4C
 s32 HasMonsterVoice(void) {
     return (s32)(fn_80021DD0());
+}
+
+// 0x800EFEB0
+s32 HasTimePressure(void) {
+    return (s32)(fn_80021E30());
 }
 
 // 0x800EFEB4

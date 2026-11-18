@@ -120,13 +120,13 @@ s32 GetExperimentScore(void) {
 
 // 0x80073454
 // Pulls the camera matrix from the level object and applies it to the camera; returns a global.
-s32 fn_80073454(void) {
+u8* fn_80073454(void) {
     f32 mtx[3][4];
     u8* obj = *(u8**)(lbl_803C4298 + 4);
     (*(void (**)(u8*, f32 (*)[4]))(*(u8**)obj + 0x38))(obj, mtx);
     CameraSetMatrix(lbl_8047C640, mtx);
     fn_80009840(lbl_803C4298);
-    return *(s32*)lbl_805FB5F8;
+    return *(u8**)lbl_805FB5F8;
 }
 
 // 0x80074BD8

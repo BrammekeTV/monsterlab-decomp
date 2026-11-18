@@ -38,7 +38,7 @@ static void GxBpWrite(u32 value) {
 
 // 0x80154294
 // One-shot: when the flag is clear, sets it and sends two BP writes (the second carries lbl_805F9232).
-void fn_80154294(void) {
+extern "C" void fn_80154294(void) {
     if (lbl_805F9231 != 0) return;
     lbl_805F9231 = 1;
     u32 v = lbl_805F9232;

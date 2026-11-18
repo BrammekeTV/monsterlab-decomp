@@ -1,15 +1,15 @@
 {
  "game_id": "RM7P4F",
- "generated": "2026-11-18T21:36:18+00:00",
- "commit": "5338070",
- "commit_date": "2026-11-18T22:31:08+01:00",
+ "generated": "2026-11-18T21:44:40+00:00",
+ "commit": "91fe902",
+ "commit_date": "2026-11-18T22:36:27+01:00",
  "game": {
   "functions": 8548,
   "bytes": 2265988,
   "named": 2748,
   "named_bytes": 616800,
-  "decompiled": 4536,
-  "decompiled_bytes": 495948
+  "decompiled": 4588,
+  "decompiled_bytes": 508620
  },
  "library": {
   "functions": 4039,
@@ -24,8 +24,8 @@
   "bytes": 3404928,
   "named": 3211,
   "named_bytes": 721548,
-  "decompiled": 4537,
-  "decompiled_bytes": 496068
+  "decompiled": 4589,
+  "decompiled_bytes": 508740
  },
  "game_range": [
   "80006B40",
@@ -81,7 +81,7 @@
    0.645
   ],
   [
-   0.332,
+   0.528,
    0.059
   ],
   [
@@ -305,7 +305,7 @@
    0.106
   ],
   [
-   0.103,
+   0.104,
    0.004
   ],
   [
@@ -321,7 +321,7 @@
    0.005
   ],
   [
-   0.223,
+   0.486,
    0.0
   ],
   [
@@ -377,7 +377,7 @@
    0.018
   ],
   [
-   0.116,
+   0.452,
    0.0
   ],
   [
@@ -461,7 +461,7 @@
    0.541
   ],
   [
-   0.132,
+   0.133,
    0.97
   ],
   [
@@ -761,11 +761,11 @@
    0.543
   ],
   [
-   0.771,
+   0.998,
    0.968
   ],
   [
-   0.0,
+   0.05,
    1.0
   ],
   [
@@ -793,11 +793,11 @@
    0.018
   ],
   [
-   0.444,
+   0.516,
    0.0
   ],
   [
-   0.06,
+   0.326,
    0.013
   ],
   [
@@ -1303,6 +1303,61 @@
    ]
   },
   {
+   "path": "src/engine/draft_8019d.cpp",
+   "functions": [
+    {
+     "name": "UIImage_SetTexture",
+     "addr": "80191B68",
+     "size": 324
+    },
+    {
+     "name": "UIImage_GetTexture",
+     "addr": "80191CAC",
+     "size": 244
+    },
+    {
+     "name": "UIImage_SetIgnoreAlphaPixels",
+     "addr": "80191DA0",
+     "size": 244
+    },
+    {
+     "name": "UISlideshow_Start",
+     "addr": "80191E94",
+     "size": 228
+    },
+    {
+     "name": "UISlideshow_Stop",
+     "addr": "80191F78",
+     "size": 228
+    },
+    {
+     "name": "UISlideshow_Pause",
+     "addr": "8019205C",
+     "size": 228
+    },
+    {
+     "name": "UISlideshow_Resume",
+     "addr": "80192140",
+     "size": 228
+    },
+    {
+     "name": "UISlideshow_SetUITextureList",
+     "addr": "80192224",
+     "size": 308
+    },
+    {
+     "name": "UISlider_SetValue",
+     "addr": "80192358",
+     "size": 204
+    },
+    {
+     "name": "UISlider_SetValue_Int",
+     "addr": "80192424",
+     "size": 228
+    }
+   ]
+  },
+  {
    "path": "src/engine/draft_801A.cpp",
    "functions": [
     {
@@ -1349,6 +1404,61 @@
      "name": "fn_801A2DDC",
      "addr": "801A2DDC",
      "size": 132
+    }
+   ]
+  },
+  {
+   "path": "src/engine/draft_801Ad.cpp",
+   "functions": [
+    {
+     "name": "fn_801A2F78",
+     "addr": "801A2F78",
+     "size": 152
+    },
+    {
+     "name": "fn_801A3010",
+     "addr": "801A3010",
+     "size": 176
+    },
+    {
+     "name": "fn_801A30C0",
+     "addr": "801A30C0",
+     "size": 252
+    },
+    {
+     "name": "fn_801A3798",
+     "addr": "801A3798",
+     "size": 368
+    },
+    {
+     "name": "fn_801A3910",
+     "addr": "801A3910",
+     "size": 256
+    },
+    {
+     "name": "fn_801A3D84",
+     "addr": "801A3D84",
+     "size": 280
+    },
+    {
+     "name": "fn_801A3E9C",
+     "addr": "801A3E9C",
+     "size": 260
+    },
+    {
+     "name": "fn_801A408C",
+     "addr": "801A408C",
+     "size": 176
+    },
+    {
+     "name": "fn_801A413C",
+     "addr": "801A413C",
+     "size": 728
+    },
+    {
+     "name": "fn_801A4414",
+     "addr": "801A4414",
+     "size": 324
     }
    ]
   },
@@ -4398,6 +4508,56 @@
    ]
   },
   {
+   "path": "src/game/draft_8002d.cpp",
+   "functions": [
+    {
+     "name": "fn_8002129C",
+     "addr": "8002129C",
+     "size": 184
+    },
+    {
+     "name": "fn_800213A4",
+     "addr": "800213A4",
+     "size": 200
+    },
+    {
+     "name": "fn_80021594",
+     "addr": "80021594",
+     "size": 228
+    },
+    {
+     "name": "fn_800216B8",
+     "addr": "800216B8",
+     "size": 152
+    },
+    {
+     "name": "fn_80021BE4",
+     "addr": "80021BE4",
+     "size": 200
+    },
+    {
+     "name": "fn_80021CAC",
+     "addr": "80021CAC",
+     "size": 256
+    },
+    {
+     "name": "fn_80021E30",
+     "addr": "80021E30",
+     "size": 156
+    },
+    {
+     "name": "fn_800222F4",
+     "addr": "800222F4",
+     "size": 152
+    },
+    {
+     "name": "fn_800223F0",
+     "addr": "800223F0",
+     "size": 212
+    }
+   ]
+  },
+  {
    "path": "src/game/draft_8007b.cpp",
    "functions": [
     {
@@ -4653,6 +4813,61 @@
    ]
   },
   {
+   "path": "src/game/draft_800Ad.cpp",
+   "functions": [
+    {
+     "name": "fn_800A3418",
+     "addr": "800A3418",
+     "size": 168
+    },
+    {
+     "name": "fn_800A355C",
+     "addr": "800A355C",
+     "size": 220
+    },
+    {
+     "name": "fn_800A3638",
+     "addr": "800A3638",
+     "size": 176
+    },
+    {
+     "name": "fn_800A36E8",
+     "addr": "800A36E8",
+     "size": 168
+    },
+    {
+     "name": "fn_800A3790",
+     "addr": "800A3790",
+     "size": 136
+    },
+    {
+     "name": "fn_800A381C",
+     "addr": "800A381C",
+     "size": 184
+    },
+    {
+     "name": "fn_800A3CAC",
+     "addr": "800A3CAC",
+     "size": 348
+    },
+    {
+     "name": "fn_800A3E08",
+     "addr": "800A3E08",
+     "size": 292
+    },
+    {
+     "name": "fn_800A3F2C",
+     "addr": "800A3F2C",
+     "size": 560
+    },
+    {
+     "name": "fn_800A415C",
+     "addr": "800A415C",
+     "size": 240
+    }
+   ]
+  },
+  {
    "path": "src/game/draft_800B.cpp",
    "functions": [
     {
@@ -4704,6 +4919,61 @@
      "name": "fn_800B15B4",
      "addr": "800B15B4",
      "size": 192
+    }
+   ]
+  },
+  {
+   "path": "src/game/draft_800Cd.cpp",
+   "functions": [
+    {
+     "name": "fn_800C09D8",
+     "addr": "800C09D8",
+     "size": 272
+    },
+    {
+     "name": "fn_800C0BA4",
+     "addr": "800C0BA4",
+     "size": 140
+    },
+    {
+     "name": "fn_800C10D0",
+     "addr": "800C10D0",
+     "size": 212
+    },
+    {
+     "name": "fn_800C124C",
+     "addr": "800C124C",
+     "size": 364
+    },
+    {
+     "name": "fn_800C148C",
+     "addr": "800C148C",
+     "size": 332
+    },
+    {
+     "name": "fn_800C15E8",
+     "addr": "800C15E8",
+     "size": 384
+    },
+    {
+     "name": "fn_800C1B78",
+     "addr": "800C1B78",
+     "size": 460
+    },
+    {
+     "name": "fn_800C1DC0",
+     "addr": "800C1DC0",
+     "size": 344
+    },
+    {
+     "name": "fn_800C1F18",
+     "addr": "800C1F18",
+     "size": 272
+    },
+    {
+     "name": "fn_800C2028",
+     "addr": "800C2028",
+     "size": 212
     }
    ]
   },
@@ -16801,6 +17071,11 @@
      "size": 4
     },
     {
+     "name": "fn_8009B23C",
+     "addr": "8009B23C",
+     "size": 4
+    },
+    {
      "name": "fn_8009B240",
      "addr": "8009B240",
      "size": 4
@@ -17770,6 +18045,11 @@
   {
    "path": "src/leaf/auto_03_800C8C8C_text.cpp",
    "functions": [
+    {
+     "name": "fn_800C8E50",
+     "addr": "800C8E50",
+     "size": 4
+    },
     {
      "name": "fn_800C9244",
      "addr": "800C9244",
@@ -18883,6 +19163,11 @@
     {
      "name": "HasMonsterVoice",
      "addr": "800EFE4C",
+     "size": 4
+    },
+    {
+     "name": "HasTimePressure",
+     "addr": "800EFEB0",
      "size": 4
     },
     {

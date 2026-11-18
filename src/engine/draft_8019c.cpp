@@ -15,8 +15,8 @@ u32         fn_8019DC10(void* el);                         // 0x8019DC10
 void        fn_8019DC58(void* el);                         // 0x8019DC58
 void        fn_8019F340(void* el, s32 a, f32 v);           // 0x8019F340
 void        fn_8019F3B4(void* el, s32 v);                  // 0x8019F3B4
-void        fn_801A3010(void* obj, void* data);            // 0x801A3010
-void        fn_801A30C0(void* el, u32 bone);               // 0x801A30C0
+s32         fn_801A3010(void* obj, void* data);            // 0x801A3010
+s32         fn_801A30C0(void* el, u32 bone);               // 0x801A30C0
 void        fn_801A8654(u8* obj, s32 a1);                  // 0x801A8654
 
 extern void* gScreenSets;                  // 0x805FB654

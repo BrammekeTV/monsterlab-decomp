@@ -600,7 +600,7 @@ u32 HasBadge(u32 badge);                                               // src/ga
 s32 HasMonsterVoice(void);                                             // src/leaf/auto_03_800E75B0_text_cb.cpp
 s32 HasPrimaryForRecipe(void);                                         // src/game/draft_8011b.cpp
 s32 HasSecondaryForRecipe(void);                                       // src/game/draft_8011b.cpp
-s32 HasTimePressure(void);  // type 0x22 (from signature table)
+s32 HasTimePressure(void);                                             // src/leaf/auto_03_800E75B0_text_cb.cpp
 s32 HasValidKeyIngredient(void);                                       // src/game/draft_8011c.cpp
 s32 HasValidRecipe(void);                                              // src/game/draft_8011b.cpp
 s32 HasValidSecondaryIngredient(void);                                 // src/game/draft_8011c.cpp
@@ -1734,9 +1734,9 @@ void UIGrid_SetTextColorList(u32 a0, BOOL a1);  // type 0x81 (from signature tab
 void UIGrid_SetTextList(u32 a0, BOOL a1);  // type 0x81 (from signature table)
 void UIGroup_DisableHitTest(u32 a0);                                   // src/engine/draft_8019b.cpp
 void UIGroup_EnableHitTest(u32 a0);                                    // src/engine/draft_8019b.cpp
-ScriptValue UIImage_GetTexture(u32 a0);  // type 0x25 (from signature table)
-void UIImage_SetIgnoreAlphaPixels(u32 a0, u32 /*0x06*/ a1);  // type 0x74 (from signature table)
-void UIImage_SetTexture(u32 a0, BOOL a1);  // type 0x81 (from signature table)
+ScriptValue UIImage_GetTexture(u32 a0);                                // src/engine/draft_8019d.cpp
+void UIImage_SetIgnoreAlphaPixels(u32 a0, u32 /*0x06*/ a1);            // src/engine/draft_8019d.cpp
+void UIImage_SetTexture(u32 a0, BOOL a1);                              // src/engine/draft_8019d.cpp
 void UIModel_SetModel(u32 a0, BOOL a1);  // type 0x81 (from signature table)
 void UIParticleEffect_SetActive(u32 a0, u32 /*0x06*/ a1);              // src/engine/draft_8019c.cpp
 void UIScreen_ClearStack(void);  // type 0x8F (from signature table)
@@ -1764,13 +1764,13 @@ void UISlider_SetMaxValue(u32 a0, f32 a1);  // type 0x76 (from signature table)
 void UISlider_SetMaxValue_Int(u32 a0, s32 a1);  // type 0x7E (from signature table)
 void UISlider_SetMinValue(u32 a0, f32 a1);  // type 0x76 (from signature table)
 void UISlider_SetMinValue_Int(u32 a0, s32 a1);  // type 0x7E (from signature table)
-void UISlider_SetValue(u32 a0, f32 a1);  // type 0x76 (from signature table)
-void UISlider_SetValue_Int(u32 a0, s32 a1);  // type 0x7E (from signature table)
-void UISlideshow_Pause(u32 a0);  // type 0x71 (from signature table)
-void UISlideshow_Resume(u32 a0);  // type 0x71 (from signature table)
-void UISlideshow_SetUITextureList(u32 a0, u32 a1);  // type 0x7A (from signature table)
-void UISlideshow_Start(u32 a0);  // type 0x71 (from signature table)
-void UISlideshow_Stop(u32 a0);  // type 0x71 (from signature table)
+void UISlider_SetValue(u32 a0, f32 a1);                                // src/engine/draft_8019d.cpp
+void UISlider_SetValue_Int(u32 a0, s32 a1);                            // src/engine/draft_8019d.cpp
+void UISlideshow_Pause(u32 a0);                                        // src/engine/draft_8019d.cpp
+void UISlideshow_Resume(u32 a0);                                       // src/engine/draft_8019d.cpp
+void UISlideshow_SetUITextureList(u32 a0, u32 a1);                     // src/engine/draft_8019d.cpp
+void UISlideshow_Start(u32 a0);                                        // src/engine/draft_8019d.cpp
+void UISlideshow_Stop(u32 a0);                                         // src/engine/draft_8019d.cpp
 ScriptValue UISoundList_GetSound(u32 a0, s32 a1);  // type 0x26 (from signature table)
 void UISoundList_PlayRandomSfx(u32 a0);  // type 0x71 (from signature table)
 void UISoundList_PlayRandomVoiceSfx(u32 a0);  // type 0x71 (from signature table)

@@ -234,7 +234,7 @@ extern "C" void* ScreenSetFindWidget(void* set, u32 hash) {
 
 // 0x80198F1C
 // Looks up an entry by hash in the table at set+0x20. Logs and returns NULL when missing.
-void* fn_80198F1C(void* set, u32 hash) {
+extern "C" void* fn_80198F1C(void* set, u32 hash) {
     void* table = *(void**)((u8*)set + 0x20);
     void* r = fn_8018E8D8(table, hash);
     if (r == NULL) {
@@ -245,7 +245,7 @@ void* fn_80198F1C(void* set, u32 hash) {
 
 // 0x80198F74
 // Looks up an entry by hash in the table at set+0x34. Logs and returns NULL when missing.
-void* fn_80198F74(void* set, u32 hash) {
+extern "C" void* fn_80198F74(void* set, u32 hash) {
     void* table = *(void**)((u8*)set + 0x34);
     void* r = fn_8018E8D8(table, hash);
     if (r == NULL) {

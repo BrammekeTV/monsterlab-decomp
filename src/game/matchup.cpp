@@ -13,7 +13,7 @@ BOOL   MatchupIsActive(void);                              // 0x801409FC
 void*  fn_801B7198(void* anim, s32 a);
 s32    fn_8004E300(void* a, s32 b);
 void*  MatchupGetRemoteData(void);                         // 0x80113974
-void   fn_801A3010(void* obj, void* data);
+s32    fn_801A3010(void* obj, void* data);
 void   fn_8013E0EC(void);  void fn_8013DE7C(void);
 void   MatchupShowStatus(BOOL waiting);                    // 0x8013DC54
 void   MatchupSetReady(BOOL ready);                        // 0x8013F2A4
