@@ -136,7 +136,7 @@ s32 Troublescope_GetCreatureLoaded(void) {
 BOOL Troublescope_SetCurrentMonster(void) {
     u8* t0 = *(u8**)((u8*)lbl_805FAF80);
     if (t0 == 0) {
-        return (BOOL)(uintptr_t)(t0);
+        return 0;
     }
     s32 t1 = *(s32*)(t0 + 16);
     s32 t2 = *(s32*)((u8*)lbl_805FBBE0);

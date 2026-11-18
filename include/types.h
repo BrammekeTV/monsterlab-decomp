@@ -14,6 +14,9 @@ typedef uint64_t u64;
 typedef float    f32;
 typedef double   f64;
 typedef int      BOOL;
+// Return value of script callbacks whose signature type is 0x03/0x2E: an int, bool or a pointer
+// (string, texture, buffer). Pointer-sized so the x64 build does not truncate it.
+typedef intptr_t ScriptValue;
 
 #ifndef TRUE
 #define TRUE 1

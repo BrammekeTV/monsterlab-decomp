@@ -61,7 +61,8 @@ def decl_from_sig(fn, ty, sigs):
         return f"void {fn}(ScriptCtx* ctx);  // type 0x{ty:X}, signature unknown"
     ret, args = sigs[ty]
     params = ", ".join(f"{c_type(a)} a{i}" for i, a in enumerate(args)) or "void"
-    return f"{c_type(ret)} {fn}({params});  // type 0x{ty:X}"
+    rt = "ScriptValue" if ret == 3 else c_type(ret)  # type 3 can carry pointers
+    return f"{rt} {fn}({params});  // type 0x{ty:X}"
 
 
 def main():

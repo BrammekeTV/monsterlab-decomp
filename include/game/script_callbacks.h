@@ -7,371 +7,371 @@
 u32 /*0x06*/ ActionSelectable(s32 a0);  // type 0x6 (from signature table)
 void ActivateCurrentJunction(u32 /*0x06*/ a0);  // type 0x67 (from signature table)
 void ActivateEntity(void* a0);  // type 0x2F (from signature table)
-void ActivateListEntry(u32 a0, u32 a1);  // type 0x7A (from signature table)
-void AddBadge(u32 /*0x46*/ a0);  // type 0x14C (from signature table)
-void AddCastleCamera(u32 a0, u32 a1);  // type 0x7A (from signature table)
+void ActivateListEntry(u32 a3, u32 a4);                                // src/leaf/auto_03_800E75B0_text_cb.cpp
+void AddBadge(u32 badge);                                              // src/game/player_api.cpp
+void AddCastleCamera(u32 a3, u32 a4);                                  // src/leaf/auto_03_800E75B0_text_cb.cpp
 void AddCharacterParticleEffect(u32 /*0x2E*/ a0, u32 a1);  // type 0xF4 (from signature table)
 void AddEntityParticleEffect(void* a0, u32 a1);  // type 0x42 (from signature table)
-void AddHealth(void* a0, void* a1, f32 a2);  // type 0x104 (from signature table)
-void AddJournalEntry(u32 /*0x52*/ a0, u32 a1, u32 /*0x47*/ a2, s32 a3);  // type 0x157 (from signature table)
-void AddJournalEntryNoPopup(u32 /*0x52*/ a0, u32 a1, u32 /*0x47*/ a2, s32 a3);  // type 0x157 (from signature table)
+void AddHealth(void* a0, void* a1, f32 a2);                            // src/game/small_800Ec.cpp
+void AddJournalEntry(u32 a3, u32 a4, u32 a5, s32 a6);                  // src/leaf/auto_03_800E75B0_text_cb.cpp
+void AddJournalEntryNoPopup(u32 a3, u32 a4, u32 a5, s32 a6);           // src/leaf/auto_03_800E75B0_text_cb.cpp
 void AddMoveEntityTask(void* a0, u32 /*0x17*/ a1, u32 /*0x17*/ a2, f32 a3, u32 /*0x06*/ a4, u32 /*0x06*/ a5);  // type 0x106 (from signature table)
-void AddPartToPlayerInventory(u32 /*0x3F*/ a0, s32 a1, s32 a2);  // type 0x15F (from signature table)
-void AddPlayerKeyIngredient(u32 /*0x41*/ a0);  // type 0x154 (from signature table)
-void AddPlayerMSP(BOOL a0);  // type 0x8C (from signature table)
-void AddPlayerMonster(u32 /*0x3F*/ a0, u32 /*0x3F*/ a1, u32 /*0x3F*/ a2, u32 /*0x3F*/ a3, u32 /*0x3F*/ a4);  // type 0x15E (from signature table)
+void AddPartToPlayerInventory(u32 def, s32 tier, s32 quality);         // src/game/player_api.cpp
+void AddPlayerKeyIngredient(u32 i);                                    // src/game/player_api.cpp
+void AddPlayerMSP(BOOL amount);                                        // src/game/player_api.cpp
+void AddPlayerMonster(u32 a3, u32 a4, u32 a5, u32 a6, u32 a7);         // src/leaf/auto_03_8020F8E0_text_cb.cpp
 void AddPlayerMonsterFromDatabase(u32 /*0x44*/ a0);  // type 0x15B (from signature table)
-void AddPlayerPart(u32 /*0x3F*/ a0);  // type 0x15D (from signature table)
-void AddPlayerQuestItem(u32 /*0x40*/ a0);  // type 0x160 (from signature table)
-void AddPlayerQuestReward(u32 /*0x49*/ a0);  // type 0x161 (from signature table)
-void AddPlayerSecondaryIngredient(u32 /*0x42*/ a0);  // type 0x167 (from signature table)
-void AddTimetoQuestTimer(s32 a0);  // type 0x83 (from signature table)
-void AddToFloat(u32 /*0x24*/ a0, f32 a1);  // type 0x16E (from signature table)
-void AddToInt(u32 /*0x23*/ a0, s32 a1);  // type 0x170 (from signature table)
-void AddTrackableScore(u32 a0, f32 a1, f32 a2, f32 a3);  // type 0x77 (from signature table)
+void AddPlayerPart(u32 def);                                           // src/game/player_api.cpp
+void AddPlayerQuestItem(u32 item);                                     // src/game/player_api.cpp
+void AddPlayerQuestReward(u32 r);                                      // src/game/player_api.cpp
+void AddPlayerSecondaryIngredient(u32 i);                              // src/game/player_api.cpp
+void AddTimetoQuestTimer(s32 a0);                                      // src/game/small_800Fb.cpp
+void AddToFloat(u32 a3, f32 f1);                                       // src/leaf/auto_03_80106AA8_text_cb.cpp
+void AddToInt(u32 a3, s32 a4);                                         // src/leaf/auto_03_80106AA8_text_cb.cpp
+void AddTrackableScore(u32 id, f32 a1, f32 a2, f32 a3);                // src/game/small_8007.cpp
 void AddTrackableScoreTrigger(u32 a0, f32 a1, u32 /*0x0A*/ a2, u32 a3);  // type 0x173 (from signature table)
-void AggressorDeclined(void);  // type 0x8F (from signature table)
+void AggressorDeclined(void);                                          // src/game/small_8013.cpp
 s32 AltitudeGreaterThan(u32 /*0x2F*/ a0, f32 a1);  // type 0xCA (from signature table)
 s32 AltitudeLessThan(u32 /*0x2F*/ a0, f32 a1);  // type 0xCA (from signature table)
 u32 /*0x06*/ AmIThreatenedByPlayersAnimDef(u32 /*0x2E*/ a0, u32 a1);  // type 0xA3 (from signature table)
 void AmplifyKnockback(u32 /*0x2E*/ a0, f32 a1);  // type 0xF3 (from signature table)
 s32 AnimDoneUB(void* a0, u32 a1);  // type 0x1B (from signature table)
 void AnimSetPercentComplete(void* a0, f32 a1);  // type 0x40 (from signature table)
-s32 ArmWrestleArmGetIdleAnimation(void* a0);  // type 0x16 (from signature table)
-s32 ArmWrestleArmGetStatus(void* a0);  // type 0x16 (from signature table)
+s32 ArmWrestleArmGetIdleAnimation(void* a0);                           // src/game/small_800Bb.cpp
+s32 ArmWrestleArmGetStatus(void* a0);                                  // src/game/small_800Bb.cpp
 void ArmWrestleArmMoveDown(void* a0);  // type 0x2F (from signature table)
 void ArmWrestleArmMoveLeft(void* a0);  // type 0x2F (from signature table)
 void ArmWrestleArmMoveRight(void* a0);  // type 0x2F (from signature table)
 void ArmWrestleArmMoveUp(void* a0);  // type 0x2F (from signature table)
-s32 ArmWrestleMechArmIsWhichArm(void* a0);  // type 0x16 (from signature table)
+s32 ArmWrestleMechArmIsWhichArm(void* a3);                             // src/leaf/auto_03_800B7E34_text_cb.cpp
 void AssignFieldRepairHealthPointsToPlayer(void);  // type 0x8F (from signature table)
 void AstralPickUpCollisionCallback(void* a0, void* a1);  // type 0x30 (from signature table)
-void Badges_BadgeList_Generate(void);  // type 0x8F (from signature table)
-s32 Badges_DoesBadgeExist(s32 a0);  // type 0x1F (from signature table)
-BOOL Badges_GetBadgeDescription(s32 a0);  // type 0x28 (from signature table)
-BOOL Badges_GetBadgeName(s32 a0);  // type 0x28 (from signature table)
-BOOL Badges_GetBadgeTexture(s32 a0);  // type 0x28 (from signature table)
-BOOL Badges_GetBadgesEarned(void);  // type 0x2E (from signature table)
-BOOL Badges_GetCurrentTypeName(void);  // type 0x2E (from signature table)
-void Badges_IncRow(s32 a0);  // type 0x83 (from signature table)
+void Badges_BadgeList_Generate(void);                                  // src/game/lab_books_e.cpp
+s32 Badges_DoesBadgeExist(s32 a0);                                     // src/game/lab_books_e.cpp
+ScriptValue Badges_GetBadgeDescription(s32 a0);  // type 0x28 (from signature table)
+ScriptValue Badges_GetBadgeName(s32 a0);  // type 0x28 (from signature table)
+ScriptValue Badges_GetBadgeTexture(s32 a0);  // type 0x28 (from signature table)
+ScriptValue Badges_GetBadgesEarned(void);  // type 0x2E (from signature table)
+ScriptValue Badges_GetCurrentTypeName(void);  // type 0x2E (from signature table)
+void Badges_IncRow(s32 a0);                                            // src/game/lab_books_e.cpp
 void Badges_IncType(s32 a0);  // type 0x83 (from signature table)
-s32 Badges_IsTextureAsyncLoaded(void);  // type 0x22 (from signature table)
-BOOL BattleRequestNoMonsters(void);  // type 0x2E (from signature table)
-BOOL BattleRequestOk(void);  // type 0x2E (from signature table)
-u32 /*0x06*/ BrainChunkBounceWasLeft(u32 /*0x56*/ a0);  // type 0x9B (from signature table)
-u32 /*0x5B*/ BrainChunkGetChunkType(u32 /*0x56*/ a0);  // type 0xB1 (from signature table)
-s32 BrainChunkGetHitType(u32 /*0x56*/ a0);  // type 0xBE (from signature table)
-u32 /*0x06*/ BrainChunkIsInUse(u32 /*0x56*/ a0);  // type 0x9B (from signature table)
-u32 /*0x06*/ BrainChunkIsOfType(u32 /*0x56*/ a0, u32 /*0x5B*/ a1);  // type 0x9C (from signature table)
+s32 Badges_IsTextureAsyncLoaded(void);                                 // src/game/lab_books_e.cpp
+BOOL BattleRequestNoMonsters(void);                                    // src/leaf/auto_03_8013F034_text_cb.cpp
+BOOL BattleRequestOk(void);                                            // src/leaf/auto_03_8013F034_text_cb.cpp
+u32 BrainChunkBounceWasLeft(u32 a3);                                   // src/leaf/auto_03_80081AF4_text_cb.cpp
+u32 BrainChunkGetChunkType(u32 a3);                                    // src/leaf/auto_03_80081AF4_text_cb.cpp
+s32 BrainChunkGetHitType(u32 a3);                                      // src/leaf/auto_03_80081AF4_text_cb.cpp
+u32 BrainChunkIsInUse(u32 a3);                                         // src/leaf/auto_03_80081AF4_text_cb.cpp
+u32 BrainChunkIsOfType(u32 a3, u32 a4);                                // src/leaf/auto_03_80081AF4_text_cb.cpp
 void BrainChunkSetInUse(u32 /*0x56*/ a0, u32 /*0x06*/ a1);  // type 0xE3 (from signature table)
-u32 /*0x06*/ BrainChunkSplatOnWall(u32 /*0x56*/ a0);  // type 0x9B (from signature table)
+u32 BrainChunkSplatOnWall(u32 a3);                                     // src/leaf/auto_03_80081AF4_text_cb.cpp
 void BrainChunkUpdateBounce(u32 /*0x56*/ a0);  // type 0xE2 (from signature table)
 void BrainChunkUpdateLoad(u32 /*0x56*/ a0);  // type 0xE2 (from signature table)
-void BrainChunkUpdateSplat(u32 /*0x56*/ a0);  // type 0xE2 (from signature table)
-void BrainChunkUpdateThrow(u32 /*0x56*/ a0);  // type 0xE2 (from signature table)
-u32 /*0x56*/ BrainHandGetHeldChunk(u32 /*0x5A*/ a0);  // type 0x92 (from signature table)
-s32 BrainHandGetTossStrength(u32 /*0x5A*/ a0);  // type 0xBF (from signature table)
-void BrainHandSetHeldChunk(void* a0, void* a1);  // type 0x30 (from signature table)
+void BrainChunkUpdateSplat(u32 a3);                                    // src/leaf/auto_03_80081AF4_text_cb.cpp
+void BrainChunkUpdateThrow(u32 a3);                                    // src/leaf/auto_03_80081AF4_text_cb.cpp
+u32 BrainHandGetHeldChunk(u32 a3);                                     // src/leaf/auto_03_80086780_text_cb.cpp
+s32 BrainHandGetTossStrength(u32 a3);                                  // src/leaf/auto_03_80086780_text_cb.cpp
+void BrainHandSetHeldChunk(void* a3, void* a4);                        // src/leaf/auto_03_80086780_text_cb.cpp
 void BrainHandUpdateHeldChunk(u32 /*0x5A*/ a0);  // type 0xE7 (from signature table)
 u32 /*0x06*/ BrainHeadCrazyWalk(u32 /*0x58*/ a0);  // type 0x9D (from signature table)
-void BrainHeadEatMeat(u32 /*0x58*/ a0);  // type 0xE5 (from signature table)
+void BrainHeadEatMeat(u32 a0);                                         // src/game/small_8008b.cpp
 void BrainHeadFollowMeat(u32 /*0x58*/ a0);  // type 0xE5 (from signature table)
-u32 /*0x06*/ BrainHeadFreebieIsNext(u32 /*0x58*/ a0);  // type 0x9D (from signature table)
-u32 /*0x56*/ BrainHeadGetTrackedChunk(u32 /*0x58*/ a0);  // type 0x91 (from signature table)
-void BrainHeadGoToTrapDoor(u32 /*0x58*/ a0);  // type 0xE5 (from signature table)
-u32 /*0x06*/ BrainHeadIsEating(u32 /*0x58*/ a0);  // type 0x9D (from signature table)
+u32 BrainHeadFreebieIsNext(u32 a3);                                    // src/leaf/auto_03_80083A6C_text_cb.cpp
+u32 BrainHeadGetTrackedChunk(u32 a3);                                  // src/leaf/auto_03_80083A6C_text_cb.cpp
+void BrainHeadGoToTrapDoor(u32 a3);                                    // src/leaf/auto_03_80083A6C_text_cb.cpp
+u32 BrainHeadIsEating(u32 a3);                                         // src/leaf/auto_03_80083A6C_text_cb.cpp
 void BrainHeadMove(u32 /*0x58*/ a0);  // type 0xE5 (from signature table)
-u32 /*0x06*/ BrainHeadMovingSideways(u32 /*0x58*/ a0);  // type 0x9D (from signature table)
+u32 BrainHeadMovingSideways(u32 a3);                                   // src/leaf/auto_03_80083A6C_text_cb.cpp
 void BrainHeadPlayIdleAnim(u32 /*0x58*/ a0);  // type 0xE5 (from signature table)
-void BrainHeadSetEating(u32 /*0x58*/ a0, u32 /*0x06*/ a1);  // type 0xE6 (from signature table)
+void BrainHeadSetEating(u32 a3, u32 a4);                               // src/leaf/auto_03_80083A6C_text_cb.cpp
 u32 /*0x06*/ BrainHeadSetFreebieIsNext(u32 /*0x58*/ a0, u32 /*0x06*/ a1);  // type 0x9E (from signature table)
 void BrainPowerUpArrive(u32 /*0x59*/ a0);  // type 0xE8 (from signature table)
 void BrainPowerUpEnact(u32 /*0x59*/ a0);  // type 0xE8 (from signature table)
-s32 BrainPowerUpGetNextPowerUpType(u32 /*0x59*/ a0);  // type 0xC0 (from signature table)
+s32 BrainPowerUpGetNextPowerUpType(u32 a3);                            // src/leaf/auto_03_80084E94_text_cb.cpp
 u32 /*0x06*/ BrainPowerUpIsTouchingHead(u32 /*0x59*/ a0);  // type 0x9F (from signature table)
-void BrainPowerUpSetActive(u32 /*0x59*/ a0, u32 /*0x06*/ a1);  // type 0xE9 (from signature table)
+void BrainPowerUpSetActive(u32 a3, u32 a4);                            // src/leaf/auto_03_80084E94_text_cb.cpp
 u32 /*0x06*/ BrainTargetDestinationReached(u32 /*0x57*/ a0);  // type 0xA0 (from signature table)
 void BrainTargetGenerateDestination(u32 /*0x57*/ a0);  // type 0xEA (from signature table)
 void BrainTargetGenerateWaitTime(u32 /*0x57*/ a0);  // type 0xEA (from signature table)
-u32 /*0x56*/ BrainTargetGetReceivedChunk(u32 /*0x57*/ a0);  // type 0x93 (from signature table)
-void BrainTargetSetReceivedChunk(void* a0, void* a1);  // type 0x30 (from signature table)
-void BrainTargetSetStateTime(u32 /*0x57*/ a0, f32 a1);  // type 0xEC (from signature table)
-void BrainTargetSetWaiting(u32 /*0x57*/ a0, u32 /*0x06*/ a1);  // type 0xEB (from signature table)
-void BrainTargetWait(u32 /*0x57*/ a0);  // type 0xEA (from signature table)
-u32 /*0x06*/ BrainTargetWaitTimedOut(u32 /*0x57*/ a0);  // type 0xA0 (from signature table)
-f32 BrainTossFreebieDuration(void);  // type 0x12 (from signature table)
-s32 BrainTossGetAvailableChunks(void);  // type 0x22 (from signature table)
-u32 /*0x59*/ BrainTossGetPowerUp(void);  // type 0x94 (from signature table)
+u32 BrainTargetGetReceivedChunk(u32 a3);                               // src/leaf/auto_03_800836A0_text_cb.cpp
+void BrainTargetSetReceivedChunk(void* a3, void* a4);                  // src/leaf/auto_03_800836A0_text_cb.cpp
+void BrainTargetSetStateTime(u32 a3, f32 f1);                          // src/leaf/auto_03_800836A0_text_cb.cpp
+void BrainTargetSetWaiting(u32 a3, u32 a4);                            // src/leaf/auto_03_800836A0_text_cb.cpp
+void BrainTargetWait(u32 a3);                                          // src/leaf/auto_03_800836A0_text_cb.cpp
+u32 BrainTargetWaitTimedOut(u32 a3);                                   // src/leaf/auto_03_800836A0_text_cb.cpp
+f32 BrainTossFreebieDuration(void);                                    // src/game/small_8008.cpp
+s32 BrainTossGetAvailableChunks(void);                                 // src/game/small_8008.cpp
+u32 BrainTossGetPowerUp(void);                                         // src/game/small_8008.cpp
 u32 /*0x06*/ BrainTossReloadBrainChunk(void);  // type 0xA (from signature table)
-u32 /*0x06*/ BrainTossRumbleOnMiss(void);  // type 0xA (from signature table)
+u32 BrainTossRumbleOnMiss(void);                                       // src/leaf/auto_03_8007D4DC_text_cb.cpp
 void BrainTossThrowBrainChunk(u32 /*0x56*/ a0, f32 a1);  // type 0xE4 (from signature table)
-void BrainTossUpdateScore(u32 /*0x56*/ a0);  // type 0xE2 (from signature table)
+void BrainTossUpdateScore(u32 a0);                                     // src/game/small_8008.cpp
 s32 BrazierBowlGetExplosionSize(void* a0);  // type 0x16 (from signature table)
 s32 BrazierBowlGetFireSize(void* a0);  // type 0x16 (from signature table)
-s32 BrazierSymbolAddSymbolToWand(void* a0);  // type 0x16 (from signature table)
-void BrazierSymbolDestroyed(void* a0);  // type 0x2F (from signature table)
+s32 BrazierSymbolAddSymbolToWand(void* a3);                            // src/leaf/auto_03_8008CBB0_text_cb.cpp
+void BrazierSymbolDestroyed(void* a3);                                 // src/leaf/auto_03_8008CBB0_text_cb.cpp
 s32 BrazierSymbolGetSymbolHashType(void* a0);  // type 0x16 (from signature table)
-s32 BrazierSymbolGetSymbolStatus(void* a0);  // type 0x16 (from signature table)
-s32 BrazierSymbolIsReadyToMoveBack(void* a0);  // type 0x16 (from signature table)
-s32 BrazierSymbolIsThrowTrailAttached(void* a0);  // type 0x16 (from signature table)
-void BrazierSymbolSetSymbolOccupied(void* a0);  // type 0x2F (from signature table)
+s32 BrazierSymbolGetSymbolStatus(void* a3);                            // src/leaf/auto_03_8008CBB0_text_cb.cpp
+s32 BrazierSymbolIsReadyToMoveBack(void* a3);                          // src/leaf/auto_03_8008CBB0_text_cb.cpp
+s32 BrazierSymbolIsThrowTrailAttached(void* a3);                       // src/leaf/auto_03_8008CBB0_text_cb.cpp
+void BrazierSymbolSetSymbolOccupied(void* a3);                         // src/leaf/auto_03_8008CBB0_text_cb.cpp
 void BrazierSymbolSetUnused(void* a0);  // type 0x2F (from signature table)
 void BrazierSymbolStartMovingBack(void* a0);  // type 0x2F (from signature table)
-void BrazierSymbolStartRising(void* a0);  // type 0x2F (from signature table)
+void BrazierSymbolStartRising(void* a3);                               // src/leaf/auto_03_8008CBB0_text_cb.cpp
 void BrazierSymbolUpdateDisappearing(void* a0);  // type 0x2F (from signature table)
-void BrazierSymbolUpdateMovingBack(void* a0);  // type 0x2F (from signature table)
-void BrazierSymbolUpdateOrbiting(void* a0);  // type 0x2F (from signature table)
-void BrazierSymbolUpdateRising(void* a0);  // type 0x2F (from signature table)
-void BrazierWandFlickSymbols(void* a0);  // type 0x2F (from signature table)
+void BrazierSymbolUpdateMovingBack(void* a3);                          // src/leaf/auto_03_8008CBB0_text_cb.cpp
+void BrazierSymbolUpdateOrbiting(void* a3);                            // src/leaf/auto_03_8008CBB0_text_cb.cpp
+void BrazierSymbolUpdateRising(void* a3);                              // src/leaf/auto_03_8008CBB0_text_cb.cpp
+void BrazierWandFlickSymbols(void* a3);                                // src/leaf/auto_03_8008B430_text_cb.cpp
 s32 BrazierWandGetWandStatus(void* a0);  // type 0x16 (from signature table)
-void BrazierWandSetIdle(void* a0);  // type 0x2F (from signature table)
-void BrazierWandUpdateMoving(void* a0);  // type 0x2F (from signature table)
+void BrazierWandSetIdle(void* a3);                                     // src/leaf/auto_03_8008B430_text_cb.cpp
+void BrazierWandUpdateMoving(void* a3);                                // src/leaf/auto_03_8008B430_text_cb.cpp
 void BroadcastEvent(void* a0, u32 a1, u32 a2, BOOL a3, BOOL a4);  // type 0x45 (from signature table)
-void BroadcastEventFromProperty(u32 /*0x34*/ a0, u32 a1);  // type 0x12F (from signature table)
-void CIAnimatedPropEnable(u32 /*0x17*/ a0, u32 a1);  // type 0x144 (from signature table)
-void CIAnimatedPropEnableByID(u32 a0, u32 a1);  // type 0x7A (from signature table)
+void BroadcastEventFromProperty(u32 a3, u32 a4);                       // src/leaf/auto_03_800FB958_text_cb.cpp
+void CIAnimatedPropEnable(u32 a0, u32 a1);                             // src/game/small_800Ec.cpp
+void CIAnimatedPropEnableByID(u32 a0, u32 a1);                         // src/game/small_800Ec.cpp
 void CIAnimatedPropEnableByProp(u32 /*0x31*/ a0, u32 /*0x2B*/ a1);  // type 0x128 (from signature table)
-u32 /*0x31*/ CIAnimatedPropGetProp(u32 /*0x17*/ a0);  // type 0x97 (from signature table)
+u32 CIAnimatedPropGetProp(u32 a0);                                     // src/game/small_800Eb.cpp
 void CIAnimatedPropStartInfluenceBlend(u32 /*0x17*/ a0);  // type 0x141 (from signature table)
 void CIAnimatedPropStartInfluenceBlendByProp(u32 /*0x31*/ a0);  // type 0x127 (from signature table)
 void CIAnimatedPropUpdateInfluenceBlend(u32 /*0x17*/ a0);  // type 0x141 (from signature table)
 void CIAnimatedPropUpdateInfluenceBlendByProp(u32 /*0x31*/ a0);  // type 0x127 (from signature table)
-u32 /*0x06*/ CIPannerAtZero(u32 /*0x17*/ a0);  // type 0xA6 (from signature table)
+u32 CIPannerAtZero(u32 a0);                                            // src/game/small_800Eb.cpp
 void CIPannerReturnToZero(u32 /*0x17*/ a0);  // type 0x141 (from signature table)
 void CameraShake(void* a0, f32 a1, f32 a2, f32 a3);  // type 0x10A (from signature table)
 void CameraShakeSynced(void* a0, f32 a1, f32 a2, f32 a3);  // type 0x10A (from signature table)
 s32 CanChargeMonster(void);  // type 0x22 (from signature table)
-s32 CanCreateNewMonster(void);  // type 0x22 (from signature table)
-s32 CanDoFieldRepair(void);  // type 0x22 (from signature table)
-s32 CanProcessInput(void);  // type 0x22 (from signature table)
+s32 CanCreateNewMonster(void);                                         // src/leaf/auto_03_8001B20C_text_cb.cpp
+s32 CanDoFieldRepair(void);                                            // src/leaf/auto_03_800E75B0_text_cb.cpp
+s32 CanProcessInput(void);                                             // src/leaf/auto_03_8010FDA4_text_cb.cpp
 void CancelBattle(void);  // type 0x8F (from signature table)
-void CancelConnect(void);  // type 0x8F (from signature table)
+void CancelConnect(void);                                              // src/leaf/auto_03_8013F034_text_cb.cpp
 void CancelIngredientSelection(void);  // type 0x8F (from signature table)
-void CancelMatchup(void);  // type 0x8F (from signature table)
+void CancelMatchup(void);                                              // src/leaf/auto_03_8013A03C_text_cb.cpp
 u32 /*0x4F*/ CastleAccessFromExperimentType(u32 /*0x4D*/ a0);  // type 0xB2 (from signature table)
-s32 ChallengeCheckDebugCheat(void);  // type 0x22 (from signature table)
-void ChallengeGame_EnterPauseScreen(void);  // type 0x8F (from signature table)
-void ChallengeGame_ExitPauseScreen(void);  // type 0x8F (from signature table)
+s32 ChallengeCheckDebugCheat(void);                                    // src/leaf/auto_03_80021594_text_cb.cpp
+void ChallengeGame_EnterPauseScreen(void);                             // src/game/small_800Eb.cpp
+void ChallengeGame_ExitPauseScreen(void);                              // src/game/small_800Eb.cpp
 u32 /*0x06*/ CharacterAnimationDone(u32 /*0x55*/ a0);  // type 0xA2 (from signature table)
 u32 CharacterGetGroundMatBelow(u32 /*0x2E*/ a0);  // type 0xBA (from signature table)
-u32 /*0x06*/ CharacterIsAirborne(u32 /*0x2E*/ a0);  // type 0xA1 (from signature table)
+u32 CharacterIsAirborne(u32 a3);                                       // src/leaf/auto_03_800E75B0_text_cb.cpp
 u32 /*0x06*/ CheckCastleAccess(u32 /*0x4F*/ a0);  // type 0xA9 (from signature table)
-u32 /*0x06*/ CheckGameProgressBitFlag(u32 /*0x50*/ a0);  // type 0xAA (from signature table)
-u32 /*0x06*/ CheckGameProgressMarker(BOOL a0);  // type 0x8 (from signature table)
+u32 CheckGameProgressBitFlag(u32 flag);                                // src/game/player_api.cpp
+u32 CheckGameProgressMarker(BOOL marker);                              // src/game/player_api.cpp
 void CheckHazardCollision(void* a0, void* a1);  // type 0x30 (from signature table)
-u32 /*0x06*/ CheckIsCurrentCollisionEntity(void* a0);  // type 0x1 (from signature table)
-u32 /*0x06*/ CheckIsCurrentCollisionEntityByName(u32 a0);  // type 0x5 (from signature table)
-s32 CheckJunctionEnterEntity(u32 a0, u32 a1);  // type 0xDC (from signature table)
-u32 /*0x06*/ CheckLastMonsterKilled(u32 a0);  // type 0x5 (from signature table)
-s32 CheckMonsterDead(u32 a0);  // type 0x1E (from signature table)
+u32 CheckIsCurrentCollisionEntity(void* a3);                           // src/leaf/auto_03_800E75B0_text_cb.cpp
+u32 CheckIsCurrentCollisionEntityByName(u32 a3);                       // src/leaf/auto_03_800E75B0_text_cb.cpp
+s32 CheckJunctionEnterEntity(u32 a0, u32 a1);                          // src/game/small_800F.cpp
+u32 CheckLastMonsterKilled(u32 a3);                                    // src/leaf/auto_03_800E75B0_text_cb.cpp
+s32 CheckMonsterDead(u32 a0);                                          // src/game/small_800Eb.cpp
 void CheckName(void);  // type 0x8F (from signature table)
 u32 /*0x06*/ CheckNoGameEventsActive(void);  // type 0xA (from signature table)
 void CheckObstacleCollision(void* a0, void* a1);  // type 0x30 (from signature table)
-BOOL CheckPlayerName(void);  // type 0x2E (from signature table)
-void CheckPoint(void* a0, void* a1);  // type 0x30 (from signature table)
+BOOL CheckPlayerName(void);                                            // src/leaf/auto_03_8013EB1C_text_cb.cpp
+void CheckPoint(void* a3, void* a4);                                   // src/leaf/auto_03_800E75B0_text_cb.cpp
 u32 /*0x06*/ CheckQuestInterrupt(u32 a0);  // type 0x5 (from signature table)
 s32 CheckRockCrushed(void);  // type 0x22 (from signature table)
 u32 /*0x06*/ CheckWiiInput(u32 a0);  // type 0x5 (from signature table)
 void CheckpointMCReceivedCallback(u32 /*0x19*/ a0);  // type 0x56 (from signature table)
 void CheckpointMCSentCallback(u32 /*0x19*/ a0);  // type 0x56 (from signature table)
-s32 ChooseFlailingLand(u32 /*0x2E*/ a0, s32 a1);  // type 0xC4 (from signature table)
-s32 ChooseGuard(u32 /*0x2F*/ a0, f32 a1);  // type 0xCA (from signature table)
+s32 ChooseFlailingLand(u32 a3, s32 a4);                                // src/leaf/auto_03_80052504_text_cb.cpp
+s32 ChooseGuard(u32 a3, f32 f1);                                       // src/leaf/auto_03_800FB958_text_cb.cpp
 void CleanupMonsters(void);  // type 0x8F (from signature table)
 void CleanupSplashScreen(BOOL a0);  // type 0x8C (from signature table)
-void ClearBattleRequest(void);  // type 0x8F (from signature table)
-void ClearDiscError(void);  // type 0x8F (from signature table)
-void ClearExperimentSounds(void);  // type 0x8F (from signature table)
+void ClearBattleRequest(void);                                         // src/leaf/auto_03_8013F034_text_cb.cpp
+void ClearDiscError(void);                                             // src/game/small_8014.cpp
+void ClearExperimentSounds(void);                                      // src/leaf/auto_03_8006FA44_text_cb.cpp
 void ClearJunctionText(u32 a0);  // type 0x71 (from signature table)
-s32 ClearLineToTarget(u32 /*0x2F*/ a0, f32 a1);  // type 0xCA (from signature table)
-void ClearLostConnection(void);  // type 0x8F (from signature table)
+s32 ClearLineToTarget(u32 a3, f32 f1);                                 // src/leaf/auto_03_800FB958_text_cb.cpp
+void ClearLostConnection(void);                                        // src/game/small_8014.cpp
 void ClearMonster(void);  // type 0x8F (from signature table)
-void ClearNetError(void);  // type 0x8F (from signature table)
-void ClearNetworkStall(void);  // type 0x8F (from signature table)
-void ClearNoMonstersFlag(void);  // type 0x8F (from signature table)
-void ClearScoreTracker(void);  // type 0x8F (from signature table)
-void ClearUBAnims(void* a0);  // type 0x2F (from signature table)
-u32 /*0x06*/ CloneFSMCallback(u32 /*0x08*/ a0, u32 /*0x08*/ a1);  // type 0x7 (from signature table)
-u32 /*0x06*/ CloneRenderObjectCallback(u32 /*0x08*/ a0, u32 /*0x08*/ a1);  // type 0x7 (from signature table)
+void ClearNetError(void);                                              // src/game/small_8014.cpp
+void ClearNetworkStall(void);                                          // src/leaf/auto_03_8013F034_text_cb.cpp
+void ClearNoMonstersFlag(void);                                        // src/leaf/auto_03_8013F034_text_cb.cpp
+void ClearScoreTracker(void);                                          // src/game/small_8007.cpp
+void ClearUBAnims(void* a3);                                           // src/leaf/auto_03_800E75B0_text_cb.cpp
+u32 CloneFSMCallback(u32 a3, u32 a4);                                  // src/leaf/auto_03_8010C750_text_cb.cpp
+u32 CloneRenderObjectCallback(u32 a3, u32 a4);                         // src/leaf/auto_03_8010C750_text_cb.cpp
 void CloseBooks(void);  // type 0x8F (from signature table)
 void CombatHUDDisableInput(u32 a0);  // type 0x71 (from signature table)
 void CombatHUDEnableInput(void);  // type 0x8F (from signature table)
 void CombatHUDRestoreDisableState(void);  // type 0x8F (from signature table)
-void CombatHUDStoreDisableState(void);  // type 0x8F (from signature table)
-void CombatHUD_UpdatePlayersPaperDoll(void);  // type 0x8F (from signature table)
-void CombatPanelAnimComplete(void);  // type 0x8F (from signature table)
+void CombatHUDStoreDisableState(void);                                 // src/leaf/auto_03_80044CDC_text_cb.cpp
+void CombatHUD_UpdatePlayersPaperDoll(void);                           // src/game/small_8004b.cpp
+void CombatPanelAnimComplete(void);                                    // src/leaf/auto_03_800E75B0_text_cb.cpp
 u32 /*0x06*/ CombatPartZonesAreLoaded(void);  // type 0xA (from signature table)
-void CombatResultsPauseGame(void);  // type 0x8F (from signature table)
-void CombatResultsResumeGame(void);  // type 0x8F (from signature table)
-u32 /*0x06*/ CombatTestOn(void);  // type 0xA (from signature table)
-u32 /*0x06*/ CommentTimerPastThreshold(f32 a0);  // type 0xB0 (from signature table)
-void CompleteJournalEntryStep(u32 /*0x52*/ a0);  // type 0x155 (from signature table)
+void CombatResultsPauseGame(void);                                     // src/game/small_8004b.cpp
+void CombatResultsResumeGame(void);                                    // src/game/small_8004b.cpp
+u32 CombatTestOn(void);                                                // src/leaf/auto_03_800E75B0_text_cb.cpp
+u32 CommentTimerPastThreshold(f32 a0);                                 // src/game/small_8007.cpp
+void CompleteJournalEntryStep(u32 a3);                                 // src/leaf/auto_03_800E75B0_text_cb.cpp
 void ConfirmIngredientSelection(void);  // type 0x8F (from signature table)
-void ConversationEnqueAnim(u32 a0);  // type 0x71 (from signature table)
+void ConversationEnqueAnim(u32 a0);                                    // src/game/small_8005.cpp
 void ConversationHideHUDInfo(void);  // type 0x8F (from signature table)
-void ConversationPlayAnim(u32 a0);  // type 0x71 (from signature table)
+void ConversationPlayAnim(u32 a0);                                     // src/game/small_8005.cpp
 void ConversationShowHUDInfo(void);  // type 0x8F (from signature table)
-void ConversationSignal(u32 a0, BOOL a1, BOOL a2);  // type 0x17E (from signature table)
-void ConversationStopVoiceSFX(void);  // type 0x8F (from signature table)
-void CreateDoubleTransitionToFrontEndScreen(u32 a0, u32 a1, u32 a2, u32 a3, u32 a4);  // type 0x177 (from signature table)
-void CreateDoubleTransitionToScreen(u32 a0, u32 a1, u32 a2, u32 a3, u32 a4);  // type 0x177 (from signature table)
-void CreateDoubleTransitionToScreenAndSetDisplayEnvironment(u32 a0, u32 a1, u32 a2, u32 a3, u32 a4, u32 a5);  // type 0x178 (from signature table)
+void ConversationSignal(u32 a0, BOOL a1, BOOL a2);                     // src/game/small_8005.cpp
+void ConversationStopVoiceSFX(void);                                   // src/game/small_8005.cpp
+void CreateDoubleTransitionToFrontEndScreen(u32 a3, u32 a4, u32 a5, u32 a6, u32 a7); // src/leaf/auto_03_800E75B0_text_cb.cpp
+void CreateDoubleTransitionToScreen(u32 a3, u32 a4, u32 a5, u32 a6, u32 a7); // src/leaf/auto_03_800E75B0_text_cb.cpp
+void CreateDoubleTransitionToScreenAndSetDisplayEnvironment(u32 a3, u32 a4, u32 a5, u32 a6, u32 a7, u32 a8); // src/leaf/auto_03_800E75B0_text_cb.cpp
 void CreateEmptyMonster(void);  // type 0x8F (from signature table)
-u32 /*0x06*/ CreateEntityPartCallback(u32 /*0x08*/ a0, u32 /*0x08*/ a1);  // type 0x7 (from signature table)
-u32 /*0x06*/ CreatePooledEntityCallback(u32 /*0x08*/ a0, u32 /*0x08*/ a1);  // type 0x7 (from signature table)
+u32 CreateEntityPartCallback(u32 a3, u32 a4);                          // src/leaf/auto_03_8004E58C_text_cb.cpp
+u32 CreatePooledEntityCallback(u32 a3, u32 a4);                        // src/leaf/auto_03_8010C750_text_cb.cpp
 u32 /*0x06*/ CreateProjectileEntityCallback(u32 /*0x08*/ a0, u32 /*0x08*/ a1);  // type 0x7 (from signature table)
-void CreateTransitionToScreen(u32 a0, u32 a1, u32 a2, u32 a3);  // type 0x176 (from signature table)
-void Creatures_AdjustPositionForLegs(void);  // type 0x8F (from signature table)
-s32 Creatures_GetCreatureLoaded(void);  // type 0x22 (from signature table)
-f32 Creatures_GetCurrentAttack(void);  // type 0x12 (from signature table)
-f32 Creatures_GetCurrentDefense(void);  // type 0x12 (from signature table)
-f32 Creatures_GetCurrentEnergy(void);  // type 0x12 (from signature table)
-f32 Creatures_GetCurrentHP(void);  // type 0x12 (from signature table)
-f32 Creatures_GetCurrentMadness(void);  // type 0x12 (from signature table)
-f32 Creatures_GetMaxMadness(void);  // type 0x12 (from signature table)
-BOOL Creatures_GetMonsterName(void);  // type 0x2E (from signature table)
+void CreateTransitionToScreen(u32 a3, u32 a4, u32 a5, u32 a6);         // src/leaf/auto_03_800E75B0_text_cb.cpp
+void Creatures_AdjustPositionForLegs(void);                            // src/game/lab_books_c.cpp
+s32 Creatures_GetCreatureLoaded(void);                                 // src/game/lab_books_c.cpp
+f32 Creatures_GetCurrentAttack(void);                                  // src/game/lab_books_c.cpp
+f32 Creatures_GetCurrentDefense(void);                                 // src/game/lab_books_c.cpp
+f32 Creatures_GetCurrentEnergy(void);                                  // src/game/lab_books_c.cpp
+f32 Creatures_GetCurrentHP(void);                                      // src/game/lab_books_c.cpp
+f32 Creatures_GetCurrentMadness(void);                                 // src/game/lab_books_c.cpp
+f32 Creatures_GetMaxMadness(void);                                     // src/game/lab_books_c.cpp
+ScriptValue Creatures_GetMonsterName(void);  // type 0x2E (from signature table)
 void Creatures_IncCreature(s32 a0);  // type 0x83 (from signature table)
-void Creatures_InitEntityData(void);  // type 0x8F (from signature table)
-s32 Creatures_MonstersInInventory(void);  // type 0x22 (from signature table)
-void Creatures_UpdateMonsterImage(void);  // type 0x8F (from signature table)
+void Creatures_InitEntityData(void);                                   // src/game/lab_books_c.cpp
+s32 Creatures_MonstersInInventory(void);                               // src/game/lab_books_c.cpp
+void Creatures_UpdateMonsterImage(void);                               // src/game/lab_books_c.cpp
 s32 CurrentScience_Alchemy(void);  // type 0x22 (from signature table)
 s32 CurrentScience_Biological(void);  // type 0x22 (from signature table)
 s32 CurrentScience_Mechanical(void);  // type 0x22 (from signature table)
-s32 CurrentScreen_Badges(void);  // type 0x22 (from signature table)
-s32 CurrentScreen_Creatures(void);  // type 0x22 (from signature table)
-s32 CurrentScreen_Ingredients(void);  // type 0x22 (from signature table)
-s32 CurrentScreen_Parts(void);  // type 0x22 (from signature table)
-s32 CurrentScreen_Recipes(void);  // type 0x22 (from signature table)
-BOOL CurrentlySelected(void);  // type 0x2E (from signature table)
-void DS_AdjustExplorationTimer(BOOL a0, f32 a1);  // type 0x184 (from signature table)
-u32 /*0x06*/ DS_AnySaveSlotsPlayable(void);  // type 0xA (from signature table)
-u32 /*0x06*/ DS_AreAllSaveSlotsCorrupt(void);  // type 0xA (from signature table)
-void DS_AssociateFlagWithComponent(BOOL a0, u32 a1);  // type 0x185 (from signature table)
-u32 /*0x06*/ DS_DeleteCorruptSaveSlots(void);  // type 0xA (from signature table)
-void DS_DeleteOperatingTableMonster(void);  // type 0x8F (from signature table)
-void DS_DisplayNISText(BOOL a0, u32 a1);  // type 0x185 (from signature table)
-u32 /*0x06*/ DS_DoesFSMPopMatchFSMPush(void);  // type 0xA (from signature table)
-u32 /*0x06*/ DS_DoesSaveDataDiffer(u32 /*0x06*/ a0);  // type 0xA7 (from signature table)
-void DS_EnableFieldRepair(u32 /*0x06*/ a0);  // type 0x67 (from signature table)
-void DS_EndWiiMoteMiniGame(u32 /*0x06*/ a0);  // type 0x67 (from signature table)
-void DS_ExplorationPrepareForTransition(u32 /*0x4B*/ a0, u32 a1);  // type 0x15A (from signature table)
-void DS_GameFlowPopTo(BOOL a0);  // type 0x8C (from signature table)
-s32 DS_GetLastPDAScreen(void);  // type 0x22 (from signature table)
-void DS_HandleEnemyFledCombat(void);  // type 0x8F (from signature table)
-void DS_HandlePlayerFledCombat(void);  // type 0x8F (from signature table)
-void DS_HandlePlayerLostCombat(void);  // type 0x8F (from signature table)
-void DS_HandlePlayerWonCombat(void);  // type 0x8F (from signature table)
-u32 /*0x06*/ DS_HasExperimentKey(void);  // type 0xA (from signature table)
-u32 /*0x06*/ DS_HasExperimentSecondary(void);  // type 0xA (from signature table)
-u32 /*0x06*/ DS_IsEepromNotLoaded(void);  // type 0xA (from signature table)
-u32 /*0x06*/ DS_IsGlobalSaveSlotCorrupt(void);  // type 0xA (from signature table)
-s32 DS_IsKeyIngredientSelected(void);  // type 0x22 (from signature table)
-u32 /*0x06*/ DS_IsNewestSaveSlotCorrupt(void);  // type 0xA (from signature table)
-u32 /*0x06*/ DS_IsOperatingTableMonsterLoaded(void);  // type 0xA (from signature table)
-u32 /*0x06*/ DS_IsOperatingTableMonsterTooMad(void);  // type 0xA (from signature table)
-u32 /*0x06*/ DS_IsOperatingTableMonsterValid(void);  // type 0xA (from signature table)
-u32 /*0x06*/ DS_IsPlayerMadEnoughForCurrentRecipe(void);  // type 0xA (from signature table)
-u32 /*0x06*/ DS_IsSaveSlotCorrupt(s32 a0);  // type 0x6 (from signature table)
-u32 /*0x06*/ DS_IsSaveSlotPlayable(s32 a0);  // type 0x6 (from signature table)
-s32 DS_IsSecondaryIngredientSelected(void);  // type 0x22 (from signature table)
-void DS_KillEnemy(u32 a0);  // type 0x71 (from signature table)
-void DS_LoadDatabaseTable(u32 a0);  // type 0x71 (from signature table)
-void DS_LoadSavedGame(BOOL a0);  // type 0x8C (from signature table)
-void DS_LoadSavedGamesFromEeprom(void);  // type 0x8F (from signature table)
-u32 /*0x06*/ DS_MonsterConstructorMonsterHasChanged(void);  // type 0xA (from signature table)
-void DS_PlayNISFromXML(u32 a0, u32 a1, BOOL a2);  // type 0x7D (from signature table)
-void DS_PlayNISMovie(BOOL a0, u32 a1);  // type 0x185 (from signature table)
-void DS_PopDisplayScreenComponent(u32 /*0x06*/ a0, u32 /*0x06*/ a1);  // type 0x14B (from signature table)
-void DS_PositionPlayerAtSafeNode(void);  // type 0x8F (from signature table)
-void DS_PushConversationFSM(void);  // type 0x8F (from signature table)
-void DS_PushDisplayScreenComponent(u32 a0, u32 /*0x06*/ a1);  // type 0x74 (from signature table)
-void DS_RemoveExperimentIngredients(void);  // type 0x8F (from signature table)
-void DS_ReversePlayerDirection(void);  // type 0x8F (from signature table)
-void DS_SaveOptionsSettings(void);  // type 0x8F (from signature table)
-void DS_SendEntityNameAsSignal(void* a0);  // type 0x2F (from signature table)
-void DS_SendObjectNameAsSignalByThis(void* a0);  // type 0x2F (from signature table)
-void DS_SendSignalToEnemy(u32 a0, u32 a1);  // type 0x7A (from signature table)
-void DS_SetAppropriateExplorationLocation(void);  // type 0x8F (from signature table)
-void DS_SetButtonPulsing(u32 a0, u32 /*0x06*/ a1);  // type 0x74 (from signature table)
-void DS_SetCanPause(u32 /*0x06*/ a0);  // type 0x67 (from signature table)
-void DS_SetChallengeNodeInactiveTime(s32 a0);  // type 0x83 (from signature table)
-void DS_SetHazardCollision(u32 a0, u32 /*0x06*/ a1);  // type 0x74 (from signature table)
-void DS_SetHazardCollisionByThis(void* a0, u32 /*0x06*/ a1);  // type 0x3E (from signature table)
-void DS_SetHazardIdleTime(u32 a0, f32 a1);  // type 0x76 (from signature table)
-void DS_SetHazardRepeatCount(u32 a0, s32 a1);  // type 0x7E (from signature table)
-void DS_SetKeyIngredient(u32 /*0x41*/ a0);  // type 0x154 (from signature table)
-void DS_SetLastPDAScreen(s32 a0);  // type 0x83 (from signature table)
-void DS_SetNextExperiment(u32 /*0x4D*/ a0, BOOL a1);  // type 0x150 (from signature table)
-void DS_SetPausedQuestFSM(u32 /*0x06*/ a0);  // type 0x67 (from signature table)
-void DS_SetScreenShake(f32 a0, f32 a1, f32 a2, u32 /*0x06*/ a3);  // type 0x16A (from signature table)
-void DS_SetSpriteIdleAnim(u32 a0, u32 a1);  // type 0x7A (from signature table)
-void DS_SetStateSpriteIdleAnim(u32 a0, u32 a1, u32 /*0x06*/ a2);  // type 0x174 (from signature table)
-void DS_SetWiimoteSequenceInput(u32 a0);  // type 0x71 (from signature table)
-void DS_SetupOperatingTable(s32 a0);  // type 0x83 (from signature table)
-void DS_StartCurrentExperiment(void);  // type 0x8F (from signature table)
-void DS_StartStoredNISFSM(void);  // type 0x8F (from signature table)
-void DS_StartWiiMoteMiniGame(BOOL a0, u32 a1, s32 a2, f32 a3);  // type 0x186 (from signature table)
-void DS_StartWiiMoteMiniGameWithEntity(BOOL a0, void* a1, s32 a2, f32 a3);  // type 0x183 (from signature table)
-void DS_StoreAndTransitionToNISFSM(u32 a0);  // type 0x71 (from signature table)
-void DS_StoreLastButtonPressed(u32 a0);  // type 0x71 (from signature table)
-void DS_StoreLastNISConvFSMPop(u32 a0);  // type 0x71 (from signature table)
-void DS_TeleportPlayerToNode(u32 a0);  // type 0x71 (from signature table)
-void DS_UnlockAllCastle(void);  // type 0x8F (from signature table)
+s32 CurrentScreen_Badges(void);                                        // src/game/lab_books_a.cpp
+s32 CurrentScreen_Creatures(void);                                     // src/game/lab_books_a.cpp
+s32 CurrentScreen_Ingredients(void);                                   // src/game/lab_books_a.cpp
+s32 CurrentScreen_Parts(void);                                         // src/game/lab_books_a.cpp
+s32 CurrentScreen_Recipes(void);                                       // src/game/lab_books_a.cpp
+ScriptValue CurrentlySelected(void);  // type 0x2E (from signature table)
+void DS_AdjustExplorationTimer(BOOL a3, f32 f1);                       // src/leaf/auto_03_800E75B0_text_cb.cpp
+u32 DS_AnySaveSlotsPlayable(void);                                     // src/leaf/auto_03_800E75B0_text_cb.cpp
+u32 DS_AreAllSaveSlotsCorrupt(void);                                   // src/leaf/auto_03_800E75B0_text_cb.cpp
+void DS_AssociateFlagWithComponent(BOOL a3, u32 a4);                   // src/leaf/auto_03_800E75B0_text_cb.cpp
+u32 DS_DeleteCorruptSaveSlots(void);                                   // src/leaf/auto_03_800E75B0_text_cb.cpp
+void DS_DeleteOperatingTableMonster(void);                             // src/leaf/auto_03_800E75B0_text_cb.cpp
+void DS_DisplayNISText(BOOL a3, u32 a4);                               // src/leaf/auto_03_800E75B0_text_cb.cpp
+u32 DS_DoesFSMPopMatchFSMPush(void);                                   // src/leaf/auto_03_800E75B0_text_cb.cpp
+u32 DS_DoesSaveDataDiffer(u32 a3);                                     // src/leaf/auto_03_800E75B0_text_cb.cpp
+void DS_EnableFieldRepair(u32 a3);                                     // src/leaf/auto_03_800E75B0_text_cb.cpp
+void DS_EndWiiMoteMiniGame(u32 a3);                                    // src/leaf/auto_03_800E75B0_text_cb.cpp
+void DS_ExplorationPrepareForTransition(u32 a3, u32 a4);               // src/leaf/auto_03_800E75B0_text_cb.cpp
+void DS_GameFlowPopTo(BOOL a3);                                        // src/leaf/auto_03_800E75B0_text_cb.cpp
+s32 DS_GetLastPDAScreen(void);                                         // src/leaf/auto_03_800E75B0_text_cb.cpp
+void DS_HandleEnemyFledCombat(void);                                   // src/leaf/auto_03_800E75B0_text_cb.cpp
+void DS_HandlePlayerFledCombat(void);                                  // src/leaf/auto_03_800E75B0_text_cb.cpp
+void DS_HandlePlayerLostCombat(void);                                  // src/leaf/auto_03_800E75B0_text_cb.cpp
+void DS_HandlePlayerWonCombat(void);                                   // src/leaf/auto_03_800E75B0_text_cb.cpp
+u32 DS_HasExperimentKey(void);                                         // src/leaf/auto_03_800E75B0_text_cb.cpp
+u32 DS_HasExperimentSecondary(void);                                   // src/leaf/auto_03_800E75B0_text_cb.cpp
+u32 DS_IsEepromNotLoaded(void);                                        // src/leaf/auto_03_800E75B0_text_cb.cpp
+u32 DS_IsGlobalSaveSlotCorrupt(void);                                  // src/leaf/auto_03_800E75B0_text_cb.cpp
+s32 DS_IsKeyIngredientSelected(void);                                  // src/leaf/auto_03_800E75B0_text_cb.cpp
+u32 DS_IsNewestSaveSlotCorrupt(void);                                  // src/leaf/auto_03_800E75B0_text_cb.cpp
+u32 DS_IsOperatingTableMonsterLoaded(void);                            // src/leaf/auto_03_800E75B0_text_cb.cpp
+u32 DS_IsOperatingTableMonsterTooMad(void);                            // src/leaf/auto_03_800E75B0_text_cb.cpp
+u32 DS_IsOperatingTableMonsterValid(void);                             // src/leaf/auto_03_800E75B0_text_cb.cpp
+u32 DS_IsPlayerMadEnoughForCurrentRecipe(void);                        // src/leaf/auto_03_800E75B0_text_cb.cpp
+u32 DS_IsSaveSlotCorrupt(s32 a3);                                      // src/leaf/auto_03_800E75B0_text_cb.cpp
+u32 DS_IsSaveSlotPlayable(s32 a3);                                     // src/leaf/auto_03_800E75B0_text_cb.cpp
+s32 DS_IsSecondaryIngredientSelected(void);                            // src/leaf/auto_03_800E75B0_text_cb.cpp
+void DS_KillEnemy(u32 a3);                                             // src/leaf/auto_03_800E75B0_text_cb.cpp
+void DS_LoadDatabaseTable(u32 a3);                                     // src/leaf/auto_03_800E75B0_text_cb.cpp
+void DS_LoadSavedGame(BOOL a3);                                        // src/leaf/auto_03_800E75B0_text_cb.cpp
+void DS_LoadSavedGamesFromEeprom(void);                                // src/leaf/auto_03_800E75B0_text_cb.cpp
+u32 DS_MonsterConstructorMonsterHasChanged(void);                      // src/leaf/auto_03_800E75B0_text_cb.cpp
+void DS_PlayNISFromXML(u32 a3, u32 a4, BOOL a5);                       // src/leaf/auto_03_800E75B0_text_cb.cpp
+void DS_PlayNISMovie(BOOL a3, u32 a4);                                 // src/leaf/auto_03_800E75B0_text_cb.cpp
+void DS_PopDisplayScreenComponent(u32 a3, u32 a4);                     // src/leaf/auto_03_800E75B0_text_cb.cpp
+void DS_PositionPlayerAtSafeNode(void);                                // src/leaf/auto_03_800E75B0_text_cb.cpp
+void DS_PushConversationFSM(void);                                     // src/leaf/auto_03_800E75B0_text_cb.cpp
+void DS_PushDisplayScreenComponent(u32 a3, u32 a4);                    // src/leaf/auto_03_800E75B0_text_cb.cpp
+void DS_RemoveExperimentIngredients(void);                             // src/leaf/auto_03_800E75B0_text_cb.cpp
+void DS_ReversePlayerDirection(void);                                  // src/leaf/auto_03_800E75B0_text_cb.cpp
+void DS_SaveOptionsSettings(void);                                     // src/leaf/auto_03_800E75B0_text_cb.cpp
+void DS_SendEntityNameAsSignal(void* a3);                              // src/leaf/auto_03_800E75B0_text_cb.cpp
+void DS_SendObjectNameAsSignalByThis(void* a3);                        // src/leaf/auto_03_800E75B0_text_cb.cpp
+void DS_SendSignalToEnemy(u32 a3, u32 a4);                             // src/leaf/auto_03_800E75B0_text_cb.cpp
+void DS_SetAppropriateExplorationLocation(void);                       // src/leaf/auto_03_800E75B0_text_cb.cpp
+void DS_SetButtonPulsing(u32 a3, u32 a4);                              // src/leaf/auto_03_800E75B0_text_cb.cpp
+void DS_SetCanPause(u32 a3);                                           // src/leaf/auto_03_800E75B0_text_cb.cpp
+void DS_SetChallengeNodeInactiveTime(s32 a3);                          // src/leaf/auto_03_800E75B0_text_cb.cpp
+void DS_SetHazardCollision(u32 a3, u32 a4);                            // src/leaf/auto_03_800E75B0_text_cb.cpp
+void DS_SetHazardCollisionByThis(void* a3, u32 a4);                    // src/leaf/auto_03_800E75B0_text_cb.cpp
+void DS_SetHazardIdleTime(u32 a3, f32 f1);                             // src/leaf/auto_03_800E75B0_text_cb.cpp
+void DS_SetHazardRepeatCount(u32 a3, s32 a4);                          // src/leaf/auto_03_800E75B0_text_cb.cpp
+void DS_SetKeyIngredient(u32 a3);                                      // src/leaf/auto_03_800E75B0_text_cb.cpp
+void DS_SetLastPDAScreen(s32 a3);                                      // src/leaf/auto_03_800E75B0_text_cb.cpp
+void DS_SetNextExperiment(u32 a3, BOOL a4);                            // src/leaf/auto_03_800E75B0_text_cb.cpp
+void DS_SetPausedQuestFSM(u32 a3);                                     // src/leaf/auto_03_800E75B0_text_cb.cpp
+void DS_SetScreenShake(f32 f1, f32 f2, f32 f3, u32 a3);                // src/leaf/auto_03_800E75B0_text_cb.cpp
+void DS_SetSpriteIdleAnim(u32 a3, u32 a4);                             // src/leaf/auto_03_800E75B0_text_cb.cpp
+void DS_SetStateSpriteIdleAnim(u32 a3, u32 a4, u32 a5);                // src/leaf/auto_03_800E75B0_text_cb.cpp
+void DS_SetWiimoteSequenceInput(u32 a3);                               // src/leaf/auto_03_800E75B0_text_cb.cpp
+void DS_SetupOperatingTable(s32 a3);                                   // src/leaf/auto_03_800E75B0_text_cb.cpp
+void DS_StartCurrentExperiment(void);                                  // src/leaf/auto_03_800E75B0_text_cb.cpp
+void DS_StartStoredNISFSM(void);                                       // src/leaf/auto_03_800E75B0_text_cb.cpp
+void DS_StartWiiMoteMiniGame(BOOL a3, u32 a4, s32 a5, f32 f1);         // src/leaf/auto_03_800E75B0_text_cb.cpp
+void DS_StartWiiMoteMiniGameWithEntity(BOOL a3, void* a4, s32 a5, f32 f1); // src/leaf/auto_03_800E75B0_text_cb.cpp
+void DS_StoreAndTransitionToNISFSM(u32 a3);                            // src/leaf/auto_03_800E75B0_text_cb.cpp
+void DS_StoreLastButtonPressed(u32 a3);                                // src/leaf/auto_03_800E75B0_text_cb.cpp
+void DS_StoreLastNISConvFSMPop(u32 a3);                                // src/leaf/auto_03_800E75B0_text_cb.cpp
+void DS_TeleportPlayerToNode(u32 a3);                                  // src/leaf/auto_03_800E75B0_text_cb.cpp
+void DS_UnlockAllCastle(void);                                         // src/leaf/auto_03_800E75B0_text_cb.cpp
 void DamagePlayerMonster(s32 a0);  // type 0x83 (from signature table)
 void DeInitializeOperatingTable(void);  // type 0x8F (from signature table)
-void DeactivateEntity(void* a0);  // type 0x2F (from signature table)
-void DeactivateListEntry(u32 a0, u32 a1);  // type 0x7A (from signature table)
+void DeactivateEntity(void* a0);                                       // src/game/small_800Fc.cpp
+void DeactivateListEntry(u32 a3, u32 a4);                              // src/leaf/auto_03_800E75B0_text_cb.cpp
 u32 /*0x06*/ DeallocEntityPartCallback(u32 /*0x08*/ a0, u32 /*0x08*/ a1);  // type 0x7 (from signature table)
-u32 /*0x06*/ DeallocFSMPoolCallback(u32 /*0x08*/ a0, u32 /*0x08*/ a1);  // type 0x7 (from signature table)
-u32 /*0x06*/ DeallocPooledEntityCallback(u32 /*0x08*/ a0, u32 /*0x08*/ a1);  // type 0x7 (from signature table)
-void DebugSetPlayerRank(u32 /*0x54*/ a0);  // type 0x15C (from signature table)
-BOOL DecrementPropState(u32 /*0x31*/ a0, u32 /*0x06*/ a1);  // type 0xDF (from signature table)
-void DecrementQuestIntBy(u32 /*0x43*/ a0, s32 a1);  // type 0x163 (from signature table)
-void DefineStateOnEnemy(u32 a0, u32 a1, u32 a2, s32 a3, u32 a4, u32 /*0x06*/ a5, u32 /*0x06*/ a6);  // type 0x179 (from signature table)
-void DefineStateOnEnemyByThis(void* a0, u32 a1, u32 a2, s32 a3, u32 a4, u32 /*0x06*/ a5, u32 /*0x06*/ a6);  // type 0x10F (from signature table)
-void DefineStateOnPlayer(u32 a0, u32 a1, s32 a2, u32 a3, u32 /*0x06*/ a4, u32 /*0x06*/ a5);  // type 0x17A (from signature table)
-void DefineStateOnProp(u32 a0, u32 a1, u32 a2, s32 a3, u32 a4, u32 /*0x06*/ a5, u32 /*0x06*/ a6);  // type 0x179 (from signature table)
+u32 DeallocFSMPoolCallback(u32 a3, u32 a4);                            // src/leaf/auto_03_8010C750_text_cb.cpp
+u32 DeallocPooledEntityCallback(u32 a3, u32 a4);                       // src/leaf/auto_03_8010C750_text_cb.cpp
+void DebugSetPlayerRank(u32 a3);                                       // src/leaf/auto_03_800E75B0_text_cb.cpp
+BOOL DecrementPropState(u32 a3, u32 a4);                               // src/leaf/auto_03_80069028_text_cb.cpp
+void DecrementQuestIntBy(u32 q, s32 n);                                // src/game/player_api.cpp
+void DefineStateOnEnemy(u32 a3, u32 a4, u32 a5, s32 a6, u32 a7, u32 a8, u32 a9); // src/leaf/auto_03_800E75B0_text_cb.cpp
+void DefineStateOnEnemyByThis(void* a3, u32 a4, u32 a5, s32 a6, u32 a7, u32 a8, u32 a9); // src/leaf/auto_03_800E75B0_text_cb.cpp
+void DefineStateOnPlayer(u32 a3, u32 a4, s32 a5, u32 a6, u32 a7, u32 a8); // src/leaf/auto_03_800E75B0_text_cb.cpp
+void DefineStateOnProp(u32 a3, u32 a4, u32 a5, s32 a6, u32 a7, u32 a8, u32 a9); // src/leaf/auto_03_800E75B0_text_cb.cpp
 void DeinitChallenge(void);  // type 0x8F (from signature table)
-void DeleteChallengeCursor(void);  // type 0x8F (from signature table)
+void DeleteChallengeCursor(void);                                      // src/leaf/auto_03_800E75B0_text_cb.cpp
 void DeleteCursor(void);                                               // src/game/game_ui.cpp
 u32 /*0x06*/ DemolishEntityPartCallback(u32 /*0x08*/ a0, u32 /*0x08*/ a1);  // type 0x7 (from signature table)
-void DemolishEntityPoolCallback(u32 /*0x08*/ a0);  // type 0x87 (from signature table)
-u32 /*0x06*/ DemolishFSMCallback(u32 /*0x08*/ a0, u32 /*0x08*/ a1);  // type 0x7 (from signature table)
+void DemolishEntityPoolCallback(u32 a3);                               // src/leaf/auto_03_8010C750_text_cb.cpp
+u32 DemolishFSMCallback(u32 a3, u32 a4);                               // src/leaf/auto_03_8010C750_text_cb.cpp
 u32 /*0x06*/ DemolishPooledEntityCallback(u32 /*0x08*/ a0, u32 /*0x08*/ a1);  // type 0x7 (from signature table)
 u32 /*0x06*/ DemolishProjectileEntityCallback(u32 /*0x08*/ a0, u32 /*0x08*/ a1);  // type 0x7 (from signature table)
 u32 /*0x06*/ DemolishRenderObjectCallback(u32 /*0x08*/ a0, u32 /*0x08*/ a1);  // type 0x7 (from signature table)
-void DespawnEntity(void* a0, u32 /*0x06*/ a1);  // type 0x3E (from signature table)
-void DespawnEntityByName(u32 a0, u32 /*0x06*/ a1);  // type 0x74 (from signature table)
+void DespawnEntity(void* a3, u32 a4);                                  // src/leaf/auto_03_800E75B0_text_cb.cpp
+void DespawnEntityByName(u32 a3, u32 a4);                              // src/leaf/auto_03_800E75B0_text_cb.cpp
 void DestroyLabBooks(void);  // type 0x8F (from signature table)
 u32 /*0x06*/ DidNetworkStall(void);  // type 0xA (from signature table)
-BOOL DidOpponentAcceptRematch(void);  // type 0x2E (from signature table)
-BOOL DidOpponentCancelDuringPreparing(void);  // type 0x2E (from signature table)
-BOOL DidOpponentCloseConnection(void);  // type 0x2E (from signature table)
-BOOL DidOpponentDeclineRematch(void);  // type 0x2E (from signature table)
-BOOL DidWeConnectToOpponent(void);  // type 0x2E (from signature table)
-BOOL DidWeLoseConnection(void);  // type 0x2E (from signature table)
+ScriptValue DidOpponentAcceptRematch(void);  // type 0x2E (from signature table)
+BOOL DidOpponentCancelDuringPreparing(void);                           // src/leaf/auto_03_8013F034_text_cb.cpp
+BOOL DidOpponentCloseConnection(void);                                 // src/game/small_8014.cpp
+ScriptValue DidOpponentDeclineRematch(void);  // type 0x2E (from signature table)
+BOOL DidWeConnectToOpponent(void);                                     // src/game/small_8014.cpp
+BOOL DidWeLoseConnection(void);                                        // src/game/small_8014.cpp
 void DisableAllCameraInfluenceInZone(void);  // type 0x8F (from signature table)
 void DisableCameraInfluence(u32 /*0x17*/ a0);  // type 0x141 (from signature table)
 void DisableHazardCollision(void* a0);  // type 0x2F (from signature table)
-void DisableHomeButton(void);  // type 0x8F (from signature table)
-void DisablePlayerControls(u32 /*0x06*/ a0);  // type 0x67 (from signature table)
-void DisablePlayerInput(u32 /*0x36*/ a0);  // type 0x153 (from signature table)
-void DisableTrigger(u32 /*0x34*/ a0);  // type 0x12E (from signature table)
-void DoTradeWithMerchant(void);  // type 0x8F (from signature table)
-u32 /*0x06*/ DoesPlayerMonsterHaveAnArm(void);  // type 0xA (from signature table)
-u32 /*0x06*/ DoesPlayerMonsterUsePart(u32 /*0x3F*/ a0, s32 a1);  // type 0xAD (from signature table)
+void DisableHomeButton(void);                                          // src/leaf/auto_03_8013F034_text_cb.cpp
+void DisablePlayerControls(u32 a3);                                    // src/leaf/auto_03_800E75B0_text_cb.cpp
+void DisablePlayerInput(u32 a0);                                       // src/game/small_800Ec.cpp
+void DisableTrigger(u32 a3);                                           // src/leaf/auto_03_8006F5A0_text_cb.cpp
+void DoTradeWithMerchant(void);                                        // src/leaf/auto_03_800E75B0_text_cb.cpp
+u32 DoesPlayerMonsterHaveAnArm(void);                                  // src/game/player_api.cpp
+u32 DoesPlayerMonsterUsePart(u32 def, s32 tier);                       // src/game/player_api.cpp
 s32 DoingIngredientsSelection(void);  // type 0x22 (from signature table)
-void DummyFunctionVU1(BOOL a0);  // type 0x8C (from signature table)
-void DummyFunctionVU2(BOOL a0);  // type 0x8C (from signature table)
-void DummyFunctionVV1(void);  // type 0x8F (from signature table)
-void DummyFunctionVV2(void);  // type 0x8F (from signature table)
+void DummyFunctionVU1(BOOL a3);                                        // src/leaf/auto_03_8013F034_text_cb.cpp
+void DummyFunctionVU2(BOOL a3);                                        // src/leaf/auto_03_8013F034_text_cb.cpp
+void DummyFunctionVV1(void);                                           // src/leaf/auto_03_8013F034_text_cb.cpp
+void DummyFunctionVV2(void);                                           // src/leaf/auto_03_8013F034_text_cb.cpp
 void EnableCameraInfluence(u32 /*0x17*/ a0);  // type 0x141 (from signature table)
-void EnableFieldRepair(u32 /*0x06*/ a0);  // type 0x67 (from signature table)
+void EnableFieldRepair(u32 a3);                                        // src/leaf/auto_03_800E75B0_text_cb.cpp
 void EnableHazardCollision(void* a0);  // type 0x2F (from signature table)
-u32 /*0x06*/ EnableMainMenuDebugOptions(void);  // type 0xA (from signature table)
-void EnablePlayerInput(u32 /*0x36*/ a0);  // type 0x153 (from signature table)
-void EndIngredientsSelection(void);  // type 0x8F (from signature table)
-void EndQuest(void);  // type 0x8F (from signature table)
-void EndQuestTimer(void);  // type 0x8F (from signature table)
+u32 EnableMainMenuDebugOptions(void);                                  // src/leaf/auto_03_800E75B0_text_cb.cpp
+void EnablePlayerInput(u32 a0);                                        // src/game/small_800Ec.cpp
+void EndIngredientsSelection(void);                                    // src/leaf/auto_03_8010FDA4_text_cb.cpp
+void EndQuest(void);                                                   // src/game/small_800Fc.cpp
+void EndQuestTimer(void);                                              // src/leaf/auto_03_800E75B0_text_cb.cpp
 void EndTest(void);  // type 0x8F (from signature table)
 void EnemyFireLightningAtActiveTarget(u32 /*0x2F*/ a0, u32 /*0x30*/ a1, u32 a2, u32 /*0x38*/ a3, f32 a4, f32 a5);  // type 0x117 (from signature table)
 void EnemyFireProjectileAtActiveTarget(u32 /*0x2F*/ a0, u32 /*0x38*/ a1, u32 /*0x30*/ a2, f32 a3);  // type 0x11A (from signature table)
@@ -380,36 +380,36 @@ void EnterName_AddLetter(s32 a0);  // type 0x83 (from signature table)
 void EnterName_AddSpace(void);  // type 0x8F (from signature table)
 void EnterName_DelLetter(void);  // type 0x8F (from signature table)
 void EnterName_Destroy(void);  // type 0x8F (from signature table)
-u32 /*0x06*/ EnterName_EnteringPlayerName(void);  // type 0xA (from signature table)
-BOOL EnterName_GetName(void);  // type 0x2E (from signature table)
+u32 EnterName_EnteringPlayerName(void);                                // src/leaf/auto_03_800FB958_text_cb.cpp
+BOOL EnterName_GetName(void);                                          // src/leaf/auto_03_80120AAC_text_cb.cpp
 u32 /*0x06*/ EnterName_HasValidName(void);  // type 0xA (from signature table)
 void EnterName_Init(void);  // type 0x8F (from signature table)
-void EnterName_NameInputDone(u32 /*0x06*/ a0);  // type 0x67 (from signature table)
+void EnterName_NameInputDone(u32 a3);                                  // src/leaf/auto_03_80120AAC_text_cb.cpp
 void EnterName_SaveNameToPlayerName(void);  // type 0x8F (from signature table)
-void EnterScientistNameDeInit(void);  // type 0x8F (from signature table)
+void EnterScientistNameDeInit(void);                                   // src/leaf/auto_03_8013EB1C_text_cb.cpp
 void EnterScientistNameInit(void);  // type 0x8F (from signature table)
 u32 /*0x06*/ EntityPartZoneUnloadCallback(u32 /*0x08*/ a0, u32 /*0x08*/ a1);  // type 0x7 (from signature table)
-void Explode(void* a0);  // type 0x2F (from signature table)
-void ExplodeIfDead(u32 /*0x2F*/ a0);  // type 0x114 (from signature table)
+void Explode(void* a3);                                                // src/leaf/auto_03_800E75B0_text_cb.cpp
+void ExplodeIfDead(u32 a0);                                            // src/game/small_8010.cpp
 void ExplorationInit(void);  // type 0x8F (from signature table)
 void ExplorationPreInit(u32 /*0x4A*/ a0);  // type 0x165 (from signature table)
-void ExplorationShutdown(void);  // type 0x8F (from signature table)
-void FSMAddRegInt(void* a0, BOOL a1, s32 a2);  // type 0x4D (from signature table)
-s32 FSMGetRegInt(void* a0, BOOL a1);  // type 0x1C (from signature table)
-void FSMSetRegInt(void* a0, BOOL a1, s32 a2);  // type 0x4D (from signature table)
+void ExplorationShutdown(void);                                        // src/game/small_800F.cpp
+void FSMAddRegInt(void* a0, BOOL a1, s32 a2);                          // src/game/small_800Eb.cpp
+s32 FSMGetRegInt(void* a0, BOOL a1);                                   // src/game/small_800Eb.cpp
+void FSMSetRegInt(void* a0, BOOL a1, s32 a2);                          // src/game/small_800Eb.cpp
 void FSM_AddToFloat(ScriptCtx* a0, u32 /*0x27*/ a1, f32 a2);  // type 0x134 (from signature table)
 void FSM_AddToInt(ScriptCtx* a0, u32 /*0x26*/ a1, s32 a2);  // type 0x136 (from signature table)
 s32 FSM_GetBit(ScriptCtx* a0, u32 /*0x25*/ a1);  // type 0xCD (from signature table)
 f32 FSM_GetFloat(ScriptCtx* a0, u32 /*0x27*/ a1);  // type 0xB7 (from signature table)
-s32 FSM_GetInt(ScriptCtx* a0, u32 /*0x26*/ a1);  // type 0xCE (from signature table)
+s32 FSM_GetInt(ScriptCtx* a3, u32 a4);                                 // src/leaf/auto_03_80106AA8_text_cb.cpp
 void FSM_PrintBit(ScriptCtx* a0, u32 /*0x25*/ a1);  // type 0x131 (from signature table)
 void FSM_PrintFloat(ScriptCtx* a0, u32 /*0x27*/ a1);  // type 0x133 (from signature table)
 void FSM_PrintInt(ScriptCtx* a0, u32 /*0x26*/ a1);  // type 0x135 (from signature table)
 void FSM_SetBit(ScriptCtx* a0, u32 /*0x25*/ a1, s32 a2);  // type 0x132 (from signature table)
 void FSM_SetFloat(ScriptCtx* a0, u32 /*0x27*/ a1, f32 a2);  // type 0x134 (from signature table)
-void FSM_SetInt(ScriptCtx* a0, u32 /*0x26*/ a1, s32 a2);  // type 0x136 (from signature table)
-s32 FaderFinished(void);  // type 0x22 (from signature table)
-void FaderSetTargetColour(f32 a0, f32 a1, f32 a2);  // type 0x6A (from signature table)
+void FSM_SetInt(ScriptCtx* a3, u32 a4, s32 a5);                        // src/leaf/auto_03_80106AA8_text_cb.cpp
+s32 FaderFinished(void);                                               // src/leaf/auto_03_801D5D0C_text_cb.cpp
+void FaderSetTargetColour(f32 a0, f32 a1, f32 a2);                     // src/engine/small_801D.cpp
 void FilenameTimestamp(BOOL a0);  // type 0x8C (from signature table)
 void FireLightningAtTarget(void* a0, u32 /*0x30*/ a1, u32 a2, u32 /*0x38*/ a3, f32 a4, f32 a5, u32 /*0x17*/ a6);  // type 0xFF (from signature table)
 void FireProjectileAtEntity(void* a0, u32 /*0x38*/ a1, void* a2, u32 /*0x30*/ a3, f32 a4);  // type 0x103 (from signature table)
@@ -424,35 +424,35 @@ u32 /*0x06*/ FixUpPooledEntityCallback(u32 /*0x08*/ a0, u32 /*0x08*/ a1);  // ty
 u32 /*0x06*/ FixUpProjectileEntityCallback(u32 /*0x08*/ a0, u32 /*0x08*/ a1);  // type 0x7 (from signature table)
 u32 /*0x06*/ FixUpRenderObjectCallback(u32 /*0x08*/ a0, u32 /*0x08*/ a1);  // type 0x7 (from signature table)
 u32 /*0x06*/ FixupFSMPoolCallback(u32 /*0x08*/ a0, u32 /*0x08*/ a1);  // type 0x7 (from signature table)
-void ForceCameraRotateMode(u32 /*0x06*/ a0);  // type 0x67 (from signature table)
-void ForceStrafeMode(s32 a0);  // type 0x83 (from signature table)
-void ForceTracingGame(u32 /*0x48*/ a0);  // type 0x169 (from signature table)
+void ForceCameraRotateMode(u32 a3);                                    // src/leaf/auto_03_800DB9A4_text_cb.cpp
+void ForceStrafeMode(s32 a3);                                          // src/leaf/auto_03_800E75B0_text_cb.cpp
+void ForceTracingGame(u32 a3);                                         // src/leaf/auto_03_800E75B0_text_cb.cpp
 void FrameFxRippleAtChild(void* a0, u32 /*0x30*/ a1, f32 a2);  // type 0xFD (from signature table)
 void FreezeCamera(u32 /*0x06*/ a0);  // type 0x67 (from signature table)
-void FreezePlayerInput(s32 a0);  // type 0x83 (from signature table)
+void FreezePlayerInput(s32 a3);                                        // src/leaf/auto_03_800E75B0_text_cb.cpp
 void FriendCodeInputClickedKey(BOOL a0);  // type 0x8C (from signature table)
-void FriendCodeInputDeInit(void);  // type 0x8F (from signature table)
+void FriendCodeInputDeInit(void);                                      // src/leaf/auto_03_801399E8_text_cb.cpp
 void FriendCodeInputInit(void);  // type 0x8F (from signature table)
 void FriendCodeInputUpdate(void);  // type 0x8F (from signature table)
 void FriendCodeInputVerify(void);  // type 0x8F (from signature table)
-void FriendListChallenge(void);  // type 0x8F (from signature table)
+void FriendListChallenge(void);                                        // src/game/small_8013.cpp
 void FriendListDelete(void);  // type 0x8F (from signature table)
-void FriendListDisableAutoScroll(void);  // type 0x8F (from signature table)
+void FriendListDisableAutoScroll(void);                                // src/leaf/auto_03_8013A03C_text_cb.cpp
 void FriendListHideFloaty(BOOL a0);  // type 0x8C (from signature table)
 void FriendListInit(void);  // type 0x8F (from signature table)
 void FriendListPreInit(void);  // type 0x8F (from signature table)
-void FriendListScrollDown(void);  // type 0x8F (from signature table)
-void FriendListScrollUp(void);  // type 0x8F (from signature table)
+void FriendListScrollDown(void);                                       // src/game/small_8013.cpp
+void FriendListScrollUp(void);                                         // src/game/small_8013.cpp
 void FriendListSetSelectedSlot(BOOL a0);  // type 0x8C (from signature table)
 void FriendListShowFloaty(void);  // type 0x8F (from signature table)
 void FriendListSort(BOOL a0);  // type 0x8C (from signature table)
-void FriendListUpdate(void);  // type 0x8F (from signature table)
+void FriendListUpdate(void);                                           // src/game/small_8013.cpp
 void FriendsListAddFriend(void);  // type 0x8F (from signature table)
-BOOL FriendsListIsBuddy(void);  // type 0x2E (from signature table)
-BOOL FriendsListIsPlayerBusy(void);  // type 0x2E (from signature table)
-BOOL FriendsListIsPlayerOnline(void);  // type 0x2E (from signature table)
-void FriendsListSendAccept(void);  // type 0x8F (from signature table)
-void FriendsListSendDecline(void);  // type 0x8F (from signature table)
+ScriptValue FriendsListIsBuddy(void);  // type 0x2E (from signature table)
+BOOL FriendsListIsPlayerBusy(void);                                    // src/game/small_8013.cpp
+BOOL FriendsListIsPlayerOnline(void);                                  // src/game/small_8013.cpp
+void FriendsListSendAccept(void);                                      // src/leaf/auto_03_8013A03C_text_cb.cpp
+void FriendsListSendDecline(void);                                     // src/game/small_8013.cpp
 void GameFlowDelayedSignal(s32 id, s32 arg1, s32 arg2, f32 delay);     // src/game/game_ui.cpp
 void GameFlowPauseGame(s32 value);                                     // src/game/game_ui.cpp
 void GameFlowPop(void);                                                // src/game/game_ui.cpp
@@ -466,145 +466,145 @@ void GameFlowSignal(s32 id, s32 arg1, s32 arg2);                       // src/ga
 void GameFlowSleep(void);                                              // src/game/game_ui.cpp
 BOOL GameFlowStopped(void);                                            // src/game/game_ui.cpp
 u32 /*0x06*/ GameNetDistributeChunkCallback(u32 /*0x18*/ a0);  // type 0x4 (from signature table)
-BOOL GameNetGetChunkSizeCallback(BOOL a0);  // type 0x2B (from signature table)
+ScriptValue GameNetGetChunkSizeCallback(BOOL a0);  // type 0x2B (from signature table)
 void GameNetObserveChunkCallback(u32 /*0x18*/ a0);  // type 0x57 (from signature table)
 void GameNetStartClientGame(void);  // type 0x8F (from signature table)
 void GameNetStartHostGame(void);  // type 0x8F (from signature table)
 void GeneratorShakeEntry(ScriptCtx* ctx);                              // src/game/ai_states.cpp
 void GeneratorShakeExit(ScriptCtx* ctx);                               // src/game/ai_states.cpp
 void GeneratorShakeUpdate(ScriptCtx* ctx);                             // src/game/ai_states.cpp
-BOOL GetActivePartID(void);  // type 0x2E (from signature table)
-BOOL GetBatteryString(void);  // type 0x2E (from signature table)
-s32 GetBit(u32 /*0x22*/ a0);  // type 0xDA (from signature table)
-s32 GetCombatWinner(void);  // type 0x22 (from signature table)
-u32 GetCurAnimDef(u32 /*0x2E*/ a0);  // type 0xBA (from signature table)
-s32 GetCurrentCastleLocation(void);  // type 0x22 (from signature table)
-s32 GetCurrentController(void);  // type 0x22 (from signature table)
-BOOL GetCurrentInventoryPart(void);  // type 0x2E (from signature table)
-u32 GetCurrentJunctionID(void);  // type 0x15 (from signature table)
-u32 GetCurrentLevelId(void);  // type 0x15 (from signature table)
-u32 /*0x4B*/ GetCurrentLocation(void);  // type 0xB4 (from signature table)
-BOOL GetCurrentMonster(void);  // type 0x2E (from signature table)
+ScriptValue GetActivePartID(void);  // type 0x2E (from signature table)
+ScriptValue GetBatteryString(void);  // type 0x2E (from signature table)
+s32 GetBit(u32 a3);                                                    // src/leaf/auto_03_80106AA8_text_cb.cpp
+s32 GetCombatWinner(void);                                             // src/leaf/auto_03_8003CF40_text_cb.cpp
+u32 GetCurAnimDef(u32 a3);                                             // src/leaf/auto_03_800E75B0_text_cb.cpp
+s32 GetCurrentCastleLocation(void);                                    // src/game/player_api.cpp
+s32 GetCurrentController(void);                                        // src/leaf/auto_03_800E75B0_text_cb.cpp
+ScriptValue GetCurrentInventoryPart(void);  // type 0x2E (from signature table)
+u32 GetCurrentJunctionID(void);                                        // src/game/small_800F.cpp
+u32 GetCurrentLevelId(void);                                           // src/leaf/auto_03_800E75B0_text_cb.cpp
+u32 GetCurrentLocation(void);                                          // src/game/player_api.cpp
+BOOL GetCurrentMonster(void);                                          // src/leaf/auto_03_8001B20C_text_cb.cpp
 s32 GetCursorPos(void);                                                // src/game/game_ui.cpp
-s32 GetDifficultyLevel(void);  // type 0x22 (from signature table)
+s32 GetDifficultyLevel(void);                                          // src/leaf/auto_03_800E75B0_text_cb.cpp
 f32 GetDistanceTo(void* a0, u32 /*0x17*/ a1);  // type 0xD (from signature table)
 f32 GetDistanceToPlayer(void* a0);  // type 0xC (from signature table)
-u32 /*0x11*/ GetEnhancementDefectForIngredients(void);  // type 0x9A (from signature table)
-f32 GetEntityHealth(void* a0);  // type 0xC (from signature table)
-f32 GetEntityHealthPercent(void* a0);  // type 0xC (from signature table)
-f32 GetEntityMaxHealth(void* a0);  // type 0xC (from signature table)
-BOOL GetErrorType(void);  // type 0x2E (from signature table)
-s32 GetExperimentDifficulty(void);  // type 0x22 (from signature table)
+u32 GetEnhancementDefectForIngredients(void);                          // src/leaf/auto_03_8010FDA4_text_cb.cpp
+f32 GetEntityHealth(void* a3);                                         // src/leaf/auto_03_800E75B0_text_cb.cpp
+f32 GetEntityHealthPercent(void* a0);                                  // src/game/small_800Eb.cpp
+f32 GetEntityMaxHealth(void* a3);                                      // src/leaf/auto_03_800E75B0_text_cb.cpp
+BOOL GetErrorType(void);                                               // src/leaf/auto_03_8013F034_text_cb.cpp
+s32 GetExperimentDifficulty(void);                                     // src/leaf/auto_03_800747DC_text_cb.cpp
 s32 GetExperimentMSP(void);  // type 0x22 (from signature table)
-s32 GetExperimentQuality(void);  // type 0x22 (from signature table)
+s32 GetExperimentQuality(void);                                        // src/game/small_8007.cpp
 s32 GetExperimentScienceType(void);  // type 0x22 (from signature table)
-s32 GetExperimentScore(void);  // type 0x22 (from signature table)
+s32 GetExperimentScore(void);                                          // src/game/small_8007.cpp
 u32 /*0x4D*/ GetExperimentTypeFromStation(u32 /*0x32*/ a0);  // type 0xB3 (from signature table)
-f32 GetFloat(u32 /*0x24*/ a0);  // type 0xB9 (from signature table)
-BOOL GetGameProgressMarker(void);  // type 0x2E (from signature table)
+f32 GetFloat(u32 a3);                                                  // src/leaf/auto_03_80106AA8_text_cb.cpp
+BOOL GetGameProgressMarker(void);                                      // src/leaf/auto_03_8020F8E0_text_cb.cpp
 s32 GetHealth(u32 /*0x2F*/ a0);  // type 0xC7 (from signature table)
-BOOL GetHelloPayloadCallback(void);  // type 0x2E (from signature table)
-s32 GetInt(u32 /*0x23*/ a0);  // type 0xDB (from signature table)
-s32 GetIntProperty(u32 /*0x34*/ a0, u32 a1);  // type 0xCC (from signature table)
+ScriptValue GetHelloPayloadCallback(void);  // type 0x2E (from signature table)
+s32 GetInt(u32 a3);                                                    // src/leaf/auto_03_80106AA8_text_cb.cpp
+s32 GetIntProperty(u32 a3, u32 a4);                                    // src/leaf/auto_03_800FB958_text_cb.cpp
 s32 GetIntersectorCount(u32 /*0x34*/ a0);  // type 0xCB (from signature table)
-u32 /*0x06*/ GetIsPlaytest(void);  // type 0xA (from signature table)
-BOOL GetLastCombatResult(void);  // type 0x2E (from signature table)
-f32 GetLastDamageAmountTaken(u32 /*0x2E*/ a0);  // type 0xB6 (from signature table)
-s32 GetLastDamageTypeTaken(u32 /*0x2E*/ a0);  // type 0xC1 (from signature table)
-s32 GetLastHitstunTaken(u32 /*0x2E*/ a0);  // type 0xC1 (from signature table)
-u32 GetLastMatTypeHit(void* a0);  // type 0xBB (from signature table)
-s32 GetLastMinigameScore(void);  // type 0x22 (from signature table)
-u32 GetLastProjectileIDHitWith(void* a0);  // type 0xBB (from signature table)
-s32 GetLastRandomZeroToMax(void);  // type 0x22 (from signature table)
-f32 GetMaxPlayerMadness(void);  // type 0x12 (from signature table)
-f32 GetMonsterAttack(void);  // type 0x12 (from signature table)
-f32 GetMonsterDefense(void);  // type 0x12 (from signature table)
-f32 GetMonsterEnergy(void);  // type 0x12 (from signature table)
-f32 GetMonsterHP(void);  // type 0x12 (from signature table)
-f32 GetMonsterMadness(void);  // type 0x12 (from signature table)
-BOOL GetMonsterName(void);  // type 0x2E (from signature table)
-s32 GetMonsterSelected(void);  // type 0x22 (from signature table)
+u32 GetIsPlaytest(void);                                               // src/leaf/auto_03_800E75B0_text_cb.cpp
+BOOL GetLastCombatResult(void);                                        // src/leaf/auto_03_800E75B0_text_cb.cpp
+f32 GetLastDamageAmountTaken(u32 a3);                                  // src/leaf/auto_03_80052504_text_cb.cpp
+s32 GetLastDamageTypeTaken(u32 a3);                                    // src/leaf/auto_03_80052504_text_cb.cpp
+s32 GetLastHitstunTaken(u32 a3);                                       // src/leaf/auto_03_80052504_text_cb.cpp
+u32 GetLastMatTypeHit(void* a3);                                       // src/leaf/auto_03_800E75B0_text_cb.cpp
+s32 GetLastMinigameScore(void);                                        // src/game/player_api.cpp
+u32 GetLastProjectileIDHitWith(void* a3);                              // src/leaf/auto_03_800E75B0_text_cb.cpp
+s32 GetLastRandomZeroToMax(void);                                      // src/leaf/auto_03_800E75B0_text_cb.cpp
+f32 GetMaxPlayerMadness(void);                                         // src/leaf/auto_03_8001B20C_text_cb.cpp
+f32 GetMonsterAttack(void);                                            // src/leaf/auto_03_8001B20C_text_cb.cpp
+f32 GetMonsterDefense(void);                                           // src/leaf/auto_03_8001B20C_text_cb.cpp
+f32 GetMonsterEnergy(void);                                            // src/leaf/auto_03_8001B20C_text_cb.cpp
+f32 GetMonsterHP(void);                                                // src/leaf/auto_03_8001B20C_text_cb.cpp
+f32 GetMonsterMadness(void);                                           // src/leaf/auto_03_8001B20C_text_cb.cpp
+ScriptValue GetMonsterName(void);  // type 0x2E (from signature table)
+s32 GetMonsterSelected(void);                                          // src/leaf/auto_03_8001B20C_text_cb.cpp
 s32 GetMonstersAvailableToModify(void);  // type 0x22 (from signature table)
-BOOL GetMultiplayerLevel(void);  // type 0x2E (from signature table)
+BOOL GetMultiplayerLevel(void);                                        // src/leaf/auto_03_8013A03C_text_cb.cpp
 void GetNextInstructionsString(void);  // type 0x8F (from signature table)
-s32 GetNextLocation(void);  // type 0x22 (from signature table)
-s32 GetNextRegion(void);  // type 0x22 (from signature table)
-s32 GetNumBadges(void);  // type 0x22 (from signature table)
-BOOL GetNumBattlesLostConsecutively(void);  // type 0x2E (from signature table)
-s32 GetNumFreeMonsterSlots(void);  // type 0x22 (from signature table)
-s32 GetNumPlayerMonsters(void);  // type 0x22 (from signature table)
-s32 GetNumPlayerParts(void);  // type 0x22 (from signature table)
-s32 GetNumPlayerQuestItems(void);  // type 0x22 (from signature table)
-BOOL GetNumPropStates(u32 /*0x32*/ a0);  // type 0xE1 (from signature table)
-BOOL GetOptionsBrightness(void);  // type 0x2E (from signature table)
-BOOL GetOptionsMusicVolume(void);  // type 0x2E (from signature table)
-u32 /*0x06*/ GetOptionsRumble(void);  // type 0xA (from signature table)
-BOOL GetOptionsSfxVolume(void);  // type 0x2E (from signature table)
-BOOL GetOptionsVoiceVolume(void);  // type 0x2E (from signature table)
-BOOL GetPageString(void);  // type 0x2E (from signature table)
-u32 /*0x06*/ GetPerformFieldRepair(void);  // type 0xA (from signature table)
-void* GetPlayerAvatarEntity(void);  // type 0x96 (from signature table)
+s32 GetNextLocation(void);                                             // src/game/player_api.cpp
+s32 GetNextRegion(void);                                               // src/game/player_api.cpp
+s32 GetNumBadges(void);                                                // src/game/player_api.cpp
+BOOL GetNumBattlesLostConsecutively(void);                             // src/game/player_api.cpp
+s32 GetNumFreeMonsterSlots(void);                                      // src/game/player_api.cpp
+s32 GetNumPlayerMonsters(void);                                        // src/game/player_api.cpp
+s32 GetNumPlayerParts(void);                                           // src/game/player_api.cpp
+s32 GetNumPlayerQuestItems(void);                                      // src/game/player_api.cpp
+BOOL GetNumPropStates(u32 a3);                                         // src/leaf/auto_03_80069028_text_cb.cpp
+BOOL GetOptionsBrightness(void);                                       // src/leaf/auto_03_800E75B0_text_cb.cpp
+BOOL GetOptionsMusicVolume(void);                                      // src/leaf/auto_03_800E75B0_text_cb.cpp
+u32 GetOptionsRumble(void);                                            // src/leaf/auto_03_800E75B0_text_cb.cpp
+BOOL GetOptionsSfxVolume(void);                                        // src/leaf/auto_03_800E75B0_text_cb.cpp
+BOOL GetOptionsVoiceVolume(void);                                      // src/leaf/auto_03_800E75B0_text_cb.cpp
+ScriptValue GetPageString(void);                                       // src/game/small_8011.cpp
+u32 GetPerformFieldRepair(void);                                       // src/leaf/auto_03_800E75B0_text_cb.cpp
+void* GetPlayerAvatarEntity(void);                                     // src/leaf/auto_03_800E75B0_text_cb.cpp
 s32 GetPlayerDistanceToJunction(u32 a0);  // type 0x1E (from signature table)
-u32 /*0x2D*/ GetPlayerMonster(BOOL a0);  // type 0x98 (from signature table)
-u32 /*0x2C*/ GetPlayerPart(BOOL a0);  // type 0x99 (from signature table)
-s32 GetPreviousCastleLocation(void);  // type 0x22 (from signature table)
+u32 GetPlayerMonster(BOOL index);                                      // src/game/player_api.cpp
+u32 GetPlayerPart(BOOL index);                                         // src/game/player_api.cpp
+s32 GetPreviousCastleLocation(void);                                   // src/game/player_api.cpp
 void GetPreviousInstructionsString(void);  // type 0x8F (from signature table)
-BOOL GetPropCurrentState(u32 /*0x32*/ a0);  // type 0xE1 (from signature table)
-s32 GetPropInstanceData(void* a0);  // type 0x16 (from signature table)
-BOOL GetPropPreviousState(u32 /*0x32*/ a0);  // type 0xE1 (from signature table)
-s32 GetQuestFlag(u32 /*0x43*/ a0, BOOL a1);  // type 0xD8 (from signature table)
-s32 GetQuestInt(u32 /*0x43*/ a0);  // type 0xD7 (from signature table)
-u32 /*0x06*/ GetQuestJunctionInterrupt(void);  // type 0xA (from signature table)
-s32 GetQuestLevel(u32 /*0x43*/ a0);  // type 0xD7 (from signature table)
-s32 GetRewardedItemId(void);  // type 0x22 (from signature table)
-u32 /*0x11*/ GetSelectedKeyIngredient(void);  // type 0x9A (from signature table)
-u32 /*0x11*/ GetSelectedPartForIngredients(void);  // type 0x9A (from signature table)
-u32 /*0x11*/ GetSelectedSecondaryIngredient(void);  // type 0x9A (from signature table)
-u32 /*0x11*/ GetStoredTextForIngredientSelection(void);  // type 0x9A (from signature table)
+BOOL GetPropCurrentState(u32 a3);                                      // src/leaf/auto_03_80069028_text_cb.cpp
+s32 GetPropInstanceData(void* a3);                                     // src/leaf/auto_03_800E75B0_text_cb.cpp
+BOOL GetPropPreviousState(u32 a3);                                     // src/leaf/auto_03_80069028_text_cb.cpp
+s32 GetQuestFlag(u32 quest, BOOL flag);                                // src/game/player_api.cpp
+s32 GetQuestInt(u32 q);                                                // src/game/player_api.cpp
+u32 GetQuestJunctionInterrupt(void);                                   // src/game/player_api.cpp
+s32 GetQuestLevel(u32 quest);                                          // src/game/player_api.cpp
+s32 GetRewardedItemId(void);                                           // src/leaf/auto_03_800E75B0_text_cb.cpp
+u32 GetSelectedKeyIngredient(void);                                    // src/leaf/auto_03_8010FDA4_text_cb.cpp
+u32 GetSelectedPartForIngredients(void);                               // src/leaf/auto_03_8010FDA4_text_cb.cpp
+u32 GetSelectedSecondaryIngredient(void);                              // src/leaf/auto_03_8010FDA4_text_cb.cpp
+u32 GetStoredTextForIngredientSelection(void);                         // src/leaf/auto_03_8010FDA4_text_cb.cpp
 void* GetTHIS(void* a0);  // type 0x95 (from signature table)
-s32 GetTwoBitsOfQuestInt(u32 /*0x43*/ a0, BOOL a1);  // type 0xD8 (from signature table)
-u32 /*0x06*/ GetWonLastMinigame(void);  // type 0xA (from signature table)
-void GivePlayerQuestReward(u32 /*0x49*/ a0);  // type 0x161 (from signature table)
-BOOL GotResponse(void);  // type 0x2E (from signature table)
+s32 GetTwoBitsOfQuestInt(u32 q, BOOL which);                           // src/game/player_api.cpp
+u32 GetWonLastMinigame(void);                                          // src/game/player_api.cpp
+void GivePlayerQuestReward(u32 r);                                     // src/game/player_api.cpp
+BOOL GotResponse(void);                                                // src/leaf/auto_03_8013F034_text_cb.cpp
 void GotoCastleLocation(u32 /*0x4B*/ a0);  // type 0x159 (from signature table)
 void GrowJuiceHeart_PlayEffectNear(void* a0, void* a1, u32 a2);  // type 0x105 (from signature table)
-void GrowJuiceHeart_StartGooBubble(u32 /*0x0C*/ a0);  // type 0x5F (from signature table)
-void GrowJuiceHeart_StartHeartbeat(u32 /*0x0C*/ a0);  // type 0x5F (from signature table)
-void GrowJuiceHeart_StopHeartbeat(void);  // type 0x8F (from signature table)
+void GrowJuiceHeart_StartGooBubble(u32 a0);                            // src/game/small_800B.cpp
+void GrowJuiceHeart_StartHeartbeat(u32 a0);                            // src/game/small_800B.cpp
+void GrowJuiceHeart_StopHeartbeat(void);                               // src/game/small_800B.cpp
 void GrowJuiceLauncher_FireSeed(void* a0);  // type 0x2F (from signature table)
-s32 GrowJuiceLauncher_GetSoundNumber(void* a0);  // type 0x16 (from signature table)
+s32 GrowJuiceLauncher_GetSoundNumber(void* a3);                        // src/leaf/auto_03_800ACD24_text_cb.cpp
 s32 GrowJuiceProjectile_PassedFarBoundary(void* a0);  // type 0x16 (from signature table)
 void GrowJuiceProjectile_PositionToHide(void* a0);  // type 0x2F (from signature table)
 void GrowJuiceSeed_ConvertToTentacle(void* a0);  // type 0x2F (from signature table)
-void GrowJuiceSeed_FireSeed(void* a0);  // type 0x2F (from signature table)
-s32 GrowJuiceSeed_HitGround(void* a0);  // type 0x16 (from signature table)
-s32 GrowJuiceSeed_OffTopOfScreen(void* a0);  // type 0x16 (from signature table)
+void GrowJuiceSeed_FireSeed(void* a3);                                 // src/leaf/auto_03_800ABE10_text_cb.cpp
+s32 GrowJuiceSeed_HitGround(void* a3);                                 // src/leaf/auto_03_800ABE10_text_cb.cpp
+s32 GrowJuiceSeed_OffTopOfScreen(void* a3);                            // src/leaf/auto_03_800ABE10_text_cb.cpp
 void GrowJuiceSeed_PositionToHide(void* a0);  // type 0x2F (from signature table)
 s32 GrowJuiceTentacle_CheckHitPlayer(void* a0);  // type 0x16 (from signature table)
-void GrowJuiceTentacle_ClearStageTimeout(void* a0);  // type 0x2F (from signature table)
+void GrowJuiceTentacle_ClearStageTimeout(void* a3);                    // src/leaf/auto_03_800AD844_text_cb.cpp
 void GrowJuiceTentacle_GoBerserk(void* a0);  // type 0x2F (from signature table)
 void GrowJuiceTentacle_HeadPlayAnimation(void* a0, u32 a1);  // type 0x42 (from signature table)
 void GrowJuiceTentacle_HitHeart(void* a0);  // type 0x2F (from signature table)
 void GrowJuiceTentacle_HitPlayer(void* a0);  // type 0x2F (from signature table)
 void GrowJuiceTentacle_RecoverFromBerserk(void* a0);  // type 0x2F (from signature table)
-void GrowJuiceTentacle_SetHeadSizeAsStarting(void* a0);  // type 0x2F (from signature table)
+void GrowJuiceTentacle_SetHeadSizeAsStarting(void* a3);                // src/leaf/auto_03_800AD844_text_cb.cpp
 void GrowJuiceTentacle_SetHeadSizeGrowth(void* a0, s32 a1, f32 a2, f32 a3, f32 a4, f32 a5, f32 a6, f32 a7);  // type 0x112 (from signature table)
-void GrowJuiceTentacle_SetStageTimeout(void* a0, u32 a1);  // type 0x42 (from signature table)
-void GrowJuiceTentacle_SetVisibleComponents(void* a0, u32 a1);  // type 0x42 (from signature table)
+void GrowJuiceTentacle_SetStageTimeout(void* a3, u32 a4);              // src/leaf/auto_03_800AD844_text_cb.cpp
+void GrowJuiceTentacle_SetVisibleComponents(void* a3, u32 a4);         // src/leaf/auto_03_800AD844_text_cb.cpp
 s32 GrowJuiceTentacle_ShouldAttackPlayer(void* a0);  // type 0x16 (from signature table)
 s32 GrowJuiceTentacle_ShouldGoBerserk(void* a0);  // type 0x16 (from signature table)
 s32 GrowJuiceTentacle_ShouldReactToPlayer(void* a0);  // type 0x16 (from signature table)
 void GrowJuiceWeaponBase_AttemptReload(void* a0);  // type 0x2F (from signature table)
-void GrowJuiceWeaponBase_LoadedInSlot(void* a0, void* a1, s32 a2);  // type 0x32 (from signature table)
+void GrowJuiceWeaponBase_LoadedInSlot(void* a3, void* a4, s32 a5);     // src/leaf/auto_03_800B068C_text_cb.cpp
 void GrowJuiceWeapon_LoadIntoChamber(void* a0);  // type 0x2F (from signature table)
-void GrowJuiceWeapon_LoadedIntoChamber(void* a0, void* a1);  // type 0x30 (from signature table)
-void GrowJuiceWeapon_PlayStruckEffect(void* a0);  // type 0x2F (from signature table)
+void GrowJuiceWeapon_LoadedIntoChamber(void* a3, void* a4);            // src/leaf/auto_03_800AF568_text_cb.cpp
+void GrowJuiceWeapon_PlayStruckEffect(void* a0);                       // src/game/small_800B.cpp
 void GrowJuiceWeapon_RoundDoneFlight(void* a0, void* a1);  // type 0x30 (from signature table)
-void GrowJuiceWeapon_RoundInFlight(void* a0, void* a1);  // type 0x30 (from signature table)
-void HandleHomeButtonIcon(void);  // type 0x8F (from signature table)
-void HandleReturnToCastle(void);  // type 0x8F (from signature table)
-u32 /*0x06*/ HasActiveQuest(void);  // type 0xA (from signature table)
-u32 /*0x06*/ HasBadge(u32 /*0x46*/ a0);  // type 0xA8 (from signature table)
+void GrowJuiceWeapon_RoundInFlight(void* a3, void* a4);                // src/leaf/auto_03_800AF568_text_cb.cpp
+void HandleHomeButtonIcon(void);                                       // src/game/small_8014.cpp
+void HandleReturnToCastle(void);                                       // src/game/player_api.cpp
+u32 HasActiveQuest(void);                                              // src/leaf/auto_03_800E75B0_text_cb.cpp
+u32 HasBadge(u32 badge);                                               // src/game/player_api.cpp
 s32 HasMonsterVoice(void);  // type 0x22 (from signature table)
 s32 HasPrimaryForRecipe(void);  // type 0x22 (from signature table)
 s32 HasSecondaryForRecipe(void);  // type 0x22 (from signature table)
@@ -612,16 +612,16 @@ s32 HasTimePressure(void);  // type 0x22 (from signature table)
 s32 HasValidKeyIngredient(void);  // type 0x22 (from signature table)
 s32 HasValidRecipe(void);  // type 0x22 (from signature table)
 s32 HasValidSecondaryIngredient(void);  // type 0x22 (from signature table)
-BOOL HeadToFriendslist(void);  // type 0x2E (from signature table)
+ScriptValue HeadToFriendslist(void);  // type 0x2E (from signature table)
 void HideAlertBox(void);  // type 0x8F (from signature table)
 void HideInstructionScreen(u32 /*0x06*/ a0);  // type 0x67 (from signature table)
 void HideKeyboard(void);  // type 0x8F (from signature table)
-void HideMessageBox(void);  // type 0x8F (from signature table)
+void HideMessageBox(void);                                             // src/leaf/auto_03_800E75B0_text_cb.cpp
 void HideProgressScreen(void);  // type 0x8F (from signature table)
-void HideQuestCounter(void);  // type 0x8F (from signature table)
+void HideQuestCounter(void);                                           // src/leaf/auto_03_800E6360_text_cb.cpp
 void HideScreen(u32 a0);  // type 0x71 (from signature table)
 void HideSelectionHUD(void);  // type 0x8F (from signature table)
-void HostGame(void);  // type 0x8F (from signature table)
+void HostGame(void);                                                   // src/game/small_800Fb.cpp
 BOOL IfCurrentGameFlowStateIs(s32 id);                                 // src/game/game_ui.cpp
 BOOL IfTestNameIs(s32 player);                                         // src/game/game_ui.cpp
 BOOL IfTestTypeIs(s32 player);                                         // src/game/game_ui.cpp
@@ -631,149 +631,149 @@ void IncOptionsMusicVolume(s32 a0);  // type 0x83 (from signature table)
 void IncOptionsSfxVolume(s32 a0);  // type 0x83 (from signature table)
 void IncOptionsVoiceVolume(s32 a0);  // type 0x83 (from signature table)
 void IncrementOption(s32 a0);  // type 0x83 (from signature table)
-BOOL IncrementPropState(u32 /*0x31*/ a0, u32 /*0x06*/ a1);  // type 0xDF (from signature table)
-void IncrementQuestIntBy(u32 /*0x43*/ a0, s32 a1);  // type 0x163 (from signature table)
-void IngredientSelectionClearErrorTransition(void);  // type 0x8F (from signature table)
-s32 IngredientSelectionIsErrorTransition(void);  // type 0x22 (from signature table)
-void IngredientSelectionSetErrorTransition(void);  // type 0x8F (from signature table)
+BOOL IncrementPropState(u32 a3, u32 a4);                               // src/leaf/auto_03_80069028_text_cb.cpp
+void IncrementQuestIntBy(u32 q, s32 n);                                // src/game/player_api.cpp
+void IngredientSelectionClearErrorTransition(void);                    // src/leaf/auto_03_8010FDA4_text_cb.cpp
+s32 IngredientSelectionIsErrorTransition(void);                        // src/leaf/auto_03_8010FDA4_text_cb.cpp
+void IngredientSelectionSetErrorTransition(void);                      // src/leaf/auto_03_8010FDA4_text_cb.cpp
 s32 IngredientsSelectionFinished(void);  // type 0x22 (from signature table)
-s32 Ingredients_IsTextureAsyncLoaded(void);  // type 0x22 (from signature table)
-s32 Ingredients_IsValidIngredient(s32 a0);  // type 0x1F (from signature table)
-void Ingredients_RemoveCurrentIngredient(void);  // type 0x8F (from signature table)
-BOOL Ingredients_RenderList_GetSelectedImage(void);  // type 0x2E (from signature table)
-s32 Ingredients_SciencePlayOffAnim(void);  // type 0x22 (from signature table)
-void InitFader(s32 a0, f32 a1);  // type 0x181 (from signature table)
+s32 Ingredients_IsTextureAsyncLoaded(void);                            // src/game/lab_books_b.cpp
+s32 Ingredients_IsValidIngredient(s32 a0);                             // src/game/lab_books_a.cpp
+void Ingredients_RemoveCurrentIngredient(void);                        // src/game/lab_books_b.cpp
+BOOL Ingredients_RenderList_GetSelectedImage(void);                    // src/game/lab_books_a.cpp
+s32 Ingredients_SciencePlayOffAnim(void);                              // src/game/lab_books_b.cpp
+void InitFader(s32 a3, f32 f1);                                        // src/leaf/auto_03_801D5D0C_text_cb.cpp
 void InitLabBooks(void);  // type 0x8F (from signature table)
 void InitLoadProgressProjectile(s32 s0, s32 s1, s32 s2, s32 s3, s32 s4, s32 s5); // src/game/game_flow.cpp
-void InitNetwork(void);  // type 0x8F (from signature table)
-void InitPlayerData(void);  // type 0x8F (from signature table)
-void InitPreloadFader(s32 a0);  // type 0x83 (from signature table)
+void InitNetwork(void);                                                // src/game/small_800Fb.cpp
+void InitPlayerData(void);                                             // src/leaf/auto_03_800E75B0_text_cb.cpp
+void InitPreloadFader(s32 a3);                                         // src/leaf/auto_03_800E75B0_text_cb.cpp
 void InitProgressScreen(u32 a0);  // type 0x71 (from signature table)
-void InitRematchFlow(void);  // type 0x8F (from signature table)
-u32 /*0x06*/ InitializeMerchantIngredients(s32 a0);  // type 0x6 (from signature table)
+void InitRematchFlow(void);                                            // src/leaf/auto_03_8013F034_text_cb.cpp
+u32 InitializeMerchantIngredients(s32 a3);                             // src/leaf/auto_03_800E75B0_text_cb.cpp
 void InitializeOperatingTable(void);  // type 0x8F (from signature table)
-void InspectOpponentDeInit(void);  // type 0x8F (from signature table)
+void InspectOpponentDeInit(void);                                      // src/leaf/auto_03_8013C600_text_cb.cpp
 void InspectOpponentInit(void);  // type 0x8F (from signature table)
 void InspectOpponentUpdate(void);  // type 0x8F (from signature table)
-void InstantLockCameraToEntity(u32 a0);  // type 0x71 (from signature table)
+void InstantLockCameraToEntity(u32 a0);                                // src/game/small_800Fb.cpp
 s32 InstructionsCanExit(void);  // type 0x22 (from signature table)
 void InstructionsExitted(void);  // type 0x8F (from signature table)
 void InterpolateGunFromIntroPosition(void);  // type 0x8F (from signature table)
 void InterpolateGunToOutroPosition(void);  // type 0x8F (from signature table)
-BOOL InventoryGetPartDefect(s32 a0);  // type 0x28 (from signature table)
-BOOL InventoryGetPartEnhancement(s32 a0);  // type 0x28 (from signature table)
-s32 InventoryGetPartHealth(s32 a0);  // type 0x1F (from signature table)
-s32 InventoryGetPartMadness(s32 a0);  // type 0x1F (from signature table)
-BOOL InventoryGetPartName(s32 a0);  // type 0x28 (from signature table)
-s32 InventoryGetPartQuality(s32 a0);  // type 0x1F (from signature table)
-BOOL InventoryPartAction1GetCost(s32 a0);  // type 0x28 (from signature table)
-BOOL InventoryPartAction1GetValue(s32 a0);  // type 0x28 (from signature table)
-BOOL InventoryPartAction2GetCost(s32 a0);  // type 0x28 (from signature table)
-BOOL InventoryPartAction2GetValue(s32 a0);  // type 0x28 (from signature table)
-s32 InventoryPartGetInstalled(s32 a0);  // type 0x1F (from signature table)
-BOOL InventoryPartGetMonsterName(s32 a0);  // type 0x28 (from signature table)
-s32 InventoryPartHasDefect(s32 a0);  // type 0x1F (from signature table)
-s32 InventoryPartHasEnhancement(s32 a0);  // type 0x1F (from signature table)
-s32 IsActiveQuest(u32 /*0x43*/ a0);  // type 0xD7 (from signature table)
+ScriptValue InventoryGetPartDefect(s32 a0);  // type 0x28 (from signature table)
+ScriptValue InventoryGetPartEnhancement(s32 a0);  // type 0x28 (from signature table)
+s32 InventoryGetPartHealth(s32 a0);                                    // src/game/small_800Fb.cpp
+s32 InventoryGetPartMadness(s32 a0);                                   // src/game/small_800F.cpp
+ScriptValue InventoryGetPartName(s32 a0);  // type 0x28 (from signature table)
+s32 InventoryGetPartQuality(s32 a0);                                   // src/game/small_800F.cpp
+ScriptValue InventoryPartAction1GetCost(s32 a0);  // type 0x28 (from signature table)
+ScriptValue InventoryPartAction1GetValue(s32 a0);  // type 0x28 (from signature table)
+ScriptValue InventoryPartAction2GetCost(s32 a0);  // type 0x28 (from signature table)
+ScriptValue InventoryPartAction2GetValue(s32 a0);  // type 0x28 (from signature table)
+s32 InventoryPartGetInstalled(s32 a0);                                 // src/game/small_800Fb.cpp
+ScriptValue InventoryPartGetMonsterName(s32 a0);  // type 0x28 (from signature table)
+s32 InventoryPartHasDefect(s32 a0);                                    // src/game/small_800Fb.cpp
+s32 InventoryPartHasEnhancement(s32 a0);                               // src/game/small_800Fb.cpp
+s32 IsActiveQuest(u32 quest);                                          // src/game/player_api.cpp
 u32 /*0x06*/ IsButtonDown(u32 /*0x36*/ a0);  // type 0xAB (from signature table)
-u32 /*0x06*/ IsCameraMoving(void);  // type 0xA (from signature table)
+u32 IsCameraMoving(void);                                              // src/leaf/auto_03_800E75B0_text_cb.cpp
 u32 /*0x06*/ IsCastleAccessBlocked(u32 /*0x4F*/ a0);  // type 0xA9 (from signature table)
-s32 IsCastleGameContext(void);  // type 0x22 (from signature table)
-u32 /*0x06*/ IsCharacter(void* a0);  // type 0x1 (from signature table)
-u32 /*0x06*/ IsCombatTutorialActive(void);  // type 0xA (from signature table)
-u32 /*0x06*/ IsCombatWon(void);  // type 0xA (from signature table)
-s32 IsCoopGame(void);  // type 0x22 (from signature table)
-u32 /*0x06*/ IsCurrentInteractionID(u32 a0);  // type 0x5 (from signature table)
-u32 /*0x06*/ IsCurrentJunctionActive(void);  // type 0xA (from signature table)
-s32 IsCurrentJunctionID(u32 a0);  // type 0x1E (from signature table)
-u32 /*0x06*/ IsCurrentLevel(u32 a0);  // type 0x5 (from signature table)
-BOOL IsCurrentLevelLoaded(u32 a0);  // type 0x25 (from signature table)
-s32 IsCurrentLocation(u32 /*0x4B*/ a0);  // type 0xD4 (from signature table)
-u32 /*0x06*/ IsCurrentTutorialConversation(s32 a0);  // type 0x6 (from signature table)
+s32 IsCastleGameContext(void);                                         // src/game/small_800Fb.cpp
+u32 IsCharacter(void* a3);                                             // src/leaf/auto_03_800E75B0_text_cb.cpp
+u32 IsCombatTutorialActive(void);                                      // src/leaf/auto_03_800FB958_text_cb.cpp
+u32 IsCombatWon(void);                                                 // src/leaf/auto_03_800E75B0_text_cb.cpp
+s32 IsCoopGame(void);                                                  // src/leaf/auto_03_800E75B0_text_cb.cpp
+u32 IsCurrentInteractionID(u32 a3);                                    // src/leaf/auto_03_800E75B0_text_cb.cpp
+u32 IsCurrentJunctionActive(void);                                     // src/game/small_800Fc.cpp
+s32 IsCurrentJunctionID(u32 a0);                                       // src/game/small_800Fc.cpp
+u32 IsCurrentLevel(u32 a3);                                            // src/leaf/auto_03_8010711C_text_cb.cpp
+BOOL IsCurrentLevelLoaded(u32 a0);                                     // src/game/small_800Fc.cpp
+s32 IsCurrentLocation(u32 loc);                                        // src/game/player_api.cpp
+u32 IsCurrentTutorialConversation(s32 a3);                             // src/leaf/auto_03_800FB958_text_cb.cpp
 s32 IsDead(void* a0);  // type 0x16 (from signature table)
-u32 /*0x06*/ IsDifficultyLevel(s32 a0);  // type 0x6 (from signature table)
-s32 IsEntityInstance(void* a0, void* a1);  // type 0x17 (from signature table)
-s32 IsEntityOfSubtype(void* a0, u32 a1);  // type 0x1B (from signature table)
+u32 IsDifficultyLevel(s32 a0);                                         // src/game/small_800Eb.cpp
+s32 IsEntityInstance(void* a3, void* a4);                              // src/leaf/auto_03_800E75B0_text_cb.cpp
+s32 IsEntityOfSubtype(void* a3, u32 a4);                               // src/leaf/auto_03_800E75B0_text_cb.cpp
 s32 IsEntityOfType(void* a0, u32 /*0x28*/ a1);  // type 0xC5 (from signature table)
-s32 IsFalling(void* a0);  // type 0x16 (from signature table)
-u32 /*0x06*/ IsFinalBuild(void);  // type 0xA (from signature table)
+s32 IsFalling(void* a0);                                               // src/game/small_800Ec.cpp
+u32 IsFinalBuild(void);                                                // src/leaf/auto_03_800E75B0_text_cb.cpp
 s32 IsFirstPage(void);  // type 0x22 (from signature table)
 s32 IsGameFlowQuiting(void);  // type 0x22 (from signature table)
 s32 IsInventoryMonster(void);  // type 0x22 (from signature table)
-u32 /*0x06*/ IsLastCombatResult(BOOL a0);  // type 0x8 (from signature table)
+u32 IsLastCombatResult(BOOL a3);                                       // src/leaf/auto_03_800E75B0_text_cb.cpp
 s32 IsLastPage(void);  // type 0x22 (from signature table)
-u32 /*0x06*/ IsLevelRoamable(void);  // type 0xA (from signature table)
+u32 IsLevelRoamable(void);                                             // src/leaf/auto_03_8010711C_text_cb.cpp
 u32 /*0x06*/ IsLightningQueued(void* a0, u32 a1);  // type 0xA4 (from signature table)
-u32 /*0x06*/ IsListFull(void);  // type 0xA (from signature table)
-s32 IsLocalPlayerOfSubtype(u32 a0);  // type 0x1E (from signature table)
-u32 /*0x06*/ IsMonsterAttackAnimationDone(u32 /*0x55*/ a0);  // type 0xA2 (from signature table)
-u32 /*0x06*/ IsMovieDone(void);  // type 0xA (from signature table)
-u32 /*0x06*/ IsMultiPlayer(void);  // type 0xA (from signature table)
-BOOL IsNetThreadRunning(void);  // type 0x2E (from signature table)
+u32 IsListFull(void);                                                  // src/game/small_8013.cpp
+s32 IsLocalPlayerOfSubtype(u32 a0);                                    // src/game/small_800Eb.cpp
+u32 IsMonsterAttackAnimationDone(u32 a0);                              // src/game/small_800Ec.cpp
+u32 IsMovieDone(void);                                                 // src/game/small_800Eb.cpp
+u32 IsMultiPlayer(void);                                               // src/game/small_800Fc.cpp
+BOOL IsNetThreadRunning(void);                                         // src/leaf/auto_03_8013F034_text_cb.cpp
 s32 IsOnRealGround(u32 /*0x2E*/ a0);  // type 0xC1 (from signature table)
-BOOL IsOpponentLoading(void);  // type 0x2E (from signature table)
-BOOL IsOpponentPreparing(void);  // type 0x2E (from signature table)
-s32 IsPS2(void);  // type 0x22 (from signature table)
-u32 /*0x06*/ IsPartLoaded(void);  // type 0xA (from signature table)
-u32 /*0x06*/ IsPartOnMonster(u32 /*0x3F*/ a0, s32 a1);  // type 0xAD (from signature table)
-s32 IsPlayerActive(u32 a0);  // type 0x1E (from signature table)
-s32 IsPlayerAtJunction(void);  // type 0x22 (from signature table)
-u32 /*0x06*/ IsPlayerAttackAnimationDone(void);  // type 0xA (from signature table)
+BOOL IsOpponentLoading(void);                                          // src/game/small_8014.cpp
+BOOL IsOpponentPreparing(void);                                        // src/leaf/auto_03_8013F034_text_cb.cpp
+s32 IsPS2(void);                                                       // src/leaf/auto_03_800E75B0_text_cb.cpp
+u32 IsPartLoaded(void);                                                // src/leaf/auto_03_8001B20C_text_cb.cpp
+u32 IsPartOnMonster(u32 def, s32 tier);                                // src/game/player_api.cpp
+s32 IsPlayerActive(u32 a0);                                            // src/game/small_800Ec.cpp
+s32 IsPlayerAtJunction(void);                                          // src/game/small_800Fc.cpp
+u32 IsPlayerAttackAnimationDone(void);                                 // src/game/small_800Ec.cpp
 BOOL IsPlayerLoaded(void);                                             // src/game/game_ui.cpp
-u32 /*0x06*/ IsPlayerOffJunction(void);  // type 0xA (from signature table)
-u32 /*0x06*/ IsPlayerPartInventoryFull(void);  // type 0xA (from signature table)
-s32 IsPreviousLocation(u32 /*0x4B*/ a0);  // type 0xD4 (from signature table)
-u32 /*0x06*/ IsPreviousLocationExplorationOrCombat(void);  // type 0xA (from signature table)
-u32 /*0x06*/ IsProp(void* a0);  // type 0x1 (from signature table)
-s32 IsQuestAtLevel(u32 /*0x43*/ a0, BOOL a1);  // type 0xD8 (from signature table)
-s32 IsQuestFlagFalse(u32 /*0x43*/ a0, BOOL a1);  // type 0xD8 (from signature table)
-s32 IsQuestFlagTrue(u32 /*0x43*/ a0, BOOL a1);  // type 0xD8 (from signature table)
-u32 /*0x06*/ IsQuestTimerDone(void);  // type 0xA (from signature table)
-u32 /*0x06*/ IsRegionComplete(u32 /*0x4A*/ a0);  // type 0xAE (from signature table)
-u32 /*0x06*/ IsRegionLocked(u32 /*0x4A*/ a0);  // type 0xAE (from signature table)
-u32 /*0x06*/ IsRegionReached(u32 /*0x4A*/ a0);  // type 0xAE (from signature table)
+u32 IsPlayerOffJunction(void);                                         // src/leaf/auto_03_800E75B0_text_cb.cpp
+u32 IsPlayerPartInventoryFull(void);                                   // src/game/player_api.cpp
+s32 IsPreviousLocation(u32 loc);                                       // src/game/player_api.cpp
+u32 IsPreviousLocationExplorationOrCombat(void);                       // src/game/player_api.cpp
+u32 IsProp(void* a3);                                                  // src/leaf/auto_03_800E75B0_text_cb.cpp
+s32 IsQuestAtLevel(u32 quest, BOOL level);                             // src/game/player_api.cpp
+s32 IsQuestFlagFalse(u32 quest, BOOL flag);                            // src/game/player_api.cpp
+s32 IsQuestFlagTrue(u32 quest, BOOL flag);                             // src/game/player_api.cpp
+u32 IsQuestTimerDone(void);                                            // src/game/small_800Fb.cpp
+u32 IsRegionComplete(u32 a3);                                          // src/leaf/auto_03_8020F8E0_text_cb.cpp
+u32 IsRegionLocked(u32 region);                                        // src/game/player_api.cpp
+u32 IsRegionReached(u32 region);                                       // src/game/player_api.cpp
 u32 /*0x06*/ IsSelectedActionRPSBad(void);  // type 0xA (from signature table)
 u32 /*0x06*/ IsSelectedActionRPSGood(void);  // type 0xA (from signature table)
 u32 /*0x06*/ IsSelectedActionRPSMixed(void);  // type 0xA (from signature table)
 u32 /*0x06*/ IsSelectedActionRPSNeutral(void);  // type 0xA (from signature table)
-u32 /*0x06*/ IsShowingError(void);  // type 0xA (from signature table)
-BOOL IsSpecialAlertBox(void);  // type 0x2E (from signature table)
+u32 IsShowingError(void);                                              // src/leaf/auto_03_801420EC_text_cb.cpp
+BOOL IsSpecialAlertBox(void);                                          // src/game/small_8014.cpp
 u32 /*0x06*/ IsSplashScreenReady(BOOL a0);  // type 0x8 (from signature table)
-BOOL IsThisPAL(void);  // type 0x2E (from signature table)
-s32 IsTimerCountdown(void);  // type 0x22 (from signature table)
+ScriptValue IsThisPAL(void);  // type 0x2E (from signature table)
+s32 IsTimerCountdown(void);                                            // src/leaf/auto_03_800E75B0_text_cb.cpp
 s32 IsUIAnimationFinished(u32 a0);  // type 0x1E (from signature table)
 BOOL IsUISlotActive(s32 id);                                           // src/game/game_ui.cpp
 s32 IsValidMonster(void);  // type 0x22 (from signature table)
 s32 IsValidName(void);  // type 0x22 (from signature table)
-u32 /*0x06*/ IsVerticalSlice(void);  // type 0xA (from signature table)
-BOOL IsVideoModePAL(void);  // type 0x2E (from signature table)
-u32 /*0x06*/ IsWiiSelectorActive(void);  // type 0xA (from signature table)
-u32 /*0x06*/ Is_DSBuild(void);  // type 0xA (from signature table)
-u32 /*0x06*/ Is_WiiBuild(void);  // type 0xA (from signature table)
-void JoinGame(s32 a0);  // type 0x83 (from signature table)
+u32 IsVerticalSlice(void);                                             // src/game/player_api.cpp
+BOOL IsVideoModePAL(void);                                             // src/leaf/auto_03_800E75B0_text_cb.cpp
+u32 IsWiiSelectorActive(void);                                         // src/leaf/auto_03_800E75B0_text_cb.cpp
+u32 Is_DSBuild(void);                                                  // src/leaf/auto_03_8020F8E0_text_cb.cpp
+u32 Is_WiiBuild(void);                                                 // src/leaf/auto_03_8020F8E0_text_cb.cpp
+void JoinGame(s32 a0);                                                 // src/game/small_800Fb.cpp
 void JumpTo(u32 /*0x2F*/ a0, u32 /*0x17*/ a1);  // type 0x11D (from signature table)
-void JumpToPlatform(u32 /*0x2F*/ a0, u32 /*0x17*/ a1, u32 /*0x17*/ a2);  // type 0x11E (from signature table)
-void JumpToTarget(u32 /*0x2F*/ a0);  // type 0x114 (from signature table)
+void JumpToPlatform(u32 a0, u32 a1, u32 a2);                           // src/game/small_8010.cpp
+void JumpToTarget(u32 a3);                                             // src/leaf/auto_03_800FB958_text_cb.cpp
 void KillEntity(void* a0);  // type 0x2F (from signature table)
-void KillGoal(u32 /*0x2F*/ a0, u32 a1);  // type 0x122 (from signature table)
+void KillGoal(u32 a3, u32 a4);                                         // src/leaf/auto_03_800FB958_text_cb.cpp
 void KillHighlights(void);  // type 0x8F (from signature table)
-void KillMatchConnection(void);  // type 0x8F (from signature table)
+void KillMatchConnection(void);                                        // src/game/small_8014.cpp
 void KillParticleAtJunction(u32 a0, u32 a1);  // type 0x7A (from signature table)
-void KillPersistentGoal(u32 /*0x2F*/ a0, u32 a1);  // type 0x122 (from signature table)
+void KillPersistentGoal(u32 a3, u32 a4);                               // src/leaf/auto_03_800FB958_text_cb.cpp
 void KillProp(u32 /*0x31*/ a0);  // type 0x127 (from signature table)
 s32 KnowsSecondaryForRecipe(void);  // type 0x22 (from signature table)
 s32 LT_AllPartsForStickTutorialSelected(void);  // type 0x22 (from signature table)
 void LT_ClearTutorialText(void);  // type 0x8F (from signature table)
 void LT_ConversationStopVoiceSFX(void);  // type 0x8F (from signature table)
 void LT_DeleteMonster(void);  // type 0x8F (from signature table)
-void LT_ForceSelectPart(u32 /*0x4E*/ a0);  // type 0x168 (from signature table)
+void LT_ForceSelectPart(u32 a3);                                       // src/leaf/auto_03_8001B20C_text_cb.cpp
 s32 LT_GetCurrentPartInventoryIndex(void);  // type 0x22 (from signature table)
-u32 /*0x4E*/ LT_GetMarkedBodyPart(void);  // type 0xB5 (from signature table)
+u32 LT_GetMarkedBodyPart(void);                                        // src/leaf/auto_03_8001B20C_text_cb.cpp
 s32 LT_GetMonsterHasEnergyForCurrentPartAction(s32 a0);  // type 0x1F (from signature table)
-s32 LT_GetShowingPartsInformation(void);  // type 0x22 (from signature table)
+s32 LT_GetShowingPartsInformation(void);                               // src/leaf/auto_03_8001B20C_text_cb.cpp
 void LT_HighlightAllPartsForStickTutorial(void);  // type 0x8F (from signature table)
 s32 LT_IsEdittingMonster(void);  // type 0x22 (from signature table)
-s32 LT_IsHoveringOverEnhancementDefect(void);  // type 0x22 (from signature table)
+s32 LT_IsHoveringOverEnhancementDefect(void);                          // src/leaf/auto_03_8001B20C_text_cb.cpp
 void LT_MarkCurrentBodyPart(void);  // type 0x8F (from signature table)
 s32 LT_MonsterHasAllParts(void);  // type 0x22 (from signature table)
 s32 LT_MonsterHasEnoughEnergyForPartActions(void);  // type 0x22 (from signature table)
@@ -781,64 +781,64 @@ s32 LT_MonsterHasRequiredParts(void);  // type 0x22 (from signature table)
 s32 LT_PartSelectionMatches(u32 /*0x4E*/ a0);  // type 0xD9 (from signature table)
 s32 LT_PartSlotHasValidPart(u32 /*0x4E*/ a0);  // type 0xD9 (from signature table)
 s32 LT_PlayerCanUseAllMonsterParts(void);  // type 0x22 (from signature table)
-void LT_SetHoveringOverEnhancementDefect(s32 a0);  // type 0x83 (from signature table)
+void LT_SetHoveringOverEnhancementDefect(s32 a3);                      // src/leaf/auto_03_8001B20C_text_cb.cpp
 void LT_SetTutorialText(u32 /*0x11*/ a0, u32 /*0x0D*/ a1);  // type 0x148 (from signature table)
-void LT_TogglePartsMonsterInformation(void);  // type 0x8F (from signature table)
-void LT_UpdateHighlight(void);  // type 0x8F (from signature table)
+void LT_TogglePartsMonsterInformation(void);                           // src/leaf/auto_03_8001B20C_text_cb.cpp
+void LT_UpdateHighlight(void);                                         // src/leaf/auto_03_8001B20C_text_cb.cpp
 s32 LT_UpdatePartSelectionForInput(void);  // type 0x22 (from signature table)
-BOOL LabBooks_Ingredients_GetCurrentType(void);  // type 0x2E (from signature table)
-BOOL LabBooks_Ingredients_GetTypeName(void);  // type 0x2E (from signature table)
-void LabBooks_Ingredients_IncrementRow(s32 a0);  // type 0x83 (from signature table)
-void LabBooks_Ingredients_IncrementType(s32 a0);  // type 0x83 (from signature table)
-void LabBooks_Ingredients_RenderList_Generate(void);  // type 0x8F (from signature table)
-BOOL LabBooks_Ingredients_RenderList_GetIconList(void);  // type 0x2E (from signature table)
-BOOL LabBooks_Ingredients_RenderList_GetNumberList(void);  // type 0x2E (from signature table)
-BOOL LabBooks_Ingredients_RenderList_GetSelectedItem(void);  // type 0x2E (from signature table)
-BOOL LabBooks_Ingredients_RenderList_GetSelectedName(void);  // type 0x2E (from signature table)
-BOOL LabBooks_Ingredients_RenderList_GetTextureList(void);  // type 0x2E (from signature table)
-void LabBooks_Ingredients_RenderList_IncSelectedItem(s32 a0);  // type 0x83 (from signature table)
-void LabBooks_Ingredients_RenderList_SetSelectedItem(BOOL a0);  // type 0x8C (from signature table)
-s32 LabBooks_Ingredients_ShowIngredientFilters(void);  // type 0x22 (from signature table)
+BOOL LabBooks_Ingredients_GetCurrentType(void);                        // src/game/lab_books_a.cpp
+ScriptValue LabBooks_Ingredients_GetTypeName(void);                    // src/game/lab_books_a.cpp
+void LabBooks_Ingredients_IncrementRow(s32 a0);                        // src/game/lab_books_a.cpp
+void LabBooks_Ingredients_IncrementType(s32 a0);                       // src/game/lab_books_a.cpp
+void LabBooks_Ingredients_RenderList_Generate(void);                   // src/game/lab_books_a.cpp
+BOOL LabBooks_Ingredients_RenderList_GetIconList(void);                // src/game/lab_books_a.cpp
+BOOL LabBooks_Ingredients_RenderList_GetNumberList(void);              // src/game/lab_books_a.cpp
+BOOL LabBooks_Ingredients_RenderList_GetSelectedItem(void);            // src/game/lab_books_a.cpp
+ScriptValue LabBooks_Ingredients_RenderList_GetSelectedName(void);     // src/game/lab_books_a.cpp
+BOOL LabBooks_Ingredients_RenderList_GetTextureList(void);             // src/game/lab_books_a.cpp
+void LabBooks_Ingredients_RenderList_IncSelectedItem(s32 a0);          // src/game/lab_books_a.cpp
+void LabBooks_Ingredients_RenderList_SetSelectedItem(BOOL a0);         // src/game/lab_books_a.cpp
+s32 LabBooks_Ingredients_ShowIngredientFilters(void);                  // src/game/lab_books_a.cpp
 void LabBooks_SetCurrentScience(u32 a0);  // type 0x71 (from signature table)
 void LabBooks_UpdateLabBooks(void);  // type 0x8F (from signature table)
-BOOL LeaveInterlabLink(void);  // type 0x2E (from signature table)
-void Level_AddToFloat(u32 /*0x3C*/ a0, f32 a1);  // type 0x13E (from signature table)
-void Level_AddToInt(u32 /*0x3B*/ a0, s32 a1);  // type 0x140 (from signature table)
-s32 Level_GetBit(u32 /*0x3A*/ a0);  // type 0xCF (from signature table)
-f32 Level_GetFloat(u32 /*0x3C*/ a0);  // type 0xB8 (from signature table)
-s32 Level_GetInt(u32 /*0x3B*/ a0);  // type 0xD0 (from signature table)
-void Level_PrintBit(u32 /*0x3A*/ a0);  // type 0x13B (from signature table)
-void Level_PrintFloat(u32 /*0x3C*/ a0);  // type 0x13D (from signature table)
-void Level_PrintInt(u32 /*0x3B*/ a0);  // type 0x13F (from signature table)
-void Level_SetBit(u32 /*0x3A*/ a0, s32 a1);  // type 0x13C (from signature table)
-void Level_SetFloat(u32 /*0x3C*/ a0, f32 a1);  // type 0x13E (from signature table)
-void Level_SetInt(u32 /*0x3B*/ a0, s32 a1);  // type 0x140 (from signature table)
-s32 LighthingTowerGetSelectingPart(void);  // type 0x22 (from signature table)
+ScriptValue LeaveInterlabLink(void);  // type 0x2E (from signature table)
+void Level_AddToFloat(u32 a3, f32 f1);                                 // src/leaf/auto_03_80106AA8_text_cb.cpp
+void Level_AddToInt(u32 a3, s32 a4);                                   // src/leaf/auto_03_80106AA8_text_cb.cpp
+s32 Level_GetBit(u32 a3);                                              // src/leaf/auto_03_80106AA8_text_cb.cpp
+f32 Level_GetFloat(u32 a3);                                            // src/leaf/auto_03_80106AA8_text_cb.cpp
+s32 Level_GetInt(u32 a3);                                              // src/leaf/auto_03_80106AA8_text_cb.cpp
+void Level_PrintBit(u32 a0);                                           // src/game/small_8010.cpp
+void Level_PrintFloat(u32 a0);                                         // src/game/small_8010.cpp
+void Level_PrintInt(u32 a0);                                           // src/game/small_8010.cpp
+void Level_SetBit(u32 a3, s32 a4);                                     // src/leaf/auto_03_80106AA8_text_cb.cpp
+void Level_SetFloat(u32 a3, f32 f1);                                   // src/leaf/auto_03_80106AA8_text_cb.cpp
+void Level_SetInt(u32 a3, s32 a4);                                     // src/leaf/auto_03_80106AA8_text_cb.cpp
+s32 LighthingTowerGetSelectingPart(void);                              // src/leaf/auto_03_8001B20C_text_cb.cpp
 s32 LightningGetInventoryPartID(void);  // type 0x22 (from signature table)
 s32 LightningGetInventoryPos(void);  // type 0x22 (from signature table)
 s32 LightningMonsterCharged(void);  // type 0x22 (from signature table)
 void LightningTowerChargeMonster(u32 /*0x06*/ a0);  // type 0x67 (from signature table)
-s32 LightningTowerGetOnOperatingTable(void);  // type 0x22 (from signature table)
-s32 LightningTowerGetSelectingMonster(void);  // type 0x22 (from signature table)
-void LightningTowerResetAnim(void);  // type 0x8F (from signature table)
-void LightningTowerSetSelectingMonster(s32 a0);  // type 0x83 (from signature table)
-void LightningTowerSetSelectingPart(s32 a0);  // type 0x83 (from signature table)
+s32 LightningTowerGetOnOperatingTable(void);                           // src/leaf/auto_03_8001B20C_text_cb.cpp
+s32 LightningTowerGetSelectingMonster(void);                           // src/leaf/auto_03_8001B20C_text_cb.cpp
+void LightningTowerResetAnim(void);                                    // src/leaf/auto_03_8001B20C_text_cb.cpp
+void LightningTowerSetSelectingMonster(s32 a3);                        // src/leaf/auto_03_8001B20C_text_cb.cpp
+void LightningTowerSetSelectingPart(s32 a3);                           // src/leaf/auto_03_8001B20C_text_cb.cpp
 void LightningTowerShowMonster(u32 /*0x06*/ a0);  // type 0x67 (from signature table)
 void LineTimestamp(BOOL a0);  // type 0x8C (from signature table)
-void LoadChallengeUI(void);  // type 0x8F (from signature table)
+void LoadChallengeUI(void);                                            // src/leaf/auto_03_800E75B0_text_cb.cpp
 void LoadDefaultLevel(void);  // type 0x8F (from signature table)
 void LoadExperiment(void);  // type 0x8F (from signature table)
-void LoadExperimentUI(s32 a0);  // type 0x83 (from signature table)
+void LoadExperimentUI(s32 a3);                                         // src/leaf/auto_03_800747DC_text_cb.cpp
 void LoadInventoryMonster(void);  // type 0x8F (from signature table)
 void LoadLevel(u32 a0);  // type 0x71 (from signature table)
 void Loading_SetHomeButtonGone(void);  // type 0x8F (from signature table)
 void LobShot(void* a0, u32 /*0x30*/ a1, u32 /*0x38*/ a2, f32 a3, f32 a4);  // type 0xFA (from signature table)
 void LobWarningShot(void* a0, u32 /*0x30*/ a1, u32 /*0x38*/ a2, f32 a3, f32 a4);  // type 0xFA (from signature table)
-void LockCameraToEntity(u32 a0);  // type 0x71 (from signature table)
-void LockCurrentJunctionPath(BOOL a0, u32 a1);  // type 0x185 (from signature table)
-void LockInput(s32 a0);  // type 0x83 (from signature table)
+void LockCameraToEntity(u32 a0);                                       // src/game/small_800Fb.cpp
+void LockCurrentJunctionPath(BOOL a3, u32 a4);                         // src/leaf/auto_03_800E75B0_text_cb.cpp
+void LockInput(s32 a3);                                                // src/leaf/auto_03_8010FDA4_text_cb.cpp
 void LockJunctionPath(u32 a0, BOOL a1, u32 a2);  // type 0x17D (from signature table)
-void LockPartSelected(void);  // type 0x8F (from signature table)
+void LockPartSelected(void);                                           // src/game/small_8004b.cpp
 void LogAutoDelete(BOOL a0);  // type 0x8C (from signature table)
 void LoginPoller(void);  // type 0x8F (from signature table)
 void LostOpponent(void);  // type 0x8F (from signature table)
@@ -846,83 +846,83 @@ void MPNameAddLetter(s32 a0);  // type 0x83 (from signature table)
 void MPNameAddSpace(void);  // type 0x8F (from signature table)
 void MPNameDeleteLetter(void);  // type 0x8F (from signature table)
 void MPNameEntryUpdateCursor(void);  // type 0x8F (from signature table)
-BOOL MPNameInput(void);  // type 0x2E (from signature table)
+BOOL MPNameInput(void);                                                // src/leaf/auto_03_8013EB1C_text_cb.cpp
 void MatchupAcceptFight(void);  // type 0x8F (from signature table)
 void MatchupCancel(void);  // type 0x8F (from signature table)
 void MatchupCleanup(void);  // type 0x8F (from signature table)
-void MatchupDeInit(void);  // type 0x8F (from signature table)
+void MatchupDeInit(void);                                              // src/game/small_8013.cpp
 void MatchupInit(void);  // type 0x8F (from signature table)
 void MatchupPreInit(void);  // type 0x8F (from signature table)
 void MatchupShowMyMonster(void);  // type 0x8F (from signature table)
-BOOL MatchupTimerIsUp(void);  // type 0x2E (from signature table)
-void MatchupUpdate(void);  // type 0x8F (from signature table)
-void MegaChunkReceivedCallback(u32 /*0x19*/ a0);  // type 0x56 (from signature table)
-void MegaChunkSentCallback(u32 /*0x19*/ a0);  // type 0x56 (from signature table)
+BOOL MatchupTimerIsUp(void);                                           // src/leaf/auto_03_8013F034_text_cb.cpp
+void MatchupUpdate(void);                                              // src/game/matchup.cpp
+void MegaChunkReceivedCallback(u32 a3);                                // src/leaf/auto_03_800E75B0_text_cb.cpp
+void MegaChunkSentCallback(u32 a3);                                    // src/leaf/auto_03_800E75B0_text_cb.cpp
 void ModifyScore(u32 a0, f32 a1);  // type 0x76 (from signature table)
-void MonsterSelectDeInit(void);  // type 0x8F (from signature table)
+void MonsterSelectDeInit(void);                                        // src/leaf/auto_03_8013E4D0_text_cb.cpp
 void MonsterSelectInit(void);  // type 0x8F (from signature table)
 void MonsterSelectUpdate(void);  // type 0x8F (from signature table)
-void MoveCursorToContinueButtonPS2(void);  // type 0x8F (from signature table)
-void MoveEnemyToJunction(u32 a0, u32 a1);  // type 0x7A (from signature table)
-void MoveEnemyToPlayer(u32 a0);  // type 0x71 (from signature table)
+void MoveCursorToContinueButtonPS2(void);                              // src/leaf/auto_03_800E75B0_text_cb.cpp
+void MoveEnemyToJunction(u32 a0, u32 a1);                              // src/game/small_800F.cpp
+void MoveEnemyToPlayer(u32 a0);                                        // src/game/small_800F.cpp
 void MoveEntityToLocation(u32 a0, f32 a1, f32 a2, f32 a3);  // type 0x77 (from signature table)
 void MoveEntityToLocator(u32 a0, u32 a1);  // type 0x7A (from signature table)
 void MovePlayerDirection(BOOL a0);  // type 0x8C (from signature table)
-void MultiCountAction(u32 /*0x2F*/ a0, u32 a1, s32 a2);  // type 0x124 (from signature table)
+void MultiCountAction(u32 a3, u32 a4, s32 a5);                         // src/leaf/auto_03_800FB958_text_cb.cpp
 void MultiPlayerInit(void);  // type 0x8F (from signature table)
 void MultiplayerCleanup(void);  // type 0x8F (from signature table)
-void MultiplayerLevelLoaded(void);  // type 0x8F (from signature table)
+void MultiplayerLevelLoaded(void);                                     // src/leaf/auto_03_8013A03C_text_cb.cpp
 void MysticBrewGhost_FireProjectile(void* a0);  // type 0x2F (from signature table)
 void MysticBrewGhost_PositionToHide(void* a0);  // type 0x2F (from signature table)
-s32 MysticBrewPowerUp_IsShieldTypePowerUp(void* a0);  // type 0x16 (from signature table)
+s32 MysticBrewPowerUp_IsShieldTypePowerUp(void* a3);                   // src/leaf/auto_03_800BD894_text_cb.cpp
 void MysticBrewPowerUp_PositionToHide(void* a0);  // type 0x2F (from signature table)
 void MysticBrewProjectile_PositionToHide(void* a0);  // type 0x2F (from signature table)
 void NameAddLetter(s32 a0);  // type 0x83 (from signature table)
 void NameAddSpace(void);  // type 0x8F (from signature table)
-void NameClear(void);  // type 0x8F (from signature table)
+void NameClear(void);                                                  // src/leaf/auto_03_8001B20C_text_cb.cpp
 void NameDelLetter(void);  // type 0x8F (from signature table)
-s32 NavTargetIsLeft(u32 /*0x2F*/ a0);  // type 0xC7 (from signature table)
-BOOL NotDebugging(void);  // type 0x2E (from signature table)
-BOOL NotStreamingMatchScreenParts(void);  // type 0x2E (from signature table)
+s32 NavTargetIsLeft(u32 a3);                                           // src/leaf/auto_03_800FB958_text_cb.cpp
+BOOL NotDebugging(void);                                               // src/leaf/auto_03_800505E0_text_cb.cpp
+BOOL NotStreamingMatchScreenParts(void);                               // src/game/small_8014.cpp
 void OnExperimentFadeIn(void);  // type 0x8F (from signature table)
 void OnRocketImpact(void* a0);  // type 0x2F (from signature table)
-BOOL OpponentCancelled(void);  // type 0x2E (from signature table)
-BOOL OpponentMatchupTimerIsUp(void);  // type 0x2E (from signature table)
-BOOL OpponentReadyForBattle(void);  // type 0x2E (from signature table)
+BOOL OpponentCancelled(void);                                          // src/leaf/auto_03_8013F034_text_cb.cpp
+BOOL OpponentMatchupTimerIsUp(void);                                   // src/leaf/auto_03_8013F034_text_cb.cpp
+BOOL OpponentReadyForBattle(void);                                     // src/leaf/auto_03_8013F034_text_cb.cpp
 void OrientBoneToTarget(u32 /*0x2F*/ a0, u32 /*0x30*/ a1, f32 a2);  // type 0x116 (from signature table)
-void PanCameraToEntity(u32 a0, f32 a1);  // type 0x76 (from signature table)
+void PanCameraToEntity(u32 a3, f32 f1);                                // src/leaf/auto_03_800E75B0_text_cb.cpp
 void PanCameraToJunction(u32 a0, f32 a1);  // type 0x76 (from signature table)
-void PanCameraToPlayer(f32 a0);  // type 0x69 (from signature table)
-BOOL PartAction1GetCost(s32 a0);  // type 0x28 (from signature table)
+void PanCameraToPlayer(f32 f1);                                        // src/leaf/auto_03_800E75B0_text_cb.cpp
+ScriptValue PartAction1GetCost(s32 a0);  // type 0x28 (from signature table)
 s32 PartAction1GetIsTarget(s32 a0, s32 a1);  // type 0x20 (from signature table)
 s32 PartAction1GetTarget1(s32 a0);  // type 0x1F (from signature table)
 s32 PartAction1GetTarget2(s32 a0);  // type 0x1F (from signature table)
-BOOL PartAction1GetValue(s32 a0);  // type 0x28 (from signature table)
-BOOL PartAction2GetCost(s32 a0);  // type 0x28 (from signature table)
+ScriptValue PartAction1GetValue(s32 a0);  // type 0x28 (from signature table)
+ScriptValue PartAction2GetCost(s32 a0);  // type 0x28 (from signature table)
 s32 PartAction2GetIsTarget(s32 a0, s32 a1);  // type 0x20 (from signature table)
 s32 PartAction2GetTarget1(s32 a0);  // type 0x1F (from signature table)
 s32 PartAction2GetTarget2(s32 a0);  // type 0x1F (from signature table)
-BOOL PartAction2GetValue(s32 a0);  // type 0x28 (from signature table)
-BOOL PartGetEnhancementName(s32 a0);  // type 0x28 (from signature table)
-BOOL PartGetEnhancementTexture(s32 a0);  // type 0x28 (from signature table)
-BOOL PartGetPartAction1(s32 a0);  // type 0x28 (from signature table)
-BOOL PartGetPartAction2(s32 a0);  // type 0x28 (from signature table)
-BOOL PartGetSecondaryIngredientName(s32 a0);  // type 0x28 (from signature table)
-BOOL PartGetSecondaryIngredientTexture(s32 a0);  // type 0x28 (from signature table)
+ScriptValue PartAction2GetValue(s32 a0);  // type 0x28 (from signature table)
+ScriptValue PartGetEnhancementName(s32 a0);  // type 0x28 (from signature table)
+ScriptValue PartGetEnhancementTexture(s32 a0);                         // src/game/small_800Fc.cpp
+ScriptValue PartGetPartAction1(s32 a0);  // type 0x28 (from signature table)
+ScriptValue PartGetPartAction2(s32 a0);  // type 0x28 (from signature table)
+ScriptValue PartGetSecondaryIngredientName(s32 a0);  // type 0x28 (from signature table)
+ScriptValue PartGetSecondaryIngredientTexture(s32 a0);  // type 0x28 (from signature table)
 s32 PartHasEnhancement(s32 a0);  // type 0x1F (from signature table)
-BOOL PartInfo_GetEnhanceDefectDesc(void);  // type 0x2E (from signature table)
-BOOL PartInfo_GetEnhanceDefectTexture(void);  // type 0x2E (from signature table)
-BOOL PartInfo_GetTexture(void);  // type 0x2E (from signature table)
+BOOL PartInfo_GetEnhanceDefectDesc(void);                              // src/leaf/auto_03_8010FDA4_text_cb.cpp
+BOOL PartInfo_GetEnhanceDefectTexture(void);                           // src/leaf/auto_03_8010FDA4_text_cb.cpp
+BOOL PartInfo_GetTexture(void);                                        // src/leaf/auto_03_8010FDA4_text_cb.cpp
 void PartInfo_LoadModel(void);  // type 0x8F (from signature table)
-s32 PartInfo_PlayerNeedsMoreRanks(void);  // type 0x22 (from signature table)
-void PartInfo_UnloadModel(void);  // type 0x8F (from signature table)
+s32 PartInfo_PlayerNeedsMoreRanks(void);                               // src/leaf/auto_03_8010FDA4_text_cb.cpp
+void PartInfo_UnloadModel(void);                                       // src/game/lab_books_e.cpp
 s32 PartIsAction1Attack(s32 a0);  // type 0x1F (from signature table)
 s32 PartIsAction1Defense(s32 a0);  // type 0x1F (from signature table)
 s32 PartIsAction2Attack(s32 a0);  // type 0x1F (from signature table)
 s32 PartIsAction2Defense(s32 a0);  // type 0x1F (from signature table)
-s32 PartIsAlchemy(s32 a0);  // type 0x1F (from signature table)
-s32 PartIsBio(s32 a0);  // type 0x1F (from signature table)
-s32 PartIsMech(s32 a0);  // type 0x1F (from signature table)
+s32 PartIsAlchemy(s32 a0);                                             // src/game/small_800Fc.cpp
+s32 PartIsBio(s32 a0);                                                 // src/game/small_800Fc.cpp
+s32 PartIsMech(s32 a0);                                                // src/game/small_800Fc.cpp
 s32 PartQuery_AttackTargetsLimb(BOOL a0, BOOL a1);  // type 0xDE (from signature table)
 s32 PartQuery_GetActionCost(u32 which);                                // src/game/part_query.cpp
 s32 PartQuery_GetActionDamage(BOOL a0);  // type 0xDD (from signature table)
@@ -948,49 +948,49 @@ void PartQuery_SetInventoryPartByIndex(s32 index);                     // src/ga
 void PartQuery_SetLightningTowerMonster(void);                         // src/game/part_query.cpp
 void PartQuery_SetPart(void);                                          // src/game/part_query.cpp
 void PartSetPartUIImage(u32 a0, s32 a1);  // type 0x7E (from signature table)
-s32 Parts_CanDelete(void);  // type 0x22 (from signature table)
-BOOL Parts_GetBodyPartSlotName(void);  // type 0x2E (from signature table)
-BOOL Parts_GetCurrentPart(void);  // type 0x2E (from signature table)
-s32 Parts_GetDeleteString(void);  // type 0x22 (from signature table)
-BOOL Parts_GetImage(void);  // type 0x2E (from signature table)
-void Parts_GetInfoImages(void);  // type 0x8F (from signature table)
-BOOL Parts_GetModificationList(void);  // type 0x2E (from signature table)
-s32 Parts_GetNameByIndex(s32 a0);  // type 0x1F (from signature table)
-BOOL Parts_GetOnMonsterList(void);  // type 0x2E (from signature table)
-BOOL Parts_GetSelectedName(void);  // type 0x2E (from signature table)
-BOOL Parts_GetTextureList(void);  // type 0x2E (from signature table)
-s32 Parts_HasRecipe(void);  // type 0x22 (from signature table)
-void Parts_IncrementBodyPart(s32 a0);  // type 0x83 (from signature table)
-void Parts_IncrementRow(s32 a0);  // type 0x83 (from signature table)
-s32 Parts_IsCurrentPartOnMonster(void);  // type 0x22 (from signature table)
-s32 Parts_IsPartPopupOn(s32 a0);  // type 0x1F (from signature table)
-s32 Parts_IsTextureAsyncLoaded(void);  // type 0x22 (from signature table)
-s32 Parts_IsValidPart(s32 a0);  // type 0x1F (from signature table)
-BOOL Parts_RemoveCurrentPart(s32 a0);  // type 0x28 (from signature table)
-s32 Parts_RenderList_GetSelectedItem(void);  // type 0x22 (from signature table)
-void Parts_RenderList_SetSelectedItem(s32 a0);  // type 0x83 (from signature table)
-void Parts_SetPartPopup(s32 a0);  // type 0x83 (from signature table)
-void Parts_SetupRenderList(void);  // type 0x8F (from signature table)
-void Pause(void);  // type 0x8F (from signature table)
+s32 Parts_CanDelete(void);                                             // src/game/lab_books_b.cpp
+BOOL Parts_GetBodyPartSlotName(void);                                  // src/game/lab_books_b.cpp
+BOOL Parts_GetCurrentPart(void);                                       // src/game/lab_books_b.cpp
+ScriptValue Parts_GetDeleteString(void);                               // src/game/lab_books_c.cpp
+BOOL Parts_GetImage(void);                                             // src/game/lab_books_b.cpp
+void Parts_GetInfoImages(void);                                        // src/game/lab_books_b.cpp
+BOOL Parts_GetModificationList(void);                                  // src/game/lab_books_b.cpp
+s32 Parts_GetNameByIndex(s32 a0);                                      // src/game/lab_books_b.cpp
+BOOL Parts_GetOnMonsterList(void);                                     // src/game/lab_books_b.cpp
+BOOL Parts_GetSelectedName(void);                                      // src/game/lab_books_b.cpp
+BOOL Parts_GetTextureList(void);                                       // src/game/lab_books_b.cpp
+s32 Parts_HasRecipe(void);                                             // src/game/lab_books_b.cpp
+void Parts_IncrementBodyPart(s32 a0);                                  // src/game/lab_books_b.cpp
+void Parts_IncrementRow(s32 a0);                                       // src/game/lab_books_b.cpp
+s32 Parts_IsCurrentPartOnMonster(void);                                // src/game/lab_books_c.cpp
+s32 Parts_IsPartPopupOn(s32 a0);                                       // src/game/lab_books_c.cpp
+s32 Parts_IsTextureAsyncLoaded(void);                                  // src/game/lab_books_c.cpp
+s32 Parts_IsValidPart(s32 a0);                                         // src/game/lab_books_c.cpp
+BOOL Parts_RemoveCurrentPart(s32 a0);                                  // src/game/lab_books_c.cpp
+s32 Parts_RenderList_GetSelectedItem(void);                            // src/game/lab_books_b.cpp
+void Parts_RenderList_SetSelectedItem(s32 a0);                         // src/game/lab_books_b.cpp
+void Parts_SetPartPopup(s32 a0);                                       // src/game/lab_books_c.cpp
+void Parts_SetupRenderList(void);                                      // src/game/lab_books_b.cpp
+void Pause(void);                                                      // src/leaf/auto_03_800E75B0_text_cb.cpp
 void PauseAllExplorationCharacters(void);  // type 0x8F (from signature table)
-void PauseGame(u32 /*0x06*/ a0);  // type 0x67 (from signature table)
-void PauseSoundEffects(BOOL a0);  // type 0x8C (from signature table)
-void PlaceSaw(void);  // type 0x8F (from signature table)
+void PauseGame(u32 a3);                                                // src/leaf/auto_03_800E75B0_text_cb.cpp
+void PauseSoundEffects(BOOL a3);                                       // src/leaf/auto_03_8013F034_text_cb.cpp
+void PlaceSaw(void);                                                   // src/leaf/auto_03_8009F66C_text_cb.cpp
 void PlayAnim(void* a0, u32 /*0x2B*/ a1);  // type 0xF7 (from signature table)
 void PlayAnimByID(void* a0, u32 a1);  // type 0x42 (from signature table)
 void PlayAnimByIDLoop(void* a0, u32 a1);  // type 0x42 (from signature table)
-void PlayAnimUB(u32 /*0x2E*/ a0, u32 /*0x2B*/ a1, u32 a2);  // type 0xF0 (from signature table)
-void PlayAnimation(u32 a0, u32 a1);  // type 0x7A (from signature table)
+void PlayAnimUB(u32 a3, u32 a4, u32 a5);                               // src/leaf/auto_03_800E75B0_text_cb.cpp
+void PlayAnimation(u32 a3, u32 a4);                                    // src/leaf/auto_03_800E75B0_text_cb.cpp
 void PlayAttachedParticleEffectAtEmitter(void* a0, u32 a1, u32 a2);  // type 0x10E (from signature table)
 void PlayBackgroundSFX(u32 /*0x0B*/ a0, u32 /*0x0B*/ a1);  // type 0x145 (from signature table)
 void PlayBackgroundSFXWithEffect(u32 /*0x0B*/ a0, u32 /*0x0B*/ a1, s32 a2);  // type 0x146 (from signature table)
-void PlayBossCameraAnimation(u32 a0);  // type 0x71 (from signature table)
+void PlayBossCameraAnimation(u32 a0);                                  // src/game/small_800Fb.cpp
 void PlayCameraAnimation(u32 a0);  // type 0x71 (from signature table)
-void PlayChallengeMusic(void);  // type 0x8F (from signature table)
+void PlayChallengeMusic(void);                                         // src/leaf/auto_03_800E75B0_text_cb.cpp
 void PlayCharacterAnimation(u32 /*0x55*/ a0, u32 /*0x4E*/ a1, u32 a2, u32 /*0x06*/ a3);  // type 0xEF (from signature table)
-void PlayDanceAnimation(void* a0, u32 /*0x2B*/ a1);  // type 0xF7 (from signature table)
+void PlayDanceAnimation(void* a0, u32 a1);                             // src/game/small_8007b.cpp
 void PlayEffect(void* a0, u32 a1);  // type 0x42 (from signature table)
-void PlayEffectTransient(void* a0, u32 a1);  // type 0x42 (from signature table)
+void PlayEffectTransient(void* a0, u32 a1);                            // src/game/small_8010.cpp
 void PlayEntitySoundGroupFX(void* a0, u32 a1, u32 /*0x06*/ a2);  // type 0x10C (from signature table)
 void PlayExperimentSound(void* a0, u32 a1, s32 a2);  // type 0x46 (from signature table)
 void PlayExperimentSoundAtPropLocation(void* a0, u32 a1, s32 a2);  // type 0x46 (from signature table)
@@ -1007,157 +1007,157 @@ void PlayPlayerAttackAnimation(void);  // type 0x8F (from signature table)
 s32 PlaySoundEffect(u32 /*0x0B*/ a0);  // type 0xD2 (from signature table)
 s32 PlaySoundEffectWithEffect(u32 /*0x0B*/ a0, s32 a1);  // type 0xD3 (from signature table)
 void PlaySpraySound(void);  // type 0x8F (from signature table)
-void PlayStateOnEnemy(u32 a0, u32 a1);  // type 0x7A (from signature table)
-void PlayStateOnEnemyByThis(void* a0, u32 a1);  // type 0x42 (from signature table)
-void PlayStateOnPlayer(u32 a0);  // type 0x71 (from signature table)
-void PlayStateOnProp(u32 a0, u32 a1);  // type 0x7A (from signature table)
-void PlayStateOnPropByThis(void* a0, u32 a1);  // type 0x42 (from signature table)
+void PlayStateOnEnemy(u32 a3, u32 a4);                                 // src/leaf/auto_03_800E75B0_text_cb.cpp
+void PlayStateOnEnemyByThis(void* a3, u32 a4);                         // src/leaf/auto_03_800E75B0_text_cb.cpp
+void PlayStateOnPlayer(u32 a3);                                        // src/leaf/auto_03_800E75B0_text_cb.cpp
+void PlayStateOnProp(u32 a3, u32 a4);                                  // src/leaf/auto_03_800E75B0_text_cb.cpp
+void PlayStateOnPropByThis(void* a3, u32 a4);                          // src/leaf/auto_03_800E75B0_text_cb.cpp
 void PlayStrikeSoundFX(void* a0);  // type 0x2F (from signature table)
 void PlaySustainedAnimation(void* a0);  // type 0x2F (from signature table)
 void PlaySwitchBackAnimation(void* a0);  // type 0x2F (from signature table)
 void PlayUnattachedParticleEffectAtEmitter(void* a0, u32 a1, u32 a2);  // type 0x10E (from signature table)
-void PlayerClearOverrideTarget(void);  // type 0x8F (from signature table)
-u32 /*0x06*/ PlayerHasKeyIngredient(u32 /*0x41*/ a0);  // type 0xAC (from signature table)
-s32 PlayerHasPart(u32 /*0x3F*/ a0, s32 a1);  // type 0xD5 (from signature table)
-s32 PlayerHasQuestItem(u32 /*0x40*/ a0);  // type 0xD6 (from signature table)
-u32 /*0x06*/ PlayerHasSecondaryIngredient(u32 /*0x42*/ a0);  // type 0xAF (from signature table)
-void PlayerSetOverrideTarget(void* a0);  // type 0x2F (from signature table)
-void PopFSM(void);  // type 0x8F (from signature table)
+void PlayerClearOverrideTarget(void);                                  // src/leaf/auto_03_800E75B0_text_cb.cpp
+u32 PlayerHasKeyIngredient(u32 i);                                     // src/game/player_api.cpp
+s32 PlayerHasPart(u32 def, s32 tier);                                  // src/game/player_api.cpp
+s32 PlayerHasQuestItem(u32 item);                                      // src/game/player_api.cpp
+u32 PlayerHasSecondaryIngredient(u32 i);                               // src/game/player_api.cpp
+void PlayerSetOverrideTarget(void* a3);                                // src/leaf/auto_03_800E75B0_text_cb.cpp
+void PopFSM(void);                                                     // src/leaf/auto_03_800E75B0_text_cb.cpp
 void PopOldScreen(void);  // type 0x8F (from signature table)
 u32 /*0x06*/ Popup_IsPlayingLevelUpEvent(void);  // type 0xA (from signature table)
 void PositionalCameraShake(void* a0, f32 a1, f32 a2, f32 a3, f32 a4);  // type 0x10B (from signature table)
 void PostMultiplayerFight(void);  // type 0x8F (from signature table)
 void PreloadLevel(u32 a0);  // type 0x71 (from signature table)
-void PrintBit(u32 /*0x22*/ a0);  // type 0x16B (from signature table)
-void PrintCurrentLevelName(void);  // type 0x8F (from signature table)
-void PrintFloat(u32 /*0x24*/ a0);  // type 0x16D (from signature table)
-void PrintHash(u32 a0);  // type 0x71 (from signature table)
-void PrintInt(u32 /*0x23*/ a0);  // type 0x16F (from signature table)
+void PrintBit(u32 a0);                                                 // src/game/small_8010.cpp
+void PrintCurrentLevelName(void);                                      // src/game/small_800F.cpp
+void PrintFloat(u32 a0);                                               // src/game/small_8010.cpp
+void PrintHash(u32 a3);                                                // src/leaf/auto_03_800E75B0_text_cb.cpp
+void PrintInt(u32 a0);                                                 // src/game/small_8010.cpp
 void PrintLevelName(u32 /*0x33*/ a0);  // type 0x13A (from signature table)
-void PrintTest(void);  // type 0x8F (from signature table)
+void PrintTest(void);                                                  // src/leaf/auto_03_800E75B0_text_cb.cpp
 void ProcessHelloPayloadCallback(BOOL a0);  // type 0x8C (from signature table)
-void Projectile_Set_Dead(u32 /*0x3E*/ a0);  // type 0x126 (from signature table)
+void Projectile_Set_Dead(u32 a3);                                      // src/leaf/auto_03_800636A0_text_cb.cpp
 void PropAttachProjectile(u32 /*0x31*/ a0, u32 /*0x38*/ a1, u32 /*0x30*/ a2);  // type 0x12B (from signature table)
 void PropFireLightningAtActiveTarget(u32 /*0x31*/ a0, u32 /*0x30*/ a1, u32 a2, u32 /*0x38*/ a3, f32 a4, f32 a5);  // type 0x129 (from signature table)
 void PropFireProjectileAtActiveTarget(u32 /*0x31*/ a0, u32 /*0x38*/ a1, u32 /*0x30*/ a2, f32 a3);  // type 0x12C (from signature table)
-u32 /*0x06*/ PropHasAttachedProjectile(u32 /*0x31*/ a0);  // type 0xA5 (from signature table)
-void PropRemoveAttachedProjectile(u32 /*0x31*/ a0);  // type 0x127 (from signature table)
-void PropSetActiveTarget(u32 /*0x31*/ a0, void* a1);  // type 0x12A (from signature table)
-void PropSetAnimUpdate(u32 /*0x31*/ a0, u32 /*0x06*/ a1);  // type 0x12D (from signature table)
-void PushExperimentLoadingScreen(void);  // type 0x8F (from signature table)
+u32 PropHasAttachedProjectile(u32 a3);                                 // src/leaf/auto_03_800E75B0_text_cb.cpp
+void PropRemoveAttachedProjectile(u32 a3);                             // src/leaf/auto_03_800E75B0_text_cb.cpp
+void PropSetActiveTarget(u32 a3, void* a4);                            // src/leaf/auto_03_800E75B0_text_cb.cpp
+void PropSetAnimUpdate(u32 a3, u32 a4);                                // src/leaf/auto_03_80069028_text_cb.cpp
+void PushExperimentLoadingScreen(void);                                // src/game/small_8007.cpp
 void PushExperimentUI(void);  // type 0x8F (from signature table)
-void PushFSM(u32 a0);  // type 0x71 (from signature table)
+void PushFSM(u32 a3);                                                  // src/leaf/auto_03_800E75B0_text_cb.cpp
 void QuestCounterCleanUp(void);  // type 0x8F (from signature table)
-void QuestCounterUpdateNumber(void);  // type 0x8F (from signature table)
-BOOL QuestLog_GetCounter(s32 a0);  // type 0x28 (from signature table)
-BOOL QuestLog_GetMainIcon(s32 a0);  // type 0x28 (from signature table)
-BOOL QuestLog_GetNextQuestLocationString(void);  // type 0x2E (from signature table)
-BOOL QuestLog_GetQuestDescription(void);  // type 0x2E (from signature table)
-BOOL QuestLog_GetQuestJournalEntry(void);  // type 0x2E (from signature table)
-BOOL QuestLog_GetQuestName(void);  // type 0x2E (from signature table)
-BOOL QuestLog_GetSubQuestDescription(s32 a0);  // type 0x28 (from signature table)
+void QuestCounterUpdateNumber(void);                                   // src/game/small_800Ec.cpp
+ScriptValue QuestLog_GetCounter(s32 a0);  // type 0x28 (from signature table)
+BOOL QuestLog_GetMainIcon(s32 a0);                                     // src/game/lab_books_d.cpp
+ScriptValue QuestLog_GetNextQuestLocationString(void);  // type 0x2E (from signature table)
+ScriptValue QuestLog_GetQuestDescription(void);  // type 0x2E (from signature table)
+BOOL QuestLog_GetQuestJournalEntry(void);                              // src/game/lab_books_d.cpp
+ScriptValue QuestLog_GetQuestName(void);  // type 0x2E (from signature table)
+ScriptValue QuestLog_GetSubQuestDescription(s32 a0);  // type 0x28 (from signature table)
 s32 QuestLog_HasCounter(s32 a0);  // type 0x1F (from signature table)
-s32 QuestLog_HasMainIcon(s32 a0);  // type 0x1F (from signature table)
-s32 QuestLog_HasNextQuestLocationString(void);  // type 0x22 (from signature table)
-s32 QuestLog_HasQuest(void);  // type 0x22 (from signature table)
+s32 QuestLog_HasMainIcon(s32 a0);                                      // src/game/lab_books_d.cpp
+s32 QuestLog_HasNextQuestLocationString(void);                         // src/game/lab_books_d.cpp
+s32 QuestLog_HasQuest(void);                                           // src/game/lab_books_d.cpp
 s32 QuestLog_HasSubQuest(s32 a0);  // type 0x1F (from signature table)
 s32 QuestLog_IsComplete(s32 a0);  // type 0x1F (from signature table)
-void QueueGameEvent(u32 /*0x51*/ a0, u32 a1, u32 /*0x47*/ a2, s32 a3, s32 a4);  // type 0x151 (from signature table)
+void QueueGameEvent(u32 a0, u32 a1, u32 a2, s32 a3, s32 a4);           // src/game/player_api.cpp
 void QueueSoundFX(void* a0, u32 /*0x0B*/ a1, u32 a2);  // type 0x3B (from signature table)
 s32 RandomPercent(s32 a0);  // type 0x1F (from signature table)
 s32 RandomZeroToMax(s32 a0);  // type 0x1F (from signature table)
-s32 ReactorFastenerAdjustmentsRequired(void* a0);  // type 0x16 (from signature table)
-u32 /*0x06*/ ReactorFastenerIsDecoy(void* a0);  // type 0x1 (from signature table)
-void* ReactorHeartGetMagnetLight(void* a0);  // type 0x95 (from signature table)
-void* ReactorHeartGetTargetLeak(void* a0);  // type 0x95 (from signature table)
-void ReactorHeartResetTimer(void* a0);  // type 0x2F (from signature table)
+s32 ReactorFastenerAdjustmentsRequired(void* a3);                      // src/leaf/auto_03_80097574_text_cb.cpp
+u32 ReactorFastenerIsDecoy(void* a3);                                  // src/leaf/auto_03_80097574_text_cb.cpp
+void* ReactorHeartGetMagnetLight(void* a3);                            // src/leaf/auto_03_80098DA8_text_cb.cpp
+void* ReactorHeartGetTargetLeak(void* a3);                             // src/leaf/auto_03_80098DA8_text_cb.cpp
+void ReactorHeartResetTimer(void* a3);                                 // src/leaf/auto_03_80098DA8_text_cb.cpp
 void ReactorHeartUpdateRotation(void* a0);  // type 0x2F (from signature table)
-void ReactorHeartUpdateTimer(void* a0);  // type 0x2F (from signature table)
+void ReactorHeartUpdateTimer(void* a3);                                // src/leaf/auto_03_80098DA8_text_cb.cpp
 void* ReactorLeakGetCurrentLeak(void);  // type 0x96 (from signature table)
-s32 ReactorLeakIdleNearHeart(void);  // type 0x22 (from signature table)
+s32 ReactorLeakIdleNearHeart(void);                                    // src/leaf/auto_03_80098BC0_text_cb.cpp
 void ReactorLeakManipulateFastener(void);  // type 0x8F (from signature table)
 u32 /*0x06*/ ReactorLeakManipulationDetected(void* a0);  // type 0x1 (from signature table)
-BOOL Recipes_GetBodyPartSlotName(void);  // type 0x2E (from signature table)
-BOOL Recipes_GetImage(void);  // type 0x2E (from signature table)
-BOOL Recipes_GetKeyIngredientImage(void);  // type 0x2E (from signature table)
-BOOL Recipes_GetKeyIngredientName(void);  // type 0x2E (from signature table)
-BOOL Recipes_GetNameByIndex(s32 a0);  // type 0x28 (from signature table)
-BOOL Recipes_GetSecondaryIngredientImage(void);  // type 0x2E (from signature table)
-BOOL Recipes_GetSecondaryIngredientName(void);  // type 0x2E (from signature table)
-BOOL Recipes_GetSelectedName(void);  // type 0x2E (from signature table)
-BOOL Recipes_GetTextureList(void);  // type 0x2E (from signature table)
+ScriptValue Recipes_GetBodyPartSlotName(void);  // type 0x2E (from signature table)
+BOOL Recipes_GetImage(void);                                           // src/game/lab_books_d.cpp
+ScriptValue Recipes_GetKeyIngredientImage(void);  // type 0x2E (from signature table)
+ScriptValue Recipes_GetKeyIngredientName(void);  // type 0x2E (from signature table)
+ScriptValue Recipes_GetNameByIndex(s32 a0);  // type 0x28 (from signature table)
+ScriptValue Recipes_GetSecondaryIngredientImage(void);  // type 0x2E (from signature table)
+ScriptValue Recipes_GetSecondaryIngredientName(void);  // type 0x2E (from signature table)
+ScriptValue Recipes_GetSelectedName(void);  // type 0x2E (from signature table)
+ScriptValue Recipes_GetTextureList(void);  // type 0x2E (from signature table)
 s32 Recipes_HasSecondaryIngredient(void);  // type 0x22 (from signature table)
 void Recipes_IncrementBodyPart(s32 a0);  // type 0x83 (from signature table)
 void Recipes_IncrementRow(s32 a0);  // type 0x83 (from signature table)
 s32 Recipes_IsRecipePopupOn(s32 a0);  // type 0x1F (from signature table)
-s32 Recipes_IsTextureAsyncLoaded(void);  // type 0x22 (from signature table)
+s32 Recipes_IsTextureAsyncLoaded(void);                                // src/game/lab_books_d.cpp
 s32 Recipes_IsValidRecipe(s32 a0);  // type 0x1F (from signature table)
-s32 Recipes_RenderList_GetSelectedItem(void);  // type 0x22 (from signature table)
+s32 Recipes_RenderList_GetSelectedItem(void);                          // src/game/lab_books_d.cpp
 void Recipes_RenderList_SetSelectedItem(s32 a0);  // type 0x83 (from signature table)
 void Recipes_SetRecipePopup(s32 a0);  // type 0x83 (from signature table)
-void Recipes_SetupRenderList(void);  // type 0x8F (from signature table)
+void Recipes_SetupRenderList(void);                                    // src/game/lab_books_d.cpp
 void RegisterExperimentSound(void* a0, u32 /*0x0B*/ a1, u32 a2);  // type 0x3B (from signature table)
-void RegisterHooks(void);  // type 0x8F (from signature table)
-void RegisterMidiLoop(u32 /*0x0B*/ a0, u32 a1);  // type 0x147 (from signature table)
-void ReleaseDanceAnimation(void* a0);  // type 0x2F (from signature table)
-void ReleaseFader(void);  // type 0x8F (from signature table)
-void ReleaseHUD(void);  // type 0x8F (from signature table)
-void RemoveAllAttachedParticleEffectAtEmitter(void* a0, u32 a1);  // type 0x42 (from signature table)
-void RemoveAllParticles(void);  // type 0x8F (from signature table)
-void RemoveAttachedParticleEffectAtEmitter(void* a0, u32 a1);  // type 0x42 (from signature table)
-void RemoveAttachedParticleEffectAtEmitterImmediate(void* a0, u32 a1);  // type 0x42 (from signature table)
-void RemoveBadge(u32 /*0x46*/ a0);  // type 0x14C (from signature table)
-void RemoveCharacterParticleEffect(u32 /*0x2E*/ a0, u32 /*0x06*/ a1);  // type 0xF2 (from signature table)
+void RegisterHooks(void);                                              // src/engine/small_801D.cpp
+void RegisterMidiLoop(u32 a3, u32 a4);                                 // src/leaf/auto_03_800756E0_text_cb.cpp
+void ReleaseDanceAnimation(void* a0);                                  // src/game/small_8007.cpp
+void ReleaseFader(void);                                               // src/leaf/auto_03_801D5D0C_text_cb.cpp
+void ReleaseHUD(void);                                                 // src/leaf/auto_03_80044CDC_text_cb.cpp
+void RemoveAllAttachedParticleEffectAtEmitter(void* a0, u32 a1);       // src/game/small_800Fb.cpp
+void RemoveAllParticles(void);                                         // src/leaf/auto_03_800E75B0_text_cb.cpp
+void RemoveAttachedParticleEffectAtEmitter(void* a0, u32 a1);          // src/game/small_800Fb.cpp
+void RemoveAttachedParticleEffectAtEmitterImmediate(void* a0, u32 a1); // src/game/small_800Fb.cpp
+void RemoveBadge(u32 badge);                                           // src/game/player_api.cpp
+void RemoveCharacterParticleEffect(u32 a3, u32 a4);                    // src/leaf/auto_03_800E75B0_text_cb.cpp
 void RemoveEntityParticleEffect(void* a0, u32 /*0x06*/ a1);  // type 0x3E (from signature table)
 void RemoveLightning(void* a0, u32 a1);  // type 0x42 (from signature table)
-void RemoveMonsterAndItsPartsByIndex(BOOL a0);  // type 0x8C (from signature table)
-void RemovePlayerKeyIngredient(u32 /*0x41*/ a0);  // type 0x154 (from signature table)
-void RemovePlayerMonster(u32 /*0x2D*/ a0);  // type 0x138 (from signature table)
-void RemovePlayerPart(u32 /*0x2C*/ a0);  // type 0x139 (from signature table)
-void RemovePlayerQuestItem(u32 /*0x40*/ a0);  // type 0x160 (from signature table)
-void RemovePlayerQuestReward(u32 /*0x49*/ a0);  // type 0x161 (from signature table)
-void RemovePlayerSecondaryIngredient(u32 /*0x42*/ a0);  // type 0x167 (from signature table)
-void RemoveSpecificAttachedParticleEffectAtEmitter(void* a0, u32 a1, u32 a2);  // type 0x10E (from signature table)
+void RemoveMonsterAndItsPartsByIndex(BOOL index);                      // src/game/player_api.cpp
+void RemovePlayerKeyIngredient(u32 i);                                 // src/game/player_api.cpp
+void RemovePlayerMonster(u32 monster);                                 // src/game/player_api.cpp
+void RemovePlayerPart(u32 part);                                       // src/game/player_api.cpp
+void RemovePlayerQuestItem(u32 item);                                  // src/game/player_api.cpp
+void RemovePlayerQuestReward(u32 r);                                   // src/game/player_api.cpp
+void RemovePlayerSecondaryIngredient(u32 i);                           // src/game/player_api.cpp
+void RemoveSpecificAttachedParticleEffectAtEmitter(void* a0, u32 a1, u32 a2); // src/game/small_800Fc.cpp
 u32 /*0x06*/ RenderObjectZoneUnloadCallback(u32 /*0x08*/ a0, u32 /*0x08*/ a1);  // type 0x7 (from signature table)
-s32 RequestMeleeAttack(u32 /*0x2F*/ a0, f32 a1);  // type 0xCA (from signature table)
-s32 RequestRangedAttack(u32 /*0x2F*/ a0, f32 a1);  // type 0xCA (from signature table)
-void ResetCommentTimer(void);  // type 0x8F (from signature table)
-void ResetSpawnDelay(void);  // type 0x8F (from signature table)
-void ResetSubQuest(u32 /*0x43*/ a0);  // type 0x162 (from signature table)
+s32 RequestMeleeAttack(u32 a3, f32 f1);                                // src/leaf/auto_03_800FB958_text_cb.cpp
+s32 RequestRangedAttack(u32 a3, f32 f1);                               // src/leaf/auto_03_800FB958_text_cb.cpp
+void ResetCommentTimer(void);                                          // src/leaf/auto_03_8006FA44_text_cb.cpp
+void ResetSpawnDelay(void);                                            // src/leaf/auto_03_800E75B0_text_cb.cpp
+void ResetSubQuest(u32 q);                                             // src/game/player_api.cpp
 void RespawnEntity(void* a0);  // type 0x2F (from signature table)
-void RestartExperiment(void);  // type 0x8F (from signature table)
-void RestoreCheckPoint(void);  // type 0x8F (from signature table)
-void RestoreFOV(void);  // type 0x8F (from signature table)
-void ReturnHomeButton(void);  // type 0x8F (from signature table)
-void ReversePlayerDirection(void);  // type 0x8F (from signature table)
-void RewardPlayerChallenge(u32 /*0x4C*/ a0);  // type 0x14E (from signature table)
-void RewardPlayerCombat(void);  // type 0x8F (from signature table)
-void RewardPlayerExperiment(u32 /*0x4D*/ a0, BOOL a1);  // type 0x150 (from signature table)
-void RewardPlayerQuest(u32 /*0x43*/ a0);  // type 0x162 (from signature table)
+void RestartExperiment(void);                                          // src/game/small_8007.cpp
+void RestoreCheckPoint(void);                                          // src/leaf/auto_03_800E75B0_text_cb.cpp
+void RestoreFOV(void);                                                 // src/leaf/auto_03_800E75B0_text_cb.cpp
+void ReturnHomeButton(void);                                           // src/leaf/auto_03_8013F034_text_cb.cpp
+void ReversePlayerDirection(void);                                     // src/game/small_800F.cpp
+void RewardPlayerChallenge(u32 c);                                     // src/game/player_api.cpp
+void RewardPlayerCombat(void);                                         // src/game/player_api.cpp
+void RewardPlayerExperiment(u32 e, BOOL a);                            // src/game/player_api.cpp
+void RewardPlayerQuest(u32 q);                                         // src/game/player_api.cpp
 void RobotEvolutionExperiment_RobotGetUniqueRandomZeroToMax(s32 a0);  // type 0x83 (from signature table)
 void RobotEvolutionExperiment_RobotPlayLoopingAnimSound(ScriptCtx* a0);  // type 0x4E (from signature table)
-void RobotEvolutionExperiment_RobotSetLoopingAnimSound(ScriptCtx* a0, u32 a1, u32 /*0x0C*/ a2);  // type 0x137 (from signature table)
+void RobotEvolutionExperiment_RobotSetLoopingAnimSound(ScriptCtx* a0, u32 a1, u32 a2); // src/game/small_8009c.cpp
 void RotateEntityAroundAxis(u32 a0, f32 a1, f32 a2, f32 a3);  // type 0x77 (from signature table)
-s32 RunIngredientsSelection(void);  // type 0x22 (from signature table)
-void SaveCheckPoint(void);  // type 0x8F (from signature table)
-u32 /*0x06*/ SaveManager_CanContinue(void);  // type 0xA (from signature table)
+s32 RunIngredientsSelection(void);                                     // src/leaf/auto_03_800747DC_text_cb.cpp
+void SaveCheckPoint(void);                                             // src/leaf/auto_03_800E75B0_text_cb.cpp
+u32 SaveManager_CanContinue(void);                                     // src/leaf/auto_03_800FB958_text_cb.cpp
 u32 /*0x06*/ SaveManager_CanLoadGame(void);  // type 0xA (from signature table)
 u32 /*0x06*/ SaveManager_CanSaveGame(void);  // type 0xA (from signature table)
-u32 /*0x06*/ SaveManager_CheckIfSlotEmptyFromTmp(s32 a0);  // type 0x6 (from signature table)
+u32 SaveManager_CheckIfSlotEmptyFromTmp(s32 a3);                       // src/leaf/auto_03_801230DC_text_cb.cpp
 u32 /*0x06*/ SaveManager_DoesProfileNameExist(BOOL a0);  // type 0x8 (from signature table)
 void SaveManager_EraseAllData(void);  // type 0x8F (from signature table)
 void SaveManager_EraseData(s32 a0);  // type 0x83 (from signature table)
 void SaveManager_FreeTmpData(void);  // type 0x8F (from signature table)
-s32 SaveManager_GetContinueSlot(void);  // type 0x22 (from signature table)
-s32 SaveManager_GetCurrentSlot(void);  // type 0x22 (from signature table)
-BOOL SaveManager_GetNumBlocksNeededToBeFreed(void);  // type 0x2E (from signature table)
-BOOL SaveManager_GetPlayerNameFromTmp(s32 a0);  // type 0x28 (from signature table)
-s32 SaveManager_GetPlayerRankFromTmp(s32 a0);  // type 0x1F (from signature table)
-s32 SaveManager_GetPlayerTimeHourFromTmp(s32 a0);  // type 0x1F (from signature table)
-s32 SaveManager_GetPlayerTimeMinFromTmp(s32 a0);  // type 0x1F (from signature table)
+s32 SaveManager_GetContinueSlot(void);                                 // src/leaf/auto_03_800FB958_text_cb.cpp
+s32 SaveManager_GetCurrentSlot(void);                                  // src/leaf/auto_03_800FB958_text_cb.cpp
+ScriptValue SaveManager_GetNumBlocksNeededToBeFreed(void);  // type 0x2E (from signature table)
+BOOL SaveManager_GetPlayerNameFromTmp(s32 a3);                         // src/leaf/auto_03_801230DC_text_cb.cpp
+s32 SaveManager_GetPlayerRankFromTmp(s32 a3);                          // src/leaf/auto_03_801230DC_text_cb.cpp
+s32 SaveManager_GetPlayerTimeHourFromTmp(s32 a3);                      // src/leaf/auto_03_801230DC_text_cb.cpp
+s32 SaveManager_GetPlayerTimeMinFromTmp(s32 a3);                       // src/leaf/auto_03_801230DC_text_cb.cpp
 u32 /*0x06*/ SaveManager_HasEnoughFreeMemory(void);  // type 0xA (from signature table)
 void SaveManager_Init(void);  // type 0x8F (from signature table)
-s32 SaveManager_IsInOverwriteScreen(void);  // type 0x22 (from signature table)
+s32 SaveManager_IsInOverwriteScreen(void);                             // src/leaf/auto_03_800FB958_text_cb.cpp
 u32 /*0x06*/ SaveManager_IsSaveDataCorrupted(void);  // type 0xA (from signature table)
 void SaveManager_LoadData(void);  // type 0x8F (from signature table)
 void SaveManager_LoadDataToTmp(void);  // type 0x8F (from signature table)
@@ -1166,215 +1166,215 @@ void SaveManager_ReturnToMainMenu(void);  // type 0x8F (from signature table)
 void SaveManager_SaveData(void);  // type 0x8F (from signature table)
 void SaveManager_SaveOptions(void);  // type 0x8F (from signature table)
 s32 SaveManager_SelectFirstEmptySlot(void);  // type 0x22 (from signature table)
-void SaveManager_SetContinueSlot(s32 a0);  // type 0x83 (from signature table)
-void SaveManager_SetCurrentSlot(s32 a0);  // type 0x83 (from signature table)
-void SaveManager_SetInOverwriteScreen(u32 /*0x06*/ a0);  // type 0x67 (from signature table)
+void SaveManager_SetContinueSlot(s32 a3);                              // src/leaf/auto_03_800FB958_text_cb.cpp
+void SaveManager_SetCurrentSlot(s32 a3);                               // src/leaf/auto_03_800FB958_text_cb.cpp
+void SaveManager_SetInOverwriteScreen(u32 a3);                         // src/leaf/auto_03_800FB958_text_cb.cpp
 void SaveMonster(void);  // type 0x8F (from signature table)
 void SavedGameMCReceivedCallback(u32 /*0x19*/ a0);  // type 0x56 (from signature table)
-void SavedGameMCSentCallback(u32 /*0x19*/ a0);  // type 0x56 (from signature table)
-void ScreenIsOpen(void);  // type 0x8F (from signature table)
-s32 GetResultRegister(void);  // type 0x22 (from signature table)
+void SavedGameMCSentCallback(u32 a3);                                  // src/leaf/auto_03_80109BE0_text_cb.cpp
+void ScreenIsOpen(void);                                               // src/leaf/auto_03_8013F034_text_cb.cpp
+s32 GetResultRegister(void);                                           // src/leaf/auto_03_801D9028_text_cb.cpp
 void SelectKeyIngredient(void);  // type 0x8F (from signature table)
 void SelectRecipe(void);  // type 0x8F (from signature table)
 void SelectSecondaryIngredient(void);  // type 0x8F (from signature table)
 s32 SelectedIngredientsMadnessTooHigh(void);  // type 0x22 (from signature table)
 s32 SelectedIngredientsValid(void);  // type 0x22 (from signature table)
-BOOL SelectingMonster(void);  // type 0x2E (from signature table)
-void SendChatTargetSignal(u32 /*0x2E*/ a0, u32 a1);  // type 0xF4 (from signature table)
+BOOL SelectingMonster(void);                                           // src/leaf/auto_03_8013F034_text_cb.cpp
+void SendChatTargetSignal(u32 a3, u32 a4);                             // src/leaf/auto_03_800505E0_text_cb.cpp
 void SendConversationSignal(u32 a0);  // type 0x71 (from signature table)
-void SendEntitySignal(void* a0, u32 a1);  // type 0x42 (from signature table)
-void SendEvent(void* a0, void* a1, u32 a2, BOOL a3, BOOL a4);  // type 0x31 (from signature table)
-void SendEventToNISCamera(u32 a0, u32 /*0x06*/ a1);  // type 0x74 (from signature table)
+void SendEntitySignal(void* a3, u32 a4);                               // src/leaf/auto_03_800505E0_text_cb.cpp
+void SendEvent(void* a3, void* a4, u32 a5, BOOL a6, BOOL a7);          // src/leaf/auto_03_800E75B0_text_cb.cpp
+void SendEventToNISCamera(u32 a0, u32 a1);                             // src/game/small_800Fc.cpp
 void SendMatchupRequest(void);  // type 0x8F (from signature table)
-void SendMonsterChangeCancel(void);  // type 0x8F (from signature table)
+void SendMonsterChangeCancel(void);                                    // src/leaf/auto_03_8013F034_text_cb.cpp
 void SendMonsterChangePacket(void);  // type 0x8F (from signature table)
 void SendNISSignal(u32 a0);  // type 0x71 (from signature table)
-void SendPlayerSignal(u32 a0);  // type 0x71 (from signature table)
-void SendQuestSignal(u32 a0);  // type 0x71 (from signature table)
-void SendRematchAccepted(void);  // type 0x8F (from signature table)
+void SendPlayerSignal(u32 a3);                                         // src/leaf/auto_03_800505E0_text_cb.cpp
+void SendQuestSignal(u32 a3);                                          // src/leaf/auto_03_800E75B0_text_cb.cpp
+void SendRematchAccepted(void);                                        // src/leaf/auto_03_8013F034_text_cb.cpp
 void SendRematchDeclined(void);  // type 0x8F (from signature table)
-void SendResponse(void);  // type 0x8F (from signature table)
-void SendSignalCombatExitLocation(void);  // type 0x8F (from signature table)
-void SendSignalToEntity(u32 a0, u32 a1, s32 a2, s32 a3);  // type 0x17B (from signature table)
+void SendResponse(void);                                               // src/game/small_8014.cpp
+void SendSignalCombatExitLocation(void);                               // src/game/small_800Fb.cpp
+void SendSignalToEntity(u32 a0, u32 a1, s32 a2, s32 a3);               // src/game/small_800Ec.cpp
 void SendTimeIsUp(void);  // type 0x8F (from signature table)
-void ServerConnect(void);  // type 0x8F (from signature table)
+void ServerConnect(void);                                              // src/game/small_8013.cpp
 void SetActionSelected(s32 a0);  // type 0x83 (from signature table)
 void SetActiveAction(s32 a0);  // type 0x83 (from signature table)
-void SetAirFriction(u32 /*0x2E*/ a0, f32 a1);  // type 0xF3 (from signature table)
-void SetAirFrictionToDefault(u32 /*0x2E*/ a0);  // type 0xED (from signature table)
-void SetAnimatedCamera(void* a0);  // type 0x2F (from signature table)
-void SetBit(u32 /*0x22*/ a0, s32 a1);  // type 0x16C (from signature table)
+void SetAirFriction(u32 a3, f32 f1);                                   // src/leaf/auto_03_80052504_text_cb.cpp
+void SetAirFrictionToDefault(u32 a3);                                  // src/leaf/auto_03_80052504_text_cb.cpp
+void SetAnimatedCamera(void* a3);                                      // src/leaf/auto_03_800E75B0_text_cb.cpp
+void SetBit(u32 a3, s32 a4);                                           // src/leaf/auto_03_80106AA8_text_cb.cpp
 void SetBook(u32 a0);  // type 0x71 (from signature table)
-void SetCastleAccess(u32 /*0x4F*/ a0, u32 /*0x06*/ a1);  // type 0x14D (from signature table)
-void SetChallengeCursor(void);  // type 0x8F (from signature table)
+void SetCastleAccess(u32 a3, u32 a4);                                  // src/leaf/auto_03_800E75B0_text_cb.cpp
+void SetChallengeCursor(void);                                         // src/leaf/auto_03_800E75B0_text_cb.cpp
 void SetChallengeProjectorsForNIS(void);  // type 0x8F (from signature table)
-void SetCharCollision(u32 /*0x2E*/ a0, s32 a1);  // type 0xF5 (from signature table)
-void SetCharacterPerformanceCap(f32 a0);  // type 0x69 (from signature table)
-void SetCharacterPerformanceCapToDefault(void);  // type 0x8F (from signature table)
-void SetClosingConnection(void);  // type 0x8F (from signature table)
+void SetCharCollision(u32 a3, s32 a4);                                 // src/leaf/auto_03_80052504_text_cb.cpp
+void SetCharacterPerformanceCap(f32 f1);                               // src/leaf/auto_03_800E75B0_text_cb.cpp
+void SetCharacterPerformanceCapToDefault(void);                        // src/leaf/auto_03_800E75B0_text_cb.cpp
+void SetClosingConnection(void);                                       // src/leaf/auto_03_8013F034_text_cb.cpp
 void SetCoffinLanded(void* a0);  // type 0x2F (from signature table)
 void SetCurrentJunctionState(u32 /*0x06*/ a0);  // type 0x67 (from signature table)
-void SetCurrentLocation(u32 /*0x4B*/ a0);  // type 0x159 (from signature table)
+void SetCurrentLocation(u32 loc);                                      // src/game/player_api.cpp
 void SetCurrentMPMonster(void);  // type 0x8F (from signature table)
 void SetCurrentMonster(void);  // type 0x8F (from signature table)
-void SetCurrentTutorialConversation(s32 a0);  // type 0x83 (from signature table)
+void SetCurrentTutorialConversation(s32 a3);                           // src/leaf/auto_03_800FB958_text_cb.cpp
 void SetCursor(s32 id);                                                // src/game/game_ui.cpp
-void SetDefaultExperimentScore(void);  // type 0x8F (from signature table)
-void SetDeflectBullets(u32 /*0x2F*/ a0, s32 a1);  // type 0x125 (from signature table)
-void SetEnableHomeButton(u32 /*0x06*/ a0);  // type 0x67 (from signature table)
-void SetEnableHomeButtonDisableIcon(u32 /*0x06*/ a0);  // type 0x67 (from signature table)
-void SetEnemyIdleTime(void* a0, f32 a1);  // type 0x40 (from signature table)
+void SetDefaultExperimentScore(void);                                  // src/leaf/auto_03_8006FA44_text_cb.cpp
+void SetDeflectBullets(u32 a3, s32 a4);                                // src/leaf/auto_03_800E75B0_text_cb.cpp
+void SetEnableHomeButton(u32 a3);                                      // src/leaf/auto_03_800E75B0_text_cb.cpp
+void SetEnableHomeButtonDisableIcon(u32 a3);                           // src/leaf/auto_03_800E75B0_text_cb.cpp
+void SetEnemyIdleTime(void* a3, f32 f1);                               // src/leaf/auto_03_800E75B0_text_cb.cpp
 void SetEnemyToJunction(void* a0, u32 a1);  // type 0x42 (from signature table)
 void SetEnemyTutorialAction(void);  // type 0x8F (from signature table)
-void SetEntityAI(void* a0, BOOL a1, u32 a2);  // type 0x113 (from signature table)
-void SetEntityAggressive(void* a0, u32 /*0x06*/ a1);  // type 0x3E (from signature table)
+void SetEntityAI(void* a3, BOOL a4, u32 a5);                           // src/leaf/auto_03_800E75B0_text_cb.cpp
+void SetEntityAggressive(void* a3, u32 a4);                            // src/leaf/auto_03_800E75B0_text_cb.cpp
 void SetEntityAsQuestGiver(u32 /*0x2E*/ a0, u32 /*0x06*/ a1);  // type 0xF2 (from signature table)
-void SetEntityCollisionOnOff(void* a0, u32 /*0x06*/ a1);  // type 0x3E (from signature table)
-void SetEntityCollisionOnOffByName(u32 a0, u32 /*0x06*/ a1);  // type 0x74 (from signature table)
+void SetEntityCollisionOnOff(void* a3, u32 a4);                        // src/leaf/auto_03_800E75B0_text_cb.cpp
+void SetEntityCollisionOnOffByName(u32 a3, u32 a4);                    // src/leaf/auto_03_800E75B0_text_cb.cpp
 void SetEntityColor0(void* a0, f32 a1, f32 a2, f32 a3);  // type 0x10A (from signature table)
 void SetEntityFacing(void* a0, f32 a1, f32 a2, u32 /*0x06*/ a3);  // type 0x41 (from signature table)
-void SetEntityHealth(void* a0, f32 a1);  // type 0x40 (from signature table)
-void SetEntityHealthPercent(void* a0, f32 a1);  // type 0x40 (from signature table)
-void SetEntityMaxHealth(void* a0, f32 a1);  // type 0x40 (from signature table)
+void SetEntityHealth(void* a3, f32 f1);                                // src/leaf/auto_03_800E75B0_text_cb.cpp
+void SetEntityHealthPercent(void* a0, f32 a1);                         // src/game/small_800Eb.cpp
+void SetEntityMaxHealth(void* a3, f32 f1);                             // src/leaf/auto_03_800E75B0_text_cb.cpp
 void SetEntityMoveInNIS(void* a0, u32 /*0x06*/ a1);  // type 0x3E (from signature table)
 void SetEntityMovementAI(void* a0, u32 a1, u32 a2);  // type 0x10E (from signature table)
-void SetEntitySpeed(void* a0, f32 a1);  // type 0x40 (from signature table)
+void SetEntitySpeed(void* a3, f32 f1);                                 // src/leaf/auto_03_800E75B0_text_cb.cpp
 void SetEntityVisibility(void* a0, s32 a1);  // type 0x48 (from signature table)
-void SetEntityVisible(u32 a0, u32 /*0x06*/ a1);  // type 0x74 (from signature table)
-void SetErrorType(BOOL a0);  // type 0x8C (from signature table)
+void SetEntityVisible(u32 a3, u32 a4);                                 // src/leaf/auto_03_800E75B0_text_cb.cpp
+void SetErrorType(BOOL a3);                                            // src/leaf/auto_03_8013F034_text_cb.cpp
 void SetFinalChallengeScore(void);  // type 0x8F (from signature table)
 void SetFinalExperimentScore(s32 a0);  // type 0x83 (from signature table)
 void SetFixedCamera(u32 a0, u32 a1, f32 a2);  // type 0x7B (from signature table)
-void SetFleeGoal(u32 /*0x2F*/ a0, f32 a1, f32 a2);  // type 0x121 (from signature table)
-void SetFloat(u32 /*0x24*/ a0, f32 a1);  // type 0x16E (from signature table)
-void SetFlying(u32 /*0x2F*/ a0, s32 a1);  // type 0x125 (from signature table)
-void SetFreezePlayer(u32 /*0x06*/ a0);  // type 0x67 (from signature table)
-void SetGameProgressBitFlag(u32 /*0x50*/ a0, u32 /*0x06*/ a1);  // type 0x152 (from signature table)
-void SetGameProgressMarker(BOOL a0);  // type 0x8C (from signature table)
-void SetGoal(u32 /*0x2F*/ a0, u32 a1, f32 a2);  // type 0x123 (from signature table)
-void SetGoalWithTarget(u32 /*0x2F*/ a0, void* a1, u32 a2, f32 a3);  // type 0x11C (from signature table)
-void SetGroundFriction(u32 /*0x2E*/ a0, f32 a1);  // type 0xF3 (from signature table)
-void SetGroundFrictionToDefault(u32 /*0x2E*/ a0);  // type 0xED (from signature table)
-void SetGroupSize(u32 /*0x34*/ a0, s32 a1);  // type 0x130 (from signature table)
-void SetGuardGoal(u32 /*0x2F*/ a0, void* a1, f32 a2, f32 a3);  // type 0x11B (from signature table)
-void SetHazardAttackTime(void* a0, f32 a1);  // type 0x40 (from signature table)
-void SetHazardIdleTime(void* a0, f32 a1);  // type 0x40 (from signature table)
+void SetFleeGoal(u32 a3, f32 f1, f32 f2);                              // src/leaf/auto_03_800FB958_text_cb.cpp
+void SetFloat(u32 a3, f32 f1);                                         // src/leaf/auto_03_80106AA8_text_cb.cpp
+void SetFlying(u32 a3, s32 a4);                                        // src/leaf/auto_03_800E75B0_text_cb.cpp
+void SetFreezePlayer(u32 a0);                                          // src/game/small_800Fc.cpp
+void SetGameProgressBitFlag(u32 flag, u32 on);                         // src/game/player_api.cpp
+void SetGameProgressMarker(BOOL a3);                                   // src/leaf/auto_03_8020F8E0_text_cb.cpp
+void SetGoal(u32 a3, u32 a4, f32 f1);                                  // src/leaf/auto_03_800FB958_text_cb.cpp
+void SetGoalWithTarget(u32 a3, void* a4, u32 a5, f32 f1);              // src/leaf/auto_03_800FB958_text_cb.cpp
+void SetGroundFriction(u32 a3, f32 f1);                                // src/leaf/auto_03_80052504_text_cb.cpp
+void SetGroundFrictionToDefault(u32 a3);                               // src/leaf/auto_03_80052504_text_cb.cpp
+void SetGroupSize(u32 a3, s32 a4);                                     // src/leaf/auto_03_800FB958_text_cb.cpp
+void SetGuardGoal(u32 a3, void* a4, f32 f1, f32 f2);                   // src/leaf/auto_03_800FB958_text_cb.cpp
+void SetHazardAttackTime(void* a3, f32 f1);                            // src/leaf/auto_03_800E75B0_text_cb.cpp
+void SetHazardIdleTime(void* a3, f32 f1);                              // src/leaf/auto_03_800E75B0_text_cb.cpp
 void SetHitBoxes(BOOL a0);  // type 0x8C (from signature table)
-void SetHomeButtonGone(void);  // type 0x8F (from signature table)
-void SetInBasicTutorialFlag(void);  // type 0x8F (from signature table)
-void SetInTargetedPartTutorial(void);  // type 0x8F (from signature table)
+void SetHomeButtonGone(void);                                          // src/leaf/auto_03_8013F034_text_cb.cpp
+void SetInBasicTutorialFlag(void);                                     // src/leaf/auto_03_800FB958_text_cb.cpp
+void SetInTargetedPartTutorial(void);                                  // src/leaf/auto_03_80044CDC_text_cb.cpp
 void SetInstructionsHeaderString(void);  // type 0x8F (from signature table)
-void SetInt(u32 /*0x23*/ a0, s32 a1);  // type 0x170 (from signature table)
-void SetInterlabLink(BOOL a0);  // type 0x8C (from signature table)
-void SetInviteTimeout(void);  // type 0x8F (from signature table)
-void SetJunctionSpriteVisible(u32 a0, u32 a1, u32 /*0x06*/ a2);  // type 0x174 (from signature table)
+void SetInt(u32 a3, s32 a4);                                           // src/leaf/auto_03_80106AA8_text_cb.cpp
+void SetInterlabLink(BOOL a3);                                         // src/leaf/auto_03_8013F034_text_cb.cpp
+void SetInviteTimeout(void);                                           // src/leaf/auto_03_8013F034_text_cb.cpp
+void SetJunctionSpriteVisible(u32 a3, u32 a4, u32 a5);                 // src/leaf/auto_03_800E75B0_text_cb.cpp
 void SetJunctionState(u32 a0, u32 /*0x06*/ a1);  // type 0x74 (from signature table)
 void SetJunctionText(u32 a0, u32 /*0x11*/ a1);  // type 0x73 (from signature table)
 void SetKnockbackSpeed(u32 /*0x2E*/ a0, f32 a1);  // type 0xF3 (from signature table)
-void SetLocalStringTable(void);  // type 0x8F (from signature table)
-void SetMPSection(u32 a0);  // type 0x71 (from signature table)
-void SetMinimumDamage(u32 /*0x2E*/ a0, f32 a1);  // type 0xF3 (from signature table)
-void SetMinimumHitstun(u32 /*0x2E*/ a0, s32 a1);  // type 0xF5 (from signature table)
-void SetMinimumKnockbackVel(u32 /*0x2E*/ a0, f32 a1);  // type 0xF3 (from signature table)
-void SetMonsterInventoryPos(s32 a0);  // type 0x83 (from signature table)
-void SetMonsterSelected(s32 a0);  // type 0x83 (from signature table)
-void SetMyMonsterAttack(f32 a0);  // type 0x69 (from signature table)
-void SetMyMonsterDefense(f32 a0);  // type 0x69 (from signature table)
-void SetMyMonsterEnergy(f32 a0);  // type 0x69 (from signature table)
-void SetMyMonsterHitpoints(f32 a0);  // type 0x69 (from signature table)
+void SetLocalStringTable(void);                                        // src/game/small_8005.cpp
+void SetMPSection(u32 a3);                                             // src/leaf/auto_03_8013F034_text_cb.cpp
+void SetMinimumDamage(u32 a3, f32 f1);                                 // src/leaf/auto_03_80052504_text_cb.cpp
+void SetMinimumHitstun(u32 a3, s32 a4);                                // src/leaf/auto_03_80052504_text_cb.cpp
+void SetMinimumKnockbackVel(u32 a3, f32 f1);                           // src/leaf/auto_03_80052504_text_cb.cpp
+void SetMonsterInventoryPos(s32 a3);                                   // src/leaf/auto_03_8001B20C_text_cb.cpp
+void SetMonsterSelected(s32 a3);                                       // src/leaf/auto_03_8001B20C_text_cb.cpp
+void SetMyMonsterAttack(f32 f1);                                       // src/leaf/auto_03_8013E4D0_text_cb.cpp
+void SetMyMonsterDefense(f32 f1);                                      // src/leaf/auto_03_8013E4D0_text_cb.cpp
+void SetMyMonsterEnergy(f32 f1);                                       // src/leaf/auto_03_8013E4D0_text_cb.cpp
+void SetMyMonsterHitpoints(f32 f1);                                    // src/leaf/auto_03_8013E4D0_text_cb.cpp
 void SetMyMonsterName(BOOL a0);  // type 0x8C (from signature table)
-void SetNPCDefaultAnimation(u32 a0);  // type 0x71 (from signature table)
-void SetNameScreen(u32 /*0x06*/ a0);  // type 0x67 (from signature table)
+void SetNPCDefaultAnimation(u32 a3);                                   // src/leaf/auto_03_800505E0_text_cb.cpp
+void SetNameScreen(u32 a3);                                            // src/leaf/auto_03_8001B20C_text_cb.cpp
 void SetNextCombatType(u32 a0);  // type 0x71 (from signature table)
 void SetNextExperiment(u32 a0);  // type 0x71 (from signature table)
-void SetNextExperimentDifficulty(s32 a0);  // type 0x83 (from signature table)
-void SetNextLocation(u32 /*0x4B*/ a0);  // type 0x159 (from signature table)
-void SetNextQuestLocationString(u32 a0);  // type 0x71 (from signature table)
-void SetNextRegion(u32 /*0x4A*/ a0);  // type 0x165 (from signature table)
-void SetNodeHighlightVisible(u32 a0, u32 /*0x06*/ a1);  // type 0x74 (from signature table)
+void SetNextExperimentDifficulty(s32 a3);                              // src/leaf/auto_03_800747DC_text_cb.cpp
+void SetNextLocation(u32 loc);                                         // src/game/player_api.cpp
+void SetNextQuestLocationString(u32 text);                             // src/game/player_api.cpp
+void SetNextRegion(u32 r);                                             // src/game/player_api.cpp
+void SetNodeHighlightVisible(u32 a3, u32 a4);                          // src/leaf/auto_03_800E75B0_text_cb.cpp
 void SetNormalCamera(void);  // type 0x8F (from signature table)
 void SetOptionsBrightness(BOOL a0);  // type 0x8C (from signature table)
 void SetOptionsBrightnessTmp(BOOL a0);  // type 0x8C (from signature table)
 void SetOptionsMusicVolume(BOOL a0);  // type 0x8C (from signature table)
 void SetOptionsMusicVolumeTmp(BOOL a0);  // type 0x8C (from signature table)
-void SetOptionsRumble(u32 /*0x06*/ a0);  // type 0x67 (from signature table)
+void SetOptionsRumble(u32 a3);                                         // src/leaf/auto_03_800E75B0_text_cb.cpp
 void SetOptionsSfxVolume(BOOL a0);  // type 0x8C (from signature table)
 void SetOptionsSfxVolumeTmp(BOOL a0);  // type 0x8C (from signature table)
 void SetOptionsVoiceVolume(BOOL a0);  // type 0x8C (from signature table)
 void SetOptionsVoiceVolumeTmp(BOOL a0);  // type 0x8C (from signature table)
-BOOL SetPartSelected(s32 a0);  // type 0x83 (from signature table)
-void SetPerformFieldRepair(s32 a0);  // type 0x83 (from signature table)
-void SetPersistentGoal(u32 /*0x2F*/ a0, u32 a1, f32 a2);  // type 0x123 (from signature table)
-void SetPersistentGoalWithTarget(u32 /*0x2F*/ a0, void* a1, u32 a2, f32 a3);  // type 0x11C (from signature table)
+BOOL SetPartSelected(s32 slot);                                        // src/game/combat_hud.cpp
+void SetPerformFieldRepair(s32 a0);                                    // src/game/small_800Fc.cpp
+void SetPersistentGoal(u32 a3, u32 a4, f32 f1);                        // src/leaf/auto_03_800FB958_text_cb.cpp
+void SetPersistentGoalWithTarget(u32 a3, void* a4, u32 a5, f32 f1);    // src/leaf/auto_03_800FB958_text_cb.cpp
 void SetPersistentWaypointGoal(u32 /*0x2F*/ a0, u32 /*0x17*/ a1, f32 a2);  // type 0x11F (from signature table)
 void SetPlayerAvatarRenderFlag(u32 /*0x06*/ a0);  // type 0x67 (from signature table)
-void SetPlayerBaseSpeed(f32 a0);  // type 0x69 (from signature table)
-void SetPlayerCollisionEnabled(u32 /*0x06*/ a0);  // type 0x67 (from signature table)
-void SetPlayerConfused(u32 /*0x06*/ a0);  // type 0x67 (from signature table)
-void SetPlayerMovementAI(BOOL a0, u32 a1);  // type 0x185 (from signature table)
-void SetPlayerPathRunMode(u32 /*0x06*/ a0);  // type 0x67 (from signature table)
-void SetPlayerRankAccordingToQuestTable(u32 /*0x43*/ a0);  // type 0x162 (from signature table)
-void SetPropCollision(u32 /*0x2E*/ a0, s32 a1);  // type 0xF5 (from signature table)
-BOOL SetPropState(u32 /*0x31*/ a0, BOOL a1, u32 /*0x06*/ a2);  // type 0xE0 (from signature table)
-void SetQuestDescriptionString(u32 a0);  // type 0x71 (from signature table)
-void SetQuestFlag(u32 /*0x43*/ a0, BOOL a1, s32 a2);  // type 0x164 (from signature table)
-void SetQuestGiverIcon(u32 a0);  // type 0x71 (from signature table)
-void SetQuestInt(u32 /*0x43*/ a0, s32 a1);  // type 0x163 (from signature table)
-void SetQuestJunctionInterrupt(u32 /*0x06*/ a0);  // type 0x67 (from signature table)
-void SetQuestLevel(u32 /*0x43*/ a0, s32 a1);  // type 0x163 (from signature table)
-void SetQuitPauseGame(void);  // type 0x8F (from signature table)
-void SetRegionComplete(u32 /*0x4A*/ a0);  // type 0x165 (from signature table)
-void SetRegionReached(u32 /*0x4A*/ a0, u32 /*0x06*/ a1);  // type 0x166 (from signature table)
-void SetRenderObjectAttachPoint(u32 /*0x2F*/ a0, u32 /*0x30*/ a1);  // type 0x115 (from signature table)
-void SetResponse(u32 a0);  // type 0x71 (from signature table)
-void SetRival(u32 /*0x2F*/ a0, u32 a1, s32 a2);  // type 0x124 (from signature table)
-void SetSawInput(s32 a0);  // type 0x83 (from signature table)
-void SetSection(u32 a0);  // type 0x71 (from signature table)
-void SetSpawnPriority(u32 /*0x2E*/ a0, BOOL a1);  // type 0xF6 (from signature table)
-void SetSpecialGameEvent(u32 /*0x06*/ a0);  // type 0x67 (from signature table)
-void SetStoredTextForIngredientSelection(u32 /*0x11*/ a0);  // type 0x65 (from signature table)
-void SetSuccessExperimentScore(void);  // type 0x8F (from signature table)
-void SetTappingObjectSFX(u32 a0, u32 a1);  // type 0x7A (from signature table)
-void SetTappingObjectSFXByThis(void* a0, u32 a1);  // type 0x42 (from signature table)
-void SetTappingObjectSpriteEffect(u32 a0, u32 a1);  // type 0x7A (from signature table)
-void SetTappingObjectSpriteEffectByThis(void* a0, u32 a1);  // type 0x42 (from signature table)
-void SetTimeoutFromProperty(u32 /*0x34*/ a0, u32 a1);  // type 0x12F (from signature table)
-void SetTurningRate(u32 /*0x2F*/ a0, f32 a1);  // type 0x120 (from signature table)
-void SetTwoBitsOfQuestInt(u32 /*0x43*/ a0, BOOL a1, s32 a2);  // type 0x164 (from signature table)
+void SetPlayerBaseSpeed(f32 f1);                                       // src/leaf/auto_03_800E75B0_text_cb.cpp
+void SetPlayerCollisionEnabled(u32 a3);                                // src/leaf/auto_03_800E75B0_text_cb.cpp
+void SetPlayerConfused(u32 a0);                                        // src/game/small_800F.cpp
+void SetPlayerMovementAI(BOOL a3, u32 a4);                             // src/leaf/auto_03_800E75B0_text_cb.cpp
+void SetPlayerPathRunMode(u32 a3);                                     // src/leaf/auto_03_800E75B0_text_cb.cpp
+void SetPlayerRankAccordingToQuestTable(u32 q);                        // src/game/player_api.cpp
+void SetPropCollision(u32 a3, s32 a4);                                 // src/leaf/auto_03_80052504_text_cb.cpp
+ScriptValue SetPropState(u32 /*0x31*/ a0, BOOL a1, u32 /*0x06*/ a2);  // type 0xE0 (from signature table)
+void SetQuestDescriptionString(u32 text);                              // src/game/player_api.cpp
+void SetQuestFlag(u32 quest, BOOL flag, s32 value);                    // src/game/player_api.cpp
+void SetQuestGiverIcon(u32 a3);                                        // src/leaf/auto_03_8020F8E0_text_cb.cpp
+void SetQuestInt(u32 q, s32 v);                                        // src/game/player_api.cpp
+void SetQuestJunctionInterrupt(u32 v);                                 // src/game/player_api.cpp
+void SetQuestLevel(u32 quest, s32 level);                              // src/game/player_api.cpp
+void SetQuitPauseGame(void);                                           // src/leaf/auto_03_80021594_text_cb.cpp
+void SetRegionComplete(u32 a3);                                        // src/leaf/auto_03_8020F8E0_text_cb.cpp
+void SetRegionReached(u32 region, u32 reached);                        // src/game/player_api.cpp
+void SetRenderObjectAttachPoint(u32 a3, u32 a4);                       // src/leaf/auto_03_800FB958_text_cb.cpp
+void SetResponse(u32 a3);                                              // src/leaf/auto_03_8013F034_text_cb.cpp
+void SetRival(u32 a3, u32 a4, s32 a5);                                 // src/leaf/auto_03_800FB958_text_cb.cpp
+void SetSawInput(s32 a3);                                              // src/leaf/auto_03_8009F66C_text_cb.cpp
+void SetSection(u32 a0);                                               // src/game/small_8011.cpp
+void SetSpawnPriority(u32 a3, BOOL a4);                                // src/leaf/auto_03_800E75B0_text_cb.cpp
+void SetSpecialGameEvent(u32 a3);                                      // src/leaf/auto_03_800E75B0_text_cb.cpp
+void SetStoredTextForIngredientSelection(u32 a3);                      // src/leaf/auto_03_8010FDA4_text_cb.cpp
+void SetSuccessExperimentScore(void);                                  // src/game/small_8007.cpp
+void SetTappingObjectSFX(u32 a3, u32 a4);                              // src/leaf/auto_03_800E75B0_text_cb.cpp
+void SetTappingObjectSFXByThis(void* a3, u32 a4);                      // src/leaf/auto_03_800E75B0_text_cb.cpp
+void SetTappingObjectSpriteEffect(u32 a3, u32 a4);                     // src/leaf/auto_03_800E75B0_text_cb.cpp
+void SetTappingObjectSpriteEffectByThis(void* a3, u32 a4);             // src/leaf/auto_03_800E75B0_text_cb.cpp
+void SetTimeoutFromProperty(u32 a3, u32 a4);                           // src/leaf/auto_03_800FB958_text_cb.cpp
+void SetTurningRate(u32 a3, f32 f1);                                   // src/leaf/auto_03_800FB958_text_cb.cpp
+void SetTwoBitsOfQuestInt(u32 q, BOOL which, s32 v);                   // src/game/player_api.cpp
 void SetUpCombatResultsScreen(void);  // type 0x8F (from signature table)
 void SetUpCombatRewardsScreen(void);  // type 0x8F (from signature table)
-void SetVelocity(u32 /*0x2F*/ a0, f32 a1, f32 a2);  // type 0x121 (from signature table)
-void SetVerticalSlice(u32 /*0x06*/ a0);  // type 0x67 (from signature table)
+void SetVelocity(u32 a3, f32 f1, f32 f2);                              // src/leaf/auto_03_800FB958_text_cb.cpp
+void SetVerticalSlice(u32 on);                                         // src/game/player_api.cpp
 void SetWaypointGoal(u32 /*0x2F*/ a0, u32 /*0x17*/ a1, f32 a2);  // type 0x11F (from signature table)
-void SetWiiSelectorActive(u32 /*0x06*/ a0);  // type 0x67 (from signature table)
-void SetWiiSelectorPaused(u32 /*0x06*/ a0);  // type 0x67 (from signature table)
+void SetWiiSelectorActive(u32 a3);                                     // src/leaf/auto_03_800E75B0_text_cb.cpp
+void SetWiiSelectorPaused(u32 a3);                                     // src/leaf/auto_03_800E75B0_text_cb.cpp
 void SetWorldRender(s32 quit);                                         // src/game/game_ui.cpp
 void SetupChallengeProjector(void* a0, u32 a1, u32 a2);  // type 0x10E (from signature table)
 void SetupFieldRepairHealthPoints(void);  // type 0x8F (from signature table)
-void SetupGame(void);  // type 0x8F (from signature table)
+void SetupGame(void);                                                  // src/game/small_800Fc.cpp
 void SetupSplashScreen(u32 a0, BOOL a1);  // type 0x81 (from signature table)
 void SetupVictoryScreenShot(s32 a0);  // type 0x83 (from signature table)
-s32 ShouldShowExperimentFailureMovie(void);  // type 0x22 (from signature table)
-BOOL ShouldWeLeaveCombat(void);  // type 0x2E (from signature table)
-void ShowAlertBox(u32 a0);  // type 0x71 (from signature table)
+s32 ShouldShowExperimentFailureMovie(void);                            // src/leaf/auto_03_8006FA44_text_cb.cpp
+ScriptValue ShouldWeLeaveCombat(void);  // type 0x2E (from signature table)
+void ShowAlertBox(u32 hash);                                           // src/system/alert.cpp
 void ShowCursor(s32 id);                                               // src/game/game_ui.cpp
 void ShowInstructionScreen(u32 /*0x11*/ a0, u32 /*0x11*/ a1, BOOL a2, u32 /*0x06*/ a3);  // type 0x149 (from signature table)
-void ShowMessageBox(u32 a0, u32 a1, u32 a2, u32 a3);  // type 0x176 (from signature table)
+void ShowMessageBox(u32 a3, u32 a4, u32 a5, u32 a6);                   // src/leaf/auto_03_800E75B0_text_cb.cpp
 void ShowNextRewardItem(void);  // type 0x8F (from signature table)
-void ShowQuestCompleteEvent(u32 /*0x43*/ a0);  // type 0x162 (from signature table)
+void ShowQuestCompleteEvent(u32 a3);                                   // src/leaf/auto_03_800E75B0_text_cb.cpp
 void ShowScreen(u32 a0);  // type 0x71 (from signature table)
 void ShowSelectionHUD(void);  // type 0x8F (from signature table)
 void ShowSplashScreen(BOOL a0);  // type 0x8C (from signature table)
-void SimpleProjectile(u32 /*0x2F*/ a0, u32 /*0x38*/ a1);  // type 0x119 (from signature table)
-void SkipFrameRender(s32 a0);  // type 0x83 (from signature table)
+void SimpleProjectile(u32 a3, u32 a4);                                 // src/leaf/auto_03_800FB958_text_cb.cpp
+void SkipFrameRender(s32 a3);                                          // src/leaf/auto_03_800E75B0_text_cb.cpp
 void Slider_SetImage(u32 a0);  // type 0x71 (from signature table)
 void Slider_SetTopAndBottom(u32 a0, u32 a1);  // type 0x7A (from signature table)
 void SpawnAttachedParticleAtChild(void* a0, u32 /*0x30*/ a1, u32 a2);  // type 0xFE (from signature table)
 void SpawnCoffinProjectile(void);  // type 0x8F (from signature table)
 void SpawnDatabaseMonsterAtNode(void* a0, u32 /*0x44*/ a1, u32 a2, s32 a3, s32 a4);  // type 0x108 (from signature table)
-void SpawnDatabaseMonsterAtNodeGroup(u32 a0, u32 /*0x44*/ a1, s32 a2, s32 a3, s32 a4);  // type 0x171 (from signature table)
+void SpawnDatabaseMonsterAtNodeGroup(u32 a3, u32 a4, s32 a5, s32 a6, s32 a7); // src/leaf/auto_03_800E75B0_text_cb.cpp
 u32 SpawnDatabseMonsterAtNodeGroup(void* a0, u32 /*0x44*/ a1, s32 a2, s32 a3, s32 a4);  // type 0xBC (from signature table)
-void SpawnEntity(void* a0);  // type 0x2F (from signature table)
+void SpawnEntity(void* a0);                                            // src/game/small_800Eb.cpp
 void SpawnLightningBetweenChildren(void* a0, u32 /*0x30*/ a1, u32 /*0x30*/ a2, f32 a3, u32 a4, u32 a5);  // type 0xF9 (from signature table)
 void SpawnLightningBetweenNodes(u32 /*0x17*/ a0, u32 /*0x17*/ a1, f32 a2, u32 a3);  // type 0x143 (from signature table)
 void SpawnLightningFromChildToNode(void* a0, u32 /*0x30*/ a1, u32 /*0x17*/ a2, f32 a3, u32 a4, u32 a5);  // type 0xFC (from signature table)
@@ -1383,119 +1383,119 @@ void SpawnOneParticleAtChild(void* a0, u32 /*0x30*/ a1, u32 a2, s32 a3);  // typ
 void SpawnParticleAtChild(void* a0, u32 /*0x30*/ a1, u32 a2);  // type 0xFE (from signature table)
 void SpawnParticleAtJunction(u32 a0, u32 a1);  // type 0x7A (from signature table)
 void SpawnParticleAtLocator(u32 a0, u32 a1);  // type 0x7A (from signature table)
-void SpawnParticleOnBone(void* a0, u32 a1, s32 a2);  // type 0x46 (from signature table)
+void SpawnParticleOnBone(void* a0, u32 a1, s32 a2);                    // src/game/small_800Ec.cpp
 void SpawnParticleOnSkeleton(void* a0, u32 a1);  // type 0x42 (from signature table)
 void SpawnPooledEntityAt(u32 a0, u32 /*0x17*/ a1);  // type 0x72 (from signature table)
-void SpawnProjectile(void* a0, u32 /*0x38*/ a1);  // type 0x102 (from signature table)
+void SpawnProjectile(void* a0, u32 a1);                                // src/game/small_800Fc.cpp
 void SpawnProjectileAtChild(void* a0, u32 /*0x30*/ a1, u32 /*0x38*/ a2, u32 a3);  // type 0xFB (from signature table)
-void SpawnProjectileAtLocationAndFireAtTarget(u32 a0, s32 a1, s32 a2, u32 a3, s32 a4, s32 a5);  // type 0x17C (from signature table)
+void SpawnProjectileAtLocationAndFireAtTarget(u32 a3, s32 a4, s32 a5, u32 a6, s32 a7, s32 a8); // src/leaf/auto_03_800E75B0_text_cb.cpp
 void SpawnRandomLightningBetweenNodes(u32 /*0x17*/ a0, u32 /*0x17*/ a1, f32 a2, f32 a3, f32 a4, u32 a5);  // type 0x142 (from signature table)
 void SpawnRandomMonsterAtNode(void* a0, u32 /*0x45*/ a1, u32 a2, s32 a3, s32 a4);  // type 0x109 (from signature table)
 u32 SpawnRandomMonsterAtNodeGroup(void* a0, u32 /*0x45*/ a1, s32 a2, s32 a3, s32 a4);  // type 0xBD (from signature table)
-void SpecialAlertBoxGone(void);  // type 0x8F (from signature table)
+void SpecialAlertBoxGone(void);                                        // src/leaf/auto_03_801420EC_text_cb.cpp
 void SpeedUpNISCameraAnimation(void);  // type 0x8F (from signature table)
-s32 SpiritDrumsLeftDrumFocus(void);  // type 0x22 (from signature table)
-s32 SpiritDrumsLeftGongFocus(void);  // type 0x22 (from signature table)
-s32 SpiritDrumsRightDrumFocus(void);  // type 0x22 (from signature table)
-s32 SpiritDrumsRightGongFocus(void);  // type 0x22 (from signature table)
+s32 SpiritDrumsLeftDrumFocus(void);                                    // src/leaf/auto_03_800756E0_text_cb.cpp
+s32 SpiritDrumsLeftGongFocus(void);                                    // src/leaf/auto_03_800756E0_text_cb.cpp
+s32 SpiritDrumsRightDrumFocus(void);                                   // src/leaf/auto_03_800756E0_text_cb.cpp
+s32 SpiritDrumsRightGongFocus(void);                                   // src/leaf/auto_03_800756E0_text_cb.cpp
 void StartChallenge(u32 a0);  // type 0x71 (from signature table)
-void StartCombatConversationID(u32 a0, s32 a1);  // type 0x7E (from signature table)
+void StartCombatConversationID(u32 a3, s32 a4);                        // src/leaf/auto_03_800505E0_text_cb.cpp
 void StartConversationID(u32 a0);  // type 0x71 (from signature table)
-void StartEngine(u32 a0, u32 a1, u32 a2);  // type 0x175 (from signature table)
-void StartExperimentLoadingMusic(void);  // type 0x8F (from signature table)
-void StartHazardEffect(void* a0, u32 a1);  // type 0x42 (from signature table)
-void StartIngredientsSelection(u32 /*0x4D*/ a0);  // type 0x14F (from signature table)
+void StartEngine(u32 a3, u32 a4, u32 a5);                              // src/leaf/auto_03_800E75B0_text_cb.cpp
+void StartExperimentLoadingMusic(void);                                // src/game/small_8007.cpp
+void StartHazardEffect(void* a3, u32 a4);                              // src/leaf/auto_03_800E75B0_text_cb.cpp
+void StartIngredientsSelection(u32 a3);                                // src/leaf/auto_03_8010FDA4_text_cb.cpp
 void StartLaser(void* a0, s32 a1, u32 /*0x30*/ a2, u32 a3);  // type 0x111 (from signature table)
-void StartLobbyCallback(void);  // type 0x8F (from signature table)
+void StartLobbyCallback(void);                                         // src/leaf/auto_03_80109BE0_text_cb.cpp
 void StartNISFSM(u32 a0);  // type 0x71 (from signature table)
 void StartPrimaryAuxEffect(u32 a0);  // type 0x71 (from signature table)
-void StartQuest(u32 a0, u32 /*0x43*/ a1);  // type 0x172 (from signature table)
+void StartQuest(u32 a0, u32 a1);                                       // src/game/small_800Fc.cpp
 void StartQuestTimer(s32 a0, u32 /*0x06*/ a1);  // type 0x180 (from signature table)
 void StartSecondaryAuxEffect(u32 a0);  // type 0x71 (from signature table)
-void StartSubQuest(u32 /*0x43*/ a0);  // type 0x162 (from signature table)
-BOOL StartTest(void);  // type 0x2E (from signature table)
+void StartSubQuest(u32 q);                                             // src/game/player_api.cpp
+BOOL StartTest(void);                                                  // src/leaf/auto_03_80142E94_text_cb.cpp
 void StartWiiInputGame(void);  // type 0x8F (from signature table)
-s32 StateFinished(void);  // type 0x22 (from signature table)
-void Statistics_ExperimentPageDown(void);  // type 0x8F (from signature table)
-void Statistics_ExperimentPageUp(void);  // type 0x8F (from signature table)
-BOOL Statistics_GetBattlesLost(void);  // type 0x2E (from signature table)
-BOOL Statistics_GetBattlesWon(void);  // type 0x2E (from signature table)
-BOOL Statistics_GetDisplayChallengeStats(void);  // type 0x2E (from signature table)
-BOOL Statistics_GetDisplayCombatStats(void);  // type 0x2E (from signature table)
-BOOL Statistics_GetDisplayExperimentStats(void);  // type 0x2E (from signature table)
-BOOL Statistics_GetDisplayScientistStats(void);  // type 0x2E (from signature table)
-BOOL Statistics_GetExperimentFailure(void);  // type 0x2E (from signature table)
-BOOL Statistics_GetExperimentPage1(void);  // type 0x2E (from signature table)
-BOOL Statistics_GetExperimentSuccess(void);  // type 0x2E (from signature table)
-BOOL Statistics_GetMonsterMadness(void);  // type 0x2E (from signature table)
-BOOL Statistics_GetMonstersBuilt(void);  // type 0x2E (from signature table)
-BOOL Statistics_GetMonstersGoneMad(void);  // type 0x2E (from signature table)
-BOOL Statistics_GetPartMadness(void);  // type 0x2E (from signature table)
-BOOL Statistics_GetPlayerMSP(void);  // type 0x2E (from signature table)
-BOOL Statistics_GetPlayerNextMSP(void);  // type 0x2E (from signature table)
-BOOL Statistics_GetPlayerRank(void);  // type 0x2E (from signature table)
+s32 StateFinished(void);                                               // src/leaf/auto_03_800E75B0_text_cb.cpp
+void Statistics_ExperimentPageDown(void);                              // src/game/lab_books_d.cpp
+void Statistics_ExperimentPageUp(void);                                // src/game/lab_books_d.cpp
+BOOL Statistics_GetBattlesLost(void);                                  // src/game/lab_books_stats.cpp
+BOOL Statistics_GetBattlesWon(void);                                   // src/game/lab_books_stats.cpp
+BOOL Statistics_GetDisplayChallengeStats(void);                        // src/game/lab_books_stats.cpp
+BOOL Statistics_GetDisplayCombatStats(void);                           // src/game/lab_books_stats.cpp
+BOOL Statistics_GetDisplayExperimentStats(void);                       // src/game/lab_books_stats.cpp
+BOOL Statistics_GetDisplayScientistStats(void);                        // src/game/lab_books_stats.cpp
+BOOL Statistics_GetExperimentFailure(void);                            // src/game/lab_books_stats.cpp
+BOOL Statistics_GetExperimentPage1(void);                              // src/game/lab_books_stats.cpp
+BOOL Statistics_GetExperimentSuccess(void);                            // src/game/lab_books_stats.cpp
+BOOL Statistics_GetMonsterMadness(void);                               // src/game/lab_books_stats.cpp
+BOOL Statistics_GetMonstersBuilt(void);                                // src/game/lab_books_stats.cpp
+BOOL Statistics_GetMonstersGoneMad(void);                              // src/game/lab_books_stats.cpp
+BOOL Statistics_GetPartMadness(void);                                  // src/game/lab_books_stats.cpp
+BOOL Statistics_GetPlayerMSP(void);                                    // src/game/lab_books_stats.cpp
+BOOL Statistics_GetPlayerNextMSP(void);                                // src/game/lab_books_stats.cpp
+BOOL Statistics_GetPlayerRank(void);                                   // src/game/lab_books_stats.cpp
 void Statistics_IncDisplay(s32 a0);  // type 0x83 (from signature table)
-void Statistics_SetupChallengeBestTimes(void);  // type 0x8F (from signature table)
-void Statistics_SetupExperimentHighScores(void);  // type 0x8F (from signature table)
-void Statistics_SetupExperimentSlider(void);  // type 0x8F (from signature table)
-void Statistics_SetupRegionCombatMSP(void);  // type 0x8F (from signature table)
-void Stitching_Bug_PositionToHide(void* a0);  // type 0x2F (from signature table)
-void Stitching_Bug_StartBugMoving(void* a0);  // type 0x2F (from signature table)
+void Statistics_SetupChallengeBestTimes(void);                         // src/game/lab_books_stats.cpp
+void Statistics_SetupExperimentHighScores(void);                       // src/game/lab_books_stats.cpp
+void Statistics_SetupExperimentSlider(void);                           // src/game/lab_books_d.cpp
+void Statistics_SetupRegionCombatMSP(void);                            // src/game/lab_books_stats.cpp
+void Stitching_Bug_PositionToHide(void* a3);                           // src/leaf/auto_03_800C5F84_text_cb.cpp
+void Stitching_Bug_StartBugMoving(void* a3);                           // src/leaf/auto_03_800C5F84_text_cb.cpp
 void Stitching_Bug_StartEatingSound(void* a0, u32 /*0x0C*/ a1);  // type 0x107 (from signature table)
 void Stitching_Bug_StartSkitterSound(void* a0, u32 /*0x0C*/ a1);  // type 0x107 (from signature table)
-void Stitching_Bug_StopEatingSound(void* a0);  // type 0x2F (from signature table)
-void Stitching_Bug_StopSkitterSound(void* a0);  // type 0x2F (from signature table)
-void Stitching_Reticle_FireStaple(void* a0);  // type 0x2F (from signature table)
+void Stitching_Bug_StopEatingSound(void* a0);                          // src/game/small_800Cb.cpp
+void Stitching_Bug_StopSkitterSound(void* a0);                         // src/game/small_800Cb.cpp
+void Stitching_Reticle_FireStaple(void* a3);                           // src/leaf/auto_03_800CC108_text_cb.cpp
 s32 Stitching_Reticle_GetLastStapleQuality(void* a0);  // type 0x16 (from signature table)
-s32 Stitching_Reticle_LastStaplePatchedFlesh(void* a0);  // type 0x16 (from signature table)
+s32 Stitching_Reticle_LastStaplePatchedFlesh(void* a3);                // src/leaf/auto_03_800CC108_text_cb.cpp
 void Stitching_Reticle_ReadyToFire(void* a0);  // type 0x2F (from signature table)
-void StopAllExperimentSounds(void);  // type 0x8F (from signature table)
+void StopAllExperimentSounds(void);                                    // src/game/small_8007b.cpp
 void StopBackgroundSFX(u32 /*0x0B*/ a0, u32 /*0x0B*/ a1);  // type 0x145 (from signature table)
 void StopConversation(void);  // type 0x8F (from signature table)
-void StopEntityLoopingSoundFX(void* a0);  // type 0x2F (from signature table)
+void StopEntityLoopingSoundFX(void* a3);                               // src/leaf/auto_03_800E75B0_text_cb.cpp
 void StopExperimentSound(void* a0, u32 a1);  // type 0x42 (from signature table)
-void StopHazardEffect(void* a0);  // type 0x2F (from signature table)
+void StopHazardEffect(void* a3);                                       // src/leaf/auto_03_800E75B0_text_cb.cpp
 void StopLaser(void* a0, s32 a1);  // type 0x48 (from signature table)
-void StopNISFSM(void);  // type 0x8F (from signature table)
+void StopNISFSM(void);                                                 // src/game/small_800Fc.cpp
 void StopPrimaryAuxEffect(void);  // type 0x8F (from signature table)
 void StopSecondaryAuxEffect(void);  // type 0x8F (from signature table)
-void StopSoundEffect(u32 /*0x0B*/ a0);  // type 0x5E (from signature table)
+void StopSoundEffect(u32 a3);                                          // src/leaf/auto_03_8010FA48_text_cb.cpp
 void StopUsingAnimatedCamera(void);  // type 0x8F (from signature table)
-void StopWiiInputGame(void);  // type 0x8F (from signature table)
-void StoreFOV(void);  // type 0x8F (from signature table)
-s32 StringHashValid(u32 a0);  // type 0x1E (from signature table)
-void SupressHUD(void);  // type 0x8F (from signature table)
-s32 TargetIsFarBelow(u32 /*0x2F*/ a0);  // type 0xC7 (from signature table)
-s32 TargetIsLeft(u32 /*0x2F*/ a0);  // type 0xC7 (from signature table)
+void StopWiiInputGame(void);                                           // src/game/small_800Fb.cpp
+void StoreFOV(void);                                                   // src/game/small_800Fb.cpp
+s32 StringHashValid(u32 a3);                                           // src/leaf/auto_03_800747DC_text_cb.cpp
+void SupressHUD(void);                                                 // src/leaf/auto_03_80044CDC_text_cb.cpp
+s32 TargetIsFarBelow(u32 a3);                                          // src/leaf/auto_03_800FB958_text_cb.cpp
+s32 TargetIsLeft(u32 a3);                                              // src/leaf/auto_03_800FB958_text_cb.cpp
 void TeleportPlayerTo(f32 a0, f32 a1, f32 a2);  // type 0x6A (from signature table)
 void TeleportPlayerToJunction(u32 a0);  // type 0x71 (from signature table)
 void TeleportTo(void* a0, u32 /*0x17*/ a1, f32 a2);  // type 0x36 (from signature table)
 void TestFailed(void);  // type 0x8F (from signature table)
-s32 TestRestartInput(void);  // type 0x22 (from signature table)
-void TestWire(u32 /*0x3D*/ a0);  // type 0x14A (from signature table)
-void TokenUpdate(ScriptCtx* a0);  // type 0x4E (from signature table)
+s32 TestRestartInput(void);                                            // src/leaf/auto_03_8006FA44_text_cb.cpp
+void TestWire(u32 a3);                                                 // src/leaf/auto_03_800E75B0_text_cb.cpp
+void TokenUpdate(ScriptCtx* a3);                                       // src/leaf/auto_03_800756E0_text_cb.cpp
 void TransitionToRopeCamera(void);  // type 0x8F (from signature table)
-void TransmitMe(void);  // type 0x8F (from signature table)
+void TransmitMe(void);                                                 // src/game/small_8013.cpp
 void TransmitMonster(void);  // type 0x8F (from signature table)
 void Troublescope_Deinit(void);  // type 0x8F (from signature table)
-s32 Troublescope_GetCreatureLoaded(void);  // type 0x22 (from signature table)
-f32 Troublescope_GetCurrentAttack(void);  // type 0x12 (from signature table)
-f32 Troublescope_GetCurrentDefense(void);  // type 0x12 (from signature table)
-f32 Troublescope_GetCurrentEnergy(void);  // type 0x12 (from signature table)
-f32 Troublescope_GetCurrentHP(void);  // type 0x12 (from signature table)
-f32 Troublescope_GetCurrentMadness(void);  // type 0x12 (from signature table)
-BOOL Troublescope_GetInventoryPosString(void);  // type 0x2E (from signature table)
-f32 Troublescope_GetMaxMadness(void);  // type 0x12 (from signature table)
-BOOL Troublescope_GetMonsterName(void);  // type 0x2E (from signature table)
-s32 Troublescope_GetPartID(void);  // type 0x22 (from signature table)
-BOOL Troublescope_GetPartImage(void);  // type 0x2E (from signature table)
-s32 Troublescope_GetPartInventoryPos(void);  // type 0x22 (from signature table)
+s32 Troublescope_GetCreatureLoaded(void);                              // src/leaf/auto_03_8001EE48_text_cb.cpp
+f32 Troublescope_GetCurrentAttack(void);                               // src/leaf/auto_03_8001EE48_text_cb.cpp
+f32 Troublescope_GetCurrentDefense(void);                              // src/leaf/auto_03_8001EE48_text_cb.cpp
+f32 Troublescope_GetCurrentEnergy(void);                               // src/leaf/auto_03_8001EE48_text_cb.cpp
+f32 Troublescope_GetCurrentHP(void);                                   // src/leaf/auto_03_8001EE48_text_cb.cpp
+f32 Troublescope_GetCurrentMadness(void);                              // src/leaf/auto_03_8001EE48_text_cb.cpp
+BOOL Troublescope_GetInventoryPosString(void);                         // src/leaf/auto_03_8001EE48_text_cb.cpp
+f32 Troublescope_GetMaxMadness(void);                                  // src/leaf/auto_03_8001EE48_text_cb.cpp
+ScriptValue Troublescope_GetMonsterName(void);  // type 0x2E (from signature table)
+s32 Troublescope_GetPartID(void);                                      // src/leaf/auto_03_8001EE48_text_cb.cpp
+BOOL Troublescope_GetPartImage(void);                                  // src/leaf/auto_03_8001EE48_text_cb.cpp
+s32 Troublescope_GetPartInventoryPos(void);                            // src/leaf/auto_03_8001EE48_text_cb.cpp
 void Troublescope_IncCreature(s32 a0);  // type 0x83 (from signature table)
 void Troublescope_Init(void);  // type 0x8F (from signature table)
-u32 /*0x06*/ Troublescope_IsMonsterLoaded(void);  // type 0xA (from signature table)
+u32 Troublescope_IsMonsterLoaded(void);                                // src/leaf/auto_03_8001EE48_text_cb.cpp
 void Troublescope_LoadPartImage(void);  // type 0x8F (from signature table)
-s32 Troublescope_MonstersInInventory(void);  // type 0x22 (from signature table)
-BOOL Troublescope_SetCurrentMonster(void);  // type 0x2E (from signature table)
+s32 Troublescope_MonstersInInventory(void);                            // src/leaf/auto_03_8001EE48_text_cb.cpp
+BOOL Troublescope_SetCurrentMonster(void);                             // src/leaf/auto_03_8001EE48_text_cb.cpp
 void Troublescope_SetHead(void);  // type 0x8F (from signature table)
 void Troublescope_SetLeftArm(void);  // type 0x8F (from signature table)
 void Troublescope_SetLegs(void);  // type 0x8F (from signature table)
@@ -1504,113 +1504,113 @@ void Troublescope_SetTorso(void);  // type 0x8F (from signature table)
 void Troublescope_UnLoadPartImage(void);  // type 0x8F (from signature table)
 void Troublescope_Update(void);  // type 0x8F (from signature table)
 s32 TurretHasTarget(void* a0);  // type 0x16 (from signature table)
-void TurretNoTargetMe(void* a0, void* a1);  // type 0x30 (from signature table)
+void TurretNoTargetMe(void* a3, void* a4);                             // src/leaf/auto_03_800E75B0_text_cb.cpp
 s32 TurretReload(void* a0, s32 a1);  // type 0xC6 (from signature table)
 void TurretSetMuzzle(void* a0, u32 /*0x30*/ a1);  // type 0xF8 (from signature table)
-void TurretSetRotateMode(void* a0, s32 a1);  // type 0x48 (from signature table)
-void TurretTargetMe(void* a0, void* a1);  // type 0x30 (from signature table)
-void TurretTrackTarget(void* a0, f32 a1);  // type 0x40 (from signature table)
+void TurretSetRotateMode(void* a0, s32 a1);                            // src/game/small_800Ec.cpp
+void TurretTargetMe(void* a3, void* a4);                               // src/leaf/auto_03_800E75B0_text_cb.cpp
+void TurretTrackTarget(void* a3, f32 f1);                              // src/leaf/auto_03_800E75B0_text_cb.cpp
 void UIEngine_ActivateUIScreenSet(s32 id);                             // src/game/game_ui.cpp
 void UIEngine_LoadUIScreenSet(s32 id);                                 // src/game/game_ui.cpp
 void UIEngine_UnloadUISlot(s32 a0);  // type 0x83 (from signature table)
 void UIPlayGlobalGroupSound(u32 a0);  // type 0x71 (from signature table)
-void UIScreen_SetPS2SnapToEnabled(u32 /*0x06*/ a0);  // type 0x67 (from signature table)
+void UIScreen_SetPS2SnapToEnabled(u32 a3);                             // src/leaf/auto_03_800E75B0_text_cb.cpp
 void UnPauseAllExplorationCharacters(void);  // type 0x8F (from signature table)
-void UnlockCurrentJunctionPath(BOOL a0);  // type 0x8C (from signature table)
+void UnlockCurrentJunctionPath(BOOL a3);                               // src/leaf/auto_03_800E75B0_text_cb.cpp
 void UnlockJunctionPath(u32 a0, BOOL a1);  // type 0x81 (from signature table)
-void Unpause(void);  // type 0x8F (from signature table)
+void Unpause(void);                                                    // src/leaf/auto_03_800E75B0_text_cb.cpp
 void UnspawnAttachedParticleAtChild(void* a0, u32 /*0x30*/ a1);  // type 0xF8 (from signature table)
 void UpdateCombatHUD(f32 a0);  // type 0x69 (from signature table)
 void UpdateDanceAnimation(void* a0, f32 a1);  // type 0x40 (from signature table)
-void UpdateFader(void);  // type 0x8F (from signature table)
-void UpdateJournalEntryCount(u32 /*0x52*/ a0, s32 a1, u32 /*0x06*/ a2);  // type 0x158 (from signature table)
-void UpdateJournalEntryIcon(u32 /*0x52*/ a0, u32 /*0x47*/ a1);  // type 0x156 (from signature table)
+void UpdateFader(void);                                                // src/leaf/auto_03_801D5D0C_text_cb.cpp
+void UpdateJournalEntryCount(u32 a3, s32 a4, u32 a5);                  // src/leaf/auto_03_800E75B0_text_cb.cpp
+void UpdateJournalEntryIcon(u32 a3, u32 a4);                           // src/leaf/auto_03_800E75B0_text_cb.cpp
 void UpdatePartLoading(void);  // type 0x8F (from signature table)
 void UpdateSelectedIngredients(void);  // type 0x8F (from signature table)
-void UpdateSelectedIngredientsRecipe(void);  // type 0x8F (from signature table)
+void UpdateSelectedIngredientsRecipe(void);                            // src/game/lab_books_b.cpp
 void UpdateSelectedRecipe(void);  // type 0x8F (from signature table)
-void UpdateSplashScreen(void);  // type 0x8F (from signature table)
+void UpdateSplashScreen(void);                                         // src/leaf/auto_03_800E75B0_text_cb.cpp
 void UpdateWeldingGunIntroPos(void);  // type 0x8F (from signature table)
 void UpdateWeldingGunOutroPos(void);  // type 0x8F (from signature table)
-void VSHACKSetFightTextVisible(void);  // type 0x8F (from signature table)
+void VSHACKSetFightTextVisible(void);                                  // src/game/small_800Fc.cpp
 void VariableToNormalCamera(f32 a0);  // type 0x69 (from signature table)
 void WarpCamera(void);  // type 0x8F (from signature table)
 u32 /*0x06*/ WasButtonPressed(u32 /*0x36*/ a0);  // type 0xAB (from signature table)
 u32 /*0x06*/ WasButtonReleased(u32 /*0x36*/ a0);  // type 0xAB (from signature table)
 u32 /*0x06*/ WasEntityDrawnLastFrame(void* a0);  // type 0x1 (from signature table)
-BOOL WasPacketDelivered(void);  // type 0x2E (from signature table)
-BOOL WasThereADiscError(void);  // type 0x2E (from signature table)
-BOOL WasThereANetError(void);  // type 0x2E (from signature table)
-s32 WeArePostMatchupScreen(void);  // type 0x22 (from signature table)
-s32 WeldingBadWeld(ScriptCtx* a0);  // type 0x1D (from signature table)
-u32 /*0x06*/ WeldingPS2WeldButtonJustPressed(void);  // type 0xA (from signature table)
-u32 /*0x06*/ WeldingPS2WeldButtonReleased(void);  // type 0xA (from signature table)
-f32 WeldingQualityLevel(void);  // type 0x12 (from signature table)
-s32 WeldingShakeThisFrame(ScriptCtx* a0);  // type 0x1D (from signature table)
-s32 WeldingShakeThresholdBeaten(ScriptCtx* a0);  // type 0x1D (from signature table)
+ScriptValue WasPacketDelivered(void);  // type 0x2E (from signature table)
+BOOL WasThereADiscError(void);                                         // src/game/small_8014.cpp
+BOOL WasThereANetError(void);                                          // src/game/small_8014.cpp
+s32 WeArePostMatchupScreen(void);                                      // src/leaf/auto_03_8013CA74_text_cb.cpp
+s32 WeldingBadWeld(ScriptCtx* a0);                                     // src/game/small_8007b.cpp
+u32 WeldingPS2WeldButtonJustPressed(void);                             // src/leaf/auto_03_80077D1C_text_cb.cpp
+u32 WeldingPS2WeldButtonReleased(void);                                // src/leaf/auto_03_80077D1C_text_cb.cpp
+f32 WeldingQualityLevel(void);                                         // src/leaf/auto_03_80077B50_text_cb.cpp
+s32 WeldingShakeThisFrame(ScriptCtx* a3);                              // src/leaf/auto_03_80077B50_text_cb.cpp
+s32 WeldingShakeThresholdBeaten(ScriptCtx* a0);                        // src/game/small_8007b.cpp
 void WiiSelectorSetUpCameraView(void);  // type 0x8F (from signature table)
 void Wii_PlayConversationIntro(BOOL a0);  // type 0x8C (from signature table)
 void Wii_PlayConversationOutro(BOOL a0);  // type 0x8C (from signature table)
-void Wii_PlayEntityAnimationSlot(u32 a0, s32 a1);  // type 0x7E (from signature table)
+void Wii_PlayEntityAnimationSlot(u32 a0, s32 a1);                      // src/game/small_800Eb.cpp
 void Wii_SetCameraInfluenceState(u32 a0, u32 /*0x06*/ a1);  // type 0x74 (from signature table)
 void Wii_SetConversationEntity(u32 a0);  // type 0x71 (from signature table)
 void Wii_StartConversationFX(BOOL a0);  // type 0x8C (from signature table)
 void Wii_StopConversationFX(BOOL a0);  // type 0x8C (from signature table)
-s32 WithinAngleOfNav(u32 /*0x2F*/ a0, f32 a1);  // type 0xCA (from signature table)
-s32 WithinAngleOfTarget(u32 /*0x2F*/ a0, f32 a1);  // type 0xCA (from signature table)
-s32 WithinJumpRange(u32 /*0x2F*/ a0);  // type 0xC7 (from signature table)
+s32 WithinAngleOfNav(u32 a3, f32 f1);                                  // src/leaf/auto_03_800FB958_text_cb.cpp
+s32 WithinAngleOfTarget(u32 a3, f32 f1);                               // src/leaf/auto_03_800FB958_text_cb.cpp
+s32 WithinJumpRange(u32 a3);                                           // src/leaf/auto_03_800FB958_text_cb.cpp
 s32 WithinRangeOf(void* a0, u32 /*0x17*/ a1, f32 a2);  // type 0x19 (from signature table)
-s32 WithinRangeOfTarget(u32 /*0x2F*/ a0, f32 a1);  // type 0xCA (from signature table)
+s32 WithinRangeOfTarget(u32 a3, f32 f1);                               // src/leaf/auto_03_800FB958_text_cb.cpp
 void app_PlayMusic(u32 a0, f32 a1);  // type 0x76 (from signature table)
 void app_StopMusic(void);                                              // src/game/game_flow.cpp
-void decr_reg(void* a0, BOOL a1);  // type 0x4C (from signature table)
-void decr_reg0(void* a0);  // type 0x2F (from signature table)
-s32 get_reg(BOOL a0);  // type 0xDD (from signature table)
-s32 get_reg0(void* a0);  // type 0x16 (from signature table)
-u32 /*0x06*/ isPartLocked(void);  // type 0xA (from signature table)
-void minigame_gameflow_control_failure_outro_entry(void);  // type 0x8F (from signature table)
-void minigame_gameflow_control_failure_outro_exit(void);  // type 0x8F (from signature table)
-void minigame_gameflow_control_failure_outro_update(void);  // type 0x8F (from signature table)
-void minigame_gameflow_control_gameplay_entry(void);  // type 0x8F (from signature table)
-void minigame_gameflow_control_gameplay_exit(void);  // type 0x8F (from signature table)
-void minigame_gameflow_control_gameplay_update(void);  // type 0x8F (from signature table)
-void minigame_gameflow_control_intro_entry(void);  // type 0x8F (from signature table)
-void minigame_gameflow_control_intro_exit(void);  // type 0x8F (from signature table)
-void minigame_gameflow_control_intro_update(void);  // type 0x8F (from signature table)
-void minigame_gameflow_control_pause_transition(void);  // type 0x8F (from signature table)
-void minigame_gameflow_control_pause_update(void);  // type 0x8F (from signature table)
-void minigame_gameflow_control_quit(void);  // type 0x8F (from signature table)
+void decr_reg(void* a0, BOOL a1);                                      // src/game/small_800F.cpp
+void decr_reg0(void* a0);                                              // src/game/small_800F.cpp
+s32 get_reg(BOOL a0);                                                  // src/game/small_800F.cpp
+s32 get_reg0(void* a0);                                                // src/game/small_800F.cpp
+u32 isPartLocked(void);                                                // src/leaf/auto_03_80044CDC_text_cb.cpp
+void minigame_gameflow_control_failure_outro_entry(void);              // src/game/minigame_flow.cpp
+void minigame_gameflow_control_failure_outro_exit(void);               // src/game/minigame_flow.cpp
+void minigame_gameflow_control_failure_outro_update(void);             // src/game/minigame_flow.cpp
+void minigame_gameflow_control_gameplay_entry(void);                   // src/game/minigame_flow.cpp
+void minigame_gameflow_control_gameplay_exit(void);                    // src/game/minigame_flow.cpp
+void minigame_gameflow_control_gameplay_update(void);                  // src/game/minigame_flow.cpp
+void minigame_gameflow_control_intro_entry(void);                      // src/game/minigame_flow.cpp
+void minigame_gameflow_control_intro_exit(void);                       // src/game/minigame_flow.cpp
+void minigame_gameflow_control_intro_update(void);                     // src/game/minigame_flow.cpp
+void minigame_gameflow_control_pause_transition(void);                 // src/leaf/auto_03_80074CC8_text_cb.cpp
+void minigame_gameflow_control_pause_update(void);                     // src/game/minigame_flow.cpp
+void minigame_gameflow_control_quit(void);                             // src/game/minigame_flow.cpp
 void minigame_gameflow_control_result_animate_quality_enter(void);  // type 0x8F (from signature table)
 void minigame_gameflow_control_result_animate_quality_exit(void);  // type 0x8F (from signature table)
 void minigame_gameflow_control_result_animate_quality_update(void);  // type 0x8F (from signature table)
-void minigame_gameflow_control_success_fail_screen_update(void);  // type 0x8F (from signature table)
-void minigame_gameflow_control_success_outro_entry(void);  // type 0x8F (from signature table)
-void minigame_gameflow_control_success_outro_exit(void);  // type 0x8F (from signature table)
-void minigame_gameflow_control_success_outro_update(void);  // type 0x8F (from signature table)
-void prop_selected(void);  // type 0x8F (from signature table)
-s32 reg0_gt_0(void* a0);  // type 0x16 (from signature table)
-void set_reg(BOOL a0, s32 a1);  // type 0x187 (from signature table)
-void set_reg0(void* a0, s32 a1);  // type 0x48 (from signature table)
-void BroadcastToDstGroup(void* a0, u32 a1);  // type 0x42 (from signature table)
+void minigame_gameflow_control_success_fail_screen_update(void);       // src/game/minigame_flow.cpp
+void minigame_gameflow_control_success_outro_entry(void);              // src/game/minigame_flow.cpp
+void minigame_gameflow_control_success_outro_exit(void);               // src/game/minigame_flow.cpp
+void minigame_gameflow_control_success_outro_update(void);             // src/game/minigame_flow.cpp
+void prop_selected(void);                                              // src/leaf/auto_03_800E75B0_text_cb.cpp
+s32 reg0_gt_0(void* a0);                                               // src/game/small_800F.cpp
+void set_reg(BOOL a3, s32 a4);                                         // src/leaf/auto_03_800E75B0_text_cb.cpp
+void set_reg0(void* a3, s32 a4);                                       // src/leaf/auto_03_800E75B0_text_cb.cpp
+void BroadcastToDstGroup(void* a3, u32 a4);                            // src/leaf/auto_03_801B313C_text_cb.cpp
 void CallActivateHandler(void* a0);  // type 0x2F (from signature table)
 void CallDeactivateHandler(void* a0);  // type 0x2F (from signature table)
 f32 CosInterp(f32 a0, f32 a1, f32 a2);  // type 0xF (from signature table)
-void DefaultAnimLoopCallback(u32 /*0x1F*/ a0);  // type 0x63 (from signature table)
-void EntityReachedWaypointCallback(u32 /*0x16*/ a0, u32 /*0x08*/ a1, u32 /*0x14*/ a2);  // type 0x66 (from signature table)
-void EntityWaypointTaskCompleteCallback(u32 /*0x08*/ a0, u32 /*0x14*/ a1);  // type 0x88 (from signature table)
+void DefaultAnimLoopCallback(u32 a3);                                  // src/leaf/auto_03_8016E304_text_cb.cpp
+void EntityReachedWaypointCallback(u32 a3, u32 a4, u32 a5);            // src/leaf/auto_03_801B313C_text_cb.cpp
+void EntityWaypointTaskCompleteCallback(u32 a3, u32 a4);               // src/leaf/auto_03_801B313C_text_cb.cpp
 void Entity_SleepFSM(void* a0);  // type 0x2F (from signature table)
 void FadeToOverlayAlpha(void* a0, f32 a1, f32 a2, u32 /*0x06*/ a3);  // type 0x41 (from signature table)
 void FollowWaypointPath(void* a0, u32 /*0x17*/ a1, f32 a2);  // type 0x36 (from signature table)
 void FrameFxBlur(s32 a0, f32 a1, f32 a2);  // type 0x86 (from signature table)
-void FrameFxBlurAndTint(f32 a0, f32 a1, f32 a2, f32 a3, f32 a4);  // type 0x6B (from signature table)
+void FrameFxBlurAndTint(f32 a0, f32 a1, f32 a2, f32 a3, f32 a4);       // src/engine/small_801Db.cpp
 void FrameFxBlurBulge(f32 a0, f32 a1, f32 a2, f32 a3, s32 a4);  // type 0x6F (from signature table)
-void FrameFxEggcrate(f32 a0, f32 a1, f32 a2);  // type 0x6A (from signature table)
-void FrameFxFlash(f32 a0, f32 a1, f32 a2);  // type 0x6A (from signature table)
+void FrameFxEggcrate(f32 a0, f32 a1, f32 a2);                          // src/engine/small_801Db.cpp
+void FrameFxFlash(f32 a0, f32 a1, f32 a2);                             // src/engine/small_801D.cpp
 void FrameFxPlay(u32 /*0x1D*/ a0);  // type 0x70 (from signature table)
-void FrameFxRipple(f32 a0, f32 a1, f32 a2);  // type 0x6A (from signature table)
+void FrameFxRipple(f32 a0, f32 a1, f32 a2);                            // src/engine/small_801D.cpp
 void FrameFxStop(u32 /*0x1D*/ a0);  // type 0x70 (from signature table)
-void FrameFxStopAll(void);  // type 0x8F (from signature table)
-void FrameFxTint(f32 a0, f32 a1, f32 a2, f32 a3, f32 a4, f32 a5, f32 a6);  // type 0x6C (from signature table)
+void FrameFxStopAll(void);                                             // src/leaf/auto_03_801D9028_text_cb.cpp
+void FrameFxTint(f32 a0, f32 a1, f32 a2, f32 a3, f32 a4, f32 a5, f32 a6); // src/engine/small_801Db.cpp
 void FrameFxTunnel(f32 a0, f32 a1, f32 a2, f32 a3, f32 a4, f32 a5, s32 a6);  // type 0x6D (from signature table)
 void FrameFxVortex(f32 a0, f32 a1, f32 a2, f32 a3, f32 a4, s32 a5);  // type 0x6E (from signature table)
 u32 GetCurrentStateID(ScriptCtx* a0);  // type 0x13 (from signature table)
@@ -1620,25 +1620,25 @@ u32 GetHash(u32 a0);  // type 0x14 (from signature table)
 void InterpolateTo(void* a0, u32 /*0x17*/ a1, f32 a2, u32 /*0x06*/ a3);  // type 0x37 (from signature table)
 f32 IntervalRandomFloat(f32 a0, f32 a1);  // type 0xE (from signature table)
 s32 IntervalRandomInt(s32 a0, s32 a1);  // type 0x20 (from signature table)
-u32 /*0x06*/ IsHost(void);  // type 0xA (from signature table)
+u32 IsHost(void);                                                      // src/leaf/auto_03_801D9028_text_cb.cpp
 u32 /*0x06*/ IsRumbling(s32 a0);  // type 0x6 (from signature table)
 void LightSetColor(u32 /*0x0E*/ a0, f32 a1, f32 a2, f32 a3);  // type 0x55 (from signature table)
 void Log(void* a0, u32 /*0x1B*/ a1);  // type 0x3F (from signature table)
 void MeshFadeToOverlayAlpha(u32 /*0x17*/ a0, u32 /*0x21*/ a1, f32 a2, f32 a3);  // type 0x59 (from signature table)
 void MeshStartBouncingOverlayAlpha(u32 /*0x17*/ a0, u32 /*0x21*/ a1, f32 a2, f32 a3, f32 a4);  // type 0x5A (from signature table)
 void MeshStopBouncingOverlayAlpha(u32 /*0x17*/ a0, u32 /*0x21*/ a1);  // type 0x58 (from signature table)
-void Noop(void);  // type 0x8F (from signature table)
+void Noop(void);                                                       // src/leaf/auto_03_801D9028_text_cb.cpp
 void PauseFollowingWaypointPath(void* a0, f32 a1);  // type 0x40 (from signature table)
-void PauseMusic(u32 /*0x06*/ a0);  // type 0x67 (from signature table)
+void PauseMusic(u32 a0);                                               // src/game/small_8020b.cpp
 void PauseRumble(s32 a0);  // type 0x83 (from signature table)
-void PauseSFX(u32 /*0x06*/ a0);  // type 0x67 (from signature table)
-void PlayGlobalGroupSound_NoLoad(u32 /*0x0C*/ a0);  // type 0x5F (from signature table)
-void PlayGlobalGroupSoundWithEffect_NoLoad(u32 /*0x0C*/ a0, s32 a1);  // type 0x60 (from signature table)
+void PauseSFX(u32 a3);                                                 // src/leaf/auto_03_80208CE8_text_cb.cpp
+void PlayGlobalGroupSound_NoLoad(u32 a3);                              // src/leaf/auto_03_801D9028_text_cb.cpp
+void PlayGlobalGroupSoundWithEffect_NoLoad(u32 a3, s32 a4);            // src/leaf/auto_03_801D9028_text_cb.cpp
 void PlayGlobalLoopingGroupSound_NoLoad(u32 /*0x0C*/ a0);  // type 0x5F (from signature table)
-void PlayGlobalSound(u32 /*0x0B*/ a0);  // type 0x5E (from signature table)
+void PlayGlobalSound(u32 a3);                                          // src/leaf/auto_03_801D9028_text_cb.cpp
 void PlayGlobalSoundSynced(u32 /*0x0B*/ a0);  // type 0x5E (from signature table)
-void PlayGlobalSoundWithEffect(u32 /*0x0B*/ a0, s32 a1);  // type 0x62 (from signature table)
-void PlayLoopingSoundFX(void* a0, u32 /*0x0B*/ a1, s32 a2);  // type 0x3C (from signature table)
+void PlayGlobalSoundWithEffect(u32 a3, s32 a4);                        // src/leaf/auto_03_801D9028_text_cb.cpp
+void PlayLoopingSoundFX(void* a3, u32 a4, s32 a5);                     // src/leaf/auto_03_801D9028_text_cb.cpp
 void PlayLoopingSoundFXWithEffect(void* a0, u32 /*0x0B*/ a1, s32 a2, s32 a3);  // type 0x3D (from signature table)
 void PlayLoopingSoundGroupFX(void* a0, u32 /*0x0C*/ a1, s32 a2);  // type 0x39 (from signature table)
 void PlayLoopingSoundGroupFXWithEffect(void* a0, u32 /*0x0C*/ a1, s32 a2, s32 a3);  // type 0x3A (from signature table)
@@ -1646,14 +1646,14 @@ void PlaySoundFX(void* a0, u32 /*0x0B*/ a1, s32 a2);  // type 0x3C (from signatu
 void PlaySoundFXWithEffect(void* a0, u32 /*0x0B*/ a1, s32 a2);  // type 0x3C (from signature table)
 void PlaySoundGroupFX(void* a0, u32 /*0x0C*/ a1, s32 a2);  // type 0x39 (from signature table)
 void PlaySoundGroupFXWithEffect(void* a0, u32 /*0x0C*/ a1, s32 a2, s32 a3);  // type 0x3A (from signature table)
-void PlayVoiceSFX(u32 /*0x0D*/ a0);  // type 0x61 (from signature table)
+void PlayVoiceSFX(u32 a0);                                             // src/game/small_800Ec.cpp
 void Print(u32 /*0x0A*/ a0);  // type 0x8B (from signature table)
-void PrintFResult(void);  // type 0x8F (from signature table)
-void PrintPosition(void* a0);  // type 0x2F (from signature table)
-void PrintResult(void);  // type 0x8F (from signature table)
-void PrintText(BOOL a0);  // type 0x8C (from signature table)
+void PrintFResult(void);                                               // src/leaf/auto_03_801D9028_text_cb.cpp
+void PrintPosition(void* a3);                                          // src/leaf/auto_03_801D9028_text_cb.cpp
+void PrintResult(void);                                                // src/leaf/auto_03_801D9028_text_cb.cpp
+void PrintText(BOOL a3);                                               // src/leaf/auto_03_800E75B0_text_cb.cpp
 void Print_v_E_E_i_f(void* a0, void* a1, s32 a2, f32 a3);  // type 0x33 (from signature table)
-void ResetSpawningMode(void);  // type 0x8F (from signature table)
+void ResetSpawningMode(void);                                          // src/leaf/auto_03_801EFC74_text_cb.cpp
 void ResumeFollowingWaypointPath(void* a0);  // type 0x2F (from signature table)
 s32 Return(s32 a0);  // type 0x1F (from signature table)
 void SetEntityOrientationCallback(u32 /*0x13*/ a0, u32 /*0x08*/ a1, u32 /*0x14*/ a2);  // type 0x8A (from signature table)
@@ -1662,13 +1662,13 @@ void SetGlobalMusicVolume(f32 a0);  // type 0x69 (from signature table)
 void SetGlobalSfxVolume(f32 a0);  // type 0x69 (from signature table)
 void SetOverlayAlpha(void* a0, f32 a1);  // type 0x40 (from signature table)
 void SetRenderFlag(void* a0, u32 /*0x06*/ a1);  // type 0x3E (from signature table)
-void SetResultRegister(s32 a0);  // type 0x83 (from signature table)
-void SetSpawnCount(void* a0, s32 a1);  // type 0x48 (from signature table)
-void SetSpawningMode(u32 /*0x1E*/ a0);  // type 0x68 (from signature table)
-void SetTimeout(ScriptCtx* a0, f32 a1);  // type 0x50 (from signature table)
+void SetResultRegister(s32 a3);                                        // src/leaf/auto_03_801D9028_text_cb.cpp
+void SetSpawnCount(void* a3, s32 a4);                                  // src/leaf/auto_03_801D9028_text_cb.cpp
+void SetSpawningMode(u32 a3);                                          // src/leaf/auto_03_801EFC74_text_cb.cpp
+void SetTimeout(ScriptCtx* a3, f32 f1);                                // src/leaf/auto_03_801D9028_text_cb.cpp
 void SetWaypointPathSpeed(void* a0, f32 a1);  // type 0x40 (from signature table)
 void ShaderFadeToOverlayAlpha(u32 /*0x17*/ a0, u32 /*0x1A*/ a1, f32 a2, f32 a3);  // type 0x5C (from signature table)
-void ShaderSetOverlayAlpha(u32 /*0x1A*/ a0, f32 a1);  // type 0x64 (from signature table)
+void ShaderSetOverlayAlpha(u32 a0, f32 a1);                            // src/engine/small_801D.cpp
 void ShaderSetOverlayAlphaFromDistance(void* a0, u32 /*0x17*/ a1, u32 /*0x1A*/ a2, f32 a3);  // type 0x35 (from signature table)
 void ShaderStartBouncingOverlayAlpha(u32 /*0x17*/ a0, u32 /*0x1A*/ a1, f32 a2, f32 a3, f32 a4);  // type 0x5D (from signature table)
 void ShaderStopBouncingOverlayAlpha(u32 /*0x17*/ a0, u32 /*0x1A*/ a1);  // type 0x5B (from signature table)
@@ -1680,19 +1680,19 @@ void StartNISFrameFx(void);  // type 0x8F (from signature table)
 void StartNISTVStaticFrameFx(void);  // type 0x8F (from signature table)
 void StartRumble(s32 a0, u32 /*0x2A*/ a1);  // type 0x84 (from signature table)
 void StopAllSFX(void);  // type 0x8F (from signature table)
-void StopBouncingOverlayAlpha(void* a0);  // type 0x2F (from signature table)
+void StopBouncingOverlayAlpha(void* a0);                               // src/engine/small_801Bb.cpp
 void StopChallengeFrameFx(void);  // type 0x8F (from signature table)
 void StopFollowingWaypointPath(void* a0);  // type 0x2F (from signature table)
-void StopGlobalLoopingGroupSound(void);  // type 0x8F (from signature table)
-void StopLoopingSoundFX(void* a0);  // type 0x2F (from signature table)
-void StopLoopingSoundGroupFX(void* a0);  // type 0x2F (from signature table)
+void StopGlobalLoopingGroupSound(void);                                // src/leaf/auto_03_801D9028_text_cb.cpp
+void StopLoopingSoundFX(void* a3);                                     // src/leaf/auto_03_801D9028_text_cb.cpp
+void StopLoopingSoundGroupFX(void* a3);                                // src/leaf/auto_03_801D9028_text_cb.cpp
 void StopMusic(void);  // type 0x8F (from signature table)
 void StopNISFrameFx(void);  // type 0x8F (from signature table)
 void StopNISTVStaticFrameFx(void);  // type 0x8F (from signature table)
-void StopRumble(s32 a0);  // type 0x83 (from signature table)
-void StopVoiceSFX(u32 /*0x0D*/ a0);  // type 0x61 (from signature table)
-void SuspendSFX(u32 /*0x06*/ a0);  // type 0x67 (from signature table)
-void TestScriptCallback(void* a0, u32 /*0x29*/ a1, void* a2);  // type 0x4B (from signature table)
+void StopRumble(s32 chan);                                             // src/engine/small_801Bb.cpp
+void StopVoiceSFX(u32 a3);                                             // src/leaf/auto_03_800E75B0_text_cb.cpp
+void SuspendSFX(u32 a3);                                               // src/leaf/auto_03_80208CE8_text_cb.cpp
+void TestScriptCallback(void* a3, u32 a4, void* a5);                   // src/leaf/auto_03_801D9028_text_cb.cpp
 void TimedRumble(s32 a0, f32 a1, u32 /*0x2A*/ a2);  // type 0x85 (from signature table)
 s32 UIActivationGrid_GetCurrentIndex(void);  // type 0x22 (from signature table)
 void UIActivationGrid_SetCurrentIndex(s32 a0);  // type 0x83 (from signature table)
@@ -1729,11 +1729,11 @@ void UIEntity_SetOffsetBone(u32 a0, u32 a1);  // type 0x7A (from signature table
 void UIEvent_SendToAllScreens(u32 a0);  // type 0x71 (from signature table)
 void UIEvent_SendToElement(u32 a0, u32 a1);  // type 0x7A (from signature table)
 void UIEvent_SendToScreen(u32 a0, u32 a1);  // type 0x7A (from signature table)
-void UIEvent_SendToTopScreen(u32 a0);  // type 0x71 (from signature table)
+void UIEvent_SendToTopScreen(u32 a0);                                  // src/engine/small_8019.cpp
 void UIEvent_SendToTopScreenAndChildren(u32 a0);  // type 0x71 (from signature table)
 s32 UIGrid_GetCurrentIndex_ToScript(u32 a0);  // type 0x1E (from signature table)
 s32 UIGrid_GetCurrentText(u32 a0);  // type 0x1E (from signature table)
-BOOL UIGrid_GetElementPos(u32 a0, s32 a1);  // type 0x26 (from signature table)
+ScriptValue UIGrid_GetElementPos(u32 a0, s32 a1);  // type 0x26 (from signature table)
 s32 UIGrid_GetNumValidCols(u32 a0);  // type 0x1E (from signature table)
 s32 UIGrid_GetNumValidItems(u32 a0);  // type 0x1E (from signature table)
 s32 UIGrid_GetNumValidRows(u32 a0);  // type 0x1E (from signature table)
@@ -1755,7 +1755,7 @@ void UIGrid_SetTextColorList(u32 a0, BOOL a1);  // type 0x81 (from signature tab
 void UIGrid_SetTextList(u32 a0, BOOL a1);  // type 0x81 (from signature table)
 void UIGroup_DisableHitTest(u32 a0);  // type 0x71 (from signature table)
 void UIGroup_EnableHitTest(u32 a0);  // type 0x71 (from signature table)
-BOOL UIImage_GetTexture(u32 a0);  // type 0x25 (from signature table)
+ScriptValue UIImage_GetTexture(u32 a0);  // type 0x25 (from signature table)
 void UIImage_SetIgnoreAlphaPixels(u32 a0, u32 /*0x06*/ a1);  // type 0x74 (from signature table)
 void UIImage_SetTexture(u32 a0, BOOL a1);  // type 0x81 (from signature table)
 void UIModel_SetModel(u32 a0, BOOL a1);  // type 0x81 (from signature table)
@@ -1792,27 +1792,27 @@ void UISlideshow_Resume(u32 a0);  // type 0x71 (from signature table)
 void UISlideshow_SetUITextureList(u32 a0, u32 a1);  // type 0x7A (from signature table)
 void UISlideshow_Start(u32 a0);  // type 0x71 (from signature table)
 void UISlideshow_Stop(u32 a0);  // type 0x71 (from signature table)
-BOOL UISoundList_GetSound(u32 a0, s32 a1);  // type 0x26 (from signature table)
+ScriptValue UISoundList_GetSound(u32 a0, s32 a1);  // type 0x26 (from signature table)
 void UISoundList_PlayRandomSfx(u32 a0);  // type 0x71 (from signature table)
 void UISoundList_PlayRandomVoiceSfx(u32 a0);  // type 0x71 (from signature table)
 void UISoundList_PlaySfx(u32 a0, u32 a1);  // type 0x7A (from signature table)
 void UISoundList_PlayVoiceSfx(u32 a0, u32 a1);  // type 0x7A (from signature table)
 void UIText_ForceTypeout(u32 a0);  // type 0x71 (from signature table)
 f32 UIText_GetRightXPos(u32 a0);  // type 0x10 (from signature table)
-BOOL UIText_GetString(u32 a0);  // type 0x25 (from signature table)
+ScriptValue UIText_GetString(u32 a0);  // type 0x25 (from signature table)
 u32 /*0x06*/ UIText_IsOnLastPage(u32 a0);  // type 0x5 (from signature table)
 u32 /*0x06*/ UIText_IsTypeoutDone(u32 a0);  // type 0x5 (from signature table)
 void UIText_RefreshText(u32 a0);  // type 0x71 (from signature table)
-void UIText_SetString(u32 a0, BOOL a1);  // type 0x81 (from signature table)
+void UIText_SetString(u32 a3, BOOL a4);                                // src/leaf/auto_03_8018E0CC_text_cb.cpp
 void UIText_SetString_Float(u32 a0, f32 a1, BOOL a2);  // type 0x79 (from signature table)
 void UIText_SetString_Int(u32 a0, s32 a1);  // type 0x7E (from signature table)
 void UIText_SetString_TextID(u32 a0, u32 /*0x11*/ a1);  // type 0x73 (from signature table)
 void UIText_SetWrapLength(u32 a0, s32 a1);  // type 0x7E (from signature table)
-BOOL UITextureList_GetNextTexture(u32 a0, BOOL a1);  // type 0x27 (from signature table)
-BOOL UITextureList_GetTexture(u32 a0, s32 a1);  // type 0x26 (from signature table)
+ScriptValue UITextureList_GetNextTexture(u32 a0, BOOL a1);  // type 0x27 (from signature table)
+ScriptValue UITextureList_GetTexture(u32 a0, s32 a1);  // type 0x26 (from signature table)
 void UITopScreen_PlayLoopingSfx(u32 a0, u32 a1);  // type 0x7A (from signature table)
 void UITopScreen_StopLoopingSfx(void);  // type 0x8F (from signature table)
-void UnpauseRumble(s32 a0);  // type 0x83 (from signature table)
+void UnpauseRumble(s32 chan);                                          // src/engine/small_801Bb.cpp
 void UnspawnAttachedParticle(void* a0, u32 /*0x06*/ a1);  // type 0x3E (from signature table)
 f32 fGetResultRegister(void);  // type 0x12 (from signature table)
 void fSetResultRegister(f32 a0);  // type 0x69 (from signature table)

@@ -172,12 +172,12 @@ s32 PartIsAlchemy(s32 a0) {
 // 0x800F40F0
 // Returns the enhancement texture of a part definition (0 if the part has no enhancement).
 // Note: the header lists this as BOOL, but the original returns the texture pointer.
-BOOL PartGetEnhancementTexture(s32 a0) {
+ScriptValue PartGetEnhancementTexture(s32 a0) {
     if (a0 < 0 || a0 >= 0xBA) return 0;
     PartDef def;
     PartDbGetDef(&def, gGameDb, a0);
     if (def.unk20 == -1) return 0;
-    return (BOOL)(uintptr_t)EnhancementGetTexture(def.unk20);
+    return (ScriptValue)EnhancementGetTexture(def.unk20);
 }
 
 // 0x800F48D4

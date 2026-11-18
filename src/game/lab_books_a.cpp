@@ -104,10 +104,10 @@ BOOL LabBooks_Ingredients_GetCurrentType(void) {
 }
 
 // 0x80110964
-BOOL LabBooks_Ingredients_GetTypeName(void) {
+ScriptValue LabBooks_Ingredients_GetTypeName(void) {
     u8* p = IngredientsObj();
     if (p == 0) return 0;
-    return (BOOL)(uintptr_t)fn_80118F44(p);  // TODO: header return type cannot hold a pointer on x64
+    return (ScriptValue)fn_80118F44(p);
 }
 
 // 0x801109D4
@@ -189,10 +189,10 @@ BOOL LabBooks_Ingredients_RenderList_GetIconList(void) {
 
 // 0x80110ECC
 // The header types this as BOOL, but the callee returns a pointer (value passed through as is).
-BOOL LabBooks_Ingredients_RenderList_GetSelectedName(void) {
+ScriptValue LabBooks_Ingredients_RenderList_GetSelectedName(void) {
     u8* p = IngredientsObj();
     if (p == 0) return 0;
-    return (BOOL)(uintptr_t)fn_8011966C(p);
+    return (ScriptValue)fn_8011966C(p);
 }
 
 // 0x80110F3C

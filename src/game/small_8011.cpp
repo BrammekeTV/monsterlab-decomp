@@ -237,7 +237,7 @@ BOOL fn_80119B38(void) {
 // 0x801102A0
 // Script callback: formats the current section's page record (fn_80116C44) and returns the
 // buffer pointer as a BOOL, or 0 when there is no section or no page.
-BOOL GetPageString(void) {
+ScriptValue GetPageString(void) {
     u8* sec = *(u8**)lbl_805FB248;
     u8* p = NULL;
     if (sec) {
@@ -245,7 +245,7 @@ BOOL GetPageString(void) {
         u8* obj = *(u8**)(sec + idx * 4 + 4);
         p = *(u8**)(obj + 0x4);
     }
-    if (p) return (BOOL)(uintptr_t)fn_80116C44(p);
+    if (p) return (ScriptValue)fn_80116C44(p);
     return 0;
 }
 

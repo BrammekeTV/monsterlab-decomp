@@ -102,10 +102,10 @@ s32 Parts_IsTextureAsyncLoaded(void) {
 
 // 0x801130F0
 // Returns the delete prompt text for the parts page's current part.
-s32 Parts_GetDeleteString(void) {
+ScriptValue Parts_GetDeleteString(void) {
     u8* obj = PartsObj();
     if (obj == 0) return 0;
-    return (BOOL)(uintptr_t)fn_8011AFEC(obj);  // TODO: header return type cannot hold a pointer on x64
+    return (ScriptValue)fn_8011AFEC(obj);
 }
 
 // 0x80113160
