@@ -5,6 +5,7 @@
 
 #include "types.h"
 
+extern u8 gStringTable2[];
 extern u8 lbl_804FB5F8[];
 extern u8 lbl_805F97F0[];
 extern u8 lbl_805F9800[];
@@ -20,6 +21,7 @@ extern u8 lbl_805FB908[];
 extern u8 lbl_805FB95C[];
 extern u8 lbl_805FB978[];
 extern u8 lbl_805FB97C[];
+extern u8 lbl_805FB9A4[];
 extern u8 lbl_805FB9D0[];
 extern u8 lbl_805FB9DC[];
 extern u8 lbl_805FB9E0[];
@@ -27,10 +29,23 @@ extern u8 lbl_805FB9EC[];
 extern u8 lbl_806000B4[];
 extern u8 lbl_806000D0[];
 extern u8 sWorldParams[];
+extern "C" void fn_801EFC9C(void);
 
 // 0x801EFC74
 extern "C" void fn_801EFC74(s32 a3) {
     *(u32*)((u8*)lbl_805FB908) = (u32)((u32)(uintptr_t)(a3));
+}
+
+// 0x801EFC7C
+extern "C" void StringTableInit(u8* a3) {
+    // tail-call arguments inferred from the registers set before the call
+    *(u32*)(((u8*)(uintptr_t)(a3)) + 0) = (u32)((u32)(0));
+    *(u32*)(((u8*)(uintptr_t)(a3)) + 4) = (u32)((u32)(0));
+    *(u32*)(((u8*)(uintptr_t)(a3)) + 8) = (u32)((u32)(0));
+    *(u32*)(((u8*)(uintptr_t)(a3)) + 12) = (u32)((u32)(0));
+    *(u32*)(((u8*)(uintptr_t)(a3)) + 16) = (u32)((u32)(0));
+    *(u32*)((u8*)gStringTable2) = (u32)((u32)(uintptr_t)(a3));
+    fn_801EFC9C();
 }
 
 // 0x801F004C
@@ -88,6 +103,17 @@ extern "C" s32 fn_801F38F0(void) {
     return (s32)(t0);
 }
 
+// 0x801F38F8
+extern "C" u32 fn_801F38F8(u8* a3) {
+    if (a3 != 0) {
+        s32 t0 = *(s32*)(((u8*)(uintptr_t)(a3)) + 184);
+        u32 t1 = (((u32)(t0) << 30) | ((u32)(t0) >> 2)) & 0x1u;
+        u32 t2 = (u32)(t1) ^ 0x1u;
+        return (u32)(t2);
+    }
+    return (u32)(0);
+}
+
 // 0x801F43A8
 extern "C" s32 fn_801F43A8(void) {
     return (s32)(0);
@@ -100,6 +126,14 @@ extern "C" s32 fn_801F4874(void) {
 
 // 0x801F521C
 extern "C" void fn_801F521C(void) {
+}
+
+// 0x801F5248
+extern "C" u32 fn_801F5248(u8* a3) {
+    s32 t0 = *(s32*)(((u8*)(uintptr_t)(a3)) + 4);
+    u32 t1 = (u32)(t0) - 6u;
+    u32 t2 = (u32)(t1 == 0);
+    return (u32)(t2);
 }
 
 // 0x801F525C
@@ -121,6 +155,17 @@ extern "C" void fn_801F5270(s32 a3, s32 a4, s32 a5, s32 a6, s32 a7, s32 a8, s32 
     *(u32*)((u8*)lbl_805F9814) = (u32)((u32)(uintptr_t)(a8));
     *(u32*)((u8*)lbl_805F9818) = (u32)((u32)(uintptr_t)(a9));
     *(u32*)((u8*)lbl_805F981C) = (u32)((u32)(uintptr_t)(a10));
+}
+
+// 0x801F5384
+extern "C" void ScopedLockCtor(u8* a3) {
+    s32 t0 = *(s32*)((u8*)lbl_805FB9A4);
+    if (t0 != 0) {
+        *(u32*)(((u8*)(uintptr_t)(a3)) + 0) = (u32)((u32)(1));
+        return;
+    }
+    *(u32*)((u8*)lbl_805FB9A4) = (u32)((u32)(1));
+    *(u32*)(((u8*)(uintptr_t)(a3)) + 0) = (u32)((u32)(0));
 }
 
 // 0x801F5408
@@ -189,4 +234,12 @@ extern "C" void fn_801F57B8(void) {
 // 0x801F5814
 extern "C" void fn_801F5814(s32 a3) {
     *(u8*)((u8*)lbl_805FB9E0) = (u8)((u32)(uintptr_t)(a3));
+}
+
+// 0x801F581C
+extern "C" u32 fn_801F581C(void) {
+    u8 t0 = *(u8*)((u8*)lbl_805FB9E0);
+    u32 t1 = (u32)(t0) - 1u;
+    u32 t2 = (u32)(t1 == 0);
+    return (u32)(t2);
 }

@@ -6,6 +6,16 @@
 #include "types.h"
 
 extern u8 lbl_805FDE40[];
+extern u8 lbl_805FDE50[];
+extern "C" void app_PlayMusic(u32, f32);
+extern "C" void fn_800C253C(s32, s32);
+
+// 0x800A19B0
+extern "C" void fn_800A19B0(void) {
+    f32 t0 = *(f32*)((u8*)lbl_805FDE50);
+    u32 t1 = (u32)(0x8d4c0000) - 25340u;
+    app_PlayMusic((u32)((u32)(t1)), (f32)(t0));
+}
 
 // 0x800A1BE8
 extern "C" void fn_800A1BE8(void) {
@@ -33,4 +43,16 @@ extern "C" void fn_800A2328(void) {
 extern "C" f32 fn_800A23E4(u8* a3) {
     f32 t0 = *(f32*)(((u8*)(uintptr_t)(a3)) + 3316);
     return (f32)(t0);
+}
+
+// 0x800A23EC
+extern "C" void fn_800A23EC(s32 a3) {
+    // tail-call arguments inferred from the registers set before the call
+    fn_800C253C((s32)((u32)(uintptr_t)(a3)), (s32)((u32)(2)));
+}
+
+// 0x800A23F4
+extern "C" void fn_800A23F4(s32 a3) {
+    // tail-call arguments inferred from the registers set before the call
+    fn_800C253C((s32)((u32)(uintptr_t)(a3)), (s32)((u32)(1)));
 }

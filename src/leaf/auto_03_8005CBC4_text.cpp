@@ -17,6 +17,17 @@ extern "C" u8* fn_8005E128(u8* a3) {
     return (u8*)(t0);
 }
 
+// 0x8005F444
+extern "C" s32 fn_8005F444(u8* a3) {
+    u16 t0 = *(u16*)(((u8*)(uintptr_t)(a3)) + 0);
+    u32 t1 = (u32)(t0) & 0x1u;
+    if (t1 == 0) {
+        return (s32)(-1);
+    }
+    u8 t2 = *(u8*)(((u8*)(uintptr_t)(a3)) + 2);
+    return (s32)(t2);
+}
+
 // 0x80062C38
 extern "C" s32 fn_80062C38(u8* a3) {
     s32 t0 = *(s32*)(((u8*)(uintptr_t)(a3)) + 3132);

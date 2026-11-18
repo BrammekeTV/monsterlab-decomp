@@ -11,6 +11,12 @@ extern u8 lbl_805FB3F4[];
 extern u8 lbl_805FB3F8[];
 extern u8 lbl_805FB3FC[];
 
+// 0x8013E734
+void MonsterSelectDeInit(void) {
+    u32 t0 = (u32)(0x60b10000) + 23953u;
+    UIElement_SetVisibleFlag((u32)((u32)(t0)), (u32)((u32)(0)));
+}
+
 // 0x8013E744
 void SetMyMonsterHitpoints(f32 f1) {
     *(f32*)((u8*)lbl_805FB3F0) = (f32)(f1);

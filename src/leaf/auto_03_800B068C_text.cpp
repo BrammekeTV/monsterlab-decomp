@@ -9,3 +9,11 @@
 extern "C" void fn_800B0CFC(u8* a3) {
     *(u32*)(((u8*)(uintptr_t)(a3)) + 664) = (u32)((u32)(1));
 }
+
+// 0x800B1464
+extern "C" u32 fn_800B1464(u8* a3) {
+    s32 t0 = *(s32*)(((u8*)(uintptr_t)(a3)) + 664);
+    u32 t1 = (u32)(t0) - 1u;
+    u32 t2 = (u32)(t1 == 0);
+    return (u32)(t2);
+}

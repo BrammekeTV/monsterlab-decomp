@@ -5,6 +5,30 @@
 
 #include "types.h"
 
+extern "C" void UIElement_PlayUIAnimAtRate(u32, u32, f32);
+
+// 0x80030348
+extern "C" void CatchObject_SetLane(u8* a3, u8* a4) {
+    s32 t0 = *(s32*)(((u8*)(uintptr_t)(a4)) + 12);
+    if (t0 == 0) {
+        *(u32*)(((u8*)(uintptr_t)(a4)) + 12) = (u32)((u32)(uintptr_t)(a3));
+        *(u32*)(((u8*)(uintptr_t)(a3)) + 8) = (u32)((u32)(uintptr_t)(a4));
+        return;
+    }
+    *(u32*)(((u8*)(uintptr_t)(a3)) + 12) = (u32)((u32)(t0));
+    *(u32*)((u8*)(uintptr_t)(t0) + 8) = (u32)((u32)(uintptr_t)(a3));
+    *(u32*)(((u8*)(uintptr_t)(a4)) + 12) = (u32)((u32)(uintptr_t)(a3));
+    *(u32*)(((u8*)(uintptr_t)(a3)) + 8) = (u32)((u32)(uintptr_t)(a4));
+}
+
+// 0x80030554
+extern "C" void fn_80030554(u8* a3, f32 f1) {
+    u8* t0 = *(u8**)(((u8*)(uintptr_t)(a3)) + 4);
+    u32 t1 = (u32)(0x4fd60000) - 22875u;
+    s32 t2 = *(s32*)(t0 + 0);
+    UIElement_PlayUIAnimAtRate((u32)((u32)(t2)), (u32)((u32)(t1)), (f32)(f1));
+}
+
 // 0x80030568
 extern "C" void fn_80030568(void) {
 }

@@ -6,10 +6,131 @@
 #include "types.h"
 #include "game/script_callbacks.h"
 
+extern u8 lbl_8040E5F0[];
+extern u8 lbl_805F9980[];
 extern u8 lbl_805FB89C[];
+extern "C" void PlaySound(u32, s32, s32, s32, s32, s32);
+extern "C" void PlaySoundAt(void*, int, u8*, int);
+extern "C" void TriggerDoAction(void*, s32);
+extern "C" void fn_80162A70(u8*);
+extern "C" void fn_801B6878(s32, s32, s32);
+extern "C" void fn_801B69F8(s32);
+extern "C" void fn_801B6AA4(s32);
+extern "C" void fn_801B6EC8(s32, s32);
+extern "C" BOOL fn_801F5220(void);
+extern "C" void fn_8020A398(void);
 
 // 0x801DB490
 void Noop(void) {
+}
+
+// 0x801DB4BC
+void PrintResult(void) {
+    GetResultRegister();
+}
+
+// 0x801DB4C0
+void PrintFResult(void) {
+    fGetResultRegister();
+}
+
+// 0x801DBDC4
+void FrameFxStopAll(void) {
+    // tail-call arguments inferred from the registers set before the call
+    fn_80162A70((u8*)lbl_8040E5F0);
+}
+
+// 0x801DBED0
+u32 IsHost(void) {
+    return (u32)(fn_801F5220());
+}
+
+// 0x801DC19C
+void TestScriptCallback(void* a3, u32 a4, void* a5) {
+    TriggerDoAction((void*)(((u8*)(uintptr_t)(a4))), (s32)((u32)(uintptr_t)(a3)));
+}
+
+// 0x801DC1AC
+void PlayGlobalSound(u32 a3) {
+    PlaySoundAt((void*)(((u8*)(uintptr_t)(a3))), (int)((u32)(0)), (u8*)(uintptr_t)(0), (int)((u32)(0)));
+}
+
+// 0x801DC1BC
+void PlayGlobalSoundWithEffect(u32 a3, s32 a4) {
+    *(u8*)(((u8*)(uintptr_t)(a3)) + 46) = (u8)((u32)(uintptr_t)(a4));
+    PlaySoundAt((void*)(((u8*)(uintptr_t)(a3))), (int)((u32)(0)), (u8*)(uintptr_t)(0), (int)((u32)(0)));
+}
+
+// 0x801DC224
+void PlayGlobalGroupSound_NoLoad(u32 a3) {
+    PlaySound((u32)((u32)(uintptr_t)(a3)), (s32)((u32)(0)), (s32)((u32)(0)), (s32)((u32)(0)), (s32)((u32)(0)), (s32)((u32)(0)));
+}
+
+// 0x801DC298
+void StopGlobalLoopingGroupSound(void) {
+    // tail-call arguments inferred from the registers set before the call
+    s32 t0 = *(s32*)((u8*)lbl_805F9980);
+    if ((s32)(u32)(t0) == -1) {
+        return;
+    }
+    fn_8020A398();
+}
+
+// 0x801DC2AC
+void PlayGlobalGroupSoundWithEffect_NoLoad(u32 a3, s32 a4) {
+    u32 t0 = (u32)(uintptr_t)(a4) & 0xffu;
+    PlaySound((u32)((u32)(uintptr_t)(a3)), (s32)((u32)(0)), (s32)((u32)(0)), (s32)((u32)(0)), (s32)((u32)(0)), (s32)((u32)(t0)));
+}
+
+// 0x801DDDCC
+void PlayLoopingSoundFX(void* a3, u32 a4, s32 a5) {
+    // tail-call arguments inferred from the registers set before the call
+    if (a3 == 0) {
+        return;
+    }
+    fn_801B6878((s32)((u32)(uintptr_t)(a3)), (s32)((u32)(uintptr_t)(a4)), (s32)((u32)(uintptr_t)(a5)));
+}
+
+// 0x801DDECC
+void PrintPosition(void* a3) {
+    // tail-call arguments inferred from the registers set before the call
+    if (a3 == 0) {
+        return;
+    }
+    fn_801B6AA4((s32)((u32)(uintptr_t)(a3)));
+}
+
+// 0x801DDF20
+void SetSpawnCount(void* a3, s32 a4) {
+    // tail-call arguments inferred from the registers set before the call
+    fn_801B6EC8((s32)((u32)(uintptr_t)(a3)), (s32)((u32)(uintptr_t)(a4)));
+}
+
+// 0x801DDF24
+void SetTimeout(ScriptCtx* a3, f32 f1) {
+    if (a3 == 0) {
+        return;
+    }
+    *(f32*)(((u8*)(uintptr_t)(a3)) + 76) = (f32)(f1);
+    *(f32*)(((u8*)(uintptr_t)(a3)) + 80) = (f32)(f1);
+}
+
+// 0x801DDF38
+void StopLoopingSoundFX(void* a3) {
+    // tail-call arguments inferred from the registers set before the call
+    if (a3 == 0) {
+        return;
+    }
+    fn_801B69F8((s32)((u32)(uintptr_t)(a3)));
+}
+
+// 0x801DDF48
+void StopLoopingSoundGroupFX(void* a3) {
+    // tail-call arguments inferred from the registers set before the call
+    if (a3 == 0) {
+        return;
+    }
+    fn_801B69F8((s32)((u32)(uintptr_t)(a3)));
 }
 
 // 0x801E1B94

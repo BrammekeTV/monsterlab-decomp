@@ -5,6 +5,23 @@
 
 #include "types.h"
 
+extern "C" void fn_8006C3FC(void);
+
+// 0x8006B9CC
+extern "C" s32 fn_8006B9CC(u8* a3) {
+    u8* t0 = *(u8**)(((u8*)(uintptr_t)(a3)) + 352);
+    if (t0 == 0) {
+        return (s32)(0);
+    }
+    u8* t1 = *(u8**)(t0 + 4);
+    s32 t2 = *(s32*)(t1 + 32);
+    u32 t3 = (u32)(t2) & 0x2u;
+    if (t3 == 0) {
+        return (s32)(0);
+    }
+    return (s32)(1);
+}
+
 // 0x8006C65C
 extern "C" u8 fn_8006C65C(u8* a3) {
     u8 t0 = *(u8*)(((u8*)(uintptr_t)(a3)) + 544);
@@ -15,6 +32,14 @@ extern "C" u8 fn_8006C65C(u8* a3) {
 extern "C" s32 fn_8006C664(u8* a3) {
     s32 t0 = *(s32*)(((u8*)(uintptr_t)(a3)) + 548);
     return (s32)(t0);
+}
+
+// 0x8006C6AC
+extern "C" void fn_8006C6AC(u8* a3) {
+    // tail-call arguments inferred from the registers set before the call
+    *(u8*)(((u8*)(uintptr_t)(a3)) + 544) = (u8)((u32)(0));
+    *(u32*)(((u8*)(uintptr_t)(a3)) + 548) = (u32)((u32)(-1));
+    fn_8006C3FC();
 }
 
 // 0x8006CB54

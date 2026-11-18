@@ -7,6 +7,26 @@
 
 extern u8 lbl_805FB2E8[];
 
+// 0x80126354
+extern "C" s32 fn_80126354(void) {
+    u8* t0 = *(u8**)((u8*)lbl_805FB2E8);
+    if (t0 == 0) {
+        return (s32)(0);
+    }
+    s32 t1 = *(s32*)(t0 + 264);
+    return (s32)(t1);
+}
+
+// 0x801265F4
+extern "C" u8* fn_801265F4(void) {
+    u8* t0 = *(u8**)((u8*)lbl_805FB2E8);
+    if (t0 == 0) {
+        return (u8*)(t0);
+    }
+    *(u8*)(t0 + 268) = (u8)((u32)(0));
+    return (u8*)(t0);
+}
+
 // 0x8012670C
 extern "C" s32 fn_8012670C(void) {
     u8* t0 = *(u8**)((u8*)lbl_805FB2E8);

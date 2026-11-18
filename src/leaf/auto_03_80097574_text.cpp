@@ -6,6 +6,8 @@
 #include "types.h"
 
 extern u8 lbl_805FDBA0[];
+extern "C" void fn_801EC8C4(s32, s32, s32);
+extern "C" void fn_801ECFA0(s32, s32);
 
 // 0x80097574
 extern "C" void fn_80097574(u8* a3) {
@@ -28,6 +30,23 @@ extern "C" void fn_80097BCC(u8* a3, u8* a4) {
     *(f32*)(((u8*)(uintptr_t)(a3)) + 4) = (f32)(t6);
     f32 t7 = *(f32*)((u8*)(uintptr_t)(t4) + 100);
     *(f32*)(((u8*)(uintptr_t)(a3)) + 8) = (f32)(t7);
+}
+
+// 0x800980C8
+extern "C" void fn_800980C8(u8* a3, s32 a4) {
+    // tail-call arguments inferred from the registers set before the call
+    if (a4 == 0) {
+        s32 t0 = *(s32*)(((u8*)(uintptr_t)(a3)) + 612);
+        s32 t1 = *(s32*)(((u8*)(uintptr_t)(a3)) + 616);
+        u32 t2 = (u32)(t0) + 148u;
+        fn_801ECFA0((s32)((u32)(t2)), (s32)((u32)(t1)));
+        return;
+    }
+    s32 t3 = *(s32*)(((u8*)(uintptr_t)(a3)) + 612);
+    s32 t4 = *(s32*)(((u8*)(uintptr_t)(a3)) + 616);
+    u32 t5 = (u32)(0xc3220000) + 26819u;
+    u32 t6 = (u32)(t3) + 148u;
+    fn_801EC8C4((s32)((u32)(t6)), (s32)((u32)(t4)), (s32)((u32)(t5)));
 }
 
 // 0x80098560

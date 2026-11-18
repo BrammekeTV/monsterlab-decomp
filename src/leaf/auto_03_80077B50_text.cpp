@@ -5,7 +5,62 @@
 
 #include "types.h"
 
+extern "C" void fn_8007B194(s32);
+extern "C" void fn_8007C080(s32);
+extern "C" void fn_8007C110(u8*);
+extern "C" void fn_8007C12C(u8*);
+extern "C" void fn_8007C140(s32);
+extern "C" void fn_8007C278(s32);
+extern "C" void fn_8007C3B0(s32);
+
+// 0x80077BC0
+extern "C" void WeldingGunHeatDecrease(u8* a3) {
+    // tail-call arguments inferred from the registers set before the call
+    s32 t0 = *(s32*)(((u8*)(uintptr_t)(a3)) + 16);
+    fn_8007B194((s32)((u32)(t0)));
+}
+
 // 0x80077C48
 extern "C" s32 WeldingOverDangerZone(void) {
     return (s32)(0);
+}
+
+// 0x80077CC8
+extern "C" void WeldingUpdateShake(u8* a3) {
+    // tail-call arguments inferred from the registers set before the call
+    s32 t0 = *(s32*)(((u8*)(uintptr_t)(a3)) + 16);
+    fn_8007C080((s32)((u32)(t0)));
+}
+
+// 0x80077CD0
+extern "C" void WeldingResetShakeCount(u8* a3) {
+    u8* t0 = *(u8**)(((u8*)(uintptr_t)(a3)) + 16);
+    fn_8007C110(t0);
+}
+
+// 0x80077CDC
+extern "C" void WeldingResetOverheatCounter(u8* a3) {
+    u8* t0 = *(u8**)(((u8*)(uintptr_t)(a3)) + 16);
+    fn_8007C12C(t0);
+}
+
+// 0x80077CE4
+extern "C" void StartWeldLightingEffect(u8* a3) {
+    // tail-call arguments inferred from the registers set before the call
+    s32 t0 = *(s32*)(((u8*)(uintptr_t)(a3)) + 16);
+    fn_8007C140((s32)((u32)(t0)));
+}
+
+// 0x80077CEC
+extern "C" void StartBrokenGunLightingEffect(u8* a3) {
+    // tail-call arguments inferred from the registers set before the call
+    s32 t0 = *(s32*)(((u8*)(uintptr_t)(a3)) + 16);
+    fn_8007C278((s32)((u32)(t0)));
+}
+
+// 0x80077CF4
+extern "C" void StopWeldLightingEffect(u8* a3) {
+    // tail-call arguments inferred from the registers set before the call
+    s32 t0 = *(s32*)(((u8*)(uintptr_t)(a3)) + 16);
+    fn_8007C3B0((s32)((u32)(t0)));
 }

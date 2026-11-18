@@ -6,6 +6,32 @@
 #include "types.h"
 
 extern u8 lbl_805FDA1C[];
+extern u8 lbl_805FDA28[];
+
+// 0x8008CDFC
+extern "C" f32 fn_8008CDFC(u8* a3, s32 a4, f32 f1) {
+    if (a4 == 0) {
+        s32 t0 = *(s32*)(((u8*)(uintptr_t)(a3)) + 620);
+        if ((s32)(u32)(t0) != 3) {
+            return (f32)(f1);
+        }
+        f32 t1 = *(f32*)(((u8*)(uintptr_t)(a3)) + 692);
+        f32 t2 = *(f32*)((u8*)lbl_805FDA28);
+        f32 t3 = (f32)(t1 * t2);
+        *(f32*)(((u8*)(uintptr_t)(a3)) + 692) = (f32)(t3);
+        return (f32)(t1);
+    }
+    *(u32*)(((u8*)(uintptr_t)(a3)) + 636) = (u32)((u32)(uintptr_t)(a4));
+    s32 t4 = *(s32*)(((u8*)(uintptr_t)(a3)) + 620);
+    if ((s32)(u32)(t4) != 3) {
+        return (f32)(f1);
+    }
+    f32 t5 = *(f32*)(((u8*)(uintptr_t)(a3)) + 692);
+    f32 t6 = *(f32*)((u8*)lbl_805FDA28);
+    f32 t7 = (f32)(t5 * t6);
+    *(f32*)(((u8*)(uintptr_t)(a3)) + 692) = (f32)(t7);
+    return (f32)(t5);
+}
 
 // 0x8008CE28
 extern "C" void fn_8008CE28(u8* a3, f32 f1) {

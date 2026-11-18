@@ -5,6 +5,16 @@
 
 #include "types.h"
 
+extern u8 gFlag805FB948[];
+extern "C" void fn_801F31A8(void);
+
+// 0x8010A374
+extern "C" void fn_8010A374(void) {
+    // tail-call arguments inferred from the registers set before the call
+    *(u8*)((u8*)gFlag805FB948) = (u8)((u32)(0));
+    fn_801F31A8();
+}
+
 // 0x8010A3B0
 extern "C" void fn_8010A3B0(void) {
 }

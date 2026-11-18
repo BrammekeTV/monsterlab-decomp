@@ -69,6 +69,16 @@ extern "C" u32 fn_80066800(u8* a3) {
     return (u32)(t1);
 }
 
+// 0x80066960
+extern "C" void fn_80066960(u8* a3) {
+    u8* t0 = *(u8**)(((u8*)(uintptr_t)(a3)) + 0);
+    if (t0 == 0) {
+        return;
+    }
+    *(u32*)(t0 + 0) = (u32)((u32)(0));
+    *(u32*)(((u8*)(uintptr_t)(a3)) + 0) = (u32)((u32)(0));
+}
+
 // 0x800676D4
 extern "C" void fn_800676D4(u8* a3, u8* a4) {
     f32 t0 = *(f32*)(((u8*)(uintptr_t)(a4)) + 0);

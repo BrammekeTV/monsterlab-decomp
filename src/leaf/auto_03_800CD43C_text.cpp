@@ -5,7 +5,56 @@
 
 #include "types.h"
 
+extern u8 lbl_803C6ED8[];
+extern u8 lbl_805F8C88[];
+extern "C" void fn_800C2180(u8*, u8*, s32);
+extern "C" void fn_800C253C(s32, s32);
+
+// 0x800CD490
+extern "C" void fn_800CD490(u8* a3, s32 a4) {
+    // tail-call arguments inferred from the registers set before the call
+    *(u32*)(((u8*)(uintptr_t)(a3)) + 20) = (u32)((u32)(uintptr_t)(a4));
+    *(u32*)(((u8*)(uintptr_t)(a3)) + 24) = (u32)((u32)(0));
+    *(u32*)(((u8*)(uintptr_t)(a3)) + 28) = (u32)((u32)(1));
+    fn_800C2180(((u8*)(uintptr_t)(a3)), (u8*)lbl_803C6ED8, (s32)((u32)(5)));
+}
+
+// 0x800CD778
+extern "C" void fn_800CD778(s32 a3) {
+    // tail-call arguments inferred from the registers set before the call
+    fn_800C253C((s32)((u32)(uintptr_t)(a3)), (s32)((u32)(0)));
+}
+
+// 0x800CD780
+extern "C" void fn_800CD780(s32 a3) {
+    // tail-call arguments inferred from the registers set before the call
+    fn_800C253C((s32)((u32)(uintptr_t)(a3)), (s32)((u32)(4)));
+}
+
+// 0x800CD7C0
+extern "C" s32 fn_800CD7C0(s32 a3, s32 a4) {
+    s32 t0 = *(s32*)((u8*)lbl_805F8C88);
+    if ((u32)(uintptr_t)(a4) != (u32)(t0)) {
+        return (s32)(0);
+    }
+    return (s32)(1);
+}
+
 // 0x800CD9A4
 extern "C" void fn_800CD9A4(u8* a3) {
     *(u32*)(((u8*)(uintptr_t)(a3)) + 0) = (u32)((u32)(0));
+}
+
+// 0x800CDC9C
+extern "C" void fn_800CDC9C(u8* a3, s32 a4) {
+    s32 t0 = *(s32*)(((u8*)(uintptr_t)(a3)) + 0);
+    if ((s32)(u32)(t0) >= 9) {
+        return;
+    }
+    u32 t1 = (((u32)(t0) << 2) | ((u32)(t0) >> 30)) & 0xfffffffcu;
+    u32 t2 = (u32)(uintptr_t)(a3) + (u32)(t1);
+    *(u32*)((u8*)(uintptr_t)(t2) + 4) = (u32)((u32)(uintptr_t)(a4));
+    s32 t3 = *(s32*)(((u8*)(uintptr_t)(a3)) + 0);
+    u32 t4 = (u32)(t3) + 1u;
+    *(u32*)(((u8*)(uintptr_t)(a3)) + 0) = (u32)((u32)(t4));
 }

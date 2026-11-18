@@ -5,6 +5,10 @@
 
 #include "types.h"
 
+extern u8 lbl_803C4298[];
+extern u8 lbl_805FB2F3[];
+extern "C" void fn_8010FA48(void);
+
 // 0x8012A748
 extern "C" u32 fn_8012A748(s32 a3) {
     u32 t0 = (u32)(uintptr_t)(a3) + 65536u;
@@ -33,6 +37,17 @@ extern "C" void fn_8012A77C(void) {
 extern "C" void fn_8012A790(u8* a3, u8* a4) {
     s32 t0 = *(s32*)(((u8*)(uintptr_t)(a4)) + 0);
     *(u32*)(((u8*)(uintptr_t)(a3)) + 0) = (u32)((u32)(t0));
+}
+
+// 0x8012AAD8
+extern "C" void fn_8012AAD8(void) {
+    u8 t0 = *(u8*)((u8*)lbl_805FB2F3);
+    if (t0 != 0) {
+        return;
+    }
+    *(u8*)((u8*)lbl_805FB2F3) = (u8)((u32)(1));
+    u8 t1 = *(u8*)((u8*)lbl_803C4298 + 28);
+    fn_8010FA48();
 }
 
 // 0x8012CDF0

@@ -5,6 +5,7 @@
 
 #include "types.h"
 
+extern u8 gVideoDrawDone[];
 extern u8 lbl_805FB528[];
 extern u8 lbl_805FB550[];
 extern u8 lbl_805FB554[];
@@ -12,6 +13,9 @@ extern u8 lbl_805FB580[];
 extern u8 lbl_805FB590[];
 extern u8 lbl_805FF20C[];
 extern u8 lbl_805FF210[];
+extern u8 lbl_805FF228[];
+extern u8 lbl_805FF22C[];
+extern "C" s32 OSSignalSemaphore(u8*);
 
 // 0x80156AAC
 extern "C" s32 fn_80156AAC(u8* a3) {
@@ -66,6 +70,20 @@ extern "C" u32 fn_80159084(s32 a3, u8* a4) {
     return (u32)(0xcc010000);
 }
 
+// 0x8015A340
+extern "C" s32 fn_8015A340(u8* a3) {
+    u8 t0 = *(u8*)(((u8*)(uintptr_t)(a3)) + 13);
+    u32 t1 = (((u32)(t0) << 3) | ((u32)(t0) >> 29)) & 0xfffffff8u;
+    if (t1 != 0) {
+        u8 t2 = *(u8*)(((u8*)(uintptr_t)(a3)) + 11);
+        u32 t3 = (u32)(t2) | 0x4u;
+        *(u8*)(((u8*)(uintptr_t)(a3)) + 11) = (u8)((u32)(t3));
+        s32 t4 = *(s32*)(((u8*)(uintptr_t)(a3)) + 28);
+        return (s32)(t4);
+    }
+    return (s32)(0);
+}
+
 // 0x8015A58C
 extern "C" u32 fn_8015A58C(u8* a3) {
     u8 t0 = *(u8*)(((u8*)(uintptr_t)(a3)) + 13);
@@ -84,6 +102,19 @@ extern "C" u32 fn_8015BA30(u8* a3) {
     u32 t3 = (u32)(t2) | 0x80000000u;
     u32 t4 = (u32)(t3) - (u32)(t0);
     return (u32)(t4);
+}
+
+// 0x8015D2E0
+extern "C" s32 fn_8015D2E0(void) {
+    return (s32)(OSSignalSemaphore((u8*)gVideoDrawDone));
+}
+
+// 0x8015DE24
+extern "C" u32 VideoIsPal50(void) {
+    s32 t0 = *(s32*)((u8*)lbl_805FB554);
+    u32 t1 = (u32)(t0) - 520u;
+    u32 t2 = (u32)(t1 == 0);
+    return (u32)(t2);
 }
 
 // 0x8015DE48
@@ -176,6 +207,23 @@ extern "C" void fn_8015FD30(u8* a3, u8* a4) {
     *(f32*)(((u8*)(uintptr_t)(a3)) + 4) = (f32)(t0);
     *(f32*)(((u8*)(uintptr_t)(a3)) + 8) = (f32)(t0);
     *(f32*)(((u8*)(uintptr_t)(a3)) + 12) = (f32)(t0);
+}
+
+// 0x8015FD74
+extern "C" f64 fn_8015FD74(u8* a3, u8* a4) {
+    f32 t0 = *(f32*)(((u8*)(uintptr_t)(a4)) + 0);
+    f32 t1 = *(f32*)((u8*)lbl_805FF22C);
+    if (!(t0 < t1)) {
+        f32 t2 = *(f32*)((u8*)lbl_805FF228);
+        if (!(t0 > t2)) {
+            *(f32*)(((u8*)(uintptr_t)(a3)) + 0) = (f32)(t0);
+            return (f64)(t0);
+        }
+        *(f32*)(((u8*)(uintptr_t)(a3)) + 0) = (f32)(t2);
+        return (f64)(t2);
+    }
+    *(f32*)(((u8*)(uintptr_t)(a3)) + 0) = (f32)(t1);
+    return (f64)(t1);
 }
 
 // 0x80160030

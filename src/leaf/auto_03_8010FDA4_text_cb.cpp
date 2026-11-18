@@ -6,14 +6,89 @@
 #include "types.h"
 #include "game/script_callbacks.h"
 
+extern u8 lbl_805FB24D[];
 extern u8 lbl_805FB250[];
 extern u8 lbl_805FB254[];
 extern u8 lbl_805FB258[];
 extern u8 lbl_805FB25C[];
+extern "C" void fn_80119798(s32);
+extern "C" s32 fn_80119C58(void);
+extern "C" s32 fn_80119FFC(void);
+extern "C" s32 fn_8011A004(void);
+extern "C" s32 fn_8011A00C(void);
+extern "C" s32 fn_8011A014(void);
+extern "C" void fn_8011A01C(void);
+extern "C" void fn_8011A028(void);
+extern "C" u8 fn_8011A034(void);
+extern "C" void fn_8011A03C(s32);
+extern "C" s32 fn_8011A044(void);
 
 // 0x801116FC
 void LockInput(s32 a3) {
     *(u32*)((u8*)lbl_805FB25C) = (u32)((u32)(uintptr_t)(a3));
+}
+
+// 0x80111704
+s32 CanProcessInput(void) {
+    s32 t0 = *(s32*)((u8*)lbl_805FB25C);
+    u32 t1 = (u32)(t0 == 0);
+    return (s32)(t1);
+}
+
+// 0x80111A70
+void StartIngredientsSelection(u32 a3) {
+    // tail-call arguments inferred from the registers set before the call
+    fn_80119798((s32)((u32)(uintptr_t)(a3)));
+}
+
+// 0x801124BC
+void EndIngredientsSelection(void) {
+    fn_80119C58();
+}
+
+// 0x801124C0
+u32 GetSelectedKeyIngredient(void) {
+    return (u32)(fn_80119FFC());
+}
+
+// 0x801124C4
+u32 GetSelectedSecondaryIngredient(void) {
+    return (u32)(fn_8011A004());
+}
+
+// 0x801124C8
+u32 GetSelectedPartForIngredients(void) {
+    return (u32)(fn_8011A00C());
+}
+
+// 0x801124CC
+u32 GetEnhancementDefectForIngredients(void) {
+    return (u32)(fn_8011A014());
+}
+
+// 0x801124D0
+void IngredientSelectionSetErrorTransition(void) {
+    fn_8011A01C();
+}
+
+// 0x801124D4
+void IngredientSelectionClearErrorTransition(void) {
+    fn_8011A028();
+}
+
+// 0x801124D8
+void SetStoredTextForIngredientSelection(u32 a3) {
+    fn_8011A03C((s32)((u32)(uintptr_t)(a3)));
+}
+
+// 0x801124DC
+u32 GetStoredTextForIngredientSelection(void) {
+    return (u32)(fn_8011A044());
+}
+
+// 0x801124E0
+s32 IngredientSelectionIsErrorTransition(void) {
+    return (s32)(fn_8011A034());
 }
 
 // 0x80116848
@@ -32,4 +107,11 @@ BOOL PartInfo_GetEnhanceDefectTexture(void) {
 BOOL PartInfo_GetEnhanceDefectDesc(void) {
     s32 t0 = *(s32*)((u8*)lbl_805FB258);
     return (BOOL)(t0);
+}
+
+// 0x80116860
+s32 PartInfo_PlayerNeedsMoreRanks(void) {
+    u8 t0 = *(u8*)((u8*)lbl_805FB24D);
+    u32 t1 = (u32)(t0 == 0);
+    return (s32)(t1);
 }

@@ -8,6 +8,9 @@
 extern u8 lbl_803839F0[];
 extern u8 lbl_805FD300[];
 extern u8 lbl_805FD304[];
+extern u8 lbl_805FD378[];
+extern u8 lbl_805FD37C[];
+extern "C" void fn_801C4B90(u8*, s32, s32, s32, s32, s32);
 
 // 0x80052504
 extern "C" void fn_80052504(u8* a3) {
@@ -43,6 +46,19 @@ extern "C" u8* fn_800526D4(u8* a3) {
 extern "C" s32 fn_800526DC(u8* a3) {
     s32 t0 = *(s32*)(((u8*)(uintptr_t)(a3)) + 4);
     return (s32)(t0);
+}
+
+// 0x800531BC
+extern "C" void fn_800531BC(u8* a3, s32 a4) {
+    if (a4 == 0) {
+        s32 t0 = *(s32*)(((u8*)(uintptr_t)(a3)) + 2104);
+        u32 t1 = (u32)(t0) & 0xfdffffffu;
+        *(u32*)(((u8*)(uintptr_t)(a3)) + 2104) = (u32)((u32)(t1));
+        return;
+    }
+    s32 t2 = *(s32*)(((u8*)(uintptr_t)(a3)) + 2104);
+    u32 t3 = (u32)(t2) | 0x2000000u;
+    *(u32*)(((u8*)(uintptr_t)(a3)) + 2104) = (u32)((u32)(t3));
 }
 
 // 0x800531E4
@@ -112,6 +128,15 @@ extern "C" u8* CharacterSetRotated(u8* a3) {
 extern "C" u8* fn_80053410(u8* a3) {
     u8* t0 = ((u8*)(uintptr_t)(a3)) + 140;
     return (u8*)(t0);
+}
+
+// 0x8005353C
+extern "C" void fn_8005353C(u8* a3, s32 a4) {
+    s32 t0 = *(s32*)(((u8*)(uintptr_t)(a3)) + 2560);
+    if (t0 == 0) {
+        return;
+    }
+    *(u8*)(((u8*)(uintptr_t)(a3)) + 2197) = (u8)((u32)(uintptr_t)(a4));
 }
 
 // 0x80053550
@@ -225,6 +250,14 @@ extern "C" u8 fn_80054A88(u8* a3) {
     return (u8)(t0);
 }
 
+// 0x80054AB4
+extern "C" void fn_80054AB4(u8* a3, s32 a4, s32 a5, s32 a6, s32 a7) {
+    // tail-call arguments inferred from the registers set before the call
+    u8* t0 = *(u8**)(((u8*)(uintptr_t)(a3)) + 0);
+    s32 t1 = *(s32*)(t0 + 4);
+    fn_801C4B90(((u8*)(uintptr_t)(a3)), (s32)((u32)(uintptr_t)(a4)), (s32)((u32)(uintptr_t)(a5)), (s32)((u32)(uintptr_t)(a6)), (s32)((u32)(uintptr_t)(a7)), (s32)((u32)(t1)));
+}
+
 // 0x800553C0
 extern "C" f32 fn_800553C0(u8* a3, u8* a4) {
     f32 t0 = *(f32*)(((u8*)(uintptr_t)(a4)) + 0);
@@ -330,6 +363,19 @@ extern "C" f32 fn_80058BD4(u8* a3, u8* a4) {
     f32 t2 = (f32)(t0 / t1);
     *(f32*)(((u8*)(uintptr_t)(a3)) + 0) = (f32)(t2);
     return (f32)(t0);
+}
+
+// 0x80058C00
+extern "C" s32 fn_80058C00(f32 f1) {
+    f32 t0 = *(f32*)((u8*)lbl_805FD37C);
+    if (!(f1 > t0)) {
+        return (s32)(0);
+    }
+    f32 t1 = *(f32*)((u8*)lbl_805FD378);
+    if (!(f1 < t1)) {
+        return (s32)(0);
+    }
+    return (s32)(1);
 }
 
 // 0x8005B648

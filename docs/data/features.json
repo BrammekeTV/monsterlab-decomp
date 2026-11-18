@@ -69,6 +69,11 @@
  "changelog": [
   {
    "date": "2026-11-18",
+   "time": "13:27",
+   "text": "The leaf generator now also writes forwarding wrappers (functions that pass their arguments on to another function, often only when a save is loaded) and small compare-and-return functions (range checks, flag tests, 'is this zero' idioms). About 670 more small functions are now covered automatically."
+  },
+  {
+   "date": "2026-11-18",
    "time": "12:49",
    "text": "Decompiled the small battle building blocks: value boxes (the int arrays used for stats and damage), fighter stats setup (two 7-stat boxes, chosen action, side, eight effect slots), empty action choices, and the round-side records with their constructors and destructors."
   },

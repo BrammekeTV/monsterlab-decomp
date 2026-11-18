@@ -7,7 +7,9 @@
 
 extern u8 lbl_805FB124[];
 extern u8 lbl_805FB128[];
+extern u8 lbl_805FB134[];
 extern u8 lbl_805FD5D8[];
+extern u8 lbl_805FD5F0[];
 extern u8 lbl_805FD630[];
 
 // 0x8006FA44
@@ -27,6 +29,19 @@ extern "C" u32 fn_8006FA5C(u8* a3, s32 a4) {
     u32 t3 = (u32)(t2) | (u32)(t1);
     u32 t4 = (((u32)(t3) << 1) | ((u32)(t3) >> 31)) & 0x1u;
     return (u32)(t4);
+}
+
+// 0x8006FBDC
+extern "C" u8* fn_8006FBDC(void) {
+    u8* t0 = *(u8**)((u8*)lbl_805FB134);
+    if (t0 == 0) {
+        return (u8*)(t0);
+    }
+    s32 t1 = *(s32*)(t0 + 0);
+    if ((s32)(u32)(t1) == 1) {
+        return (u8*)(t0);
+    }
+    return (u8*)(uintptr_t)(0);
 }
 
 // 0x8006FBFC
@@ -56,6 +71,21 @@ extern "C" void fn_80070450(s32 a3) {
 extern "C" s32 RaySceneTest(void) {
     s32 t0 = *(s32*)((u8*)lbl_805FB124);
     return (s32)(t0);
+}
+
+// 0x80070FAC
+extern "C" void fn_80070FAC(u8* a3, f32 f1) {
+    f32 t0 = *(f32*)((u8*)lbl_805FD5D8);
+    if (!(f1 < t0)) {
+        f32 t1 = *(f32*)((u8*)lbl_805FD5F0);
+        if (!(f1 > t1)) {
+            *(f32*)(((u8*)(uintptr_t)(a3)) + 132) = (f32)(f1);
+            return;
+        }
+        *(f32*)(((u8*)(uintptr_t)(a3)) + 132) = (f32)(t1);
+        return;
+    }
+    *(f32*)(((u8*)(uintptr_t)(a3)) + 132) = (f32)(t0);
 }
 
 // 0x800712B4

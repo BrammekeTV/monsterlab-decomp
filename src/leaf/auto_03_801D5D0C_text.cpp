@@ -5,12 +5,22 @@
 
 #include "types.h"
 
+extern u8 lbl_805FB7F0[];
 extern u8 lbl_805FB7F8[];
 extern u8 lbl_805FB7FC[];
 
 // 0x801D5D0C
 extern "C" void fn_801D5D0C(s32 a3) {
     *(u32*)((u8*)lbl_805FB7F8) = (u32)((u32)(uintptr_t)(a3));
+}
+
+// 0x801D659C
+extern "C" void fn_801D659C(void) {
+    u8 t0 = *(u8*)((u8*)lbl_805FB7F0);
+    if (t0 == 0) {
+        return;
+    }
+    *(u8*)((u8*)lbl_805FB7F0) = (u8)((u32)(0));
 }
 
 // 0x801D65B4

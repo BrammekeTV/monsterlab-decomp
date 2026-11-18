@@ -5,6 +5,23 @@
 
 #include "types.h"
 
+extern u8 lbl_805FDAA0[];
+extern "C" void app_PlayMusic(u32, f32);
+extern "C" void fn_8009133C(s32, s32);
+
+// 0x8008F908
+extern "C" void fn_8008F908(void) {
+    f32 t0 = *(f32*)((u8*)lbl_805FDAA0);
+    u32 t1 = (u32)(0x74b90000) + 15810u;
+    app_PlayMusic((u32)((u32)(t1)), (f32)(t0));
+}
+
+// 0x80090038
+extern "C" void fn_80090038(s32 a3) {
+    // tail-call arguments inferred from the registers set before the call
+    fn_8009133C((s32)((u32)(uintptr_t)(a3)), (s32)((u32)(0)));
+}
+
 // 0x80090150
 extern "C" void fn_80090150(void) {
 }

@@ -5,6 +5,42 @@
 
 #include "types.h"
 
+extern "C" s32 fn_8004CB10(u8* a3);
+extern u8 lbl_805F86F8[];
+extern "C" s32 PartGetCurrentHealth(u8*);
+extern "C" s32 PartGetMaxHealth(u8*);
+extern "C" void fn_8004B500(u8*);
+extern "C" void fn_8004CAB4(u8*);
+extern "C" void fn_8004D3F8(s32, u8*, s32, s32);
+extern "C" void fn_8020E668(s32);
+
+// 0x8004B5EC
+extern "C" void fn_8004B5EC(u8* a3) {
+    // tail-call arguments inferred from the registers set before the call
+    u8* t0 = ((u8*)(uintptr_t)(a3)) + -3144;
+    fn_8004CAB4(t0);
+}
+
+// 0x8004B5F4
+extern "C" s32 fn_8004B5F4(u8* a3) {
+    u8* t0 = ((u8*)(uintptr_t)(a3)) + -3144;
+    return (s32)(fn_8004CB10(t0));
+}
+
+// 0x8004B5FC
+extern "C" void fn_8004B5FC(u8* a3) {
+    // tail-call arguments inferred from the registers set before the call
+    u8* t0 = ((u8*)(uintptr_t)(a3)) + -3144;
+    fn_8004B500(t0);
+}
+
+// 0x8004C710
+extern "C" void fn_8004C710(u8* a3) {
+    // tail-call arguments inferred from the registers set before the call
+    s32 t0 = *(s32*)(((u8*)(uintptr_t)(a3)) + 3148);
+    fn_8020E668((s32)((u32)(t0)));
+}
+
 // 0x8004CB10
 extern "C" s32 fn_8004CB10(u8* a3) {
     s32 t0 = *(s32*)(((u8*)(uintptr_t)(a3)) + 3148);
@@ -17,6 +53,34 @@ extern "C" s32 GetGestureDetector(s32 a3, s32 a4) {
     u32 t1 = (u32)(uintptr_t)(a3) + (u32)(t0);
     s32 t2 = *(s32*)((u8*)(uintptr_t)(t1) + 3172);
     return (s32)(t2);
+}
+
+// 0x8004D2B8
+extern "C" void CharacterSetInCombat(s32 a3) {
+    // tail-call arguments inferred from the registers set before the call
+    fn_8004D3F8((s32)((u32)(uintptr_t)(a3)), (u8*)lbl_805F86F8, (s32)((u32)(1)), (s32)((u32)(1)));
+}
+
+// 0x8004E2A4
+extern "C" s32 fn_8004E2A4(s32 a3, s32 a4) {
+    u32 t0 = (((u32)(uintptr_t)(a4) << 2) | ((u32)(uintptr_t)(a4) >> 30)) & 0xfffffffcu;
+    u32 t1 = (u32)(uintptr_t)(a3) + (u32)(t0);
+    u8* t2 = *(u8**)((u8*)(uintptr_t)(t1) + 2204);
+    if (t2 == 0) {
+        return (s32)(0);
+    }
+    return (s32)(PartGetCurrentHealth(t2));
+}
+
+// 0x8004E2C4
+extern "C" s32 fn_8004E2C4(s32 a3, s32 a4) {
+    u32 t0 = (((u32)(uintptr_t)(a4) << 2) | ((u32)(uintptr_t)(a4) >> 30)) & 0xfffffffcu;
+    u32 t1 = (u32)(uintptr_t)(a3) + (u32)(t0);
+    u8* t2 = *(u8**)((u8*)(uintptr_t)(t1) + 2204);
+    if (t2 == 0) {
+        return (s32)(0);
+    }
+    return (s32)(PartGetMaxHealth(t2));
 }
 
 // 0x8004E2E4

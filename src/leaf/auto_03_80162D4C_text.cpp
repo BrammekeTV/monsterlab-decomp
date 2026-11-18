@@ -79,6 +79,16 @@ extern "C" void fn_80168350(s32 a3, u8* a4) {
     *(f32*)(((u8*)(uintptr_t)(a4)) + 0) = (f32)(t0);
 }
 
+// 0x80169838
+extern "C" u32 ParticleSystemFirst(u8* a3) {
+    s32 t0 = *(s32*)(((u8*)(uintptr_t)(a3)) + 16);
+    if (t0 == 0) {
+        return (u32)(0);
+    }
+    u32 t1 = (u32)(t0) - 16u;
+    return (u32)(t1);
+}
+
 // 0x8016A768
 extern "C" u32 fn_8016A768(u8* a3) {
     s32 t0 = *(s32*)(((u8*)(uintptr_t)(a3)) + 12);
@@ -89,6 +99,19 @@ extern "C" u32 fn_8016A768(u8* a3) {
     u32 t5 = (u32)(t4) & 0xfffffff0u;
     u32 t6 = (u32)(t5) + (u32)(t3);
     return (u32)(t6);
+}
+
+// 0x8016B6DC
+extern "C" s32 fn_8016B6DC(u8* a3) {
+    s32 t0 = *(s32*)(((u8*)(uintptr_t)(a3)) + 4);
+    s32 t1 = *(s32*)(((u8*)(uintptr_t)(a3)) + 0);
+    s32 t2 = *(s32*)(((u8*)(uintptr_t)(a3)) + 8);
+    u32 t3 = (u32)(t0) - (u32)(t1);
+    if ((s32)(u32)(t3) < (s32)(u32)(t2)) {
+        s32 t4 = *(s32*)((u8*)(uintptr_t)(t0) + 0);
+        return (s32)(t4);
+    }
+    return (s32)(0);
 }
 
 // 0x8016B704

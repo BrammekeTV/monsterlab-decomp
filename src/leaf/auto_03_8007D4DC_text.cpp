@@ -6,6 +6,28 @@
 #include "types.h"
 
 extern u8 gZoneResourceSize[];
+extern u8 lbl_803C4298[];
+extern u8 lbl_805FD788[];
+extern u8 lbl_805FD790[];
+extern "C" void AimMinigame_Update(u8*);
+extern "C" void StartRumble(s32, u32);
+extern "C" void app_PlayMusic(u32, f32);
+extern "C" void fn_8007E354(s32, s32);
+
+// 0x8007DD0C
+extern "C" u32 fn_8007DD0C(u8* a3, s32 a4) {
+    if ((s32)(u32)(uintptr_t)(a4) < 0) {
+        return (u32)(0);
+    }
+    s32 t0 = *(s32*)(((u8*)(uintptr_t)(a3)) + 36);
+    if ((s32)(u32)(uintptr_t)(a4) >= (s32)(u32)(t0)) {
+        return (u32)(0);
+    }
+    s32 t1 = *(s32*)(((u8*)(uintptr_t)(a3)) + 40);
+    u32 t2 = (((u32)(uintptr_t)(a4) << 5) | ((u32)(uintptr_t)(a4) >> 27)) & 0xffffffe0u;
+    u32 t3 = (u32)(t1) + (u32)(t2);
+    return (u32)(t3);
+}
 
 // 0x8007E0B8
 extern "C" u32 fn_8007E0B8(u8* a3, s32 a4) {
@@ -16,12 +38,68 @@ extern "C" u32 fn_8007E0B8(u8* a3, s32 a4) {
     return (u32)(t3);
 }
 
+// 0x8007E0CC
+extern "C" void fn_8007E0CC(void) {
+    f32 t0 = *(f32*)((u8*)lbl_805FD788);
+    u32 t1 = (u32)(0xa4310000) - 30585u;
+    app_PlayMusic((u32)((u32)(t1)), (f32)(t0));
+}
+
 // 0x8007E344
 extern "C" void fn_8007E344(void) {
 }
 
+// 0x8007E348
+extern "C" void fn_8007E348(s32 a3) {
+    // tail-call arguments inferred from the registers set before the call
+    u32 t0 = (u32)(0x437b0000) + 15717u;
+    fn_8007E354((s32)((u32)(uintptr_t)(a3)), (s32)((u32)(t0)));
+}
+
+// 0x8007E8FC
+extern "C" void fn_8007E8FC(u8* a3) {
+    u8 t0 = *(u8*)(((u8*)(uintptr_t)(a3)) + 800);
+    if (t0 == 0) {
+        return;
+    }
+    s32 t1 = *(s32*)((u8*)lbl_803C4298 + 56);
+    StartRumble((s32)((u32)(t1)), (u32)((u32)(0)));
+}
+
+// 0x8007E920
+extern "C" void fn_8007E920(s32 a3) {
+    // tail-call arguments inferred from the registers set before the call
+    u32 t0 = (u32)(0xc6090000) - 14270u;
+    fn_8007E354((s32)((u32)(uintptr_t)(a3)), (s32)((u32)(t0)));
+}
+
+// 0x8007E92C
+extern "C" void fn_8007E92C(u8* a3) {
+    f32 t0 = *(f32*)(((u8*)(uintptr_t)(a3)) + 168);
+    f32 t1 = *(f32*)((u8*)lbl_805FD790);
+    f32 t2 = (f32)(t0 * t1);
+    *(f32*)(((u8*)(uintptr_t)(a3)) + 168) = (f32)(t2);
+    AimMinigame_Update(((u8*)(uintptr_t)(a3)));
+}
+
 // 0x8007E940
 extern "C" void fn_8007E940(void) {
+}
+
+// 0x8007E944
+extern "C" void fn_8007E944(s32 a3) {
+    // tail-call arguments inferred from the registers set before the call
+    u32 t0 = (u32)(0x11770000) + 16835u;
+    fn_8007E354((s32)((u32)(uintptr_t)(a3)), (s32)((u32)(t0)));
+}
+
+// 0x8007E950
+extern "C" void fn_8007E950(u8* a3) {
+    f32 t0 = *(f32*)(((u8*)(uintptr_t)(a3)) + 168);
+    f32 t1 = *(f32*)((u8*)lbl_805FD790);
+    f32 t2 = (f32)(t0 * t1);
+    *(f32*)(((u8*)(uintptr_t)(a3)) + 168) = (f32)(t2);
+    AimMinigame_Update(((u8*)(uintptr_t)(a3)));
 }
 
 // 0x8007E964

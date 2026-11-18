@@ -33,6 +33,14 @@ extern "C" f32 fn_80082A04(u8* a3) {
     return (f32)(t0);
 }
 
+// 0x80082A0C
+extern "C" u32 fn_80082A0C(u8* a3, s32 a4) {
+    s32 t0 = *(s32*)(((u8*)(uintptr_t)(a3)) + 612);
+    u32 t1 = (u32)(t0) - (u32)(uintptr_t)(a4);
+    u32 t2 = (u32)(t1 == 0);
+    return (u32)(t2);
+}
+
 // 0x80082A20
 extern "C" void fn_80082A20(u8* a3, f32 f1) {
     f32 t0 = (f32)(f1);

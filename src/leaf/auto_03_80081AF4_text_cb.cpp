@@ -6,6 +6,9 @@
 #include "types.h"
 #include "game/script_callbacks.h"
 
+extern u8 gWorldState[];
+extern "C" void fn_80082474(s32, s32, f32);
+
 // 0x8008237C
 u32 BrainChunkIsInUse(u32 a3) {
     u8 t0 = *(u8*)(((u8*)(uintptr_t)(a3)) + 616);
@@ -16,6 +19,13 @@ u32 BrainChunkIsInUse(u32 a3) {
 s32 BrainChunkGetHitType(u32 a3) {
     s32 t0 = *(s32*)(((u8*)(uintptr_t)(a3)) + 696);
     return (s32)(t0);
+}
+
+// 0x80083444
+void BrainChunkUpdateThrow(u32 a3) {
+    // tail-call arguments inferred from the registers set before the call
+    f32 t0 = *(f32*)((u8*)gWorldState + 12);
+    fn_80082474((s32)((u32)(uintptr_t)(a3)), (s32)((u32)(0)), (f32)(t0));
 }
 
 // 0x80083458
@@ -32,6 +42,14 @@ u32 BrainChunkBounceWasLeft(u32 a3) {
 u32 BrainChunkSplatOnWall(u32 a3) {
     u8 t0 = *(u8*)(((u8*)(uintptr_t)(a3)) + 701);
     return (u32)(t0);
+}
+
+// 0x8008364C
+u32 BrainChunkIsOfType(u32 a3, u32 a4) {
+    s32 t0 = *(s32*)(((u8*)(uintptr_t)(a3)) + 612);
+    u32 t1 = (u32)(t0) - (u32)(uintptr_t)(a4);
+    u32 t2 = (u32)(t1 == 0);
+    return (u32)(t2);
 }
 
 // 0x80083660

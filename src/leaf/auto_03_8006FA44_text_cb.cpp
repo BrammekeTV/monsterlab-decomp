@@ -7,6 +7,26 @@
 #include "game/script_callbacks.h"
 
 extern u8 lbl_805FB12C[];
+extern u8 lbl_805FB134[];
+extern u8 lbl_805FD5D8[];
+
+// 0x80070134
+void ResetCommentTimer(void) {
+    u8* t0 = *(u8**)((u8*)lbl_805FB134);
+    if (t0 == 0) {
+        f32 t1 = *(f32*)((u8*)lbl_805FD5D8);
+        *(f32*)(t0 + 136) = (f32)(t1);
+        return;
+    }
+    s32 t2 = *(s32*)(t0 + 0);
+    if ((s32)(u32)(t2) == 1) {
+        f32 t3 = *(f32*)((u8*)lbl_805FD5D8);
+        *(f32*)(t0 + 136) = (f32)(t3);
+        return;
+    }
+    f32 t4 = *(f32*)((u8*)lbl_805FD5D8);
+    *(f32*)((u8*)(uintptr_t)(0) + 136) = (f32)(t4);
+}
 
 // 0x80070F40
 void ClearExperimentSounds(void) {

@@ -5,12 +5,94 @@
 
 #include "types.h"
 
+extern u8 lbl_805FBBE0[];
+extern u8 lbl_805FECE0[];
+extern "C" f32 MonsterRateAttack(u8*);
+extern "C" f32 MonsterRateDefence(u8*);
+extern "C" f32 MonsterRateEnergy(u8*);
+extern "C" f32 MonsterRateHealth(u8*);
+extern "C" f32 MonsterRateMadness(u8*);
+extern "C" f32 PlayerRankFraction(void);
+
 // 0x80117264
 extern "C" void fn_80117264(void) {
 }
 
 // 0x80117268
 extern "C" void fn_80117268(void) {
+}
+
+// 0x801173A0
+extern "C" f32 fn_801173A0(u8* a3) {
+    u8* t0 = *(u8**)(((u8*)(uintptr_t)(a3)) + 32);
+    if (t0 == 0) {
+        f32 t1 = *(f32*)((u8*)lbl_805FECE0);
+        return (f32)(t1);
+    }
+    return (f32)(MonsterRateAttack(t0));
+}
+
+// 0x801173B8
+extern "C" f32 fn_801173B8(u8* a3) {
+    u8* t0 = *(u8**)(((u8*)(uintptr_t)(a3)) + 32);
+    if (t0 == 0) {
+        f32 t1 = *(f32*)((u8*)lbl_805FECE0);
+        return (f32)(t1);
+    }
+    return (f32)(MonsterRateDefence(t0));
+}
+
+// 0x801173D0
+extern "C" f32 fn_801173D0(u8* a3) {
+    u8* t0 = *(u8**)(((u8*)(uintptr_t)(a3)) + 32);
+    if (t0 == 0) {
+        f32 t1 = *(f32*)((u8*)lbl_805FECE0);
+        return (f32)(t1);
+    }
+    return (f32)(MonsterRateEnergy(t0));
+}
+
+// 0x801173E8
+extern "C" f32 fn_801173E8(u8* a3) {
+    u8* t0 = *(u8**)(((u8*)(uintptr_t)(a3)) + 32);
+    if (t0 == 0) {
+        f32 t1 = *(f32*)((u8*)lbl_805FECE0);
+        return (f32)(t1);
+    }
+    return (f32)(MonsterRateHealth(t0));
+}
+
+// 0x80117400
+extern "C" f32 fn_80117400(u8* a3) {
+    u8* t0 = *(u8**)(((u8*)(uintptr_t)(a3)) + 32);
+    if (t0 == 0) {
+        f32 t1 = *(f32*)((u8*)lbl_805FECE0);
+        return (f32)(t1);
+    }
+    return (f32)(MonsterRateMadness(t0));
+}
+
+// 0x80117418
+extern "C" f32 fn_80117418(u8* a3) {
+    s32 t0 = *(s32*)(((u8*)(uintptr_t)(a3)) + 32);
+    if (t0 == 0) {
+        f32 t1 = *(f32*)((u8*)lbl_805FECE0);
+        return (f32)(t1);
+    }
+    return (f32)(PlayerRankFraction());
+}
+
+// 0x80117948
+extern "C" s32 fn_80117948(void) {
+    u8* t0 = *(u8**)((u8*)lbl_805FBBE0);
+    if (t0 == 0) {
+        return (s32)(0);
+    }
+    s32 t1 = *(s32*)(t0 + 4328);
+    if ((s32)(u32)(t1) <= 0) {
+        return (s32)(0);
+    }
+    return (s32)(1);
 }
 
 // 0x801179C0

@@ -5,6 +5,20 @@
 
 #include "types.h"
 
+// 0x8003CAE0
+extern "C" s32 fn_8003CAE0(u8* a3) {
+    s32 t0 = *(s32*)(((u8*)(uintptr_t)(a3)) + 28);
+    u32 t1 = (u32)(t0) & 0xcu;
+    if (t1 != 0) {
+        return (s32)(1);
+    }
+    u8 t2 = *(u8*)(((u8*)(uintptr_t)(a3)) + 44);
+    if (t2 == 0) {
+        return (s32)(0);
+    }
+    return (s32)(1);
+}
+
 // 0x8003CB08
 extern "C" u8 fn_8003CB08(u8* a3) {
     u8 t0 = *(u8*)(((u8*)(uintptr_t)(a3)) + 0);

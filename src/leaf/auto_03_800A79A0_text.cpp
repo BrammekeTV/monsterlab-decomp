@@ -5,7 +5,18 @@
 
 #include "types.h"
 
+extern u8 lbl_805FDF18[];
 extern u8 lbl_805FDF1C[];
+extern "C" void app_PlayMusic(u32, f32);
+extern "C" void fn_800B170C(s32);
+extern "C" f32 fn_800B1D90(u8*);
+
+// 0x800A8AEC
+extern "C" void fn_800A8AEC(void) {
+    f32 t0 = *(f32*)((u8*)lbl_805FDF1C);
+    u32 t1 = (u32)(0x2e00000) - 15495u;
+    app_PlayMusic((u32)((u32)(t1)), (f32)(t0));
+}
 
 // 0x800A8ED0
 extern "C" void fn_800A8ED0(void) {
@@ -19,8 +30,25 @@ extern "C" void fn_800A968C(void) {
 extern "C" void fn_800A97FC(void) {
 }
 
+// 0x800A9B7C
+extern "C" f32 fn_800A9B7C(u8* a3) {
+    u8* t0 = *(u8**)(((u8*)(uintptr_t)(a3)) + 148);
+    if (t0 == 0) {
+        f32 t1 = *(f32*)((u8*)lbl_805FDF18);
+        return (f32)(t1);
+    }
+    return (f32)(fn_800B1D90(t0));
+}
+
 // 0x800A9B94
 extern "C" f32 fn_800A9B94(void) {
     f32 t0 = *(f32*)((u8*)lbl_805FDF1C);
     return (f32)(t0);
+}
+
+// 0x800AA684
+extern "C" void fn_800AA684(u8* a3) {
+    // tail-call arguments inferred from the registers set before the call
+    s32 t0 = *(s32*)(((u8*)(uintptr_t)(a3)) + 148);
+    fn_800B170C((s32)((u32)(t0)));
 }

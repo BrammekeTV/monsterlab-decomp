@@ -12,11 +12,22 @@ extern u8 lbl_805FB41C[];
 extern u8 lbl_805FB424[];
 extern u8 lbl_805FB438[];
 extern u8 lbl_805FEFEC[];
+extern "C" void SaveManager_SaveOptions(void);
 
 // 0x8013F38C
 extern "C" s32 AlertGetScreenSets(void) {
     s32 t0 = *(s32*)((u8*)gScreenSets);
     return (s32)(t0);
+}
+
+// 0x80140320
+extern "C" void OnlineRecordWin(void) {
+    SaveManager_SaveOptions();
+}
+
+// 0x80140324
+extern "C" void OnlineRecordLoss(void) {
+    SaveManager_SaveOptions();
 }
 
 // 0x801409FC

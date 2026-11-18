@@ -8,6 +8,7 @@
 extern u8 lbl_8047D2E8[];
 extern u8 lbl_8047D318[];
 extern u8 lbl_805FB800[];
+extern "C" void fn_801D66C4(f32, f32);
 
 // 0x801D66B4
 extern "C" s32 fn_801D66B4(void) {
@@ -18,6 +19,14 @@ extern "C" s32 fn_801D66B4(void) {
 // 0x801D66BC
 extern "C" void fn_801D66BC(s32 a3) {
     *(u32*)((u8*)lbl_805FB800) = (u32)((u32)(uintptr_t)(a3));
+}
+
+// 0x801D6780
+extern "C" void fn_801D6780(void) {
+    u8* t0 = *(u8**)((u8*)lbl_805FB800);
+    f32 t1 = *(f32*)(t0 + 8);
+    f32 t2 = *(f32*)(t0 + 12);
+    fn_801D66C4((f32)(t1), (f32)(t2));
 }
 
 // 0x801D6790

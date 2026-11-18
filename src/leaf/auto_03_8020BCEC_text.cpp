@@ -5,12 +5,14 @@
 
 #include "types.h"
 
+extern u8 gBattle[];
 extern u8 lbl_80388D88[];
 extern u8 lbl_80388D98[];
 extern u8 lbl_80388DB0[];
 extern u8 lbl_80388E18[];
 extern u8 lbl_80388E30[];
 extern u8 lbl_80388E50[];
+extern "C" void BattleOnListenerDone(u8*, u32);
 
 // 0x8020E30C
 extern "C" void fn_8020E30C(void) {
@@ -50,6 +52,13 @@ extern "C" void fn_8020EA84(u8* a3) {
 extern "C" void fn_8020F228(u8* a3, s32 a4) {
     *(u32*)(((u8*)(uintptr_t)(a3)) + 8) = (u32)((u32)(uintptr_t)(a4));
     *(u32*)(((u8*)(uintptr_t)(a3)) + 0) = (u32)((u32)(uintptr_t)((u8*)lbl_80388E18));
+}
+
+// 0x8020F290
+extern "C" void fn_8020F290(u8* a3) {
+    *(u32*)(((u8*)(uintptr_t)(a3)) + 4) = (u32)((u32)(0));
+    u8* t0 = *(u8**)((u8*)gBattle);
+    BattleOnListenerDone(t0, (u32)((u32)(uintptr_t)(a3)));
 }
 
 // 0x8020F2A4
@@ -114,6 +123,17 @@ extern "C" void fn_8020F46C(u8* a3, u8* a4) {
 
 // 0x8020F494
 extern "C" void fn_8020F494(void) {
+}
+
+// 0x8020F530
+extern "C" s32 fn_8020F530(u8* a3) {
+    u8 t0 = *(u8*)(((u8*)(uintptr_t)(a3)) + 69);
+    *(u8*)(((u8*)(uintptr_t)(a3)) + 68) = (u8)((u32)(1));
+    if (t0 == 0) {
+        return (s32)(0);
+    }
+    u8 t1 = *(u8*)(((u8*)(uintptr_t)(a3)) + 70);
+    return (s32)(t1);
 }
 
 // 0x8020F554

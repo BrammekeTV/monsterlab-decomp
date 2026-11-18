@@ -6,6 +6,37 @@
 #include "types.h"
 #include "game/script_callbacks.h"
 
+extern u8 gEventMgr[];
+extern "C" void EventSendTo(void*, u32, void*, u32, int, int);
+extern "C" void TriggerDoAction(void*, s32);
+
+// 0x801B6D80
+void BroadcastToDstGroup(void* a3, u32 a4) {
+    if (a3 == 0) {
+        return;
+    }
+    s32 t0 = *(s32*)(((u8*)(uintptr_t)(a3)) + 248);
+    if (t0 == 0) {
+        return;
+    }
+    u8* t1 = *(u8**)((u8*)gEventMgr);
+    EventSendTo((void*)(t1), (u32)((u32)(t0)), (void*)(((u8*)(uintptr_t)(a3))), (u32)((u32)(uintptr_t)(a4)), (int)((u32)(0)), (int)((u32)(0)));
+}
+
+// 0x801B8700
+void EntityReachedWaypointCallback(u32 a3, u32 a4, u32 a5) {
+    if (a3 == 0) {
+        return;
+    }
+    s32 t0 = *(s32*)(((u8*)(uintptr_t)(a3)) + 64);
+    u32 t1 = (((u32)(t0) << 5) | ((u32)(t0) >> 27)) & 0xfu;
+    if (t1 == 0) {
+        return;
+    }
+    u8* t2 = ((u8*)(uintptr_t)(a3)) + 64;
+    TriggerDoAction((void*)(t2), (s32)((u32)(uintptr_t)(a4)));
+}
+
 // 0x801B8724
 void EntityWaypointTaskCompleteCallback(u32 a3, u32 a4) {
     u8* t0 = *(u8**)(((u8*)(uintptr_t)(a3)) + 4);

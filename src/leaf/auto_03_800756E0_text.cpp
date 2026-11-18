@@ -5,8 +5,30 @@
 
 #include "types.h"
 
+extern "C" void GameFlowSignal(s32, s32, s32);
+extern "C" void fn_80077544(s32);
+
+// 0x80076278
+extern "C" void fn_80076278(void) {
+    u32 t0 = (u32)(0x88c70000) - 5823u;
+    GameFlowSignal((s32)((u32)(t0)), (s32)((u32)(0)), (s32)((u32)(0)));
+}
+
+// 0x8007628C
+extern "C" void fn_8007628C(void) {
+    u32 t0 = (u32)(0x88c70000) - 5823u;
+    GameFlowSignal((s32)((u32)(t0)), (s32)((u32)(0)), (s32)((u32)(0)));
+}
+
 // 0x80076384
 extern "C" void fn_80076384(void) {
+}
+
+// 0x80076388
+extern "C" void fn_80076388(u8* a3) {
+    // tail-call arguments inferred from the registers set before the call
+    s32 t0 = *(s32*)(((u8*)(uintptr_t)(a3)) + 1740);
+    fn_80077544((s32)((u32)(t0)));
 }
 
 // 0x8007657C

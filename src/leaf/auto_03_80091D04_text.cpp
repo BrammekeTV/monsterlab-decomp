@@ -5,7 +5,9 @@
 
 #include "types.h"
 
+extern u8 gEventMgr[];
 extern u8 lbl_805FDB00[];
+extern "C" void EventSend(void*, void*, void*, u32, int, int, int, int);
 
 // 0x80091D04
 extern "C" void fn_80091D04(u8* a3) {
@@ -15,6 +17,15 @@ extern "C" void fn_80091D04(u8* a3) {
     *(u32*)(((u8*)(uintptr_t)(a3)) + 8) = (u32)((u32)(-1));
     *(u8*)(((u8*)(uintptr_t)(a3)) + 12) = (u8)((u32)(0));
     *(f32*)(((u8*)(uintptr_t)(a3)) + 16) = (f32)(t0);
+}
+
+// 0x80091EE8
+extern "C" void fn_80091EE8(u8* a3) {
+    *(u32*)(((u8*)(uintptr_t)(a3)) + 4) = (u32)((u32)(0));
+    u32 t0 = (u32)(0x31f20000) - 9793u;
+    u8* t1 = *(u8**)(((u8*)(uintptr_t)(a3)) + 0);
+    u8* t2 = *(u8**)((u8*)gEventMgr);
+    EventSend((void*)(t2), (void*)(t1), (void*)((u8*)(uintptr_t)(0)), (u32)((u32)(t0)), (int)((u32)(0)), (int)((u32)(0)), (int)((u32)(1)), (int)((u32)(0)));
 }
 
 // 0x80091F18

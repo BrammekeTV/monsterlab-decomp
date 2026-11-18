@@ -5,6 +5,22 @@
 
 #include "types.h"
 
+// 0x801E4B00
+extern "C" u32 fn_801E4B00(u8* a3) {
+    s32 t0 = *(s32*)(((u8*)(uintptr_t)(a3)) + 16);
+    if ((s32)(u32)(t0) < 0) {
+        u32 t1 = (u32)(1 == 0);
+        return (u32)(t1);
+    }
+    s32 t2 = *(s32*)(((u8*)(uintptr_t)(a3)) + 20);
+    if ((s32)(u32)(t2) >= 0) {
+        u32 t3 = (u32)(0 == 0);
+        return (u32)(t3);
+    }
+    u32 t4 = (u32)(1 == 0);
+    return (u32)(t4);
+}
+
 // 0x801E5478
 extern "C" void fn_801E5478(u8* a3, s32 a4) {
     *(u32*)(((u8*)(uintptr_t)(a3)) + 36) = (u32)((u32)(uintptr_t)(a4));

@@ -8,6 +8,7 @@
 extern u8 lbl_805F98C4[];
 extern u8 lbl_805F98C8[];
 extern u8 lbl_805F98E0[];
+extern "C" void AudioSetPaused(void*, int);
 
 // 0x801FD8EC
 extern "C" void fn_801FD8EC(u8* a3) {
@@ -15,6 +16,12 @@ extern "C" void fn_801FD8EC(u8* a3) {
     *(u8*)(((u8*)(uintptr_t)(a3)) + 41) = (u8)((u32)(0));
     u32 t1 = (u32)(t0) + 1u;
     *(u32*)(((u8*)(uintptr_t)(a3)) + 692) = (u32)((u32)(t1));
+}
+
+// 0x801FF908
+extern "C" void fn_801FF908(u8* a3, s32 a4) {
+    *(u8*)(((u8*)(uintptr_t)(a3)) + 697) = (u8)((u32)(uintptr_t)(a4));
+    AudioSetPaused((void*)(((u8*)(uintptr_t)(a3))), (int)((u32)(uintptr_t)(a4)));
 }
 
 // 0x801FFC48

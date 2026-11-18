@@ -6,6 +6,8 @@
 #include "types.h"
 
 extern u8 lbl_805FBBE0[];
+extern "C" void fn_80116D40(u8*);
+extern "C" void fn_80116EF0(u8*, s32);
 
 // 0x8011D670
 extern "C" void fn_8011D670(u8* a3) {
@@ -25,6 +27,22 @@ extern "C" void fn_8011D694(void) {
 
 // 0x8011D698
 extern "C" void fn_8011D698(void) {
+}
+
+// 0x8011D6F4
+extern "C" void fn_8011D6F4(u8* a3) {
+    u32 t0 = (u32)((s32)(u32)(0) * 10);
+    *(u32*)(((u8*)(uintptr_t)(a3)) + 32) = (u32)((u32)(0));
+    u8* t1 = ((u8*)(uintptr_t)(a3)) + 36;
+    fn_80116EF0(t1, (s32)((u32)(t0)));
+}
+
+// 0x8011D708
+extern "C" void fn_8011D708(u8* a3) {
+    u32 t0 = (u32)((s32)(u32)(1) * 10);
+    *(u32*)(((u8*)(uintptr_t)(a3)) + 32) = (u32)((u32)(1));
+    u8* t1 = ((u8*)(uintptr_t)(a3)) + 36;
+    fn_80116EF0(t1, (s32)((u32)(t0)));
 }
 
 // 0x8011D71C
@@ -72,6 +90,51 @@ extern "C" s32 fn_8011D9B4(void) {
     u8* t0 = *(u8**)((u8*)lbl_805FBBE0);
     s32 t1 = *(s32*)(t0 + 2316);
     return (s32)(t1);
+}
+
+// 0x8011E94C
+extern "C" u32 fn_8011E94C(u8* a3) {
+    s32 t0 = *(s32*)(((u8*)(uintptr_t)(a3)) + 28);
+    u32 t1 = (u32)(t0 == 0);
+    return (u32)(t1);
+}
+
+// 0x8011E95C
+extern "C" u32 fn_8011E95C(u8* a3) {
+    s32 t0 = *(s32*)(((u8*)(uintptr_t)(a3)) + 28);
+    u32 t1 = (u32)(t0) - 1u;
+    u32 t2 = (u32)(t1 == 0);
+    return (u32)(t2);
+}
+
+// 0x8011E970
+extern "C" u32 fn_8011E970(u8* a3) {
+    s32 t0 = *(s32*)(((u8*)(uintptr_t)(a3)) + 28);
+    u32 t1 = (u32)(t0) - 2u;
+    u32 t2 = (u32)(t1 == 0);
+    return (u32)(t2);
+}
+
+// 0x8011E984
+extern "C" u32 fn_8011E984(u8* a3) {
+    s32 t0 = *(s32*)(((u8*)(uintptr_t)(a3)) + 28);
+    u32 t1 = (u32)(t0) - 3u;
+    u32 t2 = (u32)(t1 == 0);
+    return (u32)(t2);
+}
+
+// 0x8011E998
+extern "C" u32 fn_8011E998(u8* a3) {
+    s32 t0 = *(s32*)(((u8*)(uintptr_t)(a3)) + 32);
+    u32 t1 = (u32)(t0 == 0);
+    return (u32)(t1);
+}
+
+// 0x8011E9A8
+extern "C" void fn_8011E9A8(u8* a3) {
+    // tail-call arguments inferred from the registers set before the call
+    u8* t0 = ((u8*)(uintptr_t)(a3)) + 36;
+    fn_80116D40(t0);
 }
 
 // 0x8011E9B0

@@ -43,3 +43,14 @@ s32 SaveManager_GetPlayerTimeMinFromTmp(s32 a3) {
     s32 t3 = *(s32*)((u8*)(uintptr_t)(t2) + 3052);
     return (s32)(t3);
 }
+
+// 0x80124320
+u32 SaveManager_CheckIfSlotEmptyFromTmp(s32 a3) {
+    u32 t0 = (u32)((s32)(u32)(uintptr_t)(a3) * 2440);
+    s32 t1 = *(s32*)((u8*)lbl_805FB2D0);
+    u32 t2 = (u32)(t1) + (u32)(t0);
+    u8 t3 = *(u8*)((u8*)(uintptr_t)(t2) + 3584);
+    u32 t4 = (u32)(s32)(s8)(u32)(t3);
+    u32 t5 = (u32)(t4 == 0);
+    return (u32)(t5);
+}

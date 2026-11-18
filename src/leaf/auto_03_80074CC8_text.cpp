@@ -41,3 +41,20 @@ extern "C" void fn_80074D74(void) {
 extern "C" void fn_80075264(u8* a3, s32 a4) {
     *(u32*)(((u8*)(uintptr_t)(a3)) + 88) = (u32)((u32)(uintptr_t)(a4));
 }
+
+// 0x8007526C
+extern "C" u32 fn_8007526C(u8* a3) {
+    s32 t0 = *(s32*)(((u8*)(uintptr_t)(a3)) + 92);
+    u32 t1 = (u32)(t0 == 0);
+    return (u32)(t1);
+}
+
+// 0x8007527C
+extern "C" u32 fn_8007527C(u8* a3) {
+    s32 t0 = *(s32*)(((u8*)(uintptr_t)(a3)) + 96);
+    s32 t1 = *(s32*)(((u8*)(uintptr_t)(a3)) + 92);
+    u32 t2 = (u32)(t0) - 1u;
+    u32 t3 = (u32)(t2) - (u32)(t1);
+    u32 t4 = (u32)(t3 == 0);
+    return (u32)(t4);
+}

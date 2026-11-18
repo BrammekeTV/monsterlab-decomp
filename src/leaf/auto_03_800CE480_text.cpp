@@ -5,7 +5,12 @@
 
 #include "types.h"
 
+extern u8 gEventMgr[];
 extern u8 lbl_805FE558[];
+extern u8 lbl_805FE598[];
+extern "C" void EventSendTo(void*, u32, void*, u32, int, int);
+extern "C" void app_PlayMusic(u32, f32);
+extern "C" f32 fn_800C8A5C(u8*);
 
 // 0x800CF224
 extern "C" void fn_800CF224(void) {
@@ -13,6 +18,21 @@ extern "C" void fn_800CF224(void) {
 
 // 0x800CF228
 extern "C" void fn_800CF228(void) {
+}
+
+// 0x800CF22C
+extern "C" void fn_800CF22C(void) {
+    f32 t0 = *(f32*)((u8*)lbl_805FE598);
+    u32 t1 = (u32)(0x95f50000) - 9301u;
+    app_PlayMusic((u32)((u32)(t1)), (f32)(t0));
+}
+
+// 0x800CF2C8
+extern "C" void fn_800CF2C8(void) {
+    u32 t0 = (u32)(0xf1590000) + 6310u;
+    u8* t1 = *(u8**)((u8*)gEventMgr);
+    u32 t2 = (u32)(0x757b0000) + 111u;
+    EventSendTo((void*)(t1), (u32)((u32)(t2)), (void*)((u8*)(uintptr_t)(0)), (u32)((u32)(t0)), (int)((u32)(0)), (int)((u32)(0)));
 }
 
 // 0x800CF2EC
@@ -33,4 +53,10 @@ extern "C" void fn_800CF500(u8* a3) {
 
 // 0x800CF710
 extern "C" void fn_800CF710(void) {
+}
+
+// 0x800CF714
+extern "C" f32 fn_800CF714(u8* a3) {
+    u8* t0 = ((u8*)(uintptr_t)(a3)) + 244;
+    return (f32)(fn_800C8A5C(t0));
 }

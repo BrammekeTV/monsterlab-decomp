@@ -5,13 +5,45 @@
 
 #include "types.h"
 
+extern "C" s32 fn_8019555C(u8* a3);
 extern u8 lbl_805FB688[];
 extern u8 lbl_805FB698[];
+extern u8 lbl_805FFA3C[];
+extern "C" void fn_80195608(u8*, s32, s32);
+extern "C" void fn_8019914C(s32, u8*);
+extern "C" void fn_8019B808(void);
+extern "C" void fn_8019DB40(void);
+extern "C" void fn_801BA68C(s32);
+extern "C" void fn_801BA930(s32, s32, s32, s32, s32, s32, s32);
+
+// 0x8019552C
+extern "C" u32 fn_8019552C(u8* a3, s32 a4) {
+    if ((s32)(u32)(uintptr_t)(a4) < 0) {
+        return (u32)(0);
+    }
+    s32 t0 = *(s32*)(((u8*)(uintptr_t)(a3)) + 4);
+    if ((s32)(u32)(uintptr_t)(a4) < (s32)(u32)(t0)) {
+        s32 t1 = *(s32*)(((u8*)(uintptr_t)(a3)) + 8);
+        s32 t2 = *(s32*)(((u8*)(uintptr_t)(a3)) + 16);
+        u32 t3 = (u32)(uintptr_t)(a4) * (u32)(t1);
+        u32 t4 = (u32)(t2) + (u32)(t3);
+        return (u32)(t4);
+    }
+    return (u32)(0);
+}
 
 // 0x8019555C
 extern "C" s32 fn_8019555C(u8* a3) {
     s32 t0 = *(s32*)(((u8*)(uintptr_t)(a3)) + 0);
     return (s32)(t0);
+}
+
+// 0x80195564
+extern "C" void fn_80195564(u8* a3, s32 a4) {
+    // tail-call arguments inferred from the registers set before the call
+    s32 t0 = *(s32*)(((u8*)(uintptr_t)(a3)) + 0);
+    u32 t1 = (u32)(t0) - 1u;
+    fn_80195608(((u8*)(uintptr_t)(a3)), (s32)((u32)(uintptr_t)(a4)), (s32)((u32)(t1)));
 }
 
 // 0x80196668
@@ -28,6 +60,19 @@ extern "C" s32 fn_80196B10(u8* a3) {
     return (s32)(0);
 }
 
+// 0x80196B24
+extern "C" u32 fn_80196B24(u8* a3) {
+    s32 t0 = *(s32*)(((u8*)(uintptr_t)(a3)) + 64);
+    if ((s32)(u32)(t0) <= 0) {
+        return (u32)(0);
+    }
+    u32 t1 = (u32)(t0) - 1u;
+    u32 t2 = (u32)((s32)(u32)(t1) * 96);
+    u32 t3 = (u32)(uintptr_t)(a3) + (u32)(t2);
+    u32 t4 = (u32)(t3) + 116u;
+    return (u32)(t4);
+}
+
 // 0x80196C88
 extern "C" s32 fn_80196C88(u8* a3) {
     s32 t0 = *(s32*)(((u8*)(uintptr_t)(a3)) + 1028);
@@ -36,9 +81,64 @@ extern "C" s32 fn_80196C88(u8* a3) {
     return (s32)(0);
 }
 
+// 0x80196C9C
+extern "C" u32 fn_80196C9C(u8* a3) {
+    s32 t0 = *(s32*)(((u8*)(uintptr_t)(a3)) + 1028);
+    if ((s32)(u32)(t0) <= 0) {
+        return (u32)(0);
+    }
+    if ((s32)(u32)(t0) > 10) {
+        return (u32)(0);
+    }
+    u32 t1 = (u32)(t0) - 1u;
+    u32 t2 = (((u32)(t1) << 5) | ((u32)(t1) >> 27)) & 0xffffffe0u;
+    u32 t3 = (u32)(uintptr_t)(a3) + (u32)(t2);
+    u32 t4 = (u32)(t3) + 1048u;
+    return (u32)(t4);
+}
+
 // 0x80196D04
 extern "C" s32 fn_80196D04(void) {
     return (s32)(0);
+}
+
+// 0x80196E7C
+extern "C" s32 fn_80196E7C(u8* a3, s32 a4) {
+    if (a4 == 0) {
+        s32 t0 = *(s32*)(((u8*)(uintptr_t)(a3)) + 4);
+        *(u32*)(((u8*)(uintptr_t)(a3)) + 8) = (u32)((u32)(t0));
+        return (s32)(0);
+    }
+    *(u32*)(((u8*)(uintptr_t)(a3)) + 8) = (u32)((u32)(uintptr_t)(a4));
+    return (s32)(0);
+}
+
+// 0x80196FB0
+extern "C" void fn_80196FB0(u8* a3, s32 a4, s32 a5, s32 a6, s32 a7, s32 a8, s32 a9) {
+    // tail-call arguments inferred from the registers set before the call
+    s32 t0 = *(s32*)(((u8*)(uintptr_t)(a3)) + 8);
+    fn_801BA930((s32)((u32)(t0)), (s32)((u32)(uintptr_t)(a4)), (s32)((u32)(uintptr_t)(a6)), (s32)((u32)(uintptr_t)(a7)), (s32)((u32)(uintptr_t)(a8)), (s32)((u32)(uintptr_t)(a9)), (s32)((u32)(0)));
+}
+
+// 0x801970A4
+extern "C" void fn_801970A4(u8* a3) {
+    // tail-call arguments inferred from the registers set before the call
+    s32 t0 = *(s32*)(((u8*)(uintptr_t)(a3)) + 8);
+    fn_801BA68C((s32)((u32)(t0)));
+}
+
+// 0x801970AC
+extern "C" s32 fn_801970AC(u8* a3) {
+    u8* t0 = *(u8**)(((u8*)(uintptr_t)(a3)) + 8);
+    s32 t1 = *(s32*)(t0 + 4);
+    if (t1 == 0) {
+        return (s32)(0);
+    }
+    s32 t2 = *(s32*)(t0 + 8);
+    if (t2 == 0) {
+        return (s32)(0);
+    }
+    return (s32)(1);
 }
 
 // 0x80197FD8
@@ -68,6 +168,13 @@ extern "C" s32 fn_80198E20(u8* a3) {
     return (s32)(t3);
 }
 
+// 0x80199534
+extern "C" void fn_80199534(u8* a3) {
+    // tail-call arguments inferred from the registers set before the call
+    s32 t0 = *(s32*)(((u8*)(uintptr_t)(a3)) + 0);
+    fn_8019914C((s32)((u32)(t0)), ((u8*)(uintptr_t)(a3)));
+}
+
 // 0x8019956C
 extern "C" u8* fn_8019956C(u8* a3) {
     u8* t0 = ((u8*)(uintptr_t)(a3)) + 240;
@@ -94,6 +201,38 @@ extern "C" u32 fn_8019A9D4(u8* a3) {
     return (u32)(t4);
 }
 
+// 0x8019AA10
+extern "C" s32 fn_8019AA10(u8* a3, s32 a4) {
+    if (a4 == 0) {
+        s32 t0 = *(s32*)(((u8*)(uintptr_t)(a3)) + 0);
+        u32 t1 = (u32)(t0) | 0x10u;
+        *(u32*)(((u8*)(uintptr_t)(a3)) + 0) = (u32)((u32)(t1));
+        return (s32)(0);
+    }
+    s32 t2 = *(s32*)(((u8*)(uintptr_t)(a3)) + 0);
+    u32 t3 = (u32)(t2) & 0xffffffefu;
+    *(u32*)(((u8*)(uintptr_t)(a3)) + 0) = (u32)((u32)(t3));
+    return (s32)(0);
+}
+
+// 0x8019AD6C
+extern "C" s32 fn_8019AD6C(u8* a3) {
+    u8* t0 = *(u8**)(((u8*)(uintptr_t)(a3)) + 4);
+    if (t0 == 0) {
+        return (s32)(0);
+    }
+    return (s32)(fn_8019555C(t0));
+}
+
+// 0x8019AE94
+extern "C" s32 fn_8019AE94(u8* a3) {
+    u8* t0 = *(u8**)(((u8*)(uintptr_t)(a3)) + 4);
+    if (t0 == 0) {
+        return (s32)(0);
+    }
+    return (s32)(fn_8019555C(t0));
+}
+
 // 0x8019B880
 extern "C" s32 fn_8019B880(void) {
     return (s32)(0);
@@ -115,6 +254,23 @@ extern "C" s32 fn_8019CE50(void) {
     return (s32)(0);
 }
 
+// 0x8019DB14
+extern "C" void fn_8019DB14(u8* a3) {
+    // tail-call arguments inferred from the registers set before the call
+    s32 t0 = *(s32*)(((u8*)(uintptr_t)(a3)) + 492);
+    if ((u32)(t0) <= 0x1u) {
+        return;
+    }
+    s32 t1 = *(s32*)(((u8*)(uintptr_t)(a3)) + 488);
+    u32 t2 = (u32)(t0) - 1u;
+    if ((u32)(t1) >= (u32)(t2)) {
+        return;
+    }
+    u32 t3 = (u32)(t1) + 1u;
+    *(u32*)(((u8*)(uintptr_t)(a3)) + 488) = (u32)((u32)(t3));
+    fn_8019DB40();
+}
+
 // 0x8019DC48
 extern "C" s32 fn_8019DC48(u8* a3) {
     s32 t0 = *(s32*)(((u8*)(uintptr_t)(a3)) + 492);
@@ -127,10 +283,31 @@ extern "C" s32 fn_8019DC50(u8* a3) {
     return (s32)(t0);
 }
 
+// 0x8019EA5C
+extern "C" void fn_8019EA5C(u8* a3, s32 a4) {
+    s32 t0 = *(s32*)(((u8*)(uintptr_t)(a3)) + 320);
+    if ((u32)(t0) == (u32)(uintptr_t)(a4)) {
+        return;
+    }
+    *(u32*)(((u8*)(uintptr_t)(a3)) + 320) = (u32)((u32)(uintptr_t)(a4));
+    *(u32*)(((u8*)(uintptr_t)(a3)) + 324) = (u32)((u32)(0));
+    *(u8*)(((u8*)(uintptr_t)(a3)) + 328) = (u8)((u32)(0));
+}
+
 // 0x8019F3AC
 extern "C" s32 UITextGetString(u8* a3) {
     s32 t0 = *(s32*)(((u8*)(uintptr_t)(a3)) + 368);
     return (s32)(t0);
+}
+
+// 0x801A05C8
+extern "C" s32 fn_801A05C8(u8* a3) {
+    u8* t0 = *(u8**)(((u8*)(uintptr_t)(a3)) + 320);
+    if (t0 == 0) {
+        return (s32)(0);
+    }
+    *(u32*)(t0 + 0) = (u32)((u32)(0));
+    return (s32)(0);
 }
 
 // 0x801A0DF0
@@ -159,6 +336,20 @@ extern "C" s32 UISetTexture(u8* a3, s32 a4) {
     return (s32)(0);
 }
 
+// 0x801A1208
+extern "C" s32 fn_801A1208(u8* a3) {
+    s32 t0 = *(s32*)(((u8*)(uintptr_t)(a3)) + 324);
+    if (t0 == 0) {
+        u8* t1 = *(u8**)(((u8*)(uintptr_t)(a3)) + 320);
+        if (t1 == 0) {
+            return (s32)(0);
+        }
+        s32 t2 = *(s32*)(t1 + 0);
+        return (s32)(t2);
+    }
+    return (s32)(t0);
+}
+
 // 0x801A2380
 extern "C" s32 fn_801A2380(void) {
     return (s32)(2);
@@ -174,6 +365,16 @@ extern "C" s32 fn_801A2540(void) {
     return (s32)(0);
 }
 
+// 0x801A2748
+extern "C" s32 fn_801A2748(u8* a3) {
+    s32 t0 = *(s32*)(((u8*)(uintptr_t)(a3)) + 320);
+    if (t0 == 0) {
+        return (s32)(-1);
+    }
+    *(u32*)(((u8*)(uintptr_t)(a3)) + 320) = (u32)((u32)(0));
+    return (s32)(-1);
+}
+
 // 0x801A2E84
 extern "C" s32 fn_801A2E84(void) {
     return (s32)(0);
@@ -187,6 +388,15 @@ extern "C" s32 fn_801A2E8C(void) {
 // 0x801A3908
 extern "C" s32 fn_801A3908(void) {
     return (s32)(0);
+}
+
+// 0x801A3A10
+extern "C" s32 fn_801A3A10(u8* a3) {
+    u8* t0 = *(u8**)(((u8*)(uintptr_t)(a3)) + 348);
+    if (t0 == 0) {
+        return (s32)(0);
+    }
+    return (s32)(fn_8019555C(t0));
 }
 
 // 0x801A4018
@@ -268,6 +478,21 @@ extern "C" s32 fn_801A7DB8(u8* a3) {
 // 0x801A81D8
 extern "C" s32 fn_801A81D8(void) {
     return (s32)(0);
+}
+
+// 0x801A883C
+extern "C" void fn_801A883C(u8* a3, u8* a4) {
+    // tail-call arguments inferred from the registers set before the call
+    s32 t0 = *(s32*)(((u8*)(uintptr_t)(a4)) + 100);
+    u32 t1 = (u32)(t0) & 0x40000u;
+    if (t1 == 0) {
+        f32 t2 = *(f32*)((u8*)lbl_805FFA3C);
+        *(f32*)(((u8*)(uintptr_t)(a3)) + 8) = (f32)(t2);
+        *(f32*)(((u8*)(uintptr_t)(a3)) + 4) = (f32)(t2);
+        *(f32*)(((u8*)(uintptr_t)(a3)) + 0) = (f32)(t2);
+        return;
+    }
+    fn_8019B808();
 }
 
 // 0x801A8AF4
@@ -407,4 +632,15 @@ extern "C" void fn_801ABD48(s32 a3) {
 // 0x801ABD50
 extern "C" void fn_801ABD50(s32 a3) {
     *(u32*)((u8*)lbl_805FB698) = (u32)((u32)(uintptr_t)(a3));
+}
+
+// 0x801AC164
+extern "C" u32 AnimSetGetClip(u8* a3, s32 a4) {
+    if ((s32)(u32)(uintptr_t)(a4) < 0) {
+        return (u32)(0);
+    }
+    u32 t0 = (u32)((s32)(u32)(uintptr_t)(a4) * 68);
+    s32 t1 = *(s32*)(((u8*)(uintptr_t)(a3)) + 12);
+    u32 t2 = (u32)(t1) + (u32)(t0);
+    return (u32)(t2);
 }

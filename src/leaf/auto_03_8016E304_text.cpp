@@ -5,12 +5,24 @@
 
 #include "types.h"
 
+extern u8 lbl_803F2880[];
+extern u8 lbl_80412BC0[];
+extern u8 lbl_80412BF8[];
+extern u8 lbl_805F95F8[];
 extern u8 lbl_805FB5FC[];
 extern u8 lbl_805FB638[];
 extern u8 lbl_805FB648[];
 extern u8 lbl_805FB650[];
+extern u8 lbl_805FB854[];
 extern u8 lbl_805FF618[];
 extern u8 lbl_805FF630[];
+extern "C" void BufferFree(void*);
+extern "C" void* MEMAllocFromAllocator(u8*, u32);
+extern "C" void MEMFreeToAllocator(u8*, void*);
+extern "C" void fn_80184314(s32, s32, s32);
+extern "C" void fn_80184490(s32, s32, s32);
+extern "C" void fn_8018979C(s32, s32, s32, s32);
+extern "C" void fn_801EF070(u8*, s32);
 
 // 0x8016EB0C
 extern "C" void fn_8016EB0C(u8* a3, f32 f1, f32 f2) {
@@ -128,6 +140,16 @@ extern "C" void fn_801731C0(void) {
 
 // 0x801731C4
 extern "C" void fn_801731C4(void) {
+}
+
+// 0x80173284
+extern "C" void* fn_80173284(s32 a3) {
+    return (void*)(MEMAllocFromAllocator((u8*)lbl_803F2880, (u32)((u32)(uintptr_t)(a3))));
+}
+
+// 0x80173294
+extern "C" void fn_80173294(u8* a3) {
+    MEMFreeToAllocator((u8*)lbl_803F2880, (void*)(((u8*)(uintptr_t)(a3))));
 }
 
 // 0x801736E4
@@ -280,12 +302,56 @@ extern "C" void fn_80182AB8(void) {
 extern "C" void fn_80183F60(void) {
 }
 
+// 0x80183FA0
+extern "C" u32 fn_80183FA0(u8* a3) {
+    s32 t0 = *(s32*)(((u8*)(uintptr_t)(a3)) + 56);
+    if ((s32)(u32)(t0) < 4096) {
+        u32 t1 = (u32)((s32)(u32)(t0) * 28);
+        u32 t2 = (u32)(t0) + 1u;
+        s32 t3 = *(s32*)(((u8*)(uintptr_t)(a3)) + 44);
+        *(u32*)(((u8*)(uintptr_t)(a3)) + 56) = (u32)((u32)(t2));
+        u32 t4 = (u32)(t3) + (u32)(t1);
+        return (u32)(t4);
+    }
+    return (u32)(0);
+}
+
 // 0x80184260
 extern "C" void fn_80184260(void) {
 }
 
 // 0x80184264
 extern "C" void fn_80184264(void) {
+}
+
+// 0x801842B0
+extern "C" u8* fn_801842B0(u8* a3) {
+    if (a3 == 0) {
+        return (u8*)(uintptr_t)(0);
+    }
+    u8* t0 = ((u8*)(uintptr_t)(a3)) + -4;
+    return (u8*)(t0);
+}
+
+// 0x801842C8
+extern "C" u8* fn_801842C8(u8* a3) {
+    if (a3 == 0) {
+        return (u8*)(uintptr_t)(0);
+    }
+    u8* t0 = ((u8*)(uintptr_t)(a3)) + -16;
+    return (u8*)(t0);
+}
+
+// 0x8018430C
+extern "C" void fn_8018430C(s32 a3, s32 a4) {
+    // tail-call arguments inferred from the registers set before the call
+    fn_80184314((s32)((u32)(uintptr_t)(a3)), (s32)((u32)(uintptr_t)(a4)), (s32)((u32)(0)));
+}
+
+// 0x80184488
+extern "C" void fn_80184488(s32 a3, s32 a4) {
+    // tail-call arguments inferred from the registers set before the call
+    fn_80184490((s32)((u32)(uintptr_t)(a3)), (s32)((u32)(uintptr_t)(a4)), (s32)((u32)(0)));
 }
 
 // 0x80185C94
@@ -295,6 +361,13 @@ extern "C" void fn_80185C94(void) {
 // 0x80188ED4
 extern "C" void fn_80188ED4(s32 a3) {
     *(u32*)((u8*)lbl_805FB638) = (u32)((u32)(uintptr_t)(a3));
+}
+
+// 0x80188EDC
+extern "C" void fn_80188EDC(s32 a3, s32 a4, s32 a5) {
+    // tail-call arguments inferred from the registers set before the call
+    s32 t0 = *(s32*)((u8*)lbl_80412BC0 + 16);
+    fn_8018979C((s32)((u32)(t0)), (s32)((u32)(uintptr_t)(a3)), (s32)((u32)(uintptr_t)(a4)), (s32)((u32)(uintptr_t)(a5)));
 }
 
 // 0x8018A3E4
@@ -310,6 +383,33 @@ extern "C" s32 fn_8018C47C(u8* a3) {
     return (s32)(t2);
 }
 
+// 0x8018C4D8
+extern "C" void fn_8018C4D8(u8* a3) {
+    u8* t0 = *(u8**)(((u8*)(uintptr_t)(a3)) + 4);
+    if (t0 == 0) {
+        s32 t1 = *(s32*)(((u8*)(uintptr_t)(a3)) + 20);
+        *(u32*)(((u8*)(uintptr_t)(a3)) + 32) = (u32)((u32)(-1));
+        u32 t2 = (u32)(t1) | 0x20000u;
+        *(u32*)(((u8*)(uintptr_t)(a3)) + 20) = (u32)((u32)(t2));
+        return;
+    }
+    u8* t3 = *(u8**)(t0 + 20);
+    *(u32*)(t3 + 28) = (u32)((u32)(0));
+    s32 t4 = *(s32*)(((u8*)(uintptr_t)(a3)) + 20);
+    *(u32*)(((u8*)(uintptr_t)(a3)) + 32) = (u32)((u32)(-1));
+    u32 t5 = (u32)(t4) | 0x20000u;
+    *(u32*)(((u8*)(uintptr_t)(a3)) + 20) = (u32)((u32)(t5));
+}
+
+// 0x8018C8CC
+extern "C" u32 fn_8018C8CC(u8* a3) {
+    s32 t0 = *(s32*)(((u8*)(uintptr_t)(a3)) + 188);
+    s32 t1 = *(s32*)((u8*)lbl_805FB854);
+    u32 t2 = (u32)(t1) - (u32)(t0);
+    u32 t3 = (u32)(t2 == 0);
+    return (u32)(t3);
+}
+
 // 0x8018C8E4
 extern "C" s32 fn_8018C8E4(void) {
     s32 t0 = *(s32*)((u8*)lbl_805FB650);
@@ -319,6 +419,19 @@ extern "C" s32 fn_8018C8E4(void) {
 // 0x8018C8EC
 extern "C" void fn_8018C8EC(s32 a3) {
     *(u32*)((u8*)lbl_805FB650) = (u32)((u32)(uintptr_t)(a3));
+}
+
+// 0x8018C9DC
+extern "C" s32 fn_8018C9DC(s32 a3, u8* a4) {
+    if (a4 != 0) {
+        u8* t0 = ((u8*)(uintptr_t)(a4)) + -1;
+        u32 t1 = (((u32)(uintptr_t)(t0) << 2) | ((u32)(uintptr_t)(t0) >> 30)) & 0xfffffffcu;
+        u32 t2 = (u32)(uintptr_t)(a3) + (u32)(t1);
+        u8* t3 = *(u8**)((u8*)(uintptr_t)(t2) + 20);
+        s32 t4 = *(s32*)(t3 + 204);
+        return (s32)(t4);
+    }
+    return (s32)(0);
 }
 
 // 0x8018D1E4
@@ -333,6 +446,17 @@ extern "C" s32 ScreenSetsFind(s32 a3, s32 a4) {
     u32 t1 = (u32)(uintptr_t)(a3) + (u32)(t0);
     s32 t2 = *(s32*)((u8*)(uintptr_t)(t1) + 136);
     return (s32)(t2);
+}
+
+// 0x8018D4CC
+extern "C" void fn_8018D4CC(u8* a3) {
+    // tail-call arguments inferred from the registers set before the call
+    s32 t0 = *(s32*)((u8*)lbl_805F95F8);
+    if ((s32)(u32)(t0) <= 0) {
+        fn_801EF070((u8*)lbl_80412BF8, (s32)((u32)(uintptr_t)(a3)));
+        return;
+    }
+    BufferFree((void*)(((u8*)(uintptr_t)(a3))));
 }
 
 // 0x8018D524

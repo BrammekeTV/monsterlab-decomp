@@ -6,6 +6,36 @@
 #include "types.h"
 
 extern u8 lbl_805FAFE8[];
+extern "C" void fn_800222F0(void);
+extern "C" void fn_8002238C(void);
+extern "C" void fn_80022390(void);
+extern "C" void fn_800223D4(void);
+extern "C" void fn_800223D8(void);
+
+// 0x800317A4
+extern "C" void fn_800317A4(void) {
+    fn_800222F0();
+}
+
+// 0x80031F0C
+extern "C" void fn_80031F0C(void) {
+    fn_80022390();
+}
+
+// 0x80031F10
+extern "C" void fn_80031F10(void) {
+    fn_800223D8();
+}
+
+// 0x80031F14
+extern "C" void fn_80031F14(void) {
+    fn_8002238C();
+}
+
+// 0x80031F18
+extern "C" void fn_80031F18(void) {
+    fn_800223D4();
+}
 
 // 0x800320A4
 extern "C" s32 CheckResult(void) {

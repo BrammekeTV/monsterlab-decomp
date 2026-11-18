@@ -5,6 +5,13 @@
 
 #include "types.h"
 
+extern "C" u8* fn_80021750(void);
+
+// 0x800237F0
+extern "C" u8* DiggingOutputTest(void) {
+    return (u8*)(fn_80021750());
+}
+
 // 0x800237F4
 extern "C" void PrintIdle(void) {
 }

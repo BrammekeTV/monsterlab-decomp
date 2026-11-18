@@ -6,6 +6,8 @@
 #include "types.h"
 #include "game/script_callbacks.h"
 
+extern "C" void BufferFree(void*);
+
 // 0x8010C750
 u32 CloneRenderObjectCallback(u32 a3, u32 a4) {
     return (u32)(1);
@@ -22,6 +24,15 @@ u32 DeallocPooledEntityCallback(u32 a3, u32 a4) {
     s32 t1 = *(s32*)(((u8*)(uintptr_t)(a4)) + 32);
     *(u32*)(t0 + 4) = (u32)((u32)(t1));
     return (u32)(1);
+}
+
+// 0x8010C8F8
+void DemolishEntityPoolCallback(u32 a3) {
+    u8* t0 = *(u8**)(((u8*)(uintptr_t)(a3)) + 32);
+    if (t0 == 0) {
+        return;
+    }
+    BufferFree((void*)(t0));
 }
 
 // 0x8010CC98

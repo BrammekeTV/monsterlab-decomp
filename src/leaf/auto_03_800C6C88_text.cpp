@@ -28,3 +28,33 @@ extern "C" void fn_800C72B4(u8* a3, s32 a4) {
     *(u32*)(((u8*)(uintptr_t)(a3)) + 8) = (u32)((u32)(uintptr_t)(a4));
     *(u32*)(((u8*)(uintptr_t)(a3)) + 16) = (u32)((u32)(2));
 }
+
+// 0x800C73B4
+extern "C" s32 fn_800C73B4(u8* a3) {
+    s32 t0 = *(s32*)(((u8*)(uintptr_t)(a3)) + 12);
+    if ((s32)(u32)(t0) != 2) {
+        return (s32)(0);
+    }
+    s32 t1 = *(s32*)(((u8*)(uintptr_t)(a3)) + 4);
+    return (s32)(t1);
+}
+
+// 0x800C73D0
+extern "C" s32 fn_800C73D0(u8* a3) {
+    s32 t0 = *(s32*)(((u8*)(uintptr_t)(a3)) + 12);
+    if ((s32)(u32)(t0) != 1) {
+        return (s32)(0);
+    }
+    s32 t1 = *(s32*)(((u8*)(uintptr_t)(a3)) + 4);
+    return (s32)(t1);
+}
+
+// 0x800C73EC
+extern "C" s32 fn_800C73EC(u8* a3) {
+    s32 t0 = *(s32*)(((u8*)(uintptr_t)(a3)) + 12);
+    if ((s32)(u32)(t0) != 3) {
+        return (s32)(0);
+    }
+    s32 t1 = *(s32*)(((u8*)(uintptr_t)(a3)) + 4);
+    return (s32)(t1);
+}

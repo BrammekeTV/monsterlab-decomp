@@ -6,6 +6,7 @@
 #include "types.h"
 
 extern u8 lbl_805FB2A4[];
+extern "C" void fn_80116D40(u8*);
 
 // 0x8011AD84
 extern "C" void fn_8011AD84(void) {
@@ -31,6 +32,13 @@ extern "C" u32 fn_8011BA5C(u8* a3) {
     u32 t1 = (((u32)(t0) << 2) | ((u32)(t0) >> 30)) & 0xfffffffcu;
     u32 t2 = (u32)(t0) - (u32)(t1);
     return (u32)(t2);
+}
+
+// 0x8011BA6C
+extern "C" void fn_8011BA6C(u8* a3) {
+    // tail-call arguments inferred from the registers set before the call
+    u8* t0 = ((u8*)(uintptr_t)(a3)) + 11444;
+    fn_80116D40(t0);
 }
 
 // 0x8011BA74
@@ -71,6 +79,75 @@ extern "C" s32 fn_8011BB20(u8* a3) {
     return (s32)(t0);
 }
 
+// 0x8011BE84
+extern "C" s32 fn_8011BE84(u8* a3) {
+    s32 t0 = *(s32*)(((u8*)(uintptr_t)(a3)) + 9628);
+    s32 t1 = *(s32*)(((u8*)(uintptr_t)(a3)) + 11432);
+    if ((s32)(u32)(t0) >= (s32)(u32)(t1)) {
+        return (s32)(0);
+    }
+    u32 t2 = (((u32)(t0) << 2) | ((u32)(t0) >> 30)) & 0xfffffffcu;
+    u32 t3 = (u32)(uintptr_t)(a3) + (u32)(t2);
+    u8* t4 = *(u8**)((u8*)(uintptr_t)(t3) + 9640);
+    s32 t5 = *(s32*)(t4 + 16);
+    return (s32)(t5);
+}
+
+// 0x8011BEB0
+extern "C" s32 fn_8011BEB0(u8* a3) {
+    s32 t0 = *(s32*)(((u8*)(uintptr_t)(a3)) + 9628);
+    s32 t1 = *(s32*)(((u8*)(uintptr_t)(a3)) + 11432);
+    if ((s32)(u32)(t0) >= (s32)(u32)(t1)) {
+        return (s32)(0);
+    }
+    u32 t2 = (((u32)(t0) << 2) | ((u32)(t0) >> 30)) & 0xfffffffcu;
+    u32 t3 = (u32)(uintptr_t)(a3) + (u32)(t2);
+    u8* t4 = *(u8**)((u8*)(uintptr_t)(t3) + 9640);
+    s32 t5 = *(s32*)(t4 + 24);
+    return (s32)(t5);
+}
+
+// 0x8011BEDC
+extern "C" s32 fn_8011BEDC(u8* a3) {
+    s32 t0 = *(s32*)(((u8*)(uintptr_t)(a3)) + 9628);
+    s32 t1 = *(s32*)(((u8*)(uintptr_t)(a3)) + 11432);
+    if ((s32)(u32)(t0) >= (s32)(u32)(t1)) {
+        return (s32)(0);
+    }
+    u32 t2 = (((u32)(t0) << 2) | ((u32)(t0) >> 30)) & 0xfffffffcu;
+    u32 t3 = (u32)(uintptr_t)(a3) + (u32)(t2);
+    u8* t4 = *(u8**)((u8*)(uintptr_t)(t3) + 9640);
+    s32 t5 = *(s32*)(t4 + 28);
+    return (s32)(t5);
+}
+
+// 0x8011BF08
+extern "C" s32 fn_8011BF08(u8* a3) {
+    s32 t0 = *(s32*)(((u8*)(uintptr_t)(a3)) + 9628);
+    s32 t1 = *(s32*)(((u8*)(uintptr_t)(a3)) + 11432);
+    if ((s32)(u32)(t0) >= (s32)(u32)(t1)) {
+        return (s32)(0);
+    }
+    u32 t2 = (((u32)(t0) << 2) | ((u32)(t0) >> 30)) & 0xfffffffcu;
+    u32 t3 = (u32)(uintptr_t)(a3) + (u32)(t2);
+    u8* t4 = *(u8**)((u8*)(uintptr_t)(t3) + 9640);
+    s32 t5 = *(s32*)(t4 + 36);
+    return (s32)(t5);
+}
+
+// 0x8011C108
+extern "C" s32 fn_8011C108(u8* a3) {
+    s32 t0 = *(s32*)(((u8*)(uintptr_t)(a3)) + 9628);
+    s32 t1 = *(s32*)(((u8*)(uintptr_t)(a3)) + 11432);
+    if ((s32)(u32)(t0) >= (s32)(u32)(t1)) {
+        return (s32)(0);
+    }
+    u32 t2 = (((u32)(t0) << 2) | ((u32)(t0) >> 30)) & 0xfffffffcu;
+    u32 t3 = (u32)(uintptr_t)(a3) + (u32)(t2);
+    s32 t4 = *(s32*)((u8*)(uintptr_t)(t3) + 10088);
+    return (s32)(t4);
+}
+
 // 0x8011C1D0
 extern "C" u32 fn_8011C1D0(u8* a3, s32 a4) {
     s32 t0 = *(s32*)(((u8*)(uintptr_t)(a3)) + 9632);
@@ -83,6 +160,14 @@ extern "C" u32 fn_8011C1D0(u8* a3, s32 a4) {
     u32 t7 = (u32)(t5) - (u32)(t6);
     u32 t8 = (((u32)(t7) << 1) | ((u32)(t7) >> 31)) & 0x1u;
     return (u32)(t8);
+}
+
+// 0x8011C1F8
+extern "C" u32 fn_8011C1F8(u8* a3, s32 a4) {
+    s32 t0 = *(s32*)(((u8*)(uintptr_t)(a3)) + 11748);
+    u32 t1 = (u32)(t0) - (u32)(uintptr_t)(a4);
+    u32 t2 = (u32)(t1 == 0);
+    return (u32)(t2);
 }
 
 // 0x8011C20C

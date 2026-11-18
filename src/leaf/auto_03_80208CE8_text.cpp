@@ -5,7 +5,18 @@
 
 #include "types.h"
 
+extern u8 gAudio[];
+extern u8 lbl_805F996C[];
 extern u8 lbl_805FBBA0[];
+extern u8 lbl_80600488[];
+extern u8 lbl_8060048C[];
+extern "C" void fn_801FCFB4(u8*);
+extern "C" void fn_801FF500(u8*);
+extern "C" f32 fn_801FFC48(void);
+extern "C" void fn_801FFC50(s32, s32);
+extern "C" f32 fn_801FFF1C(void);
+extern "C" void fn_802005EC(u8*);
+extern "C" void fn_802014D4(u8*);
 
 // 0x80208CE8
 extern "C" s32 fn_80208CE8(void) {
@@ -13,6 +24,61 @@ extern "C" s32 fn_80208CE8(void) {
     return (s32)(t0);
 }
 
+// 0x80208CF0
+extern "C" void fn_80208CF0(s32 a3) {
+    // tail-call arguments inferred from the registers set before the call
+    *(u32*)((u8*)lbl_805FBBA0) = (u32)((u32)(uintptr_t)(a3));
+    fn_801FCFB4((u8*)gAudio);
+}
+
+// 0x802097E4
+extern "C" void fn_802097E4(f32 f1) {
+    f32 t0 = *(f32*)((u8*)lbl_80600488);
+    if (!(f1 < t0)) {
+        f32 t1 = *(f32*)((u8*)lbl_8060048C);
+        if (!(f1 > t1)) {
+            *(f32*)((u8*)lbl_805F996C) = (f32)(f1);
+            return;
+        }
+        *(f32*)((u8*)lbl_805F996C) = (f32)(t1);
+        return;
+    }
+    *(f32*)((u8*)lbl_805F996C) = (f32)(t0);
+}
+
 // 0x80209810
 extern "C" void fn_80209810(void) {
+}
+
+// 0x8020A680
+extern "C" void fn_8020A680(void) {
+    // tail-call arguments inferred from the registers set before the call
+    fn_801FF500((u8*)gAudio);
+}
+
+// 0x8020B05C
+extern "C" f32 fn_8020B05C(void) {
+    return (f32)(fn_801FFC48());
+}
+
+// 0x8020B068
+extern "C" void fn_8020B068(s32 a3) {
+    fn_801FFC50((s32)((u32)(uintptr_t)((u8*)gAudio)), (s32)((u32)(uintptr_t)(a3)));
+}
+
+// 0x8020B154
+extern "C" f32 fn_8020B154(void) {
+    return (f32)(fn_801FFF1C());
+}
+
+// 0x8020B1C8
+extern "C" void fn_8020B1C8(void) {
+    // tail-call arguments inferred from the registers set before the call
+    fn_802005EC((u8*)gAudio);
+}
+
+// 0x8020B1D4
+extern "C" void fn_8020B1D4(void) {
+    // tail-call arguments inferred from the registers set before the call
+    fn_802014D4((u8*)gAudio);
 }

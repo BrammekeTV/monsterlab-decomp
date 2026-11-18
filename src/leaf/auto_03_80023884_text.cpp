@@ -5,7 +5,71 @@
 
 #include "types.h"
 
+extern u8 lbl_805FAFB0[];
+extern "C" void fn_8002238C(void);
+extern "C" void fn_80022390(void);
+extern "C" void fn_800223D4(void);
+extern "C" void fn_800223D8(void);
+extern "C" void fn_80022E10(void);
+extern "C" void fn_80022F28(void);
+
+// 0x80024BCC
+extern "C" void fn_80024BCC(void) {
+    fn_80022390();
+}
+
+// 0x80024BD0
+extern "C" void fn_80024BD0(void) {
+    fn_800223D8();
+}
+
+// 0x80024BD4
+extern "C" void fn_80024BD4(void) {
+    fn_8002238C();
+}
+
+// 0x80024BD8
+extern "C" void fn_80024BD8(void) {
+    fn_800223D4();
+}
+
 // 0x80024D98
 extern "C" void fn_80024D98(u8* a3) {
     *(u8*)(((u8*)(uintptr_t)(a3)) + 253) = (u8)((u32)(1));
+}
+
+// 0x800258C0
+extern "C" void fn_800258C0(void) {
+    // tail-call arguments inferred from the registers set before the call
+    u8* t0 = *(u8**)((u8*)lbl_805FAFB0);
+    s32 t1 = *(s32*)(t0 + 196);
+    u32 t2 = (((u32)(t1) << 1) | ((u32)(t1) >> 31)) & 0x1u;
+    u32 t3 = (u32)(t1) & 0x1u;
+    u32 t4 = (u32)(t3) ^ (u32)(t2);
+    u32 t5 = (u32)(t4) - (u32)(t2);
+    if (t5 != 0) {
+        return;
+    }
+    if ((s32)(u32)(t1) <= 1) {
+        return;
+    }
+    fn_80022E10();
+}
+
+// 0x800258EC
+extern "C" void fn_800258EC(void) {
+    // tail-call arguments inferred from the registers set before the call
+    u8* t0 = *(u8**)((u8*)lbl_805FAFB0);
+    s32 t1 = *(s32*)(t0 + 2800);
+    u32 t2 = (((u32)(t1) << 1) | ((u32)(t1) >> 31)) & 0x1u;
+    u32 t3 = (u32)(t1) & 0x1u;
+    u32 t4 = (u32)(t3) ^ (u32)(t2);
+    u32 t5 = (u32)(t4) - (u32)(t2);
+    if (t5 != 0) {
+        return;
+    }
+    if ((s32)(u32)(t1) <= 1) {
+        return;
+    }
+    fn_80022F28();
 }

@@ -6,6 +6,7 @@
 #include "types.h"
 
 extern u8 lbl_805FAFC8[];
+extern u8 lbl_805FCAAC[];
 
 // 0x800294B4
 extern "C" s32 fn_800294B4(void) {
@@ -31,4 +32,16 @@ extern "C" u32 fn_8002A7F8(u8* a3, s32 a4) {
 // 0x8002A8CC
 extern "C" void fn_8002A8CC(void) {
     *(u32*)((u8*)lbl_805FAFC8) = (u32)((u32)(5));
+}
+
+// 0x8002AA64
+extern "C" void fn_8002AA64(u8* a3, u8* a4) {
+    *(u32*)(((u8*)(uintptr_t)(a3)) + 24) = (u32)((u32)(7));
+    if (a4 != 0) {
+        f32 t0 = *(f32*)(((u8*)(uintptr_t)(a4)) + 16);
+        *(f32*)(((u8*)(uintptr_t)(a3)) + 16) = (f32)(t0);
+        return;
+    }
+    f32 t1 = *(f32*)((u8*)lbl_805FCAAC);
+    *(f32*)(((u8*)(uintptr_t)(a3)) + 16) = (f32)(t1);
 }

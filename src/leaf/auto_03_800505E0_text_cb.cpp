@@ -6,10 +6,34 @@
 #include "types.h"
 #include "game/script_callbacks.h"
 
+extern u8 gEventMgr[];
+extern u8 gGame[];
+extern u8 lbl_805FB02C[];
 extern u8 lbl_805FB0E8[];
+extern "C" void EventSend(void*, void*, void*, u32, int, int, int, int);
+
+// 0x80050F24
+void SendPlayerSignal(u32 a3) {
+    u8* t0 = *(u8**)((u8*)gEventMgr);
+    u32 t1 = (u32)(uintptr_t)((u8*)gGame) + 65536u;
+    u8* t2 = *(u8**)((u8*)(uintptr_t)(t1) + -10732);
+    EventSend((void*)(t0), (void*)(t2), (void*)((u8*)(uintptr_t)(0)), (u32)((u32)(uintptr_t)(a3)), (int)((u32)(0)), (int)((u32)(0)), (int)((u32)(1)), (int)((u32)(0)));
+}
+
+// 0x80050F54
+void SendEntitySignal(void* a3, u32 a4) {
+    u8* t0 = *(u8**)((u8*)gEventMgr);
+    EventSend((void*)(t0), (void*)(((u8*)(uintptr_t)(a3))), (void*)((u8*)(uintptr_t)(0)), (u32)((u32)(uintptr_t)(a4)), (int)((u32)(0)), (int)((u32)(0)), (int)((u32)(0)), (int)((u32)(0)));
+}
 
 // 0x80050F7C
 void SendChatTargetSignal(u32 a3, u32 a4) {
+}
+
+// 0x80050F80
+void StartCombatConversationID(u32 a3, s32 a4) {
+    *(u32*)((u8*)lbl_805FB02C) = (u32)((u32)(uintptr_t)(a4));
+    StartConversationID((u32)((u32)(uintptr_t)(a3)));
 }
 
 // 0x80051648

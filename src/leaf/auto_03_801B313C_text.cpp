@@ -5,6 +5,8 @@
 
 #include "types.h"
 
+extern "C" void fn_801BA470(void);
+extern u8 gEventMgr[];
 extern u8 lbl_80383C68[];
 extern u8 lbl_805FB6A0[];
 extern u8 lbl_805FB6A8[];
@@ -13,6 +15,12 @@ extern u8 lbl_805FB6E8[];
 extern u8 lbl_805FB6F0[];
 extern u8 lbl_805FB704[];
 extern u8 lbl_805FFB08[];
+extern "C" void EventSend(void*, void*, void*, u32, int, int, int, int);
+extern "C" void EventSendTo(void*, u32, void*, u32, int, int);
+extern "C" void fn_801B1778(s32, s32);
+extern "C" void fn_801BB530(s32, s32);
+extern "C" void fn_801EBA20(s32);
+extern "C" void fn_801EBBE0(s32, u8*, s32);
 
 // 0x801B3308
 extern "C" s32 fn_801B3308(void) {
@@ -43,13 +51,51 @@ extern "C" s32 fn_801B3938(u8* a3) {
 extern "C" void fn_801B4028(void) {
 }
 
+// 0x801B41F0
+extern "C" s32 fn_801B41F0(u8* a3) {
+    u8* t0 = *(u8**)(((u8*)(uintptr_t)(a3)) + 4);
+    if (t0 != 0) {
+        s32 t1 = *(s32*)(t0 + 0);
+        return (s32)(t1);
+    }
+    return (s32)(0);
+}
+
 // 0x801B432C
 extern "C" void fn_801B432C(s32 a3) {
     *(u32*)((u8*)lbl_805FB6A8) = (u32)((u32)(uintptr_t)(a3));
 }
 
+// 0x801B4C40
+extern "C" void fn_801B4C40(u8* a3) {
+    // tail-call arguments inferred from the registers set before the call
+    u8* t0 = *(u8**)(((u8*)(uintptr_t)(a3)) + 164);
+    if (t0 == 0) {
+        return;
+    }
+    s32 t1 = *(s32*)(t0 + 0);
+    if (t1 == 0) {
+        return;
+    }
+    s32 t2 = *(s32*)(((u8*)(uintptr_t)(a3)) + 4);
+    u32 t3 = (u32)(t2) + 55u;
+    fn_801BB530((s32)((u32)(t1)), (s32)((u32)(t3)));
+}
+
 // 0x801B5334
 extern "C" void fn_801B5334(void) {
+}
+
+// 0x801B62A4
+extern "C" s32 fn_801B62A4(u8* a3) {
+    if (a3 != 0) {
+        s32 t0 = *(s32*)(((u8*)(uintptr_t)(a3)) + 4);
+        if (t0 != 0) {
+            return (s32)(t0);
+        }
+        return (s32)(0);
+    }
+    return (s32)(0);
 }
 
 // 0x801B62C8
@@ -127,12 +173,43 @@ extern "C" s32 fn_801B6E8C(void) {
     return (s32)(1);
 }
 
+// 0x801B7020
+extern "C" void fn_801B7020(u8* a3) {
+    // tail-call arguments inferred from the registers set before the call
+    s32 t0 = *(s32*)(((u8*)(uintptr_t)(a3)) + 140);
+    if (t0 == 0) {
+        return;
+    }
+    u8* t1 = *(u8**)(((u8*)(uintptr_t)(a3)) + 4);
+    s32 t2 = *(s32*)(t1 + 32);
+    u32 t3 = (u32)(t2) | 0x4000u;
+    *(u32*)(t1 + 32) = (u32)((u32)(t3));
+    s32 t4 = *(s32*)(((u8*)(uintptr_t)(a3)) + 140);
+    fn_801B1778((s32)((u32)(t4)), (s32)((u32)(1)));
+}
+
 // 0x801B70E8
 extern "C" u32 EntityIsFrozen(u8* a3) {
     u8* t0 = *(u8**)(((u8*)(uintptr_t)(a3)) + 4);
     s32 t1 = *(s32*)(t0 + 44);
     u32 t2 = (((u32)(t1) << 25) | ((u32)(t1) >> 7)) & 0x1u;
     return (u32)(t2);
+}
+
+// 0x801B70F8
+extern "C" u8* fn_801B70F8(u8* a3, s32 a4) {
+    if (a4 == 0) {
+        u8* t0 = *(u8**)(((u8*)(uintptr_t)(a3)) + 4);
+        s32 t1 = *(s32*)(t0 + 44);
+        u32 t2 = (u32)(t1) & 0xffffff7fu;
+        *(u32*)(t0 + 44) = (u32)((u32)(t2));
+        return (u8*)(t0);
+    }
+    u8* t3 = *(u8**)(((u8*)(uintptr_t)(a3)) + 4);
+    s32 t4 = *(s32*)(t3 + 44);
+    u32 t5 = (u32)(t4) | 0x80u;
+    *(u32*)(t3 + 44) = (u32)((u32)(t5));
+    return (u8*)(t3);
 }
 
 // 0x801B9C94
@@ -165,6 +242,13 @@ extern "C" void fn_801B9E7C(u8* a3) {
     *(u32*)(((u8*)(uintptr_t)(a3)) + 3112) = (u32)((u32)(0));
 }
 
+// 0x801BA4A0
+extern "C" void fn_801BA4A0(u8* a3) {
+    // tail-call arguments inferred from the registers set before the call
+    s32 t0 = *(s32*)(((u8*)(uintptr_t)(a3)) + 0);
+    fn_801EBBE0((s32)((u32)(t0)), (u8*)(uintptr_t)&fn_801BA470, (s32)((u32)(t0)));
+}
+
 // 0x801BA9BC
 extern "C" s32 fn_801BA9BC(void) {
     return (s32)(0);
@@ -173,6 +257,22 @@ extern "C" s32 fn_801BA9BC(void) {
 // 0x801BB3CC
 extern "C" void fn_801BB3CC(s32 a3) {
     *(u32*)((u8*)lbl_805FB6E0) = (u32)((u32)(uintptr_t)(a3));
+}
+
+// 0x801BBAC0
+extern "C" void fn_801BBAC0(u8* a3, s32 a4, s32 a5, s32 a6) {
+    u8* t0 = *(u8**)(((u8*)(uintptr_t)(a3)) + 16);
+    u8* t1 = *(u8**)((u8*)gEventMgr);
+    EventSend((void*)(t1), (void*)(t0), (void*)(t0), (u32)((u32)(uintptr_t)(a4)), (int)((u32)(uintptr_t)(a5)), (int)((u32)(uintptr_t)(a6)), (int)((u32)(1)), (int)((u32)(0)));
+}
+
+// 0x801BBAEC
+extern "C" void RequestSend(u8* a3, s32 a4, s32 a5) {
+    u8* t0 = *(u8**)(((u8*)(uintptr_t)(a3)) + 16);
+    u8* t1 = *(u8**)((u8*)gEventMgr);
+    s32 t2 = *(s32*)(t0 + 240);
+    u32 t3 = (u32)(0x4d20000) + 29061u;
+    EventSendTo((void*)(t1), (u32)((u32)(uintptr_t)(a4)), (void*)(t0), (u32)((u32)(t3)), (int)((u32)(t2)), (int)((u32)(uintptr_t)(a5)));
 }
 
 // 0x801BBE38
@@ -241,6 +341,22 @@ extern "C" void fn_801BF36C(u8* a3) {
 // 0x801C37EC
 extern "C" void fn_801C37EC(s32 a3) {
     *(u32*)((u8*)lbl_805FB6F0) = (u32)((u32)(uintptr_t)(a3));
+}
+
+// 0x801C3E7C
+extern "C" void fn_801C3E7C(s32 a3, u8* a4) {
+    // tail-call arguments inferred from the registers set before the call
+    u8* t0 = *(u8**)(((u8*)(uintptr_t)(a4)) + 0);
+    s32 t1 = *(s32*)(t0 + 120);
+    fn_801EBA20((s32)((u32)(t1)));
+}
+
+// 0x801C3E88
+extern "C" void fn_801C3E88(s32 a3, u8* a4) {
+    // tail-call arguments inferred from the registers set before the call
+    u8* t0 = *(u8**)(((u8*)(uintptr_t)(a4)) + 0);
+    s32 t1 = *(s32*)(t0 + 124);
+    fn_801EBA20((s32)((u32)(t1)));
 }
 
 // 0x801C3E94

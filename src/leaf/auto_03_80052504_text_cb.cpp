@@ -31,6 +31,36 @@ void SetAirFrictionToDefault(u32 a3) {
     *(f32*)(((u8*)(uintptr_t)(a3)) + 2140) = (f32)(t0);
 }
 
+// 0x8005C418
+void SetPropCollision(u32 a3, s32 a4) {
+    if (a4 == 0) {
+        u8* t0 = *(u8**)(((u8*)(uintptr_t)(a3)) + 4);
+        s32 t1 = *(s32*)(t0 + 32);
+        u32 t2 = (u32)(t1) | 0x2000000u;
+        *(u32*)(t0 + 32) = (u32)((u32)(t2));
+        return;
+    }
+    u8* t3 = *(u8**)(((u8*)(uintptr_t)(a3)) + 4);
+    s32 t4 = *(s32*)(t3 + 32);
+    u32 t5 = (u32)(t4) & 0xfdffffffu;
+    *(u32*)(t3 + 32) = (u32)((u32)(t5));
+}
+
+// 0x8005C448
+void SetCharCollision(u32 a3, s32 a4) {
+    if (a4 == 0) {
+        u8* t0 = *(u8**)(((u8*)(uintptr_t)(a3)) + 4);
+        s32 t1 = *(s32*)(t0 + 32);
+        u32 t2 = (u32)(t1) | 0x40000000u;
+        *(u32*)(t0 + 32) = (u32)((u32)(t2));
+        return;
+    }
+    u8* t3 = *(u8**)(((u8*)(uintptr_t)(a3)) + 4);
+    s32 t4 = *(s32*)(t3 + 32);
+    u32 t5 = (u32)(t4) & 0xbfffffffu;
+    *(u32*)(t3 + 32) = (u32)((u32)(t5));
+}
+
 // 0x8005C478
 s32 ChooseFlailingLand(u32 a3, s32 a4) {
     return (s32)(0);

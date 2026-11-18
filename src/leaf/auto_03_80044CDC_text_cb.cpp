@@ -8,7 +8,9 @@
 
 extern u8 lbl_805FB098[];
 extern u8 lbl_805FB0A8[];
+extern u8 lbl_805FB0A9[];
 extern u8 lbl_805FB0AA[];
+extern "C" void fn_800493A8(s32);
 
 // 0x80046B9C
 u32 isPartLocked(void) {
@@ -21,7 +23,24 @@ void SupressHUD(void) {
     *(u8*)((u8*)lbl_805FB0A8) = (u8)((u32)(1));
 }
 
+// 0x80048A8C
+void ReleaseHUD(void) {
+    u8 t0 = *(u8*)((u8*)lbl_805FB0A9);
+    *(u8*)((u8*)lbl_805FB0A8) = (u8)((u32)(0));
+    if (t0 == 0) {
+        return;
+    }
+    *(u8*)((u8*)lbl_805FB0A9) = (u8)((u32)(0));
+    ShowSelectionHUD();
+}
+
 // 0x80048AAC
 void SetInTargetedPartTutorial(void) {
     *(u8*)((u8*)lbl_805FB0AA) = (u8)((u32)(1));
+}
+
+// 0x80049374
+void CombatHUDStoreDisableState(void) {
+    // tail-call arguments inferred from the registers set before the call
+    fn_800493A8((s32)((u32)(0)));
 }

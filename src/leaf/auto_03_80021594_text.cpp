@@ -6,12 +6,42 @@
 #include "types.h"
 
 extern u8 lbl_805FAF90[];
+extern u8 lbl_805FAF98[];
+extern u8 lbl_805FAF9C[];
+extern u8 lbl_805FAFA0[];
+extern u8 lbl_805FB134[];
 extern u8 lbl_805FC8E0[];
+extern u8 lbl_805FC8F4[];
+extern "C" void UIEngine_LoadUIScreenSet(s32);
+extern "C" void app_PlayMusic(u32, f32);
+
+// 0x80021750
+extern "C" u8* fn_80021750(void) {
+    u8* t0 = *(u8**)((u8*)lbl_805FB134);
+    if (t0 == 0) {
+        return (u8*)(t0);
+    }
+    s32 t1 = *(s32*)(t0 + 0);
+    if (t1 == 0) {
+        return (u8*)(t0);
+    }
+    return (u8*)(uintptr_t)(0);
+}
 
 // 0x800217A8
 extern "C" s32 fn_800217A8(u8* a3) {
     s32 t0 = *(s32*)(((u8*)(uintptr_t)(a3)) + 124);
     return (s32)(t0);
+}
+
+// 0x80021DAC
+extern "C" s32 fn_80021DAC(void) {
+    u8 t0 = *(u8*)((u8*)lbl_805FAF98);
+    if (t0 == 0) {
+        return (s32)(0);
+    }
+    *(u8*)((u8*)lbl_805FAF98) = (u8)((u32)(0));
+    return (s32)(1);
 }
 
 // 0x800222F0
@@ -52,6 +82,22 @@ extern "C" void fn_800223EC(void) {
 extern "C" s32 fn_80022608(void) {
     s32 t0 = *(s32*)((u8*)lbl_805FAF90);
     return (s32)(t0);
+}
+
+// 0x80022D10
+extern "C" void fn_80022D10(void) {
+    s32 t0 = *(s32*)((u8*)lbl_805FAF9C);
+    UIEngine_LoadUIScreenSet((s32)((u32)(2)));
+}
+
+// 0x80022D1C
+extern "C" void fn_80022D1C(void) {
+    s32 t0 = *(s32*)((u8*)lbl_805FAFA0);
+    if (t0 == 0) {
+        return;
+    }
+    f32 t1 = *(f32*)((u8*)lbl_805FC8F4);
+    app_PlayMusic((u32)((u32)(t0)), (f32)(t1));
 }
 
 // 0x80022E0C

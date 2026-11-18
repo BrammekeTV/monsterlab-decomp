@@ -5,6 +5,8 @@
 
 #include "types.h"
 
+extern "C" void fn_801219F0(void);
+
 // 0x8012148C
 extern "C" void fn_8012148C(void) {
 }
@@ -15,6 +17,11 @@ extern "C" void fn_80121490(void) {
 
 // 0x80121494
 extern "C" void fn_80121494(void) {
+}
+
+// 0x801214D8
+extern "C" void fn_801214D8(void) {
+    fn_801219F0();
 }
 
 // 0x801214DC

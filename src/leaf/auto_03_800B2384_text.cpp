@@ -5,7 +5,17 @@
 
 #include "types.h"
 
+extern u8 gEventMgr[];
 extern u8 lbl_805FE108[];
+extern "C" void EventSendTo(void*, u32, void*, u32, int, int);
+
+// 0x800B42EC
+extern "C" void fn_800B42EC(void) {
+    u32 t0 = (u32)(0xf1590000) + 6310u;
+    u8* t1 = *(u8**)((u8*)gEventMgr);
+    u32 t2 = (u32)(0x16a0000) + 14501u;
+    EventSendTo((void*)(t1), (u32)((u32)(t2)), (void*)((u8*)(uintptr_t)(0)), (u32)((u32)(t0)), (int)((u32)(0)), (int)((u32)(0)));
+}
 
 // 0x800B4310
 extern "C" void fn_800B4310(void) {

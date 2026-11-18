@@ -1,15 +1,15 @@
 {
  "game_id": "RM7P4F",
- "generated": "2026-11-18T11:49:08+00:00",
- "commit": "aca4037",
- "commit_date": "2026-11-18T12:47:23+01:00",
+ "generated": "2026-11-18T12:26:42+00:00",
+ "commit": "af5920c",
+ "commit_date": "2026-11-18T12:49:09+01:00",
  "game": {
   "functions": 8548,
   "bytes": 2265988,
   "named": 2720,
   "named_bytes": 605280,
-  "decompiled": 2205,
-  "decompiled_bytes": 267080
+  "decompiled": 2879,
+  "decompiled_bytes": 282620
  },
  "library": {
   "functions": 4039,
@@ -24,8 +24,8 @@
   "bytes": 3404928,
   "named": 3182,
   "named_bytes": 709908,
-  "decompiled": 2205,
-  "decompiled_bytes": 267080
+  "decompiled": 2879,
+  "decompiled_bytes": 282620
  },
  "game_range": [
   "80006B40",
@@ -33,7 +33,7 @@
  ],
  "memory_map": [
   [
-   0.523,
+   0.525,
    0.696
   ],
   [
@@ -41,7 +41,7 @@
    0.0
   ],
   [
-   0.459,
+   0.47,
    0.435
   ],
   [
@@ -69,35 +69,35 @@
    0.921
   ],
   [
-   0.008,
+   0.025,
    0.858
   ],
   [
-   0.004,
+   0.044,
    0.665
   ],
   [
-   0.023,
+   0.094,
    0.645
   ],
   [
-   0.024,
+   0.044,
    0.059
   ],
   [
-   0.004,
+   0.016,
    0.199
   ],
   [
-   0.0,
+   0.009,
    0.32
   ],
   [
-   0.003,
+   0.012,
    0.044
   ],
   [
-   0.007,
+   0.012,
    0.0
   ],
   [
@@ -105,19 +105,19 @@
    0.049
   ],
   [
-   0.345,
+   0.348,
    0.598
   ],
   [
-   0.005,
+   0.019,
    0.061
   ],
   [
-   0.003,
+   0.008,
    0.014
   ],
   [
-   0.002,
+   0.003,
    0.0
   ],
   [
@@ -125,11 +125,11 @@
    0.0
   ],
   [
-   0.0,
+   0.005,
    0.0
   ],
   [
-   0.002,
+   0.009,
    0.0
   ],
   [
@@ -137,15 +137,15 @@
    0.006
   ],
   [
-   0.009,
+   0.015,
    0.019
   ],
   [
-   0.014,
+   0.018,
    0.03
   ],
   [
-   0.361,
+   0.369,
    0.398
   ],
   [
@@ -153,35 +153,35 @@
    0.687
   ],
   [
-   0.292,
+   0.298,
    0.736
   ],
   [
-   0.005,
+   0.012,
    0.101
   ],
   [
-   0.003,
+   0.005,
    0.13
   ],
   [
-   0.005,
+   0.013,
    0.233
   ],
   [
-   0.024,
+   0.054,
    0.378
   ],
   [
-   0.077,
+   0.084,
    0.078
   ],
   [
-   0.06,
+   0.061,
    0.06
   ],
   [
-   0.412,
+   0.416,
    0.409
   ],
   [
@@ -189,11 +189,11 @@
    0.13
   ],
   [
-   0.013,
+   0.024,
    0.324
   ],
   [
-   0.002,
+   0.005,
    0.0
   ],
   [
@@ -209,7 +209,7 @@
    0.0
   ],
   [
-   0.004,
+   0.007,
    0.0
   ],
   [
@@ -217,35 +217,35 @@
    0.155
   ],
   [
-   0.003,
+   0.012,
    0.078
   ],
   [
-   0.007,
+   0.013,
    0.052
   ],
   [
-   0.011,
+   0.027,
    0.125
   ],
   [
-   0.586,
+   0.59,
    0.725
   ],
   [
-   0.014,
+   0.016,
    0.312
   ],
   [
-   0.004,
+   0.023,
    0.115
   ],
   [
-   0.007,
+   0.017,
    0.049
   ],
   [
-   0.036,
+   0.039,
    0.034
   ],
   [
@@ -253,7 +253,7 @@
    0.0
   ],
   [
-   0.004,
+   0.024,
    0.009
   ],
   [
@@ -261,15 +261,15 @@
    0.448
   ],
   [
-   0.047,
+   0.06,
    0.136
   ],
   [
-   0.009,
+   0.022,
    0.482
   ],
   [
-   0.01,
+   0.015,
    0.089
   ],
   [
@@ -277,23 +277,23 @@
    0.0
   ],
   [
-   0.024,
+   0.03,
    0.03
   ],
   [
-   0.027,
+   0.053,
    0.139
   ],
   [
-   0.001,
+   0.004,
    0.0
   ],
   [
-   0.01,
+   0.016,
    0.252
   ],
   [
-   0.004,
+   0.01,
    0.241
   ],
   [
@@ -301,11 +301,11 @@
    0.008
   ],
   [
-   0.013,
+   0.018,
    0.106
   ],
   [
-   0.011,
+   0.017,
    0.004
   ],
   [
@@ -317,7 +317,7 @@
    0.052
   ],
   [
-   0.007,
+   0.012,
    0.005
   ],
   [
@@ -325,27 +325,27 @@
    0.0
   ],
   [
-   0.0,
+   0.012,
    0.0
   ],
   [
-   0.0,
+   0.007,
    0.0
-  ],
-  [
-   0.002,
-   0.0
-  ],
-  [
-   0.001,
-   0.139
-  ],
-  [
-   0.004,
-   0.31
   ],
   [
    0.006,
+   0.0
+  ],
+  [
+   0.017,
+   0.139
+  ],
+  [
+   0.016,
+   0.31
+  ],
+  [
+   0.025,
    0.113
   ],
   [
@@ -353,7 +353,7 @@
    0.047
   ],
   [
-   0.015,
+   0.02,
    0.0
   ],
   [
@@ -361,19 +361,19 @@
    0.135
   ],
   [
-   0.006,
+   0.011,
    0.001
   ],
   [
-   0.003,
+   0.01,
    0.0
   ],
   [
-   0.004,
+   0.021,
    0.069
   ],
   [
-   0.005,
+   0.01,
    0.018
   ],
   [
@@ -381,15 +381,15 @@
    0.0
   ],
   [
-   0.001,
+   0.008,
    0.0
   ],
   [
-   0.015,
+   0.029,
    0.051
   ],
   [
-   0.012,
+   0.021,
    0.0
   ],
   [
@@ -397,11 +397,11 @@
    0.0
   ],
   [
-   0.002,
+   0.02,
    0.072
   ],
   [
-   0.006,
+   0.016,
    0.0
   ],
   [
@@ -413,11 +413,11 @@
    0.041
   ],
   [
-   0.007,
+   0.06,
    0.099
   ],
   [
-   0.003,
+   0.008,
    0.201
   ],
   [
@@ -429,7 +429,7 @@
    0.0
   ],
   [
-   0.032,
+   0.053,
    0.001
   ],
   [
@@ -445,27 +445,27 @@
    0.142
   ],
   [
-   0.004,
+   0.014,
    0.155
   ],
   [
-   0.011,
+   0.043,
    1.0
   ],
   [
-   0.0,
+   0.001,
    0.843
   ],
   [
-   0.005,
+   0.038,
    0.541
   ],
   [
-   0.011,
+   0.053,
    0.97
   ],
   [
-   0.0,
+   0.024,
    0.957
   ],
   [
@@ -473,19 +473,19 @@
    0.931
   ],
   [
-   0.003,
+   0.035,
    0.99
   ],
   [
-   0.005,
+   0.016,
    1.0
   ],
   [
-   0.187,
+   0.241,
    0.929
   ],
   [
-   0.939,
+   0.941,
    0.992
   ],
   [
@@ -497,15 +497,15 @@
    0.0
   ],
   [
-   0.047,
+   0.23,
    1.0
   ],
   [
-   0.985,
+   0.993,
    1.0
   ],
   [
-   0.491,
+   0.55,
    0.883
   ],
   [
@@ -513,19 +513,19 @@
    0.224
   ],
   [
-   0.025,
+   0.027,
    0.058
   ],
   [
-   0.817,
+   0.819,
    0.865
   ],
   [
-   0.006,
+   0.014,
    0.801
   ],
   [
-   0.001,
+   0.008,
    1.0
   ],
   [
@@ -533,27 +533,27 @@
    0.955
   ],
   [
-   0.006,
+   0.01,
    0.853
   ],
   [
-   0.006,
+   0.033,
    0.0
   ],
   [
-   0.026,
+   0.04,
    0.0
   ],
   [
-   0.035,
+   0.083,
    0.0
   ],
   [
-   0.015,
+   0.025,
    0.0
   ],
   [
-   0.042,
+   0.089,
    0.11
   ],
   [
@@ -561,11 +561,11 @@
    0.55
   ],
   [
-   0.36,
+   0.363,
    0.547
   ],
   [
-   0.738,
+   0.743,
    0.749
   ],
   [
@@ -573,7 +573,7 @@
    0.0
   ],
   [
-   0.908,
+   0.912,
    0.911
   ],
   [
@@ -601,23 +601,23 @@
    0.0
   ],
   [
-   0.005,
+   0.011,
    0.54
   ],
   [
-   0.37,
+   0.381,
    0.952
   ],
   [
-   0.031,
+   0.037,
    0.676
   ],
   [
-   0.414,
+   0.445,
    0.834
   ],
   [
-   0.157,
+   0.171,
    0.631
   ],
   [
@@ -625,7 +625,7 @@
    0.275
   ],
   [
-   0.027,
+   0.035,
    0.1
   ],
   [
@@ -641,7 +641,7 @@
    0.404
   ],
   [
-   0.0,
+   0.017,
    0.206
   ],
   [
@@ -661,15 +661,15 @@
    0.0
   ],
   [
-   0.045,
+   0.048,
    0.42
   ],
   [
-   0.331,
+   0.338,
    0.327
   ],
   [
-   0.062,
+   0.068,
    0.042
   ],
   [
@@ -677,7 +677,7 @@
    0.0
   ],
   [
-   0.007,
+   0.013,
    0.0
   ],
   [
@@ -689,15 +689,15 @@
    0.0
   ],
   [
-   0.004,
+   0.007,
    0.022
   ],
   [
-   0.007,
+   0.012,
    0.0
   ],
   [
-   0.026,
+   0.027,
    0.078
   ],
   [
@@ -705,7 +705,7 @@
    0.035
   ],
   [
-   0.004,
+   0.008,
    0.0
   ],
   [
@@ -737,7 +737,7 @@
    0.0
   ],
   [
-   0.001,
+   0.014,
    0.014
   ],
   [
@@ -745,7 +745,7 @@
    0.0
   ],
   [
-   0.001,
+   0.005,
    0.0
   ],
   [
@@ -753,15 +753,15 @@
    0.0
   ],
   [
-   0.009,
+   0.026,
    0.257
   ],
   [
-   0.002,
+   0.004,
    0.543
   ],
   [
-   0.0,
+   0.001,
    0.968
   ],
   [
@@ -769,35 +769,35 @@
    1.0
   ],
   [
-   0.002,
+   0.009,
    0.399
   ],
   [
-   0.01,
+   0.034,
    0.0
   ],
   [
-   0.008,
+   0.014,
    0.02
   ],
   [
-   0.003,
+   0.008,
    0.017
   ],
   [
-   0.002,
+   0.013,
    0.1
   ],
   [
-   0.005,
+   0.013,
    0.018
   ],
   [
-   0.005,
+   0.008,
    0.0
   ],
   [
-   0.015,
+   0.017,
    0.013
   ],
   [
@@ -805,11 +805,11 @@
    0.0
   ],
   [
-   0.004,
+   0.008,
    0.0
   ],
   [
-   0.03,
+   0.034,
    0.004
   ],
   [
@@ -825,23 +825,23 @@
    0.19
   ],
   [
-   0.009,
+   0.012,
    0.094
   ],
   [
-   0.009,
+   0.024,
    0.103
   ],
   [
-   0.005,
+   0.02,
    0.241
   ],
   [
-   0.011,
+   0.013,
    0.179
   ],
   [
-   0.008,
+   0.016,
    0.093
   ],
   [
@@ -857,7 +857,7 @@
    0.0
   ],
   [
-   0.004,
+   0.006,
    0.0
   ],
   [
@@ -865,15 +865,15 @@
    0.088
   ],
   [
-   0.01,
+   0.012,
    0.0
   ],
   [
-   0.01,
+   0.019,
    0.0
   ],
   [
-   0.046,
+   0.063,
    0.0
   ],
   [
@@ -889,23 +889,23 @@
    0.477
   ],
   [
-   0.021,
+   0.034,
    0.141
   ],
   [
-   0.01,
+   0.015,
    0.102
   ],
   [
-   0.007,
+   0.01,
    0.2
   ],
   [
-   0.53,
+   0.546,
    0.916
   ],
   [
-   0.797,
+   0.813,
    0.864
   ],
   [
@@ -913,11 +913,11 @@
    0.749
   ],
   [
-   0.006,
+   0.024,
    0.0
   ],
   [
-   0.008,
+   0.019,
    0.107
   ],
   [
@@ -925,19 +925,19 @@
    0.068
   ],
   [
-   0.001,
+   0.013,
    0.302
   ],
   [
-   0.002,
+   0.005,
    0.068
   ],
   [
-   0.006,
+   0.013,
    0.068
   ],
   [
-   0.466,
+   0.47,
    0.478
   ],
   [
@@ -945,11 +945,11 @@
    0.292
   ],
   [
-   0.028,
+   0.042,
    0.097
   ],
   [
-   0.005,
+   0.009,
    0.0
   ],
   [
@@ -973,7 +973,7 @@
    0.0
   ],
   [
-   0.013,
+   0.017,
    0.178
   ],
   [
@@ -981,11 +981,11 @@
    0.234
   ],
   [
-   0.014,
+   0.021,
    0.0
   ],
   [
-   0.0,
+   0.021,
    0.377
   ],
   [
@@ -993,7 +993,7 @@
    0.0
   ],
   [
-   0.036,
+   0.043,
    0.057
   ],
   [
@@ -1001,7 +1001,7 @@
    0.539
   ],
   [
-   0.929,
+   0.932,
    0.923
   ],
   [
@@ -1025,11 +1025,11 @@
    0.998
   ],
   [
-   0.224,
+   0.245,
    0.347
   ],
   [
-   0.83,
+   0.831,
    0.967
   ],
   [
@@ -1041,7 +1041,7 @@
    0.838
   ],
   [
-   0.326,
+   0.329,
    0.435
   ],
   [
@@ -1049,11 +1049,11 @@
    0.995
   ],
   [
-   0.006,
+   0.01,
    0.149
   ],
   [
-   0.006,
+   0.01,
    0.056
   ]
  ],
@@ -4486,6 +4486,11 @@
      "size": 4
     },
     {
+     "name": "fn_800084A0",
+     "addr": "800084A0",
+     "size": 24
+    },
+    {
      "name": "fn_80009728",
      "addr": "80009728",
      "size": 4
@@ -4551,9 +4556,24 @@
      "size": 12
     },
     {
+     "name": "fn_8000B8B8",
+     "addr": "8000B8B8",
+     "size": 20
+    },
+    {
      "name": "fn_8000B8CC",
      "addr": "8000B8CC",
      "size": 8
+    },
+    {
+     "name": "fn_8000B8D4",
+     "addr": "8000B8D4",
+     "size": 40
+    },
+    {
+     "name": "fn_8000B8FC",
+     "addr": "8000B8FC",
+     "size": 40
     },
     {
      "name": "fn_8000B924",
@@ -4623,12 +4643,147 @@
    ]
   },
   {
+   "path": "src/leaf/auto_03_8001B20C_text.cpp",
+   "functions": [
+    {
+     "name": "LightningTowerGetMonster",
+     "addr": "8001E020",
+     "size": 28
+    }
+   ]
+  },
+  {
    "path": "src/leaf/auto_03_8001B20C_text_cb.cpp",
    "functions": [
+    {
+     "name": "LT_GetShowingPartsInformation",
+     "addr": "8001BF78",
+     "size": 40
+    },
+    {
+     "name": "LT_TogglePartsMonsterInformation",
+     "addr": "8001BFA0",
+     "size": 32
+    },
+    {
+     "name": "LT_ForceSelectPart",
+     "addr": "8001C100",
+     "size": 4
+    },
+    {
+     "name": "LT_GetMarkedBodyPart",
+     "addr": "8001C3B0",
+     "size": 28
+    },
+    {
+     "name": "LT_IsHoveringOverEnhancementDefect",
+     "addr": "8001C4D0",
+     "size": 28
+    },
+    {
+     "name": "LT_SetHoveringOverEnhancementDefect",
+     "addr": "8001C4EC",
+     "size": 20
+    },
+    {
+     "name": "SetMonsterInventoryPos",
+     "addr": "8001CDE4",
+     "size": 44
+    },
+    {
+     "name": "NameClear",
+     "addr": "8001D2A8",
+     "size": 40
+    },
+    {
+     "name": "LT_UpdateHighlight",
+     "addr": "8001D4E8",
+     "size": 20
+    },
     {
      "name": "CanCreateNewMonster",
      "addr": "8001DFE0",
      "size": 32
+    },
+    {
+     "name": "GetCurrentMonster",
+     "addr": "8001E000",
+     "size": 32
+    },
+    {
+     "name": "LightningTowerResetAnim",
+     "addr": "8001E3A4",
+     "size": 44
+    },
+    {
+     "name": "LightningTowerSetSelectingMonster",
+     "addr": "8001E3D0",
+     "size": 20
+    },
+    {
+     "name": "LightningTowerGetSelectingMonster",
+     "addr": "8001E3E4",
+     "size": 28
+    },
+    {
+     "name": "LightningTowerSetSelectingPart",
+     "addr": "8001E400",
+     "size": 20
+    },
+    {
+     "name": "LighthingTowerGetSelectingPart",
+     "addr": "8001E414",
+     "size": 28
+    },
+    {
+     "name": "LightningTowerGetOnOperatingTable",
+     "addr": "8001E430",
+     "size": 28
+    },
+    {
+     "name": "SetNameScreen",
+     "addr": "8001E6F0",
+     "size": 20
+    },
+    {
+     "name": "GetMonsterHP",
+     "addr": "8001E7AC",
+     "size": 28
+    },
+    {
+     "name": "GetMonsterEnergy",
+     "addr": "8001E7C8",
+     "size": 28
+    },
+    {
+     "name": "GetMonsterAttack",
+     "addr": "8001E7E4",
+     "size": 28
+    },
+    {
+     "name": "GetMonsterDefense",
+     "addr": "8001E800",
+     "size": 28
+    },
+    {
+     "name": "GetMonsterMadness",
+     "addr": "8001E81C",
+     "size": 28
+    },
+    {
+     "name": "GetMaxPlayerMadness",
+     "addr": "8001E838",
+     "size": 28
+    },
+    {
+     "name": "SetMonsterSelected",
+     "addr": "8001EDE4",
+     "size": 28
+    },
+    {
+     "name": "GetMonsterSelected",
+     "addr": "8001EE00",
+     "size": 28
     },
     {
      "name": "IsPartLoaded",
@@ -4641,6 +4796,56 @@
    "path": "src/leaf/auto_03_8001EE48_text_cb.cpp",
    "functions": [
     {
+     "name": "Troublescope_GetCurrentAttack",
+     "addr": "8001F5CC",
+     "size": 36
+    },
+    {
+     "name": "Troublescope_GetCurrentDefense",
+     "addr": "8001F5F0",
+     "size": 36
+    },
+    {
+     "name": "Troublescope_GetCurrentEnergy",
+     "addr": "8001F614",
+     "size": 36
+    },
+    {
+     "name": "Troublescope_GetCurrentHP",
+     "addr": "8001F638",
+     "size": 36
+    },
+    {
+     "name": "Troublescope_GetCurrentMadness",
+     "addr": "8001F65C",
+     "size": 36
+    },
+    {
+     "name": "Troublescope_GetMaxMadness",
+     "addr": "8001F680",
+     "size": 36
+    },
+    {
+     "name": "Troublescope_MonstersInInventory",
+     "addr": "8001F794",
+     "size": 40
+    },
+    {
+     "name": "Troublescope_GetCreatureLoaded",
+     "addr": "8001F80C",
+     "size": 28
+    },
+    {
+     "name": "Troublescope_SetCurrentMonster",
+     "addr": "8001F828",
+     "size": 40
+    },
+    {
+     "name": "Troublescope_GetInventoryPosString",
+     "addr": "8001F850",
+     "size": 28
+    },
+    {
      "name": "Troublescope_GetPartID",
      "addr": "8001FB78",
      "size": 8
@@ -4649,6 +4854,11 @@
      "name": "Troublescope_GetPartInventoryPos",
      "addr": "8001FB80",
      "size": 8
+    },
+    {
+     "name": "Troublescope_GetPartImage",
+     "addr": "8001FC68",
+     "size": 20
     },
     {
      "name": "Troublescope_IsMonsterLoaded",
@@ -4679,6 +4889,11 @@
      "name": "fn_800202FC",
      "addr": "800202FC",
      "size": 16
+    },
+    {
+     "name": "fn_8002030C",
+     "addr": "8002030C",
+     "size": 40
     },
     {
      "name": "fn_80020458",
@@ -4729,6 +4944,26 @@
      "name": "fn_80021390",
      "addr": "80021390",
      "size": 20
+    },
+    {
+     "name": "fn_8002146C",
+     "addr": "8002146C",
+     "size": 36
+    },
+    {
+     "name": "fn_80021490",
+     "addr": "80021490",
+     "size": 36
+    }
+   ]
+  },
+  {
+   "path": "src/leaf/auto_03_800214D4_text.cpp",
+   "functions": [
+    {
+     "name": "RemoteInputGet",
+     "addr": "80021550",
+     "size": 36
     }
    ]
   },
@@ -4736,9 +4971,19 @@
    "path": "src/leaf/auto_03_80021594_text.cpp",
    "functions": [
     {
+     "name": "fn_80021750",
+     "addr": "80021750",
+     "size": 32
+    },
+    {
      "name": "fn_800217A8",
      "addr": "800217A8",
      "size": 8
+    },
+    {
+     "name": "fn_80021DAC",
+     "addr": "80021DAC",
+     "size": 36
     },
     {
      "name": "fn_800222F0",
@@ -4786,6 +5031,16 @@
      "size": 8
     },
     {
+     "name": "fn_80022D10",
+     "addr": "80022D10",
+     "size": 12
+    },
+    {
+     "name": "fn_80022D1C",
+     "addr": "80022D1C",
+     "size": 24
+    },
+    {
      "name": "fn_80022E0C",
      "addr": "80022E0C",
      "size": 4
@@ -4809,12 +5064,22 @@
      "name": "ChallengeCheckDebugCheat",
      "addr": "80022D08",
      "size": 8
+    },
+    {
+     "name": "SetQuitPauseGame",
+     "addr": "80022DDC",
+     "size": 48
     }
    ]
   },
   {
    "path": "src/leaf/auto_03_800232A4_text.cpp",
    "functions": [
+    {
+     "name": "DiggingOutputTest",
+     "addr": "800237F0",
+     "size": 4
+    },
     {
      "name": "PrintIdle",
      "addr": "800237F4",
@@ -4826,15 +5091,95 @@
    "path": "src/leaf/auto_03_80023884_text.cpp",
    "functions": [
     {
+     "name": "fn_80024BCC",
+     "addr": "80024BCC",
+     "size": 4
+    },
+    {
+     "name": "fn_80024BD0",
+     "addr": "80024BD0",
+     "size": 4
+    },
+    {
+     "name": "fn_80024BD4",
+     "addr": "80024BD4",
+     "size": 4
+    },
+    {
+     "name": "fn_80024BD8",
+     "addr": "80024BD8",
+     "size": 4
+    },
+    {
      "name": "fn_80024D98",
      "addr": "80024D98",
      "size": 12
+    },
+    {
+     "name": "fn_800258C0",
+     "addr": "800258C0",
+     "size": 44
+    },
+    {
+     "name": "fn_800258EC",
+     "addr": "800258EC",
+     "size": 44
+    }
+   ]
+  },
+  {
+   "path": "src/leaf/auto_03_800259D8_text.cpp",
+   "functions": [
+    {
+     "name": "fn_80027CD8",
+     "addr": "80027CD8",
+     "size": 4
+    },
+    {
+     "name": "fn_80027D38",
+     "addr": "80027D38",
+     "size": 40
     }
    ]
   },
   {
    "path": "src/leaf/auto_03_80028038_text.cpp",
    "functions": [
+    {
+     "name": "fn_8002896C",
+     "addr": "8002896C",
+     "size": 4
+    },
+    {
+     "name": "fn_80028970",
+     "addr": "80028970",
+     "size": 4
+    },
+    {
+     "name": "fn_80029160",
+     "addr": "80029160",
+     "size": 4
+    },
+    {
+     "name": "fn_80029168",
+     "addr": "80029168",
+     "size": 4
+    },
+    {
+     "name": "fn_8002916C",
+     "addr": "8002916C",
+     "size": 4
+    },
+    {
+     "name": "fn_80029174",
+     "addr": "80029174",
+     "size": 4
+    },
+    {
+     "name": "fn_80029178",
+     "addr": "80029178",
+     "size": 4
+    },
     {
      "name": "ResetCounter",
      "addr": "8002931C",
@@ -4864,6 +5209,11 @@
      "name": "fn_8002A8CC",
      "addr": "8002A8CC",
      "size": 12
+    },
+    {
+     "name": "fn_8002AA64",
+     "addr": "8002AA64",
+     "size": 40
     }
    ]
   },
@@ -4928,8 +5278,38 @@
    ]
   },
   {
+   "path": "src/leaf/auto_03_8002DE9C_text.cpp",
+   "functions": [
+    {
+     "name": "fn_8002E370",
+     "addr": "8002E370",
+     "size": 24
+    },
+    {
+     "name": "fn_8002FA64",
+     "addr": "8002FA64",
+     "size": 4
+    },
+    {
+     "name": "fn_8002FCB4",
+     "addr": "8002FCB4",
+     "size": 24
+    }
+   ]
+  },
+  {
    "path": "src/leaf/auto_03_80030228_text.cpp",
    "functions": [
+    {
+     "name": "CatchObject_SetLane",
+     "addr": "80030348",
+     "size": 32
+    },
+    {
+     "name": "fn_80030554",
+     "addr": "80030554",
+     "size": 20
+    },
     {
      "name": "fn_80030568",
      "addr": "80030568",
@@ -4941,6 +5321,21 @@
    "path": "src/leaf/auto_03_80030604_text.cpp",
    "functions": [
     {
+     "name": "fn_8003074C",
+     "addr": "8003074C",
+     "size": 4
+    },
+    {
+     "name": "fn_8003089C",
+     "addr": "8003089C",
+     "size": 4
+    },
+    {
+     "name": "fn_800309EC",
+     "addr": "800309EC",
+     "size": 4
+    },
+    {
      "name": "CatchObject_Release",
      "addr": "80030A98",
      "size": 8
@@ -4949,6 +5344,11 @@
      "name": "fn_80030AA0",
      "addr": "80030AA0",
      "size": 8
+    },
+    {
+     "name": "fn_80030B48",
+     "addr": "80030B48",
+     "size": 32
     }
    ]
   },
@@ -4965,6 +5365,31 @@
   {
    "path": "src/leaf/auto_03_800314F8_text.cpp",
    "functions": [
+    {
+     "name": "fn_800317A4",
+     "addr": "800317A4",
+     "size": 4
+    },
+    {
+     "name": "fn_80031F0C",
+     "addr": "80031F0C",
+     "size": 4
+    },
+    {
+     "name": "fn_80031F10",
+     "addr": "80031F10",
+     "size": 4
+    },
+    {
+     "name": "fn_80031F14",
+     "addr": "80031F14",
+     "size": 4
+    },
+    {
+     "name": "fn_80031F18",
+     "addr": "80031F18",
+     "size": 4
+    },
     {
      "name": "CheckResult",
      "addr": "800320A4",
@@ -4983,8 +5408,33 @@
    ]
   },
   {
+   "path": "src/leaf/auto_03_80032EDC_text.cpp",
+   "functions": [
+    {
+     "name": "fn_80034048",
+     "addr": "80034048",
+     "size": 28
+    }
+   ]
+  },
+  {
    "path": "src/leaf/auto_03_80034084_text.cpp",
    "functions": [
+    {
+     "name": "fn_80034388",
+     "addr": "80034388",
+     "size": 4
+    },
+    {
+     "name": "fn_8003438C",
+     "addr": "8003438C",
+     "size": 4
+    },
+    {
+     "name": "fn_800344B0",
+     "addr": "800344B0",
+     "size": 4
+    },
     {
      "name": "fn_800359F4",
      "addr": "800359F4",
@@ -4993,8 +5443,58 @@
    ]
   },
   {
+   "path": "src/leaf/auto_03_80038578_text.cpp",
+   "functions": [
+    {
+     "name": "fn_80038A8C",
+     "addr": "80038A8C",
+     "size": 24
+    }
+   ]
+  },
+  {
+   "path": "src/leaf/auto_03_80039CF8_text.cpp",
+   "functions": [
+    {
+     "name": "fn_8003A09C",
+     "addr": "8003A09C",
+     "size": 4
+    },
+    {
+     "name": "fn_8003A268",
+     "addr": "8003A268",
+     "size": 4
+    },
+    {
+     "name": "fn_8003A26C",
+     "addr": "8003A26C",
+     "size": 4
+    },
+    {
+     "name": "fn_8003A270",
+     "addr": "8003A270",
+     "size": 4
+    },
+    {
+     "name": "fn_8003A274",
+     "addr": "8003A274",
+     "size": 4
+    },
+    {
+     "name": "fn_8003C7E8",
+     "addr": "8003C7E8",
+     "size": 12
+    }
+   ]
+  },
+  {
    "path": "src/leaf/auto_03_8003CA78_text.cpp",
    "functions": [
+    {
+     "name": "fn_8003CAE0",
+     "addr": "8003CAE0",
+     "size": 40
+    },
     {
      "name": "fn_8003CB08",
      "addr": "8003CB08",
@@ -5039,6 +5539,11 @@
      "name": "fn_8003FF7C",
      "addr": "8003FF7C",
      "size": 40
+    },
+    {
+     "name": "fn_8003FFA4",
+     "addr": "8003FFA4",
+     "size": 44
     }
    ]
   },
@@ -5096,9 +5601,44 @@
      "size": 8
     },
     {
+     "name": "fn_80042B0C",
+     "addr": "80042B0C",
+     "size": 36
+    },
+    {
      "name": "fn_80042BE8",
      "addr": "80042BE8",
      "size": 16
+    }
+   ]
+  },
+  {
+   "path": "src/leaf/auto_03_80042C38_text.cpp",
+   "functions": [
+    {
+     "name": "fn_800433F8",
+     "addr": "800433F8",
+     "size": 8
+    },
+    {
+     "name": "fn_80043800",
+     "addr": "80043800",
+     "size": 36
+    },
+    {
+     "name": "fn_80043CE8",
+     "addr": "80043CE8",
+     "size": 8
+    },
+    {
+     "name": "fn_80043CF0",
+     "addr": "80043CF0",
+     "size": 8
+    },
+    {
+     "name": "fn_80044078",
+     "addr": "80044078",
+     "size": 32
     }
    ]
   },
@@ -5174,6 +5714,11 @@
      "name": "fn_8004936C",
      "addr": "8004936C",
      "size": 8
+    },
+    {
+     "name": "fn_8004947C",
+     "addr": "8004947C",
+     "size": 24
     }
    ]
   },
@@ -5191,15 +5736,30 @@
      "size": 12
     },
     {
+     "name": "ReleaseHUD",
+     "addr": "80048A8C",
+     "size": 32
+    },
+    {
      "name": "SetInTargetedPartTutorial",
      "addr": "80048AAC",
      "size": 12
+    },
+    {
+     "name": "CombatHUDStoreDisableState",
+     "addr": "80049374",
+     "size": 8
     }
    ]
   },
   {
    "path": "src/leaf/auto_03_8004B498_text.cpp",
    "functions": [
+    {
+     "name": "fn_8004B558",
+     "addr": "8004B558",
+     "size": 20
+    },
     {
      "name": "fn_8004B570",
      "addr": "8004B570",
@@ -5226,6 +5786,26 @@
    "path": "src/leaf/auto_03_8004B5EC_text.cpp",
    "functions": [
     {
+     "name": "fn_8004B5EC",
+     "addr": "8004B5EC",
+     "size": 8
+    },
+    {
+     "name": "fn_8004B5F4",
+     "addr": "8004B5F4",
+     "size": 8
+    },
+    {
+     "name": "fn_8004B5FC",
+     "addr": "8004B5FC",
+     "size": 8
+    },
+    {
+     "name": "fn_8004C710",
+     "addr": "8004C710",
+     "size": 8
+    },
+    {
      "name": "fn_8004CB10",
      "addr": "8004CB10",
      "size": 8
@@ -5234,6 +5814,21 @@
      "name": "GetGestureDetector",
      "addr": "8004CED8",
      "size": 16
+    },
+    {
+     "name": "CharacterSetInCombat",
+     "addr": "8004D2B8",
+     "size": 16
+    },
+    {
+     "name": "fn_8004E2A4",
+     "addr": "8004E2A4",
+     "size": 32
+    },
+    {
+     "name": "fn_8004E2C4",
+     "addr": "8004E2C4",
+     "size": 32
     },
     {
      "name": "fn_8004E2E4",
@@ -5246,8 +5841,18 @@
    "path": "src/leaf/auto_03_8004E58C_text.cpp",
    "functions": [
     {
+     "name": "fn_8004E58C",
+     "addr": "8004E58C",
+     "size": 8
+    },
+    {
      "name": "fn_8004E8CC",
      "addr": "8004E8CC",
+     "size": 8
+    },
+    {
+     "name": "LimbHasEffect",
+     "addr": "8005015C",
      "size": 8
     },
     {
@@ -5296,14 +5901,44 @@
    "path": "src/leaf/auto_03_800505E0_text.cpp",
    "functions": [
     {
+     "name": "fn_800505E0",
+     "addr": "800505E0",
+     "size": 8
+    },
+    {
+     "name": "fn_800505E8",
+     "addr": "800505E8",
+     "size": 8
+    },
+    {
      "name": "fn_800508D0",
      "addr": "800508D0",
      "size": 8
     },
     {
+     "name": "SetPlayerLineID",
+     "addr": "800508D8",
+     "size": 20
+    },
+    {
+     "name": "fn_80050F08",
+     "addr": "80050F08",
+     "size": 20
+    },
+    {
      "name": "GetTalkingToCharacterEntity",
      "addr": "80050F1C",
      "size": 8
+    },
+    {
+     "name": "fn_800512D0",
+     "addr": "800512D0",
+     "size": 44
+    },
+    {
+     "name": "fn_800517C0",
+     "addr": "800517C0",
+     "size": 48
     },
     {
      "name": "IsConversationPopupVisible",
@@ -5321,9 +5956,24 @@
    "path": "src/leaf/auto_03_800505E0_text_cb.cpp",
    "functions": [
     {
+     "name": "SendPlayerSignal",
+     "addr": "80050F24",
+     "size": 48
+    },
+    {
+     "name": "SendEntitySignal",
+     "addr": "80050F54",
+     "size": 40
+    },
+    {
      "name": "SendChatTargetSignal",
      "addr": "80050F7C",
      "size": 4
+    },
+    {
+     "name": "StartCombatConversationID",
+     "addr": "80050F80",
+     "size": 8
     },
     {
      "name": "NotDebugging",
@@ -5348,6 +5998,11 @@
     {
      "name": "fn_80051EF4",
      "addr": "80051EF4",
+     "size": 8
+    },
+    {
+     "name": "fn_80051EFC",
+     "addr": "80051EFC",
      "size": 8
     }
    ]
@@ -5396,6 +6051,11 @@
      "size": 8
     },
     {
+     "name": "fn_800531BC",
+     "addr": "800531BC",
+     "size": 40
+    },
+    {
      "name": "fn_800531E4",
      "addr": "800531E4",
      "size": 36
@@ -5429,6 +6089,11 @@
      "name": "fn_80053410",
      "addr": "80053410",
      "size": 8
+    },
+    {
+     "name": "fn_8005353C",
+     "addr": "8005353C",
+     "size": 20
     },
     {
      "name": "fn_80053550",
@@ -5501,6 +6166,11 @@
      "size": 8
     },
     {
+     "name": "fn_80054AB4",
+     "addr": "80054AB4",
+     "size": 12
+    },
+    {
      "name": "fn_800553C0",
      "addr": "800553C0",
      "size": 28
@@ -5561,6 +6231,11 @@
      "size": 20
     },
     {
+     "name": "fn_80058C00",
+     "addr": "80058C00",
+     "size": 36
+    },
+    {
      "name": "fn_8005B648",
      "addr": "8005B648",
      "size": 8
@@ -5594,6 +6269,16 @@
      "name": "SetAirFrictionToDefault",
      "addr": "8005C40C",
      "size": 12
+    },
+    {
+     "name": "SetPropCollision",
+     "addr": "8005C418",
+     "size": 48
+    },
+    {
+     "name": "SetCharCollision",
+     "addr": "8005C448",
+     "size": 48
     },
     {
      "name": "ChooseFlailingLand",
@@ -5644,6 +6329,11 @@
      "name": "fn_8005E128",
      "addr": "8005E128",
      "size": 8
+    },
+    {
+     "name": "fn_8005F444",
+     "addr": "8005F444",
+     "size": 28
     },
     {
      "name": "fn_80062C38",
@@ -5706,6 +6396,11 @@
      "size": 12
     },
     {
+     "name": "fn_80066960",
+     "addr": "80066960",
+     "size": 28
+    },
+    {
      "name": "fn_800676D4",
      "addr": "800676D4",
      "size": 12
@@ -5731,6 +6426,11 @@
    "path": "src/leaf/auto_03_80069028_text.cpp",
    "functions": [
     {
+     "name": "fn_8006B9CC",
+     "addr": "8006B9CC",
+     "size": 40
+    },
+    {
      "name": "fn_8006C65C",
      "addr": "8006C65C",
      "size": 8
@@ -5739,6 +6439,11 @@
      "name": "fn_8006C664",
      "addr": "8006C664",
      "size": 8
+    },
+    {
+     "name": "fn_8006C6AC",
+     "addr": "8006C6AC",
+     "size": 20
     },
     {
      "name": "fn_8006CB54",
@@ -5764,6 +6469,21 @@
      "name": "GetPropPreviousState",
      "addr": "8006BB30",
      "size": 12
+    },
+    {
+     "name": "IncrementPropState",
+     "addr": "8006BDCC",
+     "size": 20
+    },
+    {
+     "name": "DecrementPropState",
+     "addr": "8006BDE0",
+     "size": 20
+    },
+    {
+     "name": "PropSetAnimUpdate",
+     "addr": "8006CC7C",
+     "size": 40
     }
    ]
   },
@@ -5774,6 +6494,36 @@
      "name": "fn_8006D248",
      "addr": "8006D248",
      "size": 8
+    }
+   ]
+  },
+  {
+   "path": "src/leaf/auto_03_8006F5A0_text.cpp",
+   "functions": [
+    {
+     "name": "fn_8006F5A0",
+     "addr": "8006F5A0",
+     "size": 24
+    }
+   ]
+  },
+  {
+   "path": "src/leaf/auto_03_8006F5A0_text_cb.cpp",
+   "functions": [
+    {
+     "name": "DisableTrigger",
+     "addr": "8006F5F4",
+     "size": 8
+    }
+   ]
+  },
+  {
+   "path": "src/leaf/auto_03_8006F61C_text.cpp",
+   "functions": [
+    {
+     "name": "fn_8006F67C",
+     "addr": "8006F67C",
+     "size": 28
     }
    ]
   },
@@ -5789,6 +6539,11 @@
      "name": "fn_8006FA5C",
      "addr": "8006FA5C",
      "size": 24
+    },
+    {
+     "name": "fn_8006FBDC",
+     "addr": "8006FBDC",
+     "size": 32
     },
     {
      "name": "fn_8006FBFC",
@@ -5814,6 +6569,11 @@
      "name": "RaySceneTest",
      "addr": "80070458",
      "size": 8
+    },
+    {
+     "name": "fn_80070FAC",
+     "addr": "80070FAC",
+     "size": 44
     },
     {
      "name": "fn_800712B4",
@@ -5851,6 +6611,11 @@
    "path": "src/leaf/auto_03_8006FA44_text_cb.cpp",
    "functions": [
     {
+     "name": "ResetCommentTimer",
+     "addr": "80070134",
+     "size": 40
+    },
+    {
      "name": "ClearExperimentSounds",
      "addr": "80070F40",
      "size": 12
@@ -5884,6 +6649,21 @@
      "name": "StringHashValid",
      "addr": "800747E4",
      "size": 16
+    },
+    {
+     "name": "LoadExperimentUI",
+     "addr": "80074984",
+     "size": 12
+    },
+    {
+     "name": "GetExperimentDifficulty",
+     "addr": "80074CA0",
+     "size": 4
+    },
+    {
+     "name": "SetNextExperimentDifficulty",
+     "addr": "80074CA4",
+     "size": 4
     }
    ]
   },
@@ -5919,6 +6699,16 @@
      "name": "fn_80075264",
      "addr": "80075264",
      "size": 8
+    },
+    {
+     "name": "fn_8007526C",
+     "addr": "8007526C",
+     "size": 16
+    },
+    {
+     "name": "fn_8007527C",
+     "addr": "8007527C",
+     "size": 28
     }
    ]
   },
@@ -5936,9 +6726,24 @@
    "path": "src/leaf/auto_03_800756E0_text.cpp",
    "functions": [
     {
+     "name": "fn_80076278",
+     "addr": "80076278",
+     "size": 20
+    },
+    {
+     "name": "fn_8007628C",
+     "addr": "8007628C",
+     "size": 20
+    },
+    {
      "name": "fn_80076384",
      "addr": "80076384",
      "size": 4
+    },
+    {
+     "name": "fn_80076388",
+     "addr": "80076388",
+     "size": 8
     },
     {
      "name": "fn_8007657C",
@@ -5958,6 +6763,41 @@
    ]
   },
   {
+   "path": "src/leaf/auto_03_800756E0_text_cb.cpp",
+   "functions": [
+    {
+     "name": "TokenUpdate",
+     "addr": "80075F8C",
+     "size": 12
+    },
+    {
+     "name": "RegisterMidiLoop",
+     "addr": "80075F98",
+     "size": 24
+    },
+    {
+     "name": "SpiritDrumsLeftDrumFocus",
+     "addr": "80076A44",
+     "size": 8
+    },
+    {
+     "name": "SpiritDrumsLeftGongFocus",
+     "addr": "80076A4C",
+     "size": 8
+    },
+    {
+     "name": "SpiritDrumsRightDrumFocus",
+     "addr": "80076A54",
+     "size": 8
+    },
+    {
+     "name": "SpiritDrumsRightGongFocus",
+     "addr": "80076A5C",
+     "size": 8
+    }
+   ]
+  },
+  {
    "path": "src/leaf/auto_03_80076AB8_text.cpp",
    "functions": [
     {
@@ -5971,6 +6811,11 @@
    "path": "src/leaf/auto_03_80076D38_text.cpp",
    "functions": [
     {
+     "name": "fn_80077210",
+     "addr": "80077210",
+     "size": 8
+    },
+    {
      "name": "fn_8007739C",
      "addr": "8007739C",
      "size": 48
@@ -5981,9 +6826,59 @@
    "path": "src/leaf/auto_03_80077B50_text.cpp",
    "functions": [
     {
+     "name": "WeldingGunHeatDecrease",
+     "addr": "80077BC0",
+     "size": 8
+    },
+    {
      "name": "WeldingOverDangerZone",
      "addr": "80077C48",
      "size": 8
+    },
+    {
+     "name": "WeldingUpdateShake",
+     "addr": "80077CC8",
+     "size": 8
+    },
+    {
+     "name": "WeldingResetShakeCount",
+     "addr": "80077CD0",
+     "size": 8
+    },
+    {
+     "name": "WeldingResetOverheatCounter",
+     "addr": "80077CDC",
+     "size": 8
+    },
+    {
+     "name": "StartWeldLightingEffect",
+     "addr": "80077CE4",
+     "size": 8
+    },
+    {
+     "name": "StartBrokenGunLightingEffect",
+     "addr": "80077CEC",
+     "size": 8
+    },
+    {
+     "name": "StopWeldLightingEffect",
+     "addr": "80077CF4",
+     "size": 8
+    }
+   ]
+  },
+  {
+   "path": "src/leaf/auto_03_80077B50_text_cb.cpp",
+   "functions": [
+    {
+     "name": "WeldingShakeThisFrame",
+     "addr": "80077CC0",
+     "size": 8
+    },
+    {
+     "name": "WeldingQualityLevel",
+     "addr": "80077CD8",
+     "size": 4
     }
    ]
   },
@@ -5996,6 +6891,11 @@
      "size": 8
     },
     {
+     "name": "fn_80079190",
+     "addr": "80079190",
+     "size": 12
+    },
+    {
      "name": "fn_80079E14",
      "addr": "80079E14",
      "size": 4
@@ -6004,6 +6904,31 @@
      "name": "fn_80079E1C",
      "addr": "80079E1C",
      "size": 4
+    },
+    {
+     "name": "fn_80079F60",
+     "addr": "80079F60",
+     "size": 4
+    },
+    {
+     "name": "fn_80079F64",
+     "addr": "80079F64",
+     "size": 4
+    },
+    {
+     "name": "fn_80079FBC",
+     "addr": "80079FBC",
+     "size": 8
+    },
+    {
+     "name": "fn_80079FC4",
+     "addr": "80079FC4",
+     "size": 8
+    },
+    {
+     "name": "fn_80079FCC",
+     "addr": "80079FCC",
+     "size": 8
     },
     {
      "name": "fn_8007A2AC",
@@ -6291,9 +7216,19 @@
    "path": "src/leaf/auto_03_8007D4DC_text.cpp",
    "functions": [
     {
+     "name": "fn_8007DD0C",
+     "addr": "8007DD0C",
+     "size": 44
+    },
+    {
      "name": "fn_8007E0B8",
      "addr": "8007E0B8",
      "size": 20
+    },
+    {
+     "name": "fn_8007E0CC",
+     "addr": "8007E0CC",
+     "size": 16
     },
     {
      "name": "fn_8007E344",
@@ -6301,9 +7236,39 @@
      "size": 4
     },
     {
+     "name": "fn_8007E348",
+     "addr": "8007E348",
+     "size": 12
+    },
+    {
+     "name": "fn_8007E8FC",
+     "addr": "8007E8FC",
+     "size": 36
+    },
+    {
+     "name": "fn_8007E920",
+     "addr": "8007E920",
+     "size": 12
+    },
+    {
+     "name": "fn_8007E92C",
+     "addr": "8007E92C",
+     "size": 20
+    },
+    {
      "name": "fn_8007E940",
      "addr": "8007E940",
      "size": 4
+    },
+    {
+     "name": "fn_8007E944",
+     "addr": "8007E944",
+     "size": 12
+    },
+    {
+     "name": "fn_8007E950",
+     "addr": "8007E950",
+     "size": 20
     },
     {
      "name": "fn_8007E964",
@@ -6354,6 +7319,11 @@
      "name": "fn_80082A04",
      "addr": "80082A04",
      "size": 8
+    },
+    {
+     "name": "fn_80082A0C",
+     "addr": "80082A0C",
+     "size": 20
     },
     {
      "name": "fn_80082A20",
@@ -6426,6 +7396,11 @@
      "size": 8
     },
     {
+     "name": "BrainChunkUpdateThrow",
+     "addr": "80083444",
+     "size": 20
+    },
+    {
      "name": "BrainChunkUpdateSplat",
      "addr": "80083458",
      "size": 4
@@ -6439,6 +7414,11 @@
      "name": "BrainChunkSplatOnWall",
      "addr": "80083644",
      "size": 8
+    },
+    {
+     "name": "BrainChunkIsOfType",
+     "addr": "8008364C",
+     "size": 20
     },
     {
      "name": "BrainChunkGetChunkType",
@@ -6471,6 +7451,11 @@
      "size": 28
     },
     {
+     "name": "BrainTargetWaitTimedOut",
+     "addr": "800837C4",
+     "size": 48
+    },
+    {
      "name": "BrainTargetSetStateTime",
      "addr": "800837F4",
      "size": 8
@@ -6495,6 +7480,16 @@
   {
    "path": "src/leaf/auto_03_80083A6C_text_cb.cpp",
    "functions": [
+    {
+     "name": "BrainHeadGoToTrapDoor",
+     "addr": "80083D64",
+     "size": 4
+    },
+    {
+     "name": "BrainHeadGetTrackedChunk",
+     "addr": "80084638",
+     "size": 24
+    },
     {
      "name": "BrainHeadSetEating",
      "addr": "80084D04",
@@ -6529,12 +7524,22 @@
      "name": "fn_80085414",
      "addr": "80085414",
      "size": 16
+    },
+    {
+     "name": "fn_80085464",
+     "addr": "80085464",
+     "size": 48
     }
    ]
   },
   {
    "path": "src/leaf/auto_03_80084E94_text_cb.cpp",
    "functions": [
+    {
+     "name": "BrainPowerUpSetActive",
+     "addr": "80086170",
+     "size": 48
+    },
     {
      "name": "BrainPowerUpGetNextPowerUpType",
      "addr": "80086758",
@@ -6565,6 +7570,16 @@
   {
    "path": "src/leaf/auto_03_80086BE8_text.cpp",
    "functions": [
+    {
+     "name": "fn_80087ADC",
+     "addr": "80087ADC",
+     "size": 16
+    },
+    {
+     "name": "fn_80087BD4",
+     "addr": "80087BD4",
+     "size": 36
+    },
     {
      "name": "fn_80087EA8",
      "addr": "80087EA8",
@@ -6611,6 +7626,11 @@
      "size": 40
     },
     {
+     "name": "fn_8008BEE8",
+     "addr": "8008BEE8",
+     "size": 28
+    },
+    {
      "name": "fn_8008C104",
      "addr": "8008C104",
      "size": 36
@@ -6641,6 +7661,16 @@
    "path": "src/leaf/auto_03_8008B430_text_cb.cpp",
    "functions": [
     {
+     "name": "BrazierWandFlickSymbols",
+     "addr": "8008C8EC",
+     "size": 4
+    },
+    {
+     "name": "BrazierWandUpdateMoving",
+     "addr": "8008C8F0",
+     "size": 16
+    },
+    {
      "name": "BrazierWandSetIdle",
      "addr": "8008C9CC",
      "size": 12
@@ -6664,12 +7694,22 @@
      "name": "fn_8008CABC",
      "addr": "8008CABC",
      "size": 4
+    },
+    {
+     "name": "fn_8008CAFC",
+     "addr": "8008CAFC",
+     "size": 44
     }
    ]
   },
   {
    "path": "src/leaf/auto_03_8008CBB0_text.cpp",
    "functions": [
+    {
+     "name": "fn_8008CDFC",
+     "addr": "8008CDFC",
+     "size": 44
+    },
     {
      "name": "fn_8008CE28",
      "addr": "8008CE28",
@@ -6761,14 +7801,49 @@
    "path": "src/leaf/auto_03_8008CBB0_text_cb.cpp",
    "functions": [
     {
+     "name": "BrazierSymbolUpdateRising",
+     "addr": "8008E880",
+     "size": 16
+    },
+    {
+     "name": "BrazierSymbolUpdateOrbiting",
+     "addr": "8008E890",
+     "size": 16
+    },
+    {
+     "name": "BrazierSymbolStartRising",
+     "addr": "8008E8A0",
+     "size": 24
+    },
+    {
      "name": "BrazierSymbolDestroyed",
      "addr": "8008E8B8",
      "size": 12
     },
     {
+     "name": "BrazierSymbolGetSymbolStatus",
+     "addr": "8008E8C4",
+     "size": 4
+    },
+    {
+     "name": "BrazierSymbolAddSymbolToWand",
+     "addr": "8008EB38",
+     "size": 32
+    },
+    {
+     "name": "BrazierSymbolUpdateMovingBack",
+     "addr": "8008EC20",
+     "size": 16
+    },
+    {
      "name": "BrazierSymbolSetSymbolOccupied",
      "addr": "8008EC30",
      "size": 12
+    },
+    {
+     "name": "BrazierSymbolIsReadyToMoveBack",
+     "addr": "8008EC3C",
+     "size": 40
     },
     {
      "name": "BrazierSymbolIsThrowTrailAttached",
@@ -6780,6 +7855,16 @@
   {
    "path": "src/leaf/auto_03_8008ED38_text.cpp",
    "functions": [
+    {
+     "name": "fn_8008F908",
+     "addr": "8008F908",
+     "size": 16
+    },
+    {
+     "name": "fn_80090038",
+     "addr": "80090038",
+     "size": 8
+    },
     {
      "name": "fn_80090150",
      "addr": "80090150",
@@ -6806,6 +7891,11 @@
      "size": 36
     },
     {
+     "name": "fn_80091EE8",
+     "addr": "80091EE8",
+     "size": 48
+    },
+    {
      "name": "fn_80091F18",
      "addr": "80091F18",
      "size": 16
@@ -6828,6 +7918,16 @@
    ]
   },
   {
+   "path": "src/leaf/auto_03_800938A4_text.cpp",
+   "functions": [
+    {
+     "name": "fn_80093BF0",
+     "addr": "80093BF0",
+     "size": 48
+    }
+   ]
+  },
+  {
    "path": "src/leaf/auto_03_800940BC_text.cpp",
    "functions": [
     {
@@ -6844,6 +7944,11 @@
      "name": "fn_80094FA0",
      "addr": "80094FA0",
      "size": 8
+    },
+    {
+     "name": "fn_80094FA8",
+     "addr": "80094FA8",
+     "size": 16
     },
     {
      "name": "fn_8009515C",
@@ -6873,6 +7978,11 @@
     {
      "name": "fn_80097BCC",
      "addr": "80097BCC",
+     "size": 48
+    },
+    {
+     "name": "fn_800980C8",
+     "addr": "800980C8",
      "size": 48
     },
     {
@@ -6956,6 +8066,21 @@
      "size": 8
     },
     {
+     "name": "fn_8009A64C",
+     "addr": "8009A64C",
+     "size": 16
+    },
+    {
+     "name": "fn_8009A9B0",
+     "addr": "8009A9B0",
+     "size": 20
+    },
+    {
+     "name": "fn_8009ABAC",
+     "addr": "8009ABAC",
+     "size": 16
+    },
+    {
      "name": "fn_8009ABBC",
      "addr": "8009ABBC",
      "size": 12
@@ -6973,6 +8098,21 @@
     {
      "name": "fn_8009AC40",
      "addr": "8009AC40",
+     "size": 4
+    }
+   ]
+  },
+  {
+   "path": "src/leaf/auto_03_8009B19C_text.cpp",
+   "functions": [
+    {
+     "name": "fn_8009B234",
+     "addr": "8009B234",
+     "size": 4
+    },
+    {
+     "name": "fn_8009B238",
+     "addr": "8009B238",
      "size": 4
     }
    ]
@@ -7016,6 +8156,11 @@
    "path": "src/leaf/auto_03_8009F66C_text.cpp",
    "functions": [
     {
+     "name": "fn_800A19B0",
+     "addr": "800A19B0",
+     "size": 16
+    },
+    {
      "name": "fn_800A1BE8",
      "addr": "800A1BE8",
      "size": 4
@@ -7044,12 +8189,27 @@
      "name": "fn_800A23E4",
      "addr": "800A23E4",
      "size": 8
+    },
+    {
+     "name": "fn_800A23EC",
+     "addr": "800A23EC",
+     "size": 8
+    },
+    {
+     "name": "fn_800A23F4",
+     "addr": "800A23F4",
+     "size": 8
     }
    ]
   },
   {
    "path": "src/leaf/auto_03_8009F66C_text_cb.cpp",
    "functions": [
+    {
+     "name": "PlaceSaw",
+     "addr": "800A1988",
+     "size": 16
+    },
     {
      "name": "SetSawInput",
      "addr": "800A1998",
@@ -7074,12 +8234,47 @@
      "name": "fn_800A43A8",
      "addr": "800A43A8",
      "size": 24
+    },
+    {
+     "name": "fn_800A4EBC",
+     "addr": "800A4EBC",
+     "size": 40
+    }
+   ]
+  },
+  {
+   "path": "src/leaf/auto_03_800A5BCC_text.cpp",
+   "functions": [
+    {
+     "name": "fn_800A5DBC",
+     "addr": "800A5DBC",
+     "size": 24
+    }
+   ]
+  },
+  {
+   "path": "src/leaf/auto_03_800A6538_text.cpp",
+   "functions": [
+    {
+     "name": "fn_800A660C",
+     "addr": "800A660C",
+     "size": 36
+    },
+    {
+     "name": "fn_800A71C8",
+     "addr": "800A71C8",
+     "size": 40
     }
    ]
   },
   {
    "path": "src/leaf/auto_03_800A79A0_text.cpp",
    "functions": [
+    {
+     "name": "fn_800A8AEC",
+     "addr": "800A8AEC",
+     "size": 16
+    },
     {
      "name": "fn_800A8ED0",
      "addr": "800A8ED0",
@@ -7096,8 +8291,18 @@
      "size": 4
     },
     {
+     "name": "fn_800A9B7C",
+     "addr": "800A9B7C",
+     "size": 24
+    },
+    {
      "name": "fn_800A9B94",
      "addr": "800A9B94",
+     "size": 8
+    },
+    {
+     "name": "fn_800AA684",
+     "addr": "800AA684",
      "size": 8
     }
    ]
@@ -7109,6 +8314,36 @@
      "name": "fn_800AC5EC",
      "addr": "800AC5EC",
      "size": 12
+    }
+   ]
+  },
+  {
+   "path": "src/leaf/auto_03_800ABE10_text_cb.cpp",
+   "functions": [
+    {
+     "name": "GrowJuiceSeed_FireSeed",
+     "addr": "800AC714",
+     "size": 20
+    },
+    {
+     "name": "GrowJuiceSeed_HitGround",
+     "addr": "800AC7F0",
+     "size": 48
+    },
+    {
+     "name": "GrowJuiceSeed_OffTopOfScreen",
+     "addr": "800AC820",
+     "size": 48
+    }
+   ]
+  },
+  {
+   "path": "src/leaf/auto_03_800ACD24_text_cb.cpp",
+   "functions": [
+    {
+     "name": "GrowJuiceLauncher_GetSoundNumber",
+     "addr": "800AD118",
+     "size": 24
     }
    ]
   },
@@ -7128,12 +8363,57 @@
    ]
   },
   {
+   "path": "src/leaf/auto_03_800AD844_text_cb.cpp",
+   "functions": [
+    {
+     "name": "GrowJuiceTentacle_SetVisibleComponents",
+     "addr": "800AEC04",
+     "size": 16
+    },
+    {
+     "name": "GrowJuiceTentacle_SetStageTimeout",
+     "addr": "800AEC14",
+     "size": 16
+    },
+    {
+     "name": "GrowJuiceTentacle_ClearStageTimeout",
+     "addr": "800AEC24",
+     "size": 32
+    },
+    {
+     "name": "GrowJuiceTentacle_SetHeadSizeAsStarting",
+     "addr": "800AEE44",
+     "size": 48
+    }
+   ]
+  },
+  {
    "path": "src/leaf/auto_03_800AF568_text.cpp",
    "functions": [
+    {
+     "name": "fn_800AFBCC",
+     "addr": "800AFBCC",
+     "size": 32
+    },
     {
      "name": "fn_800B0104",
      "addr": "800B0104",
      "size": 20
+    }
+   ]
+  },
+  {
+   "path": "src/leaf/auto_03_800AF568_text_cb.cpp",
+   "functions": [
+    {
+     "name": "GrowJuiceWeapon_LoadedIntoChamber",
+     "addr": "800B0460",
+     "size": 36
+    },
+    {
+     "name": "GrowJuiceWeapon_RoundInFlight",
+     "addr": "800B0484",
+     "size": 36
     }
    ]
   },
@@ -7144,6 +8424,21 @@
      "name": "fn_800B0CFC",
      "addr": "800B0CFC",
      "size": 12
+    },
+    {
+     "name": "fn_800B1464",
+     "addr": "800B1464",
+     "size": 20
+    }
+   ]
+  },
+  {
+   "path": "src/leaf/auto_03_800B068C_text_cb.cpp",
+   "functions": [
+    {
+     "name": "GrowJuiceWeaponBase_LoadedInSlot",
+     "addr": "800B1390",
+     "size": 40
     }
    ]
   },
@@ -7180,6 +8475,11 @@
   {
    "path": "src/leaf/auto_03_800B2384_text.cpp",
    "functions": [
+    {
+     "name": "fn_800B42EC",
+     "addr": "800B42EC",
+     "size": 36
+    },
     {
      "name": "fn_800B4310",
      "addr": "800B4310",
@@ -7343,6 +8643,16 @@
    ]
   },
   {
+   "path": "src/leaf/auto_03_800B7E34_text.cpp",
+   "functions": [
+    {
+     "name": "fn_800B8A3C",
+     "addr": "800B8A3C",
+     "size": 44
+    }
+   ]
+  },
+  {
    "path": "src/leaf/auto_03_800B7E34_text_cb.cpp",
    "functions": [
     {
@@ -7391,6 +8701,11 @@
    "path": "src/leaf/auto_03_800B9AA0_text.cpp",
    "functions": [
     {
+     "name": "fn_800BA680",
+     "addr": "800BA680",
+     "size": 16
+    },
+    {
      "name": "fn_800BA984",
      "addr": "800BA984",
      "size": 4
@@ -7411,6 +8726,16 @@
      "size": 4
     },
     {
+     "name": "fn_800BB620",
+     "addr": "800BB620",
+     "size": 24
+    },
+    {
+     "name": "fn_800BB638",
+     "addr": "800BB638",
+     "size": 24
+    },
+    {
      "name": "fn_800BB650",
      "addr": "800BB650",
      "size": 8
@@ -7424,6 +8749,16 @@
      "name": "fn_800BCC10",
      "addr": "800BCC10",
      "size": 20
+    },
+    {
+     "name": "fn_800BD440",
+     "addr": "800BD440",
+     "size": 40
+    },
+    {
+     "name": "fn_800BD468",
+     "addr": "800BD468",
+     "size": 40
     }
    ]
   },
@@ -7434,6 +8769,21 @@
      "name": "fn_800BD978",
      "addr": "800BD978",
      "size": 12
+    },
+    {
+     "name": "fn_800BDFD8",
+     "addr": "800BDFD8",
+     "size": 40
+    }
+   ]
+  },
+  {
+   "path": "src/leaf/auto_03_800BD894_text_cb.cpp",
+   "functions": [
+    {
+     "name": "MysticBrewPowerUp_IsShieldTypePowerUp",
+     "addr": "800BE094",
+     "size": 36
     }
    ]
   },
@@ -7444,6 +8794,11 @@
      "name": "fn_800BE3A4",
      "addr": "800BE3A4",
      "size": 4
+    },
+    {
+     "name": "fn_800BF158",
+     "addr": "800BF158",
+     "size": 40
     },
     {
      "name": "fn_800BF180",
@@ -7538,6 +8893,46 @@
    ]
   },
   {
+   "path": "src/leaf/auto_03_800C407C_text.cpp",
+   "functions": [
+    {
+     "name": "fn_800C4220",
+     "addr": "800C4220",
+     "size": 4
+    }
+   ]
+  },
+  {
+   "path": "src/leaf/auto_03_800C42B8_text.cpp",
+   "functions": [
+    {
+     "name": "fn_800C4480",
+     "addr": "800C4480",
+     "size": 8
+    },
+    {
+     "name": "fn_800C4488",
+     "addr": "800C4488",
+     "size": 8
+    },
+    {
+     "name": "fn_800C4490",
+     "addr": "800C4490",
+     "size": 8
+    },
+    {
+     "name": "fn_800C4498",
+     "addr": "800C4498",
+     "size": 8
+    },
+    {
+     "name": "fn_800C44A0",
+     "addr": "800C44A0",
+     "size": 32
+    }
+   ]
+  },
+  {
    "path": "src/leaf/auto_03_800C52B4_text.cpp",
    "functions": [
     {
@@ -7576,9 +8971,19 @@
    "path": "src/leaf/auto_03_800C5F84_text.cpp",
    "functions": [
     {
+     "name": "fn_800C69DC",
+     "addr": "800C69DC",
+     "size": 48
+    },
+    {
      "name": "fn_800C6A0C",
      "addr": "800C6A0C",
      "size": 28
+    },
+    {
+     "name": "fn_800C6A28",
+     "addr": "800C6A28",
+     "size": 48
     }
    ]
   },
@@ -7589,6 +8994,11 @@
      "name": "Stitching_Bug_PositionToHide",
      "addr": "800C6A58",
      "size": 4
+    },
+    {
+     "name": "Stitching_Bug_StartBugMoving",
+     "addr": "800C6A5C",
+     "size": 20
     }
    ]
   },
@@ -7609,6 +9019,21 @@
      "name": "fn_800C72B4",
      "addr": "800C72B4",
      "size": 16
+    },
+    {
+     "name": "fn_800C73B4",
+     "addr": "800C73B4",
+     "size": 28
+    },
+    {
+     "name": "fn_800C73D0",
+     "addr": "800C73D0",
+     "size": 28
+    },
+    {
+     "name": "fn_800C73EC",
+     "addr": "800C73EC",
+     "size": 28
     }
    ]
   },
@@ -7723,12 +9148,52 @@
    ]
   },
   {
+   "path": "src/leaf/auto_03_800CC108_text_cb.cpp",
+   "functions": [
+    {
+     "name": "Stitching_Reticle_FireStaple",
+     "addr": "800CC51C",
+     "size": 16
+    },
+    {
+     "name": "Stitching_Reticle_LastStaplePatchedFlesh",
+     "addr": "800CC6F8",
+     "size": 36
+    }
+   ]
+  },
+  {
    "path": "src/leaf/auto_03_800CD43C_text.cpp",
    "functions": [
+    {
+     "name": "fn_800CD490",
+     "addr": "800CD490",
+     "size": 36
+    },
+    {
+     "name": "fn_800CD778",
+     "addr": "800CD778",
+     "size": 8
+    },
+    {
+     "name": "fn_800CD780",
+     "addr": "800CD780",
+     "size": 8
+    },
+    {
+     "name": "fn_800CD7C0",
+     "addr": "800CD7C0",
+     "size": 24
+    },
     {
      "name": "fn_800CD9A4",
      "addr": "800CD9A4",
      "size": 12
+    },
+    {
+     "name": "fn_800CDC9C",
+     "addr": "800CDC9C",
+     "size": 40
     }
    ]
   },
@@ -7744,6 +9209,16 @@
      "name": "fn_800CF228",
      "addr": "800CF228",
      "size": 4
+    },
+    {
+     "name": "fn_800CF22C",
+     "addr": "800CF22C",
+     "size": 16
+    },
+    {
+     "name": "fn_800CF2C8",
+     "addr": "800CF2C8",
+     "size": 36
     },
     {
      "name": "fn_800CF2EC",
@@ -7764,6 +9239,11 @@
      "name": "fn_800CF710",
      "addr": "800CF710",
      "size": 4
+    },
+    {
+     "name": "fn_800CF714",
+     "addr": "800CF714",
+     "size": 8
     }
    ]
   },
@@ -7861,14 +9341,94 @@
      "size": 12
     },
     {
+     "name": "fn_800D5660",
+     "addr": "800D5660",
+     "size": 32
+    },
+    {
+     "name": "fn_800D5680",
+     "addr": "800D5680",
+     "size": 32
+    },
+    {
+     "name": "fn_800D56A0",
+     "addr": "800D56A0",
+     "size": 32
+    },
+    {
+     "name": "fn_800D56C0",
+     "addr": "800D56C0",
+     "size": 32
+    },
+    {
      "name": "PathAtWaypoint",
      "addr": "800D56E0",
      "size": 24
     },
     {
+     "name": "PathGetNodeId",
+     "addr": "800D56F8",
+     "size": 32
+    },
+    {
      "name": "PathGetPosition",
      "addr": "800D5718",
      "size": 12
+    },
+    {
+     "name": "fn_800D5800",
+     "addr": "800D5800",
+     "size": 28
+    },
+    {
+     "name": "PathGetNodeText",
+     "addr": "800D581C",
+     "size": 28
+    },
+    {
+     "name": "fn_800D5838",
+     "addr": "800D5838",
+     "size": 24
+    },
+    {
+     "name": "PathIsAtJunction",
+     "addr": "800D5924",
+     "size": 32
+    },
+    {
+     "name": "PathGetNodeType",
+     "addr": "800D5944",
+     "size": 32
+    },
+    {
+     "name": "PathIsInConversation",
+     "addr": "800D5964",
+     "size": 32
+    },
+    {
+     "name": "PathGetChallengeId",
+     "addr": "800D5984",
+     "size": 32
+    },
+    {
+     "name": "fn_800D59D4",
+     "addr": "800D59D4",
+     "size": 32
+    },
+    {
+     "name": "PathSetPaused",
+     "addr": "800D5DA4",
+     "size": 40
+    },
+    {
+     "name": "PathIsPaused",
+     "addr": "800D5DCC",
+     "size": 24
+    },
+    {
+     "name": "PathReverse",
+     "addr": "800D6A00",
+     "size": 24
     },
     {
      "name": "PathSetSpeed",
@@ -7889,6 +9449,11 @@
      "name": "fn_800D83B0",
      "addr": "800D83B0",
      "size": 8
+    },
+    {
+     "name": "fn_800D83B8",
+     "addr": "800D83B8",
+     "size": 16
     },
     {
      "name": "WorldSetFocus",
@@ -7961,6 +9526,11 @@
      "size": 32
     },
     {
+     "name": "fn_800DE49C",
+     "addr": "800DE49C",
+     "size": 28
+    },
+    {
      "name": "fn_800DE4B8",
      "addr": "800DE4B8",
      "size": 8
@@ -7978,6 +9548,11 @@
     {
      "name": "fn_800DE4D4",
      "addr": "800DE4D4",
+     "size": 8
+    },
+    {
+     "name": "fn_800DE4DC",
+     "addr": "800DE4DC",
      "size": 8
     },
     {
@@ -8026,6 +9601,16 @@
      "size": 4
     },
     {
+     "name": "fn_800DE534",
+     "addr": "800DE534",
+     "size": 40
+    },
+    {
+     "name": "fn_800DE55C",
+     "addr": "800DE55C",
+     "size": 40
+    },
+    {
      "name": "fn_800DE584",
      "addr": "800DE584",
      "size": 8
@@ -8049,6 +9634,16 @@
      "name": "ForceCameraRotateMode",
      "addr": "800DD1E4",
      "size": 8
+    }
+   ]
+  },
+  {
+   "path": "src/leaf/auto_03_800DE5B4_text.cpp",
+   "functions": [
+    {
+     "name": "fn_800DE5B4",
+     "addr": "800DE5B4",
+     "size": 48
     }
    ]
   },
@@ -8218,6 +9813,16 @@
    ]
   },
   {
+   "path": "src/leaf/auto_03_800E6360_text_cb.cpp",
+   "functions": [
+    {
+     "name": "HideQuestCounter",
+     "addr": "800E6934",
+     "size": 40
+    }
+   ]
+  },
+  {
    "path": "src/leaf/auto_03_800E75B0_text.cpp",
    "functions": [
     {
@@ -8261,6 +9866,11 @@
    "path": "src/leaf/auto_03_800E75B0_text_cb.cpp",
    "functions": [
     {
+     "name": "IsVideoModePAL",
+     "addr": "800E75D8",
+     "size": 8
+    },
+    {
      "name": "IsPS2",
      "addr": "800E75E0",
      "size": 8
@@ -8274,6 +9884,11 @@
      "name": "IsCoopGame",
      "addr": "800E7660",
      "size": 8
+    },
+    {
+     "name": "GetDifficultyLevel",
+     "addr": "800E76A0",
+     "size": 40
     },
     {
      "name": "TestWire",
@@ -8301,9 +9916,49 @@
      "size": 12
     },
     {
+     "name": "GetEntityHealth",
+     "addr": "800E8430",
+     "size": 12
+    },
+    {
+     "name": "SetEntityMaxHealth",
+     "addr": "800E843C",
+     "size": 40
+    },
+    {
+     "name": "SetEntityAggressive",
+     "addr": "800E8600",
+     "size": 44
+    },
+    {
+     "name": "SetEntitySpeed",
+     "addr": "800E862C",
+     "size": 16
+    },
+    {
+     "name": "GetEntityMaxHealth",
+     "addr": "800E863C",
+     "size": 48
+    },
+    {
      "name": "GetCurAnimDef",
      "addr": "800E8714",
      "size": 12
+    },
+    {
+     "name": "IsEntityOfSubtype",
+     "addr": "800E8744",
+     "size": 40
+    },
+    {
+     "name": "StopEntityLoopingSoundFX",
+     "addr": "800E95BC",
+     "size": 4
+    },
+    {
+     "name": "StopVoiceSFX",
+     "addr": "800E9638",
+     "size": 32
     },
     {
      "name": "PrintTest",
@@ -8316,6 +9971,11 @@
      "size": 16
     },
     {
+     "name": "IsEntityInstance",
+     "addr": "800E96A0",
+     "size": 48
+    },
+    {
      "name": "ResetSpawnDelay",
      "addr": "800E9720",
      "size": 28
@@ -8326,9 +9986,39 @@
      "size": 8
     },
     {
+     "name": "RemoveAllParticles",
+     "addr": "800E9A30",
+     "size": 12
+    },
+    {
+     "name": "TurretTrackTarget",
+     "addr": "800EC344",
+     "size": 24
+    },
+    {
+     "name": "TurretTargetMe",
+     "addr": "800EC35C",
+     "size": 44
+    },
+    {
+     "name": "TurretNoTargetMe",
+     "addr": "800EC388",
+     "size": 48
+    },
+    {
      "name": "CheckPoint",
      "addr": "800EC458",
      "size": 4
+    },
+    {
+     "name": "SendQuestSignal",
+     "addr": "800EC68C",
+     "size": 36
+    },
+    {
+     "name": "SetDeflectBullets",
+     "addr": "800EC774",
+     "size": 32
     },
     {
      "name": "ForceStrafeMode",
@@ -8341,9 +10031,39 @@
      "size": 20
     },
     {
+     "name": "ClearUBAnims",
+     "addr": "800EC890",
+     "size": 12
+    },
+    {
+     "name": "SendEvent",
+     "addr": "800ECBB4",
+     "size": 44
+    },
+    {
+     "name": "SetFlying",
+     "addr": "800ECC30",
+     "size": 40
+    },
+    {
      "name": "PropSetActiveTarget",
      "addr": "800ECCC4",
      "size": 8
+    },
+    {
+     "name": "PropRemoveAttachedProjectile",
+     "addr": "800ED1F8",
+     "size": 4
+    },
+    {
+     "name": "PropHasAttachedProjectile",
+     "addr": "800ED1FC",
+     "size": 4
+    },
+    {
+     "name": "Explode",
+     "addr": "800ED2EC",
+     "size": 36
     },
     {
      "name": "PlayerSetOverrideTarget",
@@ -8366,6 +10086,21 @@
      "size": 8
     },
     {
+     "name": "PlayAnimUB",
+     "addr": "800ED58C",
+     "size": 16
+    },
+    {
+     "name": "SaveCheckPoint",
+     "addr": "800EF7D4",
+     "size": 16
+    },
+    {
+     "name": "RestoreCheckPoint",
+     "addr": "800EF7E4",
+     "size": 16
+    },
+    {
      "name": "IsCharacter",
      "addr": "800EF7F4",
      "size": 16
@@ -8376,9 +10111,19 @@
      "size": 16
     },
     {
+     "name": "GetLastMatTypeHit",
+     "addr": "800EF814",
+     "size": 48
+    },
+    {
      "name": "SetCharacterPerformanceCapToDefault",
      "addr": "800EF844",
      "size": 12
+    },
+    {
+     "name": "SetCharacterPerformanceCap",
+     "addr": "800EF850",
+     "size": 40
     },
     {
      "name": "MegaChunkSentCallback",
@@ -8391,8 +10136,38 @@
      "size": 4
     },
     {
+     "name": "CharacterIsAirborne",
+     "addr": "800EF958",
+     "size": 20
+    },
+    {
+     "name": "GetLastProjectileIDHitWith",
+     "addr": "800EF96C",
+     "size": 48
+    },
+    {
      "name": "MoveCursorToContinueButtonPS2",
      "addr": "800EFCD0",
+     "size": 4
+    },
+    {
+     "name": "LoadChallengeUI",
+     "addr": "800EFE24",
+     "size": 4
+    },
+    {
+     "name": "PlayChallengeMusic",
+     "addr": "800EFE28",
+     "size": 4
+    },
+    {
+     "name": "ForceTracingGame",
+     "addr": "800EFE34",
+     "size": 20
+    },
+    {
+     "name": "IsTimerCountdown",
+     "addr": "800EFE48",
      "size": 4
     },
     {
@@ -8401,9 +10176,54 @@
      "size": 8
     },
     {
+     "name": "GetCurrentLevelId",
+     "addr": "800F0044",
+     "size": 16
+    },
+    {
      "name": "GetIsPlaytest",
      "addr": "800F0160",
      "size": 8
+    },
+    {
+     "name": "set_reg",
+     "addr": "800F0168",
+     "size": 44
+    },
+    {
+     "name": "set_reg0",
+     "addr": "800F0218",
+     "size": 48
+    },
+    {
+     "name": "LockCurrentJunctionPath",
+     "addr": "800F02FC",
+     "size": 48
+    },
+    {
+     "name": "UnlockCurrentJunctionPath",
+     "addr": "800F032C",
+     "size": 44
+    },
+    {
+     "name": "EnableFieldRepair",
+     "addr": "800F11E4",
+     "size": 32
+    },
+    {
+     "name": "SetEnemyIdleTime",
+     "addr": "800F1384",
+     "size": 24
+    },
+    {
+     "name": "InitPreloadFader",
+     "addr": "800F1A10",
+     "size": 20
+    },
+    {
+     "name": "CanDoFieldRepair",
+     "addr": "800F4558",
+     "size": 4
     },
     {
      "name": "CombatTestOn",
@@ -8411,14 +10231,69 @@
      "size": 8
     },
     {
+     "name": "ShowQuestCompleteEvent",
+     "addr": "800F49AC",
+     "size": 16
+    },
+    {
+     "name": "HasActiveQuest",
+     "addr": "800F49BC",
+     "size": 44
+    },
+    {
+     "name": "EndQuestTimer",
+     "addr": "800F4A70",
+     "size": 16
+    },
+    {
+     "name": "SetAnimatedCamera",
+     "addr": "800F4F94",
+     "size": 28
+    },
+    {
+     "name": "RestoreFOV",
+     "addr": "800F58F4",
+     "size": 24
+    },
+    {
+     "name": "GetPerformFieldRepair",
+     "addr": "800F5A48",
+     "size": 48
+    },
+    {
+     "name": "IsCombatWon",
+     "addr": "800F5E44",
+     "size": 44
+    },
+    {
+     "name": "CombatPanelAnimComplete",
+     "addr": "800F5ED8",
+     "size": 24
+    },
+    {
+     "name": "CheckLastMonsterKilled",
+     "addr": "800F6048",
+     "size": 24
+    },
+    {
      "name": "prop_selected",
      "addr": "800F6060",
+     "size": 4
+    },
+    {
+     "name": "AddCastleCamera",
+     "addr": "800F6064",
      "size": 4
     },
     {
      "name": "IsCameraMoving",
      "addr": "800F656C",
      "size": 8
+    },
+    {
+     "name": "PushFSM",
+     "addr": "800F7634",
+     "size": 24
     },
     {
      "name": "PopFSM",
@@ -8431,6 +10306,106 @@
      "size": 20
     },
     {
+     "name": "SetCastleAccess",
+     "addr": "800F826C",
+     "size": 36
+    },
+    {
+     "name": "SetWiiSelectorPaused",
+     "addr": "800F85B4",
+     "size": 4
+    },
+    {
+     "name": "SetWiiSelectorActive",
+     "addr": "800F85B8",
+     "size": 4
+    },
+    {
+     "name": "IsWiiSelectorActive",
+     "addr": "800F85BC",
+     "size": 4
+    },
+    {
+     "name": "RemoveCharacterParticleEffect",
+     "addr": "800F85F4",
+     "size": 24
+    },
+    {
+     "name": "SetHazardIdleTime",
+     "addr": "800F8E5C",
+     "size": 32
+    },
+    {
+     "name": "SetHazardAttackTime",
+     "addr": "800F8E7C",
+     "size": 32
+    },
+    {
+     "name": "StartHazardEffect",
+     "addr": "800F8F10",
+     "size": 24
+    },
+    {
+     "name": "StopHazardEffect",
+     "addr": "800F8F28",
+     "size": 24
+    },
+    {
+     "name": "GetPropInstanceData",
+     "addr": "800F90E0",
+     "size": 32
+    },
+    {
+     "name": "AddJournalEntry",
+     "addr": "800F969C",
+     "size": 40
+    },
+    {
+     "name": "AddJournalEntryNoPopup",
+     "addr": "800F96C4",
+     "size": 40
+    },
+    {
+     "name": "UpdateJournalEntryCount",
+     "addr": "800F96EC",
+     "size": 48
+    },
+    {
+     "name": "UpdateJournalEntryIcon",
+     "addr": "800F971C",
+     "size": 20
+    },
+    {
+     "name": "CompleteJournalEntryStep",
+     "addr": "800F9730",
+     "size": 12
+    },
+    {
+     "name": "GetRewardedItemId",
+     "addr": "800FA504",
+     "size": 40
+    },
+    {
+     "name": "InitializeMerchantIngredients",
+     "addr": "800FA5E8",
+     "size": 12
+    },
+    {
+     "name": "DoTradeWithMerchant",
+     "addr": "800FA5F4",
+     "size": 8
+    },
+    {
+     "name": "DebugSetPlayerRank",
+     "addr": "800FA5FC",
+     "size": 12
+    },
+    {
+     "name": "UpdateSplashScreen",
+     "addr": "800FA9B8",
+     "size": 12
+    },
+    {
      "name": "EnableMainMenuDebugOptions",
      "addr": "800FA9C4",
      "size": 8
@@ -8439,6 +10414,21 @@
      "name": "IsFinalBuild",
      "addr": "800FA9CC",
      "size": 8
+    },
+    {
+     "name": "SetEnableHomeButton",
+     "addr": "800FA9D4",
+     "size": 16
+    },
+    {
+     "name": "SetEnableHomeButtonDisableIcon",
+     "addr": "800FA9E4",
+     "size": 24
+    },
+    {
+     "name": "SetSpecialGameEvent",
+     "addr": "800FA9FC",
+     "size": 24
     },
     {
      "name": "GetOptionsMusicVolume",
@@ -8469,6 +10459,11 @@
      "name": "GetOptionsRumble",
      "addr": "800FB42C",
      "size": 12
+    },
+    {
+     "name": "IsCurrentInteractionID",
+     "addr": "800FB468",
+     "size": 40
     },
     {
      "name": "ActivateListEntry",
@@ -9086,9 +11081,74 @@
    "path": "src/leaf/auto_03_800FB958_text_cb.cpp",
    "functions": [
     {
+     "name": "BroadcastEventFromProperty",
+     "addr": "801035F8",
+     "size": 16
+    },
+    {
+     "name": "ChooseGuard",
+     "addr": "80103608",
+     "size": 4
+    },
+    {
+     "name": "ClearLineToTarget",
+     "addr": "8010360C",
+     "size": 4
+    },
+    {
      "name": "EnterName_EnteringPlayerName",
      "addr": "80103610",
      "size": 20
+    },
+    {
+     "name": "GetIntProperty",
+     "addr": "8010368C",
+     "size": 28
+    },
+    {
+     "name": "IsCombatTutorialActive",
+     "addr": "801036A8",
+     "size": 40
+    },
+    {
+     "name": "IsCurrentTutorialConversation",
+     "addr": "801036D0",
+     "size": 20
+    },
+    {
+     "name": "JumpToTarget",
+     "addr": "80103748",
+     "size": 4
+    },
+    {
+     "name": "KillGoal",
+     "addr": "8010374C",
+     "size": 4
+    },
+    {
+     "name": "KillPersistentGoal",
+     "addr": "80103750",
+     "size": 4
+    },
+    {
+     "name": "MultiCountAction",
+     "addr": "80103754",
+     "size": 4
+    },
+    {
+     "name": "NavTargetIsLeft",
+     "addr": "80103758",
+     "size": 4
+    },
+    {
+     "name": "RequestMeleeAttack",
+     "addr": "80103898",
+     "size": 4
+    },
+    {
+     "name": "RequestRangedAttack",
+     "addr": "8010389C",
+     "size": 4
     },
     {
      "name": "SaveManager_CanContinue",
@@ -9131,14 +11191,224 @@
      "size": 8
     },
     {
+     "name": "SetFleeGoal",
+     "addr": "801038E8",
+     "size": 4
+    },
+    {
+     "name": "SetGoal",
+     "addr": "801038EC",
+     "size": 4
+    },
+    {
+     "name": "SetGoalWithTarget",
+     "addr": "801038F0",
+     "size": 4
+    },
+    {
+     "name": "SetGroupSize",
+     "addr": "801038F4",
+     "size": 16
+    },
+    {
+     "name": "SetGuardGoal",
+     "addr": "80103904",
+     "size": 4
+    },
+    {
      "name": "SetInBasicTutorialFlag",
      "addr": "80103908",
      "size": 16
     },
     {
+     "name": "SetPersistentGoal",
+     "addr": "80103918",
+     "size": 4
+    },
+    {
+     "name": "SetPersistentGoalWithTarget",
+     "addr": "8010391C",
+     "size": 4
+    },
+    {
      "name": "SetRenderObjectAttachPoint",
      "addr": "8010394C",
      "size": 12
+    },
+    {
+     "name": "SetRival",
+     "addr": "80103958",
+     "size": 8
+    },
+    {
+     "name": "SetTimeoutFromProperty",
+     "addr": "80103960",
+     "size": 16
+    },
+    {
+     "name": "SetTurningRate",
+     "addr": "80103970",
+     "size": 4
+    },
+    {
+     "name": "SetVelocity",
+     "addr": "80103974",
+     "size": 4
+    },
+    {
+     "name": "SimpleProjectile",
+     "addr": "801039A4",
+     "size": 4
+    },
+    {
+     "name": "TargetIsFarBelow",
+     "addr": "801039A8",
+     "size": 4
+    },
+    {
+     "name": "TargetIsLeft",
+     "addr": "801039AC",
+     "size": 4
+    },
+    {
+     "name": "WithinAngleOfNav",
+     "addr": "801039B0",
+     "size": 4
+    },
+    {
+     "name": "WithinAngleOfTarget",
+     "addr": "801039B4",
+     "size": 4
+    },
+    {
+     "name": "WithinJumpRange",
+     "addr": "801039B8",
+     "size": 4
+    },
+    {
+     "name": "WithinRangeOfTarget",
+     "addr": "801039BC",
+     "size": 4
+    }
+   ]
+  },
+  {
+   "path": "src/leaf/auto_03_80106884_text.cpp",
+   "functions": [
+    {
+     "name": "fn_80106884",
+     "addr": "80106884",
+     "size": 4
+    }
+   ]
+  },
+  {
+   "path": "src/leaf/auto_03_801068A8_text.cpp",
+   "functions": [
+    {
+     "name": "fn_80106900",
+     "addr": "80106900",
+     "size": 32
+    },
+    {
+     "name": "fn_80106988",
+     "addr": "80106988",
+     "size": 40
+    }
+   ]
+  },
+  {
+   "path": "src/leaf/auto_03_80106AA8_text_cb.cpp",
+   "functions": [
+    {
+     "name": "SetBit",
+     "addr": "80106AA8",
+     "size": 24
+    },
+    {
+     "name": "GetBit",
+     "addr": "80106AC0",
+     "size": 20
+    },
+    {
+     "name": "SetInt",
+     "addr": "80106AD4",
+     "size": 24
+    },
+    {
+     "name": "GetInt",
+     "addr": "80106AEC",
+     "size": 20
+    },
+    {
+     "name": "SetFloat",
+     "addr": "80106B00",
+     "size": 20
+    },
+    {
+     "name": "GetFloat",
+     "addr": "80106B14",
+     "size": 20
+    },
+    {
+     "name": "AddToInt",
+     "addr": "80106B28",
+     "size": 24
+    },
+    {
+     "name": "AddToFloat",
+     "addr": "80106B40",
+     "size": 20
+    },
+    {
+     "name": "Level_SetBit",
+     "addr": "80106C70",
+     "size": 24
+    },
+    {
+     "name": "Level_GetBit",
+     "addr": "80106C88",
+     "size": 20
+    },
+    {
+     "name": "Level_SetInt",
+     "addr": "80106C9C",
+     "size": 24
+    },
+    {
+     "name": "Level_GetInt",
+     "addr": "80106CB4",
+     "size": 20
+    },
+    {
+     "name": "Level_SetFloat",
+     "addr": "80106CC8",
+     "size": 20
+    },
+    {
+     "name": "Level_GetFloat",
+     "addr": "80106CDC",
+     "size": 20
+    },
+    {
+     "name": "Level_AddToInt",
+     "addr": "80106CF0",
+     "size": 24
+    },
+    {
+     "name": "Level_AddToFloat",
+     "addr": "80106D08",
+     "size": 20
+    },
+    {
+     "name": "FSM_SetInt",
+     "addr": "80106E80",
+     "size": 36
+    },
+    {
+     "name": "FSM_GetInt",
+     "addr": "80106EA4",
+     "size": 36
     }
    ]
   },
@@ -9180,6 +11450,11 @@
   {
    "path": "src/leaf/auto_03_80109BE0_text.cpp",
    "functions": [
+    {
+     "name": "fn_8010A374",
+     "addr": "8010A374",
+     "size": 12
+    },
     {
      "name": "fn_8010A3B0",
      "addr": "8010A3B0",
@@ -9281,6 +11556,11 @@
      "size": 20
     },
     {
+     "name": "DemolishEntityPoolCallback",
+     "addr": "8010C8F8",
+     "size": 20
+    },
+    {
      "name": "CloneFSMCallback",
      "addr": "8010CC98",
      "size": 8
@@ -9298,12 +11578,37 @@
    ]
   },
   {
+   "path": "src/leaf/auto_03_8010CD18_text.cpp",
+   "functions": [
+    {
+     "name": "fn_8010CD18",
+     "addr": "8010CD18",
+     "size": 4
+    },
+    {
+     "name": "fn_8010F784",
+     "addr": "8010F784",
+     "size": 16
+    }
+   ]
+  },
+  {
    "path": "src/leaf/auto_03_8010FA48_text.cpp",
    "functions": [
     {
      "name": "fn_8010FA48",
      "addr": "8010FA48",
      "size": 4
+    }
+   ]
+  },
+  {
+   "path": "src/leaf/auto_03_8010FA48_text_cb.cpp",
+   "functions": [
+    {
+     "name": "StopSoundEffect",
+     "addr": "8010FCE0",
+     "size": 20
     }
    ]
   },
@@ -9326,6 +11631,66 @@
      "size": 8
     },
     {
+     "name": "CanProcessInput",
+     "addr": "80111704",
+     "size": 16
+    },
+    {
+     "name": "StartIngredientsSelection",
+     "addr": "80111A70",
+     "size": 4
+    },
+    {
+     "name": "EndIngredientsSelection",
+     "addr": "801124BC",
+     "size": 4
+    },
+    {
+     "name": "GetSelectedKeyIngredient",
+     "addr": "801124C0",
+     "size": 4
+    },
+    {
+     "name": "GetSelectedSecondaryIngredient",
+     "addr": "801124C4",
+     "size": 4
+    },
+    {
+     "name": "GetSelectedPartForIngredients",
+     "addr": "801124C8",
+     "size": 4
+    },
+    {
+     "name": "GetEnhancementDefectForIngredients",
+     "addr": "801124CC",
+     "size": 4
+    },
+    {
+     "name": "IngredientSelectionSetErrorTransition",
+     "addr": "801124D0",
+     "size": 4
+    },
+    {
+     "name": "IngredientSelectionClearErrorTransition",
+     "addr": "801124D4",
+     "size": 4
+    },
+    {
+     "name": "SetStoredTextForIngredientSelection",
+     "addr": "801124D8",
+     "size": 4
+    },
+    {
+     "name": "GetStoredTextForIngredientSelection",
+     "addr": "801124DC",
+     "size": 4
+    },
+    {
+     "name": "IngredientSelectionIsErrorTransition",
+     "addr": "801124E0",
+     "size": 4
+    },
+    {
      "name": "PartInfo_GetTexture",
      "addr": "80116848",
      "size": 8
@@ -9339,6 +11704,11 @@
      "name": "PartInfo_GetEnhanceDefectDesc",
      "addr": "80116858",
      "size": 8
+    },
+    {
+     "name": "PartInfo_PlayerNeedsMoreRanks",
+     "addr": "80116860",
+     "size": 16
     }
    ]
   },
@@ -9349,6 +11719,16 @@
      "name": "fn_80116BE8",
      "addr": "80116BE8",
      "size": 28
+    }
+   ]
+  },
+  {
+   "path": "src/leaf/auto_03_80116CA8_text.cpp",
+   "functions": [
+    {
+     "name": "fn_80116EF0",
+     "addr": "80116EF0",
+     "size": 24
     }
    ]
   },
@@ -9364,6 +11744,41 @@
      "name": "fn_80117268",
      "addr": "80117268",
      "size": 4
+    },
+    {
+     "name": "fn_801173A0",
+     "addr": "801173A0",
+     "size": 24
+    },
+    {
+     "name": "fn_801173B8",
+     "addr": "801173B8",
+     "size": 24
+    },
+    {
+     "name": "fn_801173D0",
+     "addr": "801173D0",
+     "size": 24
+    },
+    {
+     "name": "fn_801173E8",
+     "addr": "801173E8",
+     "size": 24
+    },
+    {
+     "name": "fn_80117400",
+     "addr": "80117400",
+     "size": 24
+    },
+    {
+     "name": "fn_80117418",
+     "addr": "80117418",
+     "size": 24
+    },
+    {
+     "name": "fn_80117948",
+     "addr": "80117948",
+     "size": 40
     },
     {
      "name": "fn_801179C0",
@@ -9391,9 +11806,19 @@
      "size": 8
     },
     {
+     "name": "fn_80118C24",
+     "addr": "80118C24",
+     "size": 48
+    },
+    {
      "name": "fn_80118F3C",
      "addr": "80118F3C",
      "size": 8
+    },
+    {
+     "name": "fn_801191AC",
+     "addr": "801191AC",
+     "size": 20
     },
     {
      "name": "fn_801191C0",
@@ -9406,9 +11831,19 @@
      "size": 20
     },
     {
+     "name": "fn_801195F0",
+     "addr": "801195F0",
+     "size": 8
+    },
+    {
      "name": "fn_801195F8",
      "addr": "801195F8",
      "size": 8
+    },
+    {
+     "name": "fn_80119600",
+     "addr": "80119600",
+     "size": 48
     },
     {
      "name": "fn_80119630",
@@ -9424,6 +11859,11 @@
      "name": "fn_80119658",
      "addr": "80119658",
      "size": 20
+    },
+    {
+     "name": "fn_801196A8",
+     "addr": "801196A8",
+     "size": 44
     }
    ]
   },
@@ -9449,6 +11889,11 @@
      "name": "fn_80119794",
      "addr": "80119794",
      "size": 4
+    },
+    {
+     "name": "fn_80119AE0",
+     "addr": "80119AE0",
+     "size": 32
     },
     {
      "name": "fn_80119C58",
@@ -9551,6 +11996,11 @@
      "size": 16
     },
     {
+     "name": "fn_8011BA6C",
+     "addr": "8011BA6C",
+     "size": 8
+    },
+    {
      "name": "fn_8011BA74",
      "addr": "8011BA74",
      "size": 8
@@ -9576,9 +12026,39 @@
      "size": 8
     },
     {
+     "name": "fn_8011BE84",
+     "addr": "8011BE84",
+     "size": 44
+    },
+    {
+     "name": "fn_8011BEB0",
+     "addr": "8011BEB0",
+     "size": 44
+    },
+    {
+     "name": "fn_8011BEDC",
+     "addr": "8011BEDC",
+     "size": 44
+    },
+    {
+     "name": "fn_8011BF08",
+     "addr": "8011BF08",
+     "size": 44
+    },
+    {
+     "name": "fn_8011C108",
+     "addr": "8011C108",
+     "size": 40
+    },
+    {
      "name": "fn_8011C1D0",
      "addr": "8011C1D0",
      "size": 40
+    },
+    {
+     "name": "fn_8011C1F8",
+     "addr": "8011C1F8",
+     "size": 20
     },
     {
      "name": "fn_8011C20C",
@@ -9603,6 +12083,21 @@
     {
      "name": "fn_8011CD10",
      "addr": "8011CD10",
+     "size": 8
+    },
+    {
+     "name": "fn_8011CDD4",
+     "addr": "8011CDD4",
+     "size": 48
+    },
+    {
+     "name": "fn_8011CF64",
+     "addr": "8011CF64",
+     "size": 40
+    },
+    {
+     "name": "fn_8011D028",
+     "addr": "8011D028",
      "size": 8
     },
     {
@@ -9656,6 +12151,16 @@
      "size": 4
     },
     {
+     "name": "fn_8011D6F4",
+     "addr": "8011D6F4",
+     "size": 20
+    },
+    {
+     "name": "fn_8011D708",
+     "addr": "8011D708",
+     "size": 20
+    },
+    {
      "name": "fn_8011D71C",
      "addr": "8011D71C",
      "size": 12
@@ -9689,6 +12194,36 @@
      "name": "fn_8011D9B4",
      "addr": "8011D9B4",
      "size": 12
+    },
+    {
+     "name": "fn_8011E94C",
+     "addr": "8011E94C",
+     "size": 16
+    },
+    {
+     "name": "fn_8011E95C",
+     "addr": "8011E95C",
+     "size": 20
+    },
+    {
+     "name": "fn_8011E970",
+     "addr": "8011E970",
+     "size": 20
+    },
+    {
+     "name": "fn_8011E984",
+     "addr": "8011E984",
+     "size": 20
+    },
+    {
+     "name": "fn_8011E998",
+     "addr": "8011E998",
+     "size": 16
+    },
+    {
+     "name": "fn_8011E9A8",
+     "addr": "8011E9A8",
+     "size": 8
     },
     {
      "name": "fn_8011E9B0",
@@ -9751,14 +12286,54 @@
      "size": 20
     },
     {
+     "name": "fn_80120390",
+     "addr": "80120390",
+     "size": 48
+    },
+    {
      "name": "fn_801203F0",
      "addr": "801203F0",
      "size": 40
     },
     {
+     "name": "fn_80120418",
+     "addr": "80120418",
+     "size": 44
+    },
+    {
+     "name": "fn_80120444",
+     "addr": "80120444",
+     "size": 48
+    },
+    {
+     "name": "fn_80120474",
+     "addr": "80120474",
+     "size": 48
+    },
+    {
+     "name": "fn_801204A4",
+     "addr": "801204A4",
+     "size": 48
+    },
+    {
+     "name": "fn_801204D4",
+     "addr": "801204D4",
+     "size": 48
+    },
+    {
+     "name": "fn_80120504",
+     "addr": "80120504",
+     "size": 48
+    },
+    {
      "name": "fn_8012078C",
      "addr": "8012078C",
      "size": 44
+    },
+    {
+     "name": "fn_801207B8",
+     "addr": "801207B8",
+     "size": 24
     },
     {
      "name": "fn_801207D0",
@@ -9768,6 +12343,11 @@
     {
      "name": "fn_8012096C",
      "addr": "8012096C",
+     "size": 12
+    },
+    {
+     "name": "fn_80120978",
+     "addr": "80120978",
      "size": 12
     },
     {
@@ -9789,6 +12369,11 @@
      "name": "EnterName_GetName",
      "addr": "80120CBC",
      "size": 8
+    },
+    {
+     "name": "EnterName_NameInputDone",
+     "addr": "80120D00",
+     "size": 20
     }
    ]
   },
@@ -9805,6 +12390,11 @@
   {
    "path": "src/leaf/auto_03_801210E4_text.cpp",
    "functions": [
+    {
+     "name": "fn_801210E4",
+     "addr": "801210E4",
+     "size": 20
+    },
     {
      "name": "fn_80121434",
      "addr": "80121434",
@@ -9833,6 +12423,11 @@
     {
      "name": "fn_80121494",
      "addr": "80121494",
+     "size": 4
+    },
+    {
+     "name": "fn_801214D8",
+     "addr": "801214D8",
      "size": 4
     },
     {
@@ -9899,12 +12494,27 @@
      "name": "SaveManager_GetPlayerTimeMinFromTmp",
      "addr": "8012430C",
      "size": 20
+    },
+    {
+     "name": "SaveManager_CheckIfSlotEmptyFromTmp",
+     "addr": "80124320",
+     "size": 32
     }
    ]
   },
   {
    "path": "src/leaf/auto_03_8012570C_text.cpp",
    "functions": [
+    {
+     "name": "fn_80126354",
+     "addr": "80126354",
+     "size": 24
+    },
+    {
+     "name": "fn_801265F4",
+     "addr": "801265F4",
+     "size": 24
+    },
     {
      "name": "fn_8012670C",
      "addr": "8012670C",
@@ -9939,6 +12549,11 @@
      "name": "fn_8012A790",
      "addr": "8012A790",
      "size": 12
+    },
+    {
+     "name": "fn_8012AAD8",
+     "addr": "8012AAD8",
+     "size": 40
     },
     {
      "name": "fn_8012CDF0",
@@ -10021,6 +12636,16 @@
      "size": 4
     },
     {
+     "name": "fn_80139FD0",
+     "addr": "80139FD0",
+     "size": 32
+    },
+    {
+     "name": "fn_80139FF0",
+     "addr": "80139FF0",
+     "size": 20
+    },
+    {
      "name": "fn_8013A004",
      "addr": "8013A004",
      "size": 12
@@ -10043,6 +12668,16 @@
    ]
   },
   {
+   "path": "src/leaf/auto_03_8013A03C_text.cpp",
+   "functions": [
+    {
+     "name": "fn_8013C444",
+     "addr": "8013C444",
+     "size": 32
+    }
+   ]
+  },
+  {
    "path": "src/leaf/auto_03_8013A03C_text_cb.cpp",
    "functions": [
     {
@@ -10051,9 +12686,34 @@
      "size": 12
     },
     {
+     "name": "FriendsListSendAccept",
+     "addr": "8013BC5C",
+     "size": 12
+    },
+    {
+     "name": "MultiplayerLevelLoaded",
+     "addr": "8013BE0C",
+     "size": 12
+    },
+    {
      "name": "GetMultiplayerLevel",
      "addr": "8013BE74",
      "size": 8
+    },
+    {
+     "name": "CancelMatchup",
+     "addr": "8013BF94",
+     "size": 20
+    }
+   ]
+  },
+  {
+   "path": "src/leaf/auto_03_8013C600_text_cb.cpp",
+   "functions": [
+    {
+     "name": "InspectOpponentDeInit",
+     "addr": "8013C6BC",
+     "size": 16
     }
    ]
   },
@@ -10174,12 +12834,22 @@
      "name": "fn_8013E774",
      "addr": "8013E774",
      "size": 12
+    },
+    {
+     "name": "fn_8013EADC",
+     "addr": "8013EADC",
+     "size": 32
     }
    ]
   },
   {
    "path": "src/leaf/auto_03_8013E4D0_text_cb.cpp",
    "functions": [
+    {
+     "name": "MonsterSelectDeInit",
+     "addr": "8013E734",
+     "size": 16
+    },
     {
      "name": "SetMyMonsterHitpoints",
      "addr": "8013E744",
@@ -10231,6 +12901,16 @@
      "size": 8
     },
     {
+     "name": "OnlineRecordWin",
+     "addr": "80140320",
+     "size": 4
+    },
+    {
+     "name": "OnlineRecordLoss",
+     "addr": "80140324",
+     "size": 4
+    },
+    {
      "name": "MatchupIsActive",
      "addr": "801409FC",
      "size": 8
@@ -10266,6 +12946,16 @@
      "size": 12
     },
     {
+     "name": "SendRematchAccepted",
+     "addr": "8013FDEC",
+     "size": 12
+    },
+    {
+     "name": "PauseSoundEffects",
+     "addr": "80140328",
+     "size": 36
+    },
+    {
      "name": "DisableHomeButton",
      "addr": "801403A0",
      "size": 20
@@ -10274,6 +12964,21 @@
      "name": "ReturnHomeButton",
      "addr": "801403B4",
      "size": 12
+    },
+    {
+     "name": "SendMonsterChangeCancel",
+     "addr": "801403C0",
+     "size": 12
+    },
+    {
+     "name": "CancelConnect",
+     "addr": "801403FC",
+     "size": 8
+    },
+    {
+     "name": "ClearNetworkStall",
+     "addr": "80140498",
+     "size": 8
     },
     {
      "name": "SetErrorType",
@@ -10286,6 +12991,11 @@
      "size": 8
     },
     {
+     "name": "SelectingMonster",
+     "addr": "801409D4",
+     "size": 28
+    },
+    {
      "name": "ScreenIsOpen",
      "addr": "801409F0",
      "size": 12
@@ -10294,6 +13004,56 @@
      "name": "SetHomeButtonGone",
      "addr": "80140A04",
      "size": 12
+    },
+    {
+     "name": "IsOpponentPreparing",
+     "addr": "80140A54",
+     "size": 28
+    },
+    {
+     "name": "BattleRequestNoMonsters",
+     "addr": "80140AE4",
+     "size": 8
+    },
+    {
+     "name": "ClearNoMonstersFlag",
+     "addr": "80140AEC",
+     "size": 8
+    },
+    {
+     "name": "BattleRequestOk",
+     "addr": "80140AF4",
+     "size": 8
+    },
+    {
+     "name": "ClearBattleRequest",
+     "addr": "80140AFC",
+     "size": 8
+    },
+    {
+     "name": "OpponentCancelled",
+     "addr": "80140B04",
+     "size": 8
+    },
+    {
+     "name": "MatchupTimerIsUp",
+     "addr": "80140B0C",
+     "size": 8
+    },
+    {
+     "name": "OpponentMatchupTimerIsUp",
+     "addr": "80140B14",
+     "size": 8
+    },
+    {
+     "name": "OpponentReadyForBattle",
+     "addr": "80140B1C",
+     "size": 12
+    },
+    {
+     "name": "SetClosingConnection",
+     "addr": "80140B28",
+     "size": 8
     },
     {
      "name": "SetInviteTimeout",
@@ -10311,6 +13071,11 @@
      "size": 8
     },
     {
+     "name": "DidOpponentCancelDuringPreparing",
+     "addr": "80140B60",
+     "size": 28
+    },
+    {
      "name": "SetResponse",
      "addr": "80140CC4",
      "size": 8
@@ -10319,6 +13084,11 @@
      "name": "GotResponse",
      "addr": "80140CCC",
      "size": 20
+    },
+    {
+     "name": "IsNetThreadRunning",
+     "addr": "8014205C",
+     "size": 36
     },
     {
      "name": "DummyFunctionVV1",
@@ -10371,6 +13141,11 @@
    "path": "src/leaf/auto_03_801420EC_text_cb.cpp",
    "functions": [
     {
+     "name": "SpecialAlertBoxGone",
+     "addr": "8014241C",
+     "size": 16
+    },
+    {
      "name": "IsShowingError",
      "addr": "80142490",
      "size": 8
@@ -10406,6 +13181,11 @@
      "size": 20
     },
     {
+     "name": "fn_80142ED0",
+     "addr": "80142ED0",
+     "size": 4
+    },
+    {
      "name": "fn_80142ED4",
      "addr": "80142ED4",
      "size": 12
@@ -10426,6 +13206,21 @@
      "size": 4
     },
     {
+     "name": "fn_801432FC",
+     "addr": "801432FC",
+     "size": 20
+    },
+    {
+     "name": "fn_80143310",
+     "addr": "80143310",
+     "size": 32
+    },
+    {
+     "name": "fn_80143330",
+     "addr": "80143330",
+     "size": 32
+    },
+    {
      "name": "fn_80144F78",
      "addr": "80144F78",
      "size": 20
@@ -10434,6 +13229,16 @@
      "name": "fn_801467D4",
      "addr": "801467D4",
      "size": 4
+    }
+   ]
+  },
+  {
+   "path": "src/leaf/auto_03_80142E94_text_cb.cpp",
+   "functions": [
+    {
+     "name": "StartTest",
+     "addr": "80142F84",
+     "size": 12
     }
    ]
   },
@@ -10449,6 +13254,16 @@
      "name": "fn_80146800",
      "addr": "80146800",
      "size": 8
+    },
+    {
+     "name": "fn_80146A58",
+     "addr": "80146A58",
+     "size": 28
+    },
+    {
+     "name": "fn_80146A74",
+     "addr": "80146A74",
+     "size": 4
     },
     {
      "name": "fn_80146A78",
@@ -10476,6 +13291,11 @@
      "size": 8
     },
     {
+     "name": "fn_80148308",
+     "addr": "80148308",
+     "size": 12
+    },
+    {
      "name": "fn_801483BC",
      "addr": "801483BC",
      "size": 16
@@ -10484,6 +13304,16 @@
      "name": "fn_801483CC",
      "addr": "801483CC",
      "size": 48
+    },
+    {
+     "name": "RendDefaultAlloc",
+     "addr": "80148530",
+     "size": 16
+    },
+    {
+     "name": "RendDefaultFree",
+     "addr": "80148540",
+     "size": 16
     },
     {
      "name": "fn_80148770",
@@ -10549,6 +13379,36 @@
      "name": "fn_8014EACC",
      "addr": "8014EACC",
      "size": 40
+    },
+    {
+     "name": "fn_80150DD4",
+     "addr": "80150DD4",
+     "size": 24
+    },
+    {
+     "name": "fn_80151244",
+     "addr": "80151244",
+     "size": 8
+    },
+    {
+     "name": "RendSetFlagA",
+     "addr": "8015124C",
+     "size": 12
+    },
+    {
+     "name": "SetRenderEnabled",
+     "addr": "80151258",
+     "size": 12
+    },
+    {
+     "name": "fn_801514D4",
+     "addr": "801514D4",
+     "size": 28
+    },
+    {
+     "name": "fn_801514F0",
+     "addr": "801514F0",
+     "size": 28
     },
     {
      "name": "fn_8015428C",
@@ -10621,6 +13481,11 @@
      "size": 28
     },
     {
+     "name": "fn_8015A340",
+     "addr": "8015A340",
+     "size": 40
+    },
+    {
      "name": "fn_8015A58C",
      "addr": "8015A58C",
      "size": 24
@@ -10629,6 +13494,16 @@
      "name": "fn_8015BA30",
      "addr": "8015BA30",
      "size": 28
+    },
+    {
+     "name": "fn_8015D2E0",
+     "addr": "8015D2E0",
+     "size": 12
+    },
+    {
+     "name": "VideoIsPal50",
+     "addr": "8015DE24",
+     "size": 20
     },
     {
      "name": "VideoGetWidth",
@@ -10686,6 +13561,11 @@
      "size": 24
     },
     {
+     "name": "fn_8015FD74",
+     "addr": "8015FD74",
+     "size": 48
+    },
+    {
      "name": "fn_80160030",
      "addr": "80160030",
      "size": 36
@@ -10694,6 +13574,16 @@
      "name": "fn_801604F4",
      "addr": "801604F4",
      "size": 4
+    }
+   ]
+  },
+  {
+   "path": "src/leaf/auto_03_80160BD4_text.cpp",
+   "functions": [
+    {
+     "name": "fn_80162C1C",
+     "addr": "80162C1C",
+     "size": 12
     }
    ]
   },
@@ -10736,9 +13626,19 @@
      "size": 12
     },
     {
+     "name": "ParticleSystemFirst",
+     "addr": "80169838",
+     "size": 28
+    },
+    {
      "name": "fn_8016A768",
      "addr": "8016A768",
      "size": 32
+    },
+    {
+     "name": "fn_8016B6DC",
+     "addr": "8016B6DC",
+     "size": 40
     },
     {
      "name": "fn_8016B704",
@@ -10866,6 +13766,16 @@
      "size": 4
     },
     {
+     "name": "fn_80173284",
+     "addr": "80173284",
+     "size": 16
+    },
+    {
+     "name": "fn_80173294",
+     "addr": "80173294",
+     "size": 16
+    },
+    {
      "name": "fn_801736E4",
      "addr": "801736E4",
      "size": 4
@@ -10981,6 +13891,11 @@
      "size": 4
     },
     {
+     "name": "fn_80183FA0",
+     "addr": "80183FA0",
+     "size": 44
+    },
+    {
      "name": "fn_80184260",
      "addr": "80184260",
      "size": 4
@@ -10989,6 +13904,26 @@
      "name": "fn_80184264",
      "addr": "80184264",
      "size": 4
+    },
+    {
+     "name": "fn_801842B0",
+     "addr": "801842B0",
+     "size": 24
+    },
+    {
+     "name": "fn_801842C8",
+     "addr": "801842C8",
+     "size": 24
+    },
+    {
+     "name": "fn_8018430C",
+     "addr": "8018430C",
+     "size": 8
+    },
+    {
+     "name": "fn_80184488",
+     "addr": "80184488",
+     "size": 8
     },
     {
      "name": "fn_80185C94",
@@ -11001,6 +13936,11 @@
      "size": 8
     },
     {
+     "name": "fn_80188EDC",
+     "addr": "80188EDC",
+     "size": 36
+    },
+    {
      "name": "fn_8018A3E4",
      "addr": "8018A3E4",
      "size": 8
@@ -11009,6 +13949,16 @@
      "name": "fn_8018C47C",
      "addr": "8018C47C",
      "size": 16
+    },
+    {
+     "name": "fn_8018C4D8",
+     "addr": "8018C4D8",
+     "size": 48
+    },
+    {
+     "name": "fn_8018C8CC",
+     "addr": "8018C8CC",
+     "size": 24
     },
     {
      "name": "fn_8018C8E4",
@@ -11021,6 +13971,11 @@
      "size": 8
     },
     {
+     "name": "fn_8018C9DC",
+     "addr": "8018C9DC",
+     "size": 40
+    },
+    {
      "name": "ScreenSetsCurrent",
      "addr": "8018D1E4",
      "size": 8
@@ -11029,6 +13984,11 @@
      "name": "ScreenSetsFind",
      "addr": "8018D1EC",
      "size": 16
+    },
+    {
+     "name": "fn_8018D4CC",
+     "addr": "8018D4CC",
+     "size": 32
     },
     {
      "name": "fn_8018D524",
@@ -11056,9 +14016,19 @@
    "path": "src/leaf/auto_03_8018E0CC_text.cpp",
    "functions": [
     {
+     "name": "fn_8019552C",
+     "addr": "8019552C",
+     "size": 48
+    },
+    {
      "name": "fn_8019555C",
      "addr": "8019555C",
      "size": 8
+    },
+    {
+     "name": "fn_80195564",
+     "addr": "80195564",
+     "size": 12
     },
     {
      "name": "fn_80196668",
@@ -11071,14 +14041,44 @@
      "size": 20
     },
     {
+     "name": "fn_80196B24",
+     "addr": "80196B24",
+     "size": 40
+    },
+    {
      "name": "fn_80196C88",
      "addr": "80196C88",
      "size": 20
     },
     {
+     "name": "fn_80196C9C",
+     "addr": "80196C9C",
+     "size": 48
+    },
+    {
      "name": "fn_80196D04",
      "addr": "80196D04",
      "size": 8
+    },
+    {
+     "name": "fn_80196E7C",
+     "addr": "80196E7C",
+     "size": 28
+    },
+    {
+     "name": "fn_80196FB0",
+     "addr": "80196FB0",
+     "size": 28
+    },
+    {
+     "name": "fn_801970A4",
+     "addr": "801970A4",
+     "size": 8
+    },
+    {
+     "name": "fn_801970AC",
+     "addr": "801970AC",
+     "size": 40
     },
     {
      "name": "fn_80197FD8",
@@ -11101,6 +14101,11 @@
      "size": 20
     },
     {
+     "name": "fn_80199534",
+     "addr": "80199534",
+     "size": 12
+    },
+    {
      "name": "fn_8019956C",
      "addr": "8019956C",
      "size": 8
@@ -11118,6 +14123,21 @@
     {
      "name": "fn_8019A9D4",
      "addr": "8019A9D4",
+     "size": 24
+    },
+    {
+     "name": "fn_8019AA10",
+     "addr": "8019AA10",
+     "size": 44
+    },
+    {
+     "name": "fn_8019AD6C",
+     "addr": "8019AD6C",
+     "size": 24
+    },
+    {
+     "name": "fn_8019AE94",
+     "addr": "8019AE94",
      "size": 24
     },
     {
@@ -11141,6 +14161,11 @@
      "size": 8
     },
     {
+     "name": "fn_8019DB14",
+     "addr": "8019DB14",
+     "size": 44
+    },
+    {
      "name": "fn_8019DC48",
      "addr": "8019DC48",
      "size": 8
@@ -11151,9 +14176,19 @@
      "size": 8
     },
     {
+     "name": "fn_8019EA5C",
+     "addr": "8019EA5C",
+     "size": 32
+    },
+    {
      "name": "UITextGetString",
      "addr": "8019F3AC",
      "size": 8
+    },
+    {
+     "name": "fn_801A05C8",
+     "addr": "801A05C8",
+     "size": 28
     },
     {
      "name": "fn_801A0DF0",
@@ -11176,6 +14211,11 @@
      "size": 12
     },
     {
+     "name": "fn_801A1208",
+     "addr": "801A1208",
+     "size": 48
+    },
+    {
      "name": "fn_801A2380",
      "addr": "801A2380",
      "size": 8
@@ -11191,6 +14231,11 @@
      "size": 8
     },
     {
+     "name": "fn_801A2748",
+     "addr": "801A2748",
+     "size": 28
+    },
+    {
      "name": "fn_801A2E84",
      "addr": "801A2E84",
      "size": 8
@@ -11204,6 +14249,11 @@
      "name": "fn_801A3908",
      "addr": "801A3908",
      "size": 8
+    },
+    {
+     "name": "fn_801A3A10",
+     "addr": "801A3A10",
+     "size": 24
     },
     {
      "name": "fn_801A4018",
@@ -11269,6 +14319,11 @@
      "name": "fn_801A81D8",
      "addr": "801A81D8",
      "size": 8
+    },
+    {
+     "name": "fn_801A883C",
+     "addr": "801A883C",
+     "size": 36
     },
     {
      "name": "fn_801A8AF4",
@@ -11368,6 +14423,21 @@
     {
      "name": "fn_801ABD50",
      "addr": "801ABD50",
+     "size": 8
+    },
+    {
+     "name": "AnimSetGetClip",
+     "addr": "801AC164",
+     "size": 32
+    }
+   ]
+  },
+  {
+   "path": "src/leaf/auto_03_8018E0CC_text_cb.cpp",
+   "functions": [
+    {
+     "name": "UIText_SetString",
+     "addr": "80190E48",
      "size": 8
     }
    ]
@@ -11481,14 +14551,29 @@
      "size": 4
     },
     {
+     "name": "fn_801B41F0",
+     "addr": "801B41F0",
+     "size": 28
+    },
+    {
      "name": "fn_801B432C",
      "addr": "801B432C",
      "size": 8
     },
     {
+     "name": "fn_801B4C40",
+     "addr": "801B4C40",
+     "size": 44
+    },
+    {
      "name": "fn_801B5334",
      "addr": "801B5334",
      "size": 4
+    },
+    {
+     "name": "fn_801B62A4",
+     "addr": "801B62A4",
+     "size": 36
     },
     {
      "name": "fn_801B62C8",
@@ -11571,9 +14656,19 @@
      "size": 8
     },
     {
+     "name": "fn_801B7020",
+     "addr": "801B7020",
+     "size": 44
+    },
+    {
      "name": "EntityIsFrozen",
      "addr": "801B70E8",
      "size": 16
+    },
+    {
+     "name": "fn_801B70F8",
+     "addr": "801B70F8",
+     "size": 48
     },
     {
      "name": "fn_801B9C94",
@@ -11591,6 +14686,11 @@
      "size": 48
     },
     {
+     "name": "fn_801BA4A0",
+     "addr": "801BA4A0",
+     "size": 20
+    },
+    {
      "name": "fn_801BA9BC",
      "addr": "801BA9BC",
      "size": 8
@@ -11599,6 +14699,16 @@
      "name": "fn_801BB3CC",
      "addr": "801BB3CC",
      "size": 8
+    },
+    {
+     "name": "fn_801BBAC0",
+     "addr": "801BBAC0",
+     "size": 44
+    },
+    {
+     "name": "RequestSend",
+     "addr": "801BBAEC",
+     "size": 32
     },
     {
      "name": "fn_801BBE38",
@@ -11666,6 +14776,16 @@
      "size": 8
     },
     {
+     "name": "fn_801C3E7C",
+     "addr": "801C3E7C",
+     "size": 12
+    },
+    {
+     "name": "fn_801C3E88",
+     "addr": "801C3E88",
+     "size": 12
+    },
+    {
      "name": "fn_801C3E94",
      "addr": "801C3E94",
      "size": 16
@@ -11686,6 +14806,16 @@
    "path": "src/leaf/auto_03_801B313C_text_cb.cpp",
    "functions": [
     {
+     "name": "BroadcastToDstGroup",
+     "addr": "801B6D80",
+     "size": 48
+    },
+    {
+     "name": "EntityReachedWaypointCallback",
+     "addr": "801B8700",
+     "size": 36
+    },
+    {
      "name": "EntityWaypointTaskCompleteCallback",
      "addr": "801B8724",
      "size": 16
@@ -11699,6 +14829,11 @@
      "name": "fn_801C7614",
      "addr": "801C7614",
      "size": 40
+    },
+    {
+     "name": "fn_801C85E0",
+     "addr": "801C85E0",
+     "size": 16
     },
     {
      "name": "fn_801C911C",
@@ -11746,6 +14881,21 @@
      "size": 16
     },
     {
+     "name": "fn_801CB96C",
+     "addr": "801CB96C",
+     "size": 28
+    },
+    {
+     "name": "fn_801CBCDC",
+     "addr": "801CBCDC",
+     "size": 28
+    },
+    {
+     "name": "fn_801CBD10",
+     "addr": "801CBD10",
+     "size": 24
+    },
+    {
      "name": "fn_801CBD28",
      "addr": "801CBD28",
      "size": 8
@@ -11766,6 +14916,11 @@
      "size": 8
     },
     {
+     "name": "fn_801CC8AC",
+     "addr": "801CC8AC",
+     "size": 28
+    },
+    {
      "name": "fn_801CC8E0",
      "addr": "801CC8E0",
      "size": 4
@@ -11779,6 +14934,11 @@
      "name": "fn_801CC8EC",
      "addr": "801CC8EC",
      "size": 8
+    },
+    {
+     "name": "fn_801CC90C",
+     "addr": "801CC90C",
+     "size": 28
     },
     {
      "name": "fn_801CCDBC",
@@ -11829,6 +14989,11 @@
      "name": "fn_801CE2CC",
      "addr": "801CE2CC",
      "size": 8
+    },
+    {
+     "name": "fn_801CE2D4",
+     "addr": "801CE2D4",
+     "size": 40
     },
     {
      "name": "fn_801CE2FC",
@@ -11951,6 +15116,11 @@
      "size": 8
     },
     {
+     "name": "fn_801CE720",
+     "addr": "801CE720",
+     "size": 32
+    },
+    {
      "name": "fn_801CE740",
      "addr": "801CE740",
      "size": 36
@@ -11959,6 +15129,11 @@
      "name": "fn_801CE764",
      "addr": "801CE764",
      "size": 8
+    },
+    {
+     "name": "fn_801CE76C",
+     "addr": "801CE76C",
+     "size": 32
     },
     {
      "name": "fn_801CE78C",
@@ -12201,6 +15376,11 @@
      "size": 8
     },
     {
+     "name": "fn_801D659C",
+     "addr": "801D659C",
+     "size": 24
+    },
+    {
      "name": "fn_801D65B4",
      "addr": "801D65B4",
      "size": 12
@@ -12216,9 +15396,24 @@
    "path": "src/leaf/auto_03_801D5D0C_text_cb.cpp",
    "functions": [
     {
+     "name": "InitFader",
+     "addr": "801D663C",
+     "size": 16
+    },
+    {
      "name": "UpdateFader",
      "addr": "801D664C",
      "size": 4
+    },
+    {
+     "name": "FaderFinished",
+     "addr": "801D6650",
+     "size": 44
+    },
+    {
+     "name": "ReleaseFader",
+     "addr": "801D667C",
+     "size": 24
     }
    ]
   },
@@ -12234,6 +15429,11 @@
      "name": "fn_801D66BC",
      "addr": "801D66BC",
      "size": 8
+    },
+    {
+     "name": "fn_801D6780",
+     "addr": "801D6780",
+     "size": 16
     },
     {
      "name": "fn_801D6790",
@@ -12286,6 +15486,11 @@
      "size": 4
     },
     {
+     "name": "fn_801D949C",
+     "addr": "801D949C",
+     "size": 48
+    },
+    {
      "name": "fn_801D9648",
      "addr": "801D9648",
      "size": 4
@@ -12321,6 +15526,11 @@
      "size": 4
     },
     {
+     "name": "fn_801DB194",
+     "addr": "801DB194",
+     "size": 24
+    },
+    {
      "name": "fn_801DC574",
      "addr": "801DC574",
      "size": 8
@@ -12351,6 +15561,16 @@
      "size": 32
     },
     {
+     "name": "fn_801DFF3C",
+     "addr": "801DFF3C",
+     "size": 24
+    },
+    {
+     "name": "fn_801DFF54",
+     "addr": "801DFF54",
+     "size": 32
+    },
+    {
      "name": "fn_801E0318",
      "addr": "801E0318",
      "size": 8
@@ -12364,6 +15584,31 @@
      "name": "fn_801E0328",
      "addr": "801E0328",
      "size": 8
+    },
+    {
+     "name": "fn_801E2368",
+     "addr": "801E2368",
+     "size": 24
+    },
+    {
+     "name": "fn_801E239C",
+     "addr": "801E239C",
+     "size": 20
+    },
+    {
+     "name": "fn_801E23D8",
+     "addr": "801E23D8",
+     "size": 40
+    },
+    {
+     "name": "fn_801E2420",
+     "addr": "801E2420",
+     "size": 40
+    },
+    {
+     "name": "fn_801E2448",
+     "addr": "801E2448",
+     "size": 40
     }
    ]
   },
@@ -12374,6 +15619,86 @@
      "name": "Noop",
      "addr": "801DB490",
      "size": 4
+    },
+    {
+     "name": "PrintResult",
+     "addr": "801DB4BC",
+     "size": 4
+    },
+    {
+     "name": "PrintFResult",
+     "addr": "801DB4C0",
+     "size": 4
+    },
+    {
+     "name": "FrameFxStopAll",
+     "addr": "801DBDC4",
+     "size": 12
+    },
+    {
+     "name": "IsHost",
+     "addr": "801DBED0",
+     "size": 4
+    },
+    {
+     "name": "TestScriptCallback",
+     "addr": "801DC19C",
+     "size": 16
+    },
+    {
+     "name": "PlayGlobalSound",
+     "addr": "801DC1AC",
+     "size": 16
+    },
+    {
+     "name": "PlayGlobalSoundWithEffect",
+     "addr": "801DC1BC",
+     "size": 20
+    },
+    {
+     "name": "PlayGlobalGroupSound_NoLoad",
+     "addr": "801DC224",
+     "size": 24
+    },
+    {
+     "name": "StopGlobalLoopingGroupSound",
+     "addr": "801DC298",
+     "size": 20
+    },
+    {
+     "name": "PlayGlobalGroupSoundWithEffect_NoLoad",
+     "addr": "801DC2AC",
+     "size": 28
+    },
+    {
+     "name": "PlayLoopingSoundFX",
+     "addr": "801DDDCC",
+     "size": 16
+    },
+    {
+     "name": "PrintPosition",
+     "addr": "801DDECC",
+     "size": 16
+    },
+    {
+     "name": "SetSpawnCount",
+     "addr": "801DDF20",
+     "size": 4
+    },
+    {
+     "name": "SetTimeout",
+     "addr": "801DDF24",
+     "size": 20
+    },
+    {
+     "name": "StopLoopingSoundFX",
+     "addr": "801DDF38",
+     "size": 16
+    },
+    {
+     "name": "StopLoopingSoundGroupFX",
+     "addr": "801DDF48",
+     "size": 16
     },
     {
      "name": "GetResultRegister",
@@ -12416,6 +15741,11 @@
    "path": "src/leaf/auto_03_801E47D8_text.cpp",
    "functions": [
     {
+     "name": "fn_801E4B00",
+     "addr": "801E4B00",
+     "size": 44
+    },
+    {
      "name": "fn_801E5478",
      "addr": "801E5478",
      "size": 8
@@ -12430,6 +15760,11 @@
   {
    "path": "src/leaf/auto_03_801E54A4_text.cpp",
    "functions": [
+    {
+     "name": "fn_801E6570",
+     "addr": "801E6570",
+     "size": 48
+    },
     {
      "name": "fn_801E65A0",
      "addr": "801E65A0",
@@ -12451,14 +15786,54 @@
      "size": 4
     },
     {
+     "name": "InterpolateVector3Task_Update_SLERP",
+     "addr": "801EA320",
+     "size": 48
+    },
+    {
      "name": "InterpolateQuaternionTask_DefaultSetQuaternionCallback",
      "addr": "801EA598",
      "size": 4
     },
     {
+     "name": "InterpolateQuaternionTask_Update_LERP",
+     "addr": "801EA7C8",
+     "size": 48
+    },
+    {
+     "name": "InterpolateToNextWaypointTask_DefaultReachedWaypointCallback",
+     "addr": "801EB310",
+     "size": 32
+    },
+    {
      "name": "fn_801EBD1C",
      "addr": "801EBD1C",
      "size": 16
+    },
+    {
+     "name": "fn_801ED2FC",
+     "addr": "801ED2FC",
+     "size": 24
+    },
+    {
+     "name": "fn_801ED538",
+     "addr": "801ED538",
+     "size": 28
+    },
+    {
+     "name": "fn_801EE134",
+     "addr": "801EE134",
+     "size": 4
+    },
+    {
+     "name": "fn_801EE138",
+     "addr": "801EE138",
+     "size": 4
+    },
+    {
+     "name": "fn_801EE13C",
+     "addr": "801EE13C",
+     "size": 4
     },
     {
      "name": "fn_801EE144",
@@ -12481,6 +15856,11 @@
      "size": 8
     },
     {
+     "name": "fn_801EFA18",
+     "addr": "801EFA18",
+     "size": 12
+    },
+    {
      "name": "fn_801EFB44",
      "addr": "801EFB44",
      "size": 4
@@ -12499,6 +15879,11 @@
      "name": "fn_801EFC74",
      "addr": "801EFC74",
      "size": 8
+    },
+    {
+     "name": "StringTableInit",
+     "addr": "801EFC7C",
+     "size": 32
     },
     {
      "name": "fn_801F004C",
@@ -12556,6 +15941,11 @@
      "size": 8
     },
     {
+     "name": "fn_801F38F8",
+     "addr": "801F38F8",
+     "size": 32
+    },
+    {
      "name": "fn_801F43A8",
      "addr": "801F43A8",
      "size": 8
@@ -12571,6 +15961,11 @@
      "size": 4
     },
     {
+     "name": "fn_801F5248",
+     "addr": "801F5248",
+     "size": 20
+    },
+    {
      "name": "fn_801F525C",
      "addr": "801F525C",
      "size": 20
@@ -12579,6 +15974,11 @@
      "name": "fn_801F5270",
      "addr": "801F5270",
      "size": 36
+    },
+    {
+     "name": "ScopedLockCtor",
+     "addr": "801F5384",
+     "size": 44
     },
     {
      "name": "fn_801F5408",
@@ -12639,6 +16039,11 @@
      "name": "fn_801F5814",
      "addr": "801F5814",
      "size": 8
+    },
+    {
+     "name": "fn_801F581C",
+     "addr": "801F581C",
+     "size": 20
     }
    ]
   },
@@ -12664,6 +16069,11 @@
      "name": "fn_801F59A4",
      "addr": "801F59A4",
      "size": 12
+    },
+    {
+     "name": "fn_801F59F0",
+     "addr": "801F59F0",
+     "size": 36
     },
     {
      "name": "fn_801F5B30",
@@ -12736,6 +16146,11 @@
      "size": 24
     },
     {
+     "name": "fn_801FF908",
+     "addr": "801FF908",
+     "size": 8
+    },
+    {
      "name": "fn_801FFC48",
      "addr": "801FFC48",
      "size": 8
@@ -12771,9 +16186,24 @@
      "size": 36
     },
     {
+     "name": "fn_802041F4",
+     "addr": "802041F4",
+     "size": 28
+    },
+    {
      "name": "fn_8020441C",
      "addr": "8020441C",
      "size": 20
+    },
+    {
+     "name": "fn_80204470",
+     "addr": "80204470",
+     "size": 4
+    },
+    {
+     "name": "fn_80204474",
+     "addr": "80204474",
+     "size": 4
     },
     {
      "name": "fn_802044B4",
@@ -12851,6 +16281,11 @@
      "size": 4
     },
     {
+     "name": "fn_80208CA8",
+     "addr": "80208CA8",
+     "size": 40
+    },
+    {
      "name": "fn_80208CD0",
      "addr": "80208CD0",
      "size": 4
@@ -12876,9 +16311,64 @@
      "size": 8
     },
     {
+     "name": "fn_80208CF0",
+     "addr": "80208CF0",
+     "size": 16
+    },
+    {
+     "name": "fn_802097E4",
+     "addr": "802097E4",
+     "size": 44
+    },
+    {
      "name": "fn_80209810",
      "addr": "80209810",
      "size": 4
+    },
+    {
+     "name": "fn_8020A680",
+     "addr": "8020A680",
+     "size": 12
+    },
+    {
+     "name": "fn_8020B05C",
+     "addr": "8020B05C",
+     "size": 12
+    },
+    {
+     "name": "fn_8020B068",
+     "addr": "8020B068",
+     "size": 16
+    },
+    {
+     "name": "fn_8020B154",
+     "addr": "8020B154",
+     "size": 12
+    },
+    {
+     "name": "fn_8020B1C8",
+     "addr": "8020B1C8",
+     "size": 12
+    },
+    {
+     "name": "fn_8020B1D4",
+     "addr": "8020B1D4",
+     "size": 12
+    }
+   ]
+  },
+  {
+   "path": "src/leaf/auto_03_80208CE8_text_cb.cpp",
+   "functions": [
+    {
+     "name": "PauseSFX",
+     "addr": "8020A69C",
+     "size": 20
+    },
+    {
+     "name": "SuspendSFX",
+     "addr": "8020A6B0",
+     "size": 24
     }
    ]
   },
@@ -12918,6 +16408,11 @@
     {
      "name": "fn_8020F228",
      "addr": "8020F228",
+     "size": 20
+    },
+    {
+     "name": "fn_8020F290",
+     "addr": "8020F290",
      "size": 20
     },
     {
@@ -12981,6 +16476,11 @@
      "size": 4
     },
     {
+     "name": "fn_8020F530",
+     "addr": "8020F530",
+     "size": 36
+    },
+    {
      "name": "fn_8020F554",
      "addr": "8020F554",
      "size": 12
@@ -12995,6 +16495,11 @@
   {
    "path": "src/leaf/auto_03_8020F8E0_text.cpp",
    "functions": [
+    {
+     "name": "fn_80212E10",
+     "addr": "80212E10",
+     "size": 24
+    },
     {
      "name": "fn_80213130",
      "addr": "80213130",
@@ -13161,6 +16666,26 @@
      "size": 48
     },
     {
+     "name": "fn_8021FA80",
+     "addr": "8021FA80",
+     "size": 40
+    },
+    {
+     "name": "fn_8021FAA8",
+     "addr": "8021FAA8",
+     "size": 44
+    },
+    {
+     "name": "fn_8021FAD4",
+     "addr": "8021FAD4",
+     "size": 40
+    },
+    {
+     "name": "fn_8021FAFC",
+     "addr": "8021FAFC",
+     "size": 44
+    },
+    {
      "name": "fn_8021FB28",
      "addr": "8021FB28",
      "size": 8
@@ -13206,6 +16731,11 @@
      "size": 16
     },
     {
+     "name": "fn_80220974",
+     "addr": "80220974",
+     "size": 36
+    },
+    {
      "name": "fn_802209D0",
      "addr": "802209D0",
      "size": 8
@@ -13239,6 +16769,11 @@
      "name": "fn_80220A34",
      "addr": "80220A34",
      "size": 24
+    },
+    {
+     "name": "fn_8022123C",
+     "addr": "8022123C",
+     "size": 4
     },
     {
      "name": "fn_80222994",
@@ -13321,6 +16856,11 @@
      "size": 16
     },
     {
+     "name": "fn_802280B0",
+     "addr": "802280B0",
+     "size": 32
+    },
+    {
      "name": "fn_802285FC",
      "addr": "802285FC",
      "size": 8
@@ -13376,6 +16916,11 @@
      "size": 8
     },
     {
+     "name": "fn_8022CD34",
+     "addr": "8022CD34",
+     "size": 32
+    },
+    {
      "name": "fn_8022D93C",
      "addr": "8022D93C",
      "size": 16
@@ -13394,6 +16939,11 @@
      "name": "SaveGetCurrentMonster",
      "addr": "8022E170",
      "size": 8
+    },
+    {
+     "name": "fn_8022E330",
+     "addr": "8022E330",
+     "size": 36
     },
     {
      "name": "fn_8022E3DC",
@@ -13458,6 +17008,16 @@
    ]
   },
   {
+   "path": "src/leaf/auto_fn_80142E90_text.cpp",
+   "functions": [
+    {
+     "name": "fn_80142E90",
+     "addr": "80142E90",
+     "size": 4
+    }
+   ]
+  },
+  {
    "path": "src/leaf/auto_fn_801604F8_text.cpp",
    "functions": [
     {
@@ -13474,6 +17034,36 @@
      "name": "fn_80160BD0",
      "addr": "80160BD0",
      "size": 4
+    }
+   ]
+  },
+  {
+   "path": "src/leaf/auto_fn_80162D20_text.cpp",
+   "functions": [
+    {
+     "name": "fn_80162D20",
+     "addr": "80162D20",
+     "size": 44
+    }
+   ]
+  },
+  {
+   "path": "src/leaf/auto_fn_8016E2FC_text.cpp",
+   "functions": [
+    {
+     "name": "fn_8016E2FC",
+     "addr": "8016E2FC",
+     "size": 8
+    }
+   ]
+  },
+  {
+   "path": "src/leaf/auto_fn_8018E0C0_text.cpp",
+   "functions": [
+    {
+     "name": "fn_8018E0C0",
+     "addr": "8018E0C0",
+     "size": 12
     }
    ]
   },
@@ -13534,6 +17124,16 @@
      "name": "fn_801E47BC",
      "addr": "801E47BC",
      "size": 28
+    }
+   ]
+  },
+  {
+   "path": "src/leaf/auto_fn_80208CDC_text.cpp",
+   "functions": [
+    {
+     "name": "fn_80208CDC",
+     "addr": "80208CDC",
+     "size": 12
     }
    ]
   },

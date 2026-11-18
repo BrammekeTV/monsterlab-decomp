@@ -6,6 +6,7 @@
 #include "types.h"
 
 extern u8 lbl_805FC8C8[];
+extern u8 lbl_805FC8D4[];
 
 // 0x800204BC
 extern "C" void fn_800204BC(u8* a3) {
@@ -83,4 +84,32 @@ extern "C" void fn_80021390(u8* a3) {
     *(f32*)(((u8*)(uintptr_t)(a3)) + 4) = (f32)(t0);
     *(f32*)(((u8*)(uintptr_t)(a3)) + 0) = (f32)(t0);
     *(f32*)(((u8*)(uintptr_t)(a3)) + 80) = (f32)(t0);
+}
+
+// 0x8002146C
+extern "C" f32 fn_8002146C(u8* a3) {
+    f32 t0 = *(f32*)((u8*)lbl_805FC8C8);
+    f32 t1 = *(f32*)(((u8*)(uintptr_t)(a3)) + 88);
+    if (t0 == t1) {
+        return (f32)(t0);
+    }
+    f32 t2 = *(f32*)((u8*)lbl_805FC8D4);
+    f32 t3 = *(f32*)(((u8*)(uintptr_t)(a3)) + 92);
+    f32 t4 = (f32)(t2 * t3);
+    f32 t5 = (f32)(t4 / t1);
+    return (f32)(t5);
+}
+
+// 0x80021490
+extern "C" f32 fn_80021490(u8* a3) {
+    f32 t0 = *(f32*)((u8*)lbl_805FC8C8);
+    f32 t1 = *(f32*)(((u8*)(uintptr_t)(a3)) + 88);
+    if (t0 == t1) {
+        return (f32)(t0);
+    }
+    f32 t2 = *(f32*)((u8*)lbl_805FC8D4);
+    f32 t3 = *(f32*)(((u8*)(uintptr_t)(a3)) + 92);
+    f32 t4 = (f32)(t2 * t3);
+    f32 t5 = (f32)(t4 / t1);
+    return (f32)(t5);
 }

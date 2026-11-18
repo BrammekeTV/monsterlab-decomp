@@ -5,6 +5,25 @@
 
 #include "types.h"
 
+extern "C" void fn_80022390(void);
+extern "C" void fn_800223D8(void);
+extern "C" void fn_800223DC(u8*);
+
+// 0x80034388
+extern "C" void fn_80034388(void) {
+    fn_80022390();
+}
+
+// 0x8003438C
+extern "C" void fn_8003438C(u8* a3) {
+    fn_800223DC(((u8*)(uintptr_t)(a3)));
+}
+
+// 0x800344B0
+extern "C" void fn_800344B0(void) {
+    fn_800223D8();
+}
+
 // 0x800359F4
 extern "C" void fn_800359F4(u8* a3, f32 f1, f32 f2, f32 f3) {
     *(f32*)(((u8*)(uintptr_t)(a3)) + 0) = (f32)(f1);

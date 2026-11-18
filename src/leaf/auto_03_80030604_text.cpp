@@ -5,6 +5,24 @@
 
 #include "types.h"
 
+extern u8 lbl_805FCCCC[];
+extern "C" void fn_80030554(u8*, f32);
+
+// 0x8003074C
+extern "C" void fn_8003074C(u8* a3, f32 f1) {
+    fn_80030554(((u8*)(uintptr_t)(a3)), (f32)(f1));
+}
+
+// 0x8003089C
+extern "C" void fn_8003089C(u8* a3, f32 f1) {
+    fn_80030554(((u8*)(uintptr_t)(a3)), (f32)(f1));
+}
+
+// 0x800309EC
+extern "C" void fn_800309EC(u8* a3, f32 f1) {
+    fn_80030554(((u8*)(uintptr_t)(a3)), (f32)(f1));
+}
+
 // 0x80030A98
 extern "C" void CatchObject_Release(u8* a3, s32 a4) {
     *(u32*)(((u8*)(uintptr_t)(a3)) + 56) = (u32)((u32)(uintptr_t)(a4));
@@ -13,4 +31,15 @@ extern "C" void CatchObject_Release(u8* a3, s32 a4) {
 // 0x80030AA0
 extern "C" s32 fn_80030AA0(void) {
     return (s32)(0);
+}
+
+// 0x80030B48
+extern "C" void fn_80030B48(u8* a3, f32 f1) {
+    f32 t0 = *(f32*)(((u8*)(uintptr_t)(a3)) + 52);
+    *(u32*)(((u8*)(uintptr_t)(a3)) + 36) = (u32)((u32)(0));
+    u8* t1 = *(u8**)(((u8*)(uintptr_t)(a3)) + 4);
+    f32 t2 = *(f32*)((u8*)lbl_805FCCCC);
+    *(f32*)(t1 + 112) = (f32)(t0);
+    *(f32*)(((u8*)(uintptr_t)(a3)) + 24) = (f32)(t2);
+    fn_80030554(((u8*)(uintptr_t)(a3)), (f32)(f1));
 }

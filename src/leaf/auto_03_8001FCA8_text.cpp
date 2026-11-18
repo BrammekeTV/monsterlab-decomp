@@ -40,6 +40,21 @@ extern "C" void fn_800202FC(u8* a3) {
     *(u32*)(((u8*)(uintptr_t)(a3)) + 76) = (u32)((u32)(uintptr_t)((u8*)lbl_80355658));
 }
 
+// 0x8002030C
+extern "C" f32 fn_8002030C(u8* a3, f32 f1) {
+    f32 t0 = *(f32*)(((u8*)(uintptr_t)(a3)) + 64);
+    if (!(f1 < t0)) {
+        f32 t1 = *(f32*)(((u8*)(uintptr_t)(a3)) + 68);
+        if (!(f1 > t1)) {
+            return (f32)(f1);
+        }
+        f32 t2 = *(f32*)((u8*)lbl_805FC8BC);
+        return (f32)(t2);
+    }
+    f32 t3 = *(f32*)((u8*)lbl_805FC8BC);
+    return (f32)(t3);
+}
+
 // 0x80020458
 extern "C" f32 fn_80020458(void) {
     f32 t0 = *(f32*)((u8*)lbl_805FC8BC);

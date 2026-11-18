@@ -6,8 +6,21 @@
 #include "types.h"
 
 extern u8 lbl_803F2210[];
+extern "C" void UIGroup_DisableHitTest(u32);
+extern "C" void UIGroup_EnableHitTest(u32);
 
 // 0x8013E774
 extern "C" u8* fn_8013E774(void) {
     return (u8*)((u8*)lbl_803F2210);
+}
+
+// 0x8013EADC
+extern "C" void fn_8013EADC(s32 a3) {
+    if ((u32)(uintptr_t)(a3) != 0x1u) {
+        u32 t0 = (u32)(0xa390000) - 6723u;
+        UIGroup_DisableHitTest((u32)((u32)(t0)));
+        return;
+    }
+    u32 t1 = (u32)(0xa390000) - 6723u;
+    UIGroup_EnableHitTest((u32)((u32)(t1)));
 }

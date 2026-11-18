@@ -5,18 +5,103 @@
 
 #include "types.h"
 
+extern u8 gScriptFuncs[];
+extern u8 lbl_804DD0C8[];
+extern u8 lbl_804DD0D4[];
+extern u8 lbl_804DD100[];
+extern u8 lbl_805FB6B8[];
+extern "C" void BufferFree(void*);
+extern "C" void InterpolateQuaternionTask_Update_SLERP(void);
+extern "C" void InterpolateVector3Task_Update_LERP(void);
+extern "C" void* MemAllocDefault(u32);
+extern "C" void TriggerDoAction(void*, s32);
+extern "C" void fn_801EE2C4(u8*);
+
 // 0x801E9E4C
 extern "C" void InterpolateVector3Task_DefaultSetVector3Callback(void) {
+}
+
+// 0x801EA320
+extern "C" void InterpolateVector3Task_Update_SLERP(u8* a3) {
+    // tail-call arguments inferred from the registers set before the call
+    *(u32*)(((u8*)(uintptr_t)(a3)) + 52) = (u32)((u32)(1));
+    s32 t0 = *(s32*)((u8*)lbl_804DD0C8 + 4);
+    u32 t1 = (u32)((s32)(u32)(t0) * 12);
+    u32 t2 = (u32)(uintptr_t)((u8*)gScriptFuncs) + (u32)(t1);
+    s32 t3 = *(s32*)((u8*)(uintptr_t)(t2) + 4);
+    *(u32*)(((u8*)(uintptr_t)(a3)) + 108) = (u32)((u32)(t3));
+    InterpolateVector3Task_Update_LERP();
 }
 
 // 0x801EA598
 extern "C" void InterpolateQuaternionTask_DefaultSetQuaternionCallback(void) {
 }
 
+// 0x801EA7C8
+extern "C" void InterpolateQuaternionTask_Update_LERP(u8* a3) {
+    // tail-call arguments inferred from the registers set before the call
+    *(u32*)(((u8*)(uintptr_t)(a3)) + 68) = (u32)((u32)(2));
+    s32 t0 = *(s32*)((u8*)lbl_804DD0D4 + 8);
+    u32 t1 = (u32)((s32)(u32)(t0) * 12);
+    u32 t2 = (u32)(uintptr_t)((u8*)gScriptFuncs) + (u32)(t1);
+    s32 t3 = *(s32*)((u8*)(uintptr_t)(t2) + 4);
+    *(u32*)(((u8*)(uintptr_t)(a3)) + 108) = (u32)((u32)(t3));
+    InterpolateQuaternionTask_Update_SLERP();
+}
+
+// 0x801EB310
+extern "C" void InterpolateToNextWaypointTask_DefaultReachedWaypointCallback(u8* a3) {
+    s32 t0 = *(s32*)(((u8*)(uintptr_t)(a3)) + 64);
+    u32 t1 = (((u32)(t0) << 5) | ((u32)(t0) >> 27)) & 0xfu;
+    if (t1 == 0) {
+        return;
+    }
+    u8* t2 = ((u8*)(uintptr_t)(a3)) + 64;
+    TriggerDoAction((void*)(t2), (s32)((u32)(0)));
+}
+
 // 0x801EBD1C
 extern "C" void fn_801EBD1C(u8* a3, s32 a4) {
     *(u32*)(((u8*)(uintptr_t)(a3)) + 4) = (u32)((u32)(uintptr_t)(a4));
     *(u32*)(((u8*)(uintptr_t)(a3)) + 0) = (u32)((u32)(0));
+}
+
+// 0x801ED2FC
+extern "C" u32 fn_801ED2FC(u8* a3) {
+    u8 t0 = *(u8*)(((u8*)(uintptr_t)(a3)) + 0);
+    u32 t1 = (((u32)(t0) << 28) | ((u32)(t0) >> 4)) & 0x8u;
+    if (t1 != 0) {
+        return (u32)(1);
+    }
+    u32 t2 = (u32)(t0) & 0xfu;
+    return (u32)(t2);
+}
+
+// 0x801ED538
+extern "C" s32 fn_801ED538(u8* a3) {
+    u8 t0 = *(u8*)(((u8*)(uintptr_t)(a3)) + 0);
+    s32 t1 = *(s32*)((u8*)lbl_805FB6B8);
+    u32 t2 = (((u32)(t0) << 28) | ((u32)(t0) >> 4)) & 0x8u;
+    if (t2 == 0) {
+        return (s32)(t1);
+    }
+    s32 t3 = *(s32*)(((u8*)(uintptr_t)(a3)) + 0);
+    return (s32)(t3);
+}
+
+// 0x801EE134
+extern "C" void* fn_801EE134(s32 a3) {
+    return (void*)(MemAllocDefault((u32)((u32)(uintptr_t)(a3))));
+}
+
+// 0x801EE138
+extern "C" void fn_801EE138(u8* a3) {
+    BufferFree((void*)(((u8*)(uintptr_t)(a3))));
+}
+
+// 0x801EE13C
+extern "C" void* fn_801EE13C(s32 a3) {
+    return (void*)(MemAllocDefault((u32)((u32)(uintptr_t)(a3))));
 }
 
 // 0x801EE144
@@ -44,6 +129,12 @@ extern "C" s32 fn_801EE4FC(u8* a3) {
 extern "C" s32 fn_801EE504(u8* a3) {
     s32 t0 = *(s32*)(((u8*)(uintptr_t)(a3)) + 8);
     return (s32)(t0);
+}
+
+// 0x801EFA18
+extern "C" void fn_801EFA18(void) {
+    // tail-call arguments inferred from the registers set before the call
+    fn_801EE2C4((u8*)lbl_804DD100);
 }
 
 // 0x801EFB44

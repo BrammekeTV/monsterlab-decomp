@@ -15,12 +15,35 @@ extern u8 lbl_805FB428[];
 extern u8 lbl_805FB42C[];
 extern u8 lbl_805FB434[];
 extern u8 lbl_805FB438[];
+extern u8 lbl_805FB964[];
 extern u8 lbl_805FBA30[];
 extern u8 lbl_805FEFF0[];
+extern "C" void* EventPost(s32, s32);
+extern "C" BOOL fn_801F56FC(s32);
+extern "C" void fn_801F5714(s32);
+extern "C" void fn_801F5724(u32);
+extern "C" void fn_801F5814(s32);
 
 // 0x8013FC10
 void InitRematchFlow(void) {
     *(u32*)((u8*)lbl_805FB418) = (u32)((u32)(0));
+}
+
+// 0x8013FDEC
+void SendRematchAccepted(void) {
+    EventPost((s32)((u32)(71)), (s32)((u32)(0)));
+}
+
+// 0x80140328
+void PauseSoundEffects(BOOL a3) {
+    if (a3 != 0) {
+        if ((u32)(uintptr_t)(a3) != 0x1u) {
+            return;
+        }
+        PauseSFX((u32)((u32)(1)));
+        return;
+    }
+    PauseSFX((u32)((u32)(0)));
 }
 
 // 0x801403A0
@@ -36,6 +59,22 @@ void ReturnHomeButton(void) {
     *(u32*)((u8*)lbl_805FBA30) = (u32)((u32)(t0));
 }
 
+// 0x801403C0
+void SendMonsterChangeCancel(void) {
+    EventPost((s32)((u32)(73)), (s32)((u32)(0)));
+}
+
+// 0x801403FC
+void CancelConnect(void) {
+    fn_801F5724((u32)((u32)(2)));
+}
+
+// 0x80140498
+void ClearNetworkStall(void) {
+    // tail-call arguments inferred from the registers set before the call
+    fn_801F5714((s32)((u32)(0x10000)));
+}
+
 // 0x80140828
 void SetErrorType(BOOL a3) {
     *(u32*)((u8*)lbl_805FB420) = (u32)((u32)(uintptr_t)(a3));
@@ -47,6 +86,15 @@ BOOL GetErrorType(void) {
     return (BOOL)(t0);
 }
 
+// 0x801409D4
+BOOL SelectingMonster(void) {
+    s32 t0 = *(s32*)((u8*)lbl_805F90D8);
+    u32 t1 = (u32)(0x13e20000) + 3129u;
+    u32 t2 = (u32)(t0) - (u32)(t1);
+    u32 t3 = (u32)(t2 == 0);
+    return (BOOL)(t3);
+}
+
 // 0x801409F0
 void ScreenIsOpen(void) {
     *(u8*)((u8*)lbl_805FB41C) = (u8)((u32)(1));
@@ -55,6 +103,64 @@ void ScreenIsOpen(void) {
 // 0x80140A04
 void SetHomeButtonGone(void) {
     *(u8*)((u8*)lbl_805FB41D) = (u8)((u32)(1));
+}
+
+// 0x80140A54
+BOOL IsOpponentPreparing(void) {
+    s32 t0 = *(s32*)((u8*)lbl_805FB418);
+    u32 t1 = (u32)(t0) & 0x8u;
+    if (t1 == 0) {
+        return (BOOL)(1);
+    }
+    return (BOOL)(0);
+}
+
+// 0x80140AE4
+BOOL BattleRequestNoMonsters(void) {
+    return (BOOL)(fn_801F56FC((s32)((u32)(1024))));
+}
+
+// 0x80140AEC
+void ClearNoMonstersFlag(void) {
+    // tail-call arguments inferred from the registers set before the call
+    fn_801F5714((s32)((u32)(1024)));
+}
+
+// 0x80140AF4
+BOOL BattleRequestOk(void) {
+    return (BOOL)(fn_801F56FC((s32)((u32)(2048))));
+}
+
+// 0x80140AFC
+void ClearBattleRequest(void) {
+    // tail-call arguments inferred from the registers set before the call
+    fn_801F5714((s32)((u32)(2048)));
+}
+
+// 0x80140B04
+BOOL OpponentCancelled(void) {
+    return (BOOL)(fn_801F56FC((s32)((u32)(4096))));
+}
+
+// 0x80140B0C
+BOOL MatchupTimerIsUp(void) {
+    return (BOOL)(fn_801F56FC((s32)((u32)(8192))));
+}
+
+// 0x80140B14
+BOOL OpponentMatchupTimerIsUp(void) {
+    return (BOOL)(fn_801F56FC((s32)((u32)(16384))));
+}
+
+// 0x80140B1C
+BOOL OpponentReadyForBattle(void) {
+    u32 t0 = (u32)(0x10000) - 32768u;
+    return (BOOL)(fn_801F56FC((s32)((u32)(t0))));
+}
+
+// 0x80140B28
+void SetClosingConnection(void) {
+    fn_801F5814((s32)((u32)(1)));
 }
 
 // 0x80140B3C
@@ -73,6 +179,16 @@ void SetMPSection(u32 a3) {
     *(u32*)((u8*)lbl_805F90D8) = (u32)((u32)(uintptr_t)(a3));
 }
 
+// 0x80140B60
+BOOL DidOpponentCancelDuringPreparing(void) {
+    s32 t0 = *(s32*)((u8*)lbl_805FB418);
+    u32 t1 = (u32)(t0) & 0x10u;
+    if (t1 == 0) {
+        return (BOOL)(0);
+    }
+    return (BOOL)(1);
+}
+
 // 0x80140CC4
 void SetResponse(u32 a3) {
     *(u32*)((u8*)lbl_805FB438) = (u32)((u32)(uintptr_t)(a3));
@@ -85,6 +201,19 @@ BOOL GotResponse(void) {
     u32 t2 = (u32)(t1) | (u32)(t0);
     u32 t3 = (((u32)(t2) << 1) | ((u32)(t2) >> 31)) & 0x1u;
     return (BOOL)(t3);
+}
+
+// 0x8014205C
+BOOL IsNetThreadRunning(void) {
+    u8* t0 = *(u8**)((u8*)lbl_805FB964);
+    if (t0 == 0) {
+        return (BOOL)(1);
+    }
+    u8 t1 = *(u8*)(t0 + 176);
+    if (t1 == 0) {
+        return (BOOL)(1);
+    }
+    return (BOOL)(0);
 }
 
 // 0x801420BC

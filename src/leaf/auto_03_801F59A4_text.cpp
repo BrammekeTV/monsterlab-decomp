@@ -10,6 +10,17 @@ extern "C" void fn_801F59A4(u8* a3) {
     *(u32*)(((u8*)(uintptr_t)(a3)) + 0) = (u32)((u32)(-1));
 }
 
+// 0x801F59F0
+extern "C" u8* fn_801F59F0(u8* a3) {
+    u8* t0 = ((u8*)(uintptr_t)(a3)) + 24;
+    s32 t1 = *(s32*)(((u8*)(uintptr_t)(a3)) + 16);
+    u32 t2 = (u32)(uintptr_t)(t0) - (u32)(uintptr_t)(a3);
+    if ((u32)(t2) < (u32)(t1)) {
+        return (u8*)(t0);
+    }
+    return (u8*)(uintptr_t)(0);
+}
+
 // 0x801F5B30
 extern "C" void fn_801F5B30(u8* a3) {
     *(u32*)(((u8*)(uintptr_t)(a3)) + 16) = (u32)((u32)(24));

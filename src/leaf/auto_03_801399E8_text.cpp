@@ -6,11 +6,33 @@
 #include "types.h"
 
 extern u8 lbl_803F0CF0[];
+extern u8 lbl_805FB340[];
 extern u8 lbl_805FB348[];
 extern u8 lbl_805FB34C[];
+extern "C" void UIGroup_DisableHitTest(u32);
+extern "C" void UIGroup_EnableHitTest(u32);
 
 // 0x801399E8
 extern "C" void fn_801399E8(void) {
+}
+
+// 0x80139FD0
+extern "C" void fn_80139FD0(s32 a3) {
+    if ((u32)(uintptr_t)(a3) != 0x1u) {
+        u32 t0 = (u32)(0x911a0000) - 28939u;
+        UIGroup_DisableHitTest((u32)((u32)(t0)));
+        return;
+    }
+    u32 t1 = (u32)(0x911a0000) - 28939u;
+    UIGroup_EnableHitTest((u32)((u32)(t1)));
+}
+
+// 0x80139FF0
+extern "C" u32 fn_80139FF0(void) {
+    u8 t0 = *(u8*)((u8*)lbl_805FB340);
+    u32 t1 = (u32)(t0) - 1u;
+    u32 t2 = (u32)(t1 == 0);
+    return (u32)(t2);
 }
 
 // 0x8013A004

@@ -16,6 +16,18 @@ extern "C" void fn_8008B9EC(u8* a3) {
     *(u32*)(((u8*)(uintptr_t)(a3)) + 1228) = (u32)((u32)(0));
 }
 
+// 0x8008BEE8
+extern "C" s32 fn_8008BEE8(u8* a3) {
+    s32 t0 = *(s32*)(((u8*)(uintptr_t)(a3)) + 860);
+    if ((s32)(u32)(t0) == 50) {
+        return (s32)(1);
+    }
+    if ((s32)(u32)(t0) == 50) {
+        return (s32)(1);
+    }
+    return (s32)(0);
+}
+
 // 0x8008C104
 extern "C" void fn_8008C104(u8* a3, u8* a4) {
     f32 t0 = *(f32*)(((u8*)(uintptr_t)(a4)) + 620);

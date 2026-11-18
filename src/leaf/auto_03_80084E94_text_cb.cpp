@@ -6,6 +6,23 @@
 #include "types.h"
 #include "game/script_callbacks.h"
 
+extern u8 lbl_805FD8C8[];
+
+// 0x80086170
+void BrainPowerUpSetActive(u32 a3, u32 a4) {
+    u32 t0 = 0u - (u32)(uintptr_t)(a4);
+    u8 t1 = *(u8*)(((u8*)(uintptr_t)(a3)) + 624);
+    u32 t2 = (u32)(t0) | (u32)(uintptr_t)(a4);
+    u32 t3 = (((u32)(t2) << 1) | ((u32)(t2) >> 31)) & 0x1u;
+    if ((u32)(t3) == (u32)(t1)) {
+        f32 t4 = *(f32*)((u8*)lbl_805FD8C8);
+        *(f32*)(((u8*)(uintptr_t)(a3)) + 616) = (f32)(t4);
+        return;
+    }
+    f32 t5 = *(f32*)(((u8*)(uintptr_t)(a3)) + 620);
+    *(f32*)(((u8*)(uintptr_t)(a3)) + 616) = (f32)(t5);
+}
+
 // 0x80086758
 s32 BrainPowerUpGetNextPowerUpType(u32 a3) {
     s32 t0 = *(s32*)(((u8*)(uintptr_t)(a3)) + 644);

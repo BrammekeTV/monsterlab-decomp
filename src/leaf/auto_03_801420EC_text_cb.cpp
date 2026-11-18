@@ -7,6 +7,14 @@
 #include "game/script_callbacks.h"
 
 extern u8 lbl_805FB44C[];
+extern u8 lbl_805FB454[];
+extern "C" void fn_801F5724(u32);
+
+// 0x8014241C
+void SpecialAlertBoxGone(void) {
+    *(u8*)((u8*)lbl_805FB454) = (u8)((u32)(1));
+    fn_801F5724((u32)((u32)(320)));
+}
 
 // 0x80142490
 u32 IsShowingError(void) {

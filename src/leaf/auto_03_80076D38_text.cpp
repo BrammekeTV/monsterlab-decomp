@@ -5,6 +5,15 @@
 
 #include "types.h"
 
+extern "C" void fn_8021F338(u8*);
+
+// 0x80077210
+extern "C" void fn_80077210(u8* a3) {
+    // tail-call arguments inferred from the registers set before the call
+    u8* t0 = ((u8*)(uintptr_t)(a3)) + 36;
+    fn_8021F338(t0);
+}
+
 // 0x8007739C
 extern "C" void fn_8007739C(u8* a3, s32 a4, s32 a5) {
     s32 t0 = *(s32*)(((u8*)(uintptr_t)(a3)) + 4832);

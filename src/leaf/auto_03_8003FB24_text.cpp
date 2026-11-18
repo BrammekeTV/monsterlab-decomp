@@ -17,3 +17,20 @@ extern "C" s32 fn_8003FF7C(u8* a3) {
     *(u8*)(t1 + 136) = (u8)((u32)(1));
     return (s32)(t4);
 }
+
+// 0x8003FFA4
+extern "C" u8 fn_8003FFA4(u8* a3, u8* a4) {
+    u8 t0 = *(u8*)(((u8*)(uintptr_t)(a3)) + 136);
+    if ((u32)(t0) != 0x1u) {
+        u8 t1 = *(u8*)(((u8*)(uintptr_t)(a3)) + 136);
+        return (u8)(t1);
+    }
+    s32 t2 = *(s32*)(((u8*)(uintptr_t)(a3)) + 140);
+    *(u32*)(((u8*)(uintptr_t)(a4)) + 0) = (u32)((u32)(t2));
+    u8 t3 = *(u8*)(((u8*)(uintptr_t)(a3)) + 144);
+    *(u8*)(((u8*)(uintptr_t)(a4)) + 4) = (u8)((u32)(t3));
+    s32 t4 = *(s32*)(((u8*)(uintptr_t)(a3)) + 148);
+    *(u32*)(((u8*)(uintptr_t)(a4)) + 8) = (u32)((u32)(t4));
+    u8 t5 = *(u8*)(((u8*)(uintptr_t)(a3)) + 136);
+    return (u8)(t5);
+}

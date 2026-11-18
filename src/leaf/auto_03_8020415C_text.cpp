@@ -5,11 +5,15 @@
 
 #include "types.h"
 
+extern u8 lbl_805FBB10[];
+extern u8 lbl_805FBB11[];
 extern u8 lbl_805FBB24[];
 extern u8 lbl_805FBB54[];
 extern u8 lbl_805FBB58[];
 extern u8 lbl_805FBB5C[];
 extern u8 lbl_806003F0[];
+extern "C" void BufferFree(void*);
+extern "C" void* MemAllocDefault(u32);
 
 // 0x8020415C
 extern "C" void fn_8020415C(u8* a3) {
@@ -35,11 +39,31 @@ extern "C" void fn_8020418C(u8* a3) {
     *(u32*)(((u8*)(uintptr_t)(a3)) + 272) = (u32)((u32)(0));
 }
 
+// 0x802041F4
+extern "C" void fn_802041F4(s32 a3) {
+    if ((s32)(u32)(uintptr_t)(a3) != -1) {
+        *(u8*)((u8*)lbl_805FBB10) = (u8)((u32)(0));
+        return;
+    }
+    *(u8*)((u8*)lbl_805FBB11) = (u8)((u32)(1));
+    *(u8*)((u8*)lbl_805FBB10) = (u8)((u32)(0));
+}
+
 // 0x8020441C
 extern "C" void fn_8020441C(u8* a3) {
     f32 t0 = *(f32*)((u8*)lbl_806003F0);
     *(u32*)(((u8*)(uintptr_t)(a3)) + 4) = (u32)((u32)(0));
     *(f32*)(((u8*)(uintptr_t)(a3)) + 0) = (f32)(t0);
+}
+
+// 0x80204470
+extern "C" void* fn_80204470(s32 a3) {
+    return (void*)(MemAllocDefault((u32)((u32)(uintptr_t)(a3))));
+}
+
+// 0x80204474
+extern "C" void fn_80204474(u8* a3) {
+    BufferFree((void*)(((u8*)(uintptr_t)(a3))));
 }
 
 // 0x802044B4
@@ -117,6 +141,19 @@ extern "C" u8 fn_80208C04(s32 a3, u8* a4, u8* a5) {
 
 // 0x80208CA4
 extern "C" void fn_80208CA4(void) {
+}
+
+// 0x80208CA8
+extern "C" s32 fn_80208CA8(u8* a3) {
+    u8 t0 = *(u8*)(((u8*)(uintptr_t)(a3)) + 8);
+    if (t0 == 0) {
+        return (s32)(1);
+    }
+    s32 t1 = *(s32*)(((u8*)(uintptr_t)(a3)) + 4);
+    if ((s32)(u32)(t1) != 6) {
+        return (s32)(0);
+    }
+    return (s32)(1);
 }
 
 // 0x80208CD0

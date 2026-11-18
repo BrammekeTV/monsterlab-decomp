@@ -5,6 +5,7 @@
 
 #include "types.h"
 
+extern u8 gScriptSigs[];
 extern u8 lbl_80384430[];
 extern u8 lbl_805FB868[];
 extern u8 lbl_805FB86C[];
@@ -14,6 +15,7 @@ extern u8 lbl_805FB878[];
 extern u8 lbl_805FB890[];
 extern u8 lbl_805FB894[];
 extern u8 lbl_805FB898[];
+extern "C" s32 fn_801EB94C(void);
 
 // 0x801D9028
 extern "C" void fn_801D9028(u8* a3) {
@@ -22,6 +24,25 @@ extern "C" void fn_801D9028(u8* a3) {
 
 // 0x801D9160
 extern "C" void fn_801D9160(void) {
+}
+
+// 0x801D949C
+extern "C" void fn_801D949C(u8* a3) {
+    s32 t0 = *(s32*)(((u8*)(uintptr_t)(a3)) + 8);
+    u32 t1 = (u32)(t0) & 0x10u;
+    if (t1 == 0) {
+        u32 t2 = (u32)(t0) & 0xffffffdfu;
+        *(u32*)(((u8*)(uintptr_t)(a3)) + 8) = (u32)((u32)(t2));
+        s32 t3 = *(s32*)(((u8*)(uintptr_t)(a3)) + 8);
+        u32 t4 = (u32)(t3) & 0xffffffefu;
+        *(u32*)(((u8*)(uintptr_t)(a3)) + 8) = (u32)((u32)(t4));
+        return;
+    }
+    u32 t5 = (u32)(t0) | 0x20u;
+    *(u32*)(((u8*)(uintptr_t)(a3)) + 8) = (u32)((u32)(t5));
+    s32 t6 = *(s32*)(((u8*)(uintptr_t)(a3)) + 8);
+    u32 t7 = (u32)(t6) & 0xffffffefu;
+    *(u32*)(((u8*)(uintptr_t)(a3)) + 8) = (u32)((u32)(t7));
 }
 
 // 0x801D9648
@@ -60,6 +81,16 @@ extern "C" s32 fn_801DA7C0(u8* a3) {
 extern "C" void fn_801DA8CC(void) {
 }
 
+// 0x801DB194
+extern "C" s32 fn_801DB194(u8* a3) {
+    // tail-call arguments inferred from the registers set before the call
+    s32 t0 = *(s32*)(((u8*)(uintptr_t)(a3)) + 4);
+    if (t0 == 0) {
+        return (s32)(0);
+    }
+    return (s32)(fn_801EB94C());
+}
+
 // 0x801DC574
 extern "C" void fn_801DC574(s32 a3) {
     *(u32*)((u8*)lbl_805FB86C) = (u32)((u32)(uintptr_t)(a3));
@@ -95,6 +126,28 @@ extern "C" void fn_801DFAC0(u8* a3, s32 a4, s32 a5) {
     *(u32*)(((u8*)(uintptr_t)(a3)) + 20) = (u32)((u32)(0));
 }
 
+// 0x801DFF3C
+extern "C" u32 fn_801DFF3C(s32 a3, s32 a4, s32 a5) {
+    if ((u32)(uintptr_t)(a4) >= 0x20u) {
+        return (u32)(uintptr_t)(a3);
+    }
+    u32 t0 = (((u32)(uintptr_t)(a4) << 2) | ((u32)(uintptr_t)(a4) >> 30)) & 0xfffffffcu;
+    u32 t1 = (u32)(uintptr_t)(a3) + (u32)(t0);
+    *(u32*)((u8*)(uintptr_t)(t1) + 4) = (u32)((u32)(uintptr_t)(a5));
+    return (u32)(t1);
+}
+
+// 0x801DFF54
+extern "C" s32 fn_801DFF54(s32 a3, s32 a4) {
+    if ((u32)(uintptr_t)(a4) >= 0x20u) {
+        return (s32)(0);
+    }
+    u32 t0 = (((u32)(uintptr_t)(a4) << 2) | ((u32)(uintptr_t)(a4) >> 30)) & 0xfffffffcu;
+    u32 t1 = (u32)(uintptr_t)(a3) + (u32)(t0);
+    s32 t2 = *(s32*)((u8*)(uintptr_t)(t1) + 4);
+    return (s32)(t2);
+}
+
 // 0x801E0318
 extern "C" void fn_801E0318(s32 a3) {
     *(u32*)((u8*)lbl_805FB890) = (u32)((u32)(uintptr_t)(a3));
@@ -108,4 +161,57 @@ extern "C" void fn_801E0320(s32 a3) {
 // 0x801E0328
 extern "C" void fn_801E0328(s32 a3) {
     *(u32*)((u8*)lbl_805FB898) = (u32)((u32)(uintptr_t)(a3));
+}
+
+// 0x801E2368
+extern "C" u32 fn_801E2368(u8* a3) {
+    s32 t0 = *(s32*)(((u8*)(uintptr_t)(a3)) + 0);
+    u32 t1 = (u32)(t0) & 0xffu;
+    u32 t2 = (u32)(t1) - 1u;
+    u32 t3 = (u32)(t2 == 0);
+    return (u32)(t3);
+}
+
+// 0x801E239C
+extern "C" u32 fn_801E239C(s32 a3) {
+    u32 t0 = (((u32)(uintptr_t)(a3) << 16) | ((u32)(uintptr_t)(a3) >> 16)) & 0xfffu;
+    u32 t1 = (u32)(t0) & 0x8000u;
+    if (t1 == 0) {
+        return (u32)(t0);
+    }
+    u32 t2 = (u32)(t0) | 0xffff0000u;
+    return (u32)(t2);
+}
+
+// 0x801E23D8
+extern "C" s32 fn_801E23D8(s32 a3) {
+    if ((u32)(uintptr_t)(a3) >= 0x211u) {
+        return (s32)(-1);
+    }
+    u32 t0 = (u32)((s32)(u32)(uintptr_t)(a3) * 52);
+    u32 t1 = (u32)(uintptr_t)((u8*)gScriptSigs) + (u32)(t0);
+    s32 t2 = *(s32*)((u8*)(uintptr_t)(t1) + 12);
+    return (s32)(t2);
+}
+
+// 0x801E2420
+extern "C" s32 fn_801E2420(s32 a3) {
+    if ((u32)(uintptr_t)(a3) >= 0x211u) {
+        return (s32)(0);
+    }
+    u32 t0 = (u32)((s32)(u32)(uintptr_t)(a3) * 52);
+    u32 t1 = (u32)(uintptr_t)((u8*)gScriptSigs) + (u32)(t0);
+    s32 t2 = *(s32*)((u8*)(uintptr_t)(t1) + 8);
+    return (s32)(t2);
+}
+
+// 0x801E2448
+extern "C" s32 fn_801E2448(s32 a3) {
+    if ((u32)(uintptr_t)(a3) >= 0x211u) {
+        return (s32)(0);
+    }
+    u32 t0 = (u32)((s32)(u32)(uintptr_t)(a3) * 52);
+    u32 t1 = (u32)(uintptr_t)((u8*)gScriptSigs) + (u32)(t0);
+    s32 t2 = *(s32*)((u8*)(uintptr_t)(t1) + 16);
+    return (s32)(t2);
 }

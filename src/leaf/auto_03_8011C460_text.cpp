@@ -6,6 +6,8 @@
 #include "types.h"
 
 extern u8 lbl_805FB2A8[];
+extern "C" void fn_80116D40(u8*);
+extern "C" void fn_80116EF0(u8*, s32);
 
 // 0x8011CC58
 extern "C" void fn_8011CC58(void) {
@@ -15,6 +17,45 @@ extern "C" void fn_8011CC58(void) {
 extern "C" u8 fn_8011CD10(void) {
     u8 t0 = *(u8*)((u8*)lbl_805FB2A8);
     return (u8)(t0);
+}
+
+// 0x8011CDD4
+extern "C" void fn_8011CDD4(u8* a3, s32 a4) {
+    u32 t0 = (((u32)(uintptr_t)(a4) << 2) | ((u32)(uintptr_t)(a4) >> 30)) & 0xfffffffcu;
+    s32 t1 = *(s32*)(((u8*)(uintptr_t)(a3)) + 4844);
+    u32 t2 = (u32)(t0) - (u32)(uintptr_t)(a4);
+    u32 t3 = (u32)(t1) + (u32)(t2);
+    if ((s32)(u32)(t3) < 0) {
+        return;
+    }
+    s32 t4 = *(s32*)(((u8*)(uintptr_t)(a3)) + 4228);
+    if ((s32)(u32)(t3) >= (s32)(u32)(t4)) {
+        return;
+    }
+    *(u32*)(((u8*)(uintptr_t)(a3)) + 4844) = (u32)((u32)(t3));
+    u8* t5 = ((u8*)(uintptr_t)(a3)) + 4888;
+    fn_80116EF0(t5, (s32)((u32)(t3)));
+}
+
+// 0x8011CF64
+extern "C" s32 fn_8011CF64(u8* a3, s32 a4) {
+    s32 t0 = *(s32*)(((u8*)(uintptr_t)(a3)) + 4844);
+    u32 t1 = (u32)(t0) + (u32)(uintptr_t)(a4);
+    if ((s32)(u32)(t1) < 0) {
+        return (s32)(0);
+    }
+    s32 t2 = *(s32*)(((u8*)(uintptr_t)(a3)) + 4228);
+    if ((s32)(u32)(t1) >= (s32)(u32)(t2)) {
+        return (s32)(0);
+    }
+    return (s32)(1);
+}
+
+// 0x8011D028
+extern "C" void fn_8011D028(u8* a3) {
+    // tail-call arguments inferred from the registers set before the call
+    u8* t0 = ((u8*)(uintptr_t)(a3)) + 4888;
+    fn_80116D40(t0);
 }
 
 // 0x8011D030

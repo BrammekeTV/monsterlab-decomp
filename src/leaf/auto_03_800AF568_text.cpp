@@ -5,6 +5,14 @@
 
 #include "types.h"
 
+extern "C" void PlaySound(u32, s32, s32, s32, s32, s32);
+
+// 0x800AFBCC
+extern "C" void fn_800AFBCC(void) {
+    u32 t0 = (u32)(0x44870000) - 1233u;
+    PlaySound((u32)((u32)(t0)), (s32)((u32)(0)), (s32)((u32)(0)), (s32)((u32)(0)), (s32)((u32)(0)), (s32)((u32)(1)));
+}
+
 // 0x800B0104
 extern "C" u32 fn_800B0104(u8* a3) {
     s32 t0 = *(s32*)(((u8*)(uintptr_t)(a3)) + 652);

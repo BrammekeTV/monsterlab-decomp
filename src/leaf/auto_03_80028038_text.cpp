@@ -6,6 +6,48 @@
 #include "types.h"
 
 extern u8 lbl_805FAFC0[];
+extern "C" void fn_800222F0(void);
+extern "C" void fn_8002238C(void);
+extern "C" void fn_80022390(void);
+extern "C" void fn_800223D4(void);
+extern "C" void fn_800223D8(void);
+extern "C" void fn_800223DC(u8*);
+extern "C" void fn_800223EC(void);
+
+// 0x8002896C
+extern "C" void fn_8002896C(void) {
+    fn_800222F0();
+}
+
+// 0x80028970
+extern "C" void fn_80028970(u8* a3) {
+    fn_800223DC(((u8*)(uintptr_t)(a3)));
+}
+
+// 0x80029160
+extern "C" void fn_80029160(void) {
+    fn_800223EC();
+}
+
+// 0x80029168
+extern "C" void fn_80029168(void) {
+    fn_8002238C();
+}
+
+// 0x8002916C
+extern "C" void fn_8002916C(void) {
+    fn_80022390();
+}
+
+// 0x80029174
+extern "C" void fn_80029174(void) {
+    fn_800223D4();
+}
+
+// 0x80029178
+extern "C" void fn_80029178(void) {
+    fn_800223D8();
+}
 
 // 0x8002931C
 extern "C" u8* ResetCounter(void) {

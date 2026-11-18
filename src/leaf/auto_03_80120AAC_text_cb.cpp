@@ -13,3 +13,12 @@ BOOL EnterName_GetName(void) {
     s32 t0 = *(s32*)((u8*)lbl_805FB2B8);
     return (BOOL)(t0);
 }
+
+// 0x80120D00
+void EnterName_NameInputDone(u32 a3) {
+    u8* t0 = *(u8**)((u8*)lbl_805FB2B8);
+    if (t0 == 0) {
+        return;
+    }
+    *(u8*)(t0 + 20) = (u8)((u32)(uintptr_t)(a3));
+}

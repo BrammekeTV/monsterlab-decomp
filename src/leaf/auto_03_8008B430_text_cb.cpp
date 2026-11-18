@@ -6,6 +6,23 @@
 #include "types.h"
 #include "game/script_callbacks.h"
 
+extern u8 gWorldState[];
+extern "C" void fn_8008BA80(s32, f32);
+extern "C" void fn_8008C204(s32);
+
+// 0x8008C8EC
+void BrazierWandFlickSymbols(void* a3) {
+    // tail-call arguments inferred from the registers set before the call
+    fn_8008C204((s32)((u32)(uintptr_t)(a3)));
+}
+
+// 0x8008C8F0
+void BrazierWandUpdateMoving(void* a3) {
+    // tail-call arguments inferred from the registers set before the call
+    f32 t0 = *(f32*)((u8*)gWorldState + 12);
+    fn_8008BA80((s32)((u32)(uintptr_t)(a3)), (f32)(t0));
+}
+
 // 0x8008C9CC
 void BrazierWandSetIdle(void* a3) {
     *(u32*)(((u8*)(uintptr_t)(a3)) + 612) = (u32)((u32)(0));

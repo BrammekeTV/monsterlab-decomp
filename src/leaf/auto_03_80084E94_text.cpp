@@ -5,6 +5,8 @@
 
 #include "types.h"
 
+extern u8 lbl_805FD8D0[];
+
 // 0x80085398
 extern "C" void fn_80085398(u8* a3, f32 f1) {
     f32 t0 = *(f32*)(((u8*)(uintptr_t)(a3)) + 12);
@@ -19,4 +21,21 @@ extern "C" void fn_80085414(u8* a3, f32 f1) {
     f32 t0 = *(f32*)(((u8*)(uintptr_t)(a3)) + 12);
     f32 t1 = (f32)(t0 - f1);
     *(f32*)(((u8*)(uintptr_t)(a3)) + 12) = (f32)(t1);
+}
+
+// 0x80085464
+extern "C" f32 fn_80085464(u8* a3, f32 f1) {
+    u8* t0 = *(u8**)(((u8*)(uintptr_t)(a3)) + 4);
+    u8* t1 = *(u8**)(t0 + 668);
+    u8 t2 = *(u8*)(t1 + 624);
+    if (t2 == 0) {
+        return (f32)(f1);
+    }
+    f32 t3 = *(f32*)(t1 + 620);
+    f32 t4 = *(f32*)(((u8*)(uintptr_t)(a3)) + 16);
+    f32 t5 = *(f32*)((u8*)lbl_805FD8D0);
+    f32 t6 = (f32)(t4 + t3);
+    *(f32*)(t1 + 620) = (f32)(t6);
+    *(f32*)(((u8*)(uintptr_t)(a3)) + 12) = (f32)(t5);
+    return (f32)(t6);
 }

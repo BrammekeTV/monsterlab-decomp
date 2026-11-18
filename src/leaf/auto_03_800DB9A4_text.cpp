@@ -9,6 +9,7 @@ extern u8 lbl_805FB1A0[];
 extern u8 lbl_805FB1A1[];
 extern u8 lbl_805FB1A4[];
 extern u8 lbl_805FE70C[];
+extern "C" void fn_800E04CC(u8*);
 
 // 0x800DC504
 extern "C" f32 fn_800DC504(void) {
@@ -68,6 +69,17 @@ extern "C" void fn_800DE28C(u8* a3, u8* a4, f32 f1) {
     *(f32*)(((u8*)(uintptr_t)(a3)) + 8) = (f32)(t3);
 }
 
+// 0x800DE49C
+extern "C" f64 fn_800DE49C(u8* a3, f32 f1) {
+    f32 t0 = *(f32*)((u8*)lbl_805FE70C);
+    if (!(f1 < t0)) {
+        *(f32*)(((u8*)(uintptr_t)(a3)) + 20) = (f32)(t0);
+        return (f64)(t0);
+    }
+    *(f32*)(((u8*)(uintptr_t)(a3)) + 20) = (f32)(f1);
+    return (f64)(f1);
+}
+
 // 0x800DE4B8
 extern "C" void fn_800DE4B8(u8* a3, f32 f1) {
     *(f32*)(((u8*)(uintptr_t)(a3)) + 16) = (f32)(f1);
@@ -86,6 +98,13 @@ extern "C" void fn_800DE4C8(u8* a3) {
 // 0x800DE4D4
 extern "C" s32 fn_800DE4D4(void) {
     return (s32)(0);
+}
+
+// 0x800DE4DC
+extern "C" void fn_800DE4DC(u8* a3) {
+    // tail-call arguments inferred from the registers set before the call
+    u8* t0 = ((u8*)(uintptr_t)(a3)) + 104;
+    fn_800E04CC(t0);
 }
 
 // 0x800DE4E4
@@ -131,6 +150,32 @@ extern "C" void fn_800DE51C(void) {
 
 // 0x800DE520
 extern "C" void fn_800DE520(void) {
+}
+
+// 0x800DE534
+extern "C" void fn_800DE534(u8* a3, s32 a4) {
+    if (a4 == 0) {
+        s32 t0 = *(s32*)(((u8*)(uintptr_t)(a3)) + 504);
+        u32 t1 = (u32)(t0) & 0xfffffffbu;
+        *(u32*)(((u8*)(uintptr_t)(a3)) + 504) = (u32)((u32)(t1));
+        return;
+    }
+    s32 t2 = *(s32*)(((u8*)(uintptr_t)(a3)) + 504);
+    u32 t3 = (u32)(t2) | 0x4u;
+    *(u32*)(((u8*)(uintptr_t)(a3)) + 504) = (u32)((u32)(t3));
+}
+
+// 0x800DE55C
+extern "C" s32 fn_800DE55C(u8* a3) {
+    s32 t0 = *(s32*)(((u8*)(uintptr_t)(a3)) + 316);
+    if ((s32)(u32)(t0) != 2) {
+        return (s32)(0);
+    }
+    u8 t1 = *(u8*)(((u8*)(uintptr_t)(a3)) + 200);
+    if (t1 != 0) {
+        return (s32)(0);
+    }
+    return (s32)(1);
 }
 
 // 0x800DE584

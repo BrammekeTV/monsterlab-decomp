@@ -6,17 +6,80 @@
 #include "types.h"
 #include "game/script_callbacks.h"
 
+extern u8 gBattle[];
+extern u8 gEventMgr[];
 extern u8 gGame[];
 extern u8 gIgcMode[];
+extern u8 gLab[];
+extern u8 gVideo[];
 extern u8 gWorldState[];
+extern u8 lbl_803C2A20[];
 extern u8 lbl_803C4298[];
+extern u8 lbl_8047C640[];
+extern u8 lbl_8047C760[];
+extern u8 lbl_805FB014[];
 extern u8 lbl_805FB1A1[];
 extern u8 lbl_805FB1D4[];
 extern u8 lbl_805FB1E8[];
 extern u8 lbl_805FB1F4[];
 extern u8 lbl_805FB300[];
+extern u8 lbl_805FBA30[];
 extern u8 lbl_805FBBE0[];
+extern u8 lbl_805FEB04[];
+extern u8 lbl_805FEB0C[];
+extern u8 lbl_805FEB48[];
+extern u8 lbl_805FEB4C[];
 extern u8 lbl_805FEB68[];
+extern u8 lbl_805FEB6C[];
+extern "C" void CameraSetFov(void*, f32);
+extern "C" void EventSend(void*, void*, void*, u32, int, int, int, int);
+extern "C" void HudShowConversation(void*, s32);
+extern "C" s32 LoadingScreenTick(int, f32);
+extern "C" void SaveSetFlag2(u8*, u8, BOOL);
+extern "C" void SessionBegin(void*);
+extern "C" void SessionStopTimer(u8*);
+extern "C" s32 VideoIsPal50(u8*);
+extern "C" void WorldSendEvent(void*, s32, int, int, int);
+extern "C" void fn_80013340(u8*);
+extern "C" s32 fn_80021DAC(void);
+extern "C" void fn_80022D10(void);
+extern "C" void fn_80022D1C(void);
+extern "C" u8 fn_8004936C(void);
+extern "C" void fn_800598E8(s32, s32);
+extern "C" void fn_8005BF7C(s32, s32, s32);
+extern "C" void fn_8005F204(u8*);
+extern "C" void fn_80069090(u8*);
+extern "C" void fn_8006AD84(u8*);
+extern "C" void fn_8006B974(s32);
+extern "C" s32 fn_8006B9CC(u8*);
+extern "C" void fn_8006CD70(u8*, s32);
+extern "C" void fn_8006CE08(u8*);
+extern "C" void fn_800D68CC(s32, s32, s32);
+extern "C" void fn_800E69EC(s32);
+extern "C" u32 fn_8010720C(s32);
+extern "C" void fn_8012636C(s32, s32);
+extern "C" void fn_8012660C(s32);
+extern "C" void fn_80126684(s32);
+extern "C" s32 fn_8012670C(void);
+extern "C" void fn_801AC7F0(s32, u8*);
+extern "C" void fn_801B69F8(s32);
+extern "C" void fn_801C9D74(u8*);
+extern "C" void fn_801D5D14(s32, f32);
+extern "C" void fn_801FC1E4(s32);
+extern "C" void fn_8020A474(s32);
+extern "C" void fn_8022DE8C(s32, s32, s32);
+extern "C" void fn_8022E178(s32, s32, s32, s32, s32, s32);
+extern "C" void fn_8022E2A4(s32, s32, s32, s32);
+extern "C" u32 fn_8022E330(s32, s32, s32);
+extern "C" void fn_8022E354(s32, s32);
+extern "C" void fn_8022E3E0(s32, s32);
+extern "C" u32 fn_8022E440(s32, s32);
+extern "C" void fn_8022E658(s32);
+
+// 0x800E75D8
+BOOL IsVideoModePAL(void) {
+    return (BOOL)(VideoIsPal50((u8*)gVideo));
+}
 
 // 0x800E75E0
 s32 IsPS2(void) {
@@ -30,6 +93,19 @@ void UIScreen_SetPS2SnapToEnabled(u32 a3) {
 // 0x800E7660
 s32 IsCoopGame(void) {
     return (s32)(0);
+}
+
+// 0x800E76A0
+s32 GetDifficultyLevel(void) {
+    u32 t0 = (u32)(uintptr_t)((u8*)gGame) + 65536u;
+    s32 t1 = *(s32*)((u8*)(uintptr_t)(t0) + -15268);
+    if ((s32)(u32)(t1) < 0) {
+        return (s32)(1);
+    }
+    if ((s32)(u32)(t1) <= 3) {
+        return (s32)(t1);
+    }
+    return (s32)(1);
 }
 
 // 0x800E76C8
@@ -55,11 +131,112 @@ void SetEntityHealth(void* a3, f32 f1) {
     *(f32*)(t0 + 36) = (f32)(f1);
 }
 
+// 0x800E8430
+f32 GetEntityHealth(void* a3) {
+    u8* t0 = *(u8**)(((u8*)(uintptr_t)(a3)) + 4);
+    f32 t1 = *(f32*)(t0 + 36);
+    return (f32)(t1);
+}
+
+// 0x800E843C
+void SetEntityMaxHealth(void* a3, f32 f1) {
+    u8* t0 = *(u8**)(((u8*)(uintptr_t)(a3)) + 4);
+    s32 t1 = *(s32*)(t0 + 28);
+    u32 t2 = (u32)(t1) & 0x10u;
+    if (t2 == 0) {
+        u32 t3 = (u32)(t1) & 0x40u;
+        if (t3 == 0) {
+            return;
+        }
+        *(f32*)(((u8*)(uintptr_t)(a3)) + 344) = (f32)(f1);
+        return;
+    }
+    *(f32*)(((u8*)(uintptr_t)(a3)) + 1524) = (f32)(f1);
+}
+
+// 0x800E8600
+void SetEntityAggressive(void* a3, u32 a4) {
+    if (a3 == 0) {
+        return;
+    }
+    u8* t0 = *(u8**)(((u8*)(uintptr_t)(a3)) + 4);
+    s32 t1 = *(s32*)(t0 + 28);
+    u32 t2 = (u32)(t1) & 0x20u;
+    if (t2 == 0) {
+        return;
+    }
+    u32 t3 = 0u - (u32)(uintptr_t)(a4);
+    u32 t4 = (u32)(t3) | (u32)(uintptr_t)(a4);
+    u32 t5 = (((u32)(t4) << 1) | ((u32)(t4) >> 31)) & 0x1u;
+    *(u8*)(((u8*)(uintptr_t)(a3)) + 3039) = (u8)((u32)(t5));
+}
+
+// 0x800E862C
+void SetEntitySpeed(void* a3, f32 f1) {
+    if (a3 == 0) {
+        return;
+    }
+    *(f32*)(((u8*)(uintptr_t)(a3)) + 2548) = (f32)(f1);
+}
+
+// 0x800E863C
+f32 GetEntityMaxHealth(void* a3) {
+    u8* t0 = *(u8**)(((u8*)(uintptr_t)(a3)) + 4);
+    s32 t1 = *(s32*)(t0 + 28);
+    u32 t2 = (u32)(t1) & 0x10u;
+    if (t2 == 0) {
+        u32 t3 = (u32)(t1) & 0x40u;
+        if (t3 == 0) {
+            f32 t4 = *(f32*)((u8*)lbl_805FEB0C);
+            return (f32)(t4);
+        }
+        f32 t5 = *(f32*)(((u8*)(uintptr_t)(a3)) + 344);
+        return (f32)(t5);
+    }
+    f32 t6 = *(f32*)(((u8*)(uintptr_t)(a3)) + 1524);
+    return (f32)(t6);
+}
+
 // 0x800E8714
 u32 GetCurAnimDef(u32 a3) {
     u8* t0 = *(u8**)(((u8*)(uintptr_t)(a3)) + 132);
     s32 t1 = *(s32*)(t0 + 44);
     return (u32)(t1);
+}
+
+// 0x800E8744
+s32 IsEntityOfSubtype(void* a3, u32 a4) {
+    u8* t0 = *(u8**)(((u8*)(uintptr_t)(a3)) + 156);
+    if (t0 == 0) {
+        u32 t1 = (u32)(0) - (u32)(uintptr_t)(a4);
+        u32 t2 = (u32)(t1 == 0);
+        return (s32)(t2);
+    }
+    s32 t3 = *(s32*)(t0 + 8);
+    u32 t4 = (u32)(t3) - (u32)(uintptr_t)(a4);
+    u32 t5 = (u32)(t4 == 0);
+    return (s32)(t5);
+}
+
+// 0x800E95BC
+void StopEntityLoopingSoundFX(void* a3) {
+    // tail-call arguments inferred from the registers set before the call
+    fn_801B69F8((s32)((u32)(uintptr_t)(a3)));
+}
+
+// 0x800E9638
+void StopVoiceSFX(u32 a3) {
+    // tail-call arguments inferred from the registers set before the call
+    if (a3 == 0) {
+        return;
+    }
+    u8 t0 = *(u8*)(((u8*)(uintptr_t)(a3)) + 5);
+    u32 t1 = (u32)(t0) & 0x1u;
+    if (t1 != 0) {
+        return;
+    }
+    s32 t2 = *(s32*)(((u8*)(uintptr_t)(a3)) + 0);
+    fn_8020A474((s32)((u32)(t2)));
 }
 
 // 0x800E9658
@@ -70,6 +247,22 @@ void PrintTest(void) {
 s32 GetCurrentController(void) {
     s32 t0 = *(s32*)((u8*)lbl_803C4298 + 56);
     return (s32)(t0);
+}
+
+// 0x800E96A0
+s32 IsEntityInstance(void* a3, void* a4) {
+    if (a3 == 0) {
+        return (s32)(0);
+    }
+    if (a4 == 0) {
+        return (s32)(0);
+    }
+    s32 t0 = *(s32*)(((u8*)(uintptr_t)(a3)) + 44);
+    s32 t1 = *(s32*)(((u8*)(uintptr_t)(a4)) + 44);
+    if ((u32)(t0) != (u32)(t1)) {
+        return (s32)(0);
+    }
+    return (s32)(1);
 }
 
 // 0x800E9720
@@ -83,8 +276,78 @@ void SetSpawnPriority(u32 a3, BOOL a4) {
     *(u32*)(((u8*)(uintptr_t)(a3)) + 2148) = (u32)((u32)(uintptr_t)(a4));
 }
 
+// 0x800E9A30
+void RemoveAllParticles(void) {
+    // tail-call arguments inferred from the registers set before the call
+    fn_801C9D74((u8*)lbl_8047C760);
+}
+
+// 0x800EC344
+void TurretTrackTarget(void* a3, f32 f1) {
+    // tail-call arguments inferred from the registers set before the call
+    u8* t0 = *(u8**)(((u8*)(uintptr_t)(a3)) + 4);
+    s32 t1 = *(s32*)(t0 + 28);
+    u32 t2 = (u32)(t1) & 0x40u;
+    if (t2 == 0) {
+        return;
+    }
+    fn_8006AD84(((u8*)(uintptr_t)(a3)));
+}
+
+// 0x800EC35C
+void TurretTargetMe(void* a3, void* a4) {
+    if (a4 == 0) {
+        return;
+    }
+    u8* t0 = *(u8**)(((u8*)(uintptr_t)(a4)) + 4);
+    s32 t1 = *(s32*)(t0 + 28);
+    u32 t2 = (u32)(t1) & 0x40u;
+    if (t2 == 0) {
+        return;
+    }
+    s32 t3 = *(s32*)(((u8*)(uintptr_t)(a4)) + 396);
+    if (t3 != 0) {
+        return;
+    }
+    *(u32*)(((u8*)(uintptr_t)(a4)) + 396) = (u32)((u32)(uintptr_t)(a3));
+}
+
+// 0x800EC388
+void TurretNoTargetMe(void* a3, void* a4) {
+    if (a4 == 0) {
+        return;
+    }
+    u8* t0 = *(u8**)(((u8*)(uintptr_t)(a4)) + 4);
+    s32 t1 = *(s32*)(t0 + 28);
+    u32 t2 = (u32)(t1) & 0x40u;
+    if (t2 == 0) {
+        return;
+    }
+    s32 t3 = *(s32*)(((u8*)(uintptr_t)(a4)) + 396);
+    if ((u32)(t3) != (u32)(uintptr_t)(a3)) {
+        return;
+    }
+    *(u32*)(((u8*)(uintptr_t)(a4)) + 396) = (u32)((u32)(0));
+}
+
 // 0x800EC458
 void CheckPoint(void* a3, void* a4) {
+}
+
+// 0x800EC68C
+void SendQuestSignal(u32 a3) {
+    u32 t0 = (u32)(uintptr_t)((u8*)gGame) + 65536u;
+    u32 t1 = (u32)(t0) - 10768u;
+    WorldSendEvent((void*)((u8*)(uintptr_t)(t1)), (s32)((u32)(uintptr_t)(a3)), (int)((u32)(0)), (int)((u32)(0)), (int)((u32)(0)));
+}
+
+// 0x800EC774
+void SetDeflectBullets(u32 a3, s32 a4) {
+    if (a4 == 0) {
+        *(u8*)(((u8*)(uintptr_t)(a3)) + 3038) = (u8)((u32)(0));
+        return;
+    }
+    *(u8*)(((u8*)(uintptr_t)(a3)) + 3038) = (u8)((u32)(1));
 }
 
 // 0x800EC7D4
@@ -99,9 +362,63 @@ void FreezePlayerInput(s32 a3) {
     *(u8*)((u8*)gIgcMode) = (u8)((u32)(t2));
 }
 
+// 0x800EC890
+void ClearUBAnims(void* a3) {
+    // tail-call arguments inferred from the registers set before the call
+    s32 t0 = *(s32*)(((u8*)(uintptr_t)(a3)) + 160);
+    fn_801AC7F0((s32)((u32)(t0)), ((u8*)(uintptr_t)(a3)));
+}
+
+// 0x800ECBB4
+void SendEvent(void* a3, void* a4, u32 a5, BOOL a6, BOOL a7) {
+    u8* t0 = *(u8**)((u8*)gEventMgr);
+    EventSend((void*)(t0), (void*)(((u8*)(uintptr_t)(a4))), (void*)(((u8*)(uintptr_t)(a3))), (u32)((u32)(uintptr_t)(a5)), (int)((u32)(uintptr_t)(a6)), (int)((u32)(uintptr_t)(a7)), (int)((u32)(1)), (int)((u32)(0)));
+}
+
+// 0x800ECC30
+void SetFlying(u32 a3, s32 a4) {
+    if (a4 == 0) {
+        s32 t0 = *(s32*)(((u8*)(uintptr_t)(a3)) + 2104);
+        u32 t1 = (u32)(t0) & 0xffbfffffu;
+        *(u32*)(((u8*)(uintptr_t)(a3)) + 2104) = (u32)((u32)(t1));
+        return;
+    }
+    s32 t2 = *(s32*)(((u8*)(uintptr_t)(a3)) + 2104);
+    u32 t3 = (u32)(t2) | 0x400000u;
+    *(u32*)(((u8*)(uintptr_t)(a3)) + 2104) = (u32)((u32)(t3));
+}
+
 // 0x800ECCC4
 void PropSetActiveTarget(u32 a3, void* a4) {
     *(u32*)(((u8*)(uintptr_t)(a3)) + 396) = (u32)((u32)(uintptr_t)(a4));
+}
+
+// 0x800ED1F8
+void PropRemoveAttachedProjectile(u32 a3) {
+    // tail-call arguments inferred from the registers set before the call
+    fn_8006B974((s32)((u32)(uintptr_t)(a3)));
+}
+
+// 0x800ED1FC
+u32 PropHasAttachedProjectile(u32 a3) {
+    return (u32)(fn_8006B9CC(((u8*)(uintptr_t)(a3))));
+}
+
+// 0x800ED2EC
+void Explode(void* a3) {
+    // tail-call arguments inferred from the registers set before the call
+    u8* t0 = *(u8**)(((u8*)(uintptr_t)(a3)) + 4);
+    s32 t1 = *(s32*)(t0 + 28);
+    u32 t2 = (u32)(t1) & 0x40u;
+    if (t2 == 0) {
+        u32 t3 = (u32)(t1) & 0x20u;
+        if (t3 == 0) {
+            return;
+        }
+        fn_8005F204(((u8*)(uintptr_t)(a3)));
+        return;
+    }
+    fn_80069090(((u8*)(uintptr_t)(a3)));
 }
 
 // 0x800ED34C
@@ -122,6 +439,28 @@ s32 GetLastRandomZeroToMax(void) {
     return (s32)(t0);
 }
 
+// 0x800ED58C
+void PlayAnimUB(u32 a3, u32 a4, u32 a5) {
+    // tail-call arguments inferred from the registers set before the call
+    if (a3 == 0) {
+        return;
+    }
+    fn_8005BF7C((s32)((u32)(uintptr_t)(a3)), (s32)((u32)(uintptr_t)(a4)), (s32)((u32)(uintptr_t)(a5)));
+}
+
+// 0x800EF7D4
+void SaveCheckPoint(void) {
+    // tail-call arguments inferred from the registers set before the call
+    u8* t0 = (u8*)gGame + 1480;
+    fn_80013340(t0);
+}
+
+// 0x800EF7E4
+void RestoreCheckPoint(void) {
+    u8* t0 = (u8*)gGame + 1480;
+    SessionBegin((void*)(t0));
+}
+
 // 0x800EF7F4
 u32 IsCharacter(void* a3) {
     u8* t0 = *(u8**)(((u8*)(uintptr_t)(a3)) + 4);
@@ -138,10 +477,45 @@ u32 IsProp(void* a3) {
     return (u32)(t2);
 }
 
+// 0x800EF814
+u32 GetLastMatTypeHit(void* a3) {
+    if (a3 != 0) {
+        u8* t0 = *(u8**)(((u8*)(uintptr_t)(a3)) + 4);
+        s32 t1 = *(s32*)(t0 + 28);
+        u32 t2 = (u32)(t1) & 0x2u;
+        if (t2 == 0) {
+            return (u32)(0);
+        }
+        s32 t3 = *(s32*)(((u8*)(uintptr_t)(a3)) + 332);
+        return (u32)(t3);
+    }
+    return (u32)(0);
+}
+
 // 0x800EF844
 void SetCharacterPerformanceCapToDefault(void) {
     f32 t0 = *(f32*)((u8*)lbl_805FEB68);
     *(f32*)((u8*)lbl_805FB300) = (f32)(t0);
+}
+
+// 0x800EF850
+void SetCharacterPerformanceCap(f32 f1) {
+    f32 t0 = *(f32*)((u8*)lbl_805FEB48);
+    if (!(f1 < t0)) {
+        f32 t1 = *(f32*)((u8*)lbl_805FEB6C);
+        if (!(f1 > t1)) {
+            *(f32*)((u8*)lbl_805FB300) = (f32)(f1);
+            return;
+        }
+        *(f32*)((u8*)lbl_805FB300) = (f32)(t1);
+        return;
+    }
+    f32 t2 = *(f32*)((u8*)lbl_805FEB6C);
+    if (!(t0 > t2)) {
+        *(f32*)((u8*)lbl_805FB300) = (f32)(t0);
+        return;
+    }
+    *(f32*)((u8*)lbl_805FB300) = (f32)(t2);
 }
 
 // 0x800EF878
@@ -152,13 +526,69 @@ void MegaChunkSentCallback(u32 a3) {
 void MegaChunkReceivedCallback(u32 a3) {
 }
 
+// 0x800EF958
+u32 CharacterIsAirborne(u32 a3) {
+    s32 t0 = *(s32*)(((u8*)(uintptr_t)(a3)) + 1932);
+    u32 t1 = (u32)(t0) - 1u;
+    u32 t2 = (u32)(t1 == 0);
+    return (u32)(t2);
+}
+
+// 0x800EF96C
+u32 GetLastProjectileIDHitWith(void* a3) {
+    u8* t0 = *(u8**)(((u8*)(uintptr_t)(a3)) + 4);
+    s32 t1 = *(s32*)(t0 + 28);
+    u32 t2 = (u32)(t1) & 0x10u;
+    if (t2 == 0) {
+        u32 t3 = (u32)(t1) & 0x40u;
+        if (t3 == 0) {
+            return (u32)(0);
+        }
+        s32 t4 = *(s32*)(((u8*)(uintptr_t)(a3)) + 424);
+        return (u32)(t4);
+    }
+    s32 t5 = *(s32*)(((u8*)(uintptr_t)(a3)) + 1548);
+    return (u32)(t5);
+}
+
 // 0x800EFCD0
 void MoveCursorToContinueButtonPS2(void) {
+}
+
+// 0x800EFE24
+void LoadChallengeUI(void) {
+    fn_80022D10();
+}
+
+// 0x800EFE28
+void PlayChallengeMusic(void) {
+    fn_80022D1C();
+}
+
+// 0x800EFE34
+void ForceTracingGame(u32 a3) {
+    u8* t0 = *(u8**)((u8*)gLab);
+    if (t0 == 0) {
+        return;
+    }
+    *(u32*)(t0 + 100) = (u32)((u32)(uintptr_t)(a3));
+}
+
+// 0x800EFE48
+s32 IsTimerCountdown(void) {
+    return (s32)(fn_80021DAC());
 }
 
 // 0x800EFEB4
 s32 StateFinished(void) {
     return (s32)(1);
+}
+
+// 0x800F0044
+u32 GetCurrentLevelId(void) {
+    // tail-call arguments inferred from the registers set before the call
+    u8 t0 = *(u8*)((u8*)lbl_803C4298 + 28);
+    return (u32)(fn_8010720C((s32)((u32)(t0))));
 }
 
 // 0x800F0160
@@ -167,19 +597,225 @@ u32 GetIsPlaytest(void) {
     return (u32)(t0);
 }
 
+// 0x800F0168
+void set_reg(BOOL a3, s32 a4) {
+    if ((u32)(uintptr_t)(a3) >= 0x4u) {
+        return;
+    }
+    s32 t0 = *(s32*)((u8*)lbl_803C2A20 + 3480);
+    if (t0 == 0) {
+        return;
+    }
+    u32 t1 = (((u32)(uintptr_t)(a3) << 2) | ((u32)(uintptr_t)(a3) >> 30)) & 0xfffffffcu;
+    u32 t2 = (u32)(t0) + (u32)(t1);
+    *(u32*)((u8*)(uintptr_t)(t2) + 44) = (u32)((u32)(uintptr_t)(a4));
+}
+
+// 0x800F0218
+void set_reg0(void* a3, s32 a4) {
+    if (a3 == 0) {
+        if (0 == 0) {
+            return;
+        }
+        *(u32*)((u8*)(uintptr_t)(0) + 44) = (u32)((u32)(uintptr_t)(a4));
+        return;
+    }
+    u8* t0 = *(u8**)(((u8*)(uintptr_t)(a3)) + 164);
+    if (t0 == 0) {
+        if (0 == 0) {
+            return;
+        }
+        *(u32*)((u8*)(uintptr_t)(0) + 44) = (u32)((u32)(uintptr_t)(a4));
+        return;
+    }
+    u8* t1 = *(u8**)(t0 + 0);
+    if (t1 == 0) {
+        return;
+    }
+    *(u32*)(t1 + 44) = (u32)((u32)(uintptr_t)(a4));
+}
+
+// 0x800F02FC
+void LockCurrentJunctionPath(BOOL a3, u32 a4) {
+    // tail-call arguments inferred from the registers set before the call
+    u32 t0 = (u32)(uintptr_t)((u8*)gGame) + 65536u;
+    u8* t1 = *(u8**)((u8*)(uintptr_t)(t0) + -10732);
+    if (t1 == 0) {
+        return;
+    }
+    s32 t2 = *(s32*)(t1 + 2560);
+    fn_800D68CC((s32)((u32)(t2)), (s32)((u32)(uintptr_t)(a3)), (s32)((u32)(uintptr_t)(a4)));
+}
+
+// 0x800F032C
+void UnlockCurrentJunctionPath(BOOL a3) {
+    // tail-call arguments inferred from the registers set before the call
+    u32 t0 = (u32)(uintptr_t)((u8*)gGame) + 65536u;
+    u8* t1 = *(u8**)((u8*)(uintptr_t)(t0) + -10732);
+    if (t1 == 0) {
+        return;
+    }
+    s32 t2 = *(s32*)(t1 + 2560);
+    fn_800D68CC((s32)((u32)(t2)), (s32)((u32)(uintptr_t)(a3)), (s32)((u32)(0)));
+}
+
+// 0x800F11E4
+void EnableFieldRepair(u32 a3) {
+    u8* t0 = *(u8**)((u8*)lbl_805FBBE0);
+    if (t0 == 0) {
+        return;
+    }
+    u32 t1 = 0u - (u32)(uintptr_t)(a3);
+    u32 t2 = (u32)(t1) | (u32)(uintptr_t)(a3);
+    u32 t3 = (((u32)(t2) << 1) | ((u32)(t2) >> 31)) & 0x1u;
+    *(u8*)(t0 + 2597) = (u8)((u32)(t3));
+}
+
+// 0x800F1384
+void SetEnemyIdleTime(void* a3, f32 f1) {
+    u8* t0 = *(u8**)(((u8*)(uintptr_t)(a3)) + 4);
+    s32 t1 = *(s32*)(t0 + 28);
+    u32 t2 = (u32)(t1) & 0x20u;
+    if (t2 == 0) {
+        return;
+    }
+    *(f32*)(((u8*)(uintptr_t)(a3)) + 3140) = (f32)(f1);
+}
+
+// 0x800F1A10
+void InitPreloadFader(s32 a3) {
+    // tail-call arguments inferred from the registers set before the call
+    u32 t0 = 0u - (u32)(uintptr_t)(a3);
+    f32 t1 = *(f32*)((u8*)lbl_805FEB04);
+    u32 t2 = (u32)(t0) | (u32)(uintptr_t)(a3);
+    u32 t3 = (((u32)(t2) << 1) | ((u32)(t2) >> 31)) & 0x1u;
+    fn_801D5D14((s32)((u32)(t3)), (f32)(t1));
+}
+
+// 0x800F4558
+s32 CanDoFieldRepair(void) {
+    return (s32)(fn_8004936C());
+}
+
 // 0x800F455C
 u32 CombatTestOn(void) {
     return (u32)(0);
+}
+
+// 0x800F49AC
+void ShowQuestCompleteEvent(u32 a3) {
+    // tail-call arguments inferred from the registers set before the call
+    s32 t0 = *(s32*)((u8*)lbl_805FBBE0);
+    fn_8022DE8C((s32)((u32)(t0)), (s32)((u32)(3)), (s32)((u32)(uintptr_t)(a3)));
+}
+
+// 0x800F49BC
+u32 HasActiveQuest(void) {
+    u32 t0 = (u32)(uintptr_t)((u8*)gGame) + 65536u;
+    s32 t1 = *(s32*)((u8*)(uintptr_t)(t0) + -10720);
+    if (t1 != 0) {
+        u32 t2 = 0u - (u32)(t1);
+        u32 t3 = (u32)(t2) | (u32)(t1);
+        u32 t4 = (((u32)(t3) << 1) | ((u32)(t3) >> 31)) & 0x1u;
+        return (u32)(t4);
+    }
+    s32 t5 = *(s32*)((u8*)(uintptr_t)(t0) + -10768);
+    u32 t6 = 0u - (u32)(t5);
+    u32 t7 = (u32)(t6) | (u32)(t5);
+    u32 t8 = (((u32)(t7) << 1) | ((u32)(t7) >> 31)) & 0x1u;
+    return (u32)(t8);
+}
+
+// 0x800F4A70
+void EndQuestTimer(void) {
+    u8* t0 = (u8*)gGame + 1480;
+    SessionStopTimer(t0);
+}
+
+// 0x800F4F94
+void SetAnimatedCamera(void* a3) {
+    if (a3 == 0) {
+        return;
+    }
+    u8* t0 = *(u8**)((u8*)lbl_805FB014);
+    if (t0 == 0) {
+        return;
+    }
+    *(u32*)(t0 + 1236) = (u32)((u32)(uintptr_t)(a3));
+}
+
+// 0x800F58F4
+void RestoreFOV(void) {
+    f32 t0 = *(f32*)((u8*)gGame + 32);
+    CameraSetFov((void*)((u8*)lbl_8047C640), (f32)(t0));
+}
+
+// 0x800F5A48
+u32 GetPerformFieldRepair(void) {
+    s32 t0 = *(s32*)((u8*)gGame + 4064);
+    if (t0 != 0) {
+        return (u32)(0);
+    }
+    u8* t1 = *(u8**)((u8*)lbl_805FBBE0);
+    s32 t2 = *(s32*)(t1 + 2588);
+    if (t2 == 0) {
+        return (u32)(0);
+    }
+    return (u32)(1);
+}
+
+// 0x800F5E44
+u32 IsCombatWon(void) {
+    u8* t0 = *(u8**)((u8*)gBattle);
+    if (t0 == 0) {
+        return (u32)(1);
+    }
+    s32 t1 = *(s32*)(t0 + 2636);
+    s32 t2 = *(s32*)(t0 + 2560);
+    u32 t3 = (u32)(t2) - (u32)(t1);
+    u32 t4 = (u32)(t3 == 0);
+    return (u32)(t4);
+}
+
+// 0x800F5ED8
+void CombatPanelAnimComplete(void) {
+    u8* t0 = *(u8**)((u8*)lbl_805FB014);
+    if (t0 == 0) {
+        return;
+    }
+    *(u8*)(t0 + 1256) = (u8)((u32)(1));
+}
+
+// 0x800F6048
+u32 CheckLastMonsterKilled(u32 a3) {
+    u8* t0 = *(u8**)((u8*)lbl_805FBBE0);
+    s32 t1 = *(s32*)(t0 + 308);
+    u32 t2 = (u32)(t1) - (u32)(uintptr_t)(a3);
+    u32 t3 = (u32)(t2 == 0);
+    return (u32)(t3);
 }
 
 // 0x800F6060
 void prop_selected(void) {
 }
 
+// 0x800F6064
+void AddCastleCamera(u32 a3, u32 a4) {
+    // tail-call arguments inferred from the registers set before the call
+    fn_8012636C((s32)((u32)(uintptr_t)(a3)), (s32)((u32)(uintptr_t)(a4)));
+}
+
 // 0x800F656C
 u32 IsCameraMoving(void) {
     u8 t0 = *(u8*)((u8*)lbl_805FB1A1);
     return (u32)(t0);
+}
+
+// 0x800F7634
+void PushFSM(u32 a3) {
+    u32 t0 = (u32)(uintptr_t)((u8*)gGame) + 65536u;
+    u8* t1 = *(u8**)((u8*)(uintptr_t)(t0) + -10700);
+    HudShowConversation((void*)(t1), (s32)((u32)(uintptr_t)(a3)));
 }
 
 // 0x800F764C
@@ -196,6 +832,188 @@ void* GetPlayerAvatarEntity(void) {
     return (void*)(uintptr_t)(t1);
 }
 
+// 0x800F826C
+void SetCastleAccess(u32 a3, u32 a4) {
+    if (a4 == 0) {
+        u8* t0 = *(u8**)((u8*)lbl_805FBBE0);
+        SaveSetFlag2(t0, (u8)((u32)(uintptr_t)(a3)), (BOOL)((u32)(0)));
+        return;
+    }
+    u8* t1 = *(u8**)((u8*)lbl_805FBBE0);
+    SaveSetFlag2(t1, (u8)((u32)(uintptr_t)(a3)), (BOOL)((u32)(1)));
+}
+
+// 0x800F85B4
+void SetWiiSelectorPaused(u32 a3) {
+    // tail-call arguments inferred from the registers set before the call
+    fn_8012660C((s32)((u32)(uintptr_t)(a3)));
+}
+
+// 0x800F85B8
+void SetWiiSelectorActive(u32 a3) {
+    // tail-call arguments inferred from the registers set before the call
+    fn_80126684((s32)((u32)(uintptr_t)(a3)));
+}
+
+// 0x800F85BC
+u32 IsWiiSelectorActive(void) {
+    return (u32)(fn_8012670C());
+}
+
+// 0x800F85F4
+void RemoveCharacterParticleEffect(u32 a3, u32 a4) {
+    // tail-call arguments inferred from the registers set before the call
+    if (a4 == 0) {
+        fn_800598E8((s32)((u32)(uintptr_t)(a3)), (s32)((u32)(0)));
+        return;
+    }
+    fn_800598E8((s32)((u32)(uintptr_t)(a3)), (s32)((u32)(1)));
+}
+
+// 0x800F8E5C
+void SetHazardIdleTime(void* a3, f32 f1) {
+    if (a3 == 0) {
+        return;
+    }
+    u8* t0 = *(u8**)(((u8*)(uintptr_t)(a3)) + 4);
+    s32 t1 = *(s32*)(t0 + 28);
+    u32 t2 = (u32)(t1) & 0x8000u;
+    if (t2 == 0) {
+        return;
+    }
+    *(f32*)(((u8*)(uintptr_t)(a3)) + 628) = (f32)(f1);
+}
+
+// 0x800F8E7C
+void SetHazardAttackTime(void* a3, f32 f1) {
+    if (a3 == 0) {
+        return;
+    }
+    u8* t0 = *(u8**)(((u8*)(uintptr_t)(a3)) + 4);
+    s32 t1 = *(s32*)(t0 + 28);
+    u32 t2 = (u32)(t1) & 0x8000u;
+    if (t2 == 0) {
+        return;
+    }
+    *(f32*)(((u8*)(uintptr_t)(a3)) + 632) = (f32)(f1);
+}
+
+// 0x800F8F10
+void StartHazardEffect(void* a3, u32 a4) {
+    // tail-call arguments inferred from the registers set before the call
+    u8* t0 = *(u8**)(((u8*)(uintptr_t)(a3)) + 4);
+    s32 t1 = *(s32*)(t0 + 28);
+    u32 t2 = (u32)(t1) & 0x8000u;
+    if (t2 == 0) {
+        return;
+    }
+    fn_8006CD70(((u8*)(uintptr_t)(a3)), (s32)((u32)(uintptr_t)(a4)));
+}
+
+// 0x800F8F28
+void StopHazardEffect(void* a3) {
+    // tail-call arguments inferred from the registers set before the call
+    u8* t0 = *(u8**)(((u8*)(uintptr_t)(a3)) + 4);
+    s32 t1 = *(s32*)(t0 + 28);
+    u32 t2 = (u32)(t1) & 0x8000u;
+    if (t2 == 0) {
+        return;
+    }
+    fn_8006CE08(((u8*)(uintptr_t)(a3)));
+}
+
+// 0x800F90E0
+s32 GetPropInstanceData(void* a3) {
+    u8* t0 = *(u8**)(((u8*)(uintptr_t)(a3)) + 4);
+    s32 t1 = *(s32*)(t0 + 28);
+    u32 t2 = (u32)(t1) & 0x40u;
+    if (t2 == 0) {
+        return (s32)(0);
+    }
+    s32 t3 = *(s32*)(((u8*)(uintptr_t)(a3)) + 428);
+    return (s32)(t3);
+}
+
+// 0x800F969C
+void AddJournalEntry(u32 a3, u32 a4, u32 a5, s32 a6) {
+    // tail-call arguments inferred from the registers set before the call
+    s32 t0 = *(s32*)((u8*)lbl_805FBBE0);
+    fn_8022E178((s32)((u32)(t0)), (s32)((u32)(uintptr_t)(a3)), (s32)((u32)(uintptr_t)(a4)), (s32)((u32)(uintptr_t)(a5)), (s32)((u32)(uintptr_t)(a6)), (s32)((u32)(1)));
+}
+
+// 0x800F96C4
+void AddJournalEntryNoPopup(u32 a3, u32 a4, u32 a5, s32 a6) {
+    // tail-call arguments inferred from the registers set before the call
+    s32 t0 = *(s32*)((u8*)lbl_805FBBE0);
+    fn_8022E178((s32)((u32)(t0)), (s32)((u32)(uintptr_t)(a3)), (s32)((u32)(uintptr_t)(a4)), (s32)((u32)(uintptr_t)(a5)), (s32)((u32)(uintptr_t)(a6)), (s32)((u32)(0)));
+}
+
+// 0x800F96EC
+void UpdateJournalEntryCount(u32 a3, s32 a4, u32 a5) {
+    // tail-call arguments inferred from the registers set before the call
+    if (a5 == 0) {
+        s32 t0 = *(s32*)((u8*)lbl_805FBBE0);
+        fn_8022E2A4((s32)((u32)(t0)), (s32)((u32)(uintptr_t)(a3)), (s32)((u32)(uintptr_t)(a4)), (s32)((u32)(0)));
+        return;
+    }
+    s32 t1 = *(s32*)((u8*)lbl_805FBBE0);
+    fn_8022E2A4((s32)((u32)(t1)), (s32)((u32)(uintptr_t)(a3)), (s32)((u32)(uintptr_t)(a4)), (s32)((u32)(1)));
+}
+
+// 0x800F971C
+void UpdateJournalEntryIcon(u32 a3, u32 a4) {
+    s32 t0 = *(s32*)((u8*)lbl_805FBBE0);
+    fn_8022E330((s32)((u32)(t0)), (s32)((u32)(uintptr_t)(a3)), (s32)((u32)(uintptr_t)(a4)));
+}
+
+// 0x800F9730
+void CompleteJournalEntryStep(u32 a3) {
+    // tail-call arguments inferred from the registers set before the call
+    s32 t0 = *(s32*)((u8*)lbl_805FBBE0);
+    fn_8022E354((s32)((u32)(t0)), (s32)((u32)(uintptr_t)(a3)));
+}
+
+// 0x800FA504
+s32 GetRewardedItemId(void) {
+    u8* t0 = *(u8**)((u8*)gLab);
+    if (t0 == 0) {
+        return (s32)(0);
+    }
+    u8* t1 = *(u8**)(t0 + 60);
+    if (t1 == 0) {
+        return (s32)(0);
+    }
+    s32 t2 = *(s32*)(t1 + 12);
+    return (s32)(t2);
+}
+
+// 0x800FA5E8
+u32 InitializeMerchantIngredients(s32 a3) {
+    // tail-call arguments inferred from the registers set before the call
+    s32 t0 = *(s32*)((u8*)lbl_805FBBE0);
+    return (u32)(fn_8022E440((s32)((u32)(t0)), (s32)((u32)(uintptr_t)(a3))));
+}
+
+// 0x800FA5F4
+void DoTradeWithMerchant(void) {
+    // tail-call arguments inferred from the registers set before the call
+    s32 t0 = *(s32*)((u8*)lbl_805FBBE0);
+    fn_8022E658((s32)((u32)(t0)));
+}
+
+// 0x800FA5FC
+void DebugSetPlayerRank(u32 a3) {
+    // tail-call arguments inferred from the registers set before the call
+    s32 t0 = *(s32*)((u8*)lbl_805FBBE0);
+    fn_8022E3E0((s32)((u32)(t0)), (s32)((u32)(uintptr_t)(a3)));
+}
+
+// 0x800FA9B8
+void UpdateSplashScreen(void) {
+    f32 t0 = *(f32*)((u8*)lbl_805FEB4C);
+    LoadingScreenTick((int)((u32)(0)), (f32)(t0));
+}
+
 // 0x800FA9C4
 u32 EnableMainMenuDebugOptions(void) {
     return (u32)(0);
@@ -204,6 +1022,31 @@ u32 EnableMainMenuDebugOptions(void) {
 // 0x800FA9CC
 u32 IsFinalBuild(void) {
     return (u32)(1);
+}
+
+// 0x800FA9D4
+void SetEnableHomeButton(u32 a3) {
+    u32 t0 = (u32)(a3 == 0);
+    *(u32*)((u8*)lbl_805FBA30) = (u32)((u32)(t0));
+}
+
+// 0x800FA9E4
+void SetEnableHomeButtonDisableIcon(u32 a3) {
+    if (a3 == 0) {
+        fn_801FC1E4((s32)((u32)(0)));
+        return;
+    }
+    fn_801FC1E4((s32)((u32)(1)));
+}
+
+// 0x800FA9FC
+void SetSpecialGameEvent(u32 a3) {
+    // tail-call arguments inferred from the registers set before the call
+    if (a3 == 0) {
+        fn_800E69EC((s32)((u32)(0)));
+        return;
+    }
+    fn_800E69EC((s32)((u32)(1)));
 }
 
 // 0x800FAB38
@@ -249,6 +1092,19 @@ u32 GetOptionsRumble(void) {
     u8* t0 = *(u8**)((u8*)lbl_805FBBE0);
     u8 t1 = *(u8*)(t0 + 2332);
     return (u32)(t1);
+}
+
+// 0x800FB468
+u32 IsCurrentInteractionID(u32 a3) {
+    u8* t0 = *(u8**)((u8*)lbl_805FBBE0);
+    if (t0 == 0) {
+        return (u32)(0);
+    }
+    s32 t1 = *(s32*)(t0 + 304);
+    if ((u32)(uintptr_t)(a3) != (u32)(t1)) {
+        return (u32)(0);
+    }
+    return (u32)(1);
 }
 
 // 0x800FB6EC

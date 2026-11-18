@@ -5,10 +5,27 @@
 
 #include "types.h"
 
+extern "C" void fn_8004B754(u8*);
+extern "C" void fn_801ED1F8(u8*);
+
+// 0x8004E58C
+extern "C" void fn_8004E58C(u8* a3) {
+    // tail-call arguments inferred from the registers set before the call
+    u8* t0 = ((u8*)(uintptr_t)(a3)) + -3144;
+    fn_8004B754(t0);
+}
+
 // 0x8004E8CC
 extern "C" s32 fn_8004E8CC(u8* a3) {
     s32 t0 = *(s32*)(((u8*)(uintptr_t)(a3)) + 616);
     return (s32)(t0);
+}
+
+// 0x8005015C
+extern "C" void LimbHasEffect(u8* a3) {
+    // tail-call arguments inferred from the registers set before the call
+    u8* t0 = ((u8*)(uintptr_t)(a3)) + 148;
+    fn_801ED1F8(t0);
 }
 
 // 0x80050588

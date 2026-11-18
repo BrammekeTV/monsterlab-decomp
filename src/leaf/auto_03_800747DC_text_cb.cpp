@@ -6,6 +6,9 @@
 #include "types.h"
 #include "game/script_callbacks.h"
 
+extern "C" s32 fn_80070448(void);
+extern "C" void fn_80070450(s32);
+
 // 0x800747DC
 s32 RunIngredientsSelection(void) {
     return (s32)(1);
@@ -17,4 +20,20 @@ s32 StringHashValid(u32 a3) {
     u32 t1 = (u32)(t0) | (u32)(uintptr_t)(a3);
     u32 t2 = (((u32)(t1) << 1) | ((u32)(t1) >> 31)) & 0x1u;
     return (s32)(t2);
+}
+
+// 0x80074984
+void LoadExperimentUI(s32 a3) {
+    u32 t0 = (u32)(0xf6120000) - 2250u;
+    UIEngine_LoadUIScreenSet((s32)((u32)(uintptr_t)(a3)));
+}
+
+// 0x80074CA0
+s32 GetExperimentDifficulty(void) {
+    return (s32)(fn_80070448());
+}
+
+// 0x80074CA4
+void SetNextExperimentDifficulty(s32 a3) {
+    fn_80070450((s32)((u32)(uintptr_t)(a3)));
 }

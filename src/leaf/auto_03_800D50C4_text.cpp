@@ -5,9 +5,55 @@
 
 #include "types.h"
 
+extern "C" void fn_800D6A24(void);
+
 // 0x800D50C4
 extern "C" void fn_800D50C4(u8* a3) {
     *(u32*)(((u8*)(uintptr_t)(a3)) + 0) = (u32)((u32)(0));
+}
+
+// 0x800D5660
+extern "C" u32 fn_800D5660(u8* a3) {
+    u8* t0 = *(u8**)(((u8*)(uintptr_t)(a3)) + 0);
+    s32 t1 = *(s32*)(t0 + 20);
+    if (t1 == 0) {
+        return (u32)(0);
+    }
+    u32 t2 = (u32)(t1) + 164u;
+    return (u32)(t2);
+}
+
+// 0x800D5680
+extern "C" s32 fn_800D5680(u8* a3) {
+    u8* t0 = *(u8**)(((u8*)(uintptr_t)(a3)) + 0);
+    u8* t1 = *(u8**)(t0 + 20);
+    if (t1 == 0) {
+        return (s32)(0);
+    }
+    s32 t2 = *(s32*)(t1 + 424);
+    return (s32)(t2);
+}
+
+// 0x800D56A0
+extern "C" s32 fn_800D56A0(u8* a3) {
+    u8* t0 = *(u8**)(((u8*)(uintptr_t)(a3)) + 0);
+    u8* t1 = *(u8**)(t0 + 20);
+    if (t1 == 0) {
+        return (s32)(0);
+    }
+    s32 t2 = *(s32*)(t1 + 420);
+    return (s32)(t2);
+}
+
+// 0x800D56C0
+extern "C" s32 fn_800D56C0(u8* a3) {
+    u8* t0 = *(u8**)(((u8*)(uintptr_t)(a3)) + 0);
+    u8* t1 = *(u8**)(t0 + 20);
+    if (t1 == 0) {
+        return (s32)(1);
+    }
+    s32 t2 = *(s32*)(t1 + 88);
+    return (s32)(t2);
 }
 
 // 0x800D56E0
@@ -20,11 +66,141 @@ extern "C" u32 PathAtWaypoint(u8* a3) {
     return (u32)(t4);
 }
 
+// 0x800D56F8
+extern "C" s32 PathGetNodeId(u8* a3) {
+    u8* t0 = *(u8**)(((u8*)(uintptr_t)(a3)) + 0);
+    u8* t1 = *(u8**)(t0 + 20);
+    if (t1 == 0) {
+        return (s32)(0);
+    }
+    s32 t2 = *(s32*)(t1 + 0);
+    return (s32)(t2);
+}
+
 // 0x800D5718
 extern "C" u32 PathGetPosition(u8* a3) {
     s32 t0 = *(s32*)(((u8*)(uintptr_t)(a3)) + 0);
     u32 t1 = (u32)(t0) + 24u;
     return (u32)(t1);
+}
+
+// 0x800D5800
+extern "C" s32 fn_800D5800(u8* a3) {
+    u8* t0 = *(u8**)(((u8*)(uintptr_t)(a3)) + 0);
+    u8* t1 = *(u8**)(t0 + 16);
+    if (t1 == 0) {
+        return (s32)(-1);
+    }
+    s32 t2 = *(s32*)(t1 + 20);
+    return (s32)(t2);
+}
+
+// 0x800D581C
+extern "C" s32 PathGetNodeText(u8* a3) {
+    u8* t0 = *(u8**)(((u8*)(uintptr_t)(a3)) + 0);
+    u8* t1 = *(u8**)(t0 + 20);
+    if (t1 == 0) {
+        return (s32)(0);
+    }
+    s32 t2 = *(s32*)(t1 + 160);
+    return (s32)(t2);
+}
+
+// 0x800D5838
+extern "C" u8* fn_800D5838(u8* a3, s32 a4) {
+    u8* t0 = *(u8**)(((u8*)(uintptr_t)(a3)) + 0);
+    u8* t1 = *(u8**)(t0 + 20);
+    if (t1 == 0) {
+        return (u8*)(t1);
+    }
+    *(u32*)(t1 + 160) = (u32)((u32)(uintptr_t)(a4));
+    return (u8*)(t1);
+}
+
+// 0x800D5924
+extern "C" s32 PathIsAtJunction(u8* a3) {
+    u8* t0 = *(u8**)(((u8*)(uintptr_t)(a3)) + 0);
+    u8* t1 = *(u8**)(t0 + 20);
+    if (t1 == 0) {
+        return (s32)(1);
+    }
+    u8 t2 = *(u8*)(t1 + 156);
+    return (s32)(t2);
+}
+
+// 0x800D5944
+extern "C" s32 PathGetNodeType(u8* a3) {
+    u8* t0 = *(u8**)(((u8*)(uintptr_t)(a3)) + 0);
+    u8* t1 = *(u8**)(t0 + 20);
+    if (t1 == 0) {
+        return (s32)(1);
+    }
+    s32 t2 = *(s32*)(t1 + 64);
+    return (s32)(t2);
+}
+
+// 0x800D5964
+extern "C" s32 PathIsInConversation(u8* a3) {
+    u8* t0 = *(u8**)(((u8*)(uintptr_t)(a3)) + 0);
+    u8* t1 = *(u8**)(t0 + 20);
+    if (t1 == 0) {
+        return (s32)(0);
+    }
+    s32 t2 = *(s32*)(t1 + 152);
+    return (s32)(t2);
+}
+
+// 0x800D5984
+extern "C" s32 PathGetChallengeId(u8* a3) {
+    u8* t0 = *(u8**)(((u8*)(uintptr_t)(a3)) + 0);
+    u8* t1 = *(u8**)(t0 + 20);
+    if (t1 == 0) {
+        return (s32)(0);
+    }
+    s32 t2 = *(s32*)(t1 + 148);
+    return (s32)(t2);
+}
+
+// 0x800D59D4
+extern "C" s32 fn_800D59D4(u8* a3) {
+    u8* t0 = *(u8**)(((u8*)(uintptr_t)(a3)) + 0);
+    u8* t1 = *(u8**)(t0 + 20);
+    if (t1 == 0) {
+        return (s32)(0);
+    }
+    s32 t2 = *(s32*)(t1 + 96);
+    return (s32)(t2);
+}
+
+// 0x800D5DA4
+extern "C" u8* PathSetPaused(u8* a3, s32 a4) {
+    if (a4 == 0) {
+        u8* t0 = *(u8**)(((u8*)(uintptr_t)(a3)) + 0);
+        *(u32*)(t0 + 8) = (u32)((u32)(0));
+        return (u8*)(t0);
+    }
+    u8* t1 = *(u8**)(((u8*)(uintptr_t)(a3)) + 0);
+    *(u32*)(t1 + 8) = (u32)((u32)(2));
+    return (u8*)(t1);
+}
+
+// 0x800D5DCC
+extern "C" u32 PathIsPaused(u8* a3) {
+    u8* t0 = *(u8**)(((u8*)(uintptr_t)(a3)) + 0);
+    s32 t1 = *(s32*)(t0 + 8);
+    u32 t2 = (u32)(t1) - 2u;
+    u32 t3 = (u32)(t2 == 0);
+    return (u32)(t3);
+}
+
+// 0x800D6A00
+extern "C" void PathReverse(u8* a3) {
+    // tail-call arguments inferred from the registers set before the call
+    u8* t0 = *(u8**)(((u8*)(uintptr_t)(a3)) + 0);
+    u8 t1 = *(u8*)(t0 + 4);
+    u32 t2 = (u32)(t1 == 0);
+    *(u8*)(t0 + 4) = (u8)((u32)(t2));
+    fn_800D6A24();
 }
 
 // 0x800D6A18

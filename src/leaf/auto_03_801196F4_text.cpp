@@ -5,6 +5,8 @@
 
 #include "types.h"
 
+extern u8 lbl_803E6B28[];
+extern u8 lbl_803E6B34[];
 extern u8 lbl_805F8F20[];
 extern u8 lbl_805FB26C[];
 extern u8 lbl_805FB270[];
@@ -13,6 +15,7 @@ extern u8 lbl_805FB278[];
 extern u8 lbl_805FB28C[];
 extern u8 lbl_805FB290[];
 extern u8 lbl_805FB291[];
+extern "C" void fn_8011A04C(void);
 
 // 0x80119788
 extern "C" void fn_80119788(void) {
@@ -28,6 +31,14 @@ extern "C" void fn_80119790(void) {
 
 // 0x80119794
 extern "C" void fn_80119794(void) {
+}
+
+// 0x80119AE0
+extern "C" void fn_80119AE0(void) {
+    // tail-call arguments inferred from the registers set before the call
+    *(u32*)((u8*)lbl_803E6B28 + 4) = (u32)((u32)(-1));
+    *(u32*)((u8*)lbl_803E6B34 + 4) = (u32)((u32)(-1));
+    fn_8011A04C();
 }
 
 // 0x80119C58

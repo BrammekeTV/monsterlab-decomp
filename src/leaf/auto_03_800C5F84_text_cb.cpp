@@ -9,3 +9,11 @@
 // 0x800C6A58
 void Stitching_Bug_PositionToHide(void* a3) {
 }
+
+// 0x800C6A5C
+void Stitching_Bug_StartBugMoving(void* a3) {
+    if (a3 == 0) {
+        return;
+    }
+    *(u32*)(((u8*)(uintptr_t)(a3)) + 616) = (u32)((u32)(2));
+}
