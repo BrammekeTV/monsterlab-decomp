@@ -65,9 +65,8 @@ static void PushNotice(SaveProgress* s, s32 type, s32 value) {
     NoticePosted(s);
 }
 
-// Add MSP (experience) to the player and post a notice for every rank gained.
-static void AddMSP(u32 amount) {
-    SaveProgress* s = gSaveSystem;
+// Add MSP (experience) to a save and post a notice for every rank gained.
+static void AddMSPTo(SaveProgress* s, u32 amount) {
     s->msp += amount;
     if (s->msp > MAX_MSP) s->msp = MAX_MSP;
     if ((s32)s->rank >= MAX_RANK) return;
@@ -80,6 +79,8 @@ static void AddMSP(u32 amount) {
     }
     if (gained) PushNotice(s, NOTICE_RANK_UP, s->rank);
 }
+
+static void AddMSP(u32 amount) { AddMSPTo(gSaveSystem, amount); }
 
 static void Unlock(SaveProgress* s, s32 id) {
     u64 bit = (u64)1 << (id - 0x40);
@@ -600,6 +601,124 @@ void fn_802268BC(u8* s, const u8* spec) {
     s32 q = *(const s16*)(spec + 0x12) + RandomUpTo(*(const s16*)(spec + 0x14) - *(const s16*)(spec + 0x12));
     LabOnMaterialReward(gLab, mat, 1, (u8)q);
     LabAddMaterial(s + 0xA30, mat, 1, (u8)q, TRUE);
+}
+
+}  // extern "C"
+
+// ---------------------------------------------------------------- experiment / discovery
+
+extern "C" {
+void fn_802189E0(void* lab);              // 0x802189E0
+s32  PartPower(s32 defIndex, s32 tier);   // 0x8021B650 (opponent_gen.cpp)
+}
+
+// Badges for discovering many part types: (row of the threshold table at db+0x99D0, badge id).
+static const u32 kDiscoverBadgeRow[8] = { 0x59, 0x5A, 0x5B, 0x5C, 0x5D, 0x5E, 0xA3, 0x5F };
+static const u32 kDiscoverBadge[8]    = { 0x37, 0x38, 0x39, 0x3A, 0x3B, 0x3C, 0x3D, 0x3E };
+enum { NOTICE_TYPE_7 = 7 };
+
+extern "C" {
+
+// 0x802239D0
+// Record that a part type has been seen at a tier. The first time gives MSP (part power times a
+// tuning factor) and the matching rank-ups, tells the lab, and then (while fewer than 0x270 part
+// tiers are known) awards any "discovered N parts" badge whose threshold has been reached.
+// (The original also fetched the part definition here but never used it.)
+void SaveDiscoverPart(u8* s, s32 type, u8 tier) {
+    SaveProgress* sp = (SaveProgress*)s;
+    if ((u32)type >= 0x9C || tier == 0 || tier > 4) return;
+    u8 bit = (u8)(1 << (tier - 1));
+    if (bit != (bit & s[0x40 + type])) {
+        *(s32*)(s + 0x11C) += 1;
+        s[0x40 + type] |= bit;
+        s32 part = *(const s32*)(*(u8**)(Db() + 0x6C18) + type * 0x24 + 0x20);
+        s32 power = PartPower(part, tier);
+        f32 factor = *(const f32*)(*(u8**)(Db() + 0x99D0) + 0x674);
+        AddMSPTo(sp, (u32)(power * (u32)factor));
+        LabOnDiscoveryReward(gLab, type, tier);
+    }
+    s32 count = *(s32*)(s + 0x11C);
+    if (count >= 0x270) return;
+    for (s32 i = 7; i >= 0; i--) {
+        u32 badge = kDiscoverBadge[i];
+        if (SaveHasBadge(s, badge)) continue;
+        const u8* row = *(u8**)(Db() + 0x99D0) + kDiscoverBadgeRow[i] * 8;
+        if (count < (s32)*(const f32*)(row + 4)) continue;
+        SaveAddBadge(sp, (s32)badge);
+    }
+}
+
+// 0x80224A34
+// Finish an experiment: `quest` is the quest/reward id it completes (-1 for none), `quality`
+// (capped at 100) is the quality of the part produced. If the quest has a pending unlock reward
+// it is handed out (and removed from the pending list) instead of the experiment's own part.
+// Otherwise (when the lab has an experiment result selected) the result row gives MSP (rank-ups
+// are checked), a part discovery with notice 8 (new tier of a known part) or 7 (new part), and a
+// new part for the inventory, which gets an enhancement or a random defect depending on the kind.
+void SaveRewardExperiment(SaveProgress* s, s32 quest, s32 quality) {
+    u8* raw = (u8*)s;
+    if ((u32)quality > 100) quality = 100;
+    LabQuestFinished(gLab, quest);
+    BOOL unlocked = FALSE;
+    if (quest != -1) {
+        for (s32 i = 0; i < (s32)raw[0x124]; i++) {
+            const u8* rec = *(u8**)(Db() + 0x8D58) + *(s32*)(raw + 0x6BC + i * 4) * 0x3C;
+            u8 copy[0x3C];
+            memcpy(copy, rec, 0x3C);
+            if (*(const s32*)(copy + 8) != quest) continue;
+            SaveUnlockReward(s, copy, FALSE);
+            if ((u32)i < raw[0x124]) {
+                // Remove from the pending list by moving the last entry into the hole.
+                *(s32*)(raw + 0x6BC + i * 4) = *(s32*)(raw + 0x6BC + (raw[0x124] - 1) * 4);
+                *(s32*)(raw + 0x6BC + (raw[0x124] - 1) * 4) = -1;
+                raw[0x124]--;
+            }
+            unlocked = TRUE;
+            break;
+        }
+    }
+
+    u8* lab = (u8*)gLab;
+    if (*(s32*)(lab + 0x58) == -1) return;
+    AddMSPTo(s, *(u32*)(lab + 0x78));
+
+    const u8* exp = *(u8**)(Db() + 0x5328) + *(s32*)(lab + 0x54) * 0x18;
+    const u8* row = *(u8**)(Db() + 0x6C18) + *(s32*)(lab + 0x58) * 0x24;
+    s32 kind = *(const s32*)(exp + 8);
+    u8  tier = *(const u8*)(exp + 0x13);       // low byte of the word at +0x10
+    s32 partType = *(const s32*)row;
+    BOOL isKind = *(const s32*)(row + 0x14) == kind;
+
+    BOOL full = SavePartTierSeen(raw, partType, tier) && (raw[0x40 + partType] & (1 << (tier + 3)));
+    BOOL seen = SavePartTierSeen(raw, partType, tier);
+    LabOnDiscoveryReward(gLab, -1, 0);
+    if (isKind && !full) {
+        SaveDiscoverPart(raw, partType, tier);
+        if (SavePartTierSeen(raw, partType, tier)) raw[0x40 + partType] |= (u8)(1 << (tier + 3));
+        PostNotice6(s, NOTICE_DISCOVERY, partType, (s8)tier);
+    } else if (!full && !seen) {
+        SaveDiscoverPart(raw, partType, tier);
+        PostNotice6(s, NOTICE_TYPE_7, partType, (s8)tier);
+    }
+
+    if (unlocked) return;
+    s32 def = *(const s32*)(row + 0x20);
+    PartInstance* p = PartInventoryAlloc(raw + 0xA30);
+    if (p != NULL) PartSetDef(p, def);
+    if (p != NULL) {
+        PartSetTier(p, tier);
+        PartSetQuality(p, (s8)quality);
+        if (*(const s32*)(row + 0x14) == kind) {
+            PartDef d;
+            PartDbGetDef(&d, gGameDb, def);
+            p->enhancement = d.unk20;
+        } else if (*(const s32*)(row + 0x18) == kind || *(const s32*)(row + 0x1C) == kind) {
+            p->defect = fn_8022515C(raw, (u8*)p);
+        }
+        PartSetHealth(p, PartGetMaxHealth(p));
+        LabOnPartReward(gLab, p);
+    }
+    fn_802189E0(gLab);
 }
 
 }  // extern "C"

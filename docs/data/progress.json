@@ -1,15 +1,15 @@
 {
  "game_id": "RM7P4F",
- "generated": "2026-11-18T14:54:56+00:00",
- "commit": "7ca7a0c",
- "commit_date": "2026-11-18T14:41:11+01:00",
+ "generated": "2026-11-18T15:44:37+00:00",
+ "commit": "7875a2b",
+ "commit_date": "2026-11-18T15:54:57+01:00",
  "game": {
   "functions": 8548,
   "bytes": 2265988,
   "named": 2731,
   "named_bytes": 610828,
-  "decompiled": 2892,
-  "decompiled_bytes": 289960
+  "decompiled": 2924,
+  "decompiled_bytes": 296268
  },
  "library": {
   "functions": 4039,
@@ -24,8 +24,8 @@
   "bytes": 3404928,
   "named": 3194,
   "named_bytes": 715576,
-  "decompiled": 2893,
-  "decompiled_bytes": 290080
+  "decompiled": 2925,
+  "decompiled_bytes": 296388
  },
  "game_range": [
   "80006B40",
@@ -433,15 +433,15 @@
    0.001
   ],
   [
-   0.002,
+   0.028,
    0.0
   ],
   [
-   0.01,
+   0.056,
    0.009
   ],
   [
-   0.009,
+   0.094,
    0.142
   ],
   [
@@ -461,11 +461,11 @@
    0.541
   ],
   [
-   0.053,
+   0.06,
    0.97
   ],
   [
-   0.024,
+   0.14,
    0.957
   ],
   [
@@ -1033,7 +1033,7 @@
    0.967
   ],
   [
-   0.573,
+   1.0,
    0.958
   ],
   [
@@ -4006,6 +4006,11 @@
      "size": 76
     },
     {
+     "name": "SaveDiscoverPart",
+     "addr": "802239D0",
+     "size": 2048
+    },
+    {
      "name": "TuningGetPair",
      "addr": "802241D0",
      "size": 32
@@ -4039,6 +4044,11 @@
      "name": "SaveGiveQuestReward",
      "addr": "8022497C",
      "size": 184
+    },
+    {
+     "name": "SaveRewardExperiment",
+     "addr": "80224A34",
+     "size": 1832
     },
     {
      "name": "fn_8022515C",
@@ -4519,6 +4529,166 @@
      "name": "GameSessionUpdate",
      "addr": "80008544",
      "size": 4580
+    }
+   ]
+  },
+  {
+   "path": "src/game/small_800E.cpp",
+   "functions": [
+    {
+     "name": "fn_800E0228",
+     "addr": "800E0228",
+     "size": 96
+    },
+    {
+     "name": "fn_800E0BCC",
+     "addr": "800E0BCC",
+     "size": 92
+    },
+    {
+     "name": "fn_800E0C28",
+     "addr": "800E0C28",
+     "size": 72
+    },
+    {
+     "name": "fn_800E2DF4",
+     "addr": "800E2DF4",
+     "size": 84
+    },
+    {
+     "name": "fn_800E2E48",
+     "addr": "800E2E48",
+     "size": 84
+    },
+    {
+     "name": "fn_800E2EBC",
+     "addr": "800E2EBC",
+     "size": 84
+    },
+    {
+     "name": "fn_800E2FE8",
+     "addr": "800E2FE8",
+     "size": 84
+    },
+    {
+     "name": "fn_800E3280",
+     "addr": "800E3280",
+     "size": 96
+    },
+    {
+     "name": "fn_800E36CC",
+     "addr": "800E36CC",
+     "size": 96
+    },
+    {
+     "name": "fn_800E3750",
+     "addr": "800E3750",
+     "size": 92
+    },
+    {
+     "name": "fn_800E37B4",
+     "addr": "800E37B4",
+     "size": 96
+    },
+    {
+     "name": "fn_800E3838",
+     "addr": "800E3838",
+     "size": 92
+    },
+    {
+     "name": "fn_800E389C",
+     "addr": "800E389C",
+     "size": 96
+    },
+    {
+     "name": "fn_800E3C74",
+     "addr": "800E3C74",
+     "size": 96
+    },
+    {
+     "name": "fn_800E4268",
+     "addr": "800E4268",
+     "size": 96
+    }
+   ]
+  },
+  {
+   "path": "src/game/small_800F.cpp",
+   "functions": [
+    {
+     "name": "PrintCurrentLevelName",
+     "addr": "800F00BC",
+     "size": 48
+    },
+    {
+     "name": "get_reg",
+     "addr": "800F0194",
+     "size": 60
+    },
+    {
+     "name": "decr_reg",
+     "addr": "800F01D0",
+     "size": 72
+    },
+    {
+     "name": "get_reg0",
+     "addr": "800F0248",
+     "size": 56
+    },
+    {
+     "name": "reg0_gt_0",
+     "addr": "800F0280",
+     "size": 68
+    },
+    {
+     "name": "decr_reg0",
+     "addr": "800F02C4",
+     "size": 56
+    },
+    {
+     "name": "GetCurrentJunctionID",
+     "addr": "800F04C0",
+     "size": 76
+    },
+    {
+     "name": "ExplorationShutdown",
+     "addr": "800F0F6C",
+     "size": 80
+    },
+    {
+     "name": "MoveEnemyToJunction",
+     "addr": "800F1044",
+     "size": 80
+    },
+    {
+     "name": "MoveEnemyToPlayer",
+     "addr": "800F1094",
+     "size": 72
+    },
+    {
+     "name": "CheckJunctionEnterEntity",
+     "addr": "800F1778",
+     "size": 60
+    },
+    {
+     "name": "ReversePlayerDirection",
+     "addr": "800F186C",
+     "size": 80
+    },
+    {
+     "name": "SetPlayerConfused",
+     "addr": "800F194C",
+     "size": 88
+    },
+    {
+     "name": "InventoryGetPartMadness",
+     "addr": "800F1FC0",
+     "size": 88
+    },
+    {
+     "name": "InventoryGetPartQuality",
+     "addr": "800F2018",
+     "size": 88
     }
    ]
   },
