@@ -791,3 +791,6 @@ fn_80213660 BattleClear
 fn_8020F8E0 BattleCtor
 fn_8020FEEC BattleDtor
 fn_80210060 BattleUpdate
+fn_802102DC BattleTickFighters
+fn_80210634 BattleSpeedRoll
+fn_802188E4 LabTickReset

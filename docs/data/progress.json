@@ -1,15 +1,15 @@
 {
  "game_id": "RM7P4F",
- "generated": "2026-11-18T13:35:27+00:00",
- "commit": "502b986",
- "commit_date": "2026-11-18T13:26:56+01:00",
+ "generated": "2026-11-18T13:39:00+00:00",
+ "commit": "50011a8",
+ "commit_date": "2026-11-18T14:35:32+01:00",
  "game": {
   "functions": 8548,
   "bytes": 2265988,
-  "named": 2728,
-  "named_bytes": 608636,
-  "decompiled": 2886,
-  "decompiled_bytes": 285952
+  "named": 2731,
+  "named_bytes": 610828,
+  "decompiled": 2889,
+  "decompiled_bytes": 288144
  },
  "library": {
   "functions": 4039,
@@ -22,10 +22,10 @@
  "all": {
   "functions": 12587,
   "bytes": 3404928,
-  "named": 3191,
-  "named_bytes": 713384,
-  "decompiled": 2887,
-  "decompiled_bytes": 286072
+  "named": 3194,
+  "named_bytes": 715576,
+  "decompiled": 2890,
+  "decompiled_bytes": 288264
  },
  "game_range": [
   "80006B40",
@@ -997,8 +997,8 @@
    0.057
   ],
   [
-   0.797,
-   0.797
+   1.0,
+   1.0
   ],
   [
    0.988,
@@ -1013,8 +1013,8 @@
    0.212
   ],
   [
-   0.687,
-   0.779
+   0.704,
+   0.796
   ],
   [
    1.0,
@@ -2086,9 +2086,24 @@
      "size": 636
     },
     {
+     "name": "BattleTickFighters",
+     "addr": "802102DC",
+     "size": 856
+    },
+    {
+     "name": "BattleSpeedRoll",
+     "addr": "80210634",
+     "size": 1156
+    },
+    {
      "name": "BattleClear",
      "addr": "80213660",
      "size": 432
+    },
+    {
+     "name": "LabTickReset",
+     "addr": "802188E4",
+     "size": 180
     },
     {
      "name": "BlockPoolCreate",

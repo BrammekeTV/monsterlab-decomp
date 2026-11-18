@@ -406,13 +406,6 @@ extern "C" s32 fn_80220A2C(void) {
     return (s32)(0);
 }
 
-// 0x80220A34
-extern "C" void fn_80220A34(u8* a3) {
-    u32 t0 = (u32)(0xbf0000) - 4352u;
-    *(u32*)(((u8*)(uintptr_t)(a3)) + 2496) = (u32)((u32)(625));
-    *(u32*)(((u8*)(uintptr_t)(a3)) + 2500) = (u32)((u32)(t0));
-}
-
 // 0x8022123C
 extern "C" u32 fn_8022123C(u8* a3) {
     return (u32)(RngNext((void*)(((u8*)(uintptr_t)(a3)))));

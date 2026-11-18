@@ -69,6 +69,11 @@
  "changelog": [
   {
    "date": "2026-11-18",
+   "time": "14:40",
+   "text": "Decompiled the battle's fighter-turn phase (both sides' owners act until they finish, then the choices are recorded) and the speed roll (each fighter rolls 1-49 plus limb bonuses, ties broken by a coin flip, results written to the battle log), plus the lab state reset."
+  },
+  {
+   "date": "2026-11-18",
    "time": "14:35",
    "text": "Decompiled the battle object itself: its constructor (default rules plus tuning values from the game database), destructor, clear-between-battles, and the per-frame update that runs the battle phases (intro, choosing, new round, attack playback, outro). Also its random number generator setup, block pools, and the runtime array-destroy helper."
   },

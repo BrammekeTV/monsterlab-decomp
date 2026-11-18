@@ -14,10 +14,31 @@ u8*   RoundSideInit(u8* r);                             // 0x80213B5C
 void  BattleStartRound(u8* b);                          // 0x802124F4
 void  BattleAdvance(u8* b);                             // 0x80212A00
 void  BattleTakeChoice(u8* b);                          // 0x80213308
-void  fn_802188E4(void* lab);
-void  fn_802102DC(u8* b);
-void  fn_80210634(u8* b);
+void  LabTickReset(u8* lab);                            // 0x802188E4
+void  BattleTickFighters(u8* b, f32 dt);                // 0x802102DC
+void  BattleSpeedRoll(u8* b);                           // 0x80210634
+u8**  FighterStatsGetPart(u8* stats, s32 slot);
+s32   FighterStatsGet(u8* stats, s32 i);
+u8**  FighterGetSlot(u8* f, s32 i);
+BOOL  BattleCommitAction(u8* battle, s32 side);         // 0x80211F98
+u32   BattleIsFinalRound(u8* b);                        // 0x80212BE4
+void  BattleAwardWin(u8* b);                            // 0x80213428
+u32   RngBelow(void* rng, u32 max);
+u32   fn_8022123C(u8* rng);                             // raw 32-bit random
+s32   PartActionStat1(void* p, u32 actionKey);          // 0x8021DE10
+void* ChoiceDestroy(void* c, s32 del);                  // 0x8020F394
+void  fn_80041810(u8* dst, u8* src);                    // copy a choice (action, limb flag, limb)
+void* fn_802209D8(s32 kind);                            // debug record allocator hook (NULL in retail)
+u8    fn_80220A14(void);                                // debug flag: swap speed-roll sides
+s32   fn_80220A2C(void);
+u32   fn_80220890(u8* data, s32 len);                   // CRC-32
+void  fn_802209F4(u8* data, s32 len);                   // debug record finish hook
+void  SysSprintf(char* buf, const char* fmt, ...);      // 0x80142EFC
+void  BattleLogAdd(void* log, const char* text);        // 0x802207A0
+void* memset(void* p, int c, unsigned long n);
 }
+extern u8* gBattle;         // 0x805FBBB8
+extern char lbl_80388F4C[]; // "Speed roll: %d + %d bonus = %d"
 extern u8 lbl_8038901C[];   // battle vtable
 extern void* gLab;          // 0x805FBBC8
 
@@ -237,17 +258,214 @@ typedef u32 (*PollFn)(void* obj);
 static inline u32 VTick(void* o, f32 dt) { return (*(TickFn*)(*(u8**)o + 0xC))(o, dt); }
 static inline u32 VCall(void* o, u32 slot) { return (*(PollFn*)(*(u8**)o + slot))(o); }
 
+// Read a choice (action id, limb flag, limb) out of a fighter's stats.
+static inline s32 ChoiceActionOf(u8* stats) {
+    u8 c[12]; fn_80041810(c, stats); s32 v = *(s32*)c; ChoiceDestroy(c, -1); return v;
+}
+static inline s32 ChoiceLimbOf(u8* stats) {
+    u8 c[12]; fn_80041810(c, stats); s32 v = *(s32*)(c + 8); ChoiceDestroy(c, -1); return v;
+}
+
+// 0x802102DC
+// Battle phase 1: both fighters' owners (player/AI) act until both are done. Then the choices
+// are copied into the round record and the battle moves on. A finished battle awards the win
+// and enters phase 8.
+void BattleTickFighters(u8* b, f32 dt) {
+    if (BattleIsFinalRound(b) == 1) {
+        BattleAwardWin(b);
+        *(u32*)(b + 0xA18) = 8;
+        VCall(*(void**)(b + 0xA34), 0x14);
+        return;
+    }
+    u32 allDone = 1;
+    for (s32 i = 0; i < 2; i++) {
+        // Owner 1 waits while owner 0 is idle with [5] == 1 (the original reads owner 0 here).
+        u8* o0 = *(u8**)(*(u8**)(b + 0xA00) + 0x20);
+        bool hold = (o0[4] == 0 && o0[5] == 1 && i == 1);
+        u8* fighter = ((u8**)(b + 0xA00))[i];
+        u8* owner = *(u8**)(fighter + 0x20);
+        if (owner[4] == 0 && !hold) VTick(owner, dt);
+        allDone = (allDone & owner[4]) != 0;
+        if (owner[4] != 0 && i == 0 && b[0xACD] == 0) {
+            // Debug input recorder (hook is empty in the retail build).
+            u8* rec = (u8*)fn_802209D8(2);
+            if (rec != NULL) {
+                b[0xACD] = 1;
+                *(s32*)(rec + 4) = fn_80220A2C();
+                *(u32*)(rec + 0x1C) = 2;
+                *(u32*)(rec + 0xC) = 0x30;
+                *(s32*)(rec + 0x24) = ChoiceActionOf(fighter + 0x20);
+                *(s32*)(rec + 0x2C) = ChoiceLimbOf(fighter + 0x20);
+                *(u32*)(rec + 0x14) = 0;
+                *(u32*)(rec + 0x14) = fn_80220890(rec, 0x30);
+                fn_802209F4(rec, 0x30);
+            }
+        }
+    }
+    if (allDone != 1) return;
+    b[0xACD] = 0;
+    u32 mode = *(u32*)(b + 0xAD0);
+    if (mode == 4 || mode == 2) {
+        // Modes 2/4: if fighter 0's action is of category 2 or 3, fighter 1's choice is forced
+        // to action 0x4F on limb 4.
+        s32 act = ChoiceActionOf(*(u8**)(b + 0xA00) + 0x20);
+        u8* db = *(u8**)((u8*)gGameDb + 0xC);
+        s32 type = *(s32*)(*(u8**)(db + 0x430) + act * 0x14 + 4);
+        s32 kind = *(s32*)(*(u8**)(db + 8) + type * 0x24 + 8);
+        if ((u32)(kind - 2) <= 1) {
+            u8* dst = *(u8**)(b + 0xA04) + 0x38;
+            *(s32*)dst = 0x4F;
+            dst[4] = 0;
+            *(s32*)(dst + 8) = 4;
+        }
+    }
+    for (s32 i = 0; i < 2; i++) {
+        u8* other = ((u8**)(b + 0xA00))[1 - i];
+        *(s32*)(b + 0x9CC + i * 0xC) = ChoiceActionOf(other + 0x20);
+        *(s32*)(b + 0x9D0 + i * 0xC) = ChoiceLimbOf(other + 0x20);
+    }
+    BattleAdvance(b);
+}
+
+// 0x80210634
+// Battle phase 3: each fighter rolls speed (1..49) plus bonuses from its action's category and
+// working limbs; the higher total goes first (a tie is broken by a coin flip). Also records
+// what each side chose (committed / flagged) for the round.
+void BattleSpeedRoll(u8* b) {
+    b[0xA50] = 0;
+    s32 roll[2];
+    for (s32 i = 0; i < 2; i++) {
+        s32 r = (s32)RngBelow(b + 4, 0x31) + 1;
+        if (fn_80220A14() != 0) roll[1 - i] = r; else roll[i] = r;
+    }
+    s32 acted = 0;
+    for (s32 i = 0; i < 2; i++) {
+        b[0x9E4 + i] = 0;
+        *(s32*)(b + 0x9E8 + i * 4) = 1;
+        b[0x9F0 + i] = 0;
+        b[0x9FC + i] = 0;
+        b[0x9F2 + i] = 0;
+        *(s32*)(b + 0x9F4 + i * 4) = 0;
+
+        u8* stats = ((u8**)(gBattle + 0xA00))[i] + 0x20;
+        s32 act = ChoiceActionOf(stats);
+        u8* db = *(u8**)((u8*)gGameDb + 0xC);
+        u8* ent = *(u8**)(db + 0x430) + act * 0x14;
+        s32 type = *(s32*)(ent + 4);
+        s32 kind = *(s32*)(*(u8**)(db + 8) + type * 0x24 + 8);
+        switch (kind) {
+        case 0: (*(s32*)(b + 0xAF8))++; break;
+        case 1: (*(s32*)(b + 0xAF0))++; break;
+        case 2: (*(s32*)(b + 0xAF4))++; break;
+        case 3: (*(s32*)(b + 0xAFC))++; break;
+        }
+
+        // Limb effects on speed: effect 15 adds, defect 2 subtracts the tuned amount.
+        s32 bonus = 0;
+        for (s32 s = 0; s < 5; s++) {
+            u8** part = FighterStatsGetPart(stats, s);
+            bool broken = part == NULL || **(s32**)part <= 0;
+            if (!broken) {
+                u8* d = *(u8**)part;
+                if (*(s32*)(d + 0x20) == 0xF) bonus += *(s32*)(b + 0xA9C);
+                if (*(s32*)(d + 0x24) == 2) bonus -= *(s32*)(b + 0xA9C);
+            }
+        }
+
+        if (b[0x9FE + i] == 0) {
+            switch (kind) {
+            case 2:
+                *(s32*)(b + 0x9E8 + i * 4) = 0;
+                if (BattleCommitAction(b, i)) b[0x9F0 + i] = 1;
+                acted++;
+                break;
+            case 1:
+                *(s32*)(b + 0x9E8 + i * 4) = 0;
+                if (BattleCommitAction(b, i)) {
+                    b[0x9F2 + i] = 1;
+                    s32 limb = ChoiceLimbOf(stats);
+                    *(s32*)(b + 0x9F4 + i * 4) = (s32)(s16)*(u32*)(ent + 0xC);
+                    void* part = ((void**)((u8**)(gBattle + 0xA00))[i])[limb];
+                    if (part != NULL && *(void**)part != NULL)
+                        *(s32*)(b + 0x9F4 + i * 4) = PartActionStat1(*(void**)part, (u32)act);
+                }
+                acted++;
+                break;
+            case 5: {
+                u32 mode = *(u32*)(b + 0xAD0);
+                bool flag;
+                if (mode == 1 || mode == 3) {
+                    flag = true;
+                } else {
+                    u8** slot = FighterGetSlot(((u8**)(gBattle + 0xA00))[i], 1);
+                    flag = slot == NULL || **(s32**)slot <= 0;
+                }
+                if (flag) b[0x9FE + i] = 1; else b[0x9FC + i] = 1;
+                break;
+            }
+            }
+        }
+
+        s32 total = bonus + FighterStatsGet(stats, 6);
+        if (b[0x9FC + i] != 0) total -= 1000;
+        s32 old = roll[i];
+        roll[i] = old + total;
+        char buf[0xB0];
+        SysSprintf(buf, lbl_80388F4C, old, total, roll[i]);
+        BattleLogAdd(*(void**)(gBattle + i * 4 + 0xA3C), buf);
+    }
+    if (acted > 1) b[0xA50] = 1;
+    if (roll[0] == roll[1]) {
+        u32 coin = fn_8022123C(b + 4) & 1;
+        if (fn_80220A14() != 0) roll[1 - coin]++; else roll[coin]++;
+    }
+    *(u32*)(b + 0xA08) = roll[0] <= roll[1];
+}
+
+// 0x802188E4
+// Lab state reset: clears two blocks and sets every id to -1 / counter to 0.
+void LabTickReset(u8* lab) {
+    memset(lab + 0x48, 0, 0x10);
+    memset(lab + 0x6C, 0, 0x14);
+    *(s32*)(lab + 0x48) = -1;
+    *(s32*)(lab + 0x50) = -1;
+    *(s32*)(lab + 0x54) = -1;
+    *(s32*)(lab + 0x4C) = -1;
+    lab[0x6C] = 0;
+    *(u32*)(lab + 0x70) = 0;
+    *(u32*)(lab + 0x78) = 0;
+    *(s32*)(lab + 0x58) = -1;
+    *(s32*)(lab + 0x60) = -1;
+    *(u32*)(lab + 0x5C) = 0;
+    *(u32*)(lab + 0x3C) = 0;
+    *(s32*)(lab + 0x00) = -1;
+    *(u32*)(lab + 0x10) = 0;
+    lab[0x14] = 0;
+    *(s32*)(lab + 0x0C) = -1;
+    *(u32*)(lab + 0x1C) = 0;
+    lab[0x20] = 0;
+    *(s32*)(lab + 0x18) = -1;
+    *(u32*)(lab + 0x28) = 0;
+    lab[0x2C] = 0;
+    *(s32*)(lab + 0x24) = -1;
+    *(u32*)(lab + 0x34) = 0;
+    lab[0x38] = 0;
+    *(s32*)(lab + 0x30) = -1;
+    *(u32*)(lab + 0x08) = 0;
+}
+
+
 // 0x80210060
 // Per-frame battle update: count the turn timer down and run the current phase.
 void BattleUpdate(u8* b, f32 dt) {
     *(f32*)(b + 0xA14) -= dt;
     switch (*(u32*)(b + 0xA18)) {
     case 0:  // intro
-        fn_802188E4(gLab);
+        LabTickReset((u8*)gLab);
         if (VTick(*(void**)(b + 0xA34), dt) == 1) BattleAdvance(b);
         break;
     case 1:
-        fn_802102DC(b);
+        BattleTickFighters(b, dt);
         break;
     case 2:  // choosing: take the choice, then tick the listeners still running
         BattleTakeChoice(b);
@@ -257,7 +475,7 @@ void BattleUpdate(u8* b, f32 dt) {
             if (b[0xA2C + i] == 0) VTick(((void**)(b + 0xA1C))[i], dt);
         break;
     case 3:
-        fn_80210634(b);
+        BattleSpeedRoll(b);
         BattleAdvance(b);
         break;
     case 4: {  // new round record
