@@ -40,7 +40,7 @@ u32     PadGetHeld(s32 chan);                                    // 0x801B9B98
 void    fn_801229D0(void);                                       // 0x801229D0
 void    fn_8032F1E8(u8* obj, void (*cb)(void), s32 a, s32 b, s32 c); // 0x8032F1E8
 void    __destroy_arr(void* arr, void (*dtor)(void*, s32), u32 size, u32 count); // 0x8032F2E0
-void    fn_8022ED98(void* obj, s32 del);                         // 0x8022ED98
+u8* fn_8022ED98(u8* p, s32 del);                         // 0x8022ED98
 s32     SaveInitDefault(void);                                   // 0x80011754
 void    fn_80265D78(void* p);                                    // 0x80265D78
 }
@@ -238,7 +238,7 @@ u32 WasButtonReleased(u32 a0) {
 // object when del > 0. Returns the object.
 void* fn_80123364(u8* p, s32 del) {
     if (p != 0) {
-        __destroy_arr(p + 0xB98, fn_8022ED98, 0x988, 4);
+        __destroy_arr(p + 0xB98, (void (*)(void*, s32))fn_8022ED98, 0x988, 4);
         if (del > 0) operator_delete(p);
     }
     return p;

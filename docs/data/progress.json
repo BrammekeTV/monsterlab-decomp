@@ -1,15 +1,15 @@
 {
  "game_id": "RM7P4F",
- "generated": "2026-11-18T23:28:05+00:00",
- "commit": "12baef8",
- "commit_date": "2026-11-19T00:14:59+01:00",
+ "generated": "2026-11-19T00:27:35+00:00",
+ "commit": "3afb082",
+ "commit_date": "2026-11-19T00:28:07+01:00",
  "game": {
   "functions": 8548,
   "bytes": 2265988,
   "named": 2748,
   "named_bytes": 616800,
-  "decompiled": 4786,
-  "decompiled_bytes": 558224
+  "decompiled": 4827,
+  "decompiled_bytes": 566400
  },
  "library": {
   "functions": 4039,
@@ -24,8 +24,8 @@
   "bytes": 3404928,
   "named": 3211,
   "named_bytes": 721548,
-  "decompiled": 4787,
-  "decompiled_bytes": 558344
+  "decompiled": 4828,
+  "decompiled_bytes": 566520
  },
  "game_range": [
   "80006B40",
@@ -149,15 +149,15 @@
    0.398
   ],
   [
-   0.347,
+   0.349,
    0.687
   ],
   [
-   0.412,
+   0.429,
    0.736
   ],
   [
-   0.173,
+   0.274,
    0.101
   ],
   [
@@ -189,7 +189,7 @@
    0.13
   ],
   [
-   0.082,
+   0.158,
    0.324
   ],
   [
@@ -237,7 +237,7 @@
    0.312
   ],
   [
-   0.153,
+   0.175,
    0.115
   ],
   [
@@ -261,7 +261,7 @@
    0.448
   ],
   [
-   0.261,
+   0.342,
    0.136
   ],
   [
@@ -313,7 +313,7 @@
    0.0
   ],
   [
-   0.007,
+   0.058,
    0.052
   ],
   [
@@ -357,7 +357,7 @@
    0.0
   ],
   [
-   0.187,
+   0.301,
    0.135
   ],
   [
@@ -457,7 +457,7 @@
    0.843
   ],
   [
-   0.151,
+   0.181,
    0.541
   ],
   [
@@ -465,7 +465,7 @@
    0.97
   ],
   [
-   0.798,
+   0.832,
    0.957
   ],
   [
@@ -473,7 +473,7 @@
    0.931
   ],
   [
-   0.355,
+   0.41,
    0.99
   ],
   [
@@ -481,7 +481,7 @@
    1.0
   ],
   [
-   0.254,
+   0.304,
    0.929
   ],
   [
@@ -497,7 +497,7 @@
    0.0
   ],
   [
-   0.644,
+   0.733,
    1.0
   ],
   [
@@ -533,7 +533,7 @@
    0.955
   ],
   [
-   0.324,
+   0.337,
    0.853
   ],
   [
@@ -565,7 +565,7 @@
    0.547
   ],
   [
-   0.743,
+   0.756,
    0.749
   ],
   [
@@ -585,7 +585,7 @@
    0.287
   ],
   [
-   0.028,
+   0.085,
    0.367
   ],
   [
@@ -613,7 +613,7 @@
    0.676
   ],
   [
-   0.575,
+   0.642,
    0.834
   ],
   [
@@ -669,7 +669,7 @@
    0.327
   ],
   [
-   0.112,
+   0.121,
    0.042
   ],
   [
@@ -689,7 +689,7 @@
    0.0
   ],
   [
-   0.018,
+   0.06,
    0.022
   ],
   [
@@ -753,7 +753,7 @@
    0.0
   ],
   [
-   0.263,
+   0.268,
    0.257
   ],
   [
@@ -781,7 +781,7 @@
    0.02
   ],
   [
-   0.156,
+   0.171,
    0.017
   ],
   [
@@ -829,7 +829,7 @@
    0.094
   ],
   [
-   0.193,
+   0.236,
    0.103
   ],
   [
@@ -965,7 +965,7 @@
    0.0
   ],
   [
-   0.11,
+   0.117,
    0.056
   ],
   [
@@ -985,7 +985,7 @@
    0.0
   ],
   [
-   0.231,
+   0.242,
    0.377
   ],
   [
@@ -993,7 +993,7 @@
    0.0
   ],
   [
-   0.294,
+   0.302,
    0.096
   ],
   [
@@ -1025,7 +1025,7 @@
    0.998
   ],
   [
-   0.769,
+   0.772,
    0.385
   ],
   [
@@ -1053,7 +1053,7 @@
    0.149
   ],
   [
-   0.196,
+   0.204,
    0.056
   ]
  ],
@@ -5604,6 +5604,216 @@
      "name": "fn_801FF2A8",
      "addr": "801FF2A8",
      "size": 468
+    }
+   ]
+  },
+  {
+   "path": "src/game/draft_miss11.cpp",
+   "functions": [
+    {
+     "name": "ActionSelectable",
+     "addr": "800477D0",
+     "size": 12
+    },
+    {
+     "name": "AddTrackableScoreTrigger",
+     "addr": "800754D0",
+     "size": 192
+    },
+    {
+     "name": "AddMoveEntityTask",
+     "addr": "800ED4F0",
+     "size": 156
+    },
+    {
+     "name": "ActivateCurrentJunction",
+     "addr": "800F0B48",
+     "size": 308
+    },
+    {
+     "name": "AddPlayerMonsterFromDatabase",
+     "addr": "800F8F40",
+     "size": 416
+    },
+    {
+     "name": "AltitudeGreaterThan",
+     "addr": "801035B4",
+     "size": 20
+    },
+    {
+     "name": "fn_80126808",
+     "addr": "80126808",
+     "size": 112
+    },
+    {
+     "name": "AcquireZoneSlot",
+     "addr": "80131A20",
+     "size": 520
+    },
+    {
+     "name": "AlertShowScreen",
+     "addr": "80141CA4",
+     "size": 584
+    },
+    {
+     "name": "fn_8015EA40",
+     "addr": "8015EA40",
+     "size": 80
+    },
+    {
+     "name": "fn_8016A3F8",
+     "addr": "8016A3F8",
+     "size": 68
+    },
+    {
+     "name": "fn_8016A43C",
+     "addr": "8016A43C",
+     "size": 308
+    },
+    {
+     "name": "fn_8019BF64",
+     "addr": "8019BF64",
+     "size": 148
+    },
+    {
+     "name": "fn_801B5A60",
+     "addr": "801B5A60",
+     "size": 376
+    },
+    {
+     "name": "fn_801FFC04",
+     "addr": "801FFC04",
+     "size": 68
+    },
+    {
+     "name": "fn_8020F4F0",
+     "addr": "8020F4F0",
+     "size": 64
+    },
+    {
+     "name": "fn_8021F338",
+     "addr": "8021F338",
+     "size": 24
+    },
+    {
+     "name": "fn_802209CC",
+     "addr": "802209CC",
+     "size": 4
+    },
+    {
+     "name": "fn_80221288",
+     "addr": "80221288",
+     "size": 4
+    },
+    {
+     "name": "fn_8022ED98",
+     "addr": "8022ED98",
+     "size": 64
+    }
+   ]
+  },
+  {
+   "path": "src/game/draft_miss12.cpp",
+   "functions": [
+    {
+     "name": "BattleHudSetTurn",
+     "addr": "80048BF4",
+     "size": 192
+    },
+    {
+     "name": "AttackSequence_LoseLimb",
+     "addr": "8004A9DC",
+     "size": 620
+    },
+    {
+     "name": "AmplifyKnockback",
+     "addr": "8005C724",
+     "size": 240
+    },
+    {
+     "name": "AmIThreatenedByPlayersAnimDef",
+     "addr": "8005C82C",
+     "size": 440
+    },
+    {
+     "name": "BrainChunkSetInUse",
+     "addr": "80082384",
+     "size": 232
+    },
+    {
+     "name": "BrainChunkUpdateBounce",
+     "addr": "8008345C",
+     "size": 28
+    },
+    {
+     "name": "BrainChunkUpdateLoad",
+     "addr": "80083478",
+     "size": 452
+    },
+    {
+     "name": "AstralPickUpCollisionCallback",
+     "addr": "8009E600",
+     "size": 504
+    },
+    {
+     "name": "ArmWrestleArmMoveRight",
+     "addr": "800B746C",
+     "size": 328
+    },
+    {
+     "name": "ArmWrestleArmMoveUp",
+     "addr": "800B75B4",
+     "size": 144
+    },
+    {
+     "name": "ArmWrestleArmMoveLeft",
+     "addr": "800B7644",
+     "size": 328
+    },
+    {
+     "name": "ArmWrestleArmMoveDown",
+     "addr": "800B778C",
+     "size": 204
+    },
+    {
+     "name": "AnimDoneUB",
+     "addr": "800EC7EC",
+     "size": 164
+    },
+    {
+     "name": "AssignFieldRepairHealthPointsToPlayer",
+     "addr": "800F5C1C",
+     "size": 468
+    },
+    {
+     "name": "AltitudeLessThan",
+     "addr": "801035C8",
+     "size": 20
+    },
+    {
+     "name": "AnimSetPercentComplete",
+     "addr": "801035DC",
+     "size": 28
+    },
+    {
+     "name": "Badges_IncType",
+     "addr": "80115D60",
+     "size": 120
+    },
+    {
+     "name": "AnimGetTime",
+     "addr": "8018BE78",
+     "size": 44
+    },
+    {
+     "name": "AudioSetListenerFwd",
+     "addr": "8020AA3C",
+     "size": 44
+    },
+    {
+     "name": "AudioSetListenerUp",
+     "addr": "8020AA68",
+     "size": 44
     }
    ]
   },
@@ -22648,6 +22858,11 @@
     {
      "name": "WorldRefreshZones",
      "addr": "80131A14",
+     "size": 4
+    },
+    {
+     "name": "fn_80131A18",
+     "addr": "80131A18",
      "size": 4
     },
     {

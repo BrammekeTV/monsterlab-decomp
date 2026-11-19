@@ -24,7 +24,7 @@ void* fn_8021FEFC(u8* p, u8* seqData, s32 idx, void* cb, s32 arg);   // 0x8021FE
 void  fn_8021FF9C(u8* p, u8* q);                                     // 0x8021FF9C
 void* fn_8032F028(void* mem, void* ctor, s32 a, s32 size, s32 count); // 0x8032F028
 s32   fn_80221288(const char* a, const char* b, u32 n);              // 0x80221288
-void  fn_802209CC(void* dst, s32 val, s32 n);                        // 0x802209CC
+void* fn_802209CC(void* dst, s32 val, u32 n);                        // 0x802209CC
 void  fn_80220188(u8* p, u8* buf, s32 arg);                          // 0x80220188
 
 extern u8 lbl_80389160[];            // 0x80389160 (vtable)

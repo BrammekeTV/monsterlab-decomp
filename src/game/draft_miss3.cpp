@@ -40,7 +40,7 @@ void* fn_801EEB20(u8* heap, u32 size);                            // 0x801EEB20
 void  fn_801EBA20(void* list, void* item);                        // 0x801EBA20
 void  fn_801EF1A8(u8* heap, u8* arg);                             // 0x801EF1A8
 void* fn_8022ED60(void* p);                                       // 0x8022ED60
-void  fn_8022ED98(void* p, s32 del);                              // 0x8022ED98
+u8* fn_8022ED98(u8* p, s32 del);                              // 0x8022ED98
 void  fn_8032F1E8(void* arr, void (*ctor)(void), void (*dtor)(void), s32 size, s32 count);   // 0x8032F1E8
 void  operator_delete(void* p);                                   // 0x801D426C
 
@@ -309,7 +309,7 @@ void SaveManager_SaveOptions(void) {
             fn_80123954(lbl_805FB2CC, save);
             SaveGameWrite("save", save, 0x31C0);
         }
-        __destroy_arr(save + 0xB98, fn_8022ED98, 0x988, 4);
+        __destroy_arr(save + 0xB98, (void (*)(void*, s32))fn_8022ED98, 0x988, 4);
     }
 }
 

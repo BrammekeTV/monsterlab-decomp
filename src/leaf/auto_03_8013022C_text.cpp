@@ -5,8 +5,15 @@
 
 #include "types.h"
 
+extern "C" void fn_801384B0(u8*, s32, s32);
+
 // 0x80131A14
 extern "C" void WorldRefreshZones(void) {
+}
+
+// 0x80131A18
+extern "C" void fn_80131A18(u8* a3, s32 a4, s32 a5) {
+    fn_801384B0(((u8*)(uintptr_t)(a3)), (s32)((u32)(uintptr_t)(a4)), (s32)((u32)(uintptr_t)(a5)));
 }
 
 // 0x80132094

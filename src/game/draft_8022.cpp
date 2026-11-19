@@ -11,7 +11,7 @@ void  fn_8021FB28(void);                                        // 0x8021FB28: r
 void  fn_8021FF94(void* p, void* v);                            // 0x8021FF94: stores v at +0x14
 void  fn_8021FF9C(void* p, void* v);                            // 0x8021FF9C: stores v at +0x18
 void* MemCopy(void* dst, const void* src, u32 n);               // 0x802209C8 (tail call memcpy)
-void  fn_802209CC(void* dst, s32 val, u32 n);                   // 0x802209CC (tail call memset)
+void* fn_802209CC(void* dst, s32 val, u32 n);                   // 0x802209CC (tail call memset)
 s32   fn_80221288(const char* a, const char* b, u32 n);         // 0x80221288 (tail call string compare)
 extern const char* lbl_80389188[4];                             // 0x80389188
 extern const char* lbl_805FA0E4;                                // 0x805FA0E4

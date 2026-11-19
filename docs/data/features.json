@@ -94,6 +94,11 @@
  "changelog": [
   {
    "date": "2026-11-19",
+   "time": "02:45",
+   "text": "Sixth round from the missing-symbols list: 42 more functions, including script callbacks for action selection, altitude checks, brain chunk bounce/load, arm wrestling up/down, astral pickup, field repair health, adding trackable score triggers and entity move tasks, the junction activation jump table, zone slot acquisition and the alert screen."
+  },
+  {
+   "date": "2026-11-19",
    "time": "02:10",
    "text": "Fifth round from the missing-symbols list: 40 more functions, including UI widget animation and conversation HUD, the jump-table dispatchers behind two HUD updates, debug text printing, UI graphic and animation handles, the work-queue helper and a group of render-thread setup calls. Several older prototypes were corrected to match the asm."
   },

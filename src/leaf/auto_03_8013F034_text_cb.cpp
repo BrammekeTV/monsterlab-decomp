@@ -6,7 +6,7 @@
 #include "types.h"
 #include "game/script_callbacks.h"
 
-extern u8 lbl_805F90D8[];
+extern s32 lbl_805F90D8;
 extern s32 lbl_805FB418;
 extern u8 lbl_805FB41C[];
 extern u8 lbl_805FB41D[];

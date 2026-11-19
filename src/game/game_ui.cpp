@@ -220,7 +220,7 @@ void UIEngine_ActivateUIScreenSet(s32 id) {
 extern "C" void ZoneLog(void* loader, const char* fmt, ...);
 // 0x8000CC30
 // Debug log; the body was compiled out of the release build.
-void ZoneLog(void* loader, const char* fmt, ...) {
+extern "C" void ZoneLog(void* loader, const char* fmt, ...) {
     (void)loader; (void)fmt;
 }
 

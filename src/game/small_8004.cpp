@@ -15,7 +15,7 @@ void  fn_8020F23C(u8* p, s32 del);                              // 0x8020F23C
 void  fn_8020F2B4(u8* p, s32 del);                              // 0x8020F2B4
 void  fn_8020F228(u8* p, s32 a2);                               // 0x8020F228
 void  fn_8020F498(u8* p, s32 a2);                               // 0x8020F498
-void  fn_8020F4F0(u8* p, s32 del);                              // 0x8020F4F0
+u8* fn_8020F4F0(u8* p, s32 del);                              // 0x8020F4F0
 void  fn_8014E3EC(s32 n);                                       // 0x8014E3EC
 void  fn_801B3310(u8* p, u8* q);                                // 0x801B3310
 u8*   fn_801B3308(void);                                        // 0x801B3308

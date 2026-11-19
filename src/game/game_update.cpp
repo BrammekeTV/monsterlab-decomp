@@ -21,7 +21,7 @@ s32   LoadingScreenTick(int, f32);                       // 0x8000E254
 void  fn_80121254(void*);
 s32   fn_801F525C(void); void fn_801F357C(void); void fn_801F3BB8(void); void fn_801F401C(void);
 void  fn_8020A680(void); void fn_8020A69C(int); void MusicUpdate(void); void fn_8020AF2C(void);
-s32   AcquireZoneSlot(void);                            // 0x80131A20 ("lock_available_zone_slot waiting...")
+s32 AcquireZoneSlot(u8* world);                            // 0x80131A20 ("lock_available_zone_slot waiting...")
 void  ReleaseZoneSlot(void);                            // 0x80131C28
 void  GameLog(int level, int category, const char* fmt, ...);   // 0x8000B2F0
 s32   VideoIsPal50(RendVideo* video);                    // 0x8015DE24: video height == 520
@@ -172,7 +172,7 @@ static void UpdateMovieMode(ModeState* st) {
         if (gGameMode == 7) {
             gMovieZoneSlot = 3;
         } else if (gGameMode == 3) {
-            gMovieZoneSlot = (*(s32*)(gWorldState + 0xB4) > 0) ? AcquireZoneSlot() : -1;
+            gMovieZoneSlot = (*(s32*)(gWorldState + 0xB4) > 0) ? AcquireZoneSlot(gWorldState) : -1;
         }
 
         if (gMovieZoneSlot != -1) {

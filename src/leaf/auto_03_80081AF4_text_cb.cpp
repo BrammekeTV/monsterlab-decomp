@@ -7,7 +7,7 @@
 #include "game/script_callbacks.h"
 
 extern u8* gWorldState;
-extern "C" void fn_80082474(s32, s32, f32);
+extern "C" void fn_80082474(u8*, s32, f32);
 
 // 0x8008237C
 u32 BrainChunkIsInUse(u32 a3) {
@@ -23,9 +23,8 @@ s32 BrainChunkGetHitType(u32 a3) {
 
 // 0x80083444
 void BrainChunkUpdateThrow(u32 a3) {
-    // tail-call arguments inferred from the registers set before the call
     f32 t0 = *(f32*)((u8*)&gWorldState + 12);
-    fn_80082474((s32)((u32)(uintptr_t)(a3)), (s32)((u32)(0)), (f32)(t0));
+    fn_80082474(((u8*)(uintptr_t)(a3)), (s32)((u32)(0)), (f32)(t0));
 }
 
 // 0x80083458
