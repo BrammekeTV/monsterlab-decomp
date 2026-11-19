@@ -45,7 +45,7 @@ s32    WorldGetPhase(void* world);                                              
 void   WorldSendEvent(void* world, s32 id, int a, int b, int c);                                // 0x800D87EC
 BOOL   ZoneIsLoaded(void* world, s32 zone);                                                     // 0x8012F408
 u8*    fn_80062C80(u8* p);                                                                      // 0x80062C80 (base ctor, returns this)
-void   fn_8012E7B0(u8* world, u8* obj, s32 a);                                                  // 0x8012E7B0
+s32    fn_8012E7B0(u8* world, u8* obj, s32 a);                                                  // 0x8012E7B0
 BOOL   fn_8013E464(void);                                                                       // 0x8013E464
 void   fn_8016964C(u8* mgr, u8* tex);                                                           // 0x8016964C
 u8*    fn_8016A08C(const char* name);                                                           // 0x8016A08C (texture cache lookup)

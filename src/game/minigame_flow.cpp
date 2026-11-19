@@ -23,7 +23,7 @@ void fn_80074D74(void);                                                    // 0x
 u8* fn_80021750(void);                                                     // 0x80021750
 u8* fn_8020637C(u8* p);                                                    // 0x8020637C
 u8* fn_80206434(u8* p, s32 del);                                           // 0x80206434
-void fn_801BC574(void* p);                                                 // 0x801BC574
+void* fn_801BC574(void* p);                                                // 0x801BC574
 void __register_global_object(void* obj, void (*dtor)(void*), void* handle);  // 0x8032EFC8
 }
 

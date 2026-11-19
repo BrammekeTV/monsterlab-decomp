@@ -33,7 +33,7 @@ void  fn_8013F394(s32 a);                                            // 0x8013F3
 void  fn_80142470(void);                                             // 0x80142470
 s32   fn_8016195C(void* p, s32 a, s32 b, void* c);                   // 0x8016195C
 void  fn_801629D0(void* obj, s32 n);                                 // 0x801629D0
-void  fn_801BC574(void* p);                                          // 0x801BC574
+void*  fn_801BC574(void* p);                                          // 0x801BC574
 void* fn_801D40E0(s32 n);                                            // 0x801D40E0
 BOOL  fn_801F56FC(s32 flags);                                        // 0x801F56FC
 void  fn_801F5714(s32 flags);                                        // 0x801F5714

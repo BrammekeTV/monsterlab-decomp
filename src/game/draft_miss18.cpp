@@ -41,7 +41,7 @@ void   fn_800D83B8(u8* a3, s32 a4);                                  // 0x800D83
 void*  fn_80109330(const char* name);                                // 0x80109330 (texture lookup by name)
 s32    fn_801138F8(void);                                            // 0x801138F8
 s32    fn_80119B78(void);                                            // 0x80119B78
-void   fn_8012E7B0(u8* world, u8* obj, s32 a);                       // 0x8012E7B0
+s32    fn_8012E7B0(u8* world, u8* obj, s32 a);                       // 0x8012E7B0
 BOOL   fn_80142358(void);                                            // 0x80142358
 u64    fn_801425DC(u8* timer);                                       // 0x801425DC
 void   fn_8015EB28(u8* a, f32* outA, f32* outB);                     // 0x8015EB28

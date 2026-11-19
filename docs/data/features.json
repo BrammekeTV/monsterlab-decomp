@@ -94,6 +94,11 @@
  "changelog": [
   {
    "date": "2026-11-19",
+   "time": "13:45",
+   "text": "Tenth round from the missing-symbols list: 44 more functions, including the grow-juice boss (tentacle hits, berserk checks, seed and launcher, heart effect), matchup screen helpers, distance-to-player queries, health and monster-name getters, SIR file loading, the alert box and the brightness option."
+  },
+  {
+   "date": "2026-11-19",
    "time": "13:10",
    "text": "Ninth round from the missing-symbols list: 38 more functions, including the friend list and friend-code entry screens (init, add friend, buddy check, floaty, selected slot), the entity fix-up callbacks, frame effects and camera freeze, the name-entry letter and space handling, the event manager tick and rocket firing."
   },

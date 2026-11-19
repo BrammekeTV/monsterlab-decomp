@@ -1,15 +1,15 @@
 {
  "game_id": "RM7P4F",
- "generated": "2026-11-19T11:49:08+00:00",
- "commit": "71747f5",
- "commit_date": "2026-11-19T12:38:25+01:00",
+ "generated": "2026-11-19T11:58:28+00:00",
+ "commit": "d9ff2ef",
+ "commit_date": "2026-11-19T12:49:10+01:00",
  "game": {
   "functions": 8548,
   "bytes": 2265988,
   "named": 2748,
   "named_bytes": 616800,
-  "decompiled": 4941,
-  "decompiled_bytes": 590916
+  "decompiled": 4984,
+  "decompiled_bytes": 600340
  },
  "library": {
   "functions": 4039,
@@ -24,8 +24,8 @@
   "bytes": 3404928,
   "named": 3211,
   "named_bytes": 721548,
-  "decompiled": 4942,
-  "decompiled_bytes": 591036
+  "decompiled": 4985,
+  "decompiled_bytes": 600460
  },
  "game_range": [
   "80006B40",
@@ -73,7 +73,7 @@
    0.858
   ],
   [
-   0.156,
+   0.166,
    0.665
   ],
   [
@@ -225,7 +225,7 @@
    0.052
   ],
   [
-   0.208,
+   0.222,
    0.125
   ],
   [
@@ -337,11 +337,11 @@
    0.0
   ],
   [
-   0.017,
+   0.141,
    0.139
   ],
   [
-   0.016,
+   0.286,
    0.31
   ],
   [
@@ -349,7 +349,7 @@
    0.113
   ],
   [
-   0.043,
+   0.073,
    0.047
   ],
   [
@@ -445,7 +445,7 @@
    0.142
   ],
   [
-   0.164,
+   0.165,
    0.155
   ],
   [
@@ -457,11 +457,11 @@
    0.843
   ],
   [
-   0.181,
+   0.202,
    0.541
   ],
   [
-   0.229,
+   0.248,
    0.97
   ],
   [
@@ -481,11 +481,11 @@
    1.0
   ],
   [
-   0.353,
+   0.399,
    0.929
   ],
   [
-   0.941,
+   0.953,
    0.992
   ],
   [
@@ -497,7 +497,7 @@
    0.0
   ],
   [
-   0.733,
+   0.775,
    1.0
   ],
   [
@@ -513,7 +513,7 @@
    0.224
   ],
   [
-   0.119,
+   0.123,
    0.058
   ],
   [
@@ -577,7 +577,7 @@
    0.911
   ],
   [
-   0.001,
+   0.049,
    0.565
   ],
   [
@@ -605,19 +605,19 @@
    0.54
   ],
   [
-   0.597,
+   0.619,
    0.952
   ],
   [
-   0.107,
+   0.14,
    0.676
   ],
   [
-   0.699,
+   0.819,
    0.834
   ],
   [
-   0.324,
+   0.329,
    0.631
   ],
   [
@@ -689,7 +689,7 @@
    0.0
   ],
   [
-   0.06,
+   0.103,
    0.022
   ],
   [
@@ -749,7 +749,7 @@
    0.0
   ],
   [
-   0.054,
+   0.098,
    0.0
   ],
   [
@@ -841,7 +841,7 @@
    0.179
   ],
   [
-   0.095,
+   0.102,
    0.093
   ],
   [
@@ -905,7 +905,7 @@
    0.916
   ],
   [
-   0.834,
+   0.843,
    0.864
   ],
   [
@@ -917,11 +917,11 @@
    0.0
   ],
   [
-   0.074,
+   0.141,
    0.107
   ],
   [
-   0.061,
+   0.128,
    0.068
   ],
   [
@@ -929,7 +929,7 @@
    0.302
   ],
   [
-   0.108,
+   0.116,
    0.068
   ],
   [
@@ -6518,6 +6518,241 @@
    ]
   },
   {
+   "path": "src/game/draft_miss21.cpp",
+   "functions": [
+    {
+     "name": "GameFlowQuitToMainMenu",
+     "addr": "8000CDE8",
+     "size": 12
+    },
+    {
+     "name": "GetDistanceTo",
+     "addr": "800ECADC",
+     "size": 216
+    },
+    {
+     "name": "GetDistanceToPlayer",
+     "addr": "800F92B0",
+     "size": 200
+    },
+    {
+     "name": "GetExperimentMSP",
+     "addr": "800FA52C",
+     "size": 56
+    },
+    {
+     "name": "GameNetGetChunkSizeCallback",
+     "addr": "8010A634",
+     "size": 36
+    },
+    {
+     "name": "MatchupCleanup",
+     "addr": "8013BFA8",
+     "size": 196
+    },
+    {
+     "name": "MatchupSetReady",
+     "addr": "8013F2A4",
+     "size": 232
+    },
+    {
+     "name": "MatchupSetHighlight",
+     "addr": "8013FBCC",
+     "size": 68
+    },
+    {
+     "name": "fn_8016964C",
+     "addr": "8016964C",
+     "size": 184
+    },
+    {
+     "name": "fn_8016A08C",
+     "addr": "8016A08C",
+     "size": 192
+    },
+    {
+     "name": "fn_801BC574",
+     "addr": "801BC574",
+     "size": 60
+    },
+    {
+     "name": "GetCurrentStateID",
+     "addr": "801DDD64",
+     "size": 76
+    },
+    {
+     "name": "fn_801EC03C",
+     "addr": "801EC03C",
+     "size": 68
+    }
+   ]
+  },
+  {
+   "path": "src/game/draft_miss22.cpp",
+   "functions": [
+    {
+     "name": "GetMonstersAvailableToModify",
+     "addr": "8001DFC8",
+     "size": 24
+    },
+    {
+     "name": "GetMonsterName",
+     "addr": "8001E704",
+     "size": 60
+    },
+    {
+     "name": "GetIntersectorCount",
+     "addr": "8006F514",
+     "size": 108
+    },
+    {
+     "name": "GrowJuiceProjectile_PositionToHide",
+     "addr": "800ABC80",
+     "size": 180
+    },
+    {
+     "name": "GrowJuiceProjectile_PassedFarBoundary",
+     "addr": "800ABD34",
+     "size": 76
+    },
+    {
+     "name": "GrowJuiceSeed_PositionToHide",
+     "addr": "800AC728",
+     "size": 200
+    },
+    {
+     "name": "GrowJuiceTentacle_ShouldAttackPlayer",
+     "addr": "800AE680",
+     "size": 156
+    },
+    {
+     "name": "GrowJuiceTentacle_ShouldGoBerserk",
+     "addr": "800AE960",
+     "size": 160
+    },
+    {
+     "name": "GrowJuiceTentacle_HitPlayer",
+     "addr": "800AEA00",
+     "size": 56
+    },
+    {
+     "name": "GrowJuiceTentacle_HitHeart",
+     "addr": "800AEA38",
+     "size": 52
+    },
+    {
+     "name": "GrowJuiceTentacle_GoBerserk",
+     "addr": "800AEA6C",
+     "size": 164
+    },
+    {
+     "name": "GetTHIS",
+     "addr": "800E76CC",
+     "size": 4
+    },
+    {
+     "name": "HideInstructionScreen",
+     "addr": "800EFB88",
+     "size": 132
+    },
+    {
+     "name": "GetExperimentScienceType",
+     "addr": "800FA564",
+     "size": 132
+    },
+    {
+     "name": "GetHealth",
+     "addr": "8010366C",
+     "size": 32
+    },
+    {
+     "name": "GetText",
+     "addr": "801401FC",
+     "size": 160
+    },
+    {
+     "name": "GetRandomSeed",
+     "addr": "801427F0",
+     "size": 40
+    },
+    {
+     "name": "GetHash",
+     "addr": "801DC3A8",
+     "size": 4
+    }
+   ]
+  },
+  {
+   "path": "src/game/draft_miss23.cpp",
+   "functions": [
+    {
+     "name": "GrowJuiceSeed_ConvertToTentacle",
+     "addr": "800AC5F8",
+     "size": 284
+    },
+    {
+     "name": "GrowJuiceLauncher_FireSeed",
+     "addr": "800ACFA4",
+     "size": 372
+    },
+    {
+     "name": "GrowJuiceTentacle_ShouldReactToPlayer",
+     "addr": "800AE3B8",
+     "size": 712
+    },
+    {
+     "name": "GrowJuiceTentacle_CheckHitPlayer",
+     "addr": "800AE71C",
+     "size": 580
+    },
+    {
+     "name": "GrowJuiceTentacle_SetHeadSizeGrowth",
+     "addr": "800AEC44",
+     "size": 512
+    },
+    {
+     "name": "GrowJuiceHeart_PlayEffectNear",
+     "addr": "800B182C",
+     "size": 312
+    },
+    {
+     "name": "IncOptionsBrightness",
+     "addr": "800FB258",
+     "size": 440
+    },
+    {
+     "name": "fn_8012E7B0",
+     "addr": "8012E7B0",
+     "size": 396
+    },
+    {
+     "name": "HeadToFriendslist",
+     "addr": "801404F4",
+     "size": 524
+    },
+    {
+     "name": "HideAlertBox",
+     "addr": "80141EEC",
+     "size": 368
+    },
+    {
+     "name": "fn_8018A5F4",
+     "addr": "8018A5F4",
+     "size": 408
+    },
+    {
+     "name": "SirLoad",
+     "addr": "801E6138",
+     "size": 572
+    },
+    {
+     "name": "SirFinishLoad",
+     "addr": "801E6C44",
+     "size": 620
+    }
+   ]
+  },
+  {
    "path": "src/game/draft_miss3.cpp",
    "functions": [
     {
@@ -7584,11 +7819,6 @@
      "name": "IsUISlotActive",
      "addr": "8000CD90",
      "size": 88
-    },
-    {
-     "name": "GameFlowQuitToMainMenu",
-     "addr": "8000CDE8",
-     "size": 12
     },
     {
      "name": "IsGameFlowQuiting",
