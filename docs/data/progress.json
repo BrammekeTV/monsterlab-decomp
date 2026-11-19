@@ -1,15 +1,15 @@
 {
  "game_id": "RM7P4F",
- "generated": "2026-11-19T11:58:28+00:00",
- "commit": "d9ff2ef",
- "commit_date": "2026-11-19T12:49:10+01:00",
+ "generated": "2026-11-19T12:10:09+00:00",
+ "commit": "2e7ce88",
+ "commit_date": "2026-11-19T12:58:29+01:00",
  "game": {
   "functions": 8548,
   "bytes": 2265988,
   "named": 2748,
   "named_bytes": 616800,
-  "decompiled": 4984,
-  "decompiled_bytes": 600340
+  "decompiled": 5054,
+  "decompiled_bytes": 613556
  },
  "library": {
   "functions": 4039,
@@ -24,8 +24,8 @@
   "bytes": 3404928,
   "named": 3211,
   "named_bytes": 721548,
-  "decompiled": 4985,
-  "decompiled_bytes": 600460
+  "decompiled": 5055,
+  "decompiled_bytes": 613676
  },
  "game_range": [
   "80006B40",
@@ -69,15 +69,15 @@
    0.921
   ],
   [
-   0.237,
+   0.369,
    0.858
   ],
   [
-   0.166,
+   0.534,
    0.665
   ],
   [
-   0.288,
+   0.317,
    0.645
   ],
   [
@@ -329,7 +329,7 @@
    0.0
   ],
   [
-   0.037,
+   0.056,
    0.0
   ],
   [
@@ -341,7 +341,7 @@
    0.139
   ],
   [
-   0.286,
+   0.309,
    0.31
   ],
   [
@@ -449,7 +449,7 @@
    0.155
   ],
   [
-   0.329,
+   0.353,
    1.0
   ],
   [
@@ -457,23 +457,23 @@
    0.843
   ],
   [
-   0.202,
+   0.205,
    0.541
   ],
   [
-   0.248,
+   0.32,
    0.97
   ],
   [
-   0.832,
+   0.942,
    0.957
   ],
   [
-   0.025,
+   0.174,
    0.931
   ],
   [
-   0.431,
+   0.451,
    0.99
   ],
   [
@@ -481,11 +481,11 @@
    1.0
   ],
   [
-   0.399,
+   0.442,
    0.929
   ],
   [
-   0.953,
+   0.961,
    0.992
   ],
   [
@@ -505,7 +505,7 @@
    1.0
   ],
   [
-   0.736,
+   0.8,
    0.883
   ],
   [
@@ -521,11 +521,11 @@
    0.865
   ],
   [
-   0.583,
+   0.616,
    0.801
   ],
   [
-   0.79,
+   0.791,
    1.0
   ],
   [
@@ -605,19 +605,19 @@
    0.54
   ],
   [
-   0.619,
+   0.64,
    0.952
   ],
   [
-   0.14,
+   0.165,
    0.676
   ],
   [
-   0.819,
+   0.834,
    0.834
   ],
   [
-   0.329,
+   0.396,
    0.631
   ],
   [
@@ -705,7 +705,7 @@
    0.035
   ],
   [
-   0.059,
+   0.077,
    0.0
   ],
   [
@@ -825,7 +825,7 @@
    0.19
   ],
   [
-   0.369,
+   0.374,
    0.094
   ],
   [
@@ -837,7 +837,7 @@
    0.241
   ],
   [
-   0.27,
+   0.301,
    0.179
   ],
   [
@@ -917,7 +917,7 @@
    0.0
   ],
   [
-   0.141,
+   0.197,
    0.107
   ],
   [
@@ -925,11 +925,11 @@
    0.068
   ],
   [
-   0.106,
+   0.233,
    0.302
   ],
   [
-   0.116,
+   0.18,
    0.068
   ],
   [
@@ -6753,6 +6753,391 @@
    ]
   },
   {
+   "path": "src/game/draft_miss24.cpp",
+   "functions": [
+    {
+     "name": "GameFlowSetControlFlowActive",
+     "addr": "8000C7C8",
+     "size": 8
+    },
+    {
+     "name": "GameFlowQuitGame",
+     "addr": "8000CE0C",
+     "size": 20
+    },
+    {
+     "name": "IncMonsterInventoryPos",
+     "addr": "8001CE10",
+     "size": 116
+    },
+    {
+     "name": "GetBatteryString",
+     "addr": "8001E854",
+     "size": 256
+    },
+    {
+     "name": "fn_800A7D88",
+     "addr": "800A7D88",
+     "size": 152
+    },
+    {
+     "name": "GrowJuiceTentacle_RecoverFromBerserk",
+     "addr": "800AEB10",
+     "size": 204
+    },
+    {
+     "name": "Explode",
+     "addr": "800ED2EC",
+     "size": 36
+    },
+    {
+     "name": "IncOptionsMusicVolume",
+     "addr": "800FAB44",
+     "size": 188
+    },
+    {
+     "name": "IncOptionsSfxVolume",
+     "addr": "800FACC0",
+     "size": 132
+    },
+    {
+     "name": "IncOptionsVoiceVolume",
+     "addr": "800FAE74",
+     "size": 188
+    },
+    {
+     "name": "FSM_SetBit",
+     "addr": "80106E38",
+     "size": 36
+    },
+    {
+     "name": "FSM_SetFloat",
+     "addr": "80106EC8",
+     "size": 36
+    },
+    {
+     "name": "FSM_AddToInt",
+     "addr": "80106F10",
+     "size": 36
+    },
+    {
+     "name": "InitLabBooks",
+     "addr": "8010FDA4",
+     "size": 148
+    },
+    {
+     "name": "IngredientsSelectionFinished",
+     "addr": "801124B0",
+     "size": 4
+    },
+    {
+     "name": "HideScreen",
+     "addr": "8013FAE0",
+     "size": 124
+    },
+    {
+     "name": "HideKeyboard",
+     "addr": "8013FB5C",
+     "size": 112
+    },
+    {
+     "name": "HideProgressScreen",
+     "addr": "8014029C",
+     "size": 132
+    },
+    {
+     "name": "fn_801731C8",
+     "addr": "801731C8",
+     "size": 116
+    }
+   ]
+  },
+  {
+   "path": "src/game/draft_miss25.cpp",
+   "functions": [
+    {
+     "name": "IsGameFlowQuiting",
+     "addr": "8000CDF4",
+     "size": 24
+    },
+    {
+     "name": "IsValidMonster",
+     "addr": "8001DDA0",
+     "size": 144
+    },
+    {
+     "name": "IsInventoryMonster",
+     "addr": "8001DF90",
+     "size": 56
+    },
+    {
+     "name": "IsValidName",
+     "addr": "8001E740",
+     "size": 108
+    },
+    {
+     "name": "IsEntityOfType",
+     "addr": "800E8720",
+     "size": 36
+    },
+    {
+     "name": "InstructionsCanExit",
+     "addr": "800EFDBC",
+     "size": 56
+    },
+    {
+     "name": "InstructionsExitted",
+     "addr": "800EFDF4",
+     "size": 48
+    },
+    {
+     "name": "IsUIAnimationFinished",
+     "addr": "800EFEBC",
+     "size": 104
+    },
+    {
+     "name": "InventoryGetPartName",
+     "addr": "800F1F04",
+     "size": 188
+    },
+    {
+     "name": "InventoryPartGetMonsterName",
+     "addr": "800F2488",
+     "size": 212
+    },
+    {
+     "name": "InventoryPartAction1GetCost",
+     "addr": "800F2A98",
+     "size": 176
+    },
+    {
+     "name": "InventoryPartAction2GetCost",
+     "addr": "800F36E8",
+     "size": 176
+    },
+    {
+     "name": "IsSelectedActionRPSGood",
+     "addr": "800F47DC",
+     "size": 40
+    },
+    {
+     "name": "IsSelectedActionRPSNeutral",
+     "addr": "800F4804",
+     "size": 44
+    },
+    {
+     "name": "IsSelectedActionRPSBad",
+     "addr": "800F4830",
+     "size": 44
+    },
+    {
+     "name": "IsSelectedActionRPSMixed",
+     "addr": "800F485C",
+     "size": 44
+    },
+    {
+     "name": "IsSplashScreenReady",
+     "addr": "800FA8F8",
+     "size": 44
+    },
+    {
+     "name": "InspectOpponentInit",
+     "addr": "8013C600",
+     "size": 188
+    },
+    {
+     "name": "IsRumbling",
+     "addr": "801B2DDC",
+     "size": 40
+    }
+   ]
+  },
+  {
+   "path": "src/game/draft_miss26.cpp",
+   "functions": [
+    {
+     "name": "LT_UpdatePartSelectionForInput",
+     "addr": "8001C084",
+     "size": 124
+    },
+    {
+     "name": "LT_IsEdittingMonster",
+     "addr": "8001C104",
+     "size": 56
+    },
+    {
+     "name": "LT_MonsterHasRequiredParts",
+     "addr": "8001C13C",
+     "size": 208
+    },
+    {
+     "name": "LT_PlayerCanUseAllMonsterParts",
+     "addr": "8001C20C",
+     "size": 80
+    },
+    {
+     "name": "LT_MarkCurrentBodyPart",
+     "addr": "8001C37C",
+     "size": 52
+    },
+    {
+     "name": "LT_PartSlotHasValidPart",
+     "addr": "8001C3CC",
+     "size": 116
+    },
+    {
+     "name": "LT_MonsterHasAllParts",
+     "addr": "8001C440",
+     "size": 144
+    },
+    {
+     "name": "LT_HighlightAllPartsForStickTutorial",
+     "addr": "8001C500",
+     "size": 112
+    },
+    {
+     "name": "LT_AllPartsForStickTutorialSelected",
+     "addr": "8001C570",
+     "size": 132
+    },
+    {
+     "name": "LT_SetTutorialText",
+     "addr": "8001C5F4",
+     "size": 228
+    },
+    {
+     "name": "LT_ClearTutorialText",
+     "addr": "8001C6D8",
+     "size": 88
+    },
+    {
+     "name": "LT_ConversationStopVoiceSFX",
+     "addr": "8001C730",
+     "size": 72
+    },
+    {
+     "name": "LT_PartSelectionMatches",
+     "addr": "8001C778",
+     "size": 56
+    },
+    {
+     "name": "LT_GetCurrentPartInventoryIndex",
+     "addr": "8001C7B0",
+     "size": 88
+    },
+    {
+     "name": "KillHighlights",
+     "addr": "8001D3F4",
+     "size": 244
+    },
+    {
+     "name": "LT_DeleteMonster",
+     "addr": "8001E2AC",
+     "size": 248
+    },
+    {
+     "name": "KillParticleAtJunction",
+     "addr": "800E9818",
+     "size": 176
+    },
+    {
+     "name": "KillProp",
+     "addr": "800F1A88",
+     "size": 28
+    },
+    {
+     "name": "KillEntity",
+     "addr": "800FB490",
+     "size": 92
+    }
+   ]
+  },
+  {
+   "path": "src/game/draft_miss27.cpp",
+   "functions": [
+    {
+     "name": "LT_MonsterHasEnoughEnergyForPartActions",
+     "addr": "8001C25C",
+     "size": 288
+    },
+    {
+     "name": "LT_GetMonsterHasEnergyForCurrentPartAction",
+     "addr": "8001C808",
+     "size": 352
+    },
+    {
+     "name": "LoadInventoryMonster",
+     "addr": "8001CAC0",
+     "size": 652
+    },
+    {
+     "name": "IncrementOption",
+     "addr": "8001CE84",
+     "size": 640
+    },
+    {
+     "name": "IsLightningQueued",
+     "addr": "800EF538",
+     "size": 272
+    },
+    {
+     "name": "InventoryGetPartEnhancement",
+     "addr": "800F2138",
+     "size": 380
+    },
+    {
+     "name": "InventoryGetPartDefect",
+     "addr": "800F22B4",
+     "size": 372
+    },
+    {
+     "name": "InventoryPartAction1GetValue",
+     "addr": "800F2D14",
+     "size": 400
+    },
+    {
+     "name": "InventoryPartAction2GetValue",
+     "addr": "800F3798",
+     "size": 400
+    },
+    {
+     "name": "LoadDefaultLevel",
+     "addr": "801073DC",
+     "size": 420
+    },
+    {
+     "name": "fn_80143A5C",
+     "addr": "80143A5C",
+     "size": 588
+    },
+    {
+     "name": "InterpolateTo",
+     "addr": "801B916C",
+     "size": 268
+    },
+    {
+     "name": "fn_801E4918",
+     "addr": "801E4918",
+     "size": 488
+    },
+    {
+     "name": "InterpolateVector3Task_Update_LERP",
+     "addr": "801EA134",
+     "size": 492
+    },
+    {
+     "name": "InterpolateQuaternionTask_Update_SLERP",
+     "addr": "801EA7F8",
+     "size": 528
+    },
+    {
+     "name": "InterpolateToNextWaypointTask_SetVector3Callback",
+     "addr": "801EB330",
+     "size": 568
+    }
+   ]
+  },
+  {
    "path": "src/game/draft_miss3.cpp",
    "functions": [
     {
@@ -7736,11 +8121,6 @@
    "path": "src/game/game_ui.cpp",
    "functions": [
     {
-     "name": "GameFlowSetControlFlowActive",
-     "addr": "8000C7C8",
-     "size": 8
-    },
-    {
      "name": "GameFlowDelayedSignal",
      "addr": "8000C7D0",
      "size": 36
@@ -7819,16 +8199,6 @@
      "name": "IsUISlotActive",
      "addr": "8000CD90",
      "size": 88
-    },
-    {
-     "name": "IsGameFlowQuiting",
-     "addr": "8000CDF4",
-     "size": 24
-    },
-    {
-     "name": "GameFlowQuitGame",
-     "addr": "8000CE0C",
-     "size": 20
     },
     {
      "name": "GameFlowQuitGameDone",

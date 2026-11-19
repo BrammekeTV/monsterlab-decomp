@@ -11,8 +11,8 @@ extern u8 lbl_804DD0D4[];
 extern u8 lbl_804DD100[];
 extern s32 lbl_805FB6B8;
 extern "C" void BufferFree(void*);
-extern "C" void InterpolateQuaternionTask_Update_SLERP(void);
-extern "C" void InterpolateVector3Task_Update_LERP(void);
+extern "C" s32 InterpolateQuaternionTask_Update_SLERP(u8*, void*);
+extern "C" s32 InterpolateVector3Task_Update_LERP(u8*, void*);
 extern "C" void* MemAllocDefault(u32);
 extern "C" void TriggerDoAction(void*, void*, void*);
 extern "C" void fn_801EE2C4(u8*);
@@ -22,15 +22,14 @@ extern "C" void InterpolateVector3Task_DefaultSetVector3Callback(void) {
 }
 
 // 0x801EA320
-extern "C" void InterpolateVector3Task_Update_SLERP(u8* a3) {
-    // tail-call arguments inferred from the registers set before the call
+extern "C" s32 InterpolateVector3Task_Update_SLERP(u8* a3, u8* a4) {
     *(u32*)(((u8*)(uintptr_t)(a3)) + 52) = (u32)((u32)(1));
     s32 t0 = *(s32*)((u8*)&lbl_804DD0C8 + 4);
     u32 t1 = (u32)((s32)(u32)(t0) * 12);
     u32 t2 = (u32)(uintptr_t)((u8*)&gScriptFuncs) + (u32)(t1);
     s32 t3 = *(s32*)((u8*)(uintptr_t)(t2) + 4);
     *(u32*)(((u8*)(uintptr_t)(a3)) + 108) = (u32)((u32)(t3));
-    InterpolateVector3Task_Update_LERP();
+    return (s32)(InterpolateVector3Task_Update_LERP(((u8*)(uintptr_t)(a3)), (void*)(((u8*)(uintptr_t)(a4)))));
 }
 
 // 0x801EA598
@@ -38,15 +37,14 @@ extern "C" void InterpolateQuaternionTask_DefaultSetQuaternionCallback(void) {
 }
 
 // 0x801EA7C8
-extern "C" void InterpolateQuaternionTask_Update_LERP(u8* a3) {
-    // tail-call arguments inferred from the registers set before the call
+extern "C" s32 InterpolateQuaternionTask_Update_LERP(u8* a3, u8* a4) {
     *(u32*)(((u8*)(uintptr_t)(a3)) + 68) = (u32)((u32)(2));
     s32 t0 = *(s32*)((u8*)&lbl_804DD0D4 + 8);
     u32 t1 = (u32)((s32)(u32)(t0) * 12);
     u32 t2 = (u32)(uintptr_t)((u8*)&gScriptFuncs) + (u32)(t1);
     s32 t3 = *(s32*)((u8*)(uintptr_t)(t2) + 4);
     *(u32*)(((u8*)(uintptr_t)(a3)) + 108) = (u32)((u32)(t3));
-    InterpolateQuaternionTask_Update_SLERP();
+    return (s32)(InterpolateQuaternionTask_Update_SLERP(((u8*)(uintptr_t)(a3)), (void*)(((u8*)(uintptr_t)(a4)))));
 }
 
 // 0x801EB310

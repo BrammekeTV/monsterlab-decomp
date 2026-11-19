@@ -17,7 +17,7 @@ extern "C" f32 MonsterRateHealth(u8*);
 extern "C" f32 MonsterRateMadness(u8*);
 extern "C" f32 PlayerRankFraction(void);
 extern "C" void fn_8001D4FC(void);
-extern "C" void fn_8001E508(s32);
+extern "C" s32 fn_8001E508(s32);
 extern "C" s32 fn_8004D3F8(void*, char*, s32, s32);
 
 // 0x8001BF78
@@ -46,7 +46,6 @@ void LT_TogglePartsMonsterInformation(void) {
 
 // 0x8001C100
 void LT_ForceSelectPart(u32 a3) {
-    // tail-call arguments inferred from the registers set before the call
     fn_8001E508((s32)((u32)(uintptr_t)(a3)));
 }
 

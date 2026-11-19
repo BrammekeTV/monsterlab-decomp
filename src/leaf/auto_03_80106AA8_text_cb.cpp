@@ -12,14 +12,13 @@ extern "C" void fn_801DFEA8(u8*, s32, s32);
 extern "C" s32 fn_801DFF00(u8*, u32);
 extern "C" u32 fn_801DFF3C(s32, s32, s32);
 extern "C" s32 fn_801DFF54(u8*, s32);
-extern "C" void fn_801DFF74(u8*, s32);
+extern "C" void fn_801DFF74(u8*, u32, f32);
 extern "C" f32 fn_801DFF9C(u8*, u32);
 extern "C" void fn_801DFFCC(u8*, s32, s32);
 extern "C" void fn_801E0004(u8*, u32, f32);
 
 // 0x80106AA8
 void SetBit(u32 a3, s32 a4) {
-    // tail-call arguments inferred from the registers set before the call
     u8* t0 = (u8*)&gGame + 1480;
     fn_801DFEA8(t0, (s32)((u32)(uintptr_t)(a3)), (s32)((u32)(uintptr_t)(a4)));
 }
@@ -44,9 +43,8 @@ s32 GetInt(u32 a3) {
 
 // 0x80106B00
 void SetFloat(u32 a3, f32 f1) {
-    // tail-call arguments inferred from the registers set before the call
     u8* t0 = (u8*)&gGame + 1480;
-    fn_801DFF74(t0, (s32)((u32)(uintptr_t)(a3)));
+    fn_801DFF74(t0, (u32)((u32)(uintptr_t)(a3)), (f32)(f1));
 }
 
 // 0x80106B14
@@ -57,7 +55,6 @@ f32 GetFloat(u32 a3) {
 
 // 0x80106B28
 void AddToInt(u32 a3, s32 a4) {
-    // tail-call arguments inferred from the registers set before the call
     u8* t0 = (u8*)&gGame + 1480;
     fn_801DFFCC(t0, (s32)((u32)(uintptr_t)(a3)), (s32)((u32)(uintptr_t)(a4)));
 }
@@ -70,7 +67,6 @@ void AddToFloat(u32 a3, f32 f1) {
 
 // 0x80106C70
 void Level_SetBit(u32 a3, s32 a4) {
-    // tail-call arguments inferred from the registers set before the call
     u8* t0 = (u8*)&gGame + 1736;
     fn_801DFEA8(t0, (s32)((u32)(uintptr_t)(a3)), (s32)((u32)(uintptr_t)(a4)));
 }
@@ -95,9 +91,8 @@ s32 Level_GetInt(u32 a3) {
 
 // 0x80106CC8
 void Level_SetFloat(u32 a3, f32 f1) {
-    // tail-call arguments inferred from the registers set before the call
     u8* t0 = (u8*)&gGame + 1736;
-    fn_801DFF74(t0, (s32)((u32)(uintptr_t)(a3)));
+    fn_801DFF74(t0, (u32)((u32)(uintptr_t)(a3)), (f32)(f1));
 }
 
 // 0x80106CDC
@@ -108,7 +103,6 @@ f32 Level_GetFloat(u32 a3) {
 
 // 0x80106CF0
 void Level_AddToInt(u32 a3, s32 a4) {
-    // tail-call arguments inferred from the registers set before the call
     u8* t0 = (u8*)&gGame + 1736;
     fn_801DFFCC(t0, (s32)((u32)(uintptr_t)(a3)), (s32)((u32)(uintptr_t)(a4)));
 }

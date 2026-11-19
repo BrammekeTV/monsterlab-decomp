@@ -10,7 +10,7 @@ void    operator_delete(void* p);                                        // 0x80
 void    BufferFree(void* p);                                             // 0x801D4980
 s32     RegisterScriptFunc(const char* name, s32 type, void* fn);        // 0x801DC91C
 void    InterpolateToNextWaypointTask_DefaultReachedWaypointCallback(u8* a3); // 0x801EB310
-void    InterpolateToNextWaypointTask_SetVector3Callback(void);          // 0x801EB330
+void    InterpolateToNextWaypointTask_SetVector3Callback(f32* v, u8* state, u8* task); // 0x801EB330
 s32     inflateInit_(void* strm, const char* version, s32 size);         // 0x80230854
 s32     inflate(void* strm, s32 flush);                                  // 0x802309E0
 s32     inflateEnd(void* strm);                                          // 0x80232120

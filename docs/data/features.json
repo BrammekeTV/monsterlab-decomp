@@ -94,6 +94,11 @@
  "changelog": [
   {
    "date": "2026-11-19",
+   "time": "14:20",
+   "text": "Eleventh round from the missing-symbols list: 74 more functions, including the lab tutorial callbacks (part selection, monster completeness checks, tutorial text), the options volume and brightness steppers, inventory part names, costs, enhancements and defects, FSM bit and float setters, interpolation tasks (lerp, slerp, waypoint), the battery string and the key and entity kill callbacks."
+  },
+  {
+   "date": "2026-11-19",
    "time": "13:45",
    "text": "Tenth round from the missing-symbols list: 44 more functions, including the grow-juice boss (tentacle hits, berserk checks, seed and launcher, heart effect), matchup screen helpers, distance-to-player queries, health and monster-name getters, SIR file loading, the alert box and the brightness option."
   },
