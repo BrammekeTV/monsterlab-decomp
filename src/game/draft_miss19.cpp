@@ -49,7 +49,7 @@ s32    fn_8012E7B0(u8* world, u8* obj, s32 a);                                  
 BOOL   fn_8013E464(void);                                                                       // 0x8013E464
 void   fn_8016964C(u8* mgr, u8* tex);                                                           // 0x8016964C
 u8*    fn_8016A08C(const char* name);                                                           // 0x8016A08C (texture cache lookup)
-void   fn_8016A2B8(void);                                                                       // 0x8016A2B8
+void fn_8016A2B8(u8* p);                                                                       // 0x8016A2B8
 void   fn_8016B5E0(u8* obj, u8* data, s32 hash);                                                // 0x8016B5E0
 u8*    fn_8016B724(u8* obj, s32 a, const char* name);                                           // 0x8016B724
 void   fn_8017493C(void* p);                                                                    // 0x8017493C
@@ -259,7 +259,7 @@ static void FreeUiSlot(u8* obj) {
     if (res != NULL) {
         s32 rc = *(s32*)(res + 0x10) - 1;
         *(s32*)(res + 0x10) = rc;
-        if (rc == 0) fn_8016A2B8();
+        if (rc == 0) fn_8016A2B8(res);
         *(void**)(obj + 0x14) = NULL;
     }
     *(s32*)obj = 0;

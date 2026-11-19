@@ -27,7 +27,7 @@ s32 fn_800BE3A8(u8* proj, f32* a, f32* b, s32 code, f32 f1, f32 f2);  // 0x800BE
 s32 fn_800BF18C(s32 p);                                        // 0x800BF18C
 void fn_8010A374(void);                                        // 0x8010A374
 s32 fn_801A3010(void* obj, void* data);                        // 0x801A3010
-s32 fn_801B6F34(void* obj);                                    // 0x801B6F34
+void fn_801B6F34(u8* p);                                    // 0x801B6F34
 s32 fn_801E9678(void* list, void* handle);                     // 0x801E9678
 void* fn_801E9D18(void* p, u32 hash, s32 size);                // 0x801E9D18
 s32 fn_8020AB5C(void);                                         // 0x8020AB5C
@@ -364,7 +364,7 @@ void MysticBrewGhost_PositionToHide(void* a0) {
         fn_800BF18C(h);
         *(s32*)(p + 0x29C) = 0;
     }
-    fn_801B6F34(a0);
+    fn_801B6F34((u8*)a0);
 }
 
 // 0x800BE000
@@ -379,7 +379,7 @@ void MysticBrewPowerUp_PositionToHide(void* a0) {
     *(f32*)(obj + 0x4) = lbl_805FE2F0;
     *(f32*)(obj + 0x8) = lbl_805FE2C8;
     MysticBrewHideFlags(obj);
-    fn_801B6F34(a0);
+    fn_801B6F34((u8*)a0);
 }
 
 // 0x800BF218
@@ -394,7 +394,7 @@ void MysticBrewProjectile_PositionToHide(void* a0) {
     *(f32*)(obj + 0x4) = lbl_805FE308;
     *(f32*)(obj + 0x8) = lbl_805FE330;
     MysticBrewHideFlags(obj);
-    fn_801B6F34(a0);
+    fn_801B6F34((u8*)a0);
 }
 
 // 0x8001D2D0

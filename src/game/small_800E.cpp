@@ -5,7 +5,7 @@ extern "C" {
 void  operator_delete(void* p);                                 // 0x801D426C
 u8*  fn_800DE5E4(u8* p, s32 del);                              // 0x800DE5E4
 void  fn_800DEC28(u8* p, void* arg);                            // 0x800DEC28
-void* fn_800DECD8(u8* p);                                       // 0x800DECD8
+s32   fn_800DECD8(u8* p, f32 dt);                                    // 0x800DECD8
 s32   RegisterScriptFunc(const char* name, s32 type, void* fn); // 0x801DC91C
 void  CIWaypointPath_StaticSetPosition(void);                   // 0x800E2F88
 void  CIWaypointPath_StaticSetOrientation(void);                // 0x800E2FA4
@@ -126,8 +126,8 @@ u8* fn_800E36CC(u8* p, s32 del) {
 
 // 0x800E3750
 // If the global's sub-object is present, feeds the average at +0x68 from this record's +0x58 / +0x44.
-s32 fn_800E3750(u8* p) {
-    if (fn_800DECD8(p)) {
+s32 fn_800E3750(u8* p, f32 dt) {
+    if (fn_800DECD8(p, dt)) {
         u8* avg = *(u8**)(lbl_803C4298 + 8) + 0x68;
         fn_800E2DF4(avg, *(f32*)(p + 0x58), *(f32*)(p + 0x44));
     }
@@ -146,8 +146,8 @@ u8* fn_800E37B4(u8* p, s32 del) {
 
 // 0x800E3838
 // Same as fn_800E3750, but feeds fn_800E2E48.
-s32 fn_800E3838(u8* p) {
-    if (fn_800DECD8(p)) {
+s32 fn_800E3838(u8* p, f32 dt) {
+    if (fn_800DECD8(p, dt)) {
         u8* avg = *(u8**)(lbl_803C4298 + 8) + 0x68;
         fn_800E2E48(avg, *(f32*)(p + 0x58), *(f32*)(p + 0x44));
     }

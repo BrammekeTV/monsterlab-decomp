@@ -31,7 +31,7 @@ void* EventPost(s32 id, void* sender);                      // 0x801F3918 (retur
 s32   WorldGetPhase(void* world);                           // 0x800D83A8
 BOOL  ZoneIsLoaded(void* world, s32 zone);                  // 0x8012F408
 void  fn_8018DEF4(void* sets);                              // 0x8018DEF4
-s32   fn_800D816C(u8* world, s32 a);                        // 0x800D816C
+void fn_800D816C(u8* arg0, s32 arg1);                        // 0x800D816C
 void  ConversationHideHUDInfo(void);                        // 0x8004xxxx (draft_miss9.cpp)
 void  SessionResetUnk204(u8* s);                            // 0x80013684
 void  fn_8020A474(s32 handle);                              // 0x8020A474
@@ -78,7 +78,7 @@ void* EventPost(s32 id, void* sender);                      // 0x801F3918 (retur
 s32   WorldGetPhase(void* world);                           // 0x800D83A8
 BOOL  ZoneIsLoaded(void* world, s32 zone);                  // 0x8012F408
 void  fn_8018DEF4(void* sets);                              // 0x8018DEF4
-s32   fn_800D816C(u8* world, s32 a);                        // 0x800D816C
+void fn_800D816C(u8* arg0, s32 arg1);                        // 0x800D816C
 void  SessionResetUnk204(u8* s);                            // 0x80013684
 void  fn_8020A474(s32 handle);                              // 0x8020A474
 BOOL  PathIsAtJunction(PathFollower* p);                    // 0x800D5924

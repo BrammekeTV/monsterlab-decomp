@@ -93,6 +93,11 @@
  ],
  "changelog": [
   {
+   "date": "2026-11-20",
+   "time": "00:13",
+   "text": "Decompiled 68 more game functions (Digging*, Puzzle*, WeldingOverPlate, ShovelDirection, fn_800C*/fn_800D*/fn_800E* helpers, ...)"
+  },
+  {
    "date": "2026-11-19",
    "time": "23:55",
    "text": "Decompiled 68 more game functions (fn_8007*/fn_800A*/fn_800B*/fn_800C* helpers, particle and event utilities, ...)"

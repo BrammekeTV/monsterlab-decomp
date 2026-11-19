@@ -1,15 +1,15 @@
 {
  "game_id": "RM7P4F",
- "generated": "2026-11-19T22:55:13+00:00",
- "commit": "0087f68",
- "commit_date": "2026-11-19T19:21:13+01:00",
+ "generated": "2026-11-19T23:13:04+00:00",
+ "commit": "9d87279",
+ "commit_date": "2026-11-19T23:55:15+01:00",
  "game": {
   "functions": 8548,
   "bytes": 2265988,
   "named": 2748,
   "named_bytes": 616800,
-  "decompiled": 5672,
-  "decompiled_bytes": 774916
+  "decompiled": 5742,
+  "decompiled_bytes": 791004
  },
  "library": {
   "functions": 4039,
@@ -24,8 +24,8 @@
   "bytes": 3404928,
   "named": 3211,
   "named_bytes": 721548,
-  "decompiled": 5673,
-  "decompiled_bytes": 775036
+  "decompiled": 5743,
+  "decompiled_bytes": 791124
  },
  "game_range": [
   "80006B40",
@@ -85,15 +85,15 @@
    0.059
   ],
   [
-   0.26,
+   0.421,
    0.199
   ],
   [
-   0.038,
+   0.357,
    0.32
   ],
   [
-   0.139,
+   0.18,
    0.044
   ],
   [
@@ -101,11 +101,11 @@
    0.0
   ],
   [
-   0.044,
+   0.09,
    0.049
   ],
   [
-   0.428,
+   0.459,
    0.598
   ],
   [
@@ -237,19 +237,19 @@
    0.312
   ],
   [
-   0.247,
+   0.263,
    0.115
   ],
   [
-   0.28,
+   0.319,
    0.049
   ],
   [
-   0.408,
+   0.44,
    0.034
   ],
   [
-   0.482,
+   0.55,
    0.0
   ],
   [
@@ -289,7 +289,7 @@
    0.0
   ],
   [
-   0.511,
+   0.589,
    0.252
   ],
   [
@@ -349,7 +349,7 @@
    0.113
   ],
   [
-   0.261,
+   0.289,
    0.047
   ],
   [
@@ -357,7 +357,7 @@
    0.0
   ],
   [
-   0.348,
+   0.38,
    0.135
   ],
   [
@@ -385,11 +385,11 @@
    0.0
   ],
   [
-   0.164,
+   0.257,
    0.051
   ],
   [
-   0.313,
+   0.356,
    0.0
   ],
   [
@@ -397,7 +397,7 @@
    0.0
   ],
   [
-   0.325,
+   0.332,
    0.072
   ],
   [
@@ -413,23 +413,23 @@
    0.041
   ],
   [
-   0.375,
+   0.485,
    0.099
   ],
   [
-   0.35,
+   0.574,
    0.201
   ],
   [
-   0.019,
+   0.055,
    0.012
   ],
   [
-   0.002,
+   0.029,
    0.0
   ],
   [
-   0.085,
+   0.187,
    0.001
   ],
   [
@@ -441,11 +441,11 @@
    0.009
   ],
   [
-   0.332,
+   0.36,
    0.142
   ],
   [
-   0.258,
+   0.325,
    0.155
   ],
   [
@@ -621,7 +621,7 @@
    0.631
   ],
   [
-   0.269,
+   0.335,
    0.275
   ],
   [
@@ -689,7 +689,7 @@
    0.0
   ],
   [
-   0.143,
+   0.155,
    0.022
   ],
   [
@@ -709,7 +709,7 @@
    0.0
   ],
   [
-   0.105,
+   0.129,
    0.071
   ],
   [
@@ -833,7 +833,7 @@
    0.103
   ],
   [
-   0.381,
+   0.408,
    0.241
   ],
   [
@@ -857,7 +857,7 @@
    0.0
   ],
   [
-   0.006,
+   0.045,
    0.0
   ],
   [
@@ -949,7 +949,7 @@
    0.097
   ],
   [
-   0.094,
+   0.108,
    0.0
   ],
   [
@@ -1025,7 +1025,7 @@
    0.998
   ],
   [
-   0.772,
+   0.773,
    0.385
   ],
   [
@@ -10714,6 +10714,371 @@
      "name": "fn_8018C0A8",
      "addr": "8018C0A8",
      "size": 756
+    }
+   ]
+  },
+  {
+   "path": "src/game/draft_miss57a.cpp",
+   "functions": [
+    {
+     "name": "DiggingRockAbsent",
+     "addr": "800232A4",
+     "size": 44
+    },
+    {
+     "name": "DiggingRockCrushed",
+     "addr": "80023344",
+     "size": 44
+    },
+    {
+     "name": "DiggingClearRockGraphic",
+     "addr": "80023414",
+     "size": 232
+    },
+    {
+     "name": "DiggingPlayThrustAnim",
+     "addr": "800234FC",
+     "size": 164
+    },
+    {
+     "name": "DiggingPlayLiftAnim",
+     "addr": "800235A0",
+     "size": 164
+    },
+    {
+     "name": "DiggingPlayHitAnim",
+     "addr": "80023644",
+     "size": 136
+    },
+    {
+     "name": "DiggingPlayClangAnim",
+     "addr": "800236CC",
+     "size": 136
+    },
+    {
+     "name": "DiggingPlayDirtAnim",
+     "addr": "80023754",
+     "size": 156
+    },
+    {
+     "name": "SetDirtPile",
+     "addr": "800237F8",
+     "size": 36
+    },
+    {
+     "name": "ResetDirtPile",
+     "addr": "8002381C",
+     "size": 36
+    },
+    {
+     "name": "DiggingSetDustCloud",
+     "addr": "80024DA4",
+     "size": 236
+    },
+    {
+     "name": "PuzzleTimeout",
+     "addr": "80025D98",
+     "size": 28
+    },
+    {
+     "name": "PuzzleSetCursor",
+     "addr": "8002671C",
+     "size": 224
+    },
+    {
+     "name": "IsFull",
+     "addr": "8002D54C",
+     "size": 60
+    },
+    {
+     "name": "IsNewlyFull",
+     "addr": "8002D588",
+     "size": 136
+    },
+    {
+     "name": "IsSpinning",
+     "addr": "8002D610",
+     "size": 52
+    },
+    {
+     "name": "NeedWheelSound",
+     "addr": "8002D644",
+     "size": 144
+    },
+    {
+     "name": "PlayHealthRecoverySound",
+     "addr": "8002DD14",
+     "size": 172
+    },
+    {
+     "name": "fn_8016A2B8",
+     "addr": "8016A2B8",
+     "size": 108
+    },
+    {
+     "name": "fn_8017493C",
+     "addr": "8017493C",
+     "size": 224
+    },
+    {
+     "name": "fn_801B6F34",
+     "addr": "801B6F34",
+     "size": 236
+    },
+    {
+     "name": "fn_801F61AC",
+     "addr": "801F61AC",
+     "size": 140
+    },
+    {
+     "name": "fn_8021F350",
+     "addr": "8021F350",
+     "size": 12
+    }
+   ]
+  },
+  {
+   "path": "src/game/draft_miss57b.cpp",
+   "functions": [
+    {
+     "name": "ShovelDirection",
+     "addr": "80023840",
+     "size": 36
+    },
+    {
+     "name": "ShowCompletePuzzle",
+     "addr": "80026658",
+     "size": 196
+    },
+    {
+     "name": "StoppedSpinning",
+     "addr": "8002DDC0",
+     "size": 100
+    },
+    {
+     "name": "fn_80075964",
+     "addr": "80075964",
+     "size": 132
+    },
+    {
+     "name": "WeldingOverPlate",
+     "addr": "80077BC8",
+     "size": 44
+    },
+    {
+     "name": "fn_8007C8CC",
+     "addr": "8007C8CC",
+     "size": 140
+    },
+    {
+     "name": "fn_800C5FC8",
+     "addr": "800C5FC8",
+     "size": 248
+    },
+    {
+     "name": "fn_800C6CE4",
+     "addr": "800C6CE4",
+     "size": 180
+    },
+    {
+     "name": "fn_800C6D98",
+     "addr": "800C6D98",
+     "size": 176
+    },
+    {
+     "name": "fn_800C6E48",
+     "addr": "800C6E48",
+     "size": 180
+    },
+    {
+     "name": "fn_800CD744",
+     "addr": "800CD744",
+     "size": 52
+    },
+    {
+     "name": "fn_800D5008",
+     "addr": "800D5008",
+     "size": 156
+    },
+    {
+     "name": "fn_800D6A24",
+     "addr": "800D6A24",
+     "size": 200
+    },
+    {
+     "name": "fn_800D6DDC",
+     "addr": "800D6DDC",
+     "size": 56
+    },
+    {
+     "name": "fn_800D6E14",
+     "addr": "800D6E14",
+     "size": 124
+    },
+    {
+     "name": "fn_800D816C",
+     "addr": "800D816C",
+     "size": 64
+    },
+    {
+     "name": "fn_800D85CC",
+     "addr": "800D85CC",
+     "size": 56
+    },
+    {
+     "name": "fn_800D8A40",
+     "addr": "800D8A40",
+     "size": 144
+    },
+    {
+     "name": "fn_800D8FC4",
+     "addr": "800D8FC4",
+     "size": 128
+    },
+    {
+     "name": "fn_800DEC28",
+     "addr": "800DEC28",
+     "size": 80
+    },
+    {
+     "name": "fn_800E4F84",
+     "addr": "800E4F84",
+     "size": 248
+    }
+   ]
+  },
+  {
+   "path": "src/game/draft_miss58.cpp",
+   "functions": [
+    {
+     "name": "DiggingPlayDirtFallingAnim",
+     "addr": "80024FA0",
+     "size": 332
+    },
+    {
+     "name": "PuzzleSelectPiece",
+     "addr": "80025DB4",
+     "size": 680
+    },
+    {
+     "name": "PuzzleRepositionCursor",
+     "addr": "8002605C",
+     "size": 312
+    },
+    {
+     "name": "PuzzleMovePiece",
+     "addr": "80026194",
+     "size": 484
+    },
+    {
+     "name": "PuzzlePiecePlaced",
+     "addr": "80026378",
+     "size": 736
+    },
+    {
+     "name": "CheckBugSound",
+     "addr": "800291C8",
+     "size": 340
+    },
+    {
+     "name": "fn_800775A4",
+     "addr": "800775A4",
+     "size": 292
+    },
+    {
+     "name": "fn_8007AE90",
+     "addr": "8007AE90",
+     "size": 276
+    },
+    {
+     "name": "fn_8007C958",
+     "addr": "8007C958",
+     "size": 528
+    },
+    {
+     "name": "RobotEvolutionExperiment_IntroSmasherHit",
+     "addr": "80091AE0",
+     "size": 272
+    },
+    {
+     "name": "fn_800921B0",
+     "addr": "800921B0",
+     "size": 364
+    },
+    {
+     "name": "fn_800B1D98",
+     "addr": "800B1D98",
+     "size": 292
+    },
+    {
+     "name": "fn_800B60A0",
+     "addr": "800B60A0",
+     "size": 288
+    },
+    {
+     "name": "fn_800C8118",
+     "addr": "800C8118",
+     "size": 388
+    },
+    {
+     "name": "fn_800D59F4",
+     "addr": "800D59F4",
+     "size": 296
+    },
+    {
+     "name": "fn_800D61D8",
+     "addr": "800D61D8",
+     "size": 500
+    },
+    {
+     "name": "fn_800D6B44",
+     "addr": "800D6B44",
+     "size": 664
+    },
+    {
+     "name": "fn_800D7288",
+     "addr": "800D7288",
+     "size": 268
+    },
+    {
+     "name": "fn_800D75D0",
+     "addr": "800D75D0",
+     "size": 300
+    },
+    {
+     "name": "fn_800D7FF0",
+     "addr": "800D7FF0",
+     "size": 272
+    },
+    {
+     "name": "fn_800DB370",
+     "addr": "800DB370",
+     "size": 288
+    },
+    {
+     "name": "fn_800DECD8",
+     "addr": "800DECD8",
+     "size": 696
+    },
+    {
+     "name": "fn_800E6360",
+     "addr": "800E6360",
+     "size": 264
+    },
+    {
+     "name": "fn_800E6A84",
+     "addr": "800E6A84",
+     "size": 336
+    },
+    {
+     "name": "fn_801458B0",
+     "addr": "801458B0",
+     "size": 592
+    },
+    {
+     "name": "fn_801C5CC0",
+     "addr": "801C5CC0",
+     "size": 368
     }
    ]
   },

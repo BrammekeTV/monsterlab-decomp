@@ -29,16 +29,16 @@ void fn_800921B0(void);                                        // 0x800921B0
 s32  fn_80093934(void);                                          // 0x80093934
 f32  fn_80147800(s32 a);                                         // 0x80147800
 
-void PuzzleTimeout(void);
-void PuzzleSelectPiece(void);
+s32 PuzzleTimeout(void);
+s32  PuzzleSelectPiece(void);
 void PuzzleRepositionCursor(void);
 void PuzzleMovePiece(void);
-void PuzzlePiecePlaced(void);
+s32  PuzzlePiecePlaced(void);
 void ShowCompletePuzzle(void);
-void PuzzleSetCursor(void);
-void CheckBugSound(void);
+void PuzzleSetCursor(s32 unused, u32 hash);
+s32  CheckBugSound(void);
 void ResetCounter(void);
-void RobotEvolutionExperiment_IntroSmasherHit(void);
+void RobotEvolutionExperiment_IntroSmasherHit(u8* arg0);
 void RobotEvolutionExperiment_IntroSmasherDone(void);
 void RobotEvolutionExperiment_IntroRobotShowCountdown(u8* p);
 void RobotEvolutionExperiment_IntroRobotDone(void);

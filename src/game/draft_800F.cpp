@@ -34,10 +34,10 @@ s32   fn_800D3930(void* db);
 u8*   fn_800D393C(void* db, s32 i);
 u8*   fn_800D5838(u8* ref, s32 text);
 void* fn_800D59A4(u8* ref, s32 i);
-s32   fn_800D59F4(void* pathOrRef, s32 state);
+void  fn_800D59F4(void* pathOrRef, s32 state);
 void fn_800D5C48(u8* arg0, s32 arg1);
 s32 fn_800D68CC(u8* arg0, s32 arg1, s32 arg2);
-s32   fn_800D6B44(void);
+u8*  fn_800D6B44(void);
 extern u8   gGame[];                                      // 0x803B53A0
 extern void* gObjDb;                                      // 0x805FB180
 extern u8*  gSaveSystem;                                  // 0x805FBBE0

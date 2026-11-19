@@ -10,7 +10,7 @@ void  fn_8006FA44(u8* a3, s32 a4, s32 a5, s32 a6, s32 a7, s32 a8);     // 0x8006
 void  GameFlowSignal(s32 id, s32 arg1, s32 arg2);                      // 0x8000C7F4
 void  fn_800D14F0(u8* p);                                              // 0x800D14F0
 void  fn_800D0DC0(u8* p);                                              // 0x800D0DC0
-void  fn_800D5008(u8* p);                                              // 0x800D5008
+void fn_800D5008(u8* arg0, u8* arg1);                                              // 0x800D5008
 void  fn_800D50C4(u8* p);                                              // 0x800D50C4
 void  fn_801C83AC(u8* mgr, u8* item);                                  // 0x801C83AC
 void  fn_800D5110(u8* holder, u8* obj, u8* data);                      // 0x800D5110
@@ -136,10 +136,10 @@ u8* fn_800D393C(u8* p, s32 idx) {
 
 // 0x800D41F4
 // Appends one entry at index count (up to 0xFF): initialises it via fn_800D5008, then bumps the count at +0x13280.
-void fn_800D41F4(u8* p) {
+void fn_800D41F4(u8* p, u8* a1) {
     s32 n = *(s32*)(p + 0x13280);
     if (n < 0xFF) {
-        fn_800D5008(p + n * 0xDC + 0x575C);
+        fn_800D5008(p + n * 0xDC + 0x575C, a1);
         *(s32*)(p + 0x13280) += 1;
     }
 }

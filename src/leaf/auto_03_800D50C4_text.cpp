@@ -5,7 +5,7 @@
 
 #include "types.h"
 
-extern "C" void fn_800D6A24(void);
+extern "C" void fn_800D6A24(u8**);
 
 // 0x800D50C4
 extern "C" void fn_800D50C4(u8* a3) {
@@ -195,12 +195,11 @@ extern "C" u32 PathIsPaused(u8* a3) {
 
 // 0x800D6A00
 extern "C" void PathReverse(u8* a3) {
-    // tail-call arguments inferred from the registers set before the call
     u8* t0 = *(u8**)(((u8*)(uintptr_t)(a3)) + 0);
     u8 t1 = *(u8*)(t0 + 4);
     u32 t2 = (u32)(t1 == 0);
     *(u8*)(t0 + 4) = (u8)((u32)(t2));
-    fn_800D6A24();
+    fn_800D6A24((u8**)(((u8*)(uintptr_t)(a3))));
 }
 
 // 0x800D6A18

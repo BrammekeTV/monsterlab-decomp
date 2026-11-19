@@ -6,7 +6,7 @@ void  fn_800690D4(u8* p, s32 a, void* params, s32 b);   // 0x800690D4 (base ctor
 void  fn_800A7D88(void* obj, u32 hash);                 // 0x800A7D88
 void  fn_800B1D98(u8* p);                               // 0x800B1D98
 BOOL  fn_801B50B0(void* unused, u8* obj);               // 0x801B50B0
-s32   fn_801B6F34(void* obj);                           // 0x801B6F34
+void fn_801B6F34(u8* p);                           // 0x801B6F34
 void  fn_801F61AC(u8* p, s32 a);                        // 0x801F61AC
 void  fn_801F94B0(u8* p, s32 v);                        // 0x801F94B0
 void  fn_800C9500(u8* p, u8* item);                     // 0x800C9500
@@ -291,7 +291,7 @@ s32 fn_800BF18C(u8* arg0) {
     *(f32*)(sub + 0x8) = -100.0f;
     sub = *(u8**)(arg0 + 0x4);
     *(u32*)(sub + 0x20) |= 0x1000C000u;
-    return fn_801B6F34(arg0);
+    fn_801B6F34(arg0); return 0;  // r3 is left over from the callee
 }
 
 // 0x800BF654

@@ -46,7 +46,7 @@ void fn_80078BB8(u8* p);                // 0x80078BB8
 void fn_80079004(u8* p);                // 0x80079004
 f64 fn_8033E8EC(f64 x);                 // 0x8033E8EC
 void CameraSetFov(void* camera, f32 fov);   // 0x801D8ACC
-s32 fn_800D8FC4(u8* p, s32* list, s32 count, f32 a, f32 b, f32 c);   // 0x800D8FC4
+s32 fn_800D8FC4(u8* arg0, void* arg1, s32 arg2);   // 0x800D8FC4
 extern u8 lbl_803C4298[];               // 0x803C4298
 extern u8 lbl_8047C640[];               // 0x8047C640 (camera)
 extern f32 lbl_805FB144;                // 0x805FB144
@@ -465,7 +465,7 @@ void fn_800792B8(u8* arg0) {
     f32 b = 0.63661975f * a;
     f32 c = 2.0f * b;
     lbl_805FB144 = 90.0f * c;
-    fn_800D8FC4(node, list, count, c, b, a);
+    fn_800D8FC4(node, list, count);
 }
 
 // 0x8007AFC4

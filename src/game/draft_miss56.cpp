@@ -35,7 +35,7 @@ void  fn_800B9008(u8* p);                                           // 0x800B900
 void  fn_801B3378(u8* p, u8* key);                                  // 0x801B3378
 void  fn_8020B1D4(void* handle, s32 a);                             // 0x8020B1D4
 void  EventSend(void* mgr, void* target, void* from, u32 event, int a, int b, int c, int d);   // 0x801BA190
-s32   fn_801B6F34(void* obj);                                      // 0x801B6F34
+void fn_801B6F34(u8* p);                                      // 0x801B6F34
 void* MemAllocDefault(u32 size);                                    // 0x801D4650
 void  fn_800C1DC0(u8* p);                                           // 0x800C1DC0
 void  fn_800C1F18(u8* p);                                           // 0x800C1F18
@@ -50,12 +50,12 @@ s32   fn_800CD4E8(u8* p);                                            // 0x800CD4
 s32   fn_800CD744(u8* p);                                           // 0x800CD744
 s32   fn_801EC880(u8* p, u32 hash);                                 // 0x801EC880
 u32   StringHash(const char* s);                                    // 0x801EB704
-f64   fn_800C8118(u8* a, u8* b, u8* flag);                          // 0x800C8118
+f32   fn_800C8118(u8* a, u8* b, u8* flag);                          // 0x800C8118
 u8*   fn_800C73EC(u8* h);                                           // 0x800C73EC
 BOOL  fn_801B50B0(void* unused, u8* obj);                           // 0x801B50B0
 f64   fn_8033F1F4(f64 x);                                           // 0x8033F1F4 (arc-cosine-like, f64 in/out)
 void  fn_8017493C(void* p);                                         // 0x8017493C
-void  fn_8016A2B8(void);                                            // 0x8016A2B8
+void fn_8016A2B8(u8* p);                                            // 0x8016A2B8
 void  fn_8018A5F4(void* p);                                         // 0x8018A5F4
 void  EntitySyncTransform(void* entity, int a);                     // 0x801B4F4C
 void  fn_801EC080(u8* a, u8* b);                                    // 0x801EC080
@@ -107,7 +107,7 @@ void  FieldRepairParticleOn(void);
 void  FieldRepairParticleUpdate(void);
 void  FieldRepairParticleOff(void);
 void  PlayHealthRecoverySound(void);
-s32   WeldingOverPlate(void);
+s32 WeldingOverPlate(u8* arg0);
 void  WeldingGunOffUpdate(ScriptCtx* a0);
 void  WeldingGunOnUpdate(ScriptCtx* a0);
 s32   WeldingOverTrench(ScriptCtx* a0);
@@ -912,7 +912,7 @@ s32 fn_800BE3A8(u8* arg0, f32* arg1, f32* arg2, s32 arg3, f32 farg0, f32 farg1) 
     *(u32*)(*(u8**)(arg0 + 4) + 0x20) |= 0x4000;
     *(u32*)(*(u8**)(arg0 + 4) + 0x20) |= 0x10000000;
     EventSend(gEventMgr, arg0, NULL, (u32)arg3, 0, 0, 1, 0);
-    return fn_801B6F34(arg0);
+    fn_801B6F34(arg0); return 0;  // r3 is left over from the callee
 }
 
 // 0x800C2180
@@ -1370,7 +1370,7 @@ static void FreeSlotObj(u8* obj) {
     if (res != NULL) {
         s32 rc = *(s32*)(res + 0x10) - 1;
         *(s32*)(res + 0x10) = rc;
-        if (rc == 0) fn_8016A2B8();
+        if (rc == 0) fn_8016A2B8(res);
         *(s32*)(obj + 0x14) = 0;
     }
     *(s32*)obj = 0;
