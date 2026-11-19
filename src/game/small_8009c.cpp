@@ -13,6 +13,16 @@ s32   RaySceneTest(void* ray);                                    // 0x80070458
 void  fn_800690D4(u8* p, s32 a, void* params, s32 b);             // 0x800690D4 (base ctor)
 void  fn_80097BFC(u8* p);                                         // 0x80097BFC
 void  fn_800999B4(u8* obj, f32 v);                                // 0x800999B4
+void  SpawnEffectAt(void* fxMgr, u32 effect, const f32 posAndScale[4], int a);  // 0x801C80E0
+u32   RandomU32(void);                                            // 0x80143460
+void  TextureRelease(void* texture);                               // 0x80194028
+void  fn_801ECFA0(void* widget, u32 id);                           // 0x801ECFA0
+u32   fn_801EC880(void* widget, u32 hash);                         // 0x801EC880
+void  fn_801EC8C4(void* widget, u32 id, u32 value);                // 0x801EC8C4
+void* fn_801D40E0(s32 size);                                       // 0x801D40E0
+void* fn_80209814(void* resource);                                 // 0x80209814
+void  fn_8020A398(s32 handle);                                    // 0x8020A398
+s32   PlaySound(u32 hash, s32 a, s32 b, s32 c, s32 d, s32 e);      // 0x80209E70
 }
 
 // Door callbacks defined in small_8009.cpp (C++ linkage).
@@ -24,13 +34,102 @@ extern "C" void RobotEvolutionExperiment_DoorClosed(u8* p);
 extern "C++" void* gEventMgr;                                           // 0x805FB6C8
 extern u8    lbl_8035BD58[];                                      // registration name block
 extern u8    lbl_8035C3F0[];                                      // vtable
+extern u8    lbl_8035C0A0[];                                      // smasher callback names
 extern u8*   lbl_803C6A70[3];                                     // robot table (key at +4)
 extern u8*   lbl_803C6A88[3];                                     // smasher table (key at +4)
+extern u8    lbl_8047C760[];                                      // effect manager
 extern s32   lbl_803471B0[];                                      // table indexed by RaySceneTest result
 extern s32   lbl_805F8A38;                                        // last random value
+extern void* lbl_805FBBAC;                                        // voice sound resource
 extern f32   lbl_805FDB08;                                        // float threshold
 extern f32   lbl_805FDBA0;                                        // float 0.0
 extern f32   lbl_805FDBC8;                                        // float constant
+
+// Clears the widget's texture and animation state, notifies its target, and optionally plays the
+// two robot effects before setting the object's state to 3.
+// 0x80092A30
+extern "C" void fn_80092A30(u8* obj, s32 playEffects) {
+    u8* texture = *(u8**)(obj + 0xC);
+    if (texture != NULL) {
+        UIElement_PlayUIAnim(*(u32*)(obj + 0x10), 0xB729E3E6u);
+        s32 refCount = *(s32*)(texture + 0x24) - 1;
+        *(s32*)(texture + 0x24) = refCount;
+        if (refCount == 0) TextureRelease(texture);
+        *(u8**)(obj + 0xC) = NULL;
+    }
+
+    s32 handle = *(s32*)(obj + 0x24);
+    if (handle != -1) {
+        fn_8020A398(handle);
+        *(s32*)(obj + 0x24) = -1;
+    }
+    handle = *(s32*)(obj + 0x28);
+    if (handle != -1) {
+        fn_8020A398(handle);
+        *(s32*)(obj + 0x28) = -1;
+    }
+
+    u8* target = *(u8**)(obj + 0x4);
+    *(s32*)(obj + 0x2C) = 0;
+    *(s32*)(obj + 0x30) = 0;
+    if (target != NULL) {
+        u8* animations = target + 0x94;
+        fn_801ECFA0(animations, fn_801EC880(animations, 0x53B643B8u));
+        fn_801ECFA0(animations, fn_801EC880(animations, 0x37B4DA5Bu));
+        fn_801ECFA0(animations, fn_801EC880(animations, 0x8B9BD519u));
+    }
+
+    if (playEffects != 0) {
+        EventSend(gEventMgr, *(void**)(obj + 0x4), NULL, 0xB91BDDB3u, 0, 0, 1, 0);
+        if (*(s32*)(obj + 0x8) != 2) {
+            u8* position = *(u8**)(obj + 0x1C);
+            f32 effectPos[4] = {
+                *(f32*)(position + 0x8), *(f32*)(position + 0xC),
+                *(f32*)(position + 0x10), lbl_805FDB08,
+            };
+            SpawnEffectAt(lbl_8047C760, 0xFE6B32D9u, effectPos, 0);
+
+            position = *(u8**)(obj + 0x20);
+            effectPos[0] = *(f32*)(position + 0x8);
+            effectPos[1] = *(f32*)(position + 0xC);
+            effectPos[2] = *(f32*)(position + 0x10);
+            effectPos[3] = lbl_805FDB08;
+            SpawnEffectAt(lbl_8047C760, 0xFC2DB371u, effectPos, 0);
+        }
+    } else {
+        EventSend(gEventMgr, *(void**)(obj + 0x4), NULL, 0xF78001C0u, 0, 0, 1, 0);
+    }
+    *(s32*)(obj + 0x8) = 3;
+}
+
+// Sets the three robot slots' +0x40 values and selects a +0x3C flag among eligible slots.
+// 0x80092D10
+extern "C" void fn_80092D10(void) {
+    u8* first = lbl_803C6A70[0];
+    u8* second = lbl_803C6A70[1];
+    u8* third = lbl_803C6A70[2];
+
+    *(s32*)(first + 0x40) = 0;
+    *(s32*)(second + 0x40) = (*(s32*)(first + 0x8) == 2) ? 2 : 0;
+    *(s32*)(third + 0x40) = 2;
+
+    s32 otherStateCount = (*(s32*)(first + 0x8) != 2)
+        + (*(s32*)(second + 0x8) != 2)
+        + (*(s32*)(third + 0x8) != 2);
+    *(u8*)(first + 0x3C) = 0;
+    *(u8*)(second + 0x3C) = 0;
+    *(u8*)(third + 0x3C) = 0;
+
+    if (otherStateCount != 1) {
+        if (*(s32*)(second + 0x8) != 2) {
+            *(u8*)(second + 0x3C) = 1;
+        } else if (RandomU32() & 0x10000) {
+            *(u8*)(first + 0x3C) = 1;
+        } else {
+            *(u8*)(third + 0x3C) = 1;
+        }
+    }
+}
 
 // Finds the robot table entry whose key at +4 equals key, or NULL.
 static u8* RobotEntryFind(u8* key) {

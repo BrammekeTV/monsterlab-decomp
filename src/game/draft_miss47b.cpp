@@ -27,15 +27,15 @@ BOOL    fn_801A6518(void* obj);                                 // 0x801A6518
 BOOL    fn_801A655C(void* obj);                                 // 0x801A655C
 s32     fn_801A6714(u8* el);                                    // 0x801A6714
 void    fn_801A67C8(u8* el, u32 a1);                            // 0x801A67C8
-void    fn_801A75E8(u8* el, BOOL a1, s32 count);                // 0x801A75E8
-void    fn_801A7490(u8* el, BOOL a1, s32 count);                // 0x801A7490
-void    fn_801A7780(u8* el, u32 a1, BOOL a2, s32 count);        // 0x801A7780
-void    fn_801A7838(u8* el, BOOL a1, s32 count);                // 0x801A7838
-void    fn_801A79AC(u8* el, BOOL a2, s32 count, u32 a1);        // 0x801A79AC
-void    fn_801A7B14(u8* el, s32 a1, s32 a2, u32 a3);            // 0x801A7B14
+s32     fn_801A75E8(u8* el, BOOL a1, s32 count);                // 0x801A75E8
+s32     fn_801A7490(u8* el, BOOL a1, s32 count);                // 0x801A7490
+s32     fn_801A7780(u8* el, u32 a1, BOOL a2, s32 count);        // 0x801A7780
+s32     fn_801A7838(u8* el, BOOL a1, s32 count);                // 0x801A7838
+s32     fn_801A79AC(u8* el, BOOL a2, s32 count, u32 a1);        // 0x801A79AC
+s32     fn_801A7B14(u8* el, s32 a1, s32 a2, u32 a3);            // 0x801A7B14
 void    fn_801A7B8C(u8* el, u32 a1);                            // 0x801A7B8C
 void    fn_801A7C38(u8* el, s32 a1, u32 a2);                    // 0x801A7C38
-void    fn_801A7DC0(u8* el, u32 a1);                            // 0x801A7DC0
+s32     fn_801A7DC0(u8* el, u32 a1);                            // 0x801A7DC0
 ScriptValue fn_801A7CC4(u8* el, s32 a1);                        // 0x801A7CC4
 }
 

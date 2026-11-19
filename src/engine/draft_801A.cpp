@@ -9,6 +9,7 @@ extern "C" {
 typedef void (*VFnI)(void*, s32);
 typedef void (*VFnF)(void*, f32);
 typedef void (*VFnIF)(void*, s32, f32);
+typedef void (*VFnII)(void*, s32, s32);
 
 extern "C" {
 s32    UISetTexture(u8* el, s32 tex);                           // 0x801A11FC
@@ -31,6 +32,14 @@ void*  fn_801B7198(void* anim, s32 a);                          // 0x801B7198
 void   fn_801B72A0(void* anim, s32 a);                          // 0x801B72A0
 void   fn_801A21CC(u8* o);                                      // 0x801A21CC
 void   fn_801A31BC(u8* o);                                      // 0x801A31BC
+u32    fn_8019552C(u8* list, s32 index);                         // 0x8019552C
+s32    fn_8019555C(u8* list);                                    // 0x8019555C
+u8*    fn_801A9EFC(u8* element, s32 type);                       // 0x801A9EFC
+void   fn_801A1ABC(u8* element, u32 value);                      // 0x801A1ABC
+void   UISetText(void* element, const char* text, s32 mode);      // 0x8019EFC8
+void   UIWidgetPlayAnimLoop(void* widget, u32 anim, s32 count);   // 0x8019BB1C
+void   fn_8019C9F4(u8* el, u32 hash, s32* value);                 // 0x8019C9F4
+void   fn_8019CA2C(u8* el, u32 hash);                            // 0x8019CA2C
 
 extern const char lbl_80382E90[];   // 0x80382E90 ("UISlideshow.cpp")
 extern u8 lbl_80382E2C[];           // 0x80382E2C (vtable)
@@ -46,6 +55,7 @@ extern s32 lbl_805F9478;            // 0x805F9478
 extern u8 lbl_805F9212;             // 0x805F9212 (copy filter value)
 extern u8 lbl_805FB50C;             // 0x805FB50C (GX shadow flags byte)
 extern void* lbl_805FB658;          // 0x805FB658 (global render object)
+char lbl_805F94A8[8] ORIG(0x805F94A8);
 
 // 0x801A0D04
 // Draws the element's model through fn_80195A58 with GX flag bit 3 cleared, bracketed by BP
@@ -360,6 +370,416 @@ s32 fn_801A2E94(u8* arg0, f32 farg0) {
     (*(VFnIF*)(*(u8**)anim + 0x20))(anim, 0, farg0);
     if (*fn_8018C8E4() != 0) {
         fn_801A31BC(arg0);
+    }
+    return 0;
+}
+
+// The following functions operate on the cells owned by a UIGrid.  The grid stores
+// its dimensions at +0x13C/+0x140, the current cell at +0x14C/+0x150 and the
+// scroll offset at +0x15C/+0x160.
+static u8* UIGridCell(u8* grid, s32 index) {
+    u8** slot = (u8**)(uintptr_t)fn_8019552C(*(u8**)(grid + 0x1BC), index);
+    return slot != NULL ? *slot : NULL;
+}
+
+// 0x801A5ED0
+s32 fn_801A5ED0(u8* grid) {
+    s32 saved = *(s32*)(grid + 0x160);
+    for (s32 tries = 0;; tries++) {
+        s32 offset = *(s32*)(grid + 0x160) - 1;
+        *(s32*)(grid + 0x160) = offset;
+        if (offset + *(s32*)(grid + 0x150) < 0 && !(*(u32*)(grid + 0x64) & 0x10000)) {
+            *(s32*)(grid + 0x160) = saved;
+            return 0;
+        }
+        if (offset < 0) {
+            *(s32*)(grid + 0x160) += *(s32*)(grid + 0x140);
+        }
+        s32 height = *(s32*)(grid + 0x140);
+        if (tries >= height) {
+            *(s32*)(grid + 0x160) = saved;
+            return 0;
+        }
+        s32 row = *(s32*)(grid + 0x14C) + *(s32*)(grid + 0x15C);
+        s32 col = *(s32*)(grid + 0x150) + *(s32*)(grid + 0x160);
+        s32 width = *(s32*)(grid + 0x13C);
+        if (row < 0) row += width;
+        else if (row >= width) row -= width;
+        if (col < 0) col += height;
+        else if (col >= height) col -= height;
+        u8* cell = UIGridCell(grid, col + row * height);
+        if (cell != NULL && (*(u32*)(cell + 0x64) & 1)) {
+            (*(VFnI*)(*(u8**)(grid + 0x138) + 0x2C))(grid, 0x10);
+            if (*(u32*)(grid + 0x64) & 0x800000) {
+                *(u8*)(grid + 0x178) = 1;
+                *(f32*)(grid + 0x174) = 0.0f;
+            }
+            return 1;
+        }
+    }
+}
+
+// 0x801A6060
+s32 fn_801A6060(u8* grid) {
+    s32 saved = *(s32*)(grid + 0x160);
+    for (s32 tries = 0;; tries++) {
+        s32 offset = *(s32*)(grid + 0x160) + 1;
+        s32 height = *(s32*)(grid + 0x140);
+        *(s32*)(grid + 0x160) = offset;
+        if (offset + *(s32*)(grid + 0x150) >= height && !(*(u32*)(grid + 0x64) & 0x10000)) {
+            *(s32*)(grid + 0x160) = saved;
+            return 0;
+        }
+        if (offset >= height) *(s32*)(grid + 0x160) -= height;
+        if (tries >= height) {
+            *(s32*)(grid + 0x160) = saved;
+            return 0;
+        }
+        s32 row = *(s32*)(grid + 0x14C) + *(s32*)(grid + 0x15C);
+        s32 col = *(s32*)(grid + 0x150) + *(s32*)(grid + 0x160);
+        s32 width = *(s32*)(grid + 0x13C);
+        if (row < 0) row += width;
+        else if (row >= width) row -= width;
+        if (col < 0) col += height;
+        else if (col >= height) col -= height;
+        u8* cell = UIGridCell(grid, col + row * height);
+        if (cell != NULL && (*(u32*)(cell + 0x64) & 1)) {
+            (*(VFnI*)(*(u8**)(grid + 0x138) + 0x2C))(grid, 0x10);
+            if (*(u32*)(grid + 0x64) & 0x800000) {
+                *(u8*)(grid + 0x179) = 1;
+                *(f32*)(grid + 0x174) = 0.0f;
+            }
+            return 1;
+        }
+    }
+}
+
+// 0x801A61F4
+s32 fn_801A61F4(u8* grid) {
+    s32 saved = *(s32*)(grid + 0x15C);
+    for (s32 tries = 0;; tries++) {
+        s32 offset = *(s32*)(grid + 0x15C) - 1;
+        *(s32*)(grid + 0x15C) = offset;
+        s32 width = *(s32*)(grid + 0x13C);
+        if (offset + *(s32*)(grid + 0x14C) < 0 && !(*(u32*)(grid + 0x64) & 0x80000)) {
+            *(s32*)(grid + 0x15C) = saved;
+            return 0;
+        }
+        if (offset < 0) *(s32*)(grid + 0x15C) += width;
+        if (tries >= width) {
+            *(s32*)(grid + 0x15C) = saved;
+            return 0;
+        }
+        s32 row = *(s32*)(grid + 0x14C) + *(s32*)(grid + 0x15C);
+        s32 col = *(s32*)(grid + 0x150) + *(s32*)(grid + 0x160);
+        s32 height = *(s32*)(grid + 0x140);
+        if (row < 0) row += width;
+        else if (row >= width) row -= width;
+        if (col < 0) col += height;
+        else if (col >= height) col -= height;
+        u8* cell = UIGridCell(grid, col + row * height);
+        if (cell != NULL && (*(u32*)(cell + 0x64) & 1)) {
+            (*(VFnI*)(*(u8**)(grid + 0x138) + 0x2C))(grid, 0x10);
+            if (*(u32*)(grid + 0x64) & 0x800000) {
+                *(u8*)(grid + 0x17A) = 1;
+                *(f32*)(grid + 0x174) = 0.0f;
+            }
+            return 1;
+        }
+    }
+}
+
+// 0x801A6384
+s32 fn_801A6384(u8* grid) {
+    s32 saved = *(s32*)(grid + 0x15C);
+    for (s32 tries = 0;; tries++) {
+        s32 offset = *(s32*)(grid + 0x15C) + 1;
+        s32 width = *(s32*)(grid + 0x13C);
+        *(s32*)(grid + 0x15C) = offset;
+        if (offset + *(s32*)(grid + 0x14C) >= width && !(*(u32*)(grid + 0x64) & 0x80000)) {
+            *(s32*)(grid + 0x15C) = saved;
+            return 0;
+        }
+        if (offset >= width) *(s32*)(grid + 0x15C) -= width;
+        if (tries >= width) {
+            *(s32*)(grid + 0x15C) = saved;
+            return 0;
+        }
+        s32 row = *(s32*)(grid + 0x14C) + *(s32*)(grid + 0x15C);
+        s32 col = *(s32*)(grid + 0x150) + *(s32*)(grid + 0x160);
+        s32 height = *(s32*)(grid + 0x140);
+        if (row < 0) row += width;
+        else if (row >= width) row -= width;
+        if (col < 0) col += height;
+        else if (col >= height) col -= height;
+        u8* cell = UIGridCell(grid, col + row * height);
+        if (cell != NULL && (*(u32*)(cell + 0x64) & 1)) {
+            (*(VFnI*)(*(u8**)(grid + 0x138) + 0x2C))(grid, 0x10);
+            if (*(u32*)(grid + 0x64) & 0x800000) {
+                *(u8*)(grid + 0x17B) = 1;
+                *(f32*)(grid + 0x174) = 0.0f;
+            }
+            return 1;
+        }
+    }
+}
+
+// 0x801A6714
+s32 fn_801A6714(u8* grid) {
+    s32 valid = 0;
+    for (s32 row = 0; row < *(s32*)(grid + 0x13C); row++) {
+        s32 height = *(s32*)(grid + 0x140);
+        for (s32 col = 0; col < height; col++) {
+            u8* cell = UIGridCell(grid, col + row * height);
+            if (cell != NULL && (*(u32*)(cell + 0x64) & 1)) valid++;
+        }
+    }
+    return valid;
+}
+
+// 0x801A67C8
+void fn_801A67C8(u8* grid, u32 value) {
+    for (s32 row = 0; row < *(s32*)(grid + 0x13C); row++) {
+        s32 height = *(s32*)(grid + 0x140);
+        for (s32 col = 0; col < height; col++) {
+            u8* cell = UIGridCell(grid, col + row * height);
+            if (cell != NULL) {
+                u8* image = fn_801A9EFC(cell, 2);
+                if (image != NULL) fn_801A1ABC(image, value);
+            }
+        }
+    }
+}
+
+// 0x801A7250
+u8* fn_801A7250(u8* grid) {
+    s32 row = *(s32*)(grid + 0x14C) + *(s32*)(grid + 0x15C);
+    s32 col = *(s32*)(grid + 0x150) + *(s32*)(grid + 0x160);
+    s32 width = *(s32*)(grid + 0x13C);
+    s32 height = *(s32*)(grid + 0x140);
+    if (row < 0) row += width;
+    else if (row >= width) row -= width;
+    if (col < 0) col += height;
+    else if (col >= height) col -= height;
+    return UIGridCell(grid, col + row * height);
+}
+
+// 0x801A72EC
+s32 fn_801A72EC(u8* grid) {
+    for (s32 row = 0; row < *(s32*)(grid + 0x13C); row++) {
+        s32 height = *(s32*)(grid + 0x140);
+        for (s32 col = 0; col < height; col++) {
+            s32 edge = 1;
+            s32 mappedRow = row + *(s32*)(grid + 0x15C);
+            s32 mappedCol = col + *(s32*)(grid + 0x160);
+            if (mappedRow >= *(s32*)(grid + 0x13C)) mappedRow -= *(s32*)(grid + 0x13C);
+            if (mappedCol >= height) mappedCol -= height;
+            if (row >= *(s32*)(grid + 0x144) || col >= *(s32*)(grid + 0x148)) edge = 0;
+            if (*(u32*)(grid + 0x64) & 0x800000) {
+                if (row == *(s32*)(grid + 0x144) || row == *(s32*)(grid + 0x13C) - 1) edge = 1;
+                if (col == *(s32*)(grid + 0x148) || col == height - 1) edge = 1;
+            }
+            u8* cell = UIGridCell(grid, mappedCol + mappedRow * height);
+            if (cell != NULL) {
+                if (*(s32*)(grid + 0x164) == 0 && edge && !(*(u32*)(cell + 0x64) & 1)) edge = 0;
+                if (edge) (*(VFnI*)(*(u8**)(cell + 0x138) + 0x2C))(cell, 2);
+                else (*(VFnI*)(*(u8**)(cell + 0x138) + 0x30))(cell, 2);
+            }
+        }
+    }
+    *(u8*)(grid + 0x17C) = 1;
+    return 0;
+}
+
+// 0x801A7490
+s32 fn_801A7490(u8* grid, const char* const* strings, s32 limit) {
+    if (strings == NULL) return -2;
+    (*(VFnF*)(*(u8**)(grid + 0x138) + 0x18))(grid, 0.0f);
+    s32 count = fn_8019555C(*(u8**)(grid + 0x1BC));
+    s32 used = 0;
+    s32 stringIndex = 0;
+    for (s32 i = 0; i < count && used < limit; i++) {
+        u8* cell = UIGridCell(grid, i);
+        const char* text = strings[stringIndex];
+        if (cell != NULL) {
+            u8* label = fn_801A9EFC(cell, 1);
+            if (label != NULL) {
+                if (text == NULL) {
+                    (*(VFnI*)(*(u8**)(cell + 0x138) + 0x30))(cell, 1);
+                    UISetText(label, (const char*)&lbl_805F94A8, 0);
+                } else {
+                    (*(VFnI*)(*(u8**)(cell + 0x138) + 0x2C))(cell, 1);
+                    UISetText(label, text, 0);
+                }
+                used++;
+                stringIndex++;
+            }
+        }
+    }
+    (*(VFnF*)(*(u8**)(grid + 0x138) + 0x18))(grid, 0.0f);
+    return 0;
+}
+
+// 0x801A75E8
+s32 fn_801A75E8(u8* grid, const u32* textures, s32 limit) {
+    (*(VFnF*)(*(u8**)(grid + 0x138) + 0x18))(grid, 0.0f);
+    s32 count = fn_8019555C(*(u8**)(grid + 0x1BC));
+    s32 used = 0;
+    s32 textureIndex = 0;
+    for (s32 i = 0; i < count && used < limit; i++) {
+        u8* cell = UIGridCell(grid, i);
+        if (cell == NULL) continue;
+        u8* image = fn_801A9EFC(cell, 2);
+        if (image == NULL) continue;
+        u32 texture = textures != NULL ? textures[textureIndex] : 0;
+        *(u8*)(cell + 0x13C) = 1;
+        if (texture == 0) {
+            (*(VFnI*)(*(u8**)(cell + 0x138) + 0x30))(cell, 1);
+            (*(VFnI*)(*(u8**)(cell + 0x138) + 0x2C))(cell, 0x10);
+            (*(VFnI*)(*(u8**)(image + 0x138) + 0x30))(image, 2);
+            UISetTexture(image, 0);
+        } else {
+            (*(VFnI*)(*(u8**)(cell + 0x138) + 0x2C))(cell, 0x11);
+            UISetTexture(image, texture);
+            (*(VFnI*)(*(u8**)(image + 0x138) + 0x2C))(image, 2);
+        }
+        used++;
+        textureIndex++;
+    }
+    *(u8*)(grid + 0x17C) = 0;
+    (*(VFnF*)(*(u8**)(grid + 0x138) + 0x18))(grid, 0.0f);
+    return 0;
+}
+
+// 0x801A7780
+s32 fn_801A7780(u8* grid, u32 hash, const s32* const* values, s32 limit) {
+    s32 count = fn_8019555C(*(u8**)(grid + 0x1BC));
+    s32 used = 0;
+    s32 valueIndex = 0;
+    for (s32 i = 0; i < count && used < limit; i++) {
+        u8* cell = UIGridCell(grid, i);
+        if (cell == NULL) continue;
+        const s32* event = values[valueIndex];
+        if (event == NULL) {
+            fn_8019CA2C(cell, hash);
+        } else {
+            s32 payload = *event;
+            fn_8019C9F4(cell, hash, &payload);
+        }
+        valueIndex++;
+        used++;
+    }
+    return 0;
+}
+
+// 0x801A7838
+s32 fn_801A7838(u8* grid, const u32* colors, s32 limit) {
+    if (colors == NULL) return -2;
+    (*(VFnF*)(*(u8**)(grid + 0x138) + 0x18))(grid, 0.0f);
+    s32 count = fn_8019555C(*(u8**)(grid + 0x1BC));
+    s32 used = 0;
+    s32 colorIndex = 0;
+    for (s32 i = 0; i < count && used < limit; i++) {
+        u8* cell = UIGridCell(grid, i);
+        if (cell == NULL) continue;
+        u8* label = fn_801A9EFC(cell, 1);
+        if (label == NULL) continue;
+        u32 color = colors[colorIndex];
+        *(f32*)(label + 0x80) = (f32)(u8)color * (1.0f / 255.0f);
+        *(f32*)(label + 0x84) = (f32)(u8)(color >> 8) * (1.0f / 255.0f);
+        *(f32*)(label + 0x88) = (f32)(u8)(color >> 16) * (1.0f / 255.0f);
+        *(f32*)(label + 0x8C) = (f32)(u8)(color >> 24) * (1.0f / 255.0f);
+        (*(VFnI*)(*(u8**)(label + 0x138) + 0x2C))(label, 0x20);
+        colorIndex++;
+        used++;
+    }
+    return 0;
+}
+
+// 0x801A79AC
+s32 fn_801A79AC(u8* grid, const u8* active, s32 limit, u32 highlightHash) {
+    (*(VFnF*)(*(u8**)(grid + 0x138) + 0x18))(grid, 0.0f);
+    if (active == NULL) return -2;
+    *(u32*)(grid + 0x164) = highlightHash;
+    s32 count = fn_8019555C(*(u8**)(grid + 0x1BC));
+    for (s32 i = 0; i < count; i++) {
+        u8* cell = UIGridCell(grid, i);
+        if (cell == NULL) continue;
+        if (i >= limit) {
+            (*(VFnI*)(*(u8**)(cell + 0x138) + 0x30))(cell, 1);
+            if (highlightHash == 0) (*(VFnI*)(*(u8**)(cell + 0x138) + 0x30))(cell, 2);
+        } else if (active[i] != 0) {
+            (*(VFnI*)(*(u8**)(cell + 0x138) + 0x2C))(cell, 1);
+            (*(VFnI*)(*(u8**)(cell + 0x138) + 0x2C))(cell, 2);
+        } else {
+            (*(VFnI*)(*(u8**)(cell + 0x138) + 0x30))(cell, 1);
+            if (highlightHash == 0) (*(VFnI*)(*(u8**)(cell + 0x138) + 0x30))(cell, 2);
+        }
+    }
+    *(u8*)(grid + 0x17C) = 0;
+    return 0;
+}
+
+// 0x801A7B14
+s32 fn_801A7B14(u8* grid, s32 index, s32 type, u32 anim) {
+    u8* cell = UIGridCell(grid, index);
+    if (cell != NULL) {
+        u8* widget = fn_801A9EFC(cell, type);
+        if (widget != NULL) UIWidgetPlayAnimLoop(widget, anim, 0xA);
+    }
+    return 0;
+}
+
+// 0x801A7B8C
+void fn_801A7B8C(u8* grid, u32 anim) {
+    s32 count = fn_8019555C(*(u8**)(grid + 0x1BC));
+    for (s32 i = 0; i < count; i++) {
+        u8* cell = UIGridCell(grid, i);
+        if (cell == NULL) continue;
+        u8* text = fn_801A9EFC(cell, 1);
+        if (text != NULL) UIWidgetPlayAnimLoop(text, anim, 0xA);
+        u8* image = fn_801A9EFC(cell, 2);
+        if (image != NULL) UIWidgetPlayAnimLoop(image, anim, 0xA);
+    }
+}
+
+// 0x801A7C38
+void fn_801A7C38(u8* grid, s32 type, u32 anim) {
+    s32 count = fn_8019555C(*(u8**)(grid + 0x1BC));
+    for (s32 i = 0; i < count; i++) {
+        u8* cell = UIGridCell(grid, i);
+        if (cell != NULL) {
+            u8* widget = fn_801A9EFC(cell, type);
+            if (widget != NULL) UIWidgetPlayAnimLoop(widget, anim, 0xA);
+        }
+    }
+}
+
+// 0x801A7CC4
+ScriptValue fn_801A7CC4(u8* grid, s32 index) {
+    u8* cell = UIGridCell(grid, index);
+    if (cell == NULL) return 0;
+    f32 x = *(f32*)(grid + 0x1E4) + (*(f32*)(grid + 0x1D8) * *(f32*)(cell + 0x70)
+        + (*(f32*)(grid + 0x1C0) * *(f32*)(cell + 0x68)
+        + *(f32*)(grid + 0x1CC) * *(f32*)(cell + 0x6C)));
+    f32 y = *(f32*)(grid + 0x1E8) + (*(f32*)(grid + 0x1DC) * *(f32*)(cell + 0x70)
+        + (*(f32*)(grid + 0x1C4) * *(f32*)(cell + 0x68)
+        + *(f32*)(grid + 0x1D0) * *(f32*)(cell + 0x6C)));
+    f32 z = *(f32*)(grid + 0x1EC) + (*(f32*)(grid + 0x1E0) * *(f32*)(cell + 0x70)
+        + (*(f32*)(grid + 0x1C8) * *(f32*)(cell + 0x68)
+        + *(f32*)(grid + 0x1D4) * *(f32*)(cell + 0x6C)));
+    *(f32*)(grid + 0x1F8) = x;
+    *(f32*)(grid + 0x1FC) = y;
+    *(f32*)(grid + 0x200) = z;
+    return (ScriptValue)(grid + 0x1F8);
+}
+
+// 0x801A7DC0
+s32 fn_801A7DC0(u8* grid, u32 visible) {
+    u8* highlight = *(u8**)(grid + 0x1B4);
+    if (highlight != NULL) {
+        (*(VFnI*)(*(u8**)(highlight + 0x138) + (visible != 0 ? 0x2C : 0x30)))(highlight, 2);
+        (*(VFnI*)(*(u8**)(highlight + 0x138) + 0x2C))(highlight, 0x10);
     }
     return 0;
 }

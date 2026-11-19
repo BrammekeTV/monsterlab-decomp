@@ -14,15 +14,22 @@ void    fn_80147150(u8* p, s32 a);                                   // 0x801471
 u8*     fn_801FA82C(u8* p, s32 del);                                 // 0x801FA82C (deleting dtor)
 s32     fn_801F5294(s32 idx);                                        // 0x801F5294
 void    fn_801F5E3C(void* a, const void* b, s32 c);                  // 0x801F5E3C (leaf in src/leaf, takes args here)
+void*   EventPost(s32 id, void* sender);                             // 0x801F3918
+void    BufferFree(void* data);                                      // 0x801D4980
+void*   fn_801F4B6C(s32 id);                                        // 0x801F4B6C
+void*   fn_801B7198(void* words, s32 count);                        // 0x801B7198
 }
 
 extern const char lbl_80385FD8[];   // 0x80385FD8 (string)
 extern u8  lbl_804DD168[];          // 0x804DD168 (bss object, 0x18 bytes)
+extern u8  lbl_804DD140[];          // 0x804DD140
+extern u8  lbl_804FB5A8[];          // 0x804FB5A8
 extern u8  gWorldState[];           // 0x803E6D00
 extern void* lbl_805FB964;          // 0x805FB964 movie player
 extern s32 lbl_805FB950;            // 0x805FB950
 extern s32 lbl_805FB954;            // 0x805FB954
 extern s32 lbl_805FB958;            // 0x805FB958
+extern u32 lbl_805FB9F0;            // 0x805FB9F0
 extern s32 lbl_805FB970;            // 0x805FB970 (movie player active flag)
 extern s32 lbl_805FB97C;            // 0x805FB97C
 extern f32 lbl_805F9820;            // 0x805F9820 (countdown float)
@@ -67,7 +74,7 @@ void fn_801F5734(void* arg) {
 s32 fn_801F57E0(f32 dt) {
     if (lbl_805F9820 >= lbl_806000C0) return 1;
     lbl_805F9820 = lbl_805F9820 - dt;
-    return lbl_805F9820 <= lbl_806000C0;
+    return lbl_805F9820 >= lbl_806000C0;
 }
 
 // 0x801F59B0
@@ -316,6 +323,117 @@ u8* fn_801F5A14(u8* p, u8* q) {
     if (((w >> 20) & 0x7f) == 0x6f) return 0;
     if ((u32)(next - p) < *(u32*)(p + 0x10)) return next;
     return 0;
+}
+
+// 0x801F2EB8
+// Marks the event queue for processing when it has entries and its saved head differs from the
+// current head word.
+void fn_801F2EB8(void) {
+    if (lbl_805FB950 != 0 && lbl_805FB9F0 != *(u32*)lbl_804DD140) {
+        lbl_805FB954 = 1;
+    }
+}
+
+// 0x801F4DFC
+// Dispatches an entry through its referenced world object when it has one; entries without an
+// object are sent to the fallback handler as a one-word command.
+void fn_801F4DFC(u8* entry) {
+    u32 kind = (*(u32*)entry >> 20) & 0x7F;
+    s32 id = -1;
+    if (kind == 0x75) id = *(s32*)(entry + 0x20);
+    if (kind == 0x73) id = *(s32*)(entry + 0x04);
+    if (kind == 0x72) id = *(s32*)(entry + 0x04);
+    if (kind == 0x71) id = *(s32*)(entry + 0x04);
+    if (kind == 0x63) id = *(s32*)(entry + 0x08);
+
+    if (id != -1) {
+        fn_801F4B6C(id);
+    } else {
+        u32 word = *(u32*)entry;
+        fn_801B7198(&word, 1);
+    }
+}
+
+// 0x801F5484
+// Posts the pending stream-complete event, then releases its buffered payload. Returns false
+// only when an active request could not be posted.
+s32 fn_801F5484(void) {
+    s32 result = 1;
+    if (*(s32*)(lbl_804FB5A8 + 0x00) != 0 && *(s32*)(lbl_804FB5A8 + 0x04) != 0) {
+        u8* event = (u8*)EventPost(0x6D, NULL);
+        if (event != NULL) {
+            *(s32*)(event + 0x04) = 1;
+            u8* buffer = *(u8**)(lbl_804FB5A8 + 0x0C);
+            BufferFree(*(void**)(buffer + 0x08));
+            BufferFree(buffer);
+            *(void**)(lbl_804FB5A8 + 0x0C) = NULL;
+            *(s32*)(lbl_804FB5A8 + 0x00) = 0;
+        } else {
+            result = 0;
+        }
+    }
+    return result;
+}
+
+// 0x801F57C4
+// Tests whether the countdown has reached the threshold.
+s32 fn_801F57C4(void) {
+    return lbl_805F9820 >= lbl_806000C0;
+}
+
+// 0x801F5A90
+// Walks the command records after the 0x18-byte header until the end marker or buffer limit.
+s32 fn_801F5A90(u8* p) {
+    u8* q = p + 0x18;
+    if ((u32)(q - p) >= *(u32*)(p + 0x10)) q = NULL;
+
+    while (q != NULL) {
+        u32 word = *(u32*)q;
+        q += fn_801F5308(q);
+        if (((word >> 20) & 0x7F) == 0x6F || (u32)(q - p) >= *(u32*)(p + 0x10)) {
+            q = NULL;
+        }
+    }
+    return 1;
+}
+
+// 0x801F5B94
+// Returns the unused portion of the 0x400-byte command buffer.
+u32 fn_801F5B94(u8* p) {
+    return 0x400 - *(u32*)(p + 0x10);
+}
+
+// 0x801F5BA0
+// Reserves the remaining command-buffer space and returns its first byte.
+u8* fn_801F5BA0(u8* p) {
+    u32 used = *(u32*)(p + 0x10);
+    *(u32*)(p + 0x10) = 0x400;
+    return p + used;
+}
+
+// 0x801F5BB8
+// Appends an encoded command when the resolved command size fits in the 0x400-byte buffer.
+u8* fn_801F5BB8(u8* p, s32 id, s32 a, s32 b, s32 c, s32 d) {
+    u32 size = (u32)fn_801F5294(id);
+    u32 used = *(u32*)(p + 0x10);
+    if (used + size > 0x400) return NULL;
+
+    u32* command = (u32*)(p + used);
+    u32 word = *command;
+    word = (word & 0xFFF7FFFF) | ((u32)a << 19);
+    word = (word & 0xF80FFFFF) | ((u32)id << 20);
+    word = (word & 0xFFFBFFFF) | ((u32)b << 18);
+    if ((u32)c >= 3) {
+        word = (word & 0xFFFCFFFF) | 0x00030000;
+        word = (word & 0xFFFF007F) | ((u32)c << 7);
+        word = (word & 0xFFFFFF83) | ((u32)d << 2);
+    } else {
+        word = (word & 0xFFFCFFFF) | ((u32)c << 16);
+        word = (word & 0xFFFF0003) | ((u32)d << 2);
+    }
+    *command = word;
+    *(u32*)(p + 0x10) = used + size;
+    return (u8*)command;
 }
 
 // 0x801F8F34

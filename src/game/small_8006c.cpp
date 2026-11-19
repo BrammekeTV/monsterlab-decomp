@@ -14,6 +14,7 @@ extern f32 lbl_805FD4EC;            // 0x805FD4EC (float argument for fn_8006909
 extern f32 lbl_805FD568;            // 0x805FD568 (float constant stored into prop fields)
 extern u8  lbl_80383A88[];          // 0x80383A88 (vtable)
 extern u8  lbl_8035A170[];          // 0x8035A170 (vtable)
+extern u8  lbl_8035A268[];          // 0x8035A268 (vtable)
 extern u8  lbl_8047C760[];          // 0x8047C760 (effect manager, see debris.cpp)
 
 // ScopedLock is a 4-byte RAII guard (see props.cpp / small_800Fc.cpp).
@@ -48,6 +49,11 @@ void  fn_80069180(u8* p, s32 a1, s32 a2);                                    // 
 void  fn_80069638(u8* p, s32 a1);                            // 0x80069638
 void  fn_801BB478(u8* p, s32 a1);                            // 0x801BB478
 void  fn_800696C4(u8* p, s32 a1);                            // 0x800696C4
+void  SpawnEffectAt(void* fxMgr, u32 effect, const f32 posAndScale[4], int a); // 0x801C80E0
+u8*   fn_80062CE0(u8* p, s32 del);                           // 0x80062CE0 (base dtor)
+void  operator_delete(void* p);                              // 0x801D426C
+
+typedef void* (*SpawnFn)(void*, u32, const f32*, void*);
 
 // 0x800677D0
 // Returns a random float between lo and hi: lo + (hi - lo) * scaled RandomU32().
@@ -284,5 +290,67 @@ void fn_8006CEC0(u8* obj, s32 a1) {
         *(void**)(obj + 0xa8) = 0;
     }
     fn_800696C4(obj, a1);
+}
+
+// 0x8006CB78
+// Releases any held effect, then spawns a replacement at the object's scene
+// position and stores its handle in the object's effect slot.
+void fn_8006CB78(u8* obj, u32 effect) {
+    u8* old = *(u8**)(obj + 0xA8);
+    if (old != NULL) {
+        fn_801C83AC(lbl_8047C760, old);
+        *(void**)(obj + 0xA8) = NULL;
+    }
+    if (effect != 0) {
+        u8* node = *(u8**)(obj + 4);
+        f32 pos[4] = { *(f32*)(node + 0), *(f32*)(node + 4), *(f32*)(node + 8), lbl_805FD4E8 };
+        ((SpawnFn)SpawnEffectAt)(lbl_8047C760, effect, pos, obj + 0xA8);  // 4th arg: handle slot
+    }
+}
+
+// 0x8006CD70
+// Releases the held effect and immediately spawns a new effect at the object's
+// scene position, using the same handle slot.
+void fn_8006CD70(u8* obj, u32 effect) {
+    u8* old = *(u8**)(obj + 0xA8);
+    if (old != NULL) {
+        fn_801C849C(lbl_8047C760, old);
+        *(void**)(obj + 0xA8) = NULL;
+    }
+    u8* node = *(u8**)(obj + 4);
+    f32 pos[4] = { *(f32*)(node + 0), *(f32*)(node + 4), *(f32*)(node + 8), lbl_805FD568 };
+    ((SpawnFn)SpawnEffectAt)(lbl_8047C760, effect, pos, obj + 0xA8);  // 4th arg: handle slot
+}
+
+// 0x8006CF24
+// Runs the common base destructor and frees the object when requested.
+u8* fn_8006CF24(u8* obj, s32 del) {
+    if (obj != NULL) {
+        fn_80062CE0(obj, 0);
+        if (del > 0) operator_delete(obj);
+    }
+    return obj;
+}
+
+// 0x8006CFA4
+// Constructs the effect-bearing entity and marks its scene node with the
+// effect-attachment mode.
+u8* fn_8006CFA4(u8* obj, s32 a, void* params, s32 b) {
+    fn_800690D4(obj, a, params, b);
+    *(void**)obj = lbl_8035A268;
+    u8* node = *(u8**)(obj + 4);
+    if (node != NULL) {
+        *(u32*)(node + 0x1C) |= 0x10000;
+        *(u8*)(node + 0x34) = 0x10;
+    }
+    return obj;
+}
+
+// 0x8006D004
+// Starts the effect-bearing entity and enables its scene-node update bit.
+s32 fn_8006D004(u8* obj, s32 a, s32 b) {
+    fn_80069180(obj, a, b);
+    *(u32*)(*(u8**)(obj + 4) + 0x20) |= 0x02000000;
+    return 1;
 }
 }

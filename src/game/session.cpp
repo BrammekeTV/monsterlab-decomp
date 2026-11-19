@@ -10,7 +10,7 @@ void* ScreenSetFindWidget(void* set, u32 hash);         // 0x80198E34
 BOOL  ScreenSetWidgetVisible(void* set, void* widget);  // 0x80198C34
 void  UiHideByHash(u32 hash, int a);                    // 0x8018F618
 BOOL  fn_801F5220(void);
-void  fn_801F5484(void);
+s32   fn_801F5484(void);
 void* EventPost(s32 id, s32 flags);                     // 0x801F3918: returns the payload to fill
 void  SessionBegin(void* session);                      // 0x80013690
 }

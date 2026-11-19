@@ -463,3 +463,9 @@ void GameSessionUpdate(GameSession* s, f32 a, f32 dt) {
         fn_8018CE64(gScreenSets, *(u8**)((u8*)cam + 4) + 0xC, camData);
     }
 }
+
+// Clears the requested bits in the object's flag word at +0x64.
+// 0x8000BD78
+extern "C" void fn_8000BD78(u8* object, u32 mask) {
+    *(u32*)(object + 0x64) &= ~mask;
+}

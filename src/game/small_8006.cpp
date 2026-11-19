@@ -1,5 +1,6 @@
 // Small functions in 0x8006xxxx (entity base helpers).
 #include "types.h"
+#include <math.h>
 
 typedef void  (*VirtFnSelf)(u8* self);
 typedef void  (*VirtFnSetFloat)(u8* self, f32 t);
@@ -29,6 +30,21 @@ void     fn_8005CB40(u8* p, f32 t, s32 flag);                                   
 void     fn_800655D8(u8* p);                                                    // 0x800655D8
 void     fn_8032F1E8(u8* obj, void (*cb)(void), s32 a, s32 b, s32 c);    // 0x8032F1E8
 void     fn_80062C7C(void);                                                     // 0x80062C7C
+void     fn_801B6ACC(u8* obj, s32 value);                                       // 0x801B6ACC
+void     fn_801DAA40(u8* a, u8* b);                                              // 0x801DAA40
+void     fn_801DAA74(u8* a, u8* b);                                              // 0x801DAA74
+void     operator_delete(void* p);                                               // 0x801D426C
+void     fn_801B5D94(u8* obj, u8* event);                                       // 0x801B5D94
+void     fn_801B1668(void* p);                                                   // 0x801B1668
+void     fn_801B4520(u8* p);                                                     // 0x801B4520
+void     BufferFree(void* p);                                                    // 0x801D4980
+void     fn_801ACCEC(void);                                                      // 0x801ACCEC
+void     TriggerDoAction(void* action, void* a1, void* a2);                     // 0x801E0054
+void     fn_80121C90(s32 action, void* obj, void* other, const f32* pos);       // 0x80121C90
+BOOL     PropIncrementState(void* prop);                                        // 0x80069FDC
+void     fn_80068B50(u8* obj, s32 mode);                                        // 0x80068B50
+u8*       fn_8005CAE8(u8* obj, s32 mode);                                       // 0x8005CAE8
+void     fn_80184488(void* owner, u8* attached);                                // 0x80184488
 void     fn_801D9B34(void* a, f32 t);                                           // 0x801D9B34
 void*    fn_80172F70(s32 a, const void* b);                                     // 0x80172F70
 void     fn_80172E84(u8* obj);                                                  // 0x80172E84
@@ -256,5 +272,172 @@ s32 fn_800677A0(const f32* v) {
     f32 x = v[0];
     if (x <= lbl_805FD48C || x >= lbl_805FD490) return 0;
     return 1;
+}
+
+// 0x80062FA8
+// Clears the currently attached effect data when the object's attachment key changes,
+// then records the new key through the shared effect manager.
+void fn_80062FA8(u8* obj, u32 key) {
+    u32 oldKey = *(u32*)(obj + 0x88);
+    u8* attached = (u8*)(*(VirtFnSelfPtr*)(*(u8**)obj + 0xB8))(obj);
+    if (attached != NULL && oldKey != key) {
+        for (s32 off = 0; off <= 0x3C; off += 4) *(u32*)(attached + off) = 0;
+    }
+    fn_801B6ACC(obj, (s32)key);
+}
+
+// 0x80063138
+// Marks an entity as active and, when its zone is resident, refreshes the world's
+// attachment bookkeeping before enabling the entity's scene node.
+void fn_80063138(u8* obj) {
+    u8* node = *(u8**)(obj + 4);
+    u8* attach = *(u8**)(obj + 0x90);
+    if (attach != NULL && !(*(u32*)(node + 0x20) & 0x40)) {
+        u16 zone = *(u16*)(node + 0x30);
+        u8* loaded = zone == 0xFFFF ? *(u8**)(*(u8**)(gWorldState + 0x1B0))
+                                    : *(u8**)(*(u8**)(gWorldState + 0x1B0) + zone * 4);
+        if (loaded != NULL) fn_801DAA40(loaded, attach);
+    }
+    node = *(u8**)(obj + 4);
+    *(u32*)(node + 0x20) &= ~0x20500u;
+    if ((*(VirtFnSelfPtr*)(*(u8**)obj + 0xC))(obj) != NULL) {
+        u8* sub = (u8*)(*(VirtFnSelfPtr*)(*(u8**)obj + 0xC))(obj);
+        *(u32*)(sub + 8) |= 2;
+    }
+    node = *(u8**)(obj + 4);
+    *(u32*)(node + 0x20) |= 3;
+}
+
+// 0x8006322C
+// Disables an entity's scene node, clears its attachment bit, and notifies the
+// world when a resident zone is being released.
+void fn_8006322C(u8* obj) {
+    u8* node = *(u8**)(obj + 4);
+    if (node == NULL) return;
+    if ((*(VirtFnSelfPtr*)(*(u8**)obj + 0xC))(obj) != NULL) {
+        u8* sub = (u8*)(*(VirtFnSelfPtr*)(*(u8**)obj + 0xC))(obj);
+        *(u32*)(sub + 8) &= ~2u;
+    }
+    node = *(u8**)(obj + 4);
+    *(u32*)(node + 0x20) &= ~0x20503u;
+    u8* attach = *(u8**)(obj + 0x90);
+    node = *(u8**)(obj + 4);
+    if (attach != NULL && !(*(u32*)(node + 0x20) & 0x40)) {
+        u16 zone = *(u16*)(node + 0x30);
+        u8* loaded = zone == 0xFFFF ? *(u8**)(*(u8**)(gWorldState + 0x1B0))
+                                    : *(u8**)(*(u8**)(gWorldState + 0x1B0) + zone * 4);
+        if (loaded != NULL) fn_801DAA74(loaded, attach);
+    }
+}
+
+// 0x800633D4
+// Re-attaches the named world attachment to the current zone, preserving its
+// position and resetting the fourth component used by the attachment system.
+u8* fn_800633D4(u8* attachment) {
+    if (attachment == NULL) attachment = (u8*)fn_80172F70(1, lbl_80359C88);
+    if (attachment == NULL) return attachment;
+    u8* world = *(u8**)(gWorldState + 8);
+    if (world == NULL) return attachment;
+    u8* current = *(u8**)(world + 4);
+    if (current == NULL) return attachment;
+    u16 zone = *(u16*)(current + 0x30);
+    if (zone == 0 || zone > *(s32*)(gWorldState + 4)) return attachment;
+    u8* zoneObj = *(u8**)(*(u8**)(gWorldState + 0x1B0) + zone * 4);
+    s16 kind = *(s16*)(attachment + 0x10);
+    if ((kind != 1 && kind != 2) || *(u8**)(zoneObj + 0x4C) == NULL) return attachment;
+    f32 pos[4] = { *(f32*)(attachment + 0x44), *(f32*)(attachment + 0x48), *(f32*)(attachment + 0x4C), 0.0f };
+    *(f32*)(attachment + 0x50) = 0.0f;
+    fn_80172E84(attachment);
+    fn_80184488(*(void**)(zoneObj + 0x4C), attachment);
+    (void)pos;
+    return attachment;
+}
+
+// 0x8006359C
+// Configures attachment interpolation for a positive travel time.
+void fn_8006359C(u8* attachment, f32 duration) {
+    if (attachment == NULL) attachment = (u8*)fn_80172F70(1, lbl_80359C88);
+    if (attachment == NULL || duration <= 0.0f) return;
+    *(f32*)(attachment + 0x54) = 1.0f;
+    *(f32*)(attachment + 0x58) = 0.0f;
+    *(f32*)(attachment + 0x5C) = 5.0f / duration;
+    fn_80172E84(attachment);
+}
+
+// 0x8006371C
+// Releases the entity's attached resources before invoking its base destructor.
+u8* fn_8006371C(u8* obj, s32 del) {
+    if (obj != NULL) {
+        *(void**)obj = lbl_80359ED8;
+        fn_80068B50(obj, 1);
+        void* buffer = *(void**)(obj + 0x22C);
+        if (buffer != NULL) {
+            fn_801ACCEC();
+            BufferFree(buffer);
+            *(void**)(obj + 0x22C) = NULL;
+        }
+        fn_8005CAE8(obj, 0);
+        if (del > 0) operator_delete(obj);
+    }
+    return obj;
+}
+
+// 0x8006680C
+// Applies a vector to every child entry, or resets all child transforms when the
+// incoming vector is effectively zero.
+void fn_8006680C(u8* list, const f32* vec) {
+    f32 x = vec[0], y = vec[1], z = vec[2], w = 0.0f;
+    BOOL zero = x <= lbl_805FD48C && x >= lbl_805FD490 && y <= lbl_805FD48C && y >= lbl_805FD490 &&
+                z <= lbl_805FD48C && z >= lbl_805FD490 && w <= lbl_805FD48C && w >= lbl_805FD490;
+    for (s32 i = 0; i < *(s32*)(list + 0xC); ++i) {
+        u8* child = *(u8**)(list + 0x14 + i * 4);
+        if (child == NULL) continue;
+        *(f32*)(child + 0x30) = zero ? 0.0f : x;
+        *(f32*)(child + 0x34) = zero ? 0.0f : y;
+        *(f32*)(child + 0x38) = zero ? 1.0f : z;
+        *(f32*)(child + 0x3C) = zero ? 0.0f : w;
+    }
+}
+
+// 0x800676AC
+// Returns 1 if the difference a - b lies strictly between lbl_805FD490 and lbl_805FD48C (+-0.0001).
+s32 fn_800676AC(f32 a, f32 b) {
+    f32 d = a - b;
+    return d > lbl_805FD490 && d < lbl_805FD48C;
+}
+
+// 0x800676E0
+// Normalizes a vector and returns its original length through outLength.
+void fn_800676E0(f32* out, const f32* in, f32* outLength) {
+    f32 lenSq = in[0] * in[0] + in[1] * in[1] + in[2] * in[2];
+    if (lenSq == 0.0f) {
+        out[0] = out[1] = out[2] = 0.0f;
+        *outLength = 0.0f;
+        return;
+    }
+    f32 len = sqrtf(lenSq);
+    *outLength = len;
+    f32 inv = 1.0f / len;
+    out[0] = in[0] * inv;
+    out[1] = in[1] * inv;
+    out[2] = in[2] * inv;
+}
+
+// 0x80067AEC
+// Delivers a collision action to the entity's configured action and to any
+// trigger actions carried by the other object.
+void fn_80067AEC(u8* obj, u8* other, const f32* pos) {
+    u8* def = *(u8**)(obj + 0x228);
+    if (def != NULL && *(s32*)(def + 0x14C) != 0) {
+        f32 p[3] = { pos[0], pos[1], pos[2] };
+        fn_80121C90(*(s32*)(def + 0x14C), obj, other, p);
+    }
+    if (other != NULL) {
+        u8* action = *(u8**)(other + 0x9C);
+        if (action != NULL && ((*(u32*)(action + 0x74) >> 27) & 0xF) != 0)
+            TriggerDoAction(action + 0x74, other, obj);
+        if (((*(u32*)(other + 0x44) >> 27) & 0xF) != 0)
+            TriggerDoAction(other + 0x44, other, obj);
+    }
 }
 }
