@@ -1,0 +1,20 @@
+// Prop state step helpers (0x8006BDCC-0x8006BDE0).
+#include "types.h"
+
+extern "C" {
+ScriptValue SetPropState(u8* prop, u32 state, s32 a2);  // 0x8006BB3C (draft_miss2.cpp)
+
+// 0x8006BDCC
+// Moves a prop to its next state (current state byte + 1).
+ScriptValue IncrementPropState(u8* prop, s32 a2) {
+    u8 cur = *(u8*)(*(u8**)(prop + 4) + 53);
+    return SetPropState(prop, (u32)cur + 1u, a2);
+}
+
+// 0x8006BDE0
+// Moves a prop to its previous state (current state byte - 1).
+ScriptValue DecrementPropState(u8* prop, s32 a2) {
+    u8 cur = *(u8*)(*(u8**)(prop + 4) + 53);
+    return SetPropState(prop, (u32)cur - 1u, a2);
+}
+}

@@ -109,7 +109,7 @@ void fn_80082AC4(f32* a, f32* b) {
 // Stores the state index at +0x264, applies the matching prop state, and sets flag 0x400000.
 void fn_80082B90(u8* obj, s32 idx) {
     *(s32*)(obj + 0x264) = idx;
-    SetPropState((u32)(uintptr_t)obj, (BOOL)((s32*)lbl_80347D88)[idx], 0);
+    SetPropState((u8*)obj, (BOOL)((s32*)lbl_80347D88)[idx], 0);
     *(u32*)(obj + 0x15C) |= 0x400000;
 }
 

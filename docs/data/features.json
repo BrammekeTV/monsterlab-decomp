@@ -94,6 +94,11 @@
  "changelog": [
   {
    "date": "2026-11-19",
+   "time": "12:40",
+   "text": "Eighth round from the missing-symbols list: 40 more functions, including character attack start, ground state and flags, hazard and obstacle collision, rock crushing, quest interrupts, monster cleanup, the rematch accept and decline checks, projectile and entity part teardown, lab book teardown, debug stats and the lightning attack on the active target."
+  },
+  {
+   "date": "2026-11-19",
    "time": "03:20",
    "text": "Seventh round from the missing-symbols list: 40 more functions, including brain minigame helpers (target, head, power-up, held chunk), brazier bowl and symbol callbacks, the effect emitter, hit boxes, catch minigame lanes and launch, camera update and shake, action affordability and ground material lookup."
   },

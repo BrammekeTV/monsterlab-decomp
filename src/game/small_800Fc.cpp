@@ -276,7 +276,7 @@ void SetFreezePlayer(u32 a0) {
     u8* def = *(u8**)((u8*)player + 4);
     if ((*(u32*)(def + 0x1C) & 0x2000) != 0) {
         PathSetPaused(player->path, (a0 != 0) ? 1 : 0);
-        PlayCharacterAnimation((u32)(uintptr_t)player, 1, 0xE3712F44u, 1);
+        PlayCharacterAnimation((Character*)player, 1, 0xE3712F44u, 1);
     }
 }
 

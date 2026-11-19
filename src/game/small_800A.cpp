@@ -237,7 +237,7 @@ void fn_800A5F8C(u8* p) {
 // fn_800A17F8 on the global object.
 void fn_800A63B4(u8* p) {
     *(u8*)(p + 0x265) = 0;
-    SetPropState((u32)(uintptr_t)p, 1, 0);
+    SetPropState((u8*)p, 1, 0);
     fn_800A17F8(fn_8006FBDC());
 }
 

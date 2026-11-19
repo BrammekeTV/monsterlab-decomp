@@ -1,15 +1,15 @@
 {
  "game_id": "RM7P4F",
- "generated": "2026-11-19T00:37:31+00:00",
- "commit": "4a44dcc",
- "commit_date": "2026-11-19T01:27:37+01:00",
+ "generated": "2026-11-19T11:37:00+00:00",
+ "commit": "ad661f5",
+ "commit_date": "2026-11-19T01:37:32+01:00",
  "game": {
   "functions": 8548,
   "bytes": 2265988,
   "named": 2748,
   "named_bytes": 616800,
-  "decompiled": 4866,
-  "decompiled_bytes": 575688
+  "decompiled": 4906,
+  "decompiled_bytes": 583192
  },
  "library": {
   "functions": 4039,
@@ -24,8 +24,8 @@
   "bytes": 3404928,
   "named": 3211,
   "named_bytes": 721548,
-  "decompiled": 4867,
-  "decompiled_bytes": 575808
+  "decompiled": 4907,
+  "decompiled_bytes": 583312
  },
  "game_range": [
   "80006B40",
@@ -69,11 +69,11 @@
    0.921
   ],
   [
-   0.184,
+   0.237,
    0.858
   ],
   [
-   0.105,
+   0.156,
    0.665
   ],
   [
@@ -133,7 +133,7 @@
    0.0
   ],
   [
-   0.019,
+   0.025,
    0.006
   ],
   [
@@ -153,7 +153,7 @@
    0.687
   ],
   [
-   0.458,
+   0.502,
    0.736
   ],
   [
@@ -161,19 +161,19 @@
    0.101
   ],
   [
-   0.208,
+   0.226,
    0.13
   ],
   [
-   0.136,
+   0.159,
    0.233
   ],
   [
-   0.36,
+   0.364,
    0.378
   ],
   [
-   0.152,
+   0.168,
    0.078
   ],
   [
@@ -185,11 +185,11 @@
    0.409
   ],
   [
-   0.13,
+   0.173,
    0.13
   ],
   [
-   0.158,
+   0.235,
    0.324
   ],
   [
@@ -213,7 +213,7 @@
    0.0
   ],
   [
-   0.269,
+   0.288,
    0.155
   ],
   [
@@ -441,7 +441,7 @@
    0.009
   ],
   [
-   0.303,
+   0.332,
    0.142
   ],
   [
@@ -461,7 +461,7 @@
    0.541
   ],
   [
-   0.156,
+   0.229,
    0.97
   ],
   [
@@ -473,15 +473,15 @@
    0.931
   ],
   [
-   0.41,
+   0.431,
    0.99
   ],
   [
-   0.221,
+   0.3,
    1.0
   ],
   [
-   0.304,
+   0.353,
    0.929
   ],
   [
@@ -517,11 +517,11 @@
    0.058
   ],
   [
-   0.823,
+   0.837,
    0.865
   ],
   [
-   0.512,
+   0.583,
    0.801
   ],
   [
@@ -533,7 +533,7 @@
    0.955
   ],
   [
-   0.337,
+   0.385,
    0.853
   ],
   [
@@ -605,11 +605,11 @@
    0.54
   ],
   [
-   0.468,
+   0.508,
    0.952
   ],
   [
-   0.044,
+   0.075,
    0.676
   ],
   [
@@ -617,7 +617,7 @@
    0.834
   ],
   [
-   0.3,
+   0.305,
    0.631
   ],
   [
@@ -697,7 +697,7 @@
    0.0
   ],
   [
-   0.027,
+   0.105,
    0.078
   ],
   [
@@ -6019,6 +6019,216 @@
      "name": "CameraUpdate",
      "addr": "801D8C04",
      "size": 324
+    }
+   ]
+  },
+  {
+   "path": "src/game/draft_miss17.cpp",
+   "functions": [
+    {
+     "name": "ClearMonster",
+     "addr": "8001CD4C",
+     "size": 100
+    },
+    {
+     "name": "CombatHUDEnableInput",
+     "addr": "800488E4",
+     "size": 240
+    },
+    {
+     "name": "CombatHUDRestoreDisableState",
+     "addr": "8004937C",
+     "size": 44
+    },
+    {
+     "name": "fn_800493A8",
+     "addr": "800493A8",
+     "size": 212
+    },
+    {
+     "name": "CharacterStartAttack",
+     "addr": "8004D520",
+     "size": 156
+    },
+    {
+     "name": "CharacterSetFlags",
+     "addr": "800532A0",
+     "size": 132
+    },
+    {
+     "name": "CharacterSetGround",
+     "addr": "8005A304",
+     "size": 284
+    },
+    {
+     "name": "CharacterResetGroundState",
+     "addr": "8005BAD4",
+     "size": 684
+    },
+    {
+     "name": "fn_800E4E80",
+     "addr": "800E4E80",
+     "size": 260
+    },
+    {
+     "name": "CheckpointMCSentCallback",
+     "addr": "800EF880",
+     "size": 28
+    },
+    {
+     "name": "CheckpointMCReceivedCallback",
+     "addr": "800EF89C",
+     "size": 28
+    },
+    {
+     "name": "CheckRockCrushed",
+     "addr": "800EFF24",
+     "size": 48
+    },
+    {
+     "name": "CheckHazardCollision",
+     "addr": "800F8AA4",
+     "size": 728
+    },
+    {
+     "name": "CheckObstacleCollision",
+     "addr": "800F8D7C",
+     "size": 224
+    },
+    {
+     "name": "CheckQuestInterrupt",
+     "addr": "800F973C",
+     "size": 84
+    },
+    {
+     "name": "CleanupSplashScreen",
+     "addr": "800FA950",
+     "size": 104
+    },
+    {
+     "name": "CloseBooks",
+     "addr": "8010FF1C",
+     "size": 92
+    },
+    {
+     "name": "FriendListHideFloaty",
+     "addr": "8013C2E4",
+     "size": 352
+    },
+    {
+     "name": "CheckName",
+     "addr": "8013EC64",
+     "size": 112
+    },
+    {
+     "name": "CleanupMonsters",
+     "addr": "80140404",
+     "size": 4
+    }
+   ]
+  },
+  {
+   "path": "src/game/draft_miss18.cpp",
+   "functions": [
+    {
+     "name": "DeInitializeOperatingTable",
+     "addr": "8001B898",
+     "size": 472
+    },
+    {
+     "name": "CreateEmptyMonster",
+     "addr": "8001C968",
+     "size": 344
+    },
+    {
+     "name": "CombatPartZonesAreLoaded",
+     "addr": "8003CF40",
+     "size": 60
+    },
+    {
+     "name": "DeallocEntityPartCallback",
+     "addr": "8004FE6C",
+     "size": 140
+    },
+    {
+     "name": "DemolishEntityPartCallback",
+     "addr": "8004FF60",
+     "size": 84
+    },
+    {
+     "name": "EnqueIdleAnim",
+     "addr": "80051724",
+     "size": 32
+    },
+    {
+     "name": "CreateProjectileEntityCallback",
+     "addr": "80068EE8",
+     "size": 144
+    },
+    {
+     "name": "EnemyFireLightningAtActiveTarget",
+     "addr": "800EF354",
+     "size": 244
+    },
+    {
+     "name": "DeinitChallenge",
+     "addr": "800EFC0C",
+     "size": 136
+    },
+    {
+     "name": "DisableAllCameraInfluenceInZone",
+     "addr": "800F68A8",
+     "size": 180
+    },
+    {
+     "name": "DemolishRenderObjectCallback",
+     "addr": "8010C7C0",
+     "size": 80
+    },
+    {
+     "name": "DemolishPooledEntityCallback",
+     "addr": "8010C818",
+     "size": 100
+    },
+    {
+     "name": "DestroyLabBooks",
+     "addr": "8010FE38",
+     "size": 228
+    },
+    {
+     "name": "DoingIngredientsSelection",
+     "addr": "801124AC",
+     "size": 4
+    },
+    {
+     "name": "DefectGetTexture",
+     "addr": "80116A20",
+     "size": 424
+    },
+    {
+     "name": "CurrentlySelected",
+     "addr": "8013EA68",
+     "size": 48
+    },
+    {
+     "name": "DidOpponentDeclineRematch",
+     "addr": "8013FD3C",
+     "size": 64
+    },
+    {
+     "name": "DidOpponentAcceptRematch",
+     "addr": "8013FD7C",
+     "size": 64
+    },
+    {
+     "name": "EndTest",
+     "addr": "80142F90",
+     "size": 44
+    },
+    {
+     "name": "DebugDrawStats",
+     "addr": "8016DAF4",
+     "size": 696
     }
    ]
   },
@@ -14653,6 +14863,21 @@
    ]
   },
   {
+   "path": "src/game/small_propstate.cpp",
+   "functions": [
+    {
+     "name": "IncrementPropState",
+     "addr": "8006BDCC",
+     "size": 20
+    },
+    {
+     "name": "DecrementPropState",
+     "addr": "8006BDE0",
+     "size": 20
+    }
+   ]
+  },
+  {
    "path": "src/game/world_alloc.cpp",
    "functions": [
     {
@@ -16824,16 +17049,6 @@
      "name": "GetPropPreviousState",
      "addr": "8006BB30",
      "size": 12
-    },
-    {
-     "name": "IncrementPropState",
-     "addr": "8006BDCC",
-     "size": 20
-    },
-    {
-     "name": "DecrementPropState",
-     "addr": "8006BDE0",
-     "size": 20
     },
     {
      "name": "PropSetAnimUpdate",

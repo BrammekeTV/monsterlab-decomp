@@ -210,7 +210,7 @@ void fn_800856F8(u8* obj, f32 dt) {
     u8* prop = *(u8**)(ent + 0x264);
     if (prop != 0) {
         *(s32*)(prop + 0x264) = 2;
-        SetPropState((u32)(uintptr_t)prop, (BOOL)*(s32*)(lbl_80347D88 + 0x8), 0);
+        SetPropState((u8*)prop, (BOOL)*(s32*)(lbl_80347D88 + 0x8), 0);
         *(u32*)(prop + 0x15C) |= 0x400000u;
     }
 }
@@ -262,7 +262,7 @@ void fn_80085B7C(u8* obj, s32 a) {
 void fn_80085BE8(u8* obj) {
     fn_8008378C(obj);
     if (GetPropCurrentState((u32)(uintptr_t)obj)) {
-        SetPropState((u32)(uintptr_t)obj, 0, 0);
+        SetPropState((u8*)obj, 0, 0);
     }
 }
 }

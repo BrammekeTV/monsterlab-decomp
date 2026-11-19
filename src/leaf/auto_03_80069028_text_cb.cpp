@@ -26,22 +26,6 @@ BOOL GetPropPreviousState(u32 a3) {
     return (BOOL)(t1);
 }
 
-// 0x8006BDCC
-BOOL IncrementPropState(u32 a3, u32 a4) {
-    u8* t0 = *(u8**)(((u8*)(uintptr_t)(a3)) + 4);
-    u8 t1 = *(u8*)(t0 + 53);
-    u32 t2 = (u32)(t1) + 1u;
-    return (BOOL)(SetPropState((u32)((u32)(uintptr_t)(a3)), (BOOL)((u32)(t2)), (u32)((u32)(uintptr_t)(a4))));
-}
-
-// 0x8006BDE0
-BOOL DecrementPropState(u32 a3, u32 a4) {
-    u8* t0 = *(u8**)(((u8*)(uintptr_t)(a3)) + 4);
-    u8 t1 = *(u8*)(t0 + 53);
-    u32 t2 = (u32)(t1) - 1u;
-    return (BOOL)(SetPropState((u32)((u32)(uintptr_t)(a3)), (BOOL)((u32)(t2)), (u32)((u32)(uintptr_t)(a4))));
-}
-
 // 0x8006CC7C
 void PropSetAnimUpdate(u32 a3, u32 a4) {
     if (a4 == 0) {
