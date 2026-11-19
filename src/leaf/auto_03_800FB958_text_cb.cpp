@@ -14,46 +14,44 @@ extern s32 lbl_805FB2CC;
 extern u8 lbl_805FB2D4[];
 extern "C" void fn_8005B648(u8*, f32);
 extern "C" void fn_8005F4F8(s32, s32);
-extern "C" void fn_8005F81C(s32, s32);
-extern "C" void fn_8005FAAC(s32, s32, s32);
-extern "C" void fn_80060004(s32, s32);
-extern "C" void fn_80060198(s32, s32);
-extern "C" void fn_8006023C(s32, s32, s32);
-extern "C" void fn_8006066C(s32, s32);
-extern "C" void fn_80060920(s32);
+extern "C" void fn_8005F81C(u8*, u32, f32);
+extern "C" void fn_8005FAAC(u8*, s32, u32, f32);
+extern "C" void fn_80060004(u8*, u32);
+extern "C" void fn_80060198(u8*, s32, f32);
+extern "C" void fn_8006023C(u8*, s32, s32, f32);
+extern "C" void fn_8006066C(u8*, s32, f32, f32);
+extern "C" void fn_80060920(u8*, f32, f32);
 extern "C" void fn_800609E0(u8*, s32, s32);
 extern "C" s32 fn_80060C90(s32);
 extern "C" s32 fn_80060FA8(u8*, f32);
-extern "C" s32 fn_80061024(s32);
+extern "C" s32 fn_80061024(u8*, f32);
 extern "C" s32 fn_800612B8(s32);
-extern "C" s32 fn_80061770(s32);
-extern "C" void fn_80061844(s32, s32);
-extern "C" void fn_800619A4(s32);
+extern "C" s32 fn_80061770(u8*);
+extern "C" void fn_80061844(u8*, u8*);
+extern "C" void fn_800619A4(u8*, f32, f32);
 extern "C" void fn_80061CC0(s32);
-extern "C" void fn_80061FDC(s32, s32, s32);
-extern "C" s32 fn_80062174(s32);
+extern "C" void fn_80061FDC(u8*, s32, s32);
+extern "C" s32 fn_80062174(u8*);
 extern "C" s32 fn_80062398(u8*);
-extern "C" s32 fn_800623D4(s32);
-extern "C" s32 fn_80062470(s32);
-extern "C" s32 fn_800629E8(s32);
-extern "C" s32 fn_80062A98(s32);
-extern "C" s32 fn_8006E99C(s32, s32, s32);
-extern "C" void fn_8006E9D8(s32, s32);
-extern "C" void fn_8006EC6C(s32, s32);
+extern "C" s32 fn_800623D4(u8*);
+extern "C" s32 fn_80062470(u8*);
+extern "C" s32 fn_800629E8(u8*);
+extern "C" s32 fn_80062A98(u8*);
+extern "C" s32 fn_8006E99C(u8*, s32, s32);
+extern "C" void fn_8006E9D8(u8*, s32);
+extern "C" void fn_8006EC6C(u8*, s32);
 
 // 0x801035F8
 void BroadcastEventFromProperty(u32 a3, u32 a4) {
-    // tail-call arguments inferred from the registers set before the call
     if (a3 == 0) {
         return;
     }
-    fn_8006EC6C((s32)((u32)(uintptr_t)(a3)), (s32)((u32)(uintptr_t)(a4)));
+    fn_8006EC6C(((u8*)(uintptr_t)(a3)), (s32)((u32)(uintptr_t)(a4)));
 }
 
 // 0x80103608
 s32 ChooseGuard(u32 a3, f32 f1) {
-    // tail-call arguments inferred from the registers set before the call
-    return (s32)(fn_80062470((s32)((u32)(uintptr_t)(a3))));
+    return (s32)(fn_80062470(((u8*)(uintptr_t)(a3))));
 }
 
 // 0x8010360C
@@ -73,11 +71,10 @@ u32 EnterName_EnteringPlayerName(void) {
 
 // 0x8010368C
 s32 GetIntProperty(u32 a3, u32 a4) {
-    // tail-call arguments inferred from the registers set before the call
     if (a3 == 0) {
         return (s32)(0);
     }
-    return (s32)(fn_8006E99C((s32)((u32)(uintptr_t)(a3)), (s32)((u32)(uintptr_t)(a3)), (s32)((u32)(uintptr_t)(a4))));
+    return (s32)(fn_8006E99C(((u8*)(uintptr_t)(a3)), (s32)((u32)(uintptr_t)(a3)), (s32)((u32)(uintptr_t)(a4))));
 }
 
 // 0x801036A8
@@ -108,8 +105,7 @@ void JumpToTarget(u32 a3) {
 
 // 0x8010374C
 void KillGoal(u32 a3, u32 a4) {
-    // tail-call arguments inferred from the registers set before the call
-    fn_80060004((s32)((u32)(uintptr_t)(a3)), (s32)((u32)(uintptr_t)(a4)));
+    fn_80060004(((u8*)(uintptr_t)(a3)), (u32)((u32)(uintptr_t)(a4)));
 }
 
 // 0x80103750
@@ -120,14 +116,12 @@ void KillPersistentGoal(u32 a3, u32 a4) {
 
 // 0x80103754
 void MultiCountAction(u32 a3, u32 a4, s32 a5) {
-    // tail-call arguments inferred from the registers set before the call
-    fn_80061FDC((s32)((u32)(uintptr_t)(a3)), (s32)((u32)(uintptr_t)(a4)), (s32)((u32)(uintptr_t)(a5)));
+    fn_80061FDC(((u8*)(uintptr_t)(a3)), (s32)((u32)(uintptr_t)(a4)), (s32)((u32)(uintptr_t)(a5)));
 }
 
 // 0x80103758
 s32 NavTargetIsLeft(u32 a3) {
-    // tail-call arguments inferred from the registers set before the call
-    return (s32)(fn_80062A98((s32)((u32)(uintptr_t)(a3))));
+    return (s32)(fn_80062A98(((u8*)(uintptr_t)(a3))));
 }
 
 // 0x80103898
@@ -137,8 +131,7 @@ s32 RequestMeleeAttack(u32 a3, f32 f1) {
 
 // 0x8010389C
 s32 RequestRangedAttack(u32 a3, f32 f1) {
-    // tail-call arguments inferred from the registers set before the call
-    return (s32)(fn_80062174((s32)((u32)(uintptr_t)(a3))));
+    return (s32)(fn_80062174(((u8*)(uintptr_t)(a3))));
 }
 
 // 0x801038A0
@@ -189,20 +182,17 @@ void SetCurrentTutorialConversation(s32 a3) {
 
 // 0x801038E8
 void SetFleeGoal(u32 a3, f32 f1, f32 f2) {
-    // tail-call arguments inferred from the registers set before the call
-    fn_80060920((s32)((u32)(uintptr_t)(a3)));
+    fn_80060920(((u8*)(uintptr_t)(a3)), (f32)(f1), (f32)(f2));
 }
 
 // 0x801038EC
 void SetGoal(u32 a3, u32 a4, f32 f1) {
-    // tail-call arguments inferred from the registers set before the call
-    fn_80060198((s32)((u32)(uintptr_t)(a3)), (s32)((u32)(uintptr_t)(a4)));
+    fn_80060198(((u8*)(uintptr_t)(a3)), (s32)((u32)(uintptr_t)(a4)), (f32)(f1));
 }
 
 // 0x801038F0
 void SetGoalWithTarget(u32 a3, void* a4, u32 a5, f32 f1) {
-    // tail-call arguments inferred from the registers set before the call
-    fn_8006023C((s32)((u32)(uintptr_t)(a3)), (s32)((u32)(uintptr_t)(a4)), (s32)((u32)(uintptr_t)(a5)));
+    fn_8006023C(((u8*)(uintptr_t)(a3)), (s32)((u32)(uintptr_t)(a4)), (s32)((u32)(uintptr_t)(a5)), (f32)(f1));
 }
 
 // 0x801038F4
@@ -215,8 +205,7 @@ void SetGroupSize(u32 a3, s32 a4) {
 
 // 0x80103904
 void SetGuardGoal(u32 a3, void* a4, f32 f1, f32 f2) {
-    // tail-call arguments inferred from the registers set before the call
-    fn_8006066C((s32)((u32)(uintptr_t)(a3)), (s32)((u32)(uintptr_t)(a4)));
+    fn_8006066C(((u8*)(uintptr_t)(a3)), (s32)((u32)(uintptr_t)(a4)), (f32)(f1), (f32)(f2));
 }
 
 // 0x80103908
@@ -227,14 +216,12 @@ void SetInBasicTutorialFlag(void) {
 
 // 0x80103918
 void SetPersistentGoal(u32 a3, u32 a4, f32 f1) {
-    // tail-call arguments inferred from the registers set before the call
-    fn_8005F81C((s32)((u32)(uintptr_t)(a3)), (s32)((u32)(uintptr_t)(a4)));
+    fn_8005F81C(((u8*)(uintptr_t)(a3)), (u32)((u32)(uintptr_t)(a4)), (f32)(f1));
 }
 
 // 0x8010391C
 void SetPersistentGoalWithTarget(u32 a3, void* a4, u32 a5, f32 f1) {
-    // tail-call arguments inferred from the registers set before the call
-    fn_8005FAAC((s32)((u32)(uintptr_t)(a3)), (s32)((u32)(uintptr_t)(a4)), (s32)((u32)(uintptr_t)(a5)));
+    fn_8005FAAC(((u8*)(uintptr_t)(a3)), (s32)((u32)(uintptr_t)(a4)), (u32)((u32)(uintptr_t)(a5)), (f32)(f1));
 }
 
 // 0x8010394C
@@ -251,11 +238,10 @@ void SetRival(u32 a3, u32 a4, s32 a5) {
 
 // 0x80103960
 void SetTimeoutFromProperty(u32 a3, u32 a4) {
-    // tail-call arguments inferred from the registers set before the call
     if (a3 == 0) {
         return;
     }
-    fn_8006E9D8((s32)((u32)(uintptr_t)(a3)), (s32)((u32)(uintptr_t)(a4)));
+    fn_8006E9D8(((u8*)(uintptr_t)(a3)), (s32)((u32)(uintptr_t)(a4)));
 }
 
 // 0x80103970
@@ -265,26 +251,22 @@ void SetTurningRate(u32 a3, f32 f1) {
 
 // 0x80103974
 void SetVelocity(u32 a3, f32 f1, f32 f2) {
-    // tail-call arguments inferred from the registers set before the call
-    fn_800619A4((s32)((u32)(uintptr_t)(a3)));
+    fn_800619A4(((u8*)(uintptr_t)(a3)), (f32)(f1), (f32)(f2));
 }
 
 // 0x801039A4
 void SimpleProjectile(u32 a3, u32 a4) {
-    // tail-call arguments inferred from the registers set before the call
-    fn_80061844((s32)((u32)(uintptr_t)(a3)), (s32)((u32)(uintptr_t)(a4)));
+    fn_80061844(((u8*)(uintptr_t)(a3)), ((u8*)(uintptr_t)(a4)));
 }
 
 // 0x801039A8
 s32 TargetIsFarBelow(u32 a3) {
-    // tail-call arguments inferred from the registers set before the call
-    return (s32)(fn_800623D4((s32)((u32)(uintptr_t)(a3))));
+    return (s32)(fn_800623D4(((u8*)(uintptr_t)(a3))));
 }
 
 // 0x801039AC
 s32 TargetIsLeft(u32 a3) {
-    // tail-call arguments inferred from the registers set before the call
-    return (s32)(fn_800629E8((s32)((u32)(uintptr_t)(a3))));
+    return (s32)(fn_800629E8(((u8*)(uintptr_t)(a3))));
 }
 
 // 0x801039B0
@@ -295,14 +277,12 @@ s32 WithinAngleOfNav(u32 a3, f32 f1) {
 
 // 0x801039B4
 s32 WithinAngleOfTarget(u32 a3, f32 f1) {
-    // tail-call arguments inferred from the registers set before the call
-    return (s32)(fn_80061024((s32)((u32)(uintptr_t)(a3))));
+    return (s32)(fn_80061024(((u8*)(uintptr_t)(a3)), (f32)(f1)));
 }
 
 // 0x801039B8
 s32 WithinJumpRange(u32 a3) {
-    // tail-call arguments inferred from the registers set before the call
-    return (s32)(fn_80061770((s32)((u32)(uintptr_t)(a3))));
+    return (s32)(fn_80061770(((u8*)(uintptr_t)(a3))));
 }
 
 // 0x801039BC

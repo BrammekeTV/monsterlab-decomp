@@ -5,16 +5,15 @@
 
 #include "types.h"
 
-extern "C" void fn_8004B87C(void);
+extern "C" void fn_8004B87C(u8*, s32, s32);
 
 // 0x8004B558
-extern "C" void fn_8004B558(u8* a3) {
-    // tail-call arguments inferred from the registers set before the call
+extern "C" void fn_8004B558(u8* a3, s32 a4, s32 a5) {
     u8* t0 = *(u8**)(((u8*)(uintptr_t)(a3)) + 4);
     s32 t1 = *(s32*)(t0 + 32);
     u32 t2 = (u32)(t1) | 0x40000000u;
     *(u32*)(t0 + 32) = (u32)((u32)(t2));
-    fn_8004B87C();
+    fn_8004B87C(((u8*)(uintptr_t)(a3)), (s32)((u32)(uintptr_t)(a4)), (s32)((u32)(uintptr_t)(a5)));
 }
 
 // 0x8004B570

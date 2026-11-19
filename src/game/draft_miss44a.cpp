@@ -47,7 +47,7 @@ void        fn_8020A474(s32 handle);                              // 0x8020A474
 void        fn_8011D69C(void* obj, s32 a);                        // 0x8011D69C
 void        fn_801FF2A8(u8* audio, s32 handle);                   // 0x801FF2A8
 void        fn_801FF47C(u8* audio);                               // 0x801FF47C
-s32         fn_801C3E88(u8* p);                                   // 0x801C3E88
+s32         fn_801C3E88(u8* tbl, void* handle);                                   // 0x801C3E88
 void*       fn_801D40E0(s32 n);                                   // 0x801D40E0
 void*       fn_80209814(void* v);                                 // 0x80209814
 s32         PlaySound(u32 hash, s32 a, s32 b, s32 c, s32 d, s32 e); // 0x80209E70
@@ -274,14 +274,14 @@ void StopLaser(void* a0, s32 a1) {
         s32 h = lbl_805FB1E0[a1];
         lbl_805FB1D8[a1] = 0;
         if (h != 0) {
-            fn_801C3E88((u8*)&lbl_8047C7AC);
+            fn_801C3E88((u8*)&lbl_8047C7AC, (void*)(intptr_t)h);
             lbl_805FB1E0[a1] = 0;
         }
     } else if (flags & 0x20u) {
         if (a1 < 0 || a1 >= 2) return;
         *(s32*)(laser + a1 * 4 + 0xC2C) = 0;
         if (*(s32*)(laser + a1 * 4 + 0xC34) != 0) {
-            fn_801C3E88((u8*)&lbl_8047C7AC);
+            fn_801C3E88((u8*)&lbl_8047C7AC, (void*)(intptr_t)*(s32*)(laser + a1 * 4 + 0xC34));
             *(s32*)(laser + a1 * 4 + 0xC34) = 0;
         }
     }

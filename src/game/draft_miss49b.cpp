@@ -52,12 +52,12 @@ BOOL fn_801F56FC(s32 flags);
 u8* fn_800E4D7C(u32 a0);
 u32 fn_800E5684(void);
 void* fn_800E60BC(void);
-void fn_8012649C(f32 v);
+void fn_8012649C(void);
 s32 fn_8016195C(void* p, s32 a, s32 b, void* c);
 void fn_8004D760(u8* c, u8* monster);
 void* fn_8004DAF8(void* c, s32 a, s32 b);
 s32 fn_801A3010(void* obj, void* data);
-s32 fn_8004CEE8(s32);
+void fn_8004CEE8(void*);
 void fn_800D8114(u8* world);
 s32 fn_800D85CC(u8* world, s32 a);
 void fn_800E69EC(s32 flag);
@@ -146,7 +146,7 @@ void VariableToNormalCamera(f32 a0) {
         return;
     }
     if (WorldGetPhase(gGame + 0xD5F0) == 1) {
-        fn_8012649C(a0);
+        fn_8012649C();
     }
 }
 

@@ -34,9 +34,9 @@ void      fn_801EAE20(u8* p, f32 v);
 s32       fn_800D59D4(u8* a3);
 s32       fn_80022608(void);
 void      fn_800226F0(void);
-void      fn_800603AC(u32 a0, s32* goal);
-void      fn_800602E8(u32 a0, s32* goal);
-void      fn_8012649C(f32 v);
+void      fn_800603AC(u8* p, u8* arg, f32 prio);
+void      fn_800602E8(u8* arg0, u8* color, f32 farg0);
+void      fn_8012649C(void);
 const char* fn_800FA608(u32 a0, s32 lang, s32 flag);
 void      fn_8016E2CC(void);
 void      fn_8016A254(void);
@@ -158,7 +158,7 @@ void SetNormalCamera(void) {
         return;
     }
     if (WorldGetPhase(gGame + 0xD5F0) == 1 || WorldGetPhase(gGame + 0xD5F0) == 7) {
-        fn_8012649C(1.5f);
+        fn_8012649C();
     }
 }
 
@@ -229,7 +229,7 @@ void SetOptionsVoiceVolumeTmp(BOOL a0) {
 // Reads the s32 goal at a1 and passes it to the waypoint goal setter.
 void SetPersistentWaypointGoal(u32 a0, s32* a1, f32 a2) {
     s32 goal = *a1;
-    fn_800603AC(a0, &goal);
+    fn_800603AC((u8*)(uintptr_t)a0, (u8*)&goal, a2);
 }
 
 // 0x801B6DB0
@@ -257,7 +257,7 @@ void SetRenderFlag(void* a0, u32 a1) {
 // Reads the s32 goal at a1 and passes it to the waypoint goal setter (variant).
 void SetWaypointGoal(u32 a0, s32* a1, f32 a2) {
     s32 goal = *a1;
-    fn_800602E8(a0, &goal);
+    fn_800602E8((u8*)(uintptr_t)a0, (u8*)&goal, a2);  // lint:ok 32-bit build
 }
 
 // Table entry for the waypoint record at node+0x7C (NULL when the id is not in the table).

@@ -23,7 +23,7 @@ void  fn_8000B7A8(u8* p, s32 a, s32 b);                          // 0x8000B7A8
 void  fn_8001D4FC(u8* mgr);                                      // 0x8001D4FC (lightning manager refresh)
 void* fn_8003DDE8(void* part, s32 slot, s32 def, s32 flag, s32 a);  // 0x8003DDE8 (returns the part's entity id)
 void  fn_8004C718(u8* p, s32 idx, void* elem);                   // 0x8004C718
-void* fn_8004FFB4(s32 id, void* part);                           // 0x8004FFB4
+void* fn_8004FFB4(void* id, void* part);                           // 0x8004FFB4
 s32   fn_8004E300(void* a, s32 b);                               // 0x8004E300
 void  fn_8013A0A4(s32 a, s32 b);                                 // 0x8013A0A4 (callback)
 void  fn_8013A654(s32 a);                                        // 0x8013A654 (callback)
@@ -236,7 +236,7 @@ void* fn_8004DAF8(void* c, s32 a, s32 b) {
                     u8* res = *(u8**)(*(u8**)gWorldState + 0x1A4) + (id - 1) * gZoneResourceSize;
                     *(s32*)(chr + 0xC6C + k * 4) = *(s32*)(res + 0x10C);
                 }
-                void* e = fn_8004FFB4(*(s32*)(chr + 0xC6C + k * 4), *(void**)(chr + 0x89C + k * 4));
+                void* e = fn_8004FFB4(*(void**)(chr + 0xC6C + k * 4), *(void**)(chr + 0x89C + k * 4));
                 if (e != NULL) fn_8004C718(chr, k, e);
             }
         }

@@ -44,7 +44,7 @@ void  fn_8006C6C0(u8* p);                                    // 0x8006C6C0
 void  fn_801C83AC(u8* mgr, u8* item);                        // 0x801C83AC (small_800D.cpp)
 void  fn_801C849C(u8* mgr, u8* item);                        // 0x801C849C
 void  fn_800690D4(u8* p, s32 a, void* params, s32 b);        // 0x800690D4 (base ctor)
-void  fn_80069180(u8* p);                                    // 0x80069180
+void  fn_80069180(u8* p, s32 a1, s32 a2);                                    // 0x80069180
 void  fn_80069638(u8* p, s32 a1);                            // 0x80069638
 void  fn_801BB478(u8* p, s32 a1);                            // 0x801BB478
 void  fn_800696C4(u8* p, s32 a1);                            // 0x800696C4
@@ -243,8 +243,8 @@ u8* fn_8006CCC4(u8* obj, s32 a1, void* a2, s32 a3) {
 // 0x8006CD24
 // Calls fn_80069180(obj), sets the float at +0x264 to lbl_805FD568, sets bit 0x02000000 in
 // sub+0x20 (sub = obj+4) and returns 1.
-s32 fn_8006CD24(u8* obj) {
-    fn_80069180(obj);
+s32 fn_8006CD24(u8* obj, s32 a1, s32 a2) {
+    fn_80069180(obj, a1, a2);
     *(f32*)(obj + 0x264) = lbl_805FD568;
     u8* sub = *(u8**)(obj + 4);
     *(u32*)(sub + 0x20) |= 0x02000000;

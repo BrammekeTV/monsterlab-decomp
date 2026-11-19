@@ -94,6 +94,11 @@
  "changelog": [
   {
    "date": "2026-11-19",
+   "time": "18:59",
+   "text": "Decompiled 68 more game functions (part, enemy and effect helpers fn_8004*/fn_8006*, spawn and camera utilities, ...)"
+  },
+  {
+   "date": "2026-11-19",
    "time": "18:35",
    "text": "Decompiled 71 more game functions (UISlider_*, UISoundList_*, camera and zone helpers, ZoneSlotInit, ...)"
   },

@@ -36,7 +36,7 @@ void   fn_8004D39C(u8* p);                                           // 0x8004D3
 void   fn_8001D718(u8* mgr, s32 idx, u8* slot);                      // 0x8001D718
 void   fn_8005230C(void);                                            // 0x8005230C
 u8*   fn_8005CA88(u8* p);                                           // 0x8005CA88
-void*  fn_80060A28(void);                                            // 0x80060A28
+void*  fn_80060A28(u8* p);                                            // 0x80060A28
 void   fn_800D83B8(u8* a3, s32 a4);                                  // 0x800D83B8
 void*  fn_80109330(const char* name);                                // 0x80109330 (texture lookup by name)
 s32    fn_801138F8(void);                                            // 0x801138F8
@@ -479,7 +479,7 @@ void DisableAllCameraInfluenceInZone(void) {
 void EnemyFireLightningAtActiveTarget(u32 /*0x2F*/ a0, u32 /*0x30*/ a1, u32 a2, u32 /*0x38*/ a3, f32 a4, f32 a5) {
     u8* enemy = (u8*)(uintptr_t)a0;
     if (*(void**)(enemy + 0xA14) == NULL) {
-        *(void**)(enemy + 0xA14) = fn_80060A28();
+        *(void**)(enemy + 0xA14) = fn_80060A28(enemy);
     }
     u8* target = *(u8**)(enemy + 0xA14);
     if (target != NULL && (*(VIntFn*)(*(u8**)target + 0x4C))(target) == 0) {

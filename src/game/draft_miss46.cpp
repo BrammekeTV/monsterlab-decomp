@@ -98,7 +98,7 @@ s32 fn_80053550(u8* ent, s32 a);             // 0x80053550
 void fn_80053418(u8* arg0);                  // 0x80053418
 u8* fn_8015EC9C(u8* tbl, f32 a, f32 b);      // 0x8015EC9C
 extern u8 lbl_8040D500[];
-s32 fn_8004EDD0(s32 a, s32 b);               // 0x8004EDD0
+u8* fn_8004EDD0(u8* obj, s32 flag, s32 a2);   // 0x8004EDD0
 s32 fn_8004E2A4(u8* fighters, s32 slot);     // 0x8004E2A4
 s32 fn_8004E2C4(u8* fighters, s32 slot);     // 0x8004E2C4
 u32 fn_8004E2E4(u8* fighters, s32 slot);     // 0x8004E2E4
@@ -890,7 +890,7 @@ void SetPlayerAvatarRenderFlag(u32 a0) {
     if (*(s32*)(*(u8**)(e + 0x4) + 0x1C) & 0x2000) {
         u8* p = e;
         for (s32 i = 0; i < 5; i++, p += 4) {
-            if (*(s32*)(p + 0xC50) != 0) fn_8004EDD0(a0 != 0, 0);
+            if (*(s32*)(p + 0xC50) != 0) fn_8004EDD0(*(u8**)(p + 0xC50), a0 != 0, 0);
         }
     }
     EntitySetShown(e, a0 != 0);

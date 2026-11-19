@@ -15,7 +15,7 @@ extern u8 lbl_805FB0E4;
 extern s32 lbl_805FB0E8;
 extern s32 lbl_805FB0F8;
 extern "C" void UIText_SetString_TextID(u32, u32);
-extern "C" void fn_8004E7D4(u8*);
+extern "C" u8* fn_8004E7D4(u8*, s32);
 extern "C" s32 fn_8004E8CC(u8*);
 
 // 0x800505E0
@@ -25,10 +25,9 @@ extern "C" s32 fn_800505E0(u8* a3) {
 }
 
 // 0x800505E8
-extern "C" void fn_800505E8(u8* a3) {
-    // tail-call arguments inferred from the registers set before the call
+extern "C" u8* fn_800505E8(u8* a3, s32 a4) {
     u8* t0 = ((u8*)(uintptr_t)(a3)) + -612;
-    fn_8004E7D4(t0);
+    return (u8*)(fn_8004E7D4(t0, (s32)((u32)(uintptr_t)(a4))));
 }
 
 // 0x800508D0

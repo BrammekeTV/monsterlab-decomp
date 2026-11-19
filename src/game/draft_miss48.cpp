@@ -50,7 +50,7 @@ u8*   ObjDbLookup(void* db, s32 id);
 u8*   ObjRefDtor(u8* ref, s32 flags);
 Vec3* PathGetPosition(PathFollower* p);                     // 0x800D5xxx
 void  fn_80053418(u8* arg0);                                // 0x80053418
-s32   fn_8004D7E0(u8*, s32, s32);                           // 0x8004D7E0
+void* fn_8004D7E0(u8*, s32, s32);                           // 0x8004D7E0
 s32   PartGetCurrentHealth(const PartInstance* p);          // 0x8021EF68
 void  fn_800D6B0C(s32* rec);                                // 0x800D6B0C (resets a spawn record)
 void  fn_800D70EC(s32* rec, f32 amount);                    // 0x800D70EC (registers a spawn record)
@@ -94,7 +94,7 @@ u8*   ObjDbLookup(void* db, s32 id);
 u8*   ObjRefDtor(u8* ref, s32 flags);
 Vec3* PathGetPosition(PathFollower* p);
 void  fn_80053418(u8* arg0);                                // 0x80053418
-s32   fn_8004D7E0(u8*, s32, s32);                           // 0x8004D7E0
+void* fn_8004D7E0(u8*, s32, s32);                           // 0x8004D7E0
 s32   PartGetCurrentHealth(const PartInstance* p);          // 0x8021EF68
 void  fn_800D6B0C(s32* rec);                                // 0x800D6B0C (resets a spawn record)
 void  fn_800D70EC(s32* rec, f32 amount);                    // 0x800D70EC (registers a spawn record)

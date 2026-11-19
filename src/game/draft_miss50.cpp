@@ -37,7 +37,7 @@ u8*   fn_8001B044(u8* hud, u32 key);                    // 0x8001B044
 void  fn_801BBB68(void* mgr, s32 id, int a, int b);     // 0x801BBB68
 s32   fn_80051940(f32 dt);                              // 0x80051940
 void  SessionUpdateDisabled(u8* p, f32 dt);             // 0x80012B5C
-s32   fn_80012CB0(u8* p, f32 dt);                       // 0x80012CB0
+void  fn_80012CB0(u8* p, f32 dt);                       // 0x80012CB0
 
 void  MonsterBuildPreset(u8* m, s32 preset);
 void  MonsterSetName(void* monster, const char* name);
@@ -64,7 +64,7 @@ extern s32 lbl_803C4E28[];          // 0x803C4E28 (combat part zone-loaded flags
 extern u8 lbl_805FB030[];           // 0x805FB030
 extern void* lbl_803C4F60[];        // 0x803C4F60
 void* ScreenSetFindElement(void* set, u32 hash);        // 0x80198F18
-f32   fn_800311E8(u8* box, f32* pt);                    // 0x800311E8
+void  fn_800311E8(u8* box, f32* pt);                    // 0x800311E8
 void  fn_800E6360(f32 dt);                              // 0x800E6360
 void  fn_8003CF7C(f32 dt);                              // 0x8003CF7C
 void  fn_8012570C(f32 dt);                              // 0x8012570C

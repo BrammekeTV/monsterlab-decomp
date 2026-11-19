@@ -10,7 +10,6 @@ extern "C" void fn_801B4520(u8*);
 
 // 0x8006F67C
 extern "C" void fn_8006F67C(u8* a3) {
-    // tail-call arguments inferred from the registers set before the call
     u8* t0 = *(u8**)(((u8*)(uintptr_t)(a3)) + 4);
     s32 t1 = *(s32*)(t0 + 32);
     u32 t2 = (u32)(t1) & 0x1u;
