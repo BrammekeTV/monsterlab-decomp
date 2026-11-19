@@ -1,18 +1,18 @@
 {
  "log": "link.log",
  "counts": {
-  "global": 1200,
-  "game": 1268,
+  "global": 1206,
+  "game": 1237,
   "unknown": 117,
   "library": 106
  },
- "game_bytes": 546296,
+ "game_bytes": 540924,
  "duplicates": [],
  "game": [
   {
    "name": "RandomU32",
-   "refs": 17,
-   "files": 17,
+   "refs": 19,
+   "files": 19,
    "used_as": "_RandomU32",
    "addr": "80143460",
    "size": 1300,
@@ -260,12 +260,12 @@
    "kind": "game"
   },
   {
-   "name": "EffectEmitter",
+   "name": "CombatHUDEnableInput",
    "refs": 2,
    "files": 2,
-   "used_as": "_EffectEmitter",
-   "addr": "800523B8",
-   "size": 300,
+   "used_as": "_CombatHUDEnableInput",
+   "addr": "800488E4",
+   "size": 240,
    "section": ".text",
    "kind": "game"
   },
@@ -276,6 +276,16 @@
    "used_as": "_EulerToQuat",
    "addr": "80145B00",
    "size": 1000,
+   "section": ".text",
+   "kind": "game"
+  },
+  {
+   "name": "FriendListHideFloaty",
+   "refs": 2,
+   "files": 2,
+   "used_as": "_FriendListHideFloaty",
+   "addr": "8013C2E4",
+   "size": 352,
    "section": ".text",
    "kind": "game"
   },
@@ -296,16 +306,6 @@
    "used_as": "_SaveRollChallengeReward",
    "addr": "802262E0",
    "size": 924,
-   "section": ".text",
-   "kind": "game"
-  },
-  {
-   "name": "SetHitBoxes",
-   "refs": 2,
-   "files": 2,
-   "used_as": "_SetHitBoxes",
-   "addr": "80140B9C",
-   "size": 296,
    "section": ".text",
    "kind": "game"
   },
@@ -340,6 +340,16 @@
    "kind": "game"
   },
   {
+   "name": "fn_800493A8",
+   "refs": 2,
+   "files": 2,
+   "used_as": "_fn_800493A8",
+   "addr": "800493A8",
+   "size": 212,
+   "section": ".text",
+   "kind": "game"
+  },
+  {
    "name": "fn_8004C718",
    "refs": 2,
    "files": 2,
@@ -370,6 +380,16 @@
    "kind": "game"
   },
   {
+   "name": "fn_800E4E80",
+   "refs": 2,
+   "files": 2,
+   "used_as": "_fn_800E4E80",
+   "addr": "800E4E80",
+   "size": 260,
+   "section": ".text",
+   "kind": "game"
+  },
+  {
    "name": "fn_801225F4",
    "refs": 2,
    "files": 2,
@@ -386,16 +406,6 @@
    "used_as": "_fn_801384B0",
    "addr": "801384B0",
    "size": 948,
-   "section": ".text",
-   "kind": "game"
-  },
-  {
-   "name": "fn_80146180",
-   "refs": 2,
-   "files": 2,
-   "used_as": "_fn_80146180",
-   "addr": "80146180",
-   "size": 424,
    "section": ".text",
    "kind": "game"
   },
@@ -490,42 +500,12 @@
    "kind": "game"
   },
   {
-   "name": "fn_801ED788",
-   "refs": 2,
-   "files": 2,
-   "used_as": "_fn_801ED788",
-   "addr": "801ED788",
-   "size": 708,
-   "section": ".text",
-   "kind": "game"
-  },
-  {
-   "name": "BrainHandUpdateHeldChunk",
-   "refs": 1,
-   "files": 1,
-   "used_as": "_BrainHandUpdateHeldChunk",
-   "addr": "800869A0",
-   "size": 552,
-   "section": ".text",
-   "kind": "game"
-  },
-  {
    "name": "BrainHeadCrazyWalk",
    "refs": 1,
    "files": 1,
    "used_as": "_BrainHeadCrazyWalk",
    "addr": "80084768",
    "size": 1200,
-   "section": ".text",
-   "kind": "game"
-  },
-  {
-   "name": "BrainHeadFollowMeat",
-   "refs": 1,
-   "files": 1,
-   "used_as": "_BrainHeadFollowMeat",
-   "addr": "80084650",
-   "size": 160,
    "section": ".text",
    "kind": "game"
   },
@@ -540,36 +520,6 @@
    "kind": "game"
   },
   {
-   "name": "BrainHeadPlayIdleAnim",
-   "refs": 1,
-   "files": 1,
-   "used_as": "_BrainHeadPlayIdleAnim",
-   "addr": "80084DA8",
-   "size": 196,
-   "section": ".text",
-   "kind": "game"
-  },
-  {
-   "name": "BrainHeadSetFreebieIsNext",
-   "refs": 1,
-   "files": 1,
-   "used_as": "_BrainHeadSetFreebieIsNext",
-   "addr": "80084D18",
-   "size": 20,
-   "section": ".text",
-   "kind": "game"
-  },
-  {
-   "name": "BrainPowerUpArrive",
-   "refs": 1,
-   "files": 1,
-   "used_as": "_BrainPowerUpArrive",
-   "addr": "80086090",
-   "size": 224,
-   "section": ".text",
-   "kind": "game"
-  },
-  {
    "name": "BrainPowerUpEnact",
    "refs": 1,
    "files": 1,
@@ -580,322 +530,12 @@
    "kind": "game"
   },
   {
-   "name": "BrainPowerUpIsTouchingHead",
-   "refs": 1,
-   "files": 1,
-   "used_as": "_BrainPowerUpIsTouchingHead",
-   "addr": "80086650",
-   "size": 264,
-   "section": ".text",
-   "kind": "game"
-  },
-  {
-   "name": "BrainTargetDestinationReached",
-   "refs": 1,
-   "files": 1,
-   "used_as": "_BrainTargetDestinationReached",
-   "addr": "80083830",
-   "size": 256,
-   "section": ".text",
-   "kind": "game"
-  },
-  {
-   "name": "BrainTargetGenerateDestination",
-   "refs": 1,
-   "files": 1,
-   "used_as": "_BrainTargetGenerateDestination",
-   "addr": "800837FC",
-   "size": 16,
-   "section": ".text",
-   "kind": "game"
-  },
-  {
-   "name": "BrainTargetGenerateWaitTime",
-   "refs": 1,
-   "files": 1,
-   "used_as": "_BrainTargetGenerateWaitTime",
-   "addr": "80083798",
-   "size": 16,
-   "section": ".text",
-   "kind": "game"
-  },
-  {
-   "name": "BrainTossThrowBrainChunk",
-   "refs": 1,
-   "files": 1,
-   "used_as": "_BrainTossThrowBrainChunk",
-   "addr": "8007EEB8",
-   "size": 76,
-   "section": ".text",
-   "kind": "game"
-  },
-  {
-   "name": "BrazierBowlGetExplosionSize",
-   "refs": 1,
-   "files": 1,
-   "used_as": "_BrazierBowlGetExplosionSize",
-   "addr": "8008CB64",
-   "size": 44,
-   "section": ".text",
-   "kind": "game"
-  },
-  {
-   "name": "BrazierBowlGetFireSize",
-   "refs": 1,
-   "files": 1,
-   "used_as": "_BrazierBowlGetFireSize",
-   "addr": "8008CB28",
-   "size": 60,
-   "section": ".text",
-   "kind": "game"
-  },
-  {
-   "name": "BrazierSymbolGetSymbolHashType",
-   "refs": 1,
-   "files": 1,
-   "used_as": "_BrazierSymbolGetSymbolHashType",
-   "addr": "8008EC64",
-   "size": 172,
-   "section": ".text",
-   "kind": "game"
-  },
-  {
-   "name": "BrazierSymbolSetUnused",
-   "refs": 1,
-   "files": 1,
-   "used_as": "_BrazierSymbolSetUnused",
-   "addr": "8008E8C8",
-   "size": 312,
-   "section": ".text",
-   "kind": "game"
-  },
-  {
-   "name": "BrazierSymbolStartMovingBack",
-   "refs": 1,
-   "files": 1,
-   "used_as": "_BrazierSymbolStartMovingBack",
-   "addr": "8008EB58",
-   "size": 200,
-   "section": ".text",
-   "kind": "game"
-  },
-  {
-   "name": "BrazierSymbolUpdateDisappearing",
-   "refs": 1,
-   "files": 1,
-   "used_as": "_BrazierSymbolUpdateDisappearing",
-   "addr": "8008EA00",
-   "size": 312,
-   "section": ".text",
-   "kind": "game"
-  },
-  {
-   "name": "BrazierWandGetWandStatus",
-   "refs": 1,
-   "files": 1,
-   "used_as": "_BrazierWandGetWandStatus",
-   "addr": "8008C900",
-   "size": 204,
-   "section": ".text",
-   "kind": "game"
-  },
-  {
-   "name": "CIAnimatedPropEnableByProp",
-   "refs": 1,
-   "files": 1,
-   "used_as": "_CIAnimatedPropEnableByProp",
-   "addr": "800E5154",
-   "size": 228,
-   "section": ".text",
-   "kind": "game"
-  },
-  {
-   "name": "CIAnimatedPropStartInfluenceBlend",
-   "refs": 1,
-   "files": 1,
-   "used_as": "_CIAnimatedPropStartInfluenceBlend",
-   "addr": "800E5238",
-   "size": 36,
-   "section": ".text",
-   "kind": "game"
-  },
-  {
-   "name": "CIAnimatedPropStartInfluenceBlendByProp",
-   "refs": 1,
-   "files": 1,
-   "used_as": "_CIAnimatedPropStartInfluenceBlendByProp",
-   "addr": "800E525C",
-   "size": 220,
-   "section": ".text",
-   "kind": "game"
-  },
-  {
-   "name": "CIAnimatedPropUpdateInfluenceBlend",
-   "refs": 1,
-   "files": 1,
-   "used_as": "_CIAnimatedPropUpdateInfluenceBlend",
-   "addr": "800E5338",
-   "size": 168,
-   "section": ".text",
-   "kind": "game"
-  },
-  {
-   "name": "CIAnimatedPropUpdateInfluenceBlendByProp",
-   "refs": 1,
-   "files": 1,
-   "used_as": "_CIAnimatedPropUpdateInfluenceBlendByProp",
-   "addr": "800E53E0",
-   "size": 336,
-   "section": ".text",
-   "kind": "game"
-  },
-  {
-   "name": "CIPannerReturnToZero",
-   "refs": 1,
-   "files": 1,
-   "used_as": "_CIPannerReturnToZero",
-   "addr": "800E6188",
-   "size": 40,
-   "section": ".text",
-   "kind": "game"
-  },
-  {
-   "name": "CameraShake",
-   "refs": 1,
-   "files": 1,
-   "used_as": "_CameraShake",
-   "addr": "800E7884",
-   "size": 344,
-   "section": ".text",
-   "kind": "game"
-  },
-  {
-   "name": "CameraShakeSynced",
-   "refs": 1,
-   "files": 1,
-   "used_as": "_CameraShakeSynced",
-   "addr": "800E79DC",
-   "size": 344,
-   "section": ".text",
-   "kind": "game"
-  },
-  {
-   "name": "CameraUpdate",
-   "refs": 1,
-   "files": 1,
-   "used_as": "_CameraUpdate",
-   "addr": "801D8C04",
-   "size": 324,
-   "section": ".text",
-   "kind": "game"
-  },
-  {
-   "name": "CanAffordAction",
-   "refs": 1,
-   "files": 1,
-   "used_as": "_CanAffordAction",
-   "addr": "80048AB8",
-   "size": 316,
-   "section": ".text",
-   "kind": "game"
-  },
-  {
-   "name": "CanChargeMonster",
-   "refs": 1,
-   "files": 1,
-   "used_as": "_CanChargeMonster",
-   "addr": "8001DE30",
-   "size": 352,
-   "section": ".text",
-   "kind": "game"
-  },
-  {
-   "name": "CancelBattle",
-   "refs": 1,
-   "files": 1,
-   "used_as": "_CancelBattle",
-   "addr": "8013FE28",
-   "size": 56,
-   "section": ".text",
-   "kind": "game"
-  },
-  {
-   "name": "CastleAccessFromExperimentType",
-   "refs": 1,
-   "files": 1,
-   "used_as": "_CastleAccessFromExperimentType",
-   "addr": "8007472C",
-   "size": 136,
-   "section": ".text",
-   "kind": "game"
-  },
-  {
    "name": "CatchMinigame_SpawnInLane",
    "refs": 1,
    "files": 1,
    "used_as": "_CatchMinigame_SpawnInLane",
    "addr": "8002F208",
    "size": 1236,
-   "section": ".text",
-   "kind": "game"
-  },
-  {
-   "name": "CatchMinigame_UpdateBase",
-   "refs": 1,
-   "files": 1,
-   "used_as": "_CatchMinigame_UpdateBase",
-   "addr": "800224C4",
-   "size": 260,
-   "section": ".text",
-   "kind": "game"
-  },
-  {
-   "name": "CatchMinigame_UpdateLane",
-   "refs": 1,
-   "files": 1,
-   "used_as": "_CatchMinigame_UpdateLane",
-   "addr": "8002EF4C",
-   "size": 700,
-   "section": ".text",
-   "kind": "game"
-  },
-  {
-   "name": "CatchMinigame_UpdateObjects",
-   "refs": 1,
-   "files": 1,
-   "used_as": "_CatchMinigame_UpdateObjects",
-   "addr": "8002FFBC",
-   "size": 292,
-   "section": ".text",
-   "kind": "game"
-  },
-  {
-   "name": "CatchObject_Launch",
-   "refs": 1,
-   "files": 1,
-   "used_as": "_CatchObject_Launch",
-   "addr": "80030414",
-   "size": 200,
-   "section": ".text",
-   "kind": "game"
-  },
-  {
-   "name": "CharacterGetGroundMatBelow",
-   "refs": 1,
-   "files": 1,
-   "used_as": "_CharacterGetGroundMatBelow",
-   "addr": "800EF8B8",
-   "size": 160,
-   "section": ".text",
-   "kind": "game"
-  },
-  {
-   "name": "CharacterLeaveGround",
-   "refs": 1,
-   "files": 1,
-   "used_as": "_CharacterLeaveGround",
-   "addr": "8005A420",
-   "size": 256,
    "section": ".text",
    "kind": "game"
   },
@@ -1056,16 +696,6 @@
    "used_as": "_CloseBooks",
    "addr": "8010FF1C",
    "size": 92,
-   "section": ".text",
-   "kind": "game"
-  },
-  {
-   "name": "CombatHUDEnableInput",
-   "refs": 1,
-   "files": 1,
-   "used_as": "_CombatHUDEnableInput",
-   "addr": "800488E4",
-   "size": 240,
    "section": ".text",
    "kind": "game"
   },
@@ -1606,16 +1236,6 @@
    "used_as": "_FriendListDelete",
    "addr": "8013ABDC",
    "size": 508,
-   "section": ".text",
-   "kind": "game"
-  },
-  {
-   "name": "FriendListHideFloaty",
-   "refs": 1,
-   "files": 1,
-   "used_as": "_FriendListHideFloaty",
-   "addr": "8013C2E4",
-   "size": 352,
    "section": ".text",
    "kind": "game"
   },
@@ -3008,6 +2628,386 @@
    "size": 68,
    "section": ".text",
    "kind": "game"
+  },
+  {
+   "name": "MatchupSetReady",
+   "refs": 1,
+   "files": 1,
+   "used_as": "_MatchupSetReady",
+   "addr": "8013F2A4",
+   "size": 232,
+   "section": ".text",
+   "kind": "game"
+  },
+  {
+   "name": "MatchupShowMyMonster",
+   "refs": 1,
+   "files": 1,
+   "used_as": "_MatchupShowMyMonster",
+   "addr": "8013DDB4",
+   "size": 200,
+   "section": ".text",
+   "kind": "game"
+  },
+  {
+   "name": "MatchupShowStatus",
+   "refs": 1,
+   "files": 1,
+   "used_as": "_MatchupShowStatus",
+   "addr": "8013DC54",
+   "size": 200,
+   "section": ".text",
+   "kind": "game"
+  },
+  {
+   "name": "MemAlloc",
+   "refs": 1,
+   "files": 1,
+   "used_as": "_MemAlloc",
+   "addr": "801D4A90",
+   "size": 672,
+   "section": ".text",
+   "kind": "game"
+  },
+  {
+   "name": "MemFree",
+   "refs": 1,
+   "files": 1,
+   "used_as": "_MemFree",
+   "addr": "801D52D0",
+   "size": 480,
+   "section": ".text",
+   "kind": "game"
+  },
+  {
+   "name": "MemRealloc",
+   "refs": 1,
+   "files": 1,
+   "used_as": "_MemRealloc",
+   "addr": "801D4D30",
+   "size": 1440,
+   "section": ".text",
+   "kind": "game"
+  },
+  {
+   "name": "MeshFadeToOverlayAlpha",
+   "refs": 1,
+   "files": 1,
+   "used_as": "_MeshFadeToOverlayAlpha",
+   "addr": "801F2984",
+   "size": 408,
+   "section": ".text",
+   "kind": "game"
+  },
+  {
+   "name": "MeshStartBouncingOverlayAlpha",
+   "refs": 1,
+   "files": 1,
+   "used_as": "_MeshStartBouncingOverlayAlpha",
+   "addr": "801F26A0",
+   "size": 552,
+   "section": ".text",
+   "kind": "game"
+  },
+  {
+   "name": "MeshStopBouncingOverlayAlpha",
+   "refs": 1,
+   "files": 1,
+   "used_as": "_MeshStopBouncingOverlayAlpha",
+   "addr": "801F28C8",
+   "size": 188,
+   "section": ".text",
+   "kind": "game"
+  },
+  {
+   "name": "ModifyScore",
+   "refs": 1,
+   "files": 1,
+   "used_as": "_ModifyScore",
+   "addr": "80075590",
+   "size": 240,
+   "section": ".text",
+   "kind": "game"
+  },
+  {
+   "name": "MonsterCopyName",
+   "refs": 1,
+   "files": 1,
+   "used_as": "_MonsterCopyName",
+   "addr": "8020EBB8",
+   "size": 248,
+   "section": ".text",
+   "kind": "game"
+  },
+  {
+   "name": "MonsterFeelSuccess",
+   "refs": 1,
+   "files": 1,
+   "used_as": "_MonsterFeelSuccess",
+   "addr": "800320F8",
+   "size": 44,
+   "section": ".text",
+   "kind": "game"
+  },
+  {
+   "name": "MonsterSelectInit",
+   "refs": 1,
+   "files": 1,
+   "used_as": "_MonsterSelectInit",
+   "addr": "8013E4D0",
+   "size": 612,
+   "section": ".text",
+   "kind": "game"
+  },
+  {
+   "name": "MonsterSelectUpdate",
+   "refs": 1,
+   "files": 1,
+   "used_as": "_MonsterSelectUpdate",
+   "addr": "8013E898",
+   "size": 464,
+   "section": ".text",
+   "kind": "game"
+  },
+  {
+   "name": "MoveEntityToLocation",
+   "refs": 1,
+   "files": 1,
+   "used_as": "_MoveEntityToLocation",
+   "addr": "800F8344",
+   "size": 356,
+   "section": ".text",
+   "kind": "game"
+  },
+  {
+   "name": "MoveEntityToLocator",
+   "refs": 1,
+   "files": 1,
+   "used_as": "_MoveEntityToLocator",
+   "addr": "800F8290",
+   "size": 180,
+   "section": ".text",
+   "kind": "game"
+  },
+  {
+   "name": "MoviePlay",
+   "refs": 1,
+   "files": 1,
+   "used_as": "_MoviePlay",
+   "addr": "802049E0",
+   "size": 1676,
+   "section": ".text",
+   "kind": "game"
+  },
+  {
+   "name": "MtxFromLocatorRotation",
+   "refs": 1,
+   "files": 1,
+   "used_as": "_MtxFromLocatorRotation",
+   "addr": "80143CA8",
+   "size": 1800,
+   "section": ".text",
+   "kind": "game"
+  },
+  {
+   "name": "MtxMultVec",
+   "refs": 1,
+   "files": 1,
+   "used_as": "_MtxMultVec",
+   "addr": "801243B8",
+   "size": 600,
+   "section": ".text",
+   "kind": "game"
+  },
+  {
+   "name": "MultiPlayerInit",
+   "refs": 1,
+   "files": 1,
+   "used_as": "_MultiPlayerInit",
+   "addr": "8013F034",
+   "size": 300,
+   "section": ".text",
+   "kind": "game"
+  },
+  {
+   "name": "MultiplayerCleanup",
+   "refs": 1,
+   "files": 1,
+   "used_as": "_MultiplayerCleanup",
+   "addr": "8013BD7C",
+   "size": 144,
+   "section": ".text",
+   "kind": "game"
+  },
+  {
+   "name": "MusicPlay",
+   "refs": 1,
+   "files": 1,
+   "used_as": "_MusicPlay",
+   "addr": "8020AA94",
+   "size": 200,
+   "section": ".text",
+   "kind": "game"
+  },
+  {
+   "name": "MysticBrewGhost_FireProjectile",
+   "refs": 1,
+   "files": 1,
+   "used_as": "_MysticBrewGhost_FireProjectile",
+   "addr": "800BD558",
+   "size": 236,
+   "section": ".text",
+   "kind": "game"
+  },
+  {
+   "name": "MysticBrewGhost_PositionToHide",
+   "refs": 1,
+   "files": 1,
+   "used_as": "_MysticBrewGhost_PositionToHide",
+   "addr": "800BD490",
+   "size": 200,
+   "section": ".text",
+   "kind": "game"
+  },
+  {
+   "name": "MysticBrewPowerUp_PositionToHide",
+   "refs": 1,
+   "files": 1,
+   "used_as": "_MysticBrewPowerUp_PositionToHide",
+   "addr": "800BE000",
+   "size": 148,
+   "section": ".text",
+   "kind": "game"
+  },
+  {
+   "name": "MysticBrewProjectile_PositionToHide",
+   "refs": 1,
+   "files": 1,
+   "used_as": "_MysticBrewProjectile_PositionToHide",
+   "addr": "800BF218",
+   "size": 148,
+   "section": ".text",
+   "kind": "game"
+  },
+  {
+   "name": "NameAddLetter",
+   "refs": 1,
+   "files": 1,
+   "used_as": "_NameAddLetter",
+   "addr": "8001D2D0",
+   "size": 116,
+   "section": ".text",
+   "kind": "game"
+  },
+  {
+   "name": "NameAddSpace",
+   "refs": 1,
+   "files": 1,
+   "used_as": "_NameAddSpace",
+   "addr": "8001D344",
+   "size": 120,
+   "section": ".text",
+   "kind": "game"
+  },
+  {
+   "name": "NameDelLetter",
+   "refs": 1,
+   "files": 1,
+   "used_as": "_NameDelLetter",
+   "addr": "8001D3BC",
+   "size": 56,
+   "section": ".text",
+   "kind": "game"
+  },
+  {
+   "name": "NunchukUpdate",
+   "refs": 1,
+   "files": 1,
+   "used_as": "_NunchukUpdate",
+   "addr": "80122BD8",
+   "size": 596,
+   "section": ".text",
+   "kind": "game"
+  },
+  {
+   "name": "OnExperimentFadeIn",
+   "refs": 1,
+   "files": 1,
+   "used_as": "_OnExperimentFadeIn",
+   "addr": "800743A8",
+   "size": 44,
+   "section": ".text",
+   "kind": "game"
+  },
+  {
+   "name": "OnRocketImpact",
+   "refs": 1,
+   "files": 1,
+   "used_as": "_OnRocketImpact",
+   "addr": "800F8824",
+   "size": 136,
+   "section": ".text",
+   "kind": "game"
+  },
+  {
+   "name": "OrientBoneToTarget",
+   "refs": 1,
+   "files": 1,
+   "used_as": "_OrientBoneToTarget",
+   "addr": "8010375C",
+   "size": 44,
+   "section": ".text",
+   "kind": "game"
+  },
+  {
+   "name": "PanCameraToJunction",
+   "refs": 1,
+   "files": 1,
+   "used_as": "_PanCameraToJunction",
+   "addr": "800F6134",
+   "size": 532,
+   "section": ".text",
+   "kind": "game"
+  },
+  {
+   "name": "PartAction1GetCost",
+   "refs": 1,
+   "files": 1,
+   "used_as": "_PartAction1GetCost",
+   "addr": "800F2974",
+   "size": 292,
+   "section": ".text",
+   "kind": "game"
+  },
+  {
+   "name": "PartAction1GetIsTarget",
+   "refs": 1,
+   "files": 1,
+   "used_as": "_PartAction1GetIsTarget",
+   "addr": "800F3094",
+   "size": 280,
+   "section": ".text",
+   "kind": "game"
+  },
+  {
+   "name": "PartAction1GetTarget1",
+   "refs": 1,
+   "files": 1,
+   "used_as": "_PartAction1GetTarget1",
+   "addr": "800F2EA4",
+   "size": 252,
+   "section": ".text",
+   "kind": "game"
+  },
+  {
+   "name": "PartAction1GetTarget2",
+   "refs": 1,
+   "files": 1,
+   "used_as": "_PartAction1GetTarget2",
+   "addr": "800F2FA0",
+   "size": 244,
+   "section": ".text",
+   "kind": "game"
   }
  ],
  "library": [
@@ -4181,8 +4181,8 @@
  "global": [
   {
    "name": "gWorldState",
-   "refs": 49,
-   "files": 49,
+   "refs": 51,
+   "files": 51,
    "used_as": "\"unsigned char * gWorldState\" (?gWorldState@@3PAEA)",
    "addr": "803E6D00",
    "size": 12952,
@@ -4191,8 +4191,8 @@
   },
   {
    "name": "gGame",
-   "refs": 37,
-   "files": 37,
+   "refs": 38,
+   "files": 38,
    "used_as": "\"unsigned char * gGame\" (?gGame@@3PAEA)",
    "addr": "803B53A0",
    "size": 54840,
@@ -4201,8 +4201,8 @@
   },
   {
    "name": "lbl_803C4298",
-   "refs": 31,
-   "files": 31,
+   "refs": 32,
+   "files": 32,
    "used_as": "\"unsigned char * lbl_803C4298\" (?lbl_803C4298@@3PAEA)",
    "addr": "803C4298",
    "size": 360,
@@ -4211,8 +4211,8 @@
   },
   {
    "name": "lbl_805FBBE0",
-   "refs": 30,
-   "files": 30,
+   "refs": 31,
+   "files": 31,
    "used_as": "\"unsigned char * lbl_805FBBE0\" (?lbl_805FBBE0@@3PAEA)",
    "addr": "805FBBE0",
    "size": 8,
@@ -4241,8 +4241,8 @@
   },
   {
    "name": "gBattle",
-   "refs": 16,
-   "files": 16,
+   "refs": 17,
+   "files": 17,
    "used_as": "\"unsigned char * gBattle\" (?gBattle@@3PAEA)",
    "addr": "805FBBB8",
    "size": 8,
@@ -4307,6 +4307,16 @@
    "addr": "8047C7F0",
    "size": 720,
    "section": ".bss",
+   "kind": "global"
+  },
+  {
+   "name": "lbl_805FB6B8",
+   "refs": 9,
+   "files": 9,
+   "used_as": "\"int lbl_805FB6B8\" (?lbl_805FB6B8@@3HA)",
+   "addr": "805FB6B8",
+   "size": 8,
+   "section": ".sbss",
    "kind": "global"
   },
   {
@@ -4386,16 +4396,6 @@
    "used_as": "_lbl_805FB50C",
    "addr": "805FB50C",
    "size": 1,
-   "section": ".sbss",
-   "kind": "global"
-  },
-  {
-   "name": "lbl_805FB6B8",
-   "refs": 7,
-   "files": 7,
-   "used_as": "\"int lbl_805FB6B8\" (?lbl_805FB6B8@@3HA)",
-   "addr": "805FB6B8",
-   "size": 8,
    "section": ".sbss",
    "kind": "global"
   },
@@ -4530,6 +4530,16 @@
    "kind": "global"
   },
   {
+   "name": "lbl_805F90D8",
+   "refs": 4,
+   "files": 4,
+   "used_as": "\"int lbl_805F90D8\" (?lbl_805F90D8@@3HA)",
+   "addr": "805F90D8",
+   "size": 4,
+   "section": ".sdata",
+   "kind": "global"
+  },
+  {
    "name": "lbl_805F95F8",
    "refs": 4,
    "files": 4,
@@ -4537,6 +4547,16 @@
    "addr": "805F95F8",
    "size": 8,
    "section": ".sdata",
+   "kind": "global"
+  },
+  {
+   "name": "lbl_805FAF78",
+   "refs": 4,
+   "files": 4,
+   "used_as": "\"unsigned char * lbl_805FAF78\" (?lbl_805FAF78@@3PAEA)",
+   "addr": "805FAF78",
+   "size": 8,
+   "section": ".sbss",
    "kind": "global"
   },
   {
@@ -4790,16 +4810,6 @@
    "kind": "global"
   },
   {
-   "name": "lbl_805F90D8",
-   "refs": 3,
-   "files": 3,
-   "used_as": "\"int lbl_805F90D8\" (?lbl_805F90D8@@3HA)",
-   "addr": "805F90D8",
-   "size": 4,
-   "section": ".sdata",
-   "kind": "global"
-  },
-  {
    "name": "lbl_805F9614",
    "refs": 3,
    "files": 3,
@@ -4820,12 +4830,22 @@
    "kind": "global"
   },
   {
-   "name": "lbl_805FAF78",
+   "name": "lbl_805FAF94",
    "refs": 3,
    "files": 3,
-   "used_as": "\"unsigned char * lbl_805FAF78\" (?lbl_805FAF78@@3PAEA)",
-   "addr": "805FAF78",
-   "size": 8,
+   "used_as": "_lbl_805FAF94",
+   "addr": "805FAF94",
+   "size": 4,
+   "section": ".sbss",
+   "kind": "global"
+  },
+  {
+   "name": "lbl_805FAF99",
+   "refs": 3,
+   "files": 3,
+   "used_as": "_lbl_805FAF99",
+   "addr": "805FAF99",
+   "size": 1,
    "section": ".sbss",
    "kind": "global"
   },
@@ -4946,6 +4966,16 @@
    "used_as": "\"int lbl_805FB594\" (?lbl_805FB594@@3HA)",
    "addr": "805FB594",
    "size": 4,
+   "section": ".sbss",
+   "kind": "global"
+  },
+  {
+   "name": "lbl_805FB710",
+   "refs": 3,
+   "files": 3,
+   "used_as": "\"unsigned char * lbl_805FB710\" (?lbl_805FB710@@3PAEA)",
+   "addr": "805FB710",
+   "size": 8,
    "section": ".sbss",
    "kind": "global"
   },
@@ -5480,6 +5510,16 @@
    "kind": "global"
   },
   {
+   "name": "lbl_803881B4",
+   "refs": 2,
+   "files": 2,
+   "used_as": "_lbl_803881B4",
+   "addr": "803881B4",
+   "size": 164,
+   "section": ".data",
+   "kind": "global"
+  },
+  {
    "name": "lbl_803C5DB0",
    "refs": 2,
    "files": 2,
@@ -5950,31 +5990,11 @@
    "kind": "global"
   },
   {
-   "name": "lbl_805FAF94",
-   "refs": 2,
-   "files": 2,
-   "used_as": "_lbl_805FAF94",
-   "addr": "805FAF94",
-   "size": 4,
-   "section": ".sbss",
-   "kind": "global"
-  },
-  {
    "name": "lbl_805FAF98",
    "refs": 2,
    "files": 2,
    "used_as": "\"unsigned char lbl_805FAF98\" (?lbl_805FAF98@@3EA)",
    "addr": "805FAF98",
-   "size": 1,
-   "section": ".sbss",
-   "kind": "global"
-  },
-  {
-   "name": "lbl_805FAF99",
-   "refs": 2,
-   "files": 2,
-   "used_as": "_lbl_805FAF99",
-   "addr": "805FAF99",
    "size": 1,
    "section": ".sbss",
    "kind": "global"
@@ -6056,6 +6076,16 @@
    "used_as": "\"unsigned char * lbl_805FB09C\" (?lbl_805FB09C@@3PAEA)",
    "addr": "805FB09C",
    "size": 1,
+   "section": ".sbss",
+   "kind": "global"
+  },
+  {
+   "name": "lbl_805FB0A0",
+   "refs": 2,
+   "files": 2,
+   "used_as": "_lbl_805FB0A0",
+   "addr": "805FB0A0",
+   "size": 4,
    "section": ".sbss",
    "kind": "global"
   },
@@ -6460,11 +6490,11 @@
    "kind": "global"
   },
   {
-   "name": "lbl_805FB710",
+   "name": "lbl_805FB768",
    "refs": 2,
    "files": 2,
-   "used_as": "\"unsigned char * lbl_805FB710\" (?lbl_805FB710@@3PAEA)",
-   "addr": "805FB710",
+   "used_as": "_lbl_805FB768",
+   "addr": "805FB768",
    "size": 8,
    "section": ".sbss",
    "kind": "global"
@@ -6525,6 +6555,26 @@
    "files": 2,
    "used_as": "\"unsigned char * lbl_805FB800\" (?lbl_805FB800@@3PAEA)",
    "addr": "805FB800",
+   "size": 4,
+   "section": ".sbss",
+   "kind": "global"
+  },
+  {
+   "name": "lbl_805FB838",
+   "refs": 2,
+   "files": 2,
+   "used_as": "_lbl_805FB838",
+   "addr": "805FB838",
+   "size": 4,
+   "section": ".sbss",
+   "kind": "global"
+  },
+  {
+   "name": "lbl_805FB83C",
+   "refs": 2,
+   "files": 2,
+   "used_as": "_lbl_805FB83C",
+   "addr": "805FB83C",
    "size": 4,
    "section": ".sbss",
    "kind": "global"
@@ -7128,56 +7178,6 @@
    "size": 24,
    "section": ".bss",
    "kind": "global"
-  },
-  {
-   "name": "gZoneLists",
-   "refs": 1,
-   "files": 1,
-   "used_as": "\"unsigned char * gZoneLists\" (?gZoneLists@@3PAEA)",
-   "addr": "803E9FD4",
-   "size": 24,
-   "section": ".bss",
-   "kind": "global"
-  },
-  {
-   "name": "gZoneLoaded",
-   "refs": 1,
-   "files": 1,
-   "used_as": "\"unsigned char * gZoneLoaded\" (?gZoneLoaded@@3PAEA)",
-   "addr": "803C744C",
-   "size": 24,
-   "section": ".bss",
-   "kind": "global"
-  },
-  {
-   "name": "gZoneState",
-   "refs": 1,
-   "files": 1,
-   "used_as": "\"unsigned int * gZoneState\" (?gZoneState@@3PAIA)",
-   "addr": "803C7464",
-   "size": 24,
-   "section": ".bss",
-   "kind": "global"
-  },
-  {
-   "name": "lbl_80345FCC",
-   "refs": 1,
-   "files": 1,
-   "used_as": "_lbl_80345FCC",
-   "addr": "80345FCC",
-   "size": 12,
-   "section": ".rodata",
-   "kind": "global"
-  },
-  {
-   "name": "lbl_80345FD8",
-   "refs": 1,
-   "files": 1,
-   "used_as": "_lbl_80345FD8",
-   "addr": "80345FD8",
-   "size": 12,
-   "section": ".rodata",
-   "kind": "global"
   }
  ],
  "mismatch": [],
@@ -7306,6 +7306,13 @@
    "refs": 2,
    "files": 2,
    "used_as": "_ScreenSetWidgetVisible",
+   "kind": "unknown"
+  },
+  {
+   "name": "cvt_ull_flt",
+   "refs": 2,
+   "files": 2,
+   "used_as": "___cvt_ull_flt",
    "kind": "unknown"
   },
   {
@@ -7705,13 +7712,6 @@
    "refs": 1,
    "files": 1,
    "used_as": "_ZoneUnload",
-   "kind": "unknown"
-  },
-  {
-   "name": "cvt_ull_flt",
-   "refs": 1,
-   "files": 1,
-   "used_as": "___cvt_ull_flt",
    "kind": "unknown"
   },
   {

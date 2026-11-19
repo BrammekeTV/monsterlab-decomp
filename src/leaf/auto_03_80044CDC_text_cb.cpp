@@ -41,6 +41,5 @@ void SetInTargetedPartTutorial(void) {
 
 // 0x80049374
 void CombatHUDStoreDisableState(void) {
-    // tail-call arguments inferred from the registers set before the call
     fn_800493A8((s32)((u32)(0)));
 }

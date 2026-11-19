@@ -1,15 +1,15 @@
 {
  "game_id": "RM7P4F",
- "generated": "2026-11-19T00:27:35+00:00",
- "commit": "3afb082",
- "commit_date": "2026-11-19T00:28:07+01:00",
+ "generated": "2026-11-19T00:37:31+00:00",
+ "commit": "4a44dcc",
+ "commit_date": "2026-11-19T01:27:37+01:00",
  "game": {
   "functions": 8548,
   "bytes": 2265988,
   "named": 2748,
   "named_bytes": 616800,
-  "decompiled": 4827,
-  "decompiled_bytes": 566400
+  "decompiled": 4866,
+  "decompiled_bytes": 575688
  },
  "library": {
   "functions": 4039,
@@ -24,8 +24,8 @@
   "bytes": 3404928,
   "named": 3211,
   "named_bytes": 721548,
-  "decompiled": 4828,
-  "decompiled_bytes": 566520
+  "decompiled": 4867,
+  "decompiled_bytes": 575808
  },
  "game_range": [
   "80006B40",
@@ -73,7 +73,7 @@
    0.858
   ],
   [
-   0.065,
+   0.105,
    0.665
   ],
   [
@@ -81,7 +81,7 @@
    0.645
   ],
   [
-   0.528,
+   0.557,
    0.059
   ],
   [
@@ -105,11 +105,11 @@
    0.049
   ],
   [
-   0.348,
+   0.428,
    0.598
   ],
   [
-   0.292,
+   0.315,
    0.061
   ],
   [
@@ -153,7 +153,7 @@
    0.687
   ],
   [
-   0.429,
+   0.458,
    0.736
   ],
   [
@@ -169,7 +169,7 @@
    0.233
   ],
   [
-   0.324,
+   0.36,
    0.378
   ],
   [
@@ -185,7 +185,7 @@
    0.409
   ],
   [
-   0.092,
+   0.13,
    0.13
   ],
   [
@@ -233,7 +233,7 @@
    0.725
   ],
   [
-   0.114,
+   0.132,
    0.312
   ],
   [
@@ -253,7 +253,7 @@
    0.0
   ],
   [
-   0.025,
+   0.034,
    0.009
   ],
   [
@@ -261,15 +261,15 @@
    0.448
   ],
   [
-   0.342,
+   0.374,
    0.136
   ],
   [
-   0.181,
+   0.243,
    0.482
   ],
   [
-   0.015,
+   0.1,
    0.089
   ],
   [
@@ -277,11 +277,11 @@
    0.0
   ],
   [
-   0.03,
+   0.056,
    0.03
   ],
   [
-   0.053,
+   0.172,
    0.139
   ],
   [
@@ -441,15 +441,15 @@
    0.009
   ],
   [
-   0.192,
+   0.303,
    0.142
   ],
   [
-   0.16,
+   0.164,
    0.155
   ],
   [
-   0.25,
+   0.329,
    1.0
   ],
   [
@@ -461,7 +461,7 @@
    0.541
   ],
   [
-   0.133,
+   0.156,
    0.97
   ],
   [
@@ -609,11 +609,11 @@
    0.952
   ],
   [
-   0.037,
+   0.044,
    0.676
   ],
   [
-   0.642,
+   0.676,
    0.834
   ],
   [
@@ -621,7 +621,7 @@
    0.631
   ],
   [
-   0.035,
+   0.082,
    0.275
   ],
   [
@@ -893,7 +893,7 @@
    0.141
   ],
   [
-   0.147,
+   0.184,
    0.102
   ],
   [
@@ -933,7 +933,7 @@
    0.068
   ],
   [
-   0.111,
+   0.192,
    0.068
   ],
   [
@@ -5814,6 +5814,211 @@
      "name": "AudioSetListenerUp",
      "addr": "8020AA68",
      "size": 44
+    }
+   ]
+  },
+  {
+   "path": "src/game/draft_miss13.cpp",
+   "functions": [
+    {
+     "name": "EffectEmitter",
+     "addr": "800523B8",
+     "size": 300
+    },
+    {
+     "name": "BrainTossThrowBrainChunk",
+     "addr": "8007EEB8",
+     "size": 76
+    },
+    {
+     "name": "BrainTargetGenerateWaitTime",
+     "addr": "80083798",
+     "size": 16
+    },
+    {
+     "name": "BrainTargetGenerateDestination",
+     "addr": "800837FC",
+     "size": 16
+    },
+    {
+     "name": "BrainTargetDestinationReached",
+     "addr": "80083830",
+     "size": 256
+    },
+    {
+     "name": "BrainHeadFollowMeat",
+     "addr": "80084650",
+     "size": 160
+    },
+    {
+     "name": "BrainHeadSetFreebieIsNext",
+     "addr": "80084D18",
+     "size": 20
+    },
+    {
+     "name": "BrainHeadPlayIdleAnim",
+     "addr": "80084DA8",
+     "size": 196
+    },
+    {
+     "name": "BrainPowerUpArrive",
+     "addr": "80086090",
+     "size": 224
+    },
+    {
+     "name": "BrainPowerUpIsTouchingHead",
+     "addr": "80086650",
+     "size": 264
+    },
+    {
+     "name": "BrainHandUpdateHeldChunk",
+     "addr": "800869A0",
+     "size": 552
+    },
+    {
+     "name": "BrazierBowlGetFireSize",
+     "addr": "8008CB28",
+     "size": 60
+    },
+    {
+     "name": "BrazierBowlGetExplosionSize",
+     "addr": "8008CB64",
+     "size": 44
+    },
+    {
+     "name": "BrazierSymbolSetUnused",
+     "addr": "8008E8C8",
+     "size": 312
+    },
+    {
+     "name": "BrazierSymbolUpdateDisappearing",
+     "addr": "8008EA00",
+     "size": 312
+    },
+    {
+     "name": "BrazierSymbolStartMovingBack",
+     "addr": "8008EB58",
+     "size": 200
+    },
+    {
+     "name": "BrazierSymbolGetSymbolHashType",
+     "addr": "8008EC64",
+     "size": 172
+    },
+    {
+     "name": "SetHitBoxes",
+     "addr": "80140B9C",
+     "size": 296
+    },
+    {
+     "name": "fn_80146180",
+     "addr": "80146180",
+     "size": 424
+    },
+    {
+     "name": "fn_801ED788",
+     "addr": "801ED788",
+     "size": 708
+    }
+   ]
+  },
+  {
+   "path": "src/game/draft_miss14.cpp",
+   "functions": [
+    {
+     "name": "CanChargeMonster",
+     "addr": "8001DE30",
+     "size": 352
+    },
+    {
+     "name": "CatchMinigame_UpdateBase",
+     "addr": "800224C4",
+     "size": 260
+    },
+    {
+     "name": "CatchMinigame_UpdateLane",
+     "addr": "8002EF4C",
+     "size": 700
+    },
+    {
+     "name": "CatchObject_Launch",
+     "addr": "80030414",
+     "size": 200
+    },
+    {
+     "name": "CanAffordAction",
+     "addr": "80048AB8",
+     "size": 316
+    },
+    {
+     "name": "CharacterLeaveGround",
+     "addr": "8005A420",
+     "size": 256
+    },
+    {
+     "name": "CastleAccessFromExperimentType",
+     "addr": "8007472C",
+     "size": 136
+    },
+    {
+     "name": "BrazierWandGetWandStatus",
+     "addr": "8008C900",
+     "size": 204
+    },
+    {
+     "name": "CIAnimatedPropEnableByProp",
+     "addr": "800E5154",
+     "size": 228
+    },
+    {
+     "name": "CIAnimatedPropStartInfluenceBlend",
+     "addr": "800E5238",
+     "size": 36
+    },
+    {
+     "name": "CIAnimatedPropStartInfluenceBlendByProp",
+     "addr": "800E525C",
+     "size": 220
+    },
+    {
+     "name": "CIAnimatedPropUpdateInfluenceBlend",
+     "addr": "800E5338",
+     "size": 168
+    },
+    {
+     "name": "CIAnimatedPropUpdateInfluenceBlendByProp",
+     "addr": "800E53E0",
+     "size": 336
+    },
+    {
+     "name": "CIPannerReturnToZero",
+     "addr": "800E6188",
+     "size": 40
+    },
+    {
+     "name": "CameraShake",
+     "addr": "800E7884",
+     "size": 344
+    },
+    {
+     "name": "CameraShakeSynced",
+     "addr": "800E79DC",
+     "size": 344
+    },
+    {
+     "name": "CharacterGetGroundMatBelow",
+     "addr": "800EF8B8",
+     "size": 160
+    },
+    {
+     "name": "CancelBattle",
+     "addr": "8013FE28",
+     "size": 56
+    },
+    {
+     "name": "CameraUpdate",
+     "addr": "801D8C04",
+     "size": 324
     }
    ]
   },

@@ -94,6 +94,11 @@
  "changelog": [
   {
    "date": "2026-11-19",
+   "time": "03:20",
+   "text": "Seventh round from the missing-symbols list: 40 more functions, including brain minigame helpers (target, head, power-up, held chunk), brazier bowl and symbol callbacks, the effect emitter, hit boxes, catch minigame lanes and launch, camera update and shake, action affordability and ground material lookup."
+  },
+  {
+   "date": "2026-11-19",
    "time": "02:45",
    "text": "Sixth round from the missing-symbols list: 42 more functions, including script callbacks for action selection, altitude checks, brain chunk bounce/load, arm wrestling up/down, astral pickup, field repair health, adding trackable score triggers and entity move tasks, the junction activation jump table, zone slot acquisition and the alert screen."
   },

@@ -10,7 +10,7 @@ extern "C" {
 void  fn_801B3310(u8* p, u8* q);                                 // 0x801B3310
 void  fn_801B1778(void* p, s32 a);                               // 0x801B1778
 void  fn_801B737C(void* a, void* b, void* c, s32 d);             // 0x801B737C
-void  fn_801DA798(void* p);                                      // 0x801DA798
+void* fn_801DA798(void* p);                                      // 0x801DA798
 void  fn_801E7BC4(void* p, s32 n);                               // 0x801E7BC4
 s32 fn_801E9678(void* list, void* handle);                          // 0x801E9678
 void* fn_801E9D18(void* p, u32 hash, s32 size);                  // 0x801E9D18
@@ -207,9 +207,9 @@ void fn_801B503C(u8* p) {
 
 // 0x801B50FC
 // Calls the virtual (+0xC) on the object and passes its result to fn_801DA798.
-void fn_801B50FC(u8* p) {
+extern "C" void* fn_801B50FC(u8* p) {
     void* r = (*(void* (**)(u8*))(*(u8**)p + 0xc))(p);
-    fn_801DA798(r);
+    return fn_801DA798(r);
 }
 
 // 0x801B51E0
