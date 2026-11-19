@@ -7,29 +7,19 @@
 
 extern "C" void fn_8010B50C(s32, u8*);
 extern "C" void fn_8010BF6C(u8*, s32);
-extern "C" void fn_8010BFB8(u8*);
-extern "C" void fn_8010C194(u8*);
-extern "C" void fn_8010C354(s32, u8*);
+extern "C" void fn_8010BFB8(u8*, f32);
+extern "C" f32 fn_8010C194(u8*);
 
 // 0x800C4480
-extern "C" void fn_800C4480(u8* a3) {
-    // tail-call arguments inferred from the registers set before the call
+extern "C" void fn_800C4480(u8* a3, f32 f1) {
     u8* t0 = ((u8*)(uintptr_t)(a3)) + 216;
-    fn_8010BFB8(t0);
+    fn_8010BFB8(t0, (f32)(f1));
 }
 
 // 0x800C4488
-extern "C" void fn_800C4488(u8* a3) {
-    // tail-call arguments inferred from the registers set before the call
+extern "C" f32 fn_800C4488(u8* a3) {
     u8* t0 = ((u8*)(uintptr_t)(a3)) + 216;
-    fn_8010C194(t0);
-}
-
-// 0x800C4490
-extern "C" void fn_800C4490(s32 a3, u8* a4) {
-    // tail-call arguments inferred from the registers set before the call
-    u8* t0 = ((u8*)(uintptr_t)(a4)) + 216;
-    fn_8010C354((s32)((u32)(uintptr_t)(a3)), t0);
+    return (f32)(fn_8010C194(t0));
 }
 
 // 0x800C4498

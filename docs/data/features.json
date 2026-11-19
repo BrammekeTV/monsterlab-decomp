@@ -94,6 +94,11 @@
  "changelog": [
   {
    "date": "2026-11-20",
+   "time": "00:35",
+   "text": "Decompiled 61 more game functions (RobotEvolutionExperiment_*, fn_8010*/fn_8011* lab and UI helpers, ...)"
+  },
+  {
+   "date": "2026-11-20",
    "time": "00:13",
    "text": "Decompiled 68 more game functions (Digging*, Puzzle*, WeldingOverPlate, ShovelDirection, fn_800C*/fn_800D*/fn_800E* helpers, ...)"
   },

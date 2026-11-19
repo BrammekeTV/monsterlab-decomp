@@ -24,8 +24,8 @@ void    fn_8020B160(f32 v);                              // 0x8020B160 (asm read
 u32     fn_801EC880(u8* p, u32 hash);
 void    fn_801ECDE8(u8* p, s32 idx, u32 a, s32 immediate);
 void*   fn_8011AEE8(u8* out, s32 idx, u8* end);
-void*   fn_8011A3BC(void);
-void*   fn_8011D1C0(void);
+u8* fn_8011A3BC(u8* arg0);
+u8* fn_8011D1C0(u8* arg0);
 void    fn_801DFEA8(u8* p, s32 a, s32 b);                // 0x801DFEA8 (script FSM set bit)
 void    fn_801DFF74(u8* p, u32 idx, f32 v);              // 0x801DFF74 (asm: idx < 0x20, stores f1)
 void    fn_801DFFCC(u8* p, s32 a, s32 b);                // 0x801DFFCC (script FSM add int)
@@ -284,12 +284,12 @@ void InitLabBooks(void) {
             *(u8**)(t + 0x8) = NULL;
             u8* a = (u8*)fn_801D40E0(0x1C);
             if (a != NULL) {
-                a = (u8*)fn_8011A3BC();
+                a = (u8*)fn_8011A3BC(a);
             }
             *(u8**)(t + 0x4) = a;
             u8* b = (u8*)fn_801D40E0(0x20);
             if (b != NULL) {
-                b = (u8*)fn_8011D1C0();
+                b = (u8*)fn_8011D1C0(b);
             }
             *(u8**)(t + 0x8) = b;
         }

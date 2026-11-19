@@ -70,7 +70,7 @@ void  fn_8003CF7C(f32 dt);                              // 0x8003CF7C
 void  fn_8012570C(f32 dt);                              // 0x8012570C
 void  fn_800D3818(u8* objDb, f32 dt);                              // 0x800D3818
 void  fn_800D6E14(f32 dt);                              // 0x800D6E14
-void  fn_8010A678(f32 dt);                              // 0x8010A678
+void fn_8010A678(void);                              // 0x8010A678
 void  fn_8010A76C(u8* p, f32 dt);                       // 0x8010A76C
 void  fn_801214D8(u8* p, f32 a, f32 dt);                // 0x801214D8
 void  fn_801CE7FC(u8* p, f32 dt);                       // 0x801CE7FC
@@ -740,7 +740,7 @@ void fn_800098F4(u8* g, f32 f1, f32 dt) {
                 fn_801CE7FC(lbl_8047C760, dt);
                 fn_801BE44C(lbl_8047C790, dt);
                 fn_801C3C2C(lbl_8047C7AC, dt);
-                fn_8010A678(dt);
+                fn_8010A678();
             }
             fn_801B420C(lbl_8047C7D8);
             fn_801D8BB4(lbl_8047C640, dt);

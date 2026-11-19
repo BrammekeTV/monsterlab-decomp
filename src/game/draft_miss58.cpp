@@ -54,12 +54,12 @@ s32   fn_8001AFB4(u8* p, s32 del);                                  // 0x8001AFB
 u8*   fn_800D8724(u8* a, u32 key);                                  // 0x800D8724
 Vec3  QuatGetAxisY(const Quat* q);                                  // 0x801452A8
 void  QuatGetForward(Vec3* out, const Quat* q);                     // 0x801454CC
-void  fn_801455E0(f32* out, u8* quat, u8* arg);                     // 0x801455E0
+void  fn_801455E0(f32* out, u8* quat);                     // 0x801455E0
 s32   fn_800DE678(u8* a, f32* pos, f32* out, f32 f1);              // 0x800DE678
 s32   WorldGetPhase(void* world);                                   // 0x800D83A8
 s32   fn_800517C0(void);                                            // 0x800517C0
 void  fn_800E6468(void* rec, f32 dt);                               // 0x800E6468
-s32   fn_80109A0C(void);                                            // 0x80109A0C
+s32   fn_80109A0C(s32 id);                                            // 0x80109A0C
 s32   fn_80109600(void* p);                                         // 0x80109600
 s32   fn_801098DC(s32 a0);                                          // 0x801098DC
 BOOL  fn_80198C34(void* set, void* w);                              // 0x80198C34
@@ -871,7 +871,7 @@ void fn_800DB370(u8* arg0, f32* arg1, f32* arg2, f32* arg3) {
     arg3[1] = fwd.y;
     arg3[2] = fwd.z;
     f32 v[3];
-    fn_801455E0(v, *(u8**)(arg0 + 4) + 0xc, NULL);
+    fn_801455E0(v, *(u8**)(arg0 + 4) + 0xc);
     arg1[0] = v[0];
     arg1[1] = v[1];
     arg1[2] = v[2];
@@ -962,7 +962,7 @@ void fn_800E6360(f32 dt) {
     } else {
         fn_800E6A84(0);
     }
-    if (*(s32*)((u8*)lbl_805FB1C8 + 0xc) != 0 && fn_80109A0C() == 0
+    if (*(s32*)((u8*)lbl_805FB1C8 + 0xc) != 0 && fn_80109A0C(*(s32*)((u8*)lbl_805FB1C8 + 0xc)) == 0
         && fn_80109600((u8*)lbl_805FB1C8 + 0xc) != 0) {
         u8* r = (u8*)lbl_805FB1C8;
         *(s32*)(r + 0x8) = *(s32*)(r + 0xc);
@@ -1001,7 +1001,7 @@ void fn_800E6A84(s32 arg0) {
         *(u8**)rec = NULL;
     }
     if (*(s32*)(rec + 0x4) != 0) {
-        if (fn_80109A0C() == 0) fn_801098DC(*(s32*)(rec + 0x4));
+        if (fn_80109A0C(*(s32*)(rec + 0x4)) == 0) fn_801098DC(*(s32*)(rec + 0x4));
         *(s32*)(rec + 0x4) = 0;
     }
 }

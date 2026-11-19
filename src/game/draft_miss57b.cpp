@@ -12,7 +12,7 @@ extern "C" {
 void BufferFree(void* p);                                  // 0x801D4980
 void operator_delete(void* p);                             // 0x801D426C
 u8* fn_80021750(void);                                     // 0x80021750
-s32 fn_80024EB0(void);                                     // 0x80024EB0
+s32 fn_80024EB0(u8* arg0);                                     // 0x80024EB0
 void fn_8019CAD4(void* a, void* b);                        // 0x8019CAD4
 void UIElement_SetVisibleFlag(u32 hash, BOOL on);
 void UIWidgetPlayAnimLoop(void* w, u32 anim, s32 n);       // 0x8019BB1C
@@ -57,8 +57,8 @@ extern f32 lbl_805FEA54;
 
 // 0x80023840
 s32 ShovelDirection(void) {
-    fn_80021750();
-    return fn_80024EB0();
+
+    return fn_80024EB0(fn_80021750());  // r3 (the pointer) passes straight through
 }
 
 // 0x80026658

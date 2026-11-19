@@ -22,7 +22,7 @@ BOOL fn_8011BA90(u8* p);                  // 0x8011BA90
 BOOL fn_8011BAA4(u8* p);                  // 0x8011BAA4
 void fn_8011BCF8(u8* p, s32 a);           // 0x8011BCF8
 void fn_8011BDA8(u8* p, s32 a);           // 0x8011BDA8
-BOOL fn_8011BB28(u8* p);                  // 0x8011BB28
+const char* fn_8011BB28(u8* p);                  // 0x8011BB28
 BOOL fn_8011BF34(u8* p);                  // 0x8011BF34
 s32  fn_8011C018(u8* p, s32 a);           // 0x8011C018
 BOOL fn_8011C214(u8* p);                  // 0x8011C214
@@ -186,7 +186,7 @@ void Parts_IncrementRow(s32 a0) {
 BOOL Parts_GetBodyPartSlotName(void) {
     u8* p = PartsObj();
     if (p == 0) return 0;
-    return fn_8011BB28(p);
+    return (BOOL)(intptr_t)fn_8011BB28(p);  // lint:ok callback is typed BOOL in the generated header
 }
 
 // 0x8011294C

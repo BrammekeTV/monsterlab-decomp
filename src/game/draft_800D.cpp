@@ -5,7 +5,7 @@
 extern "C" {
 int   SysSprintf(char* buf, const char* fmt, ...);                 // 0x80142EF8
 void  fn_8006FAF4(u8* p, s32 a);                                   // 0x8006FAF4
-void  fn_801455E0(f32* out, u8* quat, u8* arg);                    // 0x801455E0
+void  fn_801455E0(f32* out, u8* quat);                    // 0x801455E0
 u8*   fn_801B3308(void);                                           // 0x801B3308
 void  fn_801B3378(u8* p, u8* key);                                 // 0x801B3378
 void  fn_801C83AC(u8* mgr, u8* item);                              // 0x801C83AC
@@ -93,7 +93,7 @@ s32 fn_800D01D8(u8* arg0, f32* arg1, f32* arg2) {
     arg2[2] = axis.z;
     u8* g = *(u8**)(lbl_803C4298 + 4);
     *(u8*)(g + 0xFC) = 1;
-    fn_801455E0(sp8, arg0 + 0x64, g);
+    fn_801455E0(sp8, arg0 + 0x64);
     g = *(u8**)(lbl_803C4298 + 4);
     *(f32*)(g + 0xF0) = sp8[0];
     *(f32*)(g + 0xF4) = sp8[1];

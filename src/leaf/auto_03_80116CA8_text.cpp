@@ -5,15 +5,14 @@
 
 #include "types.h"
 
-extern "C" void fn_80116F08(void);
+extern "C" void fn_80116F08(u8*);
 
 // 0x80116EF0
 extern "C" void fn_80116EF0(u8* a3, s32 a4) {
-    // tail-call arguments inferred from the registers set before the call
     s32 t0 = *(s32*)(((u8*)(uintptr_t)(a3)) + 28);
     if ((s32)(u32)(uintptr_t)(a4) > (s32)(u32)(t0)) {
         return;
     }
     *(u32*)(((u8*)(uintptr_t)(a3)) + 32) = (u32)((u32)(uintptr_t)(a4));
-    fn_80116F08();
+    fn_80116F08(((u8*)(uintptr_t)(a3)));
 }

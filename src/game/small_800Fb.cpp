@@ -35,7 +35,7 @@ void  fn_8004504C(void);                              // 0x8004504C
 f32   fn_801D8AD4(u8* p);                             // 0x801D8AD4
 void  fn_8010A374(void);                              // 0x8010A374
 void  fn_8010A28C(void);                              // 0x8010A28C
-void  fn_8010A578(void);                              // 0x8010A578
+void* fn_8010A578(s32 arg0);                              // 0x8010A578
 void  fn_802209D0(void (*cb)(void));                  // 0x802209D0
 void  fn_80220A1C(s32 a);                             // 0x80220A1C
 void  fn_80220A0C(s32 a);                             // 0x80220A0C
@@ -175,7 +175,7 @@ void SendSignalCombatExitLocation(void) {
 void InitNetwork(void) {
     fn_8010A374();
     fn_8010A28C();
-    fn_802209D0(fn_8010A578);
+    fn_802209D0((void (*)(void))fn_8010A578);  // lint:ok callback ignores the pointer return
     fn_80220A1C(1);
     lbl_805FB974 = 1;
 }

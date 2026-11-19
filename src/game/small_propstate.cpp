@@ -26,3 +26,11 @@ void fn_80054AB4(u8* obj, f32* a, f32* b, s32 c, s32 d) {
     fn_801C4B90(obj, a, b, c, d, *(u8**)(*(u8**)obj + 4));
 }
 }
+
+extern "C" {
+void fn_8010C354(f32* out, u8* self, f32 t);  // 0x8010C354
+// 0x800C4490
+void fn_800C4490(f32* out, u8* a4, f32 t) {
+    fn_8010C354(out, a4 + 0xD8, t);
+}
+}

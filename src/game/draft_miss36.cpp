@@ -15,7 +15,7 @@ static const u32 kHashRecipes = 0x9C2C1CAF;   // "Recipes"
 extern "C" {
 u8*  fn_8006FBDC(void);
 void fn_800968C4(u8* p);                                           // 0x800968C4
-void fn_800EF70C(void);                                            // 0x800EF70C (stored as a callback only)
+s32 fn_800EF70C(u8* arg0);                                            // 0x800EF70C (stored as a callback only)
 void    fn_801B6878(void* a0, u32 a1, s32 a2, s32 a3);                        // 0x801B6878
 void fn_801B72A0(void* anim, void* child);                         // 0x801B72A0
 void fn_801E8D74(void* out, void* list, void* owner, void* anim);  // 0x801E8D74

@@ -9,13 +9,13 @@ extern "C" {
 extern u8  lbl_805FB248[];                // 0x805FB248 (lab books section table pointer)
 extern u8  lbl_805FBBE0[];                // 0x805FBBE0 (save block pointer)
 
-s32  fn_8011726C(u8* creatures, s32 a);   // 0x8011726C
+void fn_8011726C(u8* arg0, s32 arg1);   // 0x8011726C
 u8*  fn_80118C24(u8* ingredients);        // 0x80118C24 (selected ingredient entry or NULL)
 s32  fn_80118C54(u8* p, s32 a, s32 b);    // 0x80118C54
 void fn_80118E88(u8* p, s32 a, s32 b);    // 0x80118E88
 void fn_80119810(u8* entry);              // 0x80119810
 void fn_80119858(u8* entry);              // 0x80119858
-s32  fn_801198A0(s32 a, u32 b);           // 0x801198A0
+void fn_801198A0(s32 a, u32 b);           // 0x801198A0
 s32  fn_80119FF4(void);                   // 0x80119FF4 (selected entry index)
 BOOL fn_8011C214(u8* p);                  // 0x8011C214
 u8*  fn_80120390(u8* recipes);            // 0x80120390

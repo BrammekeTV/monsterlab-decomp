@@ -21,7 +21,7 @@ void  fn_800ECCCC(void* a0, u32 a1, void* a2, void* a3, s32 a4, s32 a5, f32 a6);
 u32   fn_801EC880(u8* p, u32 hash);                                 // 0x801EC880
 void  fn_801EE078(void* params, u8* path, s32 a);                   // 0x801EE078
 s32   fn_801098DC(s32 a0);                                          // 0x801098DC
-s32   fn_80109A0C(void);                                            // 0x80109A0C
+s32   fn_80109A0C(s32 id);                                            // 0x80109A0C
 u8*   fn_801B6E74(u8* a3);                                          // 0x801B6E74
 }
 
@@ -134,7 +134,7 @@ void QuestCounterCleanUp(void) {
         *(void**)(st + 0x8) = NULL;
     }
     if (*(s32*)(st + 0xC) != 0) {
-        if (fn_80109A0C() == 0) {
+        if (fn_80109A0C(*(s32*)(st + 0xC)) == 0) {
             fn_801098DC(*(s32*)(st + 0xC));
         }
         *(s32*)(st + 0xC) = 0;
