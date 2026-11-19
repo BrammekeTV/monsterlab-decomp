@@ -20,7 +20,7 @@ extern u8 gScriptSigs[];          // script signature table, 0x34 bytes per entr
 extern "C" {
 void   BufferFree(void* p);
 void*  MemAllocDefault(u32 size);
-void   fn_8019600C(void* gx);                         // 0x8019600C
+s32    fn_8019600C(void* gx);                         // 0x8019600C
 void   fn_801960E4(void* gx);                         // 0x801960E4, result unused by caller
 void   fn_801985BC(void* set, s32 pass);              // 0x801985BC, result unused by caller
 void   fn_8019BFF8(void* obj, void* cb, void* arg);   // 0x8019BFF8

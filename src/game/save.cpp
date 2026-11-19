@@ -17,7 +17,7 @@
 extern "C" {
 s32   NANDCheck(u32 fsBlock, u32 inode, u32* answer);       // 0x80268194
 void  SaveSetParams(void* state, void* params);              // 0x80206AA0
-void  SaveSetBanner(const char* title, const char* sub, s32* out);   // 0x80206AA4
+s32   SaveSetBanner(const char* title, const char* sub, s32* out);   // 0x80206AA4
 s32   SaveOpen(const char* name, const char* mode);          // 0x80206474
 s32   SaveRead(s32 handle, void* buf, u32 size);             // 0x8020681C
 s32   SaveWriteData(s32 handle, const void* buf, u32 size);  // 0x8020690C

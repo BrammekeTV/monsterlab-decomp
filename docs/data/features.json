@@ -94,6 +94,11 @@
  "changelog": [
   {
    "date": "2026-11-19",
+   "time": "14:34",
+   "text": "Fifteenth round from the missing-symbols list: 42 more functions, including the options music, sound effect and voice volume setters, waypoint goals and path speed, camera setters, entity facing and position callbacks, save banner, splash screen setup, movie playback, strike sounds, injured and sustained animations and positional camera shake."
+  },
+  {
+   "date": "2026-11-19",
    "time": "14:18",
    "text": "Fourteenth round from the missing-symbols list: 51 more functions, including the save manager (can load or save, load data, select first empty slot), save read, write and setup, the quest log and recipe list queries, part action attack and defense checks, enhancement and secondary ingredient names, reactor leak callbacks and the sound queue."
   },

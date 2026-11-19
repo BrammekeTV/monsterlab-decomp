@@ -19,7 +19,7 @@ u32    fn_8019552C(u8* list, s32 index);                     // 0x8019552C (leaf
 s32    fn_8019555C(u8* list);                                // 0x8019555C (leaf)
 void   fn_80195564(u8* list, void* item);                     // 0x80195564 (list append)
 void   fn_80195570(u8* list, s32 index);                     // 0x80195570 (list remove)
-void   fn_8019600C(void* gx);                                // 0x8019600C
+s32    fn_8019600C(void* gx);                                // 0x8019600C
 void   fn_80196678(void* gx, void* p, f32 t);                // 0x80196678
 s32    fn_80196B10(u8* a3);                                  // 0x80196B10 (leaf)
 s32 fn_8019B6CC(u8* arg0, f32 farg0);                        // 0x8019B6CC (UI element base update)

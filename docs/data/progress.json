@@ -1,15 +1,15 @@
 {
  "game_id": "RM7P4F",
- "generated": "2026-11-19T13:18:29+00:00",
- "commit": "3eec86d",
- "commit_date": "2026-11-19T14:08:35+01:00",
+ "generated": "2026-11-19T13:34:43+00:00",
+ "commit": "6f18a24",
+ "commit_date": "2026-11-19T14:18:36+01:00",
  "game": {
   "functions": 8548,
   "bytes": 2265988,
   "named": 2748,
   "named_bytes": 616800,
-  "decompiled": 5221,
-  "decompiled_bytes": 647208
+  "decompiled": 5263,
+  "decompiled_bytes": 655316
  },
  "library": {
   "functions": 4039,
@@ -24,8 +24,8 @@
   "bytes": 3404928,
   "named": 3211,
   "named_bytes": 721548,
-  "decompiled": 5222,
-  "decompiled_bytes": 647328
+  "decompiled": 5264,
+  "decompiled_bytes": 655436
  },
  "game_range": [
   "80006B40",
@@ -73,7 +73,7 @@
    0.858
   ],
   [
-   0.705,
+   0.711,
    0.665
   ],
   [
@@ -81,7 +81,7 @@
    0.645
   ],
   [
-   0.557,
+   0.582,
    0.059
   ],
   [
@@ -137,7 +137,7 @@
    0.006
   ],
   [
-   0.096,
+   0.111,
    0.019
   ],
   [
@@ -153,7 +153,7 @@
    0.687
   ],
   [
-   0.502,
+   0.517,
    0.736
   ],
   [
@@ -189,7 +189,7 @@
    0.13
   ],
   [
-   0.245,
+   0.267,
    0.324
   ],
   [
@@ -417,7 +417,7 @@
    0.099
   ],
   [
-   0.163,
+   0.227,
    0.201
   ],
   [
@@ -445,11 +445,11 @@
    0.142
   ],
   [
-   0.199,
+   0.235,
    0.155
   ],
   [
-   0.378,
+   0.419,
    1.0
   ],
   [
@@ -473,7 +473,7 @@
    0.931
   ],
   [
-   0.529,
+   0.683,
    0.99
   ],
   [
@@ -481,11 +481,11 @@
    1.0
   ],
   [
-   0.463,
+   0.617,
    0.929
   ],
   [
-   0.961,
+   0.965,
    0.992
   ],
   [
@@ -501,7 +501,7 @@
    1.0
   ],
   [
-   0.993,
+   1.0,
    1.0
   ],
   [
@@ -601,15 +601,15 @@
    0.0
   ],
   [
-   0.456,
+   0.478,
    0.54
   ],
   [
-   0.77,
+   0.776,
    0.952
   ],
   [
-   0.485,
+   0.505,
    0.676
   ],
   [
@@ -689,7 +689,7 @@
    0.0
   ],
   [
-   0.103,
+   0.111,
    0.022
   ],
   [
@@ -709,7 +709,7 @@
    0.0
   ],
   [
-   0.05,
+   0.105,
    0.071
   ],
   [
@@ -769,7 +769,7 @@
    1.0
   ],
   [
-   0.104,
+   0.126,
    0.399
   ],
   [
@@ -829,11 +829,11 @@
    0.094
   ],
   [
-   0.236,
+   0.302,
    0.103
   ],
   [
-   0.265,
+   0.381,
    0.241
   ],
   [
@@ -941,7 +941,7 @@
    0.478
   ],
   [
-   0.247,
+   0.266,
    0.292
   ],
   [
@@ -977,7 +977,7 @@
    0.178
   ],
   [
-   0.154,
+   0.18,
    0.234
   ],
   [
@@ -1053,7 +1053,7 @@
    0.149
   ],
   [
-   0.214,
+   0.221,
    0.056
   ]
  ],
@@ -8244,6 +8244,231 @@
      "name": "fn_8020A474",
      "addr": "8020A474",
      "size": 296
+    }
+   ]
+  },
+  {
+   "path": "src/game/draft_miss40.cpp",
+   "functions": [
+    {
+     "name": "SetCurrentMonster",
+     "addr": "8001CDB0",
+     "size": 52
+    },
+    {
+     "name": "SetEnemyTutorialAction",
+     "addr": "800489D4",
+     "size": 172
+    },
+    {
+     "name": "SetChallengeProjectorsForNIS",
+     "addr": "800F927C",
+     "size": 52
+    },
+    {
+     "name": "SetEntityFacing",
+     "addr": "800FB66C",
+     "size": 128
+    },
+    {
+     "name": "SendMatchupRequest",
+     "addr": "8013BB68",
+     "size": 196
+    },
+    {
+     "name": "SendMonsterChangePacket",
+     "addr": "8013DD1C",
+     "size": 52
+    },
+    {
+     "name": "SetCurrentMPMonster",
+     "addr": "8013EA98",
+     "size": 68
+    },
+    {
+     "name": "SendRematchDeclined",
+     "addr": "8013FDBC",
+     "size": 48
+    },
+    {
+     "name": "SendTimeIsUp",
+     "addr": "8013FDF8",
+     "size": 48
+    },
+    {
+     "name": "fn_8019600C",
+     "addr": "8019600C",
+     "size": 216
+    },
+    {
+     "name": "SetEntityPositionCallback",
+     "addr": "801B85B8",
+     "size": 160
+    },
+    {
+     "name": "SetEntityOrientationCallback",
+     "addr": "801B8658",
+     "size": 168
+    },
+    {
+     "name": "SaveSetBanner",
+     "addr": "80206AA4",
+     "size": 200
+    },
+    {
+     "name": "fn_8022ED60",
+     "addr": "8022ED60",
+     "size": 56
+    }
+   ]
+  },
+  {
+   "path": "src/game/draft_miss41.cpp",
+   "functions": [
+    {
+     "name": "SetFinalChallengeScore",
+     "addr": "80022610",
+     "size": 224
+    },
+    {
+     "name": "SetNextCombatType",
+     "addr": "8003F75C",
+     "size": 128
+    },
+    {
+     "name": "SetKnockbackSpeed",
+     "addr": "8005C664",
+     "size": 192
+    },
+    {
+     "name": "SetFixedCamera",
+     "addr": "800F6068",
+     "size": 204
+    },
+    {
+     "name": "SetNormalCamera",
+     "addr": "800F63F4",
+     "size": 192
+    },
+    {
+     "name": "SetupSplashScreen",
+     "addr": "800FA860",
+     "size": 152
+    },
+    {
+     "name": "SetOptionsMusicVolumeTmp",
+     "addr": "800FAA14",
+     "size": 136
+    },
+    {
+     "name": "SetOptionsMusicVolume",
+     "addr": "800FAA9C",
+     "size": 156
+    },
+    {
+     "name": "SetOptionsSfxVolumeTmp",
+     "addr": "800FAC00",
+     "size": 80
+    },
+    {
+     "name": "SetOptionsSfxVolume",
+     "addr": "800FAC50",
+     "size": 100
+    },
+    {
+     "name": "SetOptionsVoiceVolumeTmp",
+     "addr": "800FAD44",
+     "size": 136
+    },
+    {
+     "name": "SetOptionsVoiceVolume",
+     "addr": "800FADCC",
+     "size": 156
+    },
+    {
+     "name": "SetPersistentWaypointGoal",
+     "addr": "80103920",
+     "size": 44
+    },
+    {
+     "name": "SetWaypointGoal",
+     "addr": "80103978",
+     "size": 44
+    },
+    {
+     "name": "SetMyMonsterName",
+     "addr": "8013E764",
+     "size": 16
+    },
+    {
+     "name": "SgShutdown",
+     "addr": "80169604",
+     "size": 72
+    },
+    {
+     "name": "SetRenderFlag",
+     "addr": "801B6DB0",
+     "size": 196
+    },
+    {
+     "name": "SetWaypointPathSpeed",
+     "addr": "801B8A68",
+     "size": 212
+    },
+    {
+     "name": "ShaderStopBouncingOverlayAlpha",
+     "addr": "801F248C",
+     "size": 160
+    }
+   ]
+  },
+  {
+   "path": "src/game/draft_miss43.cpp",
+   "functions": [
+    {
+     "name": "PathFindToward",
+     "addr": "800D6534",
+     "size": 552
+    },
+    {
+     "name": "PlayMovie",
+     "addr": "800E76D0",
+     "size": 320
+    },
+    {
+     "name": "PositionalCameraShake",
+     "addr": "800E7B34",
+     "size": 364
+    },
+    {
+     "name": "PlayUnattachedParticleEffectAtEmitter",
+     "addr": "800F4B94",
+     "size": 264
+    },
+    {
+     "name": "PlayStrikeSoundFX",
+     "addr": "800F4FFC",
+     "size": 664
+    },
+    {
+     "name": "PlayInjuredAnimation",
+     "addr": "800F9550",
+     "size": 332
+    },
+    {
+     "name": "ParticleEmitterUpdate",
+     "addr": "80174DF4",
+     "size": 508
+    },
+    {
+     "name": "fn_801B6878",
+     "addr": "801B6878",
+     "size": 384
+    },
+    {
+     "name": "PauseFollowingWaypointPath",
+     "addr": "801B8B3C",
+     "size": 504
     }
    ]
   },
