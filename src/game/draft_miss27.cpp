@@ -35,10 +35,10 @@ void   fn_8000B7A8(u8* p, s32 a, s32 b);                                 // 0x80
 s32    fn_8001D104(u8* mgr);                                             // 0x8001D104
 void   fn_8001D718(u8* mgr, s32 index, u8* slot);                        // 0x8001D718
 void   fn_8004D760(u8* c, u8* monster);                                  // 0x8004D760
-s32    fn_8004DAF8(void* c, s32 a, s32 b);                               // 0x8004DAF8
+void*  fn_8004DAF8(void* c, s32 a, s32 b);                               // 0x8004DAF8
 void   fn_80145F9C(f32* out, f32* a, f32* b, f32 t);                     // 0x80145F9C (quaternion slerp)
 BOOL   fn_80198C34(void* set, void* w);                                  // 0x80198C34
-void   fn_80198A8C(void* set, void* widget);                             // 0x80198A8C
+s32    fn_80198A8C(void* set, void* widget);                             // 0x80198A8C
 void   fn_801B8DDC(void* a0, f32* from, u8* a2, s32 a3, u8* color, s32 a5, f32 f); // 0x801B8DDC
 u8*    fn_801C6BCC(u8* key);                                             // 0x801C6BCC
 void   fn_801C6C80(u8* out, u8* rec, u8* color, s32 a);                  // 0x801C6C80

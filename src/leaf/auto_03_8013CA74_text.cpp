@@ -12,13 +12,13 @@ extern u8 lbl_805FB3A0[];
 extern u8 lbl_805FB3A4[];
 extern u8 lbl_805FB3A8[];
 extern u8 lbl_805FB3AC[];
-extern u8 lbl_805FB3B3[];
-extern u8 lbl_805FB3B5[];
-extern u8 lbl_805FB3B8[];
+extern u8 lbl_805FB3B3;
+extern u8 lbl_805FB3B5;
+extern s32 lbl_805FB3B8;
 extern u8 lbl_805FB3C4[];
-extern u8 lbl_805FB3CC[];
-extern u8 lbl_805FB3DC[];
-extern u8 lbl_805FB3DD[];
+extern s32 lbl_805FB3CC;
+extern u8 lbl_805FB3DC;
+extern u8 lbl_805FB3DD;
 
 // 0x8013E3D0
 extern "C" void fn_8013E3D0(f32 f1) {

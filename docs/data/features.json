@@ -94,6 +94,11 @@
  "changelog": [
   {
    "date": "2026-11-19",
+   "time": "14:55",
+   "text": "Twelfth round from the missing-symbols list: 50 more functions, including the matchup screen (accept, cancel, show monster and status), multiplayer and single-player name entry, music play, the mystic brew ghost and power-up hide positions, memory alloc and free, mesh overlay fades, level and experiment loading, monster select, and the lightning tower charge checks."
+  },
+  {
+   "date": "2026-11-19",
    "time": "14:20",
    "text": "Eleventh round from the missing-symbols list: 74 more functions, including the lab tutorial callbacks (part selection, monster completeness checks, tutorial text), the options volume and brightness steppers, inventory part names, costs, enhancements and defects, FSM bit and float setters, interpolation tasks (lerp, slerp, waypoint), the battery string and the key and entity kill callbacks."
   },

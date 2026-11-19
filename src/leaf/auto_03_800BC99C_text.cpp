@@ -6,7 +6,7 @@
 #include "types.h"
 
 extern void* gEventMgr;
-extern u8 lbl_805FE280[];
+extern f32 lbl_805FE280;
 extern "C" void EventSend(void*, void*, void*, u32, int, int, int, int);
 
 // 0x800BCC10

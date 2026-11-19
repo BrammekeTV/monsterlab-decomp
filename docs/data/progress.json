@@ -1,15 +1,15 @@
 {
  "game_id": "RM7P4F",
- "generated": "2026-11-19T12:10:09+00:00",
- "commit": "2e7ce88",
- "commit_date": "2026-11-19T12:58:29+01:00",
+ "generated": "2026-11-19T12:24:29+00:00",
+ "commit": "a08a163",
+ "commit_date": "2026-11-19T13:10:10+01:00",
  "game": {
   "functions": 8548,
   "bytes": 2265988,
   "named": 2748,
   "named_bytes": 616800,
-  "decompiled": 5054,
-  "decompiled_bytes": 613556
+  "decompiled": 5115,
+  "decompiled_bytes": 627508
  },
  "library": {
   "functions": 4039,
@@ -24,8 +24,8 @@
   "bytes": 3404928,
   "named": 3211,
   "named_bytes": 721548,
-  "decompiled": 5055,
-  "decompiled_bytes": 613676
+  "decompiled": 5116,
+  "decompiled_bytes": 627628
  },
  "game_range": [
   "80006B40",
@@ -41,7 +41,7 @@
    0.0
   ],
   [
-   0.512,
+   0.536,
    0.435
   ],
   [
@@ -69,11 +69,11 @@
    0.921
   ],
   [
-   0.369,
+   0.384,
    0.858
   ],
   [
-   0.534,
+   0.643,
    0.665
   ],
   [
@@ -113,7 +113,7 @@
    0.061
   ],
   [
-   0.094,
+   0.099,
    0.014
   ],
   [
@@ -161,7 +161,7 @@
    0.101
   ],
   [
-   0.281,
+   0.338,
    0.13
   ],
   [
@@ -193,7 +193,7 @@
    0.324
   ],
   [
-   0.005,
+   0.025,
    0.0
   ],
   [
@@ -233,11 +233,11 @@
    0.725
   ],
   [
-   0.132,
+   0.144,
    0.312
   ],
   [
-   0.175,
+   0.204,
    0.115
   ],
   [
@@ -341,7 +341,7 @@
    0.139
   ],
   [
-   0.309,
+   0.313,
    0.31
   ],
   [
@@ -369,11 +369,11 @@
    0.0
   ],
   [
-   0.021,
+   0.086,
    0.069
   ],
   [
-   0.01,
+   0.028,
    0.018
   ],
   [
@@ -457,7 +457,7 @@
    0.843
   ],
   [
-   0.205,
+   0.207,
    0.541
   ],
   [
@@ -469,7 +469,7 @@
    0.957
   ],
   [
-   0.174,
+   0.284,
    0.931
   ],
   [
@@ -477,7 +477,7 @@
    0.99
   ],
   [
-   0.331,
+   0.365,
    1.0
   ],
   [
@@ -497,7 +497,7 @@
    0.0
   ],
   [
-   0.775,
+   0.832,
    1.0
   ],
   [
@@ -505,7 +505,7 @@
    1.0
   ],
   [
-   0.8,
+   0.849,
    0.883
   ],
   [
@@ -541,7 +541,7 @@
    0.0
   ],
   [
-   0.185,
+   0.213,
    0.0
   ],
   [
@@ -553,7 +553,7 @@
    0.0
   ],
   [
-   0.195,
+   0.222,
    0.11
   ],
   [
@@ -601,19 +601,19 @@
    0.0
   ],
   [
-   0.378,
+   0.422,
    0.54
   ],
   [
-   0.64,
+   0.77,
    0.952
   ],
   [
-   0.165,
+   0.425,
    0.676
   ],
   [
-   0.834,
+   0.856,
    0.834
   ],
   [
@@ -777,7 +777,7 @@
    0.0
   ],
   [
-   0.213,
+   0.261,
    0.02
   ],
   [
@@ -861,7 +861,7 @@
    0.0
   ],
   [
-   0.171,
+   0.193,
    0.088
   ],
   [
@@ -885,11 +885,11 @@
    0.168
   ],
   [
-   0.152,
+   0.233,
    0.477
   ],
   [
-   0.227,
+   0.278,
    0.141
   ],
   [
@@ -905,11 +905,11 @@
    0.916
   ],
   [
-   0.843,
+   0.856,
    0.864
   ],
   [
-   0.776,
+   0.787,
    0.749
   ],
   [
@@ -929,11 +929,11 @@
    0.302
   ],
   [
-   0.18,
+   0.229,
    0.068
   ],
   [
-   0.199,
+   0.223,
    0.068
   ],
   [
@@ -941,7 +941,7 @@
    0.478
   ],
   [
-   0.106,
+   0.247,
    0.292
   ],
   [
@@ -985,7 +985,7 @@
    0.0
   ],
   [
-   0.242,
+   0.267,
    0.377
   ],
   [
@@ -993,7 +993,7 @@
    0.0
   ],
   [
-   0.302,
+   0.363,
    0.096
   ],
   [
@@ -7138,6 +7138,211 @@
    ]
   },
   {
+   "path": "src/game/draft_miss28.cpp",
+   "functions": [
+    {
+     "name": "fn_8000B7A8",
+     "addr": "8000B7A8",
+     "size": 216
+    },
+    {
+     "name": "Loading_SetHomeButtonGone",
+     "addr": "8000E248",
+     "size": 12
+    },
+    {
+     "name": "LightningTowerChargeMonster",
+     "addr": "8001BEF0",
+     "size": 136
+    },
+    {
+     "name": "LightningMonsterCharged",
+     "addr": "8001DCEC",
+     "size": 180
+    },
+    {
+     "name": "fn_8005F204",
+     "addr": "8005F204",
+     "size": 168
+    },
+    {
+     "name": "LoadExperiment",
+     "addr": "80074C10",
+     "size": 40
+    },
+    {
+     "name": "GrowJuiceTentacle_HeadPlayAnimation",
+     "addr": "800AEBDC",
+     "size": 40
+    },
+    {
+     "name": "IsDead",
+     "addr": "800EBE2C",
+     "size": 16
+    },
+    {
+     "name": "LoadingAnimCreate",
+     "addr": "80120FD8",
+     "size": 236
+    },
+    {
+     "name": "MPNameAddLetter",
+     "addr": "8013ECD4",
+     "size": 152
+    },
+    {
+     "name": "LeaveInterlabLink",
+     "addr": "80140700",
+     "size": 192
+    },
+    {
+     "name": "fn_801C6BCC",
+     "addr": "801C6BCC",
+     "size": 180
+    },
+    {
+     "name": "Log",
+     "addr": "801DDDB0",
+     "size": 28
+    },
+    {
+     "name": "fn_801DFEA8",
+     "addr": "801DFEA8",
+     "size": 88
+    },
+    {
+     "name": "fn_801DFF74",
+     "addr": "801DFF74",
+     "size": 40
+    },
+    {
+     "name": "fn_801DFFCC",
+     "addr": "801DFFCC",
+     "size": 56
+    },
+    {
+     "name": "fn_801ED554",
+     "addr": "801ED554",
+     "size": 208
+    },
+    {
+     "name": "fn_8020ECB0",
+     "addr": "8020ECB0",
+     "size": 252
+    },
+    {
+     "name": "ListenerStart",
+     "addr": "8020F27C",
+     "size": 20
+    }
+   ]
+  },
+  {
+   "path": "src/game/draft_miss29.cpp",
+   "functions": [
+    {
+     "name": "NameAddLetter",
+     "addr": "8001D2D0",
+     "size": 116
+    },
+    {
+     "name": "NameAddSpace",
+     "addr": "8001D344",
+     "size": 120
+    },
+    {
+     "name": "NameDelLetter",
+     "addr": "8001D3BC",
+     "size": 56
+    },
+    {
+     "name": "MonsterFeelSuccess",
+     "addr": "800320F8",
+     "size": 44
+    },
+    {
+     "name": "ModifyScore",
+     "addr": "80075590",
+     "size": 240
+    },
+    {
+     "name": "MysticBrewGhost_PositionToHide",
+     "addr": "800BD490",
+     "size": 200
+    },
+    {
+     "name": "MysticBrewGhost_FireProjectile",
+     "addr": "800BD558",
+     "size": 236
+    },
+    {
+     "name": "MysticBrewPowerUp_PositionToHide",
+     "addr": "800BE000",
+     "size": 148
+    },
+    {
+     "name": "MysticBrewProjectile_PositionToHide",
+     "addr": "800BF218",
+     "size": 148
+    },
+    {
+     "name": "MoveEntityToLocator",
+     "addr": "800F8290",
+     "size": 180
+    },
+    {
+     "name": "MultiplayerCleanup",
+     "addr": "8013BD7C",
+     "size": 144
+    },
+    {
+     "name": "MatchupShowStatus",
+     "addr": "8013DC54",
+     "size": 200
+    },
+    {
+     "name": "MatchupAcceptFight",
+     "addr": "8013DD50",
+     "size": 48
+    },
+    {
+     "name": "MatchupCancel",
+     "addr": "8013DD80",
+     "size": 52
+    },
+    {
+     "name": "MatchupShowMyMonster",
+     "addr": "8013DDB4",
+     "size": 200
+    },
+    {
+     "name": "MPNameDeleteLetter",
+     "addr": "8013ED6C",
+     "size": 144
+    },
+    {
+     "name": "MPNameAddSpace",
+     "addr": "8013EF74",
+     "size": 160
+    },
+    {
+     "name": "MeshStopBouncingOverlayAlpha",
+     "addr": "801F28C8",
+     "size": 188
+    },
+    {
+     "name": "MusicPlay",
+     "addr": "8020AA94",
+     "size": 200
+    },
+    {
+     "name": "MonsterCopyName",
+     "addr": "8020EBB8",
+     "size": 248
+    }
+   ]
+  },
+  {
    "path": "src/game/draft_miss3.cpp",
    "functions": [
     {
@@ -7234,6 +7439,131 @@
      "name": "BattleLogAdd",
      "addr": "802207A0",
      "size": 96
+    }
+   ]
+  },
+  {
+   "path": "src/game/draft_miss30.cpp",
+   "functions": [
+    {
+     "name": "OnExperimentFadeIn",
+     "addr": "800743A8",
+     "size": 44
+    },
+    {
+     "name": "PartAction1GetTarget1",
+     "addr": "800F2EA4",
+     "size": 252
+    },
+    {
+     "name": "PartAction1GetTarget2",
+     "addr": "800F2FA0",
+     "size": 244
+    },
+    {
+     "name": "PartAction2GetTarget1",
+     "addr": "800F3AF4",
+     "size": 252
+    },
+    {
+     "name": "PartAction2GetTarget2",
+     "addr": "800F3BF0",
+     "size": 252
+    },
+    {
+     "name": "OnRocketImpact",
+     "addr": "800F8824",
+     "size": 136
+    },
+    {
+     "name": "OrientBoneToTarget",
+     "addr": "8010375C",
+     "size": 44
+    }
+   ]
+  },
+  {
+   "path": "src/game/draft_miss31.cpp",
+   "functions": [
+    {
+     "name": "fn_8001E508",
+     "addr": "8001E508",
+     "size": 488
+    },
+    {
+     "name": "fn_8004DAF8",
+     "addr": "8004DAF8",
+     "size": 500
+    },
+    {
+     "name": "LoadLevel",
+     "addr": "80107244",
+     "size": 408
+    },
+    {
+     "name": "fn_8011AEE8",
+     "addr": "8011AEE8",
+     "size": 260
+    },
+    {
+     "name": "LoginPoller",
+     "addr": "8013B9E8",
+     "size": 384
+    },
+    {
+     "name": "MatchupPreInit",
+     "addr": "8013CA74",
+     "size": 492
+    },
+    {
+     "name": "MonsterSelectInit",
+     "addr": "8013E4D0",
+     "size": 612
+    },
+    {
+     "name": "MonsterSelectUpdate",
+     "addr": "8013E898",
+     "size": 464
+    },
+    {
+     "name": "MPNameEntryUpdateCursor",
+     "addr": "8013EDFC",
+     "size": 368
+    },
+    {
+     "name": "LostOpponent",
+     "addr": "8013F8E4",
+     "size": 456
+    },
+    {
+     "name": "fn_80198A8C",
+     "addr": "80198A8C",
+     "size": 424
+    },
+    {
+     "name": "MemAlloc",
+     "addr": "801D4A90",
+     "size": 672
+    },
+    {
+     "name": "MemFree",
+     "addr": "801D52D0",
+     "size": 480
+    },
+    {
+     "name": "fn_801ECDE8",
+     "addr": "801ECDE8",
+     "size": 440
+    },
+    {
+     "name": "MeshStartBouncingOverlayAlpha",
+     "addr": "801F26A0",
+     "size": 552
+    },
+    {
+     "name": "MeshFadeToOverlayAlpha",
+     "addr": "801F2984",
+     "size": 408
     }
    ]
   },
@@ -7919,11 +8249,6 @@
      "name": "GameCancelMode1",
      "addr": "8000D964",
      "size": 136
-    },
-    {
-     "name": "Loading_SetHomeButtonGone",
-     "addr": "8000E248",
-     "size": 12
     },
     {
      "name": "LoadingScreenTick",

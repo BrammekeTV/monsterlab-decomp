@@ -575,7 +575,7 @@ void GrowJuiceSeed_PositionToHide(void* a0);                           // src/ga
 s32 GrowJuiceTentacle_CheckHitPlayer(void* a0);                        // src/game/draft_miss23.cpp
 void GrowJuiceTentacle_ClearStageTimeout(void* a3);                    // src/leaf/auto_03_800AD844_text_cb.cpp
 void GrowJuiceTentacle_GoBerserk(void* a0);                            // src/game/draft_miss22.cpp
-void GrowJuiceTentacle_HeadPlayAnimation(void* a0, u32 a1);  // type 0x42 (from signature table)
+void GrowJuiceTentacle_HeadPlayAnimation(void* a0, u32 a1);            // src/game/draft_miss28.cpp
 void GrowJuiceTentacle_HitHeart(void* a0);                             // src/game/draft_miss22.cpp
 void GrowJuiceTentacle_HitPlayer(void* a0);                            // src/game/draft_miss22.cpp
 void GrowJuiceTentacle_RecoverFromBerserk(void* a0);                   // src/game/draft_miss24.cpp
@@ -682,7 +682,7 @@ u32 IsCurrentLevel(u32 a3);                                            // src/le
 BOOL IsCurrentLevelLoaded(u32 a0);                                     // src/game/small_800Fc.cpp
 s32 IsCurrentLocation(u32 loc);                                        // src/game/player_api.cpp
 u32 IsCurrentTutorialConversation(s32 a3);                             // src/leaf/auto_03_800FB958_text_cb.cpp
-s32 IsDead(void* a0);  // type 0x16 (from signature table)
+s32 IsDead(void* a0);                                                  // src/game/draft_miss28.cpp
 u32 IsDifficultyLevel(s32 a0);                                         // src/game/small_800Eb.cpp
 s32 IsEntityInstance(void* a3, void* a4);                              // src/leaf/auto_03_800E75B0_text_cb.cpp
 s32 IsEntityOfSubtype(void* a3, u32 a4);                               // src/leaf/auto_03_800E75B0_text_cb.cpp
@@ -790,7 +790,7 @@ void LabBooks_Ingredients_RenderList_SetSelectedItem(BOOL a0);         // src/ga
 s32 LabBooks_Ingredients_ShowIngredientFilters(void);                  // src/game/lab_books_a.cpp
 void LabBooks_SetCurrentScience(u32 a0);                               // src/game/draft_8011b.cpp
 void LabBooks_UpdateLabBooks(void);                                    // src/game/draft_8011b.cpp
-ScriptValue LeaveInterlabLink(void);  // type 0x2E (from signature table)
+ScriptValue LeaveInterlabLink(void);                                   // src/game/draft_miss28.cpp
 void Level_AddToFloat(u32 a3, f32 f1);                                 // src/leaf/auto_03_80106AA8_text_cb.cpp
 void Level_AddToInt(u32 a3, s32 a4);                                   // src/leaf/auto_03_80106AA8_text_cb.cpp
 s32 Level_GetBit(u32 a3);                                              // src/leaf/auto_03_80106AA8_text_cb.cpp
@@ -805,8 +805,8 @@ void Level_SetInt(u32 a3, s32 a4);                                     // src/le
 s32 LighthingTowerGetSelectingPart(void);                              // src/leaf/auto_03_8001B20C_text_cb.cpp
 s32 LightningGetInventoryPartID(void);                                 // src/game/draft_miss5.cpp
 s32 LightningGetInventoryPos(void);                                    // src/game/draft_miss5.cpp
-s32 LightningMonsterCharged(void);  // type 0x22 (from signature table)
-void LightningTowerChargeMonster(u32 /*0x06*/ a0);  // type 0x67 (from signature table)
+s32 LightningMonsterCharged(void);                                     // src/game/draft_miss28.cpp
+void LightningTowerChargeMonster(u32 a0);                              // src/game/draft_miss28.cpp
 s32 LightningTowerGetOnOperatingTable(void);                           // src/leaf/auto_03_8001B20C_text_cb.cpp
 s32 LightningTowerGetSelectingMonster(void);                           // src/leaf/auto_03_8001B20C_text_cb.cpp
 void LightningTowerResetAnim(void);                                    // src/leaf/auto_03_8001B20C_text_cb.cpp
@@ -816,11 +816,11 @@ void LightningTowerShowMonster(u32 /*0x06*/ a0);  // type 0x67 (from signature t
 void LineTimestamp(BOOL a0);                                           // src/engine/small_8014c.cpp
 void LoadChallengeUI(void);                                            // src/leaf/auto_03_800E75B0_text_cb.cpp
 void LoadDefaultLevel(void);                                           // src/game/draft_miss27.cpp
-void LoadExperiment(void);  // type 0x8F (from signature table)
+void LoadExperiment(void);                                             // src/game/draft_miss28.cpp
 void LoadExperimentUI(s32 a3);                                         // src/leaf/auto_03_800747DC_text_cb.cpp
 void LoadInventoryMonster(void);                                       // src/game/draft_miss27.cpp
-void LoadLevel(u32 a0);  // type 0x71 (from signature table)
-void Loading_SetHomeButtonGone(void);  // type 0x8F (from signature table)
+void LoadLevel(u32 a0);                                                // src/game/draft_miss31.cpp
+void Loading_SetHomeButtonGone(void);                                  // src/game/draft_miss28.cpp
 void LobShot(void* a0, u32 /*0x30*/ a1, u32 /*0x38*/ a2, f32 a3, f32 a4);  // type 0xFA (from signature table)
 void LobWarningShot(void* a0, u32 /*0x30*/ a1, u32 /*0x38*/ a2, f32 a3, f32 a4);  // type 0xFA (from signature table)
 void LockCameraToEntity(u32 a0);                                       // src/game/small_800Fb.cpp
@@ -829,68 +829,68 @@ void LockInput(s32 a3);                                                // src/le
 void LockJunctionPath(u32 a0, BOOL a1, u32 a2);                        // src/game/draft_800F.cpp
 void LockPartSelected(void);                                           // src/game/small_8004b.cpp
 void LogAutoDelete(BOOL a0);                                           // src/engine/small_8014c.cpp
-void LoginPoller(void);  // type 0x8F (from signature table)
-void LostOpponent(void);  // type 0x8F (from signature table)
-void MPNameAddLetter(s32 a0);  // type 0x83 (from signature table)
-void MPNameAddSpace(void);  // type 0x8F (from signature table)
-void MPNameDeleteLetter(void);  // type 0x8F (from signature table)
-void MPNameEntryUpdateCursor(void);  // type 0x8F (from signature table)
+void LoginPoller(void);                                                // src/game/draft_miss31.cpp
+void LostOpponent(void);                                               // src/game/draft_miss31.cpp
+void MPNameAddLetter(u8* a0);                                          // src/game/draft_miss28.cpp
+void MPNameAddSpace(void);                                             // src/game/draft_miss29.cpp
+void MPNameDeleteLetter(void);                                         // src/game/draft_miss29.cpp
+void MPNameEntryUpdateCursor(void);                                    // src/game/draft_miss31.cpp
 BOOL MPNameInput(void);                                                // src/leaf/auto_03_8013EB1C_text_cb.cpp
-void MatchupAcceptFight(void);  // type 0x8F (from signature table)
-void MatchupCancel(void);  // type 0x8F (from signature table)
+void MatchupAcceptFight(void);                                         // src/game/draft_miss29.cpp
+void MatchupCancel(void);                                              // src/game/draft_miss29.cpp
 void MatchupCleanup(void);                                             // src/game/draft_miss21.cpp
 void MatchupDeInit(void);                                              // src/game/small_8013.cpp
 void MatchupInit(void);  // type 0x8F (from signature table)
-void MatchupPreInit(void);  // type 0x8F (from signature table)
-void MatchupShowMyMonster(void);  // type 0x8F (from signature table)
+void MatchupPreInit(void);                                             // src/game/draft_miss31.cpp
+void MatchupShowMyMonster(void);                                       // src/game/draft_miss29.cpp
 BOOL MatchupTimerIsUp(void);                                           // src/leaf/auto_03_8013F034_text_cb.cpp
 void MatchupUpdate(void);                                              // src/game/matchup.cpp
 void MegaChunkReceivedCallback(u32 a3);                                // src/leaf/auto_03_800E75B0_text_cb.cpp
 void MegaChunkSentCallback(u32 a3);                                    // src/leaf/auto_03_800E75B0_text_cb.cpp
-void ModifyScore(u32 a0, f32 a1);  // type 0x76 (from signature table)
+void ModifyScore(u32 a0, f32 a1);                                      // src/game/draft_miss29.cpp
 void MonsterSelectDeInit(void);                                        // src/leaf/auto_03_8013E4D0_text_cb.cpp
-void MonsterSelectInit(void);  // type 0x8F (from signature table)
-void MonsterSelectUpdate(void);  // type 0x8F (from signature table)
+void MonsterSelectInit(void);                                          // src/game/draft_miss31.cpp
+void MonsterSelectUpdate(void);                                        // src/game/draft_miss31.cpp
 void MoveCursorToContinueButtonPS2(void);                              // src/leaf/auto_03_800E75B0_text_cb.cpp
 void MoveEnemyToJunction(u32 a0, u32 a1);                              // src/game/small_800F.cpp
 void MoveEnemyToPlayer(u32 a0);                                        // src/game/small_800F.cpp
 void MoveEntityToLocation(u32 a0, f32 a1, f32 a2, f32 a3);  // type 0x77 (from signature table)
-void MoveEntityToLocator(u32 a0, u32 a1);  // type 0x7A (from signature table)
+void MoveEntityToLocator(u32 a0, u32 a1);                              // src/game/draft_miss29.cpp
 void MovePlayerDirection(BOOL a0);                                     // src/game/draft_800Fc.cpp
 void MultiCountAction(u32 a3, u32 a4, s32 a5);                         // src/leaf/auto_03_800FB958_text_cb.cpp
 void MultiPlayerInit(void);  // type 0x8F (from signature table)
-void MultiplayerCleanup(void);  // type 0x8F (from signature table)
+void MultiplayerCleanup(void);                                         // src/game/draft_miss29.cpp
 void MultiplayerLevelLoaded(void);                                     // src/leaf/auto_03_8013A03C_text_cb.cpp
-void MysticBrewGhost_FireProjectile(void* a0);  // type 0x2F (from signature table)
-void MysticBrewGhost_PositionToHide(void* a0);  // type 0x2F (from signature table)
+void MysticBrewGhost_FireProjectile(void* a0);                         // src/game/draft_miss29.cpp
+void MysticBrewGhost_PositionToHide(void* a0);                         // src/game/draft_miss29.cpp
 s32 MysticBrewPowerUp_IsShieldTypePowerUp(void* a3);                   // src/leaf/auto_03_800BD894_text_cb.cpp
-void MysticBrewPowerUp_PositionToHide(void* a0);  // type 0x2F (from signature table)
-void MysticBrewProjectile_PositionToHide(void* a0);  // type 0x2F (from signature table)
-void NameAddLetter(s32 a0);  // type 0x83 (from signature table)
-void NameAddSpace(void);  // type 0x8F (from signature table)
+void MysticBrewPowerUp_PositionToHide(void* a0);                       // src/game/draft_miss29.cpp
+void MysticBrewProjectile_PositionToHide(void* a0);                    // src/game/draft_miss29.cpp
+void NameAddLetter(const char* a0);                                    // src/game/draft_miss29.cpp
+void NameAddSpace(void);                                               // src/game/draft_miss29.cpp
 void NameClear(void);                                                  // src/leaf/auto_03_8001B20C_text_cb.cpp
-void NameDelLetter(void);  // type 0x8F (from signature table)
+void NameDelLetter(void);                                              // src/game/draft_miss29.cpp
 s32 NavTargetIsLeft(u32 a3);                                           // src/leaf/auto_03_800FB958_text_cb.cpp
 BOOL NotDebugging(void);                                               // src/leaf/auto_03_800505E0_text_cb.cpp
 BOOL NotStreamingMatchScreenParts(void);                               // src/game/small_8014.cpp
-void OnExperimentFadeIn(void);  // type 0x8F (from signature table)
-void OnRocketImpact(void* a0);  // type 0x2F (from signature table)
+void OnExperimentFadeIn(void);                                         // src/game/draft_miss30.cpp
+void OnRocketImpact(void* a0);                                         // src/game/draft_miss30.cpp
 BOOL OpponentCancelled(void);                                          // src/leaf/auto_03_8013F034_text_cb.cpp
 BOOL OpponentMatchupTimerIsUp(void);                                   // src/leaf/auto_03_8013F034_text_cb.cpp
 BOOL OpponentReadyForBattle(void);                                     // src/leaf/auto_03_8013F034_text_cb.cpp
-void OrientBoneToTarget(u32 /*0x2F*/ a0, u32 /*0x30*/ a1, f32 a2);  // type 0x116 (from signature table)
+void OrientBoneToTarget(u32 a0, s32* a1, f32 a2);                      // src/game/draft_miss30.cpp
 void PanCameraToEntity(u32 a3, f32 f1);                                // src/leaf/auto_03_800E75B0_text_cb.cpp
 void PanCameraToJunction(u32 a0, f32 a1);  // type 0x76 (from signature table)
 void PanCameraToPlayer(f32 f1);                                        // src/leaf/auto_03_800E75B0_text_cb.cpp
 ScriptValue PartAction1GetCost(s32 a0);  // type 0x28 (from signature table)
 s32 PartAction1GetIsTarget(s32 a0, s32 a1);  // type 0x20 (from signature table)
-s32 PartAction1GetTarget1(s32 a0);  // type 0x1F (from signature table)
-s32 PartAction1GetTarget2(s32 a0);  // type 0x1F (from signature table)
+s32 PartAction1GetTarget1(s32 a0);                                     // src/game/draft_miss30.cpp
+s32 PartAction1GetTarget2(s32 a0);                                     // src/game/draft_miss30.cpp
 ScriptValue PartAction1GetValue(s32 a0);  // type 0x28 (from signature table)
 ScriptValue PartAction2GetCost(s32 a0);  // type 0x28 (from signature table)
 s32 PartAction2GetIsTarget(s32 a0, s32 a1);  // type 0x20 (from signature table)
-s32 PartAction2GetTarget1(s32 a0);  // type 0x1F (from signature table)
-s32 PartAction2GetTarget2(s32 a0);  // type 0x1F (from signature table)
+s32 PartAction2GetTarget1(s32 a0);                                     // src/game/draft_miss30.cpp
+s32 PartAction2GetTarget2(s32 a0);                                     // src/game/draft_miss30.cpp
 ScriptValue PartAction2GetValue(s32 a0);  // type 0x28 (from signature table)
 ScriptValue PartGetEnhancementName(s32 a0);  // type 0x28 (from signature table)
 ScriptValue PartGetEnhancementTexture(s32 a0);                         // src/game/small_800Fc.cpp
@@ -1603,10 +1603,10 @@ s32 IntervalRandomInt(s32 lo, s32 hi);                                 // src/en
 u32 IsHost(void);                                                      // src/leaf/auto_03_801D9028_text_cb.cpp
 u32 IsRumbling(s32 a0);                                                // src/game/draft_miss25.cpp
 void LightSetColor(u8* light, f32 r, f32 g, f32 b);                    // src/game/lab_books_g.cpp
-void Log(void* a0, u32 /*0x1B*/ a1);  // type 0x3F (from signature table)
-void MeshFadeToOverlayAlpha(u32 /*0x17*/ a0, u32 /*0x21*/ a1, f32 a2, f32 a3);  // type 0x59 (from signature table)
-void MeshStartBouncingOverlayAlpha(u32 /*0x17*/ a0, u32 /*0x21*/ a1, f32 a2, f32 a3, f32 a4);  // type 0x5A (from signature table)
-void MeshStopBouncingOverlayAlpha(u32 /*0x17*/ a0, u32 /*0x21*/ a1);  // type 0x58 (from signature table)
+void Log(void* a0, u32 a1);                                            // src/game/draft_miss28.cpp
+void MeshFadeToOverlayAlpha(void* a0, void* a1, f32 a2, f32 a3);       // src/game/draft_miss31.cpp
+void MeshStartBouncingOverlayAlpha(void* a0, void* a1, f32 a2, f32 a3, f32 a4); // src/game/draft_miss31.cpp
+void MeshStopBouncingOverlayAlpha(void* a0, void* a1);                 // src/game/draft_miss29.cpp
 void Noop(void);                                                       // src/leaf/auto_03_801D9028_text_cb.cpp
 void PauseFollowingWaypointPath(void* a0, f32 a1);  // type 0x40 (from signature table)
 void PauseMusic(u32 a0);                                               // src/game/small_8020b.cpp

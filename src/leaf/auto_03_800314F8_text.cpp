@@ -5,7 +5,7 @@
 
 #include "types.h"
 
-extern u8 lbl_805FAFE8[];
+extern u8* lbl_805FAFE8;
 extern "C" void fn_80021F2C(u8*, f32);
 extern "C" void fn_800222F0(void);
 extern "C" void fn_800222F4(u8*);

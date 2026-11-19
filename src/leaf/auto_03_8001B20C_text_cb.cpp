@@ -16,7 +16,7 @@ extern "C" f32 MonsterRateEnergy(u8*);
 extern "C" f32 MonsterRateHealth(u8*);
 extern "C" f32 MonsterRateMadness(u8*);
 extern "C" f32 PlayerRankFraction(void);
-extern "C" void fn_8001D4FC(void);
+extern "C" void fn_8001D4FC(u8*);
 extern "C" s32 fn_8001E508(s32);
 extern "C" s32 fn_8004D3F8(void*, char*, s32, s32);
 
@@ -110,12 +110,11 @@ void NameClear(void) {
 
 // 0x8001D4E8
 void LT_UpdateHighlight(void) {
-    // tail-call arguments inferred from the registers set before the call
-    s32 t0 = *(s32*)((u8*)&lbl_805FAF78);
+    u8* t0 = *(u8**)((u8*)&lbl_805FAF78);
     if (t0 == 0) {
         return;
     }
-    fn_8001D4FC();
+    fn_8001D4FC(t0);
 }
 
 // 0x8001DFE0

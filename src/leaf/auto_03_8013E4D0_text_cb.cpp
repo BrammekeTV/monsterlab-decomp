@@ -6,10 +6,10 @@
 #include "types.h"
 #include "game/script_callbacks.h"
 
-extern u8 lbl_805FB3F0[];
-extern u8 lbl_805FB3F4[];
-extern u8 lbl_805FB3F8[];
-extern u8 lbl_805FB3FC[];
+extern f32 lbl_805FB3F0;
+extern f32 lbl_805FB3F4;
+extern f32 lbl_805FB3F8;
+extern f32 lbl_805FB3FC;
 
 // 0x8013E734
 void MonsterSelectDeInit(void) {

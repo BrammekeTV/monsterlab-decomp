@@ -14,7 +14,7 @@ s32   fn_80266E24(u8* buf);                                      // 0x80266E24
 void  fn_8023A5B0(u8* p);                                        // 0x8023A5B0
 void  fn_8023A68C(u8* p);                                        // 0x8023A68C
 void  fn_801EF070(u8* obj, s32 v);                               // 0x801EF070
-s32   fn_801EF6E8(u8* obj, s32 a, s32 v);                        // 0x801EF6E8
+void* fn_801EF6E8(u8* obj, s32 a, s32 v);                        // 0x801EF6E8
 void  fn_802E9C94(void* fn, s32 arg);                            // 0x802E9C94
 void  fn_802F7A2C(void* fn);                                     // 0x802F7A2C
 void  fn_802F7A4C(void* fn);                                     // 0x802F7A4C
@@ -177,12 +177,12 @@ void fn_802077B8(void* unused, s32 value) {
 // 0x80207814
 // Calls fn_801EF6E8 (size 0x20, value) on lbl_80556AE0 under the lock; reports a debug message on failure.
 // Returns the call's result.
-s32 fn_80207814(void* unused, s32 value) {
+void* fn_80207814(void* unused, s32 value) {
     (void)unused;
     fn_8023A5B0(lbl_80556A98);
-    s32 r = fn_801EF6E8(lbl_80556AE0, 0x20, value);
+    void* r = fn_801EF6E8(lbl_80556AE0, 0x20, value);
     fn_8023A68C(lbl_80556A98);
-    if (r == 0) OSReport(lbl_80387380);
+    if (r == NULL) OSReport(lbl_80387380);
     return r;
 }
 

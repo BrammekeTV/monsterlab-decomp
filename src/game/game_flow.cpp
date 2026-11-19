@@ -27,7 +27,7 @@ void* ScreenSetGetStrings(void* set);          // 0x80198E20
 void* StringsLookup(void* strings, s32 id);    // 0x80199AEC
 struct LoadingAnim* LoadingAnimCreate(void* lines[6]);   // 0x80120FD8
 u32   StringHash(const char* s);               // 0x801EB704
-void  MusicPlay(const char* name, u8 loop, f32 volume);  // 0x8020AA94
+s32   MusicPlay(const char* name, u8 loop, f32 volume);  // 0x8020AA94
 void  StopMusic(void);                         // 0x8020AF2C
 void  PauseMusic(BOOL paused);             // 0x8020AFB0
 s32   WorldGetPhase(void* world);              // 0x800D83A8

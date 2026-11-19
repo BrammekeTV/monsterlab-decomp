@@ -27,7 +27,7 @@ void  fn_80016FD0(void* c, int animate);
 void  fn_80044F20(void);
 s32  fn_8004D3F8(void* c, const char* name, s32 a, s32 b);
 void  fn_8004D760(u8* c, u8* monster);
-s32   fn_8004DAF8(void* c, s32 a, s32 b);
+void* fn_8004DAF8(void* c, s32 a, s32 b);
 void fn_80053418(u8* arg0);
 void  fn_800D3428(void);
 s32   fn_800D3930(void* db);

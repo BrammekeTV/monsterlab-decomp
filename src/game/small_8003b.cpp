@@ -28,7 +28,7 @@ void  fn_8003451C(u8* p);                                       // 0x8003451C
 s32   fn_800304DC(u8* p, const f32* v);                         // 0x800304DC
 s32   CheckResult(void);                                        // 0x800320A4
 s32   GainCrystal(void);                                        // 0x800320B4
-void  MonsterFeelSuccess(void);                                 // 0x800320F8
+s32   MonsterFeelSuccess(void);                                 // 0x800320F8
 void  EventSend(void* mgr, void* target, void* from, u32 event, int a, int b, int c, int d);   // 0x801BA190
 s32   RegisterScriptFunc(const char* name, s32 type, void* fn); // 0x801DC91C
 
