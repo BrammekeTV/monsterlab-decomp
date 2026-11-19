@@ -8,7 +8,7 @@
 extern u8 lbl_805F8740[];
 extern u8 lbl_805F8744[];
 extern u8* lbl_805FBBE0;
-extern "C" void fn_8022E3DC(void);
+extern "C" u8* fn_8022E3DC(u8*);
 
 // 0x80051EEC
 extern "C" u8* fn_80051EEC(void) {
@@ -21,7 +21,7 @@ extern "C" u8* fn_80051EF4(void) {
 }
 
 // 0x80051EFC
-extern "C" void fn_80051EFC(void) {
-    s32 t0 = *(s32*)((u8*)&lbl_805FBBE0);
-    fn_8022E3DC();
+extern "C" u8* fn_80051EFC(void) {
+    u8* t0 = *(u8**)((u8*)&lbl_805FBBE0);
+    return (u8*)(fn_8022E3DC(t0));
 }

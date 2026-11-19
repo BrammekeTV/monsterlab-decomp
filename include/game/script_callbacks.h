@@ -892,23 +892,23 @@ s32 PartAction2GetIsTarget(s32 a0, s32 a1);                            // src/ga
 s32 PartAction2GetTarget1(s32 a0);                                     // src/game/draft_miss30.cpp
 s32 PartAction2GetTarget2(s32 a0);                                     // src/game/draft_miss30.cpp
 ScriptValue PartAction2GetValue(s32 a0);                               // src/game/draft_miss35.cpp
-ScriptValue PartGetEnhancementName(s32 a0);  // type 0x28 (from signature table)
+ScriptValue PartGetEnhancementName(s32 a0);                            // src/game/draft_miss39.cpp
 ScriptValue PartGetEnhancementTexture(s32 a0);                         // src/game/small_800Fc.cpp
-ScriptValue PartGetPartAction1(s32 a0);  // type 0x28 (from signature table)
-ScriptValue PartGetPartAction2(s32 a0);  // type 0x28 (from signature table)
-ScriptValue PartGetSecondaryIngredientName(s32 a0);  // type 0x28 (from signature table)
-ScriptValue PartGetSecondaryIngredientTexture(s32 a0);  // type 0x28 (from signature table)
-s32 PartHasEnhancement(s32 a0);  // type 0x1F (from signature table)
+ScriptValue PartGetPartAction1(s32 a0);                                // src/game/draft_miss39.cpp
+ScriptValue PartGetPartAction2(s32 a0);                                // src/game/draft_miss39.cpp
+ScriptValue PartGetSecondaryIngredientName(s32 a0);                    // src/game/draft_miss39.cpp
+ScriptValue PartGetSecondaryIngredientTexture(s32 a0);                 // src/game/draft_miss39.cpp
+s32 PartHasEnhancement(s32 a0);                                        // src/game/draft_miss39.cpp
 BOOL PartInfo_GetEnhanceDefectDesc(void);                              // src/leaf/auto_03_8010FDA4_text_cb.cpp
 BOOL PartInfo_GetEnhanceDefectTexture(void);                           // src/leaf/auto_03_8010FDA4_text_cb.cpp
 BOOL PartInfo_GetTexture(void);                                        // src/leaf/auto_03_8010FDA4_text_cb.cpp
 void PartInfo_LoadModel(void);  // type 0x8F (from signature table)
 s32 PartInfo_PlayerNeedsMoreRanks(void);                               // src/leaf/auto_03_8010FDA4_text_cb.cpp
 void PartInfo_UnloadModel(void);                                       // src/game/lab_books_e.cpp
-s32 PartIsAction1Attack(s32 a0);  // type 0x1F (from signature table)
-s32 PartIsAction1Defense(s32 a0);  // type 0x1F (from signature table)
-s32 PartIsAction2Attack(s32 a0);  // type 0x1F (from signature table)
-s32 PartIsAction2Defense(s32 a0);  // type 0x1F (from signature table)
+s32 PartIsAction1Attack(s32 a0);                                       // src/game/draft_miss39.cpp
+s32 PartIsAction1Defense(s32 a0);                                      // src/game/draft_miss39.cpp
+s32 PartIsAction2Attack(s32 a0);                                       // src/game/draft_miss39.cpp
+s32 PartIsAction2Defense(s32 a0);                                      // src/game/draft_miss39.cpp
 s32 PartIsAlchemy(s32 a0);                                             // src/game/small_800Fc.cpp
 s32 PartIsBio(s32 a0);                                                 // src/game/small_800Fc.cpp
 s32 PartIsMech(s32 a0);                                                // src/game/small_800Fc.cpp
@@ -1038,21 +1038,21 @@ void PushExperimentUI(void);  // type 0x8F (from signature table)
 void PushFSM(u32 a3);                                                  // src/leaf/auto_03_800E75B0_text_cb.cpp
 void QuestCounterCleanUp(void);                                        // src/game/draft_miss34.cpp
 void QuestCounterUpdateNumber(void);                                   // src/game/small_800Ec.cpp
-ScriptValue QuestLog_GetCounter(s32 a0);  // type 0x28 (from signature table)
+ScriptValue QuestLog_GetCounter(s32 a0);                               // src/game/draft_miss36.cpp
 BOOL QuestLog_GetMainIcon(s32 a0);                                     // src/game/lab_books_d.cpp
 ScriptValue QuestLog_GetNextQuestLocationString(void);                 // src/game/lab_books_g.cpp
 ScriptValue QuestLog_GetQuestDescription(void);                        // src/game/lab_books_g.cpp
 BOOL QuestLog_GetQuestJournalEntry(void);                              // src/game/lab_books_d.cpp
 ScriptValue QuestLog_GetQuestName(void);                               // src/game/lab_books_g.cpp
-ScriptValue QuestLog_GetSubQuestDescription(s32 a0);  // type 0x28 (from signature table)
-s32 QuestLog_HasCounter(s32 a0);  // type 0x1F (from signature table)
+ScriptValue QuestLog_GetSubQuestDescription(s32 a0);                   // src/game/draft_miss36.cpp
+s32 QuestLog_HasCounter(s32 a0);                                       // src/game/draft_miss36.cpp
 s32 QuestLog_HasMainIcon(s32 a0);                                      // src/game/lab_books_d.cpp
 s32 QuestLog_HasNextQuestLocationString(void);                         // src/game/lab_books_d.cpp
 s32 QuestLog_HasQuest(void);                                           // src/game/lab_books_d.cpp
-s32 QuestLog_HasSubQuest(s32 a0);  // type 0x1F (from signature table)
-s32 QuestLog_IsComplete(s32 a0);  // type 0x1F (from signature table)
+s32 QuestLog_HasSubQuest(s32 a0);                                      // src/game/draft_miss36.cpp
+s32 QuestLog_IsComplete(s32 a0);                                       // src/game/draft_miss36.cpp
 void QueueGameEvent(u32 a0, u32 a1, u32 a2, s32 a3, s32 a4);           // src/game/player_api.cpp
-void QueueSoundFX(void* a0, u32 /*0x0B*/ a1, u32 a2);  // type 0x3B (from signature table)
+void QueueSoundFX(void* a0, u32 a1, u32 a2);                           // src/game/draft_miss36.cpp
 s32 ReactorFastenerAdjustmentsRequired(void* a3);                      // src/leaf/auto_03_80097574_text_cb.cpp
 u32 ReactorFastenerIsDecoy(void* a3);                                  // src/leaf/auto_03_80097574_text_cb.cpp
 void* ReactorHeartGetMagnetLight(void* a3);                            // src/leaf/auto_03_80098DA8_text_cb.cpp
@@ -1060,28 +1060,28 @@ void* ReactorHeartGetTargetLeak(void* a3);                             // src/le
 void ReactorHeartResetTimer(void* a3);                                 // src/leaf/auto_03_80098DA8_text_cb.cpp
 void ReactorHeartUpdateRotation(void* a0);  // type 0x2F (from signature table)
 void ReactorHeartUpdateTimer(void* a3);                                // src/leaf/auto_03_80098DA8_text_cb.cpp
-void* ReactorLeakGetCurrentLeak(void);  // type 0x96 (from signature table)
+void* ReactorLeakGetCurrentLeak(void);                                 // src/game/draft_miss36.cpp
 s32 ReactorLeakIdleNearHeart(void);                                    // src/leaf/auto_03_80098BC0_text_cb.cpp
-void ReactorLeakManipulateFastener(void);  // type 0x8F (from signature table)
-u32 /*0x06*/ ReactorLeakManipulationDetected(void* a0);  // type 0x1 (from signature table)
+void ReactorLeakManipulateFastener(void);                              // src/game/draft_miss36.cpp
+u32 ReactorLeakManipulationDetected(void* a0);                         // src/game/draft_miss36.cpp
 ScriptValue Recipes_GetBodyPartSlotName(void);                         // src/game/lab_books_g.cpp
 BOOL Recipes_GetImage(void);                                           // src/game/lab_books_d.cpp
 ScriptValue Recipes_GetKeyIngredientImage(void);  // type 0x2E (from signature table)
 ScriptValue Recipes_GetKeyIngredientName(void);  // type 0x2E (from signature table)
-ScriptValue Recipes_GetNameByIndex(s32 a0);  // type 0x28 (from signature table)
+ScriptValue Recipes_GetNameByIndex(s32 a0);                            // src/game/draft_miss36.cpp
 ScriptValue Recipes_GetSecondaryIngredientImage(void);  // type 0x2E (from signature table)
 ScriptValue Recipes_GetSecondaryIngredientName(void);  // type 0x2E (from signature table)
 ScriptValue Recipes_GetSelectedName(void);                             // src/game/lab_books_g.cpp
 ScriptValue Recipes_GetTextureList(void);                              // src/game/lab_books_g.cpp
 s32 Recipes_HasSecondaryIngredient(void);  // type 0x22 (from signature table)
-void Recipes_IncrementBodyPart(s32 a0);  // type 0x83 (from signature table)
-void Recipes_IncrementRow(s32 a0);  // type 0x83 (from signature table)
-s32 Recipes_IsRecipePopupOn(s32 a0);  // type 0x1F (from signature table)
+void Recipes_IncrementBodyPart(s32 a0);                                // src/game/draft_miss36.cpp
+void Recipes_IncrementRow(s32 a0);                                     // src/game/draft_miss37.cpp
+s32 Recipes_IsRecipePopupOn(s32 a0);                                   // src/game/draft_miss37.cpp
 s32 Recipes_IsTextureAsyncLoaded(void);                                // src/game/lab_books_d.cpp
-s32 Recipes_IsValidRecipe(s32 a0);  // type 0x1F (from signature table)
+s32 Recipes_IsValidRecipe(s32 a0);                                     // src/game/draft_miss37.cpp
 s32 Recipes_RenderList_GetSelectedItem(void);                          // src/game/lab_books_d.cpp
-void Recipes_RenderList_SetSelectedItem(s32 a0);  // type 0x83 (from signature table)
-void Recipes_SetRecipePopup(s32 a0);  // type 0x83 (from signature table)
+void Recipes_RenderList_SetSelectedItem(s32 a0);                       // src/game/draft_miss37.cpp
+void Recipes_SetRecipePopup(s32 a0);                                   // src/game/draft_miss37.cpp
 void Recipes_SetupRenderList(void);                                    // src/game/lab_books_d.cpp
 void RegisterExperimentSound(void* owner, u32 sound, u32 id);          // src/game/draft_8007b.cpp
 void RegisterHooks(void);                                              // src/engine/small_801D.cpp
@@ -1121,20 +1121,20 @@ void RewardPlayerChallenge(u32 c);                                     // src/ga
 void RewardPlayerCombat(void);                                         // src/game/player_api.cpp
 void RewardPlayerExperiment(u32 e, BOOL a);                            // src/game/player_api.cpp
 void RewardPlayerQuest(u32 q);                                         // src/game/player_api.cpp
-void RobotEvolutionExperiment_RobotGetUniqueRandomZeroToMax(s32 a0);  // type 0x83 (from signature table)
-void RobotEvolutionExperiment_RobotPlayLoopingAnimSound(ScriptCtx* a0);  // type 0x4E (from signature table)
+void RobotEvolutionExperiment_RobotGetUniqueRandomZeroToMax(s32 a0);   // src/game/draft_miss37.cpp
+void RobotEvolutionExperiment_RobotPlayLoopingAnimSound(ScriptCtx* a0); // src/game/draft_miss37.cpp
 void RobotEvolutionExperiment_RobotSetLoopingAnimSound(ScriptCtx* a0, u32 a1, u32 a2); // src/game/small_8009c.cpp
 void RotateEntityAroundAxis(u32 a0, f32 a1, f32 a2, f32 a3);  // type 0x77 (from signature table)
 s32 RunIngredientsSelection(void);                                     // src/leaf/auto_03_800747DC_text_cb.cpp
 void SaveCheckPoint(void);                                             // src/leaf/auto_03_800E75B0_text_cb.cpp
 u32 SaveManager_CanContinue(void);                                     // src/leaf/auto_03_800FB958_text_cb.cpp
-u32 /*0x06*/ SaveManager_CanLoadGame(void);  // type 0xA (from signature table)
-u32 /*0x06*/ SaveManager_CanSaveGame(void);  // type 0xA (from signature table)
+u32 SaveManager_CanLoadGame(void);                                     // src/game/draft_miss37.cpp
+u32 SaveManager_CanSaveGame(void);                                     // src/game/draft_miss37.cpp
 u32 SaveManager_CheckIfSlotEmptyFromTmp(s32 a3);                       // src/leaf/auto_03_801230DC_text_cb.cpp
 u32 /*0x06*/ SaveManager_DoesProfileNameExist(BOOL a0);  // type 0x8 (from signature table)
 void SaveManager_EraseAllData(void);                                   // src/game/small_8012.cpp
 void SaveManager_EraseData(s32 a0);  // type 0x83 (from signature table)
-void SaveManager_FreeTmpData(void);  // type 0x8F (from signature table)
+void SaveManager_FreeTmpData(void);                                    // src/game/draft_miss37.cpp
 s32 SaveManager_GetContinueSlot(void);                                 // src/leaf/auto_03_800FB958_text_cb.cpp
 s32 SaveManager_GetCurrentSlot(void);                                  // src/leaf/auto_03_800FB958_text_cb.cpp
 ScriptValue SaveManager_GetNumBlocksNeededToBeFreed(void);             // src/game/draft_miss6.cpp
@@ -1146,18 +1146,18 @@ u32 /*0x06*/ SaveManager_HasEnoughFreeMemory(void);  // type 0xA (from signature
 void SaveManager_Init(void);  // type 0x8F (from signature table)
 s32 SaveManager_IsInOverwriteScreen(void);                             // src/leaf/auto_03_800FB958_text_cb.cpp
 u32 /*0x06*/ SaveManager_IsSaveDataCorrupted(void);  // type 0xA (from signature table)
-void SaveManager_LoadData(void);  // type 0x8F (from signature table)
-void SaveManager_LoadDataToTmp(void);  // type 0x8F (from signature table)
-void SaveManager_ResetCurrentData(void);  // type 0x8F (from signature table)
-void SaveManager_ReturnToMainMenu(void);  // type 0x8F (from signature table)
+void SaveManager_LoadData(void);                                       // src/game/draft_miss37.cpp
+void SaveManager_LoadDataToTmp(void);                                  // src/game/draft_miss37.cpp
+void SaveManager_ResetCurrentData(void);                               // src/game/draft_miss37.cpp
+void SaveManager_ReturnToMainMenu(void);                               // src/game/draft_miss37.cpp
 void SaveManager_SaveData(void);  // type 0x8F (from signature table)
 void SaveManager_SaveOptions(void);                                    // src/game/draft_miss3.cpp
-s32 SaveManager_SelectFirstEmptySlot(void);  // type 0x22 (from signature table)
+s32 SaveManager_SelectFirstEmptySlot(void);                            // src/game/draft_miss37.cpp
 void SaveManager_SetContinueSlot(s32 a3);                              // src/leaf/auto_03_800FB958_text_cb.cpp
 void SaveManager_SetCurrentSlot(s32 a3);                               // src/leaf/auto_03_800FB958_text_cb.cpp
 void SaveManager_SetInOverwriteScreen(u32 a3);                         // src/leaf/auto_03_800FB958_text_cb.cpp
 void SaveMonster(void);  // type 0x8F (from signature table)
-void SavedGameMCReceivedCallback(u32 /*0x19*/ a0);  // type 0x56 (from signature table)
+void SavedGameMCReceivedCallback(u8* a0);                              // src/game/draft_miss38.cpp
 void SavedGameMCSentCallback(u32 a3);                                  // src/leaf/auto_03_80109BE0_text_cb.cpp
 void ScreenIsOpen(void);                                               // src/leaf/auto_03_8013F034_text_cb.cpp
 s32 GetResultRegister(void);                                           // src/leaf/auto_03_801D9028_text_cb.cpp
@@ -1618,7 +1618,7 @@ void PlayGlobalLoopingGroupSound_NoLoad(u32 a0);                       // src/en
 void PlayGlobalSound(u32 a3);                                          // src/leaf/auto_03_801D9028_text_cb.cpp
 void PlayGlobalSoundSynced(u32 a0);                                    // src/engine/small_801Dc.cpp
 void PlayGlobalSoundWithEffect(u32 a3, s32 a4);                        // src/leaf/auto_03_801D9028_text_cb.cpp
-void PlayLoopingSoundFX(void* a0, u32 /*0x0B*/ a1, s32 a2);  // type 0x3C (from signature table)
+void PlayLoopingSoundFX(void* a0, u32 a1, s32 a2);                     // src/game/draft_miss36.cpp
 void PlayLoopingSoundFXWithEffect(void* a0, u32 a1, s32 a2, s32 a3);   // src/game/draft_miss33.cpp
 void PlayLoopingSoundGroupFX(void* a0, u32 a1, s32 a2);                // src/game/draft_miss33.cpp
 void PlayLoopingSoundGroupFXWithEffect(void* a0, u32 a1, s32 a2, s32 a3); // src/game/draft_miss33.cpp
@@ -1634,8 +1634,8 @@ void PrintResult(void);                                                // src/le
 void PrintText(BOOL a3);                                               // src/leaf/auto_03_800E75B0_text_cb.cpp
 void Print_v_E_E_i_f(void* a0, void* a1, s32 a2, f32 a3);              // src/game/draft_miss34.cpp
 void ResetSpawningMode(void);                                          // src/leaf/auto_03_801EFC74_text_cb.cpp
-void ResumeFollowingWaypointPath(void* a0);  // type 0x2F (from signature table)
-s32 Return(s32 a0);  // type 0x1F (from signature table)
+void ResumeFollowingWaypointPath(void* a0);                            // src/game/draft_miss37.cpp
+s32 Return(s32 a0);                                                    // src/game/draft_miss37.cpp
 void SetEntityOrientationCallback(u32 /*0x13*/ a0, u32 /*0x08*/ a1, u32 /*0x14*/ a2);  // type 0x8A (from signature table)
 void SetEntityPositionCallback(u32 /*0x12*/ a0, u32 /*0x08*/ a1, u32 /*0x14*/ a2);  // type 0x90 (from signature table)
 void SetGlobalMusicVolume(f32 a0);                                     // src/engine/small_801Dc.cpp

@@ -94,6 +94,11 @@
  "changelog": [
   {
    "date": "2026-11-19",
+   "time": "14:18",
+   "text": "Fourteenth round from the missing-symbols list: 51 more functions, including the save manager (can load or save, load data, select first empty slot), save read, write and setup, the quest log and recipe list queries, part action attack and defense checks, enhancement and secondary ingredient names, reactor leak callbacks and the sound queue."
+  },
+  {
+   "date": "2026-11-19",
    "time": "13:34",
    "text": "Thirteenth round from the missing-symbols list: 46 more functions, including the sound and music play callbacks (sound effects, looping and grouped sound FX, monster voices, spray sound), the part action cost, value and target getters, path-finding nodes and directions, projectile and lightning firing from props, camera pan to junction, nunchuk update and multiplayer init."
   },

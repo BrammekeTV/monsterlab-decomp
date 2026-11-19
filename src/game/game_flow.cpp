@@ -20,7 +20,7 @@ void  RendClear(int flags, int a, int b, f32 depth);   // 0x801534F0
 void  RendBeginFrame(void);                    // 0x8014F0A0
 void  RendEndFrame(void);                      // 0x801508AC
 void  RendFlush(void);                         // 0x80150148
-void  ScreenSetsDraw(void* sets, int pass);    // 0x8018CD70
+s32   ScreenSetsDraw(void* sets, int pass);    // 0x8018CD70
 void  fn_801FC0A0(void); void fn_801FC1EC(void);
 void* ScreenSetsCurrent(void* sets);           // 0x8018D1E4
 void* ScreenSetGetStrings(void* set);          // 0x80198E20

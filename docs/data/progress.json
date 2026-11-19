@@ -1,15 +1,15 @@
 {
  "game_id": "RM7P4F",
- "generated": "2026-11-19T12:34:29+00:00",
- "commit": "63a5f4d",
- "commit_date": "2026-11-19T13:24:31+01:00",
+ "generated": "2026-11-19T13:18:29+00:00",
+ "commit": "3eec86d",
+ "commit_date": "2026-11-19T14:08:35+01:00",
  "game": {
   "functions": 8548,
   "bytes": 2265988,
   "named": 2748,
   "named_bytes": 616800,
-  "decompiled": 5170,
-  "decompiled_bytes": 638180
+  "decompiled": 5221,
+  "decompiled_bytes": 647208
  },
  "library": {
   "functions": 4039,
@@ -24,8 +24,8 @@
   "bytes": 3404928,
   "named": 3211,
   "named_bytes": 721548,
-  "decompiled": 5171,
-  "decompiled_bytes": 638300
+  "decompiled": 5222,
+  "decompiled_bytes": 647328
  },
  "game_range": [
   "80006B40",
@@ -177,7 +177,7 @@
    0.078
   ],
   [
-   0.132,
+   0.145,
    0.06
   ],
   [
@@ -289,19 +289,19 @@
    0.0
   ],
   [
-   0.322,
+   0.344,
    0.252
   ],
   [
-   0.203,
+   0.224,
    0.241
   ],
   [
-   0.051,
+   0.06,
    0.008
   ],
   [
-   0.193,
+   0.195,
    0.106
   ],
   [
@@ -461,7 +461,7 @@
    0.541
   ],
   [
-   0.39,
+   0.42,
    0.97
   ],
   [
@@ -469,7 +469,7 @@
    0.957
   ],
   [
-   0.509,
+   0.931,
    0.931
   ],
   [
@@ -513,7 +513,7 @@
    0.224
   ],
   [
-   0.123,
+   0.127,
    0.058
   ],
   [
@@ -529,11 +529,11 @@
    1.0
   ],
   [
-   0.857,
+   0.969,
    0.955
   ],
   [
-   0.385,
+   0.461,
    0.853
   ],
   [
@@ -557,11 +557,11 @@
    0.11
   ],
   [
-   0.253,
+   0.34,
    0.55
   ],
   [
-   0.489,
+   0.516,
    0.547
   ],
   [
@@ -585,7 +585,7 @@
    0.287
   ],
   [
-   0.085,
+   0.086,
    0.367
   ],
   [
@@ -753,7 +753,7 @@
    0.0
   ],
   [
-   0.268,
+   0.297,
    0.257
   ],
   [
@@ -833,7 +833,7 @@
    0.103
   ],
   [
-   0.246,
+   0.265,
    0.241
   ],
   [
@@ -841,7 +841,7 @@
    0.179
   ],
   [
-   0.102,
+   0.112,
    0.093
   ],
   [
@@ -901,11 +901,11 @@
    0.2
   ],
   [
-   0.736,
+   0.754,
    0.916
   ],
   [
-   0.889,
+   0.891,
    0.864
   ],
   [
@@ -933,7 +933,7 @@
    0.068
   ],
   [
-   0.223,
+   0.244,
    0.068
   ],
   [
@@ -977,7 +977,7 @@
    0.178
   ],
   [
-   0.07,
+   0.154,
    0.234
   ],
   [
@@ -1037,7 +1037,7 @@
    0.958
   ],
   [
-   0.44,
+   0.45,
    0.838
   ],
   [
@@ -1053,7 +1053,7 @@
    0.149
   ],
   [
-   0.204,
+   0.214,
    0.056
   ]
  ],
@@ -7864,6 +7864,281 @@
      "name": "fn_801EF6E8",
      "addr": "801EF6E8",
      "size": 428
+    }
+   ]
+  },
+  {
+   "path": "src/game/draft_miss36.cpp",
+   "functions": [
+    {
+     "name": "RayHitInit",
+     "addr": "80055CD8",
+     "size": 140
+    },
+    {
+     "name": "ReactorLeakManipulateFastener",
+     "addr": "80096D3C",
+     "size": 36
+    },
+    {
+     "name": "ReactorLeakGetCurrentLeak",
+     "addr": "80097488",
+     "size": 36
+    },
+    {
+     "name": "ReactorLeakManipulationDetected",
+     "addr": "80098BC0",
+     "size": 16
+    },
+    {
+     "name": "QueueSoundFX",
+     "addr": "800EF648",
+     "size": 196
+    },
+    {
+     "name": "QuestLog_HasSubQuest",
+     "addr": "801146DC",
+     "size": 140
+    },
+    {
+     "name": "QuestLog_HasCounter",
+     "addr": "80114768",
+     "size": 140
+    },
+    {
+     "name": "QuestLog_GetCounter",
+     "addr": "801147F4",
+     "size": 140
+    },
+    {
+     "name": "QuestLog_IsComplete",
+     "addr": "80114880",
+     "size": 140
+    },
+    {
+     "name": "QuestLog_GetSubQuestDescription",
+     "addr": "80114A04",
+     "size": 140
+    },
+    {
+     "name": "Recipes_GetNameByIndex",
+     "addr": "80114C80",
+     "size": 140
+    },
+    {
+     "name": "Recipes_IncrementBodyPart",
+     "addr": "80114D0C",
+     "size": 132
+    },
+    {
+     "name": "PlayLoopingSoundFX",
+     "addr": "801DDDCC",
+     "size": 16
+    },
+    {
+     "name": "fn_801EE078",
+     "addr": "801EE078",
+     "size": 188
+    }
+   ]
+  },
+  {
+   "path": "src/game/draft_miss37.cpp",
+   "functions": [
+    {
+     "name": "RobotEvolutionExperiment_RobotGetUniqueRandomZeroToMax",
+     "addr": "800931C8",
+     "size": 176
+    },
+    {
+     "name": "RobotEvolutionExperiment_RobotPlayLoopingAnimSound",
+     "addr": "800937C0",
+     "size": 196
+    },
+    {
+     "name": "Recipes_IncrementRow",
+     "addr": "80114D90",
+     "size": 132
+    },
+    {
+     "name": "Recipes_RenderList_SetSelectedItem",
+     "addr": "801157E4",
+     "size": 132
+    },
+    {
+     "name": "Recipes_IsValidRecipe",
+     "addr": "80115868",
+     "size": 140
+    },
+    {
+     "name": "Recipes_IsRecipePopupOn",
+     "addr": "801158F4",
+     "size": 140
+    },
+    {
+     "name": "Recipes_SetRecipePopup",
+     "addr": "80115980",
+     "size": 132
+    },
+    {
+     "name": "SaveManager_ReturnToMainMenu",
+     "addr": "801233CC",
+     "size": 4
+    },
+    {
+     "name": "SaveManager_CanLoadGame",
+     "addr": "8012375C",
+     "size": 188
+    },
+    {
+     "name": "SaveManager_CanSaveGame",
+     "addr": "80123818",
+     "size": 80
+    },
+    {
+     "name": "SaveManager_SelectFirstEmptySlot",
+     "addr": "80123868",
+     "size": 236
+    },
+    {
+     "name": "SaveManager_LoadData",
+     "addr": "80123C94",
+     "size": 204
+    },
+    {
+     "name": "SaveManager_ResetCurrentData",
+     "addr": "80123D60",
+     "size": 60
+    },
+    {
+     "name": "SaveManager_LoadDataToTmp",
+     "addr": "8012423C",
+     "size": 148
+    },
+    {
+     "name": "SaveManager_FreeTmpData",
+     "addr": "80124340",
+     "size": 88
+    },
+    {
+     "name": "ReleaseZoneSlot",
+     "addr": "80131C28",
+     "size": 4
+    },
+    {
+     "name": "ResumeFollowingWaypointPath",
+     "addr": "801B8D34",
+     "size": 168
+    },
+    {
+     "name": "RequestComplete",
+     "addr": "801BBB0C",
+     "size": 92
+    },
+    {
+     "name": "Return",
+     "addr": "801DB494",
+     "size": 4
+    },
+    {
+     "name": "SaveCurrentScoreSlot",
+     "addr": "802255FC",
+     "size": 88
+    }
+   ]
+  },
+  {
+   "path": "src/game/draft_miss38.cpp",
+   "functions": [
+    {
+     "name": "SavedGameMCReceivedCallback",
+     "addr": "8010A38C",
+     "size": 36
+    },
+    {
+     "name": "ScreenSetsDraw",
+     "addr": "8018CD70",
+     "size": 244
+    },
+    {
+     "name": "ScriptSigDefine",
+     "addr": "801DC7D4",
+     "size": 156
+    },
+    {
+     "name": "SaveRead",
+     "addr": "8020681C",
+     "size": 240
+    },
+    {
+     "name": "SaveWriteData",
+     "addr": "8020690C",
+     "size": 192
+    },
+    {
+     "name": "SaveSetup",
+     "addr": "802069CC",
+     "size": 212
+    },
+    {
+     "name": "SaveQueueEvent",
+     "addr": "8022DEE8",
+     "size": 84
+    }
+   ]
+  },
+  {
+   "path": "src/game/draft_miss39.cpp",
+   "functions": [
+    {
+     "name": "PartGetPartAction1",
+     "addr": "800F255C",
+     "size": 472
+    },
+    {
+     "name": "PartIsAction1Attack",
+     "addr": "800F2734",
+     "size": 288
+    },
+    {
+     "name": "PartIsAction1Defense",
+     "addr": "800F2854",
+     "size": 288
+    },
+    {
+     "name": "PartGetPartAction2",
+     "addr": "800F31AC",
+     "size": 472
+    },
+    {
+     "name": "PartIsAction2Attack",
+     "addr": "800F3384",
+     "size": 288
+    },
+    {
+     "name": "PartIsAction2Defense",
+     "addr": "800F34A4",
+     "size": 288
+    },
+    {
+     "name": "PartHasEnhancement",
+     "addr": "800F3E04",
+     "size": 380
+    },
+    {
+     "name": "PartGetEnhancementName",
+     "addr": "800F3F80",
+     "size": 368
+    },
+    {
+     "name": "PartGetSecondaryIngredientTexture",
+     "addr": "800F4168",
+     "size": 484
+    },
+    {
+     "name": "PartGetSecondaryIngredientName",
+     "addr": "800F434C",
+     "size": 524
     }
    ]
   },

@@ -1,18 +1,18 @@
 {
  "log": "link.log",
  "counts": {
-  "global": 1326,
-  "game": 999,
+  "global": 1327,
+  "game": 966,
   "unknown": 117,
-  "library": 119
+  "library": 126
  },
- "game_bytes": 506096,
+ "game_bytes": 504372,
  "duplicates": [],
  "game": [
   {
    "name": "RandomU32",
-   "refs": 21,
-   "files": 21,
+   "refs": 22,
+   "files": 22,
    "used_as": "_RandomU32",
    "addr": "80143460",
    "size": 1300,
@@ -100,6 +100,16 @@
    "kind": "game"
   },
   {
+   "name": "fn_801E8D74",
+   "refs": 5,
+   "files": 5,
+   "used_as": "_fn_801E8D74",
+   "addr": "801E8D74",
+   "size": 1656,
+   "section": ".text",
+   "kind": "game"
+  },
+  {
    "name": "fn_801EC8C4",
    "refs": 5,
    "files": 5,
@@ -136,16 +146,6 @@
    "used_as": "_fn_8004C718",
    "addr": "8004C718",
    "size": 924,
-   "section": ".text",
-   "kind": "game"
-  },
-  {
-   "name": "fn_801E8D74",
-   "refs": 4,
-   "files": 4,
-   "used_as": "_fn_801E8D74",
-   "addr": "801E8D74",
-   "size": 1656,
    "section": ".text",
    "kind": "game"
   },
@@ -320,6 +320,16 @@
    "kind": "game"
   },
   {
+   "name": "SaveReset",
+   "refs": 2,
+   "files": 2,
+   "used_as": "_SaveReset",
+   "addr": "80222300",
+   "size": 1028,
+   "section": ".text",
+   "kind": "game"
+  },
+  {
    "name": "SaveRollChallengeReward",
    "refs": 2,
    "files": 2,
@@ -460,6 +470,16 @@
    "kind": "game"
   },
   {
+   "name": "fn_8019600C",
+   "refs": 2,
+   "files": 2,
+   "used_as": "_fn_8019600C",
+   "addr": "8019600C",
+   "size": 216,
+   "section": ".text",
+   "kind": "game"
+  },
+  {
    "name": "fn_8019C348",
    "refs": 2,
    "files": 2,
@@ -486,6 +506,16 @@
    "used_as": "_fn_801B55F4",
    "addr": "801B55F4",
    "size": 1132,
+   "section": ".text",
+   "kind": "game"
+  },
+  {
+   "name": "fn_801B6878",
+   "refs": 2,
+   "files": 2,
+   "used_as": "_fn_801B6878",
+   "addr": "801B6878",
+   "size": 384,
    "section": ".text",
    "kind": "game"
   },
@@ -530,12 +560,12 @@
    "kind": "game"
   },
   {
-   "name": "fn_801EE078",
+   "name": "fn_8022ED60",
    "refs": 2,
    "files": 2,
-   "used_as": "_fn_801EE078",
-   "addr": "801EE078",
-   "size": 188,
+   "used_as": "_fn_8022ED60",
+   "addr": "8022ED60",
+   "size": 56,
    "section": ".text",
    "kind": "game"
   },
@@ -810,112 +840,12 @@
    "kind": "game"
   },
   {
-   "name": "PartGetEnhancementName",
-   "refs": 1,
-   "files": 1,
-   "used_as": "_PartGetEnhancementName",
-   "addr": "800F3F80",
-   "size": 368,
-   "section": ".text",
-   "kind": "game"
-  },
-  {
-   "name": "PartGetPartAction1",
-   "refs": 1,
-   "files": 1,
-   "used_as": "_PartGetPartAction1",
-   "addr": "800F255C",
-   "size": 472,
-   "section": ".text",
-   "kind": "game"
-  },
-  {
-   "name": "PartGetPartAction2",
-   "refs": 1,
-   "files": 1,
-   "used_as": "_PartGetPartAction2",
-   "addr": "800F31AC",
-   "size": 472,
-   "section": ".text",
-   "kind": "game"
-  },
-  {
-   "name": "PartGetSecondaryIngredientName",
-   "refs": 1,
-   "files": 1,
-   "used_as": "_PartGetSecondaryIngredientName",
-   "addr": "800F434C",
-   "size": 524,
-   "section": ".text",
-   "kind": "game"
-  },
-  {
-   "name": "PartGetSecondaryIngredientTexture",
-   "refs": 1,
-   "files": 1,
-   "used_as": "_PartGetSecondaryIngredientTexture",
-   "addr": "800F4168",
-   "size": 484,
-   "section": ".text",
-   "kind": "game"
-  },
-  {
-   "name": "PartHasEnhancement",
-   "refs": 1,
-   "files": 1,
-   "used_as": "_PartHasEnhancement",
-   "addr": "800F3E04",
-   "size": 380,
-   "section": ".text",
-   "kind": "game"
-  },
-  {
    "name": "PartInfo_LoadModel",
    "refs": 1,
    "files": 1,
    "used_as": "_PartInfo_LoadModel",
    "addr": "80115F28",
    "size": 2220,
-   "section": ".text",
-   "kind": "game"
-  },
-  {
-   "name": "PartIsAction1Attack",
-   "refs": 1,
-   "files": 1,
-   "used_as": "_PartIsAction1Attack",
-   "addr": "800F2734",
-   "size": 288,
-   "section": ".text",
-   "kind": "game"
-  },
-  {
-   "name": "PartIsAction1Defense",
-   "refs": 1,
-   "files": 1,
-   "used_as": "_PartIsAction1Defense",
-   "addr": "800F2854",
-   "size": 288,
-   "section": ".text",
-   "kind": "game"
-  },
-  {
-   "name": "PartIsAction2Attack",
-   "refs": 1,
-   "files": 1,
-   "used_as": "_PartIsAction2Attack",
-   "addr": "800F3384",
-   "size": 288,
-   "section": ".text",
-   "kind": "game"
-  },
-  {
-   "name": "PartIsAction2Defense",
-   "refs": 1,
-   "files": 1,
-   "used_as": "_PartIsAction2Defense",
-   "addr": "800F34A4",
-   "size": 288,
    "section": ".text",
    "kind": "game"
   },
@@ -1060,16 +990,6 @@
    "kind": "game"
   },
   {
-   "name": "PlayLoopingSoundFX",
-   "refs": 1,
-   "files": 1,
-   "used_as": "_PlayLoopingSoundFX",
-   "addr": "801DDDCC",
-   "size": 16,
-   "section": ".text",
-   "kind": "game"
-  },
-  {
    "name": "PlayMovie",
    "refs": 1,
    "files": 1,
@@ -1180,76 +1100,6 @@
    "kind": "game"
   },
   {
-   "name": "QuestLog_GetCounter",
-   "refs": 1,
-   "files": 1,
-   "used_as": "_QuestLog_GetCounter",
-   "addr": "801147F4",
-   "size": 140,
-   "section": ".text",
-   "kind": "game"
-  },
-  {
-   "name": "QuestLog_GetSubQuestDescription",
-   "refs": 1,
-   "files": 1,
-   "used_as": "_QuestLog_GetSubQuestDescription",
-   "addr": "80114A04",
-   "size": 140,
-   "section": ".text",
-   "kind": "game"
-  },
-  {
-   "name": "QuestLog_HasCounter",
-   "refs": 1,
-   "files": 1,
-   "used_as": "_QuestLog_HasCounter",
-   "addr": "80114768",
-   "size": 140,
-   "section": ".text",
-   "kind": "game"
-  },
-  {
-   "name": "QuestLog_HasSubQuest",
-   "refs": 1,
-   "files": 1,
-   "used_as": "_QuestLog_HasSubQuest",
-   "addr": "801146DC",
-   "size": 140,
-   "section": ".text",
-   "kind": "game"
-  },
-  {
-   "name": "QuestLog_IsComplete",
-   "refs": 1,
-   "files": 1,
-   "used_as": "_QuestLog_IsComplete",
-   "addr": "80114880",
-   "size": 140,
-   "section": ".text",
-   "kind": "game"
-  },
-  {
-   "name": "QueueSoundFX",
-   "refs": 1,
-   "files": 1,
-   "used_as": "_QueueSoundFX",
-   "addr": "800EF648",
-   "size": 196,
-   "section": ".text",
-   "kind": "game"
-  },
-  {
-   "name": "RayHitInit",
-   "refs": 1,
-   "files": 1,
-   "used_as": "_RayHitInit",
-   "addr": "80055CD8",
-   "size": 140,
-   "section": ".text",
-   "kind": "game"
-  },
-  {
    "name": "RayQueryCast",
    "refs": 1,
    "files": 1,
@@ -1270,36 +1120,6 @@
    "kind": "game"
   },
   {
-   "name": "ReactorLeakGetCurrentLeak",
-   "refs": 1,
-   "files": 1,
-   "used_as": "_ReactorLeakGetCurrentLeak",
-   "addr": "80097488",
-   "size": 36,
-   "section": ".text",
-   "kind": "game"
-  },
-  {
-   "name": "ReactorLeakManipulateFastener",
-   "refs": 1,
-   "files": 1,
-   "used_as": "_ReactorLeakManipulateFastener",
-   "addr": "80096D3C",
-   "size": 36,
-   "section": ".text",
-   "kind": "game"
-  },
-  {
-   "name": "ReactorLeakManipulationDetected",
-   "refs": 1,
-   "files": 1,
-   "used_as": "_ReactorLeakManipulationDetected",
-   "addr": "80098BC0",
-   "size": 16,
-   "section": ".text",
-   "kind": "game"
-  },
-  {
    "name": "Recipes_GetKeyIngredientImage",
    "refs": 1,
    "files": 1,
@@ -1316,16 +1136,6 @@
    "used_as": "_Recipes_GetKeyIngredientName",
    "addr": "80115370",
    "size": 380,
-   "section": ".text",
-   "kind": "game"
-  },
-  {
-   "name": "Recipes_GetNameByIndex",
-   "refs": 1,
-   "files": 1,
-   "used_as": "_Recipes_GetNameByIndex",
-   "addr": "80114C80",
-   "size": 140,
    "section": ".text",
    "kind": "game"
   },
@@ -1360,76 +1170,6 @@
    "kind": "game"
   },
   {
-   "name": "Recipes_IncrementBodyPart",
-   "refs": 1,
-   "files": 1,
-   "used_as": "_Recipes_IncrementBodyPart",
-   "addr": "80114D0C",
-   "size": 132,
-   "section": ".text",
-   "kind": "game"
-  },
-  {
-   "name": "Recipes_IncrementRow",
-   "refs": 1,
-   "files": 1,
-   "used_as": "_Recipes_IncrementRow",
-   "addr": "80114D90",
-   "size": 132,
-   "section": ".text",
-   "kind": "game"
-  },
-  {
-   "name": "Recipes_IsRecipePopupOn",
-   "refs": 1,
-   "files": 1,
-   "used_as": "_Recipes_IsRecipePopupOn",
-   "addr": "801158F4",
-   "size": 140,
-   "section": ".text",
-   "kind": "game"
-  },
-  {
-   "name": "Recipes_IsValidRecipe",
-   "refs": 1,
-   "files": 1,
-   "used_as": "_Recipes_IsValidRecipe",
-   "addr": "80115868",
-   "size": 140,
-   "section": ".text",
-   "kind": "game"
-  },
-  {
-   "name": "Recipes_RenderList_SetSelectedItem",
-   "refs": 1,
-   "files": 1,
-   "used_as": "_Recipes_RenderList_SetSelectedItem",
-   "addr": "801157E4",
-   "size": 132,
-   "section": ".text",
-   "kind": "game"
-  },
-  {
-   "name": "Recipes_SetRecipePopup",
-   "refs": 1,
-   "files": 1,
-   "used_as": "_Recipes_SetRecipePopup",
-   "addr": "80115980",
-   "size": 132,
-   "section": ".text",
-   "kind": "game"
-  },
-  {
-   "name": "ReleaseZoneSlot",
-   "refs": 1,
-   "files": 1,
-   "used_as": "_ReleaseZoneSlot",
-   "addr": "80131C28",
-   "size": 4,
-   "section": ".text",
-   "kind": "game"
-  },
-  {
    "name": "RemoveLightning",
    "refs": 1,
    "files": 1,
@@ -1450,62 +1190,12 @@
    "kind": "game"
   },
   {
-   "name": "RequestComplete",
-   "refs": 1,
-   "files": 1,
-   "used_as": "_RequestComplete",
-   "addr": "801BBB0C",
-   "size": 92,
-   "section": ".text",
-   "kind": "game"
-  },
-  {
    "name": "RespawnEntity",
    "refs": 1,
    "files": 1,
    "used_as": "_RespawnEntity",
    "addr": "800E8278",
    "size": 316,
-   "section": ".text",
-   "kind": "game"
-  },
-  {
-   "name": "ResumeFollowingWaypointPath",
-   "refs": 1,
-   "files": 1,
-   "used_as": "_ResumeFollowingWaypointPath",
-   "addr": "801B8D34",
-   "size": 168,
-   "section": ".text",
-   "kind": "game"
-  },
-  {
-   "name": "Return",
-   "refs": 1,
-   "files": 1,
-   "used_as": "_Return",
-   "addr": "801DB494",
-   "size": 4,
-   "section": ".text",
-   "kind": "game"
-  },
-  {
-   "name": "RobotEvolutionExperiment_RobotGetUniqueRandomZeroToMax",
-   "refs": 1,
-   "files": 1,
-   "used_as": "_RobotEvolutionExperiment_RobotGetUniqueRandomZeroToMax",
-   "addr": "800931C8",
-   "size": 176,
-   "section": ".text",
-   "kind": "game"
-  },
-  {
-   "name": "RobotEvolutionExperiment_RobotPlayLoopingAnimSound",
-   "refs": 1,
-   "files": 1,
-   "used_as": "_RobotEvolutionExperiment_RobotPlayLoopingAnimSound",
-   "addr": "800937C0",
-   "size": 196,
    "section": ".text",
    "kind": "game"
   },
@@ -1590,36 +1280,6 @@
    "kind": "game"
   },
   {
-   "name": "SaveCurrentScoreSlot",
-   "refs": 1,
-   "files": 1,
-   "used_as": "_SaveCurrentScoreSlot",
-   "addr": "802255FC",
-   "size": 88,
-   "section": ".text",
-   "kind": "game"
-  },
-  {
-   "name": "SaveManager_CanLoadGame",
-   "refs": 1,
-   "files": 1,
-   "used_as": "_SaveManager_CanLoadGame",
-   "addr": "8012375C",
-   "size": 188,
-   "section": ".text",
-   "kind": "game"
-  },
-  {
-   "name": "SaveManager_CanSaveGame",
-   "refs": 1,
-   "files": 1,
-   "used_as": "_SaveManager_CanSaveGame",
-   "addr": "80123818",
-   "size": 80,
-   "section": ".text",
-   "kind": "game"
-  },
-  {
    "name": "SaveManager_DoesProfileNameExist",
    "refs": 1,
    "files": 1,
@@ -1636,16 +1296,6 @@
    "used_as": "_SaveManager_EraseData",
    "addr": "80123D9C",
    "size": 916,
-   "section": ".text",
-   "kind": "game"
-  },
-  {
-   "name": "SaveManager_FreeTmpData",
-   "refs": 1,
-   "files": 1,
-   "used_as": "_SaveManager_FreeTmpData",
-   "addr": "80124340",
-   "size": 88,
    "section": ".text",
    "kind": "game"
   },
@@ -1670,62 +1320,12 @@
    "kind": "game"
   },
   {
-   "name": "SaveManager_LoadData",
-   "refs": 1,
-   "files": 1,
-   "used_as": "_SaveManager_LoadData",
-   "addr": "80123C94",
-   "size": 204,
-   "section": ".text",
-   "kind": "game"
-  },
-  {
-   "name": "SaveManager_LoadDataToTmp",
-   "refs": 1,
-   "files": 1,
-   "used_as": "_SaveManager_LoadDataToTmp",
-   "addr": "8012423C",
-   "size": 148,
-   "section": ".text",
-   "kind": "game"
-  },
-  {
-   "name": "SaveManager_ResetCurrentData",
-   "refs": 1,
-   "files": 1,
-   "used_as": "_SaveManager_ResetCurrentData",
-   "addr": "80123D60",
-   "size": 60,
-   "section": ".text",
-   "kind": "game"
-  },
-  {
-   "name": "SaveManager_ReturnToMainMenu",
-   "refs": 1,
-   "files": 1,
-   "used_as": "_SaveManager_ReturnToMainMenu",
-   "addr": "801233CC",
-   "size": 4,
-   "section": ".text",
-   "kind": "game"
-  },
-  {
    "name": "SaveManager_SaveData",
    "refs": 1,
    "files": 1,
    "used_as": "_SaveManager_SaveData",
    "addr": "80123B78",
    "size": 284,
-   "section": ".text",
-   "kind": "game"
-  },
-  {
-   "name": "SaveManager_SelectFirstEmptySlot",
-   "refs": 1,
-   "files": 1,
-   "used_as": "_SaveManager_SelectFirstEmptySlot",
-   "addr": "80123868",
-   "size": 236,
    "section": ".text",
    "kind": "game"
   },
@@ -1750,26 +1350,6 @@
    "kind": "game"
   },
   {
-   "name": "SaveQueueEvent",
-   "refs": 1,
-   "files": 1,
-   "used_as": "_SaveQueueEvent",
-   "addr": "8022DEE8",
-   "size": 84,
-   "section": ".text",
-   "kind": "game"
-  },
-  {
-   "name": "SaveRead",
-   "refs": 1,
-   "files": 1,
-   "used_as": "_SaveRead",
-   "addr": "8020681C",
-   "size": 240,
-   "section": ".text",
-   "kind": "game"
-  },
-  {
    "name": "SaveRecordBattleLoss",
    "refs": 1,
    "files": 1,
@@ -1786,16 +1366,6 @@
    "used_as": "_SaveRecordBattleWin",
    "addr": "80226C4C",
    "size": 1392,
-   "section": ".text",
-   "kind": "game"
-  },
-  {
-   "name": "SaveReset",
-   "refs": 1,
-   "files": 1,
-   "used_as": "_SaveReset",
-   "addr": "80222300",
-   "size": 1028,
    "section": ".text",
    "kind": "game"
   },
@@ -1820,36 +1390,6 @@
    "kind": "game"
   },
   {
-   "name": "SaveSetup",
-   "refs": 1,
-   "files": 1,
-   "used_as": "_SaveSetup",
-   "addr": "802069CC",
-   "size": 212,
-   "section": ".text",
-   "kind": "game"
-  },
-  {
-   "name": "SaveWriteData",
-   "refs": 1,
-   "files": 1,
-   "used_as": "_SaveWriteData",
-   "addr": "8020690C",
-   "size": 192,
-   "section": ".text",
-   "kind": "game"
-  },
-  {
-   "name": "SavedGameMCReceivedCallback",
-   "refs": 1,
-   "files": 1,
-   "used_as": "_SavedGameMCReceivedCallback",
-   "addr": "8010A38C",
-   "size": 36,
-   "section": ".text",
-   "kind": "game"
-  },
-  {
    "name": "ScoreActivateCandidate",
    "refs": 1,
    "files": 1,
@@ -1870,22 +1410,12 @@
    "kind": "game"
   },
   {
-   "name": "ScreenSetsDraw",
+   "name": "ScriptSigFinalize",
    "refs": 1,
    "files": 1,
-   "used_as": "_ScreenSetsDraw",
-   "addr": "8018CD70",
-   "size": 244,
-   "section": ".text",
-   "kind": "game"
-  },
-  {
-   "name": "ScriptSigDefine",
-   "refs": 1,
-   "files": 1,
-   "used_as": "_ScriptSigDefine",
-   "addr": "801DC7D4",
-   "size": 156,
+   "used_as": "_ScriptSigFinalize",
+   "addr": "801DC658",
+   "size": 380,
    "section": ".text",
    "kind": "game"
   },
@@ -3008,6 +2538,476 @@
    "size": 228,
    "section": ".text",
    "kind": "game"
+  },
+  {
+   "name": "UIElement_RestoreZ",
+   "refs": 1,
+   "files": 1,
+   "used_as": "_UIElement_RestoreZ",
+   "addr": "8018FA34",
+   "size": 164,
+   "section": ".text",
+   "kind": "game"
+  },
+  {
+   "name": "UIElement_SetEnableFlag",
+   "refs": 1,
+   "files": 1,
+   "used_as": "_UIElement_SetEnableFlag",
+   "addr": "8018F778",
+   "size": 200,
+   "section": ".text",
+   "kind": "game"
+  },
+  {
+   "name": "UIElement_SetPos",
+   "refs": 1,
+   "files": 1,
+   "used_as": "_UIElement_SetPos",
+   "addr": "8018F840",
+   "size": 236,
+   "section": ".text",
+   "kind": "game"
+  },
+  {
+   "name": "UIElement_SetPos_Floats",
+   "refs": 1,
+   "files": 1,
+   "used_as": "_UIElement_SetPos_Floats",
+   "addr": "8018F92C",
+   "size": 264,
+   "section": ".text",
+   "kind": "game"
+  },
+  {
+   "name": "UIElement_SetSize",
+   "refs": 1,
+   "files": 1,
+   "used_as": "_UIElement_SetSize",
+   "addr": "8018FC68",
+   "size": 236,
+   "section": ".text",
+   "kind": "game"
+  },
+  {
+   "name": "UIElement_SetSize_Floats",
+   "refs": 1,
+   "files": 1,
+   "used_as": "_UIElement_SetSize_Floats",
+   "addr": "8018FD54",
+   "size": 264,
+   "section": ".text",
+   "kind": "game"
+  },
+  {
+   "name": "UIElement_SetX",
+   "refs": 1,
+   "files": 1,
+   "used_as": "_UIElement_SetX",
+   "addr": "8018FAD8",
+   "size": 172,
+   "section": ".text",
+   "kind": "game"
+  },
+  {
+   "name": "UIEngine_UnloadUISlot",
+   "refs": 1,
+   "files": 1,
+   "used_as": "_UIEngine_UnloadUISlot",
+   "addr": "8000CD8C",
+   "size": 4,
+   "section": ".text",
+   "kind": "game"
+  },
+  {
+   "name": "UIEvent_SendToElement",
+   "refs": 1,
+   "files": 1,
+   "used_as": "_UIEvent_SendToElement",
+   "addr": "80195348",
+   "size": 156,
+   "section": ".text",
+   "kind": "game"
+  },
+  {
+   "name": "UIEvent_SendToTopScreenAndChildren",
+   "refs": 1,
+   "files": 1,
+   "used_as": "_UIEvent_SendToTopScreenAndChildren",
+   "addr": "80195224",
+   "size": 136,
+   "section": ".text",
+   "kind": "game"
+  },
+  {
+   "name": "UIGrid_GetCurrentIndex_ToScript",
+   "refs": 1,
+   "files": 1,
+   "used_as": "_UIGrid_GetCurrentIndex_ToScript",
+   "addr": "80193688",
+   "size": 260,
+   "section": ".text",
+   "kind": "game"
+  },
+  {
+   "name": "UIGrid_GetCurrentText",
+   "refs": 1,
+   "files": 1,
+   "used_as": "_UIGrid_GetCurrentText",
+   "addr": "801938A4",
+   "size": 300,
+   "section": ".text",
+   "kind": "game"
+  },
+  {
+   "name": "UIGrid_GetElementPos",
+   "refs": 1,
+   "files": 1,
+   "used_as": "_UIGrid_GetElementPos",
+   "addr": "801947A0",
+   "size": 216,
+   "section": ".text",
+   "kind": "game"
+  },
+  {
+   "name": "UIGrid_GetNumValidCols",
+   "refs": 1,
+   "files": 1,
+   "used_as": "_UIGrid_GetNumValidCols",
+   "addr": "80193C30",
+   "size": 200,
+   "section": ".text",
+   "kind": "game"
+  },
+  {
+   "name": "UIGrid_GetNumValidItems",
+   "refs": 1,
+   "files": 1,
+   "used_as": "_UIGrid_GetNumValidItems",
+   "addr": "80193DC0",
+   "size": 200,
+   "section": ".text",
+   "kind": "game"
+  },
+  {
+   "name": "UIGrid_GetNumValidRows",
+   "refs": 1,
+   "files": 1,
+   "used_as": "_UIGrid_GetNumValidRows",
+   "addr": "80193CF8",
+   "size": 200,
+   "section": ".text",
+   "kind": "game"
+  },
+  {
+   "name": "UIGrid_GetPreviousIndex_ToScript",
+   "refs": 1,
+   "files": 1,
+   "used_as": "_UIGrid_GetPreviousIndex_ToScript",
+   "addr": "8019378C",
+   "size": 280,
+   "section": ".text",
+   "kind": "game"
+  },
+  {
+   "name": "UIGrid_GetSize",
+   "refs": 1,
+   "files": 1,
+   "used_as": "_UIGrid_GetSize",
+   "addr": "801939D0",
+   "size": 208,
+   "section": ".text",
+   "kind": "game"
+  },
+  {
+   "name": "UIGrid_IsHScrolling",
+   "refs": 1,
+   "files": 1,
+   "used_as": "_UIGrid_IsHScrolling",
+   "addr": "80193AA0",
+   "size": 200,
+   "section": ".text",
+   "kind": "game"
+  },
+  {
+   "name": "UIGrid_IsVScrolling",
+   "refs": 1,
+   "files": 1,
+   "used_as": "_UIGrid_IsVScrolling",
+   "addr": "80193B68",
+   "size": 200,
+   "section": ".text",
+   "kind": "game"
+  },
+  {
+   "name": "UIGrid_PlayUIAnim",
+   "refs": 1,
+   "files": 1,
+   "used_as": "_UIGrid_PlayUIAnim",
+   "addr": "801942E0",
+   "size": 212,
+   "section": ".text",
+   "kind": "game"
+  },
+  {
+   "name": "UIGrid_PlayUIAnimAll",
+   "refs": 1,
+   "files": 1,
+   "used_as": "_UIGrid_PlayUIAnimAll",
+   "addr": "80194490",
+   "size": 204,
+   "section": ".text",
+   "kind": "game"
+  },
+  {
+   "name": "UIGrid_PlayUIAnimOnType",
+   "refs": 1,
+   "files": 1,
+   "used_as": "_UIGrid_PlayUIAnimOnType",
+   "addr": "801943B4",
+   "size": 220,
+   "section": ".text",
+   "kind": "game"
+  },
+  {
+   "name": "UIGrid_SetActiveList",
+   "refs": 1,
+   "files": 1,
+   "used_as": "_UIGrid_SetActiveList",
+   "addr": "801941F8",
+   "size": 232,
+   "section": ".text",
+   "kind": "game"
+  },
+  {
+   "name": "UIGrid_SetCurrentIndex",
+   "refs": 1,
+   "files": 1,
+   "used_as": "_UIGrid_SetCurrentIndex",
+   "addr": "80193398",
+   "size": 752,
+   "section": ".text",
+   "kind": "game"
+  },
+  {
+   "name": "UIGrid_SetEventList",
+   "refs": 1,
+   "files": 1,
+   "used_as": "_UIGrid_SetEventList",
+   "addr": "80194038",
+   "size": 232,
+   "section": ".text",
+   "kind": "game"
+  },
+  {
+   "name": "UIGrid_SetHighlightColor",
+   "refs": 1,
+   "files": 1,
+   "used_as": "_UIGrid_SetHighlightColor",
+   "addr": "80194628",
+   "size": 376,
+   "section": ".text",
+   "kind": "game"
+  },
+  {
+   "name": "UIGrid_SetHighlightVisibleFlag",
+   "refs": 1,
+   "files": 1,
+   "used_as": "_UIGrid_SetHighlightVisibleFlag",
+   "addr": "8019455C",
+   "size": 204,
+   "section": ".text",
+   "kind": "game"
+  },
+  {
+   "name": "UIGrid_SetIgnoreAlphaPixels",
+   "refs": 1,
+   "files": 1,
+   "used_as": "_UIGrid_SetIgnoreAlphaPixels",
+   "addr": "80194878",
+   "size": 204,
+   "section": ".text",
+   "kind": "game"
+  },
+  {
+   "name": "UIGrid_SetImageList",
+   "refs": 1,
+   "files": 1,
+   "used_as": "_UIGrid_SetImageList",
+   "addr": "80193F60",
+   "size": 216,
+   "section": ".text",
+   "kind": "game"
+  },
+  {
+   "name": "UIGrid_SetTextColorList",
+   "refs": 1,
+   "files": 1,
+   "used_as": "_UIGrid_SetTextColorList",
+   "addr": "80194120",
+   "size": 216,
+   "section": ".text",
+   "kind": "game"
+  },
+  {
+   "name": "UIGrid_SetTextList",
+   "refs": 1,
+   "files": 1,
+   "used_as": "_UIGrid_SetTextList",
+   "addr": "80193E88",
+   "size": 216,
+   "section": ".text",
+   "kind": "game"
+  },
+  {
+   "name": "UIModel_SetModel",
+   "refs": 1,
+   "files": 1,
+   "used_as": "_UIModel_SetModel",
+   "addr": "80191A5C",
+   "size": 16,
+   "section": ".text",
+   "kind": "game"
+  },
+  {
+   "name": "UIPlayGlobalGroupSound",
+   "refs": 1,
+   "files": 1,
+   "used_as": "_UIPlayGlobalGroupSound",
+   "addr": "800EFFB4",
+   "size": 104,
+   "section": ".text",
+   "kind": "game"
+  },
+  {
+   "name": "UIScreen_ClearStack",
+   "refs": 1,
+   "files": 1,
+   "used_as": "_UIScreen_ClearStack",
+   "addr": "8018F088",
+   "size": 100,
+   "section": ".text",
+   "kind": "game"
+  },
+  {
+   "name": "UIScreen_Pop",
+   "refs": 1,
+   "files": 1,
+   "used_as": "_UIScreen_Pop",
+   "addr": "8018EF9C",
+   "size": 100,
+   "section": ".text",
+   "kind": "game"
+  },
+  {
+   "name": "UIScreen_SetEnableFlag",
+   "refs": 1,
+   "files": 1,
+   "used_as": "_UIScreen_SetEnableFlag",
+   "addr": "8018F1D4",
+   "size": 232,
+   "section": ".text",
+   "kind": "game"
+  },
+  {
+   "name": "UIScreen_SetVisibleFlag",
+   "refs": 1,
+   "files": 1,
+   "used_as": "_UIScreen_SetVisibleFlag",
+   "addr": "8018F0EC",
+   "size": 232,
+   "section": ".text",
+   "kind": "game"
+  },
+  {
+   "name": "UISetNegativeNumber",
+   "refs": 1,
+   "files": 1,
+   "used_as": "_UISetNegativeNumber",
+   "addr": "8019F2F4",
+   "size": 76,
+   "section": ".text",
+   "kind": "game"
+  },
+  {
+   "name": "UISlider_DecValue",
+   "refs": 1,
+   "files": 1,
+   "used_as": "_UISlider_DecValue",
+   "addr": "80192764",
+   "size": 192,
+   "section": ".text",
+   "kind": "game"
+  },
+  {
+   "name": "UISlider_GetIncValue",
+   "refs": 1,
+   "files": 1,
+   "used_as": "_UISlider_GetIncValue",
+   "addr": "801931FC",
+   "size": 200,
+   "section": ".text",
+   "kind": "game"
+  },
+  {
+   "name": "UISlider_GetIncValue_Int",
+   "refs": 1,
+   "files": 1,
+   "used_as": "_UISlider_GetIncValue_Int",
+   "addr": "801932C4",
+   "size": 212,
+   "section": ".text",
+   "kind": "game"
+  },
+  {
+   "name": "UISlider_GetMaxValue",
+   "refs": 1,
+   "files": 1,
+   "used_as": "_UISlider_GetMaxValue",
+   "addr": "80192EB0",
+   "size": 200,
+   "section": ".text",
+   "kind": "game"
+  },
+  {
+   "name": "UISlider_GetMaxValue_Int",
+   "refs": 1,
+   "files": 1,
+   "used_as": "_UISlider_GetMaxValue_Int",
+   "addr": "80192F78",
+   "size": 212,
+   "section": ".text",
+   "kind": "game"
+  },
+  {
+   "name": "UISlider_GetMinValue",
+   "refs": 1,
+   "files": 1,
+   "used_as": "_UISlider_GetMinValue",
+   "addr": "80192B64",
+   "size": 200,
+   "section": ".text",
+   "kind": "game"
+  },
+  {
+   "name": "UISlider_GetMinValue_Int",
+   "refs": 1,
+   "files": 1,
+   "used_as": "_UISlider_GetMinValue_Int",
+   "addr": "80192C2C",
+   "size": 212,
+   "section": ".text",
+   "kind": "game"
+  },
+  {
+   "name": "UISlider_GetNormalizedCurrentValue",
+   "refs": 1,
+   "files": 1,
+   "used_as": "_UISlider_GetNormalizedCurrentValue",
+   "addr": "801928EC",
+   "size": 200,
+   "section": ".text",
+   "kind": "game"
   }
  ],
  "library": [
@@ -3021,6 +3021,17 @@
    "section": ".text",
    "kind": "library",
    "region": "OS"
+  },
+  {
+   "name": "fn_8032F1E8",
+   "refs": 7,
+   "files": 7,
+   "used_as": "_fn_8032F1E8",
+   "addr": "8032F1E8",
+   "size": 248,
+   "section": ".text",
+   "kind": "library",
+   "region": "MSL C/C++ runtime"
   },
   {
    "name": "MEMAllocFromAllocator",
@@ -3043,17 +3054,6 @@
    "section": ".text",
    "kind": "library",
    "region": "OS"
-  },
-  {
-   "name": "fn_8032F1E8",
-   "refs": 6,
-   "files": 6,
-   "used_as": "_fn_8032F1E8",
-   "addr": "8032F1E8",
-   "size": 248,
-   "section": ".text",
-   "kind": "library",
-   "region": "MSL C/C++ runtime"
   },
   {
    "name": "DCFlushRange",
@@ -3219,6 +3219,17 @@
    "section": ".text",
    "kind": "library",
    "region": "WPAD/KPAD/BT"
+  },
+  {
+   "name": "fn_80265D78",
+   "refs": 2,
+   "files": 2,
+   "used_as": "_fn_80265D78",
+   "addr": "80265D78",
+   "size": 176,
+   "section": ".text",
+   "kind": "library",
+   "region": "NAND/SC/IPC"
   },
   {
    "name": "fn_8027D270",
@@ -3661,6 +3672,17 @@
    "region": "OS"
   },
   {
+   "name": "OSReturnToDataManager",
+   "refs": 1,
+   "files": 1,
+   "used_as": "_OSReturnToDataManager",
+   "addr": "8023B044",
+   "size": 64,
+   "section": ".text",
+   "kind": "library",
+   "region": "OS"
+  },
+  {
    "name": "OSSetCurrentHeap",
    "refs": 1,
    "files": 1,
@@ -3914,12 +3936,34 @@
    "region": "NAND/SC/IPC"
   },
   {
-   "name": "fn_80265D78",
+   "name": "fn_80265F80",
    "refs": 1,
    "files": 1,
-   "used_as": "_fn_80265D78",
-   "addr": "80265D78",
-   "size": 176,
+   "used_as": "_fn_80265F80",
+   "addr": "80265F80",
+   "size": 104,
+   "section": ".text",
+   "kind": "library",
+   "region": "NAND/SC/IPC"
+  },
+  {
+   "name": "fn_80266060",
+   "refs": 1,
+   "files": 1,
+   "used_as": "_fn_80266060",
+   "addr": "80266060",
+   "size": 104,
+   "section": ".text",
+   "kind": "library",
+   "region": "NAND/SC/IPC"
+  },
+  {
+   "name": "fn_80266614",
+   "refs": 1,
+   "files": 1,
+   "used_as": "_fn_80266614",
+   "addr": "80266614",
+   "size": 136,
    "section": ".text",
    "kind": "library",
    "region": "NAND/SC/IPC"
@@ -3931,6 +3975,28 @@
    "used_as": "_fn_80266E24",
    "addr": "80266E24",
    "size": 108,
+   "section": ".text",
+   "kind": "library",
+   "region": "NAND/SC/IPC"
+  },
+  {
+   "name": "fn_80267A54",
+   "refs": 1,
+   "files": 1,
+   "used_as": "_fn_80267A54",
+   "addr": "80267A54",
+   "size": 68,
+   "section": ".text",
+   "kind": "library",
+   "region": "NAND/SC/IPC"
+  },
+  {
+   "name": "fn_80267B14",
+   "refs": 1,
+   "files": 1,
+   "used_as": "_fn_80267B14",
+   "addr": "80267B14",
+   "size": 84,
    "section": ".text",
    "kind": "library",
    "region": "NAND/SC/IPC"
@@ -4156,6 +4222,17 @@
    "region": "MSL C/C++ runtime"
   },
   {
+   "name": "fn_8032F358",
+   "refs": 1,
+   "files": 1,
+   "used_as": "_fn_8032F358",
+   "addr": "8032F358",
+   "size": 128,
+   "section": ".text",
+   "kind": "library",
+   "region": "MSL C/C++ runtime"
+  },
+  {
    "name": "fn_80333424",
    "refs": 1,
    "files": 1,
@@ -4334,8 +4411,8 @@
   },
   {
    "name": "gGame",
-   "refs": 47,
-   "files": 47,
+   "refs": 49,
+   "files": 49,
    "used_as": "\"unsigned char * gGame\" (?gGame@@3PAEA)",
    "addr": "803B53A0",
    "size": 54840,
@@ -4344,8 +4421,8 @@
   },
   {
    "name": "lbl_805FBBE0",
-   "refs": 42,
-   "files": 42,
+   "refs": 43,
+   "files": 43,
    "used_as": "\"unsigned char * lbl_805FBBE0\" (?lbl_805FBBE0@@3PAEA)",
    "addr": "805FBBE0",
    "size": 8,
@@ -4364,8 +4441,8 @@
   },
   {
    "name": "gGameDb",
-   "refs": 37,
-   "files": 37,
+   "refs": 38,
+   "files": 38,
    "used_as": "\"struct GameDb * gGameDb\" (?gGameDb@@3PAUGameDb@@A)",
    "addr": "805FBBC0",
    "size": 8,
@@ -4414,8 +4491,8 @@
   },
   {
    "name": "lbl_805FB248",
-   "refs": 15,
-   "files": 15,
+   "refs": 17,
+   "files": 17,
    "used_as": "_lbl_805FB248",
    "addr": "805FB248",
    "size": 4,
@@ -4433,6 +4510,16 @@
    "kind": "global"
   },
   {
+   "name": "lbl_805F8200",
+   "refs": 14,
+   "files": 14,
+   "used_as": "\"char const * const lbl_805F8200\" (?lbl_805F8200@@3QBDB)",
+   "addr": "805F8200",
+   "size": 8,
+   "section": ".sdata",
+   "kind": "global"
+  },
+  {
    "name": "lbl_805FAF78",
    "refs": 14,
    "files": 14,
@@ -4443,19 +4530,9 @@
    "kind": "global"
   },
   {
-   "name": "lbl_805F8200",
-   "refs": 13,
-   "files": 13,
-   "used_as": "\"char const * const lbl_805F8200\" (?lbl_805F8200@@3QBDB)",
-   "addr": "805F8200",
-   "size": 8,
-   "section": ".sdata",
-   "kind": "global"
-  },
-  {
    "name": "gStringTable2",
-   "refs": 11,
-   "files": 11,
+   "refs": 12,
+   "files": 12,
    "used_as": "\"void * gStringTable2\" (?gStringTable2@@3PAXA)",
    "addr": "805FB90C",
    "size": 4,
@@ -4473,21 +4550,21 @@
    "kind": "global"
   },
   {
-   "name": "gObjDb",
-   "refs": 10,
-   "files": 10,
-   "used_as": "\"void * gObjDb\" (?gObjDb@@3PAXA)",
-   "addr": "805FB180",
+   "name": "lbl_805FB6B8",
+   "refs": 11,
+   "files": 11,
+   "used_as": "\"int lbl_805FB6B8\" (?lbl_805FB6B8@@3HA)",
+   "addr": "805FB6B8",
    "size": 8,
    "section": ".sbss",
    "kind": "global"
   },
   {
-   "name": "lbl_805FB6B8",
+   "name": "gObjDb",
    "refs": 10,
    "files": 10,
-   "used_as": "\"int lbl_805FB6B8\" (?lbl_805FB6B8@@3HA)",
-   "addr": "805FB6B8",
+   "used_as": "\"void * gObjDb\" (?gObjDb@@3PAXA)",
+   "addr": "805FB180",
    "size": 8,
    "section": ".sbss",
    "kind": "global"
@@ -4530,6 +4607,26 @@
    "addr": "8047C640",
    "size": 240,
    "section": ".bss",
+   "kind": "global"
+  },
+  {
+   "name": "lbl_805FEB0C",
+   "refs": 8,
+   "files": 8,
+   "used_as": "\"float lbl_805FEB0C\" (?lbl_805FEB0C@@3MA)",
+   "addr": "805FEB0C",
+   "size": 4,
+   "section": ".sdata2",
+   "kind": "global"
+  },
+  {
+   "name": "lbl_80354800",
+   "refs": 7,
+   "files": 7,
+   "used_as": "_lbl_80354800",
+   "addr": "80354800",
+   "size": 10,
+   "section": ".data",
    "kind": "global"
   },
   {
@@ -4583,16 +4680,6 @@
    "kind": "global"
   },
   {
-   "name": "lbl_805FEB0C",
-   "refs": 7,
-   "files": 7,
-   "used_as": "\"float lbl_805FEB0C\" (?lbl_805FEB0C@@3MA)",
-   "addr": "805FEB0C",
-   "size": 4,
-   "section": ".sdata2",
-   "kind": "global"
-  },
-  {
    "name": "gFlag805FB948",
    "refs": 6,
    "files": 6,
@@ -4623,11 +4710,11 @@
    "kind": "global"
   },
   {
-   "name": "lbl_80354800",
+   "name": "lbl_8035480C",
    "refs": 6,
    "files": 6,
-   "used_as": "_lbl_80354800",
-   "addr": "80354800",
+   "used_as": "_lbl_8035480C",
+   "addr": "8035480C",
    "size": 10,
    "section": ".data",
    "kind": "global"
@@ -4690,16 +4777,6 @@
    "addr": "8048A8F0",
    "size": 120662,
    "section": ".bss",
-   "kind": "global"
-  },
-  {
-   "name": "lbl_8035480C",
-   "refs": 5,
-   "files": 5,
-   "used_as": "_lbl_8035480C",
-   "addr": "8035480C",
-   "size": 10,
-   "section": ".data",
    "kind": "global"
   },
   {
@@ -4803,6 +4880,16 @@
    "kind": "global"
   },
   {
+   "name": "lbl_805FB658",
+   "refs": 5,
+   "files": 5,
+   "used_as": "_lbl_805FB658",
+   "addr": "805FB658",
+   "size": 4,
+   "section": ".sbss",
+   "kind": "global"
+  },
+  {
    "name": "lbl_805FB710",
    "refs": 5,
    "files": 5,
@@ -4840,6 +4927,16 @@
    "addr": "805FBB48",
    "size": 4,
    "section": ".sbss",
+   "kind": "global"
+  },
+  {
+   "name": "lbl_805FD300",
+   "refs": 5,
+   "files": 5,
+   "used_as": "\"float lbl_805FD300\" (?lbl_805FD300@@3MA)",
+   "addr": "805FD300",
+   "size": 4,
+   "section": ".sdata2",
    "kind": "global"
   },
   {
@@ -4943,21 +5040,21 @@
    "kind": "global"
   },
   {
+   "name": "lbl_805FB2D5",
+   "refs": 4,
+   "files": 4,
+   "used_as": "_lbl_805FB2D5",
+   "addr": "805FB2D5",
+   "size": 1,
+   "section": ".sbss",
+   "kind": "global"
+  },
+  {
    "name": "lbl_805FB594",
    "refs": 4,
    "files": 4,
    "used_as": "\"int lbl_805FB594\" (?lbl_805FB594@@3HA)",
    "addr": "805FB594",
-   "size": 4,
-   "section": ".sbss",
-   "kind": "global"
-  },
-  {
-   "name": "lbl_805FB658",
-   "refs": 4,
-   "files": 4,
-   "used_as": "_lbl_805FB658",
-   "addr": "805FB658",
    "size": 4,
    "section": ".sbss",
    "kind": "global"
@@ -5003,13 +5100,13 @@
    "kind": "global"
   },
   {
-   "name": "lbl_805FD300",
+   "name": "lbl_805FB8D8",
    "refs": 4,
    "files": 4,
-   "used_as": "\"float lbl_805FD300\" (?lbl_805FD300@@3MA)",
-   "addr": "805FD300",
-   "size": 4,
-   "section": ".sdata2",
+   "used_as": "_lbl_805FB8D8",
+   "addr": "805FB8D8",
+   "size": 8,
+   "section": ".sbss",
    "kind": "global"
   },
   {
@@ -5109,6 +5206,16 @@
    "used_as": "\"unsigned char * lbl_803C5DB0\" (?lbl_803C5DB0@@3PAEA)",
    "addr": "803C5DB0",
    "size": 2804,
+   "section": ".bss",
+   "kind": "global"
+  },
+  {
+   "name": "lbl_803C6A70",
+   "refs": 3,
+   "files": 3,
+   "used_as": "_lbl_803C6A70",
+   "addr": "803C6A70",
+   "size": 12,
    "section": ".bss",
    "kind": "global"
   },
@@ -5218,6 +5325,16 @@
    "files": 3,
    "used_as": "_lbl_805F81C0",
    "addr": "805F81C0",
+   "size": 4,
+   "section": ".sdata",
+   "kind": "global"
+  },
+  {
+   "name": "lbl_805F8FD4",
+   "refs": 3,
+   "files": 3,
+   "used_as": "_lbl_805F8FD4",
+   "addr": "805F8FD4",
    "size": 4,
    "section": ".sdata",
    "kind": "global"
@@ -5379,16 +5496,6 @@
    "used_as": "\"unsigned char * lbl_805FB258\" (?lbl_805FB258@@3PAEA)",
    "addr": "805FB258",
    "size": 4,
-   "section": ".sbss",
-   "kind": "global"
-  },
-  {
-   "name": "lbl_805FB2D5",
-   "refs": 3,
-   "files": 3,
-   "used_as": "_lbl_805FB2D5",
-   "addr": "805FB2D5",
-   "size": 1,
    "section": ".sbss",
    "kind": "global"
   },
@@ -5559,16 +5666,6 @@
    "used_as": "\"unsigned char * lbl_805FB89C\" (?lbl_805FB89C@@3PAEA)",
    "addr": "805FB89C",
    "size": 4,
-   "section": ".sbss",
-   "kind": "global"
-  },
-  {
-   "name": "lbl_805FB8D8",
-   "refs": 3,
-   "files": 3,
-   "used_as": "_lbl_805FB8D8",
-   "addr": "805FB8D8",
-   "size": 8,
    "section": ".sbss",
    "kind": "global"
   },
@@ -5779,6 +5876,16 @@
    "used_as": "\"struct MovieQueue gMovieQueue\" (?gMovieQueue@@3UMovieQueue@@A)",
    "addr": "803C44E0",
    "size": 1080,
+   "section": ".bss",
+   "kind": "global"
+  },
+  {
+   "name": "gScriptSigs",
+   "refs": 2,
+   "files": 2,
+   "used_as": "\"unsigned char * gScriptSigs\" (?gScriptSigs@@3PAEA)",
+   "addr": "8047D6B8",
+   "size": 27512,
    "section": ".bss",
    "kind": "global"
   },
@@ -6083,6 +6190,16 @@
    "kind": "global"
   },
   {
+   "name": "lbl_80386C10",
+   "refs": 2,
+   "files": 2,
+   "used_as": "\"unsigned char * lbl_80386C10\" (?lbl_80386C10@@3PAEA)",
+   "addr": "80386C10",
+   "size": 144,
+   "section": ".data",
+   "kind": "global"
+  },
+  {
    "name": "lbl_803881B4",
    "refs": 2,
    "files": 2,
@@ -6139,16 +6256,6 @@
    "used_as": "_lbl_803C6A38",
    "addr": "803C6A38",
    "size": 20,
-   "section": ".bss",
-   "kind": "global"
-  },
-  {
-   "name": "lbl_803C6A70",
-   "refs": 2,
-   "files": 2,
-   "used_as": "_lbl_803C6A70",
-   "addr": "803C6A70",
-   "size": 12,
    "section": ".bss",
    "kind": "global"
   },
@@ -6423,6 +6530,16 @@
    "kind": "global"
   },
   {
+   "name": "lbl_80527140",
+   "refs": 2,
+   "files": 2,
+   "used_as": "\"unsigned char * lbl_80527140\" (?lbl_80527140@@3PAEA)",
+   "addr": "80527140",
+   "size": 160,
+   "section": ".bss",
+   "kind": "global"
+  },
+  {
    "name": "lbl_80556AE0",
    "refs": 2,
    "files": 2,
@@ -6473,6 +6590,16 @@
    "kind": "global"
   },
   {
+   "name": "lbl_805F8A38",
+   "refs": 2,
+   "files": 2,
+   "used_as": "_lbl_805F8A38",
+   "addr": "805F8A38",
+   "size": 8,
+   "section": ".sdata",
+   "kind": "global"
+  },
+  {
    "name": "lbl_805F8EDC",
    "refs": 2,
    "files": 2,
@@ -6498,16 +6625,6 @@
    "files": 2,
    "used_as": "\"char const * const lbl_805F8FD0\" (?lbl_805F8FD0@@3PBDB)",
    "addr": "805F8FD0",
-   "size": 4,
-   "section": ".sdata",
-   "kind": "global"
-  },
-  {
-   "name": "lbl_805F8FD4",
-   "refs": 2,
-   "files": 2,
-   "used_as": "_lbl_805F8FD4",
-   "addr": "805F8FD4",
    "size": 4,
    "section": ".sdata",
    "kind": "global"
@@ -6913,6 +7030,16 @@
    "kind": "global"
   },
   {
+   "name": "lbl_805FB238",
+   "refs": 2,
+   "files": 2,
+   "used_as": "\"unsigned char * lbl_805FB238\" (?lbl_805FB238@@3PAEA)",
+   "addr": "805FB238",
+   "size": 1,
+   "section": ".sbss",
+   "kind": "global"
+  },
+  {
    "name": "lbl_805FB24C",
    "refs": 2,
    "files": 2,
@@ -6973,11 +7100,31 @@
    "kind": "global"
   },
   {
+   "name": "lbl_805FB2C8",
+   "refs": 2,
+   "files": 2,
+   "used_as": "\"int lbl_805FB2C8\" (?lbl_805FB2C8@@3HA)",
+   "addr": "805FB2C8",
+   "size": 4,
+   "section": ".sbss",
+   "kind": "global"
+  },
+  {
    "name": "lbl_805FB2CC",
    "refs": 2,
    "files": 2,
    "used_as": "\"int lbl_805FB2CC\" (?lbl_805FB2CC@@3HA)",
    "addr": "805FB2CC",
+   "size": 4,
+   "section": ".sbss",
+   "kind": "global"
+  },
+  {
+   "name": "lbl_805FB2D0",
+   "refs": 2,
+   "files": 2,
+   "used_as": "\"unsigned char * lbl_805FB2D0\" (?lbl_805FB2D0@@3PAEA)",
+   "addr": "805FB2D0",
    "size": 4,
    "section": ".sbss",
    "kind": "global"
@@ -7251,85 +7398,22 @@
    "size": 4,
    "section": ".sbss",
    "kind": "global"
-  },
-  {
-   "name": "lbl_805FB44C",
-   "refs": 2,
-   "files": 2,
-   "used_as": "\"unsigned char * lbl_805FB44C\" (?lbl_805FB44C@@3PAEA)",
-   "addr": "805FB44C",
-   "size": 4,
-   "section": ".sbss",
-   "kind": "global"
-  },
-  {
-   "name": "lbl_805FB454",
-   "refs": 2,
-   "files": 2,
-   "used_as": "\"unsigned char * lbl_805FB454\" (?lbl_805FB454@@3PAEA)",
-   "addr": "805FB454",
-   "size": 1,
-   "section": ".sbss",
-   "kind": "global"
-  },
-  {
-   "name": "lbl_805FB458",
-   "refs": 2,
-   "files": 2,
-   "used_as": "_lbl_805FB458",
-   "addr": "805FB458",
-   "size": 4,
-   "section": ".sbss",
-   "kind": "global"
-  },
-  {
-   "name": "lbl_805FB494",
-   "refs": 2,
-   "files": 2,
-   "used_as": "\"unsigned char * lbl_805FB494\" (?lbl_805FB494@@3PAEA)",
-   "addr": "805FB494",
-   "size": 4,
-   "section": ".sbss",
-   "kind": "global"
-  },
-  {
-   "name": "lbl_805FB498",
-   "refs": 2,
-   "files": 2,
-   "used_as": "\"void * lbl_805FB498\" (?lbl_805FB498@@3PAXA)",
-   "addr": "805FB498",
-   "size": 8,
-   "section": ".sbss",
-   "kind": "global"
-  },
-  {
-   "name": "lbl_805FB4C4",
-   "refs": 2,
-   "files": 2,
-   "used_as": "_lbl_805FB4C4",
-   "addr": "805FB4C4",
-   "size": 4,
-   "section": ".sbss",
-   "kind": "global"
-  },
-  {
-   "name": "lbl_805FB4CC",
-   "refs": 2,
-   "files": 2,
-   "used_as": "_lbl_805FB4CC",
-   "addr": "805FB4CC",
-   "size": 4,
-   "section": ".sbss",
-   "kind": "global"
   }
  ],
  "mismatch": [],
  "unknown": [
   {
    "name": "gSaveSystem",
-   "refs": 18,
-   "files": 18,
+   "refs": 19,
+   "files": 19,
    "used_as": "\"unsigned char * gSaveSystem\" (?gSaveSystem@@3PAEA)",
+   "kind": "unknown"
+  },
+  {
+   "name": "GXWGFifo",
+   "refs": 10,
+   "files": 10,
+   "used_as": "_GXWGFifo",
    "kind": "unknown"
   },
   {
@@ -7337,13 +7421,6 @@
    "refs": 10,
    "files": 10,
    "used_as": "\"unsigned char * gScriptCtx\" (?gScriptCtx@@3PAEA)",
-   "kind": "unknown"
-  },
-  {
-   "name": "GXWGFifo",
-   "refs": 9,
-   "files": 9,
-   "used_as": "_GXWGFifo",
    "kind": "unknown"
   },
   {
@@ -8146,11 +8223,11 @@
   }
  ],
  "library_regions": {
-  "OS": 37,
-  "MSL C/C++ runtime": 20,
+  "OS": 38,
+  "MSL C/C++ runtime": 21,
   "GX": 17,
   "Network (DWC/SSL/NHTTP/NWC24)": 17,
-  "NAND/SC/IPC": 10,
+  "NAND/SC/IPC": 15,
   "AI/AX/MEM": 7,
   "WPAD/KPAD/BT": 7,
   "zlib 1.2.3": 3,
