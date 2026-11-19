@@ -94,6 +94,11 @@
  "changelog": [
   {
    "date": "2026-11-19",
+   "time": "15:30",
+   "text": "Thirteenth round from the missing-symbols list: 46 more functions, including the sound and music play callbacks (sound effects, looping and grouped sound FX, monster voices, spray sound), the part action cost, value and target getters, path-finding nodes and directions, projectile and lightning firing from props, camera pan to junction, nunchuk update and multiplayer init."
+  },
+  {
+   "date": "2026-11-19",
    "time": "14:55",
    "text": "Twelfth round from the missing-symbols list: 50 more functions, including the matchup screen (accept, cancel, show monster and status), multiplayer and single-player name entry, music play, the mystic brew ghost and power-up hide positions, memory alloc and free, mesh overlay fades, level and experiment loading, monster select, and the lightning tower charge checks."
   },

@@ -1,15 +1,15 @@
 {
  "game_id": "RM7P4F",
- "generated": "2026-11-19T12:24:29+00:00",
- "commit": "a08a163",
- "commit_date": "2026-11-19T13:10:10+01:00",
+ "generated": "2026-11-19T12:34:29+00:00",
+ "commit": "63a5f4d",
+ "commit_date": "2026-11-19T13:24:31+01:00",
  "game": {
   "functions": 8548,
   "bytes": 2265988,
   "named": 2748,
   "named_bytes": 616800,
-  "decompiled": 5115,
-  "decompiled_bytes": 627508
+  "decompiled": 5170,
+  "decompiled_bytes": 638180
  },
  "library": {
   "functions": 4039,
@@ -24,8 +24,8 @@
   "bytes": 3404928,
   "named": 3211,
   "named_bytes": 721548,
-  "decompiled": 5116,
-  "decompiled_bytes": 627628
+  "decompiled": 5171,
+  "decompiled_bytes": 638300
  },
  "game_range": [
   "80006B40",
@@ -73,7 +73,7 @@
    0.858
   ],
   [
-   0.643,
+   0.705,
    0.665
   ],
   [
@@ -413,11 +413,11 @@
    0.041
   ],
   [
-   0.212,
+   0.237,
    0.099
   ],
   [
-   0.144,
+   0.163,
    0.201
   ],
   [
@@ -445,11 +445,11 @@
    0.142
   ],
   [
-   0.165,
+   0.199,
    0.155
   ],
   [
-   0.353,
+   0.378,
    1.0
   ],
   [
@@ -457,31 +457,31 @@
    0.843
   ],
   [
-   0.207,
+   0.233,
    0.541
   ],
   [
-   0.32,
+   0.39,
    0.97
   ],
   [
-   0.942,
+   0.964,
    0.957
   ],
   [
-   0.284,
+   0.509,
    0.931
   ],
   [
-   0.451,
+   0.529,
    0.99
   ],
   [
-   0.365,
+   0.404,
    1.0
   ],
   [
-   0.442,
+   0.463,
    0.929
   ],
   [
@@ -497,7 +497,7 @@
    0.0
   ],
   [
-   0.832,
+   0.942,
    1.0
   ],
   [
@@ -521,7 +521,7 @@
    0.865
   ],
   [
-   0.616,
+   0.795,
    0.801
   ],
   [
@@ -557,11 +557,11 @@
    0.11
   ],
   [
-   0.185,
+   0.253,
    0.55
   ],
   [
-   0.421,
+   0.489,
    0.547
   ],
   [
@@ -601,7 +601,7 @@
    0.0
   ],
   [
-   0.422,
+   0.456,
    0.54
   ],
   [
@@ -609,7 +609,7 @@
    0.952
   ],
   [
-   0.425,
+   0.485,
    0.676
   ],
   [
@@ -621,7 +621,7 @@
    0.631
   ],
   [
-   0.082,
+   0.103,
    0.275
   ],
   [
@@ -709,7 +709,7 @@
    0.0
   ],
   [
-   0.034,
+   0.05,
    0.071
   ],
   [
@@ -781,7 +781,7 @@
    0.02
   ],
   [
-   0.179,
+   0.215,
    0.017
   ],
   [
@@ -861,7 +861,7 @@
    0.0
   ],
   [
-   0.193,
+   0.204,
    0.088
   ],
   [
@@ -885,7 +885,7 @@
    0.168
   ],
   [
-   0.233,
+   0.294,
    0.477
   ],
   [
@@ -897,7 +897,7 @@
    0.102
   ],
   [
-   0.295,
+   0.299,
    0.2
   ],
   [
@@ -905,7 +905,7 @@
    0.916
   ],
   [
-   0.856,
+   0.889,
    0.864
   ],
   [
@@ -937,7 +937,7 @@
    0.068
   ],
   [
-   0.506,
+   0.548,
    0.478
   ],
   [
@@ -993,7 +993,7 @@
    0.0
   ],
   [
-   0.363,
+   0.365,
    0.096
   ],
   [
@@ -7564,6 +7564,306 @@
      "name": "MeshFadeToOverlayAlpha",
      "addr": "801F2984",
      "size": 408
+    }
+   ]
+  },
+  {
+   "path": "src/game/draft_miss32.cpp",
+   "functions": [
+    {
+     "name": "PathGetDirection",
+     "addr": "800D5724",
+     "size": 220
+    },
+    {
+     "name": "PathFindNode",
+     "addr": "800D648C",
+     "size": 168
+    },
+    {
+     "name": "PartSetPartUIImage",
+     "addr": "800F1E3C",
+     "size": 200
+    },
+    {
+     "name": "PlayAnim",
+     "addr": "80103788",
+     "size": 28
+    },
+    {
+     "name": "PlayAnimByID",
+     "addr": "801037A4",
+     "size": 28
+    },
+    {
+     "name": "PlayAnimByIDLoop",
+     "addr": "801037C0",
+     "size": 28
+    },
+    {
+     "name": "PlayBackgroundSFX",
+     "addr": "8010FB48",
+     "size": 164
+    },
+    {
+     "name": "SetBook",
+     "addr": "8010FF78",
+     "size": 208
+    },
+    {
+     "name": "fn_8013A654",
+     "addr": "8013A654",
+     "size": 160
+    },
+    {
+     "name": "fn_8013A6F4",
+     "addr": "8013A6F4",
+     "size": 140
+    },
+    {
+     "name": "fn_8013F394",
+     "addr": "8013F394",
+     "size": 200
+    },
+    {
+     "name": "ParticleSystemUpdateExtra",
+     "addr": "80174FF0",
+     "size": 152
+    },
+    {
+     "name": "fn_801C71EC",
+     "addr": "801C71EC",
+     "size": 88
+    },
+    {
+     "name": "PartSlotName",
+     "addr": "8020E7B4",
+     "size": 20
+    }
+   ]
+  },
+  {
+   "path": "src/game/draft_miss33.cpp",
+   "functions": [
+    {
+     "name": "Popup_IsPlayingLevelUpEvent",
+     "addr": "800E748C",
+     "size": 164
+    },
+    {
+     "name": "PlayPlayerAttackAnimation",
+     "addr": "800E936C",
+     "size": 180
+    },
+    {
+     "name": "PlayEntitySoundGroupFX",
+     "addr": "800E959C",
+     "size": 32
+    },
+    {
+     "name": "PlayMonsterSuccessVoice",
+     "addr": "800EFE50",
+     "size": 48
+    },
+    {
+     "name": "PlayMonsterFailureVoice",
+     "addr": "800EFE80",
+     "size": 48
+    },
+    {
+     "name": "PlaySpraySound",
+     "addr": "800EFF54",
+     "size": 96
+    },
+    {
+     "name": "PlayParticleEffectAtOffsetFromFeet",
+     "addr": "800F4B08",
+     "size": 140
+    },
+    {
+     "name": "PlaySwitchBackAnimation",
+     "addr": "800F9378",
+     "size": 180
+    },
+    {
+     "name": "PlaySoundEffect",
+     "addr": "8010FA4C",
+     "size": 124
+    },
+    {
+     "name": "PlaySoundEffectWithEffect",
+     "addr": "8010FAC8",
+     "size": 128
+    },
+    {
+     "name": "PlayBackgroundSFXWithEffect",
+     "addr": "8010FBEC",
+     "size": 172
+    },
+    {
+     "name": "PopOldScreen",
+     "addr": "8013FAAC",
+     "size": 52
+    },
+    {
+     "name": "Print",
+     "addr": "801DB498",
+     "size": 36
+    },
+    {
+     "name": "PlayLoopingSoundFXWithEffect",
+     "addr": "801DDDDC",
+     "size": 20
+    },
+    {
+     "name": "PlayLoopingSoundGroupFX",
+     "addr": "801DDDF0",
+     "size": 36
+    },
+    {
+     "name": "PlayLoopingSoundGroupFXWithEffect",
+     "addr": "801DDE14",
+     "size": 40
+    },
+    {
+     "name": "PlaySoundFX",
+     "addr": "801DDE3C",
+     "size": 32
+    },
+    {
+     "name": "PlaySoundFXWithEffect",
+     "addr": "801DDE5C",
+     "size": 36
+    },
+    {
+     "name": "PlaySoundGroupFX",
+     "addr": "801DDE80",
+     "size": 36
+    },
+    {
+     "name": "PlaySoundGroupFXWithEffect",
+     "addr": "801DDEA4",
+     "size": 40
+    }
+   ]
+  },
+  {
+   "path": "src/game/draft_miss34.cpp",
+   "functions": [
+    {
+     "name": "QuestCounterCleanUp",
+     "addr": "800E695C",
+     "size": 144
+    },
+    {
+     "name": "PropAttachProjectile",
+     "addr": "800ED1CC",
+     "size": 44
+    },
+    {
+     "name": "PropFireProjectileAtActiveTarget",
+     "addr": "800ED200",
+     "size": 236
+    },
+    {
+     "name": "PropFireLightningAtActiveTarget",
+     "addr": "800EF448",
+     "size": 240
+    },
+    {
+     "name": "PrintLevelName",
+     "addr": "800F001C",
+     "size": 40
+    },
+    {
+     "name": "QuatFromAxisAngle",
+     "addr": "80145EE8",
+     "size": 180
+    },
+    {
+     "name": "Print_v_E_E_i_f",
+     "addr": "801DDEDC",
+     "size": 68
+    }
+   ]
+  },
+  {
+   "path": "src/game/draft_miss35.cpp",
+   "functions": [
+    {
+     "name": "fn_8001D4FC",
+     "addr": "8001D4FC",
+     "size": 540
+    },
+    {
+     "name": "PartAction1GetCost",
+     "addr": "800F2974",
+     "size": 292
+    },
+    {
+     "name": "PartAction1GetValue",
+     "addr": "800F2B48",
+     "size": 460
+    },
+    {
+     "name": "PartAction1GetIsTarget",
+     "addr": "800F3094",
+     "size": 280
+    },
+    {
+     "name": "PartAction2GetCost",
+     "addr": "800F35C4",
+     "size": 292
+    },
+    {
+     "name": "PartAction2GetValue",
+     "addr": "800F3928",
+     "size": 460
+    },
+    {
+     "name": "PartAction2GetIsTarget",
+     "addr": "800F3CEC",
+     "size": 280
+    },
+    {
+     "name": "PanCameraToJunction",
+     "addr": "800F6134",
+     "size": 532
+    },
+    {
+     "name": "MoveEntityToLocation",
+     "addr": "800F8344",
+     "size": 356
+    },
+    {
+     "name": "NunchukUpdate",
+     "addr": "80122BD8",
+     "size": 596
+    },
+    {
+     "name": "MtxMultVec",
+     "addr": "801243B8",
+     "size": 600
+    },
+    {
+     "name": "MultiPlayerInit",
+     "addr": "8013F034",
+     "size": 300
+    },
+    {
+     "name": "fn_8019BFF8",
+     "addr": "8019BFF8",
+     "size": 380
+    },
+    {
+     "name": "fn_801D4790",
+     "addr": "801D4790",
+     "size": 496
+    },
+    {
+     "name": "fn_801EF6E8",
+     "addr": "801EF6E8",
+     "size": 428
     }
    ]
   },
@@ -27514,11 +27814,6 @@
      "name": "SetGlobalSfxVolume",
      "addr": "801DC31C",
      "size": 4
-    },
-    {
-     "name": "PlayLoopingSoundFX",
-     "addr": "801DDDCC",
-     "size": 16
     },
     {
      "name": "PrintPosition",

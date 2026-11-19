@@ -854,11 +854,11 @@ void MonsterSelectUpdate(void);                                        // src/ga
 void MoveCursorToContinueButtonPS2(void);                              // src/leaf/auto_03_800E75B0_text_cb.cpp
 void MoveEnemyToJunction(u32 a0, u32 a1);                              // src/game/small_800F.cpp
 void MoveEnemyToPlayer(u32 a0);                                        // src/game/small_800F.cpp
-void MoveEntityToLocation(u32 a0, f32 a1, f32 a2, f32 a3);  // type 0x77 (from signature table)
+void MoveEntityToLocation(u32 a0, f32 a1, f32 a2, f32 a3);             // src/game/draft_miss35.cpp
 void MoveEntityToLocator(u32 a0, u32 a1);                              // src/game/draft_miss29.cpp
 void MovePlayerDirection(BOOL a0);                                     // src/game/draft_800Fc.cpp
 void MultiCountAction(u32 a3, u32 a4, s32 a5);                         // src/leaf/auto_03_800FB958_text_cb.cpp
-void MultiPlayerInit(void);  // type 0x8F (from signature table)
+void MultiPlayerInit(void);                                            // src/game/draft_miss35.cpp
 void MultiplayerCleanup(void);                                         // src/game/draft_miss29.cpp
 void MultiplayerLevelLoaded(void);                                     // src/leaf/auto_03_8013A03C_text_cb.cpp
 void MysticBrewGhost_FireProjectile(void* a0);                         // src/game/draft_miss29.cpp
@@ -880,18 +880,18 @@ BOOL OpponentMatchupTimerIsUp(void);                                   // src/le
 BOOL OpponentReadyForBattle(void);                                     // src/leaf/auto_03_8013F034_text_cb.cpp
 void OrientBoneToTarget(u32 a0, s32* a1, f32 a2);                      // src/game/draft_miss30.cpp
 void PanCameraToEntity(u32 a3, f32 f1);                                // src/leaf/auto_03_800E75B0_text_cb.cpp
-void PanCameraToJunction(u32 a0, f32 a1);  // type 0x76 (from signature table)
+void PanCameraToJunction(u32 a0, f32 a1);                              // src/game/draft_miss35.cpp
 void PanCameraToPlayer(f32 f1);                                        // src/leaf/auto_03_800E75B0_text_cb.cpp
-ScriptValue PartAction1GetCost(s32 a0);  // type 0x28 (from signature table)
-s32 PartAction1GetIsTarget(s32 a0, s32 a1);  // type 0x20 (from signature table)
+ScriptValue PartAction1GetCost(s32 a0);                                // src/game/draft_miss35.cpp
+s32 PartAction1GetIsTarget(s32 a0, s32 a1);                            // src/game/draft_miss35.cpp
 s32 PartAction1GetTarget1(s32 a0);                                     // src/game/draft_miss30.cpp
 s32 PartAction1GetTarget2(s32 a0);                                     // src/game/draft_miss30.cpp
-ScriptValue PartAction1GetValue(s32 a0);  // type 0x28 (from signature table)
-ScriptValue PartAction2GetCost(s32 a0);  // type 0x28 (from signature table)
-s32 PartAction2GetIsTarget(s32 a0, s32 a1);  // type 0x20 (from signature table)
+ScriptValue PartAction1GetValue(s32 a0);                               // src/game/draft_miss35.cpp
+ScriptValue PartAction2GetCost(s32 a0);                                // src/game/draft_miss35.cpp
+s32 PartAction2GetIsTarget(s32 a0, s32 a1);                            // src/game/draft_miss35.cpp
 s32 PartAction2GetTarget1(s32 a0);                                     // src/game/draft_miss30.cpp
 s32 PartAction2GetTarget2(s32 a0);                                     // src/game/draft_miss30.cpp
-ScriptValue PartAction2GetValue(s32 a0);  // type 0x28 (from signature table)
+ScriptValue PartAction2GetValue(s32 a0);                               // src/game/draft_miss35.cpp
 ScriptValue PartGetEnhancementName(s32 a0);  // type 0x28 (from signature table)
 ScriptValue PartGetEnhancementTexture(s32 a0);                         // src/game/small_800Fc.cpp
 ScriptValue PartGetPartAction1(s32 a0);  // type 0x28 (from signature table)
@@ -936,7 +936,7 @@ void PartQuery_ReleaseTexture(void);  // type 0x8F (from signature table)
 void PartQuery_SetInventoryPartByIndex(s32 index);                     // src/game/part_query.cpp
 void PartQuery_SetLightningTowerMonster(void);                         // src/game/part_query.cpp
 void PartQuery_SetPart(void);                                          // src/game/part_query.cpp
-void PartSetPartUIImage(u32 a0, s32 a1);  // type 0x7E (from signature table)
+void PartSetPartUIImage(u32 a0, s32 a1);                               // src/game/draft_miss32.cpp
 s32 Parts_CanDelete(void);                                             // src/game/lab_books_b.cpp
 BOOL Parts_GetBodyPartSlotName(void);                                  // src/game/lab_books_b.cpp
 BOOL Parts_GetCurrentPart(void);                                       // src/game/lab_books_b.cpp
@@ -965,14 +965,14 @@ void PauseAllExplorationCharacters(void);                              // src/ga
 void PauseGame(u32 a3);                                                // src/leaf/auto_03_800E75B0_text_cb.cpp
 void PauseSoundEffects(BOOL a3);                                       // src/leaf/auto_03_8013F034_text_cb.cpp
 void PlaceSaw(void);                                                   // src/leaf/auto_03_8009F66C_text_cb.cpp
-void PlayAnim(void* a0, u32 /*0x2B*/ a1);  // type 0xF7 (from signature table)
-void PlayAnimByID(void* a0, u32 a1);  // type 0x42 (from signature table)
-void PlayAnimByIDLoop(void* a0, u32 a1);  // type 0x42 (from signature table)
+void PlayAnim(void* a0, u32 a1);                                       // src/game/draft_miss32.cpp
+void PlayAnimByID(void* a0, u32 a1);                                   // src/game/draft_miss32.cpp
+void PlayAnimByIDLoop(void* a0, u32 a1);                               // src/game/draft_miss32.cpp
 void PlayAnimUB(u32 a3, u32 a4, u32 a5);                               // src/leaf/auto_03_800E75B0_text_cb.cpp
 void PlayAnimation(u32 a3, u32 a4);                                    // src/leaf/auto_03_800E75B0_text_cb.cpp
 void PlayAttachedParticleEffectAtEmitter(void* a0, u32 a1, u32 a2);    // src/game/draft_miss6.cpp
-void PlayBackgroundSFX(u32 /*0x0B*/ a0, u32 /*0x0B*/ a1);  // type 0x145 (from signature table)
-void PlayBackgroundSFXWithEffect(u32 /*0x0B*/ a0, u32 /*0x0B*/ a1, s32 a2);  // type 0x146 (from signature table)
+void PlayBackgroundSFX(u32 a0, u32 a1);                                // src/game/draft_miss32.cpp
+void PlayBackgroundSFXWithEffect(u32 a0, u32 a1, s32 a2);              // src/game/draft_miss33.cpp
 void PlayBossCameraAnimation(u32 a0);                                  // src/game/small_800Fb.cpp
 void PlayCameraAnimation(u32 a0);                                      // src/game/draft_miss7.cpp
 void PlayChallengeMusic(void);                                         // src/leaf/auto_03_800E75B0_text_cb.cpp
@@ -980,7 +980,7 @@ void PlayCharacterAnimation(Character* c, int a, u32 anim, int loop);  // src/ga
 void PlayDanceAnimation(void* a0, u32 a1);                             // src/game/small_8007b.cpp
 void PlayEffect(void* a0, u32 a1);                                     // src/game/small_8010.cpp
 void PlayEffectTransient(void* a0, u32 a1);                            // src/game/small_8010.cpp
-void PlayEntitySoundGroupFX(void* a0, u32 a1, u32 /*0x06*/ a2);  // type 0x10C (from signature table)
+void PlayEntitySoundGroupFX(void* a0, u32 a1, u32 /*0x06*/ a2);        // src/game/draft_miss33.cpp
 void PlayExperimentSound(void* owner, u32 id, s32 vol);                // src/game/draft_8007b.cpp
 void PlayExperimentSoundAtPropLocation(void* owner, u32 id, s32 vol);  // src/game/draft_8007b.cpp
 void PlayExperimentSoundAttached(void* owner, u32 id, s32 vol);        // src/game/draft_8007b.cpp
@@ -988,14 +988,14 @@ void PlayFootStepEffect(void* a0);  // type 0x2F (from signature table)
 void PlayFootStepSound(void* a0);                                      // src/game/draft_miss6.cpp
 void PlayInjuredAnimation(void* a0);  // type 0x2F (from signature table)
 void PlayMonsterAttackAnimation(u32 /*0x55*/ a0);                      // src/game/draft_miss6.cpp
-void PlayMonsterFailureVoice(void);  // type 0x8F (from signature table)
-void PlayMonsterSuccessVoice(void);  // type 0x8F (from signature table)
+void PlayMonsterFailureVoice(void);                                    // src/game/draft_miss33.cpp
+void PlayMonsterSuccessVoice(void);                                    // src/game/draft_miss33.cpp
 void PlayMovie(u32 /*0x11*/ a0);  // type 0x65 (from signature table)
-void PlayParticleEffectAtOffsetFromFeet(void* a0, u32 a1, f32 a2, f32 a3, f32 a4);  // type 0x10D (from signature table)
-void PlayPlayerAttackAnimation(void);  // type 0x8F (from signature table)
-s32 PlaySoundEffect(u32 /*0x0B*/ a0);  // type 0xD2 (from signature table)
-s32 PlaySoundEffectWithEffect(u32 /*0x0B*/ a0, s32 a1);  // type 0xD3 (from signature table)
-void PlaySpraySound(void);  // type 0x8F (from signature table)
+void PlayParticleEffectAtOffsetFromFeet(void* a0, u32 a1, f32 a2, f32 a3, f32 a4); // src/game/draft_miss33.cpp
+void PlayPlayerAttackAnimation(void);                                  // src/game/draft_miss33.cpp
+s32 PlaySoundEffect(u32 a0);                                           // src/game/draft_miss33.cpp
+s32 PlaySoundEffectWithEffect(u32 a0, s32 a1);                         // src/game/draft_miss33.cpp
+void PlaySpraySound(void);                                             // src/game/draft_miss33.cpp
 void PlayStateOnEnemy(u32 a3, u32 a4);                                 // src/leaf/auto_03_800E75B0_text_cb.cpp
 void PlayStateOnEnemyByThis(void* a3, u32 a4);                         // src/leaf/auto_03_800E75B0_text_cb.cpp
 void PlayStateOnPlayer(u32 a3);                                        // src/leaf/auto_03_800E75B0_text_cb.cpp
@@ -1003,7 +1003,7 @@ void PlayStateOnProp(u32 a3, u32 a4);                                  // src/le
 void PlayStateOnPropByThis(void* a3, u32 a4);                          // src/leaf/auto_03_800E75B0_text_cb.cpp
 void PlayStrikeSoundFX(void* a0);  // type 0x2F (from signature table)
 void PlaySustainedAnimation(void* a0);  // type 0x2F (from signature table)
-void PlaySwitchBackAnimation(void* a0);  // type 0x2F (from signature table)
+void PlaySwitchBackAnimation(void* a0);                                // src/game/draft_miss33.cpp
 void PlayUnattachedParticleEffectAtEmitter(void* a0, u32 a1, u32 a2);  // type 0x10E (from signature table)
 void PlayerClearOverrideTarget(void);                                  // src/leaf/auto_03_800E75B0_text_cb.cpp
 u32 PlayerHasKeyIngredient(u32 i);                                     // src/game/player_api.cpp
@@ -1012,7 +1012,7 @@ s32 PlayerHasQuestItem(u32 item);                                      // src/ga
 u32 PlayerHasSecondaryIngredient(u32 i);                               // src/game/player_api.cpp
 void PlayerSetOverrideTarget(void* a3);                                // src/leaf/auto_03_800E75B0_text_cb.cpp
 void PopFSM(void);                                                     // src/leaf/auto_03_800E75B0_text_cb.cpp
-void PopOldScreen(void);  // type 0x8F (from signature table)
+void PopOldScreen(void);                                               // src/game/draft_miss33.cpp
 u32 /*0x06*/ Popup_IsPlayingLevelUpEvent(void);  // type 0xA (from signature table)
 void PositionalCameraShake(void* a0, f32 a1, f32 a2, f32 a3, f32 a4);  // type 0x10B (from signature table)
 void PostMultiplayerFight(void);  // type 0x8F (from signature table)
@@ -1022,13 +1022,13 @@ void PrintCurrentLevelName(void);                                      // src/ga
 void PrintFloat(u32 a0);                                               // src/game/small_8010.cpp
 void PrintHash(u32 a3);                                                // src/leaf/auto_03_800E75B0_text_cb.cpp
 void PrintInt(u32 a0);                                                 // src/game/small_8010.cpp
-void PrintLevelName(u32 /*0x33*/ a0);  // type 0x13A (from signature table)
+void PrintLevelName(u32 a0);                                           // src/game/draft_miss34.cpp
 void PrintTest(void);                                                  // src/leaf/auto_03_800E75B0_text_cb.cpp
 void ProcessHelloPayloadCallback(BOOL a0);                             // src/game/small_8010.cpp
 void Projectile_Set_Dead(u32 a3);                                      // src/leaf/auto_03_800636A0_text_cb.cpp
-void PropAttachProjectile(u32 /*0x31*/ a0, u32 /*0x38*/ a1, u32 /*0x30*/ a2);  // type 0x12B (from signature table)
-void PropFireLightningAtActiveTarget(u32 /*0x31*/ a0, u32 /*0x30*/ a1, u32 a2, u32 /*0x38*/ a3, f32 a4, f32 a5);  // type 0x129 (from signature table)
-void PropFireProjectileAtActiveTarget(u32 /*0x31*/ a0, u32 /*0x38*/ a1, u32 /*0x30*/ a2, f32 a3);  // type 0x12C (from signature table)
+void PropAttachProjectile(u32 a0, u32 a1, u32 a2);                     // src/game/draft_miss34.cpp
+void PropFireLightningAtActiveTarget(u32 a0, u32 a1, u32 a2, u32 a3, f32 a4, f32 a5); // src/game/draft_miss34.cpp
+void PropFireProjectileAtActiveTarget(u32 a0, u32 a1, u32 a2, f32 a3); // src/game/draft_miss34.cpp
 u32 PropHasAttachedProjectile(u32 a3);                                 // src/leaf/auto_03_800E75B0_text_cb.cpp
 void PropRemoveAttachedProjectile(u32 a3);                             // src/leaf/auto_03_800E75B0_text_cb.cpp
 void PropSetActiveTarget(u32 a3, void* a4);                            // src/leaf/auto_03_800E75B0_text_cb.cpp
@@ -1036,7 +1036,7 @@ void PropSetAnimUpdate(u32 a3, u32 a4);                                // src/le
 void PushExperimentLoadingScreen(void);                                // src/game/small_8007.cpp
 void PushExperimentUI(void);  // type 0x8F (from signature table)
 void PushFSM(u32 a3);                                                  // src/leaf/auto_03_800E75B0_text_cb.cpp
-void QuestCounterCleanUp(void);  // type 0x8F (from signature table)
+void QuestCounterCleanUp(void);                                        // src/game/draft_miss34.cpp
 void QuestCounterUpdateNumber(void);                                   // src/game/small_800Ec.cpp
 ScriptValue QuestLog_GetCounter(s32 a0);  // type 0x28 (from signature table)
 BOOL QuestLog_GetMainIcon(s32 a0);                                     // src/game/lab_books_d.cpp
@@ -1189,7 +1189,7 @@ void SetAirFriction(u32 a3, f32 f1);                                   // src/le
 void SetAirFrictionToDefault(u32 a3);                                  // src/leaf/auto_03_80052504_text_cb.cpp
 void SetAnimatedCamera(void* a3);                                      // src/leaf/auto_03_800E75B0_text_cb.cpp
 void SetBit(u32 a3, s32 a4);                                           // src/leaf/auto_03_80106AA8_text_cb.cpp
-void SetBook(u32 a0);  // type 0x71 (from signature table)
+void SetBook(u32 a0);                                                  // src/game/draft_miss32.cpp
 void SetCastleAccess(u32 a3, u32 a4);                                  // src/leaf/auto_03_800E75B0_text_cb.cpp
 void SetChallengeCursor(void);                                         // src/leaf/auto_03_800E75B0_text_cb.cpp
 void SetChallengeProjectorsForNIS(void);  // type 0x8F (from signature table)
@@ -1618,21 +1618,21 @@ void PlayGlobalLoopingGroupSound_NoLoad(u32 a0);                       // src/en
 void PlayGlobalSound(u32 a3);                                          // src/leaf/auto_03_801D9028_text_cb.cpp
 void PlayGlobalSoundSynced(u32 a0);                                    // src/engine/small_801Dc.cpp
 void PlayGlobalSoundWithEffect(u32 a3, s32 a4);                        // src/leaf/auto_03_801D9028_text_cb.cpp
-void PlayLoopingSoundFX(void* a3, u32 a4, s32 a5);                     // src/leaf/auto_03_801D9028_text_cb.cpp
-void PlayLoopingSoundFXWithEffect(void* a0, u32 /*0x0B*/ a1, s32 a2, s32 a3);  // type 0x3D (from signature table)
-void PlayLoopingSoundGroupFX(void* a0, u32 /*0x0C*/ a1, s32 a2);  // type 0x39 (from signature table)
-void PlayLoopingSoundGroupFXWithEffect(void* a0, u32 /*0x0C*/ a1, s32 a2, s32 a3);  // type 0x3A (from signature table)
-void PlaySoundFX(void* a0, u32 /*0x0B*/ a1, s32 a2);  // type 0x3C (from signature table)
-void PlaySoundFXWithEffect(void* a0, u32 /*0x0B*/ a1, s32 a2);  // type 0x3C (from signature table)
-void PlaySoundGroupFX(void* a0, u32 /*0x0C*/ a1, s32 a2);  // type 0x39 (from signature table)
-void PlaySoundGroupFXWithEffect(void* a0, u32 /*0x0C*/ a1, s32 a2, s32 a3);  // type 0x3A (from signature table)
+void PlayLoopingSoundFX(void* a0, u32 /*0x0B*/ a1, s32 a2);  // type 0x3C (from signature table)
+void PlayLoopingSoundFXWithEffect(void* a0, u32 a1, s32 a2, s32 a3);   // src/game/draft_miss33.cpp
+void PlayLoopingSoundGroupFX(void* a0, u32 a1, s32 a2);                // src/game/draft_miss33.cpp
+void PlayLoopingSoundGroupFXWithEffect(void* a0, u32 a1, s32 a2, s32 a3); // src/game/draft_miss33.cpp
+void PlaySoundFX(void* a0, u32 a1, s32 a2);                            // src/game/draft_miss33.cpp
+void PlaySoundFXWithEffect(void* a0, u32 a1, s32 a2);                  // src/game/draft_miss33.cpp
+void PlaySoundGroupFX(void* a0, u32 a1, s32 a2);                       // src/game/draft_miss33.cpp
+void PlaySoundGroupFXWithEffect(void* a0, u32 a1, s32 a2, s32 a3);     // src/game/draft_miss33.cpp
 void PlayVoiceSFX(u32 a0);                                             // src/game/small_800Ec.cpp
-void Print(u32 /*0x0A*/ a0);  // type 0x8B (from signature table)
+void Print(u32 a0);                                                    // src/game/draft_miss33.cpp
 void PrintFResult(void);                                               // src/leaf/auto_03_801D9028_text_cb.cpp
 void PrintPosition(void* a3);                                          // src/leaf/auto_03_801D9028_text_cb.cpp
 void PrintResult(void);                                                // src/leaf/auto_03_801D9028_text_cb.cpp
 void PrintText(BOOL a3);                                               // src/leaf/auto_03_800E75B0_text_cb.cpp
-void Print_v_E_E_i_f(void* a0, void* a1, s32 a2, f32 a3);  // type 0x33 (from signature table)
+void Print_v_E_E_i_f(void* a0, void* a1, s32 a2, f32 a3);              // src/game/draft_miss34.cpp
 void ResetSpawningMode(void);                                          // src/leaf/auto_03_801EFC74_text_cb.cpp
 void ResumeFollowingWaypointPath(void* a0);  // type 0x2F (from signature table)
 s32 Return(s32 a0);  // type 0x1F (from signature table)

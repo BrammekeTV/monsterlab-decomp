@@ -14,7 +14,6 @@ extern "C" s32 PlaySoundAt(void*, int, void*, int);
 extern "C" void TriggerDoAction(void*, void*, void*);
 extern "C" void fn_801629D0(void*, s32);
 extern "C" void fn_80162A70(u8*);
-extern "C" void fn_801B6878(s32, s32, s32);
 extern "C" void fn_801B69F8(u8*);
 extern "C" void fn_801B6AA4(s32);
 extern "C" void fn_801B6EC8(void*, s32);
@@ -91,15 +90,6 @@ void PlayGlobalGroupSoundWithEffect_NoLoad(u32 a3, s32 a4) {
 // 0x801DC31C
 void SetGlobalSfxVolume(f32 f1) {
     fn_8020B078((f32)(f1));
-}
-
-// 0x801DDDCC
-void PlayLoopingSoundFX(void* a3, u32 a4, s32 a5) {
-    // tail-call arguments inferred from the registers set before the call
-    if (a3 == 0) {
-        return;
-    }
-    fn_801B6878((s32)((u32)(uintptr_t)(a3)), (s32)((u32)(uintptr_t)(a4)), (s32)((u32)(uintptr_t)(a5)));
 }
 
 // 0x801DDECC
