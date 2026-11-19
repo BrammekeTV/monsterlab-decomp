@@ -94,6 +94,11 @@
  "changelog": [
   {
    "date": "2026-11-20",
+   "time": "00:51",
+   "text": "Decompiled 51 more game functions (fn_8011*/fn_8012* lab and recipe helpers, UI utilities, ...)"
+  },
+  {
+   "date": "2026-11-20",
    "time": "00:48",
    "text": "Merged Codex's work: 44 more functions, checked against the original code with 13 fixed, including the UI grid cells, the event queue and command buffer, entity attachments and effect entities, and a session flag helper."
   },
