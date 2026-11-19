@@ -35,7 +35,7 @@ s32    fn_8004D2C8(u8* obj, const char* name, s32 a, s32 b);         // 0x8004D2
 void   fn_8004D39C(u8* p);                                           // 0x8004D39C
 void   fn_8001D718(u8* mgr, s32 idx, u8* slot);                      // 0x8001D718
 void   fn_8005230C(void);                                            // 0x8005230C
-void   fn_8005CA88(u8* p);                                           // 0x8005CA88
+u8*   fn_8005CA88(u8* p);                                           // 0x8005CA88
 void*  fn_80060A28(void);                                            // 0x80060A28
 void   fn_800D83B8(u8* a3, s32 a4);                                  // 0x800D83B8
 void*  fn_80109330(const char* name);                                // 0x80109330 (texture lookup by name)

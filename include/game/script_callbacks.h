@@ -373,9 +373,9 @@ void EndQuestTimer(void);                                              // src/le
 void EndTest(void);                                                    // src/game/draft_miss18.cpp
 void EnemyFireLightningAtActiveTarget(u32 /*0x2F*/ a0, u32 /*0x30*/ a1, u32 a2, u32 /*0x38*/ a3, f32 a4, f32 a5); // src/game/draft_miss18.cpp
 void EnqueIdleAnim(u32 a0);                                            // src/game/draft_miss18.cpp
-void EnterName_AddLetter(s32 a0);  // type 0x83 (from signature table)
-void EnterName_AddSpace(void);  // type 0x8F (from signature table)
-void EnterName_DelLetter(void);  // type 0x8F (from signature table)
+void EnterName_AddLetter(const char* a0);                              // src/game/draft_miss19.cpp
+void EnterName_AddSpace(void);                                         // src/game/draft_miss19.cpp
+void EnterName_DelLetter(void);                                        // src/game/draft_miss19.cpp
 void EnterName_Destroy(void);                                          // src/game/small_8012.cpp
 u32 EnterName_EnteringPlayerName(void);                                // src/leaf/auto_03_800FB958_text_cb.cpp
 BOOL EnterName_GetName(void);                                          // src/leaf/auto_03_80120AAC_text_cb.cpp
@@ -384,8 +384,8 @@ void EnterName_Init(void);                                             // src/ga
 void EnterName_NameInputDone(u32 a3);                                  // src/leaf/auto_03_80120AAC_text_cb.cpp
 void EnterName_SaveNameToPlayerName(void);                             // src/game/small_8012.cpp
 void EnterScientistNameDeInit(void);                                   // src/leaf/auto_03_8013EB1C_text_cb.cpp
-void EnterScientistNameInit(void);  // type 0x8F (from signature table)
-u32 /*0x06*/ EntityPartZoneUnloadCallback(u32 /*0x08*/ a0, u32 /*0x08*/ a1);  // type 0x7 (from signature table)
+void EnterScientistNameInit(void);                                     // src/game/draft_miss19.cpp
+u32 EntityPartZoneUnloadCallback(u8* a0, void* a1);                    // src/game/draft_miss19.cpp
 void Explode(void* a0);  // type 0x2F (from signature table)
 void ExplodeIfDead(u32 a0);                                            // src/game/small_8010.cpp
 void ExplorationInit(void);                                            // src/game/draft_800F.cpp
@@ -409,41 +409,41 @@ s32 FaderFinished(void);                                               // src/le
 void FaderSetTargetColour(f32 a0, f32 a1, f32 a2);                     // src/engine/small_801D.cpp
 void FilenameTimestamp(BOOL a0);                                       // src/engine/small_8014c.cpp
 void FireLightningAtTarget(void* a0, u32 /*0x30*/ a1, u32 a2, u32 /*0x38*/ a3, f32 a4, f32 a5, u32 /*0x17*/ a6);  // type 0xFF (from signature table)
-void FireRocketAtEntity(void* a0);  // type 0x2F (from signature table)
+void FireRocketAtEntity(void* a0);                                     // src/game/draft_miss19.cpp
 void FireShot(void* a0, u32 /*0x30*/ a1, u32 /*0x38*/ a2, f32 a3, f32 a4);  // type 0xFA (from signature table)
 void FireShotAtFeet(void* a0, u32 /*0x30*/ a1, u32 /*0x38*/ a2, f32 a3, f32 a4);  // type 0xFA (from signature table)
 void FireWarningShot(void* a0, u32 /*0x30*/ a1, u32 /*0x38*/ a2, f32 a3, f32 a4);  // type 0xFA (from signature table)
-u32 /*0x06*/ FixUpEntityCallback(u32 /*0x08*/ a0, u32 /*0x08*/ a1);  // type 0x7 (from signature table)
-u32 /*0x06*/ FixUpEntityPartCallback(u32 /*0x08*/ a0, u32 /*0x08*/ a1);  // type 0x7 (from signature table)
-u32 /*0x06*/ FixUpPooledEntityCallback(u32 /*0x08*/ a0, u32 /*0x08*/ a1);  // type 0x7 (from signature table)
+u32 FixUpEntityCallback(u32 a0, u32 a1);                               // src/game/draft_miss20.cpp
+u32 FixUpEntityPartCallback(u32 a0, u32 a1);                           // src/game/draft_miss20.cpp
+u32 FixUpPooledEntityCallback(u32 a0, u32 a1);                         // src/game/draft_miss20.cpp
 u32 FixUpProjectileEntityCallback(u32 a0, u32 a1);                     // src/game/small_8006c.cpp
-u32 /*0x06*/ FixUpRenderObjectCallback(u32 /*0x08*/ a0, u32 /*0x08*/ a1);  // type 0x7 (from signature table)
-u32 /*0x06*/ FixupFSMPoolCallback(u32 /*0x08*/ a0, u32 /*0x08*/ a1);  // type 0x7 (from signature table)
+u32 FixUpRenderObjectCallback(u32 a0, u32 a1);                         // src/game/draft_miss20.cpp
+u32 FixupFSMPoolCallback(u32 a0, u32 a1);                              // src/game/draft_miss20.cpp
 void ForceCameraRotateMode(u32 a3);                                    // src/leaf/auto_03_800DB9A4_text_cb.cpp
 void ForceStrafeMode(s32 a3);                                          // src/leaf/auto_03_800E75B0_text_cb.cpp
 void ForceTracingGame(u32 a3);                                         // src/leaf/auto_03_800E75B0_text_cb.cpp
 void FrameFxRippleAtChild(void* a0, u32 /*0x30*/ a1, f32 a2);  // type 0xFD (from signature table)
-void FreezeCamera(u32 /*0x06*/ a0);  // type 0x67 (from signature table)
+void FreezeCamera(u32 a0);                                             // src/game/draft_miss20.cpp
 void FreezePlayerInput(s32 a3);                                        // src/leaf/auto_03_800E75B0_text_cb.cpp
-void FriendCodeInputClickedKey(BOOL a0);  // type 0x8C (from signature table)
+void FriendCodeInputClickedKey(BOOL a0);                               // src/game/draft_miss20.cpp
 void FriendCodeInputDeInit(void);                                      // src/leaf/auto_03_801399E8_text_cb.cpp
-void FriendCodeInputInit(void);  // type 0x8F (from signature table)
-void FriendCodeInputUpdate(void);  // type 0x8F (from signature table)
-void FriendCodeInputVerify(void);  // type 0x8F (from signature table)
+void FriendCodeInputInit(void);                                        // src/game/draft_miss20.cpp
+void FriendCodeInputUpdate(void);                                      // src/game/draft_miss20.cpp
+void FriendCodeInputVerify(void);                                      // src/game/draft_miss20.cpp
 void FriendListChallenge(void);                                        // src/game/small_8013.cpp
-void FriendListDelete(void);  // type 0x8F (from signature table)
+void FriendListDelete(void);                                           // src/game/draft_miss20.cpp
 void FriendListDisableAutoScroll(void);                                // src/leaf/auto_03_8013A03C_text_cb.cpp
 void FriendListHideFloaty(BOOL force);                                 // src/game/draft_miss17.cpp
-void FriendListInit(void);  // type 0x8F (from signature table)
-void FriendListPreInit(void);  // type 0x8F (from signature table)
+void FriendListInit(void);                                             // src/game/draft_miss20.cpp
+void FriendListPreInit(void);                                          // src/game/draft_miss20.cpp
 void FriendListScrollDown(void);                                       // src/game/small_8013.cpp
 void FriendListScrollUp(void);                                         // src/game/small_8013.cpp
-void FriendListSetSelectedSlot(BOOL a0);  // type 0x8C (from signature table)
-void FriendListShowFloaty(void);  // type 0x8F (from signature table)
+void FriendListSetSelectedSlot(BOOL a0);                               // src/game/draft_miss20.cpp
+void FriendListShowFloaty(void);                                       // src/game/draft_miss20.cpp
 void FriendListSort(BOOL a0);  // type 0x8C (from signature table)
 void FriendListUpdate(void);                                           // src/game/small_8013.cpp
-void FriendsListAddFriend(void);  // type 0x8F (from signature table)
-ScriptValue FriendsListIsBuddy(void);  // type 0x2E (from signature table)
+void FriendsListAddFriend(void);                                       // src/game/draft_miss20.cpp
+ScriptValue FriendsListIsBuddy(void);                                  // src/game/draft_miss20.cpp
 BOOL FriendsListIsPlayerBusy(void);                                    // src/game/small_8013.cpp
 BOOL FriendsListIsPlayerOnline(void);                                  // src/game/small_8013.cpp
 void FriendsListSendAccept(void);                                      // src/leaf/auto_03_8013A03C_text_cb.cpp
@@ -1581,12 +1581,12 @@ void EntityWaypointTaskCompleteCallback(u32 a3, u32 a4);               // src/le
 void Entity_SleepFSM(void* a0);                                        // src/engine/small_801Dc.cpp
 void FadeToOverlayAlpha(void* a0, f32 a1, f32 a2, u32 a3);             // src/engine/small_801Bc.cpp
 void FollowWaypointPath(void* a0, u32 /*0x17*/ a1, f32 a2);            // src/game/draft_miss5.cpp
-void FrameFxBlur(s32 a0, f32 a1, f32 a2);  // type 0x86 (from signature table)
+void FrameFxBlur(s32 a0, f32 a1, f32 a2);                              // src/game/draft_miss20.cpp
 void FrameFxBlurAndTint(f32 a0, f32 a1, f32 a2, f32 a3, f32 a4);       // src/engine/small_801Db.cpp
 void FrameFxBlurBulge(f32 a0, f32 a1, f32 a2, f32 a3, s32 a4);         // src/engine/small_801Dc.cpp
 void FrameFxEggcrate(f32 a0, f32 a1, f32 a2);                          // src/engine/small_801Db.cpp
 void FrameFxFlash(f32 a0, f32 a1, f32 a2);                             // src/engine/small_801D.cpp
-void FrameFxPlay(u32 /*0x1D*/ a0);  // type 0x70 (from signature table)
+void FrameFxPlay(u32 a0);                                              // src/game/draft_miss20.cpp
 void FrameFxRipple(f32 a0, f32 a1, f32 a2);                            // src/engine/small_801D.cpp
 void FrameFxStop(u32 a3);                                              // src/leaf/auto_03_801D9028_text_cb.cpp
 void FrameFxStopAll(void);                                             // src/leaf/auto_03_801D9028_text_cb.cpp

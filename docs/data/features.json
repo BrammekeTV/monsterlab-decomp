@@ -94,6 +94,11 @@
  "changelog": [
   {
    "date": "2026-11-19",
+   "time": "13:10",
+   "text": "Ninth round from the missing-symbols list: 38 more functions, including the friend list and friend-code entry screens (init, add friend, buddy check, floaty, selected slot), the entity fix-up callbacks, frame effects and camera freeze, the name-entry letter and space handling, the event manager tick and rocket firing."
+  },
+  {
+   "date": "2026-11-19",
    "time": "12:40",
    "text": "Eighth round from the missing-symbols list: 40 more functions, including character attack start, ground state and flags, hazard and obstacle collision, rock crushing, quest interrupts, monster cleanup, the rematch accept and decline checks, projectile and entity part teardown, lab book teardown, debug stats and the lightning attack on the active target."
   },

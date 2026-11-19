@@ -7,7 +7,7 @@
 #include "game/script_callbacks.h"
 
 extern u8 lbl_80556E80[];
-extern u8 lbl_805FB40C[];
+extern s32 lbl_805FB40C;
 
 // 0x8013EB1C
 BOOL CheckPlayerName(void) {

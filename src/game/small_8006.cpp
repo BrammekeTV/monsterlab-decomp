@@ -24,7 +24,7 @@ void     fn_801B4944(u8* p);                                                    
 void     fn_80122B00(void* a, u8* b);                                           // 0x80122B00
 u8* fn_8006F61C(u8* arg0);                                                    // 0x8006F61C
 void     fn_8006F67C(u8* p, f32 t, s32 flag);                                   // 0x8006F67C (leaf version takes only p)
-void     fn_8005CA88(u8* p);                                                    // 0x8005CA88
+u8*     fn_8005CA88(u8* p);                                                    // 0x8005CA88
 void     fn_8005CB40(u8* p, f32 t, s32 flag);                                   // 0x8005CB40
 void     fn_800655D8(u8* p);                                                    // 0x800655D8
 void     fn_8032F1E8(u8* obj, void (*cb)(void), s32 a, s32 b, s32 c);    // 0x8032F1E8

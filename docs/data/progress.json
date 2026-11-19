@@ -1,15 +1,15 @@
 {
  "game_id": "RM7P4F",
- "generated": "2026-11-19T11:37:00+00:00",
- "commit": "ad661f5",
- "commit_date": "2026-11-19T01:37:32+01:00",
+ "generated": "2026-11-19T11:49:08+00:00",
+ "commit": "71747f5",
+ "commit_date": "2026-11-19T12:38:25+01:00",
  "game": {
   "functions": 8548,
   "bytes": 2265988,
   "named": 2748,
   "named_bytes": 616800,
-  "decompiled": 4906,
-  "decompiled_bytes": 583192
+  "decompiled": 4941,
+  "decompiled_bytes": 590916
  },
  "library": {
   "functions": 4039,
@@ -24,8 +24,8 @@
   "bytes": 3404928,
   "named": 3211,
   "named_bytes": 721548,
-  "decompiled": 4907,
-  "decompiled_bytes": 583312
+  "decompiled": 4942,
+  "decompiled_bytes": 591036
  },
  "game_range": [
   "80006B40",
@@ -161,11 +161,11 @@
    0.101
   ],
   [
-   0.226,
+   0.281,
    0.13
   ],
   [
-   0.159,
+   0.175,
    0.233
   ],
   [
@@ -189,7 +189,7 @@
    0.13
   ],
   [
-   0.235,
+   0.245,
    0.324
   ],
   [
@@ -477,7 +477,7 @@
    0.99
   ],
   [
-   0.3,
+   0.331,
    1.0
   ],
   [
@@ -509,7 +509,7 @@
    0.883
   ],
   [
-   0.129,
+   0.2,
    0.224
   ],
   [
@@ -517,7 +517,7 @@
    0.058
   ],
   [
-   0.837,
+   0.853,
    0.865
   ],
   [
@@ -553,7 +553,7 @@
    0.0
   ],
   [
-   0.163,
+   0.195,
    0.11
   ],
   [
@@ -601,23 +601,23 @@
    0.0
   ],
   [
-   0.053,
+   0.378,
    0.54
   ],
   [
-   0.508,
+   0.597,
    0.952
   ],
   [
-   0.075,
+   0.107,
    0.676
   ],
   [
-   0.676,
+   0.699,
    0.834
   ],
   [
-   0.305,
+   0.324,
    0.631
   ],
   [
@@ -749,7 +749,7 @@
    0.0
   ],
   [
-   0.006,
+   0.054,
    0.0
   ],
   [
@@ -781,7 +781,7 @@
    0.02
   ],
   [
-   0.171,
+   0.179,
    0.017
   ],
   [
@@ -837,7 +837,7 @@
    0.241
   ],
   [
-   0.211,
+   0.27,
    0.179
   ],
   [
@@ -897,7 +897,7 @@
    0.102
   ],
   [
-   0.254,
+   0.295,
    0.2
   ],
   [
@@ -933,7 +933,7 @@
    0.068
   ],
   [
-   0.192,
+   0.199,
    0.068
   ],
   [
@@ -6233,6 +6233,91 @@
    ]
   },
   {
+   "path": "src/game/draft_miss19.cpp",
+   "functions": [
+    {
+     "name": "fn_8004DE74",
+     "addr": "8004DE74",
+     "size": 492
+    },
+    {
+     "name": "EntityPartZoneUnloadCallback",
+     "addr": "8004FEF8",
+     "size": 104
+    },
+    {
+     "name": "fn_8005CA88",
+     "addr": "8005CA88",
+     "size": 96
+    },
+    {
+     "name": "FireRocketAtEntity",
+     "addr": "800F88AC",
+     "size": 272
+    },
+    {
+     "name": "fn_80109330",
+     "addr": "80109330",
+     "size": 452
+    },
+    {
+     "name": "EnterName_AddLetter",
+     "addr": "80120B48",
+     "size": 160
+    },
+    {
+     "name": "EnterName_DelLetter",
+     "addr": "80120BE8",
+     "size": 60
+    },
+    {
+     "name": "EnterName_AddSpace",
+     "addr": "80120C24",
+     "size": 60
+    },
+    {
+     "name": "EnterScientistNameInit",
+     "addr": "8013EB3C",
+     "size": 284
+    },
+    {
+     "name": "fn_80142358",
+     "addr": "80142358",
+     "size": 196
+    },
+    {
+     "name": "fn_801425DC",
+     "addr": "801425DC",
+     "size": 164
+    },
+    {
+     "name": "fn_8018A78C",
+     "addr": "8018A78C",
+     "size": 440
+    },
+    {
+     "name": "fn_8019CD14",
+     "addr": "8019CD14",
+     "size": 84
+    },
+    {
+     "name": "EventMgrFlushFor",
+     "addr": "801BA108",
+     "size": 136
+    },
+    {
+     "name": "EventMgrTick",
+     "addr": "801BA4B4",
+     "size": 388
+    },
+    {
+     "name": "WaypointParamsInit",
+     "addr": "801ED314",
+     "size": 56
+    }
+   ]
+  },
+  {
    "path": "src/game/draft_miss2.cpp",
    "functions": [
     {
@@ -6329,6 +6414,106 @@
      "name": "AudioSetPaused",
      "addr": "801FF708",
      "size": 512
+    }
+   ]
+  },
+  {
+   "path": "src/game/draft_miss20.cpp",
+   "functions": [
+    {
+     "name": "FixUpEntityPartCallback",
+     "addr": "8004FE40",
+     "size": 44
+    },
+    {
+     "name": "FreezeCamera",
+     "addr": "800F7808",
+     "size": 20
+    },
+    {
+     "name": "FixUpRenderObjectCallback",
+     "addr": "8010C758",
+     "size": 44
+    },
+    {
+     "name": "FixUpPooledEntityCallback",
+     "addr": "8010C87C",
+     "size": 56
+    },
+    {
+     "name": "FixUpEntityCallback",
+     "addr": "8010C8C8",
+     "size": 48
+    },
+    {
+     "name": "FixupFSMPoolCallback",
+     "addr": "8010CCB0",
+     "size": 72
+    },
+    {
+     "name": "FriendCodeInputInit",
+     "addr": "801399EC",
+     "size": 288
+    },
+    {
+     "name": "FriendCodeInputClickedKey",
+     "addr": "80139B10",
+     "size": 436
+    },
+    {
+     "name": "FriendCodeInputUpdate",
+     "addr": "80139CC4",
+     "size": 400
+    },
+    {
+     "name": "FriendCodeInputVerify",
+     "addr": "80139E54",
+     "size": 380
+    },
+    {
+     "name": "FriendListPreInit",
+     "addr": "8013A910",
+     "size": 160
+    },
+    {
+     "name": "FriendListInit",
+     "addr": "8013A9B0",
+     "size": 556
+    },
+    {
+     "name": "FriendListDelete",
+     "addr": "8013ABDC",
+     "size": 508
+    },
+    {
+     "name": "FriendListSetSelectedSlot",
+     "addr": "8013B4A8",
+     "size": 148
+    },
+    {
+     "name": "FriendsListIsBuddy",
+     "addr": "8013BCE8",
+     "size": 148
+    },
+    {
+     "name": "FriendListShowFloaty",
+     "addr": "8013C1A4",
+     "size": 320
+    },
+    {
+     "name": "FriendsListAddFriend",
+     "addr": "8013C464",
+     "size": 312
+    },
+    {
+     "name": "FrameFxPlay",
+     "addr": "801DB748",
+     "size": 152
+    },
+    {
+     "name": "FrameFxBlur",
+     "addr": "801DB7E0",
+     "size": 188
     }
    ]
   },

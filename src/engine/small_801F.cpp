@@ -247,7 +247,7 @@ extern f32 lbl_80600250;                                // 0x80600250
 extern f32 lbl_80600278;                                // 0x80600278
 
 // Callees not defined in this file.
-s32     fn_8033861C(const char* s, const char* fmt, f32* out);      // 0x8033861C (scan)
+s32     fn_8033861C(const char* s, const char* fmt, ...);            // 0x8033861C (sscanf)
 void    fn_801F5E4C(void* a, s32 b);                                 // 0x801F5E4C (leaf in src/leaf, takes args here)
 void    fn_801F5E48(void* a, s32 b);                                 // 0x801F5E48 (leaf in src/leaf, takes args here)
 void    fn_801F8238(u8* p, s32 a4);                                  // 0x801F8238
