@@ -94,62 +94,62 @@
  "changelog": [
   {
    "date": "2026-11-19",
-   "time": "15:30",
+   "time": "13:34",
    "text": "Thirteenth round from the missing-symbols list: 46 more functions, including the sound and music play callbacks (sound effects, looping and grouped sound FX, monster voices, spray sound), the part action cost, value and target getters, path-finding nodes and directions, projectile and lightning firing from props, camera pan to junction, nunchuk update and multiplayer init."
   },
   {
    "date": "2026-11-19",
-   "time": "14:55",
+   "time": "13:24",
    "text": "Twelfth round from the missing-symbols list: 50 more functions, including the matchup screen (accept, cancel, show monster and status), multiplayer and single-player name entry, music play, the mystic brew ghost and power-up hide positions, memory alloc and free, mesh overlay fades, level and experiment loading, monster select, and the lightning tower charge checks."
   },
   {
    "date": "2026-11-19",
-   "time": "14:20",
+   "time": "13:10",
    "text": "Eleventh round from the missing-symbols list: 74 more functions, including the lab tutorial callbacks (part selection, monster completeness checks, tutorial text), the options volume and brightness steppers, inventory part names, costs, enhancements and defects, FSM bit and float setters, interpolation tasks (lerp, slerp, waypoint), the battery string and the key and entity kill callbacks."
   },
   {
    "date": "2026-11-19",
-   "time": "13:45",
+   "time": "12:58",
    "text": "Tenth round from the missing-symbols list: 44 more functions, including the grow-juice boss (tentacle hits, berserk checks, seed and launcher, heart effect), matchup screen helpers, distance-to-player queries, health and monster-name getters, SIR file loading, the alert box and the brightness option."
   },
   {
    "date": "2026-11-19",
-   "time": "13:10",
+   "time": "12:49",
    "text": "Ninth round from the missing-symbols list: 38 more functions, including the friend list and friend-code entry screens (init, add friend, buddy check, floaty, selected slot), the entity fix-up callbacks, frame effects and camera freeze, the name-entry letter and space handling, the event manager tick and rocket firing."
   },
   {
    "date": "2026-11-19",
-   "time": "12:40",
+   "time": "12:38",
    "text": "Eighth round from the missing-symbols list: 40 more functions, including character attack start, ground state and flags, hazard and obstacle collision, rock crushing, quest interrupts, monster cleanup, the rematch accept and decline checks, projectile and entity part teardown, lab book teardown, debug stats and the lightning attack on the active target."
   },
   {
    "date": "2026-11-19",
-   "time": "03:20",
+   "time": "01:37",
    "text": "Seventh round from the missing-symbols list: 40 more functions, including brain minigame helpers (target, head, power-up, held chunk), brazier bowl and symbol callbacks, the effect emitter, hit boxes, catch minigame lanes and launch, camera update and shake, action affordability and ground material lookup."
   },
   {
    "date": "2026-11-19",
-   "time": "02:45",
+   "time": "01:27",
    "text": "Sixth round from the missing-symbols list: 42 more functions, including script callbacks for action selection, altitude checks, brain chunk bounce/load, arm wrestling up/down, astral pickup, field repair health, adding trackable score triggers and entity move tasks, the junction activation jump table, zone slot acquisition and the alert screen."
   },
   {
    "date": "2026-11-19",
-   "time": "02:10",
+   "time": "00:28",
    "text": "Fifth round from the missing-symbols list: 40 more functions, including UI widget animation and conversation HUD, the jump-table dispatchers behind two HUD updates, debug text printing, UI graphic and animation handles, the work-queue helper and a group of render-thread setup calls. Several older prototypes were corrected to match the asm."
   },
   {
    "date": "2026-11-19",
-   "time": "01:30",
+   "time": "00:13",
    "text": "Fourth round from the missing-symbols list: 39 more functions, including animation length and playback, camera animation, UI colour and looped widget animation, video frame buffer, button-pressed checks, the lab experiment table switch, combat HUD action refresh and a batch of prop, zone and entity helpers. Older prototypes were corrected where the asm returns a value."
   },
   {
    "date": "2026-11-19",
-   "time": "00:50",
+   "time": "00:05",
    "text": "Third round from the missing-symbols list: 41 more functions, including heap init, string copy, controller button reads, the timer reset, step sounds, prop effects, screen-set flushing, waypoint path following, exploration HUD and lightning tower inventory helpers. The linker report is clean of duplicates and mismatches; several older prototypes were corrected to match the asm."
   },
   {
-   "date": "2026-11-19",
-   "time": "00:05",
+   "date": "2026-11-18",
+   "time": "23:48",
    "text": "Second round from the missing-symbols list: 42 more functions, including debug logging, object pool allocation, exploration pause/unpause, path exits, UI numbers and events, conversation start, world locator lookup and event sending, and options saving. Several older declarations were corrected where the asm returns a value."
   },
   {
@@ -159,7 +159,7 @@
   },
   {
    "date": "2026-11-18",
-   "time": "23:17",
+   "time": "23:18",
    "text": "PC build is now 32-bit and CI has a link step: the linker's unresolved symbols become a ranked missing-symbols report (about 1,390 game functions, 1,100 globals, 100 SDK functions). The link also exposed 60 symbols declared with a different type or C/C++ linkage than their definitions; all fixed."
   },
   {
@@ -239,12 +239,12 @@
   },
   {
    "date": "2026-11-18",
-   "time": "18:52",
+   "time": "18:38",
    "text": "Added tools/check_protos.py, which flags the same function declared with different return types, parameter counts or C/C++ linkage; fixed about 70 linkage mismatches and 20 wrong prototypes (e.g. destructors and getters that return pointers)."
   },
   {
    "date": "2026-11-18",
-   "time": "18:34",
+   "time": "18:33",
    "text": "Script callbacks now return a pointer-sized ScriptValue instead of BOOL, so string/texture getters no longer truncate on x64; decompiled the quest log, recipes, badges and creatures string getters and LightSetColor."
   },
   {
@@ -294,7 +294,7 @@
   },
   {
    "date": "2026-11-18",
-   "time": "17:37",
+   "time": "17:38",
    "text": "Decompiled 61 lab books screen callbacks: ingredient actions, the parts page (lists, slots, names, images, recipes, delete), the creatures page (current HP, energy, attack, defense, madness, monster images), and the statistics page (rank, MSP, battles, experiments, best times and high scores). Written by low-cost helper agents and reviewed."
   },
   {
@@ -314,12 +314,12 @@
   },
   {
    "date": "2026-11-18",
-   "time": "16:23",
+   "time": "17:23",
    "text": "Decompiled the statistic counters that unlock badges (experiments, wins, per-challenge records) and the lab's battle-result bookkeeping (win/loss stats, best experiment MSP, challenge MSP)."
   },
   {
    "date": "2026-11-18",
-   "time": "16:19",
+   "time": "17:19",
    "text": "Decompiled three small lab tuning lookups (difficulty flag, factor and item float values)."
   },
   {
@@ -329,12 +329,12 @@
   },
   {
    "date": "2026-11-18",
-   "time": "16:18",
+   "time": "17:18",
    "text": "Decompiled the lab experiment generator: it loads the difficulty tuning, then rolls the three candidate experiments (kind, bucket, option, item) so that none repeats the current one, and looks up each one's value."
   },
   {
    "date": "2026-11-18",
-   "time": "16:15",
+   "time": "17:15",
    "text": "Decompiled the experiment MSP calculation and the challenge reward table lookup in the lab."
   },
   {
@@ -344,17 +344,17 @@
   },
   {
    "date": "2026-11-18",
-   "time": "16:13",
+   "time": "17:13",
    "text": "Decompiled the lab's experiment bookkeeping (experiment result grade from part quality and rank, reward list, material reward counting) and a set of game-database table lookups (ability effects and others)."
   },
   {
    "date": "2026-11-18",
-   "time": "16:08",
+   "time": "17:08",
    "text": "Decompiled the list of actions a fighter can use this turn (working limbs, energy cost, blocked while an effect is active) and the computer opponent's random action pick, plus the cleanup of fighter and limb status objects."
   },
   {
    "date": "2026-11-18",
-   "time": "16:03",
+   "time": "17:03",
    "text": "Decompiled the main fighter reaction picker (hit, dodge, block or idle for the round) and the block animation names, which add a suffix for the kind of block (radioactive, acidic, celestial, explosive, fake)."
   },
   {
@@ -364,12 +364,12 @@
   },
   {
    "date": "2026-11-18",
-   "time": "15:59",
+   "time": "16:59",
    "text": "Decompiled the hit, idle and dodge animation pickers for fighters: which reaction a limb plays when struck (heavy or light injury depending on its health), the idle animation afterwards (hurt, tired or regular) and the dodge style (back, jump or duck)."
   },
   {
    "date": "2026-11-18",
-   "time": "15:48",
+   "time": "16:48",
    "text": "Decompiled the fighter animation-name builders: the strings (limb, body type, attack/dodge/idle reaction, e.g. \"legs_..._uppercut\") that the character system looks animations up by, plus the part model key and the reaction and body-type name tables."
   },
   {
@@ -379,22 +379,22 @@
   },
   {
    "date": "2026-11-18",
-   "time": "15:44",
+   "time": "16:44",
    "text": "Decompiled part discovery (first sighting of a part tier gives MSP, rank-ups and the 'parts discovered' badges) and the experiment reward (quest unlock, MSP, new-part discovery notices, and the reward part with its enhancement or random defect)."
   },
   {
    "date": "2026-11-18",
-   "time": "15:05",
+   "time": "15:54",
    "text": "Decompiled the two material-reward rolls used by challenge rewards: one picks a material matching a part (or a random one the player has unlocked enough for), the other picks a rarity and level and then a random fitting material, retrying at lower levels."
   },
   {
    "date": "2026-11-18",
-   "time": "14:52",
+   "time": "14:41",
    "text": "Decompiled a loot roll that picks a random suitable table row for a part (torso parts and other limbs use different eligibility flags)."
   },
   {
    "date": "2026-11-18",
-   "time": "14:40",
+   "time": "14:39",
    "text": "Decompiled the battle's fighter-turn phase (both sides' owners act until they finish, then the choices are recorded) and the speed roll (each fighter rolls 1-49 plus limb bonuses, ties broken by a coin flip, results written to the battle log), plus the lab state reset."
   },
   {
@@ -404,7 +404,7 @@
   },
   {
    "date": "2026-11-18",
-   "time": "13:27",
+   "time": "13:26",
    "text": "The leaf generator now also writes forwarding wrappers (functions that pass their arguments on to another function, often only when a save is loaded) and small compare-and-return functions (range checks, flag tests, 'is this zero' idioms). About 670 more small functions are now covered automatically."
   },
   {
@@ -529,7 +529,7 @@
   },
   {
    "date": "2026-11-18",
-   "time": "01:12",
+   "time": "01:49",
    "text": "Decompiled opponent generation: a random monster is built from an opponent template and re-rolled until its total part power (each part's base power times its tier multiplier) fits a window around the player's rank, then it gets defects, enhancements and a quality per limb. Also the debris that scatters over every collision shape of a broken object (more pieces for bigger shapes, up to 20)."
   },
   {
@@ -599,7 +599,7 @@
   },
   {
    "date": "2026-11-17",
-   "time": "21:23",
+   "time": "21:26",
    "text": "Switched to decompiling the largest functions first. The four biggest turned out to be the script system's tables: the 1,812-entry list of functions the level and UI scripts can call, and the 392 call signatures saying what each one takes and returns (void, int, bool, hashed name, float, entity, script context). Both were generated straight from the originals, and every script callback now has typed parameters. Decompiled game code jumped from 2.3% to 4.7%."
   },
   {
@@ -684,7 +684,7 @@
   },
   {
    "date": "2026-11-17",
-   "time": "20:20",
+   "time": "20:07",
    "text": "Decompiled the disc-error screens (no disc / wrong disc / unreadable, with reset and power handling while they are shown), helper-entity spawning and target-lead prediction. Lab notes now show the time of each entry."
   },
   {
@@ -725,7 +725,7 @@
   {
    "date": "2026-11-17",
    "text": "Project set up: disc extracted, main.dol split with decomp-toolkit, progress site launched.",
-   "time": "15:43"
+   "time": "15:55"
   }
  ]
 }

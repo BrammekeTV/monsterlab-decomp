@@ -70,6 +70,7 @@ a PC port. Read this whole file before making changes. Human contributors: see
   copies those types into `src/leaf/`.
 - `python tools/check.py [files]`: compile with MSVC using the CI flags (no args = changed files).
 - `python tools/progress.py`: progress numbers.
+- `python tools/changelog_add.py "text"`: add a progress-site changelog entry stamped with the real time (maintainer only).
 
 ## How to decompile a function
 
