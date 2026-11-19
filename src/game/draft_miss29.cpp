@@ -23,7 +23,7 @@ void* UIWidgetFindChild(void* widget, u32 hash);               // 0x80199AEC
 void UIWidgetPlayAnim(void* w, u32 anim);                      // 0x80199B38
 void* WorldFindLocator(void* world, u32 hash);                 // 0x8012AA50
 BOOL ZoneIsLoaded(void* world, s32 zone);                      // 0x8012F408
-s32 fn_800BE3A8(s32 id, f32* a, f32* b, s32 code, u8* obj, u8* tgt, f32 f1, f32 f2);  // 0x800BE3A8
+s32 fn_800BE3A8(u8* proj, f32* a, f32* b, s32 code, f32 f1, f32 f2);  // 0x800BE3A8
 s32 fn_800BF18C(s32 p);                                        // 0x800BF18C
 void fn_8010A374(void);                                        // 0x8010A374
 s32 fn_801A3010(void* obj, void* data);                        // 0x801A3010
@@ -342,7 +342,7 @@ void MysticBrewGhost_FireProjectile(void* a0) {
     vb[0] = *(f32*)(tgt + 0x0);
     vb[1] = *(f32*)(tgt + 0x4);
     vb[2] = *(f32*)(tgt + 0x8);
-    fn_800BE3A8(*(s32*)(p + 0x29C), va, vb, code, obj, tgt, *(f32*)(p + 0x274), *(f32*)(p + 0x278));
+    fn_800BE3A8(*(u8**)(p + 0x29C), va, vb, code, *(f32*)(p + 0x274), *(f32*)(p + 0x278));
     *(s32*)(p + 0x29C) = 0;
 }
 

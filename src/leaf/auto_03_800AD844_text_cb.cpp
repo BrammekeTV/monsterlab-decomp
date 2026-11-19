@@ -8,7 +8,7 @@
 
 extern f32 lbl_805FE03C;
 extern "C" void fn_800ADDB8(s32, s32);
-extern "C" void fn_800AE200(s32, s32);
+extern "C" void fn_800AE200(u8*, u32);
 
 // 0x800AEC04
 void GrowJuiceTentacle_SetVisibleComponents(void* a3, u32 a4) {
@@ -21,11 +21,10 @@ void GrowJuiceTentacle_SetVisibleComponents(void* a3, u32 a4) {
 
 // 0x800AEC14
 void GrowJuiceTentacle_SetStageTimeout(void* a3, u32 a4) {
-    // tail-call arguments inferred from the registers set before the call
     if (a3 == 0) {
         return;
     }
-    fn_800AE200((s32)((u32)(uintptr_t)(a3)), (s32)((u32)(uintptr_t)(a4)));
+    fn_800AE200(((u8*)(uintptr_t)(a3)), (u32)((u32)(uintptr_t)(a4)));
 }
 
 // 0x800AEC24

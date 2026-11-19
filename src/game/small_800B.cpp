@@ -15,7 +15,7 @@ void  fn_8020A398(s32 handle);                                          // 0x802
 s32   PlaySound(u32 hash, s32 a, s32 b, s32 c, s32 d, s32 e);           // 0x80209E70
 u32   fn_801EC880(u8* p, u32 hash);                                     // 0x801EC880
 void  fn_801EC8C4(u8* p, u32 a, u32 b);                                 // 0x801EC8C4
-s32   fn_800B20A4(u8* p, s32 a, s32 b);                                 // 0x800B20A4
+s32   fn_800B20A4(u8* p, u8* a, f32* out);                                 // 0x800B20A4
 void  fn_800B179C(s32 a);                                               // 0x800B179C
 void  fn_800B3180(u8* p);                                               // 0x800B3180
 void  fn_800B2740(u8* p);                                               // 0x800B2740
@@ -150,8 +150,8 @@ u8* fn_800B1F20(u8* p, s32 del) {
 
 // 0x800B2054
 // Returns the hash 0xDC2ED9B5 when fn_800B20A4 succeeds (after releasing +0x264 via fn_800B179C), else -1.
-s32 fn_800B2054(u8* p, s32 a) {
-    if (fn_800B20A4(p, a, 0) != 0) {
+s32 fn_800B2054(u8* p, u8* a) {
+    if (fn_800B20A4(p, a, NULL) != 0) {
         fn_800B179C(*(s32*)(p + 0x264));
         return (s32)0xDC2ED9B5u;
     }

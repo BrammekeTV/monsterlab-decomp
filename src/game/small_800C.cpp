@@ -6,7 +6,7 @@ void  operator_delete(void* p);                                 // 0x801D426C
 void  fn_800690D4(u8* p, s32 a, void* params, s32 b);                                       // 0x800690D4 (base ctor)
 u8*  fn_80062CE0(u8* p, s32 del);                              // 0x80062CE0 (base dtor)
 void  fn_800C2670(u8* p);                                       // 0x800C2670
-void  fn_800C2760(u8* p);                                       // 0x800C2760
+void  fn_800C2760(u8* p, u8* owner);                            // 0x800C2760
 void  fn_800C28C4(u8* p);                                       // 0x800C28C4
 void  fn_800C1798(void* out, void* arg);                        // 0x800C1798
 void  fn_8010BB64(u8* obj, s32 v, void* tmp);                   // 0x8010BB64
@@ -166,8 +166,8 @@ u8* fn_800C52F0(u8* p, s32 del) {
 
 // 0x800C5348
 // Init: base init (fn_800C2760), then sets float at +0xD8 to the default constant.
-void fn_800C5348(u8* p) {
-    fn_800C2760(p);
+void fn_800C5348(u8* p, u8* owner) {
+    fn_800C2760(p, owner);
     *(f32*)(p + 0xd8) = lbl_805FE3E0;
 }
 

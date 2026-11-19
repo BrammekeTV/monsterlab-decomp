@@ -39,8 +39,8 @@ void fn_802200EC(s32 h);                // 0x802200EC
 void fn_8021F35C(u8* p);                // 0x8021F35C
 f64 fn_8033ED6C(f32 a, f32 b, f32 c, f32 d, f32 e);   // 0x8033ED6C
 u32 RandomU32(void);                    // 0x80143460
-s32 fn_8007C50C(u8* p);                 // 0x8007C50C
-s32 fn_8007CB68(u8* p, s32 mode);       // 0x8007CB68
+void fn_8007C50C(u8* p);                 // 0x8007C50C
+void fn_8007CB68(u8* p, s32 mode);       // 0x8007CB68
 s32 fn_8000849C(u8* p);                 // 0x8000849C
 void fn_80078BB8(u8* p);                // 0x80078BB8
 void fn_80079004(u8* p);                // 0x80079004

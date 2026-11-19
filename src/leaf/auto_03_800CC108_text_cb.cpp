@@ -6,15 +6,14 @@
 #include "types.h"
 #include "game/script_callbacks.h"
 
-extern "C" void fn_800CC3E8(s32);
+extern "C" void fn_800CC3E8(u8*);
 
 // 0x800CC51C
 void Stitching_Reticle_FireStaple(void* a3) {
-    // tail-call arguments inferred from the registers set before the call
     if (a3 == 0) {
         return;
     }
-    fn_800CC3E8((s32)((u32)(uintptr_t)(a3)));
+    fn_800CC3E8(((u8*)(uintptr_t)(a3)));
 }
 
 // 0x800CC6F8

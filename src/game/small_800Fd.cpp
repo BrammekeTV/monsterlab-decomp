@@ -24,7 +24,7 @@ extern "C" {
 void*  CharacterFind(s32 id);                    // 0x800E876C
 s32    WorldGetPhase(void* world);               // 0x800D83A8
 u32    SaveCheckFlag2(u8* s, u8 flag);           // 0x80225DF8
-void   fn_800D4588(void* db, void* data);        // 0x800D4588
+u8*    fn_800D4588(void* db, void* data);        // 0x800D4588
 void   fn_800D75D0(void* obj);                   // 0x800D75D0
 void   fn_80050F08(void* ch);                    // 0x80050F08
 void   fn_801629D0(void* obj, s32 n);            // 0x801629D0

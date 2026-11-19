@@ -8,7 +8,7 @@
 extern u8 lbl_805FDF18[];
 extern u8 lbl_805FDF1C[];
 extern "C" void app_PlayMusic(u32, f32);
-extern "C" void fn_800B170C(s32);
+extern "C" void fn_800B170C(u8*);
 extern "C" f32 fn_800B1D90(u8*);
 
 // 0x800A8AEC
@@ -48,7 +48,6 @@ extern "C" f32 fn_800A9B94(void) {
 
 // 0x800AA684
 extern "C" void fn_800AA684(u8* a3) {
-    // tail-call arguments inferred from the registers set before the call
-    s32 t0 = *(s32*)(((u8*)(uintptr_t)(a3)) + 148);
-    fn_800B170C((s32)((u32)(t0)));
+    u8* t0 = *(u8**)(((u8*)(uintptr_t)(a3)) + 148);
+    fn_800B170C(t0);
 }

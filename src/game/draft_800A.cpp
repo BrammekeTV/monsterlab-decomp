@@ -30,7 +30,7 @@ void  fn_800A75C8(u8* p);                                        // 0x800A75C8
 void  fn_800A76B4(u8* p);                                        // 0x800A76B4
 void  fn_800A7828(u8* p);                                        // 0x800A7828
 f32   fn_800A791C(u8* p);                                        // 0x800A791C
-void  fn_800C2FF0(u8* p);                                        // 0x800C2FF0
+u8*   fn_800C2FF0(u8* p);                                        // 0x800C2FF0
 s32   fn_8018BDE0(u8* p, s32 key);                               // 0x8018BDE0
 f32   fn_8018BE30(u8* p, f32 t);                                 // 0x8018BE30
 void  fn_8018BEA4(u8* p, f32 t);                                 // 0x8018BEA4

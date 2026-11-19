@@ -7,15 +7,14 @@
 #include "game/script_callbacks.h"
 
 extern u8 lbl_805FB158[];
-extern "C" void fn_800A6704(s32, u8*);
+extern "C" void fn_800A6704(u8*, u8*);
 
 // 0x800A1988
 void PlaceSaw(void) {
-    // tail-call arguments inferred from the registers set before the call
     u8* t0 = *(u8**)((u8*)&lbl_805FB158);
-    s32 t1 = *(s32*)(t0 + 3212);
+    u8* t1 = *(u8**)(t0 + 3212);
     u8* t2 = t0 + 140;
-    fn_800A6704((s32)((u32)(t1)), t2);
+    fn_800A6704(t1, t2);
 }
 
 // 0x800A1998

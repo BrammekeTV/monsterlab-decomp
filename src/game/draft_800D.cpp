@@ -30,7 +30,7 @@ u8*   fn_800D4B68(u8* p);                                          // 0x800D4B68
 u8*   fn_800D4B74(u8* p, s32 del);                                          // 0x800D4B74
 u8*   fn_800D4BB4(u8* p);                                          // 0x800D4BB4
 u8*   fn_800D4BE8(u8* p, s32 del);                                          // 0x800D4BE8
-void  fn_800D4C64(u8* p);                                          // 0x800D4C64
+u8*   fn_800D4C64(u8* p);                                          // 0x800D4C64
 void  fn_800D50C4(u8* p);                                          // 0x800D50C4
 void  fn_800D5110(u8* holder, u8* obj, u8* data);                  // 0x800D5110
 void  fn_800D5174(u8* p, f32 dt);                                  // 0x800D5174

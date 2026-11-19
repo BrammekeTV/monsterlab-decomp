@@ -12,7 +12,6 @@ extern "C" u8* fn_800C253C(u8**, s32);
 
 // 0x800CD490
 extern "C" void fn_800CD490(u8* a3, s32 a4) {
-    // tail-call arguments inferred from the registers set before the call
     *(u32*)(((u8*)(uintptr_t)(a3)) + 20) = (u32)((u32)(uintptr_t)(a4));
     *(u32*)(((u8*)(uintptr_t)(a3)) + 24) = (u32)((u32)(0));
     *(u32*)(((u8*)(uintptr_t)(a3)) + 28) = (u32)((u32)(1));
