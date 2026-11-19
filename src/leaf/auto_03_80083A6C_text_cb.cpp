@@ -7,12 +7,11 @@
 #include "game/script_callbacks.h"
 
 extern "C" u8* fn_80080C5C(u8*);
-extern "C" void fn_80083C80(s32);
+extern "C" void fn_80083C80(u8*);
 
 // 0x80083D64
 void BrainHeadGoToTrapDoor(u32 a3) {
-    // tail-call arguments inferred from the registers set before the call
-    fn_80083C80((s32)((u32)(uintptr_t)(a3)));
+    fn_80083C80(((u8*)(uintptr_t)(a3)));
 }
 
 // 0x80084638

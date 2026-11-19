@@ -13,7 +13,7 @@ extern "C" void AimMinigame_Update(u8*);
 extern "C" void StartRumble(s32, u32);
 extern "C" void app_PlayMusic(u32, f32);
 extern "C" void fn_800704AC(u8*);
-extern "C" void fn_8007E354(s32, s32);
+extern "C" void fn_8007E354(u8*, u32);
 
 // 0x8007DD0C
 extern "C" u32 fn_8007DD0C(u8* a3, s32 a4) {
@@ -56,10 +56,9 @@ extern "C" void fn_8007E344(void) {
 }
 
 // 0x8007E348
-extern "C" void fn_8007E348(s32 a3) {
-    // tail-call arguments inferred from the registers set before the call
+extern "C" void fn_8007E348(u8* a3) {
     u32 t0 = (u32)(0x437b0000) + 15717u;
-    fn_8007E354((s32)((u32)(uintptr_t)(a3)), (s32)((u32)(t0)));
+    fn_8007E354(((u8*)(uintptr_t)(a3)), (u32)((u32)(t0)));
 }
 
 // 0x8007E8FC
@@ -73,10 +72,9 @@ extern "C" void fn_8007E8FC(u8* a3) {
 }
 
 // 0x8007E920
-extern "C" void fn_8007E920(s32 a3) {
-    // tail-call arguments inferred from the registers set before the call
+extern "C" void fn_8007E920(u8* a3) {
     u32 t0 = (u32)(0xc6090000) - 14270u;
-    fn_8007E354((s32)((u32)(uintptr_t)(a3)), (s32)((u32)(t0)));
+    fn_8007E354(((u8*)(uintptr_t)(a3)), (u32)((u32)(t0)));
 }
 
 // 0x8007E92C
@@ -93,10 +91,9 @@ extern "C" void fn_8007E940(void) {
 }
 
 // 0x8007E944
-extern "C" void fn_8007E944(s32 a3) {
-    // tail-call arguments inferred from the registers set before the call
+extern "C" void fn_8007E944(u8* a3) {
     u32 t0 = (u32)(0x11770000) + 16835u;
-    fn_8007E354((s32)((u32)(uintptr_t)(a3)), (s32)((u32)(t0)));
+    fn_8007E354(((u8*)(uintptr_t)(a3)), (u32)((u32)(t0)));
 }
 
 // 0x8007E950

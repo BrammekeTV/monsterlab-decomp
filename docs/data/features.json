@@ -94,6 +94,11 @@
  "changelog": [
   {
    "date": "2026-11-19",
+   "time": "19:21",
+   "text": "Decompiled 66 more game functions (fn_8007*/fn_8008*/fn_8009* helpers, Brazier wand and effect utilities, tree walkers, ...)"
+  },
+  {
+   "date": "2026-11-19",
    "time": "18:59",
    "text": "Decompiled 68 more game functions (part, enemy and effect helpers fn_8004*/fn_8006*, spawn and camera utilities, ...)"
   },

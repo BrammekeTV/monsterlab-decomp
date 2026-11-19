@@ -10,8 +10,8 @@ extern "C" void app_StopMusic(void);
 extern "C" void fn_800704AC(u8*);
 extern "C" f32 fn_8007CF94(u8*);
 extern "C" f32 fn_8007CFA4(u8*);
-extern "C" void fn_8007CFAC(s32);
-extern "C" void fn_8007CFD8(s32);
+extern "C" f32 fn_8007CFAC(u8*);
+extern "C" f32 fn_8007CFD8(u8*);
 
 // 0x80078BB0
 extern "C" s32 fn_80078BB0(void) {
@@ -56,17 +56,15 @@ extern "C" f32 fn_80079FBC(u8* a3) {
 }
 
 // 0x80079FC4
-extern "C" void fn_80079FC4(u8* a3) {
-    // tail-call arguments inferred from the registers set before the call
-    s32 t0 = *(s32*)(((u8*)(uintptr_t)(a3)) + 1888);
-    fn_8007CFAC((s32)((u32)(t0)));
+extern "C" f32 fn_80079FC4(u8* a3) {
+    u8* t0 = *(u8**)(((u8*)(uintptr_t)(a3)) + 1888);
+    return (f32)(fn_8007CFAC(t0));
 }
 
 // 0x80079FCC
-extern "C" void fn_80079FCC(u8* a3) {
-    // tail-call arguments inferred from the registers set before the call
-    s32 t0 = *(s32*)(((u8*)(uintptr_t)(a3)) + 1888);
-    fn_8007CFD8((s32)((u32)(t0)));
+extern "C" f32 fn_80079FCC(u8* a3) {
+    u8* t0 = *(u8**)(((u8*)(uintptr_t)(a3)) + 1888);
+    return (f32)(fn_8007CFD8(t0));
 }
 
 // 0x8007A2AC

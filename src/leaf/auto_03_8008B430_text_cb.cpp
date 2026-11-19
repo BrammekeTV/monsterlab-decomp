@@ -8,12 +8,11 @@
 
 extern u8* gWorldState;
 extern "C" void fn_8008BA80(s32, f32);
-extern "C" void fn_8008C204(s32);
+extern "C" s32 fn_8008C204(u8*);
 
 // 0x8008C8EC
 void BrazierWandFlickSymbols(void* a3) {
-    // tail-call arguments inferred from the registers set before the call
-    fn_8008C204((s32)((u32)(uintptr_t)(a3)));
+    fn_8008C204(((u8*)(uintptr_t)(a3)));
 }
 
 // 0x8008C8F0

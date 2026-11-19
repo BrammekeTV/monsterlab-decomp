@@ -26,7 +26,7 @@ void  fn_800A39A4(u8* p);                                                     //
 void  fn_800A424C(u8* p);                                                     // 0x800A424C
 u8*   fn_800A4EE4(u8* tree, u32 key);                                         // 0x800A4EE4
 u8*   fn_800A5B4C(u8* p, s32* keyp, void** outNode, u8* outLeft, u8* outAll); // 0x800A5B4C
-void  fn_800A59BC(u8* tree, u8* hint, u8 left, u8 all, void* val);            // 0x800A59BC
+u8*   fn_800A59BC(u8* tree, u8* hint, u8 left, u8 all, void* val);            // 0x800A59BC
 void  fn_800C1B78(u8* p);                                                     // 0x800C1B78
 void  fn_800C1D44(u8* p);                                                     // 0x800C1D44
 void  fn_800C2174(u8* a3, void* a4, s32 a5);                                  // 0x800C2174

@@ -21,7 +21,7 @@ void  fn_800690D4(u8* p, s32 a, void* params, s32 b);                           
 u8*   fn_8006FBDC(void);                                                                      // 0x8006FBDC
 void  fn_800712B4(void);                                                                      // 0x800712B4
 void  fn_800712B8(void);                                                                      // 0x800712B8
-u8*   fn_8007F900(u8* mgr, s32 type, f32 threshold);                                          // 0x8007F900
+u8*   fn_8007F900(u8* mgr, s32 type);                                          // 0x8007F900
 void  fn_80085C34(u8* p, s32 n);                                                              // 0x80085C34
 void  fn_801C849C(u8* mgr, u8* item);                                                         // 0x801C849C
 void* fn_801D40E0(s32 n);                                                                     // 0x801D40E0
@@ -103,7 +103,7 @@ extern "C" {
 u32 /*0x06*/ BrainTossReloadBrainChunk(void) {
     u8* mgr = fn_8006FBDC();
     f32 roll = kU32ToUnit * (f32)RandomU32();
-    u8* obj = fn_8007F900(mgr, roll < *(f32*)(mgr + 0xBC), roll);
+    u8* obj = fn_8007F900(mgr, roll < *(f32*)(mgr + 0xBC));
     if (obj == NULL) return 0;
     if (*(u8*)(obj + 0x268) != 1) {
         *(u8*)(obj + 0x268) = 1;

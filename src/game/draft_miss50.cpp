@@ -50,7 +50,7 @@ void* CharacterFind(s32 id);                            // 0x800E876C
 void* fn_8003DB78(u32 hash, s32 a, s32 b);              // 0x8003DB78
 char* fn_80338BC0(char* s, const char* sub);            // 0x80338BC0 (MSL strstr)
 void* fn_801F06FC(void);                                // 0x801F06FC
-s32   fn_801DB398(u8* a, u32 hash, u8* b, void* c);     // 0x801DB398
+void  fn_801DB398(u8* a, u32 hash, u8* b);     // 0x801DB398
 void  fn_8020E864(u8* p, s32 del);                      // 0x8020E864
 void* ScreenSetsFind(void* sets, s32 zone);
 
@@ -530,7 +530,7 @@ void fn_8003DCE0(u8* obj) {
     }
     if (*(u32*)(obj + 0xB8) & 1) {
         u8* world = *(u8**)gWorldState;
-        fn_801DB398(*(u8**)(world + 0x1A4) + gZoneResourceSize + 0xE4, 0x2C733C94u, obj, world);
+        fn_801DB398(*(u8**)(world + 0x1A4) + gZoneResourceSize + 0xE4, 0x2C733C94u, obj);
         return;
     }
     u8* list = **(u8***)((u8*)fn_801F06FC() + 0x8);

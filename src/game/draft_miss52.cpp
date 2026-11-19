@@ -58,7 +58,7 @@ void  fn_8003E000(u8* a, u8* b, u8* c);                                 // 0x800
 void  fn_80133698(void* world, s32 zone);                               // 0x80133698
 s32   ZoneLoadAsync(void* world, s32 zone, int a, void (*done)(void*, void*), s32 arg);   // 0x80132098
 void  fn_8003DB60(void* a, void* b);                                    // 0x8003DB60
-void  fn_8004FCB4(u8* obj, s32 arg);                                    // 0x8004FCB4
+s32   fn_8004FCB4(u8* obj, u8* other);                                    // 0x8004FCB4
 s32   fn_8004EDA0(u8* a, u8* b);                                        // 0x8004EDA0
 s32   fn_801B5338(u8* obj, u8* target, u32 hash, f32* vec, u8 flag);    // 0x801B5338
 s32   fn_8004EED0(u8* arg0, u32 arg1, s32 arg2);                        // 0x8004EED0
@@ -92,7 +92,7 @@ void  fn_8018A948(u8* h, f32 t);                                        // 0x801
 s32   fn_801AC51C(u8* p, u8* obj, u8* target);                              // 0x801AC51C
 void  fn_8018C3D0(u8* h);                                               // 0x8018C3D0                                               // 0x8020A398
 void  fn_801E839C(u8* p);                                               // 0x801E839C
-s32   fn_801DB398(u8* a, u32 hash, u8* b, void* c);                     // 0x801DB398
+void  fn_801DB398(u8* a, u32 hash, u8* b);                     // 0x801DB398
 s32   fn_8012E7B0(u8* world, u8* obj, s32 a);                           // 0x8012E7B0
 void  fn_800634D0(u8* h);                                               // 0x800634D0
 void  fn_80063520(u8* h);                                               // 0x80063520
@@ -366,7 +366,7 @@ void* fn_8003DB78(u32 hash, s32 a, s32 b) {
     if (obj == NULL && busy != 0) {
         u8* zr = *(u8**)(*(u8**)gWorldState + 0x1a4) + gZoneResourceSize;
         obj = (u8*)HashTableFind(zr + 0xe4, 0x2c733c94u);
-        fn_8004FCB4(obj, busy);
+        fn_8004FCB4(obj, (u8*)(intptr_t)busy);
     }
     return obj;
 }
@@ -1185,7 +1185,7 @@ void fn_80068B50(u8* p, s32 notify) {
             u8* w = *(u8**)(p + 0x254);
             if (w != NULL) {
                 // r6 (4th arg) was not set before this call in the original: caller leftover
-                fn_801DB398(*(u8**)(*(u8**)gWorldState + 0x1a4) + 0xe4, key, w, NULL);
+                fn_801DB398(*(u8**)(*(u8**)gWorldState + 0x1a4) + 0xe4, key, w);
                 *(u8**)(p + 0x254) = NULL;
             }
             *(s32*)(p + 0x90) = 0;
@@ -1193,7 +1193,7 @@ void fn_80068B50(u8* p, s32 notify) {
     }
     u32 flags = *(u32*)(p + 0xb8);
     if ((flags & 1) && !(flags & 2)) {
-        fn_801DB398(*(u8**)(*(u8**)gWorldState + 0x1a4) + 0xe4, 0xBE8520ABu, p, *(void**)gWorldState);
+        fn_801DB398(*(u8**)(*(u8**)gWorldState + 0x1a4) + 0xe4, 0xBE8520ABu, p);
         *(u32*)(p + 0xb8) |= 2;
         if (notify != 0) fn_8012E7B0(gWorldState, p, 0);
     }

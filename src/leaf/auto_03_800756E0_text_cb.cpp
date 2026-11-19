@@ -13,7 +13,6 @@ extern "C" void fn_8007739C(u8*, s32, s32);
 
 // 0x80075F8C
 void TokenUpdate(ScriptCtx* a3) {
-    // tail-call arguments inferred from the registers set before the call
     u8* t0 = *(u8**)(((u8*)(uintptr_t)(a3)) + 16);
     f32 t1 = *(f32*)(t0 + 36);
     fn_80076BA4(t0, (f32)(t1));

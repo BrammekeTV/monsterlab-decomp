@@ -9,9 +9,9 @@ extern "C" void fn_8007B194(u8*);
 extern "C" void fn_8007C080(u8*);
 extern "C" void fn_8007C110(u8*);
 extern "C" void fn_8007C12C(u8*);
-extern "C" void fn_8007C140(s32);
-extern "C" void fn_8007C278(s32);
-extern "C" void fn_8007C3B0(s32);
+extern "C" void fn_8007C140(void);
+extern "C" void fn_8007C278(void);
+extern "C" void fn_8007C3B0(u8*);
 
 // 0x80077BC0
 extern "C" void WeldingGunHeatDecrease(u8* a3) {
@@ -44,21 +44,18 @@ extern "C" void WeldingResetOverheatCounter(u8* a3) {
 
 // 0x80077CE4
 extern "C" void StartWeldLightingEffect(u8* a3) {
-    // tail-call arguments inferred from the registers set before the call
     s32 t0 = *(s32*)(((u8*)(uintptr_t)(a3)) + 16);
-    fn_8007C140((s32)((u32)(t0)));
+    fn_8007C140();
 }
 
 // 0x80077CEC
 extern "C" void StartBrokenGunLightingEffect(u8* a3) {
-    // tail-call arguments inferred from the registers set before the call
     s32 t0 = *(s32*)(((u8*)(uintptr_t)(a3)) + 16);
-    fn_8007C278((s32)((u32)(t0)));
+    fn_8007C278();
 }
 
 // 0x80077CF4
 extern "C" void StopWeldLightingEffect(u8* a3) {
-    // tail-call arguments inferred from the registers set before the call
-    s32 t0 = *(s32*)(((u8*)(uintptr_t)(a3)) + 16);
-    fn_8007C3B0((s32)((u32)(t0)));
+    u8* t0 = *(u8**)(((u8*)(uintptr_t)(a3)) + 16);
+    fn_8007C3B0(t0);
 }

@@ -7,12 +7,12 @@
 #include "game/script_callbacks.h"
 
 extern u8* gWorldState;
-extern "C" s32 fn_8008BF04(s32, u8*);
+extern "C" s32 fn_8008BF04(u8*, u8*);
 extern "C" void fn_8008CE44(u8*, u8*, s32, s32, f32, f32);
 extern "C" void fn_8008D7C8(s32, f32);
 extern "C" void fn_8008DF44(s32, f32);
-extern "C" s32 fn_8008E290(s32);
-extern "C" void fn_8008E340(s32, f32);
+extern "C" s32 fn_8008E290(u8*);
+extern "C" void fn_8008E340(u8*, f32);
 
 // 0x8008E880
 void BrazierSymbolUpdateRising(void* a3) {
@@ -46,25 +46,22 @@ void BrazierSymbolDestroyed(void* a3) {
 
 // 0x8008E8C4
 s32 BrazierSymbolGetSymbolStatus(void* a3) {
-    // tail-call arguments inferred from the registers set before the call
-    return (s32)(fn_8008E290((s32)((u32)(uintptr_t)(a3))));
+    return (s32)(fn_8008E290(((u8*)(uintptr_t)(a3))));
 }
 
 // 0x8008EB38
 s32 BrazierSymbolAddSymbolToWand(void* a3) {
-    // tail-call arguments inferred from the registers set before the call
-    s32 t0 = *(s32*)(((u8*)(uintptr_t)(a3)) + 644);
+    u8* t0 = *(u8**)(((u8*)(uintptr_t)(a3)) + 644);
     if (t0 == 0) {
         return (s32)(0);
     }
-    return (s32)(fn_8008BF04((s32)((u32)(t0)), ((u8*)(uintptr_t)(a3))));
+    return (s32)(fn_8008BF04(t0, ((u8*)(uintptr_t)(a3))));
 }
 
 // 0x8008EC20
 void BrazierSymbolUpdateMovingBack(void* a3) {
-    // tail-call arguments inferred from the registers set before the call
     f32 t0 = *(f32*)((u8*)&gWorldState + 12);
-    fn_8008E340((s32)((u32)(uintptr_t)(a3)), (f32)(t0));
+    fn_8008E340(((u8*)(uintptr_t)(a3)), (f32)(t0));
 }
 
 // 0x8008EC30
