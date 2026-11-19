@@ -840,13 +840,11 @@ void SetCastleAccess(u32 a3, u32 a4) {
 
 // 0x800F85B4
 void SetWiiSelectorPaused(u32 a3) {
-    // tail-call arguments inferred from the registers set before the call
     fn_8012660C((s32)((u32)(uintptr_t)(a3)));
 }
 
 // 0x800F85B8
 void SetWiiSelectorActive(u32 a3) {
-    // tail-call arguments inferred from the registers set before the call
     fn_80126684((s32)((u32)(uintptr_t)(a3)));
 }
 

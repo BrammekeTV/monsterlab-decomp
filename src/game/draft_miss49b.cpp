@@ -64,7 +64,7 @@ void fn_800E69EC(s32 flag);
 void fn_801214E4(void* p);
 s32 fn_801B9E7C(u8* a3);
 void fn_801BA4A0(u8* a3);
-s32 fn_801BDA0C(u8* p);
+void fn_801BDA0C(void* a0);
 void fn_801E839C(u8* p);
 void fn_800E6A84(s32);
 s32 fn_80160A28(u8* p);
@@ -73,7 +73,7 @@ void fn_801BB478(u8* p, s32 a1);
 s32 fn_802728A4(s32 chan, u32* out);
 s32 fn_80272B64(s32 chan, u8* out);
 void operator_delete(void* p);
-s32 fn_8020A6C8(void);
+void fn_8020A6C8(void* a0);
 void fn_801D5D14(u8 a, f32 b);
 s32 PlaySound(u32 hash, s32 a, s32 b, s32 c, s32 d, s32 e);
 void FaderSetTargetColour(f32 a0, f32 a1, f32 a2);
@@ -248,7 +248,7 @@ void fn_80009748(void* arg0, u8 arg1) {
     (void)arg1;
     fn_8004CEE8(0);
     app_StopMusic();
-    fn_8020A6C8();
+    fn_8020A6C8(NULL);  // r3 is left over from app_StopMusic
     fn_800D8114(gGame + 0xD5F0);
     fn_800D85CC(gGame + 0xD5F0, 0);
     fn_800E69EC(0);

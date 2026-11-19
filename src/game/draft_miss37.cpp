@@ -15,7 +15,7 @@ extern "C" {
 
 // Callee prototypes. Definitions live in other files; types follow those definitions.
 u32 fn_8012006C(s32 a3, s32 a4);                 // 0x8012006C (leaf/auto_03_8011F410_text.cpp)
-u32 fn_801205EC(s32 a3, s32 a4);                 // 0x801205EC
+void fn_801205EC(u8* p, s32 arg1);                 // 0x801205EC
 u32 fn_8012078C(s32 a3, s32 a4);                 // 0x8012078C (leaf/auto_03_8011F410_text.cpp)
 u32 fn_801207B8(s32 a3, s32 a4);                 // 0x801207B8 (leaf/auto_03_8011F410_text.cpp)
 u32 fn_801207D0(s32 a3, s32 a4);                 // 0x801207D0 (leaf/auto_03_8011F410_text.cpp)
@@ -72,7 +72,7 @@ static s32 RecipePopupQuery(void) {
 // 0x80114D90
 void Recipes_IncrementRow(s32 a0) {
     s32 r = RecipePopupQuery();
-    if (r != 0) fn_801205EC(r, a0);
+    if (r != 0) fn_801205EC((u8*)(uintptr_t)r, a0);
 }
 
 // 0x801158F4

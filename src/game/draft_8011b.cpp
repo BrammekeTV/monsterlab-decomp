@@ -19,7 +19,7 @@ void fn_80119AE0(void);                   // 0x80119AE0 (tail calls fn_8011A04C)
 s32  fn_8011BB20(u8* p);                  // 0x8011BB20 (reads +0x2CAC)
 s32  fn_8012096C(u8* p);                  // 0x8012096C (reads +0x1A650)
 s32  fn_801206A0(u8* p, s32 a);           // 0x801206A0
-s32  fn_801207DC(u8* p, s32 a);           // 0x801207DC
+void fn_801207DC(u8* p, s32 a);           // 0x801207DC
 s32  fn_80120504(u8* p);                  // 0x80120504
 u32  fn_801203C0(u8* p);                  // 0x801203C0
 BOOL SavePartTierOwned(u8* s, u32 part, s32 tier);  // 0x802241F0

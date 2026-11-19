@@ -72,7 +72,7 @@ void   fn_8007A42C(u8* obj, f32* outA, f32* outB);                     // 0x8007
 s32    fn_8007C5D8(u8* obj);                                           // 0x8007C5D8
 f32    fn_800C7408(u8* obj, f32* pos);                                 // 0x800C7408
 void   fn_800C719C(u8* entry);                                         // 0x800C719C
-s32    fn_800D76FC(u8* tbl, s32 idx);                                  // 0x800D76FC
+void   fn_800D76FC(u8* tbl, s32 idx);                                  // 0x800D76FC
 void   fn_800D795C(u8* tbl, s32 idx);                                  // 0x800D795C
 s32    fn_800DE780(u8* self, void* a, f32* pa, f32* pb, f32* out, f32 dt, f32 fa, f32 fb);  // 0x800DE780
 void   fn_800E6684(u8* self);                                          // 0x800E6684
@@ -86,7 +86,7 @@ s32    fn_8012E420(u8* world, u8* obj, s32 a, s32 b);                  // 0x8012
 u8*    fn_8015A210(u8* p, s32 a, s32* out, s32 b);                     // 0x8015A210
 void   fn_8016964C(u8* mgr, u8* tex);                                  // 0x8016964C
 u8*    fn_8016A08C(const char* name);                                  // 0x8016A08C
-void   fn_8016B5E0(u8* obj, u8* data, s32 hash);                       // 0x8016B5E0
+s32 fn_8016B5E0(u8* arg0, u8* arg1, s32 arg2);                       // 0x8016B5E0
 u8*    fn_8016B724(u8* obj, s32 a, const char* name);                  // 0x8016B724
 void   fn_8019BE68(u8* parent, u8* w);                                 // 0x8019BE68
 u8*    fn_80198E20(u8* set);                                           // 0x80198E20

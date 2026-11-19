@@ -21,7 +21,7 @@ void* UIWidgetFindChild(void* widget, u32 hash);                     // 0x80199A
 void  fn_80116D40(u8* p, u32 a, u32 b);                              // 0x80116D40
 void  fn_80116E54(u8* p, s32 a, s32 b);                              // 0x80116E54 (return value unused here)
 void  fn_80116EF0(u8* p, s32 a);                                     // 0x80116EF0
-void  fn_8012F818(u8* p, s32 a);                                     // 0x8012F818
+void fn_8012F818(u8* p);                                     // 0x8012F818
 void  fn_8012F8B8(u8* p, s32 a1, s32 a2);                            // 0x8012F8B8
 s32   fn_80139FF0(void);                                             // 0x80139FF0 (friend code verified flag == 1)
 u64   fn_8013A004(void);                                             // 0x8013A004 (verified friend code, hi:lo)
@@ -125,7 +125,7 @@ u32 FixUpPooledEntityCallback(u32 a0, u32 a1) {
 // 0x8010C758
 // Script callback (type 0x7): re-fixes the render object stored in the slot. Returns true.
 u32 FixUpRenderObjectCallback(u32 a0, u32 a1) {
-    fn_8012F818(*(u8**)a0, 0);
+    fn_8012F818(*(u8**)a0);
     return 1;
 }
 
