@@ -256,7 +256,7 @@ extern "C" void* fn_80198F74(void* set, u32 hash) {
 
 // 0x80198FCC
 // Looks up an entry by hash in the table at set+0x3C. Logs and returns NULL when missing.
-void* fn_80198FCC(void* set, u32 hash) {
+extern "C" void* fn_80198FCC(void* set, u32 hash) {
     void* table = *(void**)((u8*)set + 0x3C);
     void* r = fn_8018E8D8(table, hash);
     if (r == NULL) {

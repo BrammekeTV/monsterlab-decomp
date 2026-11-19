@@ -159,7 +159,7 @@ void  fn_801E8D74(void* out, void* list, void* owner, void* anim);   // 0x801E8D
 s32   fn_801C3EA4(u8* a, s32 b);                            // 0x801C3EA4
 s32   fn_801C5C60(s32 a);                                   // 0x801C5C60
 s32   fn_800D59D4(u8* a3);                                  // 0x800D59D4
-s32   fn_8004D968(u8*, s32, s32);                           // 0x8004D968
+void* fn_8004D968(u8*, s32, s32);                           // 0x8004D968
 void  fn_800ED944(void);                                    // 0x800ED944 (lightning callback)
 u32   StringHash(const char* s);
 extern u8 lbl_8047C7AC[];

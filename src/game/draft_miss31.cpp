@@ -21,7 +21,7 @@ u32   AlertGetLastError(void);                                   // 0x80140B58
 s32   fn_801138F8(void);                                         // 0x801138F8
 void  fn_8000B7A8(u8* p, s32 a, s32 b);                          // 0x8000B7A8
 void  fn_8001D4FC(u8* mgr);                                      // 0x8001D4FC (lightning manager refresh)
-s32   fn_8003DDE8(void* part, s32 slot, s32 def, s32 flag, s32 a);  // 0x8003DDE8 (returns the part's entity id)
+void* fn_8003DDE8(void* part, s32 slot, s32 def, s32 flag, s32 a);  // 0x8003DDE8 (returns the part's entity id)
 void  fn_8004C718(u8* p, s32 idx, void* elem);                   // 0x8004C718
 void* fn_8004FFB4(s32 id, void* part);                           // 0x8004FFB4
 s32   fn_8004E300(void* a, s32 b);                               // 0x8004E300
@@ -216,7 +216,7 @@ void* fn_8004DAF8(void* c, s32 a, s32 b) {
         if (p != NULL) {
             s32 def = p->defIndex;
             if (def != -1 && (PartGetCurrentHealth(p) > 0 || k == 1 || k == 4)) {
-                *(s32*)(chr + 0xC6C + k * 4) = fn_8003DDE8(p, k, def, resolve, b);
+                *(s32*)(chr + 0xC6C + k * 4) = (s32)(intptr_t)fn_8003DDE8(p, k, def, resolve, b);
             } else {
                 *(s32*)(chr + 0xC6C + k * 4) = 0;
                 lbl_805FB038 -= 1;

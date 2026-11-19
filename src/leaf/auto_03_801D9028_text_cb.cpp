@@ -42,7 +42,6 @@ void FrameFxStop(u32 a3) {
 
 // 0x801DBDC4
 void FrameFxStopAll(void) {
-    // tail-call arguments inferred from the registers set before the call
     fn_80162A70((u8*)&lbl_8040E5F0);
 }
 

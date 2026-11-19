@@ -63,7 +63,7 @@ void fn_800E4C70(u8* p) {
 u32 CIAnimatedPropGetProp(u32 a0) {
     u8* p = fn_801ED6E4(a0);
     s32 h = fn_801ED538(p + 0x58);
-    return (u32)fn_801B7198(&h, 0);
+    return (u32)fn_801B7198(&h, 0);  // lint:ok 32-bit build: returns an object pointer, truncation addressed with the x64 layout work
 }
 
 // 0x800E61B0

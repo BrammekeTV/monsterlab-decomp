@@ -51,7 +51,6 @@ extern "C" void fn_8003A278(u8* a3) {
 
 // 0x8003C7E8
 extern "C" void fn_8003C7E8(u8* a3) {
-    // tail-call arguments inferred from the registers set before the call
     *(u32*)(((u8*)(uintptr_t)(a3)) + 2444) = (u32)((u32)(0));
     fn_80023044();
 }

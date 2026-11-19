@@ -215,7 +215,7 @@ extern "C" void SessionReenable(u8* s, s32 id) {
 }
 
 // 0x80012B5C
-void SessionUpdateDisabled(u8* s, f32 dt) {
+extern "C" void SessionUpdateDisabled(u8* s, f32 dt) {
     if (fn_800E6BD4() || *(s32*)(gScriptCtx + 0x18) != 5) return;
     for (u32 i = 0; i < SLOT_COUNT(s); i++) {
         if (SLOTS(s)[i].id == 0) continue;
@@ -235,7 +235,7 @@ extern u8* gSaveSystem;                  // 0x805FBBE0
 
 // 0x80012F78
 // Register a moving character in gGame's tables (max 20 per level).
-BOOL RegisterMovingCharacter(u8* chr) {
+extern "C" BOOL RegisterMovingCharacter(u8* chr) {
     u32 n = *(u32*)(gGame + 0xFDC);
     if (n >= MAX_MOVING_CHARACTERS) {
         ZoneLog(gSirLoader, "Too Many Moving Characters in the level\n");

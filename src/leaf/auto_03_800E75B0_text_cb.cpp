@@ -430,7 +430,6 @@ void PlayAnimUB(u32 a3, u32 a4, u32 a5) {
 
 // 0x800EF7D4
 void SaveCheckPoint(void) {
-    // tail-call arguments inferred from the registers set before the call
     u8* t0 = (u8*)&gGame + 1480;
     fn_80013340(t0);
 }

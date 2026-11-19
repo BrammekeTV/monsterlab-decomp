@@ -195,7 +195,7 @@ static inline void MarkDespawned(Character* e) {
 // ---------------------------------------------------------------- update
 
 // 0x8012AB00
-void WorldTick(WorldState* w, f32 dt) {
+extern "C" void WorldTick(WorldState* w, f32 dt) {
     w->time += dt;
     w->dt = dt;
 

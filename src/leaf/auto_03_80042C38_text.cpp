@@ -7,7 +7,7 @@
 
 extern u8* gBattle;
 extern "C" void BattleReset(u8*);
-extern "C" void fn_80043D84(s32, s32);
+extern "C" void fn_80043D84(u8*, s32);
 extern "C" void fn_801B4308(u8*, char*);
 
 // 0x800433F8
@@ -30,15 +30,13 @@ extern "C" void fn_80043800(u8* a3) {
 }
 
 // 0x80043CE8
-extern "C" void fn_80043CE8(s32 a3) {
-    // tail-call arguments inferred from the registers set before the call
-    fn_80043D84((s32)((u32)(uintptr_t)(a3)), (s32)((u32)(1)));
+extern "C" void fn_80043CE8(u8* a3) {
+    fn_80043D84(((u8*)(uintptr_t)(a3)), (s32)((u32)(1)));
 }
 
 // 0x80043CF0
-extern "C" void fn_80043CF0(s32 a3) {
-    // tail-call arguments inferred from the registers set before the call
-    fn_80043D84((s32)((u32)(uintptr_t)(a3)), (s32)((u32)(0)));
+extern "C" void fn_80043CF0(u8* a3) {
+    fn_80043D84(((u8*)(uintptr_t)(a3)), (s32)((u32)(0)));
 }
 
 // 0x80044078

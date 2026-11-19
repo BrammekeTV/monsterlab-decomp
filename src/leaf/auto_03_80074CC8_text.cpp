@@ -5,7 +5,7 @@
 
 #include "types.h"
 
-extern u8 lbl_805FB130[];
+extern u8 lbl_805FB130;
 extern u8 lbl_805FB131[];
 extern u8* lbl_805FB134;
 

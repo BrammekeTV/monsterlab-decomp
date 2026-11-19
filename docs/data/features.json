@@ -94,6 +94,11 @@
  "changelog": [
   {
    "date": "2026-11-19",
+   "time": "18:35",
+   "text": "Decompiled 71 more game functions (UISlider_*, UISoundList_*, camera and zone helpers, ZoneSlotInit, ...)"
+  },
+  {
+   "date": "2026-11-19",
    "time": "18:11",
    "text": "Decompiled 71 more game functions (Troublescope_*, UIScreen_*, UIElement_*, lightning spawners, ShowSystemMessage, ...)"
   },

@@ -134,7 +134,7 @@ extern const char lbl_805F90D4[];
 extern u8 lbl_805FB41C;
 extern u8 lbl_8047C760[];
 extern u8 lbl_8048A8B4[];
-s32 fn_8004D968(u8*, s32, s32);                      // 0x8004D968
+void* fn_8004D968(u8*, s32, s32);                      // 0x8004D968
 void fn_800D6B0C(s32* rec);                          // 0x800D6B0C (resets a spawn record)
 void fn_800D70EC(s32* rec, f32 amount);              // 0x800D70EC (registers a spawn record)
 s32 fn_800D4730(void* db, s32 id);                   // 0x800D4730

@@ -22,7 +22,7 @@ extern u8* lbl_805FB95C;
 extern s32 lbl_805FB978;
 extern s32 lbl_805FB97C;
 extern u32 lbl_805FB9A4;
-extern u8 lbl_805FB9D0[];
+extern s32 lbl_805FB9D0;
 extern u32 lbl_805FB9DC;
 extern u8 lbl_805FB9E0[];
 extern u8 lbl_805FB9EC[];

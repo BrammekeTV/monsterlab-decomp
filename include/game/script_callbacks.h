@@ -1500,7 +1500,7 @@ void UnPauseAllExplorationCharacters(void);                            // src/ga
 void UnlockCurrentJunctionPath(BOOL a3);                               // src/leaf/auto_03_800E75B0_text_cb.cpp
 void UnlockJunctionPath(u32 a0, BOOL a1);                              // src/game/draft_800F.cpp
 void Unpause(void);                                                    // src/leaf/auto_03_800E75B0_text_cb.cpp
-void UnspawnAttachedParticleAtChild(void* a0, u32 /*0x30*/ a1);  // type 0xF8 (from signature table)
+void UnspawnAttachedParticleAtChild(void* a0, u32 a1);                 // src/game/draft_miss49b.cpp
 void UpdateCombatHUD(f32 a0);  // type 0x69 (from signature table)
 void UpdateDanceAnimation(void* a0, f32 a1);                           // src/game/small_8007c.cpp
 void UpdateFader(void);                                                // src/leaf/auto_03_801D5D0C_text_cb.cpp
@@ -1514,12 +1514,12 @@ void UpdateSplashScreen(void);                                         // src/le
 void UpdateWeldingGunIntroPos(void);                                   // src/game/small_8007c.cpp
 void UpdateWeldingGunOutroPos(void);                                   // src/game/small_8007c.cpp
 void VSHACKSetFightTextVisible(void);                                  // src/game/small_800Fc.cpp
-void VariableToNormalCamera(f32 a0);  // type 0x69 (from signature table)
+void VariableToNormalCamera(f32 a0);                                   // src/game/draft_miss49b.cpp
 void WarpCamera(void);  // type 0x8F (from signature table)
 u32 /*0x06*/ WasButtonPressed(u32 /*0x36*/ a0);  // type 0xAB (from signature table)
 u32 WasButtonReleased(u32 a0);                                         // src/game/small_8012.cpp
 u32 WasEntityDrawnLastFrame(void* a0);                                 // src/engine/small_801Bc.cpp
-ScriptValue WasPacketDelivered(void);  // type 0x2E (from signature table)
+ScriptValue WasPacketDelivered(void);                                  // src/game/draft_miss49b.cpp
 BOOL WasThereADiscError(void);                                         // src/game/small_8014.cpp
 BOOL WasThereANetError(void);                                          // src/game/small_8014.cpp
 s32 WeArePostMatchupScreen(void);                                      // src/leaf/auto_03_8013CA74_text_cb.cpp
@@ -1529,17 +1529,17 @@ u32 WeldingPS2WeldButtonReleased(void);                                // src/le
 f32 WeldingQualityLevel(void);                                         // src/leaf/auto_03_80077B50_text_cb.cpp
 s32 WeldingShakeThisFrame(ScriptCtx* a3);                              // src/leaf/auto_03_80077B50_text_cb.cpp
 s32 WeldingShakeThresholdBeaten(ScriptCtx* a0);                        // src/game/small_8007b.cpp
-void WiiSelectorSetUpCameraView(void);  // type 0x8F (from signature table)
+void WiiSelectorSetUpCameraView(void);                                 // src/game/draft_miss49b.cpp
 void Wii_PlayConversationIntro(BOOL a0);  // type 0x8C (from signature table)
 void Wii_PlayConversationOutro(BOOL a0);  // type 0x8C (from signature table)
 void Wii_PlayEntityAnimationSlot(u32 a0, s32 a1);                      // src/game/small_800Eb.cpp
 void Wii_SetConversationEntity(u32 a0);                                // src/game/small_800Fd.cpp
-void Wii_StartConversationFX(BOOL a0);  // type 0x8C (from signature table)
+void Wii_StartConversationFX(BOOL a0);                                 // src/game/draft_miss49b.cpp
 void Wii_StopConversationFX(BOOL a0);                                  // src/game/small_800Fd.cpp
 s32 WithinAngleOfNav(u32 a3, f32 f1);                                  // src/leaf/auto_03_800FB958_text_cb.cpp
 s32 WithinAngleOfTarget(u32 a3, f32 f1);                               // src/leaf/auto_03_800FB958_text_cb.cpp
 s32 WithinJumpRange(u32 a3);                                           // src/leaf/auto_03_800FB958_text_cb.cpp
-s32 WithinRangeOf(void* a0, u32 /*0x17*/ a1, f32 a2);  // type 0x19 (from signature table)
+s32 WithinRangeOf(void* a0, u32 a1, f32 a2);                           // src/game/draft_miss49b.cpp
 s32 WithinRangeOfTarget(u32 a3, f32 f1);                               // src/leaf/auto_03_800FB958_text_cb.cpp
 void app_PlayMusic(u32 a0, f32 a1);  // type 0x76 (from signature table)
 void app_StopMusic(void);                                              // src/game/game_flow.cpp
@@ -1748,22 +1748,22 @@ void UIScreen_SetEnableFlag(u32 a0, u32 a1);                           // src/ga
 void UIScreen_SetVisibleFlag(u32 a0, u32 a1);                          // src/game/draft_miss47a.cpp
 void UISlider_DecValue(u32 a0);                                        // src/game/draft_miss47b.cpp
 f32 UISlider_GetIncValue(u32 a0);                                      // src/game/draft_miss47b.cpp
-s32 UISlider_GetIncValue_Int(u32 a0);  // type 0x1E (from signature table)
-f32 UISlider_GetMaxValue(u32 a0);  // type 0x10 (from signature table)
-s32 UISlider_GetMaxValue_Int(u32 a0);  // type 0x1E (from signature table)
-f32 UISlider_GetMinValue(u32 a0);  // type 0x10 (from signature table)
-s32 UISlider_GetMinValue_Int(u32 a0);  // type 0x1E (from signature table)
-f32 UISlider_GetNormalizedCurrentValue(u32 a0);  // type 0x10 (from signature table)
-f32 UISlider_GetNormalizedValue(u32 a0);  // type 0x10 (from signature table)
-f32 UISlider_GetValue(u32 a0);  // type 0x10 (from signature table)
-s32 UISlider_GetValue_Int(u32 a0);  // type 0x1E (from signature table)
-void UISlider_IncValue(u32 a0);  // type 0x71 (from signature table)
-void UISlider_SetIncValue(u32 a0, f32 a1);  // type 0x76 (from signature table)
-void UISlider_SetIncValue_Int(u32 a0, s32 a1);  // type 0x7E (from signature table)
-void UISlider_SetMaxValue(u32 a0, f32 a1);  // type 0x76 (from signature table)
-void UISlider_SetMaxValue_Int(u32 a0, s32 a1);  // type 0x7E (from signature table)
-void UISlider_SetMinValue(u32 a0, f32 a1);  // type 0x76 (from signature table)
-void UISlider_SetMinValue_Int(u32 a0, s32 a1);  // type 0x7E (from signature table)
+s32 UISlider_GetIncValue_Int(u32 a0);                                  // src/game/draft_miss49a.cpp
+f32 UISlider_GetMaxValue(u32 a0);                                      // src/game/draft_miss49a.cpp
+s32 UISlider_GetMaxValue_Int(u32 a0);                                  // src/game/draft_miss49a.cpp
+f32 UISlider_GetMinValue(u32 a0);                                      // src/game/draft_miss49a.cpp
+s32 UISlider_GetMinValue_Int(u32 a0);                                  // src/game/draft_miss49a.cpp
+f32 UISlider_GetNormalizedCurrentValue(u32 a0);                        // src/game/draft_miss49a.cpp
+f32 UISlider_GetNormalizedValue(u32 a0);                               // src/game/draft_miss49a.cpp
+f32 UISlider_GetValue(u32 a0);                                         // src/game/draft_miss49a.cpp
+s32 UISlider_GetValue_Int(u32 a0);                                     // src/game/draft_miss49a.cpp
+void UISlider_IncValue(u32 a0);                                        // src/game/draft_miss49a.cpp
+void UISlider_SetIncValue(u32 a0, f32 a1);                             // src/game/draft_miss49a.cpp
+void UISlider_SetIncValue_Int(u32 a0, s32 a1);                         // src/game/draft_miss49a.cpp
+void UISlider_SetMaxValue(u32 a0, f32 a1);                             // src/game/draft_miss49a.cpp
+void UISlider_SetMaxValue_Int(u32 a0, s32 a1);                         // src/game/draft_miss49a.cpp
+void UISlider_SetMinValue(u32 a0, f32 a1);                             // src/game/draft_miss49a.cpp
+void UISlider_SetMinValue_Int(u32 a0, s32 a1);                         // src/game/draft_miss49a.cpp
 void UISlider_SetValue(u32 a0, f32 a1);                                // src/engine/draft_8019d.cpp
 void UISlider_SetValue_Int(u32 a0, s32 a1);                            // src/engine/draft_8019d.cpp
 void UISlideshow_Pause(u32 a0);                                        // src/engine/draft_8019d.cpp
@@ -1771,11 +1771,11 @@ void UISlideshow_Resume(u32 a0);                                       // src/en
 void UISlideshow_SetUITextureList(u32 a0, u32 a1);                     // src/engine/draft_8019d.cpp
 void UISlideshow_Start(u32 a0);                                        // src/engine/draft_8019d.cpp
 void UISlideshow_Stop(u32 a0);                                         // src/engine/draft_8019d.cpp
-ScriptValue UISoundList_GetSound(u32 a0, s32 a1);  // type 0x26 (from signature table)
-void UISoundList_PlayRandomSfx(u32 a0);  // type 0x71 (from signature table)
-void UISoundList_PlayRandomVoiceSfx(u32 a0);  // type 0x71 (from signature table)
-void UISoundList_PlaySfx(u32 a0, u32 a1);  // type 0x7A (from signature table)
-void UISoundList_PlayVoiceSfx(u32 a0, u32 a1);  // type 0x7A (from signature table)
+ScriptValue UISoundList_GetSound(u32 a0, s32 a1);                      // src/game/draft_miss49a.cpp
+void UISoundList_PlayRandomSfx(u32 a0);                                // src/game/draft_miss49a.cpp
+void UISoundList_PlayRandomVoiceSfx(u32 a0);                           // src/game/draft_miss49a.cpp
+void UISoundList_PlaySfx(u32 a0, u32 a1);                              // src/game/draft_miss50.cpp
+void UISoundList_PlayVoiceSfx(u32 a0, u32 a1);                         // src/game/draft_miss50.cpp
 void UIText_ForceTypeout(u32 a0);                                      // src/engine/draft_8019c.cpp
 f32 UIText_GetRightXPos(u32 a0);                                       // src/engine/draft_8019c.cpp
 ScriptValue UIText_GetString(u32 a0);                                  // src/engine/draft_8019b.cpp
@@ -1787,14 +1787,14 @@ void UIText_SetString_Float(u32 a0, f32 a1, BOOL a2);                  // src/en
 void UIText_SetString_Int(u32 a0, s32 a1);                             // src/engine/draft_8019c.cpp
 void UIText_SetString_TextID(u32 a0, u32 /*0x11*/ a1);                 // src/engine/draft_8019b.cpp
 void UIText_SetWrapLength(u32 a0, s32 a1);                             // src/engine/draft_8019c.cpp
-ScriptValue UITextureList_GetNextTexture(u32 a0, BOOL a1);  // type 0x27 (from signature table)
+ScriptValue UITextureList_GetNextTexture(u32 a0, BOOL a1);             // src/game/draft_miss49a.cpp
 ScriptValue UITextureList_GetTexture(u32 hash, s32 index);             // src/game/draft_miss2.cpp
-void UITopScreen_PlayLoopingSfx(u32 a0, u32 a1);  // type 0x7A (from signature table)
-void UITopScreen_StopLoopingSfx(void);  // type 0x8F (from signature table)
+void UITopScreen_PlayLoopingSfx(u32 a0, u32 a1);                       // src/game/draft_miss50.cpp
+void UITopScreen_StopLoopingSfx(void);                                 // src/game/draft_miss49b.cpp
 void UnpauseRumble(s32 chan);                                          // src/engine/small_801Bb.cpp
-void UnspawnAttachedParticle(void* a0, u32 /*0x06*/ a1);  // type 0x3E (from signature table)
+void UnspawnAttachedParticle(void* a0, u32 a1);                        // src/game/draft_miss50.cpp
 f32 fGetResultRegister(void);                                          // src/game/draft_miss7.cpp
-void fSetResultRegister(f32 a0);  // type 0x69 (from signature table)
+void fSetResultRegister(f32 a0);                                       // src/game/draft_miss49b.cpp
 
 void BroadcastEvent(void* a0, u32 a1, u32 a2, BOOL a3, BOOL a4);       // src/game/small_800Ed.cpp
 void DisableCameraInfluence(u32 a0);                                   // src/game/small_800Ed.cpp

@@ -1,15 +1,15 @@
 {
  "game_id": "RM7P4F",
- "generated": "2026-11-19T17:11:28+00:00",
- "commit": "7211c4f",
- "commit_date": "2026-11-19T17:49:13+01:00",
+ "generated": "2026-11-19T17:35:22+00:00",
+ "commit": "cec4aae",
+ "commit_date": "2026-11-19T18:11:29+01:00",
  "game": {
   "functions": 8548,
   "bytes": 2265988,
   "named": 2748,
   "named_bytes": 616800,
-  "decompiled": 5398,
-  "decompiled_bytes": 695328
+  "decompiled": 5470,
+  "decompiled_bytes": 714612
  },
  "library": {
   "functions": 4039,
@@ -24,8 +24,8 @@
   "bytes": 3404928,
   "named": 3211,
   "named_bytes": 721548,
-  "decompiled": 5399,
-  "decompiled_bytes": 695448
+  "decompiled": 5471,
+  "decompiled_bytes": 714732
  },
  "game_range": [
   "80006B40",
@@ -37,11 +37,11 @@
    0.696
   ],
   [
-   0.033,
+   0.183,
    0.0
   ],
   [
-   0.536,
+   0.607,
    0.435
   ],
   [
@@ -53,11 +53,11 @@
    0.936
   ],
   [
-   0.335,
+   0.411,
    0.737
   ],
   [
-   0.922,
+   0.984,
    0.859
   ],
   [
@@ -65,19 +65,19 @@
    0.917
   ],
   [
-   0.923,
+   0.978,
    0.921
   ],
   [
-   0.384,
+   0.421,
    0.858
   ],
   [
-   0.782,
+   0.83,
    0.665
   ],
   [
-   0.512,
+   0.572,
    0.645
   ],
   [
@@ -85,7 +85,7 @@
    0.059
   ],
   [
-   0.178,
+   0.21,
    0.199
   ],
   [
@@ -101,7 +101,7 @@
    0.0
   ],
   [
-   0.008,
+   0.014,
    0.049
   ],
   [
@@ -109,7 +109,7 @@
    0.598
   ],
   [
-   0.315,
+   0.378,
    0.061
   ],
   [
@@ -125,7 +125,7 @@
    0.0
   ],
   [
-   0.078,
+   0.16,
    0.0
   ],
   [
@@ -133,19 +133,19 @@
    0.0
   ],
   [
-   0.025,
+   0.187,
    0.006
   ],
   [
-   0.111,
+   0.14,
    0.019
   ],
   [
-   0.106,
+   0.167,
    0.03
   ],
   [
-   0.526,
+   0.548,
    0.398
   ],
   [
@@ -161,7 +161,7 @@
    0.101
   ],
   [
-   0.338,
+   0.383,
    0.13
   ],
   [
@@ -417,7 +417,7 @@
    0.099
   ],
   [
-   0.227,
+   0.34,
    0.201
   ],
   [
@@ -453,11 +453,11 @@
    1.0
   ],
   [
-   0.172,
+   0.19,
    0.843
   ],
   [
-   0.413,
+   0.429,
    0.541
   ],
   [
@@ -473,11 +473,11 @@
    0.931
   ],
   [
-   0.853,
+   0.875,
    0.99
   ],
   [
-   0.538,
+   0.562,
    1.0
   ],
   [
@@ -541,7 +541,7 @@
    0.0
   ],
   [
-   0.213,
+   0.231,
    0.0
   ],
   [
@@ -565,7 +565,7 @@
    0.547
   ],
   [
-   0.756,
+   0.77,
    0.749
   ],
   [
@@ -577,15 +577,15 @@
    0.911
   ],
   [
-   0.049,
+   0.117,
    0.565
   ],
   [
-   0.051,
+   0.108,
    0.287
   ],
   [
-   0.086,
+   0.189,
    0.367
   ],
   [
@@ -609,7 +609,7 @@
    0.952
   ],
   [
-   0.618,
+   0.623,
    0.676
   ],
   [
@@ -765,11 +765,11 @@
    0.968
   ],
   [
-   0.617,
+   1.0,
    1.0
   ],
   [
-   0.26,
+   0.45,
    0.399
   ],
   [
@@ -801,7 +801,7 @@
    0.013
   ],
   [
-   0.015,
+   0.058,
    0.0
   ],
   [
@@ -901,7 +901,7 @@
    0.2
   ],
   [
-   0.876,
+   0.907,
    0.916
   ],
   [
@@ -909,7 +909,7 @@
    0.864
   ],
   [
-   0.787,
+   0.789,
    0.749
   ],
   [
@@ -941,7 +941,7 @@
    0.478
   ],
   [
-   0.416,
+   0.434,
    0.292
   ],
   [
@@ -9183,6 +9183,246 @@
    ]
   },
   {
+   "path": "src/game/draft_miss49a.cpp",
+   "functions": [
+    {
+     "name": "fn_800D6B0C",
+     "addr": "800D6B0C",
+     "size": 56
+    },
+    {
+     "name": "fn_8011AD88",
+     "addr": "8011AD88",
+     "size": 168
+    },
+    {
+     "name": "UISlider_GetValue",
+     "addr": "80192508",
+     "size": 200
+    },
+    {
+     "name": "UISlider_GetValue_Int",
+     "addr": "801925D0",
+     "size": 212
+    },
+    {
+     "name": "UISlider_IncValue",
+     "addr": "801926A4",
+     "size": 192
+    },
+    {
+     "name": "UISlider_GetNormalizedValue",
+     "addr": "80192824",
+     "size": 200
+    },
+    {
+     "name": "UISlider_GetNormalizedCurrentValue",
+     "addr": "801928EC",
+     "size": 200
+    },
+    {
+     "name": "UISlider_SetMinValue",
+     "addr": "801929B4",
+     "size": 204
+    },
+    {
+     "name": "UISlider_SetMinValue_Int",
+     "addr": "80192A80",
+     "size": 228
+    },
+    {
+     "name": "UISlider_GetMinValue",
+     "addr": "80192B64",
+     "size": 200
+    },
+    {
+     "name": "UISlider_GetMinValue_Int",
+     "addr": "80192C2C",
+     "size": 212
+    },
+    {
+     "name": "UISlider_SetMaxValue",
+     "addr": "80192D00",
+     "size": 204
+    },
+    {
+     "name": "UISlider_SetMaxValue_Int",
+     "addr": "80192DCC",
+     "size": 228
+    },
+    {
+     "name": "UISlider_GetMaxValue",
+     "addr": "80192EB0",
+     "size": 200
+    },
+    {
+     "name": "UISlider_GetMaxValue_Int",
+     "addr": "80192F78",
+     "size": 212
+    },
+    {
+     "name": "UISlider_SetIncValue",
+     "addr": "8019304C",
+     "size": 204
+    },
+    {
+     "name": "UISlider_SetIncValue_Int",
+     "addr": "80193118",
+     "size": 228
+    },
+    {
+     "name": "UISlider_GetIncValue_Int",
+     "addr": "801932C4",
+     "size": 212
+    },
+    {
+     "name": "UITextureList_GetNextTexture",
+     "addr": "801949D4",
+     "size": 144
+    },
+    {
+     "name": "UISoundList_GetSound",
+     "addr": "80194A64",
+     "size": 144
+    },
+    {
+     "name": "UISoundList_PlayRandomSfx",
+     "addr": "80194C04",
+     "size": 256
+    },
+    {
+     "name": "UISoundList_PlayRandomVoiceSfx",
+     "addr": "80194E14",
+     "size": 256
+    },
+    {
+     "name": "fn_801A65A0",
+     "addr": "801A65A0",
+     "size": 188
+    },
+    {
+     "name": "fn_801A665C",
+     "addr": "801A665C",
+     "size": 184
+    }
+   ]
+  },
+  {
+   "path": "src/game/draft_miss49b.cpp",
+   "functions": [
+    {
+     "name": "fn_80009748",
+     "addr": "80009748",
+     "size": 248
+    },
+    {
+     "name": "fn_8000C314",
+     "addr": "8000C314",
+     "size": 108
+    },
+    {
+     "name": "fn_8001B164",
+     "addr": "8001B164",
+     "size": 136
+    },
+    {
+     "name": "fn_8001BFC0",
+     "addr": "8001BFC0",
+     "size": 196
+    },
+    {
+     "name": "fn_8001F6A4",
+     "addr": "8001F6A4",
+     "size": 240
+    },
+    {
+     "name": "fn_8002D508",
+     "addr": "8002D508",
+     "size": 28
+    },
+    {
+     "name": "fn_8002D524",
+     "addr": "8002D524",
+     "size": 20
+    },
+    {
+     "name": "fn_80031090",
+     "addr": "80031090",
+     "size": 132
+    },
+    {
+     "name": "fn_8003D4B0",
+     "addr": "8003D4B0",
+     "size": 208
+    },
+    {
+     "name": "fn_8003E354",
+     "addr": "8003E354",
+     "size": 72
+    },
+    {
+     "name": "fn_8003F7DC",
+     "addr": "8003F7DC",
+     "size": 124
+    },
+    {
+     "name": "fn_8003F858",
+     "addr": "8003F858",
+     "size": 124
+    },
+    {
+     "name": "fn_80042B30",
+     "addr": "80042B30",
+     "size": 184
+    },
+    {
+     "name": "UnspawnAttachedParticleAtChild",
+     "addr": "800E9B8C",
+     "size": 160
+    },
+    {
+     "name": "WithinRangeOf",
+     "addr": "800ECA30",
+     "size": 172
+    },
+    {
+     "name": "VariableToNormalCamera",
+     "addr": "800F64B4",
+     "size": 184
+    },
+    {
+     "name": "Wii_StartConversationFX",
+     "addr": "800F7D98",
+     "size": 216
+    },
+    {
+     "name": "WiiSelectorSetUpCameraView",
+     "addr": "8012642C",
+     "size": 112
+    },
+    {
+     "name": "WasPacketDelivered",
+     "addr": "8013FE60",
+     "size": 48
+    },
+    {
+     "name": "UITopScreen_StopLoopingSfx",
+     "addr": "80195064",
+     "size": 160
+    },
+    {
+     "name": "fSetResultRegister",
+     "addr": "801E1BBC",
+     "size": 24
+    },
+    {
+     "name": "ZoneSlotInit",
+     "addr": "801F2B40",
+     "size": 140
+    }
+   ]
+  },
+  {
    "path": "src/game/draft_miss5.cpp",
    "functions": [
     {
@@ -9284,6 +9524,141 @@
      "name": "StrCopy",
      "addr": "8022127C",
      "size": 4
+    }
+   ]
+  },
+  {
+   "path": "src/game/draft_miss50.cpp",
+   "functions": [
+    {
+     "name": "fn_800098F4",
+     "addr": "800098F4",
+     "size": 744
+    },
+    {
+     "name": "fn_8000B0E4",
+     "addr": "8000B0E4",
+     "size": 524
+    },
+    {
+     "name": "fn_80013340",
+     "addr": "80013340",
+     "size": 716
+    },
+    {
+     "name": "fn_80013D54",
+     "addr": "80013D54",
+     "size": 512
+    },
+    {
+     "name": "fn_800195A4",
+     "addr": "800195A4",
+     "size": 484
+    },
+    {
+     "name": "fn_8001D104",
+     "addr": "8001D104",
+     "size": 420
+    },
+    {
+     "name": "fn_80020334",
+     "addr": "80020334",
+     "size": 292
+    },
+    {
+     "name": "fn_80023044",
+     "addr": "80023044",
+     "size": 284
+    },
+    {
+     "name": "fn_8002FE14",
+     "addr": "8002FE14",
+     "size": 424
+    },
+    {
+     "name": "fn_80039440",
+     "addr": "80039440",
+     "size": 720
+    },
+    {
+     "name": "fn_8003D580",
+     "addr": "8003D580",
+     "size": 552
+    },
+    {
+     "name": "fn_8003DCE0",
+     "addr": "8003DCE0",
+     "size": 264
+    },
+    {
+     "name": "fn_8003DDE8",
+     "addr": "8003DDE8",
+     "size": 484
+    },
+    {
+     "name": "fn_800429C0",
+     "addr": "800429C0",
+     "size": 332
+    },
+    {
+     "name": "fn_80043D84",
+     "addr": "80043D84",
+     "size": 272
+    },
+    {
+     "name": "fn_8004D968",
+     "addr": "8004D968",
+     "size": 400
+    },
+    {
+     "name": "fn_800D70EC",
+     "addr": "800D70EC",
+     "size": 412
+    },
+    {
+     "name": "WorldUpdate",
+     "addr": "800D83C8",
+     "size": 516
+    },
+    {
+     "name": "WorldBroadcastToZone",
+     "addr": "8012E93C",
+     "size": 568
+    },
+    {
+     "name": "WorldResetQueues",
+     "addr": "8013022C",
+     "size": 492
+    },
+    {
+     "name": "ZoneLoadAsync",
+     "addr": "80132098",
+     "size": 684
+    },
+    {
+     "name": "WorldSetZoneActive",
+     "addr": "80132344",
+     "size": 264
+    },
+    {
+     "name": "UISoundList_PlaySfx",
+     "addr": "80194AF4",
+     "size": 272
+    },
+    {
+     "name": "UISoundList_PlayVoiceSfx",
+     "addr": "80194D04",
+     "size": 272
+    },
+    {
+     "name": "UITopScreen_PlayLoopingSfx",
+     "addr": "80194F14",
+     "size": 336
+    },
+    {
+     "name": "UnspawnAttachedParticle",
+     "addr": "801DC088",
+     "size": 276
     }
    ]
   },

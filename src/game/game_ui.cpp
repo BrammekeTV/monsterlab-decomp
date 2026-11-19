@@ -41,7 +41,7 @@ void* ScreenSetsFind(void* sets, s32 zone);             // 0x8018D1EC
 s32   ResourceGetCurrentId(void);                       // 0x801D3A60
 void  ZoneUnload(void* world, s32 id, BOOL now);        // 0x80131A18
 void  ZoneSetCurrent(void* world, s32 zone);            // 0x80133840
-void  ZoneLoadAsync(void* world, s32 zone, int a, void (*done)(void*, void*), s32 arg);   // 0x80132098
+s32   ZoneLoadAsync(void* world, s32 zone, int a, void (*done)(void*, void*), s32 arg);   // 0x80132098
 BOOL  ZoneIsLoaded(void* world, s32 zone);              // 0x8012F408
 void  ScriptCall(void* ctx, s32 id, s32 arg);           // 0x8000B7A8
 void  ScriptSetVar(void* ctx, s32 var, s32 value);      // 0x8000B924
