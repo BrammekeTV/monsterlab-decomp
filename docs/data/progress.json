@@ -1,15 +1,15 @@
 {
  "game_id": "RM7P4F",
- "generated": "2026-11-19T16:49:11+00:00",
- "commit": "d537480",
- "commit_date": "2026-11-19T14:34:50+01:00",
+ "generated": "2026-11-19T17:11:28+00:00",
+ "commit": "7211c4f",
+ "commit_date": "2026-11-19T17:49:13+01:00",
  "game": {
   "functions": 8548,
   "bytes": 2265988,
   "named": 2748,
   "named_bytes": 616800,
-  "decompiled": 5327,
-  "decompiled_bytes": 675044
+  "decompiled": 5398,
+  "decompiled_bytes": 695328
  },
  "library": {
   "functions": 4039,
@@ -24,8 +24,8 @@
   "bytes": 3404928,
   "named": 3211,
   "named_bytes": 721548,
-  "decompiled": 5328,
-  "decompiled_bytes": 675164
+  "decompiled": 5399,
+  "decompiled_bytes": 695448
  },
  "game_range": [
   "80006B40",
@@ -77,7 +77,7 @@
    0.665
   ],
   [
-   0.317,
+   0.512,
    0.645
   ],
   [
@@ -169,7 +169,7 @@
    0.233
   ],
   [
-   0.364,
+   0.427,
    0.378
   ],
   [
@@ -225,7 +225,7 @@
    0.052
   ],
   [
-   0.222,
+   0.285,
    0.125
   ],
   [
@@ -233,7 +233,7 @@
    0.725
   ],
   [
-   0.224,
+   0.279,
    0.312
   ],
   [
@@ -397,7 +397,7 @@
    0.0
   ],
   [
-   0.187,
+   0.235,
    0.072
   ],
   [
@@ -409,7 +409,7 @@
    0.0
   ],
   [
-   0.521,
+   0.558,
    0.041
   ],
   [
@@ -449,19 +449,19 @@
    0.155
   ],
   [
-   0.635,
+   0.858,
    1.0
   ],
   [
-   0.052,
+   0.172,
    0.843
   ],
   [
-   0.283,
+   0.413,
    0.541
   ],
   [
-   0.482,
+   0.696,
    0.97
   ],
   [
@@ -473,11 +473,11 @@
    0.931
   ],
   [
-   0.771,
+   0.853,
    0.99
   ],
   [
-   0.506,
+   0.538,
    1.0
   ],
   [
@@ -557,7 +557,7 @@
    0.11
   ],
   [
-   0.446,
+   0.481,
    0.55
   ],
   [
@@ -609,7 +609,7 @@
    0.952
   ],
   [
-   0.587,
+   0.618,
    0.676
   ],
   [
@@ -617,7 +617,7 @@
    0.834
   ],
   [
-   0.415,
+   0.442,
    0.631
   ],
   [
@@ -757,7 +757,7 @@
    0.257
   ],
   [
-   0.396,
+   0.554,
    0.543
   ],
   [
@@ -765,11 +765,11 @@
    0.968
   ],
   [
-   0.05,
+   0.617,
    1.0
   ],
   [
-   0.126,
+   0.26,
    0.399
   ],
   [
@@ -789,7 +789,7 @@
    0.1
   ],
   [
-   0.082,
+   0.09,
    0.018
   ],
   [
@@ -933,7 +933,7 @@
    0.068
   ],
   [
-   0.244,
+   0.339,
    0.068
   ],
   [
@@ -941,7 +941,7 @@
    0.478
   ],
   [
-   0.376,
+   0.416,
    0.292
   ],
   [
@@ -8808,6 +8808,381 @@
    ]
   },
   {
+   "path": "src/game/draft_miss47a.cpp",
+   "functions": [
+    {
+     "name": "UIEngine_UnloadUISlot",
+     "addr": "8000CD8C",
+     "size": 4
+    },
+    {
+     "name": "Troublescope_Deinit",
+     "addr": "8001EF50",
+     "size": 172
+    },
+    {
+     "name": "Troublescope_IncCreature",
+     "addr": "8001F4FC",
+     "size": 208
+    },
+    {
+     "name": "Troublescope_GetMonsterName",
+     "addr": "8001F7BC",
+     "size": 80
+    },
+    {
+     "name": "Troublescope_SetLegs",
+     "addr": "8001F86C",
+     "size": 156
+    },
+    {
+     "name": "Troublescope_SetTorso",
+     "addr": "8001F908",
+     "size": 156
+    },
+    {
+     "name": "Troublescope_SetHead",
+     "addr": "8001F9A4",
+     "size": 156
+    },
+    {
+     "name": "Troublescope_SetLeftArm",
+     "addr": "8001FA40",
+     "size": 156
+    },
+    {
+     "name": "Troublescope_SetRightArm",
+     "addr": "8001FADC",
+     "size": 156
+    },
+    {
+     "name": "Troublescope_LoadPartImage",
+     "addr": "8001FB88",
+     "size": 152
+    },
+    {
+     "name": "Troublescope_UnLoadPartImage",
+     "addr": "8001FC20",
+     "size": 72
+    },
+    {
+     "name": "fn_800D3C60",
+     "addr": "800D3C60",
+     "size": 240
+    },
+    {
+     "name": "UIPlayGlobalGroupSound",
+     "addr": "800EFFB4",
+     "size": 104
+    },
+    {
+     "name": "fn_80143974",
+     "addr": "80143974",
+     "size": 232
+    },
+    {
+     "name": "UIScreen_Pop",
+     "addr": "8018EF9C",
+     "size": 100
+    },
+    {
+     "name": "UIScreen_ClearStack",
+     "addr": "8018F088",
+     "size": 100
+    },
+    {
+     "name": "UIScreen_SetVisibleFlag",
+     "addr": "8018F0EC",
+     "size": 232
+    },
+    {
+     "name": "UIScreen_SetEnableFlag",
+     "addr": "8018F1D4",
+     "size": 232
+    },
+    {
+     "name": "UIElement_SetX",
+     "addr": "8018FAD8",
+     "size": 172
+    }
+   ]
+  },
+  {
+   "path": "src/game/draft_miss47b.cpp",
+   "functions": [
+    {
+     "name": "UISlider_DecValue",
+     "addr": "80192764",
+     "size": 192
+    },
+    {
+     "name": "UISlider_GetIncValue",
+     "addr": "801931FC",
+     "size": 200
+    },
+    {
+     "name": "UIGrid_GetSize",
+     "addr": "801939D0",
+     "size": 208
+    },
+    {
+     "name": "UIGrid_IsHScrolling",
+     "addr": "80193AA0",
+     "size": 200
+    },
+    {
+     "name": "UIGrid_IsVScrolling",
+     "addr": "80193B68",
+     "size": 200
+    },
+    {
+     "name": "UIGrid_GetNumValidCols",
+     "addr": "80193C30",
+     "size": 200
+    },
+    {
+     "name": "UIGrid_GetNumValidRows",
+     "addr": "80193CF8",
+     "size": 200
+    },
+    {
+     "name": "UIGrid_GetNumValidItems",
+     "addr": "80193DC0",
+     "size": 200
+    },
+    {
+     "name": "UIGrid_SetTextList",
+     "addr": "80193E88",
+     "size": 216
+    },
+    {
+     "name": "UIGrid_SetImageList",
+     "addr": "80193F60",
+     "size": 216
+    },
+    {
+     "name": "UIGrid_SetEventList",
+     "addr": "80194038",
+     "size": 232
+    },
+    {
+     "name": "UIGrid_SetTextColorList",
+     "addr": "80194120",
+     "size": 216
+    },
+    {
+     "name": "UIGrid_SetActiveList",
+     "addr": "801941F8",
+     "size": 232
+    },
+    {
+     "name": "UIGrid_PlayUIAnim",
+     "addr": "801942E0",
+     "size": 212
+    },
+    {
+     "name": "UIGrid_PlayUIAnimOnType",
+     "addr": "801943B4",
+     "size": 220
+    },
+    {
+     "name": "UIGrid_PlayUIAnimAll",
+     "addr": "80194490",
+     "size": 204
+    },
+    {
+     "name": "UIGrid_SetHighlightVisibleFlag",
+     "addr": "8019455C",
+     "size": 204
+    },
+    {
+     "name": "UIGrid_GetElementPos",
+     "addr": "801947A0",
+     "size": 216
+    },
+    {
+     "name": "UIGrid_SetIgnoreAlphaPixels",
+     "addr": "80194878",
+     "size": 204
+    },
+    {
+     "name": "UIEvent_SendToTopScreenAndChildren",
+     "addr": "80195224",
+     "size": 136
+    },
+    {
+     "name": "UIEvent_SendToElement",
+     "addr": "80195348",
+     "size": 156
+    },
+    {
+     "name": "UISetNegativeNumber",
+     "addr": "8019F2F4",
+     "size": 76
+    }
+   ]
+  },
+  {
+   "path": "src/game/draft_miss48.cpp",
+   "functions": [
+    {
+     "name": "Troublescope_Init",
+     "addr": "8001EE48",
+     "size": 264
+    },
+    {
+     "name": "StopConversation",
+     "addr": "800512FC",
+     "size": 528
+    },
+    {
+     "name": "TriggerShowProximityText",
+     "addr": "8006ED68",
+     "size": 528
+    },
+    {
+     "name": "SetNextExperiment",
+     "addr": "800747F4",
+     "size": 400
+    },
+    {
+     "name": "Stitching_Reticle_ReadyToFire",
+     "addr": "800CC52C",
+     "size": 340
+    },
+    {
+     "name": "SpawnRandomMonsterAtNodeGroup",
+     "addr": "800E8A6C",
+     "size": 296
+    },
+    {
+     "name": "SpawnRandomMonsterAtNode",
+     "addr": "800E8B94",
+     "size": 620
+    },
+    {
+     "name": "SpawnMonsterAtNode",
+     "addr": "800E8E00",
+     "size": 668
+    },
+    {
+     "name": "SpawnParticleAtChild",
+     "addr": "800E98C8",
+     "size": 360
+    },
+    {
+     "name": "SpawnParticleOnSkeleton",
+     "addr": "800E9C2C",
+     "size": 424
+    },
+    {
+     "name": "SpawnProjectileAtChild",
+     "addr": "800EA3F8",
+     "size": 688
+    },
+    {
+     "name": "StartLaser",
+     "addr": "800EC45C",
+     "size": 304
+    },
+    {
+     "name": "TeleportTo",
+     "addr": "800EC89C",
+     "size": 404
+    },
+    {
+     "name": "SpawnRandomLightningBetweenNodes",
+     "addr": "800ED6AC",
+     "size": 664
+    },
+    {
+     "name": "SpawnLightningBetweenNodes",
+     "addr": "800EE768",
+     "size": 616
+    },
+    {
+     "name": "SpawnLightningFromChildToNode",
+     "addr": "800EED80",
+     "size": 712
+    },
+    {
+     "name": "TransitionToRopeCamera",
+     "addr": "800F65E8",
+     "size": 396
+    },
+    {
+     "name": "StopUsingAnimatedCamera",
+     "addr": "800F6774",
+     "size": 308
+    },
+    {
+     "name": "StartNISFSM",
+     "addr": "800F695C",
+     "size": 304
+    },
+    {
+     "name": "fn_80123954",
+     "addr": "80123954",
+     "size": 308
+    },
+    {
+     "name": "TransmitMonster",
+     "addr": "8013E780",
+     "size": 280
+    },
+    {
+     "name": "UIElement_SetPos_Floats",
+     "addr": "8018F92C",
+     "size": 264
+    },
+    {
+     "name": "UIElement_SetSize_Floats",
+     "addr": "8018FD54",
+     "size": 264
+    },
+    {
+     "name": "UIGrid_SetCurrentIndex",
+     "addr": "80193398",
+     "size": 752
+    },
+    {
+     "name": "UIGrid_GetCurrentIndex_ToScript",
+     "addr": "80193688",
+     "size": 260
+    },
+    {
+     "name": "UIGrid_GetPreviousIndex_ToScript",
+     "addr": "8019378C",
+     "size": 280
+    },
+    {
+     "name": "UIGrid_GetCurrentText",
+     "addr": "801938A4",
+     "size": 300
+    },
+    {
+     "name": "UIGrid_SetHighlightColor",
+     "addr": "80194628",
+     "size": 376
+    },
+    {
+     "name": "fn_801EDF58",
+     "addr": "801EDF58",
+     "size": 288
+    },
+    {
+     "name": "ShowSystemMessage",
+     "addr": "801EE588",
+     "size": 540
+    },
+    {
+     "name": "fn_801F1D64",
+     "addr": "801F1D64",
+     "size": 332
+    }
+   ]
+  },
+  {
    "path": "src/game/draft_miss5.cpp",
    "functions": [
     {
@@ -9649,11 +10024,6 @@
      "name": "UIEngine_LoadUIScreenSet",
      "addr": "8000CC80",
      "size": 268
-    },
-    {
-     "name": "UIEngine_UnloadUISlot",
-     "addr": "8000CD8C",
-     "size": 4
     },
     {
      "name": "IsUISlotActive",

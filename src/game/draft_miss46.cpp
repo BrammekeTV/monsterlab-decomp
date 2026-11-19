@@ -59,7 +59,7 @@ void fn_8032F1E8(void* arr, void (*ctor)(void), void (*dtor)(void), s32 size, s3
 void* fn_8022ED60(void* p);                // 0x8022ED60
 u8* fn_8022ED98(u8* p, s32 del);           // 0x8022ED98
 s32 fn_8022F50C(u8* slot);                 // 0x8022F50C
-s32 fn_80123954(s32 v, u8* save);          // 0x80123954
+void fn_80123954(s32 v, u8* save);          // 0x80123954
 void fn_80142870(s32 a3);                  // 0x80142870
 s32 fn_80206DA4(void);                     // 0x80206DA4
 s32 fn_80266BA4(const char* name, u8* handle, s32 a);  // 0x80266BA4
@@ -106,10 +106,10 @@ void fn_8002D508(s32 idx, f32 ratio, u32 extra);  // 0x8002D508
 BOOL ZoneIsLoaded(void* world, s32 zone);
 void fn_801E8D74(void* out, void* list, void* owner, void* anim);  // 0x801E8D74
 void fn_801F2018(void);                      // 0x801F2018 (tween update callback)
-void fn_801F1D64(void);                      // 0x801F1D64 (tween update callback)
+s32 fn_801F1D64(u8* obj);                    // 0x801F1D64 (tween update callback)
 f32 fn_801EDD00(u8* obj);                    // 0x801EDD00
 void fn_801ED788(f32* out, u8* a1);          // 0x801ED788
-s32 fn_801EDF58(void);                       // 0x801EDF58
+s32 fn_801EDF58(u8* ref);                      // 0x801EDF58
 void ScreenSetsActivate(void* sets, u32 hash);       // 0x8018D70C
 void* ScreenSetsCurrent(void* sets);                 // 0x8018D1E4
 void* ScreenSetFindElement(void* set, u32 hash);     // 0x80198F18
@@ -997,12 +997,12 @@ void ShaderStartBouncingOverlayAlpha(u32 a0, u32 a1, f32 a2, f32 a3, f32 a4) {
     u8 desc[0x80];
     u8 out[8];
     if (obj == NULL) return;
-    s32 zone = fn_801EDF58();
+    s32 zone = fn_801EDF58((u8*)(uintptr_t)a0);
     if (ZoneIsLoaded(gWorldState, zone) == 0) return;
     u8* entry = *(u8**)(*(u8**)gWorldState + 0x1C8) + zone * 0xC;
     if (a2 <= 0.01f) a2 = 0.01f;
     f32 inv = 1.0f / a2;
-    ShaderTweenDescInit(desc, fn_801F1D64);
+    ShaderTweenDescInit(desc, (void (*)(void))fn_801F1D64);
     *(f32*)(desc + 0x8) = 2.0f * inv;
     if (a3 >= 1.0f) a3 = 1.0f;
     f32 lo = 0.0f;

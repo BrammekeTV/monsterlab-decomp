@@ -7,8 +7,8 @@
 #include "game/script_callbacks.h"
 
 extern u8 lbl_805F8288[];
-extern u8 lbl_805FAF80[];
-extern u8 lbl_805FAF84[];
+extern u8* lbl_805FAF80;
+extern s32 lbl_805FAF84;
 extern u8 lbl_805FAF88[];
 extern u8* lbl_805FBBE0;
 extern u8 lbl_805FC8B0[];

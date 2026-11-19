@@ -45,8 +45,8 @@ void* fn_801D40E0(s32 n);                                        // 0x801D40E0
 s32   fn_801D4790(void* p);                                      // 0x801D4790
 void  fn_801D65C0(void);                                         // 0x801D65C0
 void  fn_801E8D74(void* out, void* list, void* owner, void* anim);  // 0x801E8D74
-s32   fn_801EDF58(void);                                         // 0x801EDF58 (current zone index)
-void  fn_801F1D64(void);                                         // 0x801F1D64 (bounce task callback)
+s32   fn_801EDF58(u8* ref);                                        // 0x801EDF58 (current zone index)
+s32   fn_801F1D64(u8* obj);                                       // 0x801F1D64 (bounce task callback)
 void  fn_801F2018(void);                                         // 0x801F2018 (fade task callback)
 void  fn_801EF070(u8* heap, void* p);                            // 0x801EF070
 void* fn_801EF6E8(u8* obj, s32 a, s32 v);                   // 0x801EF6E8
@@ -614,7 +614,7 @@ void MeshFadeToOverlayAlpha(void* a0, void* a1, f32 a2, f32 a3) {
 // (min 0.01), alpha oscillating between a3 and a4 (both clamped to 0..1) via fn_801F1D64.
 void MeshStartBouncingOverlayAlpha(void* a0, void* a1, f32 a2, f32 a3, f32 a4) {
     if (a1 == NULL) return;
-    s32 zone = fn_801EDF58();
+    s32 zone = fn_801EDF58((u8*)(uintptr_t)a0);
     if (ZoneIsLoaded(gWorldState, zone) == 0) return;
     u8* list = *(u8**)(*(u8**)gWorldState + 0x1C8) + zone * 0xC;
 

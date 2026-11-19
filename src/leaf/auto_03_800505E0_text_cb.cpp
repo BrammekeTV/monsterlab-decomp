@@ -9,7 +9,7 @@
 extern void* gEventMgr;
 extern u8 gGame[];
 extern u8 lbl_805FB02C[];
-extern u8 lbl_805FB0E8[];
+extern s32 lbl_805FB0E8;
 extern "C" void EventSend(void*, void*, void*, u32, int, int, int, int);
 
 // 0x80050F24

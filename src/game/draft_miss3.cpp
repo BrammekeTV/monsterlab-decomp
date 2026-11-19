@@ -27,7 +27,7 @@ void  __destroy_arr(void* arr, void (*dtor)(void*, s32), u32 size, u32 count);  
 s32   fn_8004E594(u8* p);                                         // 0x8004E594
 s32   fn_8004F0DC(void* slot, const char* name, s32 loop);        // 0x8004F0DC
 s32   fn_800517C0(void);                                          // 0x800517C0
-s32   fn_80123954(s32 v, u8* save);                               // 0x80123954
+void  fn_80123954(s32 v, u8* save);                               // 0x80123954
 s32   fn_80133134(void* world, s32 zone);                         // 0x80133134
 s32   fn_801333B0(void* world, s32 zone);                         // 0x801333B0
 s32   fn_80160BD4(u8* mgr, s32 a, u8* item, void* c, u8* link);   // 0x80160BD4
