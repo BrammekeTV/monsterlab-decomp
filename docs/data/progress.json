@@ -1,15 +1,15 @@
 {
  "game_id": "RM7P4F",
- "generated": "2026-11-19T13:34:43+00:00",
- "commit": "6f18a24",
- "commit_date": "2026-11-19T14:18:36+01:00",
+ "generated": "2026-11-19T16:49:11+00:00",
+ "commit": "d537480",
+ "commit_date": "2026-11-19T14:34:50+01:00",
  "game": {
   "functions": 8548,
   "bytes": 2265988,
   "named": 2748,
   "named_bytes": 616800,
-  "decompiled": 5263,
-  "decompiled_bytes": 655316
+  "decompiled": 5327,
+  "decompiled_bytes": 675044
  },
  "library": {
   "functions": 4039,
@@ -24,8 +24,8 @@
   "bytes": 3404928,
   "named": 3211,
   "named_bytes": 721548,
-  "decompiled": 5264,
-  "decompiled_bytes": 655436
+  "decompiled": 5328,
+  "decompiled_bytes": 675164
  },
  "game_range": [
   "80006B40",
@@ -73,7 +73,7 @@
    0.858
   ],
   [
-   0.711,
+   0.782,
    0.665
   ],
   [
@@ -141,7 +141,7 @@
    0.019
   ],
   [
-   0.076,
+   0.106,
    0.03
   ],
   [
@@ -153,7 +153,7 @@
    0.687
   ],
   [
-   0.517,
+   0.54,
    0.736
   ],
   [
@@ -233,7 +233,7 @@
    0.725
   ],
   [
-   0.144,
+   0.224,
    0.312
   ],
   [
@@ -385,7 +385,7 @@
    0.0
   ],
   [
-   0.132,
+   0.164,
    0.051
   ],
   [
@@ -413,7 +413,7 @@
    0.041
   ],
   [
-   0.237,
+   0.296,
    0.099
   ],
   [
@@ -449,23 +449,23 @@
    0.155
   ],
   [
-   0.419,
+   0.635,
    1.0
   ],
   [
-   0.015,
+   0.052,
    0.843
   ],
   [
-   0.233,
+   0.283,
    0.541
   ],
   [
-   0.42,
+   0.482,
    0.97
   ],
   [
-   0.964,
+   1.0,
    0.957
   ],
   [
@@ -473,19 +473,19 @@
    0.931
   ],
   [
-   0.683,
+   0.771,
    0.99
   ],
   [
-   0.404,
+   0.506,
    1.0
   ],
   [
-   0.617,
+   0.663,
    0.929
   ],
   [
-   0.965,
+   0.994,
    0.992
   ],
   [
@@ -517,11 +517,11 @@
    0.058
   ],
   [
-   0.853,
+   0.865,
    0.865
   ],
   [
-   0.795,
+   0.811,
    0.801
   ],
   [
@@ -529,11 +529,11 @@
    1.0
   ],
   [
-   0.969,
+   0.985,
    0.955
   ],
   [
-   0.461,
+   0.673,
    0.853
   ],
   [
@@ -557,11 +557,11 @@
    0.11
   ],
   [
-   0.34,
+   0.446,
    0.55
   ],
   [
-   0.516,
+   0.547,
    0.547
   ],
   [
@@ -609,19 +609,19 @@
    0.952
   ],
   [
-   0.505,
+   0.587,
    0.676
   ],
   [
-   0.856,
+   0.876,
    0.834
   ],
   [
-   0.396,
+   0.415,
    0.631
   ],
   [
-   0.103,
+   0.215,
    0.275
   ],
   [
@@ -653,7 +653,7 @@
    0.0
   ],
   [
-   0.006,
+   0.083,
    0.076
   ],
   [
@@ -689,7 +689,7 @@
    0.0
   ],
   [
-   0.111,
+   0.143,
    0.022
   ],
   [
@@ -757,7 +757,7 @@
    0.257
   ],
   [
-   0.254,
+   0.396,
    0.543
   ],
   [
@@ -897,11 +897,11 @@
    0.102
   ],
   [
-   0.299,
+   0.354,
    0.2
   ],
   [
-   0.754,
+   0.876,
    0.916
   ],
   [
@@ -917,7 +917,7 @@
    0.0
   ],
   [
-   0.197,
+   0.238,
    0.107
   ],
   [
@@ -941,7 +941,7 @@
    0.478
   ],
   [
-   0.266,
+   0.376,
    0.292
   ],
   [
@@ -985,7 +985,7 @@
    0.0
   ],
   [
-   0.267,
+   0.295,
    0.377
   ],
   [
@@ -8469,6 +8469,341 @@
      "name": "PauseFollowingWaypointPath",
      "addr": "801B8B3C",
      "size": 504
+    }
+   ]
+  },
+  {
+   "path": "src/game/draft_miss44a.cpp",
+   "functions": [
+    {
+     "name": "SetupVictoryScreenShot",
+     "addr": "800428C0",
+     "size": 256
+    },
+    {
+     "name": "Stitching_Bug_StartSkitterSound",
+     "addr": "800C6A70",
+     "size": 136
+    },
+    {
+     "name": "Stitching_Bug_StartEatingSound",
+     "addr": "800C6B3C",
+     "size": 136
+    },
+    {
+     "name": "SpawnParticleAtJunction",
+     "addr": "800E9744",
+     "size": 212
+    },
+    {
+     "name": "SpawnOneParticleAtChild",
+     "addr": "800E9A3C",
+     "size": 168
+    },
+    {
+     "name": "SpawnAttachedParticleAtChild",
+     "addr": "800E9AE4",
+     "size": 168
+    },
+    {
+     "name": "StopLaser",
+     "addr": "800EC58C",
+     "size": 256
+    },
+    {
+     "name": "StartQuestTimer",
+     "addr": "800F49E8",
+     "size": 136
+    },
+    {
+     "name": "StartWiiInputGame",
+     "addr": "800F6D48",
+     "size": 224
+    },
+    {
+     "name": "SpawnCoffinProjectile",
+     "addr": "800F781C",
+     "size": 148
+    },
+    {
+     "name": "SpawnParticleAtLocator",
+     "addr": "800FB4EC",
+     "size": 204
+    },
+    {
+     "name": "SpawnPooledEntityAt",
+     "addr": "8010CBFC",
+     "size": 156
+    },
+    {
+     "name": "StopBackgroundSFX",
+     "addr": "8010FC98",
+     "size": 72
+    },
+    {
+     "name": "TimerGetSeconds",
+     "addr": "80142538",
+     "size": 164
+    }
+   ]
+  },
+  {
+   "path": "src/game/draft_miss44b.cpp",
+   "functions": [
+    {
+     "name": "Statistics_IncDisplay",
+     "addr": "801139F0",
+     "size": 132
+    },
+    {
+     "name": "ShouldWeLeaveCombat",
+     "addr": "801408F8",
+     "size": 176
+    },
+    {
+     "name": "UIActivationGrid_GetCurrentIndex",
+     "addr": "8018F3A8",
+     "size": 236
+    },
+    {
+     "name": "UIActivationGrid_SetCurrentIndex",
+     "addr": "8018F494",
+     "size": 236
+    },
+    {
+     "name": "UIElement_GetVisibleFlag",
+     "addr": "8018F6E0",
+     "size": 152
+    },
+    {
+     "name": "UIElement_SetEnableFlag",
+     "addr": "8018F778",
+     "size": 200
+    },
+    {
+     "name": "UIElement_RestoreZ",
+     "addr": "8018FA34",
+     "size": 164
+    },
+    {
+     "name": "UIElement_GetXAtPercent",
+     "addr": "8018FB84",
+     "size": 228
+    },
+    {
+     "name": "StartNISFrameFx",
+     "addr": "801DBBC0",
+     "size": 140
+    },
+    {
+     "name": "StartNISTVStaticFrameFx",
+     "addr": "801DBC98",
+     "size": 220
+    },
+    {
+     "name": "StopAllSFX",
+     "addr": "8020A59C",
+     "size": 228
+    }
+   ]
+  },
+  {
+   "path": "src/game/draft_miss46.cpp",
+   "functions": [
+    {
+     "name": "SaveMonster",
+     "addr": "8001E03C",
+     "size": 624
+    },
+    {
+     "name": "ShowNextRewardItem",
+     "addr": "8004859C",
+     "size": 260
+    },
+    {
+     "name": "PushExperimentUI",
+     "addr": "80074990",
+     "size": 584
+    },
+    {
+     "name": "fn_800D5FDC",
+     "addr": "800D5FDC",
+     "size": 508
+    },
+    {
+     "name": "RespawnEntity",
+     "addr": "800E8278",
+     "size": 316
+    },
+    {
+     "name": "SetEntityVisibility",
+     "addr": "800E8464",
+     "size": 412
+    },
+    {
+     "name": "SpawnDatabseMonsterAtNodeGroup",
+     "addr": "800E8944",
+     "size": 296
+    },
+    {
+     "name": "SpawnDatabaseMonsterAtNode",
+     "addr": "800E909C",
+     "size": 648
+    },
+    {
+     "name": "RemoveLightning",
+     "addr": "800ED59C",
+     "size": 272
+    },
+    {
+     "name": "ShowInstructionScreen",
+     "addr": "800EF9E4",
+     "size": 420
+    },
+    {
+     "name": "SetEnemyToJunction",
+     "addr": "800F1B98",
+     "size": 316
+    },
+    {
+     "name": "SetEntityColor0",
+     "addr": "800F590C",
+     "size": 316
+    },
+    {
+     "name": "SetupFieldRepairHealthPoints",
+     "addr": "800F5AF0",
+     "size": 300
+    },
+    {
+     "name": "SetPlayerAvatarRenderFlag",
+     "addr": "800F76DC",
+     "size": 300
+    },
+    {
+     "name": "RotateEntityAroundAxis",
+     "addr": "800F84A8",
+     "size": 268
+    },
+    {
+     "name": "SetupChallengeProjector",
+     "addr": "800F9100",
+     "size": 380
+    },
+    {
+     "name": "SetOptionsBrightnessTmp",
+     "addr": "800FAF30",
+     "size": 388
+    },
+    {
+     "name": "SetOptionsBrightness",
+     "addr": "800FB0B4",
+     "size": 408
+    },
+    {
+     "name": "Recipes_HasSecondaryIngredient",
+     "addr": "80115078",
+     "size": 380
+    },
+    {
+     "name": "Recipes_GetKeyIngredientImage",
+     "addr": "801151F4",
+     "size": 380
+    },
+    {
+     "name": "Recipes_GetKeyIngredientName",
+     "addr": "80115370",
+     "size": 380
+    },
+    {
+     "name": "Recipes_GetSecondaryIngredientImage",
+     "addr": "801154EC",
+     "size": 380
+    },
+    {
+     "name": "Recipes_GetSecondaryIngredientName",
+     "addr": "80115668",
+     "size": 380
+    },
+    {
+     "name": "SaveManager_Init",
+     "addr": "801230DC",
+     "size": 648
+    },
+    {
+     "name": "SaveManager_SaveData",
+     "addr": "80123B78",
+     "size": 284
+    },
+    {
+     "name": "SaveManager_DoesProfileNameExist",
+     "addr": "80124130",
+     "size": 268
+    },
+    {
+     "name": "ShowScreen",
+     "addr": "8013F71C",
+     "size": 456
+    },
+    {
+     "name": "PostMultiplayerFight",
+     "addr": "8013FC1C",
+     "size": 288
+    },
+    {
+     "name": "QuatGetAxisXY",
+     "addr": "801453BC",
+     "size": 272
+    },
+    {
+     "name": "QuatGetForward",
+     "addr": "801454CC",
+     "size": 276
+    },
+    {
+     "name": "QuatFromMtx",
+     "addr": "801456E4",
+     "size": 460
+    },
+    {
+     "name": "RendInitTargets",
+     "addr": "80157668",
+     "size": 624
+    },
+    {
+     "name": "fn_8016A64C",
+     "addr": "8016A64C",
+     "size": 284
+    },
+    {
+     "name": "ShaderSetOverlayAlphaFromDistance",
+     "addr": "801DB518",
+     "size": 456
+    },
+    {
+     "name": "SpawnAttachedParticle",
+     "addr": "801DBF3C",
+     "size": 332
+    },
+    {
+     "name": "ScriptSigFinalize",
+     "addr": "801DC658",
+     "size": 380
+    },
+    {
+     "name": "SirLoaderShutdown",
+     "addr": "801E5AE0",
+     "size": 348
+    },
+    {
+     "name": "ShaderStartBouncingOverlayAlpha",
+     "addr": "801F2288",
+     "size": 516
+    },
+    {
+     "name": "ShaderFadeToOverlayAlpha",
+     "addr": "801F252C",
+     "size": 372
     }
    ]
   },

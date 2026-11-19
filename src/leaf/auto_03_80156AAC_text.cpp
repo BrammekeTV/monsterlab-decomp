@@ -6,7 +6,7 @@
 #include "types.h"
 
 extern u8 gVideoDrawDone[];
-extern u8 lbl_805FB528[];
+extern void* lbl_805FB528;
 extern u8 lbl_805FB550[];
 extern u8 lbl_805FB554[];
 extern u8 lbl_805FB580[];

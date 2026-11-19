@@ -49,7 +49,7 @@ void*  fn_801D40E0(s32 n);
 void*  fn_80209814(void* v);
 void*  fn_8011AD88(void* def, s32 flag);
 ScriptValue fn_801A1208(u8* el);
-void   fn_8016A64C(void* sys);
+void   fn_8016A64C(void* sys, f32 dt);
 s32    fn_800D5FDC(PathFollower* p, u8* cur, s32 node, s32 a);
 void   fn_802E65C0(u8* rec);
 void   fn_802E6698(void* cb, s32 a);
@@ -176,7 +176,7 @@ const char* PartSlotName(s32 slot) {
 // Calls fn_8016A64C on the system's list, then for every element of the list at +0x7C calls
 // the dispatch entry lbl_80348F38[sys->type].unk24 with (sys+8, element word, element+8, offset, dt).
 void ParticleSystemUpdateExtra(u8* sys, f32 dt) {
-    fn_8016A64C(*(void**)(sys + 0x7C));
+    fn_8016A64C(*(void**)(sys + 0x7C), dt);
     s32 i = 0;
     while (i < *(s32*)(*(u8**)(sys + 0x7C) + 0x10)) {
         u8* list = *(u8**)(sys + 0x7C);

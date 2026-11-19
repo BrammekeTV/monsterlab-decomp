@@ -33,7 +33,7 @@ void   TargetListInit(void* t);                                       // 0x80216
 s32    fn_8000B0E4(u8* camera, u8* movieArgs);                        // 0x8000B0E4
 s32    fn_800D5FDC(PathFollower* p, u8* cur, s32 node, s32 a);        // 0x800D5FDC
 s32    fn_800D61D8(PathFollower* p, u8* cur, s32 node, s32 a);        // 0x800D61D8
-void   fn_8016A64C(void* sys);                                        // 0x8016A64C
+void   fn_8016A64C(void* sys, f32 dt);                                        // 0x8016A64C
 void*  fn_801D40E0(s32 n);                                            // 0x801D40E0
 s32    fn_801DC9B0(void* hash);                                       // 0x801DC9B0 (takes a u32 hash)
 s32    fn_801DFAC0(u8* out, s32 a, s32 b);                            // 0x801DFAC0
@@ -140,7 +140,7 @@ void fn_801B6878(u8* obj, u8* sound, s32 a2, s32 a3) {
 void ParticleEmitterUpdate(u8* system, void* emitter, void* params, f32 dt) {
     u8* e = (u8*)emitter;
     u8* out = (u8*)params;
-    fn_8016A64C(e);
+    fn_8016A64C(e, dt);
     u8* base = e + *(s32*)(e + 0x8);
     s32 stride = *(s32*)(e + 0x18);
     f32 v0 = *(f32*)(base + 0x8);
