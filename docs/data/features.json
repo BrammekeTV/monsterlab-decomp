@@ -37,7 +37,7 @@
   },
   {
    "title": "Big-endian data loader",
-   "detail": "Convert game data from the Wii's big-endian format at load time. Loading on PC now: the game database (global_binary.sir header and database, 3,823 checked values) and the file catalog (catalog.sir, all 6,457 entries), all matching the reference decoder. Next: the rest of global_binary.sir, then the title-screen UI.",
+   "detail": "Convert game data from the Wii's big-endian format at load time. Loading on PC now: the file catalog (catalog.sir) and most of global_binary.sir: the game database, the controller input table, the built-in textures, the string table and the action table. All 9,304 checked values match the reference decoder. Next: the UI screen list (needs more UI code decompiled), then the title-screen UI files.",
    "status": "in_progress"
   },
   {
@@ -92,6 +92,11 @@
   }
  ],
  "changelog": [
+  {
+   "date": "2026-11-20",
+   "time": "23:06",
+   "text": "Big-endian data loader, third part (PR #9): four more parts of global_binary.sir now load on PC: the controller input table (98 button sequences), the 44 built-in textures, the string table (4,274 strings) and the action table. All 9,304 checked values match the reference decoder. On the way, the fallback 'Generic_box' turned out to be a small 16x16 texture, not a model. The UI screen list waits until more of the UI code is decompiled."
+  },
   {
    "date": "2026-11-20",
    "time": "22:59",
