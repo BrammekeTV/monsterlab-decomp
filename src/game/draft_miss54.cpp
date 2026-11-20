@@ -117,7 +117,7 @@ void* fn_8032F028(void* mem, void* ctor, s32 a, s32 size, s32 count);   // 0x803
 void* memcpy(void* d, const void* s, size_t n);   // 0x80004338
 s32 fn_800A5164(void);                  // 0x800A5164
 void fn_800A50B4(u8** out, u8* tree, s32* key);   // 0x800A50B4
-void fn_800A2AEC(u8* node, u8* root, s32 count);  // 0x800A2AEC
+void fn_800A2AEC(u8* node, u8* root);  // 0x800A2AEC
 s32 fn_80336BF8(u8* file, const char* fmt, ...);  // 0x80336BF8
 void fn_8033B09C(void);                 // 0x8033B09C
 void operator_delete(void* p);          // 0x801D426C
@@ -1219,7 +1219,7 @@ u8* fn_800A59BC(u8* tree, u8* parent, u8 left, u8 setRoot, void* value) {
     }
     s32 count = *(s32*)tree;
     *(s32*)tree = count + 1;
-    fn_800A2AEC(node, *(u8**)(tree + 0x4), count);
+    fn_800A2AEC(node, *(u8**)(tree + 0x4));
     if (setRoot != 0) *(u8**)(tree + 0x8) = node;
     if (guard != NULL) operator_delete(guard);
     return node;

@@ -15,15 +15,15 @@ typedef void (*UIVisFn)(void*, s32);                         // element vtable (
 
 extern "C" {
 s32   fn_801499F8(u8* target, s32 w, s32 h, s32 fmt, s32 a, s32 b, const char* name);  // 0x801499F8
-s32   fn_8015A144(u8* target, u8** cursor);                                           // 0x8015A144
+void fn_8015A144(u8* arg0, u8** arg1);                                           // 0x8015A144
 void  fn_8015DE58(void* video, f32* a, f32* b, f32* c, f32* d);                       // 0x8015DE58
-s32   fn_80169770(u8* a, const char* name);                                           // 0x80169770
-s32   fn_8016D818(void);                                                              // 0x8016D818
+u8* fn_80169770(u8* arg0, const char* name);                                           // 0x80169770
+void fn_8016D818(u8* arg0);                                                              // 0x8016D818
 void  fn_80172708(void* p);                                                           // 0x80172708
 void  fn_80173164(void* p);                                                           // 0x80173164
 void  fn_801731C8(void* p);                                                           // 0x801731C8
 void  fn_8018D2B8(const char* fmt, ...);                                              // 0x8018D2B8
-void  fn_80198C78(void* set);                                                         // 0x80198C78
+s32 fn_80198C78(u8* set);                                                         // 0x80198C78
 s32   fn_8019BC80(u8* arg0, u32 arg1);                                                // 0x8019BC80
 u8*   fn_8019BF64(u8* widget, u32 hash);                                              // 0x8019BF64
 u8*   fn_801B3308(void);                                                              // 0x801B3308
@@ -108,7 +108,7 @@ void fn_80185B4C(u8* arg0) {
     }
     *(s32*)(arg0 + 0x3C) = 0;
     if (*(s32*)(arg0 + 0x1C) != 0) {
-        fn_8016D818();
+        fn_8016D818(arg0);
         *(s32*)(arg0 + 0x1C) = 0;
     }
     *(s32*)(arg0 + 0x0) = 0;

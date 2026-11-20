@@ -17,7 +17,7 @@ void  fn_8000B964(u8* p, s32 a2);                               // 0x8000B964
 BOOL  fn_80142358(void);                                        // 0x80142358
 void  fn_80142470(void);                                        // 0x80142470
 BOOL  fn_80147554(s32 button);                                  // 0x80147554
-void  fn_801FCA38(f32 a, f32 b);                                // 0x801FCA38
+s32 fn_801FCA38(f32 x, f32 y);                                // 0x801FCA38
 u32   fn_80140CE0(void);                                        // 0x80140CE0
 BOOL  fn_8013E464(void);                                        // 0x8013E464
 u8*   fn_80143158(u8* p);                                       // 0x80143158

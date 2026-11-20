@@ -8,10 +8,10 @@
 extern u8 lbl_803E6B28[];
 extern u8 lbl_803E6B34[];
 extern u8 lbl_805F8F20[];
-extern u8 lbl_805FB26C[];
-extern u8 lbl_805FB270[];
-extern u8 lbl_805FB274[];
-extern u8 lbl_805FB278[];
+extern s32 lbl_805FB26C;
+extern s32 lbl_805FB270;
+extern s32 lbl_805FB274;
+extern s32 lbl_805FB278;
 extern u8 lbl_805FB28C[];
 extern u8 lbl_805FB290[];
 extern u8 lbl_805FB291[];

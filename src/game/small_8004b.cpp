@@ -252,9 +252,10 @@ void CombatResultsResumeGame(void) {
 
 // 0x80049628
 // Constructor: base constructor, then a vtable.
-void fn_80049628(u8* p, s32 a2) {
+u8* fn_80049628(u8* p, s32 a2) {
     fn_8020E9CC(p, a2);
     *(void**)p = lbl_80358B78;
+    return p;
 }
 
 // 0x80049664

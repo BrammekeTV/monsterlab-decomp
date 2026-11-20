@@ -19,7 +19,7 @@ void  fn_80070460(u8* p);                                        // 0x80070460
 void  fn_80070FAC(u8* p, f32 v);                                 // 0x80070FAC
 void  fn_800712BC(u8* p, s32 a, s32 b);                          // 0x800712BC
 void  fn_800A0BAC(u8* p, f32 dt);                                // 0x800A0BAC
-void  fn_800A2AEC(u8* node, u8* root, s32 count);                // 0x800A2AEC
+void fn_800A2AEC(u8* node, u8* root);                // 0x800A2AEC
 void  fn_800A43C0(u8* p, s32 hash);                              // 0x800A43C0
 void  fn_800A660C(u8* p);                                        // 0x800A660C
 s32   fn_800A6694(u8* p);                                        // 0x800A6694 (returns a PlaySound handle)
@@ -374,7 +374,7 @@ u8* fn_800A29BC(u8* tree, u8* parent, s32 left, s32 setRoot, s32* value) {
     }
     s32 count = *(s32*)tree;
     *(s32*)tree = count + 1;
-    fn_800A2AEC(node, *(u8**)(tree + 0x4), count);
+    fn_800A2AEC(node, *(u8**)(tree + 0x4));
     if (setRoot != 0) *(u8**)(tree + 0x8) = node;
     if (guard != NULL) operator_delete(guard);
     return node;

@@ -11,7 +11,7 @@ void  operator_delete(void* p);                                         // 0x801
 void  fn_800690D4(u8* p, s32 a, void* params, s32 b);                   // 0x800690D4 (base ctor)
 u8*  fn_80062CE0(u8* p, s32 del);                                      // 0x80062CE0 (base dtor)
 void  fn_800B0B88(u8* p);                                               // 0x800B0B88
-void  fn_800704AC(u8* p);                                               // 0x800704AC
+void fn_800704AC(u8* arg0, f32 dt);                                               // 0x800704AC
 void  fn_800B82E0(u8* child, f32 delta);                                // 0x800B82E0
 void  fn_800B8180(u8* p);                                               // 0x800B8180
 BOOL  fn_801B50B0(void* unused, u8* obj);                               // 0x801B50B0
@@ -54,7 +54,7 @@ u8* fn_800B0778(u8* p, s32 del) {
 // 0x800B4284
 // Runs fn_800704AC on the object, then applies delta to each non-null child pointer at +0x98 and +0x9C.
 void fn_800B4284(u8* p, f32 delta) {
-    fn_800704AC(p);
+    fn_800704AC(p, delta);
     for (s32 i = 0; i < 2; i++) {
         u8* child = *(u8**)(p + 0x98 + i * 4);
         if (child) fn_800B82E0(child, delta);

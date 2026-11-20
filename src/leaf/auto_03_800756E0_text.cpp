@@ -6,12 +6,12 @@
 #include "types.h"
 
 extern "C" void GameFlowSignal(s32, s32, s32);
-extern "C" void fn_800704AC(u8*);
+extern "C" void fn_800704AC(u8*, f32);
 extern "C" void fn_80077544(u8*);
 
 // 0x80076274
-extern "C" void fn_80076274(u8* a3) {
-    fn_800704AC(((u8*)(uintptr_t)(a3)));
+extern "C" void fn_80076274(u8* a3, f32 f1) {
+    fn_800704AC(((u8*)(uintptr_t)(a3)), (f32)(f1));
 }
 
 // 0x80076278

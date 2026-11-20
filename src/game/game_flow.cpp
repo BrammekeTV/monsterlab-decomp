@@ -13,7 +13,7 @@ void  GameLog(int level, int category, const char* fmt, ...);   // 0x8000B2F0
 u8    SCGetLanguage(void);
 s32   GetRegion(void);                         // 0x8001425C: 0 = NA, 1 = EU
 BOOL  fn_80147554(s32);
-void  fn_801FCA38(f32, f32);
+s32 fn_801FCA38(f32 x, f32 y);
 s64   TimerElapsed(void* timer);               // 0x801425DC
 f32 TimerReset(u8* timer);                 // 0x80142744
 void  RendClear(int flags, int a, int b, f32 depth);   // 0x801534F0

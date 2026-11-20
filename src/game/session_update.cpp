@@ -60,7 +60,7 @@ void   CameraSetMatrix(void* camera, const f32 mtx[3][4]);   // 0x801D6814
 void   fn_801E7E28(void* p);
 BOOL   fn_801F5220(void);  BOOL fn_801F525C(void);
 void   fn_801F357C(void);  void fn_801F3BB8(void);  void fn_801F401C(void);  void fn_801F487C(void);
-void   fn_801FCA38(f32 a, f32 b);
+s32 fn_801FCA38(f32 x, f32 y);
 void   AudioSetPaused(void* audio, int paused);          // 0x801FF708
 void   SaveAddPlayTime(void* save, s64 seconds);         // 0x80225674
 void   fn_80225C10(void* save, s64 v);

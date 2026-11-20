@@ -50,7 +50,7 @@ void fn_801ECD1C(u8* p, s32 idx, s32 immediate);
 void fn_801ED788(f32* out, u8* a1);
 BOOL fn_801F56FC(s32 flags);
 u8* fn_800E4D7C(u32 a0);
-u32 fn_800E5684(void);
+u8* fn_800E5684(u8* p);
 void* fn_800E60BC(void);
 void fn_8012649C(void);
 s32 fn_8016195C(void* p, s32 a, s32 b, void* c);
@@ -165,7 +165,7 @@ void WiiSelectorSetUpCameraView(void) {
         cam = (u8*)fn_800E60BC();
         if (cam != NULL) {
             *(u8*)(cam + 0x54) = 1;
-            view = fn_800E4D7C(fn_800E5684());
+            view = fn_800E4D7C((u32)(uintptr_t)fn_800E5684(cam))  /* lint:ok r3 passthrough */;
             if (view != NULL) {
                 *(u8*)(view + 0x54) = 0;
             }

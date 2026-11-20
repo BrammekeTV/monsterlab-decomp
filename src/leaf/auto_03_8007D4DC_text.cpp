@@ -12,7 +12,7 @@ extern u8 lbl_805FD790[];
 extern "C" void AimMinigame_Update(u8*);
 extern "C" void StartRumble(s32, u32);
 extern "C" void app_PlayMusic(u32, f32);
-extern "C" void fn_800704AC(u8*);
+extern "C" void fn_800704AC(u8*, f32);
 extern "C" void fn_8007E354(u8*, u32);
 
 // 0x8007DD0C
@@ -47,8 +47,8 @@ extern "C" void fn_8007E0CC(void) {
 }
 
 // 0x8007E340
-extern "C" void fn_8007E340(u8* a3) {
-    fn_800704AC(((u8*)(uintptr_t)(a3)));
+extern "C" void fn_8007E340(u8* a3, f32 f1) {
+    fn_800704AC(((u8*)(uintptr_t)(a3)), (f32)(f1));
 }
 
 // 0x8007E344

@@ -7,7 +7,7 @@
 
 extern f32 lbl_805FE5B8;
 extern "C" void fn_80070460(u8*);
-extern "C" void fn_800704AC(u8*);
+extern "C" void fn_800704AC(u8*, f32);
 
 // 0x800D162C
 extern "C" void fn_800D162C(u8* a3) {
@@ -15,8 +15,8 @@ extern "C" void fn_800D162C(u8* a3) {
 }
 
 // 0x800D1630
-extern "C" void fn_800D1630(u8* a3) {
-    fn_800704AC(((u8*)(uintptr_t)(a3)));
+extern "C" void fn_800D1630(u8* a3, f32 f1) {
+    fn_800704AC(((u8*)(uintptr_t)(a3)), (f32)(f1));
 }
 
 // 0x800D1634

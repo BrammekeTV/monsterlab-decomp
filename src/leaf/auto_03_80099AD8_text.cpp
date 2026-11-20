@@ -11,7 +11,7 @@ extern u8 lbl_805FDC64[];
 extern "C" void PlayExperimentSound(void*, u32, s32);
 extern "C" void StopExperimentSound(void*, u32);
 extern "C" void app_PlayMusic(u32, f32);
-extern "C" void fn_800704AC(u8*);
+extern "C" void fn_800704AC(u8*, f32);
 
 // 0x8009A634
 extern "C" f32 fn_8009A634(u8* a3) {
@@ -39,8 +39,8 @@ extern "C" void fn_8009A64C(void) {
 }
 
 // 0x8009A7C0
-extern "C" void fn_8009A7C0(u8* a3) {
-    fn_800704AC(((u8*)(uintptr_t)(a3)));
+extern "C" void fn_8009A7C0(u8* a3, f32 f1) {
+    fn_800704AC(((u8*)(uintptr_t)(a3)), (f32)(f1));
 }
 
 // 0x8009A9B0

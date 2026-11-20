@@ -94,6 +94,11 @@
  "changelog": [
   {
    "date": "2026-11-20",
+   "time": "11:56",
+   "text": "Decompile 39 more missing functions (PlaySoundAt, EulerToQuat, FireLightningAtTarget, SaveRollChallengeReward, fn_8001FCA8, fn_800A2AEC, fn_801D9164, ...); fix prototypes"
+  },
+  {
+   "date": "2026-11-20",
    "time": "11:35",
    "text": "Decompile 31 more missing functions (fn_8014E*/fn_8016*/fn_8017* renderer and heap helpers, fn_8018* screen-set and font helpers, ...); fix prototypes"
   },

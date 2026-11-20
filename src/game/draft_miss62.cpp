@@ -88,7 +88,7 @@ void fn_801294CC(u8* w, s32 level, const char* dir, const char* name);   // 0x80
 u8* GetGlobalSettings(void);               // 0x801D2BF8
 s32 fn_801D3A60(s32 zone);                 // 0x801D3A60
 void fn_801384B0(u8* world, s32 slot, s32 a);   // 0x801384B0
-u32 fn_800E5684(void);                     // 0x800E5684
+u8* fn_800E5684(u8* p);                     // 0x800E5684
 u8* fn_800E4D7C(u32 a0);                   // 0x800E4D7C
 u8* ObjRefDtor(u8* ref, s32 flags);        // 0x800D50D0
 void* ScreenSetsCurrent(void* sets);       // 0x8018D1E4
@@ -531,7 +531,7 @@ void fn_801260C8(void) {
         u8* obj = (u8*)fn_800E60BC();
         if (obj != NULL) {
             obj[0x54] = 1;
-            u8* other = fn_800E4D7C(fn_800E5684());
+            u8* other = fn_800E4D7C((u32)(uintptr_t)fn_800E5684(obj))  /* lint:ok r3 passthrough */;
             if (other != NULL) other[0x54] = 0;
             cam = *(u8**)(lbl_803C4298 + 0x4);
             (*(void (**)(void*))(*(u8**)cam + 0x10))(cam);

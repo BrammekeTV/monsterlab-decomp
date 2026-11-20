@@ -13,7 +13,7 @@ void  fn_801D55F0(void* p);                                      // 0x801D55F0 (
 u8*   fn_801D55F8(u8* p, s32 del);                               // 0x801D55F8 (deleting dtor)
 u8*   fn_801D2BB8(u8* p, s32 del);                               // 0x801D2BB8 (deleting dtor)
 u8*   fn_801D9038(u8* p, s32 del);                               // 0x801D9038 (base deleting dtor, defined below)
-void  fn_801D9164(u8* p, void* v);                               // 0x801D9164
+void fn_801D9164(u8* obj, u8* pos, u8* scale, u8* quat);                               // 0x801D9164
 u8*  fn_80142500(void* p);                                      // 0x80142500
 void  fn_80172E84(u8* obj);                                      // 0x80172E84
 void  fn_80184414(void* a, void* b);                             // 0x80184414
@@ -175,7 +175,7 @@ u8* fn_801D9508(u8* p, s32 del) {
 // Sets the 3-float vector at +0x20 of the attached object from v, only when the attached object
 // exists and the flag at +0x50 is set. Calls the base helper 0x801D9164 first.
 void fn_801D99BC(u8* p, f32* v) {
-    fn_801D9164(p, v);
+    fn_801D9164(p, (u8*)v, NULL, NULL);  // asm forwards leftover r5/r6; unknown
     u8* target = *(u8**)(p + 0x48);
     if (target && *(u8*)(p + 0x50)) {
         *(f32*)(target + 0x20) = v[0];
