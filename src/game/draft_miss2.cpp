@@ -49,7 +49,7 @@ void  fn_8018D1FC(const char* fmt, ...);                         // 0x8018D1FC (
 void  fn_8018D2B8(const char* fmt, ...);                         // 0x8018D2B8 (debug log)
 void  fn_8018D370(const char* fmt, ...);                         // 0x8018D370 (debug log)
 void* fn_8018D428(s32 size, const char* file, void* tag, s32 line);   // 0x8018D428 (alloc)
-void  fn_801987BC(void* set, void* widget);                      // 0x801987BC
+s32 fn_801987BC(u8* arg0, u8* arg1);                      // 0x801987BC
 s32   fn_80198A8C(void* set, void* widget);                      // 0x80198A8C
 void* fn_80198F74(void* set, u32 hash);                          // 0x80198F74
 u32   fn_8019AC00(void* obj, s32 index);                         // 0x8019AC00
@@ -471,7 +471,7 @@ void UIScreen_Push(u32 a0) {
     }
     if (w != NULL) {
         fn_8018D1FC(lbl_80381868 + 0x94, a0);
-        fn_801987BC(set, w);
+        fn_801987BC((u8*)set, (u8*)w);
     }
 }
 

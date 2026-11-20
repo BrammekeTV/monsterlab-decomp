@@ -12,7 +12,7 @@ void  EventSend(void* mgr, void* target, void* from, u32 event, int a, int b, in
 s32   RaySceneTest(void* ray);                                    // 0x80070458
 void  fn_800690D4(u8* p, s32 a, void* params, s32 b);             // 0x800690D4 (base ctor)
 void  fn_80097BFC(u8* p);                                         // 0x80097BFC
-void  fn_800999B4(u8* obj, f32 v);                                // 0x800999B4
+f32 fn_800999B4(u8* obj, f32 v);                                // 0x800999B4
 void  SpawnEffectAt(void* fxMgr, u32 effect, const f32 posAndScale[4], int a);  // 0x801C80E0
 u32   RandomU32(void);                                            // 0x80143460
 void  TextureRelease(void* texture);                               // 0x80194028

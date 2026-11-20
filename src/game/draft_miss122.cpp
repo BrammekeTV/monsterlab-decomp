@@ -30,7 +30,7 @@ void  fn_801455E0(f32* out, u8* quat);                          // 0x801455E0
 void  fn_8018DBB8(void* sets, s32 a);                           // 0x8018DBB8
 u32   fn_8019552C(u8* list, s32 index);                         // 0x8019552C
 s32   fn_8019555C(u8* list);                                    // 0x8019555C
-void  fn_801987BC(void* set, void* widget);                     // 0x801987BC
+s32 fn_801987BC(u8* arg0, u8* arg1);                     // 0x801987BC
 s32   fn_80198A8C(void* set, void* widget);                     // 0x80198A8C
 BOOL  fn_80198C34(void* set, void* w);                          // 0x80198C34
 u8*   fn_80198E20(u8* set);                                     // 0x80198E20

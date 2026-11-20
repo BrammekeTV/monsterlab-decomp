@@ -55,7 +55,7 @@ void fn_801566E8(f32 l, f32 r, f32 b, f32 t, f32 n, f32 f);     // 0x801566E8
 void fn_80154E54(u8* m, f32 a1, f32 a2, f32 a3, f32 a4, f32 a5, f32 a6, f32 a7, f32 a8, f32 a9, f32 a10, f32 a11, f32 a12, f32 a13);  // 0x80154E54
 void fn_80155D70(void);                                         // 0x80155D70
 void fn_8016DDAC(u8* cam);                                      // 0x8016DDAC
-s32 fn_801186FC(u8* rec);                                       // 0x801186FC
+u8* fn_801186FC(u8* rec);                                       // 0x801186FC
 BOOL SavePartTierSeen(u8* s, u32 part, s32 tier);               // progress.cpp
 void* fn_8011AD88(void* def, s32 flag);                         // 0x8011AD88
 void EntryComputeRequiredRank(u8* e);                           // monster.cpp
@@ -588,8 +588,8 @@ void fn_8011A04C(void) {
         u8* eb = *(u8**)(data + 0x5328) + idxB * 0x18;
         lbl_805FB26C = TextIdFromHash(*(u32*)(ea + 4));
         lbl_805FB270 = TextIdFromHash(*(u32*)(eb + 4));
-        lbl_805FB27C = fn_801186FC(lbl_803E6B28);
-        lbl_805FB280 = fn_801186FC(lbl_803E6B34);
+        lbl_805FB27C = (s32)(intptr_t)fn_801186FC(lbl_803E6B28);  // lint:ok 32-bit slot
+        lbl_805FB280 = (s32)(intptr_t)fn_801186FC(lbl_803E6B34);  // lint:ok 32-bit slot
         u8* ep = *(u8**)(gGameDb->data + 0x6C18) + part * 0x24;
         PartDef def;
         PartDbGetDef(&def, gGameDb, *(s32*)(ep + 0x20));
@@ -618,13 +618,13 @@ void fn_8011A04C(void) {
     if (idxA != -1) {
         u8* ea = *(u8**)(gGameDb->data + 0x4F00) + idxA * 0x10;
         lbl_805FB26C = TextIdFromHash(*(u32*)(ea + 4));
-        lbl_805FB27C = fn_801186FC(lbl_803E6B28);
+        lbl_805FB27C = (s32)(intptr_t)fn_801186FC(lbl_803E6B28);  // lint:ok 32-bit slot
         return;
     }
     if (*(s32*)(lbl_803E6B34 + 4) != -1) {
         u8* eb = *(u8**)(gGameDb->data + 0x5328) + *(s32*)(lbl_803E6B34 + 4) * 0x18;
         lbl_805FB270 = TextIdFromHash(*(u32*)(eb + 4));
-        lbl_805FB280 = fn_801186FC(lbl_803E6B34);
+        lbl_805FB280 = (s32)(intptr_t)fn_801186FC(lbl_803E6B34);  // lint:ok 32-bit slot
     }
 }
 

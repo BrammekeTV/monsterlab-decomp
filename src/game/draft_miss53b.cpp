@@ -235,8 +235,9 @@ void fn_80093B3C(u8* arg0, s32 arg1, f32 farg0) {
 // RaySceneTest selects. The asm also leaves (new - old) in f1 on return; the existing
 // declaration is void and callers ignore it.
 // 0x800999B4
-void fn_800999B4(u8* obj, f32 v) {
-    *(f32*)(obj + 0x298) = *(f32*)(obj + 0x298) + v;
+f32 fn_800999B4(u8* obj, f32 v) {
+    f32 old = *(f32*)(obj + 0x298);
+    *(f32*)(obj + 0x298) = old + v;
     s32 i1 = RaySceneTest(obj);
     f32 hi = lbl_80346FD0[i1];
     // The second call receives the first result still in r3.
@@ -262,6 +263,7 @@ void fn_800999B4(u8* obj, f32 v) {
         }
     }
     *(f32*)(obj + 0x298) = res;
+    return res - old;  // net change after clamping
 }
 
 // Finds the first object of type 0x11 in the loaded zones (the argument is not read).
