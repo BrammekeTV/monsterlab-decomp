@@ -37,8 +37,8 @@
   },
   {
    "title": "Big-endian data loader",
-   "detail": "Convert game data (game database, part definitions, saves) from the Wii's big-endian format at load time.",
-   "status": "todo"
+   "detail": "Convert game data from the Wii's big-endian format at load time. The game database (global_binary.sir header and database) now loads on PC, and all 3,823 checked values match the reference decoder. Next: catalog.sir, the rest of global_binary.sir, the code pointer table, then the title-screen UI.",
+   "status": "in_progress"
   },
   {
    "title": "Tested against the original",
@@ -92,6 +92,11 @@
   }
  ],
  "changelog": [
+  {
+   "date": "2026-11-20",
+   "time": "22:45",
+   "text": "Big-endian data loader, first part (PR #7): the PC build now loads the game database from global_binary.sir, converting each field from the Wii's byte order by type and relocating its pointers. A test checks 3,823 values against the reference decoder, and all of them match. The design is in docs/loader.md. Next up: the file catalog, the rest of the game database and the title-screen UI."
+  },
   {
    "date": "2026-11-20",
    "time": "22:45",
