@@ -8,6 +8,21 @@
 extern "C" {
 #endif
 
+typedef enum SirError {
+    SIR_OK = 0,
+    SIR_ERR_NOT_SIR,          // bad magic / section table
+    SIR_ERR_SECTIONS,         // global_binary.sir must have a 4 KB header section and an image section
+    SIR_ERR_BOUNDS,           // a pointer or table leaves the image
+    SIR_ERR_GAMEDB_LAYOUT,    // descriptor does not look like one (array callbacks differ, bad counts)
+    SIR_ERR_GAMEDB_FIELD,     // unknown field type, or its size disagrees with the type
+    SIR_ERR_GAMEDB_ROWSIZE,   // field sizes do not add up to the stored row size
+    SIR_ERR_GAMEDB_OVERLAP,   // two tables share row storage
+    SIR_ERR_CATALOG,          // catalog arrays do not fit in the file
+    SIR_ERR_IO
+} SirError;
+
+const char* SirErrorText(SirError e);
+
 // ---------------------------------------------------------------------------------------------
 // Container (`PNP0`): header and section table. The table is read from the big-endian file
 // bytes; nothing is modified.
@@ -30,6 +45,43 @@ typedef struct SirSection {
 s32  SirContainerSectionCount(const u8* file, u32 fileSize);
 // Fills `out` for section `index`; FALSE if the entry is out of range or points outside the file.
 BOOL SirContainerSection(const u8* file, u32 fileSize, s32 index, SirSection* out);
+
+// ---------------------------------------------------------------------------------------------
+// catalog.sir: the file table SirLoad (0x801E6138) searches. Same container header, but the
+// section table lists the sections of every .sir file (0x18 bytes each), followed by one
+// 0x40-byte record per file. The game reads the whole file into a buffer and copies both arrays
+// out of it (fn_801E54E4), so the buffer is converted in place before that copy.
+// ---------------------------------------------------------------------------------------------
+typedef struct SirCatalogEntry {
+    s32 type;        // 0x00: section type; SirLoad's last argument (-1 header block, 0 image, ...)
+    u32 offset;      // 0x04: byte offset in the file (SirLoad reads from sector offset >> 11)
+    u32 size;        // 0x08: size in memory
+    u32 nameHash;    // 0x0C: StringHash of the file name, e.g. "global_binary.sir"
+    u32 packedSize;  // 0x10: size on disc when compressed, else 0
+    u32 hash;        // 0x14
+} SirCatalogEntry;
+
+typedef struct SirCatalogFile {
+    u32  nameHash;   // 0x00
+    u32  unk04;      // 0x04
+    char name[0x38]; // 0x08: lower-case file name
+} SirCatalogFile;
+
+typedef struct SirCatalog {
+    SirCatalogEntry* entries;
+    u32              entryCount;
+    SirCatalogFile*  files;
+    u32              fileCount;
+} SirCatalog;
+
+// Converts a catalog.sir buffer in place and returns where its two arrays are. The header words
+// at +0x04..+0x10 (version, entry count, file count, hash) are converted too; the game reads the
+// counts from +0x08 and +0x0C.
+SirError SirCatalogConvert(u8* file, u32 fileSize, SirCatalog* out);
+// Entry for a file-name hash and section type, as SirLoad searches it; NULL if absent.
+const SirCatalogEntry* SirCatalogFind(const SirCatalog* c, u32 nameHash, s32 type);
+// Index of the file record with this name hash (the index of its handle in the loader), or -1.
+s32 SirCatalogFileIndex(const SirCatalog* c, u32 nameHash);
 
 // ---------------------------------------------------------------------------------------------
 // Field schemas: one entry per run of same-typed fields. Anything a schema does not name is left
@@ -59,8 +111,9 @@ typedef struct SirRange {
     u8* host;
 } SirRange;
 
-// Maps an address inside main.dol (vtables, callbacks stored in data) to the PC build's object,
-// or returns NULL if the port has no counterpart yet.
+// Maps an address inside main.dol to the PC build's object, or returns NULL if the port has no
+// counterpart. No file converted so far needs it: the main.dol-looking words in global_binary.sir
+// are not valid addresses of the retail executable (docs/loader.md) and are typed as plain u32.
 typedef void* (*SirDolResolver)(u32 wiiAddr, void* user);
 
 typedef struct SirReloc {
@@ -112,7 +165,8 @@ enum {
 
 // Table descriptor as the decompiled code sees it after conversion (0x428 bytes).
 typedef struct GameDbTable {
-    void* arrayFn[2];                       // 0x000: two main.dol function pointers (same in every table)
+    u32   buildAddr[2];                     // 0x000: addresses from the build that baked the file; not valid in
+                                            //        the retail executable (same two values in every table)
     u8*   rows;                             // 0x008
     u32   count;                            // 0x00C
     u32   unk10;                            // 0x010: 1 (0 in the empty table)
@@ -128,19 +182,6 @@ typedef struct GameDbTable {
     u8    pad425[3];
 } GameDbTable;
 
-typedef enum SirError {
-    SIR_OK = 0,
-    SIR_ERR_NOT_SIR,          // bad magic / section table
-    SIR_ERR_SECTIONS,         // global_binary.sir must have a 4 KB header section and an image section
-    SIR_ERR_BOUNDS,           // a pointer or table leaves the image
-    SIR_ERR_GAMEDB_LAYOUT,    // descriptor does not look like one (array callbacks differ, bad counts)
-    SIR_ERR_GAMEDB_FIELD,     // unknown field type, or its size disagrees with the type
-    SIR_ERR_GAMEDB_ROWSIZE,   // field sizes do not add up to the stored row size
-    SIR_ERR_GAMEDB_OVERLAP,   // two tables share row storage
-    SIR_ERR_IO
-} SirError;
-
-const char* SirErrorText(SirError e);
 
 // Converts the game database reached from header slot 0xDC8. `image` is section 1 (big-endian,
 // as read from disc); `r` must already map GLOBAL_BINARY_WII_BASE to `image`.

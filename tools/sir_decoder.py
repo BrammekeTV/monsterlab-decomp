@@ -22,6 +22,7 @@ Usage:
   python sir_decoder.py some.sir --sections                   # also dump raw sections
   python sir_decoder.py some.sir --only mbo                   # only items whose name contains "mbo"
   python sir_decoder.py global_binary.sir --gamedb            # print the game database (text, to stdout)
+  python sir_decoder.py catalog.sir --catalog                 # print the file table (text, to stdout)
 
 Format notes (reverse-engineered):
   Archive header (big-endian): 'PNP0', u32 version, u32 section count, ...
@@ -380,7 +381,7 @@ def write_obj(path, groups):
 # global_binary.sir: section 0 is a 4 KB block of pointers into section 1, a memory image the Wii
 # places at 0x90400000. Header slot 0xDC8 points at the game database object; its word +0xC points
 # at 42 table descriptors of 0x428 bytes. Each descriptor describes its own rows:
-#   +0x00 two main.dol function pointers   +0x08 rows pointer   +0x0C row count   +0x10 1
+#   +0x00 two build-time addresses (stale) +0x08 rows pointer   +0x0C row count   +0x10 1
 #   +0x14 layout hash   +0x18 row size     +0x1C row count again
 #   +0x20 u32 type[64]  +0x120 u32 size[64]  +0x220 u32 column-name hash[64]
 #   +0x320 u32 hash of the table an id column refers to, or -1 [64]
@@ -439,8 +440,8 @@ def gamedb_dump(path):
     tables = gamedb_tables(sec, db)
     for t, (tb, rows) in enumerate(tables):
         n = len(tb['types'])
-        line = 'table %d rows %s fn %s %s count %d rowsize %d fields %d present %d' % (
-            t, ptr(tb['rows']), ptr(tb['fn'][0]), ptr(tb['fn'][1]), tb['count'], tb['rowsize'] if tb['count'] else 0, n, tb['present'])
+        line = 'table %d rows %s build %08x %08x count %d rowsize %d fields %d present %d' % (
+            t, ptr(tb['rows']), tb['fn'][0], tb['fn'][1], tb['count'], tb['rowsize'] if tb['count'] else 0, n, tb['present'])
         if tb['count']: line += ' layout %08x' % tb['layout']
         L.append(line)
         if not tb['count']: continue
@@ -460,6 +461,62 @@ def gamedb_dump(path):
         L.append('tuning %d id %d value %.9g' % (i, r[0], struct.unpack('>f', struct.pack('>I', r[1]))[0]))
     return L
 
+# ----------------------------------------------------------------------------- catalog
+# catalog.sir: container header (+0x08 entry count, +0x0C file count), then one 0x18-byte entry
+# per section of every .sir file (i32 type, u32 offset, u32 size, u32 file-name hash,
+# u32 packed size or 0, u32 hash), then one 0x40-byte record per file (u32 name hash, u32, name).
+def catalog_read(path):
+    d = open(path, 'rb').read()
+    magic, version, n, nfiles, h = struct.unpack_from('>4sIIII', d, 0)
+    if magic != b'PNP0':
+        raise SystemExit(f'{path}: not a PNP0 file')
+    entries = [struct.unpack_from('>iIIIII', d, 0x40 + i * 0x18) for i in range(n)]
+    base = 0x40 + n * 0x18
+    files = []
+    for i in range(nfiles):
+        a, b = struct.unpack_from('>II', d, base + i * 0x40)
+        files.append((a, b, d[base + i * 0x40 + 8:base + i * 0x40 + 0x40].split(b'\0')[0].decode('latin1')))
+    return version, h, entries, files
+
+def name_hash(s):
+    import zlib
+    return zlib.crc32(s.upper().encode('latin1')) & 0xFFFFFFFF
+
+def catalog_dump(path):
+    version, h, entries, files = catalog_read(path)
+    L = ['catalog version %d entries %d files %d hash %08x' % (version, len(entries), len(files), h)]
+    for i, e in enumerate(entries):
+        L.append('entry %d type %d offset %d size %d name %08x packed %d hash %08x' % ((i,) + e))
+    for i, f in enumerate(files):
+        L.append('file %d name %08x unk %08x %s' % ((i,) + f))
+    L.append('namehash %d of %d' % (sum(name_hash(f[2]) == f[0] for f in files), len(files)))
+    gh = name_hash('global_binary.sir')
+    for typ in (-1, 0):
+        e = next((e for e in entries if e[0] == typ and e[3] == gh), None)
+        fi = next((i for i, f in enumerate(files) if f[0] == gh), -1)
+        L.append('lookup global_binary.sir %d missing' % typ if e is None else
+                 'lookup global_binary.sir %d file %d sector %d size %d packed %d' % (typ, fi, e[1] >> 11, e[2], e[4]))
+    return L
+
+def catalog_crosscheck(path, streams_dir):
+    """Compare the catalog with the section table inside each .sir file. Returns (files checked, problems)."""
+    version, h, entries, files = catalog_read(path)
+    on_disk = {n.lower(): n for n in os.listdir(streams_dir)}
+    problems = []; checked = 0
+    for nh, _, name in files:
+        if name not in on_disk:
+            problems.append(f'{name}: not in {streams_dir}'); continue
+        with open(os.path.join(streams_dir, on_disk[name]), 'rb') as f:
+            head = f.read(0x40)
+            n = struct.unpack_from('>I', head, 8)[0]
+            tab = f.read(n * 0x18)
+        own = [struct.unpack_from('>iIIIII', tab, i * 0x18) for i in range(n)]
+        cat = [e for e in entries if e[3] == nh]
+        checked += 1
+        if [(e[0], e[1], e[2], e[5]) for e in own] != [(e[0], e[1], e[2], e[5]) for e in cat]:
+            problems.append(f'{name}: {len(own)} sections in the file, {len(cat)} in the catalog, or fields differ')
+    return checked, problems
+
 # ----------------------------------------------------------------------------- main
 def main():
     ap = argparse.ArgumentParser(description='Extract textures, meshes and skeletons from Monster Lab .sir archives')
@@ -471,7 +528,12 @@ def main():
     ap.add_argument('--no-textures', action='store_true')
     ap.add_argument('--no-meshes', action='store_true')
     ap.add_argument('--gamedb', action='store_true', help='global_binary.sir: print the game database as text')
+    ap.add_argument('--catalog', action='store_true', help='catalog.sir: print the file table as text')
     a = ap.parse_args()
+    if a.catalog:
+        for line in catalog_dump(a.archive):
+            print(line)
+        return
     if a.gamedb:
         for line in gamedb_dump(a.archive):
             print(line)

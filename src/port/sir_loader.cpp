@@ -10,6 +10,7 @@
 #include "port/sir_loader.h"
 
 static_assert(sizeof(GameDbTable) == GAMEDB_DESC_SIZE, "GameDbTable must match the file layout");
+static_assert(sizeof(SirCatalogEntry) == SIR_SECTION_ENTRY && sizeof(SirCatalogFile) == 0x40, "catalog records");
 
 // ------------------------------------------------------------------------------------ bytes
 
@@ -62,6 +63,44 @@ extern "C" BOOL SirContainerSection(const u8* file, u32 fileSize, s32 index, Sir
     out->hash = Be32(e + 0x14);
     if (out->offset == 0 || (u64)out->offset + out->size > fileSize) return FALSE;
     return TRUE;
+}
+
+// ------------------------------------------------------------------------------------ catalog.sir
+
+#define CATALOG_FILE_SIZE 0x40
+
+extern "C" SirError SirCatalogConvert(u8* file, u32 fileSize, SirCatalog* out) {
+    memset(out, 0, sizeof(*out));
+    if (file == NULL || fileSize < SIR_SECTION_TABLE || Be32(file) != SIR_MAGIC) return SIR_ERR_NOT_SIR;
+    u32 entryCount = Be32(file + 0x08);
+    u32 fileCount = Be32(file + 0x0C);
+    u64 filesOff = (u64)SIR_SECTION_TABLE + (u64)entryCount * SIR_SECTION_ENTRY;
+    if (filesOff + (u64)fileCount * CATALOG_FILE_SIZE > fileSize) return SIR_ERR_CATALOG;
+
+    for (u32 o = 0x04; o < 0x14; o += 4) Swap32(file + o);         // version, counts, hash
+    u8* p = file + SIR_SECTION_TABLE;
+    for (u32 i = 0; i < entryCount * 6; i++, p += 4) Swap32(p);    // six u32 per entry
+    for (u32 i = 0; i < fileCount; i++, p += CATALOG_FILE_SIZE) {  // two u32, then the name bytes
+        Swap32(p);
+        Swap32(p + 4);
+    }
+    out->entries = (SirCatalogEntry*)(file + SIR_SECTION_TABLE);
+    out->entryCount = entryCount;
+    out->files = (SirCatalogFile*)(file + (u32)filesOff);
+    out->fileCount = fileCount;
+    return SIR_OK;
+}
+
+extern "C" const SirCatalogEntry* SirCatalogFind(const SirCatalog* c, u32 nameHash, s32 type) {
+    for (u32 i = 0; i < c->entryCount; i++)
+        if (c->entries[i].type == type && c->entries[i].nameHash == nameHash) return &c->entries[i];
+    return NULL;
+}
+
+extern "C" s32 SirCatalogFileIndex(const SirCatalog* c, u32 nameHash) {
+    for (u32 i = 0; i < c->fileCount; i++)
+        if (c->files[i].nameHash == nameHash) return (s32)i;
+    return -1;
 }
 
 // ------------------------------------------------------------------------------------ relocation
@@ -151,6 +190,7 @@ extern "C" const char* SirErrorText(SirError e) {
     case SIR_ERR_GAMEDB_FIELD:   return "game database field has an unknown type or a size that does not fit it";
     case SIR_ERR_GAMEDB_ROWSIZE: return "game database field sizes do not add up to the row size";
     case SIR_ERR_GAMEDB_OVERLAP: return "two game database tables share row storage";
+    case SIR_ERR_CATALOG:        return "catalog arrays do not fit in the file";
     case SIR_ERR_IO:             return "cannot read file";
     }
     return "?";
@@ -158,17 +198,19 @@ extern "C" const char* SirErrorText(SirError e) {
 
 // ------------------------------------------------------------------------------------ game database
 
-// GameDb object (header slot 0xDC8): a main.dol pointer, then an array {fn, fn, data, count}
+// GameDb object (header slot 0xDC8): three build-time addresses, then data and count: an array
 // with one element, the block of table descriptors.
 static const SirField kGameDbFields[] = {
-    { 0x00, SIR_PTR, 4 },
+    { 0x00, SIR_U32, 3 },    // addresses from the build that baked the file (see GameDbTable)
+    { 0x0C, SIR_PTR, 1 },
     { 0x10, SIR_U32, 1 },
 };
 #define GAMEDB_OBJ_SIZE 0x14
 
 // Table descriptor (GameDbTable). The flag byte at 0x424 needs no conversion.
 static const SirField kGameDbTableFields[] = {
-    { 0x000, SIR_PTR, 3 },                       // array callbacks, rows
+    { 0x000, SIR_U32, 2 },                       // buildAddr
+    { 0x008, SIR_PTR, 1 },                       // rows
     { 0x00C, SIR_U32, 5 },                       // count, unk10, layoutHash, rowSize, count2
     { 0x020, SIR_U32, GAMEDB_MAX_FIELDS * 4 },   // fieldType, fieldSize, fieldName, fieldRef
     { 0x420, SIR_U32, 1 },                       // fieldCount
@@ -250,7 +292,7 @@ extern "C" SirError GameDbConvert(SirReloc* r, u8* image, u32 imageSize, u32 dbW
     for (s32 t = 0; t < GAMEDB_TABLE_COUNT; t++) {
         const u8* desc = data + t * GAMEDB_DESC_SIZE;
         *failTable = t;
-        // Every descriptor starts with the same two array callbacks as the database object.
+        // Every descriptor starts with the same two words as the database object (+4, +8).
         if (memcmp(desc, db + 4, 8) != 0) return SIR_ERR_GAMEDB_LAYOUT;
         SirError e = ReadRowLayout(desc, imageSize, &layouts[t]);
         if (e != SIR_OK) return e;
