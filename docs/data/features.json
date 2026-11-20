@@ -94,6 +94,11 @@
  "changelog": [
   {
    "date": "2026-11-20",
+   "time": "22:46",
+   "text": "Decompile 50 more missing functions (fn_801F*/fn_8020* helpers, fn_801A*/fn_801B*/fn_801E* UI helpers, ...); fix prototypes"
+  },
+  {
+   "date": "2026-11-20",
    "time": "22:45",
    "text": "Big-endian data loader, first part (PR #7): the PC build now loads the game database from global_binary.sir, converting each field from the Wii's byte order by type and relocating its pointers. A test checks 3,823 values against the reference decoder, and all of them match. The design is in docs/loader.md. Next up: the file catalog, the rest of the game database and the title-screen UI."
   },
