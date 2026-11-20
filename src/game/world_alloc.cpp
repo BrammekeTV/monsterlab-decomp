@@ -18,7 +18,7 @@ struct WorldParams {
     void** out;           // 0x08: receives the world data
 };
 
-static WorldParams* sWorldParams;       ORIG(0x805FB944)
+WorldParams* sWorldParams;       ORIG(0x805FB944)
 s32                 gZoneResourceSize;  ORIG(0x805FB94C) // bytes per zone record
 static u32          sEntitySlotBytes;   ORIG(0x805FB940)
 
@@ -137,7 +137,7 @@ void* memset(void* p, int c, size_t n);
 extern u8   gGame[];                                // 0x803B53A0
 extern u8   gLevelFlags[];                          // 0x80369D60: 0x20 bytes per level
 extern u8   gIdPool[];                              // 0x8048A8F0
-static s32  sZoneBudget;                            ORIG(0x805FB30C)
+s32  sZoneBudget;                            ORIG(0x805FB30C)
 static u8   sZonesDirty;                            ORIG(0x805FB310)
 
 // Eight growable arrays { data, count, owned } shared by all zones, 0x18 bytes apart.

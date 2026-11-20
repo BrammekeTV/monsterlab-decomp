@@ -14,26 +14,26 @@ void  RendInitTargets(void);            // 0x80157668: render targets ("hdrRed"/
 
 // ---- data ----
 EngineMemCallbacks* gRendMem;                           ORIG(0x805FB4A8)
-static RendDL       sDLs[REND_DL_COUNT];                ORIG(0x80401108)
-static RendDLRecord sDLRecords[REND_DL_COUNT];          ORIG(0x80401ADC)
+RendDL       sDLs[REND_DL_COUNT];                ORIG(0x80401108)
+RendDLRecord sDLRecords[REND_DL_COUNT];          ORIG(0x80401ADC)
 static void**       sScratchA;                          ORIG(0x805FB4F8) // 255 blocks of 0x3FC bytes
 static void**       sScratchB;                          ORIG(0x805FB4FC)
 
-static s32  sCurDL;            ORIG(0x805FB4BC) // DL currently being recorded
-static s32  sRecording;        ORIG(0x805FB4C0)
-static u32  sDLCapacity;       ORIG(0x805FB4C4)
-static u32  sDLFlushedEnd;     ORIG(0x805FB4C8) // bytes [x, capacity) still need a cache flush
-static u32  sDLUnkCC;          ORIG(0x805FB4CC)
-static u8*  sDLCursor;         ORIG(0x805FB4D0)
-static s32  sDeferSubmit;      ORIG(0x805FB4D4) // when set, finished DLs queue up instead of running
-static s32  sDeferHead;        ORIG(0x805FB4D8)
-static s32  sDeferCount;       ORIG(0x805FB4DC)
-static s32  sKeepDLs;          ORIG(0x805FB4E0) // when set, finished DLs are not returned to the pool
-static s32  sUnk4E4;           ORIG(0x805FB4E4)
-static s32  sKeptDLCount;      ORIG(0x805FB4E8)
-static s32  sDLBalance;        ORIG(0x805FB4EC)
-static s32  sUnk518;           ORIG(0x805FB518)
-static s32  sUnk51C;           ORIG(0x805FB51C)
+s32  sCurDL;            ORIG(0x805FB4BC) // DL currently being recorded
+s32  sRecording;        ORIG(0x805FB4C0)
+u32  sDLCapacity;       ORIG(0x805FB4C4)
+u32  sDLFlushedEnd;     ORIG(0x805FB4C8) // bytes [x, capacity) still need a cache flush
+u32  sDLUnkCC;          ORIG(0x805FB4CC)
+u8*  sDLCursor;         ORIG(0x805FB4D0)
+s32  sDeferSubmit;      ORIG(0x805FB4D4) // when set, finished DLs queue up instead of running
+s32  sDeferHead;        ORIG(0x805FB4D8)
+s32  sDeferCount;       ORIG(0x805FB4DC)
+s32  sKeepDLs;          ORIG(0x805FB4E0) // when set, finished DLs are not returned to the pool
+s32  sUnk4E4;           ORIG(0x805FB4E4)
+s32  sKeptDLCount;      ORIG(0x805FB4E8)
+s32  sDLBalance;        ORIG(0x805FB4EC)
+s32  sUnk518;           ORIG(0x805FB518)
+s32  sUnk51C;           ORIG(0x805FB51C)
 
 // 0x80148530
 

@@ -22,18 +22,18 @@ struct RendThreadState {
     OSSemaphore   vsync;                               // 0x263C: pulsed on every retrace
     OSSemaphore   freeDLs;                             // 0x2648: display-list buffers available
 };
-static RendThreadState sRend;                          ORIG(0x8040AEA8)
+RendThreadState sRend;                          ORIG(0x8040AEA8)
 
-static s32    sQueueWrite;                             ORIG(0x805FB560)
+s32    sQueueWrite;                             ORIG(0x805FB560)
 static s32    sQueueRead;                              ORIG(0x805FB564)
 static s32    sRetracesSinceFlip;                      ORIG(0x805FB568)
 static s32    sRetracesPerFrame;                       ORIG(0x805FB56C)
-static u32    sFrameTag;                               ORIG(0x805FB570) // last finished frame
-static u32    sShownFrameTag;                          ORIG(0x805FB574)
+u32    sFrameTag;                               ORIG(0x805FB570) // last finished frame
+u32    sShownFrameTag;                          ORIG(0x805FB574)
 static OSTime sLastFrameTime;                          ORIG(0x805FB578)
-static f32    sDisplayFps;                             ORIG(0x805FB580) // measured on retrace
+f32    sDisplayFps;                             ORIG(0x805FB580) // measured on retrace
 static OSTime sGpuBusyTime;                            ORIG(0x805FB588)
-static f32    sGpuFps;                                 ORIG(0x805FB590) // 1 / GPU time per frame
+f32    sGpuFps;                                 ORIG(0x805FB590) // 1 / GPU time per frame
 
 static inline f32 TicksToHz(OSTime ticks) {
     return (f32)OS_TIMER_CLOCK / __cvt_ull_flt((u64)ticks);
@@ -149,6 +149,17 @@ extern "C" void RendThreadInit(RendVideo* video, s32 freeDLs) {
 extern "C" void RendThreadSubmitDL(RendDLRecord* rec, BOOL signalFree) {
     OSWaitSemaphore(&sRend.freeSlots);
     QueuePush(REND_CMD_RUN_DL, rec, signalFree);
+    OSSignalSemaphore(&sRend.pending);
+}
+
+// 0x8015E838
+// Queues "show a new picture every `retraces` retraces" (1 = full rate, 2 = half). The video
+// pointer is not used. The original also stores whatever r7 holds in the command's pointer
+// field (RendSetFlagA, the only caller, does not set it); the render thread ignores it.
+extern "C" void fn_8015E838(u8* video, s32 retraces) {
+    (void)video;
+    OSWaitSemaphore(&sRend.freeSlots);
+    QueuePush(REND_CMD_SET_INTERVAL, NULL, (u32)retraces);
     OSSignalSemaphore(&sRend.pending);
 }
 

@@ -1,4 +1,4 @@
-// Video bring-up: picks the TV mode, allocates the two frame buffers and the GX FIFO, starts VI
+// Video bring-up: picks the TV mode, allocates the two frame buffers and the GX FIFO (MEM1), starts VI
 // and GX and installs the draw-done / draw-sync callbacks the render thread waits on.
 // Original: 0x8015BF40 - 0x8015D23C, GX default state 0x8015D660 - 0x8015DDEC
 // (auto_03_80156AAC_text.s)
@@ -116,10 +116,11 @@ extern void*        lbl_805FB534;       // 0x805FB534: memory of the main GX FIF
 extern void*        lbl_805FB538[];     // 0x805FB538: the two external frame buffers
 extern u8           lbl_805FB540;       // 0x805FB540: a display list is being captured
 extern s32          lbl_805FB544;       // 0x805FB544: number of draw-sync handlers
+extern u8           lbl_805FB548[];     // 0x805FB548: draw-sync handler keys (the token's high byte)
+extern u8           lbl_8040AE88[];     // 0x8040AE88: draw-sync handlers (function pointers)
 extern s32          lbl_805FB550;       // 0x805FB550: frame buffer width
 extern s32          lbl_805FB554;       // 0x805FB554: frame buffer height
 extern u8           lbl_805F9250;       // 0x805F9250: when set, the picture is narrowed (viWidth 666/670)
-extern MEMAllocator lbl_803F2870;       // 0x803F2870
 // TV mode tables (.data, GXRenderModeObj each)
 extern u8 lbl_803982F0[];               // 0x803982F0: NTSC interlaced
 extern u8 lbl_8039832C[];               // 0x8039832C: NTSC progressive
@@ -141,8 +142,8 @@ extern "C" void VideoInit(RendVideo* video) {
     VIInit();
     OSInitSemaphore(&gVideoDrawDone, 0);
     OSInitSemaphore(&gVideoGXLock, 1);
-    for (int i = 0; i < 2; i++) lbl_805FB538[i] = MEMAllocFromAllocator(&lbl_803F2870, VIDEO_FRAME_BUFFER_SIZE);
-    lbl_805FB534 = MEMAllocFromAllocator(&lbl_803F2870, VIDEO_FIFO_SIZE);
+    for (int i = 0; i < 2; i++) lbl_805FB538[i] = MEMAllocFromAllocator(&gSysAllocator, VIDEO_FRAME_BUFFER_SIZE);
+    lbl_805FB534 = MEMAllocFromAllocator(&gSysAllocator, VIDEO_FIFO_SIZE);
     lbl_805FB540 = 0;
     lbl_805FB544 = 0;
 
@@ -201,6 +202,16 @@ extern "C" void VideoInit(RendVideo* video) {
     fn_8024B358();
     fn_8024B5D4((void*)fn_8015D2E0);
     fn_8024B50C((void*)fn_8015D23C);
+}
+
+// 0x8015D2B8
+// Registers a handler for draw-sync tokens whose high byte is `key` (see fn_8015D23C).
+extern "C" void fn_8015D2B8(RendVideo* video, s32 key, void (*handler)(void)) {
+    (void)video;
+    s32 count = lbl_805FB544;
+    lbl_805FB548[count] = (u8)key;
+    *(void (**)(void))(lbl_8040AE88 + count * 4) = handler;
+    lbl_805FB544 = count + 1;
 }
 
 // 0x8015D660

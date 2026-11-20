@@ -123,6 +123,9 @@ EXTERN_DATA = re.compile(r"^\s*extern\s+(?:\"C\"\s+)?(?:const\s+|volatile\s+)*([
 NOT_NAMES = {"if", "for", "while", "switch", "return", "sizeof", "static", "extern", "void", "int", "ORIG"}
 
 
+PC_NO_INIT = {}   # addr -> name: globals the sources define without an initial value
+
+
 def scan_sources():
     """-> (notes: name -> Counter(addr) from address comments on declaration lines,
            markers: addr -> function name from '// 0xADDR' definition markers,
@@ -130,6 +133,7 @@ def scan_sources():
            pc_defs: addr -> name for globals the sources define themselves (ORIG markers))."""
     notes = collections.defaultdict(collections.Counter)
     markers, decl_kind, pc_defs = {}, collections.defaultdict(collections.Counter), {}
+    PC_NO_INIT.clear()
     files = glob.glob(os.path.join(ROOT, "src", "**", "*.cpp"), recursive=True) + \
         glob.glob(os.path.join(ROOT, "include", "**", "*.h"), recursive=True)
     for path in files:
@@ -160,9 +164,11 @@ def scan_sources():
                 continue
             addr = int(a.group(1), 16)
             if "ORIG(" in l and "extern" not in code:   # a definition in the sources
-                d = re.search(r"([A-Za-z_]\w*)\s*(?:\[[^\]]*\]\s*)*(?:=[^;]*)?;\s*ORIG\(", l)
+                d = re.search(r"([A-Za-z_]\w*)\s*(?:\[[^\]]*\]\s*)*(=[^;]*)?;\s*ORIG\(", l)
                 if d:
                     pc_defs.setdefault(addr, d.group(1))
+                    if not d.group(2):
+                        PC_NO_INIT[addr] = d.group(1)
                 continue
             # declaration with an address note: the declared name is the identifier before ( [ ; =
             d = re.search(r"([A-Za-z_]\w*)\s*(?:\(|\[|;|=)", re.sub(r"\([^()]*\*\s*([A-Za-z_]\w*)\)\s*\(", r"\1(", code))
@@ -422,6 +428,14 @@ def main():
                            ("Names resolved to a definition under another name", "alias"),
                            ("Split globals: defined in the sources AND used at the original address (two copies)", "split")):
             f.write(f"\n{title}: {len(report[key])}\n" + "".join(f"  {x}\n" for x in sorted(set(report[key]))))
+        # A global the sources define does not get its bytes from main.dol. If the original keeps
+        # it in an initialised section, a definition without a value starts as 0 instead.
+        sec_of = {v[1]: v[0] for v in syms.values()}
+        noinit = sorted((x, n, sec_of[x]) for x, n in PC_NO_INIT.items()
+                        if sec_of.get(x) in (".data", ".sdata", ".sdata2", ".rodata"))
+        f.write(f"\nDefined in the sources without an initial value, but in an initialised section of the "
+                f"original (starts as 0 unless main.dol has 0 there too): {len(noinit)}\n")
+        f.write("".join(f"  0x{x:08X} {n} ({sec})\n" for x, n, sec in noinit))
         f.write(f"\nDecompiled as static (not reachable through their original address): {len(static_fns)}\n")
         f.write("".join(f"  0x{x:08X} {n}\n" for x, n in sorted(static_fns)))
         f.write(f"\nGame function stubs: {len(game)}\n" + "".join(f"  0x{x:08X} {n} size 0x{s:X} ({src})\n" for x, n, s, src in game))

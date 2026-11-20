@@ -56,13 +56,13 @@ extern StringTable* gStringTable2;   ORIG(0x805FB90C)
 #define STATUS_DISABLED     0xD
 
 // ---- data ----
-static u8  sHudLocked;                    ORIG(0x805FB099)
-static u8  sHudEnabled = 1;               ORIG(0x805F865C)
+u8  sHudLocked;                    ORIG(0x805FB099)
+u8  sHudEnabled = 1;               ORIG(0x805F865C)
 s32        gSelectedPart = -1;            ORIG(0x805F8650)
 s32        gHighlightedAction = -1;       ORIG(0x805F8654)
-static u8  sDefectShown;                  ORIG(0x805FB0BC)
-static u8  sEnhancementShown;             ORIG(0x805FB0BD)
-static u8  sActionReady[2];               ORIG(0x805FB09C)
+u8  sDefectShown;                  ORIG(0x805FB0BC)
+u8  sEnhancementShown;             ORIG(0x805FB0BD)
+u8  sActionReady[2];               ORIG(0x805FB09C)
 s32        gPartSlotState[10];            ORIG(0x803C52E0)
 
 static const u32 kDisciplineIcon[3] = { 0xF25835CB, 0x2D8AF405, 0x92825F01 };   // 0x803589EC

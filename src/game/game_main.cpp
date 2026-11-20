@@ -18,9 +18,9 @@ void EngineShutdown(void);        // 0x801D17FC
 void EngineCleanup(void* ctx);    // 0x801D1538
 }
 
-static int    sArgc;              ORIG(0x805FB77C)
-static char** sArgv;              ORIG(0x805FB780)
-static u8     sEngineCtx[8];      ORIG(0x805FB770)
+int    sArgc;              ORIG(0x805FB77C)
+char** sArgv;              ORIG(0x805FB780)
+static u8 sEngineCtx[8];   ORIG(0x805FB770)
 u8            gFrameLimitEnabled; ORIG(0x805FBA08)
 s32           gTargetFps;         ORIG(0x805FBA0C)
 u8            gQuitRequested;     ORIG(0x805FB758)
