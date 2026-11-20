@@ -10,7 +10,7 @@ void    operator_delete(void* p);                                    // 0x801D42
 u8*     fn_801B3604(u8* p, s32 del);                                 // 0x801B3604 (deleting dtor)
 void    fn_80146F50(u8* p, s32 a);                                   // 0x80146F50 (base dtor)
 u8*     fn_80146FD8(u8* p, s32 a);                                   // 0x80146FD8 (base dtor)
-void    fn_80147150(u8* p, s32 a);                                   // 0x80147150 (base dtor)
+u8*     fn_80147150(u8* p, s32 a);                                   // 0x80147150 (base dtor)
 u8*     fn_801FA82C(u8* p, s32 del);                                 // 0x801FA82C (deleting dtor)
 s32     fn_801F5294(s32 idx);                                        // 0x801F5294
 void    fn_801F5E3C(void* a, const void* b, s32 c);                  // 0x801F5E3C (leaf in src/leaf, takes args here)

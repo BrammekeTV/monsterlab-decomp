@@ -16,15 +16,15 @@ extern u8 lbl_805FB470[];
 extern u8 lbl_805FB47C[];
 extern u8 lbl_805FB480[];
 extern void* lbl_805FB498;
-extern u8 lbl_805FB4A0[];
+extern void* lbl_805FB4A0;
 extern s32 lbl_805FB4E0;
 extern u8 lbl_805FB4F0[];
 extern u8 lbl_805FB4F4[];
 extern u8 lbl_805FB518[];
-extern u8 lbl_805FB524[];
+extern u8 lbl_805FB524;
 extern s32 lbl_805FB594;
-extern u8 lbl_805FF0E4[];
-extern u8 lbl_805FF0EC[];
+extern f32 lbl_805FF0E4;
+extern f32 lbl_805FF0EC;
 extern "C" BOOL DVDInit(void);
 extern "C" void MEMFreeToAllocator(u8*, void*);
 extern "C" void* VideoGetFrameBuffer(u8*, int);
@@ -32,7 +32,7 @@ extern "C" void fn_80142898(u8*);
 extern "C" void fn_80151264(void);
 extern "C" void fn_8015E838(u8*, s32);
 extern "C" void fn_8015E8B4(u8*, s32);
-extern "C" void fn_8015EA90(u8*);
+extern "C" void fn_8015EA90(void);
 extern "C" void* fn_80330D80(s32);
 extern "C" void fn_80330E20(void*);
 
@@ -244,8 +244,7 @@ extern "C" void* fn_80150DD4(void) {
 
 // 0x80151244
 extern "C" void fn_80151244(void) {
-    // tail-call arguments inferred from the registers set before the call
-    fn_8015EA90((u8*)&lbl_805FB594);
+    fn_8015EA90();
 }
 
 // 0x8015124C
@@ -262,7 +261,6 @@ extern "C" void SetRenderEnabled(s32 a3) {
 
 // 0x801514D4
 extern "C" void fn_801514D4(void) {
-    // tail-call arguments inferred from the registers set before the call
     u8 t0 = *(u8*)((u8*)&lbl_805FB524);
     if (t0 != 0) {
         return;
@@ -273,7 +271,6 @@ extern "C" void fn_801514D4(void) {
 
 // 0x801514F0
 extern "C" void fn_801514F0(void) {
-    // tail-call arguments inferred from the registers set before the call
     u8 t0 = *(u8*)((u8*)&lbl_805FB524);
     if (t0 == 0) {
         return;

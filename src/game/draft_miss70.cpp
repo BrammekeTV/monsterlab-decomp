@@ -18,7 +18,7 @@ u8*   fn_800C73EC(u8* h);                                       // 0x800C73EC (l
 void  fn_801C83AC(u8* mgr, u8* item);                           // 0x801C83AC
 void  SpawnEffectAt(void* fxMgr, u32 effect, const f32 posAndScale[4], void* owner); // 0x801C80E0; 4th arg is a pointer in the asm
 int   SysSprintf(char* buf, const char* fmt, ...);
-s32   fn_801094F4(const char* name, s32 flags);                 // 0x801094F4
+u8*   fn_801094F4(char* name, s32 flags);                       // 0x801094F4
 void  fn_8018D2B8(const char* fmt, ...);                        // 0x8018D2B8
 u8*   fn_8019BF64(u8* widget, u32 hash);                        // 0x8019BF64
 void  RobotEvolutionExperiment_SmasherIdling(u8* obj);         // small_8009b.cpp
@@ -132,10 +132,10 @@ void fn_800D5B1C(u8* arg0, s32 arg1, f32* arg2) {
 
 // 0x8011ED38
 // Builds "quest_icon_<n>" (falls back to the placeholder name) and looks it up.
-s32 fn_8011ED38(s32 arg0) {
+u8* fn_8011ED38(s32 arg0) {
     char name[0x100];
     SysSprintf(name, lbl_8036D2E4, lbl_805F8F90, (s32)(s8)arg0);
-    s32 r = fn_801094F4(name, 0);
+    u8* r = fn_801094F4(name, 0);
     if (r == 0) {
         SysSprintf(name, lbl_8036D2F8, lbl_805F8F90);
         r = fn_801094F4(name, 0);

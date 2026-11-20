@@ -94,7 +94,7 @@ u8* ObjRefDtor(u8* ref, s32 flags);        // 0x800D50D0
 void* ScreenSetsCurrent(void* sets);       // 0x8018D1E4
 void* fn_80198E68(void* set, u32 hash);    // 0x80198E68
 u8* fn_8022E2F0(u8* save);                 // 0x8022E2F0
-s32 fn_8011ED38(s32 a);                    // 0x8011ED38
+u8* fn_8011ED38(s32 a);                    // 0x8011ED38
 s32 fn_80109A0C(s32 id);                   // 0x80109A0C
 s32 TextIdFromHash(u32 hash);              // 0x80120D34: -1 if unknown
 s32 fn_80222994(u8* s);                    // 0x80222994
@@ -234,9 +234,8 @@ void fn_800E6684(u8* arg0) {
             if (k != 0 && arg0[0x1C] != 0 && *(s32*)(arg0 + 0xC) == 0) {
                 u8* rec = *(u8**)(gGameDb->data + 0x8930) + k * 8;
                 u8 b = (u8)(*(u32*)(rec + 4) >> 24);
-                s32 r = fn_8011ED38((s8)b);
-                *(s32*)(arg0 + 0xC) = r;
-                if (fn_80109A0C(r) != 0) {
+                *(u8**)(arg0 + 0xC) = fn_8011ED38((s8)b);
+                if (fn_80109A0C(*(s32*)(arg0 + 0xC)) != 0) {
                     *(s32*)(arg0 + 0x8) = *(s32*)(arg0 + 0xC);
                     *(s32*)(arg0 + 0xC) = 0;
                 }

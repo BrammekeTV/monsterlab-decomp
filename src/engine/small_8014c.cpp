@@ -20,7 +20,7 @@ s32   fn_80334290(void* obj);                                    // 0x80334290
 void  fn_80333B60(void* obj);                                    // 0x80333B60
 void  fn_8024F494(u8* p);                                        // 0x8024F494
 u8*   fn_80142500(void* p);                                      // 0x80142500
-void  fn_801472A8(u8* table);                                    // 0x801472A8
+void  fn_801472A8(void);                                         // 0x801472A8
 void  fn_801479D0(u8* table);                                    // 0x801479D0
 void  fn_802727E0(s32 a, s32 b);                                 // 0x802727E0
 s32   fn_801478C8(u8* table, s32 idx);                           // 0x801478C8
@@ -230,7 +230,7 @@ void fn_80148228(void) {
     lbl_805FB494 = old;
     fn_801479D0(old);
     memset(lbl_805FB490, 0, 0x400);
-    fn_801472A8(lbl_805FB490);
+    fn_801472A8();
 }
 
 // 0x80149428
