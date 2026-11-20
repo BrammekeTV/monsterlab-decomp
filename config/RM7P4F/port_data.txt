@@ -1,0 +1,10 @@
+# Byte order of main.dol data that the automatic rules get wrong (see docs/port_runtime.md).
+# <name|0xADDR> <field widths in bytes, repeated over the symbol>
+# GXRenderModeObj: the TV mode tables VideoInit copies
+lbl_803982F0 4 2 2 2 2 2 2 2 2 4 1x36
+lbl_8039832C 4 2 2 2 2 2 2 2 2 4 1x36
+lbl_80398368 4 2 2 2 2 2 2 2 2 4 1x36
+lbl_803983A4 4 2 2 2 2 2 2 2 2 4 1x36
+lbl_803983E0 4 2 2 2 2 2 2 2 2 4 1x36
+lbl_8039841C 4 2 2 2 2 2 2 2 2 4 1x36
+lbl_80398458 4 2 2 2 2 2 2 2 2 4 1x36
