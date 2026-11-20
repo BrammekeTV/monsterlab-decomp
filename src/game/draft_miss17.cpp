@@ -19,7 +19,7 @@ void*  ScreenSetFindElement(void* set, u32 hash);                               
 void*  ScreenSetFindWidget(void* set, u32 hash);                                               // 0x80198E34
 void*  ScreenSetsCurrent(void* sets);                                                          // 0x8018D1E4
 void   TextureRelease(void* tex);                                                              // 0x80184028
-void   TriggerDoAction(void* action, void* a4, void* a5);                                      // 0x801E0054
+s32 TriggerDoAction(void* action, void* a1, void* a2);                                      // 0x801E0054
 void*  UIWidgetFindChild(void* widget, u32 hash);                                              // 0x80199AEC
 s32    WorldGetPhase(void* world);                                                             // 0x800D83A8
 void   WorldSendEvent(void* world, s32 id, int a, int b, int c);                               // 0x800D87EC

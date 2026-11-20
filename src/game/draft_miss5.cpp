@@ -34,7 +34,7 @@ void* ScreenSetsCurrent(void* sets);                              // 0x8018D1E4
 void  ScreenSetsFlush(void* sets);                                // flushes pending screen set events
 u32   StringHash(const char* s);                                  // 0x801EB704
 int   SysSprintf(char* buf, const char* fmt, ...);                // 0x80142EFC
-void  TriggerDoAction(void* action, void* a4, void* a5);          // 0x801E0054
+s32 TriggerDoAction(void* action, void* a1, void* a2);          // 0x801E0054
 void  UIPlayAnim(void* el, u32 anim);                             // 0x8019BE40
 s32   WorldGetPhase(void* world);                                 // 0x800D83A8
 void  fn_80016FD0(Character* c, int animate);                     // 0x80016FD0

@@ -28,7 +28,7 @@ void* ScreenSetFindWidget(void* set, u32 hash);                  // 0x80198E34
 void* ScreenSetsCurrent(void* sets);                             // 0x8018D1E4
 u32   StringHash(const char* s);                                 // 0x801EB704
 int   SysSprintf(char* buf, const char* fmt, ...);               // 0x80142EFC
-void  TriggerDoAction(void* action, void* a4, void* a5);         // 0x801E0054
+s32 TriggerDoAction(void* action, void* a1, void* a2);         // 0x801E0054
 BOOL  ZoneIsLoaded(void* world, s32 zone);                       // 0x8012F408
 s32  fn_8004D3F8(void* c, const char* name, s32 a, s32 b);      // 0x8004D3F8
 void  fn_8004F310(void* slot, s32 idx, s32 a, s32 b);            // 0x8004F310

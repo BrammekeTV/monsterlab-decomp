@@ -94,6 +94,11 @@
  "changelog": [
   {
    "date": "2026-11-20",
+   "time": "17:14",
+   "text": "Decompile 43 more missing functions (BrainPowerUpEnact, FireShot, FireWarningShot, CatchMinigame_SpawnInLane, SaveReset, fn_801BC* and fn_8015E* helpers, ...); fix prototypes"
+  },
+  {
+   "date": "2026-11-20",
    "time": "16:54",
    "text": "Decompile 36 more missing functions (RandomU32, PlaySound, app_PlayMusic, ScreenSetsActivate, RendEndFrame, RngNext, ZoneEffectsUpdate, fn_801EC8C4, ...); fix prototypes"
   },

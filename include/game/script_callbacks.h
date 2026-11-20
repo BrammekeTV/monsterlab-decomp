@@ -81,13 +81,13 @@ u32 BrainHeadFreebieIsNext(u32 a3);                                    // src/le
 u32 BrainHeadGetTrackedChunk(u32 a3);                                  // src/leaf/auto_03_80083A6C_text_cb.cpp
 void BrainHeadGoToTrapDoor(u32 a3);                                    // src/leaf/auto_03_80083A6C_text_cb.cpp
 u32 BrainHeadIsEating(u32 a3);                                         // src/leaf/auto_03_80083A6C_text_cb.cpp
-void BrainHeadMove(u32 /*0x58*/ a0);  // type 0xE5 (from signature table)
+void BrainHeadMove(u32 /*0x58*/ a0);                                   // src/game/draft_miss173.cpp
 u32 BrainHeadMovingSideways(u32 a3);                                   // src/leaf/auto_03_80083A6C_text_cb.cpp
 void BrainHeadPlayIdleAnim(u32 /*0x58*/ a0);                           // src/game/draft_miss13.cpp
 void BrainHeadSetEating(u32 a3, u32 a4);                               // src/leaf/auto_03_80083A6C_text_cb.cpp
 u32 /*0x06*/ BrainHeadSetFreebieIsNext(u32 /*0x58*/ a0, u32 /*0x06*/ a1);  // type 0x9E (from signature table)
 void BrainPowerUpArrive(u32 /*0x59*/ a0);                              // src/game/draft_miss13.cpp
-void BrainPowerUpEnact(u32 /*0x59*/ a0);  // type 0xE8 (from signature table)
+void BrainPowerUpEnact(u32 /*0x59*/ a0);                               // src/game/draft_miss173.cpp
 s32 BrainPowerUpGetNextPowerUpType(u32 a3);                            // src/leaf/auto_03_80084E94_text_cb.cpp
 u32 /*0x06*/ BrainPowerUpIsTouchingHead(u32 /*0x59*/ a0);  // type 0x9F (from signature table)
 void BrainPowerUpSetActive(u32 a3, u32 a4);                            // src/leaf/auto_03_80084E94_text_cb.cpp
@@ -410,9 +410,9 @@ void FaderSetTargetColour(f32 a0, f32 a1, f32 a2);                     // src/en
 void FilenameTimestamp(BOOL a0);                                       // src/engine/small_8014c.cpp
 void FireLightningAtTarget(void* a0, u32 /*0x30*/ a1, u32 a2, u32 /*0x38*/ a3, f32 a4, f32 a5, u32 /*0x17*/ a6); // src/game/draft_miss102.cpp
 void FireRocketAtEntity(void* a0);                                     // src/game/draft_miss19.cpp
-void FireShot(void* a0, u32 /*0x30*/ a1, u32 /*0x38*/ a2, f32 a3, f32 a4);  // type 0xFA (from signature table)
+void FireShot(void* a0, u32 /*0x30*/ a1, u32 /*0x38*/ a2, f32 a3, f32 a4); // src/game/draft_miss173.cpp
 void FireShotAtFeet(void* a0, u32 /*0x30*/ a1, u32 /*0x38*/ a2, f32 a3, f32 a4); // src/game/draft_miss112.cpp
-void FireWarningShot(void* a0, u32 /*0x30*/ a1, u32 /*0x38*/ a2, f32 a3, f32 a4);  // type 0xFA (from signature table)
+void FireWarningShot(void* a0, u32 /*0x30*/ a1, u32 /*0x38*/ a2, f32 a3, f32 a4); // src/game/draft_miss173.cpp
 u32 FixUpEntityCallback(u32 a0, u32 a1);                               // src/game/draft_miss20.cpp
 u32 FixUpEntityPartCallback(u32 a0, u32 a1);                           // src/game/draft_miss20.cpp
 u32 FixUpPooledEntityCallback(u32 a0, u32 a1);                         // src/game/draft_miss20.cpp
@@ -422,7 +422,7 @@ u32 FixupFSMPoolCallback(u32 a0, u32 a1);                              // src/ga
 void ForceCameraRotateMode(u32 a3);                                    // src/leaf/auto_03_800DB9A4_text_cb.cpp
 void ForceStrafeMode(s32 a3);                                          // src/leaf/auto_03_800E75B0_text_cb.cpp
 void ForceTracingGame(u32 a3);                                         // src/leaf/auto_03_800E75B0_text_cb.cpp
-void FrameFxRippleAtChild(void* a0, u32 /*0x30*/ a1, f32 a2);  // type 0xFD (from signature table)
+void FrameFxRippleAtChild(void* a0, u32 /*0x30*/ a1, f32 a2);          // src/game/draft_miss173.cpp
 void FreezeCamera(u32 a0);                                             // src/game/draft_miss20.cpp
 void FreezePlayerInput(s32 a3);                                        // src/leaf/auto_03_800E75B0_text_cb.cpp
 void FriendCodeInputClickedKey(BOOL a0);                               // src/game/draft_miss20.cpp

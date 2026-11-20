@@ -26,7 +26,7 @@ void   GameLog(int level, int category, const char* fmt, ...);            // 0x8
 void   PropPlayAnim(void* prop, int a, int b, BOOL once);                 // 0x80069350
 void*  ScreenSetFindWidget(void* set, u32 hash);                          // 0x80198E34
 int    SysSprintf(char* buf, const char* fmt, ...);                       // 0x80142EFC
-void   TriggerDoAction(void* action, void* a4, void* a5);                 // 0x801E0054
+s32 TriggerDoAction(void* action, void* a1, void* a2);                 // 0x801E0054
 s32    WorldGetPhase(void* world);                                        // 0x800D83A8
 u8*    fn_80062CE0(u8* p, s32 del);                                       // 0x80062CE0
 void   fn_80126808(void);                                                 // 0x80126808
@@ -53,7 +53,7 @@ void   fn_801ABC50(void* h);                                              // 0x8
 void   fn_801ABCEC(void* h, void* owner);                                 // 0x801ABCEC
 void   fn_801B9FA4(void* mgr, void* obj, void* cb, void* ctx);            // 0x801B9FA4
 s32 fn_801BB3D4(u8* arg0, s32 arg1, s32 arg2, s32 arg3, u8* arg4);                                                 // 0x801BB3D4 (event callback)
-void   fn_801BB434(void);                                                 // 0x801BB434 (event callback)
+s32 fn_801BB434(void* mgr, s32 id, s32 a, s32 b);                                                 // 0x801BB434 (event callback)
 void   fn_801BB8A0(u8* hud);                                              // 0x801BB8A0
 void   fn_801BBC9C(u8* hud, u8* sub, u8* state);                          // 0x801BBC9C
 void   fn_801BC098(u8* state, u8* hud);                                   // 0x801BC098

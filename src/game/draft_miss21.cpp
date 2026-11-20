@@ -38,7 +38,7 @@ void   BufferFree(void* p);                                          // 0x801D49
 void   TextureRelease(void* tex);                                    // 0x80184028
 void   fn_801731C8(void* p);                                         // 0x801731C8
 void   fn_8017323C(u8* list, u8* node);                              // 0x8017323C
-void   fn_801BC5F0(void* obj, void* target);                         // 0x801BC5F0
+void fn_801BC5F0(void* obj);                         // 0x801BC5F0
 void   fn_801ED788(f32* out, u8* ref);                               // 0x801ED788
 s32    fn_8033B1C0(const char* name, u8* entry);                     // 0x8033B1C0
 s32    fn_801F57C4(void);                                            // 0x801F57C4
@@ -163,7 +163,7 @@ u8* fn_8016A08C(const char* name) {
 // Points the object's target slot at the static block and runs the setup on it. Returns the object.
 void* fn_801BC574(void* arg0) {
     *(void**)((u8*)arg0 + 0x34) = lbl_80383F58;
-    fn_801BC5F0(arg0, lbl_80383F58);
+    fn_801BC5F0(arg0);
     return arg0;
 }
 

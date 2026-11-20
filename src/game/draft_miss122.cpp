@@ -36,7 +36,7 @@ BOOL  fn_80198C34(void* set, void* w);                          // 0x80198C34
 u8*   fn_80198E20(u8* set);                                     // 0x80198E20
 void* fn_80198F1C(void* set, u32 hash);                         // 0x80198F1C
 s32   fn_8019EE40(u8* widget, u32 id, s32 flag);                // 0x8019EE40
-s32   fn_801AA730(u32 id, f32* v, f32 t);                       // 0x801AA730
+s32   fn_801AA730(u8* dst, u8* src);                      // 0x801AA730
 void  fn_801AA760(f32* out, u32 id);                            // 0x801AA760
 s32   fn_801B19C4(void* a, u32 hashA, void* b, u32 hashB, u8* outA, u8* outB, s32 c, s32 d);  // 0x801B19C4
 s32   fn_801D5F6C(void);                                        // 0x801D5F6C
@@ -394,7 +394,7 @@ void fn_80025524(u8* self, f32* pos, f32* vel) {
         fn_801AA760(out, id);
         v[2] = out[2];
         v[3] = out[3];
-        fn_801AA730(id, v, out[3]);
+        fn_801AA730((u8*)(intptr_t)id, (u8*)v);  // lint:ok 32-bit handle
     }
 }
 

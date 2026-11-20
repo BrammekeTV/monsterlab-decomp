@@ -471,7 +471,7 @@ u8* CharacterFind(u32 id) {
 // Runs a trigger action word: bits 1-4 give the kind, the low 18 bits the index. Kind 2 runs the
 // action from a zone's action table (zone id in bits 5-13); kind 4 calls a registered script
 // function (types 0x16 / 0x1D return a value, 0x2F / 0x4E do not). The result (r3) is not used by callers.
-void TriggerDoAction(void* action, void* a1, void* a2) {
+s32 TriggerDoAction(void* action, void* a1, void* a2) {
     u8* obj = (u8*)a1;
     ScriptValue result = 0;
     u32 w = *(u32*)action;
@@ -532,7 +532,7 @@ void TriggerDoAction(void* action, void* a1, void* a2) {
             break;
         }
     }
-    (void)result;
+    return (s32)result;
 }
 
 // 0x801EC880

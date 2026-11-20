@@ -35,7 +35,7 @@ void*  ScreenSetFindElement(void* set, u32 hash);                // 0x80198F18
 void   ScreenSetsActivate(void* sets, u32 hash);                 // 0x8018D70C
 void*  ScreenSetsCurrent(void* sets);                            // 0x8018D1E4
 int    SysSprintf(char* buf, const char* fmt, ...);              // 0x80142EFC
-void   TriggerDoAction(void* action, void* a4, void* a5);        // 0x801E0054
+s32 TriggerDoAction(void* action, void* a1, void* a2);        // 0x801E0054
 void   UIPlayAnim(void* el, u32 anim);                           // 0x8019BE40
 void   Vec3Assign(Vec3* out, const Vec3* v);                     // 0x80053354
 void   Vec3SetZero(Vec3* out);                                   // 0x800531A8

@@ -17,7 +17,7 @@ extern u8 lbl_805FFB08[];
 extern "C" void EventSend(void*, void*, void*, u32, int, int, int, int);
 extern "C" void EventSendTo(void*, u32, void*, u32, int, int);
 extern "C" void fn_801B1778(u8*, s32);
-extern "C" void fn_801BB530(s32, s32);
+extern "C" void fn_801BB530(u8*, u8*);
 extern "C" void fn_801EBA20(void*, void*);
 extern "C" void fn_801EBBE0(s32, u8*, s32);
 
@@ -61,18 +61,17 @@ extern "C" void fn_801B432C(s32 a3) {
 
 // 0x801B4C40
 extern "C" void fn_801B4C40(u8* a3) {
-    // tail-call arguments inferred from the registers set before the call
     u8* t0 = *(u8**)(((u8*)(uintptr_t)(a3)) + 164);
     if (t0 == 0) {
         return;
     }
-    s32 t1 = *(s32*)(t0 + 0);
+    u8* t1 = *(u8**)(t0 + 0);
     if (t1 == 0) {
         return;
     }
     s32 t2 = *(s32*)(((u8*)(uintptr_t)(a3)) + 4);
     u32 t3 = (u32)(t2) + 55u;
-    fn_801BB530((s32)((u32)(t1)), (s32)((u32)(t3)));
+    fn_801BB530(t1, (u8*)(uintptr_t)(t3));
 }
 
 // 0x801B5334

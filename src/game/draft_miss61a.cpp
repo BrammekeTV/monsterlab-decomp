@@ -21,7 +21,7 @@ u8*  fn_80222704(u8* s, s32 a, s32 b);  // 0x80222704
 void fn_80116BE8(u8* p);     // 0x80116BE8
 void fn_80116E54(u8* p, s32 a, s32 b);  // 0x80116E54
 void fn_80116EF0(u8* p, s32 a);         // 0x80116EF0
-s32  fn_8014ACCC(s32, s32, s32, s32, s32*, s32*, s32, s32);  // 0x8014ACCC
+void fn_8014ACCC(u32 mode, s32 fmt, s32 w, s32 h, s32* outSize, s32* outStride, s32* outW, s32* outH);  // 0x8014ACCC
 void fn_8015B19C(void);      // 0x8015B19C
 void fn_8016964C(u8* mgr, u8* tex);     // 0x8016964C
 u8*  fn_801840E4(u8* a, u8* b, s32 c);  // 0x801840E4

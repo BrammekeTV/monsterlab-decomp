@@ -41,7 +41,7 @@ BOOL  fn_800E6BD4(void);                                                // 0x800
 void* fn_800E60BC(void);                                                // 0x800E60BC
 void* fn_801F06FC(void);                                                // 0x801F06FC
 void  GameFlowSignal(s32 id, s32 arg1, s32 arg2);                       // src/game/game_ui.cpp
-void  TriggerDoAction(void* action, void* a4, void* a5);                // 0x801E0054
+s32 TriggerDoAction(void* action, void* a1, void* a2);                // 0x801E0054
 void* SpawnHelper(void* owner, void* arg);                              // 0x8000C478 (arg is a pointer here, s32 elsewhere)
 void  MonsterSetName(void* monster, const char* name);                  // 0x8021C8E0
 s32   TextIdFromHash(u32 hash);                                         // 0x80120D34: -1 if unknown

@@ -23,7 +23,7 @@ typedef void (*VFlagFn)(void* self, s32 flag);
 extern "C" {
 s32 PlaySoundAt(void* sound, int a, const void* pos, int b);  // 0x80209ABC
 void* ScreenSetsCurrent(void* sets);                          // 0x8018D1E4
-void TriggerDoAction(void* action, void* a4, void* a5);       // 0x801E0054
+s32 TriggerDoAction(void* action, void* a1, void* a2);       // 0x801E0054
 void UIPlayAnim(void* el, u32 anim);                          // 0x8019BE40
 void fn_8018D2B8(const char* fmt, ...);                       // 0x8018D2B8 (debug log)
 void fn_8018D370(const char* fmt, ...);                       // 0x8018D370 (debug log)

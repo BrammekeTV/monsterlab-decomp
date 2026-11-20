@@ -72,7 +72,7 @@ s32    WorldGetPhase(void* world);                       // 0x800D83A8
 Locator* WorldFindLocator(void* world, u32 hash);        // 0x8012AA50
 void   WorldPreUpdate(void* world);                      // 0x80130418
 void*  CharacterFind(s32 id);                            // 0x800E876C
-void   TriggerDoAction(void* action, void* a4, void* a5);        // 0x801E0054
+s32 TriggerDoAction(void* action, void* a1, void* a2);        // 0x801E0054
 void   SessionBegin(void* session);                      // 0x80013690
 void   GameSetNextMode(s32 mode);                        // 0x8000CFD8
 void*  ScreenSetsCurrent(void* sets);                    // 0x8018D1E4

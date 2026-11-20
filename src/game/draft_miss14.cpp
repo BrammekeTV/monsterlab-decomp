@@ -11,7 +11,7 @@ extern "C" {
 void*  EventPost(s32 id, void* sender);                              // 0x801F3918
 BOOL   FighterStatsHasEffect(u8* stats, s32 id);                     // 0x80214050
 int    SysSprintf(char* buf, const char* fmt, ...);                  // 0x80142EFC
-void   TriggerDoAction(void* action, void* a4, void* a5);            // 0x801E0054
+s32 TriggerDoAction(void* action, void* a1, void* a2);            // 0x801E0054
 void   UISetText(void* el, const char* text, s32 a);                 // 0x8019EFC8
 void   UIWidgetPlayAnimLoop(void* w, u32 anim, s32 n);               // 0x8019BB1C
 BOOL   ZoneIsLoaded(void* world, s32 zone);                          // 0x8012F408

@@ -20,7 +20,7 @@ void*  ScreenSetFindElement(void* set, u32 hash);                   // 0x80198F1
 void*  ScreenSetsCurrent(void* sets);                               // 0x8018D1E4
 void   SpawnEffectAt(void* fxMgr, u32 effect, const f32 posAndScale[4], int a); // 0x801C80E0
 int    SysSprintf(char* buf, const char* fmt, ...);
-void   TriggerDoAction(void* action, void* a4, void* a5);           // 0x801E0054
+s32 TriggerDoAction(void* action, void* a1, void* a2);           // 0x801E0054
 void*  UIWidgetFindChild(void* widget, u32 hash);                   // 0x80199AEC
 s32    __cvt_fp2signed(s32 v);                                      // 0x80332ED0 (integer abs)
 void   fn_8003DCE0(u8* p);

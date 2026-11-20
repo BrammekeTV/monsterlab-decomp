@@ -23,7 +23,7 @@ void   fn_80159C60(s32 a);                                                 // 0x
 void   fn_8015A02C(void);                                                  // 0x8015A02C
 void   fn_801601DC(u8* p);                                                 // 0x801601DC
 void   fn_801608C8(u8* p);                                                 // 0x801608C8
-s32    fn_8014ACCC(s32, s32, s32, s32, s32*, s32*, s32, s32);              // 0x8014ACCC
+void fn_8014ACCC(u32 mode, s32 fmt, s32 w, s32 h, s32* outSize, s32* outStride, s32* outW, s32* outH);              // 0x8014ACCC
 u64    fn_801425DC(u8* timer);                                             // 0x801425DC
 void   fn_8016A2B8(u8* p);                                                 // 0x8016A2B8
 void   fn_80172E84(u8* obj);                                               // 0x80172E84

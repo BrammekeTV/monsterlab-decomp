@@ -14,7 +14,7 @@ extern u8  lbl_8047C760[];        // effect manager
 u8*    AnimSetGetClip(void* set, s32 index);                   // 0x801AC164
 s32    AnimSetFindClip(void* set, s32 anim);                   // 0x801AC2FC
 void   operator_delete(void* p);                               // 0x801D426C
-void   TriggerDoAction(void* action, void* a4, void* a5);      // 0x801E0054 (three arguments in the asm)
+s32 TriggerDoAction(void* action, void* a1, void* a2);      // 0x801E0054 (three arguments in the asm)
 u32    fn_801EC880(u8* p, u32 hash);                           // 0x801EC880
 void   fn_801ECFA0(u8* p, s32 idx);                            // 0x801ECFA0
 void   fn_801C83AC(u8* mgr, u8* item);                         // 0x801C83AC

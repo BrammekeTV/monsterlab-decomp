@@ -39,7 +39,7 @@ void     fn_801B1668(void* p);                                                  
 void     fn_801B4520(u8* p);                                                     // 0x801B4520
 void     BufferFree(void* p);                                                    // 0x801D4980
 void     fn_801ACCEC(void);                                                      // 0x801ACCEC
-void     TriggerDoAction(void* action, void* a1, void* a2);                     // 0x801E0054
+s32 TriggerDoAction(void* action, void* a1, void* a2);                     // 0x801E0054
 void     fn_80121C90(s32 action, void* obj, void* other, const f32* pos);       // 0x80121C90
 BOOL     PropIncrementState(void* prop);                                        // 0x80069FDC
 void     fn_80068B50(u8* obj, s32 mode);                                        // 0x80068B50

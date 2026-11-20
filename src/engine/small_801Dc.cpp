@@ -28,7 +28,7 @@ void* fn_80209814(void* v);                                         // 0x8020981
 void  fn_8020B024(f32 v);                                           // 0x8020B024
 f32   fn_8020B05C(void);                                            // 0x8020B05C
 f32   fn_8020B154(void);                                            // 0x8020B154
-void  TriggerDoAction(void* action, void* a4, void* a5);            // 0x801E0054
+s32 TriggerDoAction(void* action, void* a1, void* a2);            // 0x801E0054
 f32   cosf(f32 x);                                                  // 0x8033EC98 (MSL)
 
 // Globals.

@@ -78,7 +78,7 @@ void fn_801D5D14(u8 a, f32 b);
 s32 PlaySound(u32 hash, s32 a, s32 b, s32 c, s32 d, s32 e);
 void FaderSetTargetColour(f32 a0, f32 a1, f32 a2);
 void StickRead(s32 channel, f32* x, f32* y);
-void TriggerDoAction(void* action, void* a4, void* a5);
+s32 TriggerDoAction(void* action, void* a1, void* a2);
 void* IdPoolNext(void* pool);
 
 // 0x80195064

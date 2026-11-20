@@ -10,7 +10,7 @@ void  TriggerShowProximityText(void* trigger, s32 textId);        // 0x8006ED68
 void  PropPlayAnim(void* prop, int a, int b, BOOL once);          // 0x80069350
 void  PropPlayFx(void* prop, void* fx);                           // 0x801254F8
 s32  PropIncrementState(void* prop);                             // 0x80069FDC
-void  TriggerDoAction(void* action, void* a4, void* a5);                   // 0x801E0054
+s32 TriggerDoAction(void* action, void* a1, void* a2);                   // 0x801E0054
 void  FollowWaypointPath(void* prop, void* params, f32 speed);
 struct ScopedLock { u8 pad[4]; };
 void  ScopedLockCtor(ScopedLock* l);                              // 0x801F5384

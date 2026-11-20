@@ -44,8 +44,8 @@ u8*   fn_8018C39C(u8* p, s32 idx);                                // 0x8018C39C
 extern u8  lbl_805FB64C;            // 0x805FB64C
 extern u32 lbl_805FB854;            // 0x805FB854 (32-bit frame counter)
 void  fn_80142ED0(u8* base, s32 size);                            // 0x80142ED0
-void  fn_8015E6D0(u8* thread, s32 frame);                         // 0x8015E6D0
-void  fn_8015E74C(u8* thread, s32 frame);                         // 0x8015E74C
+void fn_8015E6D0(void* unusedR3, s32 frame, s32 unusedR5, s32 unusedR6, s32 value);                         // 0x8015E6D0
+void fn_8015E74C(void* unusedR3, s32 frame, s32 unusedR5, s32 unusedR6, s32 value);                         // 0x8015E74C
 void* ScreenSetsCurrent(void* sets);                              // 0x8018D1E4
 void* ScreenSetFindWidget(void* set, u32 hash);                   // 0x80198E34
 void  FriendListHideFloaty(s32 a);
@@ -777,8 +777,8 @@ void RendEndFrame(void) {
     BPWrite((u32)(w >> 4) | 0x4D000000u);
     BPWrite(0x52004003u);
     RendCycleDL();
-    fn_8015E6D0(lbl_805FB594, parity);
-    fn_8015E74C(lbl_805FB594, lbl_805FB518);
+    fn_8015E6D0(NULL, parity, 0, 0, 0);  // asm value arg is stale r7
+    fn_8015E74C(NULL, lbl_805FB518, 0, 0, 0);  // asm value arg is stale r7
     lbl_805FB51C = 0;
     lbl_805FB518 += 1;
 }

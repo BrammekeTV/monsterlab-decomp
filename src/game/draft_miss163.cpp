@@ -20,7 +20,7 @@ void  EventSendTo(void* mgr, u32 event, void* from, u32 arg, int a, int b);   //
 u32   RandomU32(void);
 u32   StringHash(const char* s);
 int   SysSprintf(char* buf, const char* fmt, ...);
-void  TriggerDoAction(void* action, void* a4, void* a5);       // 0x801E0054
+s32 TriggerDoAction(void* action, void* a1, void* a2);       // 0x801E0054
 void  fn_8001D4FC(u8* mgr);                                    // 0x8001D4FC
 void  fn_8003DCE0(u8* p);                                      // 0x8003DCE0
 void* fn_8003DDE8(void* part, s32 slot, s32 def, s32 flag, s32 a);   // 0x8003DDE8

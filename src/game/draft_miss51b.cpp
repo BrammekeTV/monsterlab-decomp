@@ -19,7 +19,7 @@ void operator_delete(void* p);
 void CameraSetFov(void* camera, f32 fov);                                    // 0x801D8ACC
 void CharacterResetGroundState(u8* c, s32 a, s32 b);                         // 0x8005BAD4
 void EventSendTo(void* mgr, u32 event, void* from, u32 arg, int a, int b);   // 0x801BA2FC
-void TriggerDoAction(void* action, void* a4, void* a5);                      // 0x801E0054
+s32 TriggerDoAction(void* action, void* a1, void* a2);                      // 0x801E0054
 s32  fn_8001AFB4(u8* p, s32 a);                                              // 0x8001AFB4
 s32 fn_801C3E94(u8* p);                                                      // 0x801C3E94
 void fn_8020A398(s32 handle);                                                // 0x8020A398

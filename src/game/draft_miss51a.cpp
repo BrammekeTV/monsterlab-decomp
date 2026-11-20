@@ -53,7 +53,7 @@ void  fn_801C849C(u8* mgr, u8* item);               // 0x801C849C
 s32   fn_801D329C(s32 arg0);                        // 0x801D329C
 void  fn_8004D760(u8* c, u8* monster);              // 0x8004D760
 void* fn_8004DAF8(void* c, s32 a, s32 b);           // 0x8004DAF8
-void  fn_8005CC30(void);                            // 0x8005CC30
+u8*   fn_8005CC30(u8* p, s32 a, void* b, s32 c);                           // 0x8005CC30
 void  fn_8005D3C4(u8* c, s32 a, s32 b);             // 0x8005D3C4
 void  fn_8020EA34(u8* a3);                          // 0x8020EA34
 u8*   fn_802149AC(u8* obj, s32 del);                // 0x802149AC
@@ -262,7 +262,7 @@ void fn_80046F5C(void) {
 // 0x8004B604
 // Initialises the entity block: vtable, sub-object at +0xC48, zeroed fields and, for a valid +0x4 link, flags it.
 void fn_8004B604(u8* arg0) {
-    fn_8005CC30();
+    fn_8005CC30(arg0, 0, NULL, 0);  // r4-r6 stale in asm
     fn_8020EA34(arg0 + 0xC48);
     u8* temp6 = *(u8**)(arg0 + 0x4);
     *(u8**)(arg0 + 0x0) = (u8*)lbl_80359038;

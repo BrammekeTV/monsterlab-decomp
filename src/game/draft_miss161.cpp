@@ -13,8 +13,8 @@ u32     fn_801B9B6C(s32 chan);                                  // 0x801B9B6C
 void    fn_8018D2B8(const char* fmt, ...);                      // 0x8018D2B8 (debug log)
 void    fn_8018D370(const char* fmt, ...);                      // 0x8018D370 (debug log)
 void*   fn_8018D428(s32 size, const char* file, void* tag, s32 line);  // 0x8018D428
-void    fn_8018D534(void);                                      // 0x8018D534 (callback, address only)
-void    fn_80199CE8(void);                                      // 0x80199CE8 (callback, address only)
+s32 fn_8018D534(void* obj);                                      // 0x8018D534 (callback, address only)
+s32 fn_80199CE8(u8* obj, u8* list);                                      // 0x80199CE8 (callback, address only)
 s32 fn_80196678(void* gx, void* mat, f32 t);                  // 0x80196678
 s32     fn_80196B10(u8* a3);                                    // 0x80196B10
 void    fn_8019BFF8(void* obj, void* cb, void* arg);            // 0x8019BFF8
