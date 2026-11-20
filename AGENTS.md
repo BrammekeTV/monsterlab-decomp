@@ -37,7 +37,7 @@ a PC port. Read this whole file before making changes. Human contributors: see
 | `include/` | shared headers: `types.h`, `revolution.h` (SDK decls), `game/*.h`, `engine/*.h` |
 | `src/game/`, `src/engine/`, `src/system/` | hand-decompiled code, one file per system |
 | `src/leaf/` | generated tiny functions |
-| `src/port/`, `include/port/`, `tests/` | PC port code that has no original (data loader, see `docs/loader.md`) and its tests; no `// 0xADDR` markers here |
+| `src/port/`, `include/port/`, `tests/` | PC port code that has no original: data loader (`docs/loader.md`), runtime and platform layer that replaces the SDK (`docs/port_runtime.md`), and tests; no `// 0xADDR` markers here |
 | `tools/` | scripts (below) |
 
 ## Tools
@@ -72,6 +72,12 @@ a PC port. Read this whole file before making changes. Human contributors: see
 - `python tools/check.py [files]`: compile with MSVC using the CI flags (no args = changed files).
 - `python tools/loader_check.py`: builds the PC data loader test, runs its self-test and, with the game in `orig/`,
   compares the loaded `global_binary.sir` with `python tools/sir_decoder.py <file> --gamedb --image` (the reference dump).
+- `python tools/build_pc.py [--run [args]]`: builds `build/pc/monsterlab.exe` (compile, `tools/port_link.py`, link). `--run --selftest`
+  needs no game data; `--run` alone runs the game's `main()` with the disc in `orig/` until the first function that is
+  not decompiled and prints a boot summary; `--run --keep-going` lists every missing function on the way instead.
+  `build/pc/port_link.txt` is the link report: stubs, globals resolved by address, **split globals** (a `static`
+  definition in one file and the same address used under another name elsewhere: two copies, fix it) and address
+  conflicts. See `docs/port_runtime.md`.
 - `python tools/progress.py`: progress numbers.
 - `python tools/changelog_add.py "text"`: add a progress-site changelog entry stamped with the real time (maintainer only).
 

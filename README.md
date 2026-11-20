@@ -103,7 +103,7 @@ These live in the platform layer (`src/platform/`) that replaces the Wii SDK, so
 2. **Link step + missing-symbols report (done).** `tools/link_check.py` + `tools/missing_symbols.py`; CI links everything and lists unresolved functions/globals; that list drives the remaining decompilation.
 3. **Big-endian data loader (started).** Convert game data (game database, part definitions, saves) at load time. `src/port/sir_loader.cpp` converts `catalog.sir` (the file table) and the `global_binary.sir` header and game database, using the table schemas stored in the file; design, results and the next files are in [`docs/loader.md`](docs/loader.md).
 4. **Identify more SDK code.** Apply RVL SDK / MSL / Bink signatures with decomp-toolkit so the platform layer knows exactly which Nintendo SDK functions to replace (about 460 of ~4,000 library functions are named so far).
-5. **Boot to the title screen**, then compare self-contained functions against the original (differential tests).
+5. **Boot to the title screen (started).** The PC build links into `monsterlab.exe` and runs the game's `main()`: `python tools/build_pc.py`, design in [`docs/port_runtime.md`](docs/port_runtime.md). The exe maps the Wii address space at its original addresses, loads the data of your own `main.dol` into it and stops at the first function that is not decompiled, naming it. Today it gets through `SysInit` and the system heaps. Then: compare self-contained functions against the original (differential tests).
 6. **64-bit later.** Only after named structs and a loader replace raw offsets; not needed for 1080p, the settings GUI or mods.
 
 ### Priorities

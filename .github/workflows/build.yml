@@ -51,6 +51,19 @@ jobs:
           Get-Content missing.txt | Add-Content $env:GITHUB_STEP_SUMMARY
           $bad = Select-String -Path link.log -Pattern 'LNK2005|could potentially match'
           if ($bad) { $bad | Select-Object -First 20 | ForEach-Object { Write-Output "::error::$($_.Line.Trim())" }; exit 1 }
+      - name: PC executable (link + self-test)
+        # Links the real exe (docs/port_runtime.md) and runs its self-test, which needs no game
+        # data: address space, function table, traps for missing functions, heaps, threads, disc.
+        shell: pwsh
+        run: |
+          cmake --build out --config Release --target monsterlab -- /nologo /v:minimal 2>&1 | Tee-Object -FilePath exe.log
+          if ($LASTEXITCODE) {
+            Select-String -Path exe.log -Pattern ': (fatal )?error ' | Select-Object -First 20 | ForEach-Object { Write-Output "::error::$($_.Line.Trim())" }
+            exit 1
+          }
+          Get-Content out/port_gen/port_link.txt | Select-Object -First 5 | ForEach-Object { Write-Output "::notice::$_" }
+          & out/Release/monsterlab.exe --selftest
+          exit $LASTEXITCODE
       - uses: actions/upload-artifact@v4
         if: always()
         with:
@@ -59,3 +72,4 @@ jobs:
             link.log
             missing.txt
             docs/data/missing.json
+            out/port_gen/port_link.txt
