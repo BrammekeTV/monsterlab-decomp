@@ -22,7 +22,7 @@ build\pc\monsterlab.exe                        # runs main() with your own disc 
 | `--data <dir>` or `MONSTERLAB_DATA` | extracted disc (`sys/main.dol`, `files/`); default: `orig/RM7P4F` in the current folder or above the exe |
 | `--frames N` | stop after N presented frames (default 300) |
 | `--seconds N` | stop after N seconds and say where the main thread is (default 60) |
-| `--keep-going` | a missing function returns 0 instead of stopping: a survey of what the boot path still needs. After the first one the run is no longer what the game does. |
+| `--keep-going` | a missing function returns 0 instead of stopping, and a semaphore nobody signals is passed after 0.5 s: a survey of what the boot path still needs. After the first one the run is no longer what the game does. |
 | `--verbose` | log every skipped static initialiser and every SDK stub call |
 
 The run ends with a boot summary: what was reached and when, disc files opened, SDK calls that
@@ -40,8 +40,14 @@ What boots today, with the retail PAL disc:
    skipped and counted.
 3. `SysInit`: `OSInit`, `SCInit`, `DVDInit`, the MEM1 OS heap and the MEM2 expanded heap,
    WPAD/KPAD/AI/AX init (stubs).
-4. The first allocation calls `HeapInit`, which needs `fn_801EEB20` (the engine's heap
-   allocator, 1,360 bytes, not decompiled): the run stops there and says so.
+4. The engine heap (`HeapInit`, `fn_801EEB20`: Doug Lea's malloc) takes the MEM2 block and
+   serves every allocation.
+5. `GameMain`: `EngineStartup` (core and input init) and `GameInit` run to the end.
+6. `EngineInit` -> `RendInit` calls `VideoInit` (4,860 bytes, not decompiled): the run stops
+   there and says so. No disc file is opened before that point.
+
+With `--keep-going` the run gets as far as starting the render thread (`RendThreadMain` runs on
+its own OS thread), which then crashes on the state `VideoInit` did not set up.
 
 The link report (`port_link.txt`, uploaded by CI) lists the stubs and the globals.
 
@@ -109,7 +115,7 @@ handles the two ways it goes wrong:
   has external linkage, the other name is aliased to it, so there is one copy. Listed under
   "Names resolved to a definition under another name".
 - **The definition is `static`**, so it cannot be aliased: the other name gets the original
-  address and there are two copies. Listed under "Split globals" (61 today). Fix: make the
+  address and there are two copies. Listed under "Split globals" (62 today). Fix: make the
   definition non-static, or drop it and declare the global `extern` in both files.
 
 A defined global also does not get the initial value from `main.dol`; the definition must carry
@@ -118,7 +124,7 @@ it.
 ## 2. Functions
 
 `port_gen.obj` has one table entry per function of the original executable (12,587: address,
-size, name, and the PC implementation if one is linked: 6,780 today).
+size, name, and the PC implementation if one is linked: 6,900 today).
 
 - **Calls by name** link normally.
 - **Calls through an original address** (vtables and callback tables in `main.dol` data, a
@@ -132,8 +138,8 @@ size, name, and the PC implementation if one is linked: 6,780 today).
   then stops:
 
   ```
-  [port] missing function: fn_801EEB20 (0x801EEB20, 1360 bytes, game code)
-  [port]   called from HeapInit+0x92
+  [port] missing function: VideoInit (0x8015BF40, 4860 bytes, game code)
+  [port]   called from RendInit+0x2E
   ```
 
   Stubs are never written by hand. They are weak (`/alternatename`): when the function is
@@ -165,10 +171,10 @@ The original's start-up code does the same between loading the executable and ca
 It cannot wait for `OSInit`: static initialisers allocate memory, and the game's `operator new`
 calls `SysInit` itself when the heaps do not exist yet.
 
-A static initialiser that is not decompiled is skipped (209 entries; 15 run before the first
-stop). The globals it would set stay zero. These are missing game functions like any other, but
-nothing calls them by name, so they never show up in the link report: the boot summary counts
-them and `--verbose` lists them.
+A static initialiser that is not decompiled is skipped (`.ctors` has 300 entries; 37 run and
+262 are skipped on the way to `VideoInit`). The globals it would set stay zero. These are
+missing game functions like any other, but nothing calls them by name, so they never show up in
+the link report: the boot summary counts them and `--verbose` lists them.
 
 ## 3. Platform layer
 
@@ -232,15 +238,20 @@ MSVC only for now (absolute symbols, `/alternatename`, structured exception hand
 
 ## Next: the shortest path to a first title-screen frame
 
-1. **Engine heap**: `fn_801EEB20` (allocate) and the rest of the heap object at `lbl_8047CAC0`.
-   Everything allocates through it.
-2. **Static initialisers**: 194 of the 209 `.ctors` entries are not decompiled. Most are small
-   (they construct one global). They are the largest group on the boot path.
-3. **Survey with `--keep-going`** once the heap works, to list what `EngineStartup`,
-   `GameInit` and `EngineInit` still call.
+1. **`VideoInit`** (0x8015BF40, 4,860 bytes): VI/GX set-up, the render thread's FIFO and its
+   semaphores. It is the first stop today and nothing behind it can be surveyed without it. It
+   calls about 25 GX functions that are still unnamed (`fn_8024xxxx`): each needs a line in
+   `port_sdk.cpp` (a stub that records the state the renderer will need).
+2. **Survey with `--keep-going`** once `VideoInit` is in, to list what the rest of `EngineInit`,
+   `HomeButtonInit` and the first `EngineFrame` still call. The first disc reads (`catalog.sir`,
+   `global_binary.sir`) come from there.
+3. **Static initialisers**: 262 of the 300 `.ctors` entries are not decompiled. Most are small
+   (they construct one global). Until they exist those globals are zero, which will show up as
+   crashes or wrong behaviour further in. `monsterlab.exe --verbose` lists them.
 4. **Wire the `.sir` loader**: after the game reads `catalog.sir` and the `global_binary.sir`
    sections, run the conversions of `sir_loader.cpp` on the buffers (the image is already at
    `0x90400000`, so `SirRelocAddRange` is the identity). zlib `inflate` is needed for packed
    sections: link real zlib.
-5. **Initialised data**: add `port_data.txt` entries where a mixed struct is read wrongly.
-6. **GX**: record the FIFO and draw it (OpenGL). Until then a "frame" is only a VI flip.
+5. **Split globals** (62 in `port_link.txt`): each is a wrong value waiting to happen.
+6. **Initialised data**: add `port_data.txt` entries where a mixed struct is read wrongly.
+7. **GX**: record the FIFO and draw it (OpenGL). Until then a "frame" is only a VI flip.

@@ -371,7 +371,15 @@ void OSInitSemaphore(OSSemaphore* sem, s32 count) {
 }
 
 s32 OSWaitSemaphore(OSSemaphore* sem) {
-    while (sem->count <= 0) PortWaitChange();
+    for (s32 waits = 0; sem->count <= 0; waits++) {
+        if (gPortOptions.keepGoing && waits > 25) {
+            // Survey mode: whoever should signal this was probably skipped. Do not hang on it.
+            static s32 logged;
+            if (logged++ < 8) PortLog("semaphore %p was not signalled for 0.5 s: continuing (--keep-going)", (void*)sem);
+            return 0;
+        }
+        PortWaitChange();
+    }
     return sem->count--;
 }
 
