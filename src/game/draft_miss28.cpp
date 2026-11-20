@@ -25,7 +25,7 @@ void  UISetText(void* el, const char* text, s32 a);
 void* UIWidgetFindChild(void* widget, u32 hash);
 void* fn_800701A4(void);
 BOOL  fn_80142358(void);
-s32   fn_801B4160(u8* p);  // 0x801B4160 (return unused by callers)
+void  fn_801B4160(u8* p);  // 0x801B4160
 s32   fn_801C71EC(u8* key);
 void* fn_801D40E0(s32 n);
 BOOL  fn_801F56FC(s32 flags);

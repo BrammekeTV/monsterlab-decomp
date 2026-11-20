@@ -22,10 +22,10 @@ extern "C++" u8* fn_800C42B8(u8* p);  // 0x800C42B8 (defined in small_800C.cpp)
 
 extern "C" {
 // Callees
-void fn_800381B8(u8* p, s32 idx);                                // 0x800381B8
+s32 fn_800381B8(u8* p, s32 a, s32 b);                          // 0x800381B8
 void FighterStatsSetOwner(u8* stats, void* owner);               // 0x8020E7B4-area helper (owner is a pointer here)
 void* fn_80043910(void* a0, s32 idx, s32 kind);                  // 0x80043910
-s32 fn_801B4160(u8* p);                                          // 0x801B4160
+void fn_801B4160(u8* p);                                         // 0x801B4160
 u8* fn_801FA7CC(u8* p, s32 a4);                                  // 0x801FA7CC
 u8* fn_8006FA74(u8* p, s32 n);                                   // 0x8006FA74
 void fn_800C20FC(u8* p);                                         // 0x800C20FC
@@ -54,7 +54,7 @@ void fn_800B991C(u8* obj, s32 v);                                // 0x800B991C
 void fn_800B9994(u8* obj, f32 v);                                // 0x800B9994
 void fn_800B999C(u8* obj, s32 a, s32 b);                         // 0x800B999C
 u8* fn_800B6328(u8* base, u8* slot, s32 idx);                    // 0x800B6328
-void fn_800BCA44(u8* obj, s32 idx);                              // 0x800BCA44
+s32 fn_800BCA44(u8* obj, s32 idx);                              // 0x800BCA44
 void fn_800BD948(u8* obj, s32 idx);                              // 0x800BD948
 void fn_800BE3A4(u8* obj);                                       // 0x800BE3A4
 void fn_800BF6FC(u8* obj);                                       // 0x800BF6FC
@@ -66,7 +66,7 @@ s32 fn_800CD490(u8* t, s32 v);                                   // 0x800CD490
 void fn_800C8E54(u8* obj, u8* dst, s32 idx);                     // 0x800C8E54
 s32 fn_800CDC9C(u8* p);                                          // 0x800CDC9C
 void fn_800C75E8(u8* a, u8* b);                                  // 0x800C75E8
-s32 fn_800CD9F0(u8* a, f32* b);                                  // 0x800CD9F0
+void fn_800CD9F0(u8* a, f32* b);                                 // 0x800CD9F0
 s32 fn_800CC854(u8* obj, u8* b);                                 // 0x800CC854
 void fn_800D6A24(u8** p);                                        // 0x800D6A24
 const char* PartSlotName(s32 slot);                              // 0x8020E7B4
@@ -76,7 +76,7 @@ u8* fn_8003F91C(u8* p, u8* owner);                               // 0x8003F91C
 u8* fn_8020BCEC(u8* p, u8* owner);                               // 0x8020BCEC
 u8* fn_80040090(u8* p, u8* owner);                               // 0x80040090
 void fn_80040638(u8* p, u8* owner);                              // 0x80040638
-u8* fn_8004421C(u8* p);                                          // 0x8004421C
+u8* fn_8004421C(u8* p, s32 arg1);                                  // 0x8004421C
 void fn_8020F498(u8* p, s32 a2);                                 // 0x8020F498
 u8* fn_800444FC(u8* p, s32 a2);                                  // 0x800444FC
 
@@ -221,7 +221,7 @@ void fn_80037FB4(u8* p) {
     if (*(s32*)(p + 0x9A8) == 3) {
         for (s32 k = 0; k < 3; k++) {
             s32 v = lbl_80347698[k];
-            if (v < count) fn_800381B8(p, v);
+            if (v < count) fn_800381B8(p, v, 0)/*r5 leftover in asm*/;
         }
     }
 }
@@ -377,7 +377,7 @@ void fn_80042E04(u8* p) {
     lbl_803C51D8[5] = o;
     for (s32 i = 0; i < 2; i++) {
         o = (u8*)fn_801D40E0(0x4D4);
-        if (o != NULL) o = fn_8004421C(o);
+        if (o != NULL) o = fn_8004421C(o, 0)/*arg1 leftover*/;
         lbl_805FB078[i] = o;
         o = (u8*)fn_801D40E0(0x48);
         if (o != NULL) fn_8020F498(o, 0);

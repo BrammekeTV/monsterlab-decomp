@@ -17,6 +17,7 @@ extern u8 lbl_805FB894[];
 extern u8 lbl_805FB898[];
 extern "C" void fn_801D9164(u8*, u8*, u8*, u8*);
 extern "C" void* fn_801EB94C(void*);
+extern "C" void* memcpy(void*, void*, u32);
 
 // 0x801D9028
 extern "C" void fn_801D9028(u8* a3) {
@@ -129,6 +130,14 @@ extern "C" void fn_801DFAC0(u8* a3, s32 a4, s32 a5) {
     *(u32*)(((u8*)(uintptr_t)(a3)) + 12) = (u32)((u32)(uintptr_t)(a5));
     *(u32*)(((u8*)(uintptr_t)(a3)) + 16) = (u32)((u32)(uintptr_t)(a5));
     *(u32*)(((u8*)(uintptr_t)(a3)) + 20) = (u32)((u32)(0));
+}
+
+// 0x801DFE94
+extern "C" void* fn_801DFE94(u8* a3, u8* a4) {
+    if (a4 == 0) {
+        return (void*)(uintptr_t)(a3);
+    }
+    return (void*)(memcpy((void*)(((u8*)(uintptr_t)(a3))), (void*)(((u8*)(uintptr_t)(a4))), (u32)((u32)(256))));
 }
 
 // 0x801DFF3C

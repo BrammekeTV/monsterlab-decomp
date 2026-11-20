@@ -9,7 +9,7 @@ void UpdateAllZoneEntities(void);
 extern "C" {
 // Callees
 void    fn_800293C8(u8* p);                                  // 0x800293C8
-void    fn_80029660(u8* p, s32 flags);                       // 0x80029660
+u8*     fn_80029660(u8* p, s32 flags);                       // 0x80029660
 void    operator_delete(void* p);                            // 0x801D426C
 void*   fn_801D40E0(s32 n);                                  // 0x801D40E0
 void*   fn_801B373C(void* p);                                // 0x801B373C

@@ -70,7 +70,7 @@ void  fn_801455E0(f32* out, u8* quat);                                          
 void  fn_80145F9C(f32* out, f32* a, f32* b, f32 t);                             // 0x80145F9C
 void  fn_80146180(void* quat, const Vec3* axis, f32 angle);                     // 0x80146180
 s32   fn_8018BDE0(u8* p, s32 key);                                              // 0x8018BDE0
-s32   fn_801B4160(u8* p);                                                       // 0x801B4160
+void  fn_801B4160(u8* p);                                                       // 0x801B4160
 void* fn_801D40E0(s32 n);                                                       // 0x801D40E0
 u32   fn_801EC880(u8* p, u32 hash);                                             // 0x801EC880
 void* fn_80209814(void* v);                                                     // 0x80209814

@@ -24,7 +24,7 @@ int    SysSprintf(char* buf, const char* fmt, ...);
 u8*    fn_8006FA74(u8* self, s32 type);                // 0x8006FA74 (base ctor, returns self)
 void fn_8006FC04(void);                             // 0x8006FC04
 void   fn_80075264(u8* p, s32 v);                      // 0x80075264
-void   fn_800A4320(u8* obj, u8* pos);                  // 0x800A4320
+s32    fn_800A4320(u8* obj, f32* pos);                // 0x800A4320
 u8*    fn_800A43A8(u8* p, s32 group, s32 idx);         // 0x800A43A8 (returns the entry pointer)
 void   fn_800A81A8(u8* p);                             // 0x800A81A8
 void   fn_800B2740(u8* p);                             // 0x800B2740
@@ -202,7 +202,7 @@ void fn_800A71F0(u8* arg0, u8* arg1) {
             g++;
             cur += 4;
         } while (g < 3);
-        fn_800A4320(obj, *(u8**)(arg0 + 0x4));
+        fn_800A4320(obj, *(f32**)(arg0 + 0x4));
     }
     u8 active = 0;
     if (hit != NULL) {
