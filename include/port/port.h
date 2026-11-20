@@ -8,6 +8,8 @@
 #define PORT_MEM1_SIZE   0x01800000u
 #define PORT_MEM2_BASE   0x90000000u
 #define PORT_MEM2_SIZE   0x04000000u
+#define PORT_HW_BASE     0xCC000000u   // hardware registers; plain memory on PC
+#define PORT_HW_SIZE     0x00010000u
 #define PORT_TEXT_LO     0x80004000u   // .init + .text of main.dol: holds jumps and traps on PC
 #define PORT_TEXT_HI     0x80345AE0u
 #define PORT_CTORS       0x80345AE0u   // .ctors: static initialisers, run by OSInit
@@ -34,6 +36,43 @@ extern const PortDataRun gPortData[];
 extern const u32         gPortDataCount;
 extern const char        gPortNames[];
 }
+
+// ---- GX state recorded by the SDK layer (port_sdk.cpp) until a renderer uses it ----
+typedef struct PortGxState {
+    f32   viewport[6];        // left, top, width, height, near, far
+    s32   scissor[4];         // x, y, width, height
+    s32   copySrc[4];         // display copy source: x, y, width, height
+    s32   copyDst[2];         // frame buffer width, lines
+    f32   copyYScale;
+    s32   copyGamma;
+    u8    copyAa, copyVf;
+    u8    copyPattern[12][2];
+    u8    copyVfilter[7];
+    u8    clearColor[4];
+    u32   clearZ;
+    void* lastCopyDst;        // frame buffer of the last GXCopyDisp
+    s32   pixelFmt, zFmt;
+    u8    dither, colorUpdate;
+    u8    zEnable, zFunc, zUpdate;
+    u8    vtxDesc[26];        // per attribute: none / direct / index8 / index16
+    struct { u8 cnt, type, frac; } vtxFmt[8][26];
+    struct { u8 func, src, mtx, normalize, postMtx; } texGen[8];
+    u8    numTexGens, numChans, numTevStages;
+    u8    lineWidth, pointSize, cullMode, clipMode;
+    s32   scissorOffset[2];
+    f32   posMtx[10][3][4];
+    f32   nrmMtx[10][3][4];   // the upper 3x3 is used
+    f32   texMtx[10][3][4];
+    f32   postTexMtx[21][3][4];
+    u8    currentMtx;
+    u8    alphaComp[5];       // comp0, ref0, op, comp1, ref1
+    u8    blend[4];           // type, source factor, destination factor, logic op
+    u8    alphaUpdate, zCompBeforeTex, dstAlphaOn, dstAlpha;
+    s32   fogType;
+    u8    fogColor[4];
+    f32   fog[4];             // start z, end z, near z, far z
+} PortGxState;
+extern PortGxState gPortGx;
 
 // ---- runtime (port_runtime.cpp) ----
 typedef struct PortOptions {

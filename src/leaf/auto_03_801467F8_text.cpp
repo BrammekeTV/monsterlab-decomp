@@ -249,13 +249,11 @@ extern "C" void fn_80151244(void) {
 
 // 0x8015124C
 extern "C" void RendSetFlagA(s32 a3) {
-    // tail-call arguments inferred from the registers set before the call
     fn_8015E838((u8*)&lbl_805FB594, (s32)((u32)(uintptr_t)(a3)));
 }
 
 // 0x80151258
 extern "C" void SetRenderEnabled(s32 a3) {
-    // tail-call arguments inferred from the registers set before the call
     fn_8015E8B4((u8*)&lbl_805FB594, (s32)((u32)(uintptr_t)(a3)));
 }
 

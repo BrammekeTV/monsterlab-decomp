@@ -8,7 +8,7 @@
 
 extern "C" void operator_delete(void* p);         // 0x801D426C
 extern u8  gPartVtable[];                         // 0x80389120: { rtti, 0, PartClear }
-static s32 sNextPartUid;                          ORIG(0x805FA0A0)
+static s32 sNextPartUid = 1;                      ORIG(0x805FA0A0)
 
 // Enhancement (ability) and defect records: five s16 stat modifiers each.
 #define ENHANCEMENT_MODS 0x14     // within the 0x24-byte ability record (db + 0x3610)

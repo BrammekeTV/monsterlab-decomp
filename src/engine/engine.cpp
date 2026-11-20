@@ -51,8 +51,8 @@ s32   fn_801CB938(void);    // returns 0x805FB5F8
 }
 
 // ---- data ----
-static u8                  sEngineCtx[8];        ORIG(0x805FB760)
-static void*               sMemPool;             ORIG(0x805FB7A8)
+u8                  sEngineCtx[8];        ORIG(0x805FB760)
+void*               sMemPool;             ORIG(0x805FB7A8)
 static EngineMemCallbacks  sSgMemCallbacks;      ORIG(0x8047C600)
 static EngineMemCallbacks  sRendMemCallbacks;    ORIG(0x8047C614)
 extern u8                  gCamera[];            ORIG(0x8047C640)
@@ -60,14 +60,14 @@ extern u8                  gWorldState[];        ORIG(0x803E6D00) // byte at 0xF
 extern u8                  lbl_8040D500[];
 extern u8                  lbl_8047C760[], lbl_8047C790[], lbl_8047C7AC[];
 extern u8                  lbl_80401108[];
-s32                        gRendInitialized;     ORIG(0x805F9610)
-s32                        gRendTexelsInMEM2;    ORIG(0x805F95F8) // >= 0: texels/CLUTs get flag 0x80
-s32                        gUseAltRenderSetup;   ORIG(0x805F9214)
+s32                        gRendInitialized = 1; ORIG(0x805F9610)
+s32                        gRendTexelsInMEM2 = -1;   ORIG(0x805F95F8) // >= 0: texels/CLUTs get flag 0x80
+s32                        gUseAltRenderSetup = 2; ORIG(0x805F9214)
 View*                      gMainView;            ORIG(0x805FB75C)
 static EngineFrameCallback sFrameCallback;       ORIG(0x805FB784)
 static s32                 sEngineSuspended;     ORIG(0x805FB788)
-static s32                 sEngineSuspendRequest; ORIG(0x805FB78C)
-u8                         gMainHeap[0x40];      ORIG(0x8047CAC0) // size unknown
+s32                 sEngineSuspendRequest; ORIG(0x805FB78C)
+u8                         gMainHeap[0x728];     ORIG(0x8047CAC0) // two heap states of 0x394 bytes (see heap_alloc.cpp)
 extern u8                  lbl_8047C7D8[], lbl_8047C7F0[];
 static s32                 sPendingWorldReset;   ORIG(0x805FB790)
 static GameSettings*       sGameSettings;        ORIG(0x805FB794)

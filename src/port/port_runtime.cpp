@@ -678,8 +678,12 @@ struct PortBoot {
         // The Wii's two memory blocks at their original addresses. The code range must be executable.
         void* m1 = VirtualAlloc((void*)(uintptr_t)PORT_MEM1_BASE, PORT_MEM1_SIZE, MEM_RESERVE | MEM_COMMIT, PAGE_READWRITE);
         void* m2 = VirtualAlloc((void*)(uintptr_t)PORT_MEM2_BASE, PORT_MEM2_SIZE, MEM_RESERVE | MEM_COMMIT, PAGE_READWRITE);
+        // The hardware registers (0xCC000000: VI, PI, the GX write-gather pipe at 0xCC008000...).
+        // Generated code reads and writes them by address; on PC they are plain memory: writes
+        // are lost and reads give what was last written.
+        void* hw = VirtualAlloc((void*)(uintptr_t)PORT_HW_BASE, PORT_HW_SIZE, MEM_RESERVE | MEM_COMMIT, PAGE_READWRITE);
         DWORD old;
-        if (!m1 || !m2 || !VirtualProtect((void*)(uintptr_t)PORT_TEXT_LO, PORT_TEXT_HI - PORT_TEXT_LO, PAGE_EXECUTE_READWRITE, &old)) {
+        if (!m1 || !m2 || !hw || !VirtualProtect((void*)(uintptr_t)PORT_TEXT_LO, PORT_TEXT_HI - PORT_TEXT_LO, PAGE_EXECUTE_READWRITE, &old)) {
             fprintf(stderr, "[port] cannot map the Wii address space at 0x80000000 / 0x90000000 (error %lu).\n"
                             "       This needs 64-bit Windows; the exe must be linked /LARGEADDRESSAWARE.\n", GetLastError());
             ExitProcess(10);

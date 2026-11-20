@@ -16,10 +16,11 @@ MEMAllocator       gSysAllocator;              ORIG(0x803F2870) // MEM1 OS heap
 MEMAllocator       gSysMEM2Allocator;          ORIG(0x803F2880) // MEM2 expanded heap
 static SysExitMode sExitMode;                  ORIG(0x805FB45C) // requested by reset/power
 u8                 gSysExitEnabled = 1;        ORIG(0x805F90F0)
-SysEventCallback   gSysEventCallback;          ORIG(0x805F90F4)
+void SysSetExitMode(SysExitMode mode);
+SysEventCallback   gSysEventCallback = (SysEventCallback)SysSetExitMode;   ORIG(0x805F90F4) // lint:ok default handler
 char               gSysBuildInfo[64];          ORIG(0x803C5358) // header line on the crash screen
-GXColor            gSysFatalBg;                ORIG(0x805FF008)
-GXColor            gSysFatalFg;                ORIG(0x805FF00C)
+GXColor            gSysFatalBg = {0x00, 0x00, 0xFF, 0x00};   ORIG(0x805FF008)
+GXColor            gSysFatalFg = {0xFF, 0xFF, 0xFF, 0x00};   ORIG(0x805FF00C)
 
 static const char* const sErrorNames[] = {     ORIG(0x80375D98)
     "reset", "machine", "dsi", "isiexti", "align", "program", "nofp", "dec",

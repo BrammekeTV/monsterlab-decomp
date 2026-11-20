@@ -43,11 +43,28 @@ What boots today, with the retail PAL disc:
 4. The engine heap (`HeapInit`, `fn_801EEB20`: Doug Lea's malloc) takes the MEM2 block and
    serves every allocation.
 5. `GameMain`: `EngineStartup` (core and input init) and `GameInit` run to the end.
-6. `EngineInit` -> `RendInit` calls `VideoInit` (4,860 bytes, not decompiled): the run stops
-   there and says so. No disc file is opened before that point.
+6. `EngineInit` -> `RendInit`, all of it: `VideoInit` picks the TV mode (EURGB60, 640x480 at
+   60 Hz: the PC layer answers "60 Hz on, progressive off"), allocates the two frame buffers
+   and the GX FIFO and starts VI and GX; the render thread starts and runs the first display
+   list (its draw-done interrupt arrives); the 13 render targets ("hdrRed", "hdrGreen", ...)
+   are allocated from the engine heap.
+7. `SgInit` (scene graph) stops at `fn_8017A618` (1,440 bytes, not decompiled): the first stop
+   today. No disc file is opened before that point.
 
-With `--keep-going` the run gets as far as starting the render thread (`RendThreadMain` runs on
-its own OS thread), which then crashes on the state `VideoInit` did not set up.
+With `--keep-going` the rest of `EngineInit` runs with holes and `GameStart` is reached. The
+missing game functions on that path, in the order they are hit:
+
+| Function | Size | Called from | What it is |
+|---|---|---|---|
+| `fn_8017A618` | 1,440 | `fn_80182A1C` (`SgInit`) | fills a material/render-state record with defaults; no calls |
+| `fn_80149E98` | 3,636 | `fn_80149B4C` | |
+| `fn_8015AB70` | 1,580 | `fn_8015A2E8` | |
+| `RendBeginFrame` | 3,096 | `EngineInit` | |
+| `fn_8000E488` | 2,260 | `GameStart` | runs before the first disc read |
+
+After those, `GameStart` reads `global_binary.sir` twice through `SirLoad` (first its 4 KB
+header into `sSirHeader`, then the image to `0x90400000`), then `SirFinishLoad`; `catalog.sir`
+comes later. Nothing behind `fn_8000E488` is meaningful in a `--keep-going` run yet.
 
 The link report (`port_link.txt`, uploaded by CI) lists the stubs and the globals.
 
@@ -115,11 +132,19 @@ handles the two ways it goes wrong:
   has external linkage, the other name is aliased to it, so there is one copy. Listed under
   "Names resolved to a definition under another name".
 - **The definition is `static`**, so it cannot be aliased: the other name gets the original
-  address and there are two copies. Listed under "Split globals" (62 today). Fix: make the
-  definition non-static, or drop it and declare the global `extern` in both files.
+  address and there are two copies. Listed under "Split globals" (0 today, and it has to stay
+  0: the render thread's command queue was one of them). Fix: make the definition non-static,
+  or drop it and declare the global `extern` in both files.
 
 A defined global also does not get the initial value from `main.dol`; the definition must carry
-it.
+it. `port_link.txt` lists the definitions without a value whose original lives in an
+initialised section ("Defined in the sources without an initial value..."): each one starts as
+0 on PC unless `main.dol` has 0 there too. The list must stay empty. (`gRendTexelsInMEM2` is
+-1 in the original; as 0 it sent every texture allocation to a memory pool that does not exist.)
+
+A defined array must also have the size of the original symbol (`symbols.txt`): the heap object
+`gMainHeap` was defined with 0x40 bytes of its 0x728 and the allocator wrote over the globals
+behind it. Nothing checks this yet.
 
 ## 2. Functions
 
@@ -138,8 +163,8 @@ size, name, and the PC implementation if one is linked: 6,900 today).
   then stops:
 
   ```
-  [port] missing function: VideoInit (0x8015BF40, 4860 bytes, game code)
-  [port]   called from RendInit+0x2E
+  [port] missing function: fn_8017A618 (0x8017A618, 1440 bytes, game code)
+  [port]   called from fn_80182A1C+0x51
   ```
 
   Stubs are never written by hand. They are weak (`/alternatename`): when the function is
@@ -172,7 +197,7 @@ It cannot wait for `OSInit`: static initialisers allocate memory, and the game's
 calls `SysInit` itself when the heaps do not exist yet.
 
 A static initialiser that is not decompiled is skipped (`.ctors` has 300 entries; 37 run and
-262 are skipped on the way to `VideoInit`). The globals it would set stay zero. These are
+262 are skipped). The globals it would set stay zero. These are
 missing game functions like any other, but nothing calls them by name, so they never show up in
 the link report: the boot summary counts them and `--verbose` lists them.
 
@@ -190,9 +215,11 @@ so in a comment. When an SDK function is renamed with `tools/rename.py`, the def
 | OS threads, semaphores, alarms | implemented on Windows threads under one lock (below) |
 | `OSReport`, `OSFatal`, restart / menu / shutdown | console output; the last three end the run |
 | DVD (`DVDOpen`, `DVDClose`, `DVDReadAsync`, drive status) | implemented on `<data>/files/`; the completion callback arrives from the interrupt thread |
-| VI | 50 Hz retrace callbacks; a frame is counted at `VISetNextFrameBuffer` + `VIFlush` |
-| SC | fixed answers: 16:9, English |
-| GX | FIFO bookkeeping only; nothing is drawn |
+| VI | retrace callbacks at the rate of the mode `VIConfigure` got (50 Hz for PAL, else 60), `VIWaitForRetrace`; a frame is counted at `VISetNextFrameBuffer` + `VIFlush` (the first one is `VideoInit` showing the empty frame buffer) |
+| SC | fixed answers: 16:9, English, 60 Hz on, progressive off |
+| GX | nothing is drawn. The state calls (about 80 so far: viewport, scissor, copy filter, matrices, blend, depth, vertex formats...) are recorded in `gPortGx` (`port.h`) for a later renderer. A display list handed to the graphics processor (`GXSetGPFifo`) is answered with the draw-done interrupt; its commands are not executed and draw-sync tokens are not delivered |
+| MTX | `PSMTXIdentity` |
+| Hardware registers | `0xCC000000`-`0xCC00FFFF` is plain memory: generated code writes the GX write-gather pipe (`0xCC008000`) and reads PI/VI registers by address. Writes are lost |
 | AI, AX, WPAD, KPAD | stubs |
 | MSL | `__register_global_object`, array construction helpers, `ceil_`; the standard C functions come from the Windows C runtime |
 
@@ -238,20 +265,26 @@ MSVC only for now (absolute symbols, `/alternatename`, structured exception hand
 
 ## Next: the shortest path to a first title-screen frame
 
-1. **`VideoInit`** (0x8015BF40, 4,860 bytes): VI/GX set-up, the render thread's FIFO and its
-   semaphores. It is the first stop today and nothing behind it can be surveyed without it. It
-   calls about 25 GX functions that are still unnamed (`fn_8024xxxx`): each needs a line in
-   `port_sdk.cpp` (a stub that records the state the renderer will need).
-2. **Survey with `--keep-going`** once `VideoInit` is in, to list what the rest of `EngineInit`,
-   `HomeButtonInit` and the first `EngineFrame` still call. The first disc reads (`catalog.sir`,
-   `global_binary.sir`) come from there.
+1. **The five missing functions of the boot path** (table under "Status"): `fn_8017A618`,
+   `fn_80149E98`, `fn_8015AB70`, `RendBeginFrame`, `fn_8000E488`. After each, run
+   `python tools/build_pc.py --run` and follow the next stop.
+2. **Wire the `.sir` loader**: `GameStart` loads `global_binary.sir` right after
+   `fn_8000E488` (header to `sSirHeader`, image to `0x90400000`). Run the conversions of
+   `sir_loader.cpp` on the buffers when `SirFinishLoad` is done (the image is already at
+   `0x90400000`, so `SirRelocAddRange` is the identity). zlib `inflate` is needed for packed
+   sections: link real zlib. `sSirHeader` is defined with 0x1000 bytes; the original symbol
+   (`lbl_803C2A20`) is 0x15E0.
 3. **Static initialisers**: 262 of the 300 `.ctors` entries are not decompiled. Most are small
    (they construct one global). Until they exist those globals are zero, which will show up as
    crashes or wrong behaviour further in. `monsterlab.exe --verbose` lists them.
-4. **Wire the `.sir` loader**: after the game reads `catalog.sir` and the `global_binary.sir`
-   sections, run the conversions of `sir_loader.cpp` on the buffers (the image is already at
-   `0x90400000`, so `SirRelocAddRange` is the identity). zlib `inflate` is needed for packed
-   sections: link real zlib.
-5. **Split globals** (62 in `port_link.txt`): each is a wrong value waiting to happen.
-6. **Initialised data**: add `port_data.txt` entries where a mixed struct is read wrongly.
-7. **GX**: record the FIFO and draw it (OpenGL). Until then a "frame" is only a VI flip.
+4. **The GX command stream**: hand-written code writes vertices and register loads through
+   `GXWGFifo`, generated code through `0xCC008000`, and both are lost today. A renderer needs
+   them in order, in the FIFO the CPU is attached to (`GXSetCPUFifo`): make both one write-gather
+   object that appends to the current FIFO, then execute a display list at `GXSetGPFifo`
+   (which also delivers the draw-sync tokens `fn_8015D23C` dispatches).
+5. **SDK names**: the functions `port_sdk.cpp` defines as `fn_8024xxxx` are identified in its
+   comments (`VIConfigure`, `GXSetViewport`, ...). Renaming them with `tools/rename.py` needs
+   the definitions in `src/port/` and the callers renamed in the same change.
+6. **Initialised data**: add `port_data.txt` entries where a mixed struct is read wrongly (the
+   seven `GXRenderModeObj` tables are in).
+7. **GX**: draw (OpenGL). Until then a "frame" is only a VI flip.

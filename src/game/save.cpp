@@ -70,7 +70,7 @@ static const char kSlotFormat[]   = "%s_%c_%02d";    ORIG(0x803547B4)
 static const char kSaveFile[]     = "game.msa";      ORIG(0x803547C0)
 static const char kSaveComment[]  = "New Game";      ORIG(0x803547CC)
 
-static u8   sSaveState;                ORIG(0x805FAEF8)
+u8   sSaveState;                ORIG(0x805FAEF8)
 static u8   sBannerInit;               ORIG(0x805FAEF9)
 static char sBannerTitle[0x58];        ORIG(0x803C49C4)
 static char sBannerFile[0x58];         ORIG(0x803C4A1C)

@@ -56,9 +56,9 @@ public:
 extern s32   gLastSysEvent;                  // 0x805FAEAC
 extern u8    gIsReturningPlayer;             // 0x805FAEA8
 extern u8    gScriptCtx[];                   // 0x803C4298 (+0x18 = state)
-s32          gTextLanguage;                  ORIG(0x805F81B4)
-s32          gLanguage;                      ORIG(0x805F81B8)
-u8           lbl_805F81BC;                   ORIG(0x805F81BC)
+s32          gTextLanguage = 4;              ORIG(0x805F81B4)
+s32          gLanguage = 4;                  ORIG(0x805F81B8)
+u8           lbl_805F81BC = 1;               ORIG(0x805F81BC)
 u8           gLoadingActive;                 ORIG(0x805FAEC8)
 u8           lbl_805FAECA;                   ORIG(0x805FAECA)
 LoadingAnim* gLoadingAnim;                   ORIG(0x805FAECC)

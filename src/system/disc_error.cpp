@@ -47,7 +47,7 @@ extern s32  lbl_805FB970, lbl_805FBB64;
 struct StringTable;
 extern StringTable* gStringTable;           // 0x805FB910
 extern const char lbl_805F8200[];
-static volatile s32 sRetraceFlag;    ORIG(0x805FBA88)   // set by the retrace interrupt
+volatile s32 sRetraceFlag;    ORIG(0x805FBA88)   // set by the retrace interrupt
 
 static s32  sLastDriveStatus;        ORIG(0x805FAEE0)
 static f32  sStatusChangeTime;       ORIG(0x805FAEE4)
