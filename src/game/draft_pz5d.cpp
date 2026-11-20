@@ -29,7 +29,7 @@ void Vec3Sub(Vec3* out, const Vec3* a, const Vec3* b);     // 0x80053370
 f32  fn_800544B8(u8* out, u8* a, u8* b);    // 0x800544B8 (leaf: out = a - b)
 f32  fn_800548EC(u8* p);                    // 0x800548EC (leaf)
 BOOL fn_80058BE8(const f32* a, const f32* b);              // 0x80058BE8 (a < b)
-s32  fn_80067844(u8* p);                    // 0x80067844 (leaf)
+u8*  fn_80067844(u8* p);                    // 0x80067844 (leaf: pointer at +0x5C)
 f32  fn_80082F20(u8* a3, u8* a4);           // 0x80082F20 (copies a Vec3)
 u32  fn_8010A9F4(u8* p, s32 mask);          // 0x8010A9F4 (leaf: p[0] & mask != 0)
 void fn_8010AB3C(void);                     // 0x8010AB3C
@@ -814,7 +814,7 @@ void fn_801CB414(u8* arg0, s32 arg1) {
             Vec3Dot(&dot, &entPos, &refPos);
             fn_8016F6F0((u8*)&refW, ref);
             fn_800544B8((u8*)&diff, (u8*)&refW, (u8*)&dot);
-            f32 radius = fn_801CBD30((u8*)(uintptr_t)fn_80067844(ent));
+            f32 radius = fn_801CBD30(fn_80067844(ent));
             *(f32*)(rec + 0x4) = fn_800548EC((u8*)&diff) + radius;
             count++;
             *(s32*)(rec + 0x8) = fn_801CBD38(*(u8**)(ent + 0x5C)) == 0;

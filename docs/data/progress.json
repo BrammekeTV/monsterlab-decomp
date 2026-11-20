@@ -1,15 +1,15 @@
 {
  "game_id": "RM7P4F",
- "generated": "2026-11-20T22:50:27+00:00",
- "commit": "dc30efb",
- "commit_date": "2026-11-20T23:27:27+01:00",
+ "generated": "2026-11-20T22:56:35+00:00",
+ "commit": "481193e",
+ "commit_date": "2026-11-20T23:50:29+01:00",
  "game": {
   "functions": 8548,
   "bytes": 2265988,
   "named": 2748,
   "named_bytes": 616800,
-  "decompiled": 6833,
-  "decompiled_bytes": 1353860
+  "decompiled": 6847,
+  "decompiled_bytes": 1370020
  },
  "library": {
   "functions": 4039,
@@ -24,8 +24,8 @@
   "bytes": 3404928,
   "named": 3211,
   "named_bytes": 721548,
-  "decompiled": 6834,
-  "decompiled_bytes": 1353980
+  "decompiled": 6848,
+  "decompiled_bytes": 1370140
  },
  "game_range": [
   "80006B40",
@@ -849,19 +849,19 @@
    0.0
   ],
   [
-   0.502,
+   0.727,
    0.0
   ],
   [
-   0.808,
+   0.968,
    0.0
   ],
   [
-   0.185,
+   0.377,
    0.0
   ],
   [
-   0.488,
+   0.658,
    0.088
   ],
   [
@@ -869,11 +869,11 @@
    0.0
   ],
   [
-   0.168,
+   0.458,
    0.0
   ],
   [
-   0.099,
+   0.397,
    0.0
   ],
   [
@@ -889,7 +889,7 @@
    0.477
   ],
   [
-   0.457,
+   0.605,
    0.141
   ],
   [
@@ -897,7 +897,7 @@
    0.102
   ],
   [
-   0.543,
+   0.745,
    0.2
   ],
   [
@@ -905,7 +905,7 @@
    0.916
   ],
   [
-   0.997,
+   1.0,
    0.864
   ],
   [
@@ -921,7 +921,7 @@
    0.107
   ],
   [
-   0.623,
+   0.775,
    0.068
   ],
   [
@@ -1714,6 +1714,96 @@
      "name": "fn_801C3924",
      "addr": "801C3924",
      "size": 320
+    }
+   ]
+  },
+  {
+   "path": "src/engine/draft_miss271.cpp",
+   "functions": [
+    {
+     "name": "fn_801C217C",
+     "addr": "801C217C",
+     "size": 1324
+    },
+    {
+     "name": "fn_801C3EA4",
+     "addr": "801C3EA4",
+     "size": 200
+    },
+    {
+     "name": "fn_801CB988",
+     "addr": "801CB988",
+     "size": 852
+    },
+    {
+     "name": "fn_801CBCF8",
+     "addr": "801CBCF8",
+     "size": 24
+    },
+    {
+     "name": "fn_801DFE7C",
+     "addr": "801DFE7C",
+     "size": 24
+    }
+   ]
+  },
+  {
+   "path": "src/engine/draft_miss272.cpp",
+   "functions": [
+    {
+     "name": "fn_801C098C",
+     "addr": "801C098C",
+     "size": 1832
+    },
+    {
+     "name": "fn_801C5444",
+     "addr": "801C5444",
+     "size": 1640
+    },
+    {
+     "name": "fn_801C6C80",
+     "addr": "801C6C80",
+     "size": 1388
+    }
+   ]
+  },
+  {
+   "path": "src/engine/draft_miss273.cpp",
+   "functions": [
+    {
+     "name": "fn_801CAD80",
+     "addr": "801CAD80",
+     "size": 1684
+    },
+    {
+     "name": "fn_801CC928",
+     "addr": "801CC928",
+     "size": 1172
+    },
+    {
+     "name": "fn_801CD044",
+     "addr": "801CD044",
+     "size": 1540
+    }
+   ]
+  },
+  {
+   "path": "src/engine/draft_miss274.cpp",
+   "functions": [
+    {
+     "name": "fn_801D603C",
+     "addr": "801D603C",
+     "size": 1376
+    },
+    {
+     "name": "fn_801D9B34",
+     "addr": "801D9B34",
+     "size": 1688
+    },
+    {
+     "name": "fn_801E763C",
+     "addr": "801E763C",
+     "size": 1416
     }
    ]
   },

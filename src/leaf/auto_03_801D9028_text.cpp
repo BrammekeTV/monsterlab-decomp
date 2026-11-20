@@ -14,7 +14,7 @@ extern u8 lbl_805FB874[];
 extern u8 lbl_805FB878[];
 extern u8 lbl_805FB890[];
 extern u8 lbl_805FB894[];
-extern u8 lbl_805FB898[];
+extern void* lbl_805FB898;
 extern "C" void fn_801D9164(u8*, u8*, u8*, u8*);
 extern "C" void* fn_801EB94C(void*);
 

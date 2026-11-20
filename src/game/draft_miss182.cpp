@@ -88,7 +88,7 @@ void   fn_801B1988(u8* p);                                            // 0x801B1
 BOOL   fn_801B50B0(void* unused, u8* obj);                            // 0x801B50B0
 void   fn_801B55F4(u8* obj, u8* out, s32 idx);                        // 0x801B55F4
 void*  fn_801D40E0(s32 n);                                            // 0x801D40E0 (alloc)
-void   fn_801E763C(u8* p);                                            // 0x801E763C
+u8*    fn_801E763C(u8* p);                                            // 0x801E763C
 void   fn_801E7E28(void* p);                                          // 0x801E7E28
 u32    fn_801EC880(u8* p, u32 hash);                                  // 0x801EC880
 void   fn_801ECDE8(u8* p, s32 idx, u32 a, s32 immediate);             // 0x801ECDE8
