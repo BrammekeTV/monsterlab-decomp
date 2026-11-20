@@ -63,7 +63,7 @@ extern "C" void fn_8012636C(s32, s32);
 extern "C" void fn_8012660C(s32);
 extern "C" void fn_80126684(s32);
 extern "C" s32 fn_8012670C(void);
-extern "C" void fn_801AC7F0(s32, u8*);
+extern "C" void fn_801AC7F0(u8*, u8*);
 extern "C" void fn_801B69F8(u8*);
 extern "C" void fn_801C9D74(u8*);
 extern "C" void fn_801D5D14(u8, f32);
@@ -363,9 +363,8 @@ void FreezePlayerInput(s32 a3) {
 
 // 0x800EC890
 void ClearUBAnims(void* a3) {
-    // tail-call arguments inferred from the registers set before the call
-    s32 t0 = *(s32*)(((u8*)(uintptr_t)(a3)) + 160);
-    fn_801AC7F0((s32)((u32)(t0)), ((u8*)(uintptr_t)(a3)));
+    u8* t0 = *(u8**)(((u8*)(uintptr_t)(a3)) + 160);
+    fn_801AC7F0(t0, ((u8*)(uintptr_t)(a3)));
 }
 
 // 0x800ECBB4

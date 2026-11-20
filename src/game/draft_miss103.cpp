@@ -82,7 +82,7 @@ s32 fn_80199094(void* obj);   // src/engine/small_8019c.cpp
 s32 fn_80199100(void* obj);   // src/engine/small_8019c.cpp
 s32 fn_80198290(u8* a3, s32 a4);
 s32 fn_8019829C(u8* a3, f32 f1);
-void fn_801223C0(u8* obj, s32 zone, u8** self);   // 0x801223C0
+s32 fn_801223C0(u8* self, s32 unused, u8** info);   // 0x801223C0
 u8* fn_801ED684(u8* handle);
 f64 fn_8033F1F8(f64 x);   // 0x8033F1F8, takes the ratio in f1, returns an angle in f1
 f32 fn_8033F1FC(f32 y, f32 x);

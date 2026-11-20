@@ -8,7 +8,6 @@
 extern "C" void fn_801BA470(void);
 extern void* gEventMgr;
 extern u8 lbl_80383C68[];
-extern u8 lbl_805FB6A0[];
 extern u8 lbl_805FB6A8[];
 extern u8 lbl_805FB6E0[];
 extern u8 lbl_805FB6E8[];
@@ -21,12 +20,6 @@ extern "C" void fn_801B1778(u8*, s32);
 extern "C" void fn_801BB530(s32, s32);
 extern "C" void fn_801EBA20(void*, void*);
 extern "C" void fn_801EBBE0(s32, u8*, s32);
-
-// 0x801B3308
-extern "C" s32 fn_801B3308(void) {
-    s32 t0 = *(s32*)((u8*)&lbl_805FB6A0);
-    return (s32)(t0);
-}
 
 // 0x801B3430
 extern "C" void fn_801B3430(u8* a3, s32 a4) {

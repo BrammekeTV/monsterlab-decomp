@@ -87,7 +87,7 @@ s32 RaySceneTest(void* ray);            // 0x80070458
 s32 fn_80216C60(u8* p, s32 a);          // 0x80216C60
 void fn_801F8F34(u8* p, f32 v);          // 0x801F8F34
 void fn_801F8FA0(u8* p, f32 v);          // 0x801F8FA0
-s32 fn_801F8628(u8* p, s8* v, s32 n);   // 0x801F8628
+void fn_801F8628(u8* obj, s8* src, s32 n);   // 0x801F8628
 u8* fn_801B3308(void);                  // 0x801B3308
 void fn_801B3310(u8* p, u8* q);         // 0x801B3310
 void fn_801B3378(u8* p, u8* key);       // 0x801B3378

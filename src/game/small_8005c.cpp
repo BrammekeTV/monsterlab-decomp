@@ -19,7 +19,7 @@ u32    fn_801EC880(u8* p, u32 hash);                           // 0x801EC880
 void   fn_801ECFA0(u8* p, s32 idx);                            // 0x801ECFA0
 void   fn_801C83AC(u8* mgr, u8* item);                         // 0x801C83AC
 void   fn_801C849C(u8* mgr, u8* item);                         // 0x801C849C
-void   fn_801ACCA0(u8* obj, s32 mode);                         // 0x801ACCA0
+void* fn_801ACCA0(u8* arg0, s32 arg1);                         // 0x801ACCA0
 void   fn_80055E38(u8* obj, u8* other, s32 flag);              // 0x80055E38
 s32 fn_801AC51C(u8* p, u8* obj, u8* target);                  // 0x801AC51C
 void   fn_801AC944(u8* clip, s32 a, u8* b, s32 c, u8* obj);    // 0x801AC944

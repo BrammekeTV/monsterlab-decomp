@@ -58,7 +58,7 @@ u8*   fn_8006FBDC(void);                                               // 0x8006
 void  fn_800974AC(u8* obj, s32 a);                                     // 0x800974AC
 void  fn_80123954(s32 v, u8* save);                                    // 0x80123954
 void  fn_80133698(u8* world, s32 zone);                                // 0x80133698
-s32   fn_80133840(u8* world, s32 zone);                                // 0x80133840
+void  fn_80133840(u8* world, s32 zone);                                // 0x80133840
 const char* fn_8013E3F0(void);                                         // 0x8013E3F0 (returns &lbl_803F2088)
 f32   fn_8013E3FC(void);                                               // 0x8013E3FC
 f32   fn_8013E404(void);                                               // 0x8013E404

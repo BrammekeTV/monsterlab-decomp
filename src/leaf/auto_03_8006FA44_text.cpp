@@ -67,12 +67,6 @@ extern "C" void fn_80070450(s32 a3) {
     *(u32*)((u8*)&lbl_805FB128) = (u32)((u32)(uintptr_t)(a3));
 }
 
-// 0x80070458
-extern "C" s32 RaySceneTest(void) {
-    s32 t0 = *(s32*)((u8*)&lbl_805FB124);
-    return (s32)(t0);
-}
-
 // 0x80070FAC
 extern "C" void fn_80070FAC(u8* a3, f32 f1) {
     f32 t0 = *(f32*)((u8*)&lbl_805FD5D8);

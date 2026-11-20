@@ -46,12 +46,12 @@ u8*   fn_80097590(u8* p, s32 del);                                    // 0x80097
 f32 fn_800999B4(u8* obj, f32 v);                                    // 0x800999B4
 void  fn_80099D08(u8* self);                                          // 0x80099D08
 u8*   fn_8009B264(u8* p);                                             // 0x8009B264
-u32   fn_8009B320(u8* p);                                             // 0x8009B320
+void fn_8009B320(u8* self);                                             // 0x8009B320
 u8*   fn_8009BE14(u8* p);                                             // 0x8009BE14
 void  fn_8010B16C(u8* p);                                             // 0x8010B16C
 void* fn_8010B184(void* p, s32 del);                                  // 0x8010B184
 u8*   fn_800E4BFC(u8* p);                                             // 0x800E4BFC
-void  fn_800E4CB0(u8* p, f32 a);                                      // 0x800E4CB0
+void fn_800E4CB0(u8* arg0);                                      // 0x800E4CB0
 u8*   fn_800E4D7C(u32 a0);                                            // 0x800E4D7C
 void  fn_8018A948(u8* obj, f32 t);                                    // 0x8018A948
 void  fn_8018D2B8(const char* fmt, ...);                              // 0x8018D2B8
@@ -542,13 +542,14 @@ u8* fn_80099AF4(u8* arg0) {
         *(f32*)(arg0 + 0x8C) = lbl_803462C8[RaySceneTest(NULL)];
     }
     fn_80099D08(arg0);
-    u8* prop = fn_800E4D7C(fn_8009B320(arg0 + 0x180));
+    fn_8009B320(arg0 + 0x180);
+    u8* prop = fn_800E4D7C(0);  // TODO: asm passes whatever fn_8009B320 leaves in r3 (unknown)
     u8* anim = fn_801AC184(*(u8**)(*(u8**)(fn_800E4BFC(prop) + 0x9C) + 0x48), *(s32*)(prop + 0x5C));
     *(u32*)(anim + 0xC) |= 0x10000;
     *(u8*)(prop + 0x54) = 1;
     u8* holder = fn_800E4BFC(prop);
     u8* obj = (*(GetObjFn*)(*(u8**)holder + 0x10))(holder);
-    fn_800E4CB0(prop, 0.0f);
+    fn_800E4CB0(prop);
     fn_8018A948(obj, 0.0f);
     u8* blk = fn_800E4BFC(prop);
     *(u32*)(blk + 0x15C) |= 1;

@@ -9,10 +9,6 @@ extern u8 lbl_805FE478[];
 extern f32 lbl_805FE47C;
 extern f32 lbl_805FE488;
 
-// 0x800C82BC
-extern "C" void fn_800C82BC(void) {
-}
-
 // 0x800C8300
 extern "C" f32 fn_800C8300(u8* a3) {
     f32 t0 = *(f32*)((u8*)&lbl_805FE47C);

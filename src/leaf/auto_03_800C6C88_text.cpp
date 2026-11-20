@@ -5,15 +5,6 @@
 
 #include "types.h"
 
-// 0x800C6C88
-extern "C" void fn_800C6C88(u8* a3) {
-    *(u32*)(((u8*)(uintptr_t)(a3)) + 0) = (u32)((u32)(0));
-    *(u32*)(((u8*)(uintptr_t)(a3)) + 4) = (u32)((u32)(0));
-    *(u32*)(((u8*)(uintptr_t)(a3)) + 8) = (u32)((u32)(0));
-    *(u32*)(((u8*)(uintptr_t)(a3)) + 12) = (u32)((u32)(0));
-    *(u32*)(((u8*)(uintptr_t)(a3)) + 16) = (u32)((u32)(0));
-}
-
 // 0x800C6EFC
 extern "C" void fn_800C6EFC(u8* a3) {
     *(u32*)(((u8*)(uintptr_t)(a3)) + 0) = (u32)((u32)(0));

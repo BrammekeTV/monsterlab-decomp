@@ -5,8 +5,8 @@
 
 #include "types.h"
 
-extern u8 lbl_805FE348[];
-extern u8 lbl_805FE34C[];
+extern f32 lbl_805FE348;
+extern f32 lbl_805FE34C;
 
 // 0x800C09C0
 extern "C" f32 fn_800C09C0(u8* a3) {

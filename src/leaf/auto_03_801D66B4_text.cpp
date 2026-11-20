@@ -57,12 +57,6 @@ extern "C" void CameraSetFov(u8* a3, f32 f1) {
     *(f32*)(((u8*)(uintptr_t)(a3)) + 172) = (f32)(f1);
 }
 
-// 0x801D8AD4
-extern "C" f32 fn_801D8AD4(u8* a3) {
-    f32 t0 = *(f32*)(((u8*)(uintptr_t)(a3)) + 172);
-    return (f32)(t0);
-}
-
 // 0x801D8BB0
 extern "C" void fn_801D8BB0(void) {
 }

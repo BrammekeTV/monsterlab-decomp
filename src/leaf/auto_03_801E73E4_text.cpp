@@ -9,7 +9,6 @@ extern u8 gScriptFuncs[];
 extern u8 lbl_804DD0C8[];
 extern u8 lbl_804DD0D4[];
 extern u8 lbl_804DD100[];
-extern s32 lbl_805FB6B8;
 extern "C" void BufferFree(void*);
 extern "C" s32 InterpolateQuaternionTask_Update_SLERP(u8*, void*);
 extern "C" s32 InterpolateVector3Task_Update_LERP(u8*, void*);
@@ -73,18 +72,6 @@ extern "C" u32 fn_801ED2FC(u8* a3) {
     }
     u32 t2 = (u32)(t0) & 0xfu;
     return (u32)(t2);
-}
-
-// 0x801ED538
-extern "C" s32 fn_801ED538(u8* a3) {
-    u8 t0 = *(u8*)(((u8*)(uintptr_t)(a3)) + 0);
-    s32 t1 = *(s32*)((u8*)&lbl_805FB6B8);
-    u32 t2 = (((u32)(t0) << 28) | ((u32)(t0) >> 4)) & 0x8u;
-    if (t2 == 0) {
-        return (s32)(t1);
-    }
-    s32 t3 = *(s32*)(((u8*)(uintptr_t)(a3)) + 0);
-    return (s32)(t3);
 }
 
 // 0x801EE134

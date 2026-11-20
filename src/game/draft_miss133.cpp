@@ -22,7 +22,7 @@ u32    RandomU32(void);
 s32    RaySceneTest(void* ray);                        // 0x80070458 (actually returns the global at 0x805FB124)
 int    SysSprintf(char* buf, const char* fmt, ...);
 u8*    fn_8006FA74(u8* self, s32 type);                // 0x8006FA74 (base ctor, returns self)
-void   fn_8006FC04(u8* p);                             // 0x8006FC04
+void fn_8006FC04(void);                             // 0x8006FC04
 void   fn_80075264(u8* p, s32 v);                      // 0x80075264
 void   fn_800A4320(u8* obj, u8* pos);                  // 0x800A4320
 u8*    fn_800A43A8(u8* p, s32 group, s32 idx);         // 0x800A43A8 (returns the entry pointer)
@@ -31,8 +31,8 @@ void   fn_800B2740(u8* p);                             // 0x800B2740
 void   fn_800B5990(u8* p);                             // 0x800B5990
 void   fn_800B8830(u8* p, f32 v);                      // 0x800B8830
 void   fn_800B9D94(u8* p);                             // 0x800B9D94
-void   fn_800BF97C(u8* p, void* vtable);               // 0x800BF97C
-void   fn_800BFAC0(u8* p, f32* pos, u8* target);       // 0x800BFAC0
+void fn_800BF97C(u8* arg0);               // 0x800BF97C
+void fn_800BFAC0(u8* arg0, f32* arg1);       // 0x800BFAC0
 s32    fn_800C0AE8(u8* p);                             // 0x800C0AE8
 u8*    fn_800C2FF0(u8* p);                             // 0x800C2FF0
 extern "C++" u8* fn_800C42B8(u8* p);                             // 0x800C42B8
@@ -54,7 +54,7 @@ u8*    fn_801B3308(void);                              // 0x801B3308
 void   fn_801B3310(u8* p, u8* q);                      // 0x801B3310
 void*  fn_801D40E0(s32 n);                             // 0x801D40E0
 void   fn_801F61AC(u8* p, s32 a);                      // 0x801F61AC
-s32    fn_801F8628(u8* p, s8* v, s32 n);               // 0x801F8628
+void fn_801F8628(u8* obj, s8* src, s32 n);               // 0x801F8628
 void   fn_801F8F34(u8* p, f32 v);                      // 0x801F8F34
 void   fn_801F8FA0(u8* p, f32 v);                      // 0x801F8FA0
 void   fn_801F94B0(u8* p, s32 v);                      // 0x801F94B0
@@ -432,7 +432,7 @@ u8* fn_800B9AA0(u8* arg0) {
     fn_8006FA74(arg0, 0xB);
     *(void**)(arg0 + 0x4) = lbl_8035E870;
     *(f32*)(arg0 + 0x90) = 0.0f;
-    fn_800BF97C(arg0 + 0x240, lbl_8035E870);
+    fn_800BF97C(arg0 + 0x240);
     fn_801F61AC(arg0 + 0x3BC, *(s32*)(lbl_803C4298 + 0x38));
     *(s32*)(arg0 + 0x488) = 0;
     for (i = 0x94; i <= 0x120; i += 4) *(s32*)(arg0 + i) = 0;
@@ -445,7 +445,7 @@ u8* fn_800B9AA0(u8* arg0) {
     pos[0] = *(f32*)(target + 0x0);
     pos[1] = *(f32*)(target + 0x4);
     pos[2] = *(f32*)(target + 0x8);
-    fn_800BFAC0(arg0 + 0x240, pos, target);
+    fn_800BFAC0(arg0 + 0x240, pos);
     fn_800C0AE8(arg0 + 0x240);
     *(f32*)(arg0 + 0x90) = 70.0f;
     idx = RaySceneTest(NULL);
@@ -549,7 +549,7 @@ u8* fn_800CE480(u8* arg0) {
     fn_800C42B8(arg0 + 0x3020);
     CameraSetFov(lbl_8047C640,
                  2.0f * (1.5707964f * (0.63661975f * (f32)fn_8033E8EC((f64)((10.0f * (f32)fn_8033F17C(0.46364763f)) / 70.0f)))));
-    fn_8006FC04(arg0);
+    fn_8006FC04();
     fn_800CF7E8(arg0);
     *(f32*)(arg0 + 0xA0) = 0.0f;
     *(f32*)(arg0 + 0x9C) = 0.0f;
