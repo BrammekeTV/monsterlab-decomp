@@ -6,8 +6,9 @@
 2. Runs its self-test: a synthetic big-endian file built in memory (CI runs the same).
 3. If the real file is there (default: orig/RM7P4F/files/streams/global_binary.sir; also looked
    for in the main checkout when run from a git worktree), loads it with the C++ loader and
-   compares every header slot, table descriptor and row with the Python reference decoder
-   (`tools/sir_decoder.py --gamedb`), which reads the big-endian bytes directly.
+   compares every header slot, table descriptor and row, and the hand-typed image objects (input
+   table, textures, string table, action table), with the Python reference decoder
+   (`tools/sir_decoder.py --gamedb --image`), which reads the big-endian bytes directly.
 4. The same for ../catalog.sir (`--catalog`), plus a check that the catalog agrees with the
    section table inside each of the .sir files it lists.
 
@@ -25,7 +26,9 @@ import sir_decoder
 
 REL = os.path.join("orig", "RM7P4F", "files", "streams", "global_binary.sir")
 SAMPLES = ("part 0 ", "part 57 ", "part 185 ", "action 0 ", "action 200 ", "action 371 ",
-           "tuning 0 ", "tuning 100 ", "tuning 214 ", "row 39 0 ", "row 41 0 ")
+           "tuning 0 ", "tuning 100 ", "tuning 214 ", "row 39 0 ", "row 41 0 ",
+           "input ", "inputseq 50 ", "inputstep img+0x28b0 ", "texlist ", "texture 1 ", "slottexture 0x824 ",
+           "strings ", "string 100 ", "actions ", "actionrec 955 ")
 
 
 def find_data():
@@ -103,7 +106,7 @@ def main():
     if data is None:
         print("real-file check skipped: " + REL + " not found")
         return 0
-    ok = compare(exe, "--dump", data, sir_decoder.gamedb_dump(data), SAMPLES)
+    ok = compare(exe, "--dump", data, sir_decoder.gamedb_dump(data) + sir_decoder.image_dump(data), SAMPLES)
 
     streams = os.path.dirname(data)
     catalog = os.path.join(os.path.dirname(streams), "catalog.sir")

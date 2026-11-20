@@ -5,7 +5,8 @@ pointers. The PC build is little-endian Win32. This note says how the original l
 how the port converts them, and what is implemented.
 
 Code: `include/port/sir_loader.h`, `src/port/sir_loader.cpp`. Test: `tests/sir_loader_test.cpp`,
-`python tools/loader_check.py`. Reference decoder: `python tools/sir_decoder.py <file> --gamedb`.
+`python tools/loader_check.py`. Reference decoder: `python tools/sir_decoder.py <file> --gamedb`
+(game database), `--image` (the other objects of `global_binary.sir`), `--catalog`.
 
 ## Status
 
@@ -13,14 +14,23 @@ Code: `include/port/sir_loader.h`, `src/port/sir_loader.cpp`. Test: `tests/sir_l
 |---|---|
 | Container (`PNP0` header, section table) | parsed |
 | `catalog.sir` (file table: 6,394 section entries, 59 file records) | converted |
-| `global_binary.sir` header block (4 KB) | converted; 8 slots typed from code, the rest from the data (listed in the source) |
+| `global_binary.sir` header block (4 KB) | converted; 14 slots typed from code, the rest from the data (listed in the source) |
 | `global_binary.sir` game database (42 tables, 2,591 rows) | converted from the schema stored in the file |
-| Rest of the `global_binary.sir` image (about 88%: textures, models, string table, UI, fonts) | not converted yet |
+| `global_binary.sir` input table (slot `0xDC4`: 98 sequences, 101 steps) | converted; typed from code, except the last 0x38 bytes of the table (from the data) |
+| `global_binary.sir` textures (slot `0xD94`: list of 44, including the two at `0x824` and `0x828`) | headers converted; pixel data and palettes stay in GX layout |
+| `global_binary.sir` string table (slot `0xDA8`: 4,274 strings) | converted |
+| `global_binary.sir` action table (slot `0x844`: 956 records) | table and pointer array converted; the records (script words) are not |
+| `global_binary.sir` screen list and HUD (`0xD98`, `0xD9C`), UI objects (`0xDB0`-`0xDC0`), `0x10`, `0x418`, `0x830`, `0x83C` | not converted: see "Not converted yet" |
 | Hook into the game's `SirLoad` | not wired (the port has no file layer yet) |
 
-Check against the real files: all 3,823 compared lines of `global_binary.sir` (every header slot,
-table descriptor and row, plus parts, actions and tuning values read through the game's own
-structs and offsets) and all 6,457 lines of `catalog.sir` match the Python reference.
+Of the 1,096,124 bytes of the image, 15.3% is now converted by a schema (the game database is
+11.5%), 57.0% is data that needs no conversion and is reached from a converted object (texture
+pixels and palettes, string bytes), and 4.3% is fill words. 23.4% (257 KB) is not typed yet.
+
+Check against the real files: all 9,304 compared lines of `global_binary.sir` (every header slot,
+table descriptor and row, parts, actions and tuning values, and every sequence, step, texture
+header, string and action pointer, read through the game's own structs and offsets) and all
+6,457 lines of `catalog.sir` match the Python reference.
 
 ## How the original loads a file
 
@@ -101,11 +111,12 @@ Anything no schema names stays as it was read from disc.
 
 2. **Hand-written schemas, built from what the decompiled code reads.** Where a file does not
    describe itself, a struct gets a table of `SirField {offset, type, count}` entries in
-   `sir_loader.cpp` and is converted with `SirConvertRecord`. Three exist so far: the database
-   object, the table descriptor, and the 4 KB header block. Each entry of the header schema is
-   marked `code` (a decompiled function reads the slot with that type, e.g. `0x824` texture
-   pointer, `0x820` flag byte) or `data` (typed only from the values in the file; to confirm when
-   the reading code is decompiled). Words not listed are 0 or -1 in the shipped file.
+   `sir_loader.cpp` and is converted with `SirConvertRecord`: the database object, the table
+   descriptor, the 4 KB header block, and the image objects described under "The other objects
+   of `global_binary.sir`". Each entry is marked `code` (a decompiled function reads the field
+   with that type, e.g. `0x824` texture pointer, `0x820` flag byte) or `data` (typed only from
+   the values in the file; to confirm when the reading code is decompiled). Header words not
+   listed are 0 or -1 in the shipped file.
 
    New schemas should come from the same evidence: the access width and type in the decompiled
    code (`*(s16*)(row + 0x1C)`, `*(f32*)...`, a pointer dereference). Once a layout is solid it
@@ -154,8 +165,11 @@ validates everything (descriptor signature, field count, known type codes with m
 computed row size equal to the stored one, rows inside the image, no two tables or descriptors
 sharing bytes) and only then changes the first byte. A file it does not understand is rejected
 whole, with the failing table index. Hand-written schemas are bounds-checked against the record
-size. Conversion happens once per load; nothing in the data marks it as converted, so the caller
-owns that.
+size. The hand-typed image objects are checked the same way: every count, type code and pointer
+is read from the big-endian bytes first and each object is recorded as a region; a region outside
+the image, a texture list whose links disagree, or two regions that share bytes rejects the file
+before anything changes. Conversion happens once per load; nothing in the data marks it as
+converted, so the caller owns that.
 
 ### Where it plugs into the game
 
@@ -178,15 +192,22 @@ python tools/loader_check.py
    refused with the image left untouched. CI runs this step (no game data needed).
 3. With the real file in `orig/` (never committed): the C++ loader converts it and prints every
    header slot, descriptor and row, then parts, actions and tuning values through `PartDef`,
-   `PartAction`, `PartActionType` and the `data + 0x99D0` tuning rows, as the game reads them.
-   The output must equal `tools/sir_decoder.py --gamedb`, which decodes the big-endian bytes
-   directly in Python.
+   `PartAction`, `PartActionType` and the `data + 0x99D0` tuning rows, as the game reads them,
+   then the image objects through `InputSequence`, `SirTexture`, `SirStringTable` and
+   `SirActionTable`. The output must equal `tools/sir_decoder.py --gamedb --image`, which decodes
+   the big-endian bytes directly in Python. Texture pixels and string bytes are compared by a
+   checksum, so a conversion that touched them would show.
+
+The self-test also builds an input table, two textures, a string table and an action table, and
+19 broken variants of them (bad counts, unknown step class, list loops, pointers off the image,
+overlapping objects) that must be refused untouched.
 
 Result on PAL `RM7P4F`:
 
 - `global_binary.sir`: 18 header pointers, 13 header words, 3 header bytes, 42 tables,
-  382 columns, 2,591 rows, 186 parts, 372 actions and 215 tuning values, all equal. The load
-  report shows 60 image pointers relocated and none kept or unknown.
+  382 columns, 2,591 rows, 186 parts, 372 actions and 215 tuning values; 98 input sequences,
+  101 steps, 44 textures, 4,274 strings and 956 action pointers, all equal. The load report shows
+  5,615 image pointers relocated and none kept or unknown.
 - `catalog.sir`: 6,394 entries and 59 file records, all equal. All 59 file-name hashes equal
   `StringHash` of the stored name, and the two lookups `GameStart` makes for
   `global_binary.sir` find sector 1 / 4,096 bytes and sector 3 / 1,096,124 bytes.
@@ -213,7 +234,103 @@ On PC the port's file layer converts the buffer once, between the read and the c
 `fn_801E54E4`. File names in the records are lower-case (`castle_arm_wrestlec.sir` for
 `castle_arm_wrestleC.sir`), which Windows resolves; a case-sensitive file system needs a lookup.
 
+## The other objects of `global_binary.sir`
+
+Structs and constants are in `include/port/sir_loader.h`; the schemas, with the function each
+field was typed from, in `src/port/sir_loader.cpp`.
+
+### Input table (header slot `0xDC4`)
+
+`GameStart` passes it to `fn_800214D4`; `RemoteInputGet(table, id)` returns one input.
+
+| Offset | Field |
+|---|---|
+| `0x000` | 8 sequences of 0x48 bytes |
+| `0x240` | up to 100 more sequences |
+| `0x1E60` | `s32 index[34]`: sequence number (in the array at `0x240`) for each input id |
+| `0x1EE8` | `s32` sequences in use at `0x240` (90) |
+| `0x1EEC`-`0x1F23` | six pointers to the first six sequences, then `0, -, 1.0, 1, 0, 320.0, 240.0, 0`: typed from the data only |
+
+A sequence (`InputSequence`) is a step count, the current step, two values, ten step pointers,
+three times and a flag: `RemoteInputUpdate` reads all of it. A step is one of ten classes,
+chosen by the type word at `+0x48`; the names are the classes' RTTI names in `main.dol`:
+
+| Type | Class | Bytes in the file | State behind the common 0x50 bytes |
+|---|---|---|---|
+| 0 | `CAbstractInputButtonHeld` | 0x50 | none |
+| 1 | `CAbstractInputButtonJustReleased` | 0x60 | `f32` previous value |
+| 2 | `CAbstractInputButtonJustPressed` | 0x60 | `f32` previous value |
+| 3 | `CAbstractInputTwoButtonToggle` | 0x50 | none in the file (see "Found on the way") |
+| 4 | `CAbstractInputAnyButtonsHeld` | 0x50 | none |
+| 5 | `CAbstractInputAnyButtonsReleased` | 0x60 | `f32` previous value per source (4) |
+| 6 | `CAbstractInputAnyButtonsJustPressed` | 0x60 | `f32` previous value per source (4) |
+| 7 | `CAbstractInputRotateCW` | 0x60 | `s32` direction (-1), `f32` timer, time, steps |
+| 8 | `CAbstractInputRotateCCW` | 0x60 | same |
+| 9 | `CAbstractInputToggle` | 0x60 | `f32` previous value |
+
+The common part is `f32 raw, f32 value, s32 sourceCount`, up to four sources of 12 bytes
+(`u32 id, f32 value, u32 kind`; `fn_8001FCA8` switches on the kind, 0-0x1C), `s32` at `0x3C`,
+an `f32` range at `0x40`, the type, and a vtable slot at `0x4C`. Only `sourceCount` sources are
+converted; the unused ones hold fill words. The vtable slot holds a build-time address
+(`0x8048C4B0`, ...) and is typed as a plain word: `fn_80020334`, called from `fn_800214D4` at
+boot, stores the real vtable for the step's type there before anything uses it. On PC that boot
+code does the same with the port's vtables, so no resolver entry is needed.
+
+### Textures (header slot `0xD94`, and `0x824`, `0x828`)
+
+Slot `0xD94` points at the start of the image: a word (`0x42`), then a list `{head, tail,
+count}` of all 44 textures in the file, linked through `next` / `prev` / `list` pointers at
+`+0x28` of each texture. This list is typed from the data only; the loader walks it to find the
+textures and checks every link. Slots `0x824` (`Icon-HomeButtonMenu_is_not_available`, kept by
+`fn_801FC038`) and `0x828` (`Generic_box`, kept by `fn_801D5D0C`) point at the first two. Both
+are textures: `Generic_box` is a 16x16 palette texture, not a model.
+
+Texture header (`SirTexture`): `u32` 0x54, `u16` width and height twice (`fn_801FCA38` reads the
+first pair, `fn_80195A58` writes the second to the GX image register), twelve bytes (`0x0C`-`0x17`;
+mip count, GX format, palette format and others read by `fn_80195A58`; four have no known reader),
+`u32` data size, pointers to the pixel data and the palette, a small count, the three list
+pointers, a byte and the name. Pixel data and palette entries are **not** converted: they are in
+GX layout, for the port's GX layer to decode. `fn_80195A58` turns the data pointer into a
+physical address for a GX register (`>> 5`); on PC the GX layer has to take the host pointer
+there instead.
+
+### String table (header slot `0xDA8`)
+
+`{const char** strings, ptr, u32 build-time address, u32 count, ptr text}`. The game's string
+lookups (`LookupString` in `src/game/combat_hud.cpp` and its inlined copies) read `strings[id]`
+for `id < count`. The loader converts the object and the 4,274 pointers; the text
+is single-byte and stays as it is. The second pointer leads to zeroed words behind the array.
+
+### Action table (header slot `0x844`)
+
+`{u32 count, ptr records}`, read by `TriggerDoAction` for zone id 0x1FF: `records[index]` is
+passed on as the address of an action record. Table and the 956 pointers are converted. The
+records themselves (`0xDD000`-`0xF5D30`, script words such as `0x17FC0001`) are **not**: their
+format is not decoded in the decompiled code yet, so a `TriggerDoAction` on a global action would
+read big-endian words.
+
+### Not converted yet
+
+| Slot | Image offset | What is known | Why not |
+|---|---|---|---|
+| `0xD98`, `0xD9C` | `0xD77B0`, `0xD7820` | Screen list and HUD. A 0x70-byte object `{target, s32 current (-1), ...}`; the HUD holds up to 256 pointers to such objects from `+0x28`, count at `+0x428`. A target (`0xD4200`) has an array of 0x30-byte entries (`+0`, count `+4`), a pointer array of typed nodes (`+0x10`, count `+0x1C`, type 0-4 at node `+8`) and a key at `+0x30`; `fn_801BC5F0` installs vtables in all of them at boot | the entry and node layouts are not worked out yet (10 of the 20 functions in their vtables are decompiled) |
+| `0xDB0` | `0x26560` | UI root (`gScreenSets`): pointers to the objects below and to three more objects (`+0x14`-`+0x1C`; `ScreenSetsInit` installs a vtable in the sub-object at `+0xCC` of each, by the kind word at its `+4`) | those objects are not typed |
+| `0xDB4`, `0xDB8`, `0xDBC` | `0x26600`, `0x37660`, `0x38000` | kept in `lbl_805FB660`, `lbl_805FB658` (the object `fn_80195A58` draws through), `lbl_805FB670` | no field typed by code beyond `+4` of `0xDB8` |
+| `0xDC0` | `0xF6CF0` | a table of screen names (`UI_MSA_newscreen`, ...) with ids and hashes | no decompiled function reads the slot |
+| `0x10`, `0x418`, `0x830`, `0x83C` | `0xF7580`, `0xF81D0`, `0xFDE20`, `0x100650` | effect data (`lightning_scrying`, `trail_plant`) | no decompiled function reads the slots |
+
+Until these are converted the UI cannot run from this file on PC. The same screen format is
+expected in `shared_ui.sir`, so it is the next thing to type.
+
 ## Found on the way
+
+- `CAbstractInputTwoButtonToggle` (`fn_800208C0`, reset `fn_800208A0`) keeps state at `+0x50`,
+  `+0x54` and `+0x58`, but the one toggle step in the file (image `0x3840`) is 0x50 bytes long
+  and the next step starts at `0x3890`. Resetting or updating that toggle on the Wii overwrites
+  the next step's first three words (raw value, value, source count). The loader converts those
+  words as the next step's fields.
+- The image's build-time `main.dol` addresses in the input steps are vtable slots that the boot
+  code overwrites. That is one more class of them that needs no resolver.
 
 - `PartDef` (`include/game/part.h`) ends with five `s16` at `0x40`–`0x49` and three `u8` at
   `0x4A`–`0x4C` according to the file's schema, not four `u16` and two `u8[4]`.
@@ -225,10 +342,10 @@ On PC the port's file layer converts the buffer once, between the read and the c
 
 In the order the boot path needs them:
 
-1. **The rest of `global_binary.sir`**: the string table (header slot `0xDA8`, 0x10B2 entries),
-   the two objects the boot code hands to the engine (`0x824`, `0x828`: both start with a
-   `0x54`-byte GX texture header; pixel data stays big-endian for the GX layer), the screen-set list
-   (`0xD98`), and the objects at `0xDB0`–`0xDC4`. Each needs a hand-written schema.
-2. **`shared_ui.sir`** screens (title screen), then **`shared_texture.sir`**.
+1. **UI data**: the screen list and HUD of `global_binary.sir` (`0xD98`, `0xD9C`), the UI root
+   and fonts (`0xDB0`-`0xDC0`), and **`shared_ui.sir`** (title screen), which should use the
+   same screen format. Needs the node types that `fn_801BC5F0` switches on.
+2. **Action records** (`0x844`'s targets) and the effect data at `0x10`, `0x418`, `0x830`, `0x83C`.
+   Then **`shared_texture.sir`**: the texture header schema here should apply as it is.
 3. **Save files**: written from memory by the Wii build, so big-endian too.
 4. **`shared_parts.sir`** and the level and arena files: models, skeletons, textures.
