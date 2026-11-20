@@ -32,6 +32,14 @@ jobs:
           $objs = (Get-ChildItem out -Recurse -Filter *.obj).Count
           Write-Output "::notice::Compiled $objs source files"
           exit $code
+      - name: Loader self-test
+        # PC port data loader on a synthetic big-endian file (no game data in CI).
+        shell: pwsh
+        run: |
+          cmake --build out --config Release --target sir_loader_test -- /nologo /v:minimal
+          if ($LASTEXITCODE) { exit $LASTEXITCODE }
+          & out/Release/sir_loader_test.exe --selftest
+          exit $LASTEXITCODE
       - name: Link check (missing symbols)
         # Linking is expected to fail until the platform layer exists; the linker output is the
         # to-do list. This step reports it and only fails on duplicate definitions or mismatches.

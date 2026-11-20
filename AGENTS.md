@@ -37,6 +37,7 @@ a PC port. Read this whole file before making changes. Human contributors: see
 | `include/` | shared headers: `types.h`, `revolution.h` (SDK decls), `game/*.h`, `engine/*.h` |
 | `src/game/`, `src/engine/`, `src/system/` | hand-decompiled code, one file per system |
 | `src/leaf/` | generated tiny functions |
+| `src/port/`, `include/port/`, `tests/` | PC port code that has no original (data loader, see `docs/loader.md`) and its tests; no `// 0xADDR` markers here |
 | `tools/` | scripts (below) |
 
 ## Tools
@@ -69,6 +70,8 @@ a PC port. Read this whole file before making changes. Human contributors: see
   fails only on duplicates/mismatches. Declare globals with the type of their definition; `tools/gen_leaf.py`
   copies those types into `src/leaf/`.
 - `python tools/check.py [files]`: compile with MSVC using the CI flags (no args = changed files).
+- `python tools/loader_check.py`: builds the PC data loader test, runs its self-test and, with the game in `orig/`,
+  compares the loaded `global_binary.sir` with `python tools/sir_decoder.py <file> --gamedb` (the reference dump).
 - `python tools/progress.py`: progress numbers.
 - `python tools/changelog_add.py "text"`: add a progress-site changelog entry stamped with the real time (maintainer only).
 

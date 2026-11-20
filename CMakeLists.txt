@@ -26,3 +26,12 @@ set_target_properties(monsterlab_link PROPERTIES LINKER_LANGUAGE CXX)
 if(MSVC)
   target_link_options(monsterlab_link PRIVATE /NOLOGO)
 endif()
+
+# PC port loader test (tests/sir_loader_test.cpp): `--selftest` needs no game data and runs in CI;
+# `--dump <global_binary.sir>` is compared with the Python reference by tools/loader_check.py.
+add_executable(sir_loader_test tests/sir_loader_test.cpp src/port/sir_loader.cpp)
+target_include_directories(sir_loader_test PRIVATE include)
+if(MSVC)
+  target_compile_options(sir_loader_test PRIVATE /W3 /permissive- /utf-8)
+  target_compile_definitions(sir_loader_test PRIVATE _CRT_SECURE_NO_WARNINGS)
+endif()

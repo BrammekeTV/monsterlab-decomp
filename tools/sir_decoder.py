@@ -21,6 +21,7 @@ Usage:
   python sir_decoder.py some.sir --list                       # just list what's inside
   python sir_decoder.py some.sir --sections                   # also dump raw sections
   python sir_decoder.py some.sir --only mbo                   # only items whose name contains "mbo"
+  python sir_decoder.py global_binary.sir --gamedb            # print the game database (text, to stdout)
 
 Format notes (reverse-engineered):
   Archive header (big-endian): 'PNP0', u32 version, u32 section count, ...
@@ -33,7 +34,10 @@ Format notes (reverse-engineered):
   Meshes: standard GX command streams (CP/XF/BP writes + indexed draw primitives).
 """
 import argparse, json, os, re, struct, sys, collections
-import numpy as np
+try:
+    import numpy as np
+except ImportError:      # only --gamedb works without numpy
+    np = None
 
 try:
     from PIL import Image
@@ -372,6 +376,90 @@ def write_obj(path, groups):
             for a, b, c in F + 1 + base: f.write(f'f {a}/{a}/{a} {b}/{b}/{b} {c}/{c}/{c}\n')
             base += len(V)
 
+# ----------------------------------------------------------------------------- game database
+# global_binary.sir: section 0 is a 4 KB block of pointers into section 1, a memory image the Wii
+# places at 0x90400000. Header slot 0xDC8 points at the game database object; its word +0xC points
+# at 42 table descriptors of 0x428 bytes. Each descriptor describes its own rows:
+#   +0x00 two main.dol function pointers   +0x08 rows pointer   +0x0C row count   +0x10 1
+#   +0x14 layout hash   +0x18 row size     +0x1C row count again
+#   +0x20 u32 type[64]  +0x120 u32 size[64]  +0x220 u32 column-name hash[64]
+#   +0x320 u32 hash of the table an id column refers to, or -1 [64]
+#   +0x420 field count  +0x424 u8 present
+# Type codes: 3 = s32, 4 = f32, 5 = u32 hash, 6 = s16, 7 = u8 flag, 8 = u8, 11 = s32 (always -1).
+# Fields are packed in order, each aligned to its size; rows are padded to 4 bytes. Unused memory
+# is filled with 0x7F800001. This reader is the reference the PC loader (src/port/sir_loader.cpp)
+# is checked against (tools/loader_check.py), so it reads the big-endian bytes directly.
+GB_BASE = 0x90400000
+GB_TABLES = 42
+GB_DESC = 0x428
+GB_FMT = {3: '>i', 4: '>I', 5: '>I', 6: '>h', 7: 'B', 8: 'B', 11: '>i'}
+GB_HDR_PTRS = (0x10, 0x418, 0x824, 0x828, 0x830, 0x83C, 0x844, 0xD94, 0xD98, 0xD9C,
+               0xDA8, 0xDB0, 0xDB4, 0xDB8, 0xDBC, 0xDC0, 0xDC4, 0xDC8)
+GB_HDR_WORDS = (0x8, 0x82C, 0x838, 0x848, 0x85C, 0x860, 0x864, 0x86C, 0x870, 0x874, 0x878, 0x960, 0xD8C)
+
+def gamedb_tables(sec, db):
+    """[(descriptor fields dict, rows as lists of raw values)] for the 42 tables."""
+    u = lambda o: struct.unpack_from('>I', sec, o)[0]
+    data = u(db - GB_BASE + 0xC) - GB_BASE
+    out = []
+    for t in range(GB_TABLES):
+        D = data + t * GB_DESC
+        n = u(D + 0x420)
+        tb = dict(fn=(u(D), u(D + 4)), rows=u(D + 8), count=u(D + 0xC), layout=u(D + 0x14), rowsize=u(D + 0x18),
+                  present=sec[D + 0x424],
+                  types=[u(D + 0x20 + i * 4) for i in range(n)], sizes=[u(D + 0x120 + i * 4) for i in range(n)],
+                  names=[u(D + 0x220 + i * 4) for i in range(n)], refs=[u(D + 0x320 + i * 4) for i in range(n)])
+        rows = []
+        for i in range(tb['count']):
+            o = tb['rows'] - GB_BASE + i * tb['rowsize']; row = []
+            for ty, sz in zip(tb['types'], tb['sizes']):
+                o = (o + sz - 1) // sz * sz
+                row.append(struct.unpack_from(GB_FMT[ty], sec, o)[0]); o += sz
+            rows.append(row)
+        out.append((tb, rows))
+    return out
+
+def gamedb_dump(path):
+    """Text dump of the header slots and every game database value (one line per row)."""
+    version, secs = read_archive(path)
+    if len(secs) != 2 or secs[0]['size'] != 0x1000:
+        raise SystemExit(f'{path}: not global_binary.sir (expected a 4 KB header section and an image)')
+    hdr, sec = secs[0]['data'], secs[1]['data']
+    u = lambda d, o: struct.unpack_from('>I', d, o)[0]
+    def ptr(v):
+        if v == 0: return 'null'
+        if GB_BASE <= v <= GB_BASE + len(sec): return 'img+0x%x' % (v - GB_BASE)
+        return 'wii:%08x' % v
+    L = []
+    for o in GB_HDR_PTRS: L.append('hdrptr 0x%03x %s' % (o, ptr(u(hdr, o))))
+    for o in GB_HDR_WORDS: L.append('hdrword 0x%03x %08x' % (o, u(hdr, o)))
+    for o in (0x820, 0x834, 0x840): L.append('hdrbyte 0x%03x %d' % (o, hdr[o]))
+    db = u(hdr, 0xDC8)
+    L.append('gamedb %s data %s' % (ptr(db), ptr(u(sec, db - GB_BASE + 0xC))))
+    tables = gamedb_tables(sec, db)
+    for t, (tb, rows) in enumerate(tables):
+        n = len(tb['types'])
+        line = 'table %d rows %s fn %s %s count %d rowsize %d fields %d present %d' % (
+            t, ptr(tb['rows']), ptr(tb['fn'][0]), ptr(tb['fn'][1]), tb['count'], tb['rowsize'] if tb['count'] else 0, n, tb['present'])
+        if tb['count']: line += ' layout %08x' % tb['layout']
+        L.append(line)
+        if not tb['count']: continue
+        for i in range(n):
+            L.append('field %d %d type %d size %d name %08x ref %08x' % (t, i, tb['types'][i], tb['sizes'][i], tb['names'][i], tb['refs'][i]))
+        pre = {4: 'f%08x', 5: 'h%08x'}
+        for i, row in enumerate(rows):
+            L.append('row %d %d ' % (t, i) + ' '.join(pre.get(ty, '%d') % v for ty, v in zip(tb['types'], row)))
+    # Named views, by the offsets the game code uses (include/game/part.h).
+    parts, actions, types, tuning = tables[22][1], tables[1][1], tables[0][1], tables[37][1]
+    for i, r in enumerate(parts):
+        L.append('part %d index %d tiers %08x %08x %08x %08x action1 %d slot %d discipline %d action2 %d' % (
+            i, r[0], r[1], r[2], r[3], r[4], r[5], r[6], r[7], r[11]))
+    for i, r in enumerate(actions):
+        L.append('action %d key %d type %d name %08x' % (i, r[0] & 0xFFFFFFFF, r[1], types[r[1]][4]))
+    for i, r in enumerate(tuning):
+        L.append('tuning %d id %d value %.9g' % (i, r[0], struct.unpack('>f', struct.pack('>I', r[1]))[0]))
+    return L
+
 # ----------------------------------------------------------------------------- main
 def main():
     ap = argparse.ArgumentParser(description='Extract textures, meshes and skeletons from Monster Lab .sir archives')
@@ -382,7 +470,14 @@ def main():
     ap.add_argument('--only', help='only extract items whose name contains this text')
     ap.add_argument('--no-textures', action='store_true')
     ap.add_argument('--no-meshes', action='store_true')
+    ap.add_argument('--gamedb', action='store_true', help='global_binary.sir: print the game database as text')
     a = ap.parse_args()
+    if a.gamedb:
+        for line in gamedb_dump(a.archive):
+            print(line)
+        return
+    if np is None:
+        raise SystemExit('numpy is required: pip install numpy pillow')
 
     version, secs = read_archive(a.archive)
     stem = os.path.splitext(os.path.basename(a.archive))[0]
