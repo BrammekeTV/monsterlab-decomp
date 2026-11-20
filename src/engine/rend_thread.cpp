@@ -163,6 +163,16 @@ extern "C" void fn_8015E838(u8* video, s32 retraces) {
     OSSignalSemaphore(&sRend.pending);
 }
 
+// 0x8015E8B4
+// Queues "screen on / off" (SetRenderEnabled is the only caller): 0 blanks the picture. As in
+// fn_8015E838 the command's pointer field gets a leftover register in the original.
+extern "C" void fn_8015E8B4(u8* video, s32 on) {
+    (void)video;
+    OSWaitSemaphore(&sRend.freeSlots);
+    QueuePush(REND_CMD_SET_BLACK, NULL, (u32)on);
+    OSSignalSemaphore(&sRend.pending);
+}
+
 // 0x8015E930
 // Wait until the render thread has drained every queued command.
 extern "C" void RendThreadSync(void) {
