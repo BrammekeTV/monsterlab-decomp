@@ -7,8 +7,8 @@
 
 extern u8 gVideoDrawDone[];
 extern void* lbl_805FB528;
-extern u8 lbl_805FB550[];
-extern u8 lbl_805FB554[];
+extern s32 lbl_805FB550;
+extern s32 lbl_805FB554;
 extern u8 lbl_805FB580[];
 extern u8 lbl_805FB590[];
 extern u8 lbl_805FF20C[];

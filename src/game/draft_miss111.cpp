@@ -37,7 +37,7 @@ const char* fn_801EB708(u32 hash);                            // 0x801EB708
 void fn_801ED050(u8* p, s32 flag);                         // 0x801ED050
 void* fn_80209814(void* v);                                   // 0x80209814
 void fn_8020A398(s32 handle);                                 // 0x8020A398
-void fn_8019645C(void* a, s32 b);                             // 0x8019645C
+s32 fn_8019645C(u8* self, u32 mode);                             // 0x8019645C
 s32 fn_8019BA18(u8* obj, void* desc, s8 prio, f32 speed);    // 0x8019BA18
 }
 
@@ -186,7 +186,7 @@ s32 fn_8019ADFC(u8* arg0, u32 arg1) {
 
 // 0x8019B7D8
 s32 fn_8019B7D8(u8* arg0) {
-    fn_8019645C(lbl_805FB658, *(s32*)(arg0 + 0x58));
+    fn_8019645C((u8*)lbl_805FB658, *(s32*)(arg0 + 0x58));
     return 0;
 }
 

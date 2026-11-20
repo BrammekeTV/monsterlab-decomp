@@ -69,12 +69,12 @@ extern "C" void fn_801C9D74(u8*);
 extern "C" void fn_801D5D14(u8, f32);
 extern "C" void fn_801FC1E4(s32);
 extern "C" void fn_8020A474(s32);
-extern "C" void fn_8022DE8C(s32, s32, s32);
+extern "C" void fn_8022DE8C(u8*, s32, s32);
 extern "C" void fn_8022E178(u8*, s32, s32, s32, s32, s32);
-extern "C" void fn_8022E2A4(s32, s32, s32, s32);
+extern "C" void fn_8022E2A4(u8*, s32, s32, s32);
 extern "C" u32 fn_8022E330(s32, s32, s32);
 extern "C" void fn_8022E354(u8*, s32);
-extern "C" void fn_8022E3E0(s32, s32);
+extern "C" void fn_8022E3E0(u8*, s32);
 extern "C" s32 fn_8022E440(u8*, s32);
 extern "C" void fn_8022E658(s32);
 
@@ -697,9 +697,8 @@ u32 CombatTestOn(void) {
 
 // 0x800F49AC
 void ShowQuestCompleteEvent(u32 a3) {
-    // tail-call arguments inferred from the registers set before the call
-    s32 t0 = *(s32*)((u8*)&lbl_805FBBE0);
-    fn_8022DE8C((s32)((u32)(t0)), (s32)((u32)(3)), (s32)((u32)(uintptr_t)(a3)));
+    u8* t0 = *(u8**)((u8*)&lbl_805FBBE0);
+    fn_8022DE8C(t0, (s32)((u32)(3)), (s32)((u32)(uintptr_t)(a3)));
 }
 
 // 0x800F49BC
@@ -936,14 +935,13 @@ void AddJournalEntryNoPopup(u32 a3, u32 a4, u32 a5, s32 a6) {
 
 // 0x800F96EC
 void UpdateJournalEntryCount(u32 a3, s32 a4, u32 a5) {
-    // tail-call arguments inferred from the registers set before the call
     if (a5 == 0) {
-        s32 t0 = *(s32*)((u8*)&lbl_805FBBE0);
-        fn_8022E2A4((s32)((u32)(t0)), (s32)((u32)(uintptr_t)(a3)), (s32)((u32)(uintptr_t)(a4)), (s32)((u32)(0)));
+        u8* t0 = *(u8**)((u8*)&lbl_805FBBE0);
+        fn_8022E2A4(t0, (s32)((u32)(uintptr_t)(a3)), (s32)((u32)(uintptr_t)(a4)), (s32)((u32)(0)));
         return;
     }
-    s32 t1 = *(s32*)((u8*)&lbl_805FBBE0);
-    fn_8022E2A4((s32)((u32)(t1)), (s32)((u32)(uintptr_t)(a3)), (s32)((u32)(uintptr_t)(a4)), (s32)((u32)(1)));
+    u8* t1 = *(u8**)((u8*)&lbl_805FBBE0);
+    fn_8022E2A4(t1, (s32)((u32)(uintptr_t)(a3)), (s32)((u32)(uintptr_t)(a4)), (s32)((u32)(1)));
 }
 
 // 0x800F971C
@@ -987,9 +985,8 @@ void DoTradeWithMerchant(void) {
 
 // 0x800FA5FC
 void DebugSetPlayerRank(u32 a3) {
-    // tail-call arguments inferred from the registers set before the call
-    s32 t0 = *(s32*)((u8*)&lbl_805FBBE0);
-    fn_8022E3E0((s32)((u32)(t0)), (s32)((u32)(uintptr_t)(a3)));
+    u8* t0 = *(u8**)((u8*)&lbl_805FBBE0);
+    fn_8022E3E0(t0, (s32)((u32)(uintptr_t)(a3)));
 }
 
 // 0x800FA9B8

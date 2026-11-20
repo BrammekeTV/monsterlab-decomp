@@ -19,15 +19,15 @@ void    fn_8018D2B8(const char* fmt, ...);                      // 0x8018D2B8 (d
 void*   ScreenSetsCurrent(void* sets);                          // 0x8018D1E4
 u8*     fn_80198E20(u8* set);                                   // 0x80198E20 (leaf declares s32; returns a pointer)
 void    fn_8019BFF8(void* obj, void* cb, void* arg);            // 0x8019BFF8
-void    fn_80199828(void);                                      // 0x80199828 (callback; signature unknown)
-s32     fn_8019CCAC(void);                                      // 0x8019CCAC
+s32 fn_80199828(u8* self, u8** best);                                      // 0x80199828 (callback; signature unknown)
+s32 fn_8019CCAC(u8* self);                                      // 0x8019CCAC
 void    UIPlayAnim(void* el, u32 anim);                         // 0x8019BE40
 s32     fn_8019555C(u8* list);                                  // 0x8019555C (leaf)
 u32     fn_8019552C(u8* list, s32 index);                       // 0x8019552C (leaf)
 f32     fn_801AA728(u8* entry);                                 // 0x801AA728 (leaf)
-s32     fn_801B7F40(u8* arg0, u8* arg1);                        // 0x801B7F40 (return type unknown)
+s32 fn_801B7F40(u8* arg0, u8* arg1, f32 farg0);                        // 0x801B7F40 (return type unknown)
 void    fn_801C9260(u8* node, u8* owner, f32 t);                // 0x801C9260 (arg order from registers)
-s32     fn_801EE394(u8* arg0);                                  // 0x801EE394 (return type unknown)
+s32 fn_801EE394(u8* arg0, const char* name);                                  // 0x801EE394 (return type unknown)
 void    BufferFree(void* p);                                    // 0x801D4980
 void    operator_delete(void* p);                               // 0x801D426C
 u8*     fn_801FA7CC(u8* p, s32 a4);                             // 0x801FA7CC
@@ -51,7 +51,7 @@ void fn_80199738(u8* arg0) {
     fn_8019BFF8(arg0, (void*)fn_80199828, (u8*)gScreenSets + 0x70);
     if (*(s32*)((u8*)gScreenSets + 0x70) == 0) return;
 
-    if (fn_8019CCAC() == 0) {
+    if (fn_8019CCAC(other) == 0) {
         s32 pending = *(s32*)(*(u8**)((u8*)gScreenSets + 0x70) + 0xBC);
         if (pending == 0) return;
         u8* cur = fn_80198E20((u8*)ScreenSetsCurrent(gScreenSets));
@@ -115,7 +115,7 @@ s32 fn_801B7E7C(u8* arg0, u8* arg1) {
     u8 kind = *(u8*)(arg0 + 0x7F);
     switch (kind) {
     case 0x20:
-        return fn_801B7F40(arg0, arg1);
+        return fn_801B7F40(arg0, arg1, 0.0f /* leftover f1 */);
     case 0x10:
     case 0x8:
         if (kind == 0x10) {
@@ -174,7 +174,7 @@ s32 fn_801EE334(u8* arg0, s32 arg1) {
 // Resets the cursor state: calls fn_801EE394 and, if it returned 0, clears +0x4 and +0x8;
 // always clears +0x0 and +0xC. Returns the call's result.
 s32 fn_801EE46C(u8* arg0) {
-    s32 r = fn_801EE394(arg0);
+    s32 r = fn_801EE394(arg0, NULL /* leftover r4 */);
     if (r == 0) {
         *(s32*)(arg0 + 0x4) = 0;
         *(s32*)(arg0 + 0x8) = 0;

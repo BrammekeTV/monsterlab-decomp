@@ -13,7 +13,7 @@ void  fn_801B72A0(u8* anim, u8* target);                          // 0x801B72A0
 s32   fn_801B82A8(u8* p, u8* a4);                                 // 0x801B82A8
 u8*   fn_801724D4(s32 flag);                                      // 0x801724D4
 u8*   fn_80174524(u8* src);                                       // 0x80174524
-void  fn_80174AC4(u8* p, s32 a);                                  // 0x80174AC4
+void fn_80174AC4(u8* p);                                  // 0x80174AC4
 BOOL  fn_80147554(s32 button);                                    // 0x80147554
 s32   fn_801481FC(s32 chan);                                      // 0x801481FC
 void  fn_801FB624(void);                                          // 0x801FB624
@@ -322,7 +322,7 @@ u8* fn_801725C8(u8* src) {
     *(s32*)(o + 0xC0) = 0;
     *(u32*)(o + 0xC) = *(u32*)(src + 0xC) & 0xFFFFFFF3u;
     *(f32*)(o + 0x8) = 1.0f;
-    fn_80174AC4(o + 0x3C, 0);
+    fn_80174AC4(o + 0x3C);
     for (s32 off = 0x14; off <= 0x2C; off += 4) *(f32*)(o + off) = 0.0f;
     return o;
 }

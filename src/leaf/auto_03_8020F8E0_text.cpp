@@ -6,7 +6,7 @@
 #include "types.h"
 
 extern "C" s32 fn_8021FB28(void);
-extern u8 lbl_805FBBD0[];
+extern void* lbl_805FBBD0;
 extern u8 lbl_805FBBD8[];
 extern u8 lbl_805FBBD9[];
 extern u8 lbl_80600610[];

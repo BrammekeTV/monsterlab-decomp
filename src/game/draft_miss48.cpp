@@ -23,7 +23,7 @@ u32         fn_801A65A0(void* obj);                        // 0x801A65A0
 u32         fn_801A665C(void* obj);                        // 0x801A665C
 u8*         fn_801A7250(u8* grid);                         // 0x801A7250
 u8*         fn_801A9EFC(u8* a, s32 idx);                   // 0x801A9EFC
-void        fn_801A6B9C(u8* grid, s32 a);                  // 0x801A6B9C
+s32 fn_801A6B9C(u8* grid, s32 a);                  // 0x801A6B9C
 
 
 void  EventSend(void* mgr, void* target, void* from, u32 event, int a, int b, int c, int d);   // 0x801BA190

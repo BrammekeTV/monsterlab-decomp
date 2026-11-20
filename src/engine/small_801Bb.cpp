@@ -11,7 +11,7 @@ void  fn_801B3310(u8* p, u8* q);                                 // 0x801B3310
 void  fn_801B1778(void* p, s32 a);                               // 0x801B1778
 void  fn_801B737C(void* a, void* b, void* c, s32 d);             // 0x801B737C
 void* fn_801DA798(void* p);                                      // 0x801DA798
-void  fn_801E7BC4(void* p, s32 n);                               // 0x801E7BC4
+u8* fn_801E7BC4(u8* p, s32 del);                               // 0x801E7BC4
 s32 fn_801E9678(void* list, void* handle);                          // 0x801E9678
 void* fn_801E9D18(void* p, u32 hash, s32 size);                  // 0x801E9D18
 u8*  fn_801EB7A4(void* p, s32 a4, s32 a5, s32 a6, s32 a7);      // 0x801EB7A4

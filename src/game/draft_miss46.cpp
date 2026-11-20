@@ -123,7 +123,7 @@ u32 fn_801F38F8(u8* a3);                             // 0x801F38F8
 void BufferFree(void* p);                            // 0x801D4980
 void operator_delete(void* p);                       // 0x801D426C
 s32 fn_801E4E20(u8* arg0, s32 arg1);                                // 0x801E4E20
-s32 fn_801E5220(u8*, s32*);                          // 0x801E5220
+void fn_801E5220(u8* q, s32* handle);                          // 0x801E5220
 extern void* gLab;                                   // 0x805FBBC8
 extern u8 lbl_805FB0E0;
 extern s32 lbl_805FB0B8;

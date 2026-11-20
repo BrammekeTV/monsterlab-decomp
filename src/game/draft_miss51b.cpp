@@ -24,7 +24,7 @@ s32  fn_8001AFB4(u8* p, s32 a);                                              // 
 s32 fn_801C3E94(u8* p);                                                      // 0x801C3E94
 void fn_8020A398(s32 handle);                                                // 0x8020A398
 void fn_801B4520(u8* p);                                                     // 0x801B4520
-s32 fn_801B4C6C(u8* obj, s32 a);                                             // 0x801B4C6C
+void fn_801B4C6C(u8* obj, f32 dt);                                             // 0x801B4C6C
 u32 fn_801EC880(u8* p, u32 hash);                                            // 0x801EC880
 void fn_801ECFA0(u8* p, s32 idx);                                            // 0x801ECFA0
 void fn_801EC080(u8* a, u8* b);                                              // 0x801EC080

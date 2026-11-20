@@ -26,7 +26,6 @@ extern "C" s32 fn_80208CE8(void) {
 
 // 0x80208CF0
 extern "C" void fn_80208CF0(s32 a3) {
-    // tail-call arguments inferred from the registers set before the call
     *(u32*)((u8*)&lbl_805FBBA0) = (u32)((u32)(uintptr_t)(a3));
     fn_801FCFB4((u8*)&gAudio);
 }
