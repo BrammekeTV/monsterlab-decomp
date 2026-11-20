@@ -18,7 +18,7 @@ struct WorldParams {
     void** out;           // 0x08: receives the world data
 };
 
-WorldParams* sWorldParams;       ORIG(0x805FB944)
+WorldParams* gWorldParams;       ORIG(0x805FB944)
 s32                 gZoneResourceSize;  ORIG(0x805FB94C) // bytes per zone record
 static u32          sEntitySlotBytes;   ORIG(0x805FB940)
 
@@ -62,16 +62,16 @@ struct ZoneTable { u8* data; s32 count; s32 used; };
 
 // 0x801F0704
 void WorldDataCreate(WorldParams* params) {
-    sWorldParams = params;
+    gWorldParams = params;
     gZoneResourceSize = ZoneRecordSize();
 
-    sEntitySlotBytes = (S(0x68) + 1) * ((sWorldParams->staticSlots + sWorldParams->dynamicSlots) * 4);
+    sEntitySlotBytes = (S(0x68) + 1) * ((gWorldParams->staticSlots + gWorldParams->dynamicSlots) * 4);
     u32 size = FixedSize() + sEntitySlotBytes;
 
     u8* raw = (u8*)MemAllocDefault(size + 0x24);
     u8* w = (u8*)(((uintptr_t)raw + 0x23) & ~(uintptr_t)0x1F);
     ((u8**)w)[-1] = raw;
-    sEntitySlotBytes = (S(0x68) + 1) * ((sWorldParams->staticSlots + sWorldParams->dynamicSlots) * 4);
+    sEntitySlotBytes = (S(0x68) + 1) * ((gWorldParams->staticSlots + gWorldParams->dynamicSlots) * 4);
     memset(w, 0, FixedSize() + sEntitySlotBytes);
 
     // Zone records.
@@ -90,8 +90,8 @@ void WorldDataCreate(WorldParams* params) {
         *(s32*)(zi + 0x11C) = 0;
         own += S(0x34) * 0x54;
 
-        s32 statics = sWorldParams->staticSlots;
-        s32 dynamics = sWorldParams->dynamicSlots;
+        s32 statics = gWorldParams->staticSlots;
+        s32 dynamics = gWorldParams->dynamicSlots;
         u8** cursor = &own;
         if (IsSmallZone(z)) {
             statics = 1;
