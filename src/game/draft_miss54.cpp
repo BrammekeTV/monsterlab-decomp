@@ -37,7 +37,7 @@ void fn_802205F0(s32 h, s32 v);         // 0x802205F0
 void fn_80220178(s32 h);                // 0x80220178
 void fn_802200EC(s32 h);                // 0x802200EC
 void fn_8021F35C(u8* p);                // 0x8021F35C
-f64 fn_8033ED6C(f32 a, f32 b, f32 c, f32 d, f32 e);   // 0x8033ED6C
+f64 fn_8033ED6C(f64 x);   // 0x8033ED6C
 u32 RandomU32(void);                    // 0x80143460
 void fn_8007C50C(u8* p);                 // 0x8007C50C
 void fn_8007CB68(u8* p, s32 mode);       // 0x8007CB68
@@ -411,7 +411,7 @@ void fn_800773CC(u8* arg0, f32 dt) {
         *(f32*)(arg0 + 0x0) = x;
         *(f32*)(arg0 + 0x8) = z;
         *(f32*)(arg0 + 0x10) = *(f32*)(arg0 + 0x10) - dt;
-        s32 n = (s32)(f32)fn_8033ED6C(x, z, dz, x, dx);
+        s32 n = (s32)(f32)fn_8033ED6C(x);
         *(f32*)(arg0 + 0x0) = *(f32*)(arg0 + 0x0) - (f32)(u32)n;
         for (s32 i = 0; i < 4; i++) {
             s32 h = *(s32*)(arg0 + 0x14 + i * 4);

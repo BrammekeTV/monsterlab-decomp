@@ -8,9 +8,8 @@
 
 extern u8* gWorldState;
 extern "C" s32 fn_8008BF04(u8*, u8*);
-extern "C" void fn_8008CE44(u8*, u8*, s32, s32, f32, f32);
 extern "C" void fn_8008D7C8(s32, f32);
-extern "C" void fn_8008DF44(s32, f32);
+extern "C" void fn_8008DF44(u8*, f32);
 extern "C" s32 fn_8008E290(u8*);
 extern "C" void fn_8008E340(u8*, f32);
 
@@ -23,20 +22,8 @@ void BrazierSymbolUpdateRising(void* a3) {
 
 // 0x8008E890
 void BrazierSymbolUpdateOrbiting(void* a3) {
-    // tail-call arguments inferred from the registers set before the call
     f32 t0 = *(f32*)((u8*)&gWorldState + 12);
-    fn_8008DF44((s32)((u32)(uintptr_t)(a3)), (f32)(t0));
-}
-
-// 0x8008E8A0
-void BrazierSymbolStartRising(void* a3) {
-    // tail-call arguments inferred from the registers set before the call
-    f32 t0 = *(f32*)(((u8*)(uintptr_t)(a3)) + 680);
-    u8* t1 = ((u8*)(uintptr_t)(a3)) + 696;
-    f32 t2 = *(f32*)(((u8*)(uintptr_t)(a3)) + 668);
-    s32 t3 = *(s32*)(((u8*)(uintptr_t)(a3)) + 616);
-    s32 t4 = *(s32*)(((u8*)(uintptr_t)(a3)) + 620);
-    fn_8008CE44(((u8*)(uintptr_t)(a3)), t1, (s32)((u32)(t3)), (s32)((u32)(t4)), (f32)(t2), (f32)(t0));
+    fn_8008DF44(((u8*)(uintptr_t)(a3)), (f32)(t0));
 }
 
 // 0x8008E8B8

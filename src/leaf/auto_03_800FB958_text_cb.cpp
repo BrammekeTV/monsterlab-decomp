@@ -13,7 +13,7 @@ extern s32 lbl_805FB2C8;
 extern s32 lbl_805FB2CC;
 extern u8 lbl_805FB2D4[];
 extern "C" void fn_8005B648(u8*, f32);
-extern "C" void fn_8005F4F8(s32, s32);
+extern "C" void fn_8005F4F8(u8*, u32);
 extern "C" void fn_8005F81C(u8*, u32, f32);
 extern "C" void fn_8005FAAC(u8*, s32, u32, f32);
 extern "C" void fn_80060004(u8*, u32);
@@ -22,14 +22,14 @@ extern "C" void fn_8006023C(u8*, s32, s32, f32);
 extern "C" void fn_8006066C(u8*, s32, f32, f32);
 extern "C" void fn_80060920(u8*, f32, f32);
 extern "C" void fn_800609E0(u8*, s32, s32);
-extern "C" s32 fn_80060C90(s32);
+extern "C" s32 fn_80060C90(u8*, f32);
 extern "C" s32 fn_80060FA8(u8*, f32);
 extern "C" s32 fn_80061024(u8*, f32);
 extern "C" s32 fn_800612B8(s32);
 extern "C" s32 fn_80061770(u8*);
 extern "C" void fn_80061844(u8*, u8*);
 extern "C" void fn_800619A4(u8*, f32, f32);
-extern "C" void fn_80061CC0(s32);
+extern "C" void fn_80061CC0(u8*);
 extern "C" void fn_80061FDC(u8*, s32, s32);
 extern "C" s32 fn_80062174(u8*);
 extern "C" s32 fn_80062398(u8*);
@@ -56,8 +56,7 @@ s32 ChooseGuard(u32 a3, f32 f1) {
 
 // 0x8010360C
 s32 ClearLineToTarget(u32 a3, f32 f1) {
-    // tail-call arguments inferred from the registers set before the call
-    return (s32)(fn_80060C90((s32)((u32)(uintptr_t)(a3))));
+    return (s32)(fn_80060C90(((u8*)(uintptr_t)(a3)), (f32)(f1)));
 }
 
 // 0x80103610
@@ -99,8 +98,7 @@ u32 IsCurrentTutorialConversation(s32 a3) {
 
 // 0x80103748
 void JumpToTarget(u32 a3) {
-    // tail-call arguments inferred from the registers set before the call
-    fn_80061CC0((s32)((u32)(uintptr_t)(a3)));
+    fn_80061CC0(((u8*)(uintptr_t)(a3)));
 }
 
 // 0x8010374C
@@ -110,8 +108,7 @@ void KillGoal(u32 a3, u32 a4) {
 
 // 0x80103750
 void KillPersistentGoal(u32 a3, u32 a4) {
-    // tail-call arguments inferred from the registers set before the call
-    fn_8005F4F8((s32)((u32)(uintptr_t)(a3)), (s32)((u32)(uintptr_t)(a4)));
+    fn_8005F4F8(((u8*)(uintptr_t)(a3)), (u32)((u32)(uintptr_t)(a4)));
 }
 
 // 0x80103754

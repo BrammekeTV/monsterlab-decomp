@@ -61,7 +61,7 @@ u8*   fn_8020EA94(u8* p, s32 del);                  // 0x8020EA94
 u8*   fn_80062CE0(u8* p, s32 del);                  // 0x80062CE0
 BOOL  fn_801B50B0(void* unused, u8* obj);           // 0x801B50B0
 void  fn_8004E8E8(u8* obj);              // 0x8004E8E8
-s32   fn_801ED050(u8* p, s32 a, u8* b);             // 0x801ED050
+void fn_801ED050(u8* p, s32 flag);             // 0x801ED050
 s32   fn_8004EED0(u8* arg0, u32 arg1, s32 arg2);    // 0x8004EED0
 void  fn_8021570C(char* out, s32 limb, void* fighter, s32 action);  // 0x8021570C
 }
@@ -396,7 +396,7 @@ u8* fn_8004EDD0(u8* arg0, s32 arg1, s32 arg2) {
         }
         u8* temp5 = *(u8**)(arg0 + 0x4);
         *(s32*)(temp5 + 0x20) = *(s32*)(temp5 + 0x20) & ~2;
-        fn_801ED050(arg0 + 0x94, arg2, temp5);
+        fn_801ED050(arg0 + 0x94, arg2);
         *(u8*)(arg0 + 0x38E) = 0;
     }
     u8* temp = *(u8**)(arg0 + 0x4);

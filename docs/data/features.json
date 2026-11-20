@@ -94,6 +94,11 @@
  "changelog": [
   {
    "date": "2026-11-20",
+   "time": "12:31",
+   "text": "Decompile 37 more missing functions (fn_8006*/fn_8007* effect and animation helpers, fn_8000* script-context helpers, fn_8019E* text helpers, fn_8006FD18 jump table, ...); fix prototypes"
+  },
+  {
+   "date": "2026-11-20",
    "time": "12:14",
    "text": "Decompile 38 more missing functions (MatchupInit, PreloadLevel, InitProgressScreen, SaveOpen, FireShotAtFeet, fn_8019* texture-list helpers, ...); fix prototypes"
   },

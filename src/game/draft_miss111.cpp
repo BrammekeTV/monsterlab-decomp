@@ -34,7 +34,7 @@ f32 fn_801AB7F0(void* h);                                     // 0x801AB7F0
 f32 fn_801AB804(void* h);                                     // 0x801AB804
 void* fn_801D40E0(s32 n);                                     // 0x801D40E0
 const char* fn_801EB708(u32 hash);                            // 0x801EB708
-s32 fn_801ED050(u8* p, s32 a, u8* b);                         // 0x801ED050
+void fn_801ED050(u8* p, s32 flag);                         // 0x801ED050
 void* fn_80209814(void* v);                                   // 0x80209814
 void fn_8020A398(s32 handle);                                 // 0x8020A398
 void fn_8019645C(void* a, s32 b);                             // 0x8019645C
@@ -79,9 +79,9 @@ void fn_8020E668(u8* arg0, s32 arg1, s32 arg2) {
 
 // 0x8004EA38
 s32 fn_8004EA38(u8* arg0, s32 arg1, u8* arg2) {
-    s32 r = fn_801ED050(arg0 + 0x94, arg1, arg2);
+    fn_801ED050(arg0 + 0x94, arg1);  // asm also passes r5 (unused); returns whatever is left in r3
     *(u8*)(arg0 + 0x38E) = 0;
-    return r;
+    return 0;
 }
 
 // 0x80199B68

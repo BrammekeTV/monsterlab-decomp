@@ -118,7 +118,7 @@ s32 BrazierSymbolIsThrowTrailAttached(void* a3);                       // src/le
 void BrazierSymbolSetSymbolOccupied(void* a3);                         // src/leaf/auto_03_8008CBB0_text_cb.cpp
 void BrazierSymbolSetUnused(void* a0);                                 // src/game/draft_miss13.cpp
 void BrazierSymbolStartMovingBack(void* a0);                           // src/game/draft_miss13.cpp
-void BrazierSymbolStartRising(void* a3);                               // src/leaf/auto_03_8008CBB0_text_cb.cpp
+void BrazierSymbolStartRising(void* a0);  // type 0x2F (from signature table)
 void BrazierSymbolUpdateDisappearing(void* a0);                        // src/game/draft_miss13.cpp
 void BrazierSymbolUpdateMovingBack(void* a3);                          // src/leaf/auto_03_8008CBB0_text_cb.cpp
 void BrazierSymbolUpdateOrbiting(void* a3);                            // src/leaf/auto_03_8008CBB0_text_cb.cpp

@@ -7,7 +7,7 @@
 
 extern void* gStringTable2;
 extern u8 lbl_804FB5F8[];
-extern u8 lbl_805F97F0[];
+extern f32 lbl_805F97F0;
 extern s32 lbl_805F9800;
 extern u8 lbl_805F9804[];
 extern u8 lbl_805F9808[];

@@ -11,7 +11,7 @@ void WorldSendEvent(void* world, s32 id, int a, int b, int c);                  
 void TargetListInit(void* t);                                                                 // 0x802161DC
 void TargetListDecode(void* t, const u32* mask, s32 side);                                    // 0x80216240
 void* TargetListDestroy(void* t, s32 del);                                                    // 0x80216200
-void fn_800625A4(u32 a0, s32* out, f32 f);                                                    // 0x800625A4
+void fn_800625A4(u8* arg0, u8* arg1, f32 dt);                                                    // 0x800625A4
 extern u8 gGame[];                                                                            // 0x803B53A0
 extern u8* lbl_805FB134;                                                                      // 0x805FB134
 }
@@ -51,7 +51,7 @@ void OnRocketImpact(void* a0) {
 // Forwards the value at *a1 to fn_800625A4 through a stack copy (a0 and a2 pass through).
 void OrientBoneToTarget(u32 a0, s32* a1, f32 a2) {
     s32 value = *a1;
-    fn_800625A4(a0, &value, a2);
+    fn_800625A4((u8*)(intptr_t)a0, (u8*)&value, a2);  // lint:ok 32-bit handle
 }
 
 // Decodes the limbs hit by a part's action (action1, or action2 when useAction2 != 0).

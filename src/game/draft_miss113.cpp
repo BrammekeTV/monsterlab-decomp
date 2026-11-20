@@ -39,7 +39,7 @@ void UISetNumber(void* el, s32 n);                               // 0x8019F2A8
 void UISetText(void* el, const char* text, s32 a);               // 0x8019EFC8
 s32 WorldGetPhase(void* world);                                  // 0x800D83A8
 
-void fn_8000AF80(u8* ctx, s32 a, s32 b, s32 c);                  // 0x8000AF80
+s32  fn_8000AF80(u8* ctx, s32 a, s32 b, s32 c);                 // 0x8000AF80
 void fn_8000B880(u8* ctx, s32 state);                            // 0x8000B880
 u32 fn_8000B888(u8* ctx);                                        // 0x8000B888
 u32 fn_8000B894(u8* ctx);                                        // 0x8000B894

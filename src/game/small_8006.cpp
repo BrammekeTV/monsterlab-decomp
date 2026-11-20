@@ -27,7 +27,7 @@ u8* fn_8006F61C(u8* arg0);                                                    //
 void     fn_8006F67C(u8* p, f32 t, s32 flag);                                   // 0x8006F67C (leaf version takes only p)
 u8*     fn_8005CA88(u8* p);                                                    // 0x8005CA88
 void     fn_8005CB40(u8* p, f32 t, s32 flag);                                   // 0x8005CB40
-void     fn_800655D8(u8* p);                                                    // 0x800655D8
+void fn_800655D8(u8* arg0, f32 dt);                                                    // 0x800655D8
 void     fn_8032F1E8(u8* obj, void (*cb)(void), s32 a, s32 b, s32 c);    // 0x8032F1E8
 void     fn_80062C7C(void);                                                     // 0x80062C7C
 void     fn_801B6ACC(u8* obj, s32 value);                                       // 0x801B6ACC
@@ -262,7 +262,7 @@ void fn_80065EC8(u8* p, f32 t) {
         (*(VirtFnSetFloat*)(*(u8**)p + 0x58))(p, t);
         return;
     }
-    fn_800655D8(p);
+    fn_800655D8(p, t);
     fn_8005CB40(p, t, 0);
 }
 
