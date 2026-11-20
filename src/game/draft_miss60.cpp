@@ -57,7 +57,7 @@ void   UIScreen_Push(u32 hash);
 s32    WorldGetPhase(void* world);                                     // 0x800D83A8
 BOOL   ZoneIsLoaded(void* world, s32 zone);                            // 0x8012F408
 void*  ChoiceDestroy(void* c, s32 del);                                // 0x8020F394
-void   EntityRefreshLinks(void* entity);                               // 0x8012CDFC
+BOOL   EntityRefreshLinks(void* entity);                               // 0x8012CDFC
 void   SpawnEntity(void* a0);
 u8**   FighterGetSlot(u8* f, s32 i);                                   // 0x8020E794
 s32    PartMatchup(s32 defA, s32 defB);                                // 0x80213988

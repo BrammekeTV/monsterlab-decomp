@@ -18,7 +18,7 @@ void  EventMgrTick(void* mgr, f32 dt);                          // 0x801BA4B4
 void  EventMgrFlushFor(void* mgr, void* entity);                // 0x801BA108
 void* EventPost(s32 id, void* target);                          // 0x801F3918: returns payload
 BOOL  fn_801F5220(void);
-void  EntityRefreshLinks(void* entity);                         // 0x8012CDFC
+BOOL  EntityRefreshLinks(void* entity);                         // 0x8012CDFC
 s32   WorldGetEntityZone(void* world, void* entity);            // 0x80132458
 BOOL  ZoneIsLoaded(void* world, s32 zone);                      // 0x8012F408
 void  SpawnEffectAt(void* fxMgr, void* effect, const f32 posAndScale[4], int a);   // 0x801C80E0

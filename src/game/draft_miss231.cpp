@@ -13,7 +13,7 @@ int    SysSprintf(char* buf, const char* fmt, ...);
 void*  fn_8003DDE8(void* part, s32 slot, s32 def, s32 flag, s32 a);   // 0x8003DDE8
 void*  fn_8004FFB4(void* id, void* part);                         // 0x8004FFB4
 void   fn_800D42F4(u8* db, u32 hash, u32 id);                     // 0x800D42F4
-void   fn_800D4DE8(u8* rec);                                      // 0x800D4DE8
+void   fn_800D4DE8(u8* dst, u8* src);                                    // 0x800D4DE8
 void   fn_800D5110(u8* holder, u8* obj, u8* data);                // 0x800D5110
 void   fn_800D8100(u8* world);                                    // 0x800D8100
 s32    fn_801B5510(u8* a, u8* b, s32 c, f32* v, s32 d);           // 0x801B5510
@@ -325,7 +325,7 @@ void fn_800D3D6C(u8* db) {
 void fn_800D424C(u8* db, u8* arg1) {
     s32 n = *(s32*)(db + 0x2DCD8);
     if (n < 0xFF) {
-        fn_800D4DE8(db + 0x13284 + n * 0x1AC);
+        fn_800D4DE8(db + 0x13284 + n * 0x1AC, arg1);
         *(s32*)(db + 0x2DCD8) = *(s32*)(db + 0x2DCD8) + 1;
     }
     u8* p = arg1;

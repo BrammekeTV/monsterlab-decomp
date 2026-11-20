@@ -35,10 +35,10 @@ u8*   fn_80218B8C(void* lab, s32 a);                            // 0x80218B8C
 void  fn_800AB028(u8* obj);                                     // 0x800AB028
 void  fn_800ABFA8(u8* a, u8* b);                                // 0x800ABFA8
 void  fn_800ACDE0(u8* obj, u32 h0, u32 h1, u32 h2, s32 idx);    // 0x800ACDE0
-void  fn_800AD130(u8* a, u8* b);                                // 0x800AD130
+s32   fn_800AD130(u8* a, u8* b);                                // 0x800AD130
 void  fn_800AD9C4(u8* a, u8* b);                                // 0x800AD9C4
 void  fn_800AF6A0(u8* obj, f32* pos);                           // 0x800AF6A0
-void  fn_800AFA54(u8* a, u8* b);                                // 0x800AFA54
+s32   fn_800AFA54(u8* a, u8* b);                                // 0x800AFA54
 void  fn_800B07F0(u8* obj, f32* pos);                           // 0x800B07F0
 s32   fn_800B0CB4(u8* p, u8* value);                            // 0x800B0CB4
 void  fn_800B154C(u8* p, u8* value);                            // 0x800B154C
