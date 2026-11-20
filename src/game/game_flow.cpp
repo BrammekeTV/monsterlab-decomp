@@ -434,7 +434,7 @@ struct Entity {
 };
 
 // 0x800108B8
-static void UpdateZoneEntities(s32 zone) {
+extern "C" void UpdateZoneEntities(s32 zone) {
     if (zone < 0) return;
     u8* z = GetZoneInfo(zone);
     s32 count = *(s32*)(z + 0x94) + *(s32*)(z + 0x98);

@@ -1,15 +1,15 @@
 {
  "game_id": "RM7P4F",
- "generated": "2026-11-20T23:42:11+00:00",
- "commit": "5b8bc23",
- "commit_date": "2026-11-21T00:26:52+01:00",
+ "generated": "2026-11-20T23:52:48+00:00",
+ "commit": "9700efb",
+ "commit_date": "2026-11-21T00:50:36+01:00",
  "game": {
   "functions": 8548,
   "bytes": 2265988,
   "named": 2748,
   "named_bytes": 616800,
-  "decompiled": 6868,
-  "decompiled_bytes": 1394216
+  "decompiled": 6890,
+  "decompiled_bytes": 1425116
  },
  "library": {
   "functions": 4039,
@@ -24,8 +24,8 @@
   "bytes": 3404928,
   "named": 3211,
   "named_bytes": 721548,
-  "decompiled": 6869,
-  "decompiled_bytes": 1394336
+  "decompiled": 6891,
+  "decompiled_bytes": 1425236
  },
  "game_range": [
   "80006B40",
@@ -37,15 +37,15 @@
    0.696
   ],
   [
-   0.237,
+   0.58,
    0.0
   ],
   [
-   0.878,
+   0.975,
    0.435
   ],
   [
-   0.573,
+   1.0,
    0.474
   ],
   [
@@ -97,7 +97,7 @@
    0.044
   ],
   [
-   0.142,
+   0.28,
    0.0
   ],
   [
@@ -205,7 +205,7 @@
    0.003
   ],
   [
-   0.513,
+   0.897,
    0.0
   ],
   [
@@ -237,7 +237,7 @@
    0.312
   ],
   [
-   0.619,
+   0.647,
    0.115
   ],
   [
@@ -253,7 +253,7 @@
    0.0
   ],
   [
-   0.234,
+   0.541,
    0.009
   ],
   [
@@ -321,7 +321,7 @@
    0.005
   ],
   [
-   0.7,
+   0.997,
    0.0
   ],
   [
@@ -445,7 +445,7 @@
    0.142
   ],
   [
-   0.542,
+   0.764,
    0.155
   ],
   [
@@ -569,7 +569,7 @@
    0.749
   ],
   [
-   0.687,
+   0.989,
    0.0
   ],
   [
@@ -577,11 +577,11 @@
    0.911
   ],
   [
-   0.398,
+   0.507,
    0.565
   ],
   [
-   0.907,
+   0.976,
    0.287
   ],
   [
@@ -625,11 +625,11 @@
    0.275
   ],
   [
-   0.894,
+   0.925,
    0.1
   ],
   [
-   0.492,
+   0.528,
    0.0
   ],
   [
@@ -653,7 +653,7 @@
    0.0
   ],
   [
-   0.703,
+   0.731,
    0.076
   ],
   [
@@ -661,15 +661,15 @@
    0.0
   ],
   [
-   0.306,
+   0.685,
    0.42
   ],
   [
-   0.607,
+   1.0,
    0.327
   ],
   [
-   0.318,
+   0.347,
    0.042
   ],
   [
@@ -2063,6 +2063,21 @@
    ]
   },
   {
+   "path": "src/engine/rend_bootpath.cpp",
+   "functions": [
+    {
+     "name": "fn_801499F8",
+     "addr": "801499F8",
+     "size": 340
+    },
+    {
+     "name": "fn_801566E8",
+     "addr": "801566E8",
+     "size": 228
+    }
+   ]
+  },
+  {
    "path": "src/engine/rend_dl.cpp",
    "functions": [
     {
@@ -2154,6 +2169,16 @@
      "name": "RendThreadSubmitDL",
      "addr": "8015E5D0",
      "size": 132
+    },
+    {
+     "name": "fn_8015E838",
+     "addr": "8015E838",
+     "size": 124
+    },
+    {
+     "name": "fn_8015E8B4",
+     "addr": "8015E8B4",
+     "size": 124
     },
     {
      "name": "RendThreadSync",
@@ -3779,6 +3804,26 @@
      "name": "Vec3Rotate",
      "addr": "8005844C",
      "size": 124
+    }
+   ]
+  },
+  {
+   "path": "src/engine/video_init.cpp",
+   "functions": [
+    {
+     "name": "VideoInit",
+     "addr": "8015BF40",
+     "size": 4860
+    },
+    {
+     "name": "fn_8015D2B8",
+     "addr": "8015D2B8",
+     "size": 40
+    },
+    {
+     "name": "fn_8015D660",
+     "addr": "8015D660",
+     "size": 1932
     }
    ]
   },
@@ -10924,6 +10969,106 @@
      "name": "MonsterCopyName",
      "addr": "8020EBB8",
      "size": 248
+    }
+   ]
+  },
+  {
+   "path": "src/game/draft_miss291.cpp",
+   "functions": [
+    {
+     "name": "fn_8000B340",
+     "addr": "8000B340",
+     "size": 864
+    },
+    {
+     "name": "fn_8000D3AC",
+     "addr": "8000D3AC",
+     "size": 1464
+    },
+    {
+     "name": "fn_8002A158",
+     "addr": "8002A158",
+     "size": 32
+    },
+    {
+     "name": "fn_8002A31C",
+     "addr": "8002A31C",
+     "size": 1244
+    }
+   ]
+  },
+  {
+   "path": "src/game/draft_miss292.cpp",
+   "functions": [
+    {
+     "name": "fn_8007532C",
+     "addr": "8007532C",
+     "size": 232
+    },
+    {
+     "name": "fn_800E6CD0",
+     "addr": "800E6CD0",
+     "size": 1980
+    },
+    {
+     "name": "fn_8012E420",
+     "addr": "8012E420",
+     "size": 912
+    },
+    {
+     "name": "fn_8012FD0C",
+     "addr": "8012FD0C",
+     "size": 592
+    }
+   ]
+  },
+  {
+   "path": "src/game/draft_miss293.cpp",
+   "functions": [
+    {
+     "name": "fn_80146B28",
+     "addr": "80146B28",
+     "size": 284
+    }
+   ]
+  },
+  {
+   "path": "src/game/draft_miss294.cpp",
+   "functions": [
+    {
+     "name": "fn_8000A6AC",
+     "addr": "8000A6AC",
+     "size": 2260
+    },
+    {
+     "name": "fn_8000E488",
+     "addr": "8000E488",
+     "size": 2260
+    },
+    {
+     "name": "fn_8007EF04",
+     "addr": "8007EF04",
+     "size": 2556
+    }
+   ]
+  },
+  {
+   "path": "src/game/draft_miss295.cpp",
+   "functions": [
+    {
+     "name": "fn_800645C8",
+     "addr": "800645C8",
+     "size": 3072
+    },
+    {
+     "name": "fn_800A43C0",
+     "addr": "800A43C0",
+     "size": 2812
+    },
+    {
+     "name": "fn_80129CC8",
+     "addr": "80129CC8",
+     "size": 2688
     }
    ]
   },

@@ -28,7 +28,7 @@ void   GameStateReset(void* g);                         // 0x80006BB4
 void   fn_80006F44(void);
 void   fn_80009748(void* s, u8 level);                  // level teardown
 void   fn_800098F4(void* s, f32 a, f32 dt);             // world render
-void   fn_8000A6AC(void* s);                            // world draw
+void   fn_8000A6AC(void);                               // world draw
 void   fn_8000B340(void* s);                            // movie hand-off state
 void   fn_8000B9CC(void* s, f32 dt);                    // session input / HUD update
 void   fn_80013F8C(void* p);
@@ -434,7 +434,7 @@ void GameSessionUpdate(GameSession* s, f32 a, f32 dt) {
         switch (s->state) {
         case 5: case 7: case 9:
             if (gWorldState[4] && entryState != 3 && entryState != 4 && sWorldReady) {
-                fn_8000A6AC(s);
+                fn_8000A6AC();
                 break;
             }
             DrawBlankFrame();
