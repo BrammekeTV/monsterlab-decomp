@@ -35,7 +35,7 @@ void  fn_8001B164(u8* hud);                             // 0x8001B164
 void  fn_8001B128(void* hud);                           // 0x8001B128
 u8*   fn_8001B044(u8* hud, u32 key);                    // 0x8001B044
 void  fn_801BBB68(void* mgr, s32 id, int a, int b);     // 0x801BBB68
-s32   fn_80051940(f32 dt);                              // 0x80051940
+void fn_80051940(f32 dt);                              // 0x80051940
 void  SessionUpdateDisabled(u8* p, f32 dt);             // 0x80012B5C
 void  fn_80012CB0(u8* p, f32 dt);                       // 0x80012CB0
 

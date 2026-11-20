@@ -5,7 +5,7 @@
 
 #include "types.h"
 
-extern void* lbl_805FB010;
+extern u8* lbl_805FB010;
 extern u8 lbl_805FB030[];
 
 // 0x8003E39C

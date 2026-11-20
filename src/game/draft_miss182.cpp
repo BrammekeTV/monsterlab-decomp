@@ -57,7 +57,7 @@ s32    fn_80065200(u8* arg0, u8* arg1, void* arg2, u8* arg3, s32 arg4, s32 arg5,
 s32    fn_800D5800(u8* p);                                            // 0x800D5800
 void   fn_800D83B8(u8* a3, s32 a4);                                   // 0x800D83B8
 s32    fn_801088F0(u8* p, s32 a, s32* out);                           // 0x801088F0
-s32    fn_8010A49C(u8* p);                                            // 0x8010A49C
+s32 fn_8010A49C(u8* p, s32 kind);                                            // 0x8010A49C
 s32    fn_8011BC40(u8* p, s32 a);                                     // 0x8011BC40
 void   fn_8013A4A0(s32 a, s32 b);                                     // 0x8013A4A0
 void   fn_8013C06C(u8* p);                                            // 0x8013C06C
@@ -842,15 +842,15 @@ u32 /*0x06*/ GameNetDistributeChunkCallback(u32 /*0x18*/ a0) {
     case 9:
         return 1;
     case 50:
-        fn_8010A49C(msg + 4);
+        fn_8010A49C(msg + 4, 0);  // r4 stale in asm
         return 1;
     case 51:
-        fn_8010A49C(msg + 4);
+        fn_8010A49C(msg + 4, 0);  // r4 stale in asm
         if (gBattle != NULL) fn_80220A8C(gBattle + 4, *(s32*)(msg + 4 + 0x2C));
         return 1;
     case 52: {
         u8* q = msg + 4;
-        fn_8010A49C(q);
+        fn_8010A49C(q, 0);  // r4 stale in asm
         if (gBattle != NULL) {
             u8* base = *(u8**)(gBattle + 0xA04);
             if (base != NULL) {
@@ -865,7 +865,7 @@ u32 /*0x06*/ GameNetDistributeChunkCallback(u32 /*0x18*/ a0) {
     }
     case 53: {
         u8* q = msg + 4;
-        fn_8010A49C(q);
+        fn_8010A49C(q, 0);  // r4 stale in asm
         if (gBattle != NULL) {
             u8* o = *(u8**)(gBattle + 0xA58);
             if (o != NULL) (*(MsgFn*)(*(u8**)o + 0x14))(o, q);

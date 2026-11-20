@@ -41,7 +41,7 @@ void  fn_8018BEA4(void* p, f32 t);                           // 0x8018BEA4
 void  fn_8018C3D0(void* p);                                  // 0x8018C3D0
 void  fn_801B5D94(u8* obj, u8* ev);                          // 0x801B5D94
 void  fn_8006C3FC(u8* p);                                    // 0x8006C3FC
-void  fn_8006C6C0(u8* p);                                    // 0x8006C6C0
+void fn_8006C6C0(u8* self, u32 mode);                                    // 0x8006C6C0
 void  fn_801C83AC(u8* mgr, u8* item);                        // 0x801C83AC (small_800D.cpp)
 void  fn_801C849C(u8* mgr, u8* item);                        // 0x801C849C
 void  fn_800690D4(u8* p, s32 a, void* params, s32 b);        // 0x800690D4 (base ctor)
@@ -214,7 +214,7 @@ void fn_8006BFF8(u8* obj, u8* ev) {
 void fn_8006C66C(u8* obj, void* a1) {
     *(void**)(obj + 0x224) = a1;
     *(u8*)(obj + 0x220) = 1;
-    fn_8006C6C0(obj);
+    fn_8006C6C0(obj, 0);  // r4 stale in asm
     fn_8006C3FC(obj);
 }
 

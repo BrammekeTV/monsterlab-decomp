@@ -1530,7 +1530,7 @@ f32 WeldingQualityLevel(void);                                         // src/le
 s32 WeldingShakeThisFrame(ScriptCtx* a3);                              // src/leaf/auto_03_80077B50_text_cb.cpp
 s32 WeldingShakeThresholdBeaten(ScriptCtx* a0);                        // src/game/small_8007b.cpp
 void WiiSelectorSetUpCameraView(void);                                 // src/game/draft_miss49b.cpp
-void Wii_PlayConversationIntro(BOOL a0);  // type 0x8C (from signature table)
+void Wii_PlayConversationIntro(BOOL a0);                               // src/game/draft_miss192.cpp
 void Wii_PlayConversationOutro(BOOL a0);                               // src/game/draft_miss113.cpp
 void Wii_PlayEntityAnimationSlot(u32 a0, s32 a1);                      // src/game/small_800Eb.cpp
 void Wii_SetConversationEntity(u32 a0);                                // src/game/small_800Fd.cpp

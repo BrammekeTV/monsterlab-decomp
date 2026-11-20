@@ -13,7 +13,7 @@ extern u8 lbl_805FB0E1;
 extern u8 lbl_805FB0E3[];
 extern u8 lbl_805FB0E4;
 extern s32 lbl_805FB0E8;
-extern s32 lbl_805FB0F8;
+extern u8* lbl_805FB0F8;
 extern "C" void UIText_SetString_TextID(u32, u32);
 extern "C" u8* fn_8004E7D4(u8*, s32);
 extern "C" s32 fn_8004E8CC(u8*);

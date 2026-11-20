@@ -6,7 +6,7 @@ extern "C" {
 void* ObjAlloc(u32 size);                                       // 0x801D4414
 u32   StringHash(const char* s);                                // 0x801EB704
 void* fn_80070400(u8* obj);                                     // 0x80070400
-void  fn_80079440(u8* p, f32 a, f32 b, f32 c);                  // 0x80079440
+s32   fn_80079440(u8* p);                  // 0x80079440
 void  fn_8010B2D8(u8* p, u8* item);                             // 0x8010B2D8
 void  fn_801B7410(void* self, void* p4, void* p5, s32 p6, f32* pos); // 0x801B7410
 void  fn_801B7C58(void);                                        // 0x801B7C58 (address only)
@@ -107,7 +107,7 @@ void fn_8007A4B4(u8* obj, u8* src) {
     *(f32*)(obj + 0x28) = (f32)sx / hw;
     *(f32*)(obj + 0x24) = (f32)sy / hh;
 
-    fn_80079440(tmp + 0x4, hh, hw, (f32)sx);
+    fn_80079440(tmp + 0x4);
 
     *(f32*)(obj + 0x14) = a * lbl_805FD688;
     *(f32*)(obj + 0xC) = -a * lbl_805FD688;

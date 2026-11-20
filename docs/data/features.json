@@ -94,6 +94,11 @@
  "changelog": [
   {
    "date": "2026-11-20",
+   "time": "21:34",
+   "text": "Decompile 37 more missing functions (Wii_PlayConversationIntro, fn_8006C6C0 mode switch, fn_8007D860, fn_801D* object helpers, fn_8001B20C, fn_800508EC, ...); fix prototypes"
+  },
+  {
+   "date": "2026-11-20",
    "time": "21:21",
    "text": "Decompile 40 more missing functions (SaveCount*/SaveRecord* counters, UpdateCombatHUD, Troublescope_Update, LobShot, MemRealloc, RayQueryCast, HomeButtonInit, ...); fix prototypes"
   },

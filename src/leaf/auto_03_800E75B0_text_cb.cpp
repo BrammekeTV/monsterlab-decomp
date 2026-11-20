@@ -51,7 +51,7 @@ extern "C" void fn_80022D88(void);
 extern "C" u8 fn_8004936C(void);
 extern "C" void fn_800598E8(u8*, s32);
 extern "C" void fn_8005BF7C(u8*, s32, s32);
-extern "C" void fn_8006AD84(u8*);
+extern "C" void fn_8006AD84(u8*, f32);
 extern "C" void fn_8006B974(u8*);
 extern "C" s32 fn_8006B9CC(u8*);
 extern "C" void fn_8006CD70(u8*, u32);
@@ -283,14 +283,13 @@ void RemoveAllParticles(void) {
 
 // 0x800EC344
 void TurretTrackTarget(void* a3, f32 f1) {
-    // tail-call arguments inferred from the registers set before the call
     u8* t0 = *(u8**)(((u8*)(uintptr_t)(a3)) + 4);
     s32 t1 = *(s32*)(t0 + 28);
     u32 t2 = (u32)(t1) & 0x40u;
     if (t2 == 0) {
         return;
     }
-    fn_8006AD84(((u8*)(uintptr_t)(a3)));
+    fn_8006AD84(((u8*)(uintptr_t)(a3)), (f32)(f1));
 }
 
 // 0x800EC35C

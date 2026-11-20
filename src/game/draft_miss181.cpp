@@ -10,7 +10,7 @@ u8*   fn_8006F61C(u8* arg0);                            // 0x8006F61C (base ctor
 u32   fn_8016A768(u8* a3);                              // 0x8016A768
 s32   fn_8019555C(u8* a3);                              // 0x8019555C
 s32   fn_801AAEE4(u8* a3, u8* a4);                      // 0x801AAEE4
-void  fn_801AA79C(u8* dst, u8* src);                    // 0x801AA79C
+s32 fn_801AA79C(u8* dst, u8* src);                    // 0x801AA79C
 void  fn_801C7264(u8* p, u8* a, s32 b);                 // 0x801C7264
 void  fn_801C849C(u8* mgr, u8* item);                   // 0x801C849C
 void  fn_801C3E7C(u8* tbl, u8* obj);                    // 0x801C3E7C

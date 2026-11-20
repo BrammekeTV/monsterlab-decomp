@@ -25,7 +25,7 @@ extern "C" void fn_800609E0(u8*, s32, s32);
 extern "C" s32 fn_80060C90(u8*, f32);
 extern "C" s32 fn_80060FA8(u8*, f32);
 extern "C" s32 fn_80061024(u8*, f32);
-extern "C" s32 fn_800612B8(s32);
+extern "C" s32 fn_800612B8(u8*, f32);
 extern "C" s32 fn_80061770(u8*);
 extern "C" void fn_80061844(u8*, u8*);
 extern "C" void fn_800619A4(u8*, f32, f32);
@@ -268,8 +268,7 @@ s32 TargetIsLeft(u32 a3) {
 
 // 0x801039B0
 s32 WithinAngleOfNav(u32 a3, f32 f1) {
-    // tail-call arguments inferred from the registers set before the call
-    return (s32)(fn_800612B8((s32)((u32)(uintptr_t)(a3))));
+    return (s32)(fn_800612B8(((u8*)(uintptr_t)(a3)), (f32)(f1)));
 }
 
 // 0x801039B4
