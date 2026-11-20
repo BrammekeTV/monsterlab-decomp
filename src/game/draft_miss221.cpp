@@ -10,9 +10,9 @@ void PartSetDefect(u8* p, s32 d);
 void PartSetEnhancement(u8* p, s32 e);
 char* StrCopy(char* dst, const char* src);
 int SysSprintf(char* buf, const char* fmt, ...);
-s32 fn_8002BFDC(u8* p, u8* vt);       // 0x8002BFDC, return unused by callers here
-s32 fn_8002C040(u8* p, s32 v);        // 0x8002C040, return unused by callers here
-void* fn_8003FB24(void);              // 0x8003FB24
+u8* fn_8002BFDC(u8* p);                // 0x8002BFDC
+u8* fn_8002C040(u8* p, s32 v);        // 0x8002C040
+u8* fn_8003FB24(u8* p);              // 0x8003FB24
 u8* fn_801B3938(u8* a3);              // 0x801B3938
 void fn_801B4308(u8* p, const char* text);
 void* fn_801D40E0(s32 n);
@@ -115,7 +115,7 @@ void fn_800293C8(u8* arg0) {
     *(s32*)(arg0 + 0x18) = 0;
     *(f32*)(arg0 + 0x34) = *(f32*)lbl_805FCAA8;
     *(s32*)(arg0 + 0xB4) = 0;
-    fn_8002BFDC(arg0 + 0xB8, lbl_8035763C);
+    fn_8002BFDC(arg0 + 0xB8);
     *(s32*)(arg0 + 0x10C) = 0;
     *(s32*)(arg0 + 0x110) = 0;
     *(s32*)(arg0 + 0x11C) = 0;
@@ -184,7 +184,7 @@ u8* fn_8003F91C(u8* arg0, u8* arg1) {
     *(u8*)(arg0 + 0x50) = 0;
     var_r3 = (u8*)fn_801D40E0(0x9C);
     if (var_r3 != NULL) {
-        var_r3 = (u8*)fn_8003FB24();
+        var_r3 = fn_8003FB24(var_r3);  // constructs in the new allocation
     }
     *(u8**)(arg0 + 0x4C) = var_r3;
     *(u8*)(arg0 + 0x5) = 1;

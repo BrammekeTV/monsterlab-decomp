@@ -94,6 +94,11 @@
  "changelog": [
   {
    "date": "2026-11-20",
+   "time": "22:45",
+   "text": "Decompiled 30 more missing functions (PartQuery_* queries, minigame quality-meter animation, fn_8002*/fn_800A* helpers, ...); prototype fixes"
+  },
+  {
+   "date": "2026-11-20",
    "time": "22:35",
    "text": "Decompile 39 more missing functions (fn_801A*/fn_801B*/fn_801D*/fn_801E* UI, object and list helpers); fix prototypes"
   },

@@ -5,7 +5,7 @@
 
 #include "types.h"
 
-extern u8 lbl_805FDB38[];
+extern f32 lbl_805FDB38;
 extern u8 lbl_805FDB60[];
 extern f32 lbl_805FDB64;
 extern "C" void app_PlayMusic(u32, f32);

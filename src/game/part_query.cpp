@@ -157,7 +157,7 @@ void* PartQuery_GetTexture(void) {
 
 extern "C" {
 s32 PartComputeActionCost(PartInstance* p, u32 actionKey, void* monster);   // 0x8021E6EC
-s32 __cvt_fp2signed(f32 v);                                                   // 0x80332ED0
+s32 __cvt_fp2signed(s32 v);                                                   // 0x80332ED0 (integer abs)
 }
 
 static inline PartAction* ActionTable(void) {
@@ -218,4 +218,141 @@ extern "C" BOOL PartQuery_PartIsAlchemy(void);
 // 0x800FA440
 BOOL PartQuery_PartIsAlchemy(void) {
     return QueryDisciplineIs(PART_ALCHEMY);
+}
+
+extern "C" {
+s32   PartActionStat0(PartInstance* p, u32 actionKey);               // 0x8021DBE8
+s32   PartActionStat1(void* p, u32 actionKey);                       // 0x8021DE10
+BOOL  PartAllowedAtRank(void* coll, s32 defIndex, s32 tier);         // 0x802191CC
+void  TargetListInit(void* t);                                       // 0x802161DC
+void  TargetListDecode(void* t, const u32* mask, s32 side);          // 0x80216240
+void* TargetListDestroy(void* t, s32 del);                           // 0x80216200
+void* fn_8011AD88(void* def, s32 flag);                              // 0x8011AD88
+void  TextureRelease(void* tex);                                     // 0x80184028
+}
+extern void* gLab;                                                   // 0x805FBBC8
+
+extern "C" s32 PartQuery_GetDefectName(void);
+// 0x800F99B4
+// Text id of the queried part's defect name (0 if none).
+s32 PartQuery_GetDefectName(void) {
+    if (sQueryPart == NULL || sQueryPart->defect == -1) return 0;
+    u8* e = *(u8**)(gGameDb->data + 0x31E8) + (sQueryPart->defect << 5);
+    return TextIdFromHash(*(u32*)(e + 4));
+}
+
+extern "C" s32 PartQuery_GetEnhancementName(void);
+// 0x800F9A48
+// Text id of the queried part's enhancement name (0 if none).
+s32 PartQuery_GetEnhancementName(void) {
+    if (sQueryPart == NULL || sQueryPart->enhancement == -1) return 0;
+    u8* e = *(u8**)(gGameDb->data + 0x3610) + sQueryPart->enhancement * 0x24;
+    return TextIdFromHash(*(u32*)(e + 4));
+}
+
+// Action `which` (0/1) of the queried part and its action type (copied like the original).
+extern "C" s32 PartQuery_GetActionDamage(BOOL which);
+// 0x800F9C7C
+// Damage stat of action `which`: abs of stat 0 or stat 1 depending on the action type.
+s32 PartQuery_GetActionDamage(BOOL which) {
+    if ((u32)which >= 2) return 0;
+    if (sQueryPart == NULL) return 0;
+    PartDef def;
+    PartDbGetDef(&def, gGameDb, sQueryPart->defIndex);
+    PartDef def2 = def;
+    s32 action = which == 0 ? def2.action1 : def2.action2;
+    PartAction a = ActionTable()[action];
+    PartActionType t = ActionTypeTable()[a.type];
+    if (t.unk00[2] == 0) {
+        return __cvt_fp2signed(PartActionStat0(sQueryPart, (u32)(which == 0 ? def2.action1 : def2.action2)));
+    }
+    if (t.unk00[2] == 1) {
+        return __cvt_fp2signed(PartActionStat1(sQueryPart, (u32)(which == 0 ? def2.action1 : def2.action2)));
+    }
+    return 0;
+}
+
+extern "C" s32 PartQuery_IsActionAttack(BOOL which);
+// 0x800F9EEC
+// 1 if action `which` has action-type stat 0 (an attack).
+s32 PartQuery_IsActionAttack(BOOL which) {
+    if ((u32)which >= 2) return 0;
+    if (sQueryPart == NULL) return 0;
+    PartDef def;
+    PartDbGetDef(&def, gGameDb, sQueryPart->defIndex);
+    PartDef def2 = def;
+    s32 action = which == 0 ? def2.action1 : def2.action2;
+    PartAction a = ActionTable()[action];
+    PartActionType t = ActionTypeTable()[a.type];
+    if (t.unk00[2] == 0) return 1;
+    return 0;
+}
+
+extern "C" s32 PartQuery_IsActionDefense(BOOL which);
+// 0x800FA02C
+// 1 if action `which` has a non-zero action-type stat (a defensive action).
+s32 PartQuery_IsActionDefense(BOOL which) {
+    if ((u32)which >= 2) return 0;
+    if (sQueryPart == NULL) return 0;
+    PartDef def;
+    PartDbGetDef(&def, gGameDb, sQueryPart->defIndex);
+    PartDef def2 = def;
+    s32 action = which == 0 ? def2.action1 : def2.action2;
+    PartAction a = ActionTable()[action];
+    PartActionType t = ActionTypeTable()[a.type];
+    if (t.unk00[2] == 0) return 0;
+    return 1;
+}
+
+extern "C" s32 PartQuery_AttackTargetsLimb(BOOL which, BOOL limb);
+// 0x800FA174
+// 1 if action `which` of the queried part can target limb `limb`.
+s32 PartQuery_AttackTargetsLimb(BOOL which, BOOL limb) {
+    PartDef def;
+    PartDbGetDef(&def, gGameDb, sQueryPart->defIndex);
+    PartDef def2 = def;
+    s32 action = which == 0 ? def2.action1 : def2.action2;
+    PartAction a = ActionTable()[action];
+    s32 list[6];                      // target list: entries inline, count at +0x14
+    TargetListInit(list);
+    u32 mask = a.unk08;
+    TargetListDecode(list, &mask, def2.slot);
+    for (s32 i = 0; i < list[5]; i++) {
+        if (limb == list[i]) {
+            TargetListDestroy(list, -1);
+            return 1;
+        }
+    }
+    TargetListDestroy(list, -1);
+    return 0;
+}
+
+extern "C" void PartQuery_LoadTexture(void);
+// 0x800FA29C
+// Load the icon texture of the queried part's definition.
+void PartQuery_LoadTexture(void) {
+    if (sQueryPart == NULL) return;
+    PartDef def;
+    PartDbGetDef(&def, gGameDb, sQueryPart->defIndex);
+    PartDef def2 = def;
+    sQueryTexture = fn_8011AD88(&def2, 1);
+}
+
+extern "C" void PartQuery_ReleaseTexture(void);
+// 0x800FA308
+// Drop the icon texture reference (frees it at zero).
+void PartQuery_ReleaseTexture(void) {
+    if (sQueryTexture == NULL) return;
+    s32 refs = *(s32*)((u8*)sQueryTexture + 0x24) - 1;
+    *(s32*)((u8*)sQueryTexture + 0x24) = refs;
+    if (refs <= 0 && refs == 0) TextureRelease(sQueryTexture);
+    sQueryTexture = NULL;
+}
+
+extern "C" s32 PartQuery_PlayerNeedsMoreRanks(void);
+// 0x800FA4B4
+// 1 if the lab rank does not yet allow the queried part's tier.
+s32 PartQuery_PlayerNeedsMoreRanks(void) {
+    if (sQueryPart != NULL && PartAllowedAtRank(gLab, sQueryPart->defIndex, sQueryPart->tier - 1) == 0) return 1;
+    return 0;
 }

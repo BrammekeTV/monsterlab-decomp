@@ -11,7 +11,7 @@ void  fn_801F8238(u8* p, s32 a4);               // 0x801F8238 (small_801F.cpp)
 void  fn_801F8F34(u8* p, f32 v);                // 0x801F8F34 (small_801F.cpp)
 void  fn_801F8FA0(u8* p, f32 v);                // 0x801F8FA0 (small_801F.cpp)
 void  fn_801F8628(u8* obj, s8* src, s32 n);     // 0x801F8628
-s32   fn_80097064(f32* pos, f32 a, f32 b);      // 0x80097064
+s32   fn_80097064(f32* pos);      // 0x80097064
 void  fn_800A63B4(u8* p);                       // 0x800A63B4 (small_800A.cpp)
 u8*   fn_80138864(u8* p, s32 idx);              // 0x80138864
 s32   fn_801D3A60(s32 zone);                    // 0x801D3A60
@@ -76,7 +76,7 @@ void fn_80096F6C(u8* arg0) {
         pos[0] = *(f32*)(rec + 0x0);
         pos[1] = *(f32*)(rec + 0x4);
         pos[2] = *(f32*)(rec + 0x8);
-        idx = fn_80097064(pos, pos[1], pos[0]);
+        idx = fn_80097064(pos);
         *(void**)(arg0 + 0x194 + idx * 4) = p;
     }
 }

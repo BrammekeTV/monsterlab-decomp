@@ -912,27 +912,27 @@ s32 PartIsAction2Defense(s32 a0);                                      // src/ga
 s32 PartIsAlchemy(s32 a0);                                             // src/game/small_800Fc.cpp
 s32 PartIsBio(s32 a0);                                                 // src/game/small_800Fc.cpp
 s32 PartIsMech(s32 a0);                                                // src/game/small_800Fc.cpp
-s32 PartQuery_AttackTargetsLimb(BOOL a0, BOOL a1);  // type 0xDE (from signature table)
+s32 PartQuery_AttackTargetsLimb(BOOL which, BOOL limb);                // src/game/part_query.cpp
 s32 PartQuery_GetActionCost(u32 which);                                // src/game/part_query.cpp
-s32 PartQuery_GetActionDamage(BOOL a0);  // type 0xDD (from signature table)
+s32 PartQuery_GetActionDamage(BOOL which);                             // src/game/part_query.cpp
 s32 PartQuery_GetActionName(u32 which);                                // src/game/part_query.cpp
-s32 PartQuery_GetDefectName(void);  // type 0x22 (from signature table)
+s32 PartQuery_GetDefectName(void);                                     // src/game/part_query.cpp
 void* PartQuery_GetDefectTexture(void);                                // src/game/part_query.cpp
-s32 PartQuery_GetEnhancementName(void);  // type 0x22 (from signature table)
+s32 PartQuery_GetEnhancementName(void);                                // src/game/part_query.cpp
 void* PartQuery_GetEnhancementTexture(void);                           // src/game/part_query.cpp
 s32 PartQuery_GetHealth(void);                                         // src/game/part_query.cpp
 s32 PartQuery_GetMadness(void);                                        // src/game/part_query.cpp
 s32 PartQuery_GetName(void);                                           // src/game/part_query.cpp
 s32 PartQuery_GetQuality(void);                                        // src/game/part_query.cpp
 void* PartQuery_GetTexture(void);                                      // src/game/part_query.cpp
-s32 PartQuery_IsActionAttack(BOOL a0);  // type 0xDD (from signature table)
-s32 PartQuery_IsActionDefense(BOOL a0);  // type 0xDD (from signature table)
-void PartQuery_LoadTexture(void);  // type 0x8F (from signature table)
+s32 PartQuery_IsActionAttack(BOOL which);                              // src/game/part_query.cpp
+s32 PartQuery_IsActionDefense(BOOL which);                             // src/game/part_query.cpp
+void PartQuery_LoadTexture(void);                                      // src/game/part_query.cpp
 BOOL PartQuery_PartIsAlchemy(void);                                    // src/game/part_query.cpp
 BOOL PartQuery_PartIsBio(void);                                        // src/game/part_query.cpp
 BOOL PartQuery_PartIsMech(void);                                       // src/game/part_query.cpp
-s32 PartQuery_PlayerNeedsMoreRanks(void);  // type 0x22 (from signature table)
-void PartQuery_ReleaseTexture(void);  // type 0x8F (from signature table)
+s32 PartQuery_PlayerNeedsMoreRanks(void);                              // src/game/part_query.cpp
+void PartQuery_ReleaseTexture(void);                                   // src/game/part_query.cpp
 void PartQuery_SetInventoryPartByIndex(s32 index);                     // src/game/part_query.cpp
 void PartQuery_SetLightningTowerMonster(void);                         // src/game/part_query.cpp
 void PartQuery_SetPart(void);                                          // src/game/part_query.cpp
@@ -1560,9 +1560,9 @@ void minigame_gameflow_control_intro_update(void);                     // src/ga
 void minigame_gameflow_control_pause_transition(void);                 // src/leaf/auto_03_80074CC8_text_cb.cpp
 void minigame_gameflow_control_pause_update(void);                     // src/game/minigame_flow.cpp
 void minigame_gameflow_control_quit(void);                             // src/game/minigame_flow.cpp
-void minigame_gameflow_control_result_animate_quality_enter(void);  // type 0x8F (from signature table)
-void minigame_gameflow_control_result_animate_quality_exit(void);  // type 0x8F (from signature table)
-void minigame_gameflow_control_result_animate_quality_update(void);  // type 0x8F (from signature table)
+void minigame_gameflow_control_result_animate_quality_enter(void);     // src/game/draft_miss233.cpp
+void minigame_gameflow_control_result_animate_quality_exit(void);      // src/game/draft_miss233.cpp
+void minigame_gameflow_control_result_animate_quality_update(void);    // src/game/draft_miss233.cpp
 void minigame_gameflow_control_success_fail_screen_update(void);       // src/game/minigame_flow.cpp
 void minigame_gameflow_control_success_outro_entry(void);              // src/game/minigame_flow.cpp
 void minigame_gameflow_control_success_outro_exit(void);               // src/game/minigame_flow.cpp
