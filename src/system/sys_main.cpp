@@ -13,7 +13,7 @@ extern "C" void fn_80264F70(void);
 // ---- data ----
 static BOOL        sInitialized;               ORIG(0x805FB460)
 MEMAllocator       gSysAllocator;              ORIG(0x803F2870) // MEM1 OS heap
-MEMAllocator       gSygSysMEM2Allocator;          ORIG(0x803F2880) // MEM2 expanded heap
+MEMAllocator       gSysMEM2Allocator;          ORIG(0x803F2880) // MEM2 expanded heap
 static SysExitMode sExitMode;                  ORIG(0x805FB45C) // requested by reset/power
 u8                 gSysExitEnabled = 1;        ORIG(0x805F90F0)
 SysEventCallback   gSysEventCallback;          ORIG(0x805F90F4)

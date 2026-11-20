@@ -206,7 +206,8 @@ def lint_file(path):
         if MARKER_BAD.match(l):
             out.append((n, "marker", "`// 0xADDR` must be alone on its line (put the description on the next line)"))
         s = re.sub(r"//.*", "", l)
-        if re.search(r"\((?:u32|s32|BOOL|int|u16)\)\s*\(?\s*uintptr_t\)?", s) and "uintptr_t" in s:
+        # src/port/ maps Wii addresses to host memory on purpose (docs/port_runtime.md).
+        if not rel.startswith("src/port/") and re.search(r"\((?:u32|s32|BOOL|int|u16)\)\s*\(?\s*uintptr_t\)?", s) and "uintptr_t" in s:
             out.append((n, "ptrcast", "integer cast of a pointer via uintptr_t truncates on x64; widen the type (ScriptValue/intptr_t)"))
         elif re.search(r"\((?:u32|s32|BOOL|int)\)\s*&\w", s):
             out.append((n, "ptrcast", "address cast to a 32-bit integer truncates on x64"))
