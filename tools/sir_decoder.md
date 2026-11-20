@@ -21,6 +21,7 @@ python sir_decoder.py shared_parts.sir --only hum       # only items whose name 
 python sir_decoder.py some.sir --sections               # also dump the raw sections (.bin)
 python sir_decoder.py some.sir --no-textures            # meshes/skeletons only
 python sir_decoder.py global_binary.sir --gamedb        # print the game database as text (no numpy needed)
+python sir_decoder.py catalog.sir --catalog             # print the file table as text
 ```
 
 To do a whole folder (Windows PowerShell):
@@ -49,7 +50,7 @@ Get-ChildItem streams\*.sir | ForEach-Object { python sir_decoder.py $_.FullName
 
 - Material → texture links aren't decoded, so OBJs don't reference a texture. Assign the PNGs by hand. For example, the Mhartopia boss parts all use `baronboss.png`.
 - Animations (`*_mboss_*` names) aren't decoded yet. Skeletons give the bind pose only.
-- `catalog.sir` is an index/lookup file, not an asset container, so nothing is extracted from it.
+- `catalog.sir` is an index/lookup file, not an asset container, so nothing is extracted from it (`--catalog` prints it; layout in `docs/loader.md`).
 
 ## Format notes (reverse-engineered)
 

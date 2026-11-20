@@ -3,6 +3,7 @@
 //   sir_loader_test --selftest                 synthetic big-endian file built in memory (runs in CI)
 //   sir_loader_test --dump <global_binary.sir> loads the real file and prints every converted value
 //                                              in the text format of `tools/sir_decoder.py --gamedb`
+//   sir_loader_test --catalog <catalog.sir>    same for the file table (`sir_decoder.py --catalog`)
 //
 // tools/loader_check.py builds this, runs both modes and compares the dump with the Python
 // reference decoder. The real file is game data: it stays in orig/ and is never committed.
@@ -68,11 +69,7 @@ static int Dump(const char* path) {
         const GameDbTable* tb = &tables[t];
         printf("table %d rows ", t);
         PrintPtr((const u8*)&tb->rows, &f);
-        printf(" fn ");
-        PrintPtr((const u8*)&tb->arrayFn[0], &f);
-        printf(" ");
-        PrintPtr((const u8*)&tb->arrayFn[1], &f);
-        printf(" count %u rowsize %u fields %u present %u", tb->count, tb->rowSize, tb->fieldCount, tb->present);
+        printf(" build %08x %08x count %u rowsize %u fields %u present %u", tb->buildAddr[0], tb->buildAddr[1], tb->count, tb->rowSize, tb->fieldCount, tb->present);
         if (tb->count != 0) printf(" layout %08x", tb->layoutHash);
         printf("\n");
         if (tb->count == 0) continue;
@@ -124,6 +121,66 @@ static int Dump(const char* path) {
 
     printf("report image %u dolkept %u dolresolved %u unknown %u\n", r.ptrImage, r.ptrDolKept, r.ptrDolResolved, r.ptrUnknown);
     GlobalBinaryFree(&f);
+    return 0;
+}
+
+// ------------------------------------------------------------------------------------ catalog
+
+// StringHash: CRC-32 of the upper-cased name (the game's fn_80143A5C).
+static u32 NameHash(const char* s) {
+    u32 crc = 0xFFFFFFFFu;
+    for (; *s != 0; s++) {
+        u8 c = (u8)*s;
+        if (c >= 'a' && c <= 'z') c -= 0x20;
+        crc ^= c;
+        for (int k = 0; k < 8; k++) crc = (crc >> 1) ^ (0xEDB88320u & (0u - (crc & 1)));
+    }
+    return ~crc;
+}
+
+static int DumpCatalog(const char* path) {
+    FILE* fp = fopen(path, "rb");
+    if (fp == NULL) {
+        fprintf(stderr, "%s: cannot open\n", path);
+        return 1;
+    }
+    fseek(fp, 0, SEEK_END);
+    long len = ftell(fp);
+    fseek(fp, 0, SEEK_SET);
+    u8* buf = (u8*)malloc((size_t)len);
+    size_t got = fread(buf, 1, (size_t)len, fp);
+    fclose(fp);
+    SirCatalog c;
+    SirError e = got == (size_t)len ? SirCatalogConvert(buf, (u32)len, &c) : SIR_ERR_IO;
+    if (e != SIR_OK) {
+        fprintf(stderr, "%s: %s\n", path, SirErrorText(e));
+        return 1;
+    }
+    // Header words as the game reads them from the buffer.
+    printf("catalog version %u entries %u files %u hash %08x\n", *(u32*)(buf + 4), *(u32*)(buf + 8), *(u32*)(buf + 0xC),
+           *(u32*)(buf + 0x10));
+    for (u32 i = 0; i < c.entryCount; i++) {
+        const SirCatalogEntry* en = &c.entries[i];
+        printf("entry %u type %d offset %u size %u name %08x packed %u hash %08x\n", i, en->type, en->offset, en->size,
+               en->nameHash, en->packedSize, en->hash);
+    }
+    u32 named = 0;
+    for (u32 i = 0; i < c.fileCount; i++) {
+        const SirCatalogFile* f = &c.files[i];
+        printf("file %u name %08x unk %08x %.56s\n", i, f->nameHash, f->unk04, f->name);
+        if (NameHash(f->name) == f->nameHash) named++;
+    }
+    printf("namehash %u of %u\n", named, c.fileCount);
+    // The two lookups GameStart makes, done the way SirLoad does them.
+    static const s32 kTypes[] = { -1, 0 };
+    for (s32 type : kTypes) {
+        u32 h = NameHash("global_binary.sir");
+        const SirCatalogEntry* en = SirCatalogFind(&c, h, type);
+        if (en == NULL) printf("lookup global_binary.sir %d missing\n", type);
+        else printf("lookup global_binary.sir %d file %d sector %u size %u packed %u\n", type, SirCatalogFileIndex(&c, h),
+                    en->offset >> 11, en->size, en->packedSize);
+    }
+    free(buf);
     return 0;
 }
 
@@ -232,8 +289,7 @@ static int SelfTest(void) {
 
     GameDb* db = *(GameDb**)(hdr + GLOBAL_BINARY_HDR_GAMEDB);
     CHECK((u8*)db == img + T_DB);
-    CHECK(*(void**)db == (void*)gFakeVtable);                // main.dol pointer the resolver knows
-    CHECK(*(u32*)((u8*)db + 4) == T_FN_A);                   // one it does not know: Wii address kept
+    CHECK(*(u32*)db == T_VTABLE && *(u32*)((u8*)db + 4) == T_FN_A);   // build-time addresses: plain words
     CHECK(db->data == img + T_DATA);
     CHECK(*(f32*)(hdr + 0x874) == 1.2345f);
     CHECK(hdr[0x820] == 1);
@@ -257,8 +313,31 @@ static int SelfTest(void) {
     CHECK(*(const u32*)b->rows == 0x12345678);
     // The byte field and the fill behind it are untouched (a blind word swap would move 0xAB).
     CHECK(b->rows[4] == 0xAB && b->rows[5] == 0x80 && b->rows[6] == 0x00 && b->rows[7] == 0x01);
-    CHECK(r.ptrDolResolved == 1 && r.ptrUnknown == 0);
-    CHECK(r.ptrDolKept == 2 + 2 * GAMEDB_TABLE_COUNT);
+    CHECK(a->buildAddr[0] == T_FN_A && a->buildAddr[1] == T_FN_B);
+    CHECK(r.ptrImage == 4 && r.ptrDolResolved == 0 && r.ptrDolKept == 0 && r.ptrUnknown == 0);
+
+    // Pointer fields of a hand-written schema: image, main.dol (known and unknown), elsewhere, NULL.
+    {
+        static const SirField fields[] = { { 0x0, SIR_PTR, 5 }, { 0x14, SIR_U16, 2 }, { 0x18, SIR_F32, 1 } };
+        u8 rec[0x20];
+        memset(rec, 0xEE, sizeof(rec));
+        Put32(rec + 0x00, GLOBAL_BINARY_WII_BASE + 0x10);
+        Put32(rec + 0x04, T_VTABLE);
+        Put32(rec + 0x08, T_FN_A);
+        Put32(rec + 0x0C, 0x930DDD40);
+        Put32(rec + 0x10, 0);
+        Put16(rec + 0x14, 0x1234); Put16(rec + 0x16, 0xFFFE);
+        Put32(rec + 0x18, 0x3F800000);
+        CHECK(SirConvertRecord(&r, rec, sizeof(rec), fields, 3));
+        CHECK(*(u8**)(rec + 0x00) == img + 0x10);
+        CHECK(*(void**)(rec + 0x04) == (void*)gFakeVtable);
+        CHECK(*(u32*)(rec + 0x08) == T_FN_A && *(u32*)(rec + 0x0C) == 0x930DDD40 && *(void**)(rec + 0x10) == NULL);
+        CHECK(*(u16*)(rec + 0x14) == 0x1234 && *(s16*)(rec + 0x16) == -2 && *(f32*)(rec + 0x18) == 1.0f);
+        CHECK(rec[0x1C] == 0xEE && rec[0x1F] == 0xEE);
+        CHECK(r.ptrImage == 5 && r.ptrDolResolved == 1 && r.ptrDolKept == 1 && r.ptrUnknown == 1);
+        static const SirField outside[] = { { 0x1E, SIR_U32, 1 } };
+        CHECK(!SirConvertRecord(&r, rec, sizeof(rec), outside, 1));
+    }
 
     // A file the loader does not understand is refused before any byte changes.
     struct Bad { u32 off; u32 value; SirError want; s32 table; };
@@ -297,6 +376,32 @@ static int SelfTest(void) {
     file[0] = 'X';
     CHECK(SirContainerSectionCount(file, sizeof(file)) == -1);
 
+    // Catalog: two entries and one file record.
+    {
+        u8 cat[0x40 + 2 * 0x18 + 0x40];
+        memset(cat, 0, sizeof(cat));
+        memcpy(cat, "PNP0", 4);
+        Put32(cat + 0x04, 3); Put32(cat + 0x08, 2); Put32(cat + 0x0C, 1); Put32(cat + 0x10, 0xC628EA26);
+        u32 h = NameHash("Global_Binary.SIR");
+        CHECK(h == 0x756E99D4);
+        Put32(cat + 0x40, 0xFFFFFFFF); Put32(cat + 0x44, 0x800);  Put32(cat + 0x48, 0x1000);   Put32(cat + 0x4C, h);
+        Put32(cat + 0x58, 0);          Put32(cat + 0x5C, 0x1800); Put32(cat + 0x60, 0x10B9BC); Put32(cat + 0x64, h);
+        Put32(cat + 0x68, 0x4321);     Put32(cat + 0x6C, 0x66767A5C);
+        Put32(cat + 0x70, h); Put32(cat + 0x74, 0x11223344);
+        memcpy(cat + 0x78, "global_binary.sir", 18);
+        SirCatalog c;
+        CHECK(SirCatalogConvert(cat, sizeof(cat) - 1, &c) == SIR_ERR_CATALOG);
+        CHECK(cat[0x0B] == 2);                                   // refused: still big-endian
+        CHECK(SirCatalogConvert(cat, sizeof(cat), &c) == SIR_OK);
+        CHECK(c.entryCount == 2 && c.fileCount == 1 && *(u32*)(cat + 0x10) == 0xC628EA26);
+        const SirCatalogEntry* en = SirCatalogFind(&c, h, 0);
+        CHECK(en == &c.entries[1] && en->offset == 0x1800 && en->size == 0x10B9BC && en->packedSize == 0x4321 && en->hash == 0x66767A5C);
+        CHECK(SirCatalogFind(&c, h, -1) == &c.entries[0] && SirCatalogFind(&c, h, 1) == NULL);
+        CHECK(SirCatalogFileIndex(&c, h) == 0 && SirCatalogFileIndex(&c, 1) == -1);
+        CHECK(c.files[0].unk04 == 0x11223344 && strcmp(c.files[0].name, "global_binary.sir") == 0);
+        CHECK(memcmp(cat, "PNP0", 4) == 0);
+    }
+
     free(hdr);
     free(img);
     free(copy);
@@ -307,6 +412,7 @@ static int SelfTest(void) {
 int main(int argc, char** argv) {
     if (argc == 2 && strcmp(argv[1], "--selftest") == 0) return SelfTest();
     if (argc == 3 && strcmp(argv[1], "--dump") == 0) return Dump(argv[2]);
-    fprintf(stderr, "usage: sir_loader_test --selftest | --dump <global_binary.sir>\n");
+    if (argc == 3 && strcmp(argv[1], "--catalog") == 0) return DumpCatalog(argv[2]);
+    fprintf(stderr, "usage: sir_loader_test --selftest | --dump <global_binary.sir> | --catalog <catalog.sir>\n");
     return 2;
 }

@@ -8,6 +8,8 @@
    for in the main checkout when run from a git worktree), loads it with the C++ loader and
    compares every header slot, table descriptor and row with the Python reference decoder
    (`tools/sir_decoder.py --gamedb`), which reads the big-endian bytes directly.
+4. The same for ../catalog.sir (`--catalog`), plus a check that the catalog agrees with the
+   section table inside each of the .sir files it lists.
 
 Game data and the dumps stay local (orig/, build/); nothing here is committed.
 """
@@ -60,6 +62,36 @@ def build():
     return exe
 
 
+def compare(exe, mode, path, want, samples):
+    """Runs the C++ loader on `path` and compares its dump with the reference lines `want`."""
+    r = subprocess.run([exe, mode, path], capture_output=True, text=True)
+    if r.returncode != 0:
+        print(r.stdout[-2000:], r.stderr[-2000:])
+        return False
+    got = r.stdout.splitlines()
+    report = [l for l in got if l.startswith("report ")]
+    got = [l for l in got if not l.startswith("report ")]
+    bad = [(i, w, g) for i, (w, g) in enumerate(zip(want, got)) if w != g]
+    for i, w, g in bad[:10]:
+        print(f"line {i + 1}:\n  reference {w}\n  loader    {g}")
+    kinds = {}
+    for l in want:
+        kinds[l.split(" ", 1)[0]] = kinds.get(l.split(" ", 1)[0], 0) + 1
+    print(os.path.basename(path) + ": compared " + ", ".join(f"{n} {k}" for k, n in kinds.items()))
+    for s in samples:
+        for l in got:
+            if l.startswith(s):
+                print("  " + l)
+                break
+    if report:
+        print("  loader " + report[0])
+    if bad or len(want) != len(got):
+        print(f"MISMATCH: {len(bad)} differing lines, {len(want)} reference vs {len(got)} loader lines")
+        return False
+    print(f"  OK: all {len(want)} lines match the reference decoder")
+    return True
+
+
 def main():
     exe = build()
     r = subprocess.run([exe, "--selftest"], capture_output=True, text=True)
@@ -71,33 +103,22 @@ def main():
     if data is None:
         print("real-file check skipped: " + REL + " not found")
         return 0
-    r = subprocess.run([exe, "--dump", data], capture_output=True, text=True)
-    if r.returncode != 0:
-        print(r.stdout[-2000:], r.stderr[-2000:])
-        return 1
-    got = r.stdout.splitlines()
-    report = [l for l in got if l.startswith("report ")]
-    got = [l for l in got if not l.startswith("report ")]
-    want = sir_decoder.gamedb_dump(data)
+    ok = compare(exe, "--dump", data, sir_decoder.gamedb_dump(data), SAMPLES)
 
-    bad = [(i, w, g) for i, (w, g) in enumerate(zip(want, got)) if w != g]
-    for i, w, g in bad[:10]:
-        print(f"line {i + 1}:\n  reference {w}\n  loader    {g}")
-    kinds = {}
-    for l in want:
-        kinds[l.split(" ", 1)[0]] = kinds.get(l.split(" ", 1)[0], 0) + 1
-    print("compared: " + ", ".join(f"{n} {k}" for k, n in kinds.items()))
-    for s in SAMPLES:
-        for l in got:
-            if l.startswith(s):
-                print("  " + l)
-                break
-    print("loader " + (report[0] if report else "report missing"))
-    if bad or len(want) != len(got):
-        print(f"MISMATCH: {len(bad)} differing lines, {len(want)} reference vs {len(got)} loader lines")
-        return 1
-    print(f"OK: all {len(want)} lines match the reference decoder")
-    return 0
+    streams = os.path.dirname(data)
+    catalog = os.path.join(os.path.dirname(streams), "catalog.sir")
+    if os.path.exists(catalog):
+        ok = compare(exe, "--catalog", catalog, sir_decoder.catalog_dump(catalog),
+                     ("catalog ", "namehash ", "lookup global_binary.sir -1", "lookup global_binary.sir 0")) and ok
+        # Data sanity (Python only): the catalog must agree with the section table in each file.
+        checked, problems = sir_decoder.catalog_crosscheck(catalog, streams)
+        for p in problems[:10]:
+            print("  " + p)
+        print(f"  catalog vs section tables of {checked} files: " + ("OK" if not problems else f"{len(problems)} problems"))
+        ok = ok and not problems
+    else:
+        print("catalog check skipped: catalog.sir not found next to streams/")
+    return 0 if ok else 1
 
 
 if __name__ == "__main__":

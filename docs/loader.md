@@ -12,33 +12,39 @@ Code: `include/port/sir_loader.h`, `src/port/sir_loader.cpp`. Test: `tests/sir_l
 | | |
 |---|---|
 | Container (`PNP0` header, section table) | parsed |
+| `catalog.sir` (file table: 6,394 section entries, 59 file records) | converted |
 | `global_binary.sir` header block (4 KB) | converted; 8 slots typed from code, the rest from the data (listed in the source) |
 | `global_binary.sir` game database (42 tables, 2,591 rows) | converted from the schema stored in the file |
 | Rest of the `global_binary.sir` image (about 88%: textures, models, string table, UI, fonts) | not converted yet |
 | Hook into the game's `SirLoad` | not wired (the port has no file layer yet) |
 
-Check against the real file: all 3,823 compared lines (every header slot, table descriptor and row,
-plus parts, actions and tuning values read through the game's own structs and offsets) match the
-Python reference.
+Check against the real files: all 3,823 compared lines of `global_binary.sir` (every header slot,
+table descriptor and row, plus parts, actions and tuning values read through the game's own
+structs and offsets) and all 6,457 lines of `catalog.sir` match the Python reference.
 
 ## How the original loads a file
 
-1. `SirLoad(loader, name, dst, size, type)` (0x801E6138) hashes the name and looks it up, with the
-   section type, in the file table at `loader + 0x7B4` (0x18-byte entries: type, disc offset, size,
-   name hash, compression fields; presumably filled from `catalog.sir`). It then queues a disc read of the
-   section straight into `dst`. `SirFinishLoad` (0x801E6C44) runs the queue until the read is done.
+1. At start-up `fn_801E54E4` reads `catalog.sir` into a buffer and copies two arrays out of it
+   into the record at `loader + 0x7B4`: the section entries (count at buffer `+0x08`, 0x18 bytes
+   each, from `+0x40`) and the file records (count at `+0x0C`, 0x40 bytes each, right after).
+   `SirLoad(loader, name, dst, size, type)` (0x801E6138) hashes the name, finds the entry with
+   that name hash and section type, finds the file record with the same hash (its index selects
+   the open file handle), and queues a disc read of the section straight into `dst`.
+   `SirFinishLoad` (0x801E6C44) runs the queue until the read is done.
 2. There is **no fix-up step**. A section is a memory image built for one fixed address, and the
    caller passes exactly that address as `dst`. `GameStart` reads section 0 of `global_binary.sir`
    (type -1, 4 KB) into `sSirHeader` and section 1 (type 0) to `0x90400000`.
-3. Pointers in the image are absolute Wii addresses of three kinds:
-   - into the image itself (`0x904xxxxx`);
-   - into `main.dol`: vtables and callbacks of objects stored in the file (about 2,500 words in
-     the image look like such addresses, 47 distinct targets). The game database alone has 87:
-     its own vtable-like pointer `0x8049F444` and two array callbacks, `0x80072D74` and
-     `0x80072D98`, repeated in every table. So the files only work with the exact executable
-     they were built for;
-   - NULL.
-4. Memory the build tool never wrote holds the fill word `0x7F800001` (struct padding, unused
+3. Pointers in the image are absolute Wii addresses into the image itself (`0x904xxxxx`), or
+   NULL.
+4. The image also holds words that look like `main.dol` addresses (about 2,500, 47 distinct
+   values). The game database has 87: `0x8049F444` in the database object, and `0x80072D74` and
+   `0x80072D98` at the start of every table descriptor. **These are not usable pointers.** In
+   the retail PAL executable `0x80072D74` and `0x80072D98` are branch instructions in the middle
+   of `CreateEntityByType`, not function entries, so the file was baked against another build
+   and the retail game cannot be calling through them. The others fall in `.bss`, which is not
+   split into symbols yet, so they cannot be checked the same way. The loader types them as
+   plain `u32` words (`buildAddr`) until some decompiled code is shown to use one.
+5. Memory the build tool never wrote holds the fill word `0x7F800001` (struct padding, unused
    array slots). It is not data.
 
 ## Converting on PC
@@ -73,7 +79,7 @@ Anything no schema names stays as it was read from disc.
 
    | Offset | Field |
    |---|---|
-   | `0x000` | two `main.dol` function pointers (array callbacks) |
+   | `0x000` | two build-time addresses (see above), the same in every table |
    | `0x008`, `0x00C` | row pointer, row count |
    | `0x010` | 1 |
    | `0x014` | hash of the layout |
@@ -123,14 +129,15 @@ The last row is deliberate. The port never maps the Wii's address ranges, so suc
 easy to recognise in a debugger and faults when used. The load report counts them
 (`ptrDolKept`, `ptrUnknown`).
 
-The **resolver** is a callback, `void* (*)(u32 wiiAddr, void*)`. The port will fill it from a
-generated table of `{original address, &symbol}` pairs for the vtables and callbacks that data
-files reference. `symbols.txt` already has the addresses; the list of needed ones is exactly
-what the load report prints. None are registered yet.
+The **resolver** is a callback, `void* (*)(u32 wiiAddr, void*)`, for real `main.dol` pointers in
+data. Nothing converted so far has one (see "How the original loads a file", point 4), so no
+table is generated from `symbols.txt` yet: there is nothing to put in it. If a later file has
+pointer fields that do land on symbol starts, the load report (`ptrDolKept`) lists them and the
+table can be generated from that list.
 
 **Why relocate instead of reserving `0x90400000`.** A large-address-aware Win32 process could map
 the image at its Wii address and skip relocation of internal pointers. We do not rely on it:
-`main.dol` pointers need translating anyway, every pointer field must be known to be swapped at
+every pointer field must be known to be swapped at
 all, a fixed address can be taken by a DLL or the heap, and it would tie the data format to
 32-bit for good. Relocation costs nothing once the fields are typed. (If the platform layer does
 map an image at its original address, the same code runs with a delta of zero.)
@@ -175,9 +182,36 @@ python tools/loader_check.py
    The output must equal `tools/sir_decoder.py --gamedb`, which decodes the big-endian bytes
    directly in Python.
 
-Result on PAL `RM7P4F`: 18 header pointers, 13 header words, 3 header bytes, 42 tables,
-382 columns, 2,591 rows, 186 parts, 372 actions and 215 tuning values, all equal. The load
-report shows 60 image pointers relocated, 87 `main.dol` pointers kept, none unknown.
+Result on PAL `RM7P4F`:
+
+- `global_binary.sir`: 18 header pointers, 13 header words, 3 header bytes, 42 tables,
+  382 columns, 2,591 rows, 186 parts, 372 actions and 215 tuning values, all equal. The load
+  report shows 60 image pointers relocated and none kept or unknown.
+- `catalog.sir`: 6,394 entries and 59 file records, all equal. All 59 file-name hashes equal
+  `StringHash` of the stored name, and the two lookups `GameStart` makes for
+  `global_binary.sir` find sector 1 / 4,096 bytes and sector 3 / 1,096,124 bytes.
+- Python only: the catalog's entries agree with the section table inside each of the 59 files.
+
+## catalog.sir
+
+Container header, then the two arrays `fn_801E54E4` copies:
+
+| Offset | Field |
+|---|---|
+| `0x00` | `PNP0` |
+| `0x04`, `0x08`, `0x0C`, `0x10` | version 3, entry count, file count, hash |
+| `0x40` | entries, 0x18 bytes: `s32 type, u32 offset, u32 size, u32 nameHash, u32 packedSize, u32 hash` |
+| after the entries | file records, 0x40 bytes: `u32 nameHash, u32 unk, char name[0x38]` |
+
+An entry is the section-table entry of the `.sir` file itself with two changes: the file-name
+hash at `+0x0C`, and at `+0x10` the size on disc when the section is compressed (the `...C.sir`
+files), else 0. `SirCatalogConvert` swaps the header words, six words per entry and two per
+file record, and leaves the names alone. `SirCatalogFind` and `SirCatalogFileIndex` do the two
+searches `SirLoad` does.
+
+On PC the port's file layer converts the buffer once, between the read and the copy in
+`fn_801E54E4`. File names in the records are lower-case (`castle_arm_wrestlec.sir` for
+`castle_arm_wrestleC.sir`), which Windows resolves; a case-sensitive file system needs a lookup.
 
 ## Found on the way
 
@@ -191,12 +225,10 @@ report shows 60 image pointers relocated, 87 `main.dol` pointers kept, none unkn
 
 In the order the boot path needs them:
 
-1. **`catalog.sir`**: the file table `SirLoad` searches. Nothing loads without it.
-2. **The rest of `global_binary.sir`**: the string table (header slot `0xDA8`, 0x10B2 entries),
+1. **The rest of `global_binary.sir`**: the string table (header slot `0xDA8`, 0x10B2 entries),
    the two objects the boot code hands to the engine (`0x824`, `0x828`: both start with a
    `0x54`-byte GX texture header; pixel data stays big-endian for the GX layer), the screen-set list
    (`0xD98`), and the objects at `0xDB0`–`0xDC4`. Each needs a hand-written schema.
-3. **A `main.dol` pointer table** for the resolver, generated from `symbols.txt`.
-4. **`shared_ui.sir`** screens (title screen), then **`shared_texture.sir`**.
-5. **Save files**: written from memory by the Wii build, so big-endian too.
-6. **`shared_parts.sir`** and the level and arena files: models, skeletons, textures.
+2. **`shared_ui.sir`** screens (title screen), then **`shared_texture.sir`**.
+3. **Save files**: written from memory by the Wii build, so big-endian too.
+4. **`shared_parts.sir`** and the level and arena files: models, skeletons, textures.
