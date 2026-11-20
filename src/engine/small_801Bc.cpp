@@ -11,7 +11,7 @@ extern "C" {
 void  fn_801B737C(void* a, void* b, void* c, s32 d);                  // 0x801B737C
 void  fn_801B75AC(void* p);                                           // 0x801B75AC
 void  fn_801B7B60(void* anim, s32 mode, f32 rate);                    // 0x801B7B60
-void  fn_801B7D5C(void* anim, u32 a3, f32 a1, f32 a2);                // 0x801B7D5C
+u8* fn_801B7D5C(u8* arg0, u32 a3, f32 a1, f32 a2);                // 0x801B7D5C
 void  fn_801E8D74(void* out, void* list, void* owner, void* anim);    // 0x801E8D74
 s32   fn_801DC9B0(void* p);                                           // 0x801DC9B0
 void* EventPost(s32 id, void* sender);                                // 0x801F3918

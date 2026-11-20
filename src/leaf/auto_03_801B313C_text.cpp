@@ -19,7 +19,7 @@ extern "C" void EventSendTo(void*, u32, void*, u32, int, int);
 extern "C" void fn_801B1778(u8*, s32);
 extern "C" void fn_801BB530(u8*, u8*);
 extern "C" void fn_801EBA20(void*, void*);
-extern "C" void fn_801EBBE0(s32, u8*, s32);
+extern "C" s32 fn_801EBBE0(u8*, void*, s32);
 
 // 0x801B3430
 extern "C" void fn_801B3430(u8* a3, s32 a4) {
@@ -234,10 +234,9 @@ extern "C" void fn_801B9E7C(u8* a3) {
 }
 
 // 0x801BA4A0
-extern "C" void fn_801BA4A0(u8* a3) {
-    // tail-call arguments inferred from the registers set before the call
-    s32 t0 = *(s32*)(((u8*)(uintptr_t)(a3)) + 0);
-    fn_801EBBE0((s32)((u32)(t0)), (u8*)(uintptr_t)&fn_801BA470, (s32)((u32)(t0)));
+extern "C" s32 fn_801BA4A0(u8* a3) {
+    u8* t0 = *(u8**)(((u8*)(uintptr_t)(a3)) + 0);
+    return (s32)(fn_801EBBE0(t0, (void*)((u8*)(uintptr_t)&fn_801BA470), (s32)((u32)(uintptr_t)(t0))));
 }
 
 // 0x801BA9BC

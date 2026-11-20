@@ -6,7 +6,7 @@
 #include "types.h"
 
 extern "C" u8* fn_8004B754(u8*, s32);
-extern "C" void fn_801ED1F8(u8*);
+extern "C" s32 fn_801ED1F8(u8*, u32);
 extern "C" char* strcpy(char*, char*);
 
 // 0x8004E58C
@@ -30,10 +30,9 @@ extern "C" char* fn_8004E8D4(u8* a3, u8* a4, s32 a5) {
 }
 
 // 0x8005015C
-extern "C" void LimbHasEffect(u8* a3) {
-    // tail-call arguments inferred from the registers set before the call
+extern "C" s32 LimbHasEffect(u8* a3, s32 a4) {
     u8* t0 = ((u8*)(uintptr_t)(a3)) + 148;
-    fn_801ED1F8(t0);
+    return (s32)(fn_801ED1F8(t0, (u32)((u32)(uintptr_t)(a4))));
 }
 
 // 0x80050588

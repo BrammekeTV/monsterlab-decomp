@@ -115,14 +115,14 @@ u32 fn_8018409C(u8* p) {
 }
 
 // 0x80184278
-// Address of the entry at the end of the record: base 0x30 plus 24 bytes per +0xC count, plus
+// Size of the record: base 0x30 plus 24 bytes per +0xC count, plus
 // 4 bytes per +0x14 count, 6 bytes per +0x1C count and 8 bytes per +0x24 count.
-u8* fn_80184278(u8* p) {
+u32 fn_80184278(u8* p) {
     s32 a = *(s32*)(p + 0xc);
     s32 b = *(s32*)(p + 0x14);
     s32 c = *(s32*)(p + 0x1c);
     s32 d = *(s32*)(p + 0x24);
-    return p + 0x30 + a * 24 + b * 4 + c * 6 + d * 8;
+    return 0x30 + a * 24 + b * 4 + c * 6 + d * 8;
 }
 
 // 0x80184414

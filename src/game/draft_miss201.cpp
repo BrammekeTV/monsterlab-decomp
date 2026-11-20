@@ -15,7 +15,7 @@ void    fn_8020F228(u8* p, s32 a2);
 s32     fn_8024F1E8(char* path, u8* p);
 void    fn_8032F1E8(void* obj, void (*ctor)(void), void (*dtor)(void), s32 size, s32 count);
 f64     fn_8033E8EC(f64 x);
-void    fn_801EACF4(u8* self, f32 t);
+s32 fn_801EACF4(u8* arg0, u8* arg1, f32 t);
 void    PartInit(PartInstance* p);                                      // 0x8021D320
 void    PartDestroy(PartInstance* p, s32 del);                          // 0x8021D374
 s32     InterpolateVector3Task_Update_LERP(u8* a, void* b);

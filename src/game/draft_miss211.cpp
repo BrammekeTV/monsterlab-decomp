@@ -20,12 +20,12 @@ void    fn_801F8F34(u8* p, f32 v);                           // 0x801F8F34
 void    fn_801F8FA0(u8* p, f32 v);                           // 0x801F8FA0
 void    fn_801F8628(u8* obj, u8* src, s32 n);                // 0x801F8628
 void    fn_801F900C(u8* p, const u8* src);                   // 0x801F900C
-void    fn_801EE1F8(u8* p, s32 a);                           // 0x801EE1F8
-void    fn_801EFA24(void);                                   // 0x801EFA24
-void    fn_801EFAA4(void);                                   // 0x801EFAA4
+s32 fn_801EE1F8(u8* a, s32 n);                           // 0x801EE1F8
+s32 fn_801EFA24(s32 a0, s32 a1);                                   // 0x801EFA24
+s32 fn_801EFAA4(s32 a0, s32 a1, s32 a2);                                   // 0x801EFAA4
 void    fn_801EFB44(void);                                   // 0x801EFB44
-void    fn_801EFB48(void);                                   // 0x801EFB48
-void    fn_801EFBB8(void);                                   // 0x801EFBB8
+s32 fn_801EFB48(s32 a0);                                   // 0x801EFB48
+s32 fn_801EFBB8(s32 a0, s32 a1);                                   // 0x801EFBB8
 void    fn_801EFC28(void);                                   // 0x801EFC28
 u64     fn_801425DC(u8* timer);                              // 0x801425DC
 void    fn_8027D270(s32 a, f32 b, f32 c);                    // 0x8027D270

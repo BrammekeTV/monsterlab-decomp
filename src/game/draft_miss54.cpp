@@ -21,7 +21,7 @@ void fn_801BB478(u8* p, s32 a1);        // 0x801BB478
 u8* fn_80216658(GameDb* db, s32 key);   // 0x80216658
 u32 EffectEmitter(void* db, s32 effect, s32 limb);   // 0x800523B8
 void fn_801EBFBC(u8* arg0, u8* arg1);          // 0x801EBFBC
-s32 fn_801DA5F4(s32 a, u8* b, s32 c);          // 0x801DA5F4
+void fn_801DA5F4(u8* dst, u8* src, s32 mode);          // 0x801DA5F4
 void fn_8018C0A8(u8* h, void* a);       // 0x8018C0A8
 void fn_8018B2CC(u8* obj, u8* entry, s32 a, s32 b, f32 c, f32 d);   // 0x8018B2CC
 void fn_8018A948(u8* obj, f32 t);       // 0x8018A948
@@ -305,7 +305,7 @@ s32 fn_8004FCB4(u8* arg0, u8* arg1) {
         if (*(s32*)(arg1 + 0x94) > 0) fn_801EBFBC(arg0 + 0x94, arg1 + 0x94);
         if (*(s32*)(arg0 + 0x90) != 0) {
             u8* m = (*(VFn0*)(*(u8**)arg1 + 0xC))(arg1);
-            if (m != 0) fn_801DA5F4(*(s32*)(arg0 + 0x90), m, 1);
+            if (m != 0) fn_801DA5F4(*(u8**)(arg0 + 0x90), m, 1);
             for (s32 o = 0xC8; o <= 0xE8; o += 4) *(f32*)(arg0 + o) = *(f32*)(arg1 + o);
             for (s32 o = 0xEC; o <= 0xF8; o += 4) *(s32*)(arg0 + o) = *(s32*)(arg1 + o);
             fn_8018C0A8(*(u8**)(arg0 + 0xA0), (*(VFn0*)(*(u8**)arg0 + 0xC))(arg0));

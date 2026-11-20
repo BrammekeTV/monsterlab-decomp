@@ -43,7 +43,7 @@ void   fn_801E86FC(u8* out, u8* slot, u8* obj, u8* anim);             // 0x801E8
 s32    fn_801E9678(void* list, void* handle);                         // 0x801E9678
 void*  fn_801E9D18(void* p, u32 hash, s32 size);                      // 0x801E9D18
 void   fn_801EB568(u8* p, s32 a, const f32* v3, s32 b, const f32* v4, f32 f);   // 0x801EB568
-void   fn_801EB5B0(void);                                             // 0x801EB5B0 (animation callback)
+s32 fn_801EB5B0(u8* arg0, u8* arg1);                                             // 0x801EB5B0 (animation callback)
 s32    fn_801EC880(u8* p, u32 hash);                                  // 0x801EC880
 BOOL   fn_801F5220(void);                                             // 0x801F5220
 u32    fn_801F38F8(u8* a3);                                           // 0x801F38F8

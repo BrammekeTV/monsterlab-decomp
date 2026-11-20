@@ -19,7 +19,7 @@ u8*    fn_800E4D7C(u32 a0);                                      // 0x800E4D7C
 void   fn_800E4C30(u8* p);                                      // 0x800E4C30
 void   fn_800E4C70(u8* p);                                      // 0x800E4C70
 s32    fn_801C79A4(u8* p);                                       // 0x801C79A4
-void   fn_801C79E4(u8* p, s32 a, u8* b);                         // 0x801C79E4
+void fn_801C79E4(u8* p, s32 slot);                         // 0x801C79E4
 void*  fn_80198F1C(void* set, u32 hash);                         // 0x80198F1C
 s32 fn_8019BBA4(u8* arg0, u8* arg1, s32 arg2);                             // 0x8019BBA4
 void   operator_delete(void* p);                                 // 0x801D426C
@@ -128,7 +128,7 @@ u8* fn_800216B8(u8* p, s32 del) {
     if (p != 0) {
         *(s32*)(p + 0x68) = 0;
         *(u8**)(p + 0x4) = lbl_80355970;
-        fn_801C79E4(lbl_8047C760, *(s32*)(p + 0x88), lbl_80355970);
+        fn_801C79E4(lbl_8047C760, *(s32*)(p + 0x88));
         *(s32*)(lbl_8047C760 + 0x24) = *(s32*)(p + 0x8C);
         // asm passes the leftover r3 (address of lbl_8047C760) as the id; not representable on x64
         u8* prop = fn_800E4D7C(0);

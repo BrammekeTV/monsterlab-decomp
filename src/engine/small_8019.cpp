@@ -99,10 +99,10 @@ extern "C" void* UIFindElement(u32 hash) {
 
 // 0x80196CCC
 // Loads a texture by name (the hash computed from the name is discarded).
-void fn_80196CCC(void* unused, const char* name) {
+extern "C" void* fn_80196CCC(void* unused, const char* name) {
     (void)unused;
     StringHash(name);
-    TextureLoad(name);
+    return (void*)TextureLoad(name);
 }
 
 // 0x80196FCC

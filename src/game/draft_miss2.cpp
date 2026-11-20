@@ -57,7 +57,7 @@ void  fn_8019DB40(void* el);                                     // 0x8019DB40
 void  fn_8019E27C(void* el);                                     // 0x8019E27C
 s32   fn_8019EAA4(const char* text);                             // 0x8019EAA4
 s32   fn_8019EB94(void* el);                                     // 0x8019EB94
-void  fn_8019F5A8(void* el, void* sets);                         // 0x8019F5A8
+s32   fn_8019F5A8(void* el);                         // 0x8019F5A8
 s32 fn_801AC51C(u8* p, u8* obj, u8* target);                     // 0x801AC51C
 void  fn_801ACB98(void* p);                                      // 0x801ACB98
 void  fn_801B1668(void* p);                                      // 0x801B1668
@@ -546,7 +546,7 @@ void UISetText(void* elp, const char* text, s32 a) {
         (*(VFnII*)(*(u8**)(el + 0x138) + 0x30))(el, 0x20000);
     }
     *(s32*)((u8*)gScreenSets + 0x6C) = 1;
-    fn_8019F5A8(el, gScreenSets);
+    fn_8019F5A8(el);
 }
 
 // 0x80194944

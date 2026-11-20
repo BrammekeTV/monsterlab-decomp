@@ -17,7 +17,7 @@ void fn_8019B2F4(void* obj);
 u8* fn_801EB7A4(void* p, s32 a4, s32 a5, s32 a6, s32 a7);
 void fn_801EBA20(void* list, void* item);
 s32 fn_801AB7E8(u8* a3);
-void fn_801AB820(void* a0, void* a1, s32 a2);
+s32 fn_801AB820(u8* arg0, u8* arg1);
 void fn_801AB950(void* a0, void* a1);
 
 extern const char lbl_803836A8[];  // 0x803836A8 ("UIParticleEffect.cpp")
@@ -219,7 +219,7 @@ void fn_801ABC50(void* h) {
 // 0x801ABCEC
 // Runs the UI element update, then the owner hook when flag 4 is set.
 void fn_801ABCEC(void* h, void* owner) {
-    fn_801AB820(h, owner, 1);
+    fn_801AB820((u8*)h, (u8*)owner);
     if (fn_801AB7E8((u8*)h) & 4) {
         fn_801AB950(h, owner);
     }
