@@ -32,8 +32,8 @@
   },
   {
    "title": "PC build links",
-   "detail": "CI now links every object and writes a missing-symbols report (tools/missing_symbols.py, docs/data/missing.json): unresolved game functions ranked by references, library functions by SDK region, globals, duplicates and linkage mismatches (none left). The link itself still fails until the platform layer and the remaining ~1,390 game functions exist.",
-   "status": "in_progress"
+   "detail": "The Windows build links into a real monsterlab.exe. Functions that are still missing get generated stubs that report their name and stop, and the stubs disappear as decompilation fills them in.",
+   "status": "done"
   },
   {
    "title": "Big-endian data loader",
@@ -52,8 +52,8 @@
   },
   {
    "title": "Platform layer",
-   "detail": "Replace the Wii SDK: GX→OpenGL/Vulkan, AX→SDL audio, WPAD→gamepad + mouse pointer, DVD/NAND→files.",
-   "status": "todo"
+   "detail": "Windows replacements for the Wii system code: memory heaps, OS time, threads and reports work. Video, graphics, audio and input are still stubs. The game now runs main() through system setup, the heaps, engine startup and game init, and stops at video init.",
+   "status": "in_progress"
   },
   {
    "title": "Asset formats",
@@ -92,6 +92,11 @@
   }
  ],
  "changelog": [
+  {
+   "date": "2026-11-21",
+   "time": "00:21",
+   "text": "First run on Windows (PR #10): the PC build now links into a real monsterlab.exe. It runs the game's main() through system setup, the memory heaps, engine startup and game init, and stops at video init, the first part that's still a stub. Functions that aren't decompiled yet get generated stubs that name themselves when reached, so each run shows what to do next. CI builds and self-tests the exe."
+  },
   {
    "date": "2026-11-20",
    "time": "23:56",
