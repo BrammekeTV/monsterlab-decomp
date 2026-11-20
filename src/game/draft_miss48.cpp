@@ -169,10 +169,10 @@ extern s32 lbl_805FB6B8;
 extern u32 lbl_805FB1EC;
 extern u8 lbl_805FB1F0;
 extern const char lbl_8036045C[];
-s32   fn_801F1EB0(u8* obj);                                 // 0x801F1EB0
+s32 fn_801F1EB0(u8* arg0, f32 dt);                                 // 0x801F1EB0
 s32   fn_800FB444(void);                                    // 0x800FB444
 s32   fn_800FB45C(void);                                    // 0x800FB45C
-s32   fn_80206F14(u8* dst, const char* a, const char* b);   // 0x80206F14
+void fn_80206F14(u8* p, const char* title, const char* subtitle);   // 0x80206F14
 u32   fn_80143974(s32 seed, void* data, u32 len);           // 0x80143974 (checksum)
 void* MemAllocSmall(u32 size);                              // 0x801D41CC
 void  MemFreeSmall(void* p);                                // 0x801D4340
@@ -1341,7 +1341,7 @@ void fn_80123954(s32 arg0, u8* arg1) {
 s32 fn_801F1D64(u8* obj) {
     switch (*(u8*)(obj + 0x7F)) {
         case 0x20:
-            return fn_801F1EB0(obj);
+            return fn_801F1EB0(obj, 0.0f /* leftover f1 */);
         case 0x08:
             return 2;
         case 0x10: {

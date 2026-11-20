@@ -6,7 +6,7 @@ extern "C" {
 s32   RandomUpTo(s32 max);
 u32   StrLength(const char* s);
 u16   fn_8021F448(void* p);                                     // 0x8021F448: u16 count at (*(p+4))+0xA
-void  fn_8021F8D8(u8* p, u32 arg);                              // 0x8021F8D8
+void fn_8021F8D8(u8* arg0);                              // 0x8021F8D8
 void  fn_8021FB28(void);                                        // 0x8021FB28: returns 0
 void  fn_8021FF94(void* p, void* v);                            // 0x8021FF94: stores v at +0x14
 void  fn_8021FF9C(void* p, void* v);                            // 0x8021FF9C: stores v at +0x18
@@ -127,7 +127,7 @@ void fn_80220404(u8* arg0, u32 arg1) {
             else        fn_8021FF94(*(void**)(slot + 0x20), (void*)fn_8021FB28);
         }
     }
-    fn_8021F8D8(arg0, arg1);
+    fn_8021F8D8(arg0);
     *(s32*)(arg0 + 0x5070) = 0;
 }
 

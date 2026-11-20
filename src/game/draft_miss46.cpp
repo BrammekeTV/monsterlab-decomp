@@ -122,7 +122,7 @@ void SpawnEffectAt(void* fxMgr, u32 effect, const f32 posAndScale[4], int a);  /
 u32 fn_801F38F8(u8* a3);                             // 0x801F38F8
 void BufferFree(void* p);                            // 0x801D4980
 void operator_delete(void* p);                       // 0x801D426C
-s32 fn_801E4E20(u8*);                                // 0x801E4E20
+s32 fn_801E4E20(u8* arg0, s32 arg1);                                // 0x801E4E20
 s32 fn_801E5220(u8*, s32*);                          // 0x801E5220
 extern void* gLab;                                   // 0x805FBBC8
 extern u8 lbl_805FB0E0;
@@ -1147,7 +1147,7 @@ void SirLoaderShutdown(u8* a0) {
     *(void**)(a0 + 0x7B4) = NULL;
     for (s32 i = 0; i < *(s32*)(a0 + 0x7AC); i++) {
         if (*(s32*)(*(u8**)(a0 + 0x7A8) + i * 4) != 0) {
-            sp8 = fn_801E4E20(lbl_8048A8B4);
+            sp8 = fn_801E4E20(lbl_8048A8B4, 0 /* leftover r4 */);
             fn_801E5220(lbl_8048A8B4, &sp8);
         }
     }

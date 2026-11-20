@@ -11,7 +11,7 @@ void*   fn_801D40E0(s32 n);                                       // 0x801D40E0
 void*   fn_80209814(void* v);                                     // 0x80209814
 void    fn_8020A398(s32 handle);                                  // 0x8020A398
 u32     fn_8020A9A8(s32 handle);                                  // 0x8020A9A8 (signature guessed)
-s32     fn_8020B0AC(f32 v);                                       // 0x8020B0AC (signature guessed)
+void fn_8020B0AC(s32 id, f32 v);                                       // 0x8020B0AC (signature guessed)
 
 extern u8 gWorldState[];
 extern u8 lbl_803C4298[];     // 0x803C4298 (+4 and +8: objects with vtables)
@@ -184,7 +184,7 @@ void fn_80070E30(void* owner, u32 id, f32 v) {
     u8* e = lbl_803C5740;
     for (s32 i = 0; i < lbl_805FB12C; i++, e += 0x10) {
         if (*(void**)(e + 4) == owner && *(u32*)(e + 8) == id && *(s32*)(e + 0xC) != -1) {
-            fn_8020B0AC(v);
+            fn_8020B0AC(*(s32*)(e + 0xC), v);
         }
     }
 }

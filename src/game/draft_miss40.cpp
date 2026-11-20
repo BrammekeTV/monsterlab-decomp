@@ -31,7 +31,7 @@ void   fn_801D66C4(f32 a, f32 b);                               // 0x801D66C4
 void*  fn_802209CC(void* dst, s32 val, u32 n);
 s32    fn_801132BC(s32 v);
 s32    fn_801138F8(void);
-s32    fn_8020703C(void);
+s32 fn_8020703C(const char* title, const char* subtitle, u32* outSize);
 s32    fn_80267B14(u32* buf);
 s32    fn_802665B0(u8* a, char* b);
 
@@ -237,7 +237,7 @@ s32 SaveSetBanner(const char* title, const char* sub, s32* out) {
     char path[0x40];
     s32  i;
 
-    if (fn_8020703C() == 0) {
+    if (fn_8020703C(NULL, NULL, NULL /* leftover regs in the original */) == 0) {
         return 0;
     }
     for (i = 0; i < 16; i++) {

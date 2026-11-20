@@ -5,16 +5,16 @@
 
 #include "types.h"
 
-extern u8 lbl_805F98B0[];
+extern u8 lbl_805F98B0;
 extern u8 lbl_805F98B8[];
-extern u8 lbl_805FBA38[];
-extern u8 lbl_805FBA3C[];
+extern u8 lbl_805FBA38;
+extern u8* lbl_805FBA3C;
 extern u8 lbl_805FBA40[];
 extern u8 lbl_805FBA44[];
 extern u8 lbl_805FBA48[];
 extern u8 lbl_805FBA4C[];
-extern u8 lbl_805FBA50[];
-extern u8 lbl_805FBA54[];
+extern s32 lbl_805FBA50;
+extern s32 lbl_805FBA54;
 extern s32 lbl_805FBA70;
 
 // 0x801FBE38

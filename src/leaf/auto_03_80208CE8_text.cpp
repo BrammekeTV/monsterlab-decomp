@@ -52,7 +52,6 @@ extern "C" void fn_80209810(void) {
 
 // 0x8020A680
 extern "C" void fn_8020A680(void) {
-    // tail-call arguments inferred from the registers set before the call
     fn_801FF500((u8*)&gAudio);
 }
 

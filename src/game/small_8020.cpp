@@ -18,9 +18,9 @@ void* fn_801EF6E8(u8* obj, s32 a, s32 v);                        // 0x801EF6E8
 void  fn_802E9C94(void* fn, s32 arg);                            // 0x802E9C94
 void  fn_802F7A2C(void* fn);                                     // 0x802F7A2C
 void  fn_802F7A4C(void* fn);                                     // 0x802F7A4C
-void  fn_80207AB8(void);                                         // 0x80207AB8
+void fn_80207AB8(s32 arg);                                         // 0x80207AB8
 void  fn_80207A28(void);                                         // 0x80207A28
-void  fn_80207A2C(void);                                         // 0x80207A2C
+void fn_80207A2C(u32 unusedR3, const void* src);                                         // 0x80207A2C
 void  fn_802063E4(...);                                         // 0x802063E4
 
 extern s32 lbl_8051E5F0[];          // 0x8051E5F0 (s32 table)

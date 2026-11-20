@@ -47,7 +47,7 @@ void   fn_801C83AC(u8* mgr, u8* item);                           // 0x801C83AC
 const char* fn_801EB708(u32 hash);                               // 0x801EB708 (hash -> name for logs)
 void   fn_801EBAB8(u8* pool);                                    // 0x801EBAB8 (pool: build the free list)
 void   fn_801EC080(u8* a, u8* b);                                // 0x801EC080
-s32    fn_801FF21C(u8* audio, u8* sound);                        // 0x801FF21C
+void fn_801FF21C(u8* arg0, u8* arg1);                        // 0x801FF21C
 void   fn_801FF2A8(u8* audio, s32 handle);                       // 0x801FF2A8 (audio voice release)
 }
 

@@ -3,15 +3,15 @@
 
 extern "C" {
 void*  MemAllocDefault(u32 size);                              // 0x801D4650
-u8*    fn_801AA898(f32 x);                                     // 0x801AA898
+u8* fn_801AA898(u8* arg0, s32 a4, f32 farg0);                                     // 0x801AA898
 s32    fn_801AA730(u8* dst, u8* src);                          // 0x801AA730
 s32    fn_8019555C(u8* list);                                  // 0x8019555C
 void   fn_8018D370(const char* fmt, ...);                      // 0x8018D370 (debug log)
 u8*    fn_801EB7A4(void* p, s32 a4, s32 a5, s32 a6, s32 a7);  // 0x801EB7A4
 void*  fn_801EB94C(void* p);                                   // 0x801EB94C
 void   fn_801EBDF0(u8* list, u8* node);                        // 0x801EBDF0
-s32    fn_801EE46C(u8* handle, char* path);                    // 0x801EE46C
-void   fn_801EE4B8(u8* handle, s32 flag);                      // 0x801EE4B8
+s32 fn_801EE46C(u8* arg0);                    // 0x801EE46C
+void fn_801EE4B8(u8* arg0);                      // 0x801EE4B8
 s32    fn_801EE504(u8* handle);                                // 0x801EE504
 s32    fn_801EE4FC(u8* handle);                                // 0x801EE4FC
 s32    fn_8016B5E0(u8* state, u8* data, s32 size);             // 0x8016B5E0
@@ -55,7 +55,7 @@ void fn_801A2524(u8* el) {
 void fn_801AB950(u8* arg0, u8* arg1) {
     for (s32 i = 0; i < 5; i++) {
         if (*(s32*)(arg0 + i * 4 + 4) != 0) {
-            u8* temp = fn_801AA898(lbl_805FFA98);
+            u8* temp = fn_801AA898(*(u8**)(arg0 + i * 4 + 4), 0, lbl_805FFA98);
             u8* dst;
             switch (i) {
             case 0:
@@ -168,7 +168,7 @@ u8* fn_801D8D80(char* name, char* fallbackName) {
 
     strcpy(path, name);
     strcat(path, ".texture.wii");
-    if (fn_801EE46C(handle, path) == 0) {
+    if (fn_801EE46C(handle) == 0) {
         return NULL;
     }
     size = fn_801EE504(handle);
@@ -178,11 +178,11 @@ u8* fn_801D8D80(char* name, char* fallbackName) {
     for (;;) {
         if (fn_8016B6DC(state) == 3) {
             tex = fn_8016B724(state, 0, fallbackName);
-            fn_801EE4B8(handle, 1);
+            fn_801EE4B8(handle);
             return tex;
         }
         if (fn_8016B6DC(state) != 0) {
-            fn_801EE4B8(handle, 1);
+            fn_801EE4B8(handle);
             return NULL;
         }
         fn_8016B704(state);

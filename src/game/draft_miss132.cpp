@@ -65,8 +65,8 @@ u8*   fn_801AC184(u8* defs, s32 idx);                                 // 0x801AC
 void* fn_801D40E0(s32 n);                                             // 0x801D40E0
 u8*   fn_801DA788(u8* a3, s32 i);                                     // 0x801DA788
 u8* fn_801F61AC(u8* arg0, s32 arg1);                                      // 0x801F61AC
-void  fn_801F6848(u8* p, s32 a);                                      // 0x801F6848
-void  fn_801F7800(u8* p, s32 a, void* b);                             // 0x801F7800
+u8* fn_801F6848(u8* arg0, s32 arg1);                                      // 0x801F6848
+u8* fn_801F7800(u8* p, s32 a4);                             // 0x801F7800
 void  fn_801F94B0(u8* p, s32 v);                                      // 0x801F94B0
 u8*   fn_801F9544(u8* p, s32 a4);                                     // 0x801F9544
 void  fn_801FAAE0(u8* p, s32 a);                                      // 0x801FAAE0
@@ -344,7 +344,7 @@ u8* fn_8007D4DC(u8* arg0) {
     *(f32*)(arg0 + 0xB8) = 0.0f;
     *(f32*)(arg0 + 0xBC) = 0.0f;
     *(u8*)(arg0 + 0xC0) = 0;
-    fn_801F7800(arg0 + 0xC8, *(s32*)(lbl_803C4298 + 0x38), (void*)lbl_8035AFD0);
+    fn_801F7800(arg0 + 0xC8, *(s32*)(lbl_803C4298 + 0x38));
     *(s32*)(arg0 + 0x1F4) = 0;
     *(s32*)(arg0 + 0x298) = 0;
     *(s32*)(arg0 + 0x29C) = 0;

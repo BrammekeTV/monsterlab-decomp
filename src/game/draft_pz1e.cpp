@@ -19,7 +19,7 @@ u32 fn_80184278(u8* p);                                     // 0x80184278 (retur
 void  fn_8018D370(const char* fmt, ...);                      // 0x8018D370 (debug log)
 void  fn_80199738(u8* screen);                                // 0x80199738
 s32   fn_801B9F14(u8* sender, u32 id);                        // 0x801B9F14
-void  fn_801B8184(void);                                      // 0x801B8184 (stored as callback)
+s32 fn_801B8184(u8* p, u8* a4);                                      // 0x801B8184 (stored as callback)
 void  fn_801C5444(u8* node, f32 dt);                          // 0x801C5444
 void  fn_801C7E9C(u8* item, u8* mgr);                         // 0x801C7E9C
 void  fn_801C9B60(u8* p, f32 dt);                             // 0x801C9B60
