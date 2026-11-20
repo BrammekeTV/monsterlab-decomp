@@ -76,6 +76,11 @@
    "status": "todo"
   },
   {
+   "title": "Own-disc setup (ISO picker)",
+   "detail": "No game content is ever shipped. On first launch the player picks their own Monster Lab disc image (.iso or .wbfs). The port checks that it is the PAL version, extracts the files it needs and remembers them, so there is nothing to set up by hand.",
+   "status": "todo"
+  },
+  {
    "title": "Mod support",
    "detail": "Mods folder overriding any game file, plus new content in open formats: monster parts as glTF models, PNG textures and JSON/text stats, with no .sir editing needed.",
    "status": "todo"
@@ -92,6 +97,11 @@
   }
  ],
  "changelog": [
+  {
+   "date": "2026-11-21",
+   "time": "00:26",
+   "text": "Roadmap: added own-disc setup. The port will never ship game content, so on first launch the player picks their own Monster Lab disc image (.iso or .wbfs). The port checks that it is the PAL version and extracts what it needs once, so there is no manual extraction."
+  },
   {
    "date": "2026-11-21",
    "time": "00:21",
