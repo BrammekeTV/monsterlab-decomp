@@ -31,7 +31,7 @@ u8*    fn_8019F9B8(s32 kind);                                   // 0x8019F9B8 (U
 void*  fn_801B7198(void* anim, s32 a);                          // 0x801B7198
 void   fn_801B72A0(void* anim, s32 a);                          // 0x801B72A0
 void   fn_801A21CC(u8* o);                                      // 0x801A21CC
-void   fn_801A31BC(u8* o);                                      // 0x801A31BC
+s32    fn_801A31BC(u8* o);                                      // 0x801A31BC
 u32    fn_8019552C(u8* list, s32 index);                         // 0x8019552C
 s32    fn_8019555C(u8* list);                                    // 0x8019555C
 u8*    fn_801A9EFC(u8* element, s32 type);                       // 0x801A9EFC

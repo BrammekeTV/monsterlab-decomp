@@ -94,6 +94,11 @@
  "changelog": [
   {
    "date": "2026-11-20",
+   "time": "23:50",
+   "text": "Decompiled 16 more UI functions (fn_80199E80 activation grid, fn_801A9174 screen ray, fn_801BA9C4 text layout, fn_801BDB6C trail update, fn_801BFE38 segment distance, RGB/HSV converters, ...); prototype fixes"
+  },
+  {
+   "date": "2026-11-20",
    "time": "23:27",
    "text": "Decompile 51 more missing functions (UI node/event/menu functions fn_8019*-fn_801B*, effect and camera helpers, pad callbacks, ...); fix prototypes"
   },

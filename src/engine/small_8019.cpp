@@ -22,7 +22,7 @@ u32     StringHash(const char* s);                              // 0x801EB704
 void*   TextureLoad(const char* name);                          // 0x801D8E80
 s32 fn_8019BD18(u8* arg0, u32* arg1);                     // 0x8019BD18 (routes event to widget)
 void    UIWidgetPlayAnim(void* w, u32 anim);                    // 0x80199B38
-void    fn_801BA8C8(void* p);                                   // 0x801BA8C8
+void    fn_801BA8C8(void* a3, const u8* str, s32 a5, s32 a6, f32* a7, f32* a8); // 0x801BA8C8
 void* fn_801BA930(u8* a0, u8* str, u32 a2, u32 a3, u32 a4, u32 a5); // 0x801BA930
 s32     fn_801994E0(void* a, void* obj);                        // 0x801994E0 (object setup callback)
 }
@@ -125,7 +125,7 @@ void fn_8019702C(void* obj, u32 a4, u32 a5, u32 a6, f32* a7, f32* a8, f32 scale)
     (void)a4;
     (void)a5;
     (void)a6;
-    fn_801BA8C8(*(void**)((u8*)obj + 0x8));
+    fn_801BA8C8(*(void**)((u8*)obj + 0x8), (const u8*)(uintptr_t)a4, (s32)a5, (s32)a6, a7, a8);
     if (a7 != NULL) {
         *a7 *= scale;
     }

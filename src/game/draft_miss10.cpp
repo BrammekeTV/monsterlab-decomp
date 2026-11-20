@@ -19,12 +19,12 @@ u8*         fn_801A2588(void);                                                  
 u8*         fn_801A2DDC(void);                                                  // 0x801A2DDC
 u8*         fn_801A84F8(void);                                                  // 0x801A84F8
 void        fn_801A904C(u8* p);                                                 // 0x801A904C
-void        fn_801A9174(u8* p, f32* pos, f32* out);                             // 0x801A9174
+s32         fn_801A9174(u8* p, f32* pos, f32* out);                             // 0x801A9174
 s32         fn_801B5A60(u8* p);                                                 // 0x801B5A60
 void*       fn_801B7198(void* anim, s32 a);                                     // 0x801B7198
 void        fn_801B75AC(void* p);                                               // 0x801B75AC
-void*       fn_801BA9C4(u8* a0, s32 a1, u8* a2, s32 a3, u32 a4, u32 a5, u32 a6, u32 a7,
-                        f32 f1, f32 f2, f32 f3, f32 f4, u32 a8, s32 a9);        // 0x801BA9C4
+void*       fn_801BA9C4(u8* a0, s32 a1, u8* a2, u32 a3, u32 a4, u32* a5, u32 a6, s32 a7,
+                        f32 f1, f32 f2, f32 f3, f32 f4, s32 a8);                // 0x801BA9C4
 void        fn_801C83AC(u8* mgr, u8* item);                                     // 0x801C83AC
 void        fn_801C9178(u8* a, u8* b);                                          // 0x801C9178
 void        fn_801D0B48(u8* a, u8* b, u8* c);                                   // 0x801D0B48
@@ -355,7 +355,7 @@ void fn_801B737C(u8* node, u8* parent, u8* obj, s32 init) {
 // Wrapper: forwards the string (with its length) and fixed defaults (0,0,0,1.0) to fn_801BA9C4.
 void* fn_801BA930(u8* a0, u8* str, u32 a2, u32 a3, u32 a4, u32 a5) {
     u32 len = (u32)strlen((const char*)str);
-    return fn_801BA9C4(a0, 1, str, 0, len, a2, a3, a4, 0.0f, 0.0f, 0.0f, 1.0f, a5, 0);
+    return fn_801BA9C4(a0, 1, str, 0, len, (u32*)(uintptr_t)a2, a3, (s32)a4, 0.0f, 0.0f, 0.0f, 1.0f, (s32)a5);
 }
 
 // 0x801C7E9C

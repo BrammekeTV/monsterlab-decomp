@@ -18,7 +18,7 @@ void  fn_8018430C(u8* a3, u8* a4);                               // 0x8018430C
 void* fn_8018D428(s32 size, const char* file, void* tag, s32 line); // 0x8018D428 (alloc)
 void  fn_8019B2F4(void* obj);                                    // 0x8019B2F4 (UI element base init)
 u8*   fn_80196C9C(u8* a3);                                       // 0x80196C9C
-void  fn_801A1238(u8* obj, f32* colors);                         // 0x801A1238 (4 vertex colours)
+s32   fn_801A1238(u8* obj, f32* colors);                         // 0x801A1238 (4 vertex colours)
 s32   fn_801DA780(u8* a3);                                       // 0x801DA780
 u8*   fn_801DA788(u8* a3, s32 i);                                // 0x801DA788
 s32   fn_80338A2C(const char* a, const char* b, u32 n);          // 0x80338A2C (strncmp)

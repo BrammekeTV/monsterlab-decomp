@@ -1737,7 +1737,7 @@ void UIGroup_EnableHitTest(u32 a0);                                    // src/en
 ScriptValue UIImage_GetTexture(u32 a0);                                // src/engine/draft_8019d.cpp
 void UIImage_SetIgnoreAlphaPixels(u32 a0, u32 /*0x06*/ a1);            // src/engine/draft_8019d.cpp
 void UIImage_SetTexture(u32 a0, BOOL a1);                              // src/engine/draft_8019d.cpp
-void UIModel_SetModel(u32 a0, BOOL a1);  // type 0x81 (from signature table)
+void UIModel_SetModel(u32 a0, BOOL a1);                                // src/game/draft_miss261.cpp
 void UIParticleEffect_SetActive(u32 a0, u32 /*0x06*/ a1);              // src/engine/draft_8019c.cpp
 void UIScreen_ClearStack(void);                                        // src/game/draft_miss47a.cpp
 u32 /*0x06*/ UIScreen_Is_Pushed(u32 a0);  // type 0x5 (from signature table)

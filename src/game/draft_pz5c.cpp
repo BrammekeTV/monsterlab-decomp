@@ -25,7 +25,7 @@ void   fn_8016A788(u8* p);                                                // 0x8
 s32    fn_8016AFE8(u8* a, u8* b, u8* c, f32 t);                           // 0x8016AFE8 (tail-calls fn_8016ACB8)
 void   fn_80173944(u8* obj);                                              // 0x80173944
 u8*    fn_80196C9C(void* p);                                              // 0x80196C9C
-void   fn_801A1238(u8* obj, f32* colors);                                 // 0x801A1238
+s32    fn_801A1238(u8* obj, f32* colors);                                 // 0x801A1238
 void   fn_801FCD9C(void);                                                 // 0x801FCD9C (callback)
 void   fn_801FCDCC(void);                                                 // 0x801FCDCC (callback)
 void   fn_801FD730(u8* audio);                                            // 0x801FD730

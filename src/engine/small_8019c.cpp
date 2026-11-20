@@ -9,7 +9,7 @@ typedef s32  (*VFnF32Ret)(void*, f32);
 extern "C" {
 s32 fn_801A8AFC(u8* p);                                 // 0x801A8AFC
 void    fn_8020A398(s32 handle);                                // 0x8020A398
-void    fn_80199E80(void* p);                                   // 0x80199E80
+s32     fn_80199E80(void* p, f32 dt);                           // 0x80199E80
 s32     fn_80199DD4(void* obj);                                 // 0x80199DD4
 void    fn_8019BFF8(void* obj, void* cb, void* arg);            // 0x8019BFF8
 s32 fn_8019BD18(u8* arg0, u32* arg1);                     // 0x8019BD18
@@ -117,11 +117,11 @@ s32 fn_80199618(void* obj) {
 }
 
 // 0x80199ABC
-// Runs fn_80199E80 on the pointer stored at +0x144 when it is set. Returns 0.
-s32 fn_80199ABC(void* obj) {
+// Runs fn_80199E80 on the pointer stored at +0x144 when it is set (dt passed through in f1). Returns 0.
+s32 fn_80199ABC(void* obj, f32 dt) {
     void* p = *(void**)((u8*)obj + 0x144);
     if (p != NULL) {
-        fn_80199E80(p);
+        fn_80199E80(p, dt);
     }
     return 0;
 }

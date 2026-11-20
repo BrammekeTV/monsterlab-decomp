@@ -9,7 +9,7 @@ void* fn_80070400(u8* obj);                                     // 0x80070400
 s32   fn_80079440(u8* p);                  // 0x80079440
 void  fn_8010B2D8(u8* p, u8* item);                             // 0x8010B2D8
 void  fn_801B7410(void* self, void* p4, void* p5, s32 p6, f32* pos); // 0x801B7410
-void  fn_801B7C58(void);                                        // 0x801B7C58 (address only)
+s32   fn_801B7C58(u8* a, void* b, f32 dt);                    // 0x801B7C58
 void* memset(void* p, int c, unsigned long n);
 extern u8        gWorldState[];
 extern s32       lbl_805FB124;
