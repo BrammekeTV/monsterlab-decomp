@@ -52,7 +52,7 @@
   },
   {
    "title": "Platform layer",
-   "detail": "Windows replacements for the Wii system code: memory heaps, OS time, threads and reports work. Video, graphics, audio and input are still stubs. The game now runs main() through system setup, the heaps, engine startup and game init, and stops at video init.",
+   "detail": "Windows replacements for the Wii system code: memory heaps, OS time, threads and reports work, and video init runs with the graphics calls stubbed. Audio and input are still stubs. The game now runs main() through system setup, the heaps, engine startup, game init and the renderer start-up, and stops in the scene-graph setup (SgInit).",
    "status": "in_progress"
   },
   {
@@ -63,7 +63,7 @@
   {
    "title": "Boots to title screen",
    "detail": "First visible frame on Windows.",
-   "status": "todo"
+   "status": "in_progress"
   },
   {
    "title": "1080p & widescreen",
@@ -97,6 +97,11 @@
   }
  ],
  "changelog": [
+  {
+   "date": "2026-11-21",
+   "time": "00:50",
+   "text": "The Windows build boots further (PR #11): VideoInit is decompiled and its graphics calls are stubbed, so the exe now gets through the renderer start-up and stops at the scene-graph setup (SgInit). Next up: the first visible frame, the title screen."
+  },
   {
    "date": "2026-11-21",
    "time": "00:42",
