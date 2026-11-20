@@ -20,6 +20,7 @@ python sir_decoder.py village_arena.sir --list          # only list what's insid
 python sir_decoder.py shared_parts.sir --only hum       # only items whose name contains "hum"
 python sir_decoder.py some.sir --sections               # also dump the raw sections (.bin)
 python sir_decoder.py some.sir --no-textures            # meshes/skeletons only
+python sir_decoder.py global_binary.sir --gamedb        # print the game database as text (no numpy needed)
 ```
 
 To do a whole folder (Windows PowerShell):
@@ -57,4 +58,5 @@ Get-ChildItem streams\*.sir | ForEach-Object { python sir_decoder.py $_.FullName
 - **Texture header:** `0x54` bytes, holding `u32 0x54`, `u16 w, h, w, h`, `u32 mip count` at +0x10, `u8 format` at +0x14, `u32 data size` at +0x18 and `u32 data pointer` at +0x1C. The name is at +0x35.
 - **Skinned part:** the name is preceded by a float scale factor (and bounding data), then `0x7F800001` padding, then a header: `size, ?, ?, 0x60, position array offset, ?, command stream offset, ...`.
 - **Meshes:** standard GX command streams. CP writes set the array bases (`0xA0`–`0xA4`), strides (`0xB0`–`0xB4`), the vertex descriptor (`0x50`/`0x60`) and the vertex formats (`0x70`+). These are followed by indexed draws (triangles, strips and fans).
+- **Game database (`global_binary.sir`):** 42 tables that each store their own column types, sizes and name hashes. Layout in `docs/loader.md`; `--gamedb` prints every row.
 - **Skeleton:** after the `*_geoA` name come two arrays of 4×3 matrices (rotation rows, then translation), one entry per joint. The first array holds the inverse bind matrices.
