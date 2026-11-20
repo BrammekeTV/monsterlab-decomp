@@ -39,17 +39,17 @@ void   fn_80174A24(u8* p, u32 color);                             // 0x80174A24
 void   fn_80174A70(u8* p, f32 x, f32 y, f32 z);                   // 0x80174A70
 void*  fn_8018B78C(u8* b, u8* entry, s32 a, f32 x, f32 y, s32 c, s32 d);  // 0x8018B78C
 f32    fn_8018C044(u8* anim, f32 fps);                            // 0x8018C044
-u8*    fn_8018C48C(u8* p);                                        // 0x8018C48C
+u8* fn_8018C48C(u8* base, u32 key);                                        // 0x8018C48C
 u32    fn_8018C8CC(u8* anim);                                     // 0x8018C8CC
 void   fn_8018D68C(f32* out, void* sets);                         // 0x8018D68C
 u32    fn_8019552C(u8* list, s32 index);                          // 0x8019552C (leaf; returns an element pointer)
 void   fn_8018C4D8(u8* p);                                        // 0x8018C4D8
-void   fn_801A9EC8(u8* obj, f32 x, f32 y);                        // 0x801A9EC8
+s32 fn_801A9EC8(u8* obj, f32 x, f32 y, f32 z);                        // 0x801A9EC8
 s32 fn_8019CCAC(u8* self);                                      // 0x8019CCAC
 u8*    fn_801B35C8(u8* p, s32 a);                                 // 0x801B35C8
 void   fn_801BB338(u8* p, u32 color);                             // 0x801BB338
-s32    fn_801CA7B0(u32 mode);                                     // 0x801CA7B0
-void*  fn_801E6934(u8* loader, void* a, void* dst, u32 b, u32 c, s32 d, s32 e, s32 f, s32 flags);  // 0x801E6934
+void fn_801CA7B0(u32 mode);                                     // 0x801CA7B0
+u32 fn_801E6934(u8* loader, void* a, void* dst, u32 b, u32 c, s32 d, s32 e, s32 f, s32 flags);  // 0x801E6934
 void   fn_801F0668(s32 a);                                        // 0x801F0668
 void   fn_801F5E44(void);                                         // 0x801F5E44
 void   fn_801F5E48(void* a, s32 b);                               // 0x801F5E48
@@ -476,7 +476,7 @@ s32 fn_801A6B9C(u8* grid, s32 a) {
             f32* rowX = (f32*)(uintptr_t)fn_8019552C(*(u8**)(grid + 0x1b8), i);
             f32 x = *rowX + stepX * (f32)(*(s32*)(grid + 0x160) - 1);
             f32 y = 0.0f + stepY * (f32)(*(s32*)(grid + 0x15c) - 1);
-            fn_801A9EC8(cell, x, y);
+            fn_801A9EC8(cell, x, y, 0.0f /* leftover f3 */);
             if (a != 0) {
                 *(f32*)(cell + 0x68) = x;
                 *(f32*)(cell + 0x6c) = y;
@@ -525,7 +525,7 @@ s32 fn_801AC944(u8* clip, s32 a, u8* b, s32 c, u8* obj) {
             }
         }
     } else {
-        u8* e = fn_8018C48C(b);
+        u8* e = fn_8018C48C(b, 0 /* leftover r4 key */);
         if (e != NULL) {
             void* payload = *(void**)(e + 4);
             if (payload != NULL) fn_8017493C(payload);
@@ -593,7 +593,7 @@ s32 fn_801E6374(u8* pool, u8* name, u8* name2, u32 dst, u32 size, s32 hash) {
             }
             s32 csize = *(s32*)(ent + 0x10);
             if (csize == 0) csize = *(s32*)(ent + 0x8);
-            void* handle = fn_801E6934(pool, *(void**)(*(u8**)(pool + 0x7a8) + tblIdx * 4), (void*)(uintptr_t)dst,
+            void* handle = (void*)(uintptr_t)fn_801E6934(pool, *(void**)(*(u8**)(pool + 0x7a8) + tblIdx * 4), (void*)(uintptr_t)dst,
                                        (u32)csize, *(u32*)(ent + 4) >> 11, 0, 0, 0, hash);
             *(u32*)(*(u8**)(pool + 0x48c) + off4) = (u32)(uintptr_t)handle;  // lint:ok 4-byte handle slot
             return *(s32*)(*(u8**)(pool + 0x48c) + off4);

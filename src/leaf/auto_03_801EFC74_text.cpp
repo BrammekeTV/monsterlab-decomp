@@ -29,7 +29,7 @@ extern s32 lbl_805FB9EC;
 extern u8 lbl_806000B4[];
 extern u8 lbl_806000D0[];
 extern u8 sWorldParams[];
-extern "C" void fn_801EFC9C(void);
+extern "C" void fn_801EFC9C(u8*, s32, char*);
 
 // 0x801EFC74
 extern "C" void fn_801EFC74(s32 a3) {
@@ -37,15 +37,14 @@ extern "C" void fn_801EFC74(s32 a3) {
 }
 
 // 0x801EFC7C
-extern "C" void StringTableInit(u8* a3) {
-    // tail-call arguments inferred from the registers set before the call
+extern "C" void StringTableInit(u8* a3, s32 a4, u8* a5) {
     *(u32*)(((u8*)(uintptr_t)(a3)) + 0) = (u32)((u32)(0));
     *(u32*)(((u8*)(uintptr_t)(a3)) + 4) = (u32)((u32)(0));
     *(u32*)(((u8*)(uintptr_t)(a3)) + 8) = (u32)((u32)(0));
     *(u32*)(((u8*)(uintptr_t)(a3)) + 12) = (u32)((u32)(0));
     *(u32*)(((u8*)(uintptr_t)(a3)) + 16) = (u32)((u32)(0));
     *(u32*)((u8*)&gStringTable2) = (u32)((u32)(uintptr_t)(a3));
-    fn_801EFC9C();
+    fn_801EFC9C(((u8*)(uintptr_t)(a3)), (s32)((u32)(uintptr_t)(a4)), (char*)(((u8*)(uintptr_t)(a5))));
 }
 
 // 0x801F004C

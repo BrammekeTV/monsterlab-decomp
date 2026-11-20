@@ -18,7 +18,7 @@ s32 fn_8018BDE0(u8* p, s32 key);
 u8* fn_8018A3EC(u8* p);
 void* fn_80070400(u8* obj);
 s32 fn_801B5BD8(u8* self, s32 a, s32 b, u8* c);
-s32 fn_801B468C(u8* self, s32 a);
+void fn_801B468C(u8* self, s32 arg1);
 void fn_80122A10(u8* p, u32 handle);
 void fn_801B7410(void* self, void* p4, void* p5, s32 p6, f32* pos);
 s32 fn_8007BEE4(u8* a, u8** list, s32 n, u8* b);
@@ -165,7 +165,8 @@ s32 fn_80062EA8(u8* arg0, s32 arg1) {
         ClearRecord(rec);
         fn_80122A10(rec, (u32)(uintptr_t)arg0);  // lint:ok 32-bit slot handle compare; revisit with the x64 layout
     }
-    return fn_801B468C(arg0, arg1);
+    fn_801B468C(arg0, arg1);
+    return 0;
 }
 
 // 0x8006FBB8

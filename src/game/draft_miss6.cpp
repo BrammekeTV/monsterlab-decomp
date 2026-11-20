@@ -108,7 +108,7 @@ u8*    fn_801B3308(void);                                        // 0x801B3308
 void   fn_801B3378(u8* p, u32 key);                              // 0x801B3378
 void   fn_801B154C(u8* group, u32 key, ShapeFn fn, u8* arg);     // 0x801B154C
 void   fn_801BF398(u8* list, u8* item);                          // 0x801BF398
-void   fn_801C7B20(u8* fx, u8* desc, const f32* pos, u8* mgr);   // 0x801C7B20
+u8* fn_801C7B20(u8* fx, u8* desc, const f32* pos, u8* mgr);   // 0x801C7B20
 void   fn_801C849C(u8* mgr, u8* item);                           // 0x801C849C
 u8*    fn_801D8D80(char* path, const char* name);                // 0x801D8D80 (texture file load)
 void*  fn_801D40E0(s32 n);                                       // 0x801D40E0

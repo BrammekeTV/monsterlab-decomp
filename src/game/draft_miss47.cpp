@@ -56,7 +56,7 @@ s32    fn_801F57E0(f32 dt);
 void   fn_801FD730(u8* audio);
 void   fn_801FF2A8(u8* audio, s32 handle);
 void   fn_801FFC04(u8* audio, f32 v);
-s32    fn_802000F0(u8* audio);                                      // 0x802000F0
+void fn_802000F0(u8* audio);                                      // 0x802000F0
 void*  fn_80209814(void* v);
 void   fn_8020EDF0(u8* dst, u8* src);
 void   fn_80220A0C(s32 a);

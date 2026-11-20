@@ -28,9 +28,9 @@ BOOL   fn_80198C34(void* set, void* w);
 s32    fn_8019CC7C(void* el, u32 flag);
 BOOL   fn_801B50B0(void* unused, u8* obj);                  // 0x801B50B0
 void   fn_801E4918(u8* obj, s32 a, f32 t);                  // 0x801E4918
-void*  fn_801E65B8(u8* loader, u8* name, void* dst, u32 size, s32 flags, s32 a, s32 b);  // 0x801E65B8
+u32 fn_801E65B8(u8* obj, const char* name, s32 user, s32 unused, s32 key, s32 val);  // 0x801E65B8
 s32    fn_801E6FAC(u8* ent, s32 flag, f32 t);               // 0x801E6FAC
-void*  fn_801E6934(u8* loader, void* a, void* dst, u32 b, u32 c, s32 d, s32 e, s32 f, s32 flags);  // 0x801E6934
+u32 fn_801E6934(u8* loader, void* a, void* dst, u32 b, u32 c, s32 d, s32 e, s32 f, s32 flags);  // 0x801E6934
 void   fn_801EC8C4(u8* p, u32 a, u32 b);                    // 0x801EC8C4
 BOOL   fn_801F56FC(s32 flags);                              // 0x801F56FC
 void   SirFinishLoad(void* loader, void** handle);          // 0x801E6C44
@@ -130,8 +130,8 @@ void* SirLoad(void* loader_, const char* path, void* dst, u32 size, s32 flags) {
         for (s32 i = 0; i < 8; i++) {
             if (*(s32*)(loader + 0x46C + i * 4) != 0 && (u32)flags == *(u32*)(loader + 0x42C + i * 4) &&
                 strcmp((const char*)(loader + 0x22C + i * 0x40), path) == 0) {
-                void* r = fn_801E65B8(loader, loader + 0x2C + i * 0x40, dst, size, flags,
-                                      *(s32*)(loader + 0x44C + i * 4), *(s32*)(loader + 0x46C + i * 4));
+                void* r = (void*)(uintptr_t)fn_801E65B8(loader, (const char*)(loader + 0x2C + i * 0x40), (s32)(uintptr_t)dst, size, flags,
+                                      *(s32*)(loader + 0x44C + i * 4));  // lint:ok 32-bit handle
                 *(s32*)(loader + 0x46C + i * 4) = 0;
                 return r;
             }
@@ -170,7 +170,7 @@ void* SirLoad(void* loader_, const char* path, void* dst, u32 size, s32 flags) {
         }
     }
     s32 compressed = (*(s32*)(ent + 0x10) != 0) ? 1 : 0;
-    return fn_801E6934(loader, *(void**)(*(u8**)(loader + 0x7A8) + sp10 * 4), dst, *(u32*)(ent + 0x8),
+    return (void*)(uintptr_t)fn_801E6934(loader, *(void**)(*(u8**)(loader + 0x7A8) + sp10 * 4), dst, *(u32*)(ent + 0x8),
                        *(u32*)(ent + 0x4) >> 11, compressed, *(s32*)(ent + 0x10), *(s32*)(ent + 0x14), flags);
 }
 

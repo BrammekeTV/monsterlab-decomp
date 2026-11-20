@@ -21,7 +21,7 @@ void     SpawnEffectAt(void* fxMgr, void* effect, const f32 posAndScale[4], int 
 void     fn_80061A98(u8* p, s32* a, s32 v);                                     // 0x80061A98
 u8*     fn_801B44AC(u8* p, s32 del);                                           // 0x801B44AC (base dtor)
 u8* fn_801B4334(u8* arg0, s32 layer, u8* ent, s32 reset);                                                    // 0x801B4334 (base ctor)
-void     fn_801B4944(u8* p);                                                    // 0x801B4944
+void fn_801B4944(u8* obj, s32 mode);                                                    // 0x801B4944
 void     fn_80122B00(void* a, u8* b);                                           // 0x80122B00
 u8* fn_8006F61C(u8* arg0);                                                    // 0x8006F61C
 void     fn_8006F67C(u8* p, f32 t, s32 flag);                                   // 0x8006F67C (leaf version takes only p)
@@ -146,7 +146,7 @@ u8* fn_80062CE0(u8* p, s32 del) {
 // 0x80062F58
 // Calls the object's virtual slot 0xB8; if it returns a non-null object, calls fn_80122B00 with it and p.
 void fn_80062F58(u8* p) {
-    fn_801B4944(p);
+    fn_801B4944(p, 0 /* leftover r4 mode */);
     void* result = (*(VirtFnSelfPtr*)(*(u8**)p + 0xB8))(p);
     if (result != NULL) {
         fn_80122B00(result, p);

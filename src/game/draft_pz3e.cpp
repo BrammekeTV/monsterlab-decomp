@@ -77,7 +77,7 @@ s32    fn_8015BA30(void* p);                                     // 0x8015BA30
 void   fn_8014DE68(void);                                        // 0x8014DE68
 void   fn_80201F38(void);                                        // 0x80201F38 (callback)
 void   fn_80202CAC(void);                                        // 0x80202CAC (alarm callback)
-void   fn_80202FFC(void);                                        // 0x80202FFC (callback)
+void fn_80202FFC(s32 chan, s32 status);                                        // 0x80202FFC (callback)
 void   fn_802041F4(s32 a3);                                      // 0x802041F4 (read-done callback)
 s32    fn_80204210(u8* e);                                       // 0x80204210
 void   fn_80203E8C(void);                                        // 0x80203E8C

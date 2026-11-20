@@ -21,7 +21,7 @@ s32 fn_80146A58(u8* file);                                              // 0x801
 void* fn_80150DD4(void);                                                // 0x80150DD4
 void fn_80151014(void);                                                 // 0x80151014
 void fn_80151244(void);                                                 // 0x80151244
-s32 fn_801736EC(void);                                                  // 0x801736EC (return type assumed)
+u8* fn_801736EC(void);                                                  // 0x801736EC (return type assumed)
 void fn_80174AC4(u8* p);                                         // 0x80174AC4
 void* fn_8018D428(s32 size, const char* file, void* tag, s32 line);     // 0x8018D428 (alloc)
 void fn_8018D2B8(const char* fmt, ...);                                 // 0x8018D2B8 (debug log)
@@ -83,7 +83,7 @@ u8* fn_801724D4(s32 arg0) {
     u8* obj = ((HeapAllocFn)(*(void**)lbl_805FB608))(0xC4, 0x10, 0xB, 0, 0);
     *(s32*)(obj + 0x0) = 0x47;
     if (arg0 != 0) {
-        *(s32*)(obj + 0x4) = fn_801736EC();
+        *(u8**)(obj + 0x4) = fn_801736EC();
     } else {
         *(s32*)(obj + 0x4) = 0;
     }

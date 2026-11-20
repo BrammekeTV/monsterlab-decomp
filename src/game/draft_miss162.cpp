@@ -24,7 +24,7 @@ void  fn_8016A3F8(u8* p);                                         // 0x8016A3F8
 void  fn_8016A43C(u8* p);                                         // 0x8016A43C
 void  fn_8016A788(u8* p);                                         // 0x8016A788
 s32   fn_8016AFE8(u8* a, u8* b, u8* c, f32 t);                    // 0x8016AFE8
-s32   fn_8016ACB8(u8* a, s32 b, u8* c, s32 d, u8* e, s32 f, s32 g, f32 t);  // 0x8016ACB8
+void fn_8016ACB8(u8* dst, s32 dstStart, u8* srcA, s32 aStart, u8* srcB, s32 bStart, s32 maxCount, f32 t);  // 0x8016ACB8
 void  fn_8017387C(f32* out, u8* obj);                             // 0x8017387C
 void  fn_80173944(u8* obj);                                       // 0x80173944
 void  fn_8018C508(u8* p, f32 dt);                                 // 0x8018C508

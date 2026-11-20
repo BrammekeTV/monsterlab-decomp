@@ -81,7 +81,7 @@ void  fn_801D8BB4(u8* p, f32 dt);                       // 0x801D8BB4
 void  fn_801E28DC(u8* p, f32 dt);                       // 0x801E28DC
 u32   fn_801F2C10(u32 key);                             // 0x801F2C10
 BOOL  fn_801F5220(void);                                // 0x801F5220
-s32   fn_801DFB58(u8* p, s32 a);                        // 0x801DFB58
+void fn_801DFB58(u8* cmd, s32 mode);                        // 0x801DFB58
 void  WorldTick(u8* world, f32 dt);                     // 0x8012AB00
 void  ZoneEffectsUpdate(void* effects, f32 dt);         // 0x801E97FC
 u8*   fn_8015EC9C(u8* tbl, f32 a, f32 b);               // 0x8015EC9C
