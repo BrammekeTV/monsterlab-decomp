@@ -64,7 +64,7 @@ def build_context():
         if "(*" in line or "operator" in line:
             continue
         m = re.match(r"^(.+?)\b(\w+)\((.*)\);", line)
-        if not m or line.startswith("extern") or m.group(2) in known:
+        if not m or line.startswith("extern") or m.group(2) in known or m.group(2) in ("sizeof", "memcpy", "alignof", "if", "while", "for", "switch", "return"):
             continue
         ret = ctype(m.group(1))
         params = re.sub(r"/\*.*?\*/", "", m.group(3)).strip()

@@ -74,5 +74,24 @@
    "decompiled": 1,
    "decompiled_bytes": 120
   }
+ },
+ {
+  "date": "2026-11-21",
+  "game": {
+   "functions": 8548,
+   "bytes": 2265988,
+   "named": 2748,
+   "named_bytes": 616800,
+   "decompiled": 6868,
+   "decompiled_bytes": 1394216
+  },
+  "library": {
+   "functions": 4039,
+   "bytes": 1138940,
+   "named": 463,
+   "named_bytes": 104748,
+   "decompiled": 1,
+   "decompiled_bytes": 120
+  }
  }
 ]

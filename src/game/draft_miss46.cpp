@@ -105,7 +105,7 @@ u32 fn_8004E2E4(u8* fighters, s32 slot);     // 0x8004E2E4
 void fn_8002D508(s32 idx, f32 ratio, u32 extra);  // 0x8002D508
 BOOL ZoneIsLoaded(void* world, s32 zone);
 void fn_801E8D74(void* out, void* list, void* owner, void* anim);  // 0x801E8D74
-void fn_801F2018(void);                      // 0x801F2018 (tween update callback)
+s32  fn_801F2018(u8* task);                     // 0x801F2018 (tween update callback)
 s32 fn_801F1D64(u8* obj);                    // 0x801F1D64 (tween update callback)
 f32 fn_801EDD00(u8* obj);                    // 0x801EDD00
 void fn_801ED788(f32* out, u8* a1);          // 0x801ED788
@@ -941,7 +941,7 @@ void ShaderFadeToOverlayAlpha(u32 a0, u32 a1, f32 a2, f32 a3) {
     s32 zone = *(u8*)((u8*)(uintptr_t)a0 + 1);
     if (ZoneIsLoaded(gWorldState, zone) == 0) return;
     u8* entry = *(u8**)(*(u8**)gWorldState + 0x1C8) + zone * 0xC;
-    ShaderTweenDescInit(desc, fn_801F2018);
+    ShaderTweenDescInit(desc, (void (*)(void))fn_801F2018);
     *(u32*)(desc + 0x0) = a1;
     *(s32*)(desc + 0x4) = 0;
     *(f32*)(desc + 0x8) = target;

@@ -99,6 +99,11 @@
  "changelog": [
   {
    "date": "2026-11-21",
+   "time": "00:42",
+   "text": "Decompiled 21 more functions (particle constraint solver, hook script interpreter fn_801E1BD4, effect pool spawn, DSP voice start, world-data teardown, sound-bank index maths, ...); prototype fixes; m2c prototype scraper ignores sizeof"
+  },
+  {
+   "date": "2026-11-21",
    "time": "00:26",
    "text": "Roadmap: added own-disc setup. The port will never ship game content, so on first launch the player picks their own Monster Lab disc image (.iso or .wbfs). The port checks that it is the PAL version and extracts what it needs once, so there is no manual extraction."
   },

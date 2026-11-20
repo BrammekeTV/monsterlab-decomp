@@ -7,7 +7,7 @@
 
 extern f32 lbl_805F98C4;
 extern f32 lbl_805F98C8;
-extern u8 lbl_805F98E0[];
+extern u32 lbl_805F98E0;
 extern "C" void AudioSetPaused(void*, int);
 
 // 0x801FD8EC
