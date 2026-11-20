@@ -18,6 +18,11 @@ typedef enum SirError {
     SIR_ERR_GAMEDB_ROWSIZE,   // field sizes do not add up to the stored row size
     SIR_ERR_GAMEDB_OVERLAP,   // two tables share row storage
     SIR_ERR_CATALOG,          // catalog arrays do not fit in the file
+    SIR_ERR_INPUT,            // input table (header slot 0xDC4): bad count, step pointer, step type or source count
+    SIR_ERR_TEXTURE,          // texture list (header slot 0xD94): broken links, bad header or data outside the image
+    SIR_ERR_STRINGS,          // string table (header slot 0xDA8): array or a string outside the image
+    SIR_ERR_ACTIONS,          // action table (header slot 0x844): array or a record outside the image
+    SIR_ERR_OVERLAP,          // two of the objects above share bytes
     SIR_ERR_IO
 } SirError;
 
@@ -189,11 +194,114 @@ typedef struct GameDbTable {
 // the database object itself); the image may then be partly converted and must be discarded.
 SirError GameDbConvert(SirReloc* r, u8* image, u32 imageSize, u32 dbWiiAddr, s32* failTable);
 
+// ---------------------------------------------------------------------------------------------
+// Input table (header slot 0xDC4): the abstract inputs RemoteInputGet (0x80021550) hands out.
+// Layout from fn_800214D4, fn_80020334, RemoteInputGet, RemoteInputUpdate and the ten step classes.
+// ---------------------------------------------------------------------------------------------
+#define INPUT_SEQ_FIXED     8        // sequences at +0x000, initialised separately by fn_800214D4
+#define INPUT_SEQ_MAX       100      // sequences at +0x240 (room up to the index at +0x1E60)
+#define INPUT_SEQ_STEPS     10
+#define INPUT_INDEX_COUNT   34       // RemoteInputGet: ids 0..33 (0x22 returns the table itself)
+#define INPUT_TABLE_SEQS    0x240
+#define INPUT_TABLE_INDEX   0x1E60   // s32[34]: sequence number for each input id
+#define INPUT_TABLE_COUNT   0x1EE8   // s32: sequences in use at +0x240
+#define INPUT_TABLE_SIZE    0x1F24
+
+// One input: a sequence of steps that have to happen in order (most have one step).
+typedef struct InputSequence {
+    s32   stepCount;                 // 0x00
+    s32   current;                   // 0x04: step being waited for
+    f32   lastValue;                 // 0x08
+    f32   value;                     // 0x0C: what RemoteInputShake returns
+    u8*   steps[INPUT_SEQ_STEPS];    // 0x10: InputStep*
+    f32   time;                      // 0x38
+    f32   minTime;                   // 0x3C
+    f32   maxTime;                   // 0x40: 0 = no limit
+    s32   timing;                    // 0x44
+} InputSequence;
+
+// Step classes, by the type word at step +0x48 (fn_80020334 installs the vtable for it at +0x4C).
+// Names are the classes' RTTI names in main.dol (CAbstractInput...).
+enum {
+    INPUT_STEP_BUTTON_HELD = 0,             // 0x50 bytes
+    INPUT_STEP_BUTTON_JUST_RELEASED = 1,    // 0x60: f32 previous at +0x50
+    INPUT_STEP_BUTTON_JUST_PRESSED = 2,     // 0x60: f32 previous at +0x50
+    INPUT_STEP_TWO_BUTTON_TOGGLE = 3,       // 0x50 in the file, although the class uses +0x50..+0x5B
+    INPUT_STEP_ANY_BUTTONS_HELD = 4,        // 0x50
+    INPUT_STEP_ANY_BUTTONS_RELEASED = 5,    // 0x60: f32 previous[4] at +0x50
+    INPUT_STEP_ANY_BUTTONS_JUST_PRESSED = 6,// 0x60: f32 previous[4] at +0x50
+    INPUT_STEP_ROTATE_CW = 7,               // 0x60: s32 direction (-1), f32 timer, f32 time, f32 steps
+    INPUT_STEP_ROTATE_CCW = 8,              // 0x60: same
+    INPUT_STEP_TOGGLE = 9,                  // 0x60: f32 previous at +0x50
+    INPUT_STEP_TYPES = 10
+};
+#define INPUT_STEP_SOURCES 4
+// Step, common part: f32 raw +0x00, f32 value +0x04, s32 sourceCount +0x08, sources at +0x0C
+// ({u32 id, f32 value, u32 kind}, 12 bytes each, up to 4), s32 +0x3C, f32 min +0x40, f32 max +0x44,
+// u32 type +0x48, vtable +0x4C (a build-time address in the file; set at boot).
+
+// ---------------------------------------------------------------------------------------------
+// Textures. Header slot 0xD94 points at the start of the image: a word, then the list of every
+// texture in the file. Slots 0x824 and 0x828 point at two of them.
+// ---------------------------------------------------------------------------------------------
+typedef struct SirTexture {
+    u32   headerSize;     // 0x00: 0x54 (data)
+    u16   size[2];        // 0x04: width, height (code: fn_801FCA38 safe-area test)
+    u16   gxSize[2];      // 0x08: width, height written to GX TX_SETIMAGE0 (code: fn_80195A58)
+    u8    unk0C[4];       // 0x0C: no reader found; +0x0E is the bits per pixel in every texture
+    u8    unk10;
+    u8    unk11;          // 0x11: code: non-zero selects the palette path; (unk11 >> 1) goes to the TLUT register
+    u8    unk12;
+    u8    mipCount;       // 0x13: code: (mipCount - 1) << 4 is the max LOD
+    u8    format;         // 0x14: code: GX texture format (6 RGBA8, 9 CI8, 2 IA4)
+    u8    tlutFormat;     // 0x15: code
+    u8    unk16;          // 0x16: code: written to TX_SETMODE0 << 5
+    u8    unk17;          // 0x17: code: an index
+    u32   dataSize;       // 0x18: (data) bytes of pixel data
+    u8*   data;           // 0x1C: code: pixel data, in GX layout (not converted)
+    u8*   palette;        // 0x20: code: big-endian TLUT entries (not converted), or NULL
+    u32   unk24;          // 0x24: (data) small count, 2..15
+    u8*   next;           // 0x28: (data) list node: points at the next texture's +0x28
+    u8*   prev;           // 0x2C: (data)
+    u8*   list;           // 0x30: (data) the SirTextureList it is in
+    u8    unk34;
+    char  name[1];        // 0x35: NUL-terminated, can run past 0x54
+} SirTexture;
+#define SIR_TEXTURE_HEADER 0x54
+#define SIR_TEXTURE_NODE   0x28
+
+typedef struct SirTextureList {   // at image +4 (typed from the data only)
+    u8*   head;           // first texture's +0x28
+    u8*   tail;
+    u32   count;
+} SirTextureList;
+
+// ---------------------------------------------------------------------------------------------
+// String table (header slot 0xDA8, gStringTable): the string lookups (LookupString in
+// src/game/combat_hud.cpp) read strings[id] for id < count.
+// ---------------------------------------------------------------------------------------------
+typedef struct SirStringTable {
+    const char** strings;   // 0x00: code
+    u8*   unk04;            // 0x04: (data) points at zeroed words after the pointer array
+    u32   buildAddr;        // 0x08: (data) address from the build that baked the file (0x930DDD40)
+    u32   count;            // 0x0C: code
+    u8*   text;             // 0x10: (data) start of the string bytes
+} SirStringTable;
+
+// Action table (header slot 0x844, gGlobalBinaryField844): TriggerDoAction (0x801E0054) runs
+// records[index] for index < count. The records themselves are script words and not converted yet.
+typedef struct SirActionTable {
+    u32   count;            // 0x00: code
+    u8**  records;          // 0x04: code
+} SirActionTable;
+
 // Converts the 4 KB header block (the pointer table the game keeps in sSirHeader).
 SirError GlobalBinaryConvertHeader(SirReloc* r, u8* hdr);
 
 // Whole file: converts header and image in place. `hdr` and `image` are the two sections copied
-// out of the file (hdr: 0x1000 bytes). Maps the image in `r`, converts the database, then the header.
+// out of the file (hdr: 0x1000 bytes). Maps the image in `r`, checks the input table, texture list,
+// string table and action table (each is skipped when its header slot is 0), converts the database,
+// then those objects, then the header. Nothing is changed when a check fails.
 SirError GlobalBinaryConvert(SirReloc* r, u8* hdr, u8* image, u32 imageSize, s32* failTable);
 
 // Test/tool helper: reads the file with stdio, allocates the two sections with malloc and

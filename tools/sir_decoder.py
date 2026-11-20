@@ -22,6 +22,7 @@ Usage:
   python sir_decoder.py some.sir --sections                   # also dump raw sections
   python sir_decoder.py some.sir --only mbo                   # only items whose name contains "mbo"
   python sir_decoder.py global_binary.sir --gamedb            # print the game database (text, to stdout)
+  python sir_decoder.py global_binary.sir --image             # print input table, textures, string/action tables
   python sir_decoder.py catalog.sir --catalog                 # print the file table (text, to stdout)
 
 Format notes (reverse-engineered):
@@ -461,6 +462,99 @@ def gamedb_dump(path):
         L.append('tuning %d id %d value %.9g' % (i, r[0], struct.unpack('>f', struct.pack('>I', r[1]))[0]))
     return L
 
+# ----------------------------------------------------------------------------- global_binary image objects
+# Hand-typed objects of the global_binary.sir image (docs/loader.md): the input table (header
+# slot 0xDC4), the texture list at the start of the image (0xD94), the string table (0xDA8) and
+# the action table (0x844). Reference for the PC loader, read straight from the big-endian bytes.
+INPUT_STATE = {1: 'f', 2: 'f', 9: 'f', 5: 'ffff', 6: 'ffff', 7: 'ifff', 8: 'ifff'}   # by step type, at +0x50
+
+def fnv(b):
+    h = 0x811C9DC5
+    for c in b:
+        h = ((h ^ c) * 0x01000193) & 0xFFFFFFFF
+    return h
+
+def image_dump(path):
+    """Text dump of the hand-typed image objects of global_binary.sir (one line per record)."""
+    version, secs = read_archive(path)
+    if len(secs) != 2 or secs[0]['size'] != 0x1000:
+        raise SystemExit(f'{path}: not global_binary.sir (expected a 4 KB header section and an image)')
+    hdr, sec = secs[0]['data'], secs[1]['data']
+    u = lambda o: struct.unpack_from('>I', sec, o)[0]
+    i32 = lambda o: struct.unpack_from('>i', sec, o)[0]
+    h16 = lambda o: struct.unpack_from('>H', sec, o)[0]
+    slot = lambda o: struct.unpack_from('>I', hdr, o)[0]
+    def ptr(v):
+        if v == 0: return 'null'
+        if GB_BASE <= v <= GB_BASE + len(sec): return 'img+0x%x' % (v - GB_BASE)
+        return 'wii:%08x' % v
+    cstr0 = lambda o: sec[o:sec.index(b'\0', o)]
+    L = []
+
+    # Input table: 8 sequences at +0, `count` more at +0x240, s32 index[34] at +0x1E60.
+    t = slot(0xDC4) - GB_BASE
+    count = i32(t + 0x1EE8)
+    L.append('input %s sequences %d' % (ptr(slot(0xDC4)), count))
+    L.append('inputindex ' + ' '.join('%d' % i32(t + 0x1E60 + i * 4) for i in range(34)))
+    L.append('inputtail ' + ' '.join(ptr(u(t + 0x1EEC + i * 4)) for i in range(6)) +
+             ' %d %08x %d %d %08x %08x %d' % (i32(t + 0x1F04), u(t + 0x1F0C), i32(t + 0x1F10), i32(t + 0x1F14),
+                                              u(t + 0x1F18), u(t + 0x1F1C), i32(t + 0x1F20)))
+    steps = []
+    for i in range(8 + count):
+        s = t + i * 0x48 if i < 8 else t + 0x240 + (i - 8) * 0x48
+        n = i32(s)
+        L.append('inputseq %d steps %d current %d value %08x %08x time %08x %08x %08x timing %d ptrs %s' % (
+            i, n, i32(s + 4), u(s + 8), u(s + 0xC), u(s + 0x38), u(s + 0x3C), u(s + 0x40), i32(s + 0x44),
+            ' '.join(ptr(u(s + 0x10 + k * 4)) for k in range(10))))
+        for k in range(n):
+            p = u(s + 0x10 + k * 4)
+            if p and p not in steps: steps.append(p)
+    for p in steps:
+        o = p - GB_BASE
+        typ, n = u(o + 0x48), i32(o + 8)
+        line = 'inputstep %s type %d sources %d raw %08x value %08x mode %d range %08x %08x vtable %08x' % (
+            ptr(p), typ, n, u(o), u(o + 4), i32(o + 0x3C), u(o + 0x40), u(o + 0x44), u(o + 0x4C))
+        for k in range(n):
+            line += ' src %d %08x %d' % (u(o + 0xC + k * 12), u(o + 0x10 + k * 12), u(o + 0x14 + k * 12))
+        for k, c in enumerate(INPUT_STATE.get(typ, '')):
+            line += (' %d' % i32(o + 0x50 + k * 4)) if c == 'i' else (' %08x' % u(o + 0x50 + k * 4))
+        L.append(line)
+
+    # Texture list at the start of the image: u32, then {head, tail, count}; nodes are at texture +0x28.
+    t = slot(0xD94) - GB_BASE
+    count = u(t + 0xC)
+    L.append('texlist %s word %d head %s tail %s count %d' % (ptr(slot(0xD94)), u(t), ptr(u(t + 4)), ptr(u(t + 8)), count))
+    node, texs = u(t + 4), []
+    for i in range(count):
+        o = node - 0x28 - GB_BASE
+        texs.append(o)
+        size, data, pal = u(o + 0x18), u(o + 0x1C), u(o + 0x20)
+        L.append('texture %d %s hdr %d size %dx%d gx %dx%d bytes %s datasize %d data %s palette %s unk24 %d next %s prev %s list %s b34 %d name %s datasum %08x' % (
+            i, ptr(node - 0x28), u(o), h16(o + 4), h16(o + 6), h16(o + 8), h16(o + 10), sec[o + 0xC:o + 0x18].hex(),
+            size, ptr(data), ptr(pal), u(o + 0x24), ptr(u(o + 0x28)), ptr(u(o + 0x2C)), ptr(u(o + 0x30)), sec[o + 0x34],
+            cstr0(o + 0x35).decode('latin1'), fnv(sec[data - GB_BASE:data - GB_BASE + size])))
+        node = u(o + 0x28)
+    for s in (0x824, 0x828):    # the two textures GameStart hands to the engine
+        o = slot(s) - GB_BASE
+        L.append('slottexture 0x%03x %d %s' % (s, texs.index(o) if o in texs else -1, cstr0(o + 0x35).decode('latin1')))
+
+    # String table: {strings, ptr, build address, count, text}.
+    t = slot(0xDA8) - GB_BASE
+    count, arr = u(t + 0xC), u(t) - GB_BASE
+    L.append('strings %s array %s unk04 %s build %08x count %d text %s' % (
+        ptr(slot(0xDA8)), ptr(u(t)), ptr(u(t + 4)), u(t + 8), count, ptr(u(t + 0x10))))
+    for i in range(count):
+        p = u(arr + i * 4)
+        L.append('string %d %s %08x' % (i, ptr(p), fnv(cstr0(p - GB_BASE)) if p else 0))
+
+    # Action table: {count, records}.
+    t = slot(0x844) - GB_BASE
+    count, arr = u(t), u(t + 4) - GB_BASE
+    L.append('actions %s count %d records %s' % (ptr(slot(0x844)), count, ptr(u(t + 4))))
+    for i in range(count):
+        L.append('actionrec %d %s' % (i, ptr(u(arr + i * 4))))
+    return L
+
 # ----------------------------------------------------------------------------- catalog
 # catalog.sir: container header (+0x08 entry count, +0x0C file count), then one 0x18-byte entry
 # per section of every .sir file (i32 type, u32 offset, u32 size, u32 file-name hash,
@@ -528,14 +622,15 @@ def main():
     ap.add_argument('--no-textures', action='store_true')
     ap.add_argument('--no-meshes', action='store_true')
     ap.add_argument('--gamedb', action='store_true', help='global_binary.sir: print the game database as text')
+    ap.add_argument('--image', action='store_true', help='global_binary.sir: print the input table, textures, string and action tables as text')
     ap.add_argument('--catalog', action='store_true', help='catalog.sir: print the file table as text')
     a = ap.parse_args()
     if a.catalog:
         for line in catalog_dump(a.archive):
             print(line)
         return
-    if a.gamedb:
-        for line in gamedb_dump(a.archive):
+    if a.gamedb or a.image:
+        for line in (gamedb_dump(a.archive) if a.gamedb else []) + (image_dump(a.archive) if a.image else []):
             print(line)
         return
     if np is None:

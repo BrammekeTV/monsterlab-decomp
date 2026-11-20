@@ -191,6 +191,11 @@ extern "C" const char* SirErrorText(SirError e) {
     case SIR_ERR_GAMEDB_ROWSIZE: return "game database field sizes do not add up to the row size";
     case SIR_ERR_GAMEDB_OVERLAP: return "two game database tables share row storage";
     case SIR_ERR_CATALOG:        return "catalog arrays do not fit in the file";
+    case SIR_ERR_INPUT:          return "input table not recognised (count, step pointer, step type or source count)";
+    case SIR_ERR_TEXTURE:        return "texture list not recognised (links, header or data outside the image)";
+    case SIR_ERR_STRINGS:        return "string table array or a string outside the image";
+    case SIR_ERR_ACTIONS:        return "action table array or a record outside the image";
+    case SIR_ERR_OVERLAP:        return "two objects of the image share bytes";
     case SIR_ERR_IO:             return "cannot read file";
     }
     return "?";
@@ -331,6 +336,289 @@ extern "C" SirError GameDbConvert(SirReloc* r, u8* image, u32 imageSize, u32 dbW
     return SIR_OK;
 }
 
+// ------------------------------------------------------------------------------------ image objects
+//
+// The objects below have no schema in the file. Each is checked on the big-endian bytes first and
+// recorded as a region; only when every check passed, and no two regions share bytes, is the
+// first byte changed. "code": a decompiled function reads the field with that type. "data": typed
+// from the values in the shipped file only.
+
+#define COUNTOF(a) ((s32)(sizeof(a) / sizeof((a)[0])))
+
+enum RegionKind {
+    REGION_INPUT_TABLE, REGION_INPUT_STEP, REGION_TEXTURE_LIST, REGION_TEXTURE, REGION_STRING_TABLE,
+    REGION_ACTION_TABLE, REGION_PTR_ARRAY
+};
+
+struct Region {
+    u32 off;     // in the image
+    u32 size;
+    u8  kind;
+};
+
+#define TEXTURE_MAX 4096
+#define REGION_MAX  ((INPUT_SEQ_FIXED + INPUT_SEQ_MAX) * INPUT_SEQ_STEPS + TEXTURE_MAX + 16)
+
+struct ImagePlan {
+    Region regions[REGION_MAX];
+    u32    count;
+};
+static ImagePlan sPlan;   // 70 KB: too big for the stack of a game thread
+
+static bool PlanAdd(ImagePlan* plan, u32 off, u32 size, u8 kind) {
+    if (plan->count >= REGION_MAX) return false;
+    Region* g = &plan->regions[plan->count++];
+    g->off = off;
+    g->size = size;
+    g->kind = kind;
+    return true;
+}
+
+// Offset in the image of the `size` bytes at Wii address `addr`; false if they are not all inside.
+static bool ImageSpan(u32 addr, u64 size, u32 imageSize, u32* off) {
+    if (addr < GLOBAL_BINARY_WII_BASE) return false;
+    u32 o = addr - GLOBAL_BINARY_WII_BASE;
+    if ((u64)o + size > imageSize) return false;
+    *off = o;
+    return true;
+}
+
+// ---- input table (header slot 0xDC4)
+
+// Sequence (InputSequence). RemoteInputUpdate (0x80020070) reads every field.
+static const SirField kInputSequenceFields[] = {
+    { 0x00, SIR_U32, 2 },                 // code: s32 stepCount, s32 current
+    { 0x08, SIR_F32, 2 },                 // code: lastValue, value
+    { 0x10, SIR_PTR, INPUT_SEQ_STEPS },   // code: steps (fn_80020334 walks stepCount of them)
+    { 0x38, SIR_F32, 3 },                 // code: time, minTime, maxTime
+    { 0x44, SIR_U32, 1 },                 // code: s32 timing
+};
+#define INPUT_SEQ_SIZE 0x48
+
+// Table, after the sequences.
+static const SirField kInputTableFields[] = {
+    { INPUT_TABLE_INDEX, SIR_U32, INPUT_INDEX_COUNT },   // code: RemoteInputGet
+    { INPUT_TABLE_COUNT, SIR_U32, 1 },                   // code: fn_800214D4
+    { 0x1EEC, SIR_PTR, 6 },                              // data: the first six sequences at +0x240
+    { 0x1F04, SIR_U32, 1 },                              // data: 0
+    { 0x1F0C, SIR_F32, 1 },                              // data: 1.0
+    { 0x1F10, SIR_U32, 2 },                              // data: 1, 0
+    { 0x1F18, SIR_F32, 2 },                              // data: 320.0, 240.0
+    { 0x1F20, SIR_U32, 1 },                              // data: 0
+};
+
+// Step, the part every class has. fn_80020040 (vtable slot 2 of every class) writes +0x00, +0x04 and +0x40,
+// +0x44 as floats and +0x08, +0x3C as words; fn_80020334 switches on +0x48 and stores the vtable
+// at +0x4C, so the address the file has there is never used.
+static const SirField kInputStepFields[] = {
+    { 0x00, SIR_F32, 2 },    // code: raw, value
+    { 0x08, SIR_U32, 1 },    // code: s32 sourceCount
+    { 0x3C, SIR_U32, 1 },    // code: s32 (fn_800205CC: zero outside the range instead of clamping)
+    { 0x40, SIR_F32, 2 },    // code: range
+    { 0x48, SIR_U32, 2 },    // code: type; build-time vtable address
+};
+// One source (fn_8001FCA8): u32 id, f32 value (written before it is read), u32 kind (0..0x1C).
+static const SirField kInputSourceFields[] = {
+    { 0x00, SIR_U32, 1 }, { 0x04, SIR_F32, 1 }, { 0x08, SIR_U32, 1 },
+};
+// State behind the common part, by class.
+static const SirField kInputStepPrev1[] = { { 0x50, SIR_F32, 1 } };                        // fn_800204D0, fn_800207A8, fn_800213A4
+static const SirField kInputStepPrev4[] = { { 0x50, SIR_F32, INPUT_STEP_SOURCES } };       // fn_80021188, fn_8002129C: one per source
+static const SirField kInputStepRotate[] = { { 0x50, SIR_U32, 1 }, { 0x54, SIR_F32, 3 } }; // fn_80020A64, fn_80020D88
+
+// Size of a step in the file. The two-button toggle is 0x50 bytes like the classes without state,
+// although fn_800208C0 uses +0x50..+0x5B: in the shipped file those bytes are the start of the
+// next step. They are converted as that step's fields, not as toggle state.
+static u32 InputStepSize(u32 type) {
+    switch (type) {
+    case INPUT_STEP_BUTTON_HELD:
+    case INPUT_STEP_TWO_BUTTON_TOGGLE:
+    case INPUT_STEP_ANY_BUTTONS_HELD: return 0x50;
+    }
+    return 0x60;
+}
+
+static u8* InputSequenceAt(u8* table, u32 i) {
+    return table + (i < INPUT_SEQ_FIXED ? i * INPUT_SEQ_SIZE : INPUT_TABLE_SEQS + (i - INPUT_SEQ_FIXED) * INPUT_SEQ_SIZE);
+}
+
+static SirError InputTablePlan(ImagePlan* plan, u8* image, u32 imageSize, u32 addr) {
+    u32 off;
+    if (!ImageSpan(addr, INPUT_TABLE_SIZE, imageSize, &off)) return SIR_ERR_INPUT;
+    u8* table = image + off;
+    u32 seqCount = Be32(table + INPUT_TABLE_COUNT);
+    if (seqCount > INPUT_SEQ_MAX) return SIR_ERR_INPUT;
+    for (u32 i = 0; i < INPUT_INDEX_COUNT; i++)
+        if (Be32(table + INPUT_TABLE_INDEX + i * 4) >= INPUT_SEQ_MAX) return SIR_ERR_INPUT;
+    if (!PlanAdd(plan, off, INPUT_TABLE_SIZE, REGION_INPUT_TABLE)) return SIR_ERR_INPUT;
+
+    u32 firstStep = plan->count;
+    for (u32 i = 0; i < INPUT_SEQ_FIXED + seqCount; i++) {
+        const u8* seq = InputSequenceAt(table, i);
+        u32 steps = Be32(seq);
+        if (steps > INPUT_SEQ_STEPS) return SIR_ERR_INPUT;
+        for (u32 k = 0; k < steps; k++) {
+            u32 stepAddr = Be32(seq + 0x10 + k * 4), stepOff;
+            if (stepAddr == 0) continue;                 // fn_80020334 skips these too
+            if (!ImageSpan(stepAddr, 0x50, imageSize, &stepOff)) return SIR_ERR_INPUT;
+            u32 type = Be32(image + stepOff + 0x48);
+            if (type >= INPUT_STEP_TYPES || Be32(image + stepOff + 0x08) > INPUT_STEP_SOURCES) return SIR_ERR_INPUT;
+            if (!ImageSpan(stepAddr, InputStepSize(type), imageSize, &stepOff)) return SIR_ERR_INPUT;
+            bool seen = false;                           // a step can be in more than one sequence
+            for (u32 j = firstStep; j < plan->count && !seen; j++) seen = plan->regions[j].off == stepOff;
+            if (!seen && !PlanAdd(plan, stepOff, InputStepSize(type), REGION_INPUT_STEP)) return SIR_ERR_INPUT;
+        }
+    }
+    return SIR_OK;
+}
+
+static void InputTableConvert(SirReloc* r, u8* table) {
+    u32 seqCount = Be32(table + INPUT_TABLE_COUNT);
+    for (u32 i = 0; i < INPUT_SEQ_FIXED + seqCount; i++)
+        SirConvertRecord(r, InputSequenceAt(table, i), INPUT_SEQ_SIZE, kInputSequenceFields, COUNTOF(kInputSequenceFields));
+    SirConvertRecord(r, table, INPUT_TABLE_SIZE, kInputTableFields, COUNTOF(kInputTableFields));
+}
+
+static void InputStepConvert(SirReloc* r, u8* step, u32 size) {
+    u32 type = Be32(step + 0x48);
+    u32 sources = Be32(step + 0x08);
+    for (u32 i = 0; i < sources; i++)
+        SirConvertRecord(r, step + 0x0C + i * 0xC, 0xC, kInputSourceFields, COUNTOF(kInputSourceFields));
+    switch (type) {
+    case INPUT_STEP_BUTTON_JUST_RELEASED:
+    case INPUT_STEP_BUTTON_JUST_PRESSED:
+    case INPUT_STEP_TOGGLE:
+        SirConvertRecord(r, step, size, kInputStepPrev1, COUNTOF(kInputStepPrev1));
+        break;
+    case INPUT_STEP_ANY_BUTTONS_RELEASED:
+    case INPUT_STEP_ANY_BUTTONS_JUST_PRESSED:
+        SirConvertRecord(r, step, size, kInputStepPrev4, COUNTOF(kInputStepPrev4));
+        break;
+    case INPUT_STEP_ROTATE_CW:
+    case INPUT_STEP_ROTATE_CCW:
+        SirConvertRecord(r, step, size, kInputStepRotate, COUNTOF(kInputStepRotate));
+        break;
+    }
+    SirConvertRecord(r, step, size, kInputStepFields, COUNTOF(kInputStepFields));
+}
+
+// ---- textures (header slot 0xD94: the start of the image)
+
+// Texture header (SirTexture). The bytes at 0x0C-0x17 and the name need no conversion; pixel
+// data and palette stay in GX layout for the port's GX layer.
+static const SirField kTextureFields[] = {
+    { 0x00, SIR_U32, 1 },    // data: 0x54
+    { 0x04, SIR_U16, 4 },    // code: fn_801FCA38 (+4, +6), fn_80195A58 (+8, +0xA)
+    { 0x18, SIR_U32, 1 },    // data: size of the pixel data
+    { 0x1C, SIR_PTR, 2 },    // code: fn_80195A58 (pixel data, palette)
+    { 0x24, SIR_U32, 1 },    // data
+    { 0x28, SIR_PTR, 3 },    // data: next, prev, list
+};
+// Image start: a word, then the list {head, tail, count}. Typed from the data only.
+static const SirField kTextureListFields[] = {
+    { 0x00, SIR_U32, 1 },    // data: 0x42
+    { 0x04, SIR_PTR, 2 },    // data: first and last texture (+0x28 of each)
+    { 0x0C, SIR_U32, 1 },    // data: number of textures
+};
+#define TEXTURE_LIST_SIZE 0x10
+
+static SirError TextureListPlan(ImagePlan* plan, const u8* image, u32 imageSize, u32 addr) {
+    u32 off;
+    if (!ImageSpan(addr, TEXTURE_LIST_SIZE, imageSize, &off)) return SIR_ERR_TEXTURE;
+    u32 count = Be32(image + off + 0x0C);
+    if (count > TEXTURE_MAX || !PlanAdd(plan, off, TEXTURE_LIST_SIZE, REGION_TEXTURE_LIST)) return SIR_ERR_TEXTURE;
+
+    // Every node must name the node before it, so no texture can be visited twice.
+    u32 node = Be32(image + off + 0x04), prev = 0;
+    for (u32 i = 0; i < count; i++) {
+        u32 texOff, dataOff;
+        if (node < GLOBAL_BINARY_WII_BASE + SIR_TEXTURE_NODE ||
+            !ImageSpan(node - SIR_TEXTURE_NODE, SIR_TEXTURE_HEADER, imageSize, &texOff)) return SIR_ERR_TEXTURE;
+        const u8* tex = image + texOff;
+        if (Be32(tex) != SIR_TEXTURE_HEADER || Be32(tex + 0x2C) != prev || Be32(tex + 0x30) != addr + 4) return SIR_ERR_TEXTURE;
+        if (!ImageSpan(Be32(tex + 0x1C), Be32(tex + 0x18), imageSize, &dataOff)) return SIR_ERR_TEXTURE;
+        u32 palette = Be32(tex + 0x20);
+        if (palette != 0 && !ImageSpan(palette, 2, imageSize, &dataOff)) return SIR_ERR_TEXTURE;
+        if (!PlanAdd(plan, texOff, SIR_TEXTURE_HEADER, REGION_TEXTURE)) return SIR_ERR_TEXTURE;
+        prev = node;
+        node = Be32(tex + SIR_TEXTURE_NODE);
+    }
+    if (node != 0 || Be32(image + off + 0x08) != prev) return SIR_ERR_TEXTURE;
+    return SIR_OK;
+}
+
+// ---- string table (header slot 0xDA8) and action table (header slot 0x844)
+
+static const SirField kStringTableFields[] = {
+    { 0x00, SIR_PTR, 2 },    // code: strings (LookupString in combat_hud.cpp); data: +4
+    { 0x08, SIR_U32, 2 },    // data: build-time address; code: count
+    { 0x10, SIR_PTR, 1 },    // data: first string
+};
+#define STRING_TABLE_SIZE 0x14
+
+static const SirField kActionTableFields[] = {
+    { 0x00, SIR_U32, 1 },    // code: count (TriggerDoAction)
+    { 0x04, SIR_PTR, 1 },    // code: records; each element is passed on as the record's address
+};
+#define ACTION_TABLE_SIZE 0x08
+
+// An object holding a count and a pointer to that many pointers, each NULL or into the image.
+static SirError PtrArrayPlan(ImagePlan* plan, const u8* image, u32 imageSize, u32 addr, u32 objSize, u32 countAt,
+                             u32 arrayAt, u8 kind, SirError err) {
+    u32 off, arrayOff, dummy;
+    if (!ImageSpan(addr, objSize, imageSize, &off)) return err;
+    u32 count = Be32(image + off + countAt);
+    if (!ImageSpan(Be32(image + off + arrayAt), (u64)count * 4, imageSize, &arrayOff)) return err;
+    for (u32 i = 0; i < count; i++) {
+        u32 p = Be32(image + arrayOff + i * 4);
+        if (p != 0 && !ImageSpan(p, 1, imageSize, &dummy)) return err;
+    }
+    if (!PlanAdd(plan, off, objSize, kind)) return err;
+    if (count != 0 && !PlanAdd(plan, arrayOff, count * 4, REGION_PTR_ARRAY)) return err;
+    return SIR_OK;
+}
+
+// ---- all of them
+
+static SirError ImagePlanBuild(ImagePlan* plan, const u8* hdr, u8* image, u32 imageSize) {
+    plan->count = 0;
+    SirError e = SIR_OK;
+    u32 addr;
+    if ((addr = Be32(hdr + 0xDC4)) != 0) e = InputTablePlan(plan, image, imageSize, addr);
+    if (e == SIR_OK && (addr = Be32(hdr + 0xD94)) != 0) e = TextureListPlan(plan, image, imageSize, addr);
+    if (e == SIR_OK && (addr = Be32(hdr + 0xDA8)) != 0)
+        e = PtrArrayPlan(plan, image, imageSize, addr, STRING_TABLE_SIZE, 0x0C, 0x00, REGION_STRING_TABLE, SIR_ERR_STRINGS);
+    if (e == SIR_OK && (addr = Be32(hdr + 0x844)) != 0)
+        e = PtrArrayPlan(plan, image, imageSize, addr, ACTION_TABLE_SIZE, 0x00, 0x04, REGION_ACTION_TABLE, SIR_ERR_ACTIONS);
+    if (e != SIR_OK) return e;
+    for (u32 a = 0; a < plan->count; a++) {
+        const Region* ga = &plan->regions[a];
+        for (u32 b = a + 1; b < plan->count; b++) {
+            const Region* gb = &plan->regions[b];
+            if (ga->off < gb->off + gb->size && gb->off < ga->off + ga->size) return SIR_ERR_OVERLAP;
+        }
+    }
+    return SIR_OK;
+}
+
+static void ImagePlanConvert(const ImagePlan* plan, SirReloc* r, u8* image) {
+    for (u32 i = 0; i < plan->count; i++) {
+        const Region* g = &plan->regions[i];
+        u8* p = image + g->off;
+        switch (g->kind) {
+        case REGION_INPUT_TABLE:  InputTableConvert(r, p); break;
+        case REGION_INPUT_STEP:   InputStepConvert(r, p, g->size); break;
+        case REGION_TEXTURE_LIST: SirConvertRecord(r, p, g->size, kTextureListFields, COUNTOF(kTextureListFields)); break;
+        case REGION_TEXTURE:      SirConvertRecord(r, p, g->size, kTextureFields, COUNTOF(kTextureFields)); break;
+        case REGION_STRING_TABLE: SirConvertRecord(r, p, g->size, kStringTableFields, COUNTOF(kStringTableFields)); break;
+        case REGION_ACTION_TABLE: SirConvertRecord(r, p, g->size, kActionTableFields, COUNTOF(kActionTableFields)); break;
+        case REGION_PTR_ARRAY:
+            for (u32 k = 0; k < g->size; k += 4) ConvertPtr(r, p + k);
+            break;
+        }
+    }
+}
+
 // ------------------------------------------------------------------------------------ header block
 
 // The 4 KB block the game reads into sSirHeader. "code": a decompiled function reads the field
@@ -349,14 +637,14 @@ static const SirField kGlobalBinaryHeaderFields[] = {
     { 0x838, SIR_U32, 1 },    // data: 0x46
     { 0x83C, SIR_PTR, 1 },    // data
     // 0x840: u8 flag (data)
-    { 0x844, SIR_PTR, 1 },    // code: kept in gGlobalBinaryField844
+    { 0x844, SIR_PTR, 1 },    // code: action table, kept in gGlobalBinaryField844 (TriggerDoAction)
     { 0x848, SIR_U32, 6 },    // data: 0x3FFFF each
     { 0x860, SIR_U32, 5 },    // data: hash, 0x1AB80, 0, 0x37, 1234
     { 0x874, SIR_F32, 2 },    // data: 1.2345, 0.0123
     { 0x960, SIR_U32, 268 },  // data: -1 up to 0xD8C
-    { 0xD94, SIR_PTR, 3 },    // data: image base; code: 0xD98 screen set list
-    { 0xDA8, SIR_PTR, 1 },    // data: string table (0x10B2 entries)
-    { 0xDB0, SIR_PTR, 7 },    // data 0xDB0-0xDC0; code: 0xDC4, 0xDC8 (GameDb)
+    { 0xD94, SIR_PTR, 3 },    // data: image start (texture list); code: 0xD98 screen list, 0xD9C HUD
+    { 0xDA8, SIR_PTR, 1 },    // code: string table (UiInit stores it in gStringTable)
+    { 0xDB0, SIR_PTR, 7 },    // code: 0xDB0-0xDBC (UiInit), 0xDC4 input table, 0xDC8 GameDb; data: 0xDC0
 };
 
 extern "C" SirError GlobalBinaryConvertHeader(SirReloc* r, u8* hdr) {
@@ -368,9 +656,15 @@ extern "C" SirError GlobalBinaryConvertHeader(SirReloc* r, u8* hdr) {
 
 extern "C" SirError GlobalBinaryConvert(SirReloc* r, u8* hdr, u8* image, u32 imageSize, s32* failTable) {
     if (!SirRelocAddRange(r, GLOBAL_BINARY_WII_BASE, imageSize, image)) return SIR_ERR_BOUNDS;
-    u32 db = Be32(hdr + GLOBAL_BINARY_HDR_GAMEDB);
-    SirError e = GameDbConvert(r, image, imageSize, db, failTable);
+    if (failTable != NULL) *failTable = -1;
+    // Check everything before the first byte changes: the hand-typed objects here, the database
+    // inside GameDbConvert.
+    SirError e = ImagePlanBuild(&sPlan, hdr, image, imageSize);
     if (e != SIR_OK) return e;
+    u32 db = Be32(hdr + GLOBAL_BINARY_HDR_GAMEDB);
+    e = GameDbConvert(r, image, imageSize, db, failTable);
+    if (e != SIR_OK) return e;
+    ImagePlanConvert(&sPlan, r, image);
     return GlobalBinaryConvertHeader(r, hdr);
 }
 
