@@ -18,7 +18,7 @@ void fn_80119858(u8* entry);              // 0x80119858
 void fn_801198A0(s32 a, u32 b);           // 0x801198A0
 s32  fn_80119FF4(void);                   // 0x80119FF4 (selected entry index)
 BOOL fn_8011C214(u8* p);                  // 0x8011C214
-u8*  fn_80120390(u8* recipes);            // 0x80120390
+s32  fn_80120390(u8* recipes);            // 0x80120390
 u32  fn_801203C0(u8* p);                  // 0x801203C0
 s32  fn_80120504(u8* p);                  // 0x80120504
 }

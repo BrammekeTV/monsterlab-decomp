@@ -19,7 +19,7 @@ void  ScopedLockDtor(ScopedLock* l, s32 flags);                          // 0x80
 s32   WorldGetPhase(void* world);                                        // 0x800D83A8
 void fn_80053418(u8* arg0);                                              // 0x80053418
 void  fn_8005353C(u8* ent, s32 on);                                      // 0x8005353C
-s32   fn_80053550(u8* ent, s32 a);                                       // 0x80053550
+void  fn_80053550(u8* ent, s32 a);                                       // 0x80053550
 s32   fn_800D3C60(void* db, void* path, f32 a, f32 b);                  // 0x800D3C60
 u8*   fn_800E4D7C(u32 a0);                                               // 0x800E4D7C
 void* fn_800E60BC(void);                                                 // 0x800E60BC

@@ -902,7 +902,7 @@ s32 PartHasEnhancement(s32 a0);                                        // src/ga
 BOOL PartInfo_GetEnhanceDefectDesc(void);                              // src/leaf/auto_03_8010FDA4_text_cb.cpp
 BOOL PartInfo_GetEnhanceDefectTexture(void);                           // src/leaf/auto_03_8010FDA4_text_cb.cpp
 BOOL PartInfo_GetTexture(void);                                        // src/leaf/auto_03_8010FDA4_text_cb.cpp
-void PartInfo_LoadModel(void);  // type 0x8F (from signature table)
+void PartInfo_LoadModel(void);                                         // src/game/draft_miss254.cpp
 s32 PartInfo_PlayerNeedsMoreRanks(void);                               // src/leaf/auto_03_8010FDA4_text_cb.cpp
 void PartInfo_UnloadModel(void);                                       // src/game/lab_books_e.cpp
 s32 PartIsAction1Attack(s32 a0);                                       // src/game/draft_miss39.cpp
@@ -1326,7 +1326,7 @@ void SetTimeoutFromProperty(u32 a3, u32 a4);                           // src/le
 void SetTurningRate(u32 a3, f32 f1);                                   // src/leaf/auto_03_800FB958_text_cb.cpp
 void SetTwoBitsOfQuestInt(u32 q, BOOL which, s32 v);                   // src/game/player_api.cpp
 void SetUpCombatResultsScreen(void);                                   // src/game/draft_miss113.cpp
-void SetUpCombatRewardsScreen(void);  // type 0x8F (from signature table)
+void SetUpCombatRewardsScreen(void);                                   // src/game/draft_miss254.cpp
 void SetVelocity(u32 a3, f32 f1, f32 f2);                              // src/leaf/auto_03_800FB958_text_cb.cpp
 void SetVerticalSlice(u32 on);                                         // src/game/player_api.cpp
 void SetWaypointGoal(u32 a0, s32* a1, f32 a2);                         // src/game/draft_miss41.cpp

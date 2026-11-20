@@ -16,10 +16,10 @@ s32   WorldGetEntityZone(void* world, void* entity);              // 0x80132458
 s32   fn_800130E8(u8* obj, s32 zone, s32 flag);                   // 0x800130E8
 void  fn_800B61C0(u8* e);                                         // 0x800B61C0
 void  fn_800B7B08(u8* e, u32 a, u32 b);                             // 0x800B7B08
-void  fn_800B7C74(u8* e, u8* src, u32 hash);                      // 0x800B7C74
+s32   fn_800B7C74(u8* e, u8* src, u32 hash);                      // 0x800B7C74
 void  fn_800B7F8C(u8* e, u32 a, u32 b, u32 c);                    // 0x800B7F8C
-void  fn_800B8624(u8* a, u8* b);                                  // 0x800B8624
-void  fn_800B8708(u8* a, u8* b, u32 hash);                        // 0x800B8708
+s32   fn_800B8624(u8* a, u8* b);                                  // 0x800B8624
+s32   fn_800B8708(u8* a, u8* b, u32 hash);                        // 0x800B8708
 void  fn_800B8A3C(u8* e, s32 idx);                                // 0x800B8A3C
 void  fn_800B8D5C(u8* e);                                         // 0x800B8D5C
 BOOL  fn_800E6BD4(void);                                          // 0x800E6BD4
@@ -29,7 +29,7 @@ void  fn_80130B50(u8* w);                                         // 0x80130B50
 void  fn_80130FC8(u8* w, void* entity, s32 arg);                  // 0x80130FC8
 void  fn_80131500(u8* w);                                         // 0x80131500
 void  fn_80131728(u8* w);                                         // 0x80131728
-void  fn_80132F04(void);                                          // 0x80132F04
+void  fn_80132F04(u8* a);                                          // 0x80132F04
 void  fn_80135220(void);                                          // 0x80135220
 u8*   fn_80138864(u8* w, s32 idx);                                // 0x80138864
 void  fn_801458B0(f32* quat, f32* a, f32* b);                     // 0x801458B0
@@ -319,7 +319,7 @@ BOOL EntityRefreshLinks(void* entity) {
 void fn_80128C20(u8* arg0) {
     if (*(u8*)(arg0 + 4) == 0) return;
 
-    fn_80132F04();
+    fn_80132F04(arg0);
     sWorldReady = 0;
     sReadyPending = 0;
     sReadyRequested = 0;

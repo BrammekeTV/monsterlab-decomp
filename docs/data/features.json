@@ -94,6 +94,11 @@
  "changelog": [
   {
    "date": "2026-11-20",
+   "time": "23:10",
+   "text": "Decompiled 30 more missing functions (CheckWiiInput, DrawFullscreenTexture, SetUpCombatRewardsScreen, PartInfo_LoadModel, fn_8005*/fn_800B*/fn_8013* helpers, ...); prototype fixes"
+  },
+  {
+   "date": "2026-11-20",
    "time": "23:06",
    "text": "Big-endian data loader, third part (PR #9): four more parts of global_binary.sir now load on PC: the controller input table (98 button sequences), the 44 built-in textures, the string table (4,274 strings) and the action table. All 9,304 checked values match the reference decoder. On the way, the fallback 'Generic_box' turned out to be a small 16x16 texture, not a model. The UI screen list waits until more of the UI code is decompiled."
   },

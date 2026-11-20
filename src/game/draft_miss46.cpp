@@ -94,7 +94,7 @@ u8* ObjDbLookup(void* db, s32 id);
 u8* ObjRefDtor(u8* ref, s32 flags);
 Vec3* PathGetPosition(PathFollower* p);
 s32 fn_800D3C60(void* db, void* path, f32 a, f32 b);  // 0x800D3C60
-s32 fn_80053550(u8* ent, s32 a);             // 0x80053550
+void fn_80053550(u8* ent, s32 a);             // 0x80053550
 void fn_80053418(u8* arg0);                  // 0x80053418
 u8* fn_8015EC9C(u8* tbl, f32 a, f32 b);      // 0x8015EC9C
 extern u8 lbl_8040D500[];

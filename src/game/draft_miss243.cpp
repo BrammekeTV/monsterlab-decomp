@@ -23,7 +23,7 @@ f32  sinf(f32 x);                                           // 0x8033F0A4 (MSL)
 f64  fn_8033F20C(f64 x, f64 y);                             // 0x8033F20C (pow)
 f32  fn_8033F200(f32 a, f32 b);                             // 0x8033F200
 s32  fn_8002BC20(u8* p);                                    // 0x8002BC20
-s32  fn_8002BDD4(u8* p);                                    // 0x8002BDD4
+void fn_8002BDD4(u8* p);                                    // 0x8002BDD4
 void fn_8002A028(u8* e, f32 x, f32 y);                      // 0x8002A028
 void fn_8002A158(u8* e, f32 v);                             // 0x8002A158
 void fn_8002A31C(u8* e, u8* a, u8* b, u8* c, u8* d, f32 dt);  // 0x8002A31C

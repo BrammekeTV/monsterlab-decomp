@@ -185,11 +185,12 @@ void fn_80063318(u8* p, f32 t) {
 
 // 0x80063388
 // Looks up the object for key lbl_80359C88; when p is NULL, sets bit 0x8 in its s16 word at +0x12.
-void fn_80063388(u8* p) {
+u8* fn_80063388(u8* p) {
     u8* r = (u8*)fn_80172F70(1, lbl_80359C88);
     if (p == NULL) {
         *(s16*)(r + 0x12) = (s16)(*(s16*)(r + 0x12) | 0x8);
     }
+    return r;
 }
 
 // 0x800634D0
