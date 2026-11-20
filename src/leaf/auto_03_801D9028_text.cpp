@@ -15,7 +15,7 @@ extern u8 lbl_805FB878[];
 extern u8 lbl_805FB890[];
 extern u8 lbl_805FB894[];
 extern u8 lbl_805FB898[];
-extern "C" void fn_801D9164(u8*, void*);
+extern "C" void fn_801D9164(u8*, u8*, u8*, u8*);
 extern "C" void* fn_801EB94C(void*);
 
 // 0x801D9028
@@ -57,8 +57,8 @@ extern "C" void fn_801D9AD4(u8* a3) {
 }
 
 // 0x801DA208
-extern "C" void fn_801DA208(u8* a3, u8* a4) {
-    fn_801D9164(((u8*)(uintptr_t)(a3)), (void*)(((u8*)(uintptr_t)(a4))));
+extern "C" void fn_801DA208(u8* a3, u8* a4, u8* a5, u8* a6) {
+    fn_801D9164(((u8*)(uintptr_t)(a3)), ((u8*)(uintptr_t)(a4)), ((u8*)(uintptr_t)(a5)), ((u8*)(uintptr_t)(a6)));
 }
 
 // 0x801DA344

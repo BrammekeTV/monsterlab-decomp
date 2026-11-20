@@ -13,7 +13,7 @@ extern "C++" StringTable* gStringTable;  // 0x805FB910
 
 extern "C" {
 u32      AlertGetLastError(void);                                        // 0x80140B58
-void     MonsterGetName(u8* m, char* out, s32 size);                     // 0x8021C968
+s32 MonsterGetName(u8* m, char* out, s32 size);                     // 0x8021C968
 BOOL     MonsterHasPart(u8* m, const PartInstance* p);
 u8*      PartFindOwner(PartInstance* p);
 s32      PartComputeActionCost(PartInstance* p, u32 actionKey, void* monster);

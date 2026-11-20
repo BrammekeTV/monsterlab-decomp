@@ -5,10 +5,31 @@
 
 #include "types.h"
 
+extern u8 lbl_80358630[];
+extern u8 lbl_8035863C[];
+extern u8 lbl_80358648[];
+extern u8 lbl_80358654[];
 extern u8 lbl_805FB05C[];
 extern u8 lbl_805FB060[];
 extern u8 lbl_805FB064[];
 extern u8 lbl_805FD118[];
+extern "C" char* strcpy(char*, char*);
+
+// 0x80040EFC
+extern "C" char* fn_80040EFC(s32 a3, u8* a4) {
+    if (a3 != 0) {
+        return (char*)(strcpy((char*)(((u8*)(uintptr_t)(a4))), (char*)((u8*)&lbl_8035863C)));
+    }
+    return (char*)(strcpy((char*)(((u8*)(uintptr_t)(a4))), (char*)((u8*)&lbl_80358630)));
+}
+
+// 0x80040F20
+extern "C" char* fn_80040F20(s32 a3, u8* a4) {
+    if (a3 == 0) {
+        return (char*)(strcpy((char*)(((u8*)(uintptr_t)(a4))), (char*)((u8*)&lbl_80358654)));
+    }
+    return (char*)(strcpy((char*)(((u8*)(uintptr_t)(a4))), (char*)((u8*)&lbl_80358648)));
+}
 
 // 0x80041810
 extern "C" void fn_80041810(u8* a3, u8* a4) {

@@ -223,12 +223,13 @@ void MonsterSetName(u8* m, const char* name) {
 }
 
 // 0x8021C968
-void MonsterGetName(u8* m, char* out, s32 size) {
+s32 MonsterGetName(u8* m, char* out, s32 size) {
     s32 n = size - 1;
     if (n > MONSTER_NAME_LEN(m)) n = MONSTER_NAME_LEN(m);
     s32 i = 0;
     for (; i < n; i++) out[i] = (char)(MONSTER_NAME(m)[i] + 0x20);
     out[i] = 0;
+    return i;
 }
 
 // 0x8021CA88

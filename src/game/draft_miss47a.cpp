@@ -12,7 +12,7 @@ extern "C" {
 }
 
 extern "C" {
-void MonsterGetName(u8* m, char* out, s32 size);                  // 0x8021C968
+s32 MonsterGetName(u8* m, char* out, s32 size);                  // 0x8021C968
 s32 PlaySound(u32 hash, s32 a, s32 b, s32 c, s32 d, s32 e);       // 0x80209E70
 int SysSprintf(char* buf, const char* fmt, ...);                  // 0x80142EF8
 void operator_delete(void* p);                                    // 0x801D426C

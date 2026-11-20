@@ -94,6 +94,11 @@
  "changelog": [
   {
    "date": "2026-11-20",
+   "time": "12:14",
+   "text": "Decompile 38 more missing functions (MatchupInit, PreloadLevel, InitProgressScreen, SaveOpen, FireShotAtFeet, fn_8019* texture-list helpers, ...); fix prototypes"
+  },
+  {
+   "date": "2026-11-20",
    "time": "11:56",
    "text": "Decompile 39 more missing functions (PlaySoundAt, EulerToQuat, FireLightningAtTarget, SaveRollChallengeReward, fn_8001FCA8, fn_800A2AEC, fn_801D9164, ...); fix prototypes"
   },

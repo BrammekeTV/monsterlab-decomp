@@ -38,7 +38,7 @@ void     fn_801B55F4(u8* obj, u8* out, s32 idx);                 // 0x801B55F4
 void     fn_8033B310(s32 value, u8* buf, s32 n);                 // 0x8033B310 (tail-branches to fn_803340F8)
 s32      AnimSetFindClip(void* set, s32 anim);                   // 0x801AC2FC
 u8*      SaveGetCurrentMonster(u8* s);                           // 0x8022E170
-void     MonsterGetName(u8* m, char* out, s32 size);             // 0x8021C968
+s32 MonsterGetName(u8* m, char* out, s32 size);             // 0x8021C968
 void     GetBuildString(char* out);                              // 0x8001426C
 void     BufferFree(void* p);                                    // 0x801D4980
 s32      fn_800D56C0(u8* a3);                                    // 0x800D56C0

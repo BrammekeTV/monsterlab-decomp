@@ -1,15 +1,15 @@
 {
  "game_id": "RM7P4F",
- "generated": "2026-11-20T10:56:05+00:00",
- "commit": "0b70eb1",
- "commit_date": "2026-11-20T11:35:33+01:00",
+ "generated": "2026-11-20T11:14:45+00:00",
+ "commit": "3593110",
+ "commit_date": "2026-11-20T11:56:08+01:00",
  "game": {
   "functions": 8548,
   "bytes": 2265988,
   "named": 2748,
   "named_bytes": 616800,
-  "decompiled": 6042,
-  "decompiled_bytes": 888424
+  "decompiled": 6081,
+  "decompiled_bytes": 909452
  },
  "library": {
   "functions": 4039,
@@ -24,8 +24,8 @@
   "bytes": 3404928,
   "named": 3211,
   "named_bytes": 721548,
-  "decompiled": 6043,
-  "decompiled_bytes": 888544
+  "decompiled": 6082,
+  "decompiled_bytes": 909572
  },
  "game_range": [
   "80006B40",
@@ -33,7 +33,7 @@
  ],
  "memory_map": [
   [
-   0.537,
+   0.711,
    0.696
   ],
   [
@@ -41,11 +41,11 @@
    0.0
   ],
   [
-   0.609,
+   0.712,
    0.435
   ],
   [
-   0.481,
+   0.573,
    0.474
   ],
   [
@@ -69,7 +69,7 @@
    0.921
   ],
   [
-   0.421,
+   0.518,
    0.858
   ],
   [
@@ -137,7 +137,7 @@
    0.006
   ],
   [
-   0.14,
+   0.149,
    0.019
   ],
   [
@@ -149,11 +149,11 @@
    0.398
   ],
   [
-   0.438,
+   0.585,
    0.687
   ],
   [
-   0.54,
+   0.619,
    0.736
   ],
   [
@@ -165,7 +165,7 @@
    0.13
   ],
   [
-   0.465,
+   0.473,
    0.233
   ],
   [
@@ -233,7 +233,7 @@
    0.725
   ],
   [
-   0.284,
+   0.4,
    0.312
   ],
   [
@@ -301,7 +301,7 @@
    0.008
   ],
   [
-   0.39,
+   0.489,
    0.106
   ],
   [
@@ -453,7 +453,7 @@
    1.0
   ],
   [
-   0.19,
+   0.291,
    0.843
   ],
   [
@@ -461,7 +461,7 @@
    0.541
   ],
   [
-   0.842,
+   0.983,
    0.97
   ],
   [
@@ -477,7 +477,7 @@
    0.99
   ],
   [
-   0.562,
+   0.651,
    1.0
   ],
   [
@@ -505,7 +505,7 @@
    1.0
   ],
   [
-   0.849,
+   0.956,
    0.883
   ],
   [
@@ -525,7 +525,7 @@
    0.801
   ],
   [
-   0.791,
+   1.0,
    1.0
   ],
   [
@@ -557,7 +557,7 @@
    0.11
   ],
   [
-   0.62,
+   0.724,
    0.55
   ],
   [
@@ -605,11 +605,11 @@
    0.54
   ],
   [
-   0.776,
+   0.967,
    0.952
   ],
   [
-   0.848,
+   0.944,
    0.676
   ],
   [
@@ -777,11 +777,11 @@
    0.0
   ],
   [
-   0.321,
+   0.387,
    0.02
   ],
   [
-   0.33,
+   0.426,
    0.017
   ],
   [
@@ -897,7 +897,7 @@
    0.102
   ],
   [
-   0.379,
+   0.384,
    0.2
   ],
   [
@@ -933,7 +933,7 @@
    0.068
   ],
   [
-   0.339,
+   0.393,
    0.068
   ],
   [
@@ -977,7 +977,7 @@
    0.178
   ],
   [
-   0.18,
+   0.29,
    0.234
   ],
   [
@@ -993,7 +993,7 @@
    0.0
   ],
   [
-   0.393,
+   0.52,
    0.096
   ],
   [
@@ -6039,6 +6039,201 @@
      "name": "fn_8022ED98",
      "addr": "8022ED98",
      "size": 64
+    }
+   ]
+  },
+  {
+   "path": "src/game/draft_miss111.cpp",
+   "functions": [
+    {
+     "name": "fn_8004EA38",
+     "addr": "8004EA38",
+     "size": 56
+    },
+    {
+     "name": "fn_80199B68",
+     "addr": "80199B68",
+     "size": 200
+    },
+    {
+     "name": "fn_80199DD4",
+     "addr": "80199DD4",
+     "size": 108
+    },
+    {
+     "name": "fn_8019A9EC",
+     "addr": "8019A9EC",
+     "size": 36
+    },
+    {
+     "name": "fn_8019AC78",
+     "addr": "8019AC78",
+     "size": 244
+    },
+    {
+     "name": "fn_8019ADFC",
+     "addr": "8019ADFC",
+     "size": 152
+    },
+    {
+     "name": "fn_8019B7D8",
+     "addr": "8019B7D8",
+     "size": 48
+    },
+    {
+     "name": "fn_8019B808",
+     "addr": "8019B808",
+     "size": 88
+    },
+    {
+     "name": "fn_8019B888",
+     "addr": "8019B888",
+     "size": 196
+    },
+    {
+     "name": "fn_8019B94C",
+     "addr": "8019B94C",
+     "size": 204
+    },
+    {
+     "name": "fn_8019BE68",
+     "addr": "8019BE68",
+     "size": 252
+    },
+    {
+     "name": "fn_8019C6DC",
+     "addr": "8019C6DC",
+     "size": 52
+    },
+    {
+     "name": "fn_801DA798",
+     "addr": "801DA798",
+     "size": 40
+    },
+    {
+     "name": "fn_8020E668",
+     "addr": "8020E668",
+     "size": 168
+    }
+   ]
+  },
+  {
+   "path": "src/game/draft_miss112.cpp",
+   "functions": [
+    {
+     "name": "LightningTowerShowMonster",
+     "addr": "8001BB90",
+     "size": 864
+    },
+    {
+     "name": "GetExperimentTypeFromStation",
+     "addr": "800743E0",
+     "size": 844
+    },
+    {
+     "name": "ReactorHeartUpdateRotation",
+     "addr": "80099274",
+     "size": 824
+    },
+    {
+     "name": "FireShotAtFeet",
+     "addr": "800EAB70",
+     "size": 932
+    },
+    {
+     "name": "PreloadLevel",
+     "addr": "80107580",
+     "size": 884
+    },
+    {
+     "name": "SaveManager_EraseData",
+     "addr": "80123D9C",
+     "size": 916
+    },
+    {
+     "name": "InspectOpponentUpdate",
+     "addr": "8013C6CC",
+     "size": 904
+    },
+    {
+     "name": "MatchupInit",
+     "addr": "8013CC60",
+     "size": 780
+    },
+    {
+     "name": "InitProgressScreen",
+     "addr": "8013FE90",
+     "size": 876
+    },
+    {
+     "name": "fn_801ED368",
+     "addr": "801ED368",
+     "size": 464
+    },
+    {
+     "name": "fn_8020EDF0",
+     "addr": "8020EDF0",
+     "size": 920
+    }
+   ]
+  },
+  {
+   "path": "src/game/draft_miss113.cpp",
+   "functions": [
+    {
+     "name": "ScoreActivateCandidate",
+     "addr": "80006F48",
+     "size": 1012
+    },
+    {
+     "name": "ScoreCullCandidate",
+     "addr": "80007464",
+     "size": 944
+    },
+    {
+     "name": "fn_8000B9CC",
+     "addr": "8000B9CC",
+     "size": 924
+    },
+    {
+     "name": "fn_8000F298",
+     "addr": "8000F298",
+     "size": 804
+    },
+    {
+     "name": "SetActionSelected",
+     "addr": "80046808",
+     "size": 832
+    },
+    {
+     "name": "SetUpCombatResultsScreen",
+     "addr": "800479D8",
+     "size": 892
+    },
+    {
+     "name": "SpawnLightningBetweenChildren",
+     "addr": "800EE9D0",
+     "size": 944
+    },
+    {
+     "name": "Wii_PlayConversationOutro",
+     "addr": "800F7EB0",
+     "size": 820
+    },
+    {
+     "name": "Slider_SetTopAndBottom",
+     "addr": "80110FAC",
+     "size": 952
+    },
+    {
+     "name": "Slider_SetImage",
+     "addr": "80111364",
+     "size": 920
+    },
+    {
+     "name": "SaveOpen",
+     "addr": "80206474",
+     "size": 840
     }
    ]
   },
@@ -22111,6 +22306,16 @@
    "path": "src/leaf/auto_03_80040824_text.cpp",
    "functions": [
     {
+     "name": "fn_80040EFC",
+     "addr": "80040EFC",
+     "size": 36
+    },
+    {
+     "name": "fn_80040F20",
+     "addr": "80040F20",
+     "size": 36
+    },
+    {
      "name": "fn_80041810",
      "addr": "80041810",
      "size": 28
@@ -22409,6 +22614,11 @@
      "name": "fn_8004E8CC",
      "addr": "8004E8CC",
      "size": 8
+    },
+    {
+     "name": "fn_8004E8D4",
+     "addr": "8004E8D4",
+     "size": 20
     },
     {
      "name": "LimbHasEffect",

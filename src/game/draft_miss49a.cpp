@@ -15,7 +15,7 @@ const char* fn_801EB708(u32 hash);                               // 0x801EB708 (
 u32         fn_8019552C(u8* a3, s32 a4);                         // 0x8019552C (leaf)
 u32         fn_8019AD84(void* obj, s32 index);                   // 0x8019AD84
 s32         fn_8019AE94(u8* a3);                                 // 0x8019AE94 (leaf)
-ScriptValue fn_8019AC78(void* set, BOOL a1);                     // 0x8019AC78
+void*       fn_8019AC78(void* set, BOOL a1);                     // 0x8019AC78
 void*       fn_80109330(const char* name);                       // 0x80109330
 f32         fn_801A4018(u8* a3);                                 // 0x801A4018 (leaf)
 f32         fn_801A4034(u8* a3);                                 // 0x801A4034 (leaf)
@@ -376,7 +376,7 @@ ScriptValue UITextureList_GetNextTexture(u32 a0, BOOL a1) {
         fn_8018D370(lbl_80381D68, a0);
         return 0;
     }
-    ScriptValue r = fn_8019AC78(elem, a1);
+    ScriptValue r = (ScriptValue)(intptr_t)fn_8019AC78(elem, a1);
     if (r != 0) return r;
     fn_8018D370(lbl_80381EA0, a1);
     return 0;

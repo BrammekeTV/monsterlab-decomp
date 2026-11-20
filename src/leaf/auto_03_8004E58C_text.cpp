@@ -7,6 +7,7 @@
 
 extern "C" u8* fn_8004B754(u8*, s32);
 extern "C" void fn_801ED1F8(u8*);
+extern "C" char* strcpy(char*, char*);
 
 // 0x8004E58C
 extern "C" u8* fn_8004E58C(u8* a3, s32 a4) {
@@ -18,6 +19,14 @@ extern "C" u8* fn_8004E58C(u8* a3, s32 a4) {
 extern "C" s32 fn_8004E8CC(u8* a3) {
     s32 t0 = *(s32*)(((u8*)(uintptr_t)(a3)) + 616);
     return (s32)(t0);
+}
+
+// 0x8004E8D4
+extern "C" char* fn_8004E8D4(u8* a3, u8* a4, s32 a5) {
+    *(u8*)(((u8*)(uintptr_t)(a3)) + 909) = (u8)((u32)(uintptr_t)(a5));
+    *(u8*)(((u8*)(uintptr_t)(a3)) + 652) = (u8)((u32)(1));
+    u8* t0 = ((u8*)(uintptr_t)(a3)) + 653;
+    return (char*)(strcpy((char*)(t0), (char*)(((u8*)(uintptr_t)(a4)))));
 }
 
 // 0x8005015C

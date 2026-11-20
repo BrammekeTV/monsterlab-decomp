@@ -74,7 +74,8 @@ void fn_80121440(u8* v, s32 r, s32 g, s32 b, s32 a);   // 0x80121440: packs the 
 void fn_8012145C(u8* v, f32 x, f32 y, f32 z);          // 0x8012145C: position
 s32 fn_80151644(s32 a, s32 b, u8* quad);   // 0x80151644
 s32 WorldGetPhase(void* world);            // 0x800D83A8
-s32 fn_8000B888(void);                     // 0x8000B888
+u32 fn_8000B888(u8* ctx);                    // 0x8000B888
+extern u8 gScriptCtx[];                                          // 0x803C4298
 BOOL fn_800E6BD4(void);                    // 0x800E6BD4
 u8* fn_8019BF64(u8* container, u32 hash);  // 0x8019BF64
 void fn_80125970(u8* self, f32 dt);        // 0x80125970
@@ -471,7 +472,7 @@ static BOOL FourFloatsNearZero(const u8* el) {
 // marker (slot at +0x104) and marks it handled (0x40); then runs fn_80125970.
 void fn_8012570C(f32 dt) {
     if (WorldGetPhase(gGame + 0xD5F0) == 1 && *(s32*)(lbl_803C4298 + 0x18) == 5 &&
-        fn_8000B888() == 0 && *(s32*)(lbl_805FB2E8 + 0x14C) == 0 &&
+        fn_8000B888(gScriptCtx) == 0 && *(s32*)(lbl_805FB2E8 + 0x14C) == 0 &&
         *(s32*)(lbl_805FB2E8 + 0x148) != 0 && fn_800E6BD4() == 0 &&
         lbl_8047C7D8[0] == 0 && lbl_805FB1A1 == 0) {
         u8* scr = *(u8**)((u8*)gScreenSets + 0x7C);

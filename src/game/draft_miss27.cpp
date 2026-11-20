@@ -20,7 +20,7 @@ typedef s32 (*VLoadFn)(void* self, void* slot, s32 a);
 extern "C" {
 #include "game/script_callbacks.h"
 
-void   MonsterGetName(u8* m, char* out, s32 size);                       // 0x8021C968
+s32 MonsterGetName(u8* m, char* out, s32 size);                       // 0x8021C968
 s32    MonsterGetEnergy(u8* m);                                          // 0x8021CB78
 s32    PartActionStat0(PartInstance* p, u32 actionKey);                  // 0x8021DBE8
 s32    PartActionStat1(PartInstance* p, u32 actionKey);                  // 0x8021DE10

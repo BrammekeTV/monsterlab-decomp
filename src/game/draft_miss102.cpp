@@ -30,7 +30,7 @@ void ScopedLockCtor(ScopedLock* l);                             // 0x801F5384
 void ScopedLockDtor(ScopedLock* l, s32 flags);                  // 0x801F53B0
 void fn_8004BA50(u8* chr);                                      // 0x8004BA50
 void fn_8004B938(u8* chr);                                      // 0x8004B938
-s32 fn_8004EA38(u8* obj, s32 flag);                             // 0x8004EA38
+s32 fn_8004EA38(u8* arg0, s32 arg1, u8* arg2);                             // 0x8004EA38
 void fn_8020E668(u8* tbl, s32 a, s32 b);                        // 0x8020E668
 s32 fn_8020E7C8(s32 i);                                         // 0x8020E7C8
 void fn_8020E610(u8* tbl, s32 a, u8* b);                        // 0x8020E610
@@ -238,7 +238,7 @@ void fn_8004C718(u8* arg0, s32 arg1, u8* arg2) {
             ScopedLockCtor(&lock);
             (*(VFn_ps*)(*(u8**)old + 0x18))(old, 0);
             ScopedLockDtor(&lock, -1);
-            fn_8004EA38(*(u8**)(slot + 0xC50), 1);
+            fn_8004EA38(*(u8**)(slot + 0xC50), 1, NULL);  // r5 leftover in asm
         }
     }
     u8* newObj;
