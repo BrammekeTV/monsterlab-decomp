@@ -20,7 +20,7 @@ u8* fn_80021594(u8* p, s32 type, s32 hash);                       // 0x80021594 
 void fn_80030228(u8* p);                                          // 0x80030228
 void fn_8003107C(u8* p);                                          // 0x8003107C
 void fn_80031090(u8* p, s32 del);                                 // 0x80031090
-void fn_80037FB4(u8* p, s32* tbl, s32 idx);                       // 0x80037FB4
+void fn_80037FB4(u8* p);                       // 0x80037FB4
 u8* fn_800496DC(u8* p, s32 a2);                                // 0x800496DC (constructor, returns p)
 void fn_8004DD30(u8* p);                                          // 0x8004DD30
 void fn_80075264(u8* p, s32 id);                                  // 0x80075264
@@ -670,7 +670,7 @@ u8* fn_80037324(u8* p) {
     idx = *(s32*)(p + 0x9A8);
     *(s32*)(p + 0x164) = idx;
     *(s32*)(p + 0x168) = lbl_80347620[idx];
-    fn_80037FB4(p, lbl_80347620, idx);
+    fn_80037FB4(p);  // r4/r5 unused in callee
     return p;
 }
 

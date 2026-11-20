@@ -57,11 +57,11 @@ extern void* lbl_805FB5AC;           // particle list pending an update outside 
 extern u8    lbl_8047C760[];         // effect manager
 extern u32   lbl_805FB9A4;
 
-static u32   sLoadFrames;            ORIG(0x805FB2F8)
+u32   sLoadFrames;            ORIG(0x805FB2F8)
 u8           sWorldReady;            ORIG(0x805FB2F0)
-static u8    sReadyPending;          ORIG(0x805FB2F1)
-static u8    sReadyRequested;        ORIG(0x805FB2F2)
-static u8    sWorldSuspended;        ORIG(0x805FB2F4)
+u8    sReadyPending;          ORIG(0x805FB2F1)
+u8    sReadyRequested;        ORIG(0x805FB2F2)
+u8    sWorldSuspended;        ORIG(0x805FB2F4)
 static f32   sNextCullTime;          ORIG(0x805FB2FC)
 static f32   sLastCullTime;          ORIG(0x805FB304)
 

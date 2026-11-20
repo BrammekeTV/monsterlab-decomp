@@ -35,12 +35,12 @@ int   SysSprintf(char* buf, const char* fmt, ...);
 void  TextureRelease(void* tex);                                                // 0x80184028
 void  app_PlayMusic(u32 hash, f32 vol);
 s32   fn_8003F8D4(void);                                                        // 0x8003F8D4
-void  fn_80040F44(u8* p);                                                       // 0x80040F44
+void fn_80040F44(void);                                                       // 0x80040F44
 void  fn_80041874(u8* p);                                                       // 0x80041874
 u8*   fn_800418E0(u8* p, s32 a2);                                               // 0x800418E0
 void  fn_80041AB4(u8* p);                                                       // 0x80041AB4
-void  fn_80042C38(void* p);                                                     // 0x80042C38
-void  fn_80042E04(void);                                                        // 0x80042E04
+u8* fn_80042C38(u8* p);                                                     // 0x80042C38
+void fn_80042E04(u8* p);                                                        // 0x80042E04
 void* fn_80043910(void* a0, s32 idx, s32 kind);                                 // 0x80043910
 void  fn_800445E4(u8* p);                                                       // 0x800445E4
 u8*   fn_800445F4(u8* p, s32 del);                                              // 0x800445F4
@@ -65,7 +65,7 @@ void  fn_800939EC(u8* slot, s32 lane, u8* obj, s32 a, s32 b);                   
 void  fn_80093C20(u8* p, s32 on);                                               // 0x80093C20
 void  fn_80097BFC(u8* p);                                                       // 0x80097BFC
 void  fn_800980F8(u8* p, s32 b);                                                // 0x800980F8
-void  fn_8009C414(u8* obj, u8* p, u8* obj2);                                    // 0x8009C414
+void fn_8009C414(u8* p, u8* arg1);                                    // 0x8009C414
 void  fn_801455E0(f32* out, u8* quat);                                          // 0x801455E0
 void  fn_80145F9C(f32* out, f32* a, f32* b, f32 t);                             // 0x80145F9C
 void  fn_80146180(void* quat, const Vec3* axis, f32 angle);                     // 0x80146180
@@ -220,7 +220,7 @@ void fn_80040ACC(u8* arg0, u8* arg1, u8* arg2) {
     n = (u8*)fn_801D40E0(0x264);
     if (n != NULL) fn_80042C38(n);
     lbl_805FB058 = n;
-    fn_80042E04();
+    fn_80042E04(NULL);  // r3 stale in asm
 
     for (s32 i = 0; i < 2; i++) {
         FighterStatsSetOwner(((u8**)(gBattle + 0xA00))[i] + 0x20,
@@ -260,7 +260,7 @@ void fn_80040ACC(u8* arg0, u8* arg1, u8* arg2) {
     }
 
     *(void**)(arg0 + 0x4F0) = fn_80044F54();
-    if (lbl_803C4298[0x1C] == 0x1D) fn_80040F44(arg0);
+    if (lbl_803C4298[0x1C] == 0x1D) fn_80040F44();
     if (fn_8003F8D4() != 0) {
         app_PlayMusic(0x06BE5C73u, 1.0f);
     } else {
@@ -757,7 +757,7 @@ void fn_80099D08(u8* arg0) {
             *(f32*)(av + 0xC) = 5.0f;
             *(f32*)(av + 0x10) = 5.0f;
             NodeMarkDirty(av);
-            fn_8009C414(*(u8**)(arg0 + 0x198), arg0, av);
+            fn_8009C414(*(u8**)(arg0 + 0x198), arg0);
         } else if (type == kHashAstralPickup) {
             u8** list = *(u8***)(arg0 + 0x19C);
             list[np] = obj;

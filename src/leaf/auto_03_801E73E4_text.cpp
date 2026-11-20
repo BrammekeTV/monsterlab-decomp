@@ -118,7 +118,6 @@ extern "C" s32 fn_801EE504(u8* a3) {
 
 // 0x801EFA18
 extern "C" void fn_801EFA18(void) {
-    // tail-call arguments inferred from the registers set before the call
     fn_801EE2C4((u8*)&lbl_804DD100);
 }
 

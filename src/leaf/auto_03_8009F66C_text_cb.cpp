@@ -6,7 +6,7 @@
 #include "types.h"
 #include "game/script_callbacks.h"
 
-extern u8 lbl_805FB158[];
+extern u8* lbl_805FB158;
 extern "C" void fn_800A6704(u8*, u8*);
 
 // 0x800A1988

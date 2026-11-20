@@ -94,6 +94,11 @@
  "changelog": [
   {
    "date": "2026-11-20",
+   "time": "22:04",
+   "text": "Decompile 41 more missing functions (fn_8012F6B0 jump table, fn_801294CC world state, fn_8011D9C0 sort helpers, fn_800A* tree helpers, fn_801ED* list helpers, ...); fix prototypes"
+  },
+  {
+   "date": "2026-11-20",
    "time": "21:45",
    "text": "Decompile 36 more missing functions (object constructors fn_8002*/fn_8003*, fn_8008*/fn_8009* effect helpers, fn_801EA*/fn_801EB* list helpers, fn_800497F4, ...); fix prototypes"
   },

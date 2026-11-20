@@ -5,7 +5,7 @@
 
 #include "types.h"
 
-extern u8 gGameDb[];
+extern u8* gGameDb;
 extern u8 lbl_803C2A20[];
 
 // 0x80052384

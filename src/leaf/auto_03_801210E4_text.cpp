@@ -9,7 +9,6 @@ extern "C" void fn_801EF980(s32);
 
 // 0x801210E4
 extern "C" void fn_801210E4(u8* a3) {
-    // tail-call arguments inferred from the registers set before the call
     *(u32*)(((u8*)(uintptr_t)(a3)) + 0) = (u32)((u32)(0));
     u32 t0 = (u32)(0x20000) + 2048u;
     fn_801EF980((s32)((u32)(t0)));

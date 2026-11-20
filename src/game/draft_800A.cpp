@@ -18,7 +18,7 @@ s32   RaySceneTest(void* ray);                                   // 0x80070458 (
 void  fn_80070460(u8* p);                                        // 0x80070460
 void  fn_80070FAC(u8* p, f32 v);                                 // 0x80070FAC
 void  fn_800712BC(u8* p, s32 a, s32 b);                          // 0x800712BC
-void  fn_800A0BAC(u8* p, f32 dt);                                // 0x800A0BAC
+void fn_800A0BAC(u8* p);                                // 0x800A0BAC
 void fn_800A2AEC(u8* node, u8* root);                // 0x800A2AEC
 void  fn_800A43C0(u8* p, s32 hash);                              // 0x800A43C0
 void  fn_800A660C(u8* p);                                        // 0x800A660C
@@ -244,7 +244,7 @@ void fn_800A1C2C(u8* p, f32 dt) {
     }
     fn_800A7828(*(u8**)(p + 0xC8C));
     fn_800A75C8(*(u8**)(p + 0xC8C));
-    fn_800A0BAC(p, dt);
+    fn_800A0BAC(p);
     fn_800C2FF0(p + 0x8C);
     f32 left = *(f32*)(p + 0xCD0) - dt;
     *(f32*)(p + 0xCD0) = left;
@@ -341,7 +341,7 @@ void fn_800A232C(u8* p) {
     (*(VFnSelf*)(*(u8**)(p + 0x160) + 0x10))(p + 0x8C);
     (*(void (**)(u8*, u8*))(*(u8**)(p + 0x160) + 0xC))(p + 0x8C, p + 0xC74);
     fn_800A71C8(*(u8**)(p + 0xC8C), 0x9B51AA64u);
-    fn_800A0BAC(p, lbl_805FDE40);
+    fn_800A0BAC(p);
     f32 t = lbl_80346A58[RaySceneTest(NULL)];
     *(f32*)(p + 0xCD0) = t;
     fn_800712BC(p, (s32)t, 0);
