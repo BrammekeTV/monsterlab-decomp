@@ -86,6 +86,7 @@ void fn_8015490C(u8* p) {
     }
 }
 
+extern "C" {
 // 0x8015846C
 // Sends one packed BP register word built from ten fields (a3 is unused).
 void fn_8015846C(u32 a3, u32 a4, u32 a5, u32 a6, u32 a7, u32 a8, u32 a9, u32 a10,
@@ -161,6 +162,7 @@ void fn_80158FF4(u32 a3, u32 a4, u32 a5, u32 a6, u32 a7, u32 a8, u32 a9, u32 a10
             (a5 << 3) | (a6 << 6) | (a7 << 9) | (a8 << 12);
     GxBpWrite(v);
 }
+} // extern "C"
 
 // 0x8015A2E8
 // Clears bit 0x2 of the flags byte at +0xB, calls fn_8015AB70, then flushes the cache range

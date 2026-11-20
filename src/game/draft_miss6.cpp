@@ -49,7 +49,7 @@ f32    sinf(f32 x);
 
 u32    fn_8003F858(void);                                        // 0x8003F858
 s32    fn_8003F8D4(void);                                        // 0x8003F8D4
-void   fn_80044C0C(void);                                        // 0x80044C0C
+u32    fn_80044C0C(void);                                        // 0x80044C0C
 void   fn_80046F5C(void);                                        // 0x80046F5C
 void   fn_8004739C(s32 action);                                  // 0x8004739C
 s32    fn_8004E2A4(u8* fighter, s32 slot);                       // 0x8004E2A4

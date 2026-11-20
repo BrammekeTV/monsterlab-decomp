@@ -26,7 +26,7 @@ void* fn_8011AD88(void* def, s32 flag);                           // 0x8011AD88
 void fn_8018D1FC(const char* fmt, ...);                           // 0x8018D1FC
 void fn_8018D2B8(const char* fmt, ...);                           // 0x8018D2B8
 void fn_8018D370(const char* fmt, ...);                           // 0x8018D370
-void fn_8019892C(void* set);                                      // 0x8019892C
+s32 fn_8019892C(u8* set);                                      // 0x8019892C
 s32 fn_80198C78(u8* set);                                      // 0x80198C78
 void* fn_801D40E0(s32 n);                                         // 0x801D40E0
 void* fn_80209814(void* v);                                       // 0x80209814
@@ -245,7 +245,7 @@ void UIScreen_Pop(void) {
         return;
     }
     fn_8018D1FC(lbl_8038195C);
-    fn_8019892C(set);
+    fn_8019892C((u8*)set);
 }
 
 // 0x8018F088

@@ -62,7 +62,7 @@ void fn_80140D3C(void);                                          // 0x80140D3C
 s32 fn_801481FC(s32 chan);                                       // 0x801481FC
 void fn_8014DE68(void);                                          // 0x8014DE68
 s32 fn_8015BA30(void* p);                                        // 0x8015BA30
-void fn_8018CA38(void* sets, f32 dt);                            // 0x8018CA38
+s32 fn_8018CA38(u8* sets, f32 dt);                            // 0x8018CA38
 void fn_8018DBB8(void* sets, s32 a);                             // 0x8018DBB8
 s32 fn_80198A8C(void* set, void* widget);                       // 0x80198A8C
 BOOL fn_80198C34(void* set, void* w);                            // 0x80198C34
@@ -403,7 +403,7 @@ void fn_8000F298(void) {
     }
     fn_8000D3AC();
     if (fn_801F525C() == 0) fn_801F357C();
-    fn_8018CA38(gScreenSets, gFrameTime);
+    fn_8018CA38((u8*)gScreenSets, gFrameTime);
     UiUpdate(gFrameTime);
     fn_801F3BB8();
     fn_801F401C();

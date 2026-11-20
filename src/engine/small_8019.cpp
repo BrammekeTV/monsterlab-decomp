@@ -183,7 +183,7 @@ BOOL fn_801982E4(void* obj, u32 mask) {
 
 // 0x80198320
 // If flags+8 bit 1 is set, returns flags+0xC with the bits of flags+0x10 cleared; otherwise 0.
-u32 fn_80198320(void* obj) {
+extern "C" s32 fn_80198320(void* obj) {
     u8* o = (u8*)obj;
     u32 r = 0;
     if (*(u32*)(o + 0x8) & 2) {

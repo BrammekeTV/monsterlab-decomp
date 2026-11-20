@@ -38,7 +38,7 @@ void fn_801ED050(u8* p, s32 flag);                         // 0x801ED050
 void* fn_80209814(void* v);                                   // 0x80209814
 void fn_8020A398(s32 handle);                                 // 0x8020A398
 void fn_8019645C(void* a, s32 b);                             // 0x8019645C
-void fn_8019BA18(u8* arg0, void* arg1, s8 arg2, f32 arg3);    // 0x8019BA18
+s32 fn_8019BA18(u8* obj, void* desc, s8 prio, f32 speed);    // 0x8019BA18
 }
 
 extern "C" {

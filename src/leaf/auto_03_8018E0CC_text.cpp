@@ -9,7 +9,7 @@ extern "C" s32 fn_8019555C(u8* a3);
 extern u8 lbl_805FB688[];
 extern u8* lbl_805FB698;
 extern u8 lbl_805FFA3C[];
-extern "C" void fn_80195608(u8*, s32, s32);
+extern "C" s32 fn_80195608(u8*, void*, s32);
 extern "C" void fn_8019914C(s32, u8*);
 extern "C" void fn_8019B808(u8*, u8*);
 extern "C" void fn_8019DB40(u8*);
@@ -39,11 +39,10 @@ extern "C" s32 fn_8019555C(u8* a3) {
 }
 
 // 0x80195564
-extern "C" void fn_80195564(u8* a3, s32 a4) {
-    // tail-call arguments inferred from the registers set before the call
+extern "C" s32 fn_80195564(u8* a3, u8* a4) {
     s32 t0 = *(s32*)(((u8*)(uintptr_t)(a3)) + 0);
     u32 t1 = (u32)(t0) - 1u;
-    fn_80195608(((u8*)(uintptr_t)(a3)), (s32)((u32)(uintptr_t)(a4)), (s32)((u32)(t1)));
+    return (s32)(fn_80195608(((u8*)(uintptr_t)(a3)), (void*)(((u8*)(uintptr_t)(a4))), (s32)((u32)(t1))));
 }
 
 // 0x80196668

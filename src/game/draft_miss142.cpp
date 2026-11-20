@@ -24,12 +24,12 @@ void   ScopedLockDtor(ScopedLock* l, s32 flags);                      // 0x801F5
 u32    StringHash(const char* s);                                     // 0x801EB704
 Locator* WorldFindLocator(void* world, u32 hash);                     // 0x8012AA50
 void   fn_80077090(u8* self, const char* name);                       // 0x80077090
-void   fn_8007A4B4(u8* p);                                            // 0x8007A4B4
+void fn_8007A4B4(u8* obj, u8* src);                                            // 0x8007A4B4
 void   fn_80087144(u8* p);                                            // 0x80087144
 void   fn_8009487C(u8* p);                                            // 0x8009487C
 void   fn_800946E0(u8* p);                                            // 0x800946E0
 void   fn_80096F6C(u8* p);                                            // 0x80096F6C
-u8*    fn_800980C8(u8* obj, s32 mode);                                // 0x800980C8
+void   fn_800980C8(u8* obj, s32 mode);                                // 0x800980C8
 void   fn_800988F0(u8* p, s32 b);                                     // 0x800988F0
 void   fn_800C2180(u8* self, u8* tbl, s32 n);                         // 0x800C2180
 void   fn_8018BEA4(u8* p, f32 t);                                     // 0x8018BEA4
@@ -172,7 +172,7 @@ void fn_8007B20C(u8* self) {
         for (s32 j = 0; j < *(s32*)(ZoneRes(z) + 0x98); j++) {
             u8* obj = ((u8**)*(u8**)(ZoneRes(z) + 0x12C))[j];
             if (hash == *(u32*)(obj + 0x2C)) {
-                fn_8007A4B4(self + 0x264);
+                fn_8007A4B4(self + 0x264, NULL);  // r4 leftover in asm
                 found = 1;
                 break;
             }

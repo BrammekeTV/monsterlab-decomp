@@ -94,6 +94,11 @@
  "changelog": [
   {
    "date": "2026-11-20",
+   "time": "16:36",
+   "text": "Decompile 33 more missing functions (RaySceneTest, fn_801B*/fn_8019* UI and screen helpers, fn_8015* GX capture helpers, fn_8007* object helpers, ...); fix prototypes and linkage"
+  },
+  {
+   "date": "2026-11-20",
    "time": "16:23",
    "text": "Decompile 35 more missing functions (fn_8006FA74 base constructor, fn_800BF*/fn_800C* object helpers, fn_8013*/fn_8014* misc helpers, fn_801AC* UI helpers, ...); fix prototypes"
   },

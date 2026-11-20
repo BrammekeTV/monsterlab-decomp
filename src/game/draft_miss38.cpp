@@ -21,8 +21,8 @@ extern "C" {
 void   BufferFree(void* p);
 void*  MemAllocDefault(u32 size);
 s32    fn_8019600C(void* gx);                         // 0x8019600C
-void   fn_801960E4(void* gx);                         // 0x801960E4, result unused by caller
-void   fn_801985BC(void* set, s32 pass);              // 0x801985BC, result unused by caller
+s32 fn_801960E4(void* gx);                         // 0x801960E4, result unused by caller
+s32 fn_801985BC(u8* set, s32 pass);              // 0x801985BC, result unused by caller
 void   fn_8019BFF8(void* obj, void* cb, void* arg);   // 0x8019BFF8
 s32    fn_8018CD34(void* obj);                        // 0x8018CD34, draw callback
 u32    fn_80143974(s32 seed, void* data, u32 len);    // 0x80143974, checksum
@@ -126,7 +126,7 @@ s32 ScreenSetsDraw(void* sets, s32 pass) {
     if (*(s32*)(s + 0x84) == 0) return -1;
     fn_8019600C(lbl_805FB658);
     fn_801960E4(lbl_805FB658);
-    fn_801985BC(*(void**)(s + 0x84), pass);
+    fn_801985BC(*(u8**)(s + 0x84), pass);
     if (pass == 2) {
         u8* obj = *(u8**)(s + 0x7C);
         if (obj != NULL && (*(s32*)(obj + 0x64) & 2)) {

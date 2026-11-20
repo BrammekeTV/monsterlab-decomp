@@ -13,8 +13,8 @@ extern u8 lbl_805FB580[];
 extern u8 lbl_805FB590[];
 extern u8 lbl_805FF20C[];
 extern u8 lbl_805FF210[];
-extern u8 lbl_805FF228[];
-extern u8 lbl_805FF22C[];
+extern f32 lbl_805FF228;
+extern f32 lbl_805FF22C;
 extern "C" s32 OSSignalSemaphore(u8*);
 
 // 0x80156AAC
