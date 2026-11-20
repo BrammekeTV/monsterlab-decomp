@@ -18,7 +18,7 @@ void*   fn_8018E8D8(void* table, u32 hash);                     // 0x8018E8D8
 void    fn_8018D2B8(const char* fmt, ...);                      // 0x8018D2B8
 u32     StringHash(const char* s);                              // 0x801EB704
 void    operator_delete(void* p);                               // 0x801D426C
-void    fn_80196678(void* gx, void* p, f32 t);                  // 0x80196678 (f1 passed through)
+s32 fn_80196678(void* gx, void* mat, f32 t);                  // 0x80196678 (f1 passed through)
 s32 fn_80196B4C(u8* arg0, const f32* arg1);                  // 0x80196B4C (f1 passed through)
 void    fn_80199534(u8* a3);                                    // 0x80199534 (leaf)
 s32     fn_80196B10(u8* a3);                                    // 0x80196B10 (leaf)

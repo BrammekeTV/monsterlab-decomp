@@ -35,7 +35,7 @@ void  fn_801C83AC(u8* mgr, u8* item);                            // 0x801C83AC
 void  fn_8020A398(s32 handle);                                   // 0x8020A398
 void  fn_801ECFA0(u8* p, s32 idx);                               // 0x801ECFA0
 u32   fn_801EC880(u8* p, u32 hash);                              // 0x801EC880
-void  fn_801F61AC(u8* p, s32 a);                                 // 0x801F61AC
+u8* fn_801F61AC(u8* arg0, s32 arg1);                                 // 0x801F61AC
 u8*   fn_801F9544(u8* p, s32 a4);                                // 0x801F9544
 void  TextureRelease(void* tex);                                 // 0x80184028
 void  UIElement_PlayUIAnim(u32 element, u32 anim);               // defined in character_states.cpp

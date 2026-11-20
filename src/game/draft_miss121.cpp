@@ -15,7 +15,7 @@ void   fn_801B3378(u8* p, u8* key);                     // 0x801B3378
 void   fn_801C83AC(u8* mgr, u8* item);                  // 0x801C83AC
 void   fn_801C849C(u8* mgr, u8* item);                  // 0x801C849C
 void*  fn_801D40E0(s32 n);                              // 0x801D40E0
-void   fn_801F61AC(u8* p, s32 a);                       // 0x801F61AC
+u8* fn_801F61AC(u8* arg0, s32 arg1);                       // 0x801F61AC
 char*  fn_80338BC0(char* s, const char* sub);           // 0x80338BC0 (strstr)
 void   fn_800980C8(u8* obj, s32 mode);                  // 0x800980C8 (returns callee's r3; leaf decl says void)
 s32    RaySceneTest(void* ray);                         // 0x80070458

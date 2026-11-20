@@ -18,7 +18,7 @@ u8*    fn_8018C8E4(void);                                       // 0x8018C8E4
 void   fn_8018D2B8(const char* fmt, ...);                       // 0x8018D2B8 (debug log)
 void*  fn_8018D428(s32 size, const char* file, void* tag, s32 line); // 0x8018D428 (alloc)
 void   fn_80195A58(void* gx, void* a, u8* b, u8* c);            // 0x80195A58
-void   fn_80196678(void* gx, void* p, f32 t);                   // 0x80196678
+s32 fn_80196678(void* gx, void* mat, f32 t);                   // 0x80196678
 s32    fn_80196B10(u8* a3);                                     // 0x80196B10 (leaf)
 s32 fn_80196B4C(u8* arg0, const f32* arg1);                   // 0x80196B4C
 s32    fn_80196C88(u8* a3);                                     // 0x80196C88 (leaf)

@@ -23,15 +23,15 @@ void* fn_8018D428(s32 size, const char* file, void* tag, s32 line);         // 0
 void fn_8018D558(u8* sets, f32 x, f32 y, f32 z);                            // 0x8018D558
 void fn_8018DEF4(void* sets);                                               // 0x8018DEF4
 s32 fn_8018E208(void* table, u32 hash, void* entry);                        // 0x8018E208
-void fn_80196678(void* gx, void* p, f32 t);                                // 0x80196678
+s32 fn_80196678(void* gx, void* mat, f32 t);                                // 0x80196678
 s32 fn_80196B10(u8* a3);                                                    // 0x80196B10 (leaf)
-void fn_801981FC(void* obj, f32 dt);                                        // 0x801981FC
+s32 fn_801981FC(u8* arg0, f32 arg1);                                        // 0x801981FC
 s32 fn_80198290(u8* a3, s32 a4);                                            // 0x80198290
 s32 fn_8019829C(u8* a3, f32 f1);                                            // 0x8019829C
 u32 fn_80198320(void* obj);                                                 // 0x80198320
 s32 fn_80198438(void* obj, f32 dt);                                         // 0x80198438
 s32 fn_8018CA04(void* obj, f32* dt);                                        // 0x8018CA04
-void fn_801999D4(void* widget, s32 pass, void* ctx);                        // 0x801999D4
+s32 fn_801999D4(u8* arg0, s32 arg1, u8* arg2);                        // 0x801999D4
 s32 fn_80199094(void* obj);                                                 // 0x80199094
 s32 fn_80199100(void* obj);                                                 // 0x80199100
 s32 fn_80199540(u8** a, u8** b);                                            // 0x80199540 (sort compare)
@@ -256,7 +256,7 @@ s32 fn_8018CA38(u8* sets, f32 dt) {
         return 0;
     }
     if (lbl_8047C7D8[0] == 0) {
-        fn_801981FC(lbl_805FB670, t);
+        fn_801981FC((u8*)lbl_805FB670, t);
         u32 pad = fn_80198320(lbl_805FB670);
         if (pad & 0x1000) UIEvent_SendToTopScreen(0x23369815u);
         if (pad & 0x2000) UIEvent_SendToTopScreen(0xF777A7CAu);

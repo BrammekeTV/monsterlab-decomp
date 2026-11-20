@@ -110,7 +110,7 @@ void fn_8017493C(u8* p) {
 }
 
 // 0x801F61AC
-void fn_801F61AC(u8* arg0, s32 arg1) {
+u8* fn_801F61AC(u8* arg0, s32 arg1) {
     fn_801B35C8(arg0, arg1);
     *(void**)arg0 = lbl_803860E8;
     *(f32*)(arg0 + 0x90) = 0.0f;
@@ -124,6 +124,7 @@ void fn_801F61AC(u8* arg0, s32 arg1) {
     *(f32*)(arg0 + 0xB0) = 1.0f;
     *(f32*)(arg0 + 0xB4) = 1.0f;
     *(u8*)(arg0 + 0xB8) = 0;
+    return arg0;
 }
 
 // 0x8021F350

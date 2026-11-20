@@ -53,7 +53,7 @@ ScriptValue fn_801A1208(u8* el);                       // 0x801A1208
 u8*    fn_801B3308(void);                              // 0x801B3308
 void   fn_801B3310(u8* p, u8* q);                      // 0x801B3310
 void*  fn_801D40E0(s32 n);                             // 0x801D40E0
-void   fn_801F61AC(u8* p, s32 a);                      // 0x801F61AC
+u8* fn_801F61AC(u8* arg0, s32 arg1);                      // 0x801F61AC
 void fn_801F8628(u8* obj, s8* src, s32 n);               // 0x801F8628
 void   fn_801F8F34(u8* p, f32 v);                      // 0x801F8F34
 void   fn_801F8FA0(u8* p, f32 v);                      // 0x801F8FA0

@@ -94,6 +94,11 @@
  "changelog": [
   {
    "date": "2026-11-20",
+   "time": "16:54",
+   "text": "Decompile 36 more missing functions (RandomU32, PlaySound, app_PlayMusic, ScreenSetsActivate, RendEndFrame, RngNext, ZoneEffectsUpdate, fn_801EC8C4, ...); fix prototypes"
+  },
+  {
+   "date": "2026-11-20",
    "time": "16:36",
    "text": "Decompile 33 more missing functions (RaySceneTest, fn_801B*/fn_8019* UI and screen helpers, fn_8015* GX capture helpers, fn_8007* object helpers, ...); fix prototypes and linkage"
   },

@@ -52,7 +52,7 @@ void*  fn_801ABAF4(void* anim);                                           // 0x8
 void   fn_801ABC50(void* h);                                              // 0x801ABC50
 void   fn_801ABCEC(void* h, void* owner);                                 // 0x801ABCEC
 void   fn_801B9FA4(void* mgr, void* obj, void* cb, void* ctx);            // 0x801B9FA4
-void   fn_801BB3D4(void);                                                 // 0x801BB3D4 (event callback)
+s32 fn_801BB3D4(u8* arg0, s32 arg1, s32 arg2, s32 arg3, u8* arg4);                                                 // 0x801BB3D4 (event callback)
 void   fn_801BB434(void);                                                 // 0x801BB434 (event callback)
 void   fn_801BB8A0(u8* hud);                                              // 0x801BB8A0
 void   fn_801BBC9C(u8* hud, u8* sub, u8* state);                          // 0x801BBC9C

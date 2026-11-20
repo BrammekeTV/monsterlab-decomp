@@ -440,7 +440,7 @@ void FriendListScrollDown(void);                                       // src/ga
 void FriendListScrollUp(void);                                         // src/game/small_8013.cpp
 void FriendListSetSelectedSlot(BOOL a0);                               // src/game/draft_miss20.cpp
 void FriendListShowFloaty(void);                                       // src/game/draft_miss20.cpp
-void FriendListSort(BOOL a0);  // type 0x8C (from signature table)
+void FriendListSort(BOOL a0);                                          // src/game/draft_miss162.cpp
 void FriendListUpdate(void);                                           // src/game/small_8013.cpp
 void FriendsListAddFriend(void);                                       // src/game/draft_miss20.cpp
 ScriptValue FriendsListIsBuddy(void);                                  // src/game/draft_miss20.cpp
@@ -1541,7 +1541,7 @@ s32 WithinAngleOfTarget(u32 a3, f32 f1);                               // src/le
 s32 WithinJumpRange(u32 a3);                                           // src/leaf/auto_03_800FB958_text_cb.cpp
 s32 WithinRangeOf(void* a0, u32 a1, f32 a2);                           // src/game/draft_miss49b.cpp
 s32 WithinRangeOfTarget(u32 a3, f32 f1);                               // src/leaf/auto_03_800FB958_text_cb.cpp
-void app_PlayMusic(u32 a0, f32 a1);  // type 0x76 (from signature table)
+void app_PlayMusic(u32 a0, f32 a1);                                    // src/game/draft_miss162.cpp
 void app_StopMusic(void);                                              // src/game/game_flow.cpp
 void decr_reg(void* a0, BOOL a1);                                      // src/game/small_800F.cpp
 void decr_reg0(void* a0);                                              // src/game/small_800F.cpp

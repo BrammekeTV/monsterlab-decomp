@@ -7,7 +7,7 @@ void  fn_800A7D88(void* obj, u32 hash);                 // 0x800A7D88
 void  fn_800B1D98(u8* p);                               // 0x800B1D98
 BOOL  fn_801B50B0(void* unused, u8* obj);               // 0x801B50B0
 void fn_801B6F34(u8* p);                           // 0x801B6F34
-void  fn_801F61AC(u8* p, s32 a);                        // 0x801F61AC
+u8* fn_801F61AC(u8* arg0, s32 arg1);                        // 0x801F61AC
 void  fn_801F94B0(u8* p, s32 v);                        // 0x801F94B0
 void  fn_800C9500(u8* p, u8* item);                     // 0x800C9500
 void  fn_800C69DC(u8* obj);                             // 0x800C69DC
