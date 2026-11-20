@@ -20,7 +20,7 @@ void fn_801BC350(u8* a, u8* b);         // 0x801BC350
 void fn_801BB478(u8* p, s32 a1);        // 0x801BB478
 u8* fn_80216658(GameDb* db, s32 key);   // 0x80216658
 u32 EffectEmitter(void* db, s32 effect, s32 limb);   // 0x800523B8
-s32 fn_801EBFBC(u8* a, u8* b);          // 0x801EBFBC
+void fn_801EBFBC(u8* arg0, u8* arg1);          // 0x801EBFBC
 s32 fn_801DA5F4(s32 a, u8* b, s32 c);          // 0x801DA5F4
 void fn_8018C0A8(u8* h, void* a);       // 0x8018C0A8
 void fn_8018B2CC(u8* obj, u8* entry, s32 a, s32 b, f32 c, f32 d);   // 0x8018B2CC

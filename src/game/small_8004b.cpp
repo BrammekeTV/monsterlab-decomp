@@ -270,11 +270,12 @@ u8* fn_80049664(u8* p, s32 del) {
 
 // 0x800496DC
 // Constructor: base constructor, a vtable, one action-choice slot at +0x4C, pending flag +0x58 clear.
-void fn_800496DC(u8* p, s32 a2) {
+u8* fn_800496DC(u8* p, s32 a2) {
     fn_8020F3D4(p, a2);
     *(void**)p = lbl_80358BC8;
     ChoiceInit(p + 0x4C);
     p[0x58] = 0;
+    return p;
 }
 
 // 0x80049728

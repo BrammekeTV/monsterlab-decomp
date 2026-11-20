@@ -94,6 +94,11 @@
  "changelog": [
   {
    "date": "2026-11-20",
+   "time": "21:45",
+   "text": "Decompile 36 more missing functions (object constructors fn_8002*/fn_8003*, fn_8008*/fn_8009* effect helpers, fn_801EA*/fn_801EB* list helpers, fn_800497F4, ...); fix prototypes"
+  },
+  {
+   "date": "2026-11-20",
    "time": "21:34",
    "text": "Decompile 37 more missing functions (Wii_PlayConversationIntro, fn_8006C6C0 mode switch, fn_8007D860, fn_801D* object helpers, fn_8001B20C, fn_800508EC, ...); fix prototypes"
   },

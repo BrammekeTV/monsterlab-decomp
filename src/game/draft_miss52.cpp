@@ -51,7 +51,7 @@ s32   PartGetCurrentHealth(const PartInstance* p);                      // 0x802
 void  PartSetHealth(PartInstance* p, s32 hp);
 void  LimbStatusInit(u8** field, PartInstance** part);                  // 0x80214A58
 
-void  fn_8020EAD4(u8* rec);                                             // 0x8020EAD4
+u8* fn_8020EAD4(u8* arg0);                                             // 0x8020EAD4
 void  fn_8020EDF0(u8* dst, u8* src);                                    // 0x8020EDF0
 void  fn_8020EB44(u8* p, s32 del);                                      // 0x8020EB44
 void  fn_8003E000(u8* a, u8* b, u8* c);                                 // 0x8003E000

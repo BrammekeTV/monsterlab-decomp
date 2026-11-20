@@ -54,7 +54,7 @@ u8* fn_80038618(u8* p);                                         // 0x80038618
 u8* fn_80039CF8(u8* p);                                         // 0x80039CF8
 void fn_8003E0A4(void);                                         // 0x8003E0A4
 u8* fn_80040824(u8* p);                                         // 0x80040824
-s32 fn_80040ACC(u8* obj, u8* a, u8* b);                         // 0x80040ACC
+void fn_80040ACC(u8* arg0, u8* arg1, u8* arg2);                         // 0x80040ACC
 u8* fn_800497F4(u8* p);                                         // 0x800497F4
 s32 fn_800508D0(void);                                          // 0x800508D0
 void fn_800508EC(void);                                         // 0x800508EC
@@ -62,7 +62,7 @@ void fn_80050EB0(f32 a0);                                       // 0x80050EB0
 u8* fn_8004EDD0(u8* obj, s32 flag, s32 a2);                     // 0x8004EDD0
 u8* fn_8005CA88(u8* p);                                         // 0x8005CA88
 void* fn_800E60BC(void);                                        // 0x800E60BC
-s32 fn_8011ECCC(s8 c);                                          // 0x8011ECCC
+void* fn_8011ECCC(s8 arg0);                                          // 0x8011ECCC
 void fn_801265F4(void);                                         // 0x801265F4
 void fn_80126808(void);                                         // 0x80126808
 void fn_801458B0(f32* quat, f32* a, f32* b);                    // 0x801458B0
@@ -76,7 +76,7 @@ s32 fn_8019DC50(void* el);                                      // 0x8019DC50
 u8* fn_801B3308(void);                                          // 0x801B3308
 void fn_801B3310(u8* p, u8* q);                                 // 0x801B3310
 void* fn_801D40E0(s32 n);                                       // 0x801D40E0
-void fn_8020EAD4(u8* rec);                                      // 0x8020EAD4
+u8* fn_8020EAD4(u8* arg0);                                      // 0x8020EAD4
 void fn_8020F2A4(u8* p);                                         // 0x8020F2A4
 s32 fn_80213130(u8* battle, u8* x);                             // 0x80213130
 s32 fn_80213150(u8* battle, u8* x);                             // 0x80213150
@@ -222,7 +222,7 @@ void Wii_PlayConversationIntro(BOOL a0) {
             i++;
         }
         u8* ent = *(u8**)(gGameDb->data + 0x8930) + row * 8;
-        s32 tex = fn_8011ECCC(*(s8*)(ent + 0x4));
+        s32 tex = (s32)(intptr_t)fn_8011ECCC(*(s8*)(ent + 0x4));  // lint:ok 32-bit slot
         void* set = ScreenSetsCurrent(gScreenSets);
         if (set != NULL) {
             void* w = ScreenSetFindWidget(set, 0xBEF77BAEu);
