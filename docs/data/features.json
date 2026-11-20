@@ -94,6 +94,11 @@
  "changelog": [
   {
    "date": "2026-11-20",
+   "time": "22:35",
+   "text": "Decompile 39 more missing functions (fn_801A*/fn_801B*/fn_801D*/fn_801E* UI, object and list helpers); fix prototypes"
+  },
+  {
+   "date": "2026-11-20",
    "time": "22:33",
    "text": "Decompiled 58 more missing functions (fn_8002*/fn_8004* object helpers, fn_800A*/fn_800B*/fn_800C* effect helpers, fn_8012*-fn_8015* helpers, ...); prototype fixes"
   },
