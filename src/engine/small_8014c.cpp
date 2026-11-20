@@ -12,7 +12,7 @@ extern "C" {
 extern "C" {
 void  operator_delete(void* p);                                  // 0x801D426C
 s32   fn_803334E8(void* a, s32 flag);                            // 0x803334E8
-s32   fn_80146E44(u8* p);                                        // 0x80146E44
+s32   fn_80146E44(u8* p, u8* dst, s32 count);                                        // 0x80146E44
 void  fn_80146D98(u8* p);                                        // 0x80146D98
 s32   fn_80146DD8(u8* p, s32 mode, s32 val);                     // 0x80146DD8
 void  fn_80334458(void* obj, s32 x, s32 y);                      // 0x80334458
@@ -71,12 +71,12 @@ void LogAutoDelete(BOOL a0) {
 
 // 0x80146930
 // Dispatches to the attached child when present; otherwise, for state 1, runs the inline sub-object.
-s32 fn_80146930(u8* p, void* a) {
+s32 fn_80146930(u8* p, void* a, s32 c) {
     s32 r = 0;
     if (*(void**)(p + 0x4) != 0) {
         r = fn_803334E8(a, 1);
     } else if (*(s32*)(p + 0x0) == 1) {
-        r = fn_80146E44(p + 0xc);
+        r = fn_80146E44(p + 0xc, (u8*)a, c);
     }
     return r;
 }

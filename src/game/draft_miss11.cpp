@@ -54,7 +54,7 @@ void*  UIWidgetFindChild(void* widget, u32 hash);                // 0x80199AEC
 void   UIWidgetPlayAnim(void* w, u32 anim);                      // 0x80199B38
 void   ZoneLog(void* loader, const char* fmt, ...);              // 0x801D7340
 void   fn_801384B0(u8* world, s32 slot, s32 a);                  // 0x801384B0
-void   fn_80138250(u8* world, s32 slot);                         // 0x80138250
+s32    fn_80138250(u8* world, s32 slot);                         // 0x80138250
 void   fn_8013F45C(void* widget, s32 a);                         // 0x8013F45C
 BOOL   fn_80198C34(void* set, void* w);                          // 0x80198C34
 u8*    fn_8019BF64(u8* widget, u32 hash);                        // 0x8019BF64

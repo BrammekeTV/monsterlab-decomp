@@ -54,7 +54,7 @@ extern "C" void fn_8005BF7C(u8*, s32, s32);
 extern "C" void fn_8006AD84(u8*);
 extern "C" void fn_8006B974(u8*);
 extern "C" s32 fn_8006B9CC(u8*);
-extern "C" void fn_8006CD70(u8*, s32);
+extern "C" void fn_8006CD70(u8*, u32);
 extern "C" void fn_8006CE08(u8*);
 extern "C" s32 fn_800D68CC(u8*, s32, s32);
 extern "C" void fn_800E69EC(s32);
@@ -892,14 +892,13 @@ void SetHazardAttackTime(void* a3, f32 f1) {
 
 // 0x800F8F10
 void StartHazardEffect(void* a3, u32 a4) {
-    // tail-call arguments inferred from the registers set before the call
     u8* t0 = *(u8**)(((u8*)(uintptr_t)(a3)) + 4);
     s32 t1 = *(s32*)(t0 + 28);
     u32 t2 = (u32)(t1) & 0x8000u;
     if (t2 == 0) {
         return;
     }
-    fn_8006CD70(((u8*)(uintptr_t)(a3)), (s32)((u32)(uintptr_t)(a4)));
+    fn_8006CD70(((u8*)(uintptr_t)(a3)), (u32)((u32)(uintptr_t)(a4)));
 }
 
 // 0x800F8F28

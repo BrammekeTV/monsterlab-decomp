@@ -42,7 +42,7 @@ void  fn_800D5C48(u8* arg0, s32 arg1);
 void  fn_80016FD0(Character* c, int animate);
 void* ScreenSetFindWidget(void* set, u32 hash);             // 0x80198E34
 void  ScreenSetsFlush(void* sets);
-s32   fn_800C79C0(s32 a);                                   // 0x800C79C0
+u8*   fn_800C79C0(u8* a);                                    // 0x800C79C0
 u8*   fn_800C73EC(u8* h);                                    // 0x800C73EC
 s32   fn_801B5510(u8* a, u8* b, s32 c, f32* v, s32 d);      // 0x801B5510
 void  fn_802188A8(u8* lab, u8* entry);                      // 0x802188A8 (stores r4 at lab+0x48)
@@ -86,7 +86,7 @@ void  fn_800D5C48(u8* arg0, s32 arg1);
 void  fn_80016FD0(Character* c, int animate);
 void* ScreenSetFindWidget(void* set, u32 hash);             // 0x80198E34
 void  ScreenSetsFlush(void* sets);
-s32   fn_800C79C0(s32 a);                                   // 0x800C79C0
+u8*   fn_800C79C0(u8* a);                                    // 0x800C79C0
 u8*   fn_800C73EC(u8* h);                                    // 0x800C73EC
 s32   fn_801B5510(u8* a, u8* b, s32 c, f32* v, s32 d);      // 0x801B5510
 void  fn_802188A8(u8* lab, u8* entry);                      // 0x802188A8 (stores r4 at lab+0x48)
@@ -510,10 +510,10 @@ void StartNISFSM(u32 a0) {
 void Stitching_Reticle_ReadyToFire(void* a0) {
     u8* r = (u8*)a0;
     if (r != NULL && *(s32*)(r + 0x268) == 0 && *(s32*)(r + 0x26C) != 0) {
-        s32 v = fn_800C79C0(*(s32*)(r + 0x264));
-        *(s32*)(r + 0x268) = v;
+        u8* v = fn_800C79C0((u8*)*(u8**)(r + 0x264));
+        *(u8**)(r + 0x268) = v;
         if (v != 0) {
-            u8* obj = fn_800C73EC((u8*)(intptr_t)v);
+            u8* obj = fn_800C73EC(v);
             if (obj != NULL) {
                 const f32 k = lbl_805FE510;
                 u8* m = *(u8**)(r + 0x98) + *(s32*)(r + 0x270) * 0xC8;

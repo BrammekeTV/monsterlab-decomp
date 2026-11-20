@@ -34,7 +34,7 @@ void        EventSend(void* mgr, void* target, void* from, u32 event, int a, int
 s32         WorldGetPhase(void* world);                           // 0x800D83A8
 u8*         ObjDbLookup(void* db, s32 id);                        // 0x800D39BC
 u8*         ObjRefDtor(u8* ref, s32 flags);                       // 0x800D50D0
-s32         fn_800D5B1C(void* obj, s32 a0, f32* pos);             // 0x800D5B1C
+void        fn_800D5B1C(u8* obj, s32 a0, f32* pos);             // 0x800D5B1C
 void        fn_801ED788(f32* out, u8* a1);                        // 0x801ED788
 void*       fn_8010C90C(u32 pool, f32* pos, s32 flag);            // 0x8010C90C
 void        SpawnEffectAt(void* fxMgr, u32 effect, const f32 posAndScale[4], int a); // 0x801C80E0
@@ -155,7 +155,7 @@ void SpawnParticleAtJunction(u32 a0, u32 a1) {
     for (s32 off = 0; off <= 0x404; off += 4) *(u32*)((u8*)words + off) = *(u32*)(obj + off);
     Vec3* p = PathGetPosition((PathFollower*)words);
     f32 pos[3] = { p->x, p->y, p->z };
-    fn_800D5B1C(words, (s32)a0, pos);
+    fn_800D5B1C((u8*)words, (s32)a0, pos);
     ObjRefDtor((u8*)words, -1);
 }
 

@@ -43,7 +43,7 @@ void fn_801F5528(void);
 void fn_801C7570(u8* list, s32 n);
 s32  fn_801D3A60(s32 id);
 void fn_801C9D74(u8* p);
-void fn_8020A6C8(void* a0);
+void fn_8020A6C8(void);
 void fn_801C3924(void* a0);
 void fn_801BDA0C(void* a0);
 void fn_801D8D7C(void);
@@ -248,7 +248,7 @@ void fn_80129438(u8* p) {
     fn_80128C20(p);
     if (p[5] != 0) {
         fn_801C9D74(lbl_8047C760);
-        fn_8020A6C8(lbl_8047C760);
+        fn_8020A6C8();
         fn_801C3924(lbl_8047C7AC);
         fn_801BDA0C(lbl_8047C790);
     }

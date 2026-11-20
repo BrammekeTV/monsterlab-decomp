@@ -16,7 +16,7 @@ void   ChoiceInit(u8* c);
 void*  EventPost(s32 id, void* sender);                         // 0x801F3918
 int    SysSprintf(char* buf, const char* fmt, ...);
 void   fn_801F5714(s32 flags);                                  // 0x801F5714
-void   fn_8013A780(void);                                       // matchup callback
+void   fn_8013A780(s32 a, s32 b);                                       // matchup callback
 s32    fn_802E9AB0(u8* p, s32 a, s32 b, s32 c, void* cb, s32 d, s32 e, s32 f);
 s32    fn_802E6528(s32* args, s32 a, s32 b, s32 c, s32 d);      // 0x802E6528, signature guessed by draft_batch
 void   fn_8023A5B0(u8* p);                                      // 0x8023A5B0

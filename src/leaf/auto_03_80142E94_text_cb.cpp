@@ -7,10 +7,9 @@
 #include "game/script_callbacks.h"
 
 extern u8 lbl_803F22D8[];
-extern "C" BOOL fn_80143350(u8*);
+extern "C" s32 fn_80143350(u8*);
 
 // 0x80142F84
 BOOL StartTest(void) {
-    // tail-call arguments inferred from the registers set before the call
     return (BOOL)(fn_80143350((u8*)&lbl_803F22D8));
 }

@@ -20,8 +20,8 @@ BOOL  fn_80147554(s32 button);                                  // 0x80147554
 void  fn_801FCA38(f32 a, f32 b);                                // 0x801FCA38
 u32   fn_80140CE0(void);                                        // 0x80140CE0
 BOOL  fn_8013E464(void);                                        // 0x8013E464
-void  fn_80143158(u8* p);                                       // 0x80143158
-void  fn_8014328C(void* p);                                     // 0x8014328C (global destructor)
+u8*   fn_80143158(u8* p);                                       // 0x80143158
+u8*   fn_8014328C(u8* p, s32 del);                                    // 0x8014328C (global destructor)
 void  __register_global_object(void* obj, void (*dtor)(void*), void* handle);
 void  fn_8023D3C8(s32 hi, u32 lo);                              // 0x8023D3C8
 }

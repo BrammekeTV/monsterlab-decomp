@@ -33,7 +33,7 @@ void* fn_80123364(u8* p, s32 del);               // 0x80123364
 void fn_8032F1E8(u8* arr, void (*ctor)(void), void (*dtor)(void*, s32), s32 size, s32 count);  // 0x8032F1E8
 void fn_8032F358(void* obj, void* cb);           // 0x8032F358
 void __destroy_arr(void* arr, void (*dtor)(void*, s32), u32 size, u32 count);  // 0x8032F2E0
-void fn_80138380(void);                          // 0x80138380
+s32 fn_80138380(u8* world, s32 slot);                        // 0x80138380
 void OSReturnToDataManager(void);
 void operator_delete(void* p);                   // 0x801D426C
 u32 RandomU32(void);                             // 0x80143460
@@ -308,8 +308,8 @@ void SaveManager_ReturnToMainMenu(void) {
 
 // 0x80131C28
 // Releases the zone slot (tail call).
-void ReleaseZoneSlot(void) {
-    fn_80138380();
+s32 ReleaseZoneSlot(u8* world, s32 slot) {
+    return fn_80138380(world, slot);
 }
 
 // 0x802255FC

@@ -82,7 +82,7 @@ void   fn_801514F0(void);                                        // 0x801514F0
 void   fn_8015150C(const f32* v, f32 a, f32 b);                  // 0x8015150C
 void   fn_80149540(void);                                        // 0x80149540
 void   fn_80149594(void);                                        // 0x80149594
-void   fn_8014970C(s32 a, s32 b, s32 c);                         // 0x8014970C
+void   fn_8014970C(s32 a, s32 b);                         // 0x8014970C
 void   fn_80149744(s32 a);                                       // 0x80149744
 void   fn_8014977C(f32 v);                                       // 0x8014977C
 void   fn_80149780(void);                                        // 0x80149780
@@ -651,7 +651,7 @@ void RendSetDefaultState(void) {
     fn_8010AB70();
     fn_801514F0();
     fn_80149594();
-    fn_8014970C(6, 8, 0xFF);
+    fn_8014970C(6, 8);
     fn_8010AAE0();
     fn_80154318();
     fn_80149744(2);
