@@ -17,7 +17,7 @@ void   fn_80160AFC(u8* p);                                                      
 void   fn_801604F4(u8* p);                                                      // 0x801604F4 (asm passes lbl_8040D500)
 void   fn_80188E14(void);                                                       // 0x80188E14
 void   fn_801483CC(u8* a3);                                                     // 0x801483CC
-void   fn_801483FC(void);                                                       // 0x801483FC (address only)
+u8*    fn_801483FC(u8* obj, s32 del);                                                      // 0x801483FC (address only)
 void*  fn_8032F028(void* mem, void* ctor, void* a, s32 size, s32 count);        // 0x8032F028
 extern u8*  lbl_803C6A88[3];       // smasher record table (key at +4)
 extern u8   lbl_8047C760[];        // effect manager

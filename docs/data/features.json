@@ -94,6 +94,11 @@
  "changelog": [
   {
    "date": "2026-11-20",
+   "time": "11:35",
+   "text": "Decompile 31 more missing functions (fn_8014E*/fn_8016*/fn_8017* renderer and heap helpers, fn_8018* screen-set and font helpers, ...); fix prototypes"
+  },
+  {
+   "date": "2026-11-20",
    "time": "11:27",
    "text": "Decompile 37 more missing functions (fn_8015*/fn_8016* renderer and viewport helpers, RobotEvolutionExperiment_SmasherHit/Miss, fn_8014* file helpers, ...); fix prototypes"
   },

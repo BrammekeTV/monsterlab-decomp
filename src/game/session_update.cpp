@@ -51,7 +51,7 @@ void   fn_80150148(void);  void fn_801514F0(void);
 void   fn_801542DC(void);  void fn_80154318(void);
 s32   fn_8016195C(void* p, s32 a, s32 b, s32 c);
 void   fn_8016FB20(void* view);  void fn_80170044(void* view);
-void   fn_8018CE64(void* sets, void* camPos, void* camData);
+void   fn_8018CE64(void* sets, void* a, void* b, void* c);
 void   fn_8018DEF4(void* sets);
 void   fn_801B42B4(void* p);
 void   fn_801D5F98(f32 dt);
@@ -460,7 +460,7 @@ void GameSessionUpdate(GameSession* s, f32 a, f32 dt) {
     if (cam != NULL) {
         u8 camData[0x40];
         ((void (*)(void*, void*))VT(cam, 0x38))(cam, camData);
-        fn_8018CE64(gScreenSets, *(u8**)((u8*)cam + 4) + 0xC, camData);
+        fn_8018CE64(gScreenSets, *(u8**)((u8*)cam + 4), *(u8**)((u8*)cam + 4) + 0xC, camData);
     }
 }
 

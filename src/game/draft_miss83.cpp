@@ -30,7 +30,7 @@ void   fn_80172E84(u8* obj);                                               // 0x
 void*  fn_80172F70(s32 a, const void* b);                                  // 0x80172F70
 void   fn_801731C8(void* p);                                               // 0x801731C8
 void   fn_801732B0(u8* p);                                                 // 0x801732B0
-void   fn_80174C2C(u8* p);                                                 // 0x80174C2C
+s32    fn_80174C2C(u8* p);                                                 // 0x80174C2C
 void   fn_80188D24(void);                                                  // 0x80188D24
 void   fn_80188F00(const char* fmt, ...);                                  // 0x80188F00
 void   TextureRelease(void* tex);                                          // 0x80184028

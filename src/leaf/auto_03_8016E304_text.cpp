@@ -19,9 +19,9 @@ extern u8 lbl_805FF630[];
 extern "C" void BufferFree(void*);
 extern "C" void* MEMAllocFromAllocator(u8*, u32);
 extern "C" void MEMFreeToAllocator(u8*, void*);
-extern "C" void fn_80184314(s32, s32, s32);
-extern "C" void fn_80184490(s32, s32, s32);
-extern "C" void fn_8018979C(s32, s32, s32, s32);
+extern "C" void fn_80184314(void*, void*, s32);
+extern "C" void fn_80184490(void*, void*, s32);
+extern "C" void fn_8018979C(u8*, s8*, s32*, s32*);
 extern "C" void fn_801EF070(u8*, void*);
 extern "C" void* fn_80330D80(s32);
 extern "C" void fn_80330E20(void*);
@@ -355,15 +355,13 @@ extern "C" u8* fn_801842C8(u8* a3) {
 }
 
 // 0x8018430C
-extern "C" void fn_8018430C(s32 a3, s32 a4) {
-    // tail-call arguments inferred from the registers set before the call
-    fn_80184314((s32)((u32)(uintptr_t)(a3)), (s32)((u32)(uintptr_t)(a4)), (s32)((u32)(0)));
+extern "C" void fn_8018430C(u8* a3, u8* a4) {
+    fn_80184314((void*)(((u8*)(uintptr_t)(a3))), (void*)(((u8*)(uintptr_t)(a4))), (s32)((u32)(0)));
 }
 
 // 0x80184488
-extern "C" void fn_80184488(s32 a3, s32 a4) {
-    // tail-call arguments inferred from the registers set before the call
-    fn_80184490((s32)((u32)(uintptr_t)(a3)), (s32)((u32)(uintptr_t)(a4)), (s32)((u32)(0)));
+extern "C" void fn_80184488(u8* a3, u8* a4) {
+    fn_80184490((void*)(((u8*)(uintptr_t)(a3))), (void*)(((u8*)(uintptr_t)(a4))), (s32)((u32)(0)));
 }
 
 // 0x80185C94
@@ -376,10 +374,9 @@ extern "C" void fn_80188ED4(s32 a3) {
 }
 
 // 0x80188EDC
-extern "C" void fn_80188EDC(s32 a3, s32 a4, s32 a5) {
-    // tail-call arguments inferred from the registers set before the call
-    s32 t0 = *(s32*)((u8*)&lbl_80412BC0 + 16);
-    fn_8018979C((s32)((u32)(t0)), (s32)((u32)(uintptr_t)(a3)), (s32)((u32)(uintptr_t)(a4)), (s32)((u32)(uintptr_t)(a5)));
+extern "C" void fn_80188EDC(u8* a3, u8* a4, u8* a5) {
+    u8* t0 = *(u8**)((u8*)&lbl_80412BC0 + 16);
+    fn_8018979C(t0, (s8*)(((u8*)(uintptr_t)(a3))), (s32*)(((u8*)(uintptr_t)(a4))), (s32*)(((u8*)(uintptr_t)(a5))));
 }
 
 // 0x8018A3E4

@@ -19,7 +19,7 @@ void* EventPost(s32 id, s32 flags);                              // 0x801F3918
 void  fn_8032F1E8(u8* obj, void (*cb)(void), s32 a, s32 b, s32 c); // 0x8032F1E8
 void  fn_801399E8(void);                                         // 0x801399E8
 void  fn_8013ADD8(s32 step);                                     // 0x8013ADD8 (friends list scroll step)
-void  fn_8018CF1C(void* sets, void* widget);                     // 0x8018CF1C
+s32   fn_8018CF1C(void* sets, void* widget);                     // 0x8018CF1C
 void  fn_8018D648(void* sets, s32 idx);                          // 0x8018D648
 s32   fn_802E64A0(u8* p, s32 n);                                 // 0x802E64A0
 void  fn_80116CA8(u8* p);                                        // 0x80116CA8
