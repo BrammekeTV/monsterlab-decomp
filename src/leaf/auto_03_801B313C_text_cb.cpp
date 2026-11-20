@@ -8,7 +8,7 @@
 
 extern void* gEventMgr;
 extern "C" void EventSendTo(void*, u32, void*, u32, int, int);
-extern "C" void TriggerDoAction(void*, void*, void*);
+extern "C" s32 TriggerDoAction(void*, void*, void*);
 
 // 0x801B6D80
 void BroadcastToDstGroup(void* a3, u32 a4) {

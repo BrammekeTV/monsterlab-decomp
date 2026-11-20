@@ -643,7 +643,7 @@ void InitPreloadFader(s32 a3);                                         // src/le
 void InitProgressScreen(u32 a0);                                       // src/game/draft_miss112.cpp
 void InitRematchFlow(void);                                            // src/leaf/auto_03_8013F034_text_cb.cpp
 u32 InitializeMerchantIngredients(s32 a3);                             // src/leaf/auto_03_800E75B0_text_cb.cpp
-void InitializeOperatingTable(void);  // type 0x8F (from signature table)
+void InitializeOperatingTable(void);                                   // src/game/draft_miss182.cpp
 void InspectOpponentDeInit(void);                                      // src/leaf/auto_03_8013C600_text_cb.cpp
 void InspectOpponentInit(void);                                        // src/game/draft_miss25.cpp
 void InspectOpponentUpdate(void);                                      // src/game/draft_miss112.cpp
@@ -821,8 +821,8 @@ void LoadExperimentUI(s32 a3);                                         // src/le
 void LoadInventoryMonster(void);                                       // src/game/draft_miss27.cpp
 void LoadLevel(u32 a0);                                                // src/game/draft_miss31.cpp
 void Loading_SetHomeButtonGone(void);                                  // src/game/draft_miss28.cpp
-void LobShot(void* a0, u32 /*0x30*/ a1, u32 /*0x38*/ a2, f32 a3, f32 a4);  // type 0xFA (from signature table)
-void LobWarningShot(void* a0, u32 /*0x30*/ a1, u32 /*0x38*/ a2, f32 a3, f32 a4);  // type 0xFA (from signature table)
+void LobShot(void* a0, u32 /*0x30*/ a1, u32 /*0x38*/ a2, f32 a3, f32 a4); // src/game/draft_miss182.cpp
+void LobWarningShot(void* a0, u32 /*0x30*/ a1, u32 /*0x38*/ a2, f32 a3, f32 a4); // src/game/draft_miss182.cpp
 void LockCameraToEntity(u32 a0);                                       // src/game/small_800Fb.cpp
 void LockCurrentJunctionPath(BOOL a3, u32 a4);                         // src/leaf/auto_03_800E75B0_text_cb.cpp
 void LockInput(s32 a3);                                                // src/leaf/auto_03_8010FDA4_text_cb.cpp
@@ -984,7 +984,7 @@ void PlayEntitySoundGroupFX(void* a0, u32 a1, u32 /*0x06*/ a2);        // src/ga
 void PlayExperimentSound(void* owner, u32 id, s32 vol);                // src/game/draft_8007b.cpp
 void PlayExperimentSoundAtPropLocation(void* owner, u32 id, s32 vol);  // src/game/draft_8007b.cpp
 void PlayExperimentSoundAttached(void* owner, u32 id, s32 vol);        // src/game/draft_8007b.cpp
-void PlayFootStepEffect(void* a0);  // type 0x2F (from signature table)
+void PlayFootStepEffect(void* a0);                                     // src/game/draft_miss182.cpp
 void PlayFootStepSound(void* a0);                                      // src/game/draft_miss6.cpp
 void PlayInjuredAnimation(void* a0);                                   // src/game/draft_miss43.cpp
 void PlayMonsterAttackAnimation(u32 /*0x55*/ a0);                      // src/game/draft_miss6.cpp
@@ -1485,9 +1485,9 @@ void Troublescope_SetLegs(void);                                       // src/ga
 void Troublescope_SetRightArm(void);                                   // src/game/draft_miss47a.cpp
 void Troublescope_SetTorso(void);                                      // src/game/draft_miss47a.cpp
 void Troublescope_UnLoadPartImage(void);                               // src/game/draft_miss47a.cpp
-void Troublescope_Update(void);  // type 0x8F (from signature table)
+void Troublescope_Update(void);                                        // src/game/draft_miss183.cpp
 void TurretNoTargetMe(void* a3, void* a4);                             // src/leaf/auto_03_800E75B0_text_cb.cpp
-void TurretSetMuzzle(void* a0, u32 /*0x30*/ a1);  // type 0xF8 (from signature table)
+void TurretSetMuzzle(void* a0, u32 /*0x30*/ a1);                       // src/game/draft_miss183.cpp
 void TurretSetRotateMode(void* a0, s32 a1);                            // src/game/small_800Ec.cpp
 void TurretTargetMe(void* a3, void* a4);                               // src/leaf/auto_03_800E75B0_text_cb.cpp
 void TurretTrackTarget(void* a3, f32 f1);                              // src/leaf/auto_03_800E75B0_text_cb.cpp
@@ -1501,12 +1501,12 @@ void UnlockCurrentJunctionPath(BOOL a3);                               // src/le
 void UnlockJunctionPath(u32 a0, BOOL a1);                              // src/game/draft_800F.cpp
 void Unpause(void);                                                    // src/leaf/auto_03_800E75B0_text_cb.cpp
 void UnspawnAttachedParticleAtChild(void* a0, u32 a1);                 // src/game/draft_miss49b.cpp
-void UpdateCombatHUD(f32 a0);  // type 0x69 (from signature table)
+void UpdateCombatHUD(f32 a0);                                          // src/game/draft_miss183.cpp
 void UpdateDanceAnimation(void* a0, f32 a1);                           // src/game/small_8007c.cpp
 void UpdateFader(void);                                                // src/leaf/auto_03_801D5D0C_text_cb.cpp
 void UpdateJournalEntryCount(u32 a3, s32 a4, u32 a5);                  // src/leaf/auto_03_800E75B0_text_cb.cpp
 void UpdateJournalEntryIcon(u32 a3, u32 a4);                           // src/leaf/auto_03_800E75B0_text_cb.cpp
-void UpdatePartLoading(void);  // type 0x8F (from signature table)
+void UpdatePartLoading(void);                                          // src/game/draft_miss183.cpp
 void UpdateSelectedIngredients(void);                                  // src/game/draft_8011c.cpp
 void UpdateSelectedIngredientsRecipe(void);                            // src/game/lab_books_b.cpp
 void UpdateSelectedRecipe(void);                                       // src/game/draft_8011c.cpp

@@ -20,7 +20,7 @@ void     operator_delete(void* p);                                              
 void     SpawnEffectAt(void* fxMgr, void* effect, const f32 posAndScale[4], int a); // 0x801C80E0
 void     fn_80061A98(u8* p, s32* a, s32 v);                                     // 0x80061A98
 u8*     fn_801B44AC(u8* p, s32 del);                                           // 0x801B44AC (base dtor)
-void     fn_801B4334(u8* p);                                                    // 0x801B4334 (base ctor)
+u8* fn_801B4334(u8* arg0, s32 layer, u8* ent, s32 reset);                                                    // 0x801B4334 (base ctor)
 void     fn_801B4944(u8* p);                                                    // 0x801B4944
 void     fn_80122B00(void* a, u8* b);                                           // 0x80122B00
 u8* fn_8006F61C(u8* arg0);                                                    // 0x8006F61C
@@ -126,7 +126,7 @@ void fn_80062C40(void) {
 // 0x80062C80
 // Base constructor: calls fn_801B4334, sets the vtable and marks the child at +4 with bits 0x2, state 1.
 u8* fn_80062C80(u8* p) {
-    fn_801B4334(p);
+    fn_801B4334(p, 0, NULL, 0);  // r4-r6 forwarded from caller in asm
     *(void**)p = lbl_80359BC8;
     SetChildStateBits(p, 0x2, 1);
     return p;

@@ -29,7 +29,7 @@ void fn_800980C8(u8* obj, s32 mode);                                    // 0x800
 void fn_800980F8(u8* p, s32 b);                                         // 0x800980F8
 f32 fn_80098700(u8* p);                                                 // 0x80098700
 void fn_80098E74(u8* p);                                                // 0x80098E74
-void fn_80146808(u8* file, const char* name, const char* mode);         // 0x80146808
+s32  fn_80146808(u8* file, const char* name, const char* mode);         // 0x80146808
 s32 fn_80146930(u8* file, void* buf, s32 size);                         // 0x80146930
 void fn_801469FC(u8* file);                                             // 0x801469FC
 s32 fn_80146A58(u8* file);                                              // 0x80146A58

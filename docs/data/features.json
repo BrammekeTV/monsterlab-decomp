@@ -94,6 +94,11 @@
  "changelog": [
   {
    "date": "2026-11-20",
+   "time": "21:21",
+   "text": "Decompile 40 more missing functions (SaveCount*/SaveRecord* counters, UpdateCombatHUD, Troublescope_Update, LobShot, MemRealloc, RayQueryCast, HomeButtonInit, ...); fix prototypes"
+  },
+  {
+   "date": "2026-11-20",
    "time": "17:14",
    "text": "Decompile 43 more missing functions (BrainPowerUpEnact, FireShot, FireWarningShot, CatchMinigame_SpawnInLane, SaveReset, fn_801BC* and fn_8015E* helpers, ...); fix prototypes"
   },

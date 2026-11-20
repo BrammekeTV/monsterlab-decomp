@@ -64,9 +64,9 @@ s32 fn_80065200(u8* arg0, u8* arg1, void* arg2, u8* arg3, s32 arg4, s32 arg5, s3
 void fn_800690D4(u8* p, s32 a, void* params, s32 b);                  // 0x800690D4
 u8* fn_8006CCC4(u8* obj, s32 a1, void* a2, s32 a3);                   // 0x8006CCC4
 u8* fn_8006CFA4(u8* obj, s32 a, void* params, s32 b);                 // 0x8006CFA4
-u8* fn_8006D2D0(u8* p, s32 a, void* b, s32 c);                        // 0x8006D2D0
+u8* fn_8006D2D0(u8* p);                        // 0x8006D2D0
 u8* fn_8006F61C(u8* arg0);                                            // 0x8006F61C
-u8* fn_8006F6BC(u8* p, s32 a, void* b, s32 c);                        // 0x8006F6BC
+u8* fn_8006F6BC(u8* p);                        // 0x8006F6BC
 void fn_800782AC(u8* obj, s32* outB, s32* outA);                      // 0x800782AC
 s32 fn_8007C5FC(u8* rec, s32 a, s32 b, s32 c, u8* d, u8* e);          // 0x8007C5FC
 void fn_8007D2BC(u8* a3, f32 f1);                                     // 0x8007D2BC
@@ -107,12 +107,12 @@ void fn_80144624(u8* mtx, const Vec3* axis, f32 angle);               // 0x80144
 void fn_8014DE68(void);                                               // 0x8014DE68
 void fn_80154398(void);                                               // 0x80154398
 s32 fn_8015BA30(void* dl);                                            // 0x8015BA30
-void fn_8016A324(u8* p);                                              // 0x8016A324
+s32 fn_8016A324(u8* p);                                              // 0x8016A324
 void fn_80173568(u8* p);                                              // 0x80173568
-void fn_80175088(u8* p);                                              // 0x80175088
+s32 fn_80175088(u8* p);                                              // 0x80175088
 u32 fn_8018409C(u8* p);                                               // 0x8018409C
 void* fn_801BC574(void* p);                                           // 0x801BC574
-void fn_801B4334(u8* p);                                              // 0x801B4334
+u8* fn_801B4334(u8* arg0, s32 layer, u8* ent, s32 reset);                                              // 0x801B4334
 void fn_801B55F4(u8* obj, u8* out, s32 idx);                          // 0x801B55F4
 void fn_801B6F34(u8* p);                                              // 0x801B6F34
 void fn_801D94CC(u8* p);                                              // 0x801D94CC
@@ -1008,16 +1008,16 @@ void fn_8012F8B8(u8* obj, s32 arg1, s32 arg2) {
         fn_800636BC(obj);
         break;
     case 8:
-        fn_8006D2D0(obj, (s32)type, NULL, 0);
+        fn_8006D2D0(obj);
         break;
     case 9:
-        fn_8006F6BC(obj, (s32)type, NULL, 0);
+        fn_8006F6BC(obj);
         break;
     case 10:
         fn_8006307C(obj);
         break;
     default:
-        fn_801B4334(obj);
+        fn_801B4334(obj, 0, NULL, 0);  // r4-r6 forwarded from caller in asm
         break;
     }
 

@@ -42,7 +42,7 @@ s32   fn_801AA730(u8* dst, u8* src);                                  // 0x801AA
 void  fn_801AA760(u8* dst, u8* src);                                  // 0x801AA760
 void  fn_801AA7D8(void* track, s32 loop, s32 rev, f32 pos);           // 0x801AA7D8
 void  fn_801AAF14(void* a, f32 oldPos, f32 newPos, s32 loop, s32 rev);   // 0x801AAF14
-void  fn_801AB4C4(void* dst, void* src);                              // 0x801AB4C4
+s32 fn_801AB4C4(u8* dst, u8* src);                              // 0x801AB4C4
 s32   fn_801AB748(u8* p, f32 v);                                      // 0x801AB748
 f32   fn_801AB7F0(u8* a);                                             // 0x801AB7F0
 f32   fn_801AB818(u8* a);                                             // 0x801AB818
