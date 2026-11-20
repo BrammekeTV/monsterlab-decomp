@@ -26,7 +26,7 @@ void   fn_8018D2B8(const char* fmt, ...);                        // 0x8018D2B8 (
 void   fn_8018D370(const char* fmt, ...);                        // 0x8018D370 (debug log)
 s32    fn_801B5A60(u8* p);                                       // 0x801B5A60
 s32    fn_801B9F14(u8* sender, u32 id);                          // 0x801B9F14
-ScriptValue fn_801E1BD4(u8* a, u8* b, s32 word);                 // 0x801E1BD4
+ScriptValue fn_801E1BD4(u8* a, u8* b, u32* code);               // 0x801E1BD4
 const char* fn_801EB708(u32 hash);                               // 0x801EB708 (hash -> name for logs)
 void*  fn_801EEB20(u8* heap, u32 size);                          // 0x801EEB20 (heap alloc)
 void   fn_801EF070(u8* heap, void* p);                           // 0x801EF070 (heap free)
@@ -503,7 +503,7 @@ s32 TriggerDoAction(void* action, void* a1, void* a2) {
                 }
             }
             if (tbl != NULL && idx < *(u32*)tbl) {
-                result = fn_801E1BD4(obj, (u8*)a2, *(s32*)(*(u8**)(tbl + 0x4) + idx * 4));
+                result = fn_801E1BD4(obj, (u8*)a2, *(u32**)(*(u8**)(tbl + 0x4) + idx * 4));
             }
         }
     } else if (kind == 4) {

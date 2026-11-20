@@ -94,7 +94,7 @@ BOOL   fn_80198C34(void* set, void* w);                                // 0x8019
 ScriptValue fn_801A1208(u8* el);                                       // 0x801A1208
 s32    fn_801A3010(void* obj, void* data);
 void   fn_801B4EA4(u8* obj, s32 flag);                                 // 0x801B4EA4
-s32    fn_801D0C04(u8* obj, f32 dt);                                   // 0x801D0C04
+s32    fn_801D0C04(u8* obj, f64 dt);                                   // 0x801D0C04
 void*  fn_801D40E0(s32 n);                                             // 0x801D40E0
 u8*    fn_801DB2E4(u8* p, u32 key);                                    // 0x801DB2E4
 void*  fn_801DB194(u8* tmpl);                                          // 0x801DB194

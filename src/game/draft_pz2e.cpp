@@ -33,7 +33,7 @@ void   fn_801BDB6C(u8* node, f32 dt);                               // 0x801BDB6
 void   fn_801BF398(u8* list, u8* item);                             // 0x801BF398
 void   fn_801C4338(u8* node);                                       // 0x801C4338
 void   fn_801C5B0C(u8* node);                                       // 0x801C5B0C
-s32    fn_801D0DDC(u8* p);                                          // 0x801D0DDC
+u8*    fn_801D0DDC(u8* p, f64 dt);                                          // 0x801D0DDC
 void   fn_801EBA20(void* list, void* item);                         // 0x801EBA20
 void   fn_801F31A8(void);                                           // 0x801F31A8
 void   fn_801F5E48(void* a, s32 b);                                 // 0x801F5E48
@@ -700,7 +700,7 @@ s32 fn_801D0C04(u8* arg0, f64 dt64) {
         *(f32*)(p + 0x1C) = 0.0f;
         *(f32*)(p + 0x20) = 0.0f;
     }
-    return fn_801D0DDC(arg0);
+    return (s32)(size_t)fn_801D0DDC(arg0, dt64);
 }
 
 }  // extern "C"
