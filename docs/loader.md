@@ -313,7 +313,7 @@ read big-endian words.
 
 | Slot | Image offset | What is known | Why not |
 |---|---|---|---|
-| `0xD98`, `0xD9C` | `0xD77B0`, `0xD7820` | Screen list and HUD. A 0x70-byte object `{target, s32 current (-1), ...}`; the HUD holds up to 256 pointers to such objects from `+0x28`, count at `+0x428`. A target (`0xD4200`) has an array of 0x30-byte entries (`+0`, count `+4`), a pointer array of typed nodes (`+0x10`, count `+0x1C`, type 0-4 at node `+8`) and a key at `+0x30`; `fn_801BC5F0` installs vtables in all of them at boot | the node layouts per type are not decompiled |
+| `0xD98`, `0xD9C` | `0xD77B0`, `0xD7820` | Screen list and HUD. A 0x70-byte object `{target, s32 current (-1), ...}`; the HUD holds up to 256 pointers to such objects from `+0x28`, count at `+0x428`. A target (`0xD4200`) has an array of 0x30-byte entries (`+0`, count `+4`), a pointer array of typed nodes (`+0x10`, count `+0x1C`, type 0-4 at node `+8`) and a key at `+0x30`; `fn_801BC5F0` installs vtables in all of them at boot | the entry and node layouts are not worked out yet (10 of the 20 functions in their vtables are decompiled) |
 | `0xDB0` | `0x26560` | UI root (`gScreenSets`): pointers to the objects below and to three more objects (`+0x14`-`+0x1C`; `ScreenSetsInit` installs a vtable in the sub-object at `+0xCC` of each, by the kind word at its `+4`) | those objects are not typed |
 | `0xDB4`, `0xDB8`, `0xDBC` | `0x26600`, `0x37660`, `0x38000` | kept in `lbl_805FB660`, `lbl_805FB658` (the object `fn_80195A58` draws through), `lbl_805FB670` | no field typed by code beyond `+4` of `0xDB8` |
 | `0xDC0` | `0xF6CF0` | a table of screen names (`UI_MSA_newscreen`, ...) with ids and hashes | no decompiled function reads the slot |
