@@ -21,7 +21,7 @@ BOOL   ZoneIsLoaded(void* world, s32 zone);                              // 0x80
 s32    fn_8012F59C(void* world, s32 zone);                               // 0x8012F59C
 void   fn_80144C60(f32* m);                                              // 0x80144C60
 s32    fn_801604FC(u8* p);                                               // 0x801604FC
-s32    fn_8016056C(u8* p, s32 h, f32* v);                                // 0x8016056C
+u8* fn_8016056C(u8* table, s32 handle, f32* v);                                // 0x8016056C
 u8*    fn_8016060C(u8* p, s32 h, f32 v);                                 // 0x8016060C
 void   fn_80160650(u8* p, f32* v, f32 a);                                // 0x80160650
 void   fn_8016E304(void* cam);                                           // 0x8016E304

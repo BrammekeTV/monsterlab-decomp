@@ -16,7 +16,7 @@ void    fn_8018D2B8(const char* fmt, ...);                      // 0x8018D2B8 (d
 void    fn_8018D370(const char* fmt, ...);                      // 0x8018D370 (debug log)
 void    fn_8018D4CC(void* p);                                   // 0x8018D4CC (free)
 void*   fn_8018E8D8(void* table, u32 hash);                     // 0x8018E8D8 (table lookup by hash)
-void    fn_8018E2F4(void* table, void* cb);                     // 0x8018E2F4 (walk table with callback)
+s32 fn_8018E2F4(void* table, void* cb);                     // 0x8018E2F4 (walk table with callback)
 const char* fn_801EB708(u32 hash);                              // 0x801EB708 (hash -> name for logs)
 u32     StringHash(const char* s);                              // 0x801EB704
 void*   TextureLoad(const char* name);                          // 0x801D8E80

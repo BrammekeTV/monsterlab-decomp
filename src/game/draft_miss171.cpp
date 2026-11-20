@@ -14,7 +14,7 @@ void fn_8018D370(const char* fmt, ...);                            // 0x8018D370
 void fn_801BBB68(void* mgr, s32 id, s32 a, s32 b);                 // 0x801BBB68
 s32 TriggerDoAction(void* action, void* a1, void* a2);           // 0x801E0054 (returns r3)
 s32  fn_801BC4C4(u8* a, s32 b);                                    // 0x801BC4C4
-void fn_801BF714(u8* node, u8* raw);                               // 0x801BF714
+void fn_801BF714(u8* node);                               // 0x801BF714
 
 extern u8    sRendThread[];                                        // 0x8040AEA8
 extern s32   lbl_805FB560;                                         // 0x805FB560
@@ -403,7 +403,7 @@ void fn_801BE3A4(u8* arg0) {
         while (node != NULL) {
             u8* raw = *(u8**)(node - 0x4);
             u8* next = raw != NULL ? raw + 0x8 : NULL;
-            fn_801BF714(node, raw);
+            fn_801BF714(node);
             node = next;
         }
     }

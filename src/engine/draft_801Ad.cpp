@@ -28,7 +28,7 @@ u8*    fn_8019F9B8(s32 kind);                                // 0x8019F9B8 (UI e
 f32    fn_801A0DF0(u8* a3);                                  // 0x801A0DF0 (leaf)
 f32    fn_801A0DF8(u8* a3);                                  // 0x801A0DF8 (leaf)
 f32    fn_801A0E08(u8* a3);                                  // 0x801A0E08 (leaf)
-void   fn_801A0E10(void* obj, f32* box);                     // 0x801A0E10
+s32 fn_801A0E10(u8* obj, f32* box);                     // 0x801A0E10
 s32    fn_801A11C4(void* obj, f32* out);                     // 0x801A11C4
 s32    fn_801A413C(u8* arg0);                                // 0x801A413C
 u8*    fn_801B70F8(u8* a3, s32 a4);                          // 0x801B70F8

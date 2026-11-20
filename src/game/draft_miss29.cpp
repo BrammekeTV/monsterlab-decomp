@@ -30,7 +30,7 @@ s32 fn_801A3010(void* obj, void* data);                        // 0x801A3010
 void fn_801B6F34(u8* p);                                    // 0x801B6F34
 s32 fn_801E9678(void* list, void* handle);                     // 0x801E9678
 void* fn_801E9D18(void* p, u32 hash, s32 size);                // 0x801E9D18
-s32 fn_8020AB5C(void);                                         // 0x8020AB5C
+s32 fn_8020AB5C(const char* name, s32 flag);                                         // 0x8020AB5C
 void fn_802209D0(void (*cb)(void));                            // 0x802209D0
 void fn_80220A1C(s32 a);                                       // 0x80220A1C
 void fn_8023A68C(u8* p);                                       // 0x8023A68C
@@ -304,7 +304,7 @@ void MultiplayerCleanup(void) {
 s32 MusicPlay(const char* name, u8 loop, f32 volume) {
     (void)loop;  // not read by the asm
     if (name == NULL) return 0;
-    if (lbl_805FBBB3 == 0) return fn_8020AB5C();
+    if (lbl_805FBBB3 == 0) return fn_8020AB5C(name, 0 /* leftover r4 flag */);
     if (lbl_805F9974 >= lbl_806004F0) {
         strncpy(lbl_80559CF8, name, 0x7F);
         lbl_80559CF8[0x7F] = 0;

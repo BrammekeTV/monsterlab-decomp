@@ -38,7 +38,7 @@ void* fn_80198F1C(void* set, u32 hash);                         // 0x80198F1C
 s32   fn_8019EE40(u8* widget, u32 id, s32 flag);                // 0x8019EE40
 s32   fn_801AA730(u8* dst, u8* src);                      // 0x801AA730
 void  fn_801AA760(f32* out, u32 id);                            // 0x801AA760
-s32   fn_801B19C4(void* a, u32 hashA, void* b, u32 hashB, u8* outA, u8* outB, s32 c, s32 d);  // 0x801B19C4
+s32 fn_801B19C4(u8* a, u32 hashA, u8* b, u32 hashB, u8* outA, u8* outB, s32 c, s32 d, u8 e);  // 0x801B19C4
 s32   fn_801D5F6C(void);                                        // 0x801D5F6C
 void  fn_801D65CC(f32* out);                                    // 0x801D65CC
 s32   fn_801E6FAC(u8* ent, s32 flag, f32 t);                    // 0x801E6FAC
@@ -549,7 +549,7 @@ void fn_80055E38(u8* a, u8* b, s32 flip) {
     u8 hitB[0x70];
     HitInit(hitA);
     HitInit(hitB);
-    if (fn_801B19C4(*(void**)(a + 0x8C), 0xB738EABDu, *(void**)(b + 0x8C), 0xF62113D5u, hitA, hitB, 0, 0) == 0) return;
+    if (fn_801B19C4(*(u8**)(a + 0x8C), 0xB738EABDu, *(u8**)(b + 0x8C), 0xF62113D5u, hitA, hitB, 0, 0, 0 /* leftover stack arg */) == 0) return;
 
     if (flip != 0) {
         u8* obj = *(u8**)(hitB + 0x68);

@@ -8,7 +8,7 @@ extern "C" {
 }
 
 // C++ linkage, defined in small_8015.cpp / small_8019.cpp.
-void   fn_80154358(void);                                           // 0x80154358
+void fn_80154358(void);                                           // 0x80154358
 void   fn_8015A2E8(u8* p, u32 unused4, u32 flush);                  // 0x8015A2E8
 void*  fn_801970D4(void* p);                                        // 0x801970D4
 

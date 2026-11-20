@@ -24,7 +24,7 @@ void  fn_8016A3F8(u8* p);                                                       
 void  fn_8016A43C(u8* p);                                                         // 0x8016A43C
 void  fn_8016A788(u8* p);                                                         // 0x8016A788
 void  fn_80173944(u8* obj);                                                       // 0x80173944
-s32   fn_801B8474(u8* task, void* arg);                                           // 0x801B8474 (task update callback; signature not checked)
+s32 fn_801B8474(u8* arg0);                                           // 0x801B8474 (task update callback; signature not checked)
 void  fn_801B72A0(u8* p, u8* target);                                             // 0x801B72A0
 s32   fn_801C1960(f32* tmin, f32* tmax, f32 dir, f32 dist);                       // 0x801C1960
 u8*   fn_801C6BCC(u8* key);                                                       // 0x801C6BCC
@@ -34,10 +34,10 @@ void  fn_801E86FC(u8* out, u8* slot, u8* obj, u8* anim);                        
 void  fn_801E8D74(void* out, void* list, void* owner, void* anim);                // 0x801E8D74
 s32   fn_801E9678(void* list, void* handle);                                      // 0x801E9678
 void* fn_801E9D18(void* p, u32 hash, s32 size);                                   // 0x801E9D18
-void  fn_801E9E50(u8* task);                                                      // 0x801E9E50
+u8* fn_801E9E50(u8* task);                                                      // 0x801E9E50
 void  fn_801E9EE4(u8* task, u8** pts, s32 a, s32 b, s32 c, s32 d, s32 e, f32 t0, f32 t1);  // 0x801E9EE4
 f32   fn_801EA350(const u8* task);                                                // 0x801EA350
-void  fn_801EA59C(u8* task);                                                      // 0x801EA59C
+u8* fn_801EA59C(u8* task);                                                      // 0x801EA59C
 void  fn_801EA62C(u8* task, u8** pts, s32 a, s32 b, s32 c, f32 t0, f32 t1);       // 0x801EA62C
 s32   InterpolateVector3Task_Update_LERP(u8* task, void* arg);                    // 0x801EA134
 s32   InterpolateQuaternionTask_Update_SLERP(u8* task, void* arg);                // 0x801EA7F8

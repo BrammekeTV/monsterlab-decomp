@@ -94,6 +94,11 @@
  "changelog": [
   {
    "date": "2026-11-20",
+   "time": "23:27",
+   "text": "Decompile 51 more missing functions (UI node/event/menu functions fn_8019*-fn_801B*, effect and camera helpers, pad callbacks, ...); fix prototypes"
+  },
+  {
+   "date": "2026-11-20",
    "time": "23:14",
    "text": "Decompile 50 more missing functions (fn_8015*-fn_8020* UI, effect, audio and allocator helpers, dlmalloc consolidate, pad callbacks, ...); fix prototypes"
   },

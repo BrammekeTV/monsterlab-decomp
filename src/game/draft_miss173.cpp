@@ -41,7 +41,7 @@ s32   fn_8019555C(u8* list);                                          // 0x80195
 s32   fn_801AA730(u8* dst, u8* src);                                  // 0x801AA730
 void  fn_801AA760(u8* dst, u8* src);                                  // 0x801AA760
 void  fn_801AA7D8(void* track, s32 loop, s32 rev, f32 pos);           // 0x801AA7D8
-void  fn_801AAF14(void* a, f32 oldPos, f32 newPos, s32 loop, s32 rev);   // 0x801AAF14
+s32 fn_801AAF14(u8* self, f32 oldPos, f32 newPos, s32 loop, s32 rev);   // 0x801AAF14
 s32 fn_801AB4C4(u8* dst, u8* src);                              // 0x801AB4C4
 s32   fn_801AB748(u8* p, f32 v);                                      // 0x801AB748
 f32   fn_801AB7F0(u8* a);                                             // 0x801AB7F0
@@ -431,7 +431,7 @@ s32 fn_801AB56C(void* h, f32 dt) {
         }
     }
     if (oldPos != *(f32*)(obj + 0x24) && *(s32*)(obj + 0x18) != 0) {
-        fn_801AAF14(*(void**)(obj + 0x18), oldPos, *(f32*)(obj + 0x24), loop, rev);
+        fn_801AAF14(*(u8**)(obj + 0x18), oldPos, *(f32*)(obj + 0x24), loop, rev);
     }
     return ended;
 }

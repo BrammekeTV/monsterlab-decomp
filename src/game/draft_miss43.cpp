@@ -36,7 +36,7 @@ s32    fn_800D61D8(PathFollower* p, u8* cur, s32 node, s32 a);        // 0x800D6
 void   fn_8016A64C(void* sys, f32 dt);                                        // 0x8016A64C
 void*  fn_801D40E0(s32 n);                                            // 0x801D40E0
 s32    fn_801DC9B0(void* hash);                                       // 0x801DC9B0 (takes a u32 hash)
-s32    fn_801DFAC0(u8* out, s32 a, s32 b);                            // 0x801DFAC0
+void   fn_801DFAC0(u8* out, s32 a, s32 b);                            // 0x801DFAC0
 s32    fn_801DFAE0(void);                                             // 0x801DFAE0
 BOOL   fn_801E7460(u8* base, u16* id);                                // 0x801E7460
 void   fn_801E86FC(u8* out, u8* slot, u8* obj, u8* anim);             // 0x801E86FC

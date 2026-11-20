@@ -8,8 +8,8 @@ void OSReport(const char* fmt, ...);
 s32  TriggerDoAction(void* action, void* a1, void* a2);         // 0x801E0054
 u64  fn_801425DC(u8* timer);                                    // 0x801425DC (64-bit timer read)
 void fn_8015BBC0(s32 a);                                        // 0x8015BBC0
-void fn_8015E7C8(u8* state);                                    // 0x8015E7C8
-void fn_801B9278(void* p);                                      // 0x801B9278 (arg = *(hud + 4))
+void fn_8015E7C8(void* unusedR3, s32 unusedR4, s32 unusedR5, s32 unusedR6, s32 value);                                    // 0x8015E7C8
+void fn_801B9278(u8* p, f32 dt);                                      // 0x801B9278 (arg = *(hud + 4))
 void fn_80272AB0(s32 chan, s32 a);                              // 0x80272AB0
 s32  fn_802737A8(s32 chan, s32 a, void* cb);                    // 0x802737A8
 void fn_80202EFC(s32 chan, s32 result);                         // 0x80202EFC (pad connect result callback)
@@ -35,7 +35,7 @@ extern "C" {
 // 0x8015D578
 // Runs fn_8015E7C8 on the render thread state, then fn_8015BBC0(0).
 void fn_8015D578(void) {
-    fn_8015E7C8(lbl_805FB594);
+    fn_8015E7C8(lbl_805FB594, 0, 0, 0, 0 /* stale regs */);
     fn_8015BBC0(0);
 }
 
@@ -82,7 +82,7 @@ u8* fn_8018C48C(u8* base, u32 key) {
 void fn_801ACBEC(u8* hud, f32 dt) {
     if (*(void**)(hud + 0x0) != NULL) {
         void* p = *(void**)(hud + 0x4);
-        if (p != NULL) fn_801B9278(p);
+        if (p != NULL) fn_801B9278((u8*)p, 0.0f /* leftover f1 dt */);
         HudUpdateScreens(*(void**)(hud + 0x0), dt);
     }
 }
