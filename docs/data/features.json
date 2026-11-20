@@ -94,6 +94,11 @@
  "changelog": [
   {
    "date": "2026-11-20",
+   "time": "22:59",
+   "text": "Decompile 44 more missing functions (fn_8015*-fn_8022* helpers, UI/audio/effect objects, disc read state machine, ...); fix prototypes"
+  },
+  {
+   "date": "2026-11-20",
    "time": "22:58",
    "text": "Decompiled 24 more missing functions (EntityUpdate, WorldPreUpdate, EntityRefreshLinks, SessionBegin, MtxFromLocatorRotation, WorldGetEntityZone, fn_800A*/fn_800D* helpers, ...); prototype fixes"
   },
