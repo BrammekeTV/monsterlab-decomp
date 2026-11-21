@@ -6,8 +6,8 @@
 #include "types.h"
 
 extern u8 lbl_80355658[];
-extern u8 lbl_805FC8B8[];
-extern u8 lbl_805FC8BC[];
+extern f32 lbl_805FC8B8;
+extern f32 lbl_805FC8BC;
 
 // 0x80020040
 extern "C" f32 fn_80020040(u8* a3) {
