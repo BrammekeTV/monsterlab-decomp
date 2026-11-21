@@ -99,6 +99,11 @@
  "changelog": [
   {
    "date": "2026-11-21",
+   "time": "22:09",
+   "text": "Round 61 regenerated after rebase"
+  },
+  {
+   "date": "2026-11-21",
    "time": "22:05",
    "text": "The level camera works on Windows (PRs #28 to #31): the camera's update helpers, follow state and collision query are decompiled, and the empty camera object that stopped the boot is fixed. The boot now gets further into the level start and stops at the collision solver. Nothing shows on screen yet."
   },

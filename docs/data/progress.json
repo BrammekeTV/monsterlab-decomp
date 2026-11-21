@@ -1,15 +1,15 @@
 {
  "game_id": "RM7P4F",
- "generated": "2026-11-21T20:47:45+00:00",
- "commit": "5e04350",
- "commit_date": "2026-11-21T19:14:46+01:00",
+ "generated": "2026-11-21T21:09:21+00:00",
+ "commit": "36da670",
+ "commit_date": "2026-11-21T22:05:22+01:00",
  "game": {
   "functions": 8548,
   "bytes": 2265988,
   "named": 2748,
   "named_bytes": 616800,
-  "decompiled": 7317,
-  "decompiled_bytes": 1740516
+  "decompiled": 7348,
+  "decompiled_bytes": 1757092
  },
  "library": {
   "functions": 4039,
@@ -24,8 +24,8 @@
   "bytes": 3404928,
   "named": 3211,
   "named_bytes": 721548,
-  "decompiled": 7318,
-  "decompiled_bytes": 1740636
+  "decompiled": 7349,
+  "decompiled_bytes": 1757212
  },
  "game_range": [
   "80006B40",
@@ -177,7 +177,7 @@
    0.078
   ],
   [
-   0.361,
+   0.454,
    0.06
   ],
   [
@@ -281,7 +281,7 @@
    0.03
   ],
   [
-   0.906,
+   0.909,
    0.139
   ],
   [
@@ -421,23 +421,23 @@
    0.201
   ],
   [
-   0.188,
+   0.256,
    0.012
   ],
   [
-   0.562,
+   0.892,
    0.0
   ],
   [
-   0.442,
+   0.835,
    0.001
   ],
   [
-   0.098,
+   0.222,
    0.0
   ],
   [
-   0.072,
+   0.307,
    0.009
   ],
   [
@@ -449,7 +449,7 @@
    0.155
   ],
   [
-   0.997,
+   1.0,
    1.0
   ],
   [
@@ -497,7 +497,7 @@
    0.0
   ],
   [
-   0.942,
+   1.0,
    1.0
   ],
   [
@@ -513,7 +513,7 @@
    0.224
   ],
   [
-   0.647,
+   0.811,
    0.058
   ],
   [
@@ -633,7 +633,7 @@
    0.0
   ],
   [
-   0.922,
+   1.0,
    0.0
   ],
   [
@@ -653,7 +653,7 @@
    0.0
   ],
   [
-   0.922,
+   0.997,
    0.076
   ],
   [
@@ -681,7 +681,7 @@
    0.0
   ],
   [
-   0.72,
+   1.0,
    0.0
   ],
   [
@@ -689,7 +689,7 @@
    0.0
   ],
   [
-   0.993,
+   1.0,
    0.022
   ],
   [
@@ -705,7 +705,7 @@
    0.035
   ],
   [
-   0.996,
+   0.999,
    0.0
   ],
   [
@@ -737,7 +737,7 @@
    0.0
   ],
   [
-   0.998,
+   1.0,
    0.014
   ],
   [
@@ -745,7 +745,7 @@
    0.0
   ],
   [
-   0.774,
+   0.796,
    0.0
   ],
   [
@@ -861,7 +861,7 @@
    0.0
   ],
   [
-   0.971,
+   0.974,
    0.088
   ],
   [
@@ -949,7 +949,7 @@
    0.097
   ],
   [
-   0.383,
+   0.429,
    0.0
   ],
   [
@@ -1199,6 +1199,11 @@
      "name": "fn_801F5E94",
      "addr": "801F5E94",
      "size": 148
+    },
+    {
+     "name": "fn_801F5F28",
+     "addr": "801F5F28",
+     "size": 464
     }
    ]
   },
@@ -4983,12 +4988,92 @@
    ]
   },
   {
+   "path": "src/game/camera_collision.cpp",
+   "functions": [
+    {
+     "name": "fn_800D91A8",
+     "addr": "800D91A8",
+     "size": 616
+    },
+    {
+     "name": "fn_800DA8F0",
+     "addr": "800DA8F0",
+     "size": 376
+    },
+    {
+     "name": "fn_800DAA68",
+     "addr": "800DAA68",
+     "size": 2280
+    }
+   ]
+  },
+  {
+   "path": "src/game/camera_follow.cpp",
+   "functions": [
+    {
+     "name": "fn_800DBB64",
+     "addr": "800DBB64",
+     "size": 64
+    },
+    {
+     "name": "fn_800E054C",
+     "addr": "800E054C",
+     "size": 316
+    },
+    {
+     "name": "fn_800E084C",
+     "addr": "800E084C",
+     "size": 896
+    },
+    {
+     "name": "fn_800E2728",
+     "addr": "800E2728",
+     "size": 1124
+    },
+    {
+     "name": "fn_800E2B8C",
+     "addr": "800E2B8C",
+     "size": 196
+    },
+    {
+     "name": "fn_800E2C50",
+     "addr": "800E2C50",
+     "size": 412
+    }
+   ]
+  },
+  {
    "path": "src/game/camera_follow_reset.cpp",
    "functions": [
     {
      "name": "fn_800E02A8",
      "addr": "800E02A8",
      "size": 328
+    }
+   ]
+  },
+  {
+   "path": "src/game/camera_helpers.cpp",
+   "functions": [
+    {
+     "name": "fn_800DB708",
+     "addr": "800DB708",
+     "size": 316
+    },
+    {
+     "name": "fn_800DC514",
+     "addr": "800DC514",
+     "size": 432
+    },
+    {
+     "name": "fn_800DD1EC",
+     "addr": "800DD1EC",
+     "size": 464
+    },
+    {
+     "name": "fn_800DD8B4",
+     "addr": "800DD8B4",
+     "size": 2520
     }
    ]
   },
@@ -14664,6 +14749,111 @@
      "name": "PauseFollowingWaypointPath",
      "addr": "801B8B3C",
      "size": 504
+    }
+   ]
+  },
+  {
+   "path": "src/game/draft_miss431.cpp",
+   "functions": [
+    {
+     "name": "fn_8010AA0C",
+     "addr": "8010AA0C",
+     "size": 212
+    },
+    {
+     "name": "fn_8014B1A8",
+     "addr": "8014B1A8",
+     "size": 640
+    },
+    {
+     "name": "fn_80156CDC",
+     "addr": "80156CDC",
+     "size": 608
+    }
+   ]
+  },
+  {
+   "path": "src/game/draft_miss432.cpp",
+   "functions": [
+    {
+     "name": "fn_8016535C",
+     "addr": "8016535C",
+     "size": 1072
+    },
+    {
+     "name": "fn_8016599C",
+     "addr": "8016599C",
+     "size": 980
+    }
+   ]
+  },
+  {
+   "path": "src/game/draft_miss433.cpp",
+   "functions": [
+    {
+     "name": "fn_8005E11C",
+     "addr": "8005E11C",
+     "size": 4
+    },
+    {
+     "name": "BrazierSymbolStartRising",
+     "addr": "8008E8A0",
+     "size": 24
+    },
+    {
+     "name": "WarpCamera",
+     "addr": "800E7868",
+     "size": 28
+    },
+    {
+     "name": "JumpTo",
+     "addr": "801036E4",
+     "size": 44
+    },
+    {
+     "name": "fn_8016AFE8",
+     "addr": "8016AFE8",
+     "size": 60
+    },
+    {
+     "name": "fn_8017385C",
+     "addr": "8017385C",
+     "size": 24
+    },
+    {
+     "name": "fn_80184268",
+     "addr": "80184268",
+     "size": 16
+    },
+    {
+     "name": "fn_80188F00",
+     "addr": "80188F00",
+     "size": 192
+    },
+    {
+     "name": "fn_801C6618",
+     "addr": "801C6618",
+     "size": 28
+    }
+   ]
+  },
+  {
+   "path": "src/game/draft_miss434.cpp",
+   "functions": [
+    {
+     "name": "fn_800558BC",
+     "addr": "800558BC",
+     "size": 964
+    },
+    {
+     "name": "fn_8010ABA8",
+     "addr": "8010ABA8",
+     "size": 816
+    },
+    {
+     "name": "fn_8010AED8",
+     "addr": "8010AED8",
+     "size": 388
     }
    ]
   },

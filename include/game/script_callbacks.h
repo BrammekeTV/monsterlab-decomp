@@ -118,7 +118,7 @@ s32 BrazierSymbolIsThrowTrailAttached(void* a3);                       // src/le
 void BrazierSymbolSetSymbolOccupied(void* a3);                         // src/leaf/auto_03_8008CBB0_text_cb.cpp
 void BrazierSymbolSetUnused(void* a0);                                 // src/game/draft_miss13.cpp
 void BrazierSymbolStartMovingBack(void* a0);                           // src/game/draft_miss13.cpp
-void BrazierSymbolStartRising(void* a0);  // type 0x2F (from signature table)
+s32 BrazierSymbolStartRising(u8* p);                                   // src/game/draft_miss433.cpp
 void BrazierSymbolUpdateDisappearing(void* a0);                        // src/game/draft_miss13.cpp
 void BrazierSymbolUpdateMovingBack(void* a3);                          // src/leaf/auto_03_8008CBB0_text_cb.cpp
 void BrazierSymbolUpdateOrbiting(void* a3);                            // src/leaf/auto_03_8008CBB0_text_cb.cpp
@@ -740,7 +740,7 @@ u32 IsWiiSelectorActive(void);                                         // src/le
 u32 Is_DSBuild(void);                                                  // src/leaf/auto_03_8020F8E0_text_cb.cpp
 u32 Is_WiiBuild(void);                                                 // src/leaf/auto_03_8020F8E0_text_cb.cpp
 void JoinGame(s32 a0);                                                 // src/game/small_800Fb.cpp
-void JumpTo(u32 /*0x2F*/ a0, u32 /*0x17*/ a1);  // type 0x11D (from signature table)
+void JumpTo(u8* a0, s32* a1);                                          // src/game/draft_miss433.cpp
 void JumpToPlatform(u32 a0, u32 a1, u32 a2);                           // src/game/small_8010.cpp
 void JumpToTarget(u32 a3);                                             // src/leaf/auto_03_800FB958_text_cb.cpp
 void KillEntity(void* a0);                                             // src/game/draft_miss26.cpp
@@ -1515,7 +1515,7 @@ void UpdateWeldingGunIntroPos(void);                                   // src/ga
 void UpdateWeldingGunOutroPos(void);                                   // src/game/small_8007c.cpp
 void VSHACKSetFightTextVisible(void);                                  // src/game/small_800Fc.cpp
 void VariableToNormalCamera(f32 a0);                                   // src/game/draft_miss49b.cpp
-void WarpCamera(void);  // type 0x8F (from signature table)
+void WarpCamera(void);                                                 // src/game/draft_miss433.cpp
 u32 /*0x06*/ WasButtonPressed(u32 /*0x36*/ a0);  // type 0xAB (from signature table)
 u32 WasButtonReleased(u32 a0);                                         // src/game/small_8012.cpp
 u32 WasEntityDrawnLastFrame(void* a0);                                 // src/engine/small_801Bc.cpp
