@@ -23,11 +23,11 @@ void*  MemAllocDefault(u32 size);
 int    SysSprintf(char* buf, const char* fmt, ...);
 u8*    fn_801094F4(char* name, s32 flags);
 s32    fn_801B41F0(u8* a, u8* b);
-void   fn_8003FC00(u8* inner, s32 v);
+void   fn_8003FC00(u8* inner);
 void   fn_8003FC6C(u8* inner, s32 v);
 void   fn_8003FF30(u8* inner);
 u32    fn_8003FFA4(u8* inner, u8* choice);
-void   fn_8003FFD0(u8* inner);
+s32    fn_8003FFD0(u8* inner);
 void   fn_80040028(u8* inner);
 void   fn_8007D004(s32 dst, u8* src, s32 cur, s32 delta);
 void   fn_8020F46C(u8* p, u8* choice);
@@ -275,7 +275,7 @@ void fn_8003FA08(u8* obj) {
     u8 choice[12];
     u8* inner = *(u8**)(obj + 0x4C);
     if (*(s32*)(inner + 0x84) == 0) {
-        fn_8003FC00(inner, *(s32*)(obj + 0x8));
+        fn_8003FC00(inner);
     }
     u8* inner2 = *(u8**)(obj + 0x4C);
     s32 cur = *(s32*)(inner2 + 0x84);

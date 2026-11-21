@@ -52,7 +52,7 @@ u8*    fn_80062CE0(u8* p, s32 del);                        // 0x80062CE0
 u8*    fn_8007C4CC(u8* p, s32 del);                        // 0x8007C4CC
 void   fn_8006FAF4(u8* p, s32 a);                          // 0x8006FAF4
 void   fn_8007B150(u8* p);                                 // 0x8007B150
-void   fn_8007CF54(u8* p, s32 flag);                       // 0x8007CF54
+u8*    fn_8007CF54(u8* p, s32 del);                       // 0x8007CF54
 void   fn_80076654(u8* p, s32 mode);                       // 0x80076654
 void   fn_8009BBCC(s32 a, s32 b, u8* obj);                 // 0x8009BBCC
 void   __destroy_arr(void* arr, void (*dtor)(void*, s32), u32 size, u32 count);

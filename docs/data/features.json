@@ -99,6 +99,11 @@
  "changelog": [
   {
    "date": "2026-11-21",
+   "time": "23:09",
+   "text": "Round 64: 39 more small functions (character/UI/effect helpers, world and audio glue)"
+  },
+  {
+   "date": "2026-11-21",
    "time": "22:58",
    "text": "Round 63: 39 small functions (reaction/collision helpers, party stats, audio, UI) from the missing list and the uncalled pool"
   },
