@@ -5,7 +5,7 @@
 
 #include "types.h"
 
-extern u8 lbl_805FDA1C[];
+extern f32 lbl_805FDA1C;
 extern u8 lbl_805FDA28[];
 
 // 0x8008CDFC

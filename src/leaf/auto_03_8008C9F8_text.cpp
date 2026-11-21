@@ -6,7 +6,7 @@
 #include "types.h"
 
 extern void* gEventMgr;
-extern u8 lbl_805FDA08[];
+extern f32 lbl_805FDA08;
 extern "C" void EventSend(void*, void*, void*, u32, int, int, int, int);
 
 // 0x8008CAA4

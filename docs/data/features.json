@@ -99,6 +99,11 @@
  "changelog": [
   {
    "date": "2026-11-22",
+   "time": "00:32",
+   "text": "Round 75: 55 more tiny functions (vector constant writers and stubs)"
+  },
+  {
+   "date": "2026-11-22",
    "time": "00:27",
    "text": "Round 74: 56 more tiny functions (vector constant writers, clamps, delete stub)"
   },
