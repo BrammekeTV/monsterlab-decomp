@@ -22,6 +22,8 @@ typedef enum SirError {
     SIR_ERR_TEXTURE,          // texture list (header slot 0xD94): broken links, bad header or data outside the image
     SIR_ERR_STRINGS,          // string table (header slot 0xDA8): array or a string outside the image
     SIR_ERR_ACTIONS,          // action table (header slot 0x844): array or a record outside the image
+    SIR_ERR_UI,               // UI root, fonts or the objects of slots 0xDB4-0xDBC: pointer outside the image, font kind
+    SIR_ERR_SCREENS,          // screen state machines (slots 0xD98, 0xD9C): bad count, node type or pointer
     SIR_ERR_OVERLAP,          // two of the objects above share bytes
     SIR_ERR_IO
 } SirError;
@@ -295,12 +297,67 @@ typedef struct SirActionTable {
     u8**  records;          // 0x04: code
 } SirActionTable;
 
+// ---------------------------------------------------------------------------------------------
+// UI root (header slot 0xDB0, gScreenSets) and the objects of slots 0xDB4, 0xDB8 and 0xDBC.
+// Only the fields a decompiled function reads are converted; the schemas in sir_loader.cpp name
+// the function for each and list what is left.
+//   root   +0x14 font[3], +0x20 f32[19], +0x6C..+0x90 words used at run time
+//   font   +0x04 name, +0xCC font object
+//   font object: +0x00 vtable (stored by ScreenSetsInit for the kind), +0x04 kind, +0x08 data;
+//          kind 1 also has page textures from +0x24 and their count at +0x124
+// The font data behind +0x08 (glyph tables) is not converted yet.
+// ---------------------------------------------------------------------------------------------
+#define UI_ROOT_SIZE            0x98
+#define UI_ROOT_FONTS           3
+#define UI_FONT_SIZE            0xD0
+#define UI_FONT_KIND_0          0      // class of vtable 0x803821D0 (fn_80196E98), 0xC bytes
+#define UI_FONT_KIND_1          1      // class of vtable 0x80382380 (fn_801970D4), 0x128 bytes
+#define UI_FONT_OBJ_SIZE_KIND0  0x0C
+#define UI_FONT_OBJ_SIZE_KIND1  0x128
+#define UI_FONT_PAGES           64     // page pointers at +0x24..+0x123
+#define UI_FONT_LIST_SIZE       0x0C   // slot 0xDB4 (lbl_805FB660)
+#define UI_DRAW_SIZE            0x408  // slot 0xDB8 (lbl_805FB658)
+#define UI_PAD_SIZE             0x20   // slot 0xDBC (lbl_805FB670)
+
+// ---------------------------------------------------------------------------------------------
+// Screen state machines (header slot 0xD98: the screen list; slot 0xD9C: the HUD, which holds up
+// to 256 of them). Layout from HudUpdateScreens (0x801BB5BC), fn_801BB8A0, fn_801BBB68,
+// fn_801BBC9C, fn_801BC5F0 and the five classes fn_801BC5F0 installs.
+//
+//   machine     0x70 bytes: definition, current / previous / pending state, flags, timer, value table
+//   definition  states (0x30 bytes each), node pointers, shared events, key, start node at +0x34
+//   state       key, three action words (enter, update, exit), time-out, flags, events
+//   event       {id, condition word, transition}; shared event: {id, transition, condition word}
+//   node        0x30 bytes, by the type word at +0x08 (below)
+//   transition  target state or node, condition word, action word; a shared event's transition
+//               also has a list of state keys
+// An action or condition word has a type in bits 27-30 (0 = none) and a value in bits 0-17; type
+// 3 looks the value up in the machine's value table. The result goes to TriggerDoAction.
+// ---------------------------------------------------------------------------------------------
+enum {
+    FSM_NODE_PLAIN  = 0,   // vtable 0x80383FC4: no fields
+    FSM_NODE_STATE  = 1,   // vtable 0x80383F90: a state (in the state array, never in the node array)
+    FSM_NODE_START  = 2,   // vtable 0x80383F58: one transition (also the definition's start node)
+    FSM_NODE_ACTION = 3,   // vtable 0x80383F20: runs an action word, then one transition
+    FSM_NODE_CHOICE = 4    // vtable 0x80383EE8: runs an action word; its result picks one of several transitions
+};
+#define FSM_USED                    0x58   // of the 0x70 bytes; the rest has no reader
+#define FSM_DEF_USED                0x48
+#define FSM_STATE_SIZE              0x30
+#define FSM_EVENT_SIZE              0x0C
+#define FSM_NODE_SIZE               0x30
+#define FSM_TRANSITION_USED         0x18   // of 0x20
+#define FSM_SHARED_TRANSITION_USED  0x24   // of 0x30
+#define HUD_MACHINES                256
+#define HUD_SIZE                    0x434
+
 // Converts the 4 KB header block (the pointer table the game keeps in sSirHeader).
 SirError GlobalBinaryConvertHeader(SirReloc* r, u8* hdr);
 
 // Whole file: converts header and image in place. `hdr` and `image` are the two sections copied
 // out of the file (hdr: 0x1000 bytes). Maps the image in `r`, checks the input table, texture list,
-// string table and action table (each is skipped when its header slot is 0), converts the database,
+// string table, action table, UI objects and screen state machines (each is skipped when its header
+// slot is 0), converts the database,
 // then those objects, then the header. Nothing is changed when a check fails.
 SirError GlobalBinaryConvert(SirReloc* r, u8* hdr, u8* image, u32 imageSize, s32* failTable);
 

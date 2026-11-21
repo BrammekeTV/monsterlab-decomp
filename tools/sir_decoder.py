@@ -464,8 +464,9 @@ def gamedb_dump(path):
 
 # ----------------------------------------------------------------------------- global_binary image objects
 # Hand-typed objects of the global_binary.sir image (docs/loader.md): the input table (header
-# slot 0xDC4), the texture list at the start of the image (0xD94), the string table (0xDA8) and
-# the action table (0x844). Reference for the PC loader, read straight from the big-endian bytes.
+# slot 0xDC4), the texture list at the start of the image (0xD94), the string table (0xDA8), the
+# action table (0x844), the UI root and its objects (0xDB0-0xDBC) and the screen state machines
+# (0xD98, 0xD9C). Reference for the PC loader, read straight from the big-endian bytes.
 INPUT_STATE = {1: 'f', 2: 'f', 9: 'f', 5: 'ffff', 6: 'ffff', 7: 'ifff', 8: 'ifff'}   # by step type, at +0x50
 
 def fnv(b):
@@ -553,6 +554,110 @@ def image_dump(path):
     L.append('actions %s count %d records %s' % (ptr(slot(0x844)), count, ptr(u(t + 4))))
     for i in range(count):
         L.append('actionrec %d %s' % (i, ptr(u(arr + i * 4))))
+
+    # UI root (slot 0xDB0), its fonts and the objects of slots 0xDB4, 0xDB8, 0xDBC. Only the fields
+    # the game code reads are decoded (docs/loader.md lists what is left).
+    off = lambda v: v - GB_BASE
+    ws = lambda o, n: ' '.join('%08x' % u(o + i * 4) for i in range(n))
+    ps = lambda o, n: ' '.join(ptr(u(o + i * 4)) for i in range(n))
+    fontobjs = []
+    def fontobj(p):
+        if p and p not in fontobjs: fontobjs.append(p)
+    t = off(slot(0xDB0))
+    L.append('uiroot %s raw %s w10 %08x fonts %s view %s run %s %s bytes %02x %02x' % (
+        ptr(slot(0xDB0)), sec[t:t + 0x10].hex(), u(t + 0x10), ps(t + 0x14, 3), ws(t + 0x20, 19), ws(t + 0x6C, 5),
+        ws(t + 0x84, 4), sec[t + 0x80], sec[t + 0x94]))
+    for i in range(3):
+        f = u(t + 0x14 + i * 4)
+        if not f: continue
+        o = off(f)
+        L.append('uifont %d %s name %s obj %s' % (i, ptr(f), cstr0(o + 4).decode('latin1'), ptr(u(o + 0xCC))))
+        fontobj(u(o + 0xCC))
+    t = off(slot(0xDB4))
+    L.append('uifontlist %s %s' % (ptr(slot(0xDB4)), ps(t + 4, 2)))
+    fontobj(u(t + 4)); fontobj(u(t + 8))
+    for p in fontobjs:
+        o = off(p)
+        line = 'uifontobj %s vtable %08x kind %d data %s' % (ptr(p), u(o), u(o + 4), ptr(u(o + 8)))
+        if u(o + 4) == 1:
+            line += ' pages %d %s' % (u(o + 0x124), ps(o + 0x24, u(o + 0x124)))
+        L.append(line.rstrip())
+    t = off(slot(0xDB8))
+    L.append('uidraw %s raw %s w04 %08x fonts %s raw0c %s w40 %d w404 %d' % (
+        ptr(slot(0xDB8)), sec[t:t + 4].hex(), u(t + 4), ptr(u(t + 8)), sec[t + 0xC:t + 0x10].hex(), i32(t + 0x40), i32(t + 0x404)))
+    t = off(slot(0xDBC))
+    L.append('uipad %s raw %s %s' % (ptr(slot(0xDBC)), sec[t:t + 4].hex(), ws(t + 4, 7)))
+
+    # Screen state machines: the screen list (slot 0xD98) and the HUD's machines (slot 0xD9C).
+    hud = off(slot(0xD9C))
+    count = u(hud + 0x428)
+    L.append('hud %s depth %d stack %s w24 %08x count %d current %s flag %d spare %d' % (
+        ptr(slot(0xD9C)), i32(hud), ps(hud + 4, 8), u(hud + 0x24), count, ptr(u(hud + 0x42C)), sec[hud + 0x430],
+        sum(1 for i in range(count, 256) if u(hud + 0x28 + i * 4))))
+    machines = [slot(0xD98)] if slot(0xD98) else []
+    for i in range(count):
+        p = u(hud + 0x28 + i * 4)
+        L.append('hudmachine %d %s' % (i, ptr(p)))
+        if p and p not in machines: machines.append(p)
+    defs, trans, shared_trans = [], set(), set()
+    for p in machines:
+        o = off(p)
+        L.append('fsm %s def %s state %d %d %d owner %s words %s floats %s values %s raw %s' % (
+            ptr(p), ptr(u(o)), i32(o + 4), i32(o + 8), i32(o + 0xC), ptr(u(o + 0x10)), ws(o + 0x14, 6), ws(o + 0x2C, 10),
+            ptr(u(o + 0x54)), sec[o + 0x58:o + 0x70].hex()))
+        v = u(o + 0x54)
+        if v:
+            n = u(off(v))
+            L.append('fsmvalues %s count %d sum %08x' % (ptr(v), n, fnv(sec[off(v) + 4:off(v) + 4 + n * 4])))
+        if u(o) and u(o) not in defs: defs.append(u(o))
+    for d in defs:
+        o = off(d)
+        ns, nn, nr = i32(o + 4), i32(o + 0x1C), i32(o + 0x2C)
+        L.append('fsmdef %s states %s %d strings %s nodes %s %d shared %s %d key %08x start %08x %08x %d %s b44 %d raw %s %s %s' % (
+            ptr(d), ptr(u(o)), ns, ptr(u(o + 0xC)), ptr(u(o + 0x10)), nn, ptr(u(o + 0x20)), nr, u(o + 0x30), u(o + 0x34),
+            u(o + 0x38), u(o + 0x3C), ptr(u(o + 0x40)), sec[o + 0x44], sec[o + 8:o + 0xC].hex(), sec[o + 0x14:o + 0x1C].hex(),
+            sec[o + 0x24:o + 0x2C].hex()))
+        trans.add(u(o + 0x40))
+        for i in range(ns):
+            s = off(u(o)) + i * 0x30
+            ne = i32(s + 0x2C)
+            L.append('fsmstate %s %d vtable %08x key %08x type %d actions %s timeout %08x flags %08x events %s %d raw %s' % (
+                ptr(d), i, u(s), u(s + 4), u(s + 8), ws(s + 0xC, 3), u(s + 0x18), u(s + 0x1C), ptr(u(s + 0x20)), ne,
+                sec[s + 0x24:s + 0x2C].hex()))
+            for k in range(ne):
+                e = off(u(s + 0x20)) + k * 12
+                L.append('fsmevent %s %d %d id %08x cond %08x to %s' % (ptr(d), i, k, u(e), u(e + 4), ptr(u(e + 8))))
+                trans.add(u(e + 8))
+        for i in range(nn):
+            np_ = u(off(u(o + 0x10)) + i * 4)
+            n = off(np_)
+            typ = u(n + 8)
+            line = 'fsmnode %s vtable %08x key %08x type %d' % (ptr(np_), u(n), u(n + 4), typ)
+            if typ == 2:
+                line += ' to %s' % ptr(u(n + 0xC)); trans.add(u(n + 0xC))
+            elif typ == 3:
+                line += ' action %08x to %s %d %d' % (u(n + 0xC), ptr(u(n + 0x10)), i32(n + 0x14), i32(n + 0x18)); trans.add(u(n + 0x10))
+            elif typ == 4:
+                c = i32(n + 0x14)
+                line += ' action %08x choices %s %d result %d %d to %s' % (u(n + 0xC), ptr(u(n + 0x10)), c, i32(n + 0x1C), i32(n + 0x20),
+                                                                         ps(off(u(n + 0x10)), c) if c else '')
+                for k in range(c): trans.add(u(off(u(n + 0x10)) + k * 4))
+            L.append(line.rstrip())
+        for i in range(nr):
+            e = off(u(o + 0x20)) + i * 12
+            L.append('fsmshared %s %d id %08x to %s cond %08x' % (ptr(d), i, u(e), ptr(u(e + 4)), u(e + 8)))
+            shared_trans.add(u(e + 4))
+    trans.discard(0); shared_trans.discard(0)
+    for p in sorted(trans):
+        o = off(p)
+        L.append('fsmtrans %s vtable %08x target %s cond %08x action %08x %d %d raw %s' % (
+            ptr(p), u(o), ptr(u(o + 4)), u(o + 8), u(o + 0xC), i32(o + 0x10), i32(o + 0x14), sec[o + 0x18:o + 0x20].hex()))
+    for p in sorted(shared_trans):
+        o = off(p)
+        n = i32(o + 0x20)
+        L.append(('fsmsharedtrans %s vtable %08x target %s cond %08x action %08x %d %d flags %08x keys %s %d %s' % (
+            ptr(p), u(o), ptr(u(o + 4)), u(o + 8), u(o + 0xC), i32(o + 0x10), i32(o + 0x14), u(o + 0x18), ptr(u(o + 0x1C)), n,
+            ws(off(u(o + 0x1C)), n) if n else '')).rstrip())
     return L
 
 # ----------------------------------------------------------------------------- catalog
