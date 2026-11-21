@@ -49,7 +49,7 @@ s32    fn_801C10B4(u8* a, u8* b, u8* c, u8* d, u8* e, u8* f);                // 
 s32    fn_801C217C(u8* a, u8* b, u8* c, u8* d, u8* e, s32* n, f32* pos, f32* dist); // 0x801C217C
 s32    fn_801C26A8(u8* a, u8* b, u8* c, u8* d, u8* e, s32* n, f32* pos, f32* dist); // 0x801C26A8
 s32    fn_801ED538(u8* a3);                                                  // 0x801ED538
-s32    fn_80187704(u8* table);                                               // 0x80187704
+s32    fn_80187704(u8* table, s32 idx);                                            // 0x80187704
 f64    fn_8033E8EC(f64 x);                                                   // 0x8033E8EC (atan)
 
 extern const char lbl_80383448[];   // 0x80383448 (debug message block)
@@ -717,7 +717,7 @@ static void FontQueueGlyph(u8* table, u8* g, s32 x, s32 y, s32 tag) {
             *(s16*)(table + 0x1A) = i0;
             *(s16*)(table + 0x18) = (s16)idx;
         } else {
-            idx = fn_80187704(table);
+            idx = fn_80187704(table, page);
         }
     }
     u8* node = *(u8**)(table + 0xC);

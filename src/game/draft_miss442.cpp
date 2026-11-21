@@ -35,7 +35,7 @@ void   Vec3SetUnitZ(Vec3* v);                                    // 0x800549A8
 void   Vec3SetZ(Vec3* v, f32 z);
 void   Vec3SetZero(Vec3* out);                                   // 0x800531A8
 void   Vec3Sub(Vec3* out, const Vec3* a, const Vec3* b);         // 0x80053370
-s32    fn_80007CD4(s32);                                         // 0x80007CD4
+void   fn_80007CD4(u8* arg0);                                      // 0x80007CD4
 void   fn_8005263C(f32* q);                                      // 0x8005263C (quat identity)
 u8*    fn_800526DC(u8* c);                                       // 0x800526DC: returns the position pointer (+4)
 s32    fn_800544D8(u8* obj, s32 bit);                            // 0x800544D8: bit of the flag word at +4->+0x1C
@@ -618,8 +618,8 @@ void fn_80065FF0(u8* arg0, f32 farg0) {
 // character is in (hit by something, in its death state, attached, or plain), frees the effect
 // list and handles, then calls virtual slot 0x18 (delete).
 void fn_80066E54(u8* arg0) {
-    s32 h = *(s32*)(arg0 + 0xA0);
-    if (h != 0) {
+    u8* h = *(u8**)(arg0 + 0xA0);
+    if (h != NULL) {
         fn_80007CD4(h);
         *(s32*)(arg0 + 0xA0) = 0;
     }
