@@ -22,18 +22,21 @@ Code: `include/port/sir_loader.h`, `src/port/sir_loader.cpp`. Test: `tests/sir_l
 | `global_binary.sir` action table (slot `0x844`) and its 956 records | converted: a record is a program of 32-bit words; the 42 sound objects its calls point at are not |
 | `global_binary.sir` screen list and HUD (slots `0xD98`, `0xD9C`: 68 state machines, 68 definitions, 759 states, 1,345 transitions) | converted; every field typed from code, fields without a reader left as they are |
 | `global_binary.sir` UI root, fonts and the objects of slots `0xDB4`-`0xDBC` | the fields the code reads are converted; the glyph data of the three fonts is not |
-| `global_binary.sir` font glyph data, sound objects named by action records, `0xDC0`, `0x10`, `0x418`, `0x830`, `0x83C` | not converted: see "Not converted yet" |
+| `global_binary.sir` effect definitions (slots `0x82C`-`0x840`: 27 + 70 entries) and the two object pools of slots `0x10`, `0x418` | converted; fields typed from the effect and pool code |
+| `global_binary.sir` font glyph data, sound objects named by action records, `0xDC0` | not converted: see "Not converted yet" |
 | Hook into the game's `SirLoad` | not wired (the port has no file layer yet) |
 
-Of the 1,096,124 bytes of the image, 31.0% now belongs to objects converted by a schema (the game
-database is 11.5%, the screen state machines 11.2%, the action records 4.2%), 57.0% is data that
-needs no conversion and is reached from a converted object (texture pixels and palettes, string
-bytes), and 4.3% is fill words. About 7.7% (84 KB) is not typed yet.
+Of the 1,096,124 bytes of the image, 33.1% now belongs to objects converted by a schema (the game
+database is 11.5%, the screen state machines 11.2%, the action records 4.2%, effect definitions
+and pools 2.1%), 57.0% is data that needs no conversion and is reached from a converted object
+(texture pixels and palettes, string bytes), and 4.3% is fill words. About 5.6% (61 KB) is not
+typed yet.
 
-Check against the real files: all 13,834 compared lines of `global_binary.sir` (every header slot,
+Check against the real files: all 14,031 compared lines of `global_binary.sir` (every header slot,
 table descriptor and row, parts, actions and tuning values, every sequence, step, texture
-header, string, action pointer and action record, and every state machine, definition, state,
-event, node and transition, read through the game's own structs and offsets) and all
+header, string, action pointer and action record, every state machine, definition, state,
+event, node and transition, and every effect definition and pool node, read through the game's
+own structs and offsets) and all
 6,457 lines of `catalog.sir` match the Python reference.
 
 ## How the original loads a file
@@ -208,10 +211,10 @@ python tools/loader_check.py
 
 The self-test also builds an input table, two textures, a string table, an action table, a UI
 root with a font, and two state machines that share a definition with one node of each type, and
-two action records, and 43 broken variants of them (bad counts, unknown step class or node type,
+two action records, two effect definitions, a pool, and 53 broken variants of them (bad counts, unknown step class or node type,
 list loops, pointers off the image, overlapping objects, one transition used as two kinds, an
-instruction of length 0, a jump into an operand, a record without an end) that must be refused
-untouched.
+instruction of length 0, a jump into an operand, a record without an end, a pool node that links
+out of its pool, one pool memory used by two effects) that must be refused untouched.
 
 Result on PAL `RM7P4F`:
 
@@ -220,8 +223,9 @@ Result on PAL `RM7P4F`:
   101 steps, 44 textures, 4,274 strings, 956 action pointers and 956 action records (11,526
   words); the UI root, 3 fonts, 4 font
   objects, 68 state machines with their value tables, 68 definitions, 759 states, 1,104 events,
-  59 nodes, 23 shared events and 1,345 transitions, all equal. The load report shows 9,425 image
-  pointers relocated and none kept or unknown.
+  59 nodes, 23 shared events and 1,345 transitions; 27 + 70 effect definitions and two pools with
+  96 nodes, all equal. The load report shows 9,883 image pointers relocated and none kept or
+  unknown.
 - `catalog.sir`: 6,394 entries and 59 file records, all equal. All 59 file-name hashes equal
   `StringHash` of the stored name, and the two lookups `GameStart` makes for
   `global_binary.sir` find sector 1 / 4,096 bytes and sector 3 / 1,096,124 bytes.
@@ -443,6 +447,74 @@ Only fields with a reader in the code are converted.
 names, so the build-time address in the file is not used. The font object of slot `0xDB4` gets
 no vtable from any code found so far; on the Wii it keeps the build-time address.
 
+### Effect definitions (header slots `0x82C`-`0x840`)
+
+`fn_80007D68`, the start of a level load, gives two tables to their managers: `{count 0x82C,
+entries 0x830, sorted flag 0x834}` to `lbl_8047C790` and `{0x838, 0x83C, 0x840}` to
+`lbl_8047C7AC`. It stores the manager in every entry and initialises the entry's pools. Both
+tables are sorted by name hash, and the lookups search them that way when the flag is set
+(`FindRecord` in `draft_miss346.cpp`, `fn_801C3EA4`). An effect instance keeps its definition
+at `+0`, so the code reads the fields as `*(*(node) + off)`.
+
+First kind, 27 entries of 0x70 bytes (`lightning_scrying`, ...; code around `0x801BCD88`-`0x801BF900`):
+
+| Offset | Field | Reader |
+|---|---|---|
+| `0x00` | name hash | `FindRecord` |
+| `0x08` | name, text | - |
+| `0x28` | texture | `fn_801BF714` |
+| `0x2C` | draw mode | `fn_801BF714` -> `fn_801CA7B0` |
+| `0x30`, `0x34`, `0x3C`, `0x40` | words | `fn_801BDB6C` |
+| `0x44`-`0x50`, `0x54`, `0x5C` | floats | `fn_801BDB6C`, `fn_801BD278`, `fn_801BE620`, `fn_801BCD88`, `fn_801BF4B8` |
+| `0x64` | manager, stored at level load | `fn_80007D68`, `fn_801BF714` |
+| `0x68` | pool of the instances | `fn_801BE44C` |
+| `0x6C` | callback when an instance ends (NULL in the file) | `fn_801BE44C` |
+
+Second kind, 70 entries of 0x80 bytes (`trail_plant`, ...; code around `0x801C2C60`-`0x801C5C80`;
+`StartLaser` and `StopLaser` use this manager):
+
+| Offset | Field | Reader |
+|---|---|---|
+| `0x00` | name hash | `fn_801C3EA4` |
+| `0x04` | colour word | `fn_801C5AAC`; `fn_801C3F6C` replaces it with a random colour when the flag `lbl_805FB6F8` is set |
+| `0x08` | name, text | - |
+| `0x28`, `0x2C`, `0x4C`, `0x54` | words (`0x4C` picks the pool an instance comes from) | `fn_801C3F6C`, `fn_801C5444`, `fn_801C4338` |
+| `0x30`-`0x48`, `0x50`, `0x58`-`0x60` | floats | `fn_801C5444`, `fn_801C4338`, `fn_801C4B90`, `fn_801C3F6C` |
+| `0x6C` | manager, stored at level load | `fn_80007D68` |
+| `0x70` | texture | `fn_801C5B0C`, `fn_801C4338` |
+| `0x74` | draw mode | `fn_801C5B0C` -> `fn_801CA7B0` |
+| `0x78`, `0x7C` | the two pools of the instances | `fn_801C3F6C` |
+
+Left, no reader found: first kind `+0x04` (looks like a colour), `+0x38`, `+0x58`, `+0x60`; second
+kind `+0x64`, `+0x68`. The manager slots hold a build-time address in the file and are typed as
+words. Every texture is one of the 44 of the texture list.
+
+A pool pointer names 0x28 bytes of fill words: `fn_801EB908` writes all of it at level load,
+before anything reads it. The loader converts nothing there but records the memory as a region,
+so a file in which it overlaps another object, or two entries share it, is refused.
+
+### Object pools (header slots `0x10`, `0x418`)
+
+These are not effect data, as this note said before: each slot points at a ready-made object
+pool, the same object `fn_801EB7A4` builds at run time. `fn_8012189C` walks both as lists and
+gives the items back with `fn_801EBA20`; the header words `0x414` and `0x81C` are counters it
+clears, and the 256 words behind each slot are 0 in the file.
+
+| Offset | Field (from `fn_801EB7A4`, `fn_801EBAB8`, `fn_801EB94C`, `fn_801EBA20`) |
+|---|---|
+| `0x00`, `0x04`, `0x08`, `0x0C` | items per block (64 and 32), item size (0x28), alignment (0x10), items in use |
+| `0x10`, `0x14` | free list, used list: pointers to nodes |
+| `0x18` | parent pool (NULL) |
+| `0x1C` | block list |
+| `0x20` | `u8`: grow when empty |
+| `0x24` | block to use instead of allocating one |
+| `0x28` | `s32` allocator choice (-2) |
+
+The block starts with a next-block pointer; the nodes `{prev, next, item}` follow from the first
+address that puts an item on the pool's alignment, exactly as `fn_801EBAB8` lays them out. The
+loader checks that layout (one block, every link NULL or one of the pool's nodes) and converts
+the pool and the node links. The items are fill words in the file and are not converted.
+
 ### Not converted yet
 
 | Slot | Image offset | What is known | Why not |
@@ -450,7 +522,6 @@ no vtable from any code found so far; on the Wii it keeps the build-time address
 | font data (font object `+0x08`) | `0x26740`, `0x38220`, `0x390E0`, `0x626C0` | glyph tables; `fn_8018979C` measures text with them, `fn_801971F0` (709 instructions) draws, `fn_801894F4` / `fn_801894B8` prepare a font loaded from a file | those functions are not decompiled; nothing on the boot path reads the data |
 | sound objects named by action records | 42 objects between `0xDF2E0` and `0xF5D30` | argument 1 of `PlaySoundEffect`, argument 2 of `RegisterExperimentSound` and of `LT_SetTutorialText` (see "Action records") | their readers are not decompiled far enough to type the fields |
 | `0xDC0` | `0xF6CF0` | a table of screen names (`UI_MSA_newscreen`, ...) with ids and hashes | no decompiled function reads the slot |
-| `0x10`, `0x418`, `0x830`, `0x83C` | `0xF7580`, `0xF81D0`, `0xFDE20`, `0x100650` | effect data (`lightning_scrying`, `trail_plant`) | no decompiled function reads the slots |
 
 With this the boot runs through `UiInit` (`ScreenSetsInit`, `ScreenMgrLoad`, `HudInit`,
 `HudReset`), and the first `HudUpdateScreens` runs a state's enter action through the
@@ -490,7 +561,6 @@ In the order the boot path needs them:
    own (`TriggerDoAction` takes the table from the zone record at `+0xD4` for a zone id other
    than 0x1FF): the same `{count, records}` and the same record format, so `ActionRecordPlan`
    should apply once those tables are found.
-3. The effect data at `0x10`, `0x418`, `0x830`, `0x83C`, and **`shared_texture.sir`**: the texture
-   header schema here should apply as it is.
+3. **`shared_texture.sir`**: the texture header schema here should apply as it is.
 4. **Save files**: written from memory by the Wii build, so big-endian too.
 5. **`shared_parts.sir`** and the level and arena files: models, skeletons, textures.

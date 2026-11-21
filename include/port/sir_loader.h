@@ -24,6 +24,8 @@ typedef enum SirError {
     SIR_ERR_ACTIONS,          // action table (header slot 0x844): array or a record outside the image, or not a program
     SIR_ERR_UI,               // UI root, fonts or the objects of slots 0xDB4-0xDBC: pointer outside the image, font kind
     SIR_ERR_SCREENS,          // screen state machines (slots 0xD98, 0xD9C): bad count, node type or pointer
+    SIR_ERR_EFFECTS,          // effect definitions (header slots 0x82C-0x840): table or one of its pointers outside the image
+    SIR_ERR_POOL,             // object pool (header slots 0x10, 0x418): bad counts, block or list pointer
     SIR_ERR_OVERLAP,          // two of the objects above share bytes
     SIR_ERR_IO
 } SirError;
@@ -352,6 +354,21 @@ enum {
 #define FSM_SHARED_TRANSITION_USED  0x24   // of 0x30
 #define HUD_MACHINES                256
 #define HUD_SIZE                    0x434
+
+// ---------------------------------------------------------------------------------------------
+// Effect definitions (header slots 0x82C-0x840) and object pools (slots 0x10, 0x418).
+// fn_80007D68 gives the two definition tables to the managers lbl_8047C790 (0x70-byte entries)
+// and lbl_8047C7AC (0x80-byte entries). The schemas in sir_loader.cpp name the reader of each
+// field. An entry's pool pointers name memory the game initialises itself (fn_801EB908).
+// A pool is the object fn_801EB7A4 builds: {items per block, item size, alignment, in use, free
+// list, used list, parent, block list, grow flag, block, allocator}; its block holds the nodes
+// {prev, next, item} as fn_801EBAB8 lays them out.
+// ---------------------------------------------------------------------------------------------
+#define FX_BOLT_SIZE       0x70
+#define FX_TRAIL_SIZE      0x80
+#define FX_POOL_HEAD_SIZE  0x28   // what fn_801EB908 writes
+#define POOL_SIZE          0x2C
+#define POOL_MAX_ITEMS     0x10000
 
 // Converts the 4 KB header block (the pointer table the game keeps in sSirHeader).
 SirError GlobalBinaryConvertHeader(SirReloc* r, u8* hdr);

@@ -436,6 +436,91 @@ static void DumpUi(const GlobalBinaryFile* f) {
     }
 }
 
+// Effect definitions and object pools, read at the offsets the effect code (fn_80007D68,
+// fn_801BF714, fn_801BDB6C, fn_801C3F6C, fn_801C5444, ...) and the pool code (fn_801EB94C,
+// fn_801EBA20, fn_801EBAB8) use.
+static void DumpEffects(const GlobalBinaryFile* f) {
+    u32 n = *(const u32*)(f->hdr + 0x82C);
+    const u8* t = *(const u8**)(f->hdr + 0x830);
+    printf("fxbolts ");
+    PrintPtr((const u8*)&t, f);
+    printf(" count %u sorted %u\n", n, f->hdr[0x834]);
+    for (u32 i = 0; i < n; i++) {
+        const u8* e = t + i * FX_BOLT_SIZE;
+        printf("fxbolt %u hash %08x name %s tex ", i, *(const u32*)e, (const char*)e + 8);
+        PrintPtr(e + 0x28, f);
+        printf(" words ");
+        PrintWords(e + 0x2C, 3);
+        printf(" ");
+        PrintWords(e + 0x3C, 2);
+        printf(" floats");
+        for (u32 k = 0; k < 4; k++) printf(" %08x", Bits(*(const f32*)(e + 0x44 + k * 4)));
+        printf(" %08x %08x owner %08x pool ", Bits(*(const f32*)(e + 0x54)), Bits(*(const f32*)(e + 0x5C)), *(const u32*)(e + 0x64));
+        PrintPtr(e + 0x68, f);
+        printf(" end ");
+        PrintPtr(e + 0x6C, f);
+        printf(" raw ");
+        PrintRaw(e + 0x04, 4); printf(" ");
+        PrintRaw(e + 0x38, 4); printf(" ");
+        PrintRaw(e + 0x58, 4); printf(" ");
+        PrintRaw(e + 0x60, 4);
+        printf("\n");
+    }
+    n = *(const u32*)(f->hdr + 0x838);
+    t = *(const u8**)(f->hdr + 0x83C);
+    printf("fxtrails ");
+    PrintPtr((const u8*)&t, f);
+    printf(" count %u sorted %u\n", n, f->hdr[0x840]);
+    for (u32 i = 0; i < n; i++) {
+        const u8* e = t + i * FX_TRAIL_SIZE;
+        printf("fxtrail %u hash %08x colour %08x name %s words ", i, *(const u32*)e, *(const u32*)(e + 4), (const char*)e + 8);
+        PrintWords(e + 0x28, 2);
+        printf(" floats");
+        for (u32 k = 0; k < 7; k++) printf(" %08x", Bits(*(const f32*)(e + 0x30 + k * 4)));
+        printf(" w4c %d f50 %08x w54 %d floats", *(const s32*)(e + 0x4C), Bits(*(const f32*)(e + 0x50)), *(const s32*)(e + 0x54));
+        for (u32 k = 0; k < 3; k++) printf(" %08x", Bits(*(const f32*)(e + 0x58 + k * 4)));
+        printf(" owner %08x tex ", *(const u32*)(e + 0x6C));
+        PrintPtr(e + 0x70, f);
+        printf(" mode %d pools ", *(const s32*)(e + 0x74));
+        PrintPtrs(e + 0x78, 2, f);
+        printf(" raw ");
+        PrintRaw(e + 0x64, 8);
+        printf("\n");
+    }
+
+    for (u32 s : { 0x10u, 0x418u }) {
+        const u8* p = *(const u8**)(f->hdr + s);
+        if (p == NULL) continue;
+        u32 count = *(const u32*)p, size = *(const u32*)(p + 4), align = *(const u32*)(p + 8);
+        const u8* block = *(const u8**)(p + 0x24);
+        printf("pool 0x%03x ", s);
+        PrintPtr((const u8*)&p, f);
+        printf(" items %u size %u align %u used %u free ", count, size, align, *(const u32*)(p + 0xC));
+        PrintPtr(p + 0x10, f); printf(" inuse ");
+        PrintPtr(p + 0x14, f); printf(" parent ");
+        PrintPtr(p + 0x18, f); printf(" blocks ");
+        PrintPtr(p + 0x1C, f);
+        printf(" grow %u block ", p[0x20]);
+        PrintPtr(p + 0x24, f);
+        printf(" alloc %d next ", *(const s32*)(p + 0x28));
+        PrintPtr(block, f);
+        printf("\n");
+        // fn_801EBAB8 aligns on the Wii address of the block.
+        u32 blockWii = GLOBAL_BINARY_WII_BASE + (u32)(block - f->image);
+        const u8* first = f->image + ((((blockWii + 4 + align + 7) & ~(align - 1)) - 8) - GLOBAL_BINARY_WII_BASE);
+        for (u32 i = 0; i < count; i++) {
+            const u8* node = first + i * (size + 8);
+            printf("poolnode 0x%03x %u ", s, i);
+            PrintPtr((const u8*)&node, f);
+            printf(" prev ");
+            PrintPtr(node, f);
+            printf(" next ");
+            PrintPtr(node + 4, f);
+            printf("\n");
+        }
+    }
+}
+
 static int Dump(const char* path) {
     SirReloc r;
     GlobalBinaryFile f;
@@ -523,6 +608,7 @@ static int Dump(const char* path) {
 
     DumpImage(&f);
     DumpUi(&f);
+    DumpEffects(&f);
     printf("report image %u dolkept %u dolresolved %u unknown %u\n", r.ptrImage, r.ptrDolKept, r.ptrDolResolved, r.ptrUnknown);
     GlobalBinaryFree(&f);
     return 0;
@@ -641,10 +727,16 @@ static void Put16(u8* p, u16 v) {
 #define T_KEYS      (T_STRANS + 0x30)        // two state keys
 #define T_PROG0     (T_KEYS + 0x10)          // action record: 12 words
 #define T_PROG1     (T_PROG0 + 0x30)         // action record: 3 words, then a fill word
-#define T_SIZE      (T_PROG1 + 0x10)
+#define T_FXBOLT    (T_PROG1 + 0x10)         // effect definition, first kind: 0x70
+#define T_FXTRAIL   (T_FXBOLT + 0x70)        // effect definition, second kind: 0x80
+#define T_FXPOOLS   (T_FXTRAIL + 0x80)       // memory for their three pools, 0x30 each
+#define T_POOL      (T_FXPOOLS + 0x90)       // ready-made pool: 0x2C
+#define T_POOL_BLOCK (T_POOL + 0x30)         // its block: the next-block word, then two nodes of 0x30
+#define T_POOL_NODES (T_POOL_BLOCK + 0x08)
+#define T_SIZE      (T_POOL_BLOCK + 0x70)
 #define T_ADDR(off) (GLOBAL_BINARY_WII_BASE + (off))
 
-#define T_OBJECT_PTRS 68u   // image pointers in the hand-typed objects and their header slots
+#define T_OBJECT_PTRS 81u   // image pointers in the hand-typed objects and their header slots
 
 static u8 gFakeVtable[4];
 static void* TestResolver(u32 addr, void*) {
@@ -890,6 +982,48 @@ static void BuildUi(u8* hdr, u8* img) {
     Put32(img + T_KEYS + 4, 0xC80B2CFC);
 }
 
+// One effect definition of each kind with their pool memory, and a ready-made pool of two items.
+static void BuildEffects(u8* hdr, u8* img) {
+    Put32(hdr + 0x82C, 1); Put32(hdr + 0x830, T_ADDR(T_FXBOLT)); hdr[0x834] = 1;
+    Put32(hdr + 0x838, 1); Put32(hdr + 0x83C, T_ADDR(T_FXTRAIL)); hdr[0x840] = 1;
+    Put32(hdr + 0x010, T_ADDR(T_POOL));
+
+    u8* b = img + T_FXBOLT;
+    memset(b, 0, FX_BOLT_SIZE);
+    Put32(b + 0x00, 0x02212CFE);
+    Put32(b + 0x04, 0xCCFF7F7F);                              // no reader: stays as it is
+    strcpy((char*)b + 8, "bolt_test");
+    Put32(b + 0x28, T_ADDR(T_TEX0));
+    Put32(b + 0x2C, 2); Put32(b + 0x30, 5); Put32(b + 0x38, 2);
+    Put32(b + 0x48, 0x3E4CCCCD); Put32(b + 0x4C, 0x3F800000); Put32(b + 0x54, 0x3E800000);
+    Put32(b + 0x58, 1);
+    Put32(b + 0x64, T_VTABLE);
+    Put32(b + 0x68, T_ADDR(T_FXPOOLS));
+
+    u8* t = img + T_FXTRAIL;
+    memset(t, 0, FX_TRAIL_SIZE);
+    Put32(t + 0x00, 0x053C1A4D); Put32(t + 0x04, 0xFF00FF00);
+    strcpy((char*)t + 8, "trail_test");
+    Put32(t + 0x28, 1); Put32(t + 0x2C, 1000);
+    Put32(t + 0x38, 0x3F800000); Put32(t + 0x50, 0x3D086595);
+    Put32(t + 0x64, 3); Put32(t + 0x68, 3);
+    Put32(t + 0x6C, T_VTABLE);
+    Put32(t + 0x70, T_ADDR(T_TEX1));
+    Put32(t + 0x74, 2);
+    Put32(t + 0x78, T_ADDR(T_FXPOOLS + 0x30));
+    Put32(t + 0x7C, T_ADDR(T_FXPOOLS + 0x60));
+
+    u8* p = img + T_POOL;
+    Put32(p + 0x00, 2); Put32(p + 0x04, 0x28); Put32(p + 0x08, 0x10); Put32(p + 0x0C, 0);
+    Put32(p + 0x10, T_ADDR(T_POOL_NODES)); Put32(p + 0x14, 0); Put32(p + 0x18, 0); Put32(p + 0x1C, T_ADDR(T_POOL_BLOCK));
+    p[0x20] = 0;
+    Put32(p + 0x24, T_ADDR(T_POOL_BLOCK));
+    Put32(p + 0x28, 0xFFFFFFFE);
+    Put32(img + T_POOL_BLOCK, 0);
+    Put32(img + T_POOL_NODES + 0x00, 0); Put32(img + T_POOL_NODES + 0x04, T_ADDR(T_POOL_NODES + 0x30));
+    Put32(img + T_POOL_NODES + 0x30, T_ADDR(T_POOL_NODES)); Put32(img + T_POOL_NODES + 0x34, 0);
+}
+
 // A miniature global_binary image: the database object, 42 descriptors (two with rows), in the
 // byte order and with the fill pattern of the real file.
 static void BuildImage(u8* hdr, u8* img) {
@@ -955,6 +1089,7 @@ static void BuildImage(u8* hdr, u8* img) {
 
     BuildObjects(hdr, img);
     BuildUi(hdr, img);
+    BuildEffects(hdr, img);
 }
 
 static SirError ConvertBuilt(u8* hdr, u8* img, SirReloc* r, s32* failTable) {
@@ -1133,6 +1268,32 @@ static int SelfTest(void) {
         CHECK((*(const u32**)(ts + 0x1C))[1] == 0xC80B2CFC && ts[0x27] == 0);
     }
 
+    // Effect definitions and the ready-made pool, read the way fn_80007D68 and the pool code do.
+    {
+        const u8* b = *(const u8**)(hdr + 0x830);
+        CHECK(*(const u32*)(hdr + 0x82C) == 1 && b == img + T_FXBOLT && hdr[0x834] == 1);
+        CHECK(*(const u32*)b == 0x02212CFE && b[4] == 0xCC && b[7] == 0x7F && strcmp((const char*)b + 8, "bolt_test") == 0);
+        CHECK(*(const u8**)(b + 0x28) == img + T_TEX0 && *(const u32*)(b + 0x2C) == 2 && *(const u32*)(b + 0x30) == 5);
+        CHECK(b[0x3B] == 2 && b[0x5B] == 1);                                       // +0x38, +0x58: no reader, untouched
+        CHECK(*(const f32*)(b + 0x48) == 0.2f && *(const f32*)(b + 0x4C) == 1.0f && *(const f32*)(b + 0x54) == 0.25f);
+        CHECK(*(const u32*)(b + 0x64) == T_VTABLE && *(const u8**)(b + 0x68) == img + T_FXPOOLS && *(const u8**)(b + 0x6C) == NULL);
+        CHECK(img[T_FXPOOLS] == 0x7F && img[T_FXPOOLS + 3] == 0x01);               // pool memory: the game fills it in
+        const u8* t = *(const u8**)(hdr + 0x83C);
+        CHECK(*(const u32*)(hdr + 0x838) == 1 && t == img + T_FXTRAIL);
+        CHECK(*(const u32*)t == 0x053C1A4D && *(const u32*)(t + 4) == 0xFF00FF00 && *(const s32*)(t + 0x2C) == 1000);
+        CHECK(*(const f32*)(t + 0x38) == 1.0f && *(const s32*)(t + 0x4C) == 0 && t[0x67] == 3 && t[0x6B] == 3);
+        CHECK(*(const u8**)(t + 0x70) == img + T_TEX1 && *(const s32*)(t + 0x74) == 2);
+        CHECK(*(const u8**)(t + 0x78) == img + T_FXPOOLS + 0x30 && *(const u8**)(t + 0x7C) == img + T_FXPOOLS + 0x60);
+        const u8* p = *(const u8**)(hdr + 0x010);
+        CHECK(p == img + T_POOL && *(const s32*)p == 2 && *(const s32*)(p + 4) == 0x28 && *(const s32*)(p + 8) == 0x10);
+        const u8* head = *(const u8**)(p + 0x10);                                  // fn_801EB94C takes this one
+        CHECK(head == img + T_POOL_NODES && *(const u8**)(p + 0x14) == NULL && *(const u8**)(p + 0x1C) == img + T_POOL_BLOCK);
+        CHECK(p[0x20] == 0 && *(const u8**)(p + 0x24) == img + T_POOL_BLOCK && *(const s32*)(p + 0x28) == -2);
+        const u8* second = *(const u8**)(head + 4);
+        CHECK(*(const u8**)head == NULL && second == img + T_POOL_NODES + 0x30 && *(const u8**)second == head && *(const u8**)(second + 4) == NULL);
+        CHECK(head[8] == 0x7F && head[0x0B] == 0x01);                              // the items: untouched
+    }
+
     // Pointer fields of a hand-written schema: image, main.dol (known and unknown), elsewhere, NULL.
     {
         static const SirField fields[] = { { 0x0, SIR_PTR, 5 }, { 0x14, SIR_U16, 2 }, { 0x18, SIR_F32, 1 } };
@@ -1191,6 +1352,16 @@ static int SelfTest(void) {
         { T_PROG0 + 0x1C, 0x00060106, SIR_ERR_ACTIONS, -1 },                                // jump past the end
         { T_PROG1 + 0x08, 0x00000102, SIR_ERR_ACTIONS, -1 },                                // no end word
         { T_ACT + 0x0C, T_ADDR(T_PROG0 + 0x14), SIR_ERR_OVERLAP, -1 },                      // record inside another record
+        { T_FXBOLT + 0x28, 0x12345678, SIR_ERR_EFFECTS, -1 },                               // texture outside the image
+        { T_FXTRAIL + 0x7C, T_ADDR(T_SIZE - 0x10), SIR_ERR_EFFECTS, -1 },                   // pool memory runs off the image
+        { T_FXTRAIL + 0x7C, T_ADDR(T_FXPOOLS + 0x30), SIR_ERR_OVERLAP, -1 },                // one pool memory used twice
+        { T_FXTRAIL + 0x78, T_ADDR(T_POOL_NODES + 0x08), SIR_ERR_OVERLAP, -1 },             // pool memory inside the ready-made pool
+        { T_POOL + 0x00, 0, SIR_ERR_POOL, -1 },                                             // pool without items
+        { T_POOL + 0x08, 0x18, SIR_ERR_POOL, -1 },                                          // alignment not a power of two
+        { T_POOL + 0x1C, T_ADDR(T_POOL_NODES), SIR_ERR_POOL, -1 },                          // block list is not the block
+        { T_POOL + 0x10, T_ADDR(T_POOL_NODES + 0x10), SIR_ERR_POOL, -1 },                   // free list does not start at a node
+        { T_POOL_NODES + 0x04, T_ADDR(T_FXBOLT), SIR_ERR_POOL, -1 },                        // node links out of the pool
+        { T_POOL + 0x00, 3, SIR_ERR_POOL, -1 },                                             // third node would be the fill behind the block
         { T_UI_ROOT + 0x14, T_ADDR(T_SIZE - 0x40), SIR_ERR_UI, -1 },                        // font runs off the image
         { T_FONT_OBJ + 0x04, 2, SIR_ERR_UI, -1 },                                           // font object of no known class
         { T_FONT_OBJ + 0x124, UI_FONT_PAGES + 1, SIR_ERR_UI, -1 },                          // more pages than slots

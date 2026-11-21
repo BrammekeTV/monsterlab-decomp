@@ -197,6 +197,8 @@ extern "C" const char* SirErrorText(SirError e) {
     case SIR_ERR_ACTIONS:        return "action table array or a record outside the image, or a record that is not a program (length, jump)";
     case SIR_ERR_UI:             return "UI root, font or UI object not recognised (pointer outside the image, font kind or page count)";
     case SIR_ERR_SCREENS:        return "screen state machine not recognised (count, node type or pointer outside the image)";
+    case SIR_ERR_EFFECTS:        return "effect definition table, a texture or a pool pointer of it outside the image";
+    case SIR_ERR_POOL:           return "object pool not recognised (counts, block, or a list pointer that is not one of its nodes)";
     case SIR_ERR_OVERLAP:        return "two objects of the image share bytes";
     case SIR_ERR_IO:             return "cannot read file";
     }
@@ -352,7 +354,9 @@ enum RegionKind {
     REGION_ACTION_TABLE, REGION_PTR_ARRAY, REGION_U32_ARRAY,
     REGION_UI_ROOT, REGION_UI_FONT, REGION_UI_FONT_OBJ, REGION_UI_FONT_LIST, REGION_UI_DRAW, REGION_UI_PAD,
     REGION_FSM, REGION_FSM_DEF, REGION_FSM_STATES, REGION_FSM_EVENTS, REGION_FSM_SHARED_EVENTS, REGION_FSM_NODE,
-    REGION_FSM_TRANSITION, REGION_FSM_SHARED_TRANSITION, REGION_HUD
+    REGION_FSM_TRANSITION, REGION_FSM_SHARED_TRANSITION, REGION_HUD,
+    REGION_FX_BOLTS, REGION_FX_TRAILS, REGION_POOL, REGION_POOL_BLOCK,
+    REGION_RUNTIME    // memory the game initialises itself: nothing to convert, but nothing else may be there
 };
 
 struct Region {
@@ -1108,6 +1112,142 @@ static SirError ActionRecordsPlan(ImagePlan* plan, const u8* image, u32 imageSiz
     return SIR_OK;
 }
 
+// ---- effect definitions (header slots 0x82C-0x840) and the two pools of slots 0x10 and 0x418
+//
+// fn_80007D68 (the start of a level load) hands both tables to their managers: {count 0x82C,
+// entries 0x830, sorted flag 0x834} to lbl_8047C790 and {0x838, 0x83C, 0x840} to lbl_8047C7AC. It
+// stores the manager in every entry and sets up the entry's pools with fn_801EB908. An effect
+// instance keeps its definition at +0, so the fields are read as *(*(node) + off).
+
+// Entry of the first table (0x70 bytes; "lightning_scrying", ...). The name at +0x08 is text.
+// +0x04, +0x38, +0x58 and +0x60 have no reader in the decompiled code and are left.
+static const SirField kFxBoltFields[] = {
+    { 0x00, SIR_U32, 1 },     // code: name hash, the search key (FindRecord in draft_miss346.cpp; sorted when the flag is set)
+    { 0x28, SIR_PTR, 1 },     // code: texture (fn_801BF714)
+    { 0x2C, SIR_U32, 3 },     // code: draw mode (fn_801BF714 -> fn_801CA7B0), +0x30, +0x34 (fn_801BDB6C)
+    { 0x3C, SIR_U32, 2 },     // code: fn_801BDB6C
+    { 0x44, SIR_F32, 4 },     // code: fn_801BDB6C (+0x44, +0x48, +0x50), fn_801BD278, fn_801BE620, fn_801BCD88 (+0x48, +0x4C)
+    { 0x54, SIR_F32, 1 },     // code: fn_801BF4B8
+    { 0x5C, SIR_F32, 1 },     // code: fn_801BDB6C
+    { 0x64, SIR_U32, 1 },     // code: fn_80007D68 stores the manager here (the file has a build-time address)
+    { 0x68, SIR_PTR, 1 },     // code: pool of the instances (fn_80007D68, fn_801BE44C)
+    { 0x6C, SIR_PTR, 1 },     // code: callback run when an instance ends (fn_801BE44C); NULL in the file
+};
+
+// Entry of the second table (0x80 bytes; "trail_plant", ...). +0x64 and +0x68 have no reader.
+static const SirField kFxTrailFields[] = {
+    { 0x00, SIR_U32, 2 },     // code: name hash (fn_801C3EA4); colour word (fn_801C5AAC reads, fn_801C3F6C writes)
+    { 0x28, SIR_U32, 2 },     // code: fn_801C3F6C (+0x28), fn_801C5444 (+0x2C)
+    { 0x30, SIR_F32, 7 },     // code: fn_801C5444 (+0x30, +0x34, +0x40..+0x48), fn_801C4338 (+0x38), fn_801C3F6C (+0x3C..+0x48)
+    { 0x4C, SIR_U32, 1 },     // code: fn_801C3F6C, fn_801C3924 (which pool an instance comes from)
+    { 0x50, SIR_F32, 1 },     // code: fn_801C4B90, fn_801C5444
+    { 0x54, SIR_U32, 1 },     // code: fn_801C4338, fn_801C5444
+    { 0x58, SIR_F32, 3 },     // code: fn_801C4338 (+0x58, +0x60), fn_801C5444 (+0x5C)
+    { 0x6C, SIR_U32, 1 },     // code: fn_80007D68 stores the manager here (the file has a build-time address)
+    { 0x70, SIR_PTR, 1 },     // code: texture (fn_801C5B0C, fn_801C4338)
+    { 0x74, SIR_U32, 1 },     // code: draw mode (fn_801C5B0C -> fn_801CA7B0)
+    { 0x78, SIR_PTR, 2 },     // code: the two pools of the instances (fn_80007D68, fn_801C3F6C)
+};
+
+// The memory an entry's pool pointer names: fn_801EB908 writes +0x00..+0x27 of it at level load
+// before anything reads it. The file has fill words there and nothing is converted, but it is a
+// region of its own, so no other object may share it.
+static SirError FxPoolSlotPlan(ImagePlan* plan, u32 imageSize, u32 addr) {
+    u32 off;
+    if (addr == 0) return SIR_OK;   // fn_80007D68 skips a NULL pool
+    if (!ImageSpan(addr, FX_POOL_HEAD_SIZE, imageSize, &off)) return SIR_ERR_EFFECTS;
+    if (PlanHas(plan, off, REGION_RUNTIME)) return SIR_ERR_OVERLAP;   // two entries would share one pool
+    return PlanAdd(plan, off, FX_POOL_HEAD_SIZE, REGION_RUNTIME) ? SIR_OK : SIR_ERR_EFFECTS;
+}
+
+static SirError FxTablePlan(ImagePlan* plan, const u8* image, u32 imageSize, u32 addr, u32 count, bool trail) {
+    u32 off, size = trail ? FX_TRAIL_SIZE : FX_BOLT_SIZE;
+    if (count == 0) return ImagePtrOk(addr, imageSize) ? SIR_OK : SIR_ERR_EFFECTS;
+    if (!ImageSpan(addr, (u64)count * size, imageSize, &off) ||
+        !PlanAdd(plan, off, count * size, trail ? REGION_FX_TRAILS : REGION_FX_BOLTS)) return SIR_ERR_EFFECTS;
+    for (u32 i = 0; i < count; i++) {
+        const u8* e = image + off + i * size;
+        if (!ImagePtrOk(Be32(e + (trail ? 0x70 : 0x28)), imageSize)) return SIR_ERR_EFFECTS;
+        SirError err = FxPoolSlotPlan(plan, imageSize, Be32(e + (trail ? 0x78 : 0x68)));
+        if (err == SIR_OK && trail) err = FxPoolSlotPlan(plan, imageSize, Be32(e + 0x7C));
+        if (err != SIR_OK) return err;
+        if (!trail && !ImagePtrOk(Be32(e + 0x6C), imageSize)) return SIR_ERR_EFFECTS;
+    }
+    return SIR_OK;
+}
+
+// Object pool (fn_801EB7A4 builds one at run time; the two of header slots 0x10 and 0x418 come
+// ready-made in the file). fn_801EB94C takes an item from the free list, fn_801EBA20 gives it back.
+static const SirField kPoolFields[] = {
+    { 0x00, SIR_U32, 4 },     // code: items per block, item size, alignment, items in use
+    { 0x10, SIR_PTR, 4 },     // code: free list, used list, parent pool, block list
+    // 0x20: u8: grow when empty
+    { 0x24, SIR_PTR, 1 },     // code: block to use instead of allocating one (fn_801EBAB8)
+    { 0x28, SIR_U32, 1 },     // code: s32, -2 selects the allocator (fn_801EBAB8)
+};
+
+// The block of a pool as fn_801EBAB8 lays it out: the next-block pointer, then, from the first
+// address that puts an item on the pool's alignment, `count` nodes {prev, next, item}.
+struct PoolLayout {
+    u32 blockOff;      // in the image
+    u32 firstOff;      // first node
+    u32 stride;        // item size + 8
+    u32 count;
+};
+
+static bool PoolLayoutRead(const u8* pool, u32 imageSize, PoolLayout* out) {
+    u32 count = Be32(pool + 0x00), itemSize = Be32(pool + 0x04), align = Be32(pool + 0x08), block = Be32(pool + 0x24);
+    if (count == 0 || count > POOL_MAX_ITEMS || itemSize == 0 || itemSize > 0x10000 || (itemSize & 3) != 0) return false;
+    if (align < 4 || align > 0x1000 || (align & (align - 1)) != 0) return false;
+    if (block < GLOBAL_BINARY_WII_BASE || Be32(pool + 0x1C) != block) return false;
+    u32 first = ((block + 4 + align + 7) & ~(align - 1)) - 8;
+    out->stride = itemSize + 8;
+    out->count = count;
+    if (!ImageSpan(block, (u64)(first - block) + (u64)count * out->stride, imageSize, &out->blockOff)) return false;
+    out->firstOff = first - GLOBAL_BINARY_WII_BASE;
+    return true;
+}
+
+// NULL or the address of one of the pool's nodes.
+static bool PoolNodeOk(const PoolLayout* l, u32 addr) {
+    if (addr == 0) return true;
+    if (addr < GLOBAL_BINARY_WII_BASE) return false;
+    u32 off = addr - GLOBAL_BINARY_WII_BASE;
+    return off >= l->firstOff && (off - l->firstOff) % l->stride == 0 && (off - l->firstOff) / l->stride < l->count;
+}
+
+static SirError PoolPlan(ImagePlan* plan, const u8* image, u32 imageSize, u32 addr) {
+    u32 off;
+    PoolLayout l;
+    if (!ImageSpan(addr, POOL_SIZE, imageSize, &off) || !PoolLayoutRead(image + off, imageSize, &l)) return SIR_ERR_POOL;
+    const u8* pool = image + off;
+    // The lists start at a node; the pool has one block and no parent.
+    if (!PoolNodeOk(&l, Be32(pool + 0x10)) || !PoolNodeOk(&l, Be32(pool + 0x14)) || Be32(pool + 0x18) != 0 ||
+        Be32(image + l.blockOff) != 0) return SIR_ERR_POOL;
+    for (u32 i = 0; i < l.count; i++) {
+        const u8* node = image + l.firstOff + i * l.stride;
+        if (!PoolNodeOk(&l, Be32(node + 0)) || !PoolNodeOk(&l, Be32(node + 4))) return SIR_ERR_POOL;
+    }
+    if (!PlanAdd(plan, off, POOL_SIZE, REGION_POOL)) return SIR_ERR_POOL;
+    // The block is one region: its items are not converted, but the pool hands them out.
+    return PlanAdd(plan, l.blockOff, (l.firstOff - l.blockOff) + l.count * l.stride, REGION_POOL_BLOCK) ? SIR_OK : SIR_ERR_POOL;
+}
+
+// Converts a pool and its block. The block is reached from the pool, so both are done here, when
+// the pool's region comes up, while the pool's words are still big-endian.
+static void PoolConvert(SirReloc* r, u8* image, u8* pool, u32 imageSize) {
+    PoolLayout l;
+    if (PoolLayoutRead(pool, imageSize, &l)) {
+        ConvertPtr(r, image + l.blockOff);                       // next block
+        for (u32 i = 0; i < l.count; i++) {
+            u8* node = image + l.firstOff + i * l.stride;
+            ConvertPtr(r, node + 0);                             // previous node
+            ConvertPtr(r, node + 4);                             // next node
+        }
+    }
+    SirConvertRecord(r, pool, POOL_SIZE, kPoolFields, COUNTOF(kPoolFields));
+}
+
 // ---- all of them
 
 static SirError ImagePlanBuild(ImagePlan* plan, const u8* hdr, u8* image, u32 imageSize) {
@@ -1126,11 +1266,15 @@ static SirError ImagePlanBuild(ImagePlan* plan, const u8* hdr, u8* image, u32 im
     if (e == SIR_OK && (addr = Be32(hdr + 0xDBC)) != 0) e = UiPadPlan(plan, imageSize, addr);
     if (e == SIR_OK && (addr = Be32(hdr + 0xD98)) != 0) e = FsmPlan(plan, image, imageSize, addr);
     if (e == SIR_OK && (addr = Be32(hdr + 0xD9C)) != 0) e = HudPlan(plan, image, imageSize, addr);
+    if (e == SIR_OK) e = FxTablePlan(plan, image, imageSize, Be32(hdr + 0x830), Be32(hdr + 0x82C), false);
+    if (e == SIR_OK) e = FxTablePlan(plan, image, imageSize, Be32(hdr + 0x83C), Be32(hdr + 0x838), true);
+    if (e == SIR_OK && (addr = Be32(hdr + 0x010)) != 0) e = PoolPlan(plan, image, imageSize, addr);
+    if (e == SIR_OK && (addr = Be32(hdr + 0x418)) != 0) e = PoolPlan(plan, image, imageSize, addr);
     if (e != SIR_OK) return e;
     return PlanFinish(plan) ? SIR_OK : SIR_ERR_OVERLAP;
 }
 
-static void ImagePlanConvert(const ImagePlan* plan, SirReloc* r, u8* image) {
+static void ImagePlanConvert(const ImagePlan* plan, SirReloc* r, u8* image, u32 imageSize) {
     for (u32 i = 0; i < plan->count; i++) {
         const Region* g = &plan->regions[i];
         u8* p = image + g->off;
@@ -1168,6 +1312,12 @@ static void ImagePlanConvert(const ImagePlan* plan, SirReloc* r, u8* image) {
             SirConvertRecord(r, p, g->size, kFsmSharedTransitionFields, COUNTOF(kFsmSharedTransitionFields));
             break;
         case REGION_HUD:          SirConvertRecord(r, p, g->size, kHudFields, COUNTOF(kHudFields)); break;
+        case REGION_FX_BOLTS:     ConvertRecords(r, p, g->size, FX_BOLT_SIZE, kFxBoltFields, COUNTOF(kFxBoltFields)); break;
+        case REGION_FX_TRAILS:    ConvertRecords(r, p, g->size, FX_TRAIL_SIZE, kFxTrailFields, COUNTOF(kFxTrailFields)); break;
+        case REGION_POOL:         PoolConvert(r, image, p, imageSize); break;
+        case REGION_POOL_BLOCK:   // converted with its pool
+        case REGION_RUNTIME:
+            break;
         }
     }
 }
@@ -1180,16 +1330,18 @@ static void ImagePlanConvert(const ImagePlan* plan, SirReloc* r, u8* image) {
 // Words not listed are 0 or -1 in the shipped file, which read the same in both byte orders.
 static const SirField kGlobalBinaryHeaderFields[] = {
     { 0x008, SIR_U32, 1 },    // code: text hash of the save comment (-1)
-    { 0x010, SIR_PTR, 1 },    // data
-    { 0x418, SIR_PTR, 1 },    // data
+    { 0x010, SIR_PTR, 1 },    // code: object pool (fn_8012189C); the 256 words behind it are 0 in the file
+    { 0x414, SIR_U32, 1 },    // code: fn_8012189C clears it
+    { 0x418, SIR_PTR, 1 },    // code: object pool (fn_8012189C)
+    { 0x81C, SIR_U32, 1 },    // code: fn_8012189C clears it
     // 0x820: u8 flag (code: cleared as a byte)
     { 0x824, SIR_PTR, 2 },    // code: texture "Icon-HomeButtonMenu_is_not_available", model "Generic_box"
-    { 0x82C, SIR_U32, 1 },    // data: 0x1B
-    { 0x830, SIR_PTR, 1 },    // data
-    // 0x834: u8 flag (data)
-    { 0x838, SIR_U32, 1 },    // data: 0x46
-    { 0x83C, SIR_PTR, 1 },    // data
-    // 0x840: u8 flag (data)
+    { 0x82C, SIR_U32, 1 },    // code: number of effect definitions of the first kind (fn_80007D68)
+    { 0x830, SIR_PTR, 1 },    // code: their 0x70-byte entries
+    // 0x834: u8 flag (code: the entries are sorted by hash)
+    { 0x838, SIR_U32, 1 },    // code: number of effect definitions of the second kind
+    { 0x83C, SIR_PTR, 1 },    // code: their 0x80-byte entries
+    // 0x840: u8 flag (code: sorted)
     { 0x844, SIR_PTR, 1 },    // code: action table, kept in gGlobalBinaryField844 (TriggerDoAction)
     { 0x848, SIR_U32, 6 },    // data: 0x3FFFF each
     { 0x860, SIR_U32, 5 },    // data: hash, 0x1AB80, 0, 0x37, 1234
@@ -1216,7 +1368,7 @@ extern "C" SirError GlobalBinaryConvert(SirReloc* r, u8* hdr, u8* image, u32 ima
     SirError e = ImagePlanBuild(&plan, hdr, image, imageSize);
     if (e == SIR_OK) e = GameDbConvert(r, image, imageSize, Be32(hdr + GLOBAL_BINARY_HDR_GAMEDB), failTable);
     if (e == SIR_OK) {
-        ImagePlanConvert(&plan, r, image);
+        ImagePlanConvert(&plan, r, image, imageSize);
         e = GlobalBinaryConvertHeader(r, hdr);
     }
     PlanFree(&plan);
