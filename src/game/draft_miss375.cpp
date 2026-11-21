@@ -5,7 +5,7 @@
 extern "C" {
 void  fn_80155724(u8* m);                          // 0x80155724
 void fn_801561C0(f32 scale);                           // 0x801561C0
-s32   fn_801704F8(f32* scale);                     // 0x801704F8
+u8* fn_801704F8(u8* obj, f32* scale);                     // 0x801704F8
 void  fn_80173438(u8* res, s32 type, s32 flag, u8* p);  // 0x80173438
 void* fn_80183FCC(u8* p, s32 idx);                 // 0x80183FCC
 extern u8 lbl_80400FF0[];                          // 0x80400FF0 (renderer matrix block)
@@ -69,17 +69,17 @@ extern "C" {
 // draw entries of arg1.
 void fn_80170C28(u8* arg0, u8* arg1, s32 arg2) {
     f32 scale = *(f32*)(arg1 + 0x54);
-    s32 var_r31;
+    u8* var_r31;
     if (*(s32*)(arg0 + 0xB0) != 0) {
         f32 sp8 = scale;
-        var_r31 = fn_801704F8(&sp8);
+        var_r31 = fn_801704F8(arg0, &sp8);
         fn_80155724(*(u8**)(arg0 + 0x4));
         *(f32*)(lbl_80400FF0 + 0x0) = *(f32*)(arg0 + 0x24);
         *(f32*)(lbl_80400FF0 + 0x4) = *(f32*)(arg0 + 0x28);
         *(f32*)(lbl_80400FF0 + 0x8) = *(f32*)(arg0 + 0x2C);
     } else {
         u8* src = *(u8**)(arg0 + 0x4);
-        var_r31 = 0;
+        var_r31 = NULL;
         if (src != NULL) {
             f32 m[12], sp[12];
             s32 flags = *(s32*)(arg0 + 0xC);
@@ -102,7 +102,7 @@ void fn_80170C28(u8* arg0, u8* arg1, s32 arg2) {
             fn_801561C0(1.0f);  // scale is a leftover f1 in the asm; 1.0 assumed
         }
     }
-    fn_80173438(arg1, arg2, var_r31, arg0 + 0x3C);
+    fn_80173438(arg1, arg2, (s32)(intptr_t)var_r31, arg0 + 0x3C);  // lint:ok pointer passed as a flag
 }
 
 // 0x80171228
@@ -112,17 +112,17 @@ void fn_80171228(u8* arg0, s32 arg1, s32 arg2, f32 farg0) {
     u8* res = *(u8**)(arg0 + 0x10);
     if (res == NULL) return;
 
-    s32 var_r31;
+    u8* var_r31;
     f32 var_f14;
     f32* var_r30;
     if (*(s32*)(arg0 + 0xB0) != 0) {
         f32 sp8 = *(f32*)(res + 0x54);
         var_r30 = *(f32**)(arg0 + 0x4);
-        var_r31 = fn_801704F8(&sp8);
+        var_r31 = fn_801704F8(arg0, &sp8);
         var_f14 = 1.0f;
     } else {
         u8* src = *(u8**)(arg0 + 0x4);
-        var_r31 = 0;
+        var_r31 = NULL;
         if (src != NULL) {
             f32 scale = *(f32*)(res + 0x54);
             s32 flags = *(s32*)(arg0 + 0xC);
@@ -154,7 +154,7 @@ void fn_80171228(u8* arg0, s32 arg1, s32 arg2, f32 farg0) {
         s32 type = *(u8*)(r23 + 0xD);
         if (notUnit || (*(s32*)(r24 + 0xC) & 1)) type = 3;
         u8* rec = (u8*)fn_80183FCC(lbl_80412B20, type);
-        if (rec != NULL) FillRecord(rec, farg0, r23, r24, arg0, var_r30, var_r31, var_f14, arg1, arg2);
+        if (rec != NULL) FillRecord(rec, farg0, r23, r24, arg0, var_r30, (s32)(intptr_t)var_r31, var_f14, arg1, arg2);  // lint:ok pointer stored as a word
     }
     if (var_r30 == NULL) {
         u8* r23 = *(u8**)(*(u8**)(arg0 + 0x10) + 0x64);

@@ -99,6 +99,11 @@
  "changelog": [
   {
    "date": "2026-11-21",
+   "time": "17:18",
+   "text": "Round 57: 14 more renderer functions (sphere-triangle test, bone matrix builder, light slot sorts, scene draw loop, effect dispatch thunk)"
+  },
+  {
+   "date": "2026-11-21",
    "time": "17:12",
    "text": "Round 56: 24 more renderer/video functions (film dust/grain, colour grading, water height field, effect type dispatcher, fade tables, frustum tests)"
   },
