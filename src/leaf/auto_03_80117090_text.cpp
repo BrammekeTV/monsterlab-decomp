@@ -6,7 +6,7 @@
 #include "types.h"
 
 extern u8* lbl_805FBBE0;
-extern u8 lbl_805FECE0[];
+extern f32 lbl_805FECE0;
 extern "C" f32 MonsterRateAttack(u8*);
 extern "C" f32 MonsterRateDefence(u8*);
 extern "C" f32 MonsterRateEnergy(u8*);

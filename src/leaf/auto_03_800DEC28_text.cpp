@@ -5,7 +5,7 @@
 
 #include "types.h"
 
-extern u8 lbl_805FE7C4[];
+extern f32 lbl_805FE7C4;
 
 // 0x800DEF90
 extern "C" f32 fn_800DEF90(void) {

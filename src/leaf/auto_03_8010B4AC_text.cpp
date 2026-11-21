@@ -5,7 +5,7 @@
 
 #include "types.h"
 
-extern u8 lbl_805FEC70[];
+extern f32 lbl_805FEC70;
 
 // 0x8010B4AC
 extern "C" void fn_8010B4AC(u8* a3) {

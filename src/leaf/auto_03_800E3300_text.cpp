@@ -5,7 +5,7 @@
 
 #include "types.h"
 
-extern u8 lbl_805FE9A0[];
+extern f32 lbl_805FE9A0;
 
 // 0x800E3300
 extern "C" void fn_800E3300(void) {

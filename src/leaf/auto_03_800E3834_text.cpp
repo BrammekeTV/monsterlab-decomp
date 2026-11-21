@@ -5,7 +5,7 @@
 
 #include "types.h"
 
-extern u8 lbl_805FE9D8[];
+extern f32 lbl_805FE9D8;
 
 // 0x800E3834
 extern "C" void fn_800E3834(void) {

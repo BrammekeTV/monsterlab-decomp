@@ -8,7 +8,7 @@
 extern u8 lbl_805FB1A0;
 extern u8 lbl_805FB1A1;
 extern u8 lbl_805FB1A4[];
-extern u8 lbl_805FE70C[];
+extern f32 lbl_805FE70C;
 extern "C" void fn_800E04CC(u8*);
 
 // 0x800DC504
