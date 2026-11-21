@@ -99,6 +99,11 @@
  "changelog": [
   {
    "date": "2026-11-21",
+   "time": "22:48",
+   "text": "More of the level loads on Windows (PRs #35 to #37): the loader converts the level's second zone, the props' state lists and the scene object lists with their matrices and items. The entity child step and prop step are decompiled, checked against the original code."
+  },
+  {
+   "date": "2026-11-21",
    "time": "22:36",
    "text": "The loader converts the level's zone records and its animated materials (PR #34), the data the world update walks every frame."
   },
