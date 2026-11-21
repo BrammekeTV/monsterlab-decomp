@@ -9,7 +9,7 @@ void  TextureRelease(void* tex);                                // 0x80184028
 void  __destroy_arr(void* arr, void (*dtor)(void*, s32), u32 size, u32 count); // 0x8032F2E0
 void  operator_delete(void* p);                                 // 0x801D426C
 u8*   fn_800216B8(u8* p, s32 del);                              // 0x800216B8 (base destructor)
-void  fn_8002B8C4(u8* p, s32 del);                              // 0x8002B8C4 (return value unused)
+u8* fn_8002B8C4(u8* p, s32 del);                              // 0x8002B8C4 (return value unused)
 u8*   fn_8002B514(u8* p, s32 del);                              // 0x8002B514 (callback)
 u8*   fn_8002AB4C(u8* p, s32 del);                              // 0x8002AB4C (callback)
 void  fn_80031090(u8* p, s32 del);                              // 0x80031090 (base destructor)

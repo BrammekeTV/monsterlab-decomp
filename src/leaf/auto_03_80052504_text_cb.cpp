@@ -7,7 +7,7 @@
 #include "game/script_callbacks.h"
 
 extern f32 lbl_805FD300;
-extern u8 lbl_805FD318[];
+extern f32 lbl_805FD318;
 
 // 0x8005C3F0
 void SetGroundFriction(u32 a3, f32 f1) {

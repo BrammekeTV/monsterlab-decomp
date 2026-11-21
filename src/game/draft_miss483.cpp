@@ -15,11 +15,11 @@ void  fn_80023160(void);
 u8*   fn_80062CE0(u8* p, s32 del);                              // 0x80062CE0
 void  fn_8008378C(u8* a3);                                      // 0x8008378C
 void  fn_800ABA44(void* p);                                     // 0x800ABA44
-void  fn_800D7FB0(u8* p, s32 del);                              // 0x800D7FB0 (return unused)
+u8* fn_800D7FB0(u8* p, s32 del);                              // 0x800D7FB0 (return unused)
 void fn_800D9044(u8* p, f32 delta);                            // 0x800D9044 (defined in draft_miss481.cpp)
 s32   fn_801098DC(s32 a0);                                      // 0x801098DC
 s32   fn_80109A0C(s32 id);                                      // 0x80109A0C
-void  fn_8010FD2C(u8* p, s32 del);                              // 0x8010FD2C (return unused)
+u8* fn_8010FD2C(u8* p, s32 del);                              // 0x8010FD2C (return unused)
 void  fn_801A904C(u8* p);                                       // 0x801A904C
 u8*   fn_801B161C(u8* p, u32 key);                              // 0x801B161C
 void  fn_801C83AC(u8* mgr, u8* item);                           // 0x801C83AC

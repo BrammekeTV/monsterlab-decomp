@@ -1,12 +1,12 @@
 {
  "log": "link.log",
  "counts": {
-  "global": 2684,
+  "global": 2706,
   "unknown": 126,
-  "library": 186,
-  "game": 53
+  "library": 187,
+  "game": 54
  },
- "game_bytes": 35060,
+ "game_bytes": 40148,
  "duplicates": [],
  "game": [
   {
@@ -30,16 +30,6 @@
    "kind": "game"
   },
   {
-   "name": "fn_8002B8C4",
-   "refs": 1,
-   "files": 1,
-   "used_as": "_fn_8002B8C4",
-   "addr": "8002B8C4",
-   "size": 136,
-   "section": ".text",
-   "kind": "game"
-  },
-  {
    "name": "fn_800339A8",
    "refs": 1,
    "files": 1,
@@ -56,6 +46,16 @@
    "used_as": "_fn_80039268",
    "addr": "80039268",
    "size": 472,
+   "section": ".text",
+   "kind": "game"
+  },
+  {
+   "name": "fn_8003A2B4",
+   "refs": 1,
+   "files": 1,
+   "used_as": "_fn_8003A2B4",
+   "addr": "8003A2B4",
+   "size": 1444,
    "section": ".text",
    "kind": "game"
   },
@@ -130,6 +130,16 @@
    "kind": "game"
   },
   {
+   "name": "fn_80058CEC",
+   "refs": 1,
+   "files": 1,
+   "used_as": "_fn_80058CEC",
+   "addr": "80058CEC",
+   "size": 2564,
+   "section": ".text",
+   "kind": "game"
+  },
+  {
    "name": "fn_80059A88",
    "refs": 1,
    "files": 1,
@@ -156,6 +166,16 @@
    "used_as": "_fn_8005B0B8",
    "addr": "8005B0B8",
    "size": 1004,
+   "section": ".text",
+   "kind": "game"
+  },
+  {
+   "name": "fn_8005C480",
+   "refs": 1,
+   "files": 1,
+   "used_as": "_fn_8005C480",
+   "addr": "8005C480",
+   "size": 460,
    "section": ".text",
    "kind": "game"
   },
@@ -236,6 +256,16 @@
    "used_as": "_fn_8008B264",
    "addr": "8008B264",
    "size": 384,
+   "section": ".text",
+   "kind": "game"
+  },
+  {
+   "name": "fn_80094C0C",
+   "refs": 1,
+   "files": 1,
+   "used_as": "_fn_80094C0C",
+   "addr": "80094C0C",
+   "size": 508,
    "section": ".text",
    "kind": "game"
   },
@@ -360,6 +390,16 @@
    "kind": "game"
   },
   {
+   "name": "fn_800C3E84",
+   "refs": 1,
+   "files": 1,
+   "used_as": "_fn_800C3E84",
+   "addr": "800C3E84",
+   "size": 472,
+   "section": ".text",
+   "kind": "game"
+  },
+  {
    "name": "fn_800C54A0",
    "refs": 1,
    "files": 1,
@@ -400,16 +440,6 @@
    "kind": "game"
   },
   {
-   "name": "fn_800D7FB0",
-   "refs": 1,
-   "files": 1,
-   "used_as": "_fn_800D7FB0",
-   "addr": "800D7FB0",
-   "size": 64,
-   "section": ".text",
-   "kind": "game"
-  },
-  {
    "name": "fn_800DB490",
    "refs": 1,
    "files": 1,
@@ -440,16 +470,6 @@
    "kind": "game"
   },
   {
-   "name": "fn_8010FD2C",
-   "refs": 1,
-   "files": 1,
-   "used_as": "_fn_8010FD2C",
-   "addr": "8010FD2C",
-   "size": 88,
-   "section": ".text",
-   "kind": "game"
-  },
-  {
    "name": "fn_80139140",
    "refs": 1,
    "files": 1,
@@ -466,16 +486,6 @@
    "used_as": "_fn_8019B4E8",
    "addr": "8019B4E8",
    "size": 412,
-   "section": ".text",
-   "kind": "game"
-  },
-  {
-   "name": "fn_8019B684",
-   "refs": 1,
-   "files": 1,
-   "used_as": "_fn_8019B684",
-   "addr": "8019B684",
-   "size": 72,
    "section": ".text",
    "kind": "game"
   },
@@ -685,6 +695,17 @@
    "region": "OS"
   },
   {
+   "name": "OSSetAlarm",
+   "refs": 3,
+   "files": 3,
+   "used_as": "_OSSetAlarm",
+   "addr": "80234324",
+   "size": 112,
+   "section": ".text",
+   "kind": "library",
+   "region": "OS"
+  },
+  {
    "name": "fn_8024C91C",
    "refs": 3,
    "files": 3,
@@ -740,6 +761,17 @@
    "region": "Network (DWC/SSL/NHTTP/NWC24)"
   },
   {
+   "name": "fn_8032FB38",
+   "refs": 3,
+   "files": 3,
+   "used_as": "_fn_8032FB38",
+   "addr": "8032FB38",
+   "size": 204,
+   "section": ".text",
+   "kind": "library",
+   "region": "MSL C/C++ runtime"
+  },
+  {
    "name": "fn_80333D50",
    "refs": 3,
    "files": 3,
@@ -749,17 +781,6 @@
    "section": ".text",
    "kind": "library",
    "region": "MSL C/C++ runtime"
-  },
-  {
-   "name": "OSSetAlarm",
-   "refs": 2,
-   "files": 2,
-   "used_as": "_OSSetAlarm",
-   "addr": "80234324",
-   "size": 112,
-   "section": ".text",
-   "kind": "library",
-   "region": "OS"
   },
   {
    "name": "fn_80234394",
@@ -1158,6 +1179,28 @@
    "region": "Network (DWC/SSL/NHTTP/NWC24)"
   },
   {
+   "name": "fn_802E9EE0",
+   "refs": 2,
+   "files": 2,
+   "used_as": "_fn_802E9EE0",
+   "addr": "802E9EE0",
+   "size": 92,
+   "section": ".text",
+   "kind": "library",
+   "region": "Network (DWC/SSL/NHTTP/NWC24)"
+  },
+  {
+   "name": "fn_802E9F3C",
+   "refs": 2,
+   "files": 2,
+   "used_as": "_fn_802E9F3C",
+   "addr": "802E9F3C",
+   "size": 28,
+   "section": ".text",
+   "kind": "library",
+   "region": "Network (DWC/SSL/NHTTP/NWC24)"
+  },
+  {
    "name": "fn_802FA554",
    "refs": 2,
    "files": 2,
@@ -1186,17 +1229,6 @@
    "used_as": "_fn_8032F358",
    "addr": "8032F358",
    "size": 128,
-   "section": ".text",
-   "kind": "library",
-   "region": "MSL C/C++ runtime"
-  },
-  {
-   "name": "fn_8032FB38",
-   "refs": 2,
-   "files": 2,
-   "used_as": "_fn_8032FB38",
-   "addr": "8032FB38",
-   "size": 204,
    "section": ".text",
    "kind": "library",
    "region": "MSL C/C++ runtime"
@@ -2423,23 +2455,12 @@
    "region": "Network (DWC/SSL/NHTTP/NWC24)"
   },
   {
-   "name": "fn_802E9EE0",
+   "name": "fn_802F78A0",
    "refs": 1,
    "files": 1,
-   "used_as": "_fn_802E9EE0",
-   "addr": "802E9EE0",
-   "size": 92,
-   "section": ".text",
-   "kind": "library",
-   "region": "Network (DWC/SSL/NHTTP/NWC24)"
-  },
-  {
-   "name": "fn_802E9F3C",
-   "refs": 1,
-   "files": 1,
-   "used_as": "_fn_802E9F3C",
-   "addr": "802E9F3C",
-   "size": 28,
+   "used_as": "_fn_802F78A0",
+   "addr": "802F78A0",
+   "size": 284,
    "section": ".text",
    "kind": "library",
    "region": "Network (DWC/SSL/NHTTP/NWC24)"
@@ -2591,8 +2612,8 @@
  "global": [
   {
    "name": "gWorldState",
-   "refs": 147,
-   "files": 147,
+   "refs": 148,
+   "files": 148,
    "used_as": "\"unsigned char * gWorldState\" (?gWorldState@@3PAEA)",
    "addr": "803E6D00",
    "size": 12952,
@@ -2621,8 +2642,8 @@
   },
   {
    "name": "gGameDb",
-   "refs": 78,
-   "files": 78,
+   "refs": 79,
+   "files": 79,
    "used_as": "\"struct GameDb * gGameDb\" (?gGameDb@@3PAUGameDb@@A)",
    "addr": "805FBBC0",
    "size": 8,
@@ -2631,8 +2652,8 @@
   },
   {
    "name": "lbl_805FBBE0",
-   "refs": 72,
-   "files": 72,
+   "refs": 74,
+   "files": 74,
    "used_as": "\"unsigned char * lbl_805FBBE0\" (?lbl_805FBBE0@@3PAEA)",
    "addr": "805FBBE0",
    "size": 8,
@@ -2650,22 +2671,22 @@
    "kind": "global"
   },
   {
+   "name": "gBattle",
+   "refs": 45,
+   "files": 45,
+   "used_as": "\"unsigned char * gBattle\" (?gBattle@@3PAEA)",
+   "addr": "805FBBB8",
+   "size": 8,
+   "section": ".sbss",
+   "kind": "global"
+  },
+  {
    "name": "lbl_805FBBAC",
    "refs": 45,
    "files": 45,
    "used_as": "_lbl_805FBBAC",
    "addr": "805FBBAC",
    "size": 4,
-   "section": ".sbss",
-   "kind": "global"
-  },
-  {
-   "name": "gBattle",
-   "refs": 44,
-   "files": 44,
-   "used_as": "\"unsigned char * gBattle\" (?gBattle@@3PAEA)",
-   "addr": "805FBBB8",
-   "size": 8,
    "section": ".sbss",
    "kind": "global"
   },
@@ -3220,6 +3241,16 @@
    "kind": "global"
   },
   {
+   "name": "gFlag805FB948",
+   "refs": 11,
+   "files": 11,
+   "used_as": "\"unsigned char gFlag805FB948\" (?gFlag805FB948@@3EA)",
+   "addr": "805FB948",
+   "size": 1,
+   "section": ".sbss",
+   "kind": "global"
+  },
+  {
    "name": "lbl_8035480C",
    "refs": 11,
    "files": 11,
@@ -3240,6 +3271,16 @@
    "kind": "global"
   },
   {
+   "name": "lbl_805FB1A1",
+   "refs": 11,
+   "files": 11,
+   "used_as": "\"unsigned char lbl_805FB1A1\" (?lbl_805FB1A1@@3EA)",
+   "addr": "805FB1A1",
+   "size": 1,
+   "section": ".sbss",
+   "kind": "global"
+  },
+  {
    "name": "lbl_805FB4B0",
    "refs": 11,
    "files": 11,
@@ -3257,16 +3298,6 @@
    "addr": "80401ADC",
    "size": 340,
    "section": ".bss",
-   "kind": "global"
-  },
-  {
-   "name": "gFlag805FB948",
-   "refs": 10,
-   "files": 10,
-   "used_as": "\"unsigned char gFlag805FB948\" (?gFlag805FB948@@3EA)",
-   "addr": "805FB948",
-   "size": 1,
-   "section": ".sbss",
    "kind": "global"
   },
   {
@@ -3307,16 +3338,6 @@
    "addr": "8051DAD0",
    "size": 2848,
    "section": ".bss",
-   "kind": "global"
-  },
-  {
-   "name": "lbl_805FB1A1",
-   "refs": 10,
-   "files": 10,
-   "used_as": "\"unsigned char lbl_805FB1A1\" (?lbl_805FB1A1@@3EA)",
-   "addr": "805FB1A1",
-   "size": 1,
-   "section": ".sbss",
    "kind": "global"
   },
   {
@@ -3520,6 +3541,16 @@
    "kind": "global"
   },
   {
+   "name": "lbl_805FB9A4",
+   "refs": 8,
+   "files": 8,
+   "used_as": "\"unsigned int lbl_805FB9A4\" (?lbl_805FB9A4@@3IA)",
+   "addr": "805FB9A4",
+   "size": 4,
+   "section": ".sbss",
+   "kind": "global"
+  },
+  {
    "name": "lbl_805FD300",
    "refs": 8,
    "files": 8,
@@ -3645,16 +3676,6 @@
    "files": 7,
    "used_as": "_lbl_805FB75C",
    "addr": "805FB75C",
-   "size": 4,
-   "section": ".sbss",
-   "kind": "global"
-  },
-  {
-   "name": "lbl_805FB9A4",
-   "refs": 7,
-   "files": 7,
-   "used_as": "\"unsigned int lbl_805FB9A4\" (?lbl_805FB9A4@@3IA)",
-   "addr": "805FB9A4",
    "size": 4,
    "section": ".sbss",
    "kind": "global"
@@ -4170,6 +4191,16 @@
    "kind": "global"
   },
   {
+   "name": "lbl_805FAFD8",
+   "refs": 5,
+   "files": 5,
+   "used_as": "\"unsigned char * lbl_805FAFD8\" (?lbl_805FAFD8@@3PAEA)",
+   "addr": "805FAFD8",
+   "size": 4,
+   "section": ".sbss",
+   "kind": "global"
+  },
+  {
    "name": "lbl_805FB0DC",
    "refs": 5,
    "files": 5,
@@ -4337,6 +4368,16 @@
    "addr": "805FBB80",
    "size": 8,
    "section": ".sbss",
+   "kind": "global"
+  },
+  {
+   "name": "lbl_805FD304",
+   "refs": 5,
+   "files": 5,
+   "used_as": "\"float lbl_805FD304\" (?lbl_805FD304@@3MA)",
+   "addr": "805FD304",
+   "size": 4,
+   "section": ".sdata2",
    "kind": "global"
   },
   {
@@ -4610,6 +4651,16 @@
    "kind": "global"
   },
   {
+   "name": "lbl_80559CF8",
+   "refs": 4,
+   "files": 4,
+   "used_as": "_lbl_80559CF8",
+   "addr": "80559CF8",
+   "size": 128,
+   "section": ".bss",
+   "kind": "global"
+  },
+  {
    "name": "lbl_8055C578",
    "refs": 4,
    "files": 4,
@@ -4745,16 +4796,6 @@
    "files": 4,
    "used_as": "\"void * lbl_805FAFC0\" (?lbl_805FAFC0@@3PAXA)",
    "addr": "805FAFC0",
-   "size": 4,
-   "section": ".sbss",
-   "kind": "global"
-  },
-  {
-   "name": "lbl_805FAFD8",
-   "refs": 4,
-   "files": 4,
-   "used_as": "\"unsigned char * lbl_805FAFD8\" (?lbl_805FAFD8@@3PAEA)",
-   "addr": "805FAFD8",
    "size": 4,
    "section": ".sbss",
    "kind": "global"
@@ -5450,11 +5491,11 @@
    "kind": "global"
   },
   {
-   "name": "lbl_805FD304",
+   "name": "lbl_805FD650",
    "refs": 4,
    "files": 4,
-   "used_as": "\"float lbl_805FD304\" (?lbl_805FD304@@3MA)",
-   "addr": "805FD304",
+   "used_as": "_lbl_805FD650",
+   "addr": "805FD650",
    "size": 4,
    "section": ".sdata2",
    "kind": "global"
@@ -5475,6 +5516,16 @@
    "files": 4,
    "used_as": "\"float lbl_805FDBA0\" (?lbl_805FDBA0@@3MA)",
    "addr": "805FDBA0",
+   "size": 4,
+   "section": ".sdata2",
+   "kind": "global"
+  },
+  {
+   "name": "lbl_805FE03C",
+   "refs": 4,
+   "files": 4,
+   "used_as": "\"float lbl_805FE03C\" (?lbl_805FE03C@@3MA)",
+   "addr": "805FE03C",
    "size": 4,
    "section": ".sdata2",
    "kind": "global"
@@ -5557,36 +5608,6 @@
    "addr": "805FB2DC",
    "size": 4,
    "section": ".sbss",
-   "kind": "global"
-  },
-  {
-   "name": "gMovieQueue",
-   "refs": 3,
-   "files": 3,
-   "used_as": "\"struct MovieQueue gMovieQueue\" (?gMovieQueue@@3UMovieQueue@@A)",
-   "addr": "803C44E0",
-   "size": 1080,
-   "section": ".bss",
-   "kind": "global"
-  },
-  {
-   "name": "gVideoMainFifo",
-   "refs": 3,
-   "files": 3,
-   "used_as": "\"struct GXFifoObj * gVideoMainFifo\" (?gVideoMainFifo@@3PAUGXFifoObj@@A)",
-   "addr": "805FB530",
-   "size": 4,
-   "section": ".sbss",
-   "kind": "global"
-  },
-  {
-   "name": "lbl_803460D8",
-   "refs": 3,
-   "files": 3,
-   "used_as": "_lbl_803460D8",
-   "addr": "803460D8",
-   "size": 16,
-   "section": ".rodata",
    "kind": "global"
   }
  ],
@@ -6477,7 +6498,7 @@
  ],
  "library_regions": {
   "AI/AX/MEM": 59,
-  "Network (DWC/SSL/NHTTP/NWC24)": 46,
+  "Network (DWC/SSL/NHTTP/NWC24)": 47,
   "GX": 22,
   "NAND/SC/IPC": 20,
   "MSL C/C++ runtime": 15,
