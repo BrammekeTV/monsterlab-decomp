@@ -13,7 +13,7 @@ void  fn_801B42B4(void*);                                          // 0x801B42B4
 void  fn_801B420C(void*);                                          // 0x801B420C
 f32   TimerReset(u8* timer);                                       // 0x80142744
 s32   LoadingScreenTick(int, f32);                                 // 0x8000E254
-void  fn_80007D68(void* p);                                        // 0x80007D68
+s32   fn_80007D68(void* p);                                        // 0x80007D68
 void  fn_80008298(void* p);                                        // 0x80008298
 void  fn_80122B9C(u8* p, s32 v);                                   // 0x80122B9C
 void* ScreenSetsCurrent(void* sets);                               // 0x8018D1E4

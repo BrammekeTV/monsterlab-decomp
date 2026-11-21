@@ -27,7 +27,7 @@ void   fn_8025B65C(void* p);                                   // 0x8025B65C
 void   fn_8025B72C(void* p);                                   // 0x8025B72C
 void   fn_8025C52C(void* p);                                   // 0x8025C52C
 void   fn_8025C5FC(void* p);                                   // 0x8025C5FC
-void   fn_801FCDB4(void);                                      // 0x801FCDB4
+void   fn_801FCDB4(void* a, u8* b);                                    // 0x801FCDB4
 s32    fn_80263FEC(u8* p, s32 handle, s32 a);                  // 0x80263FEC
 s32    fn_80264020(u8* p);                                     // 0x80264020
 s32    fn_80264508(u8* p);                                     // 0x80264508

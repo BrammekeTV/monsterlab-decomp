@@ -5,7 +5,7 @@ extern "C" {
 char* fn_80338BC0(char* s, const char* sub);                    // 0x80338BC0 (strstr)
 u32   strlen(const char* s);
 s32   fn_802737A8(s32 chan, s32 a, void* cb);                   // 0x802737A8
-s32   fn_801F2118(u8* task);                                    // 0x801F2118
+s32   fn_801F2118(u8* task, f32 dt);                                   // 0x801F2118
 s32   fn_8025E014(void);                                        // 0x8025E014
 s32   fn_8025D7D0(void);                                        // 0x8025D7D0
 s32   fn_8025F284(void);                                        // 0x8025F284
@@ -52,14 +52,14 @@ s32 fn_801F0448(char* text, const char* pattern, const char* repl) {
 
 // 0x801F2018
 // Tween task update: returns 0 = keep, 2 = running, 3 = done.
-s32 fn_801F2018(u8* task) {
+s32 fn_801F2018(u8* task, f32 dt) {
     f32 base;
     u8* src;
     u8* obj;
     f32 d;
     switch (*(u8*)(task + 0x7F)) {
     case 0x20:
-        return fn_801F2118(task);
+        return fn_801F2118(task, dt);
     case 0x08:
         return 2;
     case 0x10:

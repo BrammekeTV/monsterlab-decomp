@@ -67,7 +67,7 @@ void fn_801E28E0(void* p);                                 // 0x801E28E0
 void fn_801E47D8(void* pool);                              // 0x801E47D8
 void fn_801E5478(void* pool, void* fn);                    // 0x801E5478
 void fn_801E5480(void* pool, void* fn);                    // 0x801E5480
-void fn_801E54E4(void* pool, const char* name, u32 addr, u32 a, u32 size);  // 0x801E54E4
+void fn_801E54E4(void* pool, const char* name, u8* buf, u32 a, u32 size);  // 0x801E54E4
 void fn_801EFC74(void* blk);                               // 0x801EFC74
 void fn_801ABD50(void* blk);                               // 0x801ABD50
 void fn_80204478(void);                                    // 0x80204478
@@ -417,7 +417,7 @@ void fn_8000E488(void) {
     fn_801E47D8(lbl_8048A8B4);
     fn_801E5478(lbl_8048A8B4, (void*)SysRequestReset);
     fn_801E5480(lbl_8048A8B4, (void*)DiscErrorHandlerExt);
-    fn_801E54E4(gIdPool, lbl_8035374C, 0x90400000u, *(u32*)GetGlobalSettings(), 0x40000);
+    fn_801E54E4(gIdPool, lbl_8035374C, (u8*)(uintptr_t)0x90400000u, *(u32*)GetGlobalSettings(), 0x40000);
     fn_80204478();   // the original also passes lbl_805FB7E8 in r3, which the callee ignores
 
     // Per-zone tables, each {data, count, kind} with count = zones + 1 and kind 1 (owned).

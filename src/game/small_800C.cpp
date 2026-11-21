@@ -49,7 +49,7 @@ void fn_800C0B54(u8* p) {
 
 // 0x800C11A4
 // Cross product: out = a x b (3-component f32 vectors).
-void fn_800C11A4(f32* out, const f32* a, const f32* b) {
+extern "C" void fn_800C11A4(f32* out, const f32* a, const f32* b) {
     out[0] = a[1] * b[2] - a[2] * b[1];
     out[1] = a[2] * b[0] - a[0] * b[2];
     out[2] = a[0] * b[1] - a[1] * b[0];

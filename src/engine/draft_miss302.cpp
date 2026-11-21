@@ -15,7 +15,7 @@ void fn_8014DE68(void);                                                 // 0x801
 void fn_80151E38(s32 quads, void* verts);                               // 0x80151E38
 void fn_801EBA20(void* list, void* item);                               // 0x801EBA20
 void fn_801D79D4(u8* self, u8* node, u8* vec, s32 a, u8 b, f32 c, f32 d);  // 0x801D79D4
-void fn_801D82AC(u8* self, u8* node, u8* vec, s32 a, u8 b, f32 c, f32 d);  // 0x801D82AC
+void fn_801D82AC(u8* self, u8* node, u8* vec, u32 a, s32 b, f32 c, f32 d);  // 0x801D82AC
 void fn_801EBC74(u8* a, void* fn, u8* entry);                           // 0x801EBC74
 s32  fn_801EBBE0(u8* a, void* fn, s32 entry);                           // 0x801EBBE0
 

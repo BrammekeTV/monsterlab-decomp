@@ -31,7 +31,7 @@ void* fn_80109330(const char* name);                 // 0x80109330 (texture look
 const char* fn_80027E50(u8* p, s32 idx, const char* name);   // 0x80027E50
 void* memcpy(void* d, const void* s, unsigned long n);
 u8*  fn_80052530(u8* p, s32 a, u8* b, s32 c);   // 0x80052530
-s32  fn_800526E4(u8* p, s32 a, s32 b);          // 0x800526E4
+void fn_800526E4(u8* p, s32 a, s32 b);          // 0x800526E4
 void fn_8005B648(u8* p, f32 v);                 // 0x8005B648
 void fn_8005E1B8(u8* p);                        // 0x8005E1B8
 void fn_8005FD4C(u8* p, u8* entry);             // 0x8005FD4C

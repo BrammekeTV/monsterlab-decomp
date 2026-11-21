@@ -138,7 +138,7 @@ extern "C" void GameUpdateWorld(GameState* g, f32 dt) {
 }
 
 // 0x80006F40
-void fn_80006F40(void) {
+extern "C" void fn_80006F40(void* g) {
 }
 
 // 0x80006F44

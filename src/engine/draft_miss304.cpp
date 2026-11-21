@@ -19,7 +19,7 @@ void  fn_80155724(u8* m);                                    // 0x80155724
 void* fn_801B7198(void* anim, s32 a);                        // 0x801B7198
 u32   fn_801CB96C(u8* list);                                 // 0x801CB96C (leaf)
 u32   fn_801CBCDC(u8* list, u8* e);                          // 0x801CBCDC (leaf)
-void  fn_801D82AC(u8* arg0, u8* node, u8* vec, u32 c, u32 d, f32 f1, f32 f2); // 0x801D82AC
+void  fn_801D82AC(u8* arg0, u8* node, u8* vec, u32 c, s32 d, f32 f1, f32 f2); // 0x801D82AC
 u8*   fn_801D5850(void);                                     // 0x801D5850
 void  fn_801E2BB4(u8* e);                                    // 0x801E2BB4
 u32   fn_801E29C8(u8* p);                                    // 0x801E29C8

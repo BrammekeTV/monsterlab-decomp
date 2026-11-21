@@ -8,7 +8,7 @@ u32   RandomU32(void);                                   // 0x80143460
 void  fn_8018D370(const char* fmt, ...);                 // 0x8018D370 (debug log)
 u32   fn_8019552C(u8* list, s32 index);                  // 0x8019552C (leaf)
 s32   fn_8019555C(u8* list);                             // 0x8019555C (leaf)
-void  fn_801AA218(u8* out, u8* key, s32 a, s32 b);       // 0x801AA218
+void  fn_801AA218(u8* out, u8* k0, u8* k1, f32* buf, f32 pos);  // 0x801AA218
 f32   fn_801AA728(u8* entry);                            // 0x801AA728 (leaf)
 void  fn_801AA760(u8* out, u8* key);                     // 0x801AA760 (leaf)
 void* fn_801EB94C(void* p);                              // 0x801EB94C
@@ -113,10 +113,10 @@ s32 fn_801AA974(u8* p, s32 unused, s32 dir, f32 t) {
 // 0x801AAC08
 // UIAnimTrack apply: reads the current key value (4 floats) and writes 1..4 components
 // (or an int for type 0) to the target at +0x18, optionally adding the base values at +0x20.
-s32 fn_801AAC08(u8* p) {
+s32 fn_801AAC08(u8* p, f32 pos) {
     f32 v[4];
-    if (*(s32*)(p + 0x10) != 0) {
-        fn_801AA218((u8*)v, *(u8**)(p + 0xC), *(s32*)(p + 0x10), 0);
+    if (*(u8**)(p + 0x10) != NULL) {
+        fn_801AA218((u8*)v, *(u8**)(p + 0xC), *(u8**)(p + 0x10), NULL, pos);
     } else {
         fn_801AA760((u8*)v, *(u8**)(p + 0xC));
     }
