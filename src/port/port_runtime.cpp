@@ -82,6 +82,7 @@ static void PrintSummary(void) {
     fprintf(stderr, "disc: %s\n", PortDvdStats(buf, sizeof(buf)));
     fprintf(stderr, "data: %s\n", PortFileStats(buf, sizeof(buf)));
     { char gx[512]; fprintf(stderr, "GX: %s\n", PortGxStatsText(gx, sizeof(gx))); }
+    { char gfx[256]; fprintf(stderr, "drawn: %s\n", PortGfxStatsText(gfx, sizeof(gfx))); }
     fprintf(stderr, "reached, in order:\n");
     for (s32 i = 0; i < sMilestoneCount; i++) {
         if (!sMilestones[i].stub) fprintf(stderr, "  %6u ms  %s\n", sMilestones[i].ms, sMilestones[i].what);
@@ -112,6 +113,10 @@ void PortStop(int exitCode, const char* fmt, ...) {
     vsnprintf(line, sizeof(line), fmt, ap);
     va_end(ap);
     fflush(stdout);
+    if (gPortOptions.screenshot) {
+        if (PortGfxSaveScreenshot(gPortOptions.screenshot)) fprintf(stderr, "[port] screenshot: %s\n", gPortOptions.screenshot);
+        else fprintf(stderr, "[port] no screenshot: nothing was shown\n");
+    }
     if (!gPortOptions.selfTest || exitCode) PrintSummary();
     fprintf(stderr, "[port] STOP: %s\n", line);
     fflush(stderr);
@@ -300,6 +305,23 @@ static void PrintStack(const CONTEXT* c) {
     }
 }
 
+// --show-texture: the first time the main thread would stop, it goes to the demo instead.
+static DWORD sMainThreadId;
+static void __cdecl DemoLanding(void) {
+    PortLockLeave();                             // the demo takes the lock itself
+    PortDemoMain();
+}
+static BOOL DemoTakesOver(CONTEXT* c) {
+    static LONG taken;
+    if (gPortOptions.showTexture < 0 || GetCurrentThreadId() != sMainThreadId) return FALSE;
+    if (InterlockedExchange(&taken, 1)) return FALSE;
+    char who[160];
+    PortLog("the boot stopped at %s; --show-texture takes over", PortDescribePc((void*)(uintptr_t)c->Eip, who, sizeof(who)));
+    c->Esp = (c->Esp & ~15u) - 64;
+    c->Eip = (DWORD)(uintptr_t)DemoLanding;
+    return TRUE;
+}
+
 static LONG CALLBACK TrapHandler(EXCEPTION_POINTERS* e) {
     DWORD code = e->ExceptionRecord->ExceptionCode;
     CONTEXT* c = e->ContextRecord;
@@ -318,6 +340,7 @@ static LONG CALLBACK TrapHandler(EXCEPTION_POINTERS* e) {
             c->Eip = (DWORD)(uintptr_t)f->impl;
             return EXCEPTION_CONTINUE_EXECUTION;
         }
+        if (f && !PortSoftSdk(eip) && !sMissingHook && DemoTakesOver(c)) return EXCEPTION_CONTINUE_EXECUTION;
         u32 ret = *(u32*)(uintptr_t)c->Esp;
         const char* soft = f ? PortSoftSdk(eip) : NULL;
         if (soft && !sMissingHook) {                 // an SDK call that may do nothing for now
@@ -366,6 +389,7 @@ static LONG CALLBACK TrapHandler(EXCEPTION_POINTERS* e) {
         return EXCEPTION_CONTINUE_SEARCH;
     }
     if (InterlockedCompareExchange(&sStopping, 0, 0)) return EXCEPTION_CONTINUE_SEARCH;
+    if (DemoTakesOver(c)) return EXCEPTION_CONTINUE_EXECUTION;
     fprintf(stderr, "\n[port] crash: exception 0x%08lX at %s\n", code, PortDescribePc((void*)(uintptr_t)eip, who, sizeof(who)));
     if (code == EXCEPTION_ACCESS_VIOLATION && e->ExceptionRecord->NumberParameters >= 2) {
         ULONG_PTR kind = e->ExceptionRecord->ExceptionInformation[0];
@@ -562,6 +586,7 @@ static DWORD WINAPI InterruptThread(void*) {
     }
 }
 
+extern "C" void* PortThreadHandle(int i, void** entry);   // port_os.cpp
 static DWORD WINAPI WatchdogThread(void*) {
     Sleep((DWORD)gPortOptions.secondsLimit * 1000);
     char where[160] = "?";
@@ -572,6 +597,18 @@ static DWORD WINAPI WatchdogThread(void*) {
         PortDescribePc((void*)(uintptr_t)c.Eip, where, sizeof(where));
         fprintf(stderr, "\n[port] time limit: the main thread is at %s\n", where);
         PrintStack(&c);
+    }
+    for (int i = 0; i < 32; i++) {               // and where every other game thread waits
+        void* entry = NULL;
+        HANDLE h = (HANDLE)PortThreadHandle(i, &entry);
+        if (!h) continue;
+        SuspendThread(h);
+        c.ContextFlags = CONTEXT_CONTROL;
+        if (GetThreadContext(h, &c)) {
+            char name[160], at[160];
+            fprintf(stderr, "[port] thread %s is at %s\n", PortDescribePc(entry, name, sizeof(name)), PortDescribePc((void*)(uintptr_t)c.Eip, at, sizeof(at)));
+            PrintStack(&c);
+        }
     }
     PortStop(5, "time limit of %d s reached before the frame limit; main thread at %s", gPortOptions.secondsLimit, where);
     return 0;
@@ -680,6 +717,7 @@ struct PortBoot {
     PortBoot() {
         sStartTick = GetTickCount();
         gPortOptions.frameLimit = 300;
+        gPortOptions.showTexture = -1;
         gPortOptions.secondsLimit = 60;
         const char* asked = getenv("MONSTERLAB_DATA");
         for (int i = 1; i < __argc && __argv; i++) {
@@ -690,6 +728,10 @@ struct PortBoot {
             else if (!strcmp(a, "--frames") && i + 1 < __argc) gPortOptions.frameLimit = atoi(__argv[++i]);
             else if (!strcmp(a, "--seconds") && i + 1 < __argc) gPortOptions.secondsLimit = atoi(__argv[++i]);
             else if (!strcmp(a, "--data") && i + 1 < __argc) asked = __argv[++i];
+            else if (!strcmp(a, "--window")) gPortOptions.window = TRUE;
+            else if (!strcmp(a, "--show-texture") && i + 1 < __argc) gPortOptions.showTexture = atoi(__argv[++i]);
+            else if (!strcmp(a, "--screenshot") && i + 1 < __argc) gPortOptions.screenshot = __argv[++i];
+            else if (!strcmp(a, "--scale") && i + 1 < __argc) gPortOptions.scale = atoi(__argv[++i]);
         }
 
         // The Wii's two memory blocks at their original addresses. The code range must be executable.
@@ -714,6 +756,7 @@ struct PortBoot {
         BuildCodeRange();
         AddVectoredExceptionHandler(1, TrapHandler);
         DuplicateHandle(GetCurrentProcess(), GetCurrentThread(), GetCurrentProcess(), &sMainThread, 0, FALSE, DUPLICATE_SAME_ACCESS);
+        sMainThreadId = GetCurrentThreadId();
         PortLockEnter();                         // the main thread is the first game thread
 
         const char* dir = FindDataDir(asked);
@@ -756,6 +799,8 @@ extern "C" void PortRunStaticInit(void);
 static void __cdecl PortPreMain(void) {
     PortOsStart();
     PortStartInterrupts();
+    if (gPortOptions.haveData && !gPortOptions.selfTest && (gPortOptions.window || gPortOptions.screenshot || gPortOptions.showTexture >= 0))
+        PortGfxStart(gPortOptions.window, gPortOptions.scale ? gPortOptions.scale : 2);
     PortRunStaticInit();
 }
 #pragma section(".CRT$XCY", read)
