@@ -13,6 +13,7 @@
    (`tools/sir_decoder.py --gamedb --image`), which reads the big-endian bytes directly.
 4. The same for ../catalog.sir (`--catalog`), plus a check that the catalog agrees with the
    section table inside each of the .sir files it lists.
+5. The same for every `*_level.sir` next to it (`--level`): the header block and zone 0's HUD.
 
 Game data and the dumps stay local (orig/, build/); nothing here is committed.
 """
@@ -126,6 +127,12 @@ def main():
         ok = ok and not problems
     else:
         print("catalog check skipped: catalog.sir not found next to streams/")
+
+    # Level files: header block and the HUD of zone 0 (`--level`).
+    for name in sorted(os.listdir(streams)):
+        if name.lower().endswith("_level.sir"):
+            path = os.path.join(streams, name)
+            ok = compare(exe, "--level", path, sir_decoder.level_dump(path), ("levelhdr ", "hud ") if name == "empty_level.sir" else ()) and ok
     return 0 if ok else 1
 
 

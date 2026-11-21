@@ -5,6 +5,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <stdint.h>
 
 #include "port/port.h"
 #include "port/sir_loader.h"
@@ -94,6 +95,39 @@ void PortFileRead(const char* path, u32 offset, u8* dst, u32 len) {
             static char line[128];   // the milestone list keeps the pointer
             snprintf(line, sizeof(line), "global_binary.sir converted: %u pointers, %u fields", reloc.ptrImage, reloc.fieldsSwapped);
             PortMilestone(line);
+            return;
+        }
+    }
+    // Level files: the header block is the world state, section type N the image of zone N.
+    size_t n = strlen(name);
+    if (n > 10 && _stricmp(name + n - 10, "_level.sir") == 0) {
+        static SirReloc reloc;
+        static u32 hudAddr;            // header +0x1F4, kept for the zone that holds the HUD
+        SirRelocInit(&reloc, NULL, NULL);
+        if (e->type == -1) {
+            u32 base = LevelHeaderWiiBase(dst, e->size);
+            if (base == 0) PortStop(8, "%s: %s", name, SirErrorText(SIR_ERR_LEVEL));
+            // The header points into itself and into the zones. The zones are read later, to
+            // the addresses the console uses (MEM2 is mapped at its original address).
+            SirRelocAddRange(&reloc, base, e->size, dst);
+            SirRelocAddRange(&reloc, 0x90000000u, 0x04000000u, (u8*)(uintptr_t)0x90000000u);
+            SirError err = LevelHeaderConvert(&reloc, dst, e->size);
+            if (err != SIR_OK) PortStop(8, "%s: %s", name, SirErrorText(err));
+            hudAddr = *(u32*)(dst + 0x1F4);
+            sConverted++;
+            PortLog("%s header converted: %u pointers, %u fields (%u pointers outside the mapped ranges)", name,
+                    reloc.ptrImage, reloc.fieldsSwapped, reloc.ptrUnknown + reloc.ptrDolKept);
+            return;
+        }
+        if (e->type == 0) {
+            u32 base = (u32)(uintptr_t)dst;
+            SirRelocAddRange(&reloc, base, e->size, dst);
+            u32 hud = hudAddr >= base && hudAddr - base < e->size ? hudAddr : 0;
+            SirError err = LevelZoneConvert(&reloc, dst, e->size, base, hud);
+            if (err != SIR_OK) PortStop(8, "%s zone 0: %s", name, SirErrorText(err));
+            sConverted++;
+            PortLog("%s zone 0: HUD and state machines converted (%u pointers, %u fields); the rest of the zone is not",
+                    name, reloc.ptrImage, reloc.fieldsSwapped);
             return;
         }
     }

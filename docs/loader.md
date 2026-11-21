@@ -24,6 +24,7 @@ Code: `include/port/sir_loader.h`, `src/port/sir_loader.cpp`. Test: `tests/sir_l
 | `global_binary.sir` UI root, fonts and the objects of slots `0xDB4`-`0xDBC` | the fields the code reads are converted; the glyph data of the three fonts is not |
 | `global_binary.sir` effect definitions (slots `0x82C`-`0x840`: 27 + 70 entries) and the two object pools of slots `0x10`, `0x418` | converted; fields typed from the effect and pool code |
 | `global_binary.sir` font glyph data, sound objects named by action records, `0xDC0` | not converted: see "Not converted yet" |
+| Level files (`*_level.sir`): header block (the world state, 493 zone slots) and zone 0's HUD with its state machines | the fields the code reads are converted; entities, props and everything else in the zone images are not: see "Level files" |
 | Hook into the game's `SirLoad` | not wired (the port has no file layer yet) |
 
 Of the 1,096,124 bytes of the image, 33.1% now belongs to objects converted by a schema (the game
@@ -528,6 +529,84 @@ With this the boot runs through `UiInit` (`ScreenSetsInit`, `ScreenMgrLoad`, `Hu
 interpreter. The screen format of `shared_ui.sir` (title screen) is expected to be the same; see
 "Next".
 
+## Level files
+
+`empty_level.sir` (the front end), `village_level.sir` and the five others have three sections:
+a header block (type -1, 0x47800 bytes) and one image per zone (type = zone number; these files
+carry zones 0 and 1). `fn_801294CC` reads the header block into the world state (`*gWorldState`),
+runs `fn_80129CC8` on it, reads zone 0 to `gZoneBase[0]`, and then `fn_8013006C` starts the level:
+`HudReload`, `fn_8012FD0C` over the zone's entities, and so on. Code: `LevelHeaderConvert`,
+`LevelZoneConvert`; reference: `python tools/sir_decoder.py <file> --level`.
+
+### The header block is the world state
+
+It was built for Wii address `0x9023C940` in every level file. The loader does not rely on that:
+the block's word `+0x1A4` points at its own `+0x21E0` (where `fn_80129CC8` puts the zone slots),
+which gives the address. Pointers in it go into the block itself or into the zones.
+
+| Offset | Field | Reader |
+|---|---|---|
+| `0x004` | last zone index | `fn_8013006C` |
+| `0x008`-`0x014` | current zone slots (set at run time) | `fn_801294CC` |
+| `0x02C`/`0x030`, `0x038`/`0x03C` | two object lists and their counts | `fn_8013006C` |
+| `0x07C`-`0x090` | `{count, entries, flag}` twice, copied to the manager `lbl_8047C730` (0x1F4-byte entries) | `fn_8012FFA4` |
+| `0x1A4`, `0x1B0`, `0x1BC`, `0x1C8`, `0x1D4` | five tables `{pointer, capacity, used}`: the zone slots, three tables of one pointer per zone, one of 12-byte entries | `fn_80129CC8` |
+| `0x1E0`-`0x1F0` | words and a byte | `GameSessionUpdate`, `PlayFootStepEffect`, `fn_800D7FF0`, `WorldPostUpdate` |
+| `0x1F4` | the level's HUD, in zone 0 | `HudReload`, `fn_800D8100` |
+| `0x1F8`-`0x20C`, `0x1A84`, `0x1A88` | floats | `fn_8003E560`, `fn_8006C3FC`, `SetOptionsBrightness` |
+| `0xA20`, `0x1A7C` | words | `fn_8003E560`, `EntityUpdate` |
+| `0x21E0` | 493 zone slots | below |
+
+A zone slot is `0x148 + 0x54 * n` bytes (`gZoneResourceSize`; 0x19C in the shipped files). The
+loader takes the size from the block: each slot's first table points at `slot + 0x140`.
+
+| Offset | Field | Reader |
+|---|---|---|
+| `0x00`-`0x14`, `0x1C`-`0x24` | floats (bounds) | `WorldGetEntityZone`, `fn_80131370`, `fn_80130FC8` |
+| `0x18` | word | `fn_80133D74` |
+| `0x50` | resource | `fn_8013006C` |
+| `0x8C`, `0x90` | two pointers; `0x94`, `0x98`: how many entries of the two entity tables are in use | `SessionBegin`, `CharacterFind`, `fn_8012FD0C` |
+| `0xA0`, `0xA8`, `0xBC`, `0xCC`, `0xD0`, `0x100`, `0x10C` | words read with `lwz`; pointer or number not known yet (bytes at `0xA4`, `0xAC`, `0xC0`) | `fn_800098F4`, `CIAnimatedPropEnableByProp`, `fn_801C668C`, `fn_801C6BCC`, `OnZoneScreensLoaded`, `fn_8004DAF8` |
+| `0xD4` | the zone's action table (`TriggerDoAction`, zone id other than 0x1FF) | `TriggerDoAction` |
+| `0xFC` | the zone's record at the start of its image | `WorldTick` |
+| `0x114`, `0x120`, `0x12C` | three tables `{pointer, capacity, used}`: 0x54-byte entries at `slot + 0x140`, and two tables of entity pointers | `fn_80129CC8`, `fn_8012FD0C` |
+
+The entity pointer tables lie behind the slot array, or, for some zone kinds, in the last words
+of the slot itself (`fn_80129CC8` decides). The loader converts their entries (and those of the
+three per-zone tables of the block) as pointers, after checking that every table is inside the
+block, outside the fixed part of every slot, and shares no word with another table.
+
+Left as they are: everything in the block no reader was found for (among it `0x94`-`0xA0` of the
+block, slot `0x30`-`0x48`, `0x74`-`0x88`, `0xC4`, `0xC8`, `0xE4`, `0xE8`), the 0x54-byte entries
+and the 12-byte entries. **A slot is far from typed**: the list above is what one pass over the
+world code (`0x80129000`-`0x80138000`) and the callers of `gWorldState` gave.
+
+### Zone 0
+
+Of the zone image only the HUD (header `+0x1F4`) and its state machines are converted, with the
+checks and schemas of `global_binary.sir`. A level's HUD is 0x438 bytes: it holds the screen-list
+slot itself at `+0x434` (`HudReload` hands `*(hud + 0x434)` to `ScreenMgrLoad`), and `+0x24`
+already points at that slot. The machines' value tables lie in another zone's image (47 to 64
+machines per level, all but one with such a table): the loader converts the pointer and leaves
+the table, which is not in memory when zone 0 is read.
+
+In the port, `PortFileRead` converts the header block when it is read (before `fn_80129CC8` runs
+on it) and zone 0 when it is read; MEM2 sits at its original address there, so pointers into
+zones that are loaded later are valid as they are.
+
+### Not converted yet in level files
+
+| What | Where | Next reader |
+|---|---|---|
+| entity and prop records | the entries of a slot's two pointer tables; `empty_level.sir` has one at zone 0 `+0x33170` | `fn_8012F8B8` (entity `+0x04` -> definition, type byte at its `+0x34`, then one constructor per type) |
+| the zone record | start of each zone image, 0x40 bytes: a word and three lists `{head, tail, count}` (the first is the texture list) | `WorldTick` reads slot `+0xFC` |
+| value tables of the HUD's machines | another zone's image | `fn_801BBE40`, as soon as a state runs an action |
+| zone action tables and their records | slot `+0xD4` | `TriggerDoAction`; `ActionRecordPlan` applies |
+| zones 1 and up, textures, models, collision | the rest | - |
+
+Check: all seven level files give the same dump from the C++ loader and the Python reference
+(505 lines for `empty_level.sir`, 2,714 to 4,892 for the others).
+
 ## Found on the way
 
 - `CAbstractInputTwoButtonToggle` (`fn_800208C0`, reset `fn_800208A0`) keeps state at `+0x50`,
@@ -553,7 +632,9 @@ In the order the boot path needs them:
    at its original address, the loader needs the script function table at load time: either the
    port converts those operands after the game has registered its functions, or a table of
    function index to signature is generated from a run of the PC build.
-2. **`shared_ui.sir`** (title screen). `FixupFSMPoolCallback` (0x8010CCB0) and `HudReload` call
+2. **Level files**: the entity records of a zone (`fn_8012F8B8` and the per-type constructors it
+   calls), the zone record, then what the title screen's zone needs. See "Level files".
+   **`shared_ui.sir`** (title screen). `FixupFSMPoolCallback` (0x8010CCB0) and `HudReload` call
    the same `fn_801BC574` on machines from other files, so the state-machine schemas here should
    apply as they are; what is missing is how those files name their machines (the section type
    and the pool the callback walks), a relocation range per file, and the widget data the

@@ -26,6 +26,7 @@ typedef enum SirError {
     SIR_ERR_SCREENS,          // screen state machines (slots 0xD98, 0xD9C): bad count, node type or pointer
     SIR_ERR_EFFECTS,          // effect definitions (header slots 0x82C-0x840): table or one of its pointers outside the image
     SIR_ERR_POOL,             // object pool (header slots 0x10, 0x418): bad counts, block or list pointer
+    SIR_ERR_LEVEL,            // level file header block: zone slot table not laid out as fn_80129CC8 does
     SIR_ERR_OVERLAP,          // two of the objects above share bytes
     SIR_ERR_IO
 } SirError;
@@ -379,6 +380,26 @@ SirError GlobalBinaryConvertHeader(SirReloc* r, u8* hdr);
 // slot is 0), converts the database,
 // then those objects, then the header. Nothing is changed when a check fails.
 SirError GlobalBinaryConvert(SirReloc* r, u8* hdr, u8* image, u32 imageSize, s32* failTable);
+
+// ---------------------------------------------------------------------------------------------
+// Level files (`*_level.sir`): a header block (section type -1) that is the world state, and one
+// image per zone (section type = zone number). See docs/loader.md, "Level files".
+// ---------------------------------------------------------------------------------------------
+#define LEVEL_HEADER_SLOTS    0x21E0   // offset of the zone slots (fn_80129CC8)
+#define LEVEL_SLOT_MIN_SIZE   0x148    // a slot is 0x148 + 0x54 * n bytes (gZoneResourceSize)
+#define LEVEL_SLOT_MAX_SIZE   0x1000
+#define LEVEL_MAX_ZONES       4096
+#define LEVEL_HUD_SIZE        0x438
+
+// Wii address the header block was built for: its word +0x1A4 points at its own +0x21E0. 0 if
+// the block does not look like a level header.
+u32 LevelHeaderWiiBase(const u8* hdr, u32 size);
+// Converts the header block in place. `r` must map the header's own range (LevelHeaderWiiBase)
+// and the zones' address ranges, so that pointers into both become host pointers.
+SirError LevelHeaderConvert(SirReloc* r, u8* hdr, u32 size);
+// Converts what is typed so far of one zone image loaded for Wii address `wiiBase`: the HUD at
+// `hudWiiAddr` (header +0x1F4; 0 for none) with its state machines. `r` must map the image.
+SirError LevelZoneConvert(SirReloc* r, u8* image, u32 imageSize, u32 wiiBase, u32 hudWiiAddr);
 
 // Test/tool helper: reads the file with stdio, allocates the two sections with malloc and
 // converts them. The game itself goes through SirLoad; see docs/loader.md for the hook.
