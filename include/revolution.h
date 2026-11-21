@@ -81,7 +81,25 @@ u32    VIGetTvFormat(void);
 // ---- GX ----
 typedef struct GXFifoObj { u8 pad[0x80]; } GXFifoObj;
 // Write-gather pipe (0xCC008000 on hardware); the platform layer provides a recorder.
-typedef union PPCWGPipe { u8 _u8; u16 _u16; u32 _u32; s32 _s32; f32 _f32; } PPCWGPipe;
+// `GXWGFifo._u8 = x` appends to the FIFO the CPU is attached to, big-endian as on the console
+// (src/port/port_gx.cpp). The members are write-only.
+void PortGxWrite8(u8 v);
+void PortGxWrite16(u16 v);
+void PortGxWrite32(u32 v);
+void PortGxWriteF32(f32 v);
+#ifdef __cplusplus
+}   // the members below are C++
+struct PPCWGPipe {
+    struct U8  { void operator=(u8 v) volatile  { PortGxWrite8(v); } } _u8;
+    struct U16 { void operator=(u16 v) volatile { PortGxWrite16(v); } } _u16;
+    struct U32 { void operator=(u32 v) volatile { PortGxWrite32(v); } } _u32;
+    struct S32 { void operator=(s32 v) volatile { PortGxWrite32((u32)v); } } _s32;
+    struct F32 { void operator=(f32 v) volatile { PortGxWriteF32(v); } } _f32;
+};
+extern "C" {
+#else
+typedef struct PPCWGPipe PPCWGPipe;
+#endif
 extern volatile PPCWGPipe GXWGFifo;
 typedef f32 Mtx[3][4];
 enum { GX_PTTEXMTX0 = 64, GX_MTX3x4 = 0 };

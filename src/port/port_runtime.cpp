@@ -13,6 +13,7 @@
 #include <string.h>
 
 #include "port/port.h"
+#include "port/port_gx.h"
 
 // This file's start-up object must be built before every other static object: game code may
 // touch globals that live in the mapped address space from its own static initialisers.
@@ -80,6 +81,7 @@ static void PrintSummary(void) {
         fprintf(stderr, "static initialisers: %d run, %d skipped (not decompiled)\n", sRunCtors, sSkippedCtors);
     fprintf(stderr, "disc: %s\n", PortDvdStats(buf, sizeof(buf)));
     fprintf(stderr, "data: %s\n", PortFileStats(buf, sizeof(buf)));
+    { char gx[512]; fprintf(stderr, "GX: %s\n", PortGxStatsText(gx, sizeof(gx))); }
     fprintf(stderr, "reached, in order:\n");
     for (s32 i = 0; i < sMilestoneCount; i++) {
         if (!sMilestones[i].stub) fprintf(stderr, "  %6u ms  %s\n", sMilestones[i].ms, sMilestones[i].what);
@@ -639,6 +641,7 @@ static int SelfTest(void) {
     memcpy(&w, img + 16, 4);
     CHECK(w == 0x100);
     fails += PortSelfTestSdk();
+    fails += PortSelfTestGx();
 #undef CHECK
     PortLog("self-test: %u functions, %u linked; %s", gPortFuncCount, linked, fails ? "FAILED" : "ok");
     return fails;

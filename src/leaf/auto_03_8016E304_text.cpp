@@ -4,6 +4,8 @@
 #include <stdint.h>
 
 #include "types.h"
+// The GX write-gather pipe (0xCC008000 on the console): src/port/port_gx.cpp.
+extern "C" { void PortGxWrite8(u8 v); void PortGxWrite16(u16 v); void PortGxWrite32(u32 v); void PortGxWriteF32(f32 v); }
 
 extern u8 lbl_803F2880[];
 extern u8 lbl_80412BC0[];
@@ -205,59 +207,59 @@ extern "C" void fn_80174A70(u8* a3, f32 f1, f32 f2, f32 f3) {
 
 // 0x801759A8
 extern "C" u32 fn_801759A8(void) {
-    *(u8*)((u8*)(uintptr_t)(0xcc010000) + -32768) = (u8)((u32)(97));
+    PortGxWrite8((u8)((u32)(97)));
     u32 t0 = (u32)(0xfe000000) + 24u;
-    *(u32*)((u8*)(uintptr_t)(0xcc010000) + -32768) = (u32)((u32)(t0));
-    *(u8*)((u8*)(uintptr_t)(0xcc010000) + -32768) = (u8)((u32)(97));
-    *(u32*)((u8*)(uintptr_t)(0xcc010000) + -32768) = (u32)((u32)(0x41000000));
+    PortGxWrite32((u32)((u32)(t0)));
+    PortGxWrite8((u8)((u32)(97)));
+    PortGxWrite32((u32)((u32)(0x41000000)));
     return (u32)(t0);
 }
 
 // 0x80175B60
 extern "C" s32 fn_80175B60(s32 a3, u8* a4, f32 f1, f32 f2, f32 f3) {
-    *(u8*)((u8*)(uintptr_t)(0xcc010000) + -32768) = (u8)((u32)(16));
+    PortGxWrite8((u8)((u32)(16)));
     u8* t0 = ((u8*)(uintptr_t)(a4)) + 1546;
-    *(u16*)((u8*)(uintptr_t)(0xcc010000) + -32768) = (u16)((u32)(2));
-    *(u16*)((u8*)(uintptr_t)(0xcc010000) + -32768) = (u16)((u32)(uintptr_t)(t0));
-    *(f32*)((u8*)(uintptr_t)(0xcc010000) + -32768) = (f32)(f1);
-    *(f32*)((u8*)(uintptr_t)(0xcc010000) + -32768) = (f32)(f2);
-    *(f32*)((u8*)(uintptr_t)(0xcc010000) + -32768) = (f32)(f3);
+    PortGxWrite16((u16)((u32)(2)));
+    PortGxWrite16((u16)((u32)(uintptr_t)(t0)));
+    PortGxWriteF32((f32)(f1));
+    PortGxWriteF32((f32)(f2));
+    PortGxWriteF32((f32)(f3));
     return (s32)(2);
 }
 
 // 0x80175B8C
 extern "C" s32 fn_80175B8C(s32 a3, u8* a4, f32 f1, f32 f2, f32 f3) {
-    *(u8*)((u8*)(uintptr_t)(0xcc010000) + -32768) = (u8)((u32)(16));
+    PortGxWrite8((u8)((u32)(16)));
     u8* t0 = ((u8*)(uintptr_t)(a4)) + 1549;
-    *(u16*)((u8*)(uintptr_t)(0xcc010000) + -32768) = (u16)((u32)(2));
-    *(u16*)((u8*)(uintptr_t)(0xcc010000) + -32768) = (u16)((u32)(uintptr_t)(t0));
-    *(f32*)((u8*)(uintptr_t)(0xcc010000) + -32768) = (f32)(f1);
-    *(f32*)((u8*)(uintptr_t)(0xcc010000) + -32768) = (f32)(f2);
-    *(f32*)((u8*)(uintptr_t)(0xcc010000) + -32768) = (f32)(f3);
+    PortGxWrite16((u16)((u32)(2)));
+    PortGxWrite16((u16)((u32)(uintptr_t)(t0)));
+    PortGxWriteF32((f32)(f1));
+    PortGxWriteF32((f32)(f2));
+    PortGxWriteF32((f32)(f3));
     return (s32)(2);
 }
 
 // 0x80175BB8
 extern "C" s32 fn_80175BB8(s32 a3, u8* a4, f32 f1, f32 f2, f32 f3) {
-    *(u8*)((u8*)(uintptr_t)(0xcc010000) + -32768) = (u8)((u32)(16));
+    PortGxWrite8((u8)((u32)(16)));
     u8* t0 = ((u8*)(uintptr_t)(a4)) + 1540;
-    *(u16*)((u8*)(uintptr_t)(0xcc010000) + -32768) = (u16)((u32)(2));
-    *(u16*)((u8*)(uintptr_t)(0xcc010000) + -32768) = (u16)((u32)(uintptr_t)(t0));
-    *(f32*)((u8*)(uintptr_t)(0xcc010000) + -32768) = (f32)(f1);
-    *(f32*)((u8*)(uintptr_t)(0xcc010000) + -32768) = (f32)(f2);
-    *(f32*)((u8*)(uintptr_t)(0xcc010000) + -32768) = (f32)(f3);
+    PortGxWrite16((u16)((u32)(2)));
+    PortGxWrite16((u16)((u32)(uintptr_t)(t0)));
+    PortGxWriteF32((f32)(f1));
+    PortGxWriteF32((f32)(f2));
+    PortGxWriteF32((f32)(f3));
     return (s32)(2);
 }
 
 // 0x80175BE4
 extern "C" s32 fn_80175BE4(s32 a3, u8* a4, f32 f1, f32 f2, f32 f3) {
-    *(u8*)((u8*)(uintptr_t)(0xcc010000) + -32768) = (u8)((u32)(16));
+    PortGxWrite8((u8)((u32)(16)));
     u8* t0 = ((u8*)(uintptr_t)(a4)) + 1543;
-    *(u16*)((u8*)(uintptr_t)(0xcc010000) + -32768) = (u16)((u32)(2));
-    *(u16*)((u8*)(uintptr_t)(0xcc010000) + -32768) = (u16)((u32)(uintptr_t)(t0));
-    *(f32*)((u8*)(uintptr_t)(0xcc010000) + -32768) = (f32)(f1);
-    *(f32*)((u8*)(uintptr_t)(0xcc010000) + -32768) = (f32)(f2);
-    *(f32*)((u8*)(uintptr_t)(0xcc010000) + -32768) = (f32)(f3);
+    PortGxWrite16((u16)((u32)(2)));
+    PortGxWrite16((u16)((u32)(uintptr_t)(t0)));
+    PortGxWriteF32((f32)(f1));
+    PortGxWriteF32((f32)(f2));
+    PortGxWriteF32((f32)(f3));
     return (s32)(2);
 }
 
@@ -271,11 +273,11 @@ extern "C" void fn_80175C10(u8* a3, f32 f1, f32 f2, f32 f3, f32 f4) {
 
 // 0x80175C24
 extern "C" s32 fn_80175C24(s32 a3, u8* a4, s32 a5) {
-    *(u8*)((u8*)(uintptr_t)(0xcc010000) + -32768) = (u8)((u32)(16));
+    PortGxWrite8((u8)((u32)(16)));
     u8* t0 = ((u8*)(uintptr_t)(a4)) + 1539;
-    *(u16*)((u8*)(uintptr_t)(0xcc010000) + -32768) = (u16)((u32)(0));
-    *(u16*)((u8*)(uintptr_t)(0xcc010000) + -32768) = (u16)((u32)(uintptr_t)(t0));
-    *(u32*)((u8*)(uintptr_t)(0xcc010000) + -32768) = (u32)((u32)(uintptr_t)(a5));
+    PortGxWrite16((u16)((u32)(0)));
+    PortGxWrite16((u16)((u32)(uintptr_t)(t0)));
+    PortGxWrite32((u32)((u32)(uintptr_t)(a5)));
     return (s32)(0);
 }
 

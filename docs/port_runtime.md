@@ -221,6 +221,38 @@ shows the count. An SDK function that has no definition at all stops the run lik
 function, unless it is in the short `PortSoftSdk` table in `port_sdk.cpp` (by original address,
 with what it is): those log and return 0. Add to that table only after reading the asm.
 
+### GX: the command stream
+
+On the console every GX command is a run of big-endian bytes written to the write-gather pipe
+at `0xCC008000`. They land in the FIFO the CPU is attached to, and the graphics processor
+executes the FIFO it is attached to. The engine uses both ways: "immediate" (both on the main
+FIFO), and its own display lists (it points the CPU FIFO at a buffer in `VideoBeginCapture`, and
+the render thread attaches the GP to that buffer in `VideoRunDL`). Most of the engine's GX state
+never goes through SDK functions: it writes BP, CP and XF register loads itself.
+
+`port_gx.cpp` keeps exactly that model:
+
+- **The pipe.** `GXWGFifo` is an object whose members append to the CPU's FIFO
+  (`GXWGFifo._u32 = x` calls `PortGxWrite32`); the bytes in the buffer are the console's.
+  `tools/gen_leaf.py` turns stores to `0xCC008000` into the same calls. Decompiled code must
+  write the pipe through `GXWGFifo`, with the width of the original store.
+- **The interpreter.** Attaching the GP to a FIFO that holds commands runs them
+  (`GXSetGPFifo`; for the shared FIFO, at `GXFlush`, `GXDrawDone` and when the CPU moves away).
+  It keeps the three register files (`PortGx`: BP with its write mask, CP, XF registers and
+  matrix memory), follows display-list calls, and works out each draw's vertex size from the
+  vertex descriptor and format registers. A byte that is no command stops the list and is
+  reported with a hex dump of what came before: that is how a missing or wrongly sized pipe
+  write shows up.
+- **Interrupts.** The draw-done token (BP 0x45) and draw-sync tokens (BP 0x48) in the stream
+  raise the two callbacks the game registered, from the interrupt thread.
+- **The renderer interface.** `PortGxBackend` receives draws (primitive, vertex layout, the
+  raw vertex bytes), frame-buffer copies and palette loads. No backend exists yet: the boot
+  summary's `GX:` line counts what a run sent.
+
+Data a command only points to (vertex arrays, textures, matrices for indexed loads) is read
+from memory in host byte order: the game's own code writes it that way, and converters for
+disc data have to leave it that way.
+
 ### Threads and interrupts
 
 The Wii has one core. Game threads never run at the same time, and interrupts (video retrace,
@@ -283,11 +315,16 @@ MSVC only for now (absolute symbols, `/alternatename`, structured exception hand
 3. **Static initialisers**: 262 of the 300 `.ctors` entries are not decompiled. Most are small
    (they construct one global). Until they exist those globals are zero, which will show up as
    crashes or wrong behaviour further in. `monsterlab.exe --verbose` lists them.
-4. **The GX command stream**: hand-written code writes vertices and register loads through
-   `GXWGFifo`, generated code through `0xCC008000`, and both are lost today. A renderer needs
-   them in order, in the FIFO the CPU is attached to (`GXSetCPUFifo`): make both one write-gather
-   object that appends to the current FIFO, then execute a display list at `GXSetGPFifo`
-   (which also delivers the draw-sync tokens `fn_8015D23C` dispatches).
+4. **A renderer behind the GX command stream.** The stream is captured and decoded
+   (`port_gx.cpp`, see "GX: the command stream"); nothing draws it yet. In order: a window and a
+   frame buffer that the display copy (BP register 0x52) presents; draws with position and
+   vertex colour through the XF matrices; texture decoding and the TEV stages as generated
+   shaders; lighting, texture-coordinate generation, fog; copies of the frame buffer to textures
+   (the engine's 13 render targets).
+   The SDK-level calls that only record state today (`GXSetViewport`, `GXSetCopyClear`,
+   `GXSetBlendMode`, ... in `port_sdk.cpp`) have to send their registers into the same stream,
+   as `GXBegin`, `GXSetVtxDesc` and `GXSetVtxAttrFmt` already do, so that the interpreter's
+   register files are the only state.
 5. **SDK names**: the functions `port_sdk.cpp` defines as `fn_8024xxxx` are identified in its
    comments (`VIConfigure`, `GXSetViewport`, ...). Renaming them with `tools/rename.py` needs
    the definitions in `src/port/` and the callers renamed in the same change.
