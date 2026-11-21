@@ -8,3 +8,11 @@ lbl_803983A4 4 2 2 2 2 2 2 2 2 4 1x36
 lbl_803983E0 4 2 2 2 2 2 2 2 2 4 1x36
 lbl_8039841C 4 2 2 2 2 2 2 2 2 4 1x36
 lbl_80398458 4 2 2 2 2 2 2 2 2 4 1x36
+# MSL "C" locale tables (reached from lbl_803B4DD0 + 0x38): character classes, lower/upper case
+# maps (StringHash upper-cases through the third), and the three wide-character tables
+lbl_80352388 2
+lbl_80352588 1
+lbl_80352688 1
+lbl_80352930 2
+lbl_80352B30 2
+lbl_80352D30 2

@@ -52,7 +52,10 @@ s32   fn_801CB938(void);    // returns 0x805FB5F8
 
 // ---- data ----
 u8                  sEngineCtx[8];        ORIG(0x805FB760)
-void*               sMemPool;             ORIG(0x805FB7A8)
+// 8 bytes in the original: the MEM2 block, then the start of the second heap (0 = none), which
+// fn_801D2C00 and the allocator read as lbl_805FB7A8 + 4.
+void*               sMemPoolObj[2];       ORIG(0x805FB7A8)
+#define sMemPool sMemPoolObj[0]
 static EngineMemCallbacks  sSgMemCallbacks;      ORIG(0x8047C600)
 static EngineMemCallbacks  sRendMemCallbacks;    ORIG(0x8047C614)
 extern u8                  gCamera[];            ORIG(0x8047C640)
@@ -69,7 +72,7 @@ static s32                 sEngineSuspended;     ORIG(0x805FB788)
 s32                 sEngineSuspendRequest; ORIG(0x805FB78C)
 u8                         gMainHeap[0x728];     ORIG(0x8047CAC0) // two heap states of 0x394 bytes (see heap_alloc.cpp)
 extern u8                  lbl_8047C7D8[], lbl_8047C7F0[];
-static s32                 sPendingWorldReset;   ORIG(0x805FB790)
+s32                        sPendingWorldReset;   ORIG(0x805FB790)
 static GameSettings*       sGameSettings;        ORIG(0x805FB794)
 extern s32                 gHomeMenuOpen;        ORIG(0x805FB51C)
 extern s32                 gViewportCount;       ORIG(0x805FB4C0)

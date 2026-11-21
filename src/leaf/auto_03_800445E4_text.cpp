@@ -4,6 +4,8 @@
 #include <stdint.h>
 
 #include "types.h"
+// The GX write-gather pipe (0xCC008000 on the console): src/port/port_gx.cpp.
+extern "C" { void PortGxWrite8(u8 v); void PortGxWrite16(u16 v); void PortGxWrite32(u32 v); void PortGxWriteF32(f32 v); }
 
 extern u8 lbl_803589B8[];
 
@@ -14,21 +16,21 @@ extern "C" void fn_800445E4(u8* a3) {
 
 // 0x80044694
 extern "C" u32 fn_80044694(void) {
-    *(u8*)((u8*)(uintptr_t)(0xcc010000) + -32768) = (u8)((u32)(97));
+    PortGxWrite8((u8)((u32)(97)));
     u32 t0 = (u32)(0xfe000000) + 1u;
-    *(u32*)((u8*)(uintptr_t)(0xcc010000) + -32768) = (u32)((u32)(t0));
-    *(u8*)((u8*)(uintptr_t)(0xcc010000) + -32768) = (u8)((u32)(97));
-    *(u32*)((u8*)(uintptr_t)(0xcc010000) + -32768) = (u32)((u32)(0x41000000));
+    PortGxWrite32((u32)((u32)(t0)));
+    PortGxWrite8((u8)((u32)(97)));
+    PortGxWrite32((u32)((u32)(0x41000000)));
     return (u32)(t0);
 }
 
 // 0x80044C0C
 extern "C" u32 fn_80044C0C(void) {
-    *(u8*)((u8*)(uintptr_t)(0xcc010000) + -32768) = (u8)((u32)(97));
+    PortGxWrite8((u8)((u32)(97)));
     u32 t0 = (u32)(0xfe000000) + 1u;
-    *(u32*)((u8*)(uintptr_t)(0xcc010000) + -32768) = (u32)((u32)(t0));
+    PortGxWrite32((u32)((u32)(t0)));
     u32 t1 = (u32)(0x41000000) + 1u;
-    *(u8*)((u8*)(uintptr_t)(0xcc010000) + -32768) = (u8)((u32)(97));
-    *(u32*)((u8*)(uintptr_t)(0xcc010000) + -32768) = (u32)((u32)(t1));
+    PortGxWrite8((u8)((u32)(97)));
+    PortGxWrite32((u32)((u32)(t1)));
     return (u32)(0x41000000);
 }

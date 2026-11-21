@@ -32,6 +32,12 @@ MAX_STEPS = 120         # instructions emitted per function, counting duplicated
 
 LOADS = {"lwz": "s32", "lhz": "u16", "lha": "s16", "lbz": "u8", "lfs": "f32", "lfd": "f64"}
 STORES = {"stw": "u32", "sth": "u16", "stb": "u8", "stfs": "f32", "stfd": "f64"}
+# A store to 0xCC008000 (lis 0xCC01, offset -0x8000) is a write to the GX write-gather pipe.
+PIPE_ADDR = "(u8*)(uintptr_t)(0xcc010000) + -32768"
+PIPE_WRITE = {"u8": "PortGxWrite8", "u16": "PortGxWrite16", "u32": "PortGxWrite32", "f32": "PortGxWriteF32"}
+PIPE_DECLS = ['// The GX write-gather pipe (0xCC008000 on the console): src/port/port_gx.cpp.',
+              'extern "C" { void PortGxWrite8(u8 v); void PortGxWrite16(u16 v); void PortGxWrite32(u32 v); '
+              'void PortGxWriteF32(f32 v); }']
 FBIN = {"fadds": ("+", "f32"), "fsubs": ("-", "f32"), "fmuls": ("*", "f32"), "fdivs": ("/", "f32"),
         "fadd": ("+", "f64"), "fsub": ("-", "f64"), "fmul": ("*", "f64"), "fdiv": ("/", "f64")}
 IBIN = {"add": "+", "subf": "-", "and": "&", "or": "|", "xor": "^", "mullw": "*"}
@@ -309,7 +315,12 @@ class Gen:
         elif op in STORES:
             t = STORES[op]
             v = self.fval(a[0]) if t.startswith("f") else self.val(a[0])
-            self.lines.append(f"{self.ind}*({t}*)({self.addr(a[1])}) = ({t})({v});")
+            ad = self.addr(a[1])
+            if ad == PIPE_ADDR and t in PIPE_WRITE:
+                # The GX write-gather pipe: the bytes go to the FIFO, not to memory.
+                self.lines.append(f"{self.ind}{PIPE_WRITE[t]}(({t})({v}));")
+            else:
+                self.lines.append(f"{self.ind}*({t}*)({ad}) = ({t})({v});")
         elif op == "li":
             v, sym = self.imm(a[1])
             if sym:
@@ -820,6 +831,8 @@ def main():
                  "#include <stdint.h>", "", '#include "types.h"']
         if cb:
             lines.append('#include "game/script_callbacks.h"')
+        if any("PortGxWrite" in l for _, _, c, _, _ in fns for l in c):
+            lines += PIPE_DECLS
         lines.append("")
         globs = sorted(set().union(*[g for _, _, _, g, _ in fns]))
         gtypes = global_types()

@@ -34,7 +34,7 @@ struct DVDFileInfo {
 static_assert(sizeof(DVDFileInfo) == 0x3C, "DVDFileInfo layout");
 typedef void (*DVDCallback)(s32 result, DVDFileInfo* info);
 
-struct DvdFile { FILE* f; u32 size; char name[120]; };
+struct DvdFile { FILE* f; u32 size; char name[120]; char path[100]; };
 static DvdFile sDvdFiles[64];
 static u32 sDvdOpens, sDvdReads, sDvdMisses;
 static u64 sDvdBytes;
@@ -44,7 +44,12 @@ BOOL DVDInit(void) {
     return TRUE;
 }
 
-s32 DVDGetDriveStatus(void) { return 0; }        // idle, no error
+// The game polls this in a loop while a read is pending (fn_80204210). On the console the drive's
+// interrupt preempts that loop; here the poll is where the interrupt thread gets to run.
+s32 DVDGetDriveStatus(void) {
+    PortYield();
+    return 0;                                    // idle, no error
+}
 
 // DVDOpen
 s32 fn_8024F1E8(char* path, u8* infoBytes) {
@@ -67,6 +72,7 @@ s32 fn_8024F1E8(char* path, u8* infoBytes) {
         fseek(f, 0, SEEK_END);
         d->size = (u32)ftell(f);
         snprintf(d->name, sizeof(d->name), "disc: opened %s (%u bytes)", path, d->size);
+        snprintf(d->path, sizeof(d->path), "%s", rel);
         memset(info, 0, sizeof(DVDFileInfo));
         info->startAddr = (u32)i + 1;
         info->length = d->size;
@@ -111,6 +117,7 @@ s32 DVDReadAsync(u8* infoBytes, void* addr, s32 len, s32 offset, void* cb, s32 p
     s32 got = (s32)fread(addr, 1, (size_t)len, d->f);
     sDvdReads++;
     sDvdBytes += (u32)got;
+    if (got > 0) PortFileRead(d->path, (u32)offset, (u8*)addr, (u32)got);
     info->state = 1;
     info->callback = cb;
     DvdDone* done = &sDvdDone[sDvdDoneNext++ % 64];
@@ -132,10 +139,29 @@ const char* PortSoftSdk(u32 addr) {
         {0x80264EE8, "audio: mixer init (fn_80264EE8)"},
         {0x80264F70, "audio: sequencer init (fn_80264F70)"},
         {0x8027FF24, "KPADReset (fn_8027FF24)"},
+        // The game's audio init (fn_801FCFB4) and its effect set-up (fn_80203E8C). No sound yet.
+        {0x8026099C, "audio: mixer set-up (fn_8026099C)"},
+        {0x80263F18, "audio: sequencer defaults (fn_80263F18)"},
+        {0x80259418, "audio: AX mode setter (fn_80259418)"},
+        {0x80260AC4, "audio: mixer sound mode setter (fn_80260AC4)"},
+        {0x80259B2C, "audio: AX frame callback registration (fn_80259B2C)"},
+        {0x8025D2E0, "audio: AXFX effect init (fn_8025D2E0)"},
+        {0x8025E3E4, "audio: AXFX effect init (fn_8025E3E4)"},
+        {0x8025B4C0, "audio: AXFX effect init (fn_8025B4C0)"},
+        {0x80264CC8, "audio: sequencer float setter (fn_80264CC8)"},
+        {0x80264CD0, "audio: sequencer float setter (fn_80264CD0)"},
+        // OSSetPeriodicAlarm: its only caller so far is the audio tick (fn_80202CAC), which needs AX.
+        {0x80234394, "OSSetPeriodicAlarm for the audio tick (fn_80234394): not started"},
+        // Registers a function and calls it with two words (from fn_80204478, argument fn_802B7DDC,
+        // SDK code). What library this starts is not known yet.
+        {0x802B4140, "library start through fn_802B4140 (fn_802B7DDC): not started"},
     };
     for (const auto& e : kSoft) if (e.addr == addr) return e.what;
     return NULL;
 }
+
+// SCGetSoundMode (the SDK reads item 0x11 and falls back to 1): 0 mono, 1 stereo, 2 surround.
+extern "C" u8 fn_8026AC14(void) { return 1; }
 
 const char* PortDvdStats(char* buf, u32 n) {
     snprintf(buf, n, "%u file(s) opened, %u read(s), %.1f MB read, %u file(s) not found",
@@ -192,65 +218,9 @@ void VIFlush(void) {
 }
 
 // ------------------------------------------------------------------ GX (nothing is drawn yet)
-volatile PPCWGPipe GXWGFifo;
-// State a GX backend will need; today it is only recorded.
+// State the SDK-level GX calls record; the command stream is handled in port_gx.cpp.
 PortGxState gPortGx;
-static GXFifoObj sGxFifo;
-struct PortFifo { void* base; u32 size; void* rd; void* wr; };
 
-GXFifoObj* GXInit(void* base, u32 size) {
-    PortMilestone("GXInit");
-    GXInitFifoBase(&sGxFifo, base, size);
-    return &sGxFifo;
-}
-void GXInitFifoBase(GXFifoObj* fifo, void* base, u32 size) {
-    PortFifo* f = (PortFifo*)fifo;
-    f->base = f->rd = f->wr = base;
-    f->size = size;
-}
-void GXInitFifoPtrs(GXFifoObj* fifo, void* readPtr, void* writePtr) {
-    PortFifo* f = (PortFifo*)fifo;
-    f->rd = readPtr;
-    f->wr = writePtr;
-}
-void GXGetFifoPtrs(GXFifoObj* fifo, void** readPtr, void** writePtr) {
-    PortFifo* f = (PortFifo*)fifo;
-    *readPtr = f->rd;
-    *writePtr = f->wr;
-}
-void GXSetCPUFifo(GXFifoObj* fifo) { STUB(GXSetCPUFifo); }
-
-// The draw-done ("PE finish") and draw-sync ("PE token") interrupts.
-typedef void (*GXDrawDoneCallback)(void);
-typedef void (*GXDrawSyncCallback)(u16 token);
-static GXDrawDoneCallback sDrawDoneCb;
-static GXDrawSyncCallback sDrawSyncCb;
-static u32 sGxDisplayLists;
-
-static void GxDrawDoneInterrupt(void* arg) {
-    if (sDrawDoneCb) sDrawDoneCb();
-    PortSignalChange();
-}
-
-// Attaching a FIFO that holds commands to the graphics processor makes it run them. Every
-// display list of the game ends with the draw-done token (RendDLEnd), so the draw-done
-// interrupt follows. The commands themselves are not executed yet, and draw-sync tokens inside
-// the list are not delivered.
-void GXSetGPFifo(GXFifoObj* fifo) {
-    PortFifo* f = (PortFifo*)fifo;
-    if (f != (PortFifo*)&sGxFifo && f->rd != f->wr) {
-        sGxDisplayLists++;
-        f->rd = f->wr;
-        PortQueueInterrupt(GxDrawDoneInterrupt, NULL);
-    }
-}
-void GXSaveCPUFifo(GXFifoObj* fifo) { STUB(GXSaveCPUFifo); }
-void GXSaveGPFifo(GXFifoObj* fifo) { STUB(GXSaveGPFifo); }
-void GXGetGPStatus(u8* overhi, u8* underlow, u8* readIdle, u8* cmdIdle, u8* brkpt) {
-    *overhi = *underlow = *brkpt = 0;
-    *readIdle = *cmdIdle = 1;                    // the "graphics processor" has always caught up
-}
-void GXFlush(void) { STUB(GXFlush); }
 void GXLoadTexMtxImm(const Mtx m, u32 id, int type) {
     STUB(GXLoadTexMtxImm);
     f32* dst = NULL;
@@ -262,43 +232,86 @@ void GXLoadTexMtxImm(const Mtx m, u32 id, int type) {
     }
 }
 
-// GXDrawDone: sends the draw-done token and waits for the graphics processor to reach it
-s32 fn_8024B358(void) {
-    STUB(GXDrawDone);
-    if (sDrawDoneCb) sDrawDoneCb();
-    return 0;
-}
-// GXSetDrawDoneCallback
-void* fn_8024B5D4(void* cb) { void* old = (void*)sDrawDoneCb; sDrawDoneCb = (GXDrawDoneCallback)cb; return old; }
-// GXSetDrawSyncCallback
-void* fn_8024B50C(void* cb) { void* old = (void*)sDrawSyncCb; sDrawSyncCb = (GXDrawSyncCallback)cb; return old; }
+
+// The vertex descriptor and formats set through the SDK are sent as CP registers at the next
+// GXBegin, as the SDK does (it marks them dirty and flushes on the first draw).
+static BOOL sVcdDirty;
+static u8   sVatDirty;                          // one bit per format
 
 // GXClearVtxDesc
 void fn_8024A7E4(void) {
-    STUB(GXClearVtxDesc);
     memset(gPortGx.vtxDesc, 0, sizeof(gPortGx.vtxDesc));
     gPortGx.vtxDesc[9] = 1;                      // position: direct
+    sVcdDirty = TRUE;
 }
 // GXSetVtxDesc(attr, type)
 void fn_8024A3A4(s32 attr, s32 type) {
-    STUB(GXSetVtxDesc);
     if ((u32)attr < 26) gPortGx.vtxDesc[attr] = (u8)type;
+    sVcdDirty = TRUE;
 }
 // GXSetVtxAttrFmt(format, attr, component count, component type, fraction bits)
 void fn_8024A818(s32 fmt, s32 attr, s32 cnt, s32 type, s32 frac) {
-    STUB(GXSetVtxAttrFmt);
     if ((u32)fmt < 8 && (u32)attr < 26) {
         gPortGx.vtxFmt[fmt][attr].cnt = (u8)cnt;
         gPortGx.vtxFmt[fmt][attr].type = (u8)type;
         gPortGx.vtxFmt[fmt][attr].frac = (u8)frac;
+        sVatDirty |= (u8)(1u << fmt);
     }
+}
+
+static void CpLoad(u8 reg, u32 value) {
+    PortGxWrite8(0x08);
+    PortGxWrite8(reg);
+    PortGxWrite32(value);
+}
+
+static void FlushVertexState(void) {
+    if (sVcdDirty) {
+        const u8* d = gPortGx.vtxDesc;
+        u32 lo = 0, hi = 0;
+        for (u32 i = 0; i < 9; i++) if (d[i]) lo |= 1u << i;             // matrix indices are 0/1
+        u32 nrm = d[25] ? d[25] : d[10];                                 // attribute 25: normal + binormal + tangent
+        lo |= (u32)(d[9] & 3) << 9 | (nrm & 3) << 11 | (u32)(d[11] & 3) << 13 | (u32)(d[12] & 3) << 15;
+        for (u32 i = 0; i < 8; i++) hi |= (u32)(d[13 + i] & 3) << (i * 2);
+        CpLoad(0x50, lo);
+        CpLoad(0x60, hi);
+        sVcdDirty = FALSE;
+    }
+    for (u32 f = 0; f < 8; f++) {
+        if (!(sVatDirty & (1u << f))) continue;
+        const auto* v = gPortGx.vtxFmt[f];
+        u32 nbt = gPortGx.vtxDesc[25] ? 1u : 0u;
+        const auto& n = nbt ? v[25] : v[10];
+        u32 a = (u32)(v[9].cnt & 1) | (u32)(v[9].type & 7) << 1 | (u32)(v[9].frac & 31) << 4 |
+                (u32)(n.cnt != 0) << 9 | (u32)(n.type & 7) << 10 |
+                (u32)(v[11].cnt & 1) << 13 | (u32)(v[11].type & 7) << 14 |
+                (u32)(v[12].cnt & 1) << 17 | (u32)(v[12].type & 7) << 18 |
+                (u32)(v[13].cnt & 1) << 21 | (u32)(v[13].type & 7) << 22 | (u32)(v[13].frac & 31) << 25 |
+                1u << 30 | (u32)(n.cnt == 2) << 31;
+        u32 b = (u32)(v[14].cnt & 1) | (u32)(v[14].type & 7) << 1 | (u32)(v[14].frac & 31) << 4 |
+                (u32)(v[15].cnt & 1) << 9 | (u32)(v[15].type & 7) << 10 | (u32)(v[15].frac & 31) << 13 |
+                (u32)(v[16].cnt & 1) << 18 | (u32)(v[16].type & 7) << 19 | (u32)(v[16].frac & 31) << 22 |
+                (u32)(v[17].cnt & 1) << 27 | (u32)(v[17].type & 7) << 28 | 1u << 31;
+        u32 c = (u32)(v[17].frac & 31) |
+                (u32)(v[18].cnt & 1) << 5 | (u32)(v[18].type & 7) << 6 | (u32)(v[18].frac & 31) << 9 |
+                (u32)(v[19].cnt & 1) << 14 | (u32)(v[19].type & 7) << 15 | (u32)(v[19].frac & 31) << 18 |
+                (u32)(v[20].cnt & 1) << 23 | (u32)(v[20].type & 7) << 24 | (u32)(v[20].frac & 31) << 27;
+        CpLoad((u8)(0x70 + f), a);
+        CpLoad((u8)(0x80 + f), b);
+        CpLoad((u8)(0x90 + f), c);
+    }
+    sVatDirty = 0;
 }
 // GXInvalidateVtxCache
 void fn_8024AC3C(void) { STUB(GXInvalidateVtxCache); }
 // GXInvalidateTexAll
 void fn_8024CB00(void) { STUB(GXInvalidateTexAll); }
 // GXBegin(primitive, vertex format, vertex count); the vertices follow through GXWGFifo
-void fn_8024B974(s32 prim, s32 fmt, s32 count) { STUB(GXBegin); }
+void fn_8024B974(s32 prim, s32 fmt, s32 count) {
+    FlushVertexState();
+    PortGxWrite8((u8)(prim | fmt));
+    PortGxWrite16((u16)count);
+}
 
 // GXSetViewport
 void fn_8024E48C(f32 left, f32 top, f32 w, f32 h, f32 nearZ, f32 farZ) {

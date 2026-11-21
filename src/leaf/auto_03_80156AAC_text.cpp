@@ -4,6 +4,8 @@
 #include <stdint.h>
 
 #include "types.h"
+// The GX write-gather pipe (0xCC008000 on the console): src/port/port_gx.cpp.
+extern "C" { void PortGxWrite8(u8 v); void PortGxWrite16(u16 v); void PortGxWrite32(u32 v); void PortGxWriteF32(f32 v); }
 
 extern u8 gVideoDrawDone[];
 extern void* lbl_805FB528;
@@ -42,31 +44,31 @@ extern "C" void fn_80157320(void) {
 
 // 0x80158E64
 extern "C" u32 fn_80158E64(s32 a3, s32 a4) {
-    *(u8*)((u8*)(uintptr_t)(0xcc010000) + -32768) = (u8)((u32)(97));
+    PortGxWrite8((u8)((u32)(97)));
     u32 t0 = (((u32)(uintptr_t)(a4) << 16) | ((u32)(uintptr_t)(a4) >> 16)) & 0xffff0000u;
-    *(u32*)((u8*)(uintptr_t)(0xcc010000) + -32768) = (u32)((u32)(0xfe070000));
-    *(u8*)((u8*)(uintptr_t)(0xcc010000) + -32768) = (u8)((u32)(97));
-    *(u32*)((u8*)(uintptr_t)(0xcc010000) + -32768) = (u32)((u32)(t0));
+    PortGxWrite32((u32)((u32)(0xfe070000)));
+    PortGxWrite8((u8)((u32)(97)));
+    PortGxWrite32((u32)((u32)(t0)));
     return (u32)(0xfe070000);
 }
 
 // 0x80159058
 extern "C" u32 fn_80159058(void) {
-    *(u8*)((u8*)(uintptr_t)(0xcc010000) + -32768) = (u8)((u32)(97));
+    PortGxWrite8((u8)((u32)(97)));
     u32 t0 = (u32)(0xfe000000) + 4064u;
-    *(u32*)((u8*)(uintptr_t)(0xcc010000) + -32768) = (u32)((u32)(t0));
+    PortGxWrite32((u32)((u32)(t0)));
     u32 t1 = (u32)(0x41000000) + 1056u;
-    *(u8*)((u8*)(uintptr_t)(0xcc010000) + -32768) = (u8)((u32)(97));
-    *(u32*)((u8*)(uintptr_t)(0xcc010000) + -32768) = (u32)((u32)(t1));
+    PortGxWrite8((u8)((u32)(97)));
+    PortGxWrite32((u32)((u32)(t1)));
     return (u32)(0x41000000);
 }
 
 // 0x80159084
 extern "C" u32 fn_80159084(s32 a3, u8* a4) {
     u8* t0 = ((u8*)(uintptr_t)(a4)) + 16;
-    *(u8*)((u8*)(uintptr_t)(0xcc010000) + -32768) = (u8)((u32)(97));
+    PortGxWrite8((u8)((u32)(97)));
     u32 t1 = (((u32)(uintptr_t)(t0) << 24) | ((u32)(uintptr_t)(t0) >> 8)) & 0xff000000u;
-    *(u32*)((u8*)(uintptr_t)(0xcc010000) + -32768) = (u32)((u32)(t1));
+    PortGxWrite32((u32)((u32)(t1)));
     return (u32)(0xcc010000);
 }
 

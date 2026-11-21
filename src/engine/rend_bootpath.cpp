@@ -16,6 +16,29 @@ extern s32 lbl_805FB4B8;                // 0x805FB4B8: projection type (1 = orth
 extern u8  lbl_805FB524;                // 0x805FB524: fog enabled
 }
 
+// 0x801567CC
+// Perspective projection from the half extents at distance 1 (x, y) and the near/far distances.
+extern "C" void fn_801567CC(f32 halfX, f32 halfY, f32 n, f32 f) {
+    lbl_805F9220 = n;
+    lbl_805F9224 = f;
+    lbl_805F9230 = 1;
+    lbl_80401030[0] = 1.0f / halfX;
+    lbl_80401030[1] = 0.0f;
+    lbl_80401030[2] = 1.0f / halfY;
+    lbl_80401030[3] = 0.0f;
+    lbl_805FB4B8 = 0;
+    lbl_80401030[4] = (2.0f * n) / (n - f);
+    lbl_80401030[5] = (f * n) / (n - f);
+
+    GXWGFifo._u8 = 0x10;
+    GXWGFifo._u16 = 6;
+    GXWGFifo._u16 = 0x1020;
+    for (int i = 0; i < 6; i++) GXWGFifo._f32 = lbl_80401030[i];
+    GXWGFifo._u32 = 0;
+
+    if (lbl_805FB524) fn_80151264();
+}
+
 // 0x801499F8
 // Fills in an image header: size, pixel format, bits per pixel, and for palette formats the
 // palette size and its entry width, then lets fn_8015A5A4 allocate the pixels.
@@ -93,4 +116,85 @@ extern "C" void fn_801566E8(f32 l, f32 r, f32 b, f32 t, f32 n, f32 f) {
     GXWGFifo._u32 = 1;
 
     if (lbl_805FB524) fn_80151264();
+}
+
+extern "C" {
+void fn_8014ACCC(u32 mode, s32 fmt, s32 w, s32 h, s32* outSize, s32* outStride, s32* outW, s32* outH);  // 0x8014ACCC
+s32  fn_80142EE0(void);                 // 0x80142EE0: size of the renderer's scratch buffer
+void* fn_80142ED4(void);                // 0x80142ED4: the renderer's scratch buffer
+}
+#include <string.h>
+#include "engine/engine.h"
+#include "engine/rend.h"
+
+// 0x8015AB70
+// Rearranges one mip level of an image from rows into the tiles GX textures are stored in,
+// in place (through a scratch buffer of one row of tiles): 4x4 pixels for 32- and 16-bit
+// formats, 8x4 for 8-bit, 8x8 for 4-bit. A 32-bit tile holds its 16 first halves, then its 16
+// second halves. Nothing is done for format 8.
+extern "C" void fn_8015AB70(u8* image, s32 level) {
+    if (image[9] == 8) {
+        return;
+    }
+    s32 w = *(u16*)(image + 4);
+    s32 h = *(u16*)(image + 6);
+    u8* data = *(u8**)(image + 0x18);
+    s32 size, stride, outW, outH;
+    for (;;) {
+        fn_8014ACCC(4, image[9], w, h, &size, &stride, &outW, &outH);
+        if (--level < 0) {
+            break;
+        }
+        w >>= 1;
+        h >>= 1;
+        data += size;
+    }
+
+    s32 bpp = image[0xA];
+    s32 rowsPerTile = (bpp == 4) ? 8 : 4;
+    s32 unit;                           // bytes of one tile row
+    if (bpp == 0x20) {
+        unit = 0x10;
+    } else if (bpp == 0x10 || bpp == 8) {
+        unit = 8;
+    } else if (bpp == 4) {
+        unit = 4;
+    } else {
+        return;
+    }
+
+    s32 chunk = stride * rowsPerTile;   // one row of tiles
+    u8* tmp;
+    if (chunk > fn_80142EE0()) {
+        tmp = (u8*)gRendMem->allocTemp((u32)chunk);
+    } else {
+        tmp = (u8*)fn_80142ED4();
+    }
+
+    s32 tilesAcross = stride / unit;    // stride >> 4, >> 3, >> 2
+    for (s32 ty = outH / rowsPerTile; ty > 0; ty--) {
+        u8* out = tmp;
+        for (s32 tx = 0; tx < tilesAcross; tx++) {
+            for (s32 r = 0; r < rowsPerTile; r++) {
+                const u8* src = data + r * stride + tx * unit;
+                if (bpp == 0x20) {
+                    const u16* s = (const u16*)src;
+                    u16* d = (u16*)(out + r * 8);
+                    for (s32 k = 0; k < 4; k++) {
+                        d[k] = s[k * 2];
+                        d[k + 0x10] = s[k * 2 + 1];
+                    }
+                } else {
+                    memcpy(out + r * unit, src, (u32)unit);
+                }
+            }
+            out += (bpp == 0x20) ? 0x40 : unit * rowsPerTile;
+        }
+        memcpy(data, tmp, (u32)chunk);
+        data += chunk;
+    }
+
+    if (chunk > fn_80142EE0()) {
+        gRendMem->freeAny(tmp);
+    }
 }

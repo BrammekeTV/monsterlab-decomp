@@ -6,7 +6,7 @@ extern "C" {
 void     fn_8014DE68(void);                                                        // 0x8014DE68
 void     fn_80152D84(u32 a, u32 b, s32 c, u32 d, u8* e, u32 f, u32 g, u32 h);      // 0x80152D84
 s32      fn_8015BA30(void* p);                                                     // 0x8015BA30
-void     fn_8015AB70(u8* p);                                                       // 0x8015AB70
+void     fn_8015AB70(u8* p, s32 level);                                                       // 0x8015AB70
 void     fn_8015BBC0(s32 a);                                                       // 0x8015BBC0
 void     fn_8015EA40(void* p);                                                     // 0x8015EA40
 GXFifoObj* GXInit(void* base, u32 size);                                           // 0x802488E8
@@ -165,12 +165,12 @@ void fn_80158FF4(u32 a3, u32 a4, u32 a5, u32 a6, u32 a7, u32 a8, u32 a9, u32 a10
 } // extern "C"
 
 // 0x8015A2E8
-// Clears bit 0x2 of the flags byte at +0xB, calls fn_8015AB70, then flushes the cache range
-// (+0x18, size +0x14) when bit 0 of flush is set.
+// Clears bit 0x2 of the flags byte at +0xB, calls fn_8015AB70 (the second argument, the mip
+// level, is passed through in r4), then flushes the cache range (+0x18, size +0x14) when bit 0
+// of flush is set.
 void fn_8015A2E8(u8* p, u32 unused4, u32 flush) {
-    (void)unused4;
     p[0xb] &= ~0x2;
-    fn_8015AB70(p);
+    fn_8015AB70(p, (s32)unused4);
     if (flush & 1) {
         DCFlushRange(*(void**)(p + 0x18), *(u32*)(p + 0x14));
     }

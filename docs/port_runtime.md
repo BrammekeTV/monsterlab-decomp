@@ -48,23 +48,16 @@ What boots today, with the retail PAL disc:
    and the GX FIFO and starts VI and GX; the render thread starts and runs the first display
    list (its draw-done interrupt arrives); the 13 render targets ("hdrRed", "hdrGreen", ...)
    are allocated from the engine heap.
-7. `SgInit` (scene graph) stops at `fn_8017A618` (1,440 bytes, not decompiled): the first stop
-   today. No disc file is opened before that point.
-
-With `--keep-going` the rest of `EngineInit` runs with holes and `GameStart` is reached. The
-missing game functions on that path, in the order they are hit:
-
-| Function | Size | Called from | What it is |
-|---|---|---|---|
-| `fn_8017A618` | 1,440 | `fn_80182A1C` (`SgInit`) | fills a material/render-state record with defaults; no calls |
-| `fn_80149E98` | 3,636 | `fn_80149B4C` | |
-| `fn_8015AB70` | 1,580 | `fn_8015A2E8` | |
-| `RendBeginFrame` | 3,096 | `EngineInit` | |
-| `fn_8000E488` | 2,260 | `GameStart` | runs before the first disc read |
-
-After those, `GameStart` reads `global_binary.sir` twice through `SirLoad` (first its 4 KB
-header into `sSirHeader`, then the image to `0x90400000`), then `SirFinishLoad`; `catalog.sir`
-comes later. Nothing behind `fn_8000E488` is meaningful in a `--keep-going` run yet.
+7. The rest of `EngineInit`: `SgInit`, the two built-in font textures (palette conversion and
+   GX tiling), the first `RendBeginFrame`, and the layer set-up of `SetRenderEnabled`.
+8. `GameStart`: the subsystem set-up (`fn_8000E488`), whose audio part runs on stubs. The disc
+   queue opens **`catalog.sir`**, reads it to `0x90400000`, and the file layer converts it
+   (6,394 sections in 59 files); the loader then opens all 59 `.sir` files.
+9. `global_binary.sir`: header (4 KB) and image (1.1 MB to `0x90400000`) are read through
+   `SirLoad` and converted in place (5,615 pointers, the game database, input table, textures,
+   strings and actions).
+10. Script system set-up (`fn_8010F794`): signatures and all script functions registered.
+11. `UiInit` stops at `fn_8018C8F4` (232 bytes, not decompiled): the first stop today.
 
 The link report (`port_link.txt`, uploaded by CI) lists the stubs and the globals.
 
@@ -228,6 +221,38 @@ shows the count. An SDK function that has no definition at all stops the run lik
 function, unless it is in the short `PortSoftSdk` table in `port_sdk.cpp` (by original address,
 with what it is): those log and return 0. Add to that table only after reading the asm.
 
+### GX: the command stream
+
+On the console every GX command is a run of big-endian bytes written to the write-gather pipe
+at `0xCC008000`. They land in the FIFO the CPU is attached to, and the graphics processor
+executes the FIFO it is attached to. The engine uses both ways: "immediate" (both on the main
+FIFO), and its own display lists (it points the CPU FIFO at a buffer in `VideoBeginCapture`, and
+the render thread attaches the GP to that buffer in `VideoRunDL`). Most of the engine's GX state
+never goes through SDK functions: it writes BP, CP and XF register loads itself.
+
+`port_gx.cpp` keeps exactly that model:
+
+- **The pipe.** `GXWGFifo` is an object whose members append to the CPU's FIFO
+  (`GXWGFifo._u32 = x` calls `PortGxWrite32`); the bytes in the buffer are the console's.
+  `tools/gen_leaf.py` turns stores to `0xCC008000` into the same calls. Decompiled code must
+  write the pipe through `GXWGFifo`, with the width of the original store.
+- **The interpreter.** Attaching the GP to a FIFO that holds commands runs them
+  (`GXSetGPFifo`; for the shared FIFO, at `GXFlush`, `GXDrawDone` and when the CPU moves away).
+  It keeps the three register files (`PortGx`: BP with its write mask, CP, XF registers and
+  matrix memory), follows display-list calls, and works out each draw's vertex size from the
+  vertex descriptor and format registers. A byte that is no command stops the list and is
+  reported with a hex dump of what came before: that is how a missing or wrongly sized pipe
+  write shows up.
+- **Interrupts.** The draw-done token (BP 0x45) and draw-sync tokens (BP 0x48) in the stream
+  raise the two callbacks the game registered, from the interrupt thread.
+- **The renderer interface.** `PortGxBackend` receives draws (primitive, vertex layout, the
+  raw vertex bytes), frame-buffer copies and palette loads. No backend exists yet: the boot
+  summary's `GX:` line counts what a run sent.
+
+Data a command only points to (vertex arrays, textures, matrices for indexed loads) is read
+from memory in host byte order: the game's own code writes it that way, and converters for
+disc data have to leave it that way.
+
 ### Threads and interrupts
 
 The Wii has one core. Game threads never run at the same time, and interrupts (video retrace,
@@ -242,6 +267,19 @@ game code in the middle of an update, which is stricter than the console.
 
 A loop that waits for an interrupt to change memory without calling any SDK function would hang.
 The time limit then reports where the main thread is.
+
+### Disc files: conversion after the read
+
+`DVDReadAsync` reads from the extracted disc and hands the bytes to `PortFileRead`
+(`port_files.cpp`) before the game's callback runs. For a `.sir` file it finds the section the
+read starts (by file name and offset, in a copy of the catalog's tables) and converts it in place
+with `sir_loader.cpp`: the catalog itself when it is read, `global_binary.sir` when its image
+arrives (the header section is kept until then: its pointers need the image). The game's
+`SirLoad`, `SirFinishLoad` and catalog loader run unchanged. A section with no converter, a
+packed one, or one read in pieces is left as it is and reported once.
+
+The game polls `DVDGetDriveStatus` in a loop while a read is pending and relies on the drive's
+interrupt to end it; on PC that call is where the interrupt thread gets to run.
 
 ## 4. Build
 
@@ -265,23 +303,28 @@ MSVC only for now (absolute symbols, `/alternatename`, structured exception hand
 
 ## Next: the shortest path to a first title-screen frame
 
-1. **The five missing functions of the boot path** (table under "Status"): `fn_8017A618`,
-   `fn_80149E98`, `fn_8015AB70`, `RendBeginFrame`, `fn_8000E488`. After each, run
-   `python tools/build_pc.py --run` and follow the next stop.
-2. **Wire the `.sir` loader**: `GameStart` loads `global_binary.sir` right after
-   `fn_8000E488` (header to `sSirHeader`, image to `0x90400000`). Run the conversions of
-   `sir_loader.cpp` on the buffers when `SirFinishLoad` is done (the image is already at
-   `0x90400000`, so `SirRelocAddRange` is the identity). zlib `inflate` is needed for packed
-   sections: link real zlib. `sSirHeader` is defined with 0x1000 bytes; the original symbol
-   (`lbl_803C2A20`) is 0x15E0.
+1. **Follow the next stops** with `python tools/build_pc.py --run`: `fn_8018C8F4` in `UiInit`,
+   then what a `--keep-going` run prints behind it.
+2. **Converters for the other `.sir` sections.** The file layer (`src/port/port_files.cpp`)
+   converts `catalog.sir` and `global_binary.sir`. Every other section the game loads is still
+   big-endian: the boot summary's `data:` line counts the kinds it met, and the log names each
+   one once (`disc: <file> section type N ... is not converted`). The title screen needs at
+   least `shared_ui.sir` and `shared_texture.sir`. Packed sections are inflated by the game's
+   own zlib (SDK range, not decompiled): link real zlib under those names, and convert after
+   the inflate instead of after the read.
 3. **Static initialisers**: 262 of the 300 `.ctors` entries are not decompiled. Most are small
    (they construct one global). Until they exist those globals are zero, which will show up as
    crashes or wrong behaviour further in. `monsterlab.exe --verbose` lists them.
-4. **The GX command stream**: hand-written code writes vertices and register loads through
-   `GXWGFifo`, generated code through `0xCC008000`, and both are lost today. A renderer needs
-   them in order, in the FIFO the CPU is attached to (`GXSetCPUFifo`): make both one write-gather
-   object that appends to the current FIFO, then execute a display list at `GXSetGPFifo`
-   (which also delivers the draw-sync tokens `fn_8015D23C` dispatches).
+4. **A renderer behind the GX command stream.** The stream is captured and decoded
+   (`port_gx.cpp`, see "GX: the command stream"); nothing draws it yet. In order: a window and a
+   frame buffer that the display copy (BP register 0x52) presents; draws with position and
+   vertex colour through the XF matrices; texture decoding and the TEV stages as generated
+   shaders; lighting, texture-coordinate generation, fog; copies of the frame buffer to textures
+   (the engine's 13 render targets).
+   The SDK-level calls that only record state today (`GXSetViewport`, `GXSetCopyClear`,
+   `GXSetBlendMode`, ... in `port_sdk.cpp`) have to send their registers into the same stream,
+   as `GXBegin`, `GXSetVtxDesc` and `GXSetVtxAttrFmt` already do, so that the interpreter's
+   register files are the only state.
 5. **SDK names**: the functions `port_sdk.cpp` defines as `fn_8024xxxx` are identified in its
    comments (`VIConfigure`, `GXSetViewport`, ...). Renaming them with `tools/rename.py` needs
    the definitions in `src/port/` and the callers renamed in the same change.

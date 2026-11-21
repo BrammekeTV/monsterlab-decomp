@@ -45,6 +45,8 @@ a PC port. Read this whole file before making changes. Human contributors: see
 - `sh tools/dump.sh <name>`: compact asm of a function.
 - `python tools/decomp.py <name|0xADDR>`: m2c draft in `build/m2c/<name>.c`, with known struct
   types (`tools/m2c_context.h`) and every `extern "C"` prototype from the sources.
+- `python tools/m2c_fifo.py build/m2c/<name>.c`: the m2c draft with the widths of its GX pipe writes
+  (`*(s8 *)0xCC008000 = x` becomes `GXWGFifo._u8/_u16/_u32/_f32 = x`, from the command stream).
 - `python tools/xref.py func <name>`: callers, callees, strings. `xref.py strings <regex>`.
 - `python tools/todo.py <object substring>`: functions, size (instructions), DONE marker.
 - `python tools/hashes.py <0xHASH>`: the string behind a `StringHash` (CRC-32 of the upper-cased
