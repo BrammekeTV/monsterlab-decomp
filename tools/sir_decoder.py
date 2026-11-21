@@ -475,6 +475,249 @@ def fnv(b):
         h = ((h ^ c) * 0x01000193) & 0xFFFFFFFF
     return h
 
+def machines_dump(L, sec, base, hud_addr, list_addr, level=False, extra=()):
+    """Appends the dump of a HUD and its state machines (global_binary.sir, or a level zone: there
+    the HUD carries the screen-list slot at +0x434 and points at it from +0x24)."""
+    u = lambda o: struct.unpack_from('>I', sec, o)[0]
+    i32 = lambda o: struct.unpack_from('>i', sec, o)[0]
+    def ptr(v):
+        if v == 0: return 'null'
+        if base <= v <= base + len(sec): return 'img+0x%x' % (v - base)
+        return 'wii:%08x' % v
+    off = lambda v: v - base
+    ws = lambda o, n: ' '.join('%08x' % u(o + i * 4) for i in range(n))
+    ps = lambda o, n: ' '.join(ptr(u(o + i * 4)) for i in range(n))
+    hud = off(hud_addr)
+    count = u(hud + 0x428)
+    L.append('hud %s depth %d stack %s %s count %d current %s flag %d spare %d' % (
+        ptr(hud_addr), i32(hud), ps(hud + 4, 8), ('slot ' + ptr(u(hud + 0x24))) if level else 'w24 %08x' % u(hud + 0x24),
+        count, ptr(u(hud + 0x42C)), sec[hud + 0x430], sum(1 for i in range(count, 256) if u(hud + 0x28 + i * 4))) +
+        (' list %s' % ptr(list_addr) if level else ''))
+    machines = [list_addr] if list_addr else []
+    for i in range(count):
+        p = u(hud + 0x28 + i * 4)
+        L.append('hudmachine %d %s' % (i, ptr(p)))
+        if p and p not in machines: machines.append(p)
+    for p in extra:
+        if p not in machines: machines.append(p)
+    defs, trans, shared_trans = [], set(), set()
+    for p in machines:
+        o = off(p)
+        L.append('fsm %s def %s state %d %d %d owner %s words %s floats %s values %s raw %s' % (
+            ptr(p), ptr(u(o)), i32(o + 4), i32(o + 8), i32(o + 0xC), ptr(u(o + 0x10)), ws(o + 0x14, 6), ws(o + 0x2C, 10),
+            ptr(u(o + 0x54)), sec[o + 0x58:o + 0x70].hex()))
+        v = u(o + 0x54)
+        if v and base <= v < base + len(sec):       # in a level file the table can lie in another zone
+            n = u(off(v))
+            L.append('fsmvalues %s count %d sum %08x' % (ptr(v), n, fnv(sec[off(v) + 4:off(v) + 4 + n * 4])))
+        if u(o) and u(o) not in defs: defs.append(u(o))
+    for d in defs:
+        o = off(d)
+        ns, nn, nr = i32(o + 4), i32(o + 0x1C), i32(o + 0x2C)
+        L.append('fsmdef %s states %s %d strings %s nodes %s %d shared %s %d key %08x start %08x %08x %d %s b44 %d raw %s %s %s' % (
+            ptr(d), ptr(u(o)), ns, ptr(u(o + 0xC)), ptr(u(o + 0x10)), nn, ptr(u(o + 0x20)), nr, u(o + 0x30), u(o + 0x34),
+            u(o + 0x38), u(o + 0x3C), ptr(u(o + 0x40)), sec[o + 0x44], sec[o + 8:o + 0xC].hex(), sec[o + 0x14:o + 0x1C].hex(),
+            sec[o + 0x24:o + 0x2C].hex()))
+        trans.add(u(o + 0x40))
+        for i in range(ns):
+            s = off(u(o)) + i * 0x30
+            ne = i32(s + 0x2C)
+            L.append('fsmstate %s %d vtable %08x key %08x type %d actions %s timeout %08x flags %08x events %s %d raw %s' % (
+                ptr(d), i, u(s), u(s + 4), u(s + 8), ws(s + 0xC, 3), u(s + 0x18), u(s + 0x1C), ptr(u(s + 0x20)), ne,
+                sec[s + 0x24:s + 0x2C].hex()))
+            for k in range(ne):
+                e = off(u(s + 0x20)) + k * 12
+                L.append('fsmevent %s %d %d id %08x cond %08x to %s' % (ptr(d), i, k, u(e), u(e + 4), ptr(u(e + 8))))
+                trans.add(u(e + 8))
+        for i in range(nn):
+            np_ = u(off(u(o + 0x10)) + i * 4)
+            n = off(np_)
+            typ = u(n + 8)
+            line = 'fsmnode %s vtable %08x key %08x type %d' % (ptr(np_), u(n), u(n + 4), typ)
+            if typ == 2:
+                line += ' to %s' % ptr(u(n + 0xC)); trans.add(u(n + 0xC))
+            elif typ == 3:
+                line += ' action %08x to %s %d %d' % (u(n + 0xC), ptr(u(n + 0x10)), i32(n + 0x14), i32(n + 0x18)); trans.add(u(n + 0x10))
+            elif typ == 4:
+                c = i32(n + 0x14)
+                line += ' action %08x choices %s %d result %d %d to %s' % (u(n + 0xC), ptr(u(n + 0x10)), c, i32(n + 0x1C), i32(n + 0x20),
+                                                                         ps(off(u(n + 0x10)), c) if c else '')
+                for k in range(c): trans.add(u(off(u(n + 0x10)) + k * 4))
+            L.append(line.rstrip())
+        for i in range(nr):
+            e = off(u(o + 0x20)) + i * 12
+            L.append('fsmshared %s %d id %08x to %s cond %08x' % (ptr(d), i, u(e), ptr(u(e + 4)), u(e + 8)))
+            shared_trans.add(u(e + 4))
+    trans.discard(0); shared_trans.discard(0)
+    for p in sorted(trans):
+        o = off(p)
+        L.append('fsmtrans %s vtable %08x target %s cond %08x action %08x %d %d raw %s' % (
+            ptr(p), u(o), ptr(u(o + 4)), u(o + 8), u(o + 0xC), i32(o + 0x10), i32(o + 0x14), sec[o + 0x18:o + 0x20].hex()))
+    for p in sorted(shared_trans):
+        o = off(p)
+        n = i32(o + 0x20)
+        L.append(('fsmsharedtrans %s vtable %08x target %s cond %08x action %08x %d %d flags %08x keys %s %d %s' % (
+            ptr(p), u(o), ptr(u(o + 4)), u(o + 8), u(o + 0xC), i32(o + 0x10), i32(o + 0x14), u(o + 0x18), ptr(u(o + 0x1C)), n,
+            ws(off(u(o + 0x1C)), n) if n else '')).rstrip())
+
+
+# ----------------------------------------------------------------------------- level files
+# A level file: the header block (section type -1) is the world state; section type N is the image
+# of zone N. Reference for the PC loader (LevelHeaderConvert, LevelZoneConvert): the fields the
+# game code reads, straight from the big-endian bytes. See docs/loader.md, "Level files".
+LEVEL_SLOTS = 0x21E0
+
+def level_dump(path):
+    version, secs = read_archive(path)
+    hdr = [x for x in secs if x['type'] == -1][0]['data']
+    zone0 = [x for x in secs if x['type'] == 0][0]['data']
+    u = lambda o: struct.unpack_from('>I', hdr, o)[0]
+    i32 = lambda o: struct.unpack_from('>i', hdr, o)[0]
+    base = u(0x1A4) - LEVEL_SLOTS                    # the block points at its own +0x21E0 (fn_80129CC8)
+    count = u(0x1A8)
+    first = u(LEVEL_SLOTS + 0x114)
+    stride = 0x148
+    while count > 1 and u(LEVEL_SLOTS + stride + 0x114) != first + stride: stride += 4
+    zbase = u(LEVEL_SLOTS + 0xFC)                    # slot 0 points at the start of zone 0's image (WorldTick)
+    def ptr(v):
+        if v == 0: return 'null'
+        if base <= v <= base + len(hdr): return 'hdr+0x%x' % (v - base)
+        if zbase <= v <= zbase + len(zone0): return 'zone0+0x%x' % (v - zbase)
+        return 'wii:%08x' % v
+    ws = lambda o, n: ' '.join('%08x' % u(o + i * 4) for i in range(n))
+    tab = lambda o: '%s %d %d' % (ptr(u(o)), i32(o + 4), i32(o + 8))
+    def entries(o):                                  # non-null entries of a pointer table {ptr, capacity, used}
+        t, n = u(o) - base, u(o + 4)
+        return ' '.join('%d:%s' % (i, ptr(u(t + i * 4))) for i in range(n) if u(t + i * 4)) or '-'
+    L = ['levelhdr base %08x size %d zones %d slot %d last %d current %s %s %s %s lists %s %d %s %d results %d %s %d %d %s %d' % (
+            base, len(hdr), count, stride, i32(4), ptr(u(8)), ptr(u(0xC)), ptr(u(0x10)), ptr(u(0x14)), ptr(u(0x2C)), i32(0x30),
+            ptr(u(0x38)), i32(0x3C), i32(0x7C), ptr(u(0x80)), hdr[0x84], i32(0x88), ptr(u(0x8C)), hdr[0x90]),
+         'leveltables %s | %s | %s | %s | %s' % tuple(tab(o) for o in (0x1A4, 0x1B0, 0x1BC, 0x1C8, 0x1D4)),
+         'levelstate %s b1ec %d w1f0 %d hud %s floats %s wa20 %d w1a7c %d floats %s' % (
+            ws(0x1E0, 3), hdr[0x1EC], i32(0x1F0), ptr(u(0x1F4)), ws(0x1F8, 6), i32(0xA20), i32(0x1A7C), ws(0x1A84, 2))]
+    for t in (0x1B0, 0x1BC, 0x1C8):
+        L.append('leveltable 0x%x %s' % (t, entries(t)))
+    for i in range(count):
+        o = LEVEL_SLOTS + i * stride
+        L.append('levelslot %d floats %s w18 %d floats %s res %s lists %s %s %d %d words %s %s %s %s bytes %d %d %d actions %s pools %s %d zone %s w100 %08x w10c %08x tables %s | %s | %s e120 %s e12c %s' % (
+            i, ws(o, 6), i32(o + 0x18), ws(o + 0x1C, 3), ptr(u(o + 0x50)), ptr(u(o + 0x8C)), ptr(u(o + 0x90)), i32(o + 0x94), i32(o + 0x98),
+            ws(o + 0xA0, 1), ws(o + 0xA8, 1), ws(o + 0xBC, 1), ws(o + 0xCC, 2), hdr[o + 0xA4], hdr[o + 0xAC], hdr[o + 0xC0],
+            ptr(u(o + 0xD4)), ptr(u(o + 0xE4)), i32(o + 0xE8), ptr(u(o + 0xFC)), u(o + 0x100), u(o + 0x10C), tab(o + 0x114), tab(o + 0x120), tab(o + 0x12C),
+            entries(o + 0x120), entries(o + 0x12C)))
+    # What the header block names in zone 0: entities (slot +0x50 and the two entity tables), scene
+    # objects (block tables +0x1B0, +0x1BC) and pool tables (slot +0xE4, +0xE8).
+    inz = lambda v: zbase <= v < zbase + len(zone0)
+    roots, scene, pooltabs = [], [], []
+    def table_entries(o):
+        t, n = u(o) - base, u(o + 4)
+        return [u(t + i * 4) for i in range(n)]
+    for t in (0x1B0, 0x1BC):
+        scene += [v for v in table_entries(t) if inz(v)]
+    for i in range(count):
+        o = LEVEL_SLOTS + i * stride
+        roots += [v for v in [u(o + 0x50)] + table_entries(o + 0x120) + table_entries(o + 0x12C) if inz(v)]
+        if inz(u(o + 0xE4)): pooltabs.append((u(o + 0xE4), u(o + 0xE8)))
+    hud = u(0x1F4)
+    zone_dump(L, zone0, zbase, hud if inz(hud) else 0, roots, scene, pooltabs)
+    return L
+
+FIXUP_ENTITY, FIXUP_PART, FIXUP_POOLED, FIXUP_PROJECTILE, FIXUP_RENDER, FIXUP_FSM = 651, 652, 653, 654, 655, 656
+
+def zone_dump(L, sec, base, hud, roots, scene_roots, pooltabs):
+    """Dump of what the loader converts in a level zone: pool tables and pools, entities (first
+    layer), scene objects, then the HUD and every state machine found on the way."""
+    u = lambda o: struct.unpack_from('>I', sec, o)[0]
+    i32 = lambda o: struct.unpack_from('>i', sec, o)[0]
+    h16 = lambda o: struct.unpack_from('>H', sec, o)[0]
+    inz = lambda v, n=1: base <= v and v + n <= base + len(sec)
+    off = lambda v: v - base
+    def ptr(v):
+        if v == 0: return 'null'
+        if base <= v <= base + len(sec): return 'img+0x%x' % (v - base)
+        return 'wii:%08x' % v
+    ws = lambda o, n: ' '.join('%08x' % u(o + i * 4) for i in range(n))
+    ents, scene, machines, projectiles = [], [], [], []
+    def add(lst, v, n=1):
+        if v and inz(v, n) and v not in lst: lst.append(v)
+    for v in roots: add(ents, v)
+    for v in scene_roots: add(scene, v)
+    for addr, n in pooltabs:
+        for i in range(n):
+            e = off(addr) + i * 0x2C
+            pool, fix = u(e + 4), i32(e + 0xC)
+            L.append('pooltable %s %d pool %s fixup %d type %d' % (ptr(addr), i, ptr(pool), fix, i32(e + 0x1C)))
+            if not inz(pool, 0x2C): continue
+            q = off(pool)
+            items, size, align, block = u(q), u(q + 4), u(q + 8), u(q + 0x24)
+            L.append('levelpool %s items %d size %d align %d used %d free %s inuse %s parent %s blocks %s grow %d block %s alloc %d' % (
+                ptr(pool), items, size, align, u(q + 0xC), ptr(u(q + 0x10)), ptr(u(q + 0x14)), ptr(u(q + 0x18)), ptr(u(q + 0x1C)),
+                sec[q + 0x20], ptr(block), i32(q + 0x28)))
+            first = ((block + 4 + align + 7) & ~(align - 1)) - 8
+            links = b''.join(sec[off(first) + k * (size + 8):off(first) + k * (size + 8) + 8] for k in range(items))
+            L.append('levelpoolnodes %s first %s sum %08x' % (ptr(pool), ptr(first), fnv(links)))
+            for k in range(items):
+                item = first + k * (size + 8) + 8
+                if fix in (FIXUP_ENTITY, FIXUP_PART, FIXUP_PROJECTILE): add(ents, item)
+                if fix == FIXUP_PROJECTILE: projectiles.append(item)
+                if fix == FIXUP_POOLED: add(ents, u(off(item)))
+                if fix == FIXUP_RENDER: L.append('renderslot %s %s' % (ptr(item), ptr(u(off(item)))))
+                if fix == FIXUP_FSM:
+                    L.append('fsmslot %s %s' % (ptr(item), ptr(u(off(item)))))
+                    add(machines, u(off(item)), 0x58)
+    def parts(c):
+        if not inz(c, 0x14): return
+        o = off(c)
+        n = u(o + 0x10)
+        L.append('entparts %s items %s %d' % (ptr(c), ptr(u(o + 0xC)), n))
+        for i in range(n):
+            it = u(off(u(o + 0xC)) + i * 4)
+            if not inz(it, 0x2C): continue
+            m = u(off(it) + 0x28)
+            L.append('entitem %s parts %s %d' % (ptr(it), ptr(u(off(it) + 0x24)), m))
+            for k in range(m):
+                pp = u(off(u(off(it) + 0x24)) + k * 4)
+                if inz(pp, 0x10): L.append('entpart %s %08x %08x kind %d' % (ptr(pp), u(off(pp)), u(off(pp) + 4), u(off(pp) + 0xC)))
+    i = 0
+    while i < len(ents):
+        a = ents[i]; i += 1
+        if not inz(a, 0x1B4): continue
+        o = off(a)
+        L.append('entity %s vtable %08x record %s parts %s scene %s w94 %d %d obj9c %s holder %s children %s f158 %08x more %s %d w1a8 %d flags %08x' % (
+            ptr(a), u(o), ptr(u(o + 4)), ptr(u(o + 0x8C)), ptr(u(o + 0x90)), i32(o + 0x94), i32(o + 0x98), ptr(u(o + 0x9C)), ptr(u(o + 0xA4)),
+            ptr(u(o + 0xB0)), u(o + 0x158), ptr(u(o + 0x194)), i32(o + 0x1A4), i32(o + 0x1A8), u(o + 0x1B0)))
+        r = u(o + 4)
+        if inz(r, 0x40):
+            q = off(r)
+            L.append('entrecord %s floats %s w1c %08x %08x f24 %08x w2c %d h30 %d bytes %s' % (
+                ptr(r), ws(q, 7), u(q + 0x1C), u(q + 0x20), u(q + 0x24), i32(q + 0x2C), h16(q + 0x30), sec[q + 0x34:q + 0x3E].hex()))
+        parts(u(o + 0x8C))
+        add(scene, u(o + 0x90), 8)
+        if inz(u(o + 0x9C), 0xC): L.append('entobj9c %s id %08x' % (ptr(u(o + 0x9C)), u(off(u(o + 0x9C)) + 8)))
+        hl = u(o + 0xA4)
+        if inz(hl, 8):
+            L.append('entholder %s machine %s other %s' % (ptr(hl), ptr(u(off(hl))), ptr(u(off(hl) + 4))))
+            add(machines, u(off(hl)), 0x58)
+        n = u(o + 0x1A4)
+        if n and inz(u(o + 0x194), n * 4):
+            for k in range(n): parts(u(off(u(o + 0x194)) + k * 4))
+        node, seen = u(o + 0xB0), set()
+        while inz(node, 0xC) and node not in seen:
+            seen.add(node)
+            L.append('entchild %s entity %s next %s' % (ptr(node), ptr(u(off(node) + 4)), ptr(u(off(node) + 8))))
+            add(ents, u(off(node) + 4))
+            node = u(off(node) + 8)
+    for a in scene:
+        o = off(a)
+        t = u(o + 4)
+        line = 'sceneobj %s type %d' % (ptr(a), t)
+        if t == 2: line += ' a %s list %s' % (ptr(u(o + 0x48)), ptr(u(o + 0x4C)))
+        if t == 3: line += ' count %d items %s' % (i32(o + 0x54), ptr(u(o + 0x58)))
+        L.append(line)
+    for a in projectiles:
+        L.append('projectile %s part %s' % (ptr(a), ptr(u(off(a) + 0x22C))))
+    if hud:
+        machines_dump(L, sec, base, hud, u(off(hud) + 0x434), True, machines)
+
 def image_dump(path):
     """Text dump of the hand-typed image objects of global_binary.sir (one line per record)."""
     version, secs = read_archive(path)
@@ -606,75 +849,7 @@ def image_dump(path):
     L.append('uipad %s raw %s %s' % (ptr(slot(0xDBC)), sec[t:t + 4].hex(), ws(t + 4, 7)))
 
     # Screen state machines: the screen list (slot 0xD98) and the HUD's machines (slot 0xD9C).
-    hud = off(slot(0xD9C))
-    count = u(hud + 0x428)
-    L.append('hud %s depth %d stack %s w24 %08x count %d current %s flag %d spare %d' % (
-        ptr(slot(0xD9C)), i32(hud), ps(hud + 4, 8), u(hud + 0x24), count, ptr(u(hud + 0x42C)), sec[hud + 0x430],
-        sum(1 for i in range(count, 256) if u(hud + 0x28 + i * 4))))
-    machines = [slot(0xD98)] if slot(0xD98) else []
-    for i in range(count):
-        p = u(hud + 0x28 + i * 4)
-        L.append('hudmachine %d %s' % (i, ptr(p)))
-        if p and p not in machines: machines.append(p)
-    defs, trans, shared_trans = [], set(), set()
-    for p in machines:
-        o = off(p)
-        L.append('fsm %s def %s state %d %d %d owner %s words %s floats %s values %s raw %s' % (
-            ptr(p), ptr(u(o)), i32(o + 4), i32(o + 8), i32(o + 0xC), ptr(u(o + 0x10)), ws(o + 0x14, 6), ws(o + 0x2C, 10),
-            ptr(u(o + 0x54)), sec[o + 0x58:o + 0x70].hex()))
-        v = u(o + 0x54)
-        if v:
-            n = u(off(v))
-            L.append('fsmvalues %s count %d sum %08x' % (ptr(v), n, fnv(sec[off(v) + 4:off(v) + 4 + n * 4])))
-        if u(o) and u(o) not in defs: defs.append(u(o))
-    for d in defs:
-        o = off(d)
-        ns, nn, nr = i32(o + 4), i32(o + 0x1C), i32(o + 0x2C)
-        L.append('fsmdef %s states %s %d strings %s nodes %s %d shared %s %d key %08x start %08x %08x %d %s b44 %d raw %s %s %s' % (
-            ptr(d), ptr(u(o)), ns, ptr(u(o + 0xC)), ptr(u(o + 0x10)), nn, ptr(u(o + 0x20)), nr, u(o + 0x30), u(o + 0x34),
-            u(o + 0x38), u(o + 0x3C), ptr(u(o + 0x40)), sec[o + 0x44], sec[o + 8:o + 0xC].hex(), sec[o + 0x14:o + 0x1C].hex(),
-            sec[o + 0x24:o + 0x2C].hex()))
-        trans.add(u(o + 0x40))
-        for i in range(ns):
-            s = off(u(o)) + i * 0x30
-            ne = i32(s + 0x2C)
-            L.append('fsmstate %s %d vtable %08x key %08x type %d actions %s timeout %08x flags %08x events %s %d raw %s' % (
-                ptr(d), i, u(s), u(s + 4), u(s + 8), ws(s + 0xC, 3), u(s + 0x18), u(s + 0x1C), ptr(u(s + 0x20)), ne,
-                sec[s + 0x24:s + 0x2C].hex()))
-            for k in range(ne):
-                e = off(u(s + 0x20)) + k * 12
-                L.append('fsmevent %s %d %d id %08x cond %08x to %s' % (ptr(d), i, k, u(e), u(e + 4), ptr(u(e + 8))))
-                trans.add(u(e + 8))
-        for i in range(nn):
-            np_ = u(off(u(o + 0x10)) + i * 4)
-            n = off(np_)
-            typ = u(n + 8)
-            line = 'fsmnode %s vtable %08x key %08x type %d' % (ptr(np_), u(n), u(n + 4), typ)
-            if typ == 2:
-                line += ' to %s' % ptr(u(n + 0xC)); trans.add(u(n + 0xC))
-            elif typ == 3:
-                line += ' action %08x to %s %d %d' % (u(n + 0xC), ptr(u(n + 0x10)), i32(n + 0x14), i32(n + 0x18)); trans.add(u(n + 0x10))
-            elif typ == 4:
-                c = i32(n + 0x14)
-                line += ' action %08x choices %s %d result %d %d to %s' % (u(n + 0xC), ptr(u(n + 0x10)), c, i32(n + 0x1C), i32(n + 0x20),
-                                                                         ps(off(u(n + 0x10)), c) if c else '')
-                for k in range(c): trans.add(u(off(u(n + 0x10)) + k * 4))
-            L.append(line.rstrip())
-        for i in range(nr):
-            e = off(u(o + 0x20)) + i * 12
-            L.append('fsmshared %s %d id %08x to %s cond %08x' % (ptr(d), i, u(e), ptr(u(e + 4)), u(e + 8)))
-            shared_trans.add(u(e + 4))
-    trans.discard(0); shared_trans.discard(0)
-    for p in sorted(trans):
-        o = off(p)
-        L.append('fsmtrans %s vtable %08x target %s cond %08x action %08x %d %d raw %s' % (
-            ptr(p), u(o), ptr(u(o + 4)), u(o + 8), u(o + 0xC), i32(o + 0x10), i32(o + 0x14), sec[o + 0x18:o + 0x20].hex()))
-    for p in sorted(shared_trans):
-        o = off(p)
-        n = i32(o + 0x20)
-        L.append(('fsmsharedtrans %s vtable %08x target %s cond %08x action %08x %d %d flags %08x keys %s %d %s' % (
-            ptr(p), u(o), ptr(u(o + 4)), u(o + 8), u(o + 0xC), i32(o + 0x10), i32(o + 0x14), u(o + 0x18), ptr(u(o + 0x1C)), n,
-            ws(off(u(o + 0x1C)), n) if n else '')).rstrip())
+    machines_dump(L, sec, GB_BASE, slot(0xD9C), slot(0xD98))
 
     # Effect definitions (header slots 0x82C-0x840): 0x70-byte and 0x80-byte entries, as the effect
     # code reads them through an instance's definition pointer.
@@ -779,9 +954,14 @@ def main():
     ap.add_argument('--gamedb', action='store_true', help='global_binary.sir: print the game database as text')
     ap.add_argument('--image', action='store_true', help='global_binary.sir: print the input table, textures, string and action tables as text')
     ap.add_argument('--catalog', action='store_true', help='catalog.sir: print the file table as text')
+    ap.add_argument('--level', action='store_true', help='a level file: print the header block and the HUD of zone 0 as text')
     a = ap.parse_args()
     if a.catalog:
         for line in catalog_dump(a.archive):
+            print(line)
+        return
+    if a.level:
+        for line in level_dump(a.archive):
             print(line)
         return
     if a.gamedb or a.image:
