@@ -111,16 +111,22 @@ static const char kVsSrc[] =
     " o.t4 = i.t4; o.t5 = i.t5; o.t6 = i.t6; o.t7 = i.t7; return o; }\n";
 
 static const char kBlitSrc[] =
-    "cbuffer C : register(b0) { float4 rect; };\n"       // u0, v0, u size, v size
+    "cbuffer C : register(b0) { float4 rect; float4 pick; };\n"   // u0, v0, u size, v size; channel weights for an intensity copy
     "Texture2D tex : register(t0); SamplerState smp : register(s0);\n"
     "struct VO { float4 pos : SV_Position; float2 uv : TEXCOORD0; };\n"
     "VO vs(uint id : SV_VertexID) { VO o; float2 p = float2((id << 1) & 2, id & 2); o.uv = rect.xy + p * rect.zw;"
     " o.pos = float4(p * float2(2, -2) + float2(-1, 1), 0, 1); return o; }\n"
-    "float4 ps(VO i) : SV_Target { return float4(tex.Sample(smp, i.uv).rgb, 1); }\n";
+    "float4 ps(VO i) : SV_Target { float4 c = tex.Sample(smp, i.uv); if (pick.x + pick.y + pick.z + pick.w > 0.0) { float v = dot(c, pick); return float4(v, v, v, v); }"
+    " return float4(c.rgb, pick.w < 0.0 ? c.a : 1.0); }\n";
 
 // The TEV stages as HLSL. Everything that changes the code is in the key; colours and reference
 // values come from the constant buffer.
-struct PsConst { f32 reg[4][4]; f32 konst[4][4]; f32 alphaRef[4]; };
+struct PsConst {
+    f32 reg[4][4]; f32 konst[4][4]; f32 alphaRef[4];
+    f32 texSize[8][4];      // width, height of each texture map (texels)
+    f32 indRow[3][2][4];    // the three indirect matrices, two rows each, already scaled to texels per unit
+    f32 indScale[4][4];     // per indirect stage: 1 / 2^scale for s and t of its coordinate
+};
 
 static const char* const kColorIn[16] = {"prev.rgb", "prev.aaa", "c0.rgb", "c0.aaa", "c1.rgb", "c1.aaa", "c2.rgb", "c2.aaa",
                                          "tex.rgb", "tex.aaa", "ras.rgb", "ras.aaa", "float3(1,1,1)", "float3(0.5,0.5,0.5)", "kc", "float3(0,0,0)"};
@@ -148,6 +154,7 @@ static std::string KonstAlpha(u32 sel) {
     return b;
 }
 
+static u32 sUnsupported;               // bit 0: an indirect matrix kind that is not implemented
 static std::string TevKey(const PortGx* g, u32* texUsed) {
     u32 stages = ((g->bp[0x00] >> 10) & 15) + 1;
     std::string key((const char*)&stages, 4);
@@ -155,13 +162,16 @@ static std::string TevKey(const PortGx* g, u32* texUsed) {
     for (u32 n = 0; n < stages; n++) {
         u32 order = g->bp[0x28 + n / 2] >> ((n & 1) ? 12 : 0) & 0xFFF;
         u32 ksel = g->bp[0xF6 + n / 2] >> ((n & 1) ? 14 : 4) & 0x3FF;
-        u32 words[4] = {g->bp[0xC0 + n * 2], g->bp[0xC1 + n * 2], order & 0x3FF, ksel};
-        key.append((const char*)words, 16);
+        u32 words[5] = {g->bp[0xC0 + n * 2], g->bp[0xC1 + n * 2], order & 0x3FF, ksel, g->bp[0x10 + n] & 0x1FFFFF};
+        key.append((const char*)words, 20);
         if (order & 0x40) *texUsed |= 1u << (order & 7);
     }
-    u32 tail[9];
+    u32 tail[11];
     for (u32 i = 0; i < 8; i++) tail[i] = g->bp[0xF6 + i] & 0xF;       // swap tables
     tail[8] = g->bp[0xF3] & 0xFF0000;                                    // alpha compare functions
+    tail[9] = (g->bp[0x00] >> 16) & 7;                                   // indirect stages
+    tail[10] = g->bp[0x27] & 0xFFFFFF;                                   // their texture maps and coordinates
+    for (u32 i = 0; i < tail[9]; i++) *texUsed |= 1u << ((g->bp[0x27] >> (i * 6)) & 7);
     key.append((const char*)tail, sizeof(tail));
     return key;
 }
@@ -169,15 +179,24 @@ static std::string TevKey(const PortGx* g, u32* texUsed) {
 static std::string TevSource(const PortGx* g) {
     u32 stages = ((g->bp[0x00] >> 10) & 15) + 1;
     std::string s =
-        "cbuffer C : register(b0) { float4 reg[4]; float4 konst[4]; float4 alphaRef; };\n"
+        "cbuffer C : register(b0) { float4 reg[4]; float4 konst[4]; float4 alphaRef; float4 texSize[8]; float4 indRow[6]; float4 indScale[4]; };\n"
         "Texture2D t0 : register(t0); Texture2D t1 : register(t1); Texture2D t2 : register(t2); Texture2D t3 : register(t3);\n"
         "Texture2D t4 : register(t4); Texture2D t5 : register(t5); Texture2D t6 : register(t6); Texture2D t7 : register(t7);\n"
         "SamplerState s0 : register(s0); SamplerState s1 : register(s1); SamplerState s2 : register(s2); SamplerState s3 : register(s3);\n"
         "SamplerState s4 : register(s4); SamplerState s5 : register(s5); SamplerState s6 : register(s6); SamplerState s7 : register(s7);\n"
         "struct VO { float4 pos : SV_Position; float4 c0 : COLOR0; float4 c1 : COLOR1; float3 tc[8] : TEXCOORD0; };\n"
         "float4 main(VO i) : SV_Target {\n"
-        "  float4 prev = reg[0], c0 = reg[1], c1 = reg[2], c2 = reg[3], tex, ras; float3 kc; float ka;\n";
-    char b[512];
+        "  float4 prev = reg[0], c0 = reg[1], c1 = reg[2], c2 = reg[3], tex, ras; float3 kc; float ka;\n"
+        "  float2 fix = float2(0, 0), coord;\n";
+    char b[768];
+    // Indirect stages: each samples its texture once; the stages below offset their coordinates
+    // with the result (alpha, blue, green as s, t, u; 0 to 255).
+    u32 numInd = (g->bp[0x00] >> 16) & 7;
+    for (u32 i = 0; i < numInd && i < 4; i++) {
+        u32 map = (g->bp[0x27] >> (i * 6)) & 7, coord = (g->bp[0x27] >> (i * 6 + 3)) & 7;
+        snprintf(b, sizeof(b), "  float3 ind%u = floor(t%u.Sample(s%u, i.tc[%u].xy / i.tc[%u].z * indScale[%u].xy).abg * 255.0 + 0.5);\n", i, map, map, coord, coord, i);
+        s += b;
+    }
     static const char sw[5] = "rgba";
     u32 lastC = 0, lastA = 0;
     for (u32 n = 0; n < stages; n++) {
@@ -193,9 +212,33 @@ static std::string TevSource(const PortGx* g) {
             tsw[k] = sw[(g->bp[0xF6 + ts * 2] >> (k * 2)) & 3]; tsw[k + 2] = sw[(g->bp[0xF7 + ts * 2] >> (k * 2)) & 3];
         }
         rsw[4] = tsw[4] = 0;
-        if (order & 0x40) snprintf(b, sizeof(b), "  tex = t%u.Sample(s%u, i.tc[%u].xy / i.tc[%u].z).%s;\n", map, map, coord, coord, tsw);
-        else snprintf(b, sizeof(b), "  tex = float4(1,1,1,1);\n");
-        s += b;
+        if (order & 0x40) {
+            // BP 0x10+n: how this stage's coordinate is changed by an indirect stage
+            u32 ic = g->bp[0x10 + n];
+            u32 bt = ic & 3, fmt = (ic >> 2) & 3, bias = (ic >> 4) & 7, mid = (ic >> 9) & 15, sw = (ic >> 13) & 7, tw = (ic >> 16) & 7, addPrev = (ic >> 20) & 1;
+            static const char* const kWrap[8] = {"", "256.0", "128.0", "64.0", "32.0", "16.0", "0", "0"};
+            snprintf(b, sizeof(b), "  coord = i.tc[%u].xy / i.tc[%u].z * texSize[%u].xy;\n", coord, coord, map);
+            s += b;
+            if (sw == 6) s += "  coord.x = 0.0;\n";
+            else if (sw) { snprintf(b, sizeof(b), "  coord.x = coord.x - %s * floor(coord.x / %s);\n", kWrap[sw], kWrap[sw]); s += b; }
+            if (tw == 6) s += "  coord.y = 0.0;\n";
+            else if (tw) { snprintf(b, sizeof(b), "  coord.y = coord.y - %s * floor(coord.y / %s);\n", kWrap[tw], kWrap[tw]); s += b; }
+            if (addPrev) s += "  coord += fix;\n";
+            if (bt < numInd && mid >= 1 && mid <= 3) {
+                static const char* const kMask[4] = {"", " - 32.0 * floor(v / 32.0)", " - 16.0 * floor(v / 16.0)", " - 8.0 * floor(v / 8.0)"};
+                snprintf(b, sizeof(b), "  { float3 v = ind%u; v = v%s; v += float3(%s, %s, %s); coord += float2(dot(indRow[%u].xyz, v), dot(indRow[%u].xyz, v)); }\n",
+                         bt, kMask[fmt], (bias & 1) ? (fmt ? "1.0" : "-128.0") : "0.0", (bias & 2) ? (fmt ? "1.0" : "-128.0") : "0.0",
+                         (bias & 4) ? (fmt ? "1.0" : "-128.0") : "0.0", (mid - 1) * 2, (mid - 1) * 2 + 1);
+                s += b;
+            } else if (bt < numInd && mid != 0) {
+                sUnsupported |= 1;                          // the two "dynamic" matrix kinds
+            }
+            s += "  fix = coord;\n";
+            snprintf(b, sizeof(b), "  tex = t%u.Sample(s%u, coord / texSize[%u].xy).%s;\n", map, map, map, tsw);
+            s += b;
+        } else {
+            s += "  tex = float4(1,1,1,1);\n";
+        }
         snprintf(b, sizeof(b), "  ras = %s.%s;\n", chan == 0 ? "i.c0" : chan == 1 ? "i.c1" : "float4(0,0,0,0)", rsw);
         s += b;
         s += "  kc = " + KonstColor(ksel & 31) + "; ka = " + KonstAlpha((ksel >> 5) & 31) + ";\n";
@@ -673,6 +716,18 @@ static void Draw(const PortGx* g, u32 prim, const PortGxLayout* L, u32 count, co
         PortLog("gfx trace: draw %02X x%u stages %u gens %u chans %u tex %02X bm %04X zm %02X cull %u vp %.0f,%.0f,%.0f,%.0f v0 pos %.2f %.2f %.2f %.2f col %.2f %.2f %.2f %.2f tc0 %.2f %.2f clipoff %u img0 %06X addr %08X",
                 prim, count, ((g->bp[0] >> 10) & 15) + 1, numGens, numChans, texUsed, g->bp[0x41] & 0xFFFF, g->bp[0x40] & 0x1F, (g->bp[0] >> 14) & 3,
                 vp[0], vp[1], vp[3], vp[4], v.pos[0], v.pos[1], v.pos[2], v.pos[3], v.col[0][0], v.col[0][1], v.col[0][2], v.col[0][3], v.tc[0][0], v.tc[0][1], g->xf[0x05] & 1, g->bp[0x88], (g->bp[0x94] & 0xFFFFFF) << 5);
+        for (u32 m = 0; m < 8; m++) if (texUsed & (1u << m)) {
+            u32 base = (m < 4 ? 0x80 : 0xA0) + (m & 3);
+            PortLog("gfx trace:   map %u: %ux%u format %u at %08X%s; stage 0 colour %06X alpha %06X order %03X", m, (g->bp[base + 8] & 0x3FF) + 1,
+                    ((g->bp[base + 8] >> 10) & 0x3FF) + 1, (g->bp[base + 8] >> 20) & 15, (g->bp[base + 0x14] & 0xFFFFFF) << 5,
+                    sEfbCopies.count((g->bp[base + 0x14] & 0xFFFFFF) << 5) ? " (a frame-buffer copy)" : "", g->bp[0xC0], g->bp[0xC1], g->bp[0x28] & 0xFFF);
+        }
+    }
+    if (sTrace && getenv("PORT_GFX_VERTS")) {
+        for (u32 i = 0; i < count && i < 6; i++)
+            PortLog("gfx trace:   v%u pos %.3f %.3f %.3f %.3f col %.2f %.2f %.2f %.2f tc0 %.3f %.3f %.3f tc1 %.3f %.3f", i, sVerts[i].pos[0], sVerts[i].pos[1], sVerts[i].pos[2],
+                    sVerts[i].pos[3], sVerts[i].col[0][0], sVerts[i].col[0][1], sVerts[i].col[0][2], sVerts[i].col[0][3], sVerts[i].tc[0][0], sVerts[i].tc[0][1], sVerts[i].tc[0][2],
+                    sVerts[i].tc[1][0], sVerts[i].tc[1][1]);
     }
     D3D11_MAPPED_SUBRESOURCE map;
     if (FAILED(sCtx->Map(sVb, 0, D3D11_MAP_WRITE_DISCARD, 0, &map))) return;
@@ -682,6 +737,24 @@ static void Draw(const PortGx* g, u32 prim, const PortGxLayout* L, u32 count, co
     PsConst pc;
     for (int i = 0; i < 4; i++) for (int k = 0; k < 4; k++) { pc.reg[i][k] = g->tevReg[i][k] / 255.0f; pc.konst[i][k] = g->tevKonst[i][k] / 255.0f; }
     pc.alphaRef[0] = (g->bp[0xF3] & 255) / 255.0f; pc.alphaRef[1] = ((g->bp[0xF3] >> 8) & 255) / 255.0f; pc.alphaRef[2] = pc.alphaRef[3] = 0;
+    for (u32 m = 0; m < 8; m++) {
+        u32 img0 = g->bp[(m < 4 ? 0x80 : 0xA0) + (m & 3) + 8];
+        pc.texSize[m][0] = (f32)((img0 & 0x3FF) + 1); pc.texSize[m][1] = (f32)(((img0 >> 10) & 0x3FF) + 1); pc.texSize[m][2] = pc.texSize[m][3] = 0;
+    }
+    for (u32 m = 0; m < 3; m++) {
+        // BP 0x06+3m..: six 11-bit signed elements (a, b | c, d | e, f) and a 6-bit scale. The
+        // offset in 1/128 texels is (M . v) >> 3, shifted by 17 - scale.
+        u32 r0 = g->bp[0x06 + m * 3], r1 = g->bp[0x07 + m * 3], r2 = g->bp[0x08 + m * 3];
+        s32 e[6] = {(s32)(r0 << 21) >> 21, (s32)(r0 << 10) >> 21, (s32)(r1 << 21) >> 21, (s32)(r1 << 10) >> 21, (s32)(r2 << 21) >> 21, (s32)(r2 << 10) >> 21};
+        s32 scale = (s32)(((r0 >> 22) & 3) | ((r1 >> 22) & 3) << 2 | ((r2 >> 22) & 3) << 4);
+        f32 k = (f32)ldexp(1.0, scale - 17) / 8.0f / 128.0f;
+        pc.indRow[m][0][0] = e[0] * k; pc.indRow[m][0][1] = e[2] * k; pc.indRow[m][0][2] = e[4] * k; pc.indRow[m][0][3] = 0;
+        pc.indRow[m][1][0] = e[1] * k; pc.indRow[m][1][1] = e[3] * k; pc.indRow[m][1][2] = e[5] * k; pc.indRow[m][1][3] = 0;
+    }
+    for (u32 i = 0; i < 4; i++) {
+        u32 sc = g->bp[0x25 + i / 2] >> ((i & 1) * 8);
+        pc.indScale[i][0] = 1.0f / (f32)(1u << (sc & 15)); pc.indScale[i][1] = 1.0f / (f32)(1u << ((sc >> 4) & 15)); pc.indScale[i][2] = pc.indScale[i][3] = 0;
+    }
     sCtx->UpdateSubresource(sPsConst, 0, NULL, &pc, 0, 0);
 
     sCtx->OMSetRenderTargets(1, &sEfbRtv, sEfbDsv);
@@ -703,9 +776,10 @@ static void Draw(const PortGx* g, u32 prim, const PortGxLayout* L, u32 count, co
 }
 
 // ------------------------------------------------------------------ frame-buffer copies
-static void Blit(ID3D11ShaderResourceView* src, ID3D11RenderTargetView* dst, u32 dstW, u32 dstH, f32 u0, f32 v0, f32 du, f32 dv) {
+static void Blit(ID3D11ShaderResourceView* src, ID3D11RenderTargetView* dst, u32 dstW, u32 dstH, f32 u0, f32 v0, f32 du, f32 dv, const f32* pick = NULL) {
     ID3D11ShaderResourceView* none[8] = {};
-    f32 rect[4] = {u0, v0, du, dv};
+    f32 rect[8] = {u0, v0, du, dv, 0, 0, 0, 0};
+    if (pick) memcpy(rect + 4, pick, 16);
     sCtx->UpdateSubresource(sBlitConst, 0, NULL, rect, 0, 0);
     sCtx->OMSetRenderTargets(1, &dst, NULL);
     D3D11_VIEWPORT v = {0, 0, (f32)dstW, (f32)dstH, 0, 1};
@@ -720,6 +794,7 @@ static void Blit(ID3D11ShaderResourceView* src, ID3D11RenderTargetView* dst, u32
     sCtx->VSSetShader(sBlitVs, NULL, 0);
     sCtx->PSSetShader(sBlitPs, NULL, 0);
     sCtx->VSSetConstantBuffers(0, 1, &sBlitConst);
+    sCtx->PSSetConstantBuffers(0, 1, &sBlitConst);
     sCtx->PSSetShaderResources(0, 1, &src);
     sCtx->PSSetSamplers(0, 1, &sLinearClamp);
     sCtx->Draw(3, 0);
@@ -754,15 +829,23 @@ static void Copy(const PortGx* g, u32 control) {
         }
         sGfxStats.presents++;
     } else {                                                // into a texture, kept at the frame buffer's resolution
+        // The copy's format (bits 3-6, low bit = the second half of the list) says which
+        // channels it takes: 8 red, 9 green, 10 blue, 7 alpha as an intensity texture; the others
+        // are kept as a colour picture with the frame buffer's alpha.
         u32 addr = (g->bp[0x4B] & 0xFFFFFF) << 5;
+        u32 tpf = (control >> 3) & 15, fmt = tpf / 2 + (tpf & 1) * 8;
+        static const f32 kPick[5][4] = {{0, 0, 0, 1}, {1, 0, 0, 0}, {0, 1, 0, 0}, {0, 0, 1, 0}, {0, 0, 0, -1}};
+        const f32* pick = fmt == 7 ? kPick[0] : fmt == 8 ? kPick[1] : fmt == 9 ? kPick[2] : fmt == 10 ? kPick[3] : kPick[4];
+        if (fmt == 0 || fmt == 1) pick = kPick[1];          // R4, and the luminance formats: red stands in
         D3D11_TEXTURE2D_DESC d = {};
         d.Width = w * sScale; d.Height = h * sScale; d.MipLevels = 1; d.ArraySize = 1; d.Format = DXGI_FORMAT_R8G8B8A8_UNORM;
-        d.SampleDesc.Count = 1; d.BindFlags = D3D11_BIND_SHADER_RESOURCE;
+        d.SampleDesc.Count = 1; d.BindFlags = D3D11_BIND_SHADER_RESOURCE | D3D11_BIND_RENDER_TARGET;
         ID3D11Texture2D* t = NULL;
         if (SUCCEEDED(sDev->CreateTexture2D(&d, NULL, &t))) {
-            D3D11_BOX box = {x * sScale, y * sScale, 0, (x + w) * sScale, (y + h) * sScale, 1};
-            sCtx->OMSetRenderTargets(0, NULL, NULL);
-            sCtx->CopySubresourceRegion(t, 0, 0, 0, 0, sEfbTex, 0, &box);
+            ID3D11RenderTargetView* rtv = NULL;
+            sDev->CreateRenderTargetView(t, NULL, &rtv);
+            Blit(sEfbSrv, rtv, d.Width, d.Height, (f32)x / EFB_W, (f32)y / EFB_H, (f32)w / EFB_W, (f32)h / EFB_H, pick);
+            rtv->Release();
             ID3D11ShaderResourceView*& slot = sEfbCopies[addr];
             if (slot) slot->Release();
             slot = NULL;
@@ -919,7 +1002,7 @@ BOOL PortGfxStart(BOOL window, int scale) {
     bd = {};
     bd.ByteWidth = sizeof(PsConst); bd.BindFlags = D3D11_BIND_CONSTANT_BUFFER;
     sDev->CreateBuffer(&bd, NULL, &sPsConst);
-    bd.ByteWidth = 16;
+    bd.ByteWidth = 32;
     sDev->CreateBuffer(&bd, NULL, &sBlitConst);
     D3D11_SAMPLER_DESC smp = {};
     smp.Filter = D3D11_FILTER_MIN_MAG_LINEAR_MIP_POINT;

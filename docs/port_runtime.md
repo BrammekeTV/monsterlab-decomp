@@ -27,7 +27,12 @@ build\pc\monsterlab.exe                        # runs main() with your own disc 
 | `--window` | open a window and draw into it |
 | `--screenshot FILE` | write the last picture shown as a PNG when the run stops (works without `--window`) |
 | `--scale N` | frame buffer size as a multiple of the console's 640x528 (default 2) |
+| `--peek ADDR` | print four words of Wii memory (hex address) when the run stops |
 | `--show-texture N` | development aid: when the boot stops, draw texture N of `global_binary.sir` through the engine's draw path instead of ending (see "GX: the renderer") |
+
+Debugging aids: `--peek ADDR` (up to eight) prints four words of Wii memory at the stop;
+`PORT_SCRIPT_TRACE=1` in the environment logs every call the script engine makes to a registered
+script function, by name; `PORT_GFX_TRACE=1` logs draws and copies.
 
 The run ends with a boot summary: what was reached and when, disc files opened, SDK calls that
 do nothing yet, and the stop reason. Exit codes: 0 frame limit or the game asked to exit,
@@ -61,9 +66,15 @@ What boots today, with the retail PAL disc:
    `SirLoad` and converted in place (5,615 pointers, the game database, input table, textures,
    strings and actions).
 10. Script system set-up (`fn_8010F794`): signatures and all script functions registered.
-11. `UiInit` crashes in `fn_8018C8F4`: the UI root, fonts, screen list and HUD in
-    `global_binary.sir` are still big-endian (`docs/loader.md`, "Not converted yet"). That is
-    the first stop today, and it is data work, not a missing function.
+11. `UiInit`, the rest of `GameStart` (save system on the PC save folder, language, string
+    table) and `HomeButtonInit` (the SDK's HOME-menu library is stubbed).
+12. The frame loop: `EngineFrame`, the UI update, `LoadingScreenTick` with `RendClear`.
+13. The main loop runs: the game presents frames (mode 2, the front end) and its boot script
+    calls `LoadLevel`. There is no controller: `KPADRead` gives no samples and `WPADProbe`
+    answers "no controller".
+14. The level load (`fn_80007D68`) crashes on the effect tables of `global_binary.sir` (header
+    slots 0x82C-0x840), which are still big-endian (`docs/loader.md`). That is the first stop
+    today. The frames up to it are black: nothing is in the scene yet.
 
 Drawing works apart from that: with `--show-texture N` the run goes on from the stop and draws
 a texture of `global_binary.sir` with the engine's own frame functions (`RendBeginFrame`, its
@@ -300,13 +311,20 @@ What it does:
   memory (`loadTlut`).
 - **Output state.** Blending, colour/alpha write masks, depth test, culling, viewport and
   scissor from the BP and XF registers.
+- **Indirect textures.** A stage's coordinate can be offset by a texture sampled in an
+  "indirect stage" (BP 0x10+n, 0x27, the three matrices at 0x06-0x0E, coordinate scale and the
+  wrap modes). The engine's post-processing depends on it: every frame it copies the red,
+  green and blue channel of the frame buffer into three intensity textures and draws the
+  screen three times, each pass looking its channel up in a 256x4 tone curve through an
+  indirect stage. The two "dynamic" matrix kinds are not implemented.
 - **Copies.** BP 0x52: a display copy shows the frame buffer in the window (and keeps it for
-  `--screenshot`); a copy to a texture keeps a snapshot at the frame buffer's resolution, used
-  when a texture with that address is bound; then the clear, if asked.
+  `--screenshot`); a copy to a texture keeps a picture at the frame buffer's resolution, used
+  when a texture with that address is bound: a single channel as an intensity texture when the
+  copy format asks for red, green, blue or alpha, the colour picture otherwise; then the clear,
+  if asked.
 
-Not done: indirect textures, fog, Z textures, lines and points (counted as skipped draws),
-mipmaps, the copy formats and filters (a copy to a texture is a plain RGBA snapshot), specular
-lights.
+Not done: fog, Z textures, lines and points (counted as skipped draws), mipmaps, the copy
+filter and gamma, the dynamic indirect matrices, specular lights.
 
 **Byte order of texture data.** Texture pixels and palettes are decoded as console bytes: that
 is what the disc data is. Textures the game builds at run time (`fn_80149B4C` for the built-in
@@ -317,11 +335,19 @@ code that produces them has to write console order on PC. Not done yet.
 before each copy to `build/pc/efb_NN.png`.
 
 **`--show-texture N`** (`port_demo.cpp`) exists because the boot does not reach the game's own
-screens yet. When the main thread would stop, it goes on in the demo instead: it binds texture
+screens yet. When the main thread would stop (or still loops in game code at the time limit), it
+goes on in the demo instead: it binds texture
 N with the engine's bind function, calls `DrawFullscreenTexture` for the 2D state and
 projection, and draws a quad with the engine's array draw. (`DrawFullscreenTexture`'s own quad
 cannot be seen: it lies at view z = -1 while its projection shows 0 to 1, and the function it
 calls to bind its texture, `fn_80154290`, is empty in this build.)
+
+### NAND: save files
+
+`port_nand.cpp` maps the console's flash file system to the folder `save` beside the executable:
+home directory, change/create directory, create, delete, open, close, read, write, length, type,
+move, free space, and the banner header. The functions are defined under the names the game
+calls (`fn_80266BA4` is `NANDOpen`, ...); each comment says which SDK function it is.
 
 ### Threads and interrupts
 
@@ -387,10 +413,8 @@ MSVC only for now (absolute symbols, `/alternatename`, structured exception hand
    crashes or wrong behaviour further in. `monsterlab.exe --verbose` lists them.
 4. **The rest of the renderer** (see "GX: the renderer" for what exists): the SDK-level calls
    in `port_sdk.cpp` that still only record state (`GXSetBlendMode`, `GXSetZMode`,
-   `GXSetTevOrder`, ...) have to send their registers into the stream; indirect textures, fog,
-   Z textures, lines and points; mipmaps; the frame-buffer copy filters the engine's
-   post-processing relies on (it copies with intensity formats). And the byte order of texture
-   data built at run time (see there).
+   `GXSetTevOrder`, ...) have to send their registers into the stream; fog, Z textures, lines
+   and points; mipmaps. And the byte order of texture data built at run time (see there).
 5. **SDK names**: the functions `port_sdk.cpp` defines as `fn_8024xxxx` are identified in its
    comments (`VIConfigure`, `GXSetViewport`, ...). Renaming them with `tools/rename.py` needs
    the definitions in `src/port/` and the callers renamed in the same change.

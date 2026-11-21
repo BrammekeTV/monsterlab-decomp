@@ -16,3 +16,6 @@ lbl_80352688 1
 lbl_80352930 2
 lbl_80352B30 2
 lbl_80352D30 2
+# The level table: name pointer, name hash (filled in at start-up), four words, then a flags byte
+# at +0x18 that the code reads as a byte (bits 2 and 3)
+gLevelFlags 4 4 4 4 4 4 1x8
