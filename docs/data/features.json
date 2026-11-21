@@ -99,6 +99,11 @@
  "changelog": [
   {
    "date": "2026-11-21",
+   "time": "12:41",
+   "text": "Round 54: 31 more missing game functions (lightning bolts, quaternion/transform helpers, segment-triangle sweep, audio listener pick, light accumulation); 57 game functions left"
+  },
+  {
+   "date": "2026-11-21",
    "time": "12:26",
    "text": "Round 53: 44 more missing game functions (spline builders, UI setters, lightning/rope strands, text parsing, GX quad draw, battle reward rolls); 75 game functions left"
   },

@@ -19,7 +19,7 @@ void  fn_801542DC(void);                                                    // 0
 void  fn_80155724(u8* m);                                                   // 0x80155724
 void  fn_8016E304(void* cam);                                               // 0x8016E304
 void  fn_801719DC(void* p);                                                 // 0x801719DC
-void  fn_80171ABC(void);                                                    // 0x80171ABC
+void fn_80171ABC(u8* p);                                                    // 0x80171ABC
 s32   fn_80173400(void* a, s32 b);                                          // 0x80173400
 void  fn_8017514C(s32 a);                                                   // 0x8017514C
 void  fn_80175C48(s32 a);                                                   // 0x80175C48
@@ -315,7 +315,7 @@ void fn_801DAAFC(u8* arg0) {
         return;
     }
     void* cam = lbl_805FB5F8;
-    fn_80171ABC();
+    fn_80171ABC(obj);  // r3 still holds obj in the asm
     if (cam == NULL) {
         RendClear(5, 0, 0, 1.0f);
         return;
