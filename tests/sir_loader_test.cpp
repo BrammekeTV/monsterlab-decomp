@@ -11,6 +11,9 @@
 #include <stdlib.h>
 #include <string.h>
 
+#include <algorithm>
+#include <vector>
+
 #include "game/part.h"
 #include "port/sir_loader.h"
 
@@ -166,6 +169,255 @@ static void DumpImage(const GlobalBinaryFile* f) {
     }
 }
 
+static void PrintWords(const u8* p, u32 n) {
+    for (u32 i = 0; i < n; i++) printf("%s%08x", i ? " " : "", *(const u32*)(p + i * 4));
+}
+
+static void PrintPtrs(const u8* p, u32 n, const GlobalBinaryFile* f) {
+    for (u32 i = 0; i < n; i++) {
+        if (i) printf(" ");
+        PrintPtr(p + i * 4, f);
+    }
+}
+
+// Bytes the loader must leave alone, as hex.
+static void PrintRaw(const u8* p, u32 n) {
+    for (u32 i = 0; i < n; i++) printf("%02x", p[i]);
+}
+
+static void AddUnique(std::vector<const u8*>& list, const u8* p) {
+    if (p != NULL && std::find(list.begin(), list.end(), p) == list.end()) list.push_back(p);
+}
+
+// UI root, fonts, the objects of slots 0xDB4-0xDBC and the screen state machines, read at the
+// offsets the game code uses (ScreenSetsInit, fn_8018C9DC, HudReset, HudUpdateScreens, fn_801BB8A0,
+// fn_801BC5F0, ...), in the text format of `tools/sir_decoder.py --image`.
+static void DumpUi(const GlobalBinaryFile* f) {
+    const u8* root = *(const u8**)(f->hdr + 0xDB0);
+    printf("uiroot ");
+    PrintPtr((const u8*)&root, f);
+    printf(" raw ");
+    PrintRaw(root, 0x10);
+    printf(" w10 %08x fonts ", *(const u32*)(root + 0x10));
+    PrintPtrs(root + 0x14, UI_ROOT_FONTS, f);
+    printf(" view ");
+    PrintWords(root + 0x20, 19);
+    printf(" run ");
+    PrintWords(root + 0x6C, 5);
+    printf(" ");
+    PrintWords(root + 0x84, 4);
+    printf(" bytes %02x %02x\n", root[0x80], root[0x94]);
+
+    std::vector<const u8*> fontObjs;
+    for (u32 i = 0; i < UI_ROOT_FONTS; i++) {
+        const u8* font = *(const u8**)(root + 0x14 + i * 4);
+        if (font == NULL) continue;
+        printf("uifont %u ", i);
+        PrintPtr((const u8*)&font, f);
+        printf(" name %s obj ", (const char*)font + 4);
+        PrintPtr(font + 0xCC, f);
+        printf("\n");
+        AddUnique(fontObjs, *(const u8**)(font + 0xCC));
+    }
+    const u8* fontList = *(const u8**)(f->hdr + 0xDB4);
+    printf("uifontlist ");
+    PrintPtr((const u8*)&fontList, f);
+    printf(" ");
+    PrintPtrs(fontList + 4, 2, f);
+    printf("\n");
+    AddUnique(fontObjs, *(const u8**)(fontList + 4));
+    AddUnique(fontObjs, *(const u8**)(fontList + 8));
+    for (const u8* obj : fontObjs) {
+        printf("uifontobj ");
+        PrintPtr((const u8*)&obj, f);
+        printf(" vtable %08x kind %u data ", *(const u32*)obj, *(const u32*)(obj + 4));
+        PrintPtr(obj + 8, f);
+        if (*(const u32*)(obj + 4) == UI_FONT_KIND_1) {
+            u32 pages = *(const u32*)(obj + 0x124);
+            printf(" pages %u", pages);
+            for (u32 i = 0; i < pages; i++) { printf(" "); PrintPtr(obj + 0x24 + i * 4, f); }
+        }
+        printf("\n");
+    }
+    const u8* draw = *(const u8**)(f->hdr + 0xDB8);
+    printf("uidraw ");
+    PrintPtr((const u8*)&draw, f);
+    printf(" raw ");
+    PrintRaw(draw, 4);
+    printf(" w04 %08x fonts ", *(const u32*)(draw + 4));
+    PrintPtr(draw + 8, f);
+    printf(" raw0c ");
+    PrintRaw(draw + 0xC, 4);
+    printf(" w40 %d w404 %d\n", *(const s32*)(draw + 0x40), *(const s32*)(draw + 0x404));
+    const u8* pad = *(const u8**)(f->hdr + 0xDBC);
+    printf("uipad ");
+    PrintPtr((const u8*)&pad, f);
+    printf(" raw ");
+    PrintRaw(pad, 4);
+    printf(" ");
+    PrintWords(pad + 4, 7);
+    printf("\n");
+
+    const u8* hud = *(const u8**)(f->hdr + 0xD9C);
+    u32 count = *(const u32*)(hud + 0x428);
+    u32 spare = 0;
+    for (u32 i = count; i < HUD_MACHINES; i++) spare += *(const u8**)(hud + 0x28 + i * 4) != NULL;
+    printf("hud ");
+    PrintPtr((const u8*)&hud, f);
+    printf(" depth %d stack ", *(const s32*)hud);
+    PrintPtrs(hud + 4, 8, f);
+    printf(" w24 %08x count %u current ", *(const u32*)(hud + 0x24), count);
+    PrintPtr(hud + 0x42C, f);
+    printf(" flag %u spare %u\n", hud[0x430], spare);
+
+    std::vector<const u8*> machines, defs, trans, sharedTrans;
+    AddUnique(machines, *(const u8**)(f->hdr + 0xD98));
+    for (u32 i = 0; i < count; i++) {
+        printf("hudmachine %u ", i);
+        PrintPtr(hud + 0x28 + i * 4, f);
+        printf("\n");
+        AddUnique(machines, *(const u8**)(hud + 0x28 + i * 4));
+    }
+    for (const u8* m : machines) {
+        printf("fsm ");
+        PrintPtr((const u8*)&m, f);
+        printf(" def ");
+        PrintPtr(m, f);
+        printf(" state %d %d %d owner ", *(const s32*)(m + 4), *(const s32*)(m + 8), *(const s32*)(m + 0xC));
+        PrintPtr(m + 0x10, f);
+        printf(" words ");
+        PrintWords(m + 0x14, 6);
+        printf(" floats ");
+        for (u32 i = 0; i < 10; i++) printf("%s%08x", i ? " " : "", Bits(*(const f32*)(m + 0x2C + i * 4)));
+        printf(" values ");
+        PrintPtr(m + 0x54, f);
+        printf(" raw ");
+        PrintRaw(m + 0x58, 0x18);
+        printf("\n");
+        const u32* values = *(const u32**)(m + 0x54);
+        if (values != NULL) {   // as fn_801BBE40 reads it: count, then the values
+            u32 h = 0x811C9DC5u;
+            for (u32 i = 1; i <= values[0]; i++)
+                for (s32 shift = 24; shift >= 0; shift -= 8) h = (h ^ ((values[i] >> shift) & 0xFF)) * 0x01000193u;
+            printf("fsmvalues ");
+            PrintPtr((const u8*)&values, f);
+            printf(" count %u sum %08x\n", values[0], h);
+        }
+        AddUnique(defs, *(const u8**)m);
+    }
+    for (const u8* d : defs) {
+        s32 states = *(const s32*)(d + 4), nodes = *(const s32*)(d + 0x1C), shared = *(const s32*)(d + 0x2C);
+        printf("fsmdef ");
+        PrintPtr((const u8*)&d, f);
+        printf(" states ");
+        PrintPtr(d, f);
+        printf(" %d strings ", states);
+        PrintPtr(d + 0xC, f);
+        printf(" nodes ");
+        PrintPtr(d + 0x10, f);
+        printf(" %d shared ", nodes);
+        PrintPtr(d + 0x20, f);
+        printf(" %d key %08x start %08x %08x %u ", shared, *(const u32*)(d + 0x30), *(const u32*)(d + 0x34), *(const u32*)(d + 0x38),
+               *(const u32*)(d + 0x3C));
+        PrintPtr(d + 0x40, f);
+        printf(" b44 %u raw ", d[0x44]);
+        PrintRaw(d + 0x08, 4);
+        printf(" ");
+        PrintRaw(d + 0x14, 8);
+        printf(" ");
+        PrintRaw(d + 0x24, 8);
+        printf("\n");
+        trans.push_back(*(const u8**)(d + 0x40));
+        for (s32 i = 0; i < states; i++) {
+            const u8* s = *(const u8**)d + i * FSM_STATE_SIZE;
+            s32 events = *(const s32*)(s + 0x2C);
+            printf("fsmstate ");
+            PrintPtr((const u8*)&d, f);
+            printf(" %d vtable %08x key %08x type %u actions ", i, *(const u32*)s, *(const u32*)(s + 4), *(const u32*)(s + 8));
+            PrintWords(s + 0xC, 3);
+            printf(" timeout %08x flags %08x events ", Bits(*(const f32*)(s + 0x18)), *(const u32*)(s + 0x1C));
+            PrintPtr(s + 0x20, f);
+            printf(" %d raw ", events);
+            PrintRaw(s + 0x24, 8);
+            printf("\n");
+            for (s32 k = 0; k < events; k++) {
+                const u8* e = *(const u8**)(s + 0x20) + k * FSM_EVENT_SIZE;
+                printf("fsmevent ");
+                PrintPtr((const u8*)&d, f);
+                printf(" %d %d id %08x cond %08x to ", i, k, *(const u32*)e, *(const u32*)(e + 4));
+                PrintPtr(e + 8, f);
+                printf("\n");
+                trans.push_back(*(const u8**)(e + 8));
+            }
+        }
+        for (s32 i = 0; i < nodes; i++) {
+            const u8* n = (*(const u8***)(d + 0x10))[i];
+            u32 type = *(const u32*)(n + 8);
+            printf("fsmnode ");
+            PrintPtr((const u8*)&n, f);
+            printf(" vtable %08x key %08x type %u", *(const u32*)n, *(const u32*)(n + 4), type);
+            if (type == FSM_NODE_START) {
+                printf(" to ");
+                PrintPtr(n + 0xC, f);
+                trans.push_back(*(const u8**)(n + 0xC));
+            } else if (type == FSM_NODE_ACTION) {
+                printf(" action %08x to ", *(const u32*)(n + 0xC));
+                PrintPtr(n + 0x10, f);
+                printf(" %d %d", *(const s32*)(n + 0x14), *(const s32*)(n + 0x18));
+                trans.push_back(*(const u8**)(n + 0x10));
+            } else if (type == FSM_NODE_CHOICE) {
+                s32 choices = *(const s32*)(n + 0x14);
+                printf(" action %08x choices ", *(const u32*)(n + 0xC));
+                PrintPtr(n + 0x10, f);
+                printf(" %d result %d %d to", choices, *(const s32*)(n + 0x1C), *(const s32*)(n + 0x20));
+                for (s32 k = 0; k < choices; k++) {
+                    const u8* slot = *(const u8**)(n + 0x10) + k * 4;
+                    printf(" ");
+                    PrintPtr(slot, f);
+                    trans.push_back(*(const u8**)slot);
+                }
+            }
+            printf("\n");
+        }
+        for (s32 i = 0; i < shared; i++) {
+            const u8* e = *(const u8**)(d + 0x20) + i * FSM_EVENT_SIZE;
+            printf("fsmshared ");
+            PrintPtr((const u8*)&d, f);
+            printf(" %d id %08x to ", i, *(const u32*)e);
+            PrintPtr(e + 4, f);
+            printf(" cond %08x\n", *(const u32*)(e + 8));
+            sharedTrans.push_back(*(const u8**)(e + 4));
+        }
+    }
+    for (std::vector<const u8*>* list : { &trans, &sharedTrans }) {
+        std::sort(list->begin(), list->end());
+        list->erase(std::unique(list->begin(), list->end()), list->end());
+        if (!list->empty() && list->front() == NULL) list->erase(list->begin());
+    }
+    for (const u8* t : trans) {
+        printf("fsmtrans ");
+        PrintPtr((const u8*)&t, f);
+        printf(" vtable %08x target ", *(const u32*)t);
+        PrintPtr(t + 4, f);
+        printf(" cond %08x action %08x %d %d raw ", *(const u32*)(t + 8), *(const u32*)(t + 0xC), *(const s32*)(t + 0x10), *(const s32*)(t + 0x14));
+        PrintRaw(t + 0x18, 8);
+        printf("\n");
+    }
+    for (const u8* t : sharedTrans) {
+        s32 keys = *(const s32*)(t + 0x20);
+        printf("fsmsharedtrans ");
+        PrintPtr((const u8*)&t, f);
+        printf(" vtable %08x target ", *(const u32*)t);
+        PrintPtr(t + 4, f);
+        printf(" cond %08x action %08x %d %d flags %08x keys ", *(const u32*)(t + 8), *(const u32*)(t + 0xC), *(const s32*)(t + 0x10),
+               *(const s32*)(t + 0x14), *(const u32*)(t + 0x18));
+        PrintPtr(t + 0x1C, f);
+        printf(" %d", keys);
+        for (s32 k = 0; k < keys; k++) printf(" %08x", (*(const u32**)(t + 0x1C))[k]);
+        printf("\n");
+    }
+}
+
 static int Dump(const char* path) {
     SirReloc r;
     GlobalBinaryFile f;
@@ -252,6 +504,7 @@ static int Dump(const char* path) {
         printf("tuning %d id %d value %.9g\n", i, *(const s32*)(tuning + i * 8), (double)*(const f32*)(tuning + i * 8 + 4));
 
     DumpImage(&f);
+    DumpUi(&f);
     printf("report image %u dolkept %u dolresolved %u unknown %u\n", r.ptrImage, r.ptrDolKept, r.ptrDolResolved, r.ptrUnknown);
     GlobalBinaryFree(&f);
     return 0;
@@ -344,10 +597,34 @@ static void Put16(u8* p, u16 v) {
 #define T_TEX1    (T_TEX0 + 0x70)            // header and name 0x60, pixels 0x10, palette 0x10
 #define T_STR     (T_TEX1 + 0x80)            // string table 0x20, array 0x10, text 0x10
 #define T_ACT     (T_STR + 0x40)             // action table 0x08, array 0x08
-#define T_SIZE    (T_ACT + 0x10)
+// UI objects and screen state machines.
+#define T_UI_ROOT   (T_ACT + 0x10)           // 0xA0
+#define T_FONT      (T_UI_ROOT + 0xA0)       // font 0xD0, then its object
+#define T_FONT_OBJ  (T_FONT + 0xD0)          // kind 1, 0x128 bytes
+#define T_FONT_DATA (T_FONT + 0x200)         // 0x10
+#define T_FONTLIST  (T_FONT_DATA + 0x10)     // 0x10
+#define T_FONT_OBJ0 (T_FONTLIST + 0x10)      // kind 0, 0x0C bytes
+#define T_DRAW      (T_FONT_OBJ0 + 0x10)     // 0x408
+#define T_PAD       (T_DRAW + 0x410)         // 0x20
+#define T_FSM0      (T_PAD + 0x20)           // 0x70: the screen list, also the HUD's first machine
+#define T_FSM1      (T_FSM0 + 0x70)          // 0x70
+#define T_VALUES    (T_FSM1 + 0x70)          // count and two values
+#define T_HUD       (T_VALUES + 0x10)        // 0x434
+#define T_DEF       (T_HUD + 0x440)          // 0x80
+#define T_STATES    (T_DEF + 0x80)           // two states
+#define T_EVENTS    (T_STATES + 0x60)        // two events of state 0
+#define T_NODEPTRS  (T_EVENTS + 0x20)        // four node pointers
+#define T_NODES     (T_NODEPTRS + 0x10)      // nodes of type 0, 2, 3 and 4
+#define T_CHOICES   (T_NODES + 0xC0)         // two transition pointers of the type 4 node
+#define T_SHARED    (T_CHOICES + 0x10)       // one shared event
+#define T_TRANS_A   (T_SHARED + 0x10)        // 0x20
+#define T_TRANS_B   (T_TRANS_A + 0x20)       // 0x20
+#define T_STRANS    (T_TRANS_B + 0x20)       // 0x30: transition of the shared event
+#define T_KEYS      (T_STRANS + 0x30)        // two state keys
+#define T_SIZE      (T_KEYS + 0x10)
 #define T_ADDR(off) (GLOBAL_BINARY_WII_BASE + (off))
 
-#define T_OBJECT_PTRS 28u   // image pointers in the hand-typed objects and their header slots
+#define T_OBJECT_PTRS 68u   // image pointers in the hand-typed objects and their header slots
 
 static u8 gFakeVtable[4];
 static void* TestResolver(u32 addr, void*) {
@@ -448,6 +725,137 @@ static void BuildObjects(u8* hdr, u8* img) {
     Put32(at + 0x0C, T_ADDR(T_ROWS_B + 0x30));
 }
 
+// UI root, one font, the objects of slots 0xDB4-0xDBC, and two state machines sharing one
+// definition (two states, one node of each type, one shared event) in the HUD.
+static void BuildUi(u8* hdr, u8* img) {
+    Put32(hdr + 0xDB0, T_ADDR(T_UI_ROOT));
+    Put32(hdr + 0xDB4, T_ADDR(T_FONTLIST));
+    Put32(hdr + 0xDB8, T_ADDR(T_DRAW));
+    Put32(hdr + 0xDBC, T_ADDR(T_PAD));
+    Put32(hdr + 0xD98, T_ADDR(T_FSM0));
+    Put32(hdr + 0xD9C, T_ADDR(T_HUD));
+
+    u8* root = img + T_UI_ROOT;
+    Put32(root + 0x00, 1);
+    Put32(root + 0x04, T_ADDR(T_DRAW));                       // no reader: stays big-endian
+    Put32(root + 0x14, T_ADDR(T_FONT));
+    Put32(root + 0x18, 0);
+    Put32(root + 0x1C, 0);
+    for (u32 o = 0x20; o < 0x6C; o += 4) Put32(root + o, 0);
+    Put32(root + 0x38, 0x3F800000);
+    for (u32 o = 0x70; o < 0x94; o += 4) if (o != 0x80) Put32(root + o, 0);
+
+    u8* font = img + T_FONT;
+    Put32(font + 0x00, 1);
+    strcpy((char*)font + 4, "test_rf");
+    Put32(font + 0xCC, T_ADDR(T_FONT_OBJ));
+    u8* obj = img + T_FONT_OBJ;
+    Put32(obj + 0x00, T_VTABLE);
+    Put32(obj + 0x04, UI_FONT_KIND_1);
+    Put32(obj + 0x08, T_ADDR(T_FONT_DATA));
+    Put32(obj + 0x24, T_ADDR(T_TEX0));
+    Put32(obj + 0x28, T_ADDR(T_TEX1));
+    Put32(obj + 0x124, 2);
+    Put32(img + T_FONT_DATA, 0x01020304);                     // font data: not converted yet
+
+    u8* list = img + T_FONTLIST;
+    Put32(list + 0x00, 1);
+    Put32(list + 0x04, T_ADDR(T_FONT_OBJ0));
+    Put32(list + 0x08, T_ADDR(T_FONT_OBJ));                   // the font's object again
+    Put32(img + T_FONT_OBJ0 + 0x00, T_VTABLE);
+    Put32(img + T_FONT_OBJ0 + 0x04, UI_FONT_KIND_0);
+    Put32(img + T_FONT_OBJ0 + 0x08, T_ADDR(T_FONT_DATA));
+
+    u8* draw = img + T_DRAW;
+    Put32(draw + 0x00, 1);
+    Put32(draw + 0x04, T_VTABLE);
+    Put32(draw + 0x08, T_ADDR(T_FONTLIST));
+    Put32(draw + 0x0C, T_ADDR(T_TEX0));                       // no reader: stays big-endian
+    Put32(draw + 0x40, 7);
+    Put32(draw + 0x404, 9);
+
+    u8* pad = img + T_PAD;
+    Put32(pad + 0x00, 1);
+    Put32(pad + 0x04, 2); Put32(pad + 0x08, 2);
+    Put32(pad + 0x18, 0x3F000000); Put32(pad + 0x1C, 0);
+
+    for (u32 k = 0; k < 2; k++) {
+        u8* m = img + (k == 0 ? T_FSM0 : T_FSM1);
+        Put32(m + 0x00, T_ADDR(T_DEF));
+        Put32(m + 0x04, 0xFFFFFFFF); Put32(m + 0x08, 0xFFFFFFFF); Put32(m + 0x0C, 0xFFFFFFFF);
+        for (u32 o = 0x10; o < 0x50; o += 4) Put32(m + o, 0);
+        Put32(m + 0x4C, 0x40A00000);                          // timer 5.0f; +0x50 keeps the fill word
+        Put32(m + 0x54, k == 0 ? T_ADDR(T_VALUES) : 0);
+        Put32(m + 0x58, 0); Put32(m + 0x5C, 0); Put32(m + 0x60, 0xFFFFFFFE);   // no reader: stay big-endian
+    }
+    Put32(img + T_VALUES + 0x00, 2);
+    Put32(img + T_VALUES + 0x04, 0x17FC0002);
+    Put32(img + T_VALUES + 0x08, 0x17FC0004);
+
+    u8* hud = img + T_HUD;
+    memset(hud, 0, HUD_SIZE);
+    Put32(hud + 0x24, T_VTABLE);
+    Put32(hud + 0x28, T_ADDR(T_FSM0));
+    Put32(hud + 0x2C, T_ADDR(T_FSM1));
+    Put32(hud + 0x428, 2);
+
+    u8* def = img + T_DEF;
+    Put32(def + 0x00, T_ADDR(T_STATES)); Put32(def + 0x04, 2); Put32(def + 0x08, 2); Put32(def + 0x0C, 0);
+    Put32(def + 0x10, T_ADDR(T_NODEPTRS)); Put32(def + 0x14, 4); Put32(def + 0x18, 2); Put32(def + 0x1C, 4);
+    Put32(def + 0x20, T_ADDR(T_SHARED)); Put32(def + 0x24, 1); Put32(def + 0x28, 2); Put32(def + 0x2C, 1);
+    Put32(def + 0x30, 0x10CD5CCF);
+    Put32(def + 0x34, T_VTABLE); Put32(def + 0x38, 0x8162E3B5); Put32(def + 0x3C, FSM_NODE_START);
+    Put32(def + 0x40, T_ADDR(T_TRANS_A));
+    def[0x44] = 1;
+
+    u8* s0 = img + T_STATES;
+    Put32(s0 + 0x00, T_VTABLE); Put32(s0 + 0x04, 0x3CDA301E); Put32(s0 + 0x08, FSM_NODE_STATE);
+    Put32(s0 + 0x0C, 0x18000000); Put32(s0 + 0x10, 0x18000001); Put32(s0 + 0x14, 0x0003FFFF);
+    Put32(s0 + 0x18, 0x42780000);                             // 62.0f
+    Put32(s0 + 0x1C, 1);
+    Put32(s0 + 0x20, T_ADDR(T_EVENTS)); Put32(s0 + 0x24, 2); Put32(s0 + 0x28, 2); Put32(s0 + 0x2C, 2);
+    u8* s1 = s0 + FSM_STATE_SIZE;
+    Put32(s1 + 0x00, T_VTABLE); Put32(s1 + 0x04, 0xC80B2CFC); Put32(s1 + 0x08, FSM_NODE_STATE);
+    Put32(s1 + 0x0C, 0x0003FFFF); Put32(s1 + 0x10, 0x0003FFFF); Put32(s1 + 0x14, 0x0003FFFF);
+    Put32(s1 + 0x18, 0xBF800000); Put32(s1 + 0x1C, 0);
+    Put32(s1 + 0x20, 0); Put32(s1 + 0x24, 0); Put32(s1 + 0x28, 2); Put32(s1 + 0x2C, 0);
+    u8* ev = img + T_EVENTS;
+    Put32(ev + 0x00, 0xBE048B88); Put32(ev + 0x04, 0x0003FFFF); Put32(ev + 0x08, T_ADDR(T_TRANS_A));
+    Put32(ev + 0x0C, 0x7A1E1C4C); Put32(ev + 0x10, 0x18000001); Put32(ev + 0x14, T_ADDR(T_TRANS_B));
+
+    for (u32 i = 0; i < 4; i++) {
+        static const u32 types[4] = { FSM_NODE_PLAIN, FSM_NODE_START, FSM_NODE_ACTION, FSM_NODE_CHOICE };
+        u8* n = img + T_NODES + i * FSM_NODE_SIZE;
+        Put32(img + T_NODEPTRS + i * 4, T_ADDR(T_NODES + i * FSM_NODE_SIZE));
+        Put32(n + 0x00, T_VTABLE); Put32(n + 0x04, 0x4DF33F00 + i); Put32(n + 0x08, types[i]);
+    }
+    u8* n1 = img + T_NODES + 1 * FSM_NODE_SIZE;
+    Put32(n1 + 0x0C, T_ADDR(T_TRANS_B));
+    u8* n2 = img + T_NODES + 2 * FSM_NODE_SIZE;
+    Put32(n2 + 0x0C, 0x18000085); Put32(n2 + 0x10, T_ADDR(T_TRANS_A)); Put32(n2 + 0x14, 5); Put32(n2 + 0x18, 6);
+    u8* n3 = img + T_NODES + 3 * FSM_NODE_SIZE;
+    Put32(n3 + 0x0C, 0x18000086); Put32(n3 + 0x10, T_ADDR(T_CHOICES)); Put32(n3 + 0x14, 2);
+    Put32(n3 + 0x1C, 0xFFFFFFFF); Put32(n3 + 0x20, 0xFFFFFFFF);
+    Put32(img + T_CHOICES + 0, T_ADDR(T_TRANS_A));
+    Put32(img + T_CHOICES + 4, 0);
+
+    u8* sh = img + T_SHARED;
+    Put32(sh + 0x00, 0x7A1E1C4C); Put32(sh + 0x04, T_ADDR(T_STRANS)); Put32(sh + 0x08, 0x0003FFFF);
+
+    u8* ta = img + T_TRANS_A;
+    Put32(ta + 0x00, T_VTABLE); Put32(ta + 0x04, T_ADDR(T_STATES + FSM_STATE_SIZE));
+    Put32(ta + 0x08, 0x0003FFFF); Put32(ta + 0x0C, 0x18000004); Put32(ta + 0x10, 0); Put32(ta + 0x14, 0); Put32(ta + 0x18, 0);
+    u8* tb = img + T_TRANS_B;
+    Put32(tb + 0x00, T_VTABLE); Put32(tb + 0x04, T_ADDR(T_NODES + 3 * FSM_NODE_SIZE));
+    Put32(tb + 0x08, 0x18000002); Put32(tb + 0x0C, 0x0003FFFF); Put32(tb + 0x10, 1); Put32(tb + 0x14, 0); Put32(tb + 0x18, 0);
+    u8* ts = img + T_STRANS;
+    Put32(ts + 0x00, T_VTABLE); Put32(ts + 0x04, T_ADDR(T_STATES));
+    Put32(ts + 0x08, 0x0003FFFF); Put32(ts + 0x0C, 0x18000118); Put32(ts + 0x10, 0); Put32(ts + 0x14, 0);
+    Put32(ts + 0x18, 1); Put32(ts + 0x1C, T_ADDR(T_KEYS)); Put32(ts + 0x20, 2); Put32(ts + 0x24, 0);
+    Put32(img + T_KEYS + 0, 0x3CDA301E);
+    Put32(img + T_KEYS + 4, 0xC80B2CFC);
+}
+
 // A miniature global_binary image: the database object, 42 descriptors (two with rows), in the
 // byte order and with the fill pattern of the real file.
 static void BuildImage(u8* hdr, u8* img) {
@@ -512,6 +920,7 @@ static void BuildImage(u8* hdr, u8* img) {
     img[T_ROWS_B + 4] = 0xAB;           // followed by the fill bytes 80 00 01
 
     BuildObjects(hdr, img);
+    BuildUi(hdr, img);
 }
 
 static SirError ConvertBuilt(u8* hdr, u8* img, SirReloc* r, s32* failTable) {
@@ -610,6 +1019,81 @@ static int SelfTest(void) {
         CHECK(img[T_ROWS_B + 0x20] == 0x7F && img[T_ROWS_B + 0x23] == 0x01);     // the records are not converted
     }
 
+    // UI root, font and the objects of slots 0xDB4-0xDBC, read the way the game code does.
+    {
+        const u8* root = *(const u8**)(hdr + 0xDB0);
+        CHECK(root == img + T_UI_ROOT);
+        CHECK(root[0x03] == 1 && root[0x04] == 0x90);                              // +0x00, +0x04: no reader, untouched
+        CHECK(*(const u32*)(root + 0x10) == 0x7F800001);                           // a pointer the file leaves unset
+        const u8* font = *(const u8**)(root + 0x14);                               // fn_8018C9DC(root, 1)
+        CHECK(font == img + T_FONT && *(const u8**)(root + 0x18) == NULL);
+        CHECK(*(const f32*)(root + 0x38) == 1.0f && *(const f32*)(root + 0x20) == 0.0f);
+        CHECK(root[0x80] == 0x7F && *(const u32*)(root + 0x84) == 0);              // the byte at +0x80 keeps its fill
+        CHECK(strcmp((const char*)font + 4, "test_rf") == 0 && font[0x03] == 1);
+        const u8* obj = *(const u8**)(font + 0xCC);                                // what ScreenSetsInit reads
+        CHECK(obj == img + T_FONT_OBJ && *(const s32*)(obj + 4) == UI_FONT_KIND_1 && *(const u32*)obj == T_VTABLE);
+        CHECK(*(const u8**)(obj + 8) == img + T_FONT_DATA && *(const s32*)(obj + 0x124) == 2);
+        CHECK(*(const u8**)(obj + 0x24) == img + T_TEX0 && *(const u8**)(obj + 0x28) == img + T_TEX1);
+        CHECK(obj[0x2C] == 0x7F && obj[0x2F] == 0x01);                             // unused page slot: untouched
+        CHECK(img[T_FONT_DATA] == 0x01 && img[T_FONT_DATA + 3] == 0x04);           // font data: not converted
+        const u8* list = *(const u8**)(hdr + 0xDB4);
+        const u8* obj0 = *(const u8**)(list + 4);
+        CHECK(list == img + T_FONTLIST && obj0 == img + T_FONT_OBJ0 && *(const u8**)(list + 8) == obj);
+        CHECK(*(const s32*)(obj0 + 4) == UI_FONT_KIND_0 && *(const u8**)(obj0 + 8) == img + T_FONT_DATA);
+        const u8* draw = *(const u8**)(hdr + 0xDB8);
+        CHECK(draw == img + T_DRAW && *(const u32*)(draw + 4) == T_VTABLE && *(const u8**)(draw + 8) == list);
+        CHECK(draw[0x0C] == 0x90 && *(const s32*)(draw + 0x40) == 7 && *(const s32*)(draw + 0x404) == 9);
+        const u8* pad = *(const u8**)(hdr + 0xDBC);
+        CHECK(pad == img + T_PAD && *(const u32*)(pad + 4) == 2 && *(const u32*)(pad + 0xC) == 0x7F800001 && *(const f32*)(pad + 0x18) == 0.5f);
+    }
+
+    // Screen state machines, read the way HudReset, fn_801BC5F0, fn_801BB8A0 and fn_801BC4C4 do.
+    {
+        const u8* hud = *(const u8**)(hdr + 0xD9C);
+        CHECK(hud == img + T_HUD && *(const u32*)(hud + 0x428) == 2 && *(const u32*)(hud + 0x24) == T_VTABLE);
+        const u8* m0 = *(const u8**)(hud + 0x28);
+        const u8* m1 = *(const u8**)(hud + 0x2C);
+        CHECK(m0 == img + T_FSM0 && m0 == *(const u8**)(hdr + 0xD98) && m1 == img + T_FSM1 && *(const u8**)(hud + 0x30) == NULL);
+        CHECK(*(const s32*)(m0 + 4) == -1 && *(const s32*)(m0 + 0xC) == -1 && *(const u32*)(m0 + 0x28) == 0);
+        CHECK(*(const f32*)(m0 + 0x4C) == 5.0f && *(const u32*)(m0 + 0x50) == 0x7F800001);
+        CHECK(m0[0x63] == 0xFE && m0[0x60] == 0xFF);                               // +0x58..: no reader, untouched
+        const u32* values = *(const u32**)(m0 + 0x54);
+        CHECK((const u8*)values == img + T_VALUES && values[0] == 2 && values[2] == 0x17FC0004 && *(const u8**)(m1 + 0x54) == NULL);
+        const u8* def = *(const u8**)m0;
+        CHECK(def == img + T_DEF && *(const u8**)m1 == def);
+        CHECK(*(const s32*)(def + 4) == 2 && *(const s32*)(def + 0x1C) == 4 && *(const s32*)(def + 0x2C) == 1);
+        CHECK(def[0x0B] == 2 && def[0x17] == 4 && def[0x27] == 1);                 // the words next to the counts: untouched
+        CHECK(*(const u32*)(def + 0x30) == 0x10CD5CCF && *(const u32*)(def + 0x3C) == FSM_NODE_START && def[0x44] == 1);
+        CHECK(*(const u8**)(def + 0x40) == img + T_TRANS_A && *(const u8**)(def + 0xC) == NULL);
+        const u8* s0 = *(const u8**)def;
+        const u8* s1 = s0 + FSM_STATE_SIZE;
+        CHECK(s0 == img + T_STATES && *(const u32*)s0 == T_VTABLE && *(const u32*)(s0 + 4) == 0x3CDA301E && *(const u32*)(s0 + 8) == FSM_NODE_STATE);
+        CHECK(*(const u32*)(s0 + 0xC) == 0x18000000 && *(const u32*)(s0 + 0x14) == 0x0003FFFF && *(const f32*)(s0 + 0x18) == 62.0f);
+        CHECK(*(const u32*)(s0 + 0x1C) == 1 && *(const s32*)(s0 + 0x2C) == 2 && s0[0x27] == 2);
+        CHECK(*(const f32*)(s1 + 0x18) == -1.0f && *(const u8**)(s1 + 0x20) == NULL && *(const s32*)(s1 + 0x2C) == 0);
+        const u8* ev = *(const u8**)(s0 + 0x20);
+        CHECK(ev == img + T_EVENTS && *(const u32*)ev == 0xBE048B88 && *(const u8**)(ev + 8) == img + T_TRANS_A);
+        CHECK(*(const u32*)(ev + 0x10) == 0x18000001 && *(const u8**)(ev + 0x14) == img + T_TRANS_B);
+        const u8* const* nodes = *(const u8* const**)(def + 0x10);
+        CHECK(nodes[0] == img + T_NODES && *(const u32*)(nodes[0] + 8) == FSM_NODE_PLAIN && nodes[0][0x0C] == 0x7F);
+        CHECK(*(const u32*)(nodes[1] + 8) == FSM_NODE_START && *(const u8**)(nodes[1] + 0xC) == img + T_TRANS_B);
+        CHECK(*(const u32*)(nodes[2] + 0xC) == 0x18000085 && *(const u8**)(nodes[2] + 0x10) == img + T_TRANS_A);
+        CHECK(*(const s32*)(nodes[2] + 0x14) == 5 && *(const s32*)(nodes[2] + 0x18) == 6);
+        CHECK(*(const u32*)(nodes[3] + 4) == 0x4DF33F03 && *(const s32*)(nodes[3] + 0x14) == 2 && *(const s32*)(nodes[3] + 0x1C) == -1);
+        const u8* const* choices = *(const u8* const**)(nodes[3] + 0x10);
+        CHECK((const u8*)choices == img + T_CHOICES && choices[0] == img + T_TRANS_A && choices[1] == NULL);
+        const u8* ta = img + T_TRANS_A;
+        const u8* tb = img + T_TRANS_B;
+        CHECK(*(const u8**)(ta + 4) == s1 && *(const u32*)(ta + 0xC) == 0x18000004 && *(const s32*)(ta + 0x10) == 0);
+        CHECK(*(const u8**)(tb + 4) == nodes[3] && *(const u32*)(tb + 8) == 0x18000002 && *(const s32*)(tb + 0x10) == 1);
+        CHECK(ta[0x1C] == 0x7F && ta[0x1F] == 0x01);                               // +0x18, +0x1C: no reader, untouched
+        const u8* sh = *(const u8**)(def + 0x20);
+        const u8* ts = *(const u8**)(sh + 4);
+        CHECK(*(const u32*)sh == 0x7A1E1C4C && ts == img + T_STRANS && *(const u32*)(sh + 8) == 0x0003FFFF);
+        CHECK(*(const u8**)(ts + 4) == s0 && *(const u32*)(ts + 0x18) == 1 && *(const s32*)(ts + 0x20) == 2);
+        CHECK((*(const u32**)(ts + 0x1C))[1] == 0xC80B2CFC && ts[0x27] == 0);
+    }
+
     // Pointer fields of a hand-written schema: image, main.dol (known and unknown), elsewhere, NULL.
     {
         static const SirField fields[] = { { 0x0, SIR_PTR, 5 }, { 0x14, SIR_U16, 2 }, { 0x18, SIR_F32, 1 } };
@@ -661,6 +1145,23 @@ static int SelfTest(void) {
         { T_STR + 0x28, T_ADDR(T_SIZE), SIR_ERR_STRINGS, -1 },                              // string outside the image
         { T_ACT + 0x0C, 0x12345678, SIR_ERR_ACTIONS, -1 },                                  // record outside the image
         { T_ACT + 0x04, T_ADDR(T_STR + 0x24), SIR_ERR_OVERLAP, -1 },                        // two tables share an array
+        { T_UI_ROOT + 0x14, T_ADDR(T_SIZE - 0x40), SIR_ERR_UI, -1 },                        // font runs off the image
+        { T_FONT_OBJ + 0x04, 2, SIR_ERR_UI, -1 },                                           // font object of no known class
+        { T_FONT_OBJ + 0x124, UI_FONT_PAGES + 1, SIR_ERR_UI, -1 },                          // more pages than slots
+        { T_FONT_OBJ + 0x28, 0x12345678, SIR_ERR_UI, -1 },                                  // page outside the image
+        { T_DRAW + 0x08, 0x80001234, SIR_ERR_UI, -1 },                                      // not an image pointer
+        { T_HUD + 0x428, HUD_MACHINES + 1, SIR_ERR_SCREENS, -1 },                           // more machines than slots
+        { T_FSM1 + 0x00, T_ADDR(T_SIZE - 8), SIR_ERR_SCREENS, -1 },                         // definition runs off the image
+        { T_VALUES + 0x00, 0x40000000, SIR_ERR_SCREENS, -1 },                               // value table runs off the image
+        { T_DEF + 0x04, 0x08000000, SIR_ERR_SCREENS, -1 },                                  // more states than fit
+        { T_NODES + 0x08, FSM_NODE_STATE, SIR_ERR_SCREENS, -1 },                            // a state in the node array
+        { T_NODES + 0x30 + 0x08, 5, SIR_ERR_SCREENS, -1 },                                  // unknown node type
+        { T_NODEPTRS + 0x08, 0, SIR_ERR_SCREENS, -1 },                                      // NULL node (fn_801BC5F0 reads it)
+        { T_EVENTS + 0x08, T_ADDR(T_SIZE - 4), SIR_ERR_SCREENS, -1 },                       // transition runs off the image
+        { T_STRANS + 0x20, 0x40000000, SIR_ERR_SCREENS, -1 },                               // key list runs off the image
+        { T_EVENTS + 0x08, T_ADDR(T_STRANS), SIR_ERR_OVERLAP, -1 },                         // one transition used as both kinds
+        { T_STATES + 0x20, T_ADDR(T_HUD + 0x100), SIR_ERR_OVERLAP, -1 },                    // events inside the HUD
+        { T_FSM1 + 0x54, T_ADDR(T_DEF + 0x04), SIR_ERR_OVERLAP, -1 },                       // value table inside the definition
     };
     for (const Bad& c : bad) {
         BuildImage(hdr, img);

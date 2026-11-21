@@ -20,16 +20,20 @@ Code: `include/port/sir_loader.h`, `src/port/sir_loader.cpp`. Test: `tests/sir_l
 | `global_binary.sir` textures (slot `0xD94`: list of 44, including the two at `0x824` and `0x828`) | headers converted; pixel data and palettes stay in GX layout |
 | `global_binary.sir` string table (slot `0xDA8`: 4,274 strings) | converted |
 | `global_binary.sir` action table (slot `0x844`: 956 records) | table and pointer array converted; the records (script words) are not |
-| `global_binary.sir` screen list and HUD (`0xD98`, `0xD9C`), UI objects (`0xDB0`-`0xDC0`), `0x10`, `0x418`, `0x830`, `0x83C` | not converted: see "Not converted yet" |
+| `global_binary.sir` screen list and HUD (slots `0xD98`, `0xD9C`: 68 state machines, 68 definitions, 759 states, 1,345 transitions) | converted; every field typed from code, fields without a reader left as they are |
+| `global_binary.sir` UI root, fonts and the objects of slots `0xDB4`-`0xDBC` | the fields the code reads are converted; the glyph data of the three fonts is not |
+| `global_binary.sir` font glyph data, action records, `0xDC0`, `0x10`, `0x418`, `0x830`, `0x83C` | not converted: see "Not converted yet" |
 | Hook into the game's `SirLoad` | not wired (the port has no file layer yet) |
 
-Of the 1,096,124 bytes of the image, 15.3% is now converted by a schema (the game database is
-11.5%), 57.0% is data that needs no conversion and is reached from a converted object (texture
-pixels and palettes, string bytes), and 4.3% is fill words. 23.4% (257 KB) is not typed yet.
+Of the 1,096,124 bytes of the image, 26.8% now belongs to objects converted by a schema (the game
+database is 11.5%, the screen state machines 11.2%), 57.0% is data that needs no conversion and is
+reached from a converted object (texture pixels and palettes, string bytes), and 4.3% is fill
+words. 11.9% (131 KB) is not typed yet; 101 KB of that is the action records.
 
-Check against the real files: all 9,304 compared lines of `global_binary.sir` (every header slot,
-table descriptor and row, parts, actions and tuning values, and every sequence, step, texture
-header, string and action pointer, read through the game's own structs and offsets) and all
+Check against the real files: all 12,878 compared lines of `global_binary.sir` (every header slot,
+table descriptor and row, parts, actions and tuning values, every sequence, step, texture
+header, string and action pointer, and every state machine, definition, state, event, node and
+transition, read through the game's own structs and offsets) and all
 6,457 lines of `catalog.sir` match the Python reference.
 
 ## How the original loads a file
@@ -168,7 +172,9 @@ whole, with the failing table index. Hand-written schemas are bounds-checked aga
 size. The hand-typed image objects are checked the same way: every count, type code and pointer
 is read from the big-endian bytes first and each object is recorded as a region; a region outside
 the image, a texture list whose links disagree, or two regions that share bytes rejects the file
-before anything changes. Conversion happens once per load; nothing in the data marks it as
+before anything changes. The regions are kept in a list that is sorted once, so the overlap test
+stays cheap with the 3,500 objects of the screen state machines; an object that several others
+point to (a definition used by two machines, a transition used by two events) is one region. Conversion happens once per load; nothing in the data marks it as
 converted, so the caller owns that.
 
 ### Where it plugs into the game
@@ -194,20 +200,26 @@ python tools/loader_check.py
    header slot, descriptor and row, then parts, actions and tuning values through `PartDef`,
    `PartAction`, `PartActionType` and the `data + 0x99D0` tuning rows, as the game reads them,
    then the image objects through `InputSequence`, `SirTexture`, `SirStringTable` and
-   `SirActionTable`. The output must equal `tools/sir_decoder.py --gamedb --image`, which decodes
+   `SirActionTable`, then the UI objects and the screen state machines at the offsets the game
+   code uses. Words the loader must leave alone (no reader in the code) are printed as raw bytes,
+   so a conversion that touched them would show. The output must equal `tools/sir_decoder.py --gamedb --image`, which decodes
    the big-endian bytes directly in Python. Texture pixels and string bytes are compared by a
    checksum, so a conversion that touched them would show.
 
-The self-test also builds an input table, two textures, a string table and an action table, and
-19 broken variants of them (bad counts, unknown step class, list loops, pointers off the image,
-overlapping objects) that must be refused untouched.
+The self-test also builds an input table, two textures, a string table, an action table, a UI
+root with a font, and two state machines that share a definition with one node of each type, and
+36 broken variants of them (bad counts, unknown step class or node type, list loops, pointers
+off the image, overlapping objects, one transition used as two kinds) that must be refused
+untouched.
 
 Result on PAL `RM7P4F`:
 
 - `global_binary.sir`: 18 header pointers, 13 header words, 3 header bytes, 42 tables,
   382 columns, 2,591 rows, 186 parts, 372 actions and 215 tuning values; 98 input sequences,
-  101 steps, 44 textures, 4,274 strings and 956 action pointers, all equal. The load report shows
-  5,615 image pointers relocated and none kept or unknown.
+  101 steps, 44 textures, 4,274 strings and 956 action pointers; the UI root, 3 fonts, 4 font
+  objects, 68 state machines with their value tables, 68 definitions, 759 states, 1,104 events,
+  59 nodes, 23 shared events and 1,345 transitions, all equal. The load report shows 9,425 image
+  pointers relocated and none kept or unknown.
 - `catalog.sir`: 6,394 entries and 59 file records, all equal. All 59 file-name hashes equal
   `StringHash` of the stored name, and the two lookups `GameStart` makes for
   `global_binary.sir` find sector 1 / 4,096 bytes and sector 3 / 1,096,124 bytes.
@@ -309,18 +321,80 @@ records themselves (`0xDD000`-`0xF5D30`, script words such as `0x17FC0001`) are 
 format is not decoded in the decompiled code yet, so a `TriggerDoAction` on a global action would
 read big-endian words.
 
+### Screen state machines (header slots `0xD98`, `0xD9C`)
+
+`UiInit` hands slot `0xD98` (the screen list) to `fn_801BC574` and slot `0xD9C` (the HUD) to
+`HudInit` / `HudReset`; `HudUpdateScreens` (0x801BB5BC) steps a machine every frame. The HUD holds
+68 machines (pointers from `+0x28`, count at `+0x428`); the first one is the screen list itself.
+Every machine in the file has its own definition, but the format allows sharing one.
+
+| Object | Bytes | Fields (all typed from code) |
+|---|---|---|
+| machine | 0x70 | definition, `s32` current / previous / pending state (-1), owner, six words (event arguments, flags at `+0x28`), ten floats (timer at `+0x4C`), value table at `+0x54` |
+| value table | 4 + 4n | `u32 count, u32 value[count]`: what an action word of type 3 is looked up in (`fn_801BBE40`) |
+| definition | 0x80 | states and count, node pointers and count (`+0x10`, `+0x1C`), shared events and count (`+0x20`, `+0x2C`), key (`+0x30`, what `fn_8001B044` searches the HUD for), the start node at `+0x34` with its transition at `+0x40`, a byte at `+0x44` |
+| state | 0x30 | vtable slot, key, type (1), three action words (enter, update, exit), `f32` time-out, flags, events and count |
+| event | 0xC | `u32 id, u32 condition, transition*`; a definition's shared event is `u32 id, transition*, u32 condition` |
+| node | 0x30 | vtable slot, key, type, then by type (below) |
+| transition | 0x20 | vtable slot, target (state or node), condition word, action word, two words |
+| shared event's transition | 0x30 | the same, then flags (`+0x18`), a list of state keys (`+0x1C`) and its count (`+0x20`): the states it applies to, or with bit 0 set those it does not (`fn_801BC4C4`) |
+
+Node types, from the vtables `fn_801BC5F0` installs:
+
+| Type | Vtable | Fields behind the common 0xC bytes |
+|---|---|---|
+| 0 | `0x80383FC4` | none |
+| 1 | `0x80383F90` | a state: lives in the state array, never in the node array |
+| 2 | `0x80383F58` | transition (also the class of a definition's start node) |
+| 3 | `0x80383F20` | action word, transition, two words copied into the machine (`fn_801BBF24`) |
+| 4 | `0x80383EE8` | action word, pointer to transition pointers and their count, result, last choice: the action's result picks the transition (`fn_801BC20C`, `fn_801BC2B8`) |
+
+The file uses types 1 and 4 only (759 states, 59 choice nodes); the loader also converts 0, 2
+and 3, typed from the same code, and refuses anything else.
+
+An action or condition word has a type in bits 27-30 (0 = none) and a value in bits 0-17. Type 3
+takes the value from the machine's value table; the result is handed to `TriggerDoAction`. Those
+results are indices into the action table of slot `0x844`, whose records are **not** converted
+yet, so a screen that runs an action still reads big-endian script words.
+
+The vtable slots hold build-time addresses (`0x804EE9D0`, ...). For states, nodes and the start
+node the boot code stores the real vtable; nothing stores one in a transition and no code calls
+through it. All are typed as plain words.
+
+Left as they are, because no decompiled function reads them: machine `+0x58`-`+0x6F`; definition
+`+0x08`, `+0x14`, `+0x18`, `+0x24`, `+0x28` (sizes next to the three arrays) and everything behind
+`+0x44`; state `+0x24`, `+0x28`; transition `+0x18`, `+0x1C`.
+
+### UI root, fonts and the objects of slots `0xDB4`-`0xDBC`
+
+Only fields with a reader in the code are converted.
+
+| Object | Converted | Left (no reader) |
+|---|---|---|
+| UI root (`0xDB0`, `gScreenSets`, 0x98 bytes) | three font pointers at `+0x14` (`ScreenSetsInit`, `fn_8018C9DC`), 19 floats at `+0x20` (a 3x4 matrix and seven more, `fn_8018CE64`), the run-time words `+0x6C`-`+0x90`, the pointer at `+0x10` (holds the fill word) | `+0x00` (1), `+0x04`-`+0x0C` (pointers to the objects of `0xDB8`, `0xDB4`, `0xDBC`) |
+| font (0xD0 bytes): `converted_rf`, `MSA_Title_rf`, `strongman_fo...` | the font object pointer at `+0xCC` | `+0x00` (1); the name at `+0x04` is text |
+| font object, kind 1 (0x128 bytes, right behind the font) | vtable slot, kind, font data pointer (`+0x08`), page texture pointers from `+0x24`, page count at `+0x124` | - |
+| font object, kind 0 (0xC bytes; none in the file) | vtable slot, kind, pointer at `+0x08` | - |
+| `0xDB4` (`lbl_805FB660`, 0xC bytes) | two font object pointers (`fn_80196D0C`, `fn_80196E7C`) and the font object they name | `+0x00` (1) |
+| `0xDB8` (`lbl_805FB658`, 0x408 bytes) | `+0x04` (`UiInit` stores `gCamera`), pointer to the `0xDB4` object (`fn_8019578C`), counters at `+0x40` and `+0x404` | `+0x00` (1), texture pointer at `+0x0C` |
+| `0xDBC` (`lbl_805FB670`, 0x20 bytes) | five words from `+0x04` (button state, `fn_801982A8`), two floats (`fn_801981FC`) | `+0x00` (1) |
+
+`ScreenSetsInit` (0x8018C8F4) stores the vtable for the kind word in each font object the root
+names, so the build-time address in the file is not used. The font object of slot `0xDB4` gets
+no vtable from any code found so far; on the Wii it keeps the build-time address.
+
 ### Not converted yet
 
 | Slot | Image offset | What is known | Why not |
 |---|---|---|---|
-| `0xD98`, `0xD9C` | `0xD77B0`, `0xD7820` | Screen list and HUD. A 0x70-byte object `{target, s32 current (-1), ...}`; the HUD holds up to 256 pointers to such objects from `+0x28`, count at `+0x428`. A target (`0xD4200`) has an array of 0x30-byte entries (`+0`, count `+4`), a pointer array of typed nodes (`+0x10`, count `+0x1C`, type 0-4 at node `+8`) and a key at `+0x30`; `fn_801BC5F0` installs vtables in all of them at boot | the entry and node layouts are not worked out yet (10 of the 20 functions in their vtables are decompiled) |
-| `0xDB0` | `0x26560` | UI root (`gScreenSets`): pointers to the objects below and to three more objects (`+0x14`-`+0x1C`; `ScreenSetsInit` installs a vtable in the sub-object at `+0xCC` of each, by the kind word at its `+4`) | those objects are not typed |
-| `0xDB4`, `0xDB8`, `0xDBC` | `0x26600`, `0x37660`, `0x38000` | kept in `lbl_805FB660`, `lbl_805FB658` (the object `fn_80195A58` draws through), `lbl_805FB670` | no field typed by code beyond `+4` of `0xDB8` |
+| font data (font object `+0x08`) | `0x26740`, `0x38220`, `0x390E0`, `0x626C0` | glyph tables; `fn_8018979C` measures text with them, `fn_801971F0` (709 instructions) draws, `fn_801894F4` / `fn_801894B8` prepare a font loaded from a file | those functions are not decompiled; nothing on the boot path reads the data |
+| `0x844` records | `0xDD000`-`0xF5D30` | script words (`0x17FC0001`, ...) run by `TriggerDoAction`; every screen action ends here | format not decoded |
 | `0xDC0` | `0xF6CF0` | a table of screen names (`UI_MSA_newscreen`, ...) with ids and hashes | no decompiled function reads the slot |
 | `0x10`, `0x418`, `0x830`, `0x83C` | `0xF7580`, `0xF81D0`, `0xFDE20`, `0x100650` | effect data (`lightning_scrying`, `trail_plant`) | no decompiled function reads the slots |
 
-Until these are converted the UI cannot run from this file on PC. The same screen format is
-expected in `shared_ui.sir`, so it is the next thing to type.
+With this the boot runs through `UiInit` (`ScreenSetsInit`, `ScreenMgrLoad`, `HudInit`,
+`HudReset`). The screen format of `shared_ui.sir` (title screen) is expected to be the same; see
+"Next".
 
 ## Found on the way
 
@@ -342,10 +416,14 @@ expected in `shared_ui.sir`, so it is the next thing to type.
 
 In the order the boot path needs them:
 
-1. **UI data**: the screen list and HUD of `global_binary.sir` (`0xD98`, `0xD9C`), the UI root
-   and fonts (`0xDB0`-`0xDC0`), and **`shared_ui.sir`** (title screen), which should use the
-   same screen format. Needs the node types that `fn_801BC5F0` switches on.
-2. **Action records** (`0x844`'s targets) and the effect data at `0x10`, `0x418`, `0x830`, `0x83C`.
-   Then **`shared_texture.sir`**: the texture header schema here should apply as it is.
-3. **Save files**: written from memory by the Wii build, so big-endian too.
-4. **`shared_parts.sir`** and the level and arena files: models, skeletons, textures.
+1. **Action records** (`0x844`'s targets): every screen's enter, update and exit action runs one,
+   so the first `HudUpdateScreens` needs them. Then the **font glyph data** (first text drawn).
+2. **`shared_ui.sir`** (title screen). `FixupFSMPoolCallback` (0x8010CCB0) and `HudReload` call
+   the same `fn_801BC574` on machines from other files, so the state-machine schemas here should
+   apply as they are; what is missing is how those files name their machines (the section type
+   and the pool the callback walks), a relocation range per file, and the widget data the
+   screens draw, which `global_binary.sir` does not have.
+3. The effect data at `0x10`, `0x418`, `0x830`, `0x83C`, and **`shared_texture.sir`**: the texture
+   header schema here should apply as it is.
+4. **Save files**: written from memory by the Wii build, so big-endian too.
+5. **`shared_parts.sir`** and the level and arena files: models, skeletons, textures.

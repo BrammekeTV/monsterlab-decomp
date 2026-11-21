@@ -69,7 +69,7 @@ void PortFileRead(const char* path, u32 offset, u8* dst, u32 len) {
         sEntryCount = cat.entryCount;
         sFileCount = cat.fileCount;
         sConverted++;
-        char line[96];
+        static char line[96];   // the milestone list keeps the pointer
         snprintf(line, sizeof(line), "catalog.sir converted: %u sections in %u files", sEntryCount, sFileCount);
         PortMilestone(line);
         return;
@@ -91,7 +91,7 @@ void PortFileRead(const char* path, u32 offset, u8* dst, u32 len) {
             SirError err = GlobalBinaryConvert(&reloc, sGlobalHdr, dst, e->size, &failTable);
             if (err != SIR_OK) PortStop(8, "global_binary.sir: %s (table %d)", SirErrorText(err), failTable);
             sConverted++;
-            char line[128];
+            static char line[128];   // the milestone list keeps the pointer
             snprintf(line, sizeof(line), "global_binary.sir converted: %u pointers, %u fields", reloc.ptrImage, reloc.fieldsSwapped);
             PortMilestone(line);
             return;

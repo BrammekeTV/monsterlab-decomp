@@ -195,6 +195,8 @@ extern "C" const char* SirErrorText(SirError e) {
     case SIR_ERR_TEXTURE:        return "texture list not recognised (links, header or data outside the image)";
     case SIR_ERR_STRINGS:        return "string table array or a string outside the image";
     case SIR_ERR_ACTIONS:        return "action table array or a record outside the image";
+    case SIR_ERR_UI:             return "UI root, font or UI object not recognised (pointer outside the image, font kind or page count)";
+    case SIR_ERR_SCREENS:        return "screen state machine not recognised (count, node type or pointer outside the image)";
     case SIR_ERR_OVERLAP:        return "two objects of the image share bytes";
     case SIR_ERR_IO:             return "cannot read file";
     }
@@ -347,7 +349,10 @@ extern "C" SirError GameDbConvert(SirReloc* r, u8* image, u32 imageSize, u32 dbW
 
 enum RegionKind {
     REGION_INPUT_TABLE, REGION_INPUT_STEP, REGION_TEXTURE_LIST, REGION_TEXTURE, REGION_STRING_TABLE,
-    REGION_ACTION_TABLE, REGION_PTR_ARRAY
+    REGION_ACTION_TABLE, REGION_PTR_ARRAY, REGION_U32_ARRAY,
+    REGION_UI_ROOT, REGION_UI_FONT, REGION_UI_FONT_OBJ, REGION_UI_FONT_LIST, REGION_UI_DRAW, REGION_UI_PAD,
+    REGION_FSM, REGION_FSM_DEF, REGION_FSM_STATES, REGION_FSM_EVENTS, REGION_FSM_SHARED_EVENTS, REGION_FSM_NODE,
+    REGION_FSM_TRANSITION, REGION_FSM_SHARED_TRANSITION, REGION_HUD
 };
 
 struct Region {
@@ -357,20 +362,68 @@ struct Region {
 };
 
 #define TEXTURE_MAX 4096
-#define REGION_MAX  ((INPUT_SEQ_FIXED + INPUT_SEQ_MAX) * INPUT_SEQ_STEPS + TEXTURE_MAX + 16)
+#define REGION_MAX  (1u << 20)   // 12 MB of plan: far more than any image of this kind needs
 
+// The list of objects found by the checks. It grows on the C heap and is freed when the
+// conversion is done (or refused).
 struct ImagePlan {
-    Region regions[REGION_MAX];
-    u32    count;
+    Region* regions;
+    u32     count;
+    u32     capacity;
 };
-static ImagePlan sPlan;   // 70 KB: too big for the stack of a game thread
 
 static bool PlanAdd(ImagePlan* plan, u32 off, u32 size, u8 kind) {
-    if (plan->count >= REGION_MAX) return false;
+    if (plan->count == plan->capacity) {
+        u32 cap = plan->capacity ? plan->capacity * 2 : 1024;
+        if (cap > REGION_MAX) return false;
+        Region* grown = (Region*)realloc(plan->regions, (size_t)cap * sizeof(Region));
+        if (grown == NULL) return false;
+        plan->regions = grown;
+        plan->capacity = cap;
+    }
     Region* g = &plan->regions[plan->count++];
     g->off = off;
     g->size = size;
     g->kind = kind;
+    return true;
+}
+
+static void PlanFree(ImagePlan* plan) {
+    free(plan->regions);
+    plan->regions = NULL;
+    plan->count = plan->capacity = 0;
+}
+
+// True when an object of this kind at `off` is already in the plan (objects that several others
+// point to are walked once).
+static bool PlanHas(const ImagePlan* plan, u32 off, u8 kind) {
+    for (u32 i = 0; i < plan->count; i++)
+        if (plan->regions[i].off == off && plan->regions[i].kind == kind) return true;
+    return false;
+}
+
+static int RegionCompare(const void* a, const void* b) {
+    const Region* ra = (const Region*)a;
+    const Region* rb = (const Region*)b;
+    if (ra->off != rb->off) return ra->off < rb->off ? -1 : 1;
+    if (ra->size != rb->size) return ra->size < rb->size ? -1 : 1;
+    return (int)ra->kind - (int)rb->kind;
+}
+
+// Sorts the plan, drops an object that was found more than once (same place, size and kind) and
+// reports whether any two of the others share bytes.
+static bool PlanFinish(ImagePlan* plan) {
+    if (plan->count == 0) return true;
+    qsort(plan->regions, plan->count, sizeof(Region), RegionCompare);
+    u32 n = 1;
+    for (u32 i = 1; i < plan->count; i++) {
+        const Region* prev = &plan->regions[n - 1];
+        const Region* g = &plan->regions[i];
+        if (g->off == prev->off && g->size == prev->size && g->kind == prev->kind) continue;
+        if (g->off < prev->off + prev->size) return false;   // the ones kept so far are disjoint, so the last one ends last
+        plan->regions[n++] = *g;
+    }
+    plan->count = n;
     return true;
 }
 
@@ -578,10 +631,395 @@ static SirError PtrArrayPlan(ImagePlan* plan, const u8* image, u32 imageSize, u3
     return SIR_OK;
 }
 
+// ---- UI root, fonts and the UI objects next to it (header slots 0xDB0-0xDBC)
+
+// UI root (gScreenSets). The words at +0x00 (1) and +0x04-+0x0C (pointers to the objects of slots
+// 0xDB8, 0xDB4 and 0xDBC) have no reader in the code and are left as they are.
+static const SirField kUiRootFields[] = {
+    { 0x10, SIR_U32, 1 },     // code: fn_801A0200 and fn_801A270C read a pointer here; the file has the fill word
+    { 0x14, SIR_PTR, UI_ROOT_FONTS },   // code: ScreenSetsInit, fn_8018C9DC (font n is root[0x14 + (n - 1) * 4])
+    { 0x20, SIR_F32, 19 },    // code: fn_8018CE64 writes, fn_801A31BC and fn_801A9174 read (+0x20..+0x68)
+    { 0x6C, SIR_U32, 5 },     // code: fn_8019CF58 (+0x6C), fn_80198438 (+0x70, +0x74), ScreenSetsActivate (+0x78, +0x7C)
+    // 0x80: u8 (ScreenSetsActivate, fn_8018CA38)
+    { 0x84, SIR_U32, 4 },     // code: ScreenSetsCurrent (+0x84), fn_8018CF1C (+0x84..+0x90), UiInit clears them
+    // 0x94: u8 (fn_80199684)
+};
+
+// Font: the root's three objects. Only +0xCC is read (fn_8018C9DC, ScreenSetsInit); the name at
+// +0x04 is text.
+static const SirField kUiFontFields[] = {
+    { 0xCC, SIR_PTR, 1 },
+};
+
+// Font object (what +0xCC points at; also the object of slot 0xDB4). The kind word picks the
+// class: ScreenSetsInit stores the vtable for it at +0x00, so the address the file has there is
+// not used. Kind 1 (fn_801970D4, 0x128 bytes): font data at +0x08 (fn_80197D98, fn_80197EC4),
+// page textures from +0x24 and their number at +0x124 (fn_80197118, fn_80198014). Kind 0
+// (fn_80196E98, 0xC bytes): a pointer at +0x08.
+static const SirField kUiFontObjFields[] = {
+    { 0x00, SIR_U32, 2 },     // build-time vtable address; code: kind
+    { 0x08, SIR_PTR, 1 },
+};
+static const SirField kUiFontObjPages[] = {
+    { 0x124, SIR_U32, 1 },
+};
+
+// Object of slot 0xDB4 (lbl_805FB660): fn_80196D0C falls back to the font object at +0x04,
+// fn_80196E7C copies +0x04 to +0x08 or stores another font object there.
+static const SirField kUiFontListFields[] = {
+    { 0x04, SIR_PTR, 2 },
+};
+
+// Object of slot 0xDB8 (lbl_805FB658). +0x00 (1) and the texture pointer at +0x0C have no reader.
+static const SirField kUiDrawFields[] = {
+    { 0x04, SIR_U32, 1 },     // code: UiInit stores gCamera here at boot (the file has a build-time address)
+    { 0x08, SIR_PTR, 1 },     // code: fn_8019578C
+    { 0x40, SIR_U32, 1 },     // code: fn_80196678, fn_80196B10, fn_80196B24
+    { 0x404, SIR_U32, 1 },    // code: fn_80196B4C, fn_80196C88, fn_80196C9C
+};
+
+// Object of slot 0xDBC (lbl_805FB670). +0x00 (1) has no reader.
+static const SirField kUiPadFields[] = {
+    { 0x04, SIR_U32, 5 },     // code: fn_80198350 (+0x04), fn_801982A8 (+0x08..+0x10), fn_801982E4 (+0x14)
+    { 0x18, SIR_F32, 2 },     // code: fn_801981FC
+};
+
+// NULL or a pointer into the image.
+static bool ImagePtrOk(u32 addr, u32 imageSize) {
+    u32 off;
+    return addr == 0 || ImageSpan(addr, 1, imageSize, &off);
+}
+
+static SirError UiFontObjPlan(ImagePlan* plan, const u8* image, u32 imageSize, u32 addr) {
+    u32 off;
+    if (!ImageSpan(addr, UI_FONT_OBJ_SIZE_KIND0, imageSize, &off)) return SIR_ERR_UI;
+    u32 kind = Be32(image + off + 0x04);
+    if (!ImagePtrOk(Be32(image + off + 0x08), imageSize)) return SIR_ERR_UI;
+    if (kind == UI_FONT_KIND_0) return PlanAdd(plan, off, UI_FONT_OBJ_SIZE_KIND0, REGION_UI_FONT_OBJ) ? SIR_OK : SIR_ERR_UI;
+    if (kind != UI_FONT_KIND_1 || !ImageSpan(addr, UI_FONT_OBJ_SIZE_KIND1, imageSize, &off)) return SIR_ERR_UI;
+    u32 pages = Be32(image + off + 0x124);
+    if (pages > UI_FONT_PAGES) return SIR_ERR_UI;
+    for (u32 i = 0; i < pages; i++)
+        if (!ImagePtrOk(Be32(image + off + 0x24 + i * 4), imageSize)) return SIR_ERR_UI;
+    return PlanAdd(plan, off, UI_FONT_OBJ_SIZE_KIND1, REGION_UI_FONT_OBJ) ? SIR_OK : SIR_ERR_UI;
+}
+
+static void UiFontObjConvert(SirReloc* r, u8* obj, u32 size) {
+    if (size == UI_FONT_OBJ_SIZE_KIND1) {
+        u32 pages = Be32(obj + 0x124);
+        for (u32 i = 0; i < pages; i++) ConvertPtr(r, obj + 0x24 + i * 4);
+        SirConvertRecord(r, obj, size, kUiFontObjPages, COUNTOF(kUiFontObjPages));
+    }
+    SirConvertRecord(r, obj, size, kUiFontObjFields, COUNTOF(kUiFontObjFields));
+}
+
+static SirError UiRootPlan(ImagePlan* plan, const u8* image, u32 imageSize, u32 addr) {
+    u32 off;
+    if (!ImageSpan(addr, UI_ROOT_SIZE, imageSize, &off) || !PlanAdd(plan, off, UI_ROOT_SIZE, REGION_UI_ROOT)) return SIR_ERR_UI;
+    for (u32 i = 0; i < UI_ROOT_FONTS; i++) {
+        u32 font = Be32(image + off + 0x14 + i * 4), fontOff;
+        if (font == 0) continue;
+        if (!ImageSpan(font, UI_FONT_SIZE, imageSize, &fontOff)) return SIR_ERR_UI;
+        if (PlanHas(plan, fontOff, REGION_UI_FONT)) continue;
+        if (!PlanAdd(plan, fontOff, UI_FONT_SIZE, REGION_UI_FONT)) return SIR_ERR_UI;
+        u32 obj = Be32(image + fontOff + 0xCC);
+        if (obj == 0) continue;
+        SirError e = UiFontObjPlan(plan, image, imageSize, obj);
+        if (e != SIR_OK) return e;
+    }
+    return SIR_OK;
+}
+
+static SirError UiFontListPlan(ImagePlan* plan, const u8* image, u32 imageSize, u32 addr) {
+    u32 off;
+    if (!ImageSpan(addr, UI_FONT_LIST_SIZE, imageSize, &off) || !PlanAdd(plan, off, UI_FONT_LIST_SIZE, REGION_UI_FONT_LIST)) return SIR_ERR_UI;
+    for (u32 i = 0; i < 2; i++) {
+        u32 obj = Be32(image + off + 0x04 + i * 4);
+        if (obj == 0) continue;
+        SirError e = UiFontObjPlan(plan, image, imageSize, obj);
+        if (e != SIR_OK) return e;
+    }
+    return SIR_OK;
+}
+
+static SirError UiDrawPlan(ImagePlan* plan, const u8* image, u32 imageSize, u32 addr) {
+    u32 off;
+    if (!ImageSpan(addr, UI_DRAW_SIZE, imageSize, &off) || !ImagePtrOk(Be32(image + off + 0x08), imageSize)) return SIR_ERR_UI;
+    return PlanAdd(plan, off, UI_DRAW_SIZE, REGION_UI_DRAW) ? SIR_OK : SIR_ERR_UI;
+}
+
+static SirError UiPadPlan(ImagePlan* plan, u32 imageSize, u32 addr) {
+    u32 off;
+    if (!ImageSpan(addr, UI_PAD_SIZE, imageSize, &off)) return SIR_ERR_UI;
+    return PlanAdd(plan, off, UI_PAD_SIZE, REGION_UI_PAD) ? SIR_OK : SIR_ERR_UI;
+}
+
+// ---- screen state machines (header slots 0xD98 and 0xD9C)
+//
+// A state machine (0x70 bytes in the file) points at its definition and keeps the run-time state.
+// HudUpdateScreens (0x801BB5BC) steps it; fn_801BB478 resets it.
+static const SirField kFsmFields[] = {
+    { 0x00, SIR_PTR, 1 },     // code: definition
+    { 0x04, SIR_U32, 3 },     // code: s32 current, previous and pending state (-1)
+    { 0x10, SIR_PTR, 1 },     // code: owner, handed to TriggerDoAction (fn_801BBE40)
+    { 0x14, SIR_U32, 6 },     // code: event arguments (+0x14, +0x18: fn_801BBB68), +0x1C, +0x20 (fn_801BBF24),
+                              //       +0x24 (RequestComplete), flags +0x28
+    { 0x2C, SIR_F32, 10 },    // code: fn_801BB478 (+0x2C..+0x48), timer +0x4C, fn_801BBFD0 (+0x50)
+    { 0x54, SIR_PTR, 1 },     // code: value table {u32 count, u32 value[count]} (fn_801BBE40)
+};
+// +0x58, +0x5C (0) and +0x60 (-1) have no reader in the decompiled code and are left.
+
+// Definition. fn_801BC5F0 walks the states and nodes; fn_801BC6F0 the shared events. The words
+// at +0x08, +0x14, +0x18, +0x24, +0x28 (sizes next to the three arrays) and everything behind
+// the byte at +0x44 have no reader and are left.
+static const SirField kFsmDefFields[] = {
+    { 0x00, SIR_PTR, 1 },     // code: states (0x30 bytes each)
+    { 0x04, SIR_U32, 1 },     // code: s32 state count
+    { 0x0C, SIR_PTR, 1 },     // code: fn_801BBE40 copies it to gStringTable2 (0 in every definition)
+    { 0x10, SIR_PTR, 1 },     // code: node pointers
+    { 0x1C, SIR_U32, 1 },     // code: s32 node count
+    { 0x20, SIR_PTR, 1 },     // code: shared events (0xC bytes each)
+    { 0x2C, SIR_U32, 1 },     // code: s32 shared event count
+    { 0x30, SIR_U32, 1 },     // code: key (fn_8001B044)
+    { 0x34, SIR_U32, 3 },     // the start node, a node of type 2: build-time vtable address (fn_801BC574 stores the
+                              // real one), key, type (fn_801BBC9C reads the type of a transition's target)
+    { 0x40, SIR_PTR, 1 },     // code: its transition (fn_801BC790)
+    // 0x44: u8 (fn_801BB530, fn_801BB57C)
+};
+
+// State (0x30 bytes). +0x24 and +0x28 have no reader.
+static const SirField kFsmStateFields[] = {
+    { 0x00, SIR_U32, 3 },     // build-time vtable address (fn_801BC5F0 stores the real one); code: key, type (1)
+    { 0x0C, SIR_U32, 3 },     // code: action words: enter (fn_801BBFD0), update (fn_801BC098), exit (fn_801BC12C)
+    { 0x18, SIR_F32, 1 },     // code: time-out, copied to the machine's timer on enter (fn_801BBFD0)
+    { 0x1C, SIR_U32, 1 },     // code: flags (HudUpdateScreens)
+    { 0x20, SIR_PTR, 1 },     // code: events (fn_801BC1C0, fn_801BB8A0)
+    { 0x2C, SIR_U32, 1 },     // code: s32 event count
+};
+// Event of a state (fn_801BB8A0): id, condition word, transition.
+static const SirField kFsmEventFields[] = {
+    { 0x00, SIR_U32, 2 }, { 0x08, SIR_PTR, 1 },
+};
+// Shared event of a definition (fn_801BC6F0, fn_801BB8A0): id, transition, condition word.
+static const SirField kFsmSharedEventFields[] = {
+    { 0x00, SIR_U32, 1 }, { 0x04, SIR_PTR, 1 }, { 0x08, SIR_U32, 1 },
+};
+
+// Node (0x30 bytes), by the type word at +0x08. fn_801BC5F0 stores the vtable for the type.
+static const SirField kFsmNodeHead[] = {
+    { 0x00, SIR_U32, 3 },     // build-time vtable address; code: key (fn_801BC4C4), type
+};
+static const SirField kFsmNodeType2[] = {
+    { 0x0C, SIR_PTR, 1 },     // code: transition (fn_801BC790)
+};
+static const SirField kFsmNodeType3[] = {
+    { 0x0C, SIR_U32, 1 },     // code: action word (fn_801BBF24)
+    { 0x10, SIR_PTR, 1 },     // code: transition (fn_801BBFC8)
+    { 0x14, SIR_U32, 2 },     // code: fn_801BBF24 copies them to the machine's +0x1C and +0x20
+};
+static const SirField kFsmNodeType4[] = {
+    { 0x0C, SIR_U32, 1 },     // code: action word; its result picks the transition (fn_801BC20C)
+    { 0x10, SIR_PTR, 1 },     // code: transition pointers (fn_801BC2B8)
+    { 0x14, SIR_U32, 1 },     // code: s32 transition count
+    { 0x1C, SIR_U32, 2 },     // code: result, last choice
+};
+
+// Transition (0x20 bytes; +0x18 and +0x1C have no reader in this class).
+static const SirField kFsmTransitionFields[] = {
+    { 0x00, SIR_U32, 1 },     // build-time vtable address; nothing stores a vtable here and no code calls through it
+    { 0x04, SIR_PTR, 1 },     // code: target state or node (fn_801BBC9C)
+    { 0x08, SIR_U32, 2 },     // code: condition word (fn_801BC41C), action word (fn_801BC350)
+    { 0x10, SIR_U32, 2 },     // code: +0x10 (fn_801BBC9C), +0x14 (fn_801BC350)
+};
+// Transition of a shared event (0x30 bytes): the same, then the states it does or does not apply to.
+static const SirField kFsmSharedTransitionFields[] = {
+    { 0x00, SIR_U32, 1 },
+    { 0x04, SIR_PTR, 1 },
+    { 0x08, SIR_U32, 2 },
+    { 0x10, SIR_U32, 2 },
+    { 0x18, SIR_U32, 1 },     // code: bit 0: the list names the states it does not apply to (fn_801BC4C4)
+    { 0x1C, SIR_PTR, 1 },     // code: state keys
+    { 0x20, SIR_U32, 1 },     // code: s32 key count
+};
+
+// HUD (header slot 0xD9C): the state machines of the game's screens.
+static const SirField kHudFields[] = {
+    { 0x00, SIR_U32, 1 },     // code: s32 depth of the stack below (fn_8001B128; HudInit clears it)
+    { 0x04, SIR_PTR, 8 },     // code: stack of state machines (fn_8001B128)
+    { 0x24, SIR_U32, 1 },     // code: HudInit stores the address of the screen-list slot (the file has a build-time address)
+    { 0x28, SIR_PTR, HUD_MACHINES },   // code: HudReset, fn_8001B044
+    { 0x428, SIR_U32, 1 },    // code: machine count
+    { 0x42C, SIR_PTR, 1 },    // code: HudShowConversation
+    // 0x430: u8 (UiUpdate)
+};
+
+static SirError FsmTransitionPlan(ImagePlan* plan, const u8* image, u32 imageSize, u32 addr, bool shared) {
+    u32 off, size = shared ? FSM_SHARED_TRANSITION_USED : FSM_TRANSITION_USED;
+    if (!ImageSpan(addr, size, imageSize, &off) || !ImagePtrOk(Be32(image + off + 0x04), imageSize)) return SIR_ERR_SCREENS;
+    if (shared) {
+        u32 keys = Be32(image + off + 0x20), keysOff;
+        if (keys != 0) {
+            if (!ImageSpan(Be32(image + off + 0x1C), (u64)keys * 4, imageSize, &keysOff) ||
+                !PlanAdd(plan, keysOff, keys * 4, REGION_U32_ARRAY)) return SIR_ERR_SCREENS;
+        } else if (!ImagePtrOk(Be32(image + off + 0x1C), imageSize)) {
+            return SIR_ERR_SCREENS;
+        }
+    }
+    return PlanAdd(plan, off, size, shared ? REGION_FSM_SHARED_TRANSITION : REGION_FSM_TRANSITION) ? SIR_OK : SIR_ERR_SCREENS;
+}
+
+// A NULL transition is accepted (the plan has nothing to convert for it).
+static SirError FsmTransitionPlanOpt(ImagePlan* plan, const u8* image, u32 imageSize, u32 addr, bool shared) {
+    return addr == 0 ? SIR_OK : FsmTransitionPlan(plan, image, imageSize, addr, shared);
+}
+
+static SirError FsmNodePlan(ImagePlan* plan, const u8* image, u32 imageSize, u32 addr) {
+    u32 off;
+    if (!ImageSpan(addr, FSM_NODE_SIZE, imageSize, &off)) return SIR_ERR_SCREENS;
+    const u8* node = image + off;
+    SirError e = SIR_OK;
+    switch (Be32(node + 0x08)) {
+    case FSM_NODE_PLAIN:
+        break;
+    case FSM_NODE_START:
+        e = FsmTransitionPlanOpt(plan, image, imageSize, Be32(node + 0x0C), false);
+        break;
+    case FSM_NODE_ACTION:
+        e = FsmTransitionPlanOpt(plan, image, imageSize, Be32(node + 0x10), false);
+        break;
+    case FSM_NODE_CHOICE: {
+        u32 count = Be32(node + 0x14), arrayOff;
+        if (count == 0) {
+            if (!ImagePtrOk(Be32(node + 0x10), imageSize)) return SIR_ERR_SCREENS;
+            break;
+        }
+        if (!ImageSpan(Be32(node + 0x10), (u64)count * 4, imageSize, &arrayOff) ||
+            !PlanAdd(plan, arrayOff, count * 4, REGION_PTR_ARRAY)) return SIR_ERR_SCREENS;
+        for (u32 i = 0; i < count && e == SIR_OK; i++)
+            e = FsmTransitionPlanOpt(plan, image, imageSize, Be32(image + arrayOff + i * 4), false);
+        break;
+    }
+    default:
+        return SIR_ERR_SCREENS;   // fn_801BC5F0 has no class for it (states, type 1, are not in the node array)
+    }
+    if (e != SIR_OK) return e;
+    return PlanAdd(plan, off, FSM_NODE_SIZE, REGION_FSM_NODE) ? SIR_OK : SIR_ERR_SCREENS;
+}
+
+static void FsmNodeConvert(SirReloc* r, u8* node) {
+    switch (Be32(node + 0x08)) {
+    case FSM_NODE_START:  SirConvertRecord(r, node, FSM_NODE_SIZE, kFsmNodeType2, COUNTOF(kFsmNodeType2)); break;
+    case FSM_NODE_ACTION: SirConvertRecord(r, node, FSM_NODE_SIZE, kFsmNodeType3, COUNTOF(kFsmNodeType3)); break;
+    case FSM_NODE_CHOICE: SirConvertRecord(r, node, FSM_NODE_SIZE, kFsmNodeType4, COUNTOF(kFsmNodeType4)); break;
+    }
+    SirConvertRecord(r, node, FSM_NODE_SIZE, kFsmNodeHead, COUNTOF(kFsmNodeHead));
+}
+
+static SirError FsmDefPlan(ImagePlan* plan, const u8* image, u32 imageSize, u32 addr) {
+    u32 off;
+    if (!ImageSpan(addr, FSM_DEF_USED, imageSize, &off)) return SIR_ERR_SCREENS;
+    if (PlanHas(plan, off, REGION_FSM_DEF)) return SIR_OK;
+    if (!PlanAdd(plan, off, FSM_DEF_USED, REGION_FSM_DEF)) return SIR_ERR_SCREENS;
+    const u8* def = image + off;
+    SirError e;
+
+    u32 states = Be32(def + 0x04), statesOff;
+    if (states != 0) {
+        if (!ImageSpan(Be32(def + 0x00), (u64)states * FSM_STATE_SIZE, imageSize, &statesOff) ||
+            !PlanAdd(plan, statesOff, states * FSM_STATE_SIZE, REGION_FSM_STATES)) return SIR_ERR_SCREENS;
+        for (u32 i = 0; i < states; i++) {
+            const u8* state = image + statesOff + i * FSM_STATE_SIZE;
+            u32 events = Be32(state + 0x2C), eventsOff;
+            if (events == 0) {
+                if (!ImagePtrOk(Be32(state + 0x20), imageSize)) return SIR_ERR_SCREENS;
+                continue;
+            }
+            if (!ImageSpan(Be32(state + 0x20), (u64)events * FSM_EVENT_SIZE, imageSize, &eventsOff) ||
+                !PlanAdd(plan, eventsOff, events * FSM_EVENT_SIZE, REGION_FSM_EVENTS)) return SIR_ERR_SCREENS;
+            for (u32 k = 0; k < events; k++) {
+                e = FsmTransitionPlanOpt(plan, image, imageSize, Be32(image + eventsOff + k * FSM_EVENT_SIZE + 0x08), false);
+                if (e != SIR_OK) return e;
+            }
+        }
+    } else if (!ImagePtrOk(Be32(def + 0x00), imageSize)) {
+        return SIR_ERR_SCREENS;
+    }
+
+    u32 nodes = Be32(def + 0x1C), nodesOff;
+    if (nodes != 0) {
+        if (!ImageSpan(Be32(def + 0x10), (u64)nodes * 4, imageSize, &nodesOff) ||
+            !PlanAdd(plan, nodesOff, nodes * 4, REGION_PTR_ARRAY)) return SIR_ERR_SCREENS;
+        for (u32 i = 0; i < nodes; i++) {
+            e = FsmNodePlan(plan, image, imageSize, Be32(image + nodesOff + i * 4));   // fn_801BC5F0 reads every node: none may be NULL
+            if (e != SIR_OK) return e;
+        }
+    } else if (!ImagePtrOk(Be32(def + 0x10), imageSize)) {
+        return SIR_ERR_SCREENS;
+    }
+
+    u32 shared = Be32(def + 0x2C), sharedOff;
+    if (shared != 0) {
+        if (!ImageSpan(Be32(def + 0x20), (u64)shared * FSM_EVENT_SIZE, imageSize, &sharedOff) ||
+            !PlanAdd(plan, sharedOff, shared * FSM_EVENT_SIZE, REGION_FSM_SHARED_EVENTS)) return SIR_ERR_SCREENS;
+        for (u32 i = 0; i < shared; i++) {
+            e = FsmTransitionPlanOpt(plan, image, imageSize, Be32(image + sharedOff + i * FSM_EVENT_SIZE + 0x04), true);
+            if (e != SIR_OK) return e;
+        }
+    } else if (!ImagePtrOk(Be32(def + 0x20), imageSize)) {
+        return SIR_ERR_SCREENS;
+    }
+
+    if (!ImagePtrOk(Be32(def + 0x0C), imageSize)) return SIR_ERR_SCREENS;
+    return FsmTransitionPlanOpt(plan, image, imageSize, Be32(def + 0x40), false);
+}
+
+static SirError FsmPlan(ImagePlan* plan, const u8* image, u32 imageSize, u32 addr) {
+    u32 off;
+    if (!ImageSpan(addr, FSM_USED, imageSize, &off)) return SIR_ERR_SCREENS;
+    if (PlanHas(plan, off, REGION_FSM)) return SIR_OK;
+    const u8* fsm = image + off;
+    if (!ImagePtrOk(Be32(fsm + 0x10), imageSize) || !PlanAdd(plan, off, FSM_USED, REGION_FSM)) return SIR_ERR_SCREENS;
+
+    u32 values = Be32(fsm + 0x54), valuesOff;
+    if (values != 0) {
+        if (!ImageSpan(values, 4, imageSize, &valuesOff)) return SIR_ERR_SCREENS;
+        u32 count = Be32(image + valuesOff);
+        if (!ImageSpan(values, 4 + (u64)count * 4, imageSize, &valuesOff) ||
+            !PlanAdd(plan, valuesOff, 4 + count * 4, REGION_U32_ARRAY)) return SIR_ERR_SCREENS;
+    }
+    u32 def = Be32(fsm + 0x00);
+    return def == 0 ? SIR_OK : FsmDefPlan(plan, image, imageSize, def);
+}
+
+static SirError HudPlan(ImagePlan* plan, const u8* image, u32 imageSize, u32 addr) {
+    u32 off;
+    if (!ImageSpan(addr, HUD_SIZE, imageSize, &off)) return SIR_ERR_SCREENS;
+    const u8* hud = image + off;
+    u32 count = Be32(hud + 0x428);
+    if (count > HUD_MACHINES || !PlanAdd(plan, off, HUD_SIZE, REGION_HUD)) return SIR_ERR_SCREENS;
+    for (u32 i = 0; i < 8; i++)
+        if (!ImagePtrOk(Be32(hud + 0x04 + i * 4), imageSize)) return SIR_ERR_SCREENS;
+    if (!ImagePtrOk(Be32(hud + 0x42C), imageSize)) return SIR_ERR_SCREENS;
+    for (u32 i = 0; i < HUD_MACHINES; i++) {
+        u32 fsm = Be32(hud + 0x28 + i * 4);
+        if (i >= count) {   // unused slots: nothing reads them, but they are converted as pointers
+            if (!ImagePtrOk(fsm, imageSize)) return SIR_ERR_SCREENS;
+            continue;
+        }
+        if (fsm == 0) continue;
+        SirError e = FsmPlan(plan, image, imageSize, fsm);
+        if (e != SIR_OK) return e;
+    }
+    return SIR_OK;
+}
+
+static void ConvertRecords(SirReloc* r, u8* p, u32 size, u32 recSize, const SirField* fields, s32 n) {
+    for (u32 o = 0; o + recSize <= size; o += recSize) SirConvertRecord(r, p + o, recSize, fields, n);
+}
+
 // ---- all of them
 
 static SirError ImagePlanBuild(ImagePlan* plan, const u8* hdr, u8* image, u32 imageSize) {
-    plan->count = 0;
     SirError e = SIR_OK;
     u32 addr;
     if ((addr = Be32(hdr + 0xDC4)) != 0) e = InputTablePlan(plan, image, imageSize, addr);
@@ -590,15 +1028,14 @@ static SirError ImagePlanBuild(ImagePlan* plan, const u8* hdr, u8* image, u32 im
         e = PtrArrayPlan(plan, image, imageSize, addr, STRING_TABLE_SIZE, 0x0C, 0x00, REGION_STRING_TABLE, SIR_ERR_STRINGS);
     if (e == SIR_OK && (addr = Be32(hdr + 0x844)) != 0)
         e = PtrArrayPlan(plan, image, imageSize, addr, ACTION_TABLE_SIZE, 0x00, 0x04, REGION_ACTION_TABLE, SIR_ERR_ACTIONS);
+    if (e == SIR_OK && (addr = Be32(hdr + 0xDB0)) != 0) e = UiRootPlan(plan, image, imageSize, addr);
+    if (e == SIR_OK && (addr = Be32(hdr + 0xDB4)) != 0) e = UiFontListPlan(plan, image, imageSize, addr);
+    if (e == SIR_OK && (addr = Be32(hdr + 0xDB8)) != 0) e = UiDrawPlan(plan, image, imageSize, addr);
+    if (e == SIR_OK && (addr = Be32(hdr + 0xDBC)) != 0) e = UiPadPlan(plan, imageSize, addr);
+    if (e == SIR_OK && (addr = Be32(hdr + 0xD98)) != 0) e = FsmPlan(plan, image, imageSize, addr);
+    if (e == SIR_OK && (addr = Be32(hdr + 0xD9C)) != 0) e = HudPlan(plan, image, imageSize, addr);
     if (e != SIR_OK) return e;
-    for (u32 a = 0; a < plan->count; a++) {
-        const Region* ga = &plan->regions[a];
-        for (u32 b = a + 1; b < plan->count; b++) {
-            const Region* gb = &plan->regions[b];
-            if (ga->off < gb->off + gb->size && gb->off < ga->off + ga->size) return SIR_ERR_OVERLAP;
-        }
-    }
-    return SIR_OK;
+    return PlanFinish(plan) ? SIR_OK : SIR_ERR_OVERLAP;
 }
 
 static void ImagePlanConvert(const ImagePlan* plan, SirReloc* r, u8* image) {
@@ -615,6 +1052,30 @@ static void ImagePlanConvert(const ImagePlan* plan, SirReloc* r, u8* image) {
         case REGION_PTR_ARRAY:
             for (u32 k = 0; k < g->size; k += 4) ConvertPtr(r, p + k);
             break;
+        case REGION_U32_ARRAY:
+            for (u32 k = 0; k < g->size; k += 4) { Swap32(p + k); r->fieldsSwapped++; }
+            break;
+        case REGION_UI_ROOT:      SirConvertRecord(r, p, g->size, kUiRootFields, COUNTOF(kUiRootFields)); break;
+        case REGION_UI_FONT:      SirConvertRecord(r, p, g->size, kUiFontFields, COUNTOF(kUiFontFields)); break;
+        case REGION_UI_FONT_OBJ:  UiFontObjConvert(r, p, g->size); break;
+        case REGION_UI_FONT_LIST: SirConvertRecord(r, p, g->size, kUiFontListFields, COUNTOF(kUiFontListFields)); break;
+        case REGION_UI_DRAW:      SirConvertRecord(r, p, g->size, kUiDrawFields, COUNTOF(kUiDrawFields)); break;
+        case REGION_UI_PAD:       SirConvertRecord(r, p, g->size, kUiPadFields, COUNTOF(kUiPadFields)); break;
+        case REGION_FSM:          SirConvertRecord(r, p, g->size, kFsmFields, COUNTOF(kFsmFields)); break;
+        case REGION_FSM_DEF:      SirConvertRecord(r, p, g->size, kFsmDefFields, COUNTOF(kFsmDefFields)); break;
+        case REGION_FSM_STATES:   ConvertRecords(r, p, g->size, FSM_STATE_SIZE, kFsmStateFields, COUNTOF(kFsmStateFields)); break;
+        case REGION_FSM_EVENTS:   ConvertRecords(r, p, g->size, FSM_EVENT_SIZE, kFsmEventFields, COUNTOF(kFsmEventFields)); break;
+        case REGION_FSM_SHARED_EVENTS:
+            ConvertRecords(r, p, g->size, FSM_EVENT_SIZE, kFsmSharedEventFields, COUNTOF(kFsmSharedEventFields));
+            break;
+        case REGION_FSM_NODE:     FsmNodeConvert(r, p); break;
+        case REGION_FSM_TRANSITION:
+            SirConvertRecord(r, p, g->size, kFsmTransitionFields, COUNTOF(kFsmTransitionFields));
+            break;
+        case REGION_FSM_SHARED_TRANSITION:
+            SirConvertRecord(r, p, g->size, kFsmSharedTransitionFields, COUNTOF(kFsmSharedTransitionFields));
+            break;
+        case REGION_HUD:          SirConvertRecord(r, p, g->size, kHudFields, COUNTOF(kHudFields)); break;
         }
     }
 }
@@ -659,13 +1120,15 @@ extern "C" SirError GlobalBinaryConvert(SirReloc* r, u8* hdr, u8* image, u32 ima
     if (failTable != NULL) *failTable = -1;
     // Check everything before the first byte changes: the hand-typed objects here, the database
     // inside GameDbConvert.
-    SirError e = ImagePlanBuild(&sPlan, hdr, image, imageSize);
-    if (e != SIR_OK) return e;
-    u32 db = Be32(hdr + GLOBAL_BINARY_HDR_GAMEDB);
-    e = GameDbConvert(r, image, imageSize, db, failTable);
-    if (e != SIR_OK) return e;
-    ImagePlanConvert(&sPlan, r, image);
-    return GlobalBinaryConvertHeader(r, hdr);
+    ImagePlan plan = { NULL, 0, 0 };
+    SirError e = ImagePlanBuild(&plan, hdr, image, imageSize);
+    if (e == SIR_OK) e = GameDbConvert(r, image, imageSize, Be32(hdr + GLOBAL_BINARY_HDR_GAMEDB), failTable);
+    if (e == SIR_OK) {
+        ImagePlanConvert(&plan, r, image);
+        e = GlobalBinaryConvertHeader(r, hdr);
+    }
+    PlanFree(&plan);
+    return e;
 }
 
 // ------------------------------------------------------------------------------------ file helper
