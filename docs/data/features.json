@@ -99,6 +99,11 @@
  "changelog": [
   {
    "date": "2026-11-21",
+   "time": "18:27",
+   "text": "Round 59: 12 more effect-slot handlers (noise texture, spawn/fade/dissolve state machines); 26 game functions left"
+  },
+  {
+   "date": "2026-11-21",
    "time": "18:14",
    "text": "Round 58: 21 more effect-system functions (vector helpers, slot state handlers, lagged-Fibonacci seed, fade/colour table builders)"
   },

@@ -14,21 +14,21 @@ void fn_80156CD8(void);                                        // 0x80156CD8 (em
 // Per-slot state handlers called by the dispatcher (all tail calls with the arguments shifted
 // down one register: slot, state, dt, flag).
 void fn_80162D70(u8* mgr, u8* slot, s32* state, f32* dt, u32 b);   // 0x80162D70
-void fn_8016633C(u8* mgr, u8* slot, u8* state, f32* dt, u32 b);   // 0x8016633C
-void fn_8016891C(u8* mgr, u8* slot, u8* state, f32* dt, u32 b);   // 0x8016891C
+void fn_8016633C(u8* mgr, u8* slot, s32* state, f32* dt, u32 b);   // 0x8016633C
+void fn_8016891C(u8* mgr, u8* slot, s32* state, f32* dt, u32 b);   // 0x8016891C
 void fn_80166510(u8* mgr, u8* slot, s32* state, f32* dt, u32 b);   // 0x80166510
 void fn_8016835C(u8* mgr, u8* slot, s32* state, f32* dt, u32 b);   // 0x8016835C
 void fn_80163778(u8* mgr, u8* slot, s32* state, f32* dt, u32 b);   // 0x80163778
-void fn_8016811C(u8* mgr, u8* slot, u8* state, f32* dt, u32 b);   // 0x8016811C
+void fn_8016811C(u8* mgr, u8* slot, s32* state, f32* dt, u32 b);   // 0x8016811C
 void fn_80166040(u8* mgr, u8* slot, s32* state, f32* dt, u32 b);   // 0x80166040
 void fn_80163010(u8* mgr, u8* slot, s32* state, f32* dt, u32 b);   // 0x80163010
 void fn_8016344C(u8* mgr, u8* slot, s32* state, f32* dt, u32 b);   // 0x8016344C
 void fn_801691E4(u8* mgr, u8* slot, s32* state, f32* dt, u32 b);   // 0x801691E4
-void fn_80168D64(u8* mgr, u8* slot, u8* state, f32* dt, u32 b);   // 0x80168D64
+void fn_80168D64(u8* mgr, u8* slot, s32* state, f32* dt, u32 b);   // 0x80168D64
 void fn_80166EEC(u8* mgr, u8* slot, s32* state, f32* dt, u32 b);   // 0x80166EEC
-void fn_80164864(u8* mgr, u8* slot, u8* state, f32* dt, u32 b);   // 0x80164864
-void fn_80163A4C(u8* mgr, u8* slot, u8* state, f32* dt, u32 b);   // 0x80163A4C
-void fn_80165DB4(u8* mgr, u8* slot, u8* state, f32* dt, u32 b);   // 0x80165DB4
+void fn_80164864(u8* mgr, u8* slot, s32* state, f32* dt, u32 b);   // 0x80164864
+void fn_80163A4C(u8* mgr, u8* slot, s32* state, f32* dt, u32 b);   // 0x80163A4C
+void fn_80165DB4(u8* mgr, u8* slot, s32* state, f32* dt, u32 b);   // 0x80165DB4
 void fn_8016535C(u8* mgr, u8* slot, u8* state, f32* dt, u32 b);   // 0x8016535C
 void fn_80166BB4(u8* mgr, u8* slot, s32* state, f32* dt, u32 b);   // 0x80166BB4
 
@@ -51,22 +51,22 @@ void fn_8016120C(u8* mgr, s32 type, u8* slot, u8* state, f32* dt, u32 b) {
     case 0:
     case 1:
     case 2:  return fn_80162D70(mgr, slot, (s32*)state, dt, b);
-    case 3:  return fn_8016633C(mgr, slot, state, dt, b);
-    case 4:  return fn_8016891C(mgr, slot, state, dt, b);
+    case 3:  return fn_8016633C(mgr, slot, (s32*)state, dt, b);
+    case 4:  return fn_8016891C(mgr, slot, (s32*)state, dt, b);
     case 5:
     case 6:  return fn_80166510(mgr, slot, (s32*)state, dt, b);
     case 7:  return fn_8016835C(mgr, slot, (s32*)state, dt, b);
     case 8:  return fn_80163778(mgr, slot, (s32*)state, dt, b);
-    case 9:  return fn_8016811C(mgr, slot, state, dt, b);
+    case 9:  return fn_8016811C(mgr, slot, (s32*)state, dt, b);
     case 10: return fn_80166040(mgr, slot, (s32*)state, dt, b);
     case 11: return fn_80163010(mgr, slot, (s32*)state, dt, b);
     case 12: return fn_8016344C(mgr, slot, (s32*)state, dt, b);
     case 13: return fn_801691E4(mgr, slot, (s32*)state, dt, b);
-    case 14: return fn_80168D64(mgr, slot, state, dt, b);
+    case 14: return fn_80168D64(mgr, slot, (s32*)state, dt, b);
     case 15: return fn_80166EEC(mgr, slot, (s32*)state, dt, b);
-    case 16: return fn_80164864(mgr, slot, state, dt, b);
-    case 17: return fn_80163A4C(mgr, slot, state, dt, b);
-    case 18: return fn_80165DB4(mgr, slot, state, dt, b);
+    case 16: return fn_80164864(mgr, slot, (s32*)state, dt, b);
+    case 17: return fn_80163A4C(mgr, slot, (s32*)state, dt, b);
+    case 18: return fn_80165DB4(mgr, slot, (s32*)state, dt, b);
     case 19: return fn_8016535C(mgr, slot, state, dt, b);
     case 20: return fn_80166BB4(mgr, slot, (s32*)state, dt, b);
     default: return;

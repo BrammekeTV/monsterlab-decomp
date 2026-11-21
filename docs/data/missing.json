@@ -4,9 +4,9 @@
   "global": 2567,
   "unknown": 125,
   "library": 178,
-  "game": 37
+  "game": 26
  },
- "game_bytes": 17584,
+ "game_bytes": 13212,
  "duplicates": [],
  "game": [
   {
@@ -26,6 +26,16 @@
    "used_as": "_fn_801214E4",
    "addr": "801214E4",
    "size": 4,
+   "section": ".text",
+   "kind": "game"
+  },
+  {
+   "name": "fn_80156CDC",
+   "refs": 2,
+   "files": 2,
+   "used_as": "_fn_80156CDC",
+   "addr": "80156CDC",
+   "size": 608,
    "section": ".text",
    "kind": "game"
   },
@@ -90,66 +100,6 @@
    "kind": "game"
   },
   {
-   "name": "fn_80156CDC",
-   "refs": 1,
-   "files": 1,
-   "used_as": "_fn_80156CDC",
-   "addr": "80156CDC",
-   "size": 608,
-   "section": ".text",
-   "kind": "game"
-  },
-  {
-   "name": "fn_801630F0",
-   "refs": 1,
-   "files": 1,
-   "used_as": "_fn_801630F0",
-   "addr": "801630F0",
-   "size": 808,
-   "section": ".text",
-   "kind": "game"
-  },
-  {
-   "name": "fn_80163514",
-   "refs": 1,
-   "files": 1,
-   "used_as": "_fn_80163514",
-   "addr": "80163514",
-   "size": 572,
-   "section": ".text",
-   "kind": "game"
-  },
-  {
-   "name": "fn_80163A4C",
-   "refs": 1,
-   "files": 1,
-   "used_as": "_fn_80163A4C",
-   "addr": "80163A4C",
-   "size": 532,
-   "section": ".text",
-   "kind": "game"
-  },
-  {
-   "name": "fn_801646E8",
-   "refs": 1,
-   "files": 1,
-   "used_as": "_fn_801646E8",
-   "addr": "801646E8",
-   "size": 308,
-   "section": ".text",
-   "kind": "game"
-  },
-  {
-   "name": "fn_80164864",
-   "refs": 1,
-   "files": 1,
-   "used_as": "_fn_80164864",
-   "addr": "80164864",
-   "size": 336,
-   "section": ".text",
-   "kind": "game"
-  },
-  {
    "name": "fn_8016535C",
    "refs": 1,
    "files": 1,
@@ -160,42 +110,12 @@
    "kind": "game"
   },
   {
-   "name": "fn_8016578C",
+   "name": "fn_8016599C",
    "refs": 1,
    "files": 1,
-   "used_as": "_fn_8016578C",
-   "addr": "8016578C",
-   "size": 528,
-   "section": ".text",
-   "kind": "game"
-  },
-  {
-   "name": "fn_80165DB4",
-   "refs": 1,
-   "files": 1,
-   "used_as": "_fn_80165DB4",
-   "addr": "80165DB4",
-   "size": 316,
-   "section": ".text",
-   "kind": "game"
-  },
-  {
-   "name": "fn_80166114",
-   "refs": 1,
-   "files": 1,
-   "used_as": "_fn_80166114",
-   "addr": "80166114",
-   "size": 512,
-   "section": ".text",
-   "kind": "game"
-  },
-  {
-   "name": "fn_8016633C",
-   "refs": 1,
-   "files": 1,
-   "used_as": "_fn_8016633C",
-   "addr": "8016633C",
-   "size": 300,
+   "used_as": "_fn_8016599C",
+   "addr": "8016599C",
+   "size": 980,
    "section": ".text",
    "kind": "game"
   },
@@ -220,16 +140,6 @@
    "kind": "game"
   },
   {
-   "name": "fn_8016811C",
-   "refs": 1,
-   "files": 1,
-   "used_as": "_fn_8016811C",
-   "addr": "8016811C",
-   "size": 560,
-   "section": ".text",
-   "kind": "game"
-  },
-  {
    "name": "fn_80168440",
    "refs": 1,
    "files": 1,
@@ -240,32 +150,12 @@
    "kind": "game"
   },
   {
-   "name": "fn_8016891C",
-   "refs": 1,
-   "files": 1,
-   "used_as": "_fn_8016891C",
-   "addr": "8016891C",
-   "size": 316,
-   "section": ".text",
-   "kind": "game"
-  },
-  {
    "name": "fn_80168A58",
    "refs": 1,
    "files": 1,
    "used_as": "_fn_80168A58",
    "addr": "80168A58",
    "size": 708,
-   "section": ".text",
-   "kind": "game"
-  },
-  {
-   "name": "fn_80168D64",
-   "refs": 1,
-   "files": 1,
-   "used_as": "_fn_80168D64",
-   "addr": "80168D64",
-   "size": 264,
    "section": ".text",
    "kind": "game"
   },
@@ -2692,6 +2582,16 @@
    "kind": "global"
   },
   {
+   "name": "lbl_8040D500",
+   "refs": 17,
+   "files": 17,
+   "used_as": "_lbl_8040D500",
+   "addr": "8040D500",
+   "size": 3424,
+   "section": ".bss",
+   "kind": "global"
+  },
+  {
    "name": "lbl_805FB8D8",
    "refs": 17,
    "files": 17,
@@ -2719,16 +2619,6 @@
    "addr": "805FB180",
    "size": 8,
    "section": ".sbss",
-   "kind": "global"
-  },
-  {
-   "name": "lbl_8040D500",
-   "refs": 16,
-   "files": 16,
-   "used_as": "_lbl_8040D500",
-   "addr": "8040D500",
-   "size": 3424,
-   "section": ".bss",
    "kind": "global"
   },
   {

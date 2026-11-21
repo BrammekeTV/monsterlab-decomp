@@ -1,15 +1,15 @@
 {
  "game_id": "RM7P4F",
- "generated": "2026-11-21T17:14:29+00:00",
- "commit": "d13597f",
- "commit_date": "2026-11-21T17:38:51+01:00",
+ "generated": "2026-11-21T17:27:07+00:00",
+ "commit": "0c04df3",
+ "commit_date": "2026-11-21T18:14:30+01:00",
  "game": {
   "functions": 8548,
   "bytes": 2265988,
   "named": 2748,
   "named_bytes": 616800,
-  "decompiled": 7289,
-  "decompiled_bytes": 1720056
+  "decompiled": 7301,
+  "decompiled_bytes": 1725408
  },
  "library": {
   "functions": 4039,
@@ -24,8 +24,8 @@
   "bytes": 3404928,
   "named": 3211,
   "named_bytes": 721548,
-  "decompiled": 7290,
-  "decompiled_bytes": 1720176
+  "decompiled": 7302,
+  "decompiled_bytes": 1725528
  },
  "game_range": [
   "80006B40",
@@ -677,15 +677,15 @@
    0.0
   ],
   [
-   0.755,
+   1.0,
    0.0
   ],
   [
-   0.217,
+   0.443,
    0.0
   ],
   [
-   0.56,
+   0.69,
    0.0
   ],
   [
@@ -14429,6 +14429,76 @@
      "name": "ShaderStopBouncingOverlayAlpha",
      "addr": "801F248C",
      "size": 160
+    }
+   ]
+  },
+  {
+   "path": "src/game/draft_miss411.cpp",
+   "functions": [
+    {
+     "name": "fn_801630F0",
+     "addr": "801630F0",
+     "size": 808
+    },
+    {
+     "name": "fn_80163514",
+     "addr": "80163514",
+     "size": 572
+    },
+    {
+     "name": "fn_80163A4C",
+     "addr": "80163A4C",
+     "size": 532
+    },
+    {
+     "name": "fn_80164864",
+     "addr": "80164864",
+     "size": 336
+    },
+    {
+     "name": "fn_80165DB4",
+     "addr": "80165DB4",
+     "size": 316
+    },
+    {
+     "name": "fn_8016633C",
+     "addr": "8016633C",
+     "size": 300
+    },
+    {
+     "name": "fn_8016891C",
+     "addr": "8016891C",
+     "size": 316
+    }
+   ]
+  },
+  {
+   "path": "src/game/draft_miss412.cpp",
+   "functions": [
+    {
+     "name": "fn_801646E8",
+     "addr": "801646E8",
+     "size": 308
+    },
+    {
+     "name": "fn_8016578C",
+     "addr": "8016578C",
+     "size": 528
+    },
+    {
+     "name": "fn_80166114",
+     "addr": "80166114",
+     "size": 512
+    },
+    {
+     "name": "fn_8016811C",
+     "addr": "8016811C",
+     "size": 560
+    },
+    {
+     "name": "fn_80168D64",
+     "addr": "80168D64",
+     "size": 264
     }
    ]
   },

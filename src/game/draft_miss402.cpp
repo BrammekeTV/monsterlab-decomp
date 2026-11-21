@@ -9,7 +9,7 @@ u8*  fn_80156AAC(s32* width);                                   // 0x80156AAC
 void fn_80156ABC(void);                                         // 0x80156ABC
 u8*  fn_80156AC0(s32 a);                                        // 0x80156AC0
 void fn_80156CD8(void);                                         // 0x80156CD8 (empty)
-void fn_80156CDC(s32 idx, s32 flag, s32 c, u32** out);          // 0x80156CDC
+void fn_80156CDC(s32 idx, s32 flag, void* c, u32** out);          // 0x80156CDC
 void fn_80156F3C(s32 idx);                                      // 0x80156F3C (empty)
 s32  fn_8016195C(void* p, s32 a, s32 b, void* c);               // 0x8016195C
 
@@ -137,7 +137,7 @@ void fn_80162E4C(u8* arg0, u8* arg1) {
         u8* slot = arg0 + idx * 4;
         u32 color = 0xFFFFFFu | ((u32)(s32)(255.0f * a) << 24);
         s32 i;
-        fn_80156CDC(idx, *(s32*)(slot + 0x3608) == 0, 0, &buf);
+        fn_80156CDC(idx, *(s32*)(slot + 0x3608) == 0, NULL, &buf);
         for (i = 0; i < 0x24 * 16; i++) {
             buf[i] = color;
         }
