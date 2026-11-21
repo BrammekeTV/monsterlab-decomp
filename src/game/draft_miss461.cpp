@@ -20,7 +20,7 @@ void    fn_8004BA50(u8* chr);                                   // 0x8004BA50
 s32     fn_8005DB68(u8* a, s32 b);                              // 0x8005DB68 (signature guessed)
 void    fn_80099D08(u8* self);                                  // 0x80099D08
 void    fn_8009B320(u8* self);                                  // 0x8009B320
-void*   fn_8009A354(void);                                      // 0x8009A354 (signature guessed)
+void    fn_8009A354(u8* p);                                     // 0x8009A354 (signature guessed)
 u8*     fn_800E4BFC(u8* p);                                     // 0x800E4BFC
 void    fn_800E4CB0(u8* arg0);                                  // 0x800E4CB0
 u8*     fn_800E4D7C(u32 a0);                                    // 0x800E4D7C
@@ -234,7 +234,8 @@ void fn_80084C18(u8* arg0) {
 // Actor setup: when lbl_803462C8[0] > lbl_805FDC50 stores lbl_803462C8[ray index] at +0x8C; runs
 // fn_80099D08 and fn_8009B320, then sets flags on the child object from fn_800E4D7C.
 void fn_8009A548(u8* arg0) {
-    void* ray = fn_8009A354();
+    fn_8009A354(arg0);
+    void* ray = NULL;  // RaySceneTest ignores its argument
     if (lbl_803462C8[0] > lbl_805FDC50) {
         *(f32*)(arg0 + 0x8C) = lbl_803462C8[RaySceneTest(ray)];
     }

@@ -99,6 +99,11 @@
  "changelog": [
   {
    "date": "2026-11-21",
+   "time": "23:52",
+   "text": "Round 69: 38 more small functions (dtors, vcall helpers, actor setup, HUD)"
+  },
+  {
+   "date": "2026-11-21",
    "time": "23:45",
    "text": "Round 68: 39 more small functions (event senders, vehicle/prop helpers, audio, UI lists)"
   },
