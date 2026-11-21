@@ -10,6 +10,10 @@ typedef struct PortGx {
                           // array bases (0xA0+) and strides (0xB0+), matrix indices (0x30, 0x40)
     u32 xf[0x58];         // XF registers 0x1000-0x1057: lighting, texgens, viewport (0x1A), projection (0x20)
     f32 xfMem[0x800];     // XF memory: position/texture matrices (0x000), normal (0x400), post (0x500), lights (0x600)
+    // BP 0xE0-0xE7 hold two things each, chosen by bit 23 of the write: the four TEV colour
+    // registers (previous, 0, 1, 2) and the four constant colours. r, g, b, a; 11-bit signed.
+    s16 tevReg[4][4];
+    s16 tevKonst[4][4];
 } PortGx;
 extern PortGx gPortGxRegs;
 
@@ -46,3 +50,9 @@ typedef struct PortGxStats {
 const PortGxStats* PortGxGetStats(void);
 const char* PortGxStatsText(char* buf, u32 bufSize);
 int  PortSelfTestGx(void);            // 0 = ok
+
+// The Direct3D 11 renderer (port_gfx_d3d11.cpp). `window` FALSE renders off screen.
+BOOL PortGfxStart(BOOL window, int scale);
+// Writes the last presented picture as a PNG; FALSE if nothing was presented.
+BOOL PortGfxSaveScreenshot(const char* path);
+const char* PortGfxStatsText(char* buf, u32 bufSize);

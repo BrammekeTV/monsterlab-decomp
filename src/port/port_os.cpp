@@ -323,6 +323,13 @@ struct PortThread {
 };
 static PortThread sThreads[32];
 
+// For the watchdog: the handle of game thread i, or NULL.
+void* PortThreadHandle(int i, void** entry) {
+    if (i < 0 || i >= 32 || !sThreads[i].key || sThreads[i].done) return NULL;
+    *entry = (void*)sThreads[i].func;
+    return sThreads[i].handle;
+}
+
 static PortThread* FindThread(OSThread* t, BOOL create) {
     for (PortThread& pt : sThreads) if (pt.key == t) return &pt;
     if (!create) return NULL;

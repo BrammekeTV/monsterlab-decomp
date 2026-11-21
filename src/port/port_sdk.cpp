@@ -220,16 +220,18 @@ void VIFlush(void) {
 // ------------------------------------------------------------------ GX (nothing is drawn yet)
 // State the SDK-level GX calls record; the command stream is handled in port_gx.cpp.
 PortGxState gPortGx;
+static void BpLoad(u32 word);
 
+static void XfLoad(u32 addr, const f32* values, u32 count) {
+    PortGxWrite8(0x10);
+    PortGxWrite16((u16)(count - 1));
+    PortGxWrite16((u16)addr);
+    for (u32 i = 0; i < count; i++) PortGxWriteF32(values[i]);
+}
+// ids 0-63 are rows of the position/texture matrix memory (four floats a row), 64 and up the
+// post-transform matrices at 0x500; type 1 is a 2x4 matrix.
 void GXLoadTexMtxImm(const Mtx m, u32 id, int type) {
-    STUB(GXLoadTexMtxImm);
-    f32* dst = NULL;
-    if (id >= 64 && id <= 124) dst = &gPortGx.postTexMtx[(id - 64) / 3][0][0];
-    else if (id >= 30 && id <= 57) dst = &gPortGx.texMtx[(id - 30) / 3][0][0];
-    if (dst) {
-        memset(dst, 0, sizeof(gPortGx.texMtx[0]));
-        memcpy(dst, m, type == 1 ? 8 * sizeof(f32) : 12 * sizeof(f32));   // type 1 = 2x4
-    }
+    XfLoad(id >= 64 ? 0x500 + (id - 64) * 4 : id * 4, &m[0][0], type == 1 ? 8 : 12);
 }
 
 
@@ -257,6 +259,11 @@ void fn_8024A818(s32 fmt, s32 attr, s32 cnt, s32 type, s32 frac) {
         gPortGx.vtxFmt[fmt][attr].frac = (u8)frac;
         sVatDirty |= (u8)(1u << fmt);
     }
+}
+
+static void BpLoad(u32 word) {
+    PortGxWrite8(0x61);
+    PortGxWrite32(word);
 }
 
 static void CpLoad(u8 reg, u32 value) {
@@ -315,7 +322,9 @@ void fn_8024B974(s32 prim, s32 fmt, s32 count) {
 
 // GXSetViewport
 void fn_8024E48C(f32 left, f32 top, f32 w, f32 h, f32 nearZ, f32 farZ) {
-    STUB(GXSetViewport);
+    PortGxWrite8(0x10); PortGxWrite16(5); PortGxWrite16(0x101A);
+    PortGxWriteF32(w * 0.5f); PortGxWriteF32(-h * 0.5f); PortGxWriteF32((farZ - nearZ) * 16777215.0f);
+    PortGxWriteF32(left + w * 0.5f + 342.0f); PortGxWriteF32(top + h * 0.5f + 342.0f); PortGxWriteF32(farZ * 16777215.0f);
     gPortGx.viewport[0] = left; gPortGx.viewport[1] = top; gPortGx.viewport[2] = w;
     gPortGx.viewport[3] = h;    gPortGx.viewport[4] = nearZ; gPortGx.viewport[5] = farZ;
 }
@@ -323,6 +332,8 @@ void fn_8024E48C(f32 left, f32 top, f32 w, f32 h, f32 nearZ, f32 farZ) {
 void fn_8024E4B8(s32 x, s32 y, s32 w, s32 h) {
     STUB(GXSetScissor);
     gPortGx.scissor[0] = x; gPortGx.scissor[1] = y; gPortGx.scissor[2] = w; gPortGx.scissor[3] = h;
+    BpLoad(0x20000000 | (u32)((y + 342) & 0xFFF) | (u32)((x + 342) & 0xFFF) << 12);
+    BpLoad(0x21000000 | (u32)((y + h + 341) & 0xFFF) | (u32)((x + w + 341) & 0xFFF) << 12);
 }
 // GXSetDispCopyYScale: returns the number of frame buffer lines the copy produces
 // (the SDK's __GXGetNumXfbLines on the copy source height).
@@ -344,8 +355,9 @@ u32 fn_8024BC90(f32 yScale) {
 }
 // GXSetDispCopySrc
 void fn_8024BBE4(s32 x, s32 y, s32 w, s32 h) {
-    STUB(GXSetDispCopySrc);
     gPortGx.copySrc[0] = x; gPortGx.copySrc[1] = y; gPortGx.copySrc[2] = w; gPortGx.copySrc[3] = h;
+    BpLoad(0x49000000 | (u32)(x & 0x3FF) | (u32)(y & 0x3FF) << 10);
+    BpLoad(0x4A000000 | (u32)((w - 1) & 0x3FF) | (u32)((h - 1) & 0x3FF) << 10);
 }
 // GXSetDispCopyDst(frame buffer width, lines)
 void fn_8024BC24(s32 w, u32 h) {
@@ -364,12 +376,18 @@ void fn_8024BDD4(u32 aa, u8* pattern, s32 vf, u8* vfilter) {
 void fn_8024BFB8(s32 gamma) { STUB(GXSetDispCopyGamma); gPortGx.copyGamma = gamma; }
 // GXSetCopyClear(colour, z): what the frame buffer is cleared to after a copy
 void fn_8024BD5C(u8* color, u32 z) {
-    STUB(GXSetCopyClear);
     memcpy(gPortGx.clearColor, color, 4);
     gPortGx.clearZ = z;
+    BpLoad(0x4F000000 | (u32)color[3] << 8 | color[0]);     // alpha, red
+    BpLoad(0x50000000 | (u32)color[1] << 8 | color[2]);     // green, blue
+    BpLoad(0x51000000 | (z & 0xFFFFFF));
 }
 // GXCopyDisp(frame buffer, clear): copies the picture to the frame buffer VI shows
-void fn_8024BFCC(void* fb, s32 clear) { STUB(GXCopyDisp); gPortGx.lastCopyDst = fb; }
+void fn_8024BFCC(void* fb, s32 clear) {
+    gPortGx.lastCopyDst = fb;
+    BpLoad(0x4B000000 | (((u32)(uintptr_t)fb & 0x3FFFFFFF) >> 5));
+    BpLoad(0x52000000 | 0x4000 | (clear ? 0x800u : 0u));    // to the display, then clear
+}
 // GXSetPixelFmt(pixel format, z format)
 void fn_8024DFE4(s32 pixFmt, s32 zFmt) { STUB(GXSetPixelFmt); gPortGx.pixelFmt = pixFmt; gPortGx.zFmt = zFmt; }
 // GXSetDither
@@ -415,14 +433,11 @@ void fn_8024E520(s32 x, s32 y) { STUB(GXSetScissorBoxOffset); gPortGx.scissorOff
 // Matrices. Position/normal matrix ids are multiples of 3 (10 slots); texture matrix ids are
 // 30 + 3n, 60 is the identity, post-transform ones are 64 + 3n with 125 the identity.
 // GXLoadPosMtxImm
-void fn_8024E280(f32* mtx, s32 id) {
-    STUB(GXLoadPosMtxImm);
-    if ((u32)id < 30) memcpy(gPortGx.posMtx[id / 3], mtx, sizeof(gPortGx.posMtx[0]));
-}
+void fn_8024E280(f32* mtx, s32 id) { XfLoad((u32)id * 4, mtx, 12); }
 // GXLoadNrmMtxImm (the upper 3x3 of a 3x4 matrix)
 void fn_8024E2D0(f32* mtx, s32 id) {
-    STUB(GXLoadNrmMtxImm);
-    if ((u32)id < 30) memcpy(gPortGx.nrmMtx[id / 3], mtx, sizeof(gPortGx.nrmMtx[0]));
+    f32 m[9] = {mtx[0], mtx[1], mtx[2], mtx[4], mtx[5], mtx[6], mtx[8], mtx[9], mtx[10]};
+    XfLoad(0x400 + (u32)id * 3, m, 9);
 }
 // GXSetCurrentMtx
 void fn_8024E328(s32 id) { STUB(GXSetCurrentMtx); gPortGx.currentMtx = (u8)id; }

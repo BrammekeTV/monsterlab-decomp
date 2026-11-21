@@ -124,6 +124,56 @@ NOT_NAMES = {"if", "for", "while", "switch", "return", "sizeof", "static", "exte
 
 
 PC_NO_INIT = {}   # addr -> name: globals the sources define without an initial value
+MOVED = [0]
+KEPT_INIT = []     # globals not moved: initialised in the sources, zero-filled in the original
+ORIG_SECTION = lambda addr: None   # set in main(): original section name of an address
+DEFS_BY_FILE = {}  # source file stem -> {name: original address} of the globals it defines with ORIG()
+
+
+def relocate_globals(path):
+    """Moves the globals a source file defines with ORIG(addr) to that address: their symbols in
+    the object become absolute. The storage the compiler reserved stays behind unused; the value
+    at the original address comes from main.dol (or is zero for .bss), as on the console. This
+    way a global has one copy however it is reached: by its name, by `lbl_<addr>` from another
+    file, or by an address inside it. -> number of symbols moved (0 if already done)."""
+    defs = DEFS_BY_FILE.get(os.path.splitext(os.path.basename(path))[0].lower())
+    if not defs:
+        return 0
+    d = bytearray(open(path, "rb").read())
+    machine, nsec, _, symoff, nsym = struct.unpack_from("<HHIII", d, 0)
+    if machine == 0 and nsec == 0xFFFF:                 # /bigobj
+        symoff, nsym = struct.unpack_from("<II", d, 48)
+        entry, fmt, absolute, sechdr = 20, "<8sIiHBB", -1, 56
+    elif machine == 0x14C:
+        entry, fmt, absolute, sechdr = 18, "<8sIhHBB", -1, 20 + struct.unpack_from("<H", d, 16)[0]
+    else:
+        return 0
+    strtab = symoff + nsym * entry
+    moved, i = 0, 0
+    while i < nsym:
+        at = symoff + i * entry
+        raw, value, sec, typ, cls, naux = struct.unpack_from(fmt, d, at)
+        i += 1 + naux
+        if cls != 2 or sec <= 0 or naux:               # external definitions only: a static keeps its storage
+            continue
+        if raw[:4] == b"\0\0\0\0":
+            o = strtab + struct.unpack_from("<I", raw, 4)[0]
+            name = d[o:d.index(b"\0", o)].decode("latin-1")
+        else:
+            name = raw.rstrip(b"\0").decode("latin-1")
+        base, is_fn = base_name(name)
+        if base in defs and not is_fn:
+            # A value the sources give a global that is zero-filled in the original (.bss) would
+            # be lost by the move: such a global keeps its storage in the executable.
+            chars = struct.unpack_from("<I", d, sechdr + (sec - 1) * 40 + 36)[0]
+            if not (chars & 0x80) and ORIG_SECTION(defs[base]) in (".bss", ".sbss", ".sbss2", None):
+                KEPT_INIT.append(f"0x{defs[base]:08X} {base}")
+                continue
+            struct.pack_into(fmt, d, at, raw, defs[base], absolute, typ, cls, naux)
+            moved += 1
+    if moved:
+        open(path, "wb").write(d)
+    return moved
 
 
 def scan_sources():
@@ -133,6 +183,7 @@ def scan_sources():
            pc_defs: addr -> name for globals the sources define themselves (ORIG markers))."""
     notes = collections.defaultdict(collections.Counter)
     markers, decl_kind, pc_defs = {}, collections.defaultdict(collections.Counter), {}
+    DEFS_BY_FILE.clear()
     PC_NO_INIT.clear()
     files = glob.glob(os.path.join(ROOT, "src", "**", "*.cpp"), recursive=True) + \
         glob.glob(os.path.join(ROOT, "include", "**", "*.h"), recursive=True)
@@ -167,6 +218,8 @@ def scan_sources():
                 d = re.search(r"([A-Za-z_]\w*)\s*(?:\[[^\]]*\]\s*)*(=[^;]*)?;\s*ORIG\(", l)
                 if d:
                     pc_defs.setdefault(addr, d.group(1))
+                    stem = os.path.splitext(os.path.basename(path))[0].lower()
+                    DEFS_BY_FILE.setdefault(stem, {})[d.group(1)] = addr
                     if not d.group(2):
                         PC_NO_INIT[addr] = d.group(1)
                 continue
@@ -248,6 +301,18 @@ def main():
     objs = collect_objects(a.objs)
     if not objs:
         sys.exit("port_link: no object files")
+    syms = load_symbols()
+    notes, markers, decl_kind, pc_defs = scan_sources()
+    global ORIG_SECTION
+    by_start = sorted((v[1], v[0]) for v in syms.values() if v[2] in ("object", "label"))
+    starts = [x[0] for x in by_start]
+
+    def orig_section(addr):
+        import bisect
+        i = bisect.bisect_right(starts, addr) - 1
+        return by_start[i][1] if i >= 0 else None
+    ORIG_SECTION = orig_section
+    MOVED[0] = sum(relocate_globals(o) for o in objs)
     defined, undefined = set(), set()
     for o in objs:
         d, u = read_obj(o)
@@ -255,12 +320,10 @@ def main():
         undefined |= u
     undefined -= defined
 
-    syms = load_symbols()
     by_addr_fn = {}
     for name, (sec, addr, typ, size, hint) in syms.items():
         if typ == "function":
             by_addr_fn.setdefault(addr, (name, size))
-    notes, markers, decl_kind, pc_defs = scan_sources()
     overrides = load_overrides()
 
     coff = Coff()
@@ -440,6 +503,12 @@ def main():
         f.write("".join(f"  0x{x:08X} {n}\n" for x, n in sorted(static_fns)))
         f.write(f"\nGame function stubs: {len(game)}\n" + "".join(f"  0x{x:08X} {n} size 0x{s:X} ({src})\n" for x, n, s, src in game))
         f.write(f"\nLibrary function stubs: {len(lib)}\n" + "".join(f"  0x{x:08X} {n} ({src})\n" for x, n, s, src in lib))
+        f.write(f"\nGlobals the sources define, moved to their original address: {MOVED[0]} in this run "
+                f"(objects already processed are not counted)\n")
+        kept = sorted(set(KEPT_INIT))
+        f.write(f"\nNot moved, because the sources give them a value and the original has them in .bss "
+                f"(they keep a copy of their own in the executable): {len(kept)}\n")
+        f.write("".join(f"  {x}\n" for x in kept))
         f.write(f"\nLeft to the system libraries (C runtime, Windows): {len(report['system'])}\n")
         f.write("".join(f"  {x}\n" for x in report["system"]))
     print(f"port_link: {len(objs)} objects, {len(impl_of)}/{func_count} functions linked, "

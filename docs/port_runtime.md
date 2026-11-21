@@ -24,6 +24,10 @@ build\pc\monsterlab.exe                        # runs main() with your own disc 
 | `--seconds N` | stop after N seconds and say where the main thread is (default 60) |
 | `--keep-going` | a missing function returns 0 instead of stopping, and a semaphore nobody signals is passed after 0.5 s: a survey of what the boot path still needs. After the first one the run is no longer what the game does. |
 | `--verbose` | log every skipped static initialiser and every SDK stub call |
+| `--window` | open a window and draw into it |
+| `--screenshot FILE` | write the last picture shown as a PNG when the run stops (works without `--window`) |
+| `--scale N` | frame buffer size as a multiple of the console's 640x528 (default 2) |
+| `--show-texture N` | development aid: when the boot stops, draw texture N of `global_binary.sir` through the engine's draw path instead of ending (see "GX: the renderer") |
 
 The run ends with a boot summary: what was reached and when, disc files opened, SDK calls that
 do nothing yet, and the stop reason. Exit codes: 0 frame limit or the game asked to exit,
@@ -57,7 +61,14 @@ What boots today, with the retail PAL disc:
    `SirLoad` and converted in place (5,615 pointers, the game database, input table, textures,
    strings and actions).
 10. Script system set-up (`fn_8010F794`): signatures and all script functions registered.
-11. `UiInit` stops at `fn_8018C8F4` (232 bytes, not decompiled): the first stop today.
+11. `UiInit` crashes in `fn_8018C8F4`: the UI root, fonts, screen list and HUD in
+    `global_binary.sir` are still big-endian (`docs/loader.md`, "Not converted yet"). That is
+    the first stop today, and it is data work, not a missing function.
+
+Drawing works apart from that: with `--show-texture N` the run goes on from the stop and draws
+a texture of `global_binary.sir` with the engine's own frame functions (`RendBeginFrame`, its
+array draw, the post-processing chain, `RendEndFrame`), through the display lists, the render
+thread, the command interpreter and Direct3D, to the window or a PNG.
 
 The link report (`port_link.txt`, uploaded by CI) lists the stubs and the globals.
 
@@ -117,27 +128,28 @@ hint is swapped wrongly until it gets an entry in `port_data.txt`. About 1,300 s
 
 ### Globals the sources define themselves
 
-A global defined in a `.cpp` (`u8 gQuitRequested; ORIG(0x805FB758)`) lives in the exe, not at
-its original address. That is fine as long as all code uses that definition. `port_link.py`
-handles the two ways it goes wrong:
+A global defined in a `.cpp` with its address (`u8 gQuitRequested; ORIG(0x805FB758)`) is
+**moved to that address** at link time: `port_link.py` rewrites the symbol in the object file
+into an absolute one. The storage the compiler reserved stays behind unused. So every global has
+one copy, however code reaches it: by its name, as `lbl_805FB758` from another file, or through
+an address inside a larger object (a draft read the render thread's semaphore as
+`lbl_8040D4C0`, which lies inside `sRend`). Its initial value is the one in `main.dol`, and its
+size is the original's whatever the definition says.
 
-- **Another file uses the same address under another name** (`lbl_805FB758`). If the definition
-  has external linkage, the other name is aliased to it, so there is one copy. Listed under
-  "Names resolved to a definition under another name".
-- **The definition is `static`**, so it cannot be aliased: the other name gets the original
-  address and there are two copies. Listed under "Split globals" (0 today, and it has to stay
-  0: the render thread's command queue was one of them). Fix: make the definition non-static,
-  or drop it and declare the global `extern` in both files.
+This replaced three kinds of bug that each stopped the boot once: a second copy under another
+name, a definition without the original's initial value, and a definition smaller than the
+original object.
 
-A defined global also does not get the initial value from `main.dol`; the definition must carry
-it. `port_link.txt` lists the definitions without a value whose original lives in an
-initialised section ("Defined in the sources without an initial value..."): each one starts as
-0 on PC unless `main.dol` has 0 there too. The list must stay empty. (`gRendTexelsInMEM2` is
--1 in the original; as 0 it sent every texture allocation to a memory pool that does not exist.)
+Two cases are not moved, and `port_link.txt` lists them:
 
-A defined array must also have the size of the original symbol (`symbols.txt`): the heap object
-`gMainHeap` was defined with 0x40 bytes of its 0x728 and the allocator wrote over the globals
-behind it. Nothing checks this yet.
+- **`static` definitions.** Another file that uses the same address gets the original address
+  and there are two copies ("Split globals", must stay 0). Fix: make the definition non-static.
+- **A value in the sources for a global the original keeps in `.bss`.** Moving it would lose
+  the value, so it keeps its own storage ("Not moved, because the sources give them a value").
+  0 today.
+
+Without game data (CI's self-test) the moved globals are zero-filled memory; nothing there runs
+game code.
 
 ## 2. Functions
 
@@ -246,12 +258,70 @@ never goes through SDK functions: it writes BP, CP and XF register loads itself.
 - **Interrupts.** The draw-done token (BP 0x45) and draw-sync tokens (BP 0x48) in the stream
   raise the two callbacks the game registered, from the interrupt thread.
 - **The renderer interface.** `PortGxBackend` receives draws (primitive, vertex layout, the
-  raw vertex bytes), frame-buffer copies and palette loads. No backend exists yet: the boot
-  summary's `GX:` line counts what a run sent.
+  raw vertex bytes), frame-buffer copies and palette loads. The boot summary's `GX:` line
+  counts what a run sent.
 
 Data a command only points to (vertex arrays, textures, matrices for indexed loads) is read
 from memory in host byte order: the game's own code writes it that way, and converters for
 disc data have to leave it that way.
+
+### GX: the renderer
+
+`port_gfx_d3d11.cpp` is the backend: Direct3D 11.
+
+**Why Direct3D 11 and not OpenGL.** It is part of Windows (no loader library, no extension
+handling), its software rasteriser (WARP) gives the same picture on a machine without a
+graphics card, which makes screenshots testable anywhere, and one device context may be used
+from any thread as long as calls do not overlap. The game draws from two threads (immediate
+commands on the main thread, display lists on the render thread) and the big lock already
+serialises them; with OpenGL the context would have to be handed from thread to thread. The
+renderer is one file behind `PortGxBackend`, so another API can be added beside it.
+
+What it does:
+
+- **Frame buffer.** The console's 640x528 "EFB" is a render target of `--scale` times that
+  size (default 2). Everything the game addresses in frame-buffer pixels (viewport, scissor,
+  copy rectangles) is multiplied by the scale, so a higher internal resolution needs no change
+  in game code. *For 1080p and widescreen later:* the scale becomes the window's height / 480,
+  and widescreen is a wider render target plus a correction of the projection's x scale at the
+  point where the XF projection is applied (`Draw`): one place, because the transform is done
+  here and not in game code.
+- **Vertices.** Decoded from the stream (or from the arrays a draw indexes), then transformed,
+  lit and given their texture coordinates on the CPU from the XF registers and matrix memory:
+  position and normal matrices, projection, the colour channels with their lights, the
+  texture-coordinate generators with their matrices. That is the console's transform unit; the
+  vertex shader only passes the results on.
+- **TEV.** The pixel shader is generated from the TEV registers (stage count, order, colour and
+  alpha combiners with bias, scale, clamp and compare modes, constant colour selection, swap
+  tables, alpha test) and cached by those registers. Register and constant colours are shader
+  constants.
+- **Textures.** I4, I8, IA4, IA8, RGB565, RGB5A3, RGBA8, C4, C8, C14X2 and CMPR are decoded to
+  RGBA8 and cached by address and content; palettes go through an emulated copy of the texture
+  memory (`loadTlut`).
+- **Output state.** Blending, colour/alpha write masks, depth test, culling, viewport and
+  scissor from the BP and XF registers.
+- **Copies.** BP 0x52: a display copy shows the frame buffer in the window (and keeps it for
+  `--screenshot`); a copy to a texture keeps a snapshot at the frame buffer's resolution, used
+  when a texture with that address is bound; then the clear, if asked.
+
+Not done: indirect textures, fog, Z textures, lines and points (counted as skipped draws),
+mipmaps, the copy formats and filters (a copy to a texture is a plain RGBA snapshot), specular
+lights.
+
+**Byte order of texture data.** Texture pixels and palettes are decoded as console bytes: that
+is what the disc data is. Textures the game builds at run time (`fn_80149B4C` for the built-in
+font, the palette conversion, `fn_8015AB70`) are in host order and would come out wrong; the
+code that produces them has to write console order on PC. Not done yet.
+
+`PORT_GFX_TRACE=1` in the environment logs every draw and copy and saves the frame buffer
+before each copy to `build/pc/efb_NN.png`.
+
+**`--show-texture N`** (`port_demo.cpp`) exists because the boot does not reach the game's own
+screens yet. When the main thread would stop, it goes on in the demo instead: it binds texture
+N with the engine's bind function, calls `DrawFullscreenTexture` for the 2D state and
+projection, and draws a quad with the engine's array draw. (`DrawFullscreenTexture`'s own quad
+cannot be seen: it lies at view z = -1 while its projection shows 0 to 1, and the function it
+calls to bind its texture, `fn_80154290`, is empty in this build.)
 
 ### Threads and interrupts
 
@@ -315,16 +385,12 @@ MSVC only for now (absolute symbols, `/alternatename`, structured exception hand
 3. **Static initialisers**: 262 of the 300 `.ctors` entries are not decompiled. Most are small
    (they construct one global). Until they exist those globals are zero, which will show up as
    crashes or wrong behaviour further in. `monsterlab.exe --verbose` lists them.
-4. **A renderer behind the GX command stream.** The stream is captured and decoded
-   (`port_gx.cpp`, see "GX: the command stream"); nothing draws it yet. In order: a window and a
-   frame buffer that the display copy (BP register 0x52) presents; draws with position and
-   vertex colour through the XF matrices; texture decoding and the TEV stages as generated
-   shaders; lighting, texture-coordinate generation, fog; copies of the frame buffer to textures
-   (the engine's 13 render targets).
-   The SDK-level calls that only record state today (`GXSetViewport`, `GXSetCopyClear`,
-   `GXSetBlendMode`, ... in `port_sdk.cpp`) have to send their registers into the same stream,
-   as `GXBegin`, `GXSetVtxDesc` and `GXSetVtxAttrFmt` already do, so that the interpreter's
-   register files are the only state.
+4. **The rest of the renderer** (see "GX: the renderer" for what exists): the SDK-level calls
+   in `port_sdk.cpp` that still only record state (`GXSetBlendMode`, `GXSetZMode`,
+   `GXSetTevOrder`, ...) have to send their registers into the stream; indirect textures, fog,
+   Z textures, lines and points; mipmaps; the frame-buffer copy filters the engine's
+   post-processing relies on (it copies with intensity formats). And the byte order of texture
+   data built at run time (see there).
 5. **SDK names**: the functions `port_sdk.cpp` defines as `fn_8024xxxx` are identified in its
    comments (`VIConfigure`, `GXSetViewport`, ...). Renaming them with `tools/rename.py` needs
    the definitions in `src/port/` and the callers renamed in the same change.

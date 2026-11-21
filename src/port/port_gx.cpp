@@ -154,6 +154,13 @@ static void BpWrite(PortGx* g, u32 word) {
     if (reg == 0xFE) { g->bpMask = value; return; }
     value = (g->bp[reg] & ~mask) | (value & mask);
     g->bp[reg] = value;
+    if (reg >= 0xE0 && reg < 0xE8) {                        // TEV colour register or constant colour
+        s16 (*dst)[4] = (value & 0x800000) ? g->tevKonst : g->tevReg;
+        u32 i = (reg - 0xE0) >> 1;
+        s16 lo = (s16)((s32)(value << 21) >> 21), hi = (s16)((s32)(value << 9) >> 21);
+        if (reg & 1) { dst[i][2] = lo; dst[i][1] = hi; }    // BG
+        else         { dst[i][0] = lo; dst[i][3] = hi; }    // RA
+    }
     sStats.bp++;
     switch (reg) {
     case 0x45:                                              // PE done

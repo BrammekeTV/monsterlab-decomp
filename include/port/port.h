@@ -83,6 +83,10 @@ typedef struct PortOptions {
     BOOL verbose;             // log every SDK stub call, not only the first
     BOOL keepGoing;           // a missing function returns 0 instead of stopping (to survey the boot path)
     BOOL haveData;            // main.dol was found and loaded
+    BOOL window;              // open a window and draw into it
+    const char* screenshot;   // write the last shown picture to this PNG when the run stops
+    s32  scale;               // frame buffer size as a multiple of the console's 640x528 (default 2)
+    s32  showTexture;         // development aid (port_demo.cpp): -1, or a texture of global_binary.sir
 } PortOptions;
 extern PortOptions gPortOptions;
 
@@ -97,6 +101,7 @@ const char* PortSoftSdk(u32 wiiAddr);
 // port_files.cpp: called for every completed disc read; converts big-endian .sir sections in place.
 void PortFileRead(const char* path, u32 offset, u8* dst, u32 len);
 const char* PortFileStats(char* buf, u32 n);
+void PortDemoMain(void);              // port_demo.cpp
 // Prints the boot summary and ends the process.
 void PortStop(int exitCode, const char* fmt, ...);
 void PortFrameDone(void);     // one presented frame (VI flip): enforces the frame limit
