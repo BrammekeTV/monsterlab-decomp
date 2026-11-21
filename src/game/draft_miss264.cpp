@@ -24,8 +24,8 @@ void fn_801BB338(u8* v, u32 color);                      // 0x801BB338
 void fn_801BB374(s32 size);                              // 0x801BB374 (commit the temp buffer)
 u8*  fn_801D5850(void);                                  // 0x801D5850
 u8*  fn_801D6D78(void);                                  // 0x801D6D78 (camera record: axes at +0/+0xC)
-void fn_801BC970(u8* obj, s32 a, s32 b, s32 c, f32 f);  // 0x801BC970
-void fn_801BD828(u8* obj);                               // 0x801BD828
+void fn_801BC970(u8* obj, s32 a, s32 b, f32 f);  // 0x801BC970
+void fn_801BD828(u8* obj, f32 t);                               // 0x801BD828
 
 // Text scratch block: 0x000 = decode buffer of fn_801BA8C8, 0x800 = four Vec3 (result bounds),
 // 0x830 and 0x1030 = 16-bit char buffers of the two layout modes.
@@ -277,8 +277,8 @@ void fn_801BDB6C(u8* obj, f32 dt) {
     if (!(lenSq <= 0.0f)) len = sqrtf(lenSq);
     *(f32*)(obj + 0x34) = len;
 
-    fn_801BC970(obj, 0, n - 1, *(s32*)(obj + 0x38), *(f32*)(def + 0x48));
-    if (fabsf(*(f32*)(*(u8**)obj + 0x5C)) > 0.01f) fn_801BD828(obj);
+    fn_801BC970(obj, 0, n - 1, *(f32*)(def + 0x48));
+    if (fabsf(*(f32*)(*(u8**)obj + 0x5C)) > 0.01f) fn_801BD828(obj, fabsf(*(f32*)(*(u8**)obj + 0x5C)));
 
     // Camera right/up axes, normalised.
     u8* cam = fn_801D6D78();

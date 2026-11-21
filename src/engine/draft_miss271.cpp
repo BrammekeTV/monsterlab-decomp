@@ -3,7 +3,7 @@
 
 extern "C" {
 s32  fn_801C1960(f32* tmin, f32* tmax, f32 dir, f32 dist);  // 0x801C1960
-s32  fn_801C3F6C(u8* table, u8* entry);                     // 0x801C3F6C
+void* fn_801C3F6C(u8* table, u8* entry);                     // 0x801C3F6C
 }
 
 extern "C++" {
@@ -161,7 +161,7 @@ s32 fn_801C3EA4(u8* table, s32 key) {
             }
         }
     }
-    return fn_801C3F6C(table, entry);
+    return (s32)(intptr_t)fn_801C3F6C(table, entry);
 }
 
 // 0x801DFE7C

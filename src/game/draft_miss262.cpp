@@ -7,7 +7,7 @@ extern "C" {
 void fn_801455E0(f32* out, u8* quat);                          // 0x801455E0
 void fn_80146180(void* quat, const Vec3* axis, f32 angle);     // 0x80146180 (rotate quat about axis)
 void QuatGetForward(Vec3* out, const Quat* q);                 // 0x801454CC
-void fn_800DB944(f32* out, u8* obj);                           // 0x800DB944
+s32  fn_800DB944(f32* out, u8* obj);                           // 0x800DB944
 s32  fn_8018BDE0(u8* p, s32 key);                              // 0x8018BDE0
 void fn_8018D2B8(const char* fmt, ...);                        // 0x8018D2B8 (debug log)
 void* fn_801B7198(void* anim, s32 a);                          // 0x801B7198

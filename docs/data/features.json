@@ -99,6 +99,11 @@
  "changelog": [
   {
    "date": "2026-11-21",
+   "time": "01:00",
+   "text": "Decompiled 43 more functions (script/hook helpers, text and sprite emitters, GX draw-state restore, inventory icon lookup, matrix/angle helpers, map insert, ...); prototype fixes"
+  },
+  {
+   "date": "2026-11-21",
    "time": "00:52",
    "text": "Decompiled 15 more functions incl. jump-table ones (movie hand-off state machine fn_8000B340/fn_8000D3AC, zone slot allocator fn_8012E420, lab panel fn_800E6CD0, world draw pass, boot setup, brain-lab chunk toss, DVD wait loop); prototype fixes"
   },
