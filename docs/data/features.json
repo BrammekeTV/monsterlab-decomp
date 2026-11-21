@@ -37,7 +37,7 @@
   },
   {
    "title": "Big-endian data loader",
-   "detail": "Convert game data from the Wii's big-endian format at load time. On PC now: the file catalog and global_binary.sir, with the game database, input table, built-in textures, strings, actions, and now the UI root, fonts and screen state machines. Everything is checked against the reference decoder. Next: the title-screen UI files.",
+   "detail": "Convert game data from the Wii's big-endian format at load time. On PC now: the file catalog and global_binary.sir, with the game database, input table, built-in textures, strings, actions, the UI root, fonts, screen state machines and now the script action records (956 small programs). Everything is checked against the reference decoder. Next: the title-screen UI files.",
    "status": "in_progress"
   },
   {
@@ -97,6 +97,11 @@
   }
  ],
  "changelog": [
+  {
+   "date": "2026-11-21",
+   "time": "12:44",
+   "text": "The loader converts the game's script actions (PR #19): the 956 small programs in global_binary.sir that the UI and game logic run, about 11,500 words with 3,236 calls to script functions. Each one is checked against the reference decoder. Without this, the first UI action on PC looped forever."
+  },
   {
    "date": "2026-11-21",
    "time": "12:41",
