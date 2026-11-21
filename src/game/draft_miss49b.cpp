@@ -67,7 +67,7 @@ void fn_801BA4A0(u8* a3);
 void fn_801BDA0C(void* a0);
 void fn_801E839C(u8* p);
 void fn_800E6A84(s32);
-u8* fn_80160A28(u8* p);
+u8* fn_80160A28(u8* arg0);
 void fn_80162A70(u8* p);
 void fn_801BB478(u8* p, s32 a1);
 s32 fn_802728A4(s32 chan, u32* out);

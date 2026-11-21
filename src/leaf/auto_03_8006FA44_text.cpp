@@ -9,7 +9,7 @@ extern s32 lbl_805FB124;
 extern u8 lbl_805FB128[];
 extern u8* lbl_805FB134;
 extern f32 lbl_805FD5D8;
-extern u8 lbl_805FD5F0[];
+extern f32 lbl_805FD5F0;
 extern u8 lbl_805FD630[];
 
 // 0x8006FA44

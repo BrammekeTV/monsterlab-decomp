@@ -99,6 +99,11 @@
  "changelog": [
   {
    "date": "2026-11-21",
+   "time": "23:45",
+   "text": "Round 68: 39 more small functions (event senders, vehicle/prop helpers, audio, UI lists)"
+  },
+  {
+   "date": "2026-11-21",
    "time": "23:37",
    "text": "Round 67: 39 more small functions (object destructors, HUD/UI, audio alarms, world flags)"
   },

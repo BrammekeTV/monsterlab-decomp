@@ -6,7 +6,7 @@
 #include "types.h"
 
 extern void* gEventMgr;
-extern u8 lbl_805FD928[];
+extern f32 lbl_805FD928;
 extern u8 lbl_805FD934[];
 extern u8 lbl_805FD958[];
 extern "C" void EventSendTo(void*, u32, void*, u32, int, int);
