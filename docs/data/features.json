@@ -99,6 +99,11 @@
  "changelog": [
   {
    "date": "2026-11-21",
+   "time": "01:31",
+   "text": "Decompiled 13 more functions (world post-update fn 0x8012DA58, zone unload/load finish fn_801360BC/fn_8013786C, lightning beam update, spike-pit constructor, zone draw fn_80133E60, slot dispatch fn_801353C0, ...); prototype fixes"
+  },
+  {
+   "date": "2026-11-21",
    "time": "01:24",
    "text": "Decompiled 17 more functions (audio update fn_8020B5E8/fn_80201F38, MoviePlay, particle batcher fn_801CBD40, trail draw fn_801C4338, box overlap fn_801C10B4, save snapshot fn_8022EDD8/fn_8022F50C, badge counters, ...); prototype fixes"
   },

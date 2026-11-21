@@ -59,7 +59,7 @@ extern "C" void fn_8006CE08(u8*);
 extern "C" s32 fn_800D68CC(u8*, s32, s32);
 extern "C" void fn_800E69EC(s32);
 extern "C" u32 fn_8010720C(u32);
-extern "C" void fn_8012636C(s32, s32);
+extern "C" s32 fn_8012636C(u32, u32);
 extern "C" void fn_8012660C(s32);
 extern "C" void fn_80126684(s32);
 extern "C" s32 fn_8012670C(void);
@@ -793,8 +793,7 @@ void prop_selected(void) {
 
 // 0x800F6064
 void AddCastleCamera(u32 a3, u32 a4) {
-    // tail-call arguments inferred from the registers set before the call
-    fn_8012636C((s32)((u32)(uintptr_t)(a3)), (s32)((u32)(uintptr_t)(a4)));
+    fn_8012636C((u32)((u32)(uintptr_t)(a3)), (u32)((u32)(uintptr_t)(a4)));
 }
 
 // 0x800F656C

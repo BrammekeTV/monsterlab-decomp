@@ -231,12 +231,12 @@ void fn_801B51E0(u8* p) {
 
 // 0x801B5248
 // Calls the virtual (+0x28) with the given argument on every child entry of the list at +0xB0.
-void fn_801B5248(u8* p, s32 arg) {
+void fn_801B5248(u8* p, u8* arg) {
     u8* item = *(u8**)(p + 0xb0);
     while (item) {
         u8* obj = *(u8**)(item + 0x4);
         if (obj) {
-            (*(void (**)(u8*, s32))(*(u8**)obj + 0x28))(obj, arg);
+            (*(void (**)(u8*, u8*))(*(u8**)obj + 0x28))(obj, arg);
         }
         item = *(u8**)(item + 0x8);
     }

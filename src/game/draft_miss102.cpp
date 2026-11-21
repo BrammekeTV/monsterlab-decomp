@@ -68,7 +68,7 @@ void fn_801B55F4(u8* obj, u8* out, s32 idx);                    // 0x801B55F4
 s32 fn_801ED368(u8* ref);                                       // 0x801ED368
 BOOL fn_801F5220(void);                                         // 0x801F5220
 void fn_801E8D74(void* out, void* list, void* owner, void* anim);  // 0x801E8D74
-void fn_800ED944(void);                                         // 0x800ED944 (lightning callback)
+s32 fn_800ED944(u8* p, f32 dt);                                         // 0x800ED944 (lightning callback)
 u32 StringHash(const char* s);                                  // 0x801EB704
 u8* GetGlobalSettings(void);                                    // 0x801D2BF8
 void* IdPoolNext(void* pool);                                   // 0x801E6EB0

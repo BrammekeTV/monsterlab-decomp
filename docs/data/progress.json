@@ -1,15 +1,15 @@
 {
  "game_id": "RM7P4F",
- "generated": "2026-11-21T00:24:34+00:00",
- "commit": "9992253",
- "commit_date": "2026-11-21T01:10:43+01:00",
+ "generated": "2026-11-21T00:31:04+00:00",
+ "commit": "7419956",
+ "commit_date": "2026-11-21T01:24:39+01:00",
  "game": {
   "functions": 8548,
   "bytes": 2265988,
   "named": 2748,
   "named_bytes": 616800,
-  "decompiled": 6978,
-  "decompiled_bytes": 1492752
+  "decompiled": 6991,
+  "decompiled_bytes": 1514420
  },
  "library": {
   "functions": 4039,
@@ -24,8 +24,8 @@
   "bytes": 3404928,
   "named": 3211,
   "named_bytes": 721548,
-  "decompiled": 6979,
-  "decompiled_bytes": 1492872
+  "decompiled": 6992,
+  "decompiled_bytes": 1514540
  },
  "game_range": [
   "80006B40",
@@ -405,7 +405,7 @@
    0.0
   ],
   [
-   0.296,
+   0.513,
    0.0
   ],
   [
@@ -457,7 +457,7 @@
    0.843
   ],
   [
-   0.657,
+   1.0,
    0.541
   ],
   [
@@ -565,7 +565,7 @@
    0.547
   ],
   [
-   0.84,
+   0.863,
    0.749
   ],
   [
@@ -577,7 +577,7 @@
    0.911
   ],
   [
-   0.507,
+   0.818,
    0.565
   ],
   [
@@ -585,19 +585,19 @@
    0.287
   ],
   [
-   0.833,
+   1.0,
    0.367
   ],
   [
-   0.204,
+   0.868,
    0.0
   ],
   [
-   0.422,
+   0.722,
    0.422
   ],
   [
-   0.349,
+   0.63,
    0.0
   ],
   [
@@ -625,7 +625,7 @@
    0.275
   ],
   [
-   0.925,
+   0.948,
    0.1
   ],
   [
@@ -11994,6 +11994,91 @@
      "name": "PlaySoundGroupFXWithEffect",
      "addr": "801DDEA4",
      "size": 40
+    }
+   ]
+  },
+  {
+   "path": "src/game/draft_miss331.cpp",
+   "functions": [
+    {
+     "name": "fn_800D02C0",
+     "addr": "800D02C0",
+     "size": 2432
+    },
+    {
+     "name": "fn_800ED944",
+     "addr": "800ED944",
+     "size": 3620
+    }
+   ]
+  },
+  {
+   "path": "src/game/draft_miss332.cpp",
+   "functions": [
+    {
+     "name": "fn_80131C2C",
+     "addr": "80131C2C",
+     "size": 1128
+    },
+    {
+     "name": "fn_80133E60",
+     "addr": "80133E60",
+     "size": 5056
+    }
+   ]
+  },
+  {
+   "path": "src/game/draft_miss333.cpp",
+   "functions": [
+    {
+     "name": "fn_801353C0",
+     "addr": "801353C0",
+     "size": 1172
+    },
+    {
+     "name": "fn_801360BC",
+     "addr": "801360BC",
+     "size": 2316
+    },
+    {
+     "name": "fn_8013786C",
+     "addr": "8013786C",
+     "size": 2532
+    }
+   ]
+  },
+  {
+   "path": "src/game/draft_miss334.cpp",
+   "functions": [
+    {
+     "name": "fn_8012636C",
+     "addr": "8012636C",
+     "size": 192
+    },
+    {
+     "name": "fn_8012CD90",
+     "addr": "8012CD90",
+     "size": 96
+    },
+    {
+     "name": "WorldPostUpdate",
+     "addr": "8012DA58",
+     "size": 2504
+    },
+    {
+     "name": "fn_80131370",
+     "addr": "80131370",
+     "size": 400
+    },
+    {
+     "name": "fn_80131A1C",
+     "addr": "80131A1C",
+     "size": 4
+    },
+    {
+     "name": "fn_8014762C",
+     "addr": "8014762C",
+     "size": 216
     }
    ]
   },
