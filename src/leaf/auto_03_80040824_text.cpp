@@ -12,7 +12,7 @@ extern u8 lbl_80358654[];
 extern u8 lbl_805FB05C[];
 extern u8 lbl_805FB060[];
 extern u8 lbl_805FB064[];
-extern u8 lbl_805FD118[];
+extern f32 lbl_805FD118;
 extern "C" char* strcpy(char*, char*);
 
 // 0x80040EFC

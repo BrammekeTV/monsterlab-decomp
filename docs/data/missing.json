@@ -1,7 +1,7 @@
 {
  "log": "link.log",
  "counts": {
-  "global": 2817,
+  "global": 2947,
   "unknown": 126,
   "library": 192,
   "game": 76
@@ -4256,6 +4256,16 @@
    "kind": "global"
   },
   {
+   "name": "lbl_805FD5D8",
+   "refs": 6,
+   "files": 6,
+   "used_as": "\"float lbl_805FD5D8\" (?lbl_805FD5D8@@3MA)",
+   "addr": "805FD5D8",
+   "size": 4,
+   "section": ".sdata2",
+   "kind": "global"
+  },
+  {
    "name": "lbl_805FD800",
    "refs": 6,
    "files": 6,
@@ -4711,16 +4721,6 @@
    "files": 5,
    "used_as": "_lbl_805FCBB0",
    "addr": "805FCBB0",
-   "size": 4,
-   "section": ".sdata2",
-   "kind": "global"
-  },
-  {
-   "name": "lbl_805FD5D8",
-   "refs": 5,
-   "files": 5,
-   "used_as": "\"float lbl_805FD5D8\" (?lbl_805FD5D8@@3MA)",
-   "addr": "805FD5D8",
    "size": 4,
    "section": ".sdata2",
    "kind": "global"

@@ -7,7 +7,7 @@ extern void* gEventMgr;     // 0x805FB6C8
 extern u8    gWorldState[]; // 0x803E6D00
 
 // fn_800C52F0 is defined with C++ linkage in small_800C.cpp.
-u8*      fn_800C52F0(u8* p, s32 del);                   // 0x800C52F0 (deleting dtor)
+u8* fn_800C52F0(u8* p, s32 del);                   // 0x800C52F0 (deleting dtor)
 
 extern "C" {
 void     operator_delete(void* p);
@@ -45,6 +45,7 @@ extern u32 lbl_805F8C78[]; // 0x805F8C78 (two record tags)
 
 extern "C" {
 
+// 0x8009BE68
 // Deleting destructor: base dtor (fn_800C52F0) on the object, then frees it if del > 0. Returns the object.
 u8* fn_8009BE68(u8* arg0, s32 arg1) {
     if (arg0 != NULL) {
