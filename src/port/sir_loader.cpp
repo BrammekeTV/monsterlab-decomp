@@ -194,7 +194,7 @@ extern "C" const char* SirErrorText(SirError e) {
     case SIR_ERR_INPUT:          return "input table not recognised (count, step pointer, step type or source count)";
     case SIR_ERR_TEXTURE:        return "texture list not recognised (links, header or data outside the image)";
     case SIR_ERR_STRINGS:        return "string table array or a string outside the image";
-    case SIR_ERR_ACTIONS:        return "action table array or a record outside the image";
+    case SIR_ERR_ACTIONS:        return "action table array or a record outside the image, or a record that is not a program (length, jump)";
     case SIR_ERR_UI:             return "UI root, font or UI object not recognised (pointer outside the image, font kind or page count)";
     case SIR_ERR_SCREENS:        return "screen state machine not recognised (count, node type or pointer outside the image)";
     case SIR_ERR_OVERLAP:        return "two objects of the image share bytes";
@@ -1017,6 +1017,97 @@ static void ConvertRecords(SirReloc* r, u8* p, u32 size, u32 recSize, const SirF
     for (u32 o = 0; o + recSize <= size; o += recSize) SirConvertRecord(r, p + o, recSize, fields, n);
 }
 
+// ---- action records (what the action table's pointers lead to)
+//
+// A record is a program for the interpreter fn_801E1BD4 (0x801E1BD4): 32-bit words, each
+// instruction one word {opcode bits 0-7, length in words bits 8-15, bits 16-27 a function index
+// or a jump distance in words} followed by length - 1 operand words; opcode 0xFF ends it. Every
+// operand is a 32-bit value: an int (opcode 18), a float (19), an action word (23), or the
+// arguments of a script function (22), which the interpreter copies as words and hands to
+// ScriptDispatchEngine. So the whole program is converted as u32 words.
+//
+// Two things the loader cannot see, because they depend on the script function table, which the
+// game fills after this file is loaded (docs/loader.md, "Action records"):
+// - a function whose signature has an argument of type 0xA (Print) has bytes behind its
+//   instruction word, not words. The shipped file has no such call.
+// - arguments of type 0xB and 0xD are pointers into the image (42 in the shipped file). They are
+//   converted as words, which is right only while the image sits at its original address, as it
+//   does in the PC build. The objects they point at are not converted.
+#define ACTION_OP_HEADER    0x01   // fn_801E2368: a record that does not start with it is not run
+#define ACTION_OP_JUMP_MIN  0x04   // 4 jump, 5 jump if the result is zero, 6-17 compare and jump
+#define ACTION_OP_JUMP_MAX  0x11
+#define ACTION_OP_PUSH_INT  0x12
+#define ACTION_OP_PUSH_F32  0x13
+#define ACTION_OP_CALL      0x16
+#define ACTION_OP_ACTION    0x17
+#define ACTION_OP_LAST      0x1B   // opcodes above it (except the end) are skipped as one word
+#define ACTION_OP_END       0xFF
+#define ACTION_CALL_ARGS    8      // the interpreter's argument buffer: the instruction word and 8 arguments
+
+static inline u32 ActionOp(u32 word)   { return word & 0xFF; }
+static inline u32 ActionLen(u32 word)  { return (word >> 8) & 0xFF; }
+static inline u32 ActionJump(u32 word) { return (word >> 16) & 0xFFF; }   // fn_801E239C
+
+// Words an instruction occupies; 0 if the interpreter could not step over it.
+static u32 ActionInstructionWords(u32 word) {
+    u32 op = ActionOp(word), len = ActionLen(word);
+    if (op > ACTION_OP_LAST) return 1;
+    if (len == 0) return 0;
+    if (op == ACTION_OP_CALL && len > 1 + ACTION_CALL_ARGS) return 0;
+    if ((op == ACTION_OP_PUSH_INT || op == ACTION_OP_PUSH_F32 || op == ACTION_OP_ACTION) && len < 2) return 0;
+    return len;
+}
+
+// Checks one program and records it. Walks the instructions in file order to the end word, then
+// checks that every jump lands on an instruction of the same program.
+static SirError ActionRecordPlan(ImagePlan* plan, const u8* image, u32 imageSize, u32 addr) {
+    u32 off;
+    if (!ImageSpan(addr, 4, imageSize, &off)) return SIR_ERR_ACTIONS;
+    if (ActionOp(Be32(image + off)) != ACTION_OP_HEADER)      // never run: only its first word is read
+        return PlanAdd(plan, off, 4, REGION_U32_ARRAY) ? SIR_OK : SIR_ERR_ACTIONS;
+
+    u32 words = 0;
+    for (;;) {
+        if ((u64)off + ((u64)words + 1) * 4 > imageSize) return SIR_ERR_ACTIONS;
+        u32 word = Be32(image + off + words * 4);
+        if (ActionOp(word) == ACTION_OP_END) break;
+        u32 n = ActionInstructionWords(word);
+        if (n == 0) return SIR_ERR_ACTIONS;
+        words += n;
+    }
+    u32 total = words + 1;   // with the end word
+    if ((u64)off + (u64)total * 4 > imageSize) return SIR_ERR_ACTIONS;
+
+    u8* starts = (u8*)calloc(total, 1);
+    if (starts == NULL) return SIR_ERR_ACTIONS;
+    for (u32 i = 0; i < words; i += ActionInstructionWords(Be32(image + off + i * 4))) starts[i] = 1;
+    starts[words] = 1;
+    bool ok = true;
+    for (u32 i = 0; i < words && ok; i += ActionInstructionWords(Be32(image + off + i * 4))) {
+        u32 word = Be32(image + off + i * 4), op = ActionOp(word);
+        if (op < ACTION_OP_JUMP_MIN || op > ACTION_OP_JUMP_MAX) continue;
+        u32 target = i + ActionJump(word);
+        ok = target < total && starts[target];
+    }
+    free(starts);
+    if (!ok) return SIR_ERR_ACTIONS;
+    return PlanAdd(plan, off, total * 4, REGION_U32_ARRAY) ? SIR_OK : SIR_ERR_ACTIONS;
+}
+
+// Every record of the action table at `addr` (already checked by PtrArrayPlan).
+static SirError ActionRecordsPlan(ImagePlan* plan, const u8* image, u32 imageSize, u32 addr) {
+    u32 off = addr - GLOBAL_BINARY_WII_BASE;
+    u32 count = Be32(image + off + 0x00);
+    u32 array = Be32(image + off + 0x04) - GLOBAL_BINARY_WII_BASE;
+    for (u32 i = 0; i < count; i++) {
+        u32 rec = Be32(image + array + i * 4);
+        if (rec == 0) continue;
+        SirError e = ActionRecordPlan(plan, image, imageSize, rec);
+        if (e != SIR_OK) return e;
+    }
+    return SIR_OK;
+}
+
 // ---- all of them
 
 static SirError ImagePlanBuild(ImagePlan* plan, const u8* hdr, u8* image, u32 imageSize) {
@@ -1028,6 +1119,7 @@ static SirError ImagePlanBuild(ImagePlan* plan, const u8* hdr, u8* image, u32 im
         e = PtrArrayPlan(plan, image, imageSize, addr, STRING_TABLE_SIZE, 0x0C, 0x00, REGION_STRING_TABLE, SIR_ERR_STRINGS);
     if (e == SIR_OK && (addr = Be32(hdr + 0x844)) != 0)
         e = PtrArrayPlan(plan, image, imageSize, addr, ACTION_TABLE_SIZE, 0x00, 0x04, REGION_ACTION_TABLE, SIR_ERR_ACTIONS);
+    if (e == SIR_OK && addr != 0) e = ActionRecordsPlan(plan, image, imageSize, addr);
     if (e == SIR_OK && (addr = Be32(hdr + 0xDB0)) != 0) e = UiRootPlan(plan, image, imageSize, addr);
     if (e == SIR_OK && (addr = Be32(hdr + 0xDB4)) != 0) e = UiFontListPlan(plan, image, imageSize, addr);
     if (e == SIR_OK && (addr = Be32(hdr + 0xDB8)) != 0) e = UiDrawPlan(plan, image, imageSize, addr);

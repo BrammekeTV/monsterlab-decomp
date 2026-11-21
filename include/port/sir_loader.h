@@ -21,7 +21,7 @@ typedef enum SirError {
     SIR_ERR_INPUT,            // input table (header slot 0xDC4): bad count, step pointer, step type or source count
     SIR_ERR_TEXTURE,          // texture list (header slot 0xD94): broken links, bad header or data outside the image
     SIR_ERR_STRINGS,          // string table (header slot 0xDA8): array or a string outside the image
-    SIR_ERR_ACTIONS,          // action table (header slot 0x844): array or a record outside the image
+    SIR_ERR_ACTIONS,          // action table (header slot 0x844): array or a record outside the image, or not a program
     SIR_ERR_UI,               // UI root, fonts or the objects of slots 0xDB4-0xDBC: pointer outside the image, font kind
     SIR_ERR_SCREENS,          // screen state machines (slots 0xD98, 0xD9C): bad count, node type or pointer
     SIR_ERR_OVERLAP,          // two of the objects above share bytes
@@ -291,7 +291,9 @@ typedef struct SirStringTable {
 } SirStringTable;
 
 // Action table (header slot 0x844, gGlobalBinaryField844): TriggerDoAction (0x801E0054) runs
-// records[index] for index < count. The records themselves are script words and not converted yet.
+// records[index] for index < count. A record is a program of 32-bit words for the interpreter
+// fn_801E1BD4: {opcode bits 0-7, length in words bits 8-15, function index or jump distance bits
+// 16-27}, then length - 1 operand words; opcode 0xFF ends it. All of it is converted as words.
 typedef struct SirActionTable {
     u32   count;            // 0x00: code
     u8**  records;          // 0x04: code

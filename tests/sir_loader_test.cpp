@@ -167,6 +167,24 @@ static void DumpImage(const GlobalBinaryFile* f) {
         PrintPtr((const u8*)&at->records[i], f);
         printf("\n");
     }
+    // The records, walked the way the interpreter fn_801E1BD4 steps through a program.
+    for (u32 i = 0; i < at->count; i++) {
+        const u32* pc = (const u32*)at->records[i];
+        if (pc == NULL || (pc[0] & 0xFF) != 1) continue;
+        u32 n = 0, calls = 0, jumps = 0, h = 0x811C9DC5u;
+        for (;;) {
+            u32 op = pc[n] & 0xFF, len = (pc[n] >> 8) & 0xFF;
+            if (op == 0xFF) break;
+            calls += op == 0x16;
+            jumps += op >= 4 && op <= 0x11;
+            n += op <= 0x1B ? len : 1;
+        }
+        for (u32 k = 0; k <= n; k++)
+            for (s32 shift = 24; shift >= 0; shift -= 8) h = (h ^ ((pc[k] >> shift) & 0xFF)) * 0x01000193u;
+        printf("actionprog %u ", i);
+        PrintPtr((const u8*)&at->records[i], f);
+        printf(" words %u calls %u jumps %u sum %08x\n", n + 1, calls, jumps, h);
+    }
 }
 
 static void PrintWords(const u8* p, u32 n) {
@@ -621,7 +639,9 @@ static void Put16(u8* p, u16 v) {
 #define T_TRANS_B   (T_TRANS_A + 0x20)       // 0x20
 #define T_STRANS    (T_TRANS_B + 0x20)       // 0x30: transition of the shared event
 #define T_KEYS      (T_STRANS + 0x30)        // two state keys
-#define T_SIZE      (T_KEYS + 0x10)
+#define T_PROG0     (T_KEYS + 0x10)          // action record: 12 words
+#define T_PROG1     (T_PROG0 + 0x30)         // action record: 3 words, then a fill word
+#define T_SIZE      (T_PROG1 + 0x10)
 #define T_ADDR(off) (GLOBAL_BINARY_WII_BASE + (off))
 
 #define T_OBJECT_PTRS 68u   // image pointers in the hand-typed objects and their header slots
@@ -721,8 +741,22 @@ static void BuildObjects(u8* hdr, u8* img) {
     u8* at = img + T_ACT;
     Put32(at + 0x00, 2);
     Put32(at + 0x04, T_ADDR(T_ACT + 0x08));
-    Put32(at + 0x08, T_ADDR(T_ROWS_B + 0x20));
-    Put32(at + 0x0C, T_ADDR(T_ROWS_B + 0x30));
+    Put32(at + 0x08, T_ADDR(T_PROG0));
+    Put32(at + 0x0C, T_ADDR(T_PROG1));
+    // Two programs for the interpreter: {opcode, length << 8, index or jump distance << 16}.
+    static const u32 prog0[12] = {
+        0x02C10101,                 // header
+        0x062E0216, 0x00000001,     // call function 0x62E with one argument
+        0x00000212, 0xFFFFFFFE,     // push int -2
+        0x00000213, 0x3F800000,     // push float 1.0
+        0x00020106,                 // jump two words ahead if equal
+        0x00000102,                 // (skipped)
+        0x00000217, 0x17FC0001,     // run global action 1
+        0x000000FF,                 // end
+    };
+    static const u32 prog1[3] = { 0x00000101, 0x00010104, 0x000000FF };   // header, jump to the end, end
+    for (u32 i = 0; i < 12; i++) Put32(img + T_PROG0 + i * 4, prog0[i]);
+    for (u32 i = 0; i < 3; i++) Put32(img + T_PROG1 + i * 4, prog1[i]);
 }
 
 // UI root, one font, the objects of slots 0xDB4-0xDBC, and two state machines sharing one
@@ -1015,8 +1049,13 @@ static int SelfTest(void) {
         CHECK(st->count == 3 && st->buildAddr == 0x930DDD40 && st->unk04 == NULL && st->text == (const u8*)img + T_STR + 0x30);
         CHECK(strcmp(st->strings[0], "abc") == 0 && st->strings[1] == NULL && strcmp(st->strings[2], "Wxyz") == 0);
         const SirActionTable* at = *(const SirActionTable**)(hdr + 0x844);
-        CHECK(at->count == 2 && at->records[0] == img + T_ROWS_B + 0x20 && at->records[1] == img + T_ROWS_B + 0x30);
-        CHECK(img[T_ROWS_B + 0x20] == 0x7F && img[T_ROWS_B + 0x23] == 0x01);     // the records are not converted
+        CHECK(at->count == 2 && at->records[0] == img + T_PROG0 && at->records[1] == img + T_PROG1);
+        const u32* p0 = (const u32*)at->records[0];                              // as fn_801E1BD4 reads a program
+        CHECK(p0[0] == 0x02C10101 && (p0[1] & 0xFF) == 0x16 && ((p0[1] >> 8) & 0xFF) == 2 && ((p0[1] >> 16) & 0xFFF) == 0x62E);
+        CHECK(p0[2] == 1 && (s32)p0[4] == -2 && *(const f32*)&p0[6] == 1.0f && p0[10] == 0x17FC0001 && p0[11] == 0xFF);
+        const u32* p1 = (const u32*)at->records[1];
+        CHECK(p1[1] == 0x00010104 && p1[2] == 0xFF);
+        CHECK(img[T_PROG1 + 0x0C] == 0x7F && img[T_PROG1 + 0x0F] == 0x01);       // the word behind the end: untouched
     }
 
     // UI root, font and the objects of slots 0xDB4-0xDBC, read the way the game code does.
@@ -1145,6 +1184,13 @@ static int SelfTest(void) {
         { T_STR + 0x28, T_ADDR(T_SIZE), SIR_ERR_STRINGS, -1 },                              // string outside the image
         { T_ACT + 0x0C, 0x12345678, SIR_ERR_ACTIONS, -1 },                                  // record outside the image
         { T_ACT + 0x04, T_ADDR(T_STR + 0x24), SIR_ERR_OVERLAP, -1 },                        // two tables share an array
+        { T_PROG0 + 0x04, 0x062E0016, SIR_ERR_ACTIONS, -1 },                                // instruction of length 0
+        { T_PROG0 + 0x04, 0x062E0A16, SIR_ERR_ACTIONS, -1 },                                // call with more than 8 arguments
+        { T_PROG0 + 0x0C, 0x00000112, SIR_ERR_ACTIONS, -1 },                                // push without its operand
+        { T_PROG0 + 0x1C, 0x00030106, SIR_ERR_ACTIONS, -1 },                                // jump into an operand
+        { T_PROG0 + 0x1C, 0x00060106, SIR_ERR_ACTIONS, -1 },                                // jump past the end
+        { T_PROG1 + 0x08, 0x00000102, SIR_ERR_ACTIONS, -1 },                                // no end word
+        { T_ACT + 0x0C, T_ADDR(T_PROG0 + 0x14), SIR_ERR_OVERLAP, -1 },                      // record inside another record
         { T_UI_ROOT + 0x14, T_ADDR(T_SIZE - 0x40), SIR_ERR_UI, -1 },                        // font runs off the image
         { T_FONT_OBJ + 0x04, 2, SIR_ERR_UI, -1 },                                           // font object of no known class
         { T_FONT_OBJ + 0x124, UI_FONT_PAGES + 1, SIR_ERR_UI, -1 },                          // more pages than slots
