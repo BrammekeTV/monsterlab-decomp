@@ -6,9 +6,9 @@
 
 extern "C" {
 f32  fn_800DE2AC(u8* zone);        // 0x800DE2AC
+BOOL ZoneIsLoaded(void* world, s32 zone);      // 0x8012F408
 extern u8 gWorldState[];           // 0x803E6D00 (first word: world block pointer)
 }
-BOOL ZoneIsLoaded(void* world, s32 zone);      // 0x8012F408
 extern "C++" s32 gZoneResourceSize;            // 0x805FB94C
 
 // The sources share four vtable slots: 0xC fills a position and a direction and returns
