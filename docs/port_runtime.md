@@ -27,7 +27,12 @@ build\pc\monsterlab.exe                        # runs main() with your own disc 
 | `--window` | open a window and draw into it |
 | `--screenshot FILE` | write the last picture shown as a PNG when the run stops (works without `--window`) |
 | `--scale N` | frame buffer size as a multiple of the console's 640x528 (default 2) |
+| `--peek ADDR` | print four words of Wii memory (hex address) when the run stops |
 | `--show-texture N` | development aid: when the boot stops, draw texture N of `global_binary.sir` through the engine's draw path instead of ending (see "GX: the renderer") |
+
+Debugging aids: `--peek ADDR` (up to eight) prints four words of Wii memory at the stop;
+`PORT_SCRIPT_TRACE=1` in the environment logs every call the script engine makes to a registered
+script function, by name; `PORT_GFX_TRACE=1` logs draws and copies.
 
 The run ends with a boot summary: what was reached and when, disc files opened, SDK calls that
 do nothing yet, and the stop reason. Exit codes: 0 frame limit or the game asked to exit,
@@ -64,10 +69,12 @@ What boots today, with the retail PAL disc:
 11. `UiInit`, the rest of `GameStart` (save system on the PC save folder, language, string
     table) and `HomeButtonInit` (the SDK's HOME-menu library is stubbed).
 12. The frame loop: `EngineFrame`, the UI update, `LoadingScreenTick` with `RendClear`.
-13. In the first UI update a screen state runs its action through `TriggerDoAction`, and the
-    script interpreter (`fn_801E1BD4`) loops: the action records of `global_binary.sir` are
-    still big-endian (`docs/loader.md`). That is the first stop today; like the UI data before
-    it, it is data conversion, not a missing function.
+13. The main loop runs: the game presents frames (mode 2, the front end) and its boot script
+    calls `LoadLevel`. There is no controller: `KPADRead` gives no samples and `WPADProbe`
+    answers "no controller".
+14. The level load (`fn_80007D68`) crashes on the effect tables of `global_binary.sir` (header
+    slots 0x82C-0x840), which are still big-endian (`docs/loader.md`). That is the first stop
+    today. The frames up to it are black: nothing is in the scene yet.
 
 Drawing works apart from that: with `--show-texture N` the run goes on from the stop and draws
 a texture of `global_binary.sir` with the engine's own frame functions (`RendBeginFrame`, its

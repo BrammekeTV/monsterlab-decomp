@@ -73,6 +73,8 @@ void PortStubCall(const char* name) {
 }
 
 static void PrintMissing(void);
+static u32 sPeek[8];
+static int sPeekCount;
 static void PrintSummary(void) {
     char buf[256];
     fprintf(stderr, "\n==== boot summary ====\n");
@@ -83,6 +85,10 @@ static void PrintSummary(void) {
     fprintf(stderr, "data: %s\n", PortFileStats(buf, sizeof(buf)));
     { char gx[512]; fprintf(stderr, "GX: %s\n", PortGxStatsText(gx, sizeof(gx))); }
     { char gfx[256]; fprintf(stderr, "drawn: %s\n", PortGfxStatsText(gfx, sizeof(gfx))); }
+    for (int i = 0; i < sPeekCount; i++) {       // --peek ADDR: four words of Wii memory at the stop
+        const u32* p = (const u32*)(uintptr_t)(sPeek[i] & ~3u);
+        if (PortIsWiiAddr(sPeek[i])) fprintf(stderr, "peek 0x%08X: %08X %08X %08X %08X\n", sPeek[i] & ~3u, p[0], p[1], p[2], p[3]);
+    }
     fprintf(stderr, "reached, in order:\n");
     for (s32 i = 0; i < sMilestoneCount; i++) {
         if (!sMilestones[i].stub) fprintf(stderr, "  %6u ms  %s\n", sMilestones[i].ms, sMilestones[i].what);
@@ -123,7 +129,40 @@ void PortStop(int exitCode, const char* fmt, ...) {
     TerminateProcess(GetCurrentProcess(), (UINT)exitCode);
 }
 
+// PORT_SCRIPT_TRACE=1: logs every call the script engine makes to a registered script function.
+// The function table (0x80484230: 0x880 entries of {signature, function, name hash}) gets a small
+// code thunk in front of each function: push the index, call the logger, jump to the function.
+static void* sScriptReal[0x880];
+static void __cdecl ScriptTraceLog(u32 index) {
+    static u32 last = ~0u, repeats;
+    if (index == last) { repeats++; return; }
+    if (repeats) fprintf(stderr, "[script]   (x%u more)\n", repeats);
+    last = index; repeats = 0;
+    char who[160];
+    fprintf(stderr, "[script] %s (function %u, frame %d)\n", PortDescribePc(sScriptReal[index], who, sizeof(who)), index, (int)sFrames);
+}
+static void InstallScriptTrace(void) {
+    struct Entry { u32 type; void* fn; u32 hash; };
+    Entry* table = (Entry*)(uintptr_t)0x80484230;
+    u8* code = (u8*)VirtualAlloc(NULL, 0x880 * 24, MEM_COMMIT | MEM_RESERVE, PAGE_EXECUTE_READWRITE);
+    if (!code) return;
+    u32 n = 0;
+    for (u32 i = 0; i < 0x880; i++) {
+        if (!table[i].fn) continue;
+        sScriptReal[i] = table[i].fn;
+        u8* t = code + i * 24;
+        t[0] = 0x68; memcpy(t + 1, &i, 4);                                   // push index
+        t[5] = 0xE8; s32 rel = (s32)((u8*)ScriptTraceLog - (t + 10)); memcpy(t + 6, &rel, 4);   // call logger
+        t[10] = 0x83; t[11] = 0xC4; t[12] = 0x04;                            // add esp, 4
+        t[13] = 0xE9; rel = (s32)((u8*)table[i].fn - (t + 18)); memcpy(t + 14, &rel, 4);       // jmp function
+        table[i].fn = t;
+        n++;
+    }
+    PortLog("script trace: %u script functions wrapped", n);
+}
+
 void PortFrameDone(void) {
+    if (sFrames == 1 && getenv("PORT_SCRIPT_TRACE")) InstallScriptTrace();
     sFrames++;
     if (gPortOptions.frameLimit && sFrames >= gPortOptions.frameLimit) {
         PortStop(0, "frame limit reached (%d frames)", sFrames);
@@ -741,6 +780,7 @@ struct PortBoot {
             else if (!strcmp(a, "--seconds") && i + 1 < __argc) gPortOptions.secondsLimit = atoi(__argv[++i]);
             else if (!strcmp(a, "--data") && i + 1 < __argc) asked = __argv[++i];
             else if (!strcmp(a, "--window")) gPortOptions.window = TRUE;
+            else if (!strcmp(a, "--peek") && i + 1 < __argc && sPeekCount < 8) sPeek[sPeekCount++] = strtoul(__argv[++i], NULL, 16);
             else if (!strcmp(a, "--show-texture") && i + 1 < __argc) gPortOptions.showTexture = atoi(__argv[++i]);
             else if (!strcmp(a, "--screenshot") && i + 1 < __argc) gPortOptions.screenshot = __argv[++i];
             else if (!strcmp(a, "--scale") && i + 1 < __argc) gPortOptions.scale = atoi(__argv[++i]);

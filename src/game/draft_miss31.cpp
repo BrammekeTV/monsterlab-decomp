@@ -360,7 +360,8 @@ void LoadLevel(u32 a0) {
         found = 1;
     } else if (a0 != 0) {
         u8 i = 0;
-        for (s32 n = 0; n < 0x11; n++, i++) {
+        // 0x44 levels: the original loop runs 0x11 times over four entries each
+        for (s32 n = 0; n < 0x44; n++, i++) {
             if (a0 == *(u32*)(gLevelFlags + (u32)i * 0x20 + 4)) {
                 level = i;
                 found = 1;
