@@ -689,12 +689,40 @@ the other levels have three (projectiles, 30 render objects, and one more).
 A level's pointers can lead into another zone's image, which is not in memory when zone 0 is
 converted. Such an object is skipped; the pointer itself is still converted.
 
+### Zone records and animated materials
+
+Every zone slot's `+0xFC` points at a 0x40-byte **zone record**. All 493 records lie at the start
+of zone 0's image, one after the other; the objects a record lists lie in the record's own zone.
+A record is a word and four lists `{head, tail, count}` at `+0x04`, `+0x10`, `+0x1C` and `+0x28`,
+whose nodes `{next, previous, list}` are inside the listed objects. Only the list at `+0x10` has a
+known reader: `WorldTick` walks it every frame (`ParticleSystemFirst`, 0x80169838). The loader
+converts that list's head and, for the objects in the zone being converted:
+
+| What | Fields | Reader |
+|---|---|---|
+| list object (0x80 bytes used; the node is at its `+0x10`) | `+0x08` pointer, `+0x10` next node, `+0x3C` eight outputs, `+0x5C` eight animation players, `+0x7C` one more player | `WorldTick`, `ParticleSystemUpdateExtra` |
+| output of a player | twelve floats (a 3x4 texture matrix) | `ParticleEmitterUpdate` writes all of them |
+| animation player | `+0x04` mode, `+0x08` offset of its elements, `+0x10` channel count, `+0x14` track, `+0x18` element stride, `+0x1C` wrapped, `+0x20` paused, `+0x24` time, `+0x28` one key pointer per channel | `fn_8016A64C`, `fn_8016A43C`, `fn_8016A788`, `ParticleEmitterUpdate` |
+| element of a mode 1 player (one per channel) | `+0x00` id, `+0x08` current value | `ParticleSystemUpdateExtra`, `fn_8016A788`, `ParticleEmitterUpdate` |
+| track | `+0x20` length, `+0x24` offset of the channel table; of each 8-byte table entry the first word, the offset of the channel's keys | `fn_8016A64C` |
+| keys of a mode 1 channel | 8 bytes each: `u16` time, value word at `+4`; the run ends with a key at time 0xFFFF | `fn_8016A43C`, `fn_8016A788` |
+
+In the level files the list objects are materials (the names next to them are material names),
+and the one or two per level that have a player animate their texture matrix: five channels of
+1,500 keys. `empty_level.sir` has one such object and no player.
+
+Not converted: the record's first word, the other three lists (no reader found; the first holds
+textures), the tail and count of the list at `+0x10`, the previous and list words of a node, the
+rest of a list object, the second word of a channel table entry (it is the key count), and
+players of mode 0 (position and rotation keys, `fn_8016A788`): none is reached from a zone
+record in zone 0 of any level.
+
 ### Not converted yet in level files
 
 | What | Where | Next reader |
 |---|---|---|
 | the rest of an entity | beyond the fields above: the action words without a reader, the name at `+0x108`, data of types other than 6 | the per-type update and script functions |
-| the zone record | start of each zone image, 0x40 bytes: a word and three lists `{head, tail, count}` (the first is the texture list) | `WorldTick` reads slot `+0xFC` |
+| three of a zone record's four lists | `+0x04`, `+0x1C`, `+0x28` | none found yet |
 | render objects | pool items of fix-up 655 | `fn_8012F818` |
 | value tables of the HUD's machines | another zone's image | `fn_801BBE40`, as soon as a state runs an action |
 | zone action tables and their records | slot `+0xD4` | `TriggerDoAction`; `ActionRecordPlan` applies |

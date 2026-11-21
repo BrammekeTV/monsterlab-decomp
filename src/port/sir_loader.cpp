@@ -200,6 +200,7 @@ extern "C" const char* SirErrorText(SirError e) {
     case SIR_ERR_EFFECTS:        return "effect definition table, a texture or a pool pointer of it outside the image";
     case SIR_ERR_POOL:           return "object pool not recognised (counts, block, or a list pointer that is not one of its nodes)";
     case SIR_ERR_LEVEL:          return "level header block not recognised (zone slot table)";
+    case SIR_ERR_ZONE_RECORD:    return "zone record of a level zone not recognised (list that leaves the zone or loops, bad animation player)";
     case SIR_ERR_ENTITY:         return "entity of a level zone not recognised (part list outside the zone, child list that loops)";
     case SIR_ERR_OVERLAP:        return "two objects of the image share bytes";
     case SIR_ERR_IO:             return "cannot read file";
@@ -360,6 +361,7 @@ enum RegionKind {
     REGION_FX_BOLTS, REGION_FX_TRAILS, REGION_POOL, REGION_POOL_BLOCK,
     REGION_ENTITY, REGION_ENTITY_RECORD, REGION_ENTITY_PART, REGION_PTR_COUNT, REGION_COUNT_PTR, REGION_POOL_TABLE,
     REGION_ENTITY_PROP, REGION_PROP_DEF,
+    REGION_ZONE_SYSTEM, REGION_ANIM_PLAYER, REGION_ANIM_ELEM, REGION_ANIM_TRACK, REGION_ANIM_KEYS, REGION_F32_ARRAY,
     REGION_RUNTIME    // memory the game initialises itself: nothing to convert, but nothing else may be there
 };
 
@@ -1474,6 +1476,95 @@ static SirError EntityPlan(ImagePlan* plan, const u8* image, u32 imageSize, u32 
     return SIR_OK;
 }
 
+// ---- zone record of a level zone
+//
+// A zone slot's +0xFC points at the zone record, at the start of the zone's image. WorldTick
+// walks its list at +0x10 (ParticleSystemFirst): objects linked through a node at their +0x10.
+// Each has eight animation players (+0x5C) with an output each (+0x3C), and one more player at
+// +0x7C. In the level files these are materials whose texture matrix is animated.
+// Only the list at +0x10 has a known reader; the record's other lists are not converted.
+static const SirField kZoneSystemFields[] = {
+    { 0x08, SIR_PTR, 1 },     // code: handed to the per-type function (ParticleSystemUpdateExtra)
+    { 0x10, SIR_PTR, 1 },     // code: next object's node (WorldTick)
+    { 0x3C, SIR_PTR, 17 },    // code: 8 outputs, 8 players, the player at +0x7C (WorldTick)
+};
+// Animation player (fn_8016A64C, fn_8016A43C, fn_8016A788). Key pointers follow at +0x28, one
+// per channel; the elements (one per channel, `stride` bytes) are at +[+0x08].
+static const SirField kAnimPlayerFields[] = {
+    { 0x04, SIR_U32, 2 },     // code: mode (0 or 1), offset of the elements
+    { 0x10, SIR_U32, 1 },     // code: channel count
+    { 0x14, SIR_PTR, 1 },     // code: track
+    { 0x18, SIR_U32, 3 },     // code: element stride (ParticleEmitterUpdate), wrapped flag, paused flag
+    { 0x24, SIR_F32, 1 },     // code: time
+};
+// Element of a mode 1 player: an id (ParticleSystemUpdateExtra) and at +8 the value, which
+// fn_8016A788 copies as a word from the key and ParticleEmitterUpdate reads as a float.
+static const SirField kAnimElemFields[] = {
+    { 0x00, SIR_U32, 1 }, { 0x08, SIR_U32, 1 },
+};
+// Track, from +0x20: length (fn_8016A64C) and the offset of its channel table, whose 8-byte
+// entries start with the offset of the channel's keys.
+static const SirField kAnimTrackFields[] = {
+    { 0x00, SIR_F32, 1 }, { 0x04, SIR_U32, 1 },
+};
+
+// A mode 1 channel is a run of 8-byte keys {u16 time, -, value}; fn_8016A43C steps to the next
+// key while that one's time is below the position (at most 0xFFFF), so the run ends with a key
+// at time 0xFFFF.
+static SirError AnimPlayerPlan(ImagePlan* plan, const u8* image, u32 imageSize, u32 addr) {
+    u32 off, t;
+    if (!LevelSpan(addr, ANIM_PLAYER_HEAD, imageSize, &off) || PlanHas(plan, off, REGION_ANIM_PLAYER)) return SIR_OK;
+    const u8* p = image + off;
+    u32 mode = Be32(p + 0x04), elems = Be32(p + 0x08), count = Be32(p + 0x10), stride = Be32(p + 0x18);
+    if (count > imageSize / 4 || (u64)off + ANIM_PLAYER_HEAD + (u64)count * 4 > imageSize) return SIR_ERR_ZONE_RECORD;
+    if (!PlanAdd(plan, off, ANIM_PLAYER_HEAD, REGION_ANIM_PLAYER)) return SIR_ERR_ZONE_RECORD;
+    if (count != 0 && !PlanAdd(plan, off + ANIM_PLAYER_HEAD, count * 4, REGION_PTR_ARRAY)) return SIR_ERR_ZONE_RECORD;
+    if (mode != 1) return SIR_OK;                                // mode 0 (position and rotation keys): not converted yet
+    if (stride < 0xC || elems < ANIM_PLAYER_HEAD + count * 4 || (u64)off + elems + (u64)count * stride > imageSize) return SIR_ERR_ZONE_RECORD;
+    for (u32 i = 0; i < count; i++)
+        if (!PlanAdd(plan, off + elems + i * stride, 0xC, REGION_ANIM_ELEM)) return SIR_ERR_ZONE_RECORD;
+    // Players can share a track: every one gets the channels of its own count checked.
+    if (!LevelSpan(Be32(p + 0x14), 0x28, imageSize, &t)) return SIR_OK;
+    if (!PlanHas(plan, t + 0x20, REGION_ANIM_TRACK) && !PlanAdd(plan, t + 0x20, 8, REGION_ANIM_TRACK)) return SIR_ERR_ZONE_RECORD;
+    u64 table = (u64)t + Be32(image + t + 0x24);
+    if (table + (u64)count * 8 > imageSize) return SIR_ERR_ZONE_RECORD;
+    for (u32 i = 0; i < count; i++) {
+        u32 entry = (u32)table + i * 8;
+        if (!PlanAdd(plan, entry, 4, REGION_U32_ARRAY)) return SIR_ERR_ZONE_RECORD;
+        u64 first = (u64)t + Be32(image + entry), k = first;
+        for (;; k += 8) {
+            if (k + 8 > imageSize) return SIR_ERR_ZONE_RECORD;
+            if (image[k] == 0xFF && image[k + 1] == 0xFF) break;
+        }
+        if (!PlanAdd(plan, (u32)first, (u32)(k + 8 - first), REGION_ANIM_KEYS)) return SIR_ERR_ZONE_RECORD;
+    }
+    return SIR_OK;
+}
+
+static SirError ZoneRecordPlan(ImagePlan* plan, const u8* image, u32 imageSize, u32 addr) {
+    u32 off, o, q;
+    if (!LevelSpan(addr, 0x14, imageSize, &off) || PlanHas(plan, off + 0x10, REGION_PTR_ARRAY)) return SIR_OK;
+    if (!PlanAdd(plan, off + 0x10, 4, REGION_PTR_ARRAY)) return SIR_ERR_ZONE_RECORD;
+    u32 node = Be32(image + off + 0x10), guard = imageSize / ZONE_SYSTEM_USED + 1;
+    SirError e;
+    // Every zone's record is in zone 0's image; the objects are in the record's own zone.
+    while (node >= sImageBase && node - sImageBase < imageSize) {
+        if (guard-- == 0 || node < sImageBase + 0x10 || !ImageSpan(node - 0x10, ZONE_SYSTEM_USED, imageSize, &o)) return SIR_ERR_ZONE_RECORD;
+        if (PlanHas(plan, o, REGION_ZONE_SYSTEM)) return SIR_ERR_ZONE_RECORD;       // a list that loops
+        if (!PlanAdd(plan, o, ZONE_SYSTEM_USED, REGION_ZONE_SYSTEM)) return SIR_ERR_ZONE_RECORD;
+        for (u32 k = 0; k < 8; k++) {
+            u32 player = Be32(image + o + 0x5C + k * 4);
+            if (player == 0) continue;
+            // The player's output: twelve floats, all written by ParticleEmitterUpdate.
+            if (LevelSpan(Be32(image + o + 0x3C + k * 4), 0x30, imageSize, &q) && !PlanAdd(plan, q, 0x30, REGION_F32_ARRAY)) return SIR_ERR_ZONE_RECORD;
+            if ((e = AnimPlayerPlan(plan, image, imageSize, player)) != SIR_OK) return e;
+        }
+        if ((e = AnimPlayerPlan(plan, image, imageSize, Be32(image + o + 0x7C))) != SIR_OK) return e;
+        node = Be32(image + o + 0x10);
+    }
+    return SIR_OK;
+}
+
 // ---- all of them
 
 static SirError ImagePlanBuild(ImagePlan* plan, const u8* hdr, u8* image, u32 imageSize) {
@@ -1545,6 +1636,16 @@ static void ImagePlanConvert(const ImagePlan* plan, SirReloc* r, u8* image, u32 
         case REGION_ENTITY:       SirConvertRecord(r, p, g->size, kEntityFields, COUNTOF(kEntityFields)); break;
         case REGION_ENTITY_PROP:  SirConvertRecord(r, p, g->size, kEntityFields, COUNTOF(kEntityFields));
                                   SirConvertRecord(r, p, g->size, kPropFields, COUNTOF(kPropFields)); break;
+        case REGION_ZONE_SYSTEM:  SirConvertRecord(r, p, g->size, kZoneSystemFields, COUNTOF(kZoneSystemFields)); break;
+        case REGION_ANIM_PLAYER:  SirConvertRecord(r, p, g->size, kAnimPlayerFields, COUNTOF(kAnimPlayerFields)); break;
+        case REGION_ANIM_ELEM:    SirConvertRecord(r, p, g->size, kAnimElemFields, COUNTOF(kAnimElemFields)); break;
+        case REGION_ANIM_TRACK:   SirConvertRecord(r, p, g->size, kAnimTrackFields, COUNTOF(kAnimTrackFields)); break;
+        case REGION_ANIM_KEYS:
+            for (u32 k = 0; k + 8 <= g->size; k += 8) { Swap16(p + k); Swap32(p + k + 4); r->fieldsSwapped += 2; }
+            break;
+        case REGION_F32_ARRAY:
+            for (u32 k = 0; k < g->size; k += 4) { Swap32(p + k); r->fieldsSwapped++; }
+            break;
         case REGION_PROP_DEF:     SirConvertRecord(r, p, g->size, kPropDefFields, COUNTOF(kPropDefFields)); break;
         case REGION_ENTITY_RECORD: SirConvertRecord(r, p, g->size, kEntityRecordFields, COUNTOF(kEntityRecordFields)); break;
         case REGION_ENTITY_PART:  SirConvertRecord(r, p, g->size, kEntityPartFields, COUNTOF(kEntityPartFields)); break;
@@ -1804,12 +1905,13 @@ extern "C" void LevelZoneRootsFree(LevelZoneRoots* roots) {
     free(roots->entities);
     free(roots->sceneObjects);
     free(roots->poolTables);
+    free(roots->zoneRecords);
     memset(roots, 0, sizeof(*roots));
 }
 
 extern "C" BOOL LevelZoneRootsCollect(const u8* hdr, u32 hdrSize, const u8* zoneHost, u32 zoneSize, u32 zoneWiiBase, LevelZoneRoots* out) {
     memset(out, 0, sizeof(*out));
-    RootList entities = { NULL, 0, 0 }, scene = { NULL, 0, 0 }, pools = { NULL, 0, 0 };
+    RootList entities = { NULL, 0, 0 }, scene = { NULL, 0, 0 }, pools = { NULL, 0, 0 }, records = { NULL, 0, 0 };
     bool ok = hdrSize >= LEVEL_HEADER_SLOTS + 0x118;
     u32 count = ok ? Host32(hdr + 0x1A8) : 0, stride = LEVEL_SLOT_MIN_SIZE, entries, addr;
     const u8* slots = hdr + LEVEL_HEADER_SLOTS;
@@ -1839,6 +1941,7 @@ extern "C" BOOL LevelZoneRootsCollect(const u8* hdr, u32 hdrSize, const u8* zone
             for (u32 k = 0; ok && table != NULL && k < entries; k++)
                 if ((addr = ZoneAddr(table + k * 4, zoneHost, zoneSize, zoneWiiBase)) != 0) ok = RootAdd(&entities, addr);
         }
+        if (ok && (addr = ZoneAddr(slot + 0xFC, zoneHost, zoneSize, zoneWiiBase)) != 0) ok = RootAdd(&records, addr);
         // The slot's pool table {entries, count} at +0xE4: address and count, as a pair.
         if (ok && (addr = ZoneAddr(slot + 0xE4, zoneHost, zoneSize, zoneWiiBase)) != 0)
             ok = RootAdd(&pools, addr) && RootAdd(&pools, Host32(slot + 0xE8));
@@ -1846,6 +1949,7 @@ extern "C" BOOL LevelZoneRootsCollect(const u8* hdr, u32 hdrSize, const u8* zone
     out->entities = entities.items;         out->entityCount = entities.count;
     out->sceneObjects = scene.items;        out->sceneObjectCount = scene.count;
     out->poolTables = pools.items;          out->poolTableCount = pools.count / 2;
+    out->zoneRecords = records.items;       out->zoneRecordCount = records.count;
     if (!ok) LevelZoneRootsFree(out);
     return ok ? TRUE : FALSE;
 }
@@ -1910,6 +2014,7 @@ extern "C" SirError LevelZoneConvert(SirReloc* r, u8* image, u32 imageSize, u32 
     for (u32 i = 0; i < roots->sceneObjectCount && e == SIR_OK; i++) e = SceneObjectPlan(&plan, image, imageSize, roots->sceneObjects[i]);
     for (u32 i = 0; i < roots->poolTableCount && e == SIR_OK; i++)
         e = PoolTablePlan(&plan, image, imageSize, roots->poolTables[i * 2], roots->poolTables[i * 2 + 1]);
+    for (u32 i = 0; i < roots->zoneRecordCount && e == SIR_OK; i++) e = ZoneRecordPlan(&plan, image, imageSize, roots->zoneRecords[i]);
     if (e == SIR_OK && !PlanFinish(&plan)) e = SIR_ERR_OVERLAP;
     if (e == SIR_OK) ImagePlanConvert(&plan, r, image, imageSize);
     PlanFree(&plan);

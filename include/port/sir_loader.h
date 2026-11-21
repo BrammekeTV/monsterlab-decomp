@@ -28,6 +28,7 @@ typedef enum SirError {
     SIR_ERR_POOL,             // object pool (header slots 0x10, 0x418): bad counts, block or list pointer
     SIR_ERR_LEVEL,            // level file header block: zone slot table not laid out as fn_80129CC8 does
     SIR_ERR_ENTITY,           // entity of a level zone: part list outside the zone, child list that loops
+    SIR_ERR_ZONE_RECORD,      // zone record of a level zone: list that leaves the zone or loops, bad animation player
     SIR_ERR_OVERLAP,          // two of the objects above share bytes
     SIR_ERR_IO
 } SirError;
@@ -400,6 +401,8 @@ u32 LevelHeaderWiiBase(const u8* hdr, u32 size);
 SirError LevelHeaderConvert(SirReloc* r, u8* hdr, u32 size);
 #define ENTITY_USED          0x1B4   // of an entity: up to the last field with a known reader
 #define ENTITY_RECORD_SIZE   0x40
+#define ZONE_SYSTEM_USED     0x80    // of an object in the zone record's list +0x10: up to the last field with a known reader
+#define ANIM_PLAYER_HEAD     0x28    // of an animation player; its key pointers follow
 #define ENTITY_TYPE_PROP     6       // byte +0x34 of the record: a prop (constructor fn_800690D4)
 #define PROP_DEF_USED        0xC0    // of a prop's definition (entity +0x9C): up to the last field with a known reader
 #define POOL_TABLE_ENTRY     0x2C
@@ -426,6 +429,8 @@ typedef struct LevelZoneRoots {
     u32  sceneObjectCount;
     u32* poolTables;         // pairs {address, entry count}: every slot's pool table (+0xE4, +0xE8)
     u32  poolTableCount;
+    u32* zoneRecords;        // every slot's +0xFC: the zone record WorldTick walks
+    u32  zoneRecordCount;
 } LevelZoneRoots;
 
 // Fills `out` from a converted header block for the zone whose image is at `zoneHost` in memory.
