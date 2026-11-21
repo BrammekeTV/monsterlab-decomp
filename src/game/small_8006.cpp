@@ -237,10 +237,11 @@ u8* fn_800636BC(u8* p) {
 
 // 0x80064568
 // Spawns an effect at the position v (x, y, z and the constant lbl_805FD468 as the fourth element).
-// fxMgr, effect and a are passed through to SpawnEffectAt unchanged.
-void fn_80064568(void* fxMgr, void* effect, const f32* v, s32 a) {
+// fxMgr and effect are passed through to SpawnEffectAt unchanged; the spawned object goes to *out
+// (may be NULL). Returns SpawnEffectAt's result.
+s32 fn_80064568(void* fxMgr, u32 effect, const f32* v, u8** out) {
     f32 pos[4] = { v[0], v[1], v[2], lbl_805FD468 };
-    SpawnEffectAt(fxMgr, (u32)(uintptr_t)effect, pos, (u8**)(uintptr_t)a);  // lint:ok
+    return SpawnEffectAt(fxMgr, effect, pos, out);
 }
 
 // 0x80065CB0

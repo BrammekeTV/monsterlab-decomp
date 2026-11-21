@@ -25,7 +25,7 @@ typedef void*  (*VFnRetPtr0)(u8* self);
 typedef void   (*VFnVoid0)(u8* self);
 typedef void   (*VFnDel)(u8* self, s32 flag);
 typedef void*  (*VFnSlot50)(u8* self, u8* obj, s32 a, s32 b, s32 c, f32 f);
-typedef void   (*VFnSlot50Void)(u8* self, u8* obj, s32 kind, s32 b, s32 c, f32 f);
+typedef void   (*VFnSlot50Void)(u8* self, u8* obj, s32 kind, s32 b, void* c, f32 f);
 
 extern "C" {
 u32   RandomU32(void);                                       // 0x80143460
@@ -68,7 +68,7 @@ f32 fn_800677D0(f32 lo, f32 hi) {
 // Does nothing unless f1 is above lbl_805FD4D8. Otherwise reads the kind from obj's record
 // (+0x228; kind 0xC when there is no record), copies the record value (+8) into the item's
 // slot +0x60C or +0x1A8 (by the item's flags) and calls the item's virtual slot 0x50.
-void fn_80067BB0(u8* obj, u8* item, s32 a2, s32 a3, f32 t) {
+void fn_80067BB0(u8* obj, u8* item, s32 a2, void* a3, f32 t) {
     if (t <= lbl_805FD4D8) return;
     u8* rec = *(u8**)(obj + 0x228);
     s32 kind;

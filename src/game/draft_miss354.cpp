@@ -30,7 +30,7 @@ void  fn_801F5E44(void);                                        // 0x801F5E44
 void  fn_801F5E48(void* a, s32 b);                              // 0x801F5E48
 void  fn_801F5E4C(void* a, s32 b);                              // 0x801F5E4C
 void  fn_80200494(u8* obj, f32 a, f32 b, f32 c, f32 d);         // 0x80200494 (args in f1..f4, none in r4)
-void  fn_80201A94(void);                                        // 0x80201A94 (DVD read callback)
+void  fn_80201A94(s32 result, u8* fileInfo);                                     // 0x80201A94 (DVD read callback)
 void  fn_80201AD8(u8* audio, u8* state);                        // 0x80201AD8
 void  fn_80203DE8(u8* audio, u8* state);                        // 0x80203DE8
 s32   fn_80205208(u8* buf, u8* texObj, s32* outA, s32* outB, s32 n);  // 0x80205208 (returns the bytes used)

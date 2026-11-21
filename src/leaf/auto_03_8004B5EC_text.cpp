@@ -12,6 +12,7 @@ extern "C" s32 PartGetMaxHealth(u8*);
 extern "C" u8* fn_8004B500(u8*, s32);
 extern "C" void fn_8004CAB4(u8*, s32, void*);
 extern "C" s32 fn_8004D3F8(void*, char*, s32, s32);
+extern "C" void fn_80053C2C(u8*, f32);
 extern "C" void fn_8020E668(u8*, s32, s32);
 
 // 0x8004B5EC
@@ -42,6 +43,11 @@ extern "C" void fn_8004C710(u8* a3, s32 a4, s32 a5) {
 extern "C" s32 fn_8004CB10(u8* a3) {
     s32 t0 = *(s32*)(((u8*)(uintptr_t)(a3)) + 3148);
     return (s32)(t0);
+}
+
+// 0x8004CB18
+extern "C" void fn_8004CB18(u8* a3, f32 f1) {
+    fn_80053C2C(((u8*)(uintptr_t)(a3)), (f32)(f1));
 }
 
 // 0x8004CED8

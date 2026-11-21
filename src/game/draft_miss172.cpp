@@ -45,7 +45,7 @@ u8* fn_8004E684(u8* p, s32 a, void* b, s32 c);                        // 0x8004E
 u8* fn_80052530(u8* p, s32 a, void* b, s32 c);                        // 0x80052530
 void fn_8005263C(f32* q);                                             // 0x8005263C
 u8* fn_800526D4(u8* a3);                                              // 0x800526D4
-s32 fn_800526DC(u8* a3);                                              // 0x800526DC
+u8* fn_800526DC(u8* a3);                                             // 0x800526DC
 f32 fn_80053208(u8* a3);                                              // 0x80053208
 u32 fn_800533A4(u8* a3);                                              // 0x800533A4
 void fn_80054484(Vec3* out, const Vec3* a, const Vec3* b);            // 0x80054484
@@ -59,7 +59,7 @@ u8* fn_8005CA88(u8* p);                                               // 0x8005C
 u8* fn_8005CC30(u8* p, s32 a, void* b, s32 c);                        // 0x8005CC30
 u8* fn_8006307C(u8* p);                                               // 0x8006307C
 u8* fn_800636BC(u8* p);                                               // 0x800636BC
-void fn_80064568(void* fxMgr, u32 hash, const f32* v, u8** out);      // 0x80064568
+s32 fn_80064568(void* fxMgr, u32 hash, const f32* v, u8** out);      // 0x80064568
 s32 fn_80065200(u8* arg0, u8* arg1, void* arg2, u8* arg3, s32 arg4, s32 arg5, s32 arg6); // 0x80065200
 void fn_800690D4(u8* p, s32 a, void* params, s32 b);                  // 0x800690D4
 u8* fn_8006CCC4(u8* obj, s32 a1, void* a2, s32 a3);                   // 0x8006CCC4
