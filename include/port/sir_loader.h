@@ -400,6 +400,8 @@ u32 LevelHeaderWiiBase(const u8* hdr, u32 size);
 SirError LevelHeaderConvert(SirReloc* r, u8* hdr, u32 size);
 #define ENTITY_USED          0x1B4   // of an entity: up to the last field with a known reader
 #define ENTITY_RECORD_SIZE   0x40
+#define ENTITY_TYPE_PROP     6       // byte +0x34 of the record: a prop (constructor fn_800690D4)
+#define PROP_DEF_USED        0xC0    // of a prop's definition (entity +0x9C): up to the last field with a known reader
 #define POOL_TABLE_ENTRY     0x2C
 
 // A pool table entry names the script function the level start runs over the pool's items

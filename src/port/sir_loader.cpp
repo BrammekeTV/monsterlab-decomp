@@ -359,6 +359,7 @@ enum RegionKind {
     REGION_FSM_TRANSITION, REGION_FSM_SHARED_TRANSITION, REGION_HUD, REGION_LEVEL_HUD,
     REGION_FX_BOLTS, REGION_FX_TRAILS, REGION_POOL, REGION_POOL_BLOCK,
     REGION_ENTITY, REGION_ENTITY_RECORD, REGION_ENTITY_PART, REGION_PTR_COUNT, REGION_COUNT_PTR, REGION_POOL_TABLE,
+    REGION_ENTITY_PROP, REGION_PROP_DEF,
     REGION_RUNTIME    // memory the game initialises itself: nothing to convert, but nothing else may be there
 };
 
@@ -1303,10 +1304,13 @@ static void PoolConvert(SirReloc* r, u8* image, u8* pool, u32 imageSize) {
 static const SirField kEntityFields[] = {
     { 0x000, SIR_U32, 1 },    // build-time vtable address; the constructor for the type stores the real one
     { 0x004, SIR_PTR, 1 },    // code: the entity's record (fn_8012F8B8, fn_801B4334)
+    { 0x02C, SIR_U32, 2 },    // code: id, which fn_800D8724 compares for every entity of a zone's tables; +0x30 (fn_801B6444)
+    { 0x084, SIR_PTR, 1 },    // code: a table fn_801B6AD4 searches (the table itself is not converted)
     { 0x08C, SIR_PTR, 2 },    // code: part container (fn_8012F6B0), sub-object (fn_8012F8B8)
     { 0x094, SIR_U32, 2 },    // code: fn_801B4334 clears them
     { 0x09C, SIR_PTR, 1 },    // code: fn_8012F8B8 reads the id at +8 of it for type 6
     { 0x0A4, SIR_PTR, 1 },    // code: state machine holder (fn_8012F8B8)
+    { 0x0AC, SIR_U32, 1 },    // code: fn_801B6554, fn_801B66EC
     { 0x0B0, SIR_PTR, 1 },    // code: list of child entities (fn_8012F8B8)
     { 0x158, SIR_F32, 1 },    // code: fn_800690D4
     { 0x194, SIR_PTR, 1 },    // code: more part containers (fn_8012F8B8),
@@ -1321,6 +1325,30 @@ static const SirField kEntityRecordFields[] = {
     { 0x24, SIR_F32, 1 },     // code: fn_800690D4
     { 0x2C, SIR_U32, 1 },     // code: fn_801B4334
     { 0x30, SIR_U16, 1 },     // code: fn_801B4334
+};
+// What a prop (entity type 6, vtable lbl_8035A0B4) has on top of kEntityFields: the fields the
+// methods of that vtable read. The level's player object is one of these. Action words are the
+// ones TriggerDoAction gets the address of; the words between them have no reader yet.
+static const SirField kPropFields[] = {
+    { 0x014, SIR_F32, 1 },    // code: fn_8006AADC (height of the anchor point)
+    { 0x028, SIR_F32, 1 },    // code: fn_8006BDF4
+    { 0x038, SIR_U32, 3 },    // code: action words (fn_8006A2D0)
+    { 0x048, SIR_U32, 4 },    // code: action words (fn_800696C4, fn_8006BDF4, fn_80069638)
+    { 0x068, SIR_U32, 1 },    // code: action word (fn_80069180)
+    { 0x0A0, SIR_PTR, 1 },    // code: object whose +0xF0 holds flags (fn_80069180, fn_8006A764)
+    { 0x0C8, SIR_F32, 3 },    // code: a position (fn_8006A764)
+    { 0x0EC, SIR_U32, 1 },    // code: fn_800696C4
+    { 0x15C, SIR_U32, 1 },    // code: flags (fn_80069180, fn_8006A764, fn_8006A2D0)
+};
+// A prop's definition (entity +0x9C), read through the same methods.
+static const SirField kPropDefFields[] = {
+    { 0x08, SIR_U32, 1 },     // code: id (fn_8012F8B8, fn_80069180, fn_8006AADC)
+    { 0x24, SIR_F32, 1 },     // code: fn_80069180 copies it to the entity's +0x158 and the record's +0x24
+    { 0x2C, SIR_U32, 1 },     // code: fn_8006A2D0
+    { 0x68, SIR_U32, 3 },     // code: action words (fn_8006A2D0)
+    { 0x78, SIR_U32, 4 },     // code: action words (fn_800696C4, fn_8006BDF4, fn_80069638)
+    { 0x98, SIR_U32, 1 },     // code: action word (fn_80069180)
+    { 0xBC, SIR_U32, 1 },     // code: flags, copied to the entity's +0x15C (fn_80069180)
 };
 // {pointer, count}: a part container's items (+0x0C, +0x10) and an item's parts (+0x24, +0x28),
 // both walked by fn_8012F6B0.
@@ -1404,9 +1432,12 @@ static SirError EntityContainerPlan(ImagePlan* plan, const u8* image, u32 imageS
 
 static SirError EntityPlan(ImagePlan* plan, const u8* image, u32 imageSize, u32 addr, u32 depth) {
     u32 off, o;
-    if (!LevelSpan(addr, ENTITY_USED, imageSize, &off) || PlanHas(plan, off, REGION_ENTITY)) return SIR_OK;
-    if (depth > ENTITY_DEPTH_MAX || !PlanAdd(plan, off, ENTITY_USED, REGION_ENTITY)) return SIR_ERR_ENTITY;
+    if (!LevelSpan(addr, ENTITY_USED, imageSize, &off) || PlanHas(plan, off, REGION_ENTITY) || PlanHas(plan, off, REGION_ENTITY_PROP))
+        return SIR_OK;
     const u8* ent = image + off;
+    // The type is the byte at +0x34 of the record (fn_8012F8B8 picks the constructor by it).
+    bool prop = LevelSpan(Be32(ent + 0x04), ENTITY_RECORD_SIZE, imageSize, &o) && image[o + 0x34] == ENTITY_TYPE_PROP;
+    if (depth > ENTITY_DEPTH_MAX || !PlanAdd(plan, off, ENTITY_USED, prop ? REGION_ENTITY_PROP : REGION_ENTITY)) return SIR_ERR_ENTITY;
     SirError e;
 
     if (LevelSpan(Be32(ent + 0x04), ENTITY_RECORD_SIZE, imageSize, &o) && !PlanAdd(plan, o, ENTITY_RECORD_SIZE, REGION_ENTITY_RECORD))
@@ -1414,7 +1445,10 @@ static SirError EntityPlan(ImagePlan* plan, const u8* image, u32 imageSize, u32 
     if ((e = EntityContainerPlan(plan, image, imageSize, Be32(ent + 0x8C))) != SIR_OK) return e;
     // Scene object (+0x90). Object at +0x9C: fn_8012F8B8 reads the id at +8 for a type 6 entity.
     if ((e = SceneObjectPlan(plan, image, imageSize, Be32(ent + 0x90))) != SIR_OK) return e;
-    if (LevelSpan(Be32(ent + 0x9C), 0xC, imageSize, &o) && !PlanAdd(plan, o + 8, 4, REGION_U32_ARRAY)) return SIR_ERR_ENTITY;
+    // For a prop it is the prop's definition.
+    if (prop) {
+        if (LevelSpan(Be32(ent + 0x9C), PROP_DEF_USED, imageSize, &o) && !PlanAdd(plan, o, PROP_DEF_USED, REGION_PROP_DEF)) return SIR_ERR_ENTITY;
+    } else if (LevelSpan(Be32(ent + 0x9C), 0xC, imageSize, &o) && !PlanAdd(plan, o + 8, 4, REGION_U32_ARRAY)) return SIR_ERR_ENTITY;
     // State machine holder: {machine, object}; fn_8012F8B8 hands the machine's definition to fn_801BC574.
     if (LevelSpan(Be32(ent + 0xA4), 8, imageSize, &o)) {
         if (!PlanAdd(plan, o, 8, REGION_PTR_ARRAY)) return SIR_ERR_ENTITY;
@@ -1509,6 +1543,9 @@ static void ImagePlanConvert(const ImagePlan* plan, SirReloc* r, u8* image, u32 
         case REGION_FX_TRAILS:    ConvertRecords(r, p, g->size, FX_TRAIL_SIZE, kFxTrailFields, COUNTOF(kFxTrailFields)); break;
         case REGION_POOL:         PoolConvert(r, image, p, imageSize); break;
         case REGION_ENTITY:       SirConvertRecord(r, p, g->size, kEntityFields, COUNTOF(kEntityFields)); break;
+        case REGION_ENTITY_PROP:  SirConvertRecord(r, p, g->size, kEntityFields, COUNTOF(kEntityFields));
+                                  SirConvertRecord(r, p, g->size, kPropFields, COUNTOF(kPropFields)); break;
+        case REGION_PROP_DEF:     SirConvertRecord(r, p, g->size, kPropDefFields, COUNTOF(kPropDefFields)); break;
         case REGION_ENTITY_RECORD: SirConvertRecord(r, p, g->size, kEntityRecordFields, COUNTOF(kEntityRecordFields)); break;
         case REGION_ENTITY_PART:  SirConvertRecord(r, p, g->size, kEntityPartFields, COUNTOF(kEntityPartFields)); break;
         case REGION_PTR_COUNT:    SirConvertRecord(r, p, g->size, kPtrCountFields, COUNTOF(kPtrCountFields)); break;

@@ -628,6 +628,42 @@ and the list behind `+0x4C` (nodes linked through their first word, a flag word 
 before each: `fn_801DB160`, `fn_801842E0`); for type 3 the count at `+0x54` and the pointer
 array at `+0x58` (`fn_801DA7C8`).
 
+Every entity also has, read by code that is not part of the level start:
+
+| Offset | Field | Reader |
+|---|---|---|
+| `0x02C` | id (a name hash). The player object of a level is the entity whose id equals the header block's `+0x1E8` | `fn_800D8724` walks both entity tables of the zone slot |
+| `0x030` | word | `fn_801B6444` |
+| `0x084` | pointer to a table `fn_801B6AD4` searches (the table is not converted) | `fn_801B6AD4` |
+| `0x0AC` | word | `fn_801B6554`, `fn_801B66EC` |
+
+### Props (entity type 6)
+
+A prop is the entity class with vtable `lbl_8035A0B4` (constructor `fn_800690D4`); the type is the
+byte at `+0x34` of the record. `empty_level.sir`'s player object is one. On top of the fields
+above, the loader converts what the methods of that vtable read:
+
+| Offset | Field | Reader |
+|---|---|---|
+| `0x014` | float: height of the anchor point | `fn_8006AADC` |
+| `0x028` | float | `fn_8006BDF4` |
+| `0x038`-`0x040`, `0x048`-`0x054`, `0x068` | action words handed to `TriggerDoAction` | `fn_8006A2D0`, `fn_800696C4`, `fn_8006BDF4`, `fn_80069638`, `fn_80069180` |
+| `0x0A0` | pointer to an object with flags at `+0xF0` | `fn_80069180`, `fn_8006A764` |
+| `0x0C8` | three floats (a position) | `fn_8006A764` |
+| `0x0EC` | word | `fn_800696C4` |
+| `0x15C` | flags | `fn_80069180`, `fn_8006A764`, `fn_8006A2D0` |
+
+The prop's **definition** (entity `+0x9C`, 0xC0 bytes used): id at `+0x08`, a float at `+0x24`
+(`fn_80069180` copies it to the entity's `+0x158` and the record's `+0x24`), a word at `+0x2C`,
+action words at `+0x68`-`+0x70`, `+0x78`-`+0x84` and `+0x98`, flags at `+0xBC` (copied to the
+entity's `+0x15C`).
+
+Not converted, because no reader was found or its kind is not clear: the floats at `+0x08`-`+0x10`
+(1.0 in every file), the other twelve of the twenty words at `+0x34`-`+0x80` (and of the
+definition's at `+0x64`-`+0xB0`), `+0x88`, `+0xA8`, `+0xC4`, `+0xE0`/`+0xE4`, `+0x160`-`+0x190`.
+Zone 0 of every level has one prop (seven files, seven props); the six type 13 entities of the
+other levels have only the common fields.
+
 ### Pool tables
 
 A zone slot's `+0xE4` / `+0xE8` name a table of 0x2C-byte entries: `{+0x04 pool, +0x0C index of a
@@ -657,7 +693,7 @@ converted. Such an object is skipped; the pointer itself is still converted.
 
 | What | Where | Next reader |
 |---|---|---|
-| the rest of an entity | beyond the fields above: the action words at `+0x34`-`+0x80`, the name at `+0x108`, type-specific data | the per-type update and script functions |
+| the rest of an entity | beyond the fields above: the action words without a reader, the name at `+0x108`, data of types other than 6 | the per-type update and script functions |
 | the zone record | start of each zone image, 0x40 bytes: a word and three lists `{head, tail, count}` (the first is the texture list) | `WorldTick` reads slot `+0xFC` |
 | render objects | pool items of fix-up 655 | `fn_8012F818` |
 | value tables of the HUD's machines | another zone's image | `fn_801BBE40`, as soon as a state runs an action |
