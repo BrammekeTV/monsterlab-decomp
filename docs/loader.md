@@ -624,9 +624,19 @@ them), layer mask and flags at `0x1C` / `0x20`, a float at `0x24`, a word at `0x
 A **scene object** (entity `+0x90`, and the entries of the header block's tables `+0x1B0` and
 `+0x1BC`) has a type word at `+0x04` that picks its class (`fn_801D94CC` 1, `fn_801DA81C` 2,
 `fn_801DA1CC` 3, `fn_801D9A24` 4). Converted: the type; for type 2 the two pointers at `+0x48`
-and the list behind `+0x4C` (nodes linked through their first word, a flag word 0xAC bytes
-before each: `fn_801DB160`, `fn_801842E0`); for type 3 the count at `+0x54` and the pointer
-array at `+0x58` (`fn_801DA7C8`).
+and the list behind `+0x4C` (below); for type 3 the count at `+0x54` and the pointer array at
+`+0x58` (`fn_801DA7C8`), and what the first frames read of the object and its entries:
+
+| Object | Fields | Reader |
+|---|---|---|
+| list object (type 2 `+0x4C`) | `+0x04` head, `+0x08` tail, `+0x0C` count; `+0x38` how many nodes are flagged | `fn_8017323C`, `fn_80184314` |
+| item (an entry of a type 3 object, a node of a list) | `+0x0C` flags; link at `+0xB8`: next, previous, the list it is in | `fn_80184314`, `fn_8017323C`, `fn_801DB160` |
+| type 3 object | `+0x48` the entity that uses it, `+0x50` current entry, `+0x5C` one matrix pointer per entry | `fn_801DA344`, `fn_801DA750`, `fn_801DA798` |
+| matrix | twelve floats (in the files it lies in its item, at `+0xD0`) | `fn_801D9164` writes all of it |
+
+`fn_801DA91C` hands every entry of a type 3 object to `fn_80184314`, which appends the entry's
+link to the list of a type 2 object: that is why the tail, the count and an unlisted item's link
+have to be converted, not only the nodes already in a list.
 
 Every entity also has, read by code that is not part of the level start:
 
@@ -652,11 +662,16 @@ above, the loader converts what the methods of that vtable read:
 | `0x0C8` | three floats (a position) | `fn_8006A764` |
 | `0x0EC` | word | `fn_800696C4` |
 | `0x15C` | flags | `fn_80069180`, `fn_8006A764`, `fn_8006A2D0` |
+| `0x1A0` | state list: `+0x1A4` pointers to definitions, one per state | `fn_800699E4` |
 
 The prop's **definition** (entity `+0x9C`, 0xC0 bytes used): id at `+0x08`, a float at `+0x24`
 (`fn_80069180` copies it to the entity's `+0x158` and the record's `+0x24`), a word at `+0x2C`,
 action words at `+0x68`-`+0x70`, `+0x78`-`+0x84` and `+0x98`, flags at `+0xBC` (copied to the
-entity's `+0x15C`).
+entity's `+0x15C`). A definition is also a state of the prop: `fn_800699E4` reads its flags at
+`+0x0C`, the animation id at `+0x10`, two words at `+0x14` / `+0x18` and the animation table
+pointer at `+0x48`. Every prop of the shipped levels has one state and names its own field
+`+0x9C` as the state list; the loader also takes a separate list, and converts each state as a
+definition (in the entity's zone or in zone 0).
 
 Not converted, because no reader was found or its kind is not clear: the floats at `+0x08`-`+0x10`
 (1.0 in every file), the other twelve of the twenty words at `+0x34`-`+0x80` (and of the
@@ -717,6 +732,32 @@ rest of a list object, the second word of a channel table entry (it is the key c
 players of mode 0 (position and rotation keys, `fn_8016A788`): none is reached from a zone
 record in zone 0 of any level.
 
+### Zone 1 and up
+
+A level file has the header block, zone 0 and one more image, section type 1: the level's own
+zone, which the game loads after the level start (`fn_80135854`) to `gZoneBase[1]` and starts
+with `fn_80135BC0` -> `fn_8012FD0C`. The same converter runs on it, with the same roots taken
+from the header block (entities of the slots' tables, scene objects, pool tables). Two things
+differ from zone 0:
+
+- **Records and prop definitions stay in zone 0.** An entity of zone 1 points at its record, and
+  a prop at its definition, in zone 0's image, which is loaded all the time. When zone 1 is
+  converted the loader converts those too. It keeps the list of what it converted in zone 0
+  (`LevelZoneDone`): an object that was converted before is skipped, and one that shares bytes
+  with a converted object stops the load with nothing changed in either image.
+- **The zone record is in zone 0**, already converted; its list at `+0x10` leads into zone 1 and
+  is walked from there.
+
+A list of one part container can be the entity's own slot at `+0x8C` (`+0x194` points at it):
+that slot is converted with the entity.
+
+The other zones (the shared ones) come from `shared_ui.sir` and `shared_parts.sir` and start
+with a copy of their zone slot (`fn_80135BC0`); those files are not converted yet.
+
+The port reads each zone to the address the console uses, so it needs no address for zone 1;
+the test tool and the reference decoder use 0x90980000 (`gZoneBase[1]`: zone 0's address plus
+its memory budget).
+
 ### Not converted yet in level files
 
 | What | Where | Next reader |
@@ -724,13 +765,15 @@ record in zone 0 of any level.
 | the rest of an entity | beyond the fields above: the action words without a reader, the name at `+0x108`, data of types other than 6 | the per-type update and script functions |
 | three of a zone record's four lists | `+0x04`, `+0x1C`, `+0x28` | none found yet |
 | render objects | pool items of fix-up 655 | `fn_8012F818` |
+| animation tables of props | definition `+0x48`, in zone 0 | `fn_801AC184`, when a prop whose definition has the byte `+0x1C` set changes state |
+| the rest of a scene object's item | beyond flags, link and matrix | the render code |
 | value tables of the HUD's machines | another zone's image | `fn_801BBE40`, as soon as a state runs an action |
 | zone action tables and their records | slot `+0xD4` | `TriggerDoAction`; `ActionRecordPlan` applies |
-| zones 1 and up, textures, models, collision | the rest | - |
+| the shared zones (`shared_ui.sir`, `shared_parts.sir`), textures, models, collision | the rest | - |
 
 Check: all seven level files give the same dump from the C++ loader and the Python reference
-(713 lines for `empty_level.sir`, 3,110 to 5,288 for the others: 97 or 98 entities each, of which
-96 are pooled projectiles).
+for zone 0 and zone 1 (1,328 lines for `empty_level.sir`, 7,463 to 9,029 for the others: 98
+entities in `empty_level.sir`, 480 to 552 in the others, of which 96 are pooled projectiles).
 
 ## Found on the way
 

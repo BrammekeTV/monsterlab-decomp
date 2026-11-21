@@ -440,6 +440,28 @@ static bool PlanFinish(ImagePlan* plan) {
 // Wii address of the image being checked and converted: global_binary.sir's, or a level zone's
 // while LevelZoneConvert runs. (One file is converted at a time, on the thread that read it.)
 static u32 sImageBase = GLOBAL_BINARY_WII_BASE;
+// Zone 0's image while another zone is converted (LevelZoneOther), and what this conversion adds in it.
+static const u8* sOtherImage = NULL;
+static u32 sOtherSize = 0, sOtherBase = 0;
+static const ImagePlan* sOtherDone = NULL;
+static ImagePlan sOtherNew = { NULL, 0, 0 };
+
+static int OtherSpan(u32 addr, u32 size, u32* off) {
+    if (sOtherImage == NULL || addr < sOtherBase || (u64)(addr - sOtherBase) + size > sOtherSize) return 0;
+    *off = addr - sOtherBase;
+    return 1;
+}
+
+// Notes an object of the other image for conversion, unless that image's earlier conversions
+// already converted exactly this object.
+static bool OtherAdd(u32 off, u32 size, u8 kind) {
+    for (u32 i = 0; sOtherDone != NULL && i < sOtherDone->count; i++) {
+        const Region* g = &sOtherDone->regions[i];
+        if (g->off == off && g->size == size && g->kind == kind) return true;
+    }
+    return PlanAdd(&sOtherNew, off, size, kind);
+}
+
 static bool sLevelZone = false;   // the image is a level zone
 
 // Offset in the image of the `size` bytes at Wii address `addr`; false if they are not all inside.
@@ -1341,12 +1363,15 @@ static const SirField kPropFields[] = {
     { 0x0C8, SIR_F32, 3 },    // code: a position (fn_8006A764)
     { 0x0EC, SIR_U32, 1 },    // code: fn_800696C4
     { 0x15C, SIR_U32, 1 },    // code: flags (fn_80069180, fn_8006A764, fn_8006A2D0)
+    { 0x1A0, SIR_PTR, 1 },    // code: the prop's states: +0x1A4 pointers to definitions (fn_800699E4)
 };
 // A prop's definition (entity +0x9C), read through the same methods.
 static const SirField kPropDefFields[] = {
     { 0x08, SIR_U32, 1 },     // code: id (fn_8012F8B8, fn_80069180, fn_8006AADC)
+    { 0x0C, SIR_U32, 4 },     // code: flags, animation id, two words copied to the prop's +0xF0 / +0xF4 (fn_800699E4)
     { 0x24, SIR_F32, 1 },     // code: fn_80069180 copies it to the entity's +0x158 and the record's +0x24
     { 0x2C, SIR_U32, 1 },     // code: fn_8006A2D0
+    { 0x48, SIR_PTR, 1 },     // code: animation table (fn_800699E4 -> fn_801AC184; the table is not converted)
     { 0x68, SIR_U32, 3 },     // code: action words (fn_8006A2D0)
     { 0x78, SIR_U32, 4 },     // code: action words (fn_800696C4, fn_8006BDF4, fn_80069638)
     { 0x98, SIR_U32, 1 },     // code: action word (fn_80069180)
@@ -1375,9 +1400,15 @@ static int LevelSpan(u32 addr, u64 size, u32 imageSize, u32* off) {
 // Scene object: what an entity's +0x90 points at, and what the header block's per-zone tables
 // (+0x1B0, +0x1BC) hold. The type word at +4 picks the class; its constructor stores the vtable
 // (fn_801D94CC 1, fn_801DA81C 2, fn_801DA1CC 3, fn_801D9A24 4).
-//   type 2: +0x48 an object whose +0x30 / +0x34 are cleared, +0x4C a list head: nodes linked through
-//           their first word, with a flag word 0xAC bytes before each (fn_801DB160, fn_801842E0)
-//   type 3: +0x54 count, +0x58 pointers to entries whose +0x30 / +0x34 are set (fn_801DA7C8)
+//   type 2: +0x48 an object whose +0x30 / +0x34 are cleared, +0x4C a list object: {+0x04 head,
+//           +0x08 tail, +0x0C count} and at +0x38 how many of its nodes are flagged (fn_80184314,
+//           fn_8017323C). A node is the link {next, prev, owner list} at +0xB8 of an item, whose
+//           flags are at +0x0C (fn_801DB160, fn_801842E0, fn_80184314)
+//   type 3: +0x54 count, +0x58 pointers to entries whose +0x30 / +0x34 are set (fn_801DA7C8); the
+//           entries are such items (fn_801DA91C hands each to fn_80184314);
+//           +0x48 the entity that uses the object (fn_801DA344 stores it), +0x50 which entry is
+//           current (fn_801DA750), +0x5C one pointer per entry to its 3x4 float matrix
+//           (fn_801DA798 returns matrix[current]; fn_801D9164 fills it)
 static const SirField kCountPtrFields[] = {
     { 0x00, SIR_U32, 1 }, { 0x04, SIR_PTR, 1 },
 };
@@ -1389,20 +1420,38 @@ static SirError SceneObjectPlan(ImagePlan* plan, const u8* image, u32 imageSize,
     u32 type = Be32(image + off + 4);
     if (type == 2) {
         if (!ImageSpan(addr, 0x50, imageSize, &off) || !PlanAdd(plan, off + 0x48, 8, REGION_PTR_ARRAY)) return SIR_ERR_ENTITY;
-        if (!LevelSpan(Be32(image + off + 0x4C), 8, imageSize, &o)) return SIR_OK;
-        if (!PlanAdd(plan, o + 4, 4, REGION_PTR_ARRAY)) return SIR_ERR_ENTITY;
-        u32 node = Be32(image + o + 4), guard = imageSize / 4 + 1;
+        if (!LevelSpan(Be32(image + off + 0x4C), 0x3C, imageSize, &o)) return SIR_OK;
+        if (PlanHas(plan, o + 4, REGION_PTR_ARRAY)) return SIR_OK;                     // two objects with one list
+        if (!PlanAdd(plan, o + 4, 8, REGION_PTR_ARRAY) || !PlanAdd(plan, o + 0xC, 4, REGION_U32_ARRAY) ||
+            !PlanAdd(plan, o + 0x38, 4, REGION_U32_ARRAY)) return SIR_ERR_ENTITY;
+        // The nodes can also be entries of a type 3 object: the same words, found twice.
+        u32 node = Be32(image + o + 4), guard = imageSize / 4 + 1, seen = 0;
         while (node != 0) {
-            if (guard-- == 0 || node < sImageBase + 0xAC || !ImageSpan(node - 0xAC, 0xB0, imageSize, &o)) return SIR_ERR_ENTITY;
-            if (PlanHas(plan, o + 0xAC, REGION_PTR_ARRAY)) return SIR_ERR_ENTITY;      // a list that loops
-            if (!PlanAdd(plan, o, 4, REGION_U32_ARRAY) || !PlanAdd(plan, o + 0xAC, 4, REGION_PTR_ARRAY)) return SIR_ERR_ENTITY;
+            if (guard-- == 0 || node < sImageBase + 0xAC || !ImageSpan(node - 0xAC, 0xB8, imageSize, &o)) return SIR_ERR_ENTITY;
+            if (!PlanAdd(plan, o, 4, REGION_U32_ARRAY) || !PlanAdd(plan, o + 0xAC, 0xC, REGION_PTR_ARRAY)) return SIR_ERR_ENTITY;
+            if (++seen > REGION_MAX / 2) return SIR_ERR_ENTITY;                         // a list that loops
             node = Be32(image + o + 0xAC);
         }
     } else if (type == 3) {
         if (!ImageSpan(addr, 0x5C, imageSize, &off) || !PlanAdd(plan, off + 0x54, 8, REGION_COUNT_PTR)) return SIR_ERR_ENTITY;
         u32 count = Be32(image + off + 0x54), array = Be32(image + off + 0x58);
-        if (count == 0 || array == 0) return SIR_OK;
-        if (!ImageSpan(array, (u64)count * 4, imageSize, &o) || !PlanAdd(plan, o, count * 4, REGION_PTR_ARRAY)) return SIR_ERR_ENTITY;
+        if (!ImageSpan(addr, 0x60, imageSize, &off) || !PlanAdd(plan, off + 0x48, 4, REGION_PTR_ARRAY) ||
+            !PlanAdd(plan, off + 0x50, 4, REGION_U32_ARRAY) || !PlanAdd(plan, off + 0x5C, 4, REGION_PTR_ARRAY)) return SIR_ERR_ENTITY;
+        if (count != 0 && array != 0) {
+            if (!ImageSpan(array, (u64)count * 4, imageSize, &o) || !PlanAdd(plan, o, count * 4, REGION_PTR_ARRAY)) return SIR_ERR_ENTITY;
+            // The entries: the flags and the list link of each.
+            u32 item;
+            for (u32 i = 0; i < count; i++)
+                if (LevelSpan(Be32(image + o + i * 4), 0xC4, imageSize, &item) &&
+                    (!PlanAdd(plan, item + 0xC, 4, REGION_U32_ARRAY) || !PlanAdd(plan, item + 0xB8, 0xC, REGION_PTR_ARRAY))) return SIR_ERR_ENTITY;
+        }
+        // The matrices: twelve floats each (a float is swapped like a word).
+        u32 matrices = Be32(image + off + 0x5C), m;
+        if (count != 0 && LevelSpan(matrices, (u64)count * 4, imageSize, &o)) {
+            if (!PlanAdd(plan, o, count * 4, REGION_PTR_ARRAY)) return SIR_ERR_ENTITY;
+            for (u32 i = 0; i < count; i++)
+                if (LevelSpan(Be32(image + o + i * 4), 0x30, imageSize, &m) && !PlanAdd(plan, m, 0x30, REGION_U32_ARRAY)) return SIR_ERR_ENTITY;
+        }
     }
     return SIR_OK;
 }
@@ -1438,7 +1487,12 @@ static SirError EntityPlan(ImagePlan* plan, const u8* image, u32 imageSize, u32 
         return SIR_OK;
     const u8* ent = image + off;
     // The type is the byte at +0x34 of the record (fn_8012F8B8 picks the constructor by it).
-    bool prop = LevelSpan(Be32(ent + 0x04), ENTITY_RECORD_SIZE, imageSize, &o) && image[o + 0x34] == ENTITY_TYPE_PROP;
+    // The record of an entity outside zone 0 lies in zone 0, and so does a prop's definition.
+    u32 otherRec = 0, q;
+    bool recordHere = LevelSpan(Be32(ent + 0x04), ENTITY_RECORD_SIZE, imageSize, &o) != 0;
+    bool recordOther = !recordHere && OtherSpan(Be32(ent + 0x04), ENTITY_RECORD_SIZE, &otherRec);
+    bool prop = (recordHere && image[o + 0x34] == ENTITY_TYPE_PROP) || (recordOther && sOtherImage[otherRec + 0x34] == ENTITY_TYPE_PROP);
+    if (recordOther && !OtherAdd(otherRec, ENTITY_RECORD_SIZE, REGION_ENTITY_RECORD)) return SIR_ERR_ENTITY;
     if (depth > ENTITY_DEPTH_MAX || !PlanAdd(plan, off, ENTITY_USED, prop ? REGION_ENTITY_PROP : REGION_ENTITY)) return SIR_ERR_ENTITY;
     SirError e;
 
@@ -1449,8 +1503,28 @@ static SirError EntityPlan(ImagePlan* plan, const u8* image, u32 imageSize, u32 
     if ((e = SceneObjectPlan(plan, image, imageSize, Be32(ent + 0x90))) != SIR_OK) return e;
     // For a prop it is the prop's definition.
     if (prop) {
-        if (LevelSpan(Be32(ent + 0x9C), PROP_DEF_USED, imageSize, &o) && !PlanAdd(plan, o, PROP_DEF_USED, REGION_PROP_DEF)) return SIR_ERR_ENTITY;
-    } else if (LevelSpan(Be32(ent + 0x9C), 0xC, imageSize, &o) && !PlanAdd(plan, o + 8, 4, REGION_U32_ARRAY)) return SIR_ERR_ENTITY;
+        if (LevelSpan(Be32(ent + 0x9C), PROP_DEF_USED, imageSize, &o)) {
+            if (!PlanAdd(plan, o, PROP_DEF_USED, REGION_PROP_DEF)) return SIR_ERR_ENTITY;
+        }
+        else if (OtherSpan(Be32(ent + 0x9C), PROP_DEF_USED, &q) && !OtherAdd(q, PROP_DEF_USED, REGION_PROP_DEF)) return SIR_ERR_ENTITY;
+        // The prop's states (fn_800699E4): +0x1A4 pointers to definitions at +0x1A0. Every prop of
+        // the shipped levels has one state and names its own field +0x9C as the list: that word
+        // is converted with the entity.
+        u32 states = Be32(ent + 0x1A4), list, def;
+        if (states != 0 && LevelSpan(Be32(ent + 0x1A0), (u64)states * 4, imageSize, &list) && !(states == 1 && list == off + 0x9C)) {
+            if (!PlanAdd(plan, list, states * 4, REGION_PTR_ARRAY)) return SIR_ERR_ENTITY;
+            for (u32 i = 0; i < states; i++) {
+                u32 state = Be32(image + list + i * 4);
+                if (LevelSpan(state, PROP_DEF_USED, imageSize, &def)) {
+                    if (!PlanAdd(plan, def, PROP_DEF_USED, REGION_PROP_DEF)) return SIR_ERR_ENTITY;
+                } else if (OtherSpan(state, PROP_DEF_USED, &def) && !OtherAdd(def, PROP_DEF_USED, REGION_PROP_DEF)) {
+                    return SIR_ERR_ENTITY;
+                }
+            }
+        }
+    } else if (LevelSpan(Be32(ent + 0x9C), 0xC, imageSize, &o)) {
+        if (!PlanAdd(plan, o + 8, 4, REGION_U32_ARRAY)) return SIR_ERR_ENTITY;
+    } else if (OtherSpan(Be32(ent + 0x9C), 0xC, &q) && !OtherAdd(q + 8, 4, REGION_U32_ARRAY)) return SIR_ERR_ENTITY;
     // State machine holder: {machine, object}; fn_8012F8B8 hands the machine's definition to fn_801BC574.
     if (LevelSpan(Be32(ent + 0xA4), 8, imageSize, &o)) {
         if (!PlanAdd(plan, o, 8, REGION_PTR_ARRAY)) return SIR_ERR_ENTITY;
@@ -1460,7 +1534,9 @@ static SirError EntityPlan(ImagePlan* plan, const u8* image, u32 imageSize, u32 
     // More part containers.
     u32 extra = Be32(ent + 0x1A4);
     if (extra != 0 && LevelSpan(Be32(ent + 0x194), (u64)extra * 4, imageSize, &o)) {
-        if (!PlanAdd(plan, o, extra * 4, REGION_PTR_ARRAY)) return SIR_ERR_ENTITY;
+        // A list of one can be the entity's own slot at +0x8C, which is converted with the entity.
+        bool ownSlot = extra == 1 && o == off + 0x8C;
+        if (!ownSlot && !PlanAdd(plan, o, extra * 4, REGION_PTR_ARRAY)) return SIR_ERR_ENTITY;
         for (u32 i = 0; i < extra; i++)
             if ((e = EntityContainerPlan(plan, image, imageSize, Be32(image + o + i * 4))) != SIR_OK) return e;
     }
@@ -1541,13 +1617,11 @@ static SirError AnimPlayerPlan(ImagePlan* plan, const u8* image, u32 imageSize, 
     return SIR_OK;
 }
 
-static SirError ZoneRecordPlan(ImagePlan* plan, const u8* image, u32 imageSize, u32 addr) {
-    u32 off, o, q;
-    if (!LevelSpan(addr, 0x14, imageSize, &off) || PlanHas(plan, off + 0x10, REGION_PTR_ARRAY)) return SIR_OK;
-    if (!PlanAdd(plan, off + 0x10, 4, REGION_PTR_ARRAY)) return SIR_ERR_ZONE_RECORD;
-    u32 node = Be32(image + off + 0x10), guard = imageSize / ZONE_SYSTEM_USED + 1;
+// Walks a zone record's list from its first node. Every zone's record is in zone 0's image; the
+// objects are in the record's own zone, so the walk ends at a node outside this image.
+static SirError ZoneListPlan(ImagePlan* plan, const u8* image, u32 imageSize, u32 node) {
+    u32 o, q, guard = imageSize / ZONE_SYSTEM_USED + 1;
     SirError e;
-    // Every zone's record is in zone 0's image; the objects are in the record's own zone.
     while (node >= sImageBase && node - sImageBase < imageSize) {
         if (guard-- == 0 || node < sImageBase + 0x10 || !ImageSpan(node - 0x10, ZONE_SYSTEM_USED, imageSize, &o)) return SIR_ERR_ZONE_RECORD;
         if (PlanHas(plan, o, REGION_ZONE_SYSTEM)) return SIR_ERR_ZONE_RECORD;       // a list that loops
@@ -1563,6 +1637,13 @@ static SirError ZoneRecordPlan(ImagePlan* plan, const u8* image, u32 imageSize, 
         node = Be32(image + o + 0x10);
     }
     return SIR_OK;
+}
+
+static SirError ZoneRecordPlan(ImagePlan* plan, const u8* image, u32 imageSize, u32 addr) {
+    u32 off;
+    if (!LevelSpan(addr, 0x14, imageSize, &off) || PlanHas(plan, off + 0x10, REGION_PTR_ARRAY)) return SIR_OK;
+    if (!PlanAdd(plan, off + 0x10, 4, REGION_PTR_ARRAY)) return SIR_ERR_ZONE_RECORD;
+    return ZoneListPlan(plan, image, imageSize, Be32(image + off + 0x10));
 }
 
 // ---- all of them
@@ -1906,12 +1987,19 @@ extern "C" void LevelZoneRootsFree(LevelZoneRoots* roots) {
     free(roots->sceneObjects);
     free(roots->poolTables);
     free(roots->zoneRecords);
+    free(roots->zoneLists);
     memset(roots, 0, sizeof(*roots));
 }
 
-extern "C" BOOL LevelZoneRootsCollect(const u8* hdr, u32 hdrSize, const u8* zoneHost, u32 zoneSize, u32 zoneWiiBase, LevelZoneRoots* out) {
+extern "C" void LevelZoneDoneFree(LevelZoneDone* done) {
+    free(done->regions);
+    memset(done, 0, sizeof(*done));
+}
+
+extern "C" BOOL LevelZoneRootsCollect(const u8* hdr, u32 hdrSize, const u8* zoneHost, u32 zoneSize, u32 zoneWiiBase,
+                                      const LevelZoneOther* other, LevelZoneRoots* out) {
     memset(out, 0, sizeof(*out));
-    RootList entities = { NULL, 0, 0 }, scene = { NULL, 0, 0 }, pools = { NULL, 0, 0 }, records = { NULL, 0, 0 };
+    RootList entities = { NULL, 0, 0 }, scene = { NULL, 0, 0 }, pools = { NULL, 0, 0 }, records = { NULL, 0, 0 }, lists = { NULL, 0, 0 };
     bool ok = hdrSize >= LEVEL_HEADER_SLOTS + 0x118;
     u32 count = ok ? Host32(hdr + 0x1A8) : 0, stride = LEVEL_SLOT_MIN_SIZE, entries, addr;
     const u8* slots = hdr + LEVEL_HEADER_SLOTS;
@@ -1942,6 +2030,12 @@ extern "C" BOOL LevelZoneRootsCollect(const u8* hdr, u32 hdrSize, const u8* zone
                 if ((addr = ZoneAddr(table + k * 4, zoneHost, zoneSize, zoneWiiBase)) != 0) ok = RootAdd(&entities, addr);
         }
         if (ok && (addr = ZoneAddr(slot + 0xFC, zoneHost, zoneSize, zoneWiiBase)) != 0) ok = RootAdd(&records, addr);
+        else if (ok && other != NULL) {                          // the record is in zone 0, converted: its list may be in this zone
+            const u8* rec;
+            memcpy(&rec, slot + 0xFC, sizeof(rec));
+            if (rec >= other->image && rec < other->image + other->imageSize && (u32)(other->image + other->imageSize - rec) >= 0x14 &&
+                (addr = ZoneAddr(rec + 0x10, zoneHost, zoneSize, zoneWiiBase)) != 0) ok = RootAdd(&lists, addr);
+        }
         // The slot's pool table {entries, count} at +0xE4: address and count, as a pair.
         if (ok && (addr = ZoneAddr(slot + 0xE4, zoneHost, zoneSize, zoneWiiBase)) != 0)
             ok = RootAdd(&pools, addr) && RootAdd(&pools, Host32(slot + 0xE8));
@@ -1950,6 +2044,7 @@ extern "C" BOOL LevelZoneRootsCollect(const u8* hdr, u32 hdrSize, const u8* zone
     out->sceneObjects = scene.items;        out->sceneObjectCount = scene.count;
     out->poolTables = pools.items;          out->poolTableCount = pools.count / 2;
     out->zoneRecords = records.items;       out->zoneRecordCount = records.count;
+    out->zoneLists = lists.items;           out->zoneListCount = lists.count;
     if (!ok) LevelZoneRootsFree(out);
     return ok ? TRUE : FALSE;
 }
@@ -2004,10 +2099,17 @@ static SirError PoolTablePlan(ImagePlan* plan, const u8* image, u32 imageSize, u
     return SIR_OK;
 }
 
-extern "C" SirError LevelZoneConvert(SirReloc* r, u8* image, u32 imageSize, u32 wiiBase, const LevelZoneRoots* roots) {
-    ImagePlan plan = { NULL, 0, 0 };
+extern "C" SirError LevelZoneConvert(SirReloc* r, u8* image, u32 imageSize, u32 wiiBase, const LevelZoneRoots* roots,
+                                     LevelZoneDone* done, const LevelZoneOther* other) {
+    ImagePlan plan = { NULL, 0, 0 }, merged = { NULL, 0, 0 };
     sImageBase = wiiBase;
     sLevelZone = true;
+    if (other != NULL) {
+        sOtherImage = other->image;
+        sOtherSize = other->imageSize;
+        sOtherBase = other->wiiBase;
+        sOtherDone = (const ImagePlan*)other->done;
+    }
     SirError e = SIR_OK;
     if (roots->hud != 0) e = HudPlan(&plan, image, imageSize, roots->hud, true);
     for (u32 i = 0; i < roots->entityCount && e == SIR_OK; i++) e = EntityPlan(&plan, image, imageSize, roots->entities[i], 0);
@@ -2015,9 +2117,40 @@ extern "C" SirError LevelZoneConvert(SirReloc* r, u8* image, u32 imageSize, u32 
     for (u32 i = 0; i < roots->poolTableCount && e == SIR_OK; i++)
         e = PoolTablePlan(&plan, image, imageSize, roots->poolTables[i * 2], roots->poolTables[i * 2 + 1]);
     for (u32 i = 0; i < roots->zoneRecordCount && e == SIR_OK; i++) e = ZoneRecordPlan(&plan, image, imageSize, roots->zoneRecords[i]);
+    for (u32 i = 0; i < roots->zoneListCount && e == SIR_OK; i++) e = ZoneListPlan(&plan, image, imageSize, roots->zoneLists[i]);
     if (e == SIR_OK && !PlanFinish(&plan)) e = SIR_ERR_OVERLAP;
-    if (e == SIR_OK) ImagePlanConvert(&plan, r, image, imageSize);
+    // What this zone adds in zone 0: disjoint among itself and from what is converted there.
+    if (e == SIR_OK && !PlanFinish(&sOtherNew)) e = SIR_ERR_OVERLAP;
+    if (e == SIR_OK && sOtherDone != NULL && sOtherNew.count != 0) {
+        for (u32 i = 0; i < sOtherDone->count && e == SIR_OK; i++)
+            if (!PlanAdd(&merged, sOtherDone->regions[i].off, sOtherDone->regions[i].size, sOtherDone->regions[i].kind)) e = SIR_ERR_ENTITY;
+        for (u32 i = 0; i < sOtherNew.count && e == SIR_OK; i++)
+            if (!PlanAdd(&merged, sOtherNew.regions[i].off, sOtherNew.regions[i].size, sOtherNew.regions[i].kind)) e = SIR_ERR_ENTITY;
+        if (e == SIR_OK && !PlanFinish(&merged)) e = SIR_ERR_OVERLAP;
+    }
+    if (e == SIR_OK) {
+        ImagePlanConvert(&plan, r, image, imageSize);
+        if (other != NULL) ImagePlanConvert(&sOtherNew, r, other->image, other->imageSize);
+        if (merged.count != 0) {                                 // zone 0's list of converted objects grows
+            LevelZoneDoneFree(other->done);
+            other->done->regions = merged.regions;
+            other->done->count = merged.count;
+            other->done->capacity = merged.capacity;
+            merged.regions = NULL;
+        }
+        if (done != NULL) {
+            LevelZoneDoneFree(done);
+            done->regions = plan.regions;
+            done->count = plan.count;
+            done->capacity = plan.capacity;
+            plan.regions = NULL;
+        }
+    }
     PlanFree(&plan);
+    PlanFree(&merged);
+    PlanFree(&sOtherNew);
+    sOtherImage = NULL;
+    sOtherDone = NULL;
     sImageBase = GLOBAL_BINARY_WII_BASE;
     sLevelZone = false;
     return e;
