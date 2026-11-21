@@ -34,7 +34,7 @@ struct DVDFileInfo {
 static_assert(sizeof(DVDFileInfo) == 0x3C, "DVDFileInfo layout");
 typedef void (*DVDCallback)(s32 result, DVDFileInfo* info);
 
-struct DvdFile { FILE* f; u32 size; char name[120]; };
+struct DvdFile { FILE* f; u32 size; char name[120]; char path[100]; };
 static DvdFile sDvdFiles[64];
 static u32 sDvdOpens, sDvdReads, sDvdMisses;
 static u64 sDvdBytes;
@@ -44,7 +44,12 @@ BOOL DVDInit(void) {
     return TRUE;
 }
 
-s32 DVDGetDriveStatus(void) { return 0; }        // idle, no error
+// The game polls this in a loop while a read is pending (fn_80204210). On the console the drive's
+// interrupt preempts that loop; here the poll is where the interrupt thread gets to run.
+s32 DVDGetDriveStatus(void) {
+    PortYield();
+    return 0;                                    // idle, no error
+}
 
 // DVDOpen
 s32 fn_8024F1E8(char* path, u8* infoBytes) {
@@ -67,6 +72,7 @@ s32 fn_8024F1E8(char* path, u8* infoBytes) {
         fseek(f, 0, SEEK_END);
         d->size = (u32)ftell(f);
         snprintf(d->name, sizeof(d->name), "disc: opened %s (%u bytes)", path, d->size);
+        snprintf(d->path, sizeof(d->path), "%s", rel);
         memset(info, 0, sizeof(DVDFileInfo));
         info->startAddr = (u32)i + 1;
         info->length = d->size;
@@ -111,6 +117,7 @@ s32 DVDReadAsync(u8* infoBytes, void* addr, s32 len, s32 offset, void* cb, s32 p
     s32 got = (s32)fread(addr, 1, (size_t)len, d->f);
     sDvdReads++;
     sDvdBytes += (u32)got;
+    if (got > 0) PortFileRead(d->path, (u32)offset, (u8*)addr, (u32)got);
     info->state = 1;
     info->callback = cb;
     DvdDone* done = &sDvdDone[sDvdDoneNext++ % 64];

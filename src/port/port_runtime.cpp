@@ -79,6 +79,7 @@ static void PrintSummary(void) {
     if (sRunCtors || sSkippedCtors)
         fprintf(stderr, "static initialisers: %d run, %d skipped (not decompiled)\n", sRunCtors, sSkippedCtors);
     fprintf(stderr, "disc: %s\n", PortDvdStats(buf, sizeof(buf)));
+    fprintf(stderr, "data: %s\n", PortFileStats(buf, sizeof(buf)));
     fprintf(stderr, "reached, in order:\n");
     for (s32 i = 0; i < sMilestoneCount; i++) {
         if (!sMilestones[i].stub) fprintf(stderr, "  %6u ms  %s\n", sMilestones[i].ms, sMilestones[i].what);

@@ -50,11 +50,14 @@ What boots today, with the retail PAL disc:
    are allocated from the engine heap.
 7. The rest of `EngineInit`: `SgInit`, the two built-in font textures (palette conversion and
    GX tiling), the first `RendBeginFrame`, and the layer set-up of `SetRenderEnabled`.
-8. `GameStart`: the subsystem set-up (`fn_8000E488`), whose audio part runs on stubs, then the
-   disc queue thread opens **`catalog.sir`** and reads it to `0x90400000`: the first disc file.
-
-The run then hangs in the catalog loader (`fn_801E54E4`): the file is big-endian and nothing
-converts it yet, so its counts are garbage. That is the next step ("Next", item 1).
+8. `GameStart`: the subsystem set-up (`fn_8000E488`), whose audio part runs on stubs. The disc
+   queue opens **`catalog.sir`**, reads it to `0x90400000`, and the file layer converts it
+   (6,394 sections in 59 files); the loader then opens all 59 `.sir` files.
+9. `global_binary.sir`: header (4 KB) and image (1.1 MB to `0x90400000`) are read through
+   `SirLoad` and converted in place (5,615 pointers, the game database, input table, textures,
+   strings and actions).
+10. Script system set-up (`fn_8010F794`): signatures and all script functions registered.
+11. `UiInit` stops at `fn_8018C8F4` (232 bytes, not decompiled): the first stop today.
 
 The link report (`port_link.txt`, uploaded by CI) lists the stubs and the globals.
 
@@ -233,6 +236,19 @@ game code in the middle of an update, which is stricter than the console.
 A loop that waits for an interrupt to change memory without calling any SDK function would hang.
 The time limit then reports where the main thread is.
 
+### Disc files: conversion after the read
+
+`DVDReadAsync` reads from the extracted disc and hands the bytes to `PortFileRead`
+(`port_files.cpp`) before the game's callback runs. For a `.sir` file it finds the section the
+read starts (by file name and offset, in a copy of the catalog's tables) and converts it in place
+with `sir_loader.cpp`: the catalog itself when it is read, `global_binary.sir` when its image
+arrives (the header section is kept until then: its pointers need the image). The game's
+`SirLoad`, `SirFinishLoad` and catalog loader run unchanged. A section with no converter, a
+packed one, or one read in pieces is left as it is and reported once.
+
+The game polls `DVDGetDriveStatus` in a loop while a read is pending and relies on the drive's
+interrupt to end it; on PC that call is where the interrupt thread gets to run.
+
 ## 4. Build
 
 `port_link.py` reads the symbol tables of the compiled objects directly (COFF), so it needs no
@@ -255,16 +271,15 @@ MSVC only for now (absolute symbols, `/alternatename`, structured exception hand
 
 ## Next: the shortest path to a first title-screen frame
 
-1. **Wire the `.sir` loader**: convert `catalog.sir` when its read completes (the loader of
-   `sir_loader.cpp` has the catalog conversion), then `global_binary.sir`, which `GameStart`
-   loads next (header to `sSirHeader`, image to `0x90400000`): run the conversions on the
-   buffers when `SirFinishLoad` is done (the image is already at `0x90400000`, so
-   `SirRelocAddRange` is the identity). zlib `inflate` is needed for packed sections: link real
-   zlib. `sSirHeader` is defined with 0x1000 bytes; the original symbol (`lbl_803C2A20`) is
-   0x15E0.
-2. **Follow the next stops** with `python tools/build_pc.py --run`. Known from a
-   `--keep-going` run: `fn_8016E304` (2,056 bytes, from `fn_801D66C4`) and `fn_8016FB20`
-   (1,316 bytes, from `CameraSetMatrix`).
+1. **Follow the next stops** with `python tools/build_pc.py --run`: `fn_8018C8F4` in `UiInit`,
+   then what a `--keep-going` run prints behind it.
+2. **Converters for the other `.sir` sections.** The file layer (`src/port/port_files.cpp`)
+   converts `catalog.sir` and `global_binary.sir`. Every other section the game loads is still
+   big-endian: the boot summary's `data:` line counts the kinds it met, and the log names each
+   one once (`disc: <file> section type N ... is not converted`). The title screen needs at
+   least `shared_ui.sir` and `shared_texture.sir`. Packed sections are inflated by the game's
+   own zlib (SDK range, not decompiled): link real zlib under those names, and convert after
+   the inflate instead of after the read.
 3. **Static initialisers**: 262 of the 300 `.ctors` entries are not decompiled. Most are small
    (they construct one global). Until they exist those globals are zero, which will show up as
    crashes or wrong behaviour further in. `monsterlab.exe --verbose` lists them.

@@ -16,6 +16,29 @@ extern s32 lbl_805FB4B8;                // 0x805FB4B8: projection type (1 = orth
 extern u8  lbl_805FB524;                // 0x805FB524: fog enabled
 }
 
+// 0x801567CC
+// Perspective projection from the half extents at distance 1 (x, y) and the near/far distances.
+extern "C" void fn_801567CC(f32 halfX, f32 halfY, f32 n, f32 f) {
+    lbl_805F9220 = n;
+    lbl_805F9224 = f;
+    lbl_805F9230 = 1;
+    lbl_80401030[0] = 1.0f / halfX;
+    lbl_80401030[1] = 0.0f;
+    lbl_80401030[2] = 1.0f / halfY;
+    lbl_80401030[3] = 0.0f;
+    lbl_805FB4B8 = 0;
+    lbl_80401030[4] = (2.0f * n) / (n - f);
+    lbl_80401030[5] = (f * n) / (n - f);
+
+    GXWGFifo._u8 = 0x10;
+    GXWGFifo._u16 = 6;
+    GXWGFifo._u16 = 0x1020;
+    for (int i = 0; i < 6; i++) GXWGFifo._f32 = lbl_80401030[i];
+    GXWGFifo._u32 = 0;
+
+    if (lbl_805FB524) fn_80151264();
+}
+
 // 0x801499F8
 // Fills in an image header: size, pixel format, bits per pixel, and for palette formats the
 // palette size and its entry width, then lets fn_8015A5A4 allocate the pixels.

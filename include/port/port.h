@@ -94,6 +94,9 @@ void PortStubCall(const char* name);
 // SDK functions without a PC implementation that may return 0 for now (port_sdk.cpp): the text
 // to log, or NULL if a call to this address must stop the run.
 const char* PortSoftSdk(u32 wiiAddr);
+// port_files.cpp: called for every completed disc read; converts big-endian .sir sections in place.
+void PortFileRead(const char* path, u32 offset, u8* dst, u32 len);
+const char* PortFileStats(char* buf, u32 n);
 // Prints the boot summary and ends the process.
 void PortStop(int exitCode, const char* fmt, ...);
 void PortFrameDone(void);     // one presented frame (VI flip): enforces the frame limit
