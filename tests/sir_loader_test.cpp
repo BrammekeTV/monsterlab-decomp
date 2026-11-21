@@ -859,7 +859,7 @@ struct ZoneDump {
                 for (u32 k = 0; k < 4; k++) printf(" %08x", *(const u32*)(e + 0x48 + k * 4));
                 printf(" %08x actor ", *(const u32*)(e + 0x68)); Ptr(e + 0xA0); printf(" fc8");
                 for (u32 k = 0; k < 3; k++) printf(" %08x", Bits(*(const f32*)(e + 0xC8 + k * 4)));
-                printf(" wec %08x w15c %08x\n", *(const u32*)(e + 0xEC), *(const u32*)(e + 0x15C));
+                printf(" wec %08x w15c %08x states ", *(const u32*)(e + 0xEC), *(const u32*)(e + 0x15C)); Ptr(e + 0x1A0); printf("\n");
             }
             Parts(*(const u8**)(e + 0x8C));
             Add(scene, *(const u8**)(e + 0x90), 8);
@@ -869,7 +869,9 @@ struct ZoneDump {
                 printf("entdef "); Val(o9c); printf(" f24 %08x w2c %08x acts", Bits(*(const f32*)(o9c + 0x24)), *(const u32*)(o9c + 0x2C));
                 for (u32 k = 0; k < 3; k++) printf(" %08x", *(const u32*)(o9c + 0x68 + k * 4));
                 for (u32 k = 0; k < 4; k++) printf(" %08x", *(const u32*)(o9c + 0x78 + k * 4));
-                printf(" %08x wbc %08x\n", *(const u32*)(o9c + 0x98), *(const u32*)(o9c + 0xBC));
+                printf(" %08x wbc %08x state", *(const u32*)(o9c + 0x98), *(const u32*)(o9c + 0xBC));
+                for (u32 k = 0; k < 4; k++) printf(" %08x", *(const u32*)(o9c + 0x0C + k * 4));
+                printf(" anims "); Ptr(o9c + 0x48); printf("\n");
             }
             const u8* holder = *(const u8**)(e + 0xA4);
             if (In(holder, 8)) {
@@ -892,8 +894,39 @@ struct ZoneDump {
             u32 type = *(const u32*)(s + 4);
             printf("sceneobj "); Val(s); printf(" type %u", type);
             if (type == 2) { printf(" a "); Ptr(s + 0x48); printf(" list "); Ptr(s + 0x4C); }
-            if (type == 3) { printf(" count %d items ", *(const s32*)(s + 0x54)); Ptr(s + 0x58); }
+            if (type == 3) {
+                printf(" count %d items ", *(const s32*)(s + 0x54)); Ptr(s + 0x58);
+                printf(" owner "); Ptr(s + 0x48); printf(" current %d matrices ", *(const s32*)(s + 0x50)); Ptr(s + 0x5C);
+            }
             printf("\n");
+            const u8* list = type == 2 ? *(const u8**)(s + 0x4C) : NULL;
+            if (In(list, 0x3C)) {
+                printf("scenelist "); Val(list); printf(" head "); Ptr(list + 4); printf(" tail "); Ptr(list + 8);
+                printf(" count %d flagged %d\n", *(const s32*)(list + 0xC), *(const s32*)(list + 0x38));
+                std::vector<const u8*> seen;
+                for (const u8* node = *(const u8**)(list + 4); node != NULL && In(node - 0xAC, 0xB8) && std::find(seen.begin(), seen.end(), node) == seen.end();
+                     node = *(const u8**)node) {
+                    seen.push_back(node);
+                    printf("scenenode "); Val(node); printf(" flags %08x next ", *(const u32*)(node - 0xAC)); Ptr(node);
+                    printf(" prev "); Ptr(node + 4); printf(" owner "); Ptr(node + 8); printf("\n");
+                }
+            }
+            u32 entries = type == 3 ? *(const u32*)(s + 0x54) : 0;
+            const u8* items = type == 3 ? *(const u8**)(s + 0x58) : NULL;
+            for (u32 k = 0; entries != 0 && In(items, entries * 4) && k < entries; k++) {
+                const u8* it = *(const u8**)(items + k * 4);
+                if (!In(it, 0xC4)) continue;
+                printf("sceneitem "); Val(it); printf(" flags %08x next ", *(const u32*)(it + 0xC)); Ptr(it + 0xB8);
+                printf(" prev "); Ptr(it + 0xBC); printf(" owner "); Ptr(it + 0xC0); printf("\n");
+            }
+            const u8* table = type == 3 ? *(const u8**)(s + 0x5C) : NULL;
+            for (u32 k = 0; entries != 0 && In(table, entries * 4) && k < entries; k++) {
+                const u8* m = *(const u8**)(table + k * 4);
+                if (!In(m, 0x30)) continue;
+                printf("scenematrix "); Val(m);
+                for (u32 w = 0; w < 12; w++) printf(" %08x", Bits(*(const f32*)(m + w * 4)));
+                printf("\n");
+            }
         }
         for (const u8* p : projectiles) { printf("projectile "); Val(p); printf(" part "); Ptr(p + 0x22C); printf("\n"); }
     }
@@ -1547,7 +1580,9 @@ static SirError ConvertBuilt(u8* hdr, u8* img, SirReloc* r, s32* failTable) {
 #define L_PLAYER   0xAB0u                     // the player: one channel, its element at +0x30
 #define L_TRACK    0xAF0u                     // the track: channel table at +0x30, two keys at +0x38
 #define L_REC1     0xB40u                     // record of the entity in zone 1 (records stay in zone 0)
-#define L_ZONE_SIZE 0xB80u
+#define L_ITEM     0xB80u                     // the scene object's one entry: flags at +0x0C, list link at +0xB8
+#define L_MATRIX   (L_ITEM + 0xD0)            // its matrix, twelve floats
+#define L_ZONE_SIZE 0xC80u
 #define L_ZONE1    0x90980000u                // Wii address of zone 1: an entity at 0x10, a list object at 0x200
 #define L_ENT1     0x10u                      // the entity slot 1's second table names
 #define L_ZONE1_SIZE 0x300u
@@ -1619,6 +1654,7 @@ static void BuildLevel(u8* hdr, u8* zone) {
     Put32(def + 0x08, 0x325462E8); Put32(def + 0x24, 0x3F800000);
     Put32(def + 0x64, 0x0003FFFF);                             // no reader: stays big-endian
     Put32(def + 0x68, 0x0003FFFF); Put32(def + 0xBC, 0x00100080);
+    Put32(def + 0x0C, 0x20); Put32(def + 0x10, 3);             // flags and animation id, as fn_800699E4 reads them
 
     // The zone records the two slots name (+0xFC): the first has a list of one object, the second none.
     Put32(zone + 0x10, L_ZONE + L_SYS + 0x10);
@@ -1648,7 +1684,8 @@ static void BuildLevel(u8* hdr, u8* zone) {
     Put32(e + 0x0A4, L_ZONE + L_HOLDER);
     Put32(e + 0x0B0, L_ZONE + L_CHILD);
     Put32(e + 0x158, 0x3F800000);
-    Put32(e + 0x1A4, 0);
+    Put32(e + 0x1A0, L_ZONE + L_ENT + 0x9C);                   // one state: the list is the field +0x9C itself
+    Put32(e + 0x1A4, 1);
     Put32(e + 0x1B0, 0x40);
     u8* rec = zone + L_RECORD;
     memset(rec, 0, 0x40);
@@ -1658,7 +1695,13 @@ static void BuildLevel(u8* hdr, u8* zone) {
     u8* sc = zone + L_SCENE;
     Put32(sc + 0x00, T_VTABLE); Put32(sc + 0x04, 3);
     Put32(sc + 0x54, 1); Put32(sc + 0x58, L_ZONE + L_SCENE + 0x60);
-    Put32(sc + 0x60, L_ZONE + L_SCENE + 0x70);
+    Put32(sc + 0x60, L_ZONE + L_ITEM);
+    Put32(zone + L_ITEM + 0x0C, 4);
+    for (u32 o = 0xB8; o < 0xC4; o += 4) Put32(zone + L_ITEM + o, 0);
+    Put32(sc + 0x48, L_ZONE + L_ENT); Put32(sc + 0x50, 0);
+    Put32(sc + 0x5C, L_ZONE + L_SCENE + 0x64);                 // one matrix pointer
+    Put32(sc + 0x64, L_ZONE + L_MATRIX);
+    for (u32 o = 0; o < 0x30; o += 4) Put32(zone + L_MATRIX + o, o == 0 ? 0x3F800000 : 0);
     Put32(zone + L_HOLDER + 0, L_ZONE + L_FSM);                // the machine the HUD also lists
     Put32(zone + L_HOLDER + 4, 0);
     Put32(zone + L_CHILD + 4, 0); Put32(zone + L_CHILD + 8, 0);   // a node without an entity, end of the list
@@ -1804,7 +1847,14 @@ static void LevelSelfTest(void) {
     CHECK(*(const f32*)(ent + 0x158) == 1.0f && *(const u32*)(ent + 0x1B0) == 0x40 && *(const u8**)(ent + 0x8C) == NULL);
     const u8* sc = *(const u8**)(ent + 0x90);
     CHECK(sc == zone + L_SCENE && *(const s32*)(sc + 4) == 3 && *(const s32*)(sc + 0x54) == 1);
-    CHECK(sc[0] == 0x80 && **(const u8***)(sc + 0x58) == sc + 0x70);               // its vtable word: left for the constructor
+    CHECK(sc[0] == 0x80 && **(const u8***)(sc + 0x58) == zone + L_ITEM);           // its vtable word: left for the constructor
+    // The entry, as fn_80184314 reads it before it links it into a list; the matrix of the current
+    // entry, as fn_801DA798 finds it; the prop's state list and the state's fields (fn_800699E4).
+    CHECK(*(const s32*)(zone + L_ITEM + 0x0C) == 4 && *(const u8**)(zone + L_ITEM + 0xC0) == NULL && zone[L_ITEM] == 0x7F);
+    const f32* matrix = (*(const f32***)(sc + 0x5C))[*(const s32*)(sc + 0x50)];
+    CHECK(*(const u8**)(sc + 0x48) == ent && (const u8*)matrix == zone + L_MATRIX && matrix[0] == 1.0f && matrix[1] == 0.0f);
+    CHECK(*(const u8**)(ent + 0x1A0) == ent + 0x9C && **(const u8***)(ent + 0x1A0) == def);
+    CHECK(*(const u32*)(def + 0x0C) == 0x20 && *(const s32*)(def + 0x10) == 3 && *(const u8**)(def + 0x48) == NULL);
     const u8* holder = *(const u8**)(ent + 0xA4);
     CHECK(holder == zone + L_HOLDER && *(const u8**)holder == list && *(const u8**)(holder + 4) == NULL);
     const u8* child = *(const u8**)(ent + 0xB0);
@@ -1832,7 +1882,7 @@ static void LevelSelfTest(void) {
         { true, L_HUD + 0x434, L_ZONE + L_ZONE_SIZE - 8, SIR_ERR_SCREENS },        // screen list runs off the zone
         { true, L_HUD + 0x24, 0x12345678, SIR_ERR_SCREENS },                       // slot pointer outside the zone
         { true, L_SCENE + 0x54, 0x100000, SIR_ERR_ENTITY },                        // scene object's items run off the zone
-        { true, L_ENT + 0x8C, L_ZONE + L_SCENE + 0x40, SIR_ERR_ENTITY },           // part container whose item list runs off the zone
+        { true, L_ENT + 0x8C, L_ZONE + L_SCENE + 0x68, SIR_ERR_ENTITY },           // part container whose item list runs off the zone
         { true, L_POOL + 0x08, 0x18, SIR_ERR_POOL },                               // pool alignment not a power of two
         { true, L_POOLBLK + 0x10, L_ZONE + L_ENT + 0x10, SIR_ERR_OVERLAP },        // pooled "machine" inside the entity
         { true, L_ENT + 0xA4, L_ZONE + L_RECORD + 0x20, SIR_ERR_OVERLAP },         // holder inside the record

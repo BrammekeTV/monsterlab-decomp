@@ -793,9 +793,9 @@ def zone_dump(L, sec, base, hud, roots, scene_roots, pooltabs, records=(), lists
         L.append('entbase %s id %08x w30 %08x p84 %s wac %08x' % (ptr(a), u(o + 0x2C), u(o + 0x30), ptr(u(o + 0x84)), u(o + 0xAC)))
         prop = rl and rl[0][rl[1] + 0x34] == 6
         if prop:
-            L.append('entprop %s f14 %08x f28 %08x acts %s %s %08x actor %s fc8 %s wec %08x w15c %08x' % (
+            L.append('entprop %s f14 %08x f28 %08x acts %s %s %08x actor %s fc8 %s wec %08x w15c %08x states %s' % (
                 ptr(a), u(o + 0x14), u(o + 0x28), ws(o + 0x38, 3), ws(o + 0x48, 4), u(o + 0x68), ptr(u(o + 0xA0)), ws(o + 0xC8, 3),
-                u(o + 0xEC), u(o + 0x15C)))
+                u(o + 0xEC), u(o + 0x15C), ptr(u(o + 0x1A0))))
         parts(u(o + 0x8C))
         add(scene, u(o + 0x90), 8)
         dl = loc(u(o + 0x9C), 0xC)
@@ -803,8 +803,9 @@ def zone_dump(L, sec, base, hud, roots, scene_roots, pooltabs, records=(), lists
         dl = loc(u(o + 0x9C), 0xC0)
         if prop and dl:
             img, q = dl
-            L.append('entdef %s f24 %08x w2c %08x acts %s %s %08x wbc %08x' % (
-                ptr(u(o + 0x9C)), U(img, q + 0x24), U(img, q + 0x2C), W(img, q + 0x68, 3), W(img, q + 0x78, 4), U(img, q + 0x98), U(img, q + 0xBC)))
+            L.append('entdef %s f24 %08x w2c %08x acts %s %s %08x wbc %08x state %s anims %s' % (
+                ptr(u(o + 0x9C)), U(img, q + 0x24), U(img, q + 0x2C), W(img, q + 0x68, 3), W(img, q + 0x78, 4), U(img, q + 0x98), U(img, q + 0xBC),
+                W(img, q + 0x0C, 4), ptr(U(img, q + 0x48))))
         hl = u(o + 0xA4)
         if inz(hl, 8):
             L.append('entholder %s machine %s other %s' % (ptr(hl), ptr(u(off(hl))), ptr(u(off(hl) + 4))))
@@ -823,8 +824,26 @@ def zone_dump(L, sec, base, hud, roots, scene_roots, pooltabs, records=(), lists
         t = u(o + 4)
         line = 'sceneobj %s type %d' % (ptr(a), t)
         if t == 2: line += ' a %s list %s' % (ptr(u(o + 0x48)), ptr(u(o + 0x4C)))
-        if t == 3: line += ' count %d items %s' % (i32(o + 0x54), ptr(u(o + 0x58)))
+        if t == 3: line += ' count %d items %s owner %s current %d matrices %s' % (
+            i32(o + 0x54), ptr(u(o + 0x58)), ptr(u(o + 0x48)), i32(o + 0x50), ptr(u(o + 0x5C)))
         L.append(line)
+        link = lambda n: 'next %s prev %s owner %s' % (ptr(u(n)), ptr(u(n + 4)), ptr(u(n + 8)))
+        if t == 2 and inz(u(o + 0x4C), 0x3C):
+            l = off(u(o + 0x4C))
+            L.append('scenelist %s head %s tail %s count %d flagged %d' % (ptr(u(o + 0x4C)), ptr(u(l + 4)), ptr(u(l + 8)), i32(l + 0xC), i32(l + 0x38)))
+            node, seen = u(l + 4), set()
+            while node >= base + 0xAC and inz(node - 0xAC, 0xB8) and node not in seen:
+                seen.add(node)
+                L.append('scenenode %s flags %08x %s' % (ptr(node), u(off(node) - 0xAC), link(off(node))))
+                node = u(off(node))
+        if t == 3 and inz(u(o + 0x58), u(o + 0x54) * 4):
+            for k in range(u(o + 0x54)):
+                it = u(off(u(o + 0x58)) + k * 4)
+                if inz(it, 0xC4): L.append('sceneitem %s flags %08x %s' % (ptr(it), u(off(it) + 0xC), link(off(it) + 0xB8)))
+        if t == 3 and inz(u(o + 0x5C), u(o + 0x54) * 4):
+            for k in range(u(o + 0x54)):
+                m = u(off(u(o + 0x5C)) + k * 4)
+                if inz(m, 0x30): L.append('scenematrix %s %s' % (ptr(m), ws(off(m), 12)))
     for a in projectiles:
         L.append('projectile %s part %s' % (ptr(a), ptr(u(off(a) + 0x22C))))
     zone_records_dump(L, sec, base, records, lists)

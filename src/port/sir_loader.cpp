@@ -1363,12 +1363,15 @@ static const SirField kPropFields[] = {
     { 0x0C8, SIR_F32, 3 },    // code: a position (fn_8006A764)
     { 0x0EC, SIR_U32, 1 },    // code: fn_800696C4
     { 0x15C, SIR_U32, 1 },    // code: flags (fn_80069180, fn_8006A764, fn_8006A2D0)
+    { 0x1A0, SIR_PTR, 1 },    // code: the prop's states: +0x1A4 pointers to definitions (fn_800699E4)
 };
 // A prop's definition (entity +0x9C), read through the same methods.
 static const SirField kPropDefFields[] = {
     { 0x08, SIR_U32, 1 },     // code: id (fn_8012F8B8, fn_80069180, fn_8006AADC)
+    { 0x0C, SIR_U32, 4 },     // code: flags, animation id, two words copied to the prop's +0xF0 / +0xF4 (fn_800699E4)
     { 0x24, SIR_F32, 1 },     // code: fn_80069180 copies it to the entity's +0x158 and the record's +0x24
     { 0x2C, SIR_U32, 1 },     // code: fn_8006A2D0
+    { 0x48, SIR_PTR, 1 },     // code: animation table (fn_800699E4 -> fn_801AC184; the table is not converted)
     { 0x68, SIR_U32, 3 },     // code: action words (fn_8006A2D0)
     { 0x78, SIR_U32, 4 },     // code: action words (fn_800696C4, fn_8006BDF4, fn_80069638)
     { 0x98, SIR_U32, 1 },     // code: action word (fn_80069180)
@@ -1397,9 +1400,15 @@ static int LevelSpan(u32 addr, u64 size, u32 imageSize, u32* off) {
 // Scene object: what an entity's +0x90 points at, and what the header block's per-zone tables
 // (+0x1B0, +0x1BC) hold. The type word at +4 picks the class; its constructor stores the vtable
 // (fn_801D94CC 1, fn_801DA81C 2, fn_801DA1CC 3, fn_801D9A24 4).
-//   type 2: +0x48 an object whose +0x30 / +0x34 are cleared, +0x4C a list head: nodes linked through
-//           their first word, with a flag word 0xAC bytes before each (fn_801DB160, fn_801842E0)
-//   type 3: +0x54 count, +0x58 pointers to entries whose +0x30 / +0x34 are set (fn_801DA7C8)
+//   type 2: +0x48 an object whose +0x30 / +0x34 are cleared, +0x4C a list object: {+0x04 head,
+//           +0x08 tail, +0x0C count} and at +0x38 how many of its nodes are flagged (fn_80184314,
+//           fn_8017323C). A node is the link {next, prev, owner list} at +0xB8 of an item, whose
+//           flags are at +0x0C (fn_801DB160, fn_801842E0, fn_80184314)
+//   type 3: +0x54 count, +0x58 pointers to entries whose +0x30 / +0x34 are set (fn_801DA7C8); the
+//           entries are such items (fn_801DA91C hands each to fn_80184314);
+//           +0x48 the entity that uses the object (fn_801DA344 stores it), +0x50 which entry is
+//           current (fn_801DA750), +0x5C one pointer per entry to its 3x4 float matrix
+//           (fn_801DA798 returns matrix[current]; fn_801D9164 fills it)
 static const SirField kCountPtrFields[] = {
     { 0x00, SIR_U32, 1 }, { 0x04, SIR_PTR, 1 },
 };
@@ -1411,20 +1420,38 @@ static SirError SceneObjectPlan(ImagePlan* plan, const u8* image, u32 imageSize,
     u32 type = Be32(image + off + 4);
     if (type == 2) {
         if (!ImageSpan(addr, 0x50, imageSize, &off) || !PlanAdd(plan, off + 0x48, 8, REGION_PTR_ARRAY)) return SIR_ERR_ENTITY;
-        if (!LevelSpan(Be32(image + off + 0x4C), 8, imageSize, &o)) return SIR_OK;
-        if (!PlanAdd(plan, o + 4, 4, REGION_PTR_ARRAY)) return SIR_ERR_ENTITY;
-        u32 node = Be32(image + o + 4), guard = imageSize / 4 + 1;
+        if (!LevelSpan(Be32(image + off + 0x4C), 0x3C, imageSize, &o)) return SIR_OK;
+        if (PlanHas(plan, o + 4, REGION_PTR_ARRAY)) return SIR_OK;                     // two objects with one list
+        if (!PlanAdd(plan, o + 4, 8, REGION_PTR_ARRAY) || !PlanAdd(plan, o + 0xC, 4, REGION_U32_ARRAY) ||
+            !PlanAdd(plan, o + 0x38, 4, REGION_U32_ARRAY)) return SIR_ERR_ENTITY;
+        // The nodes can also be entries of a type 3 object: the same words, found twice.
+        u32 node = Be32(image + o + 4), guard = imageSize / 4 + 1, seen = 0;
         while (node != 0) {
-            if (guard-- == 0 || node < sImageBase + 0xAC || !ImageSpan(node - 0xAC, 0xB0, imageSize, &o)) return SIR_ERR_ENTITY;
-            if (PlanHas(plan, o + 0xAC, REGION_PTR_ARRAY)) return SIR_ERR_ENTITY;      // a list that loops
-            if (!PlanAdd(plan, o, 4, REGION_U32_ARRAY) || !PlanAdd(plan, o + 0xAC, 4, REGION_PTR_ARRAY)) return SIR_ERR_ENTITY;
+            if (guard-- == 0 || node < sImageBase + 0xAC || !ImageSpan(node - 0xAC, 0xB8, imageSize, &o)) return SIR_ERR_ENTITY;
+            if (!PlanAdd(plan, o, 4, REGION_U32_ARRAY) || !PlanAdd(plan, o + 0xAC, 0xC, REGION_PTR_ARRAY)) return SIR_ERR_ENTITY;
+            if (++seen > REGION_MAX / 2) return SIR_ERR_ENTITY;                         // a list that loops
             node = Be32(image + o + 0xAC);
         }
     } else if (type == 3) {
         if (!ImageSpan(addr, 0x5C, imageSize, &off) || !PlanAdd(plan, off + 0x54, 8, REGION_COUNT_PTR)) return SIR_ERR_ENTITY;
         u32 count = Be32(image + off + 0x54), array = Be32(image + off + 0x58);
-        if (count == 0 || array == 0) return SIR_OK;
-        if (!ImageSpan(array, (u64)count * 4, imageSize, &o) || !PlanAdd(plan, o, count * 4, REGION_PTR_ARRAY)) return SIR_ERR_ENTITY;
+        if (!ImageSpan(addr, 0x60, imageSize, &off) || !PlanAdd(plan, off + 0x48, 4, REGION_PTR_ARRAY) ||
+            !PlanAdd(plan, off + 0x50, 4, REGION_U32_ARRAY) || !PlanAdd(plan, off + 0x5C, 4, REGION_PTR_ARRAY)) return SIR_ERR_ENTITY;
+        if (count != 0 && array != 0) {
+            if (!ImageSpan(array, (u64)count * 4, imageSize, &o) || !PlanAdd(plan, o, count * 4, REGION_PTR_ARRAY)) return SIR_ERR_ENTITY;
+            // The entries: the flags and the list link of each.
+            u32 item;
+            for (u32 i = 0; i < count; i++)
+                if (LevelSpan(Be32(image + o + i * 4), 0xC4, imageSize, &item) &&
+                    (!PlanAdd(plan, item + 0xC, 4, REGION_U32_ARRAY) || !PlanAdd(plan, item + 0xB8, 0xC, REGION_PTR_ARRAY))) return SIR_ERR_ENTITY;
+        }
+        // The matrices: twelve floats each (a float is swapped like a word).
+        u32 matrices = Be32(image + off + 0x5C), m;
+        if (count != 0 && LevelSpan(matrices, (u64)count * 4, imageSize, &o)) {
+            if (!PlanAdd(plan, o, count * 4, REGION_PTR_ARRAY)) return SIR_ERR_ENTITY;
+            for (u32 i = 0; i < count; i++)
+                if (LevelSpan(Be32(image + o + i * 4), 0x30, imageSize, &m) && !PlanAdd(plan, m, 0x30, REGION_U32_ARRAY)) return SIR_ERR_ENTITY;
+        }
     }
     return SIR_OK;
 }
@@ -1480,6 +1507,21 @@ static SirError EntityPlan(ImagePlan* plan, const u8* image, u32 imageSize, u32 
             if (!PlanAdd(plan, o, PROP_DEF_USED, REGION_PROP_DEF)) return SIR_ERR_ENTITY;
         }
         else if (OtherSpan(Be32(ent + 0x9C), PROP_DEF_USED, &q) && !OtherAdd(q, PROP_DEF_USED, REGION_PROP_DEF)) return SIR_ERR_ENTITY;
+        // The prop's states (fn_800699E4): +0x1A4 pointers to definitions at +0x1A0. Every prop of
+        // the shipped levels has one state and names its own field +0x9C as the list: that word
+        // is converted with the entity.
+        u32 states = Be32(ent + 0x1A4), list, def;
+        if (states != 0 && LevelSpan(Be32(ent + 0x1A0), (u64)states * 4, imageSize, &list) && !(states == 1 && list == off + 0x9C)) {
+            if (!PlanAdd(plan, list, states * 4, REGION_PTR_ARRAY)) return SIR_ERR_ENTITY;
+            for (u32 i = 0; i < states; i++) {
+                u32 state = Be32(image + list + i * 4);
+                if (LevelSpan(state, PROP_DEF_USED, imageSize, &def)) {
+                    if (!PlanAdd(plan, def, PROP_DEF_USED, REGION_PROP_DEF)) return SIR_ERR_ENTITY;
+                } else if (OtherSpan(state, PROP_DEF_USED, &def) && !OtherAdd(def, PROP_DEF_USED, REGION_PROP_DEF)) {
+                    return SIR_ERR_ENTITY;
+                }
+            }
+        }
     } else if (LevelSpan(Be32(ent + 0x9C), 0xC, imageSize, &o)) {
         if (!PlanAdd(plan, o + 8, 4, REGION_U32_ARRAY)) return SIR_ERR_ENTITY;
     } else if (OtherSpan(Be32(ent + 0x9C), 0xC, &q) && !OtherAdd(q + 8, 4, REGION_U32_ARRAY)) return SIR_ERR_ENTITY;
