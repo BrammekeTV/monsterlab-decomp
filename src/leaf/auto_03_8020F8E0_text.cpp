@@ -638,7 +638,9 @@ extern "C" char* fn_8022E3D8(u8* a3, u8* a4) {
 }
 
 // 0x8022E3DC
-extern "C" void fn_8022E3DC(void) {
+extern "C" u8* fn_8022E3DC(u8* a3) {
+    // empty in the original: r3 is untouched, the callers get their first argument back
+    return a3;
 }
 
 // 0x8022E430

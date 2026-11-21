@@ -616,6 +616,16 @@ def conv_ret(rett, e, t):
 
 
 def gen_function(name, items, sig, cb, sigs, protos, hnames):
+    # A function that is only `blr`, but declared in the sources as returning its first argument's
+    # type: the callers use what is left in r3, their own first argument. Return it, so the value
+    # does not depend on what the host leaves in its return register.
+    ins = [it for it in items if it[0] == "ins"]
+    pr = protos.get(name)
+    if not sig and len(ins) == 1 and ins[0][1] == "blr" and pr and pr[1] and pr[0] == pr[1][0] and \
+       pr[0] != "void" and not FLOAT_T.match(pr[0]):
+        return ([f'extern "C" {pr[0]} {name}({pr[0]} a3) {{',
+                 "    // empty in the original: r3 is untouched, the callers get their first argument back",
+                 "    return a3;", "}"], set(), {})
     g = Gen(name, cb, sigs, protos, hnames)
     labels = {it[1]: k for k, it in enumerate(items) if it[0] == "label"}
     g.run(items, labels, 0)
