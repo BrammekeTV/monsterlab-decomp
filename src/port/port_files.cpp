@@ -117,6 +117,9 @@ void PortFileRead(const char* path, u32 offset, u8* dst, u32 len) {
         static u32 hudAddr;            // header +0x1F4, kept for the zone that holds the HUD
         static u8* levelHdr;           // the header block (the world state), converted
         static u32 levelHdrSize;
+        static u8* zone0;              // zone 0's image, converted, and what was converted in it
+        static u32 zone0Size;
+        static LevelZoneDone zone0Done;
         SirRelocInit(&reloc, NULL, NULL);
         if (e->type == -1) {
             u32 base = LevelHeaderWiiBase(dst, e->size);
@@ -130,27 +133,34 @@ void PortFileRead(const char* path, u32 offset, u8* dst, u32 len) {
             hudAddr = *(u32*)(dst + 0x1F4);
             levelHdr = dst;
             levelHdrSize = e->size;
+            zone0 = NULL;
+            LevelZoneDoneFree(&zone0Done);
             sConverted++;
             PortLog("%s header converted: %u pointers, %u fields (%u pointers outside the mapped ranges)", name,
                     reloc.ptrImage, reloc.fieldsSwapped, reloc.ptrUnknown + reloc.ptrDolKept);
             return;
         }
-        if (e->type == 0) {
+        // Zone images are read to the addresses the console uses. The records and definitions of
+        // the entities of a zone other than 0 lie in zone 0's image, which stays loaded.
+        if (e->type == 0 || (e->type > 0 && zone0 != NULL)) {
             u32 base = (u32)(uintptr_t)dst;
-            SirRelocAddRange(&reloc, base, e->size, dst);
+            SirRelocAddRange(&reloc, 0x90000000u, 0x04000000u, (u8*)(uintptr_t)0x90000000u);
             CheckFixUpIndices(name);
             LevelZoneRoots roots;
+            LevelZoneOther other = { zone0, zone0Size, (u32)(uintptr_t)zone0, &zone0Done };
+            const LevelZoneOther* in0 = e->type > 0 ? &other : NULL;
             // The header block's tables have been laid out by fn_80129CC8 by now.
-            if (!levelHdr || !LevelZoneRootsCollect(levelHdr, levelHdrSize, dst, e->size, base, &roots))
-                PortStop(8, "%s zone 0: %s", name, SirErrorText(SIR_ERR_LEVEL));
+            if (!levelHdr || !LevelZoneRootsCollect(levelHdr, levelHdrSize, dst, e->size, base, in0, &roots))
+                PortStop(8, "%s zone %d: %s", name, e->type, SirErrorText(SIR_ERR_LEVEL));
             if (roots.hud == 0 && hudAddr >= base && hudAddr - base < e->size) roots.hud = hudAddr;
             u32 entityCount = roots.entityCount;
-            SirError err = LevelZoneConvert(&reloc, dst, e->size, base, &roots);
+            SirError err = LevelZoneConvert(&reloc, dst, e->size, base, &roots, e->type == 0 ? &zone0Done : NULL, in0);
             LevelZoneRootsFree(&roots);
-            if (err != SIR_OK) PortStop(8, "%s zone 0: %s", name, SirErrorText(err));
+            if (err != SIR_OK) PortStop(8, "%s zone %d: %s", name, e->type, SirErrorText(err));
+            if (e->type == 0) { zone0 = dst; zone0Size = e->size; }
             sConverted++;
-            PortLog("%s zone 0: HUD, state machines and the first layer of %u entities converted (%u pointers, %u fields); the rest of the zone is not",
-                    name, entityCount, reloc.ptrImage, reloc.fieldsSwapped);
+            PortLog("%s zone %d: what the level start and WorldTick read of %u entities and the zone's other objects converted (%u pointers, %u fields); the rest of the zone is not",
+                    name, e->type, entityCount, reloc.ptrImage, reloc.fieldsSwapped);
             return;
         }
     }

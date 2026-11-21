@@ -483,6 +483,7 @@ def machines_dump(L, sec, base, hud_addr, list_addr, level=False, extra=()):
     def ptr(v):
         if v == 0: return 'null'
         if base <= v <= base + len(sec): return 'img+0x%x' % (v - base)
+        if other_ptr(v): return other_ptr(v)
         return 'wii:%08x' % v
     off = lambda v: v - base
     ws = lambda o, n: ' '.join('%08x' % u(o + i * 4) for i in range(n))
@@ -567,8 +568,17 @@ def machines_dump(L, sec, base, hud_addr, list_addr, level=False, extra=()):
 # game code reads, straight from the big-endian bytes. See docs/loader.md, "Level files".
 LEVEL_SLOTS = 0x21E0
 
+OTHER_ZONE = None   # while a level zone is dumped: (address, zone number, image) of the level's other zone image
+
+def other_ptr(v):
+    if OTHER_ZONE and OTHER_ZONE[0] <= v <= OTHER_ZONE[0] + len(OTHER_ZONE[2]): return 'zone%d+0x%x' % (OTHER_ZONE[1], v - OTHER_ZONE[0])
+    return None
+
 def level_dump(path):
+    global OTHER_ZONE
     version, secs = read_archive(path)
+    zone1 = [x['data'] for x in secs if x['type'] == 1]
+    OTHER_ZONE = (LEVEL_ZONE1_BASE, 1, zone1[0]) if zone1 else None
     hdr = [x for x in secs if x['type'] == -1][0]['data']
     zone0 = [x for x in secs if x['type'] == 0][0]['data']
     u = lambda o: struct.unpack_from('>I', hdr, o)[0]
@@ -583,6 +593,7 @@ def level_dump(path):
         if v == 0: return 'null'
         if base <= v <= base + len(hdr): return 'hdr+0x%x' % (v - base)
         if zbase <= v <= zbase + len(zone0): return 'zone0+0x%x' % (v - zbase)
+        if other_ptr(v): return other_ptr(v)
         return 'wii:%08x' % v
     ws = lambda o, n: ' '.join('%08x' % u(o + i * 4) for i in range(n))
     tab = lambda o: '%s %d %d' % (ptr(u(o)), i32(o + 4), i32(o + 8))
@@ -607,7 +618,20 @@ def level_dump(path):
     # What the header block names in zone 0: entities (slot +0x50 and the two entity tables), scene
     # objects (block tables +0x1B0, +0x1BC) and pool tables (slot +0xE4, +0xE8).
     inz = lambda v: zbase <= v < zbase + len(zone0)
-    roots, scene, pooltabs, records = [], [], [], []
+    zones = [(0, zone0, zbase)] + [(s['type'], s['data'], LEVEL_ZONE1_BASE) for s in secs if s['type'] == 1]
+    for zn, zsec, zb in zones:
+        if zn: OTHER_ZONE = (zbase, 0, zone0)
+        level_zone_dump(L, zn, zsec, zb, u, base, count, stride, zone0, zbase)
+    OTHER_ZONE = None
+    return L
+
+LEVEL_ZONE1_BASE = 0x90980000   # gZoneBase[1] = zone 0's address + its memory budget (world_alloc.cpp); not in the file
+
+def level_zone_dump(L, zn, zone0, zbase, u, base, count, stride, zone0_image, zbase0):
+    """What the header block names in one zone (image `zone0` at `zbase`), then the zone's dump."""
+    if zn: L.append('zone %d size 0x%x' % (zn, len(zone0)))
+    inz = lambda v: zbase <= v < zbase + len(zone0)
+    roots, scene, pooltabs, records, lists = [], [], [], [], []
     def table_entries(o):
         t, n = u(o) - base, u(o + 4)
         return [u(t + i * 4) for i in range(n)]
@@ -617,20 +641,25 @@ def level_dump(path):
         o = LEVEL_SLOTS + i * stride
         roots += [v for v in [u(o + 0x50)] + table_entries(o + 0x120) + table_entries(o + 0x12C) if inz(v)]
         if inz(u(o + 0xE4)): pooltabs.append((u(o + 0xE4), u(o + 0xE8)))
-        if inz(u(o + 0xFC)): records.append(u(o + 0xFC))
+        rec = u(o + 0xFC)
+        if inz(rec): records.append(rec)
+        elif zbase0 <= rec < zbase0 + len(zone0_image) - 0x14:      # the record is in zone 0: its list may be in this zone
+            head = struct.unpack_from('>I', zone0_image, rec - zbase0 + 0x10)[0]
+            if inz(head): lists.append(head)
     hud = u(0x1F4)
-    zone_dump(L, zone0, zbase, hud if inz(hud) else 0, roots, scene, pooltabs, records)
-    return L
+    zone_dump(L, zone0, zbase, hud if inz(hud) else 0, roots, scene, pooltabs, records, lists)
 
 FIXUP_ENTITY, FIXUP_PART, FIXUP_POOLED, FIXUP_PROJECTILE, FIXUP_RENDER, FIXUP_FSM = 651, 652, 653, 654, 655, 656
 
-def zone_records_dump(L, sec, base, records):
-    """The zone records (zone slot +0xFC) and what WorldTick reaches through their list at +0x10."""
+def zone_records_dump(L, sec, base, records, lists=()):
+    """The zone records (zone slot +0xFC) and what WorldTick reaches through their list at +0x10.
+    `lists`: heads of the lists of records that lie in another zone's image (zone 0)."""
     u = lambda o: struct.unpack_from('>I', sec, o)[0]
     inz = lambda v, n=1: base <= v and v + n <= base + len(sec)
     def ptr(v):
         if v == 0: return 'null'
         if base <= v <= base + len(sec): return 'img+0x%x' % (v - base)
+        if other_ptr(v): return other_ptr(v)
         return 'wii:%08x' % v
     ws = lambda o, n: ' '.join('%08x' % u(o + i * 4) for i in range(n))
     ps = lambda o, n: ' '.join(ptr(u(o + i * 4)) for i in range(n))
@@ -662,10 +691,16 @@ def zone_records_dump(L, sec, base, records):
                 k += 8
             L.append('animkeys %s rel 0x%x keys %d first %04x %08x last %08x sum %08x' % (
                 ptr(base + first), u(table + i * 8), n, struct.unpack_from('>H', sec, first)[0], u(first + 4), u(k + 4), total))
+    heads = []
     for rec in records:
         if not inz(rec, 0x14): continue
         node = u(rec - base + 0x10)
         L.append('zonerecord %s list %s' % (ptr(rec), ptr(node)))
+        heads.append(node)
+    for node in list(lists):
+        L.append('zonelist %s' % ptr(node))
+        heads.append(node)
+    for node in heads:
         while inz(node - 0x10, 0x80):
             o = node - base - 0x10
             L.append('zonesystem %s w8 %s next %s out %s players %s extra %s' % (
@@ -678,7 +713,7 @@ def zone_records_dump(L, sec, base, records):
             player(u(o + 0x7C))
             node = u(o + 0x10)
 
-def zone_dump(L, sec, base, hud, roots, scene_roots, pooltabs, records=()):
+def zone_dump(L, sec, base, hud, roots, scene_roots, pooltabs, records=(), lists=()):
     """Dump of what the loader converts in a level zone: pool tables and pools, entities (first
     layer), scene objects, then the HUD and every state machine found on the way."""
     u = lambda o: struct.unpack_from('>I', sec, o)[0]
@@ -689,6 +724,7 @@ def zone_dump(L, sec, base, hud, roots, scene_roots, pooltabs, records=()):
     def ptr(v):
         if v == 0: return 'null'
         if base <= v <= base + len(sec): return 'img+0x%x' % (v - base)
+        if other_ptr(v): return other_ptr(v)
         return 'wii:%08x' % v
     ws = lambda o, n: ' '.join('%08x' % u(o + i * 4) for i in range(n))
     ents, scene, machines, projectiles = [], [], [], []
@@ -741,23 +777,34 @@ def zone_dump(L, sec, base, hud, roots, scene_roots, pooltabs, records=()):
             ptr(a), u(o), ptr(u(o + 4)), ptr(u(o + 0x8C)), ptr(u(o + 0x90)), i32(o + 0x94), i32(o + 0x98), ptr(u(o + 0x9C)), ptr(u(o + 0xA4)),
             ptr(u(o + 0xB0)), u(o + 0x158), ptr(u(o + 0x194)), i32(o + 0x1A4), i32(o + 0x1A8), u(o + 0x1B0)))
         r = u(o + 4)
-        if inz(r, 0x40):
-            q = off(r)
+        # The record of an entity outside zone 0 lies in zone 0's image, and so does its definition.
+        def loc(v, n):
+            if inz(v, n): return sec, off(v)
+            if OTHER_ZONE and OTHER_ZONE[0] <= v and v + n <= OTHER_ZONE[0] + len(OTHER_ZONE[2]): return OTHER_ZONE[2], v - OTHER_ZONE[0]
+            return None
+        U = lambda img, x: struct.unpack_from('>I', img, x)[0]
+        W = lambda img, x, n: ' '.join('%08x' % U(img, x + k * 4) for k in range(n))
+        rl = loc(r, 0x40)
+        if rl:
+            img, q = rl
             L.append('entrecord %s floats %s w1c %08x %08x f24 %08x w2c %d h30 %d bytes %s' % (
-                ptr(r), ws(q, 7), u(q + 0x1C), u(q + 0x20), u(q + 0x24), i32(q + 0x2C), h16(q + 0x30), sec[q + 0x34:q + 0x3E].hex()))
+                ptr(r), W(img, q, 7), U(img, q + 0x1C), U(img, q + 0x20), U(img, q + 0x24), struct.unpack_from('>i', img, q + 0x2C)[0],
+                struct.unpack_from('>H', img, q + 0x30)[0], img[q + 0x34:q + 0x3E].hex()))
         L.append('entbase %s id %08x w30 %08x p84 %s wac %08x' % (ptr(a), u(o + 0x2C), u(o + 0x30), ptr(u(o + 0x84)), u(o + 0xAC)))
-        prop = inz(r, 0x40) and sec[off(r) + 0x34] == 6
+        prop = rl and rl[0][rl[1] + 0x34] == 6
         if prop:
             L.append('entprop %s f14 %08x f28 %08x acts %s %s %08x actor %s fc8 %s wec %08x w15c %08x' % (
                 ptr(a), u(o + 0x14), u(o + 0x28), ws(o + 0x38, 3), ws(o + 0x48, 4), u(o + 0x68), ptr(u(o + 0xA0)), ws(o + 0xC8, 3),
                 u(o + 0xEC), u(o + 0x15C)))
         parts(u(o + 0x8C))
         add(scene, u(o + 0x90), 8)
-        if inz(u(o + 0x9C), 0xC): L.append('entobj9c %s id %08x' % (ptr(u(o + 0x9C)), u(off(u(o + 0x9C)) + 8)))
-        if prop and inz(u(o + 0x9C), 0xC0):
-            q = off(u(o + 0x9C))
+        dl = loc(u(o + 0x9C), 0xC)
+        if dl: L.append('entobj9c %s id %08x' % (ptr(u(o + 0x9C)), U(dl[0], dl[1] + 8)))
+        dl = loc(u(o + 0x9C), 0xC0)
+        if prop and dl:
+            img, q = dl
             L.append('entdef %s f24 %08x w2c %08x acts %s %s %08x wbc %08x' % (
-                ptr(u(o + 0x9C)), u(q + 0x24), u(q + 0x2C), ws(q + 0x68, 3), ws(q + 0x78, 4), u(q + 0x98), u(q + 0xBC)))
+                ptr(u(o + 0x9C)), U(img, q + 0x24), U(img, q + 0x2C), W(img, q + 0x68, 3), W(img, q + 0x78, 4), U(img, q + 0x98), U(img, q + 0xBC)))
         hl = u(o + 0xA4)
         if inz(hl, 8):
             L.append('entholder %s machine %s other %s' % (ptr(hl), ptr(u(off(hl))), ptr(u(off(hl) + 4))))
@@ -780,7 +827,7 @@ def zone_dump(L, sec, base, hud, roots, scene_roots, pooltabs, records=()):
         L.append(line)
     for a in projectiles:
         L.append('projectile %s part %s' % (ptr(a), ptr(u(off(a) + 0x22C))))
-    zone_records_dump(L, sec, base, records)
+    zone_records_dump(L, sec, base, records, lists)
     if hud:
         machines_dump(L, sec, base, hud, u(off(hud) + 0x434), True, machines)
 

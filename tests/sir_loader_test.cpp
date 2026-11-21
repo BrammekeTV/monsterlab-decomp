@@ -30,11 +30,18 @@ static u32 Bits(f32 f) {
 }
 
 // Pointer slot as text: "img+0x..." inside the image, "wii:XXXXXXXX" for an unresolved Wii address.
+// While a level zone is dumped: the level's other zone image.
+static const u8* sOtherZone = NULL;
+static u32 sOtherZoneSize = 0;
+static int sOtherZoneNumber = 0;
+static bool InOtherZone(const u8* p, u32 n) { return sOtherZone != NULL && p >= sOtherZone && p + n <= sOtherZone + sOtherZoneSize; }
+
 static void PrintPtr(const u8* slot, const GlobalBinaryFile* f) {
     const u8* p;
     memcpy(&p, slot, sizeof(p));
     if (p == NULL) printf("null");
     else if (p >= f->image && p <= f->image + f->imageSize) printf("img+0x%x", (u32)(p - f->image));
+    else if (InOtherZone(p, 0)) printf("zone%d+0x%x", sOtherZoneNumber, (u32)(p - sOtherZone));
     else printf("wii:%08x", *(const u32*)slot);
 }
 
@@ -639,9 +646,14 @@ static int Dump(const char* path) {
 
 // ------------------------------------------------------------------------------------ level files
 
+// Zone 1's address: gZoneBase[1] = zone 0's address plus its memory budget (world_alloc.cpp).
+// It is not in the level file; the port takes it from where the game reads the image to.
+#define LEVEL_ZONE1_WII_BASE 0x90980000u
+
 struct LevelFile {
     u8* hdr;  u32 hdrSize;      // header block (the world state), converted
     u8* zone; u32 zoneSize;     // image of zone 0, converted
+    u8* zone1; u32 zone1Size;   // image of zone 1, if the file has one
 };
 
 // Pointer slot of the header block as text: into the block, into zone 0, or a Wii address the
@@ -652,6 +664,7 @@ static void PrintLevelPtr(const u8* slot, const LevelFile* f) {
     if (p == NULL) printf("null");
     else if (p >= f->hdr && p <= f->hdr + f->hdrSize) printf("hdr+0x%x", (u32)(p - f->hdr));
     else if (p >= f->zone && p <= f->zone + f->zoneSize) printf("zone0+0x%x", (u32)(p - f->zone));
+    else if (InOtherZone(p, 0)) printf("zone%d+0x%x", sOtherZoneNumber, (u32)(p - sOtherZone));
     else printf("wii:%08x", *(const u32*)slot);
 }
 
@@ -682,6 +695,7 @@ struct ZoneDump {
     std::vector<const u8*> ents, scene, machines, projectiles;
 
     bool In(const u8* p, u32 n = 1) const { return p != NULL && p >= z->image && p + n <= z->image + z->imageSize; }
+    bool InAny(const u8* p, u32 n) const { return In(p, n) || (p != NULL && InOtherZone(p, n)); }
     void Add(std::vector<const u8*>& list, const u8* p, u32 n = 1) { if (In(p, n)) AddUnique(list, p); }
     void Ptr(const u8* slot) const { PrintPtr(slot, z); }
     void Val(const u8* p) const { PrintPtr((const u8*)&p, z); }
@@ -783,11 +797,20 @@ struct ZoneDump {
         }
     }
     void Records(const LevelZoneRoots* roots, u32 zoneBase) {
+        std::vector<const u8*> heads;
         for (u32 i = 0; i < roots->zoneRecordCount; i++) {
             const u8* rec = z->image + (roots->zoneRecords[i] - zoneBase);
             if (!In(rec, 0x14)) continue;
             printf("zonerecord "); Val(rec); printf(" list "); Ptr(rec + 0x10); printf("\n");
-            for (const u8* node = *(const u8**)(rec + 0x10); node != NULL && In(node - 0x10, ZONE_SYSTEM_USED); ) {
+            heads.push_back(*(const u8**)(rec + 0x10));
+        }
+        for (u32 i = 0; i < roots->zoneListCount; i++) {
+            const u8* node = z->image + (roots->zoneLists[i] - zoneBase);
+            printf("zonelist "); Val(node); printf("\n");
+            heads.push_back(node);
+        }
+        for (const u8* head : heads) {
+            for (const u8* node = head; node != NULL && In(node - 0x10, ZONE_SYSTEM_USED); ) {
                 const u8* s = node - 0x10;
                 printf("zonesystem "); Val(s); printf(" w8 "); Ptr(s + 8); printf(" next "); Ptr(s + 0x10);
                 printf(" out "); Ptrs(s + 0x3C, 8); printf(" players "); Ptrs(s + 0x5C, 8); printf(" extra "); Ptr(s + 0x7C); printf("\n");
@@ -819,7 +842,7 @@ struct ZoneDump {
             printf(" f158 %08x more ", Bits(*(const f32*)(e + 0x158))); Ptr(e + 0x194);
             printf(" %d w1a8 %d flags %08x\n", *(const s32*)(e + 0x1A4), *(const s32*)(e + 0x1A8), *(const u32*)(e + 0x1B0));
             const u8* r = *(const u8**)(e + 4);
-            if (In(r, ENTITY_RECORD_SIZE)) {
+            if (InAny(r, ENTITY_RECORD_SIZE)) {
                 printf("entrecord "); Val(r); printf(" floats");
                 for (u32 k = 0; k < 7; k++) printf(" %08x", Bits(*(const f32*)(r + k * 4)));
                 printf(" w1c %08x %08x f24 %08x w2c %d h30 %u bytes ", *(const u32*)(r + 0x1C), *(const u32*)(r + 0x20),
@@ -829,7 +852,7 @@ struct ZoneDump {
             }
             printf("entbase "); Val(e); printf(" id %08x w30 %08x p84 ", *(const u32*)(e + 0x2C), *(const u32*)(e + 0x30)); Ptr(e + 0x84);
             printf(" wac %08x\n", *(const u32*)(e + 0xAC));
-            bool prop = In(r, ENTITY_RECORD_SIZE) && r[0x34] == ENTITY_TYPE_PROP;
+            bool prop = InAny(r, ENTITY_RECORD_SIZE) && r[0x34] == ENTITY_TYPE_PROP;
             if (prop) {
                 printf("entprop "); Val(e); printf(" f14 %08x f28 %08x acts", Bits(*(const f32*)(e + 0x14)), Bits(*(const f32*)(e + 0x28)));
                 for (u32 k = 0; k < 3; k++) printf(" %08x", *(const u32*)(e + 0x38 + k * 4));
@@ -841,8 +864,8 @@ struct ZoneDump {
             Parts(*(const u8**)(e + 0x8C));
             Add(scene, *(const u8**)(e + 0x90), 8);
             const u8* o9c = *(const u8**)(e + 0x9C);
-            if (In(o9c, 0xC)) { printf("entobj9c "); Val(o9c); printf(" id %08x\n", *(const u32*)(o9c + 8)); }
-            if (prop && In(o9c, PROP_DEF_USED)) {
+            if (InAny(o9c, 0xC)) { printf("entobj9c "); Val(o9c); printf(" id %08x\n", *(const u32*)(o9c + 8)); }
+            if (prop && InAny(o9c, PROP_DEF_USED)) {
                 printf("entdef "); Val(o9c); printf(" f24 %08x w2c %08x acts", Bits(*(const f32*)(o9c + 0x24)), *(const u32*)(o9c + 0x2C));
                 for (u32 k = 0; k < 3; k++) printf(" %08x", *(const u32*)(o9c + 0x68 + k * 4));
                 for (u32 k = 0; k < 4; k++) printf(" %08x", *(const u32*)(o9c + 0x78 + k * 4));
@@ -887,12 +910,13 @@ static int DumpLevel(const char* path) {
     u8* file = (u8*)malloc((size_t)len);
     bool ok = fread(file, 1, (size_t)len, fp) == (size_t)len;
     fclose(fp);
-    LevelFile f = { NULL, 0, NULL, 0 };
+    LevelFile f = { NULL, 0, NULL, 0, NULL, 0 };
     for (s32 i = 0; ok && i < SirContainerSectionCount(file, (u32)len); i++) {
         SirSection sec;
         if (!SirContainerSection(file, (u32)len, i, &sec)) continue;
         if (sec.type == -1) { f.hdr = (u8*)malloc(sec.size); f.hdrSize = sec.size; memcpy(f.hdr, file + sec.offset, sec.size); }
         if (sec.type == 0) { f.zone = (u8*)malloc(sec.size); f.zoneSize = sec.size; memcpy(f.zone, file + sec.offset, sec.size); }
+        if (sec.type == 1) { f.zone1 = (u8*)malloc(sec.size); f.zone1Size = sec.size; memcpy(f.zone1, file + sec.offset, sec.size); }
     }
     free(file);
     if (f.hdr == NULL || f.zone == NULL) { fprintf(stderr, "%s: not a level file\n", path); return 1; }
@@ -906,13 +930,17 @@ static int DumpLevel(const char* path) {
     SirRelocInit(&r, NULL, NULL);
     SirRelocAddRange(&r, base, f.hdrSize, f.hdr);
     SirRelocAddRange(&r, zoneBase, f.zoneSize, f.zone);
+    if (f.zone1 != NULL) SirRelocAddRange(&r, LEVEL_ZONE1_WII_BASE, f.zone1Size, f.zone1);
+    sOtherZone = f.zone1; sOtherZoneSize = f.zone1Size; sOtherZoneNumber = 1;
+    LevelZoneDone done0;
+    memset(&done0, 0, sizeof(done0));
     SirError e = LevelHeaderConvert(&r, f.hdr, f.hdrSize);
     const u8* hud = e == SIR_OK ? *(const u8**)(f.hdr + 0x1F4) : NULL;
     bool hudInZone = hud >= f.zone && hud < f.zone + f.zoneSize;
     LevelZoneRoots roots;
     memset(&roots, 0, sizeof(roots));
-    if (e == SIR_OK && !LevelZoneRootsCollect(f.hdr, f.hdrSize, f.zone, f.zoneSize, zoneBase, &roots)) e = SIR_ERR_LEVEL;
-    if (e == SIR_OK) e = LevelZoneConvert(&r, f.zone, f.zoneSize, zoneBase, &roots);
+    if (e == SIR_OK && !LevelZoneRootsCollect(f.hdr, f.hdrSize, f.zone, f.zoneSize, zoneBase, NULL, &roots)) e = SIR_ERR_LEVEL;
+    if (e == SIR_OK) e = LevelZoneConvert(&r, f.zone, f.zoneSize, zoneBase, &roots, &done0, NULL);
     if (e != SIR_OK) { fprintf(stderr, "%s: %s\n", path, SirErrorText(e)); return 1; }
 
     const u8* h = f.hdr;
@@ -980,6 +1008,28 @@ static int DumpLevel(const char* path) {
     zd.Records(&roots, zoneBase);
     if (hudInZone) DumpMachines(&z, hud, *(const u8**)(hud + 0x434), true, &zd.machines);
     LevelZoneRootsFree(&roots);
+    // Zone 1, as the port converts it when the game loads it: zone 0 is in memory, converted.
+    if (f.zone1 != NULL) {
+        LevelZoneOther other = { f.zone, f.zoneSize, zoneBase, &done0 };
+        LevelZoneRoots roots1;
+        memset(&roots1, 0, sizeof(roots1));
+        if (!LevelZoneRootsCollect(f.hdr, f.hdrSize, f.zone1, f.zone1Size, LEVEL_ZONE1_WII_BASE, &other, &roots1)) e = SIR_ERR_LEVEL;
+        if (e == SIR_OK) e = LevelZoneConvert(&r, f.zone1, f.zone1Size, LEVEL_ZONE1_WII_BASE, &roots1, NULL, &other);
+        if (e != SIR_OK) { fprintf(stderr, "%s zone 1: %s\n", path, SirErrorText(e)); return 1; }
+        printf("zone 1 size 0x%x\n", f.zone1Size);
+        sOtherZone = f.zone; sOtherZoneSize = f.zoneSize; sOtherZoneNumber = 0;
+        GlobalBinaryFile z1 = { NULL, f.zone1, f.zone1Size };
+        ZoneDump zd1;
+        zd1.z = &z1;
+        for (u32 i = 0; i < roots1.entityCount; i++) zd1.Add(zd1.ents, f.zone1 + (roots1.entities[i] - LEVEL_ZONE1_WII_BASE));
+        for (u32 i = 0; i < roots1.sceneObjectCount; i++) zd1.Add(zd1.scene, f.zone1 + (roots1.sceneObjects[i] - LEVEL_ZONE1_WII_BASE));
+        zd1.PoolTables(&roots1, LEVEL_ZONE1_WII_BASE);
+        zd1.Entities();
+        zd1.Records(&roots1, LEVEL_ZONE1_WII_BASE);
+        LevelZoneRootsFree(&roots1);
+    }
+    sOtherZone = NULL;
+    LevelZoneDoneFree(&done0);
     printf("report image %u dolkept %u dolresolved %u unknown %u\n", r.ptrImage, r.ptrDolKept, r.ptrDolResolved, r.ptrUnknown);
     return 0;
 }
@@ -1496,7 +1546,11 @@ static SirError ConvertBuilt(u8* hdr, u8* img, SirReloc* r, s32* failTable) {
 #define L_OUT      0xA80u                     // its first player's output, 0x30
 #define L_PLAYER   0xAB0u                     // the player: one channel, its element at +0x30
 #define L_TRACK    0xAF0u                     // the track: channel table at +0x30, two keys at +0x38
-#define L_ZONE_SIZE 0xB40u
+#define L_REC1     0xB40u                     // record of the entity in zone 1 (records stay in zone 0)
+#define L_ZONE_SIZE 0xB80u
+#define L_ZONE1    0x90980000u                // Wii address of zone 1: an entity at 0x10, a list object at 0x200
+#define L_ENT1     0x10u                      // the entity slot 1's second table names
+#define L_ZONE1_SIZE 0x300u
 
 static void BuildLevel(u8* hdr, u8* zone) {
     memset(hdr, 0, L_HDR_SIZE);
@@ -1568,7 +1622,11 @@ static void BuildLevel(u8* hdr, u8* zone) {
 
     // The zone records the two slots name (+0xFC): the first has a list of one object, the second none.
     Put32(zone + 0x10, L_ZONE + L_SYS + 0x10);
-    Put32(zone + 0x50, 0);
+    Put32(zone + 0x50, L_ZONE1 + 0x210);                       // the second record's list is in zone 1
+    u8* rec1 = zone + L_REC1;
+    memset(rec1, 0, 0x40);
+    Put32(rec1 + 0x18, 0x3F800000); Put32(rec1 + 0x1C, 0x46);
+    rec1[0x34] = 6;
     u8* sys = zone + L_SYS;
     memset(sys, 0, 0x80);
     Put32(sys + 0x00, 0x53);                                   // no reader: stays big-endian
@@ -1637,15 +1695,64 @@ static void LevelSelfTest(void) {
     SirRelocInit(&r, NULL, NULL);
     SirRelocAddRange(&r, L_BASE, L_HDR_SIZE, hdr);
     SirRelocAddRange(&r, L_ZONE, L_ZONE_SIZE, zone);
+    // Zone 1, which the game loads later: a prop whose record and definition are in zone 0, and
+    // the object the second zone record lists.
+    u8* zone1 = (u8*)malloc(L_ZONE1_SIZE);
+    u8* zone1Copy = (u8*)malloc(L_ZONE1_SIZE);
+    for (u32 o = 0; o < L_ZONE1_SIZE; o += 4) Put32(zone1 + o, 0x7F800001);
+    u8* e1 = zone1 + L_ENT1;
+    memset(e1, 0, 0x1B4);
+    Put32(e1 + 0x000, T_VTABLE);
+    Put32(e1 + 0x004, L_ZONE + L_REC1);
+    Put32(e1 + 0x014, 0x40000000);
+    Put32(e1 + 0x02C, 0x8309A334);
+    Put32(e1 + 0x09C, L_ZONE + L_DEF);
+    memset(zone1 + 0x200, 0, 0x80);
+    Put32(zone1 + 0x200, 0x53);
+    SirRelocAddRange(&r, L_ZONE1, L_ZONE1_SIZE, zone1);
     CHECK(LevelHeaderConvert(&r, hdr, L_HDR_SIZE) == SIR_OK);
     LevelZoneRoots roots;
-    CHECK(LevelZoneRootsCollect(hdr, L_HDR_SIZE, zone, L_ZONE_SIZE, L_ZONE, &roots));
+    CHECK(LevelZoneRootsCollect(hdr, L_HDR_SIZE, zone, L_ZONE_SIZE, L_ZONE, NULL, &roots));
     CHECK(roots.hud == L_ZONE + L_HUD);
     CHECK(roots.zoneRecordCount == 2 && roots.zoneRecords[0] == L_ZONE && roots.zoneRecords[1] == L_ZONE + 0x40);
     CHECK(roots.entityCount == 1 && roots.entities[0] == L_ZONE + L_ENT && roots.sceneObjectCount == 1);
     CHECK(roots.poolTableCount == 1 && roots.poolTables[0] == L_ZONE + L_POOLTAB && roots.poolTables[1] == 1);
-    CHECK(LevelZoneConvert(&r, zone, L_ZONE_SIZE, L_ZONE, &roots) == SIR_OK);
+    LevelZoneDone done0;
+    memset(&done0, 0, sizeof(done0));
+    CHECK(LevelZoneConvert(&r, zone, L_ZONE_SIZE, L_ZONE, &roots, &done0, NULL) == SIR_OK);
     LevelZoneRootsFree(&roots);
+
+    // Zone 1 with zone 0 converted: the header block names the entity in slot 1's table and the
+    // list through zone 0's second record.
+    {
+        LevelZoneOther other = { zone, L_ZONE_SIZE, L_ZONE, &done0 };
+        LevelZoneRoots roots1;
+        CHECK(LevelZoneRootsCollect(hdr, L_HDR_SIZE, zone1, L_ZONE1_SIZE, L_ZONE1, &other, &roots1));
+        CHECK(roots1.zoneRecordCount == 0 && roots1.zoneListCount == 1 && roots1.zoneLists[0] == L_ZONE1 + 0x210);
+        CHECK(roots1.entityCount == 1 && roots1.entities[0] == L_ZONE1 + L_ENT1);
+        const LevelZoneRoots& named1 = roots1;
+        u8* e1 = zone1 + L_ENT1;
+        // Refused untouched, in both images: a record that shares bytes with the converted definition.
+        memcpy(zone1Copy, zone1, L_ZONE1_SIZE);
+        u8* zone0Copy = (u8*)malloc(L_ZONE_SIZE);
+        memcpy(zone0Copy, zone, L_ZONE_SIZE);
+        Put32(e1 + 0x004, L_ZONE + L_DEF + 0x10);
+        CHECK(LevelZoneConvert(&r, zone1, L_ZONE1_SIZE, L_ZONE1, &named1, NULL, &other) == SIR_ERR_OVERLAP);
+        Put32(e1 + 0x004, L_ZONE + L_REC1);
+        CHECK(memcmp(zone1Copy, zone1, L_ZONE1_SIZE) == 0 && memcmp(zone0Copy, zone, L_ZONE_SIZE) == 0);
+        u32 before = done0.count;
+        CHECK(LevelZoneConvert(&r, zone1, L_ZONE1_SIZE, L_ZONE1, &named1, NULL, &other) == SIR_OK);
+        CHECK(done0.count == before + 1);                                              // the record; the definition was converted with zone 0
+        const u8* rec1 = *(const u8**)(e1 + 4);
+        const u8* def1 = *(const u8**)(e1 + 0x9C);
+        CHECK(rec1 == zone + L_REC1 && *(const f32*)(rec1 + 0x18) == 1.0f && *(const u32*)(rec1 + 0x1C) == 0x46 && rec1[0x34] == 6);
+        CHECK(*(const u32*)(e1 + 0x2C) == 0x8309A334 && *(const f32*)(e1 + 0x14) == 2.0f);   // a prop, by its record in zone 0
+        CHECK(def1 == zone + L_DEF && *(const f32*)(def1 + 0x24) == 1.0f && *(const u32*)(def1 + 8) == 0x325462E8);   // not converted twice
+        CHECK(zone1[0x203] == 0x53 && *(const u8**)(zone1 + 0x210) == NULL && zone1[0x280] == 0x7F);
+        free(zone0Copy);
+        LevelZoneRootsFree(&roots1);
+    }
+    LevelZoneDoneFree(&done0);
 
     // The world state, read the way fn_8013006C, fn_8012FD0C and HudReload do.
     CHECK(*(s32*)(hdr + 4) == 1 && hdr[0x97] == 0xFF && hdr[0x94] == 0x00);       // +0x94: no reader, untouched
@@ -1661,9 +1768,9 @@ static void LevelSelfTest(void) {
     u8** second0 = *(u8***)(s0 + 0x12C);
     CHECK((u8*)second0 == hdr + L_T12C && second0[0] == zone + L_ENT && second0[1] == NULL && *(s32*)(s0 + 0x130) == 2);
     u8** second1 = *(u8***)(s1 + 0x12C);
-    CHECK((u8*)second1 == s1 + 0x198 && *(u32*)second1 == 0x90980010);            // no range: the Wii address, host order
+    CHECK((u8*)second1 == s1 + 0x198 && *second1 == zone1 + L_ENT1);              // the entity in zone 1
     CHECK(**(u8***)(hdr + 0x1B0) == zone + 0x40 && hdr[L_T1D4 + 0x0B] == 1);       // the 12-byte entries: untouched
-    CHECK(r.ptrUnknown == 2);                                                      // that entity and the value table below
+    CHECK(r.ptrUnknown == 1);                                                      // the value table below, in a zone that is not loaded
 
     const u8* hud = *(const u8**)(hdr + 0x1F4);
     const u8* list = *(const u8**)(hud + 0x434);                                   // what HudReload hands to ScreenMgrLoad
@@ -1684,7 +1791,7 @@ static void LevelSelfTest(void) {
     // The zone record's list, as WorldTick walks it, and the player as fn_8016A64C and its helpers read it.
     const u8* sys = *(const u8**)(zone + 0x10) - 0x10;
     const u8* pl = *(const u8**)(sys + 0x5C);
-    CHECK(sys == zone + L_SYS && sys[3] == 0x53 && *(const u8**)(sys + 0x10) == NULL && *(const u8**)(zone + 0x50) == NULL);
+    CHECK(sys == zone + L_SYS && sys[3] == 0x53 && *(const u8**)(sys + 0x10) == NULL && *(const u32*)(zone + 0x50) != 0);
     CHECK(*(const f32*)(*(const u8**)(sys + 0x3C) + 0x2C) == 1.0f && pl == zone + L_PLAYER && *(const u8**)(sys + 0x7C) == NULL);
     const u8* tr = *(const u8**)(pl + 0x14);
     CHECK(*(const s32*)(pl + 4) == 1 && *(const s32*)(pl + 0x10) == 1 && *(const s32*)(pl + 0x18) == 0xC && *(const f32*)(pl + 0x24) == 2.0f);
@@ -1753,11 +1860,11 @@ static void LevelSelfTest(void) {
         named.poolTables = poolTable;  named.poolTableCount = 1;
         u32 zoneRecords[2] = { L_ZONE, L_ZONE + 0x40 };
         named.zoneRecords = zoneRecords; named.zoneRecordCount = 2;
-        SirError e = c.inZone ? LevelZoneConvert(&r, zone, L_ZONE_SIZE, L_ZONE, &named) : LevelHeaderConvert(&r, hdr, L_HDR_SIZE);
+        SirError e = c.inZone ? LevelZoneConvert(&r, zone, L_ZONE_SIZE, L_ZONE, &named, NULL, NULL) : LevelHeaderConvert(&r, hdr, L_HDR_SIZE);
         CHECK(e == c.want);
         CHECK(memcmp(hdrCopy, hdr, L_HDR_SIZE) == 0 && memcmp(zoneCopy, zone, L_ZONE_SIZE) == 0);
     }
-    free(hdr); free(zone); free(hdrCopy); free(zoneCopy);
+    free(hdr); free(zone); free(hdrCopy); free(zoneCopy); free(zone1); free(zone1Copy);
 }
 
 static int SelfTest(void) {

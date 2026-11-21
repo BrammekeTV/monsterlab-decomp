@@ -717,6 +717,32 @@ rest of a list object, the second word of a channel table entry (it is the key c
 players of mode 0 (position and rotation keys, `fn_8016A788`): none is reached from a zone
 record in zone 0 of any level.
 
+### Zone 1 and up
+
+A level file has the header block, zone 0 and one more image, section type 1: the level's own
+zone, which the game loads after the level start (`fn_80135854`) to `gZoneBase[1]` and starts
+with `fn_80135BC0` -> `fn_8012FD0C`. The same converter runs on it, with the same roots taken
+from the header block (entities of the slots' tables, scene objects, pool tables). Two things
+differ from zone 0:
+
+- **Records and prop definitions stay in zone 0.** An entity of zone 1 points at its record, and
+  a prop at its definition, in zone 0's image, which is loaded all the time. When zone 1 is
+  converted the loader converts those too. It keeps the list of what it converted in zone 0
+  (`LevelZoneDone`): an object that was converted before is skipped, and one that shares bytes
+  with a converted object stops the load with nothing changed in either image.
+- **The zone record is in zone 0**, already converted; its list at `+0x10` leads into zone 1 and
+  is walked from there.
+
+A list of one part container can be the entity's own slot at `+0x8C` (`+0x194` points at it):
+that slot is converted with the entity.
+
+The other zones (the shared ones) come from `shared_ui.sir` and `shared_parts.sir` and start
+with a copy of their zone slot (`fn_80135BC0`); those files are not converted yet.
+
+The port reads each zone to the address the console uses, so it needs no address for zone 1;
+the test tool and the reference decoder use 0x90980000 (`gZoneBase[1]`: zone 0's address plus
+its memory budget).
+
 ### Not converted yet in level files
 
 | What | Where | Next reader |
@@ -726,7 +752,7 @@ record in zone 0 of any level.
 | render objects | pool items of fix-up 655 | `fn_8012F818` |
 | value tables of the HUD's machines | another zone's image | `fn_801BBE40`, as soon as a state runs an action |
 | zone action tables and their records | slot `+0xD4` | `TriggerDoAction`; `ActionRecordPlan` applies |
-| zones 1 and up, textures, models, collision | the rest | - |
+| the shared zones (`shared_ui.sir`, `shared_parts.sir`), textures, models, collision | the rest | - |
 
 Check: all seven level files give the same dump from the C++ loader and the Python reference
 (713 lines for `empty_level.sir`, 3,110 to 5,288 for the others: 97 or 98 entities each, of which

@@ -431,17 +431,42 @@ typedef struct LevelZoneRoots {
     u32  poolTableCount;
     u32* zoneRecords;        // every slot's +0xFC: the zone record WorldTick walks
     u32  zoneRecordCount;
+    u32* zoneLists;          // first node of the list (+0x10) of each record that lies in the other image
+    u32  zoneListCount;
 } LevelZoneRoots;
+
+// What has been converted in a zone image. Zero it before the first use; LevelZoneDoneFree frees it.
+typedef struct LevelZoneDone {
+    void* regions;
+    u32   count;
+    u32   capacity;
+} LevelZoneDone;
+void LevelZoneDoneFree(LevelZoneDone* done);
+
+// Zone 0's image, already converted, for the conversion of another zone: the records and
+// definitions of that zone's entities, and every zone's record, lie in zone 0.
+typedef struct LevelZoneOther {
+    u8*  image;
+    u32  imageSize;
+    u32  wiiBase;
+    LevelZoneDone* done;     // what LevelZoneConvert converted in it; grows with what this conversion adds
+} LevelZoneOther;
 
 // Fills `out` from a converted header block for the zone whose image is at `zoneHost` in memory.
 // FALSE if the block's slots cannot be walked. Free with LevelZoneRootsFree.
-BOOL LevelZoneRootsCollect(const u8* hdr, u32 hdrSize, const u8* zoneHost, u32 zoneSize, u32 zoneWiiBase, LevelZoneRoots* out);
+// For a zone other than 0, `other` is zone 0 (converted): the zone records lie there.
+BOOL LevelZoneRootsCollect(const u8* hdr, u32 hdrSize, const u8* zoneHost, u32 zoneSize, u32 zoneWiiBase,
+                           const LevelZoneOther* other, LevelZoneRoots* out);
 void LevelZoneRootsFree(LevelZoneRoots* roots);
 // Converts what is typed so far of one zone image loaded for Wii address `wiiBase`: the HUD with
 // its state machines, the entities (first layer: record, child entities, part lists, state
 // machine, scene object), the scene objects and the pool tables with their pools. `r` must map
 // the image. Nothing is changed when a check fails.
-SirError LevelZoneConvert(SirReloc* r, u8* image, u32 imageSize, u32 wiiBase, const LevelZoneRoots* roots);
+// `done` (may be NULL) receives the list of what was converted. For a zone other than 0, `other`
+// is zone 0 with the list its own conversion gave: the records and prop definitions of this
+// zone's entities lie there and are converted too, unless zone 0's conversion already did.
+SirError LevelZoneConvert(SirReloc* r, u8* image, u32 imageSize, u32 wiiBase, const LevelZoneRoots* roots,
+                          LevelZoneDone* done, const LevelZoneOther* other);
 
 // Test/tool helper: reads the file with stdio, allocates the two sections with malloc and
 // converts them. The game itself goes through SirLoad; see docs/loader.md for the hook.
