@@ -37,7 +37,7 @@
   },
   {
    "title": "Big-endian data loader",
-   "detail": "Convert game data from the Wii's big-endian format at load time. On PC now: the file catalog and global_binary.sir, with the game database, input table, built-in textures, strings, actions, the UI root, fonts, screen state machines and now the script action records (956 small programs). Everything is checked against the reference decoder. Next: the title-screen UI files.",
+   "detail": "Convert game data from the Wii's big-endian format at load time. On PC now: the file catalog and global_binary.sir, with the game database, input table, built-in textures, strings, actions, the UI root, fonts, screen state machines the script action records, and the effect definitions and object pools. Everything is checked against the reference decoder. Next: the title-screen UI files.",
    "status": "in_progress"
   },
   {
@@ -62,7 +62,7 @@
   },
   {
    "title": "Boots to title screen",
-   "detail": "First visible frame on Windows. A Direct3D 11 renderer now draws real game textures through the engine's own draw path. The boot loads catalog.sir and global_binary.sir (now including the UI data) from the player's own disc and runs through the UI and HUD setup. Next: the remaining boot steps, then the title screen itself.",
+   "detail": "First visible frame on Windows. The game now runs its main loop on PC: about 60 frames a second drawn by the Direct3D 11 renderer, in the front-end mode, with the boot script starting the first level load. The frames are still black because nothing is in the scene yet. Next: finishing the level load, then the title screen itself.",
    "status": "in_progress"
   },
   {
@@ -97,6 +97,11 @@
   }
  ],
  "changelog": [
+  {
+   "date": "2026-11-21",
+   "time": "13:05",
+   "text": "The game's main loop runs on Windows (PRs #18, #20 and #21): the exe now draws frames continuously in the front-end mode, and the boot script starts loading the first level. Along the way a real bug was found and fixed: LoadLevel only searched 17 of the 68 levels. The loader also converts the effect definitions and object pools. The frames are still black, because nothing is in the scene yet."
+  },
   {
    "date": "2026-11-21",
    "time": "12:44",
