@@ -4,7 +4,9 @@
 #include <math.h>
 #include <stdarg.h>
 #include <stdio.h>
+#include <stdlib.h>
 #include <string.h>
+#include <time.h>
 
 #include "types.h"
 
@@ -62,5 +64,55 @@ s32 fn_80338A2C(const char* a, const char* b, u32 n) {
     }
     return 0;
 }
+
+// MSL localtime / gmtime: seconds -> broken-down time in the library's one static `struct tm`
+// (0x805F5CA8: sec, min, hour, mday, mon, year, wday, yday, isdst), whose address is returned.
+// With NULL the original fills in its zero date instead. GetRandomSeed is the caller.
+void* fn_8033AE04(u32* seconds) {
+    static s32* const tmOut = (s32*)(uintptr_t)0x805F5CA8;
+    if (seconds == NULL) {
+        static const s32 kZero[9] = {0, 0, 0, 1, 0, 0, 1, 0, -1};
+        memcpy(tmOut, kZero, sizeof(kZero));
+        tmOut[8] = 0;
+        return tmOut;
+    }
+    time_t t = (time_t)*seconds;
+    struct tm* r = gmtime(&t);
+    if (r) {
+        s32 v[9] = {r->tm_sec, r->tm_min, r->tm_hour, r->tm_mday, r->tm_mon, r->tm_year, r->tm_wday, r->tm_yday, 0};
+        memcpy(tmOut, v, sizeof(v));
+    }
+    return tmOut;
+}
+
+// MSL strtok.
+char* fn_80338A9C(char* s, const char* delims) { return strtok(s, delims); }
+
+// MSL math (fdlibm). The parameter types are the ones the game's callers declare.
+f64 fn_8033E8EC(f64 x) { return atan(x); }                  // atan
+f64 fn_8033ED6C(f64 x) { return floor(x); }                 // floor
+f64 fn_8033F17C(f64 x) { return tan(x); }                   // tan
+f64 fn_8033F1F4(f64 x) { return acos(x); }                  // acos
+f64 fn_8033F1F8(f64 x) { return asin(x); }                  // asin
+f32 fn_8033F1FC(f32 y, f32 x) { return (f32)atan2((f64)y, (f64)x); }   // atan2
+f32 fn_8033F200(f32 x, f32 y) { return (f32)fmod((f64)x, (f64)y); }    // fmod
+f64 fn_8033F204(f64 x) { return log(x); }                   // log
+f64 fn_8033F20C(f64 x, f64 y) { return pow(x, y); }         // pow
+f64 fn_8033F45C(f64 x) { return sqrt(x); }                  // sqrt
+
+// MSL qsort.
+void fn_80336FE0(void* base, s32 n, s32 size, void* cmp) {
+    qsort(base, (size_t)n, (size_t)size, (int (__cdecl*)(const void*, const void*))cmp);
+}
+
+// MSL time: seconds; also stored through the argument when it is not NULL.
+s32 fn_8033ADCC(s32* out) {
+    s32 t = (s32)time(NULL);
+    if (out) *out = t;
+    return t;
+}
+
+// A thunk to the library's strncmp.
+s32 fn_8033B1B8(const char* a, const char* b, s32 n) { return fn_80338A2C(a, b, (u32)n); }
 
 }  // extern "C"

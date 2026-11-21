@@ -152,6 +152,17 @@ const char* PortSoftSdk(u32 addr) {
         {0x80264CD0, "audio: sequencer float setter (fn_80264CD0)"},
         // OSSetPeriodicAlarm: its only caller so far is the audio tick (fn_80202CAC), which needs AX.
         {0x80234394, "OSSetPeriodicAlarm for the audio tick (fn_80234394): not started"},
+        // The SDK's HOME-button menu library (HBM), used by HomeButtonInit and the game's
+        // home-menu update and draw. There is no HOME menu on PC yet: every call does nothing
+        // and returns 0 ("no button selected").
+        {0x802C8AB4, "HOME menu: create (fn_802C8AB4)"},
+        {0x802C8DE4, "HOME menu: aspect adjust (fn_802C8DE4)"},
+        {0x802C8E00, "HOME menu: sound set-up (fn_802C8E00)"},
+        {0x802C8C04, "HOME menu: fn_802C8C04"},
+        {0x802C8C38, "HOME menu: fn_802C8C38"},
+        {0x802C8C88, "HOME menu: fn_802C8C88"},
+        {0x802C8DF4, "HOME menu: fn_802C8DF4"},
+        {0x802C8E04, "HOME menu: fn_802C8E04"},
         // Registers a function and calls it with two words (from fn_80204478, argument fn_802B7DDC,
         // SDK code). What library this starts is not known yet.
         {0x802B4140, "library start through fn_802B4140 (fn_802B7DDC): not started"},

@@ -61,9 +61,13 @@ What boots today, with the retail PAL disc:
    `SirLoad` and converted in place (5,615 pointers, the game database, input table, textures,
    strings and actions).
 10. Script system set-up (`fn_8010F794`): signatures and all script functions registered.
-11. `UiInit` crashes in `fn_8018C8F4`: the UI root, fonts, screen list and HUD in
-    `global_binary.sir` are still big-endian (`docs/loader.md`, "Not converted yet"). That is
-    the first stop today, and it is data work, not a missing function.
+11. `UiInit`, the rest of `GameStart` (save system on the PC save folder, language, string
+    table) and `HomeButtonInit` (the SDK's HOME-menu library is stubbed).
+12. The frame loop: `EngineFrame`, the UI update, `LoadingScreenTick` with `RendClear`.
+13. In the first UI update a screen state runs its action through `TriggerDoAction`, and the
+    script interpreter (`fn_801E1BD4`) loops: the action records of `global_binary.sir` are
+    still big-endian (`docs/loader.md`). That is the first stop today; like the UI data before
+    it, it is data conversion, not a missing function.
 
 Drawing works apart from that: with `--show-texture N` the run goes on from the stop and draws
 a texture of `global_binary.sir` with the engine's own frame functions (`RendBeginFrame`, its
@@ -322,6 +326,13 @@ N with the engine's bind function, calls `DrawFullscreenTexture` for the 2D stat
 projection, and draws a quad with the engine's array draw. (`DrawFullscreenTexture`'s own quad
 cannot be seen: it lies at view z = -1 while its projection shows 0 to 1, and the function it
 calls to bind its texture, `fn_80154290`, is empty in this build.)
+
+### NAND: save files
+
+`port_nand.cpp` maps the console's flash file system to the folder `save` beside the executable:
+home directory, change/create directory, create, delete, open, close, read, write, length, type,
+move, free space, and the banner header. The functions are defined under the names the game
+calls (`fn_80266BA4` is `NANDOpen`, ...); each comment says which SDK function it is.
 
 ### Threads and interrupts
 

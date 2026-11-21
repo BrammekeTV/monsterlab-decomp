@@ -18,7 +18,7 @@ void fn_800AA5A0(void* p, s32 flag);            // 0x800AA5A0
 void fn_800AA684(u8* a3);                       // 0x800AA684
 void fn_800ABA44(void* p);                      // 0x800ABA44
 BOOL fn_802188CC(u8* lab);                      // 0x802188CC
-void fn_8033AE04(u32* out);                     // 0x8033AE04
+void* fn_8033AE04(u32* out);                    // 0x8033AE04
 u32  fn_801EC880(u8* p, u32 hash);
 void fn_801EC8C4(u8* p, u32 a, u32 b);
 void fn_801ECDE8(u8* p, s32 idx, u32 a, s32 immediate);
