@@ -99,6 +99,11 @@
  "changelog": [
   {
    "date": "2026-11-21",
+   "time": "21:47",
+   "text": "Round 60: the last big effect handlers (hue/tint/vignette blends, particle draw list) and fn_80009BE0; 22 game functions left, all skipped stubs"
+  },
+  {
+   "date": "2026-11-21",
    "time": "19:14",
    "text": "The loader converts entity IDs and properties in level files (PR #27), so the level start finds the player's object. The boot now goes further into the level start and stops while setting up the level camera."
   },

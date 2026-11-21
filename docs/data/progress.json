@@ -1,15 +1,15 @@
 {
  "game_id": "RM7P4F",
- "generated": "2026-11-21T17:27:07+00:00",
- "commit": "0c04df3",
- "commit_date": "2026-11-21T18:14:30+01:00",
+ "generated": "2026-11-21T20:47:45+00:00",
+ "commit": "5e04350",
+ "commit_date": "2026-11-21T19:14:46+01:00",
  "game": {
   "functions": 8548,
   "bytes": 2265988,
   "named": 2748,
   "named_bytes": 616800,
-  "decompiled": 7301,
-  "decompiled_bytes": 1725408
+  "decompiled": 7317,
+  "decompiled_bytes": 1740516
  },
  "library": {
   "functions": 4039,
@@ -24,8 +24,8 @@
   "bytes": 3404928,
   "named": 3211,
   "named_bytes": 721548,
-  "decompiled": 7302,
-  "decompiled_bytes": 1725528
+  "decompiled": 7318,
+  "decompiled_bytes": 1740636
  },
  "game_range": [
   "80006B40",
@@ -37,7 +37,7 @@
    0.696
   ],
   [
-   0.58,
+   1.0,
    0.0
   ],
   [
@@ -425,15 +425,15 @@
    0.012
   ],
   [
-   0.142,
+   0.562,
    0.0
   ],
   [
-   0.44,
+   0.442,
    0.001
   ],
   [
-   0.064,
+   0.098,
    0.0
   ],
   [
@@ -553,7 +553,7 @@
    0.0
   ],
   [
-   0.678,
+   0.71,
    0.11
   ],
   [
@@ -681,15 +681,15 @@
    0.0
   ],
   [
-   0.443,
+   0.72,
    0.0
   ],
   [
-   0.69,
+   1.0,
    0.0
   ],
   [
-   0.91,
+   0.993,
    0.022
   ],
   [
@@ -705,7 +705,7 @@
    0.035
   ],
   [
-   0.741,
+   0.996,
    0.0
   ],
   [
@@ -949,7 +949,7 @@
    0.097
   ],
   [
-   0.369,
+   0.383,
    0.0
   ],
   [
@@ -1192,6 +1192,16 @@
   }
  ],
  "files": [
+  {
+   "path": "src/engine/approach_value.cpp",
+   "functions": [
+    {
+     "name": "fn_801F5E94",
+     "addr": "801F5E94",
+     "size": 148
+    }
+   ]
+  },
   {
    "path": "src/engine/disc_queue_open.cpp",
    "functions": [
@@ -4973,6 +4983,16 @@
    ]
   },
   {
+   "path": "src/game/camera_follow_reset.cpp",
+   "functions": [
+    {
+     "name": "fn_800E02A8",
+     "addr": "800E02A8",
+     "size": 328
+    }
+   ]
+  },
+  {
    "path": "src/game/camera_script.cpp",
    "functions": [
     {
@@ -5119,6 +5139,41 @@
      "name": "special_camera_done_slerping",
      "addr": "80019594",
      "size": 16
+    }
+   ]
+  },
+  {
+   "path": "src/game/camera_sources.cpp",
+   "functions": [
+    {
+     "name": "fn_800DC070",
+     "addr": "800DC070",
+     "size": 1172
+    }
+   ]
+  },
+  {
+   "path": "src/game/camera_thunks.cpp",
+   "functions": [
+    {
+     "name": "fn_800DBEF0",
+     "addr": "800DBEF0",
+     "size": 384
+    },
+    {
+     "name": "fn_800DE524",
+     "addr": "800DE524",
+     "size": 16
+    }
+   ]
+  },
+  {
+   "path": "src/game/camera_update.cpp",
+   "functions": [
+    {
+     "name": "fn_800DC6C4",
+     "addr": "800DC6C4",
+     "size": 2848
     }
    ]
   },
@@ -14503,6 +14558,66 @@
    ]
   },
   {
+   "path": "src/game/draft_miss421.cpp",
+   "functions": [
+    {
+     "name": "fn_801665E4",
+     "addr": "801665E4",
+     "size": 1412
+    },
+    {
+     "name": "fn_80166C44",
+     "addr": "80166C44",
+     "size": 620
+    }
+   ]
+  },
+  {
+   "path": "src/game/draft_miss422.cpp",
+   "functions": [
+    {
+     "name": "fn_80168440",
+     "addr": "80168440",
+     "size": 1172
+    },
+    {
+     "name": "fn_80168A58",
+     "addr": "80168A58",
+     "size": 708
+    }
+   ]
+  },
+  {
+   "path": "src/game/draft_miss423.cpp",
+   "functions": [
+    {
+     "name": "fn_80168E6C",
+     "addr": "80168E6C",
+     "size": 828
+    },
+    {
+     "name": "fn_801692C0",
+     "addr": "801692C0",
+     "size": 740
+    }
+   ]
+  },
+  {
+   "path": "src/game/draft_miss424.cpp",
+   "functions": [
+    {
+     "name": "fn_80009BE0",
+     "addr": "80009BE0",
+     "size": 2764
+    },
+    {
+     "name": "fn_801727EC",
+     "addr": "801727EC",
+     "size": 1688
+    }
+   ]
+  },
+  {
    "path": "src/game/draft_miss43.cpp",
    "functions": [
     {
@@ -20464,6 +20579,21 @@
      "name": "fn_80216BF0",
      "addr": "80216BF0",
      "size": 112
+    }
+   ]
+  },
+  {
+   "path": "src/game/header_pools.cpp",
+   "functions": [
+    {
+     "name": "fn_801214E4",
+     "addr": "801214E4",
+     "size": 4
+    },
+    {
+     "name": "fn_801219F4",
+     "addr": "801219F4",
+     "size": 276
     }
    ]
   },
