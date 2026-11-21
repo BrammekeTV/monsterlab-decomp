@@ -19,21 +19,21 @@ Code: `include/port/sir_loader.h`, `src/port/sir_loader.cpp`. Test: `tests/sir_l
 | `global_binary.sir` input table (slot `0xDC4`: 98 sequences, 101 steps) | converted; typed from code, except the last 0x38 bytes of the table (from the data) |
 | `global_binary.sir` textures (slot `0xD94`: list of 44, including the two at `0x824` and `0x828`) | headers converted; pixel data and palettes stay in GX layout |
 | `global_binary.sir` string table (slot `0xDA8`: 4,274 strings) | converted |
-| `global_binary.sir` action table (slot `0x844`: 956 records) | table and pointer array converted; the records (script words) are not |
+| `global_binary.sir` action table (slot `0x844`) and its 956 records | converted: a record is a program of 32-bit words; the 42 sound objects its calls point at are not |
 | `global_binary.sir` screen list and HUD (slots `0xD98`, `0xD9C`: 68 state machines, 68 definitions, 759 states, 1,345 transitions) | converted; every field typed from code, fields without a reader left as they are |
 | `global_binary.sir` UI root, fonts and the objects of slots `0xDB4`-`0xDBC` | the fields the code reads are converted; the glyph data of the three fonts is not |
-| `global_binary.sir` font glyph data, action records, `0xDC0`, `0x10`, `0x418`, `0x830`, `0x83C` | not converted: see "Not converted yet" |
+| `global_binary.sir` font glyph data, sound objects named by action records, `0xDC0`, `0x10`, `0x418`, `0x830`, `0x83C` | not converted: see "Not converted yet" |
 | Hook into the game's `SirLoad` | not wired (the port has no file layer yet) |
 
-Of the 1,096,124 bytes of the image, 26.8% now belongs to objects converted by a schema (the game
-database is 11.5%, the screen state machines 11.2%), 57.0% is data that needs no conversion and is
-reached from a converted object (texture pixels and palettes, string bytes), and 4.3% is fill
-words. 11.9% (131 KB) is not typed yet; 101 KB of that is the action records.
+Of the 1,096,124 bytes of the image, 31.0% now belongs to objects converted by a schema (the game
+database is 11.5%, the screen state machines 11.2%, the action records 4.2%), 57.0% is data that
+needs no conversion and is reached from a converted object (texture pixels and palettes, string
+bytes), and 4.3% is fill words. About 7.7% (84 KB) is not typed yet.
 
-Check against the real files: all 12,878 compared lines of `global_binary.sir` (every header slot,
+Check against the real files: all 13,834 compared lines of `global_binary.sir` (every header slot,
 table descriptor and row, parts, actions and tuning values, every sequence, step, texture
-header, string and action pointer, and every state machine, definition, state, event, node and
-transition, read through the game's own structs and offsets) and all
+header, string, action pointer and action record, and every state machine, definition, state,
+event, node and transition, read through the game's own structs and offsets) and all
 6,457 lines of `catalog.sir` match the Python reference.
 
 ## How the original loads a file
@@ -208,15 +208,17 @@ python tools/loader_check.py
 
 The self-test also builds an input table, two textures, a string table, an action table, a UI
 root with a font, and two state machines that share a definition with one node of each type, and
-36 broken variants of them (bad counts, unknown step class or node type, list loops, pointers
-off the image, overlapping objects, one transition used as two kinds) that must be refused
+two action records, and 43 broken variants of them (bad counts, unknown step class or node type,
+list loops, pointers off the image, overlapping objects, one transition used as two kinds, an
+instruction of length 0, a jump into an operand, a record without an end) that must be refused
 untouched.
 
 Result on PAL `RM7P4F`:
 
 - `global_binary.sir`: 18 header pointers, 13 header words, 3 header bytes, 42 tables,
   382 columns, 2,591 rows, 186 parts, 372 actions and 215 tuning values; 98 input sequences,
-  101 steps, 44 textures, 4,274 strings and 956 action pointers; the UI root, 3 fonts, 4 font
+  101 steps, 44 textures, 4,274 strings, 956 action pointers and 956 action records (11,526
+  words); the UI root, 3 fonts, 4 font
   objects, 68 state machines with their value tables, 68 definitions, 759 states, 1,104 events,
   59 nodes, 23 shared events and 1,345 transitions, all equal. The load report shows 9,425 image
   pointers relocated and none kept or unknown.
@@ -316,10 +318,68 @@ is single-byte and stays as it is. The second pointer leads to zeroed words behi
 ### Action table (header slot `0x844`)
 
 `{u32 count, ptr records}`, read by `TriggerDoAction` for zone id 0x1FF: `records[index]` is
-passed on as the address of an action record. Table and the 956 pointers are converted. The
-records themselves (`0xDD000`-`0xF5D30`, script words such as `0x17FC0001`) are **not**: their
-format is not decoded in the decompiled code yet, so a `TriggerDoAction` on a global action would
-read big-endian words.
+passed on as the address of an action record. Table, the 956 pointers and the records are
+converted.
+
+### Action records
+
+A record is a program for the interpreter `fn_801E1BD4` (0x801E1BD4), which `TriggerDoAction`
+starts for an action word of type 2 (`0x17FC0002`: type 2, zone 0x1FF, record 2). It is a run of
+32-bit words. An instruction is one word and its operands:
+
+| Bits | Field |
+|---|---|
+| 0-7 | opcode |
+| 8-15 | length of the instruction in words, with its operands |
+| 16-27 | script function index (opcode 22) or jump distance in words from this instruction (opcodes 4-17; `fn_801E239C`) |
+
+| Opcode | What the interpreter does | Operands |
+|---|---|---|
+| 1 | header: `fn_801E2368` runs a record only if its first word has this opcode | - |
+| 0, 2, 3, 21 | nothing | - |
+| 4 | jump | - |
+| 5 | jump if the result register is 0 | - |
+| 6-11 | pop two ints, jump if `==`, `!=`, `>`, `<`, `>=`, `<=` | - |
+| 12-17 | the same for floats | - |
+| 18, 19 | push an int, a float | the value |
+| 20 | convert the top of the stack from int to float | - |
+| 22 | call a script function (`ScriptDispatchEngine`); the result goes to the result register | its arguments, one word each |
+| 23 | run another action word (`TriggerDoAction`) | the action word |
+| 24-27 | push the result register, pop into it (as int; 26 and 27 as float) | - |
+| 0xFF | end | - |
+| other, above 27 | skipped as one word | - |
+
+Every operand is a 32-bit value, so the loader converts a whole record as words. Before that it
+walks the instructions to the end word and refuses a record with an instruction of length 0, a
+push or action without its operand, a call with more than eight arguments (the interpreter's
+buffer), or a jump that does not land on an instruction of the same record. A record that does
+not start with the header opcode is never run; only its first word is converted. In the shipped
+file all 956 records start with `0x....0101`, hold 3,236 calls of 526 different functions, 662
+jumps, and no opcode 19 or above 25.
+
+**What a call's arguments are** depends on the function's signature (`gScriptSigs`, filled by
+`ScriptSigDefine`; argument type codes per function in `src/game/script_signatures.cpp`), and the
+function is known only by its index in `gScriptFuncs`. That table is filled in registration order
+after `global_binary.sir` is loaded (it is empty when the file is converted and has 2,050 entries
+once the text table is read), so the loader cannot look a function up. Checked once against the
+tables of the running PC build:
+
+- every one of the 3,236 calls has exactly as many operands as its signature has arguments;
+- no call uses a signature with an argument of type `0xA` (`Print`, and signatures `0x47`, `0x4A`,
+  `0x53`, `0x54`): those hand the function a pointer to what follows the instruction, which would
+  be bytes, not words;
+- arguments of type `0xB` and `0xD` are pointers into the image, and no other type ever holds one:
+  `PlaySoundEffect` (2 calls) and `RegisterExperimentSound` (1) with type `0xB`,
+  `LT_SetTutorialText` (39) with type `0xD`. The loader converts these 42 operands as words. That
+  is right in the PC build, where the image sits at its original address `0x90400000`; a loader
+  that places the image elsewhere would have to relocate them, and needs the function table for
+  that.
+
+The 42 objects those operands point at lie between the records (`0xDF2E0`, `0xE1AD0`,
+`0xECE30`, ...). The three looked at have the same shape: a pointer to a second part 0x30 bytes
+further on, a flag word, floats (1.0, -3.0), a hash, and in the second part of one a name
+(`Generic_Timer_Countdown_Mo_01`). They are **not** converted: the functions that read them are
+not decompiled far enough to type the fields.
 
 ### Screen state machines (header slots `0xD98`, `0xD9C`)
 
@@ -388,12 +448,13 @@ no vtable from any code found so far; on the Wii it keeps the build-time address
 | Slot | Image offset | What is known | Why not |
 |---|---|---|---|
 | font data (font object `+0x08`) | `0x26740`, `0x38220`, `0x390E0`, `0x626C0` | glyph tables; `fn_8018979C` measures text with them, `fn_801971F0` (709 instructions) draws, `fn_801894F4` / `fn_801894B8` prepare a font loaded from a file | those functions are not decompiled; nothing on the boot path reads the data |
-| `0x844` records | `0xDD000`-`0xF5D30` | script words (`0x17FC0001`, ...) run by `TriggerDoAction`; every screen action ends here | format not decoded |
+| sound objects named by action records | 42 objects between `0xDF2E0` and `0xF5D30` | argument 1 of `PlaySoundEffect`, argument 2 of `RegisterExperimentSound` and of `LT_SetTutorialText` (see "Action records") | their readers are not decompiled far enough to type the fields |
 | `0xDC0` | `0xF6CF0` | a table of screen names (`UI_MSA_newscreen`, ...) with ids and hashes | no decompiled function reads the slot |
 | `0x10`, `0x418`, `0x830`, `0x83C` | `0xF7580`, `0xF81D0`, `0xFDE20`, `0x100650` | effect data (`lightning_scrying`, `trail_plant`) | no decompiled function reads the slots |
 
 With this the boot runs through `UiInit` (`ScreenSetsInit`, `ScreenMgrLoad`, `HudInit`,
-`HudReset`). The screen format of `shared_ui.sir` (title screen) is expected to be the same; see
+`HudReset`), and the first `HudUpdateScreens` runs a state's enter action through the
+interpreter. The screen format of `shared_ui.sir` (title screen) is expected to be the same; see
 "Next".
 
 ## Found on the way
@@ -416,13 +477,19 @@ With this the boot runs through `UiInit` (`ScreenSetsInit`, `ScreenMgrLoad`, `Hu
 
 In the order the boot path needs them:
 
-1. **Action records** (`0x844`'s targets): every screen's enter, update and exit action runs one,
-   so the first `HudUpdateScreens` needs them. Then the **font glyph data** (first text drawn).
+1. The **font glyph data** (first text drawn) and the **sound objects** the action records point
+   at (first tutorial text or sound effect). For the second, and for any file whose image is not
+   at its original address, the loader needs the script function table at load time: either the
+   port converts those operands after the game has registered its functions, or a table of
+   function index to signature is generated from a run of the PC build.
 2. **`shared_ui.sir`** (title screen). `FixupFSMPoolCallback` (0x8010CCB0) and `HudReload` call
    the same `fn_801BC574` on machines from other files, so the state-machine schemas here should
    apply as they are; what is missing is how those files name their machines (the section type
    and the pool the callback walks), a relocation range per file, and the widget data the
-   screens draw, which `global_binary.sir` does not have.
+   screens draw, which `global_binary.sir` does not have. Zone files have action tables of their
+   own (`TriggerDoAction` takes the table from the zone record at `+0xD4` for a zone id other
+   than 0x1FF): the same `{count, records}` and the same record format, so `ActionRecordPlan`
+   should apply once those tables are found.
 3. The effect data at `0x10`, `0x418`, `0x830`, `0x83C`, and **`shared_texture.sir`**: the texture
    header schema here should apply as it is.
 4. **Save files**: written from memory by the Wii build, so big-endian too.

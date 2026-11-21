@@ -554,6 +554,23 @@ def image_dump(path):
     L.append('actions %s count %d records %s' % (ptr(slot(0x844)), count, ptr(u(t + 4))))
     for i in range(count):
         L.append('actionrec %d %s' % (i, ptr(u(arr + i * 4))))
+    # Action records: programs of 32-bit words for the interpreter fn_801E1BD4. An instruction is
+    # {opcode bits 0-7, length in words bits 8-15, function index or jump distance bits 16-27} and
+    # length - 1 operand words; opcode 0xFF ends the program, opcodes above 0x1B take one word.
+    for i in range(count):
+        p = u(arr + i * 4)
+        if not p or (u(p - GB_BASE) & 0xFF) != 1:     # fn_801E2368: not run
+            continue
+        o = p - GB_BASE
+        n = calls = jumps = 0
+        while True:
+            w = u(o + n * 4)
+            op, ln = w & 0xFF, (w >> 8) & 0xFF
+            if op == 0xFF: break
+            calls += op == 0x16
+            jumps += 4 <= op <= 0x11
+            n += ln if op <= 0x1B else 1
+        L.append('actionprog %d %s words %d calls %d jumps %d sum %08x' % (i, ptr(p), n + 1, calls, jumps, fnv(sec[o:o + (n + 1) * 4])))
 
     # UI root (slot 0xDB0), its fonts and the objects of slots 0xDB4, 0xDB8, 0xDBC. Only the fields
     # the game code reads are decoded (docs/loader.md lists what is left).
