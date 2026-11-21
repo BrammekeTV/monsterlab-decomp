@@ -28,6 +28,7 @@ build\pc\monsterlab.exe                        # runs main() with your own disc 
 | `--screenshot FILE` | write the last picture shown as a PNG when the run stops (works without `--window`) |
 | `--scale N` | frame buffer size as a multiple of the console's 640x528 (default 2) |
 | `--peek ADDR` | print four words of Wii memory (hex address) when the run stops |
+| `--watch ADDR` | report every write of the main thread to four bytes of Wii memory (hex address): writer, new value, stack |
 | `--show-texture N` | development aid: when the boot stops, draw texture N of `global_binary.sir` through the engine's draw path instead of ending (see "GX: the renderer") |
 
 Debugging aids: `--peek ADDR` (up to eight) prints four words of Wii memory at the stop;

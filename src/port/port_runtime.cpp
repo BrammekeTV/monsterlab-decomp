@@ -363,9 +363,33 @@ static BOOL DemoRedirect(CONTEXT* c, BOOL onMainThread) {
     return TRUE;
 }
 
+// --watch ADDR: a hardware write breakpoint on four bytes of Wii memory, on the main thread only.
+// Each write is reported with the function that made it, the new value and the stack.
+static u32 sWatch;
+static DWORD WINAPI WatchArm(void* thread) {
+    CONTEXT c;
+    SuspendThread((HANDLE)thread);
+    c.ContextFlags = CONTEXT_DEBUG_REGISTERS;
+    if (GetThreadContext((HANDLE)thread, &c)) {
+        c.Dr0 = sWatch & ~3u;
+        c.Dr7 = (c.Dr7 & ~0x000F0003u) | 0x000D0001u;    // slot 0: local enable, write, 4 bytes
+        SetThreadContext((HANDLE)thread, &c);
+    }
+    ResumeThread((HANDLE)thread);
+    return 0;
+}
+
 static LONG CALLBACK TrapHandler(EXCEPTION_POINTERS* e) {
     DWORD code = e->ExceptionRecord->ExceptionCode;
     CONTEXT* c = e->ContextRecord;
+    if (code == EXCEPTION_SINGLE_STEP && sWatch && (c->Dr6 & 1)) {
+        char buf[160];
+        fprintf(stderr, "[port] watch 0x%08X = %08X, written before %s\n", sWatch & ~3u,
+                *(const u32*)(uintptr_t)(sWatch & ~3u), PortDescribePc((void*)(uintptr_t)c->Eip, buf, sizeof(buf)));
+        PrintStack(c);
+        c->Dr6 = 0;
+        return EXCEPTION_CONTINUE_EXECUTION;
+    }
     u32 eip = c->Eip;
     char who[160], from[160];
     if (getenv("PORT_RAW")) {
@@ -781,6 +805,7 @@ struct PortBoot {
             else if (!strcmp(a, "--data") && i + 1 < __argc) asked = __argv[++i];
             else if (!strcmp(a, "--window")) gPortOptions.window = TRUE;
             else if (!strcmp(a, "--peek") && i + 1 < __argc && sPeekCount < 8) sPeek[sPeekCount++] = strtoul(__argv[++i], NULL, 16);
+            else if (!strcmp(a, "--watch") && i + 1 < __argc) sWatch = strtoul(__argv[++i], NULL, 16);
             else if (!strcmp(a, "--show-texture") && i + 1 < __argc) gPortOptions.showTexture = atoi(__argv[++i]);
             else if (!strcmp(a, "--screenshot") && i + 1 < __argc) gPortOptions.screenshot = __argv[++i];
             else if (!strcmp(a, "--scale") && i + 1 < __argc) gPortOptions.scale = atoi(__argv[++i]);
@@ -809,6 +834,10 @@ struct PortBoot {
         AddVectoredExceptionHandler(1, TrapHandler);
         DuplicateHandle(GetCurrentProcess(), GetCurrentThread(), GetCurrentProcess(), &sMainThread, 0, FALSE, DUPLICATE_SAME_ACCESS);
         sMainThreadId = GetCurrentThreadId();
+        if (sWatch) {
+            HANDLE h = CreateThread(NULL, 0, WatchArm, sMainThread, 0, NULL);
+            if (h) { WaitForSingleObject(h, INFINITE); CloseHandle(h); }
+        }
         PortLockEnter();                         // the main thread is the first game thread
 
         const char* dir = FindDataDir(asked);
