@@ -1,12 +1,12 @@
 {
  "log": "link.log",
  "counts": {
-  "global": 2730,
+  "global": 2741,
   "unknown": 126,
   "library": 192,
-  "game": 67
+  "game": 72
  },
- "game_bytes": 47104,
+ "game_bytes": 53164,
  "duplicates": [],
  "game": [
   {
@@ -86,6 +86,16 @@
    "used_as": "_fn_8003A2B4",
    "addr": "8003A2B4",
    "size": 1444,
+   "section": ".text",
+   "kind": "game"
+  },
+  {
+   "name": "fn_8003E560",
+   "refs": 1,
+   "files": 1,
+   "used_as": "_fn_8003E560",
+   "addr": "8003E560",
+   "size": 1308,
    "section": ".text",
    "kind": "game"
   },
@@ -220,6 +230,16 @@
    "kind": "game"
   },
   {
+   "name": "fn_800698DC",
+   "refs": 1,
+   "files": 1,
+   "used_as": "_fn_800698DC",
+   "addr": "800698DC",
+   "size": 264,
+   "section": ".text",
+   "kind": "game"
+  },
+  {
    "name": "fn_8006F794",
    "refs": 1,
    "files": 1,
@@ -266,6 +286,26 @@
    "used_as": "_fn_80087720",
    "addr": "80087720",
    "size": 956,
+   "section": ".text",
+   "kind": "game"
+  },
+  {
+   "name": "fn_80088004",
+   "refs": 1,
+   "files": 1,
+   "used_as": "_fn_80088004",
+   "addr": "80088004",
+   "size": 1336,
+   "section": ".text",
+   "kind": "game"
+  },
+  {
+   "name": "fn_80088BC0",
+   "refs": 1,
+   "files": 1,
+   "used_as": "_fn_80088BC0",
+   "addr": "80088BC0",
+   "size": 1740,
    "section": ".text",
    "kind": "game"
   },
@@ -330,16 +370,6 @@
    "kind": "game"
   },
   {
-   "name": "fn_8009BE68",
-   "refs": 1,
-   "files": 1,
-   "used_as": "_fn_8009BE68",
-   "addr": "8009BE68",
-   "size": 88,
-   "section": ".text",
-   "kind": "game"
-  },
-  {
    "name": "fn_8009C4EC",
    "refs": 1,
    "files": 1,
@@ -386,6 +416,16 @@
    "used_as": "_fn_800AC0F0",
    "addr": "800AC0F0",
    "size": 672,
+   "section": ".text",
+   "kind": "game"
+  },
+  {
+   "name": "fn_800AEFEC",
+   "refs": 1,
+   "files": 1,
+   "used_as": "_fn_800AEFEC",
+   "addr": "800AEFEC",
+   "size": 1012,
    "section": ".text",
    "kind": "game"
   },
@@ -576,6 +616,16 @@
    "used_as": "_fn_8010B5A0",
    "addr": "8010B5A0",
    "size": 552,
+   "section": ".text",
+   "kind": "game"
+  },
+  {
+   "name": "fn_801268C8",
+   "refs": 1,
+   "files": 1,
+   "used_as": "_fn_801268C8",
+   "addr": "801268C8",
+   "size": 488,
    "section": ".text",
    "kind": "game"
   },
@@ -2797,8 +2847,8 @@
  "global": [
   {
    "name": "gWorldState",
-   "refs": 149,
-   "files": 149,
+   "refs": 150,
+   "files": 150,
    "used_as": "\"unsigned char * gWorldState\" (?gWorldState@@3PAEA)",
    "addr": "803E6D00",
    "size": 12952,
@@ -2857,8 +2907,8 @@
   },
   {
    "name": "gBattle",
-   "refs": 45,
-   "files": 45,
+   "refs": 46,
+   "files": 46,
    "used_as": "\"unsigned char * gBattle\" (?gBattle@@3PAEA)",
    "addr": "805FBBB8",
    "size": 8,
@@ -3606,6 +3656,16 @@
    "kind": "global"
   },
   {
+   "name": "lbl_805FB014",
+   "refs": 9,
+   "files": 9,
+   "used_as": "\"unsigned char * lbl_805FB014\" (?lbl_805FB014@@3PAEA)",
+   "addr": "805FB014",
+   "size": 4,
+   "section": ".sbss",
+   "kind": "global"
+  },
+  {
    "name": "lbl_805FB628",
    "refs": 9,
    "files": 9,
@@ -3673,16 +3733,6 @@
    "addr": "8047CAC0",
    "size": 1832,
    "section": ".bss",
-   "kind": "global"
-  },
-  {
-   "name": "lbl_805FB014",
-   "refs": 8,
-   "files": 8,
-   "used_as": "\"unsigned char * lbl_805FB014\" (?lbl_805FB014@@3PAEA)",
-   "addr": "805FB014",
-   "size": 4,
-   "section": ".sbss",
    "kind": "global"
   },
   {
@@ -4796,6 +4846,16 @@
    "kind": "global"
   },
   {
+   "name": "lbl_803F20C4",
+   "refs": 4,
+   "files": 4,
+   "used_as": "_lbl_803F20C4",
+   "addr": "803F20C4",
+   "size": 316,
+   "section": ".bss",
+   "kind": "global"
+  },
+  {
    "name": "lbl_803F2210",
    "refs": 4,
    "files": 4,
@@ -5756,6 +5816,16 @@
    "kind": "global"
   },
   {
+   "name": "lbl_805FCBB0",
+   "refs": 4,
+   "files": 4,
+   "used_as": "_lbl_805FCBB0",
+   "addr": "805FCBB0",
+   "size": 4,
+   "section": ".sdata2",
+   "kind": "global"
+  },
+  {
    "name": "lbl_805FD650",
    "refs": 4,
    "files": 4,
@@ -5771,26 +5841,6 @@
    "files": 4,
    "used_as": "_lbl_805FDB08",
    "addr": "805FDB08",
-   "size": 4,
-   "section": ".sdata2",
-   "kind": "global"
-  },
-  {
-   "name": "lbl_805FDBA0",
-   "refs": 4,
-   "files": 4,
-   "used_as": "\"float lbl_805FDBA0\" (?lbl_805FDBA0@@3MA)",
-   "addr": "805FDBA0",
-   "size": 4,
-   "section": ".sdata2",
-   "kind": "global"
-  },
-  {
-   "name": "lbl_805FDE40",
-   "refs": 4,
-   "files": 4,
-   "used_as": "\"float lbl_805FDE40\" (?lbl_805FDE40@@3MA)",
-   "addr": "805FDE40",
    "size": 4,
    "section": ".sdata2",
    "kind": "global"

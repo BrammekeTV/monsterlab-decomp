@@ -99,6 +99,11 @@
  "changelog": [
   {
    "date": "2026-11-21",
+   "time": "23:59",
+   "text": "Round 70: 38 more small functions (delete helpers, battle update glue, prop state, HUD)"
+  },
+  {
+   "date": "2026-11-21",
    "time": "23:52",
    "text": "Round 69: 38 more small functions (dtors, vcall helpers, actor setup, HUD)"
   },
