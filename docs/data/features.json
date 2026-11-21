@@ -37,7 +37,7 @@
   },
   {
    "title": "Big-endian data loader",
-   "detail": "Convert game data from the Wii's big-endian format at load time. On PC now: the file catalog and global_binary.sir, with the game database, input table, built-in textures, strings, actions, the UI root, fonts, screen state machines the script action records, and the effect definitions and object pools. Everything is checked against the reference decoder. Next: the title-screen UI files.",
+   "detail": "Convert game data from the Wii's big-endian format at load time. On PC now: the file catalog, all of the global data in global_binary.sir (game database, input, textures, strings, script actions, UI, effects), and the first parts of level files: the header block, the HUD, the first layer of entities with their parts and state machines, scene objects and object pools. Everything is checked against the reference decoder. Next: the rest of the level data.",
    "status": "in_progress"
   },
   {
@@ -62,7 +62,7 @@
   },
   {
    "title": "Boots to title screen",
-   "detail": "First visible frame on Windows. The game now runs its main loop on PC: about 60 frames a second drawn by the Direct3D 11 renderer, in the front-end mode, with the boot script starting the first level load. The frames are still black because nothing is in the scene yet. Next: finishing the level load, then the title screen itself.",
+   "detail": "First visible frame on Windows. The game runs its main loop on PC, drawn by the Direct3D 11 renderer, and the level load now reads the front-end level (empty_level.sir) from the player's own disc and starts setting up its entities. Next: the rest of the level data, then the title screen itself.",
    "status": "in_progress"
   },
   {
@@ -97,6 +97,11 @@
   }
  ],
  "changelog": [
+  {
+   "date": "2026-11-21",
+   "time": "17:38",
+   "text": "Level files start loading on Windows (PRs #22 to #24): the boot now reads the front-end level, empty_level.sir, from the player's own disc. The loader converts its header, the HUD, the first layer of entities (position, rotation, parts and state machines), scene objects and the object pools the level start fills in. The level start runs until it reaches data that isn't converted yet. The title screen comes after the rest of the level data."
+  },
   {
    "date": "2026-11-21",
    "time": "17:18",
