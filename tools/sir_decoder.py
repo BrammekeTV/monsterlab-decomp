@@ -607,7 +607,7 @@ def level_dump(path):
     # What the header block names in zone 0: entities (slot +0x50 and the two entity tables), scene
     # objects (block tables +0x1B0, +0x1BC) and pool tables (slot +0xE4, +0xE8).
     inz = lambda v: zbase <= v < zbase + len(zone0)
-    roots, scene, pooltabs = [], [], []
+    roots, scene, pooltabs, records = [], [], [], []
     def table_entries(o):
         t, n = u(o) - base, u(o + 4)
         return [u(t + i * 4) for i in range(n)]
@@ -617,13 +617,68 @@ def level_dump(path):
         o = LEVEL_SLOTS + i * stride
         roots += [v for v in [u(o + 0x50)] + table_entries(o + 0x120) + table_entries(o + 0x12C) if inz(v)]
         if inz(u(o + 0xE4)): pooltabs.append((u(o + 0xE4), u(o + 0xE8)))
+        if inz(u(o + 0xFC)): records.append(u(o + 0xFC))
     hud = u(0x1F4)
-    zone_dump(L, zone0, zbase, hud if inz(hud) else 0, roots, scene, pooltabs)
+    zone_dump(L, zone0, zbase, hud if inz(hud) else 0, roots, scene, pooltabs, records)
     return L
 
 FIXUP_ENTITY, FIXUP_PART, FIXUP_POOLED, FIXUP_PROJECTILE, FIXUP_RENDER, FIXUP_FSM = 651, 652, 653, 654, 655, 656
 
-def zone_dump(L, sec, base, hud, roots, scene_roots, pooltabs):
+def zone_records_dump(L, sec, base, records):
+    """The zone records (zone slot +0xFC) and what WorldTick reaches through their list at +0x10."""
+    u = lambda o: struct.unpack_from('>I', sec, o)[0]
+    inz = lambda v, n=1: base <= v and v + n <= base + len(sec)
+    def ptr(v):
+        if v == 0: return 'null'
+        if base <= v <= base + len(sec): return 'img+0x%x' % (v - base)
+        return 'wii:%08x' % v
+    ws = lambda o, n: ' '.join('%08x' % u(o + i * 4) for i in range(n))
+    ps = lambda o, n: ' '.join(ptr(u(o + i * 4)) for i in range(n))
+    players, tracks = set(), set()
+    def player(a):
+        if not inz(a, 0x28) or a in players: return
+        players.add(a)
+        o = a - base
+        mode, elems, count, stride = u(o + 4), u(o + 8), u(o + 0x10), u(o + 0x18)
+        L.append('animplayer %s mode %d elems 0x%x count %d track %s stride %d flags %d %d time %08x keys %s' % (
+            ptr(a), mode, elems, count, ptr(u(o + 0x14)), stride, u(o + 0x1C), u(o + 0x20), u(o + 0x24), ps(o + 0x28, count)))
+        if mode != 1: return
+        for i in range(count):
+            e = o + elems + i * stride
+            L.append('animelem %s %08x %08x' % (ptr(base + e), u(e), u(e + 8)))
+        t = u(o + 0x14)
+        if not inz(t, 0x28) or t in tracks: return
+        tracks.add(t)
+        to = t - base
+        table = to + u(to + 0x24)
+        L.append('animtrack %s length %08x table 0x%x' % (ptr(t), u(to + 0x20), u(to + 0x24)))
+        for i in range(count):
+            first = to + u(table + i * 8)
+            k, n, total = first, 0, 0
+            while True:
+                time, value = struct.unpack_from('>H', sec, k)[0], u(k + 4)
+                n += 1; total = (total + time + value) & 0xFFFFFFFF
+                if time == 0xFFFF: break
+                k += 8
+            L.append('animkeys %s rel 0x%x keys %d first %04x %08x last %08x sum %08x' % (
+                ptr(base + first), u(table + i * 8), n, struct.unpack_from('>H', sec, first)[0], u(first + 4), u(k + 4), total))
+    for rec in records:
+        if not inz(rec, 0x14): continue
+        node = u(rec - base + 0x10)
+        L.append('zonerecord %s list %s' % (ptr(rec), ptr(node)))
+        while inz(node - 0x10, 0x80):
+            o = node - base - 0x10
+            L.append('zonesystem %s w8 %s next %s out %s players %s extra %s' % (
+                ptr(node - 0x10), ptr(u(o + 8)), ptr(u(o + 0x10)), ps(o + 0x3C, 8), ps(o + 0x5C, 8), ptr(u(o + 0x7C))))
+            for k in range(8):
+                pl, out = u(o + 0x5C + k * 4), u(o + 0x3C + k * 4)
+                if not pl: continue
+                if inz(out, 0x30): L.append('animout %s %s' % (ptr(out), ws(out - base, 12)))
+                player(pl)
+            player(u(o + 0x7C))
+            node = u(o + 0x10)
+
+def zone_dump(L, sec, base, hud, roots, scene_roots, pooltabs, records=()):
     """Dump of what the loader converts in a level zone: pool tables and pools, entities (first
     layer), scene objects, then the HUD and every state machine found on the way."""
     u = lambda o: struct.unpack_from('>I', sec, o)[0]
@@ -725,6 +780,7 @@ def zone_dump(L, sec, base, hud, roots, scene_roots, pooltabs):
         L.append(line)
     for a in projectiles:
         L.append('projectile %s part %s' % (ptr(a), ptr(u(off(a) + 0x22C))))
+    zone_records_dump(L, sec, base, records)
     if hud:
         machines_dump(L, sec, base, hud, u(off(hud) + 0x434), True, machines)
 
