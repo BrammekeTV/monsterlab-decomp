@@ -37,7 +37,7 @@
   },
   {
    "title": "Big-endian data loader",
-   "detail": "Convert game data from the Wii's big-endian format at load time. Loading on PC now: the file catalog (catalog.sir) and most of global_binary.sir: the game database, the controller input table, the built-in textures, the string table and the action table. All 9,304 checked values match the reference decoder. Next: the UI screen list (needs more UI code decompiled), then the title-screen UI files.",
+   "detail": "Convert game data from the Wii's big-endian format at load time. Loading on PC now: the file catalog (catalog.sir) and most of global_binary.sir: the game database, the controller input table, the built-in textures, the string table and the action table. All 9,304 checked values match the reference decoder. Next: the UI screen list (needs more UI code decompiled), then the title-screen UI files. The boot now uses it to load the real files from disc.",
    "status": "in_progress"
   },
   {
@@ -52,7 +52,7 @@
   },
   {
    "title": "Platform layer",
-   "detail": "Windows replacements for the Wii system code: memory heaps, OS time, threads and reports work, and video init runs with the graphics calls stubbed. Audio and input are still stubs. The game now runs main() through system setup, the heaps, engine startup, game init and the renderer start-up, and stops in the scene-graph setup (SgInit).",
+   "detail": "Windows replacements for the Wii system code: memory heaps, OS time, threads, reports and disc reads work. The game's graphics commands are now captured and decoded, ready for a renderer to plug in. Audio and input are still stubs.",
    "status": "in_progress"
   },
   {
@@ -62,7 +62,7 @@
   },
   {
    "title": "Boots to title screen",
-   "detail": "First visible frame on Windows.",
+   "detail": "First visible frame on Windows. The exe now gets through engine init, loads and converts catalog.sir and global_binary.sir from the player's own disc, and reaches the UI setup (UiInit). Next: a Windows graphics backend that draws.",
    "status": "in_progress"
   },
   {
@@ -97,6 +97,11 @@
   }
  ],
  "changelog": [
+  {
+   "date": "2026-11-21",
+   "time": "01:36",
+   "text": "The Windows build boots further (PRs #12 to #14): it now reads its first files from the player's own disc, catalog.sir and global_binary.sir, converts them with the big-endian loader and reaches the UI setup. The game's graphics commands are captured and decoded, which found two real bugs on the way. The first draw is VideoInit's screen-clearing triangle. Nothing shows on screen yet: next is a Windows graphics backend."
+  },
   {
    "date": "2026-11-21",
    "time": "01:31",
