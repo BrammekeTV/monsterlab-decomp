@@ -37,7 +37,9 @@ extern "C" void fn_8016EB0C(u8* a3, f32 f1, f32 f2) {
 }
 
 // 0x8016EB20
-extern "C" void fn_8016EB20(void) {
+extern "C" u8* fn_8016EB20(u8* a3) {
+    // empty in the original: r3 is untouched, the callers get their first argument back
+    return a3;
 }
 
 // 0x8016EB24

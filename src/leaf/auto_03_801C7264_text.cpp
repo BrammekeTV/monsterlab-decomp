@@ -164,7 +164,9 @@ extern "C" u32 fn_801CC8AC(u8* a3) {
 }
 
 // 0x801CC8E0
-extern "C" void fn_801CC8E0(void) {
+extern "C" u8* fn_801CC8E0(u8* a3) {
+    // empty in the original: r3 is untouched, the callers get their first argument back
+    return a3;
 }
 
 // 0x801CC8E4
