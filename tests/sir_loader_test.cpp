@@ -768,10 +768,27 @@ struct ZoneDump {
                 PrintRaw(r + 0x34, 10);
                 printf("\n");
             }
+            printf("entbase "); Val(e); printf(" id %08x w30 %08x p84 ", *(const u32*)(e + 0x2C), *(const u32*)(e + 0x30)); Ptr(e + 0x84);
+            printf(" wac %08x\n", *(const u32*)(e + 0xAC));
+            bool prop = In(r, ENTITY_RECORD_SIZE) && r[0x34] == ENTITY_TYPE_PROP;
+            if (prop) {
+                printf("entprop "); Val(e); printf(" f14 %08x f28 %08x acts", Bits(*(const f32*)(e + 0x14)), Bits(*(const f32*)(e + 0x28)));
+                for (u32 k = 0; k < 3; k++) printf(" %08x", *(const u32*)(e + 0x38 + k * 4));
+                for (u32 k = 0; k < 4; k++) printf(" %08x", *(const u32*)(e + 0x48 + k * 4));
+                printf(" %08x actor ", *(const u32*)(e + 0x68)); Ptr(e + 0xA0); printf(" fc8");
+                for (u32 k = 0; k < 3; k++) printf(" %08x", Bits(*(const f32*)(e + 0xC8 + k * 4)));
+                printf(" wec %08x w15c %08x\n", *(const u32*)(e + 0xEC), *(const u32*)(e + 0x15C));
+            }
             Parts(*(const u8**)(e + 0x8C));
             Add(scene, *(const u8**)(e + 0x90), 8);
             const u8* o9c = *(const u8**)(e + 0x9C);
             if (In(o9c, 0xC)) { printf("entobj9c "); Val(o9c); printf(" id %08x\n", *(const u32*)(o9c + 8)); }
+            if (prop && In(o9c, PROP_DEF_USED)) {
+                printf("entdef "); Val(o9c); printf(" f24 %08x w2c %08x acts", Bits(*(const f32*)(o9c + 0x24)), *(const u32*)(o9c + 0x2C));
+                for (u32 k = 0; k < 3; k++) printf(" %08x", *(const u32*)(o9c + 0x68 + k * 4));
+                for (u32 k = 0; k < 4; k++) printf(" %08x", *(const u32*)(o9c + 0x78 + k * 4));
+                printf(" %08x wbc %08x\n", *(const u32*)(o9c + 0x98), *(const u32*)(o9c + 0xBC));
+            }
             const u8* holder = *(const u8**)(e + 0xA4);
             if (In(holder, 8)) {
                 printf("entholder "); Val(holder); printf(" machine "); Ptr(holder); printf(" other "); Ptr(holder + 4); printf("\n");
@@ -1414,7 +1431,8 @@ static SirError ConvertBuilt(u8* hdr, u8* img, SirReloc* r, s32* failTable) {
 #define L_POOLTAB  0x8A0u                     // the slot's pool table: one 0x2C-byte entry
 #define L_POOL     0x8D0u                     // pool of two 0x10-byte items that each hold a state machine
 #define L_POOLBLK  0x900u                     // its block: next-block word, nodes at +0x08 and +0x20
-#define L_ZONE_SIZE 0x940u
+#define L_DEF      0x940u                     // the entity's definition (a prop: 0xC0 used)
+#define L_ZONE_SIZE 0xA00u
 
 static void BuildLevel(u8* hdr, u8* zone) {
     memset(hdr, 0, L_HDR_SIZE);
@@ -1472,6 +1490,17 @@ static void BuildLevel(u8* hdr, u8* zone) {
     memset(e, 0, 0x1B4);
     Put32(e + 0x000, T_VTABLE);
     Put32(e + 0x004, L_ZONE + L_RECORD);
+    Put32(e + 0x014, 0x40000000);                              // a prop's own fields
+    Put32(e + 0x02C, 0xBA4E36A9);                              // the id fn_800D8724 looks for
+    Put32(e + 0x030, 0xFFFFFFFF);
+    Put32(e + 0x068, 0x0003FFFF);
+    Put32(e + 0x09C, L_ZONE + L_DEF);
+    Put32(e + 0x0EC, 0x6C938971);
+    u8* def = zone + L_DEF;
+    memset(def, 0, 0xC0);
+    Put32(def + 0x08, 0x325462E8); Put32(def + 0x24, 0x3F800000);
+    Put32(def + 0x64, 0x0003FFFF);                             // no reader: stays big-endian
+    Put32(def + 0x68, 0x0003FFFF); Put32(def + 0xBC, 0x00100080);
     Put32(e + 0x034, 0x0003FFFF);                              // no reader yet: stays big-endian
     Put32(e + 0x090, L_ZONE + L_SCENE);
     Put32(e + 0x0A4, L_ZONE + L_HOLDER);
@@ -1562,6 +1591,11 @@ static void LevelSelfTest(void) {
     const u8* ent = second0[0];
     const u8* rec = *(const u8**)(ent + 4);
     CHECK(*(const u32*)ent == T_VTABLE && rec == zone + L_RECORD && ent[0x37] == 0xFF && ent[0x34] == 0x00);   // +0x34: untouched
+    // The prop's fields and its definition, as fn_800D8724 and fn_80069180 read them.
+    const u8* def = *(const u8**)(ent + 0x9C);
+    CHECK(*(const u32*)(ent + 0x2C) == 0xBA4E36A9 && *(const f32*)(ent + 0x14) == 2.0f && *(const u32*)(ent + 0x68) == 0x0003FFFF);
+    CHECK(*(const u32*)(ent + 0xEC) == 0x6C938971 && def == zone + L_DEF && *(const u32*)(def + 8) == 0x325462E8);
+    CHECK(*(const f32*)(def + 0x24) == 1.0f && *(const u32*)(def + 0xBC) == 0x00100080 && def[0x64] == 0x00 && def[0x67] == 0xFF);
     CHECK(*(const f32*)(rec + 0x18) == 1.0f && *(const u32*)(rec + 0x1C) == 0x46 && *(const u32*)(rec + 0x20) == 0x100);
     CHECK(*(const u16*)(rec + 0x30) == 0x1234 && rec[0x34] == 6 && rec[0x3A] == 0xFF);
     CHECK(*(const f32*)(ent + 0x158) == 1.0f && *(const u32*)(ent + 0x1B0) == 0x40 && *(const u8**)(ent + 0x8C) == NULL);
@@ -1599,6 +1633,7 @@ static void LevelSelfTest(void) {
         { true, L_POOL + 0x08, 0x18, SIR_ERR_POOL },                               // pool alignment not a power of two
         { true, L_POOLBLK + 0x10, L_ZONE + L_ENT + 0x10, SIR_ERR_OVERLAP },        // pooled "machine" inside the entity
         { true, L_ENT + 0xA4, L_ZONE + L_RECORD + 0x20, SIR_ERR_OVERLAP },         // holder inside the record
+        { true, L_ENT + 0x9C, L_ZONE + L_SCENE, SIR_ERR_OVERLAP },                 // prop "definition" on the scene object
     };
     for (const BadLevel& c : bad) {
         BuildLevel(hdr, zone);

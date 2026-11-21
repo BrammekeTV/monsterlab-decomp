@@ -690,9 +690,19 @@ def zone_dump(L, sec, base, hud, roots, scene_roots, pooltabs):
             q = off(r)
             L.append('entrecord %s floats %s w1c %08x %08x f24 %08x w2c %d h30 %d bytes %s' % (
                 ptr(r), ws(q, 7), u(q + 0x1C), u(q + 0x20), u(q + 0x24), i32(q + 0x2C), h16(q + 0x30), sec[q + 0x34:q + 0x3E].hex()))
+        L.append('entbase %s id %08x w30 %08x p84 %s wac %08x' % (ptr(a), u(o + 0x2C), u(o + 0x30), ptr(u(o + 0x84)), u(o + 0xAC)))
+        prop = inz(r, 0x40) and sec[off(r) + 0x34] == 6
+        if prop:
+            L.append('entprop %s f14 %08x f28 %08x acts %s %s %08x actor %s fc8 %s wec %08x w15c %08x' % (
+                ptr(a), u(o + 0x14), u(o + 0x28), ws(o + 0x38, 3), ws(o + 0x48, 4), u(o + 0x68), ptr(u(o + 0xA0)), ws(o + 0xC8, 3),
+                u(o + 0xEC), u(o + 0x15C)))
         parts(u(o + 0x8C))
         add(scene, u(o + 0x90), 8)
         if inz(u(o + 0x9C), 0xC): L.append('entobj9c %s id %08x' % (ptr(u(o + 0x9C)), u(off(u(o + 0x9C)) + 8)))
+        if prop and inz(u(o + 0x9C), 0xC0):
+            q = off(u(o + 0x9C))
+            L.append('entdef %s f24 %08x w2c %08x acts %s %s %08x wbc %08x' % (
+                ptr(u(o + 0x9C)), u(q + 0x24), u(q + 0x2C), ws(q + 0x68, 3), ws(q + 0x78, 4), u(q + 0x98), u(q + 0xBC)))
         hl = u(o + 0xA4)
         if inz(hl, 8):
             L.append('entholder %s machine %s other %s' % (ptr(hl), ptr(u(off(hl))), ptr(u(off(hl) + 4))))
