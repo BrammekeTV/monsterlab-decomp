@@ -99,6 +99,11 @@
  "changelog": [
   {
    "date": "2026-11-21",
+   "time": "17:02",
+   "text": "Round 55: 40 more renderer/video functions (quad draw, texture deswizzle, 21-case effect dispatcher, segment-triangle queries, bone transforms, glyph batch draw)"
+  },
+  {
+   "date": "2026-11-21",
    "time": "13:05",
    "text": "The game's main loop runs on Windows (PRs #18, #20 and #21): the exe now draws frames continuously in the front-end mode, and the boot script starts loading the first level. Along the way a mistake in the decompiled LoadLevel was fixed: it only searched 17 of the game's 68 levels. The loader also converts the effect definitions and object pools. The frames are still black, because nothing is in the scene yet."
   },
