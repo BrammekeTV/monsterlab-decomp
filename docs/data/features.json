@@ -98,6 +98,11 @@
  ],
  "changelog": [
   {
+   "date": "2026-11-22",
+   "time": "00:06",
+   "text": "Round 71: 34 more small functions (delete wrappers, prop/HUD helpers, tail-call stubs)"
+  },
+  {
    "date": "2026-11-21",
    "time": "23:59",
    "text": "Round 70: 38 more small functions (delete helpers, battle update glue, prop state, HUD)"
