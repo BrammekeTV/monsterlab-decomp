@@ -12,7 +12,7 @@ void     fn_80187B68(void* p, s32 a, s32 b);                                    
 s32      fn_80173400(void* a, s32 b);                                                  // 0x80173400
 void     fn_8017514C(s32 a);                                                           // 0x8017514C
 void     fn_80170C28(void* a, void* b, s32 c);                                         // 0x80170C28
-void     fn_80175C48(s32 a);                                                           // 0x80175C48
+void fn_80175C48(void);                                                           // 0x80175C48
 void     fn_801731C8(void* p);                                                         // 0x801731C8
 void     fn_8018A1FC(void* p);                                                         // 0x8018A1FC
 s32      fn_8015BA30(void* p);                                                         // 0x8015BA30
@@ -147,7 +147,7 @@ void fn_801719DC(u8* arg0) {
             if (fn_80173400(*(void**)(arg0 + 0x10), slot) != 0) {
                 fn_8017514C(slot);
                 fn_80170C28(arg0, *(void**)(arg0 + 0x10), slot);
-                fn_80175C48(slot);
+                fn_80175C48();
             }
         }
         if (lbl_805FB4C0 != 0 && fn_8015BA30(sRendDLs + gViewportIndex * 0x94) + 0x10C0 > gFrameBudget) {

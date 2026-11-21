@@ -131,7 +131,7 @@ BOOL fn_80162B30(u8* p, s32 h) {
 
 // 0x80162FD0
 // Copies a record: five floats and one word from src, then two default floats at +0x18 and +0x1C.
-void fn_80162FD0(u8* dst, u8* src) {
+void fn_80162FD0(u8* mgr, u8* dst, u8* src, u8* link) {
     f32 c = lbl_805FF390;
     *(f32*)(dst + 0x0)  = *(f32*)(src + 0x0);
     *(f32*)(dst + 0x4)  = *(f32*)(src + 0x4);
@@ -145,7 +145,7 @@ void fn_80162FD0(u8* dst, u8* src) {
 
 // 0x80163418
 // Copies four floats and one word from src, then sets +0x14 to the default constant.
-void fn_80163418(u8* dst, u8* src) {
+void fn_80163418(u8* mgr, u8* dst, u8* src, u8* link) {
     *(f32*)(dst + 0x0)  = *(f32*)(src + 0x0);
     *(f32*)(dst + 0x4)  = *(f32*)(src + 0x4);
     *(f32*)(dst + 0x8)  = *(f32*)(src + 0x8);
@@ -157,7 +157,7 @@ void fn_80163418(u8* dst, u8* src) {
 // 0x80163A14
 // Copies a float, a word, and two floats from src; sets +0x10 and +0x14 to the default
 // constant and clears the word at +0x18.
-void fn_80163A14(u8* dst, u8* src) {
+void fn_80163A14(u8* mgr, u8* dst, u8* src, u8* link) {
     *(f32*)(dst + 0x0)  = *(f32*)(src + 0x0);
     *(s32*)(dst + 0x4)  = *(s32*)(src + 0x4);
     *(f32*)(dst + 0x8)  = *(f32*)(src + 0x8);
@@ -169,7 +169,7 @@ void fn_80163A14(u8* dst, u8* src) {
 
 // 0x8016481C
 // Copies six floats from src; sets +0x18 and +0x1C to the default constant and clears the byte at +0x20.
-void fn_8016481C(u8* dst, u8* src) {
+void fn_8016481C(u8* mgr, u8* dst, u8* src, u8* link) {
     f32 c = lbl_805FF400;
     *(f32*)(dst + 0x0)  = *(f32*)(src + 0x0);
     *(f32*)(dst + 0x4)  = *(f32*)(src + 0x4);
@@ -184,7 +184,7 @@ void fn_8016481C(u8* dst, u8* src) {
 
 // 0x80165320
 // Copies six floats from src and sets +0x20 to the default constant.
-void fn_80165320(u8* dst, u8* src) {
+void fn_80165320(u8* mgr, u8* dst, u8* src, u8* link) {
     *(f32*)(dst + 0x0)  = *(f32*)(src + 0x0);
     *(f32*)(dst + 0x4)  = *(f32*)(src + 0x4);
     *(f32*)(dst + 0x8)  = *(f32*)(src + 0x8);
@@ -197,7 +197,7 @@ void fn_80165320(u8* dst, u8* src) {
 // 0x80165D70
 // Copies the first four floats of src into dst (+0x4 is also written to +0x28), sets +0x10 and
 // +0x14 to one constant, +0x18 to zero and +0x20 to another constant.
-void fn_80165D70(u8* dst, u8* src) {
+void fn_80165D70(u8* mgr, u8* dst, u8* src, u8* link) {
     f32 s4 = *(f32*)(src + 0x4);
     *(f32*)(dst + 0x0)  = *(f32*)(src + 0x0);
     *(f32*)(dst + 0x4)  = s4;
@@ -224,7 +224,7 @@ void fn_80166468(void* unused, u8* p) {
 
 // 0x801664C4
 // Copies eight floats from src and sets +0x20 to the default constant.
-void fn_801664C4(u8* dst, u8* src) {
+void fn_801664C4(u8* mgr, u8* dst, u8* src, u8* link) {
     for (s32 i = 0; i < 8; i++) {
         *(f32*)(dst + i * 4) = *(f32*)(src + i * 4);
     }
@@ -233,7 +233,7 @@ void fn_801664C4(u8* dst, u8* src) {
 
 // 0x80166B68
 // Copies eight floats from src and sets +0x20 to the default constant.
-void fn_80166B68(u8* dst, u8* src) {
+void fn_80166B68(u8* mgr, u8* dst, u8* src, u8* link) {
     for (s32 i = 0; i < 8; i++) {
         *(f32*)(dst + i * 4) = *(f32*)(src + i * 4);
     }
@@ -242,7 +242,7 @@ void fn_80166B68(u8* dst, u8* src) {
 
 // 0x80166EB0
 // Copies six floats from src and sets +0x18 to the default constant.
-void fn_80166EB0(u8* dst, u8* src) {
+void fn_80166EB0(u8* mgr, u8* dst, u8* src, u8* link) {
     for (s32 i = 0; i < 6; i++) {
         *(f32*)(dst + i * 4) = *(f32*)(src + i * 4);
     }
@@ -251,7 +251,7 @@ void fn_80166EB0(u8* dst, u8* src) {
 
 // 0x801688D4
 // Copies seven floats from src; sets +0x1C and +0x20 to the default constant.
-void fn_801688D4(u8* dst, u8* src) {
+void fn_801688D4(u8* mgr, u8* dst, u8* src, u8* link) {
     for (s32 i = 0; i < 7; i++) {
         *(f32*)(dst + i * 4) = *(f32*)(src + i * 4);
     }
@@ -261,7 +261,7 @@ void fn_801688D4(u8* dst, u8* src) {
 
 // 0x80168D1C
 // Copies six floats and one word from src; sets +0x1C and +0x20 to the default constant.
-void fn_80168D1C(u8* dst, u8* src) {
+void fn_80168D1C(u8* mgr, u8* dst, u8* src, u8* link) {
     for (s32 i = 0; i < 6; i++) {
         *(f32*)(dst + i * 4) = *(f32*)(src + i * 4);
     }
@@ -272,7 +272,7 @@ void fn_80168D1C(u8* dst, u8* src) {
 
 // 0x801691A8
 // Copies five floats and one word from src; sets +0x18 to the default constant.
-void fn_801691A8(u8* dst, u8* src) {
+void fn_801691A8(u8* mgr, u8* dst, u8* src, u8* link) {
     for (s32 i = 0; i < 5; i++) {
         *(f32*)(dst + i * 4) = *(f32*)(src + i * 4);
     }

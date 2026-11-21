@@ -33,7 +33,7 @@ s32  fn_8015BA30(void* p);                                 // 0x8015BA30
 u8*  fn_80142500(void* p);                                 // 0x80142500
 void fn_801214DC(void* p);                                 // 0x801214DC
 void fn_801214E0(void);                                 // 0x801214E0
-void fn_80161A28(void* fx);                                // 0x80161A28
+void fn_80161A28(u8* arg0, f32 dt);                                // 0x80161A28
 void fn_801620BC(void* fx);                                // 0x801620BC
 void fn_8016E304(void* cam);                               // 0x8016E304
 void fn_8016FB20(void* view);                              // 0x8016FB20
@@ -192,7 +192,7 @@ void fn_8000A6AC(void) {
             lbl_805FAE71 = 1;
         }
         TimerReset(lbl_805FAE78);
-        fn_80161A28(lbl_8040E5F0);
+        fn_80161A28(lbl_8040E5F0, 0.0f);  // dt is a leftover f1 in the asm
         fn_801620BC(lbl_8040E5F0);
         if (lbl_805FAE70 == 0) {
             RendClear(4, 0, 0, 1.0f);

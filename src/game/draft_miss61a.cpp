@@ -22,7 +22,7 @@ void fn_80116BE8(u8* p);     // 0x80116BE8
 void fn_80116E54(u8* p, s32 a, s32 b);  // 0x80116E54
 void fn_80116EF0(u8* p, s32 a);         // 0x80116EF0
 void fn_8014ACCC(u32 mode, s32 fmt, s32 w, s32 h, s32* outSize, s32* outStride, s32* outW, s32* outH);  // 0x8014ACCC
-void fn_8015B19C(void);      // 0x8015B19C
+void fn_8015B19C(u8* tex, s32 skip);      // 0x8015B19C
 void fn_8016964C(u8* mgr, u8* tex);     // 0x8016964C
 u8*  fn_801840E4(u8* a, u8* b, s32 c);  // 0x801840E4
 void TextureRelease(void* tex);         // 0x80184028
@@ -67,7 +67,7 @@ u8* fn_8015A210(u8* arg0, s32 arg1, s32* arg2, s32 arg3) {
     s32 total = 0;
     s32 count = arg1;
     *(u8*)(arg0 + 0xB) = (u8)(*(u8*)(arg0 + 0xB) | 2);
-    if ((arg3 & 6) != 6) fn_8015B19C();
+    if ((arg3 & 6) != 6) fn_8015B19C(arg0, arg1);
     u16 w = *(u16*)(arg0 + 0x4);
     u16 h = *(u16*)(arg0 + 0x6);
     u8* acc = *(u8**)(arg0 + 0x18);

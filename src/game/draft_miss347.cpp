@@ -22,7 +22,7 @@ void  fn_801719DC(void* p);                                                 // 0
 void fn_80171ABC(u8* p);                                                    // 0x80171ABC
 s32   fn_80173400(void* a, s32 b);                                          // 0x80173400
 void  fn_8017514C(s32 a);                                                   // 0x8017514C
-void  fn_80175C48(s32 a);                                                   // 0x80175C48
+void fn_80175C48(void);                                                   // 0x80175C48
 void  fn_801873C0(void* a, s32 b, s32 c);                                   // 0x801873C0
 u8*   fn_801D66B4(void);                                                    // 0x801D66B4
 void  fn_801D66C4(f32 a, f32 b);                                            // 0x801D66C4
@@ -155,7 +155,7 @@ void fn_801CAA10(u8* arg0, s32 arg1, u8* arg2) {
                 (*(DispatchFn*)(e + 0x54))(*(void**)(obj + 0x8), sp, e);
             }
         }
-        fn_80175C48(pass2);
+        fn_80175C48();
     }
 }
 
