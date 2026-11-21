@@ -99,6 +99,11 @@
  "changelog": [
   {
    "date": "2026-11-21",
+   "time": "22:36",
+   "text": "The loader converts the level's zone records and its animated materials (PR #34), the data the world update walks every frame."
+  },
+  {
+   "date": "2026-11-21",
    "time": "22:14",
    "text": "The level camera is complete on Windows (PRs #32 and #33): the follow step and the collision solver that keeps the camera out of walls are decompiled and checked against the original code. The boot gets past the camera set-up and now stops on level data the loader doesn't convert yet."
   },
