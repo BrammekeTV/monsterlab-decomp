@@ -311,9 +311,11 @@ static void __cdecl DemoLanding(void) {
     PortLockLeave();                             // the demo takes the lock itself
     PortDemoMain();
 }
-static BOOL DemoTakesOver(CONTEXT* c) {
+static BOOL DemoRedirect(CONTEXT* c, BOOL onMainThread);
+static BOOL DemoTakesOver(CONTEXT* c) { return DemoRedirect(c, TRUE); }
+static BOOL DemoRedirect(CONTEXT* c, BOOL onMainThread) {
     static LONG taken;
-    if (gPortOptions.showTexture < 0 || GetCurrentThreadId() != sMainThreadId) return FALSE;
+    if (gPortOptions.showTexture < 0 || (onMainThread && GetCurrentThreadId() != sMainThreadId)) return FALSE;
     if (InterlockedExchange(&taken, 1)) return FALSE;
     char who[160];
     PortLog("the boot stopped at %s; --show-texture takes over", PortDescribePc((void*)(uintptr_t)c->Eip, who, sizeof(who)));
@@ -593,6 +595,16 @@ static DWORD WINAPI WatchdogThread(void*) {
     SuspendThread(sMainThread);
     CONTEXT c;
     c.ContextFlags = CONTEXT_CONTROL;
+    // --show-texture: a main thread that loops in game code (it then holds the lock) goes to
+    // the demo, and gets the same time again.
+    if (gPortOptions.showTexture >= 0 && GetThreadContext(sMainThread, &c) && c.Eip >= sImageLo && c.Eip < sImageHi && DemoRedirect(&c, FALSE)) {
+        c.ContextFlags = CONTEXT_CONTROL;
+        SetThreadContext(sMainThread, &c);
+        ResumeThread(sMainThread);
+        Sleep((DWORD)gPortOptions.secondsLimit * 1000);
+        SuspendThread(sMainThread);
+        c.ContextFlags = CONTEXT_CONTROL;
+    }
     if (GetThreadContext(sMainThread, &c)) {
         PortDescribePc((void*)(uintptr_t)c.Eip, where, sizeof(where));
         fprintf(stderr, "\n[port] time limit: the main thread is at %s\n", where);

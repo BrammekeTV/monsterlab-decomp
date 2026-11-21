@@ -304,13 +304,20 @@ What it does:
   memory (`loadTlut`).
 - **Output state.** Blending, colour/alpha write masks, depth test, culling, viewport and
   scissor from the BP and XF registers.
+- **Indirect textures.** A stage's coordinate can be offset by a texture sampled in an
+  "indirect stage" (BP 0x10+n, 0x27, the three matrices at 0x06-0x0E, coordinate scale and the
+  wrap modes). The engine's post-processing depends on it: every frame it copies the red,
+  green and blue channel of the frame buffer into three intensity textures and draws the
+  screen three times, each pass looking its channel up in a 256x4 tone curve through an
+  indirect stage. The two "dynamic" matrix kinds are not implemented.
 - **Copies.** BP 0x52: a display copy shows the frame buffer in the window (and keeps it for
-  `--screenshot`); a copy to a texture keeps a snapshot at the frame buffer's resolution, used
-  when a texture with that address is bound; then the clear, if asked.
+  `--screenshot`); a copy to a texture keeps a picture at the frame buffer's resolution, used
+  when a texture with that address is bound: a single channel as an intensity texture when the
+  copy format asks for red, green, blue or alpha, the colour picture otherwise; then the clear,
+  if asked.
 
-Not done: indirect textures, fog, Z textures, lines and points (counted as skipped draws),
-mipmaps, the copy formats and filters (a copy to a texture is a plain RGBA snapshot), specular
-lights.
+Not done: fog, Z textures, lines and points (counted as skipped draws), mipmaps, the copy
+filter and gamma, the dynamic indirect matrices, specular lights.
 
 **Byte order of texture data.** Texture pixels and palettes are decoded as console bytes: that
 is what the disc data is. Textures the game builds at run time (`fn_80149B4C` for the built-in
@@ -321,7 +328,8 @@ code that produces them has to write console order on PC. Not done yet.
 before each copy to `build/pc/efb_NN.png`.
 
 **`--show-texture N`** (`port_demo.cpp`) exists because the boot does not reach the game's own
-screens yet. When the main thread would stop, it goes on in the demo instead: it binds texture
+screens yet. When the main thread would stop (or still loops in game code at the time limit), it
+goes on in the demo instead: it binds texture
 N with the engine's bind function, calls `DrawFullscreenTexture` for the 2D state and
 projection, and draws a quad with the engine's array draw. (`DrawFullscreenTexture`'s own quad
 cannot be seen: it lies at view z = -1 while its projection shows 0 to 1, and the function it
@@ -398,10 +406,8 @@ MSVC only for now (absolute symbols, `/alternatename`, structured exception hand
    crashes or wrong behaviour further in. `monsterlab.exe --verbose` lists them.
 4. **The rest of the renderer** (see "GX: the renderer" for what exists): the SDK-level calls
    in `port_sdk.cpp` that still only record state (`GXSetBlendMode`, `GXSetZMode`,
-   `GXSetTevOrder`, ...) have to send their registers into the stream; indirect textures, fog,
-   Z textures, lines and points; mipmaps; the frame-buffer copy filters the engine's
-   post-processing relies on (it copies with intensity formats). And the byte order of texture
-   data built at run time (see there).
+   `GXSetTevOrder`, ...) have to send their registers into the stream; fog, Z textures, lines
+   and points; mipmaps. And the byte order of texture data built at run time (see there).
 5. **SDK names**: the functions `port_sdk.cpp` defines as `fn_8024xxxx` are identified in its
    comments (`VIConfigure`, `GXSetViewport`, ...). Renaming them with `tools/rename.py` needs
    the definitions in `src/port/` and the callers renamed in the same change.
