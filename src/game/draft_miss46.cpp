@@ -140,7 +140,7 @@ void fn_800D70EC(s32* rec, f32 amount);              // 0x800D70EC (registers a 
 s32 fn_800D4730(void* db, s32 id);                   // 0x800D4730
 s32 PartGetCurrentHealth(const PartInstance* p);  // 0x8021EF68
 void fn_801499F8(u8* target, s32 w, s32 h, s32 fmt, s32 a, s32 b, const char* name);  // 0x801499F8
-void fn_80156F70(s32 idx, s32 a);                    // 0x80156F70
+u32* fn_80156F70(s32 table, s32 enable);                    // 0x80156F70
 u8* fn_80156AC0(s32 a);                             // 0x80156AC0
 void fn_8015D2B8(RendVideo* video, s32 a, void (*cb)(void));  // 0x8015D2B8
 void fn_80157494(void);                              // 0x80157494

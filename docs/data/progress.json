@@ -1,15 +1,15 @@
 {
  "game_id": "RM7P4F",
- "generated": "2026-11-21T16:02:14+00:00",
- "commit": "90ca847",
- "commit_date": "2026-11-21T13:05:22+01:00",
+ "generated": "2026-11-21T16:12:19+00:00",
+ "commit": "5cb9327",
+ "commit_date": "2026-11-21T17:02:15+01:00",
  "game": {
   "functions": 8548,
   "bytes": 2265988,
   "named": 2748,
   "named_bytes": 616800,
-  "decompiled": 7230,
-  "decompiled_bytes": 1679568
+  "decompiled": 7253,
+  "decompiled_bytes": 1698804
  },
  "library": {
   "functions": 4039,
@@ -24,8 +24,8 @@
   "bytes": 3404928,
   "named": 3211,
   "named_bytes": 721548,
-  "decompiled": 7231,
-  "decompiled_bytes": 1679688
+  "decompiled": 7254,
+  "decompiled_bytes": 1698924
  },
  "game_range": [
   "80006B40",
@@ -653,7 +653,7 @@
    0.0
   ],
   [
-   0.755,
+   0.922,
    0.076
   ],
   [
@@ -669,23 +669,23 @@
    0.327
   ],
   [
-   0.387,
+   0.784,
    0.042
   ],
   [
-   0.619,
+   0.932,
    0.0
   ],
   [
-   0.101,
+   0.591,
    0.0
   ],
   [
-   0.066,
+   0.11,
    0.0
   ],
   [
-   0.028,
+   0.533,
    0.0
   ],
   [
@@ -693,11 +693,11 @@
    0.022
   ],
   [
-   0.586,
+   0.699,
    0.0
   ],
   [
-   0.959,
+   1.0,
    0.078
   ],
   [
@@ -709,7 +709,7 @@
    0.0
   ],
   [
-   0.876,
+   0.916,
    0.071
   ],
   [
@@ -13759,6 +13759,141 @@
      "name": "SaveQueueEvent",
      "addr": "8022DEE8",
      "size": 84
+    }
+   ]
+  },
+  {
+   "path": "src/game/draft_miss381.cpp",
+   "functions": [
+    {
+     "name": "fn_80156F40",
+     "addr": "80156F40",
+     "size": 24
+    },
+    {
+     "name": "fn_80156F58",
+     "addr": "80156F58",
+     "size": 24
+    },
+    {
+     "name": "fn_80160808",
+     "addr": "80160808",
+     "size": 192
+    },
+    {
+     "name": "fn_80165EF0",
+     "addr": "80165EF0",
+     "size": 324
+    },
+    {
+     "name": "fn_8016F648",
+     "addr": "8016F648",
+     "size": 168
+    },
+    {
+     "name": "fn_8016F6FC",
+     "addr": "8016F6FC",
+     "size": 28
+    },
+    {
+     "name": "fn_8016F798",
+     "addr": "8016F798",
+     "size": 88
+    },
+    {
+     "name": "fn_8016F7F0",
+     "addr": "8016F7F0",
+     "size": 88
+    },
+    {
+     "name": "fn_80174A80",
+     "addr": "80174A80",
+     "size": 68
+    },
+    {
+     "name": "fn_801758B0",
+     "addr": "801758B0",
+     "size": 248
+    },
+    {
+     "name": "fn_801759D0",
+     "addr": "801759D0",
+     "size": 60
+    }
+   ]
+  },
+  {
+   "path": "src/game/draft_miss382.cpp",
+   "functions": [
+    {
+     "name": "fn_801561C0",
+     "addr": "801561C0",
+     "size": 1320
+    },
+    {
+     "name": "fn_8015ECA8",
+     "addr": "8015ECA8",
+     "size": 692
+    },
+    {
+     "name": "fn_8015F224",
+     "addr": "8015F224",
+     "size": 680
+    },
+    {
+     "name": "fn_8015F4CC",
+     "addr": "8015F4CC",
+     "size": 2112
+    }
+   ]
+  },
+  {
+   "path": "src/game/draft_miss383.cpp",
+   "functions": [
+    {
+     "name": "fn_80161464",
+     "addr": "80161464",
+     "size": 940
+    },
+    {
+     "name": "fn_80161810",
+     "addr": "80161810",
+     "size": 332
+    },
+    {
+     "name": "fn_80161BAC",
+     "addr": "80161BAC",
+     "size": 1296
+    },
+    {
+     "name": "fn_8016B898",
+     "addr": "8016B898",
+     "size": 620
+    },
+    {
+     "name": "fn_8016CBC4",
+     "addr": "8016CBC4",
+     "size": 412
+    }
+   ]
+  },
+  {
+   "path": "src/game/draft_miss384.cpp",
+   "functions": [
+    {
+     "name": "fn_80163C60",
+     "addr": "80163C60",
+     "size": 2696
+    },
+    {
+     "name": "fn_801649B4",
+     "addr": "801649B4",
+     "size": 2412
+    },
+    {
+     "name": "fn_80166FC4",
+     "addr": "80166FC4",
+     "size": 4412
     }
    ]
   },

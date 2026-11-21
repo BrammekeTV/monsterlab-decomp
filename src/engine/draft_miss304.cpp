@@ -14,7 +14,7 @@ s32   HeapInit(u8* arg0, u8* arg1, u32 arg2);                // 0x801EF8DC
 void  fn_800446BC(void* cam, s32 v);                         // 0x800446BC
 void  fn_8010AB0C(s32 a, s32 b);                             // 0x8010AB0C
 void  fn_8014E3EC(s32 n);                                    // 0x8014E3EC
-s32   fn_80152620(s32 a, s32 b, u8* quad);                   // 0x80152620
+void   fn_80152620(s32 a, s32 b, u8* quad);                   // 0x80152620
 void  fn_80155724(u8* m);                                    // 0x80155724
 void* fn_801B7198(void* anim, s32 a);                        // 0x801B7198
 u32   fn_801CB96C(u8* list);                                 // 0x801CB96C (leaf)

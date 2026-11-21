@@ -40,7 +40,7 @@ void  fn_8010AB70(void);                                        // 0x8010AB70
 void  fn_80149094(Vec3* out);                                   // 0x80149094
 void  fn_8014DE68(void);                                        // 0x8014DE68
 void  fn_8014E3EC(s32 n);                                       // 0x8014E3EC
-s32   fn_80152620(s32 a, s32 b, u8* quad);                      // 0x80152620
+void   fn_80152620(s32 a, s32 b, u8* quad);                      // 0x80152620
 s32   fn_80151644(s32 a, s32 b, u8* quad);                      // 0x80151644
 void  fn_80154318(void);                                        // 0x80154318
 void  fn_80155724(u8* m);                                       // 0x80155724

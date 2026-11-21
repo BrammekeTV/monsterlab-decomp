@@ -607,16 +607,17 @@ void fn_8014FCB8(void) {
 // Fills the selected 256-entry colour table (opaque black base) with a ramp on one channel:
 // table 0 steps the low byte, table 1 the next byte, table 2 the third byte. Does nothing when
 // `enable` is 0.
-void fn_80156F70(s32 table, s32 enable) {
-    if (enable == 0) return;
-    if (table < 0 || table > 2) return;
-    u32* p = *(u32**)(lbl_80401C30 + table * 4);
+u32* fn_80156F70(s32 table, s32 enable) {
+    u32* p = *(u32**)(lbl_80401C30 + table * 4);   // returned in every case
+    if (enable == 0) return p;
+    if (table < 0 || table > 2) return p;
     u32 step = (table == 0) ? 1u : (table == 1) ? 0x100u : 0x10000u;
     u32 v = 0xFF000000u;
     for (s32 n = 0; n < 256; n++) {
         p[n] = v;
         v += step;
     }
+    return p;
 }
 
 // 0x80157324

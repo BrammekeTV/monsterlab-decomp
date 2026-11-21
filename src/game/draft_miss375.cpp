@@ -4,7 +4,7 @@
 
 extern "C" {
 void  fn_80155724(u8* m);                          // 0x80155724
-void  fn_801561C0(void);                           // 0x801561C0
+void fn_801561C0(f32 scale);                           // 0x801561C0
 s32   fn_801704F8(f32* scale);                     // 0x801704F8
 void  fn_80173438(u8* res, s32 type, s32 flag, u8* p);  // 0x80173438
 void* fn_80183FCC(u8* p, s32 idx);                 // 0x80183FCC
@@ -99,7 +99,7 @@ void fn_80170C28(u8* arg0, u8* arg1, s32 arg2) {
             *(f32*)(lbl_80400FF0 + 0x4) = *(f32*)(arg0 + 0x28);
             *(f32*)(lbl_80400FF0 + 0x8) = *(f32*)(arg0 + 0x2C);
         } else {
-            fn_801561C0();
+            fn_801561C0(1.0f);  // scale is a leftover f1 in the asm; 1.0 assumed
         }
     }
     fn_80173438(arg1, arg2, var_r31, arg0 + 0x3C);

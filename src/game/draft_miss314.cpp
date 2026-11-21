@@ -30,7 +30,7 @@ f32   fn_800C11F0(f32 x);                             // 0x800C11F0
 void  fn_8010AB3C(void);                              // 0x8010AB3C
 void  fn_8010AB70(void);                              // 0x8010AB70
 void  fn_80149094(Vec3* out);                         // 0x80149094
-s32   fn_80152620(s32 a, s32 b, u8* quad);            // 0x80152620
+void   fn_80152620(s32 a, s32 b, u8* quad);            // 0x80152620
 void  fn_80154318(void);                              // 0x80154318
 void  fn_80155724(u8* m);                             // 0x80155724
 u8*   fn_8016EB20(u8* m);                             // 0x8016EB20 (returns its argument)

@@ -99,6 +99,11 @@
  "changelog": [
   {
    "date": "2026-11-21",
+   "time": "17:12",
+   "text": "Round 56: 24 more renderer/video functions (film dust/grain, colour grading, water height field, effect type dispatcher, fade tables, frustum tests)"
+  },
+  {
+   "date": "2026-11-21",
    "time": "17:02",
    "text": "Round 55: 40 more renderer/video functions (quad draw, texture deswizzle, 21-case effect dispatcher, segment-triangle queries, bone transforms, glyph batch draw)"
   },
