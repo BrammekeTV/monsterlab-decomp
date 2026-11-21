@@ -749,6 +749,65 @@ struct ZoneDump {
         }
     }
 
+    // The zone records (zone slot +0xFC) and what WorldTick reaches through their list at +0x10.
+    std::vector<const u8*> players, tracks;
+    void Ptrs(const u8* at, u32 n) { for (u32 i = 0; i < n; i++) { printf(i ? " " : ""); Ptr(at + i * 4); } }
+    void Player(const u8* a) {
+        if (!In(a, ANIM_PLAYER_HEAD) || std::find(players.begin(), players.end(), a) != players.end()) return;
+        players.push_back(a);
+        u32 mode = *(const u32*)(a + 4), elems = *(const u32*)(a + 8), count = *(const u32*)(a + 0x10), stride = *(const u32*)(a + 0x18);
+        printf("animplayer "); Val(a); printf(" mode %u elems 0x%x count %u track ", mode, elems, count); Ptr(a + 0x14);
+        printf(" stride %u flags %u %u time %08x keys ", stride, *(const u32*)(a + 0x1C), *(const u32*)(a + 0x20), Bits(*(const f32*)(a + 0x24)));
+        Ptrs(a + 0x28, count); printf("\n");
+        if (mode != 1) return;
+        for (u32 i = 0; i < count; i++) {
+            const u8* e = a + elems + i * stride;
+            printf("animelem "); Val(e); printf(" %08x %08x\n", *(const u32*)e, *(const u32*)(e + 8));
+        }
+        const u8* t = *(const u8**)(a + 0x14);
+        if (!In(t, 0x28) || std::find(tracks.begin(), tracks.end(), t) != tracks.end()) return;
+        tracks.push_back(t);
+        const u8* table = t + *(const u32*)(t + 0x24);
+        printf("animtrack "); Val(t); printf(" length %08x table 0x%x\n", Bits(*(const f32*)(t + 0x20)), *(const u32*)(t + 0x24));
+        for (u32 i = 0; i < count; i++) {
+            const u8* first = t + *(const u32*)(table + i * 8);
+            const u8* k = first;
+            u32 n = 0, total = 0;
+            for (;; k += 8) {
+                n++; total += *(const u16*)k + *(const u32*)(k + 4);
+                if (*(const u16*)k == 0xFFFF) break;
+            }
+            printf("animkeys "); Val(first);
+            printf(" rel 0x%x keys %u first %04x %08x last %08x sum %08x\n", *(const u32*)(table + i * 8), n, *(const u16*)first,
+                   *(const u32*)(first + 4), *(const u32*)(k + 4), total);
+        }
+    }
+    void Records(const LevelZoneRoots* roots, u32 zoneBase) {
+        for (u32 i = 0; i < roots->zoneRecordCount; i++) {
+            const u8* rec = z->image + (roots->zoneRecords[i] - zoneBase);
+            if (!In(rec, 0x14)) continue;
+            printf("zonerecord "); Val(rec); printf(" list "); Ptr(rec + 0x10); printf("\n");
+            for (const u8* node = *(const u8**)(rec + 0x10); node != NULL && In(node - 0x10, ZONE_SYSTEM_USED); ) {
+                const u8* s = node - 0x10;
+                printf("zonesystem "); Val(s); printf(" w8 "); Ptr(s + 8); printf(" next "); Ptr(s + 0x10);
+                printf(" out "); Ptrs(s + 0x3C, 8); printf(" players "); Ptrs(s + 0x5C, 8); printf(" extra "); Ptr(s + 0x7C); printf("\n");
+                for (u32 k = 0; k < 8; k++) {
+                    const u8* pl = *(const u8**)(s + 0x5C + k * 4);
+                    const u8* out = *(const u8**)(s + 0x3C + k * 4);
+                    if (pl == NULL) continue;
+                    if (In(out, 0x30)) {
+                        printf("animout "); Val(out);
+                        for (u32 w = 0; w < 12; w++) printf(" %08x", Bits(*(const f32*)(out + w * 4)));
+                        printf("\n");
+                    }
+                    Player(pl);
+                }
+                Player(*(const u8**)(s + 0x7C));
+                node = *(const u8**)(s + 0x10);
+            }
+        }
+    }
+
     void Entities() {
         for (size_t i = 0; i < ents.size(); i++) {
             const u8* e = ents[i];
@@ -918,6 +977,7 @@ static int DumpLevel(const char* path) {
     for (u32 i = 0; i < roots.sceneObjectCount; i++) zd.Add(zd.scene, f.zone + (roots.sceneObjects[i] - zoneBase));
     zd.PoolTables(&roots, zoneBase);
     zd.Entities();
+    zd.Records(&roots, zoneBase);
     if (hudInZone) DumpMachines(&z, hud, *(const u8**)(hud + 0x434), true, &zd.machines);
     LevelZoneRootsFree(&roots);
     printf("report image %u dolkept %u dolresolved %u unknown %u\n", r.ptrImage, r.ptrDolKept, r.ptrDolResolved, r.ptrUnknown);
@@ -1432,7 +1492,11 @@ static SirError ConvertBuilt(u8* hdr, u8* img, SirReloc* r, s32* failTable) {
 #define L_POOL     0x8D0u                     // pool of two 0x10-byte items that each hold a state machine
 #define L_POOLBLK  0x900u                     // its block: next-block word, nodes at +0x08 and +0x20
 #define L_DEF      0x940u                     // the entity's definition (a prop: 0xC0 used)
-#define L_ZONE_SIZE 0xA00u
+#define L_SYS      0xA00u                     // one object of the zone record's list (0x80 used); the record is at 0
+#define L_OUT      0xA80u                     // its first player's output, 0x30
+#define L_PLAYER   0xAB0u                     // the player: one channel, its element at +0x30
+#define L_TRACK    0xAF0u                     // the track: channel table at +0x30, two keys at +0x38
+#define L_ZONE_SIZE 0xB40u
 
 static void BuildLevel(u8* hdr, u8* zone) {
     memset(hdr, 0, L_HDR_SIZE);
@@ -1501,6 +1565,26 @@ static void BuildLevel(u8* hdr, u8* zone) {
     Put32(def + 0x08, 0x325462E8); Put32(def + 0x24, 0x3F800000);
     Put32(def + 0x64, 0x0003FFFF);                             // no reader: stays big-endian
     Put32(def + 0x68, 0x0003FFFF); Put32(def + 0xBC, 0x00100080);
+
+    // The zone records the two slots name (+0xFC): the first has a list of one object, the second none.
+    Put32(zone + 0x10, L_ZONE + L_SYS + 0x10);
+    Put32(zone + 0x50, 0);
+    u8* sys = zone + L_SYS;
+    memset(sys, 0, 0x80);
+    Put32(sys + 0x00, 0x53);                                   // no reader: stays big-endian
+    Put32(sys + 0x3C, L_ZONE + L_OUT); Put32(sys + 0x5C, L_ZONE + L_PLAYER);
+    for (u32 k = 0; k < 12; k++) Put32(zone + L_OUT + k * 4, 0x3F800000);
+    u8* pl = zone + L_PLAYER;
+    memset(pl, 0, 0x3C);
+    Put32(pl + 0x04, 1); Put32(pl + 0x08, 0x30); Put32(pl + 0x10, 1); Put32(pl + 0x14, L_ZONE + L_TRACK);
+    Put32(pl + 0x18, 0xC); Put32(pl + 0x24, 0x40000000); Put32(pl + 0x28, L_ZONE + L_TRACK + 0x38);
+    Put32(pl + 0x30, 0x49F); Put32(pl + 0x34, 0x11223344); Put32(pl + 0x38, 0x3F000000);
+    u8* tr = zone + L_TRACK;
+    memset(tr, 0, 0x48);
+    Put32(tr + 0x20, 0x41200000); Put32(tr + 0x24, 0x30);
+    Put32(tr + 0x30, 0x38); Put32(tr + 0x34, 2);               // channel table: offset of the keys; +4 has no reader
+    Put16(tr + 0x38, 0); Put32(tr + 0x3C, 0x3F800000);
+    Put16(tr + 0x40, 0xFFFF); Put32(tr + 0x44, 0x40000000);
     Put32(e + 0x034, 0x0003FFFF);                              // no reader yet: stays big-endian
     Put32(e + 0x090, L_ZONE + L_SCENE);
     Put32(e + 0x0A4, L_ZONE + L_HOLDER);
@@ -1557,6 +1641,7 @@ static void LevelSelfTest(void) {
     LevelZoneRoots roots;
     CHECK(LevelZoneRootsCollect(hdr, L_HDR_SIZE, zone, L_ZONE_SIZE, L_ZONE, &roots));
     CHECK(roots.hud == L_ZONE + L_HUD);
+    CHECK(roots.zoneRecordCount == 2 && roots.zoneRecords[0] == L_ZONE && roots.zoneRecords[1] == L_ZONE + 0x40);
     CHECK(roots.entityCount == 1 && roots.entities[0] == L_ZONE + L_ENT && roots.sceneObjectCount == 1);
     CHECK(roots.poolTableCount == 1 && roots.poolTables[0] == L_ZONE + L_POOLTAB && roots.poolTables[1] == 1);
     CHECK(LevelZoneConvert(&r, zone, L_ZONE_SIZE, L_ZONE, &roots) == SIR_OK);
@@ -1596,6 +1681,17 @@ static void LevelSelfTest(void) {
     CHECK(*(const u32*)(ent + 0x2C) == 0xBA4E36A9 && *(const f32*)(ent + 0x14) == 2.0f && *(const u32*)(ent + 0x68) == 0x0003FFFF);
     CHECK(*(const u32*)(ent + 0xEC) == 0x6C938971 && def == zone + L_DEF && *(const u32*)(def + 8) == 0x325462E8);
     CHECK(*(const f32*)(def + 0x24) == 1.0f && *(const u32*)(def + 0xBC) == 0x00100080 && def[0x64] == 0x00 && def[0x67] == 0xFF);
+    // The zone record's list, as WorldTick walks it, and the player as fn_8016A64C and its helpers read it.
+    const u8* sys = *(const u8**)(zone + 0x10) - 0x10;
+    const u8* pl = *(const u8**)(sys + 0x5C);
+    CHECK(sys == zone + L_SYS && sys[3] == 0x53 && *(const u8**)(sys + 0x10) == NULL && *(const u8**)(zone + 0x50) == NULL);
+    CHECK(*(const f32*)(*(const u8**)(sys + 0x3C) + 0x2C) == 1.0f && pl == zone + L_PLAYER && *(const u8**)(sys + 0x7C) == NULL);
+    const u8* tr = *(const u8**)(pl + 0x14);
+    CHECK(*(const s32*)(pl + 4) == 1 && *(const s32*)(pl + 0x10) == 1 && *(const s32*)(pl + 0x18) == 0xC && *(const f32*)(pl + 0x24) == 2.0f);
+    CHECK(tr == zone + L_TRACK && *(const u8**)(pl + 0x28) == tr + 0x38 && *(const u32*)(pl + 0x30) == 0x49F && *(const f32*)(pl + 0x38) == 0.5f);
+    CHECK(pl[0x34] == 0x11 && *(const f32*)(tr + 0x20) == 10.0f && *(const s32*)(tr + 0x24) == 0x30 && *(const s32*)(tr + 0x30) == 0x38);
+    CHECK(tr[0x37] == 2 && *(const u16*)(tr + 0x38) == 0 && *(const f32*)(tr + 0x3C) == 1.0f && *(const u16*)(tr + 0x40) == 0xFFFF);
+    CHECK(*(const f32*)(tr + 0x44) == 2.0f);
     CHECK(*(const f32*)(rec + 0x18) == 1.0f && *(const u32*)(rec + 0x1C) == 0x46 && *(const u32*)(rec + 0x20) == 0x100);
     CHECK(*(const u16*)(rec + 0x30) == 0x1234 && rec[0x34] == 6 && rec[0x3A] == 0xFF);
     CHECK(*(const f32*)(ent + 0x158) == 1.0f && *(const u32*)(ent + 0x1B0) == 0x40 && *(const u8**)(ent + 0x8C) == NULL);
@@ -1634,6 +1730,11 @@ static void LevelSelfTest(void) {
         { true, L_POOLBLK + 0x10, L_ZONE + L_ENT + 0x10, SIR_ERR_OVERLAP },        // pooled "machine" inside the entity
         { true, L_ENT + 0xA4, L_ZONE + L_RECORD + 0x20, SIR_ERR_OVERLAP },         // holder inside the record
         { true, L_ENT + 0x9C, L_ZONE + L_SCENE, SIR_ERR_OVERLAP },                 // prop "definition" on the scene object
+        { true, 0x10, L_ZONE + L_ZONE_SIZE - 0x20, SIR_ERR_ZONE_RECORD },          // list object runs off the zone
+        { true, L_SYS + 0x10, L_ZONE + L_SYS + 0x10, SIR_ERR_ZONE_RECORD },        // list that loops
+        { true, L_TRACK + 0x40, 0x00010000, SIR_ERR_ZONE_RECORD },                 // keys without an end run off the zone
+        { true, L_PLAYER + 0x18, 4, SIR_ERR_ZONE_RECORD },                         // element stride too small
+        { true, L_SYS + 0x5C, L_ZONE + L_ENT + 0x100, SIR_ERR_OVERLAP },           // "player" inside the entity
     };
     for (const BadLevel& c : bad) {
         BuildLevel(hdr, zone);
@@ -1650,6 +1751,8 @@ static void LevelSelfTest(void) {
         named.hud = L_ZONE + L_HUD;
         named.entities = &entity;      named.entityCount = 1;
         named.poolTables = poolTable;  named.poolTableCount = 1;
+        u32 zoneRecords[2] = { L_ZONE, L_ZONE + 0x40 };
+        named.zoneRecords = zoneRecords; named.zoneRecordCount = 2;
         SirError e = c.inZone ? LevelZoneConvert(&r, zone, L_ZONE_SIZE, L_ZONE, &named) : LevelHeaderConvert(&r, hdr, L_HDR_SIZE);
         CHECK(e == c.want);
         CHECK(memcmp(hdrCopy, hdr, L_HDR_SIZE) == 0 && memcmp(zoneCopy, zone, L_ZONE_SIZE) == 0);
