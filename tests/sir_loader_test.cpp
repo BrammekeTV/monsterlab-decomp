@@ -211,7 +211,8 @@ static void AddUnique(std::vector<const u8*>& list, const u8* p) {
 // UI root, fonts, the objects of slots 0xDB4-0xDBC and the screen state machines, read at the
 // offsets the game code uses (ScreenSetsInit, fn_8018C9DC, HudReset, HudUpdateScreens, fn_801BB8A0,
 // fn_801BC5F0, ...), in the text format of `tools/sir_decoder.py --image`.
-static void DumpMachines(const GlobalBinaryFile* f, const u8* hud, const u8* list, bool level);
+static void DumpMachines(const GlobalBinaryFile* f, const u8* hud, const u8* list, bool level,
+                         const std::vector<const u8*>* extra = NULL);
 
 static void DumpUi(const GlobalBinaryFile* f) {
     const u8* root = *(const u8**)(f->hdr + 0xDB0);
@@ -284,7 +285,7 @@ static void DumpUi(const GlobalBinaryFile* f) {
 
 // A HUD and its state machines. `f->image` is the image they live in: global_binary.sir's, or a
 // level zone's, where the HUD holds the screen-list slot itself (`level`).
-static void DumpMachines(const GlobalBinaryFile* f, const u8* hud, const u8* list, bool level) {
+static void DumpMachines(const GlobalBinaryFile* f, const u8* hud, const u8* list, bool level, const std::vector<const u8*>* extra) {
     u32 count = *(const u32*)(hud + 0x428);
     u32 spare = 0;
     for (u32 i = count; i < HUD_MACHINES; i++) spare += *(const u8**)(hud + 0x28 + i * 4) != NULL;
@@ -315,6 +316,7 @@ static void DumpMachines(const GlobalBinaryFile* f, const u8* hud, const u8* lis
         printf("\n");
         AddUnique(machines, *(const u8**)(hud + 0x28 + i * 4));
     }
+    if (extra != NULL) for (const u8* m : *extra) AddUnique(machines, m);
     for (const u8* m : machines) {
         printf("fsm ");
         PrintPtr((const u8*)&m, f);
@@ -671,6 +673,133 @@ static void PrintLevelEntries(const u8* t, const LevelFile* f) {
     if (shown == 0) printf("-");
 }
 
+// What the loader converts in a level zone, read at the offsets fn_8012F8B8, fn_8012F6B0,
+// fn_801DB1AC and the fix-up callbacks use: pool tables and pools, entities (first layer), scene
+// objects, then the HUD and every state machine found on the way. Text format of
+// `tools/sir_decoder.py --level`. `z->image` is the zone image.
+struct ZoneDump {
+    const GlobalBinaryFile* z;
+    std::vector<const u8*> ents, scene, machines, projectiles;
+
+    bool In(const u8* p, u32 n = 1) const { return p != NULL && p >= z->image && p + n <= z->image + z->imageSize; }
+    void Add(std::vector<const u8*>& list, const u8* p, u32 n = 1) { if (In(p, n)) AddUnique(list, p); }
+    void Ptr(const u8* slot) const { PrintPtr(slot, z); }
+    void Val(const u8* p) const { PrintPtr((const u8*)&p, z); }
+
+    void Parts(const u8* c) {
+        if (!In(c, 0x14)) return;
+        u32 n = *(const u32*)(c + 0x10);
+        printf("entparts "); Val(c); printf(" items "); Ptr(c + 0xC); printf(" %u\n", n);
+        for (u32 i = 0; i < n; i++) {
+            const u8* it = (*(const u8***)(c + 0xC))[i];
+            if (!In(it, 0x2C)) continue;
+            u32 m = *(const u32*)(it + 0x28);
+            printf("entitem "); Val(it); printf(" parts "); Ptr(it + 0x24); printf(" %u\n", m);
+            for (u32 k = 0; k < m; k++) {
+                const u8* part = (*(const u8***)(it + 0x24))[k];
+                if (!In(part, 0x10)) continue;
+                printf("entpart "); Val(part);
+                printf(" %08x %08x kind %u\n", *(const u32*)part, *(const u32*)(part + 4), *(const u32*)(part + 0xC));
+            }
+        }
+    }
+
+    void PoolTables(const LevelZoneRoots* roots, u32 zoneBase) {
+        for (u32 t = 0; t < roots->poolTableCount; t++) {
+            const u8* table = z->image + (roots->poolTables[t * 2] - zoneBase);
+            for (u32 i = 0; i < roots->poolTables[t * 2 + 1]; i++) {
+                const u8* e = table + i * POOL_TABLE_ENTRY;
+                const u8* pool = *(const u8**)(e + 4);
+                s32 fix = *(const s32*)(e + 0xC);
+                printf("pooltable "); Val(table); printf(" %u pool ", i); Ptr(e + 4);
+                printf(" fixup %d type %d\n", fix, *(const s32*)(e + 0x1C));
+                if (!In(pool, POOL_SIZE)) continue;
+                u32 items = *(const u32*)pool, size = *(const u32*)(pool + 4), align = *(const u32*)(pool + 8);
+                const u8* block = *(const u8**)(pool + 0x24);
+                printf("levelpool "); Val(pool);
+                printf(" items %u size %u align %u used %u free ", items, size, align, *(const u32*)(pool + 0xC));
+                Ptr(pool + 0x10); printf(" inuse "); Ptr(pool + 0x14); printf(" parent "); Ptr(pool + 0x18);
+                printf(" blocks "); Ptr(pool + 0x1C); printf(" grow %u block ", pool[0x20]); Ptr(pool + 0x24);
+                printf(" alloc %d\n", *(const s32*)(pool + 0x28));
+                // fn_801EBAB8 aligns on the block's Wii address. The node links, as Wii addresses.
+                u32 blockWii = zoneBase + (u32)(block - z->image);
+                u32 firstWii = ((blockWii + 4 + align + 7) & ~(align - 1)) - 8;
+                const u8* first = z->image + (firstWii - zoneBase);
+                u32 h = 0x811C9DC5u;
+                for (u32 k = 0; k < items; k++) {
+                    for (u32 w = 0; w < 2; w++) {
+                        const u8* link = *(const u8**)(first + k * (size + 8) + w * 4);
+                        u32 v = link == NULL ? 0 : In(link) ? zoneBase + (u32)(link - z->image) : *(const u32*)(first + k * (size + 8) + w * 4);
+                        for (s32 shift = 24; shift >= 0; shift -= 8) h = (h ^ ((v >> shift) & 0xFF)) * 0x01000193u;
+                    }
+                }
+                printf("levelpoolnodes "); Val(pool); printf(" first "); Val(first); printf(" sum %08x\n", h);
+                for (u32 k = 0; k < items; k++) {
+                    const u8* item = first + k * (size + 8) + 8;
+                    if (fix == LEVEL_FIXUP_ENTITY || fix == LEVEL_FIXUP_ENTITY_PART || fix == LEVEL_FIXUP_PROJECTILE) Add(ents, item);
+                    if (fix == LEVEL_FIXUP_PROJECTILE) projectiles.push_back(item);
+                    if (fix == LEVEL_FIXUP_POOLED_ENTITY) Add(ents, *(const u8**)item);
+                    if (fix == LEVEL_FIXUP_RENDER_OBJECT) { printf("renderslot "); Val(item); printf(" "); Ptr(item); printf("\n"); }
+                    if (fix == LEVEL_FIXUP_FSM) {
+                        printf("fsmslot "); Val(item); printf(" "); Ptr(item); printf("\n");
+                        Add(machines, *(const u8**)item, FSM_USED);
+                    }
+                }
+            }
+        }
+    }
+
+    void Entities() {
+        for (size_t i = 0; i < ents.size(); i++) {
+            const u8* e = ents[i];
+            if (!In(e, ENTITY_USED)) continue;
+            printf("entity "); Val(e); printf(" vtable %08x record ", *(const u32*)e); Ptr(e + 4);
+            printf(" parts "); Ptr(e + 0x8C); printf(" scene "); Ptr(e + 0x90);
+            printf(" w94 %d %d obj9c ", *(const s32*)(e + 0x94), *(const s32*)(e + 0x98)); Ptr(e + 0x9C);
+            printf(" holder "); Ptr(e + 0xA4); printf(" children "); Ptr(e + 0xB0);
+            printf(" f158 %08x more ", Bits(*(const f32*)(e + 0x158))); Ptr(e + 0x194);
+            printf(" %d w1a8 %d flags %08x\n", *(const s32*)(e + 0x1A4), *(const s32*)(e + 0x1A8), *(const u32*)(e + 0x1B0));
+            const u8* r = *(const u8**)(e + 4);
+            if (In(r, ENTITY_RECORD_SIZE)) {
+                printf("entrecord "); Val(r); printf(" floats");
+                for (u32 k = 0; k < 7; k++) printf(" %08x", Bits(*(const f32*)(r + k * 4)));
+                printf(" w1c %08x %08x f24 %08x w2c %d h30 %u bytes ", *(const u32*)(r + 0x1C), *(const u32*)(r + 0x20),
+                       Bits(*(const f32*)(r + 0x24)), *(const s32*)(r + 0x2C), *(const u16*)(r + 0x30));
+                PrintRaw(r + 0x34, 10);
+                printf("\n");
+            }
+            Parts(*(const u8**)(e + 0x8C));
+            Add(scene, *(const u8**)(e + 0x90), 8);
+            const u8* o9c = *(const u8**)(e + 0x9C);
+            if (In(o9c, 0xC)) { printf("entobj9c "); Val(o9c); printf(" id %08x\n", *(const u32*)(o9c + 8)); }
+            const u8* holder = *(const u8**)(e + 0xA4);
+            if (In(holder, 8)) {
+                printf("entholder "); Val(holder); printf(" machine "); Ptr(holder); printf(" other "); Ptr(holder + 4); printf("\n");
+                Add(machines, *(const u8**)holder, FSM_USED);
+            }
+            u32 more = *(const u32*)(e + 0x1A4);
+            const u8* moreList = *(const u8**)(e + 0x194);
+            if (more != 0 && In(moreList, more * 4))
+                for (u32 k = 0; k < more; k++) Parts(*(const u8**)(moreList + k * 4));
+            std::vector<const u8*> seen;
+            for (const u8* node = *(const u8**)(e + 0xB0); In(node, 0xC) && std::find(seen.begin(), seen.end(), node) == seen.end();
+                 node = *(const u8**)(node + 8)) {
+                seen.push_back(node);
+                printf("entchild "); Val(node); printf(" entity "); Ptr(node + 4); printf(" next "); Ptr(node + 8); printf("\n");
+                Add(ents, *(const u8**)(node + 4));
+            }
+        }
+        for (const u8* s : scene) {
+            u32 type = *(const u32*)(s + 4);
+            printf("sceneobj "); Val(s); printf(" type %u", type);
+            if (type == 2) { printf(" a "); Ptr(s + 0x48); printf(" list "); Ptr(s + 0x4C); }
+            if (type == 3) { printf(" count %d items ", *(const s32*)(s + 0x54)); Ptr(s + 0x58); }
+            printf("\n");
+        }
+        for (const u8* p : projectiles) { printf("projectile "); Val(p); printf(" part "); Ptr(p + 0x22C); printf("\n"); }
+    }
+};
+
 // Loads a level file as the port does (header block, then zone 0) and prints what the loader
 // converted, in the text format of `tools/sir_decoder.py --level`.
 static int DumpLevel(const char* path) {
@@ -704,7 +833,10 @@ static int DumpLevel(const char* path) {
     SirError e = LevelHeaderConvert(&r, f.hdr, f.hdrSize);
     const u8* hud = e == SIR_OK ? *(const u8**)(f.hdr + 0x1F4) : NULL;
     bool hudInZone = hud >= f.zone && hud < f.zone + f.zoneSize;
-    if (e == SIR_OK) e = LevelZoneConvert(&r, f.zone, f.zoneSize, zoneBase, hudInZone ? zoneBase + (u32)(hud - f.zone) : 0);
+    LevelZoneRoots roots;
+    memset(&roots, 0, sizeof(roots));
+    if (e == SIR_OK && !LevelZoneRootsCollect(f.hdr, f.hdrSize, f.zone, f.zoneSize, zoneBase, &roots)) e = SIR_ERR_LEVEL;
+    if (e == SIR_OK) e = LevelZoneConvert(&r, f.zone, f.zoneSize, zoneBase, &roots);
     if (e != SIR_OK) { fprintf(stderr, "%s: %s\n", path, SirErrorText(e)); return 1; }
 
     const u8* h = f.hdr;
@@ -751,7 +883,8 @@ static int DumpLevel(const char* path) {
         printf(" %d %d words %08x %08x %08x %08x %08x bytes %u %u %u actions ", *(const s32*)(s + 0x94), *(const s32*)(s + 0x98),
                *(const u32*)(s + 0xA0), *(const u32*)(s + 0xA8), *(const u32*)(s + 0xBC), *(const u32*)(s + 0xCC), *(const u32*)(s + 0xD0),
                s[0xA4], s[0xAC], s[0xC0]);
-        PrintLevelPtr(s + 0xD4, &f); printf(" zone ");
+        PrintLevelPtr(s + 0xD4, &f); printf(" pools ");
+        PrintLevelPtr(s + 0xE4, &f); printf(" %d zone ", *(const s32*)(s + 0xE8));
         PrintLevelPtr(s + 0xFC, &f);
         printf(" w100 %08x w10c %08x tables ", *(const u32*)(s + 0x100), *(const u32*)(s + 0x10C));
         PrintLevelTable(s + 0x114, &f); printf(" | ");
@@ -761,10 +894,15 @@ static int DumpLevel(const char* path) {
         PrintLevelEntries(s + 0x12C, &f);
         printf("\n");
     }
-    if (hudInZone) {
-        GlobalBinaryFile z = { NULL, f.zone, f.zoneSize };
-        DumpMachines(&z, hud, *(const u8**)(hud + 0x434), true);
-    }
+    GlobalBinaryFile z = { NULL, f.zone, f.zoneSize };
+    ZoneDump zd;
+    zd.z = &z;
+    for (u32 i = 0; i < roots.entityCount; i++) zd.Add(zd.ents, f.zone + (roots.entities[i] - zoneBase));
+    for (u32 i = 0; i < roots.sceneObjectCount; i++) zd.Add(zd.scene, f.zone + (roots.sceneObjects[i] - zoneBase));
+    zd.PoolTables(&roots, zoneBase);
+    zd.Entities();
+    if (hudInZone) DumpMachines(&z, hud, *(const u8**)(hud + 0x434), true, &zd.machines);
+    LevelZoneRootsFree(&roots);
     printf("report image %u dolkept %u dolresolved %u unknown %u\n", r.ptrImage, r.ptrDolKept, r.ptrDolResolved, r.ptrUnknown);
     return 0;
 }
@@ -1268,7 +1406,15 @@ static SirError ConvertBuilt(u8* hdr, u8* img, SirReloc* r, s32* failTable) {
 #define L_HDR_SIZE (L_T1D4 + 0x20)
 #define L_HUD      0x100u                     // in the zone image
 #define L_FSM      0x540u
-#define L_ZONE_SIZE 0x600u
+#define L_ENT      0x600u                     // entity (0x1B4 used)
+#define L_RECORD   0x7C0u                     // its record, 0x40
+#define L_SCENE    0x800u                     // its scene object, type 3: one item pointer at +0x60
+#define L_HOLDER   0x880u                     // its state machine holder
+#define L_CHILD    0x890u                     // one child list node
+#define L_POOLTAB  0x8A0u                     // the slot's pool table: one 0x2C-byte entry
+#define L_POOL     0x8D0u                     // pool of two 0x10-byte items that each hold a state machine
+#define L_POOLBLK  0x900u                     // its block: next-block word, nodes at +0x08 and +0x20
+#define L_ZONE_SIZE 0x940u
 
 static void BuildLevel(u8* hdr, u8* zone) {
     memset(hdr, 0, L_HDR_SIZE);
@@ -1301,7 +1447,8 @@ static void BuildLevel(u8* hdr, u8* zone) {
     u8* s0 = hdr + L_SLOT0;                                    // slot 0: tables behind the slot array
     Put32(s0 + 0x120, L_BASE + L_T120); Put32(s0 + 0x124, 2);
     Put32(s0 + 0x12C, L_BASE + L_T12C); Put32(s0 + 0x130, 2);
-    Put32(hdr + L_T12C, L_ZONE + 0x580);
+    Put32(hdr + L_T12C, L_ZONE + L_ENT);
+    Put32(s0 + 0x0E4, L_ZONE + L_POOLTAB); Put32(s0 + 0x0E8, 1);
     u8* s1 = hdr + L_SLOT1;                                    // slot 1: one entry each, in the slot's last words
     Put32(s1 + 0x120, L_BASE + L_SLOT1 + 0x194); Put32(s1 + 0x124, 1);
     Put32(s1 + 0x12C, L_BASE + L_SLOT1 + 0x198); Put32(s1 + 0x130, 1);
@@ -1320,6 +1467,49 @@ static void BuildLevel(u8* hdr, u8* zone) {
     Put32(m + 0x04, 0xFFFFFFFF); Put32(m + 0x08, 0xFFFFFFFF); Put32(m + 0x0C, 0xFFFFFFFF);
     for (u32 o = 0x10; o < 0x54; o += 4) Put32(m + o, 0);
     Put32(m + 0x54, 0x90E00010);                               // value table in another zone
+
+    u8* e = zone + L_ENT;                                      // an entity as fn_8012F8B8 reads it
+    memset(e, 0, 0x1B4);
+    Put32(e + 0x000, T_VTABLE);
+    Put32(e + 0x004, L_ZONE + L_RECORD);
+    Put32(e + 0x034, 0x0003FFFF);                              // no reader yet: stays big-endian
+    Put32(e + 0x090, L_ZONE + L_SCENE);
+    Put32(e + 0x0A4, L_ZONE + L_HOLDER);
+    Put32(e + 0x0B0, L_ZONE + L_CHILD);
+    Put32(e + 0x158, 0x3F800000);
+    Put32(e + 0x1A4, 0);
+    Put32(e + 0x1B0, 0x40);
+    u8* rec = zone + L_RECORD;
+    memset(rec, 0, 0x40);
+    Put32(rec + 0x18, 0x3F800000); Put32(rec + 0x1C, 0x46); Put32(rec + 0x20, 0x100);
+    Put16(rec + 0x30, 0x1234);
+    rec[0x34] = 6; rec[0x3A] = 0xFF;
+    u8* sc = zone + L_SCENE;
+    Put32(sc + 0x00, T_VTABLE); Put32(sc + 0x04, 3);
+    Put32(sc + 0x54, 1); Put32(sc + 0x58, L_ZONE + L_SCENE + 0x60);
+    Put32(sc + 0x60, L_ZONE + L_SCENE + 0x70);
+    Put32(zone + L_HOLDER + 0, L_ZONE + L_FSM);                // the machine the HUD also lists
+    Put32(zone + L_HOLDER + 4, 0);
+    Put32(zone + L_CHILD + 4, 0); Put32(zone + L_CHILD + 8, 0);   // a node without an entity, end of the list
+
+    u8* pt = zone + L_POOLTAB;
+    Put32(pt + 0x00, 0xBE8520AB);                              // no reader: stays big-endian
+    Put32(pt + 0x04, L_ZONE + L_POOL);
+    Put32(pt + 0x0C, LEVEL_FIXUP_FSM);
+    Put32(pt + 0x1C, 0);
+    u8* pool = zone + L_POOL;
+    Put32(pool + 0x00, 2); Put32(pool + 0x04, 0x10); Put32(pool + 0x08, 0x10); Put32(pool + 0x0C, 1);
+    Put32(pool + 0x10, L_ZONE + L_POOLBLK + 0x20);             // free: the second node
+    Put32(pool + 0x14, L_ZONE + L_POOLBLK + 0x08);             // in use: the first
+    Put32(pool + 0x18, 0); Put32(pool + 0x1C, L_ZONE + L_POOLBLK);
+    pool[0x20] = 0;
+    Put32(pool + 0x24, L_ZONE + L_POOLBLK); Put32(pool + 0x28, 0xFFFFFFFE);
+    u8* blk = zone + L_POOLBLK;
+    Put32(blk + 0x00, 0);
+    Put32(blk + 0x08, 0); Put32(blk + 0x0C, 0);                // node 0: no links
+    Put32(blk + 0x10, L_ZONE + L_FSM);                         // item 0: a slot holding a state machine
+    Put32(blk + 0x20, 0); Put32(blk + 0x24, 0);                // node 1
+    Put32(blk + 0x28, 0);                                      // item 1: empty slot
 }
 
 static void LevelSelfTest(void) {
@@ -1335,7 +1525,13 @@ static void LevelSelfTest(void) {
     SirRelocAddRange(&r, L_BASE, L_HDR_SIZE, hdr);
     SirRelocAddRange(&r, L_ZONE, L_ZONE_SIZE, zone);
     CHECK(LevelHeaderConvert(&r, hdr, L_HDR_SIZE) == SIR_OK);
-    CHECK(LevelZoneConvert(&r, zone, L_ZONE_SIZE, L_ZONE, L_ZONE + L_HUD) == SIR_OK);
+    LevelZoneRoots roots;
+    CHECK(LevelZoneRootsCollect(hdr, L_HDR_SIZE, zone, L_ZONE_SIZE, L_ZONE, &roots));
+    CHECK(roots.hud == L_ZONE + L_HUD);
+    CHECK(roots.entityCount == 1 && roots.entities[0] == L_ZONE + L_ENT && roots.sceneObjectCount == 1);
+    CHECK(roots.poolTableCount == 1 && roots.poolTables[0] == L_ZONE + L_POOLTAB && roots.poolTables[1] == 1);
+    CHECK(LevelZoneConvert(&r, zone, L_ZONE_SIZE, L_ZONE, &roots) == SIR_OK);
+    LevelZoneRootsFree(&roots);
 
     // The world state, read the way fn_8013006C, fn_8012FD0C and HudReload do.
     CHECK(*(s32*)(hdr + 4) == 1 && hdr[0x97] == 0xFF && hdr[0x94] == 0x00);       // +0x94: no reader, untouched
@@ -1349,7 +1545,7 @@ static void LevelSelfTest(void) {
     CHECK(*(u8**)(s0 + 0x8C) == zone + 0x200 && *(s32*)(s0 + 0x98) == 1 && *(u8**)(s1 + 0xFC) == zone + 0x40);
     CHECK(*(u8**)(s0 + 0x114) == s0 + 0x140 && *(s32*)(s0 + 0x118) == 1 && s0[0x147] == 1);   // the 0x54-byte entry: untouched
     u8** second0 = *(u8***)(s0 + 0x12C);
-    CHECK((u8*)second0 == hdr + L_T12C && second0[0] == zone + 0x580 && second0[1] == NULL && *(s32*)(s0 + 0x130) == 2);
+    CHECK((u8*)second0 == hdr + L_T12C && second0[0] == zone + L_ENT && second0[1] == NULL && *(s32*)(s0 + 0x130) == 2);
     u8** second1 = *(u8***)(s1 + 0x12C);
     CHECK((u8*)second1 == s1 + 0x198 && *(u32*)second1 == 0x90980010);            // no range: the Wii address, host order
     CHECK(**(u8***)(hdr + 0x1B0) == zone + 0x40 && hdr[L_T1D4 + 0x0B] == 1);       // the 12-byte entries: untouched
@@ -1361,6 +1557,29 @@ static void LevelSelfTest(void) {
     CHECK(*(const u32*)(hud + 0x428) == 1 && *(const u8**)list == NULL && *(const s32*)(list + 4) == -1);
     CHECK(*(const u32*)(list + 0x54) == 0x90E00010);
     CHECK(zone[0] == 0x7F && zone[3] == 0x01);                                     // the rest of the zone: untouched
+
+    // The entity, read the way fn_8012F8B8 and the constructors do.
+    const u8* ent = second0[0];
+    const u8* rec = *(const u8**)(ent + 4);
+    CHECK(*(const u32*)ent == T_VTABLE && rec == zone + L_RECORD && ent[0x37] == 0xFF && ent[0x34] == 0x00);   // +0x34: untouched
+    CHECK(*(const f32*)(rec + 0x18) == 1.0f && *(const u32*)(rec + 0x1C) == 0x46 && *(const u32*)(rec + 0x20) == 0x100);
+    CHECK(*(const u16*)(rec + 0x30) == 0x1234 && rec[0x34] == 6 && rec[0x3A] == 0xFF);
+    CHECK(*(const f32*)(ent + 0x158) == 1.0f && *(const u32*)(ent + 0x1B0) == 0x40 && *(const u8**)(ent + 0x8C) == NULL);
+    const u8* sc = *(const u8**)(ent + 0x90);
+    CHECK(sc == zone + L_SCENE && *(const s32*)(sc + 4) == 3 && *(const s32*)(sc + 0x54) == 1);
+    CHECK(sc[0] == 0x80 && **(const u8***)(sc + 0x58) == sc + 0x70);               // its vtable word: left for the constructor
+    const u8* holder = *(const u8**)(ent + 0xA4);
+    CHECK(holder == zone + L_HOLDER && *(const u8**)holder == list && *(const u8**)(holder + 4) == NULL);
+    const u8* child = *(const u8**)(ent + 0xB0);
+    CHECK(child == zone + L_CHILD && *(const u8**)(child + 4) == NULL && child[0] == 0x7F);
+    // The slot's pool table, as fn_801DB1AC reads it, and the pool as fn_801EBBE0 walks it.
+    const u8* pt = *(const u8**)(s0 + 0xE4);
+    const u8* pool = *(const u8**)(pt + 4);
+    CHECK(*(s32*)(s0 + 0xE8) == 1 && pt == zone + L_POOLTAB && pt[0] == 0xBE && *(const s32*)(pt + 0xC) == LEVEL_FIXUP_FSM);
+    CHECK(pool == zone + L_POOL && *(const s32*)pool == 2 && *(const s32*)(pool + 0x28) == -2);
+    const u8* used = *(const u8**)(pool + 0x14);
+    CHECK(used == zone + L_POOLBLK + 0x08 && *(const u8**)(used + 4) == NULL && *(const u8**)(used + 8) == list);
+    CHECK(*(const u8**)(pool + 0x10) == zone + L_POOLBLK + 0x20 && *(const u8**)(zone + L_POOLBLK + 0x28) == NULL);
 
     // Refused, with nothing changed.
     struct BadLevel { bool inZone; u32 off; u32 value; SirError want; };
@@ -1375,6 +1594,11 @@ static void LevelSelfTest(void) {
         { true, L_HUD + 0x428, HUD_MACHINES + 1, SIR_ERR_SCREENS },                // more machines than slots
         { true, L_HUD + 0x434, L_ZONE + L_ZONE_SIZE - 8, SIR_ERR_SCREENS },        // screen list runs off the zone
         { true, L_HUD + 0x24, 0x12345678, SIR_ERR_SCREENS },                       // slot pointer outside the zone
+        { true, L_SCENE + 0x54, 0x100000, SIR_ERR_ENTITY },                        // scene object's items run off the zone
+        { true, L_ENT + 0x8C, L_ZONE + L_SCENE + 0x40, SIR_ERR_ENTITY },           // part container whose item list runs off the zone
+        { true, L_POOL + 0x08, 0x18, SIR_ERR_POOL },                               // pool alignment not a power of two
+        { true, L_POOLBLK + 0x10, L_ZONE + L_ENT + 0x10, SIR_ERR_OVERLAP },        // pooled "machine" inside the entity
+        { true, L_ENT + 0xA4, L_ZONE + L_RECORD + 0x20, SIR_ERR_OVERLAP },         // holder inside the record
     };
     for (const BadLevel& c : bad) {
         BuildLevel(hdr, zone);
@@ -1384,7 +1608,14 @@ static void LevelSelfTest(void) {
         SirRelocInit(&r, NULL, NULL);
         SirRelocAddRange(&r, L_BASE, L_HDR_SIZE, hdr);
         SirRelocAddRange(&r, L_ZONE, L_ZONE_SIZE, zone);
-        SirError e = c.inZone ? LevelZoneConvert(&r, zone, L_ZONE_SIZE, L_ZONE, L_ZONE + L_HUD) : LevelHeaderConvert(&r, hdr, L_HDR_SIZE);
+        // What the header block names in the zone, by hand (the block is big-endian here).
+        u32 entity = L_ZONE + L_ENT, poolTable[2] = { L_ZONE + L_POOLTAB, 1 };
+        LevelZoneRoots named;
+        memset(&named, 0, sizeof(named));
+        named.hud = L_ZONE + L_HUD;
+        named.entities = &entity;      named.entityCount = 1;
+        named.poolTables = poolTable;  named.poolTableCount = 1;
+        SirError e = c.inZone ? LevelZoneConvert(&r, zone, L_ZONE_SIZE, L_ZONE, &named) : LevelHeaderConvert(&r, hdr, L_HDR_SIZE);
         CHECK(e == c.want);
         CHECK(memcmp(hdrCopy, hdr, L_HDR_SIZE) == 0 && memcmp(zoneCopy, zone, L_ZONE_SIZE) == 0);
     }
