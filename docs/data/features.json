@@ -99,6 +99,11 @@
  "changelog": [
   {
    "date": "2026-11-22",
+   "time": "00:11",
+   "text": "Round 72: 30 more small functions (delete wrappers, prop effects, tail-call stubs to fn_8006FA44, UI)"
+  },
+  {
+   "date": "2026-11-22",
    "time": "00:06",
    "text": "Round 71: 34 more small functions (delete wrappers, prop/HUD helpers, tail-call stubs)"
   },

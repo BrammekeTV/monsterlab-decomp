@@ -1,7 +1,7 @@
 {
  "log": "link.log",
  "counts": {
-  "global": 2742,
+  "global": 2751,
   "unknown": 126,
   "library": 192,
   "game": 75
@@ -16,6 +16,16 @@
    "used_as": "_fn_8008751C",
    "addr": "8008751C",
    "size": 516,
+   "section": ".text",
+   "kind": "game"
+  },
+  {
+   "name": "fn_80087720",
+   "refs": 2,
+   "files": 2,
+   "used_as": "_fn_80087720",
+   "addr": "80087720",
+   "size": 956,
    "section": ".text",
    "kind": "game"
   },
@@ -36,6 +46,16 @@
    "used_as": "_fn_8009BBCC",
    "addr": "8009BBCC",
    "size": 416,
+   "section": ".text",
+   "kind": "game"
+  },
+  {
+   "name": "fn_800AEFEC",
+   "refs": 2,
+   "files": 2,
+   "used_as": "_fn_800AEFEC",
+   "addr": "800AEFEC",
+   "size": 1012,
    "section": ".text",
    "kind": "game"
   },
@@ -300,16 +320,6 @@
    "kind": "game"
   },
   {
-   "name": "fn_80087720",
-   "refs": 1,
-   "files": 1,
-   "used_as": "_fn_80087720",
-   "addr": "80087720",
-   "size": 956,
-   "section": ".text",
-   "kind": "game"
-  },
-  {
    "name": "fn_80088004",
    "refs": 1,
    "files": 1,
@@ -436,16 +446,6 @@
    "used_as": "_fn_800AC0F0",
    "addr": "800AC0F0",
    "size": 672,
-   "section": ".text",
-   "kind": "game"
-  },
-  {
-   "name": "fn_800AEFEC",
-   "refs": 1,
-   "files": 1,
-   "used_as": "_fn_800AEFEC",
-   "addr": "800AEFEC",
-   "size": 1012,
    "section": ".text",
    "kind": "game"
   },
@@ -3336,6 +3336,16 @@
    "kind": "global"
   },
   {
+   "name": "gScreenWidth",
+   "refs": 15,
+   "files": 15,
+   "used_as": "\"int gScreenWidth\" (?gScreenWidth@@3HA)",
+   "addr": "805F9388",
+   "size": 4,
+   "section": ".sdata",
+   "kind": "global"
+  },
+  {
    "name": "lbl_803C4E28",
    "refs": 15,
    "files": 15,
@@ -3363,16 +3373,6 @@
    "addr": "805FEB0C",
    "size": 4,
    "section": ".sdata2",
-   "kind": "global"
-  },
-  {
-   "name": "gScreenWidth",
-   "refs": 14,
-   "files": 14,
-   "used_as": "\"int gScreenWidth\" (?gScreenWidth@@3HA)",
-   "addr": "805F9388",
-   "size": 4,
-   "section": ".sdata",
    "kind": "global"
   },
   {
@@ -4656,6 +4656,16 @@
    "kind": "global"
   },
   {
+   "name": "lbl_805FBA80",
+   "refs": 5,
+   "files": 5,
+   "used_as": "_lbl_805FBA80",
+   "addr": "805FBA80",
+   "size": 8,
+   "section": ".sbss",
+   "kind": "global"
+  },
+  {
    "name": "lbl_805FBB64",
    "refs": 5,
    "files": 5,
@@ -5702,16 +5712,6 @@
    "used_as": "_lbl_805FBA7C",
    "addr": "805FBA7C",
    "size": 1,
-   "section": ".sbss",
-   "kind": "global"
-  },
-  {
-   "name": "lbl_805FBA80",
-   "refs": 4,
-   "files": 4,
-   "used_as": "_lbl_805FBA80",
-   "addr": "805FBA80",
-   "size": 8,
    "section": ".sbss",
    "kind": "global"
   },
