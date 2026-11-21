@@ -52,6 +52,18 @@ static void Unconverted(const char* name, const SirCatalogEntry* e, const char* 
     else   PortLog("disc: %s: %s", name, why);
 }
 
+// The script function table, to check the indices the level loader relies on (LEVEL_FIXUP_*).
+struct PortScriptFunc { u32 type; void* fn; u32 hash; };
+extern "C" { extern PortScriptFunc gScriptFuncs[]; u32 StringHash(const char* s); }
+
+static void CheckFixUpIndices(const char* file) {
+    static const char* const names[] = { "FixUpEntityCallback", "FixUpEntityPartCallback", "FixUpPooledEntityCallback",
+                                         "FixUpProjectileEntityCallback", "FixUpRenderObjectCallback", "FixupFSMPoolCallback" };
+    for (u32 i = 0; i < 6; i++)
+        if (gScriptFuncs[LEVEL_FIXUP_ENTITY + i].hash != StringHash(names[i]))
+            PortStop(8, "%s: script function %u is not %s: the level loader's pool item kinds would be wrong", file, LEVEL_FIXUP_ENTITY + i, names[i]);
+}
+
 void PortFileRead(const char* path, u32 offset, u8* dst, u32 len) {
     const char* name = BaseName(path);
     const char* ext = strrchr(name, '.');
@@ -103,6 +115,8 @@ void PortFileRead(const char* path, u32 offset, u8* dst, u32 len) {
     if (n > 10 && _stricmp(name + n - 10, "_level.sir") == 0) {
         static SirReloc reloc;
         static u32 hudAddr;            // header +0x1F4, kept for the zone that holds the HUD
+        static u8* levelHdr;           // the header block (the world state), converted
+        static u32 levelHdrSize;
         SirRelocInit(&reloc, NULL, NULL);
         if (e->type == -1) {
             u32 base = LevelHeaderWiiBase(dst, e->size);
@@ -114,6 +128,8 @@ void PortFileRead(const char* path, u32 offset, u8* dst, u32 len) {
             SirError err = LevelHeaderConvert(&reloc, dst, e->size);
             if (err != SIR_OK) PortStop(8, "%s: %s", name, SirErrorText(err));
             hudAddr = *(u32*)(dst + 0x1F4);
+            levelHdr = dst;
+            levelHdrSize = e->size;
             sConverted++;
             PortLog("%s header converted: %u pointers, %u fields (%u pointers outside the mapped ranges)", name,
                     reloc.ptrImage, reloc.fieldsSwapped, reloc.ptrUnknown + reloc.ptrDolKept);
@@ -122,12 +138,19 @@ void PortFileRead(const char* path, u32 offset, u8* dst, u32 len) {
         if (e->type == 0) {
             u32 base = (u32)(uintptr_t)dst;
             SirRelocAddRange(&reloc, base, e->size, dst);
-            u32 hud = hudAddr >= base && hudAddr - base < e->size ? hudAddr : 0;
-            SirError err = LevelZoneConvert(&reloc, dst, e->size, base, hud);
+            CheckFixUpIndices(name);
+            LevelZoneRoots roots;
+            // The header block's tables have been laid out by fn_80129CC8 by now.
+            if (!levelHdr || !LevelZoneRootsCollect(levelHdr, levelHdrSize, dst, e->size, base, &roots))
+                PortStop(8, "%s zone 0: %s", name, SirErrorText(SIR_ERR_LEVEL));
+            if (roots.hud == 0 && hudAddr >= base && hudAddr - base < e->size) roots.hud = hudAddr;
+            u32 entityCount = roots.entityCount;
+            SirError err = LevelZoneConvert(&reloc, dst, e->size, base, &roots);
+            LevelZoneRootsFree(&roots);
             if (err != SIR_OK) PortStop(8, "%s zone 0: %s", name, SirErrorText(err));
             sConverted++;
-            PortLog("%s zone 0: HUD and state machines converted (%u pointers, %u fields); the rest of the zone is not",
-                    name, reloc.ptrImage, reloc.fieldsSwapped);
+            PortLog("%s zone 0: HUD, state machines and the first layer of %u entities converted (%u pointers, %u fields); the rest of the zone is not",
+                    name, entityCount, reloc.ptrImage, reloc.fieldsSwapped);
             return;
         }
     }
