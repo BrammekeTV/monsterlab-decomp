@@ -62,7 +62,7 @@
   },
   {
    "title": "Boots to title screen",
-   "detail": "First visible frame on Windows. The exe now gets through engine init, loads and converts catalog.sir and global_binary.sir from the player's own disc, and reaches the UI setup (UiInit). Next: a Windows graphics backend that draws.",
+   "detail": "First visible frame on Windows. The exe gets through engine init, loads and converts catalog.sir and global_binary.sir from the player's own disc, and enters the UI setup. Next: converting the UI data (UI root, fonts, screen list) in the loader, then a Windows graphics backend that draws.",
    "status": "in_progress"
   },
   {
@@ -97,6 +97,11 @@
   }
  ],
  "changelog": [
+  {
+   "date": "2026-11-21",
+   "time": "12:04",
+   "text": "The Windows boot enters the UI setup (PR #15): the function that wires up the UI's font objects is decompiled. The boot now stops on the UI data in global_binary.sir, which the loader doesn't convert yet. That's the next step toward the title screen."
+  },
   {
    "date": "2026-11-21",
    "time": "01:36",
