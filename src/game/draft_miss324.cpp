@@ -15,7 +15,7 @@ void  fn_801FFC04(u8* audio, f32 v);                            // 0x801FFC04
 s32   fn_8020AB5C(const char* name, s32 flag);                  // 0x8020AB5C
 void  fn_801FF2A8(u8* audio, s32 handle);                       // 0x801FF2A8 (audio voice release)
 void  fn_8020B1E0(u8* voice, u8* arg);                          // 0x8020B1E0
-void  fn_8020B548(void);                                        // 0x8020B548 (sort comparator)
+s32 fn_8020B548(u8* pa, u8* pb);                                        // 0x8020B548 (sort comparator)
 void  fn_80336FE0(void* base, s32 n, s32 size, void* cmp);      // 0x80336FE0 (sort)
 f64   fn_8033F20C(f64 x, f64 y);                                // 0x8033F20C (pow)
 u32   RandomU32(void);                                          // 0x80143460

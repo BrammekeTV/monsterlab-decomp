@@ -12,7 +12,7 @@ extern "C" {
 BOOL  ZoneIsLoaded(void* world, s32 zone);                       // 0x8012F408
 void  SleepMicroseconds(int unused, u32 us);                     // 0x80142818
 void* IdPoolNext(void* pool);                                    // 0x801E6EB0
-void  fn_801091EC(u8* out, u8* src, s32 lang);                   // 0x801091EC (localised name lookup)
+s32 fn_801091EC(u8* buf, s32 val, s32 kind);                   // 0x801091EC (localised name lookup)
 void* fn_80109278(u8* name, void* buf, s32 size);                // 0x80109278 (load named sound, returns id)
 u16   fn_801B62C8(u8* a3);                                       // 0x801B62C8
 void  fn_80144F8C(u8* m, f32 angle);                              // 0x80144F8C (rotate matrix about X)
@@ -110,7 +110,7 @@ void  fn_801CE7A0(f32* out, f32* in);                             // 0x801CE7A0 
 void  fn_801B72A0(u8* p, u8* target);                            // 0x801B72A0
 s32   fn_801FE308(u8* slot);                                     // 0x801FE308 (allocate voice for slot)
 void  fn_801FF2A8(u8* audio, s32 handle);                        // 0x801FF2A8
-void  fn_80202B8C(void);                                          // 0x80202B8C (voice callback)
+void fn_80202B8C(u8* arg0);                                          // 0x80202B8C (voice callback)
 void  fn_80203340(u8* data, s32 handle, s32 flag);               // 0x80203340
 s32   fn_8020390C(u8* audio, u8* name);                          // 0x8020390C
 void  fn_802095B0(u8* slot, void* a, void* b, void* c);          // 0x802095B0
@@ -197,7 +197,7 @@ s32 fn_801FE52C(u8* audio, u8* desc, s32 mode) {
     info = *(u8**)(desc + 0x0);
     if (*(void**)(info + 0x4) == NULL && *(s32*)(info + 0x0) == 0) {
         memset(nameBuf, 0, 0x100);
-        fn_801091EC(nameBuf, *(u8**)(desc + 0x0) + 0x18, gTextLanguage);
+        fn_801091EC(nameBuf, (s32)(intptr_t)(*(u8**)(desc + 0x0) + 0x18), gTextLanguage);  // lint:ok
         if (lbl_805FBAA4 != 0) {
             if (fn_8020390C(audio, nameBuf) == 0 && fn_8020390C(audio, *(u8**)(desc + 0x0) + 0x18) == 0) return -1;
             while (*(s32*)(lbl_8051DAD0 + 0x174) != 0) {

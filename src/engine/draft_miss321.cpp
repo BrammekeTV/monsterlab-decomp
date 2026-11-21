@@ -15,7 +15,7 @@ void fn_8014E3EC(s32 n);                                        // 0x8014E3EC
 void fn_80155D70(void);                                         // 0x80155D70
 s32  fn_8015BA30(void* p);                                      // 0x8015BA30
 u8*  fn_8016056C(u8* table, s32 handle, f32* v);                // 0x8016056C
-void fn_801C85F0(u8* node, s32 count);                          // 0x801C85F0 (spawns count particles)
+void fn_801C85F0(u8* obj, s32 count, void* fxMgr);                          // 0x801C85F0 (spawns count particles)
 void fn_801CA7B0(u32 mode);                                     // 0x801CA7B0
 f32  sinf(f32 x);                                               // 0x8033F0A4 (MSL)
 
@@ -418,7 +418,7 @@ void fn_801C9260(u8* arg0) {
     }
     if (cnt > 0x64) cnt = 0x64;
     if (cnt < 0) cnt = 0;
-    if (cnt > 0) fn_801C85F0(arg0, cnt);
+    if (cnt > 0) fn_801C85F0(arg0, cnt, NULL);  // 3rd arg (fxMgr) is a leftover register in the asm
 
     f32 px = *(f32*)(arg0 + 0x10);
     *(f32*)(arg0 + 0x20) = px;

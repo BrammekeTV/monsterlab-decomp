@@ -31,7 +31,7 @@ s32    fn_800217A8(void);                                            // 0x800217
 void   fn_80021BE4(void);                                            // 0x80021BE4
 void   fn_8003DCE0(u8* p);                                           // 0x8003DCE0
 void   fn_8004C718(u8* p, s32 idx, void* elem);                      // 0x8004C718
-s32    fn_8004D2C8(u8* obj, const char* name, s32 a, s32 b);         // 0x8004D2C8
+void* fn_8004D2C8(u8* arg0, const char* arg1, s32 arg2, s32 arg3);         // 0x8004D2C8
 void   fn_8004D39C(u8* p);                                           // 0x8004D39C
 void   fn_8001D718(u8* mgr, s32 idx, u8* slot);                      // 0x8001D718
 void   fn_8005230C(void);                                            // 0x8005230C

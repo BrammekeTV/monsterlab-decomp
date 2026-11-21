@@ -23,8 +23,8 @@ BOOL fn_8011BAA4(u8* p);                  // 0x8011BAA4
 void fn_8011BCF8(u8* p, s32 a);           // 0x8011BCF8
 void fn_8011BDA8(u8* p, s32 a);           // 0x8011BDA8
 const char* fn_8011BB28(u8* p);                  // 0x8011BB28
-BOOL fn_8011BF34(u8* p);                  // 0x8011BF34
-s32  fn_8011C018(u8* p, s32 a);           // 0x8011C018
+const char* fn_8011BF34(u8* arg0);                  // 0x8011BF34
+const char* fn_8011C018(u8* arg0, s32 arg1);           // 0x8011C018
 BOOL fn_8011C214(u8* p);                  // 0x8011C214
 BOOL fn_8011C108(u8* p);                  // 0x8011C108
 s32  fn_8011C130(u8* p);                  // 0x8011C130
@@ -191,18 +191,18 @@ BOOL Parts_GetBodyPartSlotName(void) {
 
 // 0x8011294C
 // Reports whether the selected part's name is available.
-BOOL Parts_GetSelectedName(void) {
+ScriptValue Parts_GetSelectedName(void) {
     u8* p = PartsObj();
     if (p == 0) return 0;
-    return fn_8011BF34(p);
+    return (ScriptValue)fn_8011BF34(p);
 }
 
 // 0x801129BC
 // Returns the name for the part at index a0.
-s32 Parts_GetNameByIndex(s32 a0) {
+ScriptValue Parts_GetNameByIndex(s32 a0) {
     u8* p = PartsObj();
     if (p == 0) return 0;
-    return fn_8011C018(p, a0);
+    return (ScriptValue)fn_8011C018(p, a0);
 }
 
 // 0x80112CC4

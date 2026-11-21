@@ -51,7 +51,7 @@ u32    VIGetTvFormat(void);
 Locator* WorldFindLocator(void* world, u32 hash);                     // 0x8012AA50
 s32    WorldGetPhase(void* world);                                    // 0x800D83A8
 void   QuatFromMtx(Quat* out, const f32 m[12]);                       // 0x801456E4
-s32    fn_8004D2C8(u8* obj, const char* name, s32 a, s32 b);          // 0x8004D2C8
+void* fn_8004D2C8(u8* arg0, const char* arg1, s32 arg2, s32 arg3);          // 0x8004D2C8
 s32    fn_8004D3F8(void* c, const char* name, s32 a, s32 b);          // 0x8004D3F8
 s32    fn_80065200(u8* arg0, u8* arg1, void* arg2, u8* arg3, s32 arg4, s32 arg5, s32 arg6);   // 0x80065200
 s32    fn_800D5800(u8* p);                                            // 0x800D5800
@@ -61,7 +61,7 @@ s32 fn_8010A49C(u8* p, s32 kind);                                            // 
 s32    fn_8011BC40(u8* p, s32 a);                                     // 0x8011BC40
 void   fn_8013A4A0(s32 a, s32 b);                                     // 0x8013A4A0
 void   fn_8013C06C(u8* p);                                            // 0x8013C06C
-void   fn_8013E3BC(u8* p);                                            // 0x8013E3BC
+char* fn_8013E3BC(const char* src);                                            // 0x8013E3BC
 void   fn_8013E3D0(f32 v);                                            // 0x8013E3D0
 void   fn_8013E3D8(f32 v);                                            // 0x8013E3D8
 void   fn_8013E3E0(f32 v);                                            // 0x8013E3E0
@@ -921,7 +921,7 @@ u32 /*0x06*/ GameNetDistributeChunkCallback(u32 /*0x18*/ a0) {
         }
         return 1;
     case 63: {
-        fn_8013E3BC(msg + 0x14);
+        fn_8013E3BC((const char*)(msg + 0x14));
         fn_8013E3D0(*(f32*)(msg + 4));
         fn_8013E3D8(*(f32*)(msg + 8));
         fn_8013E3E0(*(f32*)(msg + 0xC));

@@ -11,7 +11,7 @@ extern u8  lbl_805FB248[];                // 0x805FB248 (lab books section table
 
 s32  fn_8011D71C(u8* p);                  // 0x8011D71C
 s32  fn_8011D728(u8* p);                  // 0x8011D728
-s32  fn_8011D79C(u8* p);                  // 0x8011D79C
+const char* fn_8011D79C(void);                  // 0x8011D79C
 s32  fn_8011D894(u8* p);                  // 0x8011D894
 s32  fn_8011D930(u8* p);                  // 0x8011D930
 s32  fn_8011D97C(u8* p);                  // 0x8011D97C
@@ -66,10 +66,10 @@ void* MatchupGetRemoteData(void) {
 }
 
 // 0x80113A74
-BOOL Statistics_GetPlayerRank(void) {
+ScriptValue Statistics_GetPlayerRank(void) {
     u8* s = StatisticsObj();
     if (s == 0) return 0;
-    return fn_8011D79C(s);
+    return (ScriptValue)fn_8011D79C();
 }
 
 // 0x80113AF0

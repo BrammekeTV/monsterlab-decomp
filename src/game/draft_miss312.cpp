@@ -10,11 +10,11 @@ void* memset(void* p, int c, unsigned long n);
 int   strcmp(const char* a, const char* b);
 
 void  fn_80006F40(void* g);                                   // 0x80006F40
-void  fn_80007C20(u8* p);                                     // 0x80007C20 (event callback)
+s32 fn_80007C20(u8* arg0);                                     // 0x80007C20 (event callback)
 void  fn_80052384(void);                                      // 0x80052384
-void  fn_800DB9A4(u8* p);                                     // 0x800DB9A4
-void  fn_80109A20(void);                                      // 0x80109A20
-void  fn_80109AE0(void);                                      // 0x80109AE0
+u8* fn_800DB9A4(u8* p);                                     // 0x800DB9A4
+void fn_80109A20(s32 arg5);                                      // 0x80109A20
+void fn_80109AE0(s32 arg5);                                      // 0x80109AE0
 void  fn_80122220(void);                                      // 0x80122220
 void  fn_80122B98(u8* p);                                     // 0x80122B98
 void  fn_8018A41C(u8* p, s32 del);                            // 0x8018A41C
@@ -85,7 +85,7 @@ s32 fn_80007D68(void* p) {
     LoadingScreenTick(0, lbl_805FC638);
     LoadingScreenTick(0, lbl_805FC638);
     LoadingScreenTick(0, lbl_805FC638);
-    fn_80109A20();
+    fn_80109A20(0);  // arg is the caller's leftover r5
 
     // 16 records of 0xF4 bytes: pointer table at +0x1600, in-use flags at +0x1640
     *(u8**)(g + 0x1600) = (u8*)MemAllocDefault(0xF40);
@@ -203,7 +203,7 @@ void fn_80008298(void* p) {
             *(s32*)(a + 0x5C) = (head + 1) % *(s32*)(a + 0x64);
         }
     }
-    fn_80109AE0();
+    fn_80109AE0(0);  // arg is the caller's leftover r5
     for (s32 i = 0; i < 16; i++) {
         if (lbl_803C4040[i] == 0) fn_8018A41C(lbl_803C4000[i], -1);
         lbl_803C4040[i] = 0;

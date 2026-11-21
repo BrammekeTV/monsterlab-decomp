@@ -99,6 +99,11 @@
  "changelog": [
   {
    "date": "2026-11-21",
+   "time": "12:09",
+   "text": "Round 52: 57 more missing game functions decompiled (sound voices, draw-list sort, world slot loaders, effects/emitters, UI getters); 90 game functions left"
+  },
+  {
+   "date": "2026-11-21",
    "time": "12:04",
    "text": "The Windows boot enters the UI setup (PR #15): the function that wires up the UI's font objects is decompiled. The boot now stops on the UI data in global_binary.sir, which the loader doesn't convert yet. That's the next step toward the title screen."
   },

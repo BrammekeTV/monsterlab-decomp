@@ -944,9 +944,9 @@ ScriptValue Parts_GetDeleteString(void);                               // src/ga
 BOOL Parts_GetImage(void);                                             // src/game/lab_books_b.cpp
 void Parts_GetInfoImages(void);                                        // src/game/lab_books_b.cpp
 BOOL Parts_GetModificationList(void);                                  // src/game/lab_books_b.cpp
-s32 Parts_GetNameByIndex(s32 a0);                                      // src/game/lab_books_b.cpp
+ScriptValue Parts_GetNameByIndex(s32 a0);                              // src/game/lab_books_b.cpp
 BOOL Parts_GetOnMonsterList(void);                                     // src/game/lab_books_b.cpp
-BOOL Parts_GetSelectedName(void);                                      // src/game/lab_books_b.cpp
+ScriptValue Parts_GetSelectedName(void);                               // src/game/lab_books_b.cpp
 BOOL Parts_GetTextureList(void);                                       // src/game/lab_books_b.cpp
 s32 Parts_HasRecipe(void);                                             // src/game/lab_books_b.cpp
 void Parts_IncrementBodyPart(s32 a0);                                  // src/game/lab_books_b.cpp
@@ -1348,7 +1348,7 @@ void ShowNextRewardItem(void);                                         // src/ga
 void ShowQuestCompleteEvent(u32 a3);                                   // src/leaf/auto_03_800E75B0_text_cb.cpp
 void ShowScreen(u32 a0);                                               // src/game/draft_miss46.cpp
 void ShowSelectionHUD(void);                                           // src/game/draft_miss6.cpp
-void ShowSplashScreen(BOOL a0);  // type 0x8C (from signature table)
+void ShowSplashScreen(BOOL a0);                                        // src/game/draft_miss341.cpp
 void SimpleProjectile(u32 a3, u32 a4);                                 // src/leaf/auto_03_800FB958_text_cb.cpp
 void SkipFrameRender(s32 a3);                                          // src/leaf/auto_03_800E75B0_text_cb.cpp
 void Slider_SetImage(u32 a0);                                          // src/game/draft_miss113.cpp
@@ -1416,7 +1416,7 @@ BOOL Statistics_GetMonstersGoneMad(void);                              // src/ga
 BOOL Statistics_GetPartMadness(void);                                  // src/game/lab_books_stats.cpp
 BOOL Statistics_GetPlayerMSP(void);                                    // src/game/lab_books_stats.cpp
 BOOL Statistics_GetPlayerNextMSP(void);                                // src/game/lab_books_stats.cpp
-BOOL Statistics_GetPlayerRank(void);                                   // src/game/lab_books_stats.cpp
+ScriptValue Statistics_GetPlayerRank(void);                            // src/game/lab_books_stats.cpp
 void Statistics_IncDisplay(s32 a0);                                    // src/game/draft_miss44b.cpp
 void Statistics_SetupChallengeBestTimes(void);                         // src/game/lab_books_stats.cpp
 void Statistics_SetupExperimentHighScores(void);                       // src/game/lab_books_stats.cpp
@@ -1453,7 +1453,7 @@ s32 TargetIsLeft(u32 a3);                                              // src/le
 void TeleportPlayerTo(f32 a0, f32 a1, f32 a2);                         // src/game/draft_800Fc.cpp
 void TeleportPlayerToJunction(u32 a0);                                 // src/game/draft_800Fc.cpp
 void TeleportTo(void* a0, u32 a1, f32 a2);                             // src/game/draft_miss48.cpp
-void TestFailed(void);  // type 0x8F (from signature table)
+void TestFailed(void);                                                 // src/game/draft_miss342.cpp
 s32 TestRestartInput(void);                                            // src/leaf/auto_03_8006FA44_text_cb.cpp
 void TestWire(u32 a3);                                                 // src/leaf/auto_03_800E75B0_text_cb.cpp
 void TokenUpdate(ScriptCtx* a3);                                       // src/leaf/auto_03_800756E0_text_cb.cpp

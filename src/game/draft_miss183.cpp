@@ -18,7 +18,7 @@ void  fn_8003DCE0(u8* p);                                   // 0x8003DCE0
 void  fn_8001D4FC(u8* mgr);                                 // 0x8001D4FC
 void  fn_8001D718(u8* mgr, s32 idx, u8* slot);              // 0x8001D718
 void  fn_8004C718(u8* p, s32 idx, void* elem);              // 0x8004C718
-s32   fn_8004D2C8(u8* obj, const char* name, s32 a, s32 b); // 0x8004D2C8
+void* fn_8004D2C8(u8* arg0, const char* arg1, s32 arg2, s32 arg3); // 0x8004D2C8
 s32   fn_8004D3F8(void* c, const char* name, s32 a, s32 b); // 0x8004D3F8
 void  fn_8004D760(u8* c, u8* monster);                      // 0x8004D760
 void* fn_8004DAF8(void* c, s32 a, s32 b);                   // 0x8004DAF8

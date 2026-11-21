@@ -24,7 +24,7 @@ void fn_80081F04(u8* obj);                                 // 0x80081F04
 void fn_80133E60(u8* world);                               // 0x80133E60
 void fn_8014DE68(void);                                    // 0x8014DE68
 void fn_80150148(void);                                    // 0x80150148
-void fn_801514D4(void* view);                              // 0x801514D4
+void fn_801514D4(void);                              // 0x801514D4
 void fn_801514F0(void);                                    // 0x801514F0
 void fn_80154294(void);                                    // 0x80154294
 void fn_801542DC(void);                                    // 0x801542DC
@@ -32,7 +32,7 @@ void fn_80154318(void);                                    // 0x80154318
 s32  fn_8015BA30(void* p);                                 // 0x8015BA30
 u8*  fn_80142500(void* p);                                 // 0x80142500
 void fn_801214DC(void* p);                                 // 0x801214DC
-void fn_801214E0(void* p);                                 // 0x801214E0
+void fn_801214E0(void);                                 // 0x801214E0
 void fn_80161A28(void* fx);                                // 0x80161A28
 void fn_801620BC(void* fx);                                // 0x801620BC
 void fn_8016E304(void* cam);                               // 0x8016E304
@@ -158,7 +158,7 @@ void fn_8000A6AC(void) {
             fn_801D6780();
             view = (u8*)gMainView;
             *(s32*)(view + 0x188) = 1;
-            fn_801514D4(view);
+            fn_801514D4();
             u8* cam = *(u8**)(lbl_803C4298 + 4);
             (*(CamMatrixFn*)(*(u8**)cam + 0x38))(cam, &m[0][0]);
             CameraSetMatrix(lbl_8047C640, m);
@@ -221,7 +221,7 @@ void fn_8000A6AC(void) {
         fn_801D6FD0();
         fn_801D7350();
         fn_801542DC();
-        fn_801214E0(sets + 0x10);
+        fn_801214E0();
         fn_801B42B4(lbl_8047C7D8);
         fn_80170044((void*)gMainView);
         RendBudgetCheck();

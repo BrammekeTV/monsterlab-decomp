@@ -15,7 +15,7 @@ void   BufferFree(void* p);                                  // 0x801D4980
 u8*    GetGlobalSettings(void);                              // 0x801D2BF8
 void*  MemAllocDefault(u32 size);                            // 0x801D4650
 BOOL   ZoneIsLoaded(void* world, s32 zone);                  // 0x8012F408
-void   fn_8003ED08(void);                                    // 0x8003ED08
+void fn_8003ED08(u8* self);                                    // 0x8003ED08
 void   fn_8003F1B8(s32 a);                                   // 0x8003F1B8
 s32    fn_80133A84(u8* zone, s32 a);                         // 0x80133A84
 s32    fn_80133D74(u8* world, u8* ent);                      // 0x80133D74
@@ -319,7 +319,7 @@ void fn_80133E60(u8* arg0) {
     u32 charHash = *(u32*)(*(u8**)(*(u8**)(*(u8**)arg0 + 0x8) + 0x9C) + 0x8);
     if (charHash != kHashCompositeCharacter) {
         if (charHash == kHashMechanist) {
-            fn_8003ED08();
+            fn_8003ED08(arg0);
         }
         if (gBattle != NULL) {
             fn_8003F1B8(0);

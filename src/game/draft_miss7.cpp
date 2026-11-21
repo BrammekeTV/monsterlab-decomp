@@ -40,7 +40,7 @@ void   fn_8006C66C(u8* obj, s32 state);                          // 0x8006C66C
 void   fn_8006C6AC(u8* obj);                                     // 0x8006C6AC
 void*  fn_800E6228(void);                                        // 0x800E6228
 u32    fn_80122E88(u32 button);                                  // 0x80122E88
-void   fn_801514D4(void* view);                                  // 0x801514D4
+void   fn_801514D4(void);                                  // 0x801514D4
 void   fn_80154294(void);                                        // 0x80154294
 void   fn_80154318(void);                                        // 0x80154318
 u8*    fn_8015EC9C(u8* tbl, f32 a, f32 b);                       // 0x8015EC9C
@@ -309,7 +309,7 @@ void fn_80009840(u8* arg0) {
         lbl_805F9614 = 1;
         fn_801D6780();
         *(s32*)((u8*)gMainView + 0x188) = 1;
-        fn_801514D4(gMainView);
+        fn_801514D4();
         f32 m[3][4];
         u8* cam = *(u8**)(lbl_803C4298 + 4);
         (*(VFnP*)(*(u8**)cam + 0x38))(cam, m);

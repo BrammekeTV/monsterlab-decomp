@@ -6,7 +6,7 @@
 #include "types.h"
 
 extern u8 gAudio[];
-extern u8 lbl_805F996C[];
+extern f32 lbl_805F996C;
 extern u8 lbl_805FBBA0[];
 extern u8 lbl_80600488[];
 extern u8 lbl_8060048C[];

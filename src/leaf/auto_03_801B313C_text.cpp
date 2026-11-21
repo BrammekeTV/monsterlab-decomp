@@ -12,7 +12,7 @@ extern u8 lbl_805FB6A8[];
 extern u8 lbl_805FB6E0[];
 extern u8 lbl_805FB6E8[];
 extern u8 lbl_805FB6F0[];
-extern u8 lbl_805FB704[];
+extern void* lbl_805FB704;
 extern u8 lbl_805FFB08[];
 extern "C" void EventSend(void*, void*, void*, u32, int, int, int, int);
 extern "C" void EventSendTo(void*, u32, void*, u32, int, int);

@@ -18,7 +18,7 @@ void fn_801E0318(s32 a3);                                        // 0x801E0318
 void fn_801E0320(s32 a3);                                        // 0x801E0320
 void fn_801E0328(s32 a3);                                        // 0x801E0328
 void fn_80106884(void);                                          // 0x80106884: the game's signatures
-void fn_8010F7F8(void);                                          // 0x8010F7F8 (only its address is used here)
+u32 fn_8010F7F8(s32 func, u32 sig, u32* args, s32 flag);                                          // 0x8010F7F8 (only its address is used here)
 BOOL fn_8010CD18(s32 a3, s32 a4, u8* a5, u8* a6);                // 0x8010CD18
 void fn_8010F784(s32 a3);                                        // 0x8010F784
 
@@ -29,10 +29,10 @@ void SetPlayerLineID(s32 a3);
 void set_conversation_reg(s32 idx, s32 value);
 void SetPlayerOption(s32 a0, u32 a1);
 s32  Conversation_reg_eq(s32 idx, s32 value);
-void ShowConversationPopup(void);
+void ShowConversationPopup(s32 textId);
 u8   IsConversationPopupVisible(void);
 void ShowEventPopup(s32 unusedR3, u32 a1);
-void IsEventPopupVisible(void);
+BOOL IsEventPopupVisible(void);
 s32  GetTalkingToCharacterEntity(void);
 void SetConversationReady(s32 a3);
 

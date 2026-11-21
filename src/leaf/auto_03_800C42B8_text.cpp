@@ -5,7 +5,7 @@
 
 #include "types.h"
 
-extern "C" void fn_8010B50C(s32, u8*);
+extern "C" void fn_8010B50C(u8*, u8*);
 extern "C" void fn_8010BF6C(u8*, s32);
 extern "C" void fn_8010BFB8(u8*, f32);
 extern "C" f32 fn_8010C194(u8*);
@@ -23,10 +23,9 @@ extern "C" f32 fn_800C4488(u8* a3) {
 }
 
 // 0x800C4498
-extern "C" void fn_800C4498(s32 a3, u8* a4) {
-    // tail-call arguments inferred from the registers set before the call
+extern "C" void fn_800C4498(u8* a3, u8* a4) {
     u8* t0 = ((u8*)(uintptr_t)(a4)) + 216;
-    fn_8010B50C((s32)((u32)(uintptr_t)(a3)), t0);
+    fn_8010B50C(((u8*)(uintptr_t)(a3)), t0);
 }
 
 // 0x800C44A0

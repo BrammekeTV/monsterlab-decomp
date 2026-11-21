@@ -14,7 +14,7 @@ extern f32 lbl_805FECBC;                  // 0x805FECBC (default float for missi
 u32  fn_8011C1D0(u8* p, s32 a);           // 0x8011C1D0
 u32  fn_8011C1F8(u8* p, s32 a);           // 0x8011C1F8
 void fn_8011C20C(u8* p, s32 a);           // 0x8011C20C
-s32  fn_8011C22C(u8* p);                  // 0x8011C22C (return type assumed, value passed through)
+u8* fn_8011C22C(u8* arg0);                  // 0x8011C22C (return type assumed, value passed through)
 s32  fn_8011C2B4(u8* p);                  // 0x8011C2B4 (return type assumed, value passed through)
 u8   fn_8011AEE0(void);                   // 0x8011AEE0
 u8*  fn_8011AFEC(u8* p);                  // 0x8011AFEC (returns the delete-string buffer)
