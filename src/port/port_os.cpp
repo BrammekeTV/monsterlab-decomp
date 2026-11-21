@@ -412,6 +412,9 @@ static PortAlarm* FindAlarm(u8* alarm, BOOL create) {
     return NULL;
 }
 
+// OSSetAlarmUserData / the SDK keeps it at +0x28 of the alarm, where the game's handlers read it.
+void fn_80234840(u8* alarm, u8* data) { *(u8**)(alarm + 0x28) = data; }
+
 void OSCreateAlarm(u8* alarm) {
     PortAlarm* a = FindAlarm(alarm, TRUE);
     if (a) { a->handler = NULL; a->fire = a->period = 0; }
