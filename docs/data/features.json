@@ -37,7 +37,7 @@
   },
   {
    "title": "Big-endian data loader",
-   "detail": "Convert game data from the Wii's big-endian format at load time. Loading on PC now: the file catalog (catalog.sir) and most of global_binary.sir: the game database, the controller input table, the built-in textures, the string table and the action table. All 9,304 checked values match the reference decoder. Next: the UI screen list (needs more UI code decompiled), then the title-screen UI files. The boot now uses it to load the real files from disc.",
+   "detail": "Convert game data from the Wii's big-endian format at load time. On PC now: the file catalog and global_binary.sir, with the game database, input table, built-in textures, strings, actions, and now the UI root, fonts and screen state machines. Everything is checked against the reference decoder. Next: the title-screen UI files.",
    "status": "in_progress"
   },
   {
@@ -52,7 +52,7 @@
   },
   {
    "title": "Platform layer",
-   "detail": "Windows replacements for the Wii system code: memory heaps, OS time, threads, reports and disc reads work. The game's graphics commands are now captured and decoded, ready for a renderer to plug in. Audio and input are still stubs.",
+   "detail": "Windows replacements for the Wii system code: memory heaps, OS time, threads, reports and disc reads work. The game's graphics commands are now captured and decoded, drawn by a Direct3D 11 renderer. Audio and input are still stubs.",
    "status": "in_progress"
   },
   {
@@ -62,7 +62,7 @@
   },
   {
    "title": "Boots to title screen",
-   "detail": "First visible frame on Windows. The exe gets through engine init, loads and converts catalog.sir and global_binary.sir from the player's own disc, and enters the UI setup. Next: converting the UI data (UI root, fonts, screen list) in the loader, then a Windows graphics backend that draws.",
+   "detail": "First visible frame on Windows. A Direct3D 11 renderer now draws real game textures through the engine's own draw path. The boot loads catalog.sir and global_binary.sir (now including the UI data) from the player's own disc and runs through the UI and HUD setup. Next: the remaining boot steps, then the title screen itself.",
    "status": "in_progress"
   },
   {
@@ -97,6 +97,11 @@
   }
  ],
  "changelog": [
+  {
+   "date": "2026-11-21",
+   "time": "12:24",
+   "text": "First pixels on Windows (PRs #16 and #17): a Direct3D 11 renderer now draws real game textures from the player's own disc through the game's own draw code. The first one on screen was the game's font. The loader also converts the UI data of global_binary.sir (UI root, fonts, screen state machines), so the boot gets through the UI and HUD setup. The title screen is next."
+  },
   {
    "date": "2026-11-21",
    "time": "12:09",
