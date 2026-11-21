@@ -6,7 +6,7 @@
 
 extern "C" {
 void*  MemAllocSmall(u32 size);                                                 // 0x801D41CC
-void   SpawnEffectAt(void* fxMgr, u32 effect, const f32 posAndScale[4], int a); // 0x801C80E0
+s32 SpawnEffectAt(void* fxMgr, u32 effect, const f32 pos[4], u8** owner); // 0x801C80E0
 s32    RaySceneTest(void* ray);                                                 // 0x80070458
 void   TextureRelease(void* tex);                                               // 0x80184028
 void   fn_80173164(void* p);                                                    // 0x80173164

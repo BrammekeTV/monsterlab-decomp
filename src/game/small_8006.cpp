@@ -17,7 +17,7 @@ static void SetChildStateBits(u8* p, u32 bits, u8 state) {
 
 extern "C" {
 void     operator_delete(void* p);                                              // 0x801D426C
-void     SpawnEffectAt(void* fxMgr, void* effect, const f32 posAndScale[4], int a); // 0x801C80E0
+s32 SpawnEffectAt(void* fxMgr, u32 effect, const f32 pos[4], u8** owner); // 0x801C80E0
 void     fn_80061A98(u8* p, s32* a, s32 v);                                     // 0x80061A98
 u8*     fn_801B44AC(u8* p, s32 del);                                           // 0x801B44AC (base dtor)
 u8* fn_801B4334(u8* arg0, s32 layer, u8* ent, s32 reset);                                                    // 0x801B4334 (base ctor)
@@ -240,7 +240,7 @@ u8* fn_800636BC(u8* p) {
 // fxMgr, effect and a are passed through to SpawnEffectAt unchanged.
 void fn_80064568(void* fxMgr, void* effect, const f32* v, s32 a) {
     f32 pos[4] = { v[0], v[1], v[2], lbl_805FD468 };
-    SpawnEffectAt(fxMgr, effect, pos, a);
+    SpawnEffectAt(fxMgr, (u32)(uintptr_t)effect, pos, (u8**)(uintptr_t)a);  // lint:ok
 }
 
 // 0x80065CB0

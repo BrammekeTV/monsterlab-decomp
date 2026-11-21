@@ -49,7 +49,7 @@ void  fn_80069180(u8* p, s32 a1, s32 a2);                                    // 
 void  fn_80069638(u8* p, s32 a1);                            // 0x80069638
 void  fn_801BB478(u8* p, s32 a1);                            // 0x801BB478
 void  fn_800696C4(u8* p, s32 a1);                            // 0x800696C4
-void  SpawnEffectAt(void* fxMgr, u32 effect, const f32 posAndScale[4], int a); // 0x801C80E0
+s32 SpawnEffectAt(void* fxMgr, u32 effect, const f32 pos[4], u8** owner); // 0x801C80E0
 u8*   fn_80062CE0(u8* p, s32 del);                           // 0x80062CE0 (base dtor)
 void  operator_delete(void* p);                              // 0x801D426C
 

@@ -118,7 +118,7 @@ void* UIWidgetFindChild(void* widget, u32 hash);     // 0x80199AEC
 void UISetText(void* el, const char* text, s32 a);   // 0x8019EFC8
 void UISetProgress(void* obj, f32 t);
 void EventSend(void* mgr, void* target, void* from, u32 event, int a, int b, int c, int d);
-void SpawnEffectAt(void* fxMgr, u32 effect, const f32 posAndScale[4], int a);  // 0x801C80E0
+s32 SpawnEffectAt(void* fxMgr, u32 effect, const f32 pos[4], u8** owner);  // 0x801C80E0
 u32 fn_801F38F8(u8* a3);                             // 0x801F38F8
 void BufferFree(void* p);                            // 0x801D4980
 void operator_delete(void* p);                       // 0x801D426C
@@ -1186,14 +1186,14 @@ void SpawnAttachedParticle(void* a0, u32 a1, u32 a2) {
         pos[1] = *(f32*)(e + 0x1C);
         pos[2] = *(f32*)(e + 0x20);
         pos[3] = 0.0f;
-        SpawnEffectAt(lbl_8047C760, a1, pos, (int)(intptr_t)(e + 0xA8));
+        SpawnEffectAt(lbl_8047C760, a1, pos, (u8**)(e + 0xA8));
     } else if (a2 == 1) {
         u8* st = *(u8**)(e + 0x4);
         pos[0] = *(f32*)(st + 0x0);
         pos[1] = *(f32*)(st + 0x4);
         pos[2] = *(f32*)(st + 0x8);
         pos[3] = 0.0f;
-        SpawnEffectAt(lbl_8047C760, a1, pos, (int)(intptr_t)(e + 0xA8));
+        SpawnEffectAt(lbl_8047C760, a1, pos, (u8**)(e + 0xA8));
     }
 }
 // 0x800E909C

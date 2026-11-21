@@ -13,7 +13,7 @@ void ScopedLockCtor(ScopedLock* l);                                             
 void ScopedLockDtor(ScopedLock* l, s32 flags);                                      // 0x801F53B0
 void* EventPost(s32 id, void* sender);                                              // 0x801F3918
 s32 PlaySoundAt(void* sound, int a, const void* pos, int b);                        // 0x80209ABC
-void SpawnEffectAt(void* fxMgr, u32 effect, const f32 posAndScale[4], u8** owner);  // 0x801C80E0
+s32 SpawnEffectAt(void* fxMgr, u32 effect, const f32 pos[4], u8** owner);  // 0x801C80E0
 s32 WorldGetEntityZone(void* world, void* entity);                                  // 0x80132458
 BOOL ZoneIsLoaded(void* world, s32 zone);                                           // 0x8012F408
 void ZoneSlotInit(void* slot);                                                      // 0x801F2B40

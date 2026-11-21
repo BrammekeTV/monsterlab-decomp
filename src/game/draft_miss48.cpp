@@ -134,7 +134,7 @@ extern f32 lbl_805FB3F8;
 extern f32 lbl_805FB3FC;
 void  ScopedLockCtor(ScopedLock* l);
 void  ScopedLockDtor(ScopedLock* l, s32 flags);
-void  SpawnEffectAt(void* fxMgr, u32 effect, const f32 posAndScale[4], int a);   // 0x801C80E0
+s32 SpawnEffectAt(void* fxMgr, u32 effect, const f32 pos[4], u8** owner);   // 0x801C80E0
 extern u8 lbl_8047C760[];
 extern f32 lbl_805FD598;                   // 0.0f
 extern f32 lbl_805FD5A0;                   // 0.0001f
@@ -156,7 +156,7 @@ void  fn_801ED788(f32* out, u8* a1);                        // 0x801ED788
 s32   fn_8012EE30(u8* world, f32* pos);                     // 0x8012EE30
 void  fn_801B1778(void* p, s32 a);                          // 0x801B1778
 void  fn_801E8D74(void* out, void* list, void* owner, void* anim);   // 0x801E8D74
-s32   fn_801C3EA4(u8* a, s32 b);                            // 0x801C3EA4
+u8* fn_801C3EA4(u8* table, s32 key);                            // 0x801C3EA4
 s32   fn_801C5C60(s32 a);                                   // 0x801C5C60
 s32   fn_800D59D4(u8* a3);                                  // 0x800D59D4
 void* fn_8004D968(u8*, s32, s32);                           // 0x8004D968
@@ -738,7 +738,7 @@ void TriggerShowProximityText(u8* arg0, s32 arg1) {
     pos[1] = *(f32*)(arg0 + 0x198);
     pos[2] = *(f32*)(arg0 + 0x19C);
     pos[3] = lbl_805FD598;
-    SpawnEffectAt(lbl_8047C760, (u32)arg1, pos, (int)(intptr_t)(arg0 + 0x178));
+    SpawnEffectAt(lbl_8047C760, (u32)arg1, pos, (u8**)(arg0 + 0x178));
     u8* fx = *(u8**)(arg0 + 0x178);
     if (fx != NULL) {
         f32 c0 = *(f32*)(arg0 + 0x1A0);
@@ -1039,14 +1039,14 @@ void StartLaser(void* a0, s32 a1, u32 a2, u32 a3) {
         if (a1 >= 0 && a1 < 2) {
             s32 had = lbl_805FB1E0[a1];
             lbl_805FB1D8[a1] = *(s32*)(uintptr_t)a2;
-            if (had == 0) lbl_805FB1E0[a1] = fn_801C3EA4(lbl_8047C7AC, (s32)a3);
+            if (had == 0) lbl_805FB1E0[a1] = (s32)(intptr_t)fn_801C3EA4(lbl_8047C7AC, (s32)a3);  // lint:ok
             fn_801C5C60(lbl_805FB1E0[a1]);
         }
     } else if (flags & 0x20) {
         if (a1 >= 0 && a1 < 2) {
             u8* slot = e + a1 * 4;
             *(s32*)(slot + 0xC2C) = *(s32*)(uintptr_t)a2;
-            if (*(s32*)(slot + 0xC34) == 0) *(s32*)(slot + 0xC34) = fn_801C3EA4(lbl_8047C7AC, (s32)a3);
+            if (*(s32*)(slot + 0xC34) == 0) *(s32*)(slot + 0xC34) = (s32)(intptr_t)fn_801C3EA4(lbl_8047C7AC, (s32)a3);  // lint:ok
             fn_801C5C60(*(s32*)(slot + 0xC34));
         }
     }

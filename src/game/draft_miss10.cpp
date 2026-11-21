@@ -5,7 +5,7 @@
 
 extern "C" {
 void*       EventPost(s32 id, void* sender);                                    // 0x801F3918
-void        SpawnEffectAt(void* fxMgr, u32 effect, const f32 posAndScale[4], int a); // 0x801C80E0
+s32 SpawnEffectAt(void* fxMgr, u32 effect, const f32 pos[4], u8** owner); // 0x801C80E0
 int         SysSprintf(char* buf, const char* fmt, ...);
 void        fn_801609CC(u8* p, s32 h);                                          // 0x801609CC
 void        fn_8016E304(void* cam);                                             // 0x8016E304

@@ -4,7 +4,7 @@
 
 extern "C" {
 const char* AnimSetName(s32 id);
-s32 fn_801BC910(void);
+u8* fn_801BC910(void);
 s32 fn_8004E594(u8* p);
 char* fn_8004E8D4(u8* a3, u8* a4, s32 a5);
 int SysSprintf(char* buf, const char* fmt, ...);
@@ -12,7 +12,7 @@ void* fn_801D40E0(s32 n);
 u8* fn_8020E7EC(u8* p, u8* a, u8* b);
 void fn_80025524(u8* obj, f32* a, f32* b);
 void fn_801C83AC(u8* mgr, u8* item);
-void SpawnEffectAt(void* fxMgr, u32 effect, const f32 posAndScale[4], u8** owner);
+s32 SpawnEffectAt(void* fxMgr, u32 effect, const f32 pos[4], u8** owner);
 void TextureRelease(void* tex);
 ScriptValue UITextureList_GetTexture(u32 hash, s32 index);
 void UIImage_SetTexture(void* img, void* tex);
@@ -54,7 +54,7 @@ extern "C" {
 
 // 0x80007C20
 s32 fn_80007C20(u8* arg0) {
-    *(s32*)(arg0 + 0x48) = fn_801BC910();
+    *(u8**)(arg0 + 0x48) = fn_801BC910();
     return 1;
 }
 

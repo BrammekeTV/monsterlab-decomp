@@ -16,7 +16,7 @@ void  fn_80076584(u8* mgr, s32 idx, u8* item);                  // 0x80076584
 void  fn_800765D0(u8* mgr, s32 idx);                            // 0x800765D0
 u8*   fn_800C73EC(u8* h);                                       // 0x800C73EC (leaf file declares s32 return)
 void  fn_801C83AC(u8* mgr, u8* item);                           // 0x801C83AC
-void  SpawnEffectAt(void* fxMgr, u32 effect, const f32 posAndScale[4], void* owner); // 0x801C80E0; 4th arg is a pointer in the asm
+s32 SpawnEffectAt(void* fxMgr, u32 effect, const f32 pos[4], u8** owner); // 0x801C80E0; 4th arg is a pointer in the asm
 int   SysSprintf(char* buf, const char* fmt, ...);
 u8*   fn_801094F4(char* name, s32 flags);                       // 0x801094F4
 void  fn_8018D2B8(const char* fmt, ...);                        // 0x8018D2B8
@@ -126,7 +126,7 @@ void fn_800D5B1C(u8* arg0, s32 arg1, f32* arg2) {
         vec[1] = arg2[1];
         vec[2] = arg2[2];
         vec[3] = lbl_805FE618;
-        SpawnEffectAt(lbl_8047C760, (u32)arg1, vec, *(u8**)(*(u8**)arg0 + 0x14) + 0x50);
+        SpawnEffectAt(lbl_8047C760, (u32)arg1, vec, (u8**)(*(u8**)(*(u8**)arg0 + 0x14) + 0x50));
     }
 }
 

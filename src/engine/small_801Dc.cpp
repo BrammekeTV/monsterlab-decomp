@@ -18,7 +18,7 @@ s32  fn_8016195C(void* p, s32 a, s32 b, void* c);                  // 0x8016195C
 s32   fn_80162B6C(void* obj, s32 n);                                // 0x80162B6C
 void  fn_801629D0(void* obj, s32 n);                                // 0x801629D0
 void  fn_801ED788(f32* out, u8* a1);                                // 0x801ED788
-void  SpawnEffectAt(void* fxMgr, u32 effect, const f32 posAndScale[4], int a); // 0x801C80E0
+s32 SpawnEffectAt(void* fxMgr, u32 effect, const f32 pos[4], u8** owner); // 0x801C80E0
 void* EventPost(s32 id, void* sender);                              // 0x801F3918
 s32   PlaySoundAt(void* sound, int a, const void* pos, int b);      // 0x80209ABC
 s32   PlaySound(u32 hash, s32 a, s32 b, s32 c, s32 d, s32 e);       // 0x80209E70

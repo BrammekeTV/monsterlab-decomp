@@ -74,7 +74,7 @@ void   fn_80253A48(u8* p, s32 a);                              // 0x80253A48
 void   fn_80257FA8(u8* voice);                                 // 0x80257FA8
 void   fn_802581A4(u8* voice, u32 a);                          // 0x802581A4
 s32    fn_8025AC30(u8* voice, s32 a);                          // 0x8025AC30
-s32    fn_8025AD60(u8* voice, s32 a, u32 b);                   // 0x8025AD60
+void   fn_8025AD60(u8* voice, s32 a);                   // 0x8025AD60
 s32    fn_8025ADAC(u8* voice, u16* p);                         // 0x8025ADAC
 void   fn_8025ACF0(u8* voice, s32 a);                          // 0x8025ACF0
 s32    fn_8025B0A4(u8* voice, u16* p);                         // 0x8025B0A4
@@ -594,7 +594,7 @@ void fn_80203340(u8* hdr, u8* voice, s32 streamed) {
     srcBlk[4] = 0;
     srcBlk[5] = 0;
     srcBlk[6] = 0;
-    fn_8025AD60(voice, 0, ratio >> 16);
+    fn_8025AD60(voice, 0);  // the asm passes only r3/r4
     fn_8025B0A4(voice, addrBlk);
     fn_8025B19C(voice, coefBlk);
     fn_8025B330(voice, loopBlk);

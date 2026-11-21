@@ -5,7 +5,7 @@
 #include <math.h>
 
 extern "C" {
-void  SpawnEffectAt(void* fxMgr, u32 effect, const f32 posAndScale[4], u8** owner);  // 0x801C80E0 (really returns BOOL: tail call to SpawnEffectAtPos)
+s32 SpawnEffectAt(void* fxMgr, u32 effect, const f32 pos[4], u8** owner);  // 0x801C80E0 (really returns BOOL: tail call to SpawnEffectAtPos)
 u32   RandomU32(void);                                // 0x80143460
 void  fn_8006784C(u8* self);                          // 0x8006784C
 void  fn_8018D370(const char* fmt, ...);              // 0x8018D370 (debug log)

@@ -20,7 +20,7 @@ extern const char lbl_803698F0[];  // format string: "bit %s[%d] = %d"
 extern "C" {
 void     GameLog(int level, int category, const char* fmt, ...);  // 0x8000B2F0
 void     operator_delete(void* p);                                 // 0x801D426C
-void     SpawnEffectAt(void* fxMgr, void* effect, const f32 posAndScale[4], int a); // 0x801C80E0
+s32 SpawnEffectAt(void* fxMgr, u32 effect, const f32 pos[4], u8** owner); // 0x801C80E0
 void*    CreateEntityByType(void* mem, u32 typeHash, void* params); // entity_factory.cpp
 void     fn_8005F204(u8* obj);                                     // 0x8005F204
 void     fn_80061A64(void* a0, void* a1, void* a2);                // 0x80061A64 (signature not confirmed)
@@ -68,7 +68,7 @@ void PlayEffectTransient(void* a0, u32 a1) {
     pos[1] = *(f32*)(obj + 0x1C);
     pos[2] = *(f32*)(obj + 0x20);
     pos[3] = lbl_805FEBB8;
-    SpawnEffectAt(lbl_8047C760, (void*)(uintptr_t)a1, pos, 0);
+    SpawnEffectAt(lbl_8047C760, (u32)(uintptr_t)a1, pos, 0);  // lint:ok
 }
 
 // 0x801068A8
@@ -252,7 +252,7 @@ void PlayEffect(void* a0, u32 a1) {
     pos[1] = *(f32*)(obj + 0x1C);
     pos[2] = *(f32*)(obj + 0x20);
     pos[3] = lbl_805FEBB8;
-    SpawnEffectAt(lbl_8047C760, (void*)(uintptr_t)a1, pos, (int)(uintptr_t)(obj + 0xA8));
+    SpawnEffectAt(lbl_8047C760, (u32)(uintptr_t)a1, pos, (u8**)(obj + 0xA8));  // lint:ok
 }
 
 // 0x80106920

@@ -18,7 +18,7 @@ s32    PlaySound(u32 hash, s32 a, s32 b, s32 c, s32 d, s32 e);      // 0x80209E7
 s32    PlaySoundAt(void* sound, void* owner, const void* pos, int b); // 0x80209ABC
 void*  ScreenSetFindElement(void* set, u32 hash);                   // 0x80198F18
 void*  ScreenSetsCurrent(void* sets);                               // 0x8018D1E4
-void   SpawnEffectAt(void* fxMgr, u32 effect, const f32 posAndScale[4], int a); // 0x801C80E0
+s32 SpawnEffectAt(void* fxMgr, u32 effect, const f32 pos[4], u8** owner); // 0x801C80E0
 int    SysSprintf(char* buf, const char* fmt, ...);
 s32 TriggerDoAction(void* action, void* a1, void* a2);           // 0x801E0054
 void*  UIWidgetFindChild(void* widget, u32 hash);                   // 0x80199AEC

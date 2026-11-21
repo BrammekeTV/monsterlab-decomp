@@ -113,7 +113,7 @@ void  fn_801FF2A8(u8* audio, s32 handle);                        // 0x801FF2A8
 void fn_80202B8C(u8* arg0);                                          // 0x80202B8C (voice callback)
 void  fn_80203340(u8* data, s32 handle, s32 flag);               // 0x80203340
 s32   fn_8020390C(u8* audio, u8* name);                          // 0x8020390C
-void  fn_802095B0(u8* slot, void* a, void* b, void* c);          // 0x802095B0
+s32 fn_802095B0(u8* arg0, void* arg1, void* arg2, void* arg3);          // 0x802095B0
 s32   fn_80258024(s32 priority, void* cb, void* ctx);            // 0x80258024
 s32   fn_80263FEC(u8* p, s32 handle, s32 a);                     // 0x80263FEC
 s32   fn_80264020(u8* p);                                        // 0x80264020

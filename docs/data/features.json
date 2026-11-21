@@ -99,6 +99,11 @@
  "changelog": [
   {
    "date": "2026-11-21",
+   "time": "12:26",
+   "text": "Round 53: 44 more missing game functions (spline builders, UI setters, lightning/rope strands, text parsing, GX quad draw, battle reward rolls); 75 game functions left"
+  },
+  {
+   "date": "2026-11-21",
    "time": "12:24",
    "text": "First pixels on Windows (PRs #16 and #17): a Direct3D 11 renderer now draws real game textures from the player's own disc through the game's own draw code. The first one on screen was the game's font. The loader also converts the UI data of global_binary.sir (UI root, fonts, screen state machines), so the boot gets through the UI and HUD setup. The title screen is next."
   },

@@ -16,7 +16,7 @@ u8*   fn_8006FBDC(void);                                            // 0x8006FBD
 s32   fn_8006FBFC(u8* p);                                           // 0x8006FBFC
 u8*   fn_80093CF0(u8* p);                                           // 0x80093CF0
 void  EventSend(void* mgr, void* target, void* from, u32 event, int a, int b, int c, int d);   // 0x801BA190
-void  SpawnEffectAt(void* fxMgr, u32 effect, const f32 posAndScale[4], u8** owner); // 0x801C80E0 (4th arg is really the owner slot pointer)
+s32 SpawnEffectAt(void* fxMgr, u32 effect, const f32 pos[4], u8** owner); // 0x801C80E0 (4th arg is really the owner slot pointer)
 void* fn_801D40E0(s32 n);                                           // 0x801D40E0
 void* fn_80209814(void* v);                                         // 0x80209814
 s32   PlaySound(u32 hash, s32 a, s32 b, s32 c, s32 d, s32 e);      // 0x80209E70

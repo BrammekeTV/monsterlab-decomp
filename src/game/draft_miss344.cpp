@@ -19,7 +19,7 @@ f32    cosf(f32 x);                                                 // 0x8033EC9
 void   fn_80009840(u8* p);                                          // 0x80009840
 void   fn_8003EA7C(u8* p);                                          // 0x8003EA7C
 f32    fn_800DE2AC(u8* zone);                                       // 0x800DE2AC
-void   fn_8006D774(u8* ent, u8* info);                              // 0x8006D774
+void fn_8006D774(u8* p);                              // 0x8006D774
 void   fn_8014DE68(void);                                           // 0x8014DE68
 s32    fn_8015BA30(void* p);                                        // 0x8015BA30
 void   fn_801719DC(void* p);                                        // 0x801719DC
@@ -436,7 +436,7 @@ void fn_80137684(u8* world, s32 slot) {
             if ((*(u32*)(rec + 0x1C) & 0x100) != 0 && (*(u32*)(rec + 0x20) & 1) != 0 && ent != NULL) {
                 u8* owner = *(u8**)(ent + 0x4);
                 if (owner != NULL && (*(u32*)(owner + 0x1C) & 0x100) != 0) {
-                    fn_8006D774(ent, owner);
+                    fn_8006D774(ent);
                 }
             }
             off64 += 0x40;

@@ -15,7 +15,7 @@ u32   RandomU32(void);                                                          
 s32   RaySceneTest(void* ray);                                                                   // 0x80070458
 void  ScopedLockCtor(ScopedLock* l);                                                          // 0x801F5384
 void  ScopedLockDtor(ScopedLock* l, s32 flags);                                               // 0x801F53B0
-void  SpawnEffectAt(void* fxMgr, u32 effect, const f32 posAndScale[4], int a);                // 0x801C80E0
+s32 SpawnEffectAt(void* fxMgr, u32 effect, const f32 pos[4], u8** owner);                // 0x801C80E0
 u8*   fn_80062CE0(u8* p, s32 del);                                                            // 0x80062CE0 (base dtor)
 void  fn_800690D4(u8* p, s32 a, void* params, s32 b);                                         // 0x800690D4 (base ctor)
 u8*   fn_8006FBDC(void);                                                                      // 0x8006FBDC

@@ -14,7 +14,7 @@ s32   ZoneIsLoaded(void* world, s32 zone);
 void* fn_801D40E0(s32 n);                                         // 0x801D40E0
 void  fn_8008CE28(u8* vec, f32 v);
 void  fn_8020B068(s32 a3);                                        // 0x8020B068
-void  SpawnEffectAt(void* fxMgr, u32 effect, const f32 posAndScale[4], u8** owner);  // 0x801C80E0
+s32 SpawnEffectAt(void* fxMgr, u32 effect, const f32 pos[4], u8** owner);  // 0x801C80E0
 void  fn_801C849C(u8* mgr, u8* item);                             // 0x801C849C
 void  fn_801C9DF0(u8* obj, const f32* v, f32* out, f32 s);        // 0x801C9DF0
 void  fn_801CA30C(u8* obj, const f32* v);                         // 0x801CA30C

@@ -25,7 +25,7 @@ extern "C++" const char lbl_805F8DE8[];    // name string
 extern "C++" u8 gWorldState[];             // world state (pointer at offset 0)
 
 extern "C" {
-void    SpawnEffectAt(void* fxMgr, u32 effect, const f32 posAndScale[4], int a); // 0x801C80E0
+s32 SpawnEffectAt(void* fxMgr, u32 effect, const f32 pos[4], u8** owner); // 0x801C80E0
 void*   EventPost(s32 id, void* sender);                                          // 0x801F3918
 u32     StringHash(const char* s);                                                // 0x801EB704
 void    fn_801B6878(u8* obj, void* a1, s32 a2, s32 a3);                          // 0x801B6878

@@ -45,7 +45,7 @@ void* fn_801D40E0(s32 n);                                       // 0x801D40E0
 void* fn_80209814(void* v);                                     // 0x80209814
 s32   PlaySoundAt(void* sound, int a, const Vec3* pos, int b);  // 0x80209ABC
 void  fn_801B55F4(u8* obj, u8* out, s32 idx);                   // 0x801B55F4
-void  SpawnEffectAt(void* fxMgr, u32 effect, const f32 posAndScale[4], int a); // 0x801C80E0
+s32 SpawnEffectAt(void* fxMgr, u32 effect, const f32 pos[4], u8** owner); // 0x801C80E0
 void* CharacterFind(s32 id);                                    // 0x800E876C
 void  EventSend(void* mgr, void* target, void* from, u32 event, int a, int b, int c, int d);   // 0x801BA190
 const char* fn_801EB708(u32 hash);                              // 0x801EB708

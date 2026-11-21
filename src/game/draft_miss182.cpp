@@ -45,7 +45,7 @@ void   ScopedLockDtor(ScopedLock* l, s32 flags);                      // 0x801F5
 u8     SCGetAspectRatio(void);                                        // 0x8026A9D8: 1 = 16:9
 u8     SCGetLanguage(void);
 void   SetResponse(u32 a3);
-void   SpawnEffectAt(void* fxMgr, u32 effect, const f32 posAndScale[4], int a);   // 0x801C80E0
+s32 SpawnEffectAt(void* fxMgr, u32 effect, const f32 pos[4], u8** owner);   // 0x801C80E0
 void*  SpawnHelper(void* owner, s32 arg);                             // 0x8000C478
 u32    VIGetTvFormat(void);
 Locator* WorldFindLocator(void* world, u32 hash);                     // 0x8012AA50

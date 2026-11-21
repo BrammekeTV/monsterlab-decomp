@@ -37,7 +37,7 @@ u8*         ObjRefDtor(u8* ref, s32 flags);                       // 0x800D50D0
 void        fn_800D5B1C(u8* obj, s32 a0, f32* pos);             // 0x800D5B1C
 void        fn_801ED788(f32* out, u8* a1);                        // 0x801ED788
 void*       fn_8010C90C(u32 pool, f32* pos, s32 flag);            // 0x8010C90C
-void        SpawnEffectAt(void* fxMgr, u32 effect, const f32 posAndScale[4], int a); // 0x801C80E0
+s32 SpawnEffectAt(void* fxMgr, u32 effect, const f32 pos[4], u8** owner); // 0x801C80E0
 extern "C++" void* SpawnHelperAttached(void* a, void* owner, void* b);              // 0x8000C508 (game_spawn.cpp)
 s32         fn_8016195C(void* p, s32 a, s32 b, void* c);          // 0x8016195C
 extern "C++" void SessionSetTimer(u8* session, f32 seconds, u8 flag);   // 0x80012C2C (session.cpp)

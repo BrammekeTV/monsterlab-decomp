@@ -40,7 +40,7 @@ BOOL   MonsterIsFullyHealed(u8* m);                                  // part_ins
 BOOL   PartAllowedAtRank(void* coll, s32 defIndex, s32 tier);        // 0x802191CC
 void   PartComputeRequiredRank(void* lab, s32 defIndex, s32 tierIndex);
 BOOL   SavePartTierOwned(u8* s, u32 part, s32 tier);                 // 0x802241F0
-void   SpawnEffectAt(void* fxMgr, u32 effect, const f32 posAndScale[4], u8** owner);   // 0x801C80E0
+s32 SpawnEffectAt(void* fxMgr, u32 effect, const f32 pos[4], u8** owner);   // 0x801C80E0
 void*  HashTableFind(void* table, u32 hash);                         
 BOOL   ZoneIsLoaded(void* world, s32 zone);
 u32    AlertGetLastError(void);                                      // 0x80140B58

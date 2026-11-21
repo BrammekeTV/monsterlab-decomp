@@ -1693,11 +1693,11 @@ void UIElement_SetColor_Floats(u32 a0, f32 a1, f32 a2, f32 a3, f32 a4); // src/g
 void UIElement_SetColor_Ints(u32 a0, BOOL a1, BOOL a2, BOOL a3, BOOL a4); // src/game/draft_8019.cpp
 void UIElement_SetDoHitTest(u32 a0, u32 /*0x06*/ a1);                  // src/engine/draft_8019b.cpp
 void UIElement_SetEnableFlag(u32 a0, u32 a1);                          // src/game/draft_miss44b.cpp
-void UIElement_SetPos(u32 a0, BOOL a1);  // type 0x81 (from signature table)
+void UIElement_SetPos(u32 a0, f32* a1);                                // src/game/draft_miss355.cpp
 void UIElement_SetPos_Floats(u32 a0, f32 a1, f32 a2, f32 a3);          // src/game/draft_miss48.cpp
 void UIElement_SetRot(u32 a0, void* a1);                               // src/game/draft_8019.cpp
 void UIElement_SetRot_Floats(u32 a0, f32 a1, f32 a2, f32 a3);          // src/game/draft_8019.cpp
-void UIElement_SetSize(u32 a0, BOOL a1);  // type 0x81 (from signature table)
+void UIElement_SetSize(u32 a0, f32* a1);                               // src/game/draft_miss355.cpp
 void UIElement_SetSize_Floats(u32 a0, f32 a1, f32 a2, f32 a3);         // src/game/draft_miss48.cpp
 void UIElement_SetUIAnimPlaybackRate(u32 a0, f32 a1);                  // src/engine/draft_8019b.cpp
 void UIElement_SetVisibleFlag(u32 a0, u32 a1);                         // src/game/draft_miss1.cpp

@@ -135,7 +135,7 @@ s32 fn_801C217C(u8* arg0, u8* arg1, u8* arg2, u8* arg3, u8* arg4, s32* arg5, f32
 // Looks up the entry whose first word equals `key` in a table of 0x80-byte entries
 // (count at +0x18, base at +0x1C; binary search if the byte at +0x20 is set, else linear),
 // then tail-calls fn_801C3F6C(table, entry) (entry is NULL when not found).
-s32 fn_801C3EA4(u8* table, s32 key) {
+u8* fn_801C3EA4(u8* table, s32 key) {
     u32 k = (u32)key;
     u8* entry;
     if (*(u8*)(table + 0x20) != 0) {
@@ -161,7 +161,7 @@ s32 fn_801C3EA4(u8* table, s32 key) {
             }
         }
     }
-    return (s32)(intptr_t)fn_801C3F6C(table, entry);
+    return (u8*)fn_801C3F6C(table, entry);
 }
 
 // 0x801DFE7C

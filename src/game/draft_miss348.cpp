@@ -28,7 +28,7 @@ void  fn_80202CAC(void);                                           // 0x80202CAC
 void  fn_80202EFC(s32 chan, s32 result);                           // 0x80202EFC (pad connect result callback)
 void  fn_80203ABC(u8* audio, u8* state);                           // 0x80203ABC
 void  fn_80203DE8(u8* audio, u8* state);                           // 0x80203DE8
-void  fn_802044C0(void);                                           // 0x802044C0
+void fn_802044C0(u8* tex, u32 color, f32 x0, f32 x1, f32 y0, f32 y1, f32 u0, f32 u1, f32 v0, f32 v1);                                           // 0x802044C0
 s32   fn_802097CC(u8* obj, f32* a, f32* b, f32* c, f32 t);         // 0x802097CC (vcall slot 0x54)
 void  fn_80234394(u8* alarm, u32 a, OSTime start, OSTime period, void* handler, u32 extra); // 0x80234394
 void  fn_8024849C(f32* mtx, f32 a, f32 b, f32 c, f32 d, f32 e, f32 f);  // 0x8024849C

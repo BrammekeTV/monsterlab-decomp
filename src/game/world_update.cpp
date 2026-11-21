@@ -21,7 +21,7 @@ BOOL  fn_801F5220(void);
 BOOL  EntityRefreshLinks(void* entity);                         // 0x8012CDFC
 s32   WorldGetEntityZone(void* world, void* entity);            // 0x80132458
 BOOL  ZoneIsLoaded(void* world, s32 zone);                      // 0x8012F408
-void  SpawnEffectAt(void* fxMgr, void* effect, const f32 posAndScale[4], int a);   // 0x801C80E0
+s32 SpawnEffectAt(void* fxMgr, u32 effect, const f32 pos[4], u8** owner);   // 0x801C80E0
 s32   PlaySoundAt(void* sound, int a, const Vec3* pos, int b);  // 0x80209ABC
 BOOL  ScriptIsPaused(void* script);                             // 0x8000B8A0
 BOOL  ScriptIsStopped(void* script);                            // 0x8000B8AC
@@ -181,7 +181,7 @@ static inline void SpawnDespawnEffect(Character* e) {
     if (model == NULL) return;
     const Vec3* pos = (const Vec3*)((u8*)e + 0x18);
     f32 p[4] = { pos->x, pos->y, pos->z, 0.0f };
-    SpawnEffectAt(lbl_8047C760, *(void**)(model + 0x1E4), p, 0);
+    SpawnEffectAt(lbl_8047C760, *(u32*)(model + 0x1E4), p, 0);
     PlaySoundAt(*(void**)(model + 0x1F4), 0, pos, 0);
 }
 

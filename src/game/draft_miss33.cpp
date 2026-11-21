@@ -10,7 +10,7 @@ extern "C" {
 void    CharacterStartReaction(void* ch);                                   // 0x8004E3D0
 s32     PlaySound(u32 hash, s32 a, s32 b, s32 c, s32 d, s32 e);             // 0x80209E70
 s32     PlaySoundAt(void* sound, int a, const void* pos, int b);            // 0x80209ABC
-void    SpawnEffectAt(void* fxMgr, u32 effect, const f32 posAndScale[4], int a); // 0x801C80E0
+s32 SpawnEffectAt(void* fxMgr, u32 effect, const f32 pos[4], u8** owner); // 0x801C80E0
 u8*     fn_80021750(void);
 s32     fn_8004E2A4(u8* fighters, s32 slot);
 void    fn_8004F310(void* slot, s32 idx, s32 a, s32 b);

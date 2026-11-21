@@ -13,7 +13,7 @@ s32   RaySceneTest(void* ray);                                    // 0x80070458
 void  fn_800690D4(u8* p, s32 a, void* params, s32 b);             // 0x800690D4 (base ctor)
 void  fn_80097BFC(u8* p);                                         // 0x80097BFC
 f32 fn_800999B4(u8* obj, f32 v);                                // 0x800999B4
-void  SpawnEffectAt(void* fxMgr, u32 effect, const f32 posAndScale[4], int a);  // 0x801C80E0
+s32 SpawnEffectAt(void* fxMgr, u32 effect, const f32 pos[4], u8** owner);  // 0x801C80E0
 u32   RandomU32(void);                                            // 0x80143460
 void  TextureRelease(void* texture);                               // 0x80194028
 void  fn_801ECFA0(void* widget, u32 id);                           // 0x801ECFA0

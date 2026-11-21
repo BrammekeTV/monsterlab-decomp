@@ -26,7 +26,7 @@ s32    PlaySound(u32 hash, s32 a, s32 b, s32 c, s32 d, s32 e);        // 0x80209
 s32    PlaySoundAt(void* sound, void* owner, const void* pos, s32 b); // 0x80209ABC
 void   ReactionBuildHit(void* round, u8* out, s32 side);              // 0x80214F5C
 s32    RoundGetAttacker(void* round);                                 // 0x80214F48
-void   SpawnEffectAt(void* fxMgr, u32 effect, const f32 posAndScale[4], int a);   // 0x801C80E0
+s32 SpawnEffectAt(void* fxMgr, u32 effect, const f32 pos[4], u8** owner);   // 0x801C80E0
 void   TargetListDecode(void* t, const u32* mask, s32 side);          // 0x80216240
 void*  TargetListDestroy(void* t, s32 del);                           // 0x80216200
 void   TargetListInit(void* t);                                       // 0x802161DC

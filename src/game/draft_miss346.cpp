@@ -7,7 +7,7 @@
 extern "C" {
 void  fn_8018B2CC(u8* obj, u8* entry, s32 a, s32 b, f32 c, f32 d);  // 0x8018B2CC
 void  fn_801BCD88(u8* node, s32 a, s32 b, f32 scale);               // 0x801BCD88
-void  fn_801BEDBC(u8* def, f32* a, f32* b, s32 flag, u8* def2);     // 0x801BEDBC
+u8* fn_801BEDBC(u8* obj, u8* proto, f32* from, f32* to, u32 depth, u8* parent);     // 0x801BEDBC
 void* fn_801EB94C(void* p);                                         // 0x801EB94C
 u32   RandomU32(void);                                              // 0x80143460
 void  QuatFromAxisAngle(Quat* out, const Vec3* axis, f32 angle);   // 0x80145EE8
@@ -24,7 +24,7 @@ BOOL  ZoneIsLoaded(void* world, s32 zone);                         // 0x8012F408
 void* ObjAlloc(u32 size);                                          // 0x801D4414
 void  BufferFree(void* p);                                         // 0x801D4980
 void  fn_801EB748(void* p);                                        // 0x801EB748
-void  fn_801EB858(void* pool, s32 elemSize, s32 align, void* buf, u32 size);  // 0x801EB858
+void* fn_801EB858(u8* pool, s32 elemSize, s32 align, u8* buf, u32 size);  // 0x801EB858
 s32   fn_801EBD1C(u8* node, void* owner);                          // 0x801EBD1C
 void* fn_801EBD2C(void* node);                                     // 0x801EBD2C
 void  fn_801CEC68(void* item, u8* obj, f32* pos, void* fxMgr);    // 0x801CEC68
@@ -135,7 +135,7 @@ u8* fn_801BE620(u8* arg0, u32 arg1, f32* arg2, f32* arg3, u32 arg4, s32 arg5) {
     node = (u8*)fn_801EB94C(*(void**)(e1 + 0x68));
     if (node == NULL) return node;
 
-    fn_801BEDBC(e1, arg2, arg3, 1, e2);
+    fn_801BEDBC(node, e1, arg2, arg3, 1, e2);
     *(f32*)(node + 0x4C) = arg2[0];
     *(f32*)(node + 0x50) = arg2[1];
     *(f32*)(node + 0x54) = arg2[2];
@@ -356,11 +356,11 @@ void fn_801C6838(u8* out, u8* a, u8* b) {
 void fn_801C76FC(u8* arg0, void* buf0, u32 size0, void* buf1, u32 size1, void* buf2, u32 size2) {
     void* p = ObjAlloc(0x2C);
     *(void**)(arg0 + 0x14) = p;
-    if (p != NULL) fn_801EB858(p, 0xAC, 0x10, buf0, size0);
+    if (p != NULL) fn_801EB858((u8*)p, 0xAC, 0x10, (u8*)buf0, size0);
 
     p = ObjAlloc(0x2C);
     *(void**)(arg0 + 0x18) = p;
-    if (p != NULL) fn_801EB858(p, 0x80, 0x10, buf1, size1);
+    if (p != NULL) fn_801EB858((u8*)p, 0x80, 0x10, (u8*)buf1, size1);
 
     u8* blk = (u8*)ObjAlloc(0x10);
     *(u8**)(arg0 + 0x10) = blk;
@@ -380,7 +380,7 @@ void fn_801C76FC(u8* arg0, void* buf0, u32 size0, void* buf1, u32 size1, void* b
 
     p = ObjAlloc(0x2C);
     *(void**)(arg0 + 0xC) = p;
-    if (p != NULL) fn_801EB858(p, 0x34, 0x10, buf2, size2);
+    if (p != NULL) fn_801EB858((u8*)p, 0x34, 0x10, (u8*)buf2, size2);
     *(s32*)(arg0 + 0x20) = 4;
 }
 

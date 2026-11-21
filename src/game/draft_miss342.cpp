@@ -25,7 +25,7 @@ int    SysSprintf(char* buf, const char* fmt, ...);
 void*  SirLoad(void* loader, const char* path, void* dst, u32 size, s32 flags);
 s32    fn_801DC9B0(void* p);                                   // 0x801DC9B0
 s32    fn_801E5F48(u8* pool, const char* name, u32 hash);
-void   fn_801F2EE4(s32 a, s32 b);                              // 0x801F2EE4
+void fn_801F2EE4(void);                              // 0x801F2EE4
 void   fn_801F5414(u8* p);                                     // 0x801F5414
 void   fn_801F5270(s32 a3, s32 a4, s32 a5, s32 a6, s32 a7, s32 a8, s32 a9, s32 a10);  // 0x801F5270
 void   fn_80333B34(char* dst, char* src);                      // 0x80333B34
@@ -180,7 +180,7 @@ void fn_8010A28C(void) {
 
     gFlag805FB948 = 1;
     lbl_805FBB38 = 0x524D3745;
-    fn_801F2EE4(0x524D0000, 1);
+    fn_801F2EE4();
     fn_801F5414((u8*)1);
     t25 = fn_801DC9B0((u8*)0xF200EC1E);
     t26 = fn_801DC9B0((u8*)0x5D8630F8);

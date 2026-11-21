@@ -707,8 +707,8 @@ void* fn_801B7198(void* arg0, s32 arg1) {
 // table +0x10, count +0xC, 0xEC bytes per record, id in the first word; binary search when the
 // table byte +0x14 says it is sorted, else linear) and spawns it at pos. Does nothing when the
 // id is not found. (The asm returns SpawnEffectAtPos' pointer, or 0; declared void like its callers.)
-void SpawnEffectAt(void* fxMgr, u32 effect, const f32 pos[4], int a) {
-    if (effect == 0) return;
+s32 SpawnEffectAt(void* fxMgr, u32 effect, const f32 pos[4], u8** owner) {
+    if (effect == 0) return 0;
     u8* db = *(u8**)((u8*)fxMgr + 0x1C);
     s32 count = *(s32*)(db + 0xC);
     s32 found;
@@ -735,8 +735,8 @@ void SpawnEffectAt(void* fxMgr, u32 effect, const f32 pos[4], int a) {
     }
     u8* rec = NULL;
     if (found >= 0) rec = *(u8**)(db + 0x10) + found * 0xEC;
-    if (rec == NULL) return;
-    SpawnEffectAtPos((u8*)fxMgr, (u8*)rec, pos, (u8**)a);   // lint:ok tail call; the original returns its result (callers ignore it)
+    if (rec == NULL) return 0;
+    return SpawnEffectAtPos((u8*)fxMgr, (u8*)rec, pos, owner);
 }
 
 // 0x801F5220

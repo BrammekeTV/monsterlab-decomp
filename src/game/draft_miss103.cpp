@@ -24,7 +24,7 @@ void fn_8022667C(u8* s, const u8* spec, void** parts);   // progress.cpp
 void fn_802268BC(u8* s, const u8* spec);                 // progress.cpp
 s32 RandomUpTo(s32 max);
 s32 SaveUnlockReward(u8* s, const u8* reward, BOOL notify);
-void SpawnEffectAt(void* fxMgr, u32 effect, const f32 posAndScale[4], int a);
+s32 SpawnEffectAt(void* fxMgr, u32 effect, const f32 pos[4], u8** owner);
 u32 OSGetTick(void);
 int SysSprintf(char* buf, const char* fmt, ...);
 void* EventPost(s32 id, void* sender);

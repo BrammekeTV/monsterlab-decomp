@@ -28,7 +28,7 @@ void   ReactionBuildNamed(char* out, s32 limb, void* fighter, s32 reaction);   /
 s32    RaySceneTest(void* ray);                                           // 0x80070458
 void   ScopedLockCtor(ScopedLock* l);                                     // 0x801F5384
 void   ScopedLockDtor(ScopedLock* l, s32 flags);                          // 0x801F53B0
-void   SpawnEffectAt(void* fxMgr, u32 effect, const f32* posAndScale, u8** owner);   // 0x801C80E0
+s32 SpawnEffectAt(void* fxMgr, u32 effect, const f32 pos[4], u8** owner);   // 0x801C80E0
 u32    StringHash(const char* s);                                         // 0x801EB704
 int    SysSprintf(char* buf, const char* fmt, ...);                       // 0x80142EFC
 void*  UIWidgetFindChild(void* widget, u32 hash);                         // 0x80199AEC
