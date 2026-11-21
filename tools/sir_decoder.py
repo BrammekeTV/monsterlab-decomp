@@ -475,7 +475,7 @@ def fnv(b):
         h = ((h ^ c) * 0x01000193) & 0xFFFFFFFF
     return h
 
-def machines_dump(L, sec, base, hud_addr, list_addr, level=False):
+def machines_dump(L, sec, base, hud_addr, list_addr, level=False, extra=()):
     """Appends the dump of a HUD and its state machines (global_binary.sir, or a level zone: there
     the HUD carries the screen-list slot at +0x434 and points at it from +0x24)."""
     u = lambda o: struct.unpack_from('>I', sec, o)[0]
@@ -498,6 +498,8 @@ def machines_dump(L, sec, base, hud_addr, list_addr, level=False):
         p = u(hud + 0x28 + i * 4)
         L.append('hudmachine %d %s' % (i, ptr(p)))
         if p and p not in machines: machines.append(p)
+    for p in extra:
+        if p not in machines: machines.append(p)
     defs, trans, shared_trans = [], set(), set()
     for p in machines:
         o = off(p)
@@ -597,15 +599,124 @@ def level_dump(path):
         L.append('leveltable 0x%x %s' % (t, entries(t)))
     for i in range(count):
         o = LEVEL_SLOTS + i * stride
-        L.append('levelslot %d floats %s w18 %d floats %s res %s lists %s %s %d %d words %s %s %s %s bytes %d %d %d actions %s zone %s w100 %08x w10c %08x tables %s | %s | %s e120 %s e12c %s' % (
+        L.append('levelslot %d floats %s w18 %d floats %s res %s lists %s %s %d %d words %s %s %s %s bytes %d %d %d actions %s pools %s %d zone %s w100 %08x w10c %08x tables %s | %s | %s e120 %s e12c %s' % (
             i, ws(o, 6), i32(o + 0x18), ws(o + 0x1C, 3), ptr(u(o + 0x50)), ptr(u(o + 0x8C)), ptr(u(o + 0x90)), i32(o + 0x94), i32(o + 0x98),
             ws(o + 0xA0, 1), ws(o + 0xA8, 1), ws(o + 0xBC, 1), ws(o + 0xCC, 2), hdr[o + 0xA4], hdr[o + 0xAC], hdr[o + 0xC0],
-            ptr(u(o + 0xD4)), ptr(u(o + 0xFC)), u(o + 0x100), u(o + 0x10C), tab(o + 0x114), tab(o + 0x120), tab(o + 0x12C),
+            ptr(u(o + 0xD4)), ptr(u(o + 0xE4)), i32(o + 0xE8), ptr(u(o + 0xFC)), u(o + 0x100), u(o + 0x10C), tab(o + 0x114), tab(o + 0x120), tab(o + 0x12C),
             entries(o + 0x120), entries(o + 0x12C)))
+    # What the header block names in zone 0: entities (slot +0x50 and the two entity tables), scene
+    # objects (block tables +0x1B0, +0x1BC) and pool tables (slot +0xE4, +0xE8).
+    inz = lambda v: zbase <= v < zbase + len(zone0)
+    roots, scene, pooltabs = [], [], []
+    def table_entries(o):
+        t, n = u(o) - base, u(o + 4)
+        return [u(t + i * 4) for i in range(n)]
+    for t in (0x1B0, 0x1BC):
+        scene += [v for v in table_entries(t) if inz(v)]
+    for i in range(count):
+        o = LEVEL_SLOTS + i * stride
+        roots += [v for v in [u(o + 0x50)] + table_entries(o + 0x120) + table_entries(o + 0x12C) if inz(v)]
+        if inz(u(o + 0xE4)): pooltabs.append((u(o + 0xE4), u(o + 0xE8)))
     hud = u(0x1F4)
-    if zbase <= hud < zbase + len(zone0):
-        machines_dump(L, zone0, zbase, hud, struct.unpack_from('>I', zone0, hud - zbase + 0x434)[0], True)
+    zone_dump(L, zone0, zbase, hud if inz(hud) else 0, roots, scene, pooltabs)
     return L
+
+FIXUP_ENTITY, FIXUP_PART, FIXUP_POOLED, FIXUP_PROJECTILE, FIXUP_RENDER, FIXUP_FSM = 651, 652, 653, 654, 655, 656
+
+def zone_dump(L, sec, base, hud, roots, scene_roots, pooltabs):
+    """Dump of what the loader converts in a level zone: pool tables and pools, entities (first
+    layer), scene objects, then the HUD and every state machine found on the way."""
+    u = lambda o: struct.unpack_from('>I', sec, o)[0]
+    i32 = lambda o: struct.unpack_from('>i', sec, o)[0]
+    h16 = lambda o: struct.unpack_from('>H', sec, o)[0]
+    inz = lambda v, n=1: base <= v and v + n <= base + len(sec)
+    off = lambda v: v - base
+    def ptr(v):
+        if v == 0: return 'null'
+        if base <= v <= base + len(sec): return 'img+0x%x' % (v - base)
+        return 'wii:%08x' % v
+    ws = lambda o, n: ' '.join('%08x' % u(o + i * 4) for i in range(n))
+    ents, scene, machines, projectiles = [], [], [], []
+    def add(lst, v, n=1):
+        if v and inz(v, n) and v not in lst: lst.append(v)
+    for v in roots: add(ents, v)
+    for v in scene_roots: add(scene, v)
+    for addr, n in pooltabs:
+        for i in range(n):
+            e = off(addr) + i * 0x2C
+            pool, fix = u(e + 4), i32(e + 0xC)
+            L.append('pooltable %s %d pool %s fixup %d type %d' % (ptr(addr), i, ptr(pool), fix, i32(e + 0x1C)))
+            if not inz(pool, 0x2C): continue
+            q = off(pool)
+            items, size, align, block = u(q), u(q + 4), u(q + 8), u(q + 0x24)
+            L.append('levelpool %s items %d size %d align %d used %d free %s inuse %s parent %s blocks %s grow %d block %s alloc %d' % (
+                ptr(pool), items, size, align, u(q + 0xC), ptr(u(q + 0x10)), ptr(u(q + 0x14)), ptr(u(q + 0x18)), ptr(u(q + 0x1C)),
+                sec[q + 0x20], ptr(block), i32(q + 0x28)))
+            first = ((block + 4 + align + 7) & ~(align - 1)) - 8
+            links = b''.join(sec[off(first) + k * (size + 8):off(first) + k * (size + 8) + 8] for k in range(items))
+            L.append('levelpoolnodes %s first %s sum %08x' % (ptr(pool), ptr(first), fnv(links)))
+            for k in range(items):
+                item = first + k * (size + 8) + 8
+                if fix in (FIXUP_ENTITY, FIXUP_PART, FIXUP_PROJECTILE): add(ents, item)
+                if fix == FIXUP_PROJECTILE: projectiles.append(item)
+                if fix == FIXUP_POOLED: add(ents, u(off(item)))
+                if fix == FIXUP_RENDER: L.append('renderslot %s %s' % (ptr(item), ptr(u(off(item)))))
+                if fix == FIXUP_FSM:
+                    L.append('fsmslot %s %s' % (ptr(item), ptr(u(off(item)))))
+                    add(machines, u(off(item)), 0x58)
+    def parts(c):
+        if not inz(c, 0x14): return
+        o = off(c)
+        n = u(o + 0x10)
+        L.append('entparts %s items %s %d' % (ptr(c), ptr(u(o + 0xC)), n))
+        for i in range(n):
+            it = u(off(u(o + 0xC)) + i * 4)
+            if not inz(it, 0x2C): continue
+            m = u(off(it) + 0x28)
+            L.append('entitem %s parts %s %d' % (ptr(it), ptr(u(off(it) + 0x24)), m))
+            for k in range(m):
+                pp = u(off(u(off(it) + 0x24)) + k * 4)
+                if inz(pp, 0x10): L.append('entpart %s %08x %08x kind %d' % (ptr(pp), u(off(pp)), u(off(pp) + 4), u(off(pp) + 0xC)))
+    i = 0
+    while i < len(ents):
+        a = ents[i]; i += 1
+        if not inz(a, 0x1B4): continue
+        o = off(a)
+        L.append('entity %s vtable %08x record %s parts %s scene %s w94 %d %d obj9c %s holder %s children %s f158 %08x more %s %d w1a8 %d flags %08x' % (
+            ptr(a), u(o), ptr(u(o + 4)), ptr(u(o + 0x8C)), ptr(u(o + 0x90)), i32(o + 0x94), i32(o + 0x98), ptr(u(o + 0x9C)), ptr(u(o + 0xA4)),
+            ptr(u(o + 0xB0)), u(o + 0x158), ptr(u(o + 0x194)), i32(o + 0x1A4), i32(o + 0x1A8), u(o + 0x1B0)))
+        r = u(o + 4)
+        if inz(r, 0x40):
+            q = off(r)
+            L.append('entrecord %s floats %s w1c %08x %08x f24 %08x w2c %d h30 %d bytes %s' % (
+                ptr(r), ws(q, 7), u(q + 0x1C), u(q + 0x20), u(q + 0x24), i32(q + 0x2C), h16(q + 0x30), sec[q + 0x34:q + 0x3E].hex()))
+        parts(u(o + 0x8C))
+        add(scene, u(o + 0x90), 8)
+        if inz(u(o + 0x9C), 0xC): L.append('entobj9c %s id %08x' % (ptr(u(o + 0x9C)), u(off(u(o + 0x9C)) + 8)))
+        hl = u(o + 0xA4)
+        if inz(hl, 8):
+            L.append('entholder %s machine %s other %s' % (ptr(hl), ptr(u(off(hl))), ptr(u(off(hl) + 4))))
+            add(machines, u(off(hl)), 0x58)
+        n = u(o + 0x1A4)
+        if n and inz(u(o + 0x194), n * 4):
+            for k in range(n): parts(u(off(u(o + 0x194)) + k * 4))
+        node, seen = u(o + 0xB0), set()
+        while inz(node, 0xC) and node not in seen:
+            seen.add(node)
+            L.append('entchild %s entity %s next %s' % (ptr(node), ptr(u(off(node) + 4)), ptr(u(off(node) + 8))))
+            add(ents, u(off(node) + 4))
+            node = u(off(node) + 8)
+    for a in scene:
+        o = off(a)
+        t = u(o + 4)
+        line = 'sceneobj %s type %d' % (ptr(a), t)
+        if t == 2: line += ' a %s list %s' % (ptr(u(o + 0x48)), ptr(u(o + 0x4C)))
+        if t == 3: line += ' count %d items %s' % (i32(o + 0x54), ptr(u(o + 0x58)))
+        L.append(line)
+    for a in projectiles:
+        L.append('projectile %s part %s' % (ptr(a), ptr(u(off(a) + 0x22C))))
+    if hud:
+        machines_dump(L, sec, base, hud, u(off(hud) + 0x434), True, machines)
 
 def image_dump(path):
     """Text dump of the hand-typed image objects of global_binary.sir (one line per record)."""

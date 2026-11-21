@@ -24,7 +24,7 @@ Code: `include/port/sir_loader.h`, `src/port/sir_loader.cpp`. Test: `tests/sir_l
 | `global_binary.sir` UI root, fonts and the objects of slots `0xDB4`-`0xDBC` | the fields the code reads are converted; the glyph data of the three fonts is not |
 | `global_binary.sir` effect definitions (slots `0x82C`-`0x840`: 27 + 70 entries) and the two object pools of slots `0x10`, `0x418` | converted; fields typed from the effect and pool code |
 | `global_binary.sir` font glyph data, sound objects named by action records, `0xDC0` | not converted: see "Not converted yet" |
-| Level files (`*_level.sir`): header block (the world state, 493 zone slots) and zone 0's HUD with its state machines | the fields the code reads are converted; entities, props and everything else in the zone images are not: see "Level files" |
+| Level files (`*_level.sir`): header block (the world state, 493 zone slots); in zone 0 the HUD and state machines, the first layer of every entity, scene objects, pool tables and their pools | the fields the level start reads are converted; the rest of an entity and of the zone images is not: see "Level files" |
 | Hook into the game's `SirLoad` | not wired (the port has no file layer yet) |
 
 Of the 1,096,124 bytes of the image, 33.1% now belongs to objects converted by a schema (the game
@@ -568,6 +568,7 @@ loader takes the size from the block: each slot's first table points at `slot + 
 | `0x8C`, `0x90` | two pointers; `0x94`, `0x98`: how many entries of the two entity tables are in use | `SessionBegin`, `CharacterFind`, `fn_8012FD0C` |
 | `0xA0`, `0xA8`, `0xBC`, `0xCC`, `0xD0`, `0x100`, `0x10C` | words read with `lwz`; pointer or number not known yet (bytes at `0xA4`, `0xAC`, `0xC0`) | `fn_800098F4`, `CIAnimatedPropEnableByProp`, `fn_801C668C`, `fn_801C6BCC`, `OnZoneScreensLoaded`, `fn_8004DAF8` |
 | `0xD4` | the zone's action table (`TriggerDoAction`, zone id other than 0x1FF) | `TriggerDoAction` |
+| `0xE4`, `0xE8` | pool table: 0x2C-byte entries and their count | `fn_8012FD0C` -> `fn_801DB1AC` |
 | `0xFC` | the zone's record at the start of its image | `WorldTick` |
 | `0x114`, `0x120`, `0x12C` | three tables `{pointer, capacity, used}`: 0x54-byte entries at `slot + 0x140`, and two tables of entity pointers | `fn_80129CC8`, `fn_8012FD0C` |
 
@@ -583,8 +584,9 @@ world code (`0x80129000`-`0x80138000`) and the callers of `gWorldState` gave.
 
 ### Zone 0
 
-Of the zone image only the HUD (header `+0x1F4`) and its state machines are converted, with the
-checks and schemas of `global_binary.sir`. A level's HUD is 0x438 bytes: it holds the screen-list
+Converted in the zone image: the HUD and its state machines, and what the level start
+(`fn_8013006C`) walks: entities, scene objects and pool tables (next sections). The HUD (header
+`+0x1F4`) and its machines use the checks and schemas of `global_binary.sir`. A level's HUD is 0x438 bytes: it holds the screen-list
 slot itself at `+0x434` (`HudReload` hands `*(hud + 0x434)` to `ScreenMgrLoad`), and `+0x24`
 already points at that slot. The machines' value tables lie in another zone's image (47 to 64
 machines per level, all but one with such a table): the loader converts the pointer and leaves
@@ -594,18 +596,77 @@ In the port, `PortFileRead` converts the header block when it is read (before `f
 on it) and zone 0 when it is read; MEM2 sits at its original address there, so pointers into
 zones that are loaded later are valid as they are.
 
+### Entities
+
+An entity (prop, character, projectile, ...) is an object the file holds ready-made. At level
+start `fn_8012FD0C` runs `fn_8012F8B8` on every entity of a zone slot's two tables; that function
+installs the vtable for the entity's type and prepares what hangs off it. The loader converts
+**only what that pass reads**; an entity has hundreds of bytes more that later code reads.
+
+| Offset | Field | Reader |
+|---|---|---|
+| `0x000` | vtable slot (build-time address; the constructor for the type stores the real one) | `fn_801B4334`, `fn_8006F61C`, `fn_800690D4`, ... |
+| `0x004` | record (below) | `fn_8012F8B8`, `fn_801B4334` |
+| `0x08C` | part container: `{+0x0C items, +0x10 count}`; an item has `{+0x24 parts, +0x28 count}`; a part is `{vtable slot, word, -, kind}` and gets its vtable by kind | `fn_8012F6B0` |
+| `0x090` | scene object (below) | `fn_8012F8B8` |
+| `0x094`, `0x098` | words the base constructor clears | `fn_801B4334` |
+| `0x09C` | object whose `+0x08` is an id, for a type 6 entity | `fn_8012F8B8` |
+| `0x0A4` | state machine holder `{machine, object}`; the machine's definition goes to `fn_801BC574` | `fn_8012F8B8` |
+| `0x0B0` | child list: nodes `{+0x04 entity, +0x08 next}` | `fn_8012F8B8` |
+| `0x158` | float | `fn_800690D4` |
+| `0x194`, `0x1A4` | more part containers and their count; `0x1A8` | `fn_8012F8B8`, `fn_800690D4` |
+| `0x1B0` | flags | `fn_8012F8B8` |
+
+The record at `+0x04` is 0x40 bytes: two vectors of three floats and a 1.0 (`fn_801B4334` resets
+them), layer mask and flags at `0x1C` / `0x20`, a float at `0x24`, a word at `0x2C`, a `u16` at
+`0x30`, and bytes from `0x34` (the entity type is the byte at `0x34`).
+
+A **scene object** (entity `+0x90`, and the entries of the header block's tables `+0x1B0` and
+`+0x1BC`) has a type word at `+0x04` that picks its class (`fn_801D94CC` 1, `fn_801DA81C` 2,
+`fn_801DA1CC` 3, `fn_801D9A24` 4). Converted: the type; for type 2 the two pointers at `+0x48`
+and the list behind `+0x4C` (nodes linked through their first word, a flag word 0xAC bytes
+before each: `fn_801DB160`, `fn_801842E0`); for type 3 the count at `+0x54` and the pointer
+array at `+0x58` (`fn_801DA7C8`).
+
+### Pool tables
+
+A zone slot's `+0xE4` / `+0xE8` name a table of 0x2C-byte entries: `{+0x04 pool, +0x0C index of a
+script function, +0x1C entity type}`. `fn_801DB1AC` runs that function over every item of the
+pool, in use or free. The pool is the object of "Object pools" above, ready-made in the zone. What
+an item is follows from the function:
+
+| Index | Function | An item is |
+|---|---|---|
+| 651 | `FixUpEntityCallback` | an entity (its type comes from the entry's `+0x1C`) |
+| 652 | `FixUpEntityPartCallback` | an entity |
+| 653 | `FixUpPooledEntityCallback` | a slot holding an entity |
+| 654 | `FixUpProjectileEntityCallback` | an entity with a part pointer at `+0x22C` |
+| 655 | `FixUpRenderObjectCallback` | a slot holding a render object (`fn_8012F818`; the object is not typed yet) |
+| 656 | `FixupFSMPoolCallback` | a slot holding a state machine |
+
+The index is the function's place in `gScriptFuncs`, which depends on the registration order.
+The six are registered in a row; the loader uses the indices of the retail build
+(`LEVEL_FIXUP_*`), and the port checks them against the live table (by name hash) before it
+converts a zone, and stops if they differ. `empty_level.sir` has one such pool (96 projectiles);
+the other levels have three (projectiles, 30 render objects, and one more).
+
+A level's pointers can lead into another zone's image, which is not in memory when zone 0 is
+converted. Such an object is skipped; the pointer itself is still converted.
+
 ### Not converted yet in level files
 
 | What | Where | Next reader |
 |---|---|---|
-| entity and prop records | the entries of a slot's two pointer tables; `empty_level.sir` has one at zone 0 `+0x33170` | `fn_8012F8B8` (entity `+0x04` -> definition, type byte at its `+0x34`, then one constructor per type) |
+| the rest of an entity | beyond the fields above: the action words at `+0x34`-`+0x80`, the name at `+0x108`, type-specific data | the per-type update and script functions |
 | the zone record | start of each zone image, 0x40 bytes: a word and three lists `{head, tail, count}` (the first is the texture list) | `WorldTick` reads slot `+0xFC` |
+| render objects | pool items of fix-up 655 | `fn_8012F818` |
 | value tables of the HUD's machines | another zone's image | `fn_801BBE40`, as soon as a state runs an action |
 | zone action tables and their records | slot `+0xD4` | `TriggerDoAction`; `ActionRecordPlan` applies |
 | zones 1 and up, textures, models, collision | the rest | - |
 
 Check: all seven level files give the same dump from the C++ loader and the Python reference
-(505 lines for `empty_level.sir`, 2,714 to 4,892 for the others).
+(713 lines for `empty_level.sir`, 3,110 to 5,288 for the others: 97 or 98 entities each, of which
+96 are pooled projectiles).
 
 ## Found on the way
 
@@ -632,8 +693,8 @@ In the order the boot path needs them:
    at its original address, the loader needs the script function table at load time: either the
    port converts those operands after the game has registered its functions, or a table of
    function index to signature is generated from a run of the PC build.
-2. **Level files**: the entity records of a zone (`fn_8012F8B8` and the per-type constructors it
-   calls), the zone record, then what the title screen's zone needs. See "Level files".
+2. **Level files**: what the first frames of a level read of an entity beyond the first layer,
+   the zone record, render objects, then what the title screen's zone needs. See "Level files".
    **`shared_ui.sir`** (title screen). `FixupFSMPoolCallback` (0x8010CCB0) and `HudReload` call
    the same `fn_801BC574` on machines from other files, so the state-machine schemas here should
    apply as they are; what is missing is how those files name their machines (the section type
