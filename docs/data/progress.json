@@ -1,15 +1,15 @@
 {
  "game_id": "RM7P4F",
- "generated": "2026-11-21T16:18:38+00:00",
- "commit": "85355fa",
- "commit_date": "2026-11-21T17:12:20+01:00",
+ "generated": "2026-11-21T17:14:29+00:00",
+ "commit": "d13597f",
+ "commit_date": "2026-11-21T17:38:51+01:00",
  "game": {
   "functions": 8548,
   "bytes": 2265988,
   "named": 2748,
   "named_bytes": 616800,
-  "decompiled": 7267,
-  "decompiled_bytes": 1713560
+  "decompiled": 7289,
+  "decompiled_bytes": 1720056
  },
  "library": {
   "functions": 4039,
@@ -24,8 +24,8 @@
   "bytes": 3404928,
   "named": 3211,
   "named_bytes": 721548,
-  "decompiled": 7268,
-  "decompiled_bytes": 1713680
+  "decompiled": 7290,
+  "decompiled_bytes": 1720176
  },
  "game_range": [
   "80006B40",
@@ -425,7 +425,7 @@
    0.012
   ],
   [
-   0.096,
+   0.142,
    0.0
   ],
   [
@@ -621,7 +621,7 @@
    0.631
   ],
   [
-   0.789,
+   0.922,
    0.275
   ],
   [
@@ -669,7 +669,7 @@
    0.327
   ],
   [
-   0.784,
+   1.0,
    0.042
   ],
   [
@@ -677,19 +677,19 @@
    0.0
   ],
   [
-   0.591,
+   0.755,
    0.0
   ],
   [
-   0.11,
+   0.217,
    0.0
   ],
   [
-   0.533,
+   0.56,
    0.0
   ],
   [
-   0.885,
+   0.91,
    0.022
   ],
   [
@@ -14214,6 +14214,121 @@
      "name": "fn_8022ED60",
      "addr": "8022ED60",
      "size": 56
+    }
+   ]
+  },
+  {
+   "path": "src/game/draft_miss401.cpp",
+   "functions": [
+    {
+     "name": "fn_8015FD48",
+     "addr": "8015FD48",
+     "size": 44
+    },
+    {
+     "name": "fn_8015FE20",
+     "addr": "8015FE20",
+     "size": 68
+    },
+    {
+     "name": "fn_8015FE64",
+     "addr": "8015FE64",
+     "size": 116
+    },
+    {
+     "name": "fn_8015FF1C",
+     "addr": "8015FF1C",
+     "size": 116
+    },
+    {
+     "name": "fn_8015FF90",
+     "addr": "8015FF90",
+     "size": 92
+    },
+    {
+     "name": "fn_80162D70",
+     "addr": "80162D70",
+     "size": 220
+    },
+    {
+     "name": "fn_80163010",
+     "addr": "80163010",
+     "size": 224
+    },
+    {
+     "name": "fn_8016344C",
+     "addr": "8016344C",
+     "size": 200
+    },
+    {
+     "name": "fn_80166040",
+     "addr": "80166040",
+     "size": 212
+    },
+    {
+     "name": "fn_80166510",
+     "addr": "80166510",
+     "size": 212
+    },
+    {
+     "name": "fn_80166BB4",
+     "addr": "80166BB4",
+     "size": 144
+    },
+    {
+     "name": "fn_80166EEC",
+     "addr": "80166EEC",
+     "size": 216
+    },
+    {
+     "name": "fn_8016835C",
+     "addr": "8016835C",
+     "size": 228
+    },
+    {
+     "name": "fn_801691E4",
+     "addr": "801691E4",
+     "size": 220
+    }
+   ]
+  },
+  {
+   "path": "src/game/draft_miss402.cpp",
+   "functions": [
+    {
+     "name": "fn_80146328",
+     "addr": "80146328",
+     "size": 1196
+    },
+    {
+     "name": "fn_8015EF64",
+     "addr": "8015EF64",
+     "size": 704
+    },
+    {
+     "name": "fn_80160054",
+     "addr": "80160054",
+     "size": 392
+    },
+    {
+     "name": "fn_801606A4",
+     "addr": "801606A4",
+     "size": 356
+    },
+    {
+     "name": "fn_80162E4C",
+     "addr": "80162E4C",
+     "size": 388
+    },
+    {
+     "name": "fn_80163778",
+     "addr": "80163778",
+     "size": 280
+    },
+    {
+     "name": "fn_80163890",
+     "addr": "80163890",
+     "size": 388
     }
    ]
   },
@@ -27819,6 +27934,16 @@
      "name": "fn_800C4490",
      "addr": "800C4490",
      "size": 8
+    }
+   ]
+  },
+  {
+   "path": "src/game/transform_matrix.cpp",
+   "functions": [
+    {
+     "name": "fn_800DBD10",
+     "addr": "800DBD10",
+     "size": 480
     }
    ]
   },

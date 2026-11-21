@@ -99,6 +99,11 @@
  "changelog": [
   {
    "date": "2026-11-21",
+   "time": "18:14",
+   "text": "Round 58: 21 more effect-system functions (vector helpers, slot state handlers, lagged-Fibonacci seed, fade/colour table builders)"
+  },
+  {
+   "date": "2026-11-21",
    "time": "17:38",
    "text": "Level files start loading on Windows (PRs #22 to #24): the boot now reads the front-end level, empty_level.sir, from the player's own disc. The loader converts its header, the HUD, the first layer of entities (position, rotation, parts and state machines), scene objects and the object pools the level start fills in. The level start runs until it reaches data that isn't converted yet. The title screen comes after the rest of the level data."
   },
