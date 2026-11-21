@@ -199,6 +199,7 @@ extern "C" const char* SirErrorText(SirError e) {
     case SIR_ERR_SCREENS:        return "screen state machine not recognised (count, node type or pointer outside the image)";
     case SIR_ERR_EFFECTS:        return "effect definition table, a texture or a pool pointer of it outside the image";
     case SIR_ERR_POOL:           return "object pool not recognised (counts, block, or a list pointer that is not one of its nodes)";
+    case SIR_ERR_LEVEL:          return "level header block not recognised (zone slot table)";
     case SIR_ERR_OVERLAP:        return "two objects of the image share bytes";
     case SIR_ERR_IO:             return "cannot read file";
     }
@@ -354,7 +355,7 @@ enum RegionKind {
     REGION_ACTION_TABLE, REGION_PTR_ARRAY, REGION_U32_ARRAY,
     REGION_UI_ROOT, REGION_UI_FONT, REGION_UI_FONT_OBJ, REGION_UI_FONT_LIST, REGION_UI_DRAW, REGION_UI_PAD,
     REGION_FSM, REGION_FSM_DEF, REGION_FSM_STATES, REGION_FSM_EVENTS, REGION_FSM_SHARED_EVENTS, REGION_FSM_NODE,
-    REGION_FSM_TRANSITION, REGION_FSM_SHARED_TRANSITION, REGION_HUD,
+    REGION_FSM_TRANSITION, REGION_FSM_SHARED_TRANSITION, REGION_HUD, REGION_LEVEL_HUD,
     REGION_FX_BOLTS, REGION_FX_TRAILS, REGION_POOL, REGION_POOL_BLOCK,
     REGION_RUNTIME    // memory the game initialises itself: nothing to convert, but nothing else may be there
 };
@@ -431,10 +432,15 @@ static bool PlanFinish(ImagePlan* plan) {
     return true;
 }
 
+// Wii address of the image being checked and converted: global_binary.sir's, or a level zone's
+// while LevelZoneConvert runs. (One file is converted at a time, on the thread that read it.)
+static u32 sImageBase = GLOBAL_BINARY_WII_BASE;
+static bool sLevelZone = false;   // the image is a level zone
+
 // Offset in the image of the `size` bytes at Wii address `addr`; false if they are not all inside.
 static bool ImageSpan(u32 addr, u64 size, u32 imageSize, u32* off) {
-    if (addr < GLOBAL_BINARY_WII_BASE) return false;
-    u32 o = addr - GLOBAL_BINARY_WII_BASE;
+    if (addr < sImageBase) return false;
+    u32 o = addr - sImageBase;
     if ((u64)o + size > imageSize) return false;
     *off = o;
     return true;
@@ -589,7 +595,7 @@ static SirError TextureListPlan(ImagePlan* plan, const u8* image, u32 imageSize,
     u32 node = Be32(image + off + 0x04), prev = 0;
     for (u32 i = 0; i < count; i++) {
         u32 texOff, dataOff;
-        if (node < GLOBAL_BINARY_WII_BASE + SIR_TEXTURE_NODE ||
+        if (node < sImageBase + SIR_TEXTURE_NODE ||
             !ImageSpan(node - SIR_TEXTURE_NODE, SIR_TEXTURE_HEADER, imageSize, &texOff)) return SIR_ERR_TEXTURE;
         const u8* tex = image + texOff;
         if (Be32(tex) != SIR_TEXTURE_HEADER || Be32(tex + 0x2C) != prev || Be32(tex + 0x30) != addr + 4) return SIR_ERR_TEXTURE;
@@ -857,6 +863,17 @@ static const SirField kHudFields[] = {
     // 0x430: u8 (UiUpdate)
 };
 
+// HUD of a level file (0x438 bytes): the same, with the screen-list slot inside it.
+static const SirField kLevelHudFields[] = {
+    { 0x00, SIR_U32, 1 },
+    { 0x04, SIR_PTR, 8 },
+    { 0x24, SIR_PTR, 1 },     // code: address of the screen-list slot (fn_8001B128 reads through it)
+    { 0x28, SIR_PTR, HUD_MACHINES },
+    { 0x428, SIR_U32, 1 },
+    { 0x42C, SIR_PTR, 1 },
+    { 0x434, SIR_PTR, 1 },    // code: the screen list (HudReload)
+};
+
 static SirError FsmTransitionPlan(ImagePlan* plan, const u8* image, u32 imageSize, u32 addr, bool shared) {
     u32 off, size = shared ? FSM_SHARED_TRANSITION_USED : FSM_TRANSITION_USED;
     if (!ImageSpan(addr, size, imageSize, &off) || !ImagePtrOk(Be32(image + off + 0x04), imageSize)) return SIR_ERR_SCREENS;
@@ -985,7 +1002,10 @@ static SirError FsmPlan(ImagePlan* plan, const u8* image, u32 imageSize, u32 add
     if (!ImagePtrOk(Be32(fsm + 0x10), imageSize) || !PlanAdd(plan, off, FSM_USED, REGION_FSM)) return SIR_ERR_SCREENS;
 
     u32 values = Be32(fsm + 0x54), valuesOff;
-    if (values != 0) {
+    if (values != 0 && sLevelZone && !ImageSpan(values, 4, imageSize, &valuesOff)) {
+        // A level's machines keep their value tables in another zone's image: the pointer is
+        // converted, the table is not (it is not in memory when zone 0 is read).
+    } else if (values != 0) {
         if (!ImageSpan(values, 4, imageSize, &valuesOff)) return SIR_ERR_SCREENS;
         u32 count = Be32(image + valuesOff);
         if (!ImageSpan(values, 4 + (u64)count * 4, imageSize, &valuesOff) ||
@@ -995,12 +1015,22 @@ static SirError FsmPlan(ImagePlan* plan, const u8* image, u32 imageSize, u32 add
     return def == 0 ? SIR_OK : FsmDefPlan(plan, image, imageSize, def);
 }
 
-static SirError HudPlan(ImagePlan* plan, const u8* image, u32 imageSize, u32 addr) {
-    u32 off;
-    if (!ImageSpan(addr, HUD_SIZE, imageSize, &off)) return SIR_ERR_SCREENS;
+// `level`: the HUD of a level file. It carries the screen-list slot itself, at +0x434, and +0x24
+// already points at that slot (in global_binary.sir HudInit stores the address of a header slot).
+static SirError HudPlan(ImagePlan* plan, const u8* image, u32 imageSize, u32 addr, bool level) {
+    u32 off, size = level ? LEVEL_HUD_SIZE : HUD_SIZE;
+    if (!ImageSpan(addr, size, imageSize, &off)) return SIR_ERR_SCREENS;
     const u8* hud = image + off;
     u32 count = Be32(hud + 0x428);
-    if (count > HUD_MACHINES || !PlanAdd(plan, off, HUD_SIZE, REGION_HUD)) return SIR_ERR_SCREENS;
+    if (count > HUD_MACHINES || !PlanAdd(plan, off, size, level ? REGION_LEVEL_HUD : REGION_HUD)) return SIR_ERR_SCREENS;
+    if (level) {
+        u32 list = Be32(hud + 0x434);
+        if (!ImagePtrOk(Be32(hud + 0x24), imageSize)) return SIR_ERR_SCREENS;
+        if (list != 0) {
+            SirError e = FsmPlan(plan, image, imageSize, list);
+            if (e != SIR_OK) return e;
+        }
+    }
     for (u32 i = 0; i < 8; i++)
         if (!ImagePtrOk(Be32(hud + 0x04 + i * 4), imageSize)) return SIR_ERR_SCREENS;
     if (!ImagePtrOk(Be32(hud + 0x42C), imageSize)) return SIR_ERR_SCREENS;
@@ -1100,9 +1130,9 @@ static SirError ActionRecordPlan(ImagePlan* plan, const u8* image, u32 imageSize
 
 // Every record of the action table at `addr` (already checked by PtrArrayPlan).
 static SirError ActionRecordsPlan(ImagePlan* plan, const u8* image, u32 imageSize, u32 addr) {
-    u32 off = addr - GLOBAL_BINARY_WII_BASE;
+    u32 off = addr - sImageBase;
     u32 count = Be32(image + off + 0x00);
-    u32 array = Be32(image + off + 0x04) - GLOBAL_BINARY_WII_BASE;
+    u32 array = Be32(image + off + 0x04) - sImageBase;
     for (u32 i = 0; i < count; i++) {
         u32 rec = Be32(image + array + i * 4);
         if (rec == 0) continue;
@@ -1199,20 +1229,20 @@ static bool PoolLayoutRead(const u8* pool, u32 imageSize, PoolLayout* out) {
     u32 count = Be32(pool + 0x00), itemSize = Be32(pool + 0x04), align = Be32(pool + 0x08), block = Be32(pool + 0x24);
     if (count == 0 || count > POOL_MAX_ITEMS || itemSize == 0 || itemSize > 0x10000 || (itemSize & 3) != 0) return false;
     if (align < 4 || align > 0x1000 || (align & (align - 1)) != 0) return false;
-    if (block < GLOBAL_BINARY_WII_BASE || Be32(pool + 0x1C) != block) return false;
+    if (block < sImageBase || Be32(pool + 0x1C) != block) return false;
     u32 first = ((block + 4 + align + 7) & ~(align - 1)) - 8;
     out->stride = itemSize + 8;
     out->count = count;
     if (!ImageSpan(block, (u64)(first - block) + (u64)count * out->stride, imageSize, &out->blockOff)) return false;
-    out->firstOff = first - GLOBAL_BINARY_WII_BASE;
+    out->firstOff = first - sImageBase;
     return true;
 }
 
 // NULL or the address of one of the pool's nodes.
 static bool PoolNodeOk(const PoolLayout* l, u32 addr) {
     if (addr == 0) return true;
-    if (addr < GLOBAL_BINARY_WII_BASE) return false;
-    u32 off = addr - GLOBAL_BINARY_WII_BASE;
+    if (addr < sImageBase) return false;
+    u32 off = addr - sImageBase;
     return off >= l->firstOff && (off - l->firstOff) % l->stride == 0 && (off - l->firstOff) / l->stride < l->count;
 }
 
@@ -1265,7 +1295,7 @@ static SirError ImagePlanBuild(ImagePlan* plan, const u8* hdr, u8* image, u32 im
     if (e == SIR_OK && (addr = Be32(hdr + 0xDB8)) != 0) e = UiDrawPlan(plan, image, imageSize, addr);
     if (e == SIR_OK && (addr = Be32(hdr + 0xDBC)) != 0) e = UiPadPlan(plan, imageSize, addr);
     if (e == SIR_OK && (addr = Be32(hdr + 0xD98)) != 0) e = FsmPlan(plan, image, imageSize, addr);
-    if (e == SIR_OK && (addr = Be32(hdr + 0xD9C)) != 0) e = HudPlan(plan, image, imageSize, addr);
+    if (e == SIR_OK && (addr = Be32(hdr + 0xD9C)) != 0) e = HudPlan(plan, image, imageSize, addr, false);
     if (e == SIR_OK) e = FxTablePlan(plan, image, imageSize, Be32(hdr + 0x830), Be32(hdr + 0x82C), false);
     if (e == SIR_OK) e = FxTablePlan(plan, image, imageSize, Be32(hdr + 0x83C), Be32(hdr + 0x838), true);
     if (e == SIR_OK && (addr = Be32(hdr + 0x010)) != 0) e = PoolPlan(plan, image, imageSize, addr);
@@ -1312,6 +1342,7 @@ static void ImagePlanConvert(const ImagePlan* plan, SirReloc* r, u8* image, u32 
             SirConvertRecord(r, p, g->size, kFsmSharedTransitionFields, COUNTOF(kFsmSharedTransitionFields));
             break;
         case REGION_HUD:          SirConvertRecord(r, p, g->size, kHudFields, COUNTOF(kHudFields)); break;
+        case REGION_LEVEL_HUD:    SirConvertRecord(r, p, g->size, kLevelHudFields, COUNTOF(kLevelHudFields)); break;
         case REGION_FX_BOLTS:     ConvertRecords(r, p, g->size, FX_BOLT_SIZE, kFxBoltFields, COUNTOF(kFxBoltFields)); break;
         case REGION_FX_TRAILS:    ConvertRecords(r, p, g->size, FX_TRAIL_SIZE, kFxTrailFields, COUNTOF(kFxTrailFields)); break;
         case REGION_POOL:         PoolConvert(r, image, p, imageSize); break;
@@ -1372,6 +1403,169 @@ extern "C" SirError GlobalBinaryConvert(SirReloc* r, u8* hdr, u8* image, u32 ima
         e = GlobalBinaryConvertHeader(r, hdr);
     }
     PlanFree(&plan);
+    return e;
+}
+
+// ------------------------------------------------------------------------------------ level files
+//
+// A level file (`empty_level.sir`, `village_level.sir`, ...) has a header block (section type -1,
+// 0x47800 bytes) and one image per zone (section type = zone number). fn_801294CC reads the header
+// block into the world state (`*gWorldState`), runs fn_80129CC8 on it, then reads zone 0 to
+// gZoneBase[0]. The header block is the world state itself: a few top-level fields and, from
+// +0x21E0, one slot per zone. Only fields with a reader in the decompiled code are converted;
+// docs/loader.md lists them and what is left.
+
+// Top of the world state.
+static const SirField kLevelHeaderFields[] = {
+    { 0x004, SIR_U32, 1 },    // code: s32 last zone index (fn_8013006C loops i <= it)
+    { 0x008, SIR_PTR, 4 },    // code: current zone slots, set by fn_801294CC (+0x08, +0x0C; +0x10, +0x14 by index)
+    { 0x02C, SIR_PTR, 1 },    // code: object list (fn_8013006C registers it with the object database)
+    { 0x030, SIR_U32, 1 },    // code: its count
+    { 0x038, SIR_PTR, 1 },    // code: second object list
+    { 0x03C, SIR_U32, 1 },    // code: its count
+    { 0x07C, SIR_U32, 1 },    // code: fn_8012FFA4 copies +0x7C..+0x90 to the manager lbl_8047C730: count,
+    { 0x080, SIR_PTR, 1 },    //       entries, (u8 flag at +0x84),
+    { 0x088, SIR_U32, 1 },    //       count,
+    { 0x08C, SIR_PTR, 1 },    //       0x1F4-byte entries (u8 flag at +0x90)
+    { 0x1A4, SIR_PTR, 1 }, { 0x1A8, SIR_U32, 2 },   // code: zone slots, count, used (fn_80129CC8 sets all five tables)
+    { 0x1B0, SIR_PTR, 1 }, { 0x1B4, SIR_U32, 2 },
+    { 0x1BC, SIR_PTR, 1 }, { 0x1C0, SIR_U32, 2 },
+    { 0x1C8, SIR_PTR, 1 }, { 0x1CC, SIR_U32, 2 },
+    { 0x1D4, SIR_PTR, 1 }, { 0x1D8, SIR_U32, 2 },
+    { 0x1E0, SIR_U32, 3 },    // code: +0x1E0 (GameSessionUpdate), +0x1E4 (PlayFootStepEffect), +0x1E8 (fn_800D7FF0)
+    // 0x1EC: u8 (WorldPostUpdate)
+    { 0x1F0, SIR_U32, 1 },    // code: GameSessionUpdate
+    { 0x1F4, SIR_PTR, 1 },    // code: the level's HUD (HudReload, fn_800D8100)
+    { 0x1F8, SIR_F32, 6 },    // code: fn_8003E560, fn_8006C3FC
+    { 0xA20, SIR_U32, 1 },    // code: fn_8003E560
+    { 0x1A7C, SIR_U32, 1 },   // code: EntityUpdate, fn_8003E560
+    { 0x1A84, SIR_F32, 2 },   // code: SetOptionsBrightness, IncOptionsBrightness
+};
+
+// One zone slot. Words marked "word" are read with lwz by the function named; whether they hold
+// a pointer or a number is not known yet, which makes no difference while the zones sit at their
+// original addresses.
+static const SirField kLevelSlotFields[] = {
+    { 0x000, SIR_F32, 6 },    // code: WorldGetEntityZone (+0x00..+0x08), fn_80131370 (+0x0C..+0x14)
+    { 0x018, SIR_U32, 1 },    // code: fn_80133D74
+    { 0x01C, SIR_F32, 3 },    // code: WorldGetEntityZone (+0x1C), fn_80130FC8 (+0x20, +0x24)
+    { 0x050, SIR_PTR, 1 },    // code: resource released by fn_8013006C (fn_8012F8B8)
+    { 0x08C, SIR_PTR, 2 },    // code: SessionBegin, SessionRestoreZoneObjects (two pointers in every slot of the file)
+    { 0x094, SIR_U32, 2 },    // code: CharacterFind, SessionBegin
+    { 0x0A0, SIR_U32, 1 },    // word: fn_800098F4 (u8 at +0xA4)
+    { 0x0A8, SIR_U32, 1 },    // word: CIAnimatedPropEnableByProp (u8 at +0xAC)
+    { 0x0BC, SIR_U32, 1 },    // word: fn_801C668C (u8 at +0xC0: fn_8005E1B8)
+    { 0x0CC, SIR_U32, 2 },    // word: fn_801C6BCC, fn_801C6C80
+    { 0x0D4, SIR_PTR, 1 },    // code: the zone's action table (TriggerDoAction)
+    { 0x0FC, SIR_PTR, 1 },    // code: the zone's record at the start of its image (WorldTick)
+    { 0x100, SIR_U32, 1 },    // word: OnZoneScreensLoaded
+    { 0x10C, SIR_U32, 1 },    // word: fn_8004DAF8
+    { 0x114, SIR_PTR, 1 }, { 0x118, SIR_U32, 2 },   // code: three tables fn_80129CC8 places: pointer, capacity, used
+    { 0x120, SIR_PTR, 1 }, { 0x124, SIR_U32, 2 },
+    { 0x12C, SIR_PTR, 1 }, { 0x130, SIR_U32, 2 },
+};
+
+extern "C" u32 LevelHeaderWiiBase(const u8* hdr, u32 size) {
+    if (hdr == NULL || size < LEVEL_HEADER_SLOTS + 4) return 0;
+    u32 slots = Be32(hdr + 0x1A4);
+    return slots >= LEVEL_HEADER_SLOTS ? slots - LEVEL_HEADER_SLOTS : 0;
+}
+
+// Size of one zone slot: fn_80129CC8 points each slot's first table (+0x114) at slot + 0x140, so
+// the distance between two slots' tables is the slot size. 0 if the block is not laid out so.
+static u32 LevelSlotSize(const u8* hdr, u32 size, u32 base, u32 count) {
+    if (count < 2 || size < LEVEL_HEADER_SLOTS + 0x118) return LEVEL_SLOT_MIN_SIZE;
+    u32 first = Be32(hdr + LEVEL_HEADER_SLOTS + 0x114);
+    if (first != base + LEVEL_HEADER_SLOTS + 0x140) return 0;
+    for (u32 stride = LEVEL_SLOT_MIN_SIZE; stride <= LEVEL_SLOT_MAX_SIZE; stride += 4) {
+        if ((u64)LEVEL_HEADER_SLOTS + stride + 0x118 > size) break;
+        if (Be32(hdr + LEVEL_HEADER_SLOTS + stride + 0x114) == first + stride) return stride;
+    }
+    return 0;
+}
+
+// A table of pointers inside the header block: `count` words at Wii address `addr`. Marks its
+// words in `used` (one byte per header word); false if it leaves the block or shares a word with
+// a table marked before or with the slots.
+static bool LevelTableMark(u8* used, u32 size, u32 base, u32 addr, u32 count) {
+    if (count == 0) return true;
+    if (addr < base || (addr & 3) != 0) return false;
+    u32 off = addr - base;
+    if ((u64)off + (u64)count * 4 > size) return false;
+    for (u32 i = 0; i < count; i++) {
+        if (used[off / 4 + i]) return false;
+        used[off / 4 + i] = 1;
+    }
+    return true;
+}
+
+static void LevelTableConvert(SirReloc* r, u8* hdr, u32 base, u32 addr, u32 count) {
+    for (u32 i = 0; i < count; i++) ConvertPtr(r, hdr + (addr - base) + i * 4);
+}
+
+// The pointer tables of the header block: per slot the two entity tables fn_80129CC8 places
+// (+0x120 and +0x12C, capacity behind each; fn_8012FD0C walks them), and the three per-zone tables
+// of the block (+0x1B0, +0x1BC, +0x1C8; fn_8013006C and others read *table[i]). Their entries are
+// pointers into the zones. The table at slot +0x114 (0x54-byte entries) and the one at +0x1D4
+// (12-byte entries) have no typed reader yet and are left.
+static const u32 kLevelSlotTables[] = { 0x120, 0x12C };
+static const u32 kLevelBlockTables[] = { 0x1B0, 0x1BC, 0x1C8 };
+
+extern "C" SirError LevelHeaderConvert(SirReloc* r, u8* hdr, u32 size) {
+    u32 base = LevelHeaderWiiBase(hdr, size);
+    if (base == 0) return SIR_ERR_LEVEL;
+    u32 count = Be32(hdr + 0x1A8);
+    u32 stride = LevelSlotSize(hdr, size, base, count);
+    u64 slotsEnd = (u64)LEVEL_HEADER_SLOTS + (u64)count * stride;
+    if (stride == 0 || count > LEVEL_MAX_ZONES || slotsEnd > size) return SIR_ERR_LEVEL;
+
+    // Check every table before the first byte changes.
+    u8* used = (u8*)calloc(size / 4 + 1, 1);
+    if (used == NULL) return SIR_ERR_LEVEL;
+    // The top of the block and the fixed part of every slot are taken. A slot's first table
+    // (+0x114: 0x54-byte entries) starts at slot + 0x140; some slots keep their two pointer tables
+    // in the words behind it, the others in the space behind the slot array (fn_80129CC8).
+    memset(used, 1, LEVEL_HEADER_SLOTS / 4);
+    bool ok = true;
+    for (u32 i = 0; i < count && ok; i++) {
+        const u8* slot = hdr + LEVEL_HEADER_SLOTS + i * stride;
+        u32 entries = Be32(slot + 0x118);
+        ok = entries <= (stride - LEVEL_SLOT_MIN_SIZE + 8) / 0x54;
+        if (ok) memset(used + (LEVEL_HEADER_SLOTS + i * stride) / 4, 1, (0x140 + entries * 0x54) / 4);
+    }
+    for (u32 i = 0; i < count && ok; i++) {
+        const u8* slot = hdr + LEVEL_HEADER_SLOTS + i * stride;
+        for (u32 t = 0; t < 2 && ok; t++)
+            ok = LevelTableMark(used, size, base, Be32(slot + kLevelSlotTables[t]), Be32(slot + kLevelSlotTables[t] + 4));
+    }
+    for (u32 t = 0; t < 3 && ok; t++)
+        ok = LevelTableMark(used, size, base, Be32(hdr + kLevelBlockTables[t]), Be32(hdr + kLevelBlockTables[t] + 4));
+    free(used);
+    if (!ok) return SIR_ERR_LEVEL;
+
+    for (u32 i = 0; i < count; i++) {
+        u8* slot = hdr + LEVEL_HEADER_SLOTS + i * stride;
+        for (u32 t = 0; t < 2; t++)
+            LevelTableConvert(r, hdr, base, Be32(slot + kLevelSlotTables[t]), Be32(slot + kLevelSlotTables[t] + 4));
+        SirConvertRecord(r, slot, stride, kLevelSlotFields, COUNTOF(kLevelSlotFields));
+    }
+    for (u32 t = 0; t < 3; t++)
+        LevelTableConvert(r, hdr, base, Be32(hdr + kLevelBlockTables[t]), Be32(hdr + kLevelBlockTables[t] + 4));
+    SirConvertRecord(r, hdr, LEVEL_HEADER_SLOTS, kLevelHeaderFields, COUNTOF(kLevelHeaderFields));
+    return SIR_OK;
+}
+
+extern "C" SirError LevelZoneConvert(SirReloc* r, u8* image, u32 imageSize, u32 wiiBase, u32 hudWiiAddr) {
+    ImagePlan plan = { NULL, 0, 0 };
+    sImageBase = wiiBase;
+    sLevelZone = true;
+    SirError e = SIR_OK;
+    if (hudWiiAddr != 0) e = HudPlan(&plan, image, imageSize, hudWiiAddr, true);
+    if (e == SIR_OK && !PlanFinish(&plan)) e = SIR_ERR_OVERLAP;
+    if (e == SIR_OK) ImagePlanConvert(&plan, r, image, imageSize);
+    PlanFree(&plan);
+    sImageBase = GLOBAL_BINARY_WII_BASE;
+    sLevelZone = false;
     return e;
 }
 
