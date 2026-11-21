@@ -20,14 +20,14 @@
 * { box-sizing: border-box; }
 html { background: var(--bg2); }
 body {
-  margin: 0; color: var(--ink); font: 15px/1.55 Rubik, system-ui, sans-serif;
+  margin: 0; color: var(--ink); font: 16px/1.6 Rubik, system-ui, sans-serif;
   background:
     radial-gradient(1200px 500px at 50% -10%, rgba(139,226,58,.12), transparent 70%),
     repeating-linear-gradient(90deg, rgba(255,255,255,.015) 0 2px, transparent 2px 120px),
     linear-gradient(var(--bg), var(--bg2));
   min-height: 100vh;
 }
-.wrap { max-width: 1060px; margin: 0 auto; padding: 18px 16px 60px; }
+.wrap { max-width: 1280px; margin: 0 auto; padding: 18px 16px 60px; }
 
 /* ---------- title ---------- */
 header { text-align: center; margin-bottom: 8px; position: relative; }
@@ -77,33 +77,55 @@ h2 {
 }
 .label { font: 400 20px/1.1 Bangers, Impact, sans-serif; letter-spacing: .06em; color: var(--muted); }
 .big {
-  font: 400 52px/1 Bangers, Impact, sans-serif; letter-spacing: .03em; color: var(--slime);
+  font: 400 60px/1 Bangers, Impact, sans-serif; letter-spacing: .03em; color: var(--slime);
   -webkit-text-stroke: 1.5px var(--outline); text-shadow: 0 0 18px var(--glow), 0 4px 0 var(--outline);
   font-variant-numeric: tabular-nums; margin: 6px 0 2px;
 }
-.small { font-size: 13px; color: var(--muted); font-variant-numeric: tabular-nums; }
+.small { font-size: 14px; color: var(--muted); font-variant-numeric: tabular-nums; }
 
 /* ---------- test-tube bars ---------- */
 .tube {
-  position: relative; height: 22px; margin: 12px 0 10px; border-radius: 12px; overflow: hidden;
-  background: linear-gradient(rgba(255,255,255,.14), rgba(255,255,255,.03) 45%, rgba(0,0,0,.25)), #10201b;
-  border: 2px solid var(--outline); box-shadow: inset 0 0 0 1px rgba(255,255,255,.08);
+  --c1:#c3ff7a; --c2:var(--slime); --c3:var(--slime-dk); --cg:var(--glow);
+  position: relative; height: 30px; margin: 12px 0 10px; border-radius: 16px; overflow: hidden;
+  background: linear-gradient(rgba(255,255,255,.14), rgba(255,255,255,.03) 45%, rgba(0,0,0,.28)), #0d1b17;
+  border: 2px solid var(--outline); box-shadow: inset 0 0 0 1px rgba(255,255,255,.08), inset 0 -6px 10px rgba(0,0,0,.35);
 }
 .tube i {
-  position: absolute; inset: 0 auto 0 0; display: block; border-radius: 10px 0 0 10px;
+  position: absolute; inset: 0 auto 0 0; display: block; border-radius: 14px 0 0 14px; overflow: hidden;
   background:
-    radial-gradient(circle at 20% 60%, rgba(255,255,255,.55) 1.5px, transparent 2.5px) 0 0/22px 22px,
-    linear-gradient(#c3ff7a, var(--slime) 45%, var(--slime-dk));
-  box-shadow: 0 0 12px var(--glow); animation: bubble 3s linear infinite;
+    linear-gradient(105deg, transparent 35%, rgba(255,255,255,.35) 50%, transparent 65%) 0 0/60% 100% no-repeat,
+    linear-gradient(var(--c1), var(--c2) 45%, var(--c3));
+  box-shadow: 0 0 14px var(--cg), inset 0 -5px 8px rgba(0,0,0,.25);
+  animation: sheen 3.6s ease-in-out infinite; transition: width 1s cubic-bezier(.2,.8,.2,1);
+}
+.tube i::after {
+  content: ""; position: absolute; right: -6px; top: -4px; bottom: -4px; width: 22px;
+  background: radial-gradient(ellipse at 30% 50%, rgba(255,255,255,.75), rgba(255,255,255,.12) 55%, transparent 72%);
+  filter: blur(1.5px); animation: foam 1.8s ease-in-out infinite;
 }
 .tube::after {
-  content: ""; position: absolute; left: 8px; right: 8px; top: 3px; height: 4px; border-radius: 4px;
-  background: rgba(255,255,255,.25);
+  content: ""; position: absolute; left: 10px; right: 10px; top: 3px; height: 5px; border-radius: 5px;
+  background: linear-gradient(90deg, rgba(255,255,255,.1), rgba(255,255,255,.4), rgba(255,255,255,.1)); pointer-events: none;
 }
-.tube.orange i { background: radial-gradient(circle at 20% 60%, rgba(255,255,255,.5) 1.5px, transparent 2.5px) 0 0/22px 22px, linear-gradient(#ffd27a, var(--orange) 50%, #a04e00); box-shadow: 0 0 12px rgba(255,154,31,.5); }
-.tube.purple i { background: radial-gradient(circle at 20% 60%, rgba(255,255,255,.5) 1.5px, transparent 2.5px) 0 0/22px 22px, linear-gradient(#d7b8ff, var(--purple) 50%, #4b1f86); box-shadow: 0 0 12px rgba(155,93,229,.5); }
-@keyframes bubble { to { background-position: 0 -22px, 0 0; } }
-@media (prefers-reduced-motion: reduce) { .tube i { animation: none; } }
+.tube.orange { --c1:#ffd27a; --c2:var(--orange); --c3:#a04e00; --cg:rgba(255,154,31,.55); }
+.tube.purple { --c1:#d7b8ff; --c2:var(--purple); --c3:#4b1f86; --cg:rgba(155,93,229,.55); }
+.bub {
+  position: absolute; bottom: -12px; left: var(--x); width: var(--s); height: var(--s); border-radius: 50%;
+  background: radial-gradient(circle at 32% 30%, rgba(255,255,255,.95) 0 14%, rgba(255,255,255,.28) 30%, rgba(255,255,255,.06) 62%, rgba(255,255,255,.35) 100%);
+  border: 1px solid rgba(255,255,255,.55); opacity: 0;
+  animation: rise var(--d) cubic-bezier(.35,.1,.5,1) var(--dl) infinite;
+}
+@keyframes rise {
+  0% { transform: translate(0,0) scale(.4); opacity: 0; }
+  12% { opacity: .95; }
+  35% { transform: translate(var(--w), -11px) scale(1); }
+  65% { transform: translate(calc(var(--w) * -1), -22px) scale(1.05); opacity: .9; }
+  90% { transform: translate(var(--w), -31px) scale(1.15); opacity: .8; }
+  100% { transform: translate(var(--w), -34px) scale(1.7); opacity: 0; }
+}
+@keyframes sheen { 0%,100% { background-position: -40% 0, 0 0; } 50% { background-position: 140% 0, 0 0; } }
+@keyframes foam { 0%,100% { opacity: .55; transform: scaleY(.9); } 50% { opacity: 1; transform: scaleY(1.1); } }
+@media (prefers-reduced-motion: reduce) { .tube i, .tube i::after, .bub { animation: none; } .bub { display: none; } }
 
 /* ---------- specimen grid ---------- */
 .map {
@@ -128,20 +150,22 @@ ul.ms li:first-child { border-top: 0; padding-top: 0; }
 .jar.done::after { height: 80%; background: linear-gradient(#c3ff7a, var(--slime-dk)); box-shadow: 0 0 10px var(--glow); }
 .jar.in_progress::after { height: 45%; background: linear-gradient(#ffd27a, #b25a00); }
 .ms strong { font-weight: 700; }
-.ms p { margin: 2px 0 0; color: var(--muted); font-size: 13px; }
+.ms p { margin: 2px 0 0; color: var(--muted); font-size: 14.5px; }
 .ms .st { font: 400 13px Bangers, Impact, sans-serif; letter-spacing: .08em; margin-left: 6px; }
 .st.done { color: var(--slime); } .st.in_progress { color: var(--orange); } .st.todo { color: var(--dim); }
 
 /* ---------- log, table, files ---------- */
-.log { margin: 0; padding: 0; list-style: none; }
-.log li { padding: 9px 0 9px 14px; border-left: 3px solid var(--slime-dk); margin-bottom: 8px; font-size: 14px; background: rgba(0,0,0,.18); border-radius: 0 8px 8px 0; padding-right: 10px; }
+.log { margin: 0; padding: 0; list-style: none; columns: 2 380px; column-gap: 16px; } .log li { break-inside: avoid; }
+.log li { padding: 10px 0 10px 14px; border-left: 3px solid var(--slime-dk); margin-bottom: 8px; font-size: 15px; background: rgba(0,0,0,.18); border-radius: 0 8px 8px 0; padding-right: 10px; }
 .log time { font: 12px "JetBrains Mono", monospace; color: var(--yellow); display: block; }
-table { width: 100%; border-collapse: collapse; font-size: 13px; }
+table { width: 100%; border-collapse: collapse; font-size: 14.5px; }
 td, th { text-align: left; padding: 7px 4px; border-top: 1px dashed rgba(255,255,255,.12); }
 th { color: var(--muted); font-weight: 500; border-top: 0; }
 td.num { text-align: right; font-variant-numeric: tabular-nums; white-space: nowrap; }
-.mini { width: 100px; } .mini .tube { margin: 0; height: 12px; border-width: 1.5px; } .mini .tube::after { display: none; }
-code, .mono { font: 12.5px "JetBrains Mono", monospace; color: #cde8c0; }
+.mini { width: 150px; } .mini .tube { margin: 0; height: 14px; border-width: 1.5px; border-radius: 8px; } .mini .tube::after { display: none; } .mini .tube i::after { width: 10px; }
+.mini .bub { bottom: -6px; } .mini .tube .bub { animation-name: rise-s; }
+@keyframes rise-s { 0% { transform: translate(0,0) scale(.4); opacity: 0; } 15% { opacity: .95; } 50% { transform: translate(var(--w), -8px) scale(1); } 100% { transform: translate(calc(var(--w) * -1), -17px) scale(1.5); opacity: 0; } }
+code, .mono { font: 13.5px "JetBrains Mono", monospace; color: #cde8c0; }
 details { border-top: 1px dashed rgba(255,255,255,.12); padding: 8px 0; }
 details:first-of-type { border-top: 0; }
 summary { cursor: pointer; }
@@ -149,13 +173,146 @@ summary { cursor: pointer; }
 #chart svg { width: 100%; height: 170px; display: block; border-radius: 10px; background: #0b1512; border: 2px solid var(--outline); }
 .empty { color: var(--muted); font-size: 14px; margin: 0; }
 .sub-note { margin: -6px 0 12px; }
+
+/* ---------- layout upgrades ---------- */
+html { scroll-behavior: smooth; scroll-padding-top: 64px; }
+nav.top {
+  position: sticky; top: 0; z-index: 10; display: flex; gap: 6px; justify-content: center; flex-wrap: wrap; padding: 10px 16px; margin: 0;
+  background: rgba(13,23,20,.88); backdrop-filter: blur(8px); border-bottom: 2px solid var(--outline);
+}
+nav.top a { font: 400 19px/1 Bangers, Impact, sans-serif; letter-spacing: .07em; color: var(--muted); text-decoration: none; padding: 6px 12px; border-radius: 8px; }
+nav.top a:hover { color: var(--yellow); background: rgba(255,255,255,.07); }
+.scroll { max-height: 640px; overflow: auto; padding-right: 6px; scrollbar-width: thin; }
+.tablewrap { overflow-x: auto; }
+.btn {
+  font: 400 17px/1 Bangers, Impact, sans-serif; letter-spacing: .07em; color: var(--ink); cursor: pointer;
+  padding: 8px 16px; margin-top: 12px; border-radius: 10px; border: 2px solid var(--outline);
+  background: linear-gradient(var(--metal-hi), var(--metal-lo)); box-shadow: 0 3px 0 var(--outline);
+}
+.btn:hover { color: var(--yellow); } .btn:active { transform: translateY(2px); box-shadow: 0 1px 0 var(--outline); }
+.btn[hidden] { display: none; }
+.search {
+  width: 100%; padding: 9px 12px; margin-bottom: 10px; border-radius: 10px; border: 2px solid var(--outline);
+  background: #0b1512; color: var(--ink); font: 13px "JetBrains Mono", monospace;
+}
+.pill { display: inline-block; font: 12px "JetBrains Mono", monospace; padding: 1px 8px; border-radius: 99px; background: rgba(0,0,0,.3); color: var(--muted); margin-left: 6px; }
+.msum .pill { margin-left: 0; }
+.fnlist .a { color: var(--dim); font: 11px "JetBrains Mono", monospace; margin-left: 6px; }
+.msum { display: flex; gap: 8px; margin: -4px 0 12px; flex-wrap: wrap; }
+details > summary { list-style: none; } details > summary::-webkit-details-marker { display: none; }
+details > summary::before { content: "▸"; display: inline-block; width: 1.1em; color: var(--yellow); transition: transform .15s; }
+details[open] > summary::before { transform: rotate(90deg); }
+@media (max-width: 760px) { .big { font-size: 44px; } h2 { font-size: 23px; } .panel { padding: 20px 16px 16px; } }
+
+/* ---------- experiments board ---------- */
+.board { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 16px; align-items: start; }
+@media (max-width: 900px) { .board { grid-template-columns: 1fr; } }
+.col h3 { margin: 0 0 10px; font: 400 20px/1 Bangers, Impact, sans-serif; letter-spacing: .07em; display: flex; align-items: center; gap: 8px; }
+.col h3 .pill { font-size: 12px; }
+.card {
+  display: block; width: 100%; text-align: left; margin: 0 0 8px; padding: 9px 12px; border-radius: 10px; cursor: pointer; color: var(--ink);
+  font: inherit; background: rgba(0,0,0,.22); border: 1px solid rgba(255,255,255,.08); border-left: 4px solid var(--c, var(--dim));
+}
+.card:hover { background: rgba(0,0,0,.32); }
+.card strong { font-size: 15px; display: block; }
+.card p { margin: 3px 0 0; color: var(--muted); font-size: 13.5px; line-height: 1.45; display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden; }
+.card.open p { -webkit-line-clamp: unset; display: block; }
+.card.compact p { display: none; } .card.compact.open p { display: block; }
+.card.compact { padding: 7px 12px; } .card.compact strong { font-weight: 500; }
+.card.in_progress { --c: var(--orange); background: rgba(255,154,31,.09); padding: 9px 14px; }
+.card.in_progress strong { font-size: 17px; color: var(--yellow); }
+.card.in_progress:not(.open) p { -webkit-line-clamp: 2; font-size: 14px; }
+.card.done { --c: var(--slime-dk); } .card.todo { --c: var(--dim); } .card.todo:not(.open) p { -webkit-line-clamp: 1; }
+.card.done strong::before { content: "✓ "; color: var(--slime); }
 footer { margin-top: 34px; text-align: center; color: var(--dim); font-size: 13px; }
+
+/* ---------- one-screen dashboard (desktop) ---------- */
+.topbar { display: grid; grid-template-columns: 300px 1fr; gap: 14px; align-items: stretch; }
+.topbar header { margin: 0; display: flex; flex-direction: column; justify-content: center; }
+h1.logo { max-width: 200px; }
+.topbar .tag { font-size: 12.5px; margin-top: 4px; }
+.stats { display: grid; grid-template-columns: repeat(3, 1fr); gap: 14px; }
+.stats .panel { padding: 12px 18px 12px; }
+.stats .big { font-size: 46px; margin: 2px 0 0; } .stats .label { font-size: 18px; }
+.stats .tube { margin: 8px 0 6px; }
+.main { display: grid; grid-template-columns: 1.05fr .95fr 1.2fr; gap: 14px; min-height: 0; margin-top: 14px; }
+.main > .panel, .midcol > .panel { display: flex; flex-direction: column; min-height: 0; padding: 14px 16px 14px; }
+.midcol { display: grid; grid-template-rows: auto 1fr; gap: 14px; min-height: 0; min-width: 0; }
+.panel h2 { font-size: 23px; margin-bottom: 10px; }
+.map { grid-template-columns: repeat(32, 1fr) !important; gap: 2px; padding: 8px; }
+#chart svg { flex: 1; min-height: 80px; height: auto; }
+.fill { flex: 1; min-height: 0; max-height: none; }
+.tabbar { display: flex; gap: 6px; margin: -2px 0 10px; flex-wrap: wrap; }
+.tab { font: 400 19px/1 Bangers, Impact, sans-serif; letter-spacing: .07em; color: var(--muted); cursor: pointer; padding: 8px 14px; border-radius: 9px; border: 2px solid var(--outline); background: rgba(0,0,0,.25); }
+.tab:hover { color: var(--yellow); } .tab.on { color: var(--outline); background: var(--yellow); }
+.pane { display: none; min-height: 0; flex: 1; flex-direction: column; } .pane.on { display: flex; }
+.pane .btn { align-self: flex-start; }
+.log { columns: 1 !important; }
+#ms .col { margin-bottom: 14px; } #ms .col h3 { position: sticky; top: 0; background: rgba(50,58,56,.97); padding: 2px 0 6px; z-index: 1; }
+.chips { display: flex; flex-wrap: wrap; gap: 6px; }
+.chips .card { width: auto; margin: 0; padding: 5px 10px; }
+.chips .card.open { flex-basis: 100%; }
+.chips .card strong { font-size: 13.5px; }
+footer { margin: 8px 0 0; font-size: 12px; }
+@media (min-width: 1100px) and (min-height: 620px) {
+  html, body { height: 100%; overflow: hidden; }
+  .wrap { height: 100vh; max-width: none; display: grid; grid-template-rows: auto minmax(0, 1fr) auto; padding: 12px 16px 6px; }
+}
+@media (max-width: 1099px), (max-height: 619px) {
+  .topbar, .stats, .main { grid-template-columns: 1fr; }
+  .main > .panel, .midcol > .panel { min-height: 420px; }
+  .midcol { grid-template-rows: auto 260px; }
+  #chart svg { height: 170px; flex: none; }
+}
+
+/* ---------- v3: wide experiments board, small side panels ---------- */
+.main { grid-template-columns: 1.8fr 1fr; grid-template-rows: auto auto minmax(0, 1fr); }
+.midcol { display: contents; }
+#lab { grid-column: 1; grid-row: 1 / 4; overflow: hidden; min-height: 0; }
+#mapsec { grid-column: 2; grid-row: 1; } #chart { grid-column: 2; grid-row: 2; } #tabs { grid-column: 2; grid-row: 3; }
+.board { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 14px; align-items: start; }
+.board .col { margin: 0 !important; min-width: 0; }
+.chips { display: block; } .chips .card { width: 100%; margin: 0 0 6px; }
+.card.in_progress:not(.open) p { -webkit-line-clamp: 4; }
+.card.todo { padding: 6px 12px; } .board .card { margin-bottom: 6px; } .card strong { font-size: 14.5px; }
+.card.compact { padding: 6px 12px; } .card.compact strong { font-size: 14.5px; }
+#mapsec, #chart { padding: 10px 14px 10px !important; }
+#mapsec h2, #chart h2 { font-size: 18px; margin-bottom: 6px; }
+.map { grid-template-columns: repeat(64, 1fr) !important; gap: 1px; padding: 6px; }
+.legend { margin-top: 6px; font-size: 12px; gap: 12px; }
+#chart svg { flex: none; height: 80px; min-height: 0; }
+#chart .legend { margin-top: 4px; }
+.tab { font-size: 16px; padding: 6px 11px; }
+.log li { font-size: 13px; padding: 7px 0 7px 12px; margin-bottom: 6px; } .log time { font-size: 11px; }
+@media (max-width: 1099px), (max-height: 619px) {
+  .main { grid-template-columns: 1fr; grid-template-rows: none; }
+  #lab, #mapsec, #chart, #tabs { grid-column: auto; grid-row: auto; }
+  .board { grid-template-columns: 1fr; }
+  #chart svg { height: 140px; }
+}
+
+/* ---------- v4: separate experiment sections ---------- */
+.board { grid-template-rows: minmax(0, 1fr); gap: 12px; overflow: visible; align-items: stretch; }
+.board .col {
+  display: flex; flex-direction: column; min-height: 0; padding: 10px 10px 10px; border-radius: 12px;
+  background: rgba(0,0,0,.28); border: 2px solid var(--outline); box-shadow: inset 0 2px 8px rgba(0,0,0,.35);
+  border-top: 4px solid var(--c, var(--dim));
+}
+.board .col.in_progress { --c: var(--orange); } .board .col.todo { --c: #8d9a96; } .board .col.done { --c: var(--slime); }
+#ms .col h3 { position: static; background: none; padding: 0 2px 8px; margin: 0; }
+.board .list { flex: 1; min-height: 0; overflow: hidden; }
+.board .col.more .list { overflow-y: auto; scrollbar-width: thin; }
+.board .morebtn { margin-top: 8px; align-self: stretch; padding: 7px 10px; font-size: 16px; }
+@media (min-width: 1100px) and (min-height: 620px) { #ms.board { flex: 1 1 0; height: 0; } }
+.board .card { background: rgba(255,255,255,.05); }
+.board .card.in_progress { background: rgba(255,154,31,.10); }
 </style>
 </head>
 <body>
 <div class="wrap">
-  <header>
-    <h1 class="logo"><span class="sr">Monster Lab Decomp</span>
+  <div class="topbar">
+    <header id="top">
+      <h1 class="logo"><span class="sr">Monster Lab Decomp</span>
       <svg viewBox="0 -20 640 326" aria-hidden="true">
         <defs>
           <linearGradient id="mFill" x1="0" y1="0" x2="0" y2="1">
@@ -205,52 +362,50 @@ footer { margin-top: 34px; text-align: center; color: var(--dim); font-size: 13p
           </g>
         </g>
       </svg>
-    </h1>
-    <div class="tape"><span>Decomp</span></div>
-    <p class="tag">Rebuilding the Wii game (PAL, RM7P4F) as readable C++ and porting it to Windows. One specimen at a time.</p>
-    <div class="meta" id="updated">loading…</div>
-  </header>
-
-  <div class="shelf"></div>
-
-  <div class="grid stats">
-    <div class="panel"><div class="label">Game code decompiled</div><div class="big" id="s-decomp">–</div><div class="tube"><i id="b-decomp"></i></div><div class="small" id="s-decomp-sub"></div></div>
-    <div class="panel"><div class="label">Game functions named</div><div class="big" id="s-named">–</div><div class="tube orange"><i id="b-named"></i></div><div class="small" id="s-named-sub"></div></div>
-    <div class="panel"><div class="label">SDK &amp; libraries identified</div><div class="big" id="s-lib">–</div><div class="tube purple"><i id="b-lib"></i></div><div class="small" id="s-lib-sub"></div></div>
-  </div>
-
-  <div class="shelf"></div>
-
-  <section class="panel">
-    <h2>Specimen map: game code</h2>
-    <div class="map" id="map" role="img" aria-label="Map of the game code region"></div>
-    <div class="legend">
-      <span><b style="background:var(--slime)"></b>Decompiled</span>
-      <span><b style="background:var(--orange)"></b>Named</span>
-      <span><b style="background:#1e2c27"></b>Not started</span>
-      <span class="mono" id="range"></span>
+      </h1>
+      <p class="tag">Rebuilding the Wii game (PAL, RM7P4F) as readable C++ and porting it to Windows. One specimen at a time.</p>
+      <div class="meta" id="updated">loading…</div>
+    </header>
+    <div class="stats">
+      <div class="panel"><div class="label">Game code decompiled</div><div class="big" id="s-decomp">–</div><div class="tube"><i id="b-decomp"></i></div><div class="small" id="s-decomp-sub"></div></div>
+      <div class="panel"><div class="label">Game functions named</div><div class="big" id="s-named">–</div><div class="tube orange"><i id="b-named"></i></div><div class="small" id="s-named-sub"></div></div>
+      <div class="panel"><div class="label">SDK &amp; libraries identified</div><div class="big" id="s-lib">–</div><div class="tube purple"><i id="b-lib"></i></div><div class="small" id="s-lib-sub"></div></div>
     </div>
-  </section>
-
-  <div class="shelf"></div>
-
-  <div class="grid two">
-    <section class="panel"><h2>Experiments</h2><ul class="ms" id="ms"></ul></section>
-    <section class="panel"><h2>Lab notes</h2><ul class="log" id="log"></ul></section>
   </div>
 
-  <div class="shelf"></div>
+  <main class="main">
+    <section class="panel" id="lab"><h2>Experiments</h2><div class="fill board" id="ms"></div></section>
 
-  <section class="panel" id="chart"><h2>Growth chart</h2></section>
+    <div class="midcol">
+      <section class="panel" id="mapsec">
+        <h2>Specimen map: game code</h2>
+        <div class="map" id="map" role="img" aria-label="Map of the game code region"></div>
+        <div class="legend">
+          <span><b style="background:var(--slime)"></b>Decompiled</span>
+          <span><b style="background:var(--orange)"></b>Named</span>
+          <span><b style="background:#1e2c27"></b>Not started</span>
+          <span class="mono" id="range"></span>
+        </div>
+      </section>
+      <section class="panel" id="chart"><h2>Growth chart</h2></section>
+    </div>
 
-  <div class="shelf"></div>
-
-  <section class="panel" id="missing" hidden><h2>Missing symbols</h2><p class="small sub-note" id="miss-sub"></p><table id="miss"></table></section>
-
-  <div class="grid two">
-    <section class="panel"><h2>Library code</h2><p class="small sub-note">Replaced on PC, not decompiled. It only needs identifying.</p><table id="libs"></table></section>
-    <section class="panel"><h2>Decompiled source files</h2><div id="files"></div></section>
-  </div>
+    <section class="panel tabs" id="tabs">
+      <div class="tabbar" role="tablist">
+        <button role="tab" class="tab on" data-p="notes">Lab notes</button>
+        <button role="tab" class="tab" data-p="srcs">Source files</button>
+        <button role="tab" class="tab" data-p="libp">Library code</button>
+        <button role="tab" class="tab" data-p="missing">Missing</button>
+      </div>
+      <div class="pane on" id="notes"><div class="scroll fill" id="logbox"><ul class="log" id="log"></ul><button class="btn" id="logmore" hidden></button></div></div>
+      <div class="pane" id="srcs">
+        <div class="msum" id="fsum"></div><input class="search" id="fsearch" type="search" placeholder="Filter files or function names…" aria-label="Filter files or functions">
+        <div class="scroll fill" id="files"></div><button class="btn" id="filemore" hidden></button>
+      </div>
+      <div class="pane" id="libp"><p class="small sub-note">Replaced on PC, not decompiled. It only needs identifying.</p><div class="scroll fill"><table id="libs"></table></div></div>
+      <div class="pane" id="missing"><p class="small sub-note" id="miss-sub"></p><div class="scroll fill tablewrap"><table id="miss"></table></div><button class="btn" id="missmore" hidden></button></div>
+    </section>
+  </main>
 
   <footer>A fan project. No game assets are hosted here. You need your own copy of the disc to build.</footer>
 </div>
@@ -261,10 +416,19 @@ const fmt = n => n.toLocaleString('en-US');
 const esc = s => String(s).replace(/[&<>"]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
 const STATUS = { done: 'Alive!', in_progress: 'Brewing', todo: 'On the shelf' };
 
+function bubbles(bar, n = 30) {
+  for (let k = 0; k < n; k++) {
+    const b = document.createElement('span'); b.className = 'bub';
+    const sz = (n < 20 ? 3 : 4) + Math.random() * (n < 20 ? 4 : 9);
+    b.style.cssText = `--x:${(k * 100 / n + Math.random() * 100 / n).toFixed(1)}%;--s:${sz.toFixed(1)}px;--w:${(Math.random() * 5 + 1).toFixed(1)}px;--d:${(2.2 + Math.random() * 2.6).toFixed(2)}s;--dl:${(-Math.random() * 5).toFixed(2)}s`;
+    bar.appendChild(b);
+  }
+}
+
 function stat(key, done, total, sub) {
   const p = pct(done, total);
   $('s-' + key).textContent = p.toFixed(p < 10 ? 2 : 1) + '%';
-  $('b-' + key).style.width = Math.max(p, done ? 2 : 0) + '%';
+  const bar = $('b-' + key); bar.style.width = Math.max(p, done ? 2 : 0) + '%'; bubbles(bar);
   $('s-' + key + '-sub').textContent = sub;
 }
 
@@ -289,19 +453,48 @@ async function load() {
     return '<div></div>';
   }).join('');
 
-  $('ms').innerHTML = feat.milestones.map(m =>
-    `<li><span class="jar ${m.status}"></span><div><strong>${esc(m.title)}</strong><span class="st ${m.status}">${STATUS[m.status] || ''}</span><p>${esc(m.detail)}</p></div></li>`).join('');
-  $('log').innerHTML = feat.changelog.slice(0, 8).map(c =>
-    `<li><time datetime="${esc(c.date)}${c.time ? 'T' + esc(c.time) + '+01:00' : ''}">${esc(c.date)}${c.time ? ' · ' + esc(c.time) + ' CET' : ''}</time>${esc(c.text)}</li>`).join('');
+  const cols = [['in_progress', 'Brewing', 'var(--orange)'], ['todo', 'On the shelf', 'var(--muted)'], ['done', 'Alive!', 'var(--slime)']];
+  $('ms').innerHTML = cols.map(([k, name, col]) => {
+    const items = feat.milestones.filter(m => m.status === k);
+    return `<div class="col ${k}"><h3 style="color:${col}">${name}<span class="pill">${items.length}</span></h3><div class="list">${
+      items.map(m => `<button class="card ${k}${k === 'done' ? ' compact' : ''}" aria-expanded="false"><strong>${esc(m.title)}</strong><p>${esc(m.detail)}</p></button>`).join('') || '<p class="empty">Nothing here.</p>'}</div><button class="btn morebtn" hidden>Show more</button></div>`;
+  }).join('');
+  const fitCols = () => $('ms').querySelectorAll('.col').forEach(c => {
+    const l = c.querySelector('.list'), bt = c.querySelector('.morebtn');
+    if (c.classList.contains('more')) return;
+    bt.hidden = l.scrollHeight <= l.clientHeight + 1;
+  });
+  $('ms').addEventListener('click', e => {
+    const bt = e.target.closest('.morebtn');
+    if (bt) { const c = bt.parentElement; const on = c.classList.toggle('more'); bt.textContent = on ? 'Show less' : 'Show more'; if (!on) { c.querySelector('.list').scrollTop = 0; fitCols(); } return; }
+    const c = e.target.closest('.card'); if (c) { c.setAttribute('aria-expanded', c.classList.toggle('open')); fitCols(); }
+  });
+  addEventListener('resize', fitCols);
+  requestAnimationFrame(fitCols); if (document.fonts) document.fonts.ready.then(fitCols);
+  const clog = feat.changelog, LOGN = 8; let logAll = false;
+  const renderLog = () => {
+    $('log').innerHTML = (logAll ? clog : clog.slice(0, LOGN)).map(c =>
+      `<li><time datetime="${esc(c.date)}${c.time ? 'T' + esc(c.time) + '+01:00' : ''}">${esc(c.date)}${c.time ? ' · ' + esc(c.time) + ' CET' : ''}</time>${esc(c.text)}</li>`).join('');
+    $('logmore').hidden = clog.length <= LOGN;
+    $('logmore').textContent = logAll ? 'Show fewer' : `Show all ${clog.length} notes`;
+  };
+  $('logmore').onclick = () => { logAll = !logAll; renderLog(); };
+  renderLog();
 
   try {
     const m = await fetch('data/missing.json').then(r => r.ok ? r.json() : null);
     if (m) {
       const c = m.counts || {};
       $('miss-sub').textContent = `What the linker still cannot find: ${fmt(c.game || 0)} game functions (${fmt(m.game_bytes)} bytes), ${fmt(c.library || 0)} SDK/library functions, ${fmt(c.global || 0)} globals. Top game functions by references:`;
-      $('miss').innerHTML = '<tr><th>Function</th><th>Address</th><th class="num">Size</th><th class="num">Refs</th></tr>' +
-        m.game.slice(0, 20).map(e => `<tr><td>${e.name}</td><td>${e.addr}</td><td class="num">${fmt(e.size)}</td><td class="num">${fmt(e.refs)}</td></tr>`).join('');
-      $('missing').hidden = false;
+      let missN = 20;
+      const renderMiss = () => {
+        $('miss').innerHTML = '<tr><th>Function</th><th>Address</th><th class="num">Size</th><th class="num">Refs</th></tr>' +
+          m.game.slice(0, missN).map(e => `<tr><td>${esc(e.name)}</td><td>${esc(e.addr)}</td><td class="num">${fmt(e.size)}</td><td class="num">${fmt(e.refs)}</td></tr>`).join('');
+        $('missmore').hidden = m.game.length <= 20;
+        $('missmore').textContent = missN >= m.game.length ? 'Show fewer' : `Show all ${m.game.length}`;
+      };
+      $('missmore').onclick = () => { missN = missN >= m.game.length ? 20 : m.game.length; renderMiss(); };
+      renderMiss();
     }
   } catch (e) {}
   $('libs').innerHTML = '<tr><th>Library</th><th class="num">Functions</th><th>Identified</th></tr>' +
@@ -309,11 +502,39 @@ async function load() {
       const p = pct(r.named_bytes, r.bytes);
       return `<tr><td>${esc(r.name)}</td><td class="num">${fmt(r.functions)}</td><td class="mini"><div class="tube purple"><i style="width:${p}%"></i></div></td></tr>`;
     }).join('');
+  document.querySelectorAll('#libs .tube i').forEach(i => bubbles(i, 10));
 
-  $('files').innerHTML = prog.files.length ? prog.files.map(f =>
-    `<details><summary><code>${esc(f.path)}</code> <span class="small">${f.functions.length} fn</span></summary><ul class="fnlist">${
-      f.functions.map(x => `<li><code>${esc(x.name)}</code></li>`).join('')}</ul></details>`).join('')
-    : '<p class="empty">Nothing yet.</p>';
+  const files = prog.files.slice().sort((x, y) => y.functions.length - x.functions.length || x.path.localeCompare(y.path));
+  const totalFn = files.reduce((n, f) => n + f.functions.length, 0);
+  $('fsum').innerHTML = `<span class="pill">${fmt(files.length)} files</span><span class="pill">${fmt(totalFn)} functions</span>`;
+  let fileN = 25, q = '';
+  const FNCAP = 80;
+  const fnItems = (f, all) => f.functions.slice(0, all ? undefined : FNCAP).map(x => `<li><code>${esc(x.name)}</code>${x.addr ? `<span class="a">${esc(x.addr)}</span>` : ''}</li>`).join('');
+  const fill = d => {
+    const f = files[+d.dataset.i], ul = d.querySelector('ul');
+    if (ul.dataset.done) return; ul.dataset.done = 1;
+    ul.innerHTML = fnItems(f, false);
+    if (f.functions.length > FNCAP) {
+      const b = document.createElement('button'); b.className = 'btn'; b.textContent = `Show all ${f.functions.length} functions`;
+      b.onclick = () => { ul.innerHTML = fnItems(f, true); b.remove(); }; d.appendChild(b);
+    }
+  };
+  const renderFiles = () => {
+    const ql = q.toLowerCase();
+    const list = ql ? files.filter(f => f.path.toLowerCase().includes(ql) || f.functions.some(x => x.name.toLowerCase().includes(ql))) : files;
+    const shown = list.slice(0, ql ? 60 : fileN);
+    $('files').innerHTML = shown.length ? shown.map(f =>
+      `<details data-i="${files.indexOf(f)}"${ql && shown.length < 6 ? ' open' : ''}><summary><code>${esc(f.path)}</code><span class="pill">${f.functions.length} fn</span></summary><ul class="fnlist"></ul></details>`).join('')
+      : '<p class="empty">Nothing matches.</p>';
+    const more = list.length - shown.length;
+    $('filemore').hidden = !ql ? (more <= 0 && fileN <= 25) : more <= 0;
+    $('filemore').textContent = more > 0 ? `Show ${Math.min(more, 50)} more (${fmt(more)} left)` : 'Show fewer';
+    $('files').querySelectorAll('details[open]').forEach(fill);
+  };
+  $('files').addEventListener('toggle', e => { if (e.target.open) fill(e.target); }, true);
+  $('filemore').onclick = () => { if (!q && fileN >= files.length) fileN = 25; else fileN += 50; renderFiles(); };
+  $('fsearch').oninput = e => { q = e.target.value.trim(); renderFiles(); };
+  renderFiles();
 
   drawChart(hist);
 }
@@ -335,6 +556,11 @@ function drawChart(hist) {
     <polyline points="${line}" fill="none" stroke="#8be23a" stroke-width="3" vector-effect="non-scaling-stroke"/></svg>
     <div class="legend"><span>${esc(hist[0].date)}</span><span style="margin-left:auto">${esc(hist[hist.length-1].date)} · ${ys[ys.length-1].toFixed(2)}%</span></div>`);
 }
+
+document.querySelectorAll('.tab').forEach(t => t.onclick = () => {
+  document.querySelectorAll('.tab').forEach(x => x.classList.toggle('on', x === t));
+  document.querySelectorAll('.pane').forEach(x => x.classList.toggle('on', x.id === t.dataset.p));
+});
 
 load().catch(e => { $('updated').textContent = 'Could not load progress data'; console.error(e); });
 </script>
