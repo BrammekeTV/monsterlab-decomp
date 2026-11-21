@@ -62,7 +62,7 @@
   },
   {
    "title": "Boots to title screen",
-   "detail": "First visible frame on Windows. The game runs its main loop on PC, drawn by the Direct3D 11 renderer, and the front-end level loads from the player's own disc with its player object and camera. The camera's update, follow state and collision checks are decompiled. The boot now stops at the collision solver. Next: the rest of the level start, then the title screen itself.",
+   "detail": "First visible frame on Windows. The game runs its main loop on PC, drawn by the Direct3D 11 renderer, and the front-end level loads from the player's own disc with its player object and a fully decompiled camera (update, follow, collision query and solver). The boot now stops on level data the loader doesn't convert yet. Next: that data, then the title screen itself.",
    "status": "in_progress"
   },
   {
@@ -97,6 +97,11 @@
   }
  ],
  "changelog": [
+  {
+   "date": "2026-11-21",
+   "time": "22:14",
+   "text": "The level camera is complete on Windows (PRs #32 and #33): the follow step and the collision solver that keeps the camera out of walls are decompiled and checked against the original code. The boot gets past the camera set-up and now stops on level data the loader doesn't convert yet."
+  },
   {
    "date": "2026-11-21",
    "time": "22:09",
