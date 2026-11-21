@@ -230,7 +230,7 @@ void fn_80037FB4(u8* p) {
 // Battle HUD owner refresh: finds the lowest set bit (1, 2, 4) in lbl_805F8538 and clears it; for
 // bit 2 it rebuilds both fighters' owner/HUD slots. With no bit set it marks all three bits and
 // rebinds both fighters to the default owners.
-void fn_80040F44(void) {
+void fn_80040F44(u8* p) {
     s32 flags = lbl_805F8538;
     u32 bit = 1;
     while (bit < 7) {

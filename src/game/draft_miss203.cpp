@@ -35,7 +35,7 @@ int   SysSprintf(char* buf, const char* fmt, ...);
 void  TextureRelease(void* tex);                                                // 0x80184028
 void  app_PlayMusic(u32 hash, f32 vol);
 s32   fn_8003F8D4(void);                                                        // 0x8003F8D4
-void fn_80040F44(void);                                                       // 0x80040F44
+void fn_80040F44(u8* p);                                                     // 0x80040F44
 void  fn_80041874(u8* p);                                                       // 0x80041874
 u8*   fn_800418E0(u8* p, s32 a2);                                               // 0x800418E0
 void  fn_80041AB4(u8* p);                                                       // 0x80041AB4
@@ -260,7 +260,7 @@ void fn_80040ACC(u8* arg0, u8* arg1, u8* arg2) {
     }
 
     *(void**)(arg0 + 0x4F0) = fn_80044F54();
-    if (lbl_803C4298[0x1C] == 0x1D) fn_80040F44();
+    if (lbl_803C4298[0x1C] == 0x1D) fn_80040F44(arg0);
     if (fn_8003F8D4() != 0) {
         app_PlayMusic(0x06BE5C73u, 1.0f);
     } else {

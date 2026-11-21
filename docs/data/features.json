@@ -99,6 +99,11 @@
  "changelog": [
   {
    "date": "2026-11-21",
+   "time": "23:28",
+   "text": "Round 66: 39 more small functions (list/object helpers, UI, HUD, timers)"
+  },
+  {
+   "date": "2026-11-21",
    "time": "23:18",
    "text": "Round 65: 39 more small functions (stick/input, battle and zone helpers, audio timers, UI)"
   },

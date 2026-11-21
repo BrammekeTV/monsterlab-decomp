@@ -12,7 +12,7 @@ extern "C" {
 void  fn_800223D4(void);                                                        // 0x800223D4
 void  CatchMinigame_UpdateObjects(void* g, f32 dt);                             // 0x8002FFBC
 void  CatchMinigame_UpdateLane(void* g, void* lane, BOOL active, f32 dt);       // 0x8002EF4C
-void  fn_800D9044(void);                                                        // 0x800D9044
+void fn_800D9044(u8* p, f32 delta);                                                        // 0x800D9044
 void  fn_8008F7D4(u8* p);                                                       // 0x8008F7D4
 u8*   fn_801F94EC(u8* p, s32 del);                                              // 0x801F94EC
 u8*   fn_80216B94(u8* p, s32 del);                                              // 0x80216B94
@@ -34,7 +34,7 @@ void  fn_80042CC0(u8* p, s32 del);                                              
 void  fn_80044FA4(void);                                                        // 0x80044FA4
 u8*   fn_800445F4(u8* p, s32 del);                                              // 0x800445F4
 u8*   fn_80044C7C(u8* p, s32 del);                                              // 0x80044C7C
-void  fn_8021F3F0(u8* p, s32 del);                                              // 0x8021F3F0
+u8* fn_8021F3F0(u8* p, s32 del);                                              // 0x8021F3F0
 void  fn_801C7E0C(u8* p, s32 del);                                              // 0x801C7E0C
 
 extern u8 gWorldState[];                     // 0x803E6D00 (first word: world block pointer)
@@ -85,7 +85,7 @@ void fn_8007A1D0(u8* arg0) {
     f32 y;
     f32 z;
 
-    fn_800D9044();
+    fn_800D9044(arg0, 0.0f);  // f1 is stale in the asm
     e = *(u8**)(arg0 + 0x8) + *(s32*)(arg0 + 0x10) * 0x1C;
     t = *(f32*)(arg0 + 0x14) / *(f32*)(e + 0x18);
     x = *(f32*)(e + 0x0) + *(f32*)(e + 0xC) * t + *(f32*)(arg0 + 0x24);

@@ -20,7 +20,7 @@ void  fn_800C8900(u8* p, f32 dt);                 // 0x800C8900
 void  fn_80172708(void* p);
 s32   fn_8019B6CC(u8* p, f32 dt);
 void  fn_8019BFF8(void* obj, void* cb, void* arg);
-void  fn_8019CE58(void);                          // 0x8019CE58 (alarm/callback target)
+s32 fn_8019CE58(u8* p, void* arg);                          // 0x8019CE58 (alarm/callback target)
 void  fn_801B5D94(u8* obj, u8* event);
 void  fn_801B7020(u8* p);
 void* fn_801B7198(void* anim, s32 a);
