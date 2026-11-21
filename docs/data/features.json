@@ -99,6 +99,11 @@
  "changelog": [
   {
    "date": "2026-11-21",
+   "time": "18:37",
+   "text": "Level files now really load on master (PR #26, which includes #25): the level loading from PRs #23 and #24 had been merged into a side branch by mistake, and is now on master. The camera update and follow-camera reset are decompiled too. The boot reaches the player's record in the level data, which is only partly converted so far."
+  },
+  {
+   "date": "2026-11-21",
    "time": "18:27",
    "text": "Round 59: 12 more effect-slot handlers (noise texture, spawn/fade/dissolve state machines); 26 game functions left"
   },
