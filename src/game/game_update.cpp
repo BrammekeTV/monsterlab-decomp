@@ -26,7 +26,7 @@ s32   ReleaseZoneSlot(u8* world, s32 slot);                           // 0x80131
 void  GameLog(int level, int category, const char* fmt, ...);   // 0x8000B2F0
 s32   VideoIsPal50(RendVideo* video);                    // 0x8015DE24: video height == 520
 void  AudioSetPaused(void* audio, int paused);           // 0x801FF708 (provisional)
-void  MoviePlay(void* player, const char* path, int a, u32 b, s32 moreQueued, u32 duration, u32 c, int d);   // 0x802049E0
+s32   MoviePlay(void* player, const char* path, const char* subtitleName, u32 unused, s32 moreQueued, u32 duration, s32 button, void* stopCb);   // 0x802049E0
 void  fn_8000B6A0(void*, int);
 }
 

@@ -99,6 +99,11 @@
  "changelog": [
   {
    "date": "2026-11-21",
+   "time": "01:24",
+   "text": "Decompiled 17 more functions (audio update fn_8020B5E8/fn_80201F38, MoviePlay, particle batcher fn_801CBD40, trail draw fn_801C4338, box overlap fn_801C10B4, save snapshot fn_8022EDD8/fn_8022F50C, badge counters, ...); prototype fixes"
+  },
+  {
+   "date": "2026-11-21",
    "time": "01:10",
    "text": "Decompiled 28 more functions (object reset fn_800526E4, GX debug draw fn_801E2BB4/fn_801E32E4, hook table loader fn_801E54E4, UI key-frame interpolation, script thunks, hit callback fn_80067C30, material lookup fn_8006784C, ...); prototype fixes"
   },

@@ -18,7 +18,7 @@ void   fn_801469FC(u8* file);
 s32    fn_80146A58(u8* file);
 u8*    fn_801483BC(s32 idx);
 s32    fn_80203664(u8* audio, const char* name, s32 flag);    // 0x80203664
-void   fn_80203340(u8* data, s32 handle, s32 flag);           // 0x80203340
+void   fn_80203340(u8* data, u8* voice, s32 flag);           // 0x80203340
 void   fn_80202CA8(void);                                      // 0x80202CA8
 s32    fn_80258024(s32 priority, void* cb, void* ctx);        // 0x80258024
 void   fn_80258904(void* cb, void* p);                         // 0x80258904
@@ -285,7 +285,7 @@ s32 fn_801FD420(u8* audio, s32 idx, s32 pan) {
         }
     } else {
         *(u16*)(lbl_805FBB80[idx] + 0xC) = (u16)lbl_805F98E0;
-        fn_80203340(lbl_805FBB80[idx], *(s32*)(v + 0x0), lbl_805F98E0 != 0);
+        fn_80203340(lbl_805FBB80[idx], *(u8**)(v + 0x0), lbl_805F98E0 != 0);
         *(u8*)(audio + 0x28) = 1;
         *(u8*)(audio + 0x29) = 1;
     }

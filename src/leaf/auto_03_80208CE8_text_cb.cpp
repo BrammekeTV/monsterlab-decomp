@@ -7,7 +7,7 @@
 #include "game/script_callbacks.h"
 
 extern u8 gAudio[];
-extern u8 lbl_805FBBB1[];
+extern u8 lbl_805FBBB1;
 extern u8 lbl_805FBBB2[];
 extern "C" void AudioSetPaused(void*, int);
 extern "C" void fn_801FF908(u8*, s32);

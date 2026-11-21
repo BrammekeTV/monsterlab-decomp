@@ -23,7 +23,7 @@ s32 fn_801B8184(u8* p, u8* a4);                                      // 0x801B81
 void  fn_801C5444(u8* node, f32 dt);                          // 0x801C5444
 void  fn_801C7E9C(u8* item, u8* mgr);                         // 0x801C7E9C
 void  fn_801C9B60(u8* p, f32 dt);                             // 0x801C9B60
-void  fn_801CD790(u8* p, f32 dt);                             // 0x801CD790
+void  fn_801CD790(u8* node, u8* mgr, f32 dt);                           // 0x801CD790
 void  fn_801D6A4C(void* cam, const f32* mtx);                 // 0x801D6A4C
 s32 fn_801DA34C(u8* a, u8* b);                                      // 0x801DA34C (callback stored below)
 BOOL  fn_801E7460(u8* base, u16* id);                         // 0x801E7460
@@ -199,9 +199,9 @@ void fn_801CE7FC(u8* p, f32 dt) {
         u8* next = l ? l + 8 : NULL;
         if (*(s32*)(p + 0x24) == *(s32*)(node + 0x7c)) {
             if (!((*(u32*)(node + 0x0) >> 5) & 1)) {
-                fn_801CD790(p, dt);
+                fn_801CD790(node, p, dt);
             } else if (lbl_805FB750 == *(s32*)(p + 0x4) % 4) {
-                fn_801CD790(p, four * dt);
+                fn_801CD790(node, p, four * dt);
             }
         }
         node = next;

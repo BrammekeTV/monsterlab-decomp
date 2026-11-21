@@ -76,7 +76,7 @@ extern "C" u32 fn_8022E330(s32, s32, s32);
 extern "C" void fn_8022E354(u8*, s32);
 extern "C" void fn_8022E3E0(u8*, s32);
 extern "C" s32 fn_8022E440(u8*, s32);
-extern "C" void fn_8022E658(s32);
+extern "C" void fn_8022E658(u8*);
 
 // 0x800E75D8
 BOOL IsVideoModePAL(void) {
@@ -978,9 +978,8 @@ u32 InitializeMerchantIngredients(s32 a3) {
 
 // 0x800FA5F4
 void DoTradeWithMerchant(void) {
-    // tail-call arguments inferred from the registers set before the call
-    s32 t0 = *(s32*)((u8*)&lbl_805FBBE0);
-    fn_8022E658((s32)((u32)(t0)));
+    u8* t0 = *(u8**)((u8*)&lbl_805FBBE0);
+    fn_8022E658(t0);
 }
 
 // 0x800FA5FC

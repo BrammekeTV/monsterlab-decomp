@@ -58,7 +58,7 @@ void __destroy_arr(void* arr, void (*dtor)(void*, s32), u32 size, u32 count);  /
 void fn_8032F1E8(void* arr, void (*ctor)(void), void (*dtor)(void), s32 size, s32 count);  // 0x8032F1E8
 void* fn_8022ED60(void* p);                // 0x8022ED60
 u8* fn_8022ED98(u8* p, s32 del);           // 0x8022ED98
-s32 fn_8022F50C(u8* slot);                 // 0x8022F50C
+void fn_8022F50C(u8* slot);                 // 0x8022F50C
 void fn_80123954(s32 v, u8* save);          // 0x80123954
 void fn_80142870(s32 a3);                  // 0x80142870
 s32 fn_80206DA4(void);                     // 0x80206DA4
