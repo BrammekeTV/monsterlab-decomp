@@ -675,6 +675,39 @@ def image_dump(path):
         L.append(('fsmsharedtrans %s vtable %08x target %s cond %08x action %08x %d %d flags %08x keys %s %d %s' % (
             ptr(p), u(o), ptr(u(o + 4)), u(o + 8), u(o + 0xC), i32(o + 0x10), i32(o + 0x14), u(o + 0x18), ptr(u(o + 0x1C)), n,
             ws(off(u(o + 0x1C)), n) if n else '')).rstrip())
+
+    # Effect definitions (header slots 0x82C-0x840): 0x70-byte and 0x80-byte entries, as the effect
+    # code reads them through an instance's definition pointer.
+    hb = lambda o: struct.unpack_from('>I', hdr, o)[0]
+    n, t = hb(0x82C), slot(0x830)
+    L.append('fxbolts %s count %d sorted %d' % (ptr(t), n, hdr[0x834]))
+    for i in range(n):
+        e = off(t) + i * 0x70
+        L.append('fxbolt %d hash %08x name %s tex %s words %s %s floats %s %08x %08x owner %08x pool %s end %s raw %s %s %s %s' % (
+            i, u(e), cstr0(e + 8).decode('latin1'), ptr(u(e + 0x28)), ws(e + 0x2C, 3), ws(e + 0x3C, 2), ws(e + 0x44, 4),
+            u(e + 0x54), u(e + 0x5C), u(e + 0x64), ptr(u(e + 0x68)), ptr(u(e + 0x6C)), sec[e + 4:e + 8].hex(),
+            sec[e + 0x38:e + 0x3C].hex(), sec[e + 0x58:e + 0x5C].hex(), sec[e + 0x60:e + 0x64].hex()))
+    n, t = hb(0x838), slot(0x83C)
+    L.append('fxtrails %s count %d sorted %d' % (ptr(t), n, hdr[0x840]))
+    for i in range(n):
+        e = off(t) + i * 0x80
+        L.append('fxtrail %d hash %08x colour %08x name %s words %s floats %s w4c %d f50 %08x w54 %d floats %s owner %08x tex %s mode %d pools %s raw %s' % (
+            i, u(e), u(e + 4), cstr0(e + 8).decode('latin1'), ws(e + 0x28, 2), ws(e + 0x30, 7), i32(e + 0x4C), u(e + 0x50),
+            i32(e + 0x54), ws(e + 0x58, 3), u(e + 0x6C), ptr(u(e + 0x70)), i32(e + 0x74), ps(e + 0x78, 2), sec[e + 0x64:e + 0x6C].hex()))
+
+    # Object pools (header slots 0x10 and 0x418) and the nodes of their block, placed as
+    # fn_801EBAB8 places them: first node where an item lands on the pool's alignment.
+    for s in (0x10, 0x418):
+        if not slot(s): continue
+        p = off(slot(s))
+        count, size, align, block = u(p), u(p + 4), u(p + 8), u(p + 0x24)
+        L.append('pool 0x%03x %s items %d size %d align %d used %d free %s inuse %s parent %s blocks %s grow %d block %s alloc %d next %s' % (
+            s, ptr(slot(s)), count, size, align, u(p + 0xC), ptr(u(p + 0x10)), ptr(u(p + 0x14)), ptr(u(p + 0x18)), ptr(u(p + 0x1C)),
+            sec[p + 0x20], ptr(block), i32(p + 0x28), ptr(u(off(block)))))
+        first = ((block + 4 + align + 7) & ~(align - 1)) - 8
+        for i in range(count):
+            a = first + i * (size + 8)
+            L.append('poolnode 0x%03x %d %s prev %s next %s' % (s, i, ptr(a), ptr(u(off(a))), ptr(u(off(a) + 4))))
     return L
 
 # ----------------------------------------------------------------------------- catalog

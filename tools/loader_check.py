@@ -8,7 +8,7 @@
    for in the main checkout when run from a git worktree), loads it with the C++ loader and
    compares every header slot, table descriptor and row, and the hand-typed image objects (input
    table, textures, string table, action table and its records, UI root and fonts, screen state
-   machines), with
+   machines, effect definitions, object pools), with
    the Python reference decoder
    (`tools/sir_decoder.py --gamedb --image`), which reads the big-endian bytes directly.
 4. The same for ../catalog.sir (`--catalog`), plus a check that the catalog agrees with the
@@ -31,6 +31,7 @@ SAMPLES = ("part 0 ", "part 57 ", "part 185 ", "action 0 ", "action 200 ", "acti
            "tuning 0 ", "tuning 100 ", "tuning 214 ", "row 39 0 ", "row 41 0 ",
            "input ", "inputseq 50 ", "inputstep img+0x28b0 ", "texlist ", "texture 1 ", "slottexture 0x824 ",
            "strings ", "string 100 ", "actions ", "actionrec 955 ", "actionprog 2 ",
+           "fxbolts ", "fxbolt 0 ", "fxtrails ", "fxtrail 0 ", "pool 0x010 ", "poolnode 0x418 31 ",
            "uiroot ", "uifont 1 ", "uifontobj ", "hud ", "fsm ", "fsmdef ", "fsmstate ", "fsmnode ", "fsmtrans ",
            "fsmsharedtrans ")
 
