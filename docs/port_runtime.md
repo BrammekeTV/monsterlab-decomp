@@ -48,23 +48,13 @@ What boots today, with the retail PAL disc:
    and the GX FIFO and starts VI and GX; the render thread starts and runs the first display
    list (its draw-done interrupt arrives); the 13 render targets ("hdrRed", "hdrGreen", ...)
    are allocated from the engine heap.
-7. `SgInit` (scene graph) stops at `fn_8017A618` (1,440 bytes, not decompiled): the first stop
-   today. No disc file is opened before that point.
+7. The rest of `EngineInit`: `SgInit`, the two built-in font textures (palette conversion and
+   GX tiling), the first `RendBeginFrame`, and the layer set-up of `SetRenderEnabled`.
+8. `GameStart`: the subsystem set-up (`fn_8000E488`), whose audio part runs on stubs, then the
+   disc queue thread opens **`catalog.sir`** and reads it to `0x90400000`: the first disc file.
 
-With `--keep-going` the rest of `EngineInit` runs with holes and `GameStart` is reached. The
-missing game functions on that path, in the order they are hit:
-
-| Function | Size | Called from | What it is |
-|---|---|---|---|
-| `fn_8017A618` | 1,440 | `fn_80182A1C` (`SgInit`) | fills a material/render-state record with defaults; no calls |
-| `fn_80149E98` | 3,636 | `fn_80149B4C` | |
-| `fn_8015AB70` | 1,580 | `fn_8015A2E8` | |
-| `RendBeginFrame` | 3,096 | `EngineInit` | |
-| `fn_8000E488` | 2,260 | `GameStart` | runs before the first disc read |
-
-After those, `GameStart` reads `global_binary.sir` twice through `SirLoad` (first its 4 KB
-header into `sSirHeader`, then the image to `0x90400000`), then `SirFinishLoad`; `catalog.sir`
-comes later. Nothing behind `fn_8000E488` is meaningful in a `--keep-going` run yet.
+The run then hangs in the catalog loader (`fn_801E54E4`): the file is big-endian and nothing
+converts it yet, so its counts are garbage. That is the next step ("Next", item 1).
 
 The link report (`port_link.txt`, uploaded by CI) lists the stubs and the globals.
 
@@ -265,15 +255,16 @@ MSVC only for now (absolute symbols, `/alternatename`, structured exception hand
 
 ## Next: the shortest path to a first title-screen frame
 
-1. **The five missing functions of the boot path** (table under "Status"): `fn_8017A618`,
-   `fn_80149E98`, `fn_8015AB70`, `RendBeginFrame`, `fn_8000E488`. After each, run
-   `python tools/build_pc.py --run` and follow the next stop.
-2. **Wire the `.sir` loader**: `GameStart` loads `global_binary.sir` right after
-   `fn_8000E488` (header to `sSirHeader`, image to `0x90400000`). Run the conversions of
-   `sir_loader.cpp` on the buffers when `SirFinishLoad` is done (the image is already at
-   `0x90400000`, so `SirRelocAddRange` is the identity). zlib `inflate` is needed for packed
-   sections: link real zlib. `sSirHeader` is defined with 0x1000 bytes; the original symbol
-   (`lbl_803C2A20`) is 0x15E0.
+1. **Wire the `.sir` loader**: convert `catalog.sir` when its read completes (the loader of
+   `sir_loader.cpp` has the catalog conversion), then `global_binary.sir`, which `GameStart`
+   loads next (header to `sSirHeader`, image to `0x90400000`): run the conversions on the
+   buffers when `SirFinishLoad` is done (the image is already at `0x90400000`, so
+   `SirRelocAddRange` is the identity). zlib `inflate` is needed for packed sections: link real
+   zlib. `sSirHeader` is defined with 0x1000 bytes; the original symbol (`lbl_803C2A20`) is
+   0x15E0.
+2. **Follow the next stops** with `python tools/build_pc.py --run`. Known from a
+   `--keep-going` run: `fn_8016E304` (2,056 bytes, from `fn_801D66C4`) and `fn_8016FB20`
+   (1,316 bytes, from `CameraSetMatrix`).
 3. **Static initialisers**: 262 of the 300 `.ctors` entries are not decompiled. Most are small
    (they construct one global). Until they exist those globals are zero, which will show up as
    crashes or wrong behaviour further in. `monsterlab.exe --verbose` lists them.

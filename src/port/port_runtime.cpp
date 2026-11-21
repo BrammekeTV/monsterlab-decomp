@@ -302,6 +302,12 @@ static LONG CALLBACK TrapHandler(EXCEPTION_POINTERS* e) {
     CONTEXT* c = e->ContextRecord;
     u32 eip = c->Eip;
     char who[160], from[160];
+    if (getenv("PORT_RAW")) {
+        char line[96];
+        int n = _snprintf(line, sizeof(line), "\n[raw] exc %08lX at 0x%08X, esp 0x%08lX tid %lu\n", code, eip, c->Esp, GetCurrentThreadId());
+        DWORD done;
+        WriteFile(GetStdHandle(STD_ERROR_HANDLE), line, (DWORD)n, &done, NULL);
+    }
 
     if (eip >= PORT_TEXT_LO && eip < PORT_TEXT_HI) {
         const PortFunc* f = PortFindFunc(eip);
@@ -341,6 +347,13 @@ static LONG CALLBACK TrapHandler(EXCEPTION_POINTERS* e) {
         PortStop(4, "bad jump to 0x%08X", eip);
     }
 
+    if (code == EXCEPTION_STACK_OVERFLOW) {      // no room for the full report: one raw line
+        char line[96];
+        int n = _snprintf(line, sizeof(line), "\n[port] stack overflow at 0x%08X, esp 0x%08lX\n", eip, c->Esp);
+        DWORD done;
+        WriteFile(GetStdHandle(STD_ERROR_HANDLE), line, (DWORD)n, &done, NULL);
+        TerminateProcess(GetCurrentProcess(), 4);
+    }
     switch (code) {
     case EXCEPTION_ACCESS_VIOLATION: case EXCEPTION_ILLEGAL_INSTRUCTION: case EXCEPTION_PRIV_INSTRUCTION:
     case EXCEPTION_INT_DIVIDE_BY_ZERO: case EXCEPTION_STACK_OVERFLOW: case EXCEPTION_IN_PAGE_ERROR:

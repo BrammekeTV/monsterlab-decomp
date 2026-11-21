@@ -132,10 +132,29 @@ const char* PortSoftSdk(u32 addr) {
         {0x80264EE8, "audio: mixer init (fn_80264EE8)"},
         {0x80264F70, "audio: sequencer init (fn_80264F70)"},
         {0x8027FF24, "KPADReset (fn_8027FF24)"},
+        // The game's audio init (fn_801FCFB4) and its effect set-up (fn_80203E8C). No sound yet.
+        {0x8026099C, "audio: mixer set-up (fn_8026099C)"},
+        {0x80263F18, "audio: sequencer defaults (fn_80263F18)"},
+        {0x80259418, "audio: AX mode setter (fn_80259418)"},
+        {0x80260AC4, "audio: mixer sound mode setter (fn_80260AC4)"},
+        {0x80259B2C, "audio: AX frame callback registration (fn_80259B2C)"},
+        {0x8025D2E0, "audio: AXFX effect init (fn_8025D2E0)"},
+        {0x8025E3E4, "audio: AXFX effect init (fn_8025E3E4)"},
+        {0x8025B4C0, "audio: AXFX effect init (fn_8025B4C0)"},
+        {0x80264CC8, "audio: sequencer float setter (fn_80264CC8)"},
+        {0x80264CD0, "audio: sequencer float setter (fn_80264CD0)"},
+        // OSSetPeriodicAlarm: its only caller so far is the audio tick (fn_80202CAC), which needs AX.
+        {0x80234394, "OSSetPeriodicAlarm for the audio tick (fn_80234394): not started"},
+        // Registers a function and calls it with two words (from fn_80204478, argument fn_802B7DDC,
+        // SDK code). What library this starts is not known yet.
+        {0x802B4140, "library start through fn_802B4140 (fn_802B7DDC): not started"},
     };
     for (const auto& e : kSoft) if (e.addr == addr) return e.what;
     return NULL;
 }
+
+// SCGetSoundMode (the SDK reads item 0x11 and falls back to 1): 0 mono, 1 stereo, 2 surround.
+extern "C" u8 fn_8026AC14(void) { return 1; }
 
 const char* PortDvdStats(char* buf, u32 n) {
     snprintf(buf, n, "%u file(s) opened, %u read(s), %.1f MB read, %u file(s) not found",

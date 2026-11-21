@@ -101,6 +101,14 @@ static void RendThreadMain(RendVideo* video) {
     (void)video;
 }
 
+// 0x8015E9D8
+// Waits until the render thread is at most maxAhead frames behind `frame`. The first argument
+// (the render-thread object in r3) is not used.
+extern "C" void fn_8015E9D8(void* unused, s32 frame, s32 maxAhead) {
+    (void)unused;
+    while (frame - (s32)sFrameTag > maxAhead) OSWaitSemaphore(&sRend.slotFreed);
+}
+
 // 0x8015E3E8
 static void* RendThreadEntry(void* param) {
     RendThreadMain((RendVideo*)param);
