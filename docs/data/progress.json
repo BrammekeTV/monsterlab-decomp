@@ -1,15 +1,15 @@
 {
  "game_id": "RM7P4F",
- "generated": "2026-11-22T15:35:39+00:00",
- "commit": "2da976b",
- "commit_date": "2026-11-22T16:35:29+01:00",
+ "generated": "2026-11-22T15:43:50+00:00",
+ "commit": "d492793",
+ "commit_date": "2026-11-22T16:35:39+01:00",
  "game": {
   "functions": 8548,
   "bytes": 2265988,
   "named": 2748,
   "named_bytes": 616800,
-  "decompiled": 8507,
-  "decompiled_bytes": 2226228
+  "decompiled": 8511,
+  "decompiled_bytes": 2254592
  },
  "library": {
   "functions": 4039,
@@ -24,8 +24,8 @@
   "bytes": 3404928,
   "named": 3211,
   "named_bytes": 721548,
-  "decompiled": 8508,
-  "decompiled_bytes": 2226348
+  "decompiled": 8512,
+  "decompiled_bytes": 2254712
  },
  "game_range": [
   "80006B40",
@@ -721,15 +721,15 @@
    0.0
   ],
   [
-   0.315,
+   1.0,
    0.0
   ],
   [
-   0.002,
+   1.0,
    0.0
   ],
   [
-   0.0,
+   1.0,
    0.0
   ],
   [
@@ -773,7 +773,7 @@
    0.399
   ],
   [
-   0.648,
+   1.0,
    0.0
   ],
   [
@@ -2514,6 +2514,46 @@
      "name": "fn_80189EFC",
      "addr": "80189EFC",
      "size": 768
+    }
+   ]
+  },
+  {
+   "path": "src/engine/draft_miss771.cpp",
+   "functions": [
+    {
+     "name": "fn_8017B9BC",
+     "addr": "8017B9BC",
+     "size": 7816
+    }
+   ]
+  },
+  {
+   "path": "src/engine/draft_miss772.cpp",
+   "functions": [
+    {
+     "name": "fn_8017D854",
+     "addr": "8017D854",
+     "size": 10412
+    }
+   ]
+  },
+  {
+   "path": "src/engine/draft_miss773.cpp",
+   "functions": [
+    {
+     "name": "fn_80180100",
+     "addr": "80180100",
+     "size": 7300
+    }
+   ]
+  },
+  {
+   "path": "src/engine/draft_miss774.cpp",
+   "functions": [
+    {
+     "name": "fn_801971F0",
+     "addr": "801971F0",
+     "size": 2836
     }
    ]
   },

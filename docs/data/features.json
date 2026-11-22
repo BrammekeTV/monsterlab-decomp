@@ -99,6 +99,11 @@
  "changelog": [
   {
    "date": "2026-11-22",
+   "time": "16:43",
+   "text": "Decompile the last 4 undone functions (round 95): fn_8017B9BC, fn_8017D854, fn_80180100, fn_801971F0 — no game function is missing from the link any more"
+  },
+  {
+   "date": "2026-11-22",
    "time": "16:35",
    "text": "More of the opening screens load on Windows (PRs #51 to #53): the loader converts a screen set's animations and the text widgets, and the disc layer now matches the Wii when a read reaches the end of a file. That's the next step toward the title screen."
   },
