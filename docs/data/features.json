@@ -99,6 +99,11 @@
  "changelog": [
   {
    "date": "2026-11-22",
+   "time": "17:10",
+   "text": "Every level file now goes through the big-endian loader on Windows (PR #56), including ones the game reads into a buffer first, so the front-end level and the rest load the same way."
+  },
+  {
+   "date": "2026-11-22",
    "time": "17:08",
    "text": "Checked about 260 more functions in the engine and UI code against the original and fixed 6 mistakes in our decompiled code (wrong arguments in 3 calls, a flipped comparison, a wrong flag bit and a float rounding difference)"
   },
