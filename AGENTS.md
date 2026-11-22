@@ -58,6 +58,8 @@ a PC port. Read this whole file before making changes. Human contributors: see
   over a batch of undecompiled functions, cleans the output into compilable C++ and reports per function
   OK / FIX / ASM in `build/drafts/` (staging, not committed). Hand the drafts to a subagent with
   `tools/draft_fix_brief.md`; every function is still verified against the asm before it goes into `src/`.
+- `python tools/undone.py [--min N] [--max N] [--count 60] [--batch 20] [--missing-first] [--renderer]`: lists game functions with no
+  `// 0xADDR` marker (generated `src/leaf` wrappers and markers in open PRs excluded), largest first, in batches for `draft_batch.py --names`.
 - `python tools/lint_decomp.py [files|--all]`: flags pointer-truncating casts, dropped tail-call return values,
   base-constructor argument pass-through, `// 0xADDR` markers not alone on their line and scratch files
   (file:line; `lint:ok` comment suppresses an intentional one). `tools/check.py` runs it after compiling.
