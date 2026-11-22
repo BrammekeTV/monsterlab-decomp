@@ -52,7 +52,7 @@
   },
   {
    "title": "Platform layer",
-   "detail": "Windows replacements for the Wii system code: memory heaps, OS time, threads, reports and disc reads work. The game's graphics commands are now captured and decoded, drawn by a Direct3D 11 renderer. Audio and input are still stubs.",
+   "detail": "Windows replacements for the Wii system code: memory heaps, OS time, threads, reports, disc reads and the C library. The game's graphics commands run through a Direct3D 11 renderer, and the graphics state calls (blending, depth, texture combining and more) now send the same register values as on the Wii. Audio and input are still stubs.",
    "status": "in_progress"
   },
   {
@@ -97,6 +97,11 @@
   }
  ],
  "changelog": [
+  {
+   "date": "2026-11-22",
+   "time": "21:00",
+   "text": "More of the Wii graphics layer is real on Windows (PRs #57 to #59): blending, depth, texture combining and the other state calls now send the same register values the Wii's graphics chip gets, each checked against the original code. The loader also converts a zone's objects and placed effects and the props' animation tables. A check of the startup constructors found that 293 of 299 already run."
+  },
   {
    "date": "2026-11-22",
    "time": "19:32",
