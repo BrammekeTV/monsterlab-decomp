@@ -819,6 +819,23 @@ def zone_dump(L, sec, base, hud, roots, scene_roots, pooltabs, records=(), lists
             L.append('entchild %s entity %s next %s' % (ptr(node), ptr(u(off(node) + 4)), ptr(u(off(node) + 8))))
             add(ents, u(off(node) + 4))
             node = u(off(node) + 8)
+    # What the draw passes read of an item and of its mesh (fn_80184C18, fn_80171ABC, fn_80171228).
+    meshes = set()
+    def item_draw(it):
+        o = off(it)
+        L.append('itemdraw %s xf %s scale %08x mesh %s out %s cb %08x arg %s clip %s w58 %08x skin %s' % (
+            ptr(it), ptr(u(o + 4)), u(o + 8), ptr(u(o + 0x10)), ws(o + 0x14, 7), u(o + 0x30), ptr(u(o + 0x34)), ws(o + 0x3C, 4),
+            u(o + 0x58), ptr(u(o + 0xB0))))
+        x, m = u(o + 4), u(o + 0x10)
+        if inz(x, 0x60): L.append('itemxf %s %s' % (ptr(x), ws(off(x), 24)))
+        if inz(m, 0x70) and m not in meshes:
+            meshes.add(m)
+            q = off(m)
+            n = u(q + 0x6C)
+            L.append('mesh %s sphere %s v48 %s extra %s parts %d' % (ptr(m), ws(q + 0x20, 4), ws(q + 0x48, 4), ptr(u(q + 0x64)), n))
+            for k in range(n):
+                mat, b = u(q + 0x70 + k * 8), u(q + 0x74 + k * 8)
+                L.append('meshpart %s material %s batch %s flags %s' % (ptr(m), ptr(mat), ptr(b), '%08x' % u(off(b) + 0xC) if inz(b, 0x10) else '-'))
     for a in scene:
         o = off(a)
         t = u(o + 4)
@@ -835,11 +852,14 @@ def zone_dump(L, sec, base, hud, roots, scene_roots, pooltabs, records=(), lists
             while node >= base + 0xAC and inz(node - 0xAC, 0xB8) and node not in seen:
                 seen.add(node)
                 L.append('scenenode %s flags %08x %s' % (ptr(node), u(off(node) - 0xAC), link(off(node))))
+                if node >= base + 0xB8 and inz(node - 0xB8, 0xC4): item_draw(node - 0xB8)
                 node = u(off(node))
         if t == 3 and inz(u(o + 0x58), u(o + 0x54) * 4):
             for k in range(u(o + 0x54)):
                 it = u(off(u(o + 0x58)) + k * 4)
-                if inz(it, 0xC4): L.append('sceneitem %s flags %08x %s' % (ptr(it), u(off(it) + 0xC), link(off(it) + 0xB8)))
+                if inz(it, 0xC4):
+                    L.append('sceneitem %s flags %08x %s' % (ptr(it), u(off(it) + 0xC), link(off(it) + 0xB8)))
+                    item_draw(it)
         if t == 3 and inz(u(o + 0x5C), u(o + 0x54) * 4):
             for k in range(u(o + 0x54)):
                 m = u(off(u(o + 0x5C)) + k * 4)

@@ -1414,6 +1414,35 @@ static const SirField kCountPtrFields[] = {
     { 0x00, SIR_U32, 1 }, { 0x04, SIR_PTR, 1 },
 };
 
+// What the draw passes read of an item (the culling pass fn_80184C18 with fn_80171ABC, and
+// fn_80171228, which queues the item's mesh parts), at image offset `item`:
+//   +0x04 its matrix: twelve floats, and behind them twelve more that fn_80171228 writes
+//   +0x08 scale; +0x10 its mesh; +0x14 seven floats fn_80171ABC writes (two positions, a radius)
+//   +0x30 callback (a build-time address in the file) and +0x34 its argument
+//   +0x3C four floats the culling pass writes; +0x58 float; +0xB0 pointer (non-null: fn_801704F8)
+// and of the mesh: +0x20 centre and radius, +0x48 three floats, +0x54 scale, +0x64 a pointer,
+// +0x6C the number of parts, +0x70 the parts {material, batch}; of a batch the flags at +0x0C.
+static SirError SceneItemDrawPlan(ImagePlan* plan, const u8* image, u32 imageSize, u32 item) {
+    u32 x, m, b;
+    if (PlanHas(plan, item + 0x10, REGION_PTR_ARRAY)) return SIR_OK;
+    if (!PlanAdd(plan, item + 0x04, 4, REGION_PTR_ARRAY) || !PlanAdd(plan, item + 0x08, 4, REGION_U32_ARRAY) ||
+        !PlanAdd(plan, item + 0x10, 4, REGION_PTR_ARRAY) || !PlanAdd(plan, item + 0x14, 0x1C, REGION_U32_ARRAY) ||
+        !PlanAdd(plan, item + 0x30, 4, REGION_U32_ARRAY) || !PlanAdd(plan, item + 0x34, 4, REGION_PTR_ARRAY) ||
+        !PlanAdd(plan, item + 0x3C, 0x10, REGION_U32_ARRAY) || !PlanAdd(plan, item + 0x58, 4, REGION_U32_ARRAY) ||
+        !PlanAdd(plan, item + 0xB0, 4, REGION_PTR_ARRAY)) return SIR_ERR_ENTITY;
+    if (LevelSpan(Be32(image + item + 0x04), 0x60, imageSize, &x) &&
+        (!PlanAdd(plan, x, 0x30, REGION_U32_ARRAY) || !PlanAdd(plan, x + 0x30, 0x30, REGION_U32_ARRAY))) return SIR_ERR_ENTITY;
+    if (!LevelSpan(Be32(image + item + 0x10), 0x70, imageSize, &m) || PlanHas(plan, m + 0x6C, REGION_U32_ARRAY)) return SIR_OK;
+    u32 parts = Be32(image + m + 0x6C);
+    if (parts > imageSize / 8 || (u64)m + 0x70 + (u64)parts * 8 > imageSize) return SIR_ERR_ENTITY;
+    if (!PlanAdd(plan, m + 0x20, 0x10, REGION_U32_ARRAY) || !PlanAdd(plan, m + 0x48, 0x10, REGION_U32_ARRAY) ||
+        !PlanAdd(plan, m + 0x64, 4, REGION_PTR_ARRAY) || !PlanAdd(plan, m + 0x6C, 4, REGION_U32_ARRAY) ||
+        (parts != 0 && !PlanAdd(plan, m + 0x70, parts * 8, REGION_PTR_ARRAY))) return SIR_ERR_ENTITY;
+    for (u32 i = 0; i < parts; i++)
+        if (LevelSpan(Be32(image + m + 0x74 + i * 8), 0x10, imageSize, &b) && !PlanAdd(plan, b + 0x0C, 4, REGION_U32_ARRAY)) return SIR_ERR_ENTITY;
+    return SIR_OK;
+}
+
 static SirError SceneObjectPlan(ImagePlan* plan, const u8* image, u32 imageSize, u32 addr) {
     u32 off, o;
     if (!LevelSpan(addr, 8, imageSize, &off) || PlanHas(plan, off + 4, REGION_U32_ARRAY)) return SIR_OK;
@@ -1430,6 +1459,7 @@ static SirError SceneObjectPlan(ImagePlan* plan, const u8* image, u32 imageSize,
         while (node != 0) {
             if (guard-- == 0 || node < sImageBase + 0xAC || !ImageSpan(node - 0xAC, 0xB8, imageSize, &o)) return SIR_ERR_ENTITY;
             if (!PlanAdd(plan, o, 4, REGION_U32_ARRAY) || !PlanAdd(plan, o + 0xAC, 0xC, REGION_PTR_ARRAY)) return SIR_ERR_ENTITY;
+            if (o < 0xC || SceneItemDrawPlan(plan, image, imageSize, o - 0xC) != SIR_OK) return SIR_ERR_ENTITY;
             if (++seen > REGION_MAX / 2) return SIR_ERR_ENTITY;                         // a list that loops
             node = Be32(image + o + 0xAC);
         }
@@ -1444,7 +1474,8 @@ static SirError SceneObjectPlan(ImagePlan* plan, const u8* image, u32 imageSize,
             u32 item;
             for (u32 i = 0; i < count; i++)
                 if (LevelSpan(Be32(image + o + i * 4), 0xC4, imageSize, &item) &&
-                    (!PlanAdd(plan, item + 0xC, 4, REGION_U32_ARRAY) || !PlanAdd(plan, item + 0xB8, 0xC, REGION_PTR_ARRAY))) return SIR_ERR_ENTITY;
+                    (!PlanAdd(plan, item + 0xC, 4, REGION_U32_ARRAY) || !PlanAdd(plan, item + 0xB8, 0xC, REGION_PTR_ARRAY) ||
+                     SceneItemDrawPlan(plan, image, imageSize, item) != SIR_OK)) return SIR_ERR_ENTITY;
         }
         // The matrices: twelve floats each (a float is swapped like a word).
         u32 matrices = Be32(image + off + 0x5C), m;

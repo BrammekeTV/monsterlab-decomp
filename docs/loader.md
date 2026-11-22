@@ -653,6 +653,23 @@ and the list behind `+0x4C` (below); for type 3 the count at `+0x54` and the poi
 | type 3 object | `+0x48` the entity that uses it, `+0x50` current entry, `+0x5C` one matrix pointer per entry | `fn_801DA344`, `fn_801DA750`, `fn_801DA798` |
 | matrix | twelve floats (in the files it lies in its item, at `+0xD0`) | `fn_801D9164` writes all of it |
 
+What the draw passes read of an item and of the mesh it draws:
+
+| Object | Fields | Reader |
+|---|---|---|
+| item | `+0x04` its matrix, `+0x08` scale, `+0x10` its mesh, `+0x14` seven floats (two positions and a radius, written by `fn_80171ABC`), `+0x30` callback and `+0x34` its argument, `+0x3C` four floats the culling pass writes, `+0x58` float, `+0xB0` pointer (non-null: `fn_801704F8`) | `fn_80184C18` (culling), `fn_80171ABC`, `fn_80171228` |
+| matrix | twelve floats, and twelve more behind them that `fn_80171228` writes (the matrix scaled and turned to the camera) | `fn_80171ABC`, `fn_80171228` |
+| mesh | `+0x20` centre and radius, `+0x48` three floats, `+0x54` scale, `+0x64` a pointer (null in every level file), `+0x6C` number of parts, `+0x70` the parts: `{material, batch}` | `fn_80171ABC`, `fn_80171228` |
+| batch | `+0x0C` flags | `fn_80171228` |
+
+The callback at `+0x30` is a build-time address in the file (0x802C5280 or 0x802C6FD4, neither
+the start of a function in this build), like the vtable slots: it is converted as a word, and
+the code that sets the item up has to store the real function.
+
+Not converted: the rest of a mesh (bounding box, name, vertex format), the material, and the
+batch beyond its flags: display lists and vertex data, which the code that draws the queued
+records reads.
+
 `fn_801DA91C` hands every entry of a type 3 object to `fn_80184314`, which appends the entry's
 link to the list of a type 2 object: that is why the tail, the count and an unlisted item's link
 have to be converted, not only the nodes already in a list.
@@ -785,7 +802,7 @@ its memory budget).
 | three of a zone record's four lists | `+0x04`, `+0x1C`, `+0x28` | none found yet |
 | render objects | pool items of fix-up 655 | `fn_8012F818` |
 | animation tables of props | definition `+0x48`, in zone 0 | `fn_801AC184`, when a prop whose definition has the byte `+0x1C` set changes state |
-| the rest of a scene object's item | beyond flags, link and matrix | the render code |
+| materials, and a mesh batch beyond its flags (display lists, vertex data) | zone images | the code that draws the records `fn_80171228` queues |
 | value tables of the HUD's machines | another zone's image | `fn_801BBE40`, as soon as a state runs an action |
 | zone action tables and their records | slot `+0xD4` | `TriggerDoAction`; `ActionRecordPlan` applies |
 | the shared zones (`shared_ui.sir`, `shared_parts.sir`), textures, models, collision | the rest | - |
