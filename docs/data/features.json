@@ -99,6 +99,11 @@
  "changelog": [
   {
    "date": "2026-11-22",
+   "time": "11:17",
+   "text": "Round 79: 29 more functions (fn_800854D4-fn_800C509C, fn_800CDCC4, fn_80120E00, fn_80198014, fn_801A8E80 and more), Haiku-only"
+  },
+  {
+   "date": "2026-11-22",
    "time": "11:05",
    "text": "The Windows boot reaches the title screen's UI (PRs #38 to #41): the world constructor is decompiled, which fixes a stop before the game's main function. The loader converts the screen-set database and what the renderer reads of scene items and meshes. The call that loads a UI screen set was declared with the wrong arguments in our code and is fixed. The boot now gets to loading the title screen's UI."
   },
