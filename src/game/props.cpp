@@ -183,6 +183,8 @@ void NavTest(ScriptCtx* ctx) {
     FollowWaypointPath(p, &copy, 2.0f);
 }
 
+extern s32 lbl_805FAF70;   // 0x805FAF70 (cleared at the end of the prop registration)
+
 // 0x800197A8
 void RegisterPropScriptFuncs(void) {
     RegisterScriptFunc("prop_play_anim_and_fx_once", 0x4E, (void*)prop_play_anim_and_fx_once);
@@ -190,7 +192,7 @@ void RegisterPropScriptFuncs(void) {
     RegisterScriptFunc("prop_counting_down", 0x4E, (void*)prop_counting_down);
     RegisterScriptFunc("prop_check_timer", 0x1D, (void*)prop_check_timer);
     RegisterScriptFunc("prop_anim_done", 0x1D, (void*)prop_anim_done);
-    RegisterScriptFunc("prop_anim_done", 0x4E, (void*)NavTest);
+    RegisterScriptFunc("NavTest", 0x4E, (void*)NavTest);
     RegisterScriptFunc("reset_deathcount", 0x4E, (void*)reset_deathcount);
     RegisterScriptFunc("increment_deathcount", 0x4E, (void*)increment_deathcount);
     RegisterScriptFunc("increment_entity_state", 0x4E, (void*)increment_entity_state);
@@ -202,6 +204,7 @@ void RegisterPropScriptFuncs(void) {
     RegisterScriptFunc("hazard_prop_attack_entry", 0x4E, (void*)hazard_prop_attack_entry);
     RegisterScriptFunc("hazard_prop_attack_exit", 0x4E, (void*)hazard_prop_attack_exit);
     RegisterScriptFunc("hazard_prop_attack_update", 0x4E, (void*)hazard_prop_attack_update);
+    lbl_805FAF70 = 0;
 }
 
 // ---------------------------------------------------------------- delayed zone events

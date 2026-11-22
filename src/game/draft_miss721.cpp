@@ -85,7 +85,7 @@ void fn_80007814(void) {
     *(f32*)(lbl_803C29D8 + 4) = lbl_805FC604;
     *(f32*)(lbl_803C29D8 + 8) = lbl_805FC600;
     *(u8*)(gGame + 0x1C0) = 0;
-    for (i = 0; i < 256; i++) *(s32*)(gGame + 0x1C4 + i * 4) = 0;
+    for (i = 0; i < 255; i++) *(s32*)(gGame + 0x1C4 + i * 4) = 0; // asm clears 255 entries (index u8-wrapped), the 256th is left alone
 
     for (u8* p = gGame + 0xA918; p < gGame + 0xAB48; p += 0x1C) fn_80052504(p);
     fn_8032F1E8(gGame + 0xAB98, fn_8020EAD4, fn_8020EB44, 0x13C, 0x14);

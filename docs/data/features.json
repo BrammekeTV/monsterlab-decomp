@@ -99,6 +99,11 @@
  "changelog": [
   {
    "date": "2026-11-22",
+   "time": "21:41",
+   "text": "Checked about 80 more functions that run during the Windows boot against the original and fixed 4 mistakes in our decompiled code (a level path that lost a backslash, a table cleared one entry too long, a script function registered under the wrong name, and a missing store)"
+  },
+  {
+   "date": "2026-11-22",
    "time": "21:35",
    "text": "Level effects on Windows (PR #68): the loader now converts a locator's zone and the level's effect list table."
   },

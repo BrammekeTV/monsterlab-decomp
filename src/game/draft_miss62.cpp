@@ -582,7 +582,7 @@ BOOL fn_80129334(void* world, u8 level) {
     SysSprintf(lbl_80384390, "RW_ASSETS_%s", name);
     SysSprintf(path, "%s - %s", name, lbl_805F8FE8);
     if (w[0x120] == 0) WorldStateInit(w, level);
-    if (name != NULL) SysSprintf(path, "levels\%s\\", name);
+    if (name != NULL) SysSprintf(path, "levels\\%s\\", name);
     if (w[0x120] == 0) fn_80169C6C(lbl_805FB5A8, 1);
     fn_801294CC(w, level, "Streams\\", name);
     ScopedLockDtor(lock, -1);
