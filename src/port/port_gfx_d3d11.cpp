@@ -392,6 +392,7 @@ static u32 Fnv(const u8* p, u32 n, u32 h) {
 struct TexEntry { ID3D11ShaderResourceView* srv; u32 hash, w, h, fmt; };
 static std::map<u64, TexEntry> sTextures;                   // by address and palette slot
 static std::map<u32, ID3D11ShaderResourceView*> sEfbCopies; // frame-buffer copies, by destination address
+static std::map<u32, u32> sEfbCopyRowBytes;                 // console bytes per row of each copy, by destination address
 
 static ID3D11ShaderResourceView* MakeTexture(const u32* rgba, u32 w, u32 h) {
     D3D11_TEXTURE2D_DESC d = {};
@@ -522,7 +523,11 @@ static void SetOutputState(const PortGx* g) {
     memcpy(vp, &g->xf[0x1A], sizeof(vp));
     D3D11_VIEWPORT v;
     f32 w = 2.0f * vp[0], h = -2.0f * vp[1];
-    v.TopLeftX = (vp[3] - 342.0f - vp[0]) * sScale; v.TopLeftY = (vp[4] - 342.0f + vp[1]) * sScale;
+    // Scissor offset (BP 0x59: (x + 342) / 2, (y + 342) / 2 in 10 bits each): the frame-buffer
+    // position of a pixel is its screen position minus this. Used to draw a frame in bands.
+    s32 offX = 0, offY = 0;
+    if (g->bp[0x59] != 0) { offX = (s32)((g->bp[0x59] & 0x3FF) << 1) - 342; offY = (s32)(((g->bp[0x59] >> 10) & 0x3FF) << 1) - 342; }
+    v.TopLeftX = (vp[3] - 342.0f - vp[0] - (f32)offX) * sScale; v.TopLeftY = (vp[4] - 342.0f + vp[1] - (f32)offY) * sScale;
     v.Width = w * sScale; v.Height = h * sScale; v.MinDepth = 0; v.MaxDepth = 1;
     if (v.Width <= 0 || v.Height <= 0) { v.TopLeftX = v.TopLeftY = 0; v.Width = (f32)(EFB_W * sScale); v.Height = (f32)(EFB_H * sScale); }
     sCtx->RSSetViewports(1, &v);
@@ -530,6 +535,7 @@ static void SetOutputState(const PortGx* g) {
     s32 x0 = (s32)((g->bp[0x20] >> 12) & 0xFFF) - 342, y0 = (s32)(g->bp[0x20] & 0xFFF) - 342;
     s32 x1 = (s32)((g->bp[0x21] >> 12) & 0xFFF) - 342 + 1, y1 = (s32)(g->bp[0x21] & 0xFFF) - 342 + 1;
     if (x1 <= x0 || y1 <= y0) { x0 = y0 = 0; x1 = EFB_W; y1 = EFB_H; }
+    else { x0 -= offX; x1 -= offX; y0 -= offY; y1 -= offY; }
     D3D11_RECT sc = {std::max(x0, 0) * sScale, std::max(y0, 0) * sScale, std::min(x1, EFB_W) * sScale, std::min(y1, EFB_H) * sScale};
     sCtx->RSSetScissorRects(1, &sc);
 }
@@ -837,21 +843,60 @@ static void Copy(const PortGx* g, u32 control) {
         static const f32 kPick[5][4] = {{0, 0, 0, 1}, {1, 0, 0, 0}, {0, 1, 0, 0}, {0, 0, 1, 0}, {0, 0, 0, -1}};
         const f32* pick = fmt == 7 ? kPick[0] : fmt == 8 ? kPick[1] : fmt == 9 ? kPick[2] : fmt == 10 ? kPick[3] : kPick[4];
         if (fmt == 0 || fmt == 1) pick = kPick[1];          // R4, and the luminance formats: red stands in
+        // A frame drawn in bands is copied band by band into one console texture: a copy whose
+        // address is a whole number of rows into an earlier copy of the same width and format
+        // (at or before its end) becomes the rows from there on of that copy.
+        static const u8 kBits[16] = {4, 8, 8, 16, 16, 16, 32, 8, 8, 8, 8, 16, 16, 16, 16, 16};
+        u32 rowBytes = w * kBits[fmt & 15] / 8, row = 0;
+        ID3D11Texture2D* under = NULL;
+        D3D11_TEXTURE2D_DESC ud = {};
+        for (auto& e : sEfbCopyRowBytes) {
+            if (e.first >= addr || e.second != rowBytes || (addr - e.first) % rowBytes) continue;
+            auto base = sEfbCopies.find(e.first);
+            if (base == sEfbCopies.end() || !base->second) continue;
+            ID3D11Resource* res = NULL;
+            base->second->GetResource(&res);
+            ID3D11Texture2D* bt = NULL;
+            res->QueryInterface(__uuidof(ID3D11Texture2D), (void**)&bt);
+            res->Release();
+            if (!bt) continue;
+            bt->GetDesc(&ud);
+            if (ud.Width == w * sScale && (addr - e.first) / rowBytes * sScale <= ud.Height) {
+                under = bt; row = (addr - e.first) / rowBytes; addr = e.first;
+                break;
+            }
+            bt->Release();
+        }
         D3D11_TEXTURE2D_DESC d = {};
-        d.Width = w * sScale; d.Height = h * sScale; d.MipLevels = 1; d.ArraySize = 1; d.Format = DXGI_FORMAT_R8G8B8A8_UNORM;
+        d.Width = w * sScale; d.Height = (row + h) * sScale; d.MipLevels = 1; d.ArraySize = 1; d.Format = DXGI_FORMAT_R8G8B8A8_UNORM;
+        if (under && ud.Height > d.Height) d.Height = ud.Height;
         d.SampleDesc.Count = 1; d.BindFlags = D3D11_BIND_SHADER_RESOURCE | D3D11_BIND_RENDER_TARGET;
         ID3D11Texture2D* t = NULL;
         if (SUCCEEDED(sDev->CreateTexture2D(&d, NULL, &t))) {
-            ID3D11RenderTargetView* rtv = NULL;
-            sDev->CreateRenderTargetView(t, NULL, &rtv);
-            Blit(sEfbSrv, rtv, d.Width, d.Height, (f32)x / EFB_W, (f32)y / EFB_H, (f32)w / EFB_W, (f32)h / EFB_H, pick);
-            rtv->Release();
+            // The band is made on its own and then put in place, with the rows above and below it.
+            D3D11_TEXTURE2D_DESC bd = d;
+            bd.Height = h * sScale;
+            ID3D11Texture2D* band = t;
+            if (under) { band = NULL; sDev->CreateTexture2D(&bd, NULL, &band); }
+            if (band) {
+                ID3D11RenderTargetView* rtv = NULL;
+                sDev->CreateRenderTargetView(band, NULL, &rtv);
+                Blit(sEfbSrv, rtv, bd.Width, bd.Height, (f32)x / EFB_W, (f32)y / EFB_H, (f32)w / EFB_W, (f32)h / EFB_H, pick);
+                rtv->Release();
+            }
+            if (under) {
+                D3D11_BOX all = {0, 0, 0, ud.Width, ud.Height, 1};
+                sCtx->CopySubresourceRegion(t, 0, 0, 0, 0, under, 0, &all);
+                if (band) { sCtx->CopySubresourceRegion(t, 0, 0, row * sScale, 0, band, 0, NULL); band->Release(); }
+            }
             ID3D11ShaderResourceView*& slot = sEfbCopies[addr];
             if (slot) slot->Release();
             slot = NULL;
             sDev->CreateShaderResourceView(t, NULL, &slot);
+            sEfbCopyRowBytes[addr] = rowBytes;
             t->Release();
         }
+        if (under) under->Release();
         sGfxStats.texCopies++;
     }
     if (control & 0x800) {                                  // clear afterwards (BP 0x4F alpha/red, 0x50 green/blue, 0x51 depth)
