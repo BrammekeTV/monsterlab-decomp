@@ -62,7 +62,7 @@
   },
   {
    "title": "Boots to title screen",
-   "detail": "First visible frame on Windows. The PC port now draws its first real screen: the Wii Remote strap safety screen, rendered by the Direct3D 11 renderer from the player's own disc. Next: the title screen itself.",
+   "detail": "First visible frame on Windows. The PC port now draws the opening screens from the player's own disc with Direct3D 11: the Wii Remote strap safety screen and the splash and text screens. It skips the intro movie for now and starts loading the front-end level. Next: the rest of that level's data, then the title screen.",
    "status": "in_progress"
   },
   {
@@ -97,6 +97,11 @@
   }
  ],
  "changelog": [
+  {
+   "date": "2026-11-22",
+   "time": "16:59",
+   "text": "The Windows boot gets through the opening screens (PR #55): after the strap safety screen it now passes the splash and text screens, skips the intro movie for now, and starts loading the front-end level. On the way, two calls in our decompiled code that passed the wrong arguments were fixed, an audio frame callback was added and a few more system calls were filled in."
+  },
   {
    "date": "2026-11-22",
    "time": "16:43",
