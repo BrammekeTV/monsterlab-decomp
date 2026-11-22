@@ -13,6 +13,8 @@
 #include <string.h>
 
 #include <algorithm>
+#include <string>
+#include <utility>
 #include <vector>
 
 #include "game/part.h"
@@ -871,6 +873,45 @@ struct ZoneDump {
         }
     }
 
+    // The first layer of a shared zone's screen set (zone slot +0x100): the tree fn_8018E2F4 walks
+    // and the widgets fn_8019BFF8 reaches from it.
+    std::vector<const u8*> widgets;
+    void Widget(const u8* w, bool child) {
+        if (!In(w, 0x128)) return;
+        if (child) { printf("uichild "); Val(w); printf(" type %08x first ", *(const u32*)w); }
+        else { printf("uiwidget "); Val(w); printf(" first "); }
+        Ptr(w + 0x120); printf(" next "); Ptr(w + 0x124); printf("\n");
+        if (std::find(widgets.begin(), widgets.end(), w) != widgets.end()) return;
+        widgets.push_back(w);
+        for (const u8* c = *(const u8**)(w + 0x120); In(c, 0x128); c = *(const u8**)(c + 0x124)) Widget(c, true);
+    }
+    void ScreenSet(const u8* ss) {
+        if (!In(ss, 0x2C)) return;
+        const u8* table = *(const u8**)(ss + 0x28);
+        printf("uiset "); Val(ss); printf(" table "); Ptr(ss + 0x28); printf("\n");
+        if (!In(table, 0xC)) return;
+        printf("uitable "); Val(table); printf(" root "); Ptr(table); printf(" low "); Ptr(table + 4); printf(" high "); Ptr(table + 8); printf("\n");
+        std::vector<const u8*> seen;
+        std::vector<std::pair<const u8*, bool> > stack;
+        stack.push_back(std::make_pair(*(const u8* const*)table, false));
+        while (!stack.empty()) {
+            const u8* n = stack.back().first;
+            bool done = stack.back().second;
+            stack.pop_back();
+            if (!In(n, 0x14)) continue;
+            if (done) {
+                printf("uinode "); Val(n); printf(" key %08x widget ", *(const u32*)n); Ptr(n + 4);
+                printf(" left "); Ptr(n + 0xC); printf(" right "); Ptr(n + 0x10); printf("\n");
+                Widget(*(const u8**)(n + 4), false);
+            } else if (std::find(seen.begin(), seen.end(), n) == seen.end()) {
+                seen.push_back(n);
+                stack.push_back(std::make_pair(n, true));
+                stack.push_back(std::make_pair(*(const u8* const*)(n + 0x10), false));
+                stack.push_back(std::make_pair(*(const u8* const*)(n + 0xC), false));
+            }
+        }
+    }
+
     void Entities() {
         for (size_t i = 0; i < ents.size(); i++) {
             const u8* e = ents[i];
@@ -1102,6 +1143,61 @@ static int DumpLevel(const char* path) {
         zd1.Entities();
         zd1.Records(&roots1, LEVEL_ZONE1_WII_BASE);
         LevelZoneRootsFree(&roots1);
+    }
+    // The shared zones, as the port converts them while this level is loaded (empty_level.sir only).
+    std::string level(path), dir, name(path);
+    size_t cut = level.find_last_of("/\\");
+    if (cut != std::string::npos) { dir = level.substr(0, cut + 1); name = level.substr(cut + 1); }
+    FILE* sp = _stricmp(name.c_str(), "empty_level.sir") == 0 ? fopen((dir + "shared_ui.sir").c_str(), "rb") : NULL;
+    if (sp != NULL) {
+        fseek(sp, 0, SEEK_END);
+        long slen = ftell(sp);
+        fseek(sp, 0, SEEK_SET);
+        u8* sfile = (u8*)malloc((size_t)slen);
+        bool sok = fread(sfile, 1, (size_t)slen, sp) == (size_t)slen;
+        fclose(sp);
+        u32 slotSize = LevelSlotSize(f.hdr, f.hdrSize);
+        sOtherZone = f.zone; sOtherZoneSize = f.zoneSize; sOtherZoneNumber = 0;
+        for (s32 i = 0; sok && i < SirContainerSectionCount(sfile, (u32)slen); i++) {
+            SirSection sec;
+            if (!SirContainerSection(sfile, (u32)slen, i, &sec) || sec.size < 0x104) continue;
+            u8* img = (u8*)malloc(sec.size);
+            memcpy(img, sfile + sec.offset, sec.size);
+            // Not in the file: the address the game reads the image to. Every image of shared_ui.sir has
+            // its screen set right behind the slot copy, so the tool takes the address from that pointer.
+            u32 sbase = (((u32)img[0x100] << 24) | ((u32)img[0x101] << 16) | ((u32)img[0x102] << 8) | img[0x103]) & 0xFFFF0000u;
+            SirReloc sr;
+            SirRelocInit(&sr, NULL, NULL);
+            SirRelocAddRange(&sr, base, f.hdrSize, f.hdr);
+            SirRelocAddRange(&sr, zoneBase, f.zoneSize, f.zone);
+            SirRelocAddRange(&sr, sbase, sec.size, img);
+            LevelZoneOther other = { f.zone, f.zoneSize, zoneBase, &done0 };
+            LevelZoneRoots sroots;
+            memset(&sroots, 0, sizeof(sroots));
+            if (!LevelSharedZoneRootsCollect(img, sec.size, sbase, slotSize, &other, &sroots)) e = SIR_ERR_LEVEL;
+            if (e == SIR_OK) e = LevelZoneConvert(&sr, img, sec.size, sbase, &sroots, NULL, &other);
+            if (e != SIR_OK) { fprintf(stderr, "shared_ui.sir zone %d: %s\n", sec.type, SirErrorText(e)); return 1; }
+            printf("sharedzone %d size 0x%x base %08x\n", sec.type, sec.size, sbase);
+            GlobalBinaryFile sz = { NULL, img, sec.size };
+            ZoneDump sd;
+            sd.z = &sz;
+            printf("sharedslot zone %u floats", *(const u32*)(img + 0x18));
+            for (u32 k = 0; k < 6; k++) printf(" %08x", Bits(*(const f32*)(img + k * 4)));
+            printf(" actions "); sd.Ptr(img + 0xD4); printf(" pools "); sd.Ptr(img + 0xE4);
+            printf(" %u record ", *(const u32*)(img + 0xE8)); sd.Ptr(img + 0xFC);
+            // +0x100 is a word in the slot's field table: the Wii address, in host order.
+            u32 set = *(const u32*)(img + 0x100);
+            const u8* setHost = set >= sbase && set - sbase <= sec.size ? img + (set - sbase) : NULL;
+            printf(" screens "); if (setHost != NULL) printf("img+0x%x\n", set - sbase); else if (set == 0) printf("null\n"); else printf("wii:%08x\n", set);
+            for (u32 k = 0; k < sroots.entityCount; k++) sd.Add(sd.ents, img + (sroots.entities[k] - sbase));
+            sd.PoolTables(&sroots, sbase);
+            sd.Entities();
+            sd.Records(&sroots, sbase);
+            sd.ScreenSet(setHost);
+            LevelZoneRootsFree(&sroots);
+            free(img);
+        }
+        free(sfile);
     }
     sOtherZone = NULL;
     LevelZoneDoneFree(&done0);
@@ -1873,6 +1969,59 @@ static void LevelSelfTest(void) {
         CHECK(zone1[0x203] == 0x53 && *(const u8**)(zone1 + 0x210) == NULL && zone1[0x280] == 0x7F);
         free(zone0Copy);
         LevelZoneRootsFree(&roots1);
+    }
+
+    // A shared zone: the image starts with a copy of its zone slot, which names a screen set; the
+    // set's table leads to a tree of two nodes, a widget and its one child.
+    {
+        const u32 SH = 0x924C0000u, SH_SIZE = 0x480u;
+        const u32 SET = 0x1A0, TABLE = 0x1D0, NODE_A = 0x1E0, NODE_B = 0x200, WIDGET = 0x220, CHILD = 0x350;
+        u8* sh = (u8*)malloc(SH_SIZE);
+        u8* shCopy = (u8*)malloc(SH_SIZE);
+        for (u32 o = 0; o < SH_SIZE; o += 4) Put32(sh + o, 0x7F800001);
+        u32 slotSize = LevelSlotSize(hdr, L_HDR_SIZE);
+        CHECK(slotSize == L_STRIDE);
+        memset(sh, 0, L_STRIDE);
+        Put32(sh + 0x0C, 0x42480000); Put32(sh + 0x18, 480);
+        Put32(sh + 0xFC, L_ZONE + 0x40); Put32(sh + 0x100, SH + SET);
+        Put32(sh + SET + 0x28, SH + TABLE);
+        Put32(sh + TABLE + 0, SH + NODE_A); Put32(sh + TABLE + 4, SH + NODE_B); Put32(sh + TABLE + 8, SH + NODE_A);
+        Put32(sh + NODE_A + 0x00, 0x80000000); Put32(sh + NODE_A + 0x04, SH + WIDGET);
+        Put32(sh + NODE_A + 0x0C, SH + NODE_B); Put32(sh + NODE_A + 0x10, 0);
+        Put32(sh + NODE_B + 0x00, 0x10); Put32(sh + NODE_B + 0x04, 0); Put32(sh + NODE_B + 0x0C, 0); Put32(sh + NODE_B + 0x10, 0);
+        memset(sh + WIDGET, 0, 0x128);
+        Put32(sh + WIDGET + 0x000, 0x11223344);                // a tree node's widget: its first word has no reader here
+        Put32(sh + WIDGET + 0x120, SH + CHILD);
+        memset(sh + CHILD, 0, 0x128);
+        Put32(sh + CHILD + 0x000, 7);
+        SirReloc rs;
+        SirRelocInit(&rs, NULL, NULL);
+        SirRelocAddRange(&rs, L_BASE, L_HDR_SIZE, hdr);
+        SirRelocAddRange(&rs, L_ZONE, L_ZONE_SIZE, zone);
+        SirRelocAddRange(&rs, SH, SH_SIZE, sh);
+        LevelZoneOther other = { zone, L_ZONE_SIZE, L_ZONE, &done0 };
+        LevelZoneRoots sroots;
+        CHECK(LevelSharedZoneRootsCollect(sh, SH_SIZE, SH, slotSize, &other, &sroots));
+        CHECK(sroots.slotCopySize == L_STRIDE && sroots.screenSet == SH + SET && sroots.entityCount == 0 && sroots.zoneListCount == 0);
+        // Refused untouched: a node whose left child is the root.
+        memcpy(shCopy, sh, SH_SIZE);
+        Put32(sh + NODE_B + 0x0C, SH + NODE_A);
+        CHECK(LevelZoneConvert(&rs, sh, SH_SIZE, SH, &sroots, NULL, &other) == SIR_ERR_SCREENS);
+        Put32(sh + NODE_B + 0x0C, 0);
+        CHECK(memcmp(shCopy, sh, SH_SIZE) == 0);
+        CHECK(LevelZoneConvert(&rs, sh, SH_SIZE, SH, &sroots, NULL, &other) == SIR_OK);
+        // The slot copy, as fn_80135BC0 copies it and fn_80199024 / fn_8018E808 read the set.
+        CHECK(*(const f32*)(sh + 0x0C) == 50.0f && *(const s32*)(sh + 0x18) == 480 && *(const u8**)(sh + 0xFC) == zone + 0x40);
+        CHECK(*(const u32*)(sh + 0x100) == SH + SET);                                  // a word in the slot's field table
+        const u8* table = *(const u8**)(sh + SET + 0x28);
+        const u8* root = *(const u8**)table;
+        CHECK(table == sh + TABLE && root == sh + NODE_A && *(const u8**)(table + 4) == sh + NODE_B && *(const u8**)(table + 8) == root);
+        CHECK(*(const u32*)root == 0x80000000 && *(const u8**)(root + 4) == sh + WIDGET && *(const u8**)(root + 0xC) == sh + NODE_B);
+        CHECK(*(const u8**)(root + 0x10) == NULL && root[8] == 0x7F && *(const u32*)(sh + NODE_B) == 0x10);
+        const u8* child = *(const u8**)(sh + WIDGET + 0x120);
+        CHECK(child == sh + CHILD && *(const u32*)child == 7 && *(const u8**)(child + 0x124) == NULL && sh[WIDGET] == 0x11);
+        LevelZoneRootsFree(&sroots);
+        free(sh); free(shCopy);
     }
     LevelZoneDoneFree(&done0);
 

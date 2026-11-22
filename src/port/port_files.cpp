@@ -112,14 +112,14 @@ void PortFileRead(const char* path, u32 offset, u8* dst, u32 len) {
     }
     // Level files: the header block is the world state, section type N the image of zone N.
     size_t n = strlen(name);
+    static SirReloc reloc;
+    static u32 hudAddr;            // header +0x1F4, kept for the zone that holds the HUD
+    static u8* levelHdr;           // the header block (the world state), converted
+    static u32 levelHdrSize;
+    static u8* zone0;              // zone 0's image, converted, and what was converted in it
+    static u32 zone0Size;
+    static LevelZoneDone zone0Done;
     if (n > 10 && _stricmp(name + n - 10, "_level.sir") == 0) {
-        static SirReloc reloc;
-        static u32 hudAddr;            // header +0x1F4, kept for the zone that holds the HUD
-        static u8* levelHdr;           // the header block (the world state), converted
-        static u32 levelHdrSize;
-        static u8* zone0;              // zone 0's image, converted, and what was converted in it
-        static u32 zone0Size;
-        static LevelZoneDone zone0Done;
         SirRelocInit(&reloc, NULL, NULL);
         if (e->type == -1) {
             u32 base = LevelHeaderWiiBase(dst, e->size);
@@ -163,6 +163,26 @@ void PortFileRead(const char* path, u32 offset, u8* dst, u32 len) {
                     name, e->type, entityCount, reloc.ptrImage, reloc.fieldsSwapped);
             return;
         }
+    }
+    // Shared zones (shared_ui.sir, shared_parts.sir): section type N is the image of zone N. It
+    // starts with a copy of the zone's slot, which fn_80135BC0 copies into the header block.
+    bool shared = (n >= 13 && _stricmp(name + n - 13, "shared_ui.sir") == 0) || (n >= 16 && _stricmp(name + n - 16, "shared_parts.sir") == 0);
+    if (shared && e->type > 0 && zone0 != NULL && levelHdr != NULL) {
+        u32 base = (u32)(uintptr_t)dst;
+        SirRelocInit(&reloc, NULL, NULL);
+        SirRelocAddRange(&reloc, 0x90000000u, 0x04000000u, (u8*)(uintptr_t)0x90000000u);
+        CheckFixUpIndices(name);
+        LevelZoneOther other = { zone0, zone0Size, (u32)(uintptr_t)zone0, &zone0Done };
+        LevelZoneRoots roots;
+        if (!LevelSharedZoneRootsCollect(dst, e->size, base, LevelSlotSize(levelHdr, levelHdrSize), &other, &roots))
+            PortStop(8, "%s zone %d: %s", name, e->type, SirErrorText(SIR_ERR_LEVEL));
+        SirError err = LevelZoneConvert(&reloc, dst, e->size, base, &roots, NULL, &other);
+        LevelZoneRootsFree(&roots);
+        if (err != SIR_OK) PortStop(8, "%s zone %d: %s", name, e->type, SirErrorText(err));
+        sConverted++;
+        PortLog("%s zone %d: slot copy, zone objects and the first layer of the screen set converted (%u pointers, %u fields); the rest of the zone is not",
+                name, e->type, reloc.ptrImage, reloc.fieldsSwapped);
+        return;
     }
     Unconverted(name, e, "no converter for this section type yet");
 }

@@ -434,7 +434,12 @@ typedef struct LevelZoneRoots {
     u32  zoneRecordCount;
     u32* zoneLists;          // first node of the list (+0x10) of each record that lies in the other image
     u32  zoneListCount;
+    u32  slotCopySize;       // a shared zone: size of the zone slot copy the image starts with, else 0
+    u32  screenSet;          // a shared zone: the screen set its slot copy names (+0x100), or 0
 } LevelZoneRoots;
+
+// Size of one zone slot of a converted header block (the game's gZoneResourceSize), or 0.
+u32 LevelSlotSize(const u8* hdr, u32 hdrSize);
 
 // What has been converted in a zone image. Zero it before the first use; LevelZoneDoneFree frees it.
 typedef struct LevelZoneDone {
@@ -459,6 +464,11 @@ typedef struct LevelZoneOther {
 BOOL LevelZoneRootsCollect(const u8* hdr, u32 hdrSize, const u8* zoneHost, u32 zoneSize, u32 zoneWiiBase,
                            const LevelZoneOther* other, LevelZoneRoots* out);
 void LevelZoneRootsFree(LevelZoneRoots* roots);
+// A shared zone (an image of shared_ui.sir or shared_parts.sir): it starts with a copy of its
+// zone slot, which fn_80135BC0 copies into the header block, so the roots come from that copy.
+// `image` is still big-endian; `other` is zone 0, converted. Free with LevelZoneRootsFree.
+BOOL LevelSharedZoneRootsCollect(const u8* image, u32 imageSize, u32 wiiBase, u32 slotSize,
+                                 const LevelZoneOther* other, LevelZoneRoots* out);
 // Converts what is typed so far of one zone image loaded for Wii address `wiiBase`: the HUD with
 // its state machines, the entities (first layer: record, child entities, part lists, state
 // machine, scene object), the scene objects and the pool tables with their pools. `r` must map

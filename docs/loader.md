@@ -787,12 +787,42 @@ differ from zone 0:
 A list of one part container can be the entity's own slot at `+0x8C` (`+0x194` points at it):
 that slot is converted with the entity.
 
-The other zones (the shared ones) come from `shared_ui.sir` and `shared_parts.sir` and start
-with a copy of their zone slot (`fn_80135BC0`); those files are not converted yet.
+The other zones (the shared ones) come from `shared_ui.sir` and `shared_parts.sir`: next section.
 
 The port reads each zone to the address the console uses, so it needs no address for zone 1;
 the test tool and the reference decoder use 0x90980000 (`gZoneBase[1]`: zone 0's address plus
 its memory budget).
+
+### Shared zones and their screen sets
+
+`shared_ui.sir` (23 images) and `shared_parts.sir` hold the zones that every level shares; the
+section type is the zone number, and `fn_80135854` reads an image to the zone's address when a
+script asks for it (`UIEngine_LoadUIScreenSet` -> `ZoneLoadAsync`). Such an image **starts with
+a copy of its zone slot**: `fn_80135BC0` copies the first slot-size bytes into the header block
+and then starts the zone like any other. The loader converts that copy with the slot's field
+table and takes the zone's roots from it instead of from the header block: entities, pool
+table, the zone record in zone 0 (`+0xFC`) and the screen set (`+0x100`). The copy's three
+tables point into the header block as it lay when the file was built; they are empty.
+
+Of a **screen set** (what the slot's `+0x100` points at, right behind the slot copy) the first
+layer is converted:
+
+| Object | Fields | Reader |
+|---|---|---|
+| screen set | `+0x28` pointer to a table | `fn_80199024` |
+| table | `+0x00` root of a binary tree, `+0x04` / `+0x08` the nodes with the lowest and the highest key | `fn_8018E2F4`, `fn_8018E808` |
+| tree node | `+0x00` key, `+0x04` widget, `+0x0C` left, `+0x10` right | `fn_8018E2F4` (the walk), `fn_8018E808` (search by key), `fn_8018E8D8` |
+| widget | `+0x120` first child, `+0x124` next sibling; of a child the first word | `fn_8019BFF8`, `fn_80199534` |
+
+Zone 480 (the first one the boot loads) has 5 nodes; the 23 images of `shared_ui.sir` have 326
+nodes and 7,554 child widgets. Not converted: the rest of the set (`+0x00` its name hash, the
+zone, five more pointers with counts), the rest of a widget, and everything else in the image.
+
+`shared_parts.sir` goes through the same code in the port but has not been compared yet.
+
+The tools take a shared image's address from the slot copy's `+0x100` (the set lies right
+behind the copy, so the address is that pointer with the low 16 bits cleared); the port uses the
+address the game reads the image to.
 
 ### Not converted yet in level files
 
