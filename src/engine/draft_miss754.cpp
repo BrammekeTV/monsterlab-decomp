@@ -81,12 +81,12 @@ u8* fn_80178778(u8* arg0) {
 
 // 0x80178C44
 // Same as fn_80178778, then applies arg1 through fn_801787E0.
-u8* fn_80178C44(u8* arg0, s32 arg1) {
+u8* fn_80178C44(u8* arg0, u8** arg1) {
     u8* link = (arg0 != NULL) ? arg0 + 0x80 : NULL;
     u8* rec = (*(u8* (**)(u32, u32, u32, u8*, u32, u8*))lbl_805FB608)(0x13C, 0x10, 0x12, link, 0, lbl_805FB608);
     *(u8**)(rec + 0x50) = arg0;
     fn_801785A8(rec);
-    fn_801787E0(rec, (u8**)(uintptr_t)arg1);
+    fn_801787E0(rec, arg1);
     return rec;
 }
 
