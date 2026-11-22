@@ -683,12 +683,50 @@ def shared_zone_dump(L, zn, sec, slot_size, zone0, zbase0):
     if not inz(table, 0xC): return
     t = table - base
     L.append('uitable %s root %s low %s high %s' % (ptr(table), ptr(u(t)), ptr(u(t + 4)), ptr(u(t + 8))))
-    seen_w = set()
+    seen_w, fixed, lists = set(), set(), set()
+    def ui_list(a, widgets):
+        if not inz(a, 0x14) or a in lists: return
+        lists.add(a)
+        l = a - base
+        n, data = u(l), u(l + 0x10)
+        L.append('uilist %s count %d capacity %d size %d data %s' % (ptr(a), n, u(l + 4), u(l + 8), ptr(data)))
+        if n == 0 or not inz(data, n * 4): return
+        items = [u(data - base + i * 4) for i in range(n)]
+        L.append('uilistitems %s %s' % (ptr(a), ' '.join(ptr(v) for v in items)))
+        if widgets:
+            for v in items: fix(v)
+    def fix(w):
+        """What fn_8019914C reads of a widget."""
+        if not inz(w, 0x128) or w in fixed: return
+        fixed.add(w)
+        o = w - base
+        kind = u(o + 0x60)
+        line = 'uikind %s kind %d' % (ptr(w), kind)
+        if kind in (2, 3): line += ' sub %d' % u(o + 0x13C)
+        if kind == 3:
+            L.append(line + ' list %s' % ptr(u(o + 0x15C)))
+            ui_list(u(o + 0x15C), False)
+        elif kind == 4:
+            L.append(line + ' body %s list %s' % (ptr(u(o + 0x1B4)), ptr(u(o + 0x1BC))))
+            fix(u(o + 0x1B4))
+            ui_list(u(o + 0x1BC), True)
+        elif kind == 5:
+            L.append(line + ' body %s' % ptr(u(o + 0x190)))
+            fix(u(o + 0x190))
+        elif kind == 6:
+            L.append(line + ' first %s' % ptr(u(o + 0x120)))
+            c = u(o + 0x120)
+            while inz(c, 0x128):
+                fix(c)
+                c = u(c - base + 0x124)
+        else:
+            L.append(line)
     def widget(w, child):
         if not inz(w, 0x128): return
         o = w - base
         if child: L.append('uichild %s type %08x first %s next %s' % (ptr(w), u(o), ptr(u(o + 0x120)), ptr(u(o + 0x124))))
         else: L.append('uiwidget %s first %s next %s' % (ptr(w), ptr(u(o + 0x120)), ptr(u(o + 0x124))))
+        if child: fix(w)
         if w in seen_w: return
         seen_w.add(w)
         c = u(o + 0x120)

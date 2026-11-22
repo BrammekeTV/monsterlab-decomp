@@ -813,9 +813,11 @@ layer is converted:
 | table | `+0x00` root of a binary tree, `+0x04` / `+0x08` the nodes with the lowest and the highest key | `fn_8018E2F4`, `fn_8018E808` |
 | tree node | `+0x00` key, `+0x04` widget, `+0x0C` left, `+0x10` right | `fn_8018E2F4` (the walk), `fn_8018E808` (search by key), `fn_8018E8D8` |
 | widget | `+0x120` first child, `+0x124` next sibling; of a child the first word | `fn_8019BFF8`, `fn_80199534` |
+| child widget, and the widgets it names | `+0x60` kind (0-6); kinds 2 and 3: sub-kind at `+0x13C`; kind 3: a list at `+0x15C`; kind 4: a widget at `+0x1B4` and a list of widgets at `+0x1BC`; kind 5: a widget at `+0x190`; kind 6: its children | `fn_8019914C` installs the vtable for the kind at `+0x138` |
+| list | `+0x00` count, `+0x04` capacity, `+0x08` element size, `+0x10` the elements (pointers in the widget lists) | `fn_8019555C`, `fn_8019552C` |
 
 Zone 480 (the first one the boot loads) has 5 nodes; the 23 images of `shared_ui.sir` have 326
-nodes and 7,554 child widgets. Not converted: the rest of the set (`+0x00` its name hash, the
+nodes, 7,554 child widgets, 8,802 widgets with a kind and 130 lists. Not converted: the rest of the set (`+0x00` its name hash, the
 zone, five more pointers with counts), the rest of a widget, and everything else in the image.
 
 `shared_parts.sir` goes through the same code in the port but has not been compared yet.

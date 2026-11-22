@@ -875,12 +875,49 @@ struct ZoneDump {
 
     // The first layer of a shared zone's screen set (zone slot +0x100): the tree fn_8018E2F4 walks
     // and the widgets fn_8019BFF8 reaches from it.
-    std::vector<const u8*> widgets;
+    std::vector<const u8*> widgets, fixedWidgets, uiLists;
+    void UiList(const u8* a, bool isWidgets) {
+        if (!In(a, 0x14) || std::find(uiLists.begin(), uiLists.end(), a) != uiLists.end()) return;
+        uiLists.push_back(a);
+        u32 n = *(const u32*)a;
+        const u8* data = *(const u8**)(a + 0x10);
+        printf("uilist "); Val(a); printf(" count %u capacity %u size %u data ", n, *(const u32*)(a + 4), *(const u32*)(a + 8)); Ptr(a + 0x10); printf("\n");
+        if (n == 0 || !In(data, n * 4)) return;
+        printf("uilistitems "); Val(a);
+        for (u32 i = 0; i < n; i++) { printf(" "); Ptr(data + i * 4); }
+        printf("\n");
+        for (u32 i = 0; isWidgets && i < n; i++) Fix(*(const u8**)(data + i * 4));
+    }
+    // What fn_8019914C reads of a widget.
+    void Fix(const u8* w) {
+        if (!In(w, 0x128) || std::find(fixedWidgets.begin(), fixedWidgets.end(), w) != fixedWidgets.end()) return;
+        fixedWidgets.push_back(w);
+        u32 kind = *(const u32*)(w + 0x60);
+        printf("uikind "); Val(w); printf(" kind %u", kind);
+        if (kind == 2 || kind == 3) printf(" sub %u", *(const u32*)(w + 0x13C));
+        if (kind == 3) {
+            printf(" list "); Ptr(w + 0x15C); printf("\n");
+            UiList(*(const u8**)(w + 0x15C), false);
+        } else if (kind == 4) {
+            printf(" body "); Ptr(w + 0x1B4); printf(" list "); Ptr(w + 0x1BC); printf("\n");
+            Fix(*(const u8**)(w + 0x1B4));
+            UiList(*(const u8**)(w + 0x1BC), true);
+        } else if (kind == 5) {
+            printf(" body "); Ptr(w + 0x190); printf("\n");
+            Fix(*(const u8**)(w + 0x190));
+        } else if (kind == 6) {
+            printf(" first "); Ptr(w + 0x120); printf("\n");
+            for (const u8* c = *(const u8**)(w + 0x120); In(c, 0x128); c = *(const u8**)(c + 0x124)) Fix(c);
+        } else {
+            printf("\n");
+        }
+    }
     void Widget(const u8* w, bool child) {
         if (!In(w, 0x128)) return;
         if (child) { printf("uichild "); Val(w); printf(" type %08x first ", *(const u32*)w); }
         else { printf("uiwidget "); Val(w); printf(" first "); }
         Ptr(w + 0x120); printf(" next "); Ptr(w + 0x124); printf("\n");
+        if (child) Fix(w);
         if (std::find(widgets.begin(), widgets.end(), w) != widgets.end()) return;
         widgets.push_back(w);
         for (const u8* c = *(const u8**)(w + 0x120); In(c, 0x128); c = *(const u8**)(c + 0x124)) Widget(c, true);
@@ -2003,7 +2040,8 @@ static void LevelSelfTest(void) {
     // A shared zone: the image starts with a copy of its zone slot, which names a screen set; the
     // set's table leads to a tree of two nodes, a widget and its one child.
     {
-        const u32 SH = 0x924C0000u, SH_SIZE = 0x480u;
+        const u32 SH = 0x924C0000u, SH_SIZE = 0x500u;
+        const u32 LIST = 0x4C0, ITEMS = 0x4E0;                 // the child's list (kind 3): one entry
         const u32 SET = 0x1A0, TABLE = 0x1D0, NODE_A = 0x1E0, NODE_B = 0x200, WIDGET = 0x220, CHILD = 0x350;
         u8* sh = (u8*)malloc(SH_SIZE);
         u8* shCopy = (u8*)malloc(SH_SIZE);
@@ -2023,6 +2061,10 @@ static void LevelSelfTest(void) {
         Put32(sh + WIDGET + 0x120, SH + CHILD);
         memset(sh + CHILD, 0, 0x128);
         Put32(sh + CHILD + 0x000, 7);
+        Put32(sh + CHILD + 0x060, 3); Put32(sh + CHILD + 0x13C, 1);
+        Put32(sh + CHILD + 0x15C, SH + LIST);
+        Put32(sh + LIST + 0x00, 1); Put32(sh + LIST + 0x04, 2); Put32(sh + LIST + 0x08, 4); Put32(sh + LIST + 0x10, SH + ITEMS);
+        Put32(sh + ITEMS, SH + WIDGET);
         SirReloc rs;
         SirRelocInit(&rs, NULL, NULL);
         SirRelocAddRange(&rs, L_BASE, L_HDR_SIZE, hdr);
@@ -2049,6 +2091,26 @@ static void LevelSelfTest(void) {
         CHECK(*(const u8**)(root + 0x10) == NULL && root[8] == 0x7F && *(const u32*)(sh + NODE_B) == 0x10);
         const u8* child = *(const u8**)(sh + WIDGET + 0x120);
         CHECK(child == sh + CHILD && *(const u32*)child == 7 && *(const u8**)(child + 0x124) == NULL && sh[WIDGET] == 0x11);
+        // The child's kind, as fn_8019914C reads it, and its list as fn_8019555C / fn_8019552C do.
+        const u8* uiList = *(const u8**)(child + 0x15C);
+        CHECK(*(const u32*)(child + 0x60) == 3 && *(const s32*)(child + 0x13C) == 1 && uiList == sh + LIST);
+        CHECK(*(const s32*)uiList == 1 && *(const s32*)(uiList + 4) == 2 && *(const s32*)(uiList + 8) == 4 && uiList[0xC] == 0x7F);
+        CHECK(**(const u8***)(uiList + 0x10) == sh + WIDGET && sh[WIDGET + 0x60] == 0);          // a tree node's widget: kind not read
+        {
+            // Refused untouched: a list whose count exceeds its capacity.
+            u8* again = (u8*)malloc(SH_SIZE);
+            memcpy(again, shCopy, SH_SIZE);
+            Put32(again + LIST + 0x00, 3);
+            u8* againCopy = (u8*)malloc(SH_SIZE);
+            memcpy(againCopy, again, SH_SIZE);
+            SirReloc ra;
+            SirRelocInit(&ra, NULL, NULL);
+            SirRelocAddRange(&ra, L_ZONE, L_ZONE_SIZE, zone);
+            SirRelocAddRange(&ra, SH, SH_SIZE, again);
+            CHECK(LevelZoneConvert(&ra, again, SH_SIZE, SH, &sroots, NULL, &other) == SIR_ERR_SCREENS);
+            CHECK(memcmp(again, againCopy, SH_SIZE) == 0);
+            free(again); free(againCopy);
+        }
         LevelZoneRootsFree(&sroots);
         free(sh); free(shCopy);
     }

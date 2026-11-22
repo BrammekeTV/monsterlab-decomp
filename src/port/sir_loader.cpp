@@ -362,7 +362,7 @@ enum RegionKind {
     REGION_FX_BOLTS, REGION_FX_TRAILS, REGION_POOL, REGION_POOL_BLOCK,
     REGION_ENTITY, REGION_ENTITY_RECORD, REGION_ENTITY_PART, REGION_PTR_COUNT, REGION_COUNT_PTR, REGION_POOL_TABLE,
     REGION_ENTITY_PROP, REGION_PROP_DEF, REGION_KEY_PTR,
-    REGION_UI_TREE_NODE,
+    REGION_UI_TREE_NODE, REGION_UI_LIST,
     REGION_ZONE_SYSTEM, REGION_ANIM_PLAYER, REGION_ANIM_ELEM, REGION_ANIM_TRACK, REGION_ANIM_KEYS, REGION_F32_ARRAY,
     REGION_RUNTIME    // memory the game initialises itself: nothing to convert, but nothing else may be there
 };
@@ -1719,13 +1719,75 @@ static const SirField kUiTreeNodeFields[] = {
 #define UI_WIDGET_USED 0x128
 #define UI_DEPTH_MAX   256
 
+// A list of the UI code: +0x00 count (fn_8019555C), +0x04 capacity, +0x08 element size and +0x10
+// the elements (fn_8019552C). The widget lists hold pointers.
+static const SirField kUiListFields[] = {
+    { 0x00, SIR_U32, 3 }, { 0x10, SIR_PTR, 1 },
+};
+
+static SirError UiFixupPlan(ImagePlan* plan, const u8* image, u32 imageSize, u32 addr, u32 depth);
+
+static SirError UiListPlan(ImagePlan* plan, const u8* image, u32 imageSize, u32 addr, bool widgets, u32 depth) {
+    u32 l, d;
+    SirError e;
+    if (!LevelSpan(addr, 0x14, imageSize, &l) || PlanHas(plan, l, REGION_UI_LIST)) return SIR_OK;
+    if (!PlanAdd(plan, l, 0x14, REGION_UI_LIST)) return SIR_ERR_SCREENS;
+    u32 count = Be32(image + l), capacity = Be32(image + l + 4), size = Be32(image + l + 8);
+    if (count == 0) return SIR_OK;
+    if (size != 4 || count > capacity || count > imageSize / 4 || !LevelSpan(Be32(image + l + 0x10), (u64)count * 4, imageSize, &d) ||
+        !PlanAdd(plan, d, count * 4, REGION_PTR_ARRAY)) return SIR_ERR_SCREENS;
+    for (u32 i = 0; widgets && i < count; i++)
+        if ((e = UiFixupPlan(plan, image, imageSize, Be32(image + d + i * 4), depth + 1)) != SIR_OK) return e;
+    return SIR_OK;
+}
+
+// What fn_8019914C reads of a widget to install the vtable for its kind: +0x60 the kind; for kinds
+// 2 and 3 the sub-kind at +0x13C; kind 3 a list at +0x15C (its entries only get a vtable); kind 4
+// a widget at +0x1B4 and a list of widgets at +0x1BC; kind 5 a widget at +0x190; kind 6 its
+// children. Those widgets go through the same function.
+static SirError UiFixupPlan(ImagePlan* plan, const u8* image, u32 imageSize, u32 addr, u32 depth) {
+    u32 o, co;
+    SirError e = SIR_OK;
+    if (!LevelSpan(addr, UI_WIDGET_USED, imageSize, &o) || PlanHas(plan, o + 0x60, REGION_U32_ARRAY)) return SIR_OK;
+    if (depth > UI_DEPTH_MAX || !PlanAdd(plan, o + 0x60, 4, REGION_U32_ARRAY)) return SIR_ERR_SCREENS;
+    u32 kind = Be32(image + o + 0x60);
+    u32 need = kind == 2 ? 0x140 : kind == 3 ? 0x160 : kind == 4 ? 0x1C0 : kind == 5 ? 0x194 : 0;
+    if ((u64)o + need > imageSize) return SIR_ERR_SCREENS;
+    if ((kind == 2 || kind == 3) && !PlanAdd(plan, o + 0x13C, 4, REGION_U32_ARRAY)) return SIR_ERR_SCREENS;
+    if (kind == 3) {
+        if (!PlanAdd(plan, o + 0x15C, 4, REGION_PTR_ARRAY)) return SIR_ERR_SCREENS;
+        e = UiListPlan(plan, image, imageSize, Be32(image + o + 0x15C), false, depth);
+    } else if (kind == 4) {
+        if (!PlanAdd(plan, o + 0x1B4, 4, REGION_PTR_ARRAY) || !PlanAdd(plan, o + 0x1BC, 4, REGION_PTR_ARRAY)) return SIR_ERR_SCREENS;
+        if ((e = UiFixupPlan(plan, image, imageSize, Be32(image + o + 0x1B4), depth + 1)) != SIR_OK) return e;
+        e = UiListPlan(plan, image, imageSize, Be32(image + o + 0x1BC), true, depth);
+    } else if (kind == 5) {
+        if (!PlanAdd(plan, o + 0x190, 4, REGION_PTR_ARRAY)) return SIR_ERR_SCREENS;
+        e = UiFixupPlan(plan, image, imageSize, Be32(image + o + 0x190), depth + 1);
+    } else if (kind == 6) {
+        if (!PlanHas(plan, o + 0x120, REGION_PTR_ARRAY) && !PlanAdd(plan, o + 0x120, 8, REGION_PTR_ARRAY)) return SIR_ERR_SCREENS;
+        u32 c = Be32(image + o + 0x120), guard = imageSize / UI_WIDGET_USED + 1;
+        while (e == SIR_OK && LevelSpan(c, UI_WIDGET_USED, imageSize, &co)) {
+            if (guard-- == 0) return SIR_ERR_SCREENS;
+            if (!PlanHas(plan, co + 0x120, REGION_PTR_ARRAY) && !PlanAdd(plan, co + 0x120, 8, REGION_PTR_ARRAY)) return SIR_ERR_SCREENS;
+            e = UiFixupPlan(plan, image, imageSize, c, depth + 1);
+            c = Be32(image + co + 0x124);
+        }
+    }
+    return e;
+}
+
 static SirError UiWidgetPlan(ImagePlan* plan, const u8* image, u32 imageSize, u32 addr, bool child, u32 depth) {
     u32 o;
+    SirError fix;
     if (!LevelSpan(addr, UI_WIDGET_USED, imageSize, &o)) return SIR_OK;
     if (depth > UI_DEPTH_MAX) return SIR_ERR_SCREENS;
     if (child && !PlanAdd(plan, o, 4, REGION_U32_ARRAY)) return SIR_ERR_SCREENS;
-    if (PlanHas(plan, o + 0x120, REGION_PTR_ARRAY)) return SIR_OK;
-    if (!PlanAdd(plan, o + 0x120, 8, REGION_PTR_ARRAY)) return SIR_ERR_SCREENS;
+    if (child && (fix = UiFixupPlan(plan, image, imageSize, addr, depth)) != SIR_OK) return fix;   // fn_80199534 -> fn_8019914C
+    // The children, once per widget (a kind 6 widget's link may be in the plan already).
+    if (PlanHas(plan, o, REGION_RUNTIME)) return SIR_OK;                        // an empty marker at the widget
+    if (!PlanAdd(plan, o, 0, REGION_RUNTIME)) return SIR_ERR_SCREENS;
+    if (!PlanHas(plan, o + 0x120, REGION_PTR_ARRAY) && !PlanAdd(plan, o + 0x120, 8, REGION_PTR_ARRAY)) return SIR_ERR_SCREENS;
     u32 c = Be32(image + o + 0x120), guard = imageSize / UI_WIDGET_USED + 1, co;
     SirError e;
     while (LevelSpan(c, UI_WIDGET_USED, imageSize, &co)) {
@@ -1842,6 +1904,7 @@ static void ImagePlanConvert(const ImagePlan* plan, SirReloc* r, u8* image, u32 
         case REGION_KEY_PTR:
             for (u32 k = 0; k + 8 <= g->size; k += 8) { Swap32(p + k); r->fieldsSwapped++; ConvertPtr(r, p + k + 4); }
             break;
+        case REGION_UI_LIST:      SirConvertRecord(r, p, g->size, kUiListFields, COUNTOF(kUiListFields)); break;
         case REGION_UI_TREE_NODE: SirConvertRecord(r, p, g->size, kUiTreeNodeFields, COUNTOF(kUiTreeNodeFields)); break;
         case REGION_PROP_DEF:     SirConvertRecord(r, p, g->size, kPropDefFields, COUNTOF(kPropDefFields)); break;
         case REGION_ENTITY_RECORD: SirConvertRecord(r, p, g->size, kEntityRecordFields, COUNTOF(kEntityRecordFields)); break;
