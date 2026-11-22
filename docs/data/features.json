@@ -100,7 +100,7 @@
   {
    "date": "2026-11-22",
    "time": "21:35",
-   "text": "Level paths and effects on Windows (PRs #67 and #68): the audit fixed the level path in our decompiled code, which had lost a backslash, so level files are found under levels\\<name>\\. The loader also converts a locator's zone and the level's effect list table."
+   "text": "Level effects on Windows (PR #68): the loader now converts a locator's zone and the level's effect list table."
   },
   {
    "date": "2026-11-22",
