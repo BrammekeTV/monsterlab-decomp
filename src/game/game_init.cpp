@@ -156,7 +156,9 @@ extern "C" void GameStart(int argc, char** argv) {
     fn_8000E488();
     fn_801D6780();
 
-    static const f32 kIdentity[3][4] = { {1, 0, 0, 0}, {0, 1, 0, 0}, {0, 0, 1, 0} };
+    // The original flat-initialises a 3x3 identity into a 3x4 matrix, so the ones land at flat
+    // indices 0, 4 and 8 (first column of every row), not on the diagonal.
+    static const f32 kIdentity[3][4] = { {1, 0, 0, 0}, {1, 0, 0, 0}, {1, 0, 0, 0} };
     CameraSetMatrix(gCamera, kIdentity);
 
     // global_binary.sir: section 0 is a 4 KB header (pointer table into section 1), section 1

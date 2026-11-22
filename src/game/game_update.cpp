@@ -118,7 +118,7 @@ static void UpdateMode2(ModeState* st) {
         break;
     case 5:
         ClearScreen();
-        if (MovieQueueIsEmpty(&gMovieQueue) && gNextGameMode != NEXT_MODE_LOCKED) {
+        if (!MovieQueueIsEmpty(&gMovieQueue) && gNextGameMode != NEXT_MODE_LOCKED) {
             gNextGameMode = 7;   // both settings branches pick 7
         }
         break;

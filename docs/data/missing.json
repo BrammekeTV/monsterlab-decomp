@@ -3,7 +3,7 @@
  "counts": {
   "global": 3898,
   "unknown": 126,
-  "library": 205
+  "library": 196
  },
  "game_bytes": 0,
  "duplicates": [],
@@ -43,17 +43,6 @@
    "region": "MSL C/C++ runtime"
   },
   {
-   "name": "fn_8023D3C8",
-   "refs": 7,
-   "files": 7,
-   "used_as": "_fn_8023D3C8",
-   "addr": "8023D3C8",
-   "size": 180,
-   "section": ".text",
-   "kind": "library",
-   "region": "OS"
-  },
-  {
    "name": "fn_802737A8",
    "refs": 7,
    "files": 7,
@@ -85,17 +74,6 @@
    "section": ".text",
    "kind": "library",
    "region": "WPAD/KPAD/BT"
-  },
-  {
-   "name": "fn_80234418",
-   "refs": 4,
-   "files": 4,
-   "used_as": "_fn_80234418",
-   "addr": "80234418",
-   "size": 280,
-   "section": ".text",
-   "kind": "library",
-   "region": "OS"
   },
   {
    "name": "fn_8024849C",
@@ -162,28 +140,6 @@
    "section": ".text",
    "kind": "library",
    "region": "MSL C/C++ runtime"
-  },
-  {
-   "name": "OSDisableInterrupts",
-   "refs": 3,
-   "files": 3,
-   "used_as": "_OSDisableInterrupts",
-   "addr": "802393C4",
-   "size": 20,
-   "section": ".text",
-   "kind": "library",
-   "region": "OS"
-  },
-  {
-   "name": "OSRestoreInterrupts",
-   "refs": 3,
-   "files": 3,
-   "used_as": "_OSRestoreInterrupts",
-   "addr": "802393EC",
-   "size": 36,
-   "section": ".text",
-   "kind": "library",
-   "region": "OS"
   },
   {
    "name": "OSSetAlarm",
@@ -868,17 +824,6 @@
    "region": "OS"
   },
   {
-   "name": "fn_8023C168",
-   "refs": 1,
-   "files": 1,
-   "used_as": "_fn_8023C168",
-   "addr": "8023C168",
-   "size": 44,
-   "section": ".text",
-   "kind": "library",
-   "region": "OS"
-  },
-  {
    "name": "fn_80248420",
    "refs": 1,
    "files": 1,
@@ -1028,17 +973,6 @@
    "used_as": "_fn_80259418",
    "addr": "80259418",
    "size": 8,
-   "section": ".text",
-   "kind": "library",
-   "region": "AI/AX/MEM"
-  },
-  {
-   "name": "fn_80259B2C",
-   "refs": 1,
-   "files": 1,
-   "used_as": "_fn_80259B2C",
-   "addr": "80259B2C",
-   "size": 68,
    "section": ".text",
    "kind": "library",
    "region": "AI/AX/MEM"
@@ -2230,46 +2164,13 @@
    "section": ".text",
    "kind": "library",
    "region": "MSL C/C++ runtime"
-  },
-  {
-   "name": "inflate",
-   "refs": 1,
-   "files": 1,
-   "used_as": "_inflate",
-   "addr": "802309E0",
-   "size": 5952,
-   "section": ".text",
-   "kind": "library",
-   "region": "zlib 1.2.3"
-  },
-  {
-   "name": "inflateEnd",
-   "refs": 1,
-   "files": 1,
-   "used_as": "_inflateEnd",
-   "addr": "80232120",
-   "size": 136,
-   "section": ".text",
-   "kind": "library",
-   "region": "zlib 1.2.3"
-  },
-  {
-   "name": "inflateInit_",
-   "refs": 1,
-   "files": 1,
-   "used_as": "_inflateInit_",
-   "addr": "80230854",
-   "size": 16,
-   "section": ".text",
-   "kind": "library",
-   "region": "zlib 1.2.3"
   }
  ],
  "global": [
   {
    "name": "gWorldState",
-   "refs": 166,
-   "files": 166,
+   "refs": 167,
+   "files": 167,
    "used_as": "\"unsigned char * gWorldState\" (?gWorldState@@3PAEA)",
    "addr": "803E6D00",
    "size": 12952,
@@ -4057,6 +3958,16 @@
    "kind": "global"
   },
   {
+   "name": "gZoneBase",
+   "refs": 5,
+   "files": 5,
+   "used_as": "\"unsigned int * gZoneBase\" (?gZoneBase@@3PAIA)",
+   "addr": "803C7434",
+   "size": 24,
+   "section": ".bss",
+   "kind": "global"
+  },
+  {
    "name": "lbl_80346208",
    "refs": 5,
    "files": 5,
@@ -4933,16 +4844,6 @@
    "used_as": "\"unsigned char * gVideoDrawDone\" (?gVideoDrawDone@@3PAEA)",
    "addr": "8040AE30",
    "size": 12,
-   "section": ".bss",
-   "kind": "global"
-  },
-  {
-   "name": "gZoneBase",
-   "refs": 4,
-   "files": 4,
-   "used_as": "\"unsigned int * gZoneBase\" (?gZoneBase@@3PAIA)",
-   "addr": "803C7434",
-   "size": 24,
    "section": ".bss",
    "kind": "global"
   },
@@ -6153,14 +6054,13 @@
   }
  ],
  "library_regions": {
-  "AI/AX/MEM": 59,
+  "AI/AX/MEM": 58,
   "Network (DWC/SSL/NHTTP/NWC24)": 57,
   "GX": 22,
   "MSL C/C++ runtime": 21,
   "NAND/SC/IPC": 20,
-  "OS": 13,
   "WPAD/KPAD/BT": 9,
-  "zlib 1.2.3": 3,
+  "OS": 8,
   "DVD": 1
  }
 }

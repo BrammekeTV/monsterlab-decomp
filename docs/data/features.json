@@ -104,6 +104,11 @@
   },
   {
    "date": "2026-11-22",
+   "time": "21:36",
+   "text": "Checked 34 more large functions that run during the Windows boot against the original and fixed 2 mistakes in our decompiled code (a movie-queue test in GameUpdate that was the wrong way round, and the start camera matrix in GameStart)"
+  },
+  {
+   "date": "2026-11-22",
    "time": "21:30",
    "text": "More of the front-end level runs on Windows (PRs #63, #64 and #66): the loader converts skeleton animations, zone action tables and locators. Unloading a UI screen set now also unloads its zone. Node references are read as whole words in our code, which fixes their byte order, so the level's lightning script now runs to the end."
   },
