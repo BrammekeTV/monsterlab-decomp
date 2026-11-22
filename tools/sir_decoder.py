@@ -1185,6 +1185,13 @@ def zone_dump(L, sec, base, hud, roots, scene_roots, pooltabs, records=(), lists
             L.append('matrec %s back %s b4 %s floats %s f4c %s w54 %08x b58 %s w5c %s b64 %s' % (
                 ptr(r), ptr(u(q)), sec[q + 4:q + 8].hex(), ws(q + 8, 16), ws(q + 0x4C, 2), u(q + 0x54), sec[q + 0x58:q + 0x5C].hex(),
                 ws(q + 0x5C, 2), sec[q + 0x64:q + 0x68].hex()))
+    batches = set()
+    def batch(a):
+        """A mesh part's batch as fn_801873C0 draws it: statistics words, display list offset and size."""
+        if not inz(a, 0x28) or a in batches: return
+        batches.add(a)
+        o = off(a)
+        L.append('batch %s words %s dl %08x size %d' % (ptr(a), ws(o + 4, 3), u(o + 0x18), u(o + 0x24)))
     def item_draw(it):
         o = off(it)
         L.append('itemdraw %s xf %s scale %08x mesh %s out %s cb %08x arg %s clip %s w58 %08x skin %s' % (
@@ -1202,6 +1209,7 @@ def zone_dump(L, sec, base, hud, roots, scene_roots, pooltabs, records=(), lists
                 mat, b = u(q + 0x70 + k * 8), u(q + 0x74 + k * 8)
                 L.append('meshpart %s material %s batch %s flags %s' % (ptr(m), ptr(mat), ptr(b), '%08x' % u(off(b) + 0xC) if inz(b, 0x10) else '-'))
                 material(mat)
+                batch(b)
     for a in scene:
         o = off(a)
         t = u(o + 4)

@@ -1009,6 +1009,14 @@ struct ZoneDump {
     // What the draw passes read of an item and of its mesh (fn_80184C18, fn_80171ABC, fn_80171228).
     std::vector<const u8*> meshes;
     void Floats(const u8* at, u32 n) { for (u32 i = 0; i < n; i++) printf("%s%08x", i ? " " : "", Bits(*(const f32*)(at + i * 4))); }
+    std::vector<const u8*> batches;
+    // A mesh part's batch as fn_801873C0 draws it: statistics words, display list offset and size.
+    void Batch(const u8* b) {
+        if (!In(b, 0x28) || std::find(batches.begin(), batches.end(), b) != batches.end()) return;
+        batches.push_back(b);
+        printf("batch "); Val(b); printf(" words %08x %08x %08x dl %08x size %u\n", *(const u32*)(b + 4), *(const u32*)(b + 8), *(const u32*)(b + 0xC),
+               *(const u32*)(b + 0x18), *(const u32*)(b + 0x24));
+    }
     std::vector<const u8*> materials, matTextures;
     static void Hex(const u8* at, u32 n) { for (u32 i = 0; i < n; i++) printf("%02x", at[i]); }
     void MatTexture(const u8* t) {
@@ -1054,6 +1062,7 @@ struct ZoneDump {
             printf("meshpart "); Val(m); printf(" material "); Ptr(m + 0x70 + k * 8); printf(" batch "); Ptr(m + 0x74 + k * 8);
             if (In(b, 0x10)) printf(" flags %08x\n", *(const u32*)(b + 0xC)); else printf(" flags -\n");
             Material(*(const u8**)(m + 0x70 + k * 8));
+            Batch(b);
         }
     }
 
@@ -2139,7 +2148,7 @@ static SirError ConvertBuilt(u8* hdr, u8* img, SirReloc* r, s32* failTable) {
 #define L_ITEM     0xB80u                     // the scene object's one entry: flags at +0x0C, list link at +0xB8
 #define L_MATRIX   (L_ITEM + 0xD0)            // its matrix, twelve floats
 #define L_MESH     0xCC0u                     // the entry's mesh: one part at +0x70; the matrix's second half ends here
-#define L_BATCH    0xD40u                     // the part's batch: flags at +0x0C
+#define L_BATCH    0xF40u                     // the part's batch, 0x28 used: counts, flags, the display list's offset and size
 #define L_OBJLIST  0xD60u                     // slot 0's objects: one pointer
 #define L_OBJ      0xD70u                     // the object: type word at +0x08
 #define L_FXLIST   0xD80u                     // slot 0's placed effects: one pointer
@@ -2149,7 +2158,8 @@ static SirError ConvertBuilt(u8* hdr, u8* img, SirReloc* r, s32* failTable) {
 #define L_MMAT     0xE90u                     // its texture matrix, twelve floats
 #define L_MTEX     0xEC0u                     // its texture: header 0x54, pixel data 0x20 behind it
 #define L_MTEXD    0xF20u
-#define L_ZONE_SIZE 0xF40u
+#define L_BATCHDL  0xF80u                     // its display list, 0x20
+#define L_ZONE_SIZE 0xFC0u
 #define L_ZONE1    0x90980000u                // Wii address of zone 1: an entity at 0x10, a list object at 0x200
 #define L_ENT1     0x10u                      // the entity slot 1's second table names
 #define L_ZONE1_SIZE 0x300u
@@ -2305,8 +2315,12 @@ static void BuildLevel(u8* hdr, u8* zone) {
     Put32(mtexw + 0x00, 0x54); Put16(mtexw + 0x04, 8); Put16(mtexw + 0x06, 4); Put16(mtexw + 0x08, 8); Put16(mtexw + 0x0A, 4);
     Put32(mtexw + 0x18, 0x20); Put32(mtexw + 0x1C, L_ZONE + L_MTEXD);
     for (u32 i = 0; i < 8; i++) Put32(zone + L_MTEXD + i * 4, 0x81234567);   // pixel data: stays as it is
-    Put32(zone + L_BATCH + 0x08, 6);                           // no reader: stays big-endian
+    memset(zone + L_BATCH, 0, 0x28);
+    Put32(zone + L_BATCH + 0x00, 0x2C80);                      // no reader on the draw path: stays big-endian
+    Put32(zone + L_BATCH + 0x04, 0x3AD); Put32(zone + L_BATCH + 0x08, 6);
     Put32(zone + L_BATCH + 0x0C, 0x21);
+    Put32(zone + L_BATCH + 0x18, L_BATCHDL - L_BATCH); Put32(zone + L_BATCH + 0x24, 0x20);
+    for (u32 i = 0; i < 8; i++) Put32(zone + L_BATCHDL + i * 4, 0x98000001);   // display list: stays in GX layout
     for (u32 o = 0xB8; o < 0xC4; o += 4) Put32(zone + L_ITEM + o, 0);
     Put32(sc + 0x48, L_ZONE + L_ENT); Put32(sc + 0x50, 0);
     Put32(sc + 0x5C, L_ZONE + L_SCENE + 0x64);                 // one matrix pointer
@@ -2648,7 +2662,9 @@ static void LevelSelfTest(void) {
     CHECK(*(const f32*)(zone + L_MATRIX + 0x30) == 2.0f && *(const u8**)(item + 0xB0) == NULL && mesh[3] == 0x4D);
     CHECK(*(const u32*)(mesh + 0x2C) == 0x3F5DB3D7 && *(const u32*)(mesh + 0x54) == 0x3F000100 && *(const s32*)(mesh + 0x6C) == 1);
     const u8* batch = *(const u8**)(mesh + 0x74);
-    CHECK(*(const u8**)(mesh + 0x70) == zone + L_MAT && batch == zone + L_BATCH && *(const u32*)(batch + 0xC) == 0x21 && batch[0xB] == 6);
+    CHECK(*(const u8**)(mesh + 0x70) == zone + L_MAT && batch == zone + L_BATCH && *(const u32*)(batch + 0xC) == 0x21 && *(const u32*)(batch + 4) == 0x3AD && *(const u32*)(batch + 8) == 6);
+    CHECK(batch[2] == 0x2C && batch[3] == 0x80);                                   // +0x00 has no reader on the draw path
+    CHECK(*(const u32*)(batch + 0x18) == L_BATCHDL - L_BATCH && *(const u32*)(batch + 0x24) == 0x20 && zone[L_BATCHDL] == 0x98 && zone[L_BATCHDL + 3] == 0x01);
     // The material: pass and type bytes in place, the record, texture and matrix reachable, the record's fields in host order.
     const u8* matp = zone + L_MAT;
     const u8* mrecd = *(const u8**)(matp + 0x08);
@@ -2708,6 +2724,7 @@ static void LevelSelfTest(void) {
         { true, L_ENT + 0xA4, L_ZONE + L_RECORD + 0x20, SIR_ERR_OVERLAP },         // holder inside the record
         { true, L_ENT + 0x9C, L_ZONE + L_SCENE, SIR_ERR_OVERLAP },                 // prop "definition" on the scene object
         { true, L_MESH + 0x6C, 0x100000, SIR_ERR_ENTITY },                         // mesh parts run off the zone
+        { true, L_BATCH + 0x24, 0x100000, SIR_ERR_ENTITY },                        // the batch's display list runs off the zone
         { true, L_MAT + 0x00, 0x52, SIR_ERR_ENTITY },                              // not a material
         { true, L_MAT + 0x0C, 0x02010001, SIR_ERR_ENTITY },                        // a type the draw table does not have
         { true, L_MREC + 0x00, L_ZONE + L_MREC, SIR_ERR_ENTITY },                  // the record does not name its material
