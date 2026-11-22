@@ -99,6 +99,11 @@
  "changelog": [
   {
    "date": "2026-11-22",
+   "time": "19:32",
+   "text": "Checked 27 large functions that run during the Windows boot against the original and fixed 2 mistakes in our decompiled code (a texture-format table read with the wrong width, and a frame timer that was not passed on)"
+  },
+  {
+   "date": "2026-11-22",
    "time": "17:10",
    "text": "Every level file now goes through the big-endian loader on Windows (PR #56), including ones the game reads into a buffer first, so the front-end level and the rest load the same way."
   },

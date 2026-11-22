@@ -191,8 +191,8 @@ void fn_8000A6AC(void) {
             fn_80142500(lbl_805FAE78);
             lbl_805FAE71 = 1;
         }
-        TimerReset(lbl_805FAE78);
-        fn_80161A28(lbl_8040E5F0, 0.0f);  // dt is a leftover f1 in the asm
+        f32 frameDt = TimerReset(lbl_805FAE78);
+        fn_80161A28(lbl_8040E5F0, frameDt);  // dt is TimerReset's return value, still in f1 in the asm
         fn_801620BC(lbl_8040E5F0);
         if (lbl_805FAE70 == 0) {
             RendClear(4, 0, 0, 1.0f);

@@ -431,8 +431,8 @@ void fn_800446BC(u8* arg0, u8* arg1) {
             u32 v88 = (u32)*(u8*)(arg1 + 0x14) << 20 | 0x88000000 |
                       (((u32)*(u16*)(arg1 + 0xA) - 1) << 10) | ((u32)*(u16*)(arg1 + 0x8) - 1);
             GxBpWrite(v88);
-            GxBpWrite((lbl_80348950[fmt * 8] >> 5) | 0x8C0D0000 | 0x8000);
-            s32 alt = (s32)lbl_80348A10[fmt * 8];
+            GxBpWrite((*(u32*)(lbl_80348950 + fmt * 0x20) >> 5) | 0x8C0D0000 | 0x8000);
+            s32 alt = *(s32*)(lbl_80348A10 + fmt * 0x20);
             if (alt >= 0) {
                 GxBpWrite(((u32)alt >> 5) | 0x900D0000 | 0x8000);
             } else {
