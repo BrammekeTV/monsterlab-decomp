@@ -899,6 +899,13 @@ struct ZoneDump {
             if (In(e, 4)) Ptr(e); else printf("-");
             printf(" tex "); Ptr(w + 0x144); printf(" size "); Words(w + 0x148, 2); printf(" uv "); Words(w + 0x180, 8); printf("\n");
         }
+        if (*(const u32*)(w + 0x60) == 1 && In(w, 0x1F0)) {                                  // a text
+            printf("uitext "); Val(w); printf(" table "); Ptr(w + 0x13C); printf(" markers "); Ptr(w + 0x140); printf(" "); Ptr(w + 0x144);
+            printf(" byte %u time %08x words ", w[0x148], *(const u32*)(w + 0x14C)); Words(w + 0x150, 8);
+            printf(" text "); Ptr(w + 0x170); printf(" from "); Ptr(w + 0x174); printf(" chars "); Ptr(w + 0x178);
+            printf(" floats "); Words(w + 0x1B0, 2); printf(" %08x buffer ", *(const u32*)(w + 0x1D4)); Ptr(w + 0x1E0);
+            printf(" words "); Words(w + 0x1E4, 3); printf("\n");
+        }
         for (u32 k = 0; k < 3; k++) {
             for (const u8* n = *(const u8**)(w + 4 + k * 4); In(n, 0xC) && !Seen(uiEvents, n); n = *(const u8**)n) {
                 printf("uievent "); Val(n); printf(" next "); Ptr(n); printf(" id %08x word %08x\n", *(const u32*)(n + 4), *(const u32*)(n + 8));
@@ -2161,7 +2168,8 @@ static void LevelSelfTest(void) {
     // A shared zone: the image starts with a copy of its zone slot, which names a screen set; the
     // set's table leads to a tree of two nodes, a widget and its one child.
     {
-        const u32 SH = 0x924C0000u, SH_SIZE = 0x8A0u;
+        const u32 SH = 0x924C0000u, SH_SIZE = 0xAC0u;
+        const u32 TEXT = 0x8A0, TBUF = 0xAA0;                  // a text (kind 1) and its characters
         // An animation in the set's table at +0x20: one track with two keys, and one event entry.
         const u32 ATABLE = 0x720, ANODE = 0x730, ANIM = 0x750, TRACK = 0x780, TLIST = 0x7A0, KEYS = 0x7C0;
         const u32 EVENTS = 0x820, ELIST = 0x840, ENTRIES = 0x860;
@@ -2216,6 +2224,13 @@ static void LevelSelfTest(void) {
         Put32(sh + PIC + 0x140, SH + TEXW); Put32(sh + PIC + 0x148, 0x44200000); Put32(sh + PIC + 0x14C, 0x43F00000);
         Put32(sh + PIC + 0x150, 0x3F800000); Put32(sh + PIC + 0x188, 0x3F800000); Put32(sh + PIC + 0x19C, 0x3F800000);
         Put32(sh + TEXW, SH + NAMED);
+        Put32(sh + PIC + 0x124, SH + TEXT);
+        memset(sh + TEXT, 0, 0x1F4);
+        Put32(sh + TEXT + 0x060, 1); Put32(sh + TEXT + 0x128, SH + WIDGET);
+        sh[TEXT + 0x148] = 1; Put32(sh + TEXT + 0x14C, 0x408AAAAA); Put32(sh + TEXT + 0x150, 0x8F); Put32(sh + TEXT + 0x168, 0x97);
+        Put32(sh + TEXT + 0x16C, 0x1029); Put32(sh + TEXT + 0x170, SH + TBUF); Put32(sh + TEXT + 0x178, SH + TBUF + 0x10);
+        Put32(sh + TEXT + 0x17C, 0x3F800000); Put32(sh + TEXT + 0x1EC, 1);
+        memcpy(sh + TBUF, "Communications", 15);
         Put32(sh + CHILD + 0x004, SH + EVENT);
         Put32(sh + EVENT + 0, 0); Put32(sh + EVENT + 4, 0x705598E1); Put32(sh + EVENT + 8, 0x17140061);
         Put32(sh + CHILD + 0x020, 0x44200000); Put32(sh + CHILD + 0x054, 0x00020003); Put32(sh + CHILD + 0x064, 0x0002002B);
@@ -2254,7 +2269,13 @@ static void LevelSelfTest(void) {
         // The picture, as fn_801A0D04 / fn_801A1208 read its texture and fn_801A1238 its corners;
         // +0x150 has no reader and stays as it is.
         const u8* pic = sh + PIC;
-        CHECK(*(const u32*)(pic + 0x60) == 2 && *(const u32*)(pic + 0x13C) == 0 && *(const u8**)(pic + 0x124) == NULL);
+        CHECK(*(const u32*)(pic + 0x60) == 2 && *(const u32*)(pic + 0x13C) == 0 && *(const u8**)(pic + 0x124) == sh + TEXT);
+        // The text, as fn_8019CF58 and UISetText read it; its matrix at +0x17C is written first and stays.
+        const u8* text = sh + TEXT;
+        CHECK(*(const u32*)(text + 0x60) == 1 && text[0x148] == 1 && *(const f32*)(text + 0x14C) > 4.33f && *(const f32*)(text + 0x14C) < 4.34f);
+        CHECK(*(const s32*)(text + 0x150) == 0x8F && *(const s32*)(text + 0x168) == 0x97 && *(const s32*)(text + 0x16C) == 0x1029);
+        CHECK(strcmp(*(const char**)(text + 0x170), "Communications") == 0 && *(const u8**)(text + 0x178) == sh + TBUF + 0x10);
+        CHECK(text[0x17C] == 0x3F && *(const u32*)(text + 0x1EC) == 1 && *(const u8**)(text + 0x1E0) == NULL);
         CHECK(*(const u8**)(pic + 0x140) == sh + TEXW && **(const u8***)(pic + 0x140) == sh + NAMED && *(const u8**)(pic + 0x144) == NULL);
         CHECK(*(const f32*)(pic + 0x148) == 640.0f && *(const f32*)(pic + 0x14C) == 480.0f && pic[0x150] == 0x3F && pic[0x153] == 0x00);
         CHECK(*(const f32*)(pic + 0x180) == 0.0f && *(const f32*)(pic + 0x188) == 1.0f && *(const f32*)(pic + 0x19C) == 1.0f);

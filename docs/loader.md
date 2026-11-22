@@ -837,13 +837,17 @@ converted:
 | events | `+0x04` a list of entries, `+0x08`..`+0x10` three words | `fn_801AAEE4` |
 | key (0x30 bytes, in place in its list) | `+0x00` time, `+0x10` four floats, `+0x20` the curve to the next key | `fn_801AA728`, `fn_801AA760`, `fn_801AA218` |
 | entry (0x30 bytes) | `+0x00` time, `+0x24` kind, `+0x10` an action word (kind 1), an event (2) or a sound (3, a pointer) | `fn_801AAF14`, `fn_801AA784` |
+| text (kind 1) | `+0x13C` string table, `+0x140` markers of the text, `+0x144` the current one, `+0x14C` a time | `fn_8019CF58`, `fn_8019EB94`, `fn_8019E838` |
+| | `+0x150` length, `+0x154`..`+0x164` five words, `+0x168` capacity, `+0x16C` text id | `UISetText`, `fn_8019D5E8`, `fn_8019F5A8`, `fn_8019CF58` |
+| | `+0x170` the text, `+0x174` the string it was set from, `+0x178` a word per character | `UISetText`, `fn_8019EB94`, `fn_8019E27C` |
+| | `+0x1B0`, `+0x1B4`, `+0x1D4` floats; `+0x1E0` a second buffer, `+0x1E4`..`+0x1EC` three words | `fn_8019F810`, `fn_8019D5E8` |
 | event node | `+0x00` next, `+0x04` event, `+0x08` action word, animation hash or sound hash | `fn_8019BD18` |
 | activation grid | `+0x00` flags, `+0x04` a list of columns (each a list of pointers to widgets), `+0x0C`..`+0x18` current and previous cell | `fn_80199E80`, `fn_8019AA3C` |
 | child widget, and the widgets it names | `+0x60` kind (0-6); kinds 2 and 3: sub-kind at `+0x13C`; kind 3: a list at `+0x15C`; kind 4: a widget at `+0x1B4` and a list of widgets at `+0x1BC`; kind 5: a widget at `+0x190`; kind 6: its children | `fn_8019914C` installs the vtable for the kind at `+0x138` |
 | list | `+0x00` count, `+0x04` capacity, `+0x08` element size, `+0x10` the elements (pointers in the widget lists) | `fn_8019555C`, `fn_8019552C` |
 
 Zone 480 (the first one the boot loads) has 5 screens; the 23 images of `shared_ui.sir` have 326
-screens, 9,374 widgets (5,206 of them pictures), 6,218 event nodes, 6 activation grids and 191 lists.
+screens, 9,374 widgets (5,206 of them pictures, 1,662 texts), 6,218 event nodes, 6 activation grids and 191 lists.
 
 The 23 images have 3,135 animations with 4,069 tracks, 10,137 keys and 1,696 entries.
 

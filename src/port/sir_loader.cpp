@@ -363,7 +363,7 @@ enum RegionKind {
     REGION_ENTITY, REGION_ENTITY_RECORD, REGION_ENTITY_PART, REGION_PTR_COUNT, REGION_COUNT_PTR, REGION_POOL_TABLE,
     REGION_ENTITY_PROP, REGION_PROP_DEF, REGION_KEY_PTR,
     REGION_UI_TREE_NODE, REGION_UI_LIST, REGION_UI_WIDGET, REGION_UI_EVENT, REGION_UI_GRID, REGION_UI_FIXED,
-    REGION_UI_SET, REGION_UI_SCREEN, REGION_UI_GRAPHIC,
+    REGION_UI_SET, REGION_UI_SCREEN, REGION_UI_GRAPHIC, REGION_UI_TEXT,
     REGION_UI_ANIM, REGION_UI_ANIM_TRACK, REGION_UI_ANIM_EVENTS, REGION_UI_ANIM_KEYS, REGION_UI_ANIM_ENTRIES,
     REGION_ZONE_SYSTEM, REGION_ANIM_PLAYER, REGION_ANIM_ELEM, REGION_ANIM_TRACK, REGION_ANIM_KEYS, REGION_F32_ARRAY,
     REGION_RUNTIME    // memory the game initialises itself: nothing to convert, but nothing else may be there
@@ -1788,6 +1788,22 @@ static const SirField kUiGraphicFields[] = {
 };
 #define UI_GRAPHIC_AT   0x140
 #define UI_GRAPHIC_SIZE 0x60
+// What a text (kind 1, vtable lbl_80382DA4) has from +0x13C on, offsets from +0x13C:
+//   +0x13C string table (fn_8019CF58), +0x140 markers of the text (fn_8019EB94), +0x144 the
+//   current one (fn_8019E838); +0x148 a byte; +0x14C a time (fn_8019E838);
+//   +0x150 length (fn_8019EB94), +0x154 / +0x158 (fn_8019D5E8), +0x15C / +0x160 (fn_8019F5A8),
+//   +0x164, +0x168 capacity (UISetText), +0x16C text id (fn_8019CF58);
+//   +0x170 the text, +0x174 the string it was set from (UISetText, fn_8019EB94), +0x178 a word
+//   per character (fn_8019E27C; all bits set in the file, so the words themselves are left);
+//   +0x1B0, +0x1B4, +0x1D4 floats (fn_8019F810); +0x1E0 a second buffer (fn_8019D5E8),
+//   +0x1E4, +0x1E8, +0x1EC words (fn_8019D5E8, UISetText). +0x1F0 is a byte.
+// The matrix at +0x17C is written before it is read (fn_8019CF58).
+static const SirField kUiTextFields[] = {
+    { 0x00, SIR_PTR, 3 }, { 0x10, SIR_F32, 1 }, { 0x14, SIR_U32, 8 }, { 0x34, SIR_PTR, 3 },
+    { 0x74, SIR_F32, 2 }, { 0x98, SIR_F32, 1 }, { 0xA4, SIR_PTR, 1 }, { 0xA8, SIR_U32, 3 },
+};
+#define UI_TEXT_AT   0x13C
+#define UI_TEXT_SIZE 0xB4
 
 // A list of the UI code: +0x00 count (fn_8019555C), +0x04 capacity, +0x08 element size and +0x10
 // the elements (fn_8019552C). The widget lists hold pointers.
@@ -1847,6 +1863,8 @@ static SirError UiBasePlan(ImagePlan* plan, const u8* image, u32 imageSize, u32 
         if (LevelSpan(Be32(image + o + 0x140), 4, imageSize, &t) && !PlanHas(plan, t, REGION_PTR_ARRAY) &&
             !PlanAdd(plan, t, 4, REGION_PTR_ARRAY)) return SIR_ERR_SCREENS;
     }
+    if (Be32(image + o + 0x60) == 1 && (u64)o + UI_TEXT_AT + UI_TEXT_SIZE <= imageSize &&
+        !PlanAdd(plan, o + UI_TEXT_AT, UI_TEXT_SIZE, REGION_UI_TEXT)) return SIR_ERR_SCREENS;
     return UiBasePlan(plan, image, imageSize, Be32(image + o + 0x130), depth + 1);
 }
 
@@ -2097,6 +2115,7 @@ static void ImagePlanConvert(const ImagePlan* plan, SirReloc* r, u8* image, u32 
         case REGION_UI_SET:       SirConvertRecord(r, p, g->size, kUiSetFields, COUNTOF(kUiSetFields)); break;
         case REGION_UI_SCREEN:    SirConvertRecord(r, p, g->size, kUiScreenFields, COUNTOF(kUiScreenFields)); break;
         case REGION_UI_GRAPHIC:   SirConvertRecord(r, p, g->size, kUiGraphicFields, COUNTOF(kUiGraphicFields)); break;
+        case REGION_UI_TEXT:      SirConvertRecord(r, p, g->size, kUiTextFields, COUNTOF(kUiTextFields)); break;
         case REGION_UI_ANIM:      SirConvertRecord(r, p, g->size, kUiAnimFields, COUNTOF(kUiAnimFields)); break;
         case REGION_UI_ANIM_TRACK: SirConvertRecord(r, p, g->size, kUiAnimTrackFields, COUNTOF(kUiAnimTrackFields)); break;
         case REGION_UI_ANIM_EVENTS: SirConvertRecord(r, p, g->size, kUiAnimEventsFields, COUNTOF(kUiAnimEventsFields)); break;

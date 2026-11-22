@@ -716,6 +716,10 @@ def shared_zone_dump(L, zn, sec, slot_size, zone0, zbase0):
             e = u(o + 0x140)
             L.append('uigraphic %s entry %s -> %s tex %s size %s uv %s' % (ptr(w), ptr(e), ptr(u(e - base)) if inz(e, 4) else '-',
                      ptr(u(o + 0x144)), ws(o + 0x148, 2), ws(o + 0x180, 8)))
+        if u(o + 0x60) == 1 and o + 0x1F0 <= len(sec):                             # a text
+            L.append('uitext %s table %s markers %s %s byte %d time %08x words %s text %s from %s chars %s floats %s %08x buffer %s words %s' % (
+                     ptr(w), ptr(u(o + 0x13C)), ptr(u(o + 0x140)), ptr(u(o + 0x144)), sec[o + 0x148], u(o + 0x14C), ws(o + 0x150, 8),
+                     ptr(u(o + 0x170)), ptr(u(o + 0x174)), ptr(u(o + 0x178)), ws(o + 0x1B0, 2), u(o + 0x1D4), ptr(u(o + 0x1E0)), ws(o + 0x1E4, 3)))
         for k in range(3):
             n = u(o + 4 + k * 4)
             while inz(n, 0xC) and n not in events:
