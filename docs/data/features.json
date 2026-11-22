@@ -100,7 +100,7 @@
   {
    "date": "2026-11-22",
    "time": "21:14",
-   "text": "Packed game files and the right colours on Windows (PRs #60 to #62): the port now unpacks compressed game data with the real zlib library and converts it after unpacking. The strap safety screen shows its real colours, because the colour table is now written in the Wii's byte order. The audit also fixed a function in our decompiled code that passed the wrong argument."
+   "text": "Packed game files on Windows (PRs #60 and #61): the port now unpacks compressed game data with the real zlib library and converts it after unpacking. The audit also fixed a function in our decompiled code that passed the wrong argument."
   },
   {
    "date": "2026-11-22",
