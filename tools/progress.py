@@ -60,8 +60,8 @@ def load_decompiled():
             if not m:
                 continue
             # Must be followed by a definition, not a forward declaration.
-            nxt = next((l.strip() for l in lines[i + 1:] if l.strip()), "")
-            if nxt.endswith(";"):
+            nxt = next((l.strip() for l in lines[i + 1:] if l.strip() and not l.strip().startswith("//")), "")
+            if nxt.endswith(";") and not nxt.startswith(("typedef", "struct", "union", "enum")):
                 continue
             found.setdefault(int(m.group(1), 16), rel)
     return found

@@ -449,6 +449,7 @@ void fn_80157D6C(u8* dst, u8* src, s32 x, s32 y) {
 // images with a second plane (byte +0xD), the extra address / tmem registers. `arg` selects the
 // table column (0..3); the programming is skipped when the sampler already holds the same image.
 void fn_80158228(u8* p, s32 idx, s32 arg) {
+    GxBp(0xFE000060);
     GxBp(((u32)(idx + 0x80) << 24) | (((u32)*(u8*)(p + 0x12) << 5) & 0x1FE0));
     s32 k = (idx & 3) | (idx >> 3);
     if ((u32)lbl_8040ADF0[k] != *(u32*)(p + 0x18) || arg != lbl_8040AE10[k]) {

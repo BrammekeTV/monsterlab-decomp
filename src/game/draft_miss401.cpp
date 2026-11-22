@@ -21,14 +21,14 @@ extern "C++" f32 lbl_805FF534;      // 0x805FF534 (float constant)
 extern "C++" f32 lbl_805FF590;      // 0x805FF590 (float constant)
 extern "C++" f32 lbl_805FF594;      // 0x805FF594 (float constant)
 
-// min(a, b) as the PPC fcmpo/bge sequence gives it (b when a >= b or unordered).
+// min(a, b) as the PPC fcmpo/bge sequence gives it (b when a >= b; a when unordered).
 static f32 VecMinF(f32 a, f32 b) {
-    return (a < b) ? a : b;
+    return (a >= b) ? b : a;
 }
 
-// max(a, b) as the PPC fcmpo/ble sequence gives it (b when a <= b or unordered).
+// max(a, b) as the PPC fcmpo/ble sequence gives it (b when a <= b; a when unordered).
 static f32 VecMaxF(f32 a, f32 b) {
-    return (a > b) ? a : b;
+    return (a <= b) ? b : a;
 }
 
 extern "C" {

@@ -101,6 +101,11 @@
    "date": "2026-11-22",
    "time": "16:59",
    "text": "The Windows boot gets through the opening screens (PR #55): after the strap safety screen it now passes the splash and text screens, skips the intro movie for now, and starts loading the front-end level. On the way, two calls in our decompiled code that passed the wrong arguments were fixed, an audio frame callback was added and a few more system calls were filled in."
+   },
+   {
+    "date": "2026-11-22",
+   "time": "17:02",
+   "text": "Checked 210 more functions in the renderer code against the original and fixed 2 mistakes in our decompiled code (a missing graphics write, NaN handling in two min/max helpers)"
   },
   {
    "date": "2026-11-22",
