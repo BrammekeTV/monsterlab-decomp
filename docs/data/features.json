@@ -104,6 +104,11 @@
   },
   {
    "date": "2026-11-22",
+   "time": "17:11",
+   "text": "Checked about 250 more functions in the game code against the original and fixed 1 mistake in our decompiled code (the sleep timer converted microseconds to ticks the wrong way)"
+  },
+  {
+   "date": "2026-11-22",
    "time": "17:08",
    "text": "Checked about 260 more functions in the engine and UI code against the original and fixed 6 mistakes in our decompiled code (wrong arguments in 3 calls, a flipped comparison, a wrong flag bit and a float rounding difference)"
   },

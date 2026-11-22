@@ -190,11 +190,12 @@ extern "C" u8* fn_80142500(u8* p) {
 
 // 0x80142818
 // Sleeps for a 64-bit microsecond count (hi:us): converts it to timebase ticks
-// (bus clock / 4) and forwards the result to the sleep primitive.
+// (ticks per microsecond = bus clock / 4 / 1000000, then divided by 8) and forwards the
+// result to the sleep primitive.
 extern "C" void SleepMicroseconds(s32 hi, u32 us) {
     u64 micros = ((u64)(u32)hi << 32) | us;
-    u64 tb = (u64)(OSGetBusClock() >> 2);
-    u64 ticks = micros * tb / 1000000;
+    u32 tpu = (u32)(((u64)(OSGetBusClock() >> 2) * 0x431BDE83u) >> 47);
+    s64 ticks = (s64)(micros * tpu) / 8;
     fn_8023D3C8((s32)(ticks >> 32), (u32)ticks);
 }
 
