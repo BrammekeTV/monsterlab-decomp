@@ -8,8 +8,8 @@
 extern u8 lbl_803839F0[];
 extern f32 lbl_805FD300;
 extern f32 lbl_805FD304;
-extern u8 lbl_805FD378[];
-extern u8 lbl_805FD37C[];
+extern f32 lbl_805FD378;
+extern f32 lbl_805FD37C;
 
 // 0x80052504
 extern "C" void fn_80052504(u8* a3) {

@@ -40,7 +40,7 @@ void fn_8002BD60(u8* obj);                                           // 0x8002BD
 void fn_800311E8(u8* box, f32* pt);                                  // 0x800311E8
 void fn_800359F4(u8* a3, f32 f1, f32 f2, f32 f3);                    // 0x800359F4
 void fn_80035164(u8* c, s32 team, f32 dt);                           // 0x80035164
-void fn_80035A04(u8* c, s32 n);                                      // 0x80035A04
+s32 fn_80035A04(u8* c, s32 n);                                      // 0x80035A04
 void fn_80035DB8(u8* c, f32 dt);                                     // 0x80035DB8
 void fn_80036618(u8* arg0, f32 farg0);                               // 0x80036618
 s32  fn_8003639C(u8* c);                                             // 0x8003639C

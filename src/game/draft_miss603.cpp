@@ -17,7 +17,7 @@ s32 fn_800BB7D0(u8* p, u8* item);                            // 0x800BB7D0
 void fn_800BD064(u8* e, f32 dt);                              // 0x800BD064
 void fn_800BDC14(u8* e, f32 dt);                              // 0x800BDC14
 void fn_800BDC68(u8* item, f32 dt);                           // 0x800BDC68
-s32 fn_800BE9E0(u8* item, u8* ctx, u8* flag, f32 dt);        // 0x800BE9E0
+void fn_800BE9E0(u8* item, u8* ctx, u8* flag, f32 dt);        // 0x800BE9E0
 s32 fn_800BF044(u8* item, const f32* vec);                   // 0x800BF044
 void fn_800BF158(u8* item);                                  // 0x800BF158
 void fn_800BFF64(u8* p, f32 dt);                                      // 0x800BFF64
