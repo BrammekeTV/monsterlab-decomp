@@ -42,7 +42,7 @@ s32 fn_800AD5A8(u8* p, u8* a, f32* out);                                        
 s32 fn_800AEF04(u8* p, u8* a, f32* out);                                                    // 0x800AEF04
 s32 fn_800B1AD0(u8* p, u8* a, f32* out);                                                    // 0x800B1AD0
 s32 fn_800B20A4(u8* p, u8* a, f32* out);                                                    // 0x800B20A4
-void fn_800BF370(u8* p, f32* pos, f32 a, f32 b);                                            // 0x800BF370
+s32 fn_800BF370(u8* p, f32* pos, f32 a, f32 b);                                            // 0x800BF370
 s32 fn_800C0168(u8* a, u8* node, f32* move, f32* hit, f32* push, u8* flag);                // 0x800C0168
 void fn_800C1798(void* out, void* arg);                                                     // 0x800C1798
 void fn_800C7620(u8* p);                                                                    // 0x800C7620

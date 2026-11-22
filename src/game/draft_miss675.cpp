@@ -47,7 +47,7 @@ s32    fn_801ADB44(u8* arg0, u8* arg1, u8* arg2, s32 arg3, u8* arg4, f32 farg0, 
 s32    fn_801AE544(u8* arg0, u8* arg1, u8* arg2, f32 farg0, f32 farg1);     // 0x801AE544
 s32    fn_801AE9AC(u8* p0, u8* p1, u8* center, u8* half, u8* out, f32 margin);   // 0x801AE9AC
 s32    fn_801AEE84(u8* a, u8* b, u8* c, u8* h, u8* m, u8* out, f32 margin); // 0x801AEE84
-s32    fn_801AF770(u8* c, u8* a, u8* b, u8* out, s32 flag, f32 r0, f32 r1); // 0x801AF770 (r7 is overwritten inside)
+s32    fn_801AF770(u8* c, u8* a, u8* b, u8* out, f32 r0, f32 r1); // 0x801AF770 (r7 is overwritten inside)
 s32    fn_801C2C60(f32 r, u8* a, u8* b, u8* c, s32* n, f32* pos, f32* dist);   // 0x801C2C60
 s32    fn_801C3170(f32 r, u8* a, u8* b, u8* c, s32* n, f32* pos, f32* dist);   // 0x801C3170
 
@@ -554,7 +554,7 @@ s32 fn_801AE608(u8* a, u8* alt, u8* b, u8* out, s32 flag, u8* d, s32 e) {
             Vec3Assign(&cA14, (Vec3*)(a + 0x14));
             Vec3Assign(&cA20, (Vec3*)(a + 0x20));
             Vec3Assign(&cB14, (Vec3*)(b + 0x14));
-            return fn_801AF770((u8*)&cB14, (u8*)&cA20, (u8*)&cA14, out, flag, *(f32*)(b + 0x3C), *(f32*)(a + 0x3C));
+            return fn_801AF770((u8*)&cB14, (u8*)&cA20, (u8*)&cA14, out, *(f32*)(b + 0x3C), *(f32*)(a + 0x3C));
         }
         return fn_801ADB44(b + 0x14, a + 0x14, (e != 0) ? out : alt, flag, d, *(f32*)(b + 0x3C), *(f32*)(a + 0x3C));
     }
