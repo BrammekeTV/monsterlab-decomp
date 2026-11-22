@@ -101,6 +101,12 @@ const char* PortSoftSdk(u32 wiiAddr);
 // port_files.cpp: called for every completed disc read; converts big-endian .sir sections in place.
 void PortFileRead(const char* path, u32 offset, u8* dst, u32 len);
 const char* PortFileStats(char* buf, u32 n);
+// zlib streams (port_zlib.cpp): a stream that starts on the bytes of a packed .sir read is bound to its
+// section; when it ends the section is converted. Drop forgets a stream (re-init, end).
+void PortFileInflateBegin(void* strm, const u8* nextIn, u8* nextOut);
+void PortFileInflateEnd(void* strm, u32 totalOut);
+void PortFileInflateDrop(void* strm);
+int  PortSelfTestZlib(void);
 void PortDemoMain(void);              // port_demo.cpp
 // Prints the boot summary and ends the process.
 void PortStop(int exitCode, const char* fmt, ...);

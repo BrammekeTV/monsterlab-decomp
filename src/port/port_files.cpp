@@ -91,6 +91,48 @@ static void CheckFixUpIndices(const char* file) {
             PortStop(8, "%s: script function %u is not %s: the level loader's pool item kinds would be wrong", file, LEVEL_FIXUP_ENTITY + i, names[i]);
 }
 
+static void ConvertSection(const char* name, const SirCatalogFile* file, const SirCatalogEntry* e, u8* dst);
+
+// ---- packed sections: the read brings the compressed bytes, the game's zlib calls (port_zlib.cpp)
+// bring the section, so the conversion waits for the end of the stream.
+struct PackedRead { u8* dst; const SirCatalogFile* file; const SirCatalogEntry* e; char name[64]; };
+struct Inflating { void* strm; u8* out; PackedRead r; };
+static PackedRead sPacked[8];
+static u32        sPackedNext;
+static Inflating  sInflating[8];
+
+static void NotePackedRead(const char* name, const SirCatalogFile* file, const SirCatalogEntry* e, u8* dst) {
+    PackedRead* p = &sPacked[sPackedNext++ & 7];
+    p->dst = dst; p->file = file; p->e = e;
+    snprintf(p->name, sizeof(p->name), "%s", name);
+}
+void PortFileInflateDrop(void* strm) {
+    for (u32 i = 0; i < 8; i++) if (sInflating[i].strm == strm) sInflating[i].strm = NULL;
+}
+void PortFileInflateBegin(void* strm, const u8* nextIn, u8* nextOut) {
+    PortFileInflateDrop(strm);
+    for (u32 i = 0; i < 8; i++) {
+        PackedRead* p = &sPacked[i];
+        if (!p->e || p->dst != nextIn) continue;
+        for (u32 k = 0; k < 8; k++) {
+            if (sInflating[k].strm) continue;
+            sInflating[k].strm = strm; sInflating[k].out = nextOut; sInflating[k].r = *p;
+            p->e = NULL;
+            return;
+        }
+    }
+}
+void PortFileInflateEnd(void* strm, u32 totalOut) {
+    for (u32 i = 0; i < 8; i++) {
+        Inflating* f = &sInflating[i];
+        if (f->strm != strm) continue;
+        f->strm = NULL;
+        if (totalOut != f->r.e->size) { Unconverted(f->r.name, f->r.e, "inflated to another size than the catalog says"); return; }
+        ConvertSection(f->r.name, f->r.file, f->r.e, f->out);
+        return;
+    }
+}
+
 void PortFileRead(const char* path, u32 offset, u8* dst, u32 len) {
     const char* name = BaseName(path);
     const char* ext = strrchr(name, '.');
@@ -119,8 +161,13 @@ void PortFileRead(const char* path, u32 offset, u8* dst, u32 len) {
     if (!file) { Unconverted(name, NULL, "not in the catalog, left big-endian"); return; }
     const SirCatalogEntry* e = FindSection(file, offset);
     if (!e) { Unconverted(name, NULL, "a read that starts no section, left as it is"); return; }
-    if (e->packedSize != 0) { Unconverted(name, e, "packed"); return; }
+    if (e->packedSize != 0) { NotePackedRead(name, file, e, dst); return; }
     if (len < e->size) { Unconverted(name, e, "read in pieces"); return; }
+    ConvertSection(name, file, e, dst);
+}
+
+// Converts one whole section, as it lies at `dst` (read from disc, or inflated from a packed one).
+static void ConvertSection(const char* name, const SirCatalogFile* file, const SirCatalogEntry* e, u8* dst) {
 
     if (_stricmp(name, "global_binary.sir") == 0) {
         if (e->type == -1) { sGlobalHdr = dst; return; }      // converted with the image
