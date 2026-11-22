@@ -998,11 +998,48 @@ struct ZoneDump {
             const u8* tb = *(const u8**)(ss + kTables[i]);
             if (!In(tb, 0xC)) continue;
             printf("uitree 0x%x ", kTables[i]); Val(tb); printf(" root "); Ptr(tb); printf(" low "); Ptr(tb + 4); printf(" high "); Ptr(tb + 8); printf("\n");
-            Tree(*(const u8* const*)tb, false);
+            Tree(*(const u8* const*)tb, false, kTables[i] == 0x20);
         }
     }
+    // An animation: the description fn_801AB4C4 copies, its tracks with their keys and its events.
+    std::vector<const u8*> uiAnims, uiTracks;
+    void AnimList(const u8* a, bool keys) {
+        if (!In(a, 0x14) || Seen(uiLists, a)) return;
+        u32 n = *(const u32*)a, size = *(const u32*)(a + 8);
+        const u8* d = *(const u8**)(a + 0x10);
+        printf("uianimlist "); Val(a); printf(" count %u capacity %u size %u data ", n, *(const u32*)(a + 4), size); Ptr(a + 0x10); printf("\n");
+        if (n == 0 || size != 0x30 || !In(d, n * 0x30)) return;
+        printf(keys ? "uianimkeys " : "uianimentries "); Val(a);
+        for (u32 i = 0; i < n; i++, d += 0x30) {
+            printf("%s%08x ", i ? " | " : " ", *(const u32*)d);
+            if (keys) { Words(d + 0x10, 4); printf(" %u", *(const u32*)(d + 0x20)); }
+            else {
+                printf("%u ", *(const u32*)(d + 0x24));
+                if (*(const u32*)(d + 0x24) == 3) Ptr(d + 0x10); else printf("%08x", *(const u32*)(d + 0x10));
+            }
+        }
+        printf("\n");
+    }
+    void Anim(const u8* a) {
+        if (!In(a, 0x30) || Seen(uiAnims, a)) return;
+        printf("uianim "); Val(a); printf(" tracks");
+        for (u32 k = 0; k < 5; k++) { printf(" "); Ptr(a + 4 + k * 4); }
+        printf(" events "); Ptr(a + 0x18); printf(" flags %08x floats ", *(const u32*)(a + 0x1C)); Words(a + 0x20, 3);
+        printf(" w2c %08x\n", *(const u32*)(a + 0x2C));
+        for (u32 k = 0; k < 5; k++) {
+            const u8* t = *(const u8**)(a + 4 + k * 4);
+            if (!In(t, 0x18) || Seen(uiTracks, t)) continue;
+            printf("uianimtrack "); Val(t); printf(" list "); Ptr(t + 4); printf(" cursor %08x ", *(const u32*)(t + 8));
+            Ptr(t + 0xC); printf(" "); Ptr(t + 0x10); printf(" %08x\n", *(const u32*)(t + 0x14));
+            AnimList(*(const u8**)(t + 4), true);
+        }
+        const u8* t = *(const u8**)(a + 0x18);
+        if (!In(t, 0x14) || Seen(uiTracks, t)) return;
+        printf("uianimevents "); Val(t); printf(" list "); Ptr(t + 4); printf(" words "); Words(t + 8, 3); printf("\n");
+        AnimList(*(const u8**)(t + 4), false);
+    }
     // A tree as fn_8018E2F4 walks it: left subtree, right subtree, then the node.
-    void Tree(const u8* rootNode, bool screens) {
+    void Tree(const u8* rootNode, bool screens, bool animsToo = false) {
         std::vector<const u8*> seen;
         std::vector<std::pair<const u8*, bool> > stack;
         stack.push_back(std::make_pair(rootNode, false));
@@ -1019,6 +1056,7 @@ struct ZoneDump {
             } else if (done) {
                 printf("uitreenode "); Val(n); printf(" key %08x value ", *(const u32*)n); Ptr(n + 4);
                 printf(" left "); Ptr(n + 0xC); printf(" right "); Ptr(n + 0x10); printf("\n");
+                if (animsToo) Anim(*(const u8**)(n + 4));
             } else if (std::find(seen.begin(), seen.end(), n) == seen.end()) {
                 seen.push_back(n);
                 stack.push_back(std::make_pair(n, true));
@@ -2123,7 +2161,10 @@ static void LevelSelfTest(void) {
     // A shared zone: the image starts with a copy of its zone slot, which names a screen set; the
     // set's table leads to a tree of two nodes, a widget and its one child.
     {
-        const u32 SH = 0x924C0000u, SH_SIZE = 0x720u;
+        const u32 SH = 0x924C0000u, SH_SIZE = 0x8A0u;
+        // An animation in the set's table at +0x20: one track with two keys, and one event entry.
+        const u32 ATABLE = 0x720, ANODE = 0x730, ANIM = 0x750, TRACK = 0x780, TLIST = 0x7A0, KEYS = 0x7C0;
+        const u32 EVENTS = 0x820, ELIST = 0x840, ENTRIES = 0x860;
         const u32 PIC = 0x560, TEXW = 0x700;                   // a picture (kind 2, sub-kind 0) and the word with its texture
         const u32 NAMED = 0x530, DRAW = 0x540;                 // the screen's named widgets; the set's draw list
         const u32 LIST = 0x4E0, ITEMS = 0x500;                 // the child's list (kind 3): one entry
@@ -2140,6 +2181,23 @@ static void LevelSelfTest(void) {
         memset(sh + SET, 0, 0x40);
         Put32(sh + SET + 0x04, 480); Put32(sh + SET + 0x08, 0x38); Put32(sh + SET + 0x10, SH + DRAW);
         Put32(sh + SET + 0x28, SH + TABLE);
+        Put32(sh + SET + 0x20, SH + ATABLE);
+        Put32(sh + ATABLE + 0, SH + ANODE); Put32(sh + ATABLE + 4, SH + ANODE); Put32(sh + ATABLE + 8, SH + ANODE);
+        Put32(sh + ANODE + 0x00, 0x1E6D28F9); Put32(sh + ANODE + 0x04, SH + ANIM); Put32(sh + ANODE + 0x0C, 0); Put32(sh + ANODE + 0x10, 0);
+        memset(sh + ANIM, 0, 0x30);
+        Put32(sh + ANIM + 0x0C, SH + TRACK); Put32(sh + ANIM + 0x18, SH + EVENTS); Put32(sh + ANIM + 0x1C, 1);
+        Put32(sh + ANIM + 0x20, 0x3F800000); Put32(sh + ANIM + 0x28, 0x3F000000); Put32(sh + ANIM + 0x2C, 0x5E6664D7);
+        memset(sh + TRACK, 0, 0x18);
+        sh[TRACK] = 1; Put32(sh + TRACK + 0x04, SH + TLIST); Put32(sh + TRACK + 0x14, 0xFFFFFFFF);
+        Put32(sh + TLIST + 0x00, 2); Put32(sh + TLIST + 0x04, 2); Put32(sh + TLIST + 0x08, 0x30); Put32(sh + TLIST + 0x10, SH + KEYS);
+        memset(sh + KEYS, 0, 0x60);
+        Put32(sh + KEYS + 0x04, 0x7F800001); Put32(sh + KEYS + 0x1C, 0x3F800000); Put32(sh + KEYS + 0x20, 4);
+        Put32(sh + KEYS + 0x30, 0x3F800000); Put32(sh + KEYS + 0x40, 0x40000000);
+        memset(sh + EVENTS, 0, 0x14);
+        Put32(sh + EVENTS + 0x04, SH + ELIST); Put32(sh + EVENTS + 0x08, 0xFFFFFFFF);
+        Put32(sh + ELIST + 0x00, 1); Put32(sh + ELIST + 0x04, 1); Put32(sh + ELIST + 0x08, 0x30); Put32(sh + ELIST + 0x10, SH + ENTRIES);
+        memset(sh + ENTRIES, 0, 0x30);
+        Put32(sh + ENTRIES + 0x00, 0x3E000000); Put32(sh + ENTRIES + 0x10, SH + NAMED); Put32(sh + ENTRIES + 0x24, 3);
         Put32(sh + TABLE + 0, SH + NODE_A); Put32(sh + TABLE + 4, SH + NODE_B); Put32(sh + TABLE + 8, SH + NODE_A);
         Put32(sh + NODE_A + 0x00, 0x80000000); Put32(sh + NODE_A + 0x04, SH + WIDGET);
         Put32(sh + NODE_A + 0x0C, SH + NODE_B); Put32(sh + NODE_A + 0x10, 0);
@@ -2209,6 +2267,19 @@ static void LevelSelfTest(void) {
         // The set (fn_80198438, fn_801985BC) and the screen (UIWidgetFindChild, fn_80199C30).
         CHECK(*(const s32*)(sh + SET + 4) == 480 && *(const s32*)(sh + SET + 8) == 0x38 && *(const u8**)(sh + SET + 0x10) == sh + DRAW);
         CHECK(*(const s32*)(sh + WIDGET + 0x13C) == 1 && **(const u8***)(sh + WIDGET + 0x140) == sh + CHILD && *(const s32*)(sh + WIDGET + 0x14C) == -1);
+        // The animation, as fn_80198F1C finds it and fn_801AB4C4 / fn_801AA79C / fn_801AAEE4 copy it;
+        // keys as fn_801AA728 / fn_801AA760 / fn_801AA218 read them, the entry as AnimEntryFire does.
+        const u8* anim = *(const u8**)(*(const u8**)*(const u8**)(sh + SET + 0x20) + 4);
+        CHECK(anim == sh + ANIM && *(const u8**)(anim + 4) == NULL && *(const u8**)(anim + 0xC) == sh + TRACK && *(const u8**)(anim + 0x18) == sh + EVENTS);
+        CHECK(*(const u32*)(anim + 0x1C) == 1 && *(const f32*)(anim + 0x20) == 1.0f && *(const f32*)(anim + 0x28) == 0.5f && *(const u32*)(anim + 0x2C) == 0x5E6664D7);
+        const u8* track = sh + TRACK;
+        const u8* keys = *(const u8**)(*(const u8**)(track + 4) + 0x10);
+        CHECK(track[0] == 1 && *(const s32*)(track + 0x14) == -1 && *(const u8**)(track + 0xC) == NULL && *(const s32*)(*(const u8**)(track + 4) + 8) == 0x30);
+        CHECK(keys == sh + KEYS && *(const f32*)keys == 0.0f && keys[4] == 0x7F && *(const f32*)(keys + 0x1C) == 1.0f && *(const s32*)(keys + 0x20) == 4);
+        CHECK(*(const f32*)(keys + 0x30) == 1.0f && *(const f32*)(keys + 0x40) == 2.0f);
+        const u8* entry = *(const u8**)(*(const u8**)(sh + EVENTS + 4) + 0x10);
+        CHECK(*(const s32*)(sh + EVENTS + 8) == -1 && entry == sh + ENTRIES && *(const f32*)entry == 0.125f);
+        CHECK(*(const s32*)(entry + 0x24) == 3 && *(const u8**)(entry + 0x10) == sh + NAMED);
         const u8* ev = *(const u8**)(child + 4);
         CHECK(ev == sh + EVENT && *(const u8**)ev == NULL && *(const u32*)(ev + 4) == 0x705598E1 && *(const u32*)(ev + 8) == 0x17140061);
         // The child's kind, as fn_8019914C reads it, and its list as fn_8019555C / fn_8019552C do.
@@ -2217,6 +2288,19 @@ static void LevelSelfTest(void) {
         CHECK(*(const s32*)uiList == 1 && *(const s32*)(uiList + 4) == 2 && *(const s32*)(uiList + 8) == 4 && uiList[0xC] == 0x7F);
         CHECK(**(const u8***)(uiList + 0x10) == sh + WIDGET);
         {
+            // Refused untouched: a key list whose elements are not 0x30 bytes.
+            u8* bad = (u8*)malloc(SH_SIZE);
+            memcpy(bad, shCopy, SH_SIZE);
+            Put32(bad + TLIST + 0x08, 0x20);
+            u8* badCopy = (u8*)malloc(SH_SIZE);
+            memcpy(badCopy, bad, SH_SIZE);
+            SirReloc rb;
+            SirRelocInit(&rb, NULL, NULL);
+            SirRelocAddRange(&rb, L_ZONE, L_ZONE_SIZE, zone);
+            SirRelocAddRange(&rb, SH, SH_SIZE, bad);
+            CHECK(LevelZoneConvert(&rb, bad, SH_SIZE, SH, &sroots, NULL, &other) == SIR_ERR_SCREENS);
+            CHECK(memcmp(bad, badCopy, SH_SIZE) == 0);
+            free(bad); free(badCopy);
             // Refused untouched: a list whose count exceeds its capacity.
             u8* again = (u8*)malloc(SH_SIZE);
             memcpy(again, shCopy, SH_SIZE);

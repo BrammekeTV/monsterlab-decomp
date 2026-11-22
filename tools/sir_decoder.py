@@ -781,7 +781,39 @@ def shared_zone_dump(L, zn, sec, slot_size, zone0, zbase0):
             widget(c, True)
             c = u(c - base + 0x124)
     # A tree as fn_8018E2F4 walks it: left subtree, right subtree, then the node.
-    def tree(root, screens):
+    anims, tracks = set(), set()
+    def anim_list(a, keys):
+        if not inz(a, 0x14) or a in lists: return
+        lists.add(a)
+        l = a - base
+        n, size, data = u(l), u(l + 8), u(l + 0x10)
+        L.append('uianimlist %s count %d capacity %d size %d data %s' % (ptr(a), n, u(l + 4), size, ptr(data)))
+        if n == 0 or size != 0x30 or not inz(data, n * 0x30): return
+        d = data - base
+        if keys:
+            L.append('uianimkeys %s %s' % (ptr(a), ' | '.join('%08x %s %d' % (u(d + i * 0x30), ws(d + i * 0x30 + 0x10, 4), u(d + i * 0x30 + 0x20)) for i in range(n))))
+        else:
+            L.append('uianimentries %s %s' % (ptr(a), ' | '.join('%08x %d %s' % (u(d + i * 0x30), u(d + i * 0x30 + 0x24),
+                     ptr(u(d + i * 0x30 + 0x10)) if u(d + i * 0x30 + 0x24) == 3 else '%08x' % u(d + i * 0x30 + 0x10)) for i in range(n))))
+    def anim(a):
+        if not inz(a, 0x30) or a in anims: return
+        anims.add(a)
+        o = a - base
+        L.append('uianim %s tracks %s events %s flags %08x floats %s w2c %08x' % (ptr(a), ' '.join(ptr(u(o + 4 + k * 4)) for k in range(5)),
+                 ptr(u(o + 0x18)), u(o + 0x1C), ws(o + 0x20, 3), u(o + 0x2C)))
+        for k in range(5):
+            t = u(o + 4 + k * 4)
+            if not inz(t, 0x18) or t in tracks: continue
+            tracks.add(t)
+            L.append('uianimtrack %s list %s cursor %08x %s %s %08x' % (ptr(t), ptr(u(t - base + 4)), u(t - base + 8), ptr(u(t - base + 0xC)),
+                     ptr(u(t - base + 0x10)), u(t - base + 0x14)))
+            anim_list(u(t - base + 4), True)
+        t = u(o + 0x18)
+        if not inz(t, 0x14) or t in tracks: return
+        tracks.add(t)
+        L.append('uianimevents %s list %s words %s' % (ptr(t), ptr(u(t - base + 4)), ws(t - base + 8, 3)))
+        anim_list(u(t - base + 4), False)
+    def tree(root, screens, anims_too=False):
         seen, stack = set(), [(root, 0)]
         while stack:
             n, done = stack.pop()
@@ -793,6 +825,7 @@ def shared_zone_dump(L, zn, sec, slot_size, zone0, zbase0):
                 widget(u(o + 4), False)
             elif done:
                 L.append('uitreenode %s key %08x value %s left %s right %s' % (ptr(n), u(o), ptr(u(o + 4)), ptr(u(o + 0xC)), ptr(u(o + 0x10))))
+                if anims_too: anim(u(o + 4))
             elif n not in seen:
                 seen.add(n)
                 stack += [(n, 1), (u(o + 0x10), 0), (u(o + 0xC), 0)]
@@ -802,7 +835,7 @@ def shared_zone_dump(L, zn, sec, slot_size, zone0, zbase0):
             tb = u(so + at)
             if not inz(tb, 0xC): continue
             L.append('uitree 0x%x %s root %s low %s high %s' % (at, ptr(tb), ptr(u(tb - base)), ptr(u(tb - base + 4)), ptr(u(tb - base + 8))))
-            tree(u(tb - base), False)
+            tree(u(tb - base), False, at == 0x20)
 
 LEVEL_ZONE1_BASE = 0x90980000   # gZoneBase[1] = zone 0's address + its memory budget (world_alloc.cpp); not in the file
 
