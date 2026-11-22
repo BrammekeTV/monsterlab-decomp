@@ -118,6 +118,13 @@ s32 DVDReadAsync(u8* infoBytes, void* addr, s32 len, s32 offset, void* cb, s32 p
     sDvdReads++;
     sDvdBytes += (u32)got;
     if (got > 0) PortFileRead(d->path, (u32)offset, (u8*)addr, (u32)got);
+    // The drive transfers whole 32-byte units, so a read that ends within the file size rounded
+    // up to 32 delivers the length that was asked for (fn_80146C44 asks for the rounded length
+    // of a file's last part and takes anything else as a failed read). The rest is zero.
+    if (got >= 0 && got < len && (u32)offset + (u32)len <= ((d->size + 0x1Fu) & ~0x1Fu)) {
+        memset((u8*)addr + got, 0, (size_t)(len - got));
+        got = len;
+    }
     info->state = 1;
     info->callback = cb;
     DvdDone* done = &sDvdDone[sDvdDoneNext++ % 64];
