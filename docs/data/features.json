@@ -99,6 +99,11 @@
  "changelog": [
   {
    "date": "2026-11-22",
+   "time": "10:48",
+   "text": "Round 77: 47 small functions (vector constant writers, vtable thunks, tail-call wrappers, fn_8002C63C, fn_800771F8 and more), first Haiku-only round; tools/undone.py added"
+  },
+  {
+   "date": "2026-11-22",
    "time": "00:36",
    "text": "Round 76: 56 more tiny functions (vector constant writers)"
   },

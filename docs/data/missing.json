@@ -1,9 +1,9 @@
 {
  "log": "link.log",
  "counts": {
-  "global": 3199,
+  "global": 3237,
   "unknown": 126,
-  "library": 192,
+  "library": 193,
   "game": 76
  },
  "game_bytes": 56512,
@@ -1009,6 +1009,17 @@
    "used_as": "_fn_8032FB38",
    "addr": "8032FB38",
    "size": 204,
+   "section": ".text",
+   "kind": "library",
+   "region": "MSL C/C++ runtime"
+  },
+  {
+   "name": "fn_80330F50",
+   "refs": 3,
+   "files": 3,
+   "used_as": "_fn_80330F50",
+   "addr": "80330F50",
+   "size": 792,
    "section": ".text",
    "kind": "library",
    "region": "MSL C/C++ runtime"
@@ -2917,8 +2928,8 @@
   },
   {
    "name": "gGameDb",
-   "refs": 79,
-   "files": 79,
+   "refs": 80,
+   "files": 80,
    "used_as": "\"struct GameDb * gGameDb\" (?gGameDb@@3PAUGameDb@@A)",
    "addr": "805FBBC0",
    "size": 8,
@@ -3006,6 +3017,16 @@
    "kind": "global"
   },
   {
+   "name": "gIdPool",
+   "refs": 29,
+   "files": 29,
+   "used_as": "\"unsigned char * gIdPool\" (?gIdPool@@3PAEA)",
+   "addr": "8048A8F0",
+   "size": 120662,
+   "section": ".bss",
+   "kind": "global"
+  },
+  {
    "name": "gStringTable2",
    "refs": 29,
    "files": 29,
@@ -3023,16 +3044,6 @@
    "addr": "805F8200",
    "size": 8,
    "section": ".sdata",
-   "kind": "global"
-  },
-  {
-   "name": "gIdPool",
-   "refs": 28,
-   "files": 28,
-   "used_as": "\"unsigned char * gIdPool\" (?gIdPool@@3PAEA)",
-   "addr": "8048A8F0",
-   "size": 120662,
-   "section": ".bss",
    "kind": "global"
   },
   {
@@ -3326,6 +3337,16 @@
    "kind": "global"
   },
   {
+   "name": "lbl_8048A8B4",
+   "refs": 16,
+   "files": 16,
+   "used_as": "_lbl_8048A8B4",
+   "addr": "8048A8B4",
+   "size": 44,
+   "section": ".bss",
+   "kind": "global"
+  },
+  {
    "name": "lbl_80556E80",
    "refs": 16,
    "files": 16,
@@ -3372,16 +3393,6 @@
    "used_as": "_lbl_803C4E28",
    "addr": "803C4E28",
    "size": 40,
-   "section": ".bss",
-   "kind": "global"
-  },
-  {
-   "name": "lbl_8048A8B4",
-   "refs": 15,
-   "files": 15,
-   "used_as": "_lbl_8048A8B4",
-   "addr": "8048A8B4",
-   "size": 44,
    "section": ".bss",
    "kind": "global"
   },
@@ -4396,6 +4407,16 @@
    "kind": "global"
   },
   {
+   "name": "lbl_8047D248",
+   "refs": 5,
+   "files": 5,
+   "used_as": "_lbl_8047D248",
+   "addr": "8047D248",
+   "size": 160,
+   "section": ".bss",
+   "kind": "global"
+  },
+  {
    "name": "lbl_80556AC8",
    "refs": 5,
    "files": 5,
@@ -4866,6 +4887,16 @@
    "kind": "global"
   },
   {
+   "name": "lbl_803462C8",
+   "refs": 4,
+   "files": 4,
+   "used_as": "_lbl_803462C8",
+   "addr": "803462C8",
+   "size": 16,
+   "section": ".rodata",
+   "kind": "global"
+  },
+  {
    "name": "lbl_80346AB8",
    "refs": 4,
    "files": 4,
@@ -5022,16 +5053,6 @@
    "used_as": "_lbl_80478570",
    "addr": "80478570",
    "size": 72,
-   "section": ".bss",
-   "kind": "global"
-  },
-  {
-   "name": "lbl_8047D248",
-   "refs": 4,
-   "files": 4,
-   "used_as": "_lbl_8047D248",
-   "addr": "8047D248",
-   "size": 160,
    "section": ".bss",
    "kind": "global"
   },
@@ -5871,16 +5892,6 @@
    "files": 4,
    "used_as": "\"int lbl_805FBAF8\" (?lbl_805FBAF8@@3HA)",
    "addr": "805FBAF8",
-   "size": 4,
-   "section": ".sbss",
-   "kind": "global"
-  },
-  {
-   "name": "lbl_805FBB30",
-   "refs": 4,
-   "files": 4,
-   "used_as": "_lbl_805FBB30",
-   "addr": "805FBB30",
    "size": 4,
    "section": ".sbss",
    "kind": "global"
@@ -6776,7 +6787,7 @@
   "Network (DWC/SSL/NHTTP/NWC24)": 50,
   "GX": 22,
   "NAND/SC/IPC": 20,
-  "MSL C/C++ runtime": 17,
+  "MSL C/C++ runtime": 18,
   "OS": 11,
   "WPAD/KPAD/BT": 9,
   "zlib 1.2.3": 3,

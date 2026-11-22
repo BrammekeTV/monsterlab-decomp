@@ -27,6 +27,7 @@ extern "C" void fn_8018979C(u8*, s8*, s32*, s32*);
 extern "C" void fn_801EF070(u8*, void*);
 extern "C" void* fn_80330D80(s32);
 extern "C" void fn_80330E20(void*);
+extern "C" void* fn_80330F50(u8*, u32, s32, s32, s32, s32, s32, s32);
 
 // 0x8016EB0C
 extern "C" void fn_8016EB0C(u8* a3, f32 f1, f32 f2) {
@@ -161,6 +162,11 @@ extern "C" void fn_80173294(u8* a3) {
 // 0x801732A4
 extern "C" void* fn_801732A4(s32 a3) {
     return (void*)(fn_80330D80((s32)((u32)(uintptr_t)(a3))));
+}
+
+// 0x801732A8
+extern "C" void* fn_801732A8(u8* a3, s32 a4, s32 a5, s32 a6, s32 a7, s32 a8, s32 a9, s32 a10) {
+    return (void*)(fn_80330F50(((u8*)(uintptr_t)(a3)), (u32)((u32)(uintptr_t)(a4)), (s32)((u32)(uintptr_t)(a5)), (s32)((u32)(uintptr_t)(a6)), (s32)((u32)(uintptr_t)(a7)), (s32)((u32)(uintptr_t)(a8)), (s32)((u32)(uintptr_t)(a9)), (s32)((u32)(uintptr_t)(a10))));
 }
 
 // 0x801732AC

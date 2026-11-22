@@ -101,8 +101,8 @@
    "bytes": 2265988,
    "named": 2748,
    "named_bytes": 616800,
-   "decompiled": 7981,
-   "decompiled_bytes": 1878720
+   "decompiled": 8020,
+   "decompiled_bytes": 1880472
   },
   "library": {
    "functions": 4039,

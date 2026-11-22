@@ -37,6 +37,7 @@ extern "C" void fn_8015E8B4(u8*, s32);
 extern "C" void fn_8015EA90(void);
 extern "C" void* fn_80330D80(s32);
 extern "C" void fn_80330E20(void*);
+extern "C" void* fn_80330F50(u8*, u32, s32, s32, s32, s32, s32, s32);
 
 // 0x801467F8
 extern "C" void fn_801467F8(s32 a3) {
@@ -127,6 +128,11 @@ extern "C" void RendDefaultFree(u8* a3) {
 // 0x80148550
 extern "C" void* RendDefaultAllocTemp(s32 a3) {
     return (void*)(fn_80330D80((s32)((u32)(uintptr_t)(a3))));
+}
+
+// 0x80148554
+extern "C" void* RendDefaultRealloc(u8* a3, s32 a4, s32 a5, s32 a6, s32 a7, s32 a8, s32 a9, s32 a10) {
+    return (void*)(fn_80330F50(((u8*)(uintptr_t)(a3)), (u32)((u32)(uintptr_t)(a4)), (s32)((u32)(uintptr_t)(a5)), (s32)((u32)(uintptr_t)(a6)), (s32)((u32)(uintptr_t)(a7)), (s32)((u32)(uintptr_t)(a8)), (s32)((u32)(uintptr_t)(a9)), (s32)((u32)(uintptr_t)(a10))));
 }
 
 // 0x80148558
