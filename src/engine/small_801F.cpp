@@ -69,12 +69,12 @@ void fn_801F5734(void* arg) {
 }
 
 // 0x801F57E0
-// Countdown: returns 1 while the timer is still at or above the constant. Otherwise subtracts dt and
-// returns 1 once it has reached the constant, 0 while it is still above it.
+// Countdown: returns 1 while the timer is below the constant. Otherwise subtracts dt and
+// returns 1 if the timer is still above the constant, 0 once it has reached it.
 s32 fn_801F57E0(f32 dt) {
-    if (lbl_805F9820 >= lbl_806000C0) return 1;
+    if (!(lbl_805F9820 >= lbl_806000C0)) return 1;
     lbl_805F9820 = lbl_805F9820 - dt;
-    return lbl_805F9820 >= lbl_806000C0;
+    return !(lbl_805F9820 <= lbl_806000C0);
 }
 
 // 0x801F59B0

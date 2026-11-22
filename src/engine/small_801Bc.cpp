@@ -96,7 +96,7 @@ u32 WasEntityDrawnLastFrame(void* a0) {
 // and stores value in the posted event (+0x4) and in the sub-object (+0x28).
 void fn_801B6EC8(void* self, s32 value) {
     u8* s = (u8*)self;
-    if ((*(u32*)(*(u8**)(s + 0x4) + 0x20) & 0x4) == 0) {
+    if ((*(u32*)(*(u8**)(s + 0x4) + 0x20) & 0x04000000u) == 0) {
         u8* ev = (u8*)EventPost(0x62, self);
         if (ev != NULL) *(s32*)(ev + 0x4) = value;
     }

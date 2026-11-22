@@ -131,7 +131,7 @@ extern "C" void fn_801B38BC(u8* p) {
     while (cur) {
         u8* next = *(u8**)(cur - 4);
         next = next ? next + 8 : NULL;
-        fn_801EBA20(*(u8**)(p + 0x60), 0);  // r4 left over in the original
+        fn_801EBA20(*(u8**)(p + 0x60), cur);
         cur = next;
     }
 }
@@ -169,7 +169,7 @@ extern "C" void fn_801B40E4(u8* p) {
     }
     u8* next = *(u8**)(node - 0x4);
     next = next ? next + 8 : NULL;
-    fn_801EBA20(*(u8**)(p + 0x8), 0);  // r4 left over in the original
+    fn_801EBA20(*(u8**)(p + 0x8), node);
     *(u8**)(p + 0x4) = next;
     if (!next) *(u8*)(p + 0x0) = 0;
 }

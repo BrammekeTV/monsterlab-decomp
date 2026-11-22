@@ -150,7 +150,7 @@ void CameraEndFrame(void* /*camera*/) {
 // Returns the float at p+4 plus a random offset in [-r, r) (r = first float argument).
 f32 fn_801D08DC(u8* p, f32 r) {
     u32 u = RandomU32();
-    f32 t = (f32)((f64)u * (f64)lbl_805FFE40);
+    f32 t = lbl_805FFE40 * (f32)u;  // asm rounds u to single before the multiply
     return ((-r) + (2.0f * r) * t) + *(f32*)(p + 0x4);
 }
 
@@ -174,8 +174,8 @@ u8* fn_801D9508(u8* p, s32 del) {
 // 0x801D99BC
 // Sets the 3-float vector at +0x20 of the attached object from v, only when the attached object
 // exists and the flag at +0x50 is set. Calls the base helper 0x801D9164 first.
-void fn_801D99BC(u8* p, f32* v) {
-    fn_801D9164(p, (u8*)v, NULL, NULL);  // asm forwards leftover r5/r6; unknown
+void fn_801D99BC(u8* p, f32* v, u8* a5, u8* a6) {
+    fn_801D9164(p, (u8*)v, a5, a6);  // asm forwards its own r5/r6 unchanged
     u8* target = *(u8**)(p + 0x48);
     if (target && *(u8*)(p + 0x50)) {
         *(f32*)(target + 0x20) = v[0];
