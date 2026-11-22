@@ -45,7 +45,7 @@ void fn_8006C6C0(u8* self, u32 mode);                                    // 0x80
 void  fn_801C83AC(u8* mgr, u8* item);                        // 0x801C83AC (small_800D.cpp)
 void  fn_801C849C(u8* mgr, u8* item);                        // 0x801C849C
 void  fn_800690D4(u8* p, s32 a, void* params, s32 b);        // 0x800690D4 (base ctor)
-void  fn_80069180(u8* p, s32 a1, s32 a2);                                    // 0x80069180
+s32   fn_80069180(u8* p, s32 a1, s32 a2);                                    // 0x80069180
 void  fn_80069638(u8* p, s32 a1);                            // 0x80069638
 void  fn_801BB478(u8* p, s32 a1);                            // 0x801BB478
 void  fn_800696C4(u8* p, s32 a1);                            // 0x800696C4

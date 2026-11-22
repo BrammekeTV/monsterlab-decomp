@@ -99,6 +99,11 @@
  "changelog": [
   {
    "date": "2026-11-22",
+   "time": "16:21",
+   "text": "Decompile 33 more functions (round 93): fn_800294BC, fn_8006D83C, fn_80094E08, fn_8015B82C, fn_80176B98, fn_80181DE0 and more"
+  },
+  {
+   "date": "2026-11-22",
    "time": "16:14",
    "text": "Decompile 30 more functions (round 92): fn_8002B098, fn_8008FB64, fn_800B6E48, fn_800DFC44, fn_801A3A28, fn_801D964C and more"
   },

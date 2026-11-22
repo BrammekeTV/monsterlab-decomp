@@ -1210,7 +1210,7 @@ void fn_80068B50(u8* p, s32 notify) {
 // 0x80069180
 // Resets the object's runtime fields from its def (+0x9C), applies the def's flags/opacity,
 // fires the def's and the object's trigger actions, then runs fn_80062DC4(p, 0, a2).
-void fn_80069180(u8* p, s32 unused, s32 a2) {
+s32 fn_80069180(u8* p, s32 unused, s32 a2) {
     u8* def = *(u8**)(p + 0x9c);
     *(s32*)(p + 0x198) = 0;
     *(f32*)(p + 0x168) = 0.0f;
@@ -1250,6 +1250,7 @@ void fn_80069180(u8* p, s32 unused, s32 a2) {
         lbl_805FB1E0[1] = 0;
     }
     fn_80062DC4(p, 0, a2);
+    return 1; // asm returns r3 as left by the call chain (ends in fn_801B5BD8, which returns 1)
 }
 
 // 0x800696C4

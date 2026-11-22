@@ -5,6 +5,13 @@
 
 #include "types.h"
 
+extern "C" void fn_800535F8(u8*, s32);
+
+// 0x8005DB64
+extern "C" void fn_8005DB64(u8* a3, s32 a4) {
+    fn_800535F8(((u8*)(uintptr_t)(a3)), (s32)((u32)(uintptr_t)(a4)));
+}
+
 // 0x8005E120
 extern "C" u8* fn_8005E120(u8* a3) {
     u8* t0 = ((u8*)(uintptr_t)(a3)) + 24;
