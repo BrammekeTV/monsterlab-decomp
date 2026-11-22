@@ -99,6 +99,11 @@
  "changelog": [
   {
    "date": "2026-11-22",
+   "time": "13:17",
+   "text": "Round 86: 30 small-to-medium functions (fn_80023C18, fn_8004CB1C, fn_80076050, fn_8009D710, fn_800AA68C, fn_8010C608, fn_801F903C and more), Haiku-only; tools/undone.py --smallest"
+  },
+  {
+   "date": "2026-11-22",
    "time": "12:25",
    "text": "Round 85: 30 medium functions (fn_8002B58C, fn_800584D0, fn_8008853C, fn_8008AC08, fn_800AAAF8, fn_800E59C0, fn_801AE608 jump table and more), Sonnet helpers"
   },

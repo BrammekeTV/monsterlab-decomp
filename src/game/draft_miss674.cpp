@@ -70,7 +70,7 @@ void fn_800CDC44(s32* p);                                                       
 void* fn_800CF71C(void);                                                                    // 0x800CF71C
 void fn_800CF7E8(u8* p);                                                                    // 0x800CF7E8
 void fn_800CFDCC(u8* p, f32 x);                                                             // 0x800CFDCC
-s32 fn_800D01C0(void);                                                                      // 0x800D01C0
+u8* fn_800D01C0(void);                                                                      // 0x800D01C0
 u8* fn_8010C608(u8* path, s32 index);                                                       // 0x8010C608
 s32 fn_801449A4(f32* mat, f32* out);                                                        // 0x801449A4
 void fn_801458B0(f32* quat, f32* a, f32* b);                                                // 0x801458B0
