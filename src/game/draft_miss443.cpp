@@ -37,7 +37,7 @@ s32   fn_800B964C(u8* obj);                                       // 0x800B964C
 void  fn_800B999C(u8* obj, s32 a, s32 b);                         // 0x800B999C
 void  fn_800B990C(u8* obj, f32 a);                                // 0x800B990C
 f32   fn_800B68B8(u8* p);                                         // 0x800B68B8
-s32   fn_800B4070(u8* p, s32* out);                               // 0x800B4070
+s32   fn_800B4070(u8* p, s32* out, f32 t);                               // 0x800B4070
 f64   fn_8033ED6C(f64 x);                                         // 0x8033ED6C (MSL floor)
 void  GameFlowSignal(s32 id, s32 arg1, s32 arg2);                 // 0x8000C7F4
 void  StickRead(s32 channel, f32* x, f32* y);                     // 0x80147704
@@ -547,7 +547,7 @@ void fn_800B387C(u8* arg0, s32 arg1) {
     if (fn_800B9A78(*(u8**)(rec + 0xa8)) != 0 || fn_800B964C(*(u8**)(rec + 0xa8)) == 1) {
         s32 sp8 = 0;
         fn_800B68B8(*(u8**)(arg0 + 0x94));
-        s32 have = fn_800B4070(arg0, &sp8);
+        s32 have = fn_800B4070(arg0, &sp8, 0.0f /* f1 left over in the original */);
         if (have != 0) sp8 += half;
         s32 freeCount = 0;
         for (s32 i = 0; i < slots; i++) {

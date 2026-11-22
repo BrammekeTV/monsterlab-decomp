@@ -27,5 +27,7 @@ extern "C" void fn_8007D2BC(u8* a3, f32 f1) {
 }
 
 // 0x8007D2C4
-extern "C" void fn_8007D2C4(void) {
+extern "C" s32 fn_8007D2C4(s32 a3) {
+    // empty in the original: r3 is untouched, the callers get their first argument back
+    return a3;
 }

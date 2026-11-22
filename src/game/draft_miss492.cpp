@@ -25,7 +25,7 @@ void fn_80077AEC(u8* p);                                  // 0x80077AEC
 void fn_8007617C(u8* p);                                  // 0x8007617C
 void fn_800A7D88(void* obj, u32 hash);                    // 0x800A7D88
 void fn_800AC5EC(u8* p);                                  // 0x800AC5EC
-f32 fn_800C3E84(void);                                    // 0x800C3E84
+f32 fn_800C3E84(u8* a);                                    // 0x800C3E84
 BOOL fn_801B50B0(void* unused, u8* obj);                  // 0x801B50B0
 s32 fn_801B5338(u8* obj, u8* target, u32 hash, f32* vec, u8 flag);  // 0x801B5338
 void fn_801F5E50(u8* out, f32 dz);                        // 0x801F5E50
@@ -222,7 +222,7 @@ void fn_800C53B0(u8* arg0, f32 farg0) {
     f32 t;
     f32 r;
 
-    m = fn_800C3E84();
+    m = fn_800C3E84(arg0);
     c = lbl_805FE3E0;
     t = *(f32*)(arg0 + 0xD8) + farg0;
     if (m > c) {
