@@ -102,8 +102,8 @@ void TextureRelease(void* tex) {
     if (block) fn_80169704(block, p);
     fn_8015AAE8(p + 4);
     *(s32*)p = 0;
-    // Virtual call: slot 1 of the global object's vtable, passing p as the first argument.
-    (*(void (**)(void*, void*))(*(u8**)lbl_805FB608 + 0x4))(p, lbl_805FB608);
+    // The free function at +4 of the heap object, called as (p, heap).
+    (*(void (**)(void*, void*))(lbl_805FB608 + 0x4))(p, lbl_805FB608);
 }
 
 // 0x8018409C

@@ -151,12 +151,15 @@ const char* PortSoftSdk(u32 addr) {
         {0x80263F18, "audio: sequencer defaults (fn_80263F18)"},
         {0x80259418, "audio: AX mode setter (fn_80259418)"},
         {0x80260AC4, "audio: mixer sound mode setter (fn_80260AC4)"},
-        {0x80259B2C, "audio: AX frame callback registration (fn_80259B2C)"},
         {0x8025D2E0, "audio: AXFX effect init (fn_8025D2E0)"},
         {0x8025E3E4, "audio: AXFX effect init (fn_8025E3E4)"},
         {0x8025B4C0, "audio: AXFX effect init (fn_8025B4C0)"},
         {0x80264CC8, "audio: sequencer float setter (fn_80264CC8)"},
         {0x80264CD0, "audio: sequencer float setter (fn_80264CD0)"},
+        {0x80263FAC, "audio: sequencer frame, no mixer yet (fn_80263FAC)"},
+        {0x802623A8, "audio: mixer frame, no mixer yet (fn_802623A8)"},
+        {0x8025B398, "audio: AX getter, no mixer yet (fn_8025B398)"},
+        {0x8025B390, "audio: AX getter, no mixer yet (fn_8025B390)"},
         // OSSetPeriodicAlarm: its only caller so far is the audio tick (fn_80202CAC), which needs AX.
         {0x80234394, "OSSetPeriodicAlarm for the audio tick (fn_80234394): not started"},
         // The SDK's HOME-button menu library (HBM), used by HomeButtonInit and the game's
@@ -182,6 +185,10 @@ const char* PortSoftSdk(u32 addr) {
         // Registers a function and calls it with two words (from fn_80204478, argument fn_802B7DDC,
         // SDK code). What library this starts is not known yet.
         {0x802B4140, "library start through fn_802B4140 (fn_802B7DDC): not started"},
+        // Bink (RAD Video Tools) is not ported yet: the open fails (returns NULL), so MoviePlay
+        // gives up after its retries and the movie is skipped.
+        {0x802B47A0, "Bink: sound track selection (fn_802B47A0)"},
+        {0x802B4B30, "Bink: open (fn_802B4B30): no movie yet, it is skipped"},
     };
     for (const auto& e : kSoft) if (e.addr == addr) return e.what;
     return NULL;
