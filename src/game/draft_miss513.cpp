@@ -9,7 +9,7 @@ void*  ChoiceDestroy(void* c, s32 del);                               // 0x8020F
 s32    RaySceneTest(void* ray);                                       // 0x80070458
 void   __destroy_arr(void* arr, void (*dtor)(void*, s32), u32 size, u32 count);
 void   fn_80021F2C(u8* p, f32 v);                                     // 0x80021F2C
-void   fn_8002DC04(u8* p, f32 v);                                     // 0x8002DC04 (r3, f1 forwarded unchanged)
+void   fn_8002DC04(u8* p);                                     // 0x8002DC04 (r3, f1 forwarded unchanged)
 void   fn_8002C080(u8* p, u8* a, u8* b);                              // 0x8002C080
 u8*    fn_8002C614(u8* p);                                            // 0x8002C614
 void   fn_8008C41C(u8* p, s32 r4Leftover, s32 a, s32 b, f32 fa, f32 fb); // 0x8008C41C
@@ -88,7 +88,7 @@ u8* fn_800ABD80(u8* arg0) {
 void fn_8002CEC0(u8* arg0, f32 farg0) {
     f32 t;
 
-    fn_8002DC04(arg0, farg0);
+    fn_8002DC04(arg0);
     t = *(f32*)(arg0 + 0xEC) - farg0;
     *(f32*)(arg0 + 0xEC) = t;
     if (!(t > lbl_805FCBB0)) {

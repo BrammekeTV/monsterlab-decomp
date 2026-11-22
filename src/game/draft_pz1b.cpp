@@ -10,7 +10,7 @@ void   fn_8018D370(const char* fmt, ...);                      // 0x8018D370 (de
 u8*    fn_801EB7A4(void* p, s32 a4, s32 a5, s32 a6, s32 a7);  // 0x801EB7A4
 void*  fn_801EB94C(void* p);                                   // 0x801EB94C
 void   fn_801EBDF0(u8* list, u8* node);                        // 0x801EBDF0
-s32 fn_801EE46C(u8* arg0);                    // 0x801EE46C
+s32 fn_801EE46C(u8* arg0, const char* name);                    // 0x801EE46C
 void fn_801EE4B8(u8* arg0);                      // 0x801EE4B8
 s32    fn_801EE504(u8* handle);                                // 0x801EE504
 s32    fn_801EE4FC(u8* handle);                                // 0x801EE4FC
@@ -168,7 +168,7 @@ u8* fn_801D8D80(char* name, char* fallbackName) {
 
     strcpy(path, name);
     strcat(path, ".texture.wii");
-    if (fn_801EE46C(handle) == 0) {
+    if (fn_801EE46C(handle, path) == 0) {
         return NULL;
     }
     size = fn_801EE504(handle);

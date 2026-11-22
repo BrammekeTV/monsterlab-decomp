@@ -25,7 +25,7 @@ s32 StringHashValid(u32 a3) {
 // 0x80074984
 void LoadExperimentUI(s32 a3) {
     u32 t0 = (u32)(0xf6120000) - 2250u;
-    UIEngine_LoadUIScreenSet((s32)((u32)(uintptr_t)(a3)));
+    UIEngine_LoadUIScreenSet((s32)((u32)(uintptr_t)(a3)), (u32)((u32)(t0)));
 }
 
 // 0x80074CA0

@@ -62,7 +62,7 @@
   },
   {
    "title": "Boots to title screen",
-   "detail": "First visible frame on Windows. The game runs its main loop on PC, drawn by the Direct3D 11 renderer, and the front-end level loads from the player's own disc with its player object and a fully decompiled camera (update, follow, collision query and solver). The boot now stops on level data the loader doesn't convert yet. Next: that data, then the title screen itself.",
+   "detail": "First visible frame on Windows. The game runs its main loop on PC with a Direct3D 11 renderer. The front-end level loads from the player's own disc with its player object and camera, and the boot now reaches the loading of the title screen's UI screen set. Next: the rest of the UI data, then the title screen draws.",
    "status": "in_progress"
   },
   {
@@ -97,6 +97,21 @@
   }
  ],
  "changelog": [
+  {
+   "date": "2026-11-22",
+   "time": "11:17",
+   "text": "Round 79: 29 more functions (fn_800854D4-fn_800C509C, fn_800CDCC4, fn_80120E00, fn_80198014, fn_801A8E80 and more), Haiku-only"
+  },
+  {
+   "date": "2026-11-22",
+   "time": "11:05",
+   "text": "The Windows boot reaches the title screen's UI (PRs #38 to #41): the world constructor is decompiled, which fixes a stop before the game's main function. The loader converts the screen-set database and what the renderer reads of scene items and meshes. The call that loads a UI screen set was declared with the wrong arguments in our code and is fixed. The boot now gets to loading the title screen's UI."
+  },
+  {
+   "date": "2026-11-22",
+   "time": "11:01",
+   "text": "Round 78: 45 more small and medium functions (0x100-0x1A0 bytes: fn_8009875C, fn_800AB468, fn_8019B4E8, fn_801A9CE0 and more), Haiku-only"
+  },
   {
    "date": "2026-11-22",
    "time": "10:48",

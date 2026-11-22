@@ -173,8 +173,8 @@ s32 fn_801EE334(u8* arg0, s32 arg1) {
 // 0x801EE46C
 // Resets the cursor state: calls fn_801EE394 and, if it returned 0, clears +0x4 and +0x8;
 // always clears +0x0 and +0xC. Returns the call's result.
-s32 fn_801EE46C(u8* arg0) {
-    s32 r = fn_801EE394(arg0, NULL /* leftover r4 */);
+s32 fn_801EE46C(u8* arg0, const char* name) {
+    s32 r = fn_801EE394(arg0, name);
     if (r == 0) {
         *(s32*)(arg0 + 0x4) = 0;
         *(s32*)(arg0 + 0x8) = 0;
