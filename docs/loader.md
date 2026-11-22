@@ -25,7 +25,7 @@ Code: `include/port/sir_loader.h`, `src/port/sir_loader.cpp`. Test: `tests/sir_l
 | `global_binary.sir` effect definitions (slots `0x82C`-`0x840`: 27 + 70 entries) and the two object pools of slots `0x10`, `0x418` | converted; fields typed from the effect and pool code |
 | `global_binary.sir` screen set database (header slot `0xDC0`) | the lookup table and each record's zone are converted: see "Screen set database" |
 | `global_binary.sir` font glyph data, sound objects named by action records | not converted: see "Not converted yet" |
-| Level files (`*_level.sir`): header block (the world state, 493 zone slots); in zone 0 the HUD and state machines, the first layer of every entity, scene objects, pool tables and their pools | the fields the level start reads are converted; the rest of an entity and of the zone images is not: see "Level files" |
+| Level files (`*_level.sir`, arenas, castle rooms): header block (the world state, 493 zone slots); in zone 0 the HUD and state machines, the first layer of every entity, scene objects, pool tables and their pools | the fields the level start reads are converted; the rest of an entity and of the zone images is not: see "Level files" |
 | Hook into the game's `SirLoad` | not wired (the port has no file layer yet) |
 
 Of the 1,096,124 bytes of the image, 33.1% now belongs to objects converted by a schema (the game
@@ -550,7 +550,19 @@ numbers), the table's third word, and the record's hash and last word.
 
 ## Level files
 
-`empty_level.sir` (the front end), `village_level.sir` and the five others have three sections:
+A level file has three sections: a header block and the images of zone 0 and zone 1. Besides the
+seven `*_level.sir` these are the six arenas, the 21 castle rooms and `trouble_scope_map.sir` (34
+files; the port tells them by their sections in the catalog). The rooms also have a packed copy
+(`*C.sir`), which is not handled yet.
+
+The game does not always read a section to its final place. The level the front-end script loads
+(`castle_sea.sir`) is read whole to a buffer, and each section is copied from there by a thread
+when the game asks for it (`fn_801E6FAC` mode 1, `fn_801E6F78`). The port converts such a section
+in the buffer, for the place it is copied to: the world block for the header, `gZoneBase[N]` for
+zone N. The zones are converted before the header is copied, so their roots are read from a
+private copy of the header.
+
+`empty_level.sir` (the first level loaded), `village_level.sir` and the five others have three sections:
 a header block (type -1, 0x47800 bytes) and one image per zone (type = zone number; these files
 carry zones 0 and 1). `fn_801294CC` reads the header block into the world state (`*gWorldState`),
 runs `fn_80129CC8` on it, reads zone 0 to `gZoneBase[0]`, and then `fn_8013006C` starts the level:
