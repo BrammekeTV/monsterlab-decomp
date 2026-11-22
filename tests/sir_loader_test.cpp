@@ -893,6 +893,12 @@ struct ZoneDump {
         printf(" acts %08x %08x cell %u %u grid ", *(const u32*)(w + 0xA8), *(const u32*)(w + 0xB0), w[0xB8], w[0xB9]); Ptr(w + 0xBC);
         printf(" mats "); Words(w + 0xC0, 24);
         printf(" links "); Ptr(w + 0x120); printf(" "); Ptr(w + 0x124); printf(" "); Ptr(w + 0x128); printf(" front "); Ptr(w + 0x130); printf("\n");
+        if (*(const u32*)(w + 0x60) == 2 && In(w, 0x1A0) && *(const u32*)(w + 0x13C) == 0) {              // a picture
+            const u8* e = *(const u8**)(w + 0x140);
+            printf("uigraphic "); Val(w); printf(" entry "); Ptr(w + 0x140); printf(" -> ");
+            if (In(e, 4)) Ptr(e); else printf("-");
+            printf(" tex "); Ptr(w + 0x144); printf(" size "); Words(w + 0x148, 2); printf(" uv "); Words(w + 0x180, 8); printf("\n");
+        }
         for (u32 k = 0; k < 3; k++) {
             for (const u8* n = *(const u8**)(w + 4 + k * 4); In(n, 0xC) && !Seen(uiEvents, n); n = *(const u8**)n) {
                 printf("uievent "); Val(n); printf(" next "); Ptr(n); printf(" id %08x word %08x\n", *(const u32*)(n + 4), *(const u32*)(n + 8));
@@ -1195,6 +1201,9 @@ static int DumpLevel(const char* path) {
     for (u32 k = 0; k < 6; k++) printf(" %08x", Bits(*(const f32*)(h + 0x1F8 + k * 4)));
     printf(" wa20 %d w1a7c %d floats %08x %08x\n", *(const s32*)(h + 0xA20), *(const s32*)(h + 0x1A7C), Bits(*(const f32*)(h + 0x1A84)),
            Bits(*(const f32*)(h + 0x1A88)));
+    printf("levelpicture %u %u floats", h[0x1A80], h[0x1A81]);
+    for (u32 k = 0; k < 39; k++) printf(" %08x", Bits(*(const f32*)(h + 0x1A84 + k * 4)));
+    printf("\n");
     for (u32 t : { 0x1B0u, 0x1BCu, 0x1C8u }) {
         printf("leveltable 0x%x ", t);
         PrintLevelEntries(h + t, &f);
@@ -1902,6 +1911,7 @@ static void BuildLevel(u8* hdr, u8* zone) {
     Put32(hdr + 0x1F4, L_ZONE + L_HUD);
     Put32(hdr + 0x1F8, 0x3E4CCCCD);
     Put32(hdr + 0x1A84, 0x3F800000);
+    hdr[0x1A80] = 1; Put32(hdr + 0x1A8C, 0x3F5C28F6); Put32(hdr + 0x1B1C, 0x40000000);   // picture settings: 0.86, and the last float
     for (u32 i = 0; i < 2; i++) {
         u8* s = hdr + L_SLOT0 + i * L_STRIDE;
         Put32(s + 0x00C, 0x42480000);                          // 50.0f
@@ -2113,7 +2123,8 @@ static void LevelSelfTest(void) {
     // A shared zone: the image starts with a copy of its zone slot, which names a screen set; the
     // set's table leads to a tree of two nodes, a widget and its one child.
     {
-        const u32 SH = 0x924C0000u, SH_SIZE = 0x560u;
+        const u32 SH = 0x924C0000u, SH_SIZE = 0x720u;
+        const u32 PIC = 0x560, TEXW = 0x700;                   // a picture (kind 2, sub-kind 0) and the word with its texture
         const u32 NAMED = 0x530, DRAW = 0x540;                 // the screen's named widgets; the set's draw list
         const u32 LIST = 0x4E0, ITEMS = 0x500;                 // the child's list (kind 3): one entry
         const u32 EVENT = 0x510;                               // the child's one action: a node of the list at +4
@@ -2141,6 +2152,12 @@ static void LevelSelfTest(void) {
         Put32(sh + NAMED, SH + CHILD);
         memset(sh + CHILD, 0, 0x138);
         Put32(sh + CHILD + 0x000, 7);
+        Put32(sh + CHILD + 0x124, SH + PIC);
+        memset(sh + PIC, 0, 0x1A0);
+        Put32(sh + PIC + 0x060, 2); Put32(sh + PIC + 0x128, SH + WIDGET);
+        Put32(sh + PIC + 0x140, SH + TEXW); Put32(sh + PIC + 0x148, 0x44200000); Put32(sh + PIC + 0x14C, 0x43F00000);
+        Put32(sh + PIC + 0x150, 0x3F800000); Put32(sh + PIC + 0x188, 0x3F800000); Put32(sh + PIC + 0x19C, 0x3F800000);
+        Put32(sh + TEXW, SH + NAMED);
         Put32(sh + CHILD + 0x004, SH + EVENT);
         Put32(sh + EVENT + 0, 0); Put32(sh + EVENT + 4, 0x705598E1); Put32(sh + EVENT + 8, 0x17140061);
         Put32(sh + CHILD + 0x020, 0x44200000); Put32(sh + CHILD + 0x054, 0x00020003); Put32(sh + CHILD + 0x064, 0x0002002B);
@@ -2175,7 +2192,14 @@ static void LevelSelfTest(void) {
         CHECK(*(const u32*)root == 0x80000000 && *(const u8**)(root + 4) == sh + WIDGET && *(const u8**)(root + 0xC) == sh + NODE_B);
         CHECK(*(const u8**)(root + 0x10) == NULL && root[8] == 0x7F && *(const u32*)(sh + NODE_B) == 0x10);
         const u8* child = *(const u8**)(sh + WIDGET + 0x120);
-        CHECK(child == sh + CHILD && *(const u32*)child == 7 && *(const u8**)(child + 0x124) == NULL);
+        CHECK(child == sh + CHILD && *(const u32*)child == 7 && *(const u8**)(child + 0x124) == sh + PIC);
+        // The picture, as fn_801A0D04 / fn_801A1208 read its texture and fn_801A1238 its corners;
+        // +0x150 has no reader and stays as it is.
+        const u8* pic = sh + PIC;
+        CHECK(*(const u32*)(pic + 0x60) == 2 && *(const u32*)(pic + 0x13C) == 0 && *(const u8**)(pic + 0x124) == NULL);
+        CHECK(*(const u8**)(pic + 0x140) == sh + TEXW && **(const u8***)(pic + 0x140) == sh + NAMED && *(const u8**)(pic + 0x144) == NULL);
+        CHECK(*(const f32*)(pic + 0x148) == 640.0f && *(const f32*)(pic + 0x14C) == 480.0f && pic[0x150] == 0x3F && pic[0x153] == 0x00);
+        CHECK(*(const f32*)(pic + 0x180) == 0.0f && *(const f32*)(pic + 0x188) == 1.0f && *(const f32*)(pic + 0x19C) == 1.0f);
         // The part every widget has: fn_8019B4E8 copies the start values, fn_8019C348 reads scale and
         // parent, fn_8019BD18 walks the event lists; +0xAC has no reader and stays as it is.
         CHECK(*(const u32*)(sh + WIDGET) == 0x11223344 && *(const f32*)(sh + WIDGET + 0x148) > 0.0166f && *(const f32*)(sh + WIDGET + 0x148) < 0.0168f);
@@ -2217,6 +2241,8 @@ static void LevelSelfTest(void) {
     u8* slots = *(u8**)(hdr + 0x1A4);
     CHECK(slots == hdr + L_SLOT0 && *(s32*)(hdr + 0x1A8) == 2 && *(u8**)(hdr + 0x1D4) == hdr + L_T1D4);
     CHECK(*(u8**)(hdr + 0x1F4) == zone + L_HUD && *(f32*)(hdr + 0x1F8) == 0.2f && *(f32*)(hdr + 0x1A84) == 1.0f);
+    // The picture settings, as fn_8012A79C copies them: two bytes and 39 floats.
+    CHECK(hdr[0x1A80] == 1 && *(f32*)(hdr + 0x1A8C) == 0.86f && *(f32*)(hdr + 0x1B1C) == 2.0f);
     CHECK(*(u32*)(hdr + 0x1E8) == 0xBA4E36A9 && hdr[0x1EC] == 1);
     u8* s0 = slots;
     u8* s1 = slots + L_STRIDE;

@@ -622,7 +622,8 @@ def level_dump(path):
             ptr(u(0x38)), i32(0x3C), i32(0x7C), ptr(u(0x80)), hdr[0x84], i32(0x88), ptr(u(0x8C)), hdr[0x90]),
          'leveltables %s | %s | %s | %s | %s' % tuple(tab(o) for o in (0x1A4, 0x1B0, 0x1BC, 0x1C8, 0x1D4)),
          'levelstate %s b1ec %d w1f0 %d hud %s floats %s wa20 %d w1a7c %d floats %s' % (
-            ws(0x1E0, 3), hdr[0x1EC], i32(0x1F0), ptr(u(0x1F4)), ws(0x1F8, 6), i32(0xA20), i32(0x1A7C), ws(0x1A84, 2))]
+            ws(0x1E0, 3), hdr[0x1EC], i32(0x1F0), ptr(u(0x1F4)), ws(0x1F8, 6), i32(0xA20), i32(0x1A7C), ws(0x1A84, 2)),
+         'levelpicture %d %d floats %s' % (hdr[0x1A80], hdr[0x1A81], ws(0x1A84, 39))]
     for t in (0x1B0, 0x1BC, 0x1C8):
         L.append('leveltable 0x%x %s' % (t, entries(t)))
     for i in range(count):
@@ -711,6 +712,10 @@ def shared_zone_dump(L, zn, sec, slot_size, zone0, zbase0):
             ptr(w), u(o), ptr(u(o + 4)), ptr(u(o + 8)), ptr(u(o + 0xC)), ptr(u(o + 0x10)), ws(o + 0x14, 16), u(o + 0x54), u(o + 0x58),
             u(o + 0x5C), u(o + 0x60), u(o + 0x64), ws(o + 0x68, 16), u(o + 0xA8), u(o + 0xB0), sec[o + 0xB8], sec[o + 0xB9],
             ptr(u(o + 0xBC)), ws(o + 0xC0, 24), ptr(u(o + 0x120)), ptr(u(o + 0x124)), ptr(u(o + 0x128)), ptr(u(o + 0x130))))
+        if u(o + 0x60) == 2 and o + 0x1A0 <= len(sec) and u(o + 0x13C) == 0:      # a picture
+            e = u(o + 0x140)
+            L.append('uigraphic %s entry %s -> %s tex %s size %s uv %s' % (ptr(w), ptr(e), ptr(u(e - base)) if inz(e, 4) else '-',
+                     ptr(u(o + 0x144)), ws(o + 0x148, 2), ws(o + 0x180, 8)))
         for k in range(3):
             n = u(o + 4 + k * 4)
             while inz(n, 0xC) and n not in events:

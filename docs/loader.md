@@ -572,7 +572,8 @@ which gives the address. Pointers in it go into the block itself or into the zon
 | `0x1A4`, `0x1B0`, `0x1BC`, `0x1C8`, `0x1D4` | five tables `{pointer, capacity, used}`: the zone slots, three tables of one pointer per zone, one of 12-byte entries | `fn_80129CC8` |
 | `0x1E0`-`0x1F0` | words and a byte | `GameSessionUpdate`, `PlayFootStepEffect`, `fn_800D7FF0`, `WorldPostUpdate` |
 | `0x1F4` | the level's HUD, in zone 0 | `HudReload`, `fn_800D8100` |
-| `0x1F8`-`0x20C`, `0x1A84`, `0x1A88` | floats | `fn_8003E560`, `fn_8006C3FC`, `SetOptionsBrightness` |
+| `0x1F8`-`0x20C` | floats | `fn_8003E560`, `fn_8006C3FC` |
+| `0x1A80` | the level's picture settings (0xA0 bytes): two flag bytes, then 39 floats at `0x1A84`: brightness, contrast, gamma and the colour rows the colour tables are built from | `fn_8012A79C` copies them to `lbl_8040D500`, `fn_8015F4CC` builds the tables; `SetOptionsBrightness` |
 | `0xA20`, `0x1A7C` | words | `fn_8003E560`, `EntityUpdate` |
 | `0x21E0` | 493 zone slots | below |
 
@@ -828,17 +829,22 @@ converted:
 | | `+0xC0`, `+0xF0` two 3x4 matrices | `fn_8019C348` (the parent's `+0xC0`), `fn_8019DC58` |
 | | `+0x120` first child, `+0x124` next sibling, `+0x128` parent | `fn_8019BFF8`, `fn_8019C348` |
 | | `+0x130` a widget drawn before this one | `fn_801985BC` |
+| picture (kind 2, sub-kind 0) | `+0x140` pointer to the word that holds its texture, `+0x144` a texture set by a script (it wins) | `fn_801A0D04`, `fn_801A1208` |
+| | `+0x148` width and height | `fn_801A0DF0`, `fn_801A0DF8` |
+| | `+0x180` texture coordinates of the four corners | `fn_801A1238` |
 | event node | `+0x00` next, `+0x04` event, `+0x08` action word, animation hash or sound hash | `fn_8019BD18` |
 | activation grid | `+0x00` flags, `+0x04` a list of columns (each a list of pointers to widgets), `+0x0C`..`+0x18` current and previous cell | `fn_80199E80`, `fn_8019AA3C` |
 | child widget, and the widgets it names | `+0x60` kind (0-6); kinds 2 and 3: sub-kind at `+0x13C`; kind 3: a list at `+0x15C`; kind 4: a widget at `+0x1B4` and a list of widgets at `+0x1BC`; kind 5: a widget at `+0x190`; kind 6: its children | `fn_8019914C` installs the vtable for the kind at `+0x138` |
 | list | `+0x00` count, `+0x04` capacity, `+0x08` element size, `+0x10` the elements (pointers in the widget lists) | `fn_8019555C`, `fn_8019552C` |
 
 Zone 480 (the first one the boot loads) has 5 screens; the 23 images of `shared_ui.sir` have 326
-screens, 9,374 widgets, 6,218 event nodes, 6 activation grids and 191 lists.
+screens, 9,374 widgets (5,206 of them pictures), 6,218 event nodes, 6 activation grids and 191 lists.
 
 Not converted, because nothing that runs so far reads it: what the nodes of the three other
 tables point at (animations and two unknown kinds), what a widget of a given kind has behind
-`+0x138` (apart from the fields above), and of every widget the words at `+0xAC` and `+0xB4`
+`+0x138` (apart from the fields above; of a picture the corner colours at `+0x1A0`, the quad at
+`+0x1E0`, the matrix at `+0x240` and the tinted colour at `+0x270` are written by the game before
+it reads them), and of every widget the words at `+0xAC` and `+0xB4`
 (the constructor `fn_8019B2F4` sets them like the two action words), `+0x12C` and `+0x134`.
 Of the set: `+0x00` (its name hash) and the counts at `+0x14`, `+0x1C` and `+0x24`.
 
