@@ -3,7 +3,7 @@
  "counts": {
   "global": 3839,
   "unknown": 126,
-  "library": 203,
+  "library": 202,
   "game": 12
  },
  "game_bytes": 7280,
@@ -886,17 +886,6 @@
    "used_as": "_fn_80334458",
    "addr": "80334458",
    "size": 4,
-   "section": ".text",
-   "kind": "library",
-   "region": "MSL C/C++ runtime"
-  },
-  {
-   "name": "fn_8033B1C0",
-   "refs": 2,
-   "files": 2,
-   "used_as": "_fn_8033B1C0",
-   "addr": "8033B1C0",
-   "size": 168,
    "section": ".text",
    "kind": "library",
    "region": "MSL C/C++ runtime"
@@ -6256,8 +6245,8 @@
   "AI/AX/MEM": 59,
   "Network (DWC/SSL/NHTTP/NWC24)": 56,
   "GX": 22,
-  "MSL C/C++ runtime": 20,
   "NAND/SC/IPC": 20,
+  "MSL C/C++ runtime": 19,
   "OS": 13,
   "WPAD/KPAD/BT": 9,
   "zlib 1.2.3": 3,
