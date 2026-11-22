@@ -2141,7 +2141,9 @@ static const SirField kLevelHeaderFields[] = {
     { 0x1F8, SIR_F32, 6 },    // code: fn_8003E560, fn_8006C3FC
     { 0xA20, SIR_U32, 1 },    // code: fn_8003E560
     { 0x1A7C, SIR_U32, 1 },   // code: EntityUpdate, fn_8003E560
-    { 0x1A84, SIR_F32, 2 },   // code: SetOptionsBrightness, IncOptionsBrightness
+    // 0x1A80: the level's picture settings, 0xA0 bytes: two flag bytes, then 39 floats
+    { 0x1A84, SIR_F32, 39 },  // code: fn_8012A79C copies them all to lbl_8040D500 (fn_8015F4CC builds the
+                              //       colour tables from them); the first two also SetOptionsBrightness
 };
 
 // One zone slot. Words marked "word" are read with lwz by the function named; whether they hold

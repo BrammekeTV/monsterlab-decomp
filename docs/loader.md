@@ -572,7 +572,8 @@ which gives the address. Pointers in it go into the block itself or into the zon
 | `0x1A4`, `0x1B0`, `0x1BC`, `0x1C8`, `0x1D4` | five tables `{pointer, capacity, used}`: the zone slots, three tables of one pointer per zone, one of 12-byte entries | `fn_80129CC8` |
 | `0x1E0`-`0x1F0` | words and a byte | `GameSessionUpdate`, `PlayFootStepEffect`, `fn_800D7FF0`, `WorldPostUpdate` |
 | `0x1F4` | the level's HUD, in zone 0 | `HudReload`, `fn_800D8100` |
-| `0x1F8`-`0x20C`, `0x1A84`, `0x1A88` | floats | `fn_8003E560`, `fn_8006C3FC`, `SetOptionsBrightness` |
+| `0x1F8`-`0x20C` | floats | `fn_8003E560`, `fn_8006C3FC` |
+| `0x1A80` | the level's picture settings (0xA0 bytes): two flag bytes, then 39 floats at `0x1A84`: brightness, contrast, gamma and the colour rows the colour tables are built from | `fn_8012A79C` copies them to `lbl_8040D500`, `fn_8015F4CC` builds the tables; `SetOptionsBrightness` |
 | `0xA20`, `0x1A7C` | words | `fn_8003E560`, `EntityUpdate` |
 | `0x21E0` | 493 zone slots | below |
 

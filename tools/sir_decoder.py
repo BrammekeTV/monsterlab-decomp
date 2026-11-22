@@ -622,7 +622,8 @@ def level_dump(path):
             ptr(u(0x38)), i32(0x3C), i32(0x7C), ptr(u(0x80)), hdr[0x84], i32(0x88), ptr(u(0x8C)), hdr[0x90]),
          'leveltables %s | %s | %s | %s | %s' % tuple(tab(o) for o in (0x1A4, 0x1B0, 0x1BC, 0x1C8, 0x1D4)),
          'levelstate %s b1ec %d w1f0 %d hud %s floats %s wa20 %d w1a7c %d floats %s' % (
-            ws(0x1E0, 3), hdr[0x1EC], i32(0x1F0), ptr(u(0x1F4)), ws(0x1F8, 6), i32(0xA20), i32(0x1A7C), ws(0x1A84, 2))]
+            ws(0x1E0, 3), hdr[0x1EC], i32(0x1F0), ptr(u(0x1F4)), ws(0x1F8, 6), i32(0xA20), i32(0x1A7C), ws(0x1A84, 2)),
+         'levelpicture %d %d floats %s' % (hdr[0x1A80], hdr[0x1A81], ws(0x1A84, 39))]
     for t in (0x1B0, 0x1BC, 0x1C8):
         L.append('leveltable 0x%x %s' % (t, entries(t)))
     for i in range(count):

@@ -1201,6 +1201,9 @@ static int DumpLevel(const char* path) {
     for (u32 k = 0; k < 6; k++) printf(" %08x", Bits(*(const f32*)(h + 0x1F8 + k * 4)));
     printf(" wa20 %d w1a7c %d floats %08x %08x\n", *(const s32*)(h + 0xA20), *(const s32*)(h + 0x1A7C), Bits(*(const f32*)(h + 0x1A84)),
            Bits(*(const f32*)(h + 0x1A88)));
+    printf("levelpicture %u %u floats", h[0x1A80], h[0x1A81]);
+    for (u32 k = 0; k < 39; k++) printf(" %08x", Bits(*(const f32*)(h + 0x1A84 + k * 4)));
+    printf("\n");
     for (u32 t : { 0x1B0u, 0x1BCu, 0x1C8u }) {
         printf("leveltable 0x%x ", t);
         PrintLevelEntries(h + t, &f);
@@ -1908,6 +1911,7 @@ static void BuildLevel(u8* hdr, u8* zone) {
     Put32(hdr + 0x1F4, L_ZONE + L_HUD);
     Put32(hdr + 0x1F8, 0x3E4CCCCD);
     Put32(hdr + 0x1A84, 0x3F800000);
+    hdr[0x1A80] = 1; Put32(hdr + 0x1A8C, 0x3F5C28F6); Put32(hdr + 0x1B1C, 0x40000000);   // picture settings: 0.86, and the last float
     for (u32 i = 0; i < 2; i++) {
         u8* s = hdr + L_SLOT0 + i * L_STRIDE;
         Put32(s + 0x00C, 0x42480000);                          // 50.0f
@@ -2237,6 +2241,8 @@ static void LevelSelfTest(void) {
     u8* slots = *(u8**)(hdr + 0x1A4);
     CHECK(slots == hdr + L_SLOT0 && *(s32*)(hdr + 0x1A8) == 2 && *(u8**)(hdr + 0x1D4) == hdr + L_T1D4);
     CHECK(*(u8**)(hdr + 0x1F4) == zone + L_HUD && *(f32*)(hdr + 0x1F8) == 0.2f && *(f32*)(hdr + 0x1A84) == 1.0f);
+    // The picture settings, as fn_8012A79C copies them: two bytes and 39 floats.
+    CHECK(hdr[0x1A80] == 1 && *(f32*)(hdr + 0x1A8C) == 0.86f && *(f32*)(hdr + 0x1B1C) == 2.0f);
     CHECK(*(u32*)(hdr + 0x1E8) == 0xBA4E36A9 && hdr[0x1EC] == 1);
     u8* s0 = slots;
     u8* s1 = slots + L_STRIDE;
