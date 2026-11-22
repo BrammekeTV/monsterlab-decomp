@@ -99,6 +99,11 @@
  "changelog": [
   {
    "date": "2026-11-22",
+   "time": "16:14",
+   "text": "Decompile 30 more functions (round 92): fn_8002B098, fn_8008FB64, fn_800B6E48, fn_800DFC44, fn_801A3A28, fn_801D964C and more"
+  },
+  {
+   "date": "2026-11-22",
    "time": "15:59",
    "text": "The Windows build no longer stops during boot (PRs #46 and #47): the loader converts each UI widget's common part and the screen set's tables, and the port layer gets a case-insensitive string compare from the C library. In a test run the game ran 600 frames without hitting a missing piece. The screen is still black, so the next job is finding out why the first screen draws nothing."
   },

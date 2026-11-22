@@ -130,7 +130,7 @@ void  fn_801B3378(u8* p, u8* key);                                            //
 void* fn_801D40E0(s32 n);                                                     // 0x801D40E0
 void* fn_80209814(void* v);                                                   // 0x80209814
 void  fn_8020B1D4(void* h, s32 on);                                           // 0x8020B1D4
-void* fn_800B66F0(u8* p, s32 mode);                                           // 0x800B66F0
+s32 fn_800B66F0(u8* p, s32 mode);                                           // 0x800B66F0
 
 // Sets the three progress-bar fields of a UI widget to their start values.
 static void SetupProgressWidget(void* w) {
@@ -446,10 +446,10 @@ void fn_800B68C0(u8* arg0, s32 arg1, f32 farg0, f32 farg1) {
     if (v > lbl_805FE198 && v < lbl_805FE19C) r0 = 1;
     if (r0 != 0) *(f32*)(arg0 + 0x2A0) = lbl_805FE178;
 
-    void* r3 = fn_800B66F0(arg0, 0);
-    if (r3 == NULL && *(f32*)(arg0 + 0x2A0) != lbl_805FE178) {
+    s32 r3 = fn_800B66F0(arg0, 0);
+    if (r3 == 0 && *(f32*)(arg0 + 0x2A0) != lbl_805FE178) {
         f32 v2 = *(f32*)(arg0 + 0x2A0);
-        s32 idx = RaySceneTest(r3);
+        s32 idx = RaySceneTest(0);
         v2 = v2 - (farg1 * (v2 * lbl_803460A8[idx]));
         *(f32*)(arg0 + 0x2A0) = v2;
         s32 r0b = 0;

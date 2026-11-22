@@ -31,7 +31,7 @@ void  fn_800B4664(u8* p, f32 dt);                              // 0x800B4664
 void  fn_800B63F4(u8* p, f32 dt);                              // 0x800B63F4
 s32   fn_800B6848(u8* p);                                      // 0x800B6848
 s32   fn_800B6850(u8* p);                                      // 0x800B6850
-void* fn_800B66F0(u8* p, s32 mode);                            // 0x800B66F0
+s32 fn_800B66F0(u8* p, s32 mode);                            // 0x800B66F0
 f32   fn_800B7198(u8* p);                                      // 0x800B7198
 f32   fn_800B71A0(u8* p);                                      // 0x800B71A0
 f32   fn_800B71A8(u8* p);                                      // 0x800B71A8
@@ -425,15 +425,15 @@ void fn_800B5478(u8* arg0, f32 dt) {
             w = *(u8**)(arg0 + 0xA40); WSLOT(w, 0x2C)(w, 2);
         }
     } else {
-        if (fn_800B66F0(*(u8**)(arg0 + 0x94), 0) == NULL) {
+        if (fn_800B66F0(*(u8**)(arg0 + 0x94), 0) == 0) {
             SysSprintf((char*)(arg0 + 0x894), (const char*)(lbl_8035E138 + 0x10C));
             w = *(u8**)(arg0 + 0xA3C); WSLOT(w, 0x2C)(w, 2);
             w = *(u8**)(arg0 + 0xA38); WSLOT(w, 0x2C)(w, 2);
         } else {
             s32 sel = 0;
-            if ((uintptr_t)fn_800B66F0(*(u8**)(arg0 + 0x94), 0) == 2) {
+            if (fn_800B66F0(*(u8**)(arg0 + 0x94), 0) == 2) {
                 sel = 1;
-            } else if ((uintptr_t)fn_800B66F0(*(u8**)(arg0 + 0x94), 0) == 1) {
+            } else if (fn_800B66F0(*(u8**)(arg0 + 0x94), 0) == 1) {
                 sel = 0;
             }
             if (sel == 0) {

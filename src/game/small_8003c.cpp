@@ -220,7 +220,7 @@ void fn_8003C790(u8* p) {
 // 0x8003CA78
 // Hides the UI elements referenced from +0x8 and +0xC, shows the one from +0x10, and sets the timer
 // at +0x4 to lbl_805FD070 with state 4 at +0x1C.
-void fn_8003CA78(u8* p) {
+extern "C" void fn_8003CA78(u8* p) {
     u8* a = *(u8**)(p + 0x8);
     UIElement_SetVisibleFlag(*(u32*)a, 0);
     u8* b = *(u8**)(p + 0xC);
