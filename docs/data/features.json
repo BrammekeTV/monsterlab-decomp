@@ -99,6 +99,11 @@
  "changelog": [
   {
    "date": "2026-11-22",
+   "time": "13:28",
+   "text": "Round 87: 34 small functions (fn_80027A68, fn_8002D6E4, fn_8009677C, fn_800B59E8, fn_800CDEA0, fn_8011AC34, fn_801A8318, fn_801D56A4 and more), Haiku-only"
+  },
+  {
+   "date": "2026-11-22",
    "time": "13:17",
    "text": "Round 86: 30 small-to-medium functions (fn_80023C18, fn_8004CB1C, fn_80076050, fn_8009D710, fn_800AA68C, fn_8010C608, fn_801F903C and more), Haiku-only; tools/undone.py --smallest"
   },
