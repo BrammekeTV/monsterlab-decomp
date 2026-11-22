@@ -42,7 +42,7 @@ void*  fn_80209814(void* v);                                     // 0x80209814
 void   fn_8020F46C(u8* p, u8* choice);                           // 0x8020F46C
 void   fn_8004DDEC(u8* p);                                  // draft_miss511 defines it as void
 s32    fn_80040550(void);
-void   fn_8004012C(void);
+void   fn_8004012C(s32 flags);
 u8     fn_80046F54(void);                                        // 0x80046F54 (leaf, returns u8)
 void   fn_80046F30(u8* out);
 u8     fn_80049364(void);                                        // 0x80049364 (leaf, returns u8)
@@ -294,7 +294,7 @@ void fn_800403E4(u8* p) {
         return;
     }
     fn_80040550(); /* r3 (p) is unused by the callee */
-    fn_8004012C();
+    fn_8004012C(0); // asm passes fn_80040550's leftover r3 (stale register)
     if (fn_8018DEE0((u8*)gScreenSets) == 0) {
         ScreenSetsActivate(gScreenSets, 0x7A1060A7);
     }

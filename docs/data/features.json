@@ -99,6 +99,11 @@
  "changelog": [
   {
    "date": "2026-11-22",
+   "time": "15:53",
+   "text": "Decompile 7 more functions (round 90): fn_80007814, fn_8002CBFC, fn_800375F0, fn_8004012C, fn_80074DFC, fn_800C924C, fn_800CBD4C"
+  },
+  {
+   "date": "2026-11-22",
    "time": "13:57",
    "text": "Round 89: 19 small functions (fn_80029D08, fn_8002FA68, fn_8007D620, fn_800AC390, fn_800E3040, fn_801AD47C, fn_802086B8 and more), Haiku-only"
   },

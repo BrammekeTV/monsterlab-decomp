@@ -1,15 +1,15 @@
 {
  "game_id": "RM7P4F",
- "generated": "2026-11-22T12:57:54+00:00",
- "commit": "b6f4347",
- "commit_date": "2026-11-22T13:41:37+01:00",
+ "generated": "2026-11-22T14:53:48+00:00",
+ "commit": "1ad0648",
+ "commit_date": "2026-11-22T13:57:55+01:00",
  "game": {
   "functions": 8548,
   "bytes": 2265988,
   "named": 2748,
   "named_bytes": 616800,
-  "decompiled": 8371,
-  "decompiled_bytes": 2123932
+  "decompiled": 8378,
+  "decompiled_bytes": 2128532
  },
  "library": {
   "functions": 4039,
@@ -24,8 +24,8 @@
   "bytes": 3404928,
   "named": 3211,
   "named_bytes": 721548,
-  "decompiled": 8372,
-  "decompiled_bytes": 2124052
+  "decompiled": 8379,
+  "decompiled_bytes": 2128652
  },
  "game_range": [
   "80006B40",
@@ -33,7 +33,7 @@
  ],
  "memory_map": [
   [
-   0.944,
+   1.0,
    0.696
   ],
   [
@@ -101,7 +101,7 @@
    0.0
   ],
   [
-   0.835,
+   0.916,
    0.049
   ],
   [
@@ -121,7 +121,7 @@
    0.0
   ],
   [
-   0.887,
+   0.951,
    0.0
   ],
   [
@@ -137,7 +137,7 @@
    0.006
   ],
   [
-   0.918,
+   1.0,
    0.019
   ],
   [
@@ -233,7 +233,7 @@
    0.725
   ],
   [
-   0.903,
+   1.0,
    0.312
   ],
   [
@@ -389,7 +389,7 @@
    0.051
   ],
   [
-   0.853,
+   0.922,
    0.0
   ],
   [
@@ -397,7 +397,7 @@
    0.0
   ],
   [
-   0.91,
+   1.0,
    0.072
   ],
   [
@@ -24039,6 +24039,56 @@
      "name": "fn_8020F6A4",
      "addr": "8020F6A4",
      "size": 572
+    }
+   ]
+  },
+  {
+   "path": "src/game/draft_miss721.cpp",
+   "functions": [
+    {
+     "name": "fn_80007814",
+     "addr": "80007814",
+     "size": 632
+    },
+    {
+     "name": "fn_8002CBFC",
+     "addr": "8002CBFC",
+     "size": 708
+    },
+    {
+     "name": "fn_800375F0",
+     "addr": "800375F0",
+     "size": 608
+    },
+    {
+     "name": "fn_8004012C",
+     "addr": "8004012C",
+     "size": 696
+    }
+   ]
+  },
+  {
+   "path": "src/game/draft_miss722.cpp",
+   "functions": [
+    {
+     "name": "fn_80074DFC",
+     "addr": "80074DFC",
+     "size": 708
+    }
+   ]
+  },
+  {
+   "path": "src/game/draft_miss723.cpp",
+   "functions": [
+    {
+     "name": "fn_800C924C",
+     "addr": "800C924C",
+     "size": 612
+    },
+    {
+     "name": "fn_800CBD4C",
+     "addr": "800CBD4C",
+     "size": 636
     }
    ]
   },
