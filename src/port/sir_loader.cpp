@@ -1579,8 +1579,28 @@ static const SirField kCountPtrFields[] = {
 // +0x6C the number of parts, +0x70 the parts {material, batch}; of a batch the flags at +0x0C.
 static SirError SkeletonPlan(ImagePlan* plan, const u8* image, u32 imageSize, u32 addr);
 
+// A mesh part's batch, as fn_801873C0 draws it (the pass where its second argument is zero):
+//   +0x04 and +0x08 words it adds to the draw statistics (lbl_804129E8), +0x0C flags (bits 5 and 6
+//   pick a bounding-volume shape), +0x18 the offset of the display list from the batch, +0x24 its
+//   size; the batch then hands the display list to the GX FIFO (command 0x40: its address and size).
+// The display list and the vertex arrays behind it stay in GX layout. Not converted: +0x00, +0x10,
+// +0x14, +0x20 (no reader on this path) and the skinned pass, where +0x1C is a count and +0x28 the
+// list of bone influences that fn_801870AC reads (it is not used by the meshes of the level files'
+// static props).
+#define BATCH_USED 0x28
+static SirError BatchPlan(ImagePlan* plan, const u8* image, u32 imageSize, u32 addr) {
+    u32 b, d;
+    if (!LevelSpan(addr, BATCH_USED, imageSize, &b) || PlanHas(plan, b + 0x0C, REGION_U32_ARRAY)) return SIR_OK;
+    const u8* batch = image + b;
+    // The display list lies inside the zone.
+    if (Be32(batch + 0x18) > imageSize || !ImageSpan(addr + Be32(batch + 0x18), Be32(batch + 0x24), imageSize, &d)) return SIR_ERR_ENTITY;
+    if (!PlanAdd(plan, b + 0x04, 0x0C, REGION_U32_ARRAY) || !PlanAdd(plan, b + 0x18, 4, REGION_U32_ARRAY) ||
+        !PlanAdd(plan, b + 0x24, 4, REGION_U32_ARRAY)) return SIR_ERR_ENTITY;
+    return SIR_OK;
+}
+
 static SirError SceneItemDrawPlan(ImagePlan* plan, const u8* image, u32 imageSize, u32 item) {
-    u32 x, m, b;
+    u32 x, m;
     if (PlanHas(plan, item + 0x10, REGION_PTR_ARRAY)) return SIR_OK;
     if (!PlanAdd(plan, item + 0x04, 4, REGION_PTR_ARRAY) || !PlanAdd(plan, item + 0x08, 4, REGION_U32_ARRAY) ||
         !PlanAdd(plan, item + 0x10, 4, REGION_PTR_ARRAY) || !PlanAdd(plan, item + 0x14, 0x1C, REGION_U32_ARRAY) ||
@@ -1600,7 +1620,7 @@ static SirError SceneItemDrawPlan(ImagePlan* plan, const u8* image, u32 imageSiz
     for (u32 i = 0; i < parts; i++) {
         SirError e = MaterialPlan(plan, image, imageSize, Be32(image + m + 0x70 + i * 8));
         if (e != SIR_OK) return e;
-        if (LevelSpan(Be32(image + m + 0x74 + i * 8), 0x10, imageSize, &b) && !PlanAdd(plan, b + 0x0C, 4, REGION_U32_ARRAY)) return SIR_ERR_ENTITY;
+        if ((e = BatchPlan(plan, image, imageSize, Be32(image + m + 0x74 + i * 8))) != SIR_OK) return e;
     }
     return SIR_OK;
 }

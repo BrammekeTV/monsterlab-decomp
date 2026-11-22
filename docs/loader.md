@@ -841,6 +841,16 @@ words, so both walks add them and the plan drops the duplicates.
 Not converted: `+0x10`, `+0x14`, `+0x18` of a type 0 material, `+0x48` of its record and its bytes
 `+0x06`, `+0x07` (no reader); type 1 records and the extra pointers of a type 1 material.
 
+### Batches of mesh parts
+
+`fn_801873C0` draws a part's batch (the pass whose second argument is zero): it adds the words at
+`+0x04` and `+0x08` to the draw statistics, picks a bounding-volume shape from bits 5 and 6 of the
+flags (`+0x0C`), then writes GX command 0x40 (call display list) with the list's address,
+`batch + [+0x18]`, and its size `[+0x24]`. The loader converts those four words and checks that the
+display list lies in the zone; the list and the vertex arrays stay in GX layout. Not converted:
+`+0x00` (the batch's size), `+0x10`, `+0x14`, `+0x20`, and the skinned pass (second argument
+non-zero), where `+0x1C` is a count and `+0x28` the influence list `fn_801870AC` reads.
+
 ### Zone 1 and up
 
 A level file has the header block, zone 0 and one more image, section type 1: the level's own
@@ -963,7 +973,7 @@ GX layout. The two words at `+0x08` and `+0x0C` have no reader.
 | three of a zone record's four lists | `+0x04`, `+0x1C`, `+0x28` | none found yet |
 | render objects | pool items of fix-up 655 | `fn_8012F818` |
 | animation tables of props | definition `+0x48`, in zone 0 | `fn_801AC184`, when a prop whose definition has the byte `+0x1C` set changes state |
-| type 1 materials, and a mesh batch beyond its flags (display lists, vertex data) | zone images | `fn_8017ACCC`..`fn_80182A14`, `fn_801873C0` |
+| type 1 materials, and the skinned pass of a batch (`+0x1C`, `+0x28`) | zone images | `fn_8017ACCC`..`fn_80182A14` (type 1 draws through `fn_8017B9BC`, a record of more than 0xD20 bytes), `fn_801870AC` |
 | value tables of the HUD's machines | another zone's image | `fn_801BBE40`, as soon as a state runs an action |
 | zone action tables and their records | slot `+0xD4` | `TriggerDoAction`; `ActionRecordPlan` applies |
 | the shared zones (`shared_ui.sir`, `shared_parts.sir`), textures, models, collision | the rest | - |
