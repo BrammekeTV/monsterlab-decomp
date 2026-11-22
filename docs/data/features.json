@@ -99,6 +99,11 @@
  "changelog": [
   {
    "date": "2026-11-22",
+   "time": "21:35",
+   "text": "Level paths and effects on Windows (PRs #67 and #68): the audit fixed the level path in our decompiled code, which had lost a backslash, so level files are found under levels\\<name>\\. The loader also converts a locator's zone and the level's effect list table."
+  },
+  {
+   "date": "2026-11-22",
    "time": "21:30",
    "text": "More of the front-end level runs on Windows (PRs #63, #64 and #66): the loader converts skeleton animations, zone action tables and locators. Unloading a UI screen set now also unloads its zone. Node references are read as whole words in our code, which fixes their byte order, so the level's lightning script now runs to the end."
   },
