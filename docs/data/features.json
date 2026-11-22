@@ -62,7 +62,7 @@
   },
   {
    "title": "Boots to title screen",
-   "detail": "First visible frame on Windows. The game runs its main loop on PC with a Direct3D 11 renderer. The front-end level loads from the player's own disc with its player object and camera, and the boot now reaches the loading of the title screen's UI screen set. Next: the rest of the UI data, then the title screen draws.",
+   "detail": "First visible frame on Windows. The game runs its main loop on PC with a Direct3D 11 renderer, loads the front-end level and the title screen's UI data from the player's own disc, and now keeps running: 600 frames in a test run with no stop. The frames are still black, so the next step is finding why the first screen draws nothing.",
    "status": "in_progress"
   },
   {
@@ -97,6 +97,11 @@
   }
  ],
  "changelog": [
+  {
+   "date": "2026-11-22",
+   "time": "15:59",
+   "text": "The Windows build no longer stops during boot (PRs #46 and #47): the loader converts each UI widget's common part and the screen set's tables, and the port layer gets a case-insensitive string compare from the C library. In a test run the game ran 600 frames without hitting a missing piece. The screen is still black, so the next job is finding out why the first screen draws nothing."
+  },
   {
    "date": "2026-11-22",
    "time": "15:53",
