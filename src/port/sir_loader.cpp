@@ -1894,9 +1894,9 @@ static SirError ScreenSetDbPlan(ImagePlan* plan, const u8* image, u32 imageSize,
 
 // A locator (header +0x28, count at +0x24), 0x20 bytes: +0x00 the hash of its name
 // (WorldFindLocator), +0x08 position and +0x14 rotation (PlaceOnTableLocator in draft_miss182.cpp).
-// The word at +0x04 has no reader.
+// +0x04 is the locator's zone (fn_801EDF58, for a node reference of kind 4).
 static const SirField kLocatorFields[] = {
-    { 0x00, SIR_U32, 1 }, { 0x08, SIR_F32, 6 },
+    { 0x00, SIR_U32, 2 }, { 0x08, SIR_F32, 6 },
 };
 #define LOCATOR_SIZE 0x20
 
@@ -2521,11 +2521,15 @@ static void LevelTableConvert(SirReloc* r, u8* hdr, u32 base, u32 addr, u32 coun
 
 // The pointer tables of the header block: per slot the two entity tables fn_80129CC8 places
 // (+0x120 and +0x12C, capacity behind each; fn_8012FD0C walks them), and the three per-zone tables
-// of the block (+0x1B0, +0x1BC, +0x1C8; fn_8013006C and others read *table[i]). Their entries are
+// of the block (+0x1B0, +0x1BC; fn_8013006C and others read *table[i]). Their entries are
 // pointers into the zones. The table at slot +0x114 (0x54-byte entries) and the one at +0x1D4
 // (12-byte entries) have no typed reader yet and are left.
 static const u32 kLevelSlotTables[] = { 0x120, 0x12C };
-static const u32 kLevelBlockTables[] = { 0x1B0, 0x1BC, 0x1C8 };
+static const u32 kLevelBlockTables[] = { 0x1B0, 0x1BC };
+// The table at +0x1C8 has one 12-byte entry per zone (fn_80129CC8 steps 0xC for it): the zone's
+// list of running effects, {u16 first, u16 last, u16 count, u16 flags, word} (PoolSpawn in
+// draft_miss285.cpp, fn_801E7E28). The files have it all zero.
+#define LEVEL_EFFECT_LISTS 0x1C8
 
 extern "C" SirError LevelHeaderConvert(SirReloc* r, u8* hdr, u32 size) {
     u32 base = LevelHeaderWiiBase(hdr, size);
@@ -2554,8 +2558,10 @@ extern "C" SirError LevelHeaderConvert(SirReloc* r, u8* hdr, u32 size) {
         for (u32 t = 0; t < 2 && ok; t++)
             ok = LevelTableMark(used, size, base, Be32(slot + kLevelSlotTables[t]), Be32(slot + kLevelSlotTables[t] + 4));
     }
-    for (u32 t = 0; t < 3 && ok; t++)
+    for (u32 t = 0; t < COUNTOF(kLevelBlockTables) && ok; t++)
         ok = LevelTableMark(used, size, base, Be32(hdr + kLevelBlockTables[t]), Be32(hdr + kLevelBlockTables[t] + 4));
+    u32 lists = Be32(hdr + LEVEL_EFFECT_LISTS), listCount = Be32(hdr + LEVEL_EFFECT_LISTS + 4);
+    ok = ok && listCount <= LEVEL_MAX_ZONES && LevelTableMark(used, size, base, lists, listCount * 3);
     free(used);
     if (!ok) return SIR_ERR_LEVEL;
 
@@ -2565,8 +2571,14 @@ extern "C" SirError LevelHeaderConvert(SirReloc* r, u8* hdr, u32 size) {
             LevelTableConvert(r, hdr, base, Be32(slot + kLevelSlotTables[t]), Be32(slot + kLevelSlotTables[t] + 4));
         SirConvertRecord(r, slot, stride, kLevelSlotFields, COUNTOF(kLevelSlotFields));
     }
-    for (u32 t = 0; t < 3; t++)
+    for (u32 t = 0; t < COUNTOF(kLevelBlockTables); t++)
         LevelTableConvert(r, hdr, base, Be32(hdr + kLevelBlockTables[t]), Be32(hdr + kLevelBlockTables[t] + 4));
+    for (u32 i = 0; i < listCount; i++) {
+        u8* e = hdr + (lists - base) + i * 0xC;
+        for (u32 k = 0; k < 8; k += 2) Swap16(e + k);
+        Swap32(e + 8);
+        r->fieldsSwapped += 5;
+    }
     SirConvertRecord(r, hdr, LEVEL_HEADER_SLOTS, kLevelHeaderFields, COUNTOF(kLevelHeaderFields));
     return SIR_OK;
 }

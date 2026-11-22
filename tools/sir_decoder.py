@@ -625,8 +625,12 @@ def level_dump(path):
             ws(0x1E0, 3), hdr[0x1EC], i32(0x1F0), ptr(u(0x1F4)), ws(0x1F8, 6), i32(0xA20), i32(0x1A7C), ws(0x1A84, 2)),
          'levelpicture %d %d floats %s' % (hdr[0x1A80], hdr[0x1A81], ws(0x1A84, 39)),
          'levellocators %d %s' % (u(0x24), ptr(u(0x28)))]
-    for t in (0x1B0, 0x1BC, 0x1C8):
+    for t in (0x1B0, 0x1BC):
         L.append('leveltable 0x%x %s' % (t, entries(t)))
+    # +0x1C8: one 12-byte list of running effects per zone {u16 first, last, count, flags, word}.
+    lt, ln = u(0x1C8) - base, u(0x1CC)
+    used = ['%d:%04x,%04x,%04x,%04x,%08x' % ((i,) + struct.unpack_from('>4HI', hdr, lt + i * 12)) for i in range(ln) if any(hdr[lt + i * 12:lt + i * 12 + 12])]
+    L.append('leveleffectlists %d %s' % (ln, ' '.join(used) or '-'))
     for i in range(count):
         o = LEVEL_SLOTS + i * stride
         L.append('levelslot %d floats %s w18 %d floats %s res %s lists %s %s %d %d words %s %s %s %s bytes %d %d %d actions %s pools %s %d zone %s w100 %08x w10c %08x tables %s | %s | %s e120 %s e12c %s' % (
@@ -1006,7 +1010,7 @@ def zone_dump(L, sec, base, hud, roots, scene_roots, pooltabs, records=(), lists
     if locators and inz(locators[0], locators[1] * 0x20):
         for i in range(locators[1]):
             q = off(locators[0]) + i * 0x20
-            L.append('locator %d hash %08x floats %s' % (i, u(q), ws(q + 8, 6)))
+            L.append('locator %d hash %08x zone %d floats %s' % (i, u(q), u(q + 4), ws(q + 8, 6)))
     # The slots' action tables (slot +0xD4): {count, records}; a record is a program for fn_801E1BD4.
     for addr in actiontabs:
         if not inz(addr, 8): continue
