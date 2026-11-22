@@ -234,10 +234,12 @@ static void OnZoneScreensLoaded(void* zoneInfo, void* arg) {
     ZoneLog(gSirLoader, "ScreenSet load end: zone=%d", zone);
 }
 
-extern "C" void UIEngine_LoadUIScreenSet(s32 id);
+extern "C" void UIEngine_LoadUIScreenSet(s32 id, u32 name);
 // 0x8000CC80
-void UIEngine_LoadUIScreenSet(s32 id) {
-    u8* res = (u8*)ResourceFind(*(void**)((u8*)gResourceDb + 0x20), id, 0);
+// `id` is the slot the set is loaded into, `name` the hash of the set's name: the key of the
+// screen set database (r4 goes to the search untouched).
+void UIEngine_LoadUIScreenSet(s32 id, u32 name) {
+    u8* res = (u8*)ResourceFind(*(void**)((u8*)gResourceDb + 0x20), (s32)name, 0);
     if (res == NULL) return;
 
     s32 zone = *(s32*)(res + 0x44);
