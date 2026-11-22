@@ -1507,6 +1507,52 @@ static int LevelSpan(u32 addr, u64 size, u32 imageSize, u32* off) {
     return ImageSpan(addr, size, imageSize, off) ? 1 : 0;
 }
 
+// Materials. A mesh part {material, batch} is drawn by fn_80173438: it takes the material's pass
+// byte (+0x0D), calls the "before" function of the column the type byte (+0x0C) picks in
+// lbl_80348F38 with the record at +0x08, draws the batch (fn_801873C0), then calls the "after"
+// function. The level files only have types 0 and 1. A material starts {0x53, a word (2 to 7), record
+// pointer, type, pass, ...} (data only for the two words), and the material is at its record's +0x00.
+//   material, type 0 (fn_80176E20, fn_80177940): +0x1C and +0x20 textures (a header of
+//     SIR_TEXTURE_HEADER bytes: the draw adds 4 and reads its size and format bytes, fn_80177748),
+//     +0x3C a 3x4 float matrix (fn_801776C8)
+//   record, type 0: +0x04 and +0x05 enable bytes, +0x08..+0x44 sixteen floats, +0x4C and +0x50
+//     floats, +0x54 mode word, +0x58..+0x5A and +0x64..+0x67 bytes, +0x5C and +0x60 words. +0x48
+//     and the bytes +0x06 / +0x07 have no reader.
+#define MATERIAL_TAG    0x53
+#define MATERIAL_USED   0x40
+#define MATERIAL_REC0   0x68
+
+static SirError MaterialTexturePlan(ImagePlan* plan, const u8* image, u32 imageSize, u32 addr) {
+    u32 t, d;
+    if (!LevelSpan(addr, SIR_TEXTURE_HEADER, imageSize, &t) || PlanHas(plan, t, REGION_TEXTURE)) return SIR_OK;
+    const u8* tex = image + t;
+    // Pixel data and palette stay in GX layout, as in the textures of global_binary.sir.
+    if (Be32(tex) != SIR_TEXTURE_HEADER || !ImageSpan(Be32(tex + 0x1C), Be32(tex + 0x18), imageSize, &d)) return SIR_ERR_TEXTURE;
+    u32 palette = Be32(tex + 0x20);
+    if (palette != 0 && !ImageSpan(palette, 2, imageSize, &d)) return SIR_ERR_TEXTURE;
+    return PlanAdd(plan, t, SIR_TEXTURE_HEADER, REGION_TEXTURE) ? SIR_OK : SIR_ERR_TEXTURE;
+}
+
+static SirError MaterialPlan(ImagePlan* plan, const u8* image, u32 imageSize, u32 addr) {
+    u32 m, r;
+    if (!LevelSpan(addr, MATERIAL_USED, imageSize, &m) || PlanHas(plan, m, REGION_U32_ARRAY)) return SIR_OK;
+    const u8* mat = image + m;
+    if (Be32(mat) != MATERIAL_TAG || mat[0x0C] > 1) return SIR_ERR_ENTITY;
+    if (!PlanAdd(plan, m, 8, REGION_U32_ARRAY) || !PlanAdd(plan, m + 0x08, 4, REGION_PTR_ARRAY) ||
+        !PlanAdd(plan, m + 0x1C, 8, REGION_PTR_ARRAY) || !PlanAdd(plan, m + 0x3C, 4, REGION_PTR_ARRAY)) return SIR_ERR_ENTITY;
+    u32 matrix;
+    SirError e;
+    if (LevelSpan(Be32(mat + 0x3C), 0x30, imageSize, &matrix) && !PlanHas(plan, matrix, REGION_F32_ARRAY) &&
+        !PlanAdd(plan, matrix, 0x30, REGION_F32_ARRAY)) return SIR_ERR_ENTITY;
+    if ((e = MaterialTexturePlan(plan, image, imageSize, Be32(mat + 0x1C))) != SIR_OK ||
+        (e = MaterialTexturePlan(plan, image, imageSize, Be32(mat + 0x20))) != SIR_OK) return e;
+    if (mat[0x0C] != 0 || !LevelSpan(Be32(mat + 0x08), MATERIAL_REC0, imageSize, &r)) return SIR_OK;
+    if (Be32(image + r) != addr) return SIR_ERR_ENTITY;                                   // the record names its material
+    if (!PlanAdd(plan, r, 4, REGION_PTR_ARRAY) || !PlanAdd(plan, r + 0x08, 0x40, REGION_U32_ARRAY) ||
+        !PlanAdd(plan, r + 0x4C, 0x0C, REGION_U32_ARRAY) || !PlanAdd(plan, r + 0x5C, 8, REGION_U32_ARRAY)) return SIR_ERR_ENTITY;
+    return SIR_OK;
+}
+
 // Scene object: what an entity's +0x90 points at, and what the header block's per-zone tables
 // (+0x1B0, +0x1BC) hold. The type word at +4 picks the class; its constructor stores the vtable
 // (fn_801D94CC 1, fn_801DA81C 2, fn_801DA1CC 3, fn_801D9A24 4).
@@ -1551,8 +1597,11 @@ static SirError SceneItemDrawPlan(ImagePlan* plan, const u8* image, u32 imageSiz
     if (!PlanAdd(plan, m + 0x20, 0x10, REGION_U32_ARRAY) || !PlanAdd(plan, m + 0x48, 0x10, REGION_U32_ARRAY) ||
         !PlanAdd(plan, m + 0x64, 4, REGION_PTR_ARRAY) || !PlanAdd(plan, m + 0x6C, 4, REGION_U32_ARRAY) ||
         (parts != 0 && !PlanAdd(plan, m + 0x70, parts * 8, REGION_PTR_ARRAY))) return SIR_ERR_ENTITY;
-    for (u32 i = 0; i < parts; i++)
+    for (u32 i = 0; i < parts; i++) {
+        SirError e = MaterialPlan(plan, image, imageSize, Be32(image + m + 0x70 + i * 8));
+        if (e != SIR_OK) return e;
         if (LevelSpan(Be32(image + m + 0x74 + i * 8), 0x10, imageSize, &b) && !PlanAdd(plan, b + 0x0C, 4, REGION_U32_ARRAY)) return SIR_ERR_ENTITY;
+    }
     return SIR_OK;
 }
 
@@ -1698,10 +1747,11 @@ static SirError EntityPlan(ImagePlan* plan, const u8* image, u32 imageSize, u32 
 // Each has eight animation players (+0x5C) with an output each (+0x3C), and one more player at
 // +0x7C. In the level files these are materials whose texture matrix is animated.
 // Only the list at +0x10 has a known reader; the record's other lists are not converted.
+// Regions: the node's next pointer (+0x10, code: WorldTick); +0x08 (handed to the per-type function,
+// ParticleSystemUpdateExtra) and +0x3C..+0x7F (8 outputs, 8 players, the player at +0x7C) are
+// plain pointer arrays.
 static const SirField kZoneSystemFields[] = {
-    { 0x08, SIR_PTR, 1 },     // code: handed to the per-type function (ParticleSystemUpdateExtra)
-    { 0x10, SIR_PTR, 1 },     // code: next object's node (WorldTick)
-    { 0x3C, SIR_PTR, 17 },    // code: 8 outputs, 8 players, the player at +0x7C (WorldTick)
+    { 0x00, SIR_PTR, 1 },
 };
 // Animation player (fn_8016A64C, fn_8016A43C, fn_8016A788). Key pointers follow at +0x28, one
 // per channel; the elements (one per channel, `stride` bytes) are at +[+0x08].
@@ -1844,8 +1894,10 @@ static SirError ZoneListPlan(ImagePlan* plan, const u8* image, u32 imageSize, u3
     SirError e;
     while (node >= sImageBase && node - sImageBase < imageSize) {
         if (guard-- == 0 || node < sImageBase + 0x10 || !ImageSpan(node - 0x10, ZONE_SYSTEM_USED, imageSize, &o)) return SIR_ERR_ZONE_RECORD;
-        if (PlanHas(plan, o, REGION_ZONE_SYSTEM)) return SIR_ERR_ZONE_RECORD;       // a list that loops
-        if (!PlanAdd(plan, o, ZONE_SYSTEM_USED, REGION_ZONE_SYSTEM)) return SIR_ERR_ZONE_RECORD;
+        if (PlanHas(plan, o + 0x10, REGION_ZONE_SYSTEM)) return SIR_ERR_ZONE_RECORD;       // a list that loops
+        // The object is a material (MaterialPlan adds the rest of it): only the fields WorldTick reads are regions here.
+        if (!PlanAdd(plan, o + 0x10, 4, REGION_ZONE_SYSTEM) || !PlanAdd(plan, o + 0x08, 4, REGION_PTR_ARRAY) ||
+            !PlanAdd(plan, o + 0x3C, 4, REGION_PTR_ARRAY) || !PlanAdd(plan, o + 0x40, 0x40, REGION_PTR_ARRAY)) return SIR_ERR_ZONE_RECORD;
         for (u32 k = 0; k < 8; k++) {
             u32 player = Be32(image + o + 0x5C + k * 4);
             if (player == 0) continue;

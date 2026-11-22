@@ -822,6 +822,25 @@ rest of a list object, the second word of a channel table entry (it is the key c
 players of mode 0 (position and rotation keys, `fn_8016A788`): none is reached from a zone
 record in zone 0 of any level.
 
+### Materials of mesh parts
+
+A mesh part `{material, batch}` (mesh `+0x70 + i*8`) is drawn by `fn_80173438`: for a material whose
+pass byte (`+0x0D`) matches, it calls the "before" function of the column of `lbl_80348F38` that the
+type byte (`+0x0C`) picks, with the record at `+0x08`, draws the batch (`fn_801873C0`), then calls the
+"after" function. Only types 0 and 1 occur in the level files, and the material, its record and its
+textures always lie in the same zone. Every zone-record list object is such a material (see "Zone
+records"): the zone list's regions (`+0x08`, `+0x10`, `+0x3C..+0x7F`) and the material's are the same
+words, so both walks add them and the plan drops the duplicates.
+
+| What | Fields | Reader |
+|---|---|---|
+| material | `+0x00` 0x53 and `+0x04` a small word (2 to 7), data only; `+0x08` record pointer; `+0x0C` type, `+0x0D` pass (bytes); `+0x1C`, `+0x20` textures; `+0x3C` pointer to a 3x4 float matrix | `fn_80173438`, `fn_80176E20`, `fn_80177940`, `fn_801776C8` |
+| texture of a material | a texture header (same schema as above), the draw adds 4 to the pointer; pixel data and palette stay in GX layout | `fn_80177748` |
+| type 0 record | `+0x00` the material (checked), `+0x04`, `+0x05` bytes, `+0x08`..`+0x44` sixteen floats, `+0x4C`, `+0x50` floats, `+0x54` word, `+0x58`..`+0x5A` and `+0x64`..`+0x67` bytes, `+0x5C`, `+0x60` words | `fn_80176E20`, `fn_80177940` |
+
+Not converted: `+0x10`, `+0x14`, `+0x18` of a type 0 material, `+0x48` of its record and its bytes
+`+0x06`, `+0x07` (no reader); type 1 records and the extra pointers of a type 1 material.
+
 ### Zone 1 and up
 
 A level file has the header block, zone 0 and one more image, section type 1: the level's own
@@ -944,7 +963,7 @@ GX layout. The two words at `+0x08` and `+0x0C` have no reader.
 | three of a zone record's four lists | `+0x04`, `+0x1C`, `+0x28` | none found yet |
 | render objects | pool items of fix-up 655 | `fn_8012F818` |
 | animation tables of props | definition `+0x48`, in zone 0 | `fn_801AC184`, when a prop whose definition has the byte `+0x1C` set changes state |
-| materials, and a mesh batch beyond its flags (display lists, vertex data) | zone images | the code that draws the records `fn_80171228` queues |
+| type 1 materials, and a mesh batch beyond its flags (display lists, vertex data) | zone images | `fn_8017ACCC`..`fn_80182A14`, `fn_801873C0` |
 | value tables of the HUD's machines | another zone's image | `fn_801BBE40`, as soon as a state runs an action |
 | zone action tables and their records | slot `+0xD4` | `TriggerDoAction`; `ActionRecordPlan` applies |
 | the shared zones (`shared_ui.sir`, `shared_parts.sir`), textures, models, collision | the rest | - |
