@@ -574,6 +574,23 @@ def other_ptr(v):
     if OTHER_ZONE and OTHER_ZONE[0] <= v <= OTHER_ZONE[0] + len(OTHER_ZONE[2]): return 'zone%d+0x%x' % (OTHER_ZONE[1], v - OTHER_ZONE[0])
     return None
 
+def texture_stream_dump(path):
+    """shared_texture.sir: one line per section. A section is a stream that starts with the tags
+    "SG21" "WI00" and holds one texture record at 0x10: s32 size, name, four bytes, padding to a
+    multiple of four, u16 width, u16 height, pixel data (fn_8016B5E0, fn_8016B724, fn_801840E4)."""
+    L = []
+    for s in read_archive(path)[1]:
+        d = s['data']
+        size = struct.unpack_from('>i', d, 0x10)[0]
+        end = d.index(b'\0', 0x14)
+        p = end + 1
+        q = (p + 7) & ~3
+        w, h = struct.unpack_from('>HH', d, q)
+        L.append('texstream %08x size %d tags %08x %08x record %d name %s format %d %d %d flag %d width %d height %d data 0x%x' % (
+            s['type'] & 0xFFFFFFFF, len(d), struct.unpack_from('>I', d, 0)[0], struct.unpack_from('>I', d, 4)[0], size,
+            d[0x14:end].decode('ascii'), d[p], d[p + 1], d[p + 2], d[p + 3], w, h, q + 4))
+    return L
+
 def level_dump(path):
     global OTHER_ZONE
     version, secs = read_archive(path)
@@ -1190,6 +1207,7 @@ def main():
     ap.add_argument('--gamedb', action='store_true', help='global_binary.sir: print the game database as text')
     ap.add_argument('--image', action='store_true', help='global_binary.sir: print the input table, textures, string and action tables as text')
     ap.add_argument('--catalog', action='store_true', help='catalog.sir: print the file table as text')
+    ap.add_argument('--texture', action='store_true', help='shared_texture.sir: print one line per texture section')
     ap.add_argument('--level', action='store_true', help='a level file: print the header block and the HUD of zone 0 as text')
     a = ap.parse_args()
     if a.catalog:
@@ -1198,6 +1216,10 @@ def main():
         return
     if a.level:
         for line in level_dump(a.archive):
+            print(line)
+        return
+    if a.texture:
+        for line in texture_stream_dump(a.archive):
             print(line)
         return
     if a.gamedb or a.image:

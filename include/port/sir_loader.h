@@ -438,6 +438,14 @@ typedef struct LevelZoneRoots {
     u32  screenSet;          // a shared zone: the screen set its slot copy names (+0x100), or 0
 } LevelZoneRoots;
 
+// A texture section of shared_texture.sir: a stream that starts with the tags "SG21" "WI00"
+// (fn_8016B5E0 compares them as two words) and holds one texture record (fn_8016B724 ->
+// fn_801840E4): {s32 size, name, four bytes, padding to a multiple of four, u16 width, u16
+// height, pixel data}. Converts the two tags, the size, the width and the height in place; the
+// pixel data stays in GX layout. Nothing is changed when a check fails (SIR_ERR_TEXTURE).
+#define TEXTURE_STREAM_RECORD 0x10   // the record's place: fn_8016B724 skips two more words after the tags
+SirError TextureStreamConvert(u8* data, u32 size);
+
 // Size of one zone slot of a converted header block (the game's gZoneResourceSize), or 0.
 u32 LevelSlotSize(const u8* hdr, u32 hdrSize);
 

@@ -2341,6 +2341,33 @@ extern "C" SirError LevelZoneConvert(SirReloc* r, u8* image, u32 imageSize, u32 
     return e;
 }
 
+// --------------------------------------------------------------------------- texture stream
+
+// Offset of the width (the height follows) of the texture record at TEXTURE_STREAM_RECORD, or 0
+// when the stream is not what fn_8016B5E0 and fn_801840E4 expect.
+static u32 TextureStreamDims(const u8* data, u32 size) {
+    if (data == NULL || size < TEXTURE_STREAM_RECORD + 8 || memcmp(data, "SG21WI00", 8) != 0) return 0;
+    u32 recSize = Be32(data + TEXTURE_STREAM_RECORD);
+    if (recSize < 12 || recSize > size - TEXTURE_STREAM_RECORD) return 0;
+    u32 end = TEXTURE_STREAM_RECORD + recSize, p = TEXTURE_STREAM_RECORD + 4;
+    while (p < end && data[p] != 0) p++;                         // the name
+    if (p >= end) return 0;
+    p += 1;                                                      // p: format and three more bytes
+    u32 q = (p + 7) & ~3u;                                       // as fn_801840E4 rounds the cursor
+    return q + 4 <= end ? q : 0;
+}
+
+extern "C" SirError TextureStreamConvert(u8* data, u32 size) {
+    u32 q = TextureStreamDims(data, size);
+    if (q == 0) return SIR_ERR_TEXTURE;
+    Swap32(data);
+    Swap32(data + 4);
+    Swap32(data + TEXTURE_STREAM_RECORD);
+    Swap16(data + q);
+    Swap16(data + q + 2);
+    return SIR_OK;
+}
+
 // ------------------------------------------------------------------------------------ file helper
 
 extern "C" void GlobalBinaryFree(GlobalBinaryFile* f) {

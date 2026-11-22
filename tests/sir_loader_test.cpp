@@ -1219,6 +1219,35 @@ static u32 NameHash(const char* s) {
     return ~crc;
 }
 
+// Converts every section of shared_texture.sir as the port does and prints one line per section,
+// in the text format of `tools/sir_decoder.py --texture`.
+static int DumpTextures(const char* path) {
+    FILE* fp = fopen(path, "rb");
+    if (fp == NULL) { fprintf(stderr, "%s: cannot read\n", path); return 1; }
+    fseek(fp, 0, SEEK_END);
+    long len = ftell(fp);
+    fseek(fp, 0, SEEK_SET);
+    u8* file = (u8*)malloc((size_t)len);
+    bool ok = fread(file, 1, (size_t)len, fp) == (size_t)len;
+    fclose(fp);
+    for (s32 i = 0; ok && i < SirContainerSectionCount(file, (u32)len); i++) {
+        SirSection sec;
+        if (!SirContainerSection(file, (u32)len, i, &sec)) continue;
+        u8* d = file + sec.offset;
+        SirError e = TextureStreamConvert(d, sec.size);
+        if (e != SIR_OK) { fprintf(stderr, "%s section %d: %s\n", path, i, SirErrorText(e)); return 1; }
+        // Read the way fn_8016B5E0, fn_8016B724 and fn_801840E4 do.
+        const char* name = (const char*)(d + TEXTURE_STREAM_RECORD + 4);
+        const u8* p = (const u8*)name + strlen(name) + 1;
+        const u8* q = d + (((u32)(p - d) + 7) & ~3u);
+        printf("texstream %08x size %u tags %08x %08x record %d name %s format %u %u %u flag %u width %u height %u data 0x%x\n",
+               (u32)sec.type, sec.size, *(const u32*)d, *(const u32*)(d + 4), *(const s32*)(d + TEXTURE_STREAM_RECORD), name,
+               p[0], p[1], p[2], p[3], *(const u16*)q, *(const u16*)(q + 2), (u32)(q + 4 - d));
+    }
+    free(file);
+    return ok ? 0 : 1;
+}
+
 static int DumpCatalog(const char* path) {
     FILE* fp = fopen(path, "rb");
     if (fp == NULL) {
@@ -2156,6 +2185,36 @@ static void LevelSelfTest(void) {
     free(hdr); free(zone); free(hdrCopy); free(zoneCopy); free(zone1); free(zone1Copy);
 }
 
+// A texture stream as fn_801840E4 reads it; broken ones are refused untouched.
+static void TextureStreamSelfTest(void) {
+    u8 good[0x40], d[0x40];
+    memset(good, 0xEE, sizeof(good));
+    memcpy(good, "SG21WI00", 8);
+    Put32(good + 0x08, 3); Put32(good + 0x0C, 0x30);
+    Put32(good + 0x10, 0x30);                                  // the record: size, name, four bytes, dimensions, data
+    memcpy(good + 0x14, "strapA", 7);
+    good[0x1B] = 0x13; good[0x1C] = 1; good[0x1D] = 2; good[0x1E] = 3;
+    Put16(good + 0x20, 640); Put16(good + 0x22, 480);
+    memcpy(d, good, sizeof(d));
+    CHECK(TextureStreamConvert(d, sizeof(d)) == SIR_OK);
+    CHECK(*(const u32*)d == 0x53473231 && *(const u32*)(d + 4) == 0x57493030 && *(const s32*)(d + 0x10) == 0x30);
+    CHECK(*(const u16*)(d + 0x20) == 640 && *(const u16*)(d + 0x22) == 480 && d[0x1B] == 0x13 && d[0x0B] == 3 && d[0x24] == 0xEE);
+    struct { u32 off; u8 value; u32 size; } bad[] = {
+        { 0x03, '2', sizeof(d) },      // tag
+        { 0x12, 0x10, sizeof(d) },     // record larger than the section
+        { 0x1A, 'x', 0x1C },           // name runs to the end of the record
+        { 0x13, 0x10, sizeof(d) },     // record too small for the dimensions
+    };
+    for (u32 i = 0; i < sizeof(bad) / sizeof(bad[0]); i++) {
+        memcpy(d, good, sizeof(d));
+        d[bad[i].off] = bad[i].value;
+        u8 copy[0x40];
+        memcpy(copy, d, sizeof(d));
+        CHECK(TextureStreamConvert(d, bad[i].size) == SIR_ERR_TEXTURE);
+        CHECK(memcmp(copy, d, sizeof(d)) == 0);
+    }
+}
+
 static int SelfTest(void) {
     u8* hdr = (u8*)malloc(GLOBAL_BINARY_HDR_SIZE);
     u8* img = (u8*)malloc(T_SIZE);
@@ -2509,6 +2568,7 @@ static int SelfTest(void) {
     free(img);
     free(copy);
     LevelSelfTest();
+    TextureStreamSelfTest();
     printf(gFailed ? "selftest: %d FAILED\n" : "selftest: ok\n", gFailed);
     return gFailed ? 1 : 0;
 }
@@ -2517,6 +2577,7 @@ int main(int argc, char** argv) {
     if (argc == 2 && strcmp(argv[1], "--selftest") == 0) return SelfTest();
     if (argc == 3 && strcmp(argv[1], "--dump") == 0) return Dump(argv[2]);
     if (argc == 3 && strcmp(argv[1], "--catalog") == 0) return DumpCatalog(argv[2]);
+    if (argc == 3 && strcmp(argv[1], "--texture") == 0) return DumpTextures(argv[2]);
     if (argc == 3 && strcmp(argv[1], "--level") == 0) return DumpLevel(argv[2]);
     fprintf(stderr, "usage: sir_loader_test --selftest | --dump <global_binary.sir> | --catalog <catalog.sir> | --level <x_level.sir>\n");
     return 2;
