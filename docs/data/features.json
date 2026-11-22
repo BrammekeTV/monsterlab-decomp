@@ -62,7 +62,7 @@
   },
   {
    "title": "Boots to title screen",
-   "detail": "First visible frame on Windows. The game runs its main loop on PC with a Direct3D 11 renderer, loads the front-end level and the title screen's UI data from the player's own disc, and now keeps running: 600 frames in a test run with no stop. The frames are still black, so the next step is finding why the first screen draws nothing.",
+   "detail": "First visible frame on Windows. The PC port now draws its first real screen: the Wii Remote strap safety screen, rendered by the Direct3D 11 renderer from the player's own disc. Next: the title screen itself.",
    "status": "in_progress"
   },
   {
@@ -97,6 +97,11 @@
   }
  ],
  "changelog": [
+  {
+   "date": "2026-11-22",
+   "time": "16:23",
+   "text": "First screen on Windows (PRs #48 to #50): the PC port now draws the game's opening Wii Remote strap safety screen, read from the player's own disc and rendered with Direct3D 11. The loader converts picture widgets and the level's picture settings, and the renderer handles scissor offsets and frame-buffer copies in bands. The title screen is next."
+  },
   {
    "date": "2026-11-22",
    "time": "16:21",
