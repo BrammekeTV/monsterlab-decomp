@@ -17,8 +17,8 @@ s32 TriggerDoAction(void* action, void* a1, void* a2);                          
 void ZoneEffectsUpdate(void* effects, f32 dt);                                               // 0x801E97FC
 BOOL ZoneIsLoaded(void* world, s32 zone);                                                    // 0x8012F408
 void fn_80009840(u8* p);                                                                     // 0x80009840
-void fn_8006EF78(u8* p);                                                                     // 0x8006EF78
-f64 fn_800734B4(u8* camera, f32* vec);                                                       // 0x800734B4
+void fn_8006EF78(u8* p, u8* out);                                                                     // 0x8006EF78
+f32 fn_800734B4(u8* camera, f32* vec);                                                       // 0x800734B4
 s32 fn_80097064(f32* dir);                                                                   // 0x80097064
 void fn_80097BCC(u8* out, u8* obj);                                                          // 0x80097BCC
 s32 fn_800972CC(u8* p);                                                                      // 0x800972CC
@@ -210,7 +210,7 @@ void fn_8006E1A0(u8* p, f32 dt) {
 
     *(u32*)(p + 0x20C) += 1;
     for (s32 i = 0; i < 2; i++) {
-        if (*(s32*)(p + 0x17C + i * 4) != 0) fn_8006EF78(p);
+        if (*(s32*)(p + 0x17C + i * 4) != 0) fn_8006EF78(p, NULL /* leftover r4 in the original */);
     }
     if (*(u32*)(*(u8**)(p + 0x4) + 0x20) & 0x04000000) return;
 

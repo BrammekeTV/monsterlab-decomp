@@ -31,7 +31,7 @@ void   Vec3Sub(Vec3* out, const Vec3* a, const Vec3* b);          // 0x80053370
 void   fn_80054484(Vec3* out, const Vec3* a, const Vec3* b);      // 0x80054484 (a + b)
 f32    fn_8005B4A4(const Vec3* a, const Vec3* b);                 // 0x8005B4A4 (dot)
 u8*    fn_80073454(void);                                         // 0x80073454 (camera/frustum block)
-f64    fn_800734B4(u8* camera, f32* vec);                         // 0x800734B4
+f32    fn_800734B4(u8* camera, f32* vec);                         // 0x800734B4
 void   fn_80073B68(f32* out, f64 t, f32 x, f32 y, u8* cam, f32* nearOut, f32* farOut);  // 0x80073B68
 f32    fn_8007DD7C(Vec3* v);                                      // 0x8007DD7C
 void   fn_800C09C0(Vec3* out);                                    // 0x800C09C0
