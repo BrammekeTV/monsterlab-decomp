@@ -22,7 +22,7 @@ s32  fn_800B2054(u8* p, u8* a);            // 0x800B2054
 s32  fn_800B1A20(u8* p);            // 0x800B1A20
 s32  fn_800AD340(u8* p, u8* a);            // 0x800AD340
 s32  fn_800AC850(u8* p, u8* a);            // 0x800AC850
-s32  fn_800AC390(u8* a, f32* b, u8* c, s32 d, f32 e, f32 f);  // 0x800AC390
+void fn_800AC390(u8* p, f32* a, f32 dt);  // 0x800AC390
 
 extern f32 lbl_805FD654;
 extern f32 lbl_805FD658;
@@ -169,7 +169,7 @@ void fn_800AA7A8(u8* arg0) {
                     pos[1] = *(f32*)(src + 0x4);
                     pos[2] = *(f32*)(src + 0x8);
                     // r6 is not set before the call: passed as 0.
-                    fn_800AC390(*(u8**)(e + 0xE0), pos, e, 0, lbl_805FDF1C - frac, frac);
+                    fn_800AC390(*(u8**)(e + 0xE0), pos, lbl_805FDF1C - frac); /* asm also sets r5/r6/f2: unused by the callee */
                     return;
                 }
                 target -= 1;

@@ -99,6 +99,11 @@
  "changelog": [
   {
    "date": "2026-11-22",
+   "time": "13:57",
+   "text": "Round 89: 19 small functions (fn_80029D08, fn_8002FA68, fn_8007D620, fn_800AC390, fn_800E3040, fn_801AD47C, fn_802086B8 and more), Haiku-only"
+  },
+  {
+   "date": "2026-11-22",
    "time": "13:41",
    "text": "Round 88: 26 small functions (fn_80023D74, fn_80023F18, fn_8006D044, fn_800AF3E0, fn_800CF50C, fn_801F6EC4, fn_801F72F0 and more), Haiku-only"
   },

@@ -5,7 +5,7 @@
 
 #include "types.h"
 
-extern u8 lbl_805FAFC8[];
+extern s32 lbl_805FAFC8;
 extern u8 lbl_805FCAAC[];
 
 // 0x800294B4
