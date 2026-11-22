@@ -787,12 +787,62 @@ differ from zone 0:
 A list of one part container can be the entity's own slot at `+0x8C` (`+0x194` points at it):
 that slot is converted with the entity.
 
-The other zones (the shared ones) come from `shared_ui.sir` and `shared_parts.sir` and start
-with a copy of their zone slot (`fn_80135BC0`); those files are not converted yet.
+The other zones (the shared ones) come from `shared_ui.sir` and `shared_parts.sir`: next section.
 
 The port reads each zone to the address the console uses, so it needs no address for zone 1;
 the test tool and the reference decoder use 0x90980000 (`gZoneBase[1]`: zone 0's address plus
 its memory budget).
+
+### Shared zones and their screen sets
+
+`shared_ui.sir` (23 images) and `shared_parts.sir` hold the zones that every level shares; the
+section type is the zone number, and `fn_80135854` reads an image to the zone's address when a
+script asks for it (`UIEngine_LoadUIScreenSet` -> `ZoneLoadAsync`). Such an image **starts with
+a copy of its zone slot**: `fn_80135BC0` copies the first slot-size bytes into the header block
+and then starts the zone like any other. The loader converts that copy with the slot's field
+table and takes the zone's roots from it instead of from the header block: entities, pool
+table, the zone record in zone 0 (`+0xFC`) and the screen set (`+0x100`). The copy's three
+tables point into the header block as it lay when the file was built; they are empty.
+
+Of a **screen set** (what the slot's `+0x100` points at, right behind the slot copy) the first
+layer is converted:
+
+| Object | Fields | Reader |
+|---|---|---|
+| screen set | `+0x28` pointer to a table | `fn_80199024` |
+| table | `+0x00` root of a binary tree, `+0x04` / `+0x08` the nodes with the lowest and the highest key | `fn_8018E2F4`, `fn_8018E808` |
+| tree node | `+0x00` key, `+0x04` widget, `+0x0C` left, `+0x10` right | `fn_8018E2F4` (the walk), `fn_8018E808` (search by key), `fn_8018E8D8` |
+| widget | `+0x120` first child, `+0x124` next sibling; of a child the first word | `fn_8019BFF8`, `fn_80199534` |
+| child widget, and the widgets it names | `+0x60` kind (0-6); kinds 2 and 3: sub-kind at `+0x13C`; kind 3: a list at `+0x15C`; kind 4: a widget at `+0x1B4` and a list of widgets at `+0x1BC`; kind 5: a widget at `+0x190`; kind 6: its children | `fn_8019914C` installs the vtable for the kind at `+0x138` |
+| list | `+0x00` count, `+0x04` capacity, `+0x08` element size, `+0x10` the elements (pointers in the widget lists) | `fn_8019555C`, `fn_8019552C` |
+
+Zone 480 (the first one the boot loads) has 5 nodes; the 23 images of `shared_ui.sir` have 326
+nodes, 7,554 child widgets, 8,802 widgets with a kind and 130 lists. Not converted: the rest of the set (`+0x00` its name hash, the
+zone, five more pointers with counts), the rest of a widget, and everything else in the image.
+
+`shared_parts.sir` goes through the same code in the port but has not been compared yet.
+
+The tools take a shared image's address from the slot copy's `+0x100` (the set lies right
+behind the copy, so the address is that pointer with the low 16 bits cleared); the port uses the
+address the game reads the image to.
+
+### Textures of `shared_texture.sir`
+
+`shared_texture.sir` has 607 sections, one texture each; the section type is the hash of the
+texture's name. A section is a stream: `fn_8016B5E0` compares its first two words with the tags
+"SG21" and "WI00", `fn_8016B724` skips two more words and hands the rest to `fn_801840E4`, which
+reads one texture record:
+
+| Where | Field | Reader |
+|---|---|---|
+| `+0x00`, `+0x04` | the tags, compared as words | `fn_8016B5E0` |
+| `+0x10` | size of the record | `fn_801840E4` |
+| `+0x14` | name, then four bytes: GX format, two more, a flag | `fn_801840E4` |
+| next multiple of four, as the code rounds it | `u16` width, `u16` height | `fn_801840E4` |
+| after that | pixel data, then the palette entries | `fn_8015A144` copies both |
+
+The loader converts the tags, the size, the width and the height. Pixel data and palette stay in
+GX layout. The two words at `+0x08` and `+0x0C` have no reader.
 
 ### Not converted yet in level files
 

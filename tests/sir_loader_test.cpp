@@ -13,6 +13,8 @@
 #include <string.h>
 
 #include <algorithm>
+#include <string>
+#include <utility>
 #include <vector>
 
 #include "game/part.h"
@@ -871,6 +873,82 @@ struct ZoneDump {
         }
     }
 
+    // The first layer of a shared zone's screen set (zone slot +0x100): the tree fn_8018E2F4 walks
+    // and the widgets fn_8019BFF8 reaches from it.
+    std::vector<const u8*> widgets, fixedWidgets, uiLists;
+    void UiList(const u8* a, bool isWidgets) {
+        if (!In(a, 0x14) || std::find(uiLists.begin(), uiLists.end(), a) != uiLists.end()) return;
+        uiLists.push_back(a);
+        u32 n = *(const u32*)a;
+        const u8* data = *(const u8**)(a + 0x10);
+        printf("uilist "); Val(a); printf(" count %u capacity %u size %u data ", n, *(const u32*)(a + 4), *(const u32*)(a + 8)); Ptr(a + 0x10); printf("\n");
+        if (n == 0 || !In(data, n * 4)) return;
+        printf("uilistitems "); Val(a);
+        for (u32 i = 0; i < n; i++) { printf(" "); Ptr(data + i * 4); }
+        printf("\n");
+        for (u32 i = 0; isWidgets && i < n; i++) Fix(*(const u8**)(data + i * 4));
+    }
+    // What fn_8019914C reads of a widget.
+    void Fix(const u8* w) {
+        if (!In(w, 0x128) || std::find(fixedWidgets.begin(), fixedWidgets.end(), w) != fixedWidgets.end()) return;
+        fixedWidgets.push_back(w);
+        u32 kind = *(const u32*)(w + 0x60);
+        printf("uikind "); Val(w); printf(" kind %u", kind);
+        if (kind == 2 || kind == 3) printf(" sub %u", *(const u32*)(w + 0x13C));
+        if (kind == 3) {
+            printf(" list "); Ptr(w + 0x15C); printf("\n");
+            UiList(*(const u8**)(w + 0x15C), false);
+        } else if (kind == 4) {
+            printf(" body "); Ptr(w + 0x1B4); printf(" list "); Ptr(w + 0x1BC); printf("\n");
+            Fix(*(const u8**)(w + 0x1B4));
+            UiList(*(const u8**)(w + 0x1BC), true);
+        } else if (kind == 5) {
+            printf(" body "); Ptr(w + 0x190); printf("\n");
+            Fix(*(const u8**)(w + 0x190));
+        } else if (kind == 6) {
+            printf(" first "); Ptr(w + 0x120); printf("\n");
+            for (const u8* c = *(const u8**)(w + 0x120); In(c, 0x128); c = *(const u8**)(c + 0x124)) Fix(c);
+        } else {
+            printf("\n");
+        }
+    }
+    void Widget(const u8* w, bool child) {
+        if (!In(w, 0x128)) return;
+        if (child) { printf("uichild "); Val(w); printf(" type %08x first ", *(const u32*)w); }
+        else { printf("uiwidget "); Val(w); printf(" first "); }
+        Ptr(w + 0x120); printf(" next "); Ptr(w + 0x124); printf("\n");
+        if (child) Fix(w);
+        if (std::find(widgets.begin(), widgets.end(), w) != widgets.end()) return;
+        widgets.push_back(w);
+        for (const u8* c = *(const u8**)(w + 0x120); In(c, 0x128); c = *(const u8**)(c + 0x124)) Widget(c, true);
+    }
+    void ScreenSet(const u8* ss) {
+        if (!In(ss, 0x2C)) return;
+        const u8* table = *(const u8**)(ss + 0x28);
+        printf("uiset "); Val(ss); printf(" table "); Ptr(ss + 0x28); printf("\n");
+        if (!In(table, 0xC)) return;
+        printf("uitable "); Val(table); printf(" root "); Ptr(table); printf(" low "); Ptr(table + 4); printf(" high "); Ptr(table + 8); printf("\n");
+        std::vector<const u8*> seen;
+        std::vector<std::pair<const u8*, bool> > stack;
+        stack.push_back(std::make_pair(*(const u8* const*)table, false));
+        while (!stack.empty()) {
+            const u8* n = stack.back().first;
+            bool done = stack.back().second;
+            stack.pop_back();
+            if (!In(n, 0x14)) continue;
+            if (done) {
+                printf("uinode "); Val(n); printf(" key %08x widget ", *(const u32*)n); Ptr(n + 4);
+                printf(" left "); Ptr(n + 0xC); printf(" right "); Ptr(n + 0x10); printf("\n");
+                Widget(*(const u8**)(n + 4), false);
+            } else if (std::find(seen.begin(), seen.end(), n) == seen.end()) {
+                seen.push_back(n);
+                stack.push_back(std::make_pair(n, true));
+                stack.push_back(std::make_pair(*(const u8* const*)(n + 0x10), false));
+                stack.push_back(std::make_pair(*(const u8* const*)(n + 0xC), false));
+            }
+        }
+    }
+
     void Entities() {
         for (size_t i = 0; i < ents.size(); i++) {
             const u8* e = ents[i];
@@ -1103,6 +1181,61 @@ static int DumpLevel(const char* path) {
         zd1.Records(&roots1, LEVEL_ZONE1_WII_BASE);
         LevelZoneRootsFree(&roots1);
     }
+    // The shared zones, as the port converts them while this level is loaded (empty_level.sir only).
+    std::string level(path), dir, name(path);
+    size_t cut = level.find_last_of("/\\");
+    if (cut != std::string::npos) { dir = level.substr(0, cut + 1); name = level.substr(cut + 1); }
+    FILE* sp = _stricmp(name.c_str(), "empty_level.sir") == 0 ? fopen((dir + "shared_ui.sir").c_str(), "rb") : NULL;
+    if (sp != NULL) {
+        fseek(sp, 0, SEEK_END);
+        long slen = ftell(sp);
+        fseek(sp, 0, SEEK_SET);
+        u8* sfile = (u8*)malloc((size_t)slen);
+        bool sok = fread(sfile, 1, (size_t)slen, sp) == (size_t)slen;
+        fclose(sp);
+        u32 slotSize = LevelSlotSize(f.hdr, f.hdrSize);
+        sOtherZone = f.zone; sOtherZoneSize = f.zoneSize; sOtherZoneNumber = 0;
+        for (s32 i = 0; sok && i < SirContainerSectionCount(sfile, (u32)slen); i++) {
+            SirSection sec;
+            if (!SirContainerSection(sfile, (u32)slen, i, &sec) || sec.size < 0x104) continue;
+            u8* img = (u8*)malloc(sec.size);
+            memcpy(img, sfile + sec.offset, sec.size);
+            // Not in the file: the address the game reads the image to. Every image of shared_ui.sir has
+            // its screen set right behind the slot copy, so the tool takes the address from that pointer.
+            u32 sbase = (((u32)img[0x100] << 24) | ((u32)img[0x101] << 16) | ((u32)img[0x102] << 8) | img[0x103]) & 0xFFFF0000u;
+            SirReloc sr;
+            SirRelocInit(&sr, NULL, NULL);
+            SirRelocAddRange(&sr, base, f.hdrSize, f.hdr);
+            SirRelocAddRange(&sr, zoneBase, f.zoneSize, f.zone);
+            SirRelocAddRange(&sr, sbase, sec.size, img);
+            LevelZoneOther other = { f.zone, f.zoneSize, zoneBase, &done0 };
+            LevelZoneRoots sroots;
+            memset(&sroots, 0, sizeof(sroots));
+            if (!LevelSharedZoneRootsCollect(img, sec.size, sbase, slotSize, &other, &sroots)) e = SIR_ERR_LEVEL;
+            if (e == SIR_OK) e = LevelZoneConvert(&sr, img, sec.size, sbase, &sroots, NULL, &other);
+            if (e != SIR_OK) { fprintf(stderr, "shared_ui.sir zone %d: %s\n", sec.type, SirErrorText(e)); return 1; }
+            printf("sharedzone %d size 0x%x base %08x\n", sec.type, sec.size, sbase);
+            GlobalBinaryFile sz = { NULL, img, sec.size };
+            ZoneDump sd;
+            sd.z = &sz;
+            printf("sharedslot zone %u floats", *(const u32*)(img + 0x18));
+            for (u32 k = 0; k < 6; k++) printf(" %08x", Bits(*(const f32*)(img + k * 4)));
+            printf(" actions "); sd.Ptr(img + 0xD4); printf(" pools "); sd.Ptr(img + 0xE4);
+            printf(" %u record ", *(const u32*)(img + 0xE8)); sd.Ptr(img + 0xFC);
+            // +0x100 is a word in the slot's field table: the Wii address, in host order.
+            u32 set = *(const u32*)(img + 0x100);
+            const u8* setHost = set >= sbase && set - sbase <= sec.size ? img + (set - sbase) : NULL;
+            printf(" screens "); if (setHost != NULL) printf("img+0x%x\n", set - sbase); else if (set == 0) printf("null\n"); else printf("wii:%08x\n", set);
+            for (u32 k = 0; k < sroots.entityCount; k++) sd.Add(sd.ents, img + (sroots.entities[k] - sbase));
+            sd.PoolTables(&sroots, sbase);
+            sd.Entities();
+            sd.Records(&sroots, sbase);
+            sd.ScreenSet(setHost);
+            LevelZoneRootsFree(&sroots);
+            free(img);
+        }
+        free(sfile);
+    }
     sOtherZone = NULL;
     LevelZoneDoneFree(&done0);
     printf("report image %u dolkept %u dolresolved %u unknown %u\n", r.ptrImage, r.ptrDolKept, r.ptrDolResolved, r.ptrUnknown);
@@ -1121,6 +1254,35 @@ static u32 NameHash(const char* s) {
         for (int k = 0; k < 8; k++) crc = (crc >> 1) ^ (0xEDB88320u & (0u - (crc & 1)));
     }
     return ~crc;
+}
+
+// Converts every section of shared_texture.sir as the port does and prints one line per section,
+// in the text format of `tools/sir_decoder.py --texture`.
+static int DumpTextures(const char* path) {
+    FILE* fp = fopen(path, "rb");
+    if (fp == NULL) { fprintf(stderr, "%s: cannot read\n", path); return 1; }
+    fseek(fp, 0, SEEK_END);
+    long len = ftell(fp);
+    fseek(fp, 0, SEEK_SET);
+    u8* file = (u8*)malloc((size_t)len);
+    bool ok = fread(file, 1, (size_t)len, fp) == (size_t)len;
+    fclose(fp);
+    for (s32 i = 0; ok && i < SirContainerSectionCount(file, (u32)len); i++) {
+        SirSection sec;
+        if (!SirContainerSection(file, (u32)len, i, &sec)) continue;
+        u8* d = file + sec.offset;
+        SirError e = TextureStreamConvert(d, sec.size);
+        if (e != SIR_OK) { fprintf(stderr, "%s section %d: %s\n", path, i, SirErrorText(e)); return 1; }
+        // Read the way fn_8016B5E0, fn_8016B724 and fn_801840E4 do.
+        const char* name = (const char*)(d + TEXTURE_STREAM_RECORD + 4);
+        const u8* p = (const u8*)name + strlen(name) + 1;
+        const u8* q = d + (((u32)(p - d) + 7) & ~3u);
+        printf("texstream %08x size %u tags %08x %08x record %d name %s format %u %u %u flag %u width %u height %u data 0x%x\n",
+               (u32)sec.type, sec.size, *(const u32*)d, *(const u32*)(d + 4), *(const s32*)(d + TEXTURE_STREAM_RECORD), name,
+               p[0], p[1], p[2], p[3], *(const u16*)q, *(const u16*)(q + 2), (u32)(q + 4 - d));
+    }
+    free(file);
+    return ok ? 0 : 1;
 }
 
 static int DumpCatalog(const char* path) {
@@ -1874,6 +2036,84 @@ static void LevelSelfTest(void) {
         free(zone0Copy);
         LevelZoneRootsFree(&roots1);
     }
+
+    // A shared zone: the image starts with a copy of its zone slot, which names a screen set; the
+    // set's table leads to a tree of two nodes, a widget and its one child.
+    {
+        const u32 SH = 0x924C0000u, SH_SIZE = 0x500u;
+        const u32 LIST = 0x4C0, ITEMS = 0x4E0;                 // the child's list (kind 3): one entry
+        const u32 SET = 0x1A0, TABLE = 0x1D0, NODE_A = 0x1E0, NODE_B = 0x200, WIDGET = 0x220, CHILD = 0x350;
+        u8* sh = (u8*)malloc(SH_SIZE);
+        u8* shCopy = (u8*)malloc(SH_SIZE);
+        for (u32 o = 0; o < SH_SIZE; o += 4) Put32(sh + o, 0x7F800001);
+        u32 slotSize = LevelSlotSize(hdr, L_HDR_SIZE);
+        CHECK(slotSize == L_STRIDE);
+        memset(sh, 0, L_STRIDE);
+        Put32(sh + 0x0C, 0x42480000); Put32(sh + 0x18, 480);
+        Put32(sh + 0xFC, L_ZONE + 0x40); Put32(sh + 0x100, SH + SET);
+        Put32(sh + SET + 0x28, SH + TABLE);
+        Put32(sh + TABLE + 0, SH + NODE_A); Put32(sh + TABLE + 4, SH + NODE_B); Put32(sh + TABLE + 8, SH + NODE_A);
+        Put32(sh + NODE_A + 0x00, 0x80000000); Put32(sh + NODE_A + 0x04, SH + WIDGET);
+        Put32(sh + NODE_A + 0x0C, SH + NODE_B); Put32(sh + NODE_A + 0x10, 0);
+        Put32(sh + NODE_B + 0x00, 0x10); Put32(sh + NODE_B + 0x04, 0); Put32(sh + NODE_B + 0x0C, 0); Put32(sh + NODE_B + 0x10, 0);
+        memset(sh + WIDGET, 0, 0x128);
+        Put32(sh + WIDGET + 0x000, 0x11223344);                // a tree node's widget: its first word has no reader here
+        Put32(sh + WIDGET + 0x120, SH + CHILD);
+        memset(sh + CHILD, 0, 0x128);
+        Put32(sh + CHILD + 0x000, 7);
+        Put32(sh + CHILD + 0x060, 3); Put32(sh + CHILD + 0x13C, 1);
+        Put32(sh + CHILD + 0x15C, SH + LIST);
+        Put32(sh + LIST + 0x00, 1); Put32(sh + LIST + 0x04, 2); Put32(sh + LIST + 0x08, 4); Put32(sh + LIST + 0x10, SH + ITEMS);
+        Put32(sh + ITEMS, SH + WIDGET);
+        SirReloc rs;
+        SirRelocInit(&rs, NULL, NULL);
+        SirRelocAddRange(&rs, L_BASE, L_HDR_SIZE, hdr);
+        SirRelocAddRange(&rs, L_ZONE, L_ZONE_SIZE, zone);
+        SirRelocAddRange(&rs, SH, SH_SIZE, sh);
+        LevelZoneOther other = { zone, L_ZONE_SIZE, L_ZONE, &done0 };
+        LevelZoneRoots sroots;
+        CHECK(LevelSharedZoneRootsCollect(sh, SH_SIZE, SH, slotSize, &other, &sroots));
+        CHECK(sroots.slotCopySize == L_STRIDE && sroots.screenSet == SH + SET && sroots.entityCount == 0 && sroots.zoneListCount == 0);
+        // Refused untouched: a node whose left child is the root.
+        memcpy(shCopy, sh, SH_SIZE);
+        Put32(sh + NODE_B + 0x0C, SH + NODE_A);
+        CHECK(LevelZoneConvert(&rs, sh, SH_SIZE, SH, &sroots, NULL, &other) == SIR_ERR_SCREENS);
+        Put32(sh + NODE_B + 0x0C, 0);
+        CHECK(memcmp(shCopy, sh, SH_SIZE) == 0);
+        CHECK(LevelZoneConvert(&rs, sh, SH_SIZE, SH, &sroots, NULL, &other) == SIR_OK);
+        // The slot copy, as fn_80135BC0 copies it and fn_80199024 / fn_8018E808 read the set.
+        CHECK(*(const f32*)(sh + 0x0C) == 50.0f && *(const s32*)(sh + 0x18) == 480 && *(const u8**)(sh + 0xFC) == zone + 0x40);
+        CHECK(*(const u32*)(sh + 0x100) == SH + SET);                                  // a word in the slot's field table
+        const u8* table = *(const u8**)(sh + SET + 0x28);
+        const u8* root = *(const u8**)table;
+        CHECK(table == sh + TABLE && root == sh + NODE_A && *(const u8**)(table + 4) == sh + NODE_B && *(const u8**)(table + 8) == root);
+        CHECK(*(const u32*)root == 0x80000000 && *(const u8**)(root + 4) == sh + WIDGET && *(const u8**)(root + 0xC) == sh + NODE_B);
+        CHECK(*(const u8**)(root + 0x10) == NULL && root[8] == 0x7F && *(const u32*)(sh + NODE_B) == 0x10);
+        const u8* child = *(const u8**)(sh + WIDGET + 0x120);
+        CHECK(child == sh + CHILD && *(const u32*)child == 7 && *(const u8**)(child + 0x124) == NULL && sh[WIDGET] == 0x11);
+        // The child's kind, as fn_8019914C reads it, and its list as fn_8019555C / fn_8019552C do.
+        const u8* uiList = *(const u8**)(child + 0x15C);
+        CHECK(*(const u32*)(child + 0x60) == 3 && *(const s32*)(child + 0x13C) == 1 && uiList == sh + LIST);
+        CHECK(*(const s32*)uiList == 1 && *(const s32*)(uiList + 4) == 2 && *(const s32*)(uiList + 8) == 4 && uiList[0xC] == 0x7F);
+        CHECK(**(const u8***)(uiList + 0x10) == sh + WIDGET && sh[WIDGET + 0x60] == 0);          // a tree node's widget: kind not read
+        {
+            // Refused untouched: a list whose count exceeds its capacity.
+            u8* again = (u8*)malloc(SH_SIZE);
+            memcpy(again, shCopy, SH_SIZE);
+            Put32(again + LIST + 0x00, 3);
+            u8* againCopy = (u8*)malloc(SH_SIZE);
+            memcpy(againCopy, again, SH_SIZE);
+            SirReloc ra;
+            SirRelocInit(&ra, NULL, NULL);
+            SirRelocAddRange(&ra, L_ZONE, L_ZONE_SIZE, zone);
+            SirRelocAddRange(&ra, SH, SH_SIZE, again);
+            CHECK(LevelZoneConvert(&ra, again, SH_SIZE, SH, &sroots, NULL, &other) == SIR_ERR_SCREENS);
+            CHECK(memcmp(again, againCopy, SH_SIZE) == 0);
+            free(again); free(againCopy);
+        }
+        LevelZoneRootsFree(&sroots);
+        free(sh); free(shCopy);
+    }
     LevelZoneDoneFree(&done0);
 
     // The world state, read the way fn_8013006C, fn_8012FD0C and HudReload do.
@@ -2005,6 +2245,36 @@ static void LevelSelfTest(void) {
         CHECK(memcmp(hdrCopy, hdr, L_HDR_SIZE) == 0 && memcmp(zoneCopy, zone, L_ZONE_SIZE) == 0);
     }
     free(hdr); free(zone); free(hdrCopy); free(zoneCopy); free(zone1); free(zone1Copy);
+}
+
+// A texture stream as fn_801840E4 reads it; broken ones are refused untouched.
+static void TextureStreamSelfTest(void) {
+    u8 good[0x40], d[0x40];
+    memset(good, 0xEE, sizeof(good));
+    memcpy(good, "SG21WI00", 8);
+    Put32(good + 0x08, 3); Put32(good + 0x0C, 0x30);
+    Put32(good + 0x10, 0x30);                                  // the record: size, name, four bytes, dimensions, data
+    memcpy(good + 0x14, "strapA", 7);
+    good[0x1B] = 0x13; good[0x1C] = 1; good[0x1D] = 2; good[0x1E] = 3;
+    Put16(good + 0x20, 640); Put16(good + 0x22, 480);
+    memcpy(d, good, sizeof(d));
+    CHECK(TextureStreamConvert(d, sizeof(d)) == SIR_OK);
+    CHECK(*(const u32*)d == 0x53473231 && *(const u32*)(d + 4) == 0x57493030 && *(const s32*)(d + 0x10) == 0x30);
+    CHECK(*(const u16*)(d + 0x20) == 640 && *(const u16*)(d + 0x22) == 480 && d[0x1B] == 0x13 && d[0x0B] == 3 && d[0x24] == 0xEE);
+    struct { u32 off; u8 value; u32 size; } bad[] = {
+        { 0x03, '2', sizeof(d) },      // tag
+        { 0x12, 0x10, sizeof(d) },     // record larger than the section
+        { 0x1A, 'x', 0x1C },           // name runs to the end of the record
+        { 0x13, 0x10, sizeof(d) },     // record too small for the dimensions
+    };
+    for (u32 i = 0; i < sizeof(bad) / sizeof(bad[0]); i++) {
+        memcpy(d, good, sizeof(d));
+        d[bad[i].off] = bad[i].value;
+        u8 copy[0x40];
+        memcpy(copy, d, sizeof(d));
+        CHECK(TextureStreamConvert(d, bad[i].size) == SIR_ERR_TEXTURE);
+        CHECK(memcmp(copy, d, sizeof(d)) == 0);
+    }
 }
 
 static int SelfTest(void) {
@@ -2360,6 +2630,7 @@ static int SelfTest(void) {
     free(img);
     free(copy);
     LevelSelfTest();
+    TextureStreamSelfTest();
     printf(gFailed ? "selftest: %d FAILED\n" : "selftest: ok\n", gFailed);
     return gFailed ? 1 : 0;
 }
@@ -2368,6 +2639,7 @@ int main(int argc, char** argv) {
     if (argc == 2 && strcmp(argv[1], "--selftest") == 0) return SelfTest();
     if (argc == 3 && strcmp(argv[1], "--dump") == 0) return Dump(argv[2]);
     if (argc == 3 && strcmp(argv[1], "--catalog") == 0) return DumpCatalog(argv[2]);
+    if (argc == 3 && strcmp(argv[1], "--texture") == 0) return DumpTextures(argv[2]);
     if (argc == 3 && strcmp(argv[1], "--level") == 0) return DumpLevel(argv[2]);
     fprintf(stderr, "usage: sir_loader_test --selftest | --dump <global_binary.sir> | --catalog <catalog.sir> | --level <x_level.sir>\n");
     return 2;

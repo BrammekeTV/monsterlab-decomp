@@ -362,6 +362,7 @@ enum RegionKind {
     REGION_FX_BOLTS, REGION_FX_TRAILS, REGION_POOL, REGION_POOL_BLOCK,
     REGION_ENTITY, REGION_ENTITY_RECORD, REGION_ENTITY_PART, REGION_PTR_COUNT, REGION_COUNT_PTR, REGION_POOL_TABLE,
     REGION_ENTITY_PROP, REGION_PROP_DEF, REGION_KEY_PTR,
+    REGION_UI_TREE_NODE, REGION_UI_LIST,
     REGION_ZONE_SYSTEM, REGION_ANIM_PLAYER, REGION_ANIM_ELEM, REGION_ANIM_TRACK, REGION_ANIM_KEYS, REGION_F32_ARRAY,
     REGION_RUNTIME    // memory the game initialises itself: nothing to convert, but nothing else may be there
 };
@@ -1704,6 +1705,120 @@ static SirError ScreenSetDbPlan(ImagePlan* plan, const u8* image, u32 imageSize,
     return SIR_OK;
 }
 
+// ---- screen set of a shared zone (zone slot +0x100)
+//
+// fn_80135BC0 hands the slot's +0x100 to fn_80199024, which walks the binary tree behind the
+// table at +0x28 (fn_8018E2F4: table +0 is the root, +4 and +8 the nodes with the lowest and the
+// highest key, which fn_8018E808 compares a searched key with; a node is {+0x00 key, +0x04 widget,
+// +0x0C left, +0x10 right}) and for each node's widget its children (fn_8019BFF8: first child at
+// +0x120, next sibling at +0x124; fn_80199534 reads a child's first word). That is all that is
+// typed of a screen set so far.
+static const SirField kUiTreeNodeFields[] = {
+    { 0x00, SIR_U32, 1 }, { 0x04, SIR_PTR, 1 }, { 0x0C, SIR_PTR, 2 },
+};
+#define UI_WIDGET_USED 0x128
+#define UI_DEPTH_MAX   256
+
+// A list of the UI code: +0x00 count (fn_8019555C), +0x04 capacity, +0x08 element size and +0x10
+// the elements (fn_8019552C). The widget lists hold pointers.
+static const SirField kUiListFields[] = {
+    { 0x00, SIR_U32, 3 }, { 0x10, SIR_PTR, 1 },
+};
+
+static SirError UiFixupPlan(ImagePlan* plan, const u8* image, u32 imageSize, u32 addr, u32 depth);
+
+static SirError UiListPlan(ImagePlan* plan, const u8* image, u32 imageSize, u32 addr, bool widgets, u32 depth) {
+    u32 l, d;
+    SirError e;
+    if (!LevelSpan(addr, 0x14, imageSize, &l) || PlanHas(plan, l, REGION_UI_LIST)) return SIR_OK;
+    if (!PlanAdd(plan, l, 0x14, REGION_UI_LIST)) return SIR_ERR_SCREENS;
+    u32 count = Be32(image + l), capacity = Be32(image + l + 4), size = Be32(image + l + 8);
+    if (count == 0) return SIR_OK;
+    if (size != 4 || count > capacity || count > imageSize / 4 || !LevelSpan(Be32(image + l + 0x10), (u64)count * 4, imageSize, &d) ||
+        !PlanAdd(plan, d, count * 4, REGION_PTR_ARRAY)) return SIR_ERR_SCREENS;
+    for (u32 i = 0; widgets && i < count; i++)
+        if ((e = UiFixupPlan(plan, image, imageSize, Be32(image + d + i * 4), depth + 1)) != SIR_OK) return e;
+    return SIR_OK;
+}
+
+// What fn_8019914C reads of a widget to install the vtable for its kind: +0x60 the kind; for kinds
+// 2 and 3 the sub-kind at +0x13C; kind 3 a list at +0x15C (its entries only get a vtable); kind 4
+// a widget at +0x1B4 and a list of widgets at +0x1BC; kind 5 a widget at +0x190; kind 6 its
+// children. Those widgets go through the same function.
+static SirError UiFixupPlan(ImagePlan* plan, const u8* image, u32 imageSize, u32 addr, u32 depth) {
+    u32 o, co;
+    SirError e = SIR_OK;
+    if (!LevelSpan(addr, UI_WIDGET_USED, imageSize, &o) || PlanHas(plan, o + 0x60, REGION_U32_ARRAY)) return SIR_OK;
+    if (depth > UI_DEPTH_MAX || !PlanAdd(plan, o + 0x60, 4, REGION_U32_ARRAY)) return SIR_ERR_SCREENS;
+    u32 kind = Be32(image + o + 0x60);
+    u32 need = kind == 2 ? 0x140 : kind == 3 ? 0x160 : kind == 4 ? 0x1C0 : kind == 5 ? 0x194 : 0;
+    if ((u64)o + need > imageSize) return SIR_ERR_SCREENS;
+    if ((kind == 2 || kind == 3) && !PlanAdd(plan, o + 0x13C, 4, REGION_U32_ARRAY)) return SIR_ERR_SCREENS;
+    if (kind == 3) {
+        if (!PlanAdd(plan, o + 0x15C, 4, REGION_PTR_ARRAY)) return SIR_ERR_SCREENS;
+        e = UiListPlan(plan, image, imageSize, Be32(image + o + 0x15C), false, depth);
+    } else if (kind == 4) {
+        if (!PlanAdd(plan, o + 0x1B4, 4, REGION_PTR_ARRAY) || !PlanAdd(plan, o + 0x1BC, 4, REGION_PTR_ARRAY)) return SIR_ERR_SCREENS;
+        if ((e = UiFixupPlan(plan, image, imageSize, Be32(image + o + 0x1B4), depth + 1)) != SIR_OK) return e;
+        e = UiListPlan(plan, image, imageSize, Be32(image + o + 0x1BC), true, depth);
+    } else if (kind == 5) {
+        if (!PlanAdd(plan, o + 0x190, 4, REGION_PTR_ARRAY)) return SIR_ERR_SCREENS;
+        e = UiFixupPlan(plan, image, imageSize, Be32(image + o + 0x190), depth + 1);
+    } else if (kind == 6) {
+        if (!PlanHas(plan, o + 0x120, REGION_PTR_ARRAY) && !PlanAdd(plan, o + 0x120, 8, REGION_PTR_ARRAY)) return SIR_ERR_SCREENS;
+        u32 c = Be32(image + o + 0x120), guard = imageSize / UI_WIDGET_USED + 1;
+        while (e == SIR_OK && LevelSpan(c, UI_WIDGET_USED, imageSize, &co)) {
+            if (guard-- == 0) return SIR_ERR_SCREENS;
+            if (!PlanHas(plan, co + 0x120, REGION_PTR_ARRAY) && !PlanAdd(plan, co + 0x120, 8, REGION_PTR_ARRAY)) return SIR_ERR_SCREENS;
+            e = UiFixupPlan(plan, image, imageSize, c, depth + 1);
+            c = Be32(image + co + 0x124);
+        }
+    }
+    return e;
+}
+
+static SirError UiWidgetPlan(ImagePlan* plan, const u8* image, u32 imageSize, u32 addr, bool child, u32 depth) {
+    u32 o;
+    SirError fix;
+    if (!LevelSpan(addr, UI_WIDGET_USED, imageSize, &o)) return SIR_OK;
+    if (depth > UI_DEPTH_MAX) return SIR_ERR_SCREENS;
+    if (child && !PlanAdd(plan, o, 4, REGION_U32_ARRAY)) return SIR_ERR_SCREENS;
+    if (child && (fix = UiFixupPlan(plan, image, imageSize, addr, depth)) != SIR_OK) return fix;   // fn_80199534 -> fn_8019914C
+    // The children, once per widget (a kind 6 widget's link may be in the plan already).
+    if (PlanHas(plan, o, REGION_RUNTIME)) return SIR_OK;                        // an empty marker at the widget
+    if (!PlanAdd(plan, o, 0, REGION_RUNTIME)) return SIR_ERR_SCREENS;
+    if (!PlanHas(plan, o + 0x120, REGION_PTR_ARRAY) && !PlanAdd(plan, o + 0x120, 8, REGION_PTR_ARRAY)) return SIR_ERR_SCREENS;
+    u32 c = Be32(image + o + 0x120), guard = imageSize / UI_WIDGET_USED + 1, co;
+    SirError e;
+    while (LevelSpan(c, UI_WIDGET_USED, imageSize, &co)) {
+        if (guard-- == 0) return SIR_ERR_SCREENS;                // a sibling list that loops
+        if ((e = UiWidgetPlan(plan, image, imageSize, c, true, depth + 1)) != SIR_OK) return e;
+        c = Be32(image + co + 0x124);
+    }
+    return SIR_OK;
+}
+
+static SirError UiTreePlan(ImagePlan* plan, const u8* image, u32 imageSize, u32 node, u32 depth) {
+    u32 n;
+    SirError e;
+    if (!LevelSpan(node, 0x14, imageSize, &n)) return SIR_OK;
+    if (depth > 4096 || PlanHas(plan, n, REGION_UI_TREE_NODE)) return SIR_ERR_SCREENS;   // not a tree
+    if (!PlanAdd(plan, n, 0x14, REGION_UI_TREE_NODE)) return SIR_ERR_SCREENS;
+    if ((e = UiTreePlan(plan, image, imageSize, Be32(image + n + 0x0C), depth + 1)) != SIR_OK) return e;
+    if ((e = UiTreePlan(plan, image, imageSize, Be32(image + n + 0x10), depth + 1)) != SIR_OK) return e;
+    return UiWidgetPlan(plan, image, imageSize, Be32(image + n + 0x04), false, 0);
+}
+
+static SirError ScreenSetPlan(ImagePlan* plan, const u8* image, u32 imageSize, u32 addr) {
+    u32 off, t;
+    if (!LevelSpan(addr, 0x2C, imageSize, &off)) return SIR_OK;
+    if (!PlanAdd(plan, off + 0x28, 4, REGION_PTR_ARRAY)) return SIR_ERR_SCREENS;
+    // The table: the root, and the nodes with the lowest and the highest key (fn_8018E808).
+    if (!LevelSpan(Be32(image + off + 0x28), 0xC, imageSize, &t)) return SIR_OK;
+    if (!PlanAdd(plan, t, 0xC, REGION_PTR_ARRAY)) return SIR_ERR_SCREENS;
+    return UiTreePlan(plan, image, imageSize, Be32(image + t), 0);
+}
+
 // ---- all of them
 
 static SirError ImagePlanBuild(ImagePlan* plan, const u8* hdr, u8* image, u32 imageSize) {
@@ -1789,6 +1904,8 @@ static void ImagePlanConvert(const ImagePlan* plan, SirReloc* r, u8* image, u32 
         case REGION_KEY_PTR:
             for (u32 k = 0; k + 8 <= g->size; k += 8) { Swap32(p + k); r->fieldsSwapped++; ConvertPtr(r, p + k + 4); }
             break;
+        case REGION_UI_LIST:      SirConvertRecord(r, p, g->size, kUiListFields, COUNTOF(kUiListFields)); break;
+        case REGION_UI_TREE_NODE: SirConvertRecord(r, p, g->size, kUiTreeNodeFields, COUNTOF(kUiTreeNodeFields)); break;
         case REGION_PROP_DEF:     SirConvertRecord(r, p, g->size, kPropDefFields, COUNTOF(kPropDefFields)); break;
         case REGION_ENTITY_RECORD: SirConvertRecord(r, p, g->size, kEntityRecordFields, COUNTOF(kEntityRecordFields)); break;
         case REGION_ENTITY_PART:  SirConvertRecord(r, p, g->size, kEntityPartFields, COUNTOF(kEntityPartFields)); break;
@@ -2053,6 +2170,70 @@ extern "C" void LevelZoneRootsFree(LevelZoneRoots* roots) {
     memset(roots, 0, sizeof(*roots));
 }
 
+// The slot size of a converted header block: the distance between the first tables of the first
+// two slots (fn_80129CC8 puts each at slot + 0x140).
+static bool HostSlotStride(const u8* hdr, u32 hdrSize, u32* countOut, u32* strideOut) {
+    bool ok = hdrSize >= LEVEL_HEADER_SLOTS + 0x118;
+    u32 count = ok ? Host32(hdr + 0x1A8) : 0, stride = LEVEL_SLOT_MIN_SIZE;
+    const u8* slots = hdr + LEVEL_HEADER_SLOTS;
+    if (ok && count > 1) {
+        const u8* first;
+        const u8* next = NULL;
+        memcpy(&first, slots + 0x114, sizeof(first));
+        for (;; stride += 4) {
+            if (stride > LEVEL_SLOT_MAX_SIZE || (u64)LEVEL_HEADER_SLOTS + stride + 0x118 > hdrSize) { ok = false; break; }
+            memcpy(&next, slots + stride + 0x114, sizeof(next));
+            if (next == first + stride) break;
+        }
+    }
+    *countOut = count;
+    *strideOut = stride;
+    return ok && count <= LEVEL_MAX_ZONES && (u64)LEVEL_HEADER_SLOTS + (u64)count * stride <= hdrSize;
+}
+
+extern "C" u32 LevelSlotSize(const u8* hdr, u32 hdrSize) {
+    u32 count, stride;
+    return HostSlotStride(hdr, hdrSize, &count, &stride) ? stride : 0;
+}
+
+// The roots of a shared zone, from the big-endian copy of its zone slot at the start of the image.
+extern "C" BOOL LevelSharedZoneRootsCollect(const u8* image, u32 imageSize, u32 wiiBase, u32 slotSize,
+                                            const LevelZoneOther* other, LevelZoneRoots* out) {
+    memset(out, 0, sizeof(*out));
+    if (slotSize < LEVEL_SLOT_MIN_SIZE || slotSize > LEVEL_SLOT_MAX_SIZE || slotSize > imageSize) return FALSE;
+    RootList entities = { NULL, 0, 0 }, pools = { NULL, 0, 0 }, lists = { NULL, 0, 0 };
+    bool ok = true;
+    u32 addr;
+    #define IN_ZONE(a, n) ((a) >= wiiBase && (u64)((a) - wiiBase) + (n) <= imageSize)
+    if ((addr = Be32(image + 0x50)) != 0 && IN_ZONE(addr, 4)) ok = RootAdd(&entities, addr);
+    for (u32 t = 0; ok && t < 2; t++) {                          // the slot's two entity tables, when they lie in the image
+        u32 table = Be32(image + kLevelSlotTables[t]), entries = Be32(image + kLevelSlotTables[t] + 4);
+        if (table == 0 || entries > imageSize / 4 || !IN_ZONE(table, (u64)entries * 4)) continue;
+        for (u32 k = 0; ok && k < entries; k++)
+            if ((addr = Be32(image + (table - wiiBase) + k * 4)) != 0 && IN_ZONE(addr, 4)) ok = RootAdd(&entities, addr);
+    }
+    if (ok && (addr = Be32(image + 0xE4)) != 0 && IN_ZONE(addr, 4)) ok = RootAdd(&pools, addr) && RootAdd(&pools, Be32(image + 0xE8));
+    // The zone's record is in zone 0, converted: its list leads into this image.
+    u32 rec = Be32(image + 0xFC);
+    if (ok && other != NULL && rec >= other->wiiBase && (u64)(rec - other->wiiBase) + 0x14 <= other->imageSize) {
+        // A host pointer into this image, or, when zone 0 was converted without a range for
+        // this zone, the Wii address in host order (ConvertPtr keeps that).
+        const u8* head;
+        memcpy(&head, other->image + (rec - other->wiiBase) + 0x10, sizeof(head));
+        u32 raw = Host32(other->image + (rec - other->wiiBase) + 0x10);
+        if (head >= image && head < image + imageSize) ok = RootAdd(&lists, wiiBase + (u32)(head - image));
+        else if (raw >= wiiBase && raw - wiiBase < imageSize) ok = RootAdd(&lists, raw);
+    }
+    #undef IN_ZONE
+    out->entities = entities.items;         out->entityCount = entities.count;
+    out->poolTables = pools.items;          out->poolTableCount = pools.count / 2;
+    out->zoneLists = lists.items;           out->zoneListCount = lists.count;
+    out->slotCopySize = slotSize;
+    out->screenSet = Be32(image + 0x100);
+    if (!ok) LevelZoneRootsFree(out);
+    return ok ? TRUE : FALSE;
+}
+
 extern "C" void LevelZoneDoneFree(LevelZoneDone* done) {
     free(done->regions);
     memset(done, 0, sizeof(*done));
@@ -2180,6 +2361,10 @@ extern "C" SirError LevelZoneConvert(SirReloc* r, u8* image, u32 imageSize, u32 
         e = PoolTablePlan(&plan, image, imageSize, roots->poolTables[i * 2], roots->poolTables[i * 2 + 1]);
     for (u32 i = 0; i < roots->zoneRecordCount && e == SIR_OK; i++) e = ZoneRecordPlan(&plan, image, imageSize, roots->zoneRecords[i]);
     for (u32 i = 0; i < roots->zoneListCount && e == SIR_OK; i++) e = ZoneListPlan(&plan, image, imageSize, roots->zoneLists[i]);
+    // A shared zone: the slot copy at the start (converted below, by the slot's own field table) and its screen set.
+    if (e == SIR_OK && roots->slotCopySize != 0 && (roots->slotCopySize > imageSize || !PlanAdd(&plan, 0, roots->slotCopySize, REGION_RUNTIME)))
+        e = SIR_ERR_LEVEL;
+    if (e == SIR_OK && roots->screenSet != 0) e = ScreenSetPlan(&plan, image, imageSize, roots->screenSet);
     if (e == SIR_OK && !PlanFinish(&plan)) e = SIR_ERR_OVERLAP;
     // What this zone adds in zone 0: disjoint among itself and from what is converted there.
     if (e == SIR_OK && !PlanFinish(&sOtherNew)) e = SIR_ERR_OVERLAP;
@@ -2192,6 +2377,7 @@ extern "C" SirError LevelZoneConvert(SirReloc* r, u8* image, u32 imageSize, u32 
     }
     if (e == SIR_OK) {
         ImagePlanConvert(&plan, r, image, imageSize);
+        if (roots->slotCopySize != 0) SirConvertRecord(r, image, roots->slotCopySize, kLevelSlotFields, COUNTOF(kLevelSlotFields));
         if (other != NULL) ImagePlanConvert(&sOtherNew, r, other->image, other->imageSize);
         if (merged.count != 0) {                                 // zone 0's list of converted objects grows
             LevelZoneDoneFree(other->done);
@@ -2216,6 +2402,33 @@ extern "C" SirError LevelZoneConvert(SirReloc* r, u8* image, u32 imageSize, u32 
     sImageBase = GLOBAL_BINARY_WII_BASE;
     sLevelZone = false;
     return e;
+}
+
+// --------------------------------------------------------------------------- texture stream
+
+// Offset of the width (the height follows) of the texture record at TEXTURE_STREAM_RECORD, or 0
+// when the stream is not what fn_8016B5E0 and fn_801840E4 expect.
+static u32 TextureStreamDims(const u8* data, u32 size) {
+    if (data == NULL || size < TEXTURE_STREAM_RECORD + 8 || memcmp(data, "SG21WI00", 8) != 0) return 0;
+    u32 recSize = Be32(data + TEXTURE_STREAM_RECORD);
+    if (recSize < 12 || recSize > size - TEXTURE_STREAM_RECORD) return 0;
+    u32 end = TEXTURE_STREAM_RECORD + recSize, p = TEXTURE_STREAM_RECORD + 4;
+    while (p < end && data[p] != 0) p++;                         // the name
+    if (p >= end) return 0;
+    p += 1;                                                      // p: format and three more bytes
+    u32 q = (p + 7) & ~3u;                                       // as fn_801840E4 rounds the cursor
+    return q + 4 <= end ? q : 0;
+}
+
+extern "C" SirError TextureStreamConvert(u8* data, u32 size) {
+    u32 q = TextureStreamDims(data, size);
+    if (q == 0) return SIR_ERR_TEXTURE;
+    Swap32(data);
+    Swap32(data + 4);
+    Swap32(data + TEXTURE_STREAM_RECORD);
+    Swap16(data + q);
+    Swap16(data + q + 2);
+    return SIR_OK;
 }
 
 // ------------------------------------------------------------------------------------ file helper

@@ -574,6 +574,23 @@ def other_ptr(v):
     if OTHER_ZONE and OTHER_ZONE[0] <= v <= OTHER_ZONE[0] + len(OTHER_ZONE[2]): return 'zone%d+0x%x' % (OTHER_ZONE[1], v - OTHER_ZONE[0])
     return None
 
+def texture_stream_dump(path):
+    """shared_texture.sir: one line per section. A section is a stream that starts with the tags
+    "SG21" "WI00" and holds one texture record at 0x10: s32 size, name, four bytes, padding to a
+    multiple of four, u16 width, u16 height, pixel data (fn_8016B5E0, fn_8016B724, fn_801840E4)."""
+    L = []
+    for s in read_archive(path)[1]:
+        d = s['data']
+        size = struct.unpack_from('>i', d, 0x10)[0]
+        end = d.index(b'\0', 0x14)
+        p = end + 1
+        q = (p + 7) & ~3
+        w, h = struct.unpack_from('>HH', d, q)
+        L.append('texstream %08x size %d tags %08x %08x record %d name %s format %d %d %d flag %d width %d height %d data 0x%x' % (
+            s['type'] & 0xFFFFFFFF, len(d), struct.unpack_from('>I', d, 0)[0], struct.unpack_from('>I', d, 4)[0], size,
+            d[0x14:end].decode('ascii'), d[p], d[p + 1], d[p + 2], d[p + 3], w, h, q + 4))
+    return L
+
 def level_dump(path):
     global OTHER_ZONE
     version, secs = read_archive(path)
@@ -622,8 +639,112 @@ def level_dump(path):
     for zn, zsec, zb in zones:
         if zn: OTHER_ZONE = (zbase, 0, zone0)
         level_zone_dump(L, zn, zsec, zb, u, base, count, stride, zone0, zbase)
+    # The shared zones, as the port converts them while this level is loaded (empty_level.sir only).
+    shared = os.path.join(os.path.dirname(path), 'shared_ui.sir')
+    if os.path.basename(path).lower() == 'empty_level.sir' and os.path.exists(shared):
+        OTHER_ZONE = (zbase, 0, zone0)
+        for s in read_archive(shared)[1]:
+            shared_zone_dump(L, s['type'], s['data'], stride, zone0, zbase)
     OTHER_ZONE = None
     return L
+
+def shared_zone_dump(L, zn, sec, slot_size, zone0, zbase0):
+    """A shared zone image (shared_ui.sir): the copy of its zone slot at the start, the zone's
+    objects, and the first layer of the screen set the slot names (+0x100)."""
+    u = lambda o: struct.unpack_from('>I', sec, o)[0]
+    # Not in the file: the address the game reads the image to. Every image of shared_ui.sir has
+    # its screen set right behind the slot copy, so the tools take the address from that pointer.
+    base = u(0x100) & 0xFFFF0000
+    inz = lambda v, n=1: base <= v and v + n <= base + len(sec)
+    def ptr(v):
+        if v == 0: return 'null'
+        if base <= v <= base + len(sec): return 'img+0x%x' % (v - base)
+        if other_ptr(v): return other_ptr(v)
+        return 'wii:%08x' % v
+    ws = lambda o, n: ' '.join('%08x' % u(o + i * 4) for i in range(n))
+    L.append('sharedzone %d size 0x%x base %08x' % (zn, len(sec), base))
+    L.append('sharedslot zone %d floats %s actions %s pools %s %d record %s screens %s' % (
+        u(0x18), ws(0, 6), ptr(u(0xD4)), ptr(u(0xE4)), u(0xE8), ptr(u(0xFC)), ptr(u(0x100))))
+    roots, pooltabs, lists = [], [], []
+    if inz(u(0x50)): roots.append(u(0x50))
+    for t in (0x120, 0x12C):
+        table, n = u(t), u(t + 4)
+        if table and inz(table, n * 4): roots += [v for v in (u(table - base + i * 4) for i in range(n)) if inz(v)]
+    if inz(u(0xE4)): pooltabs.append((u(0xE4), u(0xE8)))
+    rec = u(0xFC)
+    if zbase0 <= rec and rec + 0x14 <= zbase0 + len(zone0):
+        head = struct.unpack_from('>I', zone0, rec - zbase0 + 0x10)[0]
+        if inz(head): lists.append(head)
+    zone_dump(L, sec, base, 0, roots, [], pooltabs, [], lists)
+    ss = u(0x100)
+    if not inz(ss, 0x2C): return
+    table = u(ss - base + 0x28)
+    L.append('uiset %s table %s' % (ptr(ss), ptr(table)))
+    if not inz(table, 0xC): return
+    t = table - base
+    L.append('uitable %s root %s low %s high %s' % (ptr(table), ptr(u(t)), ptr(u(t + 4)), ptr(u(t + 8))))
+    seen_w, fixed, lists = set(), set(), set()
+    def ui_list(a, widgets):
+        if not inz(a, 0x14) or a in lists: return
+        lists.add(a)
+        l = a - base
+        n, data = u(l), u(l + 0x10)
+        L.append('uilist %s count %d capacity %d size %d data %s' % (ptr(a), n, u(l + 4), u(l + 8), ptr(data)))
+        if n == 0 or not inz(data, n * 4): return
+        items = [u(data - base + i * 4) for i in range(n)]
+        L.append('uilistitems %s %s' % (ptr(a), ' '.join(ptr(v) for v in items)))
+        if widgets:
+            for v in items: fix(v)
+    def fix(w):
+        """What fn_8019914C reads of a widget."""
+        if not inz(w, 0x128) or w in fixed: return
+        fixed.add(w)
+        o = w - base
+        kind = u(o + 0x60)
+        line = 'uikind %s kind %d' % (ptr(w), kind)
+        if kind in (2, 3): line += ' sub %d' % u(o + 0x13C)
+        if kind == 3:
+            L.append(line + ' list %s' % ptr(u(o + 0x15C)))
+            ui_list(u(o + 0x15C), False)
+        elif kind == 4:
+            L.append(line + ' body %s list %s' % (ptr(u(o + 0x1B4)), ptr(u(o + 0x1BC))))
+            fix(u(o + 0x1B4))
+            ui_list(u(o + 0x1BC), True)
+        elif kind == 5:
+            L.append(line + ' body %s' % ptr(u(o + 0x190)))
+            fix(u(o + 0x190))
+        elif kind == 6:
+            L.append(line + ' first %s' % ptr(u(o + 0x120)))
+            c = u(o + 0x120)
+            while inz(c, 0x128):
+                fix(c)
+                c = u(c - base + 0x124)
+        else:
+            L.append(line)
+    def widget(w, child):
+        if not inz(w, 0x128): return
+        o = w - base
+        if child: L.append('uichild %s type %08x first %s next %s' % (ptr(w), u(o), ptr(u(o + 0x120)), ptr(u(o + 0x124))))
+        else: L.append('uiwidget %s first %s next %s' % (ptr(w), ptr(u(o + 0x120)), ptr(u(o + 0x124))))
+        if child: fix(w)
+        if w in seen_w: return
+        seen_w.add(w)
+        c = u(o + 0x120)
+        while inz(c, 0x128):
+            widget(c, True)
+            c = u(c - base + 0x124)
+    # The tree as fn_8018E2F4 walks it: left subtree, right subtree, then the node.
+    seen, stack = set(), [(u(t), 0)]
+    while stack:
+        n, done = stack.pop()
+        if not inz(n, 0x14): continue
+        o = n - base
+        if done:
+            L.append('uinode %s key %08x widget %s left %s right %s' % (ptr(n), u(o), ptr(u(o + 4)), ptr(u(o + 0xC)), ptr(u(o + 0x10))))
+            widget(u(o + 4), False)
+        elif n not in seen:
+            seen.add(n)
+            stack += [(n, 1), (u(o + 0x10), 0), (u(o + 0xC), 0)]
 
 LEVEL_ZONE1_BASE = 0x90980000   # gZoneBase[1] = zone 0's address + its memory budget (world_alloc.cpp); not in the file
 
@@ -1124,6 +1245,7 @@ def main():
     ap.add_argument('--gamedb', action='store_true', help='global_binary.sir: print the game database as text')
     ap.add_argument('--image', action='store_true', help='global_binary.sir: print the input table, textures, string and action tables as text')
     ap.add_argument('--catalog', action='store_true', help='catalog.sir: print the file table as text')
+    ap.add_argument('--texture', action='store_true', help='shared_texture.sir: print one line per texture section')
     ap.add_argument('--level', action='store_true', help='a level file: print the header block and the HUD of zone 0 as text')
     a = ap.parse_args()
     if a.catalog:
@@ -1132,6 +1254,10 @@ def main():
         return
     if a.level:
         for line in level_dump(a.archive):
+            print(line)
+        return
+    if a.texture:
+        for line in texture_stream_dump(a.archive):
             print(line)
         return
     if a.gamedb or a.image:

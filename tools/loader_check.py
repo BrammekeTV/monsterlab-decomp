@@ -128,6 +128,11 @@ def main():
     else:
         print("catalog check skipped: catalog.sir not found next to streams/")
 
+    # Texture sections of shared_texture.sir (`--texture`).
+    path = os.path.join(streams, "shared_texture.sir")
+    if os.path.exists(path):
+        ok = compare(exe, "--texture", path, sir_decoder.texture_stream_dump(path), ()) and ok
+
     # Level files: header block and the HUD of zone 0 (`--level`).
     for name in sorted(os.listdir(streams)):
         if name.lower().endswith("_level.sir"):
