@@ -63,16 +63,16 @@ s32 fn_8016AFE8(u8* a, u8* b, u8* c, f32 t) {
 }
 
 // 0x8017385C
-// Clears +0x60 of the record, then tail-calls slot 4 of the global object (lbl_805FB608).
+// Clears +0x60 of the record, then tail-calls the free function at +4 of the heap object (lbl_805FB608).
 void fn_8017385C(void* p) {
     *(s32*)((u8*)p + 0x60) = 0;
-    (*(void (**)(void*, void*))(*(u8**)lbl_805FB608 + 0x4))(p, lbl_805FB608);
+    (*(void (**)(void*, void*))(lbl_805FB608 + 0x4))(p, lbl_805FB608);
 }
 
 // 0x80184268
-// Tail-calls slot 4 of the global object (lbl_805FB608) with the record and the object.
+// Tail-calls the free function at +4 of the heap object (lbl_805FB608) with the record and the object.
 void fn_80184268(void* p) {
-    (*(void (**)(void*, void*))(*(u8**)lbl_805FB608 + 0x4))(p, lbl_805FB608);
+    (*(void (**)(void*, void*))(lbl_805FB608 + 0x4))(p, lbl_805FB608);
 }
 
 // 0x801C6618

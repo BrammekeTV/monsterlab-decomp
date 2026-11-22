@@ -268,6 +268,13 @@ OSTime OSGetTime(void) {
 
 u32 OSGetTick(void) { return (u32)OSGetTime(); }
 
+// OSSleepTicks (64-bit tick count in two words): the SDK sets an alarm and sleeps the thread
+// until it fires. Here the thread waits on the clock, which lets the interrupts in.
+void fn_8023D3C8(s32 hi, u32 lo) {
+    OSTime end = OSGetTime() + (((OSTime)hi << 32) | lo);
+    while (OSGetTime() < end) Sleep(1);
+}
+
 // ------------------------------------------------------------------ reports and system
 void OSReport(const char* fmt, ...) {
     va_list ap;
@@ -350,6 +357,12 @@ static DWORD WINAPI ThreadEntry(void* p) {
     return 0;
 }
 
+// OSIsThreadTerminated: 1 when the thread has ended or was never created (state 8 or 0 in the SDK).
+s32 fn_8023C168(OSThread* thread) {
+    PortThread* pt = FindThread(thread, FALSE);
+    return (!pt || pt->done) ? 1 : 0;
+}
+
 BOOL OSCreateThread(OSThread* thread, OSThreadFunc func, void* param, void* stackTop, u32 stackSize, s32 priority, u16 attr) {
     PortThread* pt = FindThread(thread, TRUE);
     pt->func = func;
@@ -420,9 +433,37 @@ void OSCreateAlarm(u8* alarm) {
     if (a) { a->handler = NULL; a->fire = a->period = 0; }
 }
 
+// OSCancelAlarm: the alarm no longer fires. Its first word (the handler) is cleared, as the SDK does.
+void fn_80234418(u8* alarm) {
+    PortAlarm* a = FindAlarm(alarm, FALSE);
+    if (a) { a->handler = NULL; a->fire = a->period = 0; }
+    *(u32*)alarm = 0;
+}
+
+// OSDisableInterrupts / OSEnableInterrupts / OSRestoreInterrupts: the interrupt thread delivers
+// nothing while they are off. Each returns the state before the call.
+s32 OSDisableInterrupts(void) { return (s32)PortDisableInterrupts(); }
+s32 OSEnableInterrupts(void) { s32 was = (s32)PortDisableInterrupts(); PortRestoreInterrupts(1); return was; }
+s32 OSRestoreInterrupts(s32 level) { s32 was = (s32)PortDisableInterrupts(); PortRestoreInterrupts((u32)(level != 0)); return was; }
+
+// AXRegisterCallback: the game's audio frame callback, which AX calls once per 5 ms audio frame.
+// There is no mixer yet; the callback still runs (from PortOsTick), because the game waits for it.
+// Returns the previous callback.
+static void (*sAxFrameCb)(void);
+static OSTime sAxNext;
+void* fn_80259B2C(void* cb) {
+    void* old = (void*)sAxFrameCb;
+    sAxFrameCb = (void (*)(void))cb;
+    return old;
+}
+
 }  // extern "C"
 
 void PortOsTick(void) {
+    if (sAxFrameCb) {
+        OSTime t = OSGetTime(), frame = (OSTime)(OSGetBusClock() / 4 / 200);
+        if (t >= sAxNext) { sAxNext = t + frame; sAxFrameCb(); }
+    }
     OSTime now = 0;
     for (PortAlarm& a : sAlarms) {
         if (!a.key || !a.handler) continue;
