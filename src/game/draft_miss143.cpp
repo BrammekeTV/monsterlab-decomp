@@ -632,7 +632,13 @@ void fn_80157324(void) {
         u32* s = (u32*)tables[t];
         for (s32 n = 0; n < 256; n++) {
             u32 x = s[n];
-            d[n] = ((x << 16) & 0xFF0000u) | 0xFF000000u | (x & 0xFF00u) | ((x >> 16) & 0xFFu);
+            // Texture data is in console byte order on every platform: alpha, then the low,
+            // middle and third byte of the table entry.
+            u8* o = (u8*)&d[n];
+            o[0] = 0xFF;
+            o[1] = (u8)x;
+            o[2] = (u8)(x >> 8);
+            o[3] = (u8)(x >> 16);
         }
         fn_8015A2E8(block, 0, 1);
         block += 0x20;
