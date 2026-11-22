@@ -52,7 +52,7 @@ BOOL fn_801C6634(u8* col);                  // 0x801C6634
 u8* fn_801C668C(u8* key);                   // 0x801C668C
 s32 fn_801DA780(u8* a3);                    // 0x801DA780
 u8* fn_801DA788(u8* a3, s32 i);             // 0x801DA788
-void fn_80050164(u8* obj);                  // 0x80050164
+void fn_80050164(u8* a0, u8* ctx);                  // 0x80050164
 u32 fn_8021F7E8(u8* p);                     // 0x8021F7E8
 u32 fn_8021F7C0(u8* p);                     // 0x8021F7C0
 void fn_8021F94C(u8* p, f32 v);             // 0x8021F94C

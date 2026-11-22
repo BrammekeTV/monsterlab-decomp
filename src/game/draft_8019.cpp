@@ -14,7 +14,7 @@ void        UIWidgetPlayAnimLoop(void* w, u32 anim, s32 n);  // 0x8019BB1C
 void        fn_8019B888(void* el, u32 anim, s32 n);        // 0x8019B888
 void        fn_8019B94C(void* el, u32 anim, s32 n);        // 0x8019B94C
 s32 fn_8019BC80(u8* arg0, u32 arg1);               // 0x8019BC80
-void        fn_801AB80C(f32 rate);                         // 0x801AB80C
+s32         fn_801AB80C(u8* a3, f32 rate);                         // 0x801AB80C
 s32 fn_801AB748(u8* p, f32 v);                          // 0x801AB748
 f32         fn_801AB7F0(void* h);                          // 0x801AB7F0
 
@@ -135,7 +135,7 @@ void UIElement_PlayUIAnimAtRate(u32 a0, u32 a1, f32 a2) {
             fn_8018D370(lbl_80381868 + 0x310);
             return;
         }
-        fn_801AB80C(a2);
+        fn_801AB80C((u8*)h, a2);
         if (a2 >= lbl_805FF8A0) {
             fn_801AB748(*(u8**)(el + 0x10), a2);  // f1 still holds a2
             return;

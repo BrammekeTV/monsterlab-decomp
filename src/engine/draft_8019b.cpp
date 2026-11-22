@@ -12,7 +12,7 @@ void        fn_8018D370(const char* fmt, ...);             // 0x8018D370 (debug 
 const char* fn_801EB708(u32 hash);                         // 0x801EB708 (hash -> name for logs)
 s32 fn_801AB748(u8* p, f32 v);                          // 0x801AB748
 f32         fn_801AB804(void* h);                          // 0x801AB804 (current anim time)
-void        fn_801AB80C(f32 rate);                         // 0x801AB80C
+s32         fn_801AB80C(u8* a3, f32 rate);                         // 0x801AB80C
 s32 fn_8019CC7C(void* el, u32 flag);               // 0x8019CC7C
 s32         fn_8019CD14(void* el);                         // 0x8019CD14
 void        fn_8019DC58(void* el);                         // 0x8019DC58
@@ -86,7 +86,7 @@ void UIElement_SetUIAnimPlaybackRate(u32 a0, f32 a1) {
             fn_8018D2B8(lbl_80381868 + 0x340, fn_801EB708(a0));
             return;
         }
-        fn_801AB80C(a1);
+        fn_801AB80C((u8*)*(void**)(el + 0x10), a1);
         fn_801AB804(*(void**)(el + 0x10));
         fn_801AB748(*(u8**)(el + 0x10), a1);  // lint:ok f1 is still a1 (no float result set in between)
     }
