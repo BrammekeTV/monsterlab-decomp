@@ -99,6 +99,11 @@
  "changelog": [
   {
    "date": "2026-11-22",
+   "time": "22:04",
+   "text": "The loader converts each mesh part's draw batch on Windows (PR #71): its statistics and where its display list starts and how long it is, the next piece the level needs to draw its 3D models."
+  },
+  {
+   "date": "2026-11-22",
    "time": "22:01",
    "text": "Level materials start loading on Windows (PR #69): the loader converts the materials of a mesh's parts (header, the first material type, its textures and matrix), the next thing the front-end level needs before it can draw its first 3D model."
   },
