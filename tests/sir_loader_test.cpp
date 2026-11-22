@@ -1009,6 +1009,33 @@ struct ZoneDump {
     // What the draw passes read of an item and of its mesh (fn_80184C18, fn_80171ABC, fn_80171228).
     std::vector<const u8*> meshes;
     void Floats(const u8* at, u32 n) { for (u32 i = 0; i < n; i++) printf("%s%08x", i ? " " : "", Bits(*(const f32*)(at + i * 4))); }
+    std::vector<const u8*> materials, matTextures;
+    static void Hex(const u8* at, u32 n) { for (u32 i = 0; i < n; i++) printf("%02x", at[i]); }
+    void MatTexture(const u8* t) {
+        if (!In(t, SIR_TEXTURE_HEADER) || std::find(matTextures.begin(), matTextures.end(), t) != matTextures.end()) return;
+        matTextures.push_back(t);
+        const SirTexture* x = (const SirTexture*)t;
+        printf("mattex "); Val(t); printf(" hdr %u size %ux%u gx %ux%u bytes ", x->headerSize, x->size[0], x->size[1], x->gxSize[0], x->gxSize[1]);
+        Hex(t + 0x0C, 12); printf(" datasize %u data ", x->dataSize); Ptr((const u8*)&x->data); printf(" palette "); Ptr((const u8*)&x->palette);
+        printf(" unk24 %u next ", x->unk24); Ptr((const u8*)&x->next); printf(" prev "); Ptr((const u8*)&x->prev); printf(" list "); Ptr((const u8*)&x->list); printf("\n");
+    }
+    // A mesh part's material and what fn_80176E20, fn_80177940 and fn_801776C8 read of it (type 0).
+    void Material(const u8* mat) {
+        if (!In(mat, 0x40) || std::find(materials.begin(), materials.end(), mat) != materials.end()) return;
+        materials.push_back(mat);
+        printf("material "); Val(mat); printf(" words %08x %08x rec ", *(const u32*)mat, *(const u32*)(mat + 4)); Ptr(mat + 8);
+        printf(" bytes "); Hex(mat + 0x0C, 4); printf(" tex "); Ptr(mat + 0x1C); printf(" "); Ptr(mat + 0x20); printf(" matrix "); Ptr(mat + 0x3C); printf("\n");
+        MatTexture(*(const u8**)(mat + 0x1C));
+        MatTexture(*(const u8**)(mat + 0x20));
+        const u8* x = *(const u8**)(mat + 0x3C);
+        const u8* r = *(const u8**)(mat + 8);
+        if (In(x, 0x30)) { printf("matmatrix "); Val(x); printf(" "); Floats(x, 12); printf("\n"); }
+        if (mat[0x0C] == 0 && In(r, 0x68)) {
+            printf("matrec "); Val(r); printf(" back "); Ptr(r); printf(" b4 "); Hex(r + 4, 4); printf(" floats "); Floats(r + 8, 16);
+            printf(" f4c "); Floats(r + 0x4C, 2); printf(" w54 %08x b58 ", *(const u32*)(r + 0x54)); Hex(r + 0x58, 4);
+            printf(" w5c "); Floats(r + 0x5C, 2); printf(" b64 "); Hex(r + 0x64, 4); printf("\n");
+        }
+    }
     void ItemDraw(const u8* it) {
         printf("itemdraw "); Val(it); printf(" xf "); Ptr(it + 4); printf(" scale %08x mesh ", Bits(*(const f32*)(it + 8))); Ptr(it + 0x10);
         printf(" out "); Floats(it + 0x14, 7); printf(" cb %08x arg ", *(const u32*)(it + 0x30)); Ptr(it + 0x34);
@@ -1026,6 +1053,7 @@ struct ZoneDump {
             const u8* b = *(const u8**)(m + 0x74 + k * 8);
             printf("meshpart "); Val(m); printf(" material "); Ptr(m + 0x70 + k * 8); printf(" batch "); Ptr(m + 0x74 + k * 8);
             if (In(b, 0x10)) printf(" flags %08x\n", *(const u32*)(b + 0xC)); else printf(" flags -\n");
+            Material(*(const u8**)(m + 0x70 + k * 8));
         }
     }
 
@@ -2116,7 +2144,12 @@ static SirError ConvertBuilt(u8* hdr, u8* img, SirReloc* r, s32* failTable) {
 #define L_OBJ      0xD70u                     // the object: type word at +0x08
 #define L_FXLIST   0xD80u                     // slot 0's placed effects: one pointer
 #define L_FX       0xD90u                     // the effect, 0x20
-#define L_ZONE_SIZE 0xDB0u
+#define L_MAT      0xDC0u                     // the part's material (type 0, pass 1): 0x60 used
+#define L_MREC     0xE20u                     // its record, 0x68
+#define L_MMAT     0xE90u                     // its texture matrix, twelve floats
+#define L_MTEX     0xEC0u                     // its texture: header 0x54, pixel data 0x20 behind it
+#define L_MTEXD    0xF20u
+#define L_ZONE_SIZE 0xF40u
 #define L_ZONE1    0x90980000u                // Wii address of zone 1: an entity at 0x10, a list object at 0x200
 #define L_ENT1     0x10u                      // the entity slot 1's second table names
 #define L_ZONE1_SIZE 0x300u
@@ -2252,7 +2285,26 @@ static void BuildLevel(u8* hdr, u8* zone) {
     memset(mesh, 0, 0x78);
     Put32(mesh + 0x00, 0x4D);                                  // no reader: stays big-endian
     Put32(mesh + 0x2C, 0x3F5DB3D7); Put32(mesh + 0x54, 0x3F000100);
-    Put32(mesh + 0x6C, 1); Put32(mesh + 0x74, L_ZONE + L_BATCH);
+    Put32(mesh + 0x6C, 1); Put32(mesh + 0x70, L_ZONE + L_MAT); Put32(mesh + 0x74, L_ZONE + L_BATCH);
+    // The material and its type 0 record, as fn_80176E20, fn_80177940 and fn_801776C8 read them.
+    u8* mmatw = zone + L_MAT;
+    memset(mmatw, 0, 0x60);
+    Put32(mmatw + 0x00, 0x53); Put32(mmatw + 0x04, 2); Put32(mmatw + 0x08, L_ZONE + L_MREC); Put32(mmatw + 0x0C, 0x00010001);
+    Put32(mmatw + 0x10, 0x11223344);                              // no reader (type 0): stays big-endian
+    Put32(mmatw + 0x1C, L_ZONE + L_MTEX); Put32(mmatw + 0x3C, L_ZONE + L_MMAT);
+    u8* mrec = zone + L_MREC;
+    memset(mrec, 0, 0x68);
+    Put32(mrec + 0x00, L_ZONE + L_MAT); Put32(mrec + 0x04, 0x01000001);
+    for (u32 i = 0; i < 16; i++) Put32(mrec + 0x08 + i * 4, 0x3F800000 + i);
+    Put32(mrec + 0x48, 0x12345678);                              // no reader: stays big-endian
+    Put32(mrec + 0x4C, 0x40000000); Put32(mrec + 0x50, 0x40400000); Put32(mrec + 0x54, 5); Put32(mrec + 0x58, 0x01020304);
+    Put32(mrec + 0x5C, 7); Put32(mrec + 0x60, 2); Put32(mrec + 0x64, 0x01010001);
+    for (u32 i = 0; i < 12; i++) Put32(zone + L_MMAT + i * 4, 0x3F000000 + i);
+    u8* mtexw = zone + L_MTEX;
+    memset(mtexw, 0, 0x54);
+    Put32(mtexw + 0x00, 0x54); Put16(mtexw + 0x04, 8); Put16(mtexw + 0x06, 4); Put16(mtexw + 0x08, 8); Put16(mtexw + 0x0A, 4);
+    Put32(mtexw + 0x18, 0x20); Put32(mtexw + 0x1C, L_ZONE + L_MTEXD);
+    for (u32 i = 0; i < 8; i++) Put32(zone + L_MTEXD + i * 4, 0x81234567);   // pixel data: stays as it is
     Put32(zone + L_BATCH + 0x08, 6);                           // no reader: stays big-endian
     Put32(zone + L_BATCH + 0x0C, 0x21);
     for (u32 o = 0xB8; o < 0xC4; o += 4) Put32(zone + L_ITEM + o, 0);
@@ -2596,7 +2648,22 @@ static void LevelSelfTest(void) {
     CHECK(*(const f32*)(zone + L_MATRIX + 0x30) == 2.0f && *(const u8**)(item + 0xB0) == NULL && mesh[3] == 0x4D);
     CHECK(*(const u32*)(mesh + 0x2C) == 0x3F5DB3D7 && *(const u32*)(mesh + 0x54) == 0x3F000100 && *(const s32*)(mesh + 0x6C) == 1);
     const u8* batch = *(const u8**)(mesh + 0x74);
-    CHECK(*(const u8**)(mesh + 0x70) == NULL && batch == zone + L_BATCH && *(const u32*)(batch + 0xC) == 0x21 && batch[0xB] == 6);
+    CHECK(*(const u8**)(mesh + 0x70) == zone + L_MAT && batch == zone + L_BATCH && *(const u32*)(batch + 0xC) == 0x21 && batch[0xB] == 6);
+    // The material: pass and type bytes in place, the record, texture and matrix reachable, the record's fields in host order.
+    const u8* matp = zone + L_MAT;
+    const u8* mrecd = *(const u8**)(matp + 0x08);
+    const SirTexture* mtexp = *(const SirTexture**)(matp + 0x1C);
+    CHECK(*(const u32*)matp == 0x53 && *(const u32*)(matp + 4) == 2 && mrecd == zone + L_MREC && matp[0x0C] == 0 && matp[0x0D] == 1 && matp[0x0F] == 1);
+    CHECK(*(const u32*)(matp + 0x10) == 0x44332211 && *(const u8**)(matp + 0x20) == NULL);
+    CHECK((const u8*)mtexp == zone + L_MTEX && (const u8*)mtexp->data == zone + L_MTEXD && mtexp->headerSize == 0x54 && mtexp->size[0] == 8 && mtexp->size[1] == 4 &&
+          mtexp->dataSize == 0x20 && zone[L_MTEXD] == 0x81 && zone[L_MTEXD + 1] == 0x23);
+    const f32* mmat = *(const f32**)(matp + 0x3C);
+    CHECK((const u8*)mmat == zone + L_MMAT && mmat[0] == 0.5f && mmat[1] > 0.5f);
+    CHECK(*(const u8**)mrecd == matp && mrecd[4] == 1 && mrecd[7] == 1 && *(const f32*)(mrecd + 0x08) == 1.0f && *(const f32*)(mrecd + 0x44) > 1.0f);
+    CHECK(*(const u32*)(mrecd + 0x48) == 0x78563412 && *(const f32*)(mrecd + 0x4C) == 2.0f && *(const f32*)(mrecd + 0x50) == 3.0f);
+    CHECK(*(const u32*)(mrecd + 0x54) == 5 && *(const u32*)(mrecd + 0x5C) == 7 && *(const u32*)(mrecd + 0x60) == 2);
+    CHECK(mrecd[0x58] == 1 && mrecd[0x5B] == 4);
+    CHECK(mrecd[0x64] == 1 && mrecd[0x67] == 1);
     const f32* matrix = (*(const f32***)(sc + 0x5C))[*(const s32*)(sc + 0x50)];
     CHECK(*(const u8**)(sc + 0x48) == ent && (const u8*)matrix == zone + L_MATRIX && matrix[0] == 1.0f && matrix[1] == 0.0f);
     CHECK(*(const u8**)(ent + 0x1A0) == ent + 0x9C && **(const u8***)(ent + 0x1A0) == def);
@@ -2641,6 +2708,11 @@ static void LevelSelfTest(void) {
         { true, L_ENT + 0xA4, L_ZONE + L_RECORD + 0x20, SIR_ERR_OVERLAP },         // holder inside the record
         { true, L_ENT + 0x9C, L_ZONE + L_SCENE, SIR_ERR_OVERLAP },                 // prop "definition" on the scene object
         { true, L_MESH + 0x6C, 0x100000, SIR_ERR_ENTITY },                         // mesh parts run off the zone
+        { true, L_MAT + 0x00, 0x52, SIR_ERR_ENTITY },                              // not a material
+        { true, L_MAT + 0x0C, 0x02010001, SIR_ERR_ENTITY },                        // a type the draw table does not have
+        { true, L_MREC + 0x00, L_ZONE + L_MREC, SIR_ERR_ENTITY },                  // the record does not name its material
+        { true, L_MTEX + 0x00, 0x58, SIR_ERR_ENTITY },                             // the material's texture is not a header
+        { true, L_MTEX + 0x18, 0x1000, SIR_ERR_ENTITY },                           // its pixel data runs off the zone
         { true, L_ITEM + 0x10, L_ZONE + L_ENT, SIR_ERR_OVERLAP },                  // "mesh" inside the entity
         { true, 0x10, L_ZONE + L_ZONE_SIZE - 0x20, SIR_ERR_ZONE_RECORD },          // list object runs off the zone
         { true, L_SYS + 0x10, L_ZONE + L_SYS + 0x10, SIR_ERR_ZONE_RECORD },        // list that loops

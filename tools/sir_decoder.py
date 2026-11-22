@@ -1161,7 +1161,30 @@ def zone_dump(L, sec, base, hud, roots, scene_roots, pooltabs, records=(), lists
             add(ents, u(off(node) + 4))
             node = u(off(node) + 8)
     # What the draw passes read of an item and of its mesh (fn_80184C18, fn_80171ABC, fn_80171228).
-    meshes = set()
+    meshes, mats, mattex = set(), set(), set()
+    def mat_texture(t):
+        if not inz(t, 0x54) or t in mattex: return
+        mattex.add(t)
+        o = off(t)
+        L.append('mattex %s hdr %d size %dx%d gx %dx%d bytes %s datasize %d data %s palette %s unk24 %d next %s prev %s list %s' % (
+            ptr(t), u(o), h16(o + 4), h16(o + 6), h16(o + 8), h16(o + 10), sec[o + 0xC:o + 0x18].hex(), u(o + 0x18), ptr(u(o + 0x1C)),
+            ptr(u(o + 0x20)), u(o + 0x24), ptr(u(o + 0x28)), ptr(u(o + 0x2C)), ptr(u(o + 0x30))))
+    def material(a):
+        """A mesh part's material and what fn_80176E20, fn_80177940, fn_801776C8 read of it (type 0)."""
+        if not inz(a, 0x40) or a in mats: return
+        mats.add(a)
+        o = off(a)
+        L.append('material %s words %s rec %s bytes %s tex %s %s matrix %s' % (
+            ptr(a), ws(o, 2), ptr(u(o + 8)), sec[o + 0xC:o + 0x10].hex(), ptr(u(o + 0x1C)), ptr(u(o + 0x20)), ptr(u(o + 0x3C))))
+        mat_texture(u(o + 0x1C))
+        mat_texture(u(o + 0x20))
+        x, r = u(o + 0x3C), u(o + 8)
+        if inz(x, 0x30): L.append('matmatrix %s %s' % (ptr(x), ws(off(x), 12)))
+        if sec[o + 0xC] == 0 and inz(r, 0x68):
+            q = off(r)
+            L.append('matrec %s back %s b4 %s floats %s f4c %s w54 %08x b58 %s w5c %s b64 %s' % (
+                ptr(r), ptr(u(q)), sec[q + 4:q + 8].hex(), ws(q + 8, 16), ws(q + 0x4C, 2), u(q + 0x54), sec[q + 0x58:q + 0x5C].hex(),
+                ws(q + 0x5C, 2), sec[q + 0x64:q + 0x68].hex()))
     def item_draw(it):
         o = off(it)
         L.append('itemdraw %s xf %s scale %08x mesh %s out %s cb %08x arg %s clip %s w58 %08x skin %s' % (
@@ -1178,6 +1201,7 @@ def zone_dump(L, sec, base, hud, roots, scene_roots, pooltabs, records=(), lists
             for k in range(n):
                 mat, b = u(q + 0x70 + k * 8), u(q + 0x74 + k * 8)
                 L.append('meshpart %s material %s batch %s flags %s' % (ptr(m), ptr(mat), ptr(b), '%08x' % u(off(b) + 0xC) if inz(b, 0x10) else '-'))
+                material(mat)
     for a in scene:
         o = off(a)
         t = u(o + 4)
