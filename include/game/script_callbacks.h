@@ -1492,7 +1492,7 @@ void TurretSetRotateMode(void* a0, s32 a1);                            // src/ga
 void TurretTargetMe(void* a3, void* a4);                               // src/leaf/auto_03_800E75B0_text_cb.cpp
 void TurretTrackTarget(void* a3, f32 f1);                              // src/leaf/auto_03_800E75B0_text_cb.cpp
 void UIEngine_ActivateUIScreenSet(s32 id);                             // src/game/game_ui.cpp
-void UIEngine_LoadUIScreenSet(s32 id);                                 // src/game/game_ui.cpp
+void UIEngine_LoadUIScreenSet(s32 id, u32 name);                               // src/game/game_ui.cpp
 void UIEngine_UnloadUISlot(s32 a0);                                    // src/game/draft_miss47a.cpp
 void UIPlayGlobalGroupSound(u32 a0);                                   // src/game/draft_miss47a.cpp
 void UIScreen_SetPS2SnapToEnabled(u32 a3);                             // src/leaf/auto_03_800E75B0_text_cb.cpp

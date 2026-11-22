@@ -75,7 +75,7 @@ void* fn_80209814(void* v);                                            // 0x8020
 void  fn_8016A3F8(u8* p);                                              // 0x8016A3F8
 void  fn_8016A43C(u8* p);                                              // 0x8016A43C
 void  fn_8016A788(u8* p);                                              // 0x8016A788
-void  fn_8019B4E8(u8* p);                                              // 0x8019B4E8
+s32   fn_8019B4E8(u8* p);                                              // 0x8019B4E8
 s32 fn_8019B684(u8* p);                                              // 0x8019B684
 u32   fn_8019552C(u8* list, s32 index);                                // 0x8019552C (returns a slot pointer; declared u32 in small_8019c.cpp)
 s32   fn_80196668(u8* p);                                              // 0x80196668

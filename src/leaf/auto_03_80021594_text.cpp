@@ -12,7 +12,7 @@ extern s32 lbl_805FAFA0;
 extern u8* lbl_805FB134;
 extern f32 lbl_805FC8E0;
 extern f32 lbl_805FC8F4;
-extern "C" void UIEngine_LoadUIScreenSet(s32);
+extern "C" void UIEngine_LoadUIScreenSet(s32, u32);
 extern "C" void app_PlayMusic(u32, f32);
 
 // 0x80021750
@@ -87,7 +87,7 @@ extern "C" s32 fn_80022608(void) {
 // 0x80022D10
 extern "C" void fn_80022D10(void) {
     s32 t0 = *(s32*)((u8*)&lbl_805FAF9C);
-    UIEngine_LoadUIScreenSet((s32)((u32)(2)));
+    UIEngine_LoadUIScreenSet((s32)((u32)(2)), (u32)((u32)(t0)));
 }
 
 // 0x80022D1C
