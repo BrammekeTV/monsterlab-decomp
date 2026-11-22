@@ -285,6 +285,7 @@ void GXLoadTexMtxImm(const Mtx m, u32 id, int type) {
 
 // The vertex descriptor and formats set through the SDK are sent as CP registers at the next
 // GXBegin, as the SDK does (it marks them dirty and flushes on the first draw).
+void PortGxFlushState(void);                    // port_gxstate.cpp: the SDK's dirty GX state
 static BOOL sVcdDirty;
 static u8   sVatDirty;                          // one bit per format
 
@@ -363,6 +364,7 @@ void fn_8024AC3C(void) { STUB(GXInvalidateVtxCache); }
 void fn_8024CB00(void) { STUB(GXInvalidateTexAll); }
 // GXBegin(primitive, vertex format, vertex count); the vertices follow through GXWGFifo
 void fn_8024B974(s32 prim, s32 fmt, s32 count) {
+    PortGxFlushState();
     FlushVertexState();
     PortGxWrite8((u8)(prim | fmt));
     PortGxWrite16((u16)count);
@@ -436,47 +438,9 @@ void fn_8024BFCC(void* fb, s32 clear) {
     BpLoad(0x4B000000 | (((u32)(uintptr_t)fb & 0x3FFFFFFF) >> 5));
     BpLoad(0x52000000 | 0x4000 | (clear ? 0x800u : 0u));    // to the display, then clear
 }
-// GXSetPixelFmt(pixel format, z format)
-void fn_8024DFE4(s32 pixFmt, s32 zFmt) { STUB(GXSetPixelFmt); gPortGx.pixelFmt = pixFmt; gPortGx.zFmt = zFmt; }
-// GXSetDither
-void fn_8024E08C(u32 on) { STUB(GXSetDither); gPortGx.dither = (u8)on; }
-// GXSetColorUpdate
-void fn_8024DF28(s32 on) { STUB(GXSetColorUpdate); gPortGx.colorUpdate = (u8)on; }
-// GXSetZMode(compare on, function, update on)
-void fn_8024DF80(s32 enable, s32 func, s32 update) {
-    STUB(GXSetZMode);
-    gPortGx.zEnable = (u8)enable; gPortGx.zFunc = (u8)func; gPortGx.zUpdate = (u8)update;
-}
 
 // ---- the rest of the GX state the game's default-state reset (fn_8015D660) sets ----
 // Geometry
-// GXSetTexCoordGen2(coord, function, source, matrix, normalize, post-transform matrix)
-void fn_8024AC4C(s32 coord, s32 func, s32 src, s32 mtx, s32 normalize, s32 postMtx) {
-    STUB(GXSetTexCoordGen2);
-    if ((u32)coord < 8) {
-        gPortGx.texGen[coord].func = (u8)func;
-        gPortGx.texGen[coord].src = (u8)src;
-        gPortGx.texGen[coord].mtx = (u8)mtx;
-        gPortGx.texGen[coord].normalize = (u8)normalize;
-        gPortGx.texGen[coord].postMtx = (u8)postMtx;
-    }
-}
-// GXSetNumTexGens
-void fn_8024AE74(s32 count) { STUB(GXSetNumTexGens); gPortGx.numTexGens = (u8)count; }
-// GXSetLineWidth(width in 1/6 pixels, texture offset)
-void fn_8024BAC0(s32 width, s32 texOffsets) { STUB(GXSetLineWidth); gPortGx.lineWidth = (u8)width; }
-// GXSetPointSize
-void fn_8024BAF4(s32 size, s32 texOffsets) { STUB(GXSetPointSize); gPortGx.pointSize = (u8)size; }
-// GXEnableTexOffsets(coord, for lines, for points)
-void fn_8024BB28(s32 coord, s32 line, s32 point) { STUB(GXEnableTexOffsets); }
-// GXSetCoPlanar
-void fn_8024BB8C(s32 enable) { STUB(GXSetCoPlanar); }
-// GXSetCullMode(0 none, 1 front, 2 back, 3 all)
-void fn_8024BB64(s32 mode) { STUB(GXSetCullMode); gPortGx.cullMode = (u8)mode; }
-// GXSetClipMode(0 = clipping on)
-void fn_8024E55C(s32 mode) { STUB(GXSetClipMode); gPortGx.clipMode = (u8)mode; }
-// GXSetScissorBoxOffset
-void fn_8024E520(s32 x, s32 y) { STUB(GXSetScissorBoxOffset); gPortGx.scissorOffset[0] = x; gPortGx.scissorOffset[1] = y; }
 
 // Matrices. Position/normal matrix ids are multiples of 3 (10 slots); texture matrix ids are
 // 30 + 3n, 60 is the identity, post-transform ones are 64 + 3n with 125 the identity.
@@ -487,76 +451,14 @@ void fn_8024E2D0(f32* mtx, s32 id) {
     f32 m[9] = {mtx[0], mtx[1], mtx[2], mtx[4], mtx[5], mtx[6], mtx[8], mtx[9], mtx[10]};
     XfLoad(0x400 + (u32)id * 3, m, 9);
 }
-// GXSetCurrentMtx
-void fn_8024E328(s32 id) { STUB(GXSetCurrentMtx); gPortGx.currentMtx = (u8)id; }
 // GXLoadTexMtxImm, under its unnamed symbol (RendInit calls it by name)
 void fn_8024E348(f32* mtx, s32 id, s32 type) { GXLoadTexMtxImm((const f32(*)[4])mtx, (u32)id, type); }
 
 // Lighting channels
-// GXSetNumChans
-void fn_8024C2F0(s32 count) { STUB(GXSetNumChans); gPortGx.numChans = (u8)count; }
-// GXSetChanCtrl(channel, lighting on, ambient source, material source, light mask, diffuse fn, attenuation fn)
-void fn_8024C314(s32 chan, s32 enable, s32 ambSrc, s32 matSrc, s32 lightMask, s32 diffFn, s32 attnFn) { STUB(GXSetChanCtrl); }
-// GXSetChanAmbColor(channel, colour)
-void fn_8024C140(s32 chan, u8* color) { STUB(GXSetChanAmbColor); }
-// GXSetChanMatColor(channel, colour)
-void fn_8024C218(s32 chan, u8* color) { STUB(GXSetChanMatColor); }
 
 // TEV
-// GXSetTevOrder(stage, texture coordinate, texture map, colour channel)
-void fn_8024DA08(s32 stage, s32 coord, s32 map, s32 color) { STUB(GXSetTevOrder); }
-// GXSetNumTevStages
-void fn_8024DB64(s32 count) { STUB(GXSetNumTevStages); gPortGx.numTevStages = (u8)count; }
-// GXSetTevOp(stage, mode)
-void fn_8024D508(s32 stage, s32 mode) { STUB(GXSetTevOp); }
-// GXSetAlphaCompare(comp0, ref0, op, comp1, ref1)
-void fn_8024D944(s32 comp0, s32 ref0, s32 op, s32 comp1, s32 ref1) {
-    STUB(GXSetAlphaCompare);
-    gPortGx.alphaComp[0] = (u8)comp0; gPortGx.alphaComp[1] = (u8)ref0; gPortGx.alphaComp[2] = (u8)op;
-    gPortGx.alphaComp[3] = (u8)comp1; gPortGx.alphaComp[4] = (u8)ref1;
-}
-// GXSetZTexture(op, format, bias)
-void fn_8024D97C(s32 op, s32 fmt, s32 bias) { STUB(GXSetZTexture); }
-// GXSetTevKColorSel(stage, selection)
-void fn_8024D7EC(s32 stage, s32 sel) { STUB(GXSetTevKColorSel); }
-// GXSetTevKAlphaSel(stage, selection)
-void fn_8024D83C(s32 stage, s32 sel) { STUB(GXSetTevKAlphaSel); }
-// GXSetTevSwapMode(stage, rasterised colour table, texture colour table)
-void fn_8024D88C(s32 stage, s32 rasSel, s32 texSel) { STUB(GXSetTevSwapMode); }
-// GXSetTevSwapModeTable(table, r, g, b, a)
-void fn_8024D8C8(s32 table, s32 r, s32 g, s32 b, s32 a) { STUB(GXSetTevSwapModeTable); }
-// GXSetTevDirect(stage): no indirect texturing
-void fn_8024D468(s32 stage) { STUB(GXSetTevDirect); }
-// GXSetNumIndStages
-void fn_8024D448(s32 count) { STUB(GXSetNumIndStages); }
-// GXSetIndTexCoordScale(indirect stage, scale s, scale t)
-void fn_8024D278(s32 stage, s32 scaleS, s32 scaleT) { STUB(GXSetIndTexCoordScale); }
 
 // Pixel pipeline
-// GXSetFog(type, colour, start z, end z, near z, far z)
-void fn_8024DB88(s32 type, u8* color, f32 startZ, f32 endZ, f32 nearZ, f32 farZ) {
-    STUB(GXSetFog);
-    gPortGx.fogType = type;
-    memcpy(gPortGx.fogColor, color, 4);
-    gPortGx.fog[0] = startZ; gPortGx.fog[1] = endZ; gPortGx.fog[2] = nearZ; gPortGx.fog[3] = farZ;
-}
-// GXSetFogRangeAdj(on, centre, table)
-void fn_8024DDB4(s32 enable, s32 center, void* table) { STUB(GXSetFogRangeAdj); }
-// GXSetBlendMode(type, source factor, destination factor, logic op)
-void fn_8024DED8(s32 type, s32 src, s32 dst, s32 op) {
-    STUB(GXSetBlendMode);
-    gPortGx.blend[0] = (u8)type; gPortGx.blend[1] = (u8)src; gPortGx.blend[2] = (u8)dst; gPortGx.blend[3] = (u8)op;
-}
-// GXSetAlphaUpdate
-void fn_8024DF54(s32 on) { STUB(GXSetAlphaUpdate); gPortGx.alphaUpdate = (u8)on; }
-// GXSetZCompLoc(depth test before texturing)
-void fn_8024DFB4(s32 beforeTex) { STUB(GXSetZCompLoc); gPortGx.zCompBeforeTex = (u8)beforeTex; }
-// GXSetDstAlpha(on, alpha)
-void fn_8024E0B8(s32 enable, s32 alpha) { STUB(GXSetDstAlpha); gPortGx.dstAlphaOn = (u8)enable; gPortGx.dstAlpha = (u8)alpha; }
-// GXSetFieldMask(odd lines, even lines)
-void fn_8024E0E8(s32 odd, s32 even) { STUB(GXSetFieldMask); }
-// GXSetFieldMode(field rendering, half-height aspect)
-void fn_8024E11C(s32 fieldMode, s32 halfAspect) { STUB(GXSetFieldMode); }
 // GXSetCopyClamp
 void fn_8024BC68(s32 clamp) { STUB(GXSetCopyClamp); }
 // GXSetDispCopyFrame2Field

@@ -406,16 +406,18 @@ MSVC only for now (absolute symbols, `/alternatename`, structured exception hand
    converts `catalog.sir` and `global_binary.sir`. Every other section the game loads is still
    big-endian: the boot summary's `data:` line counts the kinds it met, and the log names each
    one once (`disc: <file> section type N ... is not converted`). The title screen needs at
-   least `shared_ui.sir` and `shared_texture.sir`. Packed sections are inflated by the game's
-   own zlib (SDK range, not decompiled): link real zlib under those names, and convert after
-   the inflate instead of after the read.
-3. **Static initialisers**: 262 of the 300 `.ctors` entries are not decompiled. Most are small
-   (they construct one global). Until they exist those globals are zero, which will show up as
-   crashes or wrong behaviour further in. `monsterlab.exe --verbose` lists them.
-4. **The rest of the renderer** (see "GX: the renderer" for what exists): the SDK-level calls
-   in `port_sdk.cpp` that still only record state (`GXSetBlendMode`, `GXSetZMode`,
-   `GXSetTevOrder`, ...) have to send their registers into the stream; fog, Z textures, lines
-   and points; mipmaps. And the byte order of texture data built at run time (see there).
+   least `shared_ui.sir` and `shared_texture.sir`. Packed sections are inflated through `port_zlib.cpp` (real zlib 1.3.1 in `third_party/zlib`,
+   under the names the game links: `inflateInit_`, `inflate`, `inflateEnd`); the conversion runs when the
+   stream ends (`PortFileInflateEnd`), on the output, instead of after the read. Not yet seen on a real
+   packed section (the boot has not loaded one): the first one to load shows whether the stream is matched to its read.
+3. **Static initialisers**: all 300 `.ctors` entries run except six in the C++ library range
+   (0x802D1CE8 to 0x802E0CA8: locale/stream statics of the MSL, not game code). `monsterlab.exe --verbose` lists them.
+4. **The rest of the renderer**: the SDK state calls now send their real BP/CP/XF writes
+   (`src/port/port_gxstate.cpp`: blend, depth, alpha, fog, TEV order/op/konst/swap, texgens,
+   channels, matrix indices, cull, generation mode; the lazily sent ones go out at GXBegin/GXFlush as in
+   `__GXSetDirtyState`). Still only recorded: the copy-related calls (`GXSetCopyFilter`, `GXSetDispCopyYScale`,
+   gamma, clamp, field), `GXSetScissor`, the Poke calls, the Z-texture draw; fog, Z textures, lines and points in the
+   renderer; mipmaps. And the byte order of texture data built at run time (see there).
 5. **SDK names**: the functions `port_sdk.cpp` defines as `fn_8024xxxx` are identified in its
    comments (`VIConfigure`, `GXSetViewport`, ...). Renaming them with `tools/rename.py` needs
    the definitions in `src/port/` and the callers renamed in the same change.

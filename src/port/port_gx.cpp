@@ -46,6 +46,7 @@ static inline void Put(u8 b) {
     *f->wr++ = b;
     if (f->wr >= f->base + f->size) f->wr = f->base;       // the hardware wraps too
 }
+extern "C" void PortGxFlushState(void);            // port_gxstate.cpp
 extern "C" void PortGxWrite8(u8 v) { Put(v); }
 extern "C" void PortGxWrite16(u16 v) { Put((u8)(v >> 8)); Put((u8)v); }
 extern "C" void PortGxWrite32(u32 v) { Put((u8)(v >> 24)); Put((u8)(v >> 16)); Put((u8)(v >> 8)); Put((u8)v); }
@@ -303,7 +304,7 @@ void GXGetGPStatus(u8* overhi, u8* underlow, u8* readIdle, u8* cmdIdle, u8* brkp
     *overhi = *underlow = *brkpt = 0;
     *readIdle = *cmdIdle = 1;                    // the interpreter has always caught up
 }
-void GXFlush(void) { if (sCpu == sGp) Drain(); }
+void GXFlush(void) { PortGxFlushState(); if (sCpu == sGp) Drain(); }
 
 // GXDrawDone: sends the draw-done token and waits for the graphics processor to reach it
 s32 fn_8024B358(void) {
