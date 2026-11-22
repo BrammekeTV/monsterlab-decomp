@@ -17,7 +17,7 @@ s32  fn_801AC51C(u8* p, u8* obj, u8* target);                     // 0x801AC51C
 void fn_80070FD8(u8* obj);                                        // 0x80070FD8
 ScriptValue SetPropState(u8* prop, u32 state, s32 a2);            // include/game/script_callbacks.h:1302
 u8*  fn_80062CE0(u8* p, s32 del);                                 // 0x80062CE0 (base dtor)
-void fn_8009C4EC(u8* p, void* vt);                                // 0x8009C4EC
+void fn_8009C4EC(u8* p);                                // 0x8009C4EC
 u8*  fn_801F9598(u8* p, s32 del);                                // 0x801F9598
 u8*  fn_801F6238(u8* p, s32 del);                                // 0x801F6238
 u8*  fn_800D4B74(u8* p, s32 del);                                 // 0x800D4B74
@@ -254,7 +254,7 @@ u8* fn_8008B7C0(u8* arg0, s32 arg1) {
 u8* fn_8009C384(u8* arg0, s32 arg1) {
     if (arg0 != NULL) {
         *(void**)arg0 = lbl_8035CBA8;
-        fn_8009C4EC(arg0, lbl_8035CBA8);
+        fn_8009C4EC(arg0);
         fn_801F9598(arg0 + 0x324, -1);
         fn_801F6238(arg0 + 0x268, -1);
         fn_80062CE0(arg0, 0);

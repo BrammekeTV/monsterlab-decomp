@@ -34,7 +34,7 @@ u8* fn_800C2028(u8* p);                                     // 0x800C2028 (defin
 void operator_delete(void* p);                              // 0x801D426C
 void fn_8018D4CC(void* p);                                  // 0x8018D4CC (free)
 void fn_8018D1FC(const char* fmt, ...);                     // 0x8018D1FC
-s32 fn_800CD7D8(u8* p, u8* q, s32 limit);                   // 0x800CD7D8
+u8* fn_800CD7D8(u8* p, u8* q, s32 limit);                   // 0x800CD7D8
 
 // 0x80010FF4
 // Sets the 3-float state block lbl_803C49A8 (c1, c2, c1), then tail-calls fn_80142500 on lbl_805FAEF0.
@@ -145,7 +145,7 @@ void fn_800BB5E8(u8* p, f32 dt) {
 s32 fn_800CD788(u8* p, u8* q) {
     s32 idx = *(s32*)(p + 0x14);
     s32 limit = *(s32*)(q + 0x8) - 1;
-    if (limit < *(s32*)(lbl_80347440 + idx * 4)) return fn_800CD7D8(p, q, limit);
+    if (limit < *(s32*)(lbl_80347440 + idx * 4)) return (s32)(intptr_t)fn_800CD7D8(p, q, limit); // lint:ok (returns a pointer in the original)
     return ((s32(*)(u8*, u8*, s32))(*(void**)(*(u8**)(p + 0xc) + 0x18)))(p, q, limit);
 }
 

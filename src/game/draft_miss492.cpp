@@ -25,7 +25,7 @@ void fn_80077AEC(u8* p);                                  // 0x80077AEC
 void fn_8007617C(u8* p);                                  // 0x8007617C
 void fn_800A7D88(void* obj, u32 hash);                    // 0x800A7D88
 void fn_800AC5EC(u8* p);                                  // 0x800AC5EC
-f32 fn_800C3E84(void);                                    // 0x800C3E84
+f32 fn_800C3E84(u8* a);                                    // 0x800C3E84
 BOOL fn_801B50B0(void* unused, u8* obj);                  // 0x801B50B0
 s32 fn_801B5338(u8* obj, u8* target, u32 hash, f32* vec, u8 flag);  // 0x801B5338
 void fn_801F5E50(u8* out, f32 dz);                        // 0x801F5E50
@@ -33,7 +33,7 @@ u8* fn_801F69B8(u8* p, s32 del);                          // 0x801F69B8
 u8* fn_801F9598(u8* p, s32 del);                          // 0x801F9598
 u32 fn_8019552C(u8* list, s32 index);                     // 0x8019552C
 s32 fn_8022E438(u8* a);                                   // 0x8022E438
-void fn_80094C0C(u8* p, u8* tbl);                         // 0x80094C0C
+void fn_80094C0C(u8* p);                         // 0x80094C0C
 u8* fn_80097590(u8* p, s32 del);                          // 0x80097590
 void* memset(void* p, int c, unsigned long n);
 void operator_delete(void* p);
@@ -222,7 +222,7 @@ void fn_800C53B0(u8* arg0, f32 farg0) {
     f32 t;
     f32 r;
 
-    m = fn_800C3E84();
+    m = fn_800C3E84(arg0);
     c = lbl_805FE3E0;
     t = *(f32*)(arg0 + 0xD8) + farg0;
     if (m > c) {
@@ -361,7 +361,7 @@ s8* fn_80052054(void) {
 u8* fn_80094330(u8* arg0, s32 arg1) {
     if (arg0 != NULL) {
         *(u8**)(arg0 + 0x4) = lbl_8035C208;
-        fn_80094C0C(arg0, lbl_8035C208);
+        fn_80094C0C(arg0);
         __destroy_arr(arg0 + 0x384, (void (*)(void*, s32))fn_80097590, 0x20, 0x1B);
         fn_801F69B8(arg0 + 0x294, -1);
         fn_801F9598(arg0 + 0x1E0, -1);
