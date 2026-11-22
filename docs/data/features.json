@@ -99,6 +99,11 @@
  "changelog": [
   {
    "date": "2026-11-22",
+   "time": "21:10",
+   "text": "Audit round 7: four boot-path files (draft_miss332/143/284/163, ~30 large functions) checked against the asm; 1 bug fixed (fn_80133E60 passed the wrong object to fn_8003ED08)."
+  },
+  {
+   "date": "2026-11-22",
    "time": "21:00",
    "text": "More of the Wii graphics layer is real on Windows (PRs #57 to #59): blending, depth, texture combining and the other state calls now send the same register values the Wii's graphics chip gets, each checked against the original code. The loader also converts a zone's objects and placed effects and the props' animation tables. A check of the startup constructors found that 293 of 299 already run."
   },

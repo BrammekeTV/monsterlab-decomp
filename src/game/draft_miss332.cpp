@@ -319,7 +319,7 @@ void fn_80133E60(u8* arg0) {
     u32 charHash = *(u32*)(*(u8**)(*(u8**)(*(u8**)arg0 + 0x8) + 0x9C) + 0x8);
     if (charHash != kHashCompositeCharacter) {
         if (charHash == kHashMechanist) {
-            fn_8003ED08(arg0);
+            fn_8003ED08(*(u8**)(*(u8**)arg0 + 0x8));
         }
         if (gBattle != NULL) {
             fn_8003F1B8(0);
