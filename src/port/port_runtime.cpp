@@ -754,6 +754,7 @@ static int SelfTest(void) {
     CHECK(w == 0x100);
     fails += PortSelfTestSdk();
     fails += PortSelfTestGx();
+    fails += PortSelfTestZlib();
 #undef CHECK
     PortLog("self-test: %u functions, %u linked; %s", gPortFuncCount, linked, fails ? "FAILED" : "ok");
     return fails;

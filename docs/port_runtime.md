@@ -406,9 +406,10 @@ MSVC only for now (absolute symbols, `/alternatename`, structured exception hand
    converts `catalog.sir` and `global_binary.sir`. Every other section the game loads is still
    big-endian: the boot summary's `data:` line counts the kinds it met, and the log names each
    one once (`disc: <file> section type N ... is not converted`). The title screen needs at
-   least `shared_ui.sir` and `shared_texture.sir`. Packed sections are inflated by the game's
-   own zlib (SDK range, not decompiled): link real zlib under those names, and convert after
-   the inflate instead of after the read.
+   least `shared_ui.sir` and `shared_texture.sir`. Packed sections are inflated through `port_zlib.cpp` (real zlib 1.3.1 in `third_party/zlib`,
+   under the names the game links: `inflateInit_`, `inflate`, `inflateEnd`); the conversion runs when the
+   stream ends (`PortFileInflateEnd`), on the output, instead of after the read. Not yet seen on a real
+   packed section (the boot has not loaded one): the first one to load shows whether the stream is matched to its read.
 3. **Static initialisers**: all 300 `.ctors` entries run except six in the C++ library range
    (0x802D1CE8 to 0x802E0CA8: locale/stream statics of the MSL, not game code). `monsterlab.exe --verbose` lists them.
 4. **The rest of the renderer**: the SDK state calls now send their real BP/CP/XF writes
