@@ -832,7 +832,7 @@ struct ZoneDump {
         if (roots->locatorCount != 0) {
             const u8* l = z->image + (roots->locators - zoneBase);
             for (u32 i = 0; In(l, roots->locatorCount * 0x20) && i < roots->locatorCount; i++) {
-                printf("locator %u hash %08x floats", i, *(const u32*)(l + i * 0x20));
+                printf("locator %u hash %08x zone %u floats", i, *(const u32*)(l + i * 0x20), *(const u32*)(l + i * 0x20 + 4));
                 for (u32 k = 0; k < 6; k++) printf(" %08x", *(const u32*)(l + i * 0x20 + 8 + k * 4));
                 printf("\n");
             }
@@ -1408,10 +1408,24 @@ static int DumpLevel(const char* path) {
     for (u32 k = 0; k < 39; k++) printf(" %08x", Bits(*(const f32*)(h + 0x1A84 + k * 4)));
     printf("\n");
     printf("levellocators %u ", *(const u32*)(h + 0x24)); PrintLevelPtr(h + 0x28, &f); printf("\n");
-    for (u32 t : { 0x1B0u, 0x1BCu, 0x1C8u }) {
+    for (u32 t : { 0x1B0u, 0x1BCu }) {
         printf("leveltable 0x%x ", t);
         PrintLevelEntries(h + t, &f);
         printf("\n");
+    }
+    {
+        // +0x1C8: one 12-byte list of running effects per zone {u16 first, last, count, flags, word}.
+        const u8* lists = *(const u8**)(h + 0x1C8);
+        u32 n = *(const u32*)(h + 0x1CC), shown = 0;
+        printf("leveleffectlists %u", n);
+        for (u32 i = 0; i < n; i++) {
+            const u8* e = lists + i * 12;
+            const u16* w = (const u16*)e;
+            if (w[0] == 0 && w[1] == 0 && w[2] == 0 && w[3] == 0 && *(const u32*)(e + 8) == 0) continue;
+            printf(" %u:%04x,%04x,%04x,%04x,%08x", i, w[0], w[1], w[2], w[3], *(const u32*)(e + 8));
+            shown++;
+        }
+        printf(shown ? "\n" : " -\n");
     }
     for (u32 i = 0; i < count; i++) {
         const u8* s = h + LEVEL_HEADER_SLOTS + i * stride;
@@ -2076,7 +2090,7 @@ static SirError ConvertBuilt(u8* hdr, u8* img, SirReloc* r, s32* failTable) {
 #define L_T1B0     (L_T12C + 8)               // the block's per-zone tables
 #define L_T1BC     (L_T1B0 + 8)
 #define L_T1C8     (L_T1BC + 8)
-#define L_T1D4     (L_T1C8 + 8)               // 12-byte entries: not converted
+#define L_T1D4     (L_T1C8 + 0x18)            // behind the two 12-byte effect lists; its own entries are not converted
 #define L_HDR_SIZE (L_T1D4 + 0x20)
 #define L_HUD      0x100u                     // in the zone image
 #define L_FSM      0x540u
