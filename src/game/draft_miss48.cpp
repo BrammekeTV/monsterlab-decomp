@@ -3,6 +3,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include "types.h"
+#include "game/node_ref.h"
 #include "game/part.h"
 #include "game/character.h"
 #include "engine/engine.h"
@@ -951,12 +952,13 @@ void SpawnProjectileAtChild(void* a0, u32 a1, u32 a2, u32 a3) {
 //   kind 1: id of an entity (from the ref or the global lbl_805FB6B8) -> u16 at +0x30 of its state
 //   kind 4: world zone table entry (u16 index at +2) -> word at +4
 //   other:  world position lookup through fn_801ED788 + fn_8012EE30
+// The reference word is read as a whole so the code does not depend on byte order.
 s32 fn_801EDF58(u8* ref) {
-    u8 b = *ref;
-    s32 kind = (b & 0x80) ? 1 : (b & 0xF);
+    u32 w = NodeRefWord(ref);
+    u32 kind = NodeRefKind(w);
     if (kind == 4) {
-        u32 idx = (*ref & 0x80) ? 1 : (*ref & 0xF);
-        idx = (idx == 4) ? *(u16*)(ref + 2) : 0xFFFFFFFFu;
+        u32 idx = NodeRefKind(w);
+        idx = (idx == 4) ? NodeRefHalf2(w) : 0xFFFFFFFFu;
         u8* w = *(u8**)gWorldState;
         u8* zone = (idx < *(u32*)(w + 0x24)) ? *(u8**)(w + 0x28) + idx * 32 : NULL;
         if (zone == NULL) return 0;
@@ -964,7 +966,7 @@ s32 fn_801EDF58(u8* ref) {
     }
     if (kind == 1) {
         s32 id = lbl_805FB6B8;
-        if (*ref & 0x80) id = *(s32*)ref;
+        if (NodeRefIsId(w)) id = (s32)w;
         u8* obj = (u8*)fn_801B7198(&id, 0);
         if (obj == NULL) return 0;
         u8* st = *(u8**)(obj + 4);

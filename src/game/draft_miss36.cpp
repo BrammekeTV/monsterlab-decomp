@@ -1,6 +1,7 @@
 // Small functions from the miss36 draft batch: ray hit init, reactor leak queries, sound queueing,
 // QuestLog / Recipes section lookups and a few tail-call wrappers.
 #include "types.h"
+#include "game/node_ref.h"
 extern "C" {
 #include "game/script_callbacks.h"
 }
@@ -128,16 +129,12 @@ void PlayLoopingSoundFX(void* a0, u32 a1, s32 a2) {
 // Applies the mode nibble of the byte at arg0: modes 6 and 7 reload the word from lbl_805FB6B8
 // through fn_801B72A0 (child = arg1 for mode 6, arg2 for mode 7) and mark bit 0x80 of the byte.
 void fn_801EE078(u8* arg0, void* arg1, void* arg2) {
-    u8 flags;
     s32 mode;
     s32 tmp;
     u8 b;
 
-    flags = *arg0;
-    mode = 1;
-    if (((flags >> 4) & 8) == 0) {
-        mode = flags & 0xF;
-    }
+    // The reference word is read and written as a whole so the code does not depend on byte order.
+    mode = (s32)NodeRefKind(NodeRefWord(arg0));
     if (mode == 6) {
         tmp = lbl_805FB6B8;
         fn_801B72A0(&tmp, arg1);
@@ -149,9 +146,9 @@ void fn_801EE078(u8* arg0, void* arg1, void* arg2) {
     } else {
         return;
     }
-    b = *arg0;
+    b = NodeRefByte0(NodeRefWord(arg0));
     if (((b >> 4) & 8) == 0) {
-        *arg0 = (u8)(b | 0x80);
+        NodeRefSetByte0(arg0, (u8)(b | 0x80));
     }
 }
 

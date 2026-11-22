@@ -1,5 +1,6 @@
 // Prop and quest script callbacks, small math helpers and debug print helpers (0x800Exxxx, 0x801Dxxxx).
 #include "types.h"
+#include "game/node_ref.h"
 #include "engine/math.h"
 extern "C" {
 #include "game/script_callbacks.h"
@@ -50,16 +51,14 @@ void PropAttachProjectile(u32 a0, u32 a1, u32 a2) {
 // (at +0x18C) exists and its virtual +0x4C check returns 0.
 void PropFireLightningAtActiveTarget(u32 a0, u32 a1, u32 a2, u32 a3, f32 a4, f32 a5) {
     u8* self = (u8*)a0;
-    u8 wp[4];
+    u32 wpWord;  // node reference word (kind 0, index 0xFFFF)
+    u8* wp = (u8*)&wpWord;
     s32 spC;
     s32 sp8;
     u8* obj = *(u8**)(self + 0x18C);
 
     if (obj != NULL && (*(Fn*)(*(u8**)obj + 0x4C))(obj) == 0) {
-        wp[0] = 0;
-        wp[1] = 0;
-        wp[2] = 0xFF;
-        wp[3] = 0xFF;
+        wpWord = 0x0000FFFFu;
         WaypointParamsInit(wp, 6);
         fn_801EE078(wp, *(u8**)(self + 0x18C), 0);
         sp8 = *(s32*)wp;
