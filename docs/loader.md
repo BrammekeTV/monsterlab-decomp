@@ -824,6 +824,24 @@ The tools take a shared image's address from the slot copy's `+0x100` (the set l
 behind the copy, so the address is that pointer with the low 16 bits cleared); the port uses the
 address the game reads the image to.
 
+### Textures of `shared_texture.sir`
+
+`shared_texture.sir` has 607 sections, one texture each; the section type is the hash of the
+texture's name. A section is a stream: `fn_8016B5E0` compares its first two words with the tags
+"SG21" and "WI00", `fn_8016B724` skips two more words and hands the rest to `fn_801840E4`, which
+reads one texture record:
+
+| Where | Field | Reader |
+|---|---|---|
+| `+0x00`, `+0x04` | the tags, compared as words | `fn_8016B5E0` |
+| `+0x10` | size of the record | `fn_801840E4` |
+| `+0x14` | name, then four bytes: GX format, two more, a flag | `fn_801840E4` |
+| next multiple of four, as the code rounds it | `u16` width, `u16` height | `fn_801840E4` |
+| after that | pixel data, then the palette entries | `fn_8015A144` copies both |
+
+The loader converts the tags, the size, the width and the height. Pixel data and palette stay in
+GX layout. The two words at `+0x08` and `+0x0C` have no reader.
+
 ### Not converted yet in level files
 
 | What | Where | Next reader |
