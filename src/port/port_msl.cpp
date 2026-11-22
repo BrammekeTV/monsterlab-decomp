@@ -115,4 +115,18 @@ s32 fn_8033ADCC(s32* out) {
 // A thunk to the library's strncmp.
 s32 fn_8033B1B8(const char* a, const char* b, s32 n) { return fn_80338A2C(a, b, (u32)n); }
 
+// MSL stricmp: compares the lower-case forms as signed chars (bytes of 0x80 and up are left as
+// they are) and returns -1, 0 or 1.
+s32 fn_8033B1C0(const char* a, const char* b) {
+    for (;;) {
+        s32 ca = (s8)*a++;
+        s32 cb = (s8)*b++;
+        if (ca >= 'A' && ca <= 'Z') ca += 'a' - 'A';
+        if (cb >= 'A' && cb <= 'Z') cb += 'a' - 'A';
+        if (ca < cb) return -1;
+        if (ca > cb) return 1;
+        if (ca == 0) return 0;
+    }
+}
+
 }  // extern "C"
