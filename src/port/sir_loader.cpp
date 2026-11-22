@@ -2507,6 +2507,10 @@ extern "C" BOOL LevelZoneRootsCollect(const u8* hdr, u32 hdrSize, const u8* zone
         else if (ok && other != NULL) {                          // the record is in zone 0, converted: its list may be in this zone
             const u8* rec;
             memcpy(&rec, slot + 0xFC, sizeof(rec));
+            // Zone 0's image may lie somewhere else than at its address (read to a buffer first).
+            u32 recAddr = (u32)(uintptr_t)rec;
+            if ((rec < other->image || rec >= other->image + other->imageSize) && recAddr >= other->wiiBase && recAddr - other->wiiBase < other->imageSize)
+                rec = other->image + (recAddr - other->wiiBase);
             if (rec >= other->image && rec < other->image + other->imageSize && (u32)(other->image + other->imageSize - rec) >= 0x14 &&
                 (addr = ZoneAddr(rec + 0x10, zoneHost, zoneSize, zoneWiiBase)) != 0) ok = RootAdd(&lists, addr);
         }

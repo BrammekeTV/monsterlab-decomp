@@ -13,10 +13,12 @@
    (`tools/sir_decoder.py --gamedb --image`), which reads the big-endian bytes directly.
 4. The same for ../catalog.sir (`--catalog`), plus a check that the catalog agrees with the
    section table inside each of the .sir files it lists.
-5. The same for every `*_level.sir` next to it (`--level`): the header block and zone 0's HUD.
+5. The same for every level file next to it (`--level`): the `*_level.sir`, the arenas, the castle
+   rooms and the trouble scope map.
 
 Game data and the dumps stay local (orig/, build/); nothing here is committed.
 """
+import struct
 import os
 import subprocess
 import sys
@@ -101,6 +103,24 @@ def compare(exe, mode, path, want, samples):
     return True
 
 
+def is_level_file(path):
+    """A header block and the images of zone 0 and zone 1: the *_level.sir files, the arenas, the
+    castle rooms and the trouble scope map (read from the file's own section table). The rooms'
+    packed copies (*C.sir) are left out."""
+    name = os.path.basename(path).lower()
+    if not name.endswith(".sir") or name == "global_binary.sir" or os.path.getsize(path) > 64 << 20:
+        return False
+    with open(path, "rb") as f:
+        head = f.read(0x40 + 24 * 8)
+    magic, version, count = struct.unpack_from(">4sII", head, 0)
+    if magic != b"PNP0" or count > 8:
+        return False
+    entries = [struct.unpack_from(">iIIII", head, 0x40 + i * 24) for i in range(count)]
+    if any(packed != 0 for t, off, size, unk, packed in entries):
+        return False                       # a room's packed copy (*C.sir): the loader works on unpacked sections
+    return sorted(e[0] for e in entries if e[1] != 0) == [-1, 0, 1]
+
+
 def main():
     exe = build()
     r = subprocess.run([exe, "--selftest"], capture_output=True, text=True)
@@ -135,7 +155,7 @@ def main():
 
     # Level files: header block and the HUD of zone 0 (`--level`).
     for name in sorted(os.listdir(streams)):
-        if name.lower().endswith("_level.sir"):
+        if is_level_file(os.path.join(streams, name)):
             path = os.path.join(streams, name)
             ok = compare(exe, "--level", path, sir_decoder.level_dump(path), ("levelhdr ", "hud ") if name == "empty_level.sir" else ()) and ok
     return 0 if ok else 1

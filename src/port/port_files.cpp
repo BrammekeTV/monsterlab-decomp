@@ -39,6 +39,19 @@ static const SirCatalogEntry* FindSection(const SirCatalogFile* file, u32 offset
     return NULL;
 }
 
+static bool HasSection(const SirCatalogFile* file, s32 type) {
+    for (u32 i = 0; i < sEntryCount; i++)
+        if (sEntries[i].nameHash == file->nameHash && sEntries[i].type == type) return true;
+    return false;
+}
+
+// A level file has a header block (the world state) and the images of zone 0 and zone 1: the
+// seven *_level.sir, the arenas, the castle rooms and the trouble scope map. (The castle rooms'
+// second files, *c.sir, are packed copies: their sections are reported as packed.)
+static bool IsLevelFile(const SirCatalogFile* file) {
+    return _stricmp(file->name, "global_binary.sir") != 0 && HasSection(file, -1) && HasSection(file, 0) && HasSection(file, 1);
+}
+
 static void Unconverted(const char* name, const SirCatalogEntry* e, const char* why) {
     static char seen[64][80];
     char key[80];
@@ -55,6 +68,20 @@ static void Unconverted(const char* name, const SirCatalogEntry* e, const char* 
 // The script function table, to check the indices the level loader relies on (LEVEL_FIXUP_*).
 struct PortScriptFunc { u32 type; void* fn; u32 hash; };
 extern "C" { extern PortScriptFunc gScriptFuncs[]; u32 StringHash(const char* s); }
+
+// Where the game loads a level's sections to: the header block to the world block (fn_801294CC:
+// SirLoad(..., *world, size, -1)), zone N to gZoneBase[N]. A section is not always read there
+// directly: the level the front end loads is read whole to a buffer first, and each section is
+// copied from there by a thread when the game asks for it (fn_801E6FAC mode 1, fn_801E6F78). Its
+// pointers are meant for the final place either way.
+extern "C" { extern u8 gWorldState[]; }
+extern u32* gZoneBase;
+static u8* LevelFinalPlace(s32 type, u8* readTo) {
+    u8* place = NULL;
+    if (type == -1) memcpy(&place, gWorldState, sizeof(place));
+    else if (gZoneBase != NULL && type >= 0 && type < 512) place = (u8*)(uintptr_t)gZoneBase[type];
+    return place != NULL ? place : readTo;
+}
 
 static void CheckFixUpIndices(const char* file) {
     static const char* const names[] = { "FixUpEntityCallback", "FixUpEntityPartCallback", "FixUpPooledEntityCallback",
@@ -116,51 +143,71 @@ void PortFileRead(const char* path, u32 offset, u8* dst, u32 len) {
     static u32 hudAddr;            // header +0x1F4, kept for the zone that holds the HUD
     static u8* levelHdr;           // the header block (the world state), converted
     static u32 levelHdrSize;
+    static u8* levelHdrCopy;       // a level read to a buffer first: the header with its pointers into this copy
+    static u8* zone0Read;          // where zone 0's bytes were read to (the buffer, or zone0 itself)
     static u8* zone0;              // zone 0's image, converted, and what was converted in it
     static u32 zone0Size;
     static LevelZoneDone zone0Done;
-    if (n > 10 && _stricmp(name + n - 10, "_level.sir") == 0) {
+    if (IsLevelFile(file)) {
         SirRelocInit(&reloc, NULL, NULL);
         if (e->type == -1) {
             u32 base = LevelHeaderWiiBase(dst, e->size);
             if (base == 0) PortStop(8, "%s: %s", name, SirErrorText(SIR_ERR_LEVEL));
             // The header points into itself and into the zones. The zones are read later, to
             // the addresses the console uses (MEM2 is mapped at its original address).
-            SirRelocAddRange(&reloc, base, e->size, dst);
+            u8* place = LevelFinalPlace(-1, dst);
+            free(levelHdrCopy);
+            levelHdrCopy = NULL;
+            if (place != dst) {
+                // The zones are converted before the game has copied this header to the world
+                // block, so what they need of it is read from a copy whose pointers lead into itself.
+                static SirReloc own;
+                levelHdrCopy = (u8*)malloc(e->size);
+                if (!levelHdrCopy) PortStop(8, "%s: out of memory", name);
+                memcpy(levelHdrCopy, dst, e->size);
+                SirRelocInit(&own, NULL, NULL);
+                SirRelocAddRange(&own, base, e->size, levelHdrCopy);
+                SirRelocAddRange(&own, 0x90000000u, 0x04000000u, (u8*)(uintptr_t)0x90000000u);
+                SirError copyErr = LevelHeaderConvert(&own, levelHdrCopy, e->size);
+                if (copyErr != SIR_OK) PortStop(8, "%s: %s", name, SirErrorText(copyErr));
+            }
+            SirRelocAddRange(&reloc, base, e->size, place);
             SirRelocAddRange(&reloc, 0x90000000u, 0x04000000u, (u8*)(uintptr_t)0x90000000u);
             SirError err = LevelHeaderConvert(&reloc, dst, e->size);
             if (err != SIR_OK) PortStop(8, "%s: %s", name, SirErrorText(err));
             hudAddr = *(u32*)(dst + 0x1F4);
-            levelHdr = dst;
+            levelHdr = levelHdrCopy ? levelHdrCopy : dst;
             levelHdrSize = e->size;
             zone0 = NULL;
             LevelZoneDoneFree(&zone0Done);
             sConverted++;
-            PortLog("%s header converted: %u pointers, %u fields (%u pointers outside the mapped ranges)", name,
-                    reloc.ptrImage, reloc.fieldsSwapped, reloc.ptrUnknown + reloc.ptrDolKept);
+            PortLog("%s header converted%s: %u pointers, %u fields (%u pointers outside the mapped ranges)", name,
+                    place != dst ? " in the buffer it is copied from" : "", reloc.ptrImage, reloc.fieldsSwapped, reloc.ptrUnknown + reloc.ptrDolKept);
             return;
         }
         // Zone images are read to the addresses the console uses. The records and definitions of
         // the entities of a zone other than 0 lie in zone 0's image, which stays loaded.
         if (e->type == 0 || (e->type > 0 && zone0 != NULL)) {
-            u32 base = (u32)(uintptr_t)dst;
+            u8* place = LevelFinalPlace(e->type, dst);
+            u32 base = (u32)(uintptr_t)place;
             SirRelocAddRange(&reloc, 0x90000000u, 0x04000000u, (u8*)(uintptr_t)0x90000000u);
             CheckFixUpIndices(name);
             LevelZoneRoots roots;
-            LevelZoneOther other = { zone0, zone0Size, (u32)(uintptr_t)zone0, &zone0Done };
+            LevelZoneOther other = { zone0Read, zone0Size, (u32)(uintptr_t)zone0, &zone0Done };
             const LevelZoneOther* in0 = e->type > 0 ? &other : NULL;
-            // The header block's tables have been laid out by fn_80129CC8 by now.
-            if (!levelHdr || !LevelZoneRootsCollect(levelHdr, levelHdrSize, dst, e->size, base, in0, &roots))
+            // The header block's tables have been laid out by fn_80129CC8 by now (in the copy they
+            // are still as the file has them, which is the same layout).
+            if (!levelHdr || !LevelZoneRootsCollect(levelHdr, levelHdrSize, place, e->size, base, in0, &roots))
                 PortStop(8, "%s zone %d: %s", name, e->type, SirErrorText(SIR_ERR_LEVEL));
             if (roots.hud == 0 && hudAddr >= base && hudAddr - base < e->size) roots.hud = hudAddr;
             u32 entityCount = roots.entityCount;
             SirError err = LevelZoneConvert(&reloc, dst, e->size, base, &roots, e->type == 0 ? &zone0Done : NULL, in0);
             LevelZoneRootsFree(&roots);
             if (err != SIR_OK) PortStop(8, "%s zone %d: %s", name, e->type, SirErrorText(err));
-            if (e->type == 0) { zone0 = dst; zone0Size = e->size; }
+            if (e->type == 0) { zone0 = place; zone0Read = dst; zone0Size = e->size; }
             sConverted++;
-            PortLog("%s zone %d: what the level start and WorldTick read of %u entities and the zone's other objects converted (%u pointers, %u fields); the rest of the zone is not",
-                    name, e->type, entityCount, reloc.ptrImage, reloc.fieldsSwapped);
+            PortLog("%s zone %d%s: what the level start and WorldTick read of %u entities and the zone's other objects converted (%u pointers, %u fields); the rest of the zone is not",
+                    name, e->type, place != dst ? " (in the buffer it is copied from)" : "", entityCount, reloc.ptrImage, reloc.fieldsSwapped);
             return;
         }
     }
