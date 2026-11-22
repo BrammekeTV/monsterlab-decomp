@@ -187,7 +187,7 @@ void PortFileRead(const char* path, u32 offset, u8* dst, u32 len) {
         LevelZoneRootsFree(&roots);
         if (err != SIR_OK) PortStop(8, "%s zone %d: %s", name, e->type, SirErrorText(err));
         sConverted++;
-        PortLog("%s zone %d: slot copy, zone objects and the first layer of the screen set converted (%u pointers, %u fields); the rest of the zone is not",
+        PortLog("%s zone %d: slot copy, zone objects, the screen set and the common part of its widgets converted (%u pointers, %u fields); the rest of the zone is not",
                 name, e->type, reloc.ptrImage, reloc.fieldsSwapped);
         return;
     }

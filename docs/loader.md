@@ -804,21 +804,43 @@ table and takes the zone's roots from it instead of from the header block: entit
 table, the zone record in zone 0 (`+0xFC`) and the screen set (`+0x100`). The copy's three
 tables point into the header block as it lay when the file was built; they are empty.
 
-Of a **screen set** (what the slot's `+0x100` points at, right behind the slot copy) the first
-layer is converted:
+Of a **screen set** (what the slot's `+0x100` points at, right behind the slot copy) this is
+converted:
 
 | Object | Fields | Reader |
 |---|---|---|
-| screen set | `+0x28` pointer to a table | `fn_80199024` |
+| screen set | `+0x04` its zone | `fn_80198438` |
+| | `+0x08` capacity and `+0x0C` count of the draw list, `+0x10` its entries (the game writes them) | `fn_80199CE8`, `fn_801985BC`, `fn_8019B860` |
+| | `+0x20` table of animations, `+0x28` table of screens, `+0x34` and `+0x3C` two more tables | `fn_80198F1C`, `fn_80199024`, `fn_80198F74`, `fn_80198FCC` |
 | table | `+0x00` root of a binary tree, `+0x04` / `+0x08` the nodes with the lowest and the highest key | `fn_8018E2F4`, `fn_8018E808` |
-| tree node | `+0x00` key, `+0x04` widget, `+0x0C` left, `+0x10` right | `fn_8018E2F4` (the walk), `fn_8018E808` (search by key), `fn_8018E8D8` |
-| widget | `+0x120` first child, `+0x124` next sibling; of a child the first word | `fn_8019BFF8`, `fn_80199534` |
+| tree node | `+0x00` key, `+0x04` value (a screen in the table of screens), `+0x0C` left, `+0x10` right | `fn_8018E2F4` (the walk), `fn_8018E808` (search by key), `fn_8018E8D8` |
+| screen (the widget of a node) | `+0x13C` how many widgets it names, `+0x140` pointers to them | `UIWidgetFindChild` |
+| | `+0x144` its activation grid, `+0x148` a float handed on when the screen comes to the top, `+0x14C` a handle | `fn_80199ABC`, `fn_801987BC`, `fn_80199C30` |
+| every widget | `+0x00` type (hash of its name) | `fn_80199534`, `fn_80198C78` |
+| | `+0x04`, `+0x08`, `+0x0C` its actions, animations and sounds by event | `fn_8019BD18` |
+| | `+0x10` animation player | `fn_8019B6CC` |
+| | `+0x14` 16 floats: the start values of `+0x68`..`+0xA4`; `+0x54` start flags | `fn_8019B4E8` |
+| | `+0x58` a word handed to `fn_8019645C` before the widget draws; `+0x5C` draw order | `fn_8019B7D8`, `fn_80199540` |
+| | `+0x60` kind, `+0x64` flags | `fn_8019914C`, `fn_8019B6CC` |
+| | `+0x68` position, `+0x74` scale, `+0x80` colour (4), `+0x90` rotation, `+0x9C` pivot | `fn_8019C348`, `fn_801A05E4` |
+| | `+0xA8`, `+0xB0` action words | `fn_80199DD4`, `fn_8019B6CC` |
+| | `+0xBC` activation grid (the bytes at `+0xB8` / `+0xB9` are a cell of it) | `fn_8019CBEC` |
+| | `+0xC0`, `+0xF0` two 3x4 matrices | `fn_8019C348` (the parent's `+0xC0`), `fn_8019DC58` |
+| | `+0x120` first child, `+0x124` next sibling, `+0x128` parent | `fn_8019BFF8`, `fn_8019C348` |
+| | `+0x130` a widget drawn before this one | `fn_801985BC` |
+| event node | `+0x00` next, `+0x04` event, `+0x08` action word, animation hash or sound hash | `fn_8019BD18` |
+| activation grid | `+0x00` flags, `+0x04` a list of columns (each a list of pointers to widgets), `+0x0C`..`+0x18` current and previous cell | `fn_80199E80`, `fn_8019AA3C` |
 | child widget, and the widgets it names | `+0x60` kind (0-6); kinds 2 and 3: sub-kind at `+0x13C`; kind 3: a list at `+0x15C`; kind 4: a widget at `+0x1B4` and a list of widgets at `+0x1BC`; kind 5: a widget at `+0x190`; kind 6: its children | `fn_8019914C` installs the vtable for the kind at `+0x138` |
 | list | `+0x00` count, `+0x04` capacity, `+0x08` element size, `+0x10` the elements (pointers in the widget lists) | `fn_8019555C`, `fn_8019552C` |
 
-Zone 480 (the first one the boot loads) has 5 nodes; the 23 images of `shared_ui.sir` have 326
-nodes, 7,554 child widgets, 8,802 widgets with a kind and 130 lists. Not converted: the rest of the set (`+0x00` its name hash, the
-zone, five more pointers with counts), the rest of a widget, and everything else in the image.
+Zone 480 (the first one the boot loads) has 5 screens; the 23 images of `shared_ui.sir` have 326
+screens, 9,374 widgets, 6,218 event nodes, 6 activation grids and 191 lists.
+
+Not converted, because nothing that runs so far reads it: what the nodes of the three other
+tables point at (animations and two unknown kinds), what a widget of a given kind has behind
+`+0x138` (apart from the fields above), and of every widget the words at `+0xAC` and `+0xB4`
+(the constructor `fn_8019B2F4` sets them like the two action words), `+0x12C` and `+0x134`.
+Of the set: `+0x00` (its name hash) and the counts at `+0x14`, `+0x1C` and `+0x24`.
 
 `shared_parts.sir` goes through the same code in the port but has not been compared yet.
 
