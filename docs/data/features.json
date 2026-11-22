@@ -99,6 +99,11 @@
  "changelog": [
   {
    "date": "2026-11-22",
+   "time": "21:28",
+   "text": "Audit round 8: GameSessionUpdate, InitNameHashes and four more boot-path files (draft_miss62/82/173/283, about 35 large functions) checked against the asm; 1 bug fixed (fn_80129334 level path format string lost a backslash)."
+  },
+  {
+   "date": "2026-11-22",
    "time": "21:17",
    "text": "The strap safety screen shows its real colours on Windows (PR #62): our decompiled code wrote the colour table texture in the wrong byte order, and now writes it in the Wii's byte order."
   },
