@@ -99,6 +99,11 @@
  "changelog": [
   {
    "date": "2026-11-22",
+   "time": "16:35",
+   "text": "More of the opening screens load on Windows (PRs #51 to #53): the loader converts a screen set's animations and the text widgets, and the disc layer now matches the Wii when a read reaches the end of a file. That's the next step toward the title screen."
+  },
+  {
+   "date": "2026-11-22",
    "time": "16:23",
    "text": "First screen on Windows (PRs #48 to #50): the PC port now draws the game's opening Wii Remote strap safety screen, read from the player's own disc and rendered with Direct3D 11. The loader converts picture widgets and the level's picture settings, and the renderer handles scissor offsets and frame-buffer copies in bands. The title screen is next."
   },
