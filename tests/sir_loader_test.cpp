@@ -738,6 +738,33 @@ struct ZoneDump {
         }
     }
 
+    // A prop definition's animation table, as fn_800699E4 uses it (fn_801AC184, fn_801AC460).
+    std::vector<const u8*> animSets;
+    void AnimSet(const u8* s) {
+        if (!InAny(s, 0x20) || std::find(animSets.begin(), animSets.end(), s) != animSets.end()) return;
+        animSets.push_back(s);
+        const u8* counts = *(const u8**)(s + 4);
+        const u8* defs = *(const u8**)(s + 0xC);
+        u32 total = InAny(counts, 2) ? *(const u16*)counts : 0, clips = *(const u32*)(s + 0x1C);
+        printf("animset "); Val(s); printf(" counts "); Ptr(s + 4); printf(" %u entries ", total); Ptr(s + 0xC);
+        printf(" lists "); Ptr(s + 0x10); printf(" "); Ptr(s + 0x14);
+        printf(" keys %04x %04x clips %u\n", *(const u16*)(s + 0x18), *(const u16*)(s + 0x1A), clips);
+        if (total != 0 && InAny(defs, total * 0x44)) {
+            printf("animdefs "); Val(defs);
+            for (u32 k = 0; k < total; k++) {
+                const u8* d = defs + k * 0x44;
+                printf("%s%08x ", k ? " | " : " ", *(const u32*)(d + 0x2C)); Ptr(d + 0x34); printf(" %u", *(const u32*)(d + 0x38));
+            }
+            printf("\n");
+        }
+        for (u32 k = 0; k < 2; k++) {
+            const u8* list = *(const u8**)(s + 0x10 + k * 4);
+            if (clips == 0 || !In(list, clips * 4)) continue;
+            printf("animclips "); Val(list);
+            for (u32 i = 0; i < clips; i++) { printf(" "); Ptr(list + i * 4); }
+            printf("\n");
+        }
+    }
     // The slots' placed effects (slot +0x80, count +0x9C), then the slots' objects (slot +0xA8):
     // the list, and of each object the type fn_8012FD0C reads.
     void SlotObjects(const LevelZoneRoots* roots, u32 zoneBase) {
@@ -1123,8 +1150,8 @@ struct ZoneDump {
             if (InAny(r, ENTITY_RECORD_SIZE)) {
                 printf("entrecord "); Val(r); printf(" floats");
                 for (u32 k = 0; k < 7; k++) printf(" %08x", Bits(*(const f32*)(r + k * 4)));
-                printf(" w1c %08x %08x f24 %08x w2c %d h30 %u bytes ", *(const u32*)(r + 0x1C), *(const u32*)(r + 0x20),
-                       Bits(*(const f32*)(r + 0x24)), *(const s32*)(r + 0x2C), *(const u16*)(r + 0x30));
+                printf(" w1c %08x %08x f24 %08x w2c %d h30 %u %u bytes ", *(const u32*)(r + 0x1C), *(const u32*)(r + 0x20),
+                       Bits(*(const f32*)(r + 0x24)), *(const s32*)(r + 0x2C), *(const u16*)(r + 0x30), *(const u16*)(r + 0x32));
                 PrintRaw(r + 0x34, 10);
                 printf("\n");
             }
@@ -1150,6 +1177,7 @@ struct ZoneDump {
                 printf(" %08x wbc %08x state", *(const u32*)(o9c + 0x98), *(const u32*)(o9c + 0xBC));
                 for (u32 k = 0; k < 4; k++) printf(" %08x", *(const u32*)(o9c + 0x0C + k * 4));
                 printf(" anims "); Ptr(o9c + 0x48); printf("\n");
+                AnimSet(*(const u8**)(o9c + 0x48));
             }
             const u8* holder = *(const u8**)(e + 0xA4);
             if (In(holder, 8)) {

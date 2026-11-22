@@ -946,6 +946,7 @@ def zone_dump(L, sec, base, hud, roots, scene_roots, pooltabs, records=(), lists
         return 'wii:%08x' % v
     ws = lambda o, n: ' '.join('%08x' % u(o + i * 4) for i in range(n))
     ents, scene, machines, projectiles = [], [], [], []
+    animsets = set()
     def add(lst, v, n=1):
         if v and inz(v, n) and v not in lst: lst.append(v)
     for v in roots: add(ents, v)
@@ -1025,9 +1026,9 @@ def zone_dump(L, sec, base, hud, roots, scene_roots, pooltabs, records=(), lists
         rl = loc(r, 0x40)
         if rl:
             img, q = rl
-            L.append('entrecord %s floats %s w1c %08x %08x f24 %08x w2c %d h30 %d bytes %s' % (
+            L.append('entrecord %s floats %s w1c %08x %08x f24 %08x w2c %d h30 %d %d bytes %s' % (
                 ptr(r), W(img, q, 7), U(img, q + 0x1C), U(img, q + 0x20), U(img, q + 0x24), struct.unpack_from('>i', img, q + 0x2C)[0],
-                struct.unpack_from('>H', img, q + 0x30)[0], img[q + 0x34:q + 0x3E].hex()))
+                struct.unpack_from('>H', img, q + 0x30)[0], struct.unpack_from('>H', img, q + 0x32)[0], img[q + 0x34:q + 0x3E].hex()))
         L.append('entbase %s id %08x w30 %08x p84 %s wac %08x' % (ptr(a), u(o + 0x2C), u(o + 0x30), ptr(u(o + 0x84)), u(o + 0xAC)))
         prop = rl and rl[0][rl[1] + 0x34] == 6
         if prop:
@@ -1044,6 +1045,26 @@ def zone_dump(L, sec, base, hud, roots, scene_roots, pooltabs, records=(), lists
             L.append('entdef %s f24 %08x w2c %08x acts %s %s %08x wbc %08x state %s anims %s' % (
                 ptr(u(o + 0x9C)), U(img, q + 0x24), U(img, q + 0x2C), W(img, q + 0x68, 3), W(img, q + 0x78, 4), U(img, q + 0x98), U(img, q + 0xBC),
                 W(img, q + 0x0C, 4), ptr(U(img, q + 0x48))))
+            # The definition's animation table, as fn_800699E4 uses it (fn_801AC184, fn_801AC460).
+            st = U(img, q + 0x48)
+            sl = loc(st, 0x20)
+            if sl and st not in animsets:
+                animsets.add(st)
+                si, sq = sl
+                cl = loc(U(si, sq + 4), 2)
+                total = struct.unpack_from('>H', cl[0], cl[1])[0] if cl else 0
+                clips = U(si, sq + 0x1C)
+                L.append('animset %s counts %s %d entries %s lists %s %s keys %04x %04x clips %d' % (
+                    ptr(st), ptr(U(si, sq + 4)), total, ptr(U(si, sq + 0xC)), ptr(U(si, sq + 0x10)), ptr(U(si, sq + 0x14)),
+                    struct.unpack_from('>H', si, sq + 0x18)[0], struct.unpack_from('>H', si, sq + 0x1A)[0], clips))
+                el = loc(U(si, sq + 0xC), total * 0x44)
+                if el and total:
+                    L.append('animdefs %s %s' % (ptr(U(si, sq + 0xC)), ' | '.join('%08x %s %d' % (
+                        U(el[0], el[1] + k * 0x44 + 0x2C), ptr(U(el[0], el[1] + k * 0x44 + 0x34)), U(el[0], el[1] + k * 0x44 + 0x38)) for k in range(total))))
+                for k in range(2):
+                    lst = U(si, sq + 0x10 + k * 4)
+                    if clips and inz(lst, clips * 4):
+                        L.append('animclips %s %s' % (ptr(lst), ' '.join(ptr(u(off(lst) + i * 4)) for i in range(clips))))
         hl = u(o + 0xA4)
         if inz(hl, 8):
             L.append('entholder %s machine %s other %s' % (ptr(hl), ptr(u(off(hl))), ptr(u(off(hl) + 4))))

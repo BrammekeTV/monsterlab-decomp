@@ -755,6 +755,20 @@ the other levels have three (projectiles, 30 render objects, and one more).
 A level's pointers can lead into another zone's image, which is not in memory when zone 0 is
 converted. Such an object is skipped; the pointer itself is still converted.
 
+### A prop's animation table
+
+A prop definition's `+0x48` points at its animation table (`fn_800699E4`). The table is in zone
+0, its clip lists in zone 1.
+
+| Object | Fields | Reader |
+|---|---|---|
+| table | `+0x04` pointer to the entry counts (one `u16` per group; there is one group), `+0x0C` the entries | `fn_801AC184` |
+| | `+0x10` two lists of clips, `+0x18` the two `u16` keys that pick a list, `+0x1C` clips per list | `fn_801AC460` |
+| entry (0x44 bytes) | `+0x2C` handle, `+0x34` its table, `+0x38` the clip's index | `fn_801AC184`, `fn_801AC460` |
+| entity record | `+0x32` (`u16`): the key handed to `fn_801AC460` | `fn_800699E4` |
+
+The 34 level files have 189 tables. The clips are not converted yet.
+
 ### Zone records and animated materials
 
 Every zone slot's `+0xFC` points at a 0x40-byte **zone record**. All 493 records lie at the start
