@@ -430,6 +430,10 @@ typedef struct LevelZoneRoots {
     u32  sceneObjectCount;
     u32* poolTables;         // pairs {address, entry count}: every slot's pool table (+0xE4, +0xE8)
     u32  poolTableCount;
+    u32* slotObjects;        // pairs {address, entry count}: every slot's list of objects (+0xA8, byte +0xAC)
+    u32  slotObjectCount;
+    u32* slotEffects;        // pairs {address, entry count}: every slot's placed effects (+0x80, +0x9C)
+    u32  slotEffectCount;
     u32* zoneRecords;        // every slot's +0xFC: the zone record WorldTick walks
     u32  zoneRecordCount;
     u32* zoneLists;          // first node of the list (+0x10) of each record that lies in the other image

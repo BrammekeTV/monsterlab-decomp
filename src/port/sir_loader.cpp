@@ -364,6 +364,7 @@ enum RegionKind {
     REGION_ENTITY_PROP, REGION_PROP_DEF, REGION_KEY_PTR,
     REGION_UI_TREE_NODE, REGION_UI_LIST, REGION_UI_WIDGET, REGION_UI_EVENT, REGION_UI_GRID, REGION_UI_FIXED,
     REGION_UI_SET, REGION_UI_SCREEN, REGION_UI_GRAPHIC, REGION_UI_TEXT,
+    REGION_ZONE_EFFECT, REGION_ANIM_SET, REGION_ANIM_DEFS, REGION_U16_ARRAY,
     REGION_UI_ANIM, REGION_UI_ANIM_TRACK, REGION_UI_ANIM_EVENTS, REGION_UI_ANIM_KEYS, REGION_UI_ANIM_ENTRIES,
     REGION_ZONE_SYSTEM, REGION_ANIM_PLAYER, REGION_ANIM_ELEM, REGION_ANIM_TRACK, REGION_ANIM_KEYS, REGION_F32_ARRAY,
     REGION_RUNTIME    // memory the game initialises itself: nothing to convert, but nothing else may be there
@@ -467,6 +468,53 @@ static bool OtherAdd(u32 off, u32 size, u8 kind) {
 }
 
 static bool sLevelZone = false;   // the image is a level zone
+
+// An object of the image being converted or of the other image (zone 0), by Wii address.
+//   done: for the other image, an earlier conversion converted exactly this object (it is in host
+//         form); for this image, it is in the plan already (still big-endian until the plan runs).
+struct AnyObj { bool found, other, done; u32 off; };
+
+static bool PlanHas(const ImagePlan* plan, u32 off, u8 kind);
+static bool ImageSpan(u32 addr, u64 size, u32 imageSize, u32* off);
+
+static AnyObj AnyFind(const ImagePlan* plan, u32 imageSize, u32 addr, u32 size, u8 kind) {
+    AnyObj o = { false, false, false, 0 };
+    if (addr == 0) return o;
+    if (ImageSpan(addr, size, imageSize, &o.off)) {
+        o.found = true;
+        o.done = PlanHas(plan, o.off, kind);
+    } else if (OtherSpan(addr, size, &o.off)) {
+        o.found = o.other = true;
+        for (u32 i = 0; sOtherDone != NULL && i < sOtherDone->count && !o.done; i++) {
+            const Region* g = &sOtherDone->regions[i];
+            o.done = g->off == o.off && g->size == size && g->kind == kind;
+        }
+    }
+    return o;
+}
+
+static bool AnyAdd(ImagePlan* plan, const AnyObj* o, u32 size, u8 kind) {
+    if (o->done) return true;
+    return o->other ? PlanAdd(&sOtherNew, o->off, size, kind) : PlanAdd(plan, o->off, size, kind);
+}
+
+// A number of the object, whichever form it is in.
+static u32 AnyWord(const u8* image, const AnyObj* o, u32 at, u32 bytes) {
+    const u8* p = (o->other ? sOtherImage : image) + o->off + at;
+    if (o->other && o->done) return bytes == 2 ? *(const u16*)p : Host32(p);
+    return bytes == 2 ? (u32)((p[0] << 8) | p[1]) : Be32(p);
+}
+
+// A pointer of the object as a Wii address. A converted pointer leads into one of the two images,
+// or is a Wii address that was kept.
+static u32 AnyPtr(const u8* image, u32 imageSize, const AnyObj* o, u32 at) {
+    if (!(o->other && o->done)) return Be32((o->other ? sOtherImage : image) + o->off + at);
+    const u8* p;
+    memcpy(&p, sOtherImage + o->off + at, sizeof(p));
+    if (p >= sOtherImage && p < sOtherImage + sOtherSize) return sOtherBase + (u32)(p - sOtherImage);
+    if (p >= image && p < image + imageSize) return sImageBase + (u32)(p - image);
+    return (u32)(uintptr_t)p;
+}
 
 // Offset in the image of the `size` bytes at Wii address `addr`; false if they are not all inside.
 static bool ImageSpan(u32 addr, u64 size, u32 imageSize, u32* off) {
@@ -1352,7 +1400,7 @@ static const SirField kEntityRecordFields[] = {
     { 0x1C, SIR_U32, 2 },     // code: layer mask and flags (fn_8012F8B8, fn_801B4334)
     { 0x24, SIR_F32, 1 },     // code: fn_800690D4
     { 0x2C, SIR_U32, 1 },     // code: fn_801B4334
-    { 0x30, SIR_U16, 1 },     // code: fn_801B4334
+    { 0x30, SIR_U16, 2 },     // code: fn_801B4334; +0x32 picks the clip list of an animation table (fn_800699E4)
 };
 // What a prop (entity type 6, vtable lbl_8035A0B4) has on top of kEntityFields: the fields the
 // methods of that vtable read. The level's player object is one of these. Action words are the
@@ -1381,6 +1429,52 @@ static const SirField kPropDefFields[] = {
     { 0x98, SIR_U32, 1 },     // code: action word (fn_80069180)
     { 0xBC, SIR_U32, 1 },     // code: flags, copied to the entity's +0x15C (fn_80069180)
 };
+// A prop definition's animation table (+0x48), as fn_800699E4 uses it:
+//   table:  +0x04 how many entries, one u16 per group (fn_801AC184; there is one group: fn_8000E488
+//           sets the count lbl_805FB698 points at to 1), +0x0C the entries, +0x10 two lists of
+//           clips, picked by the two u16 keys at +0x18, +0x1C how many clips a list has (fn_801AC460)
+//   entry:  0x44 bytes: +0x2C handle (fn_801AC184), +0x34 its table and +0x38 the clip's index in
+//           the lists (fn_801AC460)
+// The clips themselves are not converted yet. The table and the lists may lie in different zones.
+static const SirField kAnimSetFields[] = {
+    { 0x04, SIR_PTR, 1 }, { 0x0C, SIR_PTR, 3 }, { 0x18, SIR_U16, 2 }, { 0x1C, SIR_U32, 1 },
+};
+static const SirField kAnimDefFields[] = {
+    { 0x2C, SIR_U32, 1 }, { 0x34, SIR_PTR, 1 }, { 0x38, SIR_U32, 1 },
+};
+#define ANIM_SET_USED 0x20
+#define ANIM_DEF_SIZE 0x44
+
+static SirError AnimSetPlan(ImagePlan* plan, const u8* image, u32 imageSize, u32 addr) {
+    AnyObj set = AnyFind(plan, imageSize, addr, ANIM_SET_USED, REGION_ANIM_SET);
+    if (!set.found) return SIR_OK;
+    bool walked = set.done && !set.other;                    // in this plan already: its parts are too
+    if (!AnyAdd(plan, &set, ANIM_SET_USED, REGION_ANIM_SET)) return SIR_ERR_ENTITY;
+    if (walked) return SIR_OK;
+    AnyObj counts = AnyFind(plan, imageSize, AnyPtr(image, imageSize, &set, 0x04), 2, REGION_U16_ARRAY);
+    if (counts.found) {
+        u32 total = AnyWord(image, &counts, 0, 2);
+        if (!AnyAdd(plan, &counts, 2, REGION_U16_ARRAY)) return SIR_ERR_ENTITY;
+        AnyObj defs = AnyFind(plan, imageSize, AnyPtr(image, imageSize, &set, 0x0C), total * ANIM_DEF_SIZE, REGION_ANIM_DEFS);
+        if (total != 0 && (!defs.found || !AnyAdd(plan, &defs, total * ANIM_DEF_SIZE, REGION_ANIM_DEFS))) return SIR_ERR_ENTITY;
+    }
+    u32 clips = AnyWord(image, &set, 0x1C, 4);
+    if (clips > imageSize / 4) return SIR_ERR_ENTITY;
+    for (u32 k = 0; k < 2 && clips != 0; k++) {
+        AnyObj list = AnyFind(plan, imageSize, AnyPtr(image, imageSize, &set, 0x10 + k * 4), clips * 4, REGION_PTR_ARRAY);
+        if (list.found && !AnyAdd(plan, &list, clips * 4, REGION_PTR_ARRAY)) return SIR_ERR_ENTITY;
+    }
+    return SIR_OK;
+}
+
+// A prop's definition, in this image or in zone 0's, and its animation table.
+static SirError PropDefPlan(ImagePlan* plan, const u8* image, u32 imageSize, u32 addr) {
+    AnyObj def = AnyFind(plan, imageSize, addr, PROP_DEF_USED, REGION_PROP_DEF);
+    if (!def.found) return SIR_OK;
+    if (!AnyAdd(plan, &def, PROP_DEF_USED, REGION_PROP_DEF)) return SIR_ERR_ENTITY;
+    return AnimSetPlan(plan, image, imageSize, AnyPtr(image, imageSize, &def, 0x48));
+}
+
 // {pointer, count}: a part container's items (+0x0C, +0x10) and an item's parts (+0x24, +0x28),
 // both walked by fn_8012F6B0.
 static const SirField kPtrCountFields[] = {
@@ -1538,10 +1632,7 @@ static SirError EntityPlan(ImagePlan* plan, const u8* image, u32 imageSize, u32 
     if ((e = SceneObjectPlan(plan, image, imageSize, Be32(ent + 0x90))) != SIR_OK) return e;
     // For a prop it is the prop's definition.
     if (prop) {
-        if (LevelSpan(Be32(ent + 0x9C), PROP_DEF_USED, imageSize, &o)) {
-            if (!PlanAdd(plan, o, PROP_DEF_USED, REGION_PROP_DEF)) return SIR_ERR_ENTITY;
-        }
-        else if (OtherSpan(Be32(ent + 0x9C), PROP_DEF_USED, &q) && !OtherAdd(q, PROP_DEF_USED, REGION_PROP_DEF)) return SIR_ERR_ENTITY;
+        if ((e = PropDefPlan(plan, image, imageSize, Be32(ent + 0x9C))) != SIR_OK) return e;
         // The prop's states (fn_800699E4): +0x1A4 pointers to definitions at +0x1A0. Every prop of
         // the shipped levels has one state and names its own field +0x9C as the list: that word
         // is converted with the entity.
@@ -1549,12 +1640,7 @@ static SirError EntityPlan(ImagePlan* plan, const u8* image, u32 imageSize, u32 
         if (states != 0 && LevelSpan(Be32(ent + 0x1A0), (u64)states * 4, imageSize, &list) && !(states == 1 && list == off + 0x9C)) {
             if (!PlanAdd(plan, list, states * 4, REGION_PTR_ARRAY)) return SIR_ERR_ENTITY;
             for (u32 i = 0; i < states; i++) {
-                u32 state = Be32(image + list + i * 4);
-                if (LevelSpan(state, PROP_DEF_USED, imageSize, &def)) {
-                    if (!PlanAdd(plan, def, PROP_DEF_USED, REGION_PROP_DEF)) return SIR_ERR_ENTITY;
-                } else if (OtherSpan(state, PROP_DEF_USED, &def) && !OtherAdd(def, PROP_DEF_USED, REGION_PROP_DEF)) {
-                    return SIR_ERR_ENTITY;
-                }
+                if ((e = PropDefPlan(plan, image, imageSize, Be32(image + list + i * 4))) != SIR_OK) return e;
             }
         }
     } else if (LevelSpan(Be32(ent + 0x9C), 0xC, imageSize, &o)) {
@@ -1706,6 +1792,14 @@ static SirError ScreenSetDbPlan(ImagePlan* plan, const u8* image, u32 imageSize,
     }
     return SIR_OK;
 }
+
+// A zone slot's placed effects (slot +0x80, count at +0x9C): pointers to 0x20-byte records
+// {+0x00 the effect's name hash, +0x04 position, +0x10 direction, +0x1C the running instance},
+// which WorldOnZoneLoaded hands to SpawnEffectAt.
+static const SirField kZoneEffectFields[] = {
+    { 0x00, SIR_U32, 1 }, { 0x04, SIR_F32, 6 }, { 0x1C, SIR_PTR, 1 },
+};
+#define ZONE_EFFECT_SIZE 0x20
 
 // ---- screen set of a shared zone (zone slot +0x100)
 //
@@ -2116,6 +2210,12 @@ static void ImagePlanConvert(const ImagePlan* plan, SirReloc* r, u8* image, u32 
         case REGION_UI_SCREEN:    SirConvertRecord(r, p, g->size, kUiScreenFields, COUNTOF(kUiScreenFields)); break;
         case REGION_UI_GRAPHIC:   SirConvertRecord(r, p, g->size, kUiGraphicFields, COUNTOF(kUiGraphicFields)); break;
         case REGION_UI_TEXT:      SirConvertRecord(r, p, g->size, kUiTextFields, COUNTOF(kUiTextFields)); break;
+        case REGION_ANIM_SET:     SirConvertRecord(r, p, g->size, kAnimSetFields, COUNTOF(kAnimSetFields)); break;
+        case REGION_ANIM_DEFS:    ConvertRecords(r, p, g->size, ANIM_DEF_SIZE, kAnimDefFields, COUNTOF(kAnimDefFields)); break;
+        case REGION_U16_ARRAY:
+            for (u32 k = 0; k + 2 <= g->size; k += 2) { Swap16(p + k); r->fieldsSwapped++; }
+            break;
+        case REGION_ZONE_EFFECT:  SirConvertRecord(r, p, g->size, kZoneEffectFields, COUNTOF(kZoneEffectFields)); break;
         case REGION_UI_ANIM:      SirConvertRecord(r, p, g->size, kUiAnimFields, COUNTOF(kUiAnimFields)); break;
         case REGION_UI_ANIM_TRACK: SirConvertRecord(r, p, g->size, kUiAnimTrackFields, COUNTOF(kUiAnimTrackFields)); break;
         case REGION_UI_ANIM_EVENTS: SirConvertRecord(r, p, g->size, kUiAnimEventsFields, COUNTOF(kUiAnimEventsFields)); break;
@@ -2247,10 +2347,12 @@ static const SirField kLevelSlotFields[] = {
     { 0x018, SIR_U32, 1 },    // code: fn_80133D74
     { 0x01C, SIR_F32, 3 },    // code: WorldGetEntityZone (+0x1C), fn_80130FC8 (+0x20, +0x24)
     { 0x050, SIR_PTR, 1 },    // code: resource released by fn_8013006C (fn_8012F8B8)
+    { 0x080, SIR_PTR, 1 },    // code: pointers to the zone's placed effects (WorldOnZoneLoaded), their count at +0x9C
     { 0x08C, SIR_PTR, 2 },    // code: SessionBegin, SessionRestoreZoneObjects (two pointers in every slot of the file)
     { 0x094, SIR_U32, 2 },    // code: CharacterFind, SessionBegin
+    { 0x09C, SIR_U32, 1 },    // code: how many placed effects (WorldOnZoneLoaded)
     { 0x0A0, SIR_U32, 1 },    // word: fn_800098F4 (u8 at +0xA4)
-    { 0x0A8, SIR_U32, 1 },    // word: CIAnimatedPropEnableByProp (u8 at +0xAC)
+    { 0x0A8, SIR_PTR, 1 },    // code: pointers to the zone's objects, their count in the byte at +0xAC (fn_8012FD0C)
     { 0x0BC, SIR_U32, 1 },    // word: fn_801C668C (u8 at +0xC0: fn_8005E1B8)
     { 0x0CC, SIR_U32, 2 },    // word: fn_801C6BCC, fn_801C6C80
     { 0x0D4, SIR_PTR, 1 },    // code: the zone's action table (TriggerDoAction)
@@ -2396,6 +2498,8 @@ extern "C" void LevelZoneRootsFree(LevelZoneRoots* roots) {
     free(roots->entities);
     free(roots->sceneObjects);
     free(roots->poolTables);
+    free(roots->slotObjects);
+    free(roots->slotEffects);
     free(roots->zoneRecords);
     free(roots->zoneLists);
     memset(roots, 0, sizeof(*roots));
@@ -2474,6 +2578,7 @@ extern "C" BOOL LevelZoneRootsCollect(const u8* hdr, u32 hdrSize, const u8* zone
                                       const LevelZoneOther* other, LevelZoneRoots* out) {
     memset(out, 0, sizeof(*out));
     RootList entities = { NULL, 0, 0 }, scene = { NULL, 0, 0 }, pools = { NULL, 0, 0 }, records = { NULL, 0, 0 }, lists = { NULL, 0, 0 };
+    RootList objects = { NULL, 0, 0 }, effects = { NULL, 0, 0 };
     bool ok = hdrSize >= LEVEL_HEADER_SLOTS + 0x118;
     u32 count = ok ? Host32(hdr + 0x1A8) : 0, stride = LEVEL_SLOT_MIN_SIZE, entries, addr;
     const u8* slots = hdr + LEVEL_HEADER_SLOTS;
@@ -2517,7 +2622,15 @@ extern "C" BOOL LevelZoneRootsCollect(const u8* hdr, u32 hdrSize, const u8* zone
         // The slot's pool table {entries, count} at +0xE4: address and count, as a pair.
         if (ok && (addr = ZoneAddr(slot + 0xE4, zoneHost, zoneSize, zoneWiiBase)) != 0)
             ok = RootAdd(&pools, addr) && RootAdd(&pools, Host32(slot + 0xE8));
+        // The slot's list of objects at +0xA8, as many as the byte at +0xAC says.
+        if (ok && slot[0xAC] != 0 && (addr = ZoneAddr(slot + 0xA8, zoneHost, zoneSize, zoneWiiBase)) != 0)
+            ok = RootAdd(&objects, addr) && RootAdd(&objects, slot[0xAC]);
+        // The slot's placed effects at +0x80, as many as the word at +0x9C says.
+        if (ok && Host32(slot + 0x9C) != 0 && (addr = ZoneAddr(slot + 0x80, zoneHost, zoneSize, zoneWiiBase)) != 0)
+            ok = RootAdd(&effects, addr) && RootAdd(&effects, Host32(slot + 0x9C));
     }
+    out->slotObjects = objects.items;       out->slotObjectCount = objects.count / 2;
+    out->slotEffects = effects.items;       out->slotEffectCount = effects.count / 2;
     out->entities = entities.items;         out->entityCount = entities.count;
     out->sceneObjects = scene.items;        out->sceneObjectCount = scene.count;
     out->poolTables = pools.items;          out->poolTableCount = pools.count / 2;
@@ -2530,6 +2643,32 @@ extern "C" BOOL LevelZoneRootsCollect(const u8* hdr, u32 hdrSize, const u8* zone
 // A zone slot's pool table (slot +0xE4, count +0xE8): 0x2C-byte entries {+0x04 pool, +0x0C index
 // of a script function} (kPoolTableEntryFields). fn_801DB1AC runs that function over the pool's
 // items at level start.
+
+// A zone slot's objects (slot +0xA8, count in the byte at +0xAC): pointers to objects whose type
+// word at +0x08 picks the class fn_8012FD0C sets up again when the zone starts (types 0 to 5, 8,
+// 9 and 15 to 18). That is all that is typed of them so far.
+static SirError SlotObjectsPlan(ImagePlan* plan, const u8* image, u32 imageSize, u32 addr, u32 count) {
+    u32 off, o;
+    if (count == 0) return SIR_OK;
+    if (!LevelSpan(addr, (u64)count * 4, imageSize, &off) || !PlanAdd(plan, off, count * 4, REGION_PTR_ARRAY)) return SIR_ERR_LEVEL;
+    for (u32 i = 0; i < count; i++) {
+        if (!LevelSpan(Be32(image + off + i * 4), 0x0C, imageSize, &o) || PlanHas(plan, o + 8, REGION_U32_ARRAY)) continue;
+        if (!PlanAdd(plan, o + 8, 4, REGION_U32_ARRAY)) return SIR_ERR_LEVEL;
+    }
+    return SIR_OK;
+}
+
+static SirError SlotEffectsPlan(ImagePlan* plan, const u8* image, u32 imageSize, u32 addr, u32 count) {
+    u32 off, o;
+    if (count == 0) return SIR_OK;
+    if (count > imageSize / 4 || !LevelSpan(addr, (u64)count * 4, imageSize, &off) ||
+        !PlanAdd(plan, off, count * 4, REGION_PTR_ARRAY)) return SIR_ERR_LEVEL;
+    for (u32 i = 0; i < count; i++) {
+        if (!LevelSpan(Be32(image + off + i * 4), ZONE_EFFECT_SIZE, imageSize, &o) || PlanHas(plan, o, REGION_ZONE_EFFECT)) continue;
+        if (!PlanAdd(plan, o, ZONE_EFFECT_SIZE, REGION_ZONE_EFFECT)) return SIR_ERR_LEVEL;
+    }
+    return SIR_OK;
+}
 
 static SirError PoolTablePlan(ImagePlan* plan, const u8* image, u32 imageSize, u32 addr, u32 count) {
     u32 off;
@@ -2594,6 +2733,10 @@ extern "C" SirError LevelZoneConvert(SirReloc* r, u8* image, u32 imageSize, u32 
     for (u32 i = 0; i < roots->sceneObjectCount && e == SIR_OK; i++) e = SceneObjectPlan(&plan, image, imageSize, roots->sceneObjects[i]);
     for (u32 i = 0; i < roots->poolTableCount && e == SIR_OK; i++)
         e = PoolTablePlan(&plan, image, imageSize, roots->poolTables[i * 2], roots->poolTables[i * 2 + 1]);
+    for (u32 i = 0; i < roots->slotEffectCount && e == SIR_OK; i++)
+        e = SlotEffectsPlan(&plan, image, imageSize, roots->slotEffects[i * 2], roots->slotEffects[i * 2 + 1]);
+    for (u32 i = 0; i < roots->slotObjectCount && e == SIR_OK; i++)
+        e = SlotObjectsPlan(&plan, image, imageSize, roots->slotObjects[i * 2], roots->slotObjects[i * 2 + 1]);
     for (u32 i = 0; i < roots->zoneRecordCount && e == SIR_OK; i++) e = ZoneRecordPlan(&plan, image, imageSize, roots->zoneRecords[i]);
     for (u32 i = 0; i < roots->zoneListCount && e == SIR_OK; i++) e = ZoneListPlan(&plan, image, imageSize, roots->zoneLists[i]);
     // A shared zone: the slot copy at the start (converted below, by the slot's own field table) and its screen set.

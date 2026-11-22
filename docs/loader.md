@@ -598,7 +598,9 @@ loader takes the size from the block: each slot's first table points at `slot + 
 | `0x18` | word | `fn_80133D74` |
 | `0x50` | resource | `fn_8013006C` |
 | `0x8C`, `0x90` | two pointers; `0x94`, `0x98`: how many entries of the two entity tables are in use | `SessionBegin`, `CharacterFind`, `fn_8012FD0C` |
-| `0xA0`, `0xA8`, `0xBC`, `0xCC`, `0xD0`, `0x100`, `0x10C` | words read with `lwz`; pointer or number not known yet (bytes at `0xA4`, `0xAC`, `0xC0`) | `fn_800098F4`, `CIAnimatedPropEnableByProp`, `fn_801C668C`, `fn_801C6BCC`, `OnZoneScreensLoaded`, `fn_8004DAF8` |
+| `0x80`, `0x9C` | the zone's placed effects: pointers to 0x20-byte records {name hash, position, direction, running instance} and their count | `WorldOnZoneLoaded` |
+| `0xA8`, byte `0xAC` | the zone's objects: pointers and their count; of an object the type word at `+0x08` is converted, the rest is not typed yet | `fn_8012FD0C` |
+| `0xA0`, `0xBC`, `0xCC`, `0xD0`, `0x100`, `0x10C` | words read with `lwz`; pointer or number not known yet (bytes at `0xA4`, `0xC0`) | `fn_800098F4`, `fn_801C668C`, `fn_801C6BCC`, `OnZoneScreensLoaded`, `fn_8004DAF8` |
 | `0xD4` | the zone's action table (`TriggerDoAction`, zone id other than 0x1FF) | `TriggerDoAction` |
 | `0xE4`, `0xE8` | pool table: 0x2C-byte entries and their count | `fn_8012FD0C` -> `fn_801DB1AC` |
 | `0xFC` | the zone's record at the start of its image | `WorldTick` |
@@ -752,6 +754,20 @@ the other levels have three (projectiles, 30 render objects, and one more).
 
 A level's pointers can lead into another zone's image, which is not in memory when zone 0 is
 converted. Such an object is skipped; the pointer itself is still converted.
+
+### A prop's animation table
+
+A prop definition's `+0x48` points at its animation table (`fn_800699E4`). The table is in zone
+0, its clip lists in zone 1.
+
+| Object | Fields | Reader |
+|---|---|---|
+| table | `+0x04` pointer to the entry counts (one `u16` per group; there is one group), `+0x0C` the entries | `fn_801AC184` |
+| | `+0x10` two lists of clips, `+0x18` the two `u16` keys that pick a list, `+0x1C` clips per list | `fn_801AC460` |
+| entry (0x44 bytes) | `+0x2C` handle, `+0x34` its table, `+0x38` the clip's index | `fn_801AC184`, `fn_801AC460` |
+| entity record | `+0x32` (`u16`): the key handed to `fn_801AC460` | `fn_800699E4` |
+
+The 34 level files have 189 tables. The clips are not converted yet.
 
 ### Zone records and animated materials
 
