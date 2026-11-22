@@ -4,7 +4,7 @@
 
 extern "C" {
 void fn_801785A8(void* p);               // 0x801785A8
-void fn_801787E0(u8* p, s32 arg);        // 0x801787E0
+void fn_801787E0(u8* p, u8** stream);        // 0x801787E0
 }
 
 extern u8* lbl_805FB608;                 // 0x805FB608 (heap object: slot +0 = alloc, called as (..., heap))
@@ -86,7 +86,7 @@ u8* fn_80178C44(u8* arg0, s32 arg1) {
     u8* rec = (*(u8* (**)(u32, u32, u32, u8*, u32, u8*))lbl_805FB608)(0x13C, 0x10, 0x12, link, 0, lbl_805FB608);
     *(u8**)(rec + 0x50) = arg0;
     fn_801785A8(rec);
-    fn_801787E0(rec, arg1);
+    fn_801787E0(rec, (u8**)(uintptr_t)arg1);
     return rec;
 }
 

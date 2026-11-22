@@ -30,7 +30,7 @@ void fn_800A8810(u8* p);                                                // 0x800
 void fn_800AA2D0(u8* self, f32 dt, f32 v);                              // 0x800AA2D0
 void fn_800B49B8(u8* p, f32 dt);                                        // 0x800B49B8
 void fn_800B5478(u8* p, f32 dt);                                        // 0x800B5478
-u8* fn_800B66D0(u8* p);                                                 // 0x800B66D0
+s32 fn_800B66D0(u8* p);                                                 // 0x800B66D0
 f32 fn_800B71A8(u8* p);                                                 // 0x800B71A8
 f32 fn_800B7380(u8* p);                                                 // 0x800B7380
 f32 fn_800B7388(u8* p);                                                 // 0x800B7388
@@ -456,7 +456,7 @@ void fn_800B4314(u8* arg0, f32 farg0) {
     }
     if ((*(f32*)(arg0 + 0x674) > 10.0f || (*(FnF32Obj*)(*(u8**)(arg0 + 4) + 0x64))(arg0) < 100.0f) &&
         *(u8**)(arg0 + 0x94) != NULL) {
-        u8* sub = fn_800B66D0(*(u8**)(arg0 + 0x94));
+        u8* sub = (u8*)(uintptr_t)fn_800B66D0(*(u8**)(arg0 + 0x94));
         if (sub != NULL) {
             s32 n3 = RaySceneTest(NULL);
             if (n3 < 0) n3 = 0;

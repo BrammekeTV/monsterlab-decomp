@@ -30,7 +30,7 @@ void* fn_800CF71C(void);                     // asm passes arg0 in r3; the defs 
 u8* fn_800D01C0(void);                           // src/leaf, takes no arguments
 u32 fn_80143974(s32 seed, void* data, u32 len);  // camera_collision.cpp
 void fn_801894B8(u8* p);                         // small_8018.cpp
-s32 fn_801894F4(u8* p);
+void fn_801894F4(u8* p);
 void fn_8018979C(u8*, s8*, s32*, s32*);          // src/leaf
 void* fn_8018D428(s32 size, const char* file, void* tag, s32 line);
 void fn_8018D4CC(void* p);                       // small_8019.cpp

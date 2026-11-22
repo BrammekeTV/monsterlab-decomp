@@ -7,7 +7,7 @@
 #include "game/script_callbacks.h"
 
 extern u8* gBattle;
-extern u8 lbl_805FB02C[];
+extern s32 lbl_805FB02C;
 extern u8* lbl_805FB2B8;
 extern s32 lbl_805FB2C8;
 extern s32 lbl_805FB2CC;

@@ -6,7 +6,7 @@
 #include "types.h"
 
 extern u8* lbl_805FB010;
-extern u8 lbl_805FB030[];
+extern u8 lbl_805FB030;
 
 // 0x8003E39C
 extern "C" s32 fn_8003E39C(void) {
