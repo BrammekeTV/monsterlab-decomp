@@ -20,11 +20,12 @@ build\pc\monsterlab.exe                        # runs main() with your own disc 
 | Option | |
 |---|---|
 | `--data <dir>` or `MONSTERLAB_DATA` | extracted disc (`sys/main.dol`, `files/`); default: `orig/RM7P4F` in the current folder or above the exe |
-| `--frames N` | stop after N presented frames (default 300) |
-| `--seconds N` | stop after N seconds and say where the main thread is (default 60) |
+| `--frames N` | stop after N presented frames (default: no limit; 300 with `--headless`) |
+| `--seconds N` | stop after N seconds and say where the main thread is (default: no limit; 60 with `--headless`) |
 | `--keep-going` | a missing function returns 0 instead of stopping, and a semaphore nobody signals is passed after 0.5 s: a survey of what the boot path still needs. After the first one the run is no longer what the game does. |
 | `--verbose` | log every skipped static initialiser and every SDK stub call |
-| `--window` | open a window and draw into it |
+| `--headless` | no window, stop after 300 frames or 60 seconds: the mode for tests and CI (`--selftest` implies it). Without it the exe opens a window and runs until the window is closed |
+| `--window` | open a window even with `--headless` |
 | `--screenshot FILE` | write the last picture shown as a PNG when the run stops (works without `--window`) |
 | `--scale N` | frame buffer size as a multiple of the console's 640x528 (default 2) |
 | `--peek ADDR` | print four words of Wii memory (hex address) when the run stops |

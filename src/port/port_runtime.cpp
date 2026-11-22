@@ -792,9 +792,18 @@ static const char* FindDataDir(const char* asked) {
 struct PortBoot {
     PortBoot() {
         sStartTick = GetTickCount();
-        gPortOptions.frameLimit = 300;
+        // Default: a window that runs until it is closed. --headless (and --selftest) keep the old
+        // test behaviour: no window, stop after 300 frames or 60 seconds.
+        gPortOptions.window = TRUE;
+        gPortOptions.frameLimit = 0;
         gPortOptions.showTexture = -1;
-        gPortOptions.secondsLimit = 60;
+        gPortOptions.secondsLimit = 0;
+        for (int i = 1; i < __argc && __argv; i++)
+            if (!strcmp(__argv[i], "--headless") || !strcmp(__argv[i], "--selftest")) {
+                gPortOptions.window = FALSE;
+                gPortOptions.frameLimit = 300;
+                gPortOptions.secondsLimit = 60;
+            }
         const char* asked = getenv("MONSTERLAB_DATA");
         for (int i = 1; i < __argc && __argv; i++) {
             const char* a = __argv[i];
@@ -805,6 +814,7 @@ struct PortBoot {
             else if (!strcmp(a, "--seconds") && i + 1 < __argc) gPortOptions.secondsLimit = atoi(__argv[++i]);
             else if (!strcmp(a, "--data") && i + 1 < __argc) asked = __argv[++i];
             else if (!strcmp(a, "--window")) gPortOptions.window = TRUE;
+            else if (!strcmp(a, "--headless")) {}  // handled above
             else if (!strcmp(a, "--peek") && i + 1 < __argc && sPeekCount < 8) sPeek[sPeekCount++] = strtoul(__argv[++i], NULL, 16);
             else if (!strcmp(a, "--watch") && i + 1 < __argc) sWatch = strtoul(__argv[++i], NULL, 16);
             else if (!strcmp(a, "--show-texture") && i + 1 < __argc) gPortOptions.showTexture = atoi(__argv[++i]);
