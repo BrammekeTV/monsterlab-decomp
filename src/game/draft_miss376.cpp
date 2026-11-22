@@ -24,7 +24,7 @@ void Vec3NormalizeTo(Vec3* out, const Vec3* v);                   // 0x80055D9C
 void fn_800359F4(Vec3* out, f32 x, f32 y, f32 z);                 // 0x800359F4
 s32  fn_80044694(void);                                           // 0x80044694
 u32  fn_80044C0C(void);                                           // 0x80044C0C
-void fn_80052638(Vec3* v);                                        // 0x80052638
+void fn_80052638(void);                                        // 0x80052638
 void fn_8005263C(Quat* q);                                        // 0x8005263C
 void fn_8010AAE0(void);                                           // 0x8010AAE0
 void fn_8010AB0C(s32 a, s32 b);                                   // 0x8010AB0C
@@ -197,7 +197,7 @@ void fn_8017514C(s32 mode) {
     fn_800359F4(&dir1, 3.0f, 2.0f, 7.0f);
     fn_800359F4(&dir2, 6.0f, 6.0f, -7.0f);
     fn_800359F4(&dir3, -6.0f, 6.0f, -7.0f);
-    fn_80052638(&cur);
+    fn_80052638();
     if (PadButtonHeld(0x1087) != 0) {
         lbl_805FB614 = (lbl_805FB614 + 1) % 360;
     }

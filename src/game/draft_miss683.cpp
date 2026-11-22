@@ -34,7 +34,7 @@ void fn_801894F4(u8* p);
 void fn_8018979C(u8*, s8*, s32*, s32*);          // src/leaf
 void* fn_8018D428(s32 size, const char* file, void* tag, s32 line);
 void fn_8018D4CC(void* p);                       // small_8019.cpp
-u32 fn_8019552C(u8* a3, s32 a4);                 // small_8019c.cpp (returns a pointer, declared u32)
+u8*  fn_8019552C(u8* a3, s32 a4);                 // small_8019c.cpp (returns a pointer, declared u32)
 void* fn_801D40E0(s32 n);                        // small_801Dc.cpp
 s32 fn_801EE46C(u8* handle, const char* path);
 void fn_801EE4B8(u8* handle);
@@ -241,7 +241,7 @@ s32 fn_801A820C(u8* arg0, s32 arg1, f32 farg0, f32 farg1) {
     *(s32*)(arg0 + 0x1F4) = -1;
     for (s32 row = 0; row < *(s32*)(arg0 + 0x13C); row++) {
         for (s32 col = 0; col < *(s32*)(arg0 + 0x140); col++) {
-            u8** slot = (u8**)(uintptr_t)fn_8019552C(*(u8**)(arg0 + 0x1BC), col + row * *(s32*)(arg0 + 0x140));
+            u8** slot = (u8**)fn_8019552C(*(u8**)(arg0 + 0x1BC), col + row * *(s32*)(arg0 + 0x140));
             u8* ent = (slot != NULL) ? *slot : NULL;
             if (ent != NULL && (arg1 != 0 || (*(s32*)(ent + 0x64) & 1)) &&
                 (*(s32 (**)(u8*, f32, f32))(*(u8**)(ent + 0x138) + 0x44))(ent, farg0, farg1) != 0) {

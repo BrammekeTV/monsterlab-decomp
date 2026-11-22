@@ -16,7 +16,7 @@ void  UIPlayAnim(void* el, u32 anim);                     // 0x8019BE40
 u8*   fn_801483BC(s32 idx);                               // 0x801483BC
 f32   fn_801F6610(u8* arg0, s32 arg1);                    // 0x801F6610
 void  fn_8018D2B8(const char* fmt, ...);                  // 0x8018D2B8 (debug log)
-u32   fn_8019552C(u8* list, s32 index);                   // 0x8019552C (leaf; returns a slot pointer)
+u8*    fn_8019552C(u8* list, s32 index);                   // 0x8019552C (leaf; returns a slot pointer)
 s32   fn_80196678(void* gx, void* mat, f32 t);            // 0x80196678
 s32   fn_80196B10(u8* a3);                                // 0x80196B10 (leaf)
 s32   fn_8019B6CC(u8* arg0, f32 farg0);                   // 0x8019B6CC (UI element base update)
@@ -199,7 +199,7 @@ s32 fn_801A52A0(u8* arg0) {
         } else if (col >= *(s32*)(arg0 + 0x140)) {
             col -= *(s32*)(arg0 + 0x140);
         }
-        u8** slot = (u8**)(uintptr_t)fn_8019552C(*(u8**)(arg0 + 0x1BC), col + row * *(s32*)(arg0 + 0x140));
+        u8** slot = (u8**)fn_8019552C(*(u8**)(arg0 + 0x1BC), col + row * *(s32*)(arg0 + 0x140));
         u8* cell = (slot != NULL) ? *slot : NULL;
         if (cell != NULL) {
             UIPlayAnim(cell, 0x43D82AB2U);  // "accept"

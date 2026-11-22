@@ -31,7 +31,7 @@ void   fn_8018C3D0(void* p);                                                 // 
 void   fn_8018D1FC(const char* fmt, ...);                                    // 0x8018D1FC (debug log)
 void   fn_8018D2B8(const char* fmt, ...);                                    // 0x8018D2B8 (debug log)
 void   fn_8018D370(const char* fmt, ...);                                    // 0x8018D370 (debug log)
-u32    fn_8019552C(u8* list, s32 index);                                     // 0x8019552C (leaf; returns a slot pointer)
+u8*     fn_8019552C(u8* list, s32 index);                                     // 0x8019552C (leaf; returns a slot pointer)
 s32    fn_8019555C(u8* list);                                                // 0x8019555C (leaf; element count)
 s32    fn_80196678(void* gx, void* mat, f32 t);                              // 0x80196678
 s32    fn_80196B10(u8* a3);                                                  // 0x80196B10 (leaf)

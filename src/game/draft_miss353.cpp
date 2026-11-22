@@ -22,7 +22,7 @@ void  Vec3MulScalar(Vec3* out, const Vec3* v, const f32* s);        // 0x8005322
 void  Vec3Rotate(Vec3* out, const f32 m[9], const Vec3* v);         // 0x8005844C
 void  Vec3ScaleBy(Vec3* v, const f32* s);                           // 0x80054A3C
 void  Vec3SetUnitZ(Vec3* v);                                        // 0x800549A8
-void  fn_80052638(Vec3* v);                                         // 0x80052638 (empty leaf)
+void  fn_80052638(void);                                         // 0x80052638 (empty leaf)
 void  fn_8005263C(f32* q);                                          // 0x8005263C (quat identity)
 void  fn_800526D0(u8* out);                                         // 0x800526D0 (matrix identity)
 void  fn_80054484(Vec3* out, const Vec3* a, const Vec3* b);         // 0x80054484
@@ -420,7 +420,7 @@ void fn_801CEC68(u8* p, u8* em, f32* basePos, u8* fxMgr) {
         } else {
             fn_801D0058(p, (u8*)basePos);
         }
-        fn_80052638((Vec3*)sp300);
+        fn_80052638();
         fn_801D0114((u8*)sp300, -1.0f, 1.0f);
         fn_80082BE0((u8*)sp230, (u8*)sp300);
         fn_8015EC78((u8*)sp330, (u8*)sp230);
@@ -611,7 +611,7 @@ void fn_801CEC68(u8* p, u8* em, f32* basePos, u8* fxMgr) {
         if (fn_801CC8F4(proto, 10) != 0) {
             fn_800526D0((u8*)sp370);
             fn_801C9DF0(em, (f32*)fn_801D0224(em), sp370, 0.0f);
-            fn_80052638((Vec3*)sp2A0);
+            fn_80052638();
             fn_801449A4(sp370, sp2A0);
             fn_801D0368(fn_801CE53C(p), 1.5707964f * Vec3GetX((Vec3*)sp2A0));
             fn_801D0378(fn_801CE53C(p), 1.5707964f * Vec3GetY((Vec3*)sp2A0));
@@ -640,7 +640,7 @@ void fn_801CEC68(u8* p, u8* em, f32* basePos, u8* fxMgr) {
         } else if (fn_801CC8F4(proto, 4) != 0) {
             fn_800526D0((u8*)sp340);
             fn_801C9DF0(em, (f32*)fn_801CE390(p), sp340, 0.0f);
-            fn_80052638((Vec3*)sp280);
+            fn_80052638();
             fn_801449A4(sp340, sp280);
             fn_801D0368(fn_801CE53C(p), 1.5707964f * Vec3GetX((Vec3*)sp280));
             fn_801D0378(fn_801CE53C(p), 1.5707964f * Vec3GetY((Vec3*)sp280));
@@ -775,9 +775,9 @@ void fn_801E361C(u8* obj) {
     fn_801E3CCC((u8*)&spC4, *(f32*)(obj + 0x3C));
     fn_80054484(&sp10C, &sp124, &spC4);
     ScalarZero(&sp24);
-    fn_80052638(&sp100);
-    fn_80052638(&spF4);
-    fn_80052638(&spE8);
+    fn_80052638();
+    fn_80052638();
+    fn_80052638();
     fn_800636A0();
     fn_800636A0();
     fn_800636A0();

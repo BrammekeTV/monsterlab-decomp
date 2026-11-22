@@ -27,7 +27,7 @@ void  ZoneLog(void* loader, const char* fmt, ...);              // 0x801D7340
 void  fn_800359F4(u8* a3, f32 f1, f32 f2, f32 f3);              // 0x800359F4
 u8*   fn_80044634(s32 n);                                       // 0x80044634
 void  fn_800446BC(void* cam, s32 v);                            // 0x800446BC
-void  fn_80052638(Vec3* v);                                     // 0x80052638 (empty leaf; the caller passes the vector)
+void  fn_80052638(void);                                     // 0x80052638 (empty leaf; the caller passes the vector)
 void  fn_800526D0(u8* out);                                     // 0x800526D0 (matrix identity)
 void  fn_8005535C(u8* dst, const u8* src);                      // 0x8005535C
 u8*   fn_800554D4(u8* mtx);                                     // 0x800554D4
@@ -191,13 +191,13 @@ void fn_801D82AC(u8* arg0, u8* arg1, u8* arg2, u32 arg3, s32 arg4, f32 farg0, f3
     if (fn_801CB938() == 0) return;
 
     fn_800526D0(sp108);
-    fn_80052638(&spC8);
+    fn_80052638();
     fn_800359F4(sp98, farg1, farg1, farg0);
     Vec3Copy(&spC8, (Vec3*)sp98);
     fn_800557B4(spD8);
     fn_8005535C(sp108, spD8);
-    fn_80052638(&spBC);
-    fn_80052638(&spB0);
+    fn_80052638();
+    fn_80052638();
     Vec3Assign(&spA4, (Vec3*)arg2);
 
     // Helper axis for the cross products: the axis along the smallest component first, then the largest.

@@ -11,7 +11,7 @@ s32   TriggerDoAction(void* action, void* a1, void* a2);                 // 0x80
 void  fn_8020A398(s32 handle);                                           // 0x8020A398
 void  fn_8018D1FC(const char* fmt, ...);                                 // 0x8018D1FC
 void  fn_8018D2B8(const char* fmt, ...);                                 // 0x8018D2B8 (debug log)
-u32   fn_8019552C(u8* list, s32 index);                                  // 0x8019552C
+u8*    fn_8019552C(u8* list, s32 index);                                  // 0x8019552C
 s32   fn_801A6384(u8* grid);                                             // grid helper
 s32   fn_801A6060(u8* grid);                                             // grid helper
 u32   fn_801A665C(void* obj);                                            // 0x801A665C
@@ -238,7 +238,7 @@ s32 fn_801A5608(u8* arg0) {
         } else if (r5 >= *(s32*)(arg0 + 0x140)) {
             r5 -= *(s32*)(arg0 + 0x140);
         }
-        u8** slot = (u8**)(uintptr_t)fn_8019552C(*(u8**)(arg0 + 0x1BC), r5 + r4 * *(s32*)(arg0 + 0x140));
+        u8** slot = (u8**)fn_8019552C(*(u8**)(arg0 + 0x1BC), r5 + r4 * *(s32*)(arg0 + 0x140));
         u8* elem = (slot != NULL) ? *slot : NULL;
         s32 var_r27 = 0;
         if (elem != NULL) {
@@ -312,7 +312,7 @@ s32 fn_801A5A6C(u8* arg0) {
         } else if (r5 >= *(s32*)(arg0 + 0x140)) {
             r5 -= *(s32*)(arg0 + 0x140);
         }
-        u8** slot = (u8**)(uintptr_t)fn_8019552C(*(u8**)(arg0 + 0x1BC), r5 + r4 * *(s32*)(arg0 + 0x140));
+        u8** slot = (u8**)fn_8019552C(*(u8**)(arg0 + 0x1BC), r5 + r4 * *(s32*)(arg0 + 0x140));
         u8* elem = (slot != NULL) ? *slot : NULL;
         s32 var_r27 = 0;
         if (elem != NULL) {

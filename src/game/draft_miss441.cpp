@@ -61,7 +61,7 @@ void  fn_80042364(u8* c, void* choice, u8* fighter, s32 flag);        // 0x80042
 void  fn_80042408(u8* c, const s32* kind, s32 reaction, u8* fighter, s32 flag);   // 0x80042408
 void  fn_8004504C(void);                                              // 0x8004504C
 void  fn_8004784C(void);                                              // 0x8004784C
-void  fn_80052638(Vec3* v);                                           // 0x80052638
+void  fn_80052638(void);                                           // 0x80052638
 void  fn_8005265C(u8* obj);                                           // 0x8005265C
 void  fn_800526D0(u8* out);                                           // 0x800526D0
 u8*   fn_800526D4(u8* mtx);                                           // 0x800526D4
@@ -842,8 +842,8 @@ void fn_80053C2C(u8* c, f32 dt) {
         u8 mtx[0x30];
         Vec3 p0, p1;
         fn_800526D0(mtx);
-        fn_80052638(&p0);
-        fn_80052638(&p1);
+        fn_80052638();
+        fn_80052638();
         s32 n = *(s32*)(def + 0x114);
         for (s32 i = 0; i < n; i++) {
             u8** slot = (u8**)(c + 0x81C + i * 4);

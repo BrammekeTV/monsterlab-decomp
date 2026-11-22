@@ -9,6 +9,7 @@ void RendDLBegin(RendDL* dl, RendDLRecord* rec);          // 0x8015B9F8
 void RendDLEnd(RendDL* dl);                               // 0x8015BA4C
 u8*  RendDLGetBase(RendDL* dl);                           // 0x8015BBB8
 void RendThreadSubmitDL(RendDLRecord* rec, BOOL signalFree);   // 0x8015E5D0
+// Original passes lbl_805FB594 in r3; the callee ignores r3 (uses r4/r5), so it is not declared.
 void RendThreadSync(void);                                // 0x8015E930
 void RendWaitFreeDL(void);                                // 0x8015EA34
 BOOL RendHasFreeDL(void);                                 // 0x8015EAF4

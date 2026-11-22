@@ -77,7 +77,7 @@ void  fn_8016A43C(u8* p);                                              // 0x8016
 void  fn_8016A788(u8* p);                                              // 0x8016A788
 s32   fn_8019B4E8(u8* p);                                              // 0x8019B4E8
 s32 fn_8019B684(u8* p);                                              // 0x8019B684
-u32   fn_8019552C(u8* list, s32 index);                                // 0x8019552C (returns a slot pointer; declared u32 in small_8019c.cpp)
+u8*    fn_8019552C(u8* list, s32 index);                                // 0x8019552C (returns a slot pointer; declared u32 in small_8019c.cpp)
 s32   fn_80196668(u8* p);                                              // 0x80196668
 u8*   fn_80198E20(u8* set);                                         // 0x80198E20 (returns a pointer; declared s32 in its leaf file)
 void  fn_8019C174(u8* obj, s32 (*cbA)(void*, f32*), s32 (*cbB)(void), f32* t); // 0x8019C174
@@ -127,7 +127,7 @@ s32 fn_801A4824(u8* arg0) {
     fn_8019B4E8(arg0);
     count = *(s32*)(arg0 + 0x13C) * *(s32*)(arg0 + 0x140);
     for (i = 0; i < count; i++) {
-        u8** slot = (u8**)(uintptr_t)fn_8019552C(*(u8**)(arg0 + 0x1BC), i);
+        u8** slot = (u8**)fn_8019552C(*(u8**)(arg0 + 0x1BC), i);
         u8* obj = (slot != NULL) ? *slot : NULL;
         if (obj != NULL) {
             u8* n = *(u8**)(obj + 0x120);
@@ -150,7 +150,7 @@ s32 fn_801A48DC(u8* arg0) {
     fn_8019B684(arg0);
     count = *(s32*)(arg0 + 0x13C) * *(s32*)(arg0 + 0x140);
     for (i = 0; i < count; i++) {
-        u8** slot = (u8**)(uintptr_t)fn_8019552C(*(u8**)(arg0 + 0x1BC), i);
+        u8** slot = (u8**)fn_8019552C(*(u8**)(arg0 + 0x1BC), i);
         u8* obj = (slot != NULL) ? *slot : NULL;
         if (obj != NULL) {
             u8* n = *(u8**)(obj + 0x120);

@@ -43,7 +43,7 @@ void ScalarZero(Scalar* out);                                   // 0x80055E2C
 void ScalarSet(Scalar* out, f32 v);                             // 0x80053250
 s32  ScalarLess(const Scalar* a, const Scalar* b);              // 0x800533B0
 s32  fn_80058BE8(const f32* a, const f32* b);                   // 0x80058BE8 (a > b)
-void fn_80052638(Vec3* v);                                      // 0x80052638 (empty leaf)
+void fn_80052638(void);                                      // 0x80052638 (empty leaf)
 u8*  fn_800526D4(u8* mtx);                                      // 0x800526D4 (matrix translation)
 void fn_8005C158(Vec3* out, const Vec3* v);                     // 0x8005C158
 void fn_8005A244(Vec3* out, const Vec3* a, const Vec3* b);      // 0x8005A244 (normalised cross product)
@@ -607,8 +607,8 @@ s32 fn_8016EC2C(u8* view, u8* sphere, u8* dir, u8* box) {
 
     Vec3 e1, e2;
     Vec3 pos;
-    fn_80052638(&e1);
-    fn_80052638(&e2);
+    fn_80052638();
+    fn_80052638();
     Vec3Assign(&pos, (const Vec3*)fn_800526D4(view));
 
     // Camera inside the sphere: |pos - centre|^2 <= r^2.
@@ -638,7 +638,7 @@ s32 fn_8016EC2C(u8* view, u8* sphere, u8* dir, u8* box) {
     Vec3Assign(&bmin, (const Vec3*)box);
     Vec3Assign(&bmax, (const Vec3*)(box + 0xC));
     Vec3 corners[8];
-    for (s32 i = 0; i < 8; i++) fn_80052638(&corners[i]);
+    for (s32 i = 0; i < 8; i++) fn_80052638();
     BoxCorner(&corners[0], &bmax, &bmax, &bmin);   // (max.x, max.y, min.z)
     BoxCorner(&corners[1], &bmin, &bmax, &bmin);   // (min.x, max.y, min.z)
     Vec3Copy(&corners[2], &bmin);                  // (min.x, min.y, min.z)
@@ -670,7 +670,7 @@ s32 fn_8016EC2C(u8* view, u8* sphere, u8* dir, u8* box) {
 
     // Bounds of the view's own four near corners, in world space.
     Vec3 nearPts[4];
-    for (s32 i = 0; i < 4; i++) fn_80052638(&nearPts[i]);
+    for (s32 i = 0; i < 4; i++) fn_80052638();
     fn_8016EB6C((const f32*)(view + 0x90), (f32*)nearPts, (const f32*)(view + 0x120), 4);
     Vec3 nlo, nhi;
     Vec3Assign(&nlo, &nearPts[0]);

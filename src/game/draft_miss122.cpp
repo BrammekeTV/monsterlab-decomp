@@ -28,7 +28,7 @@ void  TargetListInit(void* t);                                  // 0x802161DC
 void* UIWidgetFindChild(void* widget, u32 hash);                // 0x80199AEC
 void  fn_801455E0(f32* out, u8* quat);                          // 0x801455E0
 void  fn_8018DBB8(void* sets, s32 a);                           // 0x8018DBB8
-u32   fn_8019552C(u8* list, s32 index);                         // 0x8019552C
+u8*    fn_8019552C(u8* list, s32 index);                         // 0x8019552C
 s32   fn_8019555C(u8* list);                                    // 0x8019555C
 s32 fn_801987BC(u8* arg0, u8* arg1);                     // 0x801987BC
 s32   fn_80198A8C(void* set, void* widget);                     // 0x80198A8C
@@ -390,7 +390,7 @@ void fn_80025524(u8* self, f32* pos, f32* vel) {
         v[1] = pos[1] + ((t * (0.098f * t)) * 0.5f + n.y * w);
         v[2] = pos[2] + n.z * w;
         v[3] = pos[3] + 1.0f;
-        u32 id = fn_8019552C(list, i);
+        u32 id = (u32)(uintptr_t)fn_8019552C(list, i);
         fn_801AA760(out, id);
         v[2] = out[2];
         v[3] = out[3];

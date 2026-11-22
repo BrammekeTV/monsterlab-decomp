@@ -11,14 +11,14 @@ s32 fn_801A61F4(u8* grid);                                                // 0x8
 s32 fn_801A5ED0(u8* grid);                                                // 0x801A5ED0
 u32 fn_801A665C(void* obj);                                               // 0x801A665C
 u32 fn_801A65A0(void* obj);                                               // 0x801A65A0
-u32 fn_8019552C(u8* list, s32 index);                                     // 0x8019552C
+u8*  fn_8019552C(u8* list, s32 index);                                     // 0x8019552C
 void fn_8018D2B8(const char* fmt, ...);                                   // 0x8018D2B8 (debug log)
 s32 SpawnEffectAt(void* fxMgr, u32 effect, const f32 pos[4], u8** owner); // 0x801C80E0
 s32 fn_801A9174(u8* p, f32* pos, f32* out);                               // 0x801A9174
 void fn_801C7E0C(u8* p, s32 del);                                         // 0x801C7E0C
 void Vec3Assign(Vec3* out, const Vec3* v);                                // 0x80053354
 void Vec3Copy(Vec3* out, const Vec3* v);                                  // 0x80052640
-void fn_80052638(Vec3* v);                                                // 0x80052638 (empty leaf)
+void fn_80052638(void);                                                // 0x80052638 (empty leaf)
 s32 fn_801AD47C(u8* a, u8* b, u8* c, u8* out, s32 flag, f32 margin);      // 0x801AD47C
 s32 fn_801AD6AC(u8* a, u8* ext, u8* rot, u8* b, u8* out, s32 flag, f32 margin); // 0x801AD6AC
 s32 fn_801ADB44(u8* arg0, u8* arg1, u8* arg2, s32 arg3, u8* arg4, f32 farg0, f32 farg1); // 0x801ADB44
@@ -52,7 +52,7 @@ static const char kScrollFail[] = "UIGrid : unable to scroll grid to valid item 
 
 // Cell lookup shared by both scroll steps: grid cell list at +0x1BC.
 static inline u8* UIGridCellAt(u8* arg0, s32 index) {
-    u8** slot = (u8**)(uintptr_t)fn_8019552C(*(u8**)(arg0 + 0x1BC), index);
+    u8** slot = (u8**)fn_8019552C(*(u8**)(arg0 + 0x1BC), index);
     return slot != NULL ? *slot : NULL;
 }
 
@@ -311,8 +311,8 @@ s32 fn_801AD248(u8* arg0, u8* arg1, u8* arg2, u8* arg3, s32 arg4, u8* arg5, s32 
         a = (arg6 != 0) ? arg3 : arg1;
         return fn_801ADB44(arg2 + 0x14, arg0 + 0x14, a, arg4, arg5, *(f32*)(arg2 + 0x3C), *(f32*)(arg0 + 0x3C));
     case 5:
-        fn_80052638(&sp50);
-        fn_80052638(&sp5C);
+        fn_80052638();
+        fn_80052638();
         b = fn_801ADF54(arg2);
         a = fn_801ADF4C(arg2);
         if (fn_801C2C60(*(f32*)(arg0 + 0x3C), arg0 + 0x14, a, b, &spC, &sp50.x, &sp18) != 0) {
@@ -324,8 +324,8 @@ s32 fn_801AD248(u8* arg0, u8* arg1, u8* arg2, u8* arg3, s32 arg4, u8* arg5, s32 
         }
         return 0;
     case 6:
-        fn_80052638(&sp38);
-        fn_80052638(&sp44);
+        fn_80052638();
+        fn_80052638();
         b = fn_801ADF64(arg2);
         a = fn_801ADF5C(arg2);
         if (fn_801C3170(*(f32*)(arg0 + 0x3C), arg0 + 0x14, a, b, &sp8, &sp38.x, &sp10) != 0) {

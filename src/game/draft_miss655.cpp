@@ -7,7 +7,7 @@
 
 extern "C" {
 u8*   fn_801483BC(s32 idx);                                          // 0x801483BC
-u32   fn_8019552C(u8* list, s32 index);                              // 0x8019552C (leaf; really returns the element pointer)
+u8*    fn_8019552C(u8* list, s32 index);                              // 0x8019552C (leaf; really returns the element pointer)
 s32   fn_801A9EC8(u8* obj, f32 x, f32 y, f32 z);                     // 0x801A9EC8
 void  fn_801ACD08(u8* a, u8* b, u8* out, f32 x, f32 y);              // 0x801ACD08
 void  MtxFromLocatorRotation(f32 out[12], const void* rot);          // 0x80143CA8
@@ -148,12 +148,12 @@ s32 fn_801A6D7C(u8* obj, s32 force) {
             } else if (gc < 0) {
                 gc += cols;
             }
-            u8** slot = (u8**)(uintptr_t)fn_8019552C(*(u8**)(obj + 0x1BC), gc + gr * cols);
+            u8** slot = (u8**)fn_8019552C(*(u8**)(obj + 0x1BC), gc + gr * cols);
             u8* o = (slot != NULL) ? *slot : NULL;
             if (o == NULL) continue;
             // virtual call, slot 0x2C of the vtable at +0x138 (arg 0x18; float regs are leftovers)
             (*(GridWidgetFn*)(*(u8**)(o + 0x138) + 0x2C))(o, 0x18);
-            f32 baseX = *(f32*)(uintptr_t)fn_8019552C(*(u8**)(obj + 0x1B8), gr);
+            f32 baseX = *(f32*)fn_8019552C(*(u8**)(obj + 0x1B8), gr);
             f32 x = baseX + cellW * (f32)col;
             if (colEdge != 0) {
                 if (*(u8*)(obj + 0x178) != 0 && col == colLo) {

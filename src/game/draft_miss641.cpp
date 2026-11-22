@@ -23,7 +23,7 @@ void  fn_8002D83C(u8* p, f32 dt);                                               
 void  fn_8002DA94(u8* p, f32 dt);                                                      // 0x8002DA94
 void  fn_8002DC04(u8* p);                                                              // 0x8002DC04
 s32   fn_80031114(void* list, f32* v);                                                 // 0x80031114
-u32   fn_8019552C(u8* list, s32 index);                                                // 0x8019552C
+u8*    fn_8019552C(u8* list, s32 index);                                                // 0x8019552C
 s32   fn_8019555C(u8* list);                                                           // 0x8019555C
 void* fn_80198F1C(void* set, u32 hash);                                                // 0x80198F1C
 void  fn_801A8654(u8* obj, s32 a1);                                                    // 0x801A8654
@@ -322,7 +322,7 @@ void fn_800250EC(u8* arg0) {
     first[2] = lbl_805FC928;
     first[3] = lbl_805FC928;
     for (s32 i = 0; i < count; i++) {
-        u8* key = (u8*)(uintptr_t)fn_8019552C(list, i);
+        u8* key = fn_8019552C(list, i);
         if (i == 0) {
             fn_801AA760((u8*)first, key);
         }

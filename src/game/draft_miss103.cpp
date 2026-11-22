@@ -57,7 +57,7 @@ void Vec3SetZ(Vec3* v, f32 z);
 void Vec3SetZero(Vec3* out);
 void ScalarSet(Scalar* out, f32 v);
 void MtxFromLocatorRotation(f32 out[12], const void* rot);
-void fn_80052638(Vec3* v);   // 0x80052638 (empty leaf; the caller passes the vector)
+void fn_80052638(void);   // 0x80052638 (empty leaf; the caller passes the vector)
 void fn_800526D0(u8* out);
 void fn_8005535C(u8* dst, const u8* src);
 f32 fn_800553C0(u8* mtx, const Vec3* v);
@@ -612,7 +612,7 @@ void fn_8019C348(u8* self) {
     fn_800526D0(MP(mB));
     fn_800526D0(MP(mC));
     fn_800526D0(MP(mD));
-    fn_80052638(&v84);
+    fn_80052638();
     fn_800557B4(MP(t));
     fn_8005535C(MP(mA), MP(t));
     fn_8019C6DC(MP(mA), (const Vec3*)(self + 0x74));

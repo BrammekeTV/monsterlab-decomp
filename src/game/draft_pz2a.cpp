@@ -23,7 +23,7 @@ s32 fn_80199828(u8* self, u8** best);                                      // 0x
 s32 fn_8019CCAC(u8* self);                                      // 0x8019CCAC
 void    UIPlayAnim(void* el, u32 anim);                         // 0x8019BE40
 s32     fn_8019555C(u8* list);                                  // 0x8019555C (leaf)
-u32     fn_8019552C(u8* list, s32 index);                       // 0x8019552C (leaf)
+u8*      fn_8019552C(u8* list, s32 index);                       // 0x8019552C (leaf)
 f32     fn_801AA728(u8* entry);                                 // 0x801AA728 (leaf)
 s32 fn_801B7F40(u8* arg0, u8* arg1, f32 farg0);                        // 0x801B7F40 (return type unknown)
 void    fn_801C9260(u8* node);                                  // 0x801C9260
@@ -95,7 +95,7 @@ u8* fn_801AA898(u8* arg0, s32 a4, f32 farg0) {
     u8* entry = NULL;
     s32 i = 0;
     while (i < count) {
-        entry = (u8*)(uintptr_t)fn_8019552C(*(u8**)(arg0 + 0x4), i);
+        entry = fn_8019552C(*(u8**)(arg0 + 0x4), i);
         if (farg0 == fn_801AA728(entry)) break;
         if (fn_801AA728(entry) > farg0) {
             entry = NULL;

@@ -36,7 +36,7 @@ s32   fn_80151644(s32 a, s32 b, u8* quad);                            // 0x80151
 void  fn_80155724(u8* m);                                             // 0x80155724
 s32   fn_8015BA30(void* p);                                           // 0x8015BA30
 void  fn_8018D370(const char* fmt, ...);                              // 0x8018D370 (debug log)
-u32   fn_8019552C(u8* list, s32 index);                               // 0x8019552C
+u8*    fn_8019552C(u8* list, s32 index);                               // 0x8019552C
 s32   fn_8019555C(u8* list);                                          // 0x8019555C
 s32   fn_801AA730(u8* dst, u8* src);                                  // 0x801AA730
 void  fn_801AA760(u8* dst, u8* src);                                  // 0x801AA760
@@ -410,8 +410,8 @@ s32 fn_801AB56C(void* h, f32 dt) {
                     u8* slot = *(u8**)(obj + 4 + i * 4);
                     if (slot != NULL) {
                         u8* list = *(u8**)(slot + 4);
-                        u8* last = (u8*)(uintptr_t)fn_8019552C(list, fn_8019555C(list) - 1);
-                        u8* first = (u8*)(uintptr_t)fn_8019552C(*(u8**)(slot + 4), 0);
+                        u8* last = fn_8019552C(list, fn_8019555C(list) - 1);
+                        u8* first = fn_8019552C(*(u8**)(slot + 4), 0);
                         f32 v[4];
                         fn_801AA760((u8*)v, last);
                         fn_801AA730(first, (u8*)v);

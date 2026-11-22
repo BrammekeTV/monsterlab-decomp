@@ -53,7 +53,7 @@ void fn_801CAD80(void* recs, s32 count);    // 0x801CAD80
 s32  fn_801CC928(u8* e);                    // 0x801CC928
 s32  fn_801CD044(u8* e, u8* ref, f32 v);    // 0x801CD044
 u8*  fn_801D6D78(void);                     // 0x801D6D78 (camera record: axes at +0/+0xC/+0x18, position at +0x24)
-u32  fn_8019552C(u8* list, s32 index);      // 0x8019552C (leaf)
+u8*   fn_8019552C(u8* list, s32 index);      // 0x8019552C (leaf)
 s32  fn_8019555C(u8* list);                 // 0x8019555C (leaf)
 f32  fn_801AA728(u8* entry);                // 0x801AA728 (leaf)
 s32  fn_801AA784(u8* entry);                // 0x801AA784 (leaf)
@@ -77,7 +77,7 @@ u64  __shr2u(s32, s32, s32);                // 0x8032F9C4
 void fn_8014DE68(void);                     // 0x8014DE68
 s32  fn_8015BA30(void* p);                  // 0x8015BA30
 void fn_801514F0(void);                     // 0x801514F0
-void fn_80154290(s32 a);                    // 0x80154290
+void fn_80154290(void);                    // 0x80154290
 void fn_801542DC(void);                     // 0x801542DC
 void fn_80154974(void);                     // 0x80154974
 void fn_80155D70(void);                     // 0x80155D70
@@ -483,7 +483,7 @@ void fn_80188FC0(void) {
     GXWGFifo._u32 = 0x3F800000; GXWGFifo._u32 = 0; GXWGFifo._u32 = 0; GXWGFifo._u32 = 0; GXWGFifo._u32 = 0;
     GXWGFifo._u32 = 0x3F800000; GXWGFifo._u32 = 0; GXWGFifo._u32 = 0; GXWGFifo._u32 = 0; GXWGFifo._u32 = 0;
     GXWGFifo._u32 = 0x3F800000; GXWGFifo._u32 = 0;
-    fn_80154290(0);
+    fn_80154290();
 }
 
 // 0x801D2E9C
@@ -676,7 +676,7 @@ void fn_8020C164(u8* obj) {
 }
 
 static inline u8* ListEntry(u8* list, s32 i) {
-    return (u8*)(uintptr_t)fn_8019552C(list, i);
+    return fn_8019552C(list, i);
 }
 
 // Fires the event stored in an anim-list entry, by its kind (+0x24): 1 triggers an action if the

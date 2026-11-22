@@ -35,7 +35,7 @@ void Vec3Copy(Vec3* out, const Vec3* v);                                        
 f32 Vec3GetY(const Vec3* v);
 void Vec3ScaleBy(Vec3* v, const f32* s);                                                    // 0x80054A3C
 void Vec3SetY(Vec3* v, f32 y);
-void fn_80052638(Vec3* v);                                                                  // 0x80052638
+void fn_80052638(void);                                                                  // 0x80052638
 void fn_8006FC04(void);                                                                     // 0x8006FC04
 s32 fn_800ACAAC(u8* p, u8* a, f32* out);                                                    // 0x800ACAAC
 s32 fn_800AD5A8(u8* p, u8* a, f32* out);                                                    // 0x800AD5A8
@@ -456,7 +456,7 @@ void fn_800CA290(u8* arg0, u8* arg1) {
     u8 seg[0x14];
     f32 minLen = lbl_805FE4F0;
 
-    fn_80052638(&euler);
+    fn_80052638();
     fn_800C1798(mat, arg0);
     fn_801449A4(mat, &euler.x);
     s32 nExtra = *(s32*)(arg0 + 0x394);

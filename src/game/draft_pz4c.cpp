@@ -17,7 +17,7 @@ s32    TriggerDoAction(void* action, void* a1, void* a2);       // 0x801E0054
 BOOL   ZoneIsLoaded(void* world, s32 zone);                     // 0x8012F408
 void   fn_8018D2B8(const char* fmt, ...);                       // 0x8018D2B8 (debug log)
 void   fn_8018D370(const char* fmt, ...);                       // 0x8018D370 (debug log)
-u32    fn_8019552C(u8* list, s32 index);                        // 0x8019552C (returns slot address)
+u8*     fn_8019552C(u8* list, s32 index);                        // 0x8019552C (returns slot address)
 s32    fn_8019555C(u8* list);                                   // 0x8019555C (element count)
 void   fn_8019E27C(void* el);                                   // 0x8019E27C
 void   fn_801A1B2C(u8* node);                                   // 0x801A1B2C
@@ -683,7 +683,7 @@ s32 fn_8019914C(s32 unused, u8* node) {
         }
         u8* list = *(u8**)(node + 0x15C);
         for (s32 i = 0; i < fn_8019555C(list); i++) {
-            u8* child = *(u8**)(uintptr_t)fn_8019552C(list, i);
+            u8* child = *(u8**)fn_8019552C(list, i);
             if (child != NULL) *(u8**)(child + 0x138) = lbl_80382E2C;
         }
         break;
@@ -693,7 +693,7 @@ s32 fn_8019914C(s32 unused, u8* node) {
         fn_8019914C(0, *(u8**)(node + 0x1B4));
         u8* list = *(u8**)(node + 0x1BC);
         for (s32 i = 0; i < fn_8019555C(list); i++) {
-            u8* child = *(u8**)(uintptr_t)fn_8019552C(list, i);
+            u8* child = *(u8**)fn_8019552C(list, i);
             if (child != NULL) fn_8019914C(0, child);
         }
         break;

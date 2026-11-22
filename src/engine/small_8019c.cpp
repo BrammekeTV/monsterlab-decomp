@@ -24,7 +24,7 @@ void    fn_80199534(u8* a3);                                    // 0x80199534 (l
 s32     fn_80196B10(u8* a3);                                    // 0x80196B10 (leaf)
 s32     fn_80196C88(u8* a3);                                    // 0x80196C88 (leaf)
 s32     fn_8019555C(u8* a3);                                    // 0x8019555C (leaf)
-u32     fn_8019552C(u8* a3, s32 a4);                            // 0x8019552C (leaf)
+u8*      fn_8019552C(u8* a3, s32 a4);                            // 0x8019552C (leaf)
 char*   fn_801D8ADC(char* s);                                   // 0x801D8ADC (path name tail)
 }
 
@@ -215,7 +215,7 @@ u32 fn_8019AC00(void* obj, s32 index) {
     if (index >= 0) {
         u8* list = *(u8**)((u8*)obj + 0x4);
         if (index < fn_8019555C(list)) {
-            u8* ent = (u8*)(uintptr_t)fn_8019552C(list, index);
+            u8* ent = fn_8019552C(list, index);
             return *(u32*)ent;
         }
     }
@@ -230,7 +230,7 @@ u32 fn_8019AD84(void* obj, s32 index) {
     if (index >= 0) {
         u8* list = *(u8**)((u8*)obj + 0x4);
         if (index < fn_8019555C(list)) {
-            u8* ent = (u8*)(uintptr_t)fn_8019552C(list, index);
+            u8* ent = fn_8019552C(list, index);
             return *(u32*)(ent + 0x4);
         }
     }

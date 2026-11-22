@@ -18,7 +18,7 @@ void  Vec3SetUnitZ(Vec3* v);                          // 0x800549A8
 void  fn_800359F4(u8* a3, f32 f1, f32 f2, f32 f3);    // 0x800359F4
 u8*   fn_80044634(s32 n);                             // 0x80044634
 void  fn_800446BC(void*, int);                        // 0x800446BC
-void  fn_80052638(Vec3* v);                           // 0x80052638 (empty leaf)
+void  fn_80052638(void);                           // 0x80052638 (empty leaf)
 void  fn_800526D0(u8* out);                           // 0x800526D0
 void  fn_8005535C(u8* dst, const u8* src);            // 0x8005535C
 u8*   fn_800554D4(u8* mtx);                           // 0x800554D4
@@ -381,13 +381,13 @@ void fn_801D79D4(u8* arg0, u8* arg1, u8* arg2, u32 color, s32 mode, f32 scale, f
 
     fn_800526D0(m);
     f32 s = scale * fn_800C11F0(0.63661975f * angle);
-    fn_80052638(&vScale);
+    fn_80052638();
     fn_800359F4((u8*)&tmp, s, s, scale);
     Vec3Copy(&vScale, &tmp);
     fn_800557B4(mT);
     fn_8005535C(m, mT);
-    fn_80052638(&vSide);
-    fn_80052638(&vUp);
+    fn_80052638();
+    fn_80052638();
     Vec3Assign(&vAxis, (const Vec3*)arg2);
 
     // Pick a helper vector from the axis' smallest component.

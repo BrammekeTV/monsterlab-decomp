@@ -25,7 +25,7 @@ extern u8 lbl_80381370[];
 
 u8* fn_80142500(void* p);                                    // 0x80142500
 void fn_8032F1E8(u8* obj, void (*cb)(void), s32 a, s32 b, s32 c);  // 0x8032F1E8
-void fn_80052638(u8* p);                                   // 0x80052638
+void fn_80052638(void);                                   // 0x80052638
 void StopExperimentSound(void* obj, u32 id);                // (see src/leaf/auto_03_80099AD8_text.cpp)
 void GameFlowSignal(s32 id, s32 arg1, s32 arg2);            // 0x8000C7F4
 void EventSend(void* mgr, void* target, void* from, u32 event, int a, int b, int c, int d);  // 0x801BA190

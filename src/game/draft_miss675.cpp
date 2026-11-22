@@ -36,7 +36,7 @@ void   Vec3Copy(Vec3* out, const Vec3* v);                                  // 0
 void   Vec3Assign(Vec3* out, const Vec3* v);                                // 0x80053354
 void   Vec3Sub(Vec3* out, const Vec3* a, const Vec3* b);                    // 0x80053370
 f32    Vec3LengthSqOf(const Vec3* v);                                       // 0x80054A90
-void   fn_80052638(Vec3* v);                                                // 0x80052638 (empty leaf)
+void   fn_80052638(void);                                                // 0x80052638 (empty leaf)
 u8*    fn_801ADF4C(u8* a3);                                                 // 0x801ADF4C
 u8*    fn_801ADF54(u8* a3);                                                 // 0x801ADF54
 u8*    fn_801ADF5C(u8* a3);                                                 // 0x801ADF5C
@@ -580,8 +580,8 @@ s32 fn_801AE608(u8* a, u8* alt, u8* b, u8* out, s32 flag, u8* d, s32 e) {
         Vec3 pos[2];
         s32 n;
         f32 dist[2];
-        fn_80052638(&pos[0]);
-        fn_80052638(&pos[1]);
+        fn_80052638();
+        fn_80052638();
         u8* c = fn_801ADF54(b);
         u8* bb = fn_801ADF4C(b);
         if (fn_801C2C60(*(f32*)(a + 0x3C), a + 0x14, bb, c, &n, (f32*)pos, dist) != 0) {
@@ -597,8 +597,8 @@ s32 fn_801AE608(u8* a, u8* alt, u8* b, u8* out, s32 flag, u8* d, s32 e) {
         Vec3 pos[2];
         s32 n;
         f32 dist[2];
-        fn_80052638(&pos[0]);
-        fn_80052638(&pos[1]);
+        fn_80052638();
+        fn_80052638();
         u8* c = fn_801ADF64(b);
         u8* bb = fn_801ADF5C(b);
         if (fn_801C3170(*(f32*)(a + 0x3C), a + 0x14, bb, c, &n, (f32*)pos, dist) != 0) {

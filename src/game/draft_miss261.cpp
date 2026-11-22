@@ -8,7 +8,7 @@ extern "C" {
 
 extern "C" {
 void  fn_8018D370(const char* fmt, ...);                                  // 0x8018D370 (debug log)
-u32   fn_8019552C(u8* list, s32 index);                                   // 0x8019552C
+u8*    fn_8019552C(u8* list, s32 index);                                   // 0x8019552C
 s32   fn_8019555C(u8* list);                                              // 0x8019555C
 s32   fn_801AA974(u8* self, s32 loop, s32 rev, f32 pos);                  // 0x801AA974
 s32   fn_801AAC08(u8* self, f32 pos);                                     // 0x801AAC08
@@ -147,7 +147,7 @@ void fn_801AB3DC(u8* obj, f32 pos, s32 loop, s32 rev) {
     *(s32*)(obj + 0x8) = -2;
     if (rev == 0) {
         for (s32 i = 0; i < fn_8019555C(*(u8**)(obj + 0x4)); i++) {
-            u8* entry = (u8*)(uintptr_t)fn_8019552C(*(u8**)(obj + 0x4), i);
+            u8* entry = fn_8019552C(*(u8**)(obj + 0x4), i);
             if (entry != NULL && fn_801AA728(entry) >= pos) {
                 *(s32*)(obj + 0x8) = i;
                 break;
@@ -155,7 +155,7 @@ void fn_801AB3DC(u8* obj, f32 pos, s32 loop, s32 rev) {
         }
     } else {
         for (s32 i = count - 1; i >= 0; i--) {
-            u8* entry = (u8*)(uintptr_t)fn_8019552C(*(u8**)(obj + 0x4), i);
+            u8* entry = fn_8019552C(*(u8**)(obj + 0x4), i);
             if (entry != NULL && fn_801AA728(entry) <= pos) {
                 *(s32*)(obj + 0x8) = i;
                 break;

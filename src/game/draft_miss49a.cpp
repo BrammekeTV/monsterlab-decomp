@@ -12,7 +12,7 @@ void*       fn_80198FCC(void* set, u32 hash);                    // 0x80198FCC
 void        fn_8018D370(const char* fmt, ...);                   // 0x8018D370 (debug log)
 void        fn_8018D2B8(const char* fmt, ...);                   // 0x8018D2B8 (debug log)
 const char* fn_801EB708(u32 hash);                               // 0x801EB708 (hash -> name)
-u32         fn_8019552C(u8* a3, s32 a4);                         // 0x8019552C (leaf)
+u8*          fn_8019552C(u8* a3, s32 a4);                         // 0x8019552C (leaf)
 u32         fn_8019AD84(void* obj, s32 index);                   // 0x8019AD84
 s32         fn_8019AE94(u8* a3);                                 // 0x8019AE94 (leaf)
 void*       fn_8019AC78(void* set, BOOL a1);                     // 0x8019AC78
@@ -72,7 +72,7 @@ u32 fn_801A65A0(void* obj) {
     u32 count = 0;
     for (s32 i = 0; i < *(s32*)(o + 0x140); i++) {
         for (s32 j = 0; j < *(s32*)(o + 0x13C); j++) {
-            u8** slot = (u8**)(uintptr_t)fn_8019552C(*(u8**)(o + 0x1BC), i + j * *(s32*)(o + 0x140));
+            u8** slot = (u8**)fn_8019552C(*(u8**)(o + 0x1BC), i + j * *(s32*)(o + 0x140));
             u8* e = (slot != NULL) ? *slot : NULL;
             if (e != NULL && (*(s32*)(e + 0x64) & 1)) {
                 count += 1;
@@ -90,7 +90,7 @@ u32 fn_801A665C(void* obj) {
     u32 count = 0;
     for (s32 i = 0; i < *(s32*)(o + 0x13C); i++) {
         for (s32 j = 0; j < *(s32*)(o + 0x140); j++) {
-            u8** slot = (u8**)(uintptr_t)fn_8019552C(*(u8**)(o + 0x1BC), j + i * *(s32*)(o + 0x140));
+            u8** slot = (u8**)fn_8019552C(*(u8**)(o + 0x1BC), j + i * *(s32*)(o + 0x140));
             u8* e = (slot != NULL) ? *slot : NULL;
             if (e != NULL && (*(s32*)(e + 0x64) & 1)) {
                 count += 1;

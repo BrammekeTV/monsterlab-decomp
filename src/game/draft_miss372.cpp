@@ -12,7 +12,7 @@ f32   Vec3GetZ(const Vec3* v);
 void  Vec3MulScalar(Vec3* out, const Vec3* v, const f32* s);   // 0x80053224
 void  Vec3SetZero(Vec3* out);                                  // 0x800531A8
 void  fn_800359F4(u8* a3, f32 f1, f32 f2, f32 f3);             // 0x800359F4
-void  fn_80052638(Vec3* v);                                    // 0x80052638 (empty leaf)
+void  fn_80052638(void);                                    // 0x80052638 (empty leaf)
 void  fn_800526D0(u8* out);                                    // 0x800526D0 (matrix identity)
 void  fn_8005535C(u8* dst, const u8* src);                     // 0x8005535C
 void  fn_800554DC(u8* out, const u8* a, const u8* b);          // 0x800554DC (matrix multiply)
@@ -174,7 +174,7 @@ void fn_8016CA24(u8* arg0, u8* arg1, TriCallback arg2, u8* arg3) {
     if (*(s32*)(arg0 + 8) > 0) {
         fn_8016D814(query);
         fn_8015EC78(query, arg1);
-        fn_80052638(&normal);
+        fn_80052638();
         s32* sp = stack;
         *(u8**)(query + 0x18) = (u8*)&normal;
         s32 off = 0;

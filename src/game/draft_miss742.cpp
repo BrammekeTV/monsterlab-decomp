@@ -27,7 +27,7 @@ void  Vec3SetZ(Vec3* v, f32 z);
 void  Vec3Sub(Vec3* out, const Vec3* a, const Vec3* b);          // 0x80053370
 BOOL  ZoneIsLoaded(void* world, s32 zone);                       // 0x8012F408
 void  fn_800359F4(u8* a3, f32 f1, f32 f2, f32 f3);               // 0x800359F4
-void  fn_80052638(Vec3* v);                                      // 0x80052638 (empty leaf)
+void  fn_80052638(void);                                      // 0x80052638 (empty leaf)
 void  fn_800526D0(u8* out);                                      // 0x800526D0 (matrix identity)
 u8*   fn_800526DC(u8* c);                                        // 0x800526DC
 void  fn_8005535C(u8* dst, const u8* src);                       // 0x8005535C
@@ -331,7 +331,7 @@ void fn_8007FA1C(u8* arg0) {
     Vec3Copy((Vec3*)(arg0 + 0x90), (Vec3*)sp5C);
     u8* lvlObj = *(u8**)(lbl_803C4298 + 0x4);
     (*(VoidFn*)(*(u8**)lvlObj + 0x10))(lvlObj);
-    fn_80052638(&sp74);
+    fn_80052638();
     Vec3Sub(&sp50, (Vec3*)(hi + 8), (Vec3*)(ref + 8));
     Vec3Copy(&sp74, &sp50);
     Vec3Negate(&sp44, (Vec3*)(arg0 + 0x9C));

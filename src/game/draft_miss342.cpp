@@ -34,7 +34,7 @@ void   fn_80333B60(void* obj);                                 // 0x80333B60
 s32    fn_8010F880(u32 sig, s32 func, u32* args);              // 0x8010F880
 BOOL   ScriptDispatch(s32 func, u32 sig, u32* args, u32* result);
 void   fn_8012189C(void);                                      // 0x8012189C
-u32*   GetGlobalSettings(void);                                // 0x801D2BF8
+u8*    GetGlobalSettings(void);                                // 0x801D2BF8
 
 extern u8  lbl_803C4298[];
 extern u8  lbl_803C75C8[];

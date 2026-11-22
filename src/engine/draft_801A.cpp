@@ -32,7 +32,7 @@ void*  fn_801B7198(void* anim, s32 a);                          // 0x801B7198
 void   fn_801B72A0(void* anim, s32 a);                          // 0x801B72A0
 void   fn_801A21CC(u8* o);                                      // 0x801A21CC
 s32    fn_801A31BC(u8* o);                                      // 0x801A31BC
-u32    fn_8019552C(u8* list, s32 index);                         // 0x8019552C
+u8*     fn_8019552C(u8* list, s32 index);                         // 0x8019552C
 s32    fn_8019555C(u8* list);                                    // 0x8019555C
 u8*    fn_801A9EFC(u8* element, s32 type);                       // 0x801A9EFC
 void   fn_801A1ABC(u8* element, u32 value);                      // 0x801A1ABC
@@ -378,7 +378,7 @@ s32 fn_801A2E94(u8* arg0, f32 farg0) {
 // its dimensions at +0x13C/+0x140, the current cell at +0x14C/+0x150 and the
 // scroll offset at +0x15C/+0x160.
 static u8* UIGridCell(u8* grid, s32 index) {
-    u8** slot = (u8**)(uintptr_t)fn_8019552C(*(u8**)(grid + 0x1BC), index);
+    u8** slot = (u8**)fn_8019552C(*(u8**)(grid + 0x1BC), index);
     return slot != NULL ? *slot : NULL;
 }
 

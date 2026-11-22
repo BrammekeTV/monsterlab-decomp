@@ -27,7 +27,7 @@ void  Vec3Copy(Vec3* out, const Vec3* v);                         // 0x80052640
 void  Vec3MulScalar(Vec3* out, const Vec3* v, const f32* s);      // 0x80053224
 void  Vec3ScaleBy(Vec3* v, const f32* s);                         // 0x80054A3C
 void  Vec3Sub(Vec3* out, const Vec3* a, const Vec3* b);           // 0x80053370
-void  fn_80052638(Vec3* v);                                       // 0x80052638 (empty leaf)
+void  fn_80052638(void);                                       // 0x80052638 (empty leaf)
 void  fn_80054484(Vec3* out, const Vec3* a, const Vec3* b);       // 0x80054484 (a + b)
 f32   fn_800544B8(f32* out, f32* a, f32* b);                      // 0x800544B8 (out = a - b)
 void  fn_800544CC(u8* out);                                       // 0x800544CC (out = 1.0f)
@@ -767,9 +767,9 @@ void fn_801CD790(u8* obj, u8* mgr, f32 dt) {
             fn_801CE6D8(&sp38, &sp64);
             fn_80144F78((u8*)&sp3C, (u8*)&sp38);
             fn_80054840((u8*)&sp64, (u8*)&sp3C);
-            fn_80052638(&sp28C);
-            fn_80052638(&sp280);
-            fn_80052638(&sp274);
+            fn_80052638();
+            fn_80052638();
+            fn_80052638();
             if (fn_801CE6D0(*(u8**)(obj + 0x5C)) < 0.0f) {
                 fn_8016EB24((u8*)&sp34, (u8*)&sp64);
                 fn_80054840((u8*)&sp64, (u8*)&sp34);
@@ -851,7 +851,7 @@ void fn_801CD790(u8* obj, u8* mgr, f32 dt) {
         {
             Vec3 sp250;
             f32 sp54, sp14;
-            fn_80052638(&sp250);
+            fn_80052638();
             if (fn_801CC8F4(*(u8**)(obj + 0x5C), 0) != 0) {
                 Vec3 sp9C;
                 fn_80082F20((u8*)&sp9C, node);

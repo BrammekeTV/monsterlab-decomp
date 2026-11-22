@@ -31,7 +31,7 @@ u8*   fn_801F94EC(u8* p, s32 del);                                      // 0x801
 void  fn_8020A398(s32 handle);                                          // 0x8020A398
 void  fn_8020A958(u8* p);                                               // 0x8020A958
 void  fn_8020F46C(u8* p, u8* choice);                                   // 0x8020F46C
-void  fn_80052638(u8* p);                                              // 0x80052638
+void  fn_80052638(void);                                              // 0x80052638
 s32   fn_802E9EE0(void);                                                // 0x802E9EE0
 u8    fn_802E9F3C(void);                                                // 0x802E9F3C
 void  fn_802F78A0(u8 slot, s32 a, s32 b);                               // 0x802F78A0

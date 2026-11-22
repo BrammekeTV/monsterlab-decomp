@@ -27,7 +27,7 @@ s32 TriggerDoAction(void* action, void* a1, void* a2);       // 0x801E0054
 void UIPlayAnim(void* el, u32 anim);                          // 0x8019BE40
 void fn_8018D2B8(const char* fmt, ...);                       // 0x8018D2B8 (debug log)
 void fn_8018D370(const char* fmt, ...);                       // 0x8018D370 (debug log)
-u32 fn_8019552C(u8* a3, s32 a4);                              // 0x8019552C (leaf)
+u8*  fn_8019552C(u8* a3, s32 a4);                              // 0x8019552C (leaf)
 s32 fn_8019555C(u8* a3);                                      // 0x8019555C (leaf)
 void* fn_80198F1C(void* set, u32 hash);                       // 0x80198F1C
 f32 fn_801AB7F0(void* h);                                     // 0x801AB7F0
@@ -146,15 +146,15 @@ void* fn_8019AC78(u8* arg0, u8* arg1) {
     u8* ent = NULL;
 
     if (arg1 == NULL) {
-        ent = (u8*)(uintptr_t)fn_8019552C(list, 0);
+        ent = fn_8019552C(list, 0);
     } else {
         s32 i = 0;
         while (i < fn_8019555C(list)) {
-            u8* cur = (u8*)(uintptr_t)fn_8019552C(list, i);
+            u8* cur = fn_8019552C(list, i);
             if (*(u8**)cur == arg1) {
                 s32 last = fn_8019555C(list) - 1;
                 s32 next = (i == last) ? 0 : i + 1;
-                ent = (u8*)(uintptr_t)fn_8019552C(list, next);
+                ent = fn_8019552C(list, next);
                 break;
             }
             i++;
@@ -174,7 +174,7 @@ s32 fn_8019ADFC(u8* arg0, u32 arg1) {
     s32 i = 0;
 
     while (i < fn_8019555C(list)) {
-        u8* ent = (u8*)(uintptr_t)fn_8019552C(list, i);
+        u8* ent = fn_8019552C(list, i);
         if (*(u32*)ent == arg1) {
             return i;
         }

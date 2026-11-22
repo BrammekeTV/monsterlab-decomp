@@ -31,7 +31,7 @@ s32 fn_801B5338(u8* obj, u8* target, u32 hash, f32* vec, u8 flag);  // 0x801B533
 void fn_801F5E50(u8* out, f32 dz);                        // 0x801F5E50
 u8* fn_801F69B8(u8* p, s32 del);                          // 0x801F69B8
 u8* fn_801F9598(u8* p, s32 del);                          // 0x801F9598
-u32 fn_8019552C(u8* list, s32 index);                     // 0x8019552C
+u8*  fn_8019552C(u8* list, s32 index);                     // 0x8019552C
 s32 fn_8022E438(u8* a);                                   // 0x8022E438
 void fn_80094C0C(u8* p);                         // 0x80094C0C
 u8* fn_80097590(u8* p, s32 del);                          // 0x80097590
@@ -145,7 +145,7 @@ s32 fn_801A51FC(u8* arg0) {
     n = 0;
     count = *(s32*)(arg0 + 0x13C) * *(s32*)(arg0 + 0x140);
     for (i = 0; i < count; i++) {
-        ent = (u8*)(uintptr_t)fn_8019552C(*(u8**)(arg0 + 0x1BC), i);
+        ent = fn_8019552C(*(u8**)(arg0 + 0x1BC), i);
         v = (ent != NULL) ? *(s32*)ent : 0;
         if (v != 0) {
             n += 2;

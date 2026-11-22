@@ -20,7 +20,7 @@ void  UIPlayAnim(void* el, u32 anim);                                           
 void  __register_global_object(void* obj, void (*dtor)(void*), void* handle);    // 0x8032EFC8
 s32   fn_80109600(u8* p);
 s32   fn_80109A0C(s32 id);
-u32   fn_8019552C(u8* a3, s32 a4);          // 0x8019552C; asm dereferences the result as a pointer
+u8*    fn_8019552C(u8* a3, s32 a4);          // 0x8019552C; asm dereferences the result as a pointer
 u32   fn_801F38F8(u8* a3);
 s32   fn_801A3798(u8* p, f32 dt);
 s32   fn_8019B6CC(u8* p, f32 dt);
@@ -358,7 +358,7 @@ void fn_801A8318(u8* arg0) {
         *(u8**)((u8*)gScreenSets + 0x74) == arg0) {
         return;
     }
-    ent = (u8*)(uintptr_t)fn_8019552C(*(u8**)(arg0 + 0x1BC),
+    ent = fn_8019552C(*(u8**)(arg0 + 0x1BC),
                                       *(s32*)(arg0 + 0x150) + *(s32*)(arg0 + 0x14C) * *(s32*)(arg0 + 0x140));
     var3 = (ent != NULL) ? *(u8**)ent : NULL;
     if (var3 != NULL && *(u8*)(arg0 + 0x16C) != 0) {
@@ -373,7 +373,7 @@ void fn_801A8318(u8* arg0) {
     *(s32*)(arg0 + 0x150) = r6;
     *(s32*)(arg0 + 0x14C) = r7;
     *(u8*)(arg0 + 0x17C) = 0;
-    ent = (u8*)(uintptr_t)fn_8019552C(*(u8**)(arg0 + 0x1BC),
+    ent = fn_8019552C(*(u8**)(arg0 + 0x1BC),
                                       r6 + r7 * *(s32*)(arg0 + 0x140));
     var30 = (ent != NULL) ? *(u8**)ent : NULL;
     if (var30 != NULL) {

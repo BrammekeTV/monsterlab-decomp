@@ -25,7 +25,7 @@ void  fn_801F052C(void);  void fn_801F2BCC(void); void fn_8000E488(void); void f
 void  CameraSetMatrix(void* camera, const f32 mtx[3][4]);   // 0x801D6814
 void* SirLoad(void* loader, const char* path, void* dst, u32 size, s32 flags);   // 0x801E6138
 void  SirFinishLoad(void* loader, void** handle);           // 0x801E6C44
-u32*  GetGlobalSettings(void);                // 0x801D2BF8: returns 0x805FB7A4
+u8*   GetGlobalSettings(void);                // 0x801D2BF8: returns 0x805FB7A4
 void  fn_800214D4(u32); void fn_801FC038(u32); void fn_801D5D0C(u32);
 void  fn_80011018(void); void fn_8010F794(void); void fn_801F2EB8(void); void UiInit(void);
 void  fn_80013D54(void*); void fn_80013F8C(void*); void GameInitLanguage(void);
@@ -162,7 +162,7 @@ extern "C" void GameStart(int argc, char** argv) {
     // global_binary.sir: section 0 is a 4 KB header (pointer table into section 1), section 1
     // is a memory image that must sit at 0x90400000 (see tools/sir_decoder.py).
     SirLoad(gSirLoader, "global_binary.sir", sSirHeader, 0x1000, -1);
-    void* handle = SirLoad(gSirLoader, "global_binary.sir", MEM2_GLOBAL_BINARY, *GetGlobalSettings(), 0);
+    void* handle = SirLoad(gSirLoader, "global_binary.sir", MEM2_GLOBAL_BINARY, *(u32*)GetGlobalSettings(), 0);
     SirFinishLoad(gSirLoader, &handle);
 
     const u32* hdr = (const u32*)sSirHeader;

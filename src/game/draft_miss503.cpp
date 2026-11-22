@@ -33,7 +33,7 @@ BOOL    PropIncrementState(void* prop);
 s32     RaySceneTest(void* ray);
 u8*     fn_8006FBDC(void);
 u8*     fn_800C253C(u8** obj, s32 kind);
-u32     fn_8019552C(u8* list, s32 index);   // returns the element address (leaf def is u32)
+u8*      fn_8019552C(u8* list, s32 index);   // returns the element address (leaf def is u32)
 void    fn_8018D4CC(void* p);
 s32     UISetTexture(u8* el, s32 tex);
 
@@ -267,7 +267,7 @@ void fn_800D7F24(u8* arg0) {
 s32 fn_801A4798(u8* arg0) {
     s32 n = *(s32*)(arg0 + 0x140) * *(s32*)(arg0 + 0x13C);
     for (s32 i = 0; i < n; i++) {
-        u8* elem = (u8*)(intptr_t)fn_8019552C(*(u8**)(arg0 + 0x1BC), i);
+        u8* elem = (u8*)fn_8019552C(*(u8**)(arg0 + 0x1BC), i);
         u8* obj = *(u8**)elem;
         if (obj != NULL) {
             (*(VFnVoid*)(*(u8**)(obj + 0x138) + 0x14))(obj);

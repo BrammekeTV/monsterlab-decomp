@@ -6,7 +6,7 @@
 extern "C" {
 u32   RandomU32(void);                                   // 0x80143460
 void  fn_8018D370(const char* fmt, ...);                 // 0x8018D370 (debug log)
-u32   fn_8019552C(u8* list, s32 index);                  // 0x8019552C (leaf)
+u8*    fn_8019552C(u8* list, s32 index);                  // 0x8019552C (leaf)
 s32   fn_8019555C(u8* list);                             // 0x8019555C (leaf)
 void  fn_801AA218(u8* out, u8* k0, u8* k1, f32* buf, f32 pos);  // 0x801AA218
 f32   fn_801AA728(u8* entry);                            // 0x801AA728 (leaf)
@@ -46,14 +46,14 @@ s32 fn_801AA974(u8* p, s32 unused, s32 dir, f32 t) {
         do {
             s32 idx = *(s32*)(p + 0x8);
             if (fn_8019555C(*(u8**)(p + 0x4)) > idx) {
-                *(u8**)(p + 0xC) = (u8*)(uintptr_t)fn_8019552C(*(u8**)(p + 0x4), idx);
+                *(u8**)(p + 0xC) = fn_8019552C(*(u8**)(p + 0x4), idx);
             } else {
                 *(u8**)(p + 0xC) = 0;
             }
             if (dir == 0) {
                 s32 n = *(s32*)(p + 0x8) + 1;
                 if (fn_8019555C(*(u8**)(p + 0x4)) > n) {
-                    *(u8**)(p + 0x10) = (u8*)(uintptr_t)fn_8019552C(*(u8**)(p + 0x4), n);
+                    *(u8**)(p + 0x10) = fn_8019552C(*(u8**)(p + 0x4), n);
                 } else {
                     *(u8**)(p + 0x10) = 0;
                 }
@@ -64,7 +64,7 @@ s32 fn_801AA974(u8* p, s32 unused, s32 dir, f32 t) {
                     done = 1;
                 }
             } else {
-                u8* e = (u8*)(uintptr_t)fn_8019552C(*(u8**)(p + 0x4), *(s32*)(p + 0x8) - 1);
+                u8* e = fn_8019552C(*(u8**)(p + 0x4), *(s32*)(p + 0x8) - 1);
                 *(u8**)(p + 0x10) = e;
                 if (e != 0 && fn_801AA728(e) >= t) {
                     *(s32*)(p + 0x8) = *(s32*)(p + 0x8) - 1;
@@ -83,12 +83,12 @@ s32 fn_801AA974(u8* p, s32 unused, s32 dir, f32 t) {
             if (n + 1 >= fn_8019555C(*(u8**)(p + 0x4))) {
                 s32 last = fn_8019555C(*(u8**)(p + 0x4)) - 1;
                 *(s32*)(p + 0x8) = last;
-                *(u8**)(p + 0xC) = (u8*)(uintptr_t)fn_8019552C(*(u8**)(p + 0x4), last);
+                *(u8**)(p + 0xC) = fn_8019552C(*(u8**)(p + 0x4), last);
                 *(u8**)(p + 0x10) = 0;
                 return 0;
             }
-            *(u8**)(p + 0xC) = (u8*)(uintptr_t)fn_8019552C(*(u8**)(p + 0x4), n);
-            *(u8**)(p + 0x10) = (u8*)(uintptr_t)fn_8019552C(*(u8**)(p + 0x4), n + 1);
+            *(u8**)(p + 0xC) = fn_8019552C(*(u8**)(p + 0x4), n);
+            *(u8**)(p + 0x10) = fn_8019552C(*(u8**)(p + 0x4), n + 1);
             return 0;
         }
     }
@@ -99,12 +99,12 @@ s32 fn_801AA974(u8* p, s32 unused, s32 dir, f32 t) {
             *(s32*)(p + 0x8) = n;
             if (n - 1 < 0) {
                 *(s32*)(p + 0x8) = 0;
-                *(u8**)(p + 0xC) = (u8*)(uintptr_t)fn_8019552C(*(u8**)(p + 0x4), 0);
+                *(u8**)(p + 0xC) = fn_8019552C(*(u8**)(p + 0x4), 0);
                 *(u8**)(p + 0x10) = 0;
                 return 0;
             }
-            *(u8**)(p + 0xC) = (u8*)(uintptr_t)fn_8019552C(*(u8**)(p + 0x4), n);
-            *(u8**)(p + 0x10) = (u8*)(uintptr_t)fn_8019552C(*(u8**)(p + 0x4), n - 1);
+            *(u8**)(p + 0xC) = fn_8019552C(*(u8**)(p + 0x4), n);
+            *(u8**)(p + 0x10) = fn_8019552C(*(u8**)(p + 0x4), n - 1);
         }
     }
     return 0;

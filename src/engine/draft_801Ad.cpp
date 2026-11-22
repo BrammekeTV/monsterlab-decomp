@@ -15,7 +15,7 @@ void   fn_80170044(void*);                                   // 0x80170044
 s32    fn_8018BDE0(u8* p, s32 key);                          // 0x8018BDE0
 void   fn_8018D2B8(const char* fmt, ...);                    // 0x8018D2B8 (debug log)
 void   fn_8018D370(const char* fmt, ...);                    // 0x8018D370 (debug log)
-u32    fn_8019552C(u8* list, s32 index);                     // 0x8019552C (leaf)
+u8*     fn_8019552C(u8* list, s32 index);                     // 0x8019552C (leaf)
 s32    fn_8019555C(u8* list);                                // 0x8019555C (leaf)
 void   fn_80195564(u8* list, void* item);                     // 0x80195564 (list append)
 void   fn_80195570(u8* list, s32 index);                     // 0x80195570 (list remove)
@@ -127,7 +127,7 @@ s32 fn_801A3798(u8* arg0, f32 farg0) {
     u8* list = *(u8**)(arg0 + 0x15C);
     s32 count = fn_8019555C(list);
     for (s32 i = 0; i < count; i++) {
-        u8* ent = *(u8**)(uintptr_t)fn_8019552C(*(u8**)(arg0 + 0x15C), i);
+        u8* ent = *(u8**)fn_8019552C(*(u8**)(arg0 + 0x15C), i);
         if (mask != 0) {
             (*(VFnI*)(*(u8**)(ent + 0x138) + 0x2C))(ent, mask);
         }
@@ -152,7 +152,7 @@ s32 fn_801A3910(u8* arg0, u8* arg1) {
     f32 full = lbl_805FF9EC;
     s32 count = fn_8019555C(*(u8**)(arg0 + 0x15C));
     for (s32 i = 0; i < count; i++) {
-        u8* ent = *(u8**)(uintptr_t)fn_8019552C(*(u8**)(arg0 + 0x15C), i);
+        u8* ent = *(u8**)fn_8019552C(*(u8**)(arg0 + 0x15C), i);
         if (*(u32*)ent != 2u) {
             s32 n = *(s32*)(arg1 + 4);
             (*(u8***)(arg1 + 8))[n] = ent;
@@ -212,7 +212,7 @@ s32 fn_801A3E9C(u8* arg0, s32 arg1) {
     }
     s32 count = fn_8019555C(*(u8**)(arg0 + 0x15C));
     for (s32 i = 0; i < count; i++) {
-        u8* ent = *(u8**)(uintptr_t)fn_8019552C(*(u8**)(arg0 + 0x15C), i);
+        u8* ent = *(u8**)fn_8019552C(*(u8**)(arg0 + 0x15C), i);
         if ((u32)arg1 == *(u32*)ent) {
             (*(VFn*)(*(u8**)(ent + 0x138) + 0x14))(ent);
             fn_80195570(*(u8**)(arg0 + 0x15C), i);
@@ -270,7 +270,7 @@ s32 fn_801A413C(u8* arg0) {
     }
     s32 count = fn_8019555C(*(u8**)(arg0 + 0x15C));
     for (s32 i = 0; i < count; i++) {
-        u8* ent = *(u8**)(uintptr_t)fn_8019552C(*(u8**)(arg0 + 0x15C), i);
+        u8* ent = *(u8**)fn_8019552C(*(u8**)(arg0 + 0x15C), i);
         s32 type = *(s32*)ent;
         switch (type) {
         case 0:

@@ -27,7 +27,7 @@ s32 fn_801EE504(u8* handle);                   // 0x801EE504
 s32 fn_801EE50C(u8* handle, u8* buf, s32 size, s32 flag);  // 0x801EE50C
 void fn_801EE4B8(u8* handle);                 // 0x801EE4B8
 void fn_8018D2B8(const char* fmt, ...);        // 0x8018D2B8
-u32 fn_8019552C(u8* list, s32 index);          // 0x8019552C
+u8*  fn_8019552C(u8* list, s32 index);          // 0x8019552C
 s32 fn_8019555C(u8* list);                     // 0x8019555C
 void fn_801F5B30(u8* slot);                    // 0x801F5B30
 void fn_801F3BB8(void);                        // 0x801F3BB8
@@ -457,14 +457,14 @@ void fn_8019AA3C(u8* arg0, s32 arg1, s32 arg2) {
         u8* spr = NULL;
         old_x = *(s32*)(arg0 + 0xC);
         if (fn_8019555C(*(u8**)(arg0 + 0x4)) > old_x) {
-            cell = *(u8**)(uintptr_t)fn_8019552C(*(u8**)(arg0 + 0x4), old_x);
+            cell = *(u8**)fn_8019552C(*(u8**)(arg0 + 0x4), old_x);
         }
         if (cell == NULL) {
             fn_8018D2B8("UIActivationGrid : index (%d,%d) not valid ...\n", old_x, cur_y);
             spr = NULL;
         } else {
             if (fn_8019555C(cell) > cur_y) {
-                sub = (u8*)(uintptr_t)fn_8019552C(cell, cur_y);
+                sub = fn_8019552C(cell, cur_y);
             }
             if (sub == NULL) {
                 fn_8018D2B8("UIActivationGrid : index (%d,%d) not valid ...\n", old_x, 0);  // 2nd %d: r5 clobbered by earlier calls, passed 0
@@ -485,14 +485,14 @@ void fn_8019AA3C(u8* arg0, s32 arg1, s32 arg2) {
         cell = NULL;
         sub = NULL;
         if (fn_8019555C(*(u8**)(arg0 + 0x4)) > arg1) {
-            cell = *(u8**)(uintptr_t)fn_8019552C(*(u8**)(arg0 + 0x4), arg1);
+            cell = *(u8**)fn_8019552C(*(u8**)(arg0 + 0x4), arg1);
         }
         if (cell == NULL) {
             fn_8018D2B8("UIActivationGrid : index (%d,%d) not valid ...\n", arg1, arg2);
             a3 = NULL;
         } else {
             if (fn_8019555C(cell) > arg2) {
-                sub = (u8*)(uintptr_t)fn_8019552C(cell, arg2);
+                sub = fn_8019552C(cell, arg2);
             }
             if (sub == NULL) {
                 fn_8018D2B8("UIActivationGrid : index (%d,%d) not valid ...\n", arg1, 0);  // 2nd %d: r5 clobbered by earlier calls, passed 0

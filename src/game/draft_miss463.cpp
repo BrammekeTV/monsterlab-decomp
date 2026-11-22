@@ -27,7 +27,7 @@ u8*   fn_800DE5E4(u8* p, s32 del);               // 0x800DE5E4
 void  fn_8018D4CC(void* p);                      // 0x8018D4CC
 void* fn_8018E8D8(void* table, u32 hash);        // 0x8018E8D8
 void  fn_80169704(void* a, void* b);             // 0x80169704
-u32   fn_8019552C(u8* a3, s32 a4);               // 0x8019552C
+u8*    fn_8019552C(u8* a3, s32 a4);               // 0x8019552C
 void  fn_8032F1E8(u8* obj, void (*cb)(void), s32 a, s32 b, s32 c);  // 0x8032F1E8
 void  fn_8020415C(u8* a3);                       // 0x8020415C
 void  fn_8020418C(u8* a3);                       // 0x8020418C
@@ -376,7 +376,7 @@ s32 fn_801A5124(u8* arg0, s32 arg1) {
     s32 i;
 
     for (i = 0; i < count; i++) {
-        u8** ent = (u8**)(uintptr_t)fn_8019552C(*(u8**)(arg0 + 0x1BC), i);
+        u8** ent = (u8**)fn_8019552C(*(u8**)(arg0 + 0x1BC), i);
         u8* obj = (ent != 0) ? *ent : 0;
         if (obj != 0) {
             CallSubObjSlot20(obj, arg1);

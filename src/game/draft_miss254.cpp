@@ -90,7 +90,7 @@ void   fn_8014DE68(void);                                            // 0x8014DE
 void   fn_8014E3EC(s32 n);                                           // 0x8014E3EC
 void   fn_801514F0(void);                                            // 0x801514F0
 s32    fn_80151644(s32 a, s32 b, u8* quad);                          // 0x80151644
-void   fn_80154290(s32 a);                                           // 0x80154290
+void   fn_80154290(void);                                           // 0x80154290
 void   fn_801542DC(void);                                            // 0x801542DC
 void   fn_80154974(void);                                            // 0x80154974
 void   fn_80155D70(void);                                            // 0x80155D70
@@ -291,7 +291,7 @@ void DrawFullscreenTexture(void* tex) {
     GxBpWrite(0);
     GxBpWrite(0xFE000001);
     GxBpWrite(0x41000000);
-    fn_80154290(0);
+    fn_80154290();
     if (tex != NULL) {
         if (!(lbl_805FB50C & 2)) {
             u8 flags = lbl_805FB50C | 2;

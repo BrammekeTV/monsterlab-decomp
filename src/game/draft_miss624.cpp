@@ -10,7 +10,7 @@ void  fn_80073A7C(void* camData, const f32* pos3, f32* outX, f32* outY);  // 0x8
 void  fn_80146180(void* quat, const Vec3* axis, f32 angle);         // 0x80146180 (rotate quat about axis)
 s32   fn_80156A80(void);                                            // 0x80156A80 (screen width)
 s32   fn_80156A88(void);                                            // 0x80156A88 (screen height)
-s32 fn_8019552C(u8* list, s32 index);                             // 0x8019552C (pointer to list slot)
+u8*  fn_8019552C(u8* list, s32 index);                             // 0x8019552C (pointer to list slot)
 u8*   fn_801A9EFC(u8* element, s32 type);                           // 0x801A9EFC
 void  fn_801B6F34(u8* p);                                           // 0x801B6F34
 void  fn_801B7020(u8* p);                                           // 0x801B7020

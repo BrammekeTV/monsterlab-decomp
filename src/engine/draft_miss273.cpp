@@ -32,7 +32,7 @@ f32  fn_801CD680(f32* a, f32* b);           // 0x801CD680 (leaf: a += b)
 f32  fn_801CD694(f32* a, f32* b);           // 0x801CD694 (leaf: a *= b)
 void fn_801CD6A8(f32* angle, f32* cosOut, f32* sinOut);  // 0x801CD6A8
 void fn_800446BC(void*, int);               // 0x800446BC
-void fn_80052638(Vec3* v);                  // 0x80052638 (empty leaf; the caller passes the vector)
+void fn_80052638(void);                  // 0x80052638 (empty leaf; the caller passes the vector)
 void fn_80054484(Vec3* out, const Vec3* a, const Vec3* b);  // 0x80054484
 f32  fn_800544B8(f32* out, f32* a, f32* b); // 0x800544B8 (leaf: out = a - b)
 void fn_800544CC(f32* out);                 // 0x800544CC (leaf: out = 1.0f)
@@ -207,7 +207,7 @@ s32 fn_801CC928(u8* e) {
     u8* batchLimit = lbl_805FB728 + 0x390;
 
     Vec3 origin;
-    fn_80052638(&origin);
+    fn_80052638();
     if (fn_801CC8F4(fn_80067844(e), 0) != 0) {
         Vec3 t;
         fn_80082F20((u8*)&t, fn_801CBD28(e));
@@ -338,7 +338,7 @@ s32 fn_801CD044(u8* e, u8* ref, f32 spread) {
     u8* batchLimit = lbl_805FB728 + 0x390;
 
     Vec3 origin;
-    fn_80052638(&origin);
+    fn_80052638();
     if (fn_801CC8F4(fn_80067844(e), 0) != 0) {
         Vec3 t;
         fn_80082F20((u8*)&t, fn_801CBD28(e));

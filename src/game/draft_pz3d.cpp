@@ -42,7 +42,7 @@ f32    fn_8018C044(u8* anim, f32 fps);                            // 0x8018C044
 u8* fn_8018C48C(u8* base, u32 key);                                        // 0x8018C48C
 u32    fn_8018C8CC(u8* anim);                                     // 0x8018C8CC
 void   fn_8018D68C(f32* out, void* sets);                         // 0x8018D68C
-u32    fn_8019552C(u8* list, s32 index);                          // 0x8019552C (leaf; returns an element pointer)
+u8*     fn_8019552C(u8* list, s32 index);                          // 0x8019552C (leaf; returns an element pointer)
 void   fn_8018C4D8(u8* p);                                        // 0x8018C4D8
 s32 fn_801A9EC8(u8* obj, f32 x, f32 y, f32 z);                        // 0x801A9EC8
 s32 fn_8019CCAC(u8* self);                                      // 0x8019CCAC
@@ -469,11 +469,11 @@ s32 fn_801A6B9C(u8* grid, s32 a) {
     }
     for (s32 i = 0; i < *(s32*)(grid + 0x13c); i++) {
         for (s32 j = 0; j < *(s32*)(grid + 0x140); j++) {
-            u8* slot = (u8*)(uintptr_t)fn_8019552C(*(u8**)(grid + 0x1bc), i * *(s32*)(grid + 0x140) + j);
+            u8* slot = fn_8019552C(*(u8**)(grid + 0x1bc), i * *(s32*)(grid + 0x140) + j);
             u8* cell = slot != NULL ? *(u8**)slot : NULL;
             if (cell == NULL) continue;
             (*(void (**)(u8*, s32))(*(u8**)(cell + 0x138) + 0x2c))(cell, 0x18);
-            f32* rowX = (f32*)(uintptr_t)fn_8019552C(*(u8**)(grid + 0x1b8), i);
+            f32* rowX = (f32*)fn_8019552C(*(u8**)(grid + 0x1b8), i);
             f32 x = *rowX + stepX * (f32)(*(s32*)(grid + 0x160) - 1);
             f32 y = 0.0f + stepY * (f32)(*(s32*)(grid + 0x15c) - 1);
             fn_801A9EC8(cell, x, y, 0.0f /* leftover f3 */);

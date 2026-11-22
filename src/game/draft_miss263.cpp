@@ -13,7 +13,7 @@ BOOL fn_801982A8(void* obj, u32 mask);   // 0x801982A8 (C++ linkage)
 BOOL fn_801982E4(void* obj, u32 mask);   // 0x801982E4 (C++ linkage)
 
 extern "C" {
-u32   fn_8019552C(u8* list, s32 index);                       // 0x8019552C (leaf; returns a slot pointer)
+u8*    fn_8019552C(u8* list, s32 index);                       // 0x8019552C (leaf; returns a slot pointer)
 s32   fn_8019555C(u8* list);                                  // 0x8019555C (leaf; element count)
 void  fn_8018D2B8(const char* fmt, ...);                      // 0x8018D2B8
 void  UIPlayAnim(void* el, u32 anim);                         // 0x8019BE40
@@ -25,7 +25,7 @@ s32   fn_801449A4(f32* mat, f32* out);                        // 0x801449A4 (3x3
 }
 
 // Slot pointer returned by fn_8019552C (declared u32 by the other files; pointer-sized here).
-static inline u8** Slot(u8* list, s32 index) { return (u8**)(uintptr_t)fn_8019552C(list, index); }
+static inline u8** Slot(u8* list, s32 index) { return (u8**)fn_8019552C(list, index); }
 
 typedef void (*VFnF32)(void*, f32);
 typedef f32* (*VFnMat)(void*);
