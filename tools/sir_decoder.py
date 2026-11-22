@@ -679,12 +679,17 @@ def shared_zone_dump(L, zn, sec, slot_size, zone0, zbase0):
     ss = u(0x100)
     if not inz(ss, 0x2C): return
     table = u(ss - base + 0x28)
+    so = ss - base
     L.append('uiset %s table %s' % (ptr(ss), ptr(table)))
+    if inz(ss, 0x40):
+        L.append('uisetfields %s zone %d draw %d %d %s tables %s %s %s' % (ptr(ss), u(so + 4), u(so + 8), u(so + 0xC), ptr(u(so + 0x10)),
+                 ptr(u(so + 0x20)), ptr(u(so + 0x34)), ptr(u(so + 0x3C))))
     if not inz(table, 0xC): return
     t = table - base
     L.append('uitable %s root %s low %s high %s' % (ptr(table), ptr(u(t)), ptr(u(t + 4)), ptr(u(t + 8))))
-    seen_w, fixed, lists = set(), set(), set()
-    def ui_list(a, widgets):
+    seen_w, fixed, lists, based, events, grids = set(), set(), set(), set(), set(), set()
+    def ui_list(a, mode):
+        """mode 0: plain; 1: widgets that go through fn_8019914C; 2: lists; 3: widgets."""
         if not inz(a, 0x14) or a in lists: return
         lists.add(a)
         l = a - base
@@ -693,58 +698,106 @@ def shared_zone_dump(L, zn, sec, slot_size, zone0, zbase0):
         if n == 0 or not inz(data, n * 4): return
         items = [u(data - base + i * 4) for i in range(n)]
         L.append('uilistitems %s %s' % (ptr(a), ' '.join(ptr(v) for v in items)))
-        if widgets:
-            for v in items: fix(v)
+        for v in items:
+            if mode == 1: fix(v)
+            elif mode == 2: ui_list(v, 0)
+            elif mode == 3: ui_base(v)
+    def ui_base(w):
+        """The part every widget has (up to +0x138), its event lists and its activation grid."""
+        if not inz(w, 0x138) or w in based: return
+        based.add(w)
+        o = w - base
+        L.append('uibase %s type %08x events %s %s %s player %s start %s flags %08x w58 %d order %08x kind %d flags %08x now %s acts %08x %08x cell %d %d grid %s mats %s links %s %s %s front %s' % (
+            ptr(w), u(o), ptr(u(o + 4)), ptr(u(o + 8)), ptr(u(o + 0xC)), ptr(u(o + 0x10)), ws(o + 0x14, 16), u(o + 0x54), u(o + 0x58),
+            u(o + 0x5C), u(o + 0x60), u(o + 0x64), ws(o + 0x68, 16), u(o + 0xA8), u(o + 0xB0), sec[o + 0xB8], sec[o + 0xB9],
+            ptr(u(o + 0xBC)), ws(o + 0xC0, 24), ptr(u(o + 0x120)), ptr(u(o + 0x124)), ptr(u(o + 0x128)), ptr(u(o + 0x130))))
+        for k in range(3):
+            n = u(o + 4 + k * 4)
+            while inz(n, 0xC) and n not in events:
+                events.add(n)
+                L.append('uievent %s next %s id %08x word %08x' % (ptr(n), ptr(u(n - base)), u(n - base + 4), u(n - base + 8)))
+                n = u(n - base)
+        ui_grid(u(o + 0xBC))
+        ui_base(u(o + 0x130))
+    def ui_grid(g):
+        if not inz(g, 0x1C) or g in grids: return
+        grids.add(g)
+        L.append('uigrid %s flags %08x list %s cells %s' % (ptr(g), u(g - base), ptr(u(g - base + 4)), ws(g - base + 0xC, 4)))
+        ui_list(u(g - base + 4), 2)
+    def ui_screen(w):
+        """A screen's own fields (+0x13C on), the widgets it names and its grid."""
+        if not inz(w, 0x150): return
+        o = w - base
+        n, items = u(o + 0x13C), u(o + 0x140)
+        L.append('uiscreen %s named %d %s grid %s f148 %08x handle %08x' % (ptr(w), n, ptr(items), ptr(u(o + 0x144)), u(o + 0x148), u(o + 0x14C)))
+        if n and inz(items, n * 4):
+            named = [u(items - base + i * 4) for i in range(n)]
+            L.append('uiscreennamed %s %s' % (ptr(w), ' '.join(ptr(v) for v in named)))
+            for v in named: ui_base(v)
+        ui_grid(u(o + 0x144))
     def fix(w):
         """What fn_8019914C reads of a widget."""
-        if not inz(w, 0x128) or w in fixed: return
+        if not inz(w, 0x138) or w in fixed: return
         fixed.add(w)
+        ui_base(w)
         o = w - base
         kind = u(o + 0x60)
         line = 'uikind %s kind %d' % (ptr(w), kind)
         if kind in (2, 3): line += ' sub %d' % u(o + 0x13C)
         if kind == 3:
             L.append(line + ' list %s' % ptr(u(o + 0x15C)))
-            ui_list(u(o + 0x15C), False)
+            ui_list(u(o + 0x15C), 3)
         elif kind == 4:
             L.append(line + ' body %s list %s' % (ptr(u(o + 0x1B4)), ptr(u(o + 0x1BC))))
             fix(u(o + 0x1B4))
-            ui_list(u(o + 0x1BC), True)
+            ui_list(u(o + 0x1BC), 1)
         elif kind == 5:
             L.append(line + ' body %s' % ptr(u(o + 0x190)))
             fix(u(o + 0x190))
         elif kind == 6:
             L.append(line + ' first %s' % ptr(u(o + 0x120)))
             c = u(o + 0x120)
-            while inz(c, 0x128):
+            while inz(c, 0x138):
                 fix(c)
                 c = u(c - base + 0x124)
         else:
             L.append(line)
     def widget(w, child):
-        if not inz(w, 0x128): return
+        if not inz(w, 0x138): return
         o = w - base
         if child: L.append('uichild %s type %08x first %s next %s' % (ptr(w), u(o), ptr(u(o + 0x120)), ptr(u(o + 0x124))))
         else: L.append('uiwidget %s first %s next %s' % (ptr(w), ptr(u(o + 0x120)), ptr(u(o + 0x124))))
+        ui_base(w)
         if child: fix(w)
         if w in seen_w: return
         seen_w.add(w)
         c = u(o + 0x120)
-        while inz(c, 0x128):
+        while inz(c, 0x138):
             widget(c, True)
             c = u(c - base + 0x124)
-    # The tree as fn_8018E2F4 walks it: left subtree, right subtree, then the node.
-    seen, stack = set(), [(u(t), 0)]
-    while stack:
-        n, done = stack.pop()
-        if not inz(n, 0x14): continue
-        o = n - base
-        if done:
-            L.append('uinode %s key %08x widget %s left %s right %s' % (ptr(n), u(o), ptr(u(o + 4)), ptr(u(o + 0xC)), ptr(u(o + 0x10))))
-            widget(u(o + 4), False)
-        elif n not in seen:
-            seen.add(n)
-            stack += [(n, 1), (u(o + 0x10), 0), (u(o + 0xC), 0)]
+    # A tree as fn_8018E2F4 walks it: left subtree, right subtree, then the node.
+    def tree(root, screens):
+        seen, stack = set(), [(root, 0)]
+        while stack:
+            n, done = stack.pop()
+            if not inz(n, 0x14): continue
+            o = n - base
+            if done and screens:
+                L.append('uinode %s key %08x widget %s left %s right %s' % (ptr(n), u(o), ptr(u(o + 4)), ptr(u(o + 0xC)), ptr(u(o + 0x10))))
+                ui_screen(u(o + 4))
+                widget(u(o + 4), False)
+            elif done:
+                L.append('uitreenode %s key %08x value %s left %s right %s' % (ptr(n), u(o), ptr(u(o + 4)), ptr(u(o + 0xC)), ptr(u(o + 0x10))))
+            elif n not in seen:
+                seen.add(n)
+                stack += [(n, 1), (u(o + 0x10), 0), (u(o + 0xC), 0)]
+    tree(u(t), True)
+    if inz(ss, 0x40):
+        for at in (0x20, 0x34, 0x3C):
+            tb = u(so + at)
+            if not inz(tb, 0xC): continue
+            L.append('uitree 0x%x %s root %s low %s high %s' % (at, ptr(tb), ptr(u(tb - base)), ptr(u(tb - base + 4)), ptr(u(tb - base + 8))))
+            tree(u(tb - base), False)
 
 LEVEL_ZONE1_BASE = 0x90980000   # gZoneBase[1] = zone 0's address + its memory budget (world_alloc.cpp); not in the file
 

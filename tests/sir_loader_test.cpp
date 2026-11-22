@@ -875,8 +875,54 @@ struct ZoneDump {
 
     // The first layer of a shared zone's screen set (zone slot +0x100): the tree fn_8018E2F4 walks
     // and the widgets fn_8019BFF8 reaches from it.
-    std::vector<const u8*> widgets, fixedWidgets, uiLists;
-    void UiList(const u8* a, bool isWidgets) {
+    std::vector<const u8*> widgets, fixedWidgets, uiLists, basedWidgets, uiEvents, uiGrids;
+    static bool Seen(std::vector<const u8*>& v, const u8* p) {
+        if (std::find(v.begin(), v.end(), p) != v.end()) return true;
+        v.push_back(p);
+        return false;
+    }
+    void Words(const u8* p, u32 n) { for (u32 i = 0; i < n; i++) printf("%s%08x", i ? " " : "", *(const u32*)(p + i * 4)); }
+    // The part every widget has (up to +0x138), its event lists and its activation grid.
+    void UiBase(const u8* w) {
+        if (!In(w, 0x138) || Seen(basedWidgets, w)) return;
+        printf("uibase "); Val(w); printf(" type %08x events ", *(const u32*)w); Ptr(w + 4); printf(" "); Ptr(w + 8); printf(" "); Ptr(w + 0xC);
+        printf(" player "); Ptr(w + 0x10); printf(" start "); Words(w + 0x14, 16);
+        printf(" flags %08x w58 %u order %08x kind %u flags %08x now ", *(const u32*)(w + 0x54), *(const u32*)(w + 0x58),
+               *(const u32*)(w + 0x5C), *(const u32*)(w + 0x60), *(const u32*)(w + 0x64));
+        Words(w + 0x68, 16);
+        printf(" acts %08x %08x cell %u %u grid ", *(const u32*)(w + 0xA8), *(const u32*)(w + 0xB0), w[0xB8], w[0xB9]); Ptr(w + 0xBC);
+        printf(" mats "); Words(w + 0xC0, 24);
+        printf(" links "); Ptr(w + 0x120); printf(" "); Ptr(w + 0x124); printf(" "); Ptr(w + 0x128); printf(" front "); Ptr(w + 0x130); printf("\n");
+        for (u32 k = 0; k < 3; k++) {
+            for (const u8* n = *(const u8**)(w + 4 + k * 4); In(n, 0xC) && !Seen(uiEvents, n); n = *(const u8**)n) {
+                printf("uievent "); Val(n); printf(" next "); Ptr(n); printf(" id %08x word %08x\n", *(const u32*)(n + 4), *(const u32*)(n + 8));
+            }
+        }
+        UiGrid(*(const u8**)(w + 0xBC));
+        UiBase(*(const u8**)(w + 0x130));
+    }
+    void UiGrid(const u8* g) {
+        if (!In(g, 0x1C) || Seen(uiGrids, g)) return;
+        printf("uigrid "); Val(g); printf(" flags %08x list ", *(const u32*)g); Ptr(g + 4); printf(" cells "); Words(g + 0xC, 4); printf("\n");
+        UiList(*(const u8**)(g + 4), 2);
+    }
+    // A screen's own fields (+0x13C on), the widgets it names and its grid.
+    void UiScreen(const u8* w) {
+        if (!In(w, 0x150)) return;
+        u32 n = *(const u32*)(w + 0x13C);
+        const u8* items = *(const u8**)(w + 0x140);
+        printf("uiscreen "); Val(w); printf(" named %u ", n); Ptr(w + 0x140); printf(" grid "); Ptr(w + 0x144);
+        printf(" f148 %08x handle %08x\n", *(const u32*)(w + 0x148), *(const u32*)(w + 0x14C));
+        if (n != 0 && In(items, n * 4)) {
+            printf("uiscreennamed "); Val(w);
+            for (u32 i = 0; i < n; i++) { printf(" "); Ptr(items + i * 4); }
+            printf("\n");
+            for (u32 i = 0; i < n; i++) UiBase(*(const u8**)(items + i * 4));
+        }
+        UiGrid(*(const u8**)(w + 0x144));
+    }
+    // mode 0: plain; 1: widgets that go through fn_8019914C; 2: lists; 3: widgets.
+    void UiList(const u8* a, int mode) {
         if (!In(a, 0x14) || std::find(uiLists.begin(), uiLists.end(), a) != uiLists.end()) return;
         uiLists.push_back(a);
         u32 n = *(const u32*)a;
@@ -886,60 +932,87 @@ struct ZoneDump {
         printf("uilistitems "); Val(a);
         for (u32 i = 0; i < n; i++) { printf(" "); Ptr(data + i * 4); }
         printf("\n");
-        for (u32 i = 0; isWidgets && i < n; i++) Fix(*(const u8**)(data + i * 4));
+        for (u32 i = 0; i < n; i++) {
+            const u8* item = *(const u8**)(data + i * 4);
+            if (mode == 1) Fix(item);
+            else if (mode == 2) UiList(item, 0);
+            else if (mode == 3) UiBase(item);
+        }
     }
     // What fn_8019914C reads of a widget.
     void Fix(const u8* w) {
-        if (!In(w, 0x128) || std::find(fixedWidgets.begin(), fixedWidgets.end(), w) != fixedWidgets.end()) return;
+        if (!In(w, 0x138) || std::find(fixedWidgets.begin(), fixedWidgets.end(), w) != fixedWidgets.end()) return;
         fixedWidgets.push_back(w);
+        UiBase(w);
         u32 kind = *(const u32*)(w + 0x60);
         printf("uikind "); Val(w); printf(" kind %u", kind);
         if (kind == 2 || kind == 3) printf(" sub %u", *(const u32*)(w + 0x13C));
         if (kind == 3) {
             printf(" list "); Ptr(w + 0x15C); printf("\n");
-            UiList(*(const u8**)(w + 0x15C), false);
+            UiList(*(const u8**)(w + 0x15C), 3);
         } else if (kind == 4) {
             printf(" body "); Ptr(w + 0x1B4); printf(" list "); Ptr(w + 0x1BC); printf("\n");
             Fix(*(const u8**)(w + 0x1B4));
-            UiList(*(const u8**)(w + 0x1BC), true);
+            UiList(*(const u8**)(w + 0x1BC), 1);
         } else if (kind == 5) {
             printf(" body "); Ptr(w + 0x190); printf("\n");
             Fix(*(const u8**)(w + 0x190));
         } else if (kind == 6) {
             printf(" first "); Ptr(w + 0x120); printf("\n");
-            for (const u8* c = *(const u8**)(w + 0x120); In(c, 0x128); c = *(const u8**)(c + 0x124)) Fix(c);
+            for (const u8* c = *(const u8**)(w + 0x120); In(c, 0x138); c = *(const u8**)(c + 0x124)) Fix(c);
         } else {
             printf("\n");
         }
     }
     void Widget(const u8* w, bool child) {
-        if (!In(w, 0x128)) return;
+        if (!In(w, 0x138)) return;
         if (child) { printf("uichild "); Val(w); printf(" type %08x first ", *(const u32*)w); }
         else { printf("uiwidget "); Val(w); printf(" first "); }
         Ptr(w + 0x120); printf(" next "); Ptr(w + 0x124); printf("\n");
+        UiBase(w);
         if (child) Fix(w);
         if (std::find(widgets.begin(), widgets.end(), w) != widgets.end()) return;
         widgets.push_back(w);
-        for (const u8* c = *(const u8**)(w + 0x120); In(c, 0x128); c = *(const u8**)(c + 0x124)) Widget(c, true);
+        for (const u8* c = *(const u8**)(w + 0x120); In(c, 0x138); c = *(const u8**)(c + 0x124)) Widget(c, true);
     }
     void ScreenSet(const u8* ss) {
         if (!In(ss, 0x2C)) return;
         const u8* table = *(const u8**)(ss + 0x28);
         printf("uiset "); Val(ss); printf(" table "); Ptr(ss + 0x28); printf("\n");
+        bool whole = In(ss, 0x40);
+        if (whole) {
+            printf("uisetfields "); Val(ss); printf(" zone %u draw %u %u ", *(const u32*)(ss + 4), *(const u32*)(ss + 8), *(const u32*)(ss + 0xC));
+            Ptr(ss + 0x10); printf(" tables "); Ptr(ss + 0x20); printf(" "); Ptr(ss + 0x34); printf(" "); Ptr(ss + 0x3C); printf("\n");
+        }
         if (!In(table, 0xC)) return;
         printf("uitable "); Val(table); printf(" root "); Ptr(table); printf(" low "); Ptr(table + 4); printf(" high "); Ptr(table + 8); printf("\n");
+        Tree(*(const u8* const*)table, true);
+        static const u32 kTables[] = { 0x20, 0x34, 0x3C };
+        for (u32 i = 0; whole && i < 3; i++) {
+            const u8* tb = *(const u8**)(ss + kTables[i]);
+            if (!In(tb, 0xC)) continue;
+            printf("uitree 0x%x ", kTables[i]); Val(tb); printf(" root "); Ptr(tb); printf(" low "); Ptr(tb + 4); printf(" high "); Ptr(tb + 8); printf("\n");
+            Tree(*(const u8* const*)tb, false);
+        }
+    }
+    // A tree as fn_8018E2F4 walks it: left subtree, right subtree, then the node.
+    void Tree(const u8* rootNode, bool screens) {
         std::vector<const u8*> seen;
         std::vector<std::pair<const u8*, bool> > stack;
-        stack.push_back(std::make_pair(*(const u8* const*)table, false));
+        stack.push_back(std::make_pair(rootNode, false));
         while (!stack.empty()) {
             const u8* n = stack.back().first;
             bool done = stack.back().second;
             stack.pop_back();
             if (!In(n, 0x14)) continue;
-            if (done) {
+            if (done && screens) {
                 printf("uinode "); Val(n); printf(" key %08x widget ", *(const u32*)n); Ptr(n + 4);
                 printf(" left "); Ptr(n + 0xC); printf(" right "); Ptr(n + 0x10); printf("\n");
+                UiScreen(*(const u8**)(n + 4));
                 Widget(*(const u8**)(n + 4), false);
+            } else if (done) {
+                printf("uitreenode "); Val(n); printf(" key %08x value ", *(const u32*)n); Ptr(n + 4);
+                printf(" left "); Ptr(n + 0xC); printf(" right "); Ptr(n + 0x10); printf("\n");
             } else if (std::find(seen.begin(), seen.end(), n) == seen.end()) {
                 seen.push_back(n);
                 stack.push_back(std::make_pair(n, true));
@@ -2040,9 +2113,11 @@ static void LevelSelfTest(void) {
     // A shared zone: the image starts with a copy of its zone slot, which names a screen set; the
     // set's table leads to a tree of two nodes, a widget and its one child.
     {
-        const u32 SH = 0x924C0000u, SH_SIZE = 0x500u;
-        const u32 LIST = 0x4C0, ITEMS = 0x4E0;                 // the child's list (kind 3): one entry
-        const u32 SET = 0x1A0, TABLE = 0x1D0, NODE_A = 0x1E0, NODE_B = 0x200, WIDGET = 0x220, CHILD = 0x350;
+        const u32 SH = 0x924C0000u, SH_SIZE = 0x560u;
+        const u32 NAMED = 0x530, DRAW = 0x540;                 // the screen's named widgets; the set's draw list
+        const u32 LIST = 0x4E0, ITEMS = 0x500;                 // the child's list (kind 3): one entry
+        const u32 EVENT = 0x510;                               // the child's one action: a node of the list at +4
+        const u32 SET = 0x1A0, TABLE = 0x520, NODE_A = 0x1E0, NODE_B = 0x200, WIDGET = 0x220, CHILD = 0x370;
         u8* sh = (u8*)malloc(SH_SIZE);
         u8* shCopy = (u8*)malloc(SH_SIZE);
         for (u32 o = 0; o < SH_SIZE; o += 4) Put32(sh + o, 0x7F800001);
@@ -2051,16 +2126,26 @@ static void LevelSelfTest(void) {
         memset(sh, 0, L_STRIDE);
         Put32(sh + 0x0C, 0x42480000); Put32(sh + 0x18, 480);
         Put32(sh + 0xFC, L_ZONE + 0x40); Put32(sh + 0x100, SH + SET);
+        memset(sh + SET, 0, 0x40);
+        Put32(sh + SET + 0x04, 480); Put32(sh + SET + 0x08, 0x38); Put32(sh + SET + 0x10, SH + DRAW);
         Put32(sh + SET + 0x28, SH + TABLE);
         Put32(sh + TABLE + 0, SH + NODE_A); Put32(sh + TABLE + 4, SH + NODE_B); Put32(sh + TABLE + 8, SH + NODE_A);
         Put32(sh + NODE_A + 0x00, 0x80000000); Put32(sh + NODE_A + 0x04, SH + WIDGET);
         Put32(sh + NODE_A + 0x0C, SH + NODE_B); Put32(sh + NODE_A + 0x10, 0);
         Put32(sh + NODE_B + 0x00, 0x10); Put32(sh + NODE_B + 0x04, 0); Put32(sh + NODE_B + 0x0C, 0); Put32(sh + NODE_B + 0x10, 0);
-        memset(sh + WIDGET, 0, 0x128);
-        Put32(sh + WIDGET + 0x000, 0x11223344);                // a tree node's widget: its first word has no reader here
+        memset(sh + WIDGET, 0, 0x138);
+        Put32(sh + WIDGET + 0x000, 0x11223344);
         Put32(sh + WIDGET + 0x120, SH + CHILD);
-        memset(sh + CHILD, 0, 0x128);
+        Put32(sh + WIDGET + 0x13C, 1); Put32(sh + WIDGET + 0x140, SH + NAMED); Put32(sh + WIDGET + 0x144, 0);
+        Put32(sh + WIDGET + 0x148, 0x3C88CE70); Put32(sh + WIDGET + 0x14C, 0xFFFFFFFF);
+        Put32(sh + NAMED, SH + CHILD);
+        memset(sh + CHILD, 0, 0x138);
         Put32(sh + CHILD + 0x000, 7);
+        Put32(sh + CHILD + 0x004, SH + EVENT);
+        Put32(sh + EVENT + 0, 0); Put32(sh + EVENT + 4, 0x705598E1); Put32(sh + EVENT + 8, 0x17140061);
+        Put32(sh + CHILD + 0x020, 0x44200000); Put32(sh + CHILD + 0x054, 0x00020003); Put32(sh + CHILD + 0x064, 0x0002002B);
+        Put32(sh + CHILD + 0x074, 0x44200000); Put32(sh + CHILD + 0x0A8, 0x0003FFFF); Put32(sh + CHILD + 0x0AC, 0x0003FFFF);
+        Put32(sh + CHILD + 0x0C0, 0x3F800000); Put32(sh + CHILD + 0x11C, 0x3F800000); Put32(sh + CHILD + 0x128, SH + WIDGET);
         Put32(sh + CHILD + 0x060, 3); Put32(sh + CHILD + 0x13C, 1);
         Put32(sh + CHILD + 0x15C, SH + LIST);
         Put32(sh + LIST + 0x00, 1); Put32(sh + LIST + 0x04, 2); Put32(sh + LIST + 0x08, 4); Put32(sh + LIST + 0x10, SH + ITEMS);
@@ -2090,12 +2175,23 @@ static void LevelSelfTest(void) {
         CHECK(*(const u32*)root == 0x80000000 && *(const u8**)(root + 4) == sh + WIDGET && *(const u8**)(root + 0xC) == sh + NODE_B);
         CHECK(*(const u8**)(root + 0x10) == NULL && root[8] == 0x7F && *(const u32*)(sh + NODE_B) == 0x10);
         const u8* child = *(const u8**)(sh + WIDGET + 0x120);
-        CHECK(child == sh + CHILD && *(const u32*)child == 7 && *(const u8**)(child + 0x124) == NULL && sh[WIDGET] == 0x11);
+        CHECK(child == sh + CHILD && *(const u32*)child == 7 && *(const u8**)(child + 0x124) == NULL);
+        // The part every widget has: fn_8019B4E8 copies the start values, fn_8019C348 reads scale and
+        // parent, fn_8019BD18 walks the event lists; +0xAC has no reader and stays as it is.
+        CHECK(*(const u32*)(sh + WIDGET) == 0x11223344 && *(const f32*)(sh + WIDGET + 0x148) > 0.0166f && *(const f32*)(sh + WIDGET + 0x148) < 0.0168f);
+        CHECK(*(const f32*)(child + 0x20) == 640.0f && *(const f32*)(child + 0x74) == 640.0f && *(const u32*)(child + 0x54) == 0x20003);
+        CHECK(*(const u32*)(child + 0x64) == 0x2002B && *(const u32*)(child + 0xA8) == 0x3FFFF && child[0xAC] == 0x00 && child[0xAF] == 0xFF);
+        CHECK(*(const f32*)(child + 0xC0) == 1.0f && *(const f32*)(child + 0x11C) == 1.0f && *(const u8**)(child + 0x128) == sh + WIDGET);
+        // The set (fn_80198438, fn_801985BC) and the screen (UIWidgetFindChild, fn_80199C30).
+        CHECK(*(const s32*)(sh + SET + 4) == 480 && *(const s32*)(sh + SET + 8) == 0x38 && *(const u8**)(sh + SET + 0x10) == sh + DRAW);
+        CHECK(*(const s32*)(sh + WIDGET + 0x13C) == 1 && **(const u8***)(sh + WIDGET + 0x140) == sh + CHILD && *(const s32*)(sh + WIDGET + 0x14C) == -1);
+        const u8* ev = *(const u8**)(child + 4);
+        CHECK(ev == sh + EVENT && *(const u8**)ev == NULL && *(const u32*)(ev + 4) == 0x705598E1 && *(const u32*)(ev + 8) == 0x17140061);
         // The child's kind, as fn_8019914C reads it, and its list as fn_8019555C / fn_8019552C do.
         const u8* uiList = *(const u8**)(child + 0x15C);
         CHECK(*(const u32*)(child + 0x60) == 3 && *(const s32*)(child + 0x13C) == 1 && uiList == sh + LIST);
         CHECK(*(const s32*)uiList == 1 && *(const s32*)(uiList + 4) == 2 && *(const s32*)(uiList + 8) == 4 && uiList[0xC] == 0x7F);
-        CHECK(**(const u8***)(uiList + 0x10) == sh + WIDGET && sh[WIDGET + 0x60] == 0);          // a tree node's widget: kind not read
+        CHECK(**(const u8***)(uiList + 0x10) == sh + WIDGET);
         {
             // Refused untouched: a list whose count exceeds its capacity.
             u8* again = (u8*)malloc(SH_SIZE);

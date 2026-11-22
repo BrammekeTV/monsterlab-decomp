@@ -362,7 +362,8 @@ enum RegionKind {
     REGION_FX_BOLTS, REGION_FX_TRAILS, REGION_POOL, REGION_POOL_BLOCK,
     REGION_ENTITY, REGION_ENTITY_RECORD, REGION_ENTITY_PART, REGION_PTR_COUNT, REGION_COUNT_PTR, REGION_POOL_TABLE,
     REGION_ENTITY_PROP, REGION_PROP_DEF, REGION_KEY_PTR,
-    REGION_UI_TREE_NODE, REGION_UI_LIST,
+    REGION_UI_TREE_NODE, REGION_UI_LIST, REGION_UI_WIDGET, REGION_UI_EVENT, REGION_UI_GRID, REGION_UI_FIXED,
+    REGION_UI_SET, REGION_UI_SCREEN,
     REGION_ZONE_SYSTEM, REGION_ANIM_PLAYER, REGION_ANIM_ELEM, REGION_ANIM_TRACK, REGION_ANIM_KEYS, REGION_F32_ARRAY,
     REGION_RUNTIME    // memory the game initialises itself: nothing to convert, but nothing else may be there
 };
@@ -1711,13 +1712,70 @@ static SirError ScreenSetDbPlan(ImagePlan* plan, const u8* image, u32 imageSize,
 // table at +0x28 (fn_8018E2F4: table +0 is the root, +4 and +8 the nodes with the lowest and the
 // highest key, which fn_8018E808 compares a searched key with; a node is {+0x00 key, +0x04 widget,
 // +0x0C left, +0x10 right}) and for each node's widget its children (fn_8019BFF8: first child at
-// +0x120, next sibling at +0x124; fn_80199534 reads a child's first word). That is all that is
-// typed of a screen set so far.
+// +0x120, next sibling at +0x124; fn_80199534 reads a child's first word). Of the set itself that
+// is all that is typed so far; of the widgets, the part every kind has (kUiWidgetFields).
 static const SirField kUiTreeNodeFields[] = {
     { 0x00, SIR_U32, 1 }, { 0x04, SIR_PTR, 1 }, { 0x0C, SIR_PTR, 2 },
 };
-#define UI_WIDGET_USED 0x128
+#define UI_WIDGET_USED 0x138
 #define UI_DEPTH_MAX   256
+
+// The part every widget has, up to the vtable slot at +0x138 that the game fills in. The bytes at
+// +0xB8 / +0xB9 (a cell of the grid, fn_8019CBEC) need no conversion. No reader yet, left alone:
+// the words at +0xAC and +0xB4 (fn_8019B2F4 sets them like the action words), +0x12C, +0x134.
+static const SirField kUiWidgetFields[] = {
+    { 0x000, SIR_U32, 1 },    // code: type, the hash of its name (fn_80199534, fn_80198C78)
+    { 0x004, SIR_PTR, 3 },    // code: its actions, animations and sounds by event (fn_8019BD18)
+    { 0x010, SIR_PTR, 1 },    // code: animation player (fn_8019B6CC)
+    { 0x014, SIR_F32, 16 },   // code: start values of +0x68..+0xA4 (fn_8019B4E8)
+    { 0x054, SIR_U32, 1 },    // code: start flags (fn_8019B4E8)
+    { 0x058, SIR_U32, 1 },    // code: handed to fn_8019645C before the widget draws (fn_8019B7D8)
+    { 0x05C, SIR_F32, 1 },    // code: draw order (fn_80199540)
+    { 0x060, SIR_U32, 2 },    // code: kind (fn_8019914C), flags (fn_8019B6CC)
+    { 0x068, SIR_F32, 16 },   // code: position, scale (fn_8019C348), colour (fn_801A05E4), rotation, pivot (fn_8019C348)
+    { 0x0A8, SIR_U32, 1 },    // code: action word (fn_80199DD4)
+    { 0x0B0, SIR_U32, 1 },    // code: action word (fn_8019B6CC)
+    { 0x0BC, SIR_PTR, 1 },    // code: activation grid (fn_8019CBEC)
+    { 0x0C0, SIR_F32, 24 },   // code: two 3x4 matrices (fn_8019C348 reads the parent's +0xC0, fn_8019DC58 +0xF0)
+    { 0x120, SIR_PTR, 3 },    // code: first child, next sibling (fn_8019BFF8), parent (fn_8019C348)
+    { 0x130, SIR_PTR, 1 },    // code: a widget drawn before this one (fn_801985BC)
+};
+// A node of the three event lists: next, event, and an action word, animation hash or sound hash
+// (fn_8019BD18).
+static const SirField kUiEventFields[] = {
+    { 0x00, SIR_PTR, 1 }, { 0x04, SIR_U32, 2 },
+};
+#define UI_EVENT_SIZE 0x0C
+// An activation grid: +0x00 flags (fn_80199E80), +0x04 a list of columns, each a list of pointers
+// to widgets; +0x0C..+0x18 the current and the previous cell (fn_8019AA3C). +0x08 is written
+// before it is read.
+static const SirField kUiGridFields[] = {
+    { 0x00, SIR_U32, 1 }, { 0x04, SIR_PTR, 1 }, { 0x0C, SIR_U32, 4 },
+};
+#define UI_GRID_USED 0x1C
+// The screen set itself. Its four lookup tables are trees like the one of the screens
+// (fn_8018E8D8); what the nodes of the other three point at is not typed yet. +0x40..+0x60 is the
+// stack of screens, which the game fills.
+static const SirField kUiSetFields[] = {
+    { 0x04, SIR_U32, 1 },     // code: the set's zone (fn_80198438)
+    { 0x08, SIR_U32, 2 },     // code: draw list: capacity and count (fn_80199CE8, fn_801985BC),
+    { 0x10, SIR_PTR, 1 },     //       and its entries, which the game writes (fn_8019B860)
+    { 0x20, SIR_PTR, 1 },     // code: table of animations (fn_80198F1C)
+    { 0x28, SIR_PTR, 1 },     // code: table of screens (fn_80199024, ScreenSetFindWidget)
+    { 0x34, SIR_PTR, 1 },     // code: a table (fn_80198F74)
+    { 0x3C, SIR_PTR, 1 },     // code: a table (fn_80198FCC)
+};
+#define UI_SET_USED 0x40
+// What a screen (the widget of a node of the set's screen table) has from +0x13C on: how many
+// named widgets it has and pointers to them (UIWidgetFindChild), its activation grid
+// (fn_80199ABC), a float handed on when the screen comes to the top (fn_801987BC, fn_80198C78)
+// and a handle (fn_80199C30). The byte at +0x150 (fn_80199684) needs no conversion.
+static const SirField kUiScreenFields[] = {
+    { 0x00, SIR_U32, 1 }, { 0x04, SIR_PTR, 2 }, { 0x0C, SIR_F32, 1 }, { 0x10, SIR_U32, 1 },
+};
+#define UI_SCREEN_AT   0x13C
+#define UI_SCREEN_SIZE 0x14
+enum { UI_LIST_PLAIN, UI_LIST_FIXUP, UI_LIST_LISTS, UI_LIST_WIDGETS };
 
 // A list of the UI code: +0x00 count (fn_8019555C), +0x04 capacity, +0x08 element size and +0x10
 // the elements (fn_8019552C). The widget lists hold pointers.
@@ -1727,7 +1785,9 @@ static const SirField kUiListFields[] = {
 
 static SirError UiFixupPlan(ImagePlan* plan, const u8* image, u32 imageSize, u32 addr, u32 depth);
 
-static SirError UiListPlan(ImagePlan* plan, const u8* image, u32 imageSize, u32 addr, bool widgets, u32 depth) {
+static SirError UiBasePlan(ImagePlan* plan, const u8* image, u32 imageSize, u32 addr, u32 depth);
+
+static SirError UiListPlan(ImagePlan* plan, const u8* image, u32 imageSize, u32 addr, int mode, u32 depth) {
     u32 l, d;
     SirError e;
     if (!LevelSpan(addr, 0x14, imageSize, &l) || PlanHas(plan, l, REGION_UI_LIST)) return SIR_OK;
@@ -1736,9 +1796,39 @@ static SirError UiListPlan(ImagePlan* plan, const u8* image, u32 imageSize, u32 
     if (count == 0) return SIR_OK;
     if (size != 4 || count > capacity || count > imageSize / 4 || !LevelSpan(Be32(image + l + 0x10), (u64)count * 4, imageSize, &d) ||
         !PlanAdd(plan, d, count * 4, REGION_PTR_ARRAY)) return SIR_ERR_SCREENS;
-    for (u32 i = 0; widgets && i < count; i++)
-        if ((e = UiFixupPlan(plan, image, imageSize, Be32(image + d + i * 4), depth + 1)) != SIR_OK) return e;
+    for (u32 i = 0; mode != UI_LIST_PLAIN && i < count; i++) {
+        u32 item = Be32(image + d + i * 4);
+        e = mode == UI_LIST_FIXUP ? UiFixupPlan(plan, image, imageSize, item, depth + 1)
+          : mode == UI_LIST_LISTS ? UiListPlan(plan, image, imageSize, item, UI_LIST_PLAIN, depth + 1)
+          : UiBasePlan(plan, image, imageSize, item, depth + 1);
+        if (e != SIR_OK) return e;
+    }
     return SIR_OK;
+}
+
+static SirError UiGridPlan(ImagePlan* plan, const u8* image, u32 imageSize, u32 addr, u32 depth) {
+    u32 g;
+    if (!LevelSpan(addr, UI_GRID_USED, imageSize, &g) || PlanHas(plan, g, REGION_UI_GRID)) return SIR_OK;
+    if (!PlanAdd(plan, g, UI_GRID_USED, REGION_UI_GRID)) return SIR_ERR_SCREENS;
+    return UiListPlan(plan, image, imageSize, Be32(image + g + 4), UI_LIST_LISTS, depth);
+}
+
+// The part every widget has, with its event lists, its activation grid and the widget drawn
+// before it. Once per widget.
+static SirError UiBasePlan(ImagePlan* plan, const u8* image, u32 imageSize, u32 addr, u32 depth) {
+    u32 o, n;
+    SirError e;
+    if (!LevelSpan(addr, UI_WIDGET_USED, imageSize, &o) || PlanHas(plan, o, REGION_UI_WIDGET)) return SIR_OK;
+    if (depth > UI_DEPTH_MAX || !PlanAdd(plan, o, UI_WIDGET_USED, REGION_UI_WIDGET)) return SIR_ERR_SCREENS;
+    for (u32 k = 0; k < 3; k++) {
+        u32 node = Be32(image + o + 4 + k * 4), guard = imageSize / UI_EVENT_SIZE + 1;
+        while (LevelSpan(node, UI_EVENT_SIZE, imageSize, &n) && !PlanHas(plan, n, REGION_UI_EVENT)) {
+            if (guard-- == 0 || !PlanAdd(plan, n, UI_EVENT_SIZE, REGION_UI_EVENT)) return SIR_ERR_SCREENS;
+            node = Be32(image + n);
+        }
+    }
+    if ((e = UiGridPlan(plan, image, imageSize, Be32(image + o + 0xBC), depth)) != SIR_OK) return e;
+    return UiBasePlan(plan, image, imageSize, Be32(image + o + 0x130), depth + 1);
 }
 
 // What fn_8019914C reads of a widget to install the vtable for its kind: +0x60 the kind; for kinds
@@ -1748,28 +1838,27 @@ static SirError UiListPlan(ImagePlan* plan, const u8* image, u32 imageSize, u32 
 static SirError UiFixupPlan(ImagePlan* plan, const u8* image, u32 imageSize, u32 addr, u32 depth) {
     u32 o, co;
     SirError e = SIR_OK;
-    if (!LevelSpan(addr, UI_WIDGET_USED, imageSize, &o) || PlanHas(plan, o + 0x60, REGION_U32_ARRAY)) return SIR_OK;
-    if (depth > UI_DEPTH_MAX || !PlanAdd(plan, o + 0x60, 4, REGION_U32_ARRAY)) return SIR_ERR_SCREENS;
+    if (!LevelSpan(addr, UI_WIDGET_USED, imageSize, &o) || PlanHas(plan, o, REGION_UI_FIXED)) return SIR_OK;
+    if (depth > UI_DEPTH_MAX || !PlanAdd(plan, o, 0, REGION_UI_FIXED)) return SIR_ERR_SCREENS;           // an empty marker
+    if ((e = UiBasePlan(plan, image, imageSize, addr, depth)) != SIR_OK) return e;
     u32 kind = Be32(image + o + 0x60);
     u32 need = kind == 2 ? 0x140 : kind == 3 ? 0x160 : kind == 4 ? 0x1C0 : kind == 5 ? 0x194 : 0;
     if ((u64)o + need > imageSize) return SIR_ERR_SCREENS;
     if ((kind == 2 || kind == 3) && !PlanAdd(plan, o + 0x13C, 4, REGION_U32_ARRAY)) return SIR_ERR_SCREENS;
     if (kind == 3) {
         if (!PlanAdd(plan, o + 0x15C, 4, REGION_PTR_ARRAY)) return SIR_ERR_SCREENS;
-        e = UiListPlan(plan, image, imageSize, Be32(image + o + 0x15C), false, depth);
+        e = UiListPlan(plan, image, imageSize, Be32(image + o + 0x15C), UI_LIST_WIDGETS, depth);
     } else if (kind == 4) {
         if (!PlanAdd(plan, o + 0x1B4, 4, REGION_PTR_ARRAY) || !PlanAdd(plan, o + 0x1BC, 4, REGION_PTR_ARRAY)) return SIR_ERR_SCREENS;
         if ((e = UiFixupPlan(plan, image, imageSize, Be32(image + o + 0x1B4), depth + 1)) != SIR_OK) return e;
-        e = UiListPlan(plan, image, imageSize, Be32(image + o + 0x1BC), true, depth);
+        e = UiListPlan(plan, image, imageSize, Be32(image + o + 0x1BC), UI_LIST_FIXUP, depth);
     } else if (kind == 5) {
         if (!PlanAdd(plan, o + 0x190, 4, REGION_PTR_ARRAY)) return SIR_ERR_SCREENS;
         e = UiFixupPlan(plan, image, imageSize, Be32(image + o + 0x190), depth + 1);
     } else if (kind == 6) {
-        if (!PlanHas(plan, o + 0x120, REGION_PTR_ARRAY) && !PlanAdd(plan, o + 0x120, 8, REGION_PTR_ARRAY)) return SIR_ERR_SCREENS;
         u32 c = Be32(image + o + 0x120), guard = imageSize / UI_WIDGET_USED + 1;
         while (e == SIR_OK && LevelSpan(c, UI_WIDGET_USED, imageSize, &co)) {
             if (guard-- == 0) return SIR_ERR_SCREENS;
-            if (!PlanHas(plan, co + 0x120, REGION_PTR_ARRAY) && !PlanAdd(plan, co + 0x120, 8, REGION_PTR_ARRAY)) return SIR_ERR_SCREENS;
             e = UiFixupPlan(plan, image, imageSize, c, depth + 1);
             c = Be32(image + co + 0x124);
         }
@@ -1782,12 +1871,11 @@ static SirError UiWidgetPlan(ImagePlan* plan, const u8* image, u32 imageSize, u3
     SirError fix;
     if (!LevelSpan(addr, UI_WIDGET_USED, imageSize, &o)) return SIR_OK;
     if (depth > UI_DEPTH_MAX) return SIR_ERR_SCREENS;
-    if (child && !PlanAdd(plan, o, 4, REGION_U32_ARRAY)) return SIR_ERR_SCREENS;
+    if ((fix = UiBasePlan(plan, image, imageSize, addr, depth)) != SIR_OK) return fix;
     if (child && (fix = UiFixupPlan(plan, image, imageSize, addr, depth)) != SIR_OK) return fix;   // fn_80199534 -> fn_8019914C
-    // The children, once per widget (a kind 6 widget's link may be in the plan already).
+    // The children, once per widget.
     if (PlanHas(plan, o, REGION_RUNTIME)) return SIR_OK;                        // an empty marker at the widget
     if (!PlanAdd(plan, o, 0, REGION_RUNTIME)) return SIR_ERR_SCREENS;
-    if (!PlanHas(plan, o + 0x120, REGION_PTR_ARRAY) && !PlanAdd(plan, o + 0x120, 8, REGION_PTR_ARRAY)) return SIR_ERR_SCREENS;
     u32 c = Be32(image + o + 0x120), guard = imageSize / UI_WIDGET_USED + 1, co;
     SirError e;
     while (LevelSpan(c, UI_WIDGET_USED, imageSize, &co)) {
@@ -1798,25 +1886,49 @@ static SirError UiWidgetPlan(ImagePlan* plan, const u8* image, u32 imageSize, u3
     return SIR_OK;
 }
 
-static SirError UiTreePlan(ImagePlan* plan, const u8* image, u32 imageSize, u32 node, u32 depth) {
+// A screen's own fields, the widgets it names and its grid.
+static SirError UiScreenPlan(ImagePlan* plan, const u8* image, u32 imageSize, u32 addr) {
+    u32 w, d;
+    SirError e;
+    if (!LevelSpan(addr, UI_SCREEN_AT + UI_SCREEN_SIZE, imageSize, &w) || PlanHas(plan, w + UI_SCREEN_AT, REGION_UI_SCREEN)) return SIR_OK;
+    if (!PlanAdd(plan, w + UI_SCREEN_AT, UI_SCREEN_SIZE, REGION_UI_SCREEN)) return SIR_ERR_SCREENS;
+    u32 count = Be32(image + w + UI_SCREEN_AT);
+    if (count != 0) {
+        if (count > imageSize / 4 || !LevelSpan(Be32(image + w + 0x140), (u64)count * 4, imageSize, &d) ||
+            !PlanAdd(plan, d, count * 4, REGION_PTR_ARRAY)) return SIR_ERR_SCREENS;
+        for (u32 i = 0; i < count; i++)
+            if ((e = UiBasePlan(plan, image, imageSize, Be32(image + d + i * 4), 0)) != SIR_OK) return e;
+    }
+    return UiGridPlan(plan, image, imageSize, Be32(image + w + 0x144), 0);
+}
+
+// A tree of one of the set's tables. Only the screens' nodes have their values followed.
+static SirError UiTreePlan(ImagePlan* plan, const u8* image, u32 imageSize, u32 node, u32 depth, bool screens) {
     u32 n;
     SirError e;
     if (!LevelSpan(node, 0x14, imageSize, &n)) return SIR_OK;
     if (depth > 4096 || PlanHas(plan, n, REGION_UI_TREE_NODE)) return SIR_ERR_SCREENS;   // not a tree
     if (!PlanAdd(plan, n, 0x14, REGION_UI_TREE_NODE)) return SIR_ERR_SCREENS;
-    if ((e = UiTreePlan(plan, image, imageSize, Be32(image + n + 0x0C), depth + 1)) != SIR_OK) return e;
-    if ((e = UiTreePlan(plan, image, imageSize, Be32(image + n + 0x10), depth + 1)) != SIR_OK) return e;
+    if ((e = UiTreePlan(plan, image, imageSize, Be32(image + n + 0x0C), depth + 1, screens)) != SIR_OK) return e;
+    if ((e = UiTreePlan(plan, image, imageSize, Be32(image + n + 0x10), depth + 1, screens)) != SIR_OK) return e;
+    if (!screens) return SIR_OK;
+    if ((e = UiScreenPlan(plan, image, imageSize, Be32(image + n + 0x04))) != SIR_OK) return e;
     return UiWidgetPlan(plan, image, imageSize, Be32(image + n + 0x04), false, 0);
 }
 
 static SirError ScreenSetPlan(ImagePlan* plan, const u8* image, u32 imageSize, u32 addr) {
+    static const u32 kTables[] = { 0x28, 0x20, 0x34, 0x3C };
     u32 off, t;
-    if (!LevelSpan(addr, 0x2C, imageSize, &off)) return SIR_OK;
-    if (!PlanAdd(plan, off + 0x28, 4, REGION_PTR_ARRAY)) return SIR_ERR_SCREENS;
-    // The table: the root, and the nodes with the lowest and the highest key (fn_8018E808).
-    if (!LevelSpan(Be32(image + off + 0x28), 0xC, imageSize, &t)) return SIR_OK;
-    if (!PlanAdd(plan, t, 0xC, REGION_PTR_ARRAY)) return SIR_ERR_SCREENS;
-    return UiTreePlan(plan, image, imageSize, Be32(image + t), 0);
+    SirError e;
+    if (!LevelSpan(addr, UI_SET_USED, imageSize, &off)) return SIR_OK;
+    if (!PlanAdd(plan, off, UI_SET_USED, REGION_UI_SET)) return SIR_ERR_SCREENS;
+    // A table: the root, and the nodes with the lowest and the highest key (fn_8018E808).
+    for (u32 i = 0; i < COUNTOF(kTables); i++) {
+        if (!LevelSpan(Be32(image + off + kTables[i]), 0xC, imageSize, &t)) continue;
+        if (!PlanAdd(plan, t, 0xC, REGION_PTR_ARRAY)) return SIR_ERR_SCREENS;
+        if ((e = UiTreePlan(plan, image, imageSize, Be32(image + t), 0, kTables[i] == 0x28)) != SIR_OK) return e;
+    }
+    return SIR_OK;
 }
 
 // ---- all of them
@@ -1905,6 +2017,11 @@ static void ImagePlanConvert(const ImagePlan* plan, SirReloc* r, u8* image, u32 
             for (u32 k = 0; k + 8 <= g->size; k += 8) { Swap32(p + k); r->fieldsSwapped++; ConvertPtr(r, p + k + 4); }
             break;
         case REGION_UI_LIST:      SirConvertRecord(r, p, g->size, kUiListFields, COUNTOF(kUiListFields)); break;
+        case REGION_UI_WIDGET:    SirConvertRecord(r, p, g->size, kUiWidgetFields, COUNTOF(kUiWidgetFields)); break;
+        case REGION_UI_EVENT:     SirConvertRecord(r, p, g->size, kUiEventFields, COUNTOF(kUiEventFields)); break;
+        case REGION_UI_GRID:      SirConvertRecord(r, p, g->size, kUiGridFields, COUNTOF(kUiGridFields)); break;
+        case REGION_UI_SET:       SirConvertRecord(r, p, g->size, kUiSetFields, COUNTOF(kUiSetFields)); break;
+        case REGION_UI_SCREEN:    SirConvertRecord(r, p, g->size, kUiScreenFields, COUNTOF(kUiScreenFields)); break;
         case REGION_UI_TREE_NODE: SirConvertRecord(r, p, g->size, kUiTreeNodeFields, COUNTOF(kUiTreeNodeFields)); break;
         case REGION_PROP_DEF:     SirConvertRecord(r, p, g->size, kPropDefFields, COUNTOF(kPropDefFields)); break;
         case REGION_ENTITY_RECORD: SirConvertRecord(r, p, g->size, kEntityRecordFields, COUNTOF(kEntityRecordFields)); break;
