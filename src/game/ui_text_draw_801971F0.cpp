@@ -6,8 +6,8 @@
 
 extern "C" {
 void  fn_8018979C(u8* font, const s8* str, s32* w, s32* h);                      // 0x8018979C (measures text)
-void  fn_80189EFC(u8* font, const s8* str, u32* colors, u32 count,
-                  f32 x, f32 y, f32 sx, f32 sy);                                 // 0x80189EFC (draws glyphs)
+void  fn_80189EFC(u8* font, f32 x, f32 y, f32 sx, f32 sy,
+                  const u8* str, const u32* colors, u32 count);                  // 0x80189EFC (draws glyphs)
 void  fn_8018D2B8(const char* fmt, ...);                                         // 0x8018D2B8 (debug log)
 void  fn_8018D370(const char* fmt, ...);                                         // 0x8018D370 (debug log)
 void* fn_8019AEAC(u8* arg0, u32 arg1, s32 arg2);                                 // 0x8019AEAC
@@ -207,7 +207,7 @@ f32* fn_801971F0(u8* obj, s8* str, u32 boxW, u32* colors, u32 count, s32 mode, s
                 lbl_80413390[3] = c1;  lbl_80413390[4] = vN;  lbl_80413390[5] = zero;
                 lbl_80413390[6] = c0;  lbl_80413390[7] = c2;  lbl_80413390[8] = zero;
                 lbl_80413390[9] = c1;  lbl_80413390[10] = c2; lbl_80413390[11] = zero;
-                fn_80189EFC(font, seg, colors, count, lineX + spaceX, boxY + vOff, scale, scale);
+                fn_80189EFC(font, lineX + spaceX, boxY + vOff, scale, scale, (const u8*)seg, colors, count);
             }
 
             if ((u32)style > 9) {
