@@ -1,6 +1,7 @@
 // Small functions from the miss211 batch: object constructors and resets (0x8002xxxx, 0x80032EDC),
 // zone slot refresh (0x8004DD30), script-table registration (0x8009xxxx), 0x801Exxxx/0x801Fxxxx helpers.
 #include "types.h"
+#include "game/node_ref.h"
 
 extern "C++" s32 gZoneResourceSize;  // 0x805FB94C
 extern u8 gWorldState[];             // 0x803E6D00
@@ -282,35 +283,25 @@ void fn_801ED624(u8* p, u8* q) {
     *(u8*)(p + 0x0) = 0xFF;
     *(u8*)(p + 0x1) = 0;
     *(u16*)(p + 0x2) = 0;
-    u8 b = *(u8*)q;
-    u32 kind = 1;
-    if (((b >> 3) & 1) == 0) {
-        kind = b & 0xF;
-    }
-    if (kind != 3) {
+    // The reference word is read as a whole so the code does not depend on byte order.
+    u32 w = NodeRefWord(q);
+    if (NodeRefKind(w) != 3) {
         return;
     }
-    *(u8*)(p + 0x0) = (u8)*(u16*)(q + 0x2);
-    *(u8*)(p + 0x1) = *(u8*)(q + 0x1);
-    u8 b2 = *(u8*)q;
-    u32 nib = (b2 >> 4) & 0xF;
-    u32 sign = (b2 >> 7) & 1;
-    *(u16*)(p + 0x2) = (u16)((nib & ~(0u - sign)) & 0xFF);
+    *(u8*)(p + 0x0) = (u8)NodeRefHalf2(w);
+    *(u8*)(p + 0x1) = NodeRefByte1(w);
+    *(u16*)(p + 0x2) = (u16)NodeRefNibble(w);
 }
 
 // 0x801ED684
 // Returns the world-state entry addressed by the record at p, or NULL when out of range.
 u8* fn_801ED684(u8* p) {
-    u8 b = *(u8*)p;
-    u32 kind;
-    if (((b >> 7) & 1) == 0) {
-        kind = b & 0xF;
-    } else {
-        kind = 1;
-    }
+    // The reference word is read as a whole so the code does not depend on byte order.
+    u32 w = NodeRefWord(p);
+    u32 kind = NodeRefKind(w);
     u32 idx;
     if (kind == 4) {
-        idx = *(u16*)(p + 0x2);
+        idx = NodeRefHalf2(w);
     } else {
         idx = 0xFFFFFFFFu;
     }

@@ -2,6 +2,7 @@
 #include <string.h>
 
 #include "types.h"
+#include "game/node_ref.h"
 #include "engine/math.h"
 
 typedef char* (*SubstFn)(void* arg);
@@ -356,21 +357,19 @@ s32 fn_8019EB94(u8* el) {
 }
 
 // Record kind: 1 when the high bit of byte 0 is set, else its low nibble.
-static u32 RecKind(const u8* r) {
-    return (r[0] & 0x80) ? 1u : (u32)(r[0] & 0xF);
-}
-
 // 0x801EDA4C
 // Writes the orientation quaternion (4 floats at out) described by the packed record a1:
 // kind 1 = quaternion stored in an animation record, 2 = euler angles of a keyed record,
 // 4 = euler angles (in 2/pi units) of the world-state entry whose index is in a1+2.
 // Anything else, or a failed lookup, gives the identity quaternion.
+// The reference word is read as a whole so the code does not depend on byte order.
 void fn_801EDA4C(u8* out, u8* a1) {
-    u32 kind = RecKind(a1);
+    u32 w = NodeRefWord(a1);
+    u32 kind = NodeRefKind(w);
     switch (kind) {
     case 1: {
         s32 v = lbl_805FB6B8;
-        if (a1[0] & 0x80) v = *(s32*)a1;
+        if (NodeRefIsId(w)) v = (s32)w;
         s32 sp10 = v;
         u8* r = (u8*)fn_801B7198(&sp10, 0);
         if (r != NULL) {
@@ -388,10 +387,10 @@ void fn_801EDA4C(u8* out, u8* a1) {
         key[0] = lbl_805FB710[0];
         key[1] = lbl_805FB710[1];
         *(u16*)(key + 2) = *(u16*)(lbl_805FB710 + 2);
-        if (RecKind(a1) == 2) {
-            key[1] = a1[1];
-            key[0] = (a1[0] & 0x80) ? 0 : (u8)((a1[0] >> 4) & 0xF);
-            *(u16*)(key + 2) = *(u16*)(a1 + 2);
+        if (NodeRefKind(w) == 2) {
+            key[1] = NodeRefByte1(w);
+            key[0] = (u8)NodeRefNibble(w);
+            *(u16*)(key + 2) = NodeRefHalf2(w);
         }
         u8 key2[4];
         if (fn_801C71EC(key) != 0) {
@@ -420,7 +419,7 @@ void fn_801EDA4C(u8* out, u8* a1) {
         break;
     }
     case 4: {
-        u32 idx = (RecKind(a1) == 4) ? (u32)*(u16*)(a1 + 2) : 0xFFFFFFFFu;
+        u32 idx = (NodeRefKind(w) == 4) ? (u32)NodeRefHalf2(w) : 0xFFFFFFFFu;
         u8* world = *(u8**)gWorldState;
         u8* rec = NULL;
         if (idx < *(u32*)(world + 0x24)) rec = *(u8**)(world + 0x28) + (idx << 5);

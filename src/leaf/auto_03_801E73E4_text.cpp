@@ -63,17 +63,6 @@ extern "C" void fn_801EBD1C(u8* a3, s32 a4) {
     *(u32*)(((u8*)(uintptr_t)(a3)) + 0) = (u32)((u32)(0));
 }
 
-// 0x801ED2FC
-extern "C" u32 fn_801ED2FC(u8* a3) {
-    u8 t0 = *(u8*)(((u8*)(uintptr_t)(a3)) + 0);
-    u32 t1 = (((u32)(t0) << 28) | ((u32)(t0) >> 4)) & 0x8u;
-    if (t1 != 0) {
-        return (u32)(1);
-    }
-    u32 t2 = (u32)(t0) & 0xfu;
-    return (u32)(t2);
-}
-
 // 0x801EE134
 extern "C" void* fn_801EE134(s32 a3) {
     return (void*)(MemAllocDefault((u32)((u32)(uintptr_t)(a3))));

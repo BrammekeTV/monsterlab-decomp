@@ -5,6 +5,7 @@
 #include <string.h>
 
 #include "types.h"
+#include "game/node_ref.h"
 #include "game/part.h"
 
 struct ScopedLock { u8 pad[4]; };  // as in props.cpp
@@ -483,11 +484,8 @@ void EnemyFireLightningAtActiveTarget(u32 /*0x2F*/ a0, u32 /*0x30*/ a1, u32 a2, 
     }
     u8* target = *(u8**)(enemy + 0xA14);
     if (target != NULL && (*(VIntFn*)(*(u8**)target + 0x4C))(target) == 0) {
-        s32 params = 0;  // bytes: [0] = 0, [1] = 0, halfword at +2 = 0xFFFF
+        s32 params = 0x0000FFFF;  // node reference word: kind byte 0, byte 1 = 0, halfword at +2 = 0xFFFF
         u8* pb = (u8*)&params;
-        pb[0] = 0;
-        *(u16*)(pb + 2) = 0xFFFF;
-        pb[1] = 0;
         WaypointParamsInit(pb, 6);
         fn_801EE078(pb, target, 0);
         s32 sp8 = *(s32*)pb;

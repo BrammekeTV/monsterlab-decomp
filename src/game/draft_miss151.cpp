@@ -1,4 +1,5 @@
 #include "types.h"
+#include "game/node_ref.h"
 
 extern "C++" s32 gZoneResourceSize;   // defined in game_flow.cpp
 
@@ -37,10 +38,12 @@ u8* fn_801B3308(void) {
 }
 
 // 0x801ED538
+// The reference word is read as a whole so the code does not depend on byte order.
 s32 fn_801ED538(u8* a3) {
     s32 result = lbl_805FB6B8;
-    if (a3[0] & 0x80) {
-        result = *(s32*)a3;
+    u32 w = NodeRefWord(a3);
+    if (NodeRefIsId(w)) {
+        result = (s32)w;
     }
     return result;
 }
