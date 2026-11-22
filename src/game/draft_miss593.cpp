@@ -58,8 +58,8 @@ void* fn_8020EA20(s32 arg1) {
 
 // 0x801ACF80
 // Vtable thunk: calls slot 0x10 of the object's vtable with all arguments passed on (tail jump).
-s32 fn_801ACF80(u8* obj, s32 a1, s32 a2, s32 a3, s32 a4, s32 a5, s32 a6, s32 a7) {
-    typedef s32 (*Fn)(u8*, s32, s32, s32, s32, s32, s32, s32);
+u8* fn_801ACF80(u8* obj, s32 a1, s32 a2, s32 a3, s32 a4, s32 a5, s32 a6, s32 a7) {
+    typedef u8* (*Fn)(u8*, s32, s32, s32, s32, s32, s32, s32);
     return (*(Fn*)(*(u8**)obj + 0x10))(obj, a1, a2, a3, a4, a5, a6, a7);
 }
 

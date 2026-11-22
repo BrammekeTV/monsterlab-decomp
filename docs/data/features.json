@@ -99,6 +99,11 @@
  "changelog": [
   {
    "date": "2026-11-22",
+   "time": "11:39",
+   "text": "Round 81: 30 medium functions (fn_8002AC78, fn_80039268, fn_800C324C, fn_800DB490, fn_800E0688, fn_8019C174, fn_80207DCC and more), Sonnet helpers"
+  },
+  {
+   "date": "2026-11-22",
    "time": "11:35",
    "text": "More of the title screen's data loads on Windows (PRs #42 to #45): the loader converts the shared zones and their screen sets, every kind of UI widget (buttons, lists and their children), and the texture sections of shared_texture.sir. Three missing names in the engine's memory type table are filled in."
   },

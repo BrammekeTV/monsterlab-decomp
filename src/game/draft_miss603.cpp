@@ -20,7 +20,7 @@ void fn_800BDC68(u8* item, f32 dt);                           // 0x800BDC68
 s32 fn_800BE9E0(u8* item, u8* ctx, u8* flag, f32 dt);        // 0x800BE9E0
 s32 fn_800BF044(u8* item, const f32* vec);                   // 0x800BF044
 void fn_800BF158(u8* item);                                  // 0x800BF158
-s32 fn_800BFF64(u8* p);                                      // 0x800BFF64
+void fn_800BFF64(u8* p, f32 dt);                                      // 0x800BFF64
 u8* fn_800C253C(u8** obj, s32 kind);                         // 0x800C253C
 void fn_800C6F18(u8* item);                                   // 0x800C6F18
 void fn_800C72C4(u8* item, u8* other);                       // 0x800C72C4
@@ -113,7 +113,7 @@ typedef void (*SlotVoidF32)(u8* self, f32 arg);
 // Per-frame update of the 18 + 8 + 50 entry tables: calls the per-entry update helpers with dt.
 void fn_800BB658(u8* p, f32 dt) {
     s32 i;
-    fn_800BFF64(p + 0x240);
+    fn_800BFF64(p + 0x240, dt);
     for (i = 0; i < 0x12; i++) {
         u8* e = *(u8**)(p + 4 * i + 0x94);
         if (*(u8*)(e + 0x298) != 0) {

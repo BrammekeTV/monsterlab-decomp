@@ -29,7 +29,7 @@ void  fn_8002C540(void* out, u8* src, f32 scale);               // 0x8002C540
 void  fn_80029F30(u8* p, void* vec);                            // 0x80029F30
 u8*   fn_800216B8(u8* p, s32 del);                              // 0x800216B8 (deleting dtor)
 void  fn_802E93CC(void);                                        // 0x802E93CC
-s32   fn_8010B5A0(u8* p, s32 v);                                // 0x8010B5A0
+u8*   fn_8010B5A0(u8* p, u8* src);                                // 0x8010B5A0
 void  fn_8011B060(u8* a, u8* b);                                // 0x8011B060
 void  fn_8023A5B0(u8* p);                                       // 0x8023A5B0
 void  fn_8023A68C(u8* p);                                       // 0x8023A68C
@@ -85,9 +85,9 @@ s32 fn_800C4364(u8* arg0, u8* arg1) {
     }
     if (cur == 0) {
         // The asm reads the word at address 0x2A0 here (NULL object); the PC build passes 0.
-        return fn_8010B5A0(arg0 + 0xD8, 0);
+        return (s32)(intptr_t)fn_8010B5A0(arg0 + 0xD8, NULL); // lint:ok
     }
-    return fn_8010B5A0(arg0 + 0xD8, *(s32*)(cur + 0x2A0));
+    return (s32)(intptr_t)fn_8010B5A0(arg0 + 0xD8, *(u8**)(cur + 0x2A0)); // lint:ok
 }
 
 // 0x8002B3CC

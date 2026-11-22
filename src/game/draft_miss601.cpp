@@ -64,7 +64,7 @@ f32 fn_8007CF94(s32 h);                     // 0x8007CF94
 s32 fn_8007CDBC(u8* p, s32 h, f32 t);       // 0x8007CDBC
 void fn_8007C958(u8* obj, f32* pt);         // 0x8007C958
 s32 fn_8007D2C4(s32 h, f32 t);              // 0x8007D2C4
-s32 fn_8007D2C8(s32 h);                     // 0x8007D2C8
+void fn_8007D2C8(u8* p);                     // 0x8007D2C8
 s32 fn_800771F8(u8* p);                     // 0x800771F8
 s32 fn_80076928(u8* a, u8* b);              // 0x80076928
 void fn_80037058(u8* obj, f32* to, f32* from); // 0x80037058
@@ -532,7 +532,7 @@ void fn_80079ADC(u8* arg0, f32 farg0) {
     fn_8007CDBC(arg0 + 0x1D0, *(s32*)(arg0 + 0x760), sp14);
     fn_8007CDBC(arg0 + 0x210, *(s32*)(arg0 + 0x760), sp14);
     fn_8007D2C4(*(s32*)(arg0 + 0x760), farg0);
-    fn_8007D2C8(*(s32*)(arg0 + 0x760));
+    fn_8007D2C8(*(u8**)(arg0 + 0x760));
     if (fn_800D8F90(*(u8**)(arg0 + 0x758)) == lbl_805FD6B8) {
         GameFlowSignal(-0x39F737BE, 0, 0);
     }
