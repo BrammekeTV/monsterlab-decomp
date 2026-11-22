@@ -99,6 +99,11 @@
  "changelog": [
   {
    "date": "2026-11-22",
+   "time": "21:17",
+   "text": "The strap safety screen shows its real colours on Windows (PR #62): our decompiled code wrote the colour table texture in the wrong byte order, and now writes it in the Wii's byte order."
+  },
+  {
+   "date": "2026-11-22",
    "time": "21:14",
    "text": "Packed game files on Windows (PRs #60 and #61): the port now unpacks compressed game data with the real zlib library and converts it after unpacking. The audit also fixed a function in our decompiled code that passed the wrong argument."
   },
