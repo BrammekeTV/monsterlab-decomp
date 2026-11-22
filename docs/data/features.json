@@ -37,7 +37,7 @@
   },
   {
    "title": "Big-endian data loader",
-   "detail": "Convert game data from the Wii's big-endian format at load time. On PC now: the file catalog, all of the global data in global_binary.sir (game database, input, textures, strings, script actions, UI, effects), and the first parts of level files: the header block, the HUD, the first layer of entities with their parts and state machines, scene objects and object pools. Everything is checked against the reference decoder. Next: the rest of the level data.",
+   "detail": "Convert game data from the Wii's big-endian format at load time. On PC now: the file catalog, all of global_binary.sir (database, input, textures, strings, script actions, UI, effects, screen sets), most of the front-end level (zones, entities, props, scene objects, pools, camera data), the shared zones and their screen sets with every widget kind, and the texture sections of shared_texture.sir. Everything is checked against the reference decoder.",
    "status": "in_progress"
   },
   {
@@ -97,6 +97,11 @@
   }
  ],
  "changelog": [
+  {
+   "date": "2026-11-22",
+   "time": "11:35",
+   "text": "More of the title screen's data loads on Windows (PRs #42 to #45): the loader converts the shared zones and their screen sets, every kind of UI widget (buttons, lists and their children), and the texture sections of shared_texture.sir. Three missing names in the engine's memory type table are filled in."
+  },
   {
    "date": "2026-11-22",
    "time": "11:29",
