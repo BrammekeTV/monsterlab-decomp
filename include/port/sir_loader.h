@@ -25,6 +25,7 @@ typedef enum SirError {
     SIR_ERR_UI,               // UI root, fonts or the objects of slots 0xDB4-0xDBC: pointer outside the image, font kind
     SIR_ERR_SCREENS,          // screen state machines (slots 0xD98, 0xD9C): bad count, node type or pointer
     SIR_ERR_EFFECTS,          // effect definitions (header slots 0x82C-0x840): table or one of its pointers outside the image
+    SIR_ERR_SCREEN_SETS,      // screen set database (header slot 0xDC0): table or record outside the image, keys not ascending
     SIR_ERR_POOL,             // object pool (header slots 0x10, 0x418): bad counts, block or list pointer
     SIR_ERR_LEVEL,            // level file header block: zone slot table not laid out as fn_80129CC8 does
     SIR_ERR_ENTITY,           // entity of a level zone: part list outside the zone, child list that loops

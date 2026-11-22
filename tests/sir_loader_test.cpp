@@ -551,6 +551,23 @@ static void DumpEffects(const GlobalBinaryFile* f) {
     }
 }
 
+// The screen set database (header slot 0xDC0), read the way UIEngine_LoadUIScreenSet does.
+static void DumpScreenSets(const GlobalBinaryFile* f) {
+    const u8* db = *(const u8**)(f->hdr + 0xDC0);
+    if (db == NULL) return;
+    const u8* table = *(const u8**)(db + 0x20);
+    printf("screensetdb "); PrintPtr(f->hdr + 0xDC0, f); printf(" table "); PrintPtr(db + 0x20, f); printf("\n");
+    if (table == NULL) return;
+    const u8* entries = *(const u8**)table;
+    u32 count = *(const u32*)(table + 4);
+    printf("screensettable "); PrintPtr(db + 0x20, f); printf(" entries "); PrintPtr(table, f); printf(" count %u\n", count);
+    for (u32 i = 0; i < count; i++) {
+        const u8* rec = *(const u8**)(entries + i * 8 + 4);
+        printf("screenset %u key %08x record ", i, *(const u32*)(entries + i * 8)); PrintPtr(entries + i * 8 + 4, f);
+        printf(" zone %d name %s\n", *(const s32*)(rec + 0x44), (const char*)rec);
+    }
+}
+
 static int Dump(const char* path) {
     SirReloc r;
     GlobalBinaryFile f;
@@ -639,6 +656,7 @@ static int Dump(const char* path) {
     DumpImage(&f);
     DumpUi(&f);
     DumpEffects(&f);
+    DumpScreenSets(&f);
     printf("report image %u dolkept %u dolresolved %u unknown %u\n", r.ptrImage, r.ptrDolKept, r.ptrDolResolved, r.ptrUnknown);
     GlobalBinaryFree(&f);
     return 0;
@@ -831,6 +849,28 @@ struct ZoneDump {
         }
     }
 
+    // What the draw passes read of an item and of its mesh (fn_80184C18, fn_80171ABC, fn_80171228).
+    std::vector<const u8*> meshes;
+    void Floats(const u8* at, u32 n) { for (u32 i = 0; i < n; i++) printf("%s%08x", i ? " " : "", Bits(*(const f32*)(at + i * 4))); }
+    void ItemDraw(const u8* it) {
+        printf("itemdraw "); Val(it); printf(" xf "); Ptr(it + 4); printf(" scale %08x mesh ", Bits(*(const f32*)(it + 8))); Ptr(it + 0x10);
+        printf(" out "); Floats(it + 0x14, 7); printf(" cb %08x arg ", *(const u32*)(it + 0x30)); Ptr(it + 0x34);
+        printf(" clip "); Floats(it + 0x3C, 4); printf(" w58 %08x skin ", Bits(*(const f32*)(it + 0x58))); Ptr(it + 0xB0); printf("\n");
+        const u8* x = *(const u8**)(it + 4);
+        const u8* m = *(const u8**)(it + 0x10);
+        if (In(x, 0x60)) { printf("itemxf "); Val(x); printf(" "); Floats(x, 24); printf("\n"); }
+        if (!In(m, 0x70) || std::find(meshes.begin(), meshes.end(), m) != meshes.end()) return;
+        meshes.push_back(m);
+        u32 parts = *(const u32*)(m + 0x6C);
+        printf("mesh "); Val(m); printf(" sphere "); Floats(m + 0x20, 4); printf(" v48 "); Floats(m + 0x48, 4);
+        printf(" extra "); Ptr(m + 0x64); printf(" parts %u\n", parts);
+        for (u32 k = 0; k < parts; k++) {
+            const u8* b = *(const u8**)(m + 0x74 + k * 8);
+            printf("meshpart "); Val(m); printf(" material "); Ptr(m + 0x70 + k * 8); printf(" batch "); Ptr(m + 0x74 + k * 8);
+            if (In(b, 0x10)) printf(" flags %08x\n", *(const u32*)(b + 0xC)); else printf(" flags -\n");
+        }
+    }
+
     void Entities() {
         for (size_t i = 0; i < ents.size(); i++) {
             const u8* e = ents[i];
@@ -909,6 +949,7 @@ struct ZoneDump {
                     seen.push_back(node);
                     printf("scenenode "); Val(node); printf(" flags %08x next ", *(const u32*)(node - 0xAC)); Ptr(node);
                     printf(" prev "); Ptr(node + 4); printf(" owner "); Ptr(node + 8); printf("\n");
+                    if (node >= z->image + 0xB8 && In(node - 0xB8, 0xC4)) ItemDraw(node - 0xB8);
                 }
             }
             u32 entries = type == 3 ? *(const u32*)(s + 0x54) : 0;
@@ -918,6 +959,7 @@ struct ZoneDump {
                 if (!In(it, 0xC4)) continue;
                 printf("sceneitem "); Val(it); printf(" flags %08x next ", *(const u32*)(it + 0xC)); Ptr(it + 0xB8);
                 printf(" prev "); Ptr(it + 0xBC); printf(" owner "); Ptr(it + 0xC0); printf("\n");
+                ItemDraw(it);
             }
             const u8* table = type == 3 ? *(const u8**)(s + 0x5C) : NULL;
             for (u32 k = 0; entries != 0 && In(table, entries * 4) && k < entries; k++) {
@@ -1186,10 +1228,14 @@ static void Put16(u8* p, u16 v) {
 #define T_POOL      (T_FXPOOLS + 0x90)       // ready-made pool: 0x2C
 #define T_POOL_BLOCK (T_POOL + 0x30)         // its block: the next-block word, then two nodes of 0x30
 #define T_POOL_NODES (T_POOL_BLOCK + 0x08)
-#define T_SIZE      (T_POOL_BLOCK + 0x70)
+#define T_SETDB     (T_POOL_BLOCK + 0x70)    // screen set database: the table pointer at +0x20
+#define T_SETTABLE  (T_SETDB + 0x30)         // its table {entries, count}
+#define T_SETENTRIES (T_SETTABLE + 0x10)     // two entries {key, record}
+#define T_SETRECS   (T_SETENTRIES + 0x10)    // two records of 0x50: name, zone at +0x44
+#define T_SIZE      (T_SETRECS + 0xA0)
 #define T_ADDR(off) (GLOBAL_BINARY_WII_BASE + (off))
 
-#define T_OBJECT_PTRS 81u   // image pointers in the hand-typed objects and their header slots
+#define T_OBJECT_PTRS 86u   // image pointers in the hand-typed objects and their header slots
 
 static u8 gFakeVtable[4];
 static void* TestResolver(u32 addr, void*) {
@@ -1475,6 +1521,22 @@ static void BuildEffects(u8* hdr, u8* img) {
     Put32(img + T_POOL_BLOCK, 0);
     Put32(img + T_POOL_NODES + 0x00, 0); Put32(img + T_POOL_NODES + 0x04, T_ADDR(T_POOL_NODES + 0x30));
     Put32(img + T_POOL_NODES + 0x30, T_ADDR(T_POOL_NODES)); Put32(img + T_POOL_NODES + 0x34, 0);
+
+    // The screen set database: two sets, the table sorted by key.
+    Put32(hdr + 0xDC0, T_ADDR(T_SETDB));
+    Put32(img + T_SETDB + 0x00, T_ADDR(T_SETRECS));            // no reader: stays big-endian
+    Put32(img + T_SETDB + 0x04, 2);
+    Put32(img + T_SETDB + 0x20, T_ADDR(T_SETTABLE));
+    Put32(img + T_SETTABLE + 0, T_ADDR(T_SETENTRIES)); Put32(img + T_SETTABLE + 4, 2);
+    Put32(img + T_SETENTRIES + 0x0, 0x0F2194DF); Put32(img + T_SETENTRIES + 0x4, T_ADDR(T_SETRECS + 0x50));
+    Put32(img + T_SETENTRIES + 0x8, 0x8875297D); Put32(img + T_SETENTRIES + 0xC, T_ADDR(T_SETRECS));
+    for (u32 i = 0; i < 2; i++) {
+        u8* rec = img + T_SETRECS + i * 0x50;
+        memset(rec, 0, 0x50);
+        memcpy(rec, i == 0 ? "UI_first" : "UI_second", i == 0 ? 8 : 9);
+        Put32(rec + 0x44, 472 + i);
+        Put32(rec + 0x48, i == 0 ? 0x8875297D : 0x0F2194DF);   // no reader: stays big-endian
+    }
 }
 
 // A miniature global_binary image: the database object, 42 descriptors (two with rows), in the
@@ -1582,7 +1644,9 @@ static SirError ConvertBuilt(u8* hdr, u8* img, SirReloc* r, s32* failTable) {
 #define L_REC1     0xB40u                     // record of the entity in zone 1 (records stay in zone 0)
 #define L_ITEM     0xB80u                     // the scene object's one entry: flags at +0x0C, list link at +0xB8
 #define L_MATRIX   (L_ITEM + 0xD0)            // its matrix, twelve floats
-#define L_ZONE_SIZE 0xC80u
+#define L_MESH     0xCC0u                     // the entry's mesh: one part at +0x70; the matrix's second half ends here
+#define L_BATCH    0xD40u                     // the part's batch: flags at +0x0C
+#define L_ZONE_SIZE 0xD60u
 #define L_ZONE1    0x90980000u                // Wii address of zone 1: an entity at 0x10, a list object at 0x200
 #define L_ENT1     0x10u                      // the entity slot 1's second table names
 #define L_ZONE1_SIZE 0x300u
@@ -1697,6 +1761,21 @@ static void BuildLevel(u8* hdr, u8* zone) {
     Put32(sc + 0x54, 1); Put32(sc + 0x58, L_ZONE + L_SCENE + 0x60);
     Put32(sc + 0x60, L_ZONE + L_ITEM);
     Put32(zone + L_ITEM + 0x0C, 4);
+    // What the draw passes read of the entry: matrix, scale, mesh, callback and its argument.
+    Put32(zone + L_ITEM + 0x04, L_ZONE + L_MATRIX); Put32(zone + L_ITEM + 0x08, 0x3F800000);
+    Put32(zone + L_ITEM + 0x10, L_ZONE + L_MESH);
+    for (u32 o = 0x14; o < 0x30; o += 4) Put32(zone + L_ITEM + o, 0);
+    Put32(zone + L_ITEM + 0x30, 0x802C5280); Put32(zone + L_ITEM + 0x34, L_ZONE + L_SCENE);
+    for (u32 o = 0x3C; o < 0x4C; o += 4) Put32(zone + L_ITEM + o, 0);
+    Put32(zone + L_ITEM + 0x58, 0x3F800000); Put32(zone + L_ITEM + 0xB0, 0);
+    for (u32 o = 0x30; o < 0x60; o += 4) Put32(zone + L_MATRIX + o, o == 0x30 ? 0x40000000 : 0);
+    u8* mesh = zone + L_MESH;
+    memset(mesh, 0, 0x78);
+    Put32(mesh + 0x00, 0x4D);                                  // no reader: stays big-endian
+    Put32(mesh + 0x2C, 0x3F5DB3D7); Put32(mesh + 0x54, 0x3F000100);
+    Put32(mesh + 0x6C, 1); Put32(mesh + 0x74, L_ZONE + L_BATCH);
+    Put32(zone + L_BATCH + 0x08, 6);                           // no reader: stays big-endian
+    Put32(zone + L_BATCH + 0x0C, 0x21);
     for (u32 o = 0xB8; o < 0xC4; o += 4) Put32(zone + L_ITEM + o, 0);
     Put32(sc + 0x48, L_ZONE + L_ENT); Put32(sc + 0x50, 0);
     Put32(sc + 0x5C, L_ZONE + L_SCENE + 0x64);                 // one matrix pointer
@@ -1851,6 +1930,15 @@ static void LevelSelfTest(void) {
     // The entry, as fn_80184314 reads it before it links it into a list; the matrix of the current
     // entry, as fn_801DA798 finds it; the prop's state list and the state's fields (fn_800699E4).
     CHECK(*(const s32*)(zone + L_ITEM + 0x0C) == 4 && *(const u8**)(zone + L_ITEM + 0xC0) == NULL && zone[L_ITEM] == 0x7F);
+    // The entry and its mesh, as fn_80184C18, fn_80171ABC and fn_80171228 read them.
+    const u8* item = zone + L_ITEM;
+    const u8* mesh = *(const u8**)(item + 0x10);
+    CHECK(*(const u8**)(item + 4) == zone + L_MATRIX && *(const f32*)(item + 8) == 1.0f && mesh == zone + L_MESH);
+    CHECK(*(const u32*)(item + 0x30) == 0x802C5280 && *(const u8**)(item + 0x34) == zone + L_SCENE && *(const f32*)(item + 0x58) == 1.0f);
+    CHECK(*(const f32*)(zone + L_MATRIX + 0x30) == 2.0f && *(const u8**)(item + 0xB0) == NULL && mesh[3] == 0x4D);
+    CHECK(*(const u32*)(mesh + 0x2C) == 0x3F5DB3D7 && *(const u32*)(mesh + 0x54) == 0x3F000100 && *(const s32*)(mesh + 0x6C) == 1);
+    const u8* batch = *(const u8**)(mesh + 0x74);
+    CHECK(*(const u8**)(mesh + 0x70) == NULL && batch == zone + L_BATCH && *(const u32*)(batch + 0xC) == 0x21 && batch[0xB] == 6);
     const f32* matrix = (*(const f32***)(sc + 0x5C))[*(const s32*)(sc + 0x50)];
     CHECK(*(const u8**)(sc + 0x48) == ent && (const u8*)matrix == zone + L_MATRIX && matrix[0] == 1.0f && matrix[1] == 0.0f);
     CHECK(*(const u8**)(ent + 0x1A0) == ent + 0x9C && **(const u8***)(ent + 0x1A0) == def);
@@ -1887,6 +1975,8 @@ static void LevelSelfTest(void) {
         { true, L_POOLBLK + 0x10, L_ZONE + L_ENT + 0x10, SIR_ERR_OVERLAP },        // pooled "machine" inside the entity
         { true, L_ENT + 0xA4, L_ZONE + L_RECORD + 0x20, SIR_ERR_OVERLAP },         // holder inside the record
         { true, L_ENT + 0x9C, L_ZONE + L_SCENE, SIR_ERR_OVERLAP },                 // prop "definition" on the scene object
+        { true, L_MESH + 0x6C, 0x100000, SIR_ERR_ENTITY },                         // mesh parts run off the zone
+        { true, L_ITEM + 0x10, L_ZONE + L_ENT, SIR_ERR_OVERLAP },                  // "mesh" inside the entity
         { true, 0x10, L_ZONE + L_ZONE_SIZE - 0x20, SIR_ERR_ZONE_RECORD },          // list object runs off the zone
         { true, L_SYS + 0x10, L_ZONE + L_SYS + 0x10, SIR_ERR_ZONE_RECORD },        // list that loops
         { true, L_TRACK + 0x40, 0x00010000, SIR_ERR_ZONE_RECORD },                 // keys without an end run off the zone
@@ -2112,6 +2202,16 @@ static int SelfTest(void) {
         const u8* second = *(const u8**)(head + 4);
         CHECK(*(const u8**)head == NULL && second == img + T_POOL_NODES + 0x30 && *(const u8**)second == head && *(const u8**)(second + 4) == NULL);
         CHECK(head[8] == 0x7F && head[0x0B] == 0x01);                              // the items: untouched
+
+        // The screen set database, searched the way fn_801EBE74 does for UIEngine_LoadUIScreenSet.
+        const u8* db = *(const u8**)(hdr + 0xDC0);
+        const u8* table = *(const u8**)(db + 0x20);
+        const u8* entries = *(const u8**)table;
+        CHECK(db == img + T_SETDB && table == img + T_SETTABLE && entries == img + T_SETENTRIES && *(const s32*)(table + 4) == 2);
+        CHECK(*(const u32*)entries == 0x0F2194DF && *(const u32*)(entries + 8) == 0x8875297D);
+        const u8* found = *(const u8**)(entries + 12);
+        CHECK(found == img + T_SETRECS && *(const s32*)(found + 0x44) == 472 && strcmp((const char*)found, "UI_first") == 0);
+        CHECK(*(const s32*)(*(const u8**)(entries + 4) + 0x44) == 473 && found[0x48] == 0x88 && db[7] == 2);
     }
 
     // Pointer fields of a hand-written schema: image, main.dol (known and unknown), elsewhere, NULL.
@@ -2179,6 +2279,10 @@ static int SelfTest(void) {
         { T_POOL + 0x00, 0, SIR_ERR_POOL, -1 },                                             // pool without items
         { T_POOL + 0x08, 0x18, SIR_ERR_POOL, -1 },                                          // alignment not a power of two
         { T_POOL + 0x1C, T_ADDR(T_POOL_NODES), SIR_ERR_POOL, -1 },                          // block list is not the block
+        { T_SETENTRIES + 0x8, 0x0F2194DF, SIR_ERR_SCREEN_SETS, -1 },                        // screen set keys not ascending
+        { T_SETTABLE + 0x4, 0x100000, SIR_ERR_SCREEN_SETS, -1 },                            // screen set table runs off the image
+        { T_SETENTRIES + 0x4, T_ADDR(T_SIZE - 0x20), SIR_ERR_SCREEN_SETS, -1 },             // record runs off the image
+        { T_SETENTRIES + 0x4, T_ADDR(T_POOL - 0x24), SIR_ERR_OVERLAP, -1 },                 // record whose zone word is inside the pool
         { T_POOL + 0x10, T_ADDR(T_POOL_NODES + 0x10), SIR_ERR_POOL, -1 },                   // free list does not start at a node
         { T_POOL_NODES + 0x04, T_ADDR(T_FXBOLT), SIR_ERR_POOL, -1 },                        // node links out of the pool
         { T_POOL + 0x00, 3, SIR_ERR_POOL, -1 },                                             // third node would be the fill behind the block

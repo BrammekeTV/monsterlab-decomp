@@ -23,7 +23,8 @@ Code: `include/port/sir_loader.h`, `src/port/sir_loader.cpp`. Test: `tests/sir_l
 | `global_binary.sir` screen list and HUD (slots `0xD98`, `0xD9C`: 68 state machines, 68 definitions, 759 states, 1,345 transitions) | converted; every field typed from code, fields without a reader left as they are |
 | `global_binary.sir` UI root, fonts and the objects of slots `0xDB4`-`0xDBC` | the fields the code reads are converted; the glyph data of the three fonts is not |
 | `global_binary.sir` effect definitions (slots `0x82C`-`0x840`: 27 + 70 entries) and the two object pools of slots `0x10`, `0x418` | converted; fields typed from the effect and pool code |
-| `global_binary.sir` font glyph data, sound objects named by action records, `0xDC0` | not converted: see "Not converted yet" |
+| `global_binary.sir` screen set database (header slot `0xDC0`) | the lookup table and each record's zone are converted: see "Screen set database" |
+| `global_binary.sir` font glyph data, sound objects named by action records | not converted: see "Not converted yet" |
 | Level files (`*_level.sir`): header block (the world state, 493 zone slots); in zone 0 the HUD and state machines, the first layer of every entity, scene objects, pool tables and their pools | the fields the level start reads are converted; the rest of an entity and of the zone images is not: see "Level files" |
 | Hook into the game's `SirLoad` | not wired (the port has no file layer yet) |
 
@@ -522,12 +523,30 @@ the pool and the node links. The items are fill words in the file and are not co
 |---|---|---|---|
 | font data (font object `+0x08`) | `0x26740`, `0x38220`, `0x390E0`, `0x626C0` | glyph tables; `fn_8018979C` measures text with them, `fn_801971F0` (709 instructions) draws, `fn_801894F4` / `fn_801894B8` prepare a font loaded from a file | those functions are not decompiled; nothing on the boot path reads the data |
 | sound objects named by action records | 42 objects between `0xDF2E0` and `0xF5D30` | argument 1 of `PlaySoundEffect`, argument 2 of `RegisterExperimentSound` and of `LT_SetTutorialText` (see "Action records") | their readers are not decompiled far enough to type the fields |
-| `0xDC0` | `0xF6CF0` | a table of screen names (`UI_MSA_newscreen`, ...) with ids and hashes | no decompiled function reads the slot |
+| `0xDC0` | `0xF6CF0` | the screen set database: converted as far as it is read, see "Screen set database" | `ScreenSetsLoadCsv` stores the slot in `lbl_805FB218` |
 
 With this the boot runs through `UiInit` (`ScreenSetsInit`, `ScreenMgrLoad`, `HudInit`,
 `HudReset`), and the first `HudUpdateScreens` runs a state's enter action through the
 interpreter. The screen format of `shared_ui.sir` (title screen) is expected to be the same; see
 "Next".
+
+## Screen set database
+
+Header slot `0xDC0` of `global_binary.sir` points at the screen set database; `ScreenSetsLoadCsv`
+(0x801091B4) stores it in `lbl_805FB218`. `UIEngine_LoadUIScreenSet` looks a set up by the hash
+of its name and loads the zone the record names.
+
+| Where | Field | Reader |
+|---|---|---|
+| database `+0x20` | pointer to the lookup table | `UIEngine_LoadUIScreenSet` |
+| lookup table | `{entries, count}` | `fn_801EBE74` (binary search) |
+| entry, 8 bytes | `{key, record}`, keys in ascending order (the loader checks that) | `fn_801EBE74` |
+| record `+0x44` | zone number | `UIEngine_LoadUIScreenSet` |
+
+The file has 23 sets (`UI_MSA_newscreens` in zone 472, ...). A record is 0x50 bytes: the name,
+the zone, the name hash at `+0x48` and a word at `+0x4C`. Not converted, because no reader was
+found: the database's own words `+0x00`..`+0x1C` (a pointer to the records, their count, six
+numbers), the table's third word, and the record's hash and last word.
 
 ## Level files
 
@@ -633,6 +652,23 @@ and the list behind `+0x4C` (below); for type 3 the count at `+0x54` and the poi
 | item (an entry of a type 3 object, a node of a list) | `+0x0C` flags; link at `+0xB8`: next, previous, the list it is in | `fn_80184314`, `fn_8017323C`, `fn_801DB160` |
 | type 3 object | `+0x48` the entity that uses it, `+0x50` current entry, `+0x5C` one matrix pointer per entry | `fn_801DA344`, `fn_801DA750`, `fn_801DA798` |
 | matrix | twelve floats (in the files it lies in its item, at `+0xD0`) | `fn_801D9164` writes all of it |
+
+What the draw passes read of an item and of the mesh it draws:
+
+| Object | Fields | Reader |
+|---|---|---|
+| item | `+0x04` its matrix, `+0x08` scale, `+0x10` its mesh, `+0x14` seven floats (two positions and a radius, written by `fn_80171ABC`), `+0x30` callback and `+0x34` its argument, `+0x3C` four floats the culling pass writes, `+0x58` float, `+0xB0` pointer (non-null: `fn_801704F8`) | `fn_80184C18` (culling), `fn_80171ABC`, `fn_80171228` |
+| matrix | twelve floats, and twelve more behind them that `fn_80171228` writes (the matrix scaled and turned to the camera) | `fn_80171ABC`, `fn_80171228` |
+| mesh | `+0x20` centre and radius, `+0x48` three floats, `+0x54` scale, `+0x64` a pointer (null in every level file), `+0x6C` number of parts, `+0x70` the parts: `{material, batch}` | `fn_80171ABC`, `fn_80171228` |
+| batch | `+0x0C` flags | `fn_80171228` |
+
+The callback at `+0x30` is a build-time address in the file (0x802C5280 or 0x802C6FD4, neither
+the start of a function in this build), like the vtable slots: it is converted as a word, and
+the code that sets the item up has to store the real function.
+
+Not converted: the rest of a mesh (bounding box, name, vertex format), the material, and the
+batch beyond its flags: display lists and vertex data, which the code that draws the queued
+records reads.
 
 `fn_801DA91C` hands every entry of a type 3 object to `fn_80184314`, which appends the entry's
 link to the list of a type 2 object: that is why the tail, the count and an unlisted item's link
@@ -766,7 +802,7 @@ its memory budget).
 | three of a zone record's four lists | `+0x04`, `+0x1C`, `+0x28` | none found yet |
 | render objects | pool items of fix-up 655 | `fn_8012F818` |
 | animation tables of props | definition `+0x48`, in zone 0 | `fn_801AC184`, when a prop whose definition has the byte `+0x1C` set changes state |
-| the rest of a scene object's item | beyond flags, link and matrix | the render code |
+| materials, and a mesh batch beyond its flags (display lists, vertex data) | zone images | the code that draws the records `fn_80171228` queues |
 | value tables of the HUD's machines | another zone's image | `fn_801BBE40`, as soon as a state runs an action |
 | zone action tables and their records | slot `+0xD4` | `TriggerDoAction`; `ActionRecordPlan` applies |
 | the shared zones (`shared_ui.sir`, `shared_parts.sir`), textures, models, collision | the rest | - |
