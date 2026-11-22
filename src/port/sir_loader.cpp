@@ -363,7 +363,7 @@ enum RegionKind {
     REGION_ENTITY, REGION_ENTITY_RECORD, REGION_ENTITY_PART, REGION_PTR_COUNT, REGION_COUNT_PTR, REGION_POOL_TABLE,
     REGION_ENTITY_PROP, REGION_PROP_DEF, REGION_KEY_PTR,
     REGION_UI_TREE_NODE, REGION_UI_LIST, REGION_UI_WIDGET, REGION_UI_EVENT, REGION_UI_GRID, REGION_UI_FIXED,
-    REGION_UI_SET, REGION_UI_SCREEN,
+    REGION_UI_SET, REGION_UI_SCREEN, REGION_UI_GRAPHIC,
     REGION_ZONE_SYSTEM, REGION_ANIM_PLAYER, REGION_ANIM_ELEM, REGION_ANIM_TRACK, REGION_ANIM_KEYS, REGION_F32_ARRAY,
     REGION_RUNTIME    // memory the game initialises itself: nothing to convert, but nothing else may be there
 };
@@ -1776,6 +1776,17 @@ static const SirField kUiScreenFields[] = {
 #define UI_SCREEN_AT   0x13C
 #define UI_SCREEN_SIZE 0x14
 enum { UI_LIST_PLAIN, UI_LIST_FIXUP, UI_LIST_LISTS, UI_LIST_WIDGETS };
+// What a picture (kind 2, sub-kind 0, vtable lbl_80382E2C) has from +0x140 on that is read before
+// the game writes it: +0x140 a pointer to the word that holds its texture (fn_801A0D04,
+// fn_801A1208), +0x144 a texture set by a script, which wins (fn_801A0D04), +0x148 its size
+// (fn_801A0DF0, fn_801A0DF8) and +0x180 the texture coordinates of its four corners
+// (fn_801A1238). The corner colours (+0x1A0), the quad (+0x1E0), the matrix (+0x240) and the
+// tinted colour (+0x270) are written first (fn_801A1238, fn_801A05E4).
+static const SirField kUiGraphicFields[] = {
+    { 0x00, SIR_PTR, 2 }, { 0x08, SIR_F32, 2 }, { 0x40, SIR_F32, 8 },
+};
+#define UI_GRAPHIC_AT   0x140
+#define UI_GRAPHIC_SIZE 0x60
 
 // A list of the UI code: +0x00 count (fn_8019555C), +0x04 capacity, +0x08 element size and +0x10
 // the elements (fn_8019552C). The widget lists hold pointers.
@@ -1828,6 +1839,13 @@ static SirError UiBasePlan(ImagePlan* plan, const u8* image, u32 imageSize, u32 
         }
     }
     if ((e = UiGridPlan(plan, image, imageSize, Be32(image + o + 0xBC), depth)) != SIR_OK) return e;
+    if (Be32(image + o + 0x60) == 2 && (u64)o + UI_GRAPHIC_AT + UI_GRAPHIC_SIZE <= imageSize && Be32(image + o + 0x13C) == 0) {
+        u32 t;
+        if (!PlanAdd(plan, o + UI_GRAPHIC_AT, UI_GRAPHIC_SIZE, REGION_UI_GRAPHIC)) return SIR_ERR_SCREENS;
+        // The word the picture's +0x140 points at: its texture, shared by the pictures that show it.
+        if (LevelSpan(Be32(image + o + 0x140), 4, imageSize, &t) && !PlanHas(plan, t, REGION_PTR_ARRAY) &&
+            !PlanAdd(plan, t, 4, REGION_PTR_ARRAY)) return SIR_ERR_SCREENS;
+    }
     return UiBasePlan(plan, image, imageSize, Be32(image + o + 0x130), depth + 1);
 }
 
@@ -2022,6 +2040,7 @@ static void ImagePlanConvert(const ImagePlan* plan, SirReloc* r, u8* image, u32 
         case REGION_UI_GRID:      SirConvertRecord(r, p, g->size, kUiGridFields, COUNTOF(kUiGridFields)); break;
         case REGION_UI_SET:       SirConvertRecord(r, p, g->size, kUiSetFields, COUNTOF(kUiSetFields)); break;
         case REGION_UI_SCREEN:    SirConvertRecord(r, p, g->size, kUiScreenFields, COUNTOF(kUiScreenFields)); break;
+        case REGION_UI_GRAPHIC:   SirConvertRecord(r, p, g->size, kUiGraphicFields, COUNTOF(kUiGraphicFields)); break;
         case REGION_UI_TREE_NODE: SirConvertRecord(r, p, g->size, kUiTreeNodeFields, COUNTOF(kUiTreeNodeFields)); break;
         case REGION_PROP_DEF:     SirConvertRecord(r, p, g->size, kPropDefFields, COUNTOF(kPropDefFields)); break;
         case REGION_ENTITY_RECORD: SirConvertRecord(r, p, g->size, kEntityRecordFields, COUNTOF(kEntityRecordFields)); break;

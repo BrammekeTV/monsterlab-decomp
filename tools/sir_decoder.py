@@ -711,6 +711,10 @@ def shared_zone_dump(L, zn, sec, slot_size, zone0, zbase0):
             ptr(w), u(o), ptr(u(o + 4)), ptr(u(o + 8)), ptr(u(o + 0xC)), ptr(u(o + 0x10)), ws(o + 0x14, 16), u(o + 0x54), u(o + 0x58),
             u(o + 0x5C), u(o + 0x60), u(o + 0x64), ws(o + 0x68, 16), u(o + 0xA8), u(o + 0xB0), sec[o + 0xB8], sec[o + 0xB9],
             ptr(u(o + 0xBC)), ws(o + 0xC0, 24), ptr(u(o + 0x120)), ptr(u(o + 0x124)), ptr(u(o + 0x128)), ptr(u(o + 0x130))))
+        if u(o + 0x60) == 2 and o + 0x1A0 <= len(sec) and u(o + 0x13C) == 0:      # a picture
+            e = u(o + 0x140)
+            L.append('uigraphic %s entry %s -> %s tex %s size %s uv %s' % (ptr(w), ptr(e), ptr(u(e - base)) if inz(e, 4) else '-',
+                     ptr(u(o + 0x144)), ws(o + 0x148, 2), ws(o + 0x180, 8)))
         for k in range(3):
             n = u(o + 4 + k * 4)
             while inz(n, 0xC) and n not in events:
