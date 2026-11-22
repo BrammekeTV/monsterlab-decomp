@@ -1,6 +1,7 @@
 // Mixed small functions: monster limb damage, texture lookup, name entry, event manager timers,
 // rocket spawn, UI slot cleanup (0x8004DE74 - 0x801ED314).
 #include "types.h"
+#include "game/node_ref.h"
 #include "revolution.h"
 #include "game/part.h"
 
@@ -96,14 +97,15 @@ static inline BOOL PartAlive(const PartInstance* p) { return p != NULL && PartGe
 // 0x801ED314
 // Sets the flag bits of a waypoint-params byte: bit 7 (0x80) means "already set", otherwise
 // mode 1 sets bit 7 and any other mode ORs in its low 4 bits.
+// The reference word is read and written as a whole so the code does not depend on byte order.
 void WaypointParamsInit(void* params, int a) {
     u8* p = (u8*)params;
-    u8 v = *p;
+    u8 v = NodeRefByte0(NodeRefWord(p));
     if (v & 0x80) return;
     if (a == 1) {
-        *p = (u8)(v | 0x80);
+        NodeRefSetByte0(p, (u8)(v | 0x80));
     } else {
-        *p = (u8)(v | (a & 0xF));
+        NodeRefSetByte0(p, (u8)(v | (a & 0xF)));
     }
 }
 

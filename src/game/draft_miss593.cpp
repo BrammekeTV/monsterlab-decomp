@@ -2,6 +2,7 @@
 // vtable and SDK tail calls. Verified against the asm (sh tools/dump.sh).
 #include <string.h>
 #include "types.h"
+#include "game/node_ref.h"
 
 extern "C" {
 extern f32 lbl_805FFEA8;             // 0x805FFEA8 (float constant written to the fader slots)
@@ -32,9 +33,10 @@ void fn_801D6694(void) {
 // 0x801ED34C
 // Writes the 4-bit value arg1 into the high nibble of the byte at arg0, unless bit 0x80 of that byte is set.
 void fn_801ED34C(u8* arg0, s32 arg1) {
-    u8 temp_r5 = *arg0;
+    // The reference word is read and written as a whole so the code does not depend on byte order.
+    u8 temp_r5 = NodeRefByte0(NodeRefWord(arg0));
     if (!((temp_r5 >> 4U) & 8)) {
-        *arg0 = temp_r5 | ((arg1 * 0x10) & 0xF0);
+        NodeRefSetByte0(arg0, temp_r5 | ((arg1 * 0x10) & 0xF0));
     }
 }
 

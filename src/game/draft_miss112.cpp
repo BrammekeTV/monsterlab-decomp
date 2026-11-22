@@ -3,6 +3,7 @@
 #include <stdint.h>
 
 #include "types.h"
+#include "game/node_ref.h"
 #include "game/part.h"
 #include "engine/math.h"
 
@@ -162,16 +163,6 @@ static u8* PoolRecord(u16 h) {
     return NULL;
 }
 
-// Handle type: bit 7 set means type 1, otherwise the low nibble.
-static u32 RefType(u8 b) {
-    return (b & 0x80) ? 1 : (b & 0xF);
-}
-
-// Nibble field of a reference byte (0 when bit 7 is set).
-static u8 RefNibble(u8 b) {
-    return (b & 0x80) ? 0 : ((b >> 4) & 0xF);
-}
-
 extern "C" {
 
 // 0x801E93EC
@@ -227,21 +218,30 @@ void fn_801E93EC(u8* list, u8* entry) {
     *(u16*)(list + 4) = (u16)(*(u16*)(list + 4) - 1);
 }
 
+// 0x801ED2FC
+// Kind of a node reference: 1 when bit 7 of the first byte is set, else its low nibble.
+// The reference word is read as a whole so the code does not depend on byte order.
+u32 fn_801ED2FC(u8* a3) {
+    return NodeRefKind(NodeRefWord(a3));
+}
+
 // 0x801ED368
 // Validates a reference record: type 8 is always valid, type 2 needs a valid 3-byte key (falling
 // back to the default key), type 3 needs a valid color record. 0xFFFF in the second field is invalid.
+// The reference word is read as a whole so the code does not depend on byte order.
 s32 fn_801ED368(u8* ref) {
-    if (RefType(*(u8*)ref) == 8) return 1;
-    if (*(u16*)(ref + 2) == 0xFFFF) return 0;
-    if (RefType(*(u8*)ref) == 2) {
+    u32 w = NodeRefWord(ref);
+    if (NodeRefKind(w) == 8) return 1;
+    if (NodeRefHalf2(w) == 0xFFFF) return 0;
+    if (NodeRefKind(w) == 2) {
         u8 key[4];
         key[0] = lbl_805FB710[0];
         key[1] = lbl_805FB710[1];
         *(u16*)(key + 2) = *(u16*)(lbl_805FB710 + 2);
-        if (RefType(*(u8*)ref) == 2) {
-            key[1] = *(u8*)(ref + 1);
-            key[0] = RefNibble(*(u8*)ref);
-            *(u16*)(key + 2) = *(u16*)(ref + 2);
+        if (NodeRefKind(w) == 2) {
+            key[1] = NodeRefByte1(w);
+            key[0] = (u8)NodeRefNibble(w);
+            *(u16*)(key + 2) = NodeRefHalf2(w);
         }
         u8 key2[4];
         if (fn_801C71EC(key) != 0) {
@@ -255,15 +255,15 @@ s32 fn_801ED368(u8* ref) {
         }
         if (fn_801C71EC(key2) == 0) return 0;
     }
-    if (RefType(*(u8*)ref) == 3) {
+    if (NodeRefKind(w) == 3) {
         u8 col[4];
         col[0] = 0xFF;
         col[1] = 0;
         *(s16*)(col + 2) = 0;
-        if (RefType(*(u8*)ref) == 3) {
-            col[0] = (u8) * (u16*)(ref + 2);
-            col[1] = *(u8*)(ref + 1);
-            *(s16*)(col + 2) = (s16)(u8)RefNibble(*(u8*)ref);
+        if (NodeRefKind(w) == 3) {
+            col[0] = (u8)NodeRefHalf2(w);
+            col[1] = NodeRefByte1(w);
+            *(s16*)(col + 2) = (s16)(u8)NodeRefNibble(w);
         }
         if (fn_801C6634(col) == 0) return 0;
     }

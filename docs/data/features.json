@@ -99,6 +99,11 @@
  "changelog": [
   {
    "date": "2026-11-22",
+   "time": "21:30",
+   "text": "More of the front-end level runs on Windows (PRs #63, #64 and #66): the loader converts skeleton animations, zone action tables and locators. Unloading a UI screen set now also unloads its zone. Node references are read as whole words in our code, which fixes their byte order, so the level's lightning script now runs to the end."
+  },
+  {
+   "date": "2026-11-22",
    "time": "21:17",
    "text": "The strap safety screen shows its real colours on Windows (PR #62): our decompiled code wrote the colour table texture in the wrong byte order, and now writes it in the Wii's byte order."
   },

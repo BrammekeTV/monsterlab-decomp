@@ -5,6 +5,7 @@
 #include <stdint.h>
 
 #include "types.h"
+#include "game/node_ref.h"
 
 extern "C" {
 #include "game/script_callbacks.h"
@@ -57,18 +58,6 @@ struct IdRec {
     u8  b;
     u16 c;
 };
-
-// Type of a packed reference: 1 when bit 7 of the first byte is set, else its low nibble.
-static inline s32 RefType(const u8* r) {
-    u8 b = r[0];
-    return (b & 0x80) ? 1 : (b & 0xF);
-}
-
-// Four-bit field at the top of the first byte, 0 when bit 7 is set.
-static inline u32 RefNibble(const u8* r) {
-    u8 b = r[0];
-    return (b & 0x80) ? 0 : ((b >> 4) & 0xF);
-}
 
 extern "C" {
 
@@ -446,11 +435,13 @@ void fn_80146180(void* quat, const Vec3* axis, f32 angle) {
 // 0x801ED788
 // Resolves a packed reference (type in the first byte: 1 = anim/object lookup by hash, 2 / 3 = id record
 // lookups, 4 = world entry by index) to a position and writes x, y, z to out; 0,0,0 when not found.
+// The reference word is read as a whole so the code does not depend on byte order.
 void fn_801ED788(f32* out, u8* ref) {
-    switch (RefType(ref)) {
+    u32 w = NodeRefWord(ref);
+    switch (NodeRefKind(w)) {
     case 1: {
         u32 hash = (u32)lbl_805FB6B8;
-        if (ref[0] & 0x80) hash = *(u32*)ref;
+        if (NodeRefIsId(w)) hash = w;
         u8* node = (u8*)fn_801B7198(&hash, 0);
         if (node != NULL) {
             u8* src = *(u8**)(node + 0x4);
@@ -466,10 +457,10 @@ void fn_801ED788(f32* out, u8* ref) {
         rec.a = lbl_805FB710[0];
         rec.b = lbl_805FB710[1];
         rec.c = *(u16*)(lbl_805FB710 + 2);
-        if (RefType(ref) == 2) {
-            rec.b = ref[1];
-            rec.a = (u8)RefNibble(ref);
-            rec.c = *(u16*)(ref + 2);
+        if (NodeRefKind(w) == 2) {
+            rec.b = NodeRefByte1(w);
+            rec.a = (u8)NodeRefNibble(w);
+            rec.c = NodeRefHalf2(w);
         }
         IdRec use;
         if (fn_801C71EC((u8*)&rec) != 0) {
@@ -493,10 +484,10 @@ void fn_801ED788(f32* out, u8* ref) {
         rec.a = 0xFF;
         rec.b = 0;
         rec.c = 0;
-        if (RefType(ref) == 3) {
-            rec.a = (u8) * (u16*)(ref + 2);
-            rec.b = ref[1];
-            rec.c = (u16)(u8)RefNibble(ref);
+        if (NodeRefKind(w) == 3) {
+            rec.a = (u8)NodeRefHalf2(w);
+            rec.b = NodeRefByte1(w);
+            rec.c = (u16)(u8)NodeRefNibble(w);
         }
         u8* found = fn_801C668C((u8*)&rec);
         if (found != NULL) {
@@ -508,7 +499,7 @@ void fn_801ED788(f32* out, u8* ref) {
         break;
     }
     case 4: {
-        u32 idx = (RefType(ref) == 4) ? (u32) * (u16*)(ref + 2) : 0xFFFFFFFFu;
+        u32 idx = (NodeRefKind(w) == 4) ? (u32)NodeRefHalf2(w) : 0xFFFFFFFFu;
         u8* world = *(u8**)gWorldState;
         u8* entry = NULL;
         if (idx < *(u32*)(world + 0x24)) {

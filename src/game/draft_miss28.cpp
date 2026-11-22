@@ -1,5 +1,6 @@
 // Misc small game functions (script callbacks, FSM bit helpers, loading anim, name entry).
 #include "types.h"
+#include "game/node_ref.h"
 #include "game/part.h"
 
 // Virtual call through a vtable slot: (*(Fn*)(*(u8**)obj + OFF))(obj, ...)
@@ -153,21 +154,20 @@ void fn_801DFFCC(u8* arg0, s32 arg1, s32 arg2) {
 // and copies the found or default record into arg0.
 void fn_801ED554(u8* arg0, u8* arg1) {
     u8 key[4];
-    u32 mode = 1;
-    u8 temp;
+    u32 mode;
+    u32 w;
 
     key[0] = lbl_805FB710[0];
     key[1] = lbl_805FB710[1];
     *(u16*)(key + 0x2) = *(u16*)(lbl_805FB710 + 0x2);
 
-    temp = *(u8*)arg1;
-    if (!(temp & 0x80)) {
-        mode = temp & 0xF;
-    }
+    // The reference word is read as a whole so the code does not depend on byte order.
+    w = NodeRefWord(arg1);
+    mode = NodeRefKind(w);
     if (mode == 2) {
-        key[1] = arg1[1];
-        key[0] = (u8)(((temp >> 4) & 0xF) & ~(-(s32)((temp >> 7) & 1)));
-        *(u16*)(key + 0x2) = *(u16*)(arg1 + 0x2);
+        key[1] = NodeRefByte1(w);
+        key[0] = (u8)NodeRefNibble(w);
+        *(u16*)(key + 0x2) = NodeRefHalf2(w);
     }
     if (fn_801C71EC(key) != 0) {
         *(u16*)(arg0 + 0x2) = *(u16*)(key + 0x2);

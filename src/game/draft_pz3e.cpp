@@ -2,6 +2,7 @@
 // HUD event scan, audio bring-up, heap realloc, disc read state machine.
 #include <math.h>
 #include "types.h"
+#include "game/node_ref.h"
 #include "revolution.h"   // MEMAllocator, OSTime, GXWGFifo
 
 // Script function table entry (0xC bytes, as in small_801F.cpp).
@@ -101,11 +102,6 @@ static const u32 kHashTimeout = 0xBE048B88u;   // "Timeout"
 
 // 4-byte key used by the effect / color tables: two bytes then a halfword.
 struct Key4 { u8 a; u8 b; u16 c; };
-
-// Packed reference byte: bit 7 set means kind 1, else the low nibble is the kind; the high
-// nibble is a sub-index (0 when bit 7 is set).
-static inline s32 RefKind(u8 b) { return (b & 0x80) ? 1 : (b & 0xF); }
-static inline s32 RefSub(u8 b)  { return (b & 0x80) ? 0 : ((b >> 4) & 0xF); }
 
 // Normalize with 1/sqrt (original: frsqrte with two Newton steps); zero stays zero.
 static inline void Normalize3(f32* out, const f32* v) {
@@ -507,11 +503,13 @@ void fn_801EAAEC(u8* e, s32 a1, s32 a2, u8* col, s32 a4, s32 a5, s32 a6, s32 a7,
 // Looks up a float parameter named by a packed reference: kind 1 = animation record (+0x14),
 // 2 = color table record (+0x30), 3 = record by key (+0x10), 4 = world table entry (value 0);
 // 0.0 when not found.
+// The reference word is read as a whole so the code does not depend on byte order.
 f32 fn_801EDD00(u8* ref) {
-    switch (RefKind(ref[0])) {
+    u32 w = NodeRefWord(ref);
+    switch (NodeRefKind(w)) {
     case 1: {
         s32 v = lbl_805FB6B8;
-        if (ref[0] & 0x80) v = *(s32*)ref;
+        if (NodeRefIsId(w)) v = (s32)w;
         s32 tmp = v;
         u8* r = (u8*)fn_801B7198(&tmp, 0);
         if (r != NULL) return *(f32*)(r + 0x14);
@@ -519,10 +517,10 @@ f32 fn_801EDD00(u8* ref) {
     }
     case 2: {
         Key4 k = { lbl_805FB710[0], lbl_805FB710[1], *(u16*)(lbl_805FB710 + 2) };
-        if (RefKind(ref[0]) == 2) {
-            k.b = ref[1];
-            k.a = (u8)RefSub(ref[0]);
-            k.c = *(u16*)(ref + 2);
+        if (NodeRefKind(w) == 2) {
+            k.b = NodeRefByte1(w);
+            k.a = (u8)NodeRefNibble(w);
+            k.c = NodeRefHalf2(w);
         }
         Key4 k2;
         if (fn_801C71EC((u8*)&k) != 0) {
@@ -538,10 +536,10 @@ f32 fn_801EDD00(u8* ref) {
     }
     case 3: {
         Key4 k = { 0xFF, 0, 0 };
-        if (RefKind(ref[0]) == 3) {
-            k.a = (u8)*(u16*)(ref + 2);
-            k.b = ref[1];
-            k.c = (u16)(u8)RefSub(ref[0]);
+        if (NodeRefKind(w) == 3) {
+            k.a = (u8)NodeRefHalf2(w);
+            k.b = NodeRefByte1(w);
+            k.c = (u16)(u8)NodeRefNibble(w);
         }
         u8* r = fn_801C668C((u8*)&k);
         if (r != NULL) return *(f32*)(r + 0x10);

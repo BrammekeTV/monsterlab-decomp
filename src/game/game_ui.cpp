@@ -38,7 +38,7 @@ void  ZoneLoadScreens(void* world, s32 res, void* arg); // 0x801330D4
 void* ResourceFind(void* list, s32 id, int flags);      // 0x801EBE74
 void  ScreenSetsFlush(void* sets);                      // 0x8018DCA4
 void* ScreenSetsFind(void* sets, s32 zone);             // 0x8018D1EC
-s32   ResourceGetCurrentId(void);                       // 0x801D3A60
+s32   fn_801D3A60(s32 zone);                            // 0x801D3A60: a zone's slot index
 void  ZoneUnload(void* world, s32 id, BOOL now);        // 0x80131A18
 void  ZoneSetCurrent(void* world, s32 zone);            // 0x80133840
 s32   ZoneLoadAsync(void* world, s32 zone, int a, void (*done)(void*, void*), s32 arg);   // 0x80132098
@@ -250,7 +250,8 @@ void UIEngine_LoadUIScreenSet(s32 id, u32 name) {
     u8* loaded = (u8*)ScreenSetsFind(gScreenSets, id);
     if (loaded != NULL) {
         if (*(s32*)(loaded + 4) == zone) return;
-        ZoneUnload(gWorldState, ResourceGetCurrentId(), TRUE);
+        // The zone that is loaded in this slot goes (r3 still holds it when fn_801D3A60 is called).
+        ZoneUnload(gWorldState, fn_801D3A60(*(s32*)(loaded + 4)), TRUE);
     }
     SetLoadingIcon(FALSE);
     ZoneSetCurrent(gWorldState, zone);

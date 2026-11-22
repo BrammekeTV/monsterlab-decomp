@@ -4,6 +4,7 @@
 #include <string.h>
 
 #include "types.h"
+#include "game/node_ref.h"
 #include "revolution.h"
 
 typedef void (*VFnI)(void*, s32);
@@ -514,13 +515,12 @@ u8* fn_801ED6E4(u8* arg0) {
     u32 kind = 1;
     u8 index = 0;
     u8 zone = 0;
-    u8 b = *(u8*)arg0;
-    if (!((b >> 4) & 8)) {
-        kind = b & 0xF;
-    }
+    // The reference word is read as a whole so the code does not depend on byte order.
+    u32 w = NodeRefWord(arg0);
+    kind = NodeRefKind(w);
     if (kind == 5) {
-        u16 h = *(u16*)(arg0 + 2);
-        zone = *(u8*)(arg0 + 1);
+        u16 h = NodeRefHalf2(w);
+        zone = NodeRefByte1(w);
         index = (u8)h;
     }
     if (ZoneIsLoaded(gWorldState, (s32)zone) != 0) {
