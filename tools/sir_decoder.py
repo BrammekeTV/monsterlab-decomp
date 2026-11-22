@@ -630,16 +630,16 @@ def level_dump(path):
         o = LEVEL_SLOTS + i * stride
         L.append('levelslot %d floats %s w18 %d floats %s res %s lists %s %s %d %d words %s %s %s %s bytes %d %d %d actions %s pools %s %d zone %s w100 %08x w10c %08x tables %s | %s | %s e120 %s e12c %s' % (
             i, ws(o, 6), i32(o + 0x18), ws(o + 0x1C, 3), ptr(u(o + 0x50)), ptr(u(o + 0x8C)), ptr(u(o + 0x90)), i32(o + 0x94), i32(o + 0x98),
-            ws(o + 0xA0, 1), ws(o + 0xA8, 1), ws(o + 0xBC, 1), ws(o + 0xCC, 2), hdr[o + 0xA4], hdr[o + 0xAC], hdr[o + 0xC0],
+            ws(o + 0xA0, 1), ptr(u(o + 0xA8)), ws(o + 0xBC, 1), ws(o + 0xCC, 2), hdr[o + 0xA4], hdr[o + 0xAC], hdr[o + 0xC0],
             ptr(u(o + 0xD4)), ptr(u(o + 0xE4)), i32(o + 0xE8), ptr(u(o + 0xFC)), u(o + 0x100), u(o + 0x10C), tab(o + 0x114), tab(o + 0x120), tab(o + 0x12C),
-            entries(o + 0x120), entries(o + 0x12C)))
+            entries(o + 0x120), entries(o + 0x12C)) + ' effects %s %d' % (ptr(u(o + 0x80)), u(o + 0x9C)))
     # What the header block names in zone 0: entities (slot +0x50 and the two entity tables), scene
     # objects (block tables +0x1B0, +0x1BC) and pool tables (slot +0xE4, +0xE8).
     inz = lambda v: zbase <= v < zbase + len(zone0)
     zones = [(0, zone0, zbase)] + [(s['type'], s['data'], LEVEL_ZONE1_BASE) for s in secs if s['type'] == 1]
     for zn, zsec, zb in zones:
         if zn: OTHER_ZONE = (zbase, 0, zone0)
-        level_zone_dump(L, zn, zsec, zb, u, base, count, stride, zone0, zbase)
+        level_zone_dump(L, zn, zsec, zb, u, base, count, stride, zone0, zbase, hdr)
     # The shared zones, as the port converts them while this level is loaded (empty_level.sir only).
     shared = os.path.join(os.path.dirname(path), 'shared_ui.sir')
     if os.path.basename(path).lower() == 'empty_level.sir' and os.path.exists(shared):
@@ -843,11 +843,11 @@ def shared_zone_dump(L, zn, sec, slot_size, zone0, zbase0):
 
 LEVEL_ZONE1_BASE = 0x90980000   # gZoneBase[1] = zone 0's address + its memory budget (world_alloc.cpp); not in the file
 
-def level_zone_dump(L, zn, zone0, zbase, u, base, count, stride, zone0_image, zbase0):
+def level_zone_dump(L, zn, zone0, zbase, u, base, count, stride, zone0_image, zbase0, hdr_bytes):
     """What the header block names in one zone (image `zone0` at `zbase`), then the zone's dump."""
     if zn: L.append('zone %d size 0x%x' % (zn, len(zone0)))
     inz = lambda v: zbase <= v < zbase + len(zone0)
-    roots, scene, pooltabs, records, lists = [], [], [], [], []
+    roots, scene, pooltabs, records, lists, slotobjs, sloteffects = [], [], [], [], [], [], []
     def table_entries(o):
         t, n = u(o) - base, u(o + 4)
         return [u(t + i * 4) for i in range(n)]
@@ -857,13 +857,15 @@ def level_zone_dump(L, zn, zone0, zbase, u, base, count, stride, zone0_image, zb
         o = LEVEL_SLOTS + i * stride
         roots += [v for v in [u(o + 0x50)] + table_entries(o + 0x120) + table_entries(o + 0x12C) if inz(v)]
         if inz(u(o + 0xE4)): pooltabs.append((u(o + 0xE4), u(o + 0xE8)))
+        if hdr_bytes[o + 0xAC] and inz(u(o + 0xA8)): slotobjs.append((u(o + 0xA8), hdr_bytes[o + 0xAC]))
+        if u(o + 0x9C) and inz(u(o + 0x80)): sloteffects.append((u(o + 0x80), u(o + 0x9C)))
         rec = u(o + 0xFC)
         if inz(rec): records.append(rec)
         elif zbase0 <= rec < zbase0 + len(zone0_image) - 0x14:      # the record is in zone 0: its list may be in this zone
             head = struct.unpack_from('>I', zone0_image, rec - zbase0 + 0x10)[0]
             if inz(head): lists.append(head)
     hud = u(0x1F4)
-    zone_dump(L, zone0, zbase, hud if inz(hud) else 0, roots, scene, pooltabs, records, lists)
+    zone_dump(L, zone0, zbase, hud if inz(hud) else 0, roots, scene, pooltabs, records, lists, slotobjs, sloteffects)
 
 FIXUP_ENTITY, FIXUP_PART, FIXUP_POOLED, FIXUP_PROJECTILE, FIXUP_RENDER, FIXUP_FSM = 651, 652, 653, 654, 655, 656
 
@@ -929,7 +931,7 @@ def zone_records_dump(L, sec, base, records, lists=()):
             player(u(o + 0x7C))
             node = u(o + 0x10)
 
-def zone_dump(L, sec, base, hud, roots, scene_roots, pooltabs, records=(), lists=()):
+def zone_dump(L, sec, base, hud, roots, scene_roots, pooltabs, records=(), lists=(), slotobjs=(), sloteffects=()):
     """Dump of what the loader converts in a level zone: pool tables and pools, entities (first
     layer), scene objects, then the HUD and every state machine found on the way."""
     u = lambda o: struct.unpack_from('>I', sec, o)[0]
@@ -948,6 +950,26 @@ def zone_dump(L, sec, base, hud, roots, scene_roots, pooltabs, records=(), lists
         if v and inz(v, n) and v not in lst: lst.append(v)
     for v in roots: add(ents, v)
     for v in scene_roots: add(scene, v)
+    # The slots' placed effects (slot +0x80, count +0x9C), as WorldOnZoneLoaded reads them.
+    seen_fx = set()
+    for addr, n in sloteffects:
+        if not inz(addr, n * 4): continue
+        items = [u(off(addr) + i * 4) for i in range(n)]
+        L.append('sloteffects %s %d %s' % (ptr(addr), n, ' '.join(ptr(v) for v in items)))
+        for v in items:
+            if inz(v, 0x20) and v not in seen_fx:
+                seen_fx.add(v)
+                L.append('sloteffect %s hash %08x floats %s instance %s' % (ptr(v), u(off(v)), ws(off(v) + 4, 6), ptr(u(off(v) + 0x1C))))
+    # The slots' objects (slot +0xA8): the list, and of each object the type fn_8012FD0C reads.
+    seen_objs = set()
+    for addr, n in slotobjs:
+        if not inz(addr, n * 4): continue
+        items = [u(off(addr) + i * 4) for i in range(n)]
+        L.append('slotobjects %s %d %s' % (ptr(addr), n, ' '.join(ptr(v) for v in items)))
+        for v in items:
+            if inz(v, 0xC) and v not in seen_objs:
+                seen_objs.add(v)
+                L.append('slotobject %s type %d' % (ptr(v), u(off(v) + 8)))
     for addr, n in pooltabs:
         for i in range(n):
             e = off(addr) + i * 0x2C

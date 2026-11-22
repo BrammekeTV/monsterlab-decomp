@@ -364,6 +364,7 @@ enum RegionKind {
     REGION_ENTITY_PROP, REGION_PROP_DEF, REGION_KEY_PTR,
     REGION_UI_TREE_NODE, REGION_UI_LIST, REGION_UI_WIDGET, REGION_UI_EVENT, REGION_UI_GRID, REGION_UI_FIXED,
     REGION_UI_SET, REGION_UI_SCREEN, REGION_UI_GRAPHIC, REGION_UI_TEXT,
+    REGION_ZONE_EFFECT,
     REGION_UI_ANIM, REGION_UI_ANIM_TRACK, REGION_UI_ANIM_EVENTS, REGION_UI_ANIM_KEYS, REGION_UI_ANIM_ENTRIES,
     REGION_ZONE_SYSTEM, REGION_ANIM_PLAYER, REGION_ANIM_ELEM, REGION_ANIM_TRACK, REGION_ANIM_KEYS, REGION_F32_ARRAY,
     REGION_RUNTIME    // memory the game initialises itself: nothing to convert, but nothing else may be there
@@ -1707,6 +1708,14 @@ static SirError ScreenSetDbPlan(ImagePlan* plan, const u8* image, u32 imageSize,
     return SIR_OK;
 }
 
+// A zone slot's placed effects (slot +0x80, count at +0x9C): pointers to 0x20-byte records
+// {+0x00 the effect's name hash, +0x04 position, +0x10 direction, +0x1C the running instance},
+// which WorldOnZoneLoaded hands to SpawnEffectAt.
+static const SirField kZoneEffectFields[] = {
+    { 0x00, SIR_U32, 1 }, { 0x04, SIR_F32, 6 }, { 0x1C, SIR_PTR, 1 },
+};
+#define ZONE_EFFECT_SIZE 0x20
+
 // ---- screen set of a shared zone (zone slot +0x100)
 //
 // fn_80135BC0 hands the slot's +0x100 to fn_80199024, which walks the binary tree behind the
@@ -2116,6 +2125,7 @@ static void ImagePlanConvert(const ImagePlan* plan, SirReloc* r, u8* image, u32 
         case REGION_UI_SCREEN:    SirConvertRecord(r, p, g->size, kUiScreenFields, COUNTOF(kUiScreenFields)); break;
         case REGION_UI_GRAPHIC:   SirConvertRecord(r, p, g->size, kUiGraphicFields, COUNTOF(kUiGraphicFields)); break;
         case REGION_UI_TEXT:      SirConvertRecord(r, p, g->size, kUiTextFields, COUNTOF(kUiTextFields)); break;
+        case REGION_ZONE_EFFECT:  SirConvertRecord(r, p, g->size, kZoneEffectFields, COUNTOF(kZoneEffectFields)); break;
         case REGION_UI_ANIM:      SirConvertRecord(r, p, g->size, kUiAnimFields, COUNTOF(kUiAnimFields)); break;
         case REGION_UI_ANIM_TRACK: SirConvertRecord(r, p, g->size, kUiAnimTrackFields, COUNTOF(kUiAnimTrackFields)); break;
         case REGION_UI_ANIM_EVENTS: SirConvertRecord(r, p, g->size, kUiAnimEventsFields, COUNTOF(kUiAnimEventsFields)); break;
@@ -2247,10 +2257,12 @@ static const SirField kLevelSlotFields[] = {
     { 0x018, SIR_U32, 1 },    // code: fn_80133D74
     { 0x01C, SIR_F32, 3 },    // code: WorldGetEntityZone (+0x1C), fn_80130FC8 (+0x20, +0x24)
     { 0x050, SIR_PTR, 1 },    // code: resource released by fn_8013006C (fn_8012F8B8)
+    { 0x080, SIR_PTR, 1 },    // code: pointers to the zone's placed effects (WorldOnZoneLoaded), their count at +0x9C
     { 0x08C, SIR_PTR, 2 },    // code: SessionBegin, SessionRestoreZoneObjects (two pointers in every slot of the file)
     { 0x094, SIR_U32, 2 },    // code: CharacterFind, SessionBegin
+    { 0x09C, SIR_U32, 1 },    // code: how many placed effects (WorldOnZoneLoaded)
     { 0x0A0, SIR_U32, 1 },    // word: fn_800098F4 (u8 at +0xA4)
-    { 0x0A8, SIR_U32, 1 },    // word: CIAnimatedPropEnableByProp (u8 at +0xAC)
+    { 0x0A8, SIR_PTR, 1 },    // code: pointers to the zone's objects, their count in the byte at +0xAC (fn_8012FD0C)
     { 0x0BC, SIR_U32, 1 },    // word: fn_801C668C (u8 at +0xC0: fn_8005E1B8)
     { 0x0CC, SIR_U32, 2 },    // word: fn_801C6BCC, fn_801C6C80
     { 0x0D4, SIR_PTR, 1 },    // code: the zone's action table (TriggerDoAction)
@@ -2396,6 +2408,8 @@ extern "C" void LevelZoneRootsFree(LevelZoneRoots* roots) {
     free(roots->entities);
     free(roots->sceneObjects);
     free(roots->poolTables);
+    free(roots->slotObjects);
+    free(roots->slotEffects);
     free(roots->zoneRecords);
     free(roots->zoneLists);
     memset(roots, 0, sizeof(*roots));
@@ -2474,6 +2488,7 @@ extern "C" BOOL LevelZoneRootsCollect(const u8* hdr, u32 hdrSize, const u8* zone
                                       const LevelZoneOther* other, LevelZoneRoots* out) {
     memset(out, 0, sizeof(*out));
     RootList entities = { NULL, 0, 0 }, scene = { NULL, 0, 0 }, pools = { NULL, 0, 0 }, records = { NULL, 0, 0 }, lists = { NULL, 0, 0 };
+    RootList objects = { NULL, 0, 0 }, effects = { NULL, 0, 0 };
     bool ok = hdrSize >= LEVEL_HEADER_SLOTS + 0x118;
     u32 count = ok ? Host32(hdr + 0x1A8) : 0, stride = LEVEL_SLOT_MIN_SIZE, entries, addr;
     const u8* slots = hdr + LEVEL_HEADER_SLOTS;
@@ -2517,7 +2532,15 @@ extern "C" BOOL LevelZoneRootsCollect(const u8* hdr, u32 hdrSize, const u8* zone
         // The slot's pool table {entries, count} at +0xE4: address and count, as a pair.
         if (ok && (addr = ZoneAddr(slot + 0xE4, zoneHost, zoneSize, zoneWiiBase)) != 0)
             ok = RootAdd(&pools, addr) && RootAdd(&pools, Host32(slot + 0xE8));
+        // The slot's list of objects at +0xA8, as many as the byte at +0xAC says.
+        if (ok && slot[0xAC] != 0 && (addr = ZoneAddr(slot + 0xA8, zoneHost, zoneSize, zoneWiiBase)) != 0)
+            ok = RootAdd(&objects, addr) && RootAdd(&objects, slot[0xAC]);
+        // The slot's placed effects at +0x80, as many as the word at +0x9C says.
+        if (ok && Host32(slot + 0x9C) != 0 && (addr = ZoneAddr(slot + 0x80, zoneHost, zoneSize, zoneWiiBase)) != 0)
+            ok = RootAdd(&effects, addr) && RootAdd(&effects, Host32(slot + 0x9C));
     }
+    out->slotObjects = objects.items;       out->slotObjectCount = objects.count / 2;
+    out->slotEffects = effects.items;       out->slotEffectCount = effects.count / 2;
     out->entities = entities.items;         out->entityCount = entities.count;
     out->sceneObjects = scene.items;        out->sceneObjectCount = scene.count;
     out->poolTables = pools.items;          out->poolTableCount = pools.count / 2;
@@ -2530,6 +2553,32 @@ extern "C" BOOL LevelZoneRootsCollect(const u8* hdr, u32 hdrSize, const u8* zone
 // A zone slot's pool table (slot +0xE4, count +0xE8): 0x2C-byte entries {+0x04 pool, +0x0C index
 // of a script function} (kPoolTableEntryFields). fn_801DB1AC runs that function over the pool's
 // items at level start.
+
+// A zone slot's objects (slot +0xA8, count in the byte at +0xAC): pointers to objects whose type
+// word at +0x08 picks the class fn_8012FD0C sets up again when the zone starts (types 0 to 5, 8,
+// 9 and 15 to 18). That is all that is typed of them so far.
+static SirError SlotObjectsPlan(ImagePlan* plan, const u8* image, u32 imageSize, u32 addr, u32 count) {
+    u32 off, o;
+    if (count == 0) return SIR_OK;
+    if (!LevelSpan(addr, (u64)count * 4, imageSize, &off) || !PlanAdd(plan, off, count * 4, REGION_PTR_ARRAY)) return SIR_ERR_LEVEL;
+    for (u32 i = 0; i < count; i++) {
+        if (!LevelSpan(Be32(image + off + i * 4), 0x0C, imageSize, &o) || PlanHas(plan, o + 8, REGION_U32_ARRAY)) continue;
+        if (!PlanAdd(plan, o + 8, 4, REGION_U32_ARRAY)) return SIR_ERR_LEVEL;
+    }
+    return SIR_OK;
+}
+
+static SirError SlotEffectsPlan(ImagePlan* plan, const u8* image, u32 imageSize, u32 addr, u32 count) {
+    u32 off, o;
+    if (count == 0) return SIR_OK;
+    if (count > imageSize / 4 || !LevelSpan(addr, (u64)count * 4, imageSize, &off) ||
+        !PlanAdd(plan, off, count * 4, REGION_PTR_ARRAY)) return SIR_ERR_LEVEL;
+    for (u32 i = 0; i < count; i++) {
+        if (!LevelSpan(Be32(image + off + i * 4), ZONE_EFFECT_SIZE, imageSize, &o) || PlanHas(plan, o, REGION_ZONE_EFFECT)) continue;
+        if (!PlanAdd(plan, o, ZONE_EFFECT_SIZE, REGION_ZONE_EFFECT)) return SIR_ERR_LEVEL;
+    }
+    return SIR_OK;
+}
 
 static SirError PoolTablePlan(ImagePlan* plan, const u8* image, u32 imageSize, u32 addr, u32 count) {
     u32 off;
@@ -2594,6 +2643,10 @@ extern "C" SirError LevelZoneConvert(SirReloc* r, u8* image, u32 imageSize, u32 
     for (u32 i = 0; i < roots->sceneObjectCount && e == SIR_OK; i++) e = SceneObjectPlan(&plan, image, imageSize, roots->sceneObjects[i]);
     for (u32 i = 0; i < roots->poolTableCount && e == SIR_OK; i++)
         e = PoolTablePlan(&plan, image, imageSize, roots->poolTables[i * 2], roots->poolTables[i * 2 + 1]);
+    for (u32 i = 0; i < roots->slotEffectCount && e == SIR_OK; i++)
+        e = SlotEffectsPlan(&plan, image, imageSize, roots->slotEffects[i * 2], roots->slotEffects[i * 2 + 1]);
+    for (u32 i = 0; i < roots->slotObjectCount && e == SIR_OK; i++)
+        e = SlotObjectsPlan(&plan, image, imageSize, roots->slotObjects[i * 2], roots->slotObjects[i * 2 + 1]);
     for (u32 i = 0; i < roots->zoneRecordCount && e == SIR_OK; i++) e = ZoneRecordPlan(&plan, image, imageSize, roots->zoneRecords[i]);
     for (u32 i = 0; i < roots->zoneListCount && e == SIR_OK; i++) e = ZoneListPlan(&plan, image, imageSize, roots->zoneLists[i]);
     // A shared zone: the slot copy at the start (converted below, by the slot's own field table) and its screen set.

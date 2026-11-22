@@ -738,6 +738,42 @@ struct ZoneDump {
         }
     }
 
+    // The slots' placed effects (slot +0x80, count +0x9C), then the slots' objects (slot +0xA8):
+    // the list, and of each object the type fn_8012FD0C reads.
+    void SlotObjects(const LevelZoneRoots* roots, u32 zoneBase) {
+        std::vector<const u8*> seen;
+        for (u32 t = 0; t < roots->slotEffectCount; t++) {
+            const u8* list = z->image + (roots->slotEffects[t * 2] - zoneBase);
+            u32 n = roots->slotEffects[t * 2 + 1];
+            if (!In(list, n * 4)) continue;
+            printf("sloteffects "); Val(list); printf(" %u", n);
+            for (u32 i = 0; i < n; i++) { printf(" "); Ptr(list + i * 4); }
+            printf("\n");
+            for (u32 i = 0; i < n; i++) {
+                const u8* o = *(const u8**)(list + i * 4);
+                if (!In(o, 0x20) || std::find(seen.begin(), seen.end(), o) != seen.end()) continue;
+                seen.push_back(o);
+                printf("sloteffect "); Val(o); printf(" hash %08x floats", *(const u32*)o);
+                for (u32 k = 0; k < 6; k++) printf(" %08x", *(const u32*)(o + 4 + k * 4));
+                printf(" instance "); Ptr(o + 0x1C); printf("\n");
+            }
+        }
+        for (u32 t = 0; t < roots->slotObjectCount; t++) {
+            const u8* list = z->image + (roots->slotObjects[t * 2] - zoneBase);
+            u32 n = roots->slotObjects[t * 2 + 1];
+            if (!In(list, n * 4)) continue;
+            printf("slotobjects "); Val(list); printf(" %u", n);
+            for (u32 i = 0; i < n; i++) { printf(" "); Ptr(list + i * 4); }
+            printf("\n");
+            for (u32 i = 0; i < n; i++) {
+                const u8* o = *(const u8**)(list + i * 4);
+                if (!In(o, 0xC) || std::find(seen.begin(), seen.end(), o) != seen.end()) continue;
+                seen.push_back(o);
+                printf("slotobject "); Val(o); printf(" type %u\n", *(const u32*)(o + 8));
+            }
+        }
+    }
+
     void PoolTables(const LevelZoneRoots* roots, u32 zoneBase) {
         for (u32 t = 0; t < roots->poolTableCount; t++) {
             const u8* table = z->image + (roots->poolTables[t * 2] - zoneBase);
@@ -1264,8 +1300,9 @@ static int DumpLevel(const char* path) {
         PrintLevelPtr(s + 0x50, &f); printf(" lists ");
         PrintLevelPtr(s + 0x8C, &f); printf(" ");
         PrintLevelPtr(s + 0x90, &f);
-        printf(" %d %d words %08x %08x %08x %08x %08x bytes %u %u %u actions ", *(const s32*)(s + 0x94), *(const s32*)(s + 0x98),
-               *(const u32*)(s + 0xA0), *(const u32*)(s + 0xA8), *(const u32*)(s + 0xBC), *(const u32*)(s + 0xCC), *(const u32*)(s + 0xD0),
+        printf(" %d %d words %08x ", *(const s32*)(s + 0x94), *(const s32*)(s + 0x98), *(const u32*)(s + 0xA0));
+        PrintLevelPtr(s + 0xA8, &f);
+        printf(" %08x %08x %08x bytes %u %u %u actions ", *(const u32*)(s + 0xBC), *(const u32*)(s + 0xCC), *(const u32*)(s + 0xD0),
                s[0xA4], s[0xAC], s[0xC0]);
         PrintLevelPtr(s + 0xD4, &f); printf(" pools ");
         PrintLevelPtr(s + 0xE4, &f); printf(" %d zone ", *(const s32*)(s + 0xE8));
@@ -1276,6 +1313,7 @@ static int DumpLevel(const char* path) {
         PrintLevelTable(s + 0x12C, &f); printf(" e120 ");
         PrintLevelEntries(s + 0x120, &f); printf(" e12c ");
         PrintLevelEntries(s + 0x12C, &f);
+        printf(" effects "); PrintLevelPtr(s + 0x80, &f); printf(" %u", *(const u32*)(s + 0x9C));
         printf("\n");
     }
     GlobalBinaryFile z = { NULL, f.zone, f.zoneSize };
@@ -1283,6 +1321,7 @@ static int DumpLevel(const char* path) {
     zd.z = &z;
     for (u32 i = 0; i < roots.entityCount; i++) zd.Add(zd.ents, f.zone + (roots.entities[i] - zoneBase));
     for (u32 i = 0; i < roots.sceneObjectCount; i++) zd.Add(zd.scene, f.zone + (roots.sceneObjects[i] - zoneBase));
+    zd.SlotObjects(&roots, zoneBase);
     zd.PoolTables(&roots, zoneBase);
     zd.Entities();
     zd.Records(&roots, zoneBase);
@@ -1303,6 +1342,7 @@ static int DumpLevel(const char* path) {
         zd1.z = &z1;
         for (u32 i = 0; i < roots1.entityCount; i++) zd1.Add(zd1.ents, f.zone1 + (roots1.entities[i] - LEVEL_ZONE1_WII_BASE));
         for (u32 i = 0; i < roots1.sceneObjectCount; i++) zd1.Add(zd1.scene, f.zone1 + (roots1.sceneObjects[i] - LEVEL_ZONE1_WII_BASE));
+        zd1.SlotObjects(&roots1, LEVEL_ZONE1_WII_BASE);
         zd1.PoolTables(&roots1, LEVEL_ZONE1_WII_BASE);
         zd1.Entities();
         zd1.Records(&roots1, LEVEL_ZONE1_WII_BASE);
@@ -1935,7 +1975,11 @@ static SirError ConvertBuilt(u8* hdr, u8* img, SirReloc* r, s32* failTable) {
 #define L_MATRIX   (L_ITEM + 0xD0)            // its matrix, twelve floats
 #define L_MESH     0xCC0u                     // the entry's mesh: one part at +0x70; the matrix's second half ends here
 #define L_BATCH    0xD40u                     // the part's batch: flags at +0x0C
-#define L_ZONE_SIZE 0xD60u
+#define L_OBJLIST  0xD60u                     // slot 0's objects: one pointer
+#define L_OBJ      0xD70u                     // the object: type word at +0x08
+#define L_FXLIST   0xD80u                     // slot 0's placed effects: one pointer
+#define L_FX       0xD90u                     // the effect, 0x20
+#define L_ZONE_SIZE 0xDB0u
 #define L_ZONE1    0x90980000u                // Wii address of zone 1: an entity at 0x10, a list object at 0x200
 #define L_ENT1     0x10u                      // the entity slot 1's second table names
 #define L_ZONE1_SIZE 0x300u
@@ -1974,6 +2018,14 @@ static void BuildLevel(u8* hdr, u8* zone) {
     Put32(s0 + 0x12C, L_BASE + L_T12C); Put32(s0 + 0x130, 2);
     Put32(hdr + L_T12C, L_ZONE + L_ENT);
     Put32(s0 + 0x0E4, L_ZONE + L_POOLTAB); Put32(s0 + 0x0E8, 1);
+    Put32(s0 + 0x0A8, L_ZONE + L_OBJLIST); s0[0xAC] = 1;
+    Put32(zone + L_OBJLIST, L_ZONE + L_OBJ);
+    Put32(zone + L_OBJ + 0x00, 0x804B25D0); Put32(zone + L_OBJ + 0x04, 0xCC05AC21); Put32(zone + L_OBJ + 0x08, 15);
+    Put32(s0 + 0x080, L_ZONE + L_FXLIST); Put32(s0 + 0x09C, 1);
+    Put32(zone + L_FXLIST, L_ZONE + L_FX);
+    Put32(zone + L_FX + 0x00, 0xCA1557FC); Put32(zone + L_FX + 0x04, 0x40000000); Put32(zone + L_FX + 0x08, 0);
+    Put32(zone + L_FX + 0x0C, 0); Put32(zone + L_FX + 0x10, 0); Put32(zone + L_FX + 0x14, 0); Put32(zone + L_FX + 0x18, 0x3F800000);
+    Put32(zone + L_FX + 0x1C, 0);
     u8* s1 = hdr + L_SLOT1;                                    // slot 1: one entry each, in the slot's last words
     Put32(s1 + 0x120, L_BASE + L_SLOT1 + 0x194); Put32(s1 + 0x124, 1);
     Put32(s1 + 0x12C, L_BASE + L_SLOT1 + 0x198); Put32(s1 + 0x130, 1);
@@ -2129,6 +2181,8 @@ static void LevelSelfTest(void) {
     CHECK(roots.zoneRecordCount == 2 && roots.zoneRecords[0] == L_ZONE && roots.zoneRecords[1] == L_ZONE + 0x40);
     CHECK(roots.entityCount == 1 && roots.entities[0] == L_ZONE + L_ENT && roots.sceneObjectCount == 1);
     CHECK(roots.poolTableCount == 1 && roots.poolTables[0] == L_ZONE + L_POOLTAB && roots.poolTables[1] == 1);
+    CHECK(roots.slotObjectCount == 1 && roots.slotObjects[0] == L_ZONE + L_OBJLIST && roots.slotObjects[1] == 1);
+    CHECK(roots.slotEffectCount == 1 && roots.slotEffects[0] == L_ZONE + L_FXLIST && roots.slotEffects[1] == 1);
     LevelZoneDone done0;
     memset(&done0, 0, sizeof(done0));
     CHECK(LevelZoneConvert(&r, zone, L_ZONE_SIZE, L_ZONE, &roots, &done0, NULL) == SIR_OK);
@@ -2414,6 +2468,13 @@ static void LevelSelfTest(void) {
     CHECK(holder == zone + L_HOLDER && *(const u8**)holder == list && *(const u8**)(holder + 4) == NULL);
     const u8* child = *(const u8**)(ent + 0xB0);
     CHECK(child == zone + L_CHILD && *(const u8**)(child + 4) == NULL && child[0] == 0x7F);
+    // The slot's objects as fn_8012FD0C walks them (the type picks the class; the hash at +4 has no
+    // reader yet and stays), and its placed effects as WorldOnZoneLoaded reads them.
+    const u8* obj = **(const u8***)(s0 + 0xA8);
+    CHECK(obj == zone + L_OBJ && *(const u32*)(obj + 8) == 15 && obj[4] == 0xCC && obj[7] == 0x21);
+    const u8* fx = **(const u8***)(s0 + 0x80);
+    CHECK(*(const u32*)(s0 + 0x9C) == 1 && fx == zone + L_FX && *(const u32*)fx == 0xCA1557FC && *(const f32*)(fx + 4) == 2.0f);
+    CHECK(*(const f32*)(fx + 0x18) == 1.0f && *(const u8**)(fx + 0x1C) == NULL);
     // The slot's pool table, as fn_801DB1AC reads it, and the pool as fn_801EBBE0 walks it.
     const u8* pt = *(const u8**)(s0 + 0xE4);
     const u8* pool = *(const u8**)(pt + 4);

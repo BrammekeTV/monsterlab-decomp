@@ -598,7 +598,9 @@ loader takes the size from the block: each slot's first table points at `slot + 
 | `0x18` | word | `fn_80133D74` |
 | `0x50` | resource | `fn_8013006C` |
 | `0x8C`, `0x90` | two pointers; `0x94`, `0x98`: how many entries of the two entity tables are in use | `SessionBegin`, `CharacterFind`, `fn_8012FD0C` |
-| `0xA0`, `0xA8`, `0xBC`, `0xCC`, `0xD0`, `0x100`, `0x10C` | words read with `lwz`; pointer or number not known yet (bytes at `0xA4`, `0xAC`, `0xC0`) | `fn_800098F4`, `CIAnimatedPropEnableByProp`, `fn_801C668C`, `fn_801C6BCC`, `OnZoneScreensLoaded`, `fn_8004DAF8` |
+| `0x80`, `0x9C` | the zone's placed effects: pointers to 0x20-byte records {name hash, position, direction, running instance} and their count | `WorldOnZoneLoaded` |
+| `0xA8`, byte `0xAC` | the zone's objects: pointers and their count; of an object the type word at `+0x08` is converted, the rest is not typed yet | `fn_8012FD0C` |
+| `0xA0`, `0xBC`, `0xCC`, `0xD0`, `0x100`, `0x10C` | words read with `lwz`; pointer or number not known yet (bytes at `0xA4`, `0xC0`) | `fn_800098F4`, `fn_801C668C`, `fn_801C6BCC`, `OnZoneScreensLoaded`, `fn_8004DAF8` |
 | `0xD4` | the zone's action table (`TriggerDoAction`, zone id other than 0x1FF) | `TriggerDoAction` |
 | `0xE4`, `0xE8` | pool table: 0x2C-byte entries and their count | `fn_8012FD0C` -> `fn_801DB1AC` |
 | `0xFC` | the zone's record at the start of its image | `WorldTick` |
