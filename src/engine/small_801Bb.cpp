@@ -244,7 +244,7 @@ void fn_801B5248(u8* p, u8* arg) {
 
 // 0x801B52AC
 // Returns the index of the highest set bit of (flags at +0x1C of the object at +4) & 0x1D0, or 0 if none.
-s32 fn_801B52AC(u8* p) {
+extern "C" s32 fn_801B52AC(u8* p) {
     u8* x = *(u8**)(p + 0x4);
     s32 v = *(s32*)(x + 0x1c) & 0x1d0;
     if (v == 0) return 0;

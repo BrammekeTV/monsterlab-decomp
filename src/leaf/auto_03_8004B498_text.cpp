@@ -6,6 +6,7 @@
 #include "types.h"
 
 extern "C" void fn_8004B87C(u8*, s32, s32);
+extern "C" void fn_8005DC04(u8*, f32);
 
 // 0x8004B558
 extern "C" void fn_8004B558(u8* a3, s32 a4, s32 a5) {
@@ -14,6 +15,11 @@ extern "C" void fn_8004B558(u8* a3, s32 a4, s32 a5) {
     u32 t2 = (u32)(t1) | 0x40000000u;
     *(u32*)(t0 + 32) = (u32)((u32)(t2));
     fn_8004B87C(((u8*)(uintptr_t)(a3)), (s32)((u32)(uintptr_t)(a4)), (s32)((u32)(uintptr_t)(a5)));
+}
+
+// 0x8004B56C
+extern "C" void fn_8004B56C(u8* a3, f32 f1) {
+    fn_8005DC04(((u8*)(uintptr_t)(a3)), (f32)(f1));
 }
 
 // 0x8004B570

@@ -99,6 +99,11 @@
  "changelog": [
   {
    "date": "2026-11-22",
+   "time": "12:01",
+   "text": "Round 83: 30 medium functions (fn_80024958, fn_800412DC, fn_8005DC04, fn_8008C41C, fn_8009DA98, fn_800C0C30, fn_801A6D7C, fn_801F43B0 and more), Sonnet helpers"
+  },
+  {
+   "date": "2026-11-22",
    "time": "11:48",
    "text": "Round 82: 30 medium functions (fn_800240E8, fn_80024528, fn_80039774, fn_8004AD24, fn_80073B68, fn_800A076C, fn_801A0200 and more), Sonnet helpers"
   },

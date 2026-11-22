@@ -12,7 +12,7 @@ void   fn_80021F2C(u8* p, f32 v);                                     // 0x80021
 void   fn_8002DC04(u8* p);                                     // 0x8002DC04 (r3, f1 forwarded unchanged)
 void   fn_8002C080(u8* p, u8* a, u8* b);                              // 0x8002C080
 u8*    fn_8002C614(u8* p);                                            // 0x8002C614
-void   fn_8008C41C(u8* p, s32 r4Leftover, s32 a, s32 b, f32 fa, f32 fb); // 0x8008C41C
+void   fn_8008C41C(u8* p, f32 fa, f32 fb); // 0x8008C41C
 void   fn_800A7D88(void* obj, u32 hash);                              // 0x800A7D88
 void*  fn_800C0BA4(void* p, s32 del);                                 // 0x800C0BA4 (element dtor, returns this)
 void   fn_800C5F50(u8* p);                                            // 0x800C5F50
@@ -45,7 +45,7 @@ s32 fn_8008C148(u8* arg0, f32 farg0, f32 farg1) {
     *(s32*)(arg0 + 0x364) = x;
     *(s32*)(arg0 + 0x368) = y;
     // r4 carries the 0x43300000 float-convert high word left over from the conversion.
-    fn_8008C41C(arg0, 0x43300000, y, x, (f32)x, (f32)y);
+    fn_8008C41C(arg0, (f32)x, (f32)y);
     return 1;
 }
 

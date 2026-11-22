@@ -9,9 +9,9 @@ extern u8 lbl_80358630[];
 extern u8 lbl_8035863C[];
 extern u8 lbl_80358648[];
 extern u8 lbl_80358654[];
-extern u8 lbl_805FB05C[];
-extern u8 lbl_805FB060[];
-extern u8 lbl_805FB064[];
+extern f32 lbl_805FB05C;
+extern f32 lbl_805FB060;
+extern f32 lbl_805FB064;
 extern f32 lbl_805FD118;
 extern "C" char* strcpy(char*, char*);
 

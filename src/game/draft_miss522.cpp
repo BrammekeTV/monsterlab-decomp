@@ -6,7 +6,7 @@ extern "C" {
 u8*  fn_80062CE0(u8* p, s32 del);                  // 0x80062CE0 (base dtor)
 u8*  fn_800DE5E4(u8* p, s32 del);                  // 0x800DE5E4 (base dtor)
 void fn_80128C20(void* world);                     // 0x80128C20
-void fn_8003E560(s32 idx);                         // 0x8003E560
+s32  fn_8003E560(s32 idx);                         // 0x8003E560
 void fn_80040E4C(u8* p, f32 dt);                   // 0x80040E4C
 void BattleUpdate(u8* b, f32 dt);     // 0x80210060 (battle_object.cpp, C++ linkage)
 void operator_delete(void* p);                     // 0x801D426C
