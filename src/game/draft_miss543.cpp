@@ -2,7 +2,7 @@
 
 extern "C" {
 void fn_80086F84(u8* self);                    // 0x80086F84
-void fn_80087720(u8* p, void* arg1);           // 0x80087720
+void fn_80087720(u8* p);           // 0x80087720
 void fn_800704AC(u8* arg0, f32 dt);            // 0x800704AC
 extern "C++" void fn_800C537C(u8* p);          // 0x800C537C (small_800C.cpp defines it outside extern "C")
 void fn_800C5F44(u8* p);                       // 0x800C5F44
@@ -18,7 +18,7 @@ extern "C" {
 // 0x80087F34
 // Calls fn_80087720 with both arguments, then fn_80086F84 on the first.
 void fn_80087F34(u8* arg0, u8* arg1) {
-    fn_80087720(arg0, arg1);
+    fn_80087720(arg0);
     fn_80086F84(arg0);
 }
 

@@ -16,7 +16,7 @@ void  WPADControlMotor(s32 chan, u32 command);                                 /
 void  __destroy_arr(void* arr, void (*dtor)(void*, s32), u32 size, u32 count); // 0x8032F2E0
 void  operator_delete(void* p);                                                // 0x801D426C
 void* fn_8010B184(void* p, s32 del);                                          // 0x8010B184
-s32   fn_8005382C(void);
+void  fn_8005382C(u8* p, s32 mode);
 void  fn_8006FAF4(u8* p, s32 a);
 u8*   fn_80076FCC(s32 a, s32 b);
 void  fn_800C6EFC(u8* p);
@@ -118,7 +118,8 @@ void fn_8002F720(u8* p, f32 dt) {
 // When arg1 is set, clears the two slots at +0xC2C/+0xC34 (releasing the handle at +0xC34
 // through fn_801C3E88) and clears the global current pointer if it is p. Returns the last result.
 s32 fn_8005DB68(u8* p, s32 arg1) {
-    s32 r = fn_8005382C();
+    fn_8005382C(p, arg1);
+    s32 r = 0; // fn_8005382C returns nothing; leftover r3 is not modelled
     if (arg1 != 0) {
         if (*(u8**)lbl_805FB118 == p) {
             *(u8**)lbl_805FB118 = NULL;

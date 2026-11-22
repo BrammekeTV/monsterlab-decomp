@@ -26,7 +26,7 @@ BOOL  ZoneIsLoaded(void* world, s32 zone);                                      
 void  StickRead(s32 channel, f32* x, f32* y);                                   // 0x80147704
 void  fn_80121C90(s32 action, void* obj, void* other, const f32* pos);          // 0x80121C90
 s32   TriggerDoAction(void* action, void* a1, void* a2);                       // 0x801E0054
-s32   fn_800C0660(u8* p, f32* pos);                                             // 0x800C0660
+void  fn_800C0660(u8* p, f32* pos);                                             // 0x800C0660
 void  EventSendTo(void* mgr, u32 event, void* from, u32 arg, int a, int b);    // 0x801BA2FC
 void  MemFreeSmall(void* p);                                                   // 0x801D4340
 u8*   fn_80041880(u8* p, s32 del);                                              // 0x80041880

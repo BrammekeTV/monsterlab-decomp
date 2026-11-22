@@ -14,15 +14,15 @@ f32 sinf(f32 x);
 f32 sqrtf(f32 x);
 
 s32 fn_800BB7D0(u8* p, u8* item);                            // 0x800BB7D0
-s32 fn_800BD064(u8* e, f32 dt);                              // 0x800BD064
+void fn_800BD064(u8* e, f32 dt);                              // 0x800BD064
 void fn_800BDC14(u8* e, f32 dt);                              // 0x800BDC14
-s32 fn_800BDC68(u8* item, f32 dt);                           // 0x800BDC68
+void fn_800BDC68(u8* item, f32 dt);                           // 0x800BDC68
 s32 fn_800BE9E0(u8* item, u8* ctx, u8* flag, f32 dt);        // 0x800BE9E0
 s32 fn_800BF044(u8* item, const f32* vec);                   // 0x800BF044
 void fn_800BF158(u8* item);                                  // 0x800BF158
 s32 fn_800BFF64(u8* p);                                      // 0x800BFF64
 u8* fn_800C253C(u8** obj, s32 kind);                         // 0x800C253C
-u64 fn_800C6F18(u8* item);                                   // 0x800C6F18
+void fn_800C6F18(u8* item);                                   // 0x800C6F18
 void fn_800C72C4(u8* item, u8* other);                       // 0x800C72C4
 void fn_800C8984(u8* p);                                     // 0x800C8984
 void fn_800C89F0(u8* p);                                     // 0x800C89F0
@@ -173,9 +173,9 @@ void fn_800C7FB0(u8* p) {
         s32 type = *(s32*)(rec + 0x24);
         if ((u32)(type - 2) <= 3U) {
             s32 flagged = (type == 2 || type == 3 || type == 5) ? 1 : 0;
-            u64 r = fn_800C6F18(item);
+            fn_800C6F18(item); // returns nothing; r4 is leftover below
             if (*(s32*)(rec + 0x24) == 5) {
-                fn_800C72C4(item, LowWord(r));
+                fn_800C72C4(item, 0 /* leftover r4 */);
                 if (flagged) {
                     fn_800C89F0(p);
                 }
@@ -187,9 +187,9 @@ void fn_800C7FB0(u8* p) {
         u8* item = p + 0x7E4 + 0x14 * i;
         s32 type = *(s32*)(rec + 0x7F4);
         if ((u32)(type - 2) <= 3U) {
-            u64 r = fn_800C6F18(item);
+            fn_800C6F18(item); // returns nothing; r4 is leftover below
             if (*(s32*)(rec + 0x7F4) == 5) {
-                fn_800C72C4(item, LowWord(r));
+                fn_800C72C4(item, 0 /* leftover r4 */);
                 fn_800C8984(p);
             }
         }
@@ -199,9 +199,9 @@ void fn_800C7FB0(u8* p) {
         u8* item = p + 0xFB4 + 0x14 * i;
         s32 type = *(s32*)(rec + 0xFC4);
         if ((u32)(type - 2) <= 3U) {
-            u64 r = fn_800C6F18(item);
+            fn_800C6F18(item); // returns nothing; r4 is leftover below
             if (*(s32*)(rec + 0xFC4) == 5) {
-                fn_800C72C4(item, LowWord(r));
+                fn_800C72C4(item, 0 /* leftover r4 */);
             }
         }
     }

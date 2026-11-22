@@ -49,7 +49,7 @@ void  fn_800716D0(u8* p, u32 a);                                  // 0x800716D0
 void  fn_800712BC(u8* p, s32 a, s32 b);                           // 0x800712BC
 void  fn_80070FAC(u8* p, f32 v);                                  // 0x80070FAC
 void  fn_800BB658(u8* p, f32 dt);                                 // 0x800BB658
-void  fn_800BC050(u8* p);                                         // 0x800BC050
+s32   fn_800BC050(u8* p);                                         // 0x800BC050
 void  fn_800BC388(u8* p);                                         // 0x800BC388
 s32   fn_800BC704(u8* p, f32* out);                               // 0x800BC704
 void  fn_800BD3D4(u8* self, u8* other);                           // 0x800BD3D4
@@ -57,7 +57,7 @@ void  fn_800BD984(u8* obj, f32* pos, f32 v);                      // 0x800BD984
 void  fn_800BE148(f32* out, u8* a);                               // 0x800BE148
 void  fn_800BE5EC(u8* obj, f32* a, f32* b);                       // 0x800BE5EC
 void  fn_800BF878(u8* p, f32 a);                                  // 0x800BF878
-s32   fn_800C0660(u8* p, f32* pos);                               // 0x800C0660
+void  fn_800C0660(u8* p, f32* pos);                               // 0x800C0660
 void  fn_801455E0(f32* out, u8* quat);                         // 0x801455E0
 void  fn_801458B0(f32* quat, f32* a, f32* b);                     // 0x801458B0
 void  fn_80145F9C(f32* out, f32* a, f32* b, f32 t);               // 0x80145F9C

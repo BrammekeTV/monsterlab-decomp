@@ -60,7 +60,7 @@ u8*   fn_8006FBDC(void);                                               // 0x8006
 void  fn_800A17A0(u8* p);                                              // 0x800A17A0
 void  fn_800A7D88(u8* obj, u32 hash);                                  // 0x800A7D88
 void  fn_800B1D98(u8* p);                                              // 0x800B1D98
-u8*   fn_800B1AD0(u8* p, s32 a4, s32 a5);                              // 0x800B1AD0
+s32   fn_800B1AD0(u8* p, u8* a4, f32* a5);                              // 0x800B1AD0
 void  fn_800B3180(u8* p);                                              // 0x800B3180
 u8*   fn_800B59A8(u8* p, s32 del);                                     // 0x800B59A8
 u8*   fn_800216B8(u8* p, s32 del);                                     // 0x800216B8
@@ -404,7 +404,7 @@ s32 fn_800B1A20(u8* arg0) {
     f32 v;
 
     // r4 is never set before the call in the asm (stale), so it is passed as 0.
-    t = fn_800B1AD0(arg0, 0, 0);
+    t = (u8*)(intptr_t)fn_800B1AD0(arg0, NULL, NULL); // lint:ok (returns 0/1; RaySceneTest ignores its argument)
     if (t != NULL) {
         v = *(f32*)(arg0 + 0x268) + (lbl_80346BD0[RaySceneTest(t)] / lbl_805FE0B8);
         if (v < lbl_805FE0B0) {

@@ -33,7 +33,7 @@ u8* fn_801F5D8C(u8* p, s32 del);                                            // 0
 u8* fn_801F5DE4(u8* p, s32 del);                                            // 0x801F5DE4
 u8* fn_801F6238(u8* p, s32 del);                                            // 0x801F6238
 u8* fn_801F9598(u8* p, s32 del);                                            // 0x801F9598
-void fn_80087720(u8* p, void* arg1);                                        // 0x80087720
+void fn_80087720(u8* p);                                        // 0x80087720
 void fn_8020E950(u8* p);                                                    // 0x8020E950
 void fn_8023A5B0(u8* p);                                                    // 0x8023A5B0
 void fn_8023A68C(u8* p);                                                    // 0x8023A68C
@@ -214,7 +214,7 @@ void fn_80208C1C(u8* p) {
 u8* fn_80086F00(u8* p, s32 del) {
     if (p != NULL) {
         *(void**)(p + 0x4) = lbl_8035B830;
-        fn_80087720(p, lbl_8035B830);
+        fn_80087720(p);
         fn_801F9598(p + 0x730, -1);
         fn_801F6238(p + 0x3C0, -1);
         fn_8006FAF4(p, 0);

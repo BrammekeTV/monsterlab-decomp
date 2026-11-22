@@ -124,7 +124,7 @@ extern "C" void fn_801B3378(u8* p, u8* key) {
 
 // 0x801B38BC
 // Walks the linked list hanging off the object at +0x60 and calls fn_801EBA20 on that object for each node.
-void fn_801B38BC(u8* p) {
+extern "C" void fn_801B38BC(u8* p) {
     u8* obj = *(u8**)(p + 0x60);
     u8* list = *(u8**)(obj + 0x14);
     u8* cur = list ? list + 8 : NULL;

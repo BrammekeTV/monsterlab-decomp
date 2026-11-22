@@ -65,7 +65,7 @@ s32    fn_8012E420(u8* world, u8* obj, s32 a, s32 b);                // 0x8012E4
 void   fn_801458B0(f32* quat, f32* a, f32* b);                       // 0x801458B0
 void   fn_801B4EA4(u8* obj, u8* flag);                               // 0x801B4EA4
 s32    fn_801C3E88(u8* tbl, u8* handle);                             // 0x801C3E88
-s32    fn_801C3E94(u8* tbl);                                          // 0x801C3E94
+void   fn_801C3E94(u8* mgr, u8* obj);                                          // 0x801C3E94
 void   fn_801C849C(u8* mgr, u8* item);                               // 0x801C849C
 void   fn_801DA344(u8* obj, u8* prop);                               // 0x801DA344
 void   fn_8020A398(s32 handle);                                      // 0x8020A398
@@ -410,7 +410,7 @@ s32 fn_80063D6C(u8* arg0, u8* arg1, u8* arg2, u8* arg3, s32 arg4, s32 arg5, s32 
     }
     u8* h234 = *(u8**)(arg0 + 0x234);
     if (h234 != NULL) {
-        fn_801C3E94(lbl_8047C7AC);
+        fn_801C3E94(lbl_8047C7AC, h234);
         *(u8**)(arg0 + 0x234) = NULL;
     }
     u8* h238 = *(u8**)(arg0 + 0x238);

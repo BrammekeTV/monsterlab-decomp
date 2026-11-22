@@ -21,7 +21,7 @@ void CharacterResetGroundState(u8* c, s32 a, s32 b);                         // 
 void EventSendTo(void* mgr, u32 event, void* from, u32 arg, int a, int b);   // 0x801BA2FC
 s32 TriggerDoAction(void* action, void* a1, void* a2);                      // 0x801E0054
 s32  fn_8001AFB4(u8* p, s32 a);                                              // 0x8001AFB4
-s32 fn_801C3E94(u8* p);                                                      // 0x801C3E94
+void fn_801C3E94(u8* mgr, u8* obj);                                                      // 0x801C3E94
 void fn_8020A398(s32 handle);                                                // 0x8020A398
 void fn_801B4520(u8* p);                                                     // 0x801B4520
 void fn_801B4C6C(u8* obj, f32 dt);                                             // 0x801B4C6C
@@ -54,7 +54,7 @@ void fn_80053558(u8* arg0) {
     s32 i = 0;
     while (i < *(s32*)(list + 0x114)) {
         if (*(s32*)(p + 0x81C) != 0) {
-            fn_801C3E94(lbl_8047C7AC);
+            fn_801C3E94(lbl_8047C7AC, *(u8**)(p + 0x81C));
             *(s32*)(p + 0x81C) = 0;
         }
         p += 4;

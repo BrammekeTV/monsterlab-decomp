@@ -99,6 +99,11 @@
  "changelog": [
   {
    "date": "2026-11-22",
+   "time": "11:29",
+   "text": "Round 80: 24 medium functions (fn_80037058, fn_8003FC6C, fn_80059EB0, fn_80087720, fn_800B1AD0, fn_800BC050, fn_800C6F18 and more), first Sonnet round since 76; conflicting declarations fixed in 12 files"
+  },
+  {
+   "date": "2026-11-22",
    "time": "11:17",
    "text": "Round 79: 29 more functions (fn_800854D4-fn_800C509C, fn_800CDCC4, fn_80120E00, fn_80198014, fn_801A8E80 and more), Haiku-only"
   },
