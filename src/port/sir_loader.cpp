@@ -363,7 +363,8 @@ enum RegionKind {
     REGION_ENTITY, REGION_ENTITY_RECORD, REGION_ENTITY_PART, REGION_PTR_COUNT, REGION_COUNT_PTR, REGION_POOL_TABLE,
     REGION_ENTITY_PROP, REGION_PROP_DEF, REGION_KEY_PTR,
     REGION_UI_TREE_NODE, REGION_UI_LIST, REGION_UI_WIDGET, REGION_UI_EVENT, REGION_UI_GRID, REGION_UI_FIXED,
-    REGION_UI_SET, REGION_UI_SCREEN, REGION_UI_GRAPHIC,
+    REGION_UI_SET, REGION_UI_SCREEN, REGION_UI_GRAPHIC, REGION_UI_TEXT,
+    REGION_UI_ANIM, REGION_UI_ANIM_TRACK, REGION_UI_ANIM_EVENTS, REGION_UI_ANIM_KEYS, REGION_UI_ANIM_ENTRIES,
     REGION_ZONE_SYSTEM, REGION_ANIM_PLAYER, REGION_ANIM_ELEM, REGION_ANIM_TRACK, REGION_ANIM_KEYS, REGION_F32_ARRAY,
     REGION_RUNTIME    // memory the game initialises itself: nothing to convert, but nothing else may be there
 };
@@ -1787,6 +1788,22 @@ static const SirField kUiGraphicFields[] = {
 };
 #define UI_GRAPHIC_AT   0x140
 #define UI_GRAPHIC_SIZE 0x60
+// What a text (kind 1, vtable lbl_80382DA4) has from +0x13C on, offsets from +0x13C:
+//   +0x13C string table (fn_8019CF58), +0x140 markers of the text (fn_8019EB94), +0x144 the
+//   current one (fn_8019E838); +0x148 a byte; +0x14C a time (fn_8019E838);
+//   +0x150 length (fn_8019EB94), +0x154 / +0x158 (fn_8019D5E8), +0x15C / +0x160 (fn_8019F5A8),
+//   +0x164, +0x168 capacity (UISetText), +0x16C text id (fn_8019CF58);
+//   +0x170 the text, +0x174 the string it was set from (UISetText, fn_8019EB94), +0x178 a word
+//   per character (fn_8019E27C; all bits set in the file, so the words themselves are left);
+//   +0x1B0, +0x1B4, +0x1D4 floats (fn_8019F810); +0x1E0 a second buffer (fn_8019D5E8),
+//   +0x1E4, +0x1E8, +0x1EC words (fn_8019D5E8, UISetText). +0x1F0 is a byte.
+// The matrix at +0x17C is written before it is read (fn_8019CF58).
+static const SirField kUiTextFields[] = {
+    { 0x00, SIR_PTR, 3 }, { 0x10, SIR_F32, 1 }, { 0x14, SIR_U32, 8 }, { 0x34, SIR_PTR, 3 },
+    { 0x74, SIR_F32, 2 }, { 0x98, SIR_F32, 1 }, { 0xA4, SIR_PTR, 1 }, { 0xA8, SIR_U32, 3 },
+};
+#define UI_TEXT_AT   0x13C
+#define UI_TEXT_SIZE 0xB4
 
 // A list of the UI code: +0x00 count (fn_8019555C), +0x04 capacity, +0x08 element size and +0x10
 // the elements (fn_8019552C). The widget lists hold pointers.
@@ -1846,6 +1863,8 @@ static SirError UiBasePlan(ImagePlan* plan, const u8* image, u32 imageSize, u32 
         if (LevelSpan(Be32(image + o + 0x140), 4, imageSize, &t) && !PlanHas(plan, t, REGION_PTR_ARRAY) &&
             !PlanAdd(plan, t, 4, REGION_PTR_ARRAY)) return SIR_ERR_SCREENS;
     }
+    if (Be32(image + o + 0x60) == 1 && (u64)o + UI_TEXT_AT + UI_TEXT_SIZE <= imageSize &&
+        !PlanAdd(plan, o + UI_TEXT_AT, UI_TEXT_SIZE, REGION_UI_TEXT)) return SIR_ERR_SCREENS;
     return UiBasePlan(plan, image, imageSize, Be32(image + o + 0x130), depth + 1);
 }
 
@@ -1904,6 +1923,59 @@ static SirError UiWidgetPlan(ImagePlan* plan, const u8* image, u32 imageSize, u3
     return SIR_OK;
 }
 
+// An animation (the value of a node of the set's table at +0x20). fn_801ABAF4 makes a player from
+// it and fn_801AB4C4 copies it there:
+//   animation: +0x04 five tracks (position, scale, colour, rotation, pivot: fn_801AB820), +0x18 its
+//              events, +0x1C flags, +0x20 length, +0x24 start position, +0x28 speed, +0x2C a word
+//   track:     +0x04 a list of keys, +0x08..+0x14 the cursor, copied as words (fn_801AA79C)
+//   events:    +0x04 a list of entries, +0x08..+0x10 copied as words (fn_801AAEE4)
+//   list:      as kUiListFields, with 0x30-byte elements in place (fn_8019552C)
+//   key:       +0x00 time (fn_801AA728), +0x10 four floats (fn_801AA760), +0x20 the curve to the
+//              next key (fn_801AA218)
+//   entry:     +0x00 time, +0x24 kind, +0x10 an action word (kind 1), an event (2) or a sound (3),
+//              which is handed on as a pointer (AnimEntryFire in draft_pz5d.cpp, fn_801AA784)
+static const SirField kUiAnimFields[] = {
+    { 0x04, SIR_PTR, 6 }, { 0x1C, SIR_U32, 1 }, { 0x20, SIR_F32, 3 }, { 0x2C, SIR_U32, 1 },
+};
+static const SirField kUiAnimTrackFields[] = {
+    { 0x04, SIR_PTR, 1 }, { 0x08, SIR_U32, 1 }, { 0x0C, SIR_PTR, 2 }, { 0x14, SIR_U32, 1 },
+};
+static const SirField kUiAnimEventsFields[] = {
+    { 0x04, SIR_PTR, 1 }, { 0x08, SIR_U32, 3 },
+};
+#define UI_ANIM_USED        0x30
+#define UI_ANIM_TRACK_USED  0x18
+#define UI_ANIM_EVENTS_USED 0x14
+#define UI_ANIM_KEY_SIZE    0x30
+
+// A list whose elements are 0x30-byte keys or entries.
+static SirError UiAnimListPlan(ImagePlan* plan, const u8* image, u32 imageSize, u32 addr, u8 kind) {
+    u32 l, d;
+    if (!LevelSpan(addr, 0x14, imageSize, &l) || PlanHas(plan, l, REGION_UI_LIST)) return SIR_OK;
+    if (!PlanAdd(plan, l, 0x14, REGION_UI_LIST)) return SIR_ERR_SCREENS;
+    u32 count = Be32(image + l), capacity = Be32(image + l + 4), size = Be32(image + l + 8);
+    if (count == 0) return SIR_OK;
+    if (size != UI_ANIM_KEY_SIZE || count > capacity || count > imageSize / UI_ANIM_KEY_SIZE ||
+        !LevelSpan(Be32(image + l + 0x10), (u64)count * UI_ANIM_KEY_SIZE, imageSize, &d) ||
+        !PlanAdd(plan, d, count * UI_ANIM_KEY_SIZE, kind)) return SIR_ERR_SCREENS;
+    return SIR_OK;
+}
+
+static SirError UiAnimPlan(ImagePlan* plan, const u8* image, u32 imageSize, u32 addr) {
+    u32 a, t;
+    SirError e;
+    if (!LevelSpan(addr, UI_ANIM_USED, imageSize, &a) || PlanHas(plan, a, REGION_UI_ANIM)) return SIR_OK;
+    if (!PlanAdd(plan, a, UI_ANIM_USED, REGION_UI_ANIM)) return SIR_ERR_SCREENS;
+    for (u32 k = 0; k < 5; k++) {
+        if (!LevelSpan(Be32(image + a + 4 + k * 4), UI_ANIM_TRACK_USED, imageSize, &t) || PlanHas(plan, t, REGION_UI_ANIM_TRACK)) continue;
+        if (!PlanAdd(plan, t, UI_ANIM_TRACK_USED, REGION_UI_ANIM_TRACK)) return SIR_ERR_SCREENS;
+        if ((e = UiAnimListPlan(plan, image, imageSize, Be32(image + t + 4), REGION_UI_ANIM_KEYS)) != SIR_OK) return e;
+    }
+    if (!LevelSpan(Be32(image + a + 0x18), UI_ANIM_EVENTS_USED, imageSize, &t) || PlanHas(plan, t, REGION_UI_ANIM_EVENTS)) return SIR_OK;
+    if (!PlanAdd(plan, t, UI_ANIM_EVENTS_USED, REGION_UI_ANIM_EVENTS)) return SIR_ERR_SCREENS;
+    return UiAnimListPlan(plan, image, imageSize, Be32(image + t + 4), REGION_UI_ANIM_ENTRIES);
+}
+
 // A screen's own fields, the widgets it names and its grid.
 static SirError UiScreenPlan(ImagePlan* plan, const u8* image, u32 imageSize, u32 addr) {
     u32 w, d;
@@ -1920,16 +1992,18 @@ static SirError UiScreenPlan(ImagePlan* plan, const u8* image, u32 imageSize, u3
     return UiGridPlan(plan, image, imageSize, Be32(image + w + 0x144), 0);
 }
 
-// A tree of one of the set's tables. Only the screens' nodes have their values followed.
-static SirError UiTreePlan(ImagePlan* plan, const u8* image, u32 imageSize, u32 node, u32 depth, bool screens) {
+// A tree of one of the set's tables. The values of the screens' nodes (+0x28) and of the
+// animations' (+0x20) are followed.
+static SirError UiTreePlan(ImagePlan* plan, const u8* image, u32 imageSize, u32 node, u32 depth, u32 table) {
     u32 n;
     SirError e;
     if (!LevelSpan(node, 0x14, imageSize, &n)) return SIR_OK;
     if (depth > 4096 || PlanHas(plan, n, REGION_UI_TREE_NODE)) return SIR_ERR_SCREENS;   // not a tree
     if (!PlanAdd(plan, n, 0x14, REGION_UI_TREE_NODE)) return SIR_ERR_SCREENS;
-    if ((e = UiTreePlan(plan, image, imageSize, Be32(image + n + 0x0C), depth + 1, screens)) != SIR_OK) return e;
-    if ((e = UiTreePlan(plan, image, imageSize, Be32(image + n + 0x10), depth + 1, screens)) != SIR_OK) return e;
-    if (!screens) return SIR_OK;
+    if ((e = UiTreePlan(plan, image, imageSize, Be32(image + n + 0x0C), depth + 1, table)) != SIR_OK) return e;
+    if ((e = UiTreePlan(plan, image, imageSize, Be32(image + n + 0x10), depth + 1, table)) != SIR_OK) return e;
+    if (table == 0x20) return UiAnimPlan(plan, image, imageSize, Be32(image + n + 0x04));
+    if (table != 0x28) return SIR_OK;
     if ((e = UiScreenPlan(plan, image, imageSize, Be32(image + n + 0x04))) != SIR_OK) return e;
     return UiWidgetPlan(plan, image, imageSize, Be32(image + n + 0x04), false, 0);
 }
@@ -1944,7 +2018,7 @@ static SirError ScreenSetPlan(ImagePlan* plan, const u8* image, u32 imageSize, u
     for (u32 i = 0; i < COUNTOF(kTables); i++) {
         if (!LevelSpan(Be32(image + off + kTables[i]), 0xC, imageSize, &t)) continue;
         if (!PlanAdd(plan, t, 0xC, REGION_PTR_ARRAY)) return SIR_ERR_SCREENS;
-        if ((e = UiTreePlan(plan, image, imageSize, Be32(image + t), 0, kTables[i] == 0x28)) != SIR_OK) return e;
+        if ((e = UiTreePlan(plan, image, imageSize, Be32(image + t), 0, kTables[i])) != SIR_OK) return e;
     }
     return SIR_OK;
 }
@@ -2041,6 +2115,25 @@ static void ImagePlanConvert(const ImagePlan* plan, SirReloc* r, u8* image, u32 
         case REGION_UI_SET:       SirConvertRecord(r, p, g->size, kUiSetFields, COUNTOF(kUiSetFields)); break;
         case REGION_UI_SCREEN:    SirConvertRecord(r, p, g->size, kUiScreenFields, COUNTOF(kUiScreenFields)); break;
         case REGION_UI_GRAPHIC:   SirConvertRecord(r, p, g->size, kUiGraphicFields, COUNTOF(kUiGraphicFields)); break;
+        case REGION_UI_TEXT:      SirConvertRecord(r, p, g->size, kUiTextFields, COUNTOF(kUiTextFields)); break;
+        case REGION_UI_ANIM:      SirConvertRecord(r, p, g->size, kUiAnimFields, COUNTOF(kUiAnimFields)); break;
+        case REGION_UI_ANIM_TRACK: SirConvertRecord(r, p, g->size, kUiAnimTrackFields, COUNTOF(kUiAnimTrackFields)); break;
+        case REGION_UI_ANIM_EVENTS: SirConvertRecord(r, p, g->size, kUiAnimEventsFields, COUNTOF(kUiAnimEventsFields)); break;
+        case REGION_UI_ANIM_KEYS:
+            for (u32 k = 0; k + UI_ANIM_KEY_SIZE <= g->size; k += UI_ANIM_KEY_SIZE) {
+                Swap32(p + k);
+                for (u32 f = 0x10; f <= 0x20; f += 4) Swap32(p + k + f);
+                r->fieldsSwapped += 6;
+            }
+            break;
+        case REGION_UI_ANIM_ENTRIES:
+            for (u32 k = 0; k + UI_ANIM_KEY_SIZE <= g->size; k += UI_ANIM_KEY_SIZE) {
+                Swap32(p + k); Swap32(p + k + 0x24);
+                r->fieldsSwapped += 2;
+                if (*(const u32*)(p + k + 0x24) == 3) ConvertPtr(r, p + k + 0x10);
+                else { Swap32(p + k + 0x10); r->fieldsSwapped++; }
+            }
+            break;
         case REGION_UI_TREE_NODE: SirConvertRecord(r, p, g->size, kUiTreeNodeFields, COUNTOF(kUiTreeNodeFields)); break;
         case REGION_PROP_DEF:     SirConvertRecord(r, p, g->size, kPropDefFields, COUNTOF(kPropDefFields)); break;
         case REGION_ENTITY_RECORD: SirConvertRecord(r, p, g->size, kEntityRecordFields, COUNTOF(kEntityRecordFields)); break;
