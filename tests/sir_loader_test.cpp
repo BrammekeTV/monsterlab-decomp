@@ -738,6 +738,64 @@ struct ZoneDump {
         }
     }
 
+    // Skeleton animation: an entity's animation object (+0xA0), skeletons, their mode 0 players and
+    // the clips (tracks of 16-byte keys), as fn_8018B2CC, fn_80173944 and fn_8016A788 read them.
+    std::vector<const u8*> animObjs, skels, clips, skelPlayers;
+    void Clip(const u8* t) {
+        if (!In(t, 0x30) || Seen(clips, t)) return;
+        u32 n = *(const u32*)(t + 0x18);
+        const u8* table = t + *(const u32*)(t + 0x24);
+        printf("animclip "); Val(t); printf(" users %u channels %u length %08x table 0x%x scale 0x%x ", *(const u32*)(t + 0x10), n,
+               *(const u32*)(t + 0x20), *(const u32*)(t + 0x24), *(const u32*)(t + 0x2C));
+        Words(t + *(const u32*)(t + 0x2C), 6); printf("\n");
+        for (u32 i = 0; i < n; i++) {
+            const u8* first = t + *(const u32*)(table + i * 8);
+            const u8* k = first;
+            u32 cnt = 0, total = 0;
+            for (;; k += 0x10) {
+                cnt++;
+                for (u32 w = 0; w < 8; w++) total += *(const u16*)(k + w * 2);
+                if (*(const u16*)(k + 6) == 0xFFFF) break;
+            }
+            printf("animclipkeys "); Val(first); printf(" rel 0x%x keys %u sum %08x\n", *(const u32*)(table + i * 8), cnt, total);
+        }
+    }
+    void SkelPlayer(const u8* a) {
+        if (!In(a, 0x28) || Seen(skelPlayers, a)) return;
+        printf("skelplayer "); Val(a); printf(" mode %u elems 0x%x room %u count %u track ", *(const u32*)(a + 4), *(const u32*)(a + 8),
+               *(const u32*)(a + 0xC), *(const u32*)(a + 0x10));
+        Ptr(a + 0x14);
+        printf(" stride %u flags %u %u time %08x\n", *(const u32*)(a + 0x18), *(const u32*)(a + 0x1C), *(const u32*)(a + 0x20), *(const u32*)(a + 0x24));
+        if (*(const u32*)(a + 4) == 0) Clip(*(const u8**)(a + 0x14));
+    }
+    void Skeleton(const u8* s) {
+        if (!In(s, 0x20) || Seen(skels, s)) return;
+        u32 n = *(const u32*)(s + 8), sum = 0;
+        const u8* bones = *(const u8**)(s + 4);
+        const u8* ops = *(const u8**)(s + 0xC);
+        bool haveBones = n != 0 && In(bones, n * 0x30);
+        for (u32 i = 0; haveBones && i < n * 12; i++) sum += *(const u32*)(bones + i * 4);
+        printf("skeleton "); Val(s); printf(" bones "); Ptr(s + 4); printf(" %u sum %08x ops ", n, sum); Ptr(s + 0xC); printf(" :");
+        if (n != 0 && In(ops, n * 8)) { for (u32 i = 0; i < n; i++) printf(" %u", *(const u32*)(ops + i * 8 + 4)); }
+        else printf(" -");
+        printf(" player "); Ptr(s + 0x14); printf(" block "); Ptr(s + 0x18); printf(" root "); Ptr(s + 0x1C); printf("\n");
+        SkelPlayer(*(const u8**)(s + 0x14));
+    }
+    void AnimObj(const u8* a) {
+        if (!In(a, 0xF4) || Seen(animObjs, a)) return;
+        printf("animobj "); Val(a); printf(" skel "); Ptr(a); printf(" slots "); Ptr(a + 8); printf(" "); Ptr(a + 0x1C);
+        printf(" | "); Ptr(a + 0x2C); printf(" "); Ptr(a + 0x40); printf(" | "); Ptr(a + 0x50); printf(" "); Ptr(a + 0x64);
+        printf(" players "); Ptrs(a + 0x74, 3);
+        printf(" idx %d %d f88 %08x f90 ", *(const s32*)(a + 0x80), *(const s32*)(a + 0x84), *(const u32*)(a + 0x88)); Words(a + 0x90, 2);
+        printf(" f9c %08x bones %d %d fa8 ", *(const u32*)(a + 0x9C), *(const s32*)(a + 0xA0), *(const s32*)(a + 0xA4)); Words(a + 0xA8, 3);
+        printf(" fc0 "); Words(a + 0xC0, 6); printf(" wd8 %d fdc ", *(const s32*)(a + 0xD8)); Words(a + 0xDC, 4);
+        printf(" wec %08x %08x\n", *(const u32*)(a + 0xEC), *(const u32*)(a + 0xF0));
+        for (u32 k = 0; k < 3; k++) {
+            SkelPlayer(*(const u8**)(a + 0x74 + k * 4));
+            Skeleton(*(const u8**)(a + 8 + k * 0x24));
+        }
+        Skeleton(*(const u8**)a);
+    }
     // A prop definition's animation table, as fn_800699E4 uses it (fn_801AC184, fn_801AC460).
     std::vector<const u8*> animSets;
     void AnimSet(const u8* s) {
@@ -763,12 +821,46 @@ struct ZoneDump {
             printf("animclips "); Val(list);
             for (u32 i = 0; i < clips; i++) { printf(" "); Ptr(list + i * 4); }
             printf("\n");
+            for (u32 i = 0; i < clips; i++) Clip(*(const u8**)(list + i * 4));
         }
     }
     // The slots' placed effects (slot +0x80, count +0x9C), then the slots' objects (slot +0xA8):
     // the list, and of each object the type fn_8012FD0C reads.
     void SlotObjects(const LevelZoneRoots* roots, u32 zoneBase) {
         std::vector<const u8*> seen;
+        // The level's locators (header +0x28, count +0x24), as WorldFindLocator and its callers read them.
+        if (roots->locatorCount != 0) {
+            const u8* l = z->image + (roots->locators - zoneBase);
+            for (u32 i = 0; In(l, roots->locatorCount * 0x20) && i < roots->locatorCount; i++) {
+                printf("locator %u hash %08x floats", i, *(const u32*)(l + i * 0x20));
+                for (u32 k = 0; k < 6; k++) printf(" %08x", *(const u32*)(l + i * 0x20 + 8 + k * 4));
+                printf("\n");
+            }
+        }
+        // The slots' action tables (slot +0xD4), as TriggerDoAction reads them.
+        for (u32 t = 0; t < roots->actionTableCount; t++) {
+            const u8* table = z->image + (roots->actionTables[t] - zoneBase);
+            if (!In(table, 8)) continue;
+            u32 count = *(const u32*)table;
+            const u8* arr = *(const u8**)(table + 4);
+            printf("zoneactions "); Val(table); printf(" count %u records ", count); Ptr(table + 4); printf("\n");
+            for (u32 i = 0; i < count; i++) {
+                const u32* pc = *(const u32**)(arr + i * 4);
+                printf("zoneaction %u ", i); Ptr(arr + i * 4);
+                if (pc == NULL || (pc[0] & 0xFF) != 1) { printf("\n"); continue; }
+                u32 n = 0, calls = 0, jumps = 0, h = 0x811C9DC5u;
+                for (;;) {
+                    u32 op = pc[n] & 0xFF, len = (pc[n] >> 8) & 0xFF;
+                    if (op == 0xFF) break;
+                    calls += op == 0x16;
+                    jumps += op >= 4 && op <= 0x11;
+                    n += op <= 0x1B ? len : 1;
+                }
+                for (u32 k = 0; k <= n; k++)
+                    for (s32 shift = 24; shift >= 0; shift -= 8) h = (h ^ ((pc[k] >> shift) & 0xFF)) * 0x01000193u;
+                printf(" words %u calls %u jumps %u sum %08x\n", n + 1, calls, jumps, h);
+            }
+        }
         for (u32 t = 0; t < roots->slotEffectCount; t++) {
             const u8* list = z->image + (roots->slotEffects[t * 2] - zoneBase);
             u32 n = roots->slotEffects[t * 2 + 1];
@@ -809,7 +901,7 @@ struct ZoneDump {
                 const u8* pool = *(const u8**)(e + 4);
                 s32 fix = *(const s32*)(e + 0xC);
                 printf("pooltable "); Val(table); printf(" %u pool ", i); Ptr(e + 4);
-                printf(" fixup %d type %d\n", fix, *(const s32*)(e + 0x1C));
+                printf(" fixup %d %d type %d\n", fix, *(const s32*)(e + 0x10), *(const s32*)(e + 0x1C));
                 if (!In(pool, POOL_SIZE)) continue;
                 u32 items = *(const u32*)pool, size = *(const u32*)(pool + 4), align = *(const u32*)(pool + 8);
                 const u8* block = *(const u8**)(pool + 0x24);
@@ -921,6 +1013,7 @@ struct ZoneDump {
         printf("itemdraw "); Val(it); printf(" xf "); Ptr(it + 4); printf(" scale %08x mesh ", Bits(*(const f32*)(it + 8))); Ptr(it + 0x10);
         printf(" out "); Floats(it + 0x14, 7); printf(" cb %08x arg ", *(const u32*)(it + 0x30)); Ptr(it + 0x34);
         printf(" clip "); Floats(it + 0x3C, 4); printf(" w58 %08x skin ", Bits(*(const f32*)(it + 0x58))); Ptr(it + 0xB0); printf("\n");
+        Skeleton(*(const u8**)(it + 0xB0));
         const u8* x = *(const u8**)(it + 4);
         const u8* m = *(const u8**)(it + 0x10);
         if (In(x, 0x60)) { printf("itemxf "); Val(x); printf(" "); Floats(x, 24); printf("\n"); }
@@ -1166,6 +1259,7 @@ struct ZoneDump {
                 for (u32 k = 0; k < 3; k++) printf(" %08x", Bits(*(const f32*)(e + 0xC8 + k * 4)));
                 printf(" wec %08x w15c %08x states ", *(const u32*)(e + 0xEC), *(const u32*)(e + 0x15C)); Ptr(e + 0x1A0); printf("\n");
             }
+            AnimObj(*(const u8**)(e + 0xA0));
             Parts(*(const u8**)(e + 0x8C));
             Add(scene, *(const u8**)(e + 0x90), 8);
             const u8* o9c = *(const u8**)(e + 0x9C);
@@ -1313,6 +1407,7 @@ static int DumpLevel(const char* path) {
     printf("levelpicture %u %u floats", h[0x1A80], h[0x1A81]);
     for (u32 k = 0; k < 39; k++) printf(" %08x", Bits(*(const f32*)(h + 0x1A84 + k * 4)));
     printf("\n");
+    printf("levellocators %u ", *(const u32*)(h + 0x24)); PrintLevelPtr(h + 0x28, &f); printf("\n");
     for (u32 t : { 0x1B0u, 0x1BCu, 0x1C8u }) {
         printf("leveltable 0x%x ", t);
         PrintLevelEntries(h + t, &f);
@@ -2137,7 +2232,7 @@ static void BuildLevel(u8* hdr, u8* zone) {
     for (u32 o = 0x14; o < 0x30; o += 4) Put32(zone + L_ITEM + o, 0);
     Put32(zone + L_ITEM + 0x30, 0x802C5280); Put32(zone + L_ITEM + 0x34, L_ZONE + L_SCENE);
     for (u32 o = 0x3C; o < 0x4C; o += 4) Put32(zone + L_ITEM + o, 0);
-    Put32(zone + L_ITEM + 0x58, 0x3F800000); Put32(zone + L_ITEM + 0xB0, 0);
+    Put32(zone + L_ITEM + 0x58, 0x3F800000); Put32(zone + L_ITEM + 0xB0, 0); Put32(zone + L_ITEM + 0x38, 0);
     for (u32 o = 0x30; o < 0x60; o += 4) Put32(zone + L_MATRIX + o, o == 0x30 ? 0x40000000 : 0);
     u8* mesh = zone + L_MESH;
     memset(mesh, 0, 0x78);

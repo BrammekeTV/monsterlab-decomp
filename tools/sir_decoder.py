@@ -623,7 +623,8 @@ def level_dump(path):
          'leveltables %s | %s | %s | %s | %s' % tuple(tab(o) for o in (0x1A4, 0x1B0, 0x1BC, 0x1C8, 0x1D4)),
          'levelstate %s b1ec %d w1f0 %d hud %s floats %s wa20 %d w1a7c %d floats %s' % (
             ws(0x1E0, 3), hdr[0x1EC], i32(0x1F0), ptr(u(0x1F4)), ws(0x1F8, 6), i32(0xA20), i32(0x1A7C), ws(0x1A84, 2)),
-         'levelpicture %d %d floats %s' % (hdr[0x1A80], hdr[0x1A81], ws(0x1A84, 39))]
+         'levelpicture %d %d floats %s' % (hdr[0x1A80], hdr[0x1A81], ws(0x1A84, 39)),
+         'levellocators %d %s' % (u(0x24), ptr(u(0x28)))]
     for t in (0x1B0, 0x1BC, 0x1C8):
         L.append('leveltable 0x%x %s' % (t, entries(t)))
     for i in range(count):
@@ -847,7 +848,7 @@ def level_zone_dump(L, zn, zone0, zbase, u, base, count, stride, zone0_image, zb
     """What the header block names in one zone (image `zone0` at `zbase`), then the zone's dump."""
     if zn: L.append('zone %d size 0x%x' % (zn, len(zone0)))
     inz = lambda v: zbase <= v < zbase + len(zone0)
-    roots, scene, pooltabs, records, lists, slotobjs, sloteffects = [], [], [], [], [], [], []
+    roots, scene, pooltabs, records, lists, slotobjs, sloteffects, actiontabs = [], [], [], [], [], [], [], []
     def table_entries(o):
         t, n = u(o) - base, u(o + 4)
         return [u(t + i * 4) for i in range(n)]
@@ -859,13 +860,15 @@ def level_zone_dump(L, zn, zone0, zbase, u, base, count, stride, zone0_image, zb
         if inz(u(o + 0xE4)): pooltabs.append((u(o + 0xE4), u(o + 0xE8)))
         if hdr_bytes[o + 0xAC] and inz(u(o + 0xA8)): slotobjs.append((u(o + 0xA8), hdr_bytes[o + 0xAC]))
         if u(o + 0x9C) and inz(u(o + 0x80)): sloteffects.append((u(o + 0x80), u(o + 0x9C)))
+        if inz(u(o + 0xD4)): actiontabs.append(u(o + 0xD4))
         rec = u(o + 0xFC)
         if inz(rec): records.append(rec)
         elif zbase0 <= rec < zbase0 + len(zone0_image) - 0x14:      # the record is in zone 0: its list may be in this zone
             head = struct.unpack_from('>I', zone0_image, rec - zbase0 + 0x10)[0]
             if inz(head): lists.append(head)
     hud = u(0x1F4)
-    zone_dump(L, zone0, zbase, hud if inz(hud) else 0, roots, scene, pooltabs, records, lists, slotobjs, sloteffects)
+    locators = (u(0x28), u(0x24)) if u(0x24) and inz(u(0x28)) else None
+    zone_dump(L, zone0, zbase, hud if inz(hud) else 0, roots, scene, pooltabs, records, lists, slotobjs, sloteffects, actiontabs, locators)
 
 FIXUP_ENTITY, FIXUP_PART, FIXUP_POOLED, FIXUP_PROJECTILE, FIXUP_RENDER, FIXUP_FSM = 651, 652, 653, 654, 655, 656
 
@@ -931,7 +934,7 @@ def zone_records_dump(L, sec, base, records, lists=()):
             player(u(o + 0x7C))
             node = u(o + 0x10)
 
-def zone_dump(L, sec, base, hud, roots, scene_roots, pooltabs, records=(), lists=(), slotobjs=(), sloteffects=()):
+def zone_dump(L, sec, base, hud, roots, scene_roots, pooltabs, records=(), lists=(), slotobjs=(), sloteffects=(), actiontabs=(), locators=None):
     """Dump of what the loader converts in a level zone: pool tables and pools, entities (first
     layer), scene objects, then the HUD and every state machine found on the way."""
     u = lambda o: struct.unpack_from('>I', sec, o)[0]
@@ -947,10 +950,83 @@ def zone_dump(L, sec, base, hud, roots, scene_roots, pooltabs, records=(), lists
     ws = lambda o, n: ' '.join('%08x' % u(o + i * 4) for i in range(n))
     ents, scene, machines, projectiles = [], [], [], []
     animsets = set()
+    # Skeleton animation: an entity's animation object (+0xA0), skeletons, their mode 0 players and
+    # the clips (tracks of 16-byte keys), as fn_8018B2CC, fn_80173944 and fn_8016A788 read them.
+    animobjs, skels, clipset, skelplayers = set(), set(), set(), set()
+    def clip(t):
+        if not inz(t, 0x30) or t in clipset: return
+        clipset.add(t)
+        o = off(t)
+        n, table, sc = u(o + 0x18), o + u(o + 0x24), o + u(o + 0x2C)
+        L.append('animclip %s users %d channels %d length %08x table 0x%x scale 0x%x %s' % (
+            ptr(t), u(o + 0x10), n, u(o + 0x20), u(o + 0x24), u(o + 0x2C), ws(sc, 6)))
+        for i in range(n):
+            first = o + u(table + i * 8)
+            k, cnt, total = first, 0, 0
+            while True:
+                w = struct.unpack_from('>8H', sec, k)
+                cnt += 1; total = (total + sum(w)) & 0xFFFFFFFF
+                if w[3] == 0xFFFF: break
+                k += 0x10
+            L.append('animclipkeys %s rel 0x%x keys %d sum %08x' % (ptr(base + first), u(table + i * 8), cnt, total))
+    def skel_player(a):
+        if not inz(a, 0x28) or a in skelplayers: return
+        skelplayers.add(a)
+        o = off(a)
+        L.append('skelplayer %s mode %d elems 0x%x room %d count %d track %s stride %d flags %d %d time %08x' % (
+            ptr(a), u(o + 4), u(o + 8), u(o + 0xC), u(o + 0x10), ptr(u(o + 0x14)), u(o + 0x18), u(o + 0x1C), u(o + 0x20), u(o + 0x24)))
+        if u(o + 4) == 0: clip(u(o + 0x14))
+    def skeleton(s):
+        if not inz(s, 0x20) or s in skels: return
+        skels.add(s)
+        o = off(s)
+        n, bones, ops = u(o + 8), u(o + 4), u(o + 0xC)
+        bsum = sum(u(off(bones) + i * 4) for i in range(n * 12)) & 0xFFFFFFFF if n and inz(bones, n * 0x30) else 0
+        opl = ' '.join('%d' % u(off(ops) + i * 8 + 4) for i in range(n)) if n and inz(ops, n * 8) else '-'
+        L.append('skeleton %s bones %s %d sum %08x ops %s : %s player %s block %s root %s' % (
+            ptr(s), ptr(bones), n, bsum, ptr(ops), opl, ptr(u(o + 0x14)), ptr(u(o + 0x18)), ptr(u(o + 0x1C))))
+        skel_player(u(o + 0x14))
+    def anim_obj(a):
+        if not inz(a, 0xF4) or a in animobjs: return
+        animobjs.add(a)
+        o = off(a)
+        L.append('animobj %s skel %s slots %s %s | %s %s | %s %s players %s idx %d %d f88 %08x f90 %s f9c %08x bones %d %d fa8 %s fc0 %s wd8 %d fdc %s wec %08x %08x' % (
+            ptr(a), ptr(u(o)), ptr(u(o + 8)), ptr(u(o + 0x1C)), ptr(u(o + 0x2C)), ptr(u(o + 0x40)), ptr(u(o + 0x50)), ptr(u(o + 0x64)),
+            ' '.join(ptr(u(o + 0x74 + k * 4)) for k in range(3)), i32(o + 0x80), i32(o + 0x84), u(o + 0x88), ws(o + 0x90, 2), u(o + 0x9C),
+            i32(o + 0xA0), i32(o + 0xA4), ws(o + 0xA8, 3), ws(o + 0xC0, 6), i32(o + 0xD8), ws(o + 0xDC, 4), u(o + 0xEC), u(o + 0xF0)))
+        for k in range(3):
+            skel_player(u(o + 0x74 + k * 4))
+            skeleton(u(o + 8 + k * 0x24))
+        skeleton(u(o))
     def add(lst, v, n=1):
         if v and inz(v, n) and v not in lst: lst.append(v)
     for v in roots: add(ents, v)
     for v in scene_roots: add(scene, v)
+    # The level's locators (header +0x28, count +0x24), as WorldFindLocator and its callers read them.
+    if locators and inz(locators[0], locators[1] * 0x20):
+        for i in range(locators[1]):
+            q = off(locators[0]) + i * 0x20
+            L.append('locator %d hash %08x floats %s' % (i, u(q), ws(q + 8, 6)))
+    # The slots' action tables (slot +0xD4): {count, records}; a record is a program for fn_801E1BD4.
+    for addr in actiontabs:
+        if not inz(addr, 8): continue
+        count, arr = u(off(addr)), u(off(addr) + 4)
+        L.append('zoneactions %s count %d records %s' % (ptr(addr), count, ptr(arr)))
+        for i in range(count):
+            p = u(off(arr) + i * 4)
+            if not p or (u(off(p)) & 0xFF) != 1:
+                L.append('zoneaction %d %s' % (i, ptr(p)))
+                continue
+            o = off(p)
+            n = calls = jumps = 0
+            while True:
+                w = u(o + n * 4)
+                op, ln = w & 0xFF, (w >> 8) & 0xFF
+                if op == 0xFF: break
+                calls += op == 0x16
+                jumps += 4 <= op <= 0x11
+                n += ln if op <= 0x1B else 1
+            L.append('zoneaction %d %s words %d calls %d jumps %d sum %08x' % (i, ptr(p), n + 1, calls, jumps, fnv(sec[o:o + (n + 1) * 4])))
     # The slots' placed effects (slot +0x80, count +0x9C), as WorldOnZoneLoaded reads them.
     seen_fx = set()
     for addr, n in sloteffects:
@@ -975,7 +1051,7 @@ def zone_dump(L, sec, base, hud, roots, scene_roots, pooltabs, records=(), lists
         for i in range(n):
             e = off(addr) + i * 0x2C
             pool, fix = u(e + 4), i32(e + 0xC)
-            L.append('pooltable %s %d pool %s fixup %d type %d' % (ptr(addr), i, ptr(pool), fix, i32(e + 0x1C)))
+            L.append('pooltable %s %d pool %s fixup %d %d type %d' % (ptr(addr), i, ptr(pool), fix, i32(e + 0x10), i32(e + 0x1C)))
             if not inz(pool, 0x2C): continue
             q = off(pool)
             items, size, align, block = u(q), u(q + 4), u(q + 8), u(q + 0x24)
@@ -1035,6 +1111,7 @@ def zone_dump(L, sec, base, hud, roots, scene_roots, pooltabs, records=(), lists
             L.append('entprop %s f14 %08x f28 %08x acts %s %s %08x actor %s fc8 %s wec %08x w15c %08x states %s' % (
                 ptr(a), u(o + 0x14), u(o + 0x28), ws(o + 0x38, 3), ws(o + 0x48, 4), u(o + 0x68), ptr(u(o + 0xA0)), ws(o + 0xC8, 3),
                 u(o + 0xEC), u(o + 0x15C), ptr(u(o + 0x1A0))))
+        anim_obj(u(o + 0xA0))
         parts(u(o + 0x8C))
         add(scene, u(o + 0x90), 8)
         dl = loc(u(o + 0x9C), 0xC)
@@ -1065,6 +1142,7 @@ def zone_dump(L, sec, base, hud, roots, scene_roots, pooltabs, records=(), lists
                     lst = U(si, sq + 0x10 + k * 4)
                     if clips and inz(lst, clips * 4):
                         L.append('animclips %s %s' % (ptr(lst), ' '.join(ptr(u(off(lst) + i * 4)) for i in range(clips))))
+                        for ci in range(clips): clip(u(off(lst) + ci * 4))
         hl = u(o + 0xA4)
         if inz(hl, 8):
             L.append('entholder %s machine %s other %s' % (ptr(hl), ptr(u(off(hl))), ptr(u(off(hl) + 4))))
@@ -1085,6 +1163,7 @@ def zone_dump(L, sec, base, hud, roots, scene_roots, pooltabs, records=(), lists
         L.append('itemdraw %s xf %s scale %08x mesh %s out %s cb %08x arg %s clip %s w58 %08x skin %s' % (
             ptr(it), ptr(u(o + 4)), u(o + 8), ptr(u(o + 0x10)), ws(o + 0x14, 7), u(o + 0x30), ptr(u(o + 0x34)), ws(o + 0x3C, 4),
             u(o + 0x58), ptr(u(o + 0xB0))))
+        skeleton(u(o + 0xB0))
         x, m = u(o + 4), u(o + 0x10)
         if inz(x, 0x60): L.append('itemxf %s %s' % (ptr(x), ws(off(x), 24)))
         if inz(m, 0x70) and m not in meshes:

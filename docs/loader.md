@@ -767,7 +767,32 @@ A prop definition's `+0x48` points at its animation table (`fn_800699E4`). The t
 | entry (0x44 bytes) | `+0x2C` handle, `+0x34` its table, `+0x38` the clip's index | `fn_801AC184`, `fn_801AC460` |
 | entity record | `+0x32` (`u16`): the key handed to `fn_801AC460` | `fn_800699E4` |
 
-The 34 level files have 189 tables. The clips are not converted yet.
+The 34 level files have 189 tables. Their clips are converted as described next.
+
+### Skeleton animation
+
+Every entity has an animation object at `+0xA0` (`fn_801B4520` frees it; a prop's is started by
+`fn_800699E4`). A scene item's `+0xB0` is a skeleton too (`fn_80172708`).
+
+| Object | Fields | Reader |
+|---|---|---|
+| animation object | `+0x00` its skeleton; three 0x24-byte slots from `+0x00`, each with a skeleton at `+0x08` and a block at `+0x1C` | `fn_8018B2CC`, `fn_8018A78C` |
+| | `+0x74`, `+0x78`, `+0x7C` three players; `+0x80`, `+0x84` indices; `+0x88`..`+0xB0` times and speeds; `+0xA0`, `+0xA4` bone indices; `+0xC0`..`+0xE8` floats and a word at `+0xD8`; `+0xEC` a word, `+0xF0` flags | `fn_8018B2CC`, `fn_8018A948`, `fn_8018AF28` |
+| skeleton | `+0x04` bones (0x30 bytes each, twelve floats), `+0x08` their count, `+0x0C` one 8-byte entry per bone whose second word steers the walk, `+0x14` its player, `+0x18` a block, `+0x1C` the root matrix | `fn_80173944`, `fn_8017493C` |
+| player | as the material players, plus `+0x0C` how many channels it has room for | `AnimPlayerBind` (draft_miss163.cpp), `fn_8016B478` |
+| clip (the track of a mode 0 player) | `+0x10` users, `+0x18` channels, `+0x20` length, `+0x24` offset of the channel table, `+0x2C` offset of six floats (scale and offset of the positions) | `AnimPlayerBind`, `fn_8016A3F8`, `fn_8016A788` |
+| key (16 bytes) | eight 16-bit numbers: position x y z, time, rotation x y z w; a run ends with a key at time 0xFFFF | `fn_8016A43C`, `fn_8016A788` |
+
+The 34 level files have 4,368 animation objects, 2,269 skeletons and 2,381 clips. Not typed: the
+second word of a channel table entry (the key count) and the first word of a bone's walk entry.
+
+### Zone action tables and locators
+
+A slot's `+0xD4` is the zone's action table, laid out and checked like the one of
+`global_binary.sir` (`TriggerDoAction` kind 2): 66 tables with 23,321 records. The header block's
+`+0x28` points at the level's locators (count at `+0x24`), 0x20 bytes each: `+0x00` name hash
+(`WorldFindLocator`), `+0x08` position and `+0x14` rotation (`PlaceOnTableLocator`); 294 in all.
+A pool table entry's `+0x10` is the script function `fn_801DB248` runs when the zone is unloaded.
 
 ### Zone records and animated materials
 
