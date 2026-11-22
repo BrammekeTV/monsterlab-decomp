@@ -23,7 +23,8 @@ Code: `include/port/sir_loader.h`, `src/port/sir_loader.cpp`. Test: `tests/sir_l
 | `global_binary.sir` screen list and HUD (slots `0xD98`, `0xD9C`: 68 state machines, 68 definitions, 759 states, 1,345 transitions) | converted; every field typed from code, fields without a reader left as they are |
 | `global_binary.sir` UI root, fonts and the objects of slots `0xDB4`-`0xDBC` | the fields the code reads are converted; the glyph data of the three fonts is not |
 | `global_binary.sir` effect definitions (slots `0x82C`-`0x840`: 27 + 70 entries) and the two object pools of slots `0x10`, `0x418` | converted; fields typed from the effect and pool code |
-| `global_binary.sir` font glyph data, sound objects named by action records, `0xDC0` | not converted: see "Not converted yet" |
+| `global_binary.sir` screen set database (header slot `0xDC0`) | the lookup table and each record's zone are converted: see "Screen set database" |
+| `global_binary.sir` font glyph data, sound objects named by action records | not converted: see "Not converted yet" |
 | Level files (`*_level.sir`): header block (the world state, 493 zone slots); in zone 0 the HUD and state machines, the first layer of every entity, scene objects, pool tables and their pools | the fields the level start reads are converted; the rest of an entity and of the zone images is not: see "Level files" |
 | Hook into the game's `SirLoad` | not wired (the port has no file layer yet) |
 
@@ -522,12 +523,30 @@ the pool and the node links. The items are fill words in the file and are not co
 |---|---|---|---|
 | font data (font object `+0x08`) | `0x26740`, `0x38220`, `0x390E0`, `0x626C0` | glyph tables; `fn_8018979C` measures text with them, `fn_801971F0` (709 instructions) draws, `fn_801894F4` / `fn_801894B8` prepare a font loaded from a file | those functions are not decompiled; nothing on the boot path reads the data |
 | sound objects named by action records | 42 objects between `0xDF2E0` and `0xF5D30` | argument 1 of `PlaySoundEffect`, argument 2 of `RegisterExperimentSound` and of `LT_SetTutorialText` (see "Action records") | their readers are not decompiled far enough to type the fields |
-| `0xDC0` | `0xF6CF0` | a table of screen names (`UI_MSA_newscreen`, ...) with ids and hashes | no decompiled function reads the slot |
+| `0xDC0` | `0xF6CF0` | the screen set database: converted as far as it is read, see "Screen set database" | `ScreenSetsLoadCsv` stores the slot in `lbl_805FB218` |
 
 With this the boot runs through `UiInit` (`ScreenSetsInit`, `ScreenMgrLoad`, `HudInit`,
 `HudReset`), and the first `HudUpdateScreens` runs a state's enter action through the
 interpreter. The screen format of `shared_ui.sir` (title screen) is expected to be the same; see
 "Next".
+
+## Screen set database
+
+Header slot `0xDC0` of `global_binary.sir` points at the screen set database; `ScreenSetsLoadCsv`
+(0x801091B4) stores it in `lbl_805FB218`. `UIEngine_LoadUIScreenSet` looks a set up by the hash
+of its name and loads the zone the record names.
+
+| Where | Field | Reader |
+|---|---|---|
+| database `+0x20` | pointer to the lookup table | `UIEngine_LoadUIScreenSet` |
+| lookup table | `{entries, count}` | `fn_801EBE74` (binary search) |
+| entry, 8 bytes | `{key, record}`, keys in ascending order (the loader checks that) | `fn_801EBE74` |
+| record `+0x44` | zone number | `UIEngine_LoadUIScreenSet` |
+
+The file has 23 sets (`UI_MSA_newscreens` in zone 472, ...). A record is 0x50 bytes: the name,
+the zone, the name hash at `+0x48` and a word at `+0x4C`. Not converted, because no reader was
+found: the database's own words `+0x00`..`+0x1C` (a pointer to the records, their count, six
+numbers), the table's third word, and the record's hash and last word.
 
 ## Level files
 

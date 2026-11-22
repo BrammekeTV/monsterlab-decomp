@@ -198,6 +198,7 @@ extern "C" const char* SirErrorText(SirError e) {
     case SIR_ERR_UI:             return "UI root, font or UI object not recognised (pointer outside the image, font kind or page count)";
     case SIR_ERR_SCREENS:        return "screen state machine not recognised (count, node type or pointer outside the image)";
     case SIR_ERR_EFFECTS:        return "effect definition table, a texture or a pool pointer of it outside the image";
+    case SIR_ERR_SCREEN_SETS:    return "screen set database not recognised (table or record outside the image, or keys not in ascending order)";
     case SIR_ERR_POOL:           return "object pool not recognised (counts, block, or a list pointer that is not one of its nodes)";
     case SIR_ERR_LEVEL:          return "level header block not recognised (zone slot table)";
     case SIR_ERR_ZONE_RECORD:    return "zone record of a level zone not recognised (list that leaves the zone or loops, bad animation player)";
@@ -360,7 +361,7 @@ enum RegionKind {
     REGION_FSM_TRANSITION, REGION_FSM_SHARED_TRANSITION, REGION_HUD, REGION_LEVEL_HUD,
     REGION_FX_BOLTS, REGION_FX_TRAILS, REGION_POOL, REGION_POOL_BLOCK,
     REGION_ENTITY, REGION_ENTITY_RECORD, REGION_ENTITY_PART, REGION_PTR_COUNT, REGION_COUNT_PTR, REGION_POOL_TABLE,
-    REGION_ENTITY_PROP, REGION_PROP_DEF,
+    REGION_ENTITY_PROP, REGION_PROP_DEF, REGION_KEY_PTR,
     REGION_ZONE_SYSTEM, REGION_ANIM_PLAYER, REGION_ANIM_ELEM, REGION_ANIM_TRACK, REGION_ANIM_KEYS, REGION_F32_ARRAY,
     REGION_RUNTIME    // memory the game initialises itself: nothing to convert, but nothing else may be there
 };
@@ -1646,6 +1647,32 @@ static SirError ZoneRecordPlan(ImagePlan* plan, const u8* image, u32 imageSize, 
     return ZoneListPlan(plan, image, imageSize, Be32(image + off + 0x10));
 }
 
+// ---- screen set database (header slot 0xDC0, the game's lbl_805FB218)
+//
+// UIEngine_LoadUIScreenSet looks a screen set up by name hash: fn_801EBE74 does a binary search
+// in the table object at +0x20 of the database, {entries, count}, whose 8-byte entries are
+// {key, record}; of the record it reads the zone at +0x44. The records are 0x50 bytes with the
+// set's name in front; nothing else of them, or of the database object, has a known reader.
+#define SCREEN_SET_RECORD_USED 0x48
+static SirError ScreenSetDbPlan(ImagePlan* plan, const u8* image, u32 imageSize, u32 addr) {
+    u32 off, t, e, rec;
+    if (!ImageSpan(addr, 0x24, imageSize, &off) || !PlanAdd(plan, off + 0x20, 4, REGION_PTR_ARRAY)) return SIR_ERR_SCREEN_SETS;
+    u32 table = Be32(image + off + 0x20);
+    if (table == 0) return SIR_OK;
+    if (!ImageSpan(table, 8, imageSize, &t) || !PlanAdd(plan, t, 8, REGION_PTR_COUNT)) return SIR_ERR_SCREEN_SETS;
+    u32 count = Be32(image + t + 4);
+    if (count == 0) return SIR_OK;
+    if (count > imageSize / 8 || !ImageSpan(Be32(image + t), (u64)count * 8, imageSize, &e) ||
+        !PlanAdd(plan, e, count * 8, REGION_KEY_PTR)) return SIR_ERR_SCREEN_SETS;
+    for (u32 i = 0; i < count; i++) {
+        // The search needs the keys in ascending order.
+        if (i != 0 && Be32(image + e + i * 8) <= Be32(image + e + (i - 1) * 8)) return SIR_ERR_SCREEN_SETS;
+        if (!ImageSpan(Be32(image + e + i * 8 + 4), SCREEN_SET_RECORD_USED, imageSize, &rec) ||
+            !PlanAdd(plan, rec + 0x44, 4, REGION_U32_ARRAY)) return SIR_ERR_SCREEN_SETS;
+    }
+    return SIR_OK;
+}
+
 // ---- all of them
 
 static SirError ImagePlanBuild(ImagePlan* plan, const u8* hdr, u8* image, u32 imageSize) {
@@ -1668,6 +1695,7 @@ static SirError ImagePlanBuild(ImagePlan* plan, const u8* hdr, u8* image, u32 im
     if (e == SIR_OK) e = FxTablePlan(plan, image, imageSize, Be32(hdr + 0x83C), Be32(hdr + 0x838), true);
     if (e == SIR_OK && (addr = Be32(hdr + 0x010)) != 0) e = PoolPlan(plan, image, imageSize, addr, false);
     if (e == SIR_OK && (addr = Be32(hdr + 0x418)) != 0) e = PoolPlan(plan, image, imageSize, addr, false);
+    if (e == SIR_OK && (addr = Be32(hdr + 0xDC0)) != 0) e = ScreenSetDbPlan(plan, image, imageSize, addr);
     if (e != SIR_OK) return e;
     return PlanFinish(plan) ? SIR_OK : SIR_ERR_OVERLAP;
 }
@@ -1726,6 +1754,9 @@ static void ImagePlanConvert(const ImagePlan* plan, SirReloc* r, u8* image, u32 
             break;
         case REGION_F32_ARRAY:
             for (u32 k = 0; k < g->size; k += 4) { Swap32(p + k); r->fieldsSwapped++; }
+            break;
+        case REGION_KEY_PTR:
+            for (u32 k = 0; k + 8 <= g->size; k += 8) { Swap32(p + k); r->fieldsSwapped++; ConvertPtr(r, p + k + 4); }
             break;
         case REGION_PROP_DEF:     SirConvertRecord(r, p, g->size, kPropDefFields, COUNTOF(kPropDefFields)); break;
         case REGION_ENTITY_RECORD: SirConvertRecord(r, p, g->size, kEntityRecordFields, COUNTOF(kEntityRecordFields)); break;

@@ -551,6 +551,23 @@ static void DumpEffects(const GlobalBinaryFile* f) {
     }
 }
 
+// The screen set database (header slot 0xDC0), read the way UIEngine_LoadUIScreenSet does.
+static void DumpScreenSets(const GlobalBinaryFile* f) {
+    const u8* db = *(const u8**)(f->hdr + 0xDC0);
+    if (db == NULL) return;
+    const u8* table = *(const u8**)(db + 0x20);
+    printf("screensetdb "); PrintPtr(f->hdr + 0xDC0, f); printf(" table "); PrintPtr(db + 0x20, f); printf("\n");
+    if (table == NULL) return;
+    const u8* entries = *(const u8**)table;
+    u32 count = *(const u32*)(table + 4);
+    printf("screensettable "); PrintPtr(db + 0x20, f); printf(" entries "); PrintPtr(table, f); printf(" count %u\n", count);
+    for (u32 i = 0; i < count; i++) {
+        const u8* rec = *(const u8**)(entries + i * 8 + 4);
+        printf("screenset %u key %08x record ", i, *(const u32*)(entries + i * 8)); PrintPtr(entries + i * 8 + 4, f);
+        printf(" zone %d name %s\n", *(const s32*)(rec + 0x44), (const char*)rec);
+    }
+}
+
 static int Dump(const char* path) {
     SirReloc r;
     GlobalBinaryFile f;
@@ -639,6 +656,7 @@ static int Dump(const char* path) {
     DumpImage(&f);
     DumpUi(&f);
     DumpEffects(&f);
+    DumpScreenSets(&f);
     printf("report image %u dolkept %u dolresolved %u unknown %u\n", r.ptrImage, r.ptrDolKept, r.ptrDolResolved, r.ptrUnknown);
     GlobalBinaryFree(&f);
     return 0;
@@ -1186,10 +1204,14 @@ static void Put16(u8* p, u16 v) {
 #define T_POOL      (T_FXPOOLS + 0x90)       // ready-made pool: 0x2C
 #define T_POOL_BLOCK (T_POOL + 0x30)         // its block: the next-block word, then two nodes of 0x30
 #define T_POOL_NODES (T_POOL_BLOCK + 0x08)
-#define T_SIZE      (T_POOL_BLOCK + 0x70)
+#define T_SETDB     (T_POOL_BLOCK + 0x70)    // screen set database: the table pointer at +0x20
+#define T_SETTABLE  (T_SETDB + 0x30)         // its table {entries, count}
+#define T_SETENTRIES (T_SETTABLE + 0x10)     // two entries {key, record}
+#define T_SETRECS   (T_SETENTRIES + 0x10)    // two records of 0x50: name, zone at +0x44
+#define T_SIZE      (T_SETRECS + 0xA0)
 #define T_ADDR(off) (GLOBAL_BINARY_WII_BASE + (off))
 
-#define T_OBJECT_PTRS 81u   // image pointers in the hand-typed objects and their header slots
+#define T_OBJECT_PTRS 86u   // image pointers in the hand-typed objects and their header slots
 
 static u8 gFakeVtable[4];
 static void* TestResolver(u32 addr, void*) {
@@ -1475,6 +1497,22 @@ static void BuildEffects(u8* hdr, u8* img) {
     Put32(img + T_POOL_BLOCK, 0);
     Put32(img + T_POOL_NODES + 0x00, 0); Put32(img + T_POOL_NODES + 0x04, T_ADDR(T_POOL_NODES + 0x30));
     Put32(img + T_POOL_NODES + 0x30, T_ADDR(T_POOL_NODES)); Put32(img + T_POOL_NODES + 0x34, 0);
+
+    // The screen set database: two sets, the table sorted by key.
+    Put32(hdr + 0xDC0, T_ADDR(T_SETDB));
+    Put32(img + T_SETDB + 0x00, T_ADDR(T_SETRECS));            // no reader: stays big-endian
+    Put32(img + T_SETDB + 0x04, 2);
+    Put32(img + T_SETDB + 0x20, T_ADDR(T_SETTABLE));
+    Put32(img + T_SETTABLE + 0, T_ADDR(T_SETENTRIES)); Put32(img + T_SETTABLE + 4, 2);
+    Put32(img + T_SETENTRIES + 0x0, 0x0F2194DF); Put32(img + T_SETENTRIES + 0x4, T_ADDR(T_SETRECS + 0x50));
+    Put32(img + T_SETENTRIES + 0x8, 0x8875297D); Put32(img + T_SETENTRIES + 0xC, T_ADDR(T_SETRECS));
+    for (u32 i = 0; i < 2; i++) {
+        u8* rec = img + T_SETRECS + i * 0x50;
+        memset(rec, 0, 0x50);
+        memcpy(rec, i == 0 ? "UI_first" : "UI_second", i == 0 ? 8 : 9);
+        Put32(rec + 0x44, 472 + i);
+        Put32(rec + 0x48, i == 0 ? 0x8875297D : 0x0F2194DF);   // no reader: stays big-endian
+    }
 }
 
 // A miniature global_binary image: the database object, 42 descriptors (two with rows), in the
@@ -2112,6 +2150,16 @@ static int SelfTest(void) {
         const u8* second = *(const u8**)(head + 4);
         CHECK(*(const u8**)head == NULL && second == img + T_POOL_NODES + 0x30 && *(const u8**)second == head && *(const u8**)(second + 4) == NULL);
         CHECK(head[8] == 0x7F && head[0x0B] == 0x01);                              // the items: untouched
+
+        // The screen set database, searched the way fn_801EBE74 does for UIEngine_LoadUIScreenSet.
+        const u8* db = *(const u8**)(hdr + 0xDC0);
+        const u8* table = *(const u8**)(db + 0x20);
+        const u8* entries = *(const u8**)table;
+        CHECK(db == img + T_SETDB && table == img + T_SETTABLE && entries == img + T_SETENTRIES && *(const s32*)(table + 4) == 2);
+        CHECK(*(const u32*)entries == 0x0F2194DF && *(const u32*)(entries + 8) == 0x8875297D);
+        const u8* found = *(const u8**)(entries + 12);
+        CHECK(found == img + T_SETRECS && *(const s32*)(found + 0x44) == 472 && strcmp((const char*)found, "UI_first") == 0);
+        CHECK(*(const s32*)(*(const u8**)(entries + 4) + 0x44) == 473 && found[0x48] == 0x88 && db[7] == 2);
     }
 
     // Pointer fields of a hand-written schema: image, main.dol (known and unknown), elsewhere, NULL.
@@ -2179,6 +2227,10 @@ static int SelfTest(void) {
         { T_POOL + 0x00, 0, SIR_ERR_POOL, -1 },                                             // pool without items
         { T_POOL + 0x08, 0x18, SIR_ERR_POOL, -1 },                                          // alignment not a power of two
         { T_POOL + 0x1C, T_ADDR(T_POOL_NODES), SIR_ERR_POOL, -1 },                          // block list is not the block
+        { T_SETENTRIES + 0x8, 0x0F2194DF, SIR_ERR_SCREEN_SETS, -1 },                        // screen set keys not ascending
+        { T_SETTABLE + 0x4, 0x100000, SIR_ERR_SCREEN_SETS, -1 },                            // screen set table runs off the image
+        { T_SETENTRIES + 0x4, T_ADDR(T_SIZE - 0x20), SIR_ERR_SCREEN_SETS, -1 },             // record runs off the image
+        { T_SETENTRIES + 0x4, T_ADDR(T_POOL - 0x24), SIR_ERR_OVERLAP, -1 },                 // record whose zone word is inside the pool
         { T_POOL + 0x10, T_ADDR(T_POOL_NODES + 0x10), SIR_ERR_POOL, -1 },                   // free list does not start at a node
         { T_POOL_NODES + 0x04, T_ADDR(T_FXBOLT), SIR_ERR_POOL, -1 },                        // node links out of the pool
         { T_POOL + 0x00, 3, SIR_ERR_POOL, -1 },                                             // third node would be the fill behind the block

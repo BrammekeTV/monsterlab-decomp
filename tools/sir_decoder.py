@@ -1015,6 +1015,24 @@ def image_dump(path):
         for i in range(count):
             a = first + i * (size + 8)
             L.append('poolnode 0x%03x %d %s prev %s next %s' % (s, i, ptr(a), ptr(u(off(a))), ptr(u(off(a) + 4))))
+
+    # Screen set database (header slot 0xDC0): UIEngine_LoadUIScreenSet searches the table at
+    # +0x20 by name hash (fn_801EBE74) and reads the zone at +0x44 of the record it finds.
+    rw = lambda x: struct.unpack_from('>I', sec, x)[0]
+    db = hb(0xDC0)
+    if db:
+        table = rw(db - GB_BASE + 0x20)
+        L.append('screensetdb %s table %s' % (ptr(db), ptr(table)))
+        if table:
+            to = table - GB_BASE
+            entries, n = rw(to), rw(to + 4)
+            L.append('screensettable %s entries %s count %d' % (ptr(table), ptr(entries), n))
+            for i in range(n):
+                eo = entries - GB_BASE + i * 8
+                rec = rw(eo + 4)
+                ro = rec - GB_BASE
+                L.append('screenset %d key %08x record %s zone %d name %s' % (
+                    i, rw(eo), ptr(rec), rw(ro + 0x44), sec[ro:sec.index(b'\0', ro)].decode('ascii')))
     return L
 
 # ----------------------------------------------------------------------------- catalog
