@@ -100,6 +100,11 @@
   {
    "date": "2026-11-23",
    "time": "19:20",
+   "text": "Checked 149 larger in-level gameplay functions (world, characters, camera, waypoints, triggers) against the original game code and fixed 5 mistakes in our decompiled code (PR #98). Two world-state flags were written as whole words, overwriting the bytes next to them. The player respawn call was missing an argument. A particle spawn copied one word too many, and an entity colour loop read its count from the wrong place."
+  },
+  {
+   "date": "2026-11-23",
+   "time": "19:20",
    "text": "The Windows version runs faster (PR #99): the PC parts (graphics, sound mixer and data loader) are now built with compiler optimisation, which takes the boot from about 34 to about 46 frames per second against the Wii's 50. The decompiled game code still builds unoptimised for now, because optimising it makes the game crash at the start. Finding the functions behind that is next."
   },
   {
