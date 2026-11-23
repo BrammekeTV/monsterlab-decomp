@@ -401,7 +401,7 @@ void SaveRewardQuest(SaveProgress* s, u32 quest) {
         memcpy(rec, RewardRec(i), sizeof(rec));
         if (*(s32*)(rec + 0xC) != (s32)quest) continue;
         SaveUnlockReward(s, rec, TRUE);
-        PostNotice6(s, NOTICE_QUEST_REWARD, (s32)quest, *(s32*)(rec + 0x18));
+        PostNotice6(s, NOTICE_QUEST_REWARD, (s32)quest, (s32)*(const f32*)(rec + 0x18));
     }
 }
 
