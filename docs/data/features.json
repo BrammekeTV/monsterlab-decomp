@@ -99,6 +99,11 @@
  "changelog": [
   {
    "date": "2026-11-23",
+   "time": "17:57",
+   "text": "Checked all 289 larger menu, save and Lab functions against the original game code and fixed 10 mistakes in our decompiled code (PR #91). Among them, unlocked parts now get the right tier and quality, quest rewards show the right value, the matchup screen reads the waiting-opponent flag correctly, and a menu animation runs at the right speed. A log of every checked function is in docs/audit_log.txt."
+  },
+  {
+   "date": "2026-11-23",
    "time": "17:45",
    "text": "17 more Wii SDK functions have their real names (PR #90): system clock and threads, video timing, the audio DSP, and graphics setup. That's 77 named so far."
   },
