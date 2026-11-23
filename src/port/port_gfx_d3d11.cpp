@@ -81,7 +81,9 @@ struct OutKey { u32 bm, zm, alpha, cull, vp[6], sc0, sc1; f32 squeeze; s32 offX,
 
 static struct { u32 draws, tris, presents, texCopies, textures, shaders, skipped; } sGfxStats;
 // This frame so far (reset at each display copy): time inside this backend, draws, GX vertices, copies.
+static s64 sTotalDraw, sTotalCopy;     // time inside the backend over the whole run (the boot summary)
 static struct { s64 renderTicks; u32 draws, verts, copies; } sFrame;
+static inline s64 Ticks_freq(void) { LARGE_INTEGER f; QueryPerformanceFrequency(&f); return f.QuadPart; }
 static inline s64 Ticks(void) { LARGE_INTEGER t; QueryPerformanceCounter(&t); return t.QuadPart; }
 static u8 sTlutMem[0x80000];           // the palette half of the console's texture memory
 
@@ -110,7 +112,7 @@ static DWORD WINAPI WindowThread(void*) {
     RegisterClassA(&wc);
     RECT r = {0, 0, (LONG)sOutW, (LONG)sOutH};
     AdjustWindowRect(&r, WS_OVERLAPPEDWINDOW, FALSE);
-    sWnd = CreateWindowA(wc.lpszClassName, "Monster Lab (PC port)", WS_OVERLAPPEDWINDOW | WS_VISIBLE, CW_USEDEFAULT, CW_USEDEFAULT,
+    sWnd = CreateWindowA(wc.lpszClassName, "Monster Lab (PC port)", WS_OVERLAPPEDWINDOW | (getenv("PORT_HIDDEN") ? 0 : WS_VISIBLE), CW_USEDEFAULT, CW_USEDEFAULT,
                          r.right - r.left, r.bottom - r.top, NULL, NULL, wc.hInstance, NULL);
     SetEvent(sWndReady);
     MSG msg;
@@ -1103,10 +1105,31 @@ static void CopyEfb(const PortGx* g, u32 control) {
         FrameStats(&stats);
         PortOverlayFrame(&stats);
         if (gPortOptions.screenshotStats) PortOverlayDraw(sOutRtv, sOutW, sOutH);
-        if (sSwap && !PortFastActive()) {            // fast-forward: rendered (for screenshots) but not presented
+        // Fast-forward: every frame is rendered (copies and screenshots stay right) but the window gets
+        // a picture only four times a second, with the progress in the title bar, so it never looks hung.
+        BOOL fast = PortFastActive(), show = sSwap != NULL;
+        static DWORD lastFast;
+        static BOOL  titled;
+        if (fast && sSwap) {
+            DWORD now = GetTickCount();
+            show = (now - lastFast) >= 250;
+            if (show) {
+                lastFast = now;
+                char t[96];
+                s32 total = gPortOptions.fastForward;
+                if (total > 0) snprintf(t, sizeof(t), "Monster Lab (PC port) - Fast-forwarding... frame %d / %d", (int)PortFrameCount(), (int)total);
+                else snprintf(t, sizeof(t), "Monster Lab (PC port) - Fast-forwarding... frame %d", (int)PortFrameCount());
+                SetWindowTextA(sWnd, t);
+                titled = TRUE;
+            }
+        } else if (titled && sWnd) {
+            SetWindowTextA(sWnd, "Monster Lab (PC port)");
+            titled = FALSE;
+        }
+        if (show) {
             Blit(sOutSrv, sBackRtv, 0, 0, sOutW, sOutH, 0, 0, 1, 1);
             if (!gPortOptions.screenshotStats) PortOverlayDraw(sBackRtv, sOutW, sOutH);
-            sSwap->Present(gPortSettings.vsync ? 1 : 0, 0);
+            sSwap->Present(gPortSettings.vsync && !fast ? 1 : 0, 0);
         }
         sGfxStats.presents++;
         if (sTraceFrom > 1 && sGfxStats.presents >= sTraceFrom) sTrace = TRUE;
@@ -1252,21 +1275,42 @@ static BOOL SavePng(ID3D11Texture2D* tex, u32 sLastW, u32 sLastH, const char* pa
     return TRUE;
 }
 
+// A texture of another device as a PNG (the first-run screen's test picture).
+BOOL PortGfxSaveTexture(ID3D11Device* dev, ID3D11DeviceContext* ctx, ID3D11Texture2D* tex, u32 w, u32 h, const char* path) {
+    ID3D11Device* keepDev = sDev;
+    ID3D11DeviceContext* keepCtx = sCtx;
+    sDev = dev; sCtx = ctx;
+    BOOL ok = SavePng(tex, w, h, path);
+    sDev = keepDev; sCtx = keepCtx;
+    return ok;
+}
+
 BOOL PortGfxSaveScreenshot(const char* path) {
     if (!sStarted || !sShown) return FALSE;
     return SavePng(sOutTex, sOutW, sOutH, path);
 }
 
 // ------------------------------------------------------------------ start
+// Fast-forward with a frame target: draws only matter through the copies of the frame buffer that later
+// frames use (the engine redraws and recopies everything each frame) and the picture at the target, so the
+// draws of all but the last kFastDrawn frames are dropped. The GX interpreter still decodes them: state and
+// copies go on. (--fast has no target and always draws.)
+static const s32 kFastDrawn = 30;
+static u32 sFastSkipped;
+static BOOL FastDropping(void) { return PortFastActive() && !gPortOptions.fastAll && gPortOptions.fastForward > 0 && PortFrameCount() < gPortOptions.fastForward - kFastDrawn; }
 static void Draw(const PortGx* g, u32 prim, const PortGxLayout* L, u32 count, const u8* data) {
+    if (FastDropping()) { sFastSkipped++; return; }
     s64 t = Ticks();
     DrawPrims(g, prim, L, count, data);
     sFrame.renderTicks += Ticks() - t;
+    sTotalDraw += Ticks() - t;
 }
 static void Copy(const PortGx* g, u32 control) {
+    if (FastDropping()) return;                  // nothing was drawn: the copy would only move an old picture
     s64 t = Ticks();
     CopyEfb(g, control);
     sFrame.renderTicks += Ticks() - t;
+    sTotalCopy += Ticks() - t;
 }
 static const PortGxBackend kBackend = {Draw, Copy, LoadTlut};
 
@@ -1378,8 +1422,9 @@ BOOL PortGfxStart(BOOL window) {
 
 const char* PortGfxStatsText(char* buf, u32 n) {
     if (!sStarted) { snprintf(buf, n, "no renderer (run with --window or --screenshot FILE)"); return buf; }
-    snprintf(buf, n, "%u draw(s), %u triangle(s), %u picture(s) shown, %u copy(ies) to a texture, %u texture(s) decoded, %u shader(s), %u draw(s) skipped",
-             sGfxStats.draws, sGfxStats.tris, sGfxStats.presents, sGfxStats.texCopies, sGfxStats.textures, sGfxStats.shaders, sGfxStats.skipped);
+    snprintf(buf, n, "%u draw(s), %u triangle(s), %u picture(s) shown, %u copy(ies) to a texture, %u texture(s) decoded, %u shader(s), %u draw(s) skipped; backend time: draws %.1f s, copies %.1f s, %u draw(s) dropped by fast-forward",
+             sGfxStats.draws, sGfxStats.tris, sGfxStats.presents, sGfxStats.texCopies, sGfxStats.textures, sGfxStats.shaders, sGfxStats.skipped,
+             sTotalDraw / (double)Ticks_freq(), sTotalCopy / (double)Ticks_freq(), sFastSkipped);
     return buf;
 }
 #endif

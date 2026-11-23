@@ -91,7 +91,7 @@ extern "C" s32 fn_801B62A4(u8* a3) {
 }
 
 // 0x801B62C8
-extern "C" u16 fn_801B62C8(u8* a3) {
+extern "C" u32 fn_801B62C8(u8* a3) {
     u8* t0 = *(u8**)(((u8*)(uintptr_t)(a3)) + 4);
     u16 t1 = *(u16*)(t0 + 50);
     return (u16)(t1);

@@ -7,7 +7,7 @@
 #include "game/script_callbacks.h"
 
 extern "C" f32 fn_80079190(void);
-extern "C" u8 fn_8007C124(u8*);
+extern "C" u32 fn_8007C124(u8*);
 
 // 0x80077CC0
 s32 WeldingShakeThisFrame(ScriptCtx* a3) {

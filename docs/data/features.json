@@ -77,8 +77,8 @@
   },
   {
    "title": "Own-disc setup (ISO picker)",
-   "detail": "No game content is ever shipped. On first launch the player picks their own Monster Lab disc image (.iso or .wbfs). The port checks that it is the PAL version, extracts the files it needs and remembers them, so there is nothing to set up by hand.",
-   "status": "todo"
+   "detail": "No game content is ever shipped. On first launch the player picks their own Monster Lab disc image (.iso) or extracted folder; the game is read straight from the image, checked to be the right game and region, and the choice is kept in monsterlab.ini, with a Game page in the settings to change it (PRs #107, #111). .wbfs and .rvz images are not supported yet.",
+   "status": "done"
   },
   {
    "title": "Mod support",
@@ -97,6 +97,26 @@
   }
  ],
  "changelog": [
+  {
+   "date": "2026-11-23",
+   "time": "23:10",
+   "text": "Two fixes towards a living main-menu scene (PR #116). Level objects were updated with a frame time of 0, so their animations never advanced; now animated props and particle emitters move. And the game's clock read its two halves the wrong way round, giving an absurd time value. The castle scene itself is still mostly static: its camera doesn't move yet, and most of its objects aren't active. That's next."
+  },
+  {
+   "date": "2026-11-23",
+   "time": "23:03",
+   "text": "New smoke test, tools/smoke.py (PR #114): in under a minute it builds, runs the self-test and boots to the title and the main menu headless, then checks nothing crashed or came out blank. Every session now runs it before opening a PR. Also, the build script works again after two changes clashed (PR #115), and with the whole game optimised the game logic runs about 60% faster (about 150 instead of 93 frames per second, measured without drawing)."
+  },
+  {
+   "date": "2026-11-23",
+   "time": "22:56",
+   "text": "The whole Windows version is now built with compiler optimisation (PR #113), not just the PC parts. Some auto-generated functions returned small values whose top bits the callers then read, which only went wrong once optimised; they now return full values. Also, --to-menu in a window reaches the main menu in about 28 seconds instead of two minutes, because it skips drawing while fast-forwarding (PR #112)."
+  },
+  {
+   "date": "2026-11-23",
+   "time": "22:34",
+   "text": "Choose your own game disc (PR #111): on first start, the Windows version shows a screen where you pick your Monster Lab disc image or extracted folder. It checks that it's the right game and remembers the choice in monsterlab.ini; the settings screen has a Game page to change it. Also, the window now shows fast-forward progress while --to-menu skips the intro (PR #110). At 1080p that skip takes a couple of minutes in a window, so it isn't stuck."
+  },
   {
    "date": "2026-11-23",
    "time": "20:30",

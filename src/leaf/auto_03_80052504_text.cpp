@@ -244,7 +244,7 @@ extern "C" u32 fn_80054A74(u8* a3) {
 }
 
 // 0x80054A88
-extern "C" u8 fn_80054A88(u8* a3) {
+extern "C" u32 fn_80054A88(u8* a3) {
     u8 t0 = *(u8*)(((u8*)(uintptr_t)(a3)) + 1072);
     return (u8)(t0);
 }

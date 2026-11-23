@@ -19,7 +19,7 @@ extern "C" s32 fn_8003FF7C(u8* a3) {
 }
 
 // 0x8003FFA4
-extern "C" u8 fn_8003FFA4(u8* a3, u8* a4) {
+extern "C" u32 fn_8003FFA4(u8* a3, u8* a4) {
     u8 t0 = *(u8*)(((u8*)(uintptr_t)(a3)) + 136);
     if ((u32)(t0) != 0x1u) {
         u8 t1 = *(u8*)(((u8*)(uintptr_t)(a3)) + 136);

@@ -13,7 +13,7 @@ extern "C" void fn_8011AD84(void) {
 }
 
 // 0x8011AEE0
-extern "C" u8 fn_8011AEE0(void) {
+extern "C" u32 fn_8011AEE0(void) {
     u8 t0 = *(u8*)((u8*)&lbl_805FB2A4);
     return (u8)(t0);
 }
