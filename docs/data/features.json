@@ -99,6 +99,11 @@
  "changelog": [
   {
    "date": "2026-11-23",
+   "time": "18:12",
+   "text": "Fixed five functions that were declared differently in different files (PR #94). Each one now matches the original game code, so the PC version passes them the right arguments. The prototype check now reports no conflicts."
+  },
+  {
+   "date": "2026-11-23",
    "time": "18:11",
    "text": "You can control the game on Windows now (PR #93). Keyboard, mouse and Xbox-style gamepads stand in for the Wii Remote and Nunchuk, with the mouse as the pointer. Pressing A on the title screen plays its exit animation and opens the main menu. The menu's own pictures don't draw yet. The controls are kept in one table, ready for the settings screen later."
   },
