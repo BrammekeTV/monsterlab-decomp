@@ -30,3 +30,9 @@ typedef intptr_t ScriptValue;
 
 // Marks the original address of a decompiled function / variable.
 #define ORIG(addr)
+
+// The body of a loop that waits for an interrupt handler to change memory. On the console it is
+// empty: the interrupt arrives between two instructions. The PC build has no preemption, so the
+// loop has to let the interrupt thread run (PortInterruptPoint, docs/port_runtime.md).
+extern "C" void PortInterruptPoint(void);
+#define WAIT_FOR_INTERRUPT() PortInterruptPoint()

@@ -421,6 +421,20 @@ enum {
     LEVEL_FIXUP_FSM           = 656    // FixupFSMPoolCallback: a slot holding a state machine
 };
 
+// The script functions with a sound argument (signature argument type 0xB), by their index in
+// gScriptFuncs: the loader converts the sound objects their calls in action records point at.
+// As with the pool functions above, the indices are those of the retail build and the port checks
+// them against the live table. Bit n of argMask: argument n is a sound.
+typedef struct SirSoundCall { u16 func; u8 argMask; const char* name; } SirSoundCall;
+#define SIR_SOUND_CALLS 16
+#ifdef __cplusplus
+extern "C" {
+#endif
+extern const SirSoundCall kSirSoundCalls[SIR_SOUND_CALLS];
+#ifdef __cplusplus
+}
+#endif
+
 // What a converted header block names in one zone (Wii addresses).
 typedef struct LevelZoneRoots {
     u32  hud;                // header +0x1F4, or 0 when the HUD is in another zone

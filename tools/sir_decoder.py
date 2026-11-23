@@ -475,6 +475,42 @@ def fnv(b):
         h = ((h ^ c) * 0x01000193) & 0xFFFFFFFF
     return h
 
+# Script functions with a sound argument (index in gScriptFuncs: mask of the sound arguments), as
+# kSirSoundCalls in src/port/sir_loader.cpp.
+SOUND_CALLS = {48: 1, 49: 1, 50: 1, 51: 2, 52: 2, 55: 2, 56: 2, 1216: 3, 1217: 3, 1238: 1, 1239: 1, 1297: 2, 1330: 2,
+               1332: 1, 1684: 3, 1693: 1}
+
+def sound_dump(L, sec, base, o, n, ptr):
+    """The sound objects the calls of the action program at offset o (n words) name: every
+    variation (0x30 bytes), its sound info and the info's DSP header."""
+    u = lambda q: struct.unpack_from('>I', sec, q)[0]
+    h = lambda q: struct.unpack_from('>H', sec, q)[0]
+    inz = lambda v, size: base <= v and v + size <= base + len(sec)
+    k = 0
+    while k < n:
+        w = u(o + k * 4)
+        op, ln = w & 0xFF, (w >> 8) & 0xFF
+        mask = SOUND_CALLS.get((w >> 16) & 0xFFF, 0) if op == 0x16 else 0
+        for a in range(ln - 1 if mask else 0):
+            snd = u(o + (k + 1 + a) * 4)
+            if not (mask >> a & 1) or not snd or not inz(snd, 0x30): continue
+            q = snd - base
+            for i in range(sec[q + 4] or 1):
+                e = q + i * 0x30
+                info = u(e)
+                line = 'sound img+0x%x %d info %s bytes %s pitch %08x f10 %08x words %s' % (q, i, ptr(info), sec[e + 4:e + 8].hex(),
+                    u(e + 8), u(e + 0x10), ' '.join('%08x' % u(e + 0x18 + j * 4) for j in range(5)))
+                if info and inz(info, 0x18):
+                    f = info - base
+                    dsp = u(f + 4)
+                    line += ' | %s %s size %d flag %d zone %d' % (ptr(u(f)), ptr(dsp), u(f + 8), h(f + 0xC), h(f + 0xE))
+                    if dsp and inz(dsp, 0x60):
+                        d = dsp - base
+                        line += ' | samples %d rate %d loop %d format %d ends %d %d sum %04x' % (u(d), u(d + 8), h(d + 0xC), h(d + 0xE),
+                            u(d + 0x10), u(d + 0x14), sum(h(d + 0x1C + j * 2) for j in range(34)) & 0xFFFF)
+                L.append(line)
+        k += ln if op <= 0x1B else 1
+
 def machines_dump(L, sec, base, hud_addr, list_addr, level=False, extra=()):
     """Appends the dump of a HUD and its state machines (global_binary.sir, or a level zone: there
     the HUD carries the screen-list slot at +0x434 and points at it from +0x24)."""
@@ -623,6 +659,11 @@ def level_dump(path):
          'leveltables %s | %s | %s | %s | %s' % tuple(tab(o) for o in (0x1A4, 0x1B0, 0x1BC, 0x1C8, 0x1D4)),
          'levelstate %s b1ec %d w1f0 %d hud %s floats %s wa20 %d w1a7c %d floats %s' % (
             ws(0x1E0, 3), hdr[0x1EC], i32(0x1F0), ptr(u(0x1F4)), ws(0x1F8, 6), i32(0xA20), i32(0x1A7C), ws(0x1A84, 2)),
+         ] + [
+         # The three light records (0x1F8, 0x82C bytes each), as EntityUpdate reads them.
+         'levellight %d floats %s w20 %08x ids %d sum %08x flags %08x' % (k, ws(o, 8), u(o + 0x20), i32(o + 0x824),
+            sum(u(o + 0x24 + i * 4) for i in range(512)) & 0xFFFFFFFF, u(o + 0x828)) for k, o in enumerate((0x1F8, 0xA24, 0x1250))
+         ] + [
          'levelpicture %d %d floats %s' % (hdr[0x1A80], hdr[0x1A81], ws(0x1A84, 39)),
          'levellocators %d %s' % (u(0x24), ptr(u(0x28)))]
     for t in (0x1B0, 0x1BC):
@@ -681,7 +722,7 @@ def shared_zone_dump(L, zn, sec, slot_size, zone0, zbase0):
     if zbase0 <= rec and rec + 0x14 <= zbase0 + len(zone0):
         head = struct.unpack_from('>I', zone0, rec - zbase0 + 0x10)[0]
         if inz(head): lists.append(head)
-    zone_dump(L, sec, base, 0, roots, [], pooltabs, [], lists)
+    zone_dump(L, sec, base, 0, roots, [], pooltabs, [], lists, actiontabs=[u(0xD4)] if inz(u(0xD4), 8) else [])
     ss = u(0x100)
     if not inz(ss, 0x2C): return
     table = u(ss - base + 0x28)
@@ -1058,6 +1099,7 @@ def zone_dump(L, sec, base, hud, roots, scene_roots, pooltabs, records=(), lists
                 jumps += 4 <= op <= 0x11
                 n += ln if op <= 0x1B else 1
             L.append('zoneaction %d %s words %d calls %d jumps %d sum %08x' % (i, ptr(p), n + 1, calls, jumps, fnv(sec[o:o + (n + 1) * 4])))
+            sound_dump(L, sec, base, o, n, ptr)
     # The slots' placed effects (slot +0x80, count +0x9C), as WorldOnZoneLoaded reads them.
     seen_fx = set()
     for addr, n in sloteffects:
@@ -1119,9 +1161,9 @@ def zone_dump(L, sec, base, hud, roots, scene_roots, pooltabs, records=(), lists
         a = ents[i]; i += 1
         if not inz(a, 0x1B4): continue
         o = off(a)
-        L.append('entity %s vtable %08x record %s parts %s scene %s w94 %d %d obj9c %s holder %s children %s f158 %08x more %s %d w1a8 %d flags %08x' % (
+        L.append('entity %s vtable %08x record %s parts %s scene %s w94 %d %d obj9c %s holder %s children %s f158 %08x more %s %d w1a8 %d flags %08x wb8 %08x' % (
             ptr(a), u(o), ptr(u(o + 4)), ptr(u(o + 0x8C)), ptr(u(o + 0x90)), i32(o + 0x94), i32(o + 0x98), ptr(u(o + 0x9C)), ptr(u(o + 0xA4)),
-            ptr(u(o + 0xB0)), u(o + 0x158), ptr(u(o + 0x194)), i32(o + 0x1A4), i32(o + 0x1A8), u(o + 0x1B0)))
+            ptr(u(o + 0xB0)), u(o + 0x158), ptr(u(o + 0x194)), i32(o + 0x1A4), i32(o + 0x1A8), u(o + 0x1B0), u(o + 0xB8)))
         r = u(o + 4)
         # The record of an entity outside zone 0 lies in zone 0's image, and so does its definition.
         def loc(v, n):
@@ -1372,6 +1414,7 @@ def image_dump(path):
             jumps += 4 <= op <= 0x11
             n += ln if op <= 0x1B else 1
         L.append('actionprog %d %s words %d calls %d jumps %d sum %08x' % (i, ptr(p), n + 1, calls, jumps, fnv(sec[o:o + (n + 1) * 4])))
+        sound_dump(L, sec, GB_BASE, o, n, ptr)
 
     # UI root (slot 0xDB0), its fonts and the objects of slots 0xDB4, 0xDB8, 0xDBC. Only the fields
     # the game code reads are decoded (docs/loader.md lists what is left).

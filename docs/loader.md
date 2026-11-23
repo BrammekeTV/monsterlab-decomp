@@ -24,7 +24,7 @@ Code: `include/port/sir_loader.h`, `src/port/sir_loader.cpp`. Test: `tests/sir_l
 | `global_binary.sir` UI root, fonts and the objects of slots `0xDB4`-`0xDBC` | the fields the code reads are converted, and the glyph data of the four fonts |
 | `global_binary.sir` effect definitions (slots `0x82C`-`0x840`: 27 + 70 entries) and the two object pools of slots `0x10`, `0x418` | converted; fields typed from the effect and pool code |
 | `global_binary.sir` screen set database (header slot `0xDC0`) | the lookup table and each record's zone are converted: see "Screen set database" |
-| `global_binary.sir` sound objects named by action records | not converted: see "Not converted yet" |
+| sound objects named by action records (`global_binary.sir` and zone action tables) | converted: variation, sound info and DSP header; see "Sound objects" |
 | Level files (`*_level.sir`, arenas, castle rooms): header block (the world state, 493 zone slots); in zone 0 the HUD and state machines, the first layer of every entity, scene objects, pool tables and their pools | the fields the level start reads are converted; the rest of an entity and of the zone images is not: see "Level files" |
 | Hook into the game's `SirLoad` | not wired (the port has no file layer yet) |
 
@@ -387,6 +387,21 @@ further on, a flag word, floats (1.0, -3.0), a hash, and in the second part of o
 (`Generic_Timer_Countdown_Mo_01`). They are **not** converted: the functions that read them are
 not decompiled far enough to type the fields.
 
+### Sound objects
+
+A script function whose signature has an argument of type `0xB` gets a pointer to a sound object.
+The loader knows the 16 functions by their index in `gScriptFuncs` (`kSirSoundCalls` in
+`sir_loader.cpp`; the port checks the indices against the live table before it converts a zone)
+and converts what their calls in action records point at:
+
+| Object | Bytes | Fields |
+|---|---|---|
+| variation | 0x30 each | `+0x00` sound info, `+0x04` count of variations (byte, 0 = one; `PlaySoundAt` picks one), `+0x06` volume, `+0x07` volume spread, `+0x08` pitch, `+0x10` float, `+0x14` kind, `+0x15`/`+0x16` distances, `+0x2D`/`+0x2E` flags. `+0x0C`, `+0x18`..`+0x2B` have no reader yet (words: 0, a hash, zeros) |
+| sound info | 0x18 + name | `+0x00` word and `+0x04` DSP header (`fn_801FE52C`), `+0x08` size, `+0x0C` u16 (`PlaySoundAt`), `+0x0E` zone (`fn_801FF154`), `+0x18` name |
+| DSP header | 0x60 | as the start of a `.dsp` file (`fn_80203340`); the samples behind it are bytes |
+
+Arguments of type `0xD` (`LT_SetTutorialText`, `PlayVoiceSFX`, `StopVoiceSFX`) are still not converted.
+
 ### Screen state machines (header slots `0xD98`, `0xD9C`)
 
 `UiInit` hands slot `0xD98` (the screen list) to `fn_801BC574` and slot `0xD9C` (the HUD) to
@@ -584,9 +599,8 @@ which gives the address. Pointers in it go into the block itself or into the zon
 | `0x1A4`, `0x1B0`, `0x1BC`, `0x1C8`, `0x1D4` | five tables `{pointer, capacity, used}`: the zone slots, three tables of one pointer per zone, one of 12-byte entries | `fn_80129CC8` |
 | `0x1E0`-`0x1F0` | words and a byte | `GameSessionUpdate`, `PlayFootStepEffect`, `fn_800D7FF0`, `WorldPostUpdate` |
 | `0x1F4` | the level's HUD, in zone 0 | `HudReload`, `fn_800D8100` |
-| `0x1F8`-`0x20C` | floats | `fn_8003E560`, `fn_8006C3FC` |
+| `0x1F8` | three light records of 0x82C bytes (`0x1A7C` of them in use): six colour floats, two angles at `+0x18`, up to 512 definition ids from `+0x24`, their count at `+0x824`, flags at `+0x828` | `EntityUpdate`, `fn_8003E560`, `fn_8006C3FC` |
 | `0x1A80` | the level's picture settings (0xA0 bytes): two flag bytes, then 39 floats at `0x1A84`: brightness, contrast, gamma and the colour rows the colour tables are built from | `fn_8012A79C` copies them to `lbl_8040D500`, `fn_8015F4CC` builds the tables; `SetOptionsBrightness` |
-| `0xA20`, `0x1A7C` | words | `fn_8003E560`, `EntityUpdate` |
 | `0x21E0` | 493 zone slots | below |
 
 A zone slot is `0x148 + 0x54 * n` bytes (`gZoneResourceSize`; 0x19C in the shipped files). The

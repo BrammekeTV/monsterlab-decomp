@@ -89,6 +89,9 @@ static void CheckFixUpIndices(const char* file) {
     for (u32 i = 0; i < 6; i++)
         if (gScriptFuncs[LEVEL_FIXUP_ENTITY + i].hash != StringHash(names[i]))
             PortStop(8, "%s: script function %u is not %s: the level loader's pool item kinds would be wrong", file, LEVEL_FIXUP_ENTITY + i, names[i]);
+    for (u32 i = 0; i < SIR_SOUND_CALLS; i++)
+        if (gScriptFuncs[kSirSoundCalls[i].func].hash != StringHash(kSirSoundCalls[i].name))
+            PortStop(8, "%s: script function %u is not %s: the loader would convert the wrong sound objects", file, kSirSoundCalls[i].func, kSirSoundCalls[i].name);
 }
 
 static void ConvertSection(const char* name, const SirCatalogFile* file, const SirCatalogEntry* e, u8* dst);
