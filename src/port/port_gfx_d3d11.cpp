@@ -735,10 +735,17 @@ static void Draw(const PortGx* g, u32 prim, const PortGxLayout* L, u32 count, co
                     sVerts[i].pos[3], sVerts[i].col[0][0], sVerts[i].col[0][1], sVerts[i].col[0][2], sVerts[i].col[0][3], sVerts[i].tc[0][0], sVerts[i].tc[0][1], sVerts[i].tc[0][2],
                     sVerts[i].tc[1][0], sVerts[i].tc[1][1]);
     }
+    // The vertices go behind those of the earlier draws; the buffer (9 MB) is only replaced when
+    // it is full. Replacing it for every draw made a scene of a few thousand small draws crawl.
+    static u32 sVbUsed;
+    u32 first = sVbUsed;
     D3D11_MAPPED_SUBRESOURCE map;
-    if (FAILED(sCtx->Map(sVb, 0, D3D11_MAP_WRITE_DISCARD, 0, &map))) return;
-    memcpy(map.pData, tris.data(), tris.size() * sizeof(Vtx));
+    D3D11_MAP how = D3D11_MAP_WRITE_NO_OVERWRITE;
+    if (first + tris.size() > VB_VERTS) { first = 0; how = D3D11_MAP_WRITE_DISCARD; }
+    if (FAILED(sCtx->Map(sVb, 0, how, 0, &map))) return;
+    memcpy((u8*)map.pData + (size_t)first * sizeof(Vtx), tris.data(), tris.size() * sizeof(Vtx));
     sCtx->Unmap(sVb, 0);
+    sVbUsed = first + (u32)tris.size();
 
     PsConst pc;
     for (int i = 0; i < 4; i++) for (int k = 0; k < 4; k++) { pc.reg[i][k] = g->tevReg[i][k] / 255.0f; pc.konst[i][k] = g->tevKonst[i][k] / 255.0f; }
@@ -776,7 +783,7 @@ static void Draw(const PortGx* g, u32 prim, const PortGxLayout* L, u32 count, co
     sCtx->VSSetShader(sVs, NULL, 0);
     sCtx->PSSetShader(ps, NULL, 0);
     sCtx->PSSetConstantBuffers(0, 1, &sPsConst);
-    sCtx->Draw((UINT)tris.size(), 0);
+    sCtx->Draw((UINT)tris.size(), first);
     sGfxStats.draws++;
     sGfxStats.tris += (u32)tris.size() / 3;
 }
