@@ -17,7 +17,7 @@ in `config/RM7P4F/symbols.txt`). Names live in `config/RM7P4F/names_sdk.txt`, on
 | HBM (Home Button Menu) | 0x802C8FC8-0x802CC440+ | four banners |
 | DWC / NHTTP | 0x802E49B8 / 0x8032C5B8 | banners |
 
-## Named by this pass (35)
+## Named by this pass (33)
 
 - GX texture objects: `GXInitTexObj*`, `GXGetTexObj*`, `GXLoadTexObj*` (0x8024C3B8-0x8024C91C).
   Evidence: the init function memsets a 0x20-byte object and packs fields the getters read back.
