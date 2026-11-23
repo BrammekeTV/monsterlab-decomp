@@ -62,6 +62,7 @@ static struct { u32 draws, tris, presents, texCopies, textures, shaders, skipped
 static u8 sTlutMem[0x80000];           // the palette half of the console's texture memory
 
 struct Vtx { f32 pos[4]; f32 col[2][4]; f32 tc[8][3]; };
+static u32  sTraceFrom;
 static BOOL sTrace;                    // PORT_GFX_TRACE: log every draw and copy, save the frame buffer at each copy
 static BOOL SavePng(ID3D11Texture2D* tex, u32 w, u32 h, const char* path);
 #define VB_VERTS 65536
@@ -841,6 +842,7 @@ static void Copy(const PortGx* g, u32 control) {
             sSwap->Present(0, 0);
         }
         sGfxStats.presents++;
+        if (sTraceFrom > 1 && sGfxStats.presents >= sTraceFrom) sTrace = TRUE;
     } else {                                                // into a texture, kept at the frame buffer's resolution
         // The copy's format (bits 3-6, low bit = the second half of the list) says which
         // channels it takes: 8 red, 9 green, 10 blue, 7 alpha as an intensity texture; the others
@@ -1063,7 +1065,9 @@ BOOL PortGfxStart(BOOL window, int scale) {
     u32 white = 0xFFFFFFFF;
     sWhite = MakeTexture(&white, 1, 1);
 
-    sTrace = getenv("PORT_GFX_TRACE") != NULL;
+    // PORT_GFX_TRACE=N (N > 1) starts the trace when N pictures have been shown; any other value at once.
+    sTraceFrom = getenv("PORT_GFX_TRACE") ? (u32)atoi(getenv("PORT_GFX_TRACE")) : 0;
+    sTrace = getenv("PORT_GFX_TRACE") != NULL && sTraceFrom <= 1;
     sStarted = TRUE;
     PortGxSetBackend(&kBackend);
     return TRUE;
