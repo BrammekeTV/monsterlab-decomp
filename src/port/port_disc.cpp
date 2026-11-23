@@ -2,7 +2,8 @@
 // extracted. The image's header says which game it is; the game partition's title key is unwrapped
 // with the console's common key, its 0x8000-byte clusters (0x400 bytes of hashes, 0x7C00 of data)
 // are decrypted as they are read, and files are found through the partition's file table (FST).
-// The DVD functions (port_sdk.cpp) and the main.dol loader (port_runtime.cpp) read through this
+// The image can also be a .wbfs (Wii Backup Manager: the disc cut into blocks, only the used ones
+// stored; see Wbfs* below). The DVD functions (port_sdk.cpp) and the main.dol loader (port_runtime.cpp) read through this
 // when the game data is an image and not an extracted folder.
 #ifdef _WIN32
 #include <windows.h>
@@ -22,9 +23,14 @@
 
 static const u8 kCommonKey[16] = {0xEB, 0xE4, 0x2A, 0x22, 0x5E, 0x85, 0x93, 0xE4, 0x48, 0xD9, 0xC5, 0x45, 0x73, 0x81, 0xAA, 0xF7};
 
+enum { KIND_ISO, KIND_WBFS };
+
 struct Cluster { u64 index; u32 used; BOOL valid; u8 data[CLUSTER_DATA]; };
 static struct {
     HANDLE file;
+    int    kind;                   // KIND_*: how the image stores the disc
+    u32    wbfsShift, wbfsCount;   // .wbfs: log2 of the block size, number of blocks of the disc
+    u16*   wbfsMap;                // .wbfs: the file block (in blocks) of every disc block, 0 = not stored (reads as zeros)
     BOOL   open, plain;            // plain: an image stored without encryption and hashes
     u64    dataOff;                // the partition's data in the image
     BCRYPT_KEY_HANDLE key;         // the title key
@@ -43,6 +49,58 @@ static BOOL RawRead(HANDLE h, u64 off, void* dst, u32 len) {
     pos.QuadPart = (LONGLONG)off;
     DWORD got = 0;
     return SetFilePointerEx(h, pos, NULL, FILE_BEGIN) && ReadFile(h, dst, len, &got, NULL) && got == len;
+}
+
+// Like RawRead, but a file that ends early is not an error: the rest reads as zeros.
+static void RawReadSome(HANDLE h, u64 off, void* dst, u32 len) {
+    LARGE_INTEGER pos;
+    pos.QuadPart = (LONGLONG)off;
+    DWORD got = 0;
+    memset(dst, 0, len);
+    if (SetFilePointerEx(h, pos, NULL, FILE_BEGIN)) ReadFile(h, dst, len, &got, NULL);
+}
+
+// .wbfs: a header sector (magic, sector sizes as powers of two, a table of the discs), then for each
+// disc a record (a copy of the first 0x100 bytes of the disc, then one 16-bit big-endian block number
+// per block of the disc, 0 = not stored). Block numbers count blocks of the WBFS block size in the file.
+// Only the first disc of the file is used; split files (.wbf1) are not.
+static BOOL WbfsLoad(HANDLE h, u8* discHead, u32* shift, u32* count, u16** map) {
+    u8 b[0x20];
+    if (!RawRead(h, 0, b, sizeof(b)) || memcmp(b, "WBFS", 4)) return FALSE;
+    u32 hdShift = b[8], blkShift = b[9];
+    if (hdShift < 9 || hdShift > 12 || blkShift < 15 || blkShift > 28) return FALSE;
+    u32 hdSize = 1u << hdShift, n = ((u32)2 * 143432 * CLUSTER + (1u << blkShift) - 1) >> blkShift;   // up to a dual-layer disc
+    u8 table[4096];
+    RawReadSome(h, 0, table, hdSize < sizeof(table) ? hdSize : sizeof(table));
+    u32 slot = 12;
+    while (slot < hdSize && slot < sizeof(table) && !table[slot]) slot++;
+    if (slot >= hdSize || slot >= sizeof(table)) return FALSE;                 // no disc in the file
+    u64 recSize = ((u64)0x100 + n * 2 + hdSize - 1) & ~(u64)(hdSize - 1);
+    u64 rec = hdSize + (u64)(slot - 12) * recSize;
+    u16* m = (u16*)malloc(n * 2);
+    u8* raw = (u8*)malloc(n * 2);
+    if (!m || !raw || !RawRead(h, rec, discHead, 0x100)) { free(m); free(raw); return FALSE; }
+    RawReadSome(h, rec + 0x100, raw, n * 2);
+    for (u32 i = 0; i < n; i++) m[i] = (u16)(raw[i * 2] << 8 | raw[i * 2 + 1]);
+    free(raw);
+    *shift = blkShift; *count = n; *map = m;
+    return TRUE;
+}
+
+// Bytes of the disc as the image holds them (a game partition is still encrypted).
+static BOOL DiscRaw(u64 off, void* dstv, u32 len) {
+    if (sDisc.kind == KIND_ISO) return RawRead(sDisc.file, off, dstv, len);
+    u8* dst = (u8*)dstv;
+    u64 size = 1ull << sDisc.wbfsShift;
+    while (len) {
+        u64 k = off >> sDisc.wbfsShift;
+        u32 at = (u32)(off & (size - 1)), n = (u32)(size - at);
+        if (n > len) n = len;
+        if (k >= sDisc.wbfsCount || !sDisc.wbfsMap[k]) memset(dst, 0, n);
+        else if (!RawRead(sDisc.file, ((u64)sDisc.wbfsMap[k] << sDisc.wbfsShift) + at, dst, n)) return FALSE;
+        dst += n; off += n; len -= n;
+    }
+    return TRUE;
 }
 
 // AES-128 in CBC mode, through Windows.
@@ -69,6 +127,7 @@ void PortDiscClose(void) {
     if (sDisc.file && sDisc.file != INVALID_HANDLE_VALUE) CloseHandle(sDisc.file);
     if (sDisc.key) BCryptDestroyKey(sDisc.key);
     free(sDisc.fst);
+    free(sDisc.wbfsMap);
     memset(&sDisc, 0, sizeof(sDisc));
 }
 
@@ -78,7 +137,7 @@ u64  PortDiscDolOffset(void) { return sDisc.dolOff; }
 // Bytes of the game partition, decrypted.
 BOOL PortDiscRead(u64 off, void* dstv, u32 len) {
     u8* dst = (u8*)dstv;
-    if (sDisc.plain) return RawRead(sDisc.file, sDisc.dataOff + off, dst, len);
+    if (sDisc.plain) return DiscRaw(sDisc.dataOff + off, dst, len);
     static u8 raw[CLUSTER];
     while (len) {
         u64 index = off / CLUSTER_DATA;
@@ -93,7 +152,7 @@ BOOL PortDiscRead(u64 off, void* dstv, u32 len) {
         if (!c) {
             c = oldest;
             c->valid = FALSE;
-            if (!RawRead(sDisc.file, sDisc.dataOff + index * CLUSTER, raw, CLUSTER)) return FALSE;
+            if (!DiscRaw(sDisc.dataOff + index * CLUSTER, raw, CLUSTER)) return FALSE;
             if (!Aes(sDisc.key, FALSE, raw + 0x3D0, raw + 0x400, c->data, CLUSTER_DATA)) return FALSE;
             c->index = index;
             c->valid = TRUE;
@@ -112,9 +171,13 @@ int PortDiscCheck(const char* path, char* why, u32 n) {
     if (h == INVALID_HANDLE_VALUE) { snprintf(why, n, "The file cannot be opened: %s", path); return PORT_DISC_NO_FILE; }
     u8 hdr[0x60];
     BOOL ok = RawRead(h, 0, hdr, sizeof(hdr));
+    if (ok && !memcmp(hdr, "WBFS", 4)) {                                   // the disc's own header is copied into the file
+        u8 head[0x100]; u32 shift, count; u16* map;
+        ok = WbfsLoad(h, head, &shift, &count, &map);
+        if (ok) { free(map); memcpy(hdr, head, sizeof(hdr)); }
+    }
     CloseHandle(h);
-    if (ok && !memcmp(hdr, "WBFS", 4)) { snprintf(why, n, "This is a .wbfs image. It is not read yet: convert it to .iso (Dolphin can), or pick an extracted folder."); return PORT_DISC_NOT_WII; }
-    if (ok && !memcmp(hdr, "RVZ\x01", 4)) { snprintf(why, n, "This is a .rvz image. It is not read yet: convert it to .iso (Dolphin can), or pick an extracted folder."); return PORT_DISC_NOT_WII; }
+    if (ok && !memcmp(hdr, "RVZ", 4)) { snprintf(why, n, "This is a .rvz image. It is not read yet: convert it to .iso (Dolphin can), or pick an extracted folder."); return PORT_DISC_NOT_WII; }
     if (!ok || Be32(hdr + 0x18) != WII_MAGIC) {
         snprintf(why, n, ok && Be32(hdr + 0x1C) == 0xC2339F3Du ? "This is a GameCube disc image, not Monster Lab for Wii." : "This file is not a Wii disc image (.iso).");
         return PORT_DISC_NOT_WII;
@@ -143,20 +206,24 @@ int PortDiscOpen(const char* path, char* why, u32 n) {
     u64 part = 0;
     do {
         if (sDisc.file == INVALID_HANDLE_VALUE || !RawRead(sDisc.file, 0, b, 0x100)) break;
+        if (!memcmp(b, "WBFS", 4)) {
+            sDisc.kind = KIND_WBFS;
+            if (!WbfsLoad(sDisc.file, b, &sDisc.wbfsShift, &sDisc.wbfsCount, &sDisc.wbfsMap)) { bad = "its .wbfs structure is damaged"; break; }
+        }
         sDisc.plain = b[0x61] != 0;
         // The partition tables: four of (count, offset / 4); the game is the partition of type 0.
         bad = "it has no game partition";
-        if (!RawRead(sDisc.file, 0x40000, tables, sizeof(tables))) break;
+        if (!DiscRaw(0x40000, tables, sizeof(tables))) break;
         for (u32 t = 0; t < 4 && !part; t++) {
             u32 count = Be32(tables + t * 8);
             u64 at = (u64)Be32(tables + t * 8 + 4) << 2;
             for (u32 i = 0; i < count && i < 16 && !part; i++) {
                 u8 e[8];
-                if (!RawRead(sDisc.file, at + i * 8, e, 8)) break;
+                if (!DiscRaw(at + i * 8, e, 8)) break;
                 if (Be32(e + 4) == 0) part = (u64)Be32(e) << 2;
             }
         }
-        if (!part || !RawRead(sDisc.file, part, b, sizeof(b))) break;
+        if (!part || !DiscRaw(part, b, sizeof(b))) break;
         sDisc.dataOff = part + ((u64)Be32(b + 0x2B8) << 2);
         if (!sDisc.plain) {
             // The ticket: the title key (0x1BF) is wrapped with the common key, the title identifier (0x1DC) is the IV.
@@ -278,6 +345,43 @@ int PortSelfTestDisc(void) {
         DISC_CHECK(PortDiscDolOffset() == 0x800, "executable offset %llX", PortDiscDolOffset());
     }
     PortDiscClose();
+    {   // The same disc as a .wbfs: 128 KiB blocks stored in reverse order after the records, 512-byte sectors.
+        enum { SH = 17, BLK = 1 << SH, N = SIZE / BLK, ENTRIES = (2 * 143432 * CLUSTER + BLK - 1) >> SH, REC = (0x100 + ENTRIES * 2 + 511) & ~511, FIRST = (512 + REC + BLK - 1) / BLK };
+        u32 wsize = (FIRST + N) * BLK;
+        u8* w = (u8*)calloc(1, wsize);
+        if (!w) { fails++; } else {
+            memcpy(w, "WBFS", 4); w[8] = 9; w[9] = SH; w[12] = 1;
+            memcpy(w + 512, img, 0x100);
+            for (int k = 0; k < N; k++) {
+                u32 blk = FIRST + (N - 1 - k);
+                w[512 + 0x100 + k * 2] = (u8)(blk >> 8); w[512 + 0x100 + k * 2 + 1] = (u8)blk;
+                memcpy(w + (u64)blk * BLK, img + (u64)k * BLK, BLK);
+            }
+            char wpath[sizeof(path) + 8];
+            snprintf(wpath, sizeof(wpath), "%s.wbfs", path);
+            FILE* f = fopen(wpath, "wb");
+            BOOL wrote = f && fwrite(w, 1, wsize, f) == wsize;
+            if (f) fclose(f);
+            DISC_CHECK(wrote, "cannot write %s", wpath);
+            if (wrote) {
+                r = PortDiscOpen(wpath, why, sizeof(why));
+                DISC_CHECK(r == PORT_DISC_OK, "the .wbfs image did not open: %s", why);
+                if (r == PORT_DISC_OK) {
+                    u64 off = 0; u32 size = 0;
+                    u8 got[FILE_SIZE];
+                    DISC_CHECK(PortDiscFind("/DATA/Test.bin", &off, &size) && off == FILE_AT && size == FILE_SIZE, ".wbfs data/test.bin: offset %llX size %X", off, size);
+                    DISC_CHECK(PortDiscRead(FILE_AT, got, FILE_SIZE) && !memcmp(got, plain + FILE_AT, FILE_SIZE), ".wbfs: the file read across two clusters is wrong");
+                }
+                PortDiscClose();
+                w[512 + 0x100 + 2 * 2] = w[512 + 0x100 + 2 * 2 + 1] = 0;      // block 2 (the partition table) is not stored
+                f = fopen(wpath, "wb"); if (f) { fwrite(w, 1, wsize, f); fclose(f); }
+                DISC_CHECK(PortDiscOpen(wpath, why, sizeof(why)) == PORT_DISC_UNREADABLE, "a .wbfs without the partition table was not refused: %s", why);
+            }
+            DeleteFileA(wpath);
+            free(w);
+        }
+    }
+    PortDiscClose();
     img[3] = 'E'; write();
     DISC_CHECK(PortDiscOpen(path, why, sizeof(why)) == PORT_DISC_WRONG_REGION, "another region was not refused: %s", why);
     memcpy(img, "RSPE01", 6); write();
@@ -290,7 +394,7 @@ int PortSelfTestDisc(void) {
     PortDiscClose();
     DeleteFileA(path);
     free(img); free(plain);
-    if (!fails) PortLog("selftest disc: ok (header check, title key, clusters, file table)");
+    if (!fails) PortLog("selftest disc: ok (header check, title key, clusters, file table, .wbfs blocks)");
     return fails;
 }
 #endif
