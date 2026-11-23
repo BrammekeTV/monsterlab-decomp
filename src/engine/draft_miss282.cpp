@@ -24,7 +24,7 @@ s32    AXAcquireVoice(s32 priority, void* cb, void* ctx);        // 0x80258024
 void   fn_80258904(void* cb, void* p);                         // 0x80258904
 void   fn_80258968(void* cb, void* p);                         // 0x80258968
 void   fn_8025B65C(void* p);                                   // 0x8025B65C
-void   fn_8025B72C(void* p);                                   // 0x8025B72C
+void   AXFXReverbHiExpShutdown(void* p);                                   // 0x8025B72C
 void   fn_8025C52C(void* p);                                   // 0x8025C52C
 void   fn_8025C5FC(void* p);                                   // 0x8025C5FC
 void   fn_801FCDB4(void* a, u8* b);                                    // 0x801FCDB4
@@ -507,7 +507,7 @@ void fn_80200920(void* p, s32 a, s32 idx) {
         else          fn_80258968((void*)fn_801FCDB4, r);
     } else {
         if (mode == 2) fn_8025C5FC(r);
-        else           fn_8025B72C(r);
+        else           AXFXReverbHiExpShutdown(r);
         if (idx == 0) fn_80258904(NULL, NULL);
         else          fn_80258968(NULL, NULL);
     }

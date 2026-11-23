@@ -56,7 +56,7 @@ s32 fn_8033861C(const char* s, const char* fmt, ...) {
 }
 
 // MSL strncmp: returns the difference of the first two bytes that differ (unsigned), 0 if none.
-s32 fn_80338A2C(const char* a, const char* b, u32 n) {
+s32 strncmp(const char* a, const char* b, u32 n) {
     for (; n != 0; n--, a++, b++) {
         u8 ca = (u8)*a, cb = (u8)*b;
         if (ca != cb) return (s32)ca - (s32)cb;
@@ -113,7 +113,7 @@ s32 fn_8033ADCC(s32* out) {
 }
 
 // A thunk to the library's strncmp.
-s32 fn_8033B1B8(const char* a, const char* b, s32 n) { return fn_80338A2C(a, b, (u32)n); }
+s32 fn_8033B1B8(const char* a, const char* b, s32 n) { return strncmp(a, b, (u32)n); }
 
 // MSL stricmp: compares the lower-case forms as signed chars (bytes of 0x80 and up are left as
 // they are) and returns -1, 0 or 1.

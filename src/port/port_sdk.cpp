@@ -153,7 +153,7 @@ const char* PortSoftSdk(u32 addr) {
         {0x80260AC4, "audio: mixer sound mode setter (fn_80260AC4)"},
         {0x8025D2E0, "audio: AXFX effect init (fn_8025D2E0)"},
         {0x8025E3E4, "audio: AXFX effect init (fn_8025E3E4)"},
-        {0x8025B4C0, "audio: AXFX effect init (fn_8025B4C0)"},
+        {0x8025B4C0, "audio: AXFX effect init (AXFXReverbHiExpInit)"},
         {0x80264CC8, "audio: sequencer float setter (fn_80264CC8)"},
         {0x80264CD0, "audio: sequencer float setter (fn_80264CD0)"},
         {0x80263FAC, "audio: sequencer frame, no mixer yet (fn_80263FAC)"},
@@ -378,7 +378,7 @@ static void FlushVertexState(void) {
 // GXInvalidateVtxCache
 void GXInvalidateVtxCache(void) { STUB(GXInvalidateVtxCache); }
 // GXInvalidateTexAll
-void fn_8024CB00(void) { STUB(GXInvalidateTexAll); }
+void GXInvalidateTexAll(void) { STUB(GXInvalidateTexAll); }
 // GXBegin(primitive, vertex format, vertex count); the vertices follow through GXWGFifo
 void GXBegin(s32 prim, s32 fmt, s32 count) {
     PortGxFlushState();
@@ -404,7 +404,7 @@ void GXSetScissor(s32 x, s32 y, s32 w, s32 h) {
 }
 // GXSetDispCopyYScale: returns the number of frame buffer lines the copy produces
 // (the SDK's __GXGetNumXfbLines on the copy source height).
-u32 fn_8024BC90(f32 yScale) {
+u32 GXSetDispCopyYScale(f32 yScale) {
     STUB(GXSetDispCopyYScale);
     gPortGx.copyYScale = yScale;
     u32 scale = (u32)(256.0f / yScale) & 0x1FF;
@@ -421,18 +421,18 @@ u32 fn_8024BC90(f32 yScale) {
     return lines;
 }
 // GXSetDispCopySrc
-void fn_8024BBE4(s32 x, s32 y, s32 w, s32 h) {
+void GXSetDispCopySrc(s32 x, s32 y, s32 w, s32 h) {
     gPortGx.copySrc[0] = x; gPortGx.copySrc[1] = y; gPortGx.copySrc[2] = w; gPortGx.copySrc[3] = h;
     BpLoad(0x49000000 | (u32)(x & 0x3FF) | (u32)(y & 0x3FF) << 10);
     BpLoad(0x4A000000 | (u32)((w - 1) & 0x3FF) | (u32)((h - 1) & 0x3FF) << 10);
 }
 // GXSetDispCopyDst(frame buffer width, lines)
-void fn_8024BC24(s32 w, u32 h) {
+void GXSetDispCopyDst(s32 w, u32 h) {
     STUB(GXSetDispCopyDst);
     gPortGx.copyDst[0] = w; gPortGx.copyDst[1] = (s32)h;
 }
 // GXSetCopyFilter(antialias, sample pattern[12][2], vertical filter on, coefficients[7])
-void fn_8024BDD4(u32 aa, u8* pattern, s32 vf, u8* vfilter) {
+void GXSetCopyFilter(u32 aa, u8* pattern, s32 vf, u8* vfilter) {
     STUB(GXSetCopyFilter);
     gPortGx.copyAa = (u8)aa;
     gPortGx.copyVf = (u8)vf;
@@ -442,7 +442,7 @@ void fn_8024BDD4(u32 aa, u8* pattern, s32 vf, u8* vfilter) {
 // GXSetDispCopyGamma
 void fn_8024BFB8(s32 gamma) { STUB(GXSetDispCopyGamma); gPortGx.copyGamma = gamma; }
 // GXSetCopyClear(colour, z): what the frame buffer is cleared to after a copy
-void fn_8024BD5C(u8* color, u32 z) {
+void GXSetCopyClear(u8* color, u32 z) {
     memcpy(gPortGx.clearColor, color, 4);
     gPortGx.clearZ = z;
     BpLoad(0x4F000000 | (u32)color[3] << 8 | color[0]);     // alpha, red
@@ -450,7 +450,7 @@ void fn_8024BD5C(u8* color, u32 z) {
     BpLoad(0x51000000 | (z & 0xFFFFFF));
 }
 // GXCopyDisp(frame buffer, clear): copies the picture to the frame buffer VI shows
-void fn_8024BFCC(void* fb, s32 clear) {
+void GXCopyDisp(void* fb, s32 clear) {
     gPortGx.lastCopyDst = fb;
     BpLoad(0x4B000000 | (((u32)(uintptr_t)fb & 0x3FFFFFFF) >> 5));
     BpLoad(0x52000000 | 0x4000 | (clear ? 0x800u : 0u));    // to the display, then clear
@@ -477,11 +477,11 @@ void fn_8024E348(f32* mtx, s32 id, s32 type) { GXLoadTexMtxImm((const f32(*)[4])
 
 // Pixel pipeline
 // GXSetCopyClamp
-void fn_8024BC68(s32 clamp) { STUB(GXSetCopyClamp); }
+void GXSetCopyClamp(s32 clamp) { STUB(GXSetCopyClamp); }
 // GXSetDispCopyFrame2Field
-void fn_8024BC48(s32 mode) { STUB(GXSetDispCopyFrame2Field); }
+void GXSetDispCopyFrame2Field(s32 mode) { STUB(GXSetDispCopyFrame2Field); }
 // GXClearBoundingBox
-void fn_8024C108(void) { STUB(GXClearBoundingBox); }
+void GXClearBoundingBox(void) { STUB(GXClearBoundingBox); }
 
 // Direct frame buffer access ("poke") settings and performance counters
 void GXPokeColorUpdate(s32 enable) { STUB(GXPokeColorUpdate); }
@@ -492,12 +492,12 @@ void GXPokeAlphaMode(s32 func, s32 threshold) { STUB(GXPokeAlphaMode); }
 void GXPokeAlphaRead(s32 mode) { STUB(GXPokeAlphaRead); }
 void GXPokeDstAlpha(s32 enable, s32 alpha) { STUB(GXPokeDstAlpha); }
 void GXPokeZMode(s32 enable, s32 func, s32 update) { STUB(GXPokeZMode); }
-void fn_8024E60C(s32 perf0, s32 perf1) { STUB(GXSetGPMetric); }
+void GXSetGPMetric(s32 perf0, s32 perf1) { STUB(GXSetGPMetric); }
 void fn_8024EE38(void) { STUB(GXClearGPMetric); }
 
 // ------------------------------------------------------------------ MTX
 // PSMTXIdentity (3x4)
-void fn_80248050(f32* mtx) {
+void PSMTXIdentity(f32* mtx) {
     for (int i = 0; i < 12; i++) mtx[i] = 0.0f;
     mtx[0] = mtx[5] = mtx[10] = 1.0f;
 }

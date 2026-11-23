@@ -21,7 +21,7 @@ u8*   fn_80196C9C(u8* a3);                                       // 0x80196C9C
 s32   fn_801A1238(u8* obj, f32* colors);                         // 0x801A1238 (4 vertex colours)
 s32   fn_801DA780(u8* a3);                                       // 0x801DA780
 u8*   fn_801DA788(u8* a3, s32 i);                                // 0x801DA788
-s32   fn_80338A2C(const char* a, const char* b, u32 n);          // 0x80338A2C (strncmp)
+s32   strncmp(const char* a, const char* b, u32 n);          // 0x80338A2C (strncmp)
 s32   WPADControlSpeaker(s32 chan, s32 a, void* cb);                    // 0x802737A8
 void  fn_80202E24(s32 chan, s32 result);                         // 0x80202E24
 s32   InterpolateQuaternionTask_Update_SLERP(u8* task, void* arg); // 0x801EA7F8
@@ -303,7 +303,7 @@ void fn_801F00DC(u8* self, u8* line, u8* table) {
             for (s32 i = 0; i < lbl_805F9738; i++) {
                 const char* name = *(const char**)ent;
                 u32 n = (u32)strlen(name);
-                if (fn_80338A2C((const char*)rd, name, n) == 0) {
+                if (strncmp((const char*)rd, name, n) == 0) {
                     rd = rd + n + *(s32*)(ent + 0xC);
                     (*(TagFn*)(ent + 0x8))(rec, rd);
                     *(s32*)(rec + 0x0) = *(s32*)(ent + 0x4);

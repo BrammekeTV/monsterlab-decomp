@@ -67,7 +67,7 @@ void   fn_80205894(u8* state, f32 x, f32 y, f32 a, f32 b, f32 c, s32 w, s32 h, s
 void   fn_802062F0(u8* state);                                 // 0x802062F0
 void   fn_8020506C(u8* p);
 void   fn_80206308(u8* p);
-void   fn_8024BD5C(u8* color, u32 z);
+void   GXSetCopyClear(u8* color, u32 z);
 s32    DVDOpen(char* path, u8* p);
 void   DVDClose(u8* p);
 void   fn_80253A48(u8* p, s32 a);                              // 0x80253A48
@@ -773,7 +773,7 @@ s32 MoviePlay(u8* player, const char* path, const char* subtitleName, u32 unused
                     color[1] = 0;
                     color[2] = 0;
                     color[3] = 0;
-                    fn_8024BD5C(color, 0xFFFFFF);
+                    GXSetCopyClear(color, 0xFFFFFF);
                     fn_8015D5A4();
                     fn_80142970();
                     s32 done = 0;
