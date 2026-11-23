@@ -2496,7 +2496,7 @@ static void ImagePlanConvert(const ImagePlan* plan, SirReloc* r, u8* image, u32 
         case REGION_UI_TEXT:      SirConvertRecord(r, p, g->size, kUiTextFields, COUNTOF(kUiTextFields)); break;
         case REGION_SKELETON:     SirConvertRecord(r, p, g->size, kSkeletonFields, COUNTOF(kSkeletonFields)); break;
         case REGION_BONE_OPS:
-            for (u32 k = 0; k + 8 <= g->size; k += 8) { Swap32(p + k + 4); r->fieldsSwapped++; }
+            for (u32 k = 0; k + 8 <= g->size; k += 8) { Swap32(p + k); Swap32(p + k + 4); r->fieldsSwapped += 2; }   // bone name hash (the camera track looks joints up by it), then the walk
             break;
         case REGION_ANIM_OBJ:     SirConvertRecord(r, p, g->size, kAnimObjFields, COUNTOF(kAnimObjFields)); break;
         case REGION_ANIM_SET:     SirConvertRecord(r, p, g->size, kAnimSetFields, COUNTOF(kAnimSetFields)); break;
@@ -2959,6 +2959,8 @@ extern "C" BOOL LevelZoneRootsCollect(const u8* hdr, u32 hdrSize, const u8* zone
 // A zone slot's objects (slot +0xA8, count in the byte at +0xAC): pointers to objects whose type
 // word at +0x08 picks the class fn_8012FD0C sets up again when the zone starts (types 0 to 5, 8,
 // 9 and 15 to 18). That is all that is typed of them so far.
+#define CAMERA_TRACK_TYPE 15
+#define CAMERA_TRACK_USED 0x60
 static SirError SlotObjectsPlan(ImagePlan* plan, const u8* image, u32 imageSize, u32 addr, u32 count) {
     u32 off, o;
     if (count == 0) return SIR_OK;
@@ -2966,6 +2968,15 @@ static SirError SlotObjectsPlan(ImagePlan* plan, const u8* image, u32 imageSize,
     for (u32 i = 0; i < count; i++) {
         if (!LevelSpan(Be32(image + off + i * 4), 0x0C, imageSize, &o) || PlanHas(plan, o + 8, REGION_U32_ARRAY)) continue;
         if (!PlanAdd(plan, o + 8, 4, REGION_U32_ARRAY)) return SIR_ERR_LEVEL;
+        // Type 15 is an animated camera track (vtable lbl_803601B8, fn_800E43BC): +0x58 is the handle of
+        // the entity whose animation is the camera path and +0x5C the hash of its clip. Without them
+        // the camera never finds its entity and the menu camera stays where the follow state puts it.
+        if (Be32(image + o + 8) == CAMERA_TRACK_TYPE) {
+            u32 t;
+            if (LevelSpan(Be32(image + off + i * 4), CAMERA_TRACK_USED, imageSize, &t) && !PlanHas(plan, t + 0x58, REGION_U32_ARRAY) &&
+                !PlanAdd(plan, t + 0x58, 8, REGION_U32_ARRAY))
+                return SIR_ERR_LEVEL;
+        }
     }
     return SIR_OK;
 }

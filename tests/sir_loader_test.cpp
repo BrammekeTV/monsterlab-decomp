@@ -797,7 +797,11 @@ struct ZoneDump {
         bool haveBones = n != 0 && In(bones, n * 0x30);
         for (u32 i = 0; haveBones && i < n * 12; i++) sum += *(const u32*)(bones + i * 4);
         printf("skeleton "); Val(s); printf(" bones "); Ptr(s + 4); printf(" %u sum %08x ops ", n, sum); Ptr(s + 0xC); printf(" :");
-        if (n != 0 && In(ops, n * 8)) { for (u32 i = 0; i < n; i++) printf(" %u", *(const u32*)(ops + i * 8 + 4)); }
+        if (n != 0 && In(ops, n * 8)) {
+            for (u32 i = 0; i < n; i++) printf(" %u", *(const u32*)(ops + i * 8 + 4));
+            printf(" names");
+            for (u32 i = 0; i < n; i++) printf(" %08x", *(const u32*)(ops + i * 8));
+        }
         else printf(" -");
         printf(" player "); Ptr(s + 0x14); printf(" block "); Ptr(s + 0x18); printf(" root "); Ptr(s + 0x1C); printf(" a "); Ptr(s);
         u32 asum = 0;
@@ -912,7 +916,9 @@ struct ZoneDump {
                 const u8* o = *(const u8**)(list + i * 4);
                 if (!In(o, 0xC) || std::find(seen.begin(), seen.end(), o) != seen.end()) continue;
                 seen.push_back(o);
-                printf("slotobject "); Val(o); printf(" type %u\n", *(const u32*)(o + 8));
+                printf("slotobject "); Val(o); printf(" type %u", *(const u32*)(o + 8));
+                if (*(const u32*)(o + 8) == 15 && In(o, 0x60)) printf(" track %08x %08x", *(const u32*)(o + 0x58), *(const u32*)(o + 0x5C));
+                printf("\n");
             }
         }
     }
@@ -2225,7 +2231,7 @@ static SirError ConvertBuilt(u8* hdr, u8* img, SirReloc* r, s32* failTable) {
 #define L_MESH     0xCC0u                     // the entry's mesh: one part at +0x70; the matrix's second half ends here
 #define L_BATCH    0xF40u                     // the part's batch, 0x28 used: counts, flags, the display list's offset and size
 #define L_OBJLIST  0xD60u                     // slot 0's objects: one pointer
-#define L_OBJ      0xD70u                     // the object: type word at +0x08
+#define L_OBJ      0xFC0u                     // the object: type word at +0x08, a camera track (type 15): handle +0x58, clip hash +0x5C
 #define L_FXLIST   0xD80u                     // slot 0's placed effects: one pointer
 #define L_FX       0xD90u                     // the effect, 0x20
 #define L_MAT      0xDC0u                     // the part's material (type 0, pass 1): 0x60 used
@@ -2234,7 +2240,7 @@ static SirError ConvertBuilt(u8* hdr, u8* img, SirReloc* r, s32* failTable) {
 #define L_MTEX     0xEC0u                     // its texture: header 0x54, pixel data 0x20 behind it
 #define L_MTEXD    0xF20u
 #define L_BATCHDL  0xF80u                     // its display list, 0x20
-#define L_ZONE_SIZE 0xFC0u
+#define L_ZONE_SIZE 0x1040u
 #define L_ZONE1    0x90980000u                // Wii address of zone 1: an entity at 0x10, a list object at 0x200
 #define L_ENT1     0x10u                      // the entity slot 1's second table names
 #define L_ZONE1_SIZE 0x300u
@@ -2278,6 +2284,7 @@ static void BuildLevel(u8* hdr, u8* zone) {
     Put32(s0 + 0x0A8, L_ZONE + L_OBJLIST); s0[0xAC] = 1;
     Put32(zone + L_OBJLIST, L_ZONE + L_OBJ);
     Put32(zone + L_OBJ + 0x00, 0x804B25D0); Put32(zone + L_OBJ + 0x04, 0xCC05AC21); Put32(zone + L_OBJ + 0x08, 15);
+    Put32(zone + L_OBJ + 0x58, 0x80090020); Put32(zone + L_OBJ + 0x5C, 0x94F99D89);   // a camera track: entity handle, clip hash
     Put32(s0 + 0x080, L_ZONE + L_FXLIST); Put32(s0 + 0x09C, 1);
     Put32(zone + L_FXLIST, L_ZONE + L_FX);
     Put32(zone + L_FX + 0x00, 0xCA1557FC); Put32(zone + L_FX + 0x04, 0x40000000); Put32(zone + L_FX + 0x08, 0);
@@ -2774,6 +2781,7 @@ static void LevelSelfTest(void) {
     // reader yet and stays), and its placed effects as WorldOnZoneLoaded reads them.
     const u8* obj = **(const u8***)(s0 + 0xA8);
     CHECK(obj == zone + L_OBJ && *(const u32*)(obj + 8) == 15 && obj[4] == 0xCC && obj[7] == 0x21);
+    CHECK(*(const u32*)(obj + 0x58) == 0x80090020 && *(const u32*)(obj + 0x5C) == 0x94F99D89 && obj[0x54] == 0x7F);
     const u8* fx = **(const u8***)(s0 + 0x80);
     CHECK(*(const u32*)(s0 + 0x9C) == 1 && fx == zone + L_FX && *(const u32*)fx == 0xCA1557FC && *(const f32*)(fx + 4) == 2.0f);
     CHECK(*(const f32*)(fx + 0x18) == 1.0f && *(const u8**)(fx + 0x1C) == NULL);
