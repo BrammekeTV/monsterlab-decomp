@@ -9,7 +9,8 @@ import glob, os, subprocess, sys, tempfile
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 VSWHERE = r"C:\Program Files (x86)\Microsoft Visual Studio\Installer\vswhere.exe"
 FLAGS = ["/nologo", "/c", "/std:c++17", "/W3", "/permissive-", "/utf-8",
-         "/wd4244", "/wd4267", "/wd4305", "/D_CRT_SECURE_NO_WARNINGS", "/I", '"' + os.path.join(ROOT, "include") + '"']
+         "/wd4244", "/wd4267", "/wd4305", "/D_CRT_SECURE_NO_WARNINGS", "/I", '"' + os.path.join(ROOT, "include") + '"',
+         "/I", '"' + os.path.join(ROOT, "third_party", "imgui") + '"']
 
 
 def vcvars():

@@ -569,6 +569,13 @@ void PortAudioTick(void) {
     }
 }
 
+u32 PortAudioVoices(u32* outOf) {
+    u32 n = 0;
+    for (int i = 0; i < AX_VOICES; i++) if (sRun[i].running) n++;
+    if (outOf) *outOf = AX_VOICES;
+    return n;
+}
+
 const char* PortAudioStats(char* buf, u32 n) {
     if (sWav) WavHeader();
     snprintf(buf, n, "%u AX frame(s) (%.1f s), %u voice start(s), peak level %u of 32767%s%s",

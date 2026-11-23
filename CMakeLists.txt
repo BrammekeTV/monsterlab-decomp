@@ -8,6 +8,7 @@ set(CMAKE_CXX_STANDARD_REQUIRED ON)
 file(GLOB_RECURSE GAME_SOURCES CONFIGURE_DEPENDS src/*.cpp src/*.c)
 add_library(game OBJECT ${GAME_SOURCES})
 target_include_directories(game PUBLIC include)
+target_include_directories(game PRIVATE third_party/imgui)   # Dear ImGui, built by src/port/port_imgui.cpp
 
 if(MSVC)
   target_compile_options(game PRIVATE /W3 /permissive- /utf-8

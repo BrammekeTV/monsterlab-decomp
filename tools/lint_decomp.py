@@ -276,7 +276,7 @@ def scratch_files():
         if l.startswith("??"):
             p = l[3:].strip().strip('"')
             if p.startswith("build/") or p.startswith("src/") or p.startswith("tools/") or p.startswith("docs/") \
-                    or p.startswith("include/") or p.startswith("config/"):
+                    or p.startswith("include/") or p.startswith("config/") or p.startswith("third_party/"):
                 continue
             if re.search(r"(tmp|scratch|dump|asm)", os.path.basename(p), re.I) or p.endswith((".s", ".txt", ".asm")):
                 out.append(os.path.join(ROOT, p))

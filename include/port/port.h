@@ -85,6 +85,7 @@ typedef struct PortOptions {
     BOOL haveData;            // main.dol was found and loaded
     BOOL window;              // open a window and draw into it
     const char* screenshot;   // write the last shown picture to this PNG when the run stops
+    BOOL screenshotStats;     // draw the stats overlay into that picture too (--screenshot-stats)
     const char* wav;          // write everything the mixer produces to this WAV file
     BOOL noAudio;             // never open the sound device
     s32  showTexture;         // development aid (port_demo.cpp): -1, or a texture of global_binary.sir
@@ -123,6 +124,8 @@ void PortDemoMain(void);              // port_demo.cpp
 void PortStop(int exitCode, const char* fmt, ...);
 void PortAudioTick(void);     // port_audio.cpp: run the AX frames that are due (interrupt thread)
 const char* PortAudioStats(char* buf, u32 n);
+u32  PortAudioVoices(u32* outOf); // voices the mixer is playing now
+extern s64 gPortWaitTicks;    // QueryPerformanceCounter ticks spent asleep in VIWaitForRetrace (port_sdk.cpp)
 int  PortSelfTestAudio(void);
 void PortFrameDone(void);     // one presented frame (VI flip): enforces the frame limit
 

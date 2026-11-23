@@ -233,7 +233,11 @@ void fn_80244ED0(u8* renderMode) {
 // VIWaitForRetrace: sleeps until the next retrace interrupt
 s32 fn_80244950(void) {
     u32 count = sRetraceCount;
+    LARGE_INTEGER t0, t1;
+    QueryPerformanceCounter(&t0);
     while (count == sRetraceCount) PortWaitChange();
+    QueryPerformanceCounter(&t1);
+    gPortWaitTicks += t1.QuadPart - t0.QuadPart;
     return 0;
 }
 
