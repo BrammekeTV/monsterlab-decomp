@@ -99,6 +99,11 @@
  "changelog": [
   {
    "date": "2026-11-23",
+   "time": "19:20",
+   "text": "The Windows version runs faster (PR #99): the PC parts (graphics, sound mixer and data loader) are now built with compiler optimisation, which takes the boot from about 34 to about 46 frames per second against the Wii's 50. The decompiled game code still builds unoptimised for now, because optimising it makes the game crash at the start. Finding the functions behind that is next."
+  },
+  {
+   "date": "2026-11-23",
    "time": "19:03",
    "text": "494 more Wii SDK and library functions have their real names (PR #95), matched against the public, free-to-reuse Mario Kart Wii and Twilight Princess decomps. About 1,100 library functions are now named, including much of the online, HOME-menu and C-runtime code."
   },
