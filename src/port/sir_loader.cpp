@@ -2157,6 +2157,10 @@ static SirError UiBasePlan(ImagePlan* plan, const u8* image, u32 imageSize, u32 
         // The word the picture's +0x140 points at: its texture, shared by the pictures that show it.
         if (LevelSpan(Be32(image + o + 0x140), 4, imageSize, &t) && !PlanHas(plan, t, REGION_PTR_ARRAY) &&
             !PlanAdd(plan, t, 4, REGION_PTR_ARRAY)) return SIR_ERR_SCREENS;
+        // The texture records behind it (fn_801A0D04 draws with the one at +0x144, or with the one in the word at +0x140;
+        // fn_80195A58 reads the header). A word that holds no texture record is left alone.
+        if (LevelSpan(Be32(image + o + 0x140), 4, imageSize, &t)) (void)MaterialTexturePlan(plan, image, imageSize, Be32(image + t));
+        (void)MaterialTexturePlan(plan, image, imageSize, Be32(image + o + 0x144));
     }
     if (Be32(image + o + 0x60) == 1 && (u64)o + UI_TEXT_AT + UI_TEXT_SIZE <= imageSize &&
         !PlanAdd(plan, o + UI_TEXT_AT, UI_TEXT_SIZE, REGION_UI_TEXT)) return SIR_ERR_SCREENS;

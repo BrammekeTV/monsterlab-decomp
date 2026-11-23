@@ -1081,7 +1081,7 @@ struct ZoneDump {
 
     // The first layer of a shared zone's screen set (zone slot +0x100): the tree fn_8018E2F4 walks
     // and the widgets fn_8019BFF8 reaches from it.
-    std::vector<const u8*> widgets, fixedWidgets, uiLists, basedWidgets, uiEvents, uiGrids;
+    std::vector<const u8*> widgets, fixedWidgets, uiLists, basedWidgets, uiEvents, uiGrids, uiTexs;
     static bool Seen(std::vector<const u8*>& v, const u8* p) {
         if (std::find(v.begin(), v.end(), p) != v.end()) return true;
         v.push_back(p);
@@ -1104,6 +1104,15 @@ struct ZoneDump {
             printf("uigraphic "); Val(w); printf(" entry "); Ptr(w + 0x140); printf(" -> ");
             if (In(e, 4)) Ptr(e); else printf("-");
             printf(" tex "); Ptr(w + 0x144); printf(" size "); Words(w + 0x148, 2); printf(" uv "); Words(w + 0x180, 8); printf("\n");
+            const u8* tx[2] = { In(e, 4) ? *(const u8**)e : NULL, *(const u8**)(w + 0x144) };     // the texture records of the picture
+            for (u32 k = 0; k < 2; k++) {
+                const u8* t = tx[k];
+                if (!In(t, SIR_TEXTURE_HEADER) || ((const SirTexture*)t)->headerSize != SIR_TEXTURE_HEADER || Seen(uiTexs, t)) continue;
+                const SirTexture* x = (const SirTexture*)t;
+                printf("uitex "); Val(t); printf(" size %ux%u gx %ux%u bytes ", x->size[0], x->size[1], x->gxSize[0], x->gxSize[1]); Hex(t + 0x0C, 12);
+                printf(" datasize %u data ", x->dataSize); Ptr((const u8*)&x->data); printf(" palette "); Ptr((const u8*)&x->palette);
+                printf(" next "); Ptr((const u8*)&x->next); printf(" prev "); Ptr((const u8*)&x->prev); printf(" list "); Ptr((const u8*)&x->list); printf("\n");
+            }
         }
         if (*(const u32*)(w + 0x60) == 1 && In(w, 0x1F0)) {                                  // a text
             printf("uitext "); Val(w); printf(" table "); Ptr(w + 0x13C); printf(" markers "); Ptr(w + 0x140); printf(" "); Ptr(w + 0x144);

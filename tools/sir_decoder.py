@@ -694,6 +694,7 @@ def shared_zone_dump(L, zn, sec, slot_size, zone0, zbase0):
     t = table - base
     L.append('uitable %s root %s low %s high %s' % (ptr(table), ptr(u(t)), ptr(u(t + 4)), ptr(u(t + 8))))
     seen_w, fixed, lists, based, events, grids = set(), set(), set(), set(), set(), set()
+    uitexs = set()
     def ui_list(a, mode):
         """mode 0: plain; 1: widgets that go through fn_8019914C; 2: lists; 3: widgets."""
         if not inz(a, 0x14) or a in lists: return
@@ -721,6 +722,16 @@ def shared_zone_dump(L, zn, sec, slot_size, zone0, zbase0):
             e = u(o + 0x140)
             L.append('uigraphic %s entry %s -> %s tex %s size %s uv %s' % (ptr(w), ptr(e), ptr(u(e - base)) if inz(e, 4) else '-',
                      ptr(u(o + 0x144)), ws(o + 0x148, 2), ws(o + 0x180, 8)))
+        if u(o + 0x60) == 2 and o + 0x1A0 <= len(sec) and u(o + 0x13C) == 0:      # the texture records of a picture
+            e = u(o + 0x140)
+            for tx in ((u(e - base) if inz(e, 4) else 0), u(o + 0x144)):
+                if inz(tx, 0x54) and u(tx - base) == 0x54 and tx not in uitexs:
+                    uitexs.add(tx)
+                    q = tx - base
+                    L.append('uitex %s size %dx%d gx %dx%d bytes %s datasize %d data %s palette %s next %s prev %s list %s' % (
+                        ptr(tx), struct.unpack_from('>H', sec, q + 4)[0], struct.unpack_from('>H', sec, q + 6)[0],
+                        struct.unpack_from('>H', sec, q + 8)[0], struct.unpack_from('>H', sec, q + 10)[0], sec[q + 0xC:q + 0x18].hex(),
+                        u(q + 0x18), ptr(u(q + 0x1C)), ptr(u(q + 0x20)), ptr(u(q + 0x28)), ptr(u(q + 0x2C)), ptr(u(q + 0x30))))
         if u(o + 0x60) == 1 and o + 0x1F0 <= len(sec):                             # a text
             L.append('uitext %s table %s markers %s %s byte %d time %08x words %s text %s from %s chars %s floats %s %08x buffer %s words %s' % (
                      ptr(w), ptr(u(o + 0x13C)), ptr(u(o + 0x140)), ptr(u(o + 0x144)), sec[o + 0x148], u(o + 0x14C), ws(o + 0x150, 8),
