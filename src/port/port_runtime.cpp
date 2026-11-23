@@ -15,6 +15,7 @@
 #include "port/port.h"
 #include "port/port_input.h"
 #include "port/port_gx.h"
+#include "port/port_overlay.h"
 
 // This file's start-up object must be built before every other static object: game code may
 // touch globals that live in the mapped address space from its own static initialisers.
@@ -25,6 +26,7 @@
 extern "C" u32 _ctors[];      // 0x80345AE0, resolved by port_gen.obj like every other Wii global
 
 PortOptions gPortOptions;
+PortSettings gPortSettings = {1920, 1080, TRUE, FALSE, FALSE, FALSE, 100, FALSE};
 
 // ------------------------------------------------------------------ log and boot summary
 struct Milestone { const char* what; u32 count; u32 ms; BOOL stub; };
@@ -188,11 +190,13 @@ static void InstallScriptTrace(void) {
     PortLog("script trace: %u script functions wrapped", n);
 }
 
+s64 gPortWaitTicks;
 s32 PortFrameCount(void) { return sFrames; }
 
 void PortFrameDone(void) {
     if (sFrames == 1 && getenv("PORT_SCRIPT_TRACE")) InstallScriptTrace();
     sFrames++;
+    if (!gPortOptions.fastAll && sFrames >= gPortOptions.fastForward) PortFastEnd();
     if (gPortOptions.frameLimit && sFrames >= gPortOptions.frameLimit) {
         PortStop(0, "frame limit reached (%d frames)", sFrames);
     }
@@ -555,24 +559,29 @@ static void SwapData(u8* base, u32 baseAddr, const PortDataRun* runs, u32 count,
     }
 }
 
+// Bytes of main.dol: from the file, or with no file from the open disc image.
+static BOOL DolRead(FILE* f, u32 off, void* dst, u32 size) {
+    if (!f) return PortDiscRead(PortDiscDolOffset() + off, dst, size);
+    return fseek(f, (long)off, SEEK_SET) == 0 && fread(dst, 1, size, f) == size;
+}
+
 static BOOL LoadDol(const char* path) {
-    FILE* f = fopen(path, "rb");
-    if (!f) return FALSE;
+    FILE* f = path ? fopen(path, "rb") : NULL;
+    if (path && !f) return FALSE;
     u8 hdr[0x100];
-    if (fread(hdr, 1, sizeof(hdr), f) != sizeof(hdr)) { fclose(f); return FALSE; }
+    if (!DolRead(f, 0, hdr, sizeof(hdr))) { if (f) fclose(f); return FALSE; }
     sDataEnd = Be32(hdr + 0xD8) + Be32(hdr + 0xDC);          // bss
     for (s32 i = 7; i < 18; i++) {                           // data sections only; code is not used
         u32 off = Be32(hdr + i * 4), addr = Be32(hdr + 0x48 + i * 4), size = Be32(hdr + 0x90 + i * 4);
         if (!size) continue;
-        if (addr < PORT_MEM1_BASE || addr + size > PORT_MEM1_BASE + PORT_MEM1_SIZE) { fclose(f); return FALSE; }
+        if (addr < PORT_MEM1_BASE || addr + size > PORT_MEM1_BASE + PORT_MEM1_SIZE) { if (f) fclose(f); return FALSE; }
         if (addr >= PORT_TEXT_LO && addr < PORT_TEXT_HI) continue;       // exception tables inside the code range
-        fseek(f, off, SEEK_SET);
-        if (fread((void*)(uintptr_t)addr, 1, size, f) != size) { fclose(f); return FALSE; }
+        if (!DolRead(f, off, (void*)(uintptr_t)addr, size)) { if (f) fclose(f); return FALSE; }
         if (addr + size > sDataEnd) sDataEnd = addr + size;
         if (addr == (u32)(uintptr_t)_ctors) Swap((u8*)(uintptr_t)addr, size, 4);     // .ctors has no symbols
         SwapData((u8*)(uintptr_t)addr, addr, gPortData, gPortDataCount, addr, addr + size);
     }
-    fclose(f);
+    if (f) fclose(f);
     return TRUE;
 }
 
@@ -629,8 +638,17 @@ void PortYield(void) {
     }
 }
 
+extern volatile LONG gPortIdleWaiters;  // port_os.cpp: waiters registered at the current generation
+static HANDLE sIdleEvent;                                    // fast-forward: wakes the interrupt thread when all threads wait
+
 void PortWaitChange(void) {
     u32 gen = sChangeGen;
+    AcquireSRWLockExclusive(&sChangeLock);
+    if (sChangeGen == gen) {                     // a signal clears the count: every waiter wakes and registers again
+        gPortIdleWaiters++;
+        if (sIdleEvent && PortFastActive()) SetEvent(sIdleEvent);
+    }
+    ReleaseSRWLockExclusive(&sChangeLock);
     PortLockLeave();
     AcquireSRWLockExclusive(&sChangeLock);
     while (sChangeGen == gen) SleepConditionVariableSRW(&sChangeCv, &sChangeLock, 20, 0);
@@ -641,6 +659,7 @@ void PortWaitChange(void) {
 void PortSignalChange(void) {
     AcquireSRWLockExclusive(&sChangeLock);
     sChangeGen++;
+    gPortIdleWaiters = 0;
     ReleaseSRWLockExclusive(&sChangeLock);
     WakeAllConditionVariable(&sChangeCv);
 }
@@ -666,13 +685,16 @@ void PortQueueInterrupt(void (*fn)(void*), void* arg) {
 
 static DWORD WINAPI InterruptThread(void*) {
     for (;;) {
-        Sleep(1);
+        if (PortFastActive()) WaitForSingleObject(sIdleEvent, 1);   // fast-forward: woken as soon as every game thread waits
+        else Sleep(1);
         PortLockEnter();
         if (sIntrEnabled) {
             while (sQueueHead != sQueueTail) {
                 Queued q = sQueue[sQueueHead++ % 256];
                 q.fn(q.arg);
             }
+            // Fast-forward: nothing is queued and every game thread waits, so game time jumps to the next event.
+            if (sQueueHead == sQueueTail) PortClockAdvanceIfIdle();
             PortOsTick();
             PortViTick();
             PortAudioTick();
@@ -724,6 +746,7 @@ extern "C" void PortStartInterrupts(void) {
     if (started) return;
     started = TRUE;
     timeBeginPeriod(1);
+    sIdleEvent = CreateEventA(NULL, FALSE, FALSE, NULL);
     CloseHandle(CreateThread(NULL, 0x40000, InterruptThread, NULL, 0, NULL));
     if (gPortOptions.secondsLimit > 0) CloseHandle(CreateThread(NULL, 0x10000, WatchdogThread, NULL, 0, NULL));
 }
@@ -786,6 +809,9 @@ static int SelfTest(void) {
     fails += PortSelfTestGx();
     fails += PortSelfTestAudio();
     fails += PortSelfTestZlib();
+    fails += PortSelfTestOverlay();
+    fails += PortSelfTestDisc();
+    fails += PortSelfTestSettings();
 #undef CHECK
     PortLog("self-test: %u functions, %u linked; %s", gPortFuncCount, linked, fails ? "FAILED" : "ok");
     return fails;
@@ -820,6 +846,8 @@ static const char* FindDataDir(const char* asked) {
     return NULL;
 }
 
+static const s32 kMenuFrame = 3200;           // --to-menu: fast-forward this many frames
+
 struct PortBoot {
     PortBoot() {
         sStartTick = GetTickCount();
@@ -827,14 +855,22 @@ struct PortBoot {
         gPortOptions.showTexture = -1;
         gPortOptions.secondsLimit = 60;
         const char* asked = getenv("MONSTERLAB_DATA");
+        BOOL sawFrames = FALSE, sawSeconds = FALSE;
+        // monsterlab.ini first, so the command line wins; the self-test runs without it.
+        BOOL ini = TRUE;
+        for (int i = 1; i < __argc && __argv; i++) if (!strcmp(__argv[i], "--selftest") || !strcmp(__argv[i], "--no-ini")) ini = FALSE;
+        if (ini && PortSettingsLoad(PortSettingsPath(), &gPortSettings)) fprintf(stderr, "[port] settings: %s\n", PortSettingsPath());
         for (int i = 1; i < __argc && __argv; i++) {
             const char* a = __argv[i];
             if (!strcmp(a, "--selftest")) gPortOptions.selfTest = TRUE;
             else if (!strcmp(a, "--verbose")) gPortOptions.verbose = TRUE;
             else if (!strcmp(a, "--keep-going")) gPortOptions.keepGoing = TRUE;
-            else if (!strcmp(a, "--frames") && i + 1 < __argc) gPortOptions.frameLimit = atoi(__argv[++i]);
-            else if (!strcmp(a, "--seconds") && i + 1 < __argc) gPortOptions.secondsLimit = atoi(__argv[++i]);
-            else if (!strcmp(a, "--data") && i + 1 < __argc) asked = __argv[++i];
+            else if (!strcmp(a, "--frames") && i + 1 < __argc) { gPortOptions.frameLimit = atoi(__argv[++i]); sawFrames = TRUE; }
+            else if (!strcmp(a, "--fast-forward") && i + 1 < __argc) gPortOptions.fastForward = atoi(__argv[++i]);
+            else if (!strcmp(a, "--fast")) gPortOptions.fastAll = TRUE;
+            else if (!strcmp(a, "--to-menu")) gPortOptions.toMenu = TRUE;
+            else if (!strcmp(a, "--seconds") && i + 1 < __argc) { gPortOptions.secondsLimit = atoi(__argv[++i]); sawSeconds = TRUE; }
+            else if ((!strcmp(a, "--data") || !strcmp(a, "--iso")) && i + 1 < __argc) asked = __argv[++i];
             else if (!strcmp(a, "--window")) gPortOptions.window = TRUE;
             else if (!strcmp(a, "--wav") && i + 1 < __argc) gPortOptions.wav = __argv[++i];
             else if (!strcmp(a, "--no-audio")) gPortOptions.noAudio = TRUE;
@@ -842,12 +878,45 @@ struct PortBoot {
             else if (!strcmp(a, "--watch") && i + 1 < __argc) sWatch = strtoul(__argv[++i], NULL, 16);
             else if (!strcmp(a, "--show-texture") && i + 1 < __argc) gPortOptions.showTexture = atoi(__argv[++i]);
             else if (!strcmp(a, "--screenshot") && i + 1 < __argc) gPortOptions.screenshot = __argv[++i];
-            else if (!strcmp(a, "--scale") && i + 1 < __argc) gPortOptions.scale = atoi(__argv[++i]);
+            else if (!strcmp(a, "--stats")) gPortOverlayOn = TRUE;
+            else if (!strcmp(a, "--no-ini")) {}
+            else if (!strcmp(a, "--settings")) {                // open the settings screen at the start, optionally on a page
+                PortGuiSetOpen(TRUE);
+                if (i + 1 < __argc && __argv[i + 1][0] != '-') {
+                    const char* page = __argv[++i];
+                    gPortGuiPage = !strcmp(page, "audio") ? 1 : !strcmp(page, "controls") ? 2 : 0;
+                }
+            }
+            else if (!strcmp(a, "--vsync")) gPortSettings.vsync = TRUE;
+            else if (!strcmp(a, "--fullscreen")) gPortSettings.fullscreen = TRUE;
+            else if (!strcmp(a, "--screenshot-stats")) gPortOptions.screenshotStats = gPortOverlayOn = TRUE;
+            else if (!strcmp(a, "--res") && i + 1 < __argc) {
+                int w = 0, h = 0;
+                if (sscanf(__argv[++i], "%dx%d", &w, &h) == 2 && w >= 320 && h >= 240 && w <= 8192 && h <= 8192) { gPortSettings.width = w; gPortSettings.height = h; }
+                else fprintf(stderr, "[port] --res %s: expected WxH, e.g. 1920x1080\n", __argv[i]);
+            }
+            else if (!strcmp(a, "--stretch-ui")) gPortSettings.stretchUi = TRUE;
+            else if (!strcmp(a, "--aspect") && i + 1 < __argc) {
+                const char* v = __argv[++i];
+                if (!strcmp(v, "16:9")) gPortSettings.wide = TRUE;
+                else if (!strcmp(v, "4:3")) gPortSettings.wide = FALSE;
+                else fprintf(stderr, "[port] --aspect %s: expected 4:3 or 16:9\n", v);
+            }
+            else if (!strcmp(a, "--pointer") && i + 1 < __argc) {
+                if (!PortInputAddPointer(__argv[++i])) fprintf(stderr, "[port] --pointer %s: expected X,Y@FRAME\n", __argv[i]);
+            }
             else if (!strcmp(a, "--press") && i + 1 < __argc) {
                 if (!PortInputAddPress(__argv[++i])) fprintf(stderr, "[port] --press %s: expected BUTTON@FRAME[-FRAME]\n", __argv[i]);
             }
         }
 
+        if (gPortOptions.toMenu) {                // --to-menu: unpaced to the title, A, on to the main menu, then real time
+            // Frames as counted by PortFrameDone (the title is up from about frame 2400; the menu from about 3100).
+            if (gPortOptions.fastForward < kMenuFrame) gPortOptions.fastForward = kMenuFrame;
+            PortInputAddPress("A@2600-2610");
+            if (!sawFrames) gPortOptions.frameLimit = 0;
+            if (!sawSeconds) gPortOptions.secondsLimit = 0;
+        }
         // The Wii's two memory blocks at their original addresses. The code range must be executable.
         void* m1 = VirtualAlloc((void*)(uintptr_t)PORT_MEM1_BASE, PORT_MEM1_SIZE, MEM_RESERVE | MEM_COMMIT, PAGE_READWRITE);
         void* m2 = VirtualAlloc((void*)(uintptr_t)PORT_MEM2_BASE, PORT_MEM2_SIZE, MEM_RESERVE | MEM_COMMIT, PAGE_READWRITE);
@@ -877,8 +946,21 @@ struct PortBoot {
         }
         PortLockEnter();                         // the main thread is the first game thread
 
-        const char* dir = FindDataDir(asked);
-        if (dir) {
+        // A file is the player's disc image, read as it is (--iso FILE; --data and MONSTERLAB_DATA take one too).
+        const char* dir = NULL;
+        if (asked && FileExists(asked) && !gPortOptions.selfTest) {
+            char why[256];
+            if (PortDiscOpen(asked, why, sizeof(why)) != PORT_DISC_OK) {
+                fprintf(stderr, "[port] %s\n       %s\n", asked, why);
+                ExitProcess(12);
+            }
+            if (!LoadDol(NULL)) {
+                fprintf(stderr, "[port] the main.dol of %s is not usable\n", asked);
+                ExitProcess(11);
+            }
+            gPortOptions.dataDir = dir = asked;
+            gPortOptions.haveData = TRUE;
+        } else if ((dir = FindDataDir(asked)) != NULL) {
             char path[MAX_PATH + 32];
             snprintf(path, sizeof(path), "%s\\sys\\main.dol", dir);
             if (!LoadDol(path)) {
@@ -899,8 +981,8 @@ struct PortBoot {
             TerminateProcess(GetCurrentProcess(), fails ? 1 : 0);
         }
         if (!gPortOptions.haveData) {
-            fprintf(stderr, "[port] no game data found. Put your own extracted disc in orig/RM7P4F (sys/main.dol, files/),\n"
-                            "       or pass --data <dir> / set MONSTERLAB_DATA. Run with --selftest to test without data.\n");
+            fprintf(stderr, "[port] no game data found. Pass your own Monster Lab disc image with --iso <file>, or put the\n"
+                            "       extracted disc in orig/RM7P4F (sys/main.dol, files/), pass --data <dir> or set MONSTERLAB_DATA. Run with --selftest to test without data.\n");
             ExitProcess(2);
         }
         PortLog("game data: %s", dir);
@@ -918,7 +1000,7 @@ static void __cdecl PortPreMain(void) {
     PortOsStart();
     PortStartInterrupts();
     if (gPortOptions.haveData && !gPortOptions.selfTest && (gPortOptions.window || gPortOptions.screenshot || gPortOptions.showTexture >= 0))
-        PortGfxStart(gPortOptions.window, gPortOptions.scale ? gPortOptions.scale : 2);
+        PortGfxStart(gPortOptions.window);
     PortRunStaticInit();
 }
 #pragma section(".CRT$XCY", read)

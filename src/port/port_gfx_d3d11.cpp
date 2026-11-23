@@ -7,7 +7,7 @@
 //             a pixel shader generated from the TEV registers;
 //   copy      BP 0x52: the frame buffer goes to the window (display copy) or into a texture;
 //   loadTlut  a palette goes into the emulated texture memory.
-// The frame buffer ("EFB", 640x528 on the console) is a render target of `scale` times that size.
+// The frame buffer ("EFB", 640x528 on the console) is a render target scaled to the output size (sFx, sFy).
 #ifdef _WIN32
 #define WIN32_LEAN_AND_MEAN
 #define NOMINMAX
@@ -24,6 +24,7 @@
 
 #include "port/port.h"
 #include "port/port_gx.h"
+#include "port/port_overlay.h"
 
 #pragma comment(lib, "d3d11.lib")
 #pragma comment(lib, "d3dcompiler.lib")
@@ -42,8 +43,10 @@ static ID3D11Texture2D*        sEfbTex;
 static ID3D11RenderTargetView* sEfbRtv;
 static ID3D11ShaderResourceView* sEfbSrv;
 static ID3D11DepthStencilView* sEfbDsv;
-static ID3D11Texture2D*        sLastFrame;      // what the last display copy showed
-static u32                     sLastW, sLastH;  // its size in pixels (0 = nothing shown yet)
+static ID3D11Texture2D*        sOutTex;         // the output picture: what the last display copy showed, at the output size
+static ID3D11RenderTargetView* sOutRtv;
+static ID3D11ShaderResourceView* sOutSrv;
+static BOOL                    sShown;          // a display copy has happened
 static ID3D11VertexShader*     sVs;
 static ID3D11VertexShader*     sBlitVs;
 static ID3D11PixelShader*      sBlitPs;
@@ -54,11 +57,28 @@ static ID3D11Buffer*           sBlitConst;
 static ID3D11SamplerState*     sLinearClamp;
 static ID3D11ShaderResourceView* sWhite;
 static HWND                    sWnd;
-static int                     sScale = 2;
-static u32                     sBackW = 960, sBackH = 720;
+// Output size and the part of it the picture covers (gPortSettings: --res, --aspect). The frame
+// buffer is scaled so that the console's 640 x DISP_H picture is exactly that part, pixel for pixel.
+#define DISP_H 480
+static u32                     sOutW = 1920, sOutH = 1080;
+static u32                     sPicX, sPicY, sPicW = 1920, sPicH = 1080;
+static f32                     sFx = 3.0f, sFy = 2.25f;     // frame-buffer pixels per console pixel
+static u32                     sEfbPw, sEfbPh;              // frame buffer size in pixels
+// Console screen position -> pixel. Whole numbers, so that bands and copies meet without a seam.
+static inline s32 PxX(s32 x) { return (s32)lroundf((f32)x * sFx); }
+static inline s32 PxY(s32 y) { return (s32)lroundf((f32)y * sFy); }
+// The scissor offset (BP 0x59: (x + 342) / 2, (y + 342) / 2 in 10 bits each): the frame-buffer
+// position of a pixel is its screen position minus this. Used to draw a frame in bands.
+static inline void ScissorOffset(const PortGx* g, s32* offX, s32* offY) {
+    *offX = *offY = 0;
+    if (g->bp[0x59] != 0) { *offX = (s32)((g->bp[0x59] & 0x3FF) << 1) - 342; *offY = (s32)(((g->bp[0x59] >> 10) & 0x3FF) << 1) - 342; }
+}
 static BOOL                    sStarted;
 
 static struct { u32 draws, tris, presents, texCopies, textures, shaders, skipped; } sGfxStats;
+// This frame so far (reset at each display copy): time inside this backend, draws, GX vertices, copies.
+static struct { s64 renderTicks; u32 draws, verts, copies; } sFrame;
+static inline s64 Ticks(void) { LARGE_INTEGER t; QueryPerformanceCounter(&t); return t.QuadPart; }
 static u8 sTlutMem[0x80000];           // the palette half of the console's texture memory
 
 struct Vtx { f32 pos[4]; f32 col[2][4]; f32 tc[8][3]; };
@@ -69,8 +89,11 @@ static BOOL SavePng(ID3D11Texture2D* tex, u32 w, u32 h, const char* path);
 
 // ------------------------------------------------------------------ window
 static HANDLE sWndReady;
+static volatile LONG sWheel;           // mouse wheel movement the settings screen has not taken yet
+f32 PortGfxTakeWheel(void) { return (f32)InterlockedExchange(&sWheel, 0) / WHEEL_DELTA; }
 static LRESULT CALLBACK WndProc(HWND w, UINT m, WPARAM wp, LPARAM lp) {
     if (m == WM_CLOSE) { PortStop(0, "window closed"); return 0; }
+    if (m == WM_MOUSEWHEEL) { InterlockedExchangeAdd(&sWheel, (LONG)GET_WHEEL_DELTA_WPARAM(wp)); return 0; }
     return DefWindowProcA(w, m, wp, lp);
 }
 static DWORD WINAPI WindowThread(void*) {
@@ -80,7 +103,7 @@ static DWORD WINAPI WindowThread(void*) {
     wc.hCursor = LoadCursor(NULL, IDC_ARROW);
     wc.lpszClassName = "MonsterLabPort";
     RegisterClassA(&wc);
-    RECT r = {0, 0, (LONG)sBackW, (LONG)sBackH};
+    RECT r = {0, 0, (LONG)sOutW, (LONG)sOutH};
     AdjustWindowRect(&r, WS_OVERLAPPEDWINDOW, FALSE);
     sWnd = CreateWindowA(wc.lpszClassName, "Monster Lab (PC port)", WS_OVERLAPPEDWINDOW | WS_VISIBLE, CW_USEDEFAULT, CW_USEDEFAULT,
                          r.right - r.left, r.bottom - r.top, NULL, NULL, wc.hInstance, NULL);
@@ -91,6 +114,34 @@ static DWORD WINAPI WindowThread(void*) {
 }
 
 HWND PortGfxWindow(void) { return sWnd; }
+
+// Fullscreen is the same window without a border over its whole monitor; the picture is stretched to it.
+void PortGfxSetFullscreen(BOOL on) {
+    static RECT saved;
+    static BOOL full;
+    if (!sWnd || on == full) return;
+    full = on;
+    if (on) {
+        GetWindowRect(sWnd, &saved);
+        MONITORINFO mi = {sizeof(mi)};
+        if (!GetMonitorInfoA(MonitorFromWindow(sWnd, MONITOR_DEFAULTTONEAREST), &mi)) { full = FALSE; return; }
+        SetWindowLongA(sWnd, GWL_STYLE, WS_POPUP | WS_VISIBLE);
+        SetWindowPos(sWnd, HWND_TOP, mi.rcMonitor.left, mi.rcMonitor.top, mi.rcMonitor.right - mi.rcMonitor.left,
+                     mi.rcMonitor.bottom - mi.rcMonitor.top, SWP_FRAMECHANGED | SWP_NOOWNERZORDER);
+    } else {
+        SetWindowLongA(sWnd, GWL_STYLE, WS_OVERLAPPEDWINDOW | WS_VISIBLE);
+        SetWindowPos(sWnd, NULL, saved.left, saved.top, saved.right - saved.left, saved.bottom - saved.top,
+                     SWP_FRAMECHANGED | SWP_NOOWNERZORDER | SWP_NOZORDER);
+    }
+}
+
+// Window position (0..1 across and down) -> the console pointer's -1..1, through the picture's
+// place in the window and the narrowed 2D layer of widescreen.
+void PortGfxPointer(f32 wx, f32 wy, f32* px, f32* py) {
+    f32 x = (wx * sOutW - sPicX) / sPicW * 2.0f - 1.0f, y = (wy * sOutH - sPicY) / sPicH * 2.0f - 1.0f;
+    if (gPortSettings.wide && !gPortSettings.stretchUi) x /= 0.75f;
+    *px = x; *py = y;
+}
 
 // ------------------------------------------------------------------ shaders
 static ID3DBlob* Compile(const char* src, const char* entry, const char* target) {
@@ -129,6 +180,8 @@ struct PsConst {
     f32 texSize[8][4];      // width, height of each texture map (texels)
     f32 indRow[3][2][4];    // the three indirect matrices, two rows each, already scaled to texels per unit
     f32 indScale[4][4];     // per indirect stage: 1 / 2^scale for s and t of its coordinate
+    f32 fogP[4];            // fog: a, b, c of the hardware equation
+    f32 fogC[4];            // fog colour
 };
 
 static const char* const kColorIn[16] = {"prev.rgb", "prev.aaa", "c0.rgb", "c0.aaa", "c1.rgb", "c1.aaa", "c2.rgb", "c2.aaa",
@@ -169,11 +222,12 @@ static std::string TevKey(const PortGx* g, u32* texUsed) {
         key.append((const char*)words, 20);
         if (order & 0x40) *texUsed |= 1u << (order & 7);
     }
-    u32 tail[11];
+    u32 tail[12];
     for (u32 i = 0; i < 8; i++) tail[i] = g->bp[0xF6 + i] & 0xF;       // swap tables
     tail[8] = g->bp[0xF3] & 0xFF0000;                                    // alpha compare functions
     tail[9] = (g->bp[0x00] >> 16) & 7;                                   // indirect stages
     tail[10] = g->bp[0x27] & 0xFFFFFF;                                   // their texture maps and coordinates
+    tail[11] = (g->bp[0xF1] >> 20) & 15;                                 // fog: projection (bit 3) and kind
     for (u32 i = 0; i < tail[9]; i++) *texUsed |= 1u << ((g->bp[0x27] >> (i * 6)) & 7);
     key.append((const char*)tail, sizeof(tail));
     return key;
@@ -182,7 +236,7 @@ static std::string TevKey(const PortGx* g, u32* texUsed) {
 static std::string TevSource(const PortGx* g) {
     u32 stages = ((g->bp[0x00] >> 10) & 15) + 1;
     std::string s =
-        "cbuffer C : register(b0) { float4 reg[4]; float4 konst[4]; float4 alphaRef; float4 texSize[8]; float4 indRow[6]; float4 indScale[4]; };\n"
+        "cbuffer C : register(b0) { float4 reg[4]; float4 konst[4]; float4 alphaRef; float4 texSize[8]; float4 indRow[6]; float4 indScale[4]; float4 fogP; float4 fogC; };\n"
         "Texture2D t0 : register(t0); Texture2D t1 : register(t1); Texture2D t2 : register(t2); Texture2D t3 : register(t3);\n"
         "Texture2D t4 : register(t4); Texture2D t5 : register(t5); Texture2D t6 : register(t6); Texture2D t7 : register(t7);\n"
         "SamplerState s0 : register(s0); SamplerState s1 : register(s1); SamplerState s2 : register(s2); SamplerState s3 : register(s3);\n"
@@ -288,6 +342,18 @@ static std::string TevSource(const PortGx* g) {
         for (size_t p; (p = t1.find('r')) != std::string::npos && t1 != "true";) t1.replace(p, 1, "alphaRef.y");
         // quantise like the 8-bit hardware compare
         s += "  { float a = floor(o.a * 255.0 + 0.5) / 255.0; if (!(" + t0 + " " + kLogic[logic] + " " + t1 + ")) discard; }\n";
+    }
+    {   // fog (BP 0xEE-0xF2): the hardware's fogz = a / (b - z) - c (perspective) or a z - c (orthographic), then the kind's curve
+        u32 fk = (g->bp[0xF1] >> 21) & 7, ortho = (g->bp[0xF1] >> 20) & 1;
+        if (fk != 0) {
+            s += ortho ? "  { float fz = fogP.x * i.pos.z - fogP.z;" : "  { float fz = fogP.x / (fogP.y - i.pos.z) - fogP.z;";
+            s += " fz = saturate(fz); float f = fz;";
+            if (fk == 4) s += " f = 1.0 - exp2(-8.0 * fz);";
+            else if (fk == 5) s += " f = 1.0 - exp2(-8.0 * fz * fz);";
+            else if (fk == 6) s += " f = exp2(-8.0 * (1.0 - fz));";
+            else if (fk == 7) s += " f = exp2(-8.0 * (1.0 - fz) * (1.0 - fz));";
+            s += " o.rgb = lerp(o.rgb, fogC.rgb, f); }\n";
+        }
     }
     s += "  return o;\n}\n";
     return s;
@@ -470,7 +536,7 @@ static std::map<u32, ID3D11BlendState*> sBlends;
 static std::map<u32, ID3D11DepthStencilState*> sDepths;
 static ID3D11RasterizerState* sRaster[8];
 
-static void SetOutputState(const PortGx* g) {
+static void SetOutputState(const PortGx* g, f32 squeeze) {
     u32 bm = g->bp[0x41] & 0xFFFF, zm = g->bp[0x40] & 0x1F, hasAlpha = (g->bp[0x43] & 7) == 1;
     u32 bkey = bm | hasAlpha << 16;
     ID3D11BlendState*& bs = sBlends[bkey];
@@ -526,20 +592,30 @@ static void SetOutputState(const PortGx* g) {
     memcpy(vp, &g->xf[0x1A], sizeof(vp));
     D3D11_VIEWPORT v;
     f32 w = 2.0f * vp[0], h = -2.0f * vp[1];
-    // Scissor offset (BP 0x59: (x + 342) / 2, (y + 342) / 2 in 10 bits each): the frame-buffer
-    // position of a pixel is its screen position minus this. Used to draw a frame in bands.
-    s32 offX = 0, offY = 0;
-    if (g->bp[0x59] != 0) { offX = (s32)((g->bp[0x59] & 0x3FF) << 1) - 342; offY = (s32)(((g->bp[0x59] >> 10) & 0x3FF) << 1) - 342; }
-    v.TopLeftX = (vp[3] - 342.0f - vp[0] - (f32)offX) * sScale; v.TopLeftY = (vp[4] - 342.0f + vp[1] - (f32)offY) * sScale;
-    v.Width = w * sScale; v.Height = h * sScale; v.MinDepth = 0; v.MaxDepth = 1;
-    if (v.Width <= 0 || v.Height <= 0) { v.TopLeftX = v.TopLeftY = 0; v.Width = (f32)(EFB_W * sScale); v.Height = (f32)(EFB_H * sScale); }
+    // The offset is taken off in whole pixels (the copy of a band does the same).
+    s32 offX, offY;
+    ScissorOffset(g, &offX, &offY);
+    v.TopLeftX = (vp[3] - 342.0f - vp[0]) * sFx - (f32)PxX(offX); v.TopLeftY = (vp[4] - 342.0f + vp[1]) * sFy - (f32)PxY(offY);
+    v.Width = w * sFx; v.Height = h * sFy; v.MinDepth = 0; v.MaxDepth = 1;
+    if (v.Width <= 0 || v.Height <= 0) { v.TopLeftX = v.TopLeftY = 0; v.Width = (f32)sEfbPw; v.Height = (f32)sEfbPh; }
     sCtx->RSSetViewports(1, &v);
     // Scissor (BP 0x20 top-left, 0x21 bottom-right, both + 342, y in the low 12 bits)
     s32 x0 = (s32)((g->bp[0x20] >> 12) & 0xFFF) - 342, y0 = (s32)(g->bp[0x20] & 0xFFF) - 342;
     s32 x1 = (s32)((g->bp[0x21] >> 12) & 0xFFF) - 342 + 1, y1 = (s32)(g->bp[0x21] & 0xFFF) - 342 + 1;
-    if (x1 <= x0 || y1 <= y0) { x0 = y0 = 0; x1 = EFB_W; y1 = EFB_H; }
-    else { x0 -= offX; x1 -= offX; y0 -= offY; y1 -= offY; }
-    D3D11_RECT sc = {std::max(x0, 0) * sScale, std::max(y0, 0) * sScale, std::min(x1, EFB_W) * sScale, std::min(y1, EFB_H) * sScale};
+    D3D11_RECT sc = {0, 0, (LONG)sEfbPw, (LONG)sEfbPh};
+    if (x1 > x0 && y1 > y0) {
+        // A clip window of a narrowed 2D draw is narrowed with it (not the whole-screen one).
+        if (squeeze != 1.0f && (x0 > offX || x1 < offX + EFB_W)) {
+            f32 mid = (f32)offX + EFB_W / 2.0f;
+            sc.left = std::max((s32)lroundf((mid + ((f32)x0 - mid) * squeeze) * sFx) - PxX(offX), 0);
+            sc.right = std::min((s32)lroundf((mid + ((f32)x1 - mid) * squeeze) * sFx) - PxX(offX), (s32)sEfbPw);
+        } else {
+            sc.left = std::max(PxX(x0) - PxX(offX), 0);
+            sc.right = std::min(PxX(x1) - PxX(offX), (s32)sEfbPw);
+        }
+        sc.top = std::max(PxY(y0) - PxY(offY), 0);
+        sc.bottom = std::min(PxY(y1) - PxY(offY), (s32)sEfbPh);
+    }
     sCtx->RSSetScissorRects(1, &sc);
 }
 
@@ -616,7 +692,7 @@ static void LightChannel(const PortGx* g, u32 ctrl, const f32* mat, const f32* a
 
 static std::vector<Vtx> sVerts;
 
-static void Draw(const PortGx* g, u32 prim, const PortGxLayout* L, u32 count, const u8* data) {
+static void DrawPrims(const PortGx* g, u32 prim, const PortGxLayout* L, u32 count, const u8* data) {
     if (!sStarted || count == 0) return;
     if (prim >= 0xA8) { sGfxStats.skipped++; return; }     // lines and points: not drawn yet
     u32 texUsed;
@@ -709,6 +785,32 @@ static void Draw(const PortGx* g, u32 prim, const PortGxLayout* L, u32 count, co
         }
     }
 
+    // Widescreen. The game gives its 3D views a 16:9 projection, but lays out everything 2D
+    // (orthographic) for 640x480 and lets the TV stretch it. Here 2D draws keep their shape and
+    // stay centred instead: x is narrowed by 3/4. Layers that belong to the whole screen stay as
+    // they are: those that show a copy of the frame buffer (glow, blur, the banded frame), and
+    // those that reach from edge to edge without a picture on them (fades, bars, backdrops: no
+    // texture, or a small one). A full-screen picture (320 texels wide or more) is narrowed.
+    f32 squeeze = 1.0f;
+    if (ortho && gPortSettings.wide && !gPortSettings.stretchUi && count) {
+        BOOL whole = FALSE, picture = FALSE;
+        for (u32 m = 0; m < 8; m++) {
+            if (!(texUsed & (1u << m))) continue;
+            u32 base = (m < 4 ? 0x80 : 0xA0) + (m & 3);
+            if (sEfbCopies.count((g->bp[base + 0x14] & 0xFFFFFF) << 5)) whole = TRUE;
+            else if ((g->bp[base + 8] & 0x3FF) + 1 >= 320) picture = TRUE;
+        }
+        if (!whole && !picture) {
+            f32 lo = sVerts[0].pos[0], hi = lo;
+            for (u32 n = 1; n < count; n++) { lo = std::min(lo, sVerts[n].pos[0]); hi = std::max(hi, sVerts[n].pos[0]); }
+            if (lo <= -0.98f && hi >= 0.98f) whole = TRUE;
+        }
+        if (!whole) {
+            squeeze = 0.75f;
+            for (u32 n = 0; n < count; n++) sVerts[n].pos[0] *= squeeze;
+        }
+    }
+
     // to a triangle list
     static std::vector<Vtx> tris;
     tris.clear();
@@ -767,6 +869,16 @@ static void Draw(const PortGx* g, u32 prim, const PortGxLayout* L, u32 count, co
         pc.indRow[m][0][0] = e[0] * k; pc.indRow[m][0][1] = e[2] * k; pc.indRow[m][0][2] = e[4] * k; pc.indRow[m][0][3] = 0;
         pc.indRow[m][1][0] = e[1] * k; pc.indRow[m][1][1] = e[3] * k; pc.indRow[m][1][2] = e[5] * k; pc.indRow[m][1][3] = 0;
     }
+    {
+        u32 ab = (g->bp[0xEE] & 0xFFFFF) << 12, cb = (g->bp[0xF1] & 0xFFFFF) << 12;
+        f32 a, c;
+        memcpy(&a, &ab, 4); memcpy(&c, &cb, 4);
+        s32 expReg = g->bp[0xF0] & 31;
+        f32 b = (f32)(g->bp[0xEF] & 0xFFFFFF) / 8388638.0f * (f32)ldexp(1.0, expReg - 1);
+        pc.fogP[0] = ((g->bp[0xF1] >> 20) & 1) ? a : a * (f32)ldexp(1.0, expReg);
+        pc.fogP[1] = b; pc.fogP[2] = c; pc.fogP[3] = 0;
+        pc.fogC[0] = ((g->bp[0xF2] >> 16) & 255) / 255.0f; pc.fogC[1] = ((g->bp[0xF2] >> 8) & 255) / 255.0f; pc.fogC[2] = (g->bp[0xF2] & 255) / 255.0f; pc.fogC[3] = 1.0f;
+    }
     for (u32 i = 0; i < 4; i++) {
         u32 sc = g->bp[0x25 + i / 2] >> ((i & 1) * 8);
         pc.indScale[i][0] = 1.0f / (f32)(1u << (sc & 15)); pc.indScale[i][1] = 1.0f / (f32)(1u << ((sc >> 4) & 15)); pc.indScale[i][2] = pc.indScale[i][3] = 0;
@@ -774,7 +886,7 @@ static void Draw(const PortGx* g, u32 prim, const PortGxLayout* L, u32 count, co
     sCtx->UpdateSubresource(sPsConst, 0, NULL, &pc, 0, 0);
 
     sCtx->OMSetRenderTargets(1, &sEfbRtv, sEfbDsv);
-    SetOutputState(g);
+    SetOutputState(g, squeeze);
     ID3D11ShaderResourceView* srv[8]; ID3D11SamplerState* smp[8];
     for (u32 i = 0; i < 8; i++) { srv[i] = (texUsed & (1u << i)) ? GetTexture(g, i) : sWhite; smp[i] = (texUsed & (1u << i)) ? GetSampler(g, i) : sLinearClamp; }
     sCtx->PSSetShaderResources(0, 8, srv);
@@ -788,18 +900,19 @@ static void Draw(const PortGx* g, u32 prim, const PortGxLayout* L, u32 count, co
     sCtx->PSSetConstantBuffers(0, 1, &sPsConst);
     sCtx->Draw((UINT)tris.size(), first);
     sGfxStats.draws++;
+    sFrame.draws++; sFrame.verts += count;
     sGfxStats.tris += (u32)tris.size() / 3;
 }
 
 // ------------------------------------------------------------------ frame-buffer copies
-static void Blit(ID3D11ShaderResourceView* src, ID3D11RenderTargetView* dst, u32 dstW, u32 dstH, f32 u0, f32 v0, f32 du, f32 dv, const f32* pick = NULL) {
+static void Blit(ID3D11ShaderResourceView* src, ID3D11RenderTargetView* dst, u32 dstX, u32 dstY, u32 dstW, u32 dstH, f32 u0, f32 v0, f32 du, f32 dv, const f32* pick = NULL) {
     ID3D11ShaderResourceView* none[8] = {};
     f32 rect[8] = {u0, v0, du, dv, 0, 0, 0, 0};
     if (pick) memcpy(rect + 4, pick, 16);
     sCtx->UpdateSubresource(sBlitConst, 0, NULL, rect, 0, 0);
     sCtx->OMSetRenderTargets(1, &dst, NULL);
-    D3D11_VIEWPORT v = {0, 0, (f32)dstW, (f32)dstH, 0, 1};
-    D3D11_RECT sc = {0, 0, (LONG)dstW, (LONG)dstH};
+    D3D11_VIEWPORT v = {(f32)dstX, (f32)dstY, (f32)dstW, (f32)dstH, 0, 1};
+    D3D11_RECT sc = {(LONG)dstX, (LONG)dstY, (LONG)(dstX + dstW), (LONG)(dstY + dstH)};
     sCtx->RSSetViewports(1, &v);
     sCtx->RSSetScissorRects(1, &sc);
     sCtx->OMSetBlendState(NULL, NULL, 0xFFFFFFFF);
@@ -818,14 +931,35 @@ static void Blit(ID3D11ShaderResourceView* src, ID3D11RenderTargetView* dst, u32
     sCtx->OMSetRenderTargets(0, NULL, NULL);
 }
 
-static void Copy(const PortGx* g, u32 control) {
+// The numbers of the frame that ends at this display copy, for the overlay.
+static void FrameStats(PortFrameStats* s) {
+    static s64 last, lastWait, freq;
+    if (!freq) { LARGE_INTEGER f; QueryPerformanceFrequency(&f); freq = f.QuadPart; }
+    s64 now = Ticks(), wait = gPortWaitTicks;
+    f64 ms = 1000.0 / (f64)freq;
+    memset(s, 0, sizeof(*s));
+    if (last) {
+        s->frameMs = (f32)((now - last) * ms);
+        s->renderMs = (f32)(sFrame.renderTicks * ms);
+        s->waitMs = (f32)((wait - lastWait) * ms);
+        s->gameMs = std::max(s->frameMs - s->renderMs - s->waitMs, 0.0f);
+    }
+    last = now; lastWait = wait;
+    s->draws = sFrame.draws; s->verts = sFrame.verts; s->efbCopies = sFrame.copies;
+    s->textures = (u32)(sTextures.size() + sEfbCopies.size());
+    s->voices = PortAudioVoices(&s->voiceCount);
+    s->outW = sOutW; s->outH = sOutH; s->picW = sPicW; s->picH = sPicH; s->wide = gPortSettings.wide;
+    sFrame.renderTicks = 0; sFrame.draws = sFrame.verts = sFrame.copies = 0;
+}
+
+static void CopyEfb(const PortGx* g, u32 control) {
     if (!sStarted) return;
     if (sTrace) {
         static int n;
         char path[64];
         snprintf(path, sizeof(path), "build/pc/efb_%02d.png", n++);
         sCtx->OMSetRenderTargets(0, NULL, NULL);
-        SavePng(sEfbTex, EFB_W * sScale, EFB_H * sScale, path);
+        SavePng(sEfbTex, sEfbPw, sEfbPh, path);
         PortLog("gfx trace: copy %s control %06X src %u,%u %ux%u dest %08X -> %s", (control & 0x4000) ? "to display" : "to texture", control,
                 g->bp[0x49] & 0x3FF, (g->bp[0x49] >> 10) & 0x3FF, (g->bp[0x4A] & 0x3FF) + 1, ((g->bp[0x4A] >> 10) & 0x3FF) + 1,
                 (g->bp[0x4B] & 0xFFFFFF) << 5, path);
@@ -834,14 +968,27 @@ static void Copy(const PortGx* g, u32 control) {
     u32 w = (g->bp[0x4A] & 0x3FF) + 1, h = ((g->bp[0x4A] >> 10) & 0x3FF) + 1;
     if (x + w > EFB_W) w = EFB_W - x;
     if (y + h > EFB_H) h = EFB_H - y;
-    if (control & 0x4000) {                                 // to the display
-        D3D11_BOX box = {x * sScale, y * sScale, 0, (x + w) * sScale, (y + h) * sScale, 1};
-        sCtx->OMSetRenderTargets(0, NULL, NULL);
-        sCtx->CopySubresourceRegion(sLastFrame, 0, 0, 0, 0, sEfbTex, 0, &box);
-        sLastW = w * sScale; sLastH = h * sScale;
-        if (sSwap) {
-            Blit(sEfbSrv, sBackRtv, sBackW, sBackH, (f32)x / EFB_W, (f32)y / EFB_H, (f32)w / EFB_W, (f32)h / EFB_H);
-            sSwap->Present(0, 0);
+    // The source in frame-buffer pixels: whole pixels, placed as the draws of this band were.
+    s32 offX, offY;
+    ScissorOffset(g, &offX, &offY);
+    u32 px0 = (u32)std::max(PxX((s32)x + offX) - PxX(offX), 0), py0 = (u32)std::max(PxY((s32)y + offY) - PxY(offY), 0);
+    u32 px1 = (u32)std::min(PxX((s32)(x + w) + offX) - PxX(offX), (s32)sEfbPw), py1 = (u32)std::min(PxY((s32)(y + h) + offY) - PxY(offY), (s32)sEfbPh);
+    u32 pw = px1 - px0, ph = py1 - py0;
+    f32 su0 = (f32)px0 / sEfbPw, sv0 = (f32)py0 / sEfbPh, sdu = (f32)pw / sEfbPw, sdv = (f32)ph / sEfbPh;
+    if (control & 0x4000) {                                 // to the display: the picture's part of the output
+        f32 black[4] = {0, 0, 0, 1};
+        if (sPicW != sOutW || sPicH != sOutH) sCtx->ClearRenderTargetView(sOutRtv, black);
+        Blit(sEfbSrv, sOutRtv, sPicX, sPicY, sPicW, sPicH, su0, sv0, sdu, sdv);
+        sShown = TRUE;
+        // The overlay goes over the window's picture only, or with --screenshot-stats into the output picture itself.
+        PortFrameStats stats;
+        FrameStats(&stats);
+        PortOverlayFrame(&stats);
+        if (gPortOptions.screenshotStats) PortOverlayDraw(sOutRtv, sOutW, sOutH);
+        if (sSwap && !PortFastActive()) {            // fast-forward: rendered (for screenshots) but not presented
+            Blit(sOutSrv, sBackRtv, 0, 0, sOutW, sOutH, 0, 0, 1, 1);
+            if (!gPortOptions.screenshotStats) PortOverlayDraw(sBackRtv, sOutW, sOutH);
+            sSwap->Present(gPortSettings.vsync ? 1 : 0, 0);
         }
         sGfxStats.presents++;
         if (sTraceFrom > 1 && sGfxStats.presents >= sTraceFrom) sTrace = TRUE;
@@ -872,43 +1019,50 @@ static void Copy(const PortGx* g, u32 control) {
             res->Release();
             if (!bt) continue;
             bt->GetDesc(&ud);
-            if (ud.Width == w * sScale && (addr - e.first) / rowBytes * sScale <= ud.Height) {
+            if (ud.Width == pw && (u32)PxY((addr - e.first) / rowBytes) <= ud.Height) {
                 under = bt; row = (addr - e.first) / rowBytes; addr = e.first;
                 break;
             }
             bt->Release();
         }
-        D3D11_TEXTURE2D_DESC d = {};
-        d.Width = w * sScale; d.Height = (row + h) * sScale; d.MipLevels = 1; d.ArraySize = 1; d.Format = DXGI_FORMAT_R8G8B8A8_UNORM;
-        if (under && ud.Height > d.Height) d.Height = ud.Height;
-        d.SampleDesc.Count = 1; d.BindFlags = D3D11_BIND_SHADER_RESOURCE | D3D11_BIND_RENDER_TARGET;
-        ID3D11Texture2D* t = NULL;
-        if (SUCCEEDED(sDev->CreateTexture2D(&d, NULL, &t))) {
-            // The band is made on its own and then put in place, with the rows above and below it.
-            D3D11_TEXTURE2D_DESC bd = d;
-            bd.Height = h * sScale;
-            ID3D11Texture2D* band = t;
-            if (under) { band = NULL; sDev->CreateTexture2D(&bd, NULL, &band); }
-            if (band) {
-                ID3D11RenderTargetView* rtv = NULL;
-                sDev->CreateRenderTargetView(band, NULL, &rtv);
-                Blit(sEfbSrv, rtv, bd.Width, bd.Height, (f32)x / EFB_W, (f32)y / EFB_H, (f32)w / EFB_W, (f32)h / EFB_H, pick);
-                rtv->Release();
+        // The texture of the last copy to this address is used again when it has the right size
+        // (a new one for every copy made a 1080p frame crawl); a band is drawn into its rows.
+        ID3D11Texture2D* t = under;
+        u32 needH = (u32)PxY(row) + ph;
+        if (!t) {
+            auto old = sEfbCopies.find(addr);
+            if (old != sEfbCopies.end() && old->second) {
+                ID3D11Resource* res = NULL;
+                old->second->GetResource(&res);
+                res->QueryInterface(__uuidof(ID3D11Texture2D), (void**)&t);
+                res->Release();
+                if (t) { t->GetDesc(&ud); if (ud.Width != pw || ud.Height != needH) { t->Release(); t = NULL; } }
             }
-            if (under) {
-                D3D11_BOX all = {0, 0, 0, ud.Width, ud.Height, 1};
-                sCtx->CopySubresourceRegion(t, 0, 0, 0, 0, under, 0, &all);
-                if (band) { sCtx->CopySubresourceRegion(t, 0, 0, row * sScale, 0, band, 0, NULL); band->Release(); }
+        } else if (ud.Height < needH) {
+            t = NULL;                                       // the band reaches below the texture: a taller one, with the old rows
+        }
+        if (!t) {
+            D3D11_TEXTURE2D_DESC d = {};
+            d.Width = pw; d.Height = needH; d.MipLevels = 1; d.ArraySize = 1; d.Format = DXGI_FORMAT_R8G8B8A8_UNORM;
+            d.SampleDesc.Count = 1; d.BindFlags = D3D11_BIND_SHADER_RESOURCE | D3D11_BIND_RENDER_TARGET;
+            if (SUCCEEDED(sDev->CreateTexture2D(&d, NULL, &t))) {
+                if (under) { D3D11_BOX all = {0, 0, 0, ud.Width, ud.Height, 1}; sCtx->CopySubresourceRegion(t, 0, 0, 0, 0, under, 0, &all); }
+                ID3D11ShaderResourceView*& slot = sEfbCopies[addr];
+                if (slot) slot->Release();
+                slot = NULL;
+                sDev->CreateShaderResourceView(t, NULL, &slot);
             }
-            ID3D11ShaderResourceView*& slot = sEfbCopies[addr];
-            if (slot) slot->Release();
-            slot = NULL;
-            sDev->CreateShaderResourceView(t, NULL, &slot);
-            sEfbCopyRowBytes[addr] = rowBytes;
+            if (under) under->Release();
+        }
+        if (t) {
+            ID3D11RenderTargetView* rtv = NULL;
+            sDev->CreateRenderTargetView(t, NULL, &rtv);
+            if (rtv) { Blit(sEfbSrv, rtv, 0, (u32)PxY(row), pw, ph, su0, sv0, sdu, sdv, pick); rtv->Release(); }
+            if (!row || !sEfbCopyRowBytes.count(addr)) sEfbCopyRowBytes[addr] = rowBytes;
             t->Release();
         }
-        if (under) under->Release();
         sGfxStats.texCopies++;
+        sFrame.copies++;
     }
     if (control & 0x800) {                                  // clear afterwards (BP 0x4F alpha/red, 0x50 green/blue, 0x51 depth)
         f32 c[4] = {(g->bp[0x4F] & 255) / 255.0f, ((g->bp[0x50] >> 8) & 255) / 255.0f, (g->bp[0x50] & 255) / 255.0f, ((g->bp[0x4F] >> 8) & 255) / 255.0f};
@@ -981,21 +1135,39 @@ static BOOL SavePng(ID3D11Texture2D* tex, u32 sLastW, u32 sLastH, const char* pa
 }
 
 BOOL PortGfxSaveScreenshot(const char* path) {
-    if (!sStarted || !sLastW) return FALSE;
-    return SavePng(sLastFrame, sLastW, sLastH, path);
+    if (!sStarted || !sShown) return FALSE;
+    return SavePng(sOutTex, sOutW, sOutH, path);
 }
 
 // ------------------------------------------------------------------ start
+static void Draw(const PortGx* g, u32 prim, const PortGxLayout* L, u32 count, const u8* data) {
+    s64 t = Ticks();
+    DrawPrims(g, prim, L, count, data);
+    sFrame.renderTicks += Ticks() - t;
+}
+static void Copy(const PortGx* g, u32 control) {
+    s64 t = Ticks();
+    CopyEfb(g, control);
+    sFrame.renderTicks += Ticks() - t;
+}
 static const PortGxBackend kBackend = {Draw, Copy, LoadTlut};
 
-BOOL PortGfxStart(BOOL window, int scale) {
+BOOL PortGfxStart(BOOL window) {
     if (sStarted) return TRUE;
-    if (scale >= 1 && scale <= 8) sScale = scale;
+    // The picture is the largest 16:9 or 4:3 part of the output, centred (black bars beside it).
+    sOutW = (u32)std::min(std::max(gPortSettings.width, 320), 8192); sOutH = (u32)std::min(std::max(gPortSettings.height, 240), 8192);
+    u32 an = gPortSettings.wide ? 16 : 4, ad = gPortSettings.wide ? 9 : 3;
+    sPicW = sOutW; sPicH = sOutW * ad / an;
+    if (sPicH > sOutH) { sPicH = sOutH; sPicW = sOutH * an / ad; }
+    sPicX = (sOutW - sPicW) / 2; sPicY = (sOutH - sPicH) / 2;
+    sFx = (f32)sPicW / EFB_W; sFy = (f32)sPicH / DISP_H;
+    sEfbPw = sPicW; sEfbPh = (u32)ceilf(EFB_H * sFy);
     if (window) {
         sWndReady = CreateEventA(NULL, TRUE, FALSE, NULL);
         CloseHandle(CreateThread(NULL, 0, WindowThread, NULL, 0, NULL));
         WaitForSingleObject(sWndReady, 5000);
         if (!sWnd) window = FALSE;
+        else if (gPortSettings.fullscreen) PortGfxSetFullscreen(TRUE);
     }
     static const D3D_DRIVER_TYPE kDrivers[2] = {D3D_DRIVER_TYPE_HARDWARE, D3D_DRIVER_TYPE_WARP};
     static const D3D_FEATURE_LEVEL kLevels[2] = {D3D_FEATURE_LEVEL_11_0, D3D_FEATURE_LEVEL_10_0};
@@ -1003,14 +1175,14 @@ BOOL PortGfxStart(BOOL window, int scale) {
     for (int i = 0; i < 2 && FAILED(hr); i++) {
         if (window) {
             DXGI_SWAP_CHAIN_DESC sd = {};
-            sd.BufferCount = 2; sd.BufferDesc.Width = sBackW; sd.BufferDesc.Height = sBackH; sd.BufferDesc.Format = DXGI_FORMAT_R8G8B8A8_UNORM;
+            sd.BufferCount = 2; sd.BufferDesc.Width = sOutW; sd.BufferDesc.Height = sOutH; sd.BufferDesc.Format = DXGI_FORMAT_R8G8B8A8_UNORM;
             sd.BufferUsage = DXGI_USAGE_RENDER_TARGET_OUTPUT; sd.OutputWindow = sWnd; sd.SampleDesc.Count = 1; sd.Windowed = TRUE;
             hr = D3D11CreateDeviceAndSwapChain(NULL, kDrivers[i], NULL, 0, kLevels, 2, D3D11_SDK_VERSION, &sd, &sSwap, &sDev, NULL, &sCtx);
         } else {
             hr = D3D11CreateDevice(NULL, kDrivers[i], NULL, 0, kLevels, 2, D3D11_SDK_VERSION, &sDev, NULL, &sCtx);
         }
-        if (SUCCEEDED(hr)) PortLog("gfx: Direct3D 11 on %s, frame buffer %dx%d%s", i == 0 ? "the graphics card" : "the software rasteriser (WARP)",
-                                   EFB_W * sScale, EFB_H * sScale, window ? "" : ", no window");
+        if (SUCCEEDED(hr)) PortLog("gfx: Direct3D 11 on %s, output %ux%u, picture %ux%u (%s), frame buffer %ux%u%s", i == 0 ? "the graphics card" : "the software rasteriser (WARP)",
+                                   sOutW, sOutH, sPicW, sPicH, gPortSettings.wide ? "16:9" : "4:3", sEfbPw, sEfbPh, window ? "" : ", no window");
     }
     if (FAILED(hr)) { PortLog("gfx: no Direct3D 11 device (0x%08lX); nothing will be drawn", hr); return FALSE; }
     if (sSwap) {
@@ -1020,19 +1192,22 @@ BOOL PortGfxStart(BOOL window, int scale) {
         back->Release();
     }
     D3D11_TEXTURE2D_DESC d = {};
-    d.Width = EFB_W * sScale; d.Height = EFB_H * sScale; d.MipLevels = 1; d.ArraySize = 1; d.Format = DXGI_FORMAT_R8G8B8A8_UNORM;
+    d.Width = sOutW; d.Height = sOutH; d.MipLevels = 1; d.ArraySize = 1; d.Format = DXGI_FORMAT_R8G8B8A8_UNORM;
     d.SampleDesc.Count = 1; d.BindFlags = D3D11_BIND_RENDER_TARGET | D3D11_BIND_SHADER_RESOURCE;
+    sDev->CreateTexture2D(&d, NULL, &sOutTex);
+    sDev->CreateRenderTargetView(sOutTex, NULL, &sOutRtv);
+    sDev->CreateShaderResourceView(sOutTex, NULL, &sOutSrv);
+    d.Width = sEfbPw; d.Height = sEfbPh;
     sDev->CreateTexture2D(&d, NULL, &sEfbTex);
     sDev->CreateRenderTargetView(sEfbTex, NULL, &sEfbRtv);
     sDev->CreateShaderResourceView(sEfbTex, NULL, &sEfbSrv);
-    d.BindFlags = D3D11_BIND_SHADER_RESOURCE;
-    sDev->CreateTexture2D(&d, NULL, &sLastFrame);
     d.Format = DXGI_FORMAT_D24_UNORM_S8_UINT; d.BindFlags = D3D11_BIND_DEPTH_STENCIL;
     ID3D11Texture2D* depth = NULL;
     sDev->CreateTexture2D(&d, NULL, &depth);
     sDev->CreateDepthStencilView(depth, NULL, &sEfbDsv);
     depth->Release();
     f32 black[4] = {0, 0, 0, 1};
+    sCtx->ClearRenderTargetView(sOutRtv, black);
     sCtx->ClearRenderTargetView(sEfbRtv, black);
     sCtx->ClearDepthStencilView(sEfbDsv, D3D11_CLEAR_DEPTH, 1.0f, 0);
 
@@ -1070,6 +1245,7 @@ BOOL PortGfxStart(BOOL window, int scale) {
     // PORT_GFX_TRACE=N (N > 1) starts the trace when N pictures have been shown; any other value at once.
     sTraceFrom = getenv("PORT_GFX_TRACE") ? (u32)atoi(getenv("PORT_GFX_TRACE")) : 0;
     sTrace = getenv("PORT_GFX_TRACE") != NULL && sTraceFrom <= 1;
+    PortOverlayStart(sDev, sCtx);
     sStarted = TRUE;
     PortGxSetBackend(&kBackend);
     return TRUE;

@@ -21,6 +21,9 @@ build\pc\monsterlab.exe                        # runs main() with your own disc 
 |---|---|
 | `--data <dir>` or `MONSTERLAB_DATA` | extracted disc (`sys/main.dol`, `files/`); default: `orig/RM7P4F` in the current folder or above the exe |
 | `--frames N` | stop after N presented frames (default 300) |
+| `--fast-forward N` | run the first N frames unpaced (virtual clock, below), then continue in real time from the same game time. Nothing is presented and the sound device is not fed meanwhile; frames are still rendered |
+| `--fast` | never pace: the whole run on the virtual clock (headless tests) |
+| `--to-menu` | `--fast-forward 3200` plus `--press A@2600-2610`: unpaced through the splash screens and the title to the main menu, then real time. No frame or time limit unless `--frames` / `--seconds` is given. Try `--window --to-menu` |
 | `--seconds N` | stop after N seconds and say where the main thread is (default 60) |
 | `--keep-going` | a missing function returns 0 instead of stopping, and a semaphore nobody signals is passed after 0.5 s: a survey of what the boot path still needs. After the first one the run is no longer what the game does. |
 | `--verbose` | log every skipped static initialiser and every SDK stub call |
@@ -28,7 +31,15 @@ build\pc\monsterlab.exe                        # runs main() with your own disc 
 | `--wav FILE` | write everything the audio mixer produces to a WAV file (32 kHz stereo); works headless |
 | `--no-audio` | never open the sound device (it is only opened with `--window`) |
 | `--screenshot FILE` | write the last picture shown as a PNG when the run stops (works without `--window`) |
-| `--scale N` | frame buffer size as a multiple of the console's 640x528 (default 2) |
+| `--stats` | start with the stats overlay on (top-right; F3 turns it on and off in the window): frames per second, frame time split into game, render and wait, draw calls, GX vertices, frame-buffer copies, textures, audio voices, output size |
+| `--screenshot-stats` | draw the stats overlay into the `--screenshot` picture too (it is left out otherwise) |
+| `--settings [display\|audio\|controls]` | open the settings screen at the start (F1 or Esc opens and closes it in the window); with `--screenshot-stats` it is drawn into the screenshot |
+| `--vsync`, `--fullscreen` | vertical sync; borderless fullscreen (both also in the settings screen) |
+| `--no-ini` | do not read `monsterlab.ini` (next to the exe: display, audio and the key bindings, written by the settings screen; the command line wins over it) |
+| `--iso FILE` | the game data is your own Monster Lab disc image (.iso, RM7P4F), read as it is: nothing is extracted. `--data` and `MONSTERLAB_DATA` take an image too. Another game or region is refused with a message |
+| `--res WxH` | output size (default 1920x1080) |
+| `--aspect 4:3\|16:9` | picture shape and the console's widescreen setting (default 16:9) |
+| `--stretch-ui` | 16:9: stretch the 2D layer over the whole width, as the console does |
 | `--peek ADDR` | print four words of Wii memory (hex address) when the run stops |
 | `--watch ADDR` | report every write of the main thread to four bytes of Wii memory (hex address): writer, new value, stack |
 | `--press BUTTON@FRAME[-FRAME]` | hold a Wii Remote button (a name from the binding table: `A`, `B`, `PLUS`, `STICK_UP`...) during those frames; a press without an end lasts 6 frames. For headless tests; can be given up to 32 times |
@@ -316,13 +327,22 @@ renderer is one file behind `PortGxBackend`, so another API can be added beside 
 
 What it does:
 
-- **Frame buffer.** The console's 640x528 "EFB" is a render target of `--scale` times that
-  size (default 2). Everything the game addresses in frame-buffer pixels (viewport, scissor,
-  copy rectangles) is multiplied by the scale, so a higher internal resolution needs no change
-  in game code. *For 1080p and widescreen later:* the scale becomes the window's height / 480,
-  and widescreen is a wider render target plus a correction of the projection's x scale at the
-  point where the XF projection is applied (`Draw`): one place, because the transform is done
-  here and not in game code.
+- **Frame buffer, resolution, widescreen.** The output is `--res WxH` (default 1920x1080); the
+  picture is the largest 16:9 or 4:3 part of it (`--aspect`, default 16:9), centred, with black
+  beside it. The console's 640x528 "EFB" is a render target scaled so that its 640x480 picture
+  is exactly that part (`sFx`, `sFy`: 3 x 2.25 for 1080p 16:9). Everything the game addresses in
+  frame-buffer pixels (viewport, scissor, copy rectangles) is scaled here, so game code needs no
+  change. Positions are rounded to whole pixels after adding the scissor offset (`PxX`, `PxY`),
+  the same way for a band's draws and for its copy, so bands and copies meet without a seam at
+  any scale. `--aspect` is also what `SCGetAspectRatio` reports. The game's own 16:9 mode
+  (checked in the asm: `ViewCreate`, `CameraInit`, `fn_801FB10C`, the HOME menu) widens the 3D
+  views only: the 2D layer is always laid out for 640x480 (`fn_8019600C`, `gScreenWidth` is a
+  constant) and the TV stretches it. The port narrows orthographic draws by 3/4 about the centre
+  instead (`Draw`), except layers of the whole screen: draws that show a frame-buffer copy, and
+  ones from edge to edge with no texture or a small one (fades, backdrops; a full-screen picture
+  is narrowed). `--stretch-ui` gives the console's stretched 2D.
+  The mouse pointer goes through the same mapping (`PortGfxPointer`). All of this is in
+  `gPortSettings` (port.h), which the settings screen will edit.
 - **Vertices.** Decoded from the stream (or from the arrays a draw indexes), then transformed,
   lit and given their texture coordinates on the CPU from the XF registers and matrix memory:
   position and normal matrices, projection, the colour channels with their lights, the
@@ -389,6 +409,29 @@ game code in the middle of an update, which is stricter than the console.
 
 A loop that waits for an interrupt to change memory without calling any SDK function would hang.
 The time limit then reports where the main thread is.
+
+### The game clock and fast-forward
+
+Game time (`PortTicks`, `port_os.cpp`) is a virtual clock in `OSTime` ticks. `OSGetTime`/`OSGetTick`, the VI retrace
+(`PortViTick`), alarms, `OSSleepTicks` and the 3 ms AX frame (`PortAudioTick`) all read it. Paced, it is the real
+clock; the retrace is exactly 1,215,000 ticks (50 Hz) or 1,012,500 (60 Hz).
+
+While fast-forwarding the clock stands still while game code runs. The interrupt thread keeps a count of game
+threads (the main thread and every `OSResumeThread` thread) and of those waiting in `PortWaitChange` (semaphores,
+`VIWaitForRetrace`, `OSSleepTicks`); a signal resets the count. When all of them wait and no interrupt is queued,
+nothing can happen before the next event, and time jumps to the earliest of: next retrace, next AX frame, an alarm,
+a sleep deadline. A game thread that polls `OSGetTime` in a busy loop advances the clock 100 ticks per call so the
+loop ends. When the frame counter reaches the `--fast-forward` count the clock switches to the real one with an
+offset, so game time continues without a jump. Presenting to the window and writing to the sound device are
+skipped while fast (the mixer still runs, so game callbacks and `--wav` are the same); drawing is not skipped:
+copies and screenshots stay right.
+
+Frames at the same count show the same screen (title at 2500, main menu at 3200 with `--press A@2600-2610`), but
+effects that run on time (the title's sparks, the menu's scene) are in another phase from a paced run, and
+two runs are not pixel-identical even when both are paced (thread timing). Measured (this machine, headless, 3200 frames):
+paced about 64 s to the menu; `--to-menu` without a renderer 22 s (about 145 frames per second); with
+`--screenshot` the renderer (Direct3D WARP, software) is the cost: 640x480 about 60 s, so use `--res 640x480`
+for screenshot checks and a window (GPU) for the rest.
 
 ### Disc files: conversion after the read
 
