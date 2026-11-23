@@ -90,6 +90,8 @@ static DWORD WINAPI WindowThread(void*) {
     return 0;
 }
 
+HWND PortGfxWindow(void) { return sWnd; }
+
 // ------------------------------------------------------------------ shaders
 static ID3DBlob* Compile(const char* src, const char* entry, const char* target) {
     ID3DBlob* code = NULL; ID3DBlob* err = NULL;

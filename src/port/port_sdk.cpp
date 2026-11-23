@@ -16,6 +16,7 @@
 #include "revolution.h"
 
 int PortSelfTestOs(void);
+int PortSelfTestInput(void);
 
 #define STUB(name) PortStubCall(#name)
 
@@ -197,36 +198,7 @@ const char* PortSoftSdk(u32 addr) {
 // SCGetSoundMode (the SDK reads item 0x11 and falls back to 1): 0 mono, 1 stereo, 2 surround.
 extern "C" u8 fn_8026AC14(void) { return 1; }
 
-// The controller on PC, until there is real input: a Wii Remote with a Nunchuk on channel 0, held
-// still with no button down; nothing on channels 1 to 3. Without it the game puts its
-// "reconnect the controller" prompt (a black screen with a picture of the remote) over everything.
-//
-// KPADRead(channel, samples, capacity): the remote's samples since the last call, newest first;
-// returns how many. A sample is the SDK's KPADStatus (0x84 bytes): buttons held / pressed /
-// released at +0x00, the accelerometer at +0x0C (y = -1 is the remote lying flat), the pointer at
-// +0x20, the horizon at +0x34, the extension type at +0x5C (1 = Nunchuk), the error at +0x5D
-// (0 = fine, -1 = no controller), then the Nunchuk's stick and accelerometer from +0x60.
-extern "C" s32 KPADRead(s32 chan, u8* buf, s32 count) {
-    if (!buf || count < 1) return 0;
-    memset(buf, 0, 0x84);
-    if (chan != 0) { buf[0x5C] = 253; buf[0x5D] = 0xFF; return 0; }
-    *(f32*)(buf + 0x10) = -1.0f;        // acc.y: gravity
-    *(f32*)(buf + 0x18) = 1.0f;         // its length
-    *(f32*)(buf + 0x34) = 1.0f;         // horizon.x: level
-    *(f32*)(buf + 0x54) = 1.0f;         // acc_vertical.x
-    buf[0x5C] = 1;                      // Nunchuk attached
-    *(f32*)(buf + 0x6C) = -1.0f;        // the Nunchuk's acc.y
-    *(f32*)(buf + 0x74) = 1.0f;         // its length
-    return 1;
-}
-
-// WPADProbe(channel, device type): 0 and type 1 = a remote with a Nunchuk; -1 and type 253 = no
-// controller on this channel.
-extern "C" s32 WPADProbe(s32 chan, u32* type) {
-    if (chan != 0) { if (type) *type = 253; return -1; }
-    if (type) *type = 1;
-    return 0;
-}
+// KPADRead / WPADProbe: port_input.cpp.
 
 const char* PortDvdStats(char* buf, u32 n) {
     snprintf(buf, n, "%u file(s) opened, %u read(s), %.1f MB read, %u file(s) not found",
@@ -544,6 +516,7 @@ static void TestRetrace(u32 count) { sTestRetraces++; }
 
 int PortSelfTestSdk(void) {
     int fails = PortSelfTestOs();
+    fails += PortSelfTestInput();
 #define CHECK(cond) do { if (!(cond)) { fails++; PortLog("self-test FAILED: %s (line %d)", #cond, __LINE__); } } while (0)
     // A disc file: open by its disc path, read part of it into Wii memory, completion by callback.
     char dir[MAX_PATH], sub[MAX_PATH + 32], file[MAX_PATH + 64];

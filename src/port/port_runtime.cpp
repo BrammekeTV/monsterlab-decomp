@@ -13,6 +13,7 @@
 #include <string.h>
 
 #include "port/port.h"
+#include "port/port_input.h"
 #include "port/port_gx.h"
 
 // This file's start-up object must be built before every other static object: game code may
@@ -185,6 +186,8 @@ static void InstallScriptTrace(void) {
     }
     PortLog("script trace: %u script functions wrapped", n);
 }
+
+s32 PortFrameCount(void) { return sFrames; }
 
 void PortFrameDone(void) {
     if (sFrames == 1 && getenv("PORT_SCRIPT_TRACE")) InstallScriptTrace();
@@ -835,6 +838,9 @@ struct PortBoot {
             else if (!strcmp(a, "--show-texture") && i + 1 < __argc) gPortOptions.showTexture = atoi(__argv[++i]);
             else if (!strcmp(a, "--screenshot") && i + 1 < __argc) gPortOptions.screenshot = __argv[++i];
             else if (!strcmp(a, "--scale") && i + 1 < __argc) gPortOptions.scale = atoi(__argv[++i]);
+            else if (!strcmp(a, "--press") && i + 1 < __argc) {
+                if (!PortInputAddPress(__argv[++i])) fprintf(stderr, "[port] --press %s: expected BUTTON@FRAME[-FRAME]\n", __argv[i]);
+            }
         }
 
         // The Wii's two memory blocks at their original addresses. The code range must be executable.
