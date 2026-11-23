@@ -23,7 +23,7 @@ extern "C" s32 fn_8011A00C(void);
 extern "C" s32 fn_8011A014(void);
 extern "C" void fn_8011A01C(void);
 extern "C" void fn_8011A028(void);
-extern "C" u8 fn_8011A034(void);
+extern "C" u32 fn_8011A034(void);
 extern "C" void fn_8011A03C(s32);
 extern "C" s32 fn_8011A044(void);
 

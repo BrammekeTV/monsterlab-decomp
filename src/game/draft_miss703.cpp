@@ -232,8 +232,8 @@ s32 fn_8019F810(u8* arg0, s32 arg1, f32 farg0, f32 farg1) {
     if (lo == hi) {
         return 0;
     }
-    f32 x = (f32)farg0;
-    f32 y = (f32)farg1;
+    f32 x = farg0;
+    f32 y = farg1;
     f32 w = lbl_805FF95C;
     f32 px = *(f32*)(arg0 + 0xE4) + ((*(f32*)(arg0 + 0xD8) * w) + ((*(f32*)(arg0 + 0xC0) * x) + (*(f32*)(arg0 + 0xCC) * y)));
     f32 pz = *(f32*)(arg0 + 0xE8) + ((*(f32*)(arg0 + 0xDC) * w) + ((*(f32*)(arg0 + 0xC4) * x) + (*(f32*)(arg0 + 0xD0) * y)));

@@ -19,6 +19,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include <map>
+#include <unordered_map>
 #include <string>
 #include <vector>
 
@@ -47,11 +48,12 @@ static ID3D11Texture2D*        sOutTex;         // the output picture: what the 
 static ID3D11RenderTargetView* sOutRtv;
 static ID3D11ShaderResourceView* sOutSrv;
 static BOOL                    sShown;          // a display copy has happened
-static ID3D11VertexShader*     sVs;
+static ID3D11VertexShader*     sVs[9];                       // by the number of texture coordinates a draw has
+static ID3D11InputLayout*      sLayouts[9];
 static ID3D11VertexShader*     sBlitVs;
 static ID3D11PixelShader*      sBlitPs;
-static ID3D11InputLayout*      sLayout;
 static ID3D11Buffer*           sVb;
+static ID3D11Buffer*           sIb;
 static ID3D11Buffer*           sPsConst;
 static ID3D11Buffer*           sBlitConst;
 static ID3D11SamplerState*     sLinearClamp;
@@ -74,10 +76,14 @@ static inline void ScissorOffset(const PortGx* g, s32* offX, s32* offY) {
     if (g->bp[0x59] != 0) { *offX = (s32)((g->bp[0x59] & 0x3FF) << 1) - 342; *offY = (s32)(((g->bp[0x59] >> 10) & 0x3FF) << 1) - 342; }
 }
 static BOOL                    sStarted;
+static BOOL                    sDrawBound;                  // the pipeline state is still what FlushDraws left (Blit and copies clear it)
+struct OutKey { u32 bm, zm, alpha, cull, vp[6], sc0, sc1; f32 squeeze; s32 offX, offY; };
 
 static struct { u32 draws, tris, presents, texCopies, textures, shaders, skipped; } sGfxStats;
 // This frame so far (reset at each display copy): time inside this backend, draws, GX vertices, copies.
+static s64 sTotalDraw, sTotalCopy;     // time inside the backend over the whole run (the boot summary)
 static struct { s64 renderTicks; u32 draws, verts, copies; } sFrame;
+static inline s64 Ticks_freq(void) { LARGE_INTEGER f; QueryPerformanceFrequency(&f); return f.QuadPart; }
 static inline s64 Ticks(void) { LARGE_INTEGER t; QueryPerformanceCounter(&t); return t.QuadPart; }
 static u8 sTlutMem[0x80000];           // the palette half of the console's texture memory
 
@@ -86,12 +92,21 @@ static u32  sTraceFrom;
 static BOOL sTrace;                    // PORT_GFX_TRACE: log every draw and copy, save the frame buffer at each copy
 static BOOL SavePng(ID3D11Texture2D* tex, u32 w, u32 h, const char* path);
 #define VB_VERTS 65536
+#define IB_IDXS (1u << 20)
 
 // ------------------------------------------------------------------ window
 static HANDLE sWndReady;
 static volatile LONG sWheel;           // mouse wheel movement the settings screen has not taken yet
 f32 PortGfxTakeWheel(void) { return (f32)InterlockedExchange(&sWheel, 0) / WHEEL_DELTA; }
+#define WM_PORT_TITLE (WM_APP + 1)     // the game thread posts it; the title is set here, on the window's own thread
+static char sTitleText[96];
+static void PostTitle(const char* t) {
+    if (!sWnd) return;
+    snprintf(sTitleText, sizeof(sTitleText), "%s", t);
+    PostMessageA(sWnd, WM_PORT_TITLE, 0, 0);
+}
 static LRESULT CALLBACK WndProc(HWND w, UINT m, WPARAM wp, LPARAM lp) {
+    if (m == WM_PORT_TITLE) { SetWindowTextA(w, sTitleText); return 0; }
     if (m == WM_CLOSE) { PortStop(0, "window closed"); return 0; }
     if (m == WM_MOUSEWHEEL) { InterlockedExchangeAdd(&sWheel, (LONG)GET_WHEEL_DELTA_WPARAM(wp)); return 0; }
     return DefWindowProcA(w, m, wp, lp);
@@ -105,7 +120,9 @@ static DWORD WINAPI WindowThread(void*) {
     RegisterClassA(&wc);
     RECT r = {0, 0, (LONG)sOutW, (LONG)sOutH};
     AdjustWindowRect(&r, WS_OVERLAPPEDWINDOW, FALSE);
-    sWnd = CreateWindowA(wc.lpszClassName, "Monster Lab (PC port)", WS_OVERLAPPEDWINDOW | (getenv("PORT_HIDDEN") ? 0 : WS_VISIBLE), CW_USEDEFAULT, CW_USEDEFAULT,
+    // PORT_HIDDEN=1: not visible. PORT_OFFSCREEN=1: visible (the real code path) but far outside every monitor. For tests.
+    BOOL offscreen = getenv("PORT_OFFSCREEN") != NULL;
+    sWnd = CreateWindowA(wc.lpszClassName, "Monster Lab (PC port)", WS_OVERLAPPEDWINDOW | (getenv("PORT_HIDDEN") ? 0 : WS_VISIBLE), offscreen ? -32000 : CW_USEDEFAULT, offscreen ? -32000 : CW_USEDEFAULT,
                          r.right - r.left, r.bottom - r.top, NULL, NULL, wc.hInstance, NULL);
     SetEvent(sWndReady);
     MSG msg;
@@ -156,13 +173,21 @@ static ID3DBlob* Compile(const char* src, const char* entry, const char* target)
     return code;
 }
 
-static const char kVsSrc[] =
-    "struct VI { float4 pos : POSITION; float4 c0 : COLOR0; float4 c1 : COLOR1; float3 t0 : TEXCOORD0; float3 t1 : TEXCOORD1;"
-    " float3 t2 : TEXCOORD2; float3 t3 : TEXCOORD3; float3 t4 : TEXCOORD4; float3 t5 : TEXCOORD5; float3 t6 : TEXCOORD6; float3 t7 : TEXCOORD7; };\n"
-    "struct VO { float4 pos : SV_Position; float4 c0 : COLOR0; float4 c1 : COLOR1; float3 t0 : TEXCOORD0; float3 t1 : TEXCOORD1;"
-    " float3 t2 : TEXCOORD2; float3 t3 : TEXCOORD3; float3 t4 : TEXCOORD4; float3 t5 : TEXCOORD5; float3 t6 : TEXCOORD6; float3 t7 : TEXCOORD7; };\n"
-    "VO main(VI i) { VO o; o.pos = i.pos; o.c0 = i.c0; o.c1 = i.c1; o.t0 = i.t0; o.t1 = i.t1; o.t2 = i.t2; o.t3 = i.t3;"
-    " o.t4 = i.t4; o.t5 = i.t5; o.t6 = i.t6; o.t7 = i.t7; return o; }\n";
+// The vertex shader takes the first NGEN texture coordinates (a draw only uploads the ones it makes); the rest read as (0, 0, 1).
+static std::string VsSource(u32 ngen) {
+    std::string in = "struct VI { float4 pos : POSITION; float4 c0 : COLOR0; float4 c1 : COLOR1;";
+    std::string body = "VO main(VI i) { VO o; o.pos = i.pos; o.c0 = i.c0; o.c1 = i.c1;";
+    for (u32 t = 0; t < 8; t++) {
+        char b[96];
+        if (t < ngen) { snprintf(b, sizeof(b), " float3 t%u : TEXCOORD%u;", t, t); in += b; snprintf(b, sizeof(b), " o.t%u = i.t%u;", t, t); }
+        else snprintf(b, sizeof(b), " o.t%u = float3(0, 0, 1);", t);
+        body += b;
+    }
+    return in + " };\n"
+        "struct VO { float4 pos : SV_Position; float4 c0 : COLOR0; float4 c1 : COLOR1; float3 t0 : TEXCOORD0; float3 t1 : TEXCOORD1;"
+        " float3 t2 : TEXCOORD2; float3 t3 : TEXCOORD3; float3 t4 : TEXCOORD4; float3 t5 : TEXCOORD5; float3 t6 : TEXCOORD6; float3 t7 : TEXCOORD7; };\n"
+        + body + " return o; }\n";
+}
 
 static const char kBlitSrc[] =
     "cbuffer C : register(b0) { float4 rect; float4 pick; };\n"   // u0, v0, u size, v size; channel weights for an intensity copy
@@ -183,6 +208,15 @@ struct PsConst {
     f32 fogP[4];            // fog: a, b, c of the hardware equation
     f32 fogC[4];            // fog colour
 };
+
+// Draws queued by DrawPrims that share all their state, uploaded and drawn together by FlushDraws.
+struct PendingState { u32 ngen; PsConst pc; OutKey out; ID3D11PixelShader* ps; ID3D11ShaderResourceView* srv[8]; ID3D11SamplerState* smp[8]; };
+static PendingState sPend;
+static u32 sPendCount;                                      // GX draws queued
+static std::vector<u8> sBV;                                 // the queued vertices: position, two colours and ngen texture coordinates each
+static u32 sBVCount;
+static std::vector<u16> sBI;
+static void FlushDraws();
 
 static const char* const kColorIn[16] = {"prev.rgb", "prev.aaa", "c0.rgb", "c0.aaa", "c1.rgb", "c1.aaa", "c2.rgb", "c2.aaa",
                                          "tex.rgb", "tex.aaa", "ras.rgb", "ras.aaa", "float3(1,1,1)", "float3(0.5,0.5,0.5)", "kc", "float3(0,0,0)"};
@@ -211,9 +245,10 @@ static std::string KonstAlpha(u32 sel) {
 }
 
 static u32 sUnsupported;               // bit 0: an indirect matrix kind that is not implemented
-static std::string TevKey(const PortGx* g, u32* texUsed) {
+static const std::string& TevKey(const PortGx* g, u32* texUsed) {
     u32 stages = ((g->bp[0x00] >> 10) & 15) + 1;
-    std::string key((const char*)&stages, 4);
+    static std::string key;                                 // reused: no allocation per draw
+    key.assign((const char*)&stages, 4);
     *texUsed = 0;
     for (u32 n = 0; n < stages; n++) {
         u32 order = g->bp[0x28 + n / 2] >> ((n & 1) ? 12 : 0) & 0xFFF;
@@ -359,11 +394,16 @@ static std::string TevSource(const PortGx* g) {
     return s;
 }
 
-static std::map<std::string, ID3D11PixelShader*> sPsCache;
+static std::unordered_map<u64, ID3D11PixelShader*> sPsCache;
 static ID3D11PixelShader* GetPixelShader(const PortGx* g, u32* texUsed) {
-    std::string key = TevKey(g, texUsed);
-    auto it = sPsCache.find(key);
-    if (it != sPsCache.end()) return it->second;
+    const std::string& key = TevKey(g, texUsed);
+    static std::string lastKey; static ID3D11PixelShader* lastPs; static u32 lastTex;
+    if (lastPs && key == lastKey) { *texUsed = lastTex; return lastPs; }   // the draw before had the same TEV set-up
+    u64 h = 1469598103934665603ull;
+    const u32* w = (const u32*)key.data();
+    for (size_t i = 0; i < key.size() / 4; i++) h = (h ^ w[i]) * 1099511628211ull;
+    auto it = sPsCache.find(h);
+    if (it != sPsCache.end()) { lastKey = key; lastPs = it->second; lastTex = *texUsed; return lastPs; }
     ID3D11PixelShader* ps = NULL;
     std::string src = TevSource(g);
     ID3DBlob* code = Compile(src.c_str(), "main", "ps_4_0");
@@ -373,7 +413,7 @@ static ID3D11PixelShader* GetPixelShader(const PortGx* g, u32* texUsed) {
     } else {
         PortLog("gfx: the shader source was:\n%s", src.c_str());
     }
-    sPsCache[key] = ps;
+    sPsCache[h] = ps;
     sGfxStats.shaders++;
     return ps;
 }
@@ -458,7 +498,8 @@ static u32 Fnv(const u8* p, u32 n, u32 h) {
     return h;
 }
 
-struct TexEntry { ID3D11ShaderResourceView* srv; u32 hash, w, h, fmt; };
+struct TexEntry { ID3D11ShaderResourceView* srv; u32 hash, w, h, fmt, gen; };
+static u32 sTexGen = 1;                                    // bumped each frame and on a palette load: textures are re-hashed once per generation
 static std::map<u64, TexEntry> sTextures;                   // by address and palette slot
 static std::map<u32, ID3D11ShaderResourceView*> sEfbCopies; // frame-buffer copies, by destination address
 static std::map<u32, u32> sEfbCopyRowBytes;                 // console bytes per row of each copy, by destination address
@@ -485,30 +526,30 @@ static ID3D11ShaderResourceView* GetTexture(const PortGx* g, u32 map) {
     if (!data) return sWhite;
     const u8* tlut = sTlutMem + ((tl & 0x3FF) << 9);
     BOOL pal = fmt == 8 || fmt == 9 || fmt == 10;
+    u64 key = (u64)addr << 16 | (pal ? (tl & 0xFFF) : 0xFFFF);
+    auto it = sTextures.find(key);
+    if (it != sTextures.end() && it->second.gen == sTexGen && it->second.w == w && it->second.h == h && it->second.fmt == fmt && it->second.srv) return it->second.srv;
     u32 bytes = TextureBytes(w, h, fmt);
     u32 hash = Fnv(data, bytes, 2166136261u ^ w ^ h << 12 ^ fmt << 24);
     if (pal) hash = Fnv(tlut, fmt == 8 ? 32 : fmt == 9 ? 512 : 0x8000, hash ^ tl);
-    u64 key = (u64)addr << 16 | (pal ? (tl & 0xFFF) : 0xFFFF);
-    auto it = sTextures.find(key);
-    if (it != sTextures.end() && it->second.hash == hash) return it->second.srv;
+    if (it != sTextures.end() && it->second.hash == hash) { it->second.gen = sTexGen; it->second.w = w; it->second.h = h; it->second.fmt = fmt; return it->second.srv; }
     std::vector<u32> rgba(w * h);
     if (!DecodeTexture(data, w, h, fmt, tlut, (tl >> 10) & 3, rgba.data())) {
         static u32 warned;
         if (!(warned & (1u << fmt))) { warned |= 1u << fmt; PortLog("gfx: texture format %u is not decoded (drawn white)", fmt); }
         return sWhite;
     }
-    if (it != sTextures.end() && it->second.srv) it->second.srv->Release();
-    TexEntry e = {MakeTexture(rgba.data(), w, h), hash, w, h, fmt};
+    if (it != sTextures.end() && it->second.srv) { FlushDraws(); it->second.srv->Release(); }
+    TexEntry e = {MakeTexture(rgba.data(), w, h), hash, w, h, fmt, sTexGen};
     sTextures[key] = e;
     sGfxStats.textures++;
     return e.srv ? e.srv : sWhite;
 }
 
-static std::map<u32, ID3D11SamplerState*> sSamplers;
+static ID3D11SamplerState* sSamplers[256];
 static ID3D11SamplerState* GetSampler(const PortGx* g, u32 map) {
     u32 mode = g->bp[(map < 4 ? 0x80 : 0xA0) + (map & 3)] & 0xFF;
-    auto it = sSamplers.find(mode);
-    if (it != sSamplers.end()) return it->second;
+    if (sSamplers[mode]) return sSamplers[mode];
     static const D3D11_TEXTURE_ADDRESS_MODE kWrap[4] = {D3D11_TEXTURE_ADDRESS_CLAMP, D3D11_TEXTURE_ADDRESS_WRAP, D3D11_TEXTURE_ADDRESS_MIRROR,
                                                         D3D11_TEXTURE_ADDRESS_WRAP};
     D3D11_SAMPLER_DESC d = {};
@@ -529,6 +570,7 @@ static void LoadTlut(const PortGx* g, u32 source, u32 dest) {
     u32 off = (dest & 0x3FF) << 9, bytes = ((dest >> 10) & 0x7FF) * 32;
     if (!src || off + bytes > sizeof(sTlutMem)) return;
     memcpy(sTlutMem + off, src, bytes);
+    sTexGen++;
 }
 
 // ------------------------------------------------------------------ fixed pipeline state
@@ -536,8 +578,20 @@ static std::map<u32, ID3D11BlendState*> sBlends;
 static std::map<u32, ID3D11DepthStencilState*> sDepths;
 static ID3D11RasterizerState* sRaster[8];
 
-static void SetOutputState(const PortGx* g, f32 squeeze) {
-    u32 bm = g->bp[0x41] & 0xFFFF, zm = g->bp[0x40] & 0x1F, hasAlpha = (g->bp[0x43] & 7) == 1;
+// The fixed-function state of a draw, made from the GX registers when the draw is queued.
+static OutKey MakeOutKey(const PortGx* g, f32 squeeze) {
+    OutKey k = {};
+    k.bm = g->bp[0x41] & 0xFFFF; k.zm = g->bp[0x40] & 0x1F; k.alpha = g->bp[0x43] & 7;
+    k.cull = ((g->bp[0x00] >> 14) & 3) | (g->xf[0x05] & 1) << 2;
+    memcpy(k.vp, &g->xf[0x1A], sizeof(k.vp));
+    k.sc0 = g->bp[0x20]; k.sc1 = g->bp[0x21]; k.squeeze = squeeze;
+    ScissorOffset(g, &k.offX, &k.offY);
+    return k;
+}
+
+static void SetOutputState(const OutKey& k) {
+    f32 squeeze = k.squeeze;
+    u32 bm = k.bm, zm = k.zm, hasAlpha = k.alpha == 1;
     u32 bkey = bm | hasAlpha << 16;
     ID3D11BlendState*& bs = sBlends[bkey];
     if (!bs) {
@@ -576,7 +630,7 @@ static void SetOutputState(const PortGx* g, f32 squeeze) {
     }
     sCtx->OMSetDepthStencilState(ds, 0);
     // XF 0x1005 bit 0: clipping off. Depth is then clamped instead of clipped, as on the console.
-    u32 cull = ((g->bp[0x00] >> 14) & 3) | (g->xf[0x05] & 1) << 2;
+    u32 cull = k.cull;
     if (!sRaster[cull]) {
         D3D11_RASTERIZER_DESC d = {};
         d.FillMode = D3D11_FILL_SOLID;
@@ -589,19 +643,18 @@ static void SetOutputState(const PortGx* g, f32 squeeze) {
 
     // Viewport (XF 0x101A: half width, -half height, z range, centre x + 342, centre y + 342, far z)
     f32 vp[6];
-    memcpy(vp, &g->xf[0x1A], sizeof(vp));
+    memcpy(vp, k.vp, sizeof(vp));
     D3D11_VIEWPORT v;
     f32 w = 2.0f * vp[0], h = -2.0f * vp[1];
     // The offset is taken off in whole pixels (the copy of a band does the same).
-    s32 offX, offY;
-    ScissorOffset(g, &offX, &offY);
+    s32 offX = k.offX, offY = k.offY;
     v.TopLeftX = (vp[3] - 342.0f - vp[0]) * sFx - (f32)PxX(offX); v.TopLeftY = (vp[4] - 342.0f + vp[1]) * sFy - (f32)PxY(offY);
     v.Width = w * sFx; v.Height = h * sFy; v.MinDepth = 0; v.MaxDepth = 1;
     if (v.Width <= 0 || v.Height <= 0) { v.TopLeftX = v.TopLeftY = 0; v.Width = (f32)sEfbPw; v.Height = (f32)sEfbPh; }
     sCtx->RSSetViewports(1, &v);
     // Scissor (BP 0x20 top-left, 0x21 bottom-right, both + 342, y in the low 12 bits)
-    s32 x0 = (s32)((g->bp[0x20] >> 12) & 0xFFF) - 342, y0 = (s32)(g->bp[0x20] & 0xFFF) - 342;
-    s32 x1 = (s32)((g->bp[0x21] >> 12) & 0xFFF) - 342 + 1, y1 = (s32)(g->bp[0x21] & 0xFFF) - 342 + 1;
+    s32 x0 = (s32)((k.sc0 >> 12) & 0xFFF) - 342, y0 = (s32)(k.sc0 & 0xFFF) - 342;
+    s32 x1 = (s32)((k.sc1 >> 12) & 0xFFF) - 342 + 1, y1 = (s32)(k.sc1 & 0xFFF) - 342 + 1;
     D3D11_RECT sc = {0, 0, (LONG)sEfbPw, (LONG)sEfbPh};
     if (x1 > x0 && y1 > y0) {
         // A clip window of a narrowed 2D draw is narrowed with it (not the whole-screen one).
@@ -620,12 +673,15 @@ static void SetOutputState(const PortGx* g, f32 squeeze) {
 }
 
 // ------------------------------------------------------------------ vertices: decode, transform, light
+static inline f64 Pow2(s32 n) { u64 b = (u64)(n + 1023) << 52; f64 d; memcpy(&d, &b, 8); return d; }   // ldexp(1.0, n) for -1022 <= n <= 1023
 static inline f32 BeF32(const u8* p) { u32 u = (u32)p[0] << 24 | (u32)p[1] << 16 | (u32)p[2] << 8 | p[3]; f32 f; memcpy(&f, &u, 4); return f; }
 
 // One component of a position, normal or texture coordinate. `be`: from the command stream
 // (console byte order); otherwise from an array in memory (host order).
 static f32 Component(const u8* p, u32 fmt, u32 shift, BOOL be) {
-    f32 scale = 1.0f / (f32)(1u << shift);
+    static const f32 kScale[32] = {1.0f, 0.5f, 0.25f, 0.125f, 1.0f / 16, 1.0f / 32, 1.0f / 64, 1.0f / 128, 1.0f / 256, 1.0f / 512, 1.0f / 1024, 1.0f / 2048, 1.0f / 4096,
+                                   1.0f / 8192, 1.0f / 16384, 1.0f / 32768, 1.0f / 65536};
+    f32 scale = shift < 17 ? kScale[shift] : 1.0f / (f32)(1u << shift);
     switch (fmt) {
     case 0: return (f32)p[0] * scale;
     case 1: return (f32)(s8)p[0] * scale;
@@ -648,18 +704,20 @@ static void Colour(const u8* p, u32 fmt, BOOL be, f32* out) {
         u32 c = be ? ((u32)p[0] << 24 | (u32)p[1] << 16 | (u32)p[2] << 8 | p[3]) : *(const u32*)p;
         r = c >> 24; g = (c >> 16) & 255; b = (c >> 8) & 255; a = fmt == 2 ? 255 : (c & 255);
     }
-    out[0] = r / 255.0f; out[1] = g / 255.0f; out[2] = b / 255.0f; out[3] = a / 255.0f;
+    const f32 k = 1.0f / 255.0f;
+    out[0] = r * k; out[1] = g * k; out[2] = b * k; out[3] = a * k;
 }
 
 static inline void Mul34(const f32* m, const f32* v, f32* out) {
     for (int r = 0; r < 3; r++) out[r] = m[r * 4] * v[0] + m[r * 4 + 1] * v[1] + m[r * 4 + 2] * v[2] + m[r * 4 + 3] * v[3];
 }
 static inline void RegColour(u32 c, f32* out) {
-    out[0] = (c >> 24) / 255.0f; out[1] = ((c >> 16) & 255) / 255.0f; out[2] = ((c >> 8) & 255) / 255.0f; out[3] = (c & 255) / 255.0f;
+    const f32 k = 1.0f / 255.0f;
+    out[0] = (c >> 24) * k; out[1] = ((c >> 16) & 255) * k; out[2] = ((c >> 8) & 255) * k; out[3] = (c & 255) * k;
 }
 
 // One colour channel's control word applied to a vertex (XF 0x100E-0x1011).
-static void LightChannel(const PortGx* g, u32 ctrl, const f32* mat, const f32* amb, const f32* pos, const f32* nrm, int first, int count, f32* out) {
+static void LightChannel(const PortGx* g, const f32 (*lightCol)[4], u32 ctrl, const f32* mat, const f32* amb, const f32* pos, const f32* nrm, int first, int count, f32* out) {
     if (!(ctrl & 2)) { for (int k = first; k < first + count; k++) out[k] = mat[k]; return; }
     f32 sum[4] = {amb[0], amb[1], amb[2], amb[3]};
     u32 mask = ((ctrl >> 2) & 15) | ((ctrl >> 11) & 15) << 4;
@@ -667,11 +725,10 @@ static void LightChannel(const PortGx* g, u32 ctrl, const f32* mat, const f32* a
     for (u32 i = 0; i < 8; i++) {
         if (!(mask & (1u << i))) continue;
         const f32* l = &g->xfMem[0x600 + i * 0x10];
-        u32 lc; memcpy(&lc, &l[3], 4);
-        f32 col[4]; RegColour(lc, col);
+        const f32* col = lightCol[i];
         f32 d[3] = {l[10] - pos[0], l[11] - pos[1], l[12] - pos[2]};
         f32 dist2 = d[0] * d[0] + d[1] * d[1] + d[2] * d[2], dist = sqrtf(dist2);
-        if (dist > 0) { d[0] /= dist; d[1] /= dist; d[2] /= dist; }
+        if (dist > 0) { f32 inv = 1.0f / dist; d[0] *= inv; d[1] *= inv; d[2] *= inv; }
         f32 a = 1.0f;
         if (attn & 1) {
             if (attn & 2) {                                 // spot light
@@ -698,30 +755,43 @@ static void DrawPrims(const PortGx* g, u32 prim, const PortGxLayout* L, u32 coun
     u32 texUsed;
     ID3D11PixelShader* ps = GetPixelShader(g, &texUsed);
     if (!ps) { sGfxStats.skipped++; return; }
-
     f32 proj[7]; memcpy(proj, &g->xf[0x20], 24);
     BOOL ortho = g->xf[0x26] & 1;
     u32 numChans = g->xf[0x09] & 3, numGens = g->xf[0x3F] & 15;
     f32 ambReg[2][4], matReg[2][4];
     for (int c = 0; c < 2; c++) { RegColour(g->xf[0x0A + c], ambReg[c]); RegColour(g->xf[0x0C + c], matReg[c]); }
     u32 midx[2] = {g->cp[0x30], g->cp[0x40]};
+    f32 lightCol[8][4];
+    for (u32 i = 0; i < 8; i++) { u32 lc; memcpy(&lc, &g->xfMem[0x600 + i * 0x10 + 3], 4); RegColour(lc, lightCol[i]); }
 
     sVerts.resize(count);
+    // Per draw, not per vertex: where each array attribute's data is, and the attributes the vertex format has.
+    const u8* arrBase[21] = {}; u32 arrStride[21] = {}; BOOL arrBe[21] = {};
+    u32 active[12], nActive = 0;
+    for (u32 a = 9; a < 21; a++) {
+        if (!L->attr[a].mode) continue;
+        if (L->attr[a].mode >= 2) {
+            arrBase[a] = PortGxHostPtr(g->cp[0xA0 + (a - 9)]);
+            if (!arrBase[a]) continue;
+            arrStride[a] = g->cp[0xB0 + (a - 9)] & 0xFF;
+            arrBe[a] = PortIsSectionData(arrBase[a]);       // a mesh's arrays are file data; arrays the game builds are in host order
+        }
+        active[nActive++] = a;
+    }
     for (u32 n = 0; n < count; n++, data += L->size) {
         Vtx& o = sVerts[n];
-        f32 in[21][4];                                      // position, normal, colours, texture coordinates as given
-        BOOL has[21] = {};
-        for (u32 a = 9; a < 21; a++) {
+        f32 in[21][4];                                      // position, normal, colours, texture coordinates as given (read only where has[])
+        BOOL has[21];
+        for (u32 a = 9; a < 21; a++) has[a] = FALSE;
+        for (u32 ai = 0; ai < nActive; ai++) {
+            const u32 a = active[ai];
             const PortGxAttr& at = L->attr[a];
-            if (!at.mode) continue;
             const u8* p = data + at.offset;
             BOOL be = TRUE;
             if (at.mode >= 2) {                             // through an array
                 u32 index = at.mode == 2 ? p[0] : Be16(p);
-                const u8* base = PortGxHostPtr(g->cp[0xA0 + (a - 9)]);
-                if (!base) continue;
-                p = base + index * (g->cp[0xB0 + (a - 9)] & 0xFF);
-                be = PortIsSectionData(base);               // a mesh's arrays are file data; arrays the game builds are in host order
+                p = arrBase[a] + index * arrStride[a];
+                be = arrBe[a];
             }
             has[a] = TRUE;
             if (a == 11 || a == 12) { Colour(p, at.fmt, be, in[a]); continue; }
@@ -752,14 +822,13 @@ static void DrawPrims(const PortGx* g, u32 prim, const PortGxLayout* L, u32 coun
             if (c >= numChans) { o.col[c][0] = o.col[c][1] = o.col[c][2] = 0; o.col[c][3] = 0; if (c == 0 && numChans == 0) memcpy(o.col[0], kWhite, 16); continue; }
             const f32* vc = has[11 + c] ? in[11 + c] : kWhite;
             u32 cc = g->xf[0x0E + c], ac = g->xf[0x10 + c];
-            LightChannel(g, cc, (cc & 1) ? vc : matReg[c], (cc & 0x40) ? vc : ambReg[c], pos, nrm, 0, 3, o.col[c]);
-            LightChannel(g, ac, (ac & 1) ? vc : matReg[c], (ac & 0x40) ? vc : ambReg[c], pos, nrm, 3, 1, o.col[c]);
+            LightChannel(g, lightCol, cc, (cc & 1) ? vc : matReg[c], (cc & 0x40) ? vc : ambReg[c], pos, nrm, 0, 3, o.col[c]);
+            LightChannel(g, lightCol, ac, (ac & 1) ? vc : matReg[c], (ac & 0x40) ? vc : ambReg[c], pos, nrm, 3, 1, o.col[c]);
         }
         // texture coordinate generation
-        for (u32 t = 0; t < 8; t++) {
+        for (u32 t = 0; t < numGens && t < 8; t++) {      // (a draw only uploads the coordinates it makes)
             f32* tc = o.tc[t];
             tc[0] = tc[1] = 0; tc[2] = 1;
-            if (t >= numGens) continue;
             u32 gen = g->xf[0x40 + t];
             u32 type = (gen >> 4) & 7, row = (gen >> 7) & 31;
             if (type == 2 || type == 3) { tc[0] = o.col[type - 2][0]; tc[1] = o.col[type - 2][1]; continue; }
@@ -810,19 +879,16 @@ static void DrawPrims(const PortGx* g, u32 prim, const PortGxLayout* L, u32 coun
             for (u32 n = 0; n < count; n++) sVerts[n].pos[0] *= squeeze;
         }
     }
-
-    // to a triangle list
-    static std::vector<Vtx> tris;
-    tris.clear();
-    if (prim == 0x80) { for (u32 i = 0; i + 3 < count; i += 4) { tris.push_back(sVerts[i]); tris.push_back(sVerts[i + 1]); tris.push_back(sVerts[i + 2]);
-                                                                   tris.push_back(sVerts[i]); tris.push_back(sVerts[i + 2]); tris.push_back(sVerts[i + 3]); } }
-    else if (prim == 0x90) { for (u32 i = 0; i + 2 < count; i += 3) { tris.push_back(sVerts[i]); tris.push_back(sVerts[i + 1]); tris.push_back(sVerts[i + 2]); } }
-    else if (prim == 0x98) { for (u32 i = 0; i + 2 < count; i++) { tris.push_back(sVerts[i]); tris.push_back(sVerts[i + 1 + (i & 1)]); tris.push_back(sVerts[i + 2 - (i & 1)]); } }
-    else if (prim == 0xA0) { for (u32 i = 1; i + 1 < count; i++) { tris.push_back(sVerts[0]); tris.push_back(sVerts[i]); tris.push_back(sVerts[i + 1]); } }
-    if (tris.empty() || tris.size() > VB_VERTS) { sGfxStats.skipped++; return; }
-
+    // to a triangle list: indices into the vertices, which are uploaded once
+    static std::vector<u16> idx;
+    idx.clear();
+    if (prim == 0x80) { for (u32 i = 0; i + 3 < count; i += 4) { u16 q = (u16)i; idx.insert(idx.end(), {q, (u16)(q + 1), (u16)(q + 2), q, (u16)(q + 2), (u16)(q + 3)}); } }
+    else if (prim == 0x90) { for (u32 i = 0; i + 2 < count; i += 3) { u16 q = (u16)i; idx.insert(idx.end(), {q, (u16)(q + 1), (u16)(q + 2)}); } }
+    else if (prim == 0x98) { for (u32 i = 0; i + 2 < count; i++) { idx.push_back((u16)i); idx.push_back((u16)(i + 1 + (i & 1))); idx.push_back((u16)(i + 2 - (i & 1))); } }
+    else if (prim == 0xA0) { for (u32 i = 1; i + 1 < count; i++) { idx.push_back(0); idx.push_back((u16)i); idx.push_back((u16)(i + 1)); } }
+    if (idx.empty() || count > VB_VERTS) { sGfxStats.skipped++; return; }
     if (sTrace) {
-        const Vtx& v = tris[0];
+        const Vtx& v = sVerts[idx[0]];
         f32 vp[6]; memcpy(vp, &g->xf[0x1A], sizeof(vp));
         PortLog("gfx trace: draw %02X x%u stages %u gens %u chans %u tex %02X bm %04X zm %02X cull %u vp %.0f,%.0f,%.0f,%.0f v0 pos %.2f %.2f %.2f %.2f col %.2f %.2f %.2f %.2f tc0 %.2f %.2f clipoff %u img0 %06X addr %08X",
                 prim, count, ((g->bp[0] >> 10) & 15) + 1, numGens, numChans, texUsed, g->bp[0x41] & 0xFFFF, g->bp[0x40] & 0x1F, (g->bp[0] >> 14) & 3,
@@ -840,72 +906,133 @@ static void DrawPrims(const PortGx* g, u32 prim, const PortGxLayout* L, u32 coun
                     sVerts[i].pos[3], sVerts[i].col[0][0], sVerts[i].col[0][1], sVerts[i].col[0][2], sVerts[i].col[0][3], sVerts[i].tc[0][0], sVerts[i].tc[0][1], sVerts[i].tc[0][2],
                     sVerts[i].tc[1][0], sVerts[i].tc[1][1]);
     }
-    // The vertices go behind those of the earlier draws; the buffer (9 MB) is only replaced when
-    // it is full. Replacing it for every draw made a scene of a few thousand small draws crawl.
-    static u32 sVbUsed;
-    u32 first = sVbUsed;
-    D3D11_MAPPED_SUBRESOURCE map;
-    D3D11_MAP how = D3D11_MAP_WRITE_NO_OVERWRITE;
-    if (first + tris.size() > VB_VERTS) { first = 0; how = D3D11_MAP_WRITE_DISCARD; }
-    if (FAILED(sCtx->Map(sVb, 0, how, 0, &map))) return;
-    memcpy((u8*)map.pData + (size_t)first * sizeof(Vtx), tris.data(), tris.size() * sizeof(Vtx));
-    sCtx->Unmap(sVb, 0);
-    sVbUsed = first + (u32)tris.size();
-
     PsConst pc;
-    for (int i = 0; i < 4; i++) for (int k = 0; k < 4; k++) { pc.reg[i][k] = g->tevReg[i][k] / 255.0f; pc.konst[i][k] = g->tevKonst[i][k] / 255.0f; }
-    pc.alphaRef[0] = (g->bp[0xF3] & 255) / 255.0f; pc.alphaRef[1] = ((g->bp[0xF3] >> 8) & 255) / 255.0f; pc.alphaRef[2] = pc.alphaRef[3] = 0;
-    for (u32 m = 0; m < 8; m++) {
-        u32 img0 = g->bp[(m < 4 ? 0x80 : 0xA0) + (m & 3) + 8];
-        pc.texSize[m][0] = (f32)((img0 & 0x3FF) + 1); pc.texSize[m][1] = (f32)(((img0 >> 10) & 0x3FF) + 1); pc.texSize[m][2] = pc.texSize[m][3] = 0;
-    }
-    for (u32 m = 0; m < 3; m++) {
-        // BP 0x06+3m..: six 11-bit signed elements (a, b | c, d | e, f) and a 6-bit scale. The
-        // offset in 1/128 texels is (M . v) >> 3, shifted by 17 - scale.
-        u32 r0 = g->bp[0x06 + m * 3], r1 = g->bp[0x07 + m * 3], r2 = g->bp[0x08 + m * 3];
-        s32 e[6] = {(s32)(r0 << 21) >> 21, (s32)(r0 << 10) >> 21, (s32)(r1 << 21) >> 21, (s32)(r1 << 10) >> 21, (s32)(r2 << 21) >> 21, (s32)(r2 << 10) >> 21};
-        s32 scale = (s32)(((r0 >> 22) & 3) | ((r1 >> 22) & 3) << 2 | ((r2 >> 22) & 3) << 4);
-        f32 k = (f32)ldexp(1.0, scale - 17) / 8.0f / 128.0f;
-        pc.indRow[m][0][0] = e[0] * k; pc.indRow[m][0][1] = e[2] * k; pc.indRow[m][0][2] = e[4] * k; pc.indRow[m][0][3] = 0;
-        pc.indRow[m][1][0] = e[1] * k; pc.indRow[m][1][1] = e[3] * k; pc.indRow[m][1][2] = e[5] * k; pc.indRow[m][1][3] = 0;
-    }
+    memset(&pc, 0, sizeof(pc));
+    // The constants only change now and then: rebuild them when one of the registers they come from did.
+    struct PcSrc { s16 reg[16], konst[16]; u32 bp[8 + 9 + 5 + 2 + 1]; };
+    static PcSrc lastSrc; static PsConst lastPcVal; static BOOL haveLast;
+    PcSrc src;
+    memcpy(src.reg, g->tevReg, sizeof(src.reg)); memcpy(src.konst, g->tevKonst, sizeof(src.konst));
     {
-        u32 ab = (g->bp[0xEE] & 0xFFFFF) << 12, cb = (g->bp[0xF1] & 0xFFFFF) << 12;
-        f32 a, c;
-        memcpy(&a, &ab, 4); memcpy(&c, &cb, 4);
-        s32 expReg = g->bp[0xF0] & 31;
-        f32 b = (f32)(g->bp[0xEF] & 0xFFFFFF) / 8388638.0f * (f32)ldexp(1.0, expReg - 1);
-        pc.fogP[0] = ((g->bp[0xF1] >> 20) & 1) ? a : a * (f32)ldexp(1.0, expReg);
-        pc.fogP[1] = b; pc.fogP[2] = c; pc.fogP[3] = 0;
-        pc.fogC[0] = ((g->bp[0xF2] >> 16) & 255) / 255.0f; pc.fogC[1] = ((g->bp[0xF2] >> 8) & 255) / 255.0f; pc.fogC[2] = (g->bp[0xF2] & 255) / 255.0f; pc.fogC[3] = 1.0f;
+        u32 n = 0;
+        for (u32 m = 0; m < 8; m++) src.bp[n++] = g->bp[(m < 4 ? 0x80 : 0xA0) + (m & 3) + 8];
+        for (u32 i = 0x06; i < 0x0F; i++) src.bp[n++] = g->bp[i];
+        for (u32 i = 0xEE; i < 0xF3; i++) src.bp[n++] = g->bp[i];
+        src.bp[n++] = g->bp[0x25]; src.bp[n++] = g->bp[0x26];
+        src.bp[n++] = g->bp[0xF3];
     }
-    for (u32 i = 0; i < 4; i++) {
-        u32 sc = g->bp[0x25 + i / 2] >> ((i & 1) * 8);
-        pc.indScale[i][0] = 1.0f / (f32)(1u << (sc & 15)); pc.indScale[i][1] = 1.0f / (f32)(1u << ((sc >> 4) & 15)); pc.indScale[i][2] = pc.indScale[i][3] = 0;
+    if (haveLast && !memcmp(&src, &lastSrc, sizeof(src))) pc = lastPcVal;
+    else {
+    for (int i = 0; i < 4; i++) for (int k = 0; k < 4; k++) { pc.reg[i][k] = g->tevReg[i][k] / 255.0f; pc.konst[i][k] = g->tevKonst[i][k] / 255.0f; }
+        pc.alphaRef[0] = (g->bp[0xF3] & 255) / 255.0f; pc.alphaRef[1] = ((g->bp[0xF3] >> 8) & 255) / 255.0f; pc.alphaRef[2] = pc.alphaRef[3] = 0;
+        for (u32 m = 0; m < 8; m++) {
+            u32 img0 = g->bp[(m < 4 ? 0x80 : 0xA0) + (m & 3) + 8];
+            pc.texSize[m][0] = (f32)((img0 & 0x3FF) + 1); pc.texSize[m][1] = (f32)(((img0 >> 10) & 0x3FF) + 1); pc.texSize[m][2] = pc.texSize[m][3] = 0;
+        }
+        for (u32 m = 0; m < 3; m++) {
+            // BP 0x06+3m..: six 11-bit signed elements (a, b | c, d | e, f) and a 6-bit scale. The
+            // offset in 1/128 texels is (M . v) >> 3, shifted by 17 - scale.
+            u32 r0 = g->bp[0x06 + m * 3], r1 = g->bp[0x07 + m * 3], r2 = g->bp[0x08 + m * 3];
+            s32 e[6] = {(s32)(r0 << 21) >> 21, (s32)(r0 << 10) >> 21, (s32)(r1 << 21) >> 21, (s32)(r1 << 10) >> 21, (s32)(r2 << 21) >> 21, (s32)(r2 << 10) >> 21};
+            s32 scale = (s32)(((r0 >> 22) & 3) | ((r1 >> 22) & 3) << 2 | ((r2 >> 22) & 3) << 4);
+            f32 k = (f32)Pow2(scale - 17) / 8.0f / 128.0f;
+            pc.indRow[m][0][0] = e[0] * k; pc.indRow[m][0][1] = e[2] * k; pc.indRow[m][0][2] = e[4] * k; pc.indRow[m][0][3] = 0;
+            pc.indRow[m][1][0] = e[1] * k; pc.indRow[m][1][1] = e[3] * k; pc.indRow[m][1][2] = e[5] * k; pc.indRow[m][1][3] = 0;
+        }
+        {
+            u32 ab = (g->bp[0xEE] & 0xFFFFF) << 12, cb = (g->bp[0xF1] & 0xFFFFF) << 12;
+            f32 a, c;
+            memcpy(&a, &ab, 4); memcpy(&c, &cb, 4);
+            s32 expReg = g->bp[0xF0] & 31;
+            f32 b = (f32)(g->bp[0xEF] & 0xFFFFFF) / 8388638.0f * (f32)Pow2(expReg - 1);
+            pc.fogP[0] = ((g->bp[0xF1] >> 20) & 1) ? a : a * (f32)Pow2(expReg);
+            pc.fogP[1] = b; pc.fogP[2] = c; pc.fogP[3] = 0;
+            pc.fogC[0] = ((g->bp[0xF2] >> 16) & 255) / 255.0f; pc.fogC[1] = ((g->bp[0xF2] >> 8) & 255) / 255.0f; pc.fogC[2] = (g->bp[0xF2] & 255) / 255.0f; pc.fogC[3] = 1.0f;
+        }
+        for (u32 i = 0; i < 4; i++) {
+            u32 sc = g->bp[0x25 + i / 2] >> ((i & 1) * 8);
+            pc.indScale[i][0] = 1.0f / (f32)(1u << (sc & 15)); pc.indScale[i][1] = 1.0f / (f32)(1u << ((sc >> 4) & 15)); pc.indScale[i][2] = pc.indScale[i][3] = 0;
+        }
+        lastSrc = src; lastPcVal = pc; haveLast = TRUE;
     }
-    sCtx->UpdateSubresource(sPsConst, 0, NULL, &pc, 0, 0);
-
-    sCtx->OMSetRenderTargets(1, &sEfbRtv, sEfbDsv);
-    SetOutputState(g, squeeze);
+    OutKey ok = MakeOutKey(g, squeeze);
     ID3D11ShaderResourceView* srv[8]; ID3D11SamplerState* smp[8];
     for (u32 i = 0; i < 8; i++) { srv[i] = (texUsed & (1u << i)) ? GetTexture(g, i) : sWhite; smp[i] = (texUsed & (1u << i)) ? GetSampler(g, i) : sLinearClamp; }
-    sCtx->PSSetShaderResources(0, 8, srv);
-    sCtx->PSSetSamplers(0, 8, smp);
-    UINT stride = sizeof(Vtx), offset = 0;
-    sCtx->IASetInputLayout(sLayout);
-    sCtx->IASetVertexBuffers(0, 1, &sVb, &stride, &offset);
-    sCtx->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
-    sCtx->VSSetShader(sVs, NULL, 0);
-    sCtx->PSSetShader(ps, NULL, 0);
-    sCtx->PSSetConstantBuffers(0, 1, &sPsConst);
-    sCtx->Draw((UINT)tris.size(), first);
+
+    // Draws that need exactly the same state as the ones queued before are added to them: one upload and one draw call for the lot.
+    if (sPendCount && (sPend.ps != ps || sBVCount + count > VB_VERTS || sPend.ngen != numGens || memcmp(&sPend.out, &ok, sizeof(ok)) || memcmp(sPend.srv, srv, sizeof(srv)) ||
+                       memcmp(sPend.smp, smp, sizeof(smp)) || memcmp(&sPend.pc, &pc, sizeof(pc))))
+        FlushDraws();
+    if (!sPendCount) { sPend.ngen = numGens > 8 ? 8 : numGens; sPend.ps = ps; sPend.out = ok; memcpy(sPend.srv, srv, sizeof(srv)); memcpy(sPend.smp, smp, sizeof(smp)); sPend.pc = pc; }
+    u16 base = (u16)sBVCount;
+    {
+        u32 stride = 48 + 12 * sPend.ngen;
+        size_t at = sBV.size();
+        sBV.resize(at + (size_t)count * stride);
+        for (u32 n = 0; n < count; n++) memcpy(&sBV[at + (size_t)n * stride], &sVerts[n], stride);
+        sBVCount += count;
+    }
+    for (size_t i = 0; i < idx.size(); i++) sBI.push_back((u16)(idx[i] + base));
+    sPendCount++;
     sGfxStats.draws++;
     sFrame.draws++; sFrame.verts += count;
-    sGfxStats.tris += (u32)tris.size() / 3;
+    sGfxStats.tris += (u32)idx.size() / 3;
+}
+
+// Uploads and draws what DrawPrims has queued.
+static void FlushDraws() {
+    if (!sPendCount) return;
+    sPendCount = 0;
+    // The vertices go behind those of the earlier flushes; the buffer (9 MB) is only replaced when
+    // it is full. Replacing it for every draw made a scene of a few thousand small draws crawl.
+    static u32 sVbUsed, sIbUsed;                            // in bytes and indices
+    const u32 stride = 48 + 12 * sPend.ngen;
+    u32 bytes = (u32)sBV.size(), ni = (u32)sBI.size();
+    u32 first = sVbUsed, ifirst = sIbUsed;
+    first = (first + stride - 1) / stride * stride;           // a whole number of vertices from the start of the buffer
+    D3D11_MAPPED_SUBRESOURCE map;
+    D3D11_MAP how = D3D11_MAP_WRITE_NO_OVERWRITE;
+    if (first + bytes > VB_VERTS * sizeof(Vtx)) { first = 0; how = D3D11_MAP_WRITE_DISCARD; }
+    if (FAILED(sCtx->Map(sVb, 0, how, 0, &map))) { sBV.clear(); sBI.clear(); sBVCount = 0; return; }
+    memcpy((u8*)map.pData + first, sBV.data(), bytes);
+    sCtx->Unmap(sVb, 0);
+    sVbUsed = first + bytes;
+    how = D3D11_MAP_WRITE_NO_OVERWRITE;
+    if (ifirst + ni > IB_IDXS) { ifirst = 0; how = D3D11_MAP_WRITE_DISCARD; }
+    if (FAILED(sCtx->Map(sIb, 0, how, 0, &map))) { sBV.clear(); sBI.clear(); sBVCount = 0; return; }
+    memcpy((u16*)map.pData + ifirst, sBI.data(), ni * sizeof(u16));
+    sCtx->Unmap(sIb, 0);
+    sIbUsed = ifirst + ni;
+    sBV.clear(); sBI.clear(); sBVCount = 0;
+
+    static PsConst lastPc; static OutKey lastOut;
+    if (!sDrawBound || memcmp(&sPend.pc, &lastPc, sizeof(lastPc))) { sCtx->UpdateSubresource(sPsConst, 0, NULL, &sPend.pc, 0, 0); lastPc = sPend.pc; }
+    if (!sDrawBound) sCtx->OMSetRenderTargets(1, &sEfbRtv, sEfbDsv);
+    if (!sDrawBound || memcmp(&sPend.out, &lastOut, sizeof(lastOut))) { SetOutputState(sPend.out); lastOut = sPend.out; }
+    static ID3D11ShaderResourceView* lastSrv[8]; static ID3D11SamplerState* lastSmp[8]; static ID3D11PixelShader* lastPs;
+    if (!sDrawBound || memcmp(sPend.srv, lastSrv, sizeof(lastSrv))) { sCtx->PSSetShaderResources(0, 8, sPend.srv); memcpy(lastSrv, sPend.srv, sizeof(lastSrv)); }
+    if (!sDrawBound || memcmp(sPend.smp, lastSmp, sizeof(lastSmp))) { sCtx->PSSetSamplers(0, 8, sPend.smp); memcpy(lastSmp, sPend.smp, sizeof(lastSmp)); }
+    static u32 lastNgen = ~0u;
+    UINT vbStride = stride, vbOffset = first;
+    sCtx->IASetVertexBuffers(0, 1, &sVb, &vbStride, &vbOffset);
+    if (!sDrawBound || lastNgen != sPend.ngen) {
+        sCtx->IASetInputLayout(sLayouts[sPend.ngen]);
+        sCtx->VSSetShader(sVs[sPend.ngen], NULL, 0);
+        lastNgen = sPend.ngen;
+    }
+    if (!sDrawBound) {
+        sCtx->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
+        sCtx->PSSetConstantBuffers(0, 1, &sPsConst);
+        sCtx->IASetIndexBuffer(sIb, DXGI_FORMAT_R16_UINT, 0);
+    }
+    if (!sDrawBound || sPend.ps != lastPs) { sCtx->PSSetShader(sPend.ps, NULL, 0); lastPs = sPend.ps; }
+    sDrawBound = TRUE;
+    sCtx->DrawIndexed(ni, ifirst, 0);
 }
 
 // ------------------------------------------------------------------ frame-buffer copies
 static void Blit(ID3D11ShaderResourceView* src, ID3D11RenderTargetView* dst, u32 dstX, u32 dstY, u32 dstW, u32 dstH, f32 u0, f32 v0, f32 du, f32 dv, const f32* pick = NULL) {
+    sDrawBound = FALSE;
     ID3D11ShaderResourceView* none[8] = {};
     f32 rect[8] = {u0, v0, du, dv, 0, 0, 0, 0};
     if (pick) memcpy(rect + 4, pick, 16);
@@ -945,6 +1072,7 @@ static void FrameStats(PortFrameStats* s) {
         s->gameMs = std::max(s->frameMs - s->renderMs - s->waitMs, 0.0f);
     }
     last = now; lastWait = wait;
+    sTexGen++;
     s->draws = sFrame.draws; s->verts = sFrame.verts; s->efbCopies = sFrame.copies;
     s->textures = (u32)(sTextures.size() + sEfbCopies.size());
     s->voices = PortAudioVoices(&s->voiceCount);
@@ -952,8 +1080,38 @@ static void FrameStats(PortFrameStats* s) {
     sFrame.renderTicks = 0; sFrame.draws = sFrame.verts = sFrame.copies = 0;
 }
 
+// Whether the window should get a picture now. Paced: always. Fast-forwarding: four times a second,
+// and then the title shows "Fast-forwarding... frame N / M" (set from the window's thread).
+static BOOL FastProgress(void) {
+    static DWORD lastFast;
+    static BOOL  titled;
+    if (!sSwap) return FALSE;
+    if (!PortFastActive()) {
+        if (titled) { PostTitle("Monster Lab (PC port)"); titled = FALSE; }
+        return TRUE;
+    }
+    DWORD now = GetTickCount();
+    if (now - lastFast < 250) return FALSE;
+    lastFast = now;
+    char t[96];
+    s32 total = gPortOptions.fastForward;
+    if (total > 0) snprintf(t, sizeof(t), "Monster Lab (PC port) - Fast-forwarding... frame %d / %d", (int)PortFrameCount(), (int)total);
+    else snprintf(t, sizeof(t), "Monster Lab (PC port) - Fast-forwarding... frame %d", (int)PortFrameCount());
+    PostTitle(t);
+    titled = TRUE;
+    if (getenv("PORT_FAST_LOG")) PortLog("fast-forward progress: present + title \"%s\" at %lu ms", t, now);
+    return TRUE;
+}
+static void PresentOut(BOOL fast) {
+    Blit(sOutSrv, sBackRtv, 0, 0, sOutW, sOutH, 0, 0, 1, 1);
+    if (!gPortOptions.screenshotStats) PortOverlayDraw(sBackRtv, sOutW, sOutH);
+    sSwap->Present(gPortSettings.vsync && !fast ? 1 : 0, 0);
+}
+
 static void CopyEfb(const PortGx* g, u32 control) {
     if (!sStarted) return;
+    FlushDraws();
+    sDrawBound = FALSE;
     if (sTrace) {
         static int n;
         char path[64];
@@ -985,32 +1143,9 @@ static void CopyEfb(const PortGx* g, u32 control) {
         FrameStats(&stats);
         PortOverlayFrame(&stats);
         if (gPortOptions.screenshotStats) PortOverlayDraw(sOutRtv, sOutW, sOutH);
-        // Fast-forward: every frame is rendered (copies and screenshots stay right) but the window gets
-        // a picture only four times a second, with the progress in the title bar, so it never looks hung.
-        BOOL fast = PortFastActive(), show = sSwap != NULL;
-        static DWORD lastFast;
-        static BOOL  titled;
-        if (fast && sSwap) {
-            DWORD now = GetTickCount();
-            show = (now - lastFast) >= 250;
-            if (show) {
-                lastFast = now;
-                char t[96];
-                s32 total = gPortOptions.fastForward;
-                if (total > 0) snprintf(t, sizeof(t), "Monster Lab (PC port) - Fast-forwarding... frame %d / %d", (int)PortFrameCount(), (int)total);
-                else snprintf(t, sizeof(t), "Monster Lab (PC port) - Fast-forwarding... frame %d", (int)PortFrameCount());
-                SetWindowTextA(sWnd, t);
-                titled = TRUE;
-            }
-        } else if (titled && sWnd) {
-            SetWindowTextA(sWnd, "Monster Lab (PC port)");
-            titled = FALSE;
-        }
-        if (show) {
-            Blit(sOutSrv, sBackRtv, 0, 0, sOutW, sOutH, 0, 0, 1, 1);
-            if (!gPortOptions.screenshotStats) PortOverlayDraw(sBackRtv, sOutW, sOutH);
-            sSwap->Present(gPortSettings.vsync && !fast ? 1 : 0, 0);
-        }
+        // Fast-forward: the window gets a picture only four times a second, with the progress in the title bar.
+        BOOL fast = PortFastActive();
+        if (FastProgress()) PresentOut(fast);
         sGfxStats.presents++;
         if (sTraceFrom > 1 && sGfxStats.presents >= sTraceFrom) sTrace = TRUE;
     } else {                                                // into a texture, kept at the frame buffer's resolution
@@ -1171,15 +1306,29 @@ BOOL PortGfxSaveScreenshot(const char* path) {
 }
 
 // ------------------------------------------------------------------ start
+// Fast-forward with a frame target: draws only matter through the copies of the frame buffer that later
+// frames use (the engine redraws and recopies everything each frame) and the picture at the target, so the
+// draws of all but the last kFastDrawn frames are dropped. The GX interpreter still decodes them: state and
+// copies go on. (--fast has no target and always draws.)
+static const s32 kFastDrawn = 30;
+static u32 sFastSkipped;
+static BOOL FastDropping(void) { return PortFastActive() && !gPortOptions.fastAll && gPortOptions.fastForward > 0 && PortFrameCount() < gPortOptions.fastForward - kFastDrawn; }
 static void Draw(const PortGx* g, u32 prim, const PortGxLayout* L, u32 count, const u8* data) {
+    if (FastDropping()) { sFastSkipped++; return; }
     s64 t = Ticks();
     DrawPrims(g, prim, L, count, data);
     sFrame.renderTicks += Ticks() - t;
+    sTotalDraw += Ticks() - t;
 }
 static void Copy(const PortGx* g, u32 control) {
+    if (FastDropping()) {                        // nothing was drawn: a copy would only move an old picture
+        if ((control & 0x4000) && FastProgress()) PresentOut(TRUE);      // but the window still gets its progress
+        return;
+    }
     s64 t = Ticks();
     CopyEfb(g, control);
     sFrame.renderTicks += Ticks() - t;
+    sTotalCopy += Ticks() - t;
 }
 static const PortGxBackend kBackend = {Draw, Copy, LoadTlut};
 
@@ -1242,11 +1391,9 @@ BOOL PortGfxStart(BOOL window) {
     sCtx->ClearRenderTargetView(sEfbRtv, black);
     sCtx->ClearDepthStencilView(sEfbDsv, D3D11_CLEAR_DEPTH, 1.0f, 0);
 
-    ID3DBlob* vs = Compile(kVsSrc, "main", "vs_4_0");
     ID3DBlob* bvs = Compile(kBlitSrc, "vs", "vs_4_0");
     ID3DBlob* bps = Compile(kBlitSrc, "ps", "ps_4_0");
-    if (!vs || !bvs || !bps) return FALSE;
-    sDev->CreateVertexShader(vs->GetBufferPointer(), vs->GetBufferSize(), NULL, &sVs);
+    if (!bvs || !bps) return FALSE;
     sDev->CreateVertexShader(bvs->GetBufferPointer(), bvs->GetBufferSize(), NULL, &sBlitVs);
     sDev->CreatePixelShader(bps->GetBufferPointer(), bps->GetBufferSize(), NULL, &sBlitPs);
     D3D11_INPUT_ELEMENT_DESC el[11] = {
@@ -1255,12 +1402,21 @@ BOOL PortGfxStart(BOOL window) {
         {"COLOR", 1, DXGI_FORMAT_R32G32B32A32_FLOAT, 0, 32, D3D11_INPUT_PER_VERTEX_DATA, 0},
     };
     for (UINT i = 0; i < 8; i++) el[3 + i] = {"TEXCOORD", i, DXGI_FORMAT_R32G32B32_FLOAT, 0, 48 + i * 12, D3D11_INPUT_PER_VERTEX_DATA, 0};
-    sDev->CreateInputLayout(el, 11, vs->GetBufferPointer(), vs->GetBufferSize(), &sLayout);
-    vs->Release(); bvs->Release(); bps->Release();
+    for (u32 n = 0; n <= 8; n++) {
+        std::string src = VsSource(n);
+        ID3DBlob* vs = Compile(src.c_str(), "main", "vs_4_0");
+        if (!vs) return FALSE;
+        sDev->CreateVertexShader(vs->GetBufferPointer(), vs->GetBufferSize(), NULL, &sVs[n]);
+        sDev->CreateInputLayout(el, 3 + n, vs->GetBufferPointer(), vs->GetBufferSize(), &sLayouts[n]);
+        vs->Release();
+    }
+    bvs->Release(); bps->Release();
 
     D3D11_BUFFER_DESC bd = {};
     bd.ByteWidth = VB_VERTS * sizeof(Vtx); bd.Usage = D3D11_USAGE_DYNAMIC; bd.BindFlags = D3D11_BIND_VERTEX_BUFFER; bd.CPUAccessFlags = D3D11_CPU_ACCESS_WRITE;
     sDev->CreateBuffer(&bd, NULL, &sVb);
+    bd.ByteWidth = IB_IDXS * 2; bd.BindFlags = D3D11_BIND_INDEX_BUFFER;
+    sDev->CreateBuffer(&bd, NULL, &sIb);
     bd = {};
     bd.ByteWidth = sizeof(PsConst); bd.BindFlags = D3D11_BIND_CONSTANT_BUFFER;
     sDev->CreateBuffer(&bd, NULL, &sPsConst);
@@ -1284,8 +1440,9 @@ BOOL PortGfxStart(BOOL window) {
 
 const char* PortGfxStatsText(char* buf, u32 n) {
     if (!sStarted) { snprintf(buf, n, "no renderer (run with --window or --screenshot FILE)"); return buf; }
-    snprintf(buf, n, "%u draw(s), %u triangle(s), %u picture(s) shown, %u copy(ies) to a texture, %u texture(s) decoded, %u shader(s), %u draw(s) skipped",
-             sGfxStats.draws, sGfxStats.tris, sGfxStats.presents, sGfxStats.texCopies, sGfxStats.textures, sGfxStats.shaders, sGfxStats.skipped);
+    snprintf(buf, n, "%u draw(s), %u triangle(s), %u picture(s) shown, %u copy(ies) to a texture, %u texture(s) decoded, %u shader(s), %u draw(s) skipped; backend time: draws %.1f s, copies %.1f s, %u draw(s) dropped by fast-forward",
+             sGfxStats.draws, sGfxStats.tris, sGfxStats.presents, sGfxStats.texCopies, sGfxStats.textures, sGfxStats.shaders, sGfxStats.skipped,
+             sTotalDraw / (double)Ticks_freq(), sTotalCopy / (double)Ticks_freq(), sFastSkipped);
     return buf;
 }
 #endif

@@ -23,7 +23,7 @@ extern "C" s32 fn_8006B9CC(u8* a3) {
 }
 
 // 0x8006C65C
-extern "C" u8 fn_8006C65C(u8* a3) {
+extern "C" u32 fn_8006C65C(u8* a3) {
     u8 t0 = *(u8*)(((u8*)(uintptr_t)(a3)) + 544);
     return (u8)(t0);
 }

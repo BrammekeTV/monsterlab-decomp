@@ -2949,6 +2949,8 @@ extern "C" BOOL LevelSharedZoneRootsCollect(const u8* image, u32 imageSize, u32 
             if ((addr = Be32(image + (table - wiiBase) + k * 4)) != 0 && IN_ZONE(addr, 4)) ok = RootAdd(&entities, addr);
     }
     if (ok && (addr = Be32(image + 0xE4)) != 0 && IN_ZONE(addr, 4)) ok = RootAdd(&pools, addr) && RootAdd(&pools, Be32(image + 0xE8));
+    // The slot's action table at +0xD4 (TriggerDoAction kind 2): the screens' items run their activate / accept actions from it.
+    if (ok && (addr = Be32(image + 0xD4)) != 0 && IN_ZONE(addr, 8)) ok = RootAdd(&actions, addr);
     // The zone's record is in zone 0, converted: its list leads into this image.
     u32 rec = Be32(image + 0xFC);
     if (ok && other != NULL && rec >= other->wiiBase && (u64)(rec - other->wiiBase) + 0x14 <= other->imageSize) {
@@ -2960,13 +2962,11 @@ extern "C" BOOL LevelSharedZoneRootsCollect(const u8* image, u32 imageSize, u32 
         if (head >= image && head < image + imageSize) ok = RootAdd(&lists, wiiBase + (u32)(head - image));
         else if (raw >= wiiBase && raw - wiiBase < imageSize) ok = RootAdd(&lists, raw);
     }
-    // The zone's action table at +0xD4 (TriggerDoAction, kind 2): what a menu button's event runs.
-    if (ok && (addr = Be32(image + 0xD4)) != 0 && IN_ZONE(addr, ACTION_TABLE_SIZE)) ok = RootAdd(&actions, addr);
     #undef IN_ZONE
-    out->actionTables = actions.items;      out->actionTableCount = actions.count;
     out->entities = entities.items;         out->entityCount = entities.count;
     out->poolTables = pools.items;          out->poolTableCount = pools.count / 2;
     out->zoneLists = lists.items;           out->zoneListCount = lists.count;
+    out->actionTables = actions.items;      out->actionTableCount = actions.count;
     out->slotCopySize = slotSize;
     out->screenSet = Be32(image + 0x100);
     if (!ok) LevelZoneRootsFree(out);

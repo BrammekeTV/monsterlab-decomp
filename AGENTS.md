@@ -82,6 +82,10 @@ a PC port. Read this whole file before making changes. Human contributors: see
   `build/pc/port_link.txt` is the link report: stubs, globals resolved by address, **split globals** (a `static`
   definition in one file and the same address used under another name elsewhere: two copies, fix it) and address
   conflicts. See `docs/port_runtime.md`.
+- `python tools/smoke.py [--iso PATH]`: **required before every PR that touches `src/` or `include/`** (port and game code). Builds incrementally,
+  then runs headless: `--selftest`, `--to-menu` to frame 3300 and the title at frame 2600. Passes when each run reaches its frame limit
+  without a crash, the menu scripts ran (`UIScreen_Push`) and neither screenshot is blank or black (`build/smoke/*.png`). One verdict line
+  with timings (about 50 s); `SMOKE FAIL` lists the reasons and keeps the logs in `build/smoke/`. Needs the game data (`orig/RM7P4F` or `--iso`).
 - `python tools/progress.py`: progress numbers.
 - `python tools/changelog_add.py "text"`: add a progress-site changelog entry stamped with the real time (maintainer only).
 

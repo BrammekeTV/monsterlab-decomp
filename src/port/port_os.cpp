@@ -487,14 +487,15 @@ void OSCreateAlarm(u8* alarm) {
     if (a) { a->handler = NULL; a->fire = a->period = 0; }
 }
 
-// OSSetAlarm (0x80234324): the handler runs once, `tick` timer ticks from now (the rumble's stop
-// timer is the first user). An alarm that was never created gets its state here.
-void OSSetAlarm(u8* alarm, s64 tick, OSAlarmHandler handler) {
-    PortAlarm* a = FindAlarm(alarm, TRUE);
+// OSSetAlarm: the handler runs once, `tick` ticks from now (PortOsTick delivers it). The SDK keeps the
+// handler in the alarm's first word, which OSCancelAlarm clears.
+void OSSetAlarm(void* alarm, s64 tick, void (*handler)(void)) {
+    PortAlarm* a = FindAlarm((u8*)alarm, TRUE);
     if (!a) return;
+    a->fire = PortTicks() + (tick > 0 ? tick : 1);
     a->period = 0;
-    a->fire = PortTicks() + (tick > 0 ? tick : 0);
-    a->handler = handler;
+    a->handler = (OSAlarmHandler)handler;
+    *(u32*)alarm = (u32)(uintptr_t)handler;
 }
 
 // OSCancelAlarm: the alarm no longer fires. Its first word (the handler) is cleared, as the SDK does.

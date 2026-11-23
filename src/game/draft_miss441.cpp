@@ -521,6 +521,7 @@ static void PartClearFlags(u8* part, u32 mask) {
 // 0x200000 is set): ticks the timer at +0xC88, shows/hides the parts, runs the update virtuals,
 // mirrors the node transform onto the active part, and eases the walk/run speed at +0x9F4 towards
 // the pad-driven target, starting the "idlereg" / "explore1" animations when it reaches 0 / leaves 0.
+void EntityTick(void* e, f32 dt);   // world_update.cpp
 void fn_8004BE38(u8* c, s32 team, f32 dt) {
     typedef u8* (*GetFn)(void*);
     typedef u8** (*GetTableFn)(void*);
@@ -624,7 +625,7 @@ void fn_8004BE38(u8* c, s32 team, f32 dt) {
         f32 step = dt;
         if (*(u8*)(c + 0xC82) == 0) step = 0.0f;
         part = *(u8**)(c + 0xC50 + i * 4);
-        (*(TickFn*)(*(u8**)part + 0x20))(part, 0, step);
+        EntityTick(part, step);
         EntitySyncTransform(*(u8**)(c + 0xC50 + i * 4), 0);
     }
 
