@@ -276,17 +276,6 @@ extern "C" void RayQuerySetStart(u8* a3, u8* a4) {
     *(f32*)(((u8*)(uintptr_t)(a3)) + 68) = (f32)(t2);
 }
 
-// 0x80055D80
-extern "C" f32 RayQuerySetDir(u8* a3, u8* a4) {
-    f32 t0 = *(f32*)(((u8*)(uintptr_t)(a4)) + 0);
-    f32 t1 = *(f32*)(((u8*)(uintptr_t)(a4)) + 4);
-    f32 t2 = *(f32*)(((u8*)(uintptr_t)(a4)) + 8);
-    *(f32*)(((u8*)(uintptr_t)(a3)) + 72) = (f32)(t0);
-    *(f32*)(((u8*)(uintptr_t)(a3)) + 76) = (f32)(t1);
-    *(f32*)(((u8*)(uintptr_t)(a3)) + 80) = (f32)(t2);
-    return (f32)(t1);
-}
-
 // 0x80056208
 extern "C" s32 fn_80056208(void) {
     return (s32)(0);

@@ -9,10 +9,7 @@ extern u8 lbl_80358630[];
 extern u8 lbl_8035863C[];
 extern u8 lbl_80358648[];
 extern u8 lbl_80358654[];
-extern f32 lbl_805FB05C;
 extern f32 lbl_805FB060;
-extern f32 lbl_805FB064;
-extern f32 lbl_805FD118;
 extern "C" char* strcpy(char*, char*);
 
 // 0x80040EFC
@@ -46,14 +43,4 @@ extern "C" void fn_8004182C(f32 f1) {
     f32 t0 = *(f32*)((u8*)&lbl_805FB060);
     f32 t1 = (f32)(t0 + f1);
     *(f32*)((u8*)&lbl_805FB060) = (f32)(t1);
-}
-
-// 0x8004183C
-extern "C" f32 fn_8004183C(void) {
-    f32 t0 = *(f32*)((u8*)&lbl_805FB05C);
-    f32 t1 = *(f32*)((u8*)&lbl_805FD118);
-    *(f32*)((u8*)&lbl_805FB064) = (f32)(t0);
-    *(f32*)((u8*)&lbl_805FB060) = (f32)(t1);
-    *(f32*)((u8*)&lbl_805FB05C) = (f32)(t1);
-    return (f32)(t0);
 }

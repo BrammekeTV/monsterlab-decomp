@@ -169,29 +169,6 @@ extern "C" void fn_801487B4(u8* a3) {
     *(f32*)(((u8*)(uintptr_t)(a3)) + 12) = (f32)(t0);
 }
 
-// 0x80148D70
-extern "C" f32 fn_80148D70(u8* a3, u8* a4) {
-    f32 t0 = *(f32*)(((u8*)(uintptr_t)(a4)) + 0);
-    f32 t1 = *(f32*)(((u8*)(uintptr_t)(a4)) + 4);
-    f32 t2 = *(f32*)(((u8*)(uintptr_t)(a4)) + 8);
-    f32 t3 = *(f32*)(((u8*)(uintptr_t)(a4)) + 12);
-    *(f32*)(((u8*)(uintptr_t)(a3)) + 0) = (f32)(t0);
-    *(f32*)(((u8*)(uintptr_t)(a3)) + 4) = (f32)(t1);
-    *(f32*)(((u8*)(uintptr_t)(a3)) + 8) = (f32)(t2);
-    *(f32*)(((u8*)(uintptr_t)(a3)) + 12) = (f32)(t3);
-    return (f32)(t2);
-}
-
-// 0x80149094
-extern "C" f32 fn_80149094(u8* a3) {
-    f32 t0 = *(f32*)((u8*)&lbl_805FF0EC);
-    f32 t1 = *(f32*)((u8*)&lbl_805FF0E4);
-    *(f32*)(((u8*)(uintptr_t)(a3)) + 8) = (f32)(t0);
-    *(f32*)(((u8*)(uintptr_t)(a3)) + 4) = (f32)(t0);
-    *(f32*)(((u8*)(uintptr_t)(a3)) + 0) = (f32)(t1);
-    return (f32)(t0);
-}
-
 // 0x80149464
 extern "C" void fn_80149464(void) {
 }
