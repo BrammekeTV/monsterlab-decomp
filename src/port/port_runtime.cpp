@@ -132,9 +132,34 @@ void PortStop(int exitCode, const char* fmt, ...) {
 // PORT_SCRIPT_TRACE=1: logs every call the script engine makes to a registered script function.
 // The function table (0x80484230: 0x880 entries of {signature, function, name hash}) gets a small
 // code thunk in front of each function: push the index, call the logger, jump to the function.
+// The x87 register stack. A float result comes back in an x87 register; when the caller's
+// declaration says the function returns nothing, the value is never popped. Eight such calls
+// fill the stack, and from then on every float result on this thread is the "indefinite" NaN
+// (0xFFC00000). PortFpuDepth counts the registers in use; between two statements of the game
+// that must be 0.
+static u32 sFpuLastIp;                   // address of the last x87 instruction before the check
+static u32 PortFpuDepth(void) {
+    u32 env[7];
+    __asm { fnstenv env }
+    __asm { fldenv env }                     // fnstenv masks the exceptions: put the state back
+    u32 tags = env[2] & 0xFFFF, n = 0; sFpuLastIp = env[3];
+    for (u32 i = 0; i < 8; i++) if (((tags >> (i * 2)) & 3) != 3) n++;
+    return n;
+}
+static void PortFpuClear(void) { __asm { emms } }
+
 static void* sScriptReal[0x880];
 static void __cdecl ScriptTraceLog(u32 index) {
     static u32 last = ~0u, repeats;
+    static u32 before = ~0u;                // the script function called before this one
+    u32 depth = PortFpuDepth();
+    if (depth && before != ~0u) {
+        char who[160], who2[160];
+        fprintf(stderr, "[port] x87 stack: %u value(s) in use after script function %s (%u) and the code up to the next script call: a function that returns a float was called through a declaration that does not (frame %d; last x87 instruction in %s)%c",
+                depth, PortDescribePc(sScriptReal[before], who, sizeof(who)), before, (int)sFrames, PortDescribePc((void*)(uintptr_t)sFpuLastIp, who2, sizeof(who2)), 10);
+        PortFpuClear();
+    }
+    before = index;
     if (index == last) { repeats++; return; }
     if (repeats) fprintf(stderr, "[script]   (x%u more)\n", repeats);
     last = index; repeats = 0;
