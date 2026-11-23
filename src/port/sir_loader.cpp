@@ -364,7 +364,7 @@ enum RegionKind {
     REGION_ENTITY_PROP, REGION_PROP_DEF, REGION_KEY_PTR,
     REGION_UI_TREE_NODE, REGION_UI_LIST, REGION_UI_WIDGET, REGION_UI_EVENT, REGION_UI_GRID, REGION_UI_FIXED,
     REGION_UI_SET, REGION_UI_SCREEN, REGION_UI_GRAPHIC, REGION_UI_TEXT,
-    REGION_LOCATORS,
+    REGION_LOCATORS, REGION_SOUND, REGION_SOUND_HDR,
     REGION_ZONE_EFFECT, REGION_ANIM_SET, REGION_ANIM_DEFS, REGION_U16_ARRAY, REGION_ANIM_OBJ, REGION_SKELETON, REGION_BONE_OPS,
     REGION_UI_ANIM, REGION_UI_ANIM_TRACK, REGION_UI_ANIM_EVENTS, REGION_UI_ANIM_KEYS, REGION_UI_ANIM_ENTRIES,
     REGION_ZONE_SYSTEM, REGION_ANIM_PLAYER, REGION_ANIM_ELEM, REGION_ANIM_TRACK, REGION_ANIM_KEYS, REGION_F32_ARRAY,
@@ -1226,6 +1226,35 @@ static u32 ActionInstructionWords(u32 word) {
     return len;
 }
 
+// A sound object an action program names (the argument of PlaySoundEffect): count (byte at +4, 0 =
+// one) records of 0x30 bytes, as PlaySoundAt reads them: +0 the sound's header, +8 pitch, +0x10 a
+// float, +0x18 a hash; the other bytes are single bytes (volume, jitter, distances, flags). The
+// header: two pointers, a word, and two halves of which +0xC is zero for a sound that is not
+// streamed. Found only in the zones of the screens, where the UI's sounds are played from; the
+// objects of the global action table are not read yet (docs/loader.md).
+static const SirField kSoundEntryFields[] = {
+    { 0x00, SIR_PTR, 1 }, { 0x08, SIR_F32, 1 }, { 0x10, SIR_F32, 1 }, { 0x18, SIR_U32, 1 },
+};
+static const SirField kSoundHdrFields[] = {
+    { 0x00, SIR_PTR, 2 }, { 0x08, SIR_U32, 1 }, { 0x0C, SIR_U16, 2 },
+};
+#define SOUND_ENTRY_SIZE 0x30
+#define SOUND_HDR_SIZE   0x10
+static bool sSoundScan;
+
+static SirError SoundObjectPlan(ImagePlan* plan, const u8* image, u32 imageSize, u32 addr) {
+    u32 off, hdrOff;
+    if (!ImageSpan(addr, SOUND_ENTRY_SIZE, imageSize, &off)) return SIR_OK;       // not an address of this image
+    if (PlanHas(plan, off, REGION_SOUND)) return SIR_OK;
+    u32 count = image[off + 4] ? image[off + 4] : 1;
+    if (!ImageSpan(addr, (u64)count * SOUND_ENTRY_SIZE, imageSize, &off)) return SIR_OK;
+    if (!PlanAdd(plan, off, count * SOUND_ENTRY_SIZE, REGION_SOUND)) return SIR_ERR_ACTIONS;
+    u32 hdr = Be32(image + off);
+    if (ImageSpan(hdr, SOUND_HDR_SIZE, imageSize, &hdrOff) && !PlanHas(plan, hdrOff, REGION_SOUND_HDR) &&
+        !PlanAdd(plan, hdrOff, SOUND_HDR_SIZE, REGION_SOUND_HDR)) return SIR_ERR_ACTIONS;
+    return SIR_OK;
+}
+
 // Checks one program and records it. Walks the instructions in file order to the end word, then
 // checks that every jump lands on an instruction of the same program.
 static SirError ActionRecordPlan(ImagePlan* plan, const u8* image, u32 imageSize, u32 addr) {
@@ -1259,7 +1288,21 @@ static SirError ActionRecordPlan(ImagePlan* plan, const u8* image, u32 imageSize
     }
     free(starts);
     if (!ok) return SIR_ERR_ACTIONS;
-    return PlanAdd(plan, off, total * 4, REGION_U32_ARRAY) ? SIR_OK : SIR_ERR_ACTIONS;
+    if (!PlanAdd(plan, off, total * 4, REGION_U32_ARRAY)) return SIR_ERR_ACTIONS;
+    if (sSoundScan) {      // an operand of a call that is an address in this image names a sound object
+        for (u32 i = 0; i < words; i += ActionInstructionWords(Be32(image + off + i * 4))) {
+            u32 word = Be32(image + off + i * 4);
+            if (ActionOp(word) != ACTION_OP_CALL) continue;
+            for (u32 k = 1; k < ActionLen(word); k++) {
+                u32 operand = Be32(image + off + (i + k) * 4);
+                if ((operand & 3) == 0 && operand >= sImageBase) {
+                    SirError e = SoundObjectPlan(plan, image, imageSize, operand);
+                    if (e != SIR_OK) return e;
+                }
+            }
+        }
+    }
+    return SIR_OK;
 }
 
 // Every record of the action table at `addr` (already checked by PtrArrayPlan).
@@ -2438,6 +2481,10 @@ static void ImagePlanConvert(const ImagePlan* plan, SirReloc* r, u8* image, u32 
         case REGION_TEXTURE:      SirConvertRecord(r, p, g->size, kTextureFields, COUNTOF(kTextureFields)); break;
         case REGION_STRING_TABLE: SirConvertRecord(r, p, g->size, kStringTableFields, COUNTOF(kStringTableFields)); break;
         case REGION_ACTION_TABLE: SirConvertRecord(r, p, g->size, kActionTableFields, COUNTOF(kActionTableFields)); break;
+        case REGION_SOUND:
+            for (u32 k = 0; k + SOUND_ENTRY_SIZE <= g->size; k += SOUND_ENTRY_SIZE) SirConvertRecord(r, p + k, SOUND_ENTRY_SIZE, kSoundEntryFields, COUNTOF(kSoundEntryFields));
+            break;
+        case REGION_SOUND_HDR:    SirConvertRecord(r, p, g->size, kSoundHdrFields, COUNTOF(kSoundHdrFields)); break;
         case REGION_PTR_ARRAY:
             for (u32 k = 0; k < g->size; k += 4) ConvertPtr(r, p + k);
             break;
@@ -2843,7 +2890,7 @@ extern "C" BOOL LevelSharedZoneRootsCollect(const u8* image, u32 imageSize, u32 
                                             const LevelZoneOther* other, LevelZoneRoots* out) {
     memset(out, 0, sizeof(*out));
     if (slotSize < LEVEL_SLOT_MIN_SIZE || slotSize > LEVEL_SLOT_MAX_SIZE || slotSize > imageSize) return FALSE;
-    RootList entities = { NULL, 0, 0 }, pools = { NULL, 0, 0 }, lists = { NULL, 0, 0 };
+    RootList entities = { NULL, 0, 0 }, pools = { NULL, 0, 0 }, lists = { NULL, 0, 0 }, actions = { NULL, 0, 0 };
     bool ok = true;
     u32 addr;
     #define IN_ZONE(a, n) ((a) >= wiiBase && (u64)((a) - wiiBase) + (n) <= imageSize)
@@ -2855,6 +2902,8 @@ extern "C" BOOL LevelSharedZoneRootsCollect(const u8* image, u32 imageSize, u32 
             if ((addr = Be32(image + (table - wiiBase) + k * 4)) != 0 && IN_ZONE(addr, 4)) ok = RootAdd(&entities, addr);
     }
     if (ok && (addr = Be32(image + 0xE4)) != 0 && IN_ZONE(addr, 4)) ok = RootAdd(&pools, addr) && RootAdd(&pools, Be32(image + 0xE8));
+    // The slot's action table at +0xD4 (TriggerDoAction kind 2): the screens' items run their activate / accept actions from it.
+    if (ok && (addr = Be32(image + 0xD4)) != 0 && IN_ZONE(addr, 8)) ok = RootAdd(&actions, addr);
     // The zone's record is in zone 0, converted: its list leads into this image.
     u32 rec = Be32(image + 0xFC);
     if (ok && other != NULL && rec >= other->wiiBase && (u64)(rec - other->wiiBase) + 0x14 <= other->imageSize) {
@@ -2870,6 +2919,7 @@ extern "C" BOOL LevelSharedZoneRootsCollect(const u8* image, u32 imageSize, u32 
     out->entities = entities.items;         out->entityCount = entities.count;
     out->poolTables = pools.items;          out->poolTableCount = pools.count / 2;
     out->zoneLists = lists.items;           out->zoneListCount = lists.count;
+    out->actionTables = actions.items;      out->actionTableCount = actions.count;
     out->slotCopySize = slotSize;
     out->screenSet = Be32(image + 0x100);
     if (!ok) LevelZoneRootsFree(out);
@@ -3052,10 +3102,12 @@ extern "C" SirError LevelZoneConvert(SirReloc* r, u8* image, u32 imageSize, u32 
     }
     // A zone's action table is laid out like the one of global_binary.sir, and its records are
     // programs for the same interpreter (TriggerDoAction -> fn_801E1BD4).
+    sSoundScan = true;
     for (u32 i = 0; i < roots->actionTableCount && e == SIR_OK; i++) {
         e = PtrArrayPlan(&plan, image, imageSize, roots->actionTables[i], ACTION_TABLE_SIZE, 0x00, 0x04, REGION_ACTION_TABLE, SIR_ERR_ACTIONS);
         if (e == SIR_OK) e = ActionRecordsPlan(&plan, image, imageSize, roots->actionTables[i]);
     }
+    sSoundScan = false;
     for (u32 i = 0; i < roots->slotEffectCount && e == SIR_OK; i++)
         e = SlotEffectsPlan(&plan, image, imageSize, roots->slotEffects[i * 2], roots->slotEffects[i * 2 + 1]);
     for (u32 i = 0; i < roots->slotObjectCount && e == SIR_OK; i++)
