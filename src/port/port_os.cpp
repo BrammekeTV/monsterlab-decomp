@@ -257,8 +257,18 @@ static LARGE_INTEGER sQpcFreq, sQpcStart;
 
 u32 OSGetBusClock(void) { return *(u32*)(uintptr_t)0x800000F8; }
 
-OSTime OSGetTime(void) {
-    PortYield();                                 // busy-wait loops poll the clock: let interrupts in
+}  // extern "C"
+
+// The game clock (see port.h). Paced: the real clock plus sOffset. Fast-forwarding: sVirt, which
+// moves only when the interrupt thread finds every game thread waiting (or a game thread polls
+// OSGetTime, which then costs a few microseconds of game time so that a busy-wait ends).
+static volatile BOOL sFast;
+static s64 sVirt, sOffset, sNextWake;
+static volatile LONG sGameThreads = 1;           // the main thread
+volatile LONG gPortIdleWaiters;              // game threads waiting in PortWaitChange (port_runtime.cpp)
+static const s64 kPollTicks = 100;               // game time per OSGetTime call while fast-forwarding
+
+static s64 RealTicks(void) {
     LARGE_INTEGER now;
     QueryPerformanceCounter(&now);
     s64 d = now.QuadPart - sQpcStart.QuadPart;
@@ -266,13 +276,50 @@ OSTime OSGetTime(void) {
     return d / sQpcFreq.QuadPart * rate + d % sQpcFreq.QuadPart * rate / sQpcFreq.QuadPart;
 }
 
+s64  PortTicks(void) { return sFast ? sVirt : RealTicks() + sOffset; }
+BOOL PortFastActive(void) { return sFast; }
+void PortFastEnd(void) {
+    if (!sFast) return;
+    sOffset = sVirt - RealTicks();               // the same game time, now moving with the real clock
+    sFast = FALSE;
+}
+void PortGameThreads(s32 delta) { InterlockedAdd(&sGameThreads, delta); }
+void PortClockWakeAt(s64 t) { if (!sNextWake || t < sNextWake) sNextWake = t; }
+
+// Interrupt thread, lock held. Every game thread waits and nothing is queued: nothing can happen
+// before the next event, so jump to it.
+BOOL PortClockAdvanceIfIdle(void) {
+    if (!sFast || gPortIdleWaiters < sGameThreads) return FALSE;
+    s64 next = 0;
+    s64 cand[4] = {PortViNextTicks(), PortAudioNextTicks(), PortOsNextAlarm(), sNextWake};
+    for (s64 c : cand) if (c && (!next || c < next)) next = c;
+    if (!next || next <= sVirt) return FALSE;
+    sVirt = next;
+    return TRUE;
+}
+
+static void WakeSleepers(void) {
+    if (sNextWake && PortTicks() >= sNextWake) { sNextWake = 0; PortSignalChange(); }
+}
+
+extern "C" {
+
+OSTime OSGetTime(void) {
+    PortYield();                                 // busy-wait loops poll the clock: let interrupts in
+    if (sFast) sVirt += kPollTicks;
+    return PortTicks();
+}
+
 u32 OSGetTick(void) { return (u32)OSGetTime(); }
 
 // OSSleepTicks (64-bit tick count in two words): the SDK sets an alarm and sleeps the thread
-// until it fires. Here the thread waits on the clock, which lets the interrupts in.
+// until it fires. Here the thread waits for the clock to reach the deadline.
 void OSSleepTicks(s32 hi, u32 lo) {
-    OSTime end = OSGetTime() + (((OSTime)hi << 32) | lo);
-    while (OSGetTime() < end) Sleep(1);
+    OSTime end = PortTicks() + (((OSTime)hi << 32) | lo);
+    while (PortTicks() < end) {
+        PortClockWakeAt(end);
+        PortWaitChange();
+    }
 }
 
 // ------------------------------------------------------------------ reports and system
@@ -352,6 +399,7 @@ static DWORD WINAPI ThreadEntry(void* p) {
     PortLockEnter();
     pt->func(pt->arg);
     pt->done = TRUE;
+    PortGameThreads(-1);
     PortSignalChange();
     PortLockLeave();
     return 0;
@@ -379,6 +427,7 @@ s32 OSResumeThread(OSThread* thread) {
     if (!pt) return 0;
     if (!pt->handle) {
         // The game's own stack block is not used: PC frames are larger than PowerPC ones.
+        PortGameThreads(1);
         pt->handle = CreateThread(NULL, 0x100000, ThreadEntry, pt, 0, NULL);
         return 1;
     }
@@ -448,11 +497,18 @@ s32 OSRestoreInterrupts(s32 level) { s32 was = (s32)PortDisableInterrupts(); Por
 
 }  // extern "C"
 
+s64 PortOsNextAlarm(void) {
+    s64 next = 0;
+    for (PortAlarm& a : sAlarms) if (a.key && a.handler && (!next || a.fire < next)) next = a.fire ? a.fire : 1;
+    return next;
+}
+
 void PortOsTick(void) {
+    WakeSleepers();
     OSTime now = 0;
     for (PortAlarm& a : sAlarms) {
         if (!a.key || !a.handler) continue;
-        if (!now) now = OSGetTime();
+        if (!now) now = PortTicks();
         if (now < a.fire) continue;
         OSAlarmHandler h = a.handler;
         if (a.period > 0) a.fire += a.period; else a.handler = NULL;
@@ -463,6 +519,7 @@ void PortOsTick(void) {
 void PortOsStart(void) {
     QueryPerformanceFrequency(&sQpcFreq);
     QueryPerformanceCounter(&sQpcStart);
+    sFast = gPortOptions.fastAll || gPortOptions.fastForward > 0 || gPortOptions.toMenu;
     // MEM1: from the end of the executable's data to just under the top; MEM2: as on a retail console.
     sArena1Lo = (u8*)(uintptr_t)PortArenaLoMEM1();
     sArena1Hi = (u8*)(uintptr_t)(PORT_MEM1_BASE + PORT_MEM1_SIZE - 0x20000);

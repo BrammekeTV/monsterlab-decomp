@@ -213,7 +213,7 @@ extern "C" {
 // ------------------------------------------------------------------ VI
 static VIRetraceCallback sPreRetrace, sPostRetrace;
 static u32   sRetraceCount;
-static DWORD sNextRetraceMs;
+static s64   sNextRetrace;                      // game clock ticks (port.h)
 static BOOL  sFramePending;
 
 void VIInit(void) { PortMilestone("VIInit"); }
@@ -225,7 +225,7 @@ u32  VIGetTvFormat(void) { return 1; }           // PAL
 
 // GXRenderModeObj as VIConfigure last got it: the size and position of the picture.
 u8  gPortViMode[0x3C];
-static u32 sRetraceMs = 20;                      // PAL 50 Hz until VIConfigure says otherwise
+static u32 sRetraceHz = 50;                      // PAL until VIConfigure says otherwise
 
 // VIGetDTVStatus: no component cable, so no progressive scan
 u32 fn_80245BF8(void) { return 0; }
@@ -235,7 +235,7 @@ u32 fn_80245BF8(void) { return 0; }
 void fn_80244ED0(u8* renderMode) {
     memcpy(gPortViMode, renderMode, sizeof(gPortViMode));
     u32 format = *(u32*)renderMode >> 2;
-    sRetraceMs = (format == 1) ? 20 : 17;
+    sRetraceHz = (format == 1) ? 50 : 60;
     static char what[96];
     snprintf(what, sizeof(what), "VIConfigure: %ux%u, %u Hz", *(u16*)(renderMode + 4), *(u16*)(renderMode + 8),
              format == 1 ? 50 : 60);
@@ -500,12 +500,15 @@ void KPADInit(void) { STUB(KPADInit); }
 
 }  // extern "C"
 
+s64 PortViNextTicks(void) { return sNextRetrace; }
+
 void PortViTick(void) {
-    DWORD now = GetTickCount();
-    if (sNextRetraceMs == 0) sNextRetraceMs = now + sRetraceMs;
-    if ((s32)(now - sNextRetraceMs) < 0) return;
-    sNextRetraceMs += sRetraceMs;                // 50 or 60 fields per second (VIConfigure)
-    if ((s32)(now - sNextRetraceMs) > 200) sNextRetraceMs = now + sRetraceMs;
+    s64 period = (s64)(OSGetBusClock() / 4) / sRetraceHz;      // exact: 50 and 60 divide the 60.75 MHz timer
+    s64 now = PortTicks();
+    if (sNextRetrace == 0) sNextRetrace = now + period;
+    if (now < sNextRetrace) return;
+    sNextRetrace += period;                      // 50 or 60 fields per second (VIConfigure)
+    if (now - sNextRetrace > 10 * period) sNextRetrace = now + period;
     sRetraceCount++;
     if (sPreRetrace) sPreRetrace(sRetraceCount);
     if (sPostRetrace) sPostRetrace(sRetraceCount);

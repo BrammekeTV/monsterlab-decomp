@@ -21,6 +21,9 @@ build\pc\monsterlab.exe                        # runs main() with your own disc 
 |---|---|
 | `--data <dir>` or `MONSTERLAB_DATA` | extracted disc (`sys/main.dol`, `files/`); default: `orig/RM7P4F` in the current folder or above the exe |
 | `--frames N` | stop after N presented frames (default 300) |
+| `--fast-forward N` | run the first N frames unpaced (virtual clock, below), then continue in real time from the same game time. Nothing is presented and the sound device is not fed meanwhile; frames are still rendered |
+| `--fast` | never pace: the whole run on the virtual clock (headless tests) |
+| `--to-menu` | `--fast-forward 3200` plus `--press A@2600-2610`: unpaced through the splash screens and the title to the main menu, then real time. No frame or time limit unless `--frames` / `--seconds` is given. Try `--window --to-menu` |
 | `--seconds N` | stop after N seconds and say where the main thread is (default 60) |
 | `--keep-going` | a missing function returns 0 instead of stopping, and a semaphore nobody signals is passed after 0.5 s: a survey of what the boot path still needs. After the first one the run is no longer what the game does. |
 | `--verbose` | log every skipped static initialiser and every SDK stub call |
@@ -406,6 +409,29 @@ game code in the middle of an update, which is stricter than the console.
 
 A loop that waits for an interrupt to change memory without calling any SDK function would hang.
 The time limit then reports where the main thread is.
+
+### The game clock and fast-forward
+
+Game time (`PortTicks`, `port_os.cpp`) is a virtual clock in `OSTime` ticks. `OSGetTime`/`OSGetTick`, the VI retrace
+(`PortViTick`), alarms, `OSSleepTicks` and the 3 ms AX frame (`PortAudioTick`) all read it. Paced, it is the real
+clock; the retrace is exactly 1,215,000 ticks (50 Hz) or 1,012,500 (60 Hz).
+
+While fast-forwarding the clock stands still while game code runs. The interrupt thread keeps a count of game
+threads (the main thread and every `OSResumeThread` thread) and of those waiting in `PortWaitChange` (semaphores,
+`VIWaitForRetrace`, `OSSleepTicks`); a signal resets the count. When all of them wait and no interrupt is queued,
+nothing can happen before the next event, and time jumps to the earliest of: next retrace, next AX frame, an alarm,
+a sleep deadline. A game thread that polls `OSGetTime` in a busy loop advances the clock 100 ticks per call so the
+loop ends. When the frame counter reaches the `--fast-forward` count the clock switches to the real one with an
+offset, so game time continues without a jump. Presenting to the window and writing to the sound device are
+skipped while fast (the mixer still runs, so game callbacks and `--wav` are the same); drawing is not skipped:
+copies and screenshots stay right.
+
+Frames at the same count show the same screen (title at 2500, main menu at 3200 with `--press A@2600-2610`), but
+effects that run on time (the title's sparks, the menu's scene) are in another phase from a paced run, and
+two runs are not pixel-identical even when both are paced (thread timing). Measured (this machine, headless, 3200 frames):
+paced about 64 s to the menu; `--to-menu` without a renderer 22 s (about 145 frames per second); with
+`--screenshot` the renderer (Direct3D WARP, software) is the cost: 640x480 about 60 s, so use `--res 640x480`
+for screenshot checks and a window (GPU) for the rest.
 
 ### Disc files: conversion after the read
 

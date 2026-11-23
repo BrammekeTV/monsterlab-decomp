@@ -99,6 +99,9 @@ typedef struct PortOptions {
     BOOL screenshotStats;     // draw the stats overlay into that picture too (--screenshot-stats)
     const char* wav;          // write everything the mixer produces to this WAV file
     BOOL noAudio;             // never open the sound device
+    s32  fastForward;         // run the first N presented frames unpaced (--fast-forward N)
+    BOOL fastAll;             // never pace (--fast)
+    BOOL toMenu;              // --to-menu: fast-forward to the title, press A, go on to the main menu
     s32  showTexture;         // development aid (port_demo.cpp): -1, or a texture of global_binary.sir
 } PortOptions;
 extern PortOptions gPortOptions;
@@ -175,5 +178,20 @@ void PortQueueInterrupt(void (*fn)(void* arg), void* arg);
 void PortOsStart(void);               // heaps, time base (port_os.cpp)
 void PortOsTick(void);                // alarms, called from the interrupt thread about every ms
 void PortViTick(void);                // video retrace (port_sdk.cpp)
+s64    PortViNextTicks(void);         // when the next retrace is due (0 = not started)
+s64    PortAudioNextTicks(void);      // when the next AX frame is due (0 = audio not running)
+s64    PortOsNextAlarm(void);         // the earliest alarm (0 = none)
 int  PortSelfTestSdk(void);           // 0 = ok
+
+// ---- the clock (port_os.cpp) ----
+// Game time is a virtual clock in OSTime ticks. Paced, it follows the real clock. Fast-forwarding
+// (--fast-forward N, --fast), it stands still while game code runs and jumps to the next event
+// (retrace, AX frame, alarm, sleep deadline) when every game thread waits; the switch back to the
+// real clock continues from the same time. Retraces, alarms, OSSleep and the audio tick all use it.
+s64    PortTicks(void);               // the game clock, without side effects
+BOOL   PortFastActive(void);          // TRUE while fast-forwarding
+void   PortFastEnd(void);             // back to real-time pacing (continues from the same time)
+void   PortClockWakeAt(s64 t);     // signal the waiters when the clock reaches t (OSSleep)
+BOOL   PortClockAdvanceIfIdle(void);  // interrupt thread: all game threads wait, so jump to the next event
+void   PortGameThreads(s32 delta);    // game threads that exist (the main thread counts)
 const char* PortDvdStats(char* buf, u32 bufSize);

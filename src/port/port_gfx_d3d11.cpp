@@ -985,7 +985,7 @@ static void CopyEfb(const PortGx* g, u32 control) {
         FrameStats(&stats);
         PortOverlayFrame(&stats);
         if (gPortOptions.screenshotStats) PortOverlayDraw(sOutRtv, sOutW, sOutH);
-        if (sSwap) {
+        if (sSwap && !PortFastActive()) {            // fast-forward: rendered (for screenshots) but not presented
             Blit(sOutSrv, sBackRtv, 0, 0, sOutW, sOutH, 0, 0, 1, 1);
             if (!gPortOptions.screenshotStats) PortOverlayDraw(sBackRtv, sOutW, sOutH);
             sSwap->Present(gPortSettings.vsync ? 1 : 0, 0);

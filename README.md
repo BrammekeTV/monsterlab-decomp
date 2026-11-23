@@ -107,6 +107,8 @@ These live in the platform layer (`src/platform/`) that replaces the Wii SDK, so
 6. **Own-disc setup (ISO picker).** The port never ships game content: models, textures, audio, level and script files, and the data in `main.dol` stay the publisher's. On first launch the player picks their own `.iso` or `.wbfs`. The port checks that it is the PAL `RM7P4F` disc, extracts and caches the files it needs, and never asks again. This replaces extracting the disc into `orig/` by hand, and fits into the settings GUI. Mods (custom parts as glTF/PNG/JSON) load on top of the player's own files.
 7. **64-bit later.** Only after named structs and a loader replace raw offsets; not needed for 1080p, the settings GUI or mods.
 
+**Quick check loop.** `python tools/build_pc.py` recompiles only what changed (a no-change build takes under a second, a one-file change a few seconds; `--clean` rebuilds everything). `build\pc\monsterlab.exe --window --to-menu` runs the boot unpaced to the main menu and then plays normally; `--fast-forward N` and `--fast` do the same for N frames or the whole run (see [`docs/port_runtime.md`](docs/port_runtime.md)).
+
 ### Priorities
 
 - Game code (`main` is at `0x80142DF0`; game code sits at `0x80006B40`–`0x8022FEC4`) is the real work. zlib 1.2.3 follows at `0x8022FEC4`–`0x80232AF8` (the PC port links real zlib).
