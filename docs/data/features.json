@@ -99,6 +99,11 @@
  "changelog": [
   {
    "date": "2026-11-23",
+   "time": "23:25",
+   "text": "The main menu runs about three times faster on Windows (PR #118): from about 14 to about 44 frames per second at 1080p. The renderer now groups draws together and cuts the overhead of each of the roughly 2,250 draws per frame. The next step is moving the vertex work to the graphics card."
+  },
+  {
+   "date": "2026-11-23",
    "time": "23:10",
    "text": "Two fixes towards a living main-menu scene (PR #116). Level objects were updated with a frame time of 0, so their animations never advanced; now animated props and particle emitters move. And the game's clock read its two halves the wrong way round, giving an absurd time value. The castle scene itself is still mostly static: its camera doesn't move yet, and most of its objects aren't active. That's next."
   },
