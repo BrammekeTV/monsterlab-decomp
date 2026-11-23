@@ -74,9 +74,20 @@ typedef struct PortGxState {
 } PortGxState;
 extern PortGxState gPortGx;
 
+// ---- the player's disc image (port_disc.cpp) ----
+enum { PORT_DISC_OK, PORT_DISC_NO_FILE, PORT_DISC_NOT_WII, PORT_DISC_WRONG_GAME, PORT_DISC_WRONG_REGION, PORT_DISC_UNREADABLE };
+int  PortDiscCheck(const char* path, char* why, u32 n);    // the header only: is this Monster Lab (RM7P4F)? why says it in words
+int  PortDiscOpen(const char* path, char* why, u32 n);     // also the game partition's key and file table
+void PortDiscClose(void);
+BOOL PortDiscIsOpen(void);
+BOOL PortDiscFind(const char* path, u64* offset, u32* size);   // a file of the disc, by its path
+BOOL PortDiscRead(u64 offset, void* dst, u32 len);         // decrypted bytes of the game partition
+u64  PortDiscDolOffset(void);                              // where main.dol starts in the partition
+int  PortSelfTestDisc(void);
+
 // ---- runtime (port_runtime.cpp) ----
 typedef struct PortOptions {
-    const char* dataDir;      // extracted disc: <dataDir>/sys/main.dol and <dataDir>/files/
+    const char* dataDir;      // extracted disc: <dataDir>/sys/main.dol and <dataDir>/files/; or the disc image itself (PortDiscIsOpen)
     s32  frameLimit;          // stop after this many presented frames (0 = none)
     s32  secondsLimit;        // stop after this many seconds without reaching the frame limit
     BOOL selfTest;
@@ -85,8 +96,12 @@ typedef struct PortOptions {
     BOOL haveData;            // main.dol was found and loaded
     BOOL window;              // open a window and draw into it
     const char* screenshot;   // write the last shown picture to this PNG when the run stops
+    BOOL screenshotStats;     // draw the stats overlay into that picture too (--screenshot-stats)
     const char* wav;          // write everything the mixer produces to this WAV file
     BOOL noAudio;             // never open the sound device
+    s32  fastForward;         // run the first N presented frames unpaced (--fast-forward N)
+    BOOL fastAll;             // never pace (--fast)
+    BOOL toMenu;              // --to-menu: fast-forward to the title, press A, go on to the main menu
     s32  showTexture;         // development aid (port_demo.cpp): -1, or a texture of global_binary.sir
 } PortOptions;
 extern PortOptions gPortOptions;
@@ -96,8 +111,17 @@ typedef struct PortSettings {
     s32  width, height;       // output size in pixels (--res WxH, default 1920x1080)
     BOOL wide;                // 16:9 (the console's widescreen setting, SCGetAspectRatio) or 4:3 (--aspect)
     BOOL stretchUi;           // 16:9 only: stretch the 2D layer over the whole width as the console does (--stretch-ui)
+    BOOL vsync;               // wait for the monitor at each shown frame
+    BOOL fullscreen;          // borderless window over the whole monitor
+    s32  volume;              // 0-100, of the sound device's output
+    BOOL mute;
 } PortSettings;
 extern PortSettings gPortSettings;
+// monsterlab.ini next to the exe (port_settings.cpp): display, audio and the input bindings.
+const char* PortSettingsPath(void);
+BOOL PortSettingsLoad(const char* path, PortSettings* s);        // FALSE: no such file (nothing changed)
+BOOL PortSettingsSave(const char* path, const PortSettings* s);
+int  PortSelfTestSettings(void);
 
 void PortLog(const char* fmt, ...);
 // Records the first use of an SDK feature (shown in the boot summary); returns TRUE the first time.
@@ -123,6 +147,8 @@ void PortDemoMain(void);              // port_demo.cpp
 void PortStop(int exitCode, const char* fmt, ...);
 void PortAudioTick(void);     // port_audio.cpp: run the AX frames that are due (interrupt thread)
 const char* PortAudioStats(char* buf, u32 n);
+u32  PortAudioVoices(u32* outOf); // voices the mixer is playing now
+extern s64 gPortWaitTicks;    // QueryPerformanceCounter ticks spent asleep in VIWaitForRetrace (port_sdk.cpp)
 int  PortSelfTestAudio(void);
 void PortFrameDone(void);     // one presented frame (VI flip): enforces the frame limit
 
@@ -152,5 +178,20 @@ void PortQueueInterrupt(void (*fn)(void* arg), void* arg);
 void PortOsStart(void);               // heaps, time base (port_os.cpp)
 void PortOsTick(void);                // alarms, called from the interrupt thread about every ms
 void PortViTick(void);                // video retrace (port_sdk.cpp)
+s64    PortViNextTicks(void);         // when the next retrace is due (0 = not started)
+s64    PortAudioNextTicks(void);      // when the next AX frame is due (0 = audio not running)
+s64    PortOsNextAlarm(void);         // the earliest alarm (0 = none)
 int  PortSelfTestSdk(void);           // 0 = ok
+
+// ---- the clock (port_os.cpp) ----
+// Game time is a virtual clock in OSTime ticks. Paced, it follows the real clock. Fast-forwarding
+// (--fast-forward N, --fast), it stands still while game code runs and jumps to the next event
+// (retrace, AX frame, alarm, sleep deadline) when every game thread waits; the switch back to the
+// real clock continues from the same time. Retraces, alarms, OSSleep and the audio tick all use it.
+s64    PortTicks(void);               // the game clock, without side effects
+BOOL   PortFastActive(void);          // TRUE while fast-forwarding
+void   PortFastEnd(void);             // back to real-time pacing (continues from the same time)
+void   PortClockWakeAt(s64 t);     // signal the waiters when the clock reaches t (OSSleep)
+BOOL   PortClockAdvanceIfIdle(void);  // interrupt thread: all game threads wait, so jump to the next event
+void   PortGameThreads(s32 delta);    // game threads that exist (the main thread counts)
 const char* PortDvdStats(char* buf, u32 bufSize);

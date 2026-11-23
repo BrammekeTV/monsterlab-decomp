@@ -467,7 +467,7 @@ static s16      sRing[RING_SAMPLES * 2];
 static volatile LONG sRingWrite, sRingRead;              // in samples, never wrapped: index = value % RING_SAMPLES
 static FILE*    sWav;
 static u32      sWavSamples;
-static LARGE_INTEGER sClockStart, sClockFreq;
+static s64      sClockStart;                             // game clock (port.h) when the audio started
 static u64      sFramesDone;                             // AX frames since sClockStart
 static BOOL     sStarted;
 
@@ -517,8 +517,7 @@ static DWORD WINAPI OutputThread(void*) {
 
 static void Start(void) {
     sStarted = TRUE;
-    QueryPerformanceFrequency(&sClockFreq);
-    QueryPerformanceCounter(&sClockStart);
+    sClockStart = PortTicks();
     if (gPortOptions.wav) {
         sWav = fopen(gPortOptions.wav, "wb");
         if (sWav) WavHeader(); else PortLog("audio: cannot write %s", gPortOptions.wav);
@@ -527,16 +526,23 @@ static void Start(void) {
     if (gPortOptions.window && !gPortOptions.noAudio) CloseHandle(CreateThread(NULL, 0, OutputThread, NULL, 0, NULL));
 }
 
-// How many AX frames are due by the clock, plus the lead the ring is kept at.
+// One AX frame (3 ms) in game clock ticks.
+static s64 FrameTicks(void) { return 60750000LL * AX_FRAME / AX_RATE; }
+
+// How many AX frames are due by the game clock, plus the lead the ring is kept at.
 static int FramesDue(void) {
-    LARGE_INTEGER now;
-    QueryPerformanceCounter(&now);
-    u64 want = (u64)((now.QuadPart - sClockStart.QuadPart) * (AX_RATE / AX_FRAME * 3) / sClockFreq.QuadPart) / 3 + RING_TARGET / AX_FRAME;
+    u64 want = (u64)((PortTicks() - sClockStart) / FrameTicks()) + RING_TARGET / AX_FRAME;
     if (want <= sFramesDone) return 0;
     u64 due = want - sFramesDone;
     if (due > 60) { sFramesDone = want - 60; due = 60; }             // far behind (180 ms): skip, do not catch up
     sFramesDone += due;
     return (int)due;
+}
+
+s64 PortAudioNextTicks(void) {
+    if (!sStarted) return 0;
+    s64 lead = RING_TARGET / AX_FRAME;
+    return sClockStart + ((s64)sFramesDone + 1 - lead) * FrameTicks();
 }
 
 static void Output(const s16* frame) {
@@ -545,12 +551,13 @@ static void Output(const s16* frame) {
         sWavSamples += AX_FRAME;
         if (sWavSamples % (AX_RATE / 2 / AX_FRAME * AX_FRAME) < AX_FRAME) WavHeader();
     }
-    if (!sWave) return;
+    if (!sWave || PortFastActive()) return;       // fast-forward: the device is not fed
     LONG wr = sRingWrite;
     if (wr - sRingRead > RING_SAMPLES / 2) { sStats.dropped++; return; }   // the device is behind: drop
+    s32 gain = gPortSettings.mute ? 0 : gPortSettings.volume;             // the settings screen's volume: the device only, not --wav
     for (int n = 0; n < AX_FRAME; n++) {
         s16* p = &sRing[((u32)(wr + n) % RING_SAMPLES) * 2];
-        p[0] = frame[n * 2]; p[1] = frame[n * 2 + 1];
+        p[0] = (s16)(frame[n * 2] * gain / 100); p[1] = (s16)(frame[n * 2 + 1] * gain / 100);
     }
     sRingWrite = wr + AX_FRAME;
 }
@@ -567,6 +574,13 @@ void PortAudioTick(void) {
         sStats.samplesOut += AX_FRAME;
         Output(frame);
     }
+}
+
+u32 PortAudioVoices(u32* outOf) {
+    u32 n = 0;
+    for (int i = 0; i < AX_VOICES; i++) if (sRun[i].running) n++;
+    if (outOf) *outOf = AX_VOICES;
+    return n;
 }
 
 const char* PortAudioStats(char* buf, u32 n) {

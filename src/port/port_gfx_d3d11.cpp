@@ -24,6 +24,7 @@
 
 #include "port/port.h"
 #include "port/port_gx.h"
+#include "port/port_overlay.h"
 
 #pragma comment(lib, "d3d11.lib")
 #pragma comment(lib, "d3dcompiler.lib")
@@ -75,6 +76,9 @@ static inline void ScissorOffset(const PortGx* g, s32* offX, s32* offY) {
 static BOOL                    sStarted;
 
 static struct { u32 draws, tris, presents, texCopies, textures, shaders, skipped; } sGfxStats;
+// This frame so far (reset at each display copy): time inside this backend, draws, GX vertices, copies.
+static struct { s64 renderTicks; u32 draws, verts, copies; } sFrame;
+static inline s64 Ticks(void) { LARGE_INTEGER t; QueryPerformanceCounter(&t); return t.QuadPart; }
 static u8 sTlutMem[0x80000];           // the palette half of the console's texture memory
 
 struct Vtx { f32 pos[4]; f32 col[2][4]; f32 tc[8][3]; };
@@ -85,8 +89,11 @@ static BOOL SavePng(ID3D11Texture2D* tex, u32 w, u32 h, const char* path);
 
 // ------------------------------------------------------------------ window
 static HANDLE sWndReady;
+static volatile LONG sWheel;           // mouse wheel movement the settings screen has not taken yet
+f32 PortGfxTakeWheel(void) { return (f32)InterlockedExchange(&sWheel, 0) / WHEEL_DELTA; }
 static LRESULT CALLBACK WndProc(HWND w, UINT m, WPARAM wp, LPARAM lp) {
     if (m == WM_CLOSE) { PortStop(0, "window closed"); return 0; }
+    if (m == WM_MOUSEWHEEL) { InterlockedExchangeAdd(&sWheel, (LONG)GET_WHEEL_DELTA_WPARAM(wp)); return 0; }
     return DefWindowProcA(w, m, wp, lp);
 }
 static DWORD WINAPI WindowThread(void*) {
@@ -107,6 +114,26 @@ static DWORD WINAPI WindowThread(void*) {
 }
 
 HWND PortGfxWindow(void) { return sWnd; }
+
+// Fullscreen is the same window without a border over its whole monitor; the picture is stretched to it.
+void PortGfxSetFullscreen(BOOL on) {
+    static RECT saved;
+    static BOOL full;
+    if (!sWnd || on == full) return;
+    full = on;
+    if (on) {
+        GetWindowRect(sWnd, &saved);
+        MONITORINFO mi = {sizeof(mi)};
+        if (!GetMonitorInfoA(MonitorFromWindow(sWnd, MONITOR_DEFAULTTONEAREST), &mi)) { full = FALSE; return; }
+        SetWindowLongA(sWnd, GWL_STYLE, WS_POPUP | WS_VISIBLE);
+        SetWindowPos(sWnd, HWND_TOP, mi.rcMonitor.left, mi.rcMonitor.top, mi.rcMonitor.right - mi.rcMonitor.left,
+                     mi.rcMonitor.bottom - mi.rcMonitor.top, SWP_FRAMECHANGED | SWP_NOOWNERZORDER);
+    } else {
+        SetWindowLongA(sWnd, GWL_STYLE, WS_OVERLAPPEDWINDOW | WS_VISIBLE);
+        SetWindowPos(sWnd, NULL, saved.left, saved.top, saved.right - saved.left, saved.bottom - saved.top,
+                     SWP_FRAMECHANGED | SWP_NOOWNERZORDER | SWP_NOZORDER);
+    }
+}
 
 // Window position (0..1 across and down) -> the console pointer's -1..1, through the picture's
 // place in the window and the narrowed 2D layer of widescreen.
@@ -153,6 +180,8 @@ struct PsConst {
     f32 texSize[8][4];      // width, height of each texture map (texels)
     f32 indRow[3][2][4];    // the three indirect matrices, two rows each, already scaled to texels per unit
     f32 indScale[4][4];     // per indirect stage: 1 / 2^scale for s and t of its coordinate
+    f32 fogP[4];            // fog: a, b, c of the hardware equation
+    f32 fogC[4];            // fog colour
 };
 
 static const char* const kColorIn[16] = {"prev.rgb", "prev.aaa", "c0.rgb", "c0.aaa", "c1.rgb", "c1.aaa", "c2.rgb", "c2.aaa",
@@ -193,11 +222,12 @@ static std::string TevKey(const PortGx* g, u32* texUsed) {
         key.append((const char*)words, 20);
         if (order & 0x40) *texUsed |= 1u << (order & 7);
     }
-    u32 tail[11];
+    u32 tail[12];
     for (u32 i = 0; i < 8; i++) tail[i] = g->bp[0xF6 + i] & 0xF;       // swap tables
     tail[8] = g->bp[0xF3] & 0xFF0000;                                    // alpha compare functions
     tail[9] = (g->bp[0x00] >> 16) & 7;                                   // indirect stages
     tail[10] = g->bp[0x27] & 0xFFFFFF;                                   // their texture maps and coordinates
+    tail[11] = (g->bp[0xF1] >> 20) & 15;                                 // fog: projection (bit 3) and kind
     for (u32 i = 0; i < tail[9]; i++) *texUsed |= 1u << ((g->bp[0x27] >> (i * 6)) & 7);
     key.append((const char*)tail, sizeof(tail));
     return key;
@@ -206,7 +236,7 @@ static std::string TevKey(const PortGx* g, u32* texUsed) {
 static std::string TevSource(const PortGx* g) {
     u32 stages = ((g->bp[0x00] >> 10) & 15) + 1;
     std::string s =
-        "cbuffer C : register(b0) { float4 reg[4]; float4 konst[4]; float4 alphaRef; float4 texSize[8]; float4 indRow[6]; float4 indScale[4]; };\n"
+        "cbuffer C : register(b0) { float4 reg[4]; float4 konst[4]; float4 alphaRef; float4 texSize[8]; float4 indRow[6]; float4 indScale[4]; float4 fogP; float4 fogC; };\n"
         "Texture2D t0 : register(t0); Texture2D t1 : register(t1); Texture2D t2 : register(t2); Texture2D t3 : register(t3);\n"
         "Texture2D t4 : register(t4); Texture2D t5 : register(t5); Texture2D t6 : register(t6); Texture2D t7 : register(t7);\n"
         "SamplerState s0 : register(s0); SamplerState s1 : register(s1); SamplerState s2 : register(s2); SamplerState s3 : register(s3);\n"
@@ -312,6 +342,18 @@ static std::string TevSource(const PortGx* g) {
         for (size_t p; (p = t1.find('r')) != std::string::npos && t1 != "true";) t1.replace(p, 1, "alphaRef.y");
         // quantise like the 8-bit hardware compare
         s += "  { float a = floor(o.a * 255.0 + 0.5) / 255.0; if (!(" + t0 + " " + kLogic[logic] + " " + t1 + ")) discard; }\n";
+    }
+    {   // fog (BP 0xEE-0xF2): the hardware's fogz = a / (b - z) - c (perspective) or a z - c (orthographic), then the kind's curve
+        u32 fk = (g->bp[0xF1] >> 21) & 7, ortho = (g->bp[0xF1] >> 20) & 1;
+        if (fk != 0) {
+            s += ortho ? "  { float fz = fogP.x * i.pos.z - fogP.z;" : "  { float fz = fogP.x / (fogP.y - i.pos.z) - fogP.z;";
+            s += " fz = saturate(fz); float f = fz;";
+            if (fk == 4) s += " f = 1.0 - exp2(-8.0 * fz);";
+            else if (fk == 5) s += " f = 1.0 - exp2(-8.0 * fz * fz);";
+            else if (fk == 6) s += " f = exp2(-8.0 * (1.0 - fz));";
+            else if (fk == 7) s += " f = exp2(-8.0 * (1.0 - fz) * (1.0 - fz));";
+            s += " o.rgb = lerp(o.rgb, fogC.rgb, f); }\n";
+        }
     }
     s += "  return o;\n}\n";
     return s;
@@ -650,7 +692,7 @@ static void LightChannel(const PortGx* g, u32 ctrl, const f32* mat, const f32* a
 
 static std::vector<Vtx> sVerts;
 
-static void Draw(const PortGx* g, u32 prim, const PortGxLayout* L, u32 count, const u8* data) {
+static void DrawPrims(const PortGx* g, u32 prim, const PortGxLayout* L, u32 count, const u8* data) {
     if (!sStarted || count == 0) return;
     if (prim >= 0xA8) { sGfxStats.skipped++; return; }     // lines and points: not drawn yet
     u32 texUsed;
@@ -827,6 +869,16 @@ static void Draw(const PortGx* g, u32 prim, const PortGxLayout* L, u32 count, co
         pc.indRow[m][0][0] = e[0] * k; pc.indRow[m][0][1] = e[2] * k; pc.indRow[m][0][2] = e[4] * k; pc.indRow[m][0][3] = 0;
         pc.indRow[m][1][0] = e[1] * k; pc.indRow[m][1][1] = e[3] * k; pc.indRow[m][1][2] = e[5] * k; pc.indRow[m][1][3] = 0;
     }
+    {
+        u32 ab = (g->bp[0xEE] & 0xFFFFF) << 12, cb = (g->bp[0xF1] & 0xFFFFF) << 12;
+        f32 a, c;
+        memcpy(&a, &ab, 4); memcpy(&c, &cb, 4);
+        s32 expReg = g->bp[0xF0] & 31;
+        f32 b = (f32)(g->bp[0xEF] & 0xFFFFFF) / 8388638.0f * (f32)ldexp(1.0, expReg - 1);
+        pc.fogP[0] = ((g->bp[0xF1] >> 20) & 1) ? a : a * (f32)ldexp(1.0, expReg);
+        pc.fogP[1] = b; pc.fogP[2] = c; pc.fogP[3] = 0;
+        pc.fogC[0] = ((g->bp[0xF2] >> 16) & 255) / 255.0f; pc.fogC[1] = ((g->bp[0xF2] >> 8) & 255) / 255.0f; pc.fogC[2] = (g->bp[0xF2] & 255) / 255.0f; pc.fogC[3] = 1.0f;
+    }
     for (u32 i = 0; i < 4; i++) {
         u32 sc = g->bp[0x25 + i / 2] >> ((i & 1) * 8);
         pc.indScale[i][0] = 1.0f / (f32)(1u << (sc & 15)); pc.indScale[i][1] = 1.0f / (f32)(1u << ((sc >> 4) & 15)); pc.indScale[i][2] = pc.indScale[i][3] = 0;
@@ -848,6 +900,7 @@ static void Draw(const PortGx* g, u32 prim, const PortGxLayout* L, u32 count, co
     sCtx->PSSetConstantBuffers(0, 1, &sPsConst);
     sCtx->Draw((UINT)tris.size(), first);
     sGfxStats.draws++;
+    sFrame.draws++; sFrame.verts += count;
     sGfxStats.tris += (u32)tris.size() / 3;
 }
 
@@ -878,7 +931,28 @@ static void Blit(ID3D11ShaderResourceView* src, ID3D11RenderTargetView* dst, u32
     sCtx->OMSetRenderTargets(0, NULL, NULL);
 }
 
-static void Copy(const PortGx* g, u32 control) {
+// The numbers of the frame that ends at this display copy, for the overlay.
+static void FrameStats(PortFrameStats* s) {
+    static s64 last, lastWait, freq;
+    if (!freq) { LARGE_INTEGER f; QueryPerformanceFrequency(&f); freq = f.QuadPart; }
+    s64 now = Ticks(), wait = gPortWaitTicks;
+    f64 ms = 1000.0 / (f64)freq;
+    memset(s, 0, sizeof(*s));
+    if (last) {
+        s->frameMs = (f32)((now - last) * ms);
+        s->renderMs = (f32)(sFrame.renderTicks * ms);
+        s->waitMs = (f32)((wait - lastWait) * ms);
+        s->gameMs = std::max(s->frameMs - s->renderMs - s->waitMs, 0.0f);
+    }
+    last = now; lastWait = wait;
+    s->draws = sFrame.draws; s->verts = sFrame.verts; s->efbCopies = sFrame.copies;
+    s->textures = (u32)(sTextures.size() + sEfbCopies.size());
+    s->voices = PortAudioVoices(&s->voiceCount);
+    s->outW = sOutW; s->outH = sOutH; s->picW = sPicW; s->picH = sPicH; s->wide = gPortSettings.wide;
+    sFrame.renderTicks = 0; sFrame.draws = sFrame.verts = sFrame.copies = 0;
+}
+
+static void CopyEfb(const PortGx* g, u32 control) {
     if (!sStarted) return;
     if (sTrace) {
         static int n;
@@ -906,9 +980,15 @@ static void Copy(const PortGx* g, u32 control) {
         if (sPicW != sOutW || sPicH != sOutH) sCtx->ClearRenderTargetView(sOutRtv, black);
         Blit(sEfbSrv, sOutRtv, sPicX, sPicY, sPicW, sPicH, su0, sv0, sdu, sdv);
         sShown = TRUE;
-        if (sSwap) {
+        // The overlay goes over the window's picture only, or with --screenshot-stats into the output picture itself.
+        PortFrameStats stats;
+        FrameStats(&stats);
+        PortOverlayFrame(&stats);
+        if (gPortOptions.screenshotStats) PortOverlayDraw(sOutRtv, sOutW, sOutH);
+        if (sSwap && !PortFastActive()) {            // fast-forward: rendered (for screenshots) but not presented
             Blit(sOutSrv, sBackRtv, 0, 0, sOutW, sOutH, 0, 0, 1, 1);
-            sSwap->Present(0, 0);
+            if (!gPortOptions.screenshotStats) PortOverlayDraw(sBackRtv, sOutW, sOutH);
+            sSwap->Present(gPortSettings.vsync ? 1 : 0, 0);
         }
         sGfxStats.presents++;
         if (sTraceFrom > 1 && sGfxStats.presents >= sTraceFrom) sTrace = TRUE;
@@ -982,6 +1062,7 @@ static void Copy(const PortGx* g, u32 control) {
             t->Release();
         }
         sGfxStats.texCopies++;
+        sFrame.copies++;
     }
     if (control & 0x800) {                                  // clear afterwards (BP 0x4F alpha/red, 0x50 green/blue, 0x51 depth)
         f32 c[4] = {(g->bp[0x4F] & 255) / 255.0f, ((g->bp[0x50] >> 8) & 255) / 255.0f, (g->bp[0x50] & 255) / 255.0f, ((g->bp[0x4F] >> 8) & 255) / 255.0f};
@@ -1059,6 +1140,16 @@ BOOL PortGfxSaveScreenshot(const char* path) {
 }
 
 // ------------------------------------------------------------------ start
+static void Draw(const PortGx* g, u32 prim, const PortGxLayout* L, u32 count, const u8* data) {
+    s64 t = Ticks();
+    DrawPrims(g, prim, L, count, data);
+    sFrame.renderTicks += Ticks() - t;
+}
+static void Copy(const PortGx* g, u32 control) {
+    s64 t = Ticks();
+    CopyEfb(g, control);
+    sFrame.renderTicks += Ticks() - t;
+}
 static const PortGxBackend kBackend = {Draw, Copy, LoadTlut};
 
 BOOL PortGfxStart(BOOL window) {
@@ -1076,6 +1167,7 @@ BOOL PortGfxStart(BOOL window) {
         CloseHandle(CreateThread(NULL, 0, WindowThread, NULL, 0, NULL));
         WaitForSingleObject(sWndReady, 5000);
         if (!sWnd) window = FALSE;
+        else if (gPortSettings.fullscreen) PortGfxSetFullscreen(TRUE);
     }
     static const D3D_DRIVER_TYPE kDrivers[2] = {D3D_DRIVER_TYPE_HARDWARE, D3D_DRIVER_TYPE_WARP};
     static const D3D_FEATURE_LEVEL kLevels[2] = {D3D_FEATURE_LEVEL_11_0, D3D_FEATURE_LEVEL_10_0};
@@ -1153,6 +1245,7 @@ BOOL PortGfxStart(BOOL window) {
     // PORT_GFX_TRACE=N (N > 1) starts the trace when N pictures have been shown; any other value at once.
     sTraceFrom = getenv("PORT_GFX_TRACE") ? (u32)atoi(getenv("PORT_GFX_TRACE")) : 0;
     sTrace = getenv("PORT_GFX_TRACE") != NULL && sTraceFrom <= 1;
+    PortOverlayStart(sDev, sCtx);
     sStarted = TRUE;
     PortGxSetBackend(&kBackend);
     return TRUE;

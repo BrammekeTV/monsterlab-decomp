@@ -296,7 +296,7 @@ void fn_8018A78C(u8* arg0) {
 // Gets the current screen-set size and forwards it to slot 0x38 of the element's secondary
 // vtable (+0x138), returning its result.
 s32 fn_8019CD14(void* el) {
-    f32 pos[2];
+    f32 pos[3];   // fn_8018D68C writes x, y, z
     fn_8018D68C(pos, gScreenSets);
     return (*(WidgetPosFn*)(*(u8**)((u8*)el + 0x138) + 0x38))(el, 0, pos[0], pos[1]);
 }

@@ -315,7 +315,7 @@ typedef s32 (*PickFn)(u8* self, BOOL mask, f32 x, f32 y);
 // nearest/topmost for the point from fn_8018D68C, subject to flag checks on self and its +0x128 chain.
 // Returns 0.
 s32 fn_80199828(u8* self, u8** best) {
-    f32 pt[2];
+    f32 pt[3];   // fn_8018D68C writes x, y, z (12 bytes)
     u8* cur = *best;
     fn_8018D68C(pt, gScreenSets);
     if (cur == NULL || *(f32*)(cur + 0x70) > *(f32*)(self + 0x70)) {

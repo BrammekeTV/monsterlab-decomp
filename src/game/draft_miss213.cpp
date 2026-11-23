@@ -757,7 +757,7 @@ void fn_80125970(u8* self, f32 dt) {  // dt unused
     CameraSetMatrix(lbl_8047C640, mtx);
     fn_80009840(lbl_803C4298);
     void* view = lbl_805FB5F8;
-    f32 center[2];
+    f32 center[3];   // fn_8018D68C writes x, y, z
     fn_8018D68C(center, gScreenSets);
 
     f32 bestD = lbl_805FEE98;

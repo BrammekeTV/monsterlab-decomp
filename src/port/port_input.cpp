@@ -22,6 +22,7 @@
 #include "port/port.h"
 #include "port/port_gx.h"
 #include "port/port_input.h"
+#include "port/port_overlay.h"
 
 // WPAD button bits as KPADStatus.hold carries them.
 enum {
@@ -164,7 +165,7 @@ static void Sample(RemoteState* r) {
     }
 
     HWND wnd = PortGfxWindow();
-    BOOL focus = wnd && GetForegroundWindow() == wnd;
+    BOOL focus = wnd && GetForegroundWindow() == wnd && !gPortGuiOpen;   // the settings screen has the keyboard and mouse
     XINPUT_STATE pad;
     BOOL havePad = wnd && ReadPad(&pad);     // headless runs stay deterministic
     u32 padBits = 0;

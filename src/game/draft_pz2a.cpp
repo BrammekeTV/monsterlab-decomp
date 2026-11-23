@@ -108,14 +108,14 @@ u8* fn_801AA898(u8* arg0, s32 a4, f32 farg0) {
 }
 
 // 0x801B7E7C
-// Dispatches on the kind byte at +0x7F. Kind 0x20 forwards to fn_801B7F40; kinds 0x8 and 0x10
+// Dispatches on the kind byte at +0x7F. Kind 0x20 forwards to fn_801B7F40 with the caller's dt (f1); kinds 0x8 and 0x10
 // return the stored value at +0x10, and kind 0x10 also updates the distance at +0xC from the
 // object reached through arg1's vtable slot 0xC. Kind 0x40 returns 3, others return 0.
-s32 fn_801B7E7C(u8* arg0, u8* arg1) {
+s32 fn_801B7E7C(u8* arg0, u8* arg1, f32 farg0) {
     u8 kind = *(u8*)(arg0 + 0x7F);
     switch (kind) {
     case 0x20:
-        return fn_801B7F40(arg0, arg1, 0.0f /* leftover f1 */);
+        return fn_801B7F40(arg0, arg1, farg0);
     case 0x10:
     case 0x8:
         if (kind == 0x10) {
