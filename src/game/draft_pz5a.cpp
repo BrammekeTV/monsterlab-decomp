@@ -19,7 +19,7 @@ BOOL   fn_80147554(s32 button);                                    // 0x80147554
 s32    fn_8014762C(s32 button);                                    // 0x8014762C (button released)
 s32    fn_801481FC(s32 chan);                                      // 0x801481FC
 void   fn_8014DE68(void);                                          // 0x8014DE68
-s32    fn_80151644(s32 a, s32 b, u8* quad);                        // 0x80151644
+void    fn_80151644(s32 a, s32 b, u8* quad);                        // 0x80151644
 void   fn_80154318(void);                                          // 0x80154318
 extern "C++" void fn_80154358(void);                                          // 0x80154358
 s32    fn_8015BA30(void* dl);                                      // 0x8015BA30

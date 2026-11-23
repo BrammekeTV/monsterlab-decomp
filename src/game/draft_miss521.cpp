@@ -6,8 +6,8 @@
 extern void* gEventMgr;     // 0x805FB6C8
 extern u8    gWorldState[]; // 0x803E6D00
 
-// fn_800C52F0 is defined with C++ linkage in small_800C.cpp.
-u8* fn_800C52F0(u8* p, s32 del);                   // 0x800C52F0 (deleting dtor)
+// fn_800C52F0 is defined with C linkage in small_800C.cpp.
+extern "C" u8* fn_800C52F0(u8* p, s32 del);                   // 0x800C52F0 (deleting dtor)
 
 extern "C" {
 void     operator_delete(void* p);

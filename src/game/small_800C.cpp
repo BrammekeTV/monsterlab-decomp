@@ -156,7 +156,7 @@ extern "C" u8* fn_800C52B4(u8* p) {
 
 // 0x800C52F0
 // Deleting destructor: base dtor (fn_800C2720) on p, then free if del > 0.
-u8* fn_800C52F0(u8* p, s32 del) {
+extern "C" u8* fn_800C52F0(u8* p, s32 del) {
     if (p) {
         fn_800C2720(p, 0);
         if (del > 0) operator_delete(p);

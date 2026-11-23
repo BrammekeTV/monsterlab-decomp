@@ -1,6 +1,6 @@
 #include "types.h"
 
-extern "C++" u8* fn_800C52F0(u8* p, s32 del);                    // 0x800C52F0 (C++ linkage in small_800C.cpp)
+extern "C" u8* fn_800C52F0(u8* p, s32 del);                    // 0x800C52F0 (C++ linkage in small_800C.cpp)
 
 extern "C" {
 void fn_8006FA44(u8* a3, s32 a4, s32 a5, s32 a6, s32 a7, s32 a8); // 0x8006FA44
