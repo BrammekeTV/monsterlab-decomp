@@ -3,7 +3,7 @@
  "counts": {
   "global": 3899,
   "unknown": 130,
-  "library": 187
+  "library": 137
  },
  "game_bytes": 0,
  "duplicates": [],
@@ -164,28 +164,6 @@
    "region": "MSL C/C++ runtime"
   },
   {
-   "name": "fn_8025B330",
-   "refs": 3,
-   "files": 3,
-   "used_as": "_fn_8025B330",
-   "addr": "8025B330",
-   "size": 96,
-   "section": ".text",
-   "kind": "library",
-   "region": "AI/AX/MEM"
-  },
-  {
-   "name": "fn_80264420",
-   "refs": 3,
-   "files": 3,
-   "used_as": "_fn_80264420",
-   "addr": "80264420",
-   "size": 120,
-   "section": ".text",
-   "kind": "library",
-   "region": "NAND/SC/IPC"
-  },
-  {
    "name": "fn_80272B64",
    "refs": 3,
    "files": 3,
@@ -228,50 +206,6 @@
    "section": ".text",
    "kind": "library",
    "region": "MSL C/C++ runtime"
-  },
-  {
-   "name": "AXAcquireVoice",
-   "refs": 2,
-   "files": 2,
-   "used_as": "_AXAcquireVoice",
-   "addr": "80258024",
-   "size": 384,
-   "section": ".text",
-   "kind": "library",
-   "region": "AI/AX/MEM"
-  },
-  {
-   "name": "AXFreeVoice",
-   "refs": 2,
-   "files": 2,
-   "used_as": "_AXFreeVoice",
-   "addr": "80257FA8",
-   "size": 124,
-   "section": ".text",
-   "kind": "library",
-   "region": "AI/AX/MEM"
-  },
-  {
-   "name": "AXSetVoiceAddr",
-   "refs": 2,
-   "files": 2,
-   "used_as": "_AXSetVoiceAddr",
-   "addr": "8025B0A4",
-   "size": 248,
-   "section": ".text",
-   "kind": "library",
-   "region": "AI/AX/MEM"
-  },
-  {
-   "name": "AXSetVoiceState",
-   "refs": 2,
-   "files": 2,
-   "used_as": "_AXSetVoiceState",
-   "addr": "8025ACF0",
-   "size": 112,
-   "section": ".text",
-   "kind": "library",
-   "region": "AI/AX/MEM"
   },
   {
    "name": "GXInitTexObj",
@@ -360,160 +294,6 @@
    "section": ".text",
    "kind": "library",
    "region": "GX"
-  },
-  {
-   "name": "fn_80258904",
-   "refs": 2,
-   "files": 2,
-   "used_as": "_fn_80258904",
-   "addr": "80258904",
-   "size": 100,
-   "section": ".text",
-   "kind": "library",
-   "region": "AI/AX/MEM"
-  },
-  {
-   "name": "fn_80258968",
-   "refs": 2,
-   "files": 2,
-   "used_as": "_fn_80258968",
-   "addr": "80258968",
-   "size": 100,
-   "section": ".text",
-   "kind": "library",
-   "region": "AI/AX/MEM"
-  },
-  {
-   "name": "fn_8025AC30",
-   "refs": 2,
-   "files": 2,
-   "used_as": "_fn_8025AC30",
-   "addr": "8025AC30",
-   "size": 192,
-   "section": ".text",
-   "kind": "library",
-   "region": "AI/AX/MEM"
-  },
-  {
-   "name": "fn_8025AD60",
-   "refs": 2,
-   "files": 2,
-   "used_as": "_fn_8025AD60",
-   "addr": "8025AD60",
-   "size": 76,
-   "section": ".text",
-   "kind": "library",
-   "region": "AI/AX/MEM"
-  },
-  {
-   "name": "fn_8025B19C",
-   "refs": 2,
-   "files": 2,
-   "used_as": "_fn_8025B19C",
-   "addr": "8025B19C",
-   "size": 152,
-   "section": ".text",
-   "kind": "library",
-   "region": "AI/AX/MEM"
-  },
-  {
-   "name": "fn_8025B234",
-   "refs": 2,
-   "files": 2,
-   "used_as": "_fn_8025B234",
-   "addr": "8025B234",
-   "size": 132,
-   "section": ".text",
-   "kind": "library",
-   "region": "AI/AX/MEM"
-  },
-  {
-   "name": "fn_80263FEC",
-   "refs": 2,
-   "files": 2,
-   "used_as": "_fn_80263FEC",
-   "addr": "80263FEC",
-   "size": 52,
-   "section": ".text",
-   "kind": "library",
-   "region": "AI/AX/MEM"
-  },
-  {
-   "name": "fn_80264020",
-   "refs": 2,
-   "files": 2,
-   "used_as": "_fn_80264020",
-   "addr": "80264020",
-   "size": 1024,
-   "section": ".text",
-   "kind": "library",
-   "region": "NAND/SC/IPC"
-  },
-  {
-   "name": "fn_80264524",
-   "refs": 2,
-   "files": 2,
-   "used_as": "_fn_80264524",
-   "addr": "80264524",
-   "size": 20,
-   "section": ".text",
-   "kind": "library",
-   "region": "NAND/SC/IPC"
-  },
-  {
-   "name": "fn_80264538",
-   "refs": 2,
-   "files": 2,
-   "used_as": "_fn_80264538",
-   "addr": "80264538",
-   "size": 20,
-   "section": ".text",
-   "kind": "library",
-   "region": "NAND/SC/IPC"
-  },
-  {
-   "name": "fn_8026454C",
-   "refs": 2,
-   "files": 2,
-   "used_as": "_fn_8026454C",
-   "addr": "8026454C",
-   "size": 20,
-   "section": ".text",
-   "kind": "library",
-   "region": "NAND/SC/IPC"
-  },
-  {
-   "name": "fn_80264560",
-   "refs": 2,
-   "files": 2,
-   "used_as": "_fn_80264560",
-   "addr": "80264560",
-   "size": 20,
-   "section": ".text",
-   "kind": "library",
-   "region": "NAND/SC/IPC"
-  },
-  {
-   "name": "fn_80264574",
-   "refs": 2,
-   "files": 2,
-   "used_as": "_fn_80264574",
-   "addr": "80264574",
-   "size": 20,
-   "section": ".text",
-   "kind": "library",
-   "region": "NAND/SC/IPC"
-  },
-  {
-   "name": "fn_80264A14",
-   "refs": 2,
-   "files": 2,
-   "used_as": "_fn_80264A14",
-   "addr": "80264A14",
-   "size": 16,
-   "section": ".text",
-   "kind": "library",
-   "region": "NAND/SC/IPC"
   },
   {
    "name": "fn_802BE220",
@@ -736,50 +516,6 @@
    "region": "AI/AX/MEM"
   },
   {
-   "name": "AXQuit",
-   "refs": 1,
-   "files": 1,
-   "used_as": "_AXQuit",
-   "addr": "80257C88",
-   "size": 72,
-   "section": ".text",
-   "kind": "library",
-   "region": "AI/AX/MEM"
-  },
-  {
-   "name": "AXRmtAdvancePtr",
-   "refs": 1,
-   "files": 1,
-   "used_as": "_AXRmtAdvancePtr",
-   "addr": "80259C34",
-   "size": 88,
-   "section": ".text",
-   "kind": "library",
-   "region": "AI/AX/MEM"
-  },
-  {
-   "name": "AXRmtGetSamples",
-   "refs": 1,
-   "files": 1,
-   "used_as": "_AXRmtGetSamples",
-   "addr": "80259B70",
-   "size": 196,
-   "section": ".text",
-   "kind": "library",
-   "region": "AI/AX/MEM"
-  },
-  {
-   "name": "AXSetVoicePriority",
-   "refs": 1,
-   "files": 1,
-   "used_as": "_AXSetVoicePriority",
-   "addr": "802581A4",
-   "size": 156,
-   "section": ".text",
-   "kind": "library",
-   "region": "AI/AX/MEM"
-  },
-  {
    "name": "GXInitTexObjFilter",
    "refs": 1,
    "files": 1,
@@ -987,61 +723,6 @@
    "section": ".text",
    "kind": "library",
    "region": "DVD"
-  },
-  {
-   "name": "fn_80259418",
-   "refs": 1,
-   "files": 1,
-   "used_as": "_fn_80259418",
-   "addr": "80259418",
-   "size": 8,
-   "section": ".text",
-   "kind": "library",
-   "region": "AI/AX/MEM"
-  },
-  {
-   "name": "fn_8025ADAC",
-   "refs": 1,
-   "files": 1,
-   "used_as": "_fn_8025ADAC",
-   "addr": "8025ADAC",
-   "size": 576,
-   "section": ".text",
-   "kind": "library",
-   "region": "AI/AX/MEM"
-  },
-  {
-   "name": "fn_8025B390",
-   "refs": 1,
-   "files": 1,
-   "used_as": "_fn_8025B390",
-   "addr": "8025B390",
-   "size": 8,
-   "section": ".text",
-   "kind": "library",
-   "region": "AI/AX/MEM"
-  },
-  {
-   "name": "fn_8025B398",
-   "refs": 1,
-   "files": 1,
-   "used_as": "_fn_8025B398",
-   "addr": "8025B398",
-   "size": 8,
-   "section": ".text",
-   "kind": "library",
-   "region": "AI/AX/MEM"
-  },
-  {
-   "name": "fn_8025B3A0",
-   "refs": 1,
-   "files": 1,
-   "used_as": "_fn_8025B3A0",
-   "addr": "8025B3A0",
-   "size": 76,
-   "section": ".text",
-   "kind": "library",
-   "region": "AI/AX/MEM"
   },
   {
    "name": "fn_8025B65C",
@@ -1284,237 +965,6 @@
    "section": ".text",
    "kind": "library",
    "region": "AI/AX/MEM"
-  },
-  {
-   "name": "fn_8026099C",
-   "refs": 1,
-   "files": 1,
-   "used_as": "_fn_8026099C",
-   "addr": "8026099C",
-   "size": 276,
-   "section": ".text",
-   "kind": "library",
-   "region": "AI/AX/MEM"
-  },
-  {
-   "name": "fn_80260AB0",
-   "refs": 1,
-   "files": 1,
-   "used_as": "_fn_80260AB0",
-   "addr": "80260AB0",
-   "size": 20,
-   "section": ".text",
-   "kind": "library",
-   "region": "AI/AX/MEM"
-  },
-  {
-   "name": "fn_80260AC4",
-   "refs": 1,
-   "files": 1,
-   "used_as": "_fn_80260AC4",
-   "addr": "80260AC4",
-   "size": 8,
-   "section": ".text",
-   "kind": "library",
-   "region": "AI/AX/MEM"
-  },
-  {
-   "name": "fn_80260AD4",
-   "refs": 1,
-   "files": 1,
-   "used_as": "_fn_80260AD4",
-   "addr": "80260AD4",
-   "size": 5824,
-   "section": ".text",
-   "kind": "library",
-   "region": "AI/AX/MEM"
-  },
-  {
-   "name": "fn_80262194",
-   "refs": 1,
-   "files": 1,
-   "used_as": "_fn_80262194",
-   "addr": "80262194",
-   "size": 24,
-   "section": ".text",
-   "kind": "library",
-   "region": "AI/AX/MEM"
-  },
-  {
-   "name": "fn_80262320",
-   "refs": 1,
-   "files": 1,
-   "used_as": "_fn_80262320",
-   "addr": "80262320",
-   "size": 36,
-   "section": ".text",
-   "kind": "library",
-   "region": "AI/AX/MEM"
-  },
-  {
-   "name": "fn_80262344",
-   "refs": 1,
-   "files": 1,
-   "used_as": "_fn_80262344",
-   "addr": "80262344",
-   "size": 36,
-   "section": ".text",
-   "kind": "library",
-   "region": "AI/AX/MEM"
-  },
-  {
-   "name": "fn_80262368",
-   "refs": 1,
-   "files": 1,
-   "used_as": "_fn_80262368",
-   "addr": "80262368",
-   "size": 28,
-   "section": ".text",
-   "kind": "library",
-   "region": "AI/AX/MEM"
-  },
-  {
-   "name": "fn_80262384",
-   "refs": 1,
-   "files": 1,
-   "used_as": "_fn_80262384",
-   "addr": "80262384",
-   "size": 36,
-   "section": ".text",
-   "kind": "library",
-   "region": "AI/AX/MEM"
-  },
-  {
-   "name": "fn_802623A8",
-   "refs": 1,
-   "files": 1,
-   "used_as": "_fn_802623A8",
-   "addr": "802623A8",
-   "size": 5776,
-   "section": ".text",
-   "kind": "library",
-   "region": "AI/AX/MEM"
-  },
-  {
-   "name": "fn_80263F18",
-   "refs": 1,
-   "files": 1,
-   "used_as": "_fn_80263F18",
-   "addr": "80263F18",
-   "size": 52,
-   "section": ".text",
-   "kind": "library",
-   "region": "AI/AX/MEM"
-  },
-  {
-   "name": "fn_80263F4C",
-   "refs": 1,
-   "files": 1,
-   "used_as": "_fn_80263F4C",
-   "addr": "80263F4C",
-   "size": 96,
-   "section": ".text",
-   "kind": "library",
-   "region": "AI/AX/MEM"
-  },
-  {
-   "name": "fn_80263FAC",
-   "refs": 1,
-   "files": 1,
-   "used_as": "_fn_80263FAC",
-   "addr": "80263FAC",
-   "size": 64,
-   "section": ".text",
-   "kind": "library",
-   "region": "AI/AX/MEM"
-  },
-  {
-   "name": "fn_80264498",
-   "refs": 1,
-   "files": 1,
-   "used_as": "_fn_80264498",
-   "addr": "80264498",
-   "size": 112,
-   "section": ".text",
-   "kind": "library",
-   "region": "NAND/SC/IPC"
-  },
-  {
-   "name": "fn_80264508",
-   "refs": 1,
-   "files": 1,
-   "used_as": "_fn_80264508",
-   "addr": "80264508",
-   "size": 28,
-   "section": ".text",
-   "kind": "library",
-   "region": "NAND/SC/IPC"
-  },
-  {
-   "name": "fn_80264588",
-   "refs": 1,
-   "files": 1,
-   "used_as": "_fn_80264588",
-   "addr": "80264588",
-   "size": 32,
-   "section": ".text",
-   "kind": "library",
-   "region": "NAND/SC/IPC"
-  },
-  {
-   "name": "fn_802645A8",
-   "refs": 1,
-   "files": 1,
-   "used_as": "_fn_802645A8",
-   "addr": "802645A8",
-   "size": 20,
-   "section": ".text",
-   "kind": "library",
-   "region": "NAND/SC/IPC"
-  },
-  {
-   "name": "fn_802645BC",
-   "refs": 1,
-   "files": 1,
-   "used_as": "_fn_802645BC",
-   "addr": "802645BC",
-   "size": 32,
-   "section": ".text",
-   "kind": "library",
-   "region": "NAND/SC/IPC"
-  },
-  {
-   "name": "fn_80264A24",
-   "refs": 1,
-   "files": 1,
-   "used_as": "_fn_80264A24",
-   "addr": "80264A24",
-   "size": 80,
-   "section": ".text",
-   "kind": "library",
-   "region": "NAND/SC/IPC"
-  },
-  {
-   "name": "fn_80264CC8",
-   "refs": 1,
-   "files": 1,
-   "used_as": "_fn_80264CC8",
-   "addr": "80264CC8",
-   "size": 8,
-   "section": ".text",
-   "kind": "library",
-   "region": "NAND/SC/IPC"
-  },
-  {
-   "name": "fn_80264CD0",
-   "refs": 1,
-   "files": 1,
-   "used_as": "_fn_80264CD0",
-   "addr": "80264CD0",
-   "size": 8,
-   "section": ".text",
-   "kind": "library",
-   "region": "NAND/SC/IPC"
   },
   {
    "name": "fn_80264EE8",
@@ -5983,13 +5433,13 @@
   }
  ],
  "library_regions": {
-  "AI/AX/MEM": 58,
   "Network (DWC/SSL/NHTTP/NWC24)": 57,
-  "NAND/SC/IPC": 20,
+  "AI/AX/MEM": 24,
   "MSL C/C++ runtime": 19,
   "GX": 16,
   "WPAD/KPAD/BT": 9,
   "OS": 7,
+  "NAND/SC/IPC": 4,
   "DVD": 1
  }
 }
