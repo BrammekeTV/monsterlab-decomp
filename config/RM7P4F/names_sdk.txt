@@ -64,3 +64,13 @@ fn_802309E0 inflate
 fn_80232120 inflateEnd
 fn_802321A8 inflate_fast
 fn_802326C0 inflate_table
+# NET: the function name appears in its own debug/error string (DWC, NCD, NWC24, NHTTP)
+fn_8032683C NHTTPi_CheckCurrentThread
+fn_80320D10 NCDGetCurrentIfConfig
+fn_80320E08 NCDGetCurrentIpConfig
+fn_8032118C NCDiGetEnabledConfigList
+fn_8032292C NWC24iSetScriptMode
+fn_80322ACC NWC24iRequestGenerateUserId
+fn_80323164 NWC24iSetRtcCounter
+fn_80323574 NWC24iRequestShutdown
+fn_802EB5C4 DWCi_MatchInit
