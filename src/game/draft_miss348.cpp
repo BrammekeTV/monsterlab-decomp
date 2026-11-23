@@ -41,8 +41,8 @@ void  fn_8024B974(s32 a, s32 b, s32 c);                            // 0x8024B974
 void  fn_8024BDD4(u32 aa, u8* pattern, s32 vf, u8* vfilter);       // 0x8024BDD4: GXSetCopyFilter
 void  fn_8024C2F0(s32 a);                                          // 0x8024C2F0
 void  fn_8024C314(s32 chan, s32 enable, s32 ambSrc, s32 matSrc, s32 lightMask, s32 diffFn, s32 attnFn);  // 0x8024C314
-void  fn_8024C5C4(u8* obj, void* image, s32 w, s32 h, s32 fmt, s32 wrapS, s32 wrapT, s32 mip, s32 extra);  // 0x8024C5C4 (9th arg on the stack)
-void  fn_8024C91C(u8* obj, s32 id);                                // 0x8024C91C
+void  GXInitTexObjCI(u8* obj, void* image, s32 w, s32 h, s32 fmt, s32 wrapS, s32 wrapT, s32 mip, s32 extra);  // 0x8024C5C4 (9th arg on the stack)
+void  GXLoadTexObj(u8* obj, s32 id);                                // 0x8024C91C
 void  fn_8024C970(u8* obj, void* lut, s32 fmt, s32 n);             // 0x8024C970
 void  fn_8024C998(u8* obj, s32 id);                                // 0x8024C998
 void  fn_8024D59C(s32 a, s32 b, s32 c, s32 d, s32 e);             // 0x8024D59C
@@ -56,7 +56,7 @@ void  fn_8024DED8(s32 a, s32 b, s32 c, s32 d);                    // 0x8024DED8
 void  fn_8024DF80(s32 a, s32 b, s32 c);                            // 0x8024DF80
 void  fn_8024E1D0(f32* mtx, s32 a);                                // 0x8024E1D0
 void  fn_8024E328(s32 a);                                          // 0x8024E328
-s32   fn_8024F1E8(char* path, u8* p);                              // 0x8024F1E8
+s32   DVDOpen(char* path, u8* p);                              // 0x8024F1E8
 void  fn_80264420(u8* p);                                          // 0x80264420
 s32   fn_80264A24(u8* list, u8* item);                             // 0x80264A24 (unlink item from list)
 s32   fn_802728A4(s32 chan, u32* out);                             // 0x802728A4
@@ -228,8 +228,8 @@ void fn_801FC70C(void) {
     u8* t = lbl_805FBA78;
     fn_8024C970(sp18, *(void**)(t + 0x20), *(u8*)(t + 0x15), 0x10);
     fn_8024C998(sp18, 0);
-    fn_8024C5C4(sp28, *(void**)(t + 0x1C), *(u16*)(t + 0x4), *(u16*)(t + 0x6), *(u8*)(t + 0x14), 0, 0, 0, 0);
-    fn_8024C91C(sp28, 0);
+    GXInitTexObjCI(sp28, *(void**)(t + 0x1C), *(u16*)(t + 0x4), *(u16*)(t + 0x6), *(u8*)(t + 0x14), 0, 0, 0, 0);
+    GXLoadTexObj(sp28, 0);
     fn_8024B974(0x80, 4, 4);
     GXWGFifo._f32 = lbl_804FDA40[0];
     GXWGFifo._f32 = lbl_804FDA40[1];
@@ -618,7 +618,7 @@ s32 fn_8020390C(u8* arg0, u8* arg1) {
     }
     GameLog(1, 2, (const char*)(lbl_803865F0 + 0x5C8), buf);
     GameLog(1, 2, (const char*)(lbl_803865F0 + 0x594), buf);
-    if (fn_8024F1E8(buf, lbl_8051DAD0 + 0xC0) == 0) return -1;
+    if (DVDOpen(buf, lbl_8051DAD0 + 0xC0) == 0) return -1;
     lbl_805FBB9C = 0x10020;
     lbl_805FBB98 = (u8*)MEMAllocFromAllocator(&lbl_803F2870, 0x10020u);
     if (lbl_805FBB98 == NULL) return -1;

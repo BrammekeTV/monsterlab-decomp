@@ -51,11 +51,11 @@ void  fn_8024BB64(s32 a);                                       // 0x8024BB64
 void  fn_8024C140(s32 chan, u8* color);                         // 0x8024C140
 void  fn_8024C2F0(s32 a);                                       // 0x8024C2F0
 void  fn_8024C314(s32 chan, s32 enable, s32 ambSrc, s32 matSrc, s32 lightMask, s32 diffFn, s32 attnFn);  // 0x8024C314
-void  fn_8024C3B8(u8* obj, void* image, s32 w, s32 h, s32 fmt, s32 wrapS, s32 wrapT, s32 mip);  // 0x8024C3B8
-void  fn_8024C5C4(u8* obj, void* image, s32 w, s32 h, s32 fmt, s32 wrapS, s32 wrapT, s32 mip, s32 extra);  // 0x8024C5C4
-void  fn_8024C60C(u8* obj, s32 a, s32 b, s32 c, s32 d, s32 e, f32 f, f32 g, f32 h);  // 0x8024C60C
-void  fn_8024C72C(u8* obj, s32 a, s32 b);                       // 0x8024C72C
-void  fn_8024C91C(u8* obj, s32 id);                             // 0x8024C91C
+void  GXInitTexObj(u8* obj, void* image, s32 w, s32 h, s32 fmt, s32 wrapS, s32 wrapT, s32 mip);  // 0x8024C3B8
+void  GXInitTexObjCI(u8* obj, void* image, s32 w, s32 h, s32 fmt, s32 wrapS, s32 wrapT, s32 mip, s32 extra);  // 0x8024C5C4
+void  GXInitTexObjLOD(u8* obj, s32 a, s32 b, s32 c, s32 d, s32 e, f32 f, f32 g, f32 h);  // 0x8024C60C
+void  GXInitTexObjFilter(u8* obj, s32 a, s32 b);                       // 0x8024C72C
+void  GXLoadTexObj(u8* obj, s32 id);                             // 0x8024C91C
 void  fn_8024C970(u8* obj, void* lut, s32 fmt, s32 n);          // 0x8024C970
 void  fn_8024C998(u8* obj, s32 id);                             // 0x8024C998
 void  fn_8024D508(s32 a, s32 b);                                // 0x8024D508
@@ -412,9 +412,9 @@ void fn_802044C0(u8* tex, u32 color, f32 x0, f32 x1, f32 y0, f32 y1, f32 u0, f32
     fn_8024E1D0(proj, 1);
     fn_8024C970(tlut, *(void**)(tex + 0x1C), *(u8*)(tex + 0x11), 0x10);
     fn_8024C998(tlut, 0);
-    fn_8024C5C4(texObj, *(void**)(tex + 0x18), *(u16*)(tex + 0x0), *(u16*)(tex + 0x2), *(u8*)(tex + 0x10), 0, 0, 0, 0);
-    fn_8024C91C(texObj, 0);
-    fn_8024C72C(texObj, 0, 0);
+    GXInitTexObjCI(texObj, *(void**)(tex + 0x18), *(u16*)(tex + 0x0), *(u16*)(tex + 0x2), *(u8*)(tex + 0x10), 0, 0, 0, 0);
+    GXLoadTexObj(texObj, 0);
+    GXInitTexObjFilter(texObj, 0, 0);
     fn_80248420(scale, 1.0f, 1.0f, 1.0f);
     fn_8024E348(scale, 0x1E, 1);
     fn_8024AE74(1);
@@ -481,26 +481,26 @@ s32 fn_80205454(u8* arg0) {
             if (*(s32*)(rec + 0x118) != 0) {
                 *(u8**)(rec + 0x11C) = cur;
                 *(u32*)(rec + 0x120) = width;
-                fn_8024C3B8(obj, cur, (u16)width, (u16)*(u32*)(arg0 + 0x108), 1, 0, 0, 0);
-                fn_8024C60C(obj, 0, 0, 0, 0, 0, 0.0f, 0.0f, 0.0f);
+                GXInitTexObj(obj, cur, (u16)width, (u16)*(u32*)(arg0 + 0x108), 1, 0, 0, 0);
+                GXInitTexObjLOD(obj, 0, 0, 0, 0, 0, 0.0f, 0.0f, 0.0f);
             }
             if (*(s32*)(rec + 0x124) != 0) {
                 *(u8**)(rec + 0x128) = cur + planeB;
                 *(s32*)(rec + 0x12C) = height;
-                fn_8024C3B8(obj + 0x20, cur + planeB, (u16)height, (u16)*(u32*)(arg0 + 0x110), 1, 0, 0, 0);
-                fn_8024C60C(obj + 0x20, 0, 0, 0, 0, 0, 0.0f, 0.0f, 0.0f);
+                GXInitTexObj(obj + 0x20, cur + planeB, (u16)height, (u16)*(u32*)(arg0 + 0x110), 1, 0, 0, 0);
+                GXInitTexObjLOD(obj + 0x20, 0, 0, 0, 0, 0, 0.0f, 0.0f, 0.0f);
             }
             if (*(s32*)(rec + 0x130) != 0) {
                 *(u8**)(rec + 0x134) = cur + planeA;
                 *(s32*)(rec + 0x138) = height;
-                fn_8024C3B8(obj + 0x40, cur + planeA, (u16)height, (u16)*(u32*)(arg0 + 0x110), 1, 0, 0, 0);
-                fn_8024C60C(obj + 0x40, 0, 0, 0, 0, 0, 0.0f, 0.0f, 0.0f);
+                GXInitTexObj(obj + 0x40, cur + planeA, (u16)height, (u16)*(u32*)(arg0 + 0x110), 1, 0, 0, 0);
+                GXInitTexObjLOD(obj + 0x40, 0, 0, 0, 0, 0, 0.0f, 0.0f, 0.0f);
             }
             if (*(s32*)(rec + 0x13C) != 0) {
                 *(u8**)(rec + 0x140) = cur + planeC;
                 *(u32*)(rec + 0x144) = width;
-                fn_8024C3B8(obj + 0x60, cur + planeC, (u16)width, (u16)*(u32*)(arg0 + 0x108), 1, 0, 0, 0);
-                fn_8024C60C(obj + 0x60, 0, 0, 0, 0, 0, 0.0f, 0.0f, 0.0f);
+                GXInitTexObj(obj + 0x60, cur + planeC, (u16)width, (u16)*(u32*)(arg0 + 0x108), 1, 0, 0, 0);
+                GXInitTexObjLOD(obj + 0x60, 0, 0, 0, 0, 0, 0.0f, 0.0f, 0.0f);
             }
             rec += 0x30;
             obj += 0x80;

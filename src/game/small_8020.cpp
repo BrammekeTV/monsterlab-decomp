@@ -9,7 +9,7 @@ void  fn_80200920(void* p, s32 zero, s32 idx);                   // 0x80200920
 void  fn_802B4140(void* fn, s32* args);                          // 0x802B4140
 void  fn_802B7DDC(void);                                         // 0x802B7DDC
 void  fn_802BE220(void* h);                                      // 0x802BE220
-s32   fn_8024B34C(void);                                         // 0x8024B34C
+s32   GXReadDrawSync(void);                                         // 0x8024B34C
 s32   fn_80266E24(u8* buf);                                      // 0x80266E24
 void  fn_8023A5B0(u8* p);                                        // 0x8023A5B0
 void  fn_8023A68C(u8* p);                                        // 0x8023A68C
@@ -112,7 +112,7 @@ void fn_8020506C(u8* p) {
 
 // 0x80206308
 // Advances the index at +0x114 (wrapping at the count at +0x100) and, if the slot there is set,
-// polls fn_8024B34C until its low halfword no longer matches idx + 0x4444, then clears the slot.
+// polls GXReadDrawSync until its low halfword no longer matches idx + 0x4444, then clears the slot.
 // The advanced index is not written back (original behaviour).
 void fn_80206308(u8* p) {
     s32 idx = *(s32*)(p + 0x114) + 1;
@@ -122,7 +122,7 @@ void fn_80206308(u8* p) {
         s32 want = idx + 0x4444;
         s32 v;
         do {
-            v = fn_8024B34C();
+            v = GXReadDrawSync();
         } while ((v & 0xFFFF) == want);
         slots[idx] = 0;
     }

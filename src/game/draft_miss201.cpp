@@ -12,7 +12,7 @@ s32     RegisterScriptFunc(const char* name, s32 type, void* fn);      // 0x801D
 int     SysSprintf(char* buf, const char* fmt, ...);                    // 0x80142EF8
 void*   fn_80109330(const char* name);
 void    fn_8020F228(u8* p, s32 a2);
-s32     fn_8024F1E8(char* path, u8* p);
+s32     DVDOpen(char* path, u8* p);
 void    fn_8032F1E8(void* obj, void (*ctor)(void), void (*dtor)(void), s32 size, s32 count);
 f64     fn_8033E8EC(f64 x);
 s32 fn_801EACF4(u8* arg0, u8* arg1, f32 t);
@@ -105,7 +105,7 @@ s32 fn_80146A7C(u8* p, const char* path) {
     for (c = buf; *c != 0; c++) {
         if (*c == 0x5C) *c = 0x2F;
     }
-    if (fn_8024F1E8(buf, p) == 0) return 0;
+    if (DVDOpen(buf, p) == 0) return 0;
     *(s32*)(p + 0x48) = 0;
     *(s32*)(p + 0x3C) = *(s32*)(p + 0x34);
     *(s32*)(p + 0x40) = 0;

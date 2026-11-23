@@ -17,8 +17,8 @@ void   fn_8024A818(s32 a, s32 b, s32 c, s32 d, s32 e);            // 0x8024A818
 void   fn_8024AE74(s32 a);                                         // 0x8024AE74
 void   fn_8024BB64(s32 a);                                         // 0x8024BB64
 void   fn_8024C2F0(s32 a);                                         // 0x8024C2F0
-void   fn_8024C3B8(u8* obj, void* image, s32 w, s32 h, s32 fmt, s32 wrapS, s32 wrapT, s32 mip);  // 0x8024C3B8
-void   fn_8024C60C(u8* obj, s32 a, s32 b, s32 c, s32 d, s32 e, f32 f, f32 g, f32 h);  // 0x8024C60C
+void   GXInitTexObj(u8* obj, void* image, s32 w, s32 h, s32 fmt, s32 wrapS, s32 wrapT, s32 mip);  // 0x8024C3B8
+void   GXInitTexObjLOD(u8* obj, s32 a, s32 b, s32 c, s32 d, s32 e, f32 f, f32 g, f32 h);  // 0x8024C60C
 void   fn_8024D508(s32 a, s32 b);                                  // 0x8024D508
 void   fn_8024DA08(s32 a, s32 b, s32 c, s32 d);                    // 0x8024DA08
 void   fn_8024DB64(s32 a);                                         // 0x8024DB64
@@ -190,8 +190,8 @@ s32 fn_80205208(u8* buf, u8* texObj, s32* outWidth, s32* outHeight, s32 n) {
     fn_802050B0(tmp, n, (s32)width);
     fn_80205134(buf, tmp, (s32)width, 4, 2);
     DCFlushRange(buf, bytes);
-    fn_8024C3B8(texObj, buf, (s32)(u16)width, 4, 3, 1, 1, 0);
-    fn_8024C60C(texObj, 0, 0, 0, 0, 0, 0.0f, 0.0f, 0.0f);
+    GXInitTexObj(texObj, buf, (s32)(u16)width, 4, 3, 1, 1, 0);
+    GXInitTexObjLOD(texObj, 0, 0, 0, 0, 0, 0.0f, 0.0f, 0.0f);
     return (s32)bytes;
 }
 

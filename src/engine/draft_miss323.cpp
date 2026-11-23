@@ -68,8 +68,8 @@ void   fn_802062F0(u8* state);                                 // 0x802062F0
 void   fn_8020506C(u8* p);
 void   fn_80206308(u8* p);
 void   fn_8024BD5C(u8* color, u32 z);
-s32    fn_8024F1E8(char* path, u8* p);
-void   fn_8024F494(u8* p);
+s32    DVDOpen(char* path, u8* p);
+void   DVDClose(u8* p);
 void   fn_80253A48(u8* p, s32 a);                              // 0x80253A48
 void   fn_80257FA8(u8* voice);                                 // 0x80257FA8
 void   fn_802581A4(u8* voice, u32 a);                          // 0x802581A4
@@ -376,8 +376,8 @@ void fn_80201F38(void) {
         case 4:
             if (*(s32*)(s + 0xB8) != 0 && lbl_805FBAB4 == 0) break;
             if (lbl_805F98C1 != 0) {
-                fn_8024F494(s);
-                fn_8024F494(s + 0x3C);
+                DVDClose(s);
+                DVDClose(s + 0x3C);
             } else {
                 fn_801469FC(gAudio + 0x3C);
                 fn_801469FC(gAudio + 0x1E4);
@@ -608,7 +608,7 @@ void fn_80203340(u8* hdr, u8* voice, s32 streamed) {
 
 // 0x80203664
 // Loads "<name>.dsp" for music stream 'slot' (0/1) into an aligned buffer. With lbl_805F98C1 set the file
-// is opened through fn_8024F1E8 instead. Returns 0 on success, -1 on failure.
+// is opened through DVDOpen instead. Returns 0 on success, -1 on failure.
 s32 fn_80203664(u8* audio, const char* name, s32 slot) {
     char buf[0x80];
     s32 room = 0x7F - (s32)strlen(".dsp");
@@ -623,9 +623,9 @@ s32 fn_80203664(u8* audio, const char* name, s32 slot) {
     u8* file = NULL;
     if (lbl_805F98C1 != 0) {
         if (slot == 0) {
-            if (fn_8024F1E8(buf, lbl_8051DAD0) == 0) return -1;
+            if (DVDOpen(buf, lbl_8051DAD0) == 0) return -1;
         } else if (slot == 1) {
-            if (fn_8024F1E8(buf, lbl_8051DAD0 + 0x3C) == 0) return -1;
+            if (DVDOpen(buf, lbl_8051DAD0 + 0x3C) == 0) return -1;
         } else {
             return -1;
         }

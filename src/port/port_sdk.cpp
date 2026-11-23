@@ -52,7 +52,7 @@ s32 DVDGetDriveStatus(void) {
 }
 
 // DVDOpen
-s32 fn_8024F1E8(char* path, u8* infoBytes) {
+s32 DVDOpen(char* path, u8* infoBytes) {
     DVDFileInfo* info = (DVDFileInfo*)infoBytes;
     char host[MAX_PATH + 160];
     const char* rel = path;
@@ -86,7 +86,7 @@ s32 fn_8024F1E8(char* path, u8* infoBytes) {
 }
 
 // DVDClose
-void fn_8024F494(u8* infoBytes) {
+void DVDClose(u8* infoBytes) {
     DVDFileInfo* info = (DVDFileInfo*)infoBytes;
     if (info->startAddr == 0 || info->startAddr > 64) return;
     DvdFile* d = &sDvdFiles[info->startAddr - 1];
@@ -467,14 +467,14 @@ void fn_8024BC48(s32 mode) { STUB(GXSetDispCopyFrame2Field); }
 void fn_8024C108(void) { STUB(GXClearBoundingBox); }
 
 // Direct frame buffer access ("poke") settings and performance counters
-void fn_8024B4B0(s32 enable) { STUB(GXPokeColorUpdate); }
-void fn_8024B440(s32 enable) { STUB(GXPokeAlphaUpdate); }
-void fn_8024B4DC(s32 enable) { STUB(GXPokeDither); }
-void fn_8024B454(s32 type, s32 src, s32 dst, s32 op) { STUB(GXPokeBlendMode); }
-void fn_8024B418(s32 func, s32 threshold) { STUB(GXPokeAlphaMode); }
-void fn_8024B428(s32 mode) { STUB(GXPokeAlphaRead); }
-void fn_8024B4C4(s32 enable, s32 alpha) { STUB(GXPokeDstAlpha); }
-void fn_8024B4F0(s32 enable, s32 func, s32 update) { STUB(GXPokeZMode); }
+void GXPokeColorUpdate(s32 enable) { STUB(GXPokeColorUpdate); }
+void GXPokeAlphaUpdate(s32 enable) { STUB(GXPokeAlphaUpdate); }
+void GXPokeDither(s32 enable) { STUB(GXPokeDither); }
+void GXPokeBlendMode(s32 type, s32 src, s32 dst, s32 op) { STUB(GXPokeBlendMode); }
+void GXPokeAlphaMode(s32 func, s32 threshold) { STUB(GXPokeAlphaMode); }
+void GXPokeAlphaRead(s32 mode) { STUB(GXPokeAlphaRead); }
+void GXPokeDstAlpha(s32 enable, s32 alpha) { STUB(GXPokeDstAlpha); }
+void GXPokeZMode(s32 enable, s32 func, s32 update) { STUB(GXPokeZMode); }
 void fn_8024E60C(s32 perf0, s32 perf1) { STUB(GXSetGPMetric); }
 void fn_8024EE38(void) { STUB(GXClearGPMetric); }
 
@@ -545,13 +545,13 @@ int PortSelfTestSdk(void) {
         gPortOptions.dataDir = sub;
         u8 info[0x3C];
         u8* dst = (u8*)(uintptr_t)(PORT_MEM2_BASE + 0x02000000);
-        CHECK(fn_8024F1E8((char*)"/test.bin", info) == 1);
+        CHECK(DVDOpen((char*)"/test.bin", info) == 1);
         CHECK(*(u32*)(info + 0x34) == 4096);
         CHECK(DVDReadAsync(info, dst, 0x100, 0x800, (void*)TestReadDone, 2) == 1);
         for (int i = 0; i < 200 && sTestResult < 0; i++) PortWaitChange();
         CHECK(sTestResult == 0x100 && dst[0] == 0 && dst[0xFF] == 0xFF && *(s32*)(info + 0x0C) == 0);
-        fn_8024F494(info);
-        CHECK(fn_8024F1E8((char*)"/missing.bin", info) == 0);
+        DVDClose(info);
+        CHECK(DVDOpen((char*)"/missing.bin", info) == 0);
         gPortOptions.dataDir = savedDir;
         DeleteFileA(file);
         snprintf(file, sizeof(file), "%s\\files", sub);
