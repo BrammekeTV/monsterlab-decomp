@@ -67,13 +67,13 @@
   },
   {
    "title": "1080p & widescreen",
-   "detail": "Render at any resolution (1080p, 1440p, 4K) with internal resolution scaling; native 16:9 using the game's own widescreen support.",
-   "status": "todo"
+   "detail": "Renders at any resolution (--res, default 1920x1080) in 16:9 using the game's own widescreen mode, or 4:3; menus and logos keep their shape (or stretch like on a TV with an option). Done in PR #102.",
+   "status": "done"
   },
   {
    "title": "Settings GUI",
-   "detail": "In-game options overlay (F1) + config.ini: resolution, fullscreen, V-sync, FPS cap, render scale, MSAA, texture filtering, audio, controls.",
-   "status": "todo"
+   "detail": "In-game settings screen (F1 or Esc) built with Dear ImGui, saved to monsterlab.ini: resolution, aspect, stretched menus, V-sync, borderless fullscreen, stats overlay, volume and key rebinding (PR #105), plus an F3 stats overlay (PR #104). Still to add: FPS cap, render scale, MSAA, texture filtering and gamepad rebinding.",
+   "status": "in_progress"
   },
   {
    "title": "Own-disc setup (ISO picker)",
@@ -97,6 +97,21 @@
   }
  ],
  "changelog": [
+  {
+   "date": "2026-11-23",
+   "time": "20:20",
+   "text": "New test option for the Windows version (PR #106): --pointer X,Y@FRAME moves the Wii Remote pointer from a script, and the menu's cursor hand follows it. It's a first step towards selecting main-menu items with the mouse, which doesn't work yet; the menu is also still off-centre."
+  },
+  {
+   "date": "2026-11-23",
+   "time": "20:16",
+   "text": "Settings screen on Windows (PR #105): press F1 or Esc for display settings (resolution, 16:9 or 4:3, stretched menus, vsync, borderless fullscreen, stats overlay), volume and mute, and key rebinding: click a control, then press the new key. Settings are saved to monsterlab.ini next to the game. While the screen is open, the game doesn't get your keys or mouse."
+  },
+  {
+   "date": "2026-11-23",
+   "time": "20:11",
+   "text": "Stats overlay on Windows (PR #104): press F3, or start with --stats, for a panel in the top-right corner. It shows frames per second, frame time and its split into game, rendering and waiting, draw calls, effect copies, textures and audio voices. It's built with the open-source Dear ImGui library, which the settings screen will use next."
+  },
   {
    "date": "2026-11-23",
    "time": "20:07",

@@ -22,6 +22,7 @@
 #include "port/port.h"
 #include "port/port_gx.h"
 #include "port/port_input.h"
+#include "port/port_overlay.h"
 
 // WPAD button bits as KPADStatus.hold carries them.
 enum {
@@ -92,6 +93,26 @@ BOOL PortInputAddPress(const char* spec) {
     return TRUE;
 }
 
+// --pointer X,Y@FRAME: from that frame on the pointer is at output pixel X,Y (mapped exactly as the mouse;
+// a later entry moves it), for headless tests.
+struct ScriptedPointer { s32 from; f32 wx, wy; };
+static ScriptedPointer sPointer[32];
+static int sPointerCount;
+
+BOOL PortInputAddPointer(const char* spec) {
+    const char* at = strchr(spec, '@');
+    if (!at || sPointerCount >= 32) return FALSE;
+    char* e1; char* e2;
+    f32 x = (f32)strtod(spec, &e1);
+    if (*e1 != ',') return FALSE;
+    f32 y = (f32)strtod(e1 + 1, &e2);
+    if (e2 != at) return FALSE;
+    ScriptedPointer& p = sPointer[sPointerCount++];
+    p.from = atoi(at + 1);
+    p.wx = x; p.wy = y;      // output pixels; divided by the output size when sampled (--res may follow)
+    return TRUE;
+}
+
 // ------------------------------------------------------------------ XInput (loaded on demand)
 typedef DWORD (WINAPI* XInputGetStateFn)(DWORD, XINPUT_STATE*);
 static XInputGetStateFn sXInputGetState;
@@ -133,8 +154,18 @@ static void Sample(RemoteState* r) {
         if (sPress[i].sy) r->sy = sPress[i].sy;
     }
 
+    {
+        s32 best = -1;
+        for (int i = 0; i < sPointerCount; i++)
+            if (frame >= sPointer[i].from && (best < 0 || sPointer[i].from >= sPointer[best].from)) best = i;
+        if (best >= 0) {
+            PortGfxPointer(sPointer[best].wx / (gPortSettings.width > 0 ? gPortSettings.width : 1920), sPointer[best].wy / (gPortSettings.height > 0 ? gPortSettings.height : 1080), &r->px, &r->py);
+            r->pointerValid = TRUE;
+        }
+    }
+
     HWND wnd = PortGfxWindow();
-    BOOL focus = wnd && GetForegroundWindow() == wnd;
+    BOOL focus = wnd && GetForegroundWindow() == wnd && !gPortGuiOpen;   // the settings screen has the keyboard and mouse
     XINPUT_STATE pad;
     BOOL havePad = wnd && ReadPad(&pad);     // headless runs stay deterministic
     u32 padBits = 0;

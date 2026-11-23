@@ -15,6 +15,7 @@
 #include "port/port.h"
 #include "port/port_input.h"
 #include "port/port_gx.h"
+#include "port/port_overlay.h"
 
 // This file's start-up object must be built before every other static object: game code may
 // touch globals that live in the mapped address space from its own static initialisers.
@@ -25,7 +26,7 @@
 extern "C" u32 _ctors[];      // 0x80345AE0, resolved by port_gen.obj like every other Wii global
 
 PortOptions gPortOptions;
-PortSettings gPortSettings = {1920, 1080, TRUE, FALSE};
+PortSettings gPortSettings = {1920, 1080, TRUE, FALSE, FALSE, FALSE, 100, FALSE};
 
 // ------------------------------------------------------------------ log and boot summary
 struct Milestone { const char* what; u32 count; u32 ms; BOOL stub; };
@@ -189,6 +190,7 @@ static void InstallScriptTrace(void) {
     PortLog("script trace: %u script functions wrapped", n);
 }
 
+s64 gPortWaitTicks;
 s32 PortFrameCount(void) { return sFrames; }
 
 void PortFrameDone(void) {
@@ -802,6 +804,8 @@ static int SelfTest(void) {
     fails += PortSelfTestGx();
     fails += PortSelfTestAudio();
     fails += PortSelfTestZlib();
+    fails += PortSelfTestOverlay();
+    fails += PortSelfTestSettings();
 #undef CHECK
     PortLog("self-test: %u functions, %u linked; %s", gPortFuncCount, linked, fails ? "FAILED" : "ok");
     return fails;
@@ -846,6 +850,10 @@ struct PortBoot {
         gPortOptions.secondsLimit = 60;
         const char* asked = getenv("MONSTERLAB_DATA");
         BOOL sawFrames = FALSE, sawSeconds = FALSE;
+        // monsterlab.ini first, so the command line wins; the self-test runs without it.
+        BOOL ini = TRUE;
+        for (int i = 1; i < __argc && __argv; i++) if (!strcmp(__argv[i], "--selftest") || !strcmp(__argv[i], "--no-ini")) ini = FALSE;
+        if (ini && PortSettingsLoad(PortSettingsPath(), &gPortSettings)) fprintf(stderr, "[port] settings: %s\n", PortSettingsPath());
         for (int i = 1; i < __argc && __argv; i++) {
             const char* a = __argv[i];
             if (!strcmp(a, "--selftest")) gPortOptions.selfTest = TRUE;
@@ -864,6 +872,18 @@ struct PortBoot {
             else if (!strcmp(a, "--watch") && i + 1 < __argc) sWatch = strtoul(__argv[++i], NULL, 16);
             else if (!strcmp(a, "--show-texture") && i + 1 < __argc) gPortOptions.showTexture = atoi(__argv[++i]);
             else if (!strcmp(a, "--screenshot") && i + 1 < __argc) gPortOptions.screenshot = __argv[++i];
+            else if (!strcmp(a, "--stats")) gPortOverlayOn = TRUE;
+            else if (!strcmp(a, "--no-ini")) {}
+            else if (!strcmp(a, "--settings")) {                // open the settings screen at the start, optionally on a page
+                PortGuiSetOpen(TRUE);
+                if (i + 1 < __argc && __argv[i + 1][0] != '-') {
+                    const char* page = __argv[++i];
+                    gPortGuiPage = !strcmp(page, "audio") ? 1 : !strcmp(page, "controls") ? 2 : 0;
+                }
+            }
+            else if (!strcmp(a, "--vsync")) gPortSettings.vsync = TRUE;
+            else if (!strcmp(a, "--fullscreen")) gPortSettings.fullscreen = TRUE;
+            else if (!strcmp(a, "--screenshot-stats")) gPortOptions.screenshotStats = gPortOverlayOn = TRUE;
             else if (!strcmp(a, "--res") && i + 1 < __argc) {
                 int w = 0, h = 0;
                 if (sscanf(__argv[++i], "%dx%d", &w, &h) == 2 && w >= 320 && h >= 240 && w <= 8192 && h <= 8192) { gPortSettings.width = w; gPortSettings.height = h; }
@@ -875,6 +895,9 @@ struct PortBoot {
                 if (!strcmp(v, "16:9")) gPortSettings.wide = TRUE;
                 else if (!strcmp(v, "4:3")) gPortSettings.wide = FALSE;
                 else fprintf(stderr, "[port] --aspect %s: expected 4:3 or 16:9\n", v);
+            }
+            else if (!strcmp(a, "--pointer") && i + 1 < __argc) {
+                if (!PortInputAddPointer(__argv[++i])) fprintf(stderr, "[port] --pointer %s: expected X,Y@FRAME\n", __argv[i]);
             }
             else if (!strcmp(a, "--press") && i + 1 < __argc) {
                 if (!PortInputAddPress(__argv[++i])) fprintf(stderr, "[port] --press %s: expected BUTTON@FRAME[-FRAME]\n", __argv[i]);

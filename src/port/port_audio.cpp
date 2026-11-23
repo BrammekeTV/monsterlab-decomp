@@ -554,9 +554,10 @@ static void Output(const s16* frame) {
     if (!sWave || PortFastActive()) return;       // fast-forward: the device is not fed
     LONG wr = sRingWrite;
     if (wr - sRingRead > RING_SAMPLES / 2) { sStats.dropped++; return; }   // the device is behind: drop
+    s32 gain = gPortSettings.mute ? 0 : gPortSettings.volume;             // the settings screen's volume: the device only, not --wav
     for (int n = 0; n < AX_FRAME; n++) {
         s16* p = &sRing[((u32)(wr + n) % RING_SAMPLES) * 2];
-        p[0] = frame[n * 2]; p[1] = frame[n * 2 + 1];
+        p[0] = (s16)(frame[n * 2] * gain / 100); p[1] = (s16)(frame[n * 2 + 1] * gain / 100);
     }
     sRingWrite = wr + AX_FRAME;
 }
@@ -573,6 +574,13 @@ void PortAudioTick(void) {
         sStats.samplesOut += AX_FRAME;
         Output(frame);
     }
+}
+
+u32 PortAudioVoices(u32* outOf) {
+    u32 n = 0;
+    for (int i = 0; i < AX_VOICES; i++) if (sRun[i].running) n++;
+    if (outOf) *outOf = AX_VOICES;
+    return n;
 }
 
 const char* PortAudioStats(char* buf, u32 n) {
