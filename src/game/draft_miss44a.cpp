@@ -152,7 +152,7 @@ void SpawnParticleAtJunction(u32 a0, u32 a1) {
     u8* obj = ObjDbLookup(gObjDb, (s32)a1);
     // Copy the 0x408-byte object block (word by word) onto the stack.
     u32 words[0x102];
-    for (s32 off = 0; off <= 0x404; off += 4) *(u32*)((u8*)words + off) = *(u32*)(obj + off);
+    for (s32 off = 0; off <= 0x400; off += 4) *(u32*)((u8*)words + off) = *(u32*)(obj + off);
     Vec3* p = PathGetPosition((PathFollower*)words);
     f32 pos[3] = { p->x, p->y, p->z };
     fn_800D5B1C((u8*)words, (s32)a0, pos);
