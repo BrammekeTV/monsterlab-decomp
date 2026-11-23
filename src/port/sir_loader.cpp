@@ -356,7 +356,7 @@ extern "C" SirError GameDbConvert(SirReloc* r, u8* image, u32 imageSize, u32 dbW
 enum RegionKind {
     REGION_INPUT_TABLE, REGION_INPUT_STEP, REGION_TEXTURE_LIST, REGION_TEXTURE, REGION_STRING_TABLE,
     REGION_ACTION_TABLE, REGION_PTR_ARRAY, REGION_U32_ARRAY,
-    REGION_UI_ROOT, REGION_UI_FONT, REGION_UI_FONT_OBJ, REGION_UI_FONT_LIST, REGION_UI_DRAW, REGION_UI_PAD,
+    REGION_UI_ROOT, REGION_UI_FONT, REGION_UI_FONT_OBJ, REGION_UI_FONT_LIST, REGION_UI_FONT_DATA, REGION_UI_DRAW, REGION_UI_PAD,
     REGION_FSM, REGION_FSM_DEF, REGION_FSM_STATES, REGION_FSM_EVENTS, REGION_FSM_SHARED_EVENTS, REGION_FSM_NODE,
     REGION_FSM_TRANSITION, REGION_FSM_SHARED_TRANSITION, REGION_HUD, REGION_LEVEL_HUD,
     REGION_FX_BOLTS, REGION_FX_TRAILS, REGION_POOL, REGION_POOL_BLOCK,
@@ -780,6 +780,48 @@ static bool ImagePtrOk(u32 addr, u32 imageSize) {
     return addr == 0 || ImageSpan(addr, 1, imageSize, &off);
 }
 
+// Font data (what a kind 1 font object's +0x08 names; fn_8018979C, fn_80189EFC, fn_80189988,
+// fn_801894F4): bytes +0x00..+0x07 and +0x0D..., then u16 glyph count +0x08 and kerning count
+// +0x0A, 64 u16 hash buckets at +0x0C, `pages` (byte +3) page texture pointers at +0x8C, glyph
+// records of 0x10 bytes (four u16 first, count + 1 of them) and kerning records of 6 bytes (three
+// u16, count + 1 of them). The blobs in the file are big-endian; the game byte-swaps the ones it
+// reads from a file with fn_801894F4.
+#define UI_FONT_DATA_HEADER 0x8C
+#define UI_FONT_GLYPH_SIZE  0x10
+#define UI_FONT_KERN_SIZE   6
+
+static inline u32 Be16(const u8* p) {
+    return ((u32)p[0] << 8) | (u32)p[1];
+}
+
+static u32 UiFontDataSize(const u8* font) {
+    return UI_FONT_DATA_HEADER + (u32)font[3] * 4 + (Be16(font + 8) + 1) * UI_FONT_GLYPH_SIZE +
+           (Be16(font + 0xA) + 1) * UI_FONT_KERN_SIZE;
+}
+
+static SirError UiFontDataPlan(ImagePlan* plan, const u8* image, u32 imageSize, u32 addr) {
+    u32 off;
+    if (!ImageSpan(addr, UI_FONT_DATA_HEADER, imageSize, &off)) return SIR_ERR_UI;
+    if (PlanHas(plan, off, REGION_UI_FONT_DATA)) return SIR_OK;
+    const u8* font = image + off;
+    u32 size = UiFontDataSize(font), pagesEnd = UI_FONT_DATA_HEADER + (u32)font[3] * 4;
+    if (!ImageSpan(addr, size, imageSize, &off)) return SIR_ERR_UI;
+    for (u32 k = UI_FONT_DATA_HEADER; k < pagesEnd; k += 4)
+        if (!ImagePtrOk(Be32(font + k), imageSize)) return SIR_ERR_UI;
+    return PlanAdd(plan, off, size, REGION_UI_FONT_DATA) ? SIR_OK : SIR_ERR_UI;
+}
+
+static void UiFontDataConvert(SirReloc* r, u8* font) {
+    u32 glyphs = Be16(font + 8) + 1, kerns = Be16(font + 0xA) + 1, pages = font[3];
+    for (u32 k = 0x8; k < 0x8C; k += 2) { Swap16(font + k); r->fieldsSwapped++; }   // counts, buckets
+    for (u32 k = 0; k < pages; k++) ConvertPtr(r, font + UI_FONT_DATA_HEADER + k * 4);
+    u8* g = font + UI_FONT_DATA_HEADER + pages * 4;
+    for (u32 i = 0; i < glyphs; i++, g += UI_FONT_GLYPH_SIZE)
+        for (u32 k = 0; k < 8; k += 2) { Swap16(g + k); r->fieldsSwapped++; }
+    for (u32 i = 0; i < kerns; i++, g += UI_FONT_KERN_SIZE)
+        for (u32 k = 0; k < 6; k += 2) { Swap16(g + k); r->fieldsSwapped++; }
+}
+
 static SirError UiFontObjPlan(ImagePlan* plan, const u8* image, u32 imageSize, u32 addr) {
     u32 off;
     if (!ImageSpan(addr, UI_FONT_OBJ_SIZE_KIND0, imageSize, &off)) return SIR_ERR_UI;
@@ -791,6 +833,11 @@ static SirError UiFontObjPlan(ImagePlan* plan, const u8* image, u32 imageSize, u
     if (pages > UI_FONT_PAGES) return SIR_ERR_UI;
     for (u32 i = 0; i < pages; i++)
         if (!ImagePtrOk(Be32(image + off + 0x24 + i * 4), imageSize)) return SIR_ERR_UI;
+    u32 data = Be32(image + off + 0x08);
+    if (data != 0) {
+        SirError e = UiFontDataPlan(plan, image, imageSize, data);
+        if (e != SIR_OK) return e;
+    }
     return PlanAdd(plan, off, UI_FONT_OBJ_SIZE_KIND1, REGION_UI_FONT_OBJ) ? SIR_OK : SIR_ERR_UI;
 }
 
@@ -2401,6 +2448,7 @@ static void ImagePlanConvert(const ImagePlan* plan, SirReloc* r, u8* image, u32 
         case REGION_UI_FONT:      SirConvertRecord(r, p, g->size, kUiFontFields, COUNTOF(kUiFontFields)); break;
         case REGION_UI_FONT_OBJ:  UiFontObjConvert(r, p, g->size); break;
         case REGION_UI_FONT_LIST: SirConvertRecord(r, p, g->size, kUiFontListFields, COUNTOF(kUiFontListFields)); break;
+        case REGION_UI_FONT_DATA: UiFontDataConvert(r, p); break;
         case REGION_UI_DRAW:      SirConvertRecord(r, p, g->size, kUiDrawFields, COUNTOF(kUiDrawFields)); break;
         case REGION_UI_PAD:       SirConvertRecord(r, p, g->size, kUiPadFields, COUNTOF(kUiPadFields)); break;
         case REGION_FSM:          SirConvertRecord(r, p, g->size, kFsmFields, COUNTOF(kFsmFields)); break;

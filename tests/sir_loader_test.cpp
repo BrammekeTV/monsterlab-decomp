@@ -270,6 +270,27 @@ static void DumpUi(const GlobalBinaryFile* f) {
         }
         printf("\n");
     }
+    std::vector<const u8*> fontData;
+    for (const u8* obj : fontObjs)
+        if (*(const u32*)(obj + 4) == UI_FONT_KIND_1) AddUnique(fontData, *(const u8**)(obj + 8));
+    for (const u8* fd : fontData) {   // glyph tables: halfwords in host order, bytes as they are
+        u32 glyphs = *(const u16*)(fd + 8) + 1, kerns = *(const u16*)(fd + 0xA) + 1, pages = fd[3];
+        printf("uifontdata ");
+        PrintPtr((const u8*)&fd, f);
+        printf(" bytes ");
+        PrintRaw(fd, 8);
+        printf(" glyphs %u kerns %u buckets", glyphs, kerns);
+        for (u32 i = 0; i < 64; i++) printf(" %u", *(const u16*)(fd + 0xC + i * 2));
+        printf(" pages ");
+        PrintPtrs(fd + 0x8C, pages, f);
+        const u8* g = fd + 0x8C + pages * 4;
+        for (u32 i = 0; i < glyphs; i++, g += 0x10) {
+            printf(" g %u %u %u %u ", *(const u16*)g, *(const u16*)(g + 2), *(const u16*)(g + 4), *(const u16*)(g + 6));
+            PrintRaw(g + 8, 8);
+        }
+        for (u32 i = 0; i < kerns; i++, g += 6) printf(" k %u %u %d", *(const u16*)g, *(const u16*)(g + 2), *(const s16*)(g + 4));
+        printf("\n");
+    }
     const u8* draw = *(const u8**)(f->hdr + 0xDB8);
     printf("uidraw ");
     PrintPtr((const u8*)&draw, f);
@@ -1745,8 +1766,8 @@ static void Put16(u8* p, u16 v) {
 #define T_UI_ROOT   (T_ACT + 0x10)           // 0xA0
 #define T_FONT      (T_UI_ROOT + 0xA0)       // font 0xD0, then its object
 #define T_FONT_OBJ  (T_FONT + 0xD0)          // kind 1, 0x128 bytes
-#define T_FONT_DATA (T_FONT + 0x200)         // 0x10
-#define T_FONTLIST  (T_FONT_DATA + 0x10)     // 0x10
+#define T_FONT_DATA (T_FONT + 0x200)         // 0xB2: header 0x8C, one page pointer, two glyphs, one kerning record
+#define T_FONTLIST  (T_FONT_DATA + 0xC0)     // 0x10
 #define T_FONT_OBJ0 (T_FONTLIST + 0x10)      // kind 0, 0x0C bytes
 #define T_DRAW      (T_FONT_OBJ0 + 0x10)     // 0x408
 #define T_PAD       (T_DRAW + 0x410)         // 0x20
@@ -1926,7 +1947,19 @@ static void BuildUi(u8* hdr, u8* img) {
     Put32(obj + 0x24, T_ADDR(T_TEX0));
     Put32(obj + 0x28, T_ADDR(T_TEX1));
     Put32(obj + 0x124, 2);
-    Put32(img + T_FONT_DATA, 0x01020304);                     // font data: not converted yet
+    {   // font data (fn_8018979C): big-endian halfwords, one page, glyph 'A' (+ terminator), one kerning record
+        u8* fd = img + T_FONT_DATA;
+        fd[0] = 1; fd[1] = 0x0D; fd[2] = 0x21; fd[3] = 1; fd[4] = 1;
+        Put16(fd + 0x08, 1);                                  // glyph count (records: count + 1)
+        Put16(fd + 0x0A, 0);                                  // kerning count (records: count + 1)
+        for (u32 k = 0; k < 64; k++) Put16(fd + 0x0C + k * 2, k == 1 ? 0 : 1);
+        Put32(fd + 0x8C, T_ADDR(T_TEX0) + 4);                 // the page texture
+        u8* g = fd + 0x90;
+        Put16(g + 0x00, 0x41); Put16(g + 0x02, 0x0102); Put16(g + 0x04, 0x0304); Put16(g + 0x06, 0);
+        g[8] = 9; g[9] = 8; g[0xF] = 3;
+        u8* k = fd + 0xB0;
+        Put16(k + 0, 0x41); Put16(k + 2, 0x42); Put16(k + 4, 0xFFFE);
+    }
 
     u8* list = img + T_FONTLIST;
     Put32(list + 0x00, 1);
@@ -2878,7 +2911,7 @@ static int SelfTest(void) {
     // The byte field and the fill behind it are untouched (a blind word swap would move 0xAB).
     CHECK(b->rows[4] == 0xAB && b->rows[5] == 0x80 && b->rows[6] == 0x00 && b->rows[7] == 0x01);
     CHECK(a->buildAddr[0] == T_FN_A && a->buildAddr[1] == T_FN_B);
-    CHECK(r.ptrImage == 4 + T_OBJECT_PTRS && r.ptrDolResolved == 0 && r.ptrDolKept == 0 && r.ptrUnknown == 0);
+    CHECK(r.ptrImage == 5 + T_OBJECT_PTRS && r.ptrDolResolved == 0 && r.ptrDolKept == 0 && r.ptrUnknown == 0);
 
     // Input table, read the way RemoteInputGet, RemoteInputUpdate and the step classes do.
     {
@@ -2952,7 +2985,16 @@ static int SelfTest(void) {
         CHECK(*(const u8**)(obj + 8) == img + T_FONT_DATA && *(const s32*)(obj + 0x124) == 2);
         CHECK(*(const u8**)(obj + 0x24) == img + T_TEX0 && *(const u8**)(obj + 0x28) == img + T_TEX1);
         CHECK(obj[0x2C] == 0x7F && obj[0x2F] == 0x01);                             // unused page slot: untouched
-        CHECK(img[T_FONT_DATA] == 0x01 && img[T_FONT_DATA + 3] == 0x04);           // font data: not converted
+        {   // font data: halfwords in host order, the page pointer converted, bytes untouched
+            const u8* fd = img + T_FONT_DATA;
+            CHECK(fd[0] == 1 && fd[1] == 0x0D && fd[2] == 0x21 && fd[3] == 1);
+            CHECK(*(const u16*)(fd + 0x08) == 1 && *(const u16*)(fd + 0x0A) == 0);
+            CHECK(*(const u16*)(fd + 0x0C) == 1 && *(const u16*)(fd + 0x0E) == 0 && *(const u16*)(fd + 0x8A) == 1);
+            CHECK(*(const u8**)(fd + 0x8C) == img + T_TEX0 + 4);
+            CHECK(*(const u16*)(fd + 0x90) == 0x41 && *(const u16*)(fd + 0x92) == 0x0102 && *(const u16*)(fd + 0x94) == 0x0304);
+            CHECK(fd[0x98] == 9 && fd[0x99] == 8 && fd[0x9F] == 3);
+            CHECK(*(const u16*)(fd + 0xB0) == 0x41 && *(const u16*)(fd + 0xB2) == 0x42 && *(const s16*)(fd + 0xB4) == -2);
+        }
         const u8* list = *(const u8**)(hdr + 0xDB4);
         const u8* obj0 = *(const u8**)(list + 4);
         CHECK(list == img + T_FONTLIST && obj0 == img + T_FONT_OBJ0 && *(const u8**)(list + 8) == obj);
@@ -3065,7 +3107,7 @@ static int SelfTest(void) {
         CHECK(*(u32*)(rec + 0x08) == T_FN_A && *(u32*)(rec + 0x0C) == 0x930DDD40 && *(void**)(rec + 0x10) == NULL);
         CHECK(*(u16*)(rec + 0x14) == 0x1234 && *(s16*)(rec + 0x16) == -2 && *(f32*)(rec + 0x18) == 1.0f);
         CHECK(rec[0x1C] == 0xEE && rec[0x1F] == 0xEE);
-        CHECK(r.ptrImage == 5 + T_OBJECT_PTRS && r.ptrDolResolved == 1 && r.ptrDolKept == 1 && r.ptrUnknown == 1);
+        CHECK(r.ptrImage == 6 + T_OBJECT_PTRS && r.ptrDolResolved == 1 && r.ptrDolKept == 1 && r.ptrUnknown == 1);
         static const SirField outside[] = { { 0x1E, SIR_U32, 1 } };
         CHECK(!SirConvertRecord(&r, rec, sizeof(rec), outside, 1));
     }
@@ -3120,6 +3162,7 @@ static int SelfTest(void) {
         { T_POOL_NODES + 0x04, T_ADDR(T_FXBOLT), SIR_ERR_POOL, -1 },                        // node links out of the pool
         { T_POOL + 0x00, 3, SIR_ERR_POOL, -1 },                                             // third node would be the fill behind the block
         { T_UI_ROOT + 0x14, T_ADDR(T_SIZE - 0x40), SIR_ERR_UI, -1 },                        // font runs off the image
+        { T_FONT_OBJ + 0x08, T_ADDR(T_SIZE - 0x40), SIR_ERR_UI, -1 },                      // font data runs off the image
         { T_FONT_OBJ + 0x04, 2, SIR_ERR_UI, -1 },                                           // font object of no known class
         { T_FONT_OBJ + 0x124, UI_FONT_PAGES + 1, SIR_ERR_UI, -1 },                          // more pages than slots
         { T_FONT_OBJ + 0x28, 0x12345678, SIR_ERR_UI, -1 },                                  // page outside the image
