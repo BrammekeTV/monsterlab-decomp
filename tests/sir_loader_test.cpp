@@ -778,7 +778,10 @@ struct ZoneDump {
         printf("skeleton "); Val(s); printf(" bones "); Ptr(s + 4); printf(" %u sum %08x ops ", n, sum); Ptr(s + 0xC); printf(" :");
         if (n != 0 && In(ops, n * 8)) { for (u32 i = 0; i < n; i++) printf(" %u", *(const u32*)(ops + i * 8 + 4)); }
         else printf(" -");
-        printf(" player "); Ptr(s + 0x14); printf(" block "); Ptr(s + 0x18); printf(" root "); Ptr(s + 0x1C); printf("\n");
+        printf(" player "); Ptr(s + 0x14); printf(" block "); Ptr(s + 0x18); printf(" root "); Ptr(s + 0x1C); printf(" a "); Ptr(s);
+        u32 asum = 0;
+        if (n != 0 && In(*(const u8**)s, n * 0x30)) for (u32 i = 0; i < n * 12; i++) asum += (*(const u32**)s)[i];
+        printf(" sum %08x\n", asum);
         SkelPlayer(*(const u8**)(s + 0x14));
     }
     void AnimObj(const u8* a) {

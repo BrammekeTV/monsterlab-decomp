@@ -1001,8 +1001,10 @@ def zone_dump(L, sec, base, hud, roots, scene_roots, pooltabs, records=(), lists
         n, bones, ops = u(o + 8), u(o + 4), u(o + 0xC)
         bsum = sum(u(off(bones) + i * 4) for i in range(n * 12)) & 0xFFFFFFFF if n and inz(bones, n * 0x30) else 0
         opl = ' '.join('%d' % u(off(ops) + i * 8 + 4) for i in range(n)) if n and inz(ops, n * 8) else '-'
-        L.append('skeleton %s bones %s %d sum %08x ops %s : %s player %s block %s root %s' % (
-            ptr(s), ptr(bones), n, bsum, ptr(ops), opl, ptr(u(o + 0x14)), ptr(u(o + 0x18)), ptr(u(o + 0x1C))))
+        am = u(o)
+        asum = sum(u(off(am) + i * 4) for i in range(n * 12)) & 0xFFFFFFFF if n and inz(am, n * 0x30) else 0
+        L.append('skeleton %s bones %s %d sum %08x ops %s : %s player %s block %s root %s a %s sum %08x' % (
+            ptr(s), ptr(bones), n, bsum, ptr(ops), opl, ptr(u(o + 0x14)), ptr(u(o + 0x18)), ptr(u(o + 0x1C)), ptr(am), asum))
         skel_player(u(o + 0x14))
     def anim_obj(a):
         if not inz(a, 0xF4) or a in animobjs: return
