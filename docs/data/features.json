@@ -99,6 +99,11 @@
  "changelog": [
   {
    "date": "2026-11-23",
+   "time": "20:20",
+   "text": "New test option for the Windows version (PR #106): --pointer X,Y@FRAME moves the Wii Remote pointer from a script, and the menu's cursor hand follows it. It's a first step towards selecting main-menu items with the mouse, which doesn't work yet; the menu is also still off-centre."
+  },
+  {
+   "date": "2026-11-23",
    "time": "20:16",
    "text": "Settings screen on Windows (PR #105): press F1 or Esc for display settings (resolution, 16:9 or 4:3, stretched menus, vsync, borderless fullscreen, stats overlay), volume and mute, and key rebinding: click a control, then press the new key. Settings are saved to monsterlab.ini next to the game. While the screen is open, the game doesn't get your keys or mouse."
   },
