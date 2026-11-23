@@ -364,7 +364,7 @@ void fn_8012FFA4(void) {
 
 // 0x80138864
 // Returns element idx (0x30 bytes each, array at +0xB0) when idx is below the sum of the global
-// settings' twelve count fields, else NULL.
+// settings' thirteen count fields, else NULL.
 u8* fn_80138864(u8* obj, s32 idx) {
     s32 ok = 0;
     if (idx >= 0) {

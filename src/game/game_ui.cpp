@@ -195,7 +195,7 @@ void UiInit(void) {
     gStringTable = (StringTable*)SIR_PTR(0xDA8);
 
     void** screens = (void**)SIR_SCREENS;
-    if (screens != NULL && screens[0] != NULL) ScreenMgrLoad(screens);
+    if (screens != NULL && screens[0] != NULL) ScreenMgrLoad(screens[0]);
 
     HudInit(SIR_HUD, &SIR_SCREENS);
     HudReset(SIR_HUD);

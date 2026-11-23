@@ -53,7 +53,7 @@ struct GameState {
 void HudReload(u8* obj) {
     u8* hud = *(u8**)(obj + 0x14);
     void** screens = *(void***)(hud + 0x434);
-    if (screens != NULL && screens[0] != NULL) ScreenMgrLoad(screens);
+    if (screens != NULL && screens[0] != NULL) ScreenMgrLoad(screens[0]);
     HudReset(*(u8**)(obj + 0x14));
 }
 

@@ -34,8 +34,8 @@ s32   WorldGetPhase(void* world);              // 0x800D83A8
 void  Vec3Zero(Vec3* v);                       // 0x800DB944
 void  Vec3Forward(Vec3* v);                    // 0x800DB888
 void  Vec3Up(Vec3* v);                         // 0x800DB8D4
-void  MtxGetForward(const f32* rot, Vec3* out);    // 0x801453BC
-Vec3  MtxGetUp(const f32* rot);                // 0x801455E0
+void  QuatGetAxisXY(const Quat* q, Vec3* out);   // 0x801453BC
+void  fn_801455E0(f32* out, u8* quat);         // 0x801455E0 (up vector of a quaternion)
 void  AudioSetListenerPos(int id, const Vec3* v);  // 0x8020AA04
 void  AudioSetListenerFwd(int id, const Vec3* v);  // 0x8020AA3C
 void  AudioSetListenerUp(int id, const Vec3* v);   // 0x8020AA68
@@ -407,8 +407,8 @@ void AudioUpdateListener(void) {
         WorldGetPhase(world) == 2 && !lbl_805FB0E1) {
         Transform* xf = player->xform;
         pos = xf->pos;
-        MtxGetForward((const f32*)&xf->rot, &fwd);
-        up = MtxGetUp((const f32*)&player->xform->rot);
+        QuatGetAxisXY(&xf->rot, &fwd);
+        fn_801455E0((f32*)&up, (u8*)&player->xform->rot);
     }
 
     AudioSetListenerPos(0, &pos);
