@@ -30,9 +30,10 @@ void fn_80156CDC(s32 idx, s32 flag, void** c, u32** out) {
         u8* col = cols;
         for (s32 row = 0; row < 0x12; row++) {
             f32 y = 1.0f + (-2.0f * (0.05882353f * (f32)row));
-            for (s32 n = 4; n != 0; n--) {
+            // 32 columns, written eight at a time; the column number runs on across the groups.
+            for (s32 first = 0; first < 0x20; first += 8) {
                 for (s32 k = 0; k < 8; k++) {
-                    *(f32*)(v + k * 0xC + 0x0) = (2.0f * (0.032258064f * (f32)k)) - 1.0f;
+                    *(f32*)(v + k * 0xC + 0x0) = (2.0f * (0.032258064f * (f32)(first + k))) - 1.0f;
                     *(f32*)(v + k * 0xC + 0x4) = y;
                     *(f32*)(v + k * 0xC + 0x8) = 1.0f;
                     *(s32*)(col + k * 4) = -1;
