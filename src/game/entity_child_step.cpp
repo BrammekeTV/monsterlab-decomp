@@ -16,6 +16,7 @@ void fn_801B512C(u8* ent, f32 dt);
 // record flags (+0x20) have bit 0 or bit 1 set gets the frame time at +0x24 and its clock at +0x28
 // advanced, and its node is refreshed (fn_801B75AC); with bit 0 set its own step (vtable +0x20)
 // runs as well.
+void EntityTick(void* e, f32 dt);   // world_update.cpp
 void fn_801B512C(u8* ent, f32 dt) {
     typedef void (*ChildStepFn)(u8* self, s32 arg, f32 dt);
     for (u8* node = *(u8**)(ent + 0xB0); node != NULL; node = *(u8**)(node + 0x8)) {
@@ -26,7 +27,7 @@ void fn_801B512C(u8* ent, f32 dt) {
         *(f32*)(child + 0x28) = *(f32*)(child + 0x28) + dt;
         fn_801B75AC(node);
         if (*(u32*)(*(u8**)(child + 0x4) + 0x20) & 1) {
-            (*(ChildStepFn*)(*(u8**)child + 0x20))(child, 0, dt);
+            EntityTick(child, dt);
         }
     }
 }

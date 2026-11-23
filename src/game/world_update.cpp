@@ -151,6 +151,19 @@ typedef BOOL  (*ActivateFn)(Character*, int, int);
 typedef void  (*VoidIntFn)(Character*, int);
 typedef void  (*VoidFn)(Character*);
 typedef void  (*TickFn)(Character*, int, f32);
+
+// Entity update, vtable slot 0x20: the PowerPC passes (this, r4 = 0, f1 = dt) and each class reads what
+// it needs, since ints and floats use separate registers. Positional arguments differ per class here, so
+// the call is made with the signature of the class: the player (fn_8004BE38) and fn_8005CB40 take an
+// extra int, every other class takes (this, dt). Vtables hold the original addresses.
+extern "C" void fn_8004BE38(u8* c, s32 team, f32 dt);
+extern "C" void fn_8005CB40(u8* p, f32 dt, s32 arg);
+extern "C" void EntityTick(void* e, f32 dt) {
+    void* fn = (*(void***)e)[0x20 / 4];
+    if ((uintptr_t)fn == 0x8004BE38u) fn_8004BE38((u8*)e, 0, dt);
+    else if ((uintptr_t)fn == 0x8005CB40u) fn_8005CB40((u8*)e, dt, 0);
+    else ((void (*)(void*, f32))fn)(e, dt);
+}
 typedef void  (*StepFn)(Character*, f32);
 typedef u8*   (*GetVisualFn)(Character*);
 typedef void  (*StartActionFn)(Character*, Character*, int, int, int, f32);
@@ -426,7 +439,7 @@ extern "C" void WorldTick(WorldState* w, f32 dt) {
                 if (!(rec->stateFlags & 1) || e == NULL || EntityIsFrozen(e)) return TRUE;
                 e->dt = (e == (Character*)w->data->player) ? playerDt : worldDt;
                 *(f32*)((u8*)e + 0x28) += e->dt;
-                VCALL(e, 0x20, TickFn)(e, 0, e->dt);
+                EntityTick(e, e->dt);
                 return TRUE;
             });
         }
