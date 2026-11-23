@@ -2627,7 +2627,7 @@ static void LevelSelfTest(void) {
         Put32(sh + CHILD + 0x074, 0x44200000); Put32(sh + CHILD + 0x0A8, 0x0003FFFF); Put32(sh + CHILD + 0x0AC, 0x0003FFFF);
         Put32(sh + CHILD + 0x0C0, 0x3F800000); Put32(sh + CHILD + 0x11C, 0x3F800000); Put32(sh + CHILD + 0x128, SH + WIDGET);
         Put32(sh + CHILD + 0x060, 3); Put32(sh + CHILD + 0x13C, 1);
-        Put32(sh + CHILD + 0x15C, SH + LIST);
+        Put32(sh + CHILD + 0x15C, SH + LIST); Put32(sh + CHILD + 0x160, 0);                       // its fill picture: none
         Put32(sh + LIST + 0x00, 1); Put32(sh + LIST + 0x04, 2); Put32(sh + LIST + 0x08, 4); Put32(sh + LIST + 0x10, SH + ITEMS);
         Put32(sh + ITEMS, SH + WIDGET);
         SirReloc rs;

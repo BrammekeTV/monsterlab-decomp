@@ -364,7 +364,7 @@ enum RegionKind {
     REGION_ENTITY_PROP, REGION_PROP_DEF, REGION_KEY_PTR,
     REGION_UI_TREE_NODE, REGION_UI_LIST, REGION_UI_WIDGET, REGION_UI_EVENT, REGION_UI_GRID, REGION_UI_FIXED,
     REGION_UI_SET, REGION_UI_SCREEN, REGION_UI_GRAPHIC, REGION_UI_TEXT,
-    REGION_LOCATORS,
+    REGION_LOCATORS, REGION_UI_SLIDER,
     REGION_ZONE_EFFECT, REGION_ANIM_SET, REGION_ANIM_DEFS, REGION_U16_ARRAY, REGION_ANIM_OBJ, REGION_SKELETON, REGION_BONE_OPS,
     REGION_UI_ANIM, REGION_UI_ANIM_TRACK, REGION_UI_ANIM_EVENTS, REGION_UI_ANIM_KEYS, REGION_UI_ANIM_ENTRIES,
     REGION_ZONE_SYSTEM, REGION_ANIM_PLAYER, REGION_ANIM_ELEM, REGION_ANIM_TRACK, REGION_ANIM_KEYS, REGION_F32_ARRAY,
@@ -2233,6 +2233,16 @@ static const SirField kUiTextFields[] = {
 #define UI_TEXT_AT   0x13C
 #define UI_TEXT_SIZE 0xB4
 
+// What a slider (kind 3, sub-kind 0-2 at +0x13C) has from +0x13C on, offsets from +0x13C: the target
+// value (+0x140), the shown one and the speed it moves at (fn_801A4414: +0x144, +0x158), floats
+// (+0x148 to +0x154), the list of its picture widgets (+0x15C, fixed up by fn_8019914C), the fill
+// picture among them (+0x160), its scale (+0x164) and two floats that hold the "not set" NaN
+// (+0x168, +0x16C). The widget ends at +0x170, where its list begins.
+static const SirField kUiSliderFields[] = {
+    { 0x00, SIR_U32, 1 }, { 0x04, SIR_F32, 7 }, { 0x20, SIR_PTR, 2 }, { 0x28, SIR_F32, 3 },
+};
+#define UI_SLIDER_SIZE 0x34
+
 // A list of the UI code: +0x00 count (fn_8019555C), +0x04 capacity, +0x08 element size and +0x10
 // the elements (fn_8019552C). The widget lists hold pointers.
 static const SirField kUiListFields[] = {
@@ -2335,11 +2345,11 @@ static SirError UiFixupPlan(ImagePlan* plan, const u8* image, u32 imageSize, u32
     u32 kind = Be32(image + o + 0x60);
     u32 need = kind == 2 ? 0x140 : kind == 3 ? 0x160 : kind == 4 ? 0x1C0 : kind == 5 ? 0x194 : 0;
     if ((u64)o + need > imageSize) return SIR_ERR_SCREENS;
-    if ((kind == 2 || kind == 3) && !PlanAdd(plan, o + 0x13C, 4, REGION_U32_ARRAY)) return SIR_ERR_SCREENS;
+    if (kind == 2 && !PlanAdd(plan, o + 0x13C, 4, REGION_U32_ARRAY)) return SIR_ERR_SCREENS;
     if (kind == 2 && Be32(image + o + 0x13C) == 4) {
         e = UiSlideshowPlan(plan, image, imageSize, o);
     } else if (kind == 3) {
-        if (!PlanAdd(plan, o + 0x15C, 4, REGION_PTR_ARRAY)) return SIR_ERR_SCREENS;
+        if ((u64)o + 0x13C + UI_SLIDER_SIZE > imageSize || !PlanAdd(plan, o + 0x13C, UI_SLIDER_SIZE, REGION_UI_SLIDER)) return SIR_ERR_SCREENS;
         e = UiListPlan(plan, image, imageSize, Be32(image + o + 0x15C), UI_LIST_WIDGETS, depth);
     } else if (kind == 4) {
         if (!PlanAdd(plan, o + 0x1B4, 4, REGION_PTR_ARRAY) || !PlanAdd(plan, o + 0x1BC, 4, REGION_PTR_ARRAY)) return SIR_ERR_SCREENS;
@@ -2524,6 +2534,7 @@ static void ImagePlanConvert(const ImagePlan* plan, SirReloc* r, u8* image, u32 
         case REGION_TEXTURE:      SirConvertRecord(r, p, g->size, kTextureFields, COUNTOF(kTextureFields)); break;
         case REGION_STRING_TABLE: SirConvertRecord(r, p, g->size, kStringTableFields, COUNTOF(kStringTableFields)); break;
         case REGION_ACTION_TABLE: SirConvertRecord(r, p, g->size, kActionTableFields, COUNTOF(kActionTableFields)); break;
+        case REGION_UI_SLIDER:    SirConvertRecord(r, p, g->size, kUiSliderFields, COUNTOF(kUiSliderFields)); break;
         case REGION_PTR_ARRAY:
             for (u32 k = 0; k < g->size; k += 4) ConvertPtr(r, p + k);
             break;
