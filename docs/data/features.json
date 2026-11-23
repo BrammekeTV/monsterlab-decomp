@@ -99,6 +99,11 @@
  "changelog": [
   {
    "date": "2026-11-23",
+   "time": "14:09",
+   "text": "Fixed the 13 functions that broke the castle view on Windows (PR #82). They were set up to return a number they never actually return, so the PC's maths stack filled up. With the fix, the castle level's camera stays valid and the game reaches its title state without crashing. The title screen itself doesn't draw yet: that's renderer work."
+  },
+  {
+   "date": "2026-11-23",
    "time": "13:56",
    "text": "Found why the castle view broke on Windows (PR #81): some of our generated functions leave a stray number on the PC processor's maths stack, and once eight pile up every calculation comes out as 'not a number'. Added a check that catches the leak and a tool that lists the 13 functions causing it. Fixing them comes next."
   },
