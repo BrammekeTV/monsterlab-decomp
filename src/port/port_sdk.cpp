@@ -147,20 +147,10 @@ const char* PortSoftSdk(u32 addr) {
         {0x80264EE8, "audio: mixer init (fn_80264EE8)"},
         {0x80264F70, "audio: sequencer init (fn_80264F70)"},
         {0x8027FF24, "KPADReset (fn_8027FF24)"},
-        // The game's audio init (fn_801FCFB4) and its effect set-up (fn_80203E8C). No sound yet.
-        {0x8026099C, "audio: mixer set-up (fn_8026099C)"},
-        {0x80263F18, "audio: sequencer defaults (fn_80263F18)"},
-        {0x80259418, "audio: AX mode setter (fn_80259418)"},
-        {0x80260AC4, "audio: mixer sound mode setter (fn_80260AC4)"},
+        // The effects on AX's aux buses (the game's set-up is fn_80203E8C): not mixed on PC.
         {0x8025D2E0, "audio: AXFX effect init (fn_8025D2E0)"},
         {0x8025E3E4, "audio: AXFX effect init (fn_8025E3E4)"},
         {0x8025B4C0, "audio: AXFX effect init (fn_8025B4C0)"},
-        {0x80264CC8, "audio: sequencer float setter (fn_80264CC8)"},
-        {0x80264CD0, "audio: sequencer float setter (fn_80264CD0)"},
-        {0x80263FAC, "audio: sequencer frame, no mixer yet (fn_80263FAC)"},
-        {0x802623A8, "audio: mixer frame, no mixer yet (fn_802623A8)"},
-        {0x8025B398, "audio: AX getter, no mixer yet (fn_8025B398)"},
-        {0x8025B390, "audio: AX getter, no mixer yet (fn_8025B390)"},
         // OSSetPeriodicAlarm: its only caller so far is the audio tick (fn_80202CAC), which needs AX.
         {0x80234394, "OSSetPeriodicAlarm for the audio tick (OSSetPeriodicAlarm): not started"},
         // The SDK's HOME-button menu library (HBM), used by HomeButtonInit and the game's
@@ -474,7 +464,7 @@ void fn_80248050(f32* mtx) {
     mtx[0] = mtx[5] = mtx[10] = 1.0f;
 }
 
-// ------------------------------------------------------------------ SC, AI, AX, WPAD, KPAD
+// ------------------------------------------------------------------ SC, WPAD, KPAD (AI, AX: port_audio.cpp)
 void SCInit(void) { PortMilestone("SCInit"); }
 s32  SCCheckStatus(void) { return 0; }           // settings are loaded
 u8   SCGetAspectRatio(void) { return 1; }        // 16:9
@@ -484,8 +474,6 @@ u8   SCGetProgressiveMode(void) { return 0; }
 // SCGetEuRgb60Mode: on, so a PAL game runs at 60 Hz with 480 lines
 u8   SCGetEuRgb60Mode(void) { return 1; }
 
-void AIInit(u8* stack) { STUB(AIInit); }
-void AXInit(void) { STUB(AXInit); }
 
 static WPADAlloc sWpadAlloc;
 static WPADFree  sWpadFree;

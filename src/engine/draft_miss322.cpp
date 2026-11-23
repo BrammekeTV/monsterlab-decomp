@@ -115,18 +115,18 @@ void  fn_80203340(u8* data, s32 handle, s32 flag);               // 0x80203340
 s32   fn_8020390C(u8* audio, u8* name);                          // 0x8020390C
 s32 fn_802095B0(u8* arg0, void* arg1, void* arg2, void* arg3);          // 0x802095B0
 s32   AXAcquireVoice(s32 priority, void* cb, void* ctx);            // 0x80258024
-s32   fn_80263FEC(u8* p, s32 handle, s32 a);                     // 0x80263FEC
-s32   fn_80264020(u8* p);                                        // 0x80264020
-void  fn_80264498(u8* p);                                        // 0x80264498
-s32   fn_80264524(u8* p);                                        // 0x80264524
-s32   fn_80264538(u8* p);                                        // 0x80264538
-s32   fn_8026454C(u8* p);                                        // 0x8026454C
-s32   fn_80264560(u8* p);                                        // 0x80264560
-s32   fn_80264574(u8* p);                                        // 0x80264574
-void  fn_80264588(u8* p);                                        // 0x80264588
-void  fn_802645A8(u8* p);                                        // 0x802645A8
-void  fn_802645BC(u8* p);                                        // 0x802645BC
-s32   fn_80264A14(u8* p, u8* q);                                 // 0x80264A14
+s32   AXARTInitSound(u8* p, s32 handle, s32 a);                     // 0x80263FEC
+s32   AXARTAddSound(u8* p);                                        // 0x80264020
+void  AXARTInitArt3D(u8* p);                                        // 0x80264498
+s32   AXARTInitArtPitch(u8* p);                                        // 0x80264524
+s32   AXARTInitArtVolume(u8* p);                                        // 0x80264538
+s32   AXARTInitArtAuxAVolume(u8* p);                                        // 0x8026454C
+s32   AXARTInitArtAuxBVolume(u8* p);                                        // 0x80264560
+s32   AXARTInitArtAuxCVolume(u8* p);                                        // 0x80264574
+void  AXARTInitArtLpf(u8* p);                                        // 0x80264588
+void  AXARTInitArtRmt(u8* p);                                        // 0x802645A8
+void  AXARTInitArtRmtAuxVolume(u8* p);                                        // 0x802645BC
+s32   AXARTAddArticulator(u8* p, u8* q);                                 // 0x80264A14
 f64   fn_8033F204(f64 x);                                        // 0x8033F204 (natural log)
 
 extern u8   gWorldState[];          // 0x803E6D00
@@ -371,26 +371,26 @@ s32 fn_801FE52C(u8* audio, u8* desc, s32 mode) {
     } else {
         fn_80203340(*(u8**)(*(u8**)(desc + 0x0) + 0x4), *(s32*)(voice + 0x0), (s32)((*(u32*)(slot + 0x50) >> 9) & 1));
     }
-    fn_80263FEC(voice + 0x10, *(s32*)(voice + 0x0), *(s32*)(*(u8**)(*(u8**)(desc + 0x0) + 0x4) + 0x8));
-    fn_80264498(voice + 0x24);
-    fn_80264A14(voice + 0x10, voice + 0x24);
+    AXARTInitSound(voice + 0x10, *(s32*)(voice + 0x0), *(s32*)(*(u8**)(*(u8**)(desc + 0x0) + 0x4) + 0x8));
+    AXARTInitArt3D(voice + 0x24);
+    AXARTAddArticulator(voice + 0x10, voice + 0x24);
     *(f32*)(voice + 0x2C) = 0.0f;
     *(f32*)(voice + 0x30) = 0.0f;
     *(f32*)(voice + 0x34) = 0.0f;
     *(f32*)(voice + 0x38) = 0.0f;
     *(s32*)(voice + 0x3C) = 1;
     fn_802095B0(slot, &sp14, &sp10, &spC);
-    fn_80264538(voice + 0x68);
-    fn_80264A14(voice + 0x10, voice + 0x68);
-    fn_80264524(voice + 0x5C);
-    fn_80264A14(voice + 0x10, voice + 0x5C);
+    AXARTInitArtVolume(voice + 0x68);
+    AXARTAddArticulator(voice + 0x10, voice + 0x68);
+    AXARTInitArtPitch(voice + 0x5C);
+    AXARTAddArticulator(voice + 0x10, voice + 0x5C);
     *(u8*)(voice + 0x104) = *(u8*)(desc + 0x21);
-    fn_8026454C(voice + 0x88);
-    fn_80264A14(voice + 0x10, voice + 0x88);
-    fn_80264560(voice + 0x94);
-    fn_80264A14(voice + 0x10, voice + 0x94);
-    fn_80264574(voice + 0xA0);
-    fn_80264A14(voice + 0x10, voice + 0xA0);
+    AXARTInitArtAuxAVolume(voice + 0x88);
+    AXARTAddArticulator(voice + 0x10, voice + 0x88);
+    AXARTInitArtAuxBVolume(voice + 0x94);
+    AXARTAddArticulator(voice + 0x10, voice + 0x94);
+    AXARTInitArtAuxCVolume(voice + 0xA0);
+    AXARTAddArticulator(voice + 0x10, voice + 0xA0);
     if ((*(u8*)(desc + 0x21) & 1) || lbl_805FBAD4 != 0) {
         *(s32*)(voice + 0x90) = LevelParam(GainToLevel(lbl_805F98D8));
     } else {
@@ -402,15 +402,15 @@ s32 fn_801FE52C(u8* audio, u8* desc, s32 mode) {
         *(s32*)(voice + 0x9C) = LevelParam(-1000.0f);
     }
     *(s32*)(voice + 0xA8) = LevelParam(-1000.0f);
-    fn_80264588(voice + 0x74);
-    fn_80264A14(voice + 0x10, voice + 0x74);
+    AXARTInitArtLpf(voice + 0x74);
+    AXARTAddArticulator(voice + 0x10, voice + 0x74);
     if (*(u8*)(desc + 0x20) != 0) {
-        fn_802645A8(voice + 0xAC);
-        fn_80264A14(voice + 0x10, voice + 0xAC);
+        AXARTInitArtRmt(voice + 0xAC);
+        AXARTAddArticulator(voice + 0x10, voice + 0xAC);
         *(s16*)(voice + 0xB4) = 1;
         *(u8*)(voice + 0xFC) = 1;
-        fn_802645BC(voice + 0xB8);
-        fn_80264A14(voice + 0x10, voice + 0xB8);
+        AXARTInitArtRmtAuxVolume(voice + 0xB8);
+        AXARTAddArticulator(voice + 0x10, voice + 0xB8);
         *(s32*)(voice + 0xC0) = LevelParam(-1000.0f);
         *(u8*)(voice + 0xFD) = 0;
     }
@@ -421,7 +421,7 @@ s32 fn_801FE52C(u8* audio, u8* desc, s32 mode) {
     *(s32*)(voice + 0x84) = 1;
     *(s32*)(voice + 0x70) = LevelParam(-1000.0f);
     *(u8*)(voice + 0xFE) = 1;
-    fn_80264020(voice + 0x10);
+    AXARTAddSound(voice + 0x10);
     if (lbl_805FBAA4 != 0 && *(s32*)(desc + 0x14) == 2) {
         lbl_805FBAAC = 1;
     } else {

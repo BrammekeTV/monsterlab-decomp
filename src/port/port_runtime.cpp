@@ -84,6 +84,7 @@ static void PrintSummary(void) {
         fprintf(stderr, "static initialisers: %d run, %d skipped (not decompiled)\n", sRunCtors, sSkippedCtors);
     fprintf(stderr, "disc: %s\n", PortDvdStats(buf, sizeof(buf)));
     fprintf(stderr, "data: %s\n", PortFileStats(buf, sizeof(buf)));
+    fprintf(stderr, "audio: %s\n", PortAudioStats(buf, sizeof(buf)));
     { char gx[512]; fprintf(stderr, "GX: %s\n", PortGxStatsText(gx, sizeof(gx))); }
     { char gfx[256]; fprintf(stderr, "drawn: %s\n", PortGfxStatsText(gfx, sizeof(gfx))); }
     for (int i = 0; i < sPeekCount; i++) {       // --peek ADDR: four words of Wii memory at the stop
@@ -674,6 +675,7 @@ static DWORD WINAPI InterruptThread(void*) {
             }
             PortOsTick();
             PortViTick();
+            PortAudioTick();
         }
         PortLockLeave();
     }
@@ -782,6 +784,7 @@ static int SelfTest(void) {
     CHECK(w == 0x100);
     fails += PortSelfTestSdk();
     fails += PortSelfTestGx();
+    fails += PortSelfTestAudio();
     fails += PortSelfTestZlib();
 #undef CHECK
     PortLog("self-test: %u functions, %u linked; %s", gPortFuncCount, linked, fails ? "FAILED" : "ok");
@@ -833,6 +836,8 @@ struct PortBoot {
             else if (!strcmp(a, "--seconds") && i + 1 < __argc) gPortOptions.secondsLimit = atoi(__argv[++i]);
             else if (!strcmp(a, "--data") && i + 1 < __argc) asked = __argv[++i];
             else if (!strcmp(a, "--window")) gPortOptions.window = TRUE;
+            else if (!strcmp(a, "--wav") && i + 1 < __argc) gPortOptions.wav = __argv[++i];
+            else if (!strcmp(a, "--no-audio")) gPortOptions.noAudio = TRUE;
             else if (!strcmp(a, "--peek") && i + 1 < __argc && sPeekCount < 8) sPeek[sPeekCount++] = strtoul(__argv[++i], NULL, 16);
             else if (!strcmp(a, "--watch") && i + 1 < __argc) sWatch = strtoul(__argv[++i], NULL, 16);
             else if (!strcmp(a, "--show-texture") && i + 1 < __argc) gPortOptions.showTexture = atoi(__argv[++i]);

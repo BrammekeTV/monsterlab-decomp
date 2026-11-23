@@ -11,7 +11,7 @@ void fn_80183E88(u8* p);
 void fn_80184C18(u8* p, s32 b);
 void fn_80185988(u8* p);
 void fn_80171228(s32 a, s32 b, s32 c, f32 scale);
-s32  fn_8025B330(u8* voice, u16* p);
+s32  AXSetVoiceAdpcmLoop(u8* voice, u16* p);
 s32  fn_801D54B0(u8* p, s32 flags);
 
 extern u8  lbl_80412B20[];   // static record
@@ -112,7 +112,7 @@ void fn_80201AD8(u8* audio, u8* state) {
         params[0] = *src;
         params[1] = 0;
         params[2] = 0;
-        fn_8025B330(*(u8**)(state + 0x90), params);
+        AXSetVoiceAdpcmLoop(*(u8**)(state + 0x90), params);
     }
     *(s32*)(state + 0xBC) = 1;
     *(s32*)(state + 0xB8) = 0;
