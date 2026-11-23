@@ -64,6 +64,43 @@ fn_802309E0 inflate
 fn_80232120 inflateEnd
 fn_802321A8 inflate_fast
 fn_802326C0 inflate_table
+# GX (texture objects; evidence: GXInitTexObj memset(0x20)+field packing, getters read the same fields)
+fn_8024C3B8 GXInitTexObj
+fn_8024C5C4 GXInitTexObjCI
+fn_8024C60C GXInitTexObjLOD
+fn_8024C710 GXInitTexObjWrapMode
+fn_8024C724 GXInitTexObjTlut
+fn_8024C72C GXInitTexObjFilter
+fn_8024C754 GXInitTexObjUserData
+fn_8024C75C GXGetTexObjUserData
+fn_8024C764 GXGetTexObjWidth
+fn_8024C778 GXGetTexObjHeight
+fn_8024C78C GXGetTexObjFmt
+fn_8024C794 GXGetTexObjWrapS
+fn_8024C7A0 GXGetTexObjWrapT
+fn_8024C7AC GXGetTexObjMipMap
+fn_8024C7B8 GXLoadTexObjPreLoaded
+fn_8024C91C GXLoadTexObj
+# GX (pixel engine: direct peReg pokes, alphabetical Poke API order; draw sync callbacks)
+fn_8024B418 GXPokeAlphaMode
+fn_8024B428 GXPokeAlphaRead
+fn_8024B440 GXPokeAlphaUpdate
+fn_8024B454 GXPokeBlendMode
+fn_8024B4B0 GXPokeColorUpdate
+fn_8024B4C4 GXPokeDstAlpha
+fn_8024B4DC GXPokeDither
+fn_8024B4F0 GXPokeZMode
+fn_8024B34C GXReadDrawSync
+fn_8024B550 GXTokenInterruptHandler
+fn_8024B618 GXFinishInterruptHandler
+fn_8024B6FC __GXSetDirtyState
+# DVD (dvd.c order: path conversion, open/close, entryToPath recursion)
+fn_8024EE78 DVDConvertPathToEntrynum
+fn_8024F180 DVDFastOpen
+fn_8024F1E8 DVDOpen
+fn_8024F494 DVDClose
+fn_8024F4B8 entryToPath
+# fn_8024B50C/fn_8024B5D4 = GXSetDrawSyncCallback/GXSetDrawDoneCallback (left as fn_: defined in port_gx.cpp)
 # WPAD/KPAD/SI (input; see docs/sdk_libraries.md)
 fn_802728A4 WPADProbe
 fn_80272AB0 WPADSetDataFormat

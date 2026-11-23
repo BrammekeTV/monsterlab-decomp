@@ -21,7 +21,7 @@ void fn_8024AE74(s32 a);                                                     // 
 void fn_8024B298(u32 token);                                                 // 0x8024B298 (GXSetDrawSync)
 void fn_8024B974(s32 a, s32 b, s32 c);                                       // 0x8024B974
 void fn_8024C2F0(s32 a);                                                     // 0x8024C2F0
-void fn_8024C91C(u8* obj, s32 id);                                           // 0x8024C91C
+void GXLoadTexObj(u8* obj, s32 id);                                           // 0x8024C91C
 void fn_8024D0BC(s32 a, s32 b, s32 c, s32 d, s32 e, s32 f, s32 g, s32 h, s32 i, s32 j);  // 0x8024D0BC (two stack args)
 void fn_8024D124(s32 a, const f32* p, s32 c);                                // 0x8024D124
 void fn_8024D37C(s32 a, s32 b, s32 c);                                       // 0x8024D37C
@@ -152,17 +152,17 @@ void fn_80205894(u8* obj, f32 x, f32 y, f32 sx, f32 sy, f32 a, s32 w, s32 h, s32
     fn_8024A818(0, 0xD, 1, 4, 0);
     fn_8024A818(0, 0xE, 1, 4, 0);
     fn_8024A7E4();
-    fn_8024C91C(obj + (*(s32*)(obj + 0x114) << 7), 0);
-    fn_8024C91C(obj + 0x190, 1);
-    fn_8024C91C(obj + 0x1B0, 2);
-    fn_8024C91C(obj + (*(s32*)(obj + 0x114) << 7) + 0x20, 3);
-    fn_8024C91C(obj + (*(s32*)(obj + 0x114) << 7) + 0x40, 4);
+    GXLoadTexObj(obj + (*(s32*)(obj + 0x114) << 7), 0);
+    GXLoadTexObj(obj + 0x190, 1);
+    GXLoadTexObj(obj + 0x1B0, 2);
+    GXLoadTexObj(obj + (*(s32*)(obj + 0x114) << 7) + 0x20, 3);
+    GXLoadTexObj(obj + (*(s32*)(obj + 0x114) << 7) + 0x40, 4);
     fn_8024A3A4(9, 1);
     fn_8024A3A4(0xB, 1);
     fn_8024A3A4(0xD, 1);
     fn_8024A3A4(0xE, 1);
     if (hasExtra != 0) {
-        fn_8024C91C(obj + (*(s32*)(obj + 0x114) << 7) + 0x60, 5);
+        GXLoadTexObj(obj + (*(s32*)(obj + 0x114) << 7) + 0x60, 5);
     }
     fn_8024C2F0(1);
     fn_8024AE74(4);

@@ -83,8 +83,8 @@ void   fn_802041F4(s32 a3);                                      // 0x802041F4 (
 s32    fn_80204210(u8* e);                                       // 0x80204210
 void   fn_80203E8C(void);                                        // 0x80203E8C
 void   fn_80234394(u8* alarm, u32 a, OSTime start, OSTime period, void* handler, u32 extra); // 0x80234394
-s32    fn_8024F1E8(char* path, u8* p);                           // 0x8024F1E8
-void   fn_8024F494(u8* p);                                       // 0x8024F494
+s32    DVDOpen(char* path, u8* p);                           // 0x8024F1E8
+void   DVDClose(u8* p);                                       // 0x8024F494
 s32    fn_80259418(s32 a);                                       // 0x80259418
 void*  AXRegisterCallback(void* cb);                                    // 0x80259B2C
 s32    fn_8026099C(void);                                        // 0x8026099C
@@ -751,7 +751,7 @@ void fn_801FCFB4(u8* audio) {
 
 // 0x80204210
 // Steps one disc read request e (state at +0, sub-state at +4): state 0 opens the file
-// (fn_8024F1E8), state 1 starts the async read and then polls the drive status (calling the
+// (DVDOpen), state 1 starts the async read and then polls the drive status (calling the
 // queue's error callbacks at lbl_8048A8B4+0x24 / +0x28), state 3 closes the file. Returns 1 when
 // the request is finished, 0 while pending; a request pending for more than 0x14 steps is
 // aborted through the callback at lbl_8048A8B4+0x24.
@@ -763,7 +763,7 @@ s32 fn_80204210(u8* e) {
     switch (*(s32*)(e + 0x0)) {
     case 0:
         if (*(s32*)(e + 0x4) == 1) {
-            if (fn_8024F1E8((char*)(rec + 1), rec + 0x128) != 0) return 1;
+            if (DVDOpen((char*)(rec + 1), rec + 0x128) != 0) return 1;
             *(s32*)(e + 0x8) += 1;
             return 0;
         }
@@ -796,7 +796,7 @@ s32 fn_80204210(u8* e) {
         break;
     case 3:
         if (*(s32*)(e + 0x4) == 1) {
-            fn_8024F494(rec + 0x128);
+            DVDClose(rec + 0x128);
             return 1;
         }
         break;

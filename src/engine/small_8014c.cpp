@@ -18,7 +18,7 @@ s32   fn_80146DD8(u8* p, s32 mode, s32 val);                     // 0x80146DD8
 void  fn_80334458(void* obj, s32 x, s32 y);                      // 0x80334458
 s32   fn_80334290(void* obj);                                    // 0x80334290
 void  fn_80333B60(void* obj);                                    // 0x80333B60
-void  fn_8024F494(u8* p);                                        // 0x8024F494
+void  DVDClose(u8* p);                                        // 0x8024F494
 u8*   fn_80142500(void* p);                                      // 0x80142500
 void  fn_801472A8(void);                                         // 0x801472A8
 void  fn_801479D0(void);                                    // 0x801479D0
@@ -107,9 +107,9 @@ void fn_801469FC(u8* p) {
 }
 
 // 0x80146D98
-// Teardown of the inline sub-object: notifies fn_8024F494 and clears the shared pointer lbl_805FB478 if it names p.
+// Teardown of the inline sub-object: notifies DVDClose and clears the shared pointer lbl_805FB478 if it names p.
 void fn_80146D98(u8* p) {
-    fn_8024F494(p);
+    DVDClose(p);
     if (lbl_805FB478 == p) {
         lbl_805FB478 = 0;
     }

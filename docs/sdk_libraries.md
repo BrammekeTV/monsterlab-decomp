@@ -125,3 +125,10 @@ No new MSL or Bink names. `strlen`, `strcmp`, `snprintf`, `sinf`, `cosf`, `rand`
 - The `# MSL` and `# Bink` sections of `names_sdk.txt` are empty for now (see above).
 - SO/SOCKET code is not located.
 - `dtk dol split` was not re-run in this pass, so `build/` asm still shows the old `fn_` names for the renamed functions.
+
+## GX/DVD names added in PR #85 (33)
+
+- GX texture objects: `GXInitTexObj*`, `GXGetTexObj*`, `GXLoadTexObj*` (0x8024C3B8-0x8024C91C).
+- GX pixel engine pokes `GXPoke*` (0x8024B418-0x8024B4F0), `GXReadDrawSync`, token/finish interrupt handlers, `__GXSetDirtyState` (0x8024B6FC).
+- DVD fs: `DVDConvertPathToEntrynum`, `DVDFastOpen`, `DVDOpen`, `DVDClose`, `entryToPath`.
+- Left as `fn_`: 0x8024B50C/0x8024B5D4 (draw sync/done callbacks, defined in port_gx.cpp).

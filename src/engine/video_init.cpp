@@ -91,14 +91,14 @@ void fn_8024BDD4(u32 aa, u8* pattern, s32 vf, u8* vfilter);   // 0x8024BDD4: GXS
 void fn_8024BFB8(s32 a);                // 0x8024BFB8: GXSetDispCopyGamma
 void fn_8024BC48(s32 mode);             // 0x8024BC48: GXSetDispCopyFrame2Field
 void fn_8024C108(void);                 // 0x8024C108: GXClearBoundingBox
-void fn_8024B4B0(s32 enable);           // 0x8024B4B0: GXPokeColorUpdate
-void fn_8024B440(s32 enable);           // 0x8024B440: GXPokeAlphaUpdate
-void fn_8024B4DC(s32 enable);           // 0x8024B4DC: GXPokeDither
-void fn_8024B454(s32 type, s32 src, s32 dst, s32 op);   // 0x8024B454: GXPokeBlendMode
-void fn_8024B418(s32 func, s32 threshold);      // 0x8024B418: GXPokeAlphaMode
-void fn_8024B428(s32 mode);             // 0x8024B428: GXPokeAlphaRead
-void fn_8024B4C4(s32 enable, s32 alpha);        // 0x8024B4C4: GXPokeDstAlpha
-void fn_8024B4F0(s32 enable, s32 func, s32 update);   // 0x8024B4F0: GXPokeZMode
+void GXPokeColorUpdate(s32 enable);           // 0x8024B4B0: GXPokeColorUpdate
+void GXPokeAlphaUpdate(s32 enable);           // 0x8024B440: GXPokeAlphaUpdate
+void GXPokeDither(s32 enable);           // 0x8024B4DC: GXPokeDither
+void GXPokeBlendMode(s32 type, s32 src, s32 dst, s32 op);   // 0x8024B454: GXPokeBlendMode
+void GXPokeAlphaMode(s32 func, s32 threshold);      // 0x8024B418: GXPokeAlphaMode
+void GXPokeAlphaRead(s32 mode);             // 0x8024B428: GXPokeAlphaRead
+void GXPokeDstAlpha(s32 enable, s32 alpha);        // 0x8024B4C4: GXPokeDstAlpha
+void GXPokeZMode(s32 enable, s32 func, s32 update);   // 0x8024B4F0: GXPokeZMode
 void fn_8024E60C(s32 perf0, s32 perf1); // 0x8024E60C: GXSetGPMetric
 void fn_8024EE38(void);                 // 0x8024EE38: GXClearGPMetric
 void fn_8015BBC0(s32 clear);            // 0x8015BBC0: resets GX state for a frame, clears the frame buffers
@@ -304,14 +304,14 @@ extern "C" void fn_8015D660(void) {
     fn_8024C108();
 
     // The same for direct ("poke") access to the frame buffer, and no performance counters.
-    fn_8024B4B0(1);
-    fn_8024B440(1);
-    fn_8024B4DC(0);
-    fn_8024B454(0, 0, 1, 0xF);
-    fn_8024B418(7, 0);
-    fn_8024B428(1);
-    fn_8024B4C4(0, 0);
-    fn_8024B4F0(1, 7, 1);
+    GXPokeColorUpdate(1);
+    GXPokeAlphaUpdate(1);
+    GXPokeDither(0);
+    GXPokeBlendMode(0, 0, 1, 0xF);
+    GXPokeAlphaMode(7, 0);
+    GXPokeAlphaRead(1);
+    GXPokeDstAlpha(0, 0);
+    GXPokeZMode(1, 7, 1);
     fn_8024E60C(0x23, 0x16);
     fn_8024EE38();
 }
