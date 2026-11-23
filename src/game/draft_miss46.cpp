@@ -23,7 +23,7 @@ s32 SaveSetupBanner(void);                                       // 0x800118C4
 }
 
 extern "C" {
-s32 fn_8006D248(s32);                       // 0x8006D248
+void fn_8006D248(u8* obj, s32 value);        // 0x8006D248 (stores value at obj+0x268)
 s32 fn_8006FA5C(void* obj, s32 flags);      // 0x8006FA5C
 s32* fn_800701A4(void);                     // 0x800701A4
 u32 fn_80070270(s32 flags);                 // 0x80070270
@@ -194,7 +194,7 @@ extern "C" {
 void SetupChallengeProjector(void* a0, u32 a1, u32 a2) {
     u8* p = (u8*)a0;
     if (p != NULL && (*(s32*)(*(u8**)(p + 0x4) + 0x1C) & 0x10000)) {
-        fn_8006D248((s32)a2);
+        fn_8006D248(p, (s32)a2);
         switch (a1) {
         case 0xA41D84B9u: *(s32*)(p + 0x1AC) = 0; break;
         case 0xC4CE4FC3u: *(s32*)(p + 0x1AC) = 1; break;
