@@ -29,7 +29,7 @@ s32 fn_801EFB48(s32 a0);                                   // 0x801EFB48
 s32 fn_801EFBB8(s32 a0, s32 a1);                                   // 0x801EFBB8
 void    fn_801EFC28(void);                                   // 0x801EFC28
 u64     fn_801425DC(u8* timer);                              // 0x801425DC
-void    fn_8027D270(s32 a, f32 b, f32 c);                    // 0x8027D270
+void    KPADSetPosParam(s32 a, f32 b, f32 c);                    // 0x8027D270
 u8*     fn_801B3308(void);                                   // 0x801B3308
 void    fn_801B3310(u8* p, u8* q);                           // 0x801B3310
 s32     RaySceneTest(void* ray);                             // 0x80070458
@@ -256,7 +256,7 @@ void fn_800939EC(u8* arg0, s32 arg1, u8* arg2, s32 arg3, s32 arg4) {
 // Stores the float parameters for the object at p and points its two sub-objects at the
 // level info block.
 void fn_8009C414(u8* p, u8* arg1) {
-    fn_8027D270(*(s32*)(lbl_803C4298 + 0x38), lbl_805FDD18, lbl_805FDD1C);
+    KPADSetPosParam(*(s32*)(lbl_803C4298 + 0x38), lbl_805FDD18, lbl_805FDD1C);
     *(void**)(p + 0x264) = arg1;
     fn_801B3310(fn_801B3308(), p + 0x268);
     *(s32*)(p + 0x3BC) = 1;

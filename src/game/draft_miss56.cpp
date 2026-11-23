@@ -12,7 +12,7 @@ s32   RegisterScriptFunc(const char* name, s32 type, void* fn);   // 0x801DC91C
 s32   PlaySound(u32 hash, s32 a, s32 b, s32 c, s32 d, s32 e);     // 0x80209E70
 s32   RaySceneTest(void* ray);                                      // 0x80070458 (ignores its argument)
 u32   RandomU32(void);
-void  fn_8027D28C(s32 chan, f32 a, f32 b);                          // 0x8027D28C
+void  KPADSetHoriParam(s32 chan, f32 a, f32 b);                          // 0x8027D28C
 void  fn_801458B0(f32* quat, f32* a, f32* b);                       // 0x801458B0 (look-at quaternion)
 s32   AnimSetFindClip(void* set, s32 anim);                         // 0x801AC2FC
 void  PropPlayAnim(void* prop, int a, int b, BOOL once);            // 0x80069350
@@ -490,7 +490,7 @@ typedef void (*VCallOut)(f32* out, u8* self);
 // Sets up the camera/target object at +4 of arg0 from the entity arg1: position = entity
 // position (+ (0,0,1)), orientation = look-at of the entity's vector (via vtable slots at
 // *(arg1+0xD4) 0x20/0x24/0x28), marks it dirty, copies the position into +0x278 and clears
-// the state fields; finally sets fn_8027D28C(0, 0.1, 0.8).
+// the state fields; finally sets KPADSetHoriParam(0, 0.1, 0.8).
 void fn_800A6704(u8* arg0, u8* arg1) {
     f32 off[3] = {0.0f, 0.0f, 1.0f};
     f32 pos[3], dir[3], quat[4], a[3], b[3];
@@ -532,7 +532,7 @@ void fn_800A6704(u8* arg0, u8* arg1) {
     *(f32*)(arg0 + 0x280) = *(f32*)(p + 0x8);
     *(f32*)(arg0 + 0x264) = 0.0f;
     *(u8*)(arg0 + 0x274) = 0;
-    fn_8027D28C(0, 0.1f, 0.8f);
+    KPADSetHoriParam(0, 0.1f, 0.8f);
 }
 
 typedef u8* (*VCallRetPtr)(u8* self);

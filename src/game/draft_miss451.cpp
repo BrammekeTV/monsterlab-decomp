@@ -33,7 +33,7 @@ u8*   fn_801AC024(u8* table, u32 hash, s32 key, u8* prev); // 0x801AC024
 u32   fn_801EC880(u8* p, u32 hash);                        // 0x801EC880
 void  fn_801ECD1C(u8* p, s32 idx, s32 immediate);          // 0x801ECD1C
 void  fn_8020A398(s32 handle);                             // 0x8020A398
-void  fn_8027D28C(s32 chan, f32 a, f32 b);                 // 0x8027D28C
+void  KPADSetHoriParam(s32 chan, f32 a, f32 b);                 // 0x8027D28C
 char* fn_80338BC0(char* s, const char* sub);               // 0x80338BC0
 char* strcpy(char* d, const char* s);
 extern u8* lbl_803C4000[16];            // 0x803C4000 (pointer table)
@@ -196,7 +196,7 @@ void fn_8009C1E8(u8* arg0, u8* arg1) {
 // 0x800A6630
 // Resets the global float state, stops the handle at +0x28C and clears the widget value at +0x94.
 void fn_800A6630(u8* arg0) {
-    fn_8027D28C(0, lbl_805FDEB0, lbl_805FDEB4);
+    KPADSetHoriParam(0, lbl_805FDEB0, lbl_805FDEB4);
     fn_8020A398(*(s32*)(arg0 + 0x28C));
     u8* p = arg0 + 0x94;
     fn_801ECD1C(p, (s32)fn_801EC880(p, 0xAEB44737U), 0);

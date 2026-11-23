@@ -86,7 +86,7 @@ void   fn_80234394(u8* alarm, u32 a, OSTime start, OSTime period, void* handler,
 s32    DVDOpen(char* path, u8* p);                           // 0x8024F1E8
 void   DVDClose(u8* p);                                       // 0x8024F494
 s32    fn_80259418(s32 a);                                       // 0x80259418
-void   fn_80259B2C(void* cb);                                    // 0x80259B2C
+void*  AXRegisterCallback(void* cb);                                    // 0x80259B2C
 s32    fn_8026099C(void);                                        // 0x8026099C
 s32    fn_80260AC4(s32 a);                                       // 0x80260AC4
 s32    fn_80263F18(void);                                        // 0x80263F18
@@ -721,7 +721,7 @@ void fn_801FCFB4(u8* audio) {
         fn_80260AC4(3);
         break;
     }
-    fn_80259B2C((void*)fn_80201F38);
+    AXRegisterCallback((void*)fn_80201F38);
     fn_80203E8C();
     u8 started = lbl_805FBAB8;
     lbl_805FBABC = 0;

@@ -451,7 +451,7 @@ s32 OSRestoreInterrupts(s32 level) { s32 was = (s32)PortDisableInterrupts(); Por
 // Returns the previous callback.
 static void (*sAxFrameCb)(void);
 static OSTime sAxNext;
-void* fn_80259B2C(void* cb) {
+void* AXRegisterCallback(void* cb) {
     void* old = (void*)sAxFrameCb;
     sAxFrameCb = (void (*)(void))cb;
     return old;

@@ -101,3 +101,34 @@ fn_8024F1E8 DVDOpen
 fn_8024F494 DVDClose
 fn_8024F4B8 entryToPath
 # fn_8024B50C/fn_8024B5D4 = GXSetDrawSyncCallback/GXSetDrawDoneCallback (left as fn_: defined in port_gx.cpp)
+# WPAD/KPAD/SI (input; see docs/sdk_libraries.md)
+fn_802728A4 WPADProbe
+fn_80272AB0 WPADSetDataFormat
+fn_80273204 WPADRead
+fn_802727E0 WPADDisconnect
+fn_8027D270 KPADSetPosParam
+fn_8027D28C KPADSetHoriParam
+fn_8027F504 KPADRead
+# AX/AI/DSP (audio; see docs/sdk_libraries.md)
+fn_802576BC AIRegisterDMACallback
+fn_80257700 AIInitDMA
+fn_8025777C AIStartDMA
+fn_80257790 AIStopDMA
+fn_802577A4 AIGetDMABytesLeft
+fn_802577B4 AIGetDMAStartAddr
+fn_802577CC AIGetDMALength
+fn_80257C88 AXQuit
+fn_80257FA8 AXFreeVoice
+fn_80258024 AXAcquireVoice
+fn_80259B2C AXRegisterCallback
+
+# NET: the function name appears in its own debug/error string (DWC, NCD, NWC24, NHTTP)
+fn_8032683C NHTTPi_CheckCurrentThread
+fn_80320D10 NCDGetCurrentIfConfig
+fn_80320E08 NCDGetCurrentIpConfig
+fn_8032118C NCDiGetEnabledConfigList
+fn_8032292C NWC24iSetScriptMode
+fn_80322ACC NWC24iRequestGenerateUserId
+fn_80323164 NWC24iSetRtcCounter
+fn_80323574 NWC24iRequestShutdown
+fn_802EB5C4 DWCi_MatchInit

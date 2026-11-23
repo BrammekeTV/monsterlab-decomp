@@ -71,7 +71,7 @@ void   fn_8024BD5C(u8* color, u32 z);
 s32    DVDOpen(char* path, u8* p);
 void   DVDClose(u8* p);
 void   fn_80253A48(u8* p, s32 a);                              // 0x80253A48
-void   fn_80257FA8(u8* voice);                                 // 0x80257FA8
+void   AXFreeVoice(u8* voice);                                 // 0x80257FA8
 void   fn_802581A4(u8* voice, u32 a);                          // 0x802581A4
 s32    fn_8025AC30(u8* voice, s32 a);                          // 0x8025AC30
 void   fn_8025AD60(u8* voice, s32 a);                   // 0x8025AD60
@@ -91,7 +91,7 @@ s32    fn_80262368(u8* voice);                                 // 0x80262368
 void   fn_80263FAC(void);                                      // 0x80263FAC
 void   fn_80264420(u8* p);
 void   fn_802623A8(void);                                      // 0x802623A8
-s32    fn_802728A4(s32 chan, u32* out);
+s32    WPADProbe(s32 chan, u32* out);
 s32    fn_802737A8(s32 chan, s32 a, void* cb);
 s32    fn_802B47A0(s32 a, s32* b);                             // 0x802B47A0
 s32    fn_802B4A1C(u8* bink, u8* p);                           // 0x802B4A1C
@@ -206,7 +206,7 @@ void fn_80201F38(void) {
     fn_8025B390();
     TimerReset(lbl_805FBB08);
     if (lbl_805FBAC4 != 0) {
-        if (fn_802728A4(0, NULL) == 0) {
+        if (WPADProbe(0, NULL) == 0) {
             lbl_805FBAC4 = 0;
             fn_80203220();
         }
@@ -502,14 +502,14 @@ void fn_80201F38(void) {
                         }
                         *(u8*)(v + 0xFC) = 0;
                     }
-                    fn_80257FA8(*(u8**)v);
+                    AXFreeVoice(*(u8**)v);
                     *(u8**)v = NULL;
                     *(s32*)(v + 0x4) = 0;
                     SoundSlotFree(*(u8**)(v + 0xC), voices);
                     *(s32*)(v + 0xC) = 0;
                 } else {
                     fn_8025ACF0(*(u8**)v, 0);
-                    fn_80257FA8(*(u8**)v);
+                    AXFreeVoice(*(u8**)v);
                     *(u8**)v = NULL;
                     *(s32*)(v + 0x4) = 0;
                 }

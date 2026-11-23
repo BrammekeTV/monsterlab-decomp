@@ -70,7 +70,7 @@ void fn_800E6A84(s32);
 u8* fn_80160A28(u8* arg0);
 void fn_80162A70(u8* p);
 void fn_801BB478(u8* p, s32 a1);
-s32 fn_802728A4(s32 chan, u32* out);
+s32 WPADProbe(s32 chan, u32* out);
 s32 fn_80272B64(s32 chan, u8* out);
 void operator_delete(void* p);
 void fn_8020A6C8(void);
@@ -273,7 +273,7 @@ void fn_8000C314(u8* arg0) {
     u8 sp10[0x10];
 
     sp8 = 0;
-    if (fn_802728A4(0, &sp8) == 0 && fn_80272B64(0, sp10) == 0 && *(u32*)(sp10 + 0xC) != 0) {
+    if (WPADProbe(0, &sp8) == 0 && fn_80272B64(0, sp10) == 0 && *(u32*)(sp10 + 0xC) != 0) {
         *(s32*)(arg0 + 0x154) = 1;
     }
 }

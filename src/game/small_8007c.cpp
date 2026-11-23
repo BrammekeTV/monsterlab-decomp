@@ -22,7 +22,7 @@ f32   fn_8033F200(f32 a, f32 b);                                        // 0x803
 void  fn_8018BEA4(u8* p, f32 t);                                        // 0x8018BEA4
 u8*   fn_801B3308(void);                                                // 0x801B3308
 void  fn_801B3378(u8* p, u8* key);                                      // 0x801B3378
-void  fn_8027D270(s32 a, f32 b, f32 c);                                 // 0x8027D270
+void  KPADSetPosParam(s32 a, f32 b, f32 c);                                 // 0x8027D270
 u8*   fn_801F9598(u8* p, s32 del);                                      // 0x801F9598
 u8*   fn_80062CE0(u8* p, s32 del);                                      // 0x80062CE0
 void  fn_8006FA44(u8* a3, s32 a4, s32 a5, s32 a6, s32 a7, s32 a8);      // 0x8006FA44
@@ -217,10 +217,10 @@ u8* fn_8007B0D0(u8* p, s32 del) {
 }
 
 // 0x8007B150
-// Resets the welding sub-object at +0x2A0 and sets the two float parameters with fn_8027D270.
+// Resets the welding sub-object at +0x2A0 and sets the two float parameters with KPADSetPosParam.
 void fn_8007B150(u8* p) {
     fn_801B3378(fn_801B3308(), p + 0x2a0);
-    fn_8027D270(0, lbl_805FD6F0, lbl_805FD6F4);
+    KPADSetPosParam(0, lbl_805FD6F0, lbl_805FD6F4);
 }
 
 // 0x8007B194
@@ -252,11 +252,11 @@ void fn_8007C080(u8* p) {
 
 // 0x8007C0CC
 // Resets the welding sub-object at +0x264, clears the value at +0x298 to the floor and calls
-// fn_8027D270 with the second constant.
+// KPADSetPosParam with the second constant.
 void fn_8007C0CC(u8* p) {
     fn_8007A598(p + 0x264);
     *(f32*)(p + 0x298) = lbl_805FD6F0;
-    fn_8027D270(0, lbl_805FD6F0, lbl_805FD6F8);
+    KPADSetPosParam(0, lbl_805FD6F0, lbl_805FD6F8);
 }
 
 // 0x8007C4CC

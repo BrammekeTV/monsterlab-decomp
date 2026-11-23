@@ -10,7 +10,7 @@ u64  fn_801425DC(u8* timer);                                    // 0x801425DC (6
 void fn_8015BBC0(s32 a);                                        // 0x8015BBC0
 void fn_8015E7C8(void* unusedR3, s32 unusedR4, s32 unusedR5, s32 unusedR6, s32 value);                                    // 0x8015E7C8
 void fn_801B9278(u8* p, f32 dt);                                      // 0x801B9278 (arg = *(hud + 4))
-void fn_80272AB0(s32 chan, s32 a);                              // 0x80272AB0
+void WPADSetDataFormat(s32 chan, s32 a);                              // 0x80272AB0
 s32  fn_802737A8(s32 chan, s32 a, void* cb);                    // 0x802737A8
 void fn_80202EFC(s32 chan, s32 result);                         // 0x80202EFC (pad connect result callback)
 
@@ -150,7 +150,7 @@ void fn_80202FFC(s32 chan, s32 status) {
     if (status < 0) what = "disconnect";
     OSReport("ConnectCallback(%d) : %s\n", chan, what);
     if (status >= 0 && lbl_805FBA34 == 0) {
-        fn_80272AB0(chan, 0);
+        WPADSetDataFormat(chan, 0);
         u8* rec = lbl_8051E680 + chan * 0x28;
         *(s32*)(rec + 0x24) = 0;
         *(s32*)(rec + 0x24) = 1;

@@ -81,8 +81,8 @@ s32    fn_80120504(u8* p);                                           // 0x801205
 u8*    fn_80218B8C(void* lab, s32 a);                                // 0x80218B8C
 
 // gamepad polling
-s32    fn_8027F504(s32 chan, u8* buf, s32 count);                    // 0x8027F504
-s32    fn_802728A4(s32 chan, u32* out);                              // 0x802728A4
+s32    KPADRead(s32 chan, u8* buf, s32 count);                    // 0x8027F504
+s32    WPADProbe(s32 chan, u32* out);                              // 0x802728A4
 u8*    fn_801483BC(s32 idx);                                         // 0x801483BC
 
 // GX / display list
@@ -592,7 +592,7 @@ void fn_801479D0(void) {
     for (s32 chan = 0; chan < 4; chan++) {
         s32 off = chan * 0xB4;
         s32* state = &lbl_80400FE0[chan];
-        s32 n = fn_8027F504(chan, buf, 0x10);
+        s32 n = KPADRead(chan, buf, 0x10);
         u8* ring = fn_801483BC(chan);
         if (ring != NULL) {
             *(s32*)(ring + 0x14) = n;
@@ -617,7 +617,7 @@ void fn_801479D0(void) {
             } else {
                 memcpy(lbl_805FB490 + off + 0x400, lbl_805FB494 + off + 0x400, 0xB4);
                 u32 type = 0;
-                if (fn_802728A4(0, &type) == -1) {
+                if (WPADProbe(0, &type) == -1) {
                     *state = 0;
                 }
             }

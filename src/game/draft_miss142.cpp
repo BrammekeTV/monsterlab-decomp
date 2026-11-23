@@ -49,7 +49,7 @@ void   fn_8021FAA8(void);                                             // 0x8021F
 void   fn_8021FAFC(void);                                             // 0x8021FAFC
 void   fn_8021FB28(void);                                             // 0x8021FB28
 u8*    fn_8021FFA4(u8* p, u8* seq, s32 idx, void* cbA, void* cbB, f32 f);  // 0x8021FFA4
-void   fn_8027D270(s32 a, f32 b, f32 c);                              // 0x8027D270
+void   KPADSetPosParam(s32 a, f32 b, f32 c);                              // 0x8027D270
 
 extern u8 gWorldState[];                 // 0x803E6D00 (first word: world block pointer)
 extern void* gLab;
@@ -166,7 +166,7 @@ u8* fn_80076D38(u8* self, const char* name) {
 // flags the brain as active.
 void fn_8007B20C(u8* self) {
     u32 hash = StringHash(lbl_805F8958);
-    fn_8027D270(0, 0.0f, 0.45f);
+    KPADSetPosParam(0, 0.0f, 0.45f);
     s32 found = 0;
     for (s32 z = 0; z < *(s32*)(*(u8**)gWorldState + 0x4) + 1; z++) {
         for (s32 j = 0; j < *(s32*)(ZoneRes(z) + 0x98); j++) {
