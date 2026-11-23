@@ -151,6 +151,7 @@ u32  PortAudioVoices(u32* outOf); // voices the mixer is playing now
 extern s64 gPortWaitTicks;    // QueryPerformanceCounter ticks spent asleep in VIWaitForRetrace (port_sdk.cpp)
 int  PortSelfTestAudio(void);
 void PortFrameDone(void);     // one presented frame (VI flip): enforces the frame limit
+s32  PortFrameCount(void);    // presented frames so far
 
 const PortFunc* PortFindFunc(u32 wiiAddr);             // exact start address
 const char*     PortFuncName(const PortFunc* f);

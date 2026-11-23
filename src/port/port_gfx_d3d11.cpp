@@ -105,7 +105,7 @@ static DWORD WINAPI WindowThread(void*) {
     RegisterClassA(&wc);
     RECT r = {0, 0, (LONG)sOutW, (LONG)sOutH};
     AdjustWindowRect(&r, WS_OVERLAPPEDWINDOW, FALSE);
-    sWnd = CreateWindowA(wc.lpszClassName, "Monster Lab (PC port)", WS_OVERLAPPEDWINDOW | WS_VISIBLE, CW_USEDEFAULT, CW_USEDEFAULT,
+    sWnd = CreateWindowA(wc.lpszClassName, "Monster Lab (PC port)", WS_OVERLAPPEDWINDOW | (getenv("PORT_HIDDEN") ? 0 : WS_VISIBLE), CW_USEDEFAULT, CW_USEDEFAULT,
                          r.right - r.left, r.bottom - r.top, NULL, NULL, wc.hInstance, NULL);
     SetEvent(sWndReady);
     MSG msg;
@@ -985,10 +985,31 @@ static void CopyEfb(const PortGx* g, u32 control) {
         FrameStats(&stats);
         PortOverlayFrame(&stats);
         if (gPortOptions.screenshotStats) PortOverlayDraw(sOutRtv, sOutW, sOutH);
-        if (sSwap && !PortFastActive()) {            // fast-forward: rendered (for screenshots) but not presented
+        // Fast-forward: every frame is rendered (copies and screenshots stay right) but the window gets
+        // a picture only four times a second, with the progress in the title bar, so it never looks hung.
+        BOOL fast = PortFastActive(), show = sSwap != NULL;
+        static DWORD lastFast;
+        static BOOL  titled;
+        if (fast && sSwap) {
+            DWORD now = GetTickCount();
+            show = (now - lastFast) >= 250;
+            if (show) {
+                lastFast = now;
+                char t[96];
+                s32 total = gPortOptions.fastForward;
+                if (total > 0) snprintf(t, sizeof(t), "Monster Lab (PC port) - Fast-forwarding... frame %d / %d", (int)PortFrameCount(), (int)total);
+                else snprintf(t, sizeof(t), "Monster Lab (PC port) - Fast-forwarding... frame %d", (int)PortFrameCount());
+                SetWindowTextA(sWnd, t);
+                titled = TRUE;
+            }
+        } else if (titled && sWnd) {
+            SetWindowTextA(sWnd, "Monster Lab (PC port)");
+            titled = FALSE;
+        }
+        if (show) {
             Blit(sOutSrv, sBackRtv, 0, 0, sOutW, sOutH, 0, 0, 1, 1);
             if (!gPortOptions.screenshotStats) PortOverlayDraw(sBackRtv, sOutW, sOutH);
-            sSwap->Present(gPortSettings.vsync ? 1 : 0, 0);
+            sSwap->Present(gPortSettings.vsync && !fast ? 1 : 0, 0);
         }
         sGfxStats.presents++;
         if (sTraceFrom > 1 && sGfxStats.presents >= sTraceFrom) sTrace = TRUE;
