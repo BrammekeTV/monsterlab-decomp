@@ -25,6 +25,7 @@
 extern "C" u32 _ctors[];      // 0x80345AE0, resolved by port_gen.obj like every other Wii global
 
 PortOptions gPortOptions;
+PortSettings gPortSettings = {1920, 1080, TRUE, FALSE};
 
 // ------------------------------------------------------------------ log and boot summary
 struct Milestone { const char* what; u32 count; u32 ms; BOOL stub; };
@@ -842,7 +843,18 @@ struct PortBoot {
             else if (!strcmp(a, "--watch") && i + 1 < __argc) sWatch = strtoul(__argv[++i], NULL, 16);
             else if (!strcmp(a, "--show-texture") && i + 1 < __argc) gPortOptions.showTexture = atoi(__argv[++i]);
             else if (!strcmp(a, "--screenshot") && i + 1 < __argc) gPortOptions.screenshot = __argv[++i];
-            else if (!strcmp(a, "--scale") && i + 1 < __argc) gPortOptions.scale = atoi(__argv[++i]);
+            else if (!strcmp(a, "--res") && i + 1 < __argc) {
+                int w = 0, h = 0;
+                if (sscanf(__argv[++i], "%dx%d", &w, &h) == 2 && w >= 320 && h >= 240 && w <= 8192 && h <= 8192) { gPortSettings.width = w; gPortSettings.height = h; }
+                else fprintf(stderr, "[port] --res %s: expected WxH, e.g. 1920x1080\n", __argv[i]);
+            }
+            else if (!strcmp(a, "--stretch-ui")) gPortSettings.stretchUi = TRUE;
+            else if (!strcmp(a, "--aspect") && i + 1 < __argc) {
+                const char* v = __argv[++i];
+                if (!strcmp(v, "16:9")) gPortSettings.wide = TRUE;
+                else if (!strcmp(v, "4:3")) gPortSettings.wide = FALSE;
+                else fprintf(stderr, "[port] --aspect %s: expected 4:3 or 16:9\n", v);
+            }
             else if (!strcmp(a, "--press") && i + 1 < __argc) {
                 if (!PortInputAddPress(__argv[++i])) fprintf(stderr, "[port] --press %s: expected BUTTON@FRAME[-FRAME]\n", __argv[i]);
             }
@@ -918,7 +930,7 @@ static void __cdecl PortPreMain(void) {
     PortOsStart();
     PortStartInterrupts();
     if (gPortOptions.haveData && !gPortOptions.selfTest && (gPortOptions.window || gPortOptions.screenshot || gPortOptions.showTexture >= 0))
-        PortGfxStart(gPortOptions.window, gPortOptions.scale ? gPortOptions.scale : 2);
+        PortGfxStart(gPortOptions.window);
     PortRunStaticInit();
 }
 #pragma section(".CRT$XCY", read)

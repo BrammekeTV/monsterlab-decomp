@@ -20,6 +20,7 @@
 #include <string.h>
 
 #include "port/port.h"
+#include "port/port_gx.h"
 #include "port/port_input.h"
 
 // WPAD button bits as KPADStatus.hold carries them.
@@ -190,8 +191,7 @@ static void Sample(RemoteState* r) {
             if (pt.x != last.x || pt.y != last.y) sPadPointer = FALSE;  // the mouse moved: it leads again
             last = pt;
             if (!sPadPointer) {
-                r->px = 2.0f * pt.x / rc.right - 1.0f;
-                r->py = 2.0f * pt.y / rc.bottom - 1.0f;
+                PortGfxPointer((f32)pt.x / rc.right, (f32)pt.y / rc.bottom, &r->px, &r->py);
                 r->pointerValid = TRUE;
             }
         }
