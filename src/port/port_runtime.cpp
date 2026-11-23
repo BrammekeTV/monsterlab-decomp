@@ -26,7 +26,7 @@
 extern "C" u32 _ctors[];      // 0x80345AE0, resolved by port_gen.obj like every other Wii global
 
 PortOptions gPortOptions;
-PortSettings gPortSettings = {1920, 1080, TRUE, FALSE, FALSE, FALSE, 100, FALSE};
+PortSettings gPortSettings = {1920, 1080, TRUE, FALSE, FALSE, FALSE, 100, FALSE, "", 100, PORT_FILTER_GAME};
 
 // ------------------------------------------------------------------ log and boot summary
 struct Milestone { const char* what; u32 count; u32 ms; BOOL stub; };
@@ -896,6 +896,19 @@ struct PortBoot {
                 int w = 0, h = 0;
                 if (sscanf(__argv[++i], "%dx%d", &w, &h) == 2 && w >= 320 && h >= 240 && w <= 8192 && h <= 8192) { gPortSettings.width = w; gPortSettings.height = h; }
                 else fprintf(stderr, "[port] --res %s: expected WxH, e.g. 1920x1080\n", __argv[i]);
+            }
+            else if (!strcmp(a, "--render-scale") && i + 1 < __argc) {
+                int pct = atoi(__argv[++i]);                    // 50..200 percent; 0.5..2 is taken as a factor
+                if (pct > 0 && pct < 10) pct = (int)(atof(__argv[i]) * 100 + 0.5);
+                if (pct >= 50 && pct <= 200) gPortSettings.renderScale = pct;
+                else fprintf(stderr, "[port] --render-scale %s: expected 50-200 (percent) or 0.5-2\n", __argv[i]);
+            }
+            else if (!strcmp(a, "--filter") && i + 1 < __argc) {
+                int f = -1;
+                for (int k = 0; k < PORT_FILTER_COUNT; k++) if (!_stricmp(__argv[i + 1], kPortFilterNames[k])) f = k;
+                if (f >= 0) gPortSettings.texFilter = f;
+                else fprintf(stderr, "[port] --filter %s: expected game, nearest, bilinear, 2x, 4x, 8x or 16x\n", __argv[i + 1]);
+                i++;
             }
             else if (!strcmp(a, "--stretch-ui")) gPortSettings.stretchUi = TRUE;
             else if (!strcmp(a, "--aspect") && i + 1 < __argc) {

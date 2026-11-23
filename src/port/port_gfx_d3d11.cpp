@@ -504,13 +504,40 @@ static std::map<u64, TexEntry> sTextures;                   // by address and pa
 static std::map<u32, ID3D11ShaderResourceView*> sEfbCopies; // frame-buffer copies, by destination address
 static std::map<u32, u32> sEfbCopyRowBytes;                 // console bytes per row of each copy, by destination address
 
+// Texture filtering (Settings > Display): the game's own sampler modes, or everything nearest, bilinear
+// (trilinear over a mip chain made here) or anisotropic.
+static BOOL sFilterDirty;
+static BOOL WantMips(void) { return gPortSettings.texFilter >= PORT_FILTER_BILINEAR; }
+void PortGfxApplySettings(void) { sFilterDirty = TRUE; }
+
 static ID3D11ShaderResourceView* MakeTexture(const u32* rgba, u32 w, u32 h) {
     D3D11_TEXTURE2D_DESC d = {};
-    d.Width = w; d.Height = h; d.MipLevels = 1; d.ArraySize = 1; d.Format = DXGI_FORMAT_R8G8B8A8_UNORM;
+    std::vector<std::vector<u32>> chain;            // the smaller levels (box filter)
+    D3D11_SUBRESOURCE_DATA init[16] = {{rgba, w * 4, 0}};
+    u32 levels = 1;
+    if (WantMips() && w > 1 && h > 1) {
+        const u32* src = rgba; u32 sw = w, sh = h;
+        while ((sw > 1 || sh > 1) && levels < 16) {
+            u32 nw = sw > 1 ? sw / 2 : 1, nh = sh > 1 ? sh / 2 : 1;
+            std::vector<u32> lv(nw * nh);
+            for (u32 y = 0; y < nh; y++)
+                for (u32 x = 0; x < nw; x++) {
+                    u32 sum[4] = {0, 0, 0, 0};
+                    for (u32 k = 0; k < 4; k++) {
+                        u32 px = src[std::min(y * 2 + (k >> 1), sh - 1) * sw + std::min(x * 2 + (k & 1), sw - 1)];
+                        for (u32 c = 0; c < 4; c++) sum[c] += (px >> (c * 8)) & 255;
+                    }
+                    lv[y * nw + x] = (sum[0] + 2) / 4 | ((sum[1] + 2) / 4) << 8 | ((sum[2] + 2) / 4) << 16 | ((sum[3] + 2) / 4) << 24;
+                }
+            chain.push_back(std::move(lv));
+            src = chain.back().data(); sw = nw; sh = nh;
+            init[levels++] = {src, nw * 4, 0};
+        }
+    }
+    d.Width = w; d.Height = h; d.MipLevels = levels; d.ArraySize = 1; d.Format = DXGI_FORMAT_R8G8B8A8_UNORM;
     d.SampleDesc.Count = 1; d.Usage = D3D11_USAGE_IMMUTABLE; d.BindFlags = D3D11_BIND_SHADER_RESOURCE;
-    D3D11_SUBRESOURCE_DATA init = {rgba, w * 4, 0};
     ID3D11Texture2D* t = NULL; ID3D11ShaderResourceView* srv = NULL;
-    if (FAILED(sDev->CreateTexture2D(&d, &init, &t))) return NULL;
+    if (FAILED(sDev->CreateTexture2D(&d, init, &t))) return NULL;
     sDev->CreateShaderResourceView(t, NULL, &srv);
     t->Release();
     return srv;
@@ -556,6 +583,11 @@ static ID3D11SamplerState* GetSampler(const PortGx* g, u32 map) {
     BOOL mag = (mode >> 4) & 1, min = ((mode >> 5) & 7) & 4 ? TRUE : ((mode >> 5) & 7) == 1;
     d.Filter = mag && min ? D3D11_FILTER_MIN_MAG_LINEAR_MIP_POINT : mag ? D3D11_FILTER_MIN_POINT_MAG_LINEAR_MIP_POINT
              : min ? D3D11_FILTER_MIN_LINEAR_MAG_MIP_POINT : D3D11_FILTER_MIN_MAG_MIP_POINT;
+    u32 tf = (u32)gPortSettings.texFilter;
+    if (tf == PORT_FILTER_NEAREST) d.Filter = D3D11_FILTER_MIN_MAG_MIP_POINT;
+    else if (tf == PORT_FILTER_BILINEAR) d.Filter = D3D11_FILTER_MIN_MAG_MIP_LINEAR;
+    else if (tf >= PORT_FILTER_AF2) { d.Filter = D3D11_FILTER_ANISOTROPIC; d.MaxAnisotropy = 2u << (tf - PORT_FILTER_AF2); }
+    d.MaxAnisotropy = d.MaxAnisotropy ? d.MaxAnisotropy : 1;
     d.AddressU = kWrap[mode & 3]; d.AddressV = kWrap[(mode >> 2) & 3]; d.AddressW = D3D11_TEXTURE_ADDRESS_CLAMP;
     d.MaxLOD = D3D11_FLOAT32_MAX; d.ComparisonFunc = D3D11_COMPARISON_NEVER;
     ID3D11SamplerState* s = NULL;
@@ -1133,6 +1165,13 @@ static void CopyEfb(const PortGx* g, u32 control) {
     u32 px1 = (u32)std::min(PxX((s32)(x + w) + offX) - PxX(offX), (s32)sEfbPw), py1 = (u32)std::min(PxY((s32)(y + h) + offY) - PxY(offY), (s32)sEfbPh);
     u32 pw = px1 - px0, ph = py1 - py0;
     f32 su0 = (f32)px0 / sEfbPw, sv0 = (f32)py0 / sEfbPh, sdu = (f32)pw / sEfbPw, sdv = (f32)ph / sEfbPh;
+    if (sFilterDirty) {                                     // texture filtering changed: decode again, with or without mips
+        sFilterDirty = FALSE;
+        for (auto& e : sTextures) if (e.second.srv) e.second.srv->Release();
+        sTextures.clear();
+        for (auto& sm : sSamplers) if (sm) { sm->Release(); sm = NULL; }
+        sDrawBound = FALSE;
+    }
     if (control & 0x4000) {                                 // to the display: the picture's part of the output
         f32 black[4] = {0, 0, 0, 1};
         if (sPicW != sOutW || sPicH != sOutH) sCtx->ClearRenderTargetView(sOutRtv, black);
@@ -1340,8 +1379,12 @@ BOOL PortGfxStart(BOOL window) {
     sPicW = sOutW; sPicH = sOutW * ad / an;
     if (sPicH > sOutH) { sPicH = sOutH; sPicW = sOutH * an / ad; }
     sPicX = (sOutW - sPicW) / 2; sPicY = (sOutH - sPicH) / 2;
-    sFx = (f32)sPicW / EFB_W; sFy = (f32)sPicH / DISP_H;
-    sEfbPw = sPicW; sEfbPh = (u32)ceilf(EFB_H * sFy);
+    // The frame buffer is drawn at renderScale percent of the picture (0.5x..2x), then scaled to the picture.
+    f32 rs = (f32)std::min(std::max(gPortSettings.renderScale, 50), 200) / 100.0f;
+    sFx = (f32)sPicW * rs / EFB_W; sFy = (f32)sPicH * rs / DISP_H;
+    if (EFB_W * sFx > 8192.0f) { sFx = 8192.0f / EFB_W; sFy = sFx * ((f32)sPicH / DISP_H) / ((f32)sPicW / EFB_W); }
+    if (EFB_H * sFy > 8192.0f) { sFy = 8192.0f / EFB_H; sFx = sFy * ((f32)sPicW / EFB_W) / ((f32)sPicH / DISP_H); }
+    sEfbPw = (u32)lroundf(EFB_W * sFx); sEfbPh = (u32)ceilf(EFB_H * sFy);
     if (window) {
         sWndReady = CreateEventA(NULL, TRUE, FALSE, NULL);
         CloseHandle(CreateThread(NULL, 0, WindowThread, NULL, 0, NULL));
@@ -1361,8 +1404,8 @@ BOOL PortGfxStart(BOOL window) {
         } else {
             hr = D3D11CreateDevice(NULL, kDrivers[i], NULL, 0, kLevels, 2, D3D11_SDK_VERSION, &sDev, NULL, &sCtx);
         }
-        if (SUCCEEDED(hr)) PortLog("gfx: Direct3D 11 on %s, output %ux%u, picture %ux%u (%s), frame buffer %ux%u%s", i == 0 ? "the graphics card" : "the software rasteriser (WARP)",
-                                   sOutW, sOutH, sPicW, sPicH, gPortSettings.wide ? "16:9" : "4:3", sEfbPw, sEfbPh, window ? "" : ", no window");
+        if (SUCCEEDED(hr)) PortLog("gfx: Direct3D 11 on %s, output %ux%u, picture %ux%u (%s), frame buffer %ux%u (render scale %d%%)%s", i == 0 ? "the graphics card" : "the software rasteriser (WARP)",
+                                   sOutW, sOutH, sPicW, sPicH, gPortSettings.wide ? "16:9" : "4:3", sEfbPw, sEfbPh, gPortSettings.renderScale, window ? "" : ", no window");
     }
     if (FAILED(hr)) { PortLog("gfx: no Direct3D 11 device (0x%08lX); nothing will be drawn", hr); return FALSE; }
     if (sSwap) {

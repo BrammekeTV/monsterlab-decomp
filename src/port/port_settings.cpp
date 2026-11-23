@@ -2,7 +2,7 @@
 // screen edits: display (gPortSettings), audio and the input bindings (gPortBindings). Loaded at
 // start, before the command line (which wins); written when the settings screen saves.
 //
-//   [display]   width, height, aspect (16:9 or 4:3), stretch_ui, vsync, fullscreen
+//   [display]   width, height, aspect (16:9 or 4:3), stretch_ui, vsync, fullscreen, render_scale, texture_filter
 //   [game]      path: the player's disc image or extracted folder
 //   [audio]     volume (0-100), mute
 //   [controls]  NAME = key 1, key 2, mouse button, gamepad bits   (Windows virtual-key codes; 0 = none)
@@ -33,6 +33,8 @@ static char* Trim(char* s) {
     return s;
 }
 
+const char* const kPortFilterNames[PORT_FILTER_COUNT] = {"game", "nearest", "bilinear", "2x", "4x", "8x", "16x"};
+
 static s32 Clamp(s32 v, s32 lo, s32 hi) { return v < lo ? lo : v > hi ? hi : v; }
 
 BOOL PortSettingsLoad(const char* path, PortSettings* s) {
@@ -59,6 +61,10 @@ BOOL PortSettingsLoad(const char* path, PortSettings* s) {
             else if (!strcmp(key, "stretch_ui")) s->stretchUi = atoi(val) != 0;
             else if (!strcmp(key, "vsync")) s->vsync = atoi(val) != 0;
             else if (!strcmp(key, "fullscreen")) s->fullscreen = atoi(val) != 0;
+            else if (!strcmp(key, "render_scale")) s->renderScale = Clamp(atoi(val), 50, 200);
+            else if (!strcmp(key, "texture_filter")) {
+                for (int k = 0; k < PORT_FILTER_COUNT; k++) if (!_stricmp(val, kPortFilterNames[k])) s->texFilter = k;
+            }
         } else if (!strcmp(section, "game")) {
             if (!strcmp(key, "path")) snprintf(s->gamePath, sizeof(s->gamePath), "%s", val);
         } else if (!strcmp(section, "audio")) {
@@ -85,8 +91,10 @@ BOOL PortSettingsSave(const char* path, const PortSettings* s) {
     FILE* f = fopen(path, "w");
     if (!f) return FALSE;
     fprintf(f, "; Monster Lab PC port settings (written by the settings screen: F1 in the game)\n");
-    fprintf(f, "[display]\nwidth = %d\nheight = %d\naspect = %s\nstretch_ui = %d\nvsync = %d\nfullscreen = %d\n\n",
+    fprintf(f, "[display]\nwidth = %d\nheight = %d\naspect = %s\nstretch_ui = %d\nvsync = %d\nfullscreen = %d\n",
             s->width, s->height, s->wide ? "16:9" : "4:3", s->stretchUi ? 1 : 0, s->vsync ? 1 : 0, s->fullscreen ? 1 : 0);
+    fprintf(f, "; internal frame buffer size, percent of the output picture (50-200); texture_filter: game, nearest, bilinear, 2x, 4x, 8x, 16x (anisotropic)\nrender_scale = %d\ntexture_filter = %s\n\n",
+            s->renderScale, kPortFilterNames[s->texFilter >= 0 && s->texFilter < PORT_FILTER_COUNT ? s->texFilter : 0]);
     if (s->gamePath[0]) fprintf(f, "; your Monster Lab disc image (.iso) or extracted folder\n[game]\npath = %s\n\n", s->gamePath);
     fprintf(f, "[audio]\nvolume = %d\nmute = %d\n\n", s->volume, s->mute ? 1 : 0);
     fprintf(f, "; NAME = key 1, key 2, mouse button (1 left, 2 right), gamepad bits (hex); keys are Windows virtual-key codes\n[controls]\n");
@@ -110,18 +118,18 @@ int PortSelfTestSettings(void) {
 
     PortSettings want = {};
     want.width = 2560; want.height = 1440; want.wide = FALSE; want.stretchUi = TRUE; want.vsync = TRUE; want.fullscreen = TRUE;
-    want.volume = 37; want.mute = TRUE;
+    want.volume = 37; want.mute = TRUE; want.renderScale = 150; want.texFilter = PORT_FILTER_AF8;
     strcpy(want.gamePath, "D:\\My games\\Monster Lab (disc).iso");
     gPortBindings[0].key[0] = 'K'; gPortBindings[0].key[1] = 0; gPortBindings[0].mouse = 2; gPortBindings[0].pad = 0x20100;
     PortBinding changed = gPortBindings[0];
     if (!PortSettingsSave(path, &want)) { PortLog("selftest settings: cannot write %s", path); fails++; }
     memcpy(gPortBindings, keep, sizeof(PortBinding) * count);
 
-    PortSettings got = {1920, 1080, TRUE, FALSE, FALSE, FALSE, 100, FALSE};
+    PortSettings got = {1920, 1080, TRUE, FALSE, FALSE, FALSE, 100, FALSE, "", 100, PORT_FILTER_GAME};
     if (!fails && !PortSettingsLoad(path, &got)) { PortLog("selftest settings: cannot read %s", path); fails++; }
     if (!fails) {
         if (got.width != want.width || got.height != want.height || got.wide != want.wide || got.stretchUi != want.stretchUi ||
-            got.vsync != want.vsync || got.fullscreen != want.fullscreen || got.volume != want.volume || got.mute != want.mute || strcmp(got.gamePath, want.gamePath)) {
+            got.vsync != want.vsync || got.fullscreen != want.fullscreen || got.volume != want.volume || got.mute != want.mute || got.renderScale != want.renderScale || got.texFilter != want.texFilter || strcmp(got.gamePath, want.gamePath)) {
             PortLog("selftest settings: read back %dx%d wide %d stretch %d vsync %d fullscreen %d volume %d mute %d",
                     got.width, got.height, got.wide, got.stretchUi, got.vsync, got.fullscreen, got.volume, got.mute);
             fails++;
@@ -136,10 +144,10 @@ int PortSelfTestSettings(void) {
     }
     // A missing file changes nothing, and values out of range are brought into range.
     FILE* f = fopen(path, "w");
-    if (f) { fputs("[display]\nwidth = 5\nheight = 99999\n[audio]\nvolume = 250\n", f); fclose(f); }
-    PortSettings odd = {1920, 1080, TRUE, FALSE, FALSE, FALSE, 100, FALSE};
+    if (f) { fputs("[display]\nwidth = 5\nheight = 99999\nrender_scale = 900\n[audio]\nvolume = 250\n", f); fclose(f); }
+    PortSettings odd = {1920, 1080, TRUE, FALSE, FALSE, FALSE, 100, FALSE, "", 100, PORT_FILTER_GAME};
     PortSettingsLoad(path, &odd);
-    if (odd.width != 320 || odd.height != 8192 || odd.volume != 100) { PortLog("selftest settings: out-of-range values gave %dx%d volume %d", odd.width, odd.height, odd.volume); fails++; }
+    if (odd.width != 320 || odd.height != 8192 || odd.volume != 100 || odd.renderScale != 200) { PortLog("selftest settings: out-of-range values gave %dx%d volume %d", odd.width, odd.height, odd.volume); fails++; }
     DeleteFileA(path);
     if (PortSettingsLoad(path, &odd)) { PortLog("selftest settings: a missing file was reported as loaded"); fails++; }
     memcpy(gPortBindings, keep, sizeof(PortBinding) * count);
