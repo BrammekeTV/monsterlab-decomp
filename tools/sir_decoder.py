@@ -1053,6 +1053,7 @@ def zone_dump(L, sec, base, hud, roots, scene_roots, pooltabs, records=(), lists
         n, bones, ops = u(o + 8), u(o + 4), u(o + 0xC)
         bsum = sum(u(off(bones) + i * 4) for i in range(n * 12)) & 0xFFFFFFFF if n and inz(bones, n * 0x30) else 0
         opl = ' '.join('%d' % u(off(ops) + i * 8 + 4) for i in range(n)) if n and inz(ops, n * 8) else '-'
+        if n and inz(ops, n * 8): opl += ' names ' + ' '.join('%08x' % u(off(ops) + i * 8) for i in range(n))
         am = u(o)
         asum = sum(u(off(am) + i * 4) for i in range(n * 12)) & 0xFFFFFFFF if n and inz(am, n * 0x30) else 0
         L.append('skeleton %s bones %s %d sum %08x ops %s : %s player %s block %s root %s a %s sum %08x' % (
@@ -1119,7 +1120,11 @@ def zone_dump(L, sec, base, hud, roots, scene_roots, pooltabs, records=(), lists
         for v in items:
             if inz(v, 0xC) and v not in seen_objs:
                 seen_objs.add(v)
-                L.append('slotobject %s type %d' % (ptr(v), u(off(v) + 8)))
+                t = u(off(v) + 8)
+                if t == 15 and inz(v, 0x60):
+                    L.append('slotobject %s type %d track %08x %08x' % (ptr(v), t, u(off(v) + 0x58), u(off(v) + 0x5C)))
+                else:
+                    L.append('slotobject %s type %d' % (ptr(v), t))
     for addr, n in pooltabs:
         for i in range(n):
             e = off(addr) + i * 0x2C

@@ -692,7 +692,7 @@ void* fn_801B7198(void* arg0, s32 arg1) {
     s32 index = (w >> 2) & 0x3FFF;
     if (mode == 3) index = (w >> 2) & 0x1F;
     if (*(u8*)(gWorldState + 4) != 0 && ZoneIsLoaded(gWorldState, (s32)zone) != 0) {
-        u8* z = *(u8**)(gWorldState + 0x1A4) + zone * gZoneResourceSize;
+        u8* z = *(u8**)(*(u8**)gWorldState + 0x1A4) + zone * gZoneResourceSize;   // the world block's zone resources
         if ((w >> 18) & 1) {
             if (index < *(s32*)(z + 0x94)) return *(void**)(*(u8**)(z + 0x120) + index * 4);
         } else {
