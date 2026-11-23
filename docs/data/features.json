@@ -99,6 +99,11 @@
  "changelog": [
   {
    "date": "2026-11-23",
+   "time": "17:45",
+   "text": "17 more Wii SDK functions have their real names (PR #90): system clock and threads, video timing, the audio DSP, and graphics setup. That's 77 named so far."
+  },
+  {
+   "date": "2026-11-23",
    "time": "15:12",
    "text": "The title screen shows on Windows! (PRs #86 to #89) The Monster Lab logo appears with its orange letters, the eye, the green LAB tube and the glowing light bulb, plus the 'press A' prompt. The PC version now acts as if a Wii Remote with a Nunchuk is plugged in, so the game no longer covers everything with its 'reconnect the controller' message. Title-screen pictures are now read in the Wii's byte order, the screen's glow layer covers its full width, and each level's fog and lighting settings are converted. The background scene behind the logo is still black."
   },
