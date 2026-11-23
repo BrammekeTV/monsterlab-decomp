@@ -312,6 +312,11 @@ OSTime OSGetTime(void) {
 
 u32 OSGetTick(void) { return (u32)OSGetTime(); }
 
+// WAIT_FOR_INTERRUPT (types.h): the body of a game loop that waits for an interrupt handler to
+// change memory. Like a loop that polls the clock: interrupts get in, and game time moves on
+// while fast-forwarding.
+void PortInterruptPoint(void) { OSGetTime(); }
+
 // OSSleepTicks (64-bit tick count in two words): the SDK sets an alarm and sleeps the thread
 // until it fires. Here the thread waits for the clock to reach the deadline.
 void OSSleepTicks(s32 hi, u32 lo) {

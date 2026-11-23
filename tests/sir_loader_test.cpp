@@ -47,6 +47,41 @@ static void PrintPtr(const u8* slot, const GlobalBinaryFile* f) {
     else printf("wii:%08x", *(const u32*)slot);
 }
 
+// The sound objects the calls of a converted action program (n words) name, as PlaySoundAt,
+// fn_801FE52C and fn_80203340 read them. An operand is the object's Wii address.
+static void DumpSounds(const GlobalBinaryFile* f, u32 wiiBase, const u32* pc, u32 n) {
+    for (u32 k = 0; k < n; k += (pc[k] & 0xFF) <= 0x1B ? (pc[k] >> 8) & 0xFF : 1) {
+        u32 len = (pc[k] >> 8) & 0xFF, mask = 0;
+        if ((pc[k] & 0xFF) != 0x16) continue;
+        for (u32 c = 0; c < SIR_SOUND_CALLS; c++) if (kSirSoundCalls[c].func == ((pc[k] >> 16) & 0xFFF)) mask = kSirSoundCalls[c].argMask;
+        for (u32 a = 0; mask != 0 && a + 1 < len; a++) {
+            u32 snd = pc[k + 1 + a];
+            if (!(mask >> a & 1) || snd < wiiBase || (u64)(snd - wiiBase) + 0x30 > f->imageSize) continue;
+            const u8* first = f->image + (snd - wiiBase);
+            for (u32 i = 0; i < (first[4] != 0 ? first[4] : 1u); i++) {
+                const u8* e = first + i * 0x30;
+                const u8* info = *(const u8**)e;
+                printf("sound img+0x%x %u info ", snd - wiiBase, i);
+                PrintPtr(e, f);
+                printf(" bytes %02x%02x%02x%02x pitch %08x f10 %08x words", e[4], e[5], e[6], e[7], *(const u32*)(e + 8), *(const u32*)(e + 0x10));
+                for (u32 j = 0; j < 5; j++) printf(" %08x", *(const u32*)(e + 0x18 + j * 4));
+                if (info >= f->image && info + 0x18 <= f->image + f->imageSize) {
+                    const u8* dsp = *(const u8**)(info + 4);
+                    printf(" | "); PrintPtr(info, f); printf(" "); PrintPtr(info + 4, f);
+                    printf(" size %u flag %u zone %u", *(const u32*)(info + 8), *(const u16*)(info + 0xC), *(const u16*)(info + 0xE));
+                    if (dsp >= f->image && dsp + 0x60 <= f->image + f->imageSize) {
+                        u32 sum = 0;
+                        for (u32 j = 0; j < 34; j++) sum += *(const u16*)(dsp + 0x1C + j * 2);
+                        printf(" | samples %u rate %u loop %u format %u ends %u %u sum %04x", *(const u32*)dsp, *(const u32*)(dsp + 8),
+                               *(const u16*)(dsp + 0xC), *(const u16*)(dsp + 0xE), *(const u32*)(dsp + 0x10), *(const u32*)(dsp + 0x14), sum & 0xFFFF);
+                    }
+                }
+                printf("\n");
+            }
+        }
+    }
+}
+
 static u32 Fnv(const u8* p, u32 n) {
     u32 h = 0x811C9DC5u;
     for (u32 i = 0; i < n; i++) h = (h ^ p[i]) * 0x01000193u;
@@ -194,6 +229,7 @@ static void DumpImage(const GlobalBinaryFile* f) {
         printf("actionprog %u ", i);
         PrintPtr((const u8*)&at->records[i], f);
         printf(" words %u calls %u jumps %u sum %08x\n", n + 1, calls, jumps, h);
+        DumpSounds(f, GLOBAL_BINARY_WII_BASE, pc, n);
     }
 }
 
@@ -883,6 +919,7 @@ struct ZoneDump {
                 for (u32 k = 0; k <= n; k++)
                     for (s32 shift = 24; shift >= 0; shift -= 8) h = (h ^ ((pc[k] >> shift) & 0xFF)) * 0x01000193u;
                 printf(" words %u calls %u jumps %u sum %08x\n", n + 1, calls, jumps, h);
+                DumpSounds(z, zoneBase, pc, n);
             }
         }
         for (u32 t = 0; t < roots->slotEffectCount; t++) {
@@ -1334,7 +1371,7 @@ struct ZoneDump {
             printf(" w94 %d %d obj9c ", *(const s32*)(e + 0x94), *(const s32*)(e + 0x98)); Ptr(e + 0x9C);
             printf(" holder "); Ptr(e + 0xA4); printf(" children "); Ptr(e + 0xB0);
             printf(" f158 %08x more ", Bits(*(const f32*)(e + 0x158))); Ptr(e + 0x194);
-            printf(" %d w1a8 %d flags %08x\n", *(const s32*)(e + 0x1A4), *(const s32*)(e + 0x1A8), *(const u32*)(e + 0x1B0));
+            printf(" %d w1a8 %d flags %08x wb8 %08x\n", *(const s32*)(e + 0x1A4), *(const s32*)(e + 0x1A8), *(const u32*)(e + 0x1B0), *(const u32*)(e + 0xB8));
             const u8* r = *(const u8**)(e + 4);
             if (InAny(r, ENTITY_RECORD_SIZE)) {
                 printf("entrecord "); Val(r); printf(" floats");
@@ -1500,6 +1537,15 @@ static int DumpLevel(const char* path) {
     for (u32 k = 0; k < 6; k++) printf(" %08x", Bits(*(const f32*)(h + 0x1F8 + k * 4)));
     printf(" wa20 %d w1a7c %d floats %08x %08x\n", *(const s32*)(h + 0xA20), *(const s32*)(h + 0x1A7C), Bits(*(const f32*)(h + 0x1A84)),
            Bits(*(const f32*)(h + 0x1A88)));
+    // The three light records (0x1F8, 0x82C bytes each), as EntityUpdate reads them.
+    for (u32 k = 0; k < 3; k++) {
+        const u8* rec = h + 0x1F8 + k * 0x82C;
+        u32 sum = 0;
+        for (u32 i = 0; i < 512; i++) sum += *(const u32*)(rec + 0x24 + i * 4);
+        printf("levellight %u floats", k);
+        for (u32 i = 0; i < 8; i++) printf(" %08x", Bits(*(const f32*)(rec + i * 4)));
+        printf(" w20 %08x ids %d sum %08x flags %08x\n", *(const u32*)(rec + 0x20), *(const s32*)(rec + 0x824), sum, *(const u32*)(rec + 0x828));
+    }
     printf("levelpicture %u %u floats", h[0x1A80], h[0x1A81]);
     for (u32 k = 0; k < 39; k++) printf(" %08x", Bits(*(const f32*)(h + 0x1A84 + k * 4)));
     printf("\n");
@@ -1631,6 +1677,7 @@ static int DumpLevel(const char* path) {
             const u8* setHost = set >= sbase && set - sbase <= sec.size ? img + (set - sbase) : NULL;
             printf(" screens "); if (setHost != NULL) printf("img+0x%x\n", set - sbase); else if (set == 0) printf("null\n"); else printf("wii:%08x\n", set);
             for (u32 k = 0; k < sroots.entityCount; k++) sd.Add(sd.ents, img + (sroots.entities[k] - sbase));
+            sd.SlotObjects(&sroots, sbase);                      // the zone's action table
             sd.PoolTables(&sroots, sbase);
             sd.Entities();
             sd.Records(&sroots, sbase);

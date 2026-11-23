@@ -364,10 +364,11 @@ enum RegionKind {
     REGION_ENTITY_PROP, REGION_PROP_DEF, REGION_KEY_PTR,
     REGION_UI_TREE_NODE, REGION_UI_LIST, REGION_UI_WIDGET, REGION_UI_EVENT, REGION_UI_GRID, REGION_UI_FIXED,
     REGION_UI_SET, REGION_UI_SCREEN, REGION_UI_GRAPHIC, REGION_UI_TEXT,
-    REGION_LOCATORS, REGION_SOUND, REGION_SOUND_HDR,
+    REGION_LOCATORS,
     REGION_ZONE_EFFECT, REGION_ANIM_SET, REGION_ANIM_DEFS, REGION_U16_ARRAY, REGION_ANIM_OBJ, REGION_SKELETON, REGION_BONE_OPS,
     REGION_UI_ANIM, REGION_UI_ANIM_TRACK, REGION_UI_ANIM_EVENTS, REGION_UI_ANIM_KEYS, REGION_UI_ANIM_ENTRIES,
     REGION_ZONE_SYSTEM, REGION_ANIM_PLAYER, REGION_ANIM_ELEM, REGION_ANIM_TRACK, REGION_ANIM_KEYS, REGION_F32_ARRAY,
+    REGION_SOUND, REGION_SOUND_INFO, REGION_DSP_HEADER,
     REGION_RUNTIME    // memory the game initialises itself: nothing to convert, but nothing else may be there
 };
 
@@ -1226,32 +1227,85 @@ static u32 ActionInstructionWords(u32 word) {
     return len;
 }
 
-// A sound object an action program names (the argument of PlaySoundEffect): count (byte at +4, 0 =
-// one) records of 0x30 bytes, as PlaySoundAt reads them: +0 the sound's header, +8 pitch, +0x10 a
-// float, +0x18 a hash; the other bytes are single bytes (volume, jitter, distances, flags). The
-// header: two pointers, a word, and two halves of which +0xC is zero for a sound that is not
-// streamed. Found only in the zones of the screens, where the UI's sounds are played from; the
-// objects of the global action table are not read yet (docs/loader.md).
-static const SirField kSoundEntryFields[] = {
-    { 0x00, SIR_PTR, 1 }, { 0x08, SIR_F32, 1 }, { 0x10, SIR_F32, 1 }, { 0x18, SIR_U32, 1 },
+// ---- sound objects (what a sound argument of a script call points at)
+//
+// A script function whose signature has an argument of type 0xB gets a pointer to a sound object:
+// one or more 0x30-byte variations (PlaySoundAt picks one at random; the count is the byte at +0x04
+// of the first, 0 meaning one). A variation names its sample by a pointer to a sound info, which
+// names a DSP header (the layout of the first 0x60 bytes of a .dsp file) with the sample data behind
+// it. The functions are known by their index in gScriptFuncs (kSirSoundCalls: the registration order
+// of the retail build, which the port checks against the live table).
+//   variation: +0x00 info (PlaySoundAt), +0x04 count, +0x06 volume, +0x07 volume spread (bytes),
+//              +0x08 pitch, +0x10 float (PlaySoundAt), +0x14 kind, +0x15 / +0x16 distances, +0x17
+//              last pick, +0x2D / +0x2E flags (bytes); +0x0C and +0x18..+0x2B have no reader yet
+//              and are words in the shipped files (0, a hash, zeros)
+//   info:      +0x00 word and +0x04 DSP header (fn_801FE52C: both 0 = not loaded yet), +0x0C u16
+//              (PlaySoundAt), +0x0E s16 zone (fn_801FF154), +0x18 name (bytes); +0x08 a word (size)
+//   DSP header: fn_80203340
+extern "C" const SirSoundCall kSirSoundCalls[SIR_SOUND_CALLS] = {
+    {   48, 0x1, "PlayGlobalSound" },        {   49, 0x1, "PlayGlobalSoundSynced" },  {   50, 0x1, "PlayGlobalSoundWithEffect" },
+    {   51, 0x2, "PlayLoopingSoundFX" },     {   52, 0x2, "PlayLoopingSoundFXWithEffect" },
+    {   55, 0x2, "PlaySoundFX" },            {   56, 0x2, "PlaySoundFXWithEffect" },
+    { 1216, 0x3, "PlayBackgroundSFX" },      { 1217, 0x3, "PlayBackgroundSFXWithEffect" },
+    { 1238, 0x1, "PlaySoundEffect" },        { 1239, 0x1, "PlaySoundEffectWithEffect" },
+    { 1297, 0x2, "QueueSoundFX" },           { 1330, 0x2, "RegisterExperimentSound" }, { 1332, 0x1, "RegisterMidiLoop" },
+    { 1684, 0x3, "StopBackgroundSFX" },      { 1693, 0x1, "StopSoundEffect" },
 };
-static const SirField kSoundHdrFields[] = {
-    { 0x00, SIR_PTR, 2 }, { 0x08, SIR_U32, 1 }, { 0x0C, SIR_U16, 2 },
-};
-#define SOUND_ENTRY_SIZE 0x30
-#define SOUND_HDR_SIZE   0x10
-static bool sSoundScan;
 
-static SirError SoundObjectPlan(ImagePlan* plan, const u8* image, u32 imageSize, u32 addr) {
-    u32 off, hdrOff;
-    if (!ImageSpan(addr, SOUND_ENTRY_SIZE, imageSize, &off)) return SIR_OK;       // not an address of this image
+#define SOUND_SIZE       0x30
+#define SOUND_INFO_USED  0x18
+#define DSP_HEADER_SIZE  0x60
+
+static const SirField kSoundFields[] = {
+    { 0x00, SIR_PTR, 1 },     // code: the sound info (PlaySoundAt)
+    { 0x08, SIR_F32, 1 },     // code: pitch (PlaySoundAt)
+    { 0x0C, SIR_U32, 1 },     // data: 0
+    { 0x10, SIR_F32, 1 },     // code: float handed on with the sound (PlaySoundAt)
+    { 0x18, SIR_U32, 5 },     // data: a hash, zeros
+};
+static const SirField kSoundInfoFields[] = {
+    { 0x00, SIR_PTR, 2 },     // code: word and DSP header, both tested against 0 (fn_801FE52C)
+    { 0x08, SIR_U32, 1 },     // data: a size
+    { 0x0C, SIR_U16, 2 },     // code: u16 (PlaySoundAt), s16 zone (fn_801FF154)
+    { 0x10, SIR_U32, 2 },     // data: zeros
+};
+static const SirField kDspHeaderFields[] = {
+    { 0x00, SIR_U32, 3 },     // code: samples, nibbles, sample rate (fn_80203340 reads the rate)
+    { 0x0C, SIR_U16, 2 },     // code: loop flag, format (fn_80203340)
+    { 0x10, SIR_U32, 3 },     // code: loop start, end and current address (fn_80203340)
+    { 0x1C, SIR_U16, 34 },    // code: coefficients, gain, predictor and history, loop state (fn_80203340)
+};
+
+static SirError SoundPlan(ImagePlan* plan, const u8* image, u32 imageSize, u32 addr) {
+    u32 off, info, dsp;
+    if (addr == 0 || !ImageSpan(addr, SOUND_SIZE, imageSize, &off)) return SIR_OK;   // none, or in another image
     if (PlanHas(plan, off, REGION_SOUND)) return SIR_OK;
-    u32 count = image[off + 4] ? image[off + 4] : 1;
-    if (!ImageSpan(addr, (u64)count * SOUND_ENTRY_SIZE, imageSize, &off)) return SIR_OK;
-    if (!PlanAdd(plan, off, count * SOUND_ENTRY_SIZE, REGION_SOUND)) return SIR_ERR_ACTIONS;
-    u32 hdr = Be32(image + off);
-    if (ImageSpan(hdr, SOUND_HDR_SIZE, imageSize, &hdrOff) && !PlanHas(plan, hdrOff, REGION_SOUND_HDR) &&
-        !PlanAdd(plan, hdrOff, SOUND_HDR_SIZE, REGION_SOUND_HDR)) return SIR_ERR_ACTIONS;
+    u32 count = image[off + 4] != 0 ? image[off + 4] : 1;
+    if ((u64)off + (u64)count * SOUND_SIZE > imageSize) return SIR_ERR_ACTIONS;
+    if (!PlanAdd(plan, off, count * SOUND_SIZE, REGION_SOUND)) return SIR_ERR_ACTIONS;
+    for (u32 i = 0; i < count; i++) {
+        if (!ImageSpan(Be32(image + off + i * SOUND_SIZE), SOUND_INFO_USED, imageSize, &info) || PlanHas(plan, info, REGION_SOUND_INFO)) continue;
+        if (!PlanAdd(plan, info, SOUND_INFO_USED, REGION_SOUND_INFO)) return SIR_ERR_ACTIONS;
+        if (!ImageSpan(Be32(image + info + 4), DSP_HEADER_SIZE, imageSize, &dsp) || PlanHas(plan, dsp, REGION_DSP_HEADER)) continue;
+        if (!PlanAdd(plan, dsp, DSP_HEADER_SIZE, REGION_DSP_HEADER)) return SIR_ERR_ACTIONS;
+    }
+    return SIR_OK;
+}
+
+// The sound objects the calls of one checked program name.
+static SirError ActionSoundsPlan(ImagePlan* plan, const u8* image, u32 imageSize, u32 off, u32 words) {
+    for (u32 i = 0; i < words; i += ActionInstructionWords(Be32(image + off + i * 4))) {
+        u32 word = Be32(image + off + i * 4);
+        if (ActionOp(word) != ACTION_OP_CALL) continue;
+        for (u32 c = 0; c < SIR_SOUND_CALLS; c++) {
+            if (kSirSoundCalls[c].func != ActionJump(word)) continue;
+            for (u32 a = 0; a + 1 < ActionLen(word); a++) {
+                if (!(kSirSoundCalls[c].argMask >> a & 1)) continue;
+                SirError e = SoundPlan(plan, image, imageSize, Be32(image + off + (i + 1 + a) * 4));
+                if (e != SIR_OK) return e;
+            }
+        }
+    }
     return SIR_OK;
 }
 
@@ -1288,21 +1342,9 @@ static SirError ActionRecordPlan(ImagePlan* plan, const u8* image, u32 imageSize
     }
     free(starts);
     if (!ok) return SIR_ERR_ACTIONS;
-    if (!PlanAdd(plan, off, total * 4, REGION_U32_ARRAY)) return SIR_ERR_ACTIONS;
-    if (sSoundScan) {      // an operand of a call that is an address in this image names a sound object
-        for (u32 i = 0; i < words; i += ActionInstructionWords(Be32(image + off + i * 4))) {
-            u32 word = Be32(image + off + i * 4);
-            if (ActionOp(word) != ACTION_OP_CALL) continue;
-            for (u32 k = 1; k < ActionLen(word); k++) {
-                u32 operand = Be32(image + off + (i + k) * 4);
-                if ((operand & 3) == 0 && operand >= sImageBase) {
-                    SirError e = SoundObjectPlan(plan, image, imageSize, operand);
-                    if (e != SIR_OK) return e;
-                }
-            }
-        }
-    }
-    return SIR_OK;
+    SirError e = ActionSoundsPlan(plan, image, imageSize, off, words);
+    if (e != SIR_OK) return e;
+    return PlanAdd(plan, off, total * 4, REGION_U32_ARRAY) ? SIR_OK : SIR_ERR_ACTIONS;
 }
 
 // Every record of the action table at `addr` (already checked by PtrArrayPlan).
@@ -1482,6 +1524,7 @@ static const SirField kEntityFields[] = {
     { 0x0A4, SIR_PTR, 1 },    // code: state machine holder (fn_8012F8B8)
     { 0x0AC, SIR_U32, 1 },    // code: fn_801B6554, fn_801B66EC
     { 0x0B0, SIR_PTR, 1 },    // code: list of child entities (fn_8012F8B8)
+    { 0x0B8, SIR_U32, 1 },    // code: flags; UpdateZoneEntities updates an entity without bit 0
     { 0x158, SIR_F32, 1 },    // code: fn_800690D4
     { 0x194, SIR_PTR, 1 },    // code: more part containers (fn_8012F8B8),
     { 0x1A4, SIR_U32, 2 },    //       their count; +0x1A8 (fn_800690D4)
@@ -2481,10 +2524,6 @@ static void ImagePlanConvert(const ImagePlan* plan, SirReloc* r, u8* image, u32 
         case REGION_TEXTURE:      SirConvertRecord(r, p, g->size, kTextureFields, COUNTOF(kTextureFields)); break;
         case REGION_STRING_TABLE: SirConvertRecord(r, p, g->size, kStringTableFields, COUNTOF(kStringTableFields)); break;
         case REGION_ACTION_TABLE: SirConvertRecord(r, p, g->size, kActionTableFields, COUNTOF(kActionTableFields)); break;
-        case REGION_SOUND:
-            for (u32 k = 0; k + SOUND_ENTRY_SIZE <= g->size; k += SOUND_ENTRY_SIZE) SirConvertRecord(r, p + k, SOUND_ENTRY_SIZE, kSoundEntryFields, COUNTOF(kSoundEntryFields));
-            break;
-        case REGION_SOUND_HDR:    SirConvertRecord(r, p, g->size, kSoundHdrFields, COUNTOF(kSoundHdrFields)); break;
         case REGION_PTR_ARRAY:
             for (u32 k = 0; k < g->size; k += 4) ConvertPtr(r, p + k);
             break;
@@ -2578,6 +2617,9 @@ static void ImagePlanConvert(const ImagePlan* plan, SirReloc* r, u8* image, u32 
         case REGION_PTR_COUNT:    SirConvertRecord(r, p, g->size, kPtrCountFields, COUNTOF(kPtrCountFields)); break;
         case REGION_COUNT_PTR:    SirConvertRecord(r, p, g->size, kCountPtrFields, COUNTOF(kCountPtrFields)); break;
         case REGION_POOL_TABLE:   ConvertRecords(r, p, g->size, POOL_TABLE_ENTRY, kPoolTableEntryFields, COUNTOF(kPoolTableEntryFields)); break;
+        case REGION_SOUND:        ConvertRecords(r, p, g->size, SOUND_SIZE, kSoundFields, COUNTOF(kSoundFields)); break;
+        case REGION_SOUND_INFO:   SirConvertRecord(r, p, g->size, kSoundInfoFields, COUNTOF(kSoundInfoFields)); break;
+        case REGION_DSP_HEADER:   SirConvertRecord(r, p, g->size, kDspHeaderFields, COUNTOF(kDspHeaderFields)); break;
         case REGION_POOL_BLOCK:   // converted with its pool
         case REGION_RUNTIME:
             break;
@@ -2670,8 +2712,13 @@ static const SirField kLevelHeaderFields[] = {
     // 0x1EC: u8 (WorldPostUpdate)
     { 0x1F0, SIR_U32, 1 },    // code: GameSessionUpdate
     { 0x1F4, SIR_PTR, 1 },    // code: the level's HUD (HudReload, fn_800D8100)
-    { 0x1F8, SIR_F32, 6 },    // code: fn_8003E560, fn_8006C3FC
-    { 0xA20, SIR_U32, 1 },    // code: fn_8003E560
+    // 0x1F8: three light records of 0x82C bytes, of which +0x1A7C are in use. EntityUpdate gives an
+    // entity the first record that has flag 0x10 or lists its definition's id: +0x00 six floats
+    // (colours: fn_8003E560, fn_8006C3FC, EntityUpdate), +0x18 and +0x1C angles, +0x20 a word
+    // without a reader, +0x24 up to 512 definition ids, +0x824 how many, +0x828 flags.
+    { 0x1F8, SIR_F32, 8 },  { 0x218, SIR_U32, 515 },
+    { 0xA24, SIR_F32, 8 },  { 0xA44, SIR_U32, 515 },
+    { 0x1250, SIR_F32, 8 }, { 0x1270, SIR_U32, 515 },
     { 0x1A7C, SIR_U32, 1 },   // code: EntityUpdate, fn_8003E560
     // 0x1A80: the level's picture settings, 0xA0 bytes: two flag bytes, then 39 floats
     { 0x1A84, SIR_F32, 39 },  // code: fn_8012A79C copies them all to lbl_8040D500 (fn_8015F4CC builds the
@@ -3102,12 +3149,10 @@ extern "C" SirError LevelZoneConvert(SirReloc* r, u8* image, u32 imageSize, u32 
     }
     // A zone's action table is laid out like the one of global_binary.sir, and its records are
     // programs for the same interpreter (TriggerDoAction -> fn_801E1BD4).
-    sSoundScan = true;
     for (u32 i = 0; i < roots->actionTableCount && e == SIR_OK; i++) {
         e = PtrArrayPlan(&plan, image, imageSize, roots->actionTables[i], ACTION_TABLE_SIZE, 0x00, 0x04, REGION_ACTION_TABLE, SIR_ERR_ACTIONS);
         if (e == SIR_OK) e = ActionRecordsPlan(&plan, image, imageSize, roots->actionTables[i]);
     }
-    sSoundScan = false;
     for (u32 i = 0; i < roots->slotEffectCount && e == SIR_OK; i++)
         e = SlotEffectsPlan(&plan, image, imageSize, roots->slotEffects[i * 2], roots->slotEffects[i * 2 + 1]);
     for (u32 i = 0; i < roots->slotObjectCount && e == SIR_OK; i++)
