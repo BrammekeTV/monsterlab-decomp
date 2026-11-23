@@ -1524,6 +1524,7 @@ static const SirField kEntityFields[] = {
     { 0x0A4, SIR_PTR, 1 },    // code: state machine holder (fn_8012F8B8)
     { 0x0AC, SIR_U32, 1 },    // code: fn_801B6554, fn_801B66EC
     { 0x0B0, SIR_PTR, 1 },    // code: list of child entities (fn_8012F8B8)
+    { 0x0B8, SIR_U32, 1 },    // code: flags; UpdateZoneEntities updates an entity without bit 0
     { 0x158, SIR_F32, 1 },    // code: fn_800690D4
     { 0x194, SIR_PTR, 1 },    // code: more part containers (fn_8012F8B8),
     { 0x1A4, SIR_U32, 2 },    //       their count; +0x1A8 (fn_800690D4)
@@ -2616,10 +2617,10 @@ static void ImagePlanConvert(const ImagePlan* plan, SirReloc* r, u8* image, u32 
         case REGION_PTR_COUNT:    SirConvertRecord(r, p, g->size, kPtrCountFields, COUNTOF(kPtrCountFields)); break;
         case REGION_COUNT_PTR:    SirConvertRecord(r, p, g->size, kCountPtrFields, COUNTOF(kCountPtrFields)); break;
         case REGION_POOL_TABLE:   ConvertRecords(r, p, g->size, POOL_TABLE_ENTRY, kPoolTableEntryFields, COUNTOF(kPoolTableEntryFields)); break;
-        case REGION_POOL_BLOCK:   // converted with its pool
         case REGION_SOUND:        ConvertRecords(r, p, g->size, SOUND_SIZE, kSoundFields, COUNTOF(kSoundFields)); break;
         case REGION_SOUND_INFO:   SirConvertRecord(r, p, g->size, kSoundInfoFields, COUNTOF(kSoundInfoFields)); break;
         case REGION_DSP_HEADER:   SirConvertRecord(r, p, g->size, kDspHeaderFields, COUNTOF(kDspHeaderFields)); break;
+        case REGION_POOL_BLOCK:   // converted with its pool
         case REGION_RUNTIME:
             break;
         }
@@ -2711,8 +2712,13 @@ static const SirField kLevelHeaderFields[] = {
     // 0x1EC: u8 (WorldPostUpdate)
     { 0x1F0, SIR_U32, 1 },    // code: GameSessionUpdate
     { 0x1F4, SIR_PTR, 1 },    // code: the level's HUD (HudReload, fn_800D8100)
-    { 0x1F8, SIR_F32, 6 },    // code: fn_8003E560, fn_8006C3FC
-    { 0xA20, SIR_U32, 1 },    // code: fn_8003E560
+    // 0x1F8: three light records of 0x82C bytes, of which +0x1A7C are in use. EntityUpdate gives an
+    // entity the first record that has flag 0x10 or lists its definition's id: +0x00 six floats
+    // (colours: fn_8003E560, fn_8006C3FC, EntityUpdate), +0x18 and +0x1C angles, +0x20 a word
+    // without a reader, +0x24 up to 512 definition ids, +0x824 how many, +0x828 flags.
+    { 0x1F8, SIR_F32, 8 },  { 0x218, SIR_U32, 515 },
+    { 0xA24, SIR_F32, 8 },  { 0xA44, SIR_U32, 515 },
+    { 0x1250, SIR_F32, 8 }, { 0x1270, SIR_U32, 515 },
     { 0x1A7C, SIR_U32, 1 },   // code: EntityUpdate, fn_8003E560
     // 0x1A80: the level's picture settings, 0xA0 bytes: two flag bytes, then 39 floats
     { 0x1A84, SIR_F32, 39 },  // code: fn_8012A79C copies them all to lbl_8040D500 (fn_8015F4CC builds the
