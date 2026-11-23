@@ -28,10 +28,13 @@ typedef f32  (*SrcValueFn)(void* src);
 // `blend` gets the mean of the blend values.
 //
 // The original calls slot 0xC with entry 10 (one past its arrays) when ten entries are in use
-// and then leaves that zone's list; the arrays here have one spare entry for that call.
+// and then leaves that zone's list; the buffer below has the original's layout for that call.
 extern "C" void fn_800DC070(u8* cam, f32* pos, f32* dir, f32* blend, f32 dt) {
-    Vec3 srcPos[11];
-    Vec3 srcDir[11];
+    // The original keeps ten directions at 0x80 and ten positions right after them (0xF8), so
+    // the call with entry 10 writes its direction over the position of entry 0.
+    Vec3 buf[21];
+    Vec3* srcDir = buf;
+    Vec3* srcPos = buf + 10;
     f32  weight[10];
     f32  value[10];
 
@@ -61,7 +64,7 @@ extern "C" void fn_800DC070(u8* cam, f32* pos, f32* dir, f32* blend, f32 dt) {
             continue;
         }
         u8* res = *(u8**)(*(u8**)gWorldState + 0x1A4) + zi * gZoneResourceSize;
-        for (s32 i = 0; i < *(s32*)(res + 0xAC); i++) {
+        for (s32 i = 0; i < *(u8*)(res + 0xAC); i++) {
             void* src = (*(void***)(res + 0xA8))[i];
             if (src == NULL) {
                 continue;

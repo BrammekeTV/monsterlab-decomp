@@ -98,6 +98,11 @@
  ],
  "changelog": [
   {
+   "date": "2026-11-23",
+   "time": "12:31",
+   "text": "Checked 29 of the largest functions that run during the Windows boot (world update, video and renderer setup, camera) against the original and fixed 3 mistakes in our decompiled code (a missing return value in the level zone loader, a wrong read width and a stack layout difference in the camera source code)"
+  },
+  {
    "date": "2026-11-22",
    "time": "22:04",
    "text": "The loader converts each mesh part's draw batch on Windows (PR #71): its statistics and where its display list starts and how long it is, the next piece the level needs to draw its 3D models."

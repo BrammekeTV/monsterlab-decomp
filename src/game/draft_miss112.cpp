@@ -47,7 +47,7 @@ void  UIPlayAnim(void* el, u32 anim);                                  // 0x8019
 void  UISetProgress(void* obj, f32 t);
 void  UISetText(void* el, const char* text, s32 a);
 void* UIWidgetFindChild(void* widget, u32 hash);                       // 0x80199AEC
-void  WorldLoadLevelZones(s32 level);                                  // 0x80126AB0
+BOOL  WorldLoadLevelZones(s32 level);                                  // 0x80126AB0
 void  __destroy_arr(void* arr, void (*dtor)(void*, s32), u32 size, u32 count);   // 0x8032F2E0
 void  fn_8001D4FC(u8* mgr);
 void  fn_8004C718(u8* p, s32 idx, void* elem);

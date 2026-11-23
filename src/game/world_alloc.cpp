@@ -127,7 +127,7 @@ void WorldDataCreate(WorldParams* params) {
 // ---------------------------------------------------------------- world state setup
 
 extern "C" {
-void  WorldLoadLevelZones(s32 level);              // 0x80126AB0
+BOOL  WorldLoadLevelZones(s32 level);              // 0x80126AB0 (returns 1)
 void  ZoneSlotInit(void* slot);                    // 0x801F2B40
 void  WorldResetQueues(void* world);               // 0x8013022C
 void* IdPoolNext(void* pool);                      // 0x801E6EB0
@@ -233,7 +233,7 @@ static inline s32 CatStart(u32 off) {
 // Assign every zone the MEM2 address its .sir data is loaded to. Zone 0 and the first category
 // share the start of the area; the five streamed categories alternate between two banks
 // (one bank if the level is flagged for it).
-extern "C" void WorldLoadLevelZones(s32 level) {
+extern "C" BOOL WorldLoadLevelZones(s32 level) {
     gLevelSingleBank = (gLevelFlags[(u8)level * 0x20 + 0x18] >> 3) & 1;
     for (s32 i = 0; i < ZoneCount(); i++) {
         gZoneLoaded[i] = 0;
@@ -265,4 +265,5 @@ extern "C" void WorldLoadLevelZones(s32 level) {
         }
         blockOfs += (u32)S(0x0C + c * 4);
     }
+    return TRUE;
 }
