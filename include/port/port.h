@@ -74,9 +74,20 @@ typedef struct PortGxState {
 } PortGxState;
 extern PortGxState gPortGx;
 
+// ---- the player's disc image (port_disc.cpp) ----
+enum { PORT_DISC_OK, PORT_DISC_NO_FILE, PORT_DISC_NOT_WII, PORT_DISC_WRONG_GAME, PORT_DISC_WRONG_REGION, PORT_DISC_UNREADABLE };
+int  PortDiscCheck(const char* path, char* why, u32 n);    // the header only: is this Monster Lab (RM7P4F)? why says it in words
+int  PortDiscOpen(const char* path, char* why, u32 n);     // also the game partition's key and file table
+void PortDiscClose(void);
+BOOL PortDiscIsOpen(void);
+BOOL PortDiscFind(const char* path, u64* offset, u32* size);   // a file of the disc, by its path
+BOOL PortDiscRead(u64 offset, void* dst, u32 len);         // decrypted bytes of the game partition
+u64  PortDiscDolOffset(void);                              // where main.dol starts in the partition
+int  PortSelfTestDisc(void);
+
 // ---- runtime (port_runtime.cpp) ----
 typedef struct PortOptions {
-    const char* dataDir;      // extracted disc: <dataDir>/sys/main.dol and <dataDir>/files/
+    const char* dataDir;      // extracted disc: <dataDir>/sys/main.dol and <dataDir>/files/; or the disc image itself (PortDiscIsOpen)
     s32  frameLimit;          // stop after this many presented frames (0 = none)
     s32  secondsLimit;        // stop after this many seconds without reaching the frame limit
     BOOL selfTest;
