@@ -77,7 +77,9 @@ static BOOL                    sStarted;
 
 static struct { u32 draws, tris, presents, texCopies, textures, shaders, skipped; } sGfxStats;
 // This frame so far (reset at each display copy): time inside this backend, draws, GX vertices, copies.
+static s64 sTotalDraw, sTotalCopy;     // time inside the backend over the whole run (the boot summary)
 static struct { s64 renderTicks; u32 draws, verts, copies; } sFrame;
+static inline s64 Ticks_freq(void) { LARGE_INTEGER f; QueryPerformanceFrequency(&f); return f.QuadPart; }
 static inline s64 Ticks(void) { LARGE_INTEGER t; QueryPerformanceCounter(&t); return t.QuadPart; }
 static u8 sTlutMem[0x80000];           // the palette half of the console's texture memory
 
@@ -1171,15 +1173,26 @@ BOOL PortGfxSaveScreenshot(const char* path) {
 }
 
 // ------------------------------------------------------------------ start
+// Fast-forward with a frame target: draws only matter through the copies of the frame buffer that later
+// frames use (the engine redraws and recopies everything each frame) and the picture at the target, so the
+// draws of all but the last kFastDrawn frames are dropped. The GX interpreter still decodes them: state and
+// copies go on. (--fast has no target and always draws.)
+static const s32 kFastDrawn = 30;
+static u32 sFastSkipped;
+static BOOL FastDropping(void) { return PortFastActive() && !gPortOptions.fastAll && gPortOptions.fastForward > 0 && PortFrameCount() < gPortOptions.fastForward - kFastDrawn; }
 static void Draw(const PortGx* g, u32 prim, const PortGxLayout* L, u32 count, const u8* data) {
+    if (FastDropping()) { sFastSkipped++; return; }
     s64 t = Ticks();
     DrawPrims(g, prim, L, count, data);
     sFrame.renderTicks += Ticks() - t;
+    sTotalDraw += Ticks() - t;
 }
 static void Copy(const PortGx* g, u32 control) {
+    if (FastDropping()) return;                  // nothing was drawn: the copy would only move an old picture
     s64 t = Ticks();
     CopyEfb(g, control);
     sFrame.renderTicks += Ticks() - t;
+    sTotalCopy += Ticks() - t;
 }
 static const PortGxBackend kBackend = {Draw, Copy, LoadTlut};
 
@@ -1284,8 +1297,9 @@ BOOL PortGfxStart(BOOL window) {
 
 const char* PortGfxStatsText(char* buf, u32 n) {
     if (!sStarted) { snprintf(buf, n, "no renderer (run with --window or --screenshot FILE)"); return buf; }
-    snprintf(buf, n, "%u draw(s), %u triangle(s), %u picture(s) shown, %u copy(ies) to a texture, %u texture(s) decoded, %u shader(s), %u draw(s) skipped",
-             sGfxStats.draws, sGfxStats.tris, sGfxStats.presents, sGfxStats.texCopies, sGfxStats.textures, sGfxStats.shaders, sGfxStats.skipped);
+    snprintf(buf, n, "%u draw(s), %u triangle(s), %u picture(s) shown, %u copy(ies) to a texture, %u texture(s) decoded, %u shader(s), %u draw(s) skipped; backend time: draws %.1f s, copies %.1f s, %u draw(s) dropped by fast-forward",
+             sGfxStats.draws, sGfxStats.tris, sGfxStats.presents, sGfxStats.texCopies, sGfxStats.textures, sGfxStats.shaders, sGfxStats.skipped,
+             sTotalDraw / (double)Ticks_freq(), sTotalCopy / (double)Ticks_freq(), sFastSkipped);
     return buf;
 }
 #endif
