@@ -51,7 +51,7 @@ extern "C" void fn_8012AAD8(void) {
 }
 
 // 0x8012CDF0
-extern "C" u8 fn_8012CDF0(u8* a3) {
+extern "C" u32 fn_8012CDF0(u8* a3) {
     u8 t0 = *(u8*)(((u8*)(uintptr_t)(a3)) + 289);
     return (u8)(t0);
 }

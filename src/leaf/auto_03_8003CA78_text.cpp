@@ -20,7 +20,7 @@ extern "C" s32 fn_8003CAE0(u8* a3) {
 }
 
 // 0x8003CB08
-extern "C" u8 fn_8003CB08(u8* a3) {
+extern "C" u32 fn_8003CB08(u8* a3) {
     u8 t0 = *(u8*)(((u8*)(uintptr_t)(a3)) + 0);
     *(u8*)(((u8*)(uintptr_t)(a3)) + 0) = (u8)((u32)(0));
     return (u8)(t0);

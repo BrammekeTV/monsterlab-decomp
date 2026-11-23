@@ -18,8 +18,11 @@ ROOT = check.ROOT
 B = os.path.join(ROOT, "build", "optbisect")
 MIX = os.path.join(B, "mix")
 EXE = os.path.join(B, "monsterlab.exe")
-MENU_RE = re.compile(r"\[script\] EnableMainMenuDebugOptions")   # the main menu script runs (PORT_SCRIPT_TRACE)
-ARGS = ["--frames", "3200", "--press", "A@2600-2610", "--seconds", "300", "--no-audio"]
+# The main menu's per-frame scripts (script functions 134 and 600: EnableMainMenuDebugOptions, UiHideByHash) run from
+# about frame 2990. Names in the trace are not reliable at /O2 (the linker folds identical functions), the indices are.
+MENU_RE = re.compile(r"\(function (134|600), frame (2[89]\d\d|3[01]\d\d)\)")
+ARGS = ["--frames", "3200", "--press", "A@2600-2610", "--seconds", "300", "--no-audio", "--fast-forward", "3200"]
+CRASH_ONLY = "--crash-only" in sys.argv   # bisect: fail only on a crash, not on a missing menu
 FILES = sorted(glob.glob(os.path.join(ROOT, "src", "**", "*.cpp"), recursive=True))
 rel = lambda p: os.path.relpath(p, ROOT).replace("\\", "/")
 stem = lambda p: os.path.splitext(os.path.basename(p))[0] + ".obj"
@@ -59,7 +62,7 @@ def boot():
     p = subprocess.run([EXE] + ARGS, cwd=ROOT, capture_output=True, text=True, errors="replace",
                        env=dict(os.environ, PORT_SCRIPT_TRACE="1"))
     log = p.stdout + p.stderr
-    ok = "frame limit reached" in log and bool(MENU_RE.search(log))
+    ok = "frame limit reached" in log and (CRASH_ONLY or bool(MENU_RE.search(log)))
     stop = [l.strip() for l in log.splitlines() if "STOP" in l or "crash" in l]
     return ok, time.time() - t, stop[:1]
 

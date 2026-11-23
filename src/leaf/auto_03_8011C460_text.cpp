@@ -14,7 +14,7 @@ extern "C" void fn_8011CC58(void) {
 }
 
 // 0x8011CD10
-extern "C" u8 fn_8011CD10(void) {
+extern "C" u32 fn_8011CD10(void) {
     u8 t0 = *(u8*)((u8*)&lbl_805FB2A8);
     return (u8)(t0);
 }
