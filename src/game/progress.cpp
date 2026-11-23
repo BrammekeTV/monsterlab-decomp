@@ -251,11 +251,11 @@ u32 SaveUnlockReward(SaveProgress* s, const u8* r, BOOL notify) {
         PartInstance* p = PartInventoryAlloc(raw + 0xA30);
         if (p != NULL) PartSetDef(p, part);
         if (p != NULL) {
-            PartSetTier(p, r[0x30]);
-            PartSetQuality(p, (s8)r[0x34]);
+            PartSetTier(p, (u8) * (const s16*)(r + 0x30));
+            PartSetQuality(p, (s8) * (const s16*)(r + 0x34));
             PartSetHealth(p, PartGetMaxHealth(p));
             LabOnPartReward(gLab, p);
-            if (notify) PostNotice6(s, NOTICE_PART, *(const s32*)(r + 0x28), (u8)r[0x30]);
+            if (notify) PostNotice6(s, NOTICE_PART, *(const s32*)(r + 0x28), *(const s16*)(r + 0x30));
         }
     }
     s32 key = *(const s32*)(r + 0x1C);
@@ -280,7 +280,7 @@ u32 SaveUnlockReward(SaveProgress* s, const u8* r, BOOL notify) {
             u8 seen = (u8)(1 << ((u8)tier - 1));
             if (seen == (seen & raw[0x40 + type])) raw[0x40 + type] |= (u8)(1 << ((u8)tier + 3));
         }
-        LabOnDiscoveryReward(gLab, *(const s32*)(r + 0x2C), (u8)tier);
+        LabOnDiscoveryReward(gLab, *(const s32*)(r + 0x2C), tier);
         if (notify) PostNotice6(s, NOTICE_DISCOVERY, *(const s32*)(r + 0x2C), tier);
     }
     // MSP goes to the save that owns the record, and the rank-up is checked on it.
@@ -401,7 +401,7 @@ void SaveRewardQuest(SaveProgress* s, u32 quest) {
         memcpy(rec, RewardRec(i), sizeof(rec));
         if (*(s32*)(rec + 0xC) != (s32)quest) continue;
         SaveUnlockReward(s, rec, TRUE);
-        PostNotice6(s, NOTICE_QUEST_REWARD, (s32)quest, *(s32*)(rec + 0x18));
+        PostNotice6(s, NOTICE_QUEST_REWARD, (s32)quest, (s32)*(const f32*)(rec + 0x18));
     }
 }
 

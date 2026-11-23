@@ -87,8 +87,8 @@ void UIElement_SetUIAnimPlaybackRate(u32 a0, f32 a1) {
             return;
         }
         fn_801AB80C((u8*)*(void**)(el + 0x10), a1);
-        fn_801AB804(*(void**)(el + 0x10));
-        fn_801AB748(*(u8**)(el + 0x10), a1);  // lint:ok f1 is still a1 (no float result set in between)
+        f32 t = fn_801AB804(*(void**)(el + 0x10));
+        fn_801AB748(*(u8**)(el + 0x10), t);  // f1 = current time returned by 801AB804 (no fmr back to a1)
     }
 }
 

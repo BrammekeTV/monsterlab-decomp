@@ -317,7 +317,7 @@ s32 fn_801A4558(u8* arg0, f32 farg0) {
         if (*(f32*)(arg0 + 0x98) != lbl_805FF9F0) {
             t = *(f32*)(arg0 + 0x68) + *(f32*)(arg0 + 0x74);
             t = t - *(f32*)(arg0 + 0x68);
-            u = cur * t;
+            u = *(f32*)(arg0 + 0x144) * t;
             u = *(f32*)(arg0 + 0x68) + u;
             v = lbl_805FFA04 * *(f32*)(r3 + 0x74);
             u = u - v;
@@ -325,7 +325,7 @@ s32 fn_801A4558(u8* arg0, f32 farg0) {
         } else {
             t = *(f32*)(arg0 + 0x6C) + *(f32*)(arg0 + 0x78);
             t = t - *(f32*)(arg0 + 0x6C);
-            u = cur * t;
+            u = *(f32*)(arg0 + 0x144) * t;
             u = *(f32*)(arg0 + 0x6C) + u;
             v = lbl_805FFA04 * *(f32*)(r3 + 0x78);
             u = u - v;
