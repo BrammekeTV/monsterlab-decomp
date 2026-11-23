@@ -99,6 +99,11 @@
  "changelog": [
   {
    "date": "2026-11-23",
+   "time": "13:36",
+   "text": "3D models reach the renderer on Windows (PRs #76 to #79): the camera's field of view now reaches the main view, and mesh vertex data is read in the Wii's byte order, so the castle level's models are drawn. They still come out black, because each object's colour data hasn't been converted yet. That's next."
+  },
+  {
+   "date": "2026-11-23",
    "time": "13:11",
    "text": "Four more boot fixes on Windows (PRs #72 to #75): the loader converts an entity field whose byte order crashed the level start, and the UI's slideshow widget. The renderer now adds each draw's vertices to the vertex buffer instead of replacing them. A call in our decompiled challenge-projector setup that passed the wrong value now passes the entity, as the original does."
   },
