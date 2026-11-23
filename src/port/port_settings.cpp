@@ -1,0 +1,144 @@
+// PC platform layer: the settings file, monsterlab.ini next to the exe. It holds what the settings
+// screen edits: display (gPortSettings), audio and the input bindings (gPortBindings). Loaded at
+// start, before the command line (which wins); written when the settings screen saves.
+//
+//   [display]   width, height, aspect (16:9 or 4:3), stretch_ui, vsync, fullscreen
+//   [audio]     volume (0-100), mute
+//   [controls]  NAME = key 1, key 2, mouse button, gamepad bits   (Windows virtual-key codes; 0 = none)
+#ifdef _WIN32
+#include <windows.h>
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+
+#include "port/port.h"
+#include "port/port_input.h"
+
+const char* PortSettingsPath(void) {
+    static char path[MAX_PATH + 16];
+    if (!path[0]) {
+        DWORD n = GetModuleFileNameA(NULL, path, MAX_PATH);
+        char* slash = n && n < MAX_PATH ? strrchr(path, '\\') : NULL;
+        if (slash) strcpy(slash + 1, "monsterlab.ini");
+        else strcpy(path, "monsterlab.ini");
+    }
+    return path;
+}
+
+static char* Trim(char* s) {
+    while (*s == ' ' || *s == '\t') s++;
+    char* e = s + strlen(s);
+    while (e > s && (e[-1] == ' ' || e[-1] == '\t' || e[-1] == '\r' || e[-1] == '\n')) *--e = 0;
+    return s;
+}
+
+static s32 Clamp(s32 v, s32 lo, s32 hi) { return v < lo ? lo : v > hi ? hi : v; }
+
+BOOL PortSettingsLoad(const char* path, PortSettings* s) {
+    FILE* f = fopen(path, "r");
+    if (!f) return FALSE;
+    char line[256], section[32] = "";
+    while (fgets(line, sizeof(line), f)) {
+        char* p = Trim(line);
+        if (!*p || *p == ';' || *p == '#') continue;
+        if (*p == '[') {
+            char* end = strchr(p, ']');
+            if (end) { *end = 0; snprintf(section, sizeof(section), "%s", p + 1); }
+            continue;
+        }
+        char* eq = strchr(p, '=');
+        if (!eq) continue;
+        *eq = 0;
+        char* key = Trim(p);
+        char* val = Trim(eq + 1);
+        if (!strcmp(section, "display")) {
+            if (!strcmp(key, "width")) s->width = Clamp(atoi(val), 320, 8192);
+            else if (!strcmp(key, "height")) s->height = Clamp(atoi(val), 240, 8192);
+            else if (!strcmp(key, "aspect")) s->wide = strcmp(val, "4:3") != 0;
+            else if (!strcmp(key, "stretch_ui")) s->stretchUi = atoi(val) != 0;
+            else if (!strcmp(key, "vsync")) s->vsync = atoi(val) != 0;
+            else if (!strcmp(key, "fullscreen")) s->fullscreen = atoi(val) != 0;
+        } else if (!strcmp(section, "audio")) {
+            if (!strcmp(key, "volume")) s->volume = Clamp(atoi(val), 0, 100);
+            else if (!strcmp(key, "mute")) s->mute = atoi(val) != 0;
+        } else if (!strcmp(section, "controls")) {
+            for (int i = 0; i < gPortBindingCount; i++) {
+                PortBinding* b = &gPortBindings[i];
+                if (_stricmp(b->name, key)) continue;
+                int k0 = 0, k1 = 0, mouse = 0;
+                unsigned pad = 0;
+                if (sscanf(val, "%d , %d , %d , %x", &k0, &k1, &mouse, &pad) >= 3) {
+                    b->key[0] = Clamp(k0, 0, 255); b->key[1] = Clamp(k1, 0, 255); b->mouse = Clamp(mouse, 0, 2); b->pad = pad;
+                }
+                break;
+            }
+        }
+    }
+    fclose(f);
+    return TRUE;
+}
+
+BOOL PortSettingsSave(const char* path, const PortSettings* s) {
+    FILE* f = fopen(path, "w");
+    if (!f) return FALSE;
+    fprintf(f, "; Monster Lab PC port settings (written by the settings screen: F1 in the game)\n");
+    fprintf(f, "[display]\nwidth = %d\nheight = %d\naspect = %s\nstretch_ui = %d\nvsync = %d\nfullscreen = %d\n\n",
+            s->width, s->height, s->wide ? "16:9" : "4:3", s->stretchUi ? 1 : 0, s->vsync ? 1 : 0, s->fullscreen ? 1 : 0);
+    fprintf(f, "[audio]\nvolume = %d\nmute = %d\n\n", s->volume, s->mute ? 1 : 0);
+    fprintf(f, "; NAME = key 1, key 2, mouse button (1 left, 2 right), gamepad bits (hex); keys are Windows virtual-key codes\n[controls]\n");
+    for (int i = 0; i < gPortBindingCount; i++) {
+        const PortBinding* b = &gPortBindings[i];
+        fprintf(f, "%s = %d, %d, %d, %X\n", b->name, b->key[0], b->key[1], b->mouse, b->pad);
+    }
+    return fclose(f) == 0;
+}
+
+// Save, change everything, load: the file must bring every value back.
+int PortSelfTestSettings(void) {
+    char path[MAX_PATH + 40];
+    DWORD n = GetTempPathA(MAX_PATH, path);
+    if (!n || n >= MAX_PATH) { PortLog("selftest settings: no temporary folder"); return 1; }
+    snprintf(path + n, sizeof(path) - n, "monsterlab_selftest_%lu.ini", GetCurrentProcessId());
+    int fails = 0;
+    PortBinding keep[32];
+    int count = gPortBindingCount < 32 ? gPortBindingCount : 32;
+    memcpy(keep, gPortBindings, sizeof(PortBinding) * count);
+
+    PortSettings want = {};
+    want.width = 2560; want.height = 1440; want.wide = FALSE; want.stretchUi = TRUE; want.vsync = TRUE; want.fullscreen = TRUE;
+    want.volume = 37; want.mute = TRUE;
+    gPortBindings[0].key[0] = 'K'; gPortBindings[0].key[1] = 0; gPortBindings[0].mouse = 2; gPortBindings[0].pad = 0x20100;
+    PortBinding changed = gPortBindings[0];
+    if (!PortSettingsSave(path, &want)) { PortLog("selftest settings: cannot write %s", path); fails++; }
+    memcpy(gPortBindings, keep, sizeof(PortBinding) * count);
+
+    PortSettings got = {1920, 1080, TRUE, FALSE, FALSE, FALSE, 100, FALSE};
+    if (!fails && !PortSettingsLoad(path, &got)) { PortLog("selftest settings: cannot read %s", path); fails++; }
+    if (!fails) {
+        if (got.width != want.width || got.height != want.height || got.wide != want.wide || got.stretchUi != want.stretchUi ||
+            got.vsync != want.vsync || got.fullscreen != want.fullscreen || got.volume != want.volume || got.mute != want.mute) {
+            PortLog("selftest settings: read back %dx%d wide %d stretch %d vsync %d fullscreen %d volume %d mute %d",
+                    got.width, got.height, got.wide, got.stretchUi, got.vsync, got.fullscreen, got.volume, got.mute);
+            fails++;
+        }
+        const PortBinding* b = &gPortBindings[0];
+        if (b->key[0] != changed.key[0] || b->key[1] != changed.key[1] || b->mouse != changed.mouse || b->pad != changed.pad) {
+            PortLog("selftest settings: binding %s read back as %d, %d, %d, %X", b->name, b->key[0], b->key[1], b->mouse, b->pad);
+            fails++;
+        }
+        for (int i = 1; i < count; i++)
+            if (memcmp(&gPortBindings[i], &keep[i], sizeof(PortBinding))) { PortLog("selftest settings: binding %s changed", keep[i].name); fails++; }
+    }
+    // A missing file changes nothing, and values out of range are brought into range.
+    FILE* f = fopen(path, "w");
+    if (f) { fputs("[display]\nwidth = 5\nheight = 99999\n[audio]\nvolume = 250\n", f); fclose(f); }
+    PortSettings odd = {1920, 1080, TRUE, FALSE, FALSE, FALSE, 100, FALSE};
+    PortSettingsLoad(path, &odd);
+    if (odd.width != 320 || odd.height != 8192 || odd.volume != 100) { PortLog("selftest settings: out-of-range values gave %dx%d volume %d", odd.width, odd.height, odd.volume); fails++; }
+    DeleteFileA(path);
+    if (PortSettingsLoad(path, &odd)) { PortLog("selftest settings: a missing file was reported as loaded"); fails++; }
+    memcpy(gPortBindings, keep, sizeof(PortBinding) * count);
+    if (!fails) PortLog("selftest settings: ok (monsterlab.ini save and load)");
+    return fails;
+}
+#endif

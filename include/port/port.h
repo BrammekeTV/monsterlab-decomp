@@ -97,8 +97,17 @@ typedef struct PortSettings {
     s32  width, height;       // output size in pixels (--res WxH, default 1920x1080)
     BOOL wide;                // 16:9 (the console's widescreen setting, SCGetAspectRatio) or 4:3 (--aspect)
     BOOL stretchUi;           // 16:9 only: stretch the 2D layer over the whole width as the console does (--stretch-ui)
+    BOOL vsync;               // wait for the monitor at each shown frame
+    BOOL fullscreen;          // borderless window over the whole monitor
+    s32  volume;              // 0-100, of the sound device's output
+    BOOL mute;
 } PortSettings;
 extern PortSettings gPortSettings;
+// monsterlab.ini next to the exe (port_settings.cpp): display, audio and the input bindings.
+const char* PortSettingsPath(void);
+BOOL PortSettingsLoad(const char* path, PortSettings* s);        // FALSE: no such file (nothing changed)
+BOOL PortSettingsSave(const char* path, const PortSettings* s);
+int  PortSelfTestSettings(void);
 
 void PortLog(const char* fmt, ...);
 // Records the first use of an SDK feature (shown in the boot summary); returns TRUE the first time.

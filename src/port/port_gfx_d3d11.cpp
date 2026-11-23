@@ -89,8 +89,11 @@ static BOOL SavePng(ID3D11Texture2D* tex, u32 w, u32 h, const char* path);
 
 // ------------------------------------------------------------------ window
 static HANDLE sWndReady;
+static volatile LONG sWheel;           // mouse wheel movement the settings screen has not taken yet
+f32 PortGfxTakeWheel(void) { return (f32)InterlockedExchange(&sWheel, 0) / WHEEL_DELTA; }
 static LRESULT CALLBACK WndProc(HWND w, UINT m, WPARAM wp, LPARAM lp) {
     if (m == WM_CLOSE) { PortStop(0, "window closed"); return 0; }
+    if (m == WM_MOUSEWHEEL) { InterlockedExchangeAdd(&sWheel, (LONG)GET_WHEEL_DELTA_WPARAM(wp)); return 0; }
     return DefWindowProcA(w, m, wp, lp);
 }
 static DWORD WINAPI WindowThread(void*) {
@@ -111,6 +114,26 @@ static DWORD WINAPI WindowThread(void*) {
 }
 
 HWND PortGfxWindow(void) { return sWnd; }
+
+// Fullscreen is the same window without a border over its whole monitor; the picture is stretched to it.
+void PortGfxSetFullscreen(BOOL on) {
+    static RECT saved;
+    static BOOL full;
+    if (!sWnd || on == full) return;
+    full = on;
+    if (on) {
+        GetWindowRect(sWnd, &saved);
+        MONITORINFO mi = {sizeof(mi)};
+        if (!GetMonitorInfoA(MonitorFromWindow(sWnd, MONITOR_DEFAULTTONEAREST), &mi)) { full = FALSE; return; }
+        SetWindowLongA(sWnd, GWL_STYLE, WS_POPUP | WS_VISIBLE);
+        SetWindowPos(sWnd, HWND_TOP, mi.rcMonitor.left, mi.rcMonitor.top, mi.rcMonitor.right - mi.rcMonitor.left,
+                     mi.rcMonitor.bottom - mi.rcMonitor.top, SWP_FRAMECHANGED | SWP_NOOWNERZORDER);
+    } else {
+        SetWindowLongA(sWnd, GWL_STYLE, WS_OVERLAPPEDWINDOW | WS_VISIBLE);
+        SetWindowPos(sWnd, NULL, saved.left, saved.top, saved.right - saved.left, saved.bottom - saved.top,
+                     SWP_FRAMECHANGED | SWP_NOOWNERZORDER | SWP_NOZORDER);
+    }
+}
 
 // Window position (0..1 across and down) -> the console pointer's -1..1, through the picture's
 // place in the window and the narrowed 2D layer of widescreen.
@@ -940,7 +963,7 @@ static void CopyEfb(const PortGx* g, u32 control) {
         if (sSwap) {
             Blit(sOutSrv, sBackRtv, 0, 0, sOutW, sOutH, 0, 0, 1, 1);
             if (!gPortOptions.screenshotStats) PortOverlayDraw(sBackRtv, sOutW, sOutH);
-            sSwap->Present(0, 0);
+            sSwap->Present(gPortSettings.vsync ? 1 : 0, 0);
         }
         sGfxStats.presents++;
         if (sTraceFrom > 1 && sGfxStats.presents >= sTraceFrom) sTrace = TRUE;
@@ -1119,6 +1142,7 @@ BOOL PortGfxStart(BOOL window) {
         CloseHandle(CreateThread(NULL, 0, WindowThread, NULL, 0, NULL));
         WaitForSingleObject(sWndReady, 5000);
         if (!sWnd) window = FALSE;
+        else if (gPortSettings.fullscreen) PortGfxSetFullscreen(TRUE);
     }
     static const D3D_DRIVER_TYPE kDrivers[2] = {D3D_DRIVER_TYPE_HARDWARE, D3D_DRIVER_TYPE_WARP};
     static const D3D_FEATURE_LEVEL kLevels[2] = {D3D_FEATURE_LEVEL_11_0, D3D_FEATURE_LEVEL_10_0};

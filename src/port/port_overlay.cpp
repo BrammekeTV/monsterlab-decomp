@@ -75,10 +75,11 @@ void PortOverlayFrame(const PortFrameStats* s) {
     BOOL down = wnd && GetForegroundWindow() == wnd && (GetAsyncKeyState(VK_F3) & 0x8000);
     if (down && !wasDown) gPortOverlayOn = !gPortOverlayOn;
     wasDown = down;
+    PortGuiKeys();
 }
 
 void PortOverlayDraw(ID3D11RenderTargetView* target, u32 w, u32 h) {
-    if (!gPortOverlayOn || !sReady || !target) return;
+    if ((!gPortOverlayOn && !gPortGuiOpen) || !sReady || !target) return;
     f32 total = 0.0f, worst = 0.0f;
     for (u32 i = 0; i < sMsCount; i++) { total += sMs[i]; if (sMs[i] > worst) worst = sMs[i]; }
     char text[512];
@@ -87,8 +88,11 @@ void PortOverlayDraw(ID3D11RenderTargetView* target, u32 w, u32 h) {
     ImGuiIO& io = ImGui::GetIO();
     io.DisplaySize = ImVec2((f32)w, (f32)h);
     io.DeltaTime = sLast.frameMs > 0.0f ? sLast.frameMs / 1000.0f : 1.0f / 50.0f;
+    PortGuiInput(w, h);
     ImGui_ImplDX11_NewFrame();
     ImGui::NewFrame();
+    PortGuiBuild(w, h);
+    if (gPortOverlayOn) {
     f32 pad = h / 90.0f;
     ImGui::SetNextWindowPos(ImVec2((f32)w - pad, pad), ImGuiCond_Always, ImVec2(1.0f, 0.0f));
     ImGui::SetNextWindowBgAlpha(0.65f);
@@ -101,6 +105,7 @@ void PortOverlayDraw(ID3D11RenderTargetView* target, u32 w, u32 h) {
     ImGui::PlotLines("##ms", line, (int)sMsCount, 0, NULL, 0.0f, worst > 40.0f ? worst : 40.0f,
                      ImVec2(ImGui::GetContentRegionAvail().x, ImGui::GetFontSize() * 2.0f));
     ImGui::End();
+    }
     ImGui::Render();
     sCtx->OMSetRenderTargets(1, &target, NULL);
     ImGui_ImplDX11_RenderDrawData(ImGui::GetDrawData());
