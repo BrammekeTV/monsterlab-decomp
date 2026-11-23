@@ -366,6 +366,7 @@ enum RegionKind {
     REGION_UI_SET, REGION_UI_SCREEN, REGION_UI_GRAPHIC, REGION_UI_TEXT,
     REGION_LOCATORS, REGION_UI_SLIDER,
     REGION_ZONE_EFFECT, REGION_ANIM_SET, REGION_ANIM_DEFS, REGION_U16_ARRAY, REGION_ANIM_OBJ, REGION_SKELETON, REGION_BONE_OPS,
+    REGION_ATTACH_POINTS,
     REGION_UI_ANIM, REGION_UI_ANIM_TRACK, REGION_UI_ANIM_EVENTS, REGION_UI_ANIM_KEYS, REGION_UI_ANIM_ENTRIES,
     REGION_ZONE_SYSTEM, REGION_ANIM_PLAYER, REGION_ANIM_ELEM, REGION_ANIM_TRACK, REGION_ANIM_KEYS, REGION_F32_ARRAY,
     REGION_SOUND, REGION_SOUND_INFO, REGION_DSP_HEADER,
@@ -1518,7 +1519,8 @@ static const SirField kEntityFields[] = {
     { 0x080, SIR_U32, 1 },    // code: fn_801260C8 tests its bits 0x78000000 (0x0003FFFF in the files)
     { 0x084, SIR_PTR, 1 },    // code: a table fn_801B6AD4 searches (the table itself is not converted)
     { 0x08C, SIR_PTR, 2 },    // code: part container (fn_8012F6B0), sub-object (fn_8012F8B8)
-    { 0x094, SIR_U32, 2 },    // code: fn_801B4334 clears them
+    { 0x094, SIR_U32, 1 },    // code: how many attach points the entity has (fn_801EC080; fn_801B4334 clears it),
+    { 0x098, SIR_PTR, 1 },    //       the attach points (kAttachPointFields)
     { 0x09C, SIR_PTR, 1 },    // code: fn_8012F8B8 reads the id at +8 of it for type 6
     { 0x0A0, SIR_PTR, 1 },    // code: animation object (fn_801B4520 frees it; a prop's: fn_80069180, fn_8006A764)
     { 0x0A4, SIR_PTR, 1 },    // code: state machine holder (fn_8012F8B8)
@@ -1530,6 +1532,14 @@ static const SirField kEntityFields[] = {
     { 0x1A4, SIR_U32, 2 },    //       their count; +0x1A8 (fn_800690D4)
     { 0x1B0, SIR_U32, 1 },    // code: flags (fn_8012F8B8)
 };
+// An entity's attach points (+0x98, count +0x94): where effects hang on it. fn_801EC080 updates
+// them every frame: +0x00 the point's name hash (fn_801EC880 finds a point by it), +0x04 the bone
+// it follows (-1: the entity itself), +0x08 its matrix on that bone, +0x38 the resulting world
+// matrix, +0x68 eight effect ids, +0x88 the eight running effects, +0xA8 eight started flags.
+static const SirField kAttachPointFields[] = {
+    { 0x00, SIR_U32, 2 }, { 0x08, SIR_F32, 24 }, { 0x68, SIR_U32, 8 }, { 0x88, SIR_PTR, 8 }, { 0xA8, SIR_U32, 8 },
+};
+#define ATTACH_POINT_SIZE 0xC8
 // The record an entity points at (0x40 bytes): position, rotation, scale, layer and flags.
 // fn_801B4334 resets all of it; the bytes at +0x34..+0x3D need no conversion.
 static const SirField kEntityRecordFields[] = {
@@ -1865,6 +1875,10 @@ static SirError EntityPlan(ImagePlan* plan, const u8* image, u32 imageSize, u32 
     if ((e = EntityContainerPlan(plan, image, imageSize, Be32(ent + 0x8C))) != SIR_OK) return e;
     // Scene object (+0x90). Object at +0x9C: fn_8012F8B8 reads the id at +8 for a type 6 entity.
     if ((e = SceneObjectPlan(plan, image, imageSize, Be32(ent + 0x90))) != SIR_OK) return e;
+    // The entity's attach points (+0x98, count +0x94).
+    u32 points = Be32(ent + 0x94);
+    if (points != 0 && points <= imageSize / ATTACH_POINT_SIZE && LevelSpan(Be32(ent + 0x98), (u64)points * ATTACH_POINT_SIZE, imageSize, &o) &&
+        !PlanHas(plan, o, REGION_ATTACH_POINTS) && !PlanAdd(plan, o, points * ATTACH_POINT_SIZE, REGION_ATTACH_POINTS)) return SIR_ERR_ENTITY;
     // The entity's animation object (+0xA0).
     if ((e = AnimObjPlan(plan, image, imageSize, Be32(ent + 0xA0))) != SIR_OK) return e;
     // For a prop it is the prop's definition.
@@ -2597,6 +2611,7 @@ static void ImagePlanConvert(const ImagePlan* plan, SirReloc* r, u8* image, u32 
             break;
         case REGION_ANIM_OBJ:     SirConvertRecord(r, p, g->size, kAnimObjFields, COUNTOF(kAnimObjFields)); break;
         case REGION_ANIM_SET:     SirConvertRecord(r, p, g->size, kAnimSetFields, COUNTOF(kAnimSetFields)); break;
+        case REGION_ATTACH_POINTS: ConvertRecords(r, p, g->size, ATTACH_POINT_SIZE, kAttachPointFields, COUNTOF(kAttachPointFields)); break;
         case REGION_ANIM_DEFS:    ConvertRecords(r, p, g->size, ANIM_DEF_SIZE, kAnimDefFields, COUNTOF(kAnimDefFields)); break;
         case REGION_U16_ARRAY:
             for (u32 k = 0; k + 2 <= g->size; k += 2) { Swap16(p + k); r->fieldsSwapped++; }

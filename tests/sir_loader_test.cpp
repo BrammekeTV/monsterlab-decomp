@@ -1374,10 +1374,17 @@ struct ZoneDump {
             if (!In(e, ENTITY_USED)) continue;
             printf("entity "); Val(e); printf(" vtable %08x record ", *(const u32*)e); Ptr(e + 4);
             printf(" parts "); Ptr(e + 0x8C); printf(" scene "); Ptr(e + 0x90);
-            printf(" w94 %d %d obj9c ", *(const s32*)(e + 0x94), *(const s32*)(e + 0x98)); Ptr(e + 0x9C);
+            printf(" attach %d ", *(const s32*)(e + 0x94)); Ptr(e + 0x98); printf(" obj9c "); Ptr(e + 0x9C);
             printf(" holder "); Ptr(e + 0xA4); printf(" children "); Ptr(e + 0xB0);
             printf(" f158 %08x more ", Bits(*(const f32*)(e + 0x158))); Ptr(e + 0x194);
             printf(" %d w1a8 %d flags %08x wb8 %08x\n", *(const s32*)(e + 0x1A4), *(const s32*)(e + 0x1A8), *(const u32*)(e + 0x1B0), *(const u32*)(e + 0xB8));
+            const u8* points = *(const u8**)(e + 0x98);
+            for (u32 k = 0; *(const u32*)(e + 0x94) != 0 && In(points, *(const u32*)(e + 0x94) * 0xC8) && k < *(const u32*)(e + 0x94); k++) {
+                const u8* q = points + k * 0xC8;
+                printf("entattach "); Val(e); printf(" %u name %08x bone %d local ", k, *(const u32*)q, *(const s32*)(q + 4)); Words(q + 8, 12);
+                printf(" world "); Words(q + 0x38, 12); printf(" ids "); Words(q + 0x68, 8); printf(" running "); Ptrs(q + 0x88, 8);
+                printf(" started "); Words(q + 0xA8, 8); printf("\n");
+            }
             const u8* r = *(const u8**)(e + 4);
             if (InAny(r, ENTITY_RECORD_SIZE)) {
                 printf("entrecord "); Val(r); printf(" floats");

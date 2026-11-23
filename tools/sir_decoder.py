@@ -1166,9 +1166,16 @@ def zone_dump(L, sec, base, hud, roots, scene_roots, pooltabs, records=(), lists
         a = ents[i]; i += 1
         if not inz(a, 0x1B4): continue
         o = off(a)
-        L.append('entity %s vtable %08x record %s parts %s scene %s w94 %d %d obj9c %s holder %s children %s f158 %08x more %s %d w1a8 %d flags %08x wb8 %08x' % (
-            ptr(a), u(o), ptr(u(o + 4)), ptr(u(o + 0x8C)), ptr(u(o + 0x90)), i32(o + 0x94), i32(o + 0x98), ptr(u(o + 0x9C)), ptr(u(o + 0xA4)),
+        L.append('entity %s vtable %08x record %s parts %s scene %s attach %d %s obj9c %s holder %s children %s f158 %08x more %s %d w1a8 %d flags %08x wb8 %08x' % (
+            ptr(a), u(o), ptr(u(o + 4)), ptr(u(o + 0x8C)), ptr(u(o + 0x90)), i32(o + 0x94), ptr(u(o + 0x98)), ptr(u(o + 0x9C)), ptr(u(o + 0xA4)),
             ptr(u(o + 0xB0)), u(o + 0x158), ptr(u(o + 0x194)), i32(o + 0x1A4), i32(o + 0x1A8), u(o + 0x1B0), u(o + 0xB8)))
+        # The entity's attach points (+0x98, count +0x94), as fn_801EC080 reads them.
+        if u(o + 0x94) and inz(u(o + 0x98), u(o + 0x94) * 0xC8):
+            for k in range(u(o + 0x94)):
+                q = off(u(o + 0x98)) + k * 0xC8
+                L.append('entattach %s %d name %08x bone %d local %s world %s ids %s running %s started %s' % (
+                    ptr(a), k, u(q), i32(q + 4), ws(q + 8, 12), ws(q + 0x38, 12), ws(q + 0x68, 8),
+                    ' '.join(ptr(u(q + 0x88 + i * 4)) for i in range(8)), ws(q + 0xA8, 8)))
         r = u(o + 4)
         # The record of an entity outside zone 0 lies in zone 0's image, and so does its definition.
         def loc(v, n):
