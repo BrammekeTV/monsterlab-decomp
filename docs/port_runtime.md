@@ -28,6 +28,8 @@ build\pc\monsterlab.exe                        # runs main() with your own disc 
 | `--wav FILE` | write everything the audio mixer produces to a WAV file (32 kHz stereo); works headless |
 | `--no-audio` | never open the sound device (it is only opened with `--window`) |
 | `--screenshot FILE` | write the last picture shown as a PNG when the run stops (works without `--window`) |
+| `--stats` | start with the stats overlay on (top-right; F3 turns it on and off in the window): frames per second, frame time split into game, render and wait, draw calls, GX vertices, frame-buffer copies, textures, audio voices, output size |
+| `--screenshot-stats` | draw the stats overlay into the `--screenshot` picture too (it is left out otherwise) |
 | `--res WxH` | output size (default 1920x1080) |
 | `--aspect 4:3\|16:9` | picture shape and the console's widescreen setting (default 16:9) |
 | `--stretch-ui` | 16:9: stretch the 2D layer over the whole width, as the console does |
