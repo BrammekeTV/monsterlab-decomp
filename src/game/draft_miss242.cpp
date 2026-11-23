@@ -325,9 +325,9 @@ void fn_80128C20(u8* arg0) {
     sReadyRequested = 0;
     lbl_805FB2F3 = 0;
     lbl_805FB210 = 0;
-    *(s32*)(gGame + 0x1C0) = 0;
+    *(u8*)(gGame + 0x1C0) = 0;
     for (u8 i = 0; i != 0xFF; i++) ((s32*)(gGame + 0x1C4))[i] = 0;
-    *(s32*)(gGame + 0x13C) = 0;
+    *(u8*)(gGame + 0x13C) = 0;
     for (u8 i = 0; i != 0x20; i++) ((s32*)(gGame + 0x140))[i] = 0;
     fn_80128500(arg0, 1);
 

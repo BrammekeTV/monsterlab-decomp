@@ -711,3 +711,539 @@ fn_80286700 bta_hh_co_data  # revolution/WUD/WUDHidHost.o
 fn_8032F3D8 __ptmf_scall  # runtime/ptmf.o
 fn_8032F894 __mod2i  # runtime/runtime.o
 fn_8032FC04 __cvt_dbl_ull  # runtime/runtime.o
+
+# sigmatch mkw ARC (1)
+fn_8026BA44 __rvlMakePathRecursive  # lib/rvl/arc/rvlArchive.o (static)
+
+# sigmatch mkw DWC (2)
+fn_802E4970 DWC_ClearError  # lib/dwc/common/dwc_error.o
+fn_802E49A0 DWCi_SetError  # lib/dwc/common/dwc_error.o
+
+# sigmatch mkw GameSpy (350)
+fn_802FB3A4 ArrayNew  # lib/gamespy/darray.o
+fn_802FB440 ArrayFree  # lib/gamespy/darray.o
+fn_802FB4DC ArrayNth  # lib/gamespy/darray.o
+fn_802FB50C ArrayAppend  # lib/gamespy/darray.o
+fn_802FB630 ArrayInsertSorted  # lib/gamespy/darray.o
+fn_802FB7B0 ArrayRemoveAt  # lib/gamespy/darray.o
+fn_802FB85C ArrayDeleteAt  # lib/gamespy/darray.o
+fn_802FB94C ArrayReplaceAt  # lib/gamespy/darray.o
+fn_802FBA04 ArraySort  # lib/gamespy/darray.o
+fn_802FBA1C ArraySearch  # lib/gamespy/darray.o
+fn_802FBBB4 ArrayMapBackwards  # lib/gamespy/darray.o
+fn_802FBC50 ArrayMapBackwards2  # lib/gamespy/darray.o
+fn_802FBCF4 ArrayClear  # lib/gamespy/darray.o
+fn_802FBDF8 TableNew  # lib/gamespy/hashtable.o
+fn_802FBE14 TableNew2  # lib/gamespy/hashtable.o
+fn_802FBEB8 TableFree  # lib/gamespy/hashtable.o
+fn_802FBF34 TableCount  # lib/gamespy/hashtable.o
+fn_802FBFBC TableEnter  # lib/gamespy/hashtable.o
+fn_802FC064 TableRemove  # lib/gamespy/hashtable.o
+fn_802FC108 TableLookup  # lib/gamespy/hashtable.o
+fn_802FC1A8 TableMapSafe  # lib/gamespy/hashtable.o
+fn_802FC214 TableMapSafe2  # lib/gamespy/hashtable.o
+fn_802FC290 MD5Update  # lib/gamespy/md5c.o
+fn_802FCE34 MD5Digest  # lib/gamespy/md5c.o
+fn_802FD1B8 gs_socket  # lib/gamespy/common/revolution/gsSocketRevolution.o
+fn_802FD258 gs_bind  # lib/gamespy/common/revolution/gsSocketRevolution.o
+fn_802FD2D0 gs_connect  # lib/gamespy/common/revolution/gsSocketRevolution.o
+fn_802FD334 gs_recv  # lib/gamespy/common/revolution/gsSocketRevolution.o
+fn_802FD36C gs_recvfrom  # lib/gamespy/common/revolution/gsSocketRevolution.o
+fn_802FD400 gs_sendto  # lib/gamespy/common/revolution/gsSocketRevolution.o
+fn_802FD480 gs_getsockname  # lib/gamespy/common/revolution/gsSocketRevolution.o
+fn_802FD4DC gs_inet_addr  # lib/gamespy/common/revolution/gsSocketRevolution.o
+fn_802FD51C GSISocketSelect  # lib/gamespy/common/revolution/gsSocketRevolution.o
+fn_802FDEF4 gsiTimeInSec  # lib/gamespy/common/revolution/gsUtilRevolution.o
+fn_802FE6B8 GSIStartAvailableCheckA  # lib/gamespy/common/gsAvailable.o
+fn_802FEA2C gsUdpRemotePeerCompare  # lib/gamespy/common/gsUdpEngine.o
+fn_802FEA60 gsUdpRemotePeerCompare2  # lib/gamespy/common/gsUdpEngine.o
+fn_802FEA7C gsUdpSocketError  # lib/gamespy/common/gsUdpEngine.o
+fn_802FEB1C gsUdpClosedRoutingCB  # lib/gamespy/common/gsUdpEngine.o
+fn_802FEC6C gsUdpConnectedRoutingCB  # lib/gamespy/common/gsUdpEngine.o
+fn_802FEE98 gsUdpPingRoutingCB  # lib/gamespy/common/gsUdpEngine.o
+fn_802FEF94 gsUdpReceivedRoutingCB  # lib/gamespy/common/gsUdpEngine.o
+fn_802FF0C4 gsUdpUnrecognizedMsgCB  # lib/gamespy/common/gsUdpEngine.o
+fn_802FF158 gsUdpConnAttemptCB  # lib/gamespy/common/gsUdpEngine.o
+fn_802FF2C4 gsUdpEngineInitialize  # lib/gamespy/common/gsUdpEngine.o
+fn_802FF438 gsUdpEngineGetPeerState  # lib/gamespy/common/gsUdpEngine.o
+fn_802FF4E4 gsUdpEngineStartTalkingToPeer  # lib/gamespy/common/gsUdpEngine.o
+fn_802FF6F0 gsUdpEngineSendMessage  # lib/gamespy/common/gsUdpEngine.o
+fn_802FF834 gsUdpEngineThink  # lib/gamespy/common/gsUdpEngine.o
+fn_802FF878 gsUdpEngineShutdown  # lib/gamespy/common/gsUdpEngine.o
+fn_802FF8DC gsUdpEngineGetLocalPort  # lib/gamespy/common/gsUdpEngine.o
+fn_802FF900 gsUdpEngineAddMsgHandler  # lib/gamespy/common/gsUdpEngine.o
+fn_802FF9EC gsUdpEngineRemoveMsgHandler  # lib/gamespy/common/gsUdpEngine.o
+fn_802FFA8C gsUdpEngineNoMoreMsgHandlers  # lib/gamespy/common/gsUdpEngine.o
+fn_802FFAD4 gsUdpEngineNoApp  # lib/gamespy/common/gsUdpEngine.o
+fn_802FFB54 gsUdpEngineGetPeerOutBufferFreeSpace  # lib/gamespy/common/gsUdpEngine.o
+fn_802FFBDC gpInitialize  # lib/gamespy/GP/gp.o
+fn_802FFC08 gpDestroy  # lib/gamespy/GP/gp.o
+fn_802FFC28 gpProcess  # lib/gamespy/GP/gp.o
+fn_802FFC64 gpSetCallback  # lib/gamespy/GP/gp.o
+fn_802FFCD4 gpConnectPreAuthenticatedA  # lib/gamespy/GP/gp.o
+fn_802FFE00 gpDisconnect  # lib/gamespy/GP/gp.o
+fn_802FFE5C gpProfileSearchA  # lib/gamespy/GP/gp.o
+fn_802FFF2C gpGetInfo  # lib/gamespy/GP/gp.o
+fn_8030007C gpSendBuddyRequestA  # lib/gamespy/GP/gp.o
+fn_8030025C gpDenyBuddyRequest  # lib/gamespy/GP/gp.o
+fn_80300354 gpGetNumBuddies  # lib/gamespy/GP/gp.o
+fn_8030039C gpGetBuddyStatus  # lib/gamespy/GP/gp.o
+fn_80300574 gpGetBuddyIndex  # lib/gamespy/GP/gp.o
+fn_80300658 gpIsBuddy  # lib/gamespy/GP/gp.o
+fn_80300718 gpDeleteBuddy  # lib/gamespy/GP/gp.o
+fn_803007A0 gpSetStatusA  # lib/gamespy/GP/gp.o
+fn_803009C8 gpSendBuddyMessageA  # lib/gamespy/GP/gp.o
+fn_80300A64 gpiInitialize  # lib/gamespy/GP/gpi.o
+fn_80300C30 gpiDestroy  # lib/gamespy/GP/gpi.o
+fn_80300C8C gpiResetProfile  # lib/gamespy/GP/gpi.o (static)
+fn_80300CAC gpiReset  # lib/gamespy/GP/gpi.o
+fn_80300EF4 gpiProcessConnectionManager  # lib/gamespy/GP/gpi.o
+fn_8030124C gpiProcess  # lib/gamespy/GP/gpi.o
+fn_803013F0 gpiProcessRecvBuddyMessage  # lib/gamespy/GP/gpiBuddy.o
+fn_80301EDC gpiProcessRecvBuddyStatusInfo  # lib/gamespy/GP/gpiBuddy.o
+fn_80302588 gpiSendServerBuddyMessage  # lib/gamespy/GP/gpiBuddy.o
+fn_8030267C gpiSendBuddyMessage  # lib/gamespy/GP/gpiBuddy.o
+fn_80302834 gpiBuddyHandleKeyRequest  # lib/gamespy/GP/gpiBuddy.o
+fn_803028D8 gpiBuddyHandleKeyReply  # lib/gamespy/GP/gpiBuddy.o
+fn_80302CF4 gpiAuthBuddyRequest  # lib/gamespy/GP/gpiBuddy.o
+fn_80302E64 gpiFixBuddyIndices  # lib/gamespy/GP/gpiBuddy.o
+fn_80302EB0 gpiDeleteBuddy  # lib/gamespy/GP/gpiBuddy.o
+fn_80303120 gpiAppendCharToBuffer  # lib/gamespy/GP/gpiBuffer.o
+fn_803031C8 gpiAppendStringToBufferLen  # lib/gamespy/GP/gpiBuffer.o
+fn_80303360 gpiSendData  # lib/gamespy/GP/gpiBuffer.o (static)
+fn_8030346C gpiSendOrBufferStringLenToPeer  # lib/gamespy/GP/gpiBuffer.o
+fn_803035E0 gpiRecvToBuffer  # lib/gamespy/GP/gpiBuffer.o
+fn_80303728 gpiSendFromBuffer  # lib/gamespy/GP/gpiBuffer.o
+fn_80303828 gpiSendBufferToPeer  # lib/gamespy/GP/gpiBuffer.o
+fn_80303980 gpiReadMessageFromBuffer  # lib/gamespy/GP/gpiBuffer.o
+fn_80303AD4 gpiClipBufferToPosition  # lib/gamespy/GP/gpiBuffer.o
+fn_80303B54 gpiCallErrorCallback  # lib/gamespy/GP/gpiCallback.o
+fn_80303C14 gpiAddCallback  # lib/gamespy/GP/gpiCallback.o
+fn_80303CE4 gpiCallCallback  # lib/gamespy/GP/gpiCallback.o (static)
+fn_80303F98 gpiProcessCallbacks  # lib/gamespy/GP/gpiCallback.o
+fn_803040B8 gpiStartConnect  # lib/gamespy/GP/gpiConnect.o (static)
+fn_803043E0 gpiConnect  # lib/gamespy/GP/gpiConnect.o
+fn_80304634 gpiSendLogin  # lib/gamespy/GP/gpiConnect.o (static)
+fn_80304A6C gpiSendNewuser  # lib/gamespy/GP/gpiConnect.o (static)
+fn_80304C8C gpiProcessConnect  # lib/gamespy/GP/gpiConnect.o
+fn_80305318 gpiCheckConnect  # lib/gamespy/GP/gpiConnect.o
+fn_803053B8 gpiDisconnectCleanupProfile  # lib/gamespy/GP/gpiConnect.o (static)
+fn_80305548 gpiDisconnect  # lib/gamespy/GP/gpiConnect.o
+fn_80305700 gpiIsValidDate  # lib/gamespy/GP/gpiInfo.o (static)
+fn_80305864 gpiInfoCacheToArg  # lib/gamespy/GP/gpiInfo.o
+fn_80305AA0 gpiProcessGetInfo  # lib/gamespy/GP/gpiInfo.o
+fn_80306360 gpiAddLocalInfo  # lib/gamespy/GP/gpiInfo.o
+fn_80306474 gpiSetInfoi  # lib/gamespy/GP/gpiInfo.o
+fn_80306CB4 gpiSetInfos  # lib/gamespy/GP/gpiInfo.o
+fn_803077C4 gpiSendGetInfo  # lib/gamespy/GP/gpiInfo.o
+fn_80307888 gpiGetInfo  # lib/gamespy/GP/gpiInfo.o
+fn_80307AC4 gpiFreeInfoCache  # lib/gamespy/GP/gpiInfo.o
+fn_80307B98 gpiStatusInfoKeyFree  # lib/gamespy/GP/gpiKeys.o
+fn_80307BE4 gpiStatusInfoKeysInit  # lib/gamespy/GP/gpiKeys.o
+fn_80307C54 gpiStatusInfoKeysDestroy  # lib/gamespy/GP/gpiKeys.o
+fn_80307CA0 gpiStatusInfoAddKey  # lib/gamespy/GP/gpiKeys.o
+fn_80307D3C gpiStatusInfoSetKey  # lib/gamespy/GP/gpiKeys.o
+fn_80307DF4 gpiStatusInfoCheckKey  # lib/gamespy/GP/gpiKeys.o
+fn_80307E9C gpiSaveKeysToBuffer  # lib/gamespy/GP/gpiKeys.o
+fn_80308200 gpiFailedOpCallback  # lib/gamespy/GP/gpiOperation.o
+fn_803085D8 gpiAddOperation  # lib/gamespy/GP/gpiOperation.o
+fn_803086B8 gpiDestroyOperation  # lib/gamespy/GP/gpiOperation.o
+fn_80308758 gpiRemoveOperation  # lib/gamespy/GP/gpiOperation.o
+fn_803087A4 gpiFindOperationByID  # lib/gamespy/GP/gpiOperation.o
+fn_803087F4 gpiOperationsAreBlocking  # lib/gamespy/GP/gpiOperation.o
+fn_80308834 gpiProcessOperation  # lib/gamespy/GP/gpiOperation.o
+fn_803088D8 gpiProcessPeerInitiatingConnection  # lib/gamespy/GP/gpiPeer.o (static)
+fn_80308C28 gpiProcessPeerAcceptingConnection  # lib/gamespy/GP/gpiPeer.o (static)
+fn_80308E44 gpiPeerSendMessages  # lib/gamespy/GP/gpiPeer.o
+fn_80308F28 gpiProcessPeerConnected  # lib/gamespy/GP/gpiPeer.o (static)
+fn_8030928C gpiCheckTimedOutPeerOperations  # lib/gamespy/GP/gpiPeer.o
+fn_8030938C gpiDestroyPeer  # lib/gamespy/GP/gpiPeer.o
+fn_803093F4 gpiRemovePeer  # lib/gamespy/GP/gpiPeer.o
+fn_80309504 gpiProcessPeers  # lib/gamespy/GP/gpiPeer.o
+fn_80309648 gpiGetPeerByProfile  # lib/gamespy/GP/gpiPeer.o
+fn_80309674 gpiFreeMessage  # lib/gamespy/GP/gpiPeer.o (static)
+fn_803096AC gpiAddPeer  # lib/gamespy/GP/gpiPeer.o
+fn_80309780 gpiPeerGetSig  # lib/gamespy/GP/gpiPeer.o
+fn_80309808 gpiPeerStartConnect  # lib/gamespy/GP/gpiPeer.o
+fn_80309924 gpiPeerAddMessage  # lib/gamespy/GP/gpiPeer.o
+fn_80309AA0 gpiPeerStartTransferMessage  # lib/gamespy/GP/gpiPeer.o
+fn_80309B18 gpiPeerFinishTransferMessage  # lib/gamespy/GP/gpiPeer.o
+fn_80309C28 gpiPeerLeftCallback  # lib/gamespy/GP/gpiPeer.o
+fn_80309CB8 gpiPeerMessageCallback  # lib/gamespy/GP/gpiPeer.o
+fn_80309E38 gpiPeerAcceptedCallback  # lib/gamespy/GP/gpiPeer.o
+fn_80309EF8 gpiPeerAddOp  # lib/gamespy/GP/gpiPeer.o
+fn_80309F50 gpiPeerRemoveOp  # lib/gamespy/GP/gpiPeer.o
+fn_8030A008 gpiProfilesTableFree  # lib/gamespy/GP/gpiProfile.o (static)
+fn_8030A124 gpiInitProfiles  # lib/gamespy/GP/gpiProfile.o
+fn_8030A18C gpiProcessNewProfile  # lib/gamespy/GP/gpiProfile.o
+fn_8030A314 gpiProfileListAdd  # lib/gamespy/GP/gpiProfile.o
+fn_8030A3E8 gpiGetProfile  # lib/gamespy/GP/gpiProfile.o
+fn_8030A43C gpiProcessDeleteProfle  # lib/gamespy/GP/gpiProfile.o
+fn_8030A57C gpiRemoveProfileByID  # lib/gamespy/GP/gpiProfile.o
+fn_8030A5D4 gpiCheckProfileForUser  # lib/gamespy/GP/gpiProfile.o (static)
+fn_8030A660 gpiFindProfileByUser  # lib/gamespy/GP/gpiProfile.o
+fn_8030A6E8 gpiProfileMapCallback  # lib/gamespy/GP/gpiProfile.o (static)
+fn_8030A708 gpiProfileMap  # lib/gamespy/GP/gpiProfile.o
+fn_8030A750 gpiCheckForBuddy  # lib/gamespy/GP/gpiProfile.o (static)
+fn_8030A7A8 gpiFindBuddy  # lib/gamespy/GP/gpiProfile.o
+fn_8030A804 gpiRemoveBuddyStatus  # lib/gamespy/GP/gpiProfile.o
+fn_8030A858 gpiRemoveBuddyStatusInfo  # lib/gamespy/GP/gpiProfile.o
+fn_8030A8D0 gpiCanFreeProfile  # lib/gamespy/GP/gpiProfile.o
+fn_8030A92C gpiStartProfileSearch  # lib/gamespy/GP/gpiSearch.o (static)
+fn_8030AAFC gpiInitSearchData  # lib/gamespy/GP/gpiSearch.o (static)
+fn_8030ABE8 gpiProfileSearch  # lib/gamespy/GP/gpiSearch.o
+fn_8030AE78 gpiProcessSearch  # lib/gamespy/GP/gpiSearch.o (static)
+fn_8030CB78 gpiProcessSearches  # lib/gamespy/GP/gpiSearch.o
+fn_8030CCC8 gpiHandleTransferMessage  # lib/gamespy/GP/gpiTransfer.o
+fn_8030D008 strzcpy  # lib/gamespy/GP/gpiUtility.o
+fn_8030D04C gpiCheckForError  # lib/gamespy/GP/gpiUtility.o
+fn_8030D144 gpiValueForKey  # lib/gamespy/GP/gpiUtility.o
+fn_8030D1F0 gpiCheckSocketConnect  # lib/gamespy/GP/gpiUtility.o
+fn_8030D2DC gpiReadKeyAndValue  # lib/gamespy/GP/gpiUtility.o
+fn_8030D4C0 gpiSetError  # lib/gamespy/GP/gpiUtility.o
+fn_8030D510 gpiSetErrorString  # lib/gamespy/GP/gpiUtility.o
+fn_8030D54C gpiEncodeString  # lib/gamespy/GP/gpiUtility.o
+fn_8030D5EC gti2GetChallenge  # lib/gamespy/gt2/gt2Auth.o
+fn_8030D6FC gti2GetResponse  # lib/gamespy/gt2/gt2Auth.o
+fn_8030D8EC gti2CheckResponse  # lib/gamespy/gt2/gt2Auth.o
+fn_8030D9B0 gti2AllocateBuffer  # lib/gamespy/gt2/gt2Buffer.o
+fn_8030DA18 gti2BufferWriteByte  # lib/gamespy/gt2/gt2Buffer.o
+fn_8030DA30 gti2BufferWriteUShort  # lib/gamespy/gt2/gt2Buffer.o
+fn_8030DA5C gti2BufferWriteData  # lib/gamespy/gt2/gt2Buffer.o
+fn_8030DAE8 gti2BufferShorten  # lib/gamespy/gt2/gt2Buffer.o
+fn_8030DB54 gti2SocketErrorCallback  # lib/gamespy/gt2/gt2Callback.o
+fn_8030DBE8 gti2ConnectAttemptCallback  # lib/gamespy/gt2/gt2Callback.o
+fn_8030DCD0 gti2ConnectedCallback  # lib/gamespy/gt2/gt2Callback.o
+fn_8030DDAC gti2ReceivedCallback  # lib/gamespy/gt2/gt2Callback.o
+fn_8030DE84 gti2ClosedCallback  # lib/gamespy/gt2/gt2Callback.o
+fn_8030DF40 gti2PingCallback  # lib/gamespy/gt2/gt2Callback.o
+fn_8030DFFC gti2SendFilterCallback  # lib/gamespy/gt2/gt2Callback.o
+fn_8030E104 gti2ReceiveFilterCallback  # lib/gamespy/gt2/gt2Callback.o
+fn_8030E20C gti2DumpCallback  # lib/gamespy/gt2/gt2Callback.o
+fn_8030E308 gti2UnrecognizedMessageCallback  # lib/gamespy/gt2/gt2Callback.o
+fn_8030E3D4 gti2NewOutgoingConnection  # lib/gamespy/gt2/gt2Connection.o
+fn_8030E428 gti2NewIncomingConnection  # lib/gamespy/gt2/gt2Connection.o
+fn_8030E47C gti2StartConnectionAttempt  # lib/gamespy/gt2/gt2Connection.o
+fn_8030E550 gti2AcceptConnection  # lib/gamespy/gt2/gt2Connection.o
+fn_8030E5F4 gti2RejectConnection  # lib/gamespy/gt2/gt2Connection.o
+fn_8030E65C gti2ConnectionSendData  # lib/gamespy/gt2/gt2Connection.o
+fn_8030E6B8 gti2CheckTimeout  # lib/gamespy/gt2/gt2Connection.o (static)
+fn_8030E7B4 gti2ConnectionThink  # lib/gamespy/gt2/gt2Connection.o
+fn_8030E900 gti2CloseConnection  # lib/gamespy/gt2/gt2Connection.o
+fn_8030E9A8 gti2ConnectionClosed  # lib/gamespy/gt2/gt2Connection.o
+fn_8030EA04 gti2ConnectionCleanup  # lib/gamespy/gt2/gt2Connection.o
+fn_8030EAB0 gt2CloseSocket  # lib/gamespy/gt2/gt2Main.o
+fn_8030EAF4 gt2Think  # lib/gamespy/gt2/gt2Main.o
+fn_8030EB4C gt2Connect  # lib/gamespy/gt2/gt2Main.o
+fn_8030ECF4 gt2Send  # lib/gamespy/gt2/gt2Main.o
+fn_8030EE18 gt2GetConnectionState  # lib/gamespy/gt2/gt2Main.o
+fn_80311FB0 gti2ConnectionHash  # lib/gamespy/gt2/gt2Socket.o (static)
+fn_80311FD0 gti2ConnectionCompare  # lib/gamespy/gt2/gt2Socket.o (static)
+fn_8031200C gti2SocketFindConnection  # lib/gamespy/gt2/gt2Socket.o
+fn_80312058 gti2CreateSocket  # lib/gamespy/gt2/gt2Socket.o
+fn_80312290 gti2CloseSocket  # lib/gamespy/gt2/gt2Socket.o
+fn_803122FC gti2NewSocketConnection  # lib/gamespy/gt2/gt2Socket.o
+fn_80312570 gti2FreeSocketConnection  # lib/gamespy/gt2/gt2Socket.o
+fn_8031263C gti2SocketSend  # lib/gamespy/gt2/gt2Socket.o
+fn_80312858 gti2SocketConnectionsThinkMap  # lib/gamespy/gt2/gt2Socket.o (static)
+fn_80312974 gti2SocketConnectionsThink  # lib/gamespy/gt2/gt2Socket.o
+fn_803129C0 gti2FreeClosedConnections  # lib/gamespy/gt2/gt2Socket.o
+fn_80312AB0 gti2SocketError  # lib/gamespy/gt2/gt2Socket.o
+fn_80312C24 gt2StringToAddress  # lib/gamespy/gt2/gt2Utility.o
+fn_80312DC8 gti2MessageCheck  # lib/gamespy/gt2/gt2Utility.o
+fn_80312E2C qr2_init_socketA  # lib/gamespy/qr2/qr2.o
+fn_803130D8 qr2_think  # lib/gamespy/qr2/qr2.o
+fn_803131F0 qr2_check_queries  # lib/gamespy/qr2/qr2.o
+fn_803132AC qr2_check_send_heartbeat  # lib/gamespy/qr2/qr2.o (static)
+fn_803133C0 qr2_send_statechanged  # lib/gamespy/qr2/qr2.o
+fn_80313434 qr2_shutdown  # lib/gamespy/qr2/qr2.o
+fn_803134D4 qr2_keybuffer_add  # lib/gamespy/qr2/qr2.o
+fn_80313514 qr2_buffer_add_int  # lib/gamespy/qr2/qr2.o
+fn_803135B4 qr2_buffer_addA  # lib/gamespy/qr2/qr2.o
+fn_80313730 gs_encode  # lib/gamespy/qr2/qr2.o (static)
+fn_803138C8 gs_encrypt  # lib/gamespy/qr2/qr2.o (static)
+fn_80313CB4 qr_build_partial_query_reply  # lib/gamespy/qr2/qr2.o (static)
+fn_80313FC8 qr_build_split_query_reply  # lib/gamespy/qr2/qr2.o (static)
+fn_80314310 qr_process_query  # lib/gamespy/qr2/qr2.o (static)
+fn_803144D0 qr_process_client_message  # lib/gamespy/qr2/qr2.o (static)
+fn_80314614 qr2_process_ip_verify  # lib/gamespy/qr2/qr2.o (static)
+fn_803148A0 qr2_parse_queryA  # lib/gamespy/qr2/qr2.o
+fn_80314F38 send_keepalive  # lib/gamespy/qr2/qr2.o (static)
+fn_80314FAC send_heartbeat  # lib/gamespy/qr2/qr2.o (static)
+fn_803156EC qr2_internal_is_master_only_key  # lib/gamespy/qr2/qr2regkeys.o
+fn_80315754 qr2_register_keyA  # lib/gamespy/qr2/qr2regkeys.o
+fn_8031577C BucketNew  # lib/gamespy/gstats/gbucket.o
+fn_803158CC BucketSet  # lib/gamespy/gstats/gbucket.o
+fn_803159E8 BucketAdd  # lib/gamespy/gstats/gbucket.o
+fn_80315D8C BucketSub  # lib/gamespy/gstats/gbucket.o
+fn_80315FF8 BucketMult  # lib/gamespy/gstats/gbucket.o
+fn_8031625C BucketDiv  # lib/gamespy/gstats/gbucket.o
+fn_803164C8 BucketConcat  # lib/gamespy/gstats/gbucket.o
+fn_80316650 BucketAvg  # lib/gamespy/gstats/gbucket.o
+fn_80316914 CloseStatsConnection  # lib/gamespy/gstats/gstats.o
+fn_80316B3C IsStatsConnected  # lib/gamespy/gstats/gstats.o
+fn_80316B54 PersistThink  # lib/gamespy/gstats/gstats.o
+fn_80317008 ProcessGetData  # lib/gamespy/gstats/gstats.o (static)
+fn_80317534 ProcessStatement  # lib/gamespy/gstats/gstats.o (static)
+fn_803181C0 CallReqCallback  # lib/gamespy/gstats/gstats.o (static)
+fn_80318314 ServerOpInt  # lib/gamespy/gstats/gstats.o (static)
+fn_803183A0 ServerOpFloat  # lib/gamespy/gstats/gstats.o (static)
+fn_8031842C ServerOpString  # lib/gamespy/gstats/gstats.o (static)
+fn_803184BC TeamOpInt  # lib/gamespy/gstats/gstats.o (static)
+fn_803185A0 TeamOpFloat  # lib/gamespy/gstats/gstats.o (static)
+fn_80318680 TeamOpString  # lib/gamespy/gstats/gstats.o (static)
+fn_8031875C PlayerOpInt  # lib/gamespy/gstats/gstats.o (static)
+fn_80318840 PlayerOpFloat  # lib/gamespy/gstats/gstats.o (static)
+fn_80318920 PlayerOpString  # lib/gamespy/gstats/gstats.o (static)
+fn_8031AAB4 keyrand  # lib/gamespy/serverbrowsing/sb_crypt.o (static)
+fn_8031AB5C GOACryptInit  # lib/gamespy/serverbrowsing/sb_crypt.o
+fn_8031AE08 GOADecrypt  # lib/gamespy/serverbrowsing/sb_crypt.o
+fn_8031AEE8 FIFORemove  # lib/gamespy/serverbrowsing/sb_queryengine.o (static)
+fn_8031AF5C QEStartQuery  # lib/gamespy/serverbrowsing/sb_queryengine.o (static)
+fn_8031B1DC SBQueryEngineInit  # lib/gamespy/serverbrowsing/sb_queryengine.o
+fn_8031B284 SBEngineHaltUpdates  # lib/gamespy/serverbrowsing/sb_queryengine.o
+fn_8031B2A4 SBEngineCleanup  # lib/gamespy/serverbrowsing/sb_queryengine.o
+fn_8031B2F8 SBQueryEngineUpdateServer  # lib/gamespy/serverbrowsing/sb_queryengine.o
+fn_8031B3F4 ParseSingleQR2Reply  # lib/gamespy/serverbrowsing/sb_queryengine.o (static)
+fn_8031B5E4 ProcessIncomingReplies  # lib/gamespy/serverbrowsing/sb_queryengine.o (static)
+fn_8031B7E0 SBQueryEngineThink  # lib/gamespy/serverbrowsing/sb_queryengine.o
+fn_8031B95C SBQueryEngineAddQueryKey  # lib/gamespy/serverbrowsing/sb_queryengine.o
+fn_8031B97C SBQueryEngineRemoveServerFromFIFOs  # lib/gamespy/serverbrowsing/sb_queryengine.o
+fn_8031BA54 SBRefStrHash  # lib/gamespy/serverbrowsing/sb_server.o
+fn_8031BAAC SBRefStrHashCleanup  # lib/gamespy/serverbrowsing/sb_server.o
+fn_8031BAF0 SBServerFree  # lib/gamespy/serverbrowsing/sb_server.o
+fn_8031BB30 SBServerAddKeyValue  # lib/gamespy/serverbrowsing/sb_server.o
+fn_8031BB8C SBServerAddIntKeyValue  # lib/gamespy/serverbrowsing/sb_server.o
+fn_8031BBFC SBServerGetStringValueA  # lib/gamespy/serverbrowsing/sb_server.o
+fn_8031BC58 SBServerGetIntValueA  # lib/gamespy/serverbrowsing/sb_server.o
+fn_8031BD7C SBServerGetFloatValueA  # lib/gamespy/serverbrowsing/sb_server.o
+fn_8031BDF0 SBServerGetPublicAddress  # lib/gamespy/serverbrowsing/sb_server.o
+fn_8031BE40 SBServerGetPrivateAddress  # lib/gamespy/serverbrowsing/sb_server.o
+fn_8031BE8C SBServerParseKeyVals  # lib/gamespy/serverbrowsing/sb_server.o
+fn_8031C058 SBServerParseQR2FullKeysSingle  # lib/gamespy/serverbrowsing/sb_server.o
+fn_8031C24C SBServerParseQR2FullKeysSplit  # lib/gamespy/serverbrowsing/sb_server.o
+fn_8031C4C8 KeyValFree  # lib/gamespy/serverbrowsing/sb_server.o (static)
+fn_8031C57C KeyValCompareKey  # lib/gamespy/serverbrowsing/sb_server.o (static)
+fn_8031C5A4 SBAllocServer  # lib/gamespy/serverbrowsing/sb_server.o
+fn_8031C6AC ListCallback  # lib/gamespy/serverbrowsing/sb_serverbrowsing.o (static)
+fn_8031C8E4 EngineCallback  # lib/gamespy/serverbrowsing/sb_serverbrowsing.o (static)
+fn_8031C9E0 ServerBrowserNewA  # lib/gamespy/serverbrowsing/sb_serverbrowsing.o
+fn_8031CAC4 ServerBrowserFree  # lib/gamespy/serverbrowsing/sb_serverbrowsing.o
+fn_8031CB04 ServerBrowserBeginUpdate2  # lib/gamespy/serverbrowsing/sb_serverbrowsing.o
+fn_8031CC54 ServerBrowserSendMessageToServerA  # lib/gamespy/serverbrowsing/sb_serverbrowsing.o
+fn_8031CCBC ServerBrowserSendNatNegotiateCookieToServerA  # lib/gamespy/serverbrowsing/sb_serverbrowsing.o
+fn_8031CD2C ServerBrowserRemoveServer  # lib/gamespy/serverbrowsing/sb_serverbrowsing.o
+fn_8031CD70 ServerBrowserThink  # lib/gamespy/serverbrowsing/sb_serverbrowsing.o
+fn_8031CDA4 ServerBrowserClear  # lib/gamespy/serverbrowsing/sb_serverbrowsing.o
+fn_8031CDE4 ServerBrowserState  # lib/gamespy/serverbrowsing/sb_serverbrowsing.o
+fn_8031CE38 ServerBrowserSortA  # lib/gamespy/serverbrowsing/sb_serverbrowsing.o
+fn_8031CEC0 prevKeyCompare  # lib/gamespy/serverbrowsing/sb_serverlist.o (static)
+fn_8031D050 IntKeyCompare  # lib/gamespy/serverbrowsing/sb_serverlist.o (static)
+fn_8031D0EC FloatKeyCompare  # lib/gamespy/serverbrowsing/sb_serverlist.o (static)
+fn_8031D30C SBServerListSort  # lib/gamespy/serverbrowsing/sb_serverlist.o
+fn_8031D478 SBServerListFindServer  # lib/gamespy/serverbrowsing/sb_serverlist.o
+fn_8031D500 SBServerListRemoveAt  # lib/gamespy/serverbrowsing/sb_serverlist.o
+fn_8031D5A0 SBServerListNth  # lib/gamespy/serverbrowsing/sb_serverlist.o
+fn_8031D5C8 SBServerListClear  # lib/gamespy/serverbrowsing/sb_serverlist.o
+fn_8031D6A4 SBRefStr  # lib/gamespy/serverbrowsing/sb_serverlist.o
+fn_8031D72C SBReleaseStr  # lib/gamespy/serverbrowsing/sb_serverlist.o
+fn_8031D78C NTSLengthSB  # lib/gamespy/serverbrowsing/sb_serverlist.o
+fn_8031D7C4 SBServerListInit  # lib/gamespy/serverbrowsing/sb_serverlist.o
+fn_8031D8DC ServerListConnect  # lib/gamespy/serverbrowsing/sb_serverlist.o (static)
+fn_8031DA68 SendWithRetry  # lib/gamespy/serverbrowsing/sb_serverlist.o (static)
+fn_8031DE04 SBServerListConnectAndQuery  # lib/gamespy/serverbrowsing/sb_serverlist.o
+fn_8031E304 SBServerListDisconnect  # lib/gamespy/serverbrowsing/sb_serverlist.o
+fn_8031E470 SBServerListCleanup  # lib/gamespy/serverbrowsing/sb_serverlist.o
+fn_8031E6A0 FullRulesPresent  # lib/gamespy/serverbrowsing/sb_serverlist.o (static)
+fn_8031E778 AllKeysPresent  # lib/gamespy/serverbrowsing/sb_serverlist.o (static)
+fn_8031E8B0 ParseServer  # lib/gamespy/serverbrowsing/sb_serverlist.o (static)
+fn_8031EB80 IncomingListParseServer  # lib/gamespy/serverbrowsing/sb_serverlist.o (static)
+fn_8031ED3C ProcessMainListData  # lib/gamespy/serverbrowsing/sb_serverlist.o (static)
+fn_8031F660 ProcessPushKeyList  # lib/gamespy/serverbrowsing/sb_serverlist.o (static)
+fn_8031F838 ProcessPlayerSearch  # lib/gamespy/serverbrowsing/sb_serverlist.o (static)
+fn_8031F9FC ProcessMaploop  # lib/gamespy/serverbrowsing/sb_serverlist.o (static)
+fn_8031FBCC ProcessPushServer  # lib/gamespy/serverbrowsing/sb_serverlist.o (static)
+fn_8031FD7C ProcessAdHocData  # lib/gamespy/serverbrowsing/sb_serverlist.o (static)
+fn_803201CC ProcessIncomingData  # lib/gamespy/serverbrowsing/sb_serverlist.o (static)
+fn_803204A4 SBSendMessageToServer  # lib/gamespy/serverbrowsing/sb_serverlist.o
+fn_803205A8 SBSendNatNegotiateCookieToServer  # lib/gamespy/serverbrowsing/sb_serverlist.o
+fn_80320650 ProcessLanData  # lib/gamespy/serverbrowsing/sb_serverlist.o (static)
+fn_803207E8 SBListThink  # lib/gamespy/serverbrowsing/sb_serverlist.o
+fn_80333D50 UTF8ToUCS2String  # lib/gamespy/common/gsStringUtil.o
+
+# sigmatch mkw IPC (1)
+fn_8026BE10 IPCReInit  # lib/rvl/ipc/ipcMain.o
+
+# sigmatch mkw MEM (5)
+fn_8025FDD8 MEM_ExpAllocNewBlock  # lib/rvl/mem/rvlMemExpHeap.o (static)
+fn_8025FFDC MEM_ExpAllocFromHead  # lib/rvl/mem/rvlMemExpHeap.o
+fn_802600B8 MEM_ExpAllocFromTail  # lib/rvl/mem/rvlMemExpHeap.o
+fn_80260180 MEM_ExpRecycleRegion  # lib/rvl/mem/rvlMemExpHeap.o
+fn_80260478 MEMFreeToExpHeap  # lib/rvl/mem/rvlMemExpHeap.o
+
+# sigmatch mkw MSL (4)
+fn_8033AE98 wcslen  # lib/MSL/src/wchar.o
+fn_8033AEB4 wcsncpy  # lib/MSL/src/wchar.o
+fn_8033AEF8 wcscmp  # lib/MSL/src/wchar.o
+
+# sigmatch mkw MTX (8)
+fn_80248050 PSMTXIdentity  # lib/rvl/mtx/rvlMtx.o
+fn_8024807C PSMTXCopy  # lib/rvl/mtx/rvlMtx.o
+fn_802480B0 PSMTXConcat  # lib/rvl/mtx/rvlMtx.o
+fn_8024817C PSMTXInverse  # lib/rvl/mtx/rvlMtx.o
+fn_802482F0 PSMTXRotTrig  # lib/rvl/mtx/rvlMtx.o
+fn_802483A0 PSMTXTrans  # lib/rvl/mtx/rvlMtx.o
+fn_802483D4 PSMTXTransApply  # lib/rvl/mtx/rvlMtx.o
+fn_80248420 PSMTXScale  # lib/rvl/mtx/rvlMtx.o
+
+# sigmatch mkw OS (1)
+fn_802347B4 OS_Alarm_OnReset  # lib/rvl/os/osAlarm.o
+
+# sigmatch mkw SO (11)
+fn_8032380C SOFinish  # lib/rvl/so/soCommon.o
+fn_80323D3C SOCleanup  # lib/rvl/so/soCommon.o
+fn_80323F00 SOiIsInitialized  # lib/rvl/so/soCommon.o
+fn_80323F50 SOiAlloc  # lib/rvl/so/soCommon.o
+fn_80324038 SOiFree  # lib/rvl/so/soCommon.o
+fn_8032406C SOiPrepare  # lib/rvl/so/soCommon.o
+fn_80324154 SOiConclude  # lib/rvl/so/soCommon.o
+fn_803241B0 SOiPrepareTempRm  # lib/rvl/so/soCommon.o
+fn_80324488 SOiConcludeTempRm  # lib/rvl/so/soCommon.o
+fn_8032456C SOiWaitForDHCPEx  # lib/rvl/so/soCommon.o
+fn_803246A4 SOSocket2  # lib/rvl/so/soBasic.o
+
+# sigmatch tp AXFX (7)
+fn_8025B434 AXFXReverbHiInit  # libs/revolution/src/axfx/AXFXReverbHi.o
+fn_8025B4C0 AXFXReverbHiExpInit  # libs/revolution/src/axfx/AXFXReverbHiExp.o
+fn_8025B72C AXFXReverbHiExpShutdown  # libs/revolution/src/axfx/AXFXReverbHiExp.o
+fn_8025BC9C __AllocDelayLine  # libs/revolution/src/axfx/AXFXReverbHiExp.o (static)
+fn_8025BE10 __BzeroDelayLines  # libs/revolution/src/axfx/AXFXReverbHiExp.o (static)
+fn_8025BF34 __FreeDelayLine  # libs/revolution/src/axfx/AXFXReverbHiExp.o (static)
+fn_8025C048 __InitParams  # libs/revolution/src/axfx/AXFXReverbHiExp.o (static)
+
+# sigmatch tp DVD (14)
+fn_802546FC cbForNandSeek2  # libs/revolution/src/dvd/dvderror.o
+fn_802547B8 cbForNandRead  # libs/revolution/src/dvd/dvderror.o
+fn_802548A0 cbForNandSeek0  # libs/revolution/src/dvd/dvderror.o
+fn_80254940 cbForNandSeek1  # libs/revolution/src/dvd/dvderror.o
+fn_80254A40 cbForNandOpen  # libs/revolution/src/dvd/dvderror.o
+fn_80254B5C cbForNandCreate  # libs/revolution/src/dvd/dvderror.o
+fn_802553E4 DVDLowFinalize  # libs/revolution/src/dvd/dvd_broadway.o
+fn_80255698 DVDLowReadDiskID  # libs/revolution/src/dvd/dvd_broadway.o
+fn_80255CEC DVDLowGetNoDiscBufferSizes  # libs/revolution/src/dvd/dvd_broadway.o
+fn_80255EF8 DVDLowGetNoDiscOpenPartitionParams  # libs/revolution/src/dvd/dvd_broadway.o
+fn_80256190 DVDLowClosePartition  # libs/revolution/src/dvd/dvd_broadway.o
+fn_80256488 DVDLowStopMotor  # libs/revolution/src/dvd/dvd_broadway.o
+fn_8025661C DVDLowInquiry  # libs/revolution/src/dvd/dvd_broadway.o
+fn_80257550 DVDLowClearCoverInterrupt  # libs/revolution/src/dvd/dvd_broadway.o
+
+# sigmatch tp ESP (4)
+fn_80268A1C ESP_LaunchTitle  # libs/revolution/src/esp/esp.o
+fn_80268AB0 ESP_GetTicketViews  # libs/revolution/src/esp/esp.o
+fn_80268D5C ESP_GetTmdView  # libs/revolution/src/esp/esp.o
+fn_80268FA0 ESP_GetConsumption  # libs/revolution/src/esp/esp.o
+
+# sigmatch tp FS (1)
+fn_8026F008 ISFS_GetFileStats  # libs/revolution/src/fs/fs.o
+
+# sigmatch tp GX (31)
+fn_80249700 GXCPInterruptHandler  # libs/revolution/src/gx/GXFifo.o (static)
+fn_80249954 CPGPLinkCheck  # libs/revolution/src/gx/GXFifo.o
+fn_80249EBC __GXSaveFifo  # libs/revolution/src/gx/GXFifo.o
+fn_8024A204 __GXCleanGPFifo  # libs/revolution/src/gx/GXFifo.o
+fn_8024AF80 __GXAbort  # libs/revolution/src/gx/GXMisc.o
+fn_8024B0E4 GXAbortFrame  # libs/revolution/src/gx/GXMisc.o
+fn_8024B298 GXSetDrawSync  # libs/revolution/src/gx/GXMisc.o
+fn_8024BBE4 GXSetDispCopySrc  # libs/revolution/src/gx/GXFrameBuf.o
+fn_8024BC24 GXSetDispCopyDst  # libs/revolution/src/gx/GXFrameBuf.o
+fn_8024BC48 GXSetDispCopyFrame2Field  # libs/revolution/src/gx/GXFrameBuf.o
+fn_8024BC68 GXSetCopyClamp  # libs/revolution/src/gx/GXFrameBuf.o
+fn_8024BC90 GXSetDispCopyYScale  # libs/revolution/src/gx/GXFrameBuf.o
+fn_8024BD5C GXSetCopyClear  # libs/revolution/src/gx/GXFrameBuf.o
+fn_8024BDD4 GXSetCopyFilter  # libs/revolution/src/gx/GXFrameBuf.o
+fn_8024BFCC GXCopyDisp  # libs/revolution/src/gx/GXFrameBuf.o
+fn_8024C108 GXClearBoundingBox  # libs/revolution/src/gx/GXFrameBuf.o
+fn_8024C970 GXInitTlutObj  # libs/revolution/src/gx/GXTexture.o
+fn_8024CB00 GXInvalidateTexAll  # libs/revolution/src/gx/GXTexture.o
+fn_8024CB70 __SetSURegs  # libs/revolution/src/gx/GXTexture.o (static)
+fn_8024CC00 __GXSetSUTexRegs  # libs/revolution/src/gx/GXTexture.o
+fn_8024D508 GXSetTevOp  # libs/revolution/src/gx/GXTev.o
+fn_8024D790 GXSetTevKColor  # libs/revolution/src/gx/GXTev.o
+fn_8024D7EC GXSetTevKColorSel  # libs/revolution/src/gx/GXTev.o
+fn_8024D83C GXSetTevKAlphaSel  # libs/revolution/src/gx/GXTev.o
+fn_8024D88C GXSetTevSwapMode  # libs/revolution/src/gx/GXTev.o
+fn_8024D8C8 GXSetTevSwapModeTable  # libs/revolution/src/gx/GXTev.o
+fn_8024D944 GXSetAlphaCompare  # libs/revolution/src/gx/GXTev.o
+fn_8024D97C GXSetZTexture  # libs/revolution/src/gx/GXTev.o
+fn_8024DA08 GXSetTevOrder  # libs/revolution/src/gx/GXTev.o
+fn_8024DB64 GXSetNumTevStages  # libs/revolution/src/gx/GXTev.o
+fn_8024E60C GXSetGPMetric  # libs/revolution/src/gx/GXPerf.o
+
+# sigmatch tp HBM (2)
+fn_802C5534 init__Q210homebutton15FrameControllerFifff  # libs/revolution/src/homebuttonLib/HBMFrameController.o
+fn_802C556C initFrame__Q210homebutton15FrameControllerFv  # libs/revolution/src/homebuttonLib/HBMFrameController.o
+
+# sigmatch tp MSL (29)
+fn_803300F4 Block_link  # libs/PowerPC_EABI_Support/MSL/MSL_C/MSL_Common/Src/alloc.o
+fn_80330244 SubBlock_merge_next  # libs/PowerPC_EABI_Support/MSL/MSL_C/MSL_Common/Src/alloc.o (static)
+fn_80330934 deallocate_from_fixed_pools  # libs/PowerPC_EABI_Support/MSL/MSL_C/MSL_Common/Src/alloc.o
+fn_803314F4 __flush_all  # libs/PowerPC_EABI_Support/MSL/MSL_C/MSL_Common/Src/ansi_files.o
+fn_8033163C __timesdec  # libs/PowerPC_EABI_Support/MSL/MSL_C/MSL_Common_Embedded/Src/ansi_fp.o
+fn_803318C4 __str2dec  # libs/PowerPC_EABI_Support/MSL/MSL_C/MSL_Common_Embedded/Src/ansi_fp.o
+fn_803319B0 __two_exp  # libs/PowerPC_EABI_Support/MSL/MSL_C/MSL_Common_Embedded/Src/ansi_fp.o
+fn_80331E00 __less_dec  # libs/PowerPC_EABI_Support/MSL/MSL_C/MSL_Common_Embedded/Src/ansi_fp.o
+fn_80331F00 __minus_dec  # libs/PowerPC_EABI_Support/MSL/MSL_C/MSL_Common_Embedded/Src/ansi_fp.o
+fn_80332580 __num2dec  # libs/PowerPC_EABI_Support/MSL/MSL_C/MSL_Common_Embedded/Src/ansi_fp.o
+fn_80333B60 fclose  # libs/PowerPC_EABI_Support/MSL/MSL_C/MSL_Common/Src/file_io.o
+fn_80333C1C fflush  # libs/PowerPC_EABI_Support/MSL/MSL_C/MSL_Common/Src/file_io.o
+fn_803341E8 _ftell  # libs/PowerPC_EABI_Support/MSL/MSL_C/MSL_Common/Src/FILE_POS.o
+fn_80334474 __mbtowc_noconv  # libs/PowerPC_EABI_Support/MSL/MSL_C/MSL_Common/Src/mbstring.o
+fn_803344C0 __wctomb_noconv  # libs/PowerPC_EABI_Support/MSL/MSL_C/MSL_Common/Src/mbstring.o
+fn_80334704 __copy_longs_aligned  # libs/PowerPC_EABI_Support/MSL/MSL_C/MSL_Common/Src/mem_funcs.o
+fn_803347C0 __copy_longs_rev_aligned  # libs/PowerPC_EABI_Support/MSL/MSL_C/MSL_Common/Src/mem_funcs.o
+fn_80334868 __copy_longs_unaligned  # libs/PowerPC_EABI_Support/MSL/MSL_C/MSL_Common/Src/mem_funcs.o
+fn_80334928 __copy_longs_rev_unaligned  # libs/PowerPC_EABI_Support/MSL/MSL_C/MSL_Common/Src/mem_funcs.o
+fn_803349D4 __signbitd  # libs/PowerPC_EABI_Support/MSL/MSL_C/MSL_Common/Src/math_api.o
+fn_803349EC __fpclassifyd  # libs/PowerPC_EABI_Support/MSL/MSL_C/MSL_Common/Src/math_api.o
+fn_8033A998 strtoul  # libs/PowerPC_EABI_Support/MSL/MSL_C/MSL_Common/Src/strtoul.o
+fn_8033AA40 strtol  # libs/PowerPC_EABI_Support/MSL/MSL_C/MSL_Common/Src/strtoul.o
+fn_8033AB2C atoi  # libs/PowerPC_EABI_Support/MSL/MSL_C/MSL_Common/Src/strtoul.o
+fn_8033AFBC __write_console  # libs/PowerPC_EABI_Support/MSL/MSL_C/PPC_EABI/Src/uart_console_io_gcn.o
+fn_8033B0D0 scalbn  # libs/PowerPC_EABI_Support/MSL/MSL_C/MSL_Common_Embedded/Src/math_sun.o
+fn_8033BE10 __ieee754_log  # libs/PowerPC_EABI_Support/MSL/MSL_C/MSL_Common_Embedded/Math/Double_precision/e_log.o
+fn_8033C0C4 __ieee754_log10  # libs/PowerPC_EABI_Support/MSL/MSL_C/MSL_Common_Embedded/Math/Double_precision/e_log10.o
+
+# sigmatch tp MetroTRK (2)
+fn_8034031C usr_puts_serial  # libs/TRK_MINNOW_DOLPHIN/debugger/embedded/MetroTRK/Os/dolphin/usr_put.o
+fn_80341D2C TRK_flush_cache  # libs/TRK_MINNOW_DOLPHIN/debugger/embedded/MetroTRK/Processor/ppc/Generic/flush_cache.o
+
+# sigmatch tp NAND (1)
+fn_802669A8 NANDPrivateGetStatus  # libs/revolution/src/nand/nand.o
+
+# sigmatch tp OS (11)
+fn_802365D4 Utf16ToArg  # libs/revolution/src/os/OSExec.o (static)
+fn_802378E4 __OSBootDol  # libs/revolution/src/os/OSExec.o
+fn_8023A880 OSWaitCond  # libs/revolution/src/os/OSMutex.o
+fn_8023A960 __OSReboot  # libs/revolution/src/os/OSReboot.o
+fn_8023EE7C __OSCreateNandbootInfo  # libs/revolution/src/os/OSNandbootInfo.o
+fn_8023EF2C __OSWriteNandbootInfo  # libs/revolution/src/os/OSNandbootInfo.o
+fn_8023F084 OSPlayTimeIsLimited  # libs/revolution/src/os/OSPlayTime.o
+fn_8023F124 __OSPlayTimeFadeLastAIDCallback  # libs/revolution/src/os/OSPlayTime.o
+fn_8023F2E0 __OSWriteExpiredFlag  # libs/revolution/src/os/OSPlayTime.o
+fn_8023F3F4 __OSPlayTimeRebootThread  # libs/revolution/src/os/OSPlayTime.o (static)
+fn_8023FE74 __OSRelaunchTitle  # libs/revolution/src/os/OSLaunch.o
+
+# sigmatch tp VI (10)
+fn_802469AC __VISetYUVSEL  # libs/revolution/src/vi/vi3in1.o
+fn_80246A50 __VISetFilter4EURGB60  # libs/revolution/src/vi/vi3in1.o
+fn_80246A90 __VISetCGMS  # libs/revolution/src/vi/vi3in1.o
+fn_80246AE8 __VISetWSS  # libs/revolution/src/vi/vi3in1.o
+fn_80246B4C __VISetClosedCaption  # libs/revolution/src/vi/vi3in1.o
+fn_80246BB8 __VISetMacrovision  # libs/revolution/src/vi/vi3in1.o
+fn_80247940 __VISetGammaImm  # libs/revolution/src/vi/vi3in1.o
+fn_80247AD4 __VISetGamma  # libs/revolution/src/vi/vi3in1.o
+fn_80247AEC __VISetTrapFilter  # libs/revolution/src/vi/vi3in1.o
+fn_80247B48 __VISetRGBOverDrive  # libs/revolution/src/vi/vi3in1.o
+
+# sigmatch tp WPAD (1)
+fn_8027827C WPADiHIDParser  # libs/revolution/src/wpad/WPADHIDParser.o

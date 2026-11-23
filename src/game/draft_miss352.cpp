@@ -11,7 +11,7 @@ void   fn_80121B08(void* node);                                                /
 void   fn_801EBA20(void* list, void* item);                                    // 0x801EBA20
 char*  fn_80338A9C(char* s, const char* delim);                                // 0x80338A9C (strtok)
 char*  fn_80338BC0(char* s, const char* sub);                                  // 0x80338BC0 (strstr)
-s32    fn_8033AB2C(const char* s);                                             // 0x8033AB2C (atoi)
+s32    atoi(const char* s);                                             // 0x8033AB2C (atoi)
 void*  memcpy(void* d, const void* s, unsigned long n);
 u32    strlen(const char* s);
 
@@ -313,7 +313,7 @@ void fn_801C5E30(char* arg0) {
     while (p != NULL && *p != 0) {
         CopyLine(buf, p);
         if (first != 0) {
-            fn_8033AB2C(buf);
+            atoi(buf);
             first = 0;
             count++;
         }
@@ -350,21 +350,21 @@ char* fn_801C5F9C(char* arg0, u8* arg1) {
     t1 = fn_80338A9C(NULL, ":");
     t2 = fn_80338A9C(NULL, ",");
     t3 = fn_80338A9C(NULL, "-");
-    secs = fn_8033AB2C(t0) * 0x3C;
-    secs = (fn_8033AB2C(t1) + secs) * 0x3C;
-    base = (f32)(fn_8033AB2C(t2) + secs);
-    *(f32*)(arg1 + 0x0) = 0.001f * (f32)fn_8033AB2C(t3) + base;
+    secs = atoi(t0) * 0x3C;
+    secs = (atoi(t1) + secs) * 0x3C;
+    base = (f32)(atoi(t2) + secs);
+    *(f32*)(arg1 + 0x0) = 0.001f * (f32)atoi(t3) + base;
     fn_80338A9C(NULL, " ");
     t0 = fn_80338A9C(NULL, ":");
     t1 = fn_80338A9C(NULL, ":");
     t2 = fn_80338A9C(NULL, ",");
     t3 = fn_80338A9C(NULL, " \n");
-    secs = fn_8033AB2C(t0) * 0x3C;
-    secs = (fn_8033AB2C(t1) + secs) * 0x3C;
-    base = (f32)(fn_8033AB2C(t2) + secs);
+    secs = atoi(t0) * 0x3C;
+    secs = (atoi(t1) + secs) * 0x3C;
+    base = (f32)(atoi(t2) + secs);
     p = line3;
     n = 0;
-    *(f32*)(arg1 + 0x4) = 0.001f * (f32)fn_8033AB2C(t3) + base;
+    *(f32*)(arg1 + 0x4) = 0.001f * (f32)atoi(t3) + base;
     for (;;) {
         CopyLine(buf, p);
         if (LineIsBlank(buf) != 0) {

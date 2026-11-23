@@ -17,7 +17,7 @@ void  fn_80146D98(u8* p);                                        // 0x80146D98
 s32   fn_80146DD8(u8* p, s32 mode, s32 val);                     // 0x80146DD8
 void  fn_80334458(void* obj, s32 x, s32 y);                      // 0x80334458
 s32   fn_80334290(void* obj);                                    // 0x80334290
-void  fn_80333B60(void* obj);                                    // 0x80333B60
+void  fclose(void* obj);                                    // 0x80333B60
 void  DVDClose(u8* p);                                        // 0x8024F494
 u8*   fn_80142500(void* p);                                      // 0x80142500
 void  fn_801472A8(void);                                         // 0x801472A8
@@ -99,7 +99,7 @@ s32 fn_8014698C(u8* p, s32 a, s32 b) {
 // Releases the attached child (if any) and clears its pointer; otherwise, for state 1, runs the inline teardown.
 void fn_801469FC(u8* p) {
     if (*(void**)(p + 0x4) != 0) {
-        fn_80333B60(*(void**)(p + 0x4));
+        fclose(*(void**)(p + 0x4));
         *(void**)(p + 0x4) = 0;
     } else if (*(s32*)(p + 0x0) == 1) {
         fn_80146D98(p + 0xc);

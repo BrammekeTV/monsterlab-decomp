@@ -592,8 +592,8 @@ void WorldOnZoneLoaded(WorldState* w, s32 slotIndex) {
             ScopedLockDtor(&lock, -1);
         } else if (ez == -1) {
             if ((void*)e == w->data->player) {
-                typedef void (*RespawnFn)(Character*, s32, s32, s32, f32);
-                VCALL(e, 0x50, RespawnFn)(e, 7, 0, 0, 10.0f * *(f32*)((u8*)def + 0x24));
+                typedef void (*RespawnFn)(Character*, Character*, s32, s32, s32, f32);
+                VCALL(e, 0x50, RespawnFn)(e, e, 7, 0, 0, 10.0f * *(f32*)((u8*)def + 0x24));
             } else if (fn_801F5220() && (def->flags & 0x20)) {
                 SpawnDespawnEffect(e);
                 SetHidden(e, 2);
