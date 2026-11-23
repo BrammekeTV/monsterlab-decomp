@@ -86,6 +86,8 @@ typedef struct PortOptions {
     BOOL window;              // open a window and draw into it
     const char* screenshot;   // write the last shown picture to this PNG when the run stops
     s32  scale;               // frame buffer size as a multiple of the console's 640x528 (default 2)
+    const char* wav;          // write everything the mixer produces to this WAV file
+    BOOL noAudio;             // never open the sound device
     s32  showTexture;         // development aid (port_demo.cpp): -1, or a texture of global_binary.sir
 } PortOptions;
 extern PortOptions gPortOptions;
@@ -112,6 +114,9 @@ int  PortSelfTestZlib(void);
 void PortDemoMain(void);              // port_demo.cpp
 // Prints the boot summary and ends the process.
 void PortStop(int exitCode, const char* fmt, ...);
+void PortAudioTick(void);     // port_audio.cpp: run the AX frames that are due (interrupt thread)
+const char* PortAudioStats(char* buf, u32 n);
+int  PortSelfTestAudio(void);
 void PortFrameDone(void);     // one presented frame (VI flip): enforces the frame limit
 
 const PortFunc* PortFindFunc(u32 wiiAddr);             // exact start address

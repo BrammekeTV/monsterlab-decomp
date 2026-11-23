@@ -57,8 +57,8 @@ void  GXSetZMode(s32 a, s32 b, s32 c);                            // 0x8024DF80
 void  GXSetProjection(f32* mtx, s32 a);                                // 0x8024E1D0
 void  GXSetCurrentMtx(s32 a);                                          // 0x8024E328
 s32   DVDOpen(char* path, u8* p);                              // 0x8024F1E8
-void  fn_80264420(u8* p);                                          // 0x80264420
-s32   fn_80264A24(u8* list, u8* item);                             // 0x80264A24 (unlink item from list)
+void  AXARTRemoveSound(u8* p);                                          // 0x80264420
+s32   AXARTRemoveArticulator(u8* list, u8* item);                             // 0x80264A24 (unlink item from list)
 s32   WPADProbe(s32 chan, u32* out);                             // 0x802728A4
 s32   WPADControlSpeaker(s32 chan, s32 a, void* cb);                      // 0x802737A8
 f64   fn_8033F204(f64 x);                                          // 0x8033F204 (natural log)
@@ -457,8 +457,8 @@ s32 fn_8020151C(u8* arg0) {
             if (f28 < 0.1f) {
                 s32 saved = lbl_805FBAE0;
                 lbl_805FBAE0 = 1;
-                fn_80264A24(slot + 0x10, slot + 0xB8);
-                fn_80264A24(slot + 0x10, slot + 0xAC);
+                AXARTRemoveArticulator(slot + 0x10, slot + 0xB8);
+                AXARTRemoveArticulator(slot + 0x10, slot + 0xAC);
                 *(u8*)(slot + 0xFC) = 0;
                 if (*(u8*)(slot + 0xFD) != 0) {
                     s32 n = lbl_805FBABC - 1;
@@ -565,7 +565,7 @@ void fn_80202B8C(u8* arg0) {
     if (v == NULL) return;
     *(s32*)(v + 0x0) = 0;
     if (*(u8*)(v + 0xFE) != 0) {
-        fn_80264420(v + 0x10);
+        AXARTRemoveSound(v + 0x10);
     }
     u8* parent = *(u8**)(v + 0xC);
     s32 saved = lbl_805FBAE0;

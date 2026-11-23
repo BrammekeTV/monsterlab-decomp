@@ -85,13 +85,13 @@ void   fn_80203E8C(void);                                        // 0x80203E8C
 void   OSSetPeriodicAlarm(u8* alarm, u32 a, OSTime start, OSTime period, void* handler, u32 extra); // 0x80234394
 s32    DVDOpen(char* path, u8* p);                           // 0x8024F1E8
 void   DVDClose(u8* p);                                       // 0x8024F494
-s32    fn_80259418(s32 a);                                       // 0x80259418
+s32    AXSetMode(s32 a);                                       // 0x80259418
 void*  AXRegisterCallback(void* cb);                                    // 0x80259B2C
-s32    fn_8026099C(void);                                        // 0x8026099C
-s32    fn_80260AC4(s32 a);                                       // 0x80260AC4
-s32    fn_80263F18(void);                                        // 0x80263F18
-s32    fn_80264CC8(f32 a);                                       // 0x80264CC8
-s32    fn_80264CD0(f32 a);                                       // 0x80264CD0
+s32    MIXInit(void);                                        // 0x8026099C
+s32    MIXSetSoundMode(s32 a);                                       // 0x80260AC4
+s32    AXARTInit(void);                                        // 0x80263F18
+s32    AXARTSet3DDopplerScale(f32 a);                                       // 0x80264CC8
+s32    AXARTSet3DDistanceScale(f32 a);                                       // 0x80264CD0
 u8     SCGetSoundMode(void);                                        // 0x8026AC14
 void*  memcpy(void* d, const void* s, size_t n);
 void*  memset(void* p, int c, unsigned long n);
@@ -704,21 +704,21 @@ void fn_801FCFB4(u8* audio) {
     lbl_805FBA94 = IdPoolNext(gIdPool);
     AIInit(NULL);
     AXInit();
-    fn_8026099C();
-    fn_80263F18();
+    MIXInit();
+    AXARTInit();
     lbl_805FBA9C = SCGetSoundMode();
     switch (lbl_805FBA9C) {
     case 0:
-        fn_80259418(0);
-        fn_80260AC4(0);
+        AXSetMode(0);
+        MIXSetSoundMode(0);
         break;
     case 1:
-        fn_80259418(0);
-        fn_80260AC4(1);
+        AXSetMode(0);
+        MIXSetSoundMode(1);
         break;
     case 2:
-        fn_80259418(2);
-        fn_80260AC4(3);
+        AXSetMode(2);
+        MIXSetSoundMode(3);
         break;
     }
     AXRegisterCallback((void*)fn_80201F38);
@@ -739,8 +739,8 @@ void fn_801FCFB4(u8* audio) {
         lbl_805FBAB8 = 1;
     }
     fn_80147988((void*)fn_80202FFC);
-    fn_80264CC8(20.0f);
-    fn_80264CD0(40.0f);
+    AXARTSet3DDopplerScale(20.0f);
+    AXARTSet3DDistanceScale(40.0f);
     *(s32*)(audio + 0x2B0) = 0;
     *(s32*)(audio + 0x2B4) = 0;
     *(u8*)(audio + 0x2B9) = 0;

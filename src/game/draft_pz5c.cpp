@@ -33,8 +33,8 @@ s32    fn_801FD2D4(u8* audio, const char* name, s32 flag);                // 0x8
 s32    fn_801FD420(u8* audio, s32 a, s32 b);                              // 0x801FD420
 void   fn_801FFC04(u8* audio, f32 v);                                     // 0x801FFC04
 u8*    fn_80208CE8(void);                                                 // 0x80208CE8
-void   fn_80258904(void* cb, void* p);                                    // 0x80258904
-void   fn_80258968(void* cb, void* p);                                    // 0x80258968
+void   AXRegisterAuxACallback(void* cb, void* p);                                    // 0x80258904
+void   AXRegisterAuxBCallback(void* cb, void* p);                                    // 0x80258968
 void   fn_8025D5A4(u8* p);                                                // 0x8025D5A4
 void   fn_8025D724(u8* p);                                                // 0x8025D724
 void   fn_8025DE60(u8* p);                                                // 0x8025DE60
@@ -224,12 +224,12 @@ void fn_80200F34(void* p, s32 a, s32 idx) {
     }
     if (a != 0) {
         if (mode == 2) fn_8025DE60(r); else fn_8025D5A4(r);
-        if (idx == 0) fn_80258904((void*)fn_801FCD9C, r);
-        else          fn_80258968((void*)fn_801FCD9C, r);
+        if (idx == 0) AXRegisterAuxACallback((void*)fn_801FCD9C, r);
+        else          AXRegisterAuxBCallback((void*)fn_801FCD9C, r);
     } else {
         if (mode == 2) fn_8025DF84(r); else fn_8025D724(r);
-        if (idx == 0) fn_80258904(NULL, NULL);
-        else          fn_80258968(NULL, NULL);
+        if (idx == 0) AXRegisterAuxACallback(NULL, NULL);
+        else          AXRegisterAuxBCallback(NULL, NULL);
     }
 }
 
@@ -271,12 +271,12 @@ void fn_80201190(void* p, s32 a, s32 idx) {
     }
     if (a != 0) {
         if (mode == 2) fn_8025F0CC(r); else fn_8025E640(r);
-        if (idx == 0) fn_80258904((void*)fn_801FCDCC, r);
-        else          fn_80258968((void*)fn_801FCDCC, r);
+        if (idx == 0) AXRegisterAuxACallback((void*)fn_801FCDCC, r);
+        else          AXRegisterAuxBCallback((void*)fn_801FCDCC, r);
     } else {
         if (mode == 2) fn_8025F1F4(r); else fn_8025E768(r);
-        if (idx == 0) fn_80258904(NULL, NULL);
-        else          fn_80258968(NULL, NULL);
+        if (idx == 0) AXRegisterAuxACallback(NULL, NULL);
+        else          AXRegisterAuxBCallback(NULL, NULL);
     }
 }
 

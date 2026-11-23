@@ -136,6 +136,18 @@ void PortFileInflateEnd(void* strm, u32 totalOut) {
 void PortFileRead(const char* path, u32 offset, u8* dst, u32 len) {
     const char* name = BaseName(path);
     const char* ext = strrchr(name, '.');
+    // A .dsp sound file (music is streamed from these): the 0x60-byte header is three words
+    // (samples, nibbles, rate), two halfwords (loop flag, format), three words (loop start, end,
+    // current address), then halfwords (coefficients, gain, predictor and history). The sample
+    // data after it is bytes for ADPCM and stays as it is.
+    if (ext && _stricmp(ext, ".dsp") == 0) {
+        if (offset != 0 || len < 0x60) return;
+        for (u32 o = 0; o < 0x60; ) {
+            if (o < 0x0C || (o >= 0x10 && o < 0x1C)) { u8 t = dst[o]; dst[o] = dst[o + 3]; dst[o + 3] = t; t = dst[o + 1]; dst[o + 1] = dst[o + 2]; dst[o + 2] = t; o += 4; }
+            else { u8 t = dst[o]; dst[o] = dst[o + 1]; dst[o + 1] = t; o += 2; }
+        }
+        return;
+    }
     if (!ext || _stricmp(ext, ".sir") != 0) return;
 
     if (_stricmp(name, "catalog.sir") == 0) {

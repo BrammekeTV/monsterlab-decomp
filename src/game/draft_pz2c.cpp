@@ -27,7 +27,7 @@ extern "C" {
 s32  fn_80146808(u8* file, const char* name, const char* mode);  // 0x80146808
 s32  fn_80146930(u8* p, void* a, s32 c);                         // 0x80146930 (src/engine/small_8014c.cpp)
 void fn_801469FC(u8* p);                                         // 0x801469FC (src/engine/small_8014c.cpp)
-void fn_80262384(s32 handle, s32 code);                          // 0x80262384 (args from asm, return ignored)
+void MIXSetFader(s32 handle, s32 code);                          // 0x80262384 (args from asm, return ignored)
 s32  fn_80266944(u8* path, s32* out);                            // 0x80266944 (return used as status)
 s32  NANDGetHomeDir(u8* buf);                                       // 0x80267B14
 char* strcat(char* d, const char* s);
@@ -43,7 +43,7 @@ void fn_8020001C(u8* audio, s32 id, f32 v);                      // 0x8020001C (
 
 // 0x80203DE8
 // Resets per-object counters from the state at arg1+0x9C; on state 1 also clears two globals.
-// When the flag lbl_805F98C0 is set, flushes pending entries (fn_80262384) and sets arg1+0xB4 to 3.
+// When the flag lbl_805F98C0 is set, flushes pending entries (MIXSetFader) and sets arg1+0xB4 to 3.
 void fn_80203DE8(u8* arg0, u8* arg1) {
     s32 state;
 
@@ -60,10 +60,10 @@ void fn_80203DE8(u8* arg0, u8* arg1) {
     }
     if (lbl_805F98C0 != 0) {
         if (*(s32*)(arg1 + 0x8C) != 0) {
-            fn_80262384(*(s32*)(arg1 + 0x8C), -0x3C0);
+            MIXSetFader(*(s32*)(arg1 + 0x8C), -0x3C0);
         }
         if (*(s32*)(arg1 + 0x90) != 0) {
-            fn_80262384(*(s32*)(arg1 + 0x90), -0x3C0);
+            MIXSetFader(*(s32*)(arg1 + 0x90), -0x3C0);
         }
         *(s32*)(arg1 + 0xB4) = 3;
     }

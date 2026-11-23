@@ -25,6 +25,8 @@ build\pc\monsterlab.exe                        # runs main() with your own disc 
 | `--keep-going` | a missing function returns 0 instead of stopping, and a semaphore nobody signals is passed after 0.5 s: a survey of what the boot path still needs. After the first one the run is no longer what the game does. |
 | `--verbose` | log every skipped static initialiser and every SDK stub call |
 | `--window` | open a window and draw into it |
+| `--wav FILE` | write everything the audio mixer produces to a WAV file (32 kHz stereo); works headless |
+| `--no-audio` | never open the sound device (it is only opened with `--window`) |
 | `--screenshot FILE` | write the last picture shown as a PNG when the run stops (works without `--window`) |
 | `--scale N` | frame buffer size as a multiple of the console's 640x528 (default 2) |
 | `--peek ADDR` | print four words of Wii memory (hex address) when the run stops |
@@ -234,6 +236,7 @@ so in a comment. When an SDK function is renamed with `tools/rename.py`, the def
 | `OSReport`, `OSFatal`, restart / menu / shutdown | console output; the last three end the run |
 | DVD (`DVDOpen`, `DVDClose`, `DVDReadAsync`, drive status) | implemented on `<data>/files/`; the completion callback arrives from the interrupt thread |
 | VI | retrace callbacks at the rate of the mode `VIConfigure` got (50 Hz for PAL, else 60), `VIWaitForRetrace`; a frame is counted at `VISetNextFrameBuffer` + `VIFlush` (the first one is `VideoInit` showing the empty frame buffer) |
+| AX, MIX, AXART (`port_audio.cpp`) | implemented: 64 AX voices (DSP-ADPCM, PCM16, PCM8, loops, streams, linear resampling), MIX levels and pan, AXART articulators (3D, pan, pitch, volume). The game's audio callback runs once per 3 ms AX frame from the interrupt thread, by the clock; the mix goes to a ring that a thread of its own plays on the wave device (only with `--window`), and to `--wav`. Not done: the aux bus effects (AXFX), the remote's speaker, the low-pass filter |
 | SC | fixed answers: 16:9, English, 60 Hz on, progressive off |
 | GX | nothing is drawn. The state calls (about 80 so far: viewport, scissor, copy filter, matrices, blend, depth, vertex formats...) are recorded in `gPortGx` (`port.h`) for a later renderer. A display list handed to the graphics processor (`GXSetGPFifo`) is answered with the draw-done interrupt; its commands are not executed and draw-sync tokens are not delivered |
 | MTX | `PSMTXIdentity` |

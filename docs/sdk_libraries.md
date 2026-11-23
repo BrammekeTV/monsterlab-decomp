@@ -32,6 +32,51 @@ use, argument use, call pattern). Everything else keeps its `fn_` name.
 | 0x80257FA8 | AXFreeVoice | unlinks a voice from the active list, returns it to the free list (0x80563900) |
 | 0x80258024 | AXAcquireVoice | pops the free voice list, takes priority/callback/context arguments |
 | 0x80259B2C | AXRegisterCallback | swap-under-interrupts, returns the old callback; game registers 0x80201F38 |
+| 0x802581A4 | AXSetVoicePriority | moves the voice to the list of the new priority, stores it at voice+0x0C |
+| 0x80258904 | AXRegisterAuxACallback | stores callback and context for aux bus A |
+| 0x80258968 | AXRegisterAuxBCallback | same for aux bus B |
+| 0x80259418 | AXSetMode | stores the output mode word |
+| 0x80259B70 | AXRmtGetSamples | copies samples from the remote speaker ring of a channel |
+| 0x80259C34 | AXRmtAdvancePtr | advances that ring's read position |
+| 0x8025AC30 | AXSetVoiceSrcType | writes srcSelect / coefSelect (voice+0x30/+0x32), sync bit 0x1 |
+| 0x8025ACF0 | AXSetVoiceState | writes the state (voice+0x38), sync bit 0x4 |
+| 0x8025AD60 | AXSetVoiceType | writes the type (voice+0x3A), sync bit 0x8 |
+| 0x8025ADAC | AXSetVoiceMix | copies 24 halfwords to voice+0x3C, builds the mixer control word |
+| 0x8025B0A4 | AXSetVoiceAddr | copies loop flag, format and three addresses to voice+0x96; sets the gain for PCM formats |
+| 0x8025B19C | AXSetVoiceAdpcm | copies 20 halfwords to voice+0xA6, sync bit 0x8000 |
+| 0x8025B234 | AXSetVoiceSrc | copies 7 halfwords to voice+0xCE, sync bit 0x10000 |
+| 0x8025B330 | AXSetVoiceAdpcmLoop | copies 3 halfwords to voice+0xDC, sync bit 0x40000 |
+| 0x8025B3A0 | AXSetVoiceRmtOn | writes voice+0xFE, sync bit 0x800000 |
+| 0x8026099C | MIXInit | fills the channel table (stride 0x70, one per AX voice) with defaults |
+| 0x80260AB0 | MIXQuit | clears the table pointer |
+| 0x80260AC4 | MIXSetSoundMode | stores the sound mode (0 mono .. 3 Pro Logic 2) |
+| 0x80260AD4 | MIXInitChannel | nine arguments: voice, mode, input, three aux sends, pan, span, fader (tenths of a dB) |
+| 0x80262194 | MIXReleaseChannel | clears the channel's voice pointer |
+| 0x80262320 | MIXMute | sets the mute flag 0x8 |
+| 0x80262344 | MIXUnMute | clears it |
+| 0x80262368 | MIXIsMute | returns it |
+| 0x80262384 | MIXSetFader | stores the fader, marks the channel changed |
+| 0x802623A8 | MIXUpdateSettings | per frame: recomputes every live channel's mix and writes it to the voice |
+| 0x80263F18 | AXARTInit | empties the sound list, sets the two 3D scales |
+| 0x80263F4C | AXARTQuit | releases every sound's MIX channel |
+| 0x80263FAC | AXARTServiceSounds | walks the sound list, evaluating each sound's articulators |
+| 0x80263FEC | AXARTInitSound | stores voice and sample rate (as a float), empties the articulator list |
+| 0x80264020 | AXARTAddSound | evaluates the articulators once, calls MIXInitChannel, links the sound |
+| 0x80264420 | AXARTRemoveSound | unlinks the sound, releases its MIX channel |
+| 0x80264498 | AXARTInitArt3D | articulator type 1 with defaults (pan 0x40, span 0x7F) |
+| 0x80264508 | AXARTInitArtPanning | type 2 |
+| 0x80264524 | AXARTInitArtPitch | type 5 |
+| 0x80264538 | AXARTInitArtVolume | type 8 |
+| 0x8026454C | AXARTInitArtAuxAVolume | type 9 |
+| 0x80264560 | AXARTInitArtAuxBVolume | type 10 |
+| 0x80264574 | AXARTInitArtAuxCVolume | type 11 |
+| 0x80264588 | AXARTInitArtLpf | type 0x14 |
+| 0x802645A8 | AXARTInitArtRmt | type 0x16 |
+| 0x802645BC | AXARTInitArtRmtAuxVolume | type 0x18 (medium confidence on the name) |
+| 0x80264A14 | AXARTAddArticulator | pushes an articulator on the sound's list |
+| 0x80264A24 | AXARTRemoveArticulator | unlinks one |
+| 0x80264CC8 | AXARTSet3DDopplerScale | stores the divisor of the 3D closing speed |
+| 0x80264CD0 | AXARTSet3DDistanceScale | stores the divisor of the 3D distance |
 | 0x802728A4 | WPADProbe | returns -1 / -2 per channel state, writes the extension type to the out pointer |
 | 0x802727E0 | WPADDisconnect | clears a channel buffer; also called from the HBM home menu (medium confidence) |
 | 0x80272AB0 | WPADSetDataFormat | compares the requested format with the current one, queues a command |
@@ -42,6 +87,16 @@ use, argument use, call pattern). Everything else keeps its `fn_` name.
 
 Also named earlier: `WPADInit`, `WPADControlMotor`, `WPADSetConnectCallback`, `WPADSetExtensionCallback`,
 `WPADSetSamplingCallback`, `WPADSetAutoSamplingBuf`, `WPADRegisterAllocator`, `KPADInit`, `AIInit`, `AXInit`.
+
+## AX, MIX and AXART on PC
+
+`src/port/port_audio.cpp` replaces these three libraries. The game uses no MIDI (SEQ / SYN are only
+initialised): every sound is an AX voice. Music is two streamed `.dsp` files (left, right; DSP-ADPCM)
+on voices of type 1, whose 0x10000-byte ring buffers the game refills from the disc while it reads
+each voice's current address (voice+0xA2); sound effects are `.dsp` records in memory on voices of
+type 0, set up by `fn_80203340`. Levels and pitch come from AXART articulators through MIX.
+An AX address is a physical address in the format's units (ADPCM: nibbles, PCM16: samples, PCM8:
+bytes). The AXFX effects on the aux buses (`0x8025B4C0`-`0x8025F284`) are not mixed.
 
 ## Called by the game (still `fn_`)
 

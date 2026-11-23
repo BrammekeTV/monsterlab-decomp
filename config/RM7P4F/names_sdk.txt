@@ -121,6 +121,47 @@ fn_80257C88 AXQuit
 fn_80257FA8 AXFreeVoice
 fn_80258024 AXAcquireVoice
 fn_80259B2C AXRegisterCallback
+# MIX and AXART follow AX (0x8026099C-0x80264CD0)
+fn_80258904 AXRegisterAuxACallback
+fn_80258968 AXRegisterAuxBCallback
+fn_80259418 AXSetMode
+fn_8025AC30 AXSetVoiceSrcType
+fn_8025AD60 AXSetVoiceType
+fn_8025ADAC AXSetVoiceMix
+fn_8025B19C AXSetVoiceAdpcm
+fn_8025B234 AXSetVoiceSrc
+fn_8025B330 AXSetVoiceAdpcmLoop
+fn_8025B3A0 AXSetVoiceRmtOn
+fn_8026099C MIXInit
+fn_80260AB0 MIXQuit
+fn_80260AC4 MIXSetSoundMode
+fn_80260AD4 MIXInitChannel
+fn_80262194 MIXReleaseChannel
+fn_80262320 MIXMute
+fn_80262344 MIXUnMute
+fn_80262368 MIXIsMute
+fn_80262384 MIXSetFader
+fn_802623A8 MIXUpdateSettings
+fn_80263F18 AXARTInit
+fn_80263F4C AXARTQuit
+fn_80263FAC AXARTServiceSounds
+fn_80263FEC AXARTInitSound
+fn_80264020 AXARTAddSound
+fn_80264420 AXARTRemoveSound
+fn_80264498 AXARTInitArt3D
+fn_80264508 AXARTInitArtPanning
+fn_80264524 AXARTInitArtPitch
+fn_80264538 AXARTInitArtVolume
+fn_8026454C AXARTInitArtAuxAVolume
+fn_80264560 AXARTInitArtAuxBVolume
+fn_80264574 AXARTInitArtAuxCVolume
+fn_80264588 AXARTInitArtLpf
+fn_802645A8 AXARTInitArtRmt
+fn_802645BC AXARTInitArtRmtAuxVolume
+fn_80264A14 AXARTAddArticulator
+fn_80264A24 AXARTRemoveArticulator
+fn_80264CC8 AXARTSet3DDopplerScale
+fn_80264CD0 AXARTSet3DDistanceScale
 
 # NET: the function name appears in its own debug/error string (DWC, NCD, NWC24, NHTTP)
 fn_8032683C NHTTPi_CheckCurrentThread
