@@ -559,24 +559,29 @@ static void SwapData(u8* base, u32 baseAddr, const PortDataRun* runs, u32 count,
     }
 }
 
+// Bytes of main.dol: from the file, or with no file from the open disc image.
+static BOOL DolRead(FILE* f, u32 off, void* dst, u32 size) {
+    if (!f) return PortDiscRead(PortDiscDolOffset() + off, dst, size);
+    return fseek(f, (long)off, SEEK_SET) == 0 && fread(dst, 1, size, f) == size;
+}
+
 static BOOL LoadDol(const char* path) {
-    FILE* f = fopen(path, "rb");
-    if (!f) return FALSE;
+    FILE* f = path ? fopen(path, "rb") : NULL;
+    if (path && !f) return FALSE;
     u8 hdr[0x100];
-    if (fread(hdr, 1, sizeof(hdr), f) != sizeof(hdr)) { fclose(f); return FALSE; }
+    if (!DolRead(f, 0, hdr, sizeof(hdr))) { if (f) fclose(f); return FALSE; }
     sDataEnd = Be32(hdr + 0xD8) + Be32(hdr + 0xDC);          // bss
     for (s32 i = 7; i < 18; i++) {                           // data sections only; code is not used
         u32 off = Be32(hdr + i * 4), addr = Be32(hdr + 0x48 + i * 4), size = Be32(hdr + 0x90 + i * 4);
         if (!size) continue;
-        if (addr < PORT_MEM1_BASE || addr + size > PORT_MEM1_BASE + PORT_MEM1_SIZE) { fclose(f); return FALSE; }
+        if (addr < PORT_MEM1_BASE || addr + size > PORT_MEM1_BASE + PORT_MEM1_SIZE) { if (f) fclose(f); return FALSE; }
         if (addr >= PORT_TEXT_LO && addr < PORT_TEXT_HI) continue;       // exception tables inside the code range
-        fseek(f, off, SEEK_SET);
-        if (fread((void*)(uintptr_t)addr, 1, size, f) != size) { fclose(f); return FALSE; }
+        if (!DolRead(f, off, (void*)(uintptr_t)addr, size)) { if (f) fclose(f); return FALSE; }
         if (addr + size > sDataEnd) sDataEnd = addr + size;
         if (addr == (u32)(uintptr_t)_ctors) Swap((u8*)(uintptr_t)addr, size, 4);     // .ctors has no symbols
         SwapData((u8*)(uintptr_t)addr, addr, gPortData, gPortDataCount, addr, addr + size);
     }
-    fclose(f);
+    if (f) fclose(f);
     return TRUE;
 }
 
@@ -805,6 +810,7 @@ static int SelfTest(void) {
     fails += PortSelfTestAudio();
     fails += PortSelfTestZlib();
     fails += PortSelfTestOverlay();
+    fails += PortSelfTestDisc();
     fails += PortSelfTestSettings();
 #undef CHECK
     PortLog("self-test: %u functions, %u linked; %s", gPortFuncCount, linked, fails ? "FAILED" : "ok");
@@ -864,7 +870,7 @@ struct PortBoot {
             else if (!strcmp(a, "--fast")) gPortOptions.fastAll = TRUE;
             else if (!strcmp(a, "--to-menu")) gPortOptions.toMenu = TRUE;
             else if (!strcmp(a, "--seconds") && i + 1 < __argc) { gPortOptions.secondsLimit = atoi(__argv[++i]); sawSeconds = TRUE; }
-            else if (!strcmp(a, "--data") && i + 1 < __argc) asked = __argv[++i];
+            else if ((!strcmp(a, "--data") || !strcmp(a, "--iso")) && i + 1 < __argc) asked = __argv[++i];
             else if (!strcmp(a, "--window")) gPortOptions.window = TRUE;
             else if (!strcmp(a, "--wav") && i + 1 < __argc) gPortOptions.wav = __argv[++i];
             else if (!strcmp(a, "--no-audio")) gPortOptions.noAudio = TRUE;
@@ -940,8 +946,21 @@ struct PortBoot {
         }
         PortLockEnter();                         // the main thread is the first game thread
 
-        const char* dir = FindDataDir(asked);
-        if (dir) {
+        // A file is the player's disc image, read as it is (--iso FILE; --data and MONSTERLAB_DATA take one too).
+        const char* dir = NULL;
+        if (asked && FileExists(asked) && !gPortOptions.selfTest) {
+            char why[256];
+            if (PortDiscOpen(asked, why, sizeof(why)) != PORT_DISC_OK) {
+                fprintf(stderr, "[port] %s\n       %s\n", asked, why);
+                ExitProcess(12);
+            }
+            if (!LoadDol(NULL)) {
+                fprintf(stderr, "[port] the main.dol of %s is not usable\n", asked);
+                ExitProcess(11);
+            }
+            gPortOptions.dataDir = dir = asked;
+            gPortOptions.haveData = TRUE;
+        } else if ((dir = FindDataDir(asked)) != NULL) {
             char path[MAX_PATH + 32];
             snprintf(path, sizeof(path), "%s\\sys\\main.dol", dir);
             if (!LoadDol(path)) {
@@ -962,8 +981,8 @@ struct PortBoot {
             TerminateProcess(GetCurrentProcess(), fails ? 1 : 0);
         }
         if (!gPortOptions.haveData) {
-            fprintf(stderr, "[port] no game data found. Put your own extracted disc in orig/RM7P4F (sys/main.dol, files/),\n"
-                            "       or pass --data <dir> / set MONSTERLAB_DATA. Run with --selftest to test without data.\n");
+            fprintf(stderr, "[port] no game data found. Pass your own Monster Lab disc image with --iso <file>, or put the\n"
+                            "       extracted disc in orig/RM7P4F (sys/main.dol, files/), pass --data <dir> or set MONSTERLAB_DATA. Run with --selftest to test without data.\n");
             ExitProcess(2);
         }
         PortLog("game data: %s", dir);

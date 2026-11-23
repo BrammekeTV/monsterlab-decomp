@@ -11,6 +11,7 @@
 #include <windows.h>
 #include <stdio.h>
 #include <string.h>
+#include <algorithm>
 
 #include "port/port.h"
 #include "revolution.h"
@@ -35,7 +36,7 @@ struct DVDFileInfo {
 static_assert(sizeof(DVDFileInfo) == 0x3C, "DVDFileInfo layout");
 typedef void (*DVDCallback)(s32 result, DVDFileInfo* info);
 
-struct DvdFile { FILE* f; u32 size; char name[120]; char path[100]; };
+struct DvdFile { FILE* f; BOOL used; u64 discOff; u32 size; char name[120]; char path[100]; };   // f, or discOff in the disc image
 static DvdFile sDvdFiles[64];
 static u32 sDvdOpens, sDvdReads, sDvdMisses;
 static u64 sDvdBytes;
@@ -60,18 +61,22 @@ s32 DVDOpen(char* path, u8* infoBytes) {
     while (*rel == '/' || *rel == '\\') rel++;
     snprintf(host, sizeof(host), "%s\\files\\%s", gPortOptions.dataDir ? gPortOptions.dataDir : ".", rel);
     for (char* c = host; *c; c++) if (*c == '/') *c = '\\';
-    FILE* f = fopen(host, "rb");
-    if (!f) {
+    u64 discOff = 0;
+    u32 discSize = 0;
+    FILE* f = NULL;
+    if (PortDiscIsOpen() ? !PortDiscFind(rel, &discOff, &discSize) : !(f = fopen(host, "rb"))) {
         sDvdMisses++;
         PortLog("disc: %s not found", path);
         return 0;
     }
     for (s32 i = 0; i < 64; i++) {
         DvdFile* d = &sDvdFiles[i];
-        if (d->f) continue;
+        if (d->used) continue;
+        d->used = TRUE;
         d->f = f;
-        fseek(f, 0, SEEK_END);
-        d->size = (u32)ftell(f);
+        d->discOff = discOff;
+        d->size = discSize;
+        if (f) { fseek(f, 0, SEEK_END); d->size = (u32)ftell(f); }
         snprintf(d->name, sizeof(d->name), "disc: opened %s (%u bytes)", path, d->size);
         snprintf(d->path, sizeof(d->path), "%s", rel);
         memset(info, 0, sizeof(DVDFileInfo));
@@ -81,7 +86,7 @@ s32 DVDOpen(char* path, u8* infoBytes) {
         PortMilestone(d->name);
         return 1;
     }
-    fclose(f);
+    if (f) fclose(f);
     PortStop(7, "more than 64 disc files open");
     return 0;
 }
@@ -93,6 +98,7 @@ void DVDClose(u8* infoBytes) {
     DvdFile* d = &sDvdFiles[info->startAddr - 1];
     if (d->f) fclose(d->f);
     d->f = NULL;
+    d->used = FALSE;
     info->startAddr = 0;
 }
 
@@ -111,11 +117,17 @@ static void DvdDeliver(void* arg) {
 // thread, as the drive's interrupt does on the console.
 s32 DVDReadAsync(u8* infoBytes, void* addr, s32 len, s32 offset, void* cb, s32 prio) {
     DVDFileInfo* info = (DVDFileInfo*)infoBytes;
-    if (info->startAddr == 0 || info->startAddr > 64 || !sDvdFiles[info->startAddr - 1].f) return 0;
+    if (info->startAddr == 0 || info->startAddr > 64 || !sDvdFiles[info->startAddr - 1].used) return 0;
     DvdFile* d = &sDvdFiles[info->startAddr - 1];
     if (offset < 0 || (u32)offset > d->size) return 0;
-    fseek(d->f, offset, SEEK_SET);
-    s32 got = (s32)fread(addr, 1, (size_t)len, d->f);
+    s32 got;
+    if (d->f) {
+        fseek(d->f, offset, SEEK_SET);
+        got = (s32)fread(addr, 1, (size_t)len, d->f);
+    } else {
+        got = (s32)std::min((u32)len, d->size - (u32)offset);
+        if (got > 0 && !PortDiscRead(d->discOff + (u32)offset, addr, (u32)got)) got = 0;
+    }
     sDvdReads++;
     sDvdBytes += (u32)got;
     if (got > 0) PortFileRead(d->path, (u32)offset, (u8*)addr, (u32)got);
