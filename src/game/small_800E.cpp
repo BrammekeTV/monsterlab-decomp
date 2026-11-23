@@ -7,8 +7,8 @@ u8*  fn_800DE5E4(u8* p, s32 del);                              // 0x800DE5E4
 void  fn_800DEC28(u8* p, void* arg);                            // 0x800DEC28
 s32   fn_800DECD8(u8* p, f32 dt);                                    // 0x800DECD8
 s32   RegisterScriptFunc(const char* name, s32 type, void* fn); // 0x801DC91C
-void  CIWaypointPath_StaticSetPosition(void);                   // 0x800E2F88
-void  CIWaypointPath_StaticSetOrientation(void);                // 0x800E2FA4
+void  CIWaypointPath_StaticSetPosition(const f32* src, u8* dst);   // 0x800E2F88
+void  CIWaypointPath_StaticSetOrientation(const f32* src, u8* dst); // 0x800E2FA4
 void  fn_800E2DF4(u8* p, f32 a, f32 b);
 void  fn_800E2E48(u8* p, f32 a, f32 b);
 

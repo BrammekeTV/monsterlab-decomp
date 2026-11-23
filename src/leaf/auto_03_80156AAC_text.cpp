@@ -13,8 +13,6 @@ extern s32 lbl_805FB550;
 extern s32 lbl_805FB554;
 extern u8 lbl_805FB580[];
 extern u8 lbl_805FB590[];
-extern u8 lbl_805FF20C[];
-extern u8 lbl_805FF210[];
 extern f32 lbl_805FF228;
 extern f32 lbl_805FF22C;
 extern "C" s32 OSSignalSemaphore(u8*);
@@ -129,17 +127,6 @@ extern "C" s32 VideoGetWidth(void) {
 extern "C" s32 VideoGetHeight(void) {
     s32 t0 = *(s32*)((u8*)&lbl_805FB554);
     return (s32)(t0);
-}
-
-// 0x8015DE58
-extern "C" f32 fn_8015DE58(s32 a3, u8* a4, u8* a5, u8* a6, u8* a7) {
-    f32 t0 = *(f32*)((u8*)&lbl_805FF20C);
-    f32 t1 = *(f32*)((u8*)&lbl_805FF210);
-    *(f32*)(((u8*)(uintptr_t)(a4)) + 0) = (f32)(t0);
-    *(f32*)(((u8*)(uintptr_t)(a5)) + 0) = (f32)(t1);
-    *(f32*)(((u8*)(uintptr_t)(a6)) + 0) = (f32)(t1);
-    *(f32*)(((u8*)(uintptr_t)(a7)) + 0) = (f32)(t0);
-    return (f32)(t0);
 }
 
 // 0x8015DE74

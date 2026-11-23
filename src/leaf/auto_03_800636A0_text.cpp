@@ -31,17 +31,6 @@ extern "C" u32 fn_800651C8(u8* a3, s32 a4) {
     return (u32)(t5);
 }
 
-// 0x800651E4
-extern "C" f32 fn_800651E4(u8* a3, u8* a4) {
-    f32 t0 = *(f32*)(((u8*)(uintptr_t)(a3)) + 0);
-    f32 t1 = *(f32*)(((u8*)(uintptr_t)(a3)) + 4);
-    f32 t2 = *(f32*)(((u8*)(uintptr_t)(a3)) + 8);
-    *(f32*)(((u8*)(uintptr_t)(a4)) + 0) = (f32)(t0);
-    *(f32*)(((u8*)(uintptr_t)(a4)) + 4) = (f32)(t1);
-    *(f32*)(((u8*)(uintptr_t)(a4)) + 8) = (f32)(t2);
-    return (f32)(t1);
-}
-
 // 0x800653E8
 extern "C" u32 fn_800653E8(u8* a3) {
     u8 t0 = *(u8*)(((u8*)(uintptr_t)(a3)) + 5);
