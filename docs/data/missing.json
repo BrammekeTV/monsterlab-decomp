@@ -1,19 +1,19 @@
 {
  "log": "link.log",
  "counts": {
-  "global": 3898,
-  "unknown": 126,
-  "library": 196
+  "global": 3899,
+  "unknown": 130,
+  "library": 187
  },
  "game_bytes": 0,
  "duplicates": [],
  "game": [],
  "library": [
   {
-   "name": "fn_8023A68C",
+   "name": "OSUnlockMutex",
    "refs": 19,
    "files": 19,
-   "used_as": "_fn_8023A68C",
+   "used_as": "_OSUnlockMutex",
    "addr": "8023A68C",
    "size": 200,
    "section": ".text",
@@ -21,10 +21,10 @@
    "region": "OS"
   },
   {
-   "name": "fn_8023A5B0",
+   "name": "OSLockMutex",
    "refs": 16,
    "files": 16,
-   "used_as": "_fn_8023A5B0",
+   "used_as": "_OSLockMutex",
    "addr": "8023A5B0",
    "size": 220,
    "section": ".text",
@@ -43,10 +43,10 @@
    "region": "MSL C/C++ runtime"
   },
   {
-   "name": "fn_802737A8",
+   "name": "WPADControlSpeaker",
    "refs": 7,
    "files": 7,
-   "used_as": "_fn_802737A8",
+   "used_as": "_WPADControlSpeaker",
    "addr": "802737A8",
    "size": 5660,
    "section": ".text",
@@ -65,10 +65,10 @@
    "region": "MSL C/C++ runtime"
   },
   {
-   "name": "fn_8027D270",
+   "name": "KPADSetPosParam",
    "refs": 5,
    "files": 5,
-   "used_as": "_fn_8027D270",
+   "used_as": "_KPADSetPosParam",
    "addr": "8027D270",
    "size": 28,
    "section": ".text",
@@ -76,10 +76,10 @@
    "region": "WPAD/KPAD/BT"
   },
   {
-   "name": "fn_8024849C",
+   "name": "C_MTXOrtho",
    "refs": 4,
    "files": 4,
-   "used_as": "_fn_8024849C",
+   "used_as": "_C_MTXOrtho",
    "addr": "8024849C",
    "size": 152,
    "section": ".text",
@@ -87,26 +87,26 @@
    "region": "GX"
   },
   {
-   "name": "fn_8024E1D0",
+   "name": "DWC_ClearError",
    "refs": 4,
    "files": 4,
-   "used_as": "_fn_8024E1D0",
-   "addr": "8024E1D0",
-   "size": 100,
-   "section": ".text",
-   "kind": "library",
-   "region": "GX"
-  },
-  {
-   "name": "fn_802E4970",
-   "refs": 4,
-   "files": 4,
-   "used_as": "_fn_802E4970",
+   "used_as": "_DWC_ClearError",
    "addr": "802E4970",
    "size": 28,
    "section": ".text",
    "kind": "library",
    "region": "Network (DWC/SSL/NHTTP/NWC24)"
+  },
+  {
+   "name": "GXSetProjection",
+   "refs": 4,
+   "files": 4,
+   "used_as": "_GXSetProjection",
+   "addr": "8024E1D0",
+   "size": 100,
+   "section": ".text",
+   "kind": "library",
+   "region": "GX"
   },
   {
    "name": "fn_802E9CBC",
@@ -131,15 +131,15 @@
    "region": "MSL C/C++ runtime"
   },
   {
-   "name": "fn_80333B60",
-   "refs": 4,
-   "files": 4,
-   "used_as": "_fn_80333B60",
-   "addr": "80333B60",
-   "size": 188,
+   "name": "GXLoadTexObj",
+   "refs": 3,
+   "files": 3,
+   "used_as": "_GXLoadTexObj",
+   "addr": "8024C91C",
+   "size": 84,
    "section": ".text",
    "kind": "library",
-   "region": "MSL C/C++ runtime"
+   "region": "GX"
   },
   {
    "name": "OSSetAlarm",
@@ -153,15 +153,15 @@
    "region": "OS"
   },
   {
-   "name": "fn_8024C91C",
+   "name": "UTF8ToUCS2String",
    "refs": 3,
    "files": 3,
-   "used_as": "_fn_8024C91C",
-   "addr": "8024C91C",
-   "size": 84,
+   "used_as": "_UTF8ToUCS2String",
+   "addr": "80333D50",
+   "size": 72,
    "section": ".text",
    "kind": "library",
-   "region": "GX"
+   "region": "MSL C/C++ runtime"
   },
   {
    "name": "fn_8025B330",
@@ -230,32 +230,54 @@
    "region": "MSL C/C++ runtime"
   },
   {
-   "name": "fn_80333D50",
-   "refs": 3,
-   "files": 3,
-   "used_as": "_fn_80333D50",
-   "addr": "80333D50",
-   "size": 72,
-   "section": ".text",
-   "kind": "library",
-   "region": "MSL C/C++ runtime"
-  },
-  {
-   "name": "fn_80234394",
+   "name": "AXAcquireVoice",
    "refs": 2,
    "files": 2,
-   "used_as": "_fn_80234394",
-   "addr": "80234394",
-   "size": 132,
+   "used_as": "_AXAcquireVoice",
+   "addr": "80258024",
+   "size": 384,
    "section": ".text",
    "kind": "library",
-   "region": "OS"
+   "region": "AI/AX/MEM"
   },
   {
-   "name": "fn_8024C3B8",
+   "name": "AXFreeVoice",
    "refs": 2,
    "files": 2,
-   "used_as": "_fn_8024C3B8",
+   "used_as": "_AXFreeVoice",
+   "addr": "80257FA8",
+   "size": 124,
+   "section": ".text",
+   "kind": "library",
+   "region": "AI/AX/MEM"
+  },
+  {
+   "name": "AXSetVoiceAddr",
+   "refs": 2,
+   "files": 2,
+   "used_as": "_AXSetVoiceAddr",
+   "addr": "8025B0A4",
+   "size": 248,
+   "section": ".text",
+   "kind": "library",
+   "region": "AI/AX/MEM"
+  },
+  {
+   "name": "AXSetVoiceState",
+   "refs": 2,
+   "files": 2,
+   "used_as": "_AXSetVoiceState",
+   "addr": "8025ACF0",
+   "size": 112,
+   "section": ".text",
+   "kind": "library",
+   "region": "AI/AX/MEM"
+  },
+  {
+   "name": "GXInitTexObj",
+   "refs": 2,
+   "files": 2,
+   "used_as": "_GXInitTexObj",
    "addr": "8024C3B8",
    "size": 524,
    "section": ".text",
@@ -263,10 +285,10 @@
    "region": "GX"
   },
   {
-   "name": "fn_8024C5C4",
+   "name": "GXInitTexObjCI",
    "refs": 2,
    "files": 2,
-   "used_as": "_fn_8024C5C4",
+   "used_as": "_GXInitTexObjCI",
    "addr": "8024C5C4",
    "size": 72,
    "section": ".text",
@@ -274,10 +296,10 @@
    "region": "GX"
   },
   {
-   "name": "fn_8024C60C",
+   "name": "GXInitTexObjLOD",
    "refs": 2,
    "files": 2,
-   "used_as": "_fn_8024C60C",
+   "used_as": "_GXInitTexObjLOD",
    "addr": "8024C60C",
    "size": 260,
    "section": ".text",
@@ -285,15 +307,48 @@
    "region": "GX"
   },
   {
-   "name": "fn_8024C970",
+   "name": "GXInitTlutObj",
    "refs": 2,
    "files": 2,
-   "used_as": "_fn_8024C970",
+   "used_as": "_GXInitTlutObj",
    "addr": "8024C970",
    "size": 40,
    "section": ".text",
    "kind": "library",
    "region": "GX"
+  },
+  {
+   "name": "KPADSetHoriParam",
+   "refs": 2,
+   "files": 2,
+   "used_as": "_KPADSetHoriParam",
+   "addr": "8027D28C",
+   "size": 28,
+   "section": ".text",
+   "kind": "library",
+   "region": "WPAD/KPAD/BT"
+  },
+  {
+   "name": "OSSetPeriodicAlarm",
+   "refs": 2,
+   "files": 2,
+   "used_as": "_OSSetPeriodicAlarm",
+   "addr": "80234394",
+   "size": 132,
+   "section": ".text",
+   "kind": "library",
+   "region": "OS"
+  },
+  {
+   "name": "WPADDisconnect",
+   "refs": 2,
+   "files": 2,
+   "used_as": "_WPADDisconnect",
+   "addr": "802727E0",
+   "size": 196,
+   "section": ".text",
+   "kind": "library",
+   "region": "WPAD/KPAD/BT"
   },
   {
    "name": "fn_8024C998",
@@ -305,72 +360,6 @@
    "section": ".text",
    "kind": "library",
    "region": "GX"
-  },
-  {
-   "name": "fn_8024D59C",
-   "refs": 2,
-   "files": 2,
-   "used_as": "_fn_8024D59C",
-   "addr": "8024D59C",
-   "size": 64,
-   "section": ".text",
-   "kind": "library",
-   "region": "GX"
-  },
-  {
-   "name": "fn_8024D5DC",
-   "refs": 2,
-   "files": 2,
-   "used_as": "_fn_8024D5DC",
-   "addr": "8024D5DC",
-   "size": 64,
-   "section": ".text",
-   "kind": "library",
-   "region": "GX"
-  },
-  {
-   "name": "fn_8024D61C",
-   "refs": 2,
-   "files": 2,
-   "used_as": "_fn_8024D61C",
-   "addr": "8024D61C",
-   "size": 88,
-   "section": ".text",
-   "kind": "library",
-   "region": "GX"
-  },
-  {
-   "name": "fn_8024D674",
-   "refs": 2,
-   "files": 2,
-   "used_as": "_fn_8024D674",
-   "addr": "8024D674",
-   "size": 88,
-   "section": ".text",
-   "kind": "library",
-   "region": "GX"
-  },
-  {
-   "name": "fn_80257FA8",
-   "refs": 2,
-   "files": 2,
-   "used_as": "_fn_80257FA8",
-   "addr": "80257FA8",
-   "size": 124,
-   "section": ".text",
-   "kind": "library",
-   "region": "AI/AX/MEM"
-  },
-  {
-   "name": "fn_80258024",
-   "refs": 2,
-   "files": 2,
-   "used_as": "_fn_80258024",
-   "addr": "80258024",
-   "size": 384,
-   "section": ".text",
-   "kind": "library",
-   "region": "AI/AX/MEM"
   },
   {
    "name": "fn_80258904",
@@ -406,34 +395,12 @@
    "region": "AI/AX/MEM"
   },
   {
-   "name": "fn_8025ACF0",
-   "refs": 2,
-   "files": 2,
-   "used_as": "_fn_8025ACF0",
-   "addr": "8025ACF0",
-   "size": 112,
-   "section": ".text",
-   "kind": "library",
-   "region": "AI/AX/MEM"
-  },
-  {
    "name": "fn_8025AD60",
    "refs": 2,
    "files": 2,
    "used_as": "_fn_8025AD60",
    "addr": "8025AD60",
    "size": 76,
-   "section": ".text",
-   "kind": "library",
-   "region": "AI/AX/MEM"
-  },
-  {
-   "name": "fn_8025B0A4",
-   "refs": 2,
-   "files": 2,
-   "used_as": "_fn_8025B0A4",
-   "addr": "8025B0A4",
-   "size": 248,
    "section": ".text",
    "kind": "library",
    "region": "AI/AX/MEM"
@@ -547,28 +514,6 @@
    "section": ".text",
    "kind": "library",
    "region": "NAND/SC/IPC"
-  },
-  {
-   "name": "fn_802727E0",
-   "refs": 2,
-   "files": 2,
-   "used_as": "_fn_802727E0",
-   "addr": "802727E0",
-   "size": 196,
-   "section": ".text",
-   "kind": "library",
-   "region": "WPAD/KPAD/BT"
-  },
-  {
-   "name": "fn_8027D28C",
-   "refs": 2,
-   "files": 2,
-   "used_as": "_fn_8027D28C",
-   "addr": "8027D28C",
-   "size": 28,
-   "section": ".text",
-   "kind": "library",
-   "region": "WPAD/KPAD/BT"
   },
   {
    "name": "fn_802BE220",
@@ -769,6 +714,149 @@
    "region": "MSL C/C++ runtime"
   },
   {
+   "name": "AXFXReverbHiExpInit",
+   "refs": 1,
+   "files": 1,
+   "used_as": "_AXFXReverbHiExpInit",
+   "addr": "8025B4C0",
+   "size": 412,
+   "section": ".text",
+   "kind": "library",
+   "region": "AI/AX/MEM"
+  },
+  {
+   "name": "AXFXReverbHiExpShutdown",
+   "refs": 1,
+   "files": 1,
+   "used_as": "_AXFXReverbHiExpShutdown",
+   "addr": "8025B72C",
+   "size": 84,
+   "section": ".text",
+   "kind": "library",
+   "region": "AI/AX/MEM"
+  },
+  {
+   "name": "AXQuit",
+   "refs": 1,
+   "files": 1,
+   "used_as": "_AXQuit",
+   "addr": "80257C88",
+   "size": 72,
+   "section": ".text",
+   "kind": "library",
+   "region": "AI/AX/MEM"
+  },
+  {
+   "name": "AXRmtAdvancePtr",
+   "refs": 1,
+   "files": 1,
+   "used_as": "_AXRmtAdvancePtr",
+   "addr": "80259C34",
+   "size": 88,
+   "section": ".text",
+   "kind": "library",
+   "region": "AI/AX/MEM"
+  },
+  {
+   "name": "AXRmtGetSamples",
+   "refs": 1,
+   "files": 1,
+   "used_as": "_AXRmtGetSamples",
+   "addr": "80259B70",
+   "size": 196,
+   "section": ".text",
+   "kind": "library",
+   "region": "AI/AX/MEM"
+  },
+  {
+   "name": "AXSetVoicePriority",
+   "refs": 1,
+   "files": 1,
+   "used_as": "_AXSetVoicePriority",
+   "addr": "802581A4",
+   "size": 156,
+   "section": ".text",
+   "kind": "library",
+   "region": "AI/AX/MEM"
+  },
+  {
+   "name": "GXInitTexObjFilter",
+   "refs": 1,
+   "files": 1,
+   "used_as": "_GXInitTexObjFilter",
+   "addr": "8024C72C",
+   "size": 40,
+   "section": ".text",
+   "kind": "library",
+   "region": "GX"
+  },
+  {
+   "name": "GXReadDrawSync",
+   "refs": 1,
+   "files": 1,
+   "used_as": "_GXReadDrawSync",
+   "addr": "8024B34C",
+   "size": 12,
+   "section": ".text",
+   "kind": "library",
+   "region": "GX"
+  },
+  {
+   "name": "GXSetDrawSync",
+   "refs": 1,
+   "files": 1,
+   "used_as": "_GXSetDrawSync",
+   "addr": "8024B298",
+   "size": 180,
+   "section": ".text",
+   "kind": "library",
+   "region": "GX"
+  },
+  {
+   "name": "GXSetIndTexMtx",
+   "refs": 1,
+   "files": 1,
+   "used_as": "_GXSetIndTexMtx",
+   "addr": "8024D124",
+   "size": 340,
+   "section": ".text",
+   "kind": "library",
+   "region": "GX"
+  },
+  {
+   "name": "GXSetIndTexOrder",
+   "refs": 1,
+   "files": 1,
+   "used_as": "_GXSetIndTexOrder",
+   "addr": "8024D37C",
+   "size": 204,
+   "section": ".text",
+   "kind": "library",
+   "region": "GX"
+  },
+  {
+   "name": "GXSetTevIndirect",
+   "refs": 1,
+   "files": 1,
+   "used_as": "_GXSetTevIndirect",
+   "addr": "8024D0BC",
+   "size": 104,
+   "section": ".text",
+   "kind": "library",
+   "region": "GX"
+  },
+  {
+   "name": "GXSetTevKColor",
+   "refs": 1,
+   "files": 1,
+   "used_as": "_GXSetTevKColor",
+   "addr": "8024D790",
+   "size": 92,
+   "section": ".text",
+   "kind": "library",
+   "region": "GX"
+  },
+  {
    "name": "NANDInit",
    "refs": 1,
    "files": 1,
@@ -778,6 +866,105 @@
    "section": ".text",
    "kind": "library",
    "region": "NAND/SC/IPC"
+  },
+  {
+   "name": "OSInitMutex",
+   "refs": 1,
+   "files": 1,
+   "used_as": "_OSInitMutex",
+   "addr": "8023A578",
+   "size": 56,
+   "section": ".text",
+   "kind": "library",
+   "region": "OS"
+  },
+  {
+   "name": "OSTryLockMutex",
+   "refs": 1,
+   "files": 1,
+   "used_as": "_OSTryLockMutex",
+   "addr": "8023A7C0",
+   "size": 188,
+   "section": ".text",
+   "kind": "library",
+   "region": "OS"
+  },
+  {
+   "name": "PSMTXScale",
+   "refs": 1,
+   "files": 1,
+   "used_as": "_PSMTXScale",
+   "addr": "80248420",
+   "size": 40,
+   "section": ".text",
+   "kind": "library",
+   "region": "GX"
+  },
+  {
+   "name": "SOCleanup",
+   "refs": 1,
+   "files": 1,
+   "used_as": "_SOCleanup",
+   "addr": "80323D3C",
+   "size": 432,
+   "section": ".text",
+   "kind": "library",
+   "region": "MSL C/C++ runtime"
+  },
+  {
+   "name": "SOFinish",
+   "refs": 1,
+   "files": 1,
+   "used_as": "_SOFinish",
+   "addr": "8032380C",
+   "size": 252,
+   "section": ".text",
+   "kind": "library",
+   "region": "MSL C/C++ runtime"
+  },
+  {
+   "name": "WENCGetEncodeData",
+   "refs": 1,
+   "files": 1,
+   "used_as": "_WENCGetEncodeData",
+   "addr": "8026B174",
+   "size": 728,
+   "section": ".text",
+   "kind": "library",
+   "region": "NAND/SC/IPC"
+  },
+  {
+   "name": "WPADCanSendStreamData",
+   "refs": 1,
+   "files": 1,
+   "used_as": "_WPADCanSendStreamData",
+   "addr": "80274F80",
+   "size": 132,
+   "section": ".text",
+   "kind": "library",
+   "region": "WPAD/KPAD/BT"
+  },
+  {
+   "name": "WPADSendStreamData",
+   "refs": 1,
+   "files": 1,
+   "used_as": "_WPADSendStreamData",
+   "addr": "80275004",
+   "size": 528,
+   "section": ".text",
+   "kind": "library",
+   "region": "WPAD/KPAD/BT"
+  },
+  {
+   "name": "WPADSetDataFormat",
+   "refs": 1,
+   "files": 1,
+   "used_as": "_WPADSetDataFormat",
+   "addr": "80272AB0",
+   "size": 180,
+   "section": ".text",
+   "kind": "library",
+   "region": "WPAD/KPAD/BT"
   },
   {
    "name": "fn_80234848",
@@ -791,149 +978,6 @@
    "region": "OS"
   },
   {
-   "name": "fn_80235110",
-   "refs": 1,
-   "files": 1,
-   "used_as": "_fn_80235110",
-   "addr": "80235110",
-   "size": 48,
-   "section": ".text",
-   "kind": "library",
-   "region": "OS"
-  },
-  {
-   "name": "fn_8023A578",
-   "refs": 1,
-   "files": 1,
-   "used_as": "_fn_8023A578",
-   "addr": "8023A578",
-   "size": 56,
-   "section": ".text",
-   "kind": "library",
-   "region": "OS"
-  },
-  {
-   "name": "fn_8023A7C0",
-   "refs": 1,
-   "files": 1,
-   "used_as": "_fn_8023A7C0",
-   "addr": "8023A7C0",
-   "size": 188,
-   "section": ".text",
-   "kind": "library",
-   "region": "OS"
-  },
-  {
-   "name": "fn_80248420",
-   "refs": 1,
-   "files": 1,
-   "used_as": "_fn_80248420",
-   "addr": "80248420",
-   "size": 40,
-   "section": ".text",
-   "kind": "library",
-   "region": "GX"
-  },
-  {
-   "name": "fn_8024B298",
-   "refs": 1,
-   "files": 1,
-   "used_as": "_fn_8024B298",
-   "addr": "8024B298",
-   "size": 180,
-   "section": ".text",
-   "kind": "library",
-   "region": "GX"
-  },
-  {
-   "name": "fn_8024B34C",
-   "refs": 1,
-   "files": 1,
-   "used_as": "_fn_8024B34C",
-   "addr": "8024B34C",
-   "size": 12,
-   "section": ".text",
-   "kind": "library",
-   "region": "GX"
-  },
-  {
-   "name": "fn_8024C72C",
-   "refs": 1,
-   "files": 1,
-   "used_as": "_fn_8024C72C",
-   "addr": "8024C72C",
-   "size": 40,
-   "section": ".text",
-   "kind": "library",
-   "region": "GX"
-  },
-  {
-   "name": "fn_8024D0BC",
-   "refs": 1,
-   "files": 1,
-   "used_as": "_fn_8024D0BC",
-   "addr": "8024D0BC",
-   "size": 104,
-   "section": ".text",
-   "kind": "library",
-   "region": "GX"
-  },
-  {
-   "name": "fn_8024D124",
-   "refs": 1,
-   "files": 1,
-   "used_as": "_fn_8024D124",
-   "addr": "8024D124",
-   "size": 340,
-   "section": ".text",
-   "kind": "library",
-   "region": "GX"
-  },
-  {
-   "name": "fn_8024D37C",
-   "refs": 1,
-   "files": 1,
-   "used_as": "_fn_8024D37C",
-   "addr": "8024D37C",
-   "size": 204,
-   "section": ".text",
-   "kind": "library",
-   "region": "GX"
-  },
-  {
-   "name": "fn_8024D6CC",
-   "refs": 1,
-   "files": 1,
-   "used_as": "_fn_8024D6CC",
-   "addr": "8024D6CC",
-   "size": 96,
-   "section": ".text",
-   "kind": "library",
-   "region": "GX"
-  },
-  {
-   "name": "fn_8024D72C",
-   "refs": 1,
-   "files": 1,
-   "used_as": "_fn_8024D72C",
-   "addr": "8024D72C",
-   "size": 100,
-   "section": ".text",
-   "kind": "library",
-   "region": "GX"
-  },
-  {
-   "name": "fn_8024D790",
-   "refs": 1,
-   "files": 1,
-   "used_as": "_fn_8024D790",
-   "addr": "8024D790",
-   "size": 92,
-   "section": ".text",
-   "kind": "library",
-   "region": "GX"
-  },
-  {
    "name": "fn_80253A48",
    "refs": 1,
    "files": 1,
@@ -945,56 +989,12 @@
    "region": "DVD"
   },
   {
-   "name": "fn_80257C88",
-   "refs": 1,
-   "files": 1,
-   "used_as": "_fn_80257C88",
-   "addr": "80257C88",
-   "size": 72,
-   "section": ".text",
-   "kind": "library",
-   "region": "AI/AX/MEM"
-  },
-  {
-   "name": "fn_802581A4",
-   "refs": 1,
-   "files": 1,
-   "used_as": "_fn_802581A4",
-   "addr": "802581A4",
-   "size": 156,
-   "section": ".text",
-   "kind": "library",
-   "region": "AI/AX/MEM"
-  },
-  {
    "name": "fn_80259418",
    "refs": 1,
    "files": 1,
    "used_as": "_fn_80259418",
    "addr": "80259418",
    "size": 8,
-   "section": ".text",
-   "kind": "library",
-   "region": "AI/AX/MEM"
-  },
-  {
-   "name": "fn_80259B70",
-   "refs": 1,
-   "files": 1,
-   "used_as": "_fn_80259B70",
-   "addr": "80259B70",
-   "size": 196,
-   "section": ".text",
-   "kind": "library",
-   "region": "AI/AX/MEM"
-  },
-  {
-   "name": "fn_80259C34",
-   "refs": 1,
-   "files": 1,
-   "used_as": "_fn_80259C34",
-   "addr": "80259C34",
-   "size": 88,
    "section": ".text",
    "kind": "library",
    "region": "AI/AX/MEM"
@@ -1044,34 +1044,12 @@
    "region": "AI/AX/MEM"
   },
   {
-   "name": "fn_8025B4C0",
-   "refs": 1,
-   "files": 1,
-   "used_as": "_fn_8025B4C0",
-   "addr": "8025B4C0",
-   "size": 412,
-   "section": ".text",
-   "kind": "library",
-   "region": "AI/AX/MEM"
-  },
-  {
    "name": "fn_8025B65C",
    "refs": 1,
    "files": 1,
    "used_as": "_fn_8025B65C",
    "addr": "8025B65C",
    "size": 208,
-   "section": ".text",
-   "kind": "library",
-   "region": "AI/AX/MEM"
-  },
-  {
-   "name": "fn_8025B72C",
-   "refs": 1,
-   "files": 1,
-   "used_as": "_fn_8025B72C",
-   "addr": "8025B72C",
-   "size": 84,
    "section": ".text",
    "kind": "library",
    "region": "AI/AX/MEM"
@@ -1561,50 +1539,6 @@
    "region": "NAND/SC/IPC"
   },
   {
-   "name": "fn_8026B174",
-   "refs": 1,
-   "files": 1,
-   "used_as": "_fn_8026B174",
-   "addr": "8026B174",
-   "size": 728,
-   "section": ".text",
-   "kind": "library",
-   "region": "NAND/SC/IPC"
-  },
-  {
-   "name": "fn_80272AB0",
-   "refs": 1,
-   "files": 1,
-   "used_as": "_fn_80272AB0",
-   "addr": "80272AB0",
-   "size": 180,
-   "section": ".text",
-   "kind": "library",
-   "region": "WPAD/KPAD/BT"
-  },
-  {
-   "name": "fn_80274F80",
-   "refs": 1,
-   "files": 1,
-   "used_as": "_fn_80274F80",
-   "addr": "80274F80",
-   "size": 132,
-   "section": ".text",
-   "kind": "library",
-   "region": "WPAD/KPAD/BT"
-  },
-  {
-   "name": "fn_80275004",
-   "refs": 1,
-   "files": 1,
-   "used_as": "_fn_80275004",
-   "addr": "80275004",
-   "size": 528,
-   "section": ".text",
-   "kind": "library",
-   "region": "WPAD/KPAD/BT"
-  },
-  {
    "name": "fn_8027FF24",
    "refs": 1,
    "files": 1,
@@ -2067,34 +2001,12 @@
    "region": "MSL C/C++ runtime"
   },
   {
-   "name": "fn_8032380C",
-   "refs": 1,
-   "files": 1,
-   "used_as": "_fn_8032380C",
-   "addr": "8032380C",
-   "size": 252,
-   "section": ".text",
-   "kind": "library",
-   "region": "MSL C/C++ runtime"
-  },
-  {
    "name": "fn_80323908",
    "refs": 1,
    "files": 1,
    "used_as": "_fn_80323908",
    "addr": "80323908",
    "size": 12,
-   "section": ".text",
-   "kind": "library",
-   "region": "MSL C/C++ runtime"
-  },
-  {
-   "name": "fn_80323D3C",
-   "refs": 1,
-   "files": 1,
-   "used_as": "_fn_80323D3C",
-   "addr": "80323D3C",
-   "size": 432,
    "section": ".text",
    "kind": "library",
    "region": "MSL C/C++ runtime"
@@ -2139,17 +2051,6 @@
    "used_as": "_fn_80333B34",
    "addr": "80333B34",
    "size": 44,
-   "section": ".text",
-   "kind": "library",
-   "region": "MSL C/C++ runtime"
-  },
-  {
-   "name": "fn_8033AB2C",
-   "refs": 1,
-   "files": 1,
-   "used_as": "_fn_8033AB2C",
-   "addr": "8033AB2C",
-   "size": 196,
    "section": ".text",
    "kind": "library",
    "region": "MSL C/C++ runtime"
@@ -5332,6 +5233,34 @@
    "kind": "unknown"
   },
   {
+   "name": "fn_8024D59C",
+   "refs": 2,
+   "files": 2,
+   "used_as": "_fn_8024D59C",
+   "kind": "unknown"
+  },
+  {
+   "name": "fn_8024D5DC",
+   "refs": 2,
+   "files": 2,
+   "used_as": "_fn_8024D5DC",
+   "kind": "unknown"
+  },
+  {
+   "name": "fn_8024D61C",
+   "refs": 2,
+   "files": 2,
+   "used_as": "_fn_8024D61C",
+   "kind": "unknown"
+  },
+  {
+   "name": "fn_8024D674",
+   "refs": 2,
+   "files": 2,
+   "used_as": "_fn_8024D674",
+   "kind": "unknown"
+  },
+  {
    "name": "gAlertPlayer",
    "refs": 2,
    "files": 2,
@@ -5507,20 +5436,6 @@
    "kind": "unknown"
   },
   {
-   "name": "MtxGetForward",
-   "refs": 1,
-   "files": 1,
-   "used_as": "_MtxGetForward",
-   "kind": "unknown"
-  },
-  {
-   "name": "MtxGetUp",
-   "refs": 1,
-   "files": 1,
-   "used_as": "_MtxGetUp",
-   "kind": "unknown"
-  },
-  {
    "name": "ObjRefSetState",
    "refs": 1,
    "files": 1,
@@ -5560,13 +5475,6 @@
    "refs": 1,
    "files": 1,
    "used_as": "_ResourceFind",
-   "kind": "unknown"
-  },
-  {
-   "name": "ResourceGetCurrentId",
-   "refs": 1,
-   "files": 1,
-   "used_as": "_ResourceGetCurrentId",
    "kind": "unknown"
   },
   {
@@ -5871,6 +5779,27 @@
    "kind": "unknown"
   },
   {
+   "name": "fn_80235110",
+   "refs": 1,
+   "files": 1,
+   "used_as": "_fn_80235110",
+   "kind": "unknown"
+  },
+  {
+   "name": "fn_8024D6CC",
+   "refs": 1,
+   "files": 1,
+   "used_as": "_fn_8024D6CC",
+   "kind": "unknown"
+  },
+  {
+   "name": "fn_8024D72C",
+   "refs": 1,
+   "files": 1,
+   "used_as": "_fn_8024D72C",
+   "kind": "unknown"
+  },
+  {
    "name": "gArgc",
    "refs": 1,
    "files": 1,
@@ -6056,11 +5985,11 @@
  "library_regions": {
   "AI/AX/MEM": 58,
   "Network (DWC/SSL/NHTTP/NWC24)": 57,
-  "GX": 22,
-  "MSL C/C++ runtime": 21,
   "NAND/SC/IPC": 20,
+  "MSL C/C++ runtime": 19,
+  "GX": 16,
   "WPAD/KPAD/BT": 9,
-  "OS": 8,
+  "OS": 7,
   "DVD": 1
  }
 }
