@@ -99,6 +99,11 @@
  "changelog": [
   {
    "date": "2026-11-23",
+   "time": "13:05",
+   "text": "Checked 56 more functions that run during the Windows boot against the original and fixed 2 mistakes in our decompiled code (the Lab constructor missed two stores, and a screen-set call used the wrong entry)"
+  },
+  {
+   "date": "2026-11-23",
    "time": "12:38",
    "text": "Checked 27 more functions that run during the Windows boot against the original and fixed 3 mistakes in our decompiled code (the level-start code called the screen loader with the wrong argument, twice, and used the wrong vector helpers)"
   },

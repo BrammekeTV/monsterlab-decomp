@@ -51,7 +51,7 @@ void fn_80199738(u8* arg0) {
     fn_8019BFF8(arg0, (void*)fn_80199828, (u8*)gScreenSets + 0x70);
     if (*(s32*)((u8*)gScreenSets + 0x70) == 0) return;
 
-    if (fn_8019CCAC(other) == 0) {
+    if (fn_8019CCAC(*(u8**)((u8*)gScreenSets + 0x70)) == 0) {
         s32 pending = *(s32*)(*(u8**)((u8*)gScreenSets + 0x70) + 0xBC);
         if (pending == 0) return;
         u8* cur = fn_80198E20((u8*)ScreenSetsCurrent(gScreenSets));

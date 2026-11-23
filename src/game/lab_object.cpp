@@ -57,9 +57,11 @@ BOOL fn_802180EC(void* unused, s32* out, s32 k0, s32 k1, s32 k2, s32 k3) {
 }
 
 // 0x8021818C
-// Lab constructor: the same clean state as a reset.
+// Lab constructor: the same clean state as a reset, plus +0x64 and +0x68 set to -1.
 u8* fn_8021818C(u8* lab) {
     LabTickReset(lab);
+    *(s32*)(lab + 0x64) = -1;
+    *(s32*)(lab + 0x68) = -1;
     return lab;
 }
 
