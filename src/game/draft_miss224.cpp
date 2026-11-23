@@ -43,7 +43,7 @@ void  fn_801F8F34(u8* p, f32 v);                                // 0x801F8F34
 void  fn_801F8FA0(u8* p, f32 v);                                // 0x801F8FA0
 void  fn_8023A5B0(u8* p);                                       // 0x8023A5B0
 void  fn_8023A68C(u8* p);                                       // 0x8023A68C
-void  fn_8027D270(s32 a, f32 b, f32 c);                         // 0x8027D270
+void  KPADSetPosParam(s32 a, f32 b, f32 c);                         // 0x8027D270
 void  fn_802E9CBC(s32 counter);                                 // 0x802E9CBC
 
 extern u8    gGame[];             // 0x803B53A0
@@ -257,7 +257,7 @@ s32 fn_800CC854(u8* obj, u8* arg1) {
     *(s32*)(obj + 0x3CC) = 1;
     fn_801B3310(fn_801B3308(), obj + 0x278);
     fn_801B3310(fn_801B3308(), obj + 0x334);
-    fn_8027D270(0, 0.0f, 1.0f);
+    KPADSetPosParam(0, 0.0f, 1.0f);
     s32 w = fn_80156A88();
     f32 cx = (f32)(w / 2);
     s32 h = fn_80156A80();

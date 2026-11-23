@@ -114,7 +114,7 @@ void fn_80202B8C(u8* arg0);                                          // 0x80202B
 void  fn_80203340(u8* data, s32 handle, s32 flag);               // 0x80203340
 s32   fn_8020390C(u8* audio, u8* name);                          // 0x8020390C
 s32 fn_802095B0(u8* arg0, void* arg1, void* arg2, void* arg3);          // 0x802095B0
-s32   fn_80258024(s32 priority, void* cb, void* ctx);            // 0x80258024
+s32   AXAcquireVoice(s32 priority, void* cb, void* ctx);            // 0x80258024
 s32   fn_80263FEC(u8* p, s32 handle, s32 a);                     // 0x80263FEC
 s32   fn_80264020(u8* p);                                        // 0x80264020
 void  fn_80264498(u8* p);                                        // 0x80264498
@@ -358,7 +358,7 @@ s32 fn_801FE52C(u8* audio, u8* desc, s32 mode) {
     } else if (*(s32*)(desc + 0x14) == 1) {
         *(s32*)(voice + 0x100) = 1;
     }
-    s32 h = fn_80258024(*(s32*)(voice + 0x100), (void*)fn_80202B8C, voice);
+    s32 h = AXAcquireVoice(*(s32*)(voice + 0x100), (void*)fn_80202B8C, voice);
     *(s32*)(voice + 0x0) = h;
     if (h == 0) {
         lbl_805FBAE0 = savedBusy;

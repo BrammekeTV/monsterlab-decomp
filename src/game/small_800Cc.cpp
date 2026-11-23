@@ -22,7 +22,7 @@ void  fn_800C954C(u8* p);                                         // 0x800C954C
 void  fn_800C72B4(u8* item, u8* base);                            // 0x800C72B4
 void  fn_800C72C4(u8* item, u8* other);                           // 0x800C72C4
 void  fn_800CC29C(u8* p);                                         // 0x800CC29C
-void  fn_8027D270(s32 a, f32 b, f32 c);                           // 0x8027D270
+void  KPADSetPosParam(s32 a, f32 b, f32 c);                           // 0x8027D270
 }
 
 // Vtables and globals.
@@ -222,7 +222,7 @@ u8* fn_800CC7D4(u8* p, s32 del) {
 
 // 0x800CCA88
 // Cleanup: frees the object at +0x274 (fn_800CC29C) and clears the pointer, then resets the two
-// lists at +0x278 and +0x334 through fn_801B3378 and runs fn_8027D270(0, lbl_805FE510, lbl_805FE514).
+// lists at +0x278 and +0x334 through fn_801B3378 and runs KPADSetPosParam(0, lbl_805FE510, lbl_805FE514).
 void fn_800CCA88(u8* p) {
     if (*(u8**)(p + 0x274) != 0) {
         fn_800CC29C(*(u8**)(p + 0x274));
@@ -232,7 +232,7 @@ void fn_800CCA88(u8* p) {
     fn_801B3378(h, p + 0x278);
     h = fn_801B3308();
     fn_801B3378(h, p + 0x334);
-    fn_8027D270(0, lbl_805FE510, lbl_805FE514);
+    KPADSetPosParam(0, lbl_805FE510, lbl_805FE514);
 }
 
 // 0x800CD43C

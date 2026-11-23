@@ -20,7 +20,7 @@ u8*    fn_801483BC(s32 idx);
 s32    fn_80203664(u8* audio, const char* name, s32 flag);    // 0x80203664
 void   fn_80203340(u8* data, u8* voice, s32 flag);           // 0x80203340
 void   fn_80202CA8(void);                                      // 0x80202CA8
-s32    fn_80258024(s32 priority, void* cb, void* ctx);        // 0x80258024
+s32    AXAcquireVoice(s32 priority, void* cb, void* ctx);        // 0x80258024
 void   fn_80258904(void* cb, void* p);                         // 0x80258904
 void   fn_80258968(void* cb, void* p);                         // 0x80258968
 void   fn_8025B65C(void* p);                                   // 0x8025B65C
@@ -232,7 +232,7 @@ s32 fn_801FD420(u8* audio, s32 idx, s32 pan) {
     *(u8*)(v + 0xFE) = 0;
     *(u8*)(v + 0x105) = 0;
     *(s32*)(v + 0x100) = 0x1F;
-    s32 handle = fn_80258024(0x1F, (void*)fn_80202CA8, v);
+    s32 handle = AXAcquireVoice(0x1F, (void*)fn_80202CA8, v);
     *(s32*)(v + 0x0) = handle;
     if (handle == 0) {
         lbl_805FBAE0 = saved;

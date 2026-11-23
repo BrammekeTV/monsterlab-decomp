@@ -59,7 +59,7 @@ void  fn_8024E328(s32 a);                                          // 0x8024E328
 s32   fn_8024F1E8(char* path, u8* p);                              // 0x8024F1E8
 void  fn_80264420(u8* p);                                          // 0x80264420
 s32   fn_80264A24(u8* list, u8* item);                             // 0x80264A24 (unlink item from list)
-s32   fn_802728A4(s32 chan, u32* out);                             // 0x802728A4
+s32   WPADProbe(s32 chan, u32* out);                             // 0x802728A4
 s32   fn_802737A8(s32 chan, s32 a, void* cb);                      // 0x802737A8
 f64   fn_8033F204(f64 x);                                          // 0x8033F204 (natural log)
 f64   fn_8033F20C(f64 x, f64 y);                                   // 0x8033F20C (pow)
@@ -578,7 +578,7 @@ void fn_80202B8C(u8* arg0) {
 // periodic audio-tick alarm; otherwise flags a pad error.
 void fn_80203220(void) {
     s32 err = 0;
-    s32 r = fn_802728A4(0, NULL);
+    s32 r = WPADProbe(0, NULL);
     if (r == 0) {
         if (*(s32*)(lbl_8051E680 + 0x24) == 6) {
             *(s32*)(lbl_8051E680 + 0x24) = 0;

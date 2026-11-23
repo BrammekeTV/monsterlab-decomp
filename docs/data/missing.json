@@ -1,8 +1,8 @@
 {
  "log": "link.log",
  "counts": {
-  "global": 3898,
-  "unknown": 126,
+  "global": 3899,
+  "unknown": 123,
   "library": 196
  },
  "game_bytes": 0,
@@ -65,10 +65,10 @@
    "region": "MSL C/C++ runtime"
   },
   {
-   "name": "fn_8027D270",
+   "name": "KPADSetPosParam",
    "refs": 5,
    "files": 5,
-   "used_as": "_fn_8027D270",
+   "used_as": "_KPADSetPosParam",
    "addr": "8027D270",
    "size": 28,
    "section": ".text",
@@ -241,6 +241,50 @@
    "region": "MSL C/C++ runtime"
   },
   {
+   "name": "AXAcquireVoice",
+   "refs": 2,
+   "files": 2,
+   "used_as": "_AXAcquireVoice",
+   "addr": "80258024",
+   "size": 384,
+   "section": ".text",
+   "kind": "library",
+   "region": "AI/AX/MEM"
+  },
+  {
+   "name": "AXFreeVoice",
+   "refs": 2,
+   "files": 2,
+   "used_as": "_AXFreeVoice",
+   "addr": "80257FA8",
+   "size": 124,
+   "section": ".text",
+   "kind": "library",
+   "region": "AI/AX/MEM"
+  },
+  {
+   "name": "KPADSetHoriParam",
+   "refs": 2,
+   "files": 2,
+   "used_as": "_KPADSetHoriParam",
+   "addr": "8027D28C",
+   "size": 28,
+   "section": ".text",
+   "kind": "library",
+   "region": "WPAD/KPAD/BT"
+  },
+  {
+   "name": "WPADDisconnect",
+   "refs": 2,
+   "files": 2,
+   "used_as": "_WPADDisconnect",
+   "addr": "802727E0",
+   "size": 196,
+   "section": ".text",
+   "kind": "library",
+   "region": "WPAD/KPAD/BT"
+  },
+  {
    "name": "fn_80234394",
    "refs": 2,
    "files": 2,
@@ -349,28 +393,6 @@
    "section": ".text",
    "kind": "library",
    "region": "GX"
-  },
-  {
-   "name": "fn_80257FA8",
-   "refs": 2,
-   "files": 2,
-   "used_as": "_fn_80257FA8",
-   "addr": "80257FA8",
-   "size": 124,
-   "section": ".text",
-   "kind": "library",
-   "region": "AI/AX/MEM"
-  },
-  {
-   "name": "fn_80258024",
-   "refs": 2,
-   "files": 2,
-   "used_as": "_fn_80258024",
-   "addr": "80258024",
-   "size": 384,
-   "section": ".text",
-   "kind": "library",
-   "region": "AI/AX/MEM"
   },
   {
    "name": "fn_80258904",
@@ -547,28 +569,6 @@
    "section": ".text",
    "kind": "library",
    "region": "NAND/SC/IPC"
-  },
-  {
-   "name": "fn_802727E0",
-   "refs": 2,
-   "files": 2,
-   "used_as": "_fn_802727E0",
-   "addr": "802727E0",
-   "size": 196,
-   "section": ".text",
-   "kind": "library",
-   "region": "WPAD/KPAD/BT"
-  },
-  {
-   "name": "fn_8027D28C",
-   "refs": 2,
-   "files": 2,
-   "used_as": "_fn_8027D28C",
-   "addr": "8027D28C",
-   "size": 28,
-   "section": ".text",
-   "kind": "library",
-   "region": "WPAD/KPAD/BT"
   },
   {
    "name": "fn_802BE220",
@@ -769,6 +769,17 @@
    "region": "MSL C/C++ runtime"
   },
   {
+   "name": "AXQuit",
+   "refs": 1,
+   "files": 1,
+   "used_as": "_AXQuit",
+   "addr": "80257C88",
+   "size": 72,
+   "section": ".text",
+   "kind": "library",
+   "region": "AI/AX/MEM"
+  },
+  {
    "name": "NANDInit",
    "refs": 1,
    "files": 1,
@@ -778,6 +789,17 @@
    "section": ".text",
    "kind": "library",
    "region": "NAND/SC/IPC"
+  },
+  {
+   "name": "WPADSetDataFormat",
+   "refs": 1,
+   "files": 1,
+   "used_as": "_WPADSetDataFormat",
+   "addr": "80272AB0",
+   "size": 180,
+   "section": ".text",
+   "kind": "library",
+   "region": "WPAD/KPAD/BT"
   },
   {
    "name": "fn_80234848",
@@ -943,17 +965,6 @@
    "section": ".text",
    "kind": "library",
    "region": "DVD"
-  },
-  {
-   "name": "fn_80257C88",
-   "refs": 1,
-   "files": 1,
-   "used_as": "_fn_80257C88",
-   "addr": "80257C88",
-   "size": 72,
-   "section": ".text",
-   "kind": "library",
-   "region": "AI/AX/MEM"
   },
   {
    "name": "fn_802581A4",
@@ -1570,17 +1581,6 @@
    "section": ".text",
    "kind": "library",
    "region": "NAND/SC/IPC"
-  },
-  {
-   "name": "fn_80272AB0",
-   "refs": 1,
-   "files": 1,
-   "used_as": "_fn_80272AB0",
-   "addr": "80272AB0",
-   "size": 180,
-   "section": ".text",
-   "kind": "library",
-   "region": "WPAD/KPAD/BT"
   },
   {
    "name": "fn_80274F80",
@@ -5507,20 +5507,6 @@
    "kind": "unknown"
   },
   {
-   "name": "MtxGetForward",
-   "refs": 1,
-   "files": 1,
-   "used_as": "_MtxGetForward",
-   "kind": "unknown"
-  },
-  {
-   "name": "MtxGetUp",
-   "refs": 1,
-   "files": 1,
-   "used_as": "_MtxGetUp",
-   "kind": "unknown"
-  },
-  {
    "name": "ObjRefSetState",
    "refs": 1,
    "files": 1,
@@ -5560,13 +5546,6 @@
    "refs": 1,
    "files": 1,
    "used_as": "_ResourceFind",
-   "kind": "unknown"
-  },
-  {
-   "name": "ResourceGetCurrentId",
-   "refs": 1,
-   "files": 1,
-   "used_as": "_ResourceGetCurrentId",
    "kind": "unknown"
   },
   {

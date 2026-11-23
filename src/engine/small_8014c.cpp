@@ -22,7 +22,7 @@ void  fn_8024F494(u8* p);                                        // 0x8024F494
 u8*   fn_80142500(void* p);                                      // 0x80142500
 void  fn_801472A8(void);                                         // 0x801472A8
 void  fn_801479D0(void);                                    // 0x801479D0
-void  fn_802727E0(s32 a, s32 b);                                 // 0x802727E0
+void  WPADDisconnect(s32 a, s32 b);                                 // 0x802727E0
 s32   fn_801478C8(u8* table, s32 idx);                           // 0x801478C8
 }
 
@@ -210,7 +210,7 @@ void fn_8014792C(u8* table, s32 idx, s32 val) {
 
 // 0x80147990
 // Dispatch: with a == 0, clears lbl_80400FE0 when b < 0 and forwards to the callback in lbl_805FB498 if set;
-// with a != 0 and b == 0, forwards to fn_802727E0.
+// with a != 0 and b == 0, forwards to WPADDisconnect.
 void fn_80147990(s32 a, s32 b) {
     if (a == 0) {
         if (b < 0) lbl_80400FE0 = 0;
@@ -218,7 +218,7 @@ void fn_80147990(s32 a, s32 b) {
         if (cb != 0) ((void (*)(s32, s32))cb)(a, b);
         return;
     }
-    if (b == 0) fn_802727E0(a, b);
+    if (b == 0) WPADDisconnect(a, b);
 }
 
 // 0x80148228

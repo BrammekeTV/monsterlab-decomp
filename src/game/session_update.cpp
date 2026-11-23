@@ -65,7 +65,7 @@ void   AudioSetPaused(void* audio, int paused);          // 0x801FF708
 void   SaveAddPlayTime(void* save, s64 seconds);         // 0x80225674
 void   fn_80225C10(void* save, s64 v);
 void   fn_8022624C(void* save);
-s32    fn_802728A4(s32 chan, u32* out);
+s32    WPADProbe(s32 chan, u32* out);
 s32    fn_80272B64(s32 chan, u8* out);
 void   fn_800D81AC(void* w);  s32 fn_800D83B0(void* w);  void fn_800D8280(void* w);
 s32    WorldGetPhase(void* world);                       // 0x800D83A8
@@ -364,7 +364,7 @@ void GameSessionUpdate(GameSession* s, f32 a, f32 dt) {
         if (s->flags & SFLAG_ENTERED) {
             u32 status = 0;
             u8 info[0x20];
-            if (!fn_802728A4(0, &status) && !fn_80272B64(0, info) && *(s32*)(info + 0xC) != 0)
+            if (!WPADProbe(0, &status) && !fn_80272B64(0, info) && *(s32*)(info + 0xC) != 0)
                 s->unk154 = 1;
             if (WorldGetPhase(WORLD) == 2) SessionBegin(gGame + 0x5C8);
             TriggerDoAction(WORLD_DATA() + 0x94, 0, 0);
