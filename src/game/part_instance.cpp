@@ -426,10 +426,10 @@ s32 PartActionStat1(PartInstance* p, u32 action) {
 // 0x8021DA90
 // Damage before it is split over targets (used for ratings and return damage).
 s32 PartActionStat2(PartInstance* p, u32 action) {
-    s16 dmg = *(const s16*)(Action(action) + 0xE);
+    s32 dmg = *(const s16*)(Action(action) + 0xE);
     if (p->health > 0) {
         s32 d = (s32)((f32)dmg * ActionScale(p));
-        dmg = (s16)((d * (PartGetStatModifier(p, 0) + 100)) / 100);
+        dmg = ((d * (PartGetStatModifier(p, 0) + 100)) / 100);
     }
     return dmg;
 }
