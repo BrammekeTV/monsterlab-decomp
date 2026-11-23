@@ -132,3 +132,32 @@ No new MSL or Bink names. `strlen`, `strcmp`, `snprintf`, `sinf`, `cosf`, `rand`
 - GX pixel engine pokes `GXPoke*` (0x8024B418-0x8024B4F0), `GXReadDrawSync`, token/finish interrupt handlers, `__GXSetDirtyState` (0x8024B6FC).
 - DVD fs: `DVDConvertPathToEntrynum`, `DVDFastOpen`, `DVDOpen`, `DVDClose`, `entryToPath`.
 - Left as `fn_`: 0x8024B50C/0x8024B5D4 (draw sync/done callbacks, defined in port_gx.cpp).
+
+## Round 2: OS, VI, DSP, GX TEV (17 names)
+
+Only names the asm supports are given; everything else keeps its `fn_` name. Evidence per name:
+
+| Library | Address | Name | Evidence |
+|---|---|---|---|
+| OS | 0x80235110 | DCStoreRange | `dcbst` loop, one store per 32-byte line from the aligned start |
+| OS | 0x80234418 | OSCancelAlarm | disables interrupts, unlinks the alarm from `AlarmQueue`, re-arms the decrementer (`PPCMtdec`) |
+| OS | 0x8023C15C | OSGetCurrentThread | returns the word at 0x800000E4 (current thread pointer) |
+| VI | 0x802441F8 | VIConfigure | writes the display registers at 0xCC002000+ from a render-mode struct, delay loop, takes `fn_802440E0` table lookup |
+| VI | 0x80245B08 | VIGetCurrentLine | reads the vertical count registers 0xCC00202C/202E, halves the line |
+| VI | 0x80245BF8 | VIGetDTVStatus | returns bit 0 of 0xCC00206E |
+| DSP | 0x80264FD8 | DSPInit | RVL_SDK - DSP banner (`OSRegisterVersion`), sets the DSP interrupt handler |
+| DSP | 0x80264F90 | DSPCheckMailToDSP | top bit of the halfword at 0xCC005000 |
+| DSP | 0x80264FA0 | DSPCheckMailFromDSP | top bit of the halfword at 0xCC005004 |
+| DSP | 0x80264FB0 | DSPReadMailFromDSP | 32-bit read of 0xCC005004/0xCC005006 |
+| DSP | 0x80264FC4 | DSPSendMailToDSP | 32-bit write to 0xCC005000/0xCC005002 |
+| GX | 0x8024D59C | GXSetTevColorIn | FIFO 0x61 + TEV colour-env BP word (shadow 0x180); four 4-bit fields |
+| GX | 0x8024D5DC | GXSetTevAlphaIn | same, alpha-env shadow (0x1C0), four 3-bit fields |
+| GX | 0x8024D61C | GXSetTevColorOp | colour-env shadow (0x180), op/bias/scale/clamp/dest fields |
+| GX | 0x8024D674 | GXSetTevAlphaOp | alpha-env shadow (0x1C0), same fields |
+| GX | 0x8024D6CC | GXSetTevColor | two BP writes to 0xE0/0xE1 (TEV colour registers) from a 4-byte colour |
+| GX | 0x8024D72C | GXSetTevColorS10 | as above, from an 8-byte S10 colour |
+
+Notes:
+- The GX setters write through `lis rX, 0xCC01` + `stb 0x61` at `-0x8000(rX)`, i.e. the write-gather pipe at 0xCC008000.
+- Several GX and OS functions in the same ranges were checked and left as `fn_` (e.g. 0x8023D500, 0x8023D3C8, the TEV swap and indirect setters at 0x8024D7EC-0x8024D944, 0x8024DF28-0x8024E08C), because their asm did not identify them.
+- Round 2 is well short of the 100 target: most of the OS (~800 unnamed functions in 0x80232C5C-0x8026FFFF), VI and GX functions have no direct evidence yet (no banner strings, few asserts). Next steps: identify the GX setters with the callers in the game range, and OS thread/message-queue functions via their callers.
