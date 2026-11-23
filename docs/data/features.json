@@ -99,6 +99,11 @@
  "changelog": [
   {
    "date": "2026-11-23",
+   "time": "23:41",
+   "text": "Join Now! works on Windows (PR #120): choosing it on the main menu starts a new game, leaves the front end and starts loading the first level, castle_communication. Getting there took several fixes: game sounds and their audio headers are now converted to PC byte order, the level's lighting and object flags too, and a wait for the audio interrupt no longer hangs the game. The level crashes while loading for now, on a prop's bone data that still needs converting. That's next."
+  },
+  {
+   "date": "2026-11-23",
    "time": "23:30",
    "text": "Hovering the mouse over a main-menu item now highlights it as on the Wii: brighter and larger, with a backing plate (PR #119). Clicking and arrow keys don't work yet. Also, --to-menu in a window now shows its progress in the title bar and keeps the window painted while it skips ahead (PR #117)."
   },
