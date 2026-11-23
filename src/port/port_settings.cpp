@@ -3,6 +3,7 @@
 // start, before the command line (which wins); written when the settings screen saves.
 //
 //   [display]   width, height, aspect (16:9 or 4:3), stretch_ui, vsync, fullscreen
+//   [game]      path: the player's disc image or extracted folder
 //   [audio]     volume (0-100), mute
 //   [controls]  NAME = key 1, key 2, mouse button, gamepad bits   (Windows virtual-key codes; 0 = none)
 #ifdef _WIN32
@@ -37,7 +38,7 @@ static s32 Clamp(s32 v, s32 lo, s32 hi) { return v < lo ? lo : v > hi ? hi : v; 
 BOOL PortSettingsLoad(const char* path, PortSettings* s) {
     FILE* f = fopen(path, "r");
     if (!f) return FALSE;
-    char line[256], section[32] = "";
+    char line[600], section[32] = "";
     while (fgets(line, sizeof(line), f)) {
         char* p = Trim(line);
         if (!*p || *p == ';' || *p == '#') continue;
@@ -58,6 +59,8 @@ BOOL PortSettingsLoad(const char* path, PortSettings* s) {
             else if (!strcmp(key, "stretch_ui")) s->stretchUi = atoi(val) != 0;
             else if (!strcmp(key, "vsync")) s->vsync = atoi(val) != 0;
             else if (!strcmp(key, "fullscreen")) s->fullscreen = atoi(val) != 0;
+        } else if (!strcmp(section, "game")) {
+            if (!strcmp(key, "path")) snprintf(s->gamePath, sizeof(s->gamePath), "%s", val);
         } else if (!strcmp(section, "audio")) {
             if (!strcmp(key, "volume")) s->volume = Clamp(atoi(val), 0, 100);
             else if (!strcmp(key, "mute")) s->mute = atoi(val) != 0;
@@ -84,6 +87,7 @@ BOOL PortSettingsSave(const char* path, const PortSettings* s) {
     fprintf(f, "; Monster Lab PC port settings (written by the settings screen: F1 in the game)\n");
     fprintf(f, "[display]\nwidth = %d\nheight = %d\naspect = %s\nstretch_ui = %d\nvsync = %d\nfullscreen = %d\n\n",
             s->width, s->height, s->wide ? "16:9" : "4:3", s->stretchUi ? 1 : 0, s->vsync ? 1 : 0, s->fullscreen ? 1 : 0);
+    if (s->gamePath[0]) fprintf(f, "; your Monster Lab disc image (.iso) or extracted folder\n[game]\npath = %s\n\n", s->gamePath);
     fprintf(f, "[audio]\nvolume = %d\nmute = %d\n\n", s->volume, s->mute ? 1 : 0);
     fprintf(f, "; NAME = key 1, key 2, mouse button (1 left, 2 right), gamepad bits (hex); keys are Windows virtual-key codes\n[controls]\n");
     for (int i = 0; i < gPortBindingCount; i++) {
@@ -107,6 +111,7 @@ int PortSelfTestSettings(void) {
     PortSettings want = {};
     want.width = 2560; want.height = 1440; want.wide = FALSE; want.stretchUi = TRUE; want.vsync = TRUE; want.fullscreen = TRUE;
     want.volume = 37; want.mute = TRUE;
+    strcpy(want.gamePath, "D:\\My games\\Monster Lab (disc).iso");
     gPortBindings[0].key[0] = 'K'; gPortBindings[0].key[1] = 0; gPortBindings[0].mouse = 2; gPortBindings[0].pad = 0x20100;
     PortBinding changed = gPortBindings[0];
     if (!PortSettingsSave(path, &want)) { PortLog("selftest settings: cannot write %s", path); fails++; }
@@ -116,7 +121,7 @@ int PortSelfTestSettings(void) {
     if (!fails && !PortSettingsLoad(path, &got)) { PortLog("selftest settings: cannot read %s", path); fails++; }
     if (!fails) {
         if (got.width != want.width || got.height != want.height || got.wide != want.wide || got.stretchUi != want.stretchUi ||
-            got.vsync != want.vsync || got.fullscreen != want.fullscreen || got.volume != want.volume || got.mute != want.mute) {
+            got.vsync != want.vsync || got.fullscreen != want.fullscreen || got.volume != want.volume || got.mute != want.mute || strcmp(got.gamePath, want.gamePath)) {
             PortLog("selftest settings: read back %dx%d wide %d stretch %d vsync %d fullscreen %d volume %d mute %d",
                     got.width, got.height, got.wide, got.stretchUi, got.vsync, got.fullscreen, got.volume, got.mute);
             fails++;

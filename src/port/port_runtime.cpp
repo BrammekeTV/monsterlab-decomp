@@ -811,6 +811,7 @@ static int SelfTest(void) {
     fails += PortSelfTestZlib();
     fails += PortSelfTestOverlay();
     fails += PortSelfTestDisc();
+    fails += PortSelfTestPicker();
     fails += PortSelfTestSettings();
 #undef CHECK
     PortLog("self-test: %u functions, %u linked; %s", gPortFuncCount, linked, fails ? "FAILED" : "ok");
@@ -879,12 +880,13 @@ struct PortBoot {
             else if (!strcmp(a, "--show-texture") && i + 1 < __argc) gPortOptions.showTexture = atoi(__argv[++i]);
             else if (!strcmp(a, "--screenshot") && i + 1 < __argc) gPortOptions.screenshot = __argv[++i];
             else if (!strcmp(a, "--stats")) gPortOverlayOn = TRUE;
+            else if (!strcmp(a, "--picker-screenshot") && i + 1 < __argc) gPortOptions.pickerShot = __argv[++i];
             else if (!strcmp(a, "--no-ini")) {}
             else if (!strcmp(a, "--settings")) {                // open the settings screen at the start, optionally on a page
                 PortGuiSetOpen(TRUE);
                 if (i + 1 < __argc && __argv[i + 1][0] != '-') {
                     const char* page = __argv[++i];
-                    gPortGuiPage = !strcmp(page, "audio") ? 1 : !strcmp(page, "controls") ? 2 : 0;
+                    gPortGuiPage = !strcmp(page, "audio") ? 1 : !strcmp(page, "controls") ? 2 : !strcmp(page, "game") ? 3 : 0;
                 }
             }
             else if (!strcmp(a, "--vsync")) gPortSettings.vsync = TRUE;
@@ -947,9 +949,35 @@ struct PortBoot {
         PortLockEnter();                         // the main thread is the first game thread
 
         // A file is the player's disc image, read as it is (--iso FILE; --data and MONSTERLAB_DATA take one too).
+        // Asked for on the command line or in MONSTERLAB_DATA, else the choice kept in monsterlab.ini, else
+        // orig/RM7P4F. With none of them a player (started in a window, or with no options at all) gets the
+        // first-run screen to choose the disc; that choice goes into monsterlab.ini.
         const char* dir = NULL;
+        static char picked[MAX_PATH];
+        char why[320] = "";
+        BOOL fromIni = FALSE;
+        if (gPortOptions.pickerShot) {
+            PortPickerRun(NULL, asked, picked, sizeof(picked), gPortOptions.pickerShot);
+            ExitProcess(0);
+        }
+        if (!asked && gPortSettings.gamePath[0] && !gPortOptions.selfTest) {
+            if (PortGameCheck(gPortSettings.gamePath, why, sizeof(why)) == PORT_DISC_OK) { asked = gPortSettings.gamePath; fromIni = TRUE; }
+            else fprintf(stderr, "[port] the game disc of monsterlab.ini is not used: %s\n       %s\n", gPortSettings.gamePath, why);
+        }
+        if (!asked && !gPortOptions.selfTest && !FindDataDir(NULL) && (gPortOptions.window || __argc <= 1)) {
+            char note[400] = "";
+            if (why[0]) snprintf(note, sizeof(note), "The disc chosen before cannot be used. %s", why);
+            if (!PortPickerRun(note[0] ? note : NULL, NULL, picked, sizeof(picked), NULL)) ExitProcess(0);
+            asked = picked;
+            snprintf(gPortSettings.gamePath, sizeof(gPortSettings.gamePath), "%s", picked);
+            if (!PortSettingsSave(PortSettingsPath(), &gPortSettings)) fprintf(stderr, "[port] cannot write %s\n", PortSettingsPath());
+            if (__argc <= 1) {                    // started with no options: a player, so play in a window without limits
+                gPortOptions.window = TRUE;
+                gPortOptions.frameLimit = 0;
+                gPortOptions.secondsLimit = 0;
+            }
+        }
         if (asked && FileExists(asked) && !gPortOptions.selfTest) {
-            char why[256];
             if (PortDiscOpen(asked, why, sizeof(why)) != PORT_DISC_OK) {
                 fprintf(stderr, "[port] %s\n       %s\n", asked, why);
                 ExitProcess(12);

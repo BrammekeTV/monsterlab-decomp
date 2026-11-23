@@ -1134,6 +1134,16 @@ static BOOL SavePng(ID3D11Texture2D* tex, u32 sLastW, u32 sLastH, const char* pa
     return TRUE;
 }
 
+// A texture of another device as a PNG (the first-run screen's test picture).
+BOOL PortGfxSaveTexture(ID3D11Device* dev, ID3D11DeviceContext* ctx, ID3D11Texture2D* tex, u32 w, u32 h, const char* path) {
+    ID3D11Device* keepDev = sDev;
+    ID3D11DeviceContext* keepCtx = sCtx;
+    sDev = dev; sCtx = ctx;
+    BOOL ok = SavePng(tex, w, h, path);
+    sDev = keepDev; sCtx = keepCtx;
+    return ok;
+}
+
 BOOL PortGfxSaveScreenshot(const char* path) {
     if (!sStarted || !sShown) return FALSE;
     return SavePng(sOutTex, sOutW, sOutH, path);
