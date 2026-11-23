@@ -2586,6 +2586,8 @@ static const SirField kLevelSlotFields[] = {
     { 0x000, SIR_F32, 6 },    // code: WorldGetEntityZone (+0x00..+0x08), fn_80131370 (+0x0C..+0x14)
     { 0x018, SIR_U32, 1 },    // code: fn_80133D74
     { 0x01C, SIR_F32, 3 },    // code: WorldGetEntityZone (+0x1C), fn_80130FC8 (+0x20, +0x24)
+    { 0x030, SIR_F32, 7 },    // code: fn_80133A84 (+0x30..+0x3C fog colour, +0x40 / +0x44 fog range, +0x48 far distance; +0x4C / +0x50 have no reader)
+    { 0x054, SIR_F32, 11 },   // code: fn_80133A84 (+0x54..+0x70 two four-float colours, +0x74..+0x7C a direction)
     { 0x050, SIR_PTR, 1 },    // code: resource released by fn_8013006C (fn_8012F8B8)
     { 0x080, SIR_PTR, 1 },    // code: pointers to the zone's placed effects (WorldOnZoneLoaded), their count at +0x9C
     { 0x08C, SIR_PTR, 2 },    // code: SessionBegin, SessionRestoreZoneObjects (two pointers in every slot of the file)
