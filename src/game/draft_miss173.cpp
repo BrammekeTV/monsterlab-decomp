@@ -32,7 +32,7 @@ s32   fn_80065200(u8* arg0, u8* arg1, void* arg2, u8* arg3, s32 arg4, s32 arg5, 
 void  fn_8008139C(u8* self, void* val);                               // 0x8008139C
 void  fn_8014DE68(void);                                              // 0x8014DE68
 void  fn_8014E3EC(s32 n);                                             // 0x8014E3EC
-s32   fn_80151644(s32 a, s32 b, u8* quad);                            // 0x80151644
+void   fn_80151644(s32 a, s32 b, u8* quad);                            // 0x80151644
 void  fn_80155724(u8* m);                                             // 0x80155724
 s32   fn_8015BA30(void* p);                                           // 0x8015BA30
 void  fn_8018D370(const char* fmt, ...);                              // 0x8018D370 (debug log)

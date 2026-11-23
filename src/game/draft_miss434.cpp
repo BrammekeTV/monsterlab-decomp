@@ -22,7 +22,7 @@ void  RayQueryInit(u8* q);                                                   // 
 s32   TriggerDoAction(void* action, void* a1, void* a2);                     // 0x801E0054
 void  fn_8014DB90(u8* verts, s32 count);                                     // 0x8014DB90
 void  fn_8014E3EC(s32 n);                                                    // 0x8014E3EC
-s32   fn_80151644(s32 a, s32 b, u8* quad);                                   // 0x80151644
+void   fn_80151644(s32 a, s32 b, u8* quad);                                   // 0x80151644
 void  fn_80152620(s32 a, s32 b, u8* quad);                                   // 0x80152620
 void* fn_801ACCA0(u8* arg0, s32 arg1);                                       // 0x801ACCA0
 void* fn_801B7198(void* anim, s32 a);                                        // 0x801B7198
