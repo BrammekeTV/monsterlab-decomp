@@ -1340,10 +1340,10 @@ void fn_80123954(s32 arg0, u8* arg1) {
 // reads the current value (from the dispatch-table entry of obj+0 slot 0x30, or from the state
 // at obj+4 +0x9C), clamps it into [obj+0xC, obj+0x10], writes it back (slot 0x24 or the state)
 // and returns 2 (3 when no target exists); anything else returns 0.
-s32 fn_801F1D64(u8* obj) {
+s32 fn_801F1D64(u8* obj, f32 dt) {
     switch (*(u8*)(obj + 0x7F)) {
         case 0x20:
-            return fn_801F1EB0(obj, 0.0f /* leftover f1 */);
+            return fn_801F1EB0(obj, dt);
         case 0x08:
             return 2;
         case 0x10: {

@@ -28,7 +28,7 @@ u8*   fn_80196D0C(void* obj, const char* name, s32 flag);     // 0x80196D0C
 s32 fn_801AA85C(u8* arg0, u8* arg1, s32 arg2);              // 0x801AA85C
 void  fn_801AB3CC(u8* arg, u8* owner, s32 flag);              // 0x801AB3CC
 u8*   fn_801ABF0C(u8* table, u32 hash, s32 key);              // 0x801ABF0C
-s32 fn_801B7E7C(u8* arg0, u8* arg1);                 // 0x801B7E7C (anim callback)
+s32 fn_801B7E7C(u8* arg0, u8* arg1, f32 farg0);                 // 0x801B7E7C (anim callback)
 u8*   fn_801C6BCC(u8* key);                                   // 0x801C6BCC
 s32   fn_801EAFA4(u8* task, f32 t);                           // 0x801EAFA4
 f64   fn_8033F17C(f64 x);                                     // 0x8033F17C

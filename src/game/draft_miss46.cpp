@@ -106,7 +106,7 @@ void fn_8002D508(s32 idx, f32 ratio, u32 extra);  // 0x8002D508
 BOOL ZoneIsLoaded(void* world, s32 zone);
 void fn_801E8D74(void* out, void* list, void* owner, void* anim);  // 0x801E8D74
 s32  fn_801F2018(u8* task, f32 dt);                   // 0x801F2018 (tween update callback)
-s32 fn_801F1D64(u8* obj);                    // 0x801F1D64 (tween update callback)
+s32 fn_801F1D64(u8* obj, f32 dt);                 // 0x801F1D64 (tween update callback)
 f32 fn_801EDD00(u8* obj);                    // 0x801EDD00
 void fn_801ED788(f32* out, u8* a1);          // 0x801ED788
 s32 fn_801EDF58(u8* ref);                      // 0x801EDF58
