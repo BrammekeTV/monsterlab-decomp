@@ -56,7 +56,7 @@ u8*   sRemoteData;           ORIG(0x805FB3C0)
 s32   sLocalDelay;           ORIG(0x805FB3E8)
 s32   sRemoteDelay;          ORIG(0x805FB3E4)
 u8    sRemoteReady;          ORIG(0x805FB3B5)
-u8    sOpponentWaiting;      ORIG(0x805FB3B8)   // non-zero once the opponent chose
+s32   sOpponentWaiting;      ORIG(0x805FB3B8)   // non-zero once the opponent chose
 u8    sLocalConfirmed;       ORIG(0x805FB3B3)
 u8    sWaitPanelUp;          ORIG(0x805FB3B1)
 u8    sReadyPanelUp;         ORIG(0x805FB3B0)
