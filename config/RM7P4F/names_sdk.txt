@@ -84,3 +84,14 @@ fn_80257C88 AXQuit
 fn_80257FA8 AXFreeVoice
 fn_80258024 AXAcquireVoice
 fn_80259B2C AXRegisterCallback
+
+# NET: the function name appears in its own debug/error string (DWC, NCD, NWC24, NHTTP)
+fn_8032683C NHTTPi_CheckCurrentThread
+fn_80320D10 NCDGetCurrentIfConfig
+fn_80320E08 NCDGetCurrentIpConfig
+fn_8032118C NCDiGetEnabledConfigList
+fn_8032292C NWC24iSetScriptMode
+fn_80322ACC NWC24iRequestGenerateUserId
+fn_80323164 NWC24iSetRtcCounter
+fn_80323574 NWC24iRequestShutdown
+fn_802EB5C4 DWCi_MatchInit
