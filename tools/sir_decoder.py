@@ -1217,7 +1217,7 @@ def zone_dump(L, sec, base, hud, roots, scene_roots, pooltabs, records=(), lists
         o = off(it)
         L.append('itemdraw %s xf %s scale %08x mesh %s out %s cb %08x arg %s clip %s w58 %08x skin %s' % (
             ptr(it), ptr(u(o + 4)), u(o + 8), ptr(u(o + 0x10)), ws(o + 0x14, 7), u(o + 0x30), ptr(u(o + 0x34)), ws(o + 0x3C, 4),
-            u(o + 0x58), ptr(u(o + 0xB0))))
+            u(o + 0x58), ptr(u(o + 0xB0))) + ' buf4c %s w9c %08x pa0 %s' % (ws(o + 0x4C, 3), u(o + 0x9C), ptr(u(o + 0xA0))))
         skeleton(u(o + 0xB0))
         x, m = u(o + 4), u(o + 0x10)
         if inz(x, 0x60): L.append('itemxf %s %s' % (ptr(x), ws(off(x), 24)))
