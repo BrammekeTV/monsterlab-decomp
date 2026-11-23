@@ -98,7 +98,15 @@ static BOOL SavePng(ID3D11Texture2D* tex, u32 w, u32 h, const char* path);
 static HANDLE sWndReady;
 static volatile LONG sWheel;           // mouse wheel movement the settings screen has not taken yet
 f32 PortGfxTakeWheel(void) { return (f32)InterlockedExchange(&sWheel, 0) / WHEEL_DELTA; }
+#define WM_PORT_TITLE (WM_APP + 1)     // the game thread posts it; the title is set here, on the window's own thread
+static char sTitleText[96];
+static void PostTitle(const char* t) {
+    if (!sWnd) return;
+    snprintf(sTitleText, sizeof(sTitleText), "%s", t);
+    PostMessageA(sWnd, WM_PORT_TITLE, 0, 0);
+}
 static LRESULT CALLBACK WndProc(HWND w, UINT m, WPARAM wp, LPARAM lp) {
+    if (m == WM_PORT_TITLE) { SetWindowTextA(w, sTitleText); return 0; }
     if (m == WM_CLOSE) { PortStop(0, "window closed"); return 0; }
     if (m == WM_MOUSEWHEEL) { InterlockedExchangeAdd(&sWheel, (LONG)GET_WHEEL_DELTA_WPARAM(wp)); return 0; }
     return DefWindowProcA(w, m, wp, lp);
@@ -112,7 +120,9 @@ static DWORD WINAPI WindowThread(void*) {
     RegisterClassA(&wc);
     RECT r = {0, 0, (LONG)sOutW, (LONG)sOutH};
     AdjustWindowRect(&r, WS_OVERLAPPEDWINDOW, FALSE);
-    sWnd = CreateWindowA(wc.lpszClassName, "Monster Lab (PC port)", WS_OVERLAPPEDWINDOW | (getenv("PORT_HIDDEN") ? 0 : WS_VISIBLE), CW_USEDEFAULT, CW_USEDEFAULT,
+    // PORT_HIDDEN=1: not visible. PORT_OFFSCREEN=1: visible (the real code path) but far outside every monitor. For tests.
+    BOOL offscreen = getenv("PORT_OFFSCREEN") != NULL;
+    sWnd = CreateWindowA(wc.lpszClassName, "Monster Lab (PC port)", WS_OVERLAPPEDWINDOW | (getenv("PORT_HIDDEN") ? 0 : WS_VISIBLE), offscreen ? -32000 : CW_USEDEFAULT, offscreen ? -32000 : CW_USEDEFAULT,
                          r.right - r.left, r.bottom - r.top, NULL, NULL, wc.hInstance, NULL);
     SetEvent(sWndReady);
     MSG msg;
@@ -1070,6 +1080,34 @@ static void FrameStats(PortFrameStats* s) {
     sFrame.renderTicks = 0; sFrame.draws = sFrame.verts = sFrame.copies = 0;
 }
 
+// Whether the window should get a picture now. Paced: always. Fast-forwarding: four times a second,
+// and then the title shows "Fast-forwarding... frame N / M" (set from the window's thread).
+static BOOL FastProgress(void) {
+    static DWORD lastFast;
+    static BOOL  titled;
+    if (!sSwap) return FALSE;
+    if (!PortFastActive()) {
+        if (titled) { PostTitle("Monster Lab (PC port)"); titled = FALSE; }
+        return TRUE;
+    }
+    DWORD now = GetTickCount();
+    if (now - lastFast < 250) return FALSE;
+    lastFast = now;
+    char t[96];
+    s32 total = gPortOptions.fastForward;
+    if (total > 0) snprintf(t, sizeof(t), "Monster Lab (PC port) - Fast-forwarding... frame %d / %d", (int)PortFrameCount(), (int)total);
+    else snprintf(t, sizeof(t), "Monster Lab (PC port) - Fast-forwarding... frame %d", (int)PortFrameCount());
+    PostTitle(t);
+    titled = TRUE;
+    if (getenv("PORT_FAST_LOG")) PortLog("fast-forward progress: present + title \"%s\" at %lu ms", t, now);
+    return TRUE;
+}
+static void PresentOut(BOOL fast) {
+    Blit(sOutSrv, sBackRtv, 0, 0, sOutW, sOutH, 0, 0, 1, 1);
+    if (!gPortOptions.screenshotStats) PortOverlayDraw(sBackRtv, sOutW, sOutH);
+    sSwap->Present(gPortSettings.vsync && !fast ? 1 : 0, 0);
+}
+
 static void CopyEfb(const PortGx* g, u32 control) {
     if (!sStarted) return;
     FlushDraws();
@@ -1105,32 +1143,9 @@ static void CopyEfb(const PortGx* g, u32 control) {
         FrameStats(&stats);
         PortOverlayFrame(&stats);
         if (gPortOptions.screenshotStats) PortOverlayDraw(sOutRtv, sOutW, sOutH);
-        // Fast-forward: every frame is rendered (copies and screenshots stay right) but the window gets
-        // a picture only four times a second, with the progress in the title bar, so it never looks hung.
-        BOOL fast = PortFastActive(), show = sSwap != NULL;
-        static DWORD lastFast;
-        static BOOL  titled;
-        if (fast && sSwap) {
-            DWORD now = GetTickCount();
-            show = (now - lastFast) >= 250;
-            if (show) {
-                lastFast = now;
-                char t[96];
-                s32 total = gPortOptions.fastForward;
-                if (total > 0) snprintf(t, sizeof(t), "Monster Lab (PC port) - Fast-forwarding... frame %d / %d", (int)PortFrameCount(), (int)total);
-                else snprintf(t, sizeof(t), "Monster Lab (PC port) - Fast-forwarding... frame %d", (int)PortFrameCount());
-                SetWindowTextA(sWnd, t);
-                titled = TRUE;
-            }
-        } else if (titled && sWnd) {
-            SetWindowTextA(sWnd, "Monster Lab (PC port)");
-            titled = FALSE;
-        }
-        if (show) {
-            Blit(sOutSrv, sBackRtv, 0, 0, sOutW, sOutH, 0, 0, 1, 1);
-            if (!gPortOptions.screenshotStats) PortOverlayDraw(sBackRtv, sOutW, sOutH);
-            sSwap->Present(gPortSettings.vsync && !fast ? 1 : 0, 0);
-        }
+        // Fast-forward: the window gets a picture only four times a second, with the progress in the title bar.
+        BOOL fast = PortFastActive();
+        if (FastProgress()) PresentOut(fast);
         sGfxStats.presents++;
         if (sTraceFrom > 1 && sGfxStats.presents >= sTraceFrom) sTrace = TRUE;
     } else {                                                // into a texture, kept at the frame buffer's resolution
@@ -1306,7 +1321,10 @@ static void Draw(const PortGx* g, u32 prim, const PortGxLayout* L, u32 count, co
     sTotalDraw += Ticks() - t;
 }
 static void Copy(const PortGx* g, u32 control) {
-    if (FastDropping()) return;                  // nothing was drawn: the copy would only move an old picture
+    if (FastDropping()) {                        // nothing was drawn: a copy would only move an old picture
+        if ((control & 0x4000) && FastProgress()) PresentOut(TRUE);      // but the window still gets its progress
+        return;
+    }
     s64 t = Ticks();
     CopyEfb(g, control);
     sFrame.renderTicks += Ticks() - t;
