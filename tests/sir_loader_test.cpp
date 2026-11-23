@@ -1285,7 +1285,7 @@ struct ZoneDump {
                 PrintRaw(r + 0x34, 10);
                 printf("\n");
             }
-            printf("entbase "); Val(e); printf(" id %08x w30 %08x p84 ", *(const u32*)(e + 0x2C), *(const u32*)(e + 0x30)); Ptr(e + 0x84);
+            printf("entbase "); Val(e); printf(" id %08x w30 %08x w80 %08x p84 ", *(const u32*)(e + 0x2C), *(const u32*)(e + 0x30), *(const u32*)(e + 0x80)); Ptr(e + 0x84);
             printf(" wac %08x\n", *(const u32*)(e + 0xAC));
             bool prop = InAny(r, ENTITY_RECORD_SIZE) && r[0x34] == ENTITY_TYPE_PROP;
             if (prop) {
@@ -2270,6 +2270,7 @@ static void BuildLevel(u8* hdr, u8* zone) {
     Put32(e + 0x0A4, L_ZONE + L_HOLDER);
     Put32(e + 0x0B0, L_ZONE + L_CHILD);
     Put32(e + 0x158, 0x3F800000);
+    Put32(e + 0x80, 0x0003FFFF);                               // fn_801260C8 tests the nibble at 0x78000000
     Put32(e + 0x1A0, L_ZONE + L_ENT + 0x9C);                   // one state: the list is the field +0x9C itself
     Put32(e + 0x1A4, 1);
     Put32(e + 0x1B0, 0x40);
@@ -2647,6 +2648,7 @@ static void LevelSelfTest(void) {
     CHECK(*(const f32*)(tr + 0x44) == 2.0f);
     CHECK(*(const f32*)(rec + 0x18) == 1.0f && *(const u32*)(rec + 0x1C) == 0x46 && *(const u32*)(rec + 0x20) == 0x100);
     CHECK(*(const u16*)(rec + 0x30) == 0x1234 && rec[0x34] == 6 && rec[0x3A] == 0xFF);
+    CHECK(*(const u32*)(ent + 0x80) == 0x0003FFFF && ((*(const u32*)(ent + 0x80) >> 27) & 0xF) == 0);
     CHECK(*(const f32*)(ent + 0x158) == 1.0f && *(const u32*)(ent + 0x1B0) == 0x40 && *(const u8**)(ent + 0x8C) == NULL);
     const u8* sc = *(const u8**)(ent + 0x90);
     CHECK(sc == zone + L_SCENE && *(const s32*)(sc + 4) == 3 && *(const s32*)(sc + 0x54) == 1);
