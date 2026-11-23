@@ -53,8 +53,8 @@ void   fn_8016A64C(void* sys, f32 dt);
 s32    fn_800D5FDC(PathFollower* p, u8* cur, s32 node, s32 a);
 void   fn_802E65C0(u8* rec);
 void   fn_802E6698(void* cb, s32 a);
-void   fn_8023A5B0(u8* p);
-void   fn_8023A68C(u8* p);
+void   OSLockMutex(u8* p);
+void   OSUnlockMutex(u8* p);
 
 // 0x8010FF78
 // Book screen switch. lbl_805FB248 is a table: [0] = current index (-1 = none), then the
@@ -89,7 +89,7 @@ void SetBook(u32 a0) {
 // Clears the player record at lbl_80556E80 + arg0*0x20 under the lock, clears its counters,
 // marks the movie player's flag at +0xB1, and re-sorts the friend list.
 void fn_8013A654(s32 arg0) {
-    fn_8023A5B0(lbl_80556AC8);
+    OSLockMutex(lbl_80556AC8);
     u8* rec = lbl_80556E80 + (arg0 << 5);
     *(u8*)(rec + 0x340) = 0;
     *(s32*)(rec + 0x354) = 0;
@@ -101,21 +101,21 @@ void fn_8013A654(s32 arg0) {
         *(u8*)((u8*)lbl_805FB964 + 0xB1) = 1;
     }
     FriendListSort((BOOL)lbl_805F9028);
-    fn_8023A68C(lbl_80556AC8);
+    OSUnlockMutex(lbl_80556AC8);
 }
 
 // 0x8013A6F4
 // Under the lock: when arg0 == 0, registers fn_8013A03C; then if arg1 is set, sets the movie
 // player flag at +0xB1 (when it is already non-zero).
 void fn_8013A6F4(s32 arg0, s32 arg1) {
-    fn_8023A5B0(lbl_80556AC8);
+    OSLockMutex(lbl_80556AC8);
     if (arg0 == 0) {
         fn_802E6698((void*)fn_8013A03C, 0);
         if (arg1 != 0 && lbl_805FB964 != NULL && *(u8*)((u8*)lbl_805FB964 + 0xB1) != 0) {
             *(u8*)((u8*)lbl_805FB964 + 0xB1) = 1;
         }
     }
-    fn_8023A68C(lbl_80556AC8);
+    OSUnlockMutex(lbl_80556AC8);
 }
 
 // 0x8013F394

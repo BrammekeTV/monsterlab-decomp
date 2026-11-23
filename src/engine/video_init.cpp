@@ -24,8 +24,8 @@ struct VideoRenderMode {
 static_assert(sizeof(VideoRenderMode) == 0x3C, "GXRenderModeObj layout");
 
 extern "C" {
-u8   fn_8026AB6C(void);                 // 0x8026AB6C: SCGetProgressiveMode
-u8   fn_8026AAA0(void);                 // 0x8026AAA0: SCGetEuRgb60Mode
+u8   SCGetProgressiveMode(void);                 // 0x8026AB6C: SCGetProgressiveMode
+u8   SCGetEuRgb60Mode(void);                 // 0x8026AAA0: SCGetEuRgb60Mode
 u32  fn_80245BF8(void);                 // 0x80245BF8: VIGetDTVStatus (1 = component cable)
 void fn_80244ED0(u8* renderMode);       // 0x80244ED0: VIConfigure
 GXFifoObj* GXInit(void* base, u32 size);  // 0x802488E8
@@ -35,28 +35,28 @@ void* fn_8024B5D4(void* cb);            // 0x8024B5D4: GXSetDrawDoneCallback, re
 void* fn_8024B50C(void* cb);            // 0x8024B50C: GXSetDrawSyncCallback, returns the old one
 // GX functions of the default-state reset (identified from the SDK's __GXInitGX, which
 // fn_8015D660 repeats call for call)
-void fn_8024AC4C(s32 coord, s32 func, s32 src, s32 mtx, s32 normalize, s32 postMtx);   // 0x8024AC4C: GXSetTexCoordGen2
-void fn_8024AE74(s32 a);                // 0x8024AE74: GXSetNumTexGens
-void fn_8024A7E4(void);                 // 0x8024A7E4: GXClearVtxDesc
-void fn_8024AC3C(void);                 // 0x8024AC3C: GXInvalidateVtxCache
-void fn_8024BAC0(s32 width, s32 texOffsets);   // 0x8024BAC0: GXSetLineWidth
-void fn_8024BAF4(s32 size, s32 texOffsets);    // 0x8024BAF4: GXSetPointSize
-void fn_8024BB28(s32 coord, s32 line, s32 point);   // 0x8024BB28: GXEnableTexOffsets
+void GXSetTexCoordGen2(s32 coord, s32 func, s32 src, s32 mtx, s32 normalize, s32 postMtx);   // 0x8024AC4C: GXSetTexCoordGen2
+void GXSetNumTexGens(s32 a);                // 0x8024AE74: GXSetNumTexGens
+void GXClearVtxDesc(void);                 // 0x8024A7E4: GXClearVtxDesc
+void GXInvalidateVtxCache(void);                 // 0x8024AC3C: GXInvalidateVtxCache
+void GXSetLineWidth(s32 width, s32 texOffsets);   // 0x8024BAC0: GXSetLineWidth
+void GXSetPointSize(s32 size, s32 texOffsets);    // 0x8024BAF4: GXSetPointSize
+void GXEnableTexOffsets(s32 coord, s32 line, s32 point);   // 0x8024BB28: GXEnableTexOffsets
 void fn_80248050(f32* mtx);             // 0x80248050: PSMTXIdentity
-void fn_8024E280(f32* mtx, s32 a);      // 0x8024E280: GXLoadPosMtxImm
-void fn_8024E2D0(f32* mtx, s32 id);     // 0x8024E2D0: GXLoadNrmMtxImm
-void fn_8024E328(s32 a);                // 0x8024E328: GXSetCurrentMtx
-void fn_8024E348(f32* mtx, s32 id, s32 type);   // 0x8024E348: GXLoadTexMtxImm
-void fn_8024E48C(f32 left, f32 top, f32 w, f32 h, f32 nearZ, f32 farZ);   // 0x8024E48C: GXSetViewport
-void fn_8024BB8C(s32 enable);           // 0x8024BB8C: GXSetCoPlanar
-void fn_8024BB64(s32 a);                // 0x8024BB64: GXSetCullMode
-void fn_8024E55C(s32 mode);             // 0x8024E55C: GXSetClipMode
-void fn_8024E4B8(s32 x, s32 y, s32 w, s32 h);   // 0x8024E4B8: GXSetScissor
-void fn_8024E520(s32 x, s32 y);         // 0x8024E520: GXSetScissorBoxOffset
-void fn_8024C2F0(s32 a);                // 0x8024C2F0: GXSetNumChans
-void fn_8024C314(s32 chan, s32 enable, s32 ambSrc, s32 matSrc, s32 lightMask, s32 diffFn, s32 attnFn);   // 0x8024C314: GXSetChanCtrl
-void fn_8024C140(s32 chan, u8* color);  // 0x8024C140: GXSetChanAmbColor
-void fn_8024C218(s32 chan, u8* color);  // 0x8024C218: GXSetChanMatColor
+void GXLoadPosMtxImm(f32* mtx, s32 a);      // 0x8024E280: GXLoadPosMtxImm
+void GXLoadNrmMtxImm(f32* mtx, s32 id);     // 0x8024E2D0: GXLoadNrmMtxImm
+void GXSetCurrentMtx(s32 a);                // 0x8024E328: GXSetCurrentMtx
+void fn_8024E348(f32* mtx, s32 id, s32 type);   // 0x8024E348: fn_8024E348
+void GXSetViewport(f32 left, f32 top, f32 w, f32 h, f32 nearZ, f32 farZ);   // 0x8024E48C: GXSetViewport
+void GXSetCoPlanar(s32 enable);           // 0x8024BB8C: GXSetCoPlanar
+void GXSetCullMode(s32 a);                // 0x8024BB64: GXSetCullMode
+void GXSetClipMode(s32 mode);             // 0x8024E55C: GXSetClipMode
+void GXSetScissor(s32 x, s32 y, s32 w, s32 h);   // 0x8024E4B8: GXSetScissor
+void GXSetScissorBoxOffset(s32 x, s32 y);         // 0x8024E520: GXSetScissorBoxOffset
+void GXSetNumChans(s32 a);                // 0x8024C2F0: GXSetNumChans
+void GXSetChanCtrl(s32 chan, s32 enable, s32 ambSrc, s32 matSrc, s32 lightMask, s32 diffFn, s32 attnFn);   // 0x8024C314: GXSetChanCtrl
+void GXSetChanAmbColor(s32 chan, u8* color);  // 0x8024C140: GXSetChanAmbColor
+void GXSetChanMatColor(s32 chan, u8* color);  // 0x8024C218: GXSetChanMatColor
 void fn_8024CB00(void);                 // 0x8024CB00: GXInvalidateTexAll
 void fn_8024DA08(s32 a, s32 b, s32 c, s32 d);   // 0x8024DA08: GXSetTevOrder(stage, coord, map, colour channel)
 void fn_8024DB64(s32 a);                // 0x8024DB64: GXSetNumTevStages
@@ -67,21 +67,21 @@ void fn_8024D7EC(s32 stage, s32 sel);   // 0x8024D7EC: GXSetTevKColorSel
 void fn_8024D83C(s32 stage, s32 sel);   // 0x8024D83C: GXSetTevKAlphaSel
 void fn_8024D88C(s32 stage, s32 rasSel, s32 texSel);   // 0x8024D88C: GXSetTevSwapMode
 void fn_8024D8C8(s32 table, s32 r, s32 g, s32 b, s32 a);   // 0x8024D8C8: GXSetTevSwapModeTable
-void fn_8024D468(s32 stage);            // 0x8024D468: GXSetTevDirect
-void fn_8024D448(s32 count);            // 0x8024D448: GXSetNumIndStages
-void fn_8024D278(s32 stage, s32 scaleS, s32 scaleT);   // 0x8024D278: GXSetIndTexCoordScale
-void fn_8024DB88(s32 type, u8* color, f32 startZ, f32 endZ, f32 nearZ, f32 farZ);   // 0x8024DB88: GXSetFog
-void fn_8024DDB4(s32 enable, s32 center, void* table);   // 0x8024DDB4: GXSetFogRangeAdj
-void fn_8024DED8(s32 a, s32 b, s32 c, s32 d);   // 0x8024DED8: GXSetBlendMode
-void fn_8024DF28(s32 a);                // 0x8024DF28: GXSetColorUpdate
-void fn_8024DF54(s32 enable);           // 0x8024DF54: GXSetAlphaUpdate
-void fn_8024DF80(s32 a, s32 b, s32 c);  // 0x8024DF80: GXSetZMode
-void fn_8024DFB4(s32 beforeTex);        // 0x8024DFB4: GXSetZCompLoc
-void fn_8024E08C(u32 a);                // 0x8024E08C: GXSetDither
-void fn_8024E0B8(s32 enable, s32 alpha);   // 0x8024E0B8: GXSetDstAlpha
-void fn_8024DFE4(s32 a, s32 b);         // 0x8024DFE4: GXSetPixelFmt
-void fn_8024E0E8(s32 odd, s32 even);    // 0x8024E0E8: GXSetFieldMask
-void fn_8024E11C(s32 fieldMode, s32 halfAspect);   // 0x8024E11C: GXSetFieldMode
+void GXSetTevDirect(s32 stage);            // 0x8024D468: GXSetTevDirect
+void GXSetNumIndStages(s32 count);            // 0x8024D448: GXSetNumIndStages
+void GXSetIndTexCoordScale(s32 stage, s32 scaleS, s32 scaleT);   // 0x8024D278: GXSetIndTexCoordScale
+void GXSetFog(s32 type, u8* color, f32 startZ, f32 endZ, f32 nearZ, f32 farZ);   // 0x8024DB88: GXSetFog
+void GXSetFogRangeAdj(s32 enable, s32 center, void* table);   // 0x8024DDB4: GXSetFogRangeAdj
+void GXSetBlendMode(s32 a, s32 b, s32 c, s32 d);   // 0x8024DED8: GXSetBlendMode
+void GXSetColorUpdate(s32 a);                // 0x8024DF28: GXSetColorUpdate
+void GXSetAlphaUpdate(s32 enable);           // 0x8024DF54: GXSetAlphaUpdate
+void GXSetZMode(s32 a, s32 b, s32 c);  // 0x8024DF80: GXSetZMode
+void GXSetZCompLoc(s32 beforeTex);        // 0x8024DFB4: GXSetZCompLoc
+void GXSetDither(u32 a);                // 0x8024E08C: GXSetDither
+void GXSetDstAlpha(s32 enable, s32 alpha);   // 0x8024E0B8: GXSetDstAlpha
+void GXSetPixelFmt(s32 a, s32 b);         // 0x8024DFE4: GXSetPixelFmt
+void GXSetFieldMask(s32 odd, s32 even);    // 0x8024E0E8: GXSetFieldMask
+void GXSetFieldMode(s32 fieldMode, s32 halfAspect);   // 0x8024E11C: GXSetFieldMode
 void fn_8024BD5C(u8* color, u32 z);     // 0x8024BD5C: GXSetCopyClear
 void fn_8024BBE4(s32 x, s32 y, s32 w, s32 h);   // 0x8024BBE4: GXSetDispCopySrc
 void fn_8024BC24(s32 w, u32 h);         // 0x8024BC24: GXSetDispCopyDst
@@ -148,7 +148,7 @@ extern "C" void VideoInit(RendVideo* video) {
     lbl_805FB544 = 0;
 
     // Progressive scan needs both the console setting and a component cable.
-    u8 progressiveSetting = fn_8026AB6C();
+    u8 progressiveSetting = SCGetProgressiveMode();
     BOOL progressive = FALSE;
     if (fn_80245BF8() != 0 && progressiveSetting == 1) progressive = TRUE;
 
@@ -164,7 +164,7 @@ extern "C" void VideoInit(RendVideo* video) {
     case 1:   // PAL: 60 Hz when the console is set to it, else 50 Hz
         if (progressive) {
             table = lbl_80398458;
-        } else if (fn_8026AAA0() == 1) {
+        } else if (SCGetEuRgb60Mode() == 1) {
             table = lbl_8039841C;
         } else {
             pal50 = TRUE;
@@ -226,36 +226,36 @@ extern "C" void fn_8015D660(void) {
     f32 identity[3][4];
 
     // Texture coordinate i comes from vertex texture coordinate i, untransformed.
-    for (int i = 0; i < 8; i++) fn_8024AC4C(i, 1, 4 + i, 0x3C, 0, 0x7D);
-    fn_8024AE74(1);
-    fn_8024A7E4();
-    fn_8024AC3C();
-    fn_8024BAC0(6, 0);
-    fn_8024BAF4(6, 0);
-    for (int i = 0; i < 8; i++) fn_8024BB28(i, 0, 0);
+    for (int i = 0; i < 8; i++) GXSetTexCoordGen2(i, 1, 4 + i, 0x3C, 0, 0x7D);
+    GXSetNumTexGens(1);
+    GXClearVtxDesc();
+    GXInvalidateVtxCache();
+    GXSetLineWidth(6, 0);
+    GXSetPointSize(6, 0);
+    for (int i = 0; i < 8; i++) GXEnableTexOffsets(i, 0, 0);
 
     fn_80248050(&identity[0][0]);
-    fn_8024E280(&identity[0][0], 0);
-    fn_8024E2D0(&identity[0][0], 0);
-    fn_8024E328(0);
+    GXLoadPosMtxImm(&identity[0][0], 0);
+    GXLoadNrmMtxImm(&identity[0][0], 0);
+    GXSetCurrentMtx(0);
     fn_8024E348(&identity[0][0], 0x3C, 0);
     fn_8024E348(&identity[0][0], 0x7D, 0);
-    fn_8024E48C(0.0f, 0.0f, (f32)mode->fbWidth, (f32)mode->xfbHeight, 0.0f, 1.0f);
+    GXSetViewport(0.0f, 0.0f, (f32)mode->fbWidth, (f32)mode->xfbHeight, 0.0f, 1.0f);
 
-    fn_8024BB8C(0);
-    fn_8024BB64(2);
-    fn_8024E55C(0);
-    fn_8024E4B8(0, 0, mode->fbWidth, mode->efbHeight);
-    fn_8024E520(0, 0);
+    GXSetCoPlanar(0);
+    GXSetCullMode(2);
+    GXSetClipMode(0);
+    GXSetScissor(0, 0, mode->fbWidth, mode->efbHeight);
+    GXSetScissorBoxOffset(0, 0);
 
     // Both colour channels: unlit, vertex colour, black ambient, white material.
-    fn_8024C2F0(0);
+    GXSetNumChans(0);
     for (int chan = 4; chan <= 5; chan++) {
-        fn_8024C314(chan, 0, 0, 1, 0, 0, 2);
+        GXSetChanCtrl(chan, 0, 0, 1, 0, 0, 2);
         color[0] = color[1] = color[2] = color[3] = 0;
-        fn_8024C140(chan, color);
+        GXSetChanAmbColor(chan, color);
         color[0] = white[0]; color[1] = white[1]; color[2] = white[2]; color[3] = white[3];
-        fn_8024C218(chan, color);
+        GXSetChanMatColor(chan, color);
     }
 
     fn_8024CB00();
@@ -274,23 +274,23 @@ extern "C" void fn_8015D660(void) {
     fn_8024D8C8(1, 0, 0, 0, 3);
     fn_8024D8C8(2, 1, 1, 1, 3);
     fn_8024D8C8(3, 2, 2, 2, 3);
-    for (int i = 0; i < 16; i++) fn_8024D468(i);
-    fn_8024D448(0);
-    for (int i = 0; i < 4; i++) fn_8024D278(i, 0, 0);
+    for (int i = 0; i < 16; i++) GXSetTevDirect(i);
+    GXSetNumIndStages(0);
+    for (int i = 0; i < 4; i++) GXSetIndTexCoordScale(i, 0, 0);
 
     color[0] = color[1] = color[2] = color[3] = 0;
-    fn_8024DB88(0, color, 0.0f, 1.0f, 0.1f, 1.0f);
-    fn_8024DDB4(0, 0, NULL);
-    fn_8024DED8(0, 4, 5, 0);
-    fn_8024DF28(1);
-    fn_8024DF54(1);
-    fn_8024DF80(1, 3, 1);
-    fn_8024DFB4(1);
-    fn_8024E08C(1);
-    fn_8024E0B8(0, 0);
-    fn_8024DFE4(0, 0);
-    fn_8024E0E8(1, 1);
-    fn_8024E11C(mode->fieldRendering, mode->xfbHeight * 2 == mode->viHeight);
+    GXSetFog(0, color, 0.0f, 1.0f, 0.1f, 1.0f);
+    GXSetFogRangeAdj(0, 0, NULL);
+    GXSetBlendMode(0, 4, 5, 0);
+    GXSetColorUpdate(1);
+    GXSetAlphaUpdate(1);
+    GXSetZMode(1, 3, 1);
+    GXSetZCompLoc(1);
+    GXSetDither(1);
+    GXSetDstAlpha(0, 0);
+    GXSetPixelFmt(0, 0);
+    GXSetFieldMask(1, 1);
+    GXSetFieldMode(mode->fieldRendering, mode->xfbHeight * 2 == mode->viHeight);
 
     color[0] = clearColor[0]; color[1] = clearColor[1]; color[2] = clearColor[2]; color[3] = clearColor[3];
     fn_8024BD5C(color, 0xFFFFFF);

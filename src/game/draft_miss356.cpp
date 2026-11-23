@@ -13,19 +13,19 @@ s32  fn_8020DD90(u8* obj, s32 a);                                            // 
 s32  fn_8020DEA0(u8* obj, s32 slot);                                         // 0x8020DEA0
 BOOL fn_80212E28(u8** slot);                                                 // 0x80212E28
 void fn_8020574C(void);                                                      // 0x8020574C
-void fn_8024A3A4(s32 a, s32 b);                                              // 0x8024A3A4
-void fn_8024A7E4(void);                                                      // 0x8024A7E4
-void fn_8024A818(s32 a, s32 b, s32 c, s32 d, s32 e);                         // 0x8024A818
-void fn_8024AC4C(s32 coord, s32 func, s32 src, s32 mtx, s32 normalize, s32 postMtx);  // 0x8024AC4C
-void fn_8024AE74(s32 a);                                                     // 0x8024AE74
+void GXSetVtxDesc(s32 a, s32 b);                                              // 0x8024A3A4
+void GXClearVtxDesc(void);                                                      // 0x8024A7E4
+void GXSetVtxAttrFmt(s32 a, s32 b, s32 c, s32 d, s32 e);                         // 0x8024A818
+void GXSetTexCoordGen2(s32 coord, s32 func, s32 src, s32 mtx, s32 normalize, s32 postMtx);  // 0x8024AC4C
+void GXSetNumTexGens(s32 a);                                                     // 0x8024AE74
 void fn_8024B298(u32 token);                                                 // 0x8024B298 (GXSetDrawSync)
-void fn_8024B974(s32 a, s32 b, s32 c);                                       // 0x8024B974
-void fn_8024C2F0(s32 a);                                                     // 0x8024C2F0
+void GXBegin(s32 a, s32 b, s32 c);                                       // 0x8024B974
+void GXSetNumChans(s32 a);                                                     // 0x8024C2F0
 void GXLoadTexObj(u8* obj, s32 id);                                           // 0x8024C91C
-void fn_8024D0BC(s32 a, s32 b, s32 c, s32 d, s32 e, s32 f, s32 g, s32 h, s32 i, s32 j);  // 0x8024D0BC (two stack args)
-void fn_8024D124(s32 a, const f32* p, s32 c);                                // 0x8024D124
-void fn_8024D37C(s32 a, s32 b, s32 c);                                       // 0x8024D37C
-void fn_8024D448(s32 count);                                                 // 0x8024D448
+void GXSetTevIndirect(s32 a, s32 b, s32 c, s32 d, s32 e, s32 f, s32 g, s32 h, s32 i, s32 j);  // 0x8024D0BC (two stack args)
+void GXSetIndTexMtx(s32 a, const f32* p, s32 c);                                // 0x8024D124
+void GXSetIndTexOrder(s32 a, s32 b, s32 c);                                       // 0x8024D37C
+void GXSetNumIndStages(s32 count);                                                 // 0x8024D448
 void fn_8024D59C(s32 a, s32 b, s32 c, s32 d, s32 e);                         // 0x8024D59C
 void fn_8024D5DC(s32 a, s32 b, s32 c, s32 d, s32 e);                         // 0x8024D5DC
 void fn_8024D61C(s32 a, s32 b, s32 c, s32 d, s32 e, s32 f);                 // 0x8024D61C
@@ -38,7 +38,7 @@ void fn_8024D88C(s32 stage, s32 rasSel, s32 texSel);                         // 
 void fn_8024D8C8(s32 table, s32 r, s32 g, s32 b, s32 a);                     // 0x8024D8C8
 void fn_8024DA08(s32 a, s32 b, s32 c, s32 d);                                // 0x8024DA08
 void fn_8024DB64(s32 a);                                                     // 0x8024DB64
-void fn_8024DED8(s32 a, s32 b, s32 c, s32 d);                                // 0x8024DED8
+void GXSetBlendMode(s32 a, s32 b, s32 c, s32 d);                                // 0x8024DED8
 void fn_8024E348(f32* mtx, s32 id, s32 type);                                // 0x8024E348
 
 extern u8*  gBattle;                // 0x805FBBB8
@@ -147,39 +147,39 @@ void fn_80205894(u8* obj, f32 x, f32 y, f32 sx, f32 sy, f32 a, s32 w, s32 h, s32
 
     *(s32*)(obj + *(s32*)(obj + 0x114) * 4 + 0x1D0) = 1;
     fn_8024B298((u16)(*(s32*)(obj + 0x114) + 0x4444));
-    fn_8024A818(0, 9, 1, 3, 0);
-    fn_8024A818(0, 0xB, 1, 5, 0);
-    fn_8024A818(0, 0xD, 1, 4, 0);
-    fn_8024A818(0, 0xE, 1, 4, 0);
-    fn_8024A7E4();
+    GXSetVtxAttrFmt(0, 9, 1, 3, 0);
+    GXSetVtxAttrFmt(0, 0xB, 1, 5, 0);
+    GXSetVtxAttrFmt(0, 0xD, 1, 4, 0);
+    GXSetVtxAttrFmt(0, 0xE, 1, 4, 0);
+    GXClearVtxDesc();
     GXLoadTexObj(obj + (*(s32*)(obj + 0x114) << 7), 0);
     GXLoadTexObj(obj + 0x190, 1);
     GXLoadTexObj(obj + 0x1B0, 2);
     GXLoadTexObj(obj + (*(s32*)(obj + 0x114) << 7) + 0x20, 3);
     GXLoadTexObj(obj + (*(s32*)(obj + 0x114) << 7) + 0x40, 4);
-    fn_8024A3A4(9, 1);
-    fn_8024A3A4(0xB, 1);
-    fn_8024A3A4(0xD, 1);
-    fn_8024A3A4(0xE, 1);
+    GXSetVtxDesc(9, 1);
+    GXSetVtxDesc(0xB, 1);
+    GXSetVtxDesc(0xD, 1);
+    GXSetVtxDesc(0xE, 1);
     if (hasExtra != 0) {
         GXLoadTexObj(obj + (*(s32*)(obj + 0x114) << 7) + 0x60, 5);
     }
-    fn_8024C2F0(1);
-    fn_8024AE74(4);
+    GXSetNumChans(1);
+    GXSetNumTexGens(4);
     fn_8024DB64(4);
-    fn_8024D448(3);
-    fn_8024D37C(0, 1, 1);
-    fn_8024D37C(1, 2, 2);
+    GXSetNumIndStages(3);
+    GXSetIndTexOrder(0, 1, 1);
+    GXSetIndTexOrder(1, 2, 2);
     if (hasExtra != 0) {
-        fn_8024DED8(1, 4, 5, 0);
+        GXSetBlendMode(1, 4, 5, 0);
     } else if (alpha != 0xFF) {
-        fn_8024DED8(1, 4, 5, 0);
+        GXSetBlendMode(1, 4, 5, 0);
     } else {
-        fn_8024DED8(1, 1, 0, 0);
+        GXSetBlendMode(1, 1, 0, 0);
     }
 
     // TEV stage 0
-    fn_8024D0BC(0, 1, 0, 7, 1, 0, 0, 0, 0, 0);
+    GXSetTevIndirect(0, 1, 0, 7, 1, 0, 0, 0, 0, 0);
     fn_8024DA08(0, 0, 4, 0xFF);
     fn_8024D59C(0, 0xF, 8, 0xE, 2);
     fn_8024D61C(0, 0, 0, 0, 0, 0);
@@ -189,7 +189,7 @@ void fn_80205894(u8* obj, f32 x, f32 y, f32 sx, f32 sy, f32 a, s32 w, s32 h, s32
     fn_8024D83C(0, 0x1C);
     fn_8024D88C(0, 0, 0);
     // TEV stage 1
-    fn_8024D0BC(1, 1, 0, 7, 1, 0, 0, 0, 0, 0);
+    GXSetTevIndirect(1, 1, 0, 7, 1, 0, 0, 0, 0, 0);
     fn_8024DA08(1, 0, 3, 0xFF);
     fn_8024D59C(1, 0xF, 8, 0xE, 0);
     fn_8024D61C(1, 0, 0, 1, 0, 0);
@@ -199,7 +199,7 @@ void fn_80205894(u8* obj, f32 x, f32 y, f32 sx, f32 sy, f32 a, s32 w, s32 h, s32
     fn_8024D83C(1, 0x1D);
     fn_8024D88C(1, 0, 0);
     // TEV stage 2
-    fn_8024D0BC(2, 0, 0, 7, 1, 0, 0, 0, 0, 0);
+    GXSetTevIndirect(2, 0, 0, 7, 1, 0, 0, 0, 0, 0);
     fn_8024DA08(2, 3, 0, 0xFF);
     fn_8024D59C(2, 0xF, 8, 0xC, 0);
     fn_8024D61C(2, 0, 0, 0, 1, 0);
@@ -208,7 +208,7 @@ void fn_80205894(u8* obj, f32 x, f32 y, f32 sx, f32 sy, f32 a, s32 w, s32 h, s32
     fn_8024D88C(2, 0, 0);
     // TEV stage 3
     if (hasExtra != 0) {
-        fn_8024D0BC(3, 0, 0, 7, 1, 0, 0, 0, 0, 0);
+        GXSetTevIndirect(3, 0, 0, 7, 1, 0, 0, 0, 0, 0);
         fn_8024DA08(3, 3, 5, 4);
         fn_8024D59C(3, 1, 0, 0xE, 0xF);
         fn_8024D61C(3, 0, 0, 0, 1, 0);
@@ -248,24 +248,24 @@ void fn_80205894(u8* obj, f32 x, f32 y, f32 sx, f32 sy, f32 a, s32 w, s32 h, s32
     c0[3] = lbl_8060044B;
     fn_8024D790(2, c0);
     fn_8024D8C8(0, 0, 1, 2, 3);
-    fn_8024D124(1, lbl_80349020, 4);
+    GXSetIndTexMtx(1, lbl_80349020, 4);
 
     // Texture matrices: scale = crop size / texture size for the two chroma planes.
     lbl_80527100[0] = (f32)(*(u32*)(obj + 0x104) >> 3) / (f32)*(u32*)(obj + 0x180);
     lbl_80527100[5] = (f32)*(u32*)(obj + 0x108) / (f32)*(u32*)(obj + 0x184);
     lbl_80527120[0] = (f32)(*(u32*)(obj + 0x10C) >> 3) / (f32)*(u32*)(obj + 0x188);
     lbl_80527120[5] = (f32)*(u32*)(obj + 0x110) / (f32)*(u32*)(obj + 0x18C);
-    fn_8024AC4C(0, 1, 4, 0x1E, 0, 0x7D);
-    fn_8024AC4C(1, 1, 4, 0x21, 0, 0x7D);
-    fn_8024AC4C(2, 1, 4, 0x24, 0, 0x7D);
-    fn_8024AC4C(3, 1, 5, 0x27, 0, 0x7D);
+    GXSetTexCoordGen2(0, 1, 4, 0x1E, 0, 0x7D);
+    GXSetTexCoordGen2(1, 1, 4, 0x21, 0, 0x7D);
+    GXSetTexCoordGen2(2, 1, 4, 0x24, 0, 0x7D);
+    GXSetTexCoordGen2(3, 1, 5, 0x27, 0, 0x7D);
     fn_8024E348(lbl_80349040, 0x1E, 1);
     fn_8024E348(lbl_80527100, 0x21, 1);
     fn_8024E348(lbl_80527120, 0x24, 1);
     fn_8024E348(lbl_80349040, 0x27, 1);
 
     // Quad: 4 vertices, each s16 x, y, z + 4 colour bytes + 4 floats (two texcoord pairs).
-    fn_8024B974(0x80, 0, 4);
+    GXBegin(0x80, 0, 4);
     s32 x0 = (s32)x;
     s32 y0 = (s32)y;
     s32 x1 = x0 + (s32)((f32)(u32)w * sx);

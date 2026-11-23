@@ -28,7 +28,7 @@ void fn_8018D2B8(const char* fmt, ...);                                 // 0x801
 void fn_801BA638(void* p);                                              // 0x801BA638
 void fn_801BB478(u8* p, s32 a1);                                        // 0x801BB478
 void fn_80234418(void* p);                                              // 0x80234418
-s32 fn_802737A8(s32 a, s32 b, s32 c);                                   // 0x802737A8 (args assumed)
+s32 WPADControlSpeaker(s32 a, s32 b, s32 c);                                   // 0x802737A8 (args assumed)
 
 extern u8 gAudio[];                    // audio manager object
 extern u8 lbl_803821D0[];              // vtable of the font object
@@ -254,7 +254,7 @@ void fn_802030A8(void) {
     if (lbl_805FBABC == 0) {
         saved = lbl_805FBAE0;
         lbl_805FBAE0 = 1;
-        if (fn_802737A8(0, 2, 0) == 0) {
+        if (WPADControlSpeaker(0, 2, 0) == 0) {
             lbl_805FBAC0 = lbl_805FBABC;
         }
         lbl_805FBAE0 = saved;

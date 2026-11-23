@@ -35,8 +35,8 @@ u8* fn_801F6238(u8* p, s32 del);                                            // 0
 u8* fn_801F9598(u8* p, s32 del);                                            // 0x801F9598
 void fn_80087720(u8* p);                                        // 0x80087720
 void fn_8020E950(u8* p);                                                    // 0x8020E950
-void fn_8023A5B0(u8* p);                                                    // 0x8023A5B0
-void fn_8023A68C(u8* p);                                                    // 0x8023A68C
+void OSLockMutex(u8* p);                                                    // 0x8023A5B0
+void OSUnlockMutex(u8* p);                                                    // 0x8023A68C
 s32 fn_802E6528(s32* args, s32 a, s32 b, s32 c, s32 d);                     // 0x802E6528
 void fn_802E9CBC(s32 counter);                                              // 0x802E9CBC
 s32 fn_802EB534(void);                                                      // 0x802EB534
@@ -192,12 +192,12 @@ void fn_80208C1C(u8* p) {
     s32 took = 0;
     s32 args[2];
     if (*(u8*)(p + 0xB0) == 0) {
-        fn_8023A5B0(lbl_80556AB0);
+        OSLockMutex(lbl_80556AB0);
         took = 1;
     }
     fn_802E9CBC(fn_802EB534());
     if (took != 0) {
-        fn_8023A68C(lbl_80556AB0);
+        OSUnlockMutex(lbl_80556AB0);
     }
     args[0] = 0;
     args[1] = 0;

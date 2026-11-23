@@ -128,7 +128,7 @@ extern void* lbl_805FBBAC;     // 0x805FBBAC (voice SFX handle)
 
 u32   RandomU32(void);                                          // 0x80143460
 s32   fn_80332EE0(s32 x);                                       // 0x80332EE0 (abs)
-f64   fn_8033ED6C(f64 x);                                       // 0x8033ED6C (MSL floor)
+f64   floor(f64 x);                                       // 0x8033ED6C (MSL floor)
 void  fn_800C176C(f32* out, u8* obj);                           // 0x800C176C
 void  fn_800C694C(u8* arg0, u8* arg1);                          // 0x800C694C
 f32   fn_800C6A0C(u8* a3, u8* a4);                              // 0x800C6A0C
@@ -714,7 +714,7 @@ void fn_800CB2D8(u8* arg0) {
         s32 j = (s32)t;
         f32* a = pts + j * 3;
         f32* b = pts + (j + 1) * 3;
-        s32 fl = (s32)(f32)fn_8033ED6C((f64)t);
+        s32 fl = (s32)(f32)floor((f64)t);
         f32 frac = t - (f32)fl;
         outp[i * 3 + 0] = a[0] + (b[0] - a[0]) * frac;
         outp[i * 3 + 1] = a[1] + (b[1] - a[1]) * frac;

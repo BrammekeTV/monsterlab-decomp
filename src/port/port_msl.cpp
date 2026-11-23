@@ -90,8 +90,8 @@ char* fn_80338A9C(char* s, const char* delims) { return strtok(s, delims); }
 
 // MSL math (fdlibm). The parameter types are the ones the game's callers declare.
 f64 fn_8033E8EC(f64 x) { return atan(x); }                  // atan
-f64 fn_8033ED6C(f64 x) { return floor(x); }                 // floor
-f64 fn_8033F17C(f64 x) { return tan(x); }                   // tan
+f64 floor(f64 x) { return floor(x); }                 // floor
+f64 tan(f64 x) { return tan(x); }                   // tan
 f64 fn_8033F1F4(f64 x) { return acos(x); }                  // acos
 f64 fn_8033F1F8(f64 x) { return asin(x); }                  // asin
 f32 fn_8033F1FC(f32 y, f32 x) { return (f32)atan2((f64)y, (f64)x); }   // atan2

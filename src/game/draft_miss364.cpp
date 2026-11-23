@@ -10,23 +10,23 @@ u8     SCGetAspectRatio(void);                                     // 0x8026A9D8
 void   fn_802050B0(void* tmp, s32 n, s32 size);                    // 0x802050B0
 void   fn_80205134(u8* buf, void* tmp, s32 size, s32 a, s32 b);    // 0x80205134
 void   fn_80248050(f32* mtx);                                      // 0x80248050
-void   fn_8024849C(f32* mtx, f32 a, f32 b, f32 c, f32 d, f32 e, f32 f);  // 0x8024849C
-void   fn_8024A3A4(s32 a, s32 b);                                  // 0x8024A3A4
-void   fn_8024A7E4(void);                                          // 0x8024A7E4
-void   fn_8024A818(s32 a, s32 b, s32 c, s32 d, s32 e);            // 0x8024A818
-void   fn_8024AE74(s32 a);                                         // 0x8024AE74
-void   fn_8024BB64(s32 a);                                         // 0x8024BB64
-void   fn_8024C2F0(s32 a);                                         // 0x8024C2F0
+void   C_MTXOrtho(f32* mtx, f32 a, f32 b, f32 c, f32 d, f32 e, f32 f);  // 0x8024849C
+void   GXSetVtxDesc(s32 a, s32 b);                                  // 0x8024A3A4
+void   GXClearVtxDesc(void);                                          // 0x8024A7E4
+void   GXSetVtxAttrFmt(s32 a, s32 b, s32 c, s32 d, s32 e);            // 0x8024A818
+void   GXSetNumTexGens(s32 a);                                         // 0x8024AE74
+void   GXSetCullMode(s32 a);                                         // 0x8024BB64
+void   GXSetNumChans(s32 a);                                         // 0x8024C2F0
 void   GXInitTexObj(u8* obj, void* image, s32 w, s32 h, s32 fmt, s32 wrapS, s32 wrapT, s32 mip);  // 0x8024C3B8
 void   GXInitTexObjLOD(u8* obj, s32 a, s32 b, s32 c, s32 d, s32 e, f32 f, f32 g, f32 h);  // 0x8024C60C
 void   fn_8024D508(s32 a, s32 b);                                  // 0x8024D508
 void   fn_8024DA08(s32 a, s32 b, s32 c, s32 d);                    // 0x8024DA08
 void   fn_8024DB64(s32 a);                                         // 0x8024DB64
-void   fn_8024DED8(s32 a, s32 b, s32 c, s32 d);                    // 0x8024DED8
-void   fn_8024DF80(s32 a, s32 b, s32 c);                           // 0x8024DF80
-void   fn_8024E1D0(f32* mtx, s32 a);                               // 0x8024E1D0
-void   fn_8024E280(f32* mtx, s32 a);                               // 0x8024E280
-void   fn_8024E328(s32 a);                                         // 0x8024E328
+void   GXSetBlendMode(s32 a, s32 b, s32 c, s32 d);                    // 0x8024DED8
+void   GXSetZMode(s32 a, s32 b, s32 c);                           // 0x8024DF80
+void   GXSetProjection(f32* mtx, s32 a);                               // 0x8024E1D0
+void   GXLoadPosMtxImm(f32* mtx, s32 a);                               // 0x8024E280
+void   GXSetCurrentMtx(s32 a);                                         // 0x8024E328
 extern u8 lbl_8051E6A8[];          // 0x8051E6A8 (sound voices, 0x114 each)
 }
 
@@ -232,28 +232,28 @@ void fn_8020574C(void) {
     f32 mv[12];
     f32 proj[16];
 
-    fn_8024A7E4();
-    fn_8024A818(4, 9, 0, 4, 0);
-    fn_8024A818(4, 0xB, 0, 1, 0);
-    fn_8024A3A4(9, 1);
-    fn_8024A3A4(0xB, 1);
-    fn_8024C2F0(1);
-    fn_8024AE74(0);
+    GXClearVtxDesc();
+    GXSetVtxAttrFmt(4, 9, 0, 4, 0);
+    GXSetVtxAttrFmt(4, 0xB, 0, 1, 0);
+    GXSetVtxDesc(9, 1);
+    GXSetVtxDesc(0xB, 1);
+    GXSetNumChans(1);
+    GXSetNumTexGens(0);
     fn_8024DB64(1);
     fn_8024DA08(0, 0xFF, 0xFF, 4);
     fn_8024D508(0, 4);
-    fn_8024DED8(0, 0, 0, 0);
-    fn_8024DF80(1, 3, 1);
-    fn_8024E328(3);
+    GXSetBlendMode(0, 0, 0, 0);
+    GXSetZMode(1, 3, 1);
+    GXSetCurrentMtx(3);
     fn_80248050(mv);
-    fn_8024E280(mv, 3);
-    fn_8024BB64(0);
+    GXLoadPosMtxImm(mv, 3);
+    GXSetCullMode(0);
     if (SCGetAspectRatio() == 1) {
-        fn_8024849C(proj, 0.0f, 480.0f, 0.0f, 640.0f, 0.0f, 500.0f);
+        C_MTXOrtho(proj, 0.0f, 480.0f, 0.0f, 640.0f, 0.0f, 500.0f);
     } else {
-        fn_8024849C(proj, 0.0f, 480.0f, 0.0f, 640.0f, 0.0f, 500.0f);
+        C_MTXOrtho(proj, 0.0f, 480.0f, 0.0f, 640.0f, 0.0f, 500.0f);
     }
-    fn_8024E1D0(proj, 1);
+    GXSetProjection(proj, 1);
 }
 
 }  // extern "C"

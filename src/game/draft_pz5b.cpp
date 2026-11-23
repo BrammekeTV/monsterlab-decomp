@@ -22,7 +22,7 @@ s32   fn_801A1238(u8* obj, f32* colors);                         // 0x801A1238 (
 s32   fn_801DA780(u8* a3);                                       // 0x801DA780
 u8*   fn_801DA788(u8* a3, s32 i);                                // 0x801DA788
 s32   fn_80338A2C(const char* a, const char* b, u32 n);          // 0x80338A2C (strncmp)
-s32   fn_802737A8(s32 chan, s32 a, void* cb);                    // 0x802737A8
+s32   WPADControlSpeaker(s32 chan, s32 a, void* cb);                    // 0x802737A8
 void  fn_80202E24(s32 chan, s32 result);                         // 0x80202E24
 s32   InterpolateQuaternionTask_Update_SLERP(u8* task, void* arg); // 0x801EA7F8
 s32   InterpolateVector3Task_Update_LERP(u8* task, void* arg);     // 0x801EA134
@@ -232,7 +232,7 @@ u8* fn_8016056C(u8* table, s32 handle, f32* v) {
 
 // 0x80202EFC
 // Pad connect result callback: result 0 resets the channel record (state 1 -> 2) and requests the
-// next step via fn_802737A8; any other result except -1 queues a deferred retry (lbl_805FBAC8..D0).
+// next step via WPADControlSpeaker; any other result except -1 queues a deferred retry (lbl_805FBAC8..D0).
 void fn_80202EFC(s32 chan, s32 result) {
     if (result == 0) {
         u8* rec = lbl_8051E680 + chan * 0x28;
@@ -240,7 +240,7 @@ void fn_80202EFC(s32 chan, s32 result) {
             *(u8*)rec = 1;
             *(s32*)(rec + 0x24) = 2;
             memset(rec + 1, 0, 0x20);
-            fn_802737A8(chan, 4, (void*)fn_80202E24);
+            WPADControlSpeaker(chan, 4, (void*)fn_80202E24);
         }
     } else if (result != -1) {
         lbl_805FBAC8 = 5;

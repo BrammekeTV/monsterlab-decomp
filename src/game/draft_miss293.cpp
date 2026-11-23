@@ -11,7 +11,7 @@ s32   OSSignalSemaphore(OSSemaphore* sem);
 s32   OSWaitSemaphore(OSSemaphore* sem);
 void  fn_80146B18(void);                                                             // 0x80146B18 (read-done callback)
 void  fn_8015A5A4(u8* p, const char* name);                                          // 0x8015A5A4
-void  fn_8023D3C8(s32 hi, u32 lo);                                                   // 0x8023D3C8 (sleep ticks)
+void  OSSleepTicks(s32 hi, u32 lo);                                                   // 0x8023D3C8 (sleep ticks)
 
 extern u8  lbl_805FB470[];     // 0x805FB470 (function-pointer slot, called with 0 when the disc needs attention)
 extern u8  lbl_805FB47C[];     // 0x805FB47C (s32: async read pending)
@@ -58,7 +58,7 @@ u32 fn_80146B28(u8* fileInfo, u8* buf, u32 size, u32 offset) {
         {
             // OSMicrosecondsToTicks(5000)
             u64 ticks = (u64)(OSGetBusClock() / 4 / 125000) * 5000 / 8;
-            fn_8023D3C8((s32)(ticks >> 32), (u32)ticks);
+            OSSleepTicks((s32)(ticks >> 32), (u32)ticks);
         }
     }
     return *(u32*)lbl_805FB480;

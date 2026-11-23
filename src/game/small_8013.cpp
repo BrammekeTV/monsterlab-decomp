@@ -10,8 +10,8 @@ extern "C" {
 
 extern "C" {
 void  operator_delete(void* p);                                  // 0x801D426C
-void  fn_8023A5B0(u8* p);                                        // 0x8023A5B0
-void  fn_8023A68C(u8* p);                                        // 0x8023A68C
+void  OSLockMutex(u8* p);                                        // 0x8023A5B0
+void  OSUnlockMutex(u8* p);                                        // 0x8023A68C
 void  fn_801F5714(s32 flags);                                    // 0x801F5714
 void  fn_801F5734(void* arg);                                    // 0x801F5734
 void  fn_801F51DC(s32 flag);                                     // 0x801F51DC
@@ -127,13 +127,13 @@ void fn_801399AC(void) {
 // Under the lock at lbl_80556AC8: sends a flow signal, and sets the flag at +0xB1 of the
 // object at lbl_805FB964 to 1 when that flag is non-zero.
 void fn_8013A03C(void) {
-    fn_8023A5B0(lbl_80556AC8);
+    OSLockMutex(lbl_80556AC8);
     GameFlowSignal((s32)0xE2C48A06, 0, 0);
     u8* obj = lbl_805FB964;
     if (obj != 0 && obj[0xB1] != 0) {
         obj[0xB1] = 1;
     }
-    fn_8023A68C(lbl_80556AC8);
+    OSUnlockMutex(lbl_80556AC8);
 }
 
 // 0x8013B434
@@ -222,12 +222,12 @@ void AggressorDeclined(void) {
 // Under the lock at lbl_80556AB0 (with the nesting counter bumped), reports whether the list
 // at lbl_80556E80+0x40 is full: fn_802E64A0 returns its count, full when that is 0x40.
 u32 IsListFull(void) {
-    fn_8023A5B0(lbl_80556AB0);
+    OSLockMutex(lbl_80556AB0);
     s32 count = lbl_805FBB48;
     lbl_805FBB48 = count + 1;
     s32 n = fn_802E64A0(lbl_80556E80 + 0x40, 0x40);
     u32 full = (n == 0x40) ? 1 : 0;
-    fn_8023A68C(lbl_80556AB0);
+    OSUnlockMutex(lbl_80556AB0);
     lbl_805FBB48 = lbl_805FBB48 - 1;
     return full;
 }

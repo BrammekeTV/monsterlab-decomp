@@ -161,3 +161,34 @@ Notes:
 - The GX setters write through `lis rX, 0xCC01` + `stb 0x61` at `-0x8000(rX)`, i.e. the write-gather pipe at 0xCC008000.
 - Several GX and OS functions in the same ranges were checked and left as `fn_` (e.g. 0x8023D500, 0x8023D3C8, the TEV swap and indirect setters at 0x8024D7EC-0x8024D944, 0x8024DF28-0x8024E08C), because their asm did not identify them.
 - Round 2 is well short of the 100 target: most of the OS (~800 unnamed functions in 0x80232C5C-0x8026FFFF), VI and GX functions have no direct evidence yet (no banner strings, few asserts). Next steps: identify the GX setters with the callers in the game range, and OS thread/message-queue functions via their callers.
+
+## Signature matches (`tools/sig_match.py`)
+
+484 more functions are named by matching `main.dol` against object code compiled from the public
+[doldecomp/ogws](https://github.com/doldecomp/ogws) source (CC0-1.0; RVL SDK, MSL, MetroTRK, runtime),
+built with Metrowerks `GC/3.0a5.2`. `ogws` is Wii Sports (2006 SDK), so only code that did not change
+by 2008 matches; the rest stays `fn_`. The tool masks relocated fields (branch targets, `@ha/@l`,
+`@sda21`) in each object function, then requires an equal size and equal unmasked bits, a unique
+object function per DOL function and the reverse, no existing name, and call targets that do not
+contradict names already known. Sources and objects are not in the repo. Names are in
+`names_sdk.txt` under `# sigmatch <library>`; a trailing comment gives the source object file.
+Functions of 12 bytes or less are not matched. Static functions are named only when no other
+object has the same name.
+
+| Library | Names | | Library | Names |
+|---|---|---|---|---|
+| OS | 68 | | NWC24 | 13 |
+| BTE (Bluetooth stack) | 80 | | SC | 16 |
+| GX | 53 | | FS | 16 |
+| DVD | 36 | | IPC | 14 |
+| AX | 33 | | MSL | 12 |
+| WPAD | 32 | | VF | 9 |
+| NAND | 28 | | ARC | 8 |
+| WUD | 28 | | DSP | 7 |
+| MEM | 5 | | USB | 4 |
+| AI, EUART, EXI, runtime | 3 each | | SI, MTX, TPL | 2 each |
+| AXFX, DB, WENC, MetroTRK | 1 each | | | |
+
+Spot check: 20 random matches were compared with their callees; every call target the DOL
+already named agreed with the object's callee name, and a check over all matches found 304 such
+cross-calls and 0 disagreements.

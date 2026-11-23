@@ -46,11 +46,11 @@ u32 fn_801F38F8(u8* a3);                         // src/leaf
 void fn_801F5724(u32 button);                    // matchup.cpp
 void* fn_80209814(void* v);                      // small_801Dc.cpp
 s32 fn_80198014(u8* arg0, u8* font, const char* name);
-s32 fn_8023A578(u8* p);
-void fn_8023A5B0(u8* p);                         // small_8013.cpp
-void fn_8023A68C(u8* p);                         // small_8013.cpp
-s32 fn_8023A7C0(u8* p);
-void fn_8023D3C8(s32 hi, u32 lo);                // small_8014.cpp
+s32 OSInitMutex(u8* p);
+void OSLockMutex(u8* p);                         // small_8013.cpp
+void OSUnlockMutex(u8* p);                         // small_8013.cpp
+s32 OSTryLockMutex(u8* p);
+void OSSleepTicks(s32 hi, u32 lo);                // small_8014.cpp
 s32 fn_80207C5C(u8* arg0, s32 arg_sp0);         // thread entry of fn_8020832C (cast to OSThreadFunc)
 u8* fn_801ACB3C(u8* arg0, s32 arg1);            // destructor registered by fn_801ACB7C
 void __register_global_object(void* obj, void (*dtor)(void*), void* handle);  // small_801Db.cpp
@@ -303,9 +303,9 @@ s32 fn_8020821C(u8* arg0, u8* dst, u32* outSize) {
     }
     u32 slotOff = (u32)(((s32)lbl_805F9918 - (s32)lbl_805FBB44 + 1) % 129) << 10;
     u8* rec = lbl_80536280 + slotOff;
-    fn_8023A5B0(lbl_80556A80);
+    OSLockMutex(lbl_80556A80);
     lbl_805FBB44 = (u16)(lbl_805FBB44 - 1);
-    fn_8023A68C(lbl_80556A80);
+    OSUnlockMutex(lbl_80556A80);
     u32 len = *(u32*)(rec + 0x10);
     if (len > 0x400u) {
         return -2;
@@ -335,14 +335,14 @@ void fn_8020832C(u8* arg0) {
     *(u8*)(arg0 + 0xB0) = 0;
     *(u8*)(arg0 + 0xB1) = 0;
     if (lbl_805FBB35 == 0) {
-        fn_8023A578(base + 0x818);
-        fn_8023A578(base + 0x800);
-        fn_8023A578(base + 0x830);
-        fn_8023A578(base + 0x848);
+        OSInitMutex(base + 0x818);
+        OSInitMutex(base + 0x800);
+        OSInitMutex(base + 0x830);
+        OSInitMutex(base + 0x848);
         lbl_805FBB35 = 1;
     }
     lbl_805FBB6C = 1;
-    fn_8023A5B0(base + 0x830);
+    OSLockMutex(base + 0x830);
     if (lbl_805FBB48 < 0) {
         lbl_805FBB48 = 0;
     }
@@ -356,18 +356,18 @@ void fn_8020832C(u8* arg0) {
 // Per-frame step for the connection lock lbl_80556AB0: while the lock is free and the
 // counter at +0xB4 is positive it spins (at most 1000 iterations) and then sets the flag at +0xB0.
 void fn_8020890C(u8* arg0) {
-    if (fn_8023A7C0(lbl_80556AB0) == 0) {
+    if (OSTryLockMutex(lbl_80556AB0) == 0) {
         if (*(u8*)(arg0 + 0xB0) == 0) {
             s32 spin = 0;
             for (;;) {
                 u32 ticks = *(u32*)0x800000F8;
                 u32 hi = (u32)(((unsigned long long)(ticks >> 2) * 0x10624DD3ull) >> 32);
-                fn_8023D3C8(0, hi >> 6);
-                if (fn_8023A7C0(lbl_80556AB0) != 0) {
+                OSSleepTicks(0, hi >> 6);
+                if (OSTryLockMutex(lbl_80556AB0) != 0) {
                     break;
                 }
                 if (*(s32*)(arg0 + 0xB4) <= 0) {
-                    fn_8023A5B0(lbl_80556AB0);
+                    OSLockMutex(lbl_80556AB0);
                     break;
                 }
                 spin += 1;
@@ -376,7 +376,7 @@ void fn_8020890C(u8* arg0) {
                 }
             }
             if (spin >= 0x3E8) {
-                fn_8023A5B0(lbl_80556AC8);
+                OSLockMutex(lbl_80556AC8);
                 *(u8*)(arg0 + 0xB0) = 1;
                 lbl_805FBB6C = 0;
                 if (lbl_805FB378 == 0) {
@@ -384,7 +384,7 @@ void fn_8020890C(u8* arg0) {
                 }
             }
         } else if (*(s32*)(arg0 + 0xB4) <= 0) {
-            fn_8023A5B0(lbl_80556AB0);
+            OSLockMutex(lbl_80556AB0);
             *(u8*)(arg0 + 0xB0) = 0;
         }
     } else if (*(u8*)(arg0 + 0xB0) != 0) {

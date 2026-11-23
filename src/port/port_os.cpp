@@ -270,7 +270,7 @@ u32 OSGetTick(void) { return (u32)OSGetTime(); }
 
 // OSSleepTicks (64-bit tick count in two words): the SDK sets an alarm and sleeps the thread
 // until it fires. Here the thread waits on the clock, which lets the interrupts in.
-void fn_8023D3C8(s32 hi, u32 lo) {
+void OSSleepTicks(s32 hi, u32 lo) {
     OSTime end = OSGetTime() + (((OSTime)hi << 32) | lo);
     while (OSGetTime() < end) Sleep(1);
 }
@@ -358,7 +358,7 @@ static DWORD WINAPI ThreadEntry(void* p) {
 }
 
 // OSIsThreadTerminated: 1 when the thread has ended or was never created (state 8 or 0 in the SDK).
-s32 fn_8023C168(OSThread* thread) {
+s32 OSIsThreadTerminated(OSThread* thread) {
     PortThread* pt = FindThread(thread, FALSE);
     return (!pt || pt->done) ? 1 : 0;
 }

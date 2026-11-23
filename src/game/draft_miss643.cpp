@@ -27,7 +27,7 @@ void fn_8009875C(u8* obj, f32* color);                                          
 u8* fn_801ABF0C(u8* table, u32 hash, u8* key);                                               // 0x801ABF0C
 u8* fn_801AC024(u8* table, u32 hash, u8* key, u8* prev);                                     // 0x801AC024
 void fn_801ACBEC(void* p, f32 dt);                                                           // 0x801ACBEC
-f64 fn_8033ED6C(f64 x);                                                                      // 0x8033ED6C (floor)
+f64 floor(f64 x);                                                                      // 0x8033ED6C (floor)
 f64 fn_8033F1F4(f64 x);                                                                      // 0x8033F1F4 (acos)
 
 extern s32 gScreenHeight;      // 0x805F938C
@@ -543,7 +543,7 @@ void fn_80096038(u8* p, f32 dt) {
     f32 tm = *(f32*)(p + 0x378) + dt;
     *(f32*)(p + 0x378) = tm;
     f32 step = (one / (one + (lbl_805FDB88 * (one - (*(f32*)(p + 0x358) / lbl_805FDB3C))))) * lbl_805FDB74;
-    s32 n = (s32)(f32)fn_8033ED6C((f64)(tm / step));
+    s32 n = (s32)(f32)floor((f64)(tm / step));
     if (n > 0) {
         s32 head = (*(s32*)(p + 0x37C) + n) % 8;
         *(f32*)(p + 0x378) = lbl_805FDB28;

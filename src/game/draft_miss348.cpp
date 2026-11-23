@@ -30,17 +30,17 @@ void  fn_80203ABC(u8* audio, u8* state);                           // 0x80203ABC
 void  fn_80203DE8(u8* audio, u8* state);                           // 0x80203DE8
 void fn_802044C0(u8* tex, u32 color, f32 x0, f32 x1, f32 y0, f32 y1, f32 u0, f32 u1, f32 v0, f32 v1);                                           // 0x802044C0
 s32   fn_802097CC(u8* obj, f32* a, f32* b, f32* c, f32 t);         // 0x802097CC (vcall slot 0x54)
-void  fn_80234394(u8* alarm, u32 a, OSTime start, OSTime period, void* handler, u32 extra); // 0x80234394
-void  fn_8024849C(f32* mtx, f32 a, f32 b, f32 c, f32 d, f32 e, f32 f);  // 0x8024849C
-void  fn_8024A3A4(s32 a, s32 b);                                   // 0x8024A3A4
-void  fn_8024A7E4(void);                                           // 0x8024A7E4
-void  fn_8024A818(s32 a, s32 b, s32 c, s32 d, s32 e);             // 0x8024A818
-void  fn_8024AC4C(s32 coord, s32 func, s32 src, s32 mtx, s32 normalize, s32 postMtx);  // 0x8024AC4C
-void  fn_8024AE74(s32 a);                                          // 0x8024AE74
-void  fn_8024B974(s32 a, s32 b, s32 c);                            // 0x8024B974
+void  OSSetPeriodicAlarm(u8* alarm, u32 a, OSTime start, OSTime period, void* handler, u32 extra); // 0x80234394
+void  C_MTXOrtho(f32* mtx, f32 a, f32 b, f32 c, f32 d, f32 e, f32 f);  // 0x8024849C
+void  GXSetVtxDesc(s32 a, s32 b);                                   // 0x8024A3A4
+void  GXClearVtxDesc(void);                                           // 0x8024A7E4
+void  GXSetVtxAttrFmt(s32 a, s32 b, s32 c, s32 d, s32 e);             // 0x8024A818
+void  GXSetTexCoordGen2(s32 coord, s32 func, s32 src, s32 mtx, s32 normalize, s32 postMtx);  // 0x8024AC4C
+void  GXSetNumTexGens(s32 a);                                          // 0x8024AE74
+void  GXBegin(s32 a, s32 b, s32 c);                            // 0x8024B974
 void  fn_8024BDD4(u32 aa, u8* pattern, s32 vf, u8* vfilter);       // 0x8024BDD4: GXSetCopyFilter
-void  fn_8024C2F0(s32 a);                                          // 0x8024C2F0
-void  fn_8024C314(s32 chan, s32 enable, s32 ambSrc, s32 matSrc, s32 lightMask, s32 diffFn, s32 attnFn);  // 0x8024C314
+void  GXSetNumChans(s32 a);                                          // 0x8024C2F0
+void  GXSetChanCtrl(s32 chan, s32 enable, s32 ambSrc, s32 matSrc, s32 lightMask, s32 diffFn, s32 attnFn);  // 0x8024C314
 void  GXInitTexObjCI(u8* obj, void* image, s32 w, s32 h, s32 fmt, s32 wrapS, s32 wrapT, s32 mip, s32 extra);  // 0x8024C5C4 (9th arg on the stack)
 void  GXLoadTexObj(u8* obj, s32 id);                                // 0x8024C91C
 void  fn_8024C970(u8* obj, void* lut, s32 fmt, s32 n);             // 0x8024C970
@@ -52,15 +52,15 @@ void  fn_8024D674(s32 a, s32 b, s32 c, s32 d, s32 e, s32 f);      // 0x8024D674
 void  fn_8024D6CC(s32 id, u32* color);                             // 0x8024D6CC (reads the packed RGBA word)
 void  fn_8024DA08(s32 a, s32 b, s32 c, s32 d);                    // 0x8024DA08
 void  fn_8024DB64(s32 a);                                          // 0x8024DB64
-void  fn_8024DED8(s32 a, s32 b, s32 c, s32 d);                    // 0x8024DED8
-void  fn_8024DF80(s32 a, s32 b, s32 c);                            // 0x8024DF80
-void  fn_8024E1D0(f32* mtx, s32 a);                                // 0x8024E1D0
-void  fn_8024E328(s32 a);                                          // 0x8024E328
+void  GXSetBlendMode(s32 a, s32 b, s32 c, s32 d);                    // 0x8024DED8
+void  GXSetZMode(s32 a, s32 b, s32 c);                            // 0x8024DF80
+void  GXSetProjection(f32* mtx, s32 a);                                // 0x8024E1D0
+void  GXSetCurrentMtx(s32 a);                                          // 0x8024E328
 s32   DVDOpen(char* path, u8* p);                              // 0x8024F1E8
 void  fn_80264420(u8* p);                                          // 0x80264420
 s32   fn_80264A24(u8* list, u8* item);                             // 0x80264A24 (unlink item from list)
 s32   WPADProbe(s32 chan, u32* out);                             // 0x802728A4
-s32   fn_802737A8(s32 chan, s32 a, void* cb);                      // 0x802737A8
+s32   WPADControlSpeaker(s32 chan, s32 a, void* cb);                      // 0x802737A8
 f64   fn_8033F204(f64 x);                                          // 0x8033F204 (natural log)
 f64   fn_8033F20C(f64 x, f64 y);                                   // 0x8033F20C (pow)
 
@@ -199,17 +199,17 @@ void fn_801FC70C(void) {
     if (lbl_805FBA7C == 0) return;
     fn_8015D660();
     fn_8024BDD4(0, NULL, 0, NULL);
-    fn_8024849C(sp48, 0.0f, (f32)gScreenHeight, 0.0f, (f32)gScreenWidth, 0.0f, 500.0f);
-    fn_8024E1D0(sp48, 1);
-    fn_8024A7E4();
-    fn_8024A818(5, 9, 0, 3, 0);
-    fn_8024A818(5, 0xD, 1, 3, 0);
-    fn_8024A3A4(9, 1);
-    fn_8024A3A4(0xD, 1);
-    fn_8024C2F0(1);
-    fn_8024C314(4, 0, 1, 1, 0, 0, 2);
-    fn_8024AE74(1);
-    fn_8024AC4C(0, 1, 4, 0x3C, 0, 0x7D);
+    C_MTXOrtho(sp48, 0.0f, (f32)gScreenHeight, 0.0f, (f32)gScreenWidth, 0.0f, 500.0f);
+    GXSetProjection(sp48, 1);
+    GXClearVtxDesc();
+    GXSetVtxAttrFmt(5, 9, 0, 3, 0);
+    GXSetVtxAttrFmt(5, 0xD, 1, 3, 0);
+    GXSetVtxDesc(9, 1);
+    GXSetVtxDesc(0xD, 1);
+    GXSetNumChans(1);
+    GXSetChanCtrl(4, 0, 1, 1, 0, 0, 2);
+    GXSetNumTexGens(1);
+    GXSetTexCoordGen2(0, 1, 4, 0x3C, 0, 0x7D);
     fn_8024DB64(1);
     sp10[0] = lbl_80600300;
     sp10[1] = lbl_80600301;
@@ -222,15 +222,15 @@ void fn_801FC70C(void) {
     fn_8024D61C(0, 0, 0, 0, 1, 0);
     fn_8024D5DC(0, 7, 1, 4, 7);
     fn_8024D674(0, 0, 0, 0, 1, 0);
-    fn_8024DED8(1, 4, 5, 0);
-    fn_8024DF80(0, 3, 0);
-    fn_8024E328(3);
+    GXSetBlendMode(1, 4, 5, 0);
+    GXSetZMode(0, 3, 0);
+    GXSetCurrentMtx(3);
     u8* t = lbl_805FBA78;
     fn_8024C970(sp18, *(void**)(t + 0x20), *(u8*)(t + 0x15), 0x10);
     fn_8024C998(sp18, 0);
     GXInitTexObjCI(sp28, *(void**)(t + 0x1C), *(u16*)(t + 0x4), *(u16*)(t + 0x6), *(u8*)(t + 0x14), 0, 0, 0, 0);
     GXLoadTexObj(sp28, 0);
-    fn_8024B974(0x80, 4, 4);
+    GXBegin(0x80, 4, 4);
     GXWGFifo._f32 = lbl_804FDA40[0];
     GXWGFifo._f32 = lbl_804FDA40[1];
     GXWGFifo._f32 = 0.0f;
@@ -583,7 +583,7 @@ void fn_80203220(void) {
         if (*(s32*)(lbl_8051E680 + 0x24) == 6) {
             *(s32*)(lbl_8051E680 + 0x24) = 0;
             *(s32*)(lbl_8051E680 + 0x24) = 1;
-            fn_802737A8(0, 1, (void*)fn_80202EFC);
+            WPADControlSpeaker(0, 1, (void*)fn_80202EFC);
         }
     } else if (r != -1) {
         err = 1;
@@ -595,7 +595,7 @@ void fn_80203220(void) {
             u32 timer = OSGetBusClock() >> 2;
             u32 ms = (u32)(((u64)0x431BDE83u * timer) >> 32) >> 15;
             u32 period = (u32)(((u64)0x10624DD3u * (u32)(ms * 0x65B9ABu)) >> 32) >> 9;
-            fn_80234394(lbl_8051E600, ms, now, (OSTime)period, (void*)fn_80202CAC, 0x10624DD3u);
+            OSSetPeriodicAlarm(lbl_8051E600, ms, now, (OSTime)period, (void*)fn_80202CAC, 0x10624DD3u);
             lbl_805FBAB8 = 1;
         }
     } else {

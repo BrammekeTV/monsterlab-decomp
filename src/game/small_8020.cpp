@@ -10,9 +10,9 @@ void  fn_802B4140(void* fn, s32* args);                          // 0x802B4140
 void  fn_802B7DDC(void);                                         // 0x802B7DDC
 void  fn_802BE220(void* h);                                      // 0x802BE220
 s32   GXReadDrawSync(void);                                         // 0x8024B34C
-s32   fn_80266E24(u8* buf);                                      // 0x80266E24
-void  fn_8023A5B0(u8* p);                                        // 0x8023A5B0
-void  fn_8023A68C(u8* p);                                        // 0x8023A68C
+s32   NANDClose(u8* buf);                                      // 0x80266E24
+void  OSLockMutex(u8* p);                                        // 0x8023A5B0
+void  OSUnlockMutex(u8* p);                                        // 0x8023A68C
 void  fn_801EF070(u8* obj, s32 v);                               // 0x801EF070
 void* fn_801EF6E8(u8* obj, s32 a, s32 v);                        // 0x801EF6E8
 void  fn_802E9C94(void* fn, s32 arg);                            // 0x802E9C94
@@ -157,7 +157,7 @@ u8* fn_80206434(u8* p, s32 del) {
 // Closes the save file. Returns 0 on success, or -1 if the close call fails (buffer is cleared on success).
 s32 SaveClose(s32 handle) {
     (void)handle;
-    s32 r = fn_80266E24(lbl_80527140);
+    s32 r = NANDClose(lbl_80527140);
     if (r != 0) return -1;
     memset(lbl_80527140, 0, 0x8c);
     return 0;
@@ -168,9 +168,9 @@ s32 SaveClose(s32 handle) {
 void fn_802077B8(void* unused, s32 value) {
     (void)unused;
     if (value != 0) {
-        fn_8023A5B0(lbl_80556A98);
+        OSLockMutex(lbl_80556A98);
         fn_801EF070(lbl_80556AE0, value);
-        fn_8023A68C(lbl_80556A98);
+        OSUnlockMutex(lbl_80556A98);
     }
 }
 
@@ -179,9 +179,9 @@ void fn_802077B8(void* unused, s32 value) {
 // Returns the call's result.
 void* fn_80207814(void* unused, s32 value) {
     (void)unused;
-    fn_8023A5B0(lbl_80556A98);
+    OSLockMutex(lbl_80556A98);
     void* r = fn_801EF6E8(lbl_80556AE0, 0x20, value);
-    fn_8023A68C(lbl_80556A98);
+    OSUnlockMutex(lbl_80556A98);
     if (r == NULL) OSReport(lbl_80387380);
     return r;
 }
@@ -191,9 +191,9 @@ void* fn_80207814(void* unused, s32 value) {
 void fn_8020788C(void* unused, s32 value) {
     (void)unused;
     if (value != 0) {
-        fn_8023A5B0(lbl_80556A98);
+        OSLockMutex(lbl_80556A98);
         fn_801EF070(lbl_80556AE0, value);
-        fn_8023A68C(lbl_80556A98);
+        OSUnlockMutex(lbl_80556A98);
     }
 }
 

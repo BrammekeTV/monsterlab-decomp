@@ -51,8 +51,8 @@ void* ScreenSetFindWidget(void* set, u32 hash);                   // 0x80198E34
 void  FriendListHideFloaty(s32 a);
 void  fn_8013AFF0(void);                                          // 0x8013AFF0
 s32   fn_802E64A0(u8* p, s32 n);                                  // 0x802E64A0
-void  fn_8023A5B0(u8* p);                                         // 0x8023A5B0
-void  fn_8023A68C(u8* p);                                         // 0x8023A68C
+void  OSLockMutex(u8* p);                                         // 0x8023A5B0
+void  OSUnlockMutex(u8* p);                                         // 0x8023A68C
 int   strcmp(const char* a, const char* b);
 extern s32  lbl_803F0E30[];         // 0x803F0E30 (friend display order, 64 entries)
 extern u32  lbl_803F0F30[];         // 0x803F0F30 (per-friend flags/sort keys)
@@ -785,10 +785,10 @@ void RendEndFrame(void) {
 
 // Number of valid friend records (counted under the friend-list lock).
 static s32 FriendListCount(void) {
-    fn_8023A5B0(lbl_80556AB0);
+    OSLockMutex(lbl_80556AB0);
     lbl_805FBB48 += 1;
     s32 n = fn_802E64A0(lbl_80556E80 + 0x40, 0x40);
-    fn_8023A68C(lbl_80556AB0);
+    OSUnlockMutex(lbl_80556AB0);
     lbl_805FBB48 -= 1;
     return n;
 }

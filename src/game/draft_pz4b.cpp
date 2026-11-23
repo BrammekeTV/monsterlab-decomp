@@ -19,37 +19,37 @@ void  fn_8019F4C8(u8* el);                                          // 0x8019F4C
 s32   fn_801FB254(u32 type, f32* out);                              // 0x801FB254
 s32   fn_80244950(void);                                            // 0x80244950
 void  fn_80248050(f32* mtx);                                        // 0x80248050
-void  fn_8024849C(f32* mtx, f32 a, f32 b, f32 c, f32 d, f32 e, f32 f);   // 0x8024849C
-void  fn_8024A3A4(s32 a, s32 b);                                    // 0x8024A3A4
-void  fn_8024A7E4(void);                                            // 0x8024A7E4
-void  fn_8024A818(s32 a, s32 b, s32 c, s32 d, s32 e);              // 0x8024A818
-void  fn_8024AE74(s32 a);                                           // 0x8024AE74
+void  C_MTXOrtho(f32* mtx, f32 a, f32 b, f32 c, f32 d, f32 e, f32 f);   // 0x8024849C
+void  GXSetVtxDesc(s32 a, s32 b);                                    // 0x8024A3A4
+void  GXClearVtxDesc(void);                                            // 0x8024A7E4
+void  GXSetVtxAttrFmt(s32 a, s32 b, s32 c, s32 d, s32 e);              // 0x8024A818
+void  GXSetNumTexGens(s32 a);                                           // 0x8024AE74
 s32   fn_8024B358(void);                                            // 0x8024B358
-void  fn_8024BB64(s32 a);                                           // 0x8024BB64
+void  GXSetCullMode(s32 a);                                           // 0x8024BB64
 void  fn_8024BFCC(void* fb, s32 clear);                             // 0x8024BFCC
-void  fn_8024C2F0(s32 a);                                           // 0x8024C2F0
+void  GXSetNumChans(s32 a);                                           // 0x8024C2F0
 void  fn_8024D508(s32 a, s32 b);                                    // 0x8024D508
 void  fn_8024DA08(s32 a, s32 b, s32 c, s32 d);                      // 0x8024DA08
 void  fn_8024DB64(s32 a);                                           // 0x8024DB64
-void  fn_8024DED8(s32 a, s32 b, s32 c, s32 d);                      // 0x8024DED8
-void  fn_8024DF28(s32 a);                                           // 0x8024DF28
-void  fn_8024DF80(s32 a, s32 b, s32 c);                             // 0x8024DF80
-void  fn_8024E1D0(f32* mtx, s32 a);                                 // 0x8024E1D0
-void  fn_8024E280(f32* mtx, s32 a);                                 // 0x8024E280
-void  fn_8024E328(s32 a);                                           // 0x8024E328
-s32   fn_80259B70(s32 a, u8* buf, s32 len);                         // 0x80259B70
-s32   fn_80259C34(s32 a);                                           // 0x80259C34
+void  GXSetBlendMode(s32 a, s32 b, s32 c, s32 d);                      // 0x8024DED8
+void  GXSetColorUpdate(s32 a);                                           // 0x8024DF28
+void  GXSetZMode(s32 a, s32 b, s32 c);                             // 0x8024DF80
+void  GXSetProjection(f32* mtx, s32 a);                                 // 0x8024E1D0
+void  GXLoadPosMtxImm(f32* mtx, s32 a);                                 // 0x8024E280
+void  GXSetCurrentMtx(s32 a);                                           // 0x8024E328
+s32   AXRmtGetSamples(s32 a, u8* buf, s32 len);                         // 0x80259B70
+s32   AXRmtAdvancePtr(s32 a);                                           // 0x80259C34
 void  fn_8025B4C0(u8* p);                                           // 0x8025B4C0
 void  fn_8025C36C(u8* p);                                           // 0x8025C36C
 void  fn_8025D2E0(u8* p);                                           // 0x8025D2E0
 void  fn_8025DC3C(u8* p);                                           // 0x8025DC3C
 void  fn_8025E3E4(u8* p);                                           // 0x8025E3E4
 void  fn_8025EE54(u8* p);                                           // 0x8025EE54
-void  fn_8026B174(u8* dst, s32 a, u8* src, s32 len, u8* out);       // 0x8026B174
+void  WENCGetEncodeData(u8* dst, s32 a, u8* src, s32 len, u8* out);       // 0x8026B174
 s32   WPADProbe(s32 chan, u32* out);                              // 0x802728A4
-s32   fn_802737A8(s32 a, s32 b, s32 c);                             // 0x802737A8
-s32   fn_80274F80(s32 a);                                           // 0x80274F80
-s32   fn_80275004(s32 a, u8* buf, s32 len);                         // 0x80275004
+s32   WPADControlSpeaker(s32 a, s32 b, s32 c);                             // 0x802737A8
+s32   WPADCanSendStreamData(s32 a);                                           // 0x80274F80
+s32   WPADSendStreamData(s32 a, u8* buf, s32 len);                         // 0x80275004
 s32   KPADRead(s32 chan, u8* buf, s32 len);                      // 0x8027F504
 
 extern u8   lbl_804FB8A0[];       // 0x804FB8A0 (4 pad records of 0x10: buf ptr, x, y, status)
@@ -102,8 +102,8 @@ void fn_8015D5A4(void) {
     void* fb = lbl_805FB538[lbl_805FB518 & 1];
     fn_8015E74C(lbl_805FB594, lbl_805FB518, 0, 0, 0);  // r5 = &lbl_805FB538 (unused); r6/r7 stale
     lbl_805FB518 += 1;
-    fn_8024DF80(1, 3, 1);
-    fn_8024DF28(1);
+    GXSetZMode(1, 3, 1);
+    GXSetColorUpdate(1);
     fn_8024BFCC(fb, 1);
     fn_8024B358();
     OSWaitSemaphore(&gVideoDrawDone);
@@ -155,28 +155,28 @@ u8* fn_801AC024(u8* table, u32 hash, s32 key, u8* prev) {
 void fn_801FB10C(void) {
     f32 proj[16];
     f32 view[12];
-    fn_8024A7E4();
-    fn_8024A818(4, 9, 0, 4, 0);
-    fn_8024A818(4, 0xB, 0, 1, 0);
-    fn_8024A3A4(9, 1);
-    fn_8024A3A4(0xB, 1);
-    fn_8024C2F0(1);
-    fn_8024AE74(0);
+    GXClearVtxDesc();
+    GXSetVtxAttrFmt(4, 9, 0, 4, 0);
+    GXSetVtxAttrFmt(4, 0xB, 0, 1, 0);
+    GXSetVtxDesc(9, 1);
+    GXSetVtxDesc(0xB, 1);
+    GXSetNumChans(1);
+    GXSetNumTexGens(0);
     fn_8024DB64(1);
     fn_8024DA08(0, 0xFF, 0xFF, 4);
     fn_8024D508(0, 4);
-    fn_8024DED8(0, 0, 0, 0);
-    fn_8024DF80(1, 3, 1);
-    fn_8024E328(3);
+    GXSetBlendMode(0, 0, 0, 0);
+    GXSetZMode(1, 3, 1);
+    GXSetCurrentMtx(3);
     fn_80248050(view);
-    fn_8024E280(view, 3);
-    fn_8024BB64(0);
+    GXLoadPosMtxImm(view, 3);
+    GXSetCullMode(0);
     if (SCGetAspectRatio() == 1) {
-        fn_8024849C(proj, 228.0f, -228.0f, -416.0f, 416.0f, 0.0f, 500.0f);
+        C_MTXOrtho(proj, 228.0f, -228.0f, -416.0f, 416.0f, 0.0f, 500.0f);
     } else {
-        fn_8024849C(proj, 228.0f, -228.0f, -304.0f, 304.0f, 0.0f, 500.0f);
+        C_MTXOrtho(proj, 228.0f, -228.0f, -304.0f, 304.0f, 0.0f, 500.0f);
     }
-    fn_8024E1D0(proj, 1);
+    GXSetProjection(proj, 1);
 }
 
 // 0x801736EC
@@ -203,21 +203,21 @@ void fn_80202CAC(void) {
         if (lbl_805FBABC == 0) {
             s32 saved = lbl_805FBAE0;
             lbl_805FBAE0 = 1;
-            if (fn_802737A8(0, 2, 0) == 0) lbl_805FBAC0 = lbl_805FBABC;
+            if (WPADControlSpeaker(0, 2, 0) == 0) lbl_805FBAC0 = lbl_805FBABC;
             lbl_805FBAE0 = saved;
         } else if (lbl_805FBABC >= 1 && lbl_805FBAC0 == 0) {
             s32 saved = lbl_805FBAE0;
             lbl_805FBAE0 = 1;
-            if (fn_802737A8(0, 3, 0) == 0) lbl_805FBAC0 = lbl_805FBABC;
+            if (WPADControlSpeaker(0, 3, 0) == 0) lbl_805FBAC0 = lbl_805FBABC;
             lbl_805FBAE0 = saved;
         }
     }
-    if (fn_80259B70(0, lbl_8051E630, 0x28) == 0x28) {
+    if (AXRmtGetSamples(0, lbl_8051E630, 0x28) == 0x28) {
         did = 1;
         if (*(u8*)lbl_8051E680 != 0) {
             u8 sp8[0x14];
             s32 level = OSDisableInterrupts();
-            if (fn_80274F80(0) != 0) {
+            if (WPADCanSendStreamData(0) != 0) {
                 s32 st = *(s32*)(lbl_8051E680 + 0x24);
                 if (st == 3 || st == 4) {
                     s32 flag = 1;
@@ -225,14 +225,14 @@ void fn_80202CAC(void) {
                         *(s32*)(lbl_8051E680 + 0x24) = 4;
                         flag = 0;
                     }
-                    fn_8026B174(lbl_8051E680 + 1, flag, lbl_8051E630, 0x28, sp8);
-                    fn_80275004(0, sp8, 0x14);
+                    WENCGetEncodeData(lbl_8051E680 + 1, flag, lbl_8051E630, 0x28, sp8);
+                    WPADSendStreamData(0, sp8, 0x14);
                 }
             }
             OSRestoreInterrupts(level);
         }
     }
-    if (did != 0) fn_80259C34(0x28);
+    if (did != 0) AXRmtAdvancePtr(0x28);
 }
 
 // 0x80203E8C

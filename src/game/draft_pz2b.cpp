@@ -114,7 +114,7 @@ void fn_801FC038(u32 arg0) {
 
 // 0x801FD1F0
 // Tears down the audio resources, if the object at arg0 is flagged as active.
-// The original also has a branch that would call fn_802737A8 with a 5 stored into
+// The original also has a branch that would call WPADControlSpeaker with a 5 stored into
 // lbl_8051E680+0x24, but it tests the constant 0 and is never taken, so it is omitted.
 void fn_801FD1F0(void* arg0) {
     u8* self = (u8*)arg0;

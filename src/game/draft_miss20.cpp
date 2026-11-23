@@ -38,8 +38,8 @@ void* fn_801D40E0(s32 n);                                            // 0x801D40
 BOOL  fn_801F56FC(s32 flags);                                        // 0x801F56FC
 void  fn_801F5714(s32 flags);                                        // 0x801F5714
 void* fn_80209814(void* v);                                          // 0x80209814
-void  fn_8023A5B0(u8* p);                                            // 0x8023A5B0
-void  fn_8023A68C(u8* p);                                            // 0x8023A68C
+void  OSLockMutex(u8* p);                                            // 0x8023A5B0
+void  OSUnlockMutex(u8* p);                                            // 0x8023A68C
 void  fn_802E65C0(u8* rec);                                          // 0x802E65C0 (clears a 12-byte friend record)
 s32   fn_802E99C4(s32 a, void* cb1, s32 b, void* cb2, s32 c, void* cb3, s32 d);  // 0x802E99C4
 s32   fn_802FA554(u8* rec);                                          // 0x802FA554 (record is a buddy)
@@ -331,7 +331,7 @@ void FriendCodeInputVerify(void) {
         GameFlowSignal((s32)0x94B1685Fu, 0, 0);
         return;
     }
-    fn_8023A5B0(lbl_80556AB0);
+    OSLockMutex(lbl_80556AB0);
     lbl_805FBB48 += 1;
 
     u64 code;
@@ -343,7 +343,7 @@ void FriendCodeInputVerify(void) {
         for (s32 i = 0; i < 64; i++) {
             if (ReadCode(lbl_80556E80 + i * 0x20 + 0x340) == code) {
                 GameFlowSignal((s32)0xF719853Au, 0, 0);
-                fn_8023A68C(lbl_80556AB0);
+                OSUnlockMutex(lbl_80556AB0);
                 lbl_805FBB48 -= 1;
                 return;
             }
@@ -353,7 +353,7 @@ void FriendCodeInputVerify(void) {
         lbl_805FB348 = (s32)(u32)(code >> 32);
         GameFlowSignal((s32)0xD919921Eu, 0, 0);
     }
-    fn_8023A68C(lbl_80556AB0);
+    OSUnlockMutex(lbl_80556AB0);
     lbl_805FBB48 -= 1;
 }
 
@@ -361,7 +361,7 @@ void FriendCodeInputVerify(void) {
 // Deletes the selected friend: clears its record and name, saves the options, re-sorts the list
 // and, when a pending invite (+0x800 flag) is no longer from any listed friend, cancels it.
 void FriendListDelete(void) {
-    fn_8023A5B0(lbl_80556AB0);
+    OSLockMutex(lbl_80556AB0);
     u32 slot = lbl_803F0E30[lbl_805FB35C + lbl_805FB360];
     lbl_805FBB48 = lbl_805FBB48 + 1;
 
@@ -376,7 +376,7 @@ void FriendListDelete(void) {
     SaveManager_SaveOptions();
     fn_802E99C4(0, (void*)fn_8013A6F4, 0, (void*)fn_8013A0A4, 0, (void*)fn_8013A654, 0);
     FriendListSort(lbl_805F9028);
-    fn_8023A68C(lbl_80556AB0);
+    OSUnlockMutex(lbl_80556AB0);
     lbl_805FBB48 -= 1;
 
     if (fn_801F56FC(0x800) != 0) {
@@ -403,7 +403,7 @@ void FriendListDelete(void) {
 // Friends list init (skipped when the last alert is 0xF5F0817A): resets list state, builds the
 // player's own friend code as "XXXX-XXXX-XXXX", sets up the list scroller and sorts the list.
 void FriendListInit(void) {
-    fn_8023A5B0(lbl_80556AB0);
+    OSLockMutex(lbl_80556AB0);
     lbl_805FBB48 += 1;
     if (AlertGetLastError() != 0xF5F0817Au) {
         lbl_805FAE8C = 0;
@@ -433,7 +433,7 @@ void FriendListInit(void) {
         SetMPSection(0xF5F0817Au);
         SetHitBoxes(TRUE);
     }
-    fn_8023A68C(lbl_80556AB0);
+    OSUnlockMutex(lbl_80556AB0);
     lbl_805FBB48 -= 1;
 }
 
@@ -496,7 +496,7 @@ void FriendListShowFloaty(void) {
 void FriendsListAddFriend(void) {
     if (fn_80139FF0() == 0) return;
 
-    fn_8023A5B0(lbl_80556AB0);
+    OSLockMutex(lbl_80556AB0);
     lbl_805FBB48 += 1;
     u64 code = fn_8013A004();
     for (s32 i = 0; i < 64; i++) {
@@ -512,18 +512,18 @@ void FriendsListAddFriend(void) {
     }
     SaveManager_SaveOptions();
     fn_802E99C4(0, (void*)fn_8013A6F4, 0, (void*)fn_8013A0A4, 0, (void*)fn_8013A654, 0);
-    fn_8023A68C(lbl_80556AB0);
+    OSUnlockMutex(lbl_80556AB0);
     lbl_805FBB48 -= 1;
 }
 
 // 0x8013BCE8
 // Script callback (type 0x2E): true when the selected list entry is a buddy.
 ScriptValue FriendsListIsBuddy(void) {
-    fn_8023A5B0(lbl_80556AB0);
+    OSLockMutex(lbl_80556AB0);
     lbl_805FBB48 = lbl_805FBB48 + 1;
     u32 slot = lbl_803F0E30[lbl_805FB35C + lbl_805FB360];
     s32 buddy = fn_802FA554(lbl_80556E80 + slot * 0xC + 0x40) != 0;
-    fn_8023A68C(lbl_80556AB0);
+    OSUnlockMutex(lbl_80556AB0);
     lbl_805FBB48 -= 1;
     return (ScriptValue)buddy;
 }

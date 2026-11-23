@@ -82,7 +82,7 @@ void fn_80202FFC(s32 chan, s32 status);                                        /
 void   fn_802041F4(s32 a3);                                      // 0x802041F4 (read-done callback)
 s32    fn_80204210(u8* e);                                       // 0x80204210
 void   fn_80203E8C(void);                                        // 0x80203E8C
-void   fn_80234394(u8* alarm, u32 a, OSTime start, OSTime period, void* handler, u32 extra); // 0x80234394
+void   OSSetPeriodicAlarm(u8* alarm, u32 a, OSTime start, OSTime period, void* handler, u32 extra); // 0x80234394
 s32    DVDOpen(char* path, u8* p);                           // 0x8024F1E8
 void   DVDClose(u8* p);                                       // 0x8024F494
 s32    fn_80259418(s32 a);                                       // 0x80259418
@@ -92,7 +92,7 @@ s32    fn_80260AC4(s32 a);                                       // 0x80260AC4
 s32    fn_80263F18(void);                                        // 0x80263F18
 s32    fn_80264CC8(f32 a);                                       // 0x80264CC8
 s32    fn_80264CD0(f32 a);                                       // 0x80264CD0
-u8     fn_8026AC14(void);                                        // 0x8026AC14
+u8     SCGetSoundMode(void);                                        // 0x8026AC14
 void*  memcpy(void* d, const void* s, size_t n);
 void*  memset(void* p, int c, unsigned long n);
 void   operator_delete(void* p);                                 // 0x801D426C
@@ -681,7 +681,7 @@ void fn_801F6CC4(u8* obj, const f32* a, const f32* b) {
 // 0x801FCFB4
 // Audio bring-up on the audio object: once only (flag at +0x2AC), allocates the sound heap
 // and scratch buffer, resets the audio state block, initializes AI/AX, picks the output mode
-// from fn_8026AC14, installs callbacks, starts the periodic alarm and clears the object fields.
+// from SCGetSoundMode, installs callbacks, starts the periodic alarm and clears the object fields.
 void fn_801FCFB4(u8* audio) {
     s32 saved = lbl_805FBAE0;
     lbl_805FBAE0 = 1;
@@ -706,7 +706,7 @@ void fn_801FCFB4(u8* audio) {
     AXInit();
     fn_8026099C();
     fn_80263F18();
-    lbl_805FBA9C = fn_8026AC14();
+    lbl_805FBA9C = SCGetSoundMode();
     switch (lbl_805FBA9C) {
     case 0:
         fn_80259418(0);
@@ -735,7 +735,7 @@ void fn_801FCFB4(u8* audio) {
         u32 timer = OSGetBusClock() >> 2;
         u32 ms = (u32)(((u64)0x431BDE83u * timer) >> 32) >> 15;
         u32 period = (u32)(((u64)0x10624DD3u * (u32)(ms * 0x65B9ABu)) >> 32) >> 9;
-        fn_80234394(lbl_8051E600, ms, now, (OSTime)period, (void*)fn_80202CAC, 0x10624DD3u);
+        OSSetPeriodicAlarm(lbl_8051E600, ms, now, (OSTime)period, (void*)fn_80202CAC, 0x10624DD3u);
         lbl_805FBAB8 = 1;
     }
     fn_80147988((void*)fn_80202FFC);

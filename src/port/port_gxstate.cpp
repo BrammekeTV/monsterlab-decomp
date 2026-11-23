@@ -129,7 +129,7 @@ extern "C" {
 
 // ------------------------------------------------------------------ pixel pipeline
 // GXSetZMode(compare on, function, update on)
-void fn_8024DF80(s32 enable, s32 func, s32 update) {
+void GXSetZMode(s32 enable, s32 func, s32 update) {
     Init();
     u32 w = sh.zmode;
     w = Rlwimi(w, (u32)enable, 0, 31, 31);
@@ -139,7 +139,7 @@ void fn_8024DF80(s32 enable, s32 func, s32 update) {
     gPortGx.zEnable = (u8)enable; gPortGx.zFunc = (u8)func; gPortGx.zUpdate = (u8)update;
 }
 // GXSetBlendMode(type, source factor, destination factor, logic op)
-void fn_8024DED8(s32 type, s32 src, s32 dst, s32 op) {
+void GXSetBlendMode(s32 type, s32 src, s32 dst, s32 op) {
     Init();
     u32 w = sh.cmode0;
     w = Rlwimi(w, (u32)(type == 3), 11, 20, 20);            // subtract
@@ -152,15 +152,15 @@ void fn_8024DED8(s32 type, s32 src, s32 dst, s32 op) {
     gPortGx.blend[0] = (u8)type; gPortGx.blend[1] = (u8)src; gPortGx.blend[2] = (u8)dst; gPortGx.blend[3] = (u8)op;
 }
 // GXSetColorUpdate
-void fn_8024DF28(s32 on) { Init(); sh.cmode0 = Rlwimi(sh.cmode0, (u32)on, 3, 28, 28); Bp(sh.cmode0); gPortGx.colorUpdate = (u8)on; }
+void GXSetColorUpdate(s32 on) { Init(); sh.cmode0 = Rlwimi(sh.cmode0, (u32)on, 3, 28, 28); Bp(sh.cmode0); gPortGx.colorUpdate = (u8)on; }
 // GXSetAlphaUpdate
-void fn_8024DF54(s32 on) { Init(); sh.cmode0 = Rlwimi(sh.cmode0, (u32)on, 4, 27, 27); Bp(sh.cmode0); gPortGx.alphaUpdate = (u8)on; }
+void GXSetAlphaUpdate(s32 on) { Init(); sh.cmode0 = Rlwimi(sh.cmode0, (u32)on, 4, 27, 27); Bp(sh.cmode0); gPortGx.alphaUpdate = (u8)on; }
 // GXSetDither
-void fn_8024E08C(u32 on) { Init(); sh.cmode0 = Rlwimi(sh.cmode0, on, 2, 29, 29); Bp(sh.cmode0); gPortGx.dither = (u8)on; }
+void GXSetDither(u32 on) { Init(); sh.cmode0 = Rlwimi(sh.cmode0, on, 2, 29, 29); Bp(sh.cmode0); gPortGx.dither = (u8)on; }
 // GXSetZCompLoc(depth test before texturing)
-void fn_8024DFB4(s32 beforeTex) { Init(); sh.peCtrl = Rlwimi(sh.peCtrl, (u32)beforeTex, 6, 25, 25); Bp(sh.peCtrl); gPortGx.zCompBeforeTex = (u8)beforeTex; }
+void GXSetZCompLoc(s32 beforeTex) { Init(); sh.peCtrl = Rlwimi(sh.peCtrl, (u32)beforeTex, 6, 25, 25); Bp(sh.peCtrl); gPortGx.zCompBeforeTex = (u8)beforeTex; }
 // GXSetDstAlpha(on, alpha)
-void fn_8024E0B8(s32 enable, s32 alpha) {
+void GXSetDstAlpha(s32 enable, s32 alpha) {
     Init();
     u32 w = sh.cmode1;
     w = Rlwimi(w, (u32)alpha, 0, 24, 31);
@@ -169,7 +169,7 @@ void fn_8024E0B8(s32 enable, s32 alpha) {
     gPortGx.dstAlphaOn = (u8)enable; gPortGx.dstAlpha = (u8)alpha;
 }
 // GXSetPixelFmt(pixel format, z format). 0x80398550 maps the pixel format to the BP 0x43 field
-void fn_8024DFE4(s32 pixFmt, s32 zFmt) {
+void GXSetPixelFmt(s32 pixFmt, s32 zFmt) {
     static const u32 kPeFmt[8] = {0, 1, 2, 3, 4, 4, 4, 5};
     Init();
     u32 fmt = kPeFmt[pixFmt & 7];
@@ -214,7 +214,7 @@ void fn_8024D97C(s32 op, s32 fmt, s32 bias) {
     Bp(w1);
 }
 // GXSetFog(type, colour, start z, end z, near z, far z)
-void fn_8024DB88(s32 type, u8* color, f32 startZ, f32 endZ, f32 nearZ, f32 farZ) {
+void GXSetFog(s32 type, u8* color, f32 startZ, f32 endZ, f32 nearZ, f32 farZ) {
     u32 ortho = ((u32)type >> 3) & 1, kind = (u32)type & 7;
     f32 a, c;
     u32 fog1 = 0, fog2 = 0;                                 // the orthographic case sends two zero words (as the asm does)
@@ -262,7 +262,7 @@ void fn_8024DB88(s32 type, u8* color, f32 startZ, f32 endZ, f32 nearZ, f32 farZ)
     gPortGx.fog[0] = startZ; gPortGx.fog[1] = endZ; gPortGx.fog[2] = nearZ; gPortGx.fog[3] = farZ;
 }
 // GXSetFogRangeAdj(on, centre, table: ten u16 values)
-void fn_8024DDB4(s32 enable, s32 center, void* table) {
+void GXSetFogRangeAdj(s32 enable, s32 center, void* table) {
     if (enable) {
         const u16* t = (const u16*)table;
         for (u32 i = 0; i < 5; i++) {
@@ -278,14 +278,14 @@ void fn_8024DDB4(s32 enable, s32 center, void* table) {
     Bp(w);
 }
 // GXSetFieldMask(odd lines, even lines)
-void fn_8024E0E8(s32 odd, s32 even) {
+void GXSetFieldMask(s32 odd, s32 even) {
     u32 w = Rlwimi(0, (u32)even, 0, 31, 31);
     w = Rlwimi(w, (u32)odd, 1, 30, 30);
     w = Rlwimi(w, 0x44, 24, 0, 7);
     Bp(w);
 }
 // GXSetFieldMode(field rendering, half-height aspect)
-void fn_8024E11C(s32 fieldMode, s32 halfAspect) {
+void GXSetFieldMode(s32 fieldMode, s32 halfAspect) {
     Init();
     sh.lpSize = Rlwimi(sh.lpSize, (u32)halfAspect, 22, 9, 9);
     Bp(sh.lpSize);
@@ -296,7 +296,7 @@ void fn_8024E11C(s32 fieldMode, s32 halfAspect) {
 
 // ------------------------------------------------------------------ geometry
 // GXSetTexCoordGen2(coord, function, source, matrix, normalize, post-transform matrix)
-void fn_8024AC4C(s32 coord, s32 func, s32 src, s32 mtx, s32 normalize, s32 postMtx) {
+void GXSetTexCoordGen2(s32 coord, s32 func, s32 src, s32 mtx, s32 normalize, s32 postMtx) {
     Init();
     // 0x8039829C: per texture-generation source, the row of the source and whether it is a geometry row
     static const u8 kRow[21] = {0, 1, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 5, 5, 5, 5, 5, 5, 5, 2, 2};
@@ -341,14 +341,14 @@ void fn_8024AC4C(s32 coord, s32 func, s32 src, s32 mtx, s32 normalize, s32 postM
     }
 }
 // GXSetNumTexGens
-void fn_8024AE74(s32 count) {
+void GXSetNumTexGens(s32 count) {
     Init();
     sh.genMode = Rlwimi(sh.genMode, (u32)count, 0, 28, 31);
     sh.dirty |= DIRTY_NUMTEXGENS | DIRTY_GENMODE;
     gPortGx.numTexGens = (u8)count;
 }
 // GXSetLineWidth(width in 1/6 pixels, texture offset)
-void fn_8024BAC0(s32 width, s32 texOffsets) {
+void GXSetLineWidth(s32 width, s32 texOffsets) {
     Init();
     sh.lpSize = Rlwimi(sh.lpSize, (u32)width, 0, 24, 31);
     sh.lpSize = Rlwimi(sh.lpSize, (u32)texOffsets, 16, 13, 15);
@@ -356,7 +356,7 @@ void fn_8024BAC0(s32 width, s32 texOffsets) {
     gPortGx.lineWidth = (u8)width;
 }
 // GXSetPointSize
-void fn_8024BAF4(s32 size, s32 texOffsets) {
+void GXSetPointSize(s32 size, s32 texOffsets) {
     Init();
     sh.lpSize = Rlwimi(sh.lpSize, (u32)size, 8, 16, 23);
     sh.lpSize = Rlwimi(sh.lpSize, (u32)texOffsets, 19, 10, 12);
@@ -364,7 +364,7 @@ void fn_8024BAF4(s32 size, s32 texOffsets) {
     gPortGx.pointSize = (u8)size;
 }
 // GXEnableTexOffsets(coord, for lines, for points)
-void fn_8024BB28(s32 coord, s32 line, s32 point) {
+void GXEnableTexOffsets(s32 coord, s32 line, s32 point) {
     Init();
     u32 i = (u32)coord & 7;
     sh.suTs0[i] = Rlwimi(sh.suTs0[i], (u32)line, 18, 13, 13);
@@ -372,14 +372,14 @@ void fn_8024BB28(s32 coord, s32 line, s32 point) {
     Bp(sh.suTs0[i]);
 }
 // GXSetCoPlanar
-void fn_8024BB8C(s32 enable) {
+void GXSetCoPlanar(s32 enable) {
     Init();
     sh.genMode = Rlwimi(sh.genMode, (u32)enable, 19, 12, 12);
     Bp(0xFE080000u);                                        // write mask: only that bit
     Bp(sh.genMode);
 }
 // GXSetCullMode(0 none, 1 front, 2 back, 3 all)
-void fn_8024BB64(s32 mode) {
+void GXSetCullMode(s32 mode) {
     Init();
     u32 m = ((u32)mode >> 1) & 1;
     m = Rlwimi(m, (u32)mode, 1, 30, 30);
@@ -388,9 +388,9 @@ void fn_8024BB64(s32 mode) {
     gPortGx.cullMode = (u8)mode;
 }
 // GXSetClipMode(0 = clipping on)
-void fn_8024E55C(s32 mode) { Xf1(0x1005, (u32)mode); gPortGx.clipMode = (u8)mode; }
+void GXSetClipMode(s32 mode) { Xf1(0x1005, (u32)mode); gPortGx.clipMode = (u8)mode; }
 // GXSetScissorBoxOffset
-void fn_8024E520(s32 x, s32 y) {
+void GXSetScissorBoxOffset(s32 x, s32 y) {
     u32 w = Rlwimi(0, (u32)(x + 0x156), 31, 22, 31);
     w = Rlwimi(w, (u32)(y + 0x156), 9, 12, 21);
     w = Rlwimi(w, 0x59, 24, 0, 7);
@@ -398,7 +398,7 @@ void fn_8024E520(s32 x, s32 y) {
     gPortGx.scissorOffset[0] = x; gPortGx.scissorOffset[1] = y;
 }
 // GXSetCurrentMtx
-void fn_8024E328(s32 id) {
+void GXSetCurrentMtx(s32 id) {
     Init();
     sh.mtxIdx[0] = Rlwimi(sh.mtxIdx[0], (u32)id, 0, 26, 31);
     sh.dirty |= DIRTY_MTXIDX;
@@ -407,14 +407,14 @@ void fn_8024E328(s32 id) {
 
 // ------------------------------------------------------------------ lighting channels
 // GXSetNumChans
-void fn_8024C2F0(s32 count) {
+void GXSetNumChans(s32 count) {
     Init();
     sh.genMode = Rlwimi(sh.genMode, (u32)count, 4, 25, 27);
     sh.dirty |= DIRTY_NUMCHANS | DIRTY_GENMODE;
     gPortGx.numChans = (u8)count;
 }
 // GXSetChanCtrl(channel, lighting on, ambient source, material source, light mask, diffuse fn, attenuation fn)
-void fn_8024C314(s32 chan, s32 enable, s32 ambSrc, s32 matSrc, s32 lightMask, s32 diffFn, s32 attnFn) {
+void GXSetChanCtrl(s32 chan, s32 enable, s32 ambSrc, s32 matSrc, s32 lightMask, s32 diffFn, s32 attnFn) {
     Init();
     u32 w = Rlwimi(0, (u32)enable, 1, 30, 30);
     w = Rlwimi(w, (u32)matSrc, 0, 31, 31);
@@ -432,9 +432,9 @@ void fn_8024C314(s32 chan, s32 enable, s32 ambSrc, s32 matSrc, s32 lightMask, s3
     else if (chan == 5) { sh.chan[3] = w; sh.dirty |= 0xA000; }
 }
 // GXSetChanAmbColor(channel, colour)
-void fn_8024C140(s32 chan, u8* color) { Init(); ChanColor(chan, color, sh.amb, DIRTY_AMBIENT); }
+void GXSetChanAmbColor(s32 chan, u8* color) { Init(); ChanColor(chan, color, sh.amb, DIRTY_AMBIENT); }
 // GXSetChanMatColor(channel, colour)
-void fn_8024C218(s32 chan, u8* color) { Init(); ChanColor(chan, color, sh.mat, DIRTY_MATERIAL); }
+void GXSetChanMatColor(s32 chan, u8* color) { Init(); ChanColor(chan, color, sh.mat, DIRTY_MATERIAL); }
 
 // ------------------------------------------------------------------ TEV
 // GXSetTevOrder(stage, texture coordinate, texture map, colour channel)
@@ -518,15 +518,15 @@ void fn_8024D8C8(s32 table, s32 r, s32 g, s32 b, s32 a) {
     Bp(sh.ksel[i + 1]);
 }
 // GXSetTevDirect(stage): the SDK's GXSetTevIndirect(stage, 0, 0, 0, 0, 0, 0, 0, 0, 0), BP 0x10 + stage
-void fn_8024D468(s32 stage) { Bp((0x10u + (u32)stage) << 24); }
+void GXSetTevDirect(s32 stage) { Bp((0x10u + (u32)stage) << 24); }
 // GXSetNumIndStages
-void fn_8024D448(s32 count) {
+void GXSetNumIndStages(s32 count) {
     Init();
     sh.genMode = Rlwimi(sh.genMode, (u32)count, 16, 13, 15);
     sh.dirty |= DIRTY_GENMODE | 2;
 }
 // GXSetIndTexCoordScale(indirect stage, scale s, scale t)
-void fn_8024D278(s32 stage, s32 scaleS, s32 scaleT) {
+void GXSetIndTexCoordScale(s32 stage, s32 scaleS, s32 scaleT) {
     Init();
     u32* r = &sh.indScale[(stage >> 1) & 1];
     switch (stage) {

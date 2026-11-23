@@ -65,7 +65,7 @@ void   fn_8020A398(s32 handle);                        // 0x8020A398
 u32    fn_8020A9A8(s32 handle);                        // 0x8020A9A8
 void   fn_8020B1C8(void* handle, u32 hash, s32 a);     // 0x8020B1C8
 f64    fn_8033E8EC(f64 x);                             // 0x8033E8EC
-f64    fn_8033F17C(f64 x);                             // 0x8033F17C
+f64    tan(f64 x);                             // 0x8033F17C
 f64    fn_8033F1F4(f64 x);                             // 0x8033F1F4
 
 extern f32 lbl_80346AC8[];           // 0x80346AC8
@@ -548,7 +548,7 @@ u8* fn_800CE480(u8* arg0) {
     fn_800CD43C(arg0 + 0x2FFC);
     fn_800C42B8(arg0 + 0x3020);
     CameraSetFov(lbl_8047C640,
-                 2.0f * (1.5707964f * (0.63661975f * (f32)fn_8033E8EC((f64)((10.0f * (f32)fn_8033F17C(0.46364763f)) / 70.0f)))));
+                 2.0f * (1.5707964f * (0.63661975f * (f32)fn_8033E8EC((f64)((10.0f * (f32)tan(0.46364763f)) / 70.0f)))));
     fn_8006FC04();
     fn_800CF7E8(arg0);
     *(f32*)(arg0 + 0xA0) = 0.0f;

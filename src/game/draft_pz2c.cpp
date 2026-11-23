@@ -29,12 +29,12 @@ s32  fn_80146930(u8* p, void* a, s32 c);                         // 0x80146930 (
 void fn_801469FC(u8* p);                                         // 0x801469FC (src/engine/small_8014c.cpp)
 void fn_80262384(s32 handle, s32 code);                          // 0x80262384 (args from asm, return ignored)
 s32  fn_80266944(u8* path, s32* out);                            // 0x80266944 (return used as status)
-s32  fn_80267B14(u8* buf);                                       // 0x80267B14
+s32  NANDGetHomeDir(u8* buf);                                       // 0x80267B14
 char* strcat(char* d, const char* s);
 void* memcpy(void* d, const void* s, u32 n);
 char* StrCopy(char* dst, const char* src);                       // 0x8022127C
-void fn_8023A5B0(u8* p);                                         // 0x8023A5B0
-void fn_8023A68C(u8* p);                                         // 0x8023A68C
+void OSLockMutex(u8* p);                                         // 0x8023A5B0
+void OSUnlockMutex(u8* p);                                         // 0x8023A68C
 u8*  fn_8020F3D4(u8* arg0, s32 arg1);                            // 0x8020F3D4
 void fn_8021FF78(u8* p);                                         // 0x8021FF78 (src/leaf)
 u16  fn_8021F448(u8* p);                                         // 0x8021F448 (src/leaf)
@@ -90,13 +90,13 @@ void fn_80204978(const char* name) {
 }
 
 // 0x80206DA4
-// Builds a 64-byte path buffer with fn_80267B14, appends lbl_80386E80 and checks it with fn_80266944.
+// Builds a 64-byte path buffer with NANDGetHomeDir, appends lbl_80386E80 and checks it with fn_80266944.
 // Returns 1 when that check reports success (status 0), 0 otherwise.
 s32 fn_80206DA4(void) {
     u32 buf[16] = {0};
     s32 sp8;
 
-    if (fn_80267B14((u8*)buf) != 0) {
+    if (NANDGetHomeDir((u8*)buf) != 0) {
         return 0;
     }
     strcat((char*)buf, lbl_80386E80);
@@ -113,9 +113,9 @@ void fn_80207A2C(u32 unusedR3, const void* src) {
     lbl_805F9918 = (u16)(lbl_805F9918 + 1);
     slot = lbl_805F9918 % 129;
     memcpy(lbl_80536280 + (slot << 10), src, 0x400);
-    fn_8023A5B0(lbl_80556A80);
+    OSLockMutex(lbl_80556A80);
     lbl_805FBB44 = (u16)(lbl_805FBB44 + 1);
-    fn_8023A68C(lbl_80556A80);
+    OSUnlockMutex(lbl_80556A80);
 }
 
 // 0x8020B0AC

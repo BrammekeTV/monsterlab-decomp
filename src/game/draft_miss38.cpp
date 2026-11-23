@@ -28,10 +28,10 @@ s32    fn_8018CD34(void* obj);                        // 0x8018CD34, draw callba
 u32    fn_80143974(s32 seed, void* data, u32 len);    // 0x80143974, checksum
 s32    fn_80265F80(u8* h, void* buf, u32 n);          // 0x80265F80
 s32    fn_80266060(u8* h, void* buf, u32 n);          // 0x80266060
-s32    fn_80266614(u8* h, u32* out);                  // 0x80266614
+s32    NANDGetLength(u8* h, u32* out);                  // 0x80266614
 s32    fn_80267A54(u32* buf);                         // 0x80267A54
-s32    fn_80267B14(u32* buf);                         // 0x80267B14
-s32    fn_80265D78(void* p);                          // 0x80265D78
+s32    NANDGetHomeDir(u32* buf);                         // 0x80267B14
+s32    NANDDelete(void* p);                          // 0x80265D78
 void   fn_80206B6C(s32 code, const u8* msg);          // 0x80206B6C
 void   ScriptSigFinalize(u8* sig);                    // 0x801DC658
 void   NoticePosted(u8* s, s32 idx);                  // 0x8022DF3C
@@ -49,7 +49,7 @@ s32 SaveRead(s32 handle, void* buf, u32 size) {
     u8* raw = (u8*)MemAllocDefault(total + 0x20);
     if (raw != NULL) {
         u32 sz = 0;
-        if (fn_80266614(lbl_80527140, &sz) == 0 && sz == total) {
+        if (NANDGetLength(lbl_80527140, &sz) == 0 && sz == total) {
             u8* data = (u8*)(((uintptr_t)raw + 0x1F) & ~(uintptr_t)0x1F);
             result = fn_80265F80(lbl_80527140, data, total);
             if (result > 0) {
@@ -93,14 +93,14 @@ s32 SaveWriteData(s32 handle, const void* buf, u32 size) {
 s32 SaveSetup(const char* name) {
     u32 buf[16];
     memset(buf, 0, sizeof buf);
-    s32 r = fn_80267B14(buf);
+    s32 r = NANDGetHomeDir(buf);
     if (r != 0) {
         fn_80206B6C(r, lbl_80386C10 + 0x38);
     } else {
         r = fn_80267A54(buf);
         if (r != 0) fn_80206B6C(r, lbl_80386C10 + 0x48);
     }
-    r = fn_80265D78((void*)name);
+    r = NANDDelete((void*)name);
     if (r != 0) {
         fn_80206B6C(r, lbl_80386C10 + 0x80);
         return -1;

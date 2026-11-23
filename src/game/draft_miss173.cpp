@@ -57,8 +57,8 @@ s32   fn_801E6F78(u8* p);                                             // 0x801E6
 void  fn_801E93EC(u8* list, u8* entry);                               // 0x801E93EC
 void* fn_801D40E0(s32 n);                                             // 0x801D40E0 (alloc)
 void* fn_801EB94C(void* p);                                           // 0x801EB94C
-s32   fn_8023C168(OSThread* t);                                       // 0x8023C168
-void  fn_8023D3C8(s32 hi, u32 lo);                                    // 0x8023D3C8
+s32   OSIsThreadTerminated(OSThread* t);                                       // 0x8023C168
+void  OSSleepTicks(s32 hi, u32 lo);                                    // 0x8023D3C8
 f64   fn_8033F1F4(f64 x);                                             // 0x8033F1F4 (acos)
 
 extern u8  gGame[];                 // 0x803B53A0
@@ -508,12 +508,12 @@ s32 fn_801E6FAC(u8* p, s32 wait, f32 t) {
         OSThread* th = *(OSThread**)(p + 0x84);
         if (th != NULL) {
             if (wait != 0) {
-                while (fn_8023C168(th) == 0) {
+                while (OSIsThreadTerminated(th) == 0) {
                     u64 ticks = (u64)(OSGetBusClock() / 4 / 1000) * 100;
-                    fn_8023D3C8((s32)(ticks >> 32), (u32)ticks);
+                    OSSleepTicks((s32)(ticks >> 32), (u32)ticks);
                 }
             }
-            if (fn_8023C168(*(OSThread**)(p + 0x84)) != 0) {
+            if (OSIsThreadTerminated(*(OSThread**)(p + 0x84)) != 0) {
                 *(void**)(p + 0x84) = NULL;
                 return 1;
             }
@@ -558,12 +558,12 @@ s32 fn_801E6FAC(u8* p, s32 wait, f32 t) {
         return 0;
     }
     if (wait != 0) {
-        while (fn_8023C168(th) == 0) {
+        while (OSIsThreadTerminated(th) == 0) {
             u64 ticks = (u64)(OSGetBusClock() / 4 / 1000) * 100;
-            fn_8023D3C8((s32)(ticks >> 32), (u32)ticks);
+            OSSleepTicks((s32)(ticks >> 32), (u32)ticks);
         }
     }
-    if (fn_8023C168(*(OSThread**)(p + 0x84)) != 0) {
+    if (OSIsThreadTerminated(*(OSThread**)(p + 0x84)) != 0) {
         *(void**)(p + 0x84) = NULL;
         if (*(void**)(p + 0x78) == NULL) return 1;
         u32 n = *(u32*)(p + 0x7C);

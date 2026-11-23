@@ -161,7 +161,7 @@ const char* PortSoftSdk(u32 addr) {
         {0x8025B398, "audio: AX getter, no mixer yet (fn_8025B398)"},
         {0x8025B390, "audio: AX getter, no mixer yet (fn_8025B390)"},
         // OSSetPeriodicAlarm: its only caller so far is the audio tick (fn_80202CAC), which needs AX.
-        {0x80234394, "OSSetPeriodicAlarm for the audio tick (fn_80234394): not started"},
+        {0x80234394, "OSSetPeriodicAlarm for the audio tick (OSSetPeriodicAlarm): not started"},
         // The SDK's HOME-button menu library (HBM), used by HomeButtonInit and the game's
         // home-menu update and draw. There is no HOME menu on PC yet: every call does nothing
         // and returns 0 ("no button selected").
@@ -177,9 +177,9 @@ const char* PortSoftSdk(u32 addr) {
         {0x802727E0, "WPAD: rumble motor (WPADDisconnect)"},
         {0x80272AB0, "WPAD: WPADSetDataFormat"},
         {0x80272B64, "WPAD: fn_80272B64"},
-        {0x802737A8, "WPAD: speaker control (fn_802737A8)"},
-        {0x80274F80, "WPAD: can send speaker data (fn_80274F80)"},
-        {0x80275004, "WPAD: send speaker data (fn_80275004)"},
+        {0x802737A8, "WPAD: speaker control (WPADControlSpeaker)"},
+        {0x80274F80, "WPAD: can send speaker data (WPADCanSendStreamData)"},
+        {0x80275004, "WPAD: send speaker data (WPADSendStreamData)"},
         {0x8027D270, "KPAD: pointer parameter (KPADSetPosParam)"},
         {0x8027D28C, "KPAD: pointer parameter (KPADSetHoriParam)"},
         // Registers a function and calls it with two words (from fn_80204478, argument fn_802B7DDC,
@@ -195,7 +195,7 @@ const char* PortSoftSdk(u32 addr) {
 }
 
 // SCGetSoundMode (the SDK reads item 0x11 and falls back to 1): 0 mono, 1 stereo, 2 surround.
-extern "C" u8 fn_8026AC14(void) { return 1; }
+extern "C" u8 SCGetSoundMode(void) { return 1; }
 
 // The controller on PC, until there is real input: a Wii Remote with a Nunchuk on channel 0, held
 // still with no button down; nothing on channels 1 to 3. Without it the game puts its
@@ -307,18 +307,18 @@ static BOOL sVcdDirty;
 static u8   sVatDirty;                          // one bit per format
 
 // GXClearVtxDesc
-void fn_8024A7E4(void) {
+void GXClearVtxDesc(void) {
     memset(gPortGx.vtxDesc, 0, sizeof(gPortGx.vtxDesc));
     gPortGx.vtxDesc[9] = 1;                      // position: direct
     sVcdDirty = TRUE;
 }
 // GXSetVtxDesc(attr, type)
-void fn_8024A3A4(s32 attr, s32 type) {
+void GXSetVtxDesc(s32 attr, s32 type) {
     if ((u32)attr < 26) gPortGx.vtxDesc[attr] = (u8)type;
     sVcdDirty = TRUE;
 }
 // GXSetVtxAttrFmt(format, attr, component count, component type, fraction bits)
-void fn_8024A818(s32 fmt, s32 attr, s32 cnt, s32 type, s32 frac) {
+void GXSetVtxAttrFmt(s32 fmt, s32 attr, s32 cnt, s32 type, s32 frac) {
     if ((u32)fmt < 8 && (u32)attr < 26) {
         gPortGx.vtxFmt[fmt][attr].cnt = (u8)cnt;
         gPortGx.vtxFmt[fmt][attr].type = (u8)type;
@@ -376,11 +376,11 @@ static void FlushVertexState(void) {
     sVatDirty = 0;
 }
 // GXInvalidateVtxCache
-void fn_8024AC3C(void) { STUB(GXInvalidateVtxCache); }
+void GXInvalidateVtxCache(void) { STUB(GXInvalidateVtxCache); }
 // GXInvalidateTexAll
 void fn_8024CB00(void) { STUB(GXInvalidateTexAll); }
 // GXBegin(primitive, vertex format, vertex count); the vertices follow through GXWGFifo
-void fn_8024B974(s32 prim, s32 fmt, s32 count) {
+void GXBegin(s32 prim, s32 fmt, s32 count) {
     PortGxFlushState();
     FlushVertexState();
     PortGxWrite8((u8)(prim | fmt));
@@ -388,7 +388,7 @@ void fn_8024B974(s32 prim, s32 fmt, s32 count) {
 }
 
 // GXSetViewport
-void fn_8024E48C(f32 left, f32 top, f32 w, f32 h, f32 nearZ, f32 farZ) {
+void GXSetViewport(f32 left, f32 top, f32 w, f32 h, f32 nearZ, f32 farZ) {
     PortGxWrite8(0x10); PortGxWrite16(5); PortGxWrite16(0x101A);
     PortGxWriteF32(w * 0.5f); PortGxWriteF32(-h * 0.5f); PortGxWriteF32((farZ - nearZ) * 16777215.0f);
     PortGxWriteF32(left + w * 0.5f + 342.0f); PortGxWriteF32(top + h * 0.5f + 342.0f); PortGxWriteF32(farZ * 16777215.0f);
@@ -396,7 +396,7 @@ void fn_8024E48C(f32 left, f32 top, f32 w, f32 h, f32 nearZ, f32 farZ) {
     gPortGx.viewport[3] = h;    gPortGx.viewport[4] = nearZ; gPortGx.viewport[5] = farZ;
 }
 // GXSetScissor
-void fn_8024E4B8(s32 x, s32 y, s32 w, s32 h) {
+void GXSetScissor(s32 x, s32 y, s32 w, s32 h) {
     STUB(GXSetScissor);
     gPortGx.scissor[0] = x; gPortGx.scissor[1] = y; gPortGx.scissor[2] = w; gPortGx.scissor[3] = h;
     BpLoad(0x20000000 | (u32)((y + 342) & 0xFFF) | (u32)((x + 342) & 0xFFF) << 12);
@@ -462,9 +462,9 @@ void fn_8024BFCC(void* fb, s32 clear) {
 // Matrices. Position/normal matrix ids are multiples of 3 (10 slots); texture matrix ids are
 // 30 + 3n, 60 is the identity, post-transform ones are 64 + 3n with 125 the identity.
 // GXLoadPosMtxImm
-void fn_8024E280(f32* mtx, s32 id) { XfLoad((u32)id * 4, mtx, 12); }
+void GXLoadPosMtxImm(f32* mtx, s32 id) { XfLoad((u32)id * 4, mtx, 12); }
 // GXLoadNrmMtxImm (the upper 3x3 of a 3x4 matrix)
-void fn_8024E2D0(f32* mtx, s32 id) {
+void GXLoadNrmMtxImm(f32* mtx, s32 id) {
     f32 m[9] = {mtx[0], mtx[1], mtx[2], mtx[4], mtx[5], mtx[6], mtx[8], mtx[9], mtx[10]};
     XfLoad(0x400 + (u32)id * 3, m, 9);
 }
@@ -508,9 +508,9 @@ s32  SCCheckStatus(void) { return 0; }           // settings are loaded
 u8   SCGetAspectRatio(void) { return 1; }        // 16:9
 u8   SCGetLanguage(void) { return 1; }           // English
 // SCGetProgressiveMode: off
-u8   fn_8026AB6C(void) { return 0; }
+u8   SCGetProgressiveMode(void) { return 0; }
 // SCGetEuRgb60Mode: on, so a PAL game runs at 60 Hz with 480 lines
-u8   fn_8026AAA0(void) { return 1; }
+u8   SCGetEuRgb60Mode(void) { return 1; }
 
 void AIInit(u8* stack) { STUB(AIInit); }
 void AXInit(void) { STUB(AXInit); }

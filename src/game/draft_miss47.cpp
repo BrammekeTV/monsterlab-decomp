@@ -60,8 +60,8 @@ void fn_802000F0(u8* audio);                                      // 0x802000F0
 void*  fn_80209814(void* v);
 void   fn_8020EDF0(u8* dst, u8* src);
 void   fn_80220A0C(s32 a);
-void   fn_8023A5B0(u8* p);
-void   fn_8023A68C(u8* p);
+void   OSLockMutex(u8* p);
+void   OSUnlockMutex(u8* p);
 s32    fn_802E9EE0(void);                                           // 0x802E9EE0
 u8     fn_802E9F3C(void);                                           // 0x802E9F3C
 s32    fn_802F79BC(u8 idx, u8* buf, s32 size);                      // 0x802F79BC
@@ -357,7 +357,7 @@ s32 fn_80138380(u8* arg0, s32 arg1) {
 // player's 0x1000-byte block, and if the stored code is below our own, seeds the RNG and posts
 // event 0x3D with a random 0-5 value; otherwise sets the alternate state.
 void fn_8013A780(s32 arg0, s32 arg1) {
-    fn_8023A5B0(lbl_80556AC8);
+    OSLockMutex(lbl_80556AC8);
     s32 off = 0;
     lbl_805FB23C = 0;
     if (arg0 == 0 && arg1 == 0) {
@@ -393,7 +393,7 @@ void fn_8013A780(s32 arg0, s32 arg1) {
             fn_80220A0C(1);
         }
     }
-    fn_8023A68C(lbl_80556AC8);
+    OSUnlockMutex(lbl_80556AC8);
 }
 
 // 0x8013ADD8

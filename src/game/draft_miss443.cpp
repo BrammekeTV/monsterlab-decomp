@@ -38,7 +38,7 @@ void  fn_800B999C(u8* obj, s32 a, s32 b);                         // 0x800B999C
 void  fn_800B990C(u8* obj, f32 a);                                // 0x800B990C
 f32   fn_800B68B8(u8* p);                                         // 0x800B68B8
 s32   fn_800B4070(u8* p, s32* out, f32 t);                               // 0x800B4070
-f64   fn_8033ED6C(f64 x);                                         // 0x8033ED6C (MSL floor)
+f64   floor(f64 x);                                         // 0x8033ED6C (MSL floor)
 void  GameFlowSignal(s32 id, s32 arg1, s32 arg2);                 // 0x8000C7F4
 void  StickRead(s32 channel, f32* x, f32* y);                     // 0x80147704
 BOOL  fn_80147554(s32 button);                                    // 0x80147554
@@ -511,7 +511,7 @@ void fn_800B387C(u8* arg0, s32 arg1) {
     s32 chosen = 0;                  // r27
     f32 a = lbl_80346208[SceneLevel()];
     f32 sum = a + lbl_80346218[SceneLevel()];
-    s32 half = (s32)(f32)fn_8033ED6C((f64)(50.0f / sum));    // r29
+    s32 half = (s32)(f32)floor((f64)(50.0f / sum));    // r29
     s32 slots = half * 2 + 1;                                // r26
     u8* rec = arg0 + arg1 * 0x14;                            // r30
     u8* obj = *(u8**)(rec + 0xa8);
