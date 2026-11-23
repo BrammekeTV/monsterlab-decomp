@@ -38,6 +38,7 @@ build\pc\monsterlab.exe                        # runs main() with your own disc 
 | `--no-ini` | do not read `monsterlab.ini` (next to the exe: display, audio and the key bindings, written by the settings screen; the command line wins over it) |
 | `--iso FILE` | the game data is your own Monster Lab disc image (.iso, RM7P4F), read as it is: nothing is extracted. `--data` and `MONSTERLAB_DATA` take an image too. Another game or region is refused with a message |
 | `--picker-screenshot FILE` | draw the first-run "choose your disc" screen into a PNG and stop (tests; with `--iso FILE` it shows the verdict for that file) |
+| `--mods DIR`, `--no-mods` | use another mods folder than `mods` next to the exe; run without mods. With `--verbose` every file each mod replaces is listed (see `docs/modding.md`) |
 | `--res WxH` | output size (default 1920x1080) |
 | `--aspect 4:3\|16:9` | picture shape and the console's widescreen setting (default 16:9) |
 | `--stretch-ui` | 16:9: stretch the 2D layer over the whole width, as the console does |
