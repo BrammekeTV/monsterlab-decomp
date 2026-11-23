@@ -93,7 +93,7 @@ extern "C" s32 fn_800517C0(void) {
 }
 
 // 0x8005191C
-extern "C" u8 IsConversationPopupVisible(void) {
+extern "C" u32 IsConversationPopupVisible(void) {
     u8 t0 = *(u8*)((u8*)&lbl_805FB0E3);
     return (u8)(t0);
 }

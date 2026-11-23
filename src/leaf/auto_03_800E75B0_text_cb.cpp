@@ -48,7 +48,7 @@ extern "C" void fn_80022D10(void);
 extern "C" void fn_80022D1C(void);
 extern "C" void fn_80022D34(void);
 extern "C" void fn_80022D88(void);
-extern "C" u8 fn_8004936C(void);
+extern "C" u32 fn_8004936C(void);
 extern "C" void fn_800598E8(u8*, s32);
 extern "C" void fn_8005BF7C(u8*, s32, s32);
 extern "C" void fn_8006AD84(u8*, f32);

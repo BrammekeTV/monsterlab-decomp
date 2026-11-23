@@ -31,7 +31,7 @@ extern "C" s32 fn_8007C11C(u8* a3) {
 }
 
 // 0x8007C124
-extern "C" u8 fn_8007C124(u8* a3) {
+extern "C" u32 fn_8007C124(u8* a3) {
     u8 t0 = *(u8*)(((u8*)(uintptr_t)(a3)) + 852);
     return (u8)(t0);
 }

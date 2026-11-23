@@ -13,7 +13,7 @@ extern u8 lbl_805FB0BE;
 extern "C" void fn_8000B924(u8*, s32, s32);
 
 // 0x80046F54
-extern "C" u8 fn_80046F54(void) {
+extern "C" u32 fn_80046F54(void) {
     u8 t0 = *(u8*)((u8*)&lbl_805FB099);
     return (u8)(t0);
 }
@@ -25,13 +25,13 @@ extern "C" s32 fn_8004935C(void) {
 }
 
 // 0x80049364
-extern "C" u8 fn_80049364(void) {
+extern "C" u32 fn_80049364(void) {
     u8 t0 = *(u8*)((u8*)&lbl_805FB0BE);
     return (u8)(t0);
 }
 
 // 0x8004936C
-extern "C" u8 fn_8004936C(void) {
+extern "C" u32 fn_8004936C(void) {
     u8 t0 = *(u8*)((u8*)&lbl_805F865D);
     return (u8)(t0);
 }

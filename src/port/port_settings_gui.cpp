@@ -29,6 +29,38 @@ static BOOL Focused(void) {
 }
 static inline BOOL Down(int vk) { return (GetAsyncKeyState(vk) & 0x8000) != 0; }
 
+static void Save(void);
+// The game disc: what is running, and another choice for the next start (checked like the first-run screen does).
+static void PageGame(void) {
+    static char verdict[320];
+    static BOOL good;
+    ImGui::PushTextWrapPos(0.0f);
+    ImGui::Text("Playing from: %s", gPortOptions.dataDir ? gPortOptions.dataDir : "-");
+    if (sEdit.gamePath[0] && (!gPortOptions.dataDir || _stricmp(sEdit.gamePath, gPortOptions.dataDir))) ImGui::Text("Next start: %s", sEdit.gamePath);
+    ImGui::PopTextWrapPos();
+    ImGui::Spacing();
+    int pick = 0;
+    if (ImGui::Button("Change game disc (.iso)...")) pick = 1;
+    ImGui::SameLine();
+    if (ImGui::Button("Choose extracted folder...")) pick = 2;
+    if (pick) {
+        char path[MAX_PATH];
+        HWND wnd = PortGfxWindow();
+        if (pick == 1 ? PortPickFile(wnd, path, sizeof(path)) : PortPickFolder(wnd, path, sizeof(path))) {
+            good = PortGameCheck(path, verdict, sizeof(verdict)) == PORT_DISC_OK;
+            if (good) {
+                snprintf(sEdit.gamePath, sizeof(sEdit.gamePath), "%s", path);
+                snprintf(gPortSettings.gamePath, sizeof(gPortSettings.gamePath), "%s", path);
+                Save();
+            }
+        }
+    }
+    ImGui::PushTextWrapPos(0.0f);
+    if (verdict[0]) ImGui::TextColored(good ? ImVec4(0.45f, 0.9f, 0.45f, 1.0f) : ImVec4(1.0f, 0.7f, 0.3f, 1.0f), "%s", verdict);
+    if (verdict[0] && good) ImGui::TextDisabled("It is used when the game is started again.");
+    ImGui::PopTextWrapPos();
+}
+
 static void Save(void) {
     if (PortSettingsSave(PortSettingsPath(), &sEdit)) snprintf(sNote, sizeof(sNote), "Saved to %s", PortSettingsPath());
     else snprintf(sNote, sizeof(sNote), "Could not write %s", PortSettingsPath());
@@ -194,6 +226,7 @@ void PortGuiBuild(u32 w, u32 h) {
                 if (ImGui::BeginTabItem("Display", NULL, page == 0 ? ImGuiTabItemFlags_SetSelected : 0)) { PageDisplay(); ImGui::EndTabItem(); }
                 if (ImGui::BeginTabItem("Audio", NULL, page == 1 ? ImGuiTabItemFlags_SetSelected : 0)) { PageAudio(); ImGui::EndTabItem(); }
                 if (ImGui::BeginTabItem("Controls", NULL, page == 2 ? ImGuiTabItemFlags_SetSelected : 0)) { PageControls(); ImGui::EndTabItem(); }
+                if (ImGui::BeginTabItem("Game", NULL, page == 3 ? ImGuiTabItemFlags_SetSelected : 0)) { PageGame(); ImGui::EndTabItem(); }
                 ImGui::EndTabBar();
             }
         }

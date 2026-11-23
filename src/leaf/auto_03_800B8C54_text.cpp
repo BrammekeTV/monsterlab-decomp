@@ -23,7 +23,7 @@ extern "C" f32 fn_800B9914(u8* a3) {
 }
 
 // 0x800B998C
-extern "C" u8 fn_800B998C(u8* a3) {
+extern "C" u32 fn_800B998C(u8* a3) {
     u8 t0 = *(u8*)(((u8*)(uintptr_t)(a3)) + 680);
     return (u8)(t0);
 }
@@ -34,7 +34,7 @@ extern "C" void fn_800B9994(u8* a3, f32 f1) {
 }
 
 // 0x800B9A78
-extern "C" u8 fn_800B9A78(u8* a3) {
+extern "C" u32 fn_800B9A78(u8* a3) {
     u8 t0 = *(u8*)(((u8*)(uintptr_t)(a3)) + 681);
     return (u8)(t0);
 }

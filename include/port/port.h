@@ -74,6 +74,7 @@ typedef struct PortGxState {
 } PortGxState;
 extern PortGxState gPortGx;
 
+struct HWND__;
 // ---- the player's disc image (port_disc.cpp) ----
 enum { PORT_DISC_OK, PORT_DISC_NO_FILE, PORT_DISC_NOT_WII, PORT_DISC_WRONG_GAME, PORT_DISC_WRONG_REGION, PORT_DISC_UNREADABLE };
 int  PortDiscCheck(const char* path, char* why, u32 n);    // the header only: is this Monster Lab (RM7P4F)? why says it in words
@@ -84,6 +85,14 @@ BOOL PortDiscFind(const char* path, u64* offset, u32* size);   // a file of the 
 BOOL PortDiscRead(u64 offset, void* dst, u32 len);         // decrypted bytes of the game partition
 u64  PortDiscDolOffset(void);                              // where main.dol starts in the partition
 int  PortSelfTestDisc(void);
+
+// ---- choosing the game disc (port_picker.cpp) ----
+int  PortGameCheck(const char* path, char* why, u32 n);    // PORT_DISC_*: a disc image, or a folder with the extracted disc
+BOOL PortPickFile(HWND__* owner, char* out, u32 n);        // Windows' file dialog
+BOOL PortPickFolder(HWND__* owner, char* out, u32 n);
+// The first-run screen; TRUE with the chosen path in out. With shot it is only drawn into that PNG.
+BOOL PortPickerRun(const char* note, const char* path, char* out, u32 n, const char* shot);
+int  PortSelfTestPicker(void);
 
 // ---- runtime (port_runtime.cpp) ----
 typedef struct PortOptions {
@@ -96,6 +105,7 @@ typedef struct PortOptions {
     BOOL haveData;            // main.dol was found and loaded
     BOOL window;              // open a window and draw into it
     const char* screenshot;   // write the last shown picture to this PNG when the run stops
+    const char* pickerShot;   // --picker-screenshot FILE: draw the first-run screen into this PNG and stop (tests)
     BOOL screenshotStats;     // draw the stats overlay into that picture too (--screenshot-stats)
     const char* wav;          // write everything the mixer produces to this WAV file
     BOOL noAudio;             // never open the sound device
@@ -115,6 +125,7 @@ typedef struct PortSettings {
     BOOL fullscreen;          // borderless window over the whole monitor
     s32  volume;              // 0-100, of the sound device's output
     BOOL mute;
+    char gamePath[260];       // the player's disc image or extracted folder ([game] path; chosen in the first-run screen)
 } PortSettings;
 extern PortSettings gPortSettings;
 // monsterlab.ini next to the exe (port_settings.cpp): display, audio and the input bindings.
@@ -151,6 +162,7 @@ u32  PortAudioVoices(u32* outOf); // voices the mixer is playing now
 extern s64 gPortWaitTicks;    // QueryPerformanceCounter ticks spent asleep in VIWaitForRetrace (port_sdk.cpp)
 int  PortSelfTestAudio(void);
 void PortFrameDone(void);     // one presented frame (VI flip): enforces the frame limit
+s32  PortFrameCount(void);    // presented frames so far
 
 const PortFunc* PortFindFunc(u32 wiiAddr);             // exact start address
 const char*     PortFuncName(const PortFunc* f);

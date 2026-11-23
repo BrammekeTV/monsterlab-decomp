@@ -5,7 +5,7 @@
 Compiles every source (32-bit, the flags of tools/check.py), generates the link glue with
 tools/port_link.py and links build/pc/monsterlab.exe. See docs/port_runtime.md.
   --debug   keep debug information (/Z7, /DEBUG)
-  --noopt   build the PC layer without optimisation too (/Od everywhere)
+  --noopt   build without optimisation (/Od everywhere), for stepping through code in a debugger
   --clean   recompile everything (otherwise only sources newer than their object are recompiled)
   --run     run the exe afterwards; the remaining arguments are passed to it
 
@@ -14,10 +14,10 @@ the compiler flags and the file list. When any of them differs from the last bui
 recompiled; otherwise only the sources changed since their object was built. The link is skipped
 when nothing was recompiled and the exe is newer than the objects and the link inputs.
 
-The PC layer (src/port/: renderer, GX interpreter, audio mixer, loader) is built with /O2. The
-decompiled game code stays at /Od for now: with /O2 everywhere the boot crashes in fn_800DC070,
-so some of it still misbehaves when optimised. Optimising the PC layer alone takes a headless
-boot from about 34 to about 46 frames per second.
+Everything is built with /O2 (--noopt: /Od everywhere). The decompiled game code used to stay at /Od
+because some of it broke when optimised; tools/opt_bisect.py found them (3 callers of fn_8018D68C
+with a 2-float buffer for its 12 bytes, and generated leaf functions returning u8/u16 that callers
+read as int). CI cannot boot the game (no game data), so use tools/opt_bisect.py test ALL locally.
 """
 import glob, hashlib, json, os, subprocess, sys
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
@@ -47,7 +47,6 @@ def main():
         if b in names:
             sys.exit(f"two sources named {b}: {p} and {names[b]}")
         names[b] = p
-    port_dir = os.path.join(ROOT, "src", "port") + os.sep
     port_opt = " /Od" if "--noopt" in argv else " /O2 /DNDEBUG"
     extra = (" /Z7" if debug else "")
     # Full rebuild when a header, the flags or the file list changed since the last build.
@@ -76,8 +75,8 @@ def main():
     def stale(p):
         o = os.path.join(OBJ, os.path.splitext(os.path.basename(p))[0] + ".obj")
         return not os.path.exists(o) or os.path.getmtime(p) > os.path.getmtime(o)
-    groups = [([p for p in files if not p.startswith(port_dir) and stale(p)], " /Od"),
-              ([p for p in files if p.startswith(port_dir) and stale(p)], port_opt)]
+    # Every source is built with the same flags (/O2 since #113; --noopt for /Od).
+    groups = [([p for p in files if stale(p)], port_opt)]
     n_compile = sum(len(g) for g, _ in groups)
     print(f"{'full rebuild' if full else 'incremental'}: {n_compile} of {len(files)} sources to compile")
     compile_lines = ['@type nul >"' + OUT + '\compile.log"']
