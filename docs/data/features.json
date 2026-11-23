@@ -99,6 +99,11 @@
  "changelog": [
   {
    "date": "2026-11-23",
+   "time": "13:41",
+   "text": "More of each level object's drawing settings are now read in the Wii's byte order (PR #80), including the brightness value the castle models were getting wrong. The castle still draws black on Windows, so the colour work continues."
+  },
+  {
+   "date": "2026-11-23",
    "time": "13:36",
    "text": "3D models reach the renderer on Windows (PRs #76 to #79): the camera's field of view now reaches the main view, and mesh vertex data is read in the Wii's byte order, so the castle level's models are drawn. They still come out black, because each object's colour data hasn't been converted yet. That's next."
   },
