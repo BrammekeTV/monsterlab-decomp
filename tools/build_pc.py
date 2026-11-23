@@ -5,7 +5,13 @@
 Compiles every source (32-bit, the flags of tools/check.py), generates the link glue with
 tools/port_link.py and links build/pc/monsterlab.exe. See docs/port_runtime.md.
   --debug   keep debug information (/Z7, /DEBUG)
+  --noopt   build the PC layer without optimisation too (/Od everywhere)
   --run     run the exe afterwards; the remaining arguments are passed to it
+
+The PC layer (src/port/: renderer, GX interpreter, audio mixer, loader) is built with /O2. The
+decompiled game code stays at /Od for now: with /O2 everywhere the boot crashes in fn_800DC070,
+so some of it still misbehaves when optimised. Optimising the PC layer alone takes a headless
+boot from about 34 to about 46 frames per second.
 """
 import glob, os, subprocess, sys
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
@@ -37,17 +43,25 @@ def main():
         names[b] = p
     for old in glob.glob(os.path.join(OBJ, "*.obj")):
         os.remove(old)
-    rsp = os.path.join(OUT, "files.rsp")
-    with open(rsp, "w") as f:
-        f.write("\n".join('"' + p + '"' for p in files))
+    port_dir = os.path.join(ROOT, "src", "port") + os.sep
+    port_opt = " /Od" if "--noopt" in argv else " /O2 /DNDEBUG"
+    groups = [([p for p in files if not p.startswith(port_dir)], " /Od"),
+              ([p for p in files if p.startswith(port_dir)], port_opt)]
+    compile_lines = ['@type nul >"' + OUT + '\\compile.log"']
+    for n, (group, opt) in enumerate(groups):
+        if not group:
+            continue
+        rsp = os.path.join(OUT, f"files{n}.rsp")
+        with open(rsp, "w") as f:
+            f.write("\n".join('"' + p + '"' for p in group))
+        compile_lines += ["@cl /MP " + " ".join(check.FLAGS) + opt + (" /Z7" if debug else "") + ' /Fo"' + OBJ + '\\\\" @"' + rsp + '" >>"' + OUT + '\\compile.log" 2>&1',
+                          "@if errorlevel 1 exit /b 1"]
     exe = os.path.join(OUT, "monsterlab.exe")
     gen = '"' + sys.executable + '" "' + os.path.join(ROOT, "tools", "port_link.py") + '" --objs "' + OBJ + '" --out "' + OUT + '"'
     bat = os.path.join(OUT, "build.bat")
     with open(bat, "w") as f:
         f.write("\r\n".join([
-            '@call "' + check.vcvars() + '" >nul 2>nul',
-            "@cl /MP " + " ".join(check.FLAGS) + (" /Z7" if debug else "") + ' /Fo"' + OBJ + '\\\\" @"' + rsp + '" >"' + OUT + '\compile.log" 2>&1',
-            "@if errorlevel 1 exit /b 1",
+            '@call "' + check.vcvars() + '" >nul 2>nul'] + compile_lines + [
             "@" + gen,
             "@if errorlevel 1 exit /b 2",
             '@link ' + " ".join(LINK_FLAGS) + (" /DEBUG" if debug else "") + ' /OUT:"' + exe + '" "' + OBJ + '\*.obj" "' + OUT + '\port_gen.obj" >"' + OUT + '\link.log" 2>&1',
