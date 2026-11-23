@@ -122,17 +122,12 @@ fn_80257FA8 AXFreeVoice
 fn_80258024 AXAcquireVoice
 fn_80259B2C AXRegisterCallback
 # MIX and AXART follow AX (0x8026099C-0x80264CD0)
-fn_802581A4 AXSetVoicePriority
 fn_80258904 AXRegisterAuxACallback
 fn_80258968 AXRegisterAuxBCallback
 fn_80259418 AXSetMode
-fn_80259B70 AXRmtGetSamples
-fn_80259C34 AXRmtAdvancePtr
 fn_8025AC30 AXSetVoiceSrcType
-fn_8025ACF0 AXSetVoiceState
 fn_8025AD60 AXSetVoiceType
 fn_8025ADAC AXSetVoiceMix
-fn_8025B0A4 AXSetVoiceAddr
 fn_8025B19C AXSetVoiceAdpcm
 fn_8025B234 AXSetVoiceSrc
 fn_8025B330 AXSetVoiceAdpcmLoop
