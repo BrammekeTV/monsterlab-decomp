@@ -132,3 +132,26 @@ fn_80322ACC NWC24iRequestGenerateUserId
 fn_80323164 NWC24iSetRtcCounter
 fn_80323574 NWC24iRequestShutdown
 fn_802EB5C4 DWCi_MatchInit
+
+# OS/VI/DSP/GX round 2 (evidence in docs/sdk_libraries.md, "Round 2")
+# OS: cache store (dcbst loop over 32-byte lines), alarm cancel (queue removal + PPCMtdec re-arm), current thread (reads 0x800000E4)
+fn_80235110 DCStoreRange
+fn_80234418 OSCancelAlarm
+fn_8023C15C OSGetCurrentThread
+# VI: display config writes at 0xCC002000+, vertical count (0x202C/0x202E), DTV status bit (0x206E)
+fn_802441F8 VIConfigure
+fn_80245B08 VIGetCurrentLine
+fn_80245BF8 VIGetDTVStatus
+# DSP: banner function (RVL_SDK - DSP) and mailbox registers 0xCC005000/0xCC005004
+fn_80264FD8 DSPInit
+fn_80264F90 DSPCheckMailToDSP
+fn_80264FA0 DSPCheckMailFromDSP
+fn_80264FB0 DSPReadMailFromDSP
+fn_80264FC4 DSPSendMailToDSP
+# GX: TEV setters, FIFO write 0x61 + BP register, shadow copies in __GXData (0x180 colour env, 0x1C0 alpha env, 0xE0+ TEV colour regs)
+fn_8024D59C GXSetTevColorIn
+fn_8024D5DC GXSetTevAlphaIn
+fn_8024D61C GXSetTevColorOp
+fn_8024D674 GXSetTevAlphaOp
+fn_8024D6CC GXSetTevColor
+fn_8024D72C GXSetTevColorS10
