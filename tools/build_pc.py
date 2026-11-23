@@ -75,6 +75,7 @@ def main():
     def stale(p):
         o = os.path.join(OBJ, os.path.splitext(os.path.basename(p))[0] + ".obj")
         return not os.path.exists(o) or os.path.getmtime(p) > os.path.getmtime(o)
+    port_dir = os.path.join(ROOT, "src", "port") + os.sep
     groups = [([p for p in files if not p.startswith(port_dir) and stale(p)], " /Od"),
               ([p for p in files if p.startswith(port_dir) and stale(p)], port_opt)]
     n_compile = sum(len(g) for g, _ in groups)
