@@ -17,7 +17,7 @@ void  fn_801C3E7C(u8* tbl, u8* obj);                    // 0x801C3E7C
 void  fn_801EBDF0(u8* a, u8* b);                        // 0x801EBDF0
 BOOL  ZoneIsLoaded(void* world, s32 zone);              // 0x8012F408
 f32   fn_801D8AD4(u8* p);                               // 0x801D8AD4
-void  fn_801D89C8(u8* p);                               // 0x801D89C8
+void  fn_801D89C8(f32 fov);                             // 0x801D89C8
 u8*   fn_801D6808(u8* cam);                             // 0x801D6808
 void  fn_801D6E4C(u8* cam, f32* m, u8* extra);          // 0x801D6E4C
 }
@@ -279,8 +279,8 @@ void fn_801D1AFC(void) {
     u8* src;
     s32 i;
 
-    fn_801D8AD4(lbl_8047C640);
-    fn_801D89C8(lbl_8047C640);
+    f32 fov = fn_801D8AD4(lbl_8047C640);        // stays in f1 for the next call
+    fn_801D89C8(fov);
     src = fn_801D6808(lbl_8047C640);
     for (i = 0; i < 12; i++) {
         m[i] = *(f32*)(src + i * 4);
