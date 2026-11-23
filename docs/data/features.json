@@ -99,6 +99,11 @@
  "changelog": [
   {
    "date": "2026-11-23",
+   "time": "19:44",
+   "text": "The main menu draws on Windows (PR #101): after pressing A at the title, Join Now!, Continue, Select Profile, Options and Credits appear over the 3D castle scene. The menu's text was missing because the game's font tables were still in the Wii's byte order. Also, 73 more game functions have their real names, taken from the game's own debug messages (PR #100)."
+  },
+  {
+   "date": "2026-11-23",
    "time": "19:20",
    "text": "Checked 149 larger in-level gameplay functions (world, characters, camera, waypoints, triggers) against the original game code and fixed 5 mistakes in our decompiled code (PR #98). Two world-state flags were written as whole words, overwriting the bytes next to them. The player respawn call was missing an argument. A particle spawn copied one word too many, and an entity colour loop read its count from the wrong place."
   },
