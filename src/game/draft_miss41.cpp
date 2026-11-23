@@ -20,7 +20,7 @@ s32       WorldGetPhase(void* world);
 BOOL      ZoneIsLoaded(void* world, s32 zone);
 u32       StringHash(const char* s);
 int       SysSprintf(char* buf, const char* fmt, ...);
-void*     fn_80109330(const char* name);
+void*     TextureLoadShared(const char* name);
 void      fn_80219004(void* p, s32 v);
 void      fn_8020B024(f32 v);
 void      fn_8020B078(f32 v);
@@ -295,7 +295,7 @@ void SetupSplashScreen(u32 a0, BOOL a1) {
         s32 isDefaultRegion = (GetRegion() == 0);
         SysSprintf(buf, "%s", "ui/msa_legal/");
         strcat(buf, fn_800FA608(a0, gTextLanguage, isDefaultRegion));
-        lbl_805FB208[a1] = fn_80109330(buf);
+        lbl_805FB208[a1] = TextureLoadShared(buf);
     }
 }
 

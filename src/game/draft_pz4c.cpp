@@ -273,7 +273,7 @@ s32 fn_801DA34C(u8* a, u8* b) {
 // table at lbl_805FB678 (entries of 0x14 bytes: name, callback, arg) and shifts the per-text
 // marker offsets (12-byte entries at +0x140). Repeats until nothing is substituted.
 // Returns 1 if anything changed (and refreshes the element), else 0.
-s32 fn_8019EB94(u8* el) {
+s32 UIText_SubstituteText(u8* el) {
     if (*(char**)(el + 0x174) == NULL) return 0;
     char* tmp = (char*)MemAllocSmall(0x1000);
     u32 cap = *(u32*)(el + 0x150);

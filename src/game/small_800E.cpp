@@ -89,7 +89,7 @@ void fn_800E2E48(u8* p, f32 f1, f32 f2) {
 
 // 0x800E2EBC
 // Registers the two CIWaypointPath script functions.
-void fn_800E2EBC(void) {
+void RegisterCIWaypointPathScripts(void) {
     lbl_805FB1B0 = RegisterScriptFunc(lbl_8035FFB0, 0x90, (void*)CIWaypointPath_StaticSetPosition);
     lbl_805FB1B4 = RegisterScriptFunc(lbl_8035FFD4, 0x8a, (void*)CIWaypointPath_StaticSetOrientation);
 }

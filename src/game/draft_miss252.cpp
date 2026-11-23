@@ -614,7 +614,7 @@ void fn_80130B50(u8* self) {
 // World reset: waits (pumping the id pool and loader) until every type-1 object has been
 // re-registered, releases the queued slots, runs the type-6 slot reset and the zone-object
 // update hooks, then re-resolves the type-3 and type-6 slots and clears the ready/suspended state.
-void fn_80128500(u8* self, s32 flag) {
+void WorldReset(u8* self, s32 flag) {
     s32 first = 1;
     s32 busy = 1;
     s32 i;

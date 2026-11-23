@@ -238,7 +238,7 @@ void fn_80198350(s32 pad, u32 held, u8* out) {
 // 0x80199CE8
 // Queues an object's render entry into a list if there is room and its state allows it.
 // Returns -2 for bad args, -1 when the list is full, -7 when not eligible, 0 otherwise.
-s32 fn_80199CE8(u8* obj, u8* list) {
+s32 UIScreen_AddDeferredRender(u8* obj, u8* list) {
     if (obj == NULL || list == NULL) {
         return -2;
     }

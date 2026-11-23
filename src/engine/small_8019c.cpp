@@ -12,9 +12,9 @@ void    fn_8020A398(s32 handle);                                // 0x8020A398
 s32     fn_80199E80(void* p, f32 dt);                           // 0x80199E80
 s32     fn_80199DD4(void* obj);                                 // 0x80199DD4
 void    fn_8019BFF8(void* obj, void* cb, void* arg);            // 0x8019BFF8
-s32 fn_8019BD18(u8* arg0, u32* arg1);                     // 0x8019BD18
-void*   fn_8019B088(void* obj, s32 kind, char* name, u32 arg);  // 0x8019B088
-void*   fn_8018E8D8(void* table, u32 hash);                     // 0x8018E8D8
+s32 UIElement_PlayUIAnimByHash(u8* arg0, u32* arg1);                     // 0x8019BD18
+void*   UIAssetMgr_Load(void* obj, s32 kind, char* name, u32 arg);  // 0x8019B088
+void*   UIHashTree_Find(void* table, u32 hash);                     // 0x8018E8D8
 void    fn_8018D2B8(const char* fmt, ...);                      // 0x8018D2B8
 u32     StringHash(const char* s);                              // 0x801EB704
 void    operator_delete(void* p);                               // 0x801D426C
@@ -142,10 +142,10 @@ void* UIWidgetFindChild(void* widget, u32 hash) {
 }
 
 // 0x80199B38
-// Plays the animation with hash anim on the widget, through fn_8019BFF8 and fn_8019BD18.
+// Plays the animation with hash anim on the widget, through fn_8019BFF8 and UIElement_PlayUIAnimByHash.
 void UIWidgetPlayAnim(void* w, u32 anim) {
     u32 ev = anim;
-    fn_8019BFF8(w, (void*)fn_8019BD18, &ev);
+    fn_8019BFF8(w, (void*)UIElement_PlayUIAnimByHash, &ev);
 }
 
 // 0x80199C30
@@ -211,7 +211,7 @@ void fn_8019A994(void* p) {
 // 0x8019AC00
 // Returns the first word of entry index in the list at obj+4. Logs and returns 0 when index is
 // out of range.
-u32 fn_8019AC00(void* obj, s32 index) {
+u32 UITextureList_GetTextureByIndex(void* obj, s32 index) {
     if (index >= 0) {
         u8* list = *(u8**)((u8*)obj + 0x4);
         if (index < fn_8019555C(list)) {
@@ -226,7 +226,7 @@ u32 fn_8019AC00(void* obj, s32 index) {
 // 0x8019AD84
 // Returns the second word of entry index in the list at obj+4. Logs and returns 0 when index is
 // out of range.
-u32 fn_8019AD84(void* obj, s32 index) {
+u32 UISoundList_GetSoundByIndex(void* obj, s32 index) {
     if (index >= 0) {
         u8* list = *(u8**)((u8*)obj + 0x4);
         if (index < fn_8019555C(list)) {
@@ -240,14 +240,14 @@ u32 fn_8019AD84(void* obj, s32 index) {
 
 // 0x8019AF88
 // Looks up the child named name (hashed) in the table at obj+0x20. When it is missing, creates it
-// through fn_8019B088 (kind 2). Returns the entry at +0xCC.
+// through UIAssetMgr_Load (kind 2). Returns the entry at +0xCC.
 void* fn_8019AF88(void* obj, char* name, u32 arg) {
     u32 hash = StringHash(fn_801D8ADC(name));
-    void* found = fn_8018E8D8(*(void**)((u8*)obj + 0x20), hash);
+    void* found = UIHashTree_Find(*(void**)((u8*)obj + 0x20), hash);
     if (found != NULL) {
         return (u8*)found + 0xCC;
     }
-    void* r = fn_8019B088(obj, 2, name, arg);
+    void* r = UIAssetMgr_Load(obj, 2, name, arg);
     return (u8*)r + 0xCC;
 }
 
@@ -255,11 +255,11 @@ void* fn_8019AF88(void* obj, char* name, u32 arg) {
 // Same as fn_8019AF88 but on the table at obj+0x28 and with kind 4 when it has to create the entry.
 void* fn_8019B008(void* obj, char* name, u32 arg) {
     u32 hash = StringHash(fn_801D8ADC(name));
-    void* found = fn_8018E8D8(*(void**)((u8*)obj + 0x28), hash);
+    void* found = UIHashTree_Find(*(void**)((u8*)obj + 0x28), hash);
     if (found != NULL) {
         return (u8*)found + 0xCC;
     }
-    void* r = fn_8019B088(obj, 4, name, arg);
+    void* r = UIAssetMgr_Load(obj, 4, name, arg);
     return (u8*)r + 0xCC;
 }
 

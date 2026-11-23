@@ -19,8 +19,8 @@ void fn_80154294(void);                                                     // 0
 void fn_80154318(void);                                                     // 0x80154318
 s32 fn_8015BA30(void* p);                                                   // 0x8015BA30
 void fn_8018D370(const char* fmt, ...);                                     // 0x8018D370 (debug log)
-void* fn_8018D428(s32 size, const char* file, void* tag, s32 line);         // 0x8018D428 (alloc)
-void fn_8018D558(u8* sets, f32 x, f32 y, f32 z);                            // 0x8018D558
+void* UIEngineAlloc(s32 size, const char* file, void* tag, s32 line);         // 0x8018D428 (alloc)
+void UIEngine_SetCursorPos(u8* sets, f32 x, f32 y, f32 z);                            // 0x8018D558
 void fn_8018DEF4(void* sets);                                               // 0x8018DEF4
 s32 fn_8018E208(void* table, u32 hash, void* entry);                        // 0x8018E208
 s32 fn_80196678(void* gx, void* mat, f32 t);                                // 0x80196678
@@ -37,12 +37,12 @@ s32 fn_80199100(void* obj);                                                 // 0
 s32 fn_80199540(u8** a, u8** b);                                            // 0x80199540 (sort compare)
 void fn_80199C30(void* obj);                                                // 0x80199C30
 void fn_8019BFF8(void* obj, void* cb, void* arg);                           // 0x8019BFF8
-void* fn_8019B1C8(void* obj, s32 kind, char* name, char* arg);              // 0x8019B1C8
+void* UIAssetMgr_BuildPath(void* obj, s32 kind, char* name, char* arg);              // 0x8019B1C8
 s32 fn_801AB56C(void* h, f32 t);                                            // 0x801AB56C
 s32 fn_801AB7D4(void* h);                                                   // 0x801AB7D4
 f32 fn_801AB7F0(void* h);                                                   // 0x801AB7F0
 s32 fn_801AB7F8(u8* a3, f32 f1);                                            // 0x801AB7F8
-void* fn_801ABAF4(void* anim);                                              // 0x801ABAF4
+void* UIAnimPlayer_Alloc(void* anim);                                              // 0x801ABAF4
 void fn_801ABCEC(void* h, void* owner);                                     // 0x801ABCEC
 void fn_801D65B4(void);                                                     // 0x801D65B4
 void fn_801D65C0(void);                                                     // 0x801D65C0
@@ -280,7 +280,7 @@ s32 fn_8018CA38(u8* sets, f32 dt) {
             f32 hh = 0.5f * (f32)gScreenHeight;
             f32 y = hh + hh * (*(f32*)(ptr + 0xB4) * *(f32*)(ptr + 0x94));
             if (x != *(f32*)(cursor + 0x68) || y != *(f32*)(cursor + 0x6C)) {
-                fn_8018D558(sets, x, y, *(f32*)(cursor + 0x70));
+                UIEngine_SetCursorPos(sets, x, y, *(f32*)(cursor + 0x70));
             }
             if (*(u8*)(sets + 0x80) != 0) {
                 u8* c = *(u8**)(sets + 0x7C);
@@ -297,7 +297,7 @@ s32 fn_8018CA38(u8* sets, f32 dt) {
 // 0x80195608
 // Inserts a copy of elem at index idx + 1 of the list (count +0, capacity +4, element size +8,
 // data +0x10), shifting later elements up. Out-of-range slots resolve to NULL. Returns 0.
-s32 fn_80195608(u8* list, void* elem, s32 idx) {
+s32 UIList_Realloc(u8* list, void* elem, s32 idx) {
     if (*(s32*)(list + 0x0) + 1 > *(s32*)(list + 0x4)) {
         fn_8018D370(lbl_80382010);
     }
@@ -510,13 +510,13 @@ s32 fn_8019892C(u8* set) {
 
 // 0x8019B088
 // Creates a named entry (0xD0 bytes) of the given kind (0..4) in the table at obj + 0x18 + kind*4:
-// name at +4, optional second string at +0x68, handle from fn_8019B1C8 at +0xCC. Allocates from
+// name at +4, optional second string at +0x68, handle from UIAssetMgr_BuildPath at +0xCC. Allocates from
 // the pool index stored at obj+0. Returns the entry.
-void* fn_8019B088(u8* obj, s32 kind, char* name, char* arg) {
+void* UIAssetMgr_Load(u8* obj, s32 kind, char* name, char* arg) {
     s32 savedPool = lbl_805F95F8;
     lbl_805F95F8 = *(s32*)obj;
-    void* handle = fn_8019B1C8(obj, kind, name, arg);
-    u8* e = (u8*)fn_8018D428(0xD0, lbl_803828C8, lbl_805F93F0, 0x19E);
+    void* handle = UIAssetMgr_BuildPath(obj, kind, name, arg);
+    u8* e = (u8*)UIEngineAlloc(0xD0, lbl_803828C8, lbl_805F93F0, 0x19E);
     *(s32*)e = kind;
     if (kind >= 0 && kind < 5) {
         *(void**)(e + 0xCC) = handle;
@@ -540,7 +540,7 @@ void* fn_8019B088(u8* obj, s32 kind, char* name, char* arg) {
 // Starts the animation desc on the object (current handle at +0x10, vtable slot 0x10 stops it)
 // unless the running one has a higher priority (byte +0x30 greater than prio). Returns 0 when
 // blocked, -2 when the animation is missing, else the result of fn_801AB7D4.
-s32 fn_8019BA18(u8* obj, void* desc, s8 prio, f32 speed) {
+s32 UIElement_AllocAnimPlayer(u8* obj, void* desc, s8 prio, f32 speed) {
     u8* cur = *(u8**)(obj + 0x10);
     if (cur != NULL) {
         if ((s8)*(u8*)(cur + 0x30) < prio) {
@@ -548,7 +548,7 @@ s32 fn_8019BA18(u8* obj, void* desc, s8 prio, f32 speed) {
         }
         (*(VFnVoid*)(*(u8**)(obj + 0x138) + 0x10))(obj);
     }
-    u8* h = (u8*)fn_801ABAF4(desc);
+    u8* h = (u8*)UIAnimPlayer_Alloc(desc);
     if (h == NULL) {
         fn_8018D370(lbl_80382AF0);
         return -2;

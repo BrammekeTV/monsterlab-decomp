@@ -18,12 +18,12 @@ void*       ScreenSetsCurrent(void* sets);                 // 0x8018D1E4
 void*       ScreenSetFindElement(void* set, u32 hash);     // 0x80198F18
 void        fn_8018D2B8(const char* fmt, ...);             // 0x8018D2B8 (debug log)
 void        fn_8018D370(const char* fmt, ...);             // 0x8018D370 (debug log)
-const char* fn_801EB708(u32 hash);                         // 0x801EB708 (hash -> name for logs)
+const char* FormatHashString(u32 hash);                         // 0x801EB708 (hash -> name for logs)
 const char* UITextGetString(void* text);                   // 0x8019F3AC
 u32         fn_801A65A0(void* obj);                        // 0x801A65A0
 u32         fn_801A665C(void* obj);                        // 0x801A665C
 u8*         fn_801A7250(u8* grid);                         // 0x801A7250
-u8*         fn_801A9EFC(u8* a, s32 idx);                   // 0x801A9EFC
+u8*         UIGridItem_FindGroupType(u8* a, s32 idx);                   // 0x801A9EFC
 s32 fn_801A6B9C(u8* grid, s32 a);                  // 0x801A6B9C
 
 
@@ -230,7 +230,7 @@ static u8* FindElement48(u32 hash) {
     }
     u8* el = (u8*)ScreenSetFindElement(set, hash);
     if (el == NULL) {
-        fn_8018D2B8(lbl_80381868 + 0x238, fn_801EB708(hash));
+        fn_8018D2B8(lbl_80381868 + 0x238, FormatHashString(hash));
         return NULL;
     }
     return el;
@@ -241,7 +241,7 @@ static u8* FindGrid48(u32 hash) {
     u8* el = FindElement48(hash);
     if (el == NULL) return NULL;
     if (*(s32*)(el + 0x60) != 4) {
-        fn_8018D370(lbl_80381868 + 0x558, fn_801EB708(hash));
+        fn_8018D370(lbl_80381868 + 0x558, FormatHashString(hash));
         return NULL;
     }
     return el;
@@ -452,7 +452,7 @@ s32 UIGrid_GetCurrentText(u32 a0) {
         fn_8018D370(lbl_80381868 + 0x580);
         return 0;
     }
-    u8* cell = fn_801A9EFC(cur, 1);
+    u8* cell = UIGridItem_FindGroupType(cur, 1);
     if (cell == NULL) {
         fn_8018D370(lbl_80381868 + 0x5A8);
         return 0;

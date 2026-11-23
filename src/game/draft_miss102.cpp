@@ -42,7 +42,7 @@ void* ScreenSetsCurrent(void* sets);                            // 0x8018D1E4
 void* ScreenSetFindWidget(void* set, u32 hash);                 // 0x80198E34
 void* ScreenSetFindElement(void* set, u32 hash);                // 0x80198F18
 void* UIWidgetFindChild(void* widget, u32 hash);                // 0x80199AEC
-void* fn_80198F1C(void* set, u32 hash);                         // 0x80198F1C
+void* UIAnim_FindByName(void* set, u32 hash);                         // 0x80198F1C
 s32 fn_8019BBA4(void* el, void* aux, s32 n);                    // 0x8019BBA4
 void* fn_80209814(void* v);                                     // 0x80209814
 void UISetText(void* el, const char* text, s32 a);              // 0x8019EFC8
@@ -351,7 +351,7 @@ void fn_800704AC(u8* arg0, f32 dt) {
         void* w = ScreenSetFindWidget(set, 0xC62FBC4Eu);
         if (w != NULL) {
             el = (u8*)UIWidgetFindChild(w, 0xD07D25AEu);
-            aux = fn_80198F1C(set, 0x89F1B913u);
+            aux = UIAnim_FindByName(set, 0x89F1B913u);
         }
     }
     f32 cur = *(f32*)(arg0 + 0x6C);
@@ -383,7 +383,7 @@ void fn_80021F2C(u8* arg0, f32 dt) {
     void* aux = NULL;
     if (set != NULL) {
         el = (u8*)ScreenSetFindElement(set, 0xD07D25AEu);
-        aux = fn_80198F1C(set, 0x89F1B913u);
+        aux = UIAnim_FindByName(set, 0x89F1B913u);
     }
     f32 cur = *(f32*)(arg0 + 0x70);
     if (0.0f == cur) {

@@ -39,9 +39,9 @@ void  UIPlayAnim(void* el, u32 anim);                             // 0x8019BE40
 s32   WorldGetPhase(void* world);                                 // 0x800D83A8
 void  fn_80016FD0(Character* c, int animate);                     // 0x80016FD0
 void  fn_80041810(u8* dst, u8* src);                              // 0x80041810 (copy a choice)
-void* fn_80109330(const char* name);                              // 0x80109330 (texture lookup by name)
+void* TextureLoadShared(const char* name);                              // 0x80109330 (texture lookup by name)
 void  fn_8018D370(const char* fmt, ...);                          // 0x8018D370 (debug log)
-void* fn_80198F1C(void* set, u32 hash);                           // 0x80198F1C
+void* UIAnim_FindByName(void* set, u32 hash);                           // 0x80198F1C
 s32 fn_8019BBA4(u8* arg0, u8* arg1, s32 arg2);               // 0x8019BBA4
 s32 fn_8019CC7C(void* el, u32 flag);                            // 0x8019CC7C
 u8*   fn_801B3308(void);                                          // 0x801B3308
@@ -161,7 +161,7 @@ void CharacterStartReaction(u8* arg0) {
 // 0x8019BD18
 // UI element event router: runs the action, anim or sound registered for event id *arg1.
 // Each list is a chain of nodes {next, id, data...}; only the first match of each list fires.
-s32 fn_8019BD18(u8* arg0, u32* arg1) {
+s32 UIElement_PlayUIAnimByHash(u8* arg0, u32* arg1) {
     u32 ev = *arg1;
 
     for (u8* n = *(u8**)(arg0 + 0x4); n != NULL; n = *(u8**)n) {
@@ -173,7 +173,7 @@ s32 fn_8019BD18(u8* arg0, u32* arg1) {
     for (u8* n = *(u8**)(arg0 + 0x8); n != NULL; n = *(u8**)n) {
         if (*(u32*)(n + 4) == ev) {
             u32 hash = *(u32*)(n + 8);
-            void* anim = fn_80198F1C(ScreenSetsCurrent(gScreenSets), hash);
+            void* anim = UIAnim_FindByName(ScreenSetsCurrent(gScreenSets), hash);
             if (anim == NULL) {
                 fn_8018D370("UIElement : unable to find anim hash 0x%x descriptor ... \n", hash);
             }
@@ -343,7 +343,7 @@ void* EnhancementGetTexture(s32 arg0) {
     SysSprintf(numbered, "enhancement_icon%03d", (s32)(s8)*(u8*)(rec + 0x20));
     strcpy(path, "ui/msa_enhancements/");
     strcat(path, numbered);
-    void* tex = fn_80109330(path);
+    void* tex = TextureLoadShared(path);
 
     s32 id = TextIdFromHash(textHash);
     const char* text;
@@ -359,7 +359,7 @@ void* EnhancementGetTexture(s32 arg0) {
     if (tex == NULL) {
         strcpy(path, "ui/msa_enhancements/");
         strcat(path, "enhance_icon_temp");
-        tex = fn_80109330(path);
+        tex = TextureLoadShared(path);
     }
     return tex;
 }

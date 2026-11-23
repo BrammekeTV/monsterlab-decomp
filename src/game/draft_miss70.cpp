@@ -76,7 +76,7 @@ void fn_800779F4(u8* p) {
 
 // 0x80093934
 // Registers the smasher script callbacks from the name table lbl_8035C0A0.
-s32 fn_80093934(void) {
+s32 RobotEvolutionExperiment_RegisterSmasherScripts(void) {
     RegisterScriptFunc((const char*)(lbl_8035C0A0 + 0x00), 0x4E, (void*)RobotEvolutionExperiment_SmasherIdling);
     RegisterScriptFunc((const char*)(lbl_8035C0A0 + 0x28), 0x4E, (void*)RobotEvolutionExperiment_SmasherDropping);
     RegisterScriptFunc((const char*)(lbl_8035C0A0 + 0x58), 0x4E, (void*)RobotEvolutionExperiment_SmasherRaising);
@@ -175,7 +175,7 @@ void* fn_80198E68(void* set, u32 hash) {
 
 // 0x801A9EFC
 // Walks the linked list at +0x120 (next at +0x124, type at +0x60) for the given type; logs and returns NULL if not found.
-u8* fn_801A9EFC(u8* arg0, s32 arg1) {
+u8* UIGridItem_FindGroupType(u8* arg0, s32 arg1) {
     u8* p = *(u8**)(arg0 + 0x120);
     u8* next;
     while ((next = *(u8**)(p + 0x124)) != NULL && arg1 != *(s32*)(p + 0x60)) {

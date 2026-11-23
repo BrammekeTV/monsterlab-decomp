@@ -24,7 +24,7 @@ void  TextureRelease(void* tex);                                      // 0x80184
 s32   PartPower(s32 defIndex, s32 tier);                              // 0x8021B650
 s32   fn_80109A0C(s32 id);                                            // 0x80109A0C
 void* fn_8011ED38(s32 id);                                            // 0x8011ED38
-void* fn_8011CC5C(s32 index);                                         // 0x8011CC5C
+void* PartFormatBadgeIconName(s32 index);                                         // 0x8011CC5C
 void* fn_80118858(s32* args);                                         // 0x80118858
 void* fn_8011AE30(PartDef* def, s32 a);                               // 0x8011AE30
 void  UIImage_SetTexture(u32 hash, void* tex);                        // 0x80191B68
@@ -153,7 +153,7 @@ void fn_800E6CD0(u8* p) {
         }
         case 4: {
             u8* row = *(u8**)(data + 0x10a8) + idx * 0x18;
-            icon = fn_8011CC5C(idx);
+            icon = PartFormatBadgeIconName(idx);
             titleId = TextIdFromHash(*(u32*)(row + 4));
             number = (s32) * (f32*)(row + 0x10);
             break;

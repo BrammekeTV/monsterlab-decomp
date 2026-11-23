@@ -30,7 +30,7 @@ u8*     fn_8018C48C(u8* base, u32 key);                         // 0x8018C48C
 void    fn_8018C4D8(u8* p);                                     // 0x8018C4D8
 s32     fn_8019BC80(u8* arg0, u32 arg1);                        // 0x8019BC80
 s32     fn_800339A8(u8* arg0);                                  // 0x800339A8 (signature guessed)
-u8*     fn_801AC184(u8* defs, s32 idx);                         // 0x801AC184
+u8*     AnimDefFindByHandle(u8* defs, s32 idx);                         // 0x801AC184
 u8*     fn_801B3308(void);                                      // 0x801B3308
 void    fn_801B3378(u8* p, u8* key);                            // 0x801B3378
 void*   fn_801B373C(void* p);                                   // 0x801B373C
@@ -59,7 +59,7 @@ extern f32 lbl_805FDC50;            // 0x805FDC50 (float, 0.0)
 // 0x8003FC00
 // Allocates the 0x70-byte record (fn_801D40E0, then fn_801B373C), stores it at +0x84 and copies
 // the name string into it (0x5F bytes, NUL at +0x5F).
-void fn_8003FC00(u8* arg0) {
+void DebugActionSelectionMenu(u8* arg0) {
     u8* rec = (u8*)fn_801D40E0(0x70);
     if (rec != NULL) {
         rec = (u8*)fn_801B373C(rec);
@@ -244,7 +244,7 @@ void fn_8009A548(u8* arg0) {
     // r3 for this call is not set by the asm (fn_8009B320 returns void), so it is passed as 0.
     u8* p = fn_800E4D7C(0);
     u8* c = fn_800E4BFC(p);
-    u8* child = fn_801AC184(*(u8**)(*(u8**)(c + 0x9C) + 0x48), *(s32*)(p + 0x5C));
+    u8* child = AnimDefFindByHandle(*(u8**)(*(u8**)(c + 0x9C) + 0x48), *(s32*)(p + 0x5C));
     *(s32*)(child + 0xC) |= 0x10000;
     *(u8*)(p + 0x54) = 1;
     u8* o = fn_800E4BFC(p);

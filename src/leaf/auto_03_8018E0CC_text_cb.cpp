@@ -6,9 +6,9 @@
 #include "types.h"
 #include "game/script_callbacks.h"
 
-extern "C" void fn_80190D28(u32, char*, s32);
+extern "C" void UIText_SetStringCommon(u32, char*, s32);
 
 // 0x80190E48
 void UIText_SetString(u32 a3, BOOL a4) {
-    fn_80190D28((u32)((u32)(uintptr_t)(a3)), (char*)(((u8*)(uintptr_t)(a4))), (s32)((u32)(0)));
+    UIText_SetStringCommon((u32)((u32)(uintptr_t)(a3)), (char*)(((u8*)(uintptr_t)(a4))), (s32)((u32)(0)));
 }

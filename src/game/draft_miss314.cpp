@@ -302,7 +302,7 @@ s32 fn_800D5DE4(u8* arg0, u8* arg1, s32 arg2) {
 // UI key frame interpolation: evaluates the 4-float value between key frames `k0` and `k1` at
 // time `pos` into `out` (via `buf`, or a local when null). The mode at k0+0x20 picks the curve:
 // 0 linear, 1 cosine ease, 2 hold, 3 quadratic, 4 ease-out; others log an error.
-void fn_801AA218(u8* out, u8* k0, u8* k1, f32* buf, f32 pos) {
+void UIKeyFrame_Interpolate(u8* out, u8* k0, u8* k1, f32* buf, f32 pos) {
     f32 local[4];
     if (buf == NULL) buf = local;
 

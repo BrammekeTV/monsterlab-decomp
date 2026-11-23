@@ -9,7 +9,7 @@ s32   fn_800DECD8(u8* p, f32 dt);                                        // 0x80
 s32   PlaySoundAt(void* sound, int a, const void* pos, int b);           // 0x80209ABC
 s32   TriggerDoAction(void* action, void* a1, void* a2);                 // 0x801E0054
 void  fn_8020A398(s32 handle);                                           // 0x8020A398
-void  fn_8018D1FC(const char* fmt, ...);                                 // 0x8018D1FC
+void  GameLogDebug(const char* fmt, ...);                                 // 0x8018D1FC
 void  fn_8018D2B8(const char* fmt, ...);                                 // 0x8018D2B8 (debug log)
 u8*    fn_8019552C(u8* list, s32 index);                                  // 0x8019552C
 s32   fn_801A6384(u8* grid);                                             // grid helper
@@ -168,7 +168,7 @@ void fn_8019E838(u8* arg0, f32 farg0) {
             return;
         }
         if (type == 0) {
-            fn_8018D1FC("color tag at index %d\n");
+            GameLogDebug("color tag at index %d\n");
         } else if (type == 1) {
             if (lbl_805F9410 != -1) {
                 fn_8020A398(lbl_805F9410);

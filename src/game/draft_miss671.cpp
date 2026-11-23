@@ -35,7 +35,7 @@ void fn_80042408(u8* c, const s32* kind, s32 reaction, u8* fighter, s32 flag);  
 u8* fn_8004EDD0(u8* obj, s32 flag, s32 a2);                     // 0x8004EDD0
 void fn_800E75E8(s32 a);                                        // 0x800E75E8
 f32 fn_8018BE30(void* obj, f32 a);                              // 0x8018BE30
-void* fn_80198F1C(void* set, u32 hash);                         // 0x80198F1C
+void* UIAnim_FindByName(void* set, u32 hash);                         // 0x80198F1C
 s32 fn_8019BBA4(u8* arg0, u8* arg1, s32 arg2);                  // 0x8019BBA4
 void fn_801A1ABC(u8* el, u32 v);                                // 0x801A1ABC
 void fn_801A8654(u8* obj, s32 a1);                              // 0x801A8654
@@ -43,7 +43,7 @@ void fn_801A8E80(u8* obj, s32 flag);                            // 0x801A8E80
 u8* fn_801B3308(void);                                          // 0x801B3308
 void fn_801B3310(u8* p, u8* q);                                 // 0x801B3310
 void* fn_801D40E0(s32 n);                                       // 0x801D40E0
-const char* fn_801EB708(u32 hash);                              // 0x801EB708
+const char* FormatHashString(u32 hash);                              // 0x801EB708
 u8* fn_801F61AC(u8* arg0, s32 arg1);                            // 0x801F61AC
 u8* fn_801F8110(u8* p, s32 a4);                                 // 0x801F8110
 void fn_801F903C(u8* obj, f32* dir, f32 v);                     // 0x801F903C
@@ -190,7 +190,7 @@ u8* fn_8002B58C(u8* arg0, void* arg1, s32 arg2, u8* arg3, u8* arg4, u8* arg5) {
             u8* obj = *(u8**)(*(u8**)(zone + 0x12C) + i * 4);
             u8* info = *(u8**)(obj + 0x9C);
             u32 h = (info != NULL) ? *(u32*)(info + 0x8) : 0;
-            fn_801EB708(h);
+            FormatHashString(h);
             info = *(u8**)(obj + 0x9C);
             h = (info != NULL) ? *(u32*)(info + 0x8) : 0;
             if (h == 0xD716DA31u) {
@@ -219,7 +219,7 @@ static void GemInit(u8* arg0, void* set, s32 idx, s32 cursor, const char* animNa
     *(f32*)(arg0 + 0x38) = lbl_803475B4[idx];
     *(s32*)(arg0 + 0x10) = lbl_80347578[idx];
     *(f32*)(arg0 + 0x28) = a + (b - a) * t;
-    *(void**)(arg0 + 0x20) = fn_80198F1C(set, StringHash(animName));
+    *(void**)(arg0 + 0x20) = UIAnim_FindByName(set, StringHash(animName));
     switch (lbl_803C4DC0[cursor]) {
     case 0:
         *(void**)(arg0 + 0x54) = ScreenSetFindElement(set, hashA);

@@ -26,7 +26,7 @@ f64  fn_8033F1F4(f64 x);
 f32  fn_8033F1FC(f32 y, f32 x);
 s32  fn_80109A0C(void* h);
 s32  fn_801098DC(void* h);
-u8*  fn_80109330(const char* name);
+u8*  TextureLoadShared(const char* name);
 u8*  fn_80222704(u8* s, s32 a, s32 b);
 s32  fn_80222994(u8* s);
 u8*  fn_801483BC(s32 idx);
@@ -163,10 +163,10 @@ void fn_8011EAC4(u8* arg0) {
         s8 icon = *(s8*)(rec + 0x18);
         if (icon != 0 && icon != -1) {
             SysSprintf(name, "%squest_icon_%03d", lbl_805F8F90, (s32)icon);
-            u8* tex = fn_80109330(name);
+            u8* tex = TextureLoadShared(name);
             if (tex == NULL) {
                 SysSprintf(name, "%squest_icon_placeholder", lbl_805F8F90);
-                tex = fn_80109330(name);
+                tex = TextureLoadShared(name);
             }
             *(u8**)(arg0 + 0x30) = tex;
         }

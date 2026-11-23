@@ -98,7 +98,7 @@ void fn_800DD85C(u8* arg0, s32 arg1) {
 // 0x8018D6C8
 // Returns the cursor block at +0x7C (offset +0x68), or NULL with a debug log if no cursor.
 // The asm does not set r4 before the log call, so arg1 (the caller's r4) is forwarded.
-u8* fn_8018D6C8(u8* arg0, s32 arg1) {
+u8* UIEngine_GetCursorPos(u8* arg0, s32 arg1) {
     u8* cursor = *(u8**)(arg0 + 0x7C);
     if (cursor != NULL) {
         return cursor + 0x68;

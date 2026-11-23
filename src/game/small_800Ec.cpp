@@ -48,7 +48,7 @@ void  fn_801B55F4(u8* obj, u8* out, s32 idx);                   // 0x801B55F4
 s32 SpawnEffectAt(void* fxMgr, u32 effect, const f32 pos[4], u8** owner); // 0x801C80E0
 void* CharacterFind(s32 id);                                    // 0x800E876C
 void  EventSend(void* mgr, void* target, void* from, u32 event, int a, int b, int c, int d);   // 0x801BA190
-const char* fn_801EB708(u32 hash);                              // 0x801EB708
+const char* FormatHashString(u32 hash);                              // 0x801EB708
 f32   fn_8018BE30(void* obj, f32 a);                            // 0x8018BE30
 void  TextureRelease(void* tex);                                // 0x80184028
 f32   fn_8033F1FC(f32 y, f32 x);                                // 0x8033F1FC
@@ -274,7 +274,7 @@ void AddHealth(void* a0, void* a1, f32 a2) {
 // Sends event a1 with arguments a2, a3 (and 1, 0 as the last two) from the global event
 // manager to the character with id a0.
 void SendSignalToEntity(u32 a0, u32 a1, s32 a2, s32 a3) {
-    fn_801EB708(a0);
+    FormatHashString(a0);
     void* target = CharacterFind((s32)a0);
     EventSend(gEventMgr, target, NULL, a1, a2, a3, 1, 0);
 }

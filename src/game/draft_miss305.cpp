@@ -161,7 +161,7 @@ void* fn_8011AE30(PartDef* arg0, s32 arg1) {
 // 0x8011CC5C
 // Looks up the badge texture "<prefix>inventory_badge_%03d" for entry idx (0x18-byte records at
 // db+0x10A8, id at +0x14), falling back to the placeholder badge.
-void* fn_8011CC5C(s32 idx) {
+void* PartFormatBadgeIconName(s32 idx) {
     char buf[0x100];
     u8* rec = *(u8**)(gGameDb->data + 0x10A8) + idx * 0x18;
     void* r;

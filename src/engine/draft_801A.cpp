@@ -16,25 +16,25 @@ s32    UISetTexture(u8* el, s32 tex);                           // 0x801A11FC
 void   fn_801719DC(void* p);                                    // 0x801719DC
 u8*    fn_8018C8E4(void);                                       // 0x8018C8E4
 void   fn_8018D2B8(const char* fmt, ...);                       // 0x8018D2B8 (debug log)
-void*  fn_8018D428(s32 size, const char* file, void* tag, s32 line); // 0x8018D428 (alloc)
+void*  UIEngineAlloc(s32 size, const char* file, void* tag, s32 line); // 0x8018D428 (alloc)
 void   fn_80195A58(void* gx, void* a, u8* b, u8* c);            // 0x80195A58
 s32 fn_80196678(void* gx, void* mat, f32 t);                   // 0x80196678
 s32    fn_80196B10(u8* a3);                                     // 0x80196B10 (leaf)
 s32 fn_80196B4C(u8* arg0, const f32* arg1);                   // 0x80196B4C
 s32    fn_80196C88(u8* a3);                                     // 0x80196C88 (leaf)
 s32    fn_8019AD6C(u8* a3);                                     // 0x8019AD6C (leaf)
-u32    fn_8019AC00(void* obj, s32 index);                       // 0x8019AC00
+u32    UITextureList_GetTextureByIndex(void* obj, s32 index);                       // 0x8019AC00
 void   fn_8019B2F4(void* obj);                                  // 0x8019B2F4 (UI element base init)
 s32 fn_8019B6CC(u8* arg0, f32 farg0);                           // 0x8019B6CC (UI element base update)
 s32    fn_8019B7D8(void* obj);                                  // 0x8019B7D8
-u8*    fn_8019F9B8(s32 kind);                                   // 0x8019F9B8 (UI element factory)
+u8*    UIGraphic_Create(s32 kind);                                   // 0x8019F9B8 (UI element factory)
 void*  fn_801B7198(void* anim, s32 a);                          // 0x801B7198
 void   fn_801B72A0(void* anim, s32 a);                          // 0x801B72A0
 void   fn_801A21CC(u8* o);                                      // 0x801A21CC
-s32    fn_801A31BC(u8* o);                                      // 0x801A31BC
+s32    UIEntity_UpdateBones(u8* o);                                      // 0x801A31BC
 u8*     fn_8019552C(u8* list, s32 index);                         // 0x8019552C
 s32    fn_8019555C(u8* list);                                    // 0x8019555C
-u8*    fn_801A9EFC(u8* element, s32 type);                       // 0x801A9EFC
+u8*    UIGridItem_FindGroupType(u8* element, s32 type);                       // 0x801A9EFC
 void   fn_801A1ABC(u8* element, u32 value);                      // 0x801A1ABC
 void   UISetText(void* element, const char* text, s32 mode);      // 0x8019EFC8
 void   UIWidgetPlayAnimLoop(void* widget, u32 anim, s32 count);   // 0x8019BB1C
@@ -88,8 +88,8 @@ s32 fn_801A0D04(u8* arg0) {
 // 0x801A1B64
 // UISlideshow constructor: two child elements (kind 0) at +0x164/+0x168, crossfade timing
 // 3.0s hold / 0.5s fade, first image shown on child 1.
-void* fn_801A1B64(void) {
-    u8* o = (u8*)fn_8018D428(0x16C, lbl_80382E90, &lbl_805F9450, 0x2F);
+void* UISlideshow_Create(void) {
+    u8* o = (u8*)UIEngineAlloc(0x16C, lbl_80382E90, &lbl_805F9450, 0x2F);
     if (o != NULL) {
         *(void**)(o + 0x138) = lbl_80382EA0;
         u8* c = *(u8**)(o + 0x164);
@@ -111,7 +111,7 @@ void* fn_801A1B64(void) {
     *(s32*)(o + 0x14C) = 0;
     *(s32*)(o + 0x150) = 1;
     for (s32 i = 0; i < 2; i++) {
-        u8* ch = fn_8019F9B8(0);
+        u8* ch = UIGraphic_Create(0);
         *(u8**)(o + 0x164 + i * 4) = ch;
         *(f32*)(ch + 0x68) = 0.0f;
         *(f32*)(ch + 0x6C) = 0.0f;
@@ -127,7 +127,7 @@ void* fn_801A1B64(void) {
     *(f32*)(o + 0x15C) = 0.0f;
     *(f32*)(o + 0x160) = -1.0f;
     void* list = *(void**)(o + 0x140);
-    s32 tex = list != NULL ? (s32)fn_8019AC00(list, *(s32*)(o + 0x148)) : 0;
+    s32 tex = list != NULL ? (s32)UITextureList_GetTextureByIndex(list, *(s32*)(o + 0x148)) : 0;
     UISetTexture(*(u8**)(o + 0x164 + *(s32*)(o + 0x150) * 4), tex);
     *(f32*)(*(u8**)(o + 0x164 + *(s32*)(o + 0x150) * 4) + 0x8C) = 1.0f;
     UISetTexture(*(u8**)(o + 0x164 + *(s32*)(o + 0x14C) * 4), 0);
@@ -150,7 +150,7 @@ void fn_801A1DC8(u8* arg0, void* arg1) {
     *(s32*)(arg0 + 0x148) = 0;
     *(f32*)(arg0 + 0x15C) = 0.0f;
     *(f32*)(arg0 + 0x160) = -1.0f;
-    s32 tex = arg1 != NULL ? (s32)fn_8019AC00(arg1, 0) : 0;
+    s32 tex = arg1 != NULL ? (s32)UITextureList_GetTextureByIndex(arg1, 0) : 0;
     UISetTexture(*(u8**)(arg0 + 0x164 + *(s32*)(arg0 + 0x150) * 4), tex);
     *(f32*)(*(u8**)(arg0 + 0x164 + *(s32*)(arg0 + 0x150) * 4) + 0x8C) = 1.0f;
     UISetTexture(*(u8**)(arg0 + 0x164 + *(s32*)(arg0 + 0x14C) * 4), 0);
@@ -247,7 +247,7 @@ void fn_801A21CC(u8* arg0) {
     *(f32*)(*(u8**)(arg0 + 0x164 + next * 4) + 0x70) = 0.0f;
     *(f32*)(*(u8**)(arg0 + 0x164 + *(s32*)(arg0 + 0x150) * 4) + 0x70) = 1.0f;
     void* l2 = *(void**)(arg0 + 0x140);
-    s32 tex = l2 != NULL ? (s32)fn_8019AC00(l2, *(s32*)(arg0 + 0x148)) : 0;
+    s32 tex = l2 != NULL ? (s32)UITextureList_GetTextureByIndex(l2, *(s32*)(arg0 + 0x148)) : 0;
     UISetTexture(*(u8**)(arg0 + 0x164 + *(s32*)(arg0 + 0x150) * 4), tex);
     *(f32*)(*(u8**)(arg0 + 0x164 + *(s32*)(arg0 + 0x14C) * 4) + 0x8C) = 1.0f;
     if (*(u32*)(arg0 + 0x64) & 0x20000) {
@@ -269,7 +269,7 @@ void fn_801A23F8(u8* arg0) {
     *(s32*)(arg0 + 0x148) = 0;
     *(f32*)(arg0 + 0x15C) = 0.0f;
     *(f32*)(arg0 + 0x160) = -1.0f;
-    s32 tex = list != NULL ? (s32)fn_8019AC00(list, 0) : 0;
+    s32 tex = list != NULL ? (s32)UITextureList_GetTextureByIndex(list, 0) : 0;
     UISetTexture(*(u8**)(arg0 + 0x164 + *(s32*)(arg0 + 0x150) * 4), tex);
     *(f32*)(*(u8**)(arg0 + 0x164 + *(s32*)(arg0 + 0x150) * 4) + 0x8C) = 1.0f;
     UISetTexture(*(u8**)(arg0 + 0x164 + *(s32*)(arg0 + 0x14C) * 4), 0);
@@ -283,8 +283,8 @@ void fn_801A23F8(u8* arg0) {
 
 // 0x801A2588
 // UIModel constructor: identity-style defaults (0/1 float blocks at +0x148..+0x184).
-void* fn_801A2588(void) {
-    u8* o = (u8*)fn_8018D428(0x188, lbl_80382F10, &lbl_805F9460, 0x26);
+void* UIModel_Create(void) {
+    u8* o = (u8*)UIEngineAlloc(0x188, lbl_80382F10, &lbl_805F9460, 0x26);
     if (o != NULL) {
         *(void**)(o + 0x138) = lbl_80382F1C;
     }
@@ -337,8 +337,8 @@ s32 fn_801A2D10(u8* arg0) {
 
 // 0x801A2DDC
 // UIEntity constructor: flag 1 at +0x13C, anim handle at +0x140 initialised to 0.
-void* fn_801A2DDC(void) {
-    u8* o = (u8*)fn_8018D428(0x148, lbl_80382F80, &lbl_805F9478, 0x24);
+void* UIEntity_Create(void) {
+    u8* o = (u8*)UIEngineAlloc(0x148, lbl_80382F80, &lbl_805F9478, 0x24);
     if (o != NULL) {
         *(void**)(o + 0x138) = lbl_803830B4;
     }
@@ -353,8 +353,8 @@ void* fn_801A2DDC(void) {
 // 0x801A2E94
 // UIEntity update: if the anim handle is empty, logs (when flag 2 is set) and returns;
 // otherwise base update, copies the scale (+0x74..+0x7C) into the anim, runs its slot 0x20
-// virtual and notifies fn_801A31BC when the global byte is set. Returns 0.
-s32 fn_801A2E94(u8* arg0, f32 farg0) {
+// virtual and notifies UIEntity_UpdateBones when the global byte is set. Returns 0.
+s32 UIEntity_Update(u8* arg0, f32 farg0) {
     if (fn_801B7198(arg0 + 0x140, 0) == NULL) {
         if (*(u32*)(arg0 + 0x64) & 2) {
             fn_8018D2B8(lbl_80382F90);
@@ -369,7 +369,7 @@ s32 fn_801A2E94(u8* arg0, f32 farg0) {
     void* anim = fn_801B7198(arg0 + 0x140, 0);
     (*(VFnIF*)(*(u8**)anim + 0x20))(anim, 0, farg0);
     if (*fn_8018C8E4() != 0) {
-        fn_801A31BC(arg0);
+        UIEntity_UpdateBones(arg0);
     }
     return 0;
 }
@@ -544,7 +544,7 @@ void fn_801A67C8(u8* grid, u32 value) {
         for (s32 col = 0; col < height; col++) {
             u8* cell = UIGridCell(grid, col + row * height);
             if (cell != NULL) {
-                u8* image = fn_801A9EFC(cell, 2);
+                u8* image = UIGridItem_FindGroupType(cell, 2);
                 if (image != NULL) fn_801A1ABC(image, value);
             }
         }
@@ -602,7 +602,7 @@ s32 fn_801A7490(u8* grid, const char* const* strings, s32 limit) {
         u8* cell = UIGridCell(grid, i);
         const char* text = strings[stringIndex];
         if (cell != NULL) {
-            u8* label = fn_801A9EFC(cell, 1);
+            u8* label = UIGridItem_FindGroupType(cell, 1);
             if (label != NULL) {
                 if (text == NULL) {
                     (*(VFnI*)(*(u8**)(cell + 0x138) + 0x30))(cell, 1);
@@ -629,7 +629,7 @@ s32 fn_801A75E8(u8* grid, const u32* textures, s32 limit) {
     for (s32 i = 0; i < count && used < limit; i++) {
         u8* cell = UIGridCell(grid, i);
         if (cell == NULL) continue;
-        u8* image = fn_801A9EFC(cell, 2);
+        u8* image = UIGridItem_FindGroupType(cell, 2);
         if (image == NULL) continue;
         u32 texture = textures != NULL ? textures[textureIndex] : 0;
         *(u8*)(cell + 0x13C) = 1;
@@ -681,7 +681,7 @@ s32 fn_801A7838(u8* grid, const u32* colors, s32 limit) {
     for (s32 i = 0; i < count && used < limit; i++) {
         u8* cell = UIGridCell(grid, i);
         if (cell == NULL) continue;
-        u8* label = fn_801A9EFC(cell, 1);
+        u8* label = UIGridItem_FindGroupType(cell, 1);
         if (label == NULL) continue;
         u32 color = colors[colorIndex];
         *(f32*)(label + 0x80) = (f32)(u8)color * (1.0f / 255.0f);
@@ -723,7 +723,7 @@ s32 fn_801A79AC(u8* grid, const u8* active, s32 limit, u32 highlightHash) {
 s32 fn_801A7B14(u8* grid, s32 index, s32 type, u32 anim) {
     u8* cell = UIGridCell(grid, index);
     if (cell != NULL) {
-        u8* widget = fn_801A9EFC(cell, type);
+        u8* widget = UIGridItem_FindGroupType(cell, type);
         if (widget != NULL) UIWidgetPlayAnimLoop(widget, anim, 0xA);
     }
     return 0;
@@ -735,9 +735,9 @@ void fn_801A7B8C(u8* grid, u32 anim) {
     for (s32 i = 0; i < count; i++) {
         u8* cell = UIGridCell(grid, i);
         if (cell == NULL) continue;
-        u8* text = fn_801A9EFC(cell, 1);
+        u8* text = UIGridItem_FindGroupType(cell, 1);
         if (text != NULL) UIWidgetPlayAnimLoop(text, anim, 0xA);
-        u8* image = fn_801A9EFC(cell, 2);
+        u8* image = UIGridItem_FindGroupType(cell, 2);
         if (image != NULL) UIWidgetPlayAnimLoop(image, anim, 0xA);
     }
 }
@@ -748,7 +748,7 @@ void fn_801A7C38(u8* grid, s32 type, u32 anim) {
     for (s32 i = 0; i < count; i++) {
         u8* cell = UIGridCell(grid, i);
         if (cell != NULL) {
-            u8* widget = fn_801A9EFC(cell, type);
+            u8* widget = UIGridItem_FindGroupType(cell, type);
             if (widget != NULL) UIWidgetPlayAnimLoop(widget, anim, 0xA);
         }
     }

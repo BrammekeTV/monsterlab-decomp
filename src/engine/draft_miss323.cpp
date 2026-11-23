@@ -609,7 +609,7 @@ void fn_80203340(u8* hdr, u8* voice, s32 streamed) {
 // 0x80203664
 // Loads "<name>.dsp" for music stream 'slot' (0/1) into an aligned buffer. With lbl_805F98C1 set the file
 // is opened through DVDOpen instead. Returns 0 on success, -1 on failure.
-s32 fn_80203664(u8* audio, const char* name, s32 slot) {
+s32 MusicLoadAsync(u8* audio, const char* name, s32 slot) {
     char buf[0x80];
     s32 room = 0x7F - (s32)strlen(".dsp");
     strncpy(buf, name, room - 1);

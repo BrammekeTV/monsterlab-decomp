@@ -23,7 +23,7 @@ void fn_80122A10(u8* p, u32 handle);
 void fn_801B7410(void* self, void* p4, void* p5, s32 p6, f32* pos);
 s32 fn_8007BEE4(u8* a, u8** list, s32 n, u8* b);
 s32 fn_8007919C(void);
-s32 fn_8008EFE0(void);
+s32 RobotEvolutionExperiment_RegisterScripts(void);
 s32 fn_80024BDC(void);
 s32 fn_80025CE0(void);
 s32 fn_8002917C(void);
@@ -172,7 +172,7 @@ s32 fn_80062EA8(u8* arg0, s32 arg1) {
 // 0x8006FBB8
 s32 fn_8006FBB8(void) {
     fn_8007919C();
-    return fn_8008EFE0();
+    return RobotEvolutionExperiment_RegisterScripts();
 }
 
 // arg0 is never read by the asm; kept to match the prototype in small_8007b.cpp.

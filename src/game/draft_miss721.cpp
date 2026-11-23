@@ -21,7 +21,7 @@ void    fn_800D7F24(u8* p);                      // 0x800D7F24
 s32     fn_8004935C(void);                       // 0x8004935C
 void*   fn_801D40E0(s32 n);                      // 0x801D40E0
 void*   fn_80209814(void* v);                    // 0x80209814
-void*   fn_80198F1C(void* set, u32 hash);        // 0x80198F1C
+void*   UIAnim_FindByName(void* set, u32 hash);        // 0x80198F1C
 void    fn_80038248(u8* p);                      // 0x80038248
 s32     fn_8019BBA4(u8* a, u8* b, s32 c);        // 0x8019BBA4
 void    fn_800223F0(u8* p, f32 v);               // 0x800223F0
@@ -134,13 +134,13 @@ void fn_800375F0(u8* a) {
             u8* set = el;
             *(void**)(a + 0x154) = ScreenSetFindElement(set, 0x0C0A089Au);
             *(void**)(a + 0x158) = ScreenSetFindElement(set, 0x8F972075u);
-            *(void**)(a + 0x15C) = fn_80198F1C(set, 0xAF06E673u);
-            *(void**)(a + 0x160) = fn_80198F1C(set, 0xDFA821B1u);
+            *(void**)(a + 0x15C) = UIAnim_FindByName(set, 0xAF06E673u);
+            *(void**)(a + 0x160) = UIAnim_FindByName(set, 0xDFA821B1u);
             *(void**)(a + 0x150) = ScreenSetFindElement(set, 0x728D86D2u);
             *(void**)(a + 0xA44) = ScreenSetFindElement(set, 0x79E9F640u);
             *(void**)(a + 0xA48) = ScreenSetFindElement(set, 0xB66AE04Eu);
-            *(void**)(a + 0xA4C) = fn_80198F1C(set, 0xBC12E349u);
-            *(void**)(a + 0xA50) = fn_80198F1C(set, 0x9437A55Au);
+            *(void**)(a + 0xA4C) = UIAnim_FindByName(set, 0xBC12E349u);
+            *(void**)(a + 0xA50) = UIAnim_FindByName(set, 0x9437A55Au);
 
             el = (u8*)ScreenSetFindElement(set, 0x5A8E07B5u);
             *(void**)(a + 0xA64) = el;

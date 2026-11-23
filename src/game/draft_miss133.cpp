@@ -43,7 +43,7 @@ void   fn_800C749C(u8* p);                             // 0x800C749C
 u8*    fn_800CD43C(u8* p);                             // 0x800CD43C
 void   fn_800CD9A4(u8* p);                             // 0x800CD9A4
 void   fn_800CF7E8(u8* p);                             // 0x800CF7E8
-void*  fn_80109330(const char* name);                  // 0x80109330
+void*  TextureLoadShared(const char* name);                  // 0x80109330
 void   fn_80116BE8(u8* p);                             // 0x80116BE8
 void   fn_80116CA8(u8* p);                             // 0x80116CA8
 void   fn_80116E54(u8* p, s32 a, s32 b);               // 0x80116E54
@@ -719,20 +719,20 @@ void* fn_801186FC(u8* arg0) {
     if (kind == 0) {
         rec = *(u8**)(gGameDb->data + 0x4F00) + (*(s32*)(arg0 + 0x4) << 4);
         SysSprintf(buf, "%sinventory_icon_%03d", lbl_805F8F10, (s32)*(s8*)(rec + 0xA));
-        tex = fn_80109330(buf);
+        tex = TextureLoadShared(buf);
         if (tex == NULL) {
             SysSprintf(buf, "%sinventory_icon_placeholder", lbl_805F8F10);
-            return fn_80109330(buf);
+            return TextureLoadShared(buf);
         }
         return tex;
     }
     if (kind == 1) {
         rec = *(u8**)(gGameDb->data + 0x5328) + *(s32*)(arg0 + 0x4) * 0x18;
         SysSprintf(buf, "%sinventory_icon_sec_%03d", lbl_805F8F10, (s32)*(s8*)(rec + 0x12));
-        tex = fn_80109330(buf);
+        tex = TextureLoadShared(buf);
         if (tex == NULL) {
             SysSprintf(buf, "%sinventory_icon_placeholder", lbl_805F8F10);
-            return fn_80109330(buf);
+            return TextureLoadShared(buf);
         }
         return tex;
     }

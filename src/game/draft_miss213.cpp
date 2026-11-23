@@ -825,7 +825,7 @@ void fn_80125970(u8* self, f32 dt) {  // dt unused
 // World/level loader step: on first call resets the load flags and builds the asset path, loads
 // the level's two .sir resources through the id pool, and once both are ready sets up the
 // active zones (two-slot selection from the game state), session flags and options brightness.
-void fn_801294CC(u8* self, s32 level, const char* dir, const char* name) {
+void WorldLoadLevelFiles(u8* self, s32 level, const char* dir, const char* name) {
     if (*(u8*)(self + 0x120) == 0) {
         lbl_805FB210 = 1;
         *(u8*)(self + 5) = 1;

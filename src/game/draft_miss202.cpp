@@ -27,7 +27,7 @@ void fn_80075264(u8* p, s32 id);                                  // 0x80075264
 u8* fn_801B3308(void);                                            // 0x801B3308
 void fn_801B3310(u8* p, u8* q);                                   // 0x801B3310
 void* fn_801D40E0(s32 n);                                         // 0x801D40E0
-const char* fn_801EB708(u32 hash);                                // 0x801EB708
+const char* FormatHashString(u32 hash);                                // 0x801EB708
 u8* fn_801F61AC(u8* p, s32 a);                                    // 0x801F61AC
 u8* fn_801F8110(u8* p, s32 a4);                                   // 0x801F8110
 void fn_801F85E4(u8* p, const u8* src, s32 count);                // 0x801F85E4
@@ -299,7 +299,7 @@ u8* fn_80028038(u8* p) {
             for (s32 j = 0; j < *(s32*)(rec + 0x98); j++) {
                 u8* obj = (*(u8***)(rec + 0x12C))[j];
                 u8* nm = *(u8**)(obj + 0x9C);
-                fn_801EB708(nm != NULL ? *(u32*)(nm + 8) : 0);
+                FormatHashString(nm != NULL ? *(u32*)(nm + 8) : 0);
                 nm = *(u8**)(obj + 0x9C);
                 u32 h = nm != NULL ? *(u32*)(nm + 8) : 0;
                 if (h == 0xD716DA31u) *(u8**)(p + 0x90) = obj;

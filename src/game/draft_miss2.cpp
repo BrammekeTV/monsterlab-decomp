@@ -45,18 +45,18 @@ void  fn_80170044(void* cam);                                    // 0x80170044
 void  fn_8018A78C(void* p);                                      // 0x8018A78C
 void  fn_8018A948(u8* obj, f32 t);                               // 0x8018A948
 void  fn_8018C3D0(void* p);                                      // 0x8018C3D0
-void  fn_8018D1FC(const char* fmt, ...);                         // 0x8018D1FC (debug log)
+void  GameLogDebug(const char* fmt, ...);                         // 0x8018D1FC (debug log)
 void  fn_8018D2B8(const char* fmt, ...);                         // 0x8018D2B8 (debug log)
 void  fn_8018D370(const char* fmt, ...);                         // 0x8018D370 (debug log)
-void* fn_8018D428(s32 size, const char* file, void* tag, s32 line);   // 0x8018D428 (alloc)
+void* UIEngineAlloc(s32 size, const char* file, void* tag, s32 line);   // 0x8018D428 (alloc)
 s32 fn_801987BC(u8* arg0, u8* arg1);                      // 0x801987BC
 s32   fn_80198A8C(void* set, void* widget);                      // 0x80198A8C
-void* fn_80198F74(void* set, u32 hash);                          // 0x80198F74
-u32   fn_8019AC00(void* obj, s32 index);                         // 0x8019AC00
+void* UIScreenSet_FindTextureList(void* set, u32 hash);                          // 0x80198F74
+u32   UITextureList_GetTextureByIndex(void* obj, s32 index);                         // 0x8019AC00
 void  fn_8019DB40(void* el);                                     // 0x8019DB40
 void  fn_8019E27C(void* el);                                     // 0x8019E27C
 s32   fn_8019EAA4(const char* text);                             // 0x8019EAA4
-s32   fn_8019EB94(void* el);                                     // 0x8019EB94
+s32   UIText_SubstituteText(void* el);                                     // 0x8019EB94
 s32   fn_8019F5A8(void* el);                         // 0x8019F5A8
 s32 fn_801AC51C(u8* p, u8* obj, u8* target);                     // 0x801AC51C
 void  fn_801ACB98(void* p);                                      // 0x801ACB98
@@ -66,7 +66,7 @@ void  fn_801C849C(u8* mgr, u8* item);                            // 0x801C849C
 void* fn_801D40E0(s32 n);                                        // 0x801D40E0
 void  fn_801D6A4C(void* cam, const f32* mtx);                    // 0x801D6A4C
 void  fn_801E839C(u8* p);                                        // 0x801E839C
-const char* fn_801EB708(u32 hash);                               // 0x801EB708
+const char* FormatHashString(u32 hash);                               // 0x801EB708
 void* fn_801EEB20(u8* pool, u32 size);                           // 0x801EEB20
 void  fn_801EF070(u8* pool, void* p);                            // 0x801EF070
 void  fn_801ED130(void* p);                                      // 0x801ED130
@@ -443,7 +443,7 @@ void UIScreen_PopScreen(u32 a0) {
         fn_8018D2B8(lbl_8038191C);
         return;
     }
-    fn_8018D1FC(lbl_80381974);
+    GameLogDebug(lbl_80381974);
     void* w = ScreenSetFindWidget(set, a0);
     if (w != NULL) fn_80198A8C(set, w);
 }
@@ -465,12 +465,12 @@ void UIScreen_Push(u32 a0) {
     } else {
         w = ScreenSetFindWidget(set2, a0);
         if (w == NULL) {
-            fn_8018D370(lbl_80381868 + 0x68, fn_801EB708(a0));
+            fn_8018D370(lbl_80381868 + 0x68, FormatHashString(a0));
             w = NULL;
         }
     }
     if (w != NULL) {
-        fn_8018D1FC(lbl_80381868 + 0x94, a0);
+        GameLogDebug(lbl_80381868 + 0x94, a0);
         fn_801987BC((u8*)set, (u8*)w);
     }
 }
@@ -502,20 +502,20 @@ void UISetText(void* elp, const char* text, s32 a) {
             *(s32*)(el + 0x150) = len;
             if (len >= 0x1000) *(s32*)(el + 0x150) = 0xFFF;
             *(s32*)(el + 0x168) = *(s32*)(el + 0x150) + 1;
-            char* b = (char*)fn_8018D428(*(s32*)(el + 0x150) + 1, "UIText.cpp", &lbl_805F940C, 0x4E7);
+            char* b = (char*)UIEngineAlloc(*(s32*)(el + 0x150) + 1, "UIText.cpp", &lbl_805F940C, 0x4E7);
             *(char**)(el + 0x170) = b;
             memset(b, 0, *(s32*)(el + 0x168));
-            *(void**)(el + 0x178) = fn_8018D428(*(s32*)(el + 0x168) * 4, "UIText.cpp", &lbl_805F940C, 0x4E9);
+            *(void**)(el + 0x178) = UIEngineAlloc(*(s32*)(el + 0x168) * 4, "UIText.cpp", &lbl_805F940C, 0x4E9);
         } else {
             *(s32*)(el + 0x150) = 0x1D;
             *(s32*)(el + 0x168) = 0x1E;
-            char* b = (char*)fn_8018D428(0x1E, "UIText.cpp", &lbl_805F940C, 0x4F0);
+            char* b = (char*)UIEngineAlloc(0x1E, "UIText.cpp", &lbl_805F940C, 0x4F0);
             *(char**)(el + 0x170) = b;
             memset(b, 0, *(s32*)(el + 0x168));
-            *(void**)(el + 0x178) = fn_8018D428(*(s32*)(el + 0x168) * 4, "UIText.cpp", &lbl_805F940C, 0x4F2);
+            *(void**)(el + 0x178) = UIEngineAlloc(*(s32*)(el + 0x168) * 4, "UIText.cpp", &lbl_805F940C, 0x4F2);
         }
         if (*(void**)(el + 0x1E0) == NULL) {
-            *(void**)(el + 0x1E0) = fn_8018D428(0x200, "UIText.cpp", &lbl_805F940C, 0x4F7);
+            *(void**)(el + 0x1E0) = UIEngineAlloc(0x200, "UIText.cpp", &lbl_805F940C, 0x4F7);
         }
     } else if (text == NULL) {
         *buf = 0;
@@ -540,7 +540,7 @@ void UISetText(void* elp, const char* text, s32 a) {
     } else {
         **(char**)(el + 0x170) = 0;
     }
-    if (fn_8019EB94(el) != 0) {
+    if (UIText_SubstituteText(el) != 0) {
         (*(VFnII*)(*(u8**)(el + 0x138) + 0x2C))(el, 0x20000);
     } else {
         (*(VFnII*)(*(u8**)(el + 0x138) + 0x30))(el, 0x20000);
@@ -553,12 +553,12 @@ void UISetText(void* elp, const char* text, s32 a) {
 // Script callback: texture `index` of the textureList widget `hash` in the current screen set.
 // Logs and returns 0 when the list or the texture does not exist.
 ScriptValue UITextureList_GetTexture(u32 hash, s32 index) {
-    void* list = fn_80198F74(ScreenSetsCurrent(gScreenSets), hash);
+    void* list = UIScreenSet_FindTextureList(ScreenSetsCurrent(gScreenSets), hash);
     if (list == NULL) {
         fn_8018D370(lbl_80381D68, hash);
         return 0;
     }
-    u32 tex = fn_8019AC00(list, index);
+    u32 tex = UITextureList_GetTextureByIndex(list, index);
     if (tex == 0) {
         fn_8018D370(lbl_80381E68, index);
         return 0;

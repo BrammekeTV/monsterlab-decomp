@@ -40,7 +40,7 @@ void   fn_80184590(u8* a, u8* b);                                         // 0x8
 void   fn_8018BEA4(u8* p, f32 t);                                         // 0x8018BEA4
 void   fn_8018D370(const char* fmt, ...);                                 // 0x8018D370 (debug log)
 u8*    fn_8018E808(u8* table, u32 hash);                                  // 0x8018E808
-s32    fn_8019BD18(u8* arg0, u32* arg1);                                  // 0x8019BD18
+s32    UIElement_PlayUIAnimByHash(u8* arg0, u32* arg1);                                  // 0x8019BD18
 u8*    fn_8019BF64(u8* container, u32 hash);                              // 0x8019BF64
 void   fn_8019C348(void* obj);                                            // 0x8019C348
 s32 fn_801AB748(u8* p, f32 v);                                       // 0x801AB748
@@ -48,7 +48,7 @@ s32    fn_801AB56C(void* h, f32 t);                                       // 0x8
 s32    fn_801AB7D4(void* h);                                              // 0x801AB7D4
 f32    fn_801AB7F0(void* h);                                              // 0x801AB7F0
 f32    fn_801AB818(void* h);                                              // 0x801AB818
-void*  fn_801ABAF4(void* anim);                                           // 0x801ABAF4
+void*  UIAnimPlayer_Alloc(void* anim);                                           // 0x801ABAF4
 void   fn_801ABC50(void* h);                                              // 0x801ABC50
 void   fn_801ABCEC(void* h, void* owner);                                 // 0x801ABCEC
 void   fn_801B9FA4(void* mgr, void* obj, void* cb, void* ctx);            // 0x801B9FA4
@@ -105,7 +105,7 @@ s32 fn_8019BBA4(u8* arg0, u8* arg1, s32 arg2) {
         }
         (*(UIVisFn*)(*(u8**)(arg0 + 0x138) + 0x10))(arg0);
     }
-    u8* player = (u8*)fn_801ABAF4(arg1);
+    u8* player = (u8*)UIAnimPlayer_Alloc(arg1);
     if (player == NULL) {
         fn_8018D370("UIElement : anim player failed alloc ...\n");
         return -2;
@@ -493,7 +493,7 @@ void fn_8018C3D0(void* p) {
 // 0x8018D1FC
 // Debug log (printf style): formats into the shared message buffer lbl_80412F90, then logs it
 // with GameLog(1, 1, "DEBUG - %s"). The original builds its va_list from the register save area.
-void fn_8018D1FC(const char* fmt, ...) {
+void GameLogDebug(const char* fmt, ...) {
     va_list ap;
     va_start(ap, fmt);
     vsprintf((char*)lbl_80412F90, fmt, ap);
@@ -504,7 +504,7 @@ void fn_8018D1FC(const char* fmt, ...) {
 // 0x8018D428
 // UI engine allocator: when lbl_805F95F8 > 0 allocates through fn_801D5584 with a
 // "ui engine: <tag>" name ("zone_malloc" zone), otherwise from the heap lbl_80412BF8.
-void* fn_8018D428(s32 arg0, const char* arg1, const char* arg2, s32 arg3) {
+void* UIEngineAlloc(s32 arg0, const char* arg1, const char* arg2, s32 arg3) {
     char name[0x400];
     if (gRendTexelsInMEM2 > 0) {
         SysSprintf(name, "ui engine: %s", arg2);
@@ -547,7 +547,7 @@ void fn_8018DEF4(u8* arg0) {
 // 0x8018E8D8
 // Table lookup by hash: returns the +4 field of the entry found by fn_8018E808, or NULL (also
 // when the table is empty or NULL).
-void* fn_8018E8D8(void* table, u32 hash) {
+void* UIHashTree_Find(void* table, u32 hash) {
     if (table == NULL || *(s32*)table == 0) {
         return NULL;
     }
@@ -612,13 +612,13 @@ s32 fn_8019B6CC(u8* arg0, f32 farg0) {
         TriggerDoAction(arg0 + 0xB0, NULL, NULL);
     }
     u32 ev = kHashUpdate;
-    fn_8019BD18(arg0, &ev);
+    UIElement_PlayUIAnimByHash(arg0, &ev);
     if (*(u8**)(arg0 + 0x10) != NULL) {
         if (fn_801AB56C(*(u8**)(arg0 + 0x10), farg0) != 0) {
             fn_801ABC50(*(u8**)(arg0 + 0x10));
             *(u8**)(arg0 + 0x10) = NULL;
             u32 ev2 = 0x1BE90661u;
-            fn_8019BD18(arg0, &ev2);
+            UIElement_PlayUIAnimByHash(arg0, &ev2);
         }
         (*(UIFlagFn*)(*(u8**)(arg0 + 0x138) + 0x2C))(arg0, 0x28);
     }

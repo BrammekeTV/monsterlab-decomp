@@ -23,7 +23,7 @@ s32   fn_800B8708(u8* a, u8* b, u32 hash);                        // 0x800B8708
 void  fn_800B8A3C(u8* e, s32 idx);                                // 0x800B8A3C
 void  fn_800B8D5C(u8* e);                                         // 0x800B8D5C
 BOOL  fn_800E6BD4(void);                                          // 0x800E6BD4
-void  fn_80128500(u8* w, s32 arg);                                // 0x80128500
+void  WorldReset(u8* w, s32 arg);                                // 0x80128500
 void  fn_80130A38(u8* w);                                         // 0x80130A38
 void  fn_80130B50(u8* w);                                         // 0x80130B50
 void  fn_80130FC8(u8* w, void* entity, s32 arg);                  // 0x80130FC8
@@ -329,7 +329,7 @@ void fn_80128C20(u8* arg0) {
     for (u8 i = 0; i != 0xFF; i++) ((s32*)(gGame + 0x1C4))[i] = 0;
     *(u8*)(gGame + 0x13C) = 0;
     for (u8 i = 0; i != 0x20; i++) ((s32*)(gGame + 0x140))[i] = 0;
-    fn_80128500(arg0, 1);
+    WorldReset(arg0, 1);
 
     if (*(u8*)(arg0 + 0x121) != 0) {
         u8* z0 = *(u8**)(*(u8**)gWorldState + 0x1A4);

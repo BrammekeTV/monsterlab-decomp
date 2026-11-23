@@ -23,14 +23,14 @@ void TextureRelease(void* tex);                                   // 0x80184028
 void fn_8003DCE0(u8* p);                                          // 0x8003DCE0
 void fn_8004C718(u8* p, s32 idx, void* elem);                     // 0x8004C718
 void* fn_8011AD88(void* def, s32 flag);                           // 0x8011AD88
-void fn_8018D1FC(const char* fmt, ...);                           // 0x8018D1FC
+void GameLogDebug(const char* fmt, ...);                           // 0x8018D1FC
 void fn_8018D2B8(const char* fmt, ...);                           // 0x8018D2B8
 void fn_8018D370(const char* fmt, ...);                           // 0x8018D370
 s32 fn_8019892C(u8* set);                                      // 0x8019892C
 s32 fn_80198C78(u8* set);                                      // 0x80198C78
 void* fn_801D40E0(s32 n);                                         // 0x801D40E0
 void* fn_80209814(void* v);                                       // 0x80209814
-const char* fn_801EB708(u32 hash);                                // 0x801EB708
+const char* FormatHashString(u32 hash);                                // 0x801EB708
 }
 
 extern "C++" void* gScreenSets;                  // 0x805FB654
@@ -244,7 +244,7 @@ void UIScreen_Pop(void) {
         fn_8018D2B8(lbl_8038191C);
         return;
     }
-    fn_8018D1FC(lbl_8038195C);
+    GameLogDebug(lbl_8038195C);
     fn_8019892C((u8*)set);
 }
 
@@ -255,7 +255,7 @@ void UIScreen_ClearStack(void) {
         fn_8018D370(lbl_803818A8);
         return;
     }
-    fn_8018D1FC(lbl_80381994);
+    GameLogDebug(lbl_80381994);
     fn_80198C78((u8*)set);
 }
 
@@ -270,11 +270,11 @@ void UIScreen_SetVisibleFlag(u32 a0, u32 a1) {
     } else {
         w = ScreenSetFindWidget(set, a0);
         if (w == NULL) {
-            fn_8018D370(lbl_803818D0, fn_801EB708(a0));  // logged twice, as in the original
+            fn_8018D370(lbl_803818D0, FormatHashString(a0));  // logged twice, as in the original
         }
     }
     if (w == NULL) {
-        fn_8018D370(lbl_803818D0, fn_801EB708(a0));
+        fn_8018D370(lbl_803818D0, FormatHashString(a0));
         return;
     }
     u8* vt = *(u8**)((u8*)w + 0x138);
@@ -297,11 +297,11 @@ void UIScreen_SetEnableFlag(u32 a0, u32 a1) {
     } else {
         w = ScreenSetFindWidget(set, a0);
         if (w == NULL) {
-            fn_8018D370(lbl_803818D0, fn_801EB708(a0));  // logged twice, as in the original
+            fn_8018D370(lbl_803818D0, FormatHashString(a0));  // logged twice, as in the original
         }
     }
     if (w == NULL) {
-        fn_8018D370(lbl_803818D0, fn_801EB708(a0));
+        fn_8018D370(lbl_803818D0, FormatHashString(a0));
         return;
     }
     u8* vt = *(u8**)((u8*)w + 0x138);
@@ -325,7 +325,7 @@ void UIElement_SetX(u32 a0, f32 a1) {
     }
     void* el = ScreenSetFindElement(set, a0);
     if (el == NULL) {
-        fn_8018D2B8(lbl_80381AA0, fn_801EB708(a0));
+        fn_8018D2B8(lbl_80381AA0, FormatHashString(a0));
         return;
     }
     *(f32*)((u8*)el + 0x68) = a1;

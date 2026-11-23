@@ -28,7 +28,7 @@ void fn_80071838(u8* arg0, u32 arg1);                                   // 0x800
 void fn_800A81A8(u8* p);                                                // 0x800A81A8
 void fn_800A8810(u8* p);                                                // 0x800A8810
 void fn_800AA2D0(u8* self, f32 dt, f32 v);                              // 0x800AA2D0
-void fn_800B49B8(u8* p, f32 dt);                                        // 0x800B49B8
+void WiiMoteCheckSpike(u8* p, f32 dt);                                        // 0x800B49B8
 void fn_800B5478(u8* p, f32 dt);                                        // 0x800B5478
 s32 fn_800B66D0(u8* p);                                                 // 0x800B66D0
 f32 fn_800B71A8(u8* p);                                                 // 0x800B71A8
@@ -478,7 +478,7 @@ void fn_800B4314(u8* arg0, f32 farg0) {
             *(f32*)(arg0 + 0x67C) = out;
         }
     }
-    fn_800B49B8(arg0, farg0);
+    WiiMoteCheckSpike(arg0, farg0);
     fn_800B5478(arg0, farg0);
     void* hud = fn_80070F4C();
     if (hud != NULL) {

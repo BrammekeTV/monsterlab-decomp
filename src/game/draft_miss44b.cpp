@@ -8,7 +8,7 @@ void*       ScreenSetsCurrent(void* sets);                  // 0x8018D1E4
 void*       ScreenSetFindElement(void* set, u32 hash);      // 0x80198F18
 void        fn_8018D2B8(const char* fmt, ...);              // 0x8018D2B8 (debug log)
 void        fn_8018D370(const char* fmt, ...);              // 0x8018D370 (debug log)
-const char* fn_801EB708(u32 hash);                          // 0x801EB708 (hash -> name for logs)
+const char* FormatHashString(u32 hash);                          // 0x801EB708 (hash -> name for logs)
 u32         fn_8019A9D4(u8* a3);                            // 0x8019A9D4
 void        fn_8019A9EC(u8* sub, s32 index);                // 0x8019A9EC
 s32         fn_8016195C(void* p, s32 a, s32 b, void* c);    // 0x8016195C
@@ -47,7 +47,7 @@ static u8* UIFindScreenElement(u32 hash) {
     } else {
         el = (u8*)ScreenSetFindElement(set, hash);
         if (el == NULL) {
-            fn_8018D2B8(lbl_80381AA0, fn_801EB708(hash));
+            fn_8018D2B8(lbl_80381AA0, FormatHashString(hash));
         }
     }
     return el;

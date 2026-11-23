@@ -19,7 +19,7 @@ extern "C++" u8* lbl_805FB2E8;                  // world/event block pointer
 extern "C++" u8 lbl_805FBBE0[];                 // save block pointer (value at this address)
 extern "C++" u8 lbl_805FB210;                   // flag byte
 extern "C++" s32 lbl_805FB2D8;                  // counter
-extern "C++" void* lbl_805FB5A8;                // handle passed to fn_80169AA8 / fn_80169C6C
+extern "C++" void* lbl_805FB5A8;                // handle passed to fn_80169AA8 / TextureDescribe
 extern "C++" u8 lbl_8047C760[];
 extern "C++" u8 lbl_8047C790[];
 extern "C++" u8 lbl_8047C7AC[];
@@ -48,7 +48,7 @@ void fn_801C3924(void* a0);
 void fn_801BDA0C(void* a0);
 void fn_801D8D7C(void);
 void fn_80169AA8(void* a0);
-void fn_80169C6C(void* a0, s32 a1);
+void TextureDescribe(void* a0, s32 a1);
 void fn_80128C20(void* world);
 void fn_801D94CC(u8* p);
 void fn_801DA81C(u8* p);
@@ -254,7 +254,7 @@ void fn_80129438(u8* p) {
     }
     fn_801D8D7C();
     fn_80169AA8(lbl_805FB5A8);
-    fn_80169C6C(lbl_805FB5A8, 1);
+    TextureDescribe(lbl_805FB5A8, 1);
     p[4] = 0;
     p[5] = 0;
 }

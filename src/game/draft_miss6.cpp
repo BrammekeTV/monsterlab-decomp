@@ -112,7 +112,7 @@ u8* fn_801C7B20(u8* fx, u8* desc, const f32* pos, u8* mgr);   // 0x801C7B20
 void   fn_801C849C(u8* mgr, u8* item);                           // 0x801C849C
 u8*    fn_801D8D80(char* path, const char* name);                // 0x801D8D80 (texture file load)
 void*  fn_801D40E0(s32 n);                                       // 0x801D40E0
-const char* fn_801EB708(u32 hash);                               // 0x801EB708 (hash -> name for logs)
+const char* FormatHashString(u32 hash);                               // 0x801EB708 (hash -> name for logs)
 void*  fn_801EB94C(void* p);                                     // 0x801EB94C
 u32    fn_801EC880(u8* p, u32 hash);                             // 0x801EC880
 void   fn_801EC8C4(u8* p, u32 a, u32 b);                         // 0x801EC8C4
@@ -749,7 +749,7 @@ void UIElement_Reset(u32 a0) {
     } else {
         el = ScreenSetFindElement(set, a0);
         if (el == NULL) {
-            fn_8018D2B8(lbl_80381AA0, fn_801EB708(a0));
+            fn_8018D2B8(lbl_80381AA0, FormatHashString(a0));
             el = NULL;
         }
     }
@@ -784,7 +784,7 @@ BOOL SpawnEffectAtPos(u8* mgr, u8* effect, const f32* pos, u8** owner) {
         if (!(life >= 0.0f) && owner == NULL) {
             char buf[0x230];
             SysSprintf(buf, "EmitterDesc error: %s : attempting to add infinite life emitter without an owner.",
-                       fn_801EB708(*(u32*)(desc + 4)));
+                       FormatHashString(*(u32*)(desc + 4)));
             *(u8**)(node + 0x14 + i * 4) = NULL;
         } else {
             u8* fx = NULL;

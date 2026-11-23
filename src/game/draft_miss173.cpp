@@ -441,7 +441,7 @@ s32 fn_801AB56C(void* h, f32 dt) {
 // pool B for each used slot (five at +0x4) and one from pool C for the optional listener (+0x18),
 // releasing the player again if a pool is exhausted. Starts it at the end when its length is
 // non-negative, otherwise at the description's start time.
-void* fn_801ABAF4(void* anim) {
+void* UIAnimPlayer_Alloc(void* anim) {
     u8* src = (u8*)anim;
     u8* dst = (u8*)fn_801EB94C(lbl_805FB68C);
     if (dst == NULL) {

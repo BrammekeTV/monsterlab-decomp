@@ -24,7 +24,7 @@ s32 fn_80196678(void* gx, void* mat, f32 t);                // 0x80196678
 s32    fn_80196B10(u8* a3);                                  // 0x80196B10 (leaf)
 s32 fn_8019B6CC(u8* arg0, f32 farg0);                        // 0x8019B6CC (UI element base update)
 void   fn_8019C348(void* obj);                               // 0x8019C348
-u8*    fn_8019F9B8(s32 kind);                                // 0x8019F9B8 (UI element factory)
+u8*    UIGraphic_Create(s32 kind);                                // 0x8019F9B8 (UI element factory)
 f32    fn_801A0DF0(u8* a3);                                  // 0x801A0DF0 (leaf)
 f32    fn_801A0DF8(u8* a3);                                  // 0x801A0DF8 (leaf)
 f32    fn_801A0E08(u8* a3);                                  // 0x801A0E08 (leaf)
@@ -34,7 +34,7 @@ s32    fn_801A413C(u8* arg0);                                // 0x801A413C
 u8*    fn_801B70F8(u8* a3, s32 a4);                          // 0x801B70F8
 void*  fn_801B7198(void* anim, s32 a);                       // 0x801B7198
 void   fn_801B72A0(void* anim, void* child);                 // 0x801B72A0
-const char* fn_801EB708(u32 hash);                           // 0x801EB708 (hash -> name for logs)
+const char* FormatHashString(u32 hash);                           // 0x801EB708 (hash -> name for logs)
 
 extern const char lbl_80382F80[];   // 0x80382F80 ("UIEntity.cpp")
 extern const char lbl_80383190[];   // 0x80383190 (string)
@@ -101,7 +101,7 @@ s32 fn_801A30C0(void* obj, u32 arg1) {
     child = fn_801B7198(arg0 + 0x140, 0);
     u8* model = (*(VFnP*)(*(u8**)child + 0x10))(child);
     if (fn_8018BDE0(model, (s32)arg1) <= -1) {
-        fn_8018D370(lbl_80382F80 + 0xAC, fn_801EB708(arg1));
+        fn_8018D370(lbl_80382F80 + 0xAC, FormatHashString(arg1));
         return -1;
     }
     *(u32*)(arg0 + 0x144) = arg1;
@@ -176,13 +176,13 @@ s32 fn_801A3910(u8* arg0, u8* arg1) {
 // extra args (second-vtable slot 0x44), tags it with the type, appends it to the list at +0x15C
 // (types 3..5 also become the fill element at +0x160), re-lays out and shows it (slot 0x2C, 0x28).
 // Returns -1 on a bad type, else 0.
-s32 fn_801A3D84(u8* arg0, s32 arg1, s32 arg2, s32 arg3) {
+s32 UISlider_CreateGraphic(u8* arg0, s32 arg1, s32 arg2, s32 arg3) {
     u8* sp8;
     if (arg1 < 0 || arg1 >= 6) {
         fn_8018D370(lbl_803831B8, arg1);
         return -1;
     }
-    sp8 = fn_8019F9B8(0);
+    sp8 = UIGraphic_Create(0);
     (*(VFnII*)(*(u8**)(sp8 + 0x138) + 0x44))(sp8, arg2, arg3);
     *(s32*)sp8 = arg1;
     if (arg1 >= 3) {

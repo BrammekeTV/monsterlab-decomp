@@ -11,7 +11,7 @@ void  fn_80146180(void* quat, const Vec3* axis, f32 angle);         // 0x8014618
 s32   fn_80156A80(void);                                            // 0x80156A80 (screen width)
 s32   fn_80156A88(void);                                            // 0x80156A88 (screen height)
 u8*  fn_8019552C(u8* list, s32 index);                             // 0x8019552C (pointer to list slot)
-u8*   fn_801A9EFC(u8* element, s32 type);                           // 0x801A9EFC
+u8*   UIGridItem_FindGroupType(u8* element, s32 type);                           // 0x801A9EFC
 void  fn_801B6F34(u8* p);                                           // 0x801B6F34
 void  fn_801B7020(u8* p);                                           // 0x801B7020
 f64   fn_8033F1F4(f64 x);                                           // 0x8033F1F4 (MSL acos)
@@ -222,7 +222,7 @@ s32 fn_801A6880(u8* arg0) {
         u8** slot = (u8**)fn_8019552C(*(u8**)(arg0 + 0x1BC), cy + cx * *(s32*)(arg0 + 0x140));
         u8* cell = slot != NULL ? *slot : NULL;
         if (cell != NULL) {
-            u8* img = fn_801A9EFC(cell, 2);
+            u8* img = UIGridItem_FindGroupType(cell, 2);
             if (img != NULL) {
                 x += *(f32*)(img + 0x68);
                 y += *(f32*)(img + 0x6C);
@@ -244,7 +244,7 @@ s32 fn_801A6880(u8* arg0) {
         else if (cy >= *(s32*)(arg0 + 0x140)) cy -= *(s32*)(arg0 + 0x140);
         u8** slot = (u8**)fn_8019552C(*(u8**)(arg0 + 0x1BC), cy + cx * *(s32*)(arg0 + 0x140));
         u8* cell = slot != NULL ? *slot : NULL;
-        u8* img = cell != NULL ? fn_801A9EFC(cell, 2) : NULL;
+        u8* img = cell != NULL ? UIGridItem_FindGroupType(cell, 2) : NULL;
         if (img != NULL) {
             *(f32*)(nodeA + 0x74) = *(f32*)(img + 0x74);
             *(f32*)(nodeA + 0x78) = *(f32*)(img + 0x78);

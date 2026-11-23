@@ -521,7 +521,7 @@ void fn_801C5CC0(u8* arg0, f32* arg1, f32* arg2) {
 
 // 0x800921B0
 // Registers the robot-game script callbacks (events 0x4E, queries 0x1D).
-void fn_800921B0(void) {
+void RobotEvolutionExperiment_RegisterRobotScripts(void) {
     RegisterScriptFunc((const char*)(lbl_8035BDF0 + 0x00), 0x4E, (void*)RobotEvolutionExperiment_RobotReadyToLaunch);
     RegisterScriptFunc((const char*)(lbl_8035BDF0 + 0x2C), 0x4E, (void*)RobotEvolutionExperiment_RobotLanded);
     RegisterScriptFunc((const char*)(lbl_8035BDF0 + 0x54), 0x4E, (void*)RobotEvolutionExperiment_RobotReadyToPlay);

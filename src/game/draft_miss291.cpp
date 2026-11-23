@@ -19,9 +19,9 @@ void  fn_80122B9C(u8* p, s32 v);                                   // 0x80122B9C
 void* ScreenSetsCurrent(void* sets);                               // 0x8018D1E4
 void* ScreenSetGetStrings(void* set);                              // 0x80198E20
 void* ScreenSetFindWidget(void* set, u32 hash);                    // 0x80198E34
-void* fn_80198F1C(void* set, u32 hash);                            // 0x80198F1C
+void* UIAnim_FindByName(void* set, u32 hash);                            // 0x80198F1C
 s32   fn_8019BBA4(u8* arg0, u8* arg1, s32 arg2);                   // 0x8019BBA4
-void  fn_8018DBB8(void* sets, s32 a);                              // 0x8018DBB8
+void  UIEngine_ShowCursor(void* sets, s32 a);                              // 0x8018DBB8
 BOOL  ZoneIsLoaded(void* world, s32 zone);                         // 0x8012F408
 void  UpdateZoneEntities(s32 zone);                                // 0x800108B8
 void  EngineRequestSuspend(int on);                                // 0x801D1830
@@ -233,7 +233,7 @@ void fn_8000D3AC(void) {
             u8* sets = (u8*)gScreenSets;
             if (*(u8**)(sets + 0x7c) != NULL && show) {
                 lbl_805FAEC9 = (*(u32*)(*(u8**)(sets + 0x7c) + 0x64) & 2) == 0;
-                fn_8018DBB8(sets, 0);
+                UIEngine_ShowCursor(sets, 0);
             }
             if (gLoadingActive == 0) {
                 TimerReset(gLoadingTimer);
@@ -246,7 +246,7 @@ void fn_8000D3AC(void) {
             u32 flags = sModeTable[gGameMode].unkC;
             if (flags & 2) {
                 sets = (u8*)gScreenSets;
-                if (*(u8**)(sets + 0x7c) != NULL && lbl_805FAEC9 == 0) fn_8018DBB8(sets, 1);
+                if (*(u8**)(sets + 0x7c) != NULL && lbl_805FAEC9 == 0) UIEngine_ShowCursor(sets, 1);
                 LoadingScreenTick(0, lbl_805FC6A0);
                 void* anim = gLoadingAnim;
                 if (anim) (*(VFnI*)(*(u8**)anim + 8))((u8*)anim, 1);   // delete
@@ -383,7 +383,7 @@ void fn_8002A31C(u8* self, u8* a, u8* b, u8* c, u8* d, f32 dt) {
         *(f32*)(self + 0x10) = t;
         if (t <= lbl_805FCAA8) {
             void* set = ScreenSetsCurrent(gScreenSets);
-            void* w = fn_80198F1C(set, 0x01CEB043u);
+            void* w = UIAnim_FindByName(set, 0x01CEB043u);
             fn_8019BBA4(*(u8**)(self + 0x114), (u8*)w, 10);
             *(s32*)(self + 0x18) = 8;
         }

@@ -9,10 +9,10 @@ void*       ScreenSetsCurrent(void* sets);                 // 0x8018D1E4
 void*       ScreenSetFindElement(void* set, u32 hash);     // 0x80198F18
 void        fn_8018D2B8(const char* fmt, ...);             // 0x8018D2B8 (debug log)
 void        fn_8018D370(const char* fmt, ...);             // 0x8018D370 (debug log)
-const char* fn_801EB708(u32 hash);                         // 0x801EB708 (hash -> name for logs)
+const char* FormatHashString(u32 hash);                         // 0x801EB708 (hash -> name for logs)
 void        UIWidgetPlayAnimLoop(void* w, u32 anim, s32 n);  // 0x8019BB1C
-void        fn_8019B888(void* el, u32 anim, s32 n);        // 0x8019B888
-void        fn_8019B94C(void* el, u32 anim, s32 n);        // 0x8019B94C
+void        UIElement_PlayUIAnimFromSamePositionImpl(void* el, u32 anim, s32 n);        // 0x8019B888
+void        UIElement_PlayUIAnimFromReversePositionImpl(void* el, u32 anim, s32 n);        // 0x8019B94C
 s32 fn_8019BC80(u8* arg0, u32 arg1);               // 0x8019BC80
 s32         fn_801AB80C(u8* a3, f32 rate);                         // 0x801AB80C
 s32 fn_801AB748(u8* p, f32 v);                          // 0x801AB748
@@ -34,7 +34,7 @@ static u8* FindUIElement(u32 hash) {
     }
     u8* el = (u8*)ScreenSetFindElement(set, hash);
     if (el == NULL) {
-        fn_8018D2B8(lbl_80381AA0, fn_801EB708(hash));
+        fn_8018D2B8(lbl_80381AA0, FormatHashString(hash));
         return NULL;
     }
     return el;
@@ -102,7 +102,7 @@ void UIElement_PlayUIAnim(u32 a0, u32 a1) {
 void UIElement_PlayUIAnimFromSamePosition(u32 a0, u32 a1) {
     u8* el = FindUIElement(a0);
     if (el != NULL) {
-        fn_8019B888(el, a1, 0xA);
+        UIElement_PlayUIAnimFromSamePositionImpl(el, a1, 0xA);
     }
 }
 
@@ -111,7 +111,7 @@ void UIElement_PlayUIAnimFromSamePosition(u32 a0, u32 a1) {
 void UIElement_PlayUIAnimFromReversePosition(u32 a0, u32 a1) {
     u8* el = FindUIElement(a0);
     if (el != NULL) {
-        fn_8019B94C(el, a1, 0xA);
+        UIElement_PlayUIAnimFromReversePositionImpl(el, a1, 0xA);
     }
 }
 

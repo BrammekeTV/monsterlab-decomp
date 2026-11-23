@@ -28,7 +28,7 @@ u8*    fn_80118B1C(s32 idx);                                                 // 
 s32    fn_80120990(s32 a, s32 b, s32 tier);                                  // 0x80120990
 void   fn_8018A948(u8* obj, f32 t);                                          // 0x8018A948
 void   fn_8018C3D0(void* p);                                                 // 0x8018C3D0
-void   fn_8018D1FC(const char* fmt, ...);                                    // 0x8018D1FC (debug log)
+void   GameLogDebug(const char* fmt, ...);                                    // 0x8018D1FC (debug log)
 void   fn_8018D2B8(const char* fmt, ...);                                    // 0x8018D2B8 (debug log)
 void   fn_8018D370(const char* fmt, ...);                                    // 0x8018D370 (debug log)
 u8*     fn_8019552C(u8* list, s32 index);                                     // 0x8019552C (leaf; returns a slot pointer)
@@ -42,7 +42,7 @@ s32    fn_801A6D7C(u8* arg0, s32 mode);                                      // 
 s32    fn_801A72EC(u8* grid);                                                // 0x801A72EC
 s32    fn_801A9CE0(u8* obj, f32 dt, f32 t);                                  // 0x801A9CE0
 s32    fn_801A9E94(u8* obj, f32 a, f32 b, f32 c);                            // 0x801A9E94
-u8*    fn_801AC184(u8* defs, s32 idx);                                       // 0x801AC184
+u8*    AnimDefFindByHandle(u8* defs, s32 idx);                                       // 0x801AC184
 void*  fn_801B7198(void* anim, s32 a);                                       // 0x801B7198
 s32    fn_801C098C(u8* a, u8* b, u8* c, u8* d, u8* e, f32* out0, f32* out1); // 0x801C098C
 s32    fn_801C10B4(u8* a, u8* b, u8* c, u8* d, u8* e, u8* f);                // 0x801C10B4
@@ -106,7 +106,7 @@ s32 fn_800E43BC(u8* arg0, f32* outPos, f32* outDir) {
         if (o2 != NULL) {
             s32 anim = *(s32*)(arg0 + 0x5C);
             if (anim != 0) {
-                u8* a = fn_801AC184(*(u8**)(*(u8**)(o2 + 0x9C) + 0x48), anim);
+                u8* a = AnimDefFindByHandle(*(u8**)(*(u8**)(o2 + 0x9C) + 0x48), anim);
                 *(u32*)(a + 0xC) |= 0x10000;
                 (*(VFnInt*)(*(u8**)o2 + 0x84))(o2, *(s32*)(arg0 + 0x5C));
                 lbl_805FB1A1 = 0;
@@ -440,7 +440,7 @@ s32 fn_801A4994(u8* arg0, f32 dt) {
         }
         f32 c = cosf(1.5707964f * (0.011111111f * (180.0f * t)));
         fade = 1.0f - (0.5f * (1.0f + c));
-        fn_8018D1FC(lbl_80383448 + 0x140, (f64)fade);
+        GameLogDebug(lbl_80383448 + 0x140, (f64)fade);
     }
     s32 count = *(s32*)(arg0 + 0x13C) * *(s32*)(arg0 + 0x140);
     for (s32 i = 0; i < count; i++) {

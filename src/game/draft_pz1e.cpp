@@ -54,7 +54,7 @@ extern f32 lbl_80600034;                                      // 0x80600034
 // 0x8018E0CC
 // UIHashTree insert: node (+0 key, +8 parent, +0xC left, +0x10 right); tree has root/min/max at +0/+4/+8.
 // Returns 0 ok, -1 duplicate key, -2 null tree.
-s32 fn_8018E0CC(u8* tree, u8* node) {
+s32 UIHashTree_InsertNode(u8* tree, u8* node) {
     s32 wentLeft = 0;
     s32 wentRight = 0;
     s32 placed = 0;

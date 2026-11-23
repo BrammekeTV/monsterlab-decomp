@@ -7,10 +7,10 @@ extern "C" {
 extern "C" {
 void*       ScreenSetsCurrent(void* sets);                 // 0x8018D1E4
 void*       ScreenSetFindElement(void* set, u32 hash);     // 0x80198F18
-void*       fn_80198F74(void* set, u32 hash);              // 0x80198F74
+void*       UIScreenSet_FindTextureList(void* set, u32 hash);              // 0x80198F74
 void        fn_8018D2B8(const char* fmt, ...);             // 0x8018D2B8 (debug log)
 void        fn_8018D370(const char* fmt, ...);             // 0x8018D370 (debug log)
-const char* fn_801EB708(u32 hash);                         // 0x801EB708 (hash -> name for logs)
+const char* FormatHashString(u32 hash);                         // 0x801EB708 (hash -> name for logs)
 s32         UISetTexture(u8* el, s32 tex);                 // 0x801A11FC
 void        UISetProgress(void* obj, f32 t);               // 0x801A....
 ScriptValue fn_801A1208(u8* el);                           // 0x801A1208
@@ -36,7 +36,7 @@ static u8* FindElementD(u32 hash) {
     }
     u8* el = (u8*)ScreenSetFindElement(set, hash);
     if (el == NULL) {
-        fn_8018D2B8(lbl_80381868 + 0x238, fn_801EB708(hash));
+        fn_8018D2B8(lbl_80381868 + 0x238, FormatHashString(hash));
         return NULL;
     }
     return el;
@@ -47,11 +47,11 @@ static u8* FindImage(u32 hash) {
     u8* el = FindElementD(hash);
     if (el == NULL) return NULL;
     if (*(s32*)(el + 0x60) != 2) {
-        fn_8018D370(lbl_80381868 + 0x3d0, fn_801EB708(hash));
+        fn_8018D370(lbl_80381868 + 0x3d0, FormatHashString(hash));
         return NULL;
     }
     if (*(s32*)(el + 0x13c) != 0) {
-        fn_8018D370(lbl_80381868 + 0x498, fn_801EB708(hash));
+        fn_8018D370(lbl_80381868 + 0x498, FormatHashString(hash));
         return NULL;
     }
     return el;
@@ -62,11 +62,11 @@ static u8* FindSlideshow(u32 hash) {
     u8* el = FindElementD(hash);
     if (el == NULL) return NULL;
     if (*(s32*)(el + 0x60) != 2) {
-        fn_8018D370(lbl_80381868 + 0x3d0, fn_801EB708(hash));
+        fn_8018D370(lbl_80381868 + 0x3d0, FormatHashString(hash));
         return NULL;
     }
     if (*(s32*)(el + 0x13c) != 4) {
-        fn_8018D370(lbl_80381868 + 0x4c8, fn_801EB708(hash));
+        fn_8018D370(lbl_80381868 + 0x4c8, FormatHashString(hash));
         return NULL;
     }
     return el;
@@ -77,7 +77,7 @@ static u8* FindSlider(u32 hash) {
     u8* el = FindElementD(hash);
     if (el == NULL) return NULL;
     if (*(s32*)(el + 0x60) != 3) {
-        fn_8018D370(lbl_80381868 + 0x530, fn_801EB708(hash));
+        fn_8018D370(lbl_80381868 + 0x530, FormatHashString(hash));
         return NULL;
     }
     return el;
@@ -140,7 +140,7 @@ void UISlideshow_Resume(u32 a0) {
 void UISlideshow_SetUITextureList(u32 a0, u32 a1) {
     u8* el = FindSlideshow(a0);
     if (el == NULL) return;
-    void* list = fn_80198F74(ScreenSetsCurrent(gScreenSets), a1);
+    void* list = UIScreenSet_FindTextureList(ScreenSetsCurrent(gScreenSets), a1);
     if (list == NULL) {
         fn_8018D370(lbl_80381868 + 0x500, a1);
         return;

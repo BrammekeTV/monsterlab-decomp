@@ -20,7 +20,7 @@ void   fn_800E4C30(u8* p);                                      // 0x800E4C30
 void   fn_800E4C70(u8* p);                                      // 0x800E4C70
 s32    fn_801C79A4(u8* p);                                       // 0x801C79A4
 void fn_801C79E4(u8* p, s32 slot);                         // 0x801C79E4
-void*  fn_80198F1C(void* set, u32 hash);                         // 0x80198F1C
+void*  UIAnim_FindByName(void* set, u32 hash);                         // 0x80198F1C
 s32 fn_8019BBA4(u8* arg0, u8* arg1, s32 arg2);                             // 0x8019BBA4
 void   operator_delete(void* p);                                 // 0x801D426C
 
@@ -184,7 +184,7 @@ void fn_80021CAC(f32 farg0) {
         void* anim = 0;
         if (set != 0) {
             grp = ScreenSetFindElement(set, StringHash("timer_group"));
-            anim = fn_80198F1C(set, StringHash("timer_pulse_anim"));
+            anim = UIAnim_FindByName(set, StringHash("timer_pulse_anim"));
         }
         if (grp != 0 && anim != 0) {
             fn_8019BBA4((u8*)grp, (u8*)anim, 10);

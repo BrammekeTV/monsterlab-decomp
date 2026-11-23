@@ -24,7 +24,7 @@ void  fn_80032FBC(u8* p);                                        // 0x80032FBC
 void  fn_800336DC(u8* a, u8* b, u8* c);                          // 0x800336DC
 void  fn_80033958(u8* p);                                        // 0x80033958
 u8*   fn_80034048(u8* p);                                        // 0x80034048
-void* fn_80198F1C(void* set, u32 hash);                          // 0x80198F1C
+void* UIAnim_FindByName(void* set, u32 hash);                          // 0x80198F1C
 s32   fn_8019BBA4(u8* arg0, u8* arg1, s32 arg2);                 // 0x8019BBA4
 s32   fn_8019BC80(u8* arg0, u32 arg1);                           // 0x8019BC80
 u8*   fn_801B3308(void);                                         // 0x801B3308
@@ -260,7 +260,7 @@ void fn_800325D8(u8* arg0, f32 dt) {
             u32 hash = StringHash("axe_updown");
             u8* o = *(u8**)arg0;
             if (*(s32*)(o + 0x10) != 0) fn_8019BC80(o, 1);
-            fn_8019BBA4(*(u8**)arg0, (u8*)fn_80198F1C(ScreenSetsCurrent(gScreenSets), hash), 0xA);
+            fn_8019BBA4(*(u8**)arg0, (u8*)UIAnim_FindByName(ScreenSetsCurrent(gScreenSets), hash), 0xA);
         }
         u8* target = *(u8**)(arg0 + 0x10);
         if (target != NULL && *(s32*)(target + 0x8) == 1) {
@@ -288,7 +288,7 @@ void fn_800325D8(u8* arg0, f32 dt) {
         u8* anim = NULL;
         if (*(u8**)(arg0 + 0x10) != NULL) anim = fn_80034048(*(u8**)(arg0 + 0x10));
         if (anim == NULL) {
-            anim = (u8*)fn_80198F1C(ScreenSetsCurrent(gScreenSets), 0xBB143141u);
+            anim = (u8*)UIAnim_FindByName(ScreenSetsCurrent(gScreenSets), 0xBB143141u);
             if (lbl_805FBBAC == NULL) {
                 void* v = fn_801D40E0(1);
                 if (v != NULL) v = fn_80209814(v);

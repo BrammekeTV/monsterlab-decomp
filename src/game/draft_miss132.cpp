@@ -61,7 +61,7 @@ s32   fn_8019829C(u8* a3, f32 f1);                                    // 0x80198
 s32   fn_80199618(void* obj);                                         // 0x80199618
 void  fn_8019A994(void* p);                                           // 0x8019A994
 void  fn_8019BFF8(void* obj, void* cb, void* arg);                    // 0x8019BFF8
-u8*   fn_801AC184(u8* defs, s32 idx);                                 // 0x801AC184
+u8*   AnimDefFindByHandle(u8* defs, s32 idx);                                 // 0x801AC184
 void* fn_801D40E0(s32 n);                                             // 0x801D40E0
 u8*   fn_801DA788(u8* a3, s32 i);                                     // 0x801DA788
 u8* fn_801F61AC(u8* arg0, s32 arg1);                                      // 0x801F61AC
@@ -544,7 +544,7 @@ u8* fn_80099AF4(u8* arg0) {
     fn_80099D08(arg0);
     fn_8009B320(arg0 + 0x180);
     u8* prop = fn_800E4D7C(0);  // TODO: asm passes whatever fn_8009B320 leaves in r3 (unknown)
-    u8* anim = fn_801AC184(*(u8**)(*(u8**)(fn_800E4BFC(prop) + 0x9C) + 0x48), *(s32*)(prop + 0x5C));
+    u8* anim = AnimDefFindByHandle(*(u8**)(*(u8**)(fn_800E4BFC(prop) + 0x9C) + 0x48), *(s32*)(prop + 0x5C));
     *(u32*)(anim + 0xC) |= 0x10000;
     *(u8*)(prop + 0x54) = 1;
     u8* holder = fn_800E4BFC(prop);

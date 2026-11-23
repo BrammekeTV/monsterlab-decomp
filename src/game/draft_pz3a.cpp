@@ -13,7 +13,7 @@ void AudioSetPaused(void* audio, int paused);                          // 0x801F
 s32 LoadingScreenTick2(int unused, f32 dt);                             // 0x8000E390
 void* MemAllocDefault(u32 size);                                        // 0x801D4650
 void TextureRelease(void* tex);                                         // 0x80184028
-void* fn_80109330(const char* name);                                    // 0x80109330
+void* TextureLoadShared(const char* name);                                    // 0x80109330
 s32 fn_80146808(u8* file, const char* name, const char* mode);          // 0x80146808
 s32 fn_80146930(u8* file, void* buf, s32 size);                         // 0x80146930
 void fn_801469FC(u8* file);                                             // 0x801469FC
@@ -23,7 +23,7 @@ void fn_80151014(void);                                                 // 0x801
 void fn_80151244(void);                                                 // 0x80151244
 u8* fn_801736EC(void);                                                  // 0x801736EC (return type assumed)
 void fn_80174AC4(u8* p);                                         // 0x80174AC4
-void* fn_8018D428(s32 size, const char* file, void* tag, s32 line);     // 0x8018D428 (alloc)
+void* UIEngineAlloc(s32 size, const char* file, void* tag, s32 line);     // 0x8018D428 (alloc)
 void fn_8018D2B8(const char* fmt, ...);                                 // 0x8018D2B8 (debug log)
 void fn_801BA638(void* p);                                              // 0x801BA638
 void fn_801BB478(u8* p, s32 a1);                                        // 0x801BB478
@@ -119,7 +119,7 @@ u8* fn_80196E98(u8* obj, const char* name, void* tag) {
     (void)tag;
 
     *(u8**)obj = lbl_803821D0;
-    p = (u8*)fn_8018D428(0x20, (const char*)lbl_803821C0, &lbl_805F93A8, 0x1F);
+    p = (u8*)UIEngineAlloc(0x20, (const char*)lbl_803821C0, &lbl_805F93A8, 0x1F);
     *(u8**)(obj + 0x8) = p;
     if (p != NULL) {
         fn_801BA638(p);
@@ -280,7 +280,7 @@ void fn_80206E40(const char* name, u8* dst, s32 w, s32 h, s32 size, s32 fmt) {
         return;
     }
     memset(dst, 0, (u32)size);
-    ent = (u8*)fn_80109330(name);
+    ent = (u8*)TextureLoadShared(name);
     if (ent != NULL) {
         u8* p = ent + 4;
         if (p != NULL && *(u32*)(p + 0x14) == (u32)size && w == (s32)*(u16*)(p + 0x4) &&

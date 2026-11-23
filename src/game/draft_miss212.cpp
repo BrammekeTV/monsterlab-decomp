@@ -80,7 +80,7 @@ u8* fn_8004421C(u8* p, s32 arg1);                                  // 0x8004421C
 void fn_8020F498(u8* p, s32 a2);                                 // 0x8020F498
 u8* fn_800444FC(u8* p, s32 a2);                                  // 0x800444FC
 
-// Menu callbacks registered by fn_80042E04
+// Menu callbacks registered by DebugCombatOMaticOptionsMenu
 void fn_800440E0(u8* p);   // 0x800440E0
 void fn_8004415C(u8* p);   // 0x8004415C (second entry point at +8)
 void fn_80044098(u8* p);   // 0x80044098
@@ -262,7 +262,7 @@ void fn_80040F44(u8* p) {
 // Builds the battle debug menu: registers the per-fighter option rows (state, pad, mode, part
 // rows) on the menu at +0x260, then allocates and constructs the HUD/helper objects stored in
 // lbl_803C51D8, lbl_805FB078/80 and lbl_805FB088.
-void fn_80042E04(u8* p) {
+void DebugCombatOMaticOptionsMenu(u8* p) {
     char buf[0x40];
     u8* menu = *(u8**)(p + 0x260);
     strncpy((char*)menu, lbl_803587F0, 0x5F);

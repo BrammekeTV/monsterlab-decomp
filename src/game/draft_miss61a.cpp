@@ -89,7 +89,7 @@ u8* fn_8015A210(u8* arg0, s32 arg1, s32* arg2, s32 arg3) {
 }
 
 // 0x8016B5E0
-s32 fn_8016B5E0(u8* arg0, u8* arg1, s32 arg2) {
+s32 CheckWiiFileVersion(u8* arg0, u8* arg1, s32 arg2) {
     u32 tagA = *(u32*)arg1;
     u32 tagB = *(u32*)(arg1 + 0x4);
     *(u8**)(arg0 + 0x4) = arg1;

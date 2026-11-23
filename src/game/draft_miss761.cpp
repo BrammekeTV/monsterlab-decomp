@@ -24,7 +24,7 @@ void* fn_80040A08(u8* arg0, s32 arg1);                       // 0x80040A08
 u8*   fn_8007F900(u8* mgr, s32 type);                        // 0x8007F900
 void  fn_800822A8(u8* arg0, u8* arg1);                       // 0x800822A8
 u32   fn_8015B82C(u8* hdr, s32 x, s32 y);                    // 0x8015B82C
-void* fn_80198F1C(void* set, u32 hash);                      // 0x80198F1C
+void* UIAnim_FindByName(void* set, u32 hash);                      // 0x80198F1C
 s32   fn_8019BBA4(u8* arg0, u8* arg1, s32 arg2);             // 0x8019BBA4
 s32   fn_8019BC80(u8* arg0, u32 arg1);                       // 0x8019BC80
 ScriptValue fn_801A1208(u8* el);                             // 0x801A1208
@@ -173,7 +173,7 @@ void fn_800330E0(u8* p, f32 dt) {
         u32 hash = StringHash(lbl_80357D50);
         u8* g = *(u8**)(p + 0x18);
         if (*(s32*)(g + 0x10) != 0) fn_8019BC80(g, 1);
-        void* anim = fn_80198F1C(ScreenSetsCurrent(gScreenSets), hash);
+        void* anim = UIAnim_FindByName(ScreenSetsCurrent(gScreenSets), hash);
         g = *(u8**)(p + 0x18);
         (*(SlotFn*)(*(u8**)(g + 0x138) + 0x2C))(g, 0x1A);
         fn_8019BBA4(*(u8**)(p + 0x18), (u8*)anim, 10);

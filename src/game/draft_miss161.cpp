@@ -12,14 +12,14 @@ u32     PadGetHeld(s32 chan);                                   // 0x801B9B98
 u32     fn_801B9B6C(s32 chan);                                  // 0x801B9B6C
 void    fn_8018D2B8(const char* fmt, ...);                      // 0x8018D2B8 (debug log)
 void    fn_8018D370(const char* fmt, ...);                      // 0x8018D370 (debug log)
-void*   fn_8018D428(s32 size, const char* file, void* tag, s32 line);  // 0x8018D428
+void*   UIEngineAlloc(s32 size, const char* file, void* tag, s32 line);  // 0x8018D428
 s32 fn_8018D534(void* obj);                                      // 0x8018D534 (callback, address only)
-s32 fn_80199CE8(u8* obj, u8* list);                                      // 0x80199CE8 (callback, address only)
+s32 UIScreen_AddDeferredRender(u8* obj, u8* list);                                      // 0x80199CE8 (callback, address only)
 s32 fn_80196678(void* gx, void* mat, f32 t);                  // 0x80196678
 s32     fn_80196B10(u8* a3);                                    // 0x80196B10
 void    fn_8019BFF8(void* obj, void* cb, void* arg);            // 0x8019BFF8
 void    fn_8019C348(void* obj);                                 // 0x8019C348
-s32     fn_8018E0CC(u8* list, u8* node);                        // 0x8018E0CC
+s32     UIHashTree_InsertNode(u8* list, u8* node);                        // 0x8018E0CC
 void    fn_80198350(s32 a, u32 held, u8* p);                    // 0x80198350
 void    fn_801BBB68(void* mgr, s32 id, s32 a, s32 b);           // 0x801BBB68
 
@@ -136,7 +136,7 @@ s32 fn_8018CA04(u8* arg0, f32* arg1) {
 // Sets the cursor position on the object at +0x7C (x, y, z stored at +0x68/+0x6C/+0x70), then
 // refreshes it through the object's vtable slot 0x2C and the GX helpers. Positions outside the
 // clamp bounds are ignored.
-void fn_8018D558(u8* arg0, f32 x, f32 y, f32 z) {
+void UIEngine_SetCursorPos(u8* arg0, f32 x, f32 y, f32 z) {
     u8* obj;
     VFnPos vfn;
     f32 t;
@@ -176,7 +176,7 @@ s32 fn_8018E208(u8* arg0, u32 arg1, u8* arg2) {
         fn_8018D370(lbl_80381410 + 0x90, arg1);
         return -2;
     }
-    node = (u8*)fn_8018D428(0x14, lbl_80381410, &lbl_805F9370, 0x93);
+    node = (u8*)UIEngineAlloc(0x14, lbl_80381410, &lbl_805F9370, 0x93);
     if (node == NULL) {
         fn_8018D370(lbl_80381410 + 0xC0);
     } else {
@@ -192,7 +192,7 @@ s32 fn_8018E208(u8* arg0, u32 arg1, u8* arg2) {
     }
     *(u32*)(node + 0x0) = arg1;
     *(void**)(node + 0x4) = arg2;
-    return fn_8018E0CC(arg0, node);
+    return UIHashTree_InsertNode(arg0, node);
 }
 
 // 0x801981FC
@@ -253,7 +253,7 @@ s32 fn_801999D4(u8* arg0, s32 arg1, u8* arg2) {
     }
     ok = ((a == 1 && arg1 == 0) || (b == 1 && arg1 == 1) || (r3 == 1 && arg1 == 2));
     if (ok && (flags & 2) && *(s32*)(arg0 + 0x13C) > 0) {
-        fn_8019BFF8(arg0, (void*)fn_80199CE8, arg2);
+        fn_8019BFF8(arg0, (void*)UIScreen_AddDeferredRender, arg2);
     }
     return 0;
 }

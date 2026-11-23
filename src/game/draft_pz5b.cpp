@@ -15,7 +15,7 @@ s32   fn_80146808(u8* file, const char* name, const char* mode); // 0x80146808
 s32   fn_80146930(u8* file, void* buf, s32 size);                // 0x80146930
 s32   fn_80146A58(u8* file);                                     // 0x80146A58
 void  fn_8018430C(u8* a3, u8* a4);                               // 0x8018430C
-void* fn_8018D428(s32 size, const char* file, void* tag, s32 line); // 0x8018D428 (alloc)
+void* UIEngineAlloc(s32 size, const char* file, void* tag, s32 line); // 0x8018D428 (alloc)
 void  fn_8019B2F4(void* obj);                                    // 0x8019B2F4 (UI element base init)
 u8*   fn_80196C9C(u8* a3);                                       // 0x80196C9C
 s32   fn_801A1238(u8* obj, f32* colors);                         // 0x801A1238 (4 vertex colours)
@@ -73,9 +73,9 @@ extern "C" {
 // 0x8019FA78
 // Allocates and builds a UIImage (0x294 bytes) at (x, y) with a packed colour; applies the
 // colour (scaled by the global render object's colour, if any) to all 4 vertices.
-u8* fn_8019FA78(s32 x, s32 y, u32 color) {
+u8* UIImage_Create(s32 x, s32 y, u32 color) {
     f32 col[16];
-    u8* o = (u8*)fn_8018D428(0x294, lbl_80382E20, &lbl_805F9438, 0x2A);
+    u8* o = (u8*)UIEngineAlloc(0x294, lbl_80382E20, &lbl_805F9438, 0x2A);
     if (o != NULL) {
         *(u8**)(o + 0x138) = lbl_80382E2C;
     }

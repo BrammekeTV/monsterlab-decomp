@@ -39,14 +39,14 @@ void   fn_8005230C(void);                                            // 0x800523
 u8*   fn_8005CA88(u8* p);                                           // 0x8005CA88
 void*  fn_80060A28(u8* p);                                            // 0x80060A28
 void   fn_800D83B8(u8* a3, s32 a4);                                  // 0x800D83B8
-void*  fn_80109330(const char* name);                                // 0x80109330 (texture lookup by name)
+void*  TextureLoadShared(const char* name);                                // 0x80109330 (texture lookup by name)
 s32    fn_801138F8(void);                                            // 0x801138F8
 s32    fn_80119B78(void);                                            // 0x80119B78
 s32    fn_8012E7B0(u8* world, u8* obj, s32 a);                       // 0x8012E7B0
 BOOL   fn_80142358(void);                                            // 0x80142358
 u64    fn_801425DC(u8* timer);                                       // 0x801425DC
 void   fn_8015EB28(u8* a, f32* outA, f32* outB);                     // 0x8015EB28
-void   fn_8016D8C4(void);                                            // 0x8016D8C4
+void   DebugDrawZcullStats(void);                                            // 0x8016D8C4
 void   fn_8016DAE8(void);                                            // 0x8016DAE8
 void   fn_80188E5C(u8* p);                                           // 0x80188E5C
 void   fn_80188F00(const char* fmt, ...);                            // 0x80188F00
@@ -314,7 +314,7 @@ void DebugDrawStats(void) {
         lbl_805FB630 = -1;
         fn_80188F00("%s", sp210, v);
     }
-    if (lbl_805FB5C8 != 0) fn_8016D8C4();
+    if (lbl_805FB5C8 != 0) DebugDrawZcullStats();
     if (lbl_805FB5D0 != 0) fn_8016DAE8();
     fn_80188E5C(NULL);
 }
@@ -333,7 +333,7 @@ void* DefectGetTexture(s32 arg0) {
                *(s32*)(e + 0xC), *(s32*)(e + 0x8), *(s32*)(e + 0x4));
     strcpy(sp28, lbl_8036CF70 + 0x48);
     strcat(sp28, sp128);
-    void* tex = fn_80109330(sp28);
+    void* tex = TextureLoadShared(sp28);
     s32 id = TextIdFromHash(hash);
     const char* str;
     if (id == -1) {
@@ -356,7 +356,7 @@ void* DefectGetTexture(s32 arg0) {
     if (tex == NULL) {
         strcpy(sp28, lbl_8036CF70 + 0x48);
         strcat(sp28, lbl_8036CF70 + 0x68);
-        tex = fn_80109330(sp28);
+        tex = TextureLoadShared(sp28);
     }
     return tex;
 }

@@ -12,6 +12,7 @@ extern u8* lbl_805FB2B8;
 extern s32 lbl_805FB2C8;
 extern s32 lbl_805FB2CC;
 extern u8 lbl_805FB2D4[];
+extern "C" void SetTimeoutFromPropertyImpl(u8*, s32);
 extern "C" void fn_8005B648(u8*, f32);
 extern "C" void fn_8005F4F8(u8*, u32);
 extern "C" void fn_8005F81C(u8*, u32, f32);
@@ -38,7 +39,6 @@ extern "C" s32 fn_80062470(u8*);
 extern "C" s32 fn_800629E8(u8*);
 extern "C" s32 fn_80062A98(u8*);
 extern "C" s32 fn_8006E99C(u8*, s32, s32);
-extern "C" void fn_8006E9D8(u8*, s32);
 extern "C" void fn_8006EC6C(u8*, s32);
 
 // 0x801035F8
@@ -238,7 +238,7 @@ void SetTimeoutFromProperty(u32 a3, u32 a4) {
     if (a3 == 0) {
         return;
     }
-    fn_8006E9D8(((u8*)(uintptr_t)(a3)), (s32)((u32)(uintptr_t)(a4)));
+    SetTimeoutFromPropertyImpl(((u8*)(uintptr_t)(a3)), (s32)((u32)(uintptr_t)(a4)));
 }
 
 // 0x80103970

@@ -25,7 +25,7 @@ void  TextureRelease(void* tex);                 // 0x80184028
 void  __register_global_object(void* obj, void (*dtor)(void*), void* handle);  // 0x8032EFC8
 u8*   fn_800DE5E4(u8* p, s32 del);               // 0x800DE5E4
 void  fn_8018D4CC(void* p);                      // 0x8018D4CC
-void* fn_8018E8D8(void* table, u32 hash);        // 0x8018E8D8
+void* UIHashTree_Find(void* table, u32 hash);        // 0x8018E8D8
 void  fn_80169704(void* a, void* b);             // 0x80169704
 u8*    fn_8019552C(u8* a3, s32 a4);               // 0x8019552C
 void  fn_8032F1E8(u8* obj, void (*cb)(void), s32 a, s32 b, s32 c);  // 0x8032F1E8
@@ -226,7 +226,7 @@ void* fn_8019AEAC(u8* arg0, u32 arg1, s32 arg2) {
         }
     }
     if (!hit) {
-        found = (u8*)fn_8018E8D8(*(void**)(arg0 + slot * 4 + 0x18), arg1);
+        found = (u8*)UIHashTree_Find(*(void**)(arg0 + slot * 4 + 0x18), arg1);
     }
     if (found != NULL) {
         return found + 0xCC;

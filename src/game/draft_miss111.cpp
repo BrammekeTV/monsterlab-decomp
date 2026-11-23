@@ -7,7 +7,7 @@ extern void* lbl_805FBBAC;               // 0x805FBBAC (voice SFX handle)
 extern f32 lbl_805FF940;                 // 0x805FF940 (float constant)
 extern f32 lbl_805FF944;                 // 0x805FF944 (float constant, 1.0f)
 
-// Log strings (0x803829F8 base + offset, see fn_8019BE68).
+// Log strings (0x803829F8 base + offset, see UIElement_CreateBaseRefused).
 extern const char lbl_803826A8[];        // 0x803826A8 (log string)
 extern const char lbl_803826E8[];        // 0x803826E8 (log string)
 extern const char lbl_80382838[];        // 0x80382838 (log string)
@@ -29,16 +29,16 @@ void fn_8018D2B8(const char* fmt, ...);                       // 0x8018D2B8 (deb
 void fn_8018D370(const char* fmt, ...);                       // 0x8018D370 (debug log)
 u8*  fn_8019552C(u8* a3, s32 a4);                              // 0x8019552C (leaf)
 s32 fn_8019555C(u8* a3);                                      // 0x8019555C (leaf)
-void* fn_80198F1C(void* set, u32 hash);                       // 0x80198F1C
+void* UIAnim_FindByName(void* set, u32 hash);                       // 0x80198F1C
 f32 fn_801AB7F0(void* h);                                     // 0x801AB7F0
 f32 fn_801AB804(void* h);                                     // 0x801AB804
 void* fn_801D40E0(s32 n);                                     // 0x801D40E0
-const char* fn_801EB708(u32 hash);                            // 0x801EB708
+const char* FormatHashString(u32 hash);                            // 0x801EB708
 void fn_801ED050(u8* p, s32 flag);                         // 0x801ED050
 void* fn_80209814(void* v);                                   // 0x80209814
 void fn_8020A398(s32 handle);                                 // 0x8020A398
-s32 fn_8019645C(u8* self, u32 mode);                             // 0x8019645C
-s32 fn_8019BA18(u8* obj, void* desc, s8 prio, f32 speed);    // 0x8019BA18
+s32 UIRenderModule_SetBlendMode(u8* self, u32 mode);                             // 0x8019645C
+s32 UIElement_AllocAnimPlayer(u8* obj, void* desc, s8 prio, f32 speed);    // 0x8019BA18
 }
 
 extern "C" {
@@ -86,7 +86,7 @@ s32 fn_8004EA38(u8* arg0, s32 arg1, u8* arg2) {
 
 // 0x80199B68
 // Stops the looping SFX in slot 0x14C, then starts arg1 as a looping sound if its loop flag is set.
-void fn_80199B68(u8* arg0, u8* arg1) {
+void UIScreen_PlayLoopingSoundFX(u8* arg0, u8* arg1) {
     s32 handle = *(s32*)(arg0 + 0x14C);
     void* v;
 
@@ -169,7 +169,7 @@ void* fn_8019AC78(u8* arg0, u8* arg1) {
 
 // 0x8019ADFC
 // Index of the hash arg1 in the sound list at arg0+0x4; logs the hash name and returns -1 if absent.
-s32 fn_8019ADFC(u8* arg0, u32 arg1) {
+s32 UISoundList_FindSound(u8* arg0, u32 arg1) {
     u8* list = *(u8**)(arg0 + 0x4);
     s32 i = 0;
 
@@ -180,13 +180,13 @@ s32 fn_8019ADFC(u8* arg0, u32 arg1) {
         }
         i++;
     }
-    fn_8018D370(lbl_80382898, fn_801EB708(arg1));
+    fn_8018D370(lbl_80382898, FormatHashString(arg1));
     return -1;
 }
 
 // 0x8019B7D8
 s32 fn_8019B7D8(u8* arg0) {
-    fn_8019645C((u8*)lbl_805FB658, *(s32*)(arg0 + 0x58));
+    UIRenderModule_SetBlendMode((u8*)lbl_805FB658, *(s32*)(arg0 + 0x58));
     return 0;
 }
 
@@ -208,7 +208,7 @@ void fn_8019B808(u8* arg0, u8* arg1) {
 }
 
 // 0x8019B888
-void fn_8019B888(u8* arg0, u32 arg1, s32 arg2) {
+void UIElement_PlayUIAnimFromSamePositionImpl(u8* arg0, u32 arg1, s32 arg2) {
     f32 var = lbl_805FF940;
     u8* p = *(u8**)(arg0 + 0x10);
     void* desc;
@@ -217,15 +217,15 @@ void fn_8019B888(u8* arg0, u32 arg1, s32 arg2) {
         f32 d = fn_801AB7F0(p);
         var = fn_801AB804(p) / d;
     }
-    desc = fn_80198F1C(ScreenSetsCurrent(gScreenSets), arg1);
+    desc = UIAnim_FindByName(ScreenSetsCurrent(gScreenSets), arg1);
     if (desc == NULL) {
         fn_8018D370(lbl_80382AB4, arg1);
     }
-    fn_8019BA18(arg0, desc, (s8)arg2, var);
+    UIElement_AllocAnimPlayer(arg0, desc, (s8)arg2, var);
 }
 
 // 0x8019B94C
-void fn_8019B94C(u8* arg0, u32 arg1, s32 arg2) {
+void UIElement_PlayUIAnimFromReversePositionImpl(u8* arg0, u32 arg1, s32 arg2) {
     f32 var = lbl_805FF940;
     u8* p = *(u8**)(arg0 + 0x10);
     void* desc;
@@ -234,16 +234,16 @@ void fn_8019B94C(u8* arg0, u32 arg1, s32 arg2) {
         f32 d = fn_801AB7F0(p);
         var = lbl_805FF944 - (fn_801AB804(p) / d);
     }
-    desc = fn_80198F1C(ScreenSetsCurrent(gScreenSets), arg1);
+    desc = UIAnim_FindByName(ScreenSetsCurrent(gScreenSets), arg1);
     if (desc == NULL) {
         fn_8018D370(lbl_80382AB4, arg1);
     }
-    fn_8019BA18(arg0, desc, (s8)arg2, var);
+    UIElement_AllocAnimPlayer(arg0, desc, (s8)arg2, var);
 }
 
 // 0x8019BE68
 // Removes arg1 from the singly linked list at arg0+0x120 (next pointer at +0x124) and clears arg1's links.
-void fn_8019BE68(u8* arg0, u8* arg1) {
+void UIElement_CreateBaseRefused(u8* arg0, u8* arg1) {
     u8* head = *(u8**)(arg0 + 0x120);
     u8* cur;
     u8* prev;

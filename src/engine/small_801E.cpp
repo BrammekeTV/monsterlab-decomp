@@ -203,7 +203,7 @@ f32 fn_801EA350(const u8* p) {
 
 // 0x801EAA08
 // Registers the two InterpolateToNextWaypointTask script callbacks and stores their ids.
-void fn_801EAA08(void) {
+void RegisterInterpolateToNextWaypointTaskScripts(void) {
     lbl_805FB8E8 = RegisterScriptFunc(lbl_80385DF0, 0x66,
                                       (void*)InterpolateToNextWaypointTask_DefaultReachedWaypointCallback);
     lbl_805FB8EC = RegisterScriptFunc(lbl_80385E30, 0x90,
@@ -228,7 +228,7 @@ void fn_801EB568(u8* p, s32 a, const f32* v3, s32 b, const f32* v4, f32 f) {
 
 // 0x801EB708
 // Formats the hash into a shared 16-byte buffer and returns it (used for log messages).
-const char* fn_801EB708(u32 hash) {
+const char* FormatHashString(u32 hash) {
     SysSprintf(lbl_804DD0E0, lbl_805F96A8, hash);
     return lbl_804DD0E0;
 }

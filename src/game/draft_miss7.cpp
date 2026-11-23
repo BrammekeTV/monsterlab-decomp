@@ -46,13 +46,13 @@ void   fn_80154318(void);                                        // 0x80154318
 u8*    fn_8015EC9C(u8* tbl, f32 a, f32 b);                       // 0x8015EC9C
 void   fn_8018D2B8(const char* fmt, ...);                        // 0x8018D2B8
 void   fn_8018D370(const char* fmt, ...);                        // 0x8018D370
-void*  fn_80198F1C(void* set, u32 hash);                         // 0x80198F1C
+void*  UIAnim_FindByName(void* set, u32 hash);                         // 0x80198F1C
 s32 fn_8019BBA4(u8* arg0, u8* arg1, s32 arg2);             // 0x8019BBA4
 s32 fn_8019BC80(u8* arg0, u32 arg1);                          // 0x8019BC80
 u32    fn_801B94F8(void* obj, u32 flags);                        // 0x801B94F8
 void   fn_801D6780(void);                                        // 0x801D6780
 void   fn_801E93EC(void* list, void* entry);                     // 0x801E93EC
-const char* fn_801EB708(u32 hash);                               // 0x801EB708
+const char* FormatHashString(u32 hash);                               // 0x801EB708
 u32 fn_801F2C10(u32 key);                                    // 0x801F2C10
 void   fn_801F357C(void);                                        // 0x801F357C
 void   fn_801F3BB8(void);                                        // 0x801F3BB8
@@ -219,7 +219,7 @@ void UIElement_SetColor(u32 a0, BOOL a1) {
     } else {
         el = (u8*)ScreenSetFindElement(set, a0);
         if (el == NULL) {
-            fn_8018D2B8(lbl_80381868 + 0x238, fn_801EB708(a0));
+            fn_8018D2B8(lbl_80381868 + 0x238, FormatHashString(a0));
             el = NULL;
         }
     }
@@ -248,7 +248,7 @@ void UIElement_SetColor_Floats(u32 a0, f32 a1, f32 a2, f32 a3, f32 a4) {
     } else {
         el = (u8*)ScreenSetFindElement(set, a0);
         if (el == NULL) {
-            fn_8018D2B8(lbl_80381868 + 0x238, fn_801EB708(a0));
+            fn_8018D2B8(lbl_80381868 + 0x238, FormatHashString(a0));
             el = NULL;
         }
     }
@@ -264,7 +264,7 @@ void UIElement_SetColor_Floats(u32 a0, f32 a1, f32 a2, f32 a3, f32 a4) {
 // 0x8019BB1C
 // Starts the looping animation with hash arg1 (looked up in the current screen set) on widget arg0.
 void UIWidgetPlayAnimLoop(void* arg0, u32 arg1, s32 arg2) {
-    void* anim = fn_80198F1C(ScreenSetsCurrent(gScreenSets), arg1);
+    void* anim = UIAnim_FindByName(ScreenSetsCurrent(gScreenSets), arg1);
     if (anim == NULL) {
         fn_8018D370(lbl_80382AB4, arg1);
     }

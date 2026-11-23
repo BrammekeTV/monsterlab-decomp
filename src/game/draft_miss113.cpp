@@ -63,7 +63,7 @@ s32 fn_801481FC(s32 chan);                                       // 0x801481FC
 void fn_8014DE68(void);                                          // 0x8014DE68
 s32 fn_8015BA30(void* p);                                        // 0x8015BA30
 s32 fn_8018CA38(u8* sets, f32 dt);                            // 0x8018CA38
-void fn_8018DBB8(void* sets, s32 a);                             // 0x8018DBB8
+void UIEngine_ShowCursor(void* sets, s32 a);                             // 0x8018DBB8
 s32 fn_80198A8C(void* set, void* widget);                       // 0x80198A8C
 BOOL fn_80198C34(void* set, void* w);                            // 0x80198C34
 ScriptValue fn_801A1208(u8* el);                                 // 0x801A1208 (image element -> texture)
@@ -333,7 +333,7 @@ void fn_8000B9CC(u8* ctx, f32 dt) {
             void* w = ScreenSetFindWidget(cur, kHashCancelRing);
             if (w != 0 && fn_80198C34(cur, w) != 0) fn_80198A8C(cur, w);
             *(s32*)(ctx + 0x15C) = 0;
-            fn_8018DBB8(gScreenSets, 1);
+            UIEngine_ShowCursor(gScreenSets, 1);
         }
         if (*(f32*)(ctx + 0x160) >= lbl_805FC630) {
             *(s32*)(ctx + 0x154) = 0;
