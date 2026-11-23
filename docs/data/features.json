@@ -99,6 +99,11 @@
  "changelog": [
   {
    "date": "2026-11-23",
+   "time": "23:03",
+   "text": "New smoke test, tools/smoke.py (PR #114): in under a minute it builds, runs the self-test and boots to the title and the main menu headless, then checks nothing crashed or came out blank. Every session now runs it before opening a PR. Also, the build script works again after two changes clashed (PR #115), and with the whole game optimised the game logic runs about 60% faster (about 150 instead of 93 frames per second, measured without drawing)."
+  },
+  {
+   "date": "2026-11-23",
    "time": "22:56",
    "text": "The whole Windows version is now built with compiler optimisation (PR #113), not just the PC parts. Some auto-generated functions returned small values whose top bits the callers then read, which only went wrong once optimised; they now return full values. Also, --to-menu in a window reaches the main menu in about 28 seconds instead of two minutes, because it skips drawing while fast-forwarding (PR #112)."
   },
