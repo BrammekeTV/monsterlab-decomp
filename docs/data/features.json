@@ -99,6 +99,11 @@
  "changelog": [
   {
    "date": "2026-11-23",
+   "time": "20:16",
+   "text": "Settings screen on Windows (PR #105): press F1 or Esc for display settings (resolution, 16:9 or 4:3, stretched menus, vsync, borderless fullscreen, stats overlay), volume and mute, and key rebinding: click a control, then press the new key. Settings are saved to monsterlab.ini next to the game. While the screen is open, the game doesn't get your keys or mouse."
+  },
+  {
+   "date": "2026-11-23",
    "time": "20:11",
    "text": "Stats overlay on Windows (PR #104): press F3, or start with --stats, for a panel in the top-right corner. It shows frames per second, frame time and its split into game, rendering and waiting, draw calls, effect copies, textures and audio voices. It's built with the open-source Dear ImGui library, which the settings screen will use next."
   },
