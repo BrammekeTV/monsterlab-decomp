@@ -3,7 +3,7 @@
  "counts": {
   "global": 3899,
   "unknown": 130,
-  "library": 139
+  "library": 137
  },
  "game_bytes": 0,
  "duplicates": [],
@@ -87,6 +87,17 @@
    "region": "GX"
   },
   {
+   "name": "DWC_ClearError",
+   "refs": 4,
+   "files": 4,
+   "used_as": "_DWC_ClearError",
+   "addr": "802E4970",
+   "size": 28,
+   "section": ".text",
+   "kind": "library",
+   "region": "Network (DWC/SSL/NHTTP/NWC24)"
+  },
+  {
    "name": "GXSetProjection",
    "refs": 4,
    "files": 4,
@@ -96,17 +107,6 @@
    "section": ".text",
    "kind": "library",
    "region": "GX"
-  },
-  {
-   "name": "fn_802E4970",
-   "refs": 4,
-   "files": 4,
-   "used_as": "_fn_802E4970",
-   "addr": "802E4970",
-   "size": 28,
-   "section": ".text",
-   "kind": "library",
-   "region": "Network (DWC/SSL/NHTTP/NWC24)"
   },
   {
    "name": "fn_802E9CBC",
@@ -126,17 +126,6 @@
    "used_as": "_fn_8032F358",
    "addr": "8032F358",
    "size": 128,
-   "section": ".text",
-   "kind": "library",
-   "region": "MSL C/C++ runtime"
-  },
-  {
-   "name": "fn_80333B60",
-   "refs": 4,
-   "files": 4,
-   "used_as": "_fn_80333B60",
-   "addr": "80333B60",
-   "size": 188,
    "section": ".text",
    "kind": "library",
    "region": "MSL C/C++ runtime"
@@ -162,6 +151,17 @@
    "section": ".text",
    "kind": "library",
    "region": "OS"
+  },
+  {
+   "name": "UTF8ToUCS2String",
+   "refs": 3,
+   "files": 3,
+   "used_as": "_UTF8ToUCS2String",
+   "addr": "80333D50",
+   "size": 72,
+   "section": ".text",
+   "kind": "library",
+   "region": "MSL C/C++ runtime"
   },
   {
    "name": "fn_80272B64",
@@ -208,17 +208,6 @@
    "region": "MSL C/C++ runtime"
   },
   {
-   "name": "fn_80333D50",
-   "refs": 3,
-   "files": 3,
-   "used_as": "_fn_80333D50",
-   "addr": "80333D50",
-   "size": 72,
-   "section": ".text",
-   "kind": "library",
-   "region": "MSL C/C++ runtime"
-  },
-  {
    "name": "GXInitTexObj",
    "refs": 2,
    "files": 2,
@@ -247,6 +236,17 @@
    "used_as": "_GXInitTexObjLOD",
    "addr": "8024C60C",
    "size": 260,
+   "section": ".text",
+   "kind": "library",
+   "region": "GX"
+  },
+  {
+   "name": "GXInitTlutObj",
+   "refs": 2,
+   "files": 2,
+   "used_as": "_GXInitTlutObj",
+   "addr": "8024C970",
+   "size": 40,
    "section": ".text",
    "kind": "library",
    "region": "GX"
@@ -283,17 +283,6 @@
    "section": ".text",
    "kind": "library",
    "region": "WPAD/KPAD/BT"
-  },
-  {
-   "name": "fn_8024C970",
-   "refs": 2,
-   "files": 2,
-   "used_as": "_fn_8024C970",
-   "addr": "8024C970",
-   "size": 40,
-   "section": ".text",
-   "kind": "library",
-   "region": "GX"
   },
   {
    "name": "fn_8024C998",
@@ -505,6 +494,28 @@
    "region": "MSL C/C++ runtime"
   },
   {
+   "name": "AXFXReverbHiExpInit",
+   "refs": 1,
+   "files": 1,
+   "used_as": "_AXFXReverbHiExpInit",
+   "addr": "8025B4C0",
+   "size": 412,
+   "section": ".text",
+   "kind": "library",
+   "region": "AI/AX/MEM"
+  },
+  {
+   "name": "AXFXReverbHiExpShutdown",
+   "refs": 1,
+   "files": 1,
+   "used_as": "_AXFXReverbHiExpShutdown",
+   "addr": "8025B72C",
+   "size": 84,
+   "section": ".text",
+   "kind": "library",
+   "region": "AI/AX/MEM"
+  },
+  {
    "name": "GXInitTexObjFilter",
    "refs": 1,
    "files": 1,
@@ -522,6 +533,17 @@
    "used_as": "_GXReadDrawSync",
    "addr": "8024B34C",
    "size": 12,
+   "section": ".text",
+   "kind": "library",
+   "region": "GX"
+  },
+  {
+   "name": "GXSetDrawSync",
+   "refs": 1,
+   "files": 1,
+   "used_as": "_GXSetDrawSync",
+   "addr": "8024B298",
+   "size": 180,
    "section": ".text",
    "kind": "library",
    "region": "GX"
@@ -560,6 +582,17 @@
    "region": "GX"
   },
   {
+   "name": "GXSetTevKColor",
+   "refs": 1,
+   "files": 1,
+   "used_as": "_GXSetTevKColor",
+   "addr": "8024D790",
+   "size": 92,
+   "section": ".text",
+   "kind": "library",
+   "region": "GX"
+  },
+  {
    "name": "NANDInit",
    "refs": 1,
    "files": 1,
@@ -591,6 +624,39 @@
    "section": ".text",
    "kind": "library",
    "region": "OS"
+  },
+  {
+   "name": "PSMTXScale",
+   "refs": 1,
+   "files": 1,
+   "used_as": "_PSMTXScale",
+   "addr": "80248420",
+   "size": 40,
+   "section": ".text",
+   "kind": "library",
+   "region": "GX"
+  },
+  {
+   "name": "SOCleanup",
+   "refs": 1,
+   "files": 1,
+   "used_as": "_SOCleanup",
+   "addr": "80323D3C",
+   "size": 432,
+   "section": ".text",
+   "kind": "library",
+   "region": "MSL C/C++ runtime"
+  },
+  {
+   "name": "SOFinish",
+   "refs": 1,
+   "files": 1,
+   "used_as": "_SOFinish",
+   "addr": "8032380C",
+   "size": 252,
+   "section": ".text",
+   "kind": "library",
+   "region": "MSL C/C++ runtime"
   },
   {
    "name": "WENCGetEncodeData",
@@ -648,39 +714,6 @@
    "region": "OS"
   },
   {
-   "name": "fn_80248420",
-   "refs": 1,
-   "files": 1,
-   "used_as": "_fn_80248420",
-   "addr": "80248420",
-   "size": 40,
-   "section": ".text",
-   "kind": "library",
-   "region": "GX"
-  },
-  {
-   "name": "fn_8024B298",
-   "refs": 1,
-   "files": 1,
-   "used_as": "_fn_8024B298",
-   "addr": "8024B298",
-   "size": 180,
-   "section": ".text",
-   "kind": "library",
-   "region": "GX"
-  },
-  {
-   "name": "fn_8024D790",
-   "refs": 1,
-   "files": 1,
-   "used_as": "_fn_8024D790",
-   "addr": "8024D790",
-   "size": 92,
-   "section": ".text",
-   "kind": "library",
-   "region": "GX"
-  },
-  {
    "name": "fn_80253A48",
    "refs": 1,
    "files": 1,
@@ -692,34 +725,12 @@
    "region": "DVD"
   },
   {
-   "name": "fn_8025B4C0",
-   "refs": 1,
-   "files": 1,
-   "used_as": "_fn_8025B4C0",
-   "addr": "8025B4C0",
-   "size": 412,
-   "section": ".text",
-   "kind": "library",
-   "region": "AI/AX/MEM"
-  },
-  {
    "name": "fn_8025B65C",
    "refs": 1,
    "files": 1,
    "used_as": "_fn_8025B65C",
    "addr": "8025B65C",
    "size": 208,
-   "section": ".text",
-   "kind": "library",
-   "region": "AI/AX/MEM"
-  },
-  {
-   "name": "fn_8025B72C",
-   "refs": 1,
-   "files": 1,
-   "used_as": "_fn_8025B72C",
-   "addr": "8025B72C",
-   "size": 84,
    "section": ".text",
    "kind": "library",
    "region": "AI/AX/MEM"
@@ -1440,34 +1451,12 @@
    "region": "MSL C/C++ runtime"
   },
   {
-   "name": "fn_8032380C",
-   "refs": 1,
-   "files": 1,
-   "used_as": "_fn_8032380C",
-   "addr": "8032380C",
-   "size": 252,
-   "section": ".text",
-   "kind": "library",
-   "region": "MSL C/C++ runtime"
-  },
-  {
    "name": "fn_80323908",
    "refs": 1,
    "files": 1,
    "used_as": "_fn_80323908",
    "addr": "80323908",
    "size": 12,
-   "section": ".text",
-   "kind": "library",
-   "region": "MSL C/C++ runtime"
-  },
-  {
-   "name": "fn_80323D3C",
-   "refs": 1,
-   "files": 1,
-   "used_as": "_fn_80323D3C",
-   "addr": "80323D3C",
-   "size": 432,
    "section": ".text",
    "kind": "library",
    "region": "MSL C/C++ runtime"
@@ -1512,17 +1501,6 @@
    "used_as": "_fn_80333B34",
    "addr": "80333B34",
    "size": 44,
-   "section": ".text",
-   "kind": "library",
-   "region": "MSL C/C++ runtime"
-  },
-  {
-   "name": "fn_8033AB2C",
-   "refs": 1,
-   "files": 1,
-   "used_as": "_fn_8033AB2C",
-   "addr": "8033AB2C",
-   "size": 196,
    "section": ".text",
    "kind": "library",
    "region": "MSL C/C++ runtime"
@@ -5457,7 +5435,7 @@
  "library_regions": {
   "Network (DWC/SSL/NHTTP/NWC24)": 57,
   "AI/AX/MEM": 24,
-  "MSL C/C++ runtime": 21,
+  "MSL C/C++ runtime": 19,
   "GX": 16,
   "WPAD/KPAD/BT": 9,
   "OS": 7,
