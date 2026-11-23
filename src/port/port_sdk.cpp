@@ -467,7 +467,7 @@ void PSMTXIdentity(f32* mtx) {
 // ------------------------------------------------------------------ SC, WPAD, KPAD (AI, AX: port_audio.cpp)
 void SCInit(void) { PortMilestone("SCInit"); }
 s32  SCCheckStatus(void) { return 0; }           // settings are loaded
-u8   SCGetAspectRatio(void) { return 1; }        // 16:9
+u8   SCGetAspectRatio(void) { return gPortSettings.wide ? 1 : 0; }   // 1 = 16:9 (--aspect)
 u8   SCGetLanguage(void) { return 1; }           // English
 // SCGetProgressiveMode: off
 u8   SCGetProgressiveMode(void) { return 0; }

@@ -85,12 +85,19 @@ typedef struct PortOptions {
     BOOL haveData;            // main.dol was found and loaded
     BOOL window;              // open a window and draw into it
     const char* screenshot;   // write the last shown picture to this PNG when the run stops
-    s32  scale;               // frame buffer size as a multiple of the console's 640x528 (default 2)
     const char* wav;          // write everything the mixer produces to this WAV file
     BOOL noAudio;             // never open the sound device
     s32  showTexture;         // development aid (port_demo.cpp): -1, or a texture of global_binary.sir
 } PortOptions;
 extern PortOptions gPortOptions;
+
+// What the player can change (the settings screen edits this; the command line fills it for now).
+typedef struct PortSettings {
+    s32  width, height;       // output size in pixels (--res WxH, default 1920x1080)
+    BOOL wide;                // 16:9 (the console's widescreen setting, SCGetAspectRatio) or 4:3 (--aspect)
+    BOOL stretchUi;           // 16:9 only: stretch the 2D layer over the whole width as the console does (--stretch-ui)
+} PortSettings;
+extern PortSettings gPortSettings;
 
 void PortLog(const char* fmt, ...);
 // Records the first use of an SDK feature (shown in the boot summary); returns TRUE the first time.

@@ -28,7 +28,9 @@ build\pc\monsterlab.exe                        # runs main() with your own disc 
 | `--wav FILE` | write everything the audio mixer produces to a WAV file (32 kHz stereo); works headless |
 | `--no-audio` | never open the sound device (it is only opened with `--window`) |
 | `--screenshot FILE` | write the last picture shown as a PNG when the run stops (works without `--window`) |
-| `--scale N` | frame buffer size as a multiple of the console's 640x528 (default 2) |
+| `--res WxH` | output size (default 1920x1080) |
+| `--aspect 4:3\|16:9` | picture shape and the console's widescreen setting (default 16:9) |
+| `--stretch-ui` | 16:9: stretch the 2D layer over the whole width, as the console does |
 | `--peek ADDR` | print four words of Wii memory (hex address) when the run stops |
 | `--watch ADDR` | report every write of the main thread to four bytes of Wii memory (hex address): writer, new value, stack |
 | `--press BUTTON@FRAME[-FRAME]` | hold a Wii Remote button (a name from the binding table: `A`, `B`, `PLUS`, `STICK_UP`...) during those frames; a press without an end lasts 6 frames. For headless tests; can be given up to 32 times |
@@ -316,13 +318,22 @@ renderer is one file behind `PortGxBackend`, so another API can be added beside 
 
 What it does:
 
-- **Frame buffer.** The console's 640x528 "EFB" is a render target of `--scale` times that
-  size (default 2). Everything the game addresses in frame-buffer pixels (viewport, scissor,
-  copy rectangles) is multiplied by the scale, so a higher internal resolution needs no change
-  in game code. *For 1080p and widescreen later:* the scale becomes the window's height / 480,
-  and widescreen is a wider render target plus a correction of the projection's x scale at the
-  point where the XF projection is applied (`Draw`): one place, because the transform is done
-  here and not in game code.
+- **Frame buffer, resolution, widescreen.** The output is `--res WxH` (default 1920x1080); the
+  picture is the largest 16:9 or 4:3 part of it (`--aspect`, default 16:9), centred, with black
+  beside it. The console's 640x528 "EFB" is a render target scaled so that its 640x480 picture
+  is exactly that part (`sFx`, `sFy`: 3 x 2.25 for 1080p 16:9). Everything the game addresses in
+  frame-buffer pixels (viewport, scissor, copy rectangles) is scaled here, so game code needs no
+  change. Positions are rounded to whole pixels after adding the scissor offset (`PxX`, `PxY`),
+  the same way for a band's draws and for its copy, so bands and copies meet without a seam at
+  any scale. `--aspect` is also what `SCGetAspectRatio` reports. The game's own 16:9 mode
+  (checked in the asm: `ViewCreate`, `CameraInit`, `fn_801FB10C`, the HOME menu) widens the 3D
+  views only: the 2D layer is always laid out for 640x480 (`fn_8019600C`, `gScreenWidth` is a
+  constant) and the TV stretches it. The port narrows orthographic draws by 3/4 about the centre
+  instead (`Draw`), except layers of the whole screen: draws that show a frame-buffer copy, and
+  ones from edge to edge with no texture or a small one (fades, backdrops; a full-screen picture
+  is narrowed). `--stretch-ui` gives the console's stretched 2D.
+  The mouse pointer goes through the same mapping (`PortGfxPointer`). All of this is in
+  `gPortSettings` (port.h), which the settings screen will edit.
 - **Vertices.** Decoded from the stream (or from the arrays a draw indexes), then transformed,
   lit and given their texture coordinates on the CPU from the XF registers and matrix memory:
   position and normal matrices, projection, the colour channels with their lights, the
