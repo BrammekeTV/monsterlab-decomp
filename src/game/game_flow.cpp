@@ -255,7 +255,7 @@ void InitLoadProgressProjectile(s32 s0, s32 s1, s32 s2, s32 s3, s32 s4, s32 s5) 
 
 extern "C" void GameInitLanguage(void);
 // 0x8000ED5C
-void GameInitLanguage(void) {
+extern "C" void GameInitLanguage(void) {
     gIsReturningPlayer = 0;
     switch (SCGetLanguage()) {
     case 1: gLanguage = gTextLanguage = LANG_EN; break;   // SC_LANG_ENGLISH

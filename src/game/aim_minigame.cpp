@@ -77,7 +77,7 @@ static inline Quat QuatMul(const Quat& a, const Quat& b) {
 
 extern "C" void AimMinigame_Update(u8* g);
 // 0x8007FE30
-void AimMinigame_Update(u8* g) {
+extern "C" void AimMinigame_Update(u8* g) {
     u8* table = FindLocator(TURNTABLE_LOCATOR);
     *(f32*)(table + 0x1C) = 0.63661975f * *(f32*)(g + 0xA8);   // pointer angle -> turns
     f32 m[12];

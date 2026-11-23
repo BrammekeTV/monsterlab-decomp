@@ -52,7 +52,7 @@ s32 fn_8015BA30(void* p);                                       // 0x8015BA30
 void fn_8014DE68(void);                                         // 0x8014DE68
 void fn_801567CC(f32 a, f32 b, f32 c, f32 d);                   // 0x801567CC
 void fn_801566E8(f32 l, f32 r, f32 b, f32 t, f32 n, f32 f);     // 0x801566E8
-void fn_80154E54(u8* m, f32 a1, f32 a2, f32 a3, f32 a4, f32 a5, f32 a6, f32 a7, f32 a8, f32 a9, f32 a10, f32 a11, f32 a12, f32 a13);  // 0x80154E54
+void fn_80154E54(u8* m);  // 0x80154E54
 void fn_80155D70(void);                                         // 0x80155D70
 void fn_8016DDAC(u8* cam);                                      // 0x8016DDAC
 u8* fn_801186FC(u8* rec);                                       // 0x801186FC
@@ -471,7 +471,7 @@ void fn_80170044(void* unused) {
     *(f32*)(cam + 0xB8) = tB8;
     f32 tBC = p5 + p3;
     *(f32*)(cam + 0xBC) = tBC;
-    fn_80154E54(cam + 0x90, c20, tBC, p3, tB8, p5, p6, p7, tB4, p9, tx, p11, tz, tz);
+    fn_80154E54(cam + 0x90);
     fn_80155D70();
     fn_8016DDAC(cam);
 }

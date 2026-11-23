@@ -12,7 +12,7 @@ extern f32 lbl_805FDF1C;
 extern f32 lbl_805FDF60;
 extern f32 lbl_805FE258;
 extern "C++" void* gEventMgr;
-extern "C++" u8* fn_800C52F0(u8* p, s32 del);  // 0x800C52F0 (C++ linkage in small_800C.cpp)
+extern "C" u8* fn_800C52F0(u8* p, s32 del);  // 0x800C52F0 (C++ linkage in small_800C.cpp)
 
 extern "C" {
 extern u8 lbl_803C49A8[];
