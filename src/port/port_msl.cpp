@@ -18,6 +18,17 @@ void __register_global_object(void* obj, void (*dtor)(void*), void* handle) {}
 // Compiler helper: unsigned 64-bit integer to float.
 f32 __cvt_ull_flt(u64 v) { return (f32)v; }
 
+// Compiler helper __cvt_dbl_usll (0x8032FB38): double to signed 64-bit integer, towards zero, with
+// the ends of the range for a value that does not fit. The value arrives in f1; the game sources
+// declare the register left in r3 as a first parameter, which the helper never reads.
+u64 fn_8032FB38(u32 unused, f32 v) {
+    f64 d = v;
+    if (!(d >= 1.0) && !(d <= -1.0)) return 0;                       // also NaN, as the exponent test gives
+    if (d >= 9223372036854775808.0) return 0x7FFFFFFFFFFFFFFFull;
+    if (d <= -9223372036854775808.0) return 0x8000000000000000ull;
+    return (u64)(s64)d;
+}
+
 f64 ceil_(f64 x) { return ceil(x); }
 
 // __construct_array: runs a constructor over an array in place. The original passes 1 as the

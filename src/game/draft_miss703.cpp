@@ -223,7 +223,7 @@ void fn_8011FC60(u8* arg0) {
 // 0x8019F810
 // Returns 1 when the transformed point (sum of the matrix at +0xC0..+0xE8) lies in the
 // x range [+0x1B0, +0x1D4), z >= +0x1B4 and z < +0x1D8; arg1 == 0 also needs flag bit 0.
-s32 fn_8019F810(u8* arg0, s32 arg1, f64 farg0, f64 farg1) {
+s32 fn_8019F810(u8* arg0, s32 arg1, f32 farg0, f32 farg1) {
     if (arg1 == 0 && !(*(s32*)(arg0 + 0x64) & 1)) {
         return 0;
     }

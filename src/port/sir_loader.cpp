@@ -368,6 +368,7 @@ enum RegionKind {
     REGION_ZONE_EFFECT, REGION_ANIM_SET, REGION_ANIM_DEFS, REGION_U16_ARRAY, REGION_ANIM_OBJ, REGION_SKELETON, REGION_BONE_OPS,
     REGION_UI_ANIM, REGION_UI_ANIM_TRACK, REGION_UI_ANIM_EVENTS, REGION_UI_ANIM_KEYS, REGION_UI_ANIM_ENTRIES,
     REGION_ZONE_SYSTEM, REGION_ANIM_PLAYER, REGION_ANIM_ELEM, REGION_ANIM_TRACK, REGION_ANIM_KEYS, REGION_F32_ARRAY,
+    REGION_SOUND, REGION_SOUND_INFO, REGION_DSP_HEADER,
     REGION_RUNTIME    // memory the game initialises itself: nothing to convert, but nothing else may be there
 };
 
@@ -1226,6 +1227,88 @@ static u32 ActionInstructionWords(u32 word) {
     return len;
 }
 
+// ---- sound objects (what a sound argument of a script call points at)
+//
+// A script function whose signature has an argument of type 0xB gets a pointer to a sound object:
+// one or more 0x30-byte variations (PlaySoundAt picks one at random; the count is the byte at +0x04
+// of the first, 0 meaning one). A variation names its sample by a pointer to a sound info, which
+// names a DSP header (the layout of the first 0x60 bytes of a .dsp file) with the sample data behind
+// it. The functions are known by their index in gScriptFuncs (kSirSoundCalls: the registration order
+// of the retail build, which the port checks against the live table).
+//   variation: +0x00 info (PlaySoundAt), +0x04 count, +0x06 volume, +0x07 volume spread (bytes),
+//              +0x08 pitch, +0x10 float (PlaySoundAt), +0x14 kind, +0x15 / +0x16 distances, +0x17
+//              last pick, +0x2D / +0x2E flags (bytes); +0x0C and +0x18..+0x2B have no reader yet
+//              and are words in the shipped files (0, a hash, zeros)
+//   info:      +0x00 word and +0x04 DSP header (fn_801FE52C: both 0 = not loaded yet), +0x0C u16
+//              (PlaySoundAt), +0x0E s16 zone (fn_801FF154), +0x18 name (bytes); +0x08 a word (size)
+//   DSP header: fn_80203340
+extern "C" const SirSoundCall kSirSoundCalls[SIR_SOUND_CALLS] = {
+    {   48, 0x1, "PlayGlobalSound" },        {   49, 0x1, "PlayGlobalSoundSynced" },  {   50, 0x1, "PlayGlobalSoundWithEffect" },
+    {   51, 0x2, "PlayLoopingSoundFX" },     {   52, 0x2, "PlayLoopingSoundFXWithEffect" },
+    {   55, 0x2, "PlaySoundFX" },            {   56, 0x2, "PlaySoundFXWithEffect" },
+    { 1216, 0x3, "PlayBackgroundSFX" },      { 1217, 0x3, "PlayBackgroundSFXWithEffect" },
+    { 1238, 0x1, "PlaySoundEffect" },        { 1239, 0x1, "PlaySoundEffectWithEffect" },
+    { 1297, 0x2, "QueueSoundFX" },           { 1330, 0x2, "RegisterExperimentSound" }, { 1332, 0x1, "RegisterMidiLoop" },
+    { 1684, 0x3, "StopBackgroundSFX" },      { 1693, 0x1, "StopSoundEffect" },
+};
+
+#define SOUND_SIZE       0x30
+#define SOUND_INFO_USED  0x18
+#define DSP_HEADER_SIZE  0x60
+
+static const SirField kSoundFields[] = {
+    { 0x00, SIR_PTR, 1 },     // code: the sound info (PlaySoundAt)
+    { 0x08, SIR_F32, 1 },     // code: pitch (PlaySoundAt)
+    { 0x0C, SIR_U32, 1 },     // data: 0
+    { 0x10, SIR_F32, 1 },     // code: float handed on with the sound (PlaySoundAt)
+    { 0x18, SIR_U32, 5 },     // data: a hash, zeros
+};
+static const SirField kSoundInfoFields[] = {
+    { 0x00, SIR_PTR, 2 },     // code: word and DSP header, both tested against 0 (fn_801FE52C)
+    { 0x08, SIR_U32, 1 },     // data: a size
+    { 0x0C, SIR_U16, 2 },     // code: u16 (PlaySoundAt), s16 zone (fn_801FF154)
+    { 0x10, SIR_U32, 2 },     // data: zeros
+};
+static const SirField kDspHeaderFields[] = {
+    { 0x00, SIR_U32, 3 },     // code: samples, nibbles, sample rate (fn_80203340 reads the rate)
+    { 0x0C, SIR_U16, 2 },     // code: loop flag, format (fn_80203340)
+    { 0x10, SIR_U32, 3 },     // code: loop start, end and current address (fn_80203340)
+    { 0x1C, SIR_U16, 34 },    // code: coefficients, gain, predictor and history, loop state (fn_80203340)
+};
+
+static SirError SoundPlan(ImagePlan* plan, const u8* image, u32 imageSize, u32 addr) {
+    u32 off, info, dsp;
+    if (addr == 0 || !ImageSpan(addr, SOUND_SIZE, imageSize, &off)) return SIR_OK;   // none, or in another image
+    if (PlanHas(plan, off, REGION_SOUND)) return SIR_OK;
+    u32 count = image[off + 4] != 0 ? image[off + 4] : 1;
+    if ((u64)off + (u64)count * SOUND_SIZE > imageSize) return SIR_ERR_ACTIONS;
+    if (!PlanAdd(plan, off, count * SOUND_SIZE, REGION_SOUND)) return SIR_ERR_ACTIONS;
+    for (u32 i = 0; i < count; i++) {
+        if (!ImageSpan(Be32(image + off + i * SOUND_SIZE), SOUND_INFO_USED, imageSize, &info) || PlanHas(plan, info, REGION_SOUND_INFO)) continue;
+        if (!PlanAdd(plan, info, SOUND_INFO_USED, REGION_SOUND_INFO)) return SIR_ERR_ACTIONS;
+        if (!ImageSpan(Be32(image + info + 4), DSP_HEADER_SIZE, imageSize, &dsp) || PlanHas(plan, dsp, REGION_DSP_HEADER)) continue;
+        if (!PlanAdd(plan, dsp, DSP_HEADER_SIZE, REGION_DSP_HEADER)) return SIR_ERR_ACTIONS;
+    }
+    return SIR_OK;
+}
+
+// The sound objects the calls of one checked program name.
+static SirError ActionSoundsPlan(ImagePlan* plan, const u8* image, u32 imageSize, u32 off, u32 words) {
+    for (u32 i = 0; i < words; i += ActionInstructionWords(Be32(image + off + i * 4))) {
+        u32 word = Be32(image + off + i * 4);
+        if (ActionOp(word) != ACTION_OP_CALL) continue;
+        for (u32 c = 0; c < SIR_SOUND_CALLS; c++) {
+            if (kSirSoundCalls[c].func != ActionJump(word)) continue;
+            for (u32 a = 0; a + 1 < ActionLen(word); a++) {
+                if (!(kSirSoundCalls[c].argMask >> a & 1)) continue;
+                SirError e = SoundPlan(plan, image, imageSize, Be32(image + off + (i + 1 + a) * 4));
+                if (e != SIR_OK) return e;
+            }
+        }
+    }
+    return SIR_OK;
+}
+
 // Checks one program and records it. Walks the instructions in file order to the end word, then
 // checks that every jump lands on an instruction of the same program.
 static SirError ActionRecordPlan(ImagePlan* plan, const u8* image, u32 imageSize, u32 addr) {
@@ -1259,6 +1342,8 @@ static SirError ActionRecordPlan(ImagePlan* plan, const u8* image, u32 imageSize
     }
     free(starts);
     if (!ok) return SIR_ERR_ACTIONS;
+    SirError e = ActionSoundsPlan(plan, image, imageSize, off, words);
+    if (e != SIR_OK) return e;
     return PlanAdd(plan, off, total * 4, REGION_U32_ARRAY) ? SIR_OK : SIR_ERR_ACTIONS;
 }
 
@@ -2532,6 +2617,9 @@ static void ImagePlanConvert(const ImagePlan* plan, SirReloc* r, u8* image, u32 
         case REGION_COUNT_PTR:    SirConvertRecord(r, p, g->size, kCountPtrFields, COUNTOF(kCountPtrFields)); break;
         case REGION_POOL_TABLE:   ConvertRecords(r, p, g->size, POOL_TABLE_ENTRY, kPoolTableEntryFields, COUNTOF(kPoolTableEntryFields)); break;
         case REGION_POOL_BLOCK:   // converted with its pool
+        case REGION_SOUND:        ConvertRecords(r, p, g->size, SOUND_SIZE, kSoundFields, COUNTOF(kSoundFields)); break;
+        case REGION_SOUND_INFO:   SirConvertRecord(r, p, g->size, kSoundInfoFields, COUNTOF(kSoundInfoFields)); break;
+        case REGION_DSP_HEADER:   SirConvertRecord(r, p, g->size, kDspHeaderFields, COUNTOF(kDspHeaderFields)); break;
         case REGION_RUNTIME:
             break;
         }
@@ -2843,7 +2931,7 @@ extern "C" BOOL LevelSharedZoneRootsCollect(const u8* image, u32 imageSize, u32 
                                             const LevelZoneOther* other, LevelZoneRoots* out) {
     memset(out, 0, sizeof(*out));
     if (slotSize < LEVEL_SLOT_MIN_SIZE || slotSize > LEVEL_SLOT_MAX_SIZE || slotSize > imageSize) return FALSE;
-    RootList entities = { NULL, 0, 0 }, pools = { NULL, 0, 0 }, lists = { NULL, 0, 0 };
+    RootList entities = { NULL, 0, 0 }, pools = { NULL, 0, 0 }, lists = { NULL, 0, 0 }, actions = { NULL, 0, 0 };
     bool ok = true;
     u32 addr;
     #define IN_ZONE(a, n) ((a) >= wiiBase && (u64)((a) - wiiBase) + (n) <= imageSize)
@@ -2866,7 +2954,10 @@ extern "C" BOOL LevelSharedZoneRootsCollect(const u8* image, u32 imageSize, u32 
         if (head >= image && head < image + imageSize) ok = RootAdd(&lists, wiiBase + (u32)(head - image));
         else if (raw >= wiiBase && raw - wiiBase < imageSize) ok = RootAdd(&lists, raw);
     }
+    // The zone's action table at +0xD4 (TriggerDoAction, kind 2): what a menu button's event runs.
+    if (ok && (addr = Be32(image + 0xD4)) != 0 && IN_ZONE(addr, ACTION_TABLE_SIZE)) ok = RootAdd(&actions, addr);
     #undef IN_ZONE
+    out->actionTables = actions.items;      out->actionTableCount = actions.count;
     out->entities = entities.items;         out->entityCount = entities.count;
     out->poolTables = pools.items;          out->poolTableCount = pools.count / 2;
     out->zoneLists = lists.items;           out->zoneListCount = lists.count;
