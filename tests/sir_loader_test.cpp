@@ -1517,6 +1517,10 @@ static int DumpLevel(const char* path) {
         PrintLevelEntries(s + 0x120, &f); printf(" e12c ");
         PrintLevelEntries(s + 0x12C, &f);
         printf(" effects "); PrintLevelPtr(s + 0x80, &f); printf(" %u", *(const u32*)(s + 0x9C));
+        printf(" env");
+        for (u32 k = 0; k < 7; k++) printf(" %08x", Bits(*(const f32*)(s + 0x30 + k * 4)));
+        printf(" |");
+        for (u32 k = 0; k < 11; k++) printf(" %08x", Bits(*(const f32*)(s + 0x54 + k * 4)));
         printf("\n");
     }
     GlobalBinaryFile z = { NULL, f.zone, f.zoneSize };
@@ -2214,7 +2218,9 @@ static void BuildLevel(u8* hdr, u8* zone) {
         u8* s = hdr + L_SLOT0 + i * L_STRIDE;
         Put32(s + 0x00C, 0x42480000);                          // 50.0f
         Put32(s + 0x018, 1);
-        Put32(s + 0x030, 0x3F800000);                          // no reader: stays big-endian
+        Put32(s + 0x030, 0x3F800000); Put32(s + 0x048, 0x42820000);      // fog colour red, far distance 65.0 (fn_80133A84)
+        Put32(s + 0x04C, 0x3F800000);                          // no reader: stays big-endian
+        Put32(s + 0x054, 0x40000000); Put32(s + 0x07C, 0xBF800000);       // a colour and a direction (fn_80133A84)
         Put32(s + 0x08C, L_ZONE + 0x200 + i * 0x10);
         Put32(s + 0x098, 1);
         Put32(s + 0x0FC, L_ZONE + i * 0x40);
@@ -2639,7 +2645,8 @@ static void LevelSelfTest(void) {
     CHECK(*(u32*)(hdr + 0x1E8) == 0xBA4E36A9 && hdr[0x1EC] == 1);
     u8* s0 = slots;
     u8* s1 = slots + L_STRIDE;
-    CHECK(*(f32*)(s0 + 0xC) == 50.0f && *(s32*)(s0 + 0x18) == 1 && s0[0x30] == 0x3F && s0[0x33] == 0x00);
+    CHECK(*(f32*)(s0 + 0xC) == 50.0f && *(s32*)(s0 + 0x18) == 1 && *(f32*)(s0 + 0x30) == 1.0f && *(f32*)(s0 + 0x48) == 65.0f && s0[0x4C] == 0x3F && s0[0x4F] == 0x00 &&
+          *(f32*)(s0 + 0x54) == 2.0f && *(f32*)(s0 + 0x7C) == -1.0f);
     CHECK(*(u8**)(s0 + 0x8C) == zone + 0x200 && *(s32*)(s0 + 0x98) == 1 && *(u8**)(s1 + 0xFC) == zone + 0x40);
     CHECK(*(u8**)(s0 + 0x114) == s0 + 0x140 && *(s32*)(s0 + 0x118) == 1 && s0[0x147] == 1);   // the 0x54-byte entry: untouched
     u8** second0 = *(u8***)(s0 + 0x12C);

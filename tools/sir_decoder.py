@@ -637,7 +637,7 @@ def level_dump(path):
             i, ws(o, 6), i32(o + 0x18), ws(o + 0x1C, 3), ptr(u(o + 0x50)), ptr(u(o + 0x8C)), ptr(u(o + 0x90)), i32(o + 0x94), i32(o + 0x98),
             ws(o + 0xA0, 1), ptr(u(o + 0xA8)), ws(o + 0xBC, 1), ws(o + 0xCC, 2), hdr[o + 0xA4], hdr[o + 0xAC], hdr[o + 0xC0],
             ptr(u(o + 0xD4)), ptr(u(o + 0xE4)), i32(o + 0xE8), ptr(u(o + 0xFC)), u(o + 0x100), u(o + 0x10C), tab(o + 0x114), tab(o + 0x120), tab(o + 0x12C),
-            entries(o + 0x120), entries(o + 0x12C)) + ' effects %s %d' % (ptr(u(o + 0x80)), u(o + 0x9C)))
+            entries(o + 0x120), entries(o + 0x12C)) + ' effects %s %d' % (ptr(u(o + 0x80)), u(o + 0x9C)) + ' env %s | %s' % (ws(o + 0x30, 7), ws(o + 0x54, 11)))
     # What the header block names in zone 0: entities (slot +0x50 and the two entity tables), scene
     # objects (block tables +0x1B0, +0x1BC) and pool tables (slot +0xE4, +0xE8).
     inz = lambda v: zbase <= v < zbase + len(zone0)
