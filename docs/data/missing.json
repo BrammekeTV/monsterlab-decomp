@@ -1,19 +1,19 @@
 {
  "log": "link.log",
  "counts": {
-  "global": 3898,
-  "unknown": 126,
-  "library": 196
+  "global": 3899,
+  "unknown": 130,
+  "library": 137
  },
  "game_bytes": 0,
  "duplicates": [],
  "game": [],
  "library": [
   {
-   "name": "fn_8023A68C",
+   "name": "OSUnlockMutex",
    "refs": 19,
    "files": 19,
-   "used_as": "_fn_8023A68C",
+   "used_as": "_OSUnlockMutex",
    "addr": "8023A68C",
    "size": 200,
    "section": ".text",
@@ -21,10 +21,10 @@
    "region": "OS"
   },
   {
-   "name": "fn_8023A5B0",
+   "name": "OSLockMutex",
    "refs": 16,
    "files": 16,
-   "used_as": "_fn_8023A5B0",
+   "used_as": "_OSLockMutex",
    "addr": "8023A5B0",
    "size": 220,
    "section": ".text",
@@ -43,10 +43,10 @@
    "region": "MSL C/C++ runtime"
   },
   {
-   "name": "fn_802737A8",
+   "name": "WPADControlSpeaker",
    "refs": 7,
    "files": 7,
-   "used_as": "_fn_802737A8",
+   "used_as": "_WPADControlSpeaker",
    "addr": "802737A8",
    "size": 5660,
    "section": ".text",
@@ -65,10 +65,10 @@
    "region": "MSL C/C++ runtime"
   },
   {
-   "name": "fn_8027D270",
+   "name": "KPADSetPosParam",
    "refs": 5,
    "files": 5,
-   "used_as": "_fn_8027D270",
+   "used_as": "_KPADSetPosParam",
    "addr": "8027D270",
    "size": 28,
    "section": ".text",
@@ -76,10 +76,10 @@
    "region": "WPAD/KPAD/BT"
   },
   {
-   "name": "fn_8024849C",
+   "name": "C_MTXOrtho",
    "refs": 4,
    "files": 4,
-   "used_as": "_fn_8024849C",
+   "used_as": "_C_MTXOrtho",
    "addr": "8024849C",
    "size": 152,
    "section": ".text",
@@ -87,26 +87,26 @@
    "region": "GX"
   },
   {
-   "name": "fn_8024E1D0",
+   "name": "DWC_ClearError",
    "refs": 4,
    "files": 4,
-   "used_as": "_fn_8024E1D0",
-   "addr": "8024E1D0",
-   "size": 100,
-   "section": ".text",
-   "kind": "library",
-   "region": "GX"
-  },
-  {
-   "name": "fn_802E4970",
-   "refs": 4,
-   "files": 4,
-   "used_as": "_fn_802E4970",
+   "used_as": "_DWC_ClearError",
    "addr": "802E4970",
    "size": 28,
    "section": ".text",
    "kind": "library",
    "region": "Network (DWC/SSL/NHTTP/NWC24)"
+  },
+  {
+   "name": "GXSetProjection",
+   "refs": 4,
+   "files": 4,
+   "used_as": "_GXSetProjection",
+   "addr": "8024E1D0",
+   "size": 100,
+   "section": ".text",
+   "kind": "library",
+   "region": "GX"
   },
   {
    "name": "fn_802E9CBC",
@@ -131,15 +131,15 @@
    "region": "MSL C/C++ runtime"
   },
   {
-   "name": "fn_80333B60",
-   "refs": 4,
-   "files": 4,
-   "used_as": "_fn_80333B60",
-   "addr": "80333B60",
-   "size": 188,
+   "name": "GXLoadTexObj",
+   "refs": 3,
+   "files": 3,
+   "used_as": "_GXLoadTexObj",
+   "addr": "8024C91C",
+   "size": 84,
    "section": ".text",
    "kind": "library",
-   "region": "MSL C/C++ runtime"
+   "region": "GX"
   },
   {
    "name": "OSSetAlarm",
@@ -153,37 +153,15 @@
    "region": "OS"
   },
   {
-   "name": "fn_8024C91C",
+   "name": "UTF8ToUCS2String",
    "refs": 3,
    "files": 3,
-   "used_as": "_fn_8024C91C",
-   "addr": "8024C91C",
-   "size": 84,
+   "used_as": "_UTF8ToUCS2String",
+   "addr": "80333D50",
+   "size": 72,
    "section": ".text",
    "kind": "library",
-   "region": "GX"
-  },
-  {
-   "name": "fn_8025B330",
-   "refs": 3,
-   "files": 3,
-   "used_as": "_fn_8025B330",
-   "addr": "8025B330",
-   "size": 96,
-   "section": ".text",
-   "kind": "library",
-   "region": "AI/AX/MEM"
-  },
-  {
-   "name": "fn_80264420",
-   "refs": 3,
-   "files": 3,
-   "used_as": "_fn_80264420",
-   "addr": "80264420",
-   "size": 120,
-   "section": ".text",
-   "kind": "library",
-   "region": "NAND/SC/IPC"
+   "region": "MSL C/C++ runtime"
   },
   {
    "name": "fn_80272B64",
@@ -230,32 +208,10 @@
    "region": "MSL C/C++ runtime"
   },
   {
-   "name": "fn_80333D50",
-   "refs": 3,
-   "files": 3,
-   "used_as": "_fn_80333D50",
-   "addr": "80333D50",
-   "size": 72,
-   "section": ".text",
-   "kind": "library",
-   "region": "MSL C/C++ runtime"
-  },
-  {
-   "name": "fn_80234394",
+   "name": "GXInitTexObj",
    "refs": 2,
    "files": 2,
-   "used_as": "_fn_80234394",
-   "addr": "80234394",
-   "size": 132,
-   "section": ".text",
-   "kind": "library",
-   "region": "OS"
-  },
-  {
-   "name": "fn_8024C3B8",
-   "refs": 2,
-   "files": 2,
-   "used_as": "_fn_8024C3B8",
+   "used_as": "_GXInitTexObj",
    "addr": "8024C3B8",
    "size": 524,
    "section": ".text",
@@ -263,10 +219,10 @@
    "region": "GX"
   },
   {
-   "name": "fn_8024C5C4",
+   "name": "GXInitTexObjCI",
    "refs": 2,
    "files": 2,
-   "used_as": "_fn_8024C5C4",
+   "used_as": "_GXInitTexObjCI",
    "addr": "8024C5C4",
    "size": 72,
    "section": ".text",
@@ -274,10 +230,10 @@
    "region": "GX"
   },
   {
-   "name": "fn_8024C60C",
+   "name": "GXInitTexObjLOD",
    "refs": 2,
    "files": 2,
-   "used_as": "_fn_8024C60C",
+   "used_as": "_GXInitTexObjLOD",
    "addr": "8024C60C",
    "size": 260,
    "section": ".text",
@@ -285,15 +241,48 @@
    "region": "GX"
   },
   {
-   "name": "fn_8024C970",
+   "name": "GXInitTlutObj",
    "refs": 2,
    "files": 2,
-   "used_as": "_fn_8024C970",
+   "used_as": "_GXInitTlutObj",
    "addr": "8024C970",
    "size": 40,
    "section": ".text",
    "kind": "library",
    "region": "GX"
+  },
+  {
+   "name": "KPADSetHoriParam",
+   "refs": 2,
+   "files": 2,
+   "used_as": "_KPADSetHoriParam",
+   "addr": "8027D28C",
+   "size": 28,
+   "section": ".text",
+   "kind": "library",
+   "region": "WPAD/KPAD/BT"
+  },
+  {
+   "name": "OSSetPeriodicAlarm",
+   "refs": 2,
+   "files": 2,
+   "used_as": "_OSSetPeriodicAlarm",
+   "addr": "80234394",
+   "size": 132,
+   "section": ".text",
+   "kind": "library",
+   "region": "OS"
+  },
+  {
+   "name": "WPADDisconnect",
+   "refs": 2,
+   "files": 2,
+   "used_as": "_WPADDisconnect",
+   "addr": "802727E0",
+   "size": 196,
+   "section": ".text",
+   "kind": "library",
+   "region": "WPAD/KPAD/BT"
   },
   {
    "name": "fn_8024C998",
@@ -305,270 +294,6 @@
    "section": ".text",
    "kind": "library",
    "region": "GX"
-  },
-  {
-   "name": "fn_8024D59C",
-   "refs": 2,
-   "files": 2,
-   "used_as": "_fn_8024D59C",
-   "addr": "8024D59C",
-   "size": 64,
-   "section": ".text",
-   "kind": "library",
-   "region": "GX"
-  },
-  {
-   "name": "fn_8024D5DC",
-   "refs": 2,
-   "files": 2,
-   "used_as": "_fn_8024D5DC",
-   "addr": "8024D5DC",
-   "size": 64,
-   "section": ".text",
-   "kind": "library",
-   "region": "GX"
-  },
-  {
-   "name": "fn_8024D61C",
-   "refs": 2,
-   "files": 2,
-   "used_as": "_fn_8024D61C",
-   "addr": "8024D61C",
-   "size": 88,
-   "section": ".text",
-   "kind": "library",
-   "region": "GX"
-  },
-  {
-   "name": "fn_8024D674",
-   "refs": 2,
-   "files": 2,
-   "used_as": "_fn_8024D674",
-   "addr": "8024D674",
-   "size": 88,
-   "section": ".text",
-   "kind": "library",
-   "region": "GX"
-  },
-  {
-   "name": "fn_80257FA8",
-   "refs": 2,
-   "files": 2,
-   "used_as": "_fn_80257FA8",
-   "addr": "80257FA8",
-   "size": 124,
-   "section": ".text",
-   "kind": "library",
-   "region": "AI/AX/MEM"
-  },
-  {
-   "name": "fn_80258024",
-   "refs": 2,
-   "files": 2,
-   "used_as": "_fn_80258024",
-   "addr": "80258024",
-   "size": 384,
-   "section": ".text",
-   "kind": "library",
-   "region": "AI/AX/MEM"
-  },
-  {
-   "name": "fn_80258904",
-   "refs": 2,
-   "files": 2,
-   "used_as": "_fn_80258904",
-   "addr": "80258904",
-   "size": 100,
-   "section": ".text",
-   "kind": "library",
-   "region": "AI/AX/MEM"
-  },
-  {
-   "name": "fn_80258968",
-   "refs": 2,
-   "files": 2,
-   "used_as": "_fn_80258968",
-   "addr": "80258968",
-   "size": 100,
-   "section": ".text",
-   "kind": "library",
-   "region": "AI/AX/MEM"
-  },
-  {
-   "name": "fn_8025AC30",
-   "refs": 2,
-   "files": 2,
-   "used_as": "_fn_8025AC30",
-   "addr": "8025AC30",
-   "size": 192,
-   "section": ".text",
-   "kind": "library",
-   "region": "AI/AX/MEM"
-  },
-  {
-   "name": "fn_8025ACF0",
-   "refs": 2,
-   "files": 2,
-   "used_as": "_fn_8025ACF0",
-   "addr": "8025ACF0",
-   "size": 112,
-   "section": ".text",
-   "kind": "library",
-   "region": "AI/AX/MEM"
-  },
-  {
-   "name": "fn_8025AD60",
-   "refs": 2,
-   "files": 2,
-   "used_as": "_fn_8025AD60",
-   "addr": "8025AD60",
-   "size": 76,
-   "section": ".text",
-   "kind": "library",
-   "region": "AI/AX/MEM"
-  },
-  {
-   "name": "fn_8025B0A4",
-   "refs": 2,
-   "files": 2,
-   "used_as": "_fn_8025B0A4",
-   "addr": "8025B0A4",
-   "size": 248,
-   "section": ".text",
-   "kind": "library",
-   "region": "AI/AX/MEM"
-  },
-  {
-   "name": "fn_8025B19C",
-   "refs": 2,
-   "files": 2,
-   "used_as": "_fn_8025B19C",
-   "addr": "8025B19C",
-   "size": 152,
-   "section": ".text",
-   "kind": "library",
-   "region": "AI/AX/MEM"
-  },
-  {
-   "name": "fn_8025B234",
-   "refs": 2,
-   "files": 2,
-   "used_as": "_fn_8025B234",
-   "addr": "8025B234",
-   "size": 132,
-   "section": ".text",
-   "kind": "library",
-   "region": "AI/AX/MEM"
-  },
-  {
-   "name": "fn_80263FEC",
-   "refs": 2,
-   "files": 2,
-   "used_as": "_fn_80263FEC",
-   "addr": "80263FEC",
-   "size": 52,
-   "section": ".text",
-   "kind": "library",
-   "region": "AI/AX/MEM"
-  },
-  {
-   "name": "fn_80264020",
-   "refs": 2,
-   "files": 2,
-   "used_as": "_fn_80264020",
-   "addr": "80264020",
-   "size": 1024,
-   "section": ".text",
-   "kind": "library",
-   "region": "NAND/SC/IPC"
-  },
-  {
-   "name": "fn_80264524",
-   "refs": 2,
-   "files": 2,
-   "used_as": "_fn_80264524",
-   "addr": "80264524",
-   "size": 20,
-   "section": ".text",
-   "kind": "library",
-   "region": "NAND/SC/IPC"
-  },
-  {
-   "name": "fn_80264538",
-   "refs": 2,
-   "files": 2,
-   "used_as": "_fn_80264538",
-   "addr": "80264538",
-   "size": 20,
-   "section": ".text",
-   "kind": "library",
-   "region": "NAND/SC/IPC"
-  },
-  {
-   "name": "fn_8026454C",
-   "refs": 2,
-   "files": 2,
-   "used_as": "_fn_8026454C",
-   "addr": "8026454C",
-   "size": 20,
-   "section": ".text",
-   "kind": "library",
-   "region": "NAND/SC/IPC"
-  },
-  {
-   "name": "fn_80264560",
-   "refs": 2,
-   "files": 2,
-   "used_as": "_fn_80264560",
-   "addr": "80264560",
-   "size": 20,
-   "section": ".text",
-   "kind": "library",
-   "region": "NAND/SC/IPC"
-  },
-  {
-   "name": "fn_80264574",
-   "refs": 2,
-   "files": 2,
-   "used_as": "_fn_80264574",
-   "addr": "80264574",
-   "size": 20,
-   "section": ".text",
-   "kind": "library",
-   "region": "NAND/SC/IPC"
-  },
-  {
-   "name": "fn_80264A14",
-   "refs": 2,
-   "files": 2,
-   "used_as": "_fn_80264A14",
-   "addr": "80264A14",
-   "size": 16,
-   "section": ".text",
-   "kind": "library",
-   "region": "NAND/SC/IPC"
-  },
-  {
-   "name": "fn_802727E0",
-   "refs": 2,
-   "files": 2,
-   "used_as": "_fn_802727E0",
-   "addr": "802727E0",
-   "size": 196,
-   "section": ".text",
-   "kind": "library",
-   "region": "WPAD/KPAD/BT"
-  },
-  {
-   "name": "fn_8027D28C",
-   "refs": 2,
-   "files": 2,
-   "used_as": "_fn_8027D28C",
-   "addr": "8027D28C",
-   "size": 28,
-   "section": ".text",
-   "kind": "library",
-   "region": "WPAD/KPAD/BT"
   },
   {
    "name": "fn_802BE220",
@@ -769,6 +494,105 @@
    "region": "MSL C/C++ runtime"
   },
   {
+   "name": "AXFXReverbHiExpInit",
+   "refs": 1,
+   "files": 1,
+   "used_as": "_AXFXReverbHiExpInit",
+   "addr": "8025B4C0",
+   "size": 412,
+   "section": ".text",
+   "kind": "library",
+   "region": "AI/AX/MEM"
+  },
+  {
+   "name": "AXFXReverbHiExpShutdown",
+   "refs": 1,
+   "files": 1,
+   "used_as": "_AXFXReverbHiExpShutdown",
+   "addr": "8025B72C",
+   "size": 84,
+   "section": ".text",
+   "kind": "library",
+   "region": "AI/AX/MEM"
+  },
+  {
+   "name": "GXInitTexObjFilter",
+   "refs": 1,
+   "files": 1,
+   "used_as": "_GXInitTexObjFilter",
+   "addr": "8024C72C",
+   "size": 40,
+   "section": ".text",
+   "kind": "library",
+   "region": "GX"
+  },
+  {
+   "name": "GXReadDrawSync",
+   "refs": 1,
+   "files": 1,
+   "used_as": "_GXReadDrawSync",
+   "addr": "8024B34C",
+   "size": 12,
+   "section": ".text",
+   "kind": "library",
+   "region": "GX"
+  },
+  {
+   "name": "GXSetDrawSync",
+   "refs": 1,
+   "files": 1,
+   "used_as": "_GXSetDrawSync",
+   "addr": "8024B298",
+   "size": 180,
+   "section": ".text",
+   "kind": "library",
+   "region": "GX"
+  },
+  {
+   "name": "GXSetIndTexMtx",
+   "refs": 1,
+   "files": 1,
+   "used_as": "_GXSetIndTexMtx",
+   "addr": "8024D124",
+   "size": 340,
+   "section": ".text",
+   "kind": "library",
+   "region": "GX"
+  },
+  {
+   "name": "GXSetIndTexOrder",
+   "refs": 1,
+   "files": 1,
+   "used_as": "_GXSetIndTexOrder",
+   "addr": "8024D37C",
+   "size": 204,
+   "section": ".text",
+   "kind": "library",
+   "region": "GX"
+  },
+  {
+   "name": "GXSetTevIndirect",
+   "refs": 1,
+   "files": 1,
+   "used_as": "_GXSetTevIndirect",
+   "addr": "8024D0BC",
+   "size": 104,
+   "section": ".text",
+   "kind": "library",
+   "region": "GX"
+  },
+  {
+   "name": "GXSetTevKColor",
+   "refs": 1,
+   "files": 1,
+   "used_as": "_GXSetTevKColor",
+   "addr": "8024D790",
+   "size": 92,
+   "section": ".text",
+   "kind": "library",
+   "region": "GX"
+  },
+  {
    "name": "NANDInit",
    "refs": 1,
    "files": 1,
@@ -778,6 +602,105 @@
    "section": ".text",
    "kind": "library",
    "region": "NAND/SC/IPC"
+  },
+  {
+   "name": "OSInitMutex",
+   "refs": 1,
+   "files": 1,
+   "used_as": "_OSInitMutex",
+   "addr": "8023A578",
+   "size": 56,
+   "section": ".text",
+   "kind": "library",
+   "region": "OS"
+  },
+  {
+   "name": "OSTryLockMutex",
+   "refs": 1,
+   "files": 1,
+   "used_as": "_OSTryLockMutex",
+   "addr": "8023A7C0",
+   "size": 188,
+   "section": ".text",
+   "kind": "library",
+   "region": "OS"
+  },
+  {
+   "name": "PSMTXScale",
+   "refs": 1,
+   "files": 1,
+   "used_as": "_PSMTXScale",
+   "addr": "80248420",
+   "size": 40,
+   "section": ".text",
+   "kind": "library",
+   "region": "GX"
+  },
+  {
+   "name": "SOCleanup",
+   "refs": 1,
+   "files": 1,
+   "used_as": "_SOCleanup",
+   "addr": "80323D3C",
+   "size": 432,
+   "section": ".text",
+   "kind": "library",
+   "region": "MSL C/C++ runtime"
+  },
+  {
+   "name": "SOFinish",
+   "refs": 1,
+   "files": 1,
+   "used_as": "_SOFinish",
+   "addr": "8032380C",
+   "size": 252,
+   "section": ".text",
+   "kind": "library",
+   "region": "MSL C/C++ runtime"
+  },
+  {
+   "name": "WENCGetEncodeData",
+   "refs": 1,
+   "files": 1,
+   "used_as": "_WENCGetEncodeData",
+   "addr": "8026B174",
+   "size": 728,
+   "section": ".text",
+   "kind": "library",
+   "region": "NAND/SC/IPC"
+  },
+  {
+   "name": "WPADCanSendStreamData",
+   "refs": 1,
+   "files": 1,
+   "used_as": "_WPADCanSendStreamData",
+   "addr": "80274F80",
+   "size": 132,
+   "section": ".text",
+   "kind": "library",
+   "region": "WPAD/KPAD/BT"
+  },
+  {
+   "name": "WPADSendStreamData",
+   "refs": 1,
+   "files": 1,
+   "used_as": "_WPADSendStreamData",
+   "addr": "80275004",
+   "size": 528,
+   "section": ".text",
+   "kind": "library",
+   "region": "WPAD/KPAD/BT"
+  },
+  {
+   "name": "WPADSetDataFormat",
+   "refs": 1,
+   "files": 1,
+   "used_as": "_WPADSetDataFormat",
+   "addr": "80272AB0",
+   "size": 180,
+   "section": ".text",
+   "kind": "library",
+   "region": "WPAD/KPAD/BT"
   },
   {
    "name": "fn_80234848",
@@ -791,149 +714,6 @@
    "region": "OS"
   },
   {
-   "name": "fn_80235110",
-   "refs": 1,
-   "files": 1,
-   "used_as": "_fn_80235110",
-   "addr": "80235110",
-   "size": 48,
-   "section": ".text",
-   "kind": "library",
-   "region": "OS"
-  },
-  {
-   "name": "fn_8023A578",
-   "refs": 1,
-   "files": 1,
-   "used_as": "_fn_8023A578",
-   "addr": "8023A578",
-   "size": 56,
-   "section": ".text",
-   "kind": "library",
-   "region": "OS"
-  },
-  {
-   "name": "fn_8023A7C0",
-   "refs": 1,
-   "files": 1,
-   "used_as": "_fn_8023A7C0",
-   "addr": "8023A7C0",
-   "size": 188,
-   "section": ".text",
-   "kind": "library",
-   "region": "OS"
-  },
-  {
-   "name": "fn_80248420",
-   "refs": 1,
-   "files": 1,
-   "used_as": "_fn_80248420",
-   "addr": "80248420",
-   "size": 40,
-   "section": ".text",
-   "kind": "library",
-   "region": "GX"
-  },
-  {
-   "name": "fn_8024B298",
-   "refs": 1,
-   "files": 1,
-   "used_as": "_fn_8024B298",
-   "addr": "8024B298",
-   "size": 180,
-   "section": ".text",
-   "kind": "library",
-   "region": "GX"
-  },
-  {
-   "name": "fn_8024B34C",
-   "refs": 1,
-   "files": 1,
-   "used_as": "_fn_8024B34C",
-   "addr": "8024B34C",
-   "size": 12,
-   "section": ".text",
-   "kind": "library",
-   "region": "GX"
-  },
-  {
-   "name": "fn_8024C72C",
-   "refs": 1,
-   "files": 1,
-   "used_as": "_fn_8024C72C",
-   "addr": "8024C72C",
-   "size": 40,
-   "section": ".text",
-   "kind": "library",
-   "region": "GX"
-  },
-  {
-   "name": "fn_8024D0BC",
-   "refs": 1,
-   "files": 1,
-   "used_as": "_fn_8024D0BC",
-   "addr": "8024D0BC",
-   "size": 104,
-   "section": ".text",
-   "kind": "library",
-   "region": "GX"
-  },
-  {
-   "name": "fn_8024D124",
-   "refs": 1,
-   "files": 1,
-   "used_as": "_fn_8024D124",
-   "addr": "8024D124",
-   "size": 340,
-   "section": ".text",
-   "kind": "library",
-   "region": "GX"
-  },
-  {
-   "name": "fn_8024D37C",
-   "refs": 1,
-   "files": 1,
-   "used_as": "_fn_8024D37C",
-   "addr": "8024D37C",
-   "size": 204,
-   "section": ".text",
-   "kind": "library",
-   "region": "GX"
-  },
-  {
-   "name": "fn_8024D6CC",
-   "refs": 1,
-   "files": 1,
-   "used_as": "_fn_8024D6CC",
-   "addr": "8024D6CC",
-   "size": 96,
-   "section": ".text",
-   "kind": "library",
-   "region": "GX"
-  },
-  {
-   "name": "fn_8024D72C",
-   "refs": 1,
-   "files": 1,
-   "used_as": "_fn_8024D72C",
-   "addr": "8024D72C",
-   "size": 100,
-   "section": ".text",
-   "kind": "library",
-   "region": "GX"
-  },
-  {
-   "name": "fn_8024D790",
-   "refs": 1,
-   "files": 1,
-   "used_as": "_fn_8024D790",
-   "addr": "8024D790",
-   "size": 92,
-   "section": ".text",
-   "kind": "library",
-   "region": "GX"
-  },
-  {
    "name": "fn_80253A48",
    "refs": 1,
    "files": 1,
@@ -945,133 +725,12 @@
    "region": "DVD"
   },
   {
-   "name": "fn_80257C88",
-   "refs": 1,
-   "files": 1,
-   "used_as": "_fn_80257C88",
-   "addr": "80257C88",
-   "size": 72,
-   "section": ".text",
-   "kind": "library",
-   "region": "AI/AX/MEM"
-  },
-  {
-   "name": "fn_802581A4",
-   "refs": 1,
-   "files": 1,
-   "used_as": "_fn_802581A4",
-   "addr": "802581A4",
-   "size": 156,
-   "section": ".text",
-   "kind": "library",
-   "region": "AI/AX/MEM"
-  },
-  {
-   "name": "fn_80259418",
-   "refs": 1,
-   "files": 1,
-   "used_as": "_fn_80259418",
-   "addr": "80259418",
-   "size": 8,
-   "section": ".text",
-   "kind": "library",
-   "region": "AI/AX/MEM"
-  },
-  {
-   "name": "fn_80259B70",
-   "refs": 1,
-   "files": 1,
-   "used_as": "_fn_80259B70",
-   "addr": "80259B70",
-   "size": 196,
-   "section": ".text",
-   "kind": "library",
-   "region": "AI/AX/MEM"
-  },
-  {
-   "name": "fn_80259C34",
-   "refs": 1,
-   "files": 1,
-   "used_as": "_fn_80259C34",
-   "addr": "80259C34",
-   "size": 88,
-   "section": ".text",
-   "kind": "library",
-   "region": "AI/AX/MEM"
-  },
-  {
-   "name": "fn_8025ADAC",
-   "refs": 1,
-   "files": 1,
-   "used_as": "_fn_8025ADAC",
-   "addr": "8025ADAC",
-   "size": 576,
-   "section": ".text",
-   "kind": "library",
-   "region": "AI/AX/MEM"
-  },
-  {
-   "name": "fn_8025B390",
-   "refs": 1,
-   "files": 1,
-   "used_as": "_fn_8025B390",
-   "addr": "8025B390",
-   "size": 8,
-   "section": ".text",
-   "kind": "library",
-   "region": "AI/AX/MEM"
-  },
-  {
-   "name": "fn_8025B398",
-   "refs": 1,
-   "files": 1,
-   "used_as": "_fn_8025B398",
-   "addr": "8025B398",
-   "size": 8,
-   "section": ".text",
-   "kind": "library",
-   "region": "AI/AX/MEM"
-  },
-  {
-   "name": "fn_8025B3A0",
-   "refs": 1,
-   "files": 1,
-   "used_as": "_fn_8025B3A0",
-   "addr": "8025B3A0",
-   "size": 76,
-   "section": ".text",
-   "kind": "library",
-   "region": "AI/AX/MEM"
-  },
-  {
-   "name": "fn_8025B4C0",
-   "refs": 1,
-   "files": 1,
-   "used_as": "_fn_8025B4C0",
-   "addr": "8025B4C0",
-   "size": 412,
-   "section": ".text",
-   "kind": "library",
-   "region": "AI/AX/MEM"
-  },
-  {
    "name": "fn_8025B65C",
    "refs": 1,
    "files": 1,
    "used_as": "_fn_8025B65C",
    "addr": "8025B65C",
    "size": 208,
-   "section": ".text",
-   "kind": "library",
-   "region": "AI/AX/MEM"
-  },
-  {
-   "name": "fn_8025B72C",
-   "refs": 1,
-   "files": 1,
-   "used_as": "_fn_8025B72C",
-   "addr": "8025B72C",
-   "size": 84,
    "section": ".text",
    "kind": "library",
    "region": "AI/AX/MEM"
@@ -1308,237 +967,6 @@
    "region": "AI/AX/MEM"
   },
   {
-   "name": "fn_8026099C",
-   "refs": 1,
-   "files": 1,
-   "used_as": "_fn_8026099C",
-   "addr": "8026099C",
-   "size": 276,
-   "section": ".text",
-   "kind": "library",
-   "region": "AI/AX/MEM"
-  },
-  {
-   "name": "fn_80260AB0",
-   "refs": 1,
-   "files": 1,
-   "used_as": "_fn_80260AB0",
-   "addr": "80260AB0",
-   "size": 20,
-   "section": ".text",
-   "kind": "library",
-   "region": "AI/AX/MEM"
-  },
-  {
-   "name": "fn_80260AC4",
-   "refs": 1,
-   "files": 1,
-   "used_as": "_fn_80260AC4",
-   "addr": "80260AC4",
-   "size": 8,
-   "section": ".text",
-   "kind": "library",
-   "region": "AI/AX/MEM"
-  },
-  {
-   "name": "fn_80260AD4",
-   "refs": 1,
-   "files": 1,
-   "used_as": "_fn_80260AD4",
-   "addr": "80260AD4",
-   "size": 5824,
-   "section": ".text",
-   "kind": "library",
-   "region": "AI/AX/MEM"
-  },
-  {
-   "name": "fn_80262194",
-   "refs": 1,
-   "files": 1,
-   "used_as": "_fn_80262194",
-   "addr": "80262194",
-   "size": 24,
-   "section": ".text",
-   "kind": "library",
-   "region": "AI/AX/MEM"
-  },
-  {
-   "name": "fn_80262320",
-   "refs": 1,
-   "files": 1,
-   "used_as": "_fn_80262320",
-   "addr": "80262320",
-   "size": 36,
-   "section": ".text",
-   "kind": "library",
-   "region": "AI/AX/MEM"
-  },
-  {
-   "name": "fn_80262344",
-   "refs": 1,
-   "files": 1,
-   "used_as": "_fn_80262344",
-   "addr": "80262344",
-   "size": 36,
-   "section": ".text",
-   "kind": "library",
-   "region": "AI/AX/MEM"
-  },
-  {
-   "name": "fn_80262368",
-   "refs": 1,
-   "files": 1,
-   "used_as": "_fn_80262368",
-   "addr": "80262368",
-   "size": 28,
-   "section": ".text",
-   "kind": "library",
-   "region": "AI/AX/MEM"
-  },
-  {
-   "name": "fn_80262384",
-   "refs": 1,
-   "files": 1,
-   "used_as": "_fn_80262384",
-   "addr": "80262384",
-   "size": 36,
-   "section": ".text",
-   "kind": "library",
-   "region": "AI/AX/MEM"
-  },
-  {
-   "name": "fn_802623A8",
-   "refs": 1,
-   "files": 1,
-   "used_as": "_fn_802623A8",
-   "addr": "802623A8",
-   "size": 5776,
-   "section": ".text",
-   "kind": "library",
-   "region": "AI/AX/MEM"
-  },
-  {
-   "name": "fn_80263F18",
-   "refs": 1,
-   "files": 1,
-   "used_as": "_fn_80263F18",
-   "addr": "80263F18",
-   "size": 52,
-   "section": ".text",
-   "kind": "library",
-   "region": "AI/AX/MEM"
-  },
-  {
-   "name": "fn_80263F4C",
-   "refs": 1,
-   "files": 1,
-   "used_as": "_fn_80263F4C",
-   "addr": "80263F4C",
-   "size": 96,
-   "section": ".text",
-   "kind": "library",
-   "region": "AI/AX/MEM"
-  },
-  {
-   "name": "fn_80263FAC",
-   "refs": 1,
-   "files": 1,
-   "used_as": "_fn_80263FAC",
-   "addr": "80263FAC",
-   "size": 64,
-   "section": ".text",
-   "kind": "library",
-   "region": "AI/AX/MEM"
-  },
-  {
-   "name": "fn_80264498",
-   "refs": 1,
-   "files": 1,
-   "used_as": "_fn_80264498",
-   "addr": "80264498",
-   "size": 112,
-   "section": ".text",
-   "kind": "library",
-   "region": "NAND/SC/IPC"
-  },
-  {
-   "name": "fn_80264508",
-   "refs": 1,
-   "files": 1,
-   "used_as": "_fn_80264508",
-   "addr": "80264508",
-   "size": 28,
-   "section": ".text",
-   "kind": "library",
-   "region": "NAND/SC/IPC"
-  },
-  {
-   "name": "fn_80264588",
-   "refs": 1,
-   "files": 1,
-   "used_as": "_fn_80264588",
-   "addr": "80264588",
-   "size": 32,
-   "section": ".text",
-   "kind": "library",
-   "region": "NAND/SC/IPC"
-  },
-  {
-   "name": "fn_802645A8",
-   "refs": 1,
-   "files": 1,
-   "used_as": "_fn_802645A8",
-   "addr": "802645A8",
-   "size": 20,
-   "section": ".text",
-   "kind": "library",
-   "region": "NAND/SC/IPC"
-  },
-  {
-   "name": "fn_802645BC",
-   "refs": 1,
-   "files": 1,
-   "used_as": "_fn_802645BC",
-   "addr": "802645BC",
-   "size": 32,
-   "section": ".text",
-   "kind": "library",
-   "region": "NAND/SC/IPC"
-  },
-  {
-   "name": "fn_80264A24",
-   "refs": 1,
-   "files": 1,
-   "used_as": "_fn_80264A24",
-   "addr": "80264A24",
-   "size": 80,
-   "section": ".text",
-   "kind": "library",
-   "region": "NAND/SC/IPC"
-  },
-  {
-   "name": "fn_80264CC8",
-   "refs": 1,
-   "files": 1,
-   "used_as": "_fn_80264CC8",
-   "addr": "80264CC8",
-   "size": 8,
-   "section": ".text",
-   "kind": "library",
-   "region": "NAND/SC/IPC"
-  },
-  {
-   "name": "fn_80264CD0",
-   "refs": 1,
-   "files": 1,
-   "used_as": "_fn_80264CD0",
-   "addr": "80264CD0",
-   "size": 8,
-   "section": ".text",
-   "kind": "library",
-   "region": "NAND/SC/IPC"
-  },
-  {
    "name": "fn_80264EE8",
    "refs": 1,
    "files": 1,
@@ -1559,50 +987,6 @@
    "section": ".text",
    "kind": "library",
    "region": "NAND/SC/IPC"
-  },
-  {
-   "name": "fn_8026B174",
-   "refs": 1,
-   "files": 1,
-   "used_as": "_fn_8026B174",
-   "addr": "8026B174",
-   "size": 728,
-   "section": ".text",
-   "kind": "library",
-   "region": "NAND/SC/IPC"
-  },
-  {
-   "name": "fn_80272AB0",
-   "refs": 1,
-   "files": 1,
-   "used_as": "_fn_80272AB0",
-   "addr": "80272AB0",
-   "size": 180,
-   "section": ".text",
-   "kind": "library",
-   "region": "WPAD/KPAD/BT"
-  },
-  {
-   "name": "fn_80274F80",
-   "refs": 1,
-   "files": 1,
-   "used_as": "_fn_80274F80",
-   "addr": "80274F80",
-   "size": 132,
-   "section": ".text",
-   "kind": "library",
-   "region": "WPAD/KPAD/BT"
-  },
-  {
-   "name": "fn_80275004",
-   "refs": 1,
-   "files": 1,
-   "used_as": "_fn_80275004",
-   "addr": "80275004",
-   "size": 528,
-   "section": ".text",
-   "kind": "library",
-   "region": "WPAD/KPAD/BT"
   },
   {
    "name": "fn_8027FF24",
@@ -2067,34 +1451,12 @@
    "region": "MSL C/C++ runtime"
   },
   {
-   "name": "fn_8032380C",
-   "refs": 1,
-   "files": 1,
-   "used_as": "_fn_8032380C",
-   "addr": "8032380C",
-   "size": 252,
-   "section": ".text",
-   "kind": "library",
-   "region": "MSL C/C++ runtime"
-  },
-  {
    "name": "fn_80323908",
    "refs": 1,
    "files": 1,
    "used_as": "_fn_80323908",
    "addr": "80323908",
    "size": 12,
-   "section": ".text",
-   "kind": "library",
-   "region": "MSL C/C++ runtime"
-  },
-  {
-   "name": "fn_80323D3C",
-   "refs": 1,
-   "files": 1,
-   "used_as": "_fn_80323D3C",
-   "addr": "80323D3C",
-   "size": 432,
    "section": ".text",
    "kind": "library",
    "region": "MSL C/C++ runtime"
@@ -2139,17 +1501,6 @@
    "used_as": "_fn_80333B34",
    "addr": "80333B34",
    "size": 44,
-   "section": ".text",
-   "kind": "library",
-   "region": "MSL C/C++ runtime"
-  },
-  {
-   "name": "fn_8033AB2C",
-   "refs": 1,
-   "files": 1,
-   "used_as": "_fn_8033AB2C",
-   "addr": "8033AB2C",
-   "size": 196,
    "section": ".text",
    "kind": "library",
    "region": "MSL C/C++ runtime"
@@ -5332,6 +4683,34 @@
    "kind": "unknown"
   },
   {
+   "name": "fn_8024D59C",
+   "refs": 2,
+   "files": 2,
+   "used_as": "_fn_8024D59C",
+   "kind": "unknown"
+  },
+  {
+   "name": "fn_8024D5DC",
+   "refs": 2,
+   "files": 2,
+   "used_as": "_fn_8024D5DC",
+   "kind": "unknown"
+  },
+  {
+   "name": "fn_8024D61C",
+   "refs": 2,
+   "files": 2,
+   "used_as": "_fn_8024D61C",
+   "kind": "unknown"
+  },
+  {
+   "name": "fn_8024D674",
+   "refs": 2,
+   "files": 2,
+   "used_as": "_fn_8024D674",
+   "kind": "unknown"
+  },
+  {
    "name": "gAlertPlayer",
    "refs": 2,
    "files": 2,
@@ -5507,20 +4886,6 @@
    "kind": "unknown"
   },
   {
-   "name": "MtxGetForward",
-   "refs": 1,
-   "files": 1,
-   "used_as": "_MtxGetForward",
-   "kind": "unknown"
-  },
-  {
-   "name": "MtxGetUp",
-   "refs": 1,
-   "files": 1,
-   "used_as": "_MtxGetUp",
-   "kind": "unknown"
-  },
-  {
    "name": "ObjRefSetState",
    "refs": 1,
    "files": 1,
@@ -5560,13 +4925,6 @@
    "refs": 1,
    "files": 1,
    "used_as": "_ResourceFind",
-   "kind": "unknown"
-  },
-  {
-   "name": "ResourceGetCurrentId",
-   "refs": 1,
-   "files": 1,
-   "used_as": "_ResourceGetCurrentId",
    "kind": "unknown"
   },
   {
@@ -5871,6 +5229,27 @@
    "kind": "unknown"
   },
   {
+   "name": "fn_80235110",
+   "refs": 1,
+   "files": 1,
+   "used_as": "_fn_80235110",
+   "kind": "unknown"
+  },
+  {
+   "name": "fn_8024D6CC",
+   "refs": 1,
+   "files": 1,
+   "used_as": "_fn_8024D6CC",
+   "kind": "unknown"
+  },
+  {
+   "name": "fn_8024D72C",
+   "refs": 1,
+   "files": 1,
+   "used_as": "_fn_8024D72C",
+   "kind": "unknown"
+  },
+  {
    "name": "gArgc",
    "refs": 1,
    "files": 1,
@@ -6054,13 +5433,13 @@
   }
  ],
  "library_regions": {
-  "AI/AX/MEM": 58,
   "Network (DWC/SSL/NHTTP/NWC24)": 57,
-  "GX": 22,
-  "MSL C/C++ runtime": 21,
-  "NAND/SC/IPC": 20,
+  "AI/AX/MEM": 24,
+  "MSL C/C++ runtime": 19,
+  "GX": 16,
   "WPAD/KPAD/BT": 9,
-  "OS": 8,
+  "OS": 7,
+  "NAND/SC/IPC": 4,
   "DVD": 1
  }
 }

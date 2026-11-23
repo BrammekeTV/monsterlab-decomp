@@ -66,8 +66,8 @@ s32    fn_802E9EE0(void);                                           // 0x802E9EE
 u8     fn_802E9F3C(void);                                           // 0x802E9F3C
 s32    fn_802F79BC(u8 idx, u8* buf, s32 size);                      // 0x802F79BC
 u64    fn_802FB094(u8* rec);
-void   fn_80333B60(void* obj);
-void*  fn_80333D50(const char* path, const char* mode);             // 0x80333D50 (fopen)
+void   fclose(void* obj);
+void*  UTF8ToUCS2String(const char* path, const char* mode);             // 0x80333D50 (fopen)
 s32    fn_8033ADCC(s32* out);                                       // 0x8033ADCC (time)
 void   operator_delete(void* p);                                    // 0x801D426C
 
@@ -669,7 +669,7 @@ u8* fn_80143158(u8* arg0) {
 // usable record, 0 if either name is empty.
 s32 fn_80143350(u8* arg0) {
     if (*(void**)(arg0 + 0x0) != NULL) {
-        fn_80333B60(*(void**)(arg0 + 0x0));
+        fclose(*(void**)(arg0 + 0x0));
         *(void**)(arg0 + 0x0) = NULL;
     }
     s8 nameA = *(s8*)(arg0 + 0x4);
@@ -679,9 +679,9 @@ s32 fn_80143350(u8* arg0) {
     const char* b = (*(s8*)(arg0 + 0x104) != 0) ? (const char*)(arg0 + 0x104) : (const char*)(lbl_80375E18 + 0x34);
     SysSprintf((char*)(arg0 + 0x204), (const char*)(lbl_80375E18 + 0x1E0), (char*)(arg0 + 0x458), a, b);
     if (*(u32*)(arg0 + 0x308) & 1) {
-        *(void**)(arg0 + 0x0) = fn_80333D50((const char*)(arg0 + 0x204), "wt");
+        *(void**)(arg0 + 0x0) = UTF8ToUCS2String((const char*)(arg0 + 0x204), "wt");
     } else {
-        *(void**)(arg0 + 0x0) = fn_80333D50((const char*)(arg0 + 0x204), "at");
+        *(void**)(arg0 + 0x0) = UTF8ToUCS2String((const char*)(arg0 + 0x204), "at");
     }
     if (*(void**)(arg0 + 0x0) != NULL) *(s32*)(arg0 + 0x304) = 2;
     return 1;

@@ -34,7 +34,7 @@ s32 fn_8020AB5C(const char* name, s32 flag);                                    
 void fn_802209D0(void (*cb)(void));                            // 0x802209D0
 void fn_80220A1C(s32 a);                                       // 0x80220A1C
 void OSUnlockMutex(u8* p);                                       // 0x8023A68C
-void fn_802E4970(void);                                        // 0x802E4970
+void DWC_ClearError(void);                                        // 0x802E4970
 char* strncpy(char* dst, const char* src, size_t n);           // 0x80338854
 
 // Globals.
@@ -289,7 +289,7 @@ void MultiplayerCleanup(void) {
     fn_80220A1C(0);
     MatchupCleanup();
     if (lbl_805FB964 != NULL && *(u8*)((u8*)lbl_805FB964 + 0xB0) == 0) {
-        fn_802E4970();
+        DWC_ClearError();
     }
     lbl_805FBB6C = 0;
     OSUnlockMutex(lbl_80556AB0);

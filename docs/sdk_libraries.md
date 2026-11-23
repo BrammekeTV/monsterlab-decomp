@@ -247,3 +247,37 @@ object has the same name.
 Spot check: 20 random matches were compared with their callees; every call target the DOL
 already named agreed with the object's callee name, and a check over all matches found 304 such
 cross-calls and 0 disagreements.
+
+### Second pass: mkw and tp (496 more names)
+
+Same tool, two more public sources, compiled with the same MWCC `GC/3.0a5.2` and each project's own flags
+(sources and objects stay outside the repo):
+
+| Source | Licence | Used for |
+|---|---|---|
+| [doldecomp/mkw](https://github.com/doldecomp/mkw) (Mario Kart Wii, 2008 SDK) | CC0-1.0; `lib/gamespy` also carries GameSpy's own `license.txt`, only compiled and byte-matched here, nothing copied | GameSpy, SO, DWC, MSL, MTX, MEM, OS, ARC, IPC |
+| [zeldaret/tp](https://github.com/zeldaret/tp) (Twilight Princess Wii, `libs/revolution`, MSL_C, TRK) | CC0-1.0 | GX, DVD, VI, AXFX, ESP, MSL, OS, MetroTRK, HBM, NAND, FS, WPAD |
+
+Names added (sections `# sigmatch mkw <lib>` and `# sigmatch tp <lib>` in `names_sdk.txt`):
+
+| Library | Names | | Library | Names |
+|---|---|---|---|---|
+| GameSpy (GP, serverbrowsing, gt2, gstats, qr2, darray, hashtable, md5) | 350 | | GX | 31 |
+| MSL | 33 | | OS | 12 |
+| DVD | 14 | | SO (socket layer) | 11 |
+| VI | 10 | | MTX | 8 |
+| AXFX | 7 | | MEM | 5 |
+| ESP | 4 | | DWC | 2 |
+| HBM, MetroTRK | 2 each | | ARC, IPC, FS, NAND, WPAD | 1 each |
+
+Notes:
+- GameSpy is linked into `main.dol` (the DWC online layer sits on it), so its names are real library names.
+- The GameSpy socket wrappers (`socket`, `bind`, `connect`, `recv`, `recvfrom`, `sendto`, `getsockname`,
+  `inet_addr`) are named `gs_<name>` so they cannot clash with Winsock in the PC build. `floor`/`tan` and
+  the other math intrinsics stay `fn_`.
+- The `names_sdk.txt` comment of each line gives the source object file. A cross-call check over all
+  1416 named-callee pairs found 0 disagreements (the only differences are the `gs_` prefixes).
+- Still `fn_`: NHTTP, SSL, NCD, NWC24 beyond ogws, RevoEX 2.1plus (no public source found in mkw, tp,
+  Melee or NSMBW; NSMBW ships headers only), HBM beyond 2 (tp's `homebuttonLib` is mostly NonMatching and
+  does not compile with this MWCC), MetroTRK beyond 3 (tp's TRK compiles 11/30 files with `3.0a5.2`).
+- Melee (no licence declared) and NSMBW (no licence declared) were cloned for inspection and gave no names.

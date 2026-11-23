@@ -191,7 +191,7 @@ void GXSetPixelFmt(s32 pixFmt, s32 zFmt) {
     gPortGx.pixelFmt = pixFmt; gPortGx.zFmt = zFmt;
 }
 // GXSetAlphaCompare(comp0, ref0, op, comp1, ref1)
-void fn_8024D944(s32 comp0, s32 ref0, s32 op, s32 comp1, s32 ref1) {
+void GXSetAlphaCompare(s32 comp0, s32 ref0, s32 op, s32 comp1, s32 ref1) {
     u32 w = 0xF3000000u;
     w = Rlwimi(w, (u32)ref0, 0, 24, 31);
     w = Rlwimi(w, (u32)ref1, 8, 16, 23);
@@ -203,7 +203,7 @@ void fn_8024D944(s32 comp0, s32 ref0, s32 op, s32 comp1, s32 ref1) {
     gPortGx.alphaComp[3] = (u8)comp1; gPortGx.alphaComp[4] = (u8)ref1;
 }
 // GXSetZTexture(op, format, bias)
-void fn_8024D97C(s32 op, s32 fmt, s32 bias) {
+void GXSetZTexture(s32 op, s32 fmt, s32 bias) {
     u32 w0 = Rlwimi(0, (u32)bias, 0, 8, 31);
     w0 = Rlwimi(w0, 0xF4, 24, 0, 7);
     u32 type = fmt == 0x11 ? 0u : fmt == 0x13 ? 1u : 2u;
@@ -438,7 +438,7 @@ void GXSetChanMatColor(s32 chan, u8* color) { Init(); ChanColor(chan, color, sh.
 
 // ------------------------------------------------------------------ TEV
 // GXSetTevOrder(stage, texture coordinate, texture map, colour channel)
-void fn_8024DA08(s32 stage, s32 coord, s32 map, s32 color) {
+void GXSetTevOrder(s32 stage, s32 coord, s32 map, s32 color) {
     Init();
     u32 tmap = (u32)map & ~0x100u;
     if (tmap >= 8) tmap = 0;
@@ -462,14 +462,14 @@ void fn_8024DA08(s32 stage, s32 coord, s32 map, s32 color) {
     Bp(w);
 }
 // GXSetNumTevStages
-void fn_8024DB64(s32 count) {
+void GXSetNumTevStages(s32 count) {
     Init();
     sh.genMode = Rlwimi(sh.genMode, (u32)(count - 1), 10, 18, 21);
     sh.dirty |= DIRTY_GENMODE;
     gPortGx.numTevStages = (u8)count;
 }
 // GXSetTevOp(stage, mode). 0x803984D8: colour inputs for stage 0 / later stages, then alpha inputs
-void fn_8024D508(s32 stage, s32 mode) {
+void GXSetTevOp(s32 stage, s32 mode) {
     static const u32 kTable[20] = {
         0xC008F8AF, 0xC008A89F, 0xC008AC8F, 0xC008FFF8, 0xC008FFFA,
         0xC008F80F, 0xC008089F, 0xC0080C8F, 0xC008FFF8, 0xC008FFF0,
@@ -485,21 +485,21 @@ void fn_8024D508(s32 stage, s32 mode) {
     Bp(a); sh.teva[i] = a;
 }
 // GXSetTevKColorSel(stage, selection)
-void fn_8024D7EC(s32 stage, s32 sel) {
+void GXSetTevKColorSel(s32 stage, s32 sel) {
     Init();
     u32 i = ((u32)stage >> 1) & 7;
     sh.ksel[i] = (stage & 1) ? Rlwimi(sh.ksel[i], (u32)sel, 14, 13, 17) : Rlwimi(sh.ksel[i], (u32)sel, 4, 23, 27);
     Bp(sh.ksel[i]);
 }
 // GXSetTevKAlphaSel(stage, selection)
-void fn_8024D83C(s32 stage, s32 sel) {
+void GXSetTevKAlphaSel(s32 stage, s32 sel) {
     Init();
     u32 i = ((u32)stage >> 1) & 7;
     sh.ksel[i] = (stage & 1) ? Rlwimi(sh.ksel[i], (u32)sel, 19, 8, 12) : Rlwimi(sh.ksel[i], (u32)sel, 9, 18, 22);
     Bp(sh.ksel[i]);
 }
 // GXSetTevSwapMode(stage, rasterised colour table, texture colour table)
-void fn_8024D88C(s32 stage, s32 rasSel, s32 texSel) {
+void GXSetTevSwapMode(s32 stage, s32 rasSel, s32 texSel) {
     Init();
     u32 i = (u32)stage & 15;
     sh.teva[i] = Rlwimi(sh.teva[i], (u32)rasSel, 0, 30, 31);
@@ -507,7 +507,7 @@ void fn_8024D88C(s32 stage, s32 rasSel, s32 texSel) {
     Bp(sh.teva[i]);
 }
 // GXSetTevSwapModeTable(table, r, g, b, a)
-void fn_8024D8C8(s32 table, s32 r, s32 g, s32 b, s32 a) {
+void GXSetTevSwapModeTable(s32 table, s32 r, s32 g, s32 b, s32 a) {
     Init();
     u32 i = ((u32)table & 3) * 2;
     sh.ksel[i] = Rlwimi(sh.ksel[i], (u32)r, 0, 30, 31);
