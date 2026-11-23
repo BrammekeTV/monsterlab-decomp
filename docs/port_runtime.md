@@ -29,6 +29,7 @@ build\pc\monsterlab.exe                        # runs main() with your own disc 
 | `--scale N` | frame buffer size as a multiple of the console's 640x528 (default 2) |
 | `--peek ADDR` | print four words of Wii memory (hex address) when the run stops |
 | `--watch ADDR` | report every write of the main thread to four bytes of Wii memory (hex address): writer, new value, stack |
+| `--press BUTTON@FRAME[-FRAME]` | hold a Wii Remote button (a name from the binding table: `A`, `B`, `PLUS`, `STICK_UP`...) during those frames; a press without an end lasts 6 frames. For headless tests; can be given up to 32 times |
 | `--show-texture N` | development aid: when the boot stops, draw texture N of `global_binary.sir` through the engine's draw path instead of ending (see "GX: the renderer") |
 
 Debugging aids: `--peek ADDR` (up to eight) prints four words of Wii memory at the stop;
@@ -237,13 +238,34 @@ so in a comment. When an SDK function is renamed with `tools/rename.py`, the def
 | GX | nothing is drawn. The state calls (about 80 so far: viewport, scissor, copy filter, matrices, blend, depth, vertex formats...) are recorded in `gPortGx` (`port.h`) for a later renderer. A display list handed to the graphics processor (`GXSetGPFifo`) is answered with the draw-done interrupt; its commands are not executed and draw-sync tokens are not delivered |
 | MTX | `PSMTXIdentity` |
 | Hardware registers | `0xCC000000`-`0xCC00FFFF` is plain memory: generated code writes the GX write-gather pipe (`0xCC008000`) and reads PI/VI registers by address. Writes are lost |
-| AI, AX, WPAD, KPAD | stubs |
+| WPAD, KPAD | `KPADRead` / `WPADProbe` (`port_input.cpp`): a Wii Remote with a Nunchuk on channel 0, nothing on 1 to 3. Keyboard and mouse (while the window has the focus), the first XInput pad (only with a window) and `--press` give the buttons, the Nunchuk stick and the pointer; the bindings are one table, `gPortBindings` (`include/port/port_input.h`) |
+| AI, AX | stubs |
 | MSL | `__register_global_object`, array construction helpers, `ceil_`; the standard C functions come from the Windows C runtime |
 
 A stub that does nothing calls `PortStubCall`: the first call is logged and the boot summary
 shows the count. An SDK function that has no definition at all stops the run like a missing game
 function, unless it is in the short `PortSoftSdk` table in `port_sdk.cpp` (by original address,
 with what it is): those log and return 0. Add to that table only after reading the asm.
+
+### Controls
+
+Default bindings (`gPortBindings` in `port_input.cpp`; the game sees a Wii Remote + Nunchuk):
+
+| Wii | Keyboard / mouse | XInput pad |
+|---|---|---|
+| A | Enter, Space, left mouse button | A |
+| B | Backspace, X, right mouse button | B |
+| 1 / 2 | 1 / 2 | X / Y |
+| + / - | `=` or numpad + / `-` or numpad - | Start / Back |
+| HOME | Home | |
+| D-pad | arrow keys | D-pad |
+| Z / C (Nunchuk) | left Shift or E / left Ctrl or Q | right / left shoulder or trigger |
+| Nunchuk stick | W A S D | left stick |
+| pointer | the mouse inside the window | right stick moves it |
+
+The game turns the remote's buttons into its own input registers through a static list of
+register pairs (`lbl_80348268`, walked by `fn_801472A8`); that list is u16 data
+(`port_data.txt`).
 
 ### GX: the command stream
 
