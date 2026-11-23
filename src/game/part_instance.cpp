@@ -403,16 +403,16 @@ extern "C" {
 // Damage of an action: base damage scaled by quality/tier and the part's attack modifier (stat 0),
 // split over the targets when it hits more than one limb. Broken parts do base damage.
 s32 PartActionStat0(PartInstance* p, u32 action) {
-    s16 dmg = *(const s16*)(Action(action) + 0xE);
+    s32 dmg = *(const s16*)(Action(action) + 0xE);
     if (p->health > 0) {
         s32 d = (s32)((f32)dmg * ActionScale(p));
-        dmg = (s16)((d * (PartGetStatModifier(p, 0) + 100)) / 100);
+        dmg = (d * (PartGetStatModifier(p, 0) + 100)) / 100;
     }
     TargetList t;
     TargetListInit(&t);
     u32 mask = *(const u32*)(Action(action) + 8);
     TargetListDecode(&t, &mask, -1);
-    if (t.count > 1) dmg = (s16)(((f32)dmg * Tuning(0x8C)) / (f32)t.count);
+    if (t.count > 1) dmg = (s32)(((f32)dmg * Tuning(0x8C)) / (f32)t.count);
     TargetListDestroy(&t, -1);
     return dmg;
 }

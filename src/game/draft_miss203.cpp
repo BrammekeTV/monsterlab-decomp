@@ -220,7 +220,7 @@ void fn_80040ACC(u8* arg0, u8* arg1, u8* arg2) {
     n = (u8*)fn_801D40E0(0x264);
     if (n != NULL) fn_80042C38(n);
     lbl_805FB058 = n;
-    fn_80042E04(NULL);  // r3 stale in asm
+    fn_80042E04(n);  // r3 = the new 0x264 object
 
     for (s32 i = 0; i < 2; i++) {
         FighterStatsSetOwner(((u8**)(gBattle + 0xA00))[i] + 0x20,
