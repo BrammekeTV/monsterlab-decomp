@@ -8,8 +8,8 @@ extern "C" {
 }
 
 extern "C" {
-void  fn_8023A5B0(u8* p);                                       // 0x8023A5B0
-void  fn_8023A68C(u8* p);                                       // 0x8023A68C
+void  OSLockMutex(u8* p);                                       // 0x8023A5B0
+void  OSUnlockMutex(u8* p);                                       // 0x8023A68C
 void  fn_802E9CBC(s32 counter);                                 // 0x802E9CBC
 BOOL  fn_801F56FC(s32 flags);                                   // 0x801F56FC
 void  fn_801F5714(s32 flags);                                   // 0x801F5714
@@ -23,7 +23,7 @@ BOOL  fn_8013E464(void);                                        // 0x8013E464
 u8*   fn_80143158(u8* p);                                       // 0x80143158
 u8*   fn_8014328C(u8* p, s32 del);                                    // 0x8014328C (global destructor)
 void  __register_global_object(void* obj, void (*dtor)(void*), void* handle);
-void  fn_8023D3C8(s32 hi, u32 lo);                              // 0x8023D3C8
+void  OSSleepTicks(s32 hi, u32 lo);                              // 0x8023D3C8
 }
 
 extern u8  lbl_80556AB0[];                  // 0x80556AB0 (connection lock object)
@@ -46,11 +46,11 @@ extern s32 lbl_805FB458;                    // 0x805FB458 (callback table count)
 // Ends the online match connection: takes the connection lock, bumps the nesting
 // counter, shuts the link down, releases the lock, and decrements the counter.
 void KillMatchConnection(void) {
-    fn_8023A5B0(lbl_80556AB0);
+    OSLockMutex(lbl_80556AB0);
     s32 count = lbl_805FBB48;
     lbl_805FBB48 = count + 1;
     fn_802E9CBC(count);
-    fn_8023A68C(lbl_80556AB0);
+    OSUnlockMutex(lbl_80556AB0);
     lbl_805FBB48 = lbl_805FBB48 - 1;
 }
 
@@ -196,7 +196,7 @@ extern "C" void SleepMicroseconds(s32 hi, u32 us) {
     u64 micros = ((u64)(u32)hi << 32) | us;
     u32 tpu = (u32)(((u64)(OSGetBusClock() >> 2) * 0x431BDE83u) >> 47);
     s64 ticks = (s64)(micros * tpu) / 8;
-    fn_8023D3C8((s32)(ticks >> 32), (u32)ticks);
+    OSSleepTicks((s32)(ticks >> 32), (u32)ticks);
 }
 
 extern "C" void fn_80142970(void);

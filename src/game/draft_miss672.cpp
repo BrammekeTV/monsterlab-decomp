@@ -50,7 +50,7 @@ void   fn_801BF398(u8* list, u8* item);                                         
 void   fn_801C849C(u8* mgr, u8* item);                                                     // 0x801C849C
 void*  fn_801D40E0(s32 n);                                                                 // 0x801D40E0
 void*  fn_80209814(void* v);                                                               // 0x80209814
-f64    fn_8033ED6C(f64 x);                                                                 // 0x8033ED6C (floor)
+f64    floor(f64 x);                                                                 // 0x8033ED6C (floor)
 
 extern u8   gWorldState[];            // 0x803E6D00
 extern u8   lbl_8047C760[];           // 0x8047C760 (effect manager)
@@ -604,7 +604,7 @@ void fn_80085CF8(u8* arg0) {
     u8* pos;
     do {
         f32 r = lbl_805FD8C8 + (lbl_805FD8FC * (lbl_805FD8E4 * (f32)RandomU32()));
-        s32 idx = (s32)(f32)fn_8033ED6C((f64)r);
+        s32 idx = (s32)(f32)floor((f64)r);
         u8* ctl = *(u8**)(arg0 + 0x264);
         f32 hi = *(f32*)(ctl + 0xB0);
         f32 lo = -*(f32*)(ctl + 0xAC);

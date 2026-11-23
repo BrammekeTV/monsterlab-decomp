@@ -31,7 +31,7 @@ u8*   fn_801ABF0C(u8* table, u32 hash, s32 key);              // 0x801ABF0C
 s32 fn_801B7E7C(u8* arg0, u8* arg1);                 // 0x801B7E7C (anim callback)
 u8*   fn_801C6BCC(u8* key);                                   // 0x801C6BCC
 s32   fn_801EAFA4(u8* task, f32 t);                           // 0x801EAFA4
-f64   fn_8033F17C(f64 x);                                     // 0x8033F17C
+f64   tan(f64 x);                                     // 0x8033F17C
 
 extern ScriptFunc gScriptFuncs[];       // 0x80484230
 extern const char lbl_803828C8[];       // 0x803828C8 ("UIAssetMgr.cpp" + messages)
@@ -67,7 +67,7 @@ void fn_801D89C8(f32 fov) {
         *(f32*)(v + 0x18C) = scale;
         f32 aspect = (f32)w / (f32)h;
         *(f32*)(v + 0x190) = aspect;
-        f32 t = (f32)fn_8033F17C((f64)(1.5707964f * (0.5f * scale)));
+        f32 t = (f32)tan((f64)(1.5707964f * (0.5f * scale)));
         *(f32*)(v + 0x184) = t;
         *(f32*)(v + 0x180) = t * aspect;
         fn_8016E304(gMainView);

@@ -19,8 +19,8 @@ void   fn_801F5714(s32 flags);                                  // 0x801F5714
 void   fn_8013A780(s32 a, s32 b);                                       // matchup callback
 s32    fn_802E9AB0(u8* p, s32 a, s32 b, s32 c, void* cb, s32 d, s32 e, s32 f);
 s32    fn_802E6528(s32* args, s32 a, s32 b, s32 c, s32 d);      // 0x802E6528, signature guessed by draft_batch
-void   fn_8023A5B0(u8* p);                                      // 0x8023A5B0
-void   fn_8023A68C(u8* p);                                      // 0x8023A68C
+void   OSLockMutex(u8* p);                                      // 0x8023A5B0
+void   OSUnlockMutex(u8* p);                                      // 0x8023A68C
 f32    fn_800FB5B8(f32 a, f32 b);                               // 0x800FB5B8
 s32    fn_8015BA30(void* p);                                    // 0x8015BA30
 void   fn_8014DE68(void);                                       // 0x8014DE68
@@ -32,7 +32,7 @@ void*  fn_802209CC(void* dst, s32 val, u32 n);
 s32    fn_801132BC(s32 v);
 s32    fn_801138F8(void);
 s32 fn_8020703C(const char* title, const char* subtitle, u32* outSize);
-s32    fn_80267B14(u32* buf);
+s32    NANDGetHomeDir(u32* buf);
 s32    fn_802665B0(u8* a, char* b);
 
 // Globals (declared with the type each file loads them as)
@@ -98,7 +98,7 @@ void SendMatchupRequest(void) {
     u8* slot;
 
     MatchupCleanup();
-    fn_8023A5B0(lbl_80556AB0);
+    OSLockMutex(lbl_80556AB0);
     lbl_805FBB48 += 1;
     res = fn_802E9AB0(&lbl_805F902C, 1, 2, 0, (void*)fn_8013A780, 0, 0, 0);
     if (res != 0) {
@@ -109,7 +109,7 @@ void SendMatchupRequest(void) {
         args[0] = *(s32*)(slot + 0x350);
         fn_802E6528(args, 8, args[1], lbl_805F902C, 1);
     }
-    fn_8023A68C(lbl_80556AB0);
+    OSUnlockMutex(lbl_80556AB0);
     lbl_805FBB48 -= 1;
 }
 
@@ -229,7 +229,7 @@ void SetEntityPositionCallback(u32 a0, u32 a1, u32 a2) {
 }
 
 // 0x80206AA4
-// Builds the save-banner path from the save name (fn_80267B14) and checks it with fn_802665B0.
+// Builds the save-banner path from the save name (NANDGetHomeDir) and checks it with fn_802665B0.
 // Returns 1 when the path lookup finds nothing, 0 otherwise; returns 0 early if fn_8020703C fails.
 // The original never reads the title/sub/out arguments.
 s32 SaveSetBanner(const char* title, const char* sub, s32* out) {
@@ -243,7 +243,7 @@ s32 SaveSetBanner(const char* title, const char* sub, s32* out) {
     for (i = 0; i < 16; i++) {
         name[i] = 0;
     }
-    fn_80267B14(name);
+    NANDGetHomeDir(name);
     SysSprintf(path, lbl_805F990C, (char*)name, lbl_805F9914);
     return fn_802665B0(lbl_80386CA0, path) == 0;
 }

@@ -51,7 +51,7 @@ static DWORD Attr(const char* host) { return GetFileAttributesA(host); }
 extern "C" {
 
 // NANDGetHomeDir
-s32 fn_80267B14(char* out) { strcpy(out, kHome); return NAND_OK; }
+s32 NANDGetHomeDir(char* out) { strcpy(out, kHome); return NAND_OK; }
 
 // NANDChangeDir
 s32 fn_80267A54(const char* path) {
@@ -91,7 +91,7 @@ s32 fn_80265C18(const char* path, s32 perm, s32 attr) {
 }
 
 // NANDDelete
-s32 fn_80265D78(const char* path) {
+s32 NANDDelete(const char* path) {
     char host[MAX_PATH];
     if (!HostPath(path, host, sizeof(host))) return NAND_INVALID;
     DWORD a = Attr(host);
@@ -102,7 +102,7 @@ s32 fn_80265D78(const char* path) {
 
 // NANDOpen(path, file info, access: 1 read, 2 write, 3 both). The file must exist. The info block
 // is the SDK's to use; its first word holds the slot + 1 here.
-s32 fn_80266BA4(const char* path, u8* info, s32 access) {
+s32 NANDOpen(const char* path, u8* info, s32 access) {
     char host[MAX_PATH];
     if (!HostPath(path, host, sizeof(host))) return NAND_INVALID;
     DWORD a = Attr(host);
@@ -123,7 +123,7 @@ static FILE* FileOf(u8* info) {
 }
 
 // NANDClose
-s32 fn_80266E24(u8* info) {
+s32 NANDClose(u8* info) {
     FILE* f = FileOf(info);
     if (!f) return NAND_INVALID;
     fclose(f);
@@ -148,7 +148,7 @@ s32 fn_80266060(u8* info, void* buf, u32 n) {
 }
 
 // NANDGetLength
-s32 fn_80266614(u8* info, u32* out) {
+s32 NANDGetLength(u8* info, u32* out) {
     FILE* f = FileOf(info);
     if (!f) return NAND_INVALID;
     long at = ftell(f);
@@ -194,7 +194,7 @@ s32 fn_8026829C(u32* freeBytes, u32* freeInodes) {
 
 // NANDInitBanner(banner, flags, title, comment): the header of the save's banner file; the title
 // and comment are 16-bit text of at most 32 characters each.
-s32 fn_80267F44(u8* banner, s32 flags, s16* title, s16* comment) {
+s32 NANDInitBanner(u8* banner, s32 flags, s16* title, s16* comment) {
     memset(banner, 0, 0xA0);
     banner[0] = 'W'; banner[1] = 'I'; banner[2] = 'B'; banner[3] = 'N';
     banner[4] = (u8)(flags >> 24); banner[5] = (u8)(flags >> 16); banner[6] = (u8)(flags >> 8); banner[7] = (u8)flags;

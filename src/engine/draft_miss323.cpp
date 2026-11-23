@@ -72,12 +72,12 @@ s32    DVDOpen(char* path, u8* p);
 void   DVDClose(u8* p);
 void   fn_80253A48(u8* p, s32 a);                              // 0x80253A48
 void   AXFreeVoice(u8* voice);                                 // 0x80257FA8
-void   fn_802581A4(u8* voice, u32 a);                          // 0x802581A4
+void   AXSetVoicePriority(u8* voice, u32 a);                          // 0x802581A4
 s32    fn_8025AC30(u8* voice, s32 a);                          // 0x8025AC30
 void   fn_8025AD60(u8* voice, s32 a);                   // 0x8025AD60
 s32    fn_8025ADAC(u8* voice, u16* p);                         // 0x8025ADAC
-void   fn_8025ACF0(u8* voice, s32 a);                          // 0x8025ACF0
-s32    fn_8025B0A4(u8* voice, u16* p);                         // 0x8025B0A4
+void   AXSetVoiceState(u8* voice, s32 a);                          // 0x8025ACF0
+s32    AXSetVoiceAddr(u8* voice, u16* p);                         // 0x8025B0A4
 s32    fn_8025B19C(u8* voice, u16* p);                         // 0x8025B19C
 s32    fn_8025B234(u8* voice, u16* p);                         // 0x8025B234
 s32    fn_8025B330(u8* voice, u16* p);                         // 0x8025B330
@@ -92,7 +92,7 @@ void   fn_80263FAC(void);                                      // 0x80263FAC
 void   fn_80264420(u8* p);
 void   fn_802623A8(void);                                      // 0x802623A8
 s32    WPADProbe(s32 chan, u32* out);
-s32    fn_802737A8(s32 chan, s32 a, void* cb);
+s32    WPADControlSpeaker(s32 chan, s32 a, void* cb);
 s32    fn_802B47A0(s32 a, s32* b);                             // 0x802B47A0
 s32    fn_802B4A1C(u8* bink, u8* p);                           // 0x802B4A1C
 s32    fn_802B4B14(u8* bink, u8* p);                           // 0x802B4B14
@@ -214,7 +214,7 @@ void fn_80201F38(void) {
     if (lbl_805FBAC8 > 0) {
         lbl_805FBAC8--;
     } else if (lbl_805FBACC != NULL) {
-        fn_802737A8(0, lbl_805FBAD0, lbl_805FBACC);
+        WPADControlSpeaker(0, lbl_805FBAD0, lbl_805FBACC);
         lbl_805FBACC = NULL;
     }
 
@@ -299,9 +299,9 @@ void fn_80201F38(void) {
                     fn_80203DE8(gAudio, s);
                 }
                 u8* v0 = *(u8**)(s + 0x8C);
-                if (v0 != NULL) fn_8025ACF0(v0, 0);
+                if (v0 != NULL) AXSetVoiceState(v0, 0);
                 u8* v1 = *(u8**)(s + 0x90);
-                if (v1 != NULL) fn_8025ACF0(v1, 0);
+                if (v1 != NULL) AXSetVoiceState(v1, 0);
                 break;
             }
             u32 prev = *(u32*)(s + 0xAC);
@@ -359,8 +359,8 @@ void fn_80201F38(void) {
                 *(u16*)(voice + 0xA4) = (u16)addr;
                 *(u32*)(voice + 0x1C) |= 0x400;
             }
-            fn_8025ACF0(*(u8**)(s + 0x8C), 1);
-            fn_8025ACF0(*(u8**)(s + 0x90), 1);
+            AXSetVoiceState(*(u8**)(s + 0x8C), 1);
+            AXSetVoiceState(*(u8**)(s + 0x90), 1);
             *(u8*)(gAudio + 0x29) = 1;
             *(s32*)(s + 0xB4) = 2;
             break;
@@ -442,7 +442,7 @@ void fn_80201F38(void) {
                 if (h == NULL) continue;
                 if (*(u16*)(h + 0x38) == 0) {
                     fn_80262344(h);
-                    fn_8025ACF0(*(u8**)v, 1);
+                    AXSetVoiceState(*(u8**)v, 1);
                 }
                 if (lbl_805F98E0 != 0) continue;
                 u8* hh = *(u8**)v;
@@ -458,7 +458,7 @@ void fn_80201F38(void) {
                 u8* h = *(u8**)v;
                 if (h != NULL && *(u16*)(h + 0x38) == 1) {
                     fn_80262320(h);
-                    fn_8025ACF0(*(u8**)v, 0);
+                    AXSetVoiceState(*(u8**)v, 0);
                 }
             }
         }
@@ -475,7 +475,7 @@ void fn_80201F38(void) {
         if (vs == 2) {
             *(s32*)(v + 0x4) = 3;
         } else if (vs == 1) {
-            fn_8025ACF0(h, 1);
+            AXSetVoiceState(h, 1);
             *(s32*)(v + 0x4) = 2;
         } else if (vs == 4) {
             finished = 1;
@@ -490,7 +490,7 @@ void fn_80201F38(void) {
         if (finished != 0) {
             if (fn_80262368(*(u8**)v) != 0) {
                 if (i > 1) {
-                    fn_8025ACF0(*(u8**)v, 0);
+                    AXSetVoiceState(*(u8**)v, 0);
                     if (*(u8*)(v + 0xFE) != 0 || *(u8*)(v + 0xFC) != 0) {
                         fn_80264420(v + 0x10);
                     }
@@ -508,7 +508,7 @@ void fn_80201F38(void) {
                     SoundSlotFree(*(u8**)(v + 0xC), voices);
                     *(s32*)(v + 0xC) = 0;
                 } else {
-                    fn_8025ACF0(*(u8**)v, 0);
+                    AXSetVoiceState(*(u8**)v, 0);
                     AXFreeVoice(*(u8**)v);
                     *(u8**)v = NULL;
                     *(s32*)(v + 0x4) = 0;
@@ -530,7 +530,7 @@ void fn_80201F38(void) {
         u32 gain = *(u32*)(v + 0x100) * (u32)amp;
         if (gain < 1) gain = 1;
         else if (gain > 0x1F) gain = 0x1F;
-        fn_802581A4(*(u8**)v, gain);
+        AXSetVoicePriority(*(u8**)v, gain);
     }
     fn_80263FAC();
     fn_802623A8();
@@ -595,7 +595,7 @@ void fn_80203340(u8* hdr, u8* voice, s32 streamed) {
     srcBlk[5] = 0;
     srcBlk[6] = 0;
     fn_8025AD60(voice, 0);  // the asm passes only r3/r4
-    fn_8025B0A4(voice, addrBlk);
+    AXSetVoiceAddr(voice, addrBlk);
     fn_8025B19C(voice, coefBlk);
     fn_8025B330(voice, loopBlk);
     fn_8025B3A0(voice, 0);

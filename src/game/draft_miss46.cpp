@@ -62,10 +62,10 @@ void fn_8022F50C(u8* slot);                 // 0x8022F50C
 void fn_80123954(s32 v, u8* save);          // 0x80123954
 void fn_80142870(s32 a3);                  // 0x80142870
 s32 fn_80206DA4(void);                     // 0x80206DA4
-s32 fn_80266BA4(const char* name, u8* handle, s32 a);  // 0x80266BA4
+s32 NANDOpen(const char* name, u8* handle, s32 a);  // 0x80266BA4
 s32 fn_80265F80(u8* h, void* buf, u32 n);  // 0x80265F80
-s32 fn_80266E24(u8* handle);               // 0x80266E24
-s32 fn_80265D78(void* p);                  // 0x80265D78
+s32 NANDClose(u8* handle);               // 0x80266E24
+s32 NANDDelete(void* p);                  // 0x80265D78
 u32 fn_80143974(s32 seed, void* data, u32 len);  // 0x80143974
 void* MemAllocSmall(u32 size);             // 0x801D41CC
 void MemFreeSmall(void* p);                // 0x801D4340
@@ -635,13 +635,13 @@ u32 SaveManager_IsSaveDataCorrupted(void) {
         return 1;
     }
     if (fn_80206DA4() == 0) bad = 1;
-    if (fn_80266BA4(lbl_805F8FD0, handle, 1) != 0) bad = 1;
+    if (NANDOpen(lbl_805F8FD0, handle, 1) != 0) bad = 1;
     u8* mem = (u8*)MemAllocSmall(0xF0C0);
     u8* aligned = (u8*)(((uintptr_t)mem + 0x1F) & ~(uintptr_t)0x1F);
     if (mem == NULL) bad = 1;
     if (bad == 0) {
         r = fn_80265F80(handle, aligned, 0xF0A0);
-        fn_80266E24(handle);
+        NANDClose(handle);
         if (r == -4 || r == -1 || r == -0xF || r == -5 || r == -8) bad = 1;
     }
     if (bad == 0) {
@@ -650,7 +650,7 @@ u32 SaveManager_IsSaveDataCorrupted(void) {
     }
     if (mem != NULL) MemFreeSmall(mem);
     if (bad != 0) {
-        fn_80265D78((void*)lbl_805F8FD0);
+        NANDDelete((void*)lbl_805F8FD0);
         SaveSetupBanner();
     }
     __destroy_arr(slots, (void (*)(void*, s32))fn_8022ED98, 0x988, 4);

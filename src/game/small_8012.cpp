@@ -42,7 +42,7 @@ void    fn_8032F1E8(u8* obj, void (*cb)(void), s32 a, s32 b, s32 c); // 0x8032F1
 void    __destroy_arr(void* arr, void (*dtor)(void*, s32), u32 size, u32 count); // 0x8032F2E0
 u8* fn_8022ED98(u8* p, s32 del);                         // 0x8022ED98
 s32     SaveInitDefault(void);                                   // 0x80011754
-s32     fn_80265D78(void* p);                                    // 0x80265D78
+s32     NANDDelete(void* p);                                    // 0x80265D78
 }
 
 extern "C" {
@@ -250,7 +250,7 @@ void* fn_80123364(u8* p, s32 del) {
 void SaveManager_EraseAllData(void) {
     void* save = lbl_805F8FD0;
     lbl_805FB2D5 = 0;
-    fn_80265D78(save);
+    NANDDelete(save);
     SaveInitDefault();
     if (SaveManager_HasEnoughFreeMemory() != 0) {
         SaveManager_SaveOptions();

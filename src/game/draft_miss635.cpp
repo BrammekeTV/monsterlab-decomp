@@ -34,7 +34,7 @@ void fn_801ACF90(u8* arg0, u8* arg1);                               // 0x801ACF9
 u8*  fn_80142500(void* p);                                          // 0x80142500
 f32  TimerReset(u8* timer);                                         // 0x80142744
 f32  TimerGetSeconds(void* timer);                                  // 0x80142538
-void fn_8023D3C8(s32 hi, u32 lo);                                   // 0x8023D3C8 (sleep ticks)
+void OSSleepTicks(s32 hi, u32 lo);                                   // 0x8023D3C8 (sleep ticks)
 void fn_80207BE4(s32 flag);                                         // 0x80207BE4
 s32  fn_802FAC0C(u8* p);                                            // 0x802FAC0C
 void fn_802FABD4(u8* p);                                            // 0x802FABD4
@@ -459,7 +459,7 @@ s32 fn_80207DCC(void) {
     while (lbl_805FB374 == 0 && TimerGetSeconds(timer) < lbl_80600478) {
         fn_802E93CC();
         u64 ticks = (u64)(OSGetBusClock() / 4 / 1000) * 5;
-        fn_8023D3C8((s32)(ticks >> 32), (u32)ticks);
+        OSSleepTicks((s32)(ticks >> 32), (u32)ticks);
         got = fn_802EA048();
         if (got != prev) {
             prev = got;  // the asm has a 7-entry jump table here; every entry goes to the next step

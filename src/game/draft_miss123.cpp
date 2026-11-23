@@ -65,7 +65,7 @@ void* fn_801D40E0(s32 n);                                             // 0x801D4
 s32  fn_801DA780(u8* a3);
 u8*  fn_801DA788(u8* a3, s32 i);
 void* fn_801DA798(void* p);
-f64  fn_8033ED6C(f64 x);                                              // 0x8033ED6C (floor)
+f64  floor(f64 x);                                              // 0x8033ED6C (floor)
 f64  fn_8033F1F4(f64 x);                                              // 0x8033F1F4 (acos)
 f64  fn_8033F1F8(f64 x);                                              // 0x8033F1F8 (asin)
 
@@ -156,7 +156,7 @@ static inline f32 ClampBetween(f32 p, f32 a, f32 b) {
 
 // floor(n * frac) as an int.
 static inline s32 FloorMul(s32 n, f32 frac) {
-    return (s32)(f32)fn_8033ED6C((f64)((f32)n * frac));
+    return (s32)(f32)floor((f64)((f32)n * frac));
 }
 
 // Rotates the actor velocity (actor + 0xC0..) by the node quaternion (node + 0xC..) and moves the node

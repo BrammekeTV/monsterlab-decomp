@@ -37,8 +37,8 @@ s32 fn_802E63E4(u8* rec, void* code, u32* state);            // 0x802E63E4
 s32 fn_802E9AB0(u8* p, s32 a, s32 b, s32 c, void* cb, s32 d, s32 e, s32 f);
 void fn_8013A780(s32 a, s32 b);                              // matchup callback
 void fn_8013AFF0(void);
-void fn_8023A5B0(u8* p);
-void fn_8023A68C(u8* p);
+void OSLockMutex(u8* p);
+void OSUnlockMutex(u8* p);
 s32 fn_801F525C(void);
 void fn_801F357C(void);
 s32 fn_801F57C4(void);
@@ -312,7 +312,7 @@ void fn_8001FCA8(u8* p) {
 void fn_8013A0A4(s32 a, s32 b) {
     char text[0x100];
     s32 slot = a;
-    fn_8023A5B0(lbl_80556AC8);
+    OSLockMutex(lbl_80556AC8);
     switch ((u32)b) {
     case 0:
         SysSprintf(text, lbl_805F9038);
@@ -385,7 +385,7 @@ void fn_8013A0A4(s32 a, s32 b) {
         lbl_803F0F30[slot] = lbl_803F0F30[slot] | 1;
         fn_8013AFF0();
     }
-    fn_8023A68C(lbl_80556AC8);
+    OSUnlockMutex(lbl_80556AC8);
 }
 
 // 0x800A2AEC

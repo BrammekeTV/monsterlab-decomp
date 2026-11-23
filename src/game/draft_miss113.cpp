@@ -88,9 +88,9 @@ void fn_8020B5E8(u8* p, f32 a, f32 b);                           // 0x8020B5E8
 s32 fn_80212E10(u8* battle);                                     // 0x80212E10
 s32 fn_80265C18(const char* path, s32 mode, s32 a);              // 0x80265C18
 s32 fn_8026631C(const char* path, s32 mode, s32 a);              // 0x8026631C
-s32 fn_80266BA4(const char* name, u8* handle, s32 flags);        // 0x80266BA4
+s32 NANDOpen(const char* name, u8* handle, s32 flags);        // 0x80266BA4
 s32 fn_80267A54(u32* buf);                                       // 0x80267A54
-s32 fn_80267B14(u32* buf);                                       // 0x80267B14
+s32 NANDGetHomeDir(u32* buf);                                       // 0x80267B14
 void WPADDisconnect(s32 chan, s32 b);                               // 0x802727E0
 s32 WPADProbe(s32 chan, u32* out);                             // 0x802728A4
 s32 fn_80272B64(s32 chan, u8* out);                              // 0x80272B64
@@ -761,7 +761,7 @@ s32 SaveOpen(char* path, const char* mode) {
     s32 rc;
 
     memset(stat0, 0, sizeof(stat0));
-    rc = fn_80267B14(stat0);
+    rc = NANDGetHomeDir(stat0);
     if (rc != 0) {
         fn_80206B6C(rc, lbl_80386C10 + 0x38);
     } else {
@@ -816,14 +816,14 @@ s32 SaveOpen(char* path, const char* mode) {
             return -1;
         }
     }
-    rc = fn_80266BA4(path, lbl_80527140, flags);
+    rc = NANDOpen(path, lbl_80527140, flags);
     if (rc != 0) {
         fn_80206B6C(rc, lbl_80386C10 + 0x74);
         return -1;
     }
 
     memset(stat1, 0, sizeof(stat1));
-    rc = fn_80267B14(stat1);
+    rc = NANDGetHomeDir(stat1);
     if (rc != 0) {
         fn_80206B6C(rc, lbl_80386C10 + 0x38);
     } else {

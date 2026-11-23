@@ -27,13 +27,13 @@ void  fn_801F5794(s32 a);                                         // 0x801F5794
 void  fn_801F5734(void* arg);                                     // 0x801F5734
 void  fn_801F51DC(s32 flag);                                      // 0x801F51DC
 u8*   fn_801FA7CC(u8* p, s32 a4);                                 // 0x801FA7CC
-s32   fn_80267F44(u8* p, s32 a, s16* name, s16* comment);         // 0x80267F44
+s32   NANDInitBanner(u8* p, s32 a, s16* name, s16* comment);         // 0x80267F44
 void  fn_80206E40(const char* name, u8* dst, s32 w, s32 h, s32 size, s32 fmt);  // 0x80206E40
 void  fn_80206B6C(s32 code, const u8* msg);                       // 0x80206B6C
 s32   fn_80265C18(const char* path, s32 mode, s32 a);            // 0x80265C18
-s32   fn_80266BA4(const char* name, u8* handle, s32 flags);      // 0x80266BA4
+s32   NANDOpen(const char* name, u8* handle, s32 flags);      // 0x80266BA4
 s32   fn_80266060(u8* h, void* buf, u32 n);                       // 0x80266060
-s32   fn_80266E24(u8* handle);                                    // 0x80266E24
+s32   NANDClose(u8* handle);                                    // 0x80266E24
 int   SysSprintf(char* buf, const char* fmt, ...);                // 0x80142EF8
 BOOL  PartAllowedAtRank(void* coll, s32 defIndex, s32 tier);     // 0x802191CC
 
@@ -217,7 +217,7 @@ void fn_80206F14(u8* p, const char* title, const char* subtitle) {
     d = wSub;
     while (*subtitle != 0) *d++ = (s16)(s8)*subtitle++;
     *d = 0;
-    fn_80267F44(p, 0x11, wTitle, wSub);
+    NANDInitBanner(p, 0x11, wTitle, wSub);
     fn_80206E40(lbl_80386E98, p + 0xA0, 0xC0, 0x40, 0x6000, 0x17);
     u8* icon = p + 0x60A0;
     s32 shift = 0;
@@ -241,7 +241,7 @@ s32 fn_8020703C(const char* title, const char* subtitle, u32* outSize) {
         fn_80206B6C(r, lbl_80386C10 + 0x68);
         return 0;
     }
-    r = fn_80266BA4((const char*)(lbl_80386C10 + 0x90), handle, 2);
+    r = NANDOpen((const char*)(lbl_80386C10 + 0x90), handle, 2);
     if (r != 0) {
         fn_80206B6C(r, lbl_80386C10 + 0x74);
         return 0;
@@ -254,10 +254,10 @@ s32 fn_8020703C(const char* title, const char* subtitle, u32* outSize) {
     *outSize = n;
     if (n != 0xDEA0) {
         fn_80206B6C((s32)n, lbl_80386C10 + 0x2A8);
-        fn_80266E24(handle);
+        NANDClose(handle);
         return 0;
     }
-    r = fn_80266E24(handle);
+    r = NANDClose(handle);
     if (r != 0) {
         fn_80206B6C(r, lbl_80386C10 + 0x2B4);
         return 0;

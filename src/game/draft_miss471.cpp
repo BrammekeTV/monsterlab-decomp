@@ -35,8 +35,8 @@ s32   fn_801C3E88(u8* tbl, u8* handle);
 void* fn_801EF6E8(u8* obj, s32 a, s32 v);
 u8*   fn_801FAB3C(u8* p, s32 del);
 void  fn_80234418(void* p);
-void  fn_8023A5B0(u8* p);
-void  fn_8023A68C(u8* p);
+void  OSLockMutex(u8* p);
+void  OSUnlockMutex(u8* p);
 
 extern u8 lbl_8035A950[];
 extern const char lbl_80387380[];
@@ -321,9 +321,9 @@ void fn_801B2FF0(u8* p, f32 a) {
 // Runs fn_801EF6E8 on lbl_80556AE0 under the lock at lbl_80556A98 and reports a debug message on
 // failure. Returns the result of fn_801EF6E8.
 void* fn_80207734(s32 arg0, s32 arg1) {
-    fn_8023A5B0(lbl_80556A98);
+    OSLockMutex(lbl_80556A98);
     void* r = fn_801EF6E8(lbl_80556AE0, arg1, arg0);
-    fn_8023A68C(lbl_80556A98);
+    OSUnlockMutex(lbl_80556A98);
     if (r == NULL) {
         OSReport(lbl_80387380);
     }

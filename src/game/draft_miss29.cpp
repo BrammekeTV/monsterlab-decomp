@@ -33,7 +33,7 @@ void* fn_801E9D18(void* p, u32 hash, s32 size);                // 0x801E9D18
 s32 fn_8020AB5C(const char* name, s32 flag);                                         // 0x8020AB5C
 void fn_802209D0(void (*cb)(void));                            // 0x802209D0
 void fn_80220A1C(s32 a);                                       // 0x80220A1C
-void fn_8023A68C(u8* p);                                       // 0x8023A68C
+void OSUnlockMutex(u8* p);                                       // 0x8023A68C
 void fn_802E4970(void);                                        // 0x802E4970
 char* strncpy(char* dst, const char* src, size_t n);           // 0x80338854
 
@@ -292,9 +292,9 @@ void MultiplayerCleanup(void) {
         fn_802E4970();
     }
     lbl_805FBB6C = 0;
-    fn_8023A68C(lbl_80556AB0);
+    OSUnlockMutex(lbl_80556AB0);
     lbl_805FBB48 -= 1;
-    fn_8023A68C(lbl_80556AC8);
+    OSUnlockMutex(lbl_80556AC8);
     GameFlowSignal((s32)0xCF1260FE, 0, 0);
 }
 

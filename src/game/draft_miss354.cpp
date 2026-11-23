@@ -40,17 +40,17 @@ void* fn_802080B8(void* self);                                  // 0x802080B8 (c
 s32   fn_8020DD90(u8* obj, s32 a);                              // 0x8020DD90
 void  fn_80248050(f32* mtx);                                    // 0x80248050
 void  fn_80248420(f32* mtx, f32 x, f32 y, f32 z);               // 0x80248420
-void  fn_8024849C(f32* mtx, f32 a, f32 b, f32 c, f32 d, f32 e, f32 f);  // 0x8024849C
-void  fn_8024A3A4(s32 a, s32 b);                                // 0x8024A3A4
-void  fn_8024A7E4(void);                                        // 0x8024A7E4
-void  fn_8024A818(s32 a, s32 b, s32 c, s32 d, s32 e);           // 0x8024A818
-void  fn_8024AC4C(s32 coord, s32 func, s32 src, s32 mtx, s32 normalize, s32 postMtx);  // 0x8024AC4C
-void  fn_8024AE74(s32 a);                                       // 0x8024AE74
-void  fn_8024B974(s32 a, s32 b, s32 c);                         // 0x8024B974
-void  fn_8024BB64(s32 a);                                       // 0x8024BB64
-void  fn_8024C140(s32 chan, u8* color);                         // 0x8024C140
-void  fn_8024C2F0(s32 a);                                       // 0x8024C2F0
-void  fn_8024C314(s32 chan, s32 enable, s32 ambSrc, s32 matSrc, s32 lightMask, s32 diffFn, s32 attnFn);  // 0x8024C314
+void  C_MTXOrtho(f32* mtx, f32 a, f32 b, f32 c, f32 d, f32 e, f32 f);  // 0x8024849C
+void  GXSetVtxDesc(s32 a, s32 b);                                // 0x8024A3A4
+void  GXClearVtxDesc(void);                                        // 0x8024A7E4
+void  GXSetVtxAttrFmt(s32 a, s32 b, s32 c, s32 d, s32 e);           // 0x8024A818
+void  GXSetTexCoordGen2(s32 coord, s32 func, s32 src, s32 mtx, s32 normalize, s32 postMtx);  // 0x8024AC4C
+void  GXSetNumTexGens(s32 a);                                       // 0x8024AE74
+void  GXBegin(s32 a, s32 b, s32 c);                         // 0x8024B974
+void  GXSetCullMode(s32 a);                                       // 0x8024BB64
+void  GXSetChanAmbColor(s32 chan, u8* color);                         // 0x8024C140
+void  GXSetNumChans(s32 a);                                       // 0x8024C2F0
+void  GXSetChanCtrl(s32 chan, s32 enable, s32 ambSrc, s32 matSrc, s32 lightMask, s32 diffFn, s32 attnFn);  // 0x8024C314
 void  GXInitTexObj(u8* obj, void* image, s32 w, s32 h, s32 fmt, s32 wrapS, s32 wrapT, s32 mip);  // 0x8024C3B8
 void  GXInitTexObjCI(u8* obj, void* image, s32 w, s32 h, s32 fmt, s32 wrapS, s32 wrapT, s32 mip, s32 extra);  // 0x8024C5C4
 void  GXInitTexObjLOD(u8* obj, s32 a, s32 b, s32 c, s32 d, s32 e, f32 f, f32 g, f32 h);  // 0x8024C60C
@@ -61,16 +61,16 @@ void  fn_8024C998(u8* obj, s32 id);                             // 0x8024C998
 void  fn_8024D508(s32 a, s32 b);                                // 0x8024D508
 void  fn_8024DA08(s32 a, s32 b, s32 c, s32 d);                  // 0x8024DA08
 void  fn_8024DB64(s32 a);                                       // 0x8024DB64
-void  fn_8024DED8(s32 a, s32 b, s32 c, s32 d);                  // 0x8024DED8
-void  fn_8024DF80(s32 a, s32 b, s32 c);                         // 0x8024DF80
-void  fn_8024E1D0(f32* mtx, s32 a);                             // 0x8024E1D0
-void  fn_8024E280(f32* mtx, s32 a);                             // 0x8024E280
-void  fn_8024E328(s32 a);                                       // 0x8024E328
+void  GXSetBlendMode(s32 a, s32 b, s32 c, s32 d);                  // 0x8024DED8
+void  GXSetZMode(s32 a, s32 b, s32 c);                         // 0x8024DF80
+void  GXSetProjection(f32* mtx, s32 a);                             // 0x8024E1D0
+void  GXLoadPosMtxImm(f32* mtx, s32 a);                             // 0x8024E280
+void  GXSetCurrentMtx(s32 a);                                       // 0x8024E328
 void  fn_8024E348(f32* mtx, s32 id, s32 type);                  // 0x8024E348
 s32   fn_8025AC30(u8* voice, s32 a);                            // 0x8025AC30
-void  fn_8025ACF0(u8* voice, s32 a);                            // 0x8025ACF0
+void  AXSetVoiceState(u8* voice, s32 a);                            // 0x8025ACF0
 void  fn_8025AD60(u8* voice, s32 a);                            // 0x8025AD60 (two arguments; r5 is not read)
-s32   fn_8025B0A4(u8* voice, u16* p);                           // 0x8025B0A4
+s32   AXSetVoiceAddr(u8* voice, u16* p);                           // 0x8025B0A4
 s32   fn_8025B19C(u8* voice, u16* p);                           // 0x8025B19C
 s32   fn_8025B234(u8* voice, u16* p);                           // 0x8025B234
 s32   fn_8025B330(u8* voice, u16* p);                           // 0x8025B330
@@ -355,11 +355,11 @@ void fn_80203ABC(u8* arg0, u8* arg1) {
             src[6] = 0;
             fn_8025AD60(voice, 1);
             fn_8025B19C(voice, coef);
-            fn_8025B0A4(voice, addr);
+            AXSetVoiceAddr(voice, addr);
             fn_8025AC30(voice, 1);
             fn_8025B234(voice, src);
             if (*(u32*)(arg1 + 0x9C) == 1U) {
-                fn_8025ACF0(voice, 1);
+                AXSetVoiceState(voice, 1);
             }
         }
         slot += 4;
@@ -385,31 +385,31 @@ void fn_802044C0(u8* tex, u32 color, f32 x0, f32 x1, f32 y0, f32 y1, f32 u0, f32
     u8 texObj[0x20];
     u8 ambient[4];
 
-    fn_8024A7E4();
-    fn_8024A818(4, 9, 0, 4, 0);
-    fn_8024A818(4, 0xB, 0, 1, 0);
-    fn_8024A818(4, 0xD, 1, 4, 0);
-    fn_8024A3A4(9, 1);
-    fn_8024A3A4(0xB, 1);
-    fn_8024A3A4(0xD, 1);
+    GXClearVtxDesc();
+    GXSetVtxAttrFmt(4, 9, 0, 4, 0);
+    GXSetVtxAttrFmt(4, 0xB, 0, 1, 0);
+    GXSetVtxAttrFmt(4, 0xD, 1, 4, 0);
+    GXSetVtxDesc(9, 1);
+    GXSetVtxDesc(0xB, 1);
+    GXSetVtxDesc(0xD, 1);
     ambient[0] = lbl_80600418;
     ambient[1] = lbl_80600419;
     ambient[2] = lbl_8060041A;
     ambient[3] = lbl_8060041B;
-    fn_8024C140(0, ambient);
-    fn_8024C314(0, 1, 0, 1, 1, 2, 1);
-    fn_8024C2F0(1);
-    fn_8024AE74(1);
+    GXSetChanAmbColor(0, ambient);
+    GXSetChanCtrl(0, 1, 0, 1, 1, 2, 1);
+    GXSetNumChans(1);
+    GXSetNumTexGens(1);
     fn_8024DB64(1);
     fn_8024D508(0, 0);
     fn_8024DA08(0, 0, 0, 4);
-    fn_8024DF80(1, 3, 1);
-    fn_8024BB64(0);
-    fn_8024E328(3);
+    GXSetZMode(1, 3, 1);
+    GXSetCullMode(0);
+    GXSetCurrentMtx(3);
     fn_80248050(view);
-    fn_8024E280(view, 3);
-    fn_8024849C(proj, 1.0f, -1.0f, -1.0f, 1.0f, 0.0f, 500.0f);
-    fn_8024E1D0(proj, 1);
+    GXLoadPosMtxImm(view, 3);
+    C_MTXOrtho(proj, 1.0f, -1.0f, -1.0f, 1.0f, 0.0f, 500.0f);
+    GXSetProjection(proj, 1);
     fn_8024C970(tlut, *(void**)(tex + 0x1C), *(u8*)(tex + 0x11), 0x10);
     fn_8024C998(tlut, 0);
     GXInitTexObjCI(texObj, *(void**)(tex + 0x18), *(u16*)(tex + 0x0), *(u16*)(tex + 0x2), *(u8*)(tex + 0x10), 0, 0, 0, 0);
@@ -417,10 +417,10 @@ void fn_802044C0(u8* tex, u32 color, f32 x0, f32 x1, f32 y0, f32 y1, f32 u0, f32
     GXInitTexObjFilter(texObj, 0, 0);
     fn_80248420(scale, 1.0f, 1.0f, 1.0f);
     fn_8024E348(scale, 0x1E, 1);
-    fn_8024AE74(1);
-    fn_8024AC4C(0, 1, 4, 0x1E, 0, 0x7D);
-    fn_8024DED8(1, 4, 5, 0);
-    fn_8024B974(0x80, 4, 4);
+    GXSetNumTexGens(1);
+    GXSetTexCoordGen2(0, 1, 4, 0x1E, 0, 0x7D);
+    GXSetBlendMode(1, 4, 5, 0);
+    GXBegin(0x80, 4, 4);
     u8 c0 = (u8)color;
     u8 c1 = (u8)(color >> 8);
     u8 c2 = (u8)(color >> 16);

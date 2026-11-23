@@ -14,7 +14,7 @@ void    fn_8003DCE0(u8* p);
 void    fn_8004C718(u8* p, s32 idx, void* elem);
 void    fn_8019AA3C(u8* obj, s32 a, s32 b);
 s32     fn_8019BD18(u8* arg0, u32* arg1);
-void    fn_8023A68C(u8* p);
+void    OSUnlockMutex(u8* p);
 void    fn_802E4970(void);
 s32     fn_802E925C(void);
 void    fn_802E9CBC(s32 counter);
@@ -110,7 +110,7 @@ void fn_8019CBEC(u8* arg0) {
 // Resets the global state of the 0x8020 subsystem (counters, timers and the pending flag).
 void fn_8020852C(u8* arg0) {
     lbl_805FBB6C = 0;
-    fn_8023A68C(lbl_80556AB0);
+    OSUnlockMutex(lbl_80556AB0);
     fn_802E4970();
     fn_802E9CBC(fn_802E925C());
     fn_802E4A90();

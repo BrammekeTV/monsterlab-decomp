@@ -16,7 +16,7 @@ u8*  GetGlobalSettings(void);                               // 0x801D2BF8
 void* MemAllocDefault(u32 size);                            // 0x801D4650
 void BufferFree(void* p);                                   // 0x801D4980
 s32  fn_801C0830(u8* zone, u8* box, u8* pos);               // 0x801C0830
-f64  fn_8033ED6C(f64 x);                                    // 0x8033ED6C (floor)
+f64  floor(f64 x);                                    // 0x8033ED6C (floor)
 void fn_8008CE28(u8* vec, f32 v);                           // 0x8008CE28
 void fn_8008D29C(u8* p);                                    // 0x8008D29C
 f32  sinf(f32 x);                                           // 0x8033F0A4 (MSL)
@@ -646,9 +646,9 @@ void fn_8008D7C8(u8* p, f32 dt) {
     }
 
     // grid cell of the position
-    *(f32*)(p + 0x2F8) = (f32)(s32)(f32)fn_8033ED6C((f64)(x / 3.5f));
+    *(f32*)(p + 0x2F8) = (f32)(s32)(f32)floor((f64)(x / 3.5f));
     {
-        f32 cz = (f32)fn_8033ED6C((f64)(z / 3.5f));
+        f32 cz = (f32)floor((f64)(z / 3.5f));
         y = *(f32*)(p + 0x2BC);
         *(f32*)(p + 0x300) = (f32)(s32)cz;
     }

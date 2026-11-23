@@ -57,8 +57,8 @@ void* fn_80209814(void* v);                                      // 0x80209814
 u8*   fn_8020E530(u8* p, s32 a);                                 // 0x8020E530 (a is really an owner pointer)
 u8    fn_8021D310(u8* p);                                        // 0x8021D310
 u8    fn_8021D318(u8* p);                                        // 0x8021D318
-void  fn_8023A5B0(u8* p);                                        // 0x8023A5B0
-void  fn_8023A68C(u8* p);                                        // 0x8023A68C
+void  OSLockMutex(u8* p);                                        // 0x8023A5B0
+void  OSUnlockMutex(u8* p);                                        // 0x8023A68C
 s32   fn_802E99C4(s32 a, void* cb1, s32 b, void* cb2, s32 c, void* cb3, s32 d);  // 0x802E99C4
 
 void* CharacterFind(s32 id);                                     // 0x800E876C
@@ -406,12 +406,12 @@ void LoginPoller(void) {
             GameFlowSignal(0x0A22EBA3, 0, 0);
             return;
         }
-        fn_8023A5B0(lbl_80556AB0);
+        OSLockMutex(lbl_80556AB0);
         lbl_805FBB48 += 1;
         SaveManager_SaveOptions();
         GameFlowSignal((s32)0xB90F7B7Du, 0, 0);
         fn_802E99C4(0, (void*)fn_8013A6F4, 0, (void*)fn_8013A0A4, 0, (void*)fn_8013A654, 0);
-        fn_8023A68C(lbl_80556AB0);
+        OSUnlockMutex(lbl_80556AB0);
         lbl_805FBB48 -= 1;
     }
 }

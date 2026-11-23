@@ -155,3 +155,518 @@ fn_8024D61C GXSetTevColorOp
 fn_8024D674 GXSetTevAlphaOp
 fn_8024D6CC GXSetTevColor
 fn_8024D72C GXSetTevColorS10
+
+# --- signature matches (tools/sig_match.py, source: doldecomp/ogws compiled with MWCC GC/3.0a5.2) ---
+# sigmatch AI (3)
+fn_80257964 __AIDHandler  # revolution/AI/ai.o
+fn_80257A0C __AICallbackStackSwitch  # revolution/AI/ai.o (static)
+fn_80257A70 __AI_SRC_INIT  # revolution/AI/ai.o (static)
+# sigmatch ARC (8)
+fn_8026B44C ARCInitHandle  # revolution/ARC/arc.o
+fn_8026B4EC ARCOpen  # revolution/ARC/arc.o
+fn_8026B790 ARCFastOpen  # revolution/ARC/arc.o
+fn_8026B7E0 ARCConvertPathToEntrynum  # revolution/ARC/arc.o
+fn_8026BC0C ARCGetStartAddrInMem  # revolution/ARC/arc.o
+fn_8026BC30 ARCChangeDir  # revolution/ARC/arc.o
+fn_8026BC88 ARCOpenDir  # revolution/ARC/arc.o
+fn_8026BD04 ARCReadDir  # revolution/ARC/arc.o
+# sigmatch AX (33)
+fn_80257CD8 __AXGetStackHead  # revolution/AX/AXAlloc.o
+fn_80257CEC __AXServiceCallbackStack  # revolution/AX/AXAlloc.o
+fn_80257EF8 __AXPushFreeStack  # revolution/AX/AXAlloc.o
+fn_80257F14 __AXPushCallbackStack  # revolution/AX/AXAlloc.o
+fn_80257F24 __AXRemoveFromStack  # revolution/AX/AXAlloc.o
+fn_802581A4 AXSetVoicePriority  # revolution/AX/AXAlloc.o
+fn_80258240 __AXAuxInit  # revolution/AX/AXAux.o
+fn_80258508 __AXGetAuxCInput  # revolution/AX/AXAux.o
+fn_8025853C __AXGetAuxCOutput  # revolution/AX/AXAux.o
+fn_80258558 __AXProcessAux  # revolution/AX/AXAux.o
+fn_802589E8 __AXGetCommandListAddress  # revolution/AX/AXCL.o
+fn_80258A18 __AXNextFrame  # revolution/AX/AXCL.o
+fn_802593D8 __AXClInit  # revolution/AX/AXCL.o
+fn_80259458 __AXOutNewFrame  # revolution/AX/AXOut.o
+fn_80259774 __AXDSPResumeCallback  # revolution/AX/AXOut.o (static)
+fn_802597C8 __AXDSPDoneCallback  # revolution/AX/AXOut.o (static)
+fn_802597DC __AXOutInitDSP  # revolution/AX/AXOut.o
+fn_802598CC __AXOutInit  # revolution/AX/AXOut.o
+fn_80259B70 AXRmtGetSamples  # revolution/AX/AXOut.o
+fn_80259C34 AXRmtAdvancePtr  # revolution/AX/AXOut.o
+fn_80259C98 __AXDepopFadeMain  # revolution/AX/AXSPB.o
+fn_80259D04 __AXDepopFadeRmt  # revolution/AX/AXSPB.o
+fn_80259D70 __AXPrintStudio  # revolution/AX/AXSPB.o
+fn_80259EE8 __AXSPBInit  # revolution/AX/AXSPB.o
+fn_80259F44 __AXDepopVoice  # revolution/AX/AXSPB.o
+fn_8025A0B8 __AXServiceVPB  # revolution/AX/AXVPB.o
+fn_8025A608 __AXSyncPBs  # revolution/AX/AXVPB.o
+fn_8025A920 __AXSetPBDefault  # revolution/AX/AXVPB.o
+fn_8025A960 __AXVPBInit  # revolution/AX/AXVPB.o
+fn_8025A990 __AXVPBInitCommon  # revolution/AX/AXVPB.o (static)
+fn_8025ACF0 AXSetVoiceState  # revolution/AX/AXVPB.o
+fn_8025B0A4 AXSetVoiceAddr  # revolution/AX/AXVPB.o
+fn_8025B3F4 __AXGetCurrentProfile  # revolution/AX/AXProf.o
+# sigmatch AXFX (1)
+fn_8025F920 __AXFXGetSrcCoef  # revolution/AXFX/AXFXSrcCoef.o
+# sigmatch BTE (80)
+fn_802867B4 gki_init_free_queue  # revolution/BTE/gki/common/gki_buffer.o (static)
+fn_802869D4 gki_buffer_init  # revolution/BTE/gki/common/gki_buffer.o
+fn_80286C80 GKI_init_q  # revolution/BTE/gki/common/gki_buffer.o
+fn_80286C94 GKI_getbuf  # revolution/BTE/gki/common/gki_buffer.o
+fn_80286E34 GKI_getpoolbuf  # revolution/BTE/gki/common/gki_buffer.o
+fn_80286F1C GKI_freebuf  # revolution/BTE/gki/common/gki_buffer.o
+fn_8028708C GKI_get_buf_size  # revolution/BTE/gki/common/gki_buffer.o
+fn_802870D0 GKI_send_msg  # revolution/BTE/gki/common/gki_buffer.o
+fn_8028728C GKI_read_mbox  # revolution/BTE/gki/common/gki_buffer.o
+fn_8028733C GKI_enqueue  # revolution/BTE/gki/common/gki_buffer.o
+fn_80287478 GKI_enqueue_head  # revolution/BTE/gki/common/gki_buffer.o
+fn_802875B8 GKI_dequeue  # revolution/BTE/gki/common/gki_buffer.o
+fn_80287658 GKI_remove_from_queue  # revolution/BTE/gki/common/gki_buffer.o
+fn_80287724 GKI_getnext  # revolution/BTE/gki/common/gki_buffer.o
+fn_80287740 GKI_queue_is_empty  # revolution/BTE/gki/common/gki_buffer.o
+fn_80287750 GKI_create_pool  # revolution/BTE/gki/common/gki_buffer.o
+fn_80287A98 GKI_delete_pool  # revolution/BTE/gki/common/gki_buffer.o
+fn_80287BF8 gki_timers_init  # revolution/BTE/gki/common/gki_time.o
+fn_80287CB4 GKI_get_tick_count  # revolution/BTE/gki/common/gki_time.o
+fn_80287CC8 GKI_start_timer  # revolution/BTE/gki/common/gki_time.o
+fn_80287E18 GKI_stop_timer  # revolution/BTE/gki/common/gki_time.o
+fn_80287EB4 GKI_update_timer_list  # revolution/BTE/gki/common/gki_time.o
+fn_80287F40 GKI_add_to_timer_list  # revolution/BTE/gki/common/gki_time.o
+fn_8028802C GKI_remove_from_timer_list  # revolution/BTE/gki/common/gki_time.o
+fn_80288150 GKI_init  # revolution/BTE/rvl/gki_ppc.o
+fn_802881E0 GKI_shutdown  # revolution/BTE/rvl/gki_ppc.o
+fn_80288298 GKI_send_event  # revolution/BTE/rvl/gki_ppc.o
+fn_80288344 GKI_enable  # revolution/BTE/rvl/gki_ppc.o
+fn_80288368 GKI_disable  # revolution/BTE/rvl/gki_ppc.o
+fn_802883B0 GKI_os_malloc  # revolution/BTE/rvl/gki_ppc.o
+fn_80289758 LogMsg  # revolution/BTE/main/bte_logmsg.o
+fn_80289E64 bdcpy  # revolution/BTE/bta/sys/bd.o
+fn_80289E98 bdcmp  # revolution/BTE/bta/sys/bd.o
+fn_80289F38 bta_sys_rm_register  # revolution/BTE/bta/sys/bta_sys_conn.o
+fn_80289F48 bta_sys_compress_register  # revolution/BTE/bta/sys/bta_sys_conn.o
+fn_80289F58 bta_sys_pm_register  # revolution/BTE/bta/sys/bta_sys_conn.o
+fn_80289F68 bta_sys_conn_open  # revolution/BTE/bta/sys/bta_sys_conn.o
+fn_8028A02C bta_sys_conn_close  # revolution/BTE/bta/sys/bta_sys_conn.o
+fn_8028A0F0 bta_sys_sco_close  # revolution/BTE/bta/sys/bta_sys_conn.o
+fn_8028A124 bta_sys_idle  # revolution/BTE/bta/sys/bta_sys_conn.o
+fn_8028A158 bta_sys_busy  # revolution/BTE/bta/sys/bta_sys_conn.o
+fn_8028A18C bta_sys_init  # revolution/BTE/bta/sys/bta_sys_main.o
+fn_8028A1F0 bta_sys_event  # revolution/BTE/bta/sys/bta_sys_main.o
+fn_8028A2DC bta_sys_timer_update  # revolution/BTE/bta/sys/bta_sys_main.o
+fn_8028A2FC bta_sys_register  # revolution/BTE/bta/sys/bta_sys_main.o
+fn_8028A310 bta_sys_sendmsg  # revolution/BTE/bta/sys/bta_sys_main.o
+fn_8028A32C bta_sys_start_timer  # revolution/BTE/bta/sys/bta_sys_main.o
+fn_8028A34C bta_sys_stop_timer  # revolution/BTE/bta/sys/bta_sys_main.o
+fn_8028A360 bta_sys_disable  # revolution/BTE/bta/sys/bta_sys_main.o
+fn_8028A3D0 ptim_init  # revolution/BTE/bta/sys/ptim.o
+fn_8028A41C ptim_timer_update  # revolution/BTE/bta/sys/ptim.o
+fn_8028A4D0 ptim_start_timer  # revolution/BTE/bta/sys/ptim.o
+fn_8028A570 ptim_stop_timer  # revolution/BTE/bta/sys/ptim.o
+fn_8028A5B0 utl_freebuf  # revolution/BTE/bta/sys/utl.o
+fn_8029A14C BTM_ReadTrustedMask  # revolution/BTE/stack/btm/btm_sec.o
+fn_802A2108 hidh_conn_dereg  # revolution/BTE/stack/hid/hidh_conn.o
+fn_802A2CE0 L2CA_SetTraceLevel  # revolution/BTE/stack/l2cap/l2c_api.o
+fn_802A2D00 l2c_csm_execute  # revolution/BTE/stack/l2cap/l2c_csm.o
+fn_802A7AF0 l2cu_release_rcb  # revolution/BTE/stack/l2cap/l2c_utils.o
+fn_802AA5B4 rfc_mx_sm_execute  # revolution/BTE/stack/rfcomm/rfc_mx_fsm.o
+fn_802ABFA0 rfc_process_msc  # revolution/BTE/stack/rfcomm/rfc_port_fsm.o
+fn_802AC10C rfc_process_rls  # revolution/BTE/stack/rfcomm/rfc_port_fsm.o
+fn_802AC2F4 rfc_set_port_state  # revolution/BTE/stack/rfcomm/rfc_port_fsm.o (static)
+fn_802AC398 RFCOMM_StartRsp  # revolution/BTE/stack/rfcomm/rfc_port_if.o
+fn_802AC3C4 RFCOMM_DlcEstablishReq  # revolution/BTE/stack/rfcomm/rfc_port_if.o
+fn_802AC42C RFCOMM_DlcEstablishRsp  # revolution/BTE/stack/rfcomm/rfc_port_if.o
+fn_802AC57C RFCOMM_ParNegRsp  # revolution/BTE/stack/rfcomm/rfc_port_if.o
+fn_802AC660 RFCOMM_PortNegRsp  # revolution/BTE/stack/rfcomm/rfc_port_if.o
+fn_802AC860 RFCOMM_DlcReleaseReq  # revolution/BTE/stack/rfcomm/rfc_port_if.o
+fn_802AC88C RFCOMM_DataReq  # revolution/BTE/stack/rfcomm/rfc_port_if.o
+fn_802ACB98 rfc_send_buf_uih  # revolution/BTE/stack/rfcomm/rfc_ts_frames.o
+fn_802ADF0C rfc_calc_fcs  # revolution/BTE/stack/rfcomm/rfc_utils.o
+fn_802ADF44 rfc_check_fcs  # revolution/BTE/stack/rfcomm/rfc_utils.o
+fn_802AE3D8 rfcomm_process_timeout  # revolution/BTE/stack/rfcomm/rfc_utils.o
+fn_802AE414 rfc_sec_check_complete  # revolution/BTE/stack/rfcomm/rfc_utils.o
+fn_802AE688 rfc_check_send_cmd  # revolution/BTE/stack/rfcomm/rfc_utils.o
+fn_802AF690 find_uuid_in_seq  # revolution/BTE/stack/sdp/sdp_db.o (static)
+fn_802AF7C4 sdp_db_find_attr_in_rec  # revolution/BTE/stack/sdp/sdp_db.o
+fn_802B0220 sdpu_build_uuid_seq  # revolution/BTE/stack/sdp/sdp_discovery.o (static)
+fn_803268D4 BTM_WriteEIR  # revolution/BTE/stack/btm/btm_inq.o
+# sigmatch DB (1)
+fn_802435F4 __DBExceptionDestinationAux  # revolution/DB/db.o
+# sigmatch DSP (7)
+fn_802650A0 DSPAddTask  # revolution/DSP/dsp.o
+fn_80265150 DSPAssertTask  # revolution/DSP/dsp.o
+fn_8026525C __DSPHandler  # revolution/DSP/dsp_task.o
+fn_80265690 __DSP_exec_task  # revolution/DSP/dsp_task.o
+fn_80265834 __DSP_boot_task  # revolution/DSP/dsp_task.o
+fn_802659C0 __DSP_insert_task  # revolution/DSP/dsp_task.o
+fn_80265A5C __DSP_remove_task  # revolution/DSP/dsp_task.o
+# sigmatch DVD (36)
+fn_8024F760 StampCommand  # revolution/DVD/dvd.o
+fn_8024FAE4 cbForStateReadingFST  # revolution/DVD/dvd.o (static)
+fn_8024FC6C cbForStateError  # revolution/DVD/dvd.o (static)
+fn_8024FD7C cbForStoreErrorCode1  # revolution/DVD/dvd.o (static)
+fn_8024FD90 cbForStoreErrorCode2  # revolution/DVD/dvd.o (static)
+fn_8024FDCC CategorizeError  # revolution/DVD/dvd.o (static)
+fn_8024FEC0 cbForStoreErrorCode3  # revolution/DVD/dvd.o (static)
+fn_8024FF84 cbForStateGettingError  # revolution/DVD/dvd.o (static)
+fn_80250488 cbForUnrecoveredError  # revolution/DVD/dvd.o (static)
+fn_80250668 cbForUnrecoveredErrorRetry  # revolution/DVD/dvd.o (static)
+fn_80250CB4 cbForStateReadingTOC  # revolution/DVD/dvd.o (static)
+fn_802512CC cbForStateOpenPartition  # revolution/DVD/dvd.o (static)
+fn_80251454 cbForStateOpenPartition2  # revolution/DVD/dvd.o (static)
+fn_802515B8 cbForStateCheckID1  # revolution/DVD/dvd.o (static)
+fn_80251C28 cbForStateReset  # revolution/DVD/dvd.o (static)
+fn_80251D0C stateDownRotation  # revolution/DVD/dvd.o (static)
+fn_8025218C cbForStateCoverClosed  # revolution/DVD/dvd.o (static)
+fn_80252264 cbForPrepareCoverRegister  # revolution/DVD/dvd.o (static)
+fn_802523EC CoverAlarmHandler  # revolution/DVD/dvd.o (static)
+fn_80252410 stateReady  # revolution/DVD/dvd.o (static)
+fn_802536C8 DVDReadAbsAsyncPrio  # revolution/DVD/dvd.o
+fn_802539F8 DVDResume  # revolution/DVD/dvd.o
+fn_80253FAC __DVDPrepareResetAsync  # revolution/DVD/dvd.o
+fn_80254208 __DVDTestAlarm  # revolution/DVD/dvd.o
+fn_8025426C __DVDPushWaitingQueue  # revolution/DVD/dvdqueue.o
+fn_802542D4 __DVDPopWaitingQueue  # revolution/DVD/dvdqueue.o
+fn_80254374 __DVDCheckWaitingQueue  # revolution/DVD/dvdqueue.o
+fn_802543CC __DVDGetNextWaitingQueue  # revolution/DVD/dvdqueue.o
+fn_8025442C __DVDDequeueWaitingQueue  # revolution/DVD/dvdqueue.o
+fn_8025448C cbForNandClose  # revolution/DVD/dvderror.o (static)
+fn_802544B8 cbForNandWrite  # revolution/DVD/dvderror.o (static)
+fn_80254C04 cbForNandCreateDir  # revolution/DVD/dvderror.o (static)
+fn_80254D90 DVDCompareDiskID  # revolution/DVD/dvdidutils.o
+fn_80255270 doTransactionCallback  # revolution/DVD/dvd_broadway.o (static)
+fn_80255328 doPrepareCoverRegisterCallback  # revolution/DVD/dvd_broadway.o (static)
+fn_80257248 DVDLowGetCoverRegister  # revolution/DVD/dvd_broadway.o
+# sigmatch EUART (3)
+fn_80280318 EUARTInit  # revolution/EUART/euart.o
+fn_80280414 InitializeUART  # revolution/EUART/euart.o
+fn_8028045C WriteUARTN  # revolution/EUART/euart.o
+# sigmatch EXI (3)
+fn_80240AFC EXIImmEx  # revolution/EXI/EXIBios.o
+fn_80242024 ProbeBarnacle  # revolution/EXI/EXIUart.o (static)
+fn_80242358 EXIWriteReg  # revolution/EXI/EXICommon.o
+# sigmatch FS (16)
+fn_8026E0A8 ISFS_CreateDir  # revolution/FS/fs.o
+fn_8026E19C ISFS_CreateDirAsync  # revolution/FS/fs.o
+fn_8026E290 ISFS_ReadDir  # revolution/FS/fs.o
+fn_8026E3E4 ISFS_ReadDirAsync  # revolution/FS/fs.o
+fn_8026E52C ISFS_GetAttr  # revolution/FS/fs.o
+fn_8026E684 ISFS_GetAttrAsync  # revolution/FS/fs.o
+fn_8026E7B8 ISFS_Delete  # revolution/FS/fs.o
+fn_8026E890 ISFS_DeleteAsync  # revolution/FS/fs.o
+fn_8026E960 ISFS_Rename  # revolution/FS/fs.o
+fn_8026EA64 ISFS_RenameAsync  # revolution/FS/fs.o
+fn_8026EB68 ISFS_GetUsage  # revolution/FS/fs.o
+fn_8026ECA0 ISFS_CreateFile  # revolution/FS/fs.o
+fn_8026ED94 ISFS_CreateFileAsync  # revolution/FS/fs.o
+fn_8026F0D8 ISFS_SeekAsync  # revolution/FS/fs.o
+fn_8026F2F0 ISFS_CloseAsync  # revolution/FS/fs.o
+fn_8026F374 ISFS_ShutdownAsync  # revolution/FS/fs.o
+# sigmatch GX (53)
+fn_8024A3A4 GXSetVtxDesc  # revolution/GX/GXAttr.o
+fn_8024A608 __GXSetVCD  # revolution/GX/GXAttr.o
+fn_8024A6B8 __GXCalculateVLim  # revolution/GX/GXAttr.o
+fn_8024A7E4 GXClearVtxDesc  # revolution/GX/GXAttr.o
+fn_8024A818 GXSetVtxAttrFmt  # revolution/GX/GXAttr.o
+fn_8024A9B8 GXSetVtxAttrFmtv  # revolution/GX/GXAttr.o
+fn_8024AB7C __GXSetVAT  # revolution/GX/GXAttr.o
+fn_8024ABFC GXSetArray  # revolution/GX/GXAttr.o
+fn_8024AC3C GXInvalidateVtxCache  # revolution/GX/GXAttr.o
+fn_8024AC4C GXSetTexCoordGen2  # revolution/GX/GXAttr.o
+fn_8024AE74 GXSetNumTexGens  # revolution/GX/GXAttr.o
+fn_8024B974 GXBegin  # revolution/GX/GXGeometry.o
+fn_8024BAC0 GXSetLineWidth  # revolution/GX/GXGeometry.o
+fn_8024BAF4 GXSetPointSize  # revolution/GX/GXGeometry.o
+fn_8024BB28 GXEnableTexOffsets  # revolution/GX/GXGeometry.o
+fn_8024BB64 GXSetCullMode  # revolution/GX/GXGeometry.o
+fn_8024BB8C GXSetCoPlanar  # revolution/GX/GXGeometry.o
+fn_8024BBC0 __GXSetGenMode  # revolution/GX/GXGeometry.o
+fn_8024C140 GXSetChanAmbColor  # revolution/GX/GXLight.o
+fn_8024C218 GXSetChanMatColor  # revolution/GX/GXLight.o
+fn_8024C2F0 GXSetNumChans  # revolution/GX/GXLight.o
+fn_8024C314 GXSetChanCtrl  # revolution/GX/GXLight.o
+fn_8024D0BC GXSetTevIndirect  # revolution/GX/GXBump.o
+fn_8024D124 GXSetIndTexMtx  # revolution/GX/GXBump.o
+fn_8024D278 GXSetIndTexCoordScale  # revolution/GX/GXBump.o
+fn_8024D37C GXSetIndTexOrder  # revolution/GX/GXBump.o
+fn_8024D448 GXSetNumIndStages  # revolution/GX/GXBump.o
+fn_8024D468 GXSetTevDirect  # revolution/GX/GXBump.o
+fn_8024DB88 GXSetFog  # revolution/GX/GXPixel.o
+fn_8024DDB4 GXSetFogRangeAdj  # revolution/GX/GXPixel.o
+fn_8024DED8 GXSetBlendMode  # revolution/GX/GXPixel.o
+fn_8024DF28 GXSetColorUpdate  # revolution/GX/GXPixel.o
+fn_8024DF54 GXSetAlphaUpdate  # revolution/GX/GXPixel.o
+fn_8024DF80 GXSetZMode  # revolution/GX/GXPixel.o
+fn_8024DFB4 GXSetZCompLoc  # revolution/GX/GXPixel.o
+fn_8024DFE4 GXSetPixelFmt  # revolution/GX/GXPixel.o
+fn_8024E08C GXSetDither  # revolution/GX/GXPixel.o
+fn_8024E0B8 GXSetDstAlpha  # revolution/GX/GXPixel.o
+fn_8024E0E8 GXSetFieldMask  # revolution/GX/GXPixel.o
+fn_8024E11C GXSetFieldMode  # revolution/GX/GXPixel.o
+fn_8024E18C __GXSetProjection  # revolution/GX/GXTransform.o
+fn_8024E1D0 GXSetProjection  # revolution/GX/GXTransform.o
+fn_8024E234 GXSetProjectionv  # revolution/GX/GXTransform.o
+fn_8024E280 GXLoadPosMtxImm  # revolution/GX/GXTransform.o
+fn_8024E2D0 GXLoadNrmMtxImm  # revolution/GX/GXTransform.o
+fn_8024E328 GXSetCurrentMtx  # revolution/GX/GXTransform.o
+fn_8024E348 GXLoadTexMtxImm  # revolution/GX/GXTransform.o
+fn_8024E3FC __GXSetViewport  # revolution/GX/GXTransform.o
+fn_8024E48C GXSetViewport  # revolution/GX/GXTransform.o
+fn_8024E4B8 GXSetScissor  # revolution/GX/GXTransform.o
+fn_8024E520 GXSetScissorBoxOffset  # revolution/GX/GXTransform.o
+fn_8024E55C GXSetClipMode  # revolution/GX/GXTransform.o
+fn_8024E584 __GXSetMatrixIndex  # revolution/GX/GXTransform.o
+# sigmatch IPC (14)
+fn_8026BEBC IpcReplyHandler  # revolution/IPC/ipcclt.o (static)
+fn_8026C860 IOS_CloseAsync  # revolution/IPC/ipcclt.o
+fn_8026C920 IOS_Close  # revolution/IPC/ipcclt.o
+fn_8026C9C8 IOS_ReadAsync  # revolution/IPC/ipcclt.o
+fn_8026CAC8 IOS_Read  # revolution/IPC/ipcclt.o
+fn_8026CBD0 IOS_WriteAsync  # revolution/IPC/ipcclt.o
+fn_8026CCD0 IOS_Write  # revolution/IPC/ipcclt.o
+fn_8026CDD8 IOS_SeekAsync  # revolution/IPC/ipcclt.o
+fn_8026CFF0 IOS_Ioctl  # revolution/IPC/ipcclt.o
+fn_8026D120 __ios_Ioctlv  # revolution/IPC/ipcclt.o (static)
+fn_8026D25C IOS_IoctlvAsync  # revolution/IPC/ipcclt.o
+fn_8026D848 __iosAlloc  # revolution/IPC/memory.o
+fn_8026DD74 IPCiProfAck  # revolution/IPC/ipcProfile.o
+fn_8026DD84 IPCiProfReply  # revolution/IPC/ipcProfile.o
+# sigmatch MEM (5)
+fn_8025F96C FindContainHeap_  # revolution/MEM/mem_heapCommon.o (static)
+fn_8025FAAC MEMiInitHeapHead  # revolution/MEM/mem_heapCommon.o
+fn_8025FC6C MEMiFinalizeHeap  # revolution/MEM/mem_heapCommon.o
+fn_802603C8 MEMAllocFromExpHeapEx  # revolution/MEM/mem_expHeap.o
+fn_802605C8 MEMAllocFromFrmHeapEx  # revolution/MEM/mem_frameHeap.o
+# sigmatch MSL (12)
+fn_8033B314 __ieee754_acos  # MSL/e_acos.o
+fn_8033B870 __ieee754_atan2  # MSL/e_atan2.o
+fn_8033BAE0 __ieee754_fmod  # MSL/e_fmod.o
+fn_8033CDB8 __kernel_cos  # MSL/k_cos.o
+fn_8033CEC8 __kernel_rem_pio2  # MSL/k_rem_pio2.o
+fn_8033E5D4 __kernel_sin  # MSL/k_sin.o
+fn_8033EC6C copysign  # MSL/s_copysign.o
+fn_8033ED6C floor  # MSL/s_floor.o
+fn_8033EEB0 frexp  # MSL/s_frexp.o
+fn_8033EF38 ldexp  # MSL/s_ldexp.o
+fn_8033F17C tan  # MSL/s_tan.o
+fn_8033F210 __ieee754_sqrt  # MSL/e_sqrt.o
+# sigmatch MTX (2)
+fn_80248448 PSMTXMultVec  # revolution/MTX/mtxvec.o
+fn_8024849C C_MTXOrtho  # revolution/MTX/mtx44.o
+# sigmatch MetroTRK (1)
+fn_8033F904 TRKMessageSend  # MetroTRK/debugger/Portable/msg.o
+# sigmatch NAND (28)
+fn_80265AF0 nandCreate  # revolution/NAND/nand.o (static)
+fn_80265D78 NANDDelete  # revolution/NAND/nand.o
+fn_80265E28 NANDPrivateDelete  # revolution/NAND/nand.o
+fn_80265EC0 NANDPrivateDeleteAsync  # revolution/NAND/nand.o
+fn_80266140 NANDSeekAsync  # revolution/NAND/nand.o
+fn_802661F0 nandCreateDir  # revolution/NAND/nand.o (static)
+fn_80266408 nandMove  # revolution/NAND/nand.o (static)
+fn_80266614 NANDGetLength  # revolution/NAND/nand.o
+fn_8026669C nandComposePerm  # revolution/NAND/nand.o (static)
+fn_802666F0 nandSplitPerm  # revolution/NAND/nand.o (static)
+fn_8026677C nandGetStatus  # revolution/NAND/nand.o (static)
+fn_802668D0 nandGetStatusCallback  # revolution/NAND/nand.o (static)
+fn_80266A0C NANDPrivateGetStatusAsync  # revolution/NAND/nand.o
+fn_80266BA4 NANDOpen  # revolution/NAND/NANDOpenClose.o
+fn_80266C30 NANDPrivateOpen  # revolution/NAND/NANDOpenClose.o
+fn_80266CBC NANDOpenAsync  # revolution/NAND/NANDOpenClose.o
+fn_80266E24 NANDClose  # revolution/NAND/NANDOpenClose.o
+fn_80266E90 NANDCloseAsync  # revolution/NAND/NANDOpenClose.o
+fn_80266F18 nandCloseCallback  # revolution/NAND/NANDOpenClose.o (static)
+fn_80266F74 nandRemoveTailToken  # revolution/NAND/NANDCore.o
+fn_80267048 nandGetHeadToken  # revolution/NAND/NANDCore.o
+fn_8026711C nandGetRelativeName  # revolution/NAND/NANDCore.o
+fn_80267324 nandIsUnderPrivatePath  # revolution/NAND/NANDCore.o
+fn_802676E8 nandOnShutdown  # revolution/NAND/NANDCore.o (static)
+fn_80267B14 NANDGetHomeDir  # revolution/NAND/NANDCore.o
+fn_80267BA4 nandGetType  # revolution/NAND/NANDCore.o (static)
+fn_80267F44 NANDInitBanner  # revolution/NAND/NANDCore.o
+fn_802680D8 nandCalcUsage  # revolution/NAND/NANDCheck.o (static)
+# sigmatch NWC24 (13)
+fn_80322658 NWC24iRegister  # revolution/NWC24/NWC24Manage.o
+fn_80322690 NWC24IsMsgLibOpened  # revolution/NWC24/NWC24Manage.o
+fn_803226B8 NWC24IsMsgLibOpenBlocking  # revolution/NWC24/NWC24Manage.o
+fn_803226CC NWC24BlockOpenMsgLib  # revolution/NWC24/NWC24Manage.o
+fn_8032283C NWC24ResumeScheduler  # revolution/NWC24/NWC24Schedule.o
+fn_80322CC8 ExecSuspendScheduler  # revolution/NWC24/NWC24Schedule.o (static)
+fn_80322CD8 ExecResumeScheduler  # revolution/NWC24/NWC24Schedule.o (static)
+fn_80322CE8 ExecNoParamCommand  # revolution/NWC24/NWC24Schedule.o (static)
+fn_80323340 NWC24iOpenResourceManager  # revolution/NWC24/NWC24Ipc.o
+fn_803233B8 NWC24iCloseResourceManager  # revolution/NWC24/NWC24Ipc.o
+fn_803233EC NWC24iIoctlResourceManager  # revolution/NWC24/NWC24Ipc.o
+fn_80323434 NWC24iIoctlResourceManagerAsync  # revolution/NWC24/NWC24Ipc.o
+fn_80323498 CallbackAsyncIpc  # revolution/NWC24/NWC24Ipc.o (static)
+# sigmatch OS (68)
+fn_80233FA8 __OSGetDIConfig  # revolution/OS/OS.o
+fn_8023404C OSGetAppType  # revolution/OS/OS.o
+fn_80234394 OSSetPeriodicAlarm  # revolution/OS/OSAlarm.o
+fn_80234850 DLInsert  # revolution/OS/OSAlloc.o (static)
+fn_802348FC OSAllocFromHeap  # revolution/OS/OSAlloc.o
+fn_802349F4 OSFreeToHeap  # revolution/OS/OSAlloc.o
+fn_80234BB8 OSAllocFromMEM1ArenaLo  # revolution/OS/OSArena.o
+fn_80235754 OSSaveContext  # revolution/OS/OSContext.o
+fn_802358B4 OSSwitchFiber  # revolution/OS/OSContext.o
+fn_802358E4 OSSwitchFiberEx  # revolution/OS/OSContext.o
+fn_80235938 OSInitContext  # revolution/OS/OSContext.o
+fn_80237AC4 ScreenReport  # revolution/OS/OSFatal.o (static)
+fn_80237DE8 ConfigureVideo  # revolution/OS/OSFatal.o (static)
+fn_802380FC Halt  # revolution/OS/OSFatal.o (static)
+fn_802386FC GetFontCode  # revolution/OS/OSFont.o (static)
+fn_80238830 Decode  # revolution/OS/OSFont.o (static)
+fn_80238A54 ReadFont  # revolution/OS/OSFont.o (static)
+fn_80238D54 OSLoadFont  # revolution/OS/OSFont.o
+fn_80238E7C ParseStringS  # revolution/OS/OSFont.o (static)
+fn_80238F78 ParseStringW  # revolution/OS/OSFont.o (static)
+fn_80239134 OSGetFontTexel  # revolution/OS/OSFont.o
+fn_80239424 __OSGetInterruptHandler  # revolution/OS/OSInterrupt.o
+fn_80239854 __OSDispatchInterrupt  # revolution/OS/OSInterrupt.o
+fn_80239B60 OSInitMessageQueue  # revolution/OS/OSMessage.o
+fn_80239BC0 OSSendMessage  # revolution/OS/OSMessage.o
+fn_80239C88 OSReceiveMessage  # revolution/OS/OSMessage.o
+fn_80239E18 ConfigMEM1_24MB  # revolution/OS/OSMemory.o (static)
+fn_80239E98 ConfigMEM1_48MB  # revolution/OS/OSMemory.o (static)
+fn_80239F18 ConfigMEM2_52MB  # revolution/OS/OSMemory.o (static)
+fn_80239FF8 ConfigMEM2_56MB  # revolution/OS/OSMemory.o (static)
+fn_8023A0D8 ConfigMEM2_64MB  # revolution/OS/OSMemory.o (static)
+fn_8023A184 ConfigMEM2_112MB  # revolution/OS/OSMemory.o (static)
+fn_8023A264 ConfigMEM2_128MB  # revolution/OS/OSMemory.o (static)
+fn_8023A310 ConfigMEM_ES1_0  # revolution/OS/OSMemory.o (static)
+fn_8023A360 RealMode  # revolution/OS/OSMemory.o (static)
+fn_8023A578 OSInitMutex  # revolution/OS/OSMutex.o
+fn_8023A5B0 OSLockMutex  # revolution/OS/OSMutex.o
+fn_8023A68C OSUnlockMutex  # revolution/OS/OSMutex.o
+fn_8023A754 __OSUnlockAllMutex  # revolution/OS/OSMutex.o
+fn_8023A7C0 OSTryLockMutex  # revolution/OS/OSMutex.o
+fn_8023AA68 __OSCallShutdownFunctions  # revolution/OS/OSReset.o
+fn_8023B288 WriteSramCallback  # revolution/OS/OSRtc.o (static)
+fn_8023B8B0 __OSReadROM  # revolution/OS/OSRtc.o
+fn_8023B9D4 OSGetWirelessID  # revolution/OS/OSRtc.o
+fn_8023BA4C OSSetWirelessID  # revolution/OS/OSRtc.o
+fn_8023BE44 SystemCallVector  # revolution/OS/OSSync.o (static)
+fn_8023C168 OSIsThreadTerminated  # revolution/OS/OSThread.o
+fn_8023C20C UnsetRun  # revolution/OS/OSThread.o (static)
+fn_8023C274 __OSGetEffectivePriority  # revolution/OS/OSThread.o
+fn_8023C2B0 SetEffectivePriority  # revolution/OS/OSThread.o (static)
+fn_8023C464 __OSPromoteThread  # revolution/OS/OSThread.o
+fn_8023C6F4 OSYieldThread  # revolution/OS/OSThread.o
+fn_8023C99C OSExitThread  # revolution/OS/OSThread.o
+fn_8023CC58 OSJoinThread  # revolution/OS/OSThread.o
+fn_8023D030 OSSuspendThread  # revolution/OS/OSThread.o
+fn_8023D2B0 OSWakeupThread  # revolution/OS/OSThread.o
+fn_8023D3C8 OSSleepTicks  # revolution/OS/OSThread.o
+fn_8023D500 __OSTimeToSystemTime  # revolution/OS/OSTime.o
+fn_8023D558 GetDates  # revolution/OS/OSTime.o (static)
+fn_8023D6C8 OSTicksToCalendarTime  # revolution/OS/OSTime.o
+fn_8023D890 OSCalendarTimeToTicks  # revolution/OS/OSTime.o
+fn_8023DB30 OSUTF8to32  # revolution/OS/OSUtf.o
+fn_8023DC40 OSUTF16to32  # revolution/OS/OSUtf.o
+fn_8023DCB0 OSUTF32toANSI  # revolution/OS/OSUtf.o
+fn_8023DD28 OSUTF32toSJIS  # revolution/OS/OSUtf.o
+fn_8023E168 __OSSetVIForceDimming  # revolution/OS/OSStateTM.o
+fn_8023E260 __OSSetIdleLEDMode  # revolution/OS/OSStateTM.o
+fn_8023E318 __OSVIDimReplyHandler  # revolution/OS/OSStateTM.o (static)
+# sigmatch SC (16)
+fn_80269914 UnpackItem  # revolution/SC/scsystem.o (static)
+fn_80269AAC DeleteItemByID  # revolution/SC/scsystem.o (static)
+fn_80269C3C CreateItemByID  # revolution/SC/scsystem.o (static)
+fn_80269EB4 SCFindByteArrayItem  # revolution/SC/scsystem.o
+fn_80269F94 SCReplaceByteArrayItem  # revolution/SC/scsystem.o
+fn_8026A0B8 SCReplaceIntegerItem  # revolution/SC/scsystem.o (static)
+fn_8026A378 SCFindU32Item  # revolution/SC/scsystem.o
+fn_8026A44C SCReplaceU8Item  # revolution/SC/scsystem.o
+fn_8026AA2C SCGetDisplayOffsetH  # revolution/SC/scapi.o
+fn_8026AAA0 SCGetEuRgb60Mode  # revolution/SC/scapi.o
+fn_8026AB6C SCGetProgressiveMode  # revolution/SC/scapi.o
+fn_8026ABC0 SCGetScreenSaverMode  # revolution/SC/scapi.o
+fn_8026AC14 SCGetSoundMode  # revolution/SC/scapi.o
+fn_8026AC78 SCGetCounterBias  # revolution/SC/scapi.o
+fn_8026AE5C __SCF1  # revolution/SC/scapi_prdinfo.o
+fn_8026AFC8 SCGetProductArea  # revolution/SC/scapi_prdinfo.o
+# sigmatch SI (2)
+fn_80242C84 __SITransfer  # revolution/SI/SIBios.o (static)
+fn_80242E90 AlarmHandler  # revolution/SI/SIBios.o (static)
+# sigmatch TPL (2)
+fn_802B3D54 TPLBind  # revolution/TPL/TPL.o
+fn_802B3E68 TPLGet  # revolution/TPL/TPL.o
+# sigmatch USB (4)
+fn_80280688 USB_LOG  # revolution/USB/usb.o (static)
+fn_80280730 USB_ERR  # revolution/USB/usb.o (static)
+fn_80281028 IUSB_ReadIntrMsgAsync  # revolution/USB/usb.o
+fn_80281728 IUSB_WriteCtrlMsgAsync  # revolution/USB/usb.o
+# sigmatch VF (9)
+fn_8032158C VFipf_memset  # revolution/VF/pf_clib.o
+fn_80321690 VFiPFCODE_Divide_Width  # revolution/VF/pf_code.o
+fn_80321D7C VFiPFCODE_CP932_OEMCharWidth  # revolution/VF/pf_cp932.o
+fn_80321DB0 VFiPFCODE_CP932_isOEMMBchar  # revolution/VF/pf_cp932.o
+fn_80321E3C VFiPFAPI_convertReturnValue  # revolution/VF/pf_api_util.o
+fn_80321E4C VFipf2_init_prfile2  # revolution/VF/pf_init_prfile2.o
+fn_80321FDC VFSysInit  # revolution/VF/d_vf_sys.o
+fn_803222FC dHash_InitHashTable  # revolution/VF/d_hash.o
+fn_80322400 dCommon_initDriveInfo  # revolution/VF/d_common.o
+# sigmatch WENC (1)
+fn_8026B174 WENCGetEncodeData  # revolution/WENC/wenc.o
+# sigmatch WPAD (32)
+fn_8026F82C WPADiSendData  # revolution/WPAD/WPAD.o (static)
+fn_8026FA08 WPADiRadioSensitivity  # revolution/WPAD/WPAD.o (static)
+fn_8026FB0C IsControllerDataChanged  # revolution/WPAD/WPAD.o (static)
+fn_802706B8 CheckButtonCombination  # revolution/WPAD/WPAD.o (static)
+fn_802707C4 WPADiCheckContInputs  # revolution/WPAD/WPAD.o (static)
+fn_80271664 setupCallback  # revolution/WPAD/WPAD.o (static)
+fn_80271738 abortConnCallback  # revolution/WPAD/WPAD.o (static)
+fn_802726E4 WPADGetAccGravityUnit  # revolution/WPAD/WPAD.o
+fn_802727BC DisconnectCallback  # revolution/WPAD/WPAD.o (static)
+fn_80272A68 WPADGetDataFormat  # revolution/WPAD/WPAD.o
+fn_80272BC8 __infoCallback  # revolution/WPAD/WPAD.o (static)
+fn_80272C1C WPADGetInfoAsync  # revolution/WPAD/WPAD.o
+fn_80272F08 WPADEnableMotor  # revolution/WPAD/WPAD.o
+fn_80272F3C WPADIsMotorEnabled  # revolution/WPAD/WPAD.o
+fn_80272F70 WPADControlLed  # revolution/WPAD/WPAD.o
+fn_80273158 WPADSaveConfig  # revolution/WPAD/WPAD.o
+fn_80273520 WPADiExcludeButton  # revolution/WPAD/WPAD.o
+fn_802735E4 WPADiCopyOut  # revolution/WPAD/WPAD.o
+fn_80273764 WPADIsSpeakerEnabled  # revolution/WPAD/WPAD.o
+fn_802737A8 WPADControlSpeaker  # revolution/WPAD/WPAD.o
+fn_80274DF8 WPADSetSpeakerVolume  # revolution/WPAD/WPAD.o
+fn_80274E48 IsBusyStream  # revolution/WPAD/WPAD.o (static)
+fn_80274F80 WPADCanSendStreamData  # revolution/WPAD/WPAD.o
+fn_80275004 WPADSendStreamData  # revolution/WPAD/WPAD.o
+fn_8027521C WPADIsDpdEnabled  # revolution/WPAD/WPAD.o
+fn_80275260 __dpdCb  # revolution/WPAD/WPAD.o (static)
+fn_80275290 WPADControlDpd  # revolution/WPAD/WPAD.o
+fn_8027630C __SendData  # revolution/WPAD/WPAD.o (static)
+fn_80276760 WPADiSendWriteDataCmd  # revolution/WPAD/WPAD.o
+fn_80276914 WPADiSendWriteData  # revolution/WPAD/WPAD.o
+fn_80276ACC WPADiSendReadData  # revolution/WPAD/WPAD.o
+fn_80276C78 WPADiClearQueue  # revolution/WPAD/WPAD.o
+# sigmatch WUD (28)
+fn_802817B4 App_MEMalloc  # revolution/WUD/WUD.o
+fn_80281804 App_MEMfree  # revolution/WUD/WUD.o
+fn_80281B1C WUDiSaveDeviceToNand  # revolution/WUD/WUD.o (static)
+fn_802826F8 WUDiTerminateDevice  # revolution/WUD/WUD.o (static)
+fn_80282790 WUDiDeleteDevice  # revolution/WUD/WUD.o (static)
+fn_802829C0 WUDiClearUnregisteredDevice  # revolution/WUD/WUD.o (static)
+fn_802836F0 WUDRegisterAllocator  # revolution/WUD/WUD.o
+fn_8028395C WUDGetStatus  # revolution/WUD/WUD.o
+fn_80283998 WUDGetBufferStatus  # revolution/WUD/WUD.o
+fn_802839E0 WUDSetSniffMode  # revolution/WUD/WUD.o
+fn_80283A4C WUDSetSyncSimpleCallback  # revolution/WUD/WUD.o
+fn_80283D6C WUDSetDisableChannel  # revolution/WUD/WUD.o
+fn_80283F10 WUDSetVisibility  # revolution/WUD/WUD.o
+fn_80283F6C remove_patch_cb  # revolution/WUD/WUD.o (static)
+fn_802840E4 write_patch_cb  # revolution/WUD/WUD.o (static)
+fn_80284314 install_patch_cb  # revolution/WUD/WUD.o (static)
+fn_80284804 WUDiGetDevInfo  # revolution/WUD/WUD.o
+fn_802848DC WUDiGetNewDevInfo  # revolution/WUD/WUD.o
+fn_8028499C WUDiMoveTopSmpDevInfoPtr  # revolution/WUD/WUD.o
+fn_80284AB4 WUDiMoveBottomSmpDevInfoPtr  # revolution/WUD/WUD.o
+fn_80284BCC WUDiMoveTopOfDisconnectedSmpDevice  # revolution/WUD/WUD.o
+fn_80284D24 WUDiMoveTopStdDevInfoPtr  # revolution/WUD/WUD.o
+fn_80284E3C WUDiMoveBottomStdDevInfoPtr  # revolution/WUD/WUD.o
+fn_80284F54 WUDiMoveTopOfDisconnectedStdDevice  # revolution/WUD/WUD.o
+fn_80285120 CleanupCallback  # revolution/WUD/WUD.o (static)
+fn_80285BA8 WUDDeviceStatusCallback  # revolution/WUD/WUD.o
+fn_80286020 _WUDGetDevAddr  # revolution/WUD/WUD.o
+fn_80286700 bta_hh_co_data  # revolution/WUD/WUDHidHost.o
+# sigmatch runtime (3)
+fn_8032F3D8 __ptmf_scall  # runtime/ptmf.o
+fn_8032F894 __mod2i  # runtime/runtime.o
+fn_8032FC04 __cvt_dbl_ull  # runtime/runtime.o

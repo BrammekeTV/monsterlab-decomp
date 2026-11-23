@@ -41,8 +41,8 @@ void  fn_801F5814(s32 a);                                       // 0x801F5814
 void  fn_801F8628(u8* obj, s8* src, s32 n);                     // 0x801F8628
 void  fn_801F8F34(u8* p, f32 v);                                // 0x801F8F34
 void  fn_801F8FA0(u8* p, f32 v);                                // 0x801F8FA0
-void  fn_8023A5B0(u8* p);                                       // 0x8023A5B0
-void  fn_8023A68C(u8* p);                                       // 0x8023A68C
+void  OSLockMutex(u8* p);                                       // 0x8023A5B0
+void  OSUnlockMutex(u8* p);                                       // 0x8023A68C
 void  KPADSetPosParam(s32 a, f32 b, f32 c);                         // 0x8027D270
 void  fn_802E9CBC(s32 counter);                                 // 0x802E9CBC
 
@@ -482,11 +482,11 @@ void fn_8013A4A0(s32 hi, s32 lo) {
         fn_80140B30();
         return;
     }
-    fn_8023A5B0(lbl_80556AB0);
+    OSLockMutex(lbl_80556AB0);
     s32 counter = lbl_805FBB48;
     lbl_805FBB48 = counter + 1;
     fn_802E9CBC(counter);
-    fn_8023A68C(lbl_80556AB0);
+    OSUnlockMutex(lbl_80556AB0);
     lbl_805FBB48 = lbl_805FBB48 - 1;
 }
 

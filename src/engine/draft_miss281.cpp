@@ -4,7 +4,7 @@
 extern "C" {
 char* fn_80338BC0(char* s, const char* sub);                    // 0x80338BC0 (strstr)
 u32   strlen(const char* s);
-s32   fn_802737A8(s32 chan, s32 a, void* cb);                   // 0x802737A8
+s32   WPADControlSpeaker(s32 chan, s32 a, void* cb);                   // 0x802737A8
 s32   fn_801F2118(u8* task, f32 dt);                                   // 0x801F2118
 s32   fn_8025E014(void);                                        // 0x8025E014
 s32   fn_8025D7D0(void);                                        // 0x8025D7D0
@@ -118,7 +118,7 @@ void fn_80202E24(s32 chan, s32 result) {
         if ((&lbl_805FBABC)[chan] == 0) {
             saved = lbl_805FBAE0;
             lbl_805FBAE0 = 1;
-            if (fn_802737A8(chan, 2, 0) == 0) {
+            if (WPADControlSpeaker(chan, 2, 0) == 0) {
                 (&lbl_805FBAC0)[chan] = (&lbl_805FBABC)[chan];
             }
             lbl_805FBAE0 = saved;

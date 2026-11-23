@@ -31,9 +31,9 @@ u8*   fn_800216B8(u8* p, s32 del);                              // 0x800216B8 (d
 void  fn_802E93CC(void);                                        // 0x802E93CC
 u8*   fn_8010B5A0(u8* p, u8* src);                                // 0x8010B5A0
 void  fn_8011B060(u8* a, u8* b);                                // 0x8011B060
-void  fn_8023A5B0(u8* p);                                       // 0x8023A5B0
-void  fn_8023A68C(u8* p);                                       // 0x8023A68C
-void  fn_8023D3C8(s32 hi, u32 lo);                              // 0x8023D3C8
+void  OSLockMutex(u8* p);                                       // 0x8023A5B0
+void  OSUnlockMutex(u8* p);                                       // 0x8023A68C
+void  OSSleepTicks(s32 hi, u32 lo);                              // 0x8023D3C8
 f32   fn_8033F200(f32 a, f32 b);                                // 0x8033F200
 
 extern u8  lbl_8035DA50[];       // 0x8035DA50 (vtable)
@@ -239,15 +239,15 @@ s32 fn_80207C5C(u8* arg0, s32 arg_sp0) {
     lbl_805FBB70 = r;
     lbl_805FBB64 = 0;
     while (lbl_805FBB6C != 0) {
-        fn_8023A5B0(lbl_80556AB0);
+        OSLockMutex(lbl_80556AB0);
         lbl_805FBB48 += 1;
         if (lbl_805FBB6C != 0 && *(s32*)(arg0 + 0xB4) > 0) {
             fn_802E93CC();
             *(s32*)(arg0 + 0xB4) = 0;
         }
-        fn_8023A68C(lbl_80556AB0);
+        OSUnlockMutex(lbl_80556AB0);
         lbl_805FBB48 -= 1;
-        fn_8023D3C8(0, OSGetBusClock() / 4000);
+        OSSleepTicks(0, OSGetBusClock() / 4000);
     }
     lbl_805FBB68 = 0;
     return 0;
