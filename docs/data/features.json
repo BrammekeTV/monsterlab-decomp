@@ -99,6 +99,11 @@
  "changelog": [
   {
    "date": "2026-11-23",
+   "time": "20:26",
+   "text": "The Windows version can now read the game straight from your own Monster Lab disc image (PR #107): start it with --iso followed by the path to your .iso. There's no need to extract the disc first; files are decrypted as they're read. The disc-picking screen comes next."
+  },
+  {
+   "date": "2026-11-23",
    "time": "20:20",
    "text": "New test option for the Windows version (PR #106): --pointer X,Y@FRAME moves the Wii Remote pointer from a script, and the menu's cursor hand follows it. It's a first step towards selecting main-menu items with the mouse, which doesn't work yet; the menu is also still off-centre."
   },
