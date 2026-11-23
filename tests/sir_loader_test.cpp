@@ -1099,6 +1099,21 @@ struct ZoneDump {
             printf(" floats "); Words(w + 0x1B0, 2); printf(" %08x buffer ", *(const u32*)(w + 0x1D4)); Ptr(w + 0x1E0);
             printf(" words "); Words(w + 0x1E4, 3); printf("\n");
         }
+        bool group = *(const u32*)(w + 0x60) == 2 && In(w, 0x16C) && *(const u32*)(w + 0x13C) == 4;     // a widget of two widgets
+        if (group) {
+            printf("uigroup "); Val(w); printf(" a "); Ptr(w + 0x164); printf(" b "); Ptr(w + 0x168); printf(" holder "); Ptr(w + 0x140);
+            printf(" words "); Words(w + 0x148, 7); printf("\n");
+            const u8* hd = *(const u8**)(w + 0x140);
+            if (In(hd, 8)) {
+                const u8* lst = *(const u8**)(hd + 4);
+                printf("uislide "); Val(hd); printf(" list "); Ptr(hd + 4); printf("\n");
+                if (In(lst, 0x14) && *(const u32*)lst != 0 && In(*(const u8**)(lst + 0x10), *(const u32*)lst * 4))
+                    for (u32 k = 0; k < *(const u32*)lst; k++) {
+                        const u8* t = (*(const u8***)(lst + 0x10))[k];
+                        if (In(t, SIR_TEXTURE_HEADER)) { const SirTexture* x = (const SirTexture*)t; printf("uislidetex "); Val(t); printf(" hdr %u size %ux%u datasize %u\n", x->headerSize, x->size[0], x->size[1], x->dataSize); }
+                    }
+            }
+        }
         for (u32 k = 0; k < 3; k++) {
             for (const u8* n = *(const u8**)(w + 4 + k * 4); In(n, 0xC) && !Seen(uiEvents, n); n = *(const u8**)n) {
                 printf("uievent "); Val(n); printf(" next "); Ptr(n); printf(" id %08x word %08x\n", *(const u32*)(n + 4), *(const u32*)(n + 8));
@@ -1106,6 +1121,7 @@ struct ZoneDump {
         }
         UiGrid(*(const u8**)(w + 0xBC));
         UiBase(*(const u8**)(w + 0x130));
+        if (group) { UiBase(*(const u8**)(w + 0x164)); UiBase(*(const u8**)(w + 0x168)); }
     }
     void UiGrid(const u8* g) {
         if (!In(g, 0x1C) || Seen(uiGrids, g)) return;

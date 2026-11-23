@@ -725,6 +725,17 @@ def shared_zone_dump(L, zn, sec, slot_size, zone0, zbase0):
             L.append('uitext %s table %s markers %s %s byte %d time %08x words %s text %s from %s chars %s floats %s %08x buffer %s words %s' % (
                      ptr(w), ptr(u(o + 0x13C)), ptr(u(o + 0x140)), ptr(u(o + 0x144)), sec[o + 0x148], u(o + 0x14C), ws(o + 0x150, 8),
                      ptr(u(o + 0x170)), ptr(u(o + 0x174)), ptr(u(o + 0x178)), ws(o + 0x1B0, 2), u(o + 0x1D4), ptr(u(o + 0x1E0)), ws(o + 0x1E4, 3)))
+        group = u(o + 0x60) == 2 and o + 0x16C <= len(sec) and u(o + 0x13C) == 4      # a widget of two widgets
+        if group:
+            L.append('uigroup %s a %s b %s holder %s words %s' % (ptr(w), ptr(u(o + 0x164)), ptr(u(o + 0x168)), ptr(u(o + 0x140)), ws(o + 0x148, 7)))
+            hd = u(o + 0x140)
+            if inz(hd, 8):
+                lst = u(hd - base + 4)
+                L.append('uislide %s list %s' % (ptr(hd), ptr(lst)))
+                if inz(lst, 0x14) and u(lst - base) and inz(u(lst - base + 0x10), u(lst - base) * 4):
+                    for k in range(u(lst - base)):
+                        t = u(u(lst - base + 0x10) - base + k * 4)
+                        if inz(t, 0x54): L.append('uislidetex %s hdr %d size %dx%d datasize %d' % (ptr(t), u(t - base), struct.unpack_from('>H', sec, t - base + 4)[0], struct.unpack_from('>H', sec, t - base + 6)[0], u(t - base + 0x18)))
         for k in range(3):
             n = u(o + 4 + k * 4)
             while inz(n, 0xC) and n not in events:
@@ -733,6 +744,9 @@ def shared_zone_dump(L, zn, sec, slot_size, zone0, zbase0):
                 n = u(n - base)
         ui_grid(u(o + 0xBC))
         ui_base(u(o + 0x130))
+        if group:
+            ui_base(u(o + 0x164))
+            ui_base(u(o + 0x168))
     def ui_grid(g):
         if not inz(g, 0x1C) or g in grids: return
         grids.add(g)
