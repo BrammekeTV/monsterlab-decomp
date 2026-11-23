@@ -95,7 +95,7 @@ extern "C" void fn_8013E43C(s32 a3) {
 }
 
 // 0x8013E444
-extern "C" u8 fn_8013E444(void) {
+extern "C" u32 fn_8013E444(void) {
     u8 t0 = *(u8*)((u8*)&lbl_805FB3B3);
     return (u8)(t0);
 }
@@ -117,7 +117,7 @@ extern "C" void fn_8013E45C(s32 a3) {
 }
 
 // 0x8013E464
-extern "C" u8 fn_8013E464(void) {
+extern "C" u32 fn_8013E464(void) {
     u8 t0 = *(u8*)((u8*)&lbl_805FB3DD);
     return (u8)(t0);
 }

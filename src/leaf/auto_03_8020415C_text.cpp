@@ -107,7 +107,7 @@ extern "C" void fn_802085BC(u8* a3) {
 }
 
 // 0x80208904
-extern "C" u8 fn_80208904(u8* a3) {
+extern "C" u32 fn_80208904(u8* a3) {
     u8 t0 = *(u8*)(((u8*)(uintptr_t)(a3)) + 8);
     return (u8)(t0);
 }
@@ -130,7 +130,7 @@ extern "C" void fn_80208A38(u8* a3) {
 }
 
 // 0x80208C04
-extern "C" u8 fn_80208C04(s32 a3, u8* a4, u8* a5) {
+extern "C" u32 fn_80208C04(s32 a3, u8* a4, u8* a5) {
     s32 t0 = *(s32*)((u8*)&lbl_805FBB5C);
     *(u32*)(((u8*)(uintptr_t)(a4)) + 0) = (u32)((u32)(t0));
     s32 t1 = *(s32*)((u8*)&lbl_805FBB58);

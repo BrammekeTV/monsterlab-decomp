@@ -29,7 +29,7 @@ extern "C" s32 AlertGetTimer(void) {
 }
 
 // 0x80142468
-extern "C" u8 fn_80142468(void) {
+extern "C" u32 fn_80142468(void) {
     u8 t0 = *(u8*)((u8*)&lbl_805FB444);
     return (u8)(t0);
 }

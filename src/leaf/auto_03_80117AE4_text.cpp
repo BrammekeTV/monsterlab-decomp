@@ -13,7 +13,7 @@ extern "C" void fn_80118138(void) {
 }
 
 // 0x80118BD4
-extern "C" u8 fn_80118BD4(void) {
+extern "C" u32 fn_80118BD4(void) {
     u8 t0 = *(u8*)((u8*)&lbl_805FB260);
     return (u8)(t0);
 }
@@ -49,7 +49,7 @@ extern "C" u32 fn_801191AC(u8* a3) {
 }
 
 // 0x801191C0
-extern "C" u8 fn_801191C0(u8* a3) {
+extern "C" u32 fn_801191C0(u8* a3) {
     u8 t0 = *(u8*)(((u8*)(uintptr_t)(a3)) + 5336);
     return (u8)(t0);
 }
