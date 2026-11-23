@@ -675,7 +675,6 @@ s32 fn_801A7780(u8* grid, u32 hash, const s32* const* values, s32 limit) {
 // 0x801A7838
 s32 fn_801A7838(u8* grid, const u32* colors, s32 limit) {
     if (colors == NULL) return -2;
-    (*(VFnF*)(*(u8**)(grid + 0x138) + 0x18))(grid, 0.0f);
     s32 count = fn_8019555C(*(u8**)(grid + 0x1BC));
     s32 used = 0;
     s32 colorIndex = 0;

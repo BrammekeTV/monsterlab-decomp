@@ -476,7 +476,7 @@ s32 fn_801A6B9C(u8* grid, s32 a) {
             f32* rowX = (f32*)fn_8019552C(*(u8**)(grid + 0x1b8), i);
             f32 x = *rowX + stepX * (f32)(*(s32*)(grid + 0x160) - 1);
             f32 y = 0.0f + stepY * (f32)(*(s32*)(grid + 0x15c) - 1);
-            fn_801A9EC8(cell, x, y, 0.0f /* leftover f3 */);
+            fn_801A9EC8(cell, x, y, depth);
             if (a != 0) {
                 *(f32*)(cell + 0x68) = x;
                 *(f32*)(cell + 0x6c) = y;

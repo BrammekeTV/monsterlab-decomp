@@ -269,6 +269,9 @@ void UIScreen_SetVisibleFlag(u32 a0, u32 a1) {
         fn_8018D2B8(lbl_803818A8);
     } else {
         w = ScreenSetFindWidget(set, a0);
+        if (w == NULL) {
+            fn_8018D370(lbl_803818D0, fn_801EB708(a0));  // logged twice, as in the original
+        }
     }
     if (w == NULL) {
         fn_8018D370(lbl_803818D0, fn_801EB708(a0));
@@ -293,6 +296,9 @@ void UIScreen_SetEnableFlag(u32 a0, u32 a1) {
         fn_8018D2B8(lbl_803818A8);
     } else {
         w = ScreenSetFindWidget(set, a0);
+        if (w == NULL) {
+            fn_8018D370(lbl_803818D0, fn_801EB708(a0));  // logged twice, as in the original
+        }
     }
     if (w == NULL) {
         fn_8018D370(lbl_803818D0, fn_801EB708(a0));
