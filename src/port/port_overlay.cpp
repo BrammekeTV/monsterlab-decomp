@@ -5,8 +5,11 @@
 #ifdef _WIN32
 #include <windows.h>
 #include <d3d11.h>
+#include <tlhelp32.h>
+#include <vector>
 #include <stdio.h>
 #include <string.h>
+#include <stdlib.h>
 
 #include "imgui.h"
 #include "backends/imgui_impl_dx11.h"
@@ -14,6 +17,67 @@
 #include "port/port_overlay.h"
 
 HWND PortGfxWindow(void);
+
+// MONSTERLAB_SAMPLE=file: a sampling profiler. A thread reads the game thread's instruction pointer every ~0.5 ms
+// once the frame count passes MONSTERLAB_SAMPLE_FROM (default 3300) and writes module-relative addresses to the file
+// (tools/resolve_samples.py turns them into a function histogram with the linker's map file).
+static volatile LONG sSampleOn;
+// Samples every thread of the process (the game's OS threads take turns: only one is running, the rest wait inside the kernel).
+// An address inside the exe is written module-relative; one outside (Direct3D, the driver, Windows) as "ext <module>".
+static DWORD WINAPI SampleThread(void* arg) {
+    const char* path = (const char*)arg;
+    UINT_PTR base = (UINT_PTR)GetModuleHandleA(NULL);
+    UINT_PTR size = ((PIMAGE_NT_HEADERS)(base + ((PIMAGE_DOS_HEADER)base)->e_lfanew))->OptionalHeader.SizeOfImage;
+    FILE* f = fopen(path, "w");
+    if (!f) return 0;
+    while (!sSampleOn) Sleep(5);
+    std::vector<HANDLE> threads;
+    for (int i = 0; i < 30000; i++) {
+        if (i % 500 == 0) {
+            for (HANDLE h : threads) CloseHandle(h);
+            threads.clear();
+            HANDLE snap = CreateToolhelp32Snapshot(TH32CS_SNAPTHREAD, 0);
+            THREADENTRY32 te = {sizeof(te)};
+            if (snap != INVALID_HANDLE_VALUE && Thread32First(snap, &te)) do {
+                if (te.th32OwnerProcessID != GetCurrentProcessId() || te.th32ThreadID == GetCurrentThreadId()) continue;
+                HANDLE h = OpenThread(THREAD_SUSPEND_RESUME | THREAD_GET_CONTEXT | THREAD_QUERY_INFORMATION, FALSE, te.th32ThreadID);
+                if (h) threads.push_back(h);
+            } while (Thread32Next(snap, &te));
+            if (snap != INVALID_HANDLE_VALUE) CloseHandle(snap);
+        }
+        for (HANDLE h : threads) {
+            if (SuspendThread(h) == (DWORD)-1) continue;
+            CONTEXT c = {};
+            c.ContextFlags = CONTEXT_CONTROL;
+            if (GetThreadContext(h, &c)) {
+                if (c.Eip >= base && c.Eip < base + size) fprintf(f, "%llx\n", (unsigned long long)(c.Eip - base));
+                else {
+                    HMODULE m = NULL; char name[64] = "?";
+                    if (GetModuleHandleExA(GET_MODULE_HANDLE_EX_FLAG_FROM_ADDRESS | GET_MODULE_HANDLE_EX_FLAG_UNCHANGED_REFCOUNT, (LPCSTR)c.Eip, &m) && m)
+                        GetModuleFileNameA(m, name, sizeof(name));
+                    const char* slash = strrchr(name, 0x5C);
+                    fprintf(f, "ext %s\n", slash ? slash + 1 : name);
+                }
+            }
+            ResumeThread(h);
+        }
+        Sleep(1);
+    }
+    fclose(f);
+    return 0;
+}
+static void SampleFrame() {
+    static int state, frames, from = 3300;
+    if (state == 2) return;
+    if (state == 0) {
+        const char* path = getenv("MONSTERLAB_SAMPLE");
+        if (!path) { state = 2; return; }
+        if (getenv("MONSTERLAB_SAMPLE_FROM")) from = atoi(getenv("MONSTERLAB_SAMPLE_FROM"));
+        CreateThread(NULL, 0, SampleThread, _strdup(path), 0, NULL);
+        state = 1;
+    }
+    if (++frames >= from) sSampleOn = 1;
+}
 
 BOOL gPortOverlayOn;
 
@@ -63,6 +127,22 @@ void PortOverlayStart(ID3D11Device* dev, ID3D11DeviceContext* ctx) {
 
 void PortOverlayFrame(const PortFrameStats* s) {
     sLast = *s;
+    SampleFrame();
+    // MONSTERLAB_STATSLOG=N: print the average of every N shown frames to stderr (for headless measuring).
+    static s32 logN = -1;
+    static u32 logCount;
+    static f64 sum[7];
+    if (logN < 0) { const char* e = getenv("MONSTERLAB_STATSLOG"); logN = e ? atoi(e) : 0; }
+    if (logN > 0) {
+        f64 v[7] = { s->frameMs, s->gameMs, s->renderMs, s->waitMs, (f64)s->draws, (f64)s->verts, (f64)s->efbCopies };
+        for (s32 i = 0; i < 7; i++) sum[i] += v[i];
+        if (++logCount == (u32)logN) {
+            fprintf(stderr, "[stats] %.1f fps  frame %.2f  game %.2f  render %.2f  wait %.2f ms  draws %.0f  verts %.0f  copies %.0f\n",
+                    1000.0 * logN / sum[0], sum[0] / logN, sum[1] / logN, sum[2] / logN, sum[3] / logN, sum[4] / logN, sum[5] / logN, sum[6] / logN);
+            logCount = 0;
+            for (s32 i = 0; i < 7; i++) sum[i] = 0;
+        }
+    }
     sMs[sMsNext] = s->frameMs;
     sMsNext = (sMsNext + 1) % HISTORY;
     if (sMsCount < HISTORY) sMsCount++;
