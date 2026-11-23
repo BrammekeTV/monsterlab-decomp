@@ -82,7 +82,7 @@ u8* fn_8018C48C(u8* base, u32 key) {
 void fn_801ACBEC(u8* hud, f32 dt) {
     if (*(void**)(hud + 0x0) != NULL) {
         void* p = *(void**)(hud + 0x4);
-        if (p != NULL) fn_801B9278((u8*)p, 0.0f /* leftover f1 dt */);
+        if (p != NULL) fn_801B9278((u8*)p, dt);
         HudUpdateScreens(*(void**)(hud + 0x0), dt);
     }
 }

@@ -99,6 +99,16 @@
  "changelog": [
   {
    "date": "2026-11-23",
+   "time": "20:11",
+   "text": "Stats overlay on Windows (PR #104): press F3, or start with --stats, for a panel in the top-right corner. It shows frames per second, frame time and its split into game, rendering and waiting, draw calls, effect copies, textures and audio voices. It's built with the open-source Dear ImGui library, which the settings screen will use next."
+  },
+  {
+   "date": "2026-11-23",
+   "time": "20:07",
+   "text": "Fades and animations now play on Windows (PR #103). Three of our decompiled functions passed 0 instead of the frame time, so every fade and tween using them stood still. Now the splash screens fade, the logo glows and its arcs animate, and the game cycles from the splash screens to the title and the castle fly-by as on the Wii. Fog is now drawn too. The castle behind the title logo is still hidden by a black picture."
+  },
+  {
+   "date": "2026-11-23",
    "time": "19:58",
    "text": "The Windows version renders at 1080p in widescreen (PR #102). The 3D scene uses the game's own 16:9 mode, and the menus and logos keep their shape instead of being stretched like on a TV. Other resolutions and 4:3 are options. The frame-buffer copies used for glow effects no longer create a new texture each time, which makes it faster."
   },

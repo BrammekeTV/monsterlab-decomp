@@ -46,7 +46,7 @@ s32   fn_801D4790(void* p);                                      // 0x801D4790
 void  fn_801D65C0(void);                                         // 0x801D65C0
 void  fn_801E8D74(void* out, void* list, void* owner, void* anim);  // 0x801E8D74
 s32   fn_801EDF58(u8* ref);                                        // 0x801EDF58 (current zone index)
-s32   fn_801F1D64(u8* obj);                                       // 0x801F1D64 (bounce task callback)
+s32   fn_801F1D64(u8* obj, f32 dt);                                      // 0x801F1D64 (bounce task callback)
 s32   fn_801F2018(u8* task, f32 dt);                                      // 0x801F2018 (fade task callback)
 void  fn_801EF070(u8* heap, void* p);                            // 0x801EF070
 void* fn_801EF6E8(u8* obj, s32 a, s32 v);                   // 0x801EF6E8
