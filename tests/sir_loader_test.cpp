@@ -1014,8 +1014,17 @@ struct ZoneDump {
     void Batch(const u8* b) {
         if (!In(b, 0x28) || std::find(batches.begin(), batches.end(), b) != batches.end()) return;
         batches.push_back(b);
-        printf("batch "); Val(b); printf(" words %08x %08x %08x dl %08x size %u\n", *(const u32*)(b + 4), *(const u32*)(b + 8), *(const u32*)(b + 0xC),
-               *(const u32*)(b + 0x18), *(const u32*)(b + 0x24));
+        u32 n = *(const u32*)(b + 0x1C);
+        printf("batch "); Val(b); printf(" words %08x %08x %08x dl %08x size %u groups %u :", *(const u32*)(b + 4), *(const u32*)(b + 8), *(const u32*)(b + 0xC),
+               *(const u32*)(b + 0x18), *(const u32*)(b + 0x24), n);
+        const u8* at = b + 0x28;
+        for (u32 i = 0; i < n; i++) {
+            u32 k = *(const u32*)at;
+            printf("%s", i ? " |" : "");
+            for (u32 j = 0; j < 1 + 2 * k; j++) printf(" %08x", *(const u32*)(at + j * 4));
+            at += 4 + 8 * k;
+        }
+        printf("\n");
     }
     std::vector<const u8*> materials, matTextures;
     static void Hex(const u8* at, u32 n) { for (u32 i = 0; i < n; i++) printf("%02x", at[i]); }

@@ -1205,7 +1205,12 @@ def zone_dump(L, sec, base, hud, roots, scene_roots, pooltabs, records=(), lists
         if not inz(a, 0x28) or a in batches: return
         batches.add(a)
         o = off(a)
-        L.append('batch %s words %s dl %08x size %d' % (ptr(a), ws(o + 4, 3), u(o + 0x18), u(o + 0x24)))
+        n, at, infl = u(o + 0x1C), o + 0x28, []
+        for _ in range(n):
+            k = u(at)
+            infl.append(ws(at, 1 + 2 * k))
+            at += 4 + 8 * k
+        L.append('batch %s words %s dl %08x size %d groups %d : %s' % (ptr(a), ws(o + 4, 3), u(o + 0x18), u(o + 0x24), n, ' | '.join(infl)))
     def item_draw(it):
         o = off(it)
         L.append('itemdraw %s xf %s scale %08x mesh %s out %s cb %08x arg %s clip %s w58 %08x skin %s' % (
