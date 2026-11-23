@@ -1867,6 +1867,9 @@ static SirError AnimPlayerPlan(ImagePlan* plan, const u8* image, u32 imageSize, 
 //           entry per bone whose second word says how the walk goes on (fn_80173944), +0x14 its
 //           player, +0x18 a block that is freed with it (fn_8017493C), +0x1C the matrix the walk
 //           starts from (fn_80173944). A scene item's +0xB0 is such a skeleton (fn_80172708).
+//           +0x00 a pointer to one 0x30-byte matrix (twelve floats) per bone: a[i] of fn_801704F8,
+//           which multiplies it with b[i] from the bones at +0x04 (the same block as +0x18 in the
+//           files).
 static const SirField kAnimObjFields[] = {
     { 0x00, SIR_PTR, 1 }, { 0x08, SIR_PTR, 1 }, { 0x1C, SIR_PTR, 1 }, { 0x2C, SIR_PTR, 1 }, { 0x40, SIR_PTR, 1 },
     { 0x50, SIR_PTR, 1 }, { 0x64, SIR_PTR, 1 }, { 0x74, SIR_PTR, 3 }, { 0x80, SIR_U32, 2 }, { 0x88, SIR_F32, 1 }, { 0x90, SIR_F32, 2 },
@@ -1883,9 +1886,11 @@ static const SirField kSkeletonFields[] = {
 static SirError SkeletonPlan(ImagePlan* plan, const u8* image, u32 imageSize, u32 addr) {
     u32 s, b;
     if (!LevelSpan(addr, SKELETON_USED, imageSize, &s) || PlanHas(plan, s + 4, REGION_SKELETON)) return SIR_OK;
-    if (!PlanAdd(plan, s + 4, SKELETON_USED - 4, REGION_SKELETON)) return SIR_ERR_ENTITY;
+    if (!PlanAdd(plan, s + 4, SKELETON_USED - 4, REGION_SKELETON) || !PlanAdd(plan, s, 4, REGION_PTR_ARRAY)) return SIR_ERR_ENTITY;
     u32 bones = Be32(image + s + 8);
     if (bones != 0) {
+        if (LevelSpan(Be32(image + s), (u64)bones * 0x30, imageSize, &b) && !PlanHas(plan, b, REGION_F32_ARRAY) &&
+            !PlanAdd(plan, b, bones * 0x30, REGION_F32_ARRAY)) return SIR_ERR_ENTITY;
         if (bones > imageSize / 0x30 || !LevelSpan(Be32(image + s + 4), (u64)bones * 0x30, imageSize, &b)) return SIR_ERR_ENTITY;
         if (!PlanHas(plan, b, REGION_F32_ARRAY) && !PlanAdd(plan, b, bones * 0x30, REGION_F32_ARRAY)) return SIR_ERR_ENTITY;
         if (!LevelSpan(Be32(image + s + 0xC), (u64)bones * 8, imageSize, &b)) return SIR_ERR_ENTITY;
