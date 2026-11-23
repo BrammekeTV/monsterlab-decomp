@@ -99,6 +99,11 @@
  "changelog": [
   {
    "date": "2026-11-23",
+   "time": "18:00",
+   "text": "484 more Wii SDK and library functions have their real names (PR #92), up from 77. A new tool, tools/sig_match.py, compares the game's code against the public, free-to-reuse ogws project, which rebuilds the same Nintendo libraries. Every exact match gets its real name, across the system, graphics, audio, Wii Remote and Bluetooth code and the C runtime. Now it's clear exactly which library calls the PC version has to provide."
+  },
+  {
+   "date": "2026-11-23",
    "time": "17:57",
    "text": "Checked all 289 larger menu, save and Lab functions against the original game code and fixed 10 mistakes in our decompiled code (PR #91). Among them, unlocked parts now get the right tier and quality, quest rewards show the right value, the matchup screen reads the waiting-opponent flag correctly, and a menu animation runs at the right speed. A log of every checked function is in docs/audit_log.txt."
   },
