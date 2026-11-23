@@ -77,8 +77,8 @@
   },
   {
    "title": "Own-disc setup (ISO picker)",
-   "detail": "No game content is ever shipped. On first launch the player picks their own Monster Lab disc image (.iso or .wbfs). The port checks that it is the PAL version, extracts the files it needs and remembers them, so there is nothing to set up by hand.",
-   "status": "todo"
+   "detail": "No game content is ever shipped. On first launch the player picks their own Monster Lab disc image (.iso) or extracted folder; the game is read straight from the image, checked to be the right game and region, and the choice is kept in monsterlab.ini, with a Game page in the settings to change it (PRs #107, #111). .wbfs and .rvz images are not supported yet.",
+   "status": "done"
   },
   {
    "title": "Mod support",
@@ -97,6 +97,11 @@
   }
  ],
  "changelog": [
+  {
+   "date": "2026-11-23",
+   "time": "22:34",
+   "text": "Choose your own game disc (PR #111): on first start, the Windows version shows a screen where you pick your Monster Lab disc image or extracted folder. It checks that it's the right game and remembers the choice in monsterlab.ini; the settings screen has a Game page to change it. Also, the window now shows fast-forward progress while --to-menu skips the intro (PR #110). At 1080p that skip takes a couple of minutes in a window, so it isn't stuck."
+  },
   {
    "date": "2026-11-23",
    "time": "20:30",
