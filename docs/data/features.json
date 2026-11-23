@@ -99,6 +99,11 @@
  "changelog": [
   {
    "date": "2026-11-23",
+   "time": "23:30",
+   "text": "Hovering the mouse over a main-menu item now highlights it as on the Wii: brighter and larger, with a backing plate (PR #119). Clicking and arrow keys don't work yet. Also, --to-menu in a window now shows its progress in the title bar and keeps the window painted while it skips ahead (PR #117)."
+  },
+  {
+   "date": "2026-11-23",
    "time": "23:25",
    "text": "The main menu runs about three times faster on Windows (PR #118): from about 14 to about 44 frames per second at 1080p. The renderer now groups draws together and cuts the overhead of each of the roughly 2,250 draws per frame. The next step is moving the vertex work to the graphics card."
   },
