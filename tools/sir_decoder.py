@@ -1400,6 +1400,24 @@ def image_dump(path):
         if u(o + 4) == 1:
             line += ' pages %d %s' % (u(o + 0x124), ps(o + 0x24, u(o + 0x124)))
         L.append(line.rstrip())
+    fontdata = []
+    for p in fontobjs:
+        o = off(p)
+        if u(o + 4) == 1 and u(o + 8) and u(o + 8) not in fontdata: fontdata.append(u(o + 8))
+    for p in fontdata:   # glyph tables (the blob is big-endian; the loader makes the halfwords host order)
+        o = off(p)
+        glyphs, kerns, pages = h16(o + 8) + 1, h16(o + 0xA) + 1, sec[o + 3]
+        line = 'uifontdata %s bytes %s glyphs %d kerns %d buckets %s pages %s' % (
+            ptr(p), sec[o:o + 8].hex(), glyphs, kerns, ' '.join('%d' % h16(o + 0xC + i * 2) for i in range(64)),
+            ps(o + 0x8C, pages))
+        g = o + 0x8C + pages * 4
+        for i in range(glyphs):
+            line += ' g %d %d %d %d %s' % (h16(g), h16(g + 2), h16(g + 4), h16(g + 6), sec[g + 8:g + 16].hex())
+            g += 0x10
+        for i in range(kerns):
+            line += ' k %d %d %d' % (h16(g), h16(g + 2), struct.unpack_from('>h', sec, g + 4)[0])
+            g += 6
+        L.append(line)
     t = off(slot(0xDB8))
     L.append('uidraw %s raw %s w04 %08x fonts %s raw0c %s w40 %d w404 %d' % (
         ptr(slot(0xDB8)), sec[t:t + 4].hex(), u(t + 4), ptr(u(t + 8)), sec[t + 0xC:t + 0x10].hex(), i32(t + 0x40), i32(t + 0x404)))

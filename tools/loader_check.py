@@ -35,7 +35,7 @@ SAMPLES = ("part 0 ", "part 57 ", "part 185 ", "action 0 ", "action 200 ", "acti
            "input ", "inputseq 50 ", "inputstep img+0x28b0 ", "texlist ", "texture 1 ", "slottexture 0x824 ",
            "strings ", "string 100 ", "actions ", "actionrec 955 ", "actionprog 2 ",
            "fxbolts ", "fxbolt 0 ", "fxtrails ", "fxtrail 0 ", "pool 0x010 ", "poolnode 0x418 31 ",
-           "uiroot ", "uifont 1 ", "uifontobj ", "hud ", "fsm ", "fsmdef ", "fsmstate ", "fsmnode ", "fsmtrans ",
+           "uiroot ", "uifont 1 ", "uifontobj ", "uifontdata ", "hud ", "fsm ", "fsmdef ", "fsmstate ", "fsmnode ", "fsmtrans ",
            "fsmsharedtrans ")
 
 
