@@ -99,6 +99,11 @@
  "changelog": [
   {
    "date": "2026-11-23",
+   "time": "14:41",
+   "text": "Started naming the Nintendo Wii SDK and library code inside the game (PRs #83, #84, #85). A new map in docs/sdk_libraries.md shows where each library sits: the Wii system libraries, online play, the C runtime, Bink video and the debugger. 60 functions got their real names, including the audio, Wii Remote, graphics texture and disc functions. This shows exactly what the PC version has to provide in their place."
+  },
+  {
+   "date": "2026-11-23",
    "time": "14:09",
    "text": "Fixed the 13 functions that broke the castle view on Windows (PR #82). They were set up to return a number they never actually return, so the PC's maths stack filled up. With the fix, the castle level's camera stays valid and the game reaches its title state without crashing. The title screen itself doesn't draw yet: that's renderer work."
   },
