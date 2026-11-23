@@ -408,8 +408,10 @@ semaphore, and in `OSGetTime` (busy-wait loops call it). One more thread deliver
 interrupts, also under the lock, about once per millisecond. So an "interrupt" never preempts
 game code in the middle of an update, which is stricter than the console.
 
-A loop that waits for an interrupt to change memory without calling any SDK function would hang.
-The time limit then reports where the main thread is.
+A loop that waits for an interrupt to change memory without calling any SDK function would hang
+(the time limit then reports where the main thread is). Such a loop gets `WAIT_FOR_INTERRUPT()`
+(`types.h`) as its body: it lets the interrupt thread in and moves game time on while
+fast-forwarding. Two so far, both waiting for a music stream to stop (`fn_801FD730`, `draft_miss348.cpp`).
 
 ### The game clock and fast-forward
 

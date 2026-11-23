@@ -34,9 +34,5 @@ typedef intptr_t ScriptValue;
 // The body of a loop that waits for an interrupt handler to change memory. On the console it is
 // empty: the interrupt arrives between two instructions. The PC build has no preemption, so the
 // loop has to let the interrupt thread run (PortInterruptPoint, docs/port_runtime.md).
-#ifdef __cplusplus
 extern "C" void PortInterruptPoint(void);
-#else
-void PortInterruptPoint(void);
-#endif
 #define WAIT_FOR_INTERRUPT() PortInterruptPoint()
