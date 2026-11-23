@@ -64,6 +64,27 @@ fn_802309E0 inflate
 fn_80232120 inflateEnd
 fn_802321A8 inflate_fast
 fn_802326C0 inflate_table
+# WPAD/KPAD/SI (input; see docs/sdk_libraries.md)
+fn_802728A4 WPADProbe
+fn_80272AB0 WPADSetDataFormat
+fn_80273204 WPADRead
+fn_802727E0 WPADDisconnect
+fn_8027D270 KPADSetPosParam
+fn_8027D28C KPADSetHoriParam
+fn_8027F504 KPADRead
+# AX/AI/DSP (audio; see docs/sdk_libraries.md)
+fn_802576BC AIRegisterDMACallback
+fn_80257700 AIInitDMA
+fn_8025777C AIStartDMA
+fn_80257790 AIStopDMA
+fn_802577A4 AIGetDMABytesLeft
+fn_802577B4 AIGetDMAStartAddr
+fn_802577CC AIGetDMALength
+fn_80257C88 AXQuit
+fn_80257FA8 AXFreeVoice
+fn_80258024 AXAcquireVoice
+fn_80259B2C AXRegisterCallback
+
 # NET: the function name appears in its own debug/error string (DWC, NCD, NWC24, NHTTP)
 fn_8032683C NHTTPi_CheckCurrentThread
 fn_80320D10 NCDGetCurrentIfConfig

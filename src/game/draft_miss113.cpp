@@ -91,8 +91,8 @@ s32 fn_8026631C(const char* path, s32 mode, s32 a);              // 0x8026631C
 s32 fn_80266BA4(const char* name, u8* handle, s32 flags);        // 0x80266BA4
 s32 fn_80267A54(u32* buf);                                       // 0x80267A54
 s32 fn_80267B14(u32* buf);                                       // 0x80267B14
-void fn_802727E0(s32 chan, s32 b);                               // 0x802727E0
-s32 fn_802728A4(s32 chan, u32* out);                             // 0x802728A4
+void WPADDisconnect(s32 chan, s32 b);                               // 0x802727E0
+s32 WPADProbe(s32 chan, u32* out);                             // 0x802728A4
 s32 fn_80272B64(s32 chan, u8* out);                              // 0x80272B64
 char* fn_80338A9C(char* s, const char* delim);                   // 0x80338A9C (strtok)
 
@@ -273,17 +273,17 @@ s32 ScoreCullCandidate(u8* ent, s32 unused, u8* rec) {
 // context is in state 5 or 7.
 void fn_8000B9CC(u8* ctx, f32 dt) {
     for (s32 i = 1; i <= 3; i++) {
-        if (fn_801481FC(i) != 0) fn_802727E0(i, 0);
+        if (fn_801481FC(i) != 0) WPADDisconnect(i, 0);
     }
     if (fn_801481FC(0) == 0) {
         u32 st = 0;
-        if (fn_802728A4(0, &st) == -1 && *(s32*)(ctx + 0x158) != 1) {
+        if (WPADProbe(0, &st) == -1 && *(s32*)(ctx + 0x158) != 1) {
             *(s32*)(ctx + 0x158) = 1;
             *(f32*)(ctx + 0x164) = lbl_805FC658;
         }
     } else {
         u32 st = 0;
-        if (fn_802728A4(0, &st) == 0 && st != 0xFF) {
+        if (WPADProbe(0, &st) == 0 && st != 0xFF) {
             if (st != 1 && *(f32*)(ctx + 0x164) <= lbl_805FC630) {
                 if (*(s32*)(ctx + 0x158) != 2) *(s32*)(ctx + 0x158) = 2;
             } else if (*(f32*)(ctx + 0x164) > lbl_805FC630) {
@@ -291,7 +291,7 @@ void fn_8000B9CC(u8* ctx, f32 dt) {
             } else if (*(s32*)(ctx + 0x158) != 0) {
                 u32 st2 = 0;
                 *(s32*)(ctx + 0x158) = 0;
-                if (fn_802728A4(0, &st2) == 0) {
+                if (WPADProbe(0, &st2) == 0) {
                     u8 info[0x1C];
                     if (fn_80272B64(0, info) == 0 && *(s32*)(info + 0xC) != 0) {
                         *(s32*)(ctx + 0x154) = 1;

@@ -46,11 +46,11 @@ void  fn_8025DC3C(u8* p);                                           // 0x8025DC3
 void  fn_8025E3E4(u8* p);                                           // 0x8025E3E4
 void  fn_8025EE54(u8* p);                                           // 0x8025EE54
 void  fn_8026B174(u8* dst, s32 a, u8* src, s32 len, u8* out);       // 0x8026B174
-s32   fn_802728A4(s32 chan, u32* out);                              // 0x802728A4
+s32   WPADProbe(s32 chan, u32* out);                              // 0x802728A4
 s32   fn_802737A8(s32 a, s32 b, s32 c);                             // 0x802737A8
 s32   fn_80274F80(s32 a);                                           // 0x80274F80
 s32   fn_80275004(s32 a, u8* buf, s32 len);                         // 0x80275004
-s32   fn_8027F504(s32 chan, u8* buf, s32 len);                      // 0x8027F504
+s32   KPADRead(s32 chan, u8* buf, s32 len);                      // 0x8027F504
 
 extern u8   lbl_804FB8A0[];       // 0x804FB8A0 (4 pad records of 0x10: buf ptr, x, y, status)
 extern u8   lbl_804FB8E0[];       // 0x804FB8E0 (4 pad buffers of 0x840)
@@ -337,10 +337,10 @@ void fn_801FB3F8(void) {
     for (s32 i = 0; i < 4; i++) {
         u8* rec = lbl_804FB8A0 + i * 0x10;
         u8* buf = lbl_804FB8E0 + i * 0x840;
-        sp28[i] = fn_802728A4(i, &sp8[i]);
+        sp28[i] = WPADProbe(i, &sp8[i]);
         *(u32*)(rec + 0xC) = sp8[i];
         s32 st = sp28[i];
-        fn_8027F504(i, buf, 0x10);
+        KPADRead(i, buf, 0x10);
         if (st == 0 || st == -7 || (st >= -4 && st <= -2)) {
             *(u8**)(rec + 0x0) = buf;
             memset(buf + 0x60, 0, 0x24);

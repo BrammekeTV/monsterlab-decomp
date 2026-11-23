@@ -11,7 +11,7 @@
 extern "C" {
 void   fn_801EBA20(void* list, void* item);                           // 0x801EBA20
 void   fn_80203DE8(u8* audio, u8* state);                             // 0x80203DE8
-void   fn_80257FA8(u8* voice);                                   // 0x80257FA8
+void   AXFreeVoice(u8* voice);                                   // 0x80257FA8
 void   fn_80264420(u8* p);                                            // 0x80264420
 u32    StringHash(const char* s);                                     // 0x801EB704
 int    SysSprintf(char* buf, const char* fmt, ...);
@@ -164,7 +164,7 @@ void fn_801FD730(u8* arg0) {
                 fn_80264420(lbl_8051E6A8 + 0x10);
             }
             *(s32*)(lbl_8051DAD0 + 0x8C) = 0;
-            fn_80257FA8(*(u8**)(lbl_8051E6A8 + 0x0));
+            AXFreeVoice(*(u8**)(lbl_8051E6A8 + 0x0));
             *(s32*)(lbl_8051E6A8 + 0x0) = 0;
             *(s32*)(lbl_8051E6A8 + 0x4) = 0;
         }
@@ -181,7 +181,7 @@ void fn_801FD730(u8* arg0) {
                 fn_80264420(lbl_8051E6A8 + 0x124);
             }
             *(s32*)(lbl_8051DAD0 + 0x90) = 0;
-            fn_80257FA8(*(u8**)(lbl_8051E6A8 + 0x114));
+            AXFreeVoice(*(u8**)(lbl_8051E6A8 + 0x114));
             *(s32*)(lbl_8051E6A8 + 0x114) = 0;
             *(s32*)(lbl_8051E6A8 + 0x118) = 0;
         }

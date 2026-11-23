@@ -174,14 +174,14 @@ const char* PortSoftSdk(u32 addr) {
         {0x802C8DF4, "HOME menu: fn_802C8DF4"},
         {0x802C8E04, "HOME menu: fn_802C8E04"},
         // Wii Remote library calls that do nothing while there is no controller on PC.
-        {0x802727E0, "WPAD: rumble motor (fn_802727E0)"},
-        {0x80272AB0, "WPAD: fn_80272AB0"},
+        {0x802727E0, "WPAD: rumble motor (WPADDisconnect)"},
+        {0x80272AB0, "WPAD: WPADSetDataFormat"},
         {0x80272B64, "WPAD: fn_80272B64"},
         {0x802737A8, "WPAD: speaker control (fn_802737A8)"},
         {0x80274F80, "WPAD: can send speaker data (fn_80274F80)"},
         {0x80275004, "WPAD: send speaker data (fn_80275004)"},
-        {0x8027D270, "KPAD: pointer parameter (fn_8027D270)"},
-        {0x8027D28C, "KPAD: pointer parameter (fn_8027D28C)"},
+        {0x8027D270, "KPAD: pointer parameter (KPADSetPosParam)"},
+        {0x8027D28C, "KPAD: pointer parameter (KPADSetHoriParam)"},
         // Registers a function and calls it with two words (from fn_80204478, argument fn_802B7DDC,
         // SDK code). What library this starts is not known yet.
         {0x802B4140, "library start through fn_802B4140 (fn_802B7DDC): not started"},
@@ -199,13 +199,13 @@ extern "C" u8 fn_8026AC14(void) { return 1; }
 
 // KPADRead(channel, samples, capacity): the Wii Remote's samples since the last call. No input
 // on PC yet: no samples, which the game takes as "no remote connected".
-extern "C" s32 fn_8027F504(s32 chan, u8* buf, s32 count) {
+extern "C" s32 KPADRead(s32 chan, u8* buf, s32 count) {
     (void)chan; (void)buf; (void)count;
     return 0;
 }
 
 // WPADProbe(channel, device type): -1 and type 253 = no controller on this channel.
-extern "C" s32 fn_802728A4(s32 chan, u32* type) {
+extern "C" s32 WPADProbe(s32 chan, u32* type) {
     (void)chan;
     if (type) *type = 253;
     return -1;
