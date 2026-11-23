@@ -30,7 +30,7 @@ void  fn_8003DCE0(u8* p);                                        // 0x8003DCE0
 void  fn_8004C718(u8* p, s32 idx, void* elem);                   // 0x8004C718
 void  fn_8020EDAC(u8* p);                                        // 0x8020EDAC
 s32   fn_80333424(const char* s, void* file);                    // 0x80333424
-void  fn_80333B60(void* obj);                                    // 0x80333B60
+void  fclose(void* obj);                                    // 0x80333B60
 u8*   fn_80146C44(u8* p, u8* src, s32* count);                   // 0x80146C44
 void  WPADSetConnectCallback(s32 chan, void (*cb)(s32, s32));    // SDK call, no game address
 
@@ -107,7 +107,7 @@ void* fn_8014328C(u8* p, s32 del) {
     if (p != NULL) {
         if (*(u8**)p != NULL) {
             fn_80333424(lbl_80375E5C, *(u8**)p);
-            fn_80333B60(*(void**)p);
+            fclose(*(void**)p);
         }
         if (del > 0) {
             operator_delete(p);

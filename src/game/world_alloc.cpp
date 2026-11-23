@@ -164,9 +164,9 @@ void WorldStateInit(u8* w, s32 level) {
     *(f32*)(w + 8) = 0.0f;
     *(f32*)(w + 0xC) = 0.0f;
 
-    *(s32*)(gGame + 0x1C0) = 0;
+    *(u8*)(gGame + 0x1C0) = 0;
     for (u8 i = 0; i != 0xFF; i++) ((s32*)(gGame + 0x1C4))[i] = 0;
-    *(s32*)(gGame + 0x13C) = 0;
+    *(u8*)(gGame + 0x13C) = 0;
     for (u8 i = 0; i != 0x20; i++) ((s32*)(gGame + 0x140))[i] = 0;
     sZonesDirty = 0;
     WorldLoadLevelZones(level);

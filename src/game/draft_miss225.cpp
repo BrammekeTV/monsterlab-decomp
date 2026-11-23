@@ -28,14 +28,14 @@ void GXClearVtxDesc(void);                                                   // 
 void GXSetVtxAttrFmt(s32 a, s32 b, s32 c, s32 d, s32 e);                      // 0x8024A818
 void GXInvalidateVtxCache(void);                                                   // 0x8024AC3C
 void GXBegin(s32 a, s32 b, s32 c);                                    // 0x8024B974
-void fn_8024BBE4(s32 x, s32 y, s32 w, s32 h);                             // 0x8024BBE4
-void fn_8024BC24(s32 w, u32 h);                                           // 0x8024BC24
-u32  fn_8024BC90(f32 yScale);                                             // 0x8024BC90
-void fn_8024BD5C(u8* color, u32 z);                                       // 0x8024BD5C
-void fn_8024BDD4(u32 aa, u8* pattern, s32 vf, u8* vfilter);               // 0x8024BDD4
+void GXSetDispCopySrc(s32 x, s32 y, s32 w, s32 h);                             // 0x8024BBE4
+void GXSetDispCopyDst(s32 w, u32 h);                                           // 0x8024BC24
+u32  GXSetDispCopyYScale(f32 yScale);                                             // 0x8024BC90
+void GXSetCopyClear(u8* color, u32 z);                                       // 0x8024BD5C
+void GXSetCopyFilter(u32 aa, u8* pattern, s32 vf, u8* vfilter);               // 0x8024BDD4
 void fn_8024BFB8(s32 a);                                                  // 0x8024BFB8
-void fn_8024BFCC(void* fb, s32 clear);                                    // 0x8024BFCC
-void fn_8024CB00(void);                                                   // 0x8024CB00
+void GXCopyDisp(void* fb, s32 clear);                                    // 0x8024BFCC
+void GXInvalidateTexAll(void);                                                   // 0x8024CB00
 void GXSetColorUpdate(s32 a);                                                  // 0x8024DF28
 void GXSetZMode(s32 a, s32 b, s32 c);                                    // 0x8024DF80
 void GXSetPixelFmt(s32 a, s32 b);                                           // 0x8024DFE4
@@ -708,10 +708,10 @@ void fn_8015BBC0(s32 clear) {
     f32 zero = 0.0f;
     GXSetViewport(zero, zero, (f32)U16(lbl_8040AE48, 4), (f32)U16(lbl_8040AE48, 6), zero, 1.0f);
     GXSetScissor(0, 0, U16(lbl_8040AE48, 4), U16(lbl_8040AE48, 6));
-    u16 yScale = (u16)fn_8024BC90(1.0f);
-    fn_8024BBE4(0, 0, U16(lbl_8040AE48, 4), U16(lbl_8040AE48, 6));
-    fn_8024BC24(U16(lbl_8040AE48, 4), yScale);
-    fn_8024BDD4(lbl_8040AE48[0x19], lbl_8040AE48 + 0x1A, 0, lbl_805F9254);
+    u16 yScale = (u16)GXSetDispCopyYScale(1.0f);
+    GXSetDispCopySrc(0, 0, U16(lbl_8040AE48, 4), U16(lbl_8040AE48, 6));
+    GXSetDispCopyDst(U16(lbl_8040AE48, 4), yScale);
+    GXSetCopyFilter(lbl_8040AE48[0x19], lbl_8040AE48 + 0x1A, 0, lbl_805F9254);
     fn_8024BFB8(0);
     s32 a;
     switch (lbl_805FB500) {
@@ -736,7 +736,7 @@ void fn_8015BBC0(s32 clear) {
     GXSetVtxDesc(0xB, 1);
     GXSetVtxDesc(0xD, 1);
     GXInvalidateVtxCache();
-    fn_8024CB00();
+    GXInvalidateTexAll();
     GXBegin(0x90, 0, 3);
     for (s32 i = 0; i < 6; i++) GXWGFifo._f32 = 0.0f;
     GXWGFifo._u32 = 0;
@@ -748,12 +748,12 @@ void fn_8015BBC0(s32 clear) {
     GXWGFifo._f32 = 0.0f;
     if (clear != 0) {
         u8 color[4] = {0, 0, 0, 0};
-        fn_8024BD5C(color, 0xFFFFFF);
+        GXSetCopyClear(color, 0xFFFFFF);
         GXSetZMode(1, 3, 1);
         GXSetColorUpdate(1);
-        fn_8024BFCC(lbl_805FB538[0], 1);
-        fn_8024BFCC(lbl_805FB538[0], 1);
-        fn_8024BFCC(lbl_805FB538[1], 1);
+        GXCopyDisp(lbl_805FB538[0], 1);
+        GXCopyDisp(lbl_805FB538[0], 1);
+        GXCopyDisp(lbl_805FB538[1], 1);
     }
 }
 

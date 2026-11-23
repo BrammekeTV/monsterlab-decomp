@@ -82,7 +82,7 @@ s32 fn_80213130(u8* battle, u8* x);                             // 0x80213130
 s32 fn_80213150(u8* battle, u8* x);                             // 0x80213150
 s32 fn_802188B8(void* lab, s32 idx);                            // 0x802188B8
 void fn_8032F1E8(void* arr, void (*ctor)(void), void (*dtor)(void), s32 size, s32 count);
-void* fn_80333D50(const char* path, const char* mode);          // 0x80333D50 (fopen)
+void* UTF8ToUCS2String(const char* path, const char* mode);          // 0x80333D50 (fopen)
 s32 fn_80334290(void* obj);                                     // 0x80334290
 void fn_80334458(void* obj, s32 x, s32 y);                      // 0x80334458
 char* fn_80338BC0(char* s, const char* sub);                    // 0x80338BC0 (strstr)
@@ -146,7 +146,7 @@ s32 fn_80146808(u8* p, const char* path, const char* mode) {
     if (kind == 1 && fn_80338BC0((char*)mode, lbl_805F91E8) == NULL) {
         return fn_80146A7C(p + 0xC, path);
     }
-    void* fp = fn_80333D50(path, mode);
+    void* fp = UTF8ToUCS2String(path, mode);
     *(void**)(p + 0x4) = fp;
     if (fp == NULL) {
         return 0;

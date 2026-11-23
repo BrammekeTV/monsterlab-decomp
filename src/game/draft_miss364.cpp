@@ -9,7 +9,7 @@ s32    OSRestoreInterrupts(s32 level);                             // 0x802393EC
 u8     SCGetAspectRatio(void);                                     // 0x8026A9D8: 1 = 16:9
 void   fn_802050B0(void* tmp, s32 n, s32 size);                    // 0x802050B0
 void   fn_80205134(u8* buf, void* tmp, s32 size, s32 a, s32 b);    // 0x80205134
-void   fn_80248050(f32* mtx);                                      // 0x80248050
+void   PSMTXIdentity(f32* mtx);                                      // 0x80248050
 void   C_MTXOrtho(f32* mtx, f32 a, f32 b, f32 c, f32 d, f32 e, f32 f);  // 0x8024849C
 void   GXSetVtxDesc(s32 a, s32 b);                                  // 0x8024A3A4
 void   GXClearVtxDesc(void);                                          // 0x8024A7E4
@@ -19,9 +19,9 @@ void   GXSetCullMode(s32 a);                                         // 0x8024BB
 void   GXSetNumChans(s32 a);                                         // 0x8024C2F0
 void   GXInitTexObj(u8* obj, void* image, s32 w, s32 h, s32 fmt, s32 wrapS, s32 wrapT, s32 mip);  // 0x8024C3B8
 void   GXInitTexObjLOD(u8* obj, s32 a, s32 b, s32 c, s32 d, s32 e, f32 f, f32 g, f32 h);  // 0x8024C60C
-void   fn_8024D508(s32 a, s32 b);                                  // 0x8024D508
-void   fn_8024DA08(s32 a, s32 b, s32 c, s32 d);                    // 0x8024DA08
-void   fn_8024DB64(s32 a);                                         // 0x8024DB64
+void   GXSetTevOp(s32 a, s32 b);                                  // 0x8024D508
+void   GXSetTevOrder(s32 a, s32 b, s32 c, s32 d);                    // 0x8024DA08
+void   GXSetNumTevStages(s32 a);                                         // 0x8024DB64
 void   GXSetBlendMode(s32 a, s32 b, s32 c, s32 d);                    // 0x8024DED8
 void   GXSetZMode(s32 a, s32 b, s32 c);                           // 0x8024DF80
 void   GXSetProjection(f32* mtx, s32 a);                               // 0x8024E1D0
@@ -239,13 +239,13 @@ void fn_8020574C(void) {
     GXSetVtxDesc(0xB, 1);
     GXSetNumChans(1);
     GXSetNumTexGens(0);
-    fn_8024DB64(1);
-    fn_8024DA08(0, 0xFF, 0xFF, 4);
-    fn_8024D508(0, 4);
+    GXSetNumTevStages(1);
+    GXSetTevOrder(0, 0xFF, 0xFF, 4);
+    GXSetTevOp(0, 4);
     GXSetBlendMode(0, 0, 0, 0);
     GXSetZMode(1, 3, 1);
     GXSetCurrentMtx(3);
-    fn_80248050(mv);
+    PSMTXIdentity(mv);
     GXLoadPosMtxImm(mv, 3);
     GXSetCullMode(0);
     if (SCGetAspectRatio() == 1) {

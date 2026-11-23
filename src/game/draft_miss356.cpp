@@ -18,7 +18,7 @@ void GXClearVtxDesc(void);                                                      
 void GXSetVtxAttrFmt(s32 a, s32 b, s32 c, s32 d, s32 e);                         // 0x8024A818
 void GXSetTexCoordGen2(s32 coord, s32 func, s32 src, s32 mtx, s32 normalize, s32 postMtx);  // 0x8024AC4C
 void GXSetNumTexGens(s32 a);                                                     // 0x8024AE74
-void fn_8024B298(u32 token);                                                 // 0x8024B298 (GXSetDrawSync)
+void GXSetDrawSync(u32 token);                                                 // 0x8024B298 (GXSetDrawSync)
 void GXBegin(s32 a, s32 b, s32 c);                                       // 0x8024B974
 void GXSetNumChans(s32 a);                                                     // 0x8024C2F0
 void GXLoadTexObj(u8* obj, s32 id);                                           // 0x8024C91C
@@ -31,13 +31,13 @@ void fn_8024D5DC(s32 a, s32 b, s32 c, s32 d, s32 e);                         // 
 void fn_8024D61C(s32 a, s32 b, s32 c, s32 d, s32 e, s32 f);                 // 0x8024D61C
 void fn_8024D674(s32 a, s32 b, s32 c, s32 d, s32 e, s32 f);                 // 0x8024D674
 void fn_8024D72C(s32 reg, const void* color);                                // 0x8024D72C
-void fn_8024D790(s32 reg, const void* color);                                // 0x8024D790
-void fn_8024D7EC(s32 stage, s32 sel);                                        // 0x8024D7EC
-void fn_8024D83C(s32 stage, s32 sel);                                        // 0x8024D83C
-void fn_8024D88C(s32 stage, s32 rasSel, s32 texSel);                         // 0x8024D88C
-void fn_8024D8C8(s32 table, s32 r, s32 g, s32 b, s32 a);                     // 0x8024D8C8
-void fn_8024DA08(s32 a, s32 b, s32 c, s32 d);                                // 0x8024DA08
-void fn_8024DB64(s32 a);                                                     // 0x8024DB64
+void GXSetTevKColor(s32 reg, const void* color);                                // 0x8024D790
+void GXSetTevKColorSel(s32 stage, s32 sel);                                        // 0x8024D7EC
+void GXSetTevKAlphaSel(s32 stage, s32 sel);                                        // 0x8024D83C
+void GXSetTevSwapMode(s32 stage, s32 rasSel, s32 texSel);                         // 0x8024D88C
+void GXSetTevSwapModeTable(s32 table, s32 r, s32 g, s32 b, s32 a);                     // 0x8024D8C8
+void GXSetTevOrder(s32 a, s32 b, s32 c, s32 d);                                // 0x8024DA08
+void GXSetNumTevStages(s32 a);                                                     // 0x8024DB64
 void GXSetBlendMode(s32 a, s32 b, s32 c, s32 d);                                // 0x8024DED8
 void fn_8024E348(f32* mtx, s32 id, s32 type);                                // 0x8024E348
 
@@ -146,7 +146,7 @@ void fn_80205894(u8* obj, f32 x, f32 y, f32 sx, f32 sy, f32 a, s32 w, s32 h, s32
     hasExtra = (*(s32*)(obj + 0x140) != 0) ? 1 : 0;
 
     *(s32*)(obj + *(s32*)(obj + 0x114) * 4 + 0x1D0) = 1;
-    fn_8024B298((u16)(*(s32*)(obj + 0x114) + 0x4444));
+    GXSetDrawSync((u16)(*(s32*)(obj + 0x114) + 0x4444));
     GXSetVtxAttrFmt(0, 9, 1, 3, 0);
     GXSetVtxAttrFmt(0, 0xB, 1, 5, 0);
     GXSetVtxAttrFmt(0, 0xD, 1, 4, 0);
@@ -166,7 +166,7 @@ void fn_80205894(u8* obj, f32 x, f32 y, f32 sx, f32 sy, f32 a, s32 w, s32 h, s32
     }
     GXSetNumChans(1);
     GXSetNumTexGens(4);
-    fn_8024DB64(4);
+    GXSetNumTevStages(4);
     GXSetNumIndStages(3);
     GXSetIndTexOrder(0, 1, 1);
     GXSetIndTexOrder(1, 2, 2);
@@ -180,50 +180,50 @@ void fn_80205894(u8* obj, f32 x, f32 y, f32 sx, f32 sy, f32 a, s32 w, s32 h, s32
 
     // TEV stage 0
     GXSetTevIndirect(0, 1, 0, 7, 1, 0, 0, 0, 0, 0);
-    fn_8024DA08(0, 0, 4, 0xFF);
+    GXSetTevOrder(0, 0, 4, 0xFF);
     fn_8024D59C(0, 0xF, 8, 0xE, 2);
     fn_8024D61C(0, 0, 0, 0, 0, 0);
     fn_8024D5DC(0, 7, 4, 6, 1);
     fn_8024D674(0, 1, 0, 0, 0, 0);
-    fn_8024D7EC(0, 0xC);
-    fn_8024D83C(0, 0x1C);
-    fn_8024D88C(0, 0, 0);
+    GXSetTevKColorSel(0, 0xC);
+    GXSetTevKAlphaSel(0, 0x1C);
+    GXSetTevSwapMode(0, 0, 0);
     // TEV stage 1
     GXSetTevIndirect(1, 1, 0, 7, 1, 0, 0, 0, 0, 0);
-    fn_8024DA08(1, 0, 3, 0xFF);
+    GXSetTevOrder(1, 0, 3, 0xFF);
     fn_8024D59C(1, 0xF, 8, 0xE, 0);
     fn_8024D61C(1, 0, 0, 1, 0, 0);
     fn_8024D5DC(1, 7, 4, 6, 0);
     fn_8024D674(1, 1, 0, 0, 0, 0);
-    fn_8024D7EC(1, 0xD);
-    fn_8024D83C(1, 0x1D);
-    fn_8024D88C(1, 0, 0);
+    GXSetTevKColorSel(1, 0xD);
+    GXSetTevKAlphaSel(1, 0x1D);
+    GXSetTevSwapMode(1, 0, 0);
     // TEV stage 2
     GXSetTevIndirect(2, 0, 0, 7, 1, 0, 0, 0, 0, 0);
-    fn_8024DA08(2, 3, 0, 0xFF);
+    GXSetTevOrder(2, 3, 0, 0xFF);
     fn_8024D59C(2, 0xF, 8, 0xC, 0);
     fn_8024D61C(2, 0, 0, 0, 1, 0);
     fn_8024D5DC(2, 4, 7, 7, 0);
     fn_8024D674(2, 0, 0, 0, 1, 0);
-    fn_8024D88C(2, 0, 0);
+    GXSetTevSwapMode(2, 0, 0);
     // TEV stage 3
     if (hasExtra != 0) {
         GXSetTevIndirect(3, 0, 0, 7, 1, 0, 0, 0, 0, 0);
-        fn_8024DA08(3, 3, 5, 4);
+        GXSetTevOrder(3, 3, 5, 4);
         fn_8024D59C(3, 1, 0, 0xE, 0xF);
         fn_8024D61C(3, 0, 0, 0, 1, 0);
         fn_8024D5DC(3, 7, 4, 5, 7);
         fn_8024D674(3, 0, 0, 0, 1, 0);
-        fn_8024D88C(3, 0, 0);
-        fn_8024D7EC(3, 0xE);
+        GXSetTevSwapMode(3, 0, 0);
+        GXSetTevKColorSel(3, 0xE);
     } else {
-        fn_8024DA08(3, 0xFF, 0xFF, 4);
+        GXSetTevOrder(3, 0xFF, 0xFF, 4);
         fn_8024D59C(3, 1, 0, 0xE, 0xF);
         fn_8024D61C(3, 0, 0, 0, 1, 0);
         fn_8024D5DC(3, 7, 6, 5, 7);
         fn_8024D674(3, 0, 0, 0, 1, 0);
-        fn_8024D88C(3, 0, 0);
-        fn_8024D7EC(3, 0xE);
+        GXSetTevSwapMode(3, 0, 0);
+        GXSetTevKColorSel(3, 0xE);
     }
 
     // TEV colour registers from constant data.
@@ -236,18 +236,18 @@ void fn_80205894(u8* obj, f32 x, f32 y, f32 sx, f32 sy, f32 a, s32 w, s32 h, s32
     c8[1] = lbl_80600441;
     c8[2] = lbl_80600442;
     c8[3] = lbl_80600443;
-    fn_8024D790(0, c8);
+    GXSetTevKColor(0, c8);
     c4[0] = lbl_80600444;
     c4[1] = lbl_80600445;
     c4[2] = lbl_80600446;
     c4[3] = lbl_80600447;
-    fn_8024D790(1, c4);
+    GXSetTevKColor(1, c4);
     c0[0] = lbl_80600448;
     c0[1] = lbl_80600449;
     c0[2] = lbl_8060044A;
     c0[3] = lbl_8060044B;
-    fn_8024D790(2, c0);
-    fn_8024D8C8(0, 0, 1, 2, 3);
+    GXSetTevKColor(2, c0);
+    GXSetTevSwapModeTable(0, 0, 1, 2, 3);
     GXSetIndTexMtx(1, lbl_80349020, 4);
 
     // Texture matrices: scale = crop size / texture size for the two chroma planes.
@@ -319,7 +319,7 @@ void fn_80205894(u8* obj, f32 x, f32 y, f32 sx, f32 sy, f32 a, s32 w, s32 h, s32
     GXWGFifo._f32 = 0.0f;
     GXWGFifo._f32 = 1.0f;
 
-    fn_8024B298(0);
+    GXSetDrawSync(0);
 }
 
 // 0x8020D0E8

@@ -42,7 +42,7 @@ void GXInvalidateVtxCache(void);                 // 0x8024AC3C: GXInvalidateVtxC
 void GXSetLineWidth(s32 width, s32 texOffsets);   // 0x8024BAC0: GXSetLineWidth
 void GXSetPointSize(s32 size, s32 texOffsets);    // 0x8024BAF4: GXSetPointSize
 void GXEnableTexOffsets(s32 coord, s32 line, s32 point);   // 0x8024BB28: GXEnableTexOffsets
-void fn_80248050(f32* mtx);             // 0x80248050: PSMTXIdentity
+void PSMTXIdentity(f32* mtx);             // 0x80248050: PSMTXIdentity
 void GXLoadPosMtxImm(f32* mtx, s32 a);      // 0x8024E280: GXLoadPosMtxImm
 void GXLoadNrmMtxImm(f32* mtx, s32 id);     // 0x8024E2D0: GXLoadNrmMtxImm
 void GXSetCurrentMtx(s32 a);                // 0x8024E328: GXSetCurrentMtx
@@ -57,16 +57,16 @@ void GXSetNumChans(s32 a);                // 0x8024C2F0: GXSetNumChans
 void GXSetChanCtrl(s32 chan, s32 enable, s32 ambSrc, s32 matSrc, s32 lightMask, s32 diffFn, s32 attnFn);   // 0x8024C314: GXSetChanCtrl
 void GXSetChanAmbColor(s32 chan, u8* color);  // 0x8024C140: GXSetChanAmbColor
 void GXSetChanMatColor(s32 chan, u8* color);  // 0x8024C218: GXSetChanMatColor
-void fn_8024CB00(void);                 // 0x8024CB00: GXInvalidateTexAll
-void fn_8024DA08(s32 a, s32 b, s32 c, s32 d);   // 0x8024DA08: GXSetTevOrder(stage, coord, map, colour channel)
-void fn_8024DB64(s32 a);                // 0x8024DB64: GXSetNumTevStages
-void fn_8024D508(s32 a, s32 b);         // 0x8024D508: GXSetTevOp
-void fn_8024D944(s32 comp0, s32 ref0, s32 op, s32 comp1, s32 ref1);   // 0x8024D944: GXSetAlphaCompare
-void fn_8024D97C(s32 op, s32 fmt, s32 bias);    // 0x8024D97C: GXSetZTexture
-void fn_8024D7EC(s32 stage, s32 sel);   // 0x8024D7EC: GXSetTevKColorSel
-void fn_8024D83C(s32 stage, s32 sel);   // 0x8024D83C: GXSetTevKAlphaSel
-void fn_8024D88C(s32 stage, s32 rasSel, s32 texSel);   // 0x8024D88C: GXSetTevSwapMode
-void fn_8024D8C8(s32 table, s32 r, s32 g, s32 b, s32 a);   // 0x8024D8C8: GXSetTevSwapModeTable
+void GXInvalidateTexAll(void);                 // 0x8024CB00: GXInvalidateTexAll
+void GXSetTevOrder(s32 a, s32 b, s32 c, s32 d);   // 0x8024DA08: GXSetTevOrder(stage, coord, map, colour channel)
+void GXSetNumTevStages(s32 a);                // 0x8024DB64: GXSetNumTevStages
+void GXSetTevOp(s32 a, s32 b);         // 0x8024D508: GXSetTevOp
+void GXSetAlphaCompare(s32 comp0, s32 ref0, s32 op, s32 comp1, s32 ref1);   // 0x8024D944: GXSetAlphaCompare
+void GXSetZTexture(s32 op, s32 fmt, s32 bias);    // 0x8024D97C: GXSetZTexture
+void GXSetTevKColorSel(s32 stage, s32 sel);   // 0x8024D7EC: GXSetTevKColorSel
+void GXSetTevKAlphaSel(s32 stage, s32 sel);   // 0x8024D83C: GXSetTevKAlphaSel
+void GXSetTevSwapMode(s32 stage, s32 rasSel, s32 texSel);   // 0x8024D88C: GXSetTevSwapMode
+void GXSetTevSwapModeTable(s32 table, s32 r, s32 g, s32 b, s32 a);   // 0x8024D8C8: GXSetTevSwapModeTable
 void GXSetTevDirect(s32 stage);            // 0x8024D468: GXSetTevDirect
 void GXSetNumIndStages(s32 count);            // 0x8024D448: GXSetNumIndStages
 void GXSetIndTexCoordScale(s32 stage, s32 scaleS, s32 scaleT);   // 0x8024D278: GXSetIndTexCoordScale
@@ -82,15 +82,15 @@ void GXSetDstAlpha(s32 enable, s32 alpha);   // 0x8024E0B8: GXSetDstAlpha
 void GXSetPixelFmt(s32 a, s32 b);         // 0x8024DFE4: GXSetPixelFmt
 void GXSetFieldMask(s32 odd, s32 even);    // 0x8024E0E8: GXSetFieldMask
 void GXSetFieldMode(s32 fieldMode, s32 halfAspect);   // 0x8024E11C: GXSetFieldMode
-void fn_8024BD5C(u8* color, u32 z);     // 0x8024BD5C: GXSetCopyClear
-void fn_8024BBE4(s32 x, s32 y, s32 w, s32 h);   // 0x8024BBE4: GXSetDispCopySrc
-void fn_8024BC24(s32 w, u32 h);         // 0x8024BC24: GXSetDispCopyDst
-u32  fn_8024BC90(f32 yScale);           // 0x8024BC90: GXSetDispCopyYScale
-void fn_8024BC68(s32 clamp);            // 0x8024BC68: GXSetCopyClamp
-void fn_8024BDD4(u32 aa, u8* pattern, s32 vf, u8* vfilter);   // 0x8024BDD4: GXSetCopyFilter
+void GXSetCopyClear(u8* color, u32 z);     // 0x8024BD5C: GXSetCopyClear
+void GXSetDispCopySrc(s32 x, s32 y, s32 w, s32 h);   // 0x8024BBE4: GXSetDispCopySrc
+void GXSetDispCopyDst(s32 w, u32 h);         // 0x8024BC24: GXSetDispCopyDst
+u32  GXSetDispCopyYScale(f32 yScale);           // 0x8024BC90: GXSetDispCopyYScale
+void GXSetCopyClamp(s32 clamp);            // 0x8024BC68: GXSetCopyClamp
+void GXSetCopyFilter(u32 aa, u8* pattern, s32 vf, u8* vfilter);   // 0x8024BDD4: GXSetCopyFilter
 void fn_8024BFB8(s32 a);                // 0x8024BFB8: GXSetDispCopyGamma
-void fn_8024BC48(s32 mode);             // 0x8024BC48: GXSetDispCopyFrame2Field
-void fn_8024C108(void);                 // 0x8024C108: GXClearBoundingBox
+void GXSetDispCopyFrame2Field(s32 mode);             // 0x8024BC48: GXSetDispCopyFrame2Field
+void GXClearBoundingBox(void);                 // 0x8024C108: GXClearBoundingBox
 void GXPokeColorUpdate(s32 enable);           // 0x8024B4B0: GXPokeColorUpdate
 void GXPokeAlphaUpdate(s32 enable);           // 0x8024B440: GXPokeAlphaUpdate
 void GXPokeDither(s32 enable);           // 0x8024B4DC: GXPokeDither
@@ -99,7 +99,7 @@ void GXPokeAlphaMode(s32 func, s32 threshold);      // 0x8024B418: GXPokeAlphaMo
 void GXPokeAlphaRead(s32 mode);             // 0x8024B428: GXPokeAlphaRead
 void GXPokeDstAlpha(s32 enable, s32 alpha);        // 0x8024B4C4: GXPokeDstAlpha
 void GXPokeZMode(s32 enable, s32 func, s32 update);   // 0x8024B4F0: GXPokeZMode
-void fn_8024E60C(s32 perf0, s32 perf1); // 0x8024E60C: GXSetGPMetric
+void GXSetGPMetric(s32 perf0, s32 perf1); // 0x8024E60C: GXSetGPMetric
 void fn_8024EE38(void);                 // 0x8024EE38: GXClearGPMetric
 void fn_8015BBC0(s32 clear);            // 0x8015BBC0: resets GX state for a frame, clears the frame buffers
 s32  fn_8015D2E0(void);                 // 0x8015D2E0: draw-done callback, signals gVideoDrawDone
@@ -234,7 +234,7 @@ extern "C" void fn_8015D660(void) {
     GXSetPointSize(6, 0);
     for (int i = 0; i < 8; i++) GXEnableTexOffsets(i, 0, 0);
 
-    fn_80248050(&identity[0][0]);
+    PSMTXIdentity(&identity[0][0]);
     GXLoadPosMtxImm(&identity[0][0], 0);
     GXLoadNrmMtxImm(&identity[0][0], 0);
     GXSetCurrentMtx(0);
@@ -258,22 +258,22 @@ extern "C" void fn_8015D660(void) {
         GXSetChanMatColor(chan, color);
     }
 
-    fn_8024CB00();
-    for (int i = 0; i < 8; i++) fn_8024DA08(i, i, i, 4);
-    for (int i = 8; i < 16; i++) fn_8024DA08(i, 0xFF, 0xFF, 0xFF);
-    fn_8024DB64(1);
-    fn_8024D508(0, 3);
-    fn_8024D944(7, 0, 0, 7, 0);
-    fn_8024D97C(0, 0x11, 0);
+    GXInvalidateTexAll();
+    for (int i = 0; i < 8; i++) GXSetTevOrder(i, i, i, 4);
+    for (int i = 8; i < 16; i++) GXSetTevOrder(i, 0xFF, 0xFF, 0xFF);
+    GXSetNumTevStages(1);
+    GXSetTevOp(0, 3);
+    GXSetAlphaCompare(7, 0, 0, 7, 0);
+    GXSetZTexture(0, 0x11, 0);
     for (int i = 0; i < 16; i++) {
-        fn_8024D7EC(i, 6);
-        fn_8024D83C(i, 0);
-        fn_8024D88C(i, 0, 0);
+        GXSetTevKColorSel(i, 6);
+        GXSetTevKAlphaSel(i, 0);
+        GXSetTevSwapMode(i, 0, 0);
     }
-    fn_8024D8C8(0, 0, 1, 2, 3);
-    fn_8024D8C8(1, 0, 0, 0, 3);
-    fn_8024D8C8(2, 1, 1, 1, 3);
-    fn_8024D8C8(3, 2, 2, 2, 3);
+    GXSetTevSwapModeTable(0, 0, 1, 2, 3);
+    GXSetTevSwapModeTable(1, 0, 0, 0, 3);
+    GXSetTevSwapModeTable(2, 1, 1, 1, 3);
+    GXSetTevSwapModeTable(3, 2, 2, 2, 3);
     for (int i = 0; i < 16; i++) GXSetTevDirect(i);
     GXSetNumIndStages(0);
     for (int i = 0; i < 4; i++) GXSetIndTexCoordScale(i, 0, 0);
@@ -293,15 +293,15 @@ extern "C" void fn_8015D660(void) {
     GXSetFieldMode(mode->fieldRendering, mode->xfbHeight * 2 == mode->viHeight);
 
     color[0] = clearColor[0]; color[1] = clearColor[1]; color[2] = clearColor[2]; color[3] = clearColor[3];
-    fn_8024BD5C(color, 0xFFFFFF);
-    fn_8024BBE4(0, 0, mode->fbWidth, mode->efbHeight);
-    fn_8024BC24(mode->fbWidth, mode->efbHeight);
-    fn_8024BC90((f32)mode->xfbHeight / (f32)mode->efbHeight);
-    fn_8024BC68(3);
-    fn_8024BDD4(mode->aa, &mode->samplePattern[0][0], 1, mode->vfilter);
+    GXSetCopyClear(color, 0xFFFFFF);
+    GXSetDispCopySrc(0, 0, mode->fbWidth, mode->efbHeight);
+    GXSetDispCopyDst(mode->fbWidth, mode->efbHeight);
+    GXSetDispCopyYScale((f32)mode->xfbHeight / (f32)mode->efbHeight);
+    GXSetCopyClamp(3);
+    GXSetCopyFilter(mode->aa, &mode->samplePattern[0][0], 1, mode->vfilter);
     fn_8024BFB8(0);
-    fn_8024BC48(0);
-    fn_8024C108();
+    GXSetDispCopyFrame2Field(0);
+    GXClearBoundingBox();
 
     // The same for direct ("poke") access to the frame buffer, and no performance counters.
     GXPokeColorUpdate(1);
@@ -312,6 +312,6 @@ extern "C" void fn_8015D660(void) {
     GXPokeAlphaRead(1);
     GXPokeDstAlpha(0, 0);
     GXPokeZMode(1, 7, 1);
-    fn_8024E60C(0x23, 0x16);
+    GXSetGPMetric(0x23, 0x16);
     fn_8024EE38();
 }

@@ -32,7 +32,7 @@ s32 fn_801F72F0(u8* arg0, f32* arg1, u8* arg2);                           // 0x8
 f64 fn_8033F1F4(f64 x);                                                   // 0x8033F1F4 (MSL acos)
 s32 fn_802EA048(void);                                                    // 0x802EA048
 s32 fn_802E48B8(s32* a, s32* b);                                          // 0x802E48B8
-void fn_802E4970(void);                                                   // 0x802E4970
+void DWC_ClearError(void);                                                   // 0x802E4970
 s32 fn_802E925C(void);                                                    // 0x802E925C
 void fn_80320968(void);                                                   // 0x80320968
 s32 fn_8032D3C0(s32 code);                                                // 0x8032D3C0
@@ -441,7 +441,7 @@ s32 fn_80208A54(u8* arg0) {
                 break;
             case 1:
                 lbl_805FBB54[0] = 0;
-                fn_802E4970();
+                DWC_ClearError();
                 break;
             case 2:
                 lbl_805FBB54[0] = 1;
