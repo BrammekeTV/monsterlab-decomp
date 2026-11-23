@@ -23,6 +23,17 @@ typedef struct PortFrameStats {
 } PortFrameStats;
 
 extern BOOL gPortOverlayOn;   // F3, --stats
+extern BOOL gPortGuiOpen;     // the settings screen (F1 or Esc, --settings): it has the keyboard and mouse, the game does not
+extern int  gPortGuiPage;     // the page to open on (0 display, 1 audio, 2 controls), then -1
+
+// The settings screen (port_settings_gui.cpp), built inside the overlay's ImGui frame.
+void PortGuiSetOpen(BOOL open);
+void PortGuiKeys(void);
+void PortGuiInput(u32 w, u32 h);
+void PortGuiBuild(u32 w, u32 h);
+// Renderer hooks the settings screen uses (port_gfx_d3d11.cpp).
+void PortGfxSetFullscreen(BOOL on);
+f32  PortGfxTakeWheel(void);  // mouse wheel notches since the last call
 
 void PortOverlayStart(ID3D11Device* dev, ID3D11DeviceContext* ctx);
 // Records a shown frame and reads the F3 key.

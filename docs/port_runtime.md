@@ -30,6 +30,9 @@ build\pc\monsterlab.exe                        # runs main() with your own disc 
 | `--screenshot FILE` | write the last picture shown as a PNG when the run stops (works without `--window`) |
 | `--stats` | start with the stats overlay on (top-right; F3 turns it on and off in the window): frames per second, frame time split into game, render and wait, draw calls, GX vertices, frame-buffer copies, textures, audio voices, output size |
 | `--screenshot-stats` | draw the stats overlay into the `--screenshot` picture too (it is left out otherwise) |
+| `--settings [display\|audio\|controls]` | open the settings screen at the start (F1 or Esc opens and closes it in the window); with `--screenshot-stats` it is drawn into the screenshot |
+| `--vsync`, `--fullscreen` | vertical sync; borderless fullscreen (both also in the settings screen) |
+| `--no-ini` | do not read `monsterlab.ini` (next to the exe: display, audio and the key bindings, written by the settings screen; the command line wins over it) |
 | `--res WxH` | output size (default 1920x1080) |
 | `--aspect 4:3\|16:9` | picture shape and the console's widescreen setting (default 16:9) |
 | `--stretch-ui` | 16:9: stretch the 2D layer over the whole width, as the console does |
