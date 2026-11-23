@@ -31,7 +31,7 @@ extern "C" void OnlineRecordLoss(void) {
 }
 
 // 0x801409FC
-extern "C" u8 MatchupIsActive(void) {
+extern "C" u32 MatchupIsActive(void) {
     u8 t0 = *(u8*)((u8*)&lbl_805FB41C);
     return (u8)(t0);
 }

@@ -30,7 +30,7 @@ extern "C" u8* fn_800DD3BC(s32 a3, s32 a4) {
 }
 
 // 0x800DD3C8
-extern "C" u8 fn_800DD3C8(void) {
+extern "C" u32 fn_800DD3C8(void) {
     u8 t0 = *(u8*)((u8*)&lbl_805FB1A4 + 1);
     return (u8)(t0);
 }
@@ -107,7 +107,7 @@ extern "C" void fn_800DE4DC(u8* a3) {
 }
 
 // 0x800DE4E4
-extern "C" u8 fn_800DE4E4(u8* a3) {
+extern "C" u32 fn_800DE4E4(u8* a3) {
     u8 t0 = *(u8*)(((u8*)(uintptr_t)(a3)) + 100);
     return (u8)(t0);
 }
