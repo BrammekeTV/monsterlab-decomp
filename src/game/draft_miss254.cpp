@@ -89,7 +89,7 @@ u8*    fn_801483BC(s32 idx);                                         // 0x801483
 void   fn_8014DE68(void);                                            // 0x8014DE68
 void   fn_8014E3EC(s32 n);                                           // 0x8014E3EC
 void   fn_801514F0(void);                                            // 0x801514F0
-s32    fn_80151644(s32 a, s32 b, u8* quad);                          // 0x80151644
+void    fn_80151644(s32 a, s32 b, u8* quad);                          // 0x80151644
 void   fn_80154290(void);                                           // 0x80154290
 void   fn_801542DC(void);                                            // 0x801542DC
 void   fn_80154974(void);                                            // 0x80154974

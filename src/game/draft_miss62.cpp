@@ -72,7 +72,7 @@ void fn_800446BC(void* cam, s32 v);        // 0x800446BC
 void fn_80121434(u8* v, f32 a, f32 b);     // 0x80121434: texture coords
 void fn_80121440(u8* v, s32 r, s32 g, s32 b, s32 a);   // 0x80121440: packs the vertex colour
 void fn_8012145C(u8* v, f32 x, f32 y, f32 z);          // 0x8012145C: position
-s32 fn_80151644(s32 a, s32 b, u8* quad);   // 0x80151644
+void fn_80151644(s32 a, s32 b, u8* quad);   // 0x80151644
 s32 WorldGetPhase(void* world);            // 0x800D83A8
 u32 fn_8000B888(u8* ctx);                    // 0x8000B888
 extern u8 gScriptCtx[];                                          // 0x803C4298

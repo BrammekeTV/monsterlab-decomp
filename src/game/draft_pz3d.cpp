@@ -30,7 +30,7 @@ void   fn_8012145C(u8* v, f32 x, f32 y, f32 z);                   // 0x8012145C
 u32    fn_80143A5C(const char* s);                                // 0x80143A5C (name hash)
 void   fn_801458B0(f32* quat, f32* a, f32* b);                    // 0x801458B0
 void   fn_80146180(void* quat, const Vec3* axis, f32 angle);      // 0x80146180 (rotate quat about axis)
-s32    fn_80151644(s32 a, s32 b, u8* quad);                       // 0x80151644
+void    fn_80151644(s32 a, s32 b, u8* quad);                       // 0x80151644
 void    fn_80152620(s32 a, s32 b, u8* quad);                       // 0x80152620
 void   fn_8015D578(void);                                         // 0x8015D578
 void   fn_8015D5A4(void);                                         // 0x8015D5A4

@@ -20,7 +20,7 @@ void fn_8014ACCC(u32 mode, s32 fmt, s32 w, s32 h, s32* outSize, s32* outStride, 
 void fn_8014DE68(void);                                                   // 0x8014DE68
 void fn_8014E3EC(s32 n);                                                  // 0x8014E3EC
 u32  fn_8014EACC(void* a3, s32 a4, s32 a5, s32 a6);                       // 0x8014EACC
-s32  fn_80151644(s32 a, s32 b, u8* quad);                                 // 0x80151644
+void  fn_80151644(s32 a, s32 b, u8* quad);                                 // 0x80151644
 s32  fn_8015BA30(void* p);                                                // 0x8015BA30
 void fn_8015D660(void);                                                   // 0x8015D660
 void GXSetVtxDesc(s32 a, s32 b);                                           // 0x8024A3A4

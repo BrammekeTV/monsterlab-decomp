@@ -24,7 +24,7 @@ void  fn_8014C8F0(u8* dst, u8* src);                                            
 void  fn_8014D190(u8* dst, u8* src);                                                        // 0x8014D190
 void  fn_8014D834(u8* dst, u8* src);                                                        // 0x8014D834
 void  fn_8014E3EC(s32 n);                                                                   // 0x8014E3EC
-s32   fn_80151644(s32 a, s32 b, u8* quad);                                                  // 0x80151644
+void   fn_80151644(s32 a, s32 b, u8* quad);                                                  // 0x80151644
 u32   fn_801D3A84(s32 n);                                                                   // 0x801D3A84
 void  fn_801E7E28(void* p);                                                                 // 0x801E7E28
 extern u8 gIdPool[];                  // 0x8048A8F0
