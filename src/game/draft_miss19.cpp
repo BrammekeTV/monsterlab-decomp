@@ -245,12 +245,16 @@ BOOL fn_80142358(void) {
 // Timer: keeps the stored timestamp (u64 at +0) from running up to 60000000 ticks ahead of the
 // current time, then returns the elapsed time since it in milliseconds.
 u64 fn_801425DC(u8* timer) {
+    // The timer's time is stored the way the PowerPC wrote it: high word at +0, low word at +4
+    // (TimerReset, fn_80142500); a native u64 here would read the words swapped.
     OSTime now = OSGetTime();
-    OSTime last = *(OSTime*)timer;
+    OSTime last = ((u64)*(u32*)(timer + 0) << 32) | *(u32*)(timer + 4);
     if ((u64)(last - now) < 60000000ull) {
-        *(OSTime*)timer = now;
+        *(u32*)(timer + 4) = (u32)now;
+        *(u32*)(timer + 0) = (u32)((u64)now >> 32);
     }
-    OSTime elapsed = now - *(OSTime*)timer;
+    OSTime stored = ((u64)*(u32*)(timer + 0) << 32) | *(u32*)(timer + 4);
+    OSTime elapsed = now - stored;
     return (u64)(((s64)elapsed * 8) / (s64)(OSGetBusClock() / 4 / 125000));
 }
 
