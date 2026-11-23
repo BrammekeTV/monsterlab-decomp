@@ -2141,6 +2141,28 @@ static SirError UiBasePlan(ImagePlan* plan, const u8* image, u32 imageSize, u32 
     return UiBasePlan(plan, image, imageSize, Be32(image + o + 0x130), depth + 1);
 }
 
+// A slideshow (kind 2, sub-kind 4; vtable lbl_80382EA0, its name "UISlideshow"): +0x140 a holder
+// {+0x00 a hash, +0x04 a list of texture pointers} (fn_801A21CC hands the element at the index
+// +0x148 to UISetTexture of the widget at +0x164, fn_8019AC00 reads the list), +0x148 / +0x14C /
+// +0x150 indices and a flag, +0x154..+0x160 floats (fn_801A1F40, fn_801A21CC; +0x15C and +0x160
+// are written first), and the two picture widgets at +0x164 and +0x168 (fn_801A2330).
+static SirError UiSlideshowPlan(ImagePlan* plan, const u8* image, u32 imageSize, u32 o) {
+    u32 h, l, d;
+    SirError e;
+    if ((u64)o + 0x16C > imageSize || !PlanAdd(plan, o + 0x140, 4, REGION_PTR_ARRAY) || !PlanAdd(plan, o + 0x148, 0x1C, REGION_U32_ARRAY))
+        return SIR_ERR_SCREENS;
+    if (!LevelSpan(Be32(image + o + 0x140), 8, imageSize, &h) || PlanHas(plan, h + 4, REGION_PTR_ARRAY)) return SIR_OK;
+    if (!PlanAdd(plan, h + 4, 4, REGION_PTR_ARRAY)) return SIR_ERR_SCREENS;
+    u32 list = Be32(image + h + 4);
+    if ((e = UiListPlan(plan, image, imageSize, list, UI_LIST_PLAIN, 0)) != SIR_OK) return e;
+    if (!LevelSpan(list, 0x14, imageSize, &l)) return SIR_OK;
+    u32 count = Be32(image + l);
+    if (count == 0 || !LevelSpan(Be32(image + l + 0x10), (u64)count * 4, imageSize, &d)) return SIR_OK;
+    for (u32 i = 0; i < count; i++)
+        if ((e = MaterialTexturePlan(plan, image, imageSize, Be32(image + d + i * 4))) != SIR_OK) return SIR_ERR_SCREENS;
+    return SIR_OK;
+}
+
 // What fn_8019914C reads of a widget to install the vtable for its kind: +0x60 the kind; for kinds
 // 2 and 3 the sub-kind at +0x13C; kind 3 a list at +0x15C (its entries only get a vtable); kind 4
 // a widget at +0x1B4 and a list of widgets at +0x1BC; kind 5 a widget at +0x190; kind 6 its
@@ -2155,7 +2177,9 @@ static SirError UiFixupPlan(ImagePlan* plan, const u8* image, u32 imageSize, u32
     u32 need = kind == 2 ? 0x140 : kind == 3 ? 0x160 : kind == 4 ? 0x1C0 : kind == 5 ? 0x194 : 0;
     if ((u64)o + need > imageSize) return SIR_ERR_SCREENS;
     if ((kind == 2 || kind == 3) && !PlanAdd(plan, o + 0x13C, 4, REGION_U32_ARRAY)) return SIR_ERR_SCREENS;
-    if (kind == 3) {
+    if (kind == 2 && Be32(image + o + 0x13C) == 4) {
+        e = UiSlideshowPlan(plan, image, imageSize, o);
+    } else if (kind == 3) {
         if (!PlanAdd(plan, o + 0x15C, 4, REGION_PTR_ARRAY)) return SIR_ERR_SCREENS;
         e = UiListPlan(plan, image, imageSize, Be32(image + o + 0x15C), UI_LIST_WIDGETS, depth);
     } else if (kind == 4) {
@@ -2186,6 +2210,13 @@ static SirError UiWidgetPlan(ImagePlan* plan, const u8* image, u32 imageSize, u3
     // The children, once per widget.
     if (PlanHas(plan, o, REGION_RUNTIME)) return SIR_OK;                        // an empty marker at the widget
     if (!PlanAdd(plan, o, 0, REGION_RUNTIME)) return SIR_ERR_SCREENS;
+    // A kind 2, sub-kind 4 widget: two widgets at +0x164 and +0x168, whose vtables fn_801A1B2C installs
+    // (fn_8019914C installs this one's, by the sub-kind at +0x13C).
+    if (Be32(image + o + 0x60) == 2 && Be32(image + o + 0x13C) == 4 && (u64)o + 0x16C <= imageSize) {
+        if (!PlanAdd(plan, o + 0x164, 8, REGION_PTR_ARRAY)) return SIR_ERR_SCREENS;
+        for (u32 k = 0; k < 2; k++)
+            if ((fix = UiWidgetPlan(plan, image, imageSize, Be32(image + o + 0x164 + k * 4), false, depth + 1)) != SIR_OK) return fix;
+    }
     u32 c = Be32(image + o + 0x120), guard = imageSize / UI_WIDGET_USED + 1, co;
     SirError e;
     while (LevelSpan(c, UI_WIDGET_USED, imageSize, &co)) {
