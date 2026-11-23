@@ -2431,13 +2431,6 @@ static SirError UiAnimListPlan(ImagePlan* plan, const u8* image, u32 imageSize, 
     if (size != UI_ANIM_KEY_SIZE || count > capacity || count > imageSize / UI_ANIM_KEY_SIZE ||
         !LevelSpan(Be32(image + l + 0x10), (u64)count * UI_ANIM_KEY_SIZE, imageSize, &d) ||
         !PlanAdd(plan, d, count * UI_ANIM_KEY_SIZE, kind)) return SIR_ERR_SCREENS;
-    if (kind == REGION_UI_ANIM_ENTRIES) {        // an entry of kind 3 plays the sound object at +0x10
-        for (u32 i = 0; i < count; i++) {
-            const u8* entry = image + d + i * UI_ANIM_KEY_SIZE;
-            SirError e;
-            if (Be32(entry + 0x24) == 3 && (e = SoundPlan(plan, image, imageSize, Be32(entry + 0x10))) != SIR_OK) return e;
-        }
-    }
     return SIR_OK;
 }
 
