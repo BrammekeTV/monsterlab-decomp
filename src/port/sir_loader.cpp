@@ -3084,6 +3084,8 @@ extern "C" BOOL LevelZoneRootsCollect(const u8* hdr, u32 hdrSize, const u8* zone
 // 9 and 15 to 18). That is all that is typed of them so far.
 #define CAMERA_TRACK_TYPE 15
 #define CAMERA_TRACK_USED 0x60
+#define CAMERA_AIM_TYPE 16
+#define CAMERA_AIM_USED 0xB8
 static SirError SlotObjectsPlan(ImagePlan* plan, const u8* image, u32 imageSize, u32 addr, u32 count) {
     u32 off, o;
     if (count == 0) return SIR_OK;
@@ -3098,6 +3100,15 @@ static SirError SlotObjectsPlan(ImagePlan* plan, const u8* image, u32 imageSize,
             u32 t;
             if (LevelSpan(Be32(image + off + i * 4), CAMERA_TRACK_USED, imageSize, &t) && !PlanHas(plan, t + 0x58, REGION_U32_ARRAY) &&
                 !PlanAdd(plan, t + 0x58, 8, REGION_U32_ARRAY))
+                return SIR_ERR_LEVEL;
+        }
+        // Type 16 (vtable lbl_80360200, fn_800E5550) aims between locators: +0xA8 / +0xAC the two
+        // it looks from and to, +0xB0 / +0xB4 two whose vectors it copies (fn_800E5684 resolves the
+        // four reference words with fn_801ED684). The constructor resets the rest.
+        if (Be32(image + o + 8) == CAMERA_AIM_TYPE) {
+            u32 t;
+            if (LevelSpan(Be32(image + off + i * 4), CAMERA_AIM_USED, imageSize, &t) && !PlanHas(plan, t + 0xA8, REGION_U32_ARRAY) &&
+                !PlanAdd(plan, t + 0xA8, 16, REGION_U32_ARRAY))
                 return SIR_ERR_LEVEL;
         }
     }

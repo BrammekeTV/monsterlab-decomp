@@ -1123,6 +1123,8 @@ def zone_dump(L, sec, base, hud, roots, scene_roots, pooltabs, records=(), lists
                 t = u(off(v) + 8)
                 if t == 15 and inz(v, 0x60):
                     L.append('slotobject %s type %d track %08x %08x' % (ptr(v), t, u(off(v) + 0x58), u(off(v) + 0x5C)))
+                elif t == 16 and inz(v, 0xB8):
+                    L.append('slotobject %s type %d aim %s' % (ptr(v), t, ws(off(v) + 0xA8, 4)))
                 else:
                     L.append('slotobject %s type %d' % (ptr(v), t))
     for addr, n in pooltabs:

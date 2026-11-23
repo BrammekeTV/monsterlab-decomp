@@ -955,6 +955,7 @@ struct ZoneDump {
                 seen.push_back(o);
                 printf("slotobject "); Val(o); printf(" type %u", *(const u32*)(o + 8));
                 if (*(const u32*)(o + 8) == 15 && In(o, 0x60)) printf(" track %08x %08x", *(const u32*)(o + 0x58), *(const u32*)(o + 0x5C));
+                if (*(const u32*)(o + 8) == 16 && In(o, 0xB8)) { printf(" aim "); Words(o + 0xA8, 4); }
                 printf("\n");
             }
         }
