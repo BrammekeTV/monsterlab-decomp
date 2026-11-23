@@ -194,6 +194,7 @@ s32 PortFrameCount(void) { return sFrames; }
 void PortFrameDone(void) {
     if (sFrames == 1 && getenv("PORT_SCRIPT_TRACE")) InstallScriptTrace();
     sFrames++;
+    if (!gPortOptions.fastAll && sFrames >= gPortOptions.fastForward) PortFastEnd();
     if (gPortOptions.frameLimit && sFrames >= gPortOptions.frameLimit) {
         PortStop(0, "frame limit reached (%d frames)", sFrames);
     }
@@ -630,8 +631,17 @@ void PortYield(void) {
     }
 }
 
+extern volatile LONG gPortIdleWaiters;  // port_os.cpp: waiters registered at the current generation
+static HANDLE sIdleEvent;                                    // fast-forward: wakes the interrupt thread when all threads wait
+
 void PortWaitChange(void) {
     u32 gen = sChangeGen;
+    AcquireSRWLockExclusive(&sChangeLock);
+    if (sChangeGen == gen) {                     // a signal clears the count: every waiter wakes and registers again
+        gPortIdleWaiters++;
+        if (sIdleEvent && PortFastActive()) SetEvent(sIdleEvent);
+    }
+    ReleaseSRWLockExclusive(&sChangeLock);
     PortLockLeave();
     AcquireSRWLockExclusive(&sChangeLock);
     while (sChangeGen == gen) SleepConditionVariableSRW(&sChangeCv, &sChangeLock, 20, 0);
@@ -642,6 +652,7 @@ void PortWaitChange(void) {
 void PortSignalChange(void) {
     AcquireSRWLockExclusive(&sChangeLock);
     sChangeGen++;
+    gPortIdleWaiters = 0;
     ReleaseSRWLockExclusive(&sChangeLock);
     WakeAllConditionVariable(&sChangeCv);
 }
@@ -667,13 +678,16 @@ void PortQueueInterrupt(void (*fn)(void*), void* arg) {
 
 static DWORD WINAPI InterruptThread(void*) {
     for (;;) {
-        Sleep(1);
+        if (PortFastActive()) WaitForSingleObject(sIdleEvent, 1);   // fast-forward: woken as soon as every game thread waits
+        else Sleep(1);
         PortLockEnter();
         if (sIntrEnabled) {
             while (sQueueHead != sQueueTail) {
                 Queued q = sQueue[sQueueHead++ % 256];
                 q.fn(q.arg);
             }
+            // Fast-forward: nothing is queued and every game thread waits, so game time jumps to the next event.
+            if (sQueueHead == sQueueTail) PortClockAdvanceIfIdle();
             PortOsTick();
             PortViTick();
             PortAudioTick();
@@ -725,6 +739,7 @@ extern "C" void PortStartInterrupts(void) {
     if (started) return;
     started = TRUE;
     timeBeginPeriod(1);
+    sIdleEvent = CreateEventA(NULL, FALSE, FALSE, NULL);
     CloseHandle(CreateThread(NULL, 0x40000, InterruptThread, NULL, 0, NULL));
     if (gPortOptions.secondsLimit > 0) CloseHandle(CreateThread(NULL, 0x10000, WatchdogThread, NULL, 0, NULL));
 }
@@ -821,6 +836,8 @@ static const char* FindDataDir(const char* asked) {
     return NULL;
 }
 
+static const s32 kMenuFrame = 3200;           // --to-menu: fast-forward this many frames
+
 struct PortBoot {
     PortBoot() {
         sStartTick = GetTickCount();
@@ -828,13 +845,17 @@ struct PortBoot {
         gPortOptions.showTexture = -1;
         gPortOptions.secondsLimit = 60;
         const char* asked = getenv("MONSTERLAB_DATA");
+        BOOL sawFrames = FALSE, sawSeconds = FALSE;
         for (int i = 1; i < __argc && __argv; i++) {
             const char* a = __argv[i];
             if (!strcmp(a, "--selftest")) gPortOptions.selfTest = TRUE;
             else if (!strcmp(a, "--verbose")) gPortOptions.verbose = TRUE;
             else if (!strcmp(a, "--keep-going")) gPortOptions.keepGoing = TRUE;
-            else if (!strcmp(a, "--frames") && i + 1 < __argc) gPortOptions.frameLimit = atoi(__argv[++i]);
-            else if (!strcmp(a, "--seconds") && i + 1 < __argc) gPortOptions.secondsLimit = atoi(__argv[++i]);
+            else if (!strcmp(a, "--frames") && i + 1 < __argc) { gPortOptions.frameLimit = atoi(__argv[++i]); sawFrames = TRUE; }
+            else if (!strcmp(a, "--fast-forward") && i + 1 < __argc) gPortOptions.fastForward = atoi(__argv[++i]);
+            else if (!strcmp(a, "--fast")) gPortOptions.fastAll = TRUE;
+            else if (!strcmp(a, "--to-menu")) gPortOptions.toMenu = TRUE;
+            else if (!strcmp(a, "--seconds") && i + 1 < __argc) { gPortOptions.secondsLimit = atoi(__argv[++i]); sawSeconds = TRUE; }
             else if (!strcmp(a, "--data") && i + 1 < __argc) asked = __argv[++i];
             else if (!strcmp(a, "--window")) gPortOptions.window = TRUE;
             else if (!strcmp(a, "--wav") && i + 1 < __argc) gPortOptions.wav = __argv[++i];
@@ -860,6 +881,13 @@ struct PortBoot {
             }
         }
 
+        if (gPortOptions.toMenu) {                // --to-menu: unpaced to the title, A, on to the main menu, then real time
+            // Frames as counted by PortFrameDone (the title is up from about frame 2400; the menu from about 3100).
+            if (gPortOptions.fastForward < kMenuFrame) gPortOptions.fastForward = kMenuFrame;
+            PortInputAddPress("A@2600-2610");
+            if (!sawFrames) gPortOptions.frameLimit = 0;
+            if (!sawSeconds) gPortOptions.secondsLimit = 0;
+        }
         // The Wii's two memory blocks at their original addresses. The code range must be executable.
         void* m1 = VirtualAlloc((void*)(uintptr_t)PORT_MEM1_BASE, PORT_MEM1_SIZE, MEM_RESERVE | MEM_COMMIT, PAGE_READWRITE);
         void* m2 = VirtualAlloc((void*)(uintptr_t)PORT_MEM2_BASE, PORT_MEM2_SIZE, MEM_RESERVE | MEM_COMMIT, PAGE_READWRITE);
