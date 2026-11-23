@@ -43,8 +43,8 @@ s32   fn_801FE52C(u8* audio, u8* desc, s32 c);                   // 0x801FE52C (
 void  fn_801FF2A8(u8* audio, s32 handle);                        // 0x801FF2A8 (return value unused)
 void  fn_80234418(void* p);                                      // 0x80234418
 void  AXQuit(void);                                         // 0x80257C88 (return value unused)
-void  fn_80260AB0(void);                                         // 0x80260AB0 (return value unused)
-void  fn_80263F4C(void);                                         // 0x80263F4C (return value unused)
+void  MIXQuit(void);                                         // 0x80260AB0 (return value unused)
+void  AXARTQuit(void);                                         // 0x80263F4C (return value unused)
 
 }  // extern "C"
 
@@ -131,8 +131,8 @@ void fn_801FD1F0(void* arg0) {
         lbl_805FBAB8 = 0;
     }
     *(s32*)(lbl_8051E680 + 0x24) = 0;
-    fn_80263F4C();
-    fn_80260AB0();
+    AXARTQuit();
+    MIXQuit();
     AXQuit();
     BufferFree(lbl_805FBADC);
     lbl_805FBADC = NULL;

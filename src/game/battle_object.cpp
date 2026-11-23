@@ -384,7 +384,7 @@ void BattleSpeedRoll(u8* b) {
                 if (BattleCommitAction(b, i)) {
                     b[0x9F2 + i] = 1;
                     s32 limb = ChoiceLimbOf(stats);
-                    *(s32*)(b + 0x9F4 + i * 4) = (s32)(s16)*(u32*)(ent + 0xC);
+                    *(s32*)(b + 0x9F4 + i * 4) = (s32)*(s16*)(ent + 0xC);  // lha of the first halfword at +0xC
                     void* part = ((void**)((u8**)(gBattle + 0xA00))[i])[limb];
                     if (part != NULL && *(void**)part != NULL)
                         *(s32*)(b + 0x9F4 + i * 4) = PartActionStat1(*(void**)part, (u32)act);

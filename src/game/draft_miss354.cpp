@@ -67,14 +67,14 @@ void  GXSetProjection(f32* mtx, s32 a);                             // 0x8024E1D
 void  GXLoadPosMtxImm(f32* mtx, s32 a);                             // 0x8024E280
 void  GXSetCurrentMtx(s32 a);                                       // 0x8024E328
 void  fn_8024E348(f32* mtx, s32 id, s32 type);                  // 0x8024E348
-s32   fn_8025AC30(u8* voice, s32 a);                            // 0x8025AC30
+s32   AXSetVoiceSrcType(u8* voice, s32 a);                            // 0x8025AC30
 void  AXSetVoiceState(u8* voice, s32 a);                            // 0x8025ACF0
-void  fn_8025AD60(u8* voice, s32 a);                            // 0x8025AD60 (two arguments; r5 is not read)
+void  AXSetVoiceType(u8* voice, s32 a);                            // 0x8025AD60 (two arguments; r5 is not read)
 s32   AXSetVoiceAddr(u8* voice, u16* p);                           // 0x8025B0A4
-s32   fn_8025B19C(u8* voice, u16* p);                           // 0x8025B19C
-s32   fn_8025B234(u8* voice, u16* p);                           // 0x8025B234
-s32   fn_8025B330(u8* voice, u16* p);                           // 0x8025B330
-void  fn_80260AD4(u8* voice, s32 a, s32 b, s32 c, s32 d, s32 e, s32 f, s32 g, s32 h);  // 0x80260AD4 (9th argument on the stack)
+s32   AXSetVoiceAdpcm(u8* voice, u16* p);                           // 0x8025B19C
+s32   AXSetVoiceSrc(u8* voice, u16* p);                           // 0x8025B234
+s32   AXSetVoiceAdpcmLoop(u8* voice, u16* p);                           // 0x8025B330
+void  MIXInitChannel(u8* voice, s32 a, s32 b, s32 c, s32 d, s32 e, s32 f, s32 g, s32 h);  // 0x80260AD4 (9th argument on the stack)
 void* fn_802BE160(s32 size, s32 align);                         // 0x802BE160
 void  fn_802BE220(void* h);                                     // 0x802BE220
 
@@ -290,7 +290,7 @@ void fn_80201BD4(u8* arg0, u8* arg1) {
         loop[0] = **(u8**)(arg1 + 0x94);
         loop[1] = 0;
         loop[2] = 0;
-        fn_8025B330(*(u8**)(arg1 + 0x8C), loop);
+        AXSetVoiceAdpcmLoop(*(u8**)(arg1 + 0x8C), loop);
     }
     if (*(s32*)(arg1 + 0xA0) == 1) {
         fn_80201AD8(gAudio, arg1);
@@ -333,7 +333,7 @@ void fn_80203ABC(u8* arg0, u8* arg1) {
             u32 endAddr = base + 0x1FFFF;
             u32 curAddr = base + *(u32*)(hdr + 0x18) + 0xC0;
             u32 startAddr = base + 2;
-            fn_80260AD4(voice, 0, 0, -0x388, -0x388, -0x388, 0, 0x7F, 0);
+            MIXInitChannel(voice, 0, 0, -0x388, -0x388, -0x388, 0, 0x7F, 0);
             addr[0] = 1;
             addr[1] = 0;
             addr[2] = (u16)(startAddr >> 16);
@@ -353,11 +353,11 @@ void fn_80203ABC(u8* arg0, u8* arg1) {
             src[4] = 0;
             src[5] = 0;
             src[6] = 0;
-            fn_8025AD60(voice, 1);
-            fn_8025B19C(voice, coef);
+            AXSetVoiceType(voice, 1);
+            AXSetVoiceAdpcm(voice, coef);
             AXSetVoiceAddr(voice, addr);
-            fn_8025AC30(voice, 1);
-            fn_8025B234(voice, src);
+            AXSetVoiceSrcType(voice, 1);
+            AXSetVoiceSrc(voice, src);
             if (*(u32*)(arg1 + 0x9C) == 1U) {
                 AXSetVoiceState(voice, 1);
             }

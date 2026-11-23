@@ -65,7 +65,7 @@ void   fn_801E5C3C(u8* obj, s32 a, f32 t);                       // 0x801E5C3C
 BOOL   fn_801E5E24(u8* p);                                       // 0x801E5E24
 void   fn_801E8D74(void* out, void* list, void* owner, void* anim);   // 0x801E8D74
 void   fn_801ED788(f32* out, u32 a1);                            // 0x801ED788
-s32    strncmp(const char* a, const char* b, u32 n);          // 0x80338A2C (strncmp)
+s32    fn_80338A2C(const char* a, const char* b, u32 n);          // 0x80338A2C (strncmp)
 void   fn_801FF910(f32 v);                                       // 0x801FF910
 void*  fn_80209814(void* v);                                     // 0x80209814
 void   operator_delete(void* p);                                 // 0x801D426C
@@ -431,9 +431,9 @@ void* fn_802209CC(void* dst, s32 val, u32 n) {
 }
 
 // 0x80221288
-// Tail call to the MSL strncmp (strncmp).
+// Tail call to the MSL strncmp (fn_80338A2C).
 s32 fn_80221288(const char* a, const char* b, u32 n) {
-    return strncmp(a, b, n);
+    return fn_80338A2C(a, b, n);
 }
 
 }  // extern "C"

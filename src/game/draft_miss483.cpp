@@ -25,7 +25,7 @@ u8*   fn_801B161C(u8* p, u32 key);                              // 0x801B161C
 void  fn_801C83AC(u8* mgr, u8* item);                           // 0x801C83AC
 u8*   fn_8021824C(u8* lab, s32 del);                            // 0x8021824C
 void  fn_8020EB44(u8* p, s32 del);                              // 0x8020EB44
-s32   strncmp(const char* a, const char* b, u32 n);        // 0x80338A2C (strncmp)
+s32   fn_80338A2C(const char* a, const char* b, u32 n);        // 0x80338A2C (strncmp)
 s32   fn_8033861C(const char* s, const char* fmt, ...);         // 0x8033861C (sscanf)
 void  operator_delete(void* p);                                 // 0x801D426C
 
@@ -239,11 +239,11 @@ void fn_80142744(u8* arg0) {
 void fn_801EFF50(u8* arg0, const char* arg1) {
     s32 v;
 
-    if (strncmp(arg1, lbl_805F9708, 7) == 0) {
+    if (fn_80338A2C(arg1, lbl_805F9708, 7) == 0) {
         *(s32*)(arg0 + 0x8) = 0x01010101;
         return;
     }
-    if (strncmp(arg1, lbl_80385F40, 8) == 0) {
+    if (fn_80338A2C(arg1, lbl_80385F40, 8) == 0) {
         *(s32*)(arg0 + 0x8) = 0x01010102;
         return;
     }

@@ -302,9 +302,8 @@ void MultiplayerCleanup(void) {
 // Queues a music track name. When music is enabled and the current fade value is non-negative
 // the name is copied; otherwise the fade timers are set first. Returns 1 when the name was taken.
 s32 MusicPlay(const char* name, u8 loop, f32 volume) {
-    (void)loop;  // not read by the asm
     if (name == NULL) return 0;
-    if (lbl_805FBBB3 == 0) return fn_8020AB5C(name, 0 /* leftover r4 flag */);
+    if (lbl_805FBBB3 == 0) return fn_8020AB5C(name, loop);   // r4 is passed on as it came: the stereo flag
     if (lbl_805F9974 >= lbl_806004F0) {
         strncpy(lbl_80559CF8, name, 0x7F);
         lbl_80559CF8[0x7F] = 0;

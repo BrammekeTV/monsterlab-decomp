@@ -185,6 +185,8 @@ BOOL SetPartSelected(s32 slot) {
     for (s32 a = 0; a < 2; a++) {
         const PartActionType& type = DbActionType(actions[a].type);
         ActionDisplay disp = PartDbGetActionDisplay(gGameDb, type.unk00[2]);
+        // asm copies the returned flag bytes permuted: row flags = {show[2], show[0], show[1]}
+        u8 flags[3] = { disp.show[2], disp.show[0], disp.show[1] };
         s32 values[3];
         values[0] = PartActionStat0(part, actions[a].key);
         values[1] = PartActionStat1(part, actions[a].key);
@@ -192,7 +194,7 @@ BOOL SetPartSelected(s32 slot) {
 
         s32 row = 0;
         for (s32 s = 0; s < 3; s++) {
-            if (!disp.show[s]) continue;
+            if (!flags[s]) continue;
             for (s32 j = 0; j < 4; j++)
                 if (void* el = ScreenSetFindElement(set, kStatIcon[a][row][j])) UISetVisible(el, j == s);
             if (void* el = ScreenSetFindElement(set, kStatValue[a][row])) {

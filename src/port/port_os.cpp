@@ -446,24 +446,9 @@ s32 OSDisableInterrupts(void) { return (s32)PortDisableInterrupts(); }
 s32 OSEnableInterrupts(void) { s32 was = (s32)PortDisableInterrupts(); PortRestoreInterrupts(1); return was; }
 s32 OSRestoreInterrupts(s32 level) { s32 was = (s32)PortDisableInterrupts(); PortRestoreInterrupts((u32)(level != 0)); return was; }
 
-// AXRegisterCallback: the game's audio frame callback, which AX calls once per 5 ms audio frame.
-// There is no mixer yet; the callback still runs (from PortOsTick), because the game waits for it.
-// Returns the previous callback.
-static void (*sAxFrameCb)(void);
-static OSTime sAxNext;
-void* AXRegisterCallback(void* cb) {
-    void* old = (void*)sAxFrameCb;
-    sAxFrameCb = (void (*)(void))cb;
-    return old;
-}
-
 }  // extern "C"
 
 void PortOsTick(void) {
-    if (sAxFrameCb) {
-        OSTime t = OSGetTime(), frame = (OSTime)(OSGetBusClock() / 4 / 200);
-        if (t >= sAxNext) { sAxNext = t + frame; sAxFrameCb(); }
-    }
     OSTime now = 0;
     for (PortAlarm& a : sAlarms) {
         if (!a.key || !a.handler) continue;

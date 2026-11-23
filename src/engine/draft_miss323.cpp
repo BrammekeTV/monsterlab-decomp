@@ -73,24 +73,24 @@ void   DVDClose(u8* p);
 void   fn_80253A48(u8* p, s32 a);                              // 0x80253A48
 void   AXFreeVoice(u8* voice);                                 // 0x80257FA8
 void   AXSetVoicePriority(u8* voice, u32 a);                          // 0x802581A4
-s32    fn_8025AC30(u8* voice, s32 a);                          // 0x8025AC30
-void   fn_8025AD60(u8* voice, s32 a);                   // 0x8025AD60
-s32    fn_8025ADAC(u8* voice, u16* p);                         // 0x8025ADAC
+s32    AXSetVoiceSrcType(u8* voice, s32 a);                          // 0x8025AC30
+void   AXSetVoiceType(u8* voice, s32 a);                   // 0x8025AD60
+s32    AXSetVoiceMix(u8* voice, u16* p);                         // 0x8025ADAC
 void   AXSetVoiceState(u8* voice, s32 a);                          // 0x8025ACF0
 s32    AXSetVoiceAddr(u8* voice, u16* p);                         // 0x8025B0A4
-s32    fn_8025B19C(u8* voice, u16* p);                         // 0x8025B19C
-s32    fn_8025B234(u8* voice, u16* p);                         // 0x8025B234
-s32    fn_8025B330(u8* voice, u16* p);                         // 0x8025B330
-s32    fn_8025B3A0(u8* voice, s32 a);                          // 0x8025B3A0
+s32    AXSetVoiceAdpcm(u8* voice, u16* p);                         // 0x8025B19C
+s32    AXSetVoiceSrc(u8* voice, u16* p);                         // 0x8025B234
+s32    AXSetVoiceAdpcmLoop(u8* voice, u16* p);                         // 0x8025B330
+s32    AXSetVoiceRmtOn(u8* voice, s32 a);                          // 0x8025B3A0
 void   fn_8025B390(void);                                      // 0x8025B390
 void   fn_8025B398(void);                                      // 0x8025B398
-void   fn_80262194(u8* voice);                                 // 0x80262194
-void   fn_80262320(u8* voice);                                 // 0x80262320
-void   fn_80262344(u8* voice);                                 // 0x80262344
-s32    fn_80262368(u8* voice);                                 // 0x80262368
-void   fn_80263FAC(void);                                      // 0x80263FAC
-void   fn_80264420(u8* p);
-void   fn_802623A8(void);                                      // 0x802623A8
+void   MIXReleaseChannel(u8* voice);                                 // 0x80262194
+void   MIXMute(u8* voice);                                 // 0x80262320
+void   MIXUnMute(u8* voice);                                 // 0x80262344
+s32    MIXIsMute(u8* voice);                                 // 0x80262368
+void   AXARTServiceSounds(void);                                      // 0x80263FAC
+void   AXARTRemoveSound(u8* p);
+void   MIXUpdateSettings(void);                                      // 0x802623A8
 s32    WPADProbe(s32 chan, u32* out);
 s32    WPADControlSpeaker(s32 chan, s32 a, void* cb);
 s32    fn_802B47A0(s32 a, s32* b);                             // 0x802B47A0
@@ -367,9 +367,9 @@ void fn_80201F38(void) {
         }
         case 3: {
             u8* v0 = *(u8**)(s + 0x8C);
-            if (v0 != NULL) fn_80262194(v0);
+            if (v0 != NULL) MIXReleaseChannel(v0);
             u8* v1 = *(u8**)(s + 0x90);
-            if (v1 != NULL) fn_80262194(v1);
+            if (v1 != NULL) MIXReleaseChannel(v1);
             *(s32*)(s + 0xB4) = 4;
             break;
         }
@@ -441,7 +441,7 @@ void fn_80201F38(void) {
                 u8* h = *(u8**)v;
                 if (h == NULL) continue;
                 if (*(u16*)(h + 0x38) == 0) {
-                    fn_80262344(h);
+                    MIXUnMute(h);
                     AXSetVoiceState(*(u8**)v, 1);
                 }
                 if (lbl_805F98E0 != 0) continue;
@@ -457,7 +457,7 @@ void fn_80201F38(void) {
                 u8* v = voices + i * 0x114;
                 u8* h = *(u8**)v;
                 if (h != NULL && *(u16*)(h + 0x38) == 1) {
-                    fn_80262320(h);
+                    MIXMute(h);
                     AXSetVoiceState(*(u8**)v, 0);
                 }
             }
@@ -483,16 +483,16 @@ void fn_80201F38(void) {
             if (*(u16*)(h + 0x38) == 0) finished = 1;
         }
         if (finished != 0) {
-            if (fn_80262368(*(u8**)v) == 0) {
-                fn_80262320(*(u8**)v);
+            if (MIXIsMute(*(u8**)v) == 0) {
+                MIXMute(*(u8**)v);
             }
         }
         if (finished != 0) {
-            if (fn_80262368(*(u8**)v) != 0) {
+            if (MIXIsMute(*(u8**)v) != 0) {
                 if (i > 1) {
                     AXSetVoiceState(*(u8**)v, 0);
                     if (*(u8*)(v + 0xFE) != 0 || *(u8*)(v + 0xFC) != 0) {
-                        fn_80264420(v + 0x10);
+                        AXARTRemoveSound(v + 0x10);
                     }
                     if (*(u8*)(v + 0xFC) != 0) {
                         if (*(u8*)(v + 0xFD) != 0) {
@@ -532,8 +532,8 @@ void fn_80201F38(void) {
         else if (gain > 0x1F) gain = 0x1F;
         AXSetVoicePriority(*(u8**)v, gain);
     }
-    fn_80263FAC();
-    fn_802623A8();
+    AXARTServiceSounds();
+    MIXUpdateSettings();
     OSRestoreInterrupts(irq);
     lbl_805FBA88 = 1;
     fn_80142ED0((u8*)&lbl_805FBA88, 4);
@@ -594,16 +594,16 @@ void fn_80203340(u8* hdr, u8* voice, s32 streamed) {
     srcBlk[4] = 0;
     srcBlk[5] = 0;
     srcBlk[6] = 0;
-    fn_8025AD60(voice, 0);  // the asm passes only r3/r4
+    AXSetVoiceType(voice, 0);  // the asm passes only r3/r4
     AXSetVoiceAddr(voice, addrBlk);
-    fn_8025B19C(voice, coefBlk);
-    fn_8025B330(voice, loopBlk);
-    fn_8025B3A0(voice, 0);
-    fn_8025AC30(voice, 1);
-    fn_8025B234(voice, srcBlk);
+    AXSetVoiceAdpcm(voice, coefBlk);
+    AXSetVoiceAdpcmLoop(voice, loopBlk);
+    AXSetVoiceRmtOn(voice, 0);
+    AXSetVoiceSrcType(voice, 1);
+    AXSetVoiceSrc(voice, srcBlk);
     // The original copies 24 halfwords from the voice (+0x3C..) and then clears them before the call.
     memset(zeroBlk, 0, 0x30);
-    fn_8025ADAC(voice, zeroBlk);
+    AXSetVoiceMix(voice, zeroBlk);
 }
 
 // 0x80203664

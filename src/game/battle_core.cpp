@@ -438,7 +438,7 @@ BOOL BattleNextTurn(u8* b) {
         if (tries >= 2) break;
     }
 
-    for (s32 s = 0; s < 2; s++) *(u32*)(*(u8**)(((u8**)(b + 0xA00))[s] + 0x20) + 4) = 0;
+    for (s32 s = 0; s < 2; s++) *(u8*)(*(u8**)(((u8**)(b + 0xA00))[s] + 0x20) + 4) = 0;
     *(s32*)(b + 0xA18) = 7;
     (*(s32*)(b + 0xA10))++;
     if (BattleIsFinalRound(b) == 1) {
@@ -574,7 +574,7 @@ void BattleSetFighter(u8* b, s32 side, u8* f, u32 owner) {
     }
     FighterInitStats(f + 0x20, (u8**)f);
     if (side != 1) return;
-    u32 factor = *(u32*)(*(u8**)(gGameDb->data + 0x99D0) + 0x54C);
+    u32 factor = (u32)*(f32*)(*(u8**)(gGameDb->data + 0x99D0) + 0x54C);  // float (lfs + __cvt_fp2unsigned)
     *(u32*)(b + 0xAB8) = (u32)FighterStatsGet(((u8**)(b + 0xA00))[1] + 0x20, 1);
     *(u32*)(b + 0xAB8) = (*(u32*)(b + 0xAB8) * factor * (u32)(quality / 5)) / 100;
     switch (*(s32*)(b + 0xAD0)) {
