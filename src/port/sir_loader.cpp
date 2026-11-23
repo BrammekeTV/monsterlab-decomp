@@ -1383,6 +1383,7 @@ static const SirField kEntityFields[] = {
     { 0x000, SIR_U32, 1 },    // build-time vtable address; the constructor for the type stores the real one
     { 0x004, SIR_PTR, 1 },    // code: the entity's record (fn_8012F8B8, fn_801B4334)
     { 0x02C, SIR_U32, 2 },    // code: id, which fn_800D8724 compares for every entity of a zone's tables; +0x30 (fn_801B6444)
+    { 0x080, SIR_U32, 1 },    // code: fn_801260C8 tests its bits 0x78000000 (0x0003FFFF in the files)
     { 0x084, SIR_PTR, 1 },    // code: a table fn_801B6AD4 searches (the table itself is not converted)
     { 0x08C, SIR_PTR, 2 },    // code: part container (fn_8012F6B0), sub-object (fn_8012F8B8)
     { 0x094, SIR_U32, 2 },    // code: fn_801B4334 clears them
