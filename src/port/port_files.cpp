@@ -167,7 +167,28 @@ void PortFileRead(const char* path, u32 offset, u8* dst, u32 len) {
 }
 
 // Converts one whole section, as it lies at `dst` (read from disc, or inflated from a packed one).
+// Where section images lie in memory (where they were read to and where the game uses them).
+// What the loader does not convert in them stays in console byte order: the renderer asks here
+// whether a vertex array is such data (a mesh's arrays) or one the game built at run time.
+struct SectionRange { u8* lo; u8* hi; };
+static SectionRange sSectionRanges[128];
+static u32          sSectionRangeNext;
+static void NoteSectionRange(u8* lo, u32 size) {
+    if (lo == NULL || size == 0) return;
+    for (SectionRange& r : sSectionRanges) if (r.lo == lo) { r.hi = lo + size; return; }
+    SectionRange& r = sSectionRanges[sSectionRangeNext++ % 128];
+    r.lo = lo; r.hi = lo + size;
+}
+BOOL PortIsSectionData(const void* p) {
+    for (const SectionRange& r : sSectionRanges) if ((const u8*)p >= r.lo && (const u8*)p < r.hi) return TRUE;
+    return FALSE;
+}
+
 static void ConvertSection(const char* name, const SirCatalogFile* file, const SirCatalogEntry* e, u8* dst) {
+    if (e->type >= 0) {
+        NoteSectionRange(dst, e->size);
+        NoteSectionRange(LevelFinalPlace(e->type, dst), e->size);
+    }
 
     if (_stricmp(name, "global_binary.sir") == 0) {
         if (e->type == -1) { sGlobalHdr = dst; return; }      // converted with the image

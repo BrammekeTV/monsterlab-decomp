@@ -642,7 +642,7 @@ static void Draw(const PortGx* g, u32 prim, const PortGxLayout* L, u32 count, co
                 const u8* base = PortGxHostPtr(g->cp[0xA0 + (a - 9)]);
                 if (!base) continue;
                 p = base + index * (g->cp[0xB0 + (a - 9)] & 0xFF);
-                be = FALSE;
+                be = PortIsSectionData(base);               // a mesh's arrays are file data; arrays the game builds are in host order
             }
             has[a] = TRUE;
             if (a == 11 || a == 12) { Colour(p, at.fmt, be, in[a]); continue; }

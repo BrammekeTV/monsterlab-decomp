@@ -100,6 +100,8 @@ void PortStubCall(const char* name);
 const char* PortSoftSdk(u32 wiiAddr);
 // port_files.cpp: called for every completed disc read; converts big-endian .sir sections in place.
 void PortFileRead(const char* path, u32 offset, u8* dst, u32 len);
+// TRUE when p lies in the image of a .sir section (data still in console byte order unless the loader converts it).
+BOOL PortIsSectionData(const void* p);
 const char* PortFileStats(char* buf, u32 n);
 // zlib streams (port_zlib.cpp): a stream that starts on the bytes of a packed .sir read is bound to its
 // section; when it ends the section is converted. Drop forgets a stream (re-init, end).
