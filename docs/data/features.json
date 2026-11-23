@@ -99,6 +99,11 @@
  "changelog": [
   {
    "date": "2026-11-23",
+   "time": "19:58",
+   "text": "The Windows version renders at 1080p in widescreen (PR #102). The 3D scene uses the game's own 16:9 mode, and the menus and logos keep their shape instead of being stretched like on a TV. Other resolutions and 4:3 are options. The frame-buffer copies used for glow effects no longer create a new texture each time, which makes it faster."
+  },
+  {
+   "date": "2026-11-23",
    "time": "19:44",
    "text": "The main menu draws on Windows (PR #101): after pressing A at the title, Join Now!, Continue, Select Profile, Options and Credits appear over the 3D castle scene. The menu's text was missing because the game's font tables were still in the Wii's byte order. Also, 73 more game functions have their real names, taken from the game's own debug messages (PR #100)."
   },
