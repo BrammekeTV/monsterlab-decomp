@@ -1059,7 +1059,8 @@ struct ZoneDump {
     void ItemDraw(const u8* it) {
         printf("itemdraw "); Val(it); printf(" xf "); Ptr(it + 4); printf(" scale %08x mesh ", Bits(*(const f32*)(it + 8))); Ptr(it + 0x10);
         printf(" out "); Floats(it + 0x14, 7); printf(" cb %08x arg ", *(const u32*)(it + 0x30)); Ptr(it + 0x34);
-        printf(" clip "); Floats(it + 0x3C, 4); printf(" w58 %08x skin ", Bits(*(const f32*)(it + 0x58))); Ptr(it + 0xB0); printf("\n");
+        printf(" clip "); Floats(it + 0x3C, 4); printf(" w58 %08x skin ", Bits(*(const f32*)(it + 0x58))); Ptr(it + 0xB0);
+        printf(" buf4c "); Words(it + 0x4C, 3); printf(" w9c %08x pa0 ", *(const u32*)(it + 0x9C)); Ptr(it + 0xA0); printf("\n");
         Skeleton(*(const u8**)(it + 0xB0));
         const u8* x = *(const u8**)(it + 4);
         const u8* m = *(const u8**)(it + 0x10);
@@ -2319,6 +2320,7 @@ static void BuildLevel(u8* hdr, u8* zone) {
     Put32(zone + L_ITEM + 0x30, 0x802C5280); Put32(zone + L_ITEM + 0x34, L_ZONE + L_SCENE);
     for (u32 o = 0x3C; o < 0x4C; o += 4) Put32(zone + L_ITEM + o, 0);
     Put32(zone + L_ITEM + 0x58, 0x3F800000); Put32(zone + L_ITEM + 0xB0, 0); Put32(zone + L_ITEM + 0x38, 0);
+    Put32(zone + L_ITEM + 0x4C, 0x3F800000); Put32(zone + L_ITEM + 0x9C, 0x3F000000); Put32(zone + L_ITEM + 0xA0, 0);   // the block fn_80176E20 reads, a float and no texture override
     for (u32 o = 0x30; o < 0x60; o += 4) Put32(zone + L_MATRIX + o, o == 0x30 ? 0x40000000 : 0);
     u8* mesh = zone + L_MESH;
     memset(mesh, 0, 0x78);
@@ -2689,6 +2691,7 @@ static void LevelSelfTest(void) {
     const u8* mesh = *(const u8**)(item + 0x10);
     CHECK(*(const u8**)(item + 4) == zone + L_MATRIX && *(const f32*)(item + 8) == 1.0f && mesh == zone + L_MESH);
     CHECK(*(const u32*)(item + 0x30) == 0x802C5280 && *(const u8**)(item + 0x34) == zone + L_SCENE && *(const f32*)(item + 0x58) == 1.0f);
+    CHECK(*(const f32*)(item + 0x4C) == 1.0f && *(const f32*)(item + 0x9C) == 0.5f && *(const u8**)(item + 0xA0) == NULL);
     CHECK(*(const f32*)(zone + L_MATRIX + 0x30) == 2.0f && *(const u8**)(item + 0xB0) == NULL && mesh[3] == 0x4D);
     CHECK(*(const u32*)(mesh + 0x2C) == 0x3F5DB3D7 && *(const u32*)(mesh + 0x54) == 0x3F000100 && *(const s32*)(mesh + 0x6C) == 1);
     const u8* batch = *(const u8**)(mesh + 0x74);

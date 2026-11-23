@@ -1576,6 +1576,10 @@ static const SirField kCountPtrFields[] = {
 //   +0x08 scale; +0x10 its mesh; +0x14 seven floats fn_80171ABC writes (two positions, a radius)
 //   +0x30 callback (a build-time address in the file) and +0x34 its argument
 //   +0x3C four floats the culling pass writes; +0x58 float; +0xB0 pointer (non-null: fn_801704F8)
+//   +0x3C..+0x5B is also the block `buf` that fn_80173438 hands to the material functions
+//   (fn_80176E20: eight floats at buf +0x00..+0x1C, the last four are used when the material's
+//   record is disabled), so +0x4C..+0x57 are floats too (the file has 1.0 at +0x4C);
+//   +0x9C a float and +0xA0 a texture pointer that overrides the material's (buf +0x60 / +0x64)
 // and of the mesh: +0x20 centre and radius, +0x48 three floats, +0x54 scale, +0x64 a pointer,
 // +0x6C the number of parts, +0x70 the parts {material, batch}; of a batch the flags at +0x0C.
 static SirError SkeletonPlan(ImagePlan* plan, const u8* image, u32 imageSize, u32 addr);
@@ -1617,7 +1621,9 @@ static SirError SceneItemDrawPlan(ImagePlan* plan, const u8* image, u32 imageSiz
         !PlanAdd(plan, item + 0x10, 4, REGION_PTR_ARRAY) || !PlanAdd(plan, item + 0x14, 0x1C, REGION_U32_ARRAY) ||
         !PlanAdd(plan, item + 0x30, 4, REGION_U32_ARRAY) || !PlanAdd(plan, item + 0x34, 4, REGION_PTR_ARRAY) ||
         !PlanAdd(plan, item + 0x3C, 0x10, REGION_U32_ARRAY) || !PlanAdd(plan, item + 0x58, 4, REGION_U32_ARRAY) ||
-        !PlanAdd(plan, item + 0xB0, 4, REGION_PTR_ARRAY) || !PlanAdd(plan, item + 0x38, 4, REGION_PTR_ARRAY)) return SIR_ERR_ENTITY;
+        !PlanAdd(plan, item + 0xB0, 4, REGION_PTR_ARRAY) || !PlanAdd(plan, item + 0x38, 4, REGION_PTR_ARRAY) ||
+        !PlanAdd(plan, item + 0x4C, 0x0C, REGION_U32_ARRAY) || !PlanAdd(plan, item + 0x9C, 4, REGION_U32_ARRAY) ||
+        !PlanAdd(plan, item + 0xA0, 4, REGION_PTR_ARRAY)) return SIR_ERR_ENTITY;
     // +0xB0: the item's skeleton; +0x38: a block freed with the item (both fn_80172708).
     if (SkeletonPlan(plan, image, imageSize, Be32(image + item + 0xB0)) != SIR_OK) return SIR_ERR_ENTITY;
     if (LevelSpan(Be32(image + item + 0x04), 0x60, imageSize, &x) &&
