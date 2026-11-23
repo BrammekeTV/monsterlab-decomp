@@ -18,7 +18,7 @@ s32   fn_801ABD84(u8* rec, s32 key);                                // 0x801ABD8
 void  fn_8019F4C8(u8* el);                                          // 0x8019F4C8
 s32   fn_801FB254(u32 type, f32* out);                              // 0x801FB254
 s32   fn_80244950(void);                                            // 0x80244950
-void  fn_80248050(f32* mtx);                                        // 0x80248050
+void  PSMTXIdentity(f32* mtx);                                        // 0x80248050
 void  C_MTXOrtho(f32* mtx, f32 a, f32 b, f32 c, f32 d, f32 e, f32 f);   // 0x8024849C
 void  GXSetVtxDesc(s32 a, s32 b);                                    // 0x8024A3A4
 void  GXClearVtxDesc(void);                                            // 0x8024A7E4
@@ -26,11 +26,11 @@ void  GXSetVtxAttrFmt(s32 a, s32 b, s32 c, s32 d, s32 e);              // 0x8024
 void  GXSetNumTexGens(s32 a);                                           // 0x8024AE74
 s32   fn_8024B358(void);                                            // 0x8024B358
 void  GXSetCullMode(s32 a);                                           // 0x8024BB64
-void  fn_8024BFCC(void* fb, s32 clear);                             // 0x8024BFCC
+void  GXCopyDisp(void* fb, s32 clear);                             // 0x8024BFCC
 void  GXSetNumChans(s32 a);                                           // 0x8024C2F0
-void  fn_8024D508(s32 a, s32 b);                                    // 0x8024D508
-void  fn_8024DA08(s32 a, s32 b, s32 c, s32 d);                      // 0x8024DA08
-void  fn_8024DB64(s32 a);                                           // 0x8024DB64
+void  GXSetTevOp(s32 a, s32 b);                                    // 0x8024D508
+void  GXSetTevOrder(s32 a, s32 b, s32 c, s32 d);                      // 0x8024DA08
+void  GXSetNumTevStages(s32 a);                                           // 0x8024DB64
 void  GXSetBlendMode(s32 a, s32 b, s32 c, s32 d);                      // 0x8024DED8
 void  GXSetColorUpdate(s32 a);                                           // 0x8024DF28
 void  GXSetZMode(s32 a, s32 b, s32 c);                             // 0x8024DF80
@@ -39,7 +39,7 @@ void  GXLoadPosMtxImm(f32* mtx, s32 a);                                 // 0x802
 void  GXSetCurrentMtx(s32 a);                                           // 0x8024E328
 s32   AXRmtGetSamples(s32 a, u8* buf, s32 len);                         // 0x80259B70
 s32   AXRmtAdvancePtr(s32 a);                                           // 0x80259C34
-void  fn_8025B4C0(u8* p);                                           // 0x8025B4C0
+void  AXFXReverbHiExpInit(u8* p);                                           // 0x8025B4C0
 void  fn_8025C36C(u8* p);                                           // 0x8025C36C
 void  fn_8025D2E0(u8* p);                                           // 0x8025D2E0
 void  fn_8025DC3C(u8* p);                                           // 0x8025DC3C
@@ -104,7 +104,7 @@ void fn_8015D5A4(void) {
     lbl_805FB518 += 1;
     GXSetZMode(1, 3, 1);
     GXSetColorUpdate(1);
-    fn_8024BFCC(fb, 1);
+    GXCopyDisp(fb, 1);
     fn_8024B358();
     OSWaitSemaphore(&gVideoDrawDone);
     u8 overhi, underlow, readIdle, cmdIdle, brkpt;
@@ -162,13 +162,13 @@ void fn_801FB10C(void) {
     GXSetVtxDesc(0xB, 1);
     GXSetNumChans(1);
     GXSetNumTexGens(0);
-    fn_8024DB64(1);
-    fn_8024DA08(0, 0xFF, 0xFF, 4);
-    fn_8024D508(0, 4);
+    GXSetNumTevStages(1);
+    GXSetTevOrder(0, 0xFF, 0xFF, 4);
+    GXSetTevOp(0, 4);
     GXSetBlendMode(0, 0, 0, 0);
     GXSetZMode(1, 3, 1);
     GXSetCurrentMtx(3);
-    fn_80248050(view);
+    PSMTXIdentity(view);
     GXLoadPosMtxImm(view, 3);
     GXSetCullMode(0);
     if (SCGetAspectRatio() == 1) {
@@ -317,10 +317,10 @@ void fn_80203E8C(void) {
     } else {
         fn_8025D2E0(a);  // r3 left over from the first block address
         fn_8025E3E4(e);
-        fn_8025B4C0(c);
+        AXFXReverbHiExpInit(c);
         fn_8025D2E0(b);
         fn_8025E3E4(f);
-        fn_8025B4C0(d);
+        AXFXReverbHiExpInit(d);
     }
     *(s32*)(base + 0xB50) = 0;
     *(s32*)(base + 0xB54) = 0;

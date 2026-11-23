@@ -789,7 +789,7 @@ void SetEnemyToJunction(void* a0, u32 a1) {
 // Sets the RGB overlay colour (ids 0x135..0x137) on every renderable of the entity.
 void SetEntityColor0(void* a0, f32 a1, f32 a2, f32 a3) {
     u8* e = (u8*)a0;
-    for (s32 i = 0; i < *(s32*)((u8*)fn_801DA758((*(GetFn*)(*(u8**)e + 0xC))(e)) + 0x6C); i++) {
+    for (s32 i = 0; i < *(s32*)(*(u8**)((u8*)fn_801DA758((*(GetFn*)(*(u8**)e + 0xC))(e)) + 0x10) + 0x6C); i++) {
         u8* tbl = *(u8**)((u8*)fn_801DA758((*(GetFn*)(*(u8**)e + 0xC))(e)) + 0x10);
         u8* r = *(u8**)(tbl + i * 8 + 0x70);
         if (r != NULL) {

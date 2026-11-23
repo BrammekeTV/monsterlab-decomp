@@ -38,8 +38,8 @@ void  fn_80205310(u8* p, s32* a, s32* b, s32* c, s32* d, s32* e, u32* f, s32* g)
 void  fn_80208D00(u8* obj, void* a, void* b);                   // 0x80208D00
 void* fn_802080B8(void* self);                                  // 0x802080B8 (constructor, returns this)
 s32   fn_8020DD90(u8* obj, s32 a);                              // 0x8020DD90
-void  fn_80248050(f32* mtx);                                    // 0x80248050
-void  fn_80248420(f32* mtx, f32 x, f32 y, f32 z);               // 0x80248420
+void  PSMTXIdentity(f32* mtx);                                    // 0x80248050
+void  PSMTXScale(f32* mtx, f32 x, f32 y, f32 z);               // 0x80248420
 void  C_MTXOrtho(f32* mtx, f32 a, f32 b, f32 c, f32 d, f32 e, f32 f);  // 0x8024849C
 void  GXSetVtxDesc(s32 a, s32 b);                                // 0x8024A3A4
 void  GXClearVtxDesc(void);                                        // 0x8024A7E4
@@ -56,11 +56,11 @@ void  GXInitTexObjCI(u8* obj, void* image, s32 w, s32 h, s32 fmt, s32 wrapS, s32
 void  GXInitTexObjLOD(u8* obj, s32 a, s32 b, s32 c, s32 d, s32 e, f32 f, f32 g, f32 h);  // 0x8024C60C
 void  GXInitTexObjFilter(u8* obj, s32 a, s32 b);                       // 0x8024C72C
 void  GXLoadTexObj(u8* obj, s32 id);                             // 0x8024C91C
-void  fn_8024C970(u8* obj, void* lut, s32 fmt, s32 n);          // 0x8024C970
+void  GXInitTlutObj(u8* obj, void* lut, s32 fmt, s32 n);          // 0x8024C970
 void  fn_8024C998(u8* obj, s32 id);                             // 0x8024C998
-void  fn_8024D508(s32 a, s32 b);                                // 0x8024D508
-void  fn_8024DA08(s32 a, s32 b, s32 c, s32 d);                  // 0x8024DA08
-void  fn_8024DB64(s32 a);                                       // 0x8024DB64
+void  GXSetTevOp(s32 a, s32 b);                                // 0x8024D508
+void  GXSetTevOrder(s32 a, s32 b, s32 c, s32 d);                  // 0x8024DA08
+void  GXSetNumTevStages(s32 a);                                       // 0x8024DB64
 void  GXSetBlendMode(s32 a, s32 b, s32 c, s32 d);                  // 0x8024DED8
 void  GXSetZMode(s32 a, s32 b, s32 c);                         // 0x8024DF80
 void  GXSetProjection(f32* mtx, s32 a);                             // 0x8024E1D0
@@ -400,22 +400,22 @@ void fn_802044C0(u8* tex, u32 color, f32 x0, f32 x1, f32 y0, f32 y1, f32 u0, f32
     GXSetChanCtrl(0, 1, 0, 1, 1, 2, 1);
     GXSetNumChans(1);
     GXSetNumTexGens(1);
-    fn_8024DB64(1);
-    fn_8024D508(0, 0);
-    fn_8024DA08(0, 0, 0, 4);
+    GXSetNumTevStages(1);
+    GXSetTevOp(0, 0);
+    GXSetTevOrder(0, 0, 0, 4);
     GXSetZMode(1, 3, 1);
     GXSetCullMode(0);
     GXSetCurrentMtx(3);
-    fn_80248050(view);
+    PSMTXIdentity(view);
     GXLoadPosMtxImm(view, 3);
     C_MTXOrtho(proj, 1.0f, -1.0f, -1.0f, 1.0f, 0.0f, 500.0f);
     GXSetProjection(proj, 1);
-    fn_8024C970(tlut, *(void**)(tex + 0x1C), *(u8*)(tex + 0x11), 0x10);
+    GXInitTlutObj(tlut, *(void**)(tex + 0x1C), *(u8*)(tex + 0x11), 0x10);
     fn_8024C998(tlut, 0);
     GXInitTexObjCI(texObj, *(void**)(tex + 0x18), *(u16*)(tex + 0x0), *(u16*)(tex + 0x2), *(u8*)(tex + 0x10), 0, 0, 0, 0);
     GXLoadTexObj(texObj, 0);
     GXInitTexObjFilter(texObj, 0, 0);
-    fn_80248420(scale, 1.0f, 1.0f, 1.0f);
+    PSMTXScale(scale, 1.0f, 1.0f, 1.0f);
     fn_8024E348(scale, 0x1E, 1);
     GXSetNumTexGens(1);
     GXSetTexCoordGen2(0, 1, 4, 0x1E, 0, 0x7D);

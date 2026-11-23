@@ -38,20 +38,20 @@ void  GXSetVtxAttrFmt(s32 a, s32 b, s32 c, s32 d, s32 e);             // 0x8024A
 void  GXSetTexCoordGen2(s32 coord, s32 func, s32 src, s32 mtx, s32 normalize, s32 postMtx);  // 0x8024AC4C
 void  GXSetNumTexGens(s32 a);                                          // 0x8024AE74
 void  GXBegin(s32 a, s32 b, s32 c);                            // 0x8024B974
-void  fn_8024BDD4(u32 aa, u8* pattern, s32 vf, u8* vfilter);       // 0x8024BDD4: GXSetCopyFilter
+void  GXSetCopyFilter(u32 aa, u8* pattern, s32 vf, u8* vfilter);       // 0x8024BDD4: GXSetCopyFilter
 void  GXSetNumChans(s32 a);                                          // 0x8024C2F0
 void  GXSetChanCtrl(s32 chan, s32 enable, s32 ambSrc, s32 matSrc, s32 lightMask, s32 diffFn, s32 attnFn);  // 0x8024C314
 void  GXInitTexObjCI(u8* obj, void* image, s32 w, s32 h, s32 fmt, s32 wrapS, s32 wrapT, s32 mip, s32 extra);  // 0x8024C5C4 (9th arg on the stack)
 void  GXLoadTexObj(u8* obj, s32 id);                                // 0x8024C91C
-void  fn_8024C970(u8* obj, void* lut, s32 fmt, s32 n);             // 0x8024C970
+void  GXInitTlutObj(u8* obj, void* lut, s32 fmt, s32 n);             // 0x8024C970
 void  fn_8024C998(u8* obj, s32 id);                                // 0x8024C998
 void  fn_8024D59C(s32 a, s32 b, s32 c, s32 d, s32 e);             // 0x8024D59C
 void  fn_8024D5DC(s32 a, s32 b, s32 c, s32 d, s32 e);             // 0x8024D5DC
 void  fn_8024D61C(s32 a, s32 b, s32 c, s32 d, s32 e, s32 f);      // 0x8024D61C
 void  fn_8024D674(s32 a, s32 b, s32 c, s32 d, s32 e, s32 f);      // 0x8024D674
 void  fn_8024D6CC(s32 id, u32* color);                             // 0x8024D6CC (reads the packed RGBA word)
-void  fn_8024DA08(s32 a, s32 b, s32 c, s32 d);                    // 0x8024DA08
-void  fn_8024DB64(s32 a);                                          // 0x8024DB64
+void  GXSetTevOrder(s32 a, s32 b, s32 c, s32 d);                    // 0x8024DA08
+void  GXSetNumTevStages(s32 a);                                          // 0x8024DB64
 void  GXSetBlendMode(s32 a, s32 b, s32 c, s32 d);                    // 0x8024DED8
 void  GXSetZMode(s32 a, s32 b, s32 c);                            // 0x8024DF80
 void  GXSetProjection(f32* mtx, s32 a);                                // 0x8024E1D0
@@ -198,7 +198,7 @@ void fn_801FC70C(void) {
 
     if (lbl_805FBA7C == 0) return;
     fn_8015D660();
-    fn_8024BDD4(0, NULL, 0, NULL);
+    GXSetCopyFilter(0, NULL, 0, NULL);
     C_MTXOrtho(sp48, 0.0f, (f32)gScreenHeight, 0.0f, (f32)gScreenWidth, 0.0f, 500.0f);
     GXSetProjection(sp48, 1);
     GXClearVtxDesc();
@@ -210,14 +210,14 @@ void fn_801FC70C(void) {
     GXSetChanCtrl(4, 0, 1, 1, 0, 0, 2);
     GXSetNumTexGens(1);
     GXSetTexCoordGen2(0, 1, 4, 0x3C, 0, 0x7D);
-    fn_8024DB64(1);
+    GXSetNumTevStages(1);
     sp10[0] = lbl_80600300;
     sp10[1] = lbl_80600301;
     sp10[2] = lbl_80600302;
     sp10[3] = lbl_805FBA7C;
     sp14 = *(u32*)sp10;
     fn_8024D6CC(1, &sp14);
-    fn_8024DA08(0, 0, 0, 0xFF);
+    GXSetTevOrder(0, 0, 0, 0xFF);
     fn_8024D59C(0, 0xF, 0xF, 0xF, 8);
     fn_8024D61C(0, 0, 0, 0, 1, 0);
     fn_8024D5DC(0, 7, 1, 4, 7);
@@ -226,7 +226,7 @@ void fn_801FC70C(void) {
     GXSetZMode(0, 3, 0);
     GXSetCurrentMtx(3);
     u8* t = lbl_805FBA78;
-    fn_8024C970(sp18, *(void**)(t + 0x20), *(u8*)(t + 0x15), 0x10);
+    GXInitTlutObj(sp18, *(void**)(t + 0x20), *(u8*)(t + 0x15), 0x10);
     fn_8024C998(sp18, 0);
     GXInitTexObjCI(sp28, *(void**)(t + 0x1C), *(u16*)(t + 0x4), *(u16*)(t + 0x6), *(u8*)(t + 0x14), 0, 0, 0, 0);
     GXLoadTexObj(sp28, 0);
@@ -648,7 +648,7 @@ s32 fn_8020390C(u8* arg0, u8* arg1) {
 void fn_80204838(u8* arg0) {
     s32 spC, sp8;
     fn_8015D660();
-    fn_8024BDD4(0, NULL, 0, NULL);
+    GXSetCopyFilter(0, NULL, 0, NULL);
     f32 ratio = (f32)*(u32*)(arg0 + 0x14) / (f32)*(u32*)(arg0 + 0x18);
     s32 block = fn_801C6564((f32)*(s32*)(arg0 + 0x10) / ratio);
     if (block < 0) return;
