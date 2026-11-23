@@ -27,5 +27,6 @@ extern const int   gPortBindingCount;
 
 // --press BUTTON@FRAME[-FRAME]: hold a binding's input during those frames (tests, headless runs).
 BOOL PortInputAddPress(const char* spec);
+BOOL PortInputAddPointer(const char* spec);     // --pointer X,Y@FRAME (output pixels)
 
 #endif

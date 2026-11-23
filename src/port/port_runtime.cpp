@@ -855,6 +855,9 @@ struct PortBoot {
                 else if (!strcmp(v, "4:3")) gPortSettings.wide = FALSE;
                 else fprintf(stderr, "[port] --aspect %s: expected 4:3 or 16:9\n", v);
             }
+            else if (!strcmp(a, "--pointer") && i + 1 < __argc) {
+                if (!PortInputAddPointer(__argv[++i])) fprintf(stderr, "[port] --pointer %s: expected X,Y@FRAME\n", __argv[i]);
+            }
             else if (!strcmp(a, "--press") && i + 1 < __argc) {
                 if (!PortInputAddPress(__argv[++i])) fprintf(stderr, "[port] --press %s: expected BUTTON@FRAME[-FRAME]\n", __argv[i]);
             }
