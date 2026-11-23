@@ -62,8 +62,8 @@
   },
   {
    "title": "Boots to title screen",
-   "detail": "First visible frame on Windows. The PC port now draws the opening screens from the player's own disc with Direct3D 11: the Wii Remote strap safety screen and the splash and text screens. It skips the intro movie for now and starts loading the front-end level. Next: the rest of that level's data, then the title screen.",
-   "status": "in_progress"
+   "detail": "The PC port now reaches the title screen from the player's own disc with Direct3D 11: the strap safety screen, the splash screens, then the Monster Lab logo and the press-A prompt. The 3D castle scene behind the logo still draws black; that renderer work comes next, together with real controller input.",
+   "status": "done"
   },
   {
    "title": "1080p & widescreen",
