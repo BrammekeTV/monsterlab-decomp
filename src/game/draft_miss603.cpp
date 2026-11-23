@@ -40,7 +40,7 @@ void* fn_80209814(void* v);                                  // 0x80209814
 void fn_8020A398(s32 handle);                                // 0x8020A398
 void* fn_80207814(void* unused, s32 value);                  // 0x80207814
 void fn_8020788C(void* unused, s32 value);                   // 0x8020788C
-const char* fn_8020716C(s32 code);                                       // 0x8020716C
+const char* SoErrorName(s32 code);                                       // 0x8020716C
 s32 fn_80323644(void* tbl, void* a, void* b);                // 0x80323644
 s32 fn_80323908(void);                                       // 0x80323908
 f32 fn_8033F1FC(f32 y, f32 x);                               // 0x8033F1FC (MSL atan2)
@@ -720,7 +720,7 @@ s32 fn_802078E8(void) { // lint:ok
     r = fn_80323644(tbl, (void*)fn_8020788C, (void*)fn_80207814);
     lbl_805FBB4C = r;
     if (r == -28 || r == -49) {
-        OSReport((const char*)(lbl_80386ED0 + 0x4DC), lbl_805FBB4C, fn_8020716C(lbl_805FBB4C));
+        OSReport((const char*)(lbl_80386ED0 + 0x4DC), lbl_805FBB4C, SoErrorName(lbl_805FBB4C));
         return 0;
     }
     OSReport((const char*)(lbl_80386ED0 + 0x4F0));
@@ -728,7 +728,7 @@ s32 fn_802078E8(void) { // lint:ok
     r2 = fn_80323908();
     lbl_805FBB50 = r2;
     if (r2 != 0 && (r2 >= 0 || r2 != -7)) {
-        OSReport((const char*)(lbl_80386ED0 + 0x4DC), lbl_805FBB50, fn_8020716C(lbl_805FBB50));
+        OSReport((const char*)(lbl_80386ED0 + 0x4DC), lbl_805FBB50, SoErrorName(lbl_805FBB50));
         return 0;
     }
     OSReport((const char*)(lbl_80386ED0 + 0x4F0));

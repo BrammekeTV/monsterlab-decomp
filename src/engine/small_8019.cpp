@@ -15,12 +15,12 @@ void*   ScreenSetFindElement(void* set, u32 hash);              // 0x80198F18 (t
 void    fn_8018D2B8(const char* fmt, ...);                      // 0x8018D2B8 (debug log)
 void    fn_8018D370(const char* fmt, ...);                      // 0x8018D370 (debug log)
 void    fn_8018D4CC(void* p);                                   // 0x8018D4CC (free)
-void*   fn_8018E8D8(void* table, u32 hash);                     // 0x8018E8D8 (table lookup by hash)
+void*   UIHashTree_Find(void* table, u32 hash);                     // 0x8018E8D8 (table lookup by hash)
 s32 fn_8018E2F4(void* table, void* cb);                     // 0x8018E2F4 (walk table with callback)
-const char* fn_801EB708(u32 hash);                              // 0x801EB708 (hash -> name for logs)
+const char* FormatHashString(u32 hash);                              // 0x801EB708 (hash -> name for logs)
 u32     StringHash(const char* s);                              // 0x801EB704
 void*   TextureLoad(const char* name);                          // 0x801D8E80
-s32 fn_8019BD18(u8* arg0, u32* arg1);                     // 0x8019BD18 (routes event to widget)
+s32 UIElement_PlayUIAnimByHash(u8* arg0, u32* arg1);                     // 0x8019BD18 (routes event to widget)
 void    UIWidgetPlayAnim(void* w, u32 anim);                    // 0x80199B38
 void    fn_801BA8C8(void* a3, const u8* str, s32 a5, s32 a6, f32* a7, f32* a8); // 0x801BA8C8
 void* fn_801BA930(u8* a0, u8* str, u32 a2, u32 a3, u32 a4, u32 a5); // 0x801BA930
@@ -49,7 +49,7 @@ void UIEvent_SendToTopScreen(u32 a0) {
     if (count > 0) {
         void* top = *(void**)(set + 0x3C + count * 4);
         u32 ev = a0;
-        fn_8019BD18((u8*)top, &ev);
+        UIElement_PlayUIAnimByHash((u8*)top, &ev);
         UIWidgetPlayAnim(top, ev);
     }
 }
@@ -66,7 +66,7 @@ void* fn_801953E4(u32 hash) {
     if (w != NULL) {
         return w;
     }
-    fn_8018D370(lbl_803818D0, fn_801EB708(hash));
+    fn_8018D370(lbl_803818D0, FormatHashString(hash));
     return NULL;
 }
 
@@ -93,7 +93,7 @@ extern "C" void* UIFindElement(u32 hash) {
     if (el != NULL) {
         return el;
     }
-    fn_8018D2B8(lbl_80381AA0, fn_801EB708(hash));
+    fn_8018D2B8(lbl_80381AA0, FormatHashString(hash));
     return NULL;
 }
 
@@ -229,38 +229,38 @@ BOOL fn_80198DE4(void* p) {
 // Looks up a widget by hash in the table at set+0x28. Returns NULL when missing.
 extern "C" void* ScreenSetFindWidget(void* set, u32 hash) {
     void* table = *(void**)((u8*)set + 0x28);
-    return fn_8018E8D8(table, hash);
+    return UIHashTree_Find(table, hash);
 }
 
 // 0x80198F1C
 // Looks up an entry by hash in the table at set+0x20. Logs and returns NULL when missing.
-extern "C" void* fn_80198F1C(void* set, u32 hash) {
+extern "C" void* UIAnim_FindByName(void* set, u32 hash) {
     void* table = *(void**)((u8*)set + 0x20);
-    void* r = fn_8018E8D8(table, hash);
+    void* r = UIHashTree_Find(table, hash);
     if (r == NULL) {
-        fn_8018D2B8(lbl_80382428, fn_801EB708(hash));
+        fn_8018D2B8(lbl_80382428, FormatHashString(hash));
     }
     return r;
 }
 
 // 0x80198F74
 // Looks up an entry by hash in the table at set+0x34. Logs and returns NULL when missing.
-extern "C" void* fn_80198F74(void* set, u32 hash) {
+extern "C" void* UIScreenSet_FindTextureList(void* set, u32 hash) {
     void* table = *(void**)((u8*)set + 0x34);
-    void* r = fn_8018E8D8(table, hash);
+    void* r = UIHashTree_Find(table, hash);
     if (r == NULL) {
-        fn_8018D2B8(lbl_80382448, fn_801EB708(hash));
+        fn_8018D2B8(lbl_80382448, FormatHashString(hash));
     }
     return r;
 }
 
 // 0x80198FCC
 // Looks up an entry by hash in the table at set+0x3C. Logs and returns NULL when missing.
-extern "C" void* fn_80198FCC(void* set, u32 hash) {
+extern "C" void* UIScreenSet_FindSoundList(void* set, u32 hash) {
     void* table = *(void**)((u8*)set + 0x3C);
-    void* r = fn_8018E8D8(table, hash);
+    void* r = UIHashTree_Find(table, hash);
     if (r == NULL) {
-        fn_8018D2B8(lbl_80382478, fn_801EB708(hash));
+        fn_8018D2B8(lbl_80382478, FormatHashString(hash));
     }
     return r;
 }

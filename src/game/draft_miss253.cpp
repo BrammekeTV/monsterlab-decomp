@@ -27,7 +27,7 @@ u32   StringHash(const char* s);
 int   SysSprintf(char* buf, const char* fmt, ...);   // 0x80142EF8
 u32   RandomU32(void);
 s32   UISetTexture(u8* el, void* tex);               // 0x801A11FC
-void* fn_80109330(const char* name);                 // 0x80109330 (texture lookup by name)
+void* TextureLoadShared(const char* name);                 // 0x80109330 (texture lookup by name)
 const char* fn_80027E50(u8* p, s32 idx, const char* name);   // 0x80027E50
 void* memcpy(void* d, const void* s, unsigned long n);
 u8*  fn_80052530(u8* p, s32 a, u8* b, s32 c);   // 0x80052530
@@ -211,7 +211,7 @@ void fn_80026C88(u8* p) {
     SysSprintf(buf, "Skull_%d_complete", *(s32*)(p + 0xbc));
     *(void**)(p + 0xc0) = ScreenSetFindElement(set, StringHash(buf));
     if (*(u8**)(p + 0xc0)) {
-        void* tex = fn_80109330(fn_80027E50(p, *(s32*)(p + 0xbc), buf));
+        void* tex = TextureLoadShared(fn_80027E50(p, *(s32*)(p + 0xbc), buf));
         if (tex) {
             *(void**)(p + 0x1f4) = tex;
             UISetTexture(*(u8**)(p + 0xc0), tex);
@@ -220,7 +220,7 @@ void fn_80026C88(u8* p) {
     SysSprintf(buf, "Skull_%d_background", *(s32*)(p + 0xbc));
     *(void**)(p + 0xc4) = ScreenSetFindElement(set, StringHash(buf));
     if (*(u8**)(p + 0xc4)) {
-        void* tex = fn_80109330(fn_80027E50(p, *(s32*)(p + 0xbc), buf));
+        void* tex = TextureLoadShared(fn_80027E50(p, *(s32*)(p + 0xbc), buf));
         if (tex) {
             *(void**)(p + 0x1f8) = tex;
             UISetTexture(*(u8**)(p + 0xc4), tex);
@@ -259,7 +259,7 @@ void fn_80026C88(u8* p) {
             SysSprintf(buf, "Skull_%d_%s", *(s32*)(p + 0xbc), name);
             *(void**)(*(u8**)(p + 0xb0) + off) = ScreenSetFindElement(set, StringHash(buf));
             if (*(void**)(*(u8**)(p + 0xb0) + off)) {
-                void* tex = fn_80109330(fn_80027E50(p, *(s32*)(p + 0xbc), buf));
+                void* tex = TextureLoadShared(fn_80027E50(p, *(s32*)(p + 0xbc), buf));
                 if (tex) {
                     *(void**)(p + i * 4 + 0x1fc) = tex;
                     UISetTexture(*(u8**)(*(u8**)(p + 0xb0) + off), tex);
@@ -275,7 +275,7 @@ void fn_80026C88(u8* p) {
             SysSprintf(buf, "Skull_%d_%s", other, name);
             *(void**)(*(u8**)(p + 0xb0) + off) = ScreenSetFindElement(set, StringHash(buf));
             if (*(void**)(*(u8**)(p + 0xb0) + off)) {
-                void* tex = fn_80109330(fn_80027E50(p, other, buf));
+                void* tex = TextureLoadShared(fn_80027E50(p, other, buf));
                 if (tex) {
                     *(void**)(p + 0x22c) = tex;
                     UISetTexture(*(u8**)(*(u8**)(p + 0xb0) + off), tex);
@@ -339,7 +339,7 @@ void fn_80026C88(u8* p) {
             SysSprintf(gbuf, "Skull_%d_Grass%d", *(s32*)(p + 0xbc), k);
             *(void**)(slotp + 0x1d8) = ScreenSetFindElement(set, StringHash(gbuf));
             if (*(void**)(slotp + 0x1d8)) {
-                void* tex = fn_80109330(fn_80027E50(p, *(s32*)(p + 0xbc), gbuf));
+                void* tex = TextureLoadShared(fn_80027E50(p, *(s32*)(p + 0xbc), gbuf));
                 if (tex) {
                     *(void**)(slotp + 0x214) = tex;
                     UISetTexture(*(u8**)(slotp + 0x1d8), tex);

@@ -27,7 +27,7 @@ void   fn_8018D370(const char* fmt, ...);                        // 0x8018D370 (
 s32    fn_801B5A60(u8* p);                                       // 0x801B5A60
 s32    fn_801B9F14(u8* sender, u32 id);                          // 0x801B9F14
 ScriptValue fn_801E1BD4(u8* a, u8* b, u32* code);               // 0x801E1BD4
-const char* fn_801EB708(u32 hash);                               // 0x801EB708 (hash -> name for logs)
+const char* FormatHashString(u32 hash);                               // 0x801EB708 (hash -> name for logs)
 void*  fn_801EEB20(u8* heap, u32 size);                          // 0x801EEB20 (heap alloc)
 void   fn_801EF070(u8* heap, void* p);                           // 0x801EF070 (heap free)
 u32 fn_801F2C10(u32 key);                                    // 0x801F2C10
@@ -259,7 +259,7 @@ void UIElement_SetVisibleFlag(u32 a0, u32 a1) {
     } else {
         el = (u8*)ScreenSetFindElement(set, a0);
         if (el == NULL) {
-            fn_8018D2B8(lbl_80381AA0, fn_801EB708(a0));
+            fn_8018D2B8(lbl_80381AA0, FormatHashString(a0));
             el = NULL;
         }
     }
@@ -432,7 +432,7 @@ s32 AnimSetFindClip(u8* set, u32 key) {
         off += 0x44;
         idx++;
     }
-    GameLog(4, 0, "Could not locate index of anim_def entry with handle %s\n", fn_801EB708(key));
+    GameLog(4, 0, "Could not locate index of anim_def entry with handle %s\n", FormatHashString(key));
     return -1;
 }
 
@@ -463,7 +463,7 @@ u8* CharacterFind(u32 id) {
         }
         slot++;
     }
-    if (found == NULL) GameLog(3, 0, "Could not find character %s\n", fn_801EB708(id));
+    if (found == NULL) GameLog(3, 0, "Could not find character %s\n", FormatHashString(id));
     return found;
 }
 

@@ -29,7 +29,7 @@ void    fn_800E69EC(s32 flag);                                   // 0x800E69EC
 void*   fn_800E6228(void);                                       // 0x800E6228
 void*   fn_801D40E0(s32 n);                                      // 0x801D40E0
 void    operator_delete(void* p);                                // 0x801D426C
-void    fn_8018D1FC(const char* fmt, ...);                                       // 0x8018D1FC
+void    GameLogDebug(const char* fmt, ...);                                       // 0x8018D1FC
 void    fn_8022E3D8(void* save, u8* name);                       // 0x8022E3D8
 void    fn_801EFA18(void* p);                                    // 0x801EFA18
 s32     fn_8020E4E8(s32 hash);                                   // 0x8020E4E8
@@ -91,7 +91,7 @@ u32 EnterName_HasValidName(void) {
 void EnterName_SaveNameToPlayerName(void) {
     u8* st = lbl_805FB2B8;
     if (st == 0) return;
-    fn_8018D1FC((const char*)st); // lint:ok r4 is whatever the caller left (printf-style varargs)
+    GameLogDebug((const char*)st); // lint:ok r4 is whatever the caller left (printf-style varargs)
     fn_8022E3D8(lbl_805FBBE0, st);
 }
 

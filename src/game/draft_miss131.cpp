@@ -12,7 +12,7 @@ void BufferFree(void* p);
 void* MemAllocDefault(u32 size);
 void* ScreenSetsCurrent(void* sets);
 void fn_8018D370(const char* fmt, ...);
-void* fn_8018D428(s32 size, const char* file, void* tag, s32 line);
+void* UIEngineAlloc(s32 size, const char* file, void* tag, s32 line);
 void fn_8019B2F4(void* obj);
 u8* fn_801EB7A4(void* p, s32 a4, s32 a5, s32 a6, s32 a7);
 void fn_801EBA20(void* list, void* item);
@@ -126,8 +126,8 @@ void fn_8005C1CC(f32* out, f32* q, f32 s) {
 
 // 0x801A84F8
 // Allocates and initializes a UIParticleEffect object; returns NULL on allocation failure.
-u8* fn_801A84F8(void) {
-    u8* p = (u8*)fn_8018D428(0x18C, lbl_803836A8, lbl_805F94D0, 0x2C);
+u8* UIParticleEffect_Create(void) {
+    u8* p = (u8*)UIEngineAlloc(0x18C, lbl_803836A8, lbl_805F94D0, 0x2C);
     if (p == NULL) {
         fn_8018D370(lbl_803836C0);
         return NULL;

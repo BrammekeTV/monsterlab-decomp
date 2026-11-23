@@ -7,16 +7,16 @@
 extern "C" {
 void*       ScreenSetsCurrent(void* sets);                       // 0x8018D1E4
 void*       ScreenSetFindElement(void* set, u32 hash);           // 0x80198F18
-void*       fn_80198F74(void* set, u32 hash);                    // 0x80198F74
-void*       fn_80198FCC(void* set, u32 hash);                    // 0x80198FCC
+void*       UIScreenSet_FindTextureList(void* set, u32 hash);                    // 0x80198F74
+void*       UIScreenSet_FindSoundList(void* set, u32 hash);                    // 0x80198FCC
 void        fn_8018D370(const char* fmt, ...);                   // 0x8018D370 (debug log)
 void        fn_8018D2B8(const char* fmt, ...);                   // 0x8018D2B8 (debug log)
-const char* fn_801EB708(u32 hash);                               // 0x801EB708 (hash -> name)
+const char* FormatHashString(u32 hash);                               // 0x801EB708 (hash -> name)
 u8*          fn_8019552C(u8* a3, s32 a4);                         // 0x8019552C (leaf)
-u32         fn_8019AD84(void* obj, s32 index);                   // 0x8019AD84
+u32         UISoundList_GetSoundByIndex(void* obj, s32 index);                   // 0x8019AD84
 s32         fn_8019AE94(u8* a3);                                 // 0x8019AE94 (leaf)
 void*       fn_8019AC78(void* set, BOOL a1);                     // 0x8019AC78
-void*       fn_80109330(const char* name);                       // 0x80109330
+void*       TextureLoadShared(const char* name);                       // 0x80109330
 f32         fn_801A4018(u8* a3);                                 // 0x801A4018 (leaf)
 f32         fn_801A4034(u8* a3);                                 // 0x801A4034 (leaf)
 s32         fn_801A403C(u8* a3, f32 f1);                         // 0x801A403C (leaf)
@@ -49,14 +49,14 @@ static u8* UISlider_FindElement(u32 hash) {
     }
     u8* e = (u8*)ScreenSetFindElement(scr, hash);
     if (e == NULL) {
-        fn_8018D2B8(lbl_80381868 + 0x238, fn_801EB708(hash));
+        fn_8018D2B8(lbl_80381868 + 0x238, FormatHashString(hash));
     }
     return e;
 }
 
 // Logs a slider element whose type (+0x60) is not 3.
 static void UISlider_LogBadType(u32 hash) {
-    fn_8018D370(lbl_80381868 + 0x530, fn_801EB708(hash));
+    fn_8018D370(lbl_80381868 + 0x530, FormatHashString(hash));
 }
 }
 
@@ -129,11 +129,11 @@ void* fn_8011AD88(u8* obj, s32 flag) {
     if (flag != 0) {
         strcat(name, "_h");
     }
-    void* tex = fn_80109330(name);
+    void* tex = TextureLoadShared(name);
     if (tex == NULL) {
         strcpy(name, "ui/msa_parts/");
         strcat(name, "placeholder");
-        tex = fn_80109330(name);
+        tex = TextureLoadShared(name);
     }
     return tex;
 }
@@ -300,12 +300,12 @@ s32 UISlider_GetIncValue_Int(u32 a0) {
 // Sound handle for index a1 in the sound list of element a0, or 0 (logs) when it is missing.
 ScriptValue UISoundList_GetSound(u32 a0, s32 a1) {
     void* set = ScreenSetsCurrent(gScreenSets);
-    void* elem = fn_80198FCC(set, a0);
+    void* elem = UIScreenSet_FindSoundList(set, a0);
     if (elem == NULL) {
         fn_8018D370(lbl_80381EDC, a0);
         return 0;
     }
-    u32 snd = fn_8019AD84(elem, a1);
+    u32 snd = UISoundList_GetSoundByIndex(elem, a1);
     if (snd != 0) return (ScriptValue)snd;
     fn_8018D370(lbl_80381F0C, a1);
     return 0;
@@ -315,7 +315,7 @@ ScriptValue UISoundList_GetSound(u32 a0, s32 a1) {
 // Plays a random sound effect from the sound list of element a0 (non-voice slot, flags 0).
 void UISoundList_PlayRandomSfx(u32 a0) {
     void* set = ScreenSetsCurrent(gScreenSets);
-    void* elem = fn_80198FCC(set, a0);
+    void* elem = UIScreenSet_FindSoundList(set, a0);
     if (elem == NULL) {
         fn_8018D370(lbl_80381868 + 0x674, a0);
         return;
@@ -326,7 +326,7 @@ void UISoundList_PlayRandomSfx(u32 a0) {
         return;
     }
     s32 idx = IntervalRandomInt(0, count - 1);
-    void* snd = (void*)(uintptr_t)fn_8019AD84(elem, idx);
+    void* snd = (void*)(uintptr_t)UISoundList_GetSoundByIndex(elem, idx);
     if (snd == NULL) {
         fn_8018D370(lbl_80381868 + 0x708, idx);
         return;
@@ -343,7 +343,7 @@ void UISoundList_PlayRandomSfx(u32 a0) {
 // Same as UISoundList_PlayRandomSfx but plays through the voice handle with flags 2.
 void UISoundList_PlayRandomVoiceSfx(u32 a0) {
     void* set = ScreenSetsCurrent(gScreenSets);
-    void* elem = fn_80198FCC(set, a0);
+    void* elem = UIScreenSet_FindSoundList(set, a0);
     if (elem == NULL) {
         fn_8018D370(lbl_80381868 + 0x674, a0);
         return;
@@ -354,7 +354,7 @@ void UISoundList_PlayRandomVoiceSfx(u32 a0) {
         return;
     }
     s32 idx = IntervalRandomInt(0, count - 1);
-    void* snd = (void*)(uintptr_t)fn_8019AD84(elem, idx);
+    void* snd = (void*)(uintptr_t)UISoundList_GetSoundByIndex(elem, idx);
     if (snd == NULL) {
         fn_8018D370(lbl_80381868 + 0x708, idx);
         return;
@@ -371,7 +371,7 @@ void UISoundList_PlayRandomVoiceSfx(u32 a0) {
 // Result of fn_8019AC78 for texture list a0 at a1, or 0 (logs) when a list or entry is missing.
 ScriptValue UITextureList_GetNextTexture(u32 a0, BOOL a1) {
     void* set = ScreenSetsCurrent(gScreenSets);
-    void* elem = fn_80198F74(set, a0);
+    void* elem = UIScreenSet_FindTextureList(set, a0);
     if (elem == NULL) {
         fn_8018D370(lbl_80381D68, a0);
         return 0;

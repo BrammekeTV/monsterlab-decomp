@@ -18,7 +18,7 @@ s32 fn_801A9174(u8* p, f32* pos, f32* out);    // 0x801A9174
 void fn_801C83AC(u8* mgr, u8* item);           // 0x801C83AC
 u8* fn_801483BC(s32 idx);                      // 0x801483BC
 u8* fn_80169770(u8* arg0, const char* name);    // 0x80169770
-s32 fn_8016B5E0(u8* arg0, u8* arg1, s32 arg2); // 0x8016B5E0
+s32 CheckWiiFileVersion(u8* arg0, u8* arg1, s32 arg2); // 0x8016B5E0
 s32 fn_8016B6DC(u8* state);                    // 0x8016B6DC
 void fn_8016B704(u8* state);                   // 0x8016B704
 u8* fn_8016B724(u8* obj, u8* list, const char* name);  // 0x8016B724 (list is a pointer in asm)
@@ -407,7 +407,7 @@ s32 fn_80198014(u8* arg0, u8* arg1, const char* arg2) {
     if (buf == NULL) {
         return 0;
     }
-    fn_8016B5E0(state, buf, size);
+    CheckWiiFileVersion(state, buf, size);
     list = lbl_805FB5A8;
     *(s32*)(arg0 + 0x124) = 0;
     for (;;) {

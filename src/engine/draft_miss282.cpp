@@ -17,7 +17,7 @@ s32    fn_80146930(u8* file, void* buf, s32 size);
 void   fn_801469FC(u8* file);
 s32    fn_80146A58(u8* file);
 u8*    fn_801483BC(s32 idx);
-s32    fn_80203664(u8* audio, const char* name, s32 flag);    // 0x80203664
+s32    MusicLoadAsync(u8* audio, const char* name, s32 flag);    // 0x80203664
 void   fn_80203340(u8* data, u8* voice, s32 flag);           // 0x80203340
 void   fn_80202CA8(void);                                      // 0x80202CA8
 s32    AXAcquireVoice(s32 priority, void* cb, void* ctx);        // 0x80258024
@@ -191,7 +191,7 @@ void fn_801F95F0(u8* p, s32 a4, f32 dt) {
 // Loads "<name>.dsp" into an aligned buffer for DSP slot 'flag' (0/1). Returns 0 on success, -1 on failure.
 s32 fn_801FD2D4(u8* audio, const char* name, s32 flag) {
     char buf[0x80];
-    if (lbl_805F98C0 != 0) return fn_80203664(audio, name, flag);
+    if (lbl_805F98C0 != 0) return MusicLoadAsync(audio, name, flag);
     s32 room = 0x7F - (s32)strlen(lbl_805F98E4);
     strncpy(buf, name, room - 1);
     buf[room - 1] = 0;

@@ -86,9 +86,9 @@ s32    fn_8012E420(u8* world, u8* obj, s32 a, s32 b);                  // 0x8012
 u8*    fn_8015A210(u8* p, s32 a, s32* out, s32 b);                     // 0x8015A210
 void   fn_8016964C(u8* mgr, u8* tex);                                  // 0x8016964C
 u8*    fn_8016A08C(const char* name);                                  // 0x8016A08C
-s32 fn_8016B5E0(u8* arg0, u8* arg1, s32 arg2);                       // 0x8016B5E0
+s32 CheckWiiFileVersion(u8* arg0, u8* arg1, s32 arg2);                       // 0x8016B5E0
 u8*    fn_8016B724(u8* obj, s32 a, const char* name);                  // 0x8016B724
-void   fn_8019BE68(u8* parent, u8* w);                                 // 0x8019BE68
+void   UIElement_CreateBaseRefused(u8* parent, u8* w);                                 // 0x8019BE68
 u8*    fn_80198E20(u8* set);                                           // 0x80198E20
 BOOL   fn_80198C34(void* set, void* w);                                // 0x80198C34
 ScriptValue fn_801A1208(u8* el);                                       // 0x801A1208
@@ -205,7 +205,7 @@ void fn_801455E0(f32* out, u8* q) {
 // parent is NULL), detaching it from its old parent first, then calls vtable slot 0x2C.
 void fn_8019CAD4(u8* w, u8* parent) {
     u8* oldParent = *(u8**)(w + 0x128);
-    if (oldParent != NULL) fn_8019BE68(oldParent, w);
+    if (oldParent != NULL) UIElement_CreateBaseRefused(oldParent, w);
     if (parent == NULL) {
         parent = fn_80198E20((u8*)ScreenSetsCurrent(gScreenSets));
     }
@@ -613,7 +613,7 @@ s32 fn_80109600(void* slot) {
     if (fn_801E6BD0(gIdPool, &key) == 0) return 0;
     u8 obj[12];
     u8* r = lbl_803C75C8 + ((u32)lbl_805FB22C << 6);
-    fn_8016B5E0(obj, lbl_805FB220, *(s32*)(r + 4));
+    CheckWiiFileVersion(obj, lbl_805FB220, *(s32*)(r + 4));
     u8* tex = fn_8016B724(obj, 0, (const char*)(r + 8));
     *(u8**)slot = tex;
     if (tex != NULL) fn_8016964C(lbl_805FB5A8, tex);

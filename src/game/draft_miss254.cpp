@@ -71,7 +71,7 @@ void   fn_801DA344(u8* obj, u8* prop);                               // 0x801DA3
 void   fn_8020A398(s32 handle);                                      // 0x8020A398
 
 // lab / part info
-void*  fn_80109330(const char* name);                                // 0x80109330
+void*  TextureLoadShared(const char* name);                                // 0x80109330
 u8*    fn_801186FC(u8* rec);                                         // 0x801186FC
 void*  fn_8011AD88(void* def, s32 flag);                             // 0x8011AD88
 s32    fn_8011C214(u8* p);                                           // 0x8011C214
@@ -214,12 +214,12 @@ static u8* EnhancementTexture(u8* e) {
                *(s32*)(e + 0x10), *(s32*)(e + 0xC), *(s32*)(e + 0x8));
     strcpy(path, lbl_8036CF70);
     strcat(path, name);
-    u8* tex = (u8*)fn_80109330(path);
+    u8* tex = (u8*)TextureLoadShared(path);
     lbl_805FB258 = TextFromHash(*(u32*)(e + 0x8));
     if (tex == NULL) {
         strcpy(path, lbl_8036CF70);
         strcat(path, lbl_8036CF70 + 0x30);
-        tex = (u8*)fn_80109330(path);
+        tex = (u8*)TextureLoadShared(path);
     }
     return tex;
 }

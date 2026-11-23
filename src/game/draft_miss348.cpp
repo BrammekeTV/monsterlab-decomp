@@ -606,7 +606,7 @@ void fn_80203220(void) {
 // 0x8020390C
 // Opens the DSP file "<prefix><name>.dsp" and (re)allocates the 0x10020-byte stream buffer,
 // aligned to 32 bytes, zero-filling the unread tail. Returns 1, or -1 on failure.
-s32 fn_8020390C(u8* arg0, u8* arg1) {
+s32 MusicLoad(u8* arg0, u8* arg1) {
     char buf[0x80];
     strcpy(buf, (const char*)(lbl_803865F0 + 0x5B8));
     strcat(buf, (const char*)arg1);

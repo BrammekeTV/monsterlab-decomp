@@ -11,7 +11,7 @@ u32      StringHash(const char* s);                       // 0x801EB704
 Locator* WorldFindLocator(void* world, u32 hash);         // 0x8012AA50
 s32      WorldGetEntityZone(void* world, void* entity);
 u8*      fn_80138864(u8* p, s32 idx);
-void*    fn_80198F1C(void* set, u32 hash);                // 0x80198F1C
+void*    UIAnim_FindByName(void* set, u32 hash);                // 0x80198F1C
 s32      fn_8019BBA4(u8* arg0, u8* arg1, s32 arg2);
 s32      fn_8019BC80(u8* arg0, u32 arg1);
 void     fn_801A8654(u8* obj, s32 a1);                    // 0x801A8654
@@ -131,7 +131,7 @@ s32 fn_800B8624(u8* arg0, u8* arg1) {
 void fn_8002A8D8(u8* arg0) {
     void* sets = gScreenSets;
     u32 h0 = StringHash("bug_goo_anim");
-    u8* anim = (u8*)fn_80198F1C(ScreenSetsCurrent(sets), h0);
+    u8* anim = (u8*)UIAnim_FindByName(ScreenSetsCurrent(sets), h0);
     sets = gScreenSets;
     u32 h1 = StringHash("bug_goo");
     u8* el = (u8*)ScreenSetFindElement(ScreenSetsCurrent(sets), h1);

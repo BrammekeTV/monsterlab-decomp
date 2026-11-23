@@ -349,7 +349,7 @@ static void ClearPowerupSlots(u8* p) {
 // on the object at +0x94, applies the score changes and wind/shake feedback for each state of
 // that object, formats the two cyclic-motion debug lines and runs the power-up (+0x620) result
 // handling (succeed = state 3, failed = state 4).
-void fn_800B49B8(u8* arg0, f32 dt) {
+void WiiMoteCheckSpike(u8* arg0, f32 dt) {
     s32 hitA = 0;
     s32 hitB = 0;
     u8* obj;

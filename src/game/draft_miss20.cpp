@@ -26,7 +26,7 @@ void  fn_8012F8B8(u8* p, s32 a1, s32 a2);                            // 0x8012F8
 s32   fn_80139FF0(void);                                             // 0x80139FF0 (friend code verified flag == 1)
 u64   fn_8013A004(void);                                             // 0x8013A004 (verified friend code, hi:lo)
 char* fn_8013A010(void);                                             // 0x8013A010 (friend code display buffer)
-void  fn_8013A0A4(s32 a, s32 b);                                     // 0x8013A0A4 (callback)
+void  GetFriendStatusString(s32 a, s32 b);                                     // 0x8013A0A4 (callback)
 void  fn_8013A654(s32 a);                                            // 0x8013A654 (callback)
 void  fn_8013A6F4(s32 a, s32 b);                                     // 0x8013A6F4 (callback)
 void  fn_8013F394(s32 a);                                            // 0x8013F394
@@ -374,7 +374,7 @@ void FriendListDelete(void) {
     lbl_803F0F30[slot] = 0;
     fn_802E65C0(lbl_80556E80 + slot * 0xC + 0x40);
     SaveManager_SaveOptions();
-    fn_802E99C4(0, (void*)fn_8013A6F4, 0, (void*)fn_8013A0A4, 0, (void*)fn_8013A654, 0);
+    fn_802E99C4(0, (void*)fn_8013A6F4, 0, (void*)GetFriendStatusString, 0, (void*)fn_8013A654, 0);
     FriendListSort(lbl_805F9028);
     OSUnlockMutex(lbl_80556AB0);
     lbl_805FBB48 -= 1;
@@ -511,7 +511,7 @@ void FriendsListAddFriend(void) {
         }
     }
     SaveManager_SaveOptions();
-    fn_802E99C4(0, (void*)fn_8013A6F4, 0, (void*)fn_8013A0A4, 0, (void*)fn_8013A654, 0);
+    fn_802E99C4(0, (void*)fn_8013A6F4, 0, (void*)GetFriendStatusString, 0, (void*)fn_8013A654, 0);
     OSUnlockMutex(lbl_80556AB0);
     lbl_805FBB48 -= 1;
 }

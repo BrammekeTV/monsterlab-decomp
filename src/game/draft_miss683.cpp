@@ -32,7 +32,7 @@ u32 fn_80143974(s32 seed, void* data, u32 len);  // camera_collision.cpp
 void fn_801894B8(u8* p);                         // small_8018.cpp
 void fn_801894F4(u8* p);
 void fn_8018979C(u8*, s8*, s32*, s32*);          // src/leaf
-void* fn_8018D428(s32 size, const char* file, void* tag, s32 line);
+void* UIEngineAlloc(s32 size, const char* file, void* tag, s32 line);
 void fn_8018D4CC(void* p);                       // small_8019.cpp
 u8*  fn_8019552C(u8* a3, s32 a4);                 // small_8019c.cpp (returns a pointer, declared u32)
 void* fn_801D40E0(s32 n);                        // small_801Dc.cpp
@@ -205,7 +205,7 @@ void fn_80197D98(u8* arg0, const char* arg1, s32 arg2, s32 arg3, f32* arg4, f32*
 // 0x80197EC4
 // Loads the font "fonts\<name>.rf" into arg0+0x8 (NULL on failure). The file is read into a new
 // UIFont block; the block is freed again when fn_80198014 reports fewer entries than it holds.
-void fn_80197EC4(u8* arg0, const char* arg1) {
+void UIFont_Load(u8* arg0, const char* arg1) {
     char path[0x100];   // stack path buffer (size from the frame layout)
     u8 handle[0x10];    // stack file handle (size from the frame layout)
     s32 size;
@@ -214,7 +214,7 @@ void fn_80197EC4(u8* arg0, const char* arg1) {
     SysSprintf(path, "fonts\\%s.rf", arg1);
     if (fn_801EE46C(handle, path) != 0) {
         size = fn_801EE504(handle);
-        font = (u8*)fn_8018D428(size, "UIFont.h", &lbl_805F93BC, 0x43);
+        font = (u8*)UIEngineAlloc(size, "UIFont.h", &lbl_805F93BC, 0x43);
         fn_801EE50C(handle, font, size, 1);
         fn_801EE4B8(handle);
     }

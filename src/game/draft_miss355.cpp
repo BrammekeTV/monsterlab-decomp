@@ -9,7 +9,7 @@ void*       ScreenSetFindElement(void* set, u32 hash);   // 0x80198F18
 void*       ScreenSetsCurrent(void* sets);               // 0x8018D1E4
 void        fn_8018D2B8(const char* fmt, ...);           // 0x8018D2B8 (debug log)
 void        fn_8018D370(const char* fmt, ...);           // 0x8018D370 (debug log)
-const char* fn_801EB708(u32 hash);                       // 0x801EB708 (hash -> name for logs)
+const char* FormatHashString(u32 hash);                       // 0x801EB708 (hash -> name for logs)
 extern const char lbl_80381868[];                        // 0x80381868 (string block)
 extern f32 lbl_803483C0[];                               // 0x803483C0 (spline weights, 4 per row)
 extern f32 lbl_80348650[];                               // 0x80348650 (cubic weights, 4 per row)
@@ -160,7 +160,7 @@ void UIElement_SetPos(u32 a0, f32* a1) {
         fn_8018D370(lbl_80381868 + 0x40);
     } else {
         el = (u8*)ScreenSetFindElement(set, a0);
-        if (el == NULL) fn_8018D2B8(lbl_80381868 + 0x238, fn_801EB708(a0));
+        if (el == NULL) fn_8018D2B8(lbl_80381868 + 0x238, FormatHashString(a0));
     }
     if (el != NULL) {
         if (a1 == NULL) {
@@ -188,7 +188,7 @@ void UIElement_SetSize(u32 a0, f32* a1) {
         fn_8018D370(lbl_80381868 + 0x40);
     } else {
         el = (u8*)ScreenSetFindElement(set, a0);
-        if (el == NULL) fn_8018D2B8(lbl_80381868 + 0x238, fn_801EB708(a0));
+        if (el == NULL) fn_8018D2B8(lbl_80381868 + 0x238, FormatHashString(a0));
     }
     if (el != NULL) {
         if (a1 == NULL) {

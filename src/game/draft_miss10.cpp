@@ -13,11 +13,11 @@ void        fn_8016FB20(void*);                                                 
 void        fn_80170044(void*);                                                 // 0x80170044
 void        fn_8018B2CC(u8* obj, u8* entry, s32 a, s32 b, f32 c, f32 d);       // 0x8018B2CC
 void        fn_8018D370(const char* fmt, ...);                                  // 0x8018D370
-u8*         fn_8019FA78(s32 a, s32 b, s32 c);                                   // 0x8019FA78
-u8*         fn_801A1B64(void);                                                  // 0x801A1B64
-u8*         fn_801A2588(void);                                                  // 0x801A2588
-u8*         fn_801A2DDC(void);                                                  // 0x801A2DDC
-u8*         fn_801A84F8(void);                                                  // 0x801A84F8
+u8*         UIImage_Create(s32 a, s32 b, s32 c);                                   // 0x8019FA78
+u8*         UISlideshow_Create(void);                                                  // 0x801A1B64
+u8*         UIModel_Create(void);                                                  // 0x801A2588
+u8*         UIEntity_Create(void);                                                  // 0x801A2DDC
+u8*         UIParticleEffect_Create(void);                                                  // 0x801A84F8
 void        fn_801A904C(u8* p);                                                 // 0x801A904C
 s32         fn_801A9174(u8* p, f32* pos, f32* out);                             // 0x801A9174
 s32         fn_801B5A60(u8* p);                                                 // 0x801B5A60
@@ -28,7 +28,7 @@ void*       fn_801BA9C4(u8* a0, s32 a1, u8* a2, u32 a3, u32 a4, u32* a5, u32 a6,
 void        fn_801C83AC(u8* mgr, u8* item);                                     // 0x801C83AC
 void        fn_801C9178(u8* a, u8* b);                                          // 0x801C9178
 void        fn_801D0B48(u8* a, u8* b, u8* c);                                   // 0x801D0B48
-const char* fn_801EB708(u32 hash);                                              // 0x801EB708
+const char* FormatHashString(u32 hash);                                              // 0x801EB708
 void        fn_801EBA20(void* list, void* item);                                // 0x801EBA20
 u32         fn_801F38F8(u8* a3);                                                // 0x801F38F8
 void        fn_801F5E48(void* a, s32 b);                                        // 0x801F5E48
@@ -92,23 +92,23 @@ void fn_8019DB40(u8* p) {
 
 // 0x8019F9B8
 // UIGraphic factory: builds the graphic of the given type (0..4) and stores the type at +0x13C.
-u8* fn_8019F9B8(s32 type) {
+u8* UIGraphic_Create(s32 type) {
     u8* g = NULL;
     switch (type) {
     case 0:
-        g = fn_8019FA78(0x20, 0x20, -0xf01);
+        g = UIImage_Create(0x20, 0x20, -0xf01);
         break;
     case 1:
-        g = fn_801A2DDC();
+        g = UIEntity_Create();
         break;
     case 2:
-        g = fn_801A2588();
+        g = UIModel_Create();
         break;
     case 3:
-        g = fn_801A84F8();
+        g = UIParticleEffect_Create();
         break;
     case 4:
-        g = fn_801A1B64();
+        g = UISlideshow_Create();
         break;
     default:
         fn_8018D370("UIGraphic : invalid type %d ...\n");
@@ -278,7 +278,7 @@ s32 fn_801AC51C(u8* p, u8* obj, u8* target) {
         *(u8**)(target + 0x84) = p;
         return 1;
     }
-    SysSprintf(buf, "Anim not found: %s\n", fn_801EB708(*(u32*)(p + 0x30)));
+    SysSprintf(buf, "Anim not found: %s\n", FormatHashString(*(u32*)(p + 0x30)));
     return 0;
 }
 

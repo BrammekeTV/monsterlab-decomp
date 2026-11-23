@@ -355,7 +355,7 @@ s32 fn_801FA0A8(u8* list, s32 mode, f32* plane, s32 index, f32* outT, f32* start
 
 // 0x8020716C
 // Maps an error code (0 and negative values) to its message text; unknown codes give "?".
-const char* fn_8020716C(s32 code) {
+const char* SoErrorName(s32 code) {
     switch (code) {
     case (-0x7FFFFFFF - 1): return (const char*)(lbl_80386ED0 + 0xc);
     case -0x79: return (const char*)(lbl_80386ED0 + 0x498);

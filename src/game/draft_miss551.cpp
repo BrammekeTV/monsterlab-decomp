@@ -33,7 +33,7 @@ u32 fn_800C2618(u8* a3, s32 a4);                            // 0x800C2618
 u8* fn_800C2028(u8* p);                                     // 0x800C2028 (defined in draft_800Cd.cpp)
 void operator_delete(void* p);                              // 0x801D426C
 void fn_8018D4CC(void* p);                                  // 0x8018D4CC (free)
-void fn_8018D1FC(const char* fmt, ...);                     // 0x8018D1FC
+void GameLogDebug(const char* fmt, ...);                     // 0x8018D1FC
 u8* fn_800CD7D8(u8* p, u8* q, s32 limit);                   // 0x800CD7D8
 
 // 0x80010FF4
@@ -152,11 +152,11 @@ s32 fn_800CD788(u8* p, u8* q) {
 // 0x8018D4EC
 // Stores the entry at index idx (obj+0x88 + idx*4) into obj+0x84; if non-null, prints its s32 value
 // with the format string lbl_80381370.
-void fn_8018D4EC(u8* obj, s32 idx) {
+void UIEngine_LogActivateScreen(u8* obj, s32 idx) {
     u8* node = *(u8**)(obj + idx * 4 + 0x88);
     if (node == NULL) return;
     *(u8**)(obj + 0x84) = node;
-    fn_8018D1FC((const char*)lbl_80381370, *(s32*)node, idx);
+    GameLogDebug((const char*)lbl_80381370, *(s32*)node, idx);
 }
 
 // 0x8019CD68

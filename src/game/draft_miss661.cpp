@@ -45,7 +45,7 @@ void fn_80035DB8(u8* c, f32 dt);                                     // 0x80035D
 void fn_80036618(u8* arg0, f32 farg0);                               // 0x80036618
 s32  fn_8003639C(u8* c);                                             // 0x8003639C
 void fn_8003CE20(u8* arg0, s32 arg1, s32 arg2);                      // 0x8003CE20
-void* fn_80198F1C(void* set, u32 hash);                              // 0x80198F1C
+void* UIAnim_FindByName(void* set, u32 hash);                              // 0x80198F1C
 ScriptValue fn_801A1208(u8* el);                                        // 0x801A1208 (ScriptValue: image element -> texture)
 void fn_801A8654(u8* obj, s32 a1);                                   // 0x801A8654
 u8*  fn_801B3308(void);                                              // 0x801B3308
@@ -713,12 +713,12 @@ void fn_8003A2B4(u8* arg0) {
     *(void**)(arg0 + 0x3D0) = (void*)fn_801A1208((u8*)ScreenSetFindElement(set, StringHash("MonsterSlap")));
     *(void**)(arg0 + 0x3D4) = (void*)fn_801A1208((u8*)ScreenSetFindElement(set, StringHash("MonsterSlapFlip")));
     *(void**)(arg0 + 0x928) = ScreenSetFindElement(set, StringHash("MonsterHandInvis"));
-    *(void**)(arg0 + 0x92C) = fn_80198F1C(set, StringHash("Impact"));
+    *(void**)(arg0 + 0x92C) = UIAnim_FindByName(set, StringHash("Impact"));
     *(void**)(arg0 + 0x930) = ScreenSetFindElement(set, StringHash("ImpactScanlines"));
-    *(void**)(arg0 + 0x934) = fn_80198F1C(set, StringHash("MonsterHandWaveLeft"));
-    *(void**)(arg0 + 0x938) = fn_80198F1C(set, StringHash("MonsterHandWaveRight"));
-    *(void**)(arg0 + 0x93C) = fn_80198F1C(set, StringHash("MonsterHandPunch"));
-    *(void**)(arg0 + 0x940) = fn_80198F1C(set, StringHash("MonsterHandReset"));
+    *(void**)(arg0 + 0x934) = UIAnim_FindByName(set, StringHash("MonsterHandWaveLeft"));
+    *(void**)(arg0 + 0x938) = UIAnim_FindByName(set, StringHash("MonsterHandWaveRight"));
+    *(void**)(arg0 + 0x93C) = UIAnim_FindByName(set, StringHash("MonsterHandPunch"));
+    *(void**)(arg0 + 0x940) = UIAnim_FindByName(set, StringHash("MonsterHandReset"));
     memset(arg0 + 0x294, 0, 6);
     memset(arg0 + 0x29A, 0, 6);
 

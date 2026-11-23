@@ -40,7 +40,7 @@ void  fn_80041874(u8* p);                                                       
 u8*   fn_800418E0(u8* p, s32 a2);                                               // 0x800418E0
 void  fn_80041AB4(u8* p);                                                       // 0x80041AB4
 u8* fn_80042C38(u8* p);                                                     // 0x80042C38
-void fn_80042E04(u8* p);                                                        // 0x80042E04
+void DebugCombatOMaticOptionsMenu(u8* p);                                                        // 0x80042E04
 void* fn_80043910(void* a0, s32 idx, s32 kind);                                 // 0x80043910
 void  fn_800445E4(u8* p);                                                       // 0x800445E4
 u8*   fn_800445F4(u8* p, s32 del);                                              // 0x800445F4
@@ -220,7 +220,7 @@ void fn_80040ACC(u8* arg0, u8* arg1, u8* arg2) {
     n = (u8*)fn_801D40E0(0x264);
     if (n != NULL) fn_80042C38(n);
     lbl_805FB058 = n;
-    fn_80042E04(n);  // r3 = the new 0x264 object
+    DebugCombatOMaticOptionsMenu(n);  // r3 = the new 0x264 object
 
     for (s32 i = 0; i < 2; i++) {
         FighterStatsSetOwner(((u8**)(gBattle + 0xA00))[i] + 0x20,

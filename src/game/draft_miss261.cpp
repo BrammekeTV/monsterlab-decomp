@@ -11,7 +11,7 @@ void  fn_8018D370(const char* fmt, ...);                                  // 0x8
 u8*    fn_8019552C(u8* list, s32 index);                                   // 0x8019552C
 s32   fn_8019555C(u8* list);                                              // 0x8019555C
 s32   fn_801AA974(u8* self, s32 loop, s32 rev, f32 pos);                  // 0x801AA974
-s32   fn_801AAC08(u8* self, f32 pos);                                     // 0x801AAC08
+s32   UIAnimTrack_Evaluate(u8* self, f32 pos);                                     // 0x801AAC08
 f32   fn_801AA728(u8* entry);                                             // 0x801AA728 (leaf)
 void  fn_801B737C(void* a, void* b, void* c, s32 d);                      // 0x801B737C
 void  fn_801B75AC(void* p);                                               // 0x801B75AC
@@ -135,7 +135,7 @@ void fn_801AA7D8(void* track, s32 loop, s32 rev, f32 pos) {
         return;
     }
     fn_801AA974(self, loop, rev, pos);
-    fn_801AAC08(self, pos);
+    UIAnimTrack_Evaluate(self, pos);
 }
 
 // 0x801AB3DC

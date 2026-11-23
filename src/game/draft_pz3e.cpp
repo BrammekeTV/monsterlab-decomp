@@ -214,7 +214,7 @@ u8* fn_80174524(u8* src) {
 // 0x8019645C
 // UIRenderModule blend mode setter: checks the display-list budget, then writes the BP
 // register selecting blend mode 0..7; other modes log an error. Returns 0.
-s32 fn_8019645C(u8* self, u32 mode) {
+s32 UIRenderModule_SetBlendMode(u8* self, u32 mode) {
     if (fn_8015BA30(sRendDLs + gViewportIndex * 0x94) + 0x10CA > gFrameBudget) {
         fn_8014DE68();
         fn_8015BA30(sRendDLs + gViewportIndex * 0x94);

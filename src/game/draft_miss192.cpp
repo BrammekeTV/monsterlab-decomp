@@ -62,13 +62,13 @@ void fn_80050EB0(f32 a0);                                       // 0x80050EB0
 u8* fn_8004EDD0(u8* obj, s32 flag, s32 a2);                     // 0x8004EDD0
 u8* fn_8005CA88(u8* p);                                         // 0x8005CA88
 void* fn_800E60BC(void);                                        // 0x800E60BC
-void* fn_8011ECCC(s8 arg0);                                          // 0x8011ECCC
+void* QuestFormatIconName(s8 arg0);                                          // 0x8011ECCC
 void fn_801265F4(void);                                         // 0x801265F4
 void fn_80126808(void);                                         // 0x80126808
 void fn_801458B0(f32* quat, f32* a, f32* b);                    // 0x801458B0
 s32 fn_80146A7C(u8* p, const char* path);                       // 0x80146A7C
 s32 fn_80146DD8(u8* p, s32 mode, s32 val);                      // 0x80146DD8
-void* fn_80198F1C(void* set, u32 hash);                         // 0x80198F1C
+void* UIAnim_FindByName(void* set, u32 hash);                         // 0x80198F1C
 s32 fn_8019DB14(void* el);                                      // 0x8019DB14
 u32 fn_8019DC10(void* el);                                      // 0x8019DC10
 s32 fn_8019DC48(void* el);                                      // 0x8019DC48
@@ -222,7 +222,7 @@ void Wii_PlayConversationIntro(BOOL a0) {
             i++;
         }
         u8* ent = *(u8**)(gGameDb->data + 0x8930) + row * 8;
-        s32 tex = (s32)(intptr_t)fn_8011ECCC(*(s8*)(ent + 0x4));  // lint:ok 32-bit slot
+        s32 tex = (s32)(intptr_t)QuestFormatIconName(*(s8*)(ent + 0x4));  // lint:ok 32-bit slot
         void* set = ScreenSetsCurrent(gScreenSets);
         if (set != NULL) {
             void* w = ScreenSetFindWidget(set, 0xBEF77BAEu);
@@ -560,7 +560,7 @@ void fn_8003451C(u8* p) {
     *(void**)(p + 0x59C) = ScreenSetFindElement(set, StringHash("Basket"));
     *(void**)(p + 0x604) = ScreenSetFindElement(set, StringHash(lbl_80357DF8 + 0x34));
     *(void**)(p + 0x608) = ScreenSetFindElement(set, StringHash(lbl_80357DF8 + 0x44));
-    *(void**)(p + 0x628) = fn_80198F1C(set, StringHash(lbl_80357DF8 + 0x54));
+    *(void**)(p + 0x628) = UIAnim_FindByName(set, StringHash(lbl_80357DF8 + 0x54));
     *(void**)(p + 0x160) = ScreenSetFindElement(set, StringHash(lbl_80357DF8 + 0x60));
     f32 zero = 0.0f;
     s32 a = 0, b = 0;

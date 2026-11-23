@@ -37,7 +37,7 @@ extern u8 gGame[];                     // 0x80xxxxxx
 extern u8 gLevelFlags[];               // 0x80369D60: 0x20 bytes per level, name pointer at +0
 extern char lbl_80384390[];            // 0x80384390 (asset path buffer, initially "RW_ASSETS_nolevel")
 extern const char lbl_805F8FE8[];      // 0x805F8FE8
-extern "C++" void* lbl_805FB5A8;       // 0x805FB5A8 (handle passed to fn_80169C6C)
+extern "C++" void* lbl_805FB5A8;       // 0x805FB5A8 (handle passed to TextureDescribe)
 extern u8* lbl_805FB188;               // 0x805FB188 (spawn record table)
 extern u8* lbl_805FBBE0;               // 0x805FBBE0 (save block pointer)
 extern void* lbl_805FB1C8;             // 0x805FB1C8 (state record pointer)
@@ -84,8 +84,8 @@ void* WorldFindLocator(void* world, u32 hash);   // 0x8012AA50
 void* fn_800E60BC(void);                   // 0x800E60BC
 void ScopedLockCtor(u8* l);                // 0x801F5384
 void ScopedLockDtor(u8* l, s32 flags);     // 0x801F53B0
-void fn_80169C6C(void* a0, s32 a1);        // 0x80169C6C
-void fn_801294CC(u8* w, s32 level, const char* dir, const char* name);   // 0x801294CC
+void TextureDescribe(void* a0, s32 a1);        // 0x80169C6C
+void WorldLoadLevelFiles(u8* w, s32 level, const char* dir, const char* name);   // 0x801294CC
 u8* GetGlobalSettings(void);               // 0x801D2BF8
 s32 fn_801D3A60(s32 zone);                 // 0x801D3A60
 void fn_801384B0(u8* world, s32 slot, s32 a);   // 0x801384B0
@@ -571,7 +571,7 @@ void fn_801260C8(void) {
 
 // 0x80129334
 // Loads the level: world reset with a "World::Reset waiting..." scoped lock, builds the asset
-// path buffer ("RW_ASSETS_%s") and the "levels\%s\\" name, and hands over to fn_801294CC with the
+// path buffer ("RW_ASSETS_%s") and the "levels\%s\\" name, and hands over to WorldLoadLevelFiles with the
 // "Streams\\" directory. Always returns 1.
 BOOL fn_80129334(void* world, u8 level) {
     u8* w = (u8*)world;
@@ -583,8 +583,8 @@ BOOL fn_80129334(void* world, u8 level) {
     SysSprintf(path, "%s - %s", name, lbl_805F8FE8);
     if (w[0x120] == 0) WorldStateInit(w, level);
     if (name != NULL) SysSprintf(path, "levels\\%s\\", name);
-    if (w[0x120] == 0) fn_80169C6C(lbl_805FB5A8, 1);
-    fn_801294CC(w, level, "Streams\\", name);
+    if (w[0x120] == 0) TextureDescribe(lbl_805FB5A8, 1);
+    WorldLoadLevelFiles(w, level, "Streams\\", name);
     ScopedLockDtor(lock, -1);
     return 1;
 }

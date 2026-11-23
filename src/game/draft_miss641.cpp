@@ -25,7 +25,7 @@ void  fn_8002DC04(u8* p);                                                       
 s32   fn_80031114(void* list, f32* v);                                                 // 0x80031114
 u8*    fn_8019552C(u8* list, s32 index);                                                // 0x8019552C
 s32   fn_8019555C(u8* list);                                                           // 0x8019555C
-void* fn_80198F1C(void* set, u32 hash);                                                // 0x80198F1C
+void* UIAnim_FindByName(void* set, u32 hash);                                                // 0x80198F1C
 void  fn_801A8654(u8* obj, s32 a1);                                                    // 0x801A8654
 s32   fn_801AB80C(u8* obj, f32 rate);                                                  // 0x801AB80C
 void  fn_801AA760(u8* out, u8* key);                                                   // 0x801AA760
@@ -283,7 +283,7 @@ void fn_80024528(u8* arg0, f32 dt) {
         *(s32*)(arg0 + 0xAF0) = 0;
     }
     if (*(s32*)(arg0 + 0xC0) <= 0) {
-        void* el = fn_80198F1C(ScreenSetsCurrent(gScreenSets), 0xBC4F008Fu);
+        void* el = UIAnim_FindByName(ScreenSetsCurrent(gScreenSets), 0xBC4F008Fu);
         if (el != NULL) fn_801AB80C((u8*)el, lbl_805FC954);
         if (*(s32*)(*(u8**)(arg0 + 0x90) + 0x10) == 0) {
             *(u8*)(arg0 + 0xBC) = 0;
@@ -311,7 +311,7 @@ void fn_80024528(u8* arg0, f32 dt) {
 void fn_800250EC(u8* arg0) {
     void* sets = gScreenSets;
     u32 hash = StringHash("dirt_fling_anim");
-    u8* list = *(u8**)(*(u8**)((u8*)fn_80198F1C(ScreenSetsCurrent(sets), hash) + 4) + 4);
+    u8* list = *(u8**)(*(u8**)((u8*)UIAnim_FindByName(ScreenSetsCurrent(sets), hash) + 4) + 4);
     s32 count = fn_8019555C(list);
     if (count == *(s32*)(arg0 + 0xAF8)) return;
     *(s32*)(arg0 + 0xAF8) = 0;

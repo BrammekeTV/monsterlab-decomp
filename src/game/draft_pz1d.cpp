@@ -20,7 +20,7 @@ void  fn_8016FB20(void*);                                     // 0x8016FB20
 void  fn_80170044(void*);                                     // 0x80170044
 void  fn_8018D2B8(const char* fmt, ...);                      // 0x8018D2B8 (debug log)
 void  fn_8018D370(const char* fmt, ...);                      // 0x8018D370 (debug log)
-s32   fn_8019EB94(void* el);                                  // 0x8019EB94
+s32   UIText_SubstituteText(void* el);                                  // 0x8019EB94
 s32   fn_8019F5A8(void* el);                                  // 0x8019F5A8
 void* fn_80196CCC(void* unused, const char* name);              // 0x80196CCC (loads texture, returns it)
 u8*   fn_80196D04(void* obj, const char* name, const char* arg); // 0x80196D04
@@ -120,7 +120,7 @@ void fn_801B6AD4(u8* arg0) {
 
 // 0x8019F3B4
 // Sets the line count at +0x160 and replaces every CR/LF in the text at +0x170 by a space; when
-// the flag 0x20000 at +0x64 is set, calls fn_8019EB94. If the count is positive it then returns
+// the flag 0x20000 at +0x64 is set, calls UIText_SubstituteText. If the count is positive it then returns
 // fn_8019F5A8(el), else 0.
 s32 fn_8019F3B4(u8* arg0, s32 arg1) {
     *(s32*)(arg0 + 0x160) = arg1;
@@ -131,7 +131,7 @@ s32 fn_8019F3B4(u8* arg0, s32 arg1) {
                 if (*p == 10 || *p == 13) *p = 0x20;
                 p++;
             }
-            if (*(u32*)(arg0 + 0x64) & 0x20000) fn_8019EB94(arg0);
+            if (*(u32*)(arg0 + 0x64) & 0x20000) UIText_SubstituteText(arg0);
         }
         return fn_8019F5A8(arg0);
     }
@@ -140,7 +140,7 @@ s32 fn_8019F3B4(u8* arg0, s32 arg1) {
         if (*p == 10 || *p == 13) *p = 0x20;
         p++;
     }
-    if (*(u32*)(arg0 + 0x64) & 0x20000) fn_8019EB94(arg0);
+    if (*(u32*)(arg0 + 0x64) & 0x20000) UIText_SubstituteText(arg0);
     return 0;
 }
 
@@ -216,7 +216,7 @@ void fn_801EBAB8(u8* arg0) {
 // 0x8019B1C8
 // UI asset loader (UIAssetMgr.cpp): kind 0/1 -> fn_80196D0C(flag 0/1), 2 -> fn_80196CCC,
 // 4 -> fn_80196D04, 3 -> logs an unsupported-kind error with the "dir\name" path, other kinds log.
-void* fn_8019B1C8(void* obj, s32 kind, char* name, char* arg) {
+void* UIAssetMgr_BuildPath(void* obj, s32 kind, char* name, char* arg) {
     char buf[0xD0];
     u8* result = NULL;
     switch (kind) {

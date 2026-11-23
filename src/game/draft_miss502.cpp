@@ -99,7 +99,7 @@ void* fn_80196F1C(u8* arg0, s32 arg1) {
 // 0x80197D04
 // Prints a debug string, then calls virtual slot 0x8 of arg0 with the clip-less argument set
 // (0x7FFFFFFF in the r5 slot, the other arguments forwarded from the caller).
-void fn_80197D04(u8* arg0, s32 arg1, s32 arg2, s32 arg3, s32 arg4, s32 arg5, s32 arg6, f32 farg0) {
+void UIFont_DrawClippedString(u8* arg0, s32 arg1, s32 arg2, s32 arg3, s32 arg4, s32 arg5, s32 arg6, f32 farg0) {
     (void)arg2;  // r5 is overwritten with 0x7FFFFFFF before the virtual call
     fn_8018D2B8(lbl_80382314);
     (*(VFn8*)(*(u8**)arg0 + 0x8))(arg0, arg1, 0x7FFFFFFF, arg3, arg4, arg5, arg6, farg0);

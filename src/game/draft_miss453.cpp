@@ -28,7 +28,7 @@ extern f32 lbl_805FE238;           // float constant (1.0f)
 
 void*  ScreenSetsCurrent(void* sets);                      // 0x8018D1E4
 void*  ScreenSetFindElement(void* set, u32 hash);          // 0x80198F18
-void*  fn_80198F1C(void* set, u32 hash);                   // 0x80198F1C
+void*  UIAnim_FindByName(void* set, u32 hash);                   // 0x80198F1C
 u32    StringHash(const char* s);
 int    SysSprintf(char* buf, const char* fmt, ...);
 u32    RandomU32(void);
@@ -99,7 +99,7 @@ void fn_8003CE20(u8* arg0, s32 arg1, s32 arg2) {
         SysSprintf(name, lbl_803582D0, arg1, i, arg2);
         *(void**)(arg0 + 0x8 + i * 4) = ScreenSetFindElement(set, StringHash(name));
     }
-    *(void**)(arg0 + 0x18) = fn_80198F1C(set, StringHash(lbl_805F84D8));
+    *(void**)(arg0 + 0x18) = UIAnim_FindByName(set, StringHash(lbl_805F84D8));
     {
         u32 m = (u32)(s32)(lbl_805FD08C * *(f32*)(arg0 + 0x20));
         *(f32*)(arg0 + 0x4) = (f32)(RandomU32() % m) / lbl_805FD08C;

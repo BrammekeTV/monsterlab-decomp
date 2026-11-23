@@ -112,7 +112,7 @@ static const char* LabTextFromId(s32 id) {
 
 // 0x801091EC
 // Formats a value into buf with one of the 0x805F8Exx formats, selected by kind (default: ED8).
-s32 fn_801091EC(u8* buf, s32 val, s32 kind) {
+s32 FormatLocalizedName(u8* buf, s32 val, s32 kind) {
     switch (kind) {
     case 1:
         return SysSprintf((char*)buf, lbl_805F8EC0, val, lbl_805F8EC8);
@@ -129,7 +129,7 @@ s32 fn_801091EC(u8* buf, s32 val, s32 kind) {
 
 // 0x80109278
 // Loads a named shared voice file into dst; returns the pool id when the name is not registered.
-void* fn_80109278(u8* name, void* dst, s32 size) {
+void* VoiceLoadShared(u8* name, void* dst, s32 size) {
     char buf[0x80];
     u32 hash;
     s32 found;

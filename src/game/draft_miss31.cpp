@@ -25,7 +25,7 @@ void* fn_8003DDE8(void* part, s32 slot, s32 def, s32 flag, s32 a);  // 0x8003DDE
 void  fn_8004C718(u8* p, s32 idx, void* elem);                   // 0x8004C718
 void* fn_8004FFB4(void* id, void* part);                           // 0x8004FFB4
 s32   fn_8004E300(void* a, s32 b);                               // 0x8004E300
-void  fn_8013A0A4(s32 a, s32 b);                                 // 0x8013A0A4 (callback)
+void  GetFriendStatusString(s32 a, s32 b);                                 // 0x8013A0A4 (callback)
 void  fn_8013A654(s32 a);                                        // 0x8013A654 (callback)
 void  fn_8013A6F4(s32 a, s32 b);                                 // 0x8013A6F4 (callback)
 void  fn_8013F394(s32 a);                                        // 0x8013F394
@@ -410,7 +410,7 @@ void LoginPoller(void) {
         lbl_805FBB48 += 1;
         SaveManager_SaveOptions();
         GameFlowSignal((s32)0xB90F7B7Du, 0, 0);
-        fn_802E99C4(0, (void*)fn_8013A6F4, 0, (void*)fn_8013A0A4, 0, (void*)fn_8013A654, 0);
+        fn_802E99C4(0, (void*)fn_8013A6F4, 0, (void*)GetFriendStatusString, 0, (void*)fn_8013A654, 0);
         OSUnlockMutex(lbl_80556AB0);
         lbl_805FBB48 -= 1;
     }

@@ -1178,7 +1178,7 @@ void fn_8014ACCC(u32 mode, s32 fmt, s32 w, s32 h, s32* outSize, s32* outStride, 
 // Debug dump of the lists of a resource manager: for each entry of its four lists it runs the
 // per-entry pass (fn_8018409C / fn_8016A324 / fn_80175088 / fn_80173568) and, when arg1 is 0,
 // formats a description line into a local buffer.
-void fn_80169C6C(u8* arg0, s32 arg1) {
+void TextureDescribe(u8* arg0, s32 arg1) {
     char buf208[0x100];
     char buf108[0x100];
     char buf8[0x100];

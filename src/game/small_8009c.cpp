@@ -158,7 +158,7 @@ f32 fn_80090674(u8* p) {
 
 // 0x80091DAC
 // Registers the four robot door script callbacks.
-void fn_80091DAC(void) {
+void RobotEvolutionExperiment_RegisterDoorScripts(void) {
     RegisterScriptFunc((const char*)(lbl_8035BD58 + 0x0),  0x4E, (void*)RobotEvolutionExperiment_DoorOpenning);
     RegisterScriptFunc((const char*)(lbl_8035BD58 + 0x28), 0x4E, (void*)RobotEvolutionExperiment_DoorOpen);
     RegisterScriptFunc((const char*)(lbl_8035BD58 + 0x4C), 0x4E, (void*)RobotEvolutionExperiment_DoorClosing);

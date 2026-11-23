@@ -10,7 +10,7 @@ void*   MemAllocDefault(u32 size);                                      // 0x801
 u8*     MonsterCtor(u8* m);
 s32     RegisterScriptFunc(const char* name, s32 type, void* fn);      // 0x801DC91C
 int     SysSprintf(char* buf, const char* fmt, ...);                    // 0x80142EF8
-void*   fn_80109330(const char* name);
+void*   TextureLoadShared(const char* name);
 void    fn_8020F228(u8* p, s32 a2);
 s32     DVDOpen(char* path, u8* p);
 void    fn_8032F1E8(void* obj, void (*ctor)(void), void (*dtor)(void), s32 size, s32 count);
@@ -82,15 +82,15 @@ void fn_8006FB68(u8* p, f32 v) {
 
 // Loads the quest icon texture for the index, falling back to the placeholder.
 // 0x8011ECCC
-void* fn_8011ECCC(s8 arg0) {
+void* QuestFormatIconName(s8 arg0) {
     char buf[0x108];
     void* tex;
 
     SysSprintf(buf, "%squest_icon_%03d", lbl_805F8F90, arg0);
-    tex = fn_80109330(buf);
+    tex = TextureLoadShared(buf);
     if (tex == NULL) {
         SysSprintf(buf, "%squest_icon_placeholder", lbl_805F8F90);
-        tex = fn_80109330(buf);
+        tex = TextureLoadShared(buf);
     }
     return tex;
 }
@@ -134,7 +134,7 @@ void fn_801C5C74(u8* obj, f32* a, f32* b) {
 
 // Registers the vector3 interpolate script callbacks and stores their ids.
 // 0x801E9DB8
-void fn_801E9DB8(void) {
+void RegisterInterpolateVector3TaskScripts(void) {
     *(s32*)(lbl_804DD0C8 + 4) = RegisterScriptFunc((const char*)lbl_80385CE8, 0xB,
                                                    (void*)InterpolateVector3Task_Update_LERP);
     *(s32*)(lbl_804DD0C8 + 8) = RegisterScriptFunc((const char*)(lbl_80385CE8 + 0x24), 0xB,
@@ -146,7 +146,7 @@ void fn_801E9DB8(void) {
 
 // Registers the quaternion interpolate script callbacks and stores their ids.
 // 0x801EA508
-void fn_801EA508(void) {
+void RegisterInterpolateQuaternionTaskScripts(void) {
     s32 slerp;
 
     *(s32*)(lbl_804DD0D4 + 4) = RegisterScriptFunc((const char*)(lbl_80385CE8 + 0x80), 0xB,

@@ -15,7 +15,7 @@ s32   RaySceneTest(void* ray);                                  // 0x80070458
 void  fn_8003DA7C(void);                                        // 0x8003DA7C
 void  fn_800CD020(u8* obj);                                     // 0x800CD020
 void  fn_800D3D50(void);                                        // 0x800D3D50
-void  fn_800D3D6C(void* db);                                    // 0x800D3D6C
+void  PathCheckFullyConnected(void* db);                                    // 0x800D3D6C
 void  fn_800D41F4(void* db, u8* p);                             // 0x800D41F4
 void  fn_800D424C(void* db, u8* p);                             // 0x800D424C
 u8*   fn_800D8724(u8* a, u32 key);                              // 0x800D8724
@@ -442,7 +442,7 @@ void fn_8013006C(u8* self) {
         for (i = 0; i < *(s32*)(*(u8**)self + 0x3C); i++) {
             fn_800D41F4(gObjDb, *(u8**)(*(u8**)(*(u8**)self + 0x38) + i * 4));
         }
-        fn_800D3D6C(gObjDb);
+        PathCheckFullyConnected(gObjDb);
     }
     fn_8003DA7C();
 }

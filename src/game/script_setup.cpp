@@ -12,7 +12,7 @@ void ScriptSigFinalize(u8* sig);                                 // 0x801DC658
 void RegisterEngineScriptSigs(void);
 void RegisterGameScriptFuncs(void);                              // 0x800FB958
 void RegisterHooks(void);
-void fn_800E2EBC(void);                                          // 0x800E2EBC
+void RegisterCIWaypointPathScripts(void);                                          // 0x800E2EBC
 void fn_801068A8(void);                                          // 0x801068A8
 void fn_801E0318(s32 a3);                                        // 0x801E0318
 void fn_801E0320(s32 a3);                                        // 0x801E0320
@@ -67,7 +67,7 @@ extern "C" void fn_800505F0(void) {
 // 0x800E75B0
 extern "C" void fn_800E75B0(void) {
     RegisterGameScriptFuncs();
-    fn_800E2EBC();
+    RegisterCIWaypointPathScripts();
     fn_800505F0();
 }
 

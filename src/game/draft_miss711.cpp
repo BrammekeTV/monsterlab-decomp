@@ -77,7 +77,7 @@ void fn_80031AA4(u8* p);
 void fn_80032A48(u8* p);
 void fn_8006FAF4(u8* p, s32 a);
 void fn_80081E84(u8* self);
-void* fn_80198F1C(void* set, u32 hash);
+void* UIAnim_FindByName(void* set, u32 hash);
 s32 fn_8019BBA4(u8* arg0, u8* arg1, s32 arg2);
 s32 fn_801AB80C(u8* a3, f32 rate);
 void fn_8020A398(s32 handle);
@@ -260,7 +260,7 @@ void fn_80030CC8(u8* p) {
         u32 r = RandomU32();
         *(f32*)(p + 0x18) = (f32)(r % 5u + 8u);
         void* sets = ScreenSetsCurrent(gScreenSets);
-        u8* e = (u8*)fn_80198F1C(sets, 0x1FC61193u);
+        u8* e = (u8*)UIAnim_FindByName(sets, 0x1FC61193u);
         if (e != NULL) {
             fn_801AB80C(e, lbl_805FCCE8);
             fn_8019BBA4(*(u8**)(p + 0x4), e, 10);

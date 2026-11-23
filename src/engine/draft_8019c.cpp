@@ -9,7 +9,7 @@ void*       ScreenSetsCurrent(void* sets);                 // 0x8018D1E4
 void*       ScreenSetFindElement(void* set, u32 hash);     // 0x80198F18
 void        fn_8018D2B8(const char* fmt, ...);             // 0x8018D2B8 (debug log)
 void        fn_8018D370(const char* fmt, ...);             // 0x8018D370 (debug log)
-const char* fn_801EB708(u32 hash);                         // 0x801EB708 (hash -> name for logs)
+const char* FormatHashString(u32 hash);                         // 0x801EB708 (hash -> name for logs)
 void        UISetNumber(void* el, s32 n);                  // 0x8019EF..
 u32         fn_8019DC10(void* el);                         // 0x8019DC10
 void        fn_8019DC58(void* el);                         // 0x8019DC58
@@ -35,7 +35,7 @@ static u8* FindElementA(u32 hash) {
     }
     u8* el = (u8*)ScreenSetFindElement(set, hash);
     if (el == NULL) {
-        fn_8018D2B8(lbl_80381868 + 0x238, fn_801EB708(hash));
+        fn_8018D2B8(lbl_80381868 + 0x238, FormatHashString(hash));
         return NULL;
     }
     return el;
@@ -49,7 +49,7 @@ void UIText_SetString_Int(u32 a0, s32 a1) {
     u8* el = FindElementA(a0);
     if (el == NULL) return;
     if (*(s32*)(el + 0x60) != 1) {
-        fn_8018D370(lbl_80381868 + 0x3A8, fn_801EB708(a0));
+        fn_8018D370(lbl_80381868 + 0x3A8, FormatHashString(a0));
         return;
     }
     UISetNumber(el, a1);
@@ -61,7 +61,7 @@ void UIText_SetString_Float(u32 a0, f32 a1, BOOL a2) {
     u8* el = FindElementA(a0);
     if (el == NULL) return;
     if (*(s32*)(el + 0x60) != 1) {
-        fn_8018D370(lbl_80381868 + 0x3A8, fn_801EB708(a0));
+        fn_8018D370(lbl_80381868 + 0x3A8, FormatHashString(a0));
         return;
     }
     fn_8019F340(el, a2, a1);
@@ -72,7 +72,7 @@ void UIText_SetString_Float(u32 a0, f32 a1, BOOL a2) {
 void UIText_ForceTypeout(u32 a0) {
     u8* el = FindElementA(a0);
     if (el == NULL || *(s32*)(el + 0x60) != 1) {
-        fn_8018D2B8(lbl_80381868 + 0x3A8, fn_801EB708(a0));
+        fn_8018D2B8(lbl_80381868 + 0x3A8, FormatHashString(a0));
         return;
     }
     *(f32*)(el + 0x14C) = lbl_805FF8A4 + (f32)*(s32*)(el + 0x150) / lbl_805F9408;
@@ -84,7 +84,7 @@ u32 /*0x06*/ UIText_IsTypeoutDone(u32 a0) {
     u8* el = FindElementA(a0);
     if (el == NULL) return 1;
     if (*(s32*)(el + 0x60) != 1) {
-        fn_8018D370(lbl_80381868 + 0x3A8, fn_801EB708(a0));
+        fn_8018D370(lbl_80381868 + 0x3A8, FormatHashString(a0));
         return 1;
     }
     return (*(f32*)(el + 0x14C) * lbl_805F9408 - (f32)*(s32*)(el + 0x150)) >= lbl_805FF8A4;
@@ -96,7 +96,7 @@ u32 /*0x06*/ UIText_IsOnLastPage(u32 a0) {
     u8* el = FindElementA(a0);
     if (el == NULL) return 1;
     if (*(s32*)(el + 0x60) != 1) {
-        fn_8018D370(lbl_80381868 + 0x3A8, fn_801EB708(a0));
+        fn_8018D370(lbl_80381868 + 0x3A8, FormatHashString(a0));
         return 1;
     }
     return fn_8019DC10(el);
@@ -108,7 +108,7 @@ void UIText_SetWrapLength(u32 a0, s32 a1) {
     u8* el = FindElementA(a0);
     if (el == NULL) return;
     if (*(s32*)(el + 0x60) != 1) {
-        fn_8018D370(lbl_80381868 + 0x3A8, fn_801EB708(a0));
+        fn_8018D370(lbl_80381868 + 0x3A8, FormatHashString(a0));
         return;
     }
     fn_8019F3B4(el, a1);
@@ -121,7 +121,7 @@ f32 UIText_GetRightXPos(u32 a0) {
     u8* el = FindElementA(a0);
     if (el == NULL) return lbl_805FF8A0;
     if (*(s32*)(el + 0x60) != 1) {
-        fn_8018D370(lbl_80381868 + 0x3A8, fn_801EB708(a0));
+        fn_8018D370(lbl_80381868 + 0x3A8, FormatHashString(a0));
         return lbl_805FF8A0;
     }
     fn_8019DC58(el);
@@ -139,11 +139,11 @@ void UIEntity_SetEntity(u32 a0, BOOL a1) {
     u8* el = FindElementA(a0);
     if (el == NULL) return;
     if (*(s32*)(el + 0x60) != 2) {
-        fn_8018D370(lbl_80381868 + 0x3D0, fn_801EB708(a0));
+        fn_8018D370(lbl_80381868 + 0x3D0, FormatHashString(a0));
         return;
     }
     if (*(s32*)(el + 0x13C) != 1) {
-        fn_8018D370(lbl_80381868 + 0x400, fn_801EB708(a0));
+        fn_8018D370(lbl_80381868 + 0x400, FormatHashString(a0));
         return;
     }
     fn_801A3010(el, (void*)(uintptr_t)a1);
@@ -155,11 +155,11 @@ void UIEntity_SetOffsetBone(u32 a0, u32 a1) {
     u8* el = FindElementA(a0);
     if (el == NULL) return;
     if (*(s32*)(el + 0x60) != 2) {
-        fn_8018D370(lbl_80381868 + 0x3D0, fn_801EB708(a0));
+        fn_8018D370(lbl_80381868 + 0x3D0, FormatHashString(a0));
         return;
     }
     if (*(s32*)(el + 0x13C) != 1) {
-        fn_8018D370(lbl_80381868 + 0x400, fn_801EB708(a0));
+        fn_8018D370(lbl_80381868 + 0x400, FormatHashString(a0));
         return;
     }
     fn_801A30C0(el, a1);
@@ -171,11 +171,11 @@ void UIParticleEffect_SetActive(u32 a0, u32 /*0x06*/ a1) {
     u8* el = FindElementA(a0);
     if (el == NULL) return;
     if (*(s32*)(el + 0x60) != 2) {
-        fn_8018D370(lbl_80381868 + 0x3D0, fn_801EB708(a0));
+        fn_8018D370(lbl_80381868 + 0x3D0, FormatHashString(a0));
         return;
     }
     if (*(s32*)(el + 0x13C) != 3) {
-        fn_8018D370(lbl_80381868 + 0x460, fn_801EB708(a0));
+        fn_8018D370(lbl_80381868 + 0x460, FormatHashString(a0));
         return;
     }
     fn_801A8654(el, (s32)a1 > 0);

@@ -58,7 +58,7 @@ s32 fn_801ED538(u8* p);
 // 0x801B7198
 void* fn_801B7198(void* anim, s32 a);
 // 0x801AC184
-u8* fn_801AC184(u8* defs, s32 idx);
+u8* AnimDefFindByHandle(u8* defs, s32 idx);
 // 0x8017493C
 void fn_8017493C(void* p);
 // 0x8018C4D8
@@ -250,7 +250,7 @@ void fn_800E4CB0(u8* arg0) {
     anim = (u8*)fn_801B7198(&handle, 0);
     if (anim != NULL) {
         if (*(s32*)(arg0 + 0x5C) != 0) {
-            item = fn_801AC184(*(u8**)(*(u8**)(anim + 0x9C) + 0x48), *(s32*)(arg0 + 0x5C));
+            item = AnimDefFindByHandle(*(u8**)(*(u8**)(anim + 0x9C) + 0x48), *(s32*)(arg0 + 0x5C));
             *(s32*)(item + 0xC) |= 0x10000;
             (*(void (**)(u8*, s32))(*(u8**)anim + 0x84))(anim, *(s32*)(arg0 + 0x5C));
             lbl_805FB1A1 = 0;

@@ -24,7 +24,7 @@ void fn_80031090(u8* p, s32 del);
 void fn_8004B938(u8* chr);
 void fn_8005DB64(u8* a0, s32 a1);  // 0x8005DB64, tail-calls fn_800535F8 (not decompiled)
 void fn_80062DC4(u8* p, s32 a, s32 b);
-void* fn_80198F1C(void* set, u32 hash);
+void* UIAnim_FindByName(void* set, u32 hash);
 s32 fn_8019BBA4(u8* obj, void* set, s32 n);  // result unused here
 s32 fn_8019BC80(u8* obj, u32 v);             // result unused here
 void fn_8032F358(u8* obj, void* cb);
@@ -169,7 +169,7 @@ void fn_80032FBC(u8* arg0) {
         u32 hash = StringHash(clip);
         u8* obj = *(u8**)(arg0 + 0x18);
         if (*(s32*)(obj + 0x10) != 0) fn_8019BC80(obj, 1);
-        void* set = fn_80198F1C(ScreenSetsCurrent(gScreenSets), hash);
+        void* set = UIAnim_FindByName(ScreenSetsCurrent(gScreenSets), hash);
         obj = *(u8**)(arg0 + 0x18);
         (*(void (**)(void*, s32))(*(u8**)(obj + 0x138) + 0x2C))(obj, 0x1A);
         fn_8019BBA4(*(u8**)(arg0 + 0x18), set, 0xA);

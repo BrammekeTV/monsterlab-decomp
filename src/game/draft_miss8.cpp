@@ -41,7 +41,7 @@ s32 fn_8004EED0(u8* arg0, u32 arg1, s32 arg2);                    // 0x8004EED0
 u8*    fn_80062C80(u8* p);                                                // 0x80062C80
 s32    fn_80063D6C(u8* self, u8* a, void* pos, u8* b, s32 c, s32 d, s32 e);   // 0x80063D6C
 void   fn_800645C8(u8* self, void* pos);                                  // 0x800645C8
-void   fn_800653F4(u8* self, s32 a, s32 b, s32 c);                        // 0x800653F4
+void   ProjectileAnimate(u8* self, s32 a, s32 b, s32 c);                        // 0x800653F4
 void*  fn_80070F4C(void);                                                 // 0x80070F4C
 void   fn_800C148C(u8* p);                                                // 0x800C148C
 u8*    fn_800D3AC4(u8* db, f32* pos);                                     // 0x800D3AC4
@@ -152,7 +152,7 @@ s32 fn_80065200(u8* arg0, u8* arg1, void* arg2, u8* arg3, s32 arg4, s32 arg5, s3
     (*(VisFn*)(*(u8**)arg0 + 0x14))(arg0, 0);
     s32 x = *(s32*)(*(u8**)(arg0 + 0x228) + 0x10);
     if (x != 0) {
-        fn_800653F4(arg0, x, 1, 1);
+        ProjectileAnimate(arg0, x, 1, 1);
     }
     ScopedLockDtor(&lock, -1);
     if (!(*(u32*)(*(u8**)(arg0 + 0x4) + 0x20) & 0x04000000)) {

@@ -14,7 +14,7 @@ void*   ScreenSetsCurrent(void* sets);                          // 0x8018D1E4
 void*   ScreenSetFindElement(void* set, u32 hash);              // 0x80198F18
 void    fn_8018D2B8(const char* fmt, ...);                      // 0x8018D2B8 (debug log)
 void    fn_8018D370(const char* fmt, ...);                      // 0x8018D370 (debug log)
-const char* fn_801EB708(u32 hash);                              // 0x801EB708 (hash -> name for logs)
+const char* FormatHashString(u32 hash);                              // 0x801EB708 (hash -> name for logs)
 int     SysSprintf(char* buf, const char* fmt, ...);            // 0x80142EF8
 void    UISetText(void* el, const char* text, s32 a);           // 0x8019EFC8
 void    UIPlayAnim(void* el, u32 anim);                         // 0x8019BE40
@@ -57,11 +57,11 @@ static u8* UIFindTypedElement(u32 hash, s32 type, const char* typeMsg) {
     }
     u8* el = (u8*)ScreenSetFindElement(set, hash);
     if (el == NULL) {
-        fn_8018D2B8(lbl_80381868 + 0x238, fn_801EB708(hash));
+        fn_8018D2B8(lbl_80381868 + 0x238, FormatHashString(hash));
         return NULL;
     }
     if (*(s32*)(el + 0x60) != type) {
-        fn_8018D370(typeMsg, fn_801EB708(hash));
+        fn_8018D370(typeMsg, FormatHashString(hash));
         return NULL;
     }
     return el;
@@ -268,7 +268,7 @@ void UIEvent_SendToElement(u32 a0, u32 a1) {
     }
     u8* el = (u8*)ScreenSetFindElement(set, a1);
     if (el == NULL) {
-        fn_8018D2B8(lbl_80381AA0, fn_801EB708(a1));
+        fn_8018D2B8(lbl_80381AA0, FormatHashString(a1));
         return;
     }
     UIPlayAnim(el, a0);

@@ -27,14 +27,14 @@ void* TargetListDestroy(void* t, s32 del);                      // 0x80216200
 void  TargetListInit(void* t);                                  // 0x802161DC
 void* UIWidgetFindChild(void* widget, u32 hash);                // 0x80199AEC
 void  fn_801455E0(f32* out, u8* quat);                          // 0x801455E0
-void  fn_8018DBB8(void* sets, s32 a);                           // 0x8018DBB8
+void  UIEngine_ShowCursor(void* sets, s32 a);                           // 0x8018DBB8
 u8*    fn_8019552C(u8* list, s32 index);                         // 0x8019552C
 s32   fn_8019555C(u8* list);                                    // 0x8019555C
 s32 fn_801987BC(u8* arg0, u8* arg1);                     // 0x801987BC
 s32   fn_80198A8C(void* set, void* widget);                     // 0x80198A8C
 BOOL  fn_80198C34(void* set, void* w);                          // 0x80198C34
 u8*   fn_80198E20(u8* set);                                     // 0x80198E20
-void* fn_80198F1C(void* set, u32 hash);                         // 0x80198F1C
+void* UIAnim_FindByName(void* set, u32 hash);                         // 0x80198F1C
 s32   fn_8019EE40(u8* widget, u32 id, s32 flag);                // 0x8019EE40
 s32   fn_801AA730(u8* dst, u8* src);                      // 0x801AA730
 void  fn_801AA760(f32* out, u32 id);                            // 0x801AA760
@@ -346,7 +346,7 @@ void fn_8000C17C(u8* self) {
         fn_801987BC(set, w);
         *(s32*)(self + 0x15C) = 0;
         gs = gScreenSets;
-        fn_8018DBB8(gs, 0);
+        UIEngine_ShowCursor(gs, 0);
         return;
     }
     if (w != NULL && fn_80198E20(set) != NULL && fn_80198E20(set) != w) {
@@ -354,7 +354,7 @@ void fn_8000C17C(u8* self) {
         fn_801987BC(set, w);
         *(s32*)(self + 0x15C) = 0;
         gs = gScreenSets;
-        fn_8018DBB8(gs, 0);
+        UIEngine_ShowCursor(gs, 0);
     }
 }
 
@@ -365,7 +365,7 @@ void fn_8000C17C(u8* self) {
 void fn_80025524(u8* self, f32* pos, f32* vel) {
     void* sets = gScreenSets;
     u32 hash = StringHash("dirt_fling_anim");
-    u8* list = *(u8**)(*(u8**)((u8*)fn_80198F1C(ScreenSetsCurrent(sets), hash) + 4) + 4);
+    u8* list = *(u8**)(*(u8**)((u8*)UIAnim_FindByName(ScreenSetsCurrent(sets), hash) + 4) + 4);
     s32 count = fn_8019555C(list);
 
     f32 len2 = vel[2] * vel[2] + (vel[0] * vel[0] + vel[1] * vel[1]);

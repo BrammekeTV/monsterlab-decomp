@@ -51,7 +51,7 @@ BOOL   fn_8013E464(void);                                                       
 void   fn_8016964C(u8* mgr, u8* tex);                                                           // 0x8016964C
 u8*    fn_8016A08C(const char* name);                                                           // 0x8016A08C (texture cache lookup)
 void fn_8016A2B8(u8* p);                                                                       // 0x8016A2B8
-s32 fn_8016B5E0(u8* arg0, u8* arg1, s32 arg2);                                                // 0x8016B5E0
+s32 CheckWiiFileVersion(u8* arg0, u8* arg1, s32 arg2);                                                // 0x8016B5E0
 u8*    fn_8016B724(u8* obj, s32 a, const char* name);                                           // 0x8016B724
 void   fn_8017493C(void* p);                                                                    // 0x8017493C
 void   fn_8018A5F4(void* p);                                                                    // 0x8018A5F4
@@ -169,7 +169,7 @@ u8* fn_8005CA88(u8* p) {
 // Looks up a shared texture by name: returns the cached one (bumping its refcount at +0x24) or,
 // on a miss, loads "<shared>.sir" into the shared buffer (initialising the 0x7D0-entry id table and
 // buffer on first use) and registers the new texture with the texture manager.
-void* fn_80109330(const char* name) {
+void* TextureLoadShared(const char* name) {
     char path1[0x80];
     char path2[0x80];
     u8   obj[12];
@@ -216,7 +216,7 @@ void* fn_80109330(const char* name) {
         ok = TRUE;
     }
     if (ok) {
-        fn_8016B5E0(obj, lbl_805FB220, id);
+        CheckWiiFileVersion(obj, lbl_805FB220, id);
         tex = fn_8016B724(obj, 0, shortName);
         if (tex != NULL) fn_8016964C(lbl_805FB5A8, tex);
     }

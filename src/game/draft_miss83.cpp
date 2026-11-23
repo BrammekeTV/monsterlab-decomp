@@ -460,7 +460,7 @@ void fn_8016A14C(void) {
 // 0x8016D8C4
 // Formats the 17 frame-stat counters (lbl_80412A2C) with their format strings (lbl_80376A10,
 // variable stride), setting up lbl_805FB628/62C/630 before each print.
-void fn_8016D8C4(void) {
+void DebugDrawZcullStats(void) {
     static const u16 kOff[17] = {
         0x00, 0x14, 0x28, 0x3C, 0x50, 0x64, 0x78, 0x90, 0xA8,
         0xC0, 0xD8, 0xF0, 0x108, 0x11C, 0x130, 0x144, 0x158,

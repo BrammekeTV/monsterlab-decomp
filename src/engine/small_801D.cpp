@@ -18,9 +18,9 @@ void  fn_801842E0(void* a, s32 b, s32 c);                        // 0x801842E0
 s32  fn_8016195C(void* p, s32 a, s32 b, void* c);               // 0x8016195C
 s32 fn_801DA34C(u8* a, u8* b);                                         // 0x801DA34C (callback stored by fn_801DA7C8)
 void  RegisterEngineScriptFuncs(void);                           // 0x801DC9F4
-void  fn_801E9DB8(void);                                         // 0x801E9DB8
-void  fn_801EA508(void);                                         // 0x801EA508
-void  fn_801EAA08(void);                                         // 0x801EAA08
+void  RegisterInterpolateVector3TaskScripts(void);                                         // 0x801E9DB8
+void  RegisterInterpolateQuaternionTaskScripts(void);                                         // 0x801EA508
+void  RegisterInterpolateToNextWaypointTaskScripts(void);                                         // 0x801EAA08
 void  fn_801B8550(void);                                         // 0x801B8550
 }
 
@@ -213,9 +213,9 @@ u8* fn_801DB2E4(u8* p, u32 key) {
 // Registers the engine script callbacks and runs the four subsystem hooks.
 void RegisterHooks(void) {
     RegisterEngineScriptFuncs();
-    fn_801E9DB8();
-    fn_801EA508();
-    fn_801EAA08();
+    RegisterInterpolateVector3TaskScripts();
+    RegisterInterpolateQuaternionTaskScripts();
+    RegisterInterpolateToNextWaypointTaskScripts();
     fn_801B8550();
 }
 

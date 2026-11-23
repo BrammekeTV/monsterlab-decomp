@@ -33,7 +33,7 @@ u8    fn_800B9A78(u8* obj);                                        // 0x800B9A78
 void  fn_800C5F5C(void);                                           // 0x800C5F5C
 s32   fn_800C0C30(u8* shape, u8* arg1, u8* pos, f32* normalOut, u8* flagOut);   // 0x800C0C30
 BOOL  fn_80147554(s32 button);                                     // 0x80147554
-const char* fn_801EB708(u32 hash);                                 // 0x801EB708 (hash -> name for logs)
+const char* FormatHashString(u32 hash);                                 // 0x801EB708 (hash -> name for logs)
 u32   fn_801EC880(u8* p, u32 hash);                                // 0x801EC880
 
 extern f32 lbl_80346208[];   // 0x80346208
@@ -150,7 +150,7 @@ void fn_8009DA98(u8* arg0, f32 dt) {
                 if (*(s32*)(ent + 0xC) != 0) continue;
                 s32 hash = *(s32*)(*(u8**)(ent + 0x8) + 0x8);
                 if (hash == 0) continue;
-                fn_801EB708((u32)hash);
+                FormatHashString((u32)hash);
                 for (s32 k = 0; k < 5; k++) {
                     u32* row = lbl_80347DB8 + k * 2;
                     u8* info = *(u8**)(ent + 0x8);

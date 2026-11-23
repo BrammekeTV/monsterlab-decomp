@@ -95,7 +95,7 @@ s32 fn_801481FC(s32 idx) {
 // 0x8018DBB8
 // Shows or hides the UI cursor; when shown, makes sure the cursor object exists
 // (at +0x78) and positions it.
-void fn_8018DBB8(u8* p, s32 show) {
+void UIEngine_ShowCursor(u8* p, s32 show) {
     u8* cursor = *(u8**)(p + 0x7C);
     if (cursor == NULL) {
         fn_8018D2B8(lbl_80381318);

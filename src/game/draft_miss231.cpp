@@ -17,7 +17,7 @@ void   fn_800D4DE8(u8* dst, u8* src);                                    // 0x80
 void   fn_800D5110(u8* holder, u8* obj, u8* data);                // 0x800D5110
 void   fn_800D8100(u8* world);                                    // 0x800D8100
 s32    fn_801B5510(u8* a, u8* b, s32 c, f32* v, s32 d);           // 0x801B5510
-const char* fn_801EB708(u32 hash);                                // 0x801EB708 (hash -> name for logs)
+const char* FormatHashString(u32 hash);                                // 0x801EB708 (hash -> name for logs)
 u32    fn_801EC880(u8* p, u32 hash);                              // 0x801EC880
 u8*    fn_801F06FC(void);                                         // 0x801F06FC (returns the world params block)
 f64    fn_8033F1F4(f64 x);                                        // 0x8033F1F4 (acos)
@@ -274,7 +274,7 @@ void fn_800CD020(u8* arg0) {
 // 0x800D3D6C
 // Links the path records (0x1AC bytes each at +0x13284, four slots per record) to the nodes
 // (0xDC bytes each at +0x575C) whose hash matches, then warns about nodes left without both links.
-void fn_800D3D6C(u8* db) {
+void PathCheckFullyConnected(u8* db) {
     char buf[0x100];
     u8* aBase = db + 0x13284;
     u8* bBase = db + 0x575C;
@@ -313,7 +313,7 @@ void fn_800D3D6C(u8* db) {
         if (*(s32*)(ClampedAt(bBase, nB, b, 0xDC) + 0x4) == 0 ||
             *(s32*)(ClampedAt(bBase, nB, b, 0xDC) + 0x8) == 0) {
             SysSprintf(buf, "Path %s not fully connected\n",
-                       fn_801EB708(*(u32*)ClampedAt(bBase, nB, b, 0xDC)));
+                       FormatHashString(*(u32*)ClampedAt(bBase, nB, b, 0xDC)));
         }
     }
     fn_800D5110(db, db + 0x404, db + 0x13284);

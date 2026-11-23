@@ -13,7 +13,7 @@ extern "C" {
 void    fn_8003DCE0(u8* p);
 void    fn_8004C718(u8* p, s32 idx, void* elem);
 void    fn_8019AA3C(u8* obj, s32 a, s32 b);
-s32     fn_8019BD18(u8* arg0, u32* arg1);
+s32     UIElement_PlayUIAnimByHash(u8* arg0, u32* arg1);
 void    OSUnlockMutex(u8* p);
 void    fn_802E4970(void);
 s32     fn_802E925C(void);
@@ -99,7 +99,7 @@ void fn_8019CBEC(u8* arg0) {
             return;
         }
         u32 sp8 = 0x705598E1u;
-        fn_8019BD18(arg0, &sp8);
+        UIElement_PlayUIAnimByHash(arg0, &sp8);
         if (*(s32*)(arg0 + 0x60) == 4 && *(u8*)(arg0 + 0x16C) != 0) {
             *(u8*)(arg0 + 0x16C) = 1;
         }

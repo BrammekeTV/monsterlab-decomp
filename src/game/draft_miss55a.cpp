@@ -7,7 +7,7 @@ struct ScopedLock { u8 pad[4]; };
 typedef void (*VCallFn)(u8*, s32);
 
 // C++ linkage, as in the files that define them.
-void fn_80091DAC(void);                                          // 0x80091DAC (small_8009c.cpp)
+void RobotEvolutionExperiment_RegisterDoorScripts(void);                                          // 0x80091DAC (small_8009c.cpp)
 void fn_8015A2E8(u8* p, u32 unused4, u32 flush);                 // 0x8015A2E8 (small_8015.cpp)
 
 extern "C" {
@@ -25,8 +25,8 @@ void fn_801ECD1C(u8* p, s32 idx, s32 immediate);                 // 0x801ECD1C
 u8*  fn_8015A210(u8* p, s32 a, s32* out, s32 b);                 // 0x8015A210
 void fn_800A68F8(u8* a, u8* b, u8* c, f32 d);                    // 0x800A68F8
 void fn_800A71F0(u8* a, u8* b);                                  // 0x800A71F0
-void fn_800921B0(void);                                        // 0x800921B0
-s32  fn_80093934(void);                                          // 0x80093934
+void RobotEvolutionExperiment_RegisterRobotScripts(void);                                        // 0x800921B0
+s32  RobotEvolutionExperiment_RegisterSmasherScripts(void);                                          // 0x80093934
 f32  fn_80147800(s32 a);                                         // 0x80147800
 
 s32 PuzzleTimeout(void);
@@ -140,14 +140,14 @@ s32 fn_8008D194(u8* arg0, u8* arg1, f32 farg0, f32 farg1) {
 }
 
 // 0x8008EFE0
-s32 fn_8008EFE0(void) {
+s32 RobotEvolutionExperiment_RegisterScripts(void) {
     RegisterScriptFunc((const char*)(lbl_8035BBD8 + 0x00), 0x4E, (void*)RobotEvolutionExperiment_IntroSmasherHit);
     RegisterScriptFunc((const char*)(lbl_8035BBD8 + 0x2C), 0x4E, (void*)RobotEvolutionExperiment_IntroSmasherDone);
     RegisterScriptFunc((const char*)(lbl_8035BBD8 + 0x58), 0x4E, (void*)RobotEvolutionExperiment_IntroRobotShowCountdown);
     RegisterScriptFunc((const char*)(lbl_8035BBD8 + 0x90), 0x4E, (void*)RobotEvolutionExperiment_IntroRobotDone);
-    fn_80091DAC();
-    fn_800921B0();
-    return fn_80093934();
+    RobotEvolutionExperiment_RegisterDoorScripts();
+    RobotEvolutionExperiment_RegisterRobotScripts();
+    return RobotEvolutionExperiment_RegisterSmasherScripts();
 }
 
 // 0x800A50B4

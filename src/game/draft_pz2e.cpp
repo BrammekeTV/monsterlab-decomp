@@ -25,7 +25,7 @@ void   fn_8015DE74(RendVideo* v, s32* a, s32* b, s32* c, s32 d);   // 0x8015DE74
 void   fn_8015DE90(RendVideo* v, u8* a, s32 b);                     // 0x8015DE90
 void   fn_8015DF1C(RendVideo* v, u8* a, u8* b, s32 c, s32 d);       // 0x8015DF1C
 void   fn_8018D2B8(const char* fmt, ...);                           // 0x8018D2B8 (debug log)
-void*  fn_8018D428(s32 size, const char* file, void* tag, s32 line);   // 0x8018D428 (alloc)
+void*  UIEngineAlloc(s32 size, const char* file, void* tag, s32 line);   // 0x8018D428 (alloc)
 void   fn_8018D4CC(void* p);                                        // 0x8018D4CC (free)
 u8*    fn_80196E98(void* obj, const char* name, void* tag);         // 0x80196E98
 void   fn_801BB57C(u8* a, u8* b);                                   // 0x801BB57C
@@ -195,14 +195,14 @@ void fn_801FFDB0(u8* audio, f32 vol) {
 u8* fn_80196D0C(u8* arg0, const char* name, s32 kind) {
     u8* obj = NULL;
     if (kind == 1) {
-        u8* mem = (u8*)fn_8018D428(0x128, lbl_803820A8, &lbl_805F9398, 0x87);
+        u8* mem = (u8*)UIEngineAlloc(0x128, lbl_803820A8, &lbl_805F9398, 0x87);
         obj = mem;
         if (mem != NULL) {
             obj = (u8*)fn_801970D4(mem);   // asm also passes (name, &lbl_805F939C), unused by the callee
             *(s32*)(obj + 0x4) = 1;
         }
     } else if (kind == 0) {
-        u8* mem = (u8*)fn_8018D428(0xC, lbl_803820A8, &lbl_805F9398, 0x73);
+        u8* mem = (u8*)UIEngineAlloc(0xC, lbl_803820A8, &lbl_805F9398, 0x73);
         obj = mem;
         if (mem != NULL) {
             obj = fn_80196E98(mem, name, &lbl_805F939C);

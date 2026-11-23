@@ -83,7 +83,7 @@ void  fn_801C3E7C(u8* tbl, u8* obj);                                    // 0x801
 s32   fn_801C3E88(u8* tbl, void* handle);                                 // 0x801C3E88
 void  fn_801C5CC0(u8* obj, f32* a, f32* b);                             // 0x801C5CC0
 void  fn_8020A398(s32 h);
-u8*   fn_801AC184(u8* defs, s32 idx);                                   // 0x801AC184
+u8*   AnimDefFindByHandle(u8* defs, s32 idx);                                   // 0x801AC184
 void* fn_80007C54(void);                                                // 0x80007C54
 void  fn_8018C0A8(u8* h, void* a);                                      // 0x8018C0A8
 void* fn_801AC460(u8* anim, s32 a);                                     // 0x801AC460
@@ -1088,7 +1088,7 @@ s32 fn_80062A98(u8* p) {
 // Starts animation `idx` of the projectile's anim def table on its render object (creating the
 // render handle at +0xA0 on first use). `playing` selects the running/stopped flag state; `restart`
 // additionally clears bit 0x10 of the handle flags and kicks fn_8018C3D0.
-void fn_800653F4(u8* p, s32 idx, s32 playing, s32 restart) {
+void ProjectileAnimate(u8* p, s32 idx, s32 playing, s32 restart) {
     u8* defs = *(u8**)(*(u8**)(p + 0x9c) + 0x48);
     void* hasRender = (*(void*(**)(u8*))(*(u8**)p + 0xc))(p);
     if (hasRender == NULL) {
@@ -1101,7 +1101,7 @@ void fn_800653F4(u8* p, s32 idx, s32 playing, s32 restart) {
         SysSprintf(buf, "ERROR - attempt to animate projectile (%s) without anim def table ...\n", p + 0x108);
         return;
     }
-    u8* anim = (u8*)fn_801AC184(defs, idx);
+    u8* anim = (u8*)AnimDefFindByHandle(defs, idx);
     if (anim == NULL) {
         char buf[0x50];
         SysSprintf(buf, "ERROR - unable to find anim [%d] for projectile (%s) ...\n", idx, p + 0x108);
@@ -1336,7 +1336,7 @@ void fn_8006B808(u8* p, u8* obj, u8* spec) {
 // 0x8006E9D8
 // SetTimeoutFromProperty: picks a timeout for the FSM at +0xA4's state (+0x4C/+0x50) from a
 // property hash: fixed (+0x160) or random within value +/- spread (+0x158/+0x170 or +0x15C/+0x174).
-void fn_8006E9D8(u8* p, s32 hash) {
+void SetTimeoutFromPropertyImpl(u8* p, s32 hash) {
     f32 t = -1.0f;
     switch ((u32)hash) {
     case 0xEF6D2B59u: {

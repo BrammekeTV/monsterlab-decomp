@@ -309,7 +309,7 @@ void fn_8001FCA8(u8* p) {
 // (0x10 offline, 2 online, 8 playing, 4 match friend), runs the matchup clean-up when the current
 // slot goes offline/online, starts a match with a friend whose code matches our own, or answers
 // an invitation when playing, then refreshes the friend list (or re-sorts it when lbl_805F9028 == 1).
-void fn_8013A0A4(s32 a, s32 b) {
+void GetFriendStatusString(s32 a, s32 b) {
     char text[0x100];
     s32 slot = a;
     OSLockMutex(lbl_80556AC8);

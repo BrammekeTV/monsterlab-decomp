@@ -50,7 +50,7 @@ u8*   fn_8018C47C(u8* obj);                                    // 0x8018C47C
 void  fn_80195A58(void* gx, void* a, u8* b, u8* c);            // 0x80195A58
 s32   fn_8019600C(void* gx);                                   // 0x8019600C
 s32   fn_801960E4(void* gx);                                   // 0x801960E4
-u8*   fn_801AC184(u8* defs, s32 idx);                          // 0x801AC184
+u8*   AnimDefFindByHandle(u8* defs, s32 idx);                          // 0x801AC184
 void* fn_801AC460(u8* anim, s32 a);                            // 0x801AC460
 void  fn_801B1778(void* p, s32 a);                             // 0x801B1778
 void  fn_801B55F4(u8* obj, u8* out, s32 idx);                  // 0x801B55F4
@@ -580,7 +580,7 @@ void fn_800699E4(u8* prop, u32 state, f32 t) {
                 SysSprintf(buf, "ERROR - attempt to animate prop (%s) without anim def table ...\n", prop + 0x108);
                 return;
             }
-            u8* anim = fn_801AC184(defs, *(s32*)(newState + 0x10));
+            u8* anim = AnimDefFindByHandle(defs, *(s32*)(newState + 0x10));
             if (anim == NULL) anim = *(u8**)(defs + 0xC) + def[0x39] * 0x44;
             if (anim == NULL) {
                 char buf[0x58];

@@ -9,7 +9,7 @@ void*       ScreenSetsCurrent(void* sets);                 // 0x8018D1E4
 void*       ScreenSetFindElement(void* set, u32 hash);     // 0x80198F18
 void        fn_8018D2B8(const char* fmt, ...);             // 0x8018D2B8 (debug log)
 void        fn_8018D370(const char* fmt, ...);             // 0x8018D370 (debug log)
-const char* fn_801EB708(u32 hash);                         // 0x801EB708 (hash -> name for logs)
+const char* FormatHashString(u32 hash);                         // 0x801EB708 (hash -> name for logs)
 s32 fn_801AB748(u8* p, f32 v);                          // 0x801AB748
 f32         fn_801AB804(void* h);                          // 0x801AB804 (current anim time)
 s32         fn_801AB80C(u8* a3, f32 rate);                         // 0x801AB80C
@@ -21,7 +21,7 @@ void        UISetText(void* el, const char* text, s32 a);  // 0x8019EFC8
 const char* UITextGetString(void* text);                   // 0x8019F3AC
 int         strcmp(const char* a, const char* b);
 
-void fn_80190D28(u32 hash, const char* text, s32 v);       // 0x80190D28 (defined below)
+void UIText_SetStringCommon(u32 hash, const char* text, s32 v);       // 0x80190D28 (defined below)
 
 extern "C++" void* gScreenSets;                  // 0x805FB654
 struct StringTable;
@@ -47,7 +47,7 @@ static u8* FindElementA(u32 hash) {
     }
     u8* el = (u8*)ScreenSetFindElement(set, hash);
     if (el == NULL) {
-        fn_8018D2B8(lbl_80381868 + 0x238, fn_801EB708(hash));
+        fn_8018D2B8(lbl_80381868 + 0x238, FormatHashString(hash));
         return NULL;
     }
     return el;
@@ -62,7 +62,7 @@ static u8* FindElementB(u32 hash) {
     }
     u8* el = (u8*)ScreenSetFindElement(set, hash);
     if (el == NULL) {
-        fn_8018D2B8(lbl_80381AA0, fn_801EB708(hash));
+        fn_8018D2B8(lbl_80381AA0, FormatHashString(hash));
         return NULL;
     }
     return el;
@@ -83,7 +83,7 @@ void UIElement_SetUIAnimPlaybackRate(u32 a0, f32 a1) {
     u8* el = FindElementA(a0);
     if (el != NULL) {
         if (*(void**)(el + 0x10) == NULL) {
-            fn_8018D2B8(lbl_80381868 + 0x340, fn_801EB708(a0));
+            fn_8018D2B8(lbl_80381868 + 0x340, FormatHashString(a0));
             return;
         }
         fn_801AB80C((u8*)*(void**)(el + 0x10), a1);
@@ -99,7 +99,7 @@ f32 UIElement_GetUIAnimCurrentTime(u32 a0) {
     if (el == NULL) return lbl_805FF8A0;
     void* h = *(void**)(el + 0x10);
     if (h == NULL) {
-        fn_8018D2B8(lbl_80381868 + 0x340, fn_801EB708(a0));
+        fn_8018D2B8(lbl_80381868 + 0x340, FormatHashString(a0));
         return lbl_805FF8A0;
     }
     return fn_801AB804(h);
@@ -120,7 +120,7 @@ void UIGroup_DisableHitTest(u32 a0) {
     u8* el = FindElementA(a0);
     if (el != NULL) {
         if (*(s32*)(el + 0x60) != 0) {
-            fn_8018D2B8(lbl_80381868 + 0x378, fn_801EB708(a0));
+            fn_8018D2B8(lbl_80381868 + 0x378, FormatHashString(a0));
             return;
         }
         (*(void (**)(void*, s32))(*(u8**)(el + 0x138) + 0x2c))(el, 0x1000);
@@ -133,7 +133,7 @@ void UIGroup_EnableHitTest(u32 a0) {
     u8* el = FindElementA(a0);
     if (el != NULL) {
         if (*(s32*)(el + 0x60) != 0) {
-            fn_8018D2B8(lbl_80381868 + 0x378, fn_801EB708(a0));
+            fn_8018D2B8(lbl_80381868 + 0x378, FormatHashString(a0));
             return;
         }
         (*(void (**)(void*, s32))(*(u8**)(el + 0x138) + 0x30))(el, 0x1000);
@@ -152,11 +152,11 @@ s32 UIElement_IsCursorOverItem(u32 a0) {
 
 // 0x80190D28
 // Text element only (type +0x60 == 1): sets the text (and font value) or clears it if NULL / "NULL".
-void fn_80190D28(u32 a0, const char* a1, s32 a2) {
+void UIText_SetStringCommon(u32 a0, const char* a1, s32 a2) {
     u8* el = FindElementA(a0);
     if (el != NULL) {
         if (*(s32*)(el + 0x60) != 1) {
-            fn_8018D370(lbl_80381868 + 0x3a8, fn_801EB708(a0));
+            fn_8018D370(lbl_80381868 + 0x3a8, FormatHashString(a0));
             return;
         }
         if (a1 != NULL && strcmp(a1, lbl_805F9378) != 0) {
@@ -175,7 +175,7 @@ void UIText_SetString_TextID(u32 a0, u32 /*0x11*/ a1) {
     u8* el = FindElementA(a0);
     if (el != NULL) {
         if (*(s32*)(el + 0x60) != 1) {
-            fn_8018D370(lbl_80381868 + 0x3a8, fn_801EB708(a0));
+            fn_8018D370(lbl_80381868 + 0x3a8, FormatHashString(a0));
             return;
         }
         *(void**)(el + 0x13c) = gStringTable2;
@@ -206,7 +206,7 @@ void UIText_SetString_TextID(u32 a0, u32 /*0x11*/ a1) {
         } else {
             v = TableEntry((u8*)gStringTable, 0x4, a1);
         }
-        fn_80190D28(a0, str, v);
+        UIText_SetStringCommon(a0, str, v);
     }
 }
 
@@ -216,7 +216,7 @@ ScriptValue UIText_GetString(u32 a0) {
     u8* el = FindElementA(a0);
     if (el == NULL) return 0;
     if (*(s32*)(el + 0x60) != 1) {
-        fn_8018D370(lbl_80381868 + 0x3a8, fn_801EB708(a0));
+        fn_8018D370(lbl_80381868 + 0x3a8, FormatHashString(a0));
         return 0;
     }
     return (ScriptValue)UITextGetString(el);
@@ -228,7 +228,7 @@ void UIText_RefreshText(u32 a0) {
     u8* el = FindElementA(a0);
     if (el != NULL) {
         if (*(s32*)(el + 0x60) != 1) {
-            fn_8018D370(lbl_80381868 + 0x3a8, fn_801EB708(a0));
+            fn_8018D370(lbl_80381868 + 0x3a8, FormatHashString(a0));
             return;
         }
         fn_8019DC58(el);

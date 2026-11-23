@@ -41,11 +41,11 @@ void   fn_8016A788(u8* p);                                       // 0x8016A788
 void   fn_8018D2B8(const char* fmt, ...);                        // 0x8018D2B8 (debug log)
 void   fn_8018D370(const char* fmt, ...);                        // 0x8018D370 (debug log)
 void   fn_8018DEF4(void* sets);                                  // 0x8018DEF4
-s32 fn_8019BD18(u8* arg0, u32* arg1);                       // 0x8019BD18 (routes event to widget)
+s32 UIElement_PlayUIAnimByHash(u8* arg0, u32* arg1);                       // 0x8019BD18 (routes event to widget)
 BOOL   fn_80198C34(void* set, void* w);                          // 0x80198C34
 void   fn_801BBB68(void* mgr, s32 id, int a, int b);             // 0x801BBB68
 void   fn_801C83AC(u8* mgr, u8* item);                           // 0x801C83AC
-const char* fn_801EB708(u32 hash);                               // 0x801EB708 (hash -> name for logs)
+const char* FormatHashString(u32 hash);                               // 0x801EB708 (hash -> name for logs)
 void   fn_801EBAB8(u8* pool);                                    // 0x801EBAB8 (pool: build the free list)
 void   fn_801EC080(u8* a, u8* b);                                // 0x801EC080
 void fn_801FF21C(u8* arg0, u8* arg1);                        // 0x801FF21C
@@ -190,7 +190,7 @@ void UIEvent_SendToScreen(u32 a0, u32 a1) {
     } else {
         w = ScreenSetFindWidget(set, a1);
         if (w == NULL) {
-            fn_8018D370(lbl_803818D0, fn_801EB708(a1));
+            fn_8018D370(lbl_803818D0, FormatHashString(a1));
             w = NULL;
         }
     }
@@ -203,7 +203,7 @@ void UIEvent_SendToScreen(u32 a0, u32 a1) {
 // Sends a play-animation event (the animation hash) to the widget.
 void UIPlayAnim(void* w, u32 anim) {
     u32 ev = anim;
-    fn_8019BD18((u8*)w, &ev);
+    UIElement_PlayUIAnimByHash((u8*)w, &ev);
 }
 
 // 0x8018EE3C

@@ -1,5 +1,5 @@
 // Decompiled from drafts: fn_80076D38, fn_8007B20C, fn_8007DDEC, fn_80086F84, fn_800943CC,
-// fn_8009B320, fn_800B8830, fn_80119C6C, fn_801223C0, fn_8019B2F4, fn_801AC184, fn_801F8628.
+// fn_8009B320, fn_800B8830, fn_80119C6C, fn_801223C0, fn_8019B2F4, AnimDefFindByHandle, fn_801F8628.
 #include <math.h>
 #include <string.h>
 
@@ -36,7 +36,7 @@ void   fn_8018BEA4(u8* p, f32 t);                                     // 0x8018B
 u8*    fn_801B3308(void);                                             // 0x801B3308
 void   fn_801B3310(u8* p, u8* q);                                     // 0x801B3310
 void*  fn_801D40E0(s32 n);                                            // 0x801D40E0
-const char* fn_801EB708(u32 hash);                                    // 0x801EB708
+const char* FormatHashString(u32 hash);                                    // 0x801EB708
 void   fn_801F6CC4(u8* p, const f32* fwd, const f32* up);             // 0x801F6CC4
 void*  fn_80209814(void* v);                                          // 0x80209814
 u32    fn_8020A9A8(s32 handle);                                       // 0x8020A9A8
@@ -596,7 +596,7 @@ void fn_8019B2F4(u8* obj) {
 // 0x801AC184
 // Finds the anim_def entry with the given handle: sums the u16 counts at +0x4 (one per group,
 // group count read through lbl_805FB698), then scans that many 0x44-byte entries at +0xC.
-u8* fn_801AC184(u8* defs, s32 handle) {
+u8* AnimDefFindByHandle(u8* defs, s32 handle) {
     if (handle == 0) return NULL;
     s32 total = 0;
     s32 groups = *lbl_805FB698;
@@ -605,7 +605,7 @@ u8* fn_801AC184(u8* defs, s32 handle) {
         u8* entry = *(u8**)(defs + 0xC) + i * 0x44;
         if ((u32)handle == *(u32*)(entry + 0x2C)) return entry;
     }
-    GameLog(4, 0, "Could not locate anim_def entry with handle %s\n", fn_801EB708((u32)handle));
+    GameLog(4, 0, "Could not locate anim_def entry with handle %s\n", FormatHashString((u32)handle));
     return NULL;
 }
 

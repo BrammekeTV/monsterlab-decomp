@@ -10,11 +10,11 @@ extern "C" {
 void* ScreenSetsCurrent(void* sets);                    // 0x8018D1E4
 void  fn_8018D2B8(const char* fmt, ...);                // 0x8018D2B8 (debug log)
 void  fn_8018D370(const char* fmt, ...);                // 0x8018D370 (debug log)
-const char* fn_801EB708(u32 hash);                      // 0x801EB708 (hash -> name for logs)
-void* fn_80198FCC(void* set, u32 hash);                 // 0x80198FCC
-s32   fn_8019ADFC(void* obj, u32 hash);                 // 0x8019ADFC
-u32   fn_8019AD84(void* obj, s32 index);                // 0x8019AD84
-void  fn_80199B68(void* el, void* obj);                 // 0x80199B68
+const char* FormatHashString(u32 hash);                      // 0x801EB708 (hash -> name for logs)
+void* UIScreenSet_FindSoundList(void* set, u32 hash);                 // 0x80198FCC
+s32   UISoundList_FindSound(void* obj, u32 hash);                 // 0x8019ADFC
+u32   UISoundList_GetSoundByIndex(void* obj, s32 index);                // 0x8019AD84
+void  UIScreen_PlayLoopingSoundFX(void* el, void* obj);                 // 0x80199B68
 s32   PlaySoundAt(void* sound, int a, const void* pos, int b);  // 0x80209ABC
 void* fn_801D40E0(s32 n);                               // 0x801D40E0
 void* fn_80209814(void* v);                             // 0x80209814
@@ -195,17 +195,17 @@ extern "C" {
 // set, the entry by hash in the list, makes sure the voice SFX handle exists, then plays it.
 static void UISoundList_Play(u32 listHash, u32 entryHash, int flag) {
     void* set = ScreenSetsCurrent(gScreenSets);
-    void* list = fn_80198FCC(set, listHash);
+    void* list = UIScreenSet_FindSoundList(set, listHash);
     if (list == NULL) {
         fn_8018D370(lbl_80381868 + 0x674, listHash);
         return;
     }
-    s32 idx = fn_8019ADFC(list, entryHash);
+    s32 idx = UISoundList_FindSound(list, entryHash);
     if (idx == -1) {
-        fn_8018D370(lbl_80381868 + 0x6d8, fn_801EB708(entryHash));
+        fn_8018D370(lbl_80381868 + 0x6d8, FormatHashString(entryHash));
         return;
     }
-    u32 sound = fn_8019AD84(list, idx);
+    u32 sound = UISoundList_GetSoundByIndex(list, idx);
     if (sound == 0) {
         fn_8018D370(lbl_80381868 + 0x708, idx);
         return;
@@ -231,21 +231,21 @@ void UISoundList_PlayVoiceSfx(u32 a0, u32 a1) {
 }
 
 // 0x80194F14
-// Looks up the sound list entry, then hands it to fn_80199B68 on the top element of the
+// Looks up the sound list entry, then hands it to UIScreen_PlayLoopingSoundFX on the top element of the
 // current screen set (logging when there is no set, no element, or the top slot is empty).
 void UITopScreen_PlayLoopingSfx(u32 a0, u32 a1) {
     void* set = ScreenSetsCurrent(gScreenSets);
-    void* list = fn_80198FCC(set, a0);
+    void* list = UIScreenSet_FindSoundList(set, a0);
     if (list == NULL) {
         fn_8018D370(lbl_80381868 + 0x674, a0);
         return;
     }
-    s32 idx = fn_8019ADFC(list, a1);
+    s32 idx = UISoundList_FindSound(list, a1);
     if (idx == -1) {
-        fn_8018D370(lbl_80381868 + 0x6d8, fn_801EB708(a1));
+        fn_8018D370(lbl_80381868 + 0x6d8, FormatHashString(a1));
         return;
     }
-    u32 sound = fn_8019AD84(list, idx);
+    u32 sound = UISoundList_GetSoundByIndex(list, idx);
     if (sound == 0) {
         fn_8018D370(lbl_80381868 + 0x708, idx);
         return;
@@ -265,7 +265,7 @@ void UITopScreen_PlayLoopingSfx(u32 a0, u32 a1) {
             if (top == NULL) fn_8018D370(lbl_80381868 + 0x170);
         }
     }
-    if (top != NULL) fn_80199B68(top, (void*)(intptr_t)sound);
+    if (top != NULL) UIScreen_PlayLoopingSoundFX(top, (void*)(intptr_t)sound);
 }
 
 // 0x801DC088

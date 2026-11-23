@@ -14,7 +14,7 @@ s32 fn_801EE46C(u8* arg0, const char* name);                    // 0x801EE46C
 void fn_801EE4B8(u8* arg0);                      // 0x801EE4B8
 s32    fn_801EE504(u8* handle);                                // 0x801EE504
 s32    fn_801EE4FC(u8* handle);                                // 0x801EE4FC
-s32    fn_8016B5E0(u8* state, u8* data, s32 size);             // 0x8016B5E0
+s32    CheckWiiFileVersion(u8* state, u8* data, s32 size);             // 0x8016B5E0
 s32    fn_8016B6DC(u8* state);                                 // 0x8016B6DC
 void   fn_8016B704(u8* state);                                 // 0x8016B704
 u8*    fn_8016B724(u8* state, s32 a, const char* name);        // 0x8016B724
@@ -172,7 +172,7 @@ u8* fn_801D8D80(char* name, char* fallbackName) {
         return NULL;
     }
     size = fn_801EE504(handle);
-    if (fn_8016B5E0(state, (u8*)fn_801EE4FC(handle), size) == 0) {
+    if (CheckWiiFileVersion(state, (u8*)fn_801EE4FC(handle), size) == 0) {
         return NULL;
     }
     for (;;) {

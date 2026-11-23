@@ -22,7 +22,7 @@ u8*    fn_801189C4(s32 idx);                                                // 0
 u8*    fn_80118B1C(s32 idx);                                                // 0x80118B1C
 s32    fn_80109A0C(s32 id);                                                 // 0x80109A0C
 s32    fn_8019B6CC(u8* arg0, f32 farg0);                                    // 0x8019B6CC (UI element base update)
-s32    fn_8019EB94(void* el);                                               // 0x8019EB94
+s32    UIText_SubstituteText(void* el);                                               // 0x8019EB94
 s32    fn_8019F5A8(void* el);                                               // 0x8019F5A8
 void   fn_8019E27C(void* el);                                               // 0x8019E27C
 void   fn_8019E838(u8* el, f32 dt);                                         // 0x8019E838
@@ -443,9 +443,9 @@ s32 fn_8019CF58(u8* p, f32 dt) {
         char* s = *(char**)(p + 0x170);
         if (s != NULL && strlen(s) != 0) {
             FlattenText(s);
-            if ((*(u32*)(p + 0x64) & 0x20000) != 0) fn_8019EB94(p);
+            if ((*(u32*)(p + 0x64) & 0x20000) != 0) UIText_SubstituteText(p);
         }
-        fn_8019EB94(p);
+        UIText_SubstituteText(p);
         fn_8019F5A8(p);
     }
     if ((*(u32*)(p + 0x64) & 0x10) != 0) {
@@ -460,7 +460,7 @@ s32 fn_8019CF58(u8* p, f32 dt) {
         char* s = *(char**)(p + 0x170);
         if (s != NULL && strlen(s) != 0) {
             FlattenText(s);
-            if ((*(u32*)(p + 0x64) & 0x20000) != 0) fn_8019EB94(p);
+            if ((*(u32*)(p + 0x64) & 0x20000) != 0) UIText_SubstituteText(p);
         }
         fn_8019F5A8(p);
     }

@@ -21,7 +21,7 @@ extern "C" {
 BOOL  SavePartTierOwned(u8* s, u32 part, s32 tier);   // 0x802241F0
 u8    fn_80112FFC(void);                              // 0x80112FFC
 u32   fn_80114E14(void);                              // 0x80114E14
-void* fn_80118A6C(s32 index);                         // 0x80118A6C: texture of ingredient record `index`
+void* PartFormatSecondaryIconName(s32 index);                         // 0x80118A6C: texture of ingredient record `index`
 
 extern const char lbl_80354800[];   // 0x80354800 ("Not found")
 extern const char lbl_8035480C[];   // 0x8035480C ("NOT FOUND")
@@ -189,7 +189,7 @@ ScriptValue PartGetSecondaryIngredientTexture(s32 a0) {
                 if (*(s32*)(rec + 0x8) == *(s32*)(entry + 0x14) &&
                     *(s32*)(rec + 0xC) == *(s32*)(entry + 0x8) &&
                     *(s8*)(rec + 0x13) == tier)
-                    return (ScriptValue)fn_80118A6C(j);
+                    return (ScriptValue)PartFormatSecondaryIconName(j);
             }
         }
     }

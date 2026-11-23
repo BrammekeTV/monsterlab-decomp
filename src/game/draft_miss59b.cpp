@@ -17,7 +17,7 @@ u8*      fn_8011EA20(u8* p);                        // 0x8011EA20
 u8*      fn_8011F410(u8* p);                        // 0x8011F410
 void*    fn_801B7198(void* anim, s32 a);            // 0x801B7198
 s32      fn_8004E300(void* a, s32 b);               // 0x8004E300
-void*    fn_80109330(const char* name);             // 0x80109330 (texture lookup by name)
+void*    TextureLoadShared(const char* name);             // 0x80109330 (texture lookup by name)
 s32      LightningTowerGetOnOperatingTable(void);
 void     SetMonsterInventoryPos(s32 a3);
 int      SysSprintf(char* buf, const char* fmt, ...);
@@ -101,15 +101,15 @@ void fn_801179C8(u8* arg0) {
 // Builds the inventory icon name for table entry arg0 ("%sinventory_icon_sec_%03d") and
 // looks it up, falling back to the placeholder icon.
 // 0x80118A6C
-void* fn_80118A6C(s32 arg0) {
+void* PartFormatSecondaryIconName(s32 arg0) {
     u8* data = *(u8**)((u8*)gGameDb + 0xC);
     u8* e = *(u8**)(data + 0x5328) + arg0 * 0x18;
     char buf[0x80];
     SysSprintf(buf, "%sinventory_icon_sec_%03d", lbl_805F8F10, (s32)*(s8*)(e + 0x12));
-    void* found = fn_80109330(buf);
+    void* found = TextureLoadShared(buf);
     if (found == NULL) {
         SysSprintf(buf, "%sinventory_icon_placeholder", lbl_805F8F10);
-        found = fn_80109330(buf);
+        found = TextureLoadShared(buf);
     }
     return found;
 }

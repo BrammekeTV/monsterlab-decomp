@@ -95,7 +95,7 @@ s32 fn_801A1238(u8* arg0, f32* arg1) {
 // screen-set data (gScreenSets +0x20..+0x68), optionally subtracts the offset-bone displacement
 // (bone index at +0x144), rotates the quat by the entity's three angles (+0x90..+0x98), and writes
 // the resulting position and quat into the anim's node, flagging both as dirty. Returns 0.
-s32 fn_801A31BC(u8* arg0) {
+s32 UIEntity_UpdateBones(u8* arg0) {
     f32 off[3];      // sp50: offset-bone displacement
     f32 scl[3];      // sp5C: entity scale (+0x68..+0x70)
     f32 quat[4];     // sp68
