@@ -31,7 +31,7 @@ s32    fn_8003FFD0(u8* inner);
 void   fn_80040028(u8* inner);
 void   fn_8007D004(s32 dst, u8* src, s32 cur, s32 delta);
 void   fn_8020F46C(u8* p, u8* choice);
-f64    floor(f64 x);
+f64    fn_8033ED6C(f64 x);
 u8*    fn_801EB7A4(void* p, s32 a4, s32 a5, s32 a6, s32 a7);
 void*  fn_801EB94C(void* p);
 void   fn_801FF2A8(u8* audio, s32 handle);
@@ -319,7 +319,7 @@ s32 fn_8007CDBC(u8* self, s32 dst, f32 t) {
     }
     s32 cur = *(s32*)(self + 0x38);
     f32 frac = (t - start) / (end - start);
-    s32 newCount = (s32)(f32)floor((f64)(frac * (f32)total));
+    s32 newCount = (s32)(f32)fn_8033ED6C((f64)(frac * (f32)total));
     fn_8007D004(dst, bytes, cur, newCount - cur);
     *(s32*)(self + 0x38) = newCount;
     return 0;
