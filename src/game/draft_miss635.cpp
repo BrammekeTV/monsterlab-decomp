@@ -43,7 +43,7 @@ s32  fn_802E9668(s16* name, s32 a, void* cb, s32 b);                // 0x802E966
 void fn_802E93CC(void);                                             // 0x802E93CC
 s32  fn_802EA048(void);                                             // 0x802EA048
 s32  fn_802E48B8(s32* a, s32* b);                                   // 0x802E48B8
-void fn_802E4970(void);                                             // 0x802E4970
+void DWC_ClearError(void);                                             // 0x802E4970
 
 extern u8  gWorldState[];           // 0x803E6D00
 extern s32 lbl_805FB30C;            // 0x805FB30C (world object count)
@@ -424,7 +424,7 @@ s32 fn_801ADB44(u8* arg0, u8* arg1, u8* arg2, s32 arg3, u8* arg4, f32 farg0, f32
 // 0x80207DCC
 // One-time init of the 0x40-byte player data block and its record stream, then waits (5 ms
 // sleeps, up to lbl_80600478 seconds) for the init callback fn_80207BE4 to set lbl_805FB374,
-// servicing the pending event (1: fn_802E4970, 2..7: mark the init as failed). Returns 0 when
+// servicing the pending event (1: DWC_ClearError, 2..7: mark the init as failed). Returns 0 when
 // the stream could not be opened, else 1.
 s32 fn_80207DCC(void) {
     s16 name[16];
@@ -466,7 +466,7 @@ s32 fn_80207DCC(void) {
         }
         if (fn_802E48B8(&aux, &ev) != 0) {
             if (ev == 1) {
-                fn_802E4970();
+                DWC_ClearError();
             } else if (ev >= 2 && ev < 8) {
                 lbl_805FB374 = 1;
                 lbl_805FB36C = 0;

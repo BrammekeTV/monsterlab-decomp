@@ -29,8 +29,8 @@ void fn_801F2EE4(void);                              // 0x801F2EE4
 void   fn_801F5414(u8* p);                                     // 0x801F5414
 void   fn_801F5270(s32 a3, s32 a4, s32 a5, s32 a6, s32 a7, s32 a8, s32 a9, s32 a10);  // 0x801F5270
 void   fn_80333B34(char* dst, char* src);                      // 0x80333B34
-void*  fn_80333D50(const char* path, const char* mode);        // 0x80333D50
-void   fn_80333B60(void* obj);                                 // 0x80333B60
+void*  UTF8ToUCS2String(const char* path, const char* mode);        // 0x80333D50
+void   fclose(void* obj);                                 // 0x80333B60
 s32    fn_8010F880(u32 sig, s32 func, u32* args);              // 0x8010F880
 BOOL   ScriptDispatch(s32 func, u32 sig, u32* args, u32* result);
 void   fn_8012189C(void);                                      // 0x8012189C
@@ -351,7 +351,7 @@ void TestFailed(void) {
     const char* p2;
 
     if (*(void**)lbl_803F22D8 != NULL) {
-        fn_80333B60(*(void**)lbl_803F22D8);
+        fclose(*(void**)lbl_803F22D8);
         *(void**)lbl_803F22D8 = NULL;
         strcpy(buf, (const char*)(lbl_803F22D8 + 0x204));
         p1 = s + 0xC;
@@ -364,7 +364,7 @@ void TestFailed(void) {
         }
         SysSprintf((char*)(lbl_803F22D8 + 0x204), s + 0x20, (char*)(lbl_803F22D8 + 0x458), p1, p2, lbl_803F22D8);
         fn_80333B34(buf, (char*)(lbl_803F22D8 + 0x204));
-        *(void**)lbl_803F22D8 = fn_80333D50((const char*)(lbl_803F22D8 + 0x204), lbl_805F9178);
+        *(void**)lbl_803F22D8 = UTF8ToUCS2String((const char*)(lbl_803F22D8 + 0x204), lbl_805F9178);
     }
 }
 
