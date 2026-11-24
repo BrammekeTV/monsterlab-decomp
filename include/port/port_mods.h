@@ -1,6 +1,8 @@
 // PC port: mods (port_mods.cpp, docs/modding.md). A mod is a folder mods/<name>/ next to the exe:
 //   mods/<name>/files/<disc path>    replaces that file of the disc (for a disc image and an extracted folder alike)
 //   mods/<name>/textures/..._<16 hex digits>.png   replaces the game texture with that content hash
+//   mods/<name>/data/strings.json                   changes entries of the game's text table (port_moddata.cpp)
+//   mods/<name>/textures/<texture name>.png         replaces the game texture of that name in the game's data (wins over a hash)
 // The list and its order are kept in monsterlab.ini, [mods]: one "name = 1" (on) or "name = 0" (off)
 // line per mod. Where two mods hold the same file, the one later in the list wins.
 #ifndef PORT_MODS_H
@@ -43,14 +45,25 @@ BOOL PortModsTexturesWanted(void);
 // The content hash of a game texture: size, GX format, the pixel data as the game holds it, the palette.
 u64  PortModsTextureHash(const u8* data, u32 bytes, const u8* palette, u32 paletteBytes, u32 w, u32 h, u32 fmt);
 // The replacement for that texture as RGBA8 from malloc (any size; the caller frees it), or NULL.
-u32* PortModsTexture(u64 hash, u32* w, u32* h);
+// `name` is the texture's name in the game's data (or NULL): a PNG called <name>.png wins over one found by hash.
+u32* PortModsTexture(u64 hash, const char* name, u32* w, u32* h);
+// The name the game's data gives the texture whose pixel data is at `pixels`, or NULL (not every file is loaded by the port's loader yet).
+const char* PortModsTextureName(const void* pixels);
 // --dump-textures DIR: writes the decoded texture as DIR\tex_<w>x<h>_f<format>_<hash>.png, once per hash.
-void PortModsDumpTexture(u64 hash, const u32* rgba, u32 w, u32 h, u32 fmt);
+void PortModsDumpTexture(u64 hash, const char* name, const u32* rgba, u32 w, u32 h, u32 fmt);
 u32  PortModsDumpCount(void);
 
 // ---- PNG (port_png.cpp): RGBA8, red in the low byte ----
 BOOL PortPngWrite(const char* path, const u32* rgba, u32 w, u32 h);
 u32* PortPngRead(const char* path, u32* w, u32* h, const char** why);   // malloc; NULL and the reason
+
+// ---- data (port_moddata.cpp) ----
+// Called when global_binary.sir is converted (hdr: its converted header block). With --dump-data DIR it writes the
+// original text table as DIR\strings.json and exits; otherwise each enabled mod's data/strings.json changes strings.
+void PortModsApplyData(u8* globalHdr);
+// Applies one strings.json (text) to a table of `count` string pointers: the number of strings changed, or -1 with the
+// reason (line and column) in err and nothing changed.
+int  PortModsApplyStrings(const char* json, const char** strings, u32 count, char* err, u32 errSize);
 
 int  PortSelfTestMods(void);
 

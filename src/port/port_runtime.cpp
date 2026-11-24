@@ -31,7 +31,7 @@ extern "C" void fn_8022E3D8(void* save, const unsigned char* name);   // src/gam
 extern "C" u32 _ctors[];      // 0x80345AE0, resolved by port_gen.obj like every other Wii global
 
 PortOptions gPortOptions;
-PortSettings gPortSettings = {1920, 1080, TRUE, FALSE, FALSE, FALSE, 100, FALSE, "", 100, PORT_FILTER_GAME, 0, 0};
+PortSettings gPortSettings = {1920, 1080, TRUE, FALSE, FALSE, FALSE, 100, FALSE, "", 100, PORT_FILTER_GAME, 0, 0, TRUE};
 
 // ------------------------------------------------------------------ log and boot summary
 struct Milestone { const char* what; u32 count; u32 ms; BOOL stub; };
@@ -934,6 +934,7 @@ struct PortBoot {
             else if (!strcmp(a, "--mods") && i + 1 < __argc) PortModsSetDir(__argv[++i]);
             else if (!strcmp(a, "--no-mods")) noMods = TRUE;
             else if (!strcmp(a, "--difftest") && i + 1 < __argc) gPortOptions.diffTest = __argv[++i];
+            else if (!strcmp(a, "--dump-data") && i + 1 < __argc) gPortOptions.dumpData = __argv[++i];
             else if (!strcmp(a, "--dump-textures") && i + 1 < __argc) gPortOptions.dumpTextures = __argv[++i];
             else if (!strcmp(a, "--picker-screenshot") && i + 1 < __argc) gPortOptions.pickerShot = __argv[++i];
             else if (!strcmp(a, "--no-ini")) {}
@@ -1035,8 +1036,8 @@ struct PortBoot {
             int on = 0;
             for (int i = 0; i < gPortModCount; i++) if (gPortMods[i].enabled && gPortMods[i].present) on++;
             if (on) fprintf(stderr, "[port] mods: %d on, from %s\n", on, PortModsDir());
-        }
-        PortLockEnter();                         // the main thread is the first game thread
+        } else PortModsRefreshTextures();        // also hooks the texture names (--dump-textures with --no-mods)
+        PortLockEnter();                     // the main thread is the first game thread
 
         // A file is the player's disc image, read as it is (--iso FILE; --data and MONSTERLAB_DATA take one too).
         // Asked for on the command line or in MONSTERLAB_DATA, else the choice kept in monsterlab.ini, else

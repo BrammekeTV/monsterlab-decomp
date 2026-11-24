@@ -14,6 +14,7 @@
 
 #include "port/port.h"
 #include "port/port_mods.h"
+#include "port/sir_loader.h"
 
 PortMod gPortMods[PORT_MAX_MODS];
 int     gPortModCount;
@@ -156,6 +157,10 @@ struct TexState {
     std::map<u64, std::string> files;            // hash -> PNG, from the last enabled mod that has it
     std::map<u64, std::string> mods;             // hash -> that mod's name
     std::set<u64> dumped, logged;
+    std::map<std::string, std::string> byName;   // lower-case texture name -> PNG (a file whose name has no hash)
+    std::map<std::string, std::string> nameMods; // lower-case name -> that mod's name
+    std::map<uintptr_t, std::string> names;      // pixel data of a texture the loader converted -> its name
+    std::set<std::string> loggedNames;
 };
 static TexState& Tex(void) { static TexState* t = new TexState; return *t; }
 #define sTexFiles  Tex().files
@@ -163,6 +168,21 @@ static TexState& Tex(void) { static TexState* t = new TexState; return *t; }
 #define sTexDumped Tex().dumped
 #define sTexLogged Tex().logged
 static BOOL sDumpDirMade;
+
+static std::string Lower(const char* s) {
+    std::string r = s;
+    for (char& c : r) if (c >= 'A' && c <= 'Z') c += 32;
+    return r;
+}
+
+// The loader calls this for every texture it converts: which pixel data has which name.
+static void NoteTexture(const void* pixels, const char* name) { Tex().names[(uintptr_t)pixels] = name; }
+static void HookNames(void) { gSirTextureNote = NoteTexture; }
+
+const char* PortModsTextureName(const void* pixels) {
+    auto it = Tex().names.find((uintptr_t)pixels);
+    return it == Tex().names.end() ? NULL : it->second.c_str();
+}
 
 u64 PortModsTextureHash(const u8* data, u32 bytes, const u8* palette, u32 paletteBytes, u32 w, u32 h, u32 fmt) {
     u64 hash = 14695981039346656037ull;
@@ -204,7 +224,15 @@ static u32 TexTree(const PortMod* m, const char* dir, BOOL add) {
         u64 hash;
         if (!NameHash(fd.cFileName, &hash)) {
             size_t n = strlen(fd.cFileName);
-            if (add && n > 4 && !_stricmp(fd.cFileName + n - 4, ".png")) PortLog("mods: %s: %s has no texture hash at the end of its name (not used)", m->name, fd.cFileName);
+            if (n > 4 && !_stricmp(fd.cFileName + n - 4, ".png")) {      // no hash: the name of the texture in the game's data
+                count++;
+                if (!add) continue;
+                std::string key = Lower(fd.cFileName).substr(0, n - 4);
+                auto old = Tex().nameMods.find(key);
+                if (old != Tex().nameMods.end() && _stricmp(old->second.c_str(), m->name)) PortLog("mods: %s and %s both replace texture %s: %s comes later and wins", old->second.c_str(), m->name, key.c_str(), m->name);
+                Tex().byName[key] = sub;
+                Tex().nameMods[key] = m->name;
+            }
             continue;
         }
         count++;
@@ -222,6 +250,10 @@ void PortModsRefreshTextures(void) {
     sTexFiles.clear();
     sTexMods.clear();
     sTexLogged.clear();
+    Tex().byName.clear();
+    Tex().nameMods.clear();
+    Tex().loggedNames.clear();
+    HookNames();
     for (int i = 0; i < gPortModCount; i++) {
         PortMod* m = &gPortMods[i];
         m->textureCount = 0;
@@ -232,25 +264,46 @@ void PortModsRefreshTextures(void) {
     }
 }
 
-BOOL PortModsTexturesWanted(void) { return !sTexFiles.empty() || gPortOptions.dumpTextures != NULL; }
+BOOL PortModsTexturesWanted(void) { return !sTexFiles.empty() || !Tex().byName.empty() || gPortOptions.dumpTextures != NULL; }
 
-u32* PortModsTexture(u64 hash, u32* w, u32* h) {
-    auto it = sTexFiles.find(hash);
-    if (it == sTexFiles.end()) return NULL;
+u32* PortModsTexture(u64 hash, const char* name, u32* w, u32* h) {
+    const std::string* file = NULL;
+    const std::string* mod = NULL;
+    std::string key;
+    if (name) {                                              // by the name in the game's data first, the hash is the fallback
+        key = Lower(name);
+        auto n = Tex().byName.find(key);
+        if (n != Tex().byName.end()) { file = &n->second; mod = &Tex().nameMods[key]; }
+    }
+    if (!file) {
+        auto it = sTexFiles.find(hash);
+        if (it == sTexFiles.end()) return NULL;
+        file = &it->second;
+        mod = &sTexMods[hash];
+        key.clear();
+    }
     const char* why = NULL;
-    u32* rgba = PortPngRead(it->second.c_str(), w, h, &why);
-    if (sTexLogged.insert(hash).second) {                   // once per texture: the game decodes some again and again
-        if (rgba) PortLog("mods: texture %016llX comes from %s (%ux%u, %s)", hash, sTexMods[hash].c_str(), *w, *h, it->second.c_str());
-        else fprintf(stderr, "[port] mods: %s %s; the game's texture is used\n", it->second.c_str(), why ? why : "cannot be read");
+    u32* rgba = PortPngRead(file->c_str(), w, h, &why);
+    BOOL first = key.empty() ? sTexLogged.insert(hash).second : Tex().loggedNames.insert(key).second;   // once per texture: the game decodes some again and again
+    if (first) {
+        if (rgba && key.empty()) PortLog("mods: texture %016llX comes from %s (%ux%u, %s)", hash, mod->c_str(), *w, *h, file->c_str());
+        else if (rgba) PortLog("mods: texture %s (%016llX) comes from %s by name (%ux%u, %s)", name, hash, mod->c_str(), *w, *h, file->c_str());
+        else fprintf(stderr, "[port] mods: %s %s; the game's texture is used\n", file->c_str(), why ? why : "cannot be read");
     }
     return rgba;
 }
 
-void PortModsDumpTexture(u64 hash, const u32* rgba, u32 w, u32 h, u32 fmt) {
+void PortModsDumpTexture(u64 hash, const char* name, const u32* rgba, u32 w, u32 h, u32 fmt) {
     const char* dir = gPortOptions.dumpTextures;
     if (!dir || !sTexDumped.insert(hash).second) return;
     if (!sDumpDirMade) { sDumpDirMade = TRUE; CreateDirectoryA(dir, NULL); }
     char path[MAX_PATH + 64];
+    if (name && *name) {                                     // tex_<w>x<h>_f<fmt>_<name>_<hash>.png: works by hash as it is; rename it to <name>.png to match by name
+        char clean[96];
+        snprintf(clean, sizeof(clean), "%s", name);
+        for (char* c = clean; *c; c++) if (strchr("\\/:*?\"<>|", *c) || (u8)*c < 32) *c = '_';
+        snprintf(path, sizeof(path), "%s\\tex_%ux%u_f%u_%s_%016llX.png", dir, w, h, fmt, clean, hash);
+    } else
     snprintf(path, sizeof(path), "%s\\tex_%ux%u_f%u_%016llX.png", dir, w, h, fmt, hash);
     if (!PortPngWrite(path, rgba, w, h) && sTexDumped.size() == 1) fprintf(stderr, "[port] --dump-textures: cannot write %s\n", path);
 }
@@ -323,22 +376,47 @@ int PortSelfTestMods(void) {
         gPortMods[0].enabled = gPortMods[1].enabled = gPortMods[2].enabled = TRUE;   // order now: first, second, gone
         PortModsRefreshTextures();
         u32 tw = 0, th = 0;
-        u32* px = PortModsTexture(0xABull, &tw, &th);
+        u32* px = PortModsTexture(0xABull, NULL, &tw, &th);
         MOD_CHECK(px && tw == 5 && th == 3 && !memcmp(px, kWant, sizeof(kWant)), "a deflated PNG was not read right (%ux%u)", tw, th);
         free(px);
         MOD_CHECK(sTexMods.count(0xAB) && sTexMods[0xAB] == "second", "the later mod's texture did not win");
-        px = PortModsTexture(0xCDull, &tw, &th);
+        px = PortModsTexture(0xCDull, NULL, &tw, &th);
         MOD_CHECK(px && tw == 3 && th == 2 && !memcmp(px, own, sizeof(own)), "the PNG writer's file was not read back");
         free(px);
-        MOD_CHECK(gPortMods[0].textureCount == 1 && gPortMods[1].textureCount == 2 && sTexFiles.size() == 2, "the texture scan found %u and %u", gPortMods[0].textureCount, gPortMods[1].textureCount);
+        MOD_CHECK(gPortMods[0].textureCount == 1 && gPortMods[1].textureCount == 3 && sTexFiles.size() == 2, "the texture scan found %u and %u", gPortMods[0].textureCount, gPortMods[1].textureCount);
+        // By name: noname.png has no hash, so it replaces the texture called "NoName" (any case); the name wins over the hash.
+        px = PortModsTexture(0x1234ull, "NoName", &tw, &th);
+        MOD_CHECK(px && tw == 3 && th == 2 && !memcmp(px, own, sizeof(own)), "a texture was not found by its name");
+        free(px);
+        MOD_CHECK(!PortModsTexture(0x1234ull, "Other", &tw, &th) && PortModsTexturesWanted(), "a texture was found by the wrong name");
+        px = PortModsTexture(0xABull, "NoName", &tw, &th);
+        MOD_CHECK(px && tw == 3, "the name did not win over the hash");
+        free(px);
+        px = PortModsTexture(0xABull, "Other", &tw, &th);
+        MOD_CHECK(px && tw == 5, "the hash is not the fallback for a name no mod has");
+        free(px);
         gPortMods[1].enabled = FALSE;
         PortModsRefreshTextures();
-        MOD_CHECK(sTexMods.count(0xAB) && sTexMods[0xAB] == "first" && !PortModsTexture(0xCDull, &tw, &th), "a texture of a mod switched off is used");
+        MOD_CHECK(sTexMods.count(0xAB) && sTexMods[0xAB] == "first" && !PortModsTexture(0xCDull, NULL, &tw, &th), "a texture of a mod switched off is used");
         const u8 bytes[4] = {1, 2, 3, 4};
         MOD_CHECK(PortModsTextureHash(bytes, 4, NULL, 0, 8, 8, 6) != PortModsTextureHash(bytes, 4, NULL, 0, 8, 4, 6) &&
                   PortModsTextureHash(bytes, 4, bytes, 2, 8, 8, 9) != PortModsTextureHash(bytes, 4, bytes, 3, 8, 8, 9), "the texture hash ignores the size or the palette");
         for (const char* f : kTexFiles) { snprintf(path, sizeof(path), "%s\\%s", base, f); DeleteFileA(path); }
         for (int i = 2; i >= 0; i--) { snprintf(path, sizeof(path), "%s%s", base, kTexDirs[i]); RemoveDirectoryA(path); }
+    }
+    // Text table: a JSON file changes strings; a mistake is reported with its place and changes nothing.
+    {
+        const char* table[4] = {"a", "b", "c", "d"};
+        char err[256];
+        int n = PortModsApplyStrings("{\"format\": 1, \"strings\": {\"1\": \"B\\u00E9\\n\", \"3\": \"D\\u00E9\"}}", table, 4, err, sizeof(err));
+        MOD_CHECK(n == 2 && !strcmp(table[0], "a") && !strcmp(table[1], "B\xE9\n") && !strcmp(table[3], "D\xE9"), "strings.json was not applied (%d, %s)", n, err);
+        MOD_CHECK(PortModsApplyStrings("{\"strings\": {\"0\": \"x\",\n \"4\": \"y\"}}", table, 4, err, sizeof(err)) < 0 && strstr(err, "line 2") && strstr(err, "does not exist") && !strcmp(table[0], "a"),
+                  "a string number out of range was accepted or not placed (%s)", err);
+        MOD_CHECK(PortModsApplyStrings("{\"strings\": {\"0\": \"\\u0416\"}}", table, 4, err, sizeof(err)) < 0 && strstr(err, "U+0416"), "a character outside U+00FF was accepted (%s)", err);
+        MOD_CHECK(PortModsApplyStrings("{\"strings\": {\"0\": \"x\"", table, 4, err, sizeof(err)) < 0, "a file that stops early was accepted");
+        MOD_CHECK(PortModsApplyStrings("{\"strngs\": {}}", table, 4, err, sizeof(err)) < 0 && strstr(err, "unknown key"), "an unknown key was accepted (%s)", err);
+        MOD_CHECK(PortModsApplyStrings("{\"strings\": {\"zero\": \"x\"}}", table, 4, err, sizeof(err)) < 0, "a string number that is no number was accepted");
+        MOD_CHECK(!strcmp(table[0], "a") && !strcmp(table[2], "c"), "a broken file changed a string");
     }
 #undef MOD_CHECK
     for (const char* f : kFiles) { snprintf(path, sizeof(path), "%s\\%s", base, f); DeleteFileA(path); }
@@ -348,7 +426,7 @@ int PortSelfTestMods(void) {
     strcpy(sDir, keepDir);
     gPortOptions.noMods = keepOff;
     PortModsRefreshTextures();
-    if (!fails) PortLog("selftest mods: ok (file lookup, order, moving, switched off, PNG textures)");
+    if (!fails) PortLog("selftest mods: ok (file lookup, order, moving, switched off, PNG textures, text table)");
     return fails;
 }
 #endif

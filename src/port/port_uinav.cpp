@@ -23,6 +23,7 @@ static void Collect(u8* parent) {
     for (u8* c = *(u8**)(parent + 0x120); c != NULL && sItemCount < 64; c = *(u8**)(c + 0x124)) {
         u32 fl = *(u32*)(c + 0x64);
         f32 lo = *(f32*)(c + 0x1B0), hi = *(f32*)(c + 0x1D4), lo2 = *(f32*)(c + 0x1B4), hi2 = *(f32*)(c + 0x1D8);
+        bool visible = (((fl & 2) && *(f32*)(c + 0x8C) > 0.0f) || !(fl & 0x400));
         bool eligible = (fl & 1) && lo != hi && (*(s32*)(c + 0xBC) != 0 || fn_8019CCAC(c) != 0) &&
                         (((fl & 2) && *(f32*)(c + 0x8C) > 0.0f) || !(fl & 0x400));
         if (eligible) {
@@ -39,6 +40,20 @@ static void Collect(u8* parent) {
                     sItems[sItemCount].hovered = sItems[sItemCount].x == x && gCurX >= 0 && (*(PickFn*)(*(u8**)(c + 0x138) + 0x38))(c, 0, gCurX, gCurY) != 0;
                     sItemCount++;
                 }
+            }
+        }
+        else if ((fl & 1) && lo == hi && visible && (*(s32*)(c + 0xBC) != 0 || fn_8019CCAC(c) != 0)) {
+            // No usable hit rectangle (the Options buttons): probe the widget's own hit test on a grid
+            // and take the middle of the hits.
+            f32 sx = 0, sy = 0; int n = 0;
+            for (f32 y = 0; y < (f32)gScreenHeight; y += 6.0f)
+                for (f32 x = 0; x < (f32)gScreenWidth; x += 6.0f)
+                    if ((*(PickFn*)(*(u8**)(c + 0x138) + 0x38))(c, 0, x, y) != 0) { sx += x; sy += y; n++; }
+            if (n > 0 && sItemCount < 64) {
+                sItems[sItemCount].x = sx / n;
+                sItems[sItemCount].y = sy / n;
+                sItems[sItemCount].hovered = gCurX >= 0 && (*(PickFn*)(*(u8**)(c + 0x138) + 0x38))(c, 0, gCurX, gCurY) != 0;
+                sItemCount++;
             }
         }
         Collect(c);
@@ -67,9 +82,16 @@ extern "C" BOOL PortUiNavigate(int dx, int dy, f32* px, f32* py) {
     for (int i = 0; i < sItemCount; i++) {
         f32 along = dy ? (sItems[i].y - cy) * dy : (sItems[i].x - cx) * dx;
         f32 across = dy ? fabsf(sItems[i].x - cx) : fabsf(sItems[i].y - cy);
-        if (!sItems[i].hovered && along > 3.0f && along + 0.5f * across < bestScore) { bestScore = along + 0.5f * across; best = i; }
+        if (!sItems[i].hovered && along > 3.0f && across <= along && along + 0.5f * across < bestScore) { bestScore = along + 0.5f * across; best = i; }
         f32 far = -along;     // the other end of the screen, for wrapping
         if (far > 3.0f && far - 0.5f * across < wrapScore && far > 0) { wrapScore = far; wrap = i; }
+    }
+    if (best < 0) {          // none in the straight line: the nearest one in that direction at all
+        for (int i = 0; i < sItemCount; i++) {
+            f32 along = dy ? (sItems[i].y - cy) * dy : (sItems[i].x - cx) * dx;
+            f32 across = dy ? fabsf(sItems[i].x - cx) : fabsf(sItems[i].y - cy);
+            if (!sItems[i].hovered && along > 3.0f && along + 0.5f * across < bestScore) { bestScore = along + 0.5f * across; best = i; }
+        }
     }
     if (best < 0) {          // none further: the item farthest the other way
         f32 m = -1e30f;

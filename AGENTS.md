@@ -86,7 +86,7 @@ a PC port. Read this whole file before making changes. Human contributors: see
   then runs headless: `--selftest`, `--to-menu` to frame 3300 and the title at frame 2600. Passes when each run reaches its frame limit
   without a crash, the menu scripts ran (`UIScreen_Push`) and neither screenshot is blank or black (`build/smoke/*.png`). One verdict line
   with timings (about 50 s); `SMOKE FAIL` lists the reasons and keeps the logs in `build/smoke/`. Needs the game data (`orig/RM7P4F` or `--iso`).
-- `python tools/mod_test.py [--iso PATH] [--keep]`: texture-mod test (`docs/modding.md`): dumps the menu's textures to a temporary folder outside
+- `python tools/mod_test.py [--iso PATH] [--keep]`: mod test (textures by hash and name, JSON text; `docs/modding.md`): dumps the menu's textures to a temporary folder outside
   the repository, makes a mod with one tinted red, runs headless again and compares the screenshots. Run it after changes to
   `src/port/port_mods.cpp`, `port_png.cpp` or the texture cache in `port_gfx_d3d11.cpp`.
 - `python tools/difftest.py --fn <name|0xADDR>` / `--batch N` / `--all [--calls]`: differential test (`docs/difftest.md`): runs the original

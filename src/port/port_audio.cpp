@@ -39,7 +39,7 @@ enum {
 };
 
 static u8 sVoices[AX_VOICES][VOICE_SIZE];
-struct VoiceRun { BOOL used, running; u32 frac; s32 s0, s1; s32 volL, volR; };
+struct VoiceRun { BOOL used, running; u32 frac; s32 s0, s1; s32 volL, volR, aux[4], rmt; };
 static VoiceRun sRun[AX_VOICES];
 static void (*sAxCallback)(void);
 static BOOL sAxInit;
@@ -115,10 +115,17 @@ void AXFreeVoice(u8* v) {
 
 void AXSetVoicePriority(u8* v, u32 priority) { *(u32*)(v + V_PRIORITY) = priority; }
 
-// The aux bus effects (AXFX reverb, delay, chorus) are not mixed on PC: the callbacks are taken
-// and never called.
-void AXRegisterAuxACallback(void* cb, void* ctx) {}
-void AXRegisterAuxBCallback(void* cb, void* ctx) {}
+// The aux buses' effects (AXFX delay, chorus, reverb: port_axfx.cpp): the callback gets the bus'
+// three buffers and its context once per AX frame, after the voices are mixed.
+typedef void (*AuxCallback)(void* data, void* ctx);
+static AuxCallback sAuxCb[2];
+static void*       sAuxCtx[2];
+static void AuxRegister(int bus, void* cb, void* ctx) {
+    if ((void*)sAuxCb[bus] != cb || sAuxCtx[bus] != ctx) PortLog("audio: aux %c effect %s (%p)", 'A' + bus, cb ? "on" : "off", ctx);
+    sAuxCb[bus] = (AuxCallback)cb; sAuxCtx[bus] = ctx;
+}
+void AXRegisterAuxACallback(void* cb, void* ctx) { AuxRegister(0, cb, ctx); }
+void AXRegisterAuxBCallback(void* cb, void* ctx) { AuxRegister(1, cb, ctx); }
 s32  AXSetMode(s32 mode) { sAxMode = mode; return 0; }
 // Two getters of the DSP's cycle budget; the game ignores what they return.
 void fn_8025B390(void) {}
@@ -172,7 +179,7 @@ static void SetVoiceSrcRatio(u8* v, f32 ratio) {
 // ------------------------------------------------------------------ MIX
 // One channel per AX voice: levels in tenths of a decibel (0 = full, -904 and below = silent),
 // pan 0 (left) .. 127 (right), span (front/back, not used with two speakers), fader.
-struct MixChan { u8* voice; BOOL mute; s32 input, aux[3], pan, span, fader; };
+struct MixChan { u8* voice; BOOL mute; s32 input, aux[3], pan, span, fader, rmtLevel; };
 static MixChan sMix[AX_VOICES];
 static s32 sMixMode;
 
@@ -199,6 +206,17 @@ static void MixApply(MixChan* c) {
     }
     H(v, V_MIX + 0) = l;
     H(v, V_MIX + 4) = r;
+    // Aux sends A and B (left, right): the channel's level plus the send level, panned like the main output.
+    for (int a = 0; a < 2; a++) {
+        u16 al = 0, ar = 0;
+        if (!c->mute) {
+            s32 lvl = base + c->aux[a];
+            if (sMixMode == 0) al = ar = (u16)Level(lvl - 30);
+            else { al = (u16)Level(lvl + PanTenths(c->pan)); ar = (u16)Level(lvl + PanTenths(c->pan <= 0 ? 127 : 128 - c->pan)); }
+        }
+        H(v, V_MIX + 8 + a * 8) = al;
+        H(v, V_MIX + 0xC + a * 8) = ar;
+    }
     *(u32*)(v + V_SYNC) |= 0x10;
 }
 static MixChan* Chan(u8* v) { return v ? &sMix[Index(v)] : NULL; }
@@ -258,7 +276,7 @@ static void Art3dUpdate(u8* a) {
 static void ArtEvaluate(u8* s, BOOL first) {
     u8* v = *(u8**)(s + 0x08);
     f32 ratio = *(f32*)(s + 0x0C) / 32000.0f;
-    s32 cents = 0, volume = 0, aux[3] = {0, 0, 0}, fader = 0;
+    s32 cents = 0, volume = 0, aux[3] = {0, 0, 0}, fader = 0, rmtLevel = 0;
     s32 pan = 0x40, span = 0x7F, src = 1;
     u16 rmt = 0;
     for (u8* a = *(u8**)(s + 0x10); a; a = *(u8**)a) {
@@ -280,6 +298,7 @@ static void ArtEvaluate(u8* s, BOOL first) {
         case 12: volume += *(s32*)(a + 0x10); break;
         case 21: fader = *(s32*)(a + 8); break;
         case 22: rmt = *(u16*)(a + 8); break;
+        case 24: rmtLevel = *(s32*)(a + 8) >> 16; break;                  // the remote speaker's level: channel 0
         }
     }
     if (!v) return;
@@ -293,6 +312,7 @@ static void ArtEvaluate(u8* s, BOOL first) {
         c->aux[0] = aux[0] >> 16; c->aux[1] = aux[1] >> 16; c->aux[2] = aux[2] >> 16;
         c->pan = pan; c->span = span; c->fader = fader >> 16;
     }
+    if (Chan(v)) Chan(v)->rmtLevel = rmtLevel;
     AXSetVoiceRmtOn(v, rmt);
 }
 
@@ -351,6 +371,8 @@ void AXARTInitArtRmt(u8* a) { *(u32*)(a + 4) = 0x16; *(u16*)(a + 8) = 1; }
 void AXARTInitArtRmtAuxVolume(u8* a) { *(u32*)(a + 4) = 0x18; memset(a + 8, 0, 0x10); }
 
 }  // extern "C"
+
+int PortSelfTestAxfx(void);
 
 // ------------------------------------------------------------------ the mixer
 struct Decoder {
@@ -457,6 +479,12 @@ static void MixMovie(s32* acc) {
 static void MixFrame(s16* out) {
     s32 acc[AX_FRAME * 2];
     memset(acc, 0, sizeof(acc));
+    // Aux bus A and B: left, right, surround (not mixed in stereo)
+    s32 aux[2][3][AX_FRAME];
+    memset(aux, 0, sizeof(aux));
+    s32 rmtBus[AX_FRAME];                           // the Wii Remote speaker (channel 0), mono
+    memset(rmtBus, 0, sizeof(rmtBus));
+    bool rmtUsed = false;
     for (int i = 0; i < AX_VOICES; i++) {
         u8* v = sVoices[i];
         VoiceRun* r = &sRun[i];
@@ -464,8 +492,11 @@ static void MixFrame(s16* out) {
         *(u32*)(v + V_SYNC) = 0;
         if (!r->used || H(v, V_STATE) != 1) { r->running = FALSE; continue; }
         s32 volL = H(v, V_MIX + 0), volR = H(v, V_MIX + 4);
+        s32 auxTo[4] = {H(v, V_MIX + 8), H(v, V_MIX + 0xC), H(v, V_MIX + 0x10), H(v, V_MIX + 0x14)};
         if (!r->running) {
             r->running = TRUE; r->frac = 0x10000; r->s0 = r->s1 = 0; r->volL = volL; r->volR = volR;
+            for (int k = 0; k < 4; k++) r->aux[k] = auxTo[k];
+            r->rmt = 0;
             sStats.started++;
             if (gPortOptions.verbose || getenv("PORT_AUDIO_TRACE")) PortLog("audio: voice %d starts: format %u, type %u, ratio %08X, at %08X, loop %08X (%u), end %08X, level %d / %d", i, H(v, V_FORMAT), H(v, V_TYPE), Get32(v, V_RATIO), Get32(v, V_CURADDR), Get32(v, V_LOOPADDR), H(v, V_LOOPFLAG), Get32(v, V_ENDADDR), volL, volR);
         }
@@ -476,17 +507,44 @@ static void MixFrame(s16* out) {
         if ((sync & 0x400) && d.format == 0 && (d.addr & 0xF) == 2) d.ps = *Phys((d.addr - 2) >> 1);
         s32 stepL = (volL - r->volL) / AX_FRAME, stepR = (volR - r->volR) / AX_FRAME;
         s32 l = r->volL, rr = r->volR;
+        s32 stepA[4], av[4];
+        for (int k = 0; k < 4; k++) { stepA[k] = (auxTo[k] - r->aux[k]) / AX_FRAME; av[k] = r->aux[k]; }
+        bool rmtOn = H(v, V_RMT) != 0 && gPortSettings.remoteSpeaker;
+        s32 rmtTo = rmtOn ? Level(sMix[i].rmtLevel) : 0, rv = r->rmt, stepR2 = (rmtTo - r->rmt) / AX_FRAME;
+        if (rmtOn || r->rmt) rmtUsed = true, rmtOn = true;
+        bool sends = (auxTo[0] | auxTo[1] | auxTo[2] | auxTo[3] | r->aux[0] | r->aux[1] | r->aux[2] | r->aux[3]) != 0;
         for (int n = 0; n < AX_FRAME; n++) {
             while (r->frac >= 0x10000) { r->s0 = r->s1; r->s1 = DecoderNext(&d); r->frac -= 0x10000; }
             s32 s = r->s0 + (s32)(((s64)(r->s1 - r->s0) * (s32)r->frac) >> 16);
             acc[n * 2 + 0] += (s * l) >> 15;
             acc[n * 2 + 1] += (s * rr) >> 15;
+            if (rmtOn) { rmtBus[n] += (s * rv) >> 15; rv += stepR2; }
+            if (sends) {
+                for (int k = 0; k < 4; k++) { aux[k >> 1][k & 1][n] += (s * av[k]) >> 15; av[k] += stepA[k]; }
+            }
             r->frac += ratio;
             l += stepL; rr += stepR;
         }
         r->volL = volL; r->volR = volR;
+        r->rmt = rmtTo;
+        for (int k = 0; k < 4; k++) r->aux[k] = auxTo[k];
         DecoderStore(&d);
         if (d.stopped) r->running = FALSE;
+    }
+    for (int b = 0; b < 2; b++) {
+        if (!sAuxCb[b]) continue;
+        s32* bus[3] = {aux[b][0], aux[b][1], aux[b][2]};
+        sAuxCb[b](bus, sAuxCtx[b]);
+        for (int n = 0; n < AX_FRAME; n++) { acc[n * 2] += aux[b][0][n]; acc[n * 2 + 1] += aux[b][1][n]; }
+    }
+    if (rmtUsed) {
+        // The speaker is a small 6 kHz mono speaker: a low-pass around 3 kHz, quieter than the main output.
+        static f32 lp;
+        for (int n = 0; n < AX_FRAME; n++) {
+            lp += ((f32)rmtBus[n] - lp) * 0.445f;
+            s32 x = (s32)(lp * 0.6f);
+            acc[n * 2] += x; acc[n * 2 + 1] += x;
+        }
     }
     MixMovie(acc);
     for (int n = 0; n < AX_FRAME * 2; n++) {
@@ -704,7 +762,27 @@ int PortSelfTestAudio(void) {
     CHECK(AXARTRemoveArticulator(sound, vol) == 1 && AXARTRemoveArticulator(sound, vol) == 0);
     AXARTRemoveSound(sound);
     AXFreeVoice(v);
+    // The Wii Remote speaker: a looping constant voice that is silent on the main bus and sent to the remote.
+    for (int i = 0; i < 8; i++) { mem[i * 2] = (u8)(8000 >> 8); mem[i * 2 + 1] = (u8)8000; }
+    v = (u8*)(uintptr_t)AXAcquireVoice(16, NULL, NULL);
+    u16 a3[8] = {1, 0x0A, (u16)(first >> 16), (u16)first, (u16)(last >> 16), (u16)last, (u16)(first >> 16), (u16)first};
+    AXSetVoiceAddr(v, a3);
+    AXSetVoiceSrc(v, src);
+    MIXInitChannel(v, 0, -904, -904, -904, -904, 64, 127, 0);
+    AXSetVoiceRmtOn(v, 1);
+    sMix[Index(v)].rmtLevel = 0;
+    AXSetVoiceState(v, 1);
+    BOOL had = gPortSettings.remoteSpeaker;
+    gPortSettings.remoteSpeaker = TRUE;
+    MixFrame(out); MixFrame(out);
+    CHECK(out[2 * 90] > 2000 && out[2 * 90] == out[2 * 90 + 1] && out[2 * 90] < 8000);   // low-passed, quieter than the voice
+    gPortSettings.remoteSpeaker = FALSE;
+    for (int k = 0; k < 3; k++) MixFrame(out);
+    CHECK(out[2 * 90] == 0 && out[2 * 90 + 1] == 0);                  // switched off: silent
+    gPortSettings.remoteSpeaker = had;
+    AXFreeVoice(v);
     AXQuit();
+    fails += PortSelfTestAxfx();
     memset(&sStats, 0, sizeof(sStats));
     return fails;
 }

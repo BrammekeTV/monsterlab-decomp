@@ -580,9 +580,10 @@ static ID3D11ShaderResourceView* GetTexture(const PortGx* g, u32 map) {
     ID3D11ShaderResourceView* made = NULL;
     if (PortModsTexturesWanted()) {
         u64 content = PortModsTextureHash(data, bytes, tlut, pal ? (fmt == 8 ? 32 : fmt == 9 ? 512 : 0x8000) : 0, w, h, fmt);
-        PortModsDumpTexture(content, rgba.data(), w, h, fmt);
+        const char* tname = PortModsTextureName(data);
+        PortModsDumpTexture(content, tname, rgba.data(), w, h, fmt);
         u32 rw = 0, rh = 0;
-        u32* png = PortModsTexture(content, &rw, &rh);
+        u32* png = PortModsTexture(content, tname, &rw, &rh);
         if (png) { made = MakeTexture(png, rw, rh); free(png); }
     }
     if (!made) made = MakeTexture(rgba.data(), w, h);
@@ -1275,7 +1276,11 @@ static void CopyEfb(const PortGx* g, u32 control) {
         // address is a whole number of rows into an earlier copy of the same width and format
         // (at or before its end) becomes the rows from there on of that copy.
         static const u8 kBits[16] = {4, 8, 8, 16, 16, 16, 32, 8, 8, 8, 8, 16, 16, 16, 16, 16};
-        u32 rowBytes = w * kBits[fmt & 15] / 8, row = 0;
+        // Bit 9 (the mipmap flag of GXSetTexCopyDst): the copy is box-filtered to half the size in both
+        // directions. The blur chain of the menu takes its source that way (640x240 -> 320x120 per band).
+        bool half = (control & 0x200) != 0;
+        u32 dw = half ? pw / 2 : pw, dh = half ? ph / 2 : ph;
+        u32 rowBytes = (half ? w / 2 : w) * kBits[fmt & 15] / 8, row = 0;
         ID3D11Texture2D* under = NULL;
         D3D11_TEXTURE2D_DESC ud = {};
         for (auto& e : sEfbCopyRowBytes) {
@@ -1289,7 +1294,7 @@ static void CopyEfb(const PortGx* g, u32 control) {
             res->Release();
             if (!bt) continue;
             bt->GetDesc(&ud);
-            if (ud.Width == pw && (u32)PxY((addr - e.first) / rowBytes) <= ud.Height) {
+            if (ud.Width == dw && (u32)PxY((addr - e.first) / rowBytes) <= ud.Height) {
                 under = bt; row = (addr - e.first) / rowBytes; addr = e.first;
                 break;
             }
@@ -1298,7 +1303,7 @@ static void CopyEfb(const PortGx* g, u32 control) {
         // The texture of the last copy to this address is used again when it has the right size
         // (a new one for every copy made a 1080p frame crawl); a band is drawn into its rows.
         ID3D11Texture2D* t = under;
-        u32 needH = (u32)PxY(row) + ph;
+        u32 needH = (u32)PxY(row) + dh;
         if (!t) {
             auto old = sEfbCopies.find(addr);
             if (old != sEfbCopies.end() && old->second) {
@@ -1306,14 +1311,14 @@ static void CopyEfb(const PortGx* g, u32 control) {
                 old->second->GetResource(&res);
                 res->QueryInterface(__uuidof(ID3D11Texture2D), (void**)&t);
                 res->Release();
-                if (t) { t->GetDesc(&ud); if (ud.Width != pw || ud.Height != needH) { t->Release(); t = NULL; } }
+                if (t) { t->GetDesc(&ud); if (ud.Width != dw || ud.Height != needH) { t->Release(); t = NULL; } }
             }
         } else if (ud.Height < needH) {
             t = NULL;                                       // the band reaches below the texture: a taller one, with the old rows
         }
         if (!t) {
             D3D11_TEXTURE2D_DESC d = {};
-            d.Width = pw; d.Height = needH; d.MipLevels = 1; d.ArraySize = 1; d.Format = DXGI_FORMAT_R8G8B8A8_UNORM;
+            d.Width = dw; d.Height = needH; d.MipLevels = 1; d.ArraySize = 1; d.Format = DXGI_FORMAT_R8G8B8A8_UNORM;
             d.SampleDesc.Count = 1; d.BindFlags = D3D11_BIND_SHADER_RESOURCE | D3D11_BIND_RENDER_TARGET;
             if (SUCCEEDED(sDev->CreateTexture2D(&d, NULL, &t))) {
                 if (under) { D3D11_BOX all = {0, 0, 0, ud.Width, ud.Height, 1}; sCtx->CopySubresourceRegion(t, 0, 0, 0, 0, under, 0, &all); }
@@ -1327,7 +1332,7 @@ static void CopyEfb(const PortGx* g, u32 control) {
         if (t) {
             ID3D11RenderTargetView* rtv = NULL;
             sDev->CreateRenderTargetView(t, NULL, &rtv);
-            if (rtv) { Blit(sEfbSrv, rtv, 0, (u32)PxY(row), pw, ph, su0, sv0, sdu, sdv, pick); rtv->Release(); }
+            if (rtv) { Blit(sEfbSrv, rtv, 0, (u32)PxY(row), dw, dh, su0, sv0, sdu, sdv, pick); rtv->Release(); }
             if (!row || !sEfbCopyRowBytes.count(addr)) sEfbCopyRowBytes[addr] = rowBytes;
             t->Release();
         }

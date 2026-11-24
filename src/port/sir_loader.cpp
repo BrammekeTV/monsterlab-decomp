@@ -1843,7 +1843,7 @@ static const SirField kCountPtrFields[] = {
 //   (fn_80176E20: eight floats at buf +0x00..+0x1C, the last four are used when the material's
 //   record is disabled), so +0x4C..+0x57 are floats too (the file has 1.0 at +0x4C);
 //   +0x9C a float and +0xA0 a texture pointer that overrides the material's (buf +0x60 / +0x64)
-// and of the mesh: +0x20 centre and radius, +0x48 three floats, +0x54 scale, +0x64 a pointer,
+// and of the mesh: +0x20 centre and radius, +0x48 three floats, +0x54 scale, +0x60 the kind (3 = a particle mesh, fn_801CBD40), +0x64 a pointer,
 // +0x6C the number of parts, +0x70 the parts {material, batch}; of a batch the flags at +0x0C.
 static SirError SkeletonPlan(ImagePlan* plan, const u8* image, u32 imageSize, u32 addr);
 
@@ -1895,12 +1895,43 @@ static SirError SceneItemDrawPlan(ImagePlan* plan, const u8* image, u32 imageSiz
     u32 parts = Be32(image + m + 0x6C);
     if (parts > imageSize / 8 || (u64)m + 0x70 + (u64)parts * 8 > imageSize) return SIR_ERR_ENTITY;
     if (!PlanAdd(plan, m + 0x20, 0x10, REGION_U32_ARRAY) || !PlanAdd(plan, m + 0x48, 0x10, REGION_U32_ARRAY) ||
-        !PlanAdd(plan, m + 0x64, 4, REGION_PTR_ARRAY) || !PlanAdd(plan, m + 0x6C, 4, REGION_U32_ARRAY) ||
+        !PlanAdd(plan, m + 0x60, 4, REGION_U32_ARRAY) || !PlanAdd(plan, m + 0x64, 4, REGION_PTR_ARRAY) || !PlanAdd(plan, m + 0x6C, 4, REGION_U32_ARRAY) ||
         (parts != 0 && !PlanAdd(plan, m + 0x70, parts * 8, REGION_PTR_ARRAY))) return SIR_ERR_ENTITY;
     for (u32 i = 0; i < parts; i++) {
         SirError e = MaterialPlan(plan, image, imageSize, Be32(image + m + 0x70 + i * 8));
         if (e != SIR_OK) return e;
         if ((e = BatchPlan(plan, image, imageSize, Be32(image + m + 0x74 + i * 8))) != SIR_OK) return e;
+    }
+    return SIR_OK;
+}
+
+// Effect library: header +0x7C records, array at +0x80 (fn_8012FFA4 hands it to the manager lbl_8047C730; SpawnEffectAt
+// binary-searches it by the key when the sorted flag at +0x84 is set). A record (0xEC bytes): +0x00 the effect's name hash,
+// +0x04 the number of emitters (up to 8), from +0x0C the emitters (0x1C bytes: a pointer to the emitter descriptor, six floats).
+// A descriptor (0x1F4 bytes, found by the stride between them) is all words: hashes and floats, no pointers.
+#define FX_EFFECT_SIZE 0xEC
+#define FX_EMITTER_SIZE 0x1C
+#define FX_EMITTER_DESC_SIZE 0x1F4
+static SirError FxEffectLibraryPlan(ImagePlan* plan, const u8* image, u32 imageSize, u32 addr, u32 count) {
+    u32 off, o;
+    if (count == 0 || addr == 0) return SIR_OK;
+    if (count > 0x10000 || !ImageSpan(addr, (u64)count * FX_EFFECT_SIZE, imageSize, &off)) return SIR_ERR_EFFECTS;
+    for (u32 i = 0; i < count; i++) {
+        u32 rec = off + i * FX_EFFECT_SIZE, emitters = Be32(image + rec + 4);
+        if (emitters > 8 || !PlanAdd(plan, rec, 8, REGION_U32_ARRAY)) return SIR_ERR_EFFECTS;
+        for (u32 k = 0; k < emitters; k++) {
+            u32 e = rec + 0x0C + k * FX_EMITTER_SIZE;
+            if (!PlanAdd(plan, e, 4, REGION_PTR_ARRAY) || !PlanAdd(plan, e + 4, FX_EMITTER_SIZE - 4, REGION_U32_ARRAY)) return SIR_ERR_EFFECTS;
+            if (!ImageSpan(Be32(image + e), FX_EMITTER_DESC_SIZE, imageSize, &o)) return SIR_ERR_EFFECTS;
+            if (PlanHas(plan, o, REGION_U32_ARRAY)) continue;
+            // +0x1D4 a texture record (a sprite emitter), +0x1D8 a scene item whose mesh is the particle (fn_801CBD40).
+            if (!PlanAdd(plan, o, 0x1D4, REGION_U32_ARRAY) || !PlanAdd(plan, o + 0x1D4, 8, REGION_PTR_ARRAY) ||
+                !PlanAdd(plan, o + 0x1DC, FX_EMITTER_DESC_SIZE - 0x1DC, REGION_U32_ARRAY)) return SIR_ERR_EFFECTS;
+            SirError te = MaterialTexturePlan(plan, image, imageSize, Be32(image + o + 0x1D4));
+            u32 it;
+            if (te == SIR_OK && LevelSpan(Be32(image + o + 0x1D8), 0xC4, imageSize, &it)) te = SceneItemDrawPlan(plan, image, imageSize, it);
+            if (te != SIR_OK) return te;
+        }
     }
     return SIR_OK;
 }
@@ -2755,6 +2786,18 @@ static SirError ImagePlanBuild(ImagePlan* plan, const u8* hdr, u8* image, u32 im
     return PlanFinish(plan) ? SIR_OK : SIR_ERR_OVERLAP;
 }
 
+void (*gSirTextureNote)(const void* pixels, const char* name) = NULL;
+
+// Tells the port which pixel data belongs to which texture name (called after the header is converted).
+static void TextureNote(const u8* p, const u8* end) {
+    if (gSirTextureNote == NULL || p + 0x36 > end) return;
+    const void* pixels;
+    memcpy(&pixels, p + 0x1C, sizeof(pixels));
+    const u8* e = p + 0x35;
+    while (e < end && *e) e++;
+    if (pixels != NULL && e < end && e > p + 0x35) gSirTextureNote(pixels, (const char*)(p + 0x35));
+}
+
 static void ImagePlanConvert(const ImagePlan* plan, SirReloc* r, u8* image, u32 imageSize) {
     for (u32 i = 0; i < plan->count; i++) {
         const Region* g = &plan->regions[i];
@@ -2763,7 +2806,7 @@ static void ImagePlanConvert(const ImagePlan* plan, SirReloc* r, u8* image, u32 
         case REGION_INPUT_TABLE:  InputTableConvert(r, p); break;
         case REGION_INPUT_STEP:   InputStepConvert(r, p, g->size); break;
         case REGION_TEXTURE_LIST: SirConvertRecord(r, p, g->size, kTextureListFields, COUNTOF(kTextureListFields)); break;
-        case REGION_TEXTURE:      SirConvertRecord(r, p, g->size, kTextureFields, COUNTOF(kTextureFields)); break;
+        case REGION_TEXTURE:      SirConvertRecord(r, p, g->size, kTextureFields, COUNTOF(kTextureFields)); TextureNote(p, image + imageSize); break;
         case REGION_STRING_TABLE: SirConvertRecord(r, p, g->size, kStringTableFields, COUNTOF(kStringTableFields)); break;
         case REGION_ACTION_TABLE: SirConvertRecord(r, p, g->size, kActionTableFields, COUNTOF(kActionTableFields)); break;
         case REGION_UI_SLIDER:    SirConvertRecord(r, p, g->size, kUiSliderFields, COUNTOF(kUiSliderFields)); break;
@@ -3253,6 +3296,8 @@ extern "C" BOOL LevelZoneRootsCollect(const u8* hdr, u32 hdrSize, const u8* zone
     if (ok) out->hud = ZoneAddr(hdr + 0x1F4, zoneHost, zoneSize, zoneWiiBase);
     if (ok && Host32(hdr + 0x24) != 0 && (out->locators = ZoneAddr(hdr + 0x28, zoneHost, zoneSize, zoneWiiBase)) != 0)
         out->locatorCount = Host32(hdr + 0x24);
+    if (ok && Host32(hdr + 0x7C) != 0 && (out->effectLibrary = ZoneAddr(hdr + 0x80, zoneHost, zoneSize, zoneWiiBase)) != 0)
+        out->effectLibraryCount = Host32(hdr + 0x7C);
     for (u32 k = 0; ok && k < 2; k++) out->spawnOwners[k] = ZoneAddr(hdr + 0x74 + k * 4, zoneHost, zoneSize, zoneWiiBase);
     if (ok && Host32(hdr + 0x30) != 0 && (out->paths = ZoneAddr(hdr + 0x2C, zoneHost, zoneSize, zoneWiiBase)) != 0)
         out->pathCount = Host32(hdr + 0x30);
@@ -3519,6 +3564,7 @@ extern "C" SirError LevelZoneConvert(SirReloc* r, u8* image, u32 imageSize, u32 
     if (roots->hud != 0) e = HudPlan(&plan, image, imageSize, roots->hud, true);
     for (u32 i = 0; i < roots->entityCount && e == SIR_OK; i++) e = EntityPlan(&plan, image, imageSize, roots->entities[i], 0);
     for (u32 i = 0; i < roots->sceneObjectCount && e == SIR_OK; i++) e = SceneObjectPlan(&plan, image, imageSize, roots->sceneObjects[i]);
+    if (e == SIR_OK && roots->effectLibraryCount != 0) e = FxEffectLibraryPlan(&plan, image, imageSize, roots->effectLibrary, roots->effectLibraryCount);
     for (u32 i = 0; i < roots->poolTableCount && e == SIR_OK; i++)
         e = PoolTablePlan(&plan, image, imageSize, roots->poolTables[i * 2], roots->poolTables[i * 2 + 1]);
     if (e == SIR_OK && roots->locatorCount != 0) {
