@@ -111,10 +111,11 @@ s32 fn_80031114(u8* arg0, f32* arg1) {
     u8* verts = *(u8**)arg0;
     s32 inside = 0;
     s32 prev = count - 1;
-    f32 px = arg1[0];
-    f32 py = arg1[1];
 
+    // The point is read inside the loop, as the original does (an empty polygon never touches it).
     for (s32 j = 0; j < count; j++) {
+        f32 px = arg1[0];
+        f32 py = arg1[1];
         f32* cur = (f32*)(verts + j * 8);
         f32* pv = (f32*)(verts + prev * 8);
         f32 xi = cur[0];

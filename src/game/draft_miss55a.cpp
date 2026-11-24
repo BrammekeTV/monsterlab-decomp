@@ -155,11 +155,12 @@ s32 RobotEvolutionExperiment_RegisterScripts(void) {
 // key s32 +0xC). Writes the lower bound (first node >= key) to out[0] and the upper bound
 // (first node > key) to out[1]; both are the header slot head+4 when there is none.
 void fn_800A50B4(u8** out, u8* head, s32* keyPtr) {
-    s32 key = *keyPtr;
+    s32 key = 0;  // read inside the loop, as the original does (an empty tree never touches keyPtr)
     u8* node = *(u8**)(head + 0x4);
     u8* after = head + 0x4;
 
     while (node != NULL) {
+        key = *keyPtr;
         s32 nodeKey = *(s32*)(node + 0xC);
         if (key < nodeKey) {
             after = node;

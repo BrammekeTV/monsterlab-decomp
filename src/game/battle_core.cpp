@@ -1099,10 +1099,12 @@ extern "C" {
 // 0x80214C5C
 // Add a value box (a list of stat deltas) onto a limb's status, element by element.
 void LimbApplyDamage(u8** field, void* value) {
-    s32* st = *(s32**)field;
-    const s32* d = *(const s32**)value;
-    s32 n = *(const s32*)((u8*)value + 4);
-    for (s32 i = 0; i < n; i++) st[i] += d[i];
+    // Everything is read inside the loop, as the original does (a count of 0 touches nothing).
+    for (s32 i = 0; i < *(const s32*)((u8*)value + 4); i++) {
+        s32* st = *(s32**)field;
+        const s32* d = *(const s32**)value;
+        st[i] += d[i];
+    }
 }
 
 // 0x8021477C
