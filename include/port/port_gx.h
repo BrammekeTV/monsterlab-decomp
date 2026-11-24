@@ -16,6 +16,8 @@ typedef struct PortGx {
     s16 tevKonst[4][4];
     u32 bpGen;            // counts BP register writes (the renderer keeps what it made of them while it does not move)
     u32 xfLightGen;       // counts writes to the lights (XF memory 0x600-0x67F); the renderer rebuilds what it keeps of them when it moves
+    u32 xfMtxGen;         // counts writes to the position, texture and normal matrices (XF memory 0x000-0x4FF), likewise
+    u32 xfGen;            // counts all XF writes (registers and memory)
 } PortGx;
 extern PortGx gPortGxRegs;
 

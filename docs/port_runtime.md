@@ -360,13 +360,16 @@ What it does:
   lit and given their texture coordinates on the CPU from the XF registers and matrix memory:
   position and normal matrices, projection, the colour channels with their lights, the
   texture-coordinate generators with their matrices. That is the console's transform unit.
-  Perspective draws with one set of matrices for all their vertices do this in the vertex shader
-  instead: the CPU only decodes the attributes, and the matrices, registers and lights the shader
-  needs go into a per-draw record in a buffer the shader reads (the vertex carries the record's
-  index; a record is reused while nothing changed, the lights are a block of their own). 2D
-  (orthographic) draws stay on the CPU because widescreen needs their final positions, and so do
-  draws that pick matrices per vertex (skinned meshes). `PORT_CPU_VERTS=1` puts everything back on
-  the CPU (for comparisons). Draws are queued in batches of equal state, and the batches are
+  Draws do this in the vertex shader instead: the CPU only decodes the attributes (with a decoder
+  picked per format, component count and byte order), and the matrices, registers and lights the
+  shader needs go into a per-draw record in a buffer the shader reads (the vertex carries the
+  record's index; a record is reused while no XF register or memory was written, the lights are a
+  block of their own). Draws that pick a position matrix per vertex (skinned meshes) or a texture
+  matrix per vertex (texgens 0-2) get a matrix block with all position, texture and normal
+  matrices, and the vertex carries the indices. 2D (orthographic) draws are drawn the same way; for
+  the widescreen and movie decisions the CPU works out only where their positions land. A draw with
+  a texture matrix per vertex for texgen 3-7 would stay on the CPU. `PORT_CPU_VERTS=1` puts
+  everything back on the CPU (for comparisons). Draws are queued in batches of equal state, and the batches are
   uploaded with one Map per buffer at each frame-buffer copy or display, not one per batch.
 - **TEV.** The pixel shader is generated from the TEV registers (stage count, order, colour and
   alpha combiners with bias, scale, clamp and compare modes, constant colour selection, swap

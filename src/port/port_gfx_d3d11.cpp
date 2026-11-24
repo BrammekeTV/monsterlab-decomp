@@ -206,16 +206,20 @@ static std::string VsSource(u32 ngen) {
         + body + " return o; }\n";
 }
 
-// ---- GPU vertex path. Perspective draws whose matrices are the same for every vertex hand the vertex shader the
-// decoded attributes; it does the transform, lighting and texture-coordinate generation that DrawPrims does on the
-// CPU for the other draws, with the same arithmetic. What it needs from the XF registers is in a "record" per draw in
-// a buffer (sRecBuf, uint4s; floats as their bits), found through the vertex's record index:
+// ---- GPU vertex path. Draws hand the vertex shader the decoded attributes; it does the transform, lighting and
+// texture-coordinate generation that DrawPrims does on the CPU with PORT_CPU_VERTS=1, with the same arithmetic.
+// What it needs from the XF registers is in a "record" per draw in a buffer (sRecBuf, uint4s; floats as their bits),
+// found through the vertex's record index:
 //   0-2 position matrix rows, 3-5 normal matrix rows, 6 projection 0-3, 7 projection 4-5, light block, counts,
 //   8 colour/alpha channel controls (0x100E-0x1011), 9 material/ambient registers (0x100C-D, 0x100A-B),
 //   10-11 texgen words (0x1040+), 12-13 post-matrix words (0x1050+), 14 + 6t texgen t: its matrix rows, post matrix rows.
-//   Counts (row 7 w): channels, texgens << 4, post matrices on << 8.
+//   Counts (row 7 w): channels, texgens << 4, post matrices on << 8, matrix per vertex << 9, orthographic << 10,
+//   narrowed for widescreen (x * 3/4) << 11, texgen t (0-2) with a texture matrix per vertex << (12 + t). With a position
+//   matrix per vertex, row 0 x is the matrix block (xfMem 0x000-0x0FF as 64 rows, then the 32 normal matrices as 3 rows
+//   each) and the vertex flags hold the matrix index in bits 16-21; with a texture matrix per vertex, row 14 + 6t x is the
+//   block and the index is in the vertex: bits 20-25 (texgen 0), 26-31 (1) of the record word, flags bits 22-27 (2).
 // The light block (shared while the lights do not change): per light colour, position + a0, direction + a1, a2 k0 k1 k2.
-struct GpuVtx { f32 pos[3]; u32 rec; f32 nrm[3]; u32 flags; u32 c0, c1; f32 tc[8][2]; };   // flags: 1 normal, 2/4 colours, 8 << t coordinate t, bit 31 no position
+struct GpuVtx { f32 pos[3]; u32 rec; f32 nrm[3]; u32 flags; u32 c0, c1; f32 tc[8][2]; };   // flags: 1 normal, 2/4 colours, 8 << t coordinate t, 16-21 matrix index, bit 31 no position
 static const char kVsGpuBody[] =
     "Buffer<uint4> R : register(t0);\n"
     "float4 F(uint i) { return asfloat(R.Load(i)); }\n"
@@ -237,15 +241,18 @@ static const char kVsGpuBody[] =
     "VO main(VI i) {\n"
     "  VO o; o.pos = 0; o.c0 = 0; o.c1 = 0; float3 tc[8]; [unroll] for (uint z = 0; z < 8; z++) { tc[z] = float3(0, 0, 1); o.tc[z] = 0; }\n"
     "  float2 tin[8] = { TIN };\n"
-    "  float3 ipos = i.pw.xyz, inrm = i.nw.xyz; uint irec = asuint(i.pw.w), ifl = asuint(i.nw.w);\n"
+    "  float3 ipos = i.pw.xyz, inrm = i.nw.xyz; uint irec = asuint(i.pw.w) & 0xFFFFF, ifl = asuint(i.nw.w);\n"
     "  if (ifl & 0x80000000u) return o;\n"   // a vertex without a position: all zero
-    "  uint rb = irec; uint4 h7 = R.Load(rb + 7);\n"
-    "  float3 pos = M34(rb, float4(ipos, 1)); float3 nrm = float3(0, 0, 1);\n"
-    "  if (ifl & 1) { float3 n = float3(dot(F(rb + 3).xyz, inrm), dot(F(rb + 4).xyz, inrm), dot(F(rb + 5).xyz, inrm));\n"
+    "  uint rb = irec; uint4 h7 = R.Load(rb + 7); uint cnt = h7.w, pb = rb, nb = rb + 3;\n"
+    "  if (cnt & 0x200) { uint mb = R.Load(rb).x, pmi = (ifl >> 16) & 63; pb = mb + pmi; nb = mb + 64 + (pmi & 31) * 3; }\n"   // a matrix per vertex
+    "  float3 pos = M34(pb, float4(ipos, 1)); float3 nrm = float3(0, 0, 1);\n"
+    "  if (ifl & 1) { float3 n = float3(dot(F(nb).xyz, inrm), dot(F(nb + 1).xyz, inrm), dot(F(nb + 2).xyz, inrm));\n"
     "    float len = length(n); if (len > 0) n /= len; nrm = n; }\n"
-    "  float4 p6 = F(rb + 6); float2 p7 = asfloat(h7.xy); float w = -pos.z;\n"
-    "  o.pos = float4(p6.x * pos.x + p6.y * pos.z, p6.z * pos.y + p6.w * pos.z, (p7.x * pos.z + p7.y) + w, w);\n"
-    "  uint lb = h7.z, nc = h7.w & 15, ng = (h7.w >> 4) & 15, postOn = (h7.w >> 8) & 1;\n"
+    "  float4 p6 = F(rb + 6); float2 p7 = asfloat(h7.xy);\n"
+    "  if (cnt & 0x400) o.pos = float4(p6.x * pos.x + p6.y, p6.z * pos.y + p6.w, (p7.x * pos.z + p7.y) + 1.0, 1.0);\n"   // orthographic
+    "  else { float w = -pos.z; o.pos = float4(p6.x * pos.x + p6.y * pos.z, p6.z * pos.y + p6.w * pos.z, (p7.x * pos.z + p7.y) + w, w); }\n"
+    "  if (cnt & 0x800) o.pos.x *= 0.75;\n"   // widescreen: a 2D draw keeps its shape
+    "  uint lb = h7.z, nc = cnt & 15, ng = (cnt >> 4) & 15, postOn = (cnt >> 8) & 1;\n"
     "  uint4 cw = R.Load(rb + 8), rg = R.Load(rb + 9);\n"
     "  float4 col[2]; col[0] = nc == 0 ? float4(1, 1, 1, 1) : float4(0, 0, 0, 0); col[1] = float4(0, 0, 0, 0);\n"
     "  [unroll] for (uint c = 0; c < 2; c++) { if (c >= nc) continue;\n"
@@ -263,8 +270,9 @@ static const char kVsGpuBody[] =
     "    float4 src = float4(0, 0, 1, 1);\n"
     "    if (row == 0) src.xyz = ipos; else if (row == 1) { if (ifl & 1) src.xyz = inrm; }\n"
     "    else if (row >= 5 && row <= 12) { if (ifl & (8u << (row - 5))) src.xy = tin[row - 5]; }\n"
-    "    uint mb = rb + 14 + t * 6;\n"
-    "    float3 r = M34(mb, src); if (!(gen & 2)) r.z = 1.0;\n"
+    "    uint mb = rb + 14 + t * 6, mrow = mb;\n"
+    "    if (cnt & (0x1000u << t)) { uint ti = t == 0 ? asuint(i.pw.w) >> 20 : t == 1 ? asuint(i.pw.w) >> 26 : ifl >> 22; mrow = R.Load(mb).x + (ti & 63); }\n"   // a texture matrix per vertex
+    "    float3 r = M34(mrow, src); if (!(gen & 2)) r.z = 1.0;\n"
     "    if (postOn) { float3 v = r; if (posts[t] & 0x100) { float l = length(v); if (l > 0) v /= l; } r = M34(mb + 3, float4(v, 1)); }\n"
     "    tc[t] = float3(r.xy, r.z != 0 ? r.z : 1.0); }\n"
     "  [unroll] for (uint u = 0; u < 8; u++) o.tc[u] = tc[u];\n"
@@ -311,9 +319,21 @@ static bool sMovieOff;                 // PORT_NO_MOVIE_TARGET=1: draw movies st
 struct PendingState { bool movie; u32 vfmt, pcSerial; PsConst pc; OutKey out; ID3D11PixelShader* ps; ID3D11ShaderResourceView* srv[8]; ID3D11SamplerState* smp[8]; };
 static PendingState sPend;
 static u32 sPendCount;                                      // GX draws queued
-static std::vector<u8> sBV;                                 // the queued vertices: position, two colours and ngen texture coordinates each
+// A growing array whose resize leaves the new elements as they are (std::vector clears them: a few MB a frame).
+template <class T> struct RawBuf {
+    T* p = NULL; size_t n = 0, cap = 0;
+    size_t size() const { return n; }
+    void clear() { n = 0; }
+    T* data() { return p; }
+    T& operator[](size_t i) { return p[i]; }
+    void resize(size_t m) {
+        if (m > cap) { size_t c = std::max(m, cap * 2); T* q = (T*)realloc(p, c * sizeof(T)); if (!q) abort(); p = q; cap = c; }
+        n = m;
+    }
+};
+static RawBuf<u8> sBV;                                      // the queued vertices: position, two colours and ngen texture coordinates each
 static u32 sBVCount;                                        // vertices in the open batch
-static std::vector<u16> sBI;                                // the queued indices (each batch's from 0)
+static RawBuf<u16> sBI;                                      // the queued indices (each batch's from 0)
 static u32 sBatchVb, sBatchIdx;                             // where the open batch starts in sBV and sBI
 // Batches closed but not drawn yet: FlushDraws uploads all their vertices, indices and records with one Map each
 // (a Map costs more than the draws of a small batch) and then draws them in order.
@@ -843,7 +863,7 @@ static f32 Component(const u8* p, u32 fmt, u32 shift, BOOL be) {
     }
 }
 
-static u32 ColourU32(const u8* p, u32 fmt, BOOL be) {    // r, g, b, a in the bytes from low to high
+static inline u32 ColourU32(const u8* p, u32 fmt, BOOL be) {    // r, g, b, a in the bytes from low to high
     u32 r, g, b, a = 255;
     if (fmt == 0 || fmt == 3) {
         u32 c = be ? Be16(p) : *(const u16*)p;
@@ -941,18 +961,39 @@ static u32  sRecUsed;                                       // uint4s in sRecBuf
 static BOOL sRecDiscard = TRUE;                             // the next upload starts the buffer over
 static u32  sRecLights = ~0u, sRecLast = ~0u, sRecLastN;    // the last light block and record (reused while unchanged)
 static u32  sRecLightGen;                                   // PortGx::xfLightGen when the light block was made
+static u32  sRecMtx = ~0u, sRecMtxGen;                      // the last matrix block (draws with a matrix per vertex) and PortGx::xfMtxGen then
 static u32  sRecLastW[4 * (14 + 6 * 8)];
 static void RecReserve(u32 n) {
     if (sRecUsed + (u32)sRec.size() / 4 + n <= REC_U4) return;
     FlushDraws();
-    sRec.clear(); sRecUsed = 0; sRecDiscard = TRUE; sRecLights = sRecLast = ~0u;
+    sRec.clear(); sRecUsed = 0; sRecDiscard = TRUE; sRecLights = sRecLast = sRecMtx = ~0u;
 }
 static u32 RecAlloc(u32 n) { u32 at = sRecUsed + (u32)sRec.size() / 4; sRec.resize(sRec.size() + (size_t)n * 4); return at; }
 
 // The record of a GPU draw (layout above GpuVtx): its matrices and the XF registers the vertex shader reads.
-static u32 GpuRecord(const PortGx* g, BOOL lit, u32 numChans, u32 numGens, const f32* proj, const u32* midx) {
+// `extra`: the count bits 9-11 (matrix per vertex, orthographic, narrowed).
+static u32 GpuRecord(const PortGx* g, BOOL lit, u32 numChans, u32 numGens, const f32* proj, const u32* midx, u32 extra) {
+    // Nothing the record is made of changed since the last one (no XF write, same matrix indices and kind): the same record.
+    static u32 kXfGen, kMidx0, kMidx1, kKind;
+    const u32 kind = extra | numChans | numGens << 4 | (lit ? 1u << 31 : 0);
+    if (sRecLast != ~0u && kXfGen == g->xfGen && kMidx0 == midx[0] && kMidx1 == midx[1] && kKind == kind) return sRecLast;
+    kXfGen = g->xfGen; kMidx0 = midx[0]; kMidx1 = midx[1]; kKind = kind;
     const u32 n = 14 + 6 * numGens;
-    RecReserve(32 + n);
+    RecReserve(32 + 160 + n);
+    u32 mb = 0;
+    if (extra & 0x7200) {                                    // the matrix block: all position/texture matrices and the normal matrices
+        if (sRecMtx == ~0u || sRecMtxGen != g->xfMtxGen) {
+            sRecMtxGen = g->xfMtxGen;
+            sRecMtx = RecAlloc(160);
+            u32* w = &sRec[sRec.size() - 640];
+            memcpy(w, g->xfMem, 256 * 4);
+            for (u32 m = 0; m < 32; m++) for (u32 r = 0; r < 3; r++) {
+                u32* row = w + 256 + (m * 3 + r) * 4;
+                memcpy(row, &g->xfMem[0x400 + m * 3 + r * 3], 12); row[3] = 0;
+            }
+        }
+        mb = sRecMtx;
+    }
     u32 lb = 0;
     if (lit) {
         if (sRecLights == ~0u || sRecLightGen != g->xfLightGen) {
@@ -974,18 +1015,22 @@ static u32 GpuRecord(const PortGx* g, BOOL lit, u32 numChans, u32 numGens, const
     }
     u32 r[4 * (14 + 6 * 8)];
     memset(r, 0, (size_t)n * 16);
-    const u32 pm = midx[0] & 63;
-    memcpy(r, &g->xfMem[pm * 4], 48);
-    const f32* nm = &g->xfMem[0x400 + pm % 32 * 3];
-    for (u32 k = 0; k < 3; k++) memcpy(r + 12 + k * 4, nm + k * 3, 12);
+    if (extra & 0x200) r[0] = mb;
+    else {
+        const u32 pm = midx[0] & 63;
+        memcpy(r, &g->xfMem[pm * 4], 48);
+        const f32* nm = &g->xfMem[0x400 + pm % 32 * 3];
+        for (u32 k = 0; k < 3; k++) memcpy(r + 12 + k * 4, nm + k * 3, 12);
+    }
     memcpy(r + 24, proj, 24);
-    r[30] = lb; r[31] = numChans | numGens << 4 | (g->xf[0x12] & 1) << 8;
+    r[30] = lb; r[31] = numChans | numGens << 4 | (g->xf[0x12] & 1) << 8 | extra;
     r[32] = g->xf[0x0E]; r[33] = g->xf[0x0F]; r[34] = g->xf[0x10]; r[35] = g->xf[0x11];
     r[36] = g->xf[0x0C]; r[37] = g->xf[0x0D]; r[38] = g->xf[0x0A]; r[39] = g->xf[0x0B];
     for (u32 t = 0; t < 8; t++) { r[40 + t] = g->xf[0x40 + t]; r[48 + t] = g->xf[0x50 + t]; }
     for (u32 t = 0; t < numGens; t++) {
         u32 mi = t < 4 ? (midx[0] >> (6 + t * 6)) & 63 : (midx[1] >> ((t - 4) * 6)) & 63;
-        memcpy(r + (14 + 6 * t) * 4, &g->xfMem[mi * 4], 48);
+        if (extra & (0x1000u << t)) r[(14 + 6 * t) * 4] = mb;
+        else memcpy(r + (14 + 6 * t) * 4, &g->xfMem[mi * 4], 48);
         memcpy(r + (17 + 6 * t) * 4, &g->xfMem[0x500 + (g->xf[0x50 + t] & 63) * 4], 48);
     }
     if (sRecLast != ~0u && sRecLastN == n && !memcmp(sRecLastW, r, (size_t)n * 16)) return sRecLast;
@@ -1004,6 +1049,33 @@ static inline f32 CompScaled(const u8* p, u32 fmt, f32 scale, BOOL be) {   // Co
     }
 }
 
+// The GPU path's attribute decoders, one per format, component count and byte order (positions, normals and texture
+// coordinates: N floats; colours, N = 0: the packed RGBA word). `scale` is 1 / 2^shift.
+typedef void (*DecFn)(const u8* p, f32 scale, u8* out);
+template <u32 FMT, bool BE> static inline f32 DecOne(const u8* p, f32 scale) {
+    if (FMT == 0) return (f32)p[0] * scale;
+    if (FMT == 1) return (f32)(s8)p[0] * scale;
+    if (FMT == 2) return (f32)(BE ? Be16(p) : *(const u16*)p) * scale;
+    if (FMT == 3) return (f32)(s16)(BE ? Be16(p) : *(const u16*)p) * scale;
+    if (BE) return BeF32(p);
+    f32 f; memcpy(&f, p, 4); return f;
+}
+template <u32 FMT, u32 N, bool BE> static void Dec(const u8* p, f32 scale, u8* out) {
+    const u32 e = FMT <= 1 ? 1 : FMT <= 3 ? 2 : 4;
+    f32 d[3];
+    for (u32 c = 0; c < N; c++) d[c] = DecOne<FMT, BE>(p + c * e, scale);
+    memcpy(out, d, N * 4);
+}
+template <u32 FMT, bool BE> static void DecCol(const u8* p, f32, u8* out) { u32 c = ColourU32(p, FMT, BE); memcpy(out, &c, 4); }
+static DecFn DecPick(u32 fmt, u32 comps, BOOL be) {
+    static const DecFn kCol[2][6] = {{DecCol<0, false>, DecCol<1, false>, DecCol<2, false>, DecCol<3, false>, DecCol<4, false>, DecCol<5, false>},
+                                     {DecCol<0, true>, DecCol<1, true>, DecCol<2, true>, DecCol<3, true>, DecCol<4, true>, DecCol<5, true>}};
+#define DEC_ROW(F) {{Dec<F, 1, false>, Dec<F, 2, false>, Dec<F, 3, false>}, {Dec<F, 1, true>, Dec<F, 2, true>, Dec<F, 3, true>}}
+    static const DecFn kTab[5][2][3] = {DEC_ROW(0), DEC_ROW(1), DEC_ROW(2), DEC_ROW(3), DEC_ROW(4)};
+#undef DEC_ROW
+    if (!comps) return kCol[be ? 1 : 0][fmt > 5 ? 5 : fmt];
+    return kTab[fmt > 4 ? 4 : fmt][be ? 1 : 0][comps > 3 ? 2 : comps - 1];
+}
 static void DrawPrims(const PortGx* g, u32 prim, const PortGxLayout* L, u32 count, const u8* data) {
     if (!sStarted || count == 0) return;
     if (prim >= 0xA8) { sGfxStats.skipped++; return; }     // lines and points: not drawn yet
@@ -1027,11 +1099,12 @@ static void DrawPrims(const PortGx* g, u32 prim, const PortGxLayout* L, u32 coun
     for (u32 c = 0; c < numChans && c < 2; c++) lit |= ((g->xf[0x0E + c] | g->xf[0x10 + c]) & 2) != 0;
     // to a triangle list (indices into the vertices, which are uploaded once; written into the batch below)
     if (!(prim == 0x80 ? count >= 4 : (prim == 0x90 || prim == 0x98 || prim == 0xA0) && count >= 3) || count > VB_VERTS) { sGfxStats.skipped++; return; }
-    // Perspective draws with one set of matrices for all their vertices are transformed and lit by the vertex shader; 2D
-    // (orthographic) draws stay on the CPU, which needs their final positions for widescreen, and so do draws that pick
-    // matrices per vertex.
-    BOOL gpu = sGpuVerts && !ortho && numGens <= 8 && !L->attr[0].mode;
-    for (u32 t = 0; gpu && t < numGens; t++) if (L->attr[1 + t].mode) gpu = FALSE;
+    // Draws are transformed and lit by the vertex shader, also those with a position matrix per vertex (skinned meshes;
+    // the record then has all the matrices), and those with a texture matrix per vertex for texgens 0-2.
+    BOOL gpu = sGpuVerts && numGens <= 8;
+    u32 tmVtx = 0;                                          // texgens with a texture matrix per vertex
+    for (u32 t = 0; t < numGens && t < 8; t++) if (L->attr[1 + t].mode) tmVtx |= 1u << t;
+    if (tmVtx & ~7u) gpu = FALSE;
     u32 rec = 0, ntc = 0;
     if (gpu) {
         for (u32 t = 0; t < 8; t++) if (L->attr[13 + t].mode) ntc = t + 1;
@@ -1042,15 +1115,43 @@ static void DrawPrims(const PortGx* g, u32 prim, const PortGxLayout* L, u32 coun
     // Per draw, not per vertex: where each array attribute's data is, and the attributes the vertex format has.
     const u8* arrBase[21] = {}; u32 arrStride[21] = {}; BOOL arrBe[21] = {};
     u32 active[12], nActive = 0;
+    static u32 cArrAddr[21], cArrEpoch[21]; static const u8* cArrPtr[21]; static BOOL cArrBe[21];   // the last lookup per array (once a frame)
     for (u32 a = 9; a < 21; a++) {
         if (!L->attr[a].mode) continue;
         if (L->attr[a].mode >= 2) {
-            arrBase[a] = PortGxHostPtr(g->cp[0xA0 + (a - 9)]);
+            const u32 addr = g->cp[0xA0 + (a - 9)];
+            if (cArrEpoch[a] != sTexGen || cArrAddr[a] != addr) {
+                cArrEpoch[a] = sTexGen; cArrAddr[a] = addr;
+                cArrPtr[a] = PortGxHostPtr(addr);
+                cArrBe[a] = cArrPtr[a] && PortIsSectionData(cArrPtr[a]);   // a mesh's arrays are file data; arrays the game builds are in host order
+            }
+            arrBase[a] = cArrPtr[a];
             if (!arrBase[a]) continue;
             arrStride[a] = g->cp[0xB0 + (a - 9)] & 0xFF;
-            arrBe[a] = PortIsSectionData(arrBase[a]);       // a mesh's arrays are file data; arrays the game builds are in host order
+            arrBe[a] = cArrBe[a];
         }
         active[nActive++] = a;
+    }
+    // Where a 2D draw lands on the screen (clip x, y), for the widescreen and movie decisions below: worked out from the
+    // positions alone for a GPU draw.
+    f32 bnd[4] = {0, 0, 0, 0};                              // lowest x, highest x, lowest y, highest y
+    const BOOL movieShape = ortho && prim == 0x80 && count == 4 && ((g->bp[0x00] >> 16) & 7) >= 3;
+    const BOOL wideCheck = ortho && gPortSettings.wide && !gPortSettings.stretchUi;
+    if (gpu && (movieShape || wideCheck) && L->attr[9].mode) {
+        const PortGxAttr& at = L->attr[9];
+        const u8* d = data;
+        for (u32 n = 0; n < count; n++, d += L->size) {
+            const u8* p = d + at.offset;
+            BOOL be = TRUE;
+            if (at.mode >= 2) { if (!arrBase[9]) break; p = arrBase[9] + (at.mode == 2 ? p[0] : Be16(p)) * arrStride[9]; be = arrBe[9]; }
+            f32 v[4] = {0, 0, 0, 1};
+            for (u32 k = 0; k < at.comps && k < 3; k++) v[k] = Component(p + k * at.elem, at.fmt, at.shift, be);
+            const u32 pm = L->attr[0].mode ? d[L->attr[0].offset] : (midx[0] & 63);
+            f32 q[3]; Mul34(&g->xfMem[(pm & 63) * 4], v, q);
+            const f32 x = proj[0] * q[0] + proj[1], y = proj[2] * q[1] + proj[3];
+            if (!n) { bnd[0] = bnd[1] = x; bnd[2] = bnd[3] = y; }
+            else { bnd[0] = std::min(bnd[0], x); bnd[1] = std::max(bnd[1], x); bnd[2] = std::min(bnd[2], y); bnd[3] = std::max(bnd[3], y); }
+        }
     }
     if (!gpu)
     for (u32 n = 0; n < count; n++, data += L->size) {
@@ -1139,14 +1240,16 @@ static void DrawPrims(const PortGx* g, u32 prim, const PortGxLayout* L, u32 coun
     // planes. That only works when a pixel is a texel (the offset table and the plane are read for the same console pixel), which
     // is lost at any other size: a pixel centre that lies on the edge of a block of 8 reads a texel off, a thin line. It is drawn
     // at the console's size, 640x480, and the picture is scaled into the frame buffer.
-    bool movie = false;
-    if (ortho && prim == 0x80 && count == 4 && ((g->bp[0x00] >> 16) & 7) >= 3) {
-        f32 lox = sVerts[0].pos[0], hix = lox, loy = sVerts[0].pos[1], hiy = loy;
-        for (u32 n = 1; n < 4; n++) { lox = std::min(lox, sVerts[n].pos[0]); hix = std::max(hix, sVerts[n].pos[0]); loy = std::min(loy, sVerts[n].pos[1]); hiy = std::max(hiy, sVerts[n].pos[1]); }
-        movie = lox <= -0.98f && hix >= 0.98f && loy <= -0.98f && hiy >= 0.98f && !sMovieOff;
+    if (!gpu && (movieShape || wideCheck)) {
+        bnd[0] = bnd[1] = sVerts[0].pos[0]; bnd[2] = bnd[3] = sVerts[0].pos[1];
+        for (u32 n = 1; n < count; n++) {
+            bnd[0] = std::min(bnd[0], sVerts[n].pos[0]); bnd[1] = std::max(bnd[1], sVerts[n].pos[0]);
+            bnd[2] = std::min(bnd[2], sVerts[n].pos[1]); bnd[3] = std::max(bnd[3], sVerts[n].pos[1]);
+        }
     }
+    bool movie = movieShape && bnd[0] <= -0.98f && bnd[1] >= 0.98f && bnd[2] <= -0.98f && bnd[3] >= 0.98f && !sMovieOff;
     f32 squeeze = 1.0f;
-    if (ortho && gPortSettings.wide && !gPortSettings.stretchUi && count) {
+    if (wideCheck) {
         BOOL whole = FALSE, picture = FALSE;
         for (u32 m = 0; m < 8; m++) {
             if (!(texUsed & (1u << m))) continue;
@@ -1154,17 +1257,13 @@ static void DrawPrims(const PortGx* g, u32 prim, const PortGxLayout* L, u32 coun
             if (sEfbCopies.count((g->bp[base + 0x14] & 0xFFFFFF) << 5)) whole = TRUE;
             else if ((g->bp[base + 8] & 0x3FF) + 1 >= 320) picture = TRUE;
         }
-        if (!whole && !picture) {
-            f32 lo = sVerts[0].pos[0], hi = lo;
-            for (u32 n = 1; n < count; n++) { lo = std::min(lo, sVerts[n].pos[0]); hi = std::max(hi, sVerts[n].pos[0]); }
-            if (lo <= -0.98f && hi >= 0.98f) whole = TRUE;
-        }
+        if (!whole && !picture && bnd[0] <= -0.98f && bnd[1] >= 0.98f) whole = TRUE;
         if (!whole) {
             squeeze = 0.75f;
-            for (u32 n = 0; n < count; n++) sVerts[n].pos[0] *= squeeze;
+            if (!gpu) for (u32 n = 0; n < count; n++) sVerts[n].pos[0] *= squeeze;
         }
     }
-    if (gpu) rec = GpuRecord(g, lit, numChans, numGens, proj, midx);
+    if (gpu) rec = GpuRecord(g, lit, numChans, numGens, proj, midx, (L->attr[0].mode ? 0x200 : 0) | (ortho ? 0x400 : 0) | (squeeze != 1.0f ? 0x800 : 0) | tmVtx << 12);
     if (sTrace) {
         static const Vtx kNone = {};
         const Vtx& v = gpu ? kNone : sVerts[0];             // (a GPU draw's vertices are made by the vertex shader: logged as zero)
@@ -1261,7 +1360,7 @@ static void DrawPrims(const PortGx* g, u32 prim, const PortGxLayout* L, u32 coun
         if (gpu) {
             // The vertex shader does the rest: the attributes go into the queue as they are given (GpuVtx).
             u8* dst = &sBV[at];
-            struct AP { const u8* base; u32 arrStride, off, mode, fmt, comps, elem, dst; BOOL be; f32 scale; };
+            struct AP { const u8* base; u32 arrStride, off, mode, fmt, comps, elem, dst; BOOL be; f32 scale; DecFn fn; };
             AP ap[12];
             u32 nap = 0, fl = 0;
             BOOL hasPos = FALSE;
@@ -1277,23 +1376,36 @@ static void DrawPrims(const PortGx* g, u32 prim, const PortGxLayout* L, u32 coun
                 else if (a <= 12) { q.dst = 32 + (a - 11) * 4; q.comps = 0; fl |= 2u << (a - 11); }
                 else { q.dst = 40 + (a - 13) * 8; q.comps = ga.comps > 2 ? 2 : ga.comps; fl |= 8u << (a - 13); }
                 q.scale = 1.0f / (f32)(1u << (shift & 31));
+                q.fn = DecPick(q.fmt, q.comps, q.be);
             }
             u8* o = dst;
-            memset(o, 0, (size_t)count * stride);
             if (!hasPos) {                                      // no position: nothing is drawn (as on the CPU path)
+                memset(o, 0, (size_t)count * stride);
                 const u32 none = 0x80000000u;
                 for (u32 n = 0; n < count; n++) memcpy(o + (size_t)n * stride + 28, &none, 4);
             } else {
+                // (the shader reads only what the flags say is there: the rest is not cleared; a position with two
+                // components gets z = 0, a texture coordinate with one t = 0)
+                for (u32 k = 0; k < nap; k++) {
+                    const AP& q = ap[k];
+                    const u32 want = q.dst == 0 ? 3 : q.dst >= 40 ? 2 : q.comps;
+                    for (u32 c = q.comps; c < want; c++) for (u32 n = 0; n < count; n++) memset(o + (size_t)n * stride + q.dst + c * 4, 0, 4);
+                }
+                const u32 pmOff = L->attr[0].mode ? L->attr[0].offset : ~0u;
                 for (u32 n = 0; n < count; n++, data += L->size, o += stride) {
-                    memcpy(o + 12, &rec, 4); memcpy(o + 28, &fl, 4);
+                    u32 vfl = pmOff != ~0u ? fl | (data[pmOff] & 63u) << 16 : fl, vrec = rec;
+                    if (tmVtx) {
+                        if (tmVtx & 1) vrec |= (data[L->attr[1].offset] & 63u) << 20;
+                        if (tmVtx & 2) vrec |= (data[L->attr[2].offset] & 63u) << 26;
+                        if (tmVtx & 4) vfl |= (data[L->attr[3].offset] & 63u) << 22;
+                    }
+                    memcpy(o + 12, &vrec, 4); memcpy(o + 28, &vfl, 4);
                     for (u32 k = 0; k < nap; k++) {
                         const AP& q = ap[k];
                         const u8* p = data + q.off;
                         BOOL be = TRUE;
                         if (q.mode >= 2) { u32 index = q.mode == 2 ? p[0] : Be16(p); p = q.base + index * q.arrStride; be = q.be; }
-                        if (!q.comps) { u32 c = ColourU32(p, q.fmt, be); memcpy(o + q.dst, &c, 4); continue; }
-                        f32* d = (f32*)(o + q.dst);
-                        for (u32 c = 0; c < q.comps; c++) d[c] = CompScaled(p + c * q.elem, q.fmt, q.scale, be);
+                        q.fn(p, q.scale, o + q.dst);
                     }
                 }
             }
@@ -2007,7 +2119,7 @@ BOOL PortGfxStart(BOOL window) {
             ok = SUCCEEDED(sDev->CreateBuffer(&rd, NULL, &sRecBuf)) && SUCCEEDED(sDev->CreateShaderResourceView(sRecBuf, &sv, &sRecSrv));
         }
         sGpuVerts = ok;
-        PortLog("gfx: vertex transform and lighting on the %s", ok ? "GPU (perspective draws)" : "CPU");
+        PortLog("gfx: vertex transform and lighting on the %s", ok ? "GPU" : "CPU");
     }
 
     D3D11_BUFFER_DESC bd = {};
