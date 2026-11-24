@@ -13,6 +13,7 @@ typedef struct PortMod {
     char name[64];            // the folder's name
     BOOL enabled;
     BOOL present;             // the folder is there (a mod listed in the ini may be gone)
+    u32  fileCount;           // disc files under its files folder (counted by the scan)
 } PortMod;
 
 extern PortMod gPortMods[PORT_MAX_MODS];   // in load order
@@ -24,6 +25,8 @@ void PortModsSetDir(const char* dir);
 PortMod* PortModsAdd(const char* name, BOOL enabled);
 // Looks at the mods folder: marks the listed mods that are there, appends new folders (switched on).
 void PortModsScan(void);
+// Moves the mod at index one place up (dir -1) or down (dir 1) in the load order; FALSE at the end of the list.
+BOOL PortModsMove(int index, int dir);
 // The host path of the file that replaces this disc file, from the last enabled mod that has it.
 BOOL PortModsFindFile(const char* discPath, char* host, u32 n, const char** modName);
 // Logs every file each enabled mod replaces (--verbose).

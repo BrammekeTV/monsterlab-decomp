@@ -1,5 +1,5 @@
 // PC platform layer: the settings screen (F1 or Esc), built with Dear ImGui inside the overlay's
-// frame (port_overlay.cpp). Pages: display, audio, controls. While it is open the keyboard and the
+// frame (port_overlay.cpp). Pages: display, audio, controls, game, mods. While it is open the keyboard and the
 // mouse go to it and not to the game (port_input.cpp checks gPortGuiOpen). Closing it, or Save,
 // writes monsterlab.ini (port_settings.cpp).
 #ifdef _WIN32
@@ -10,6 +10,7 @@
 #include "imgui.h"
 #include "port/port.h"
 #include "port/port_input.h"
+#include "port/port_mods.h"
 #include "port/port_overlay.h"
 
 HWND PortGfxWindow(void);
@@ -59,6 +60,57 @@ static void PageGame(void) {
     if (verdict[0]) ImGui::TextColored(good ? ImVec4(0.45f, 0.9f, 0.45f, 1.0f) : ImVec4(1.0f, 0.7f, 0.3f, 1.0f), "%s", verdict);
     if (verdict[0] && good) ImGui::TextDisabled("It is used when the game is started again.");
     ImGui::PopTextWrapPos();
+}
+
+// The mods folder's mods in load order: switch one on or off, move it up or down. Saved at once; a
+// file the game opens from now on comes from the new list (what is loaded already stays until it is loaded again).
+static void PageMods(void) {
+    static BOOL scanned;
+    if (!scanned) { scanned = TRUE; if (!gPortOptions.noMods) PortModsScan(); }
+    ImGui::PushTextWrapPos(0.0f);
+    ImGui::Text("Mods folder: %s", PortModsDir());
+    if (gPortOptions.noMods) ImGui::TextColored(ImVec4(1.0f, 0.7f, 0.3f, 1.0f), "Started with --no-mods: no mod is used in this run.");
+    ImGui::PopTextWrapPos();
+    if (ImGui::Button("Look again")) PortModsScan();
+    ImGui::SameLine();
+    ImGui::TextDisabled("A mod lower in the list wins over the ones above it.");
+    if (!gPortModCount) { ImGui::Spacing(); ImGui::TextDisabled("No mods. Put a mod's folder into the mods folder (docs/modding.md)."); return; }
+    BOOL changed = FALSE;
+    int move = -1, dir = 0;
+    if (ImGui::BeginTable("mods", 4, ImGuiTableFlags_RowBg | ImGuiTableFlags_BordersInnerH | ImGuiTableFlags_ScrollY)) {
+        ImGui::TableSetupColumn("On", ImGuiTableColumnFlags_WidthFixed);
+        ImGui::TableSetupColumn("Mod", ImGuiTableColumnFlags_WidthStretch);
+        ImGui::TableSetupColumn("Replaces", ImGuiTableColumnFlags_WidthFixed);
+        ImGui::TableSetupColumn("Order", ImGuiTableColumnFlags_WidthFixed);
+        ImGui::TableSetupScrollFreeze(0, 1);
+        ImGui::TableHeadersRow();
+        for (int i = 0; i < gPortModCount; i++) {
+            PortMod* m = &gPortMods[i];
+            ImGui::PushID(i);
+            ImGui::TableNextRow();
+            ImGui::TableNextColumn();
+            bool on = m->enabled != 0;
+            if (ImGui::Checkbox("##on", &on)) { m->enabled = on; changed = TRUE; }
+            ImGui::TableNextColumn();
+            ImGui::AlignTextToFramePadding();
+            if (m->present) ImGui::TextUnformatted(m->name);
+            else ImGui::TextDisabled("%s (folder not found)", m->name);
+            ImGui::TableNextColumn();
+            if (m->present) ImGui::Text("%u file%s", m->fileCount, m->fileCount == 1 ? "" : "s");
+            ImGui::TableNextColumn();
+            ImGui::BeginDisabled(i == 0);
+            if (ImGui::ArrowButton("##up", ImGuiDir_Up)) { move = i; dir = -1; }
+            ImGui::EndDisabled();
+            ImGui::SameLine();
+            ImGui::BeginDisabled(i == gPortModCount - 1);
+            if (ImGui::ArrowButton("##down", ImGuiDir_Down)) { move = i; dir = 1; }
+            ImGui::EndDisabled();
+            ImGui::PopID();
+        }
+        ImGui::EndTable();
+    }
+    if (move >= 0 && PortModsMove(move, dir)) changed = TRUE;
+    if (changed) Save();
 }
 
 static void Save(void) {
@@ -311,6 +363,7 @@ void PortGuiBuild(u32 w, u32 h) {
                 if (ImGui::BeginTabItem("Audio", NULL, page == 1 ? ImGuiTabItemFlags_SetSelected : 0)) { PageAudio(); ImGui::EndTabItem(); }
                 if (ImGui::BeginTabItem("Controls", NULL, page == 2 ? ImGuiTabItemFlags_SetSelected : 0)) { PageControls(); ImGui::EndTabItem(); }
                 if (ImGui::BeginTabItem("Game", NULL, page == 3 ? ImGuiTabItemFlags_SetSelected : 0)) { PageGame(); ImGui::EndTabItem(); }
+                if (ImGui::BeginTabItem("Mods", NULL, page == 4 ? ImGuiTabItemFlags_SetSelected : 0)) { PageMods(); ImGui::EndTabItem(); }
                 ImGui::EndTabBar();
             }
         }

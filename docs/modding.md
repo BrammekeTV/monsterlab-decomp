@@ -43,6 +43,13 @@ OldMod = 0
 - A folder that is not in the list yet is added at the end, switched on, the next time the game starts.
 - A mod in the list whose folder is gone is skipped.
 
+## The Mods page
+
+The settings screen (F1 or Esc in the game's window) has a **Mods** page: a tick box switches a mod on or
+off and the arrows move it up or down in the load order. A change is written to `monsterlab.ini` at once
+and counts for every file the game opens from then on; a file that is loaded already stays as it is until
+the game loads it again (a level change, or a restart for the files read at the start).
+
 ## Command line
 
 | Option | Effect |

@@ -50,8 +50,10 @@ PortMod* PortModsAdd(const char* name, BOOL enabled) {
     return m;
 }
 
+static u32 WalkTree(const PortMod* m, const char* dir, const char* rel);
+
 void PortModsScan(void) {
-    for (int i = 0; i < gPortModCount; i++) gPortMods[i].present = FALSE;
+    for (int i = 0; i < gPortModCount; i++) { gPortMods[i].present = FALSE; gPortMods[i].fileCount = 0; }
     char pattern[MAX_PATH + 8];
     snprintf(pattern, sizeof(pattern), "%s\\*", PortModsDir());
     WIN32_FIND_DATAA fd;
@@ -63,14 +65,27 @@ void PortModsScan(void) {
         for (int i = 0; i < gPortModCount && !m; i++)
             if (!_stricmp(gPortMods[i].name, fd.cFileName)) m = &gPortMods[i];
         if (!m) m = PortModsAdd(fd.cFileName, TRUE);       // a folder dropped in is on until switched off
-        if (m) m->present = TRUE;
+        if (m) {
+            m->present = TRUE;
+            char dir[MAX_PATH];
+            m->fileCount = (u32)snprintf(dir, sizeof(dir), "%s\\%s\\files", PortModsDir(), m->name) < sizeof(dir) ? WalkTree(NULL, dir, "") : 0;
+        }
     } while (FindNextFileA(h, &fd));
     FindClose(h);
 }
 
+BOOL PortModsMove(int index, int dir) {
+    int other = index + (dir < 0 ? -1 : 1);
+    if (index < 0 || index >= gPortModCount || other < 0 || other >= gPortModCount) return FALSE;
+    PortMod t = gPortMods[index];
+    gPortMods[index] = gPortMods[other];
+    gPortMods[other] = t;
+    return TRUE;
+}
+
 BOOL PortModsFindFile(const char* discPath, char* host, u32 n, const char** modName) {
     while (*discPath == '/' || *discPath == '\\') discPath++;
-    if (!*discPath || strstr(discPath, "..")) return FALSE;
+    if (gPortOptions.noMods || !*discPath || strstr(discPath, "..")) return FALSE;
     for (int i = gPortModCount - 1; i >= 0; i--) {
         const PortMod* m = &gPortMods[i];
         if (!m->enabled || !m->present) continue;
@@ -84,8 +99,8 @@ BOOL PortModsFindFile(const char* discPath, char* host, u32 n, const char** modN
     return FALSE;
 }
 
-// Every file under dir (a mod's files folder), as its disc path.
-static u32 LogTree(const PortMod* m, const char* dir, const char* rel) {
+// Every file under dir (a mod's files folder), as its disc path: counted, and logged for a mod m.
+static u32 WalkTree(const PortMod* m, const char* dir, const char* rel) {
     char pattern[MAX_PATH + 8];
     if ((u32)snprintf(pattern, sizeof(pattern), "%s\\*", dir) >= sizeof(pattern)) return 0;
     WIN32_FIND_DATAA fd;
@@ -97,27 +112,29 @@ static u32 LogTree(const PortMod* m, const char* dir, const char* rel) {
         char sub[MAX_PATH], subRel[MAX_PATH];
         if ((u32)snprintf(sub, sizeof(sub), "%s\\%s", dir, fd.cFileName) >= sizeof(sub)) continue;
         snprintf(subRel, sizeof(subRel), "%s%s%s", rel, rel[0] ? "/" : "", fd.cFileName);
-        if (fd.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY) { count += LogTree(m, sub, subRel); continue; }
+        if (fd.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY) { count += WalkTree(m, sub, subRel); continue; }
+        count++;
+        if (!m) continue;
         // Shadowed when a later mod has the file too.
         char host[MAX_PATH];
         const char* winner = NULL;
         PortModsFindFile(subRel, host, sizeof(host), &winner);
         if (winner && _stricmp(winner, m->name)) PortLog("mods: %s has %s, but %s comes later and wins", m->name, subRel, winner);
         else PortLog("mods: %s replaces %s", m->name, subRel);
-        count++;
     } while (FindNextFileA(h, &fd));
     FindClose(h);
     return count;
 }
 
 void PortModsLogOverrides(void) {
+    if (gPortOptions.noMods) return;
     for (int i = 0; i < gPortModCount; i++) {
         const PortMod* m = &gPortMods[i];
         if (!m->present) { PortLog("mods: %s is listed in monsterlab.ini but not in %s", m->name, PortModsDir()); continue; }
         if (!m->enabled) { PortLog("mods: %s is switched off", m->name); continue; }
         char dir[MAX_PATH];
         snprintf(dir, sizeof(dir), "%s\\%s\\files", PortModsDir(), m->name);
-        if (!LogTree(m, dir, "")) PortLog("mods: %s replaces no disc file", m->name);
+        if (!WalkTree(m, dir, "")) PortLog("mods: %s replaces no disc file", m->name);
     }
 }
 
@@ -127,6 +144,8 @@ int PortSelfTestMods(void) {
     PortMod keep[PORT_MAX_MODS];
     int keepCount = gPortModCount;
     char keepDir[MAX_PATH];
+    BOOL keepOff = gPortOptions.noMods;
+    gPortOptions.noMods = FALSE;
     memcpy(keep, gPortMods, sizeof(keep));
     strcpy(keepDir, sDir);
     char base[MAX_PATH], path[MAX_PATH + 64];
@@ -159,6 +178,9 @@ int PortSelfTestMods(void) {
     MOD_CHECK(PortModsFindFile("only_first.bin", host, sizeof(host), &who), "only_first.bin was not found");
     MOD_CHECK(!PortModsFindFile("Streams/none.sir", host, sizeof(host), &who) && !PortModsFindFile("Streams", host, sizeof(host), &who) &&
               !PortModsFindFile("../first/files/only_first.bin", host, sizeof(host), &who), "a file that no mod replaces was found");
+    MOD_CHECK(gPortMods[2].fileCount == 2 && gPortMods[0].fileCount == 1, "the scan counted %u and %u files", gPortMods[2].fileCount, gPortMods[0].fileCount);
+    MOD_CHECK(PortModsMove(2, -1) && PortModsMove(1, -1) && !PortModsMove(0, -1) && !strcmp(gPortMods[0].name, "first") &&
+              PortModsFindFile("Streams/a.sir", host, sizeof(host), &who) && !strcmp(who, "second"), "moving a mod up did not change who wins");
     MOD_CHECK(!PortModsAdd("..\\outside", TRUE) && !PortModsAdd("", TRUE), "a name that is no folder name was accepted");
 #undef MOD_CHECK
     for (const char* f : kFiles) { snprintf(path, sizeof(path), "%s\\%s", base, f); DeleteFileA(path); }
@@ -166,7 +188,8 @@ int PortSelfTestMods(void) {
     memcpy(gPortMods, keep, sizeof(keep));
     gPortModCount = keepCount;
     strcpy(sDir, keepDir);
-    if (!fails) PortLog("selftest mods: ok (file lookup, order, switched off)");
+    gPortOptions.noMods = keepOff;
+    if (!fails) PortLog("selftest mods: ok (file lookup, order, moving, switched off)");
     return fails;
 }
 #endif

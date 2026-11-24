@@ -891,7 +891,7 @@ struct PortBoot {
                 PortGuiSetOpen(TRUE);
                 if (i + 1 < __argc && __argv[i + 1][0] != '-') {
                     const char* page = __argv[++i];
-                    gPortGuiPage = !strcmp(page, "audio") ? 1 : !strcmp(page, "controls") ? 2 : !strcmp(page, "game") ? 3 : 0;
+                    gPortGuiPage = !strcmp(page, "audio") ? 1 : !strcmp(page, "controls") ? 2 : !strcmp(page, "game") ? 3 : !strcmp(page, "mods") ? 4 : 0;
                 }
             }
             else if (!strcmp(a, "--vsync")) gPortSettings.vsync = TRUE;
@@ -979,8 +979,8 @@ struct PortBoot {
             if (h) { WaitForSingleObject(h, INFINITE); CloseHandle(h); }
         }
         // The mods folder: the mods of monsterlab.ini in their order, then folders it does not list yet.
-        if (noMods) gPortModCount = 0;
-        else if (!gPortOptions.selfTest) {
+        gPortOptions.noMods = noMods;
+        if (!noMods && !gPortOptions.selfTest) {
             PortModsScan();
             int on = 0;
             for (int i = 0; i < gPortModCount; i++) if (gPortMods[i].enabled && gPortMods[i].present) on++;
