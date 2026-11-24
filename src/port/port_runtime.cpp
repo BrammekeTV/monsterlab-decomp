@@ -7,6 +7,7 @@
 #define NOMINMAX
 #include <windows.h>
 #include <mmsystem.h>
+#include <math.h>
 #include <stdarg.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -260,24 +261,31 @@ static void PortStateLog(void) {
 }
 
 // The game's pointer (the "Cursor" widget, ScreenSets +0x7C) is drawn at the true size of its texture, 64 x 64 output
-// pixels, at every resolution: its scale (+0x74) is divided by the picture's pixels per console line. A scale the game
-// writes itself (an animation) becomes the new base; fn_8019C348 rebuilds the widget's transforms.
+// pixels, at every resolution: its scale (+0x74) is the game's own scale divided by the picture's output pixels per
+// console line. Every cursor widget keeps its own record of the game's scale and of the value written here, so
+// switching cursors and back never shrinks one twice; fn_8019C348 rebuilds the widget's transforms.
 extern "C" void fn_8019C348(u8* widget);
 static void PortCursorTrueScale(void) {
-    static u8* sWidget;
-    static f32 sBase[3], sMine[3];
+    struct Rec { u8* w; f32 base[3], mine[3]; };
+    static Rec sRec[16];
+    static int sRecs;
     u8* cur = gScreenSets ? *(u8**)((u8*)gScreenSets + 0x7C) : NULL;
-    if (!cur) { sWidget = NULL; return; }
+    if (!cur) return;
     f32* s = (f32*)(cur + 0x74);
-    if (cur != sWidget || s[0] != sMine[0] || s[1] != sMine[1] || s[2] != sMine[2]) {
-        sWidget = cur;
-        memcpy(sBase, s, sizeof(sBase));
+    Rec* r = NULL;
+    for (int i = 0; i < sRecs; i++) if (sRec[i].w == cur) { r = &sRec[i]; break; }
+    if (!r) {
+        r = &sRec[sRecs < 16 ? sRecs++ : 15];
+        r->w = cur;
+        memcpy(r->base, s, sizeof(r->base));
+        memcpy(r->mine, s, sizeof(r->mine));
     }
+    if (fabsf(s[0] - r->mine[0]) > 1e-4f || fabsf(s[1] - r->mine[1]) > 1e-4f) memcpy(r->base, s, sizeof(r->base));   // the game set a scale
     f32 ppl = PortGfxPixelsPerLine();
     if (!(ppl > 0.0f)) return;
     f32 k = 1.0f / ppl;
-    f32 want[3] = { sBase[0] * k, sBase[1] * k, sBase[2] };
-    memcpy(sMine, want, sizeof(sMine));
+    f32 want[3] = { r->base[0] * k, r->base[1] * k, r->base[2] };
+    memcpy(r->mine, want, sizeof(want));
     if (memcmp(s, want, sizeof(want))) {
         memcpy(s, want, sizeof(want));
         fn_8019C348(cur);

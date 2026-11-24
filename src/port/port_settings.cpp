@@ -63,6 +63,7 @@ BOOL PortSettingsLoad(const char* path, PortSettings* s) {
             else if (!strcmp(key, "stretch_ui")) s->stretchUi = atoi(val) != 0;
             else if (!strcmp(key, "vsync")) s->vsync = atoi(val) != 0;
             else if (!strcmp(key, "fullscreen")) s->fullscreen = atoi(val) != 0;
+            else if (!strcmp(key, "windows_cursor")) s->windowsCursor = atoi(val) != 0;
             else if (!strcmp(key, "render_scale")) s->renderScale = Clamp(atoi(val), 50, 200);
             else if (!strcmp(key, "msaa")) {
                 int n = atoi(val);
@@ -108,6 +109,7 @@ BOOL PortSettingsSave(const char* path, const PortSettings* s) {
     fprintf(f, "; Monster Lab PC port settings (written by the settings screen: F1 in the game)\n");
     fprintf(f, "[display]\nwidth = %d\nheight = %d\naspect = %s\nstretch_ui = %d\nvsync = %d\nfullscreen = %d\n",
             s->width, s->height, s->wide ? "16:9" : "4:3", s->stretchUi ? 1 : 0, s->vsync ? 1 : 0, s->fullscreen ? 1 : 0);
+    fprintf(f, "; windows_cursor: 1 shows the Windows mouse cursor over the game as well as the game's own hand\nwindows_cursor = %d\n", s->windowsCursor ? 1 : 0);
     fprintf(f, "; internal frame buffer size, percent of the output picture (50-200); texture_filter: game, nearest, bilinear, 2x, 4x, 8x, 16x (anisotropic)\nrender_scale = %d\ntexture_filter = %s\n\n",
             s->renderScale, kPortFilterNames[s->texFilter >= 0 && s->texFilter < PORT_FILTER_COUNT ? s->texFilter : 0]);
     fprintf(f, "; msaa: off, 2, 4 or 8 samples on the frame buffer (applies at start)\nmsaa = %d\n", s->msaa);

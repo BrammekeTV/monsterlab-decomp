@@ -121,8 +121,8 @@ static LRESULT CALLBACK WndProc(HWND w, UINT m, WPARAM wp, LPARAM lp) {
     if (m == WM_PORT_TITLE) { SetWindowTextA(w, sTitleText); return 0; }
     if (m == WM_CLOSE) { PortStop(0, "window closed"); return 0; }
     if (m == WM_MOUSEWHEEL) { InterlockedExchangeAdd(&sWheel, (LONG)GET_WHEEL_DELTA_WPARAM(wp)); return 0; }
-    // The game draws its own pointer (the hand): no Windows cursor over the picture, except while the settings screen is open.
-    if (m == WM_SETCURSOR && LOWORD(lp) == HTCLIENT) { SetCursor(gPortGuiOpen ? LoadCursor(NULL, IDC_ARROW) : NULL); return TRUE; }
+    // The game draws its own pointer (the hand): no Windows cursor over the picture, except while the settings screen is open or windows_cursor is set.
+    if (m == WM_SETCURSOR && LOWORD(lp) == HTCLIENT) { SetCursor(gPortGuiOpen || gPortSettings.windowsCursor ? LoadCursor(NULL, IDC_ARROW) : NULL); return TRUE; }
     return DefWindowProcA(w, m, wp, lp);
 }
 static DWORD WINAPI WindowThread(void*) {
