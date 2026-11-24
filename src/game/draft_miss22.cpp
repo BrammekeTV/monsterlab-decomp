@@ -103,9 +103,12 @@ s32 GetMonstersAvailableToModify(void) {
 }
 
 // 0x801427F0
-// Current random seed, as written back by fn_8033AE04.
+// Random seed: the original passes an uninitialised stack word to fn_8033AE04 (MSL localtime,
+// which only reads it) and returns that word, so on the console the seed is whatever the stack
+// held, the same at every boot. The PC build gives it a fixed value: a stack word there changes
+// from run to run (address layout), which made battles play out differently each time.
 u32 GetRandomSeed(void) {
-    u32 seed;
+    u32 seed = 0;
     fn_8033AE04(&seed);
     return seed;
 }

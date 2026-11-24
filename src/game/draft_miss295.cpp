@@ -170,11 +170,11 @@ void fn_800645C8(u8* arg0, u8* arg1) {
             }
             if (zone < 0) continue;
 
-            u8* zoneBase = *(u8**)(gWorldState + 0x1A4) + zone * gZoneResourceSize;
+            u8* zoneBase = *(u8**)(*(u8**)gWorldState + 0x1A4) + zone * gZoneResourceSize;
             s32 nA = *(s32*)(zoneBase + 0x94);
             s32 total = nA + *(s32*)(zoneBase + 0x98);
             for (s32 k = 0; k < total; k++) {
-                zoneBase = *(u8**)(gWorldState + 0x1A4) + zone * gZoneResourceSize;
+                zoneBase = *(u8**)(*(u8**)gWorldState + 0x1A4) + zone * gZoneResourceSize;
                 nA = *(s32*)(zoneBase + 0x94);
                 u8* cand;
                 u8* node;

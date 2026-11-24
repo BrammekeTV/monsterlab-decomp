@@ -12,7 +12,7 @@ s32  fn_801C1E04(u8* a, u8* b, u8* c, u8* d, s32* n, f32* pos, f32* dist);      
 s32  fn_801C217C(u8* a, u8* b, u8* c, u8* d, u8* e, s32* n, f32* pos, f32* dist);         // 0x801C217C
 s32  fn_801C26A8(u8* a, u8* b, u8* c, u8* d, u8* e, s32* n, f32* pos, f32* dist);         // 0x801C26A8
 s32  fn_801C2C60(f32 r, u8* a, u8* b, u8* c, s32* n, f32* pos, f32* dist);                // 0x801C2C60
-s32  fn_801C3074(f32 r, u8* a, u8* b, u8* c);                                             // 0x801C3074
+s32  fn_801C3074(u8* a, u8* b, u8* c, f32 r);                                             // 0x801C3074
 s32  fn_801C3170(f32 r, u8* a, u8* b, u8* c, s32* n, f32* pos, f32* dist);                // 0x801C3170
 
 extern u8  lbl_803839F0[];   // 0x803839F0 (vtable)
@@ -223,7 +223,7 @@ s32 fn_801B1498(u8* arg0, u8* arg1) {
     case 7:
         return fn_801C26A8(arg1 + 0x14, arg1 + 0x6C, arg1 + 0x3C, arg0 + 0x3C, arg0 + 0x48, &sp8, &sp20, &sp10);
     case 0:
-        return fn_801C3074(*(f32*)(arg1 + 0x3C), arg1 + 0x14, arg0 + 0x3C, arg0 + 0x48);
+        return fn_801C3074(arg1 + 0x14, arg0 + 0x3C, arg0 + 0x48, *(f32*)(arg1 + 0x3C));
     default:
         return 0;
     }

@@ -297,8 +297,8 @@ void fn_80063138(u8* obj) {
     u8* attach = *(u8**)(obj + 0x90);
     if (attach != NULL && !(*(u32*)(node + 0x20) & 0x40)) {
         u16 zone = *(u16*)(node + 0x30);
-        u8* loaded = zone == 0xFFFF ? *(u8**)(*(u8**)(gWorldState + 0x1B0))
-                                    : *(u8**)(*(u8**)(gWorldState + 0x1B0) + zone * 4);
+        u8* loaded = zone == 0xFFFF ? *(u8**)(*(u8**)(*(u8**)gWorldState + 0x1B0))
+                                    : *(u8**)(*(u8**)(*(u8**)gWorldState + 0x1B0) + zone * 4);
         if (loaded != NULL) fn_801DAA40(loaded, attach);
     }
     node = *(u8**)(obj + 4);
@@ -327,8 +327,8 @@ void fn_8006322C(u8* obj) {
     node = *(u8**)(obj + 4);
     if (attach != NULL && !(*(u32*)(node + 0x20) & 0x40)) {
         u16 zone = *(u16*)(node + 0x30);
-        u8* loaded = zone == 0xFFFF ? *(u8**)(*(u8**)(gWorldState + 0x1B0))
-                                    : *(u8**)(*(u8**)(gWorldState + 0x1B0) + zone * 4);
+        u8* loaded = zone == 0xFFFF ? *(u8**)(*(u8**)(*(u8**)gWorldState + 0x1B0))
+                                    : *(u8**)(*(u8**)(*(u8**)gWorldState + 0x1B0) + zone * 4);
         if (loaded != NULL) fn_801DAA74(loaded, attach);
     }
 }
@@ -339,13 +339,13 @@ void fn_8006322C(u8* obj) {
 u8* fn_800633D4(u8* attachment) {
     if (attachment == NULL) attachment = (u8*)fn_80172F70(1, lbl_80359C88);
     if (attachment == NULL) return attachment;
-    u8* world = *(u8**)(gWorldState + 8);
+    u8* world = *(u8**)(*(u8**)gWorldState + 8);
     if (world == NULL) return attachment;
     u8* current = *(u8**)(world + 4);
     if (current == NULL) return attachment;
     u16 zone = *(u16*)(current + 0x30);
-    if (zone == 0 || zone > *(s32*)(gWorldState + 4)) return attachment;
-    u8* zoneObj = *(u8**)(*(u8**)(gWorldState + 0x1B0) + zone * 4);
+    if (zone == 0 || zone > *(s32*)(*(u8**)gWorldState + 4)) return attachment;
+    u8* zoneObj = *(u8**)(*(u8**)(*(u8**)gWorldState + 0x1B0) + zone * 4);
     s16 kind = *(s16*)(attachment + 0x10);
     if ((kind != 1 && kind != 2) || *(u8**)(zoneObj + 0x4C) == NULL) return attachment;
     f32 pos[4] = { *(f32*)(attachment + 0x44), *(f32*)(attachment + 0x48), *(f32*)(attachment + 0x4C), 0.0f };

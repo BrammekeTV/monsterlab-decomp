@@ -44,7 +44,7 @@ extern f32   lbl_805FCEBC;                       // float constant (0.0)
 extern f32   lbl_803475F8[];                     // float table indexed by state
 extern const char lbl_805F8498[];                // format string "%d/%d"
 void    fn_80021ECC(void);
-void    fn_8002C63C(u8* obj, f32 v, u8 idx, void* a, void* b);  // 0x8002C63C
+void    fn_8002C63C(u8* p, u8 flag, u8* target, s32 arg3, f32 scale);  // 0x8002C63C (float in f1, after the integer registers)
 u32     StringHash(const char* s);
 extern u8  lbl_80357748[];                       // float table + format strings
 extern u8  lbl_805F83E0[];                       // byte table (indices per element slot)
@@ -186,7 +186,7 @@ void fn_8002CBFC(u8* obj) {
     u8* e6;
     u8* q;
     u8* sub;
-    char buf[16];
+    char buf[0x100];   // asm: 0x100 bytes at sp+0x18; the names are up to 34 characters ("fr_paper_doll_sparks_particle_%d")
     s32 i;
 
     fn_80021ECC();
@@ -195,23 +195,23 @@ void fn_8002CBFC(u8* obj) {
 
     e6 = (u8*)ScreenSetFindElement(set, 0xF92AEDD9u);
     e5 = (u8*)ScreenSetFindElement(set, 0xF190AAEFu);
-    fn_8002C63C(obj + 0xF8, *(f32*)(lbl_80357748 + 0x0), lbl_805F83E0[0], e5, e6);
+    fn_8002C63C(obj + 0xF8, lbl_805F83E0[0], e5, (s32)(intptr_t)e6, *(f32*)(lbl_80357748 + 0x0));
 
     e6 = (u8*)ScreenSetFindElement(set, 0x24106BEEu);
     e5 = (u8*)ScreenSetFindElement(set, 0xD56BDF97u);
-    fn_8002C63C(obj + 0x198, *(f32*)(lbl_80357748 + 0x10), lbl_805F83E0[4], e5, e6);
+    fn_8002C63C(obj + 0x198, lbl_805F83E0[4], e5, (s32)(intptr_t)e6, *(f32*)(lbl_80357748 + 0x10));
 
     e6 = (u8*)ScreenSetFindElement(set, 0xCF9F95F2u);
     e5 = (u8*)ScreenSetFindElement(set, 0x5B354D6Cu);
-    fn_8002C63C(obj + 0x148, *(f32*)(lbl_80357748 + 0x8), lbl_805F83E0[2], e5, e6);
+    fn_8002C63C(obj + 0x148, lbl_805F83E0[2], e5, (s32)(intptr_t)e6, *(f32*)(lbl_80357748 + 0x8));
 
     e6 = (u8*)ScreenSetFindElement(set, 0xCA398B22u);
     e5 = (u8*)ScreenSetFindElement(set, 0x6BD28D6Cu);
-    fn_8002C63C(obj + 0x170, *(f32*)(lbl_80357748 + 0xC), lbl_805F83E0[3], e5, e6);
+    fn_8002C63C(obj + 0x170, lbl_805F83E0[3], e5, (s32)(intptr_t)e6, *(f32*)(lbl_80357748 + 0xC));
 
     e6 = (u8*)ScreenSetFindElement(set, 0xD9C5BBCCu);
     e5 = (u8*)ScreenSetFindElement(set, 0xAB7B1FF9u);
-    fn_8002C63C(obj + 0x120, *(f32*)(lbl_80357748 + 0x4), lbl_805F83E0[1], e5, e6);
+    fn_8002C63C(obj + 0x120, lbl_805F83E0[1], e5, (s32)(intptr_t)e6, *(f32*)(lbl_80357748 + 0x4));
 
     *(void**)(obj + 0xF4) = ScreenSetFindElement(set, 0xA33E6DBFu);
 

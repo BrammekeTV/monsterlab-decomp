@@ -530,10 +530,10 @@ void fn_801225F4(u8* self, u8* pos, s32 effect, s8 power) {
             if (*(s32*)(e + 0x4) == 6) zone = *(s32*)(e + 0x8);
         }
         if (zone < 0) continue;
-        u8* z = *(u8**)(gWorldState + 0x1A4) + zone * gZoneResourceSize;
+        u8* z = *(u8**)(*(u8**)gWorldState + 0x1A4) + zone * gZoneResourceSize;
         s32 total = *(s32*)(z + 0x94) + *(s32*)(z + 0x98);
         for (s32 i = 0, idx = 0; i < total; i++, idx += 4) {
-            z = *(u8**)(gWorldState + 0x1A4) + zone * gZoneResourceSize;
+            z = *(u8**)(*(u8**)gWorldState + 0x1A4) + zone * gZoneResourceSize;
             s32 first = *(s32*)(z + 0x94);
             u8* obj;
             if (i < first) obj = *(u8**)(*(u8**)(z + 0x120) + idx);
