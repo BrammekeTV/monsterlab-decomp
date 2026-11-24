@@ -372,7 +372,7 @@ void fn_801EC8C4(u8* mgr, s32 idx, u32 effect) {
     }
     rec = *(u8**)(mgr + 4) + idx * 0xc8;
     f32 q[4];
-    f32 out[4];
+    f32 out[12];   // fn_801C9DF0 writes a 3x4 basis (the orientation matrix), not four floats
     q[0] = *(f32*)(rec + 0x44);
     q[1] = *(f32*)(rec + 0x48);
     q[2] = *(f32*)(rec + 0x4c);
