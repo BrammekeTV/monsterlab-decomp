@@ -903,6 +903,17 @@ struct ZoneDump {
             for (u32 i = 0; i < clips; i++) Clip(*(const u8**)(list + i * 4));
         }
     }
+    void PartTable(const LevelZoneRoots* roots, u32 zoneBase) {
+    // The part resource table (header +0x44, count +0x48): 0x10-byte entries.
+    if (roots->partCount != 0 && In(z->image + (roots->partTable - zoneBase), roots->partCount * 4)) {
+        const u32* t = (const u32*)(z->image + (roots->partTable - zoneBase));
+        for (u32 i = 0; i < roots->partCount; i++) {
+            const u8* e = *(const u8**)(t + i);
+            if (!In(e, 0x10)) continue;
+            printf("partentry %u %08x %08x %08x %08x\n", i, *(const u32*)e, *(const u32*)(e + 4), *(const u32*)(e + 8), *(const u32*)(e + 12));
+        }
+    }
+    }
     // The slots' placed effects (slot +0x80, count +0x9C), then the slots' objects (slot +0xA8):
     // the list, and of each object the type fn_8012FD0C reads.
     void SlotObjects(const LevelZoneRoots* roots, u32 zoneBase) {
@@ -1676,6 +1687,7 @@ static int DumpLevel(const char* path) {
     zd.Entities();
     zd.Records(&roots, zoneBase);
     if (hudInZone) DumpMachines(&z, hud, *(const u8**)(hud + 0x434), true, &zd.machines);
+    zd.PartTable(&roots, zoneBase);
     LevelZoneRootsFree(&roots);
     // Zone 1, as the port converts it when the game loads it: zone 0 is in memory, converted.
     if (f.zone1 != NULL) {

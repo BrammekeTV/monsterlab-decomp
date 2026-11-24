@@ -3012,6 +3012,8 @@ static const SirField kLevelHeaderFields[] = {
     { 0x030, SIR_U32, 1 },    // code: its count
     { 0x038, SIR_PTR, 1 },    // code: second object list
     { 0x03C, SIR_U32, 1 },    // code: its count
+    { 0x044, SIR_PTR, 1 },    // code: the part resource table (fn_8003DB78 looks a part's model up by its name hash),
+    { 0x048, SIR_U32, 1 },    //       and its count
     { 0x074, SIR_PTR, 2 },    // code: the objects projectiles are spawned from (SpawnCoffinProjectile +0x74, FireRocketAtEntity +0x78)
     { 0x07C, SIR_U32, 1 },    // code: fn_8012FFA4 copies +0x7C..+0x90 to the manager lbl_8047C730: count,
     { 0x080, SIR_PTR, 1 },    //       entries, (u8 flag at +0x84),
@@ -3324,6 +3326,8 @@ extern "C" BOOL LevelZoneRootsCollect(const u8* hdr, u32 hdrSize, const u8* zone
     if (ok && Host32(hdr + 0x7C) != 0 && (out->effectLibrary = ZoneAddr(hdr + 0x80, zoneHost, zoneSize, zoneWiiBase)) != 0)
         out->effectLibraryCount = Host32(hdr + 0x7C);
     for (u32 k = 0; ok && k < 2; k++) out->spawnOwners[k] = ZoneAddr(hdr + 0x74 + k * 4, zoneHost, zoneSize, zoneWiiBase);
+    if (ok && Host32(hdr + 0x48) != 0 && (out->partTable = ZoneAddr(hdr + 0x44, zoneHost, zoneSize, zoneWiiBase)) != 0)
+        out->partCount = Host32(hdr + 0x48);
     if (ok && Host32(hdr + 0x30) != 0 && (out->paths = ZoneAddr(hdr + 0x2C, zoneHost, zoneSize, zoneWiiBase)) != 0)
         out->pathCount = Host32(hdr + 0x30);
     if (ok && Host32(hdr + 0x3C) != 0 && (out->junctions = ZoneAddr(hdr + 0x38, zoneHost, zoneSize, zoneWiiBase)) != 0)
@@ -3596,6 +3600,16 @@ extern "C" SirError LevelZoneConvert(SirReloc* r, u8* image, u32 imageSize, u32 
         u32 l;
         if (roots->locatorCount > imageSize / LOCATOR_SIZE || !LevelSpan(roots->locators, (u64)roots->locatorCount * LOCATOR_SIZE, imageSize, &l) ||
             !PlanAdd(&plan, l, roots->locatorCount * LOCATOR_SIZE, REGION_LOCATORS)) e = SIR_ERR_LEVEL;
+    }
+    // The part resource table (header +0x44, count +0x48): pointers to 0x10-byte entries {users, name hash,
+    // object (set at run time), zone}. Without it no part of the player's monster is found and the monster is never built.
+    if (e == SIR_OK && roots->partCount != 0) {
+        u32 t, en;
+        if (roots->partCount > imageSize / 0x14 || !LevelSpan(roots->partTable, (u64)roots->partCount * 4, imageSize, &t) || !PlanAdd(&plan, t, roots->partCount * 4, REGION_PTR_ARRAY)) e = SIR_ERR_LEVEL;
+        for (u32 i = 0; e == SIR_OK && i < roots->partCount; i++) {
+            if (Be32(image + t + i * 4) == 0) continue;
+            if (!LevelSpan(Be32(image + t + i * 4), 0x10, imageSize, &en) || !PlanAdd(&plan, en, 0x10, REGION_U32_ARRAY)) e = SIR_ERR_LEVEL;
+        }
     }
     // The objects projectiles are spawned from (header +0x74, +0x78): projectile definitions.
     for (u32 k = 0; k < 2 && e == SIR_OK; k++) e = ProjectileDefPlan(&plan, image, imageSize, roots->spawnOwners[k]);
