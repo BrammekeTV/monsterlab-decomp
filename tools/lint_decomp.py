@@ -6,6 +6,9 @@
 
 Checks
   marker   `// 0xADDR` must be alone on its line (progress.py / small_candidates.py only count those)
+  markname the first code after a `// 0xADDR` marker is a declaration (prototype, struct, typedef) of
+           another name: tools/port_link.py binds the address to the first name after a marker, so calls
+           to that Wii address would run the declared function (put declarations above the marker)
   ptrcast  pointer-truncating casts: (u32)(uintptr_t)..., (BOOL)ptr, (u32)&sym, (s32)f() where f returns
            a pointer, `*(u32*)(..) = &sym / (u8*)x` stores of addresses (the PC build is x64)
   tail     the asm ends with a tail call `b X`, but the C drops X's return value (void function, or
@@ -194,6 +197,37 @@ def same_target(tgt, body, aliases=None):
     return any((by_name.get(n) or aliases.get(n)) == addr for n in set(re.findall(r"\b([A-Za-z_]\w*)\s*\(", body)))
 
 
+_SYMS = None
+def symbol_names():
+    """-> address -> name from config/RM7P4F/symbols.txt."""
+    global _SYMS
+    if _SYMS is None:
+        _SYMS = {}
+        path = os.path.join(ROOT, "config", "RM7P4F", "symbols.txt")
+        if os.path.exists(path):
+            for l in open(path, encoding="utf-8", errors="replace"):
+                m = re.match(r"(\w+) = \.\w+:0x([0-9A-Fa-f]{8});", l)
+                if m: _SYMS.setdefault(int(m.group(2), 16), m.group(1))
+    return _SYMS
+
+def marker_names_other(lines, n):
+    """Line index n holds a marker: the declaration port_link would take for it instead of the
+    definition, or None."""
+    addr = int(MARKER.match(lines[n]).group(1), 16)
+    for nxt in lines[n + 1:n + 6]:
+        code = re.sub(r"//.*", "", nxt).strip()
+        if not code:
+            continue
+        is_decl = code.endswith(";") or re.match(r"(typedef|struct|class|union|using)\b", code)
+        if not is_decl:
+            return None
+        name = symbol_names().get(addr)
+        m = re.search(r"(\w+)\s*\(", code)
+        if m and (m.group(1) == name or m.group(1).upper().endswith("%08X" % addr)):
+            return None          # a declaration of the function itself (lists of callees with markers)
+        return code
+    return None
+
 def lint_file(path):
     rel = os.path.relpath(path, ROOT).replace(os.sep, "/")
     txt = open(path, encoding="utf-8", errors="replace").read()
@@ -205,6 +239,10 @@ def lint_file(path):
     for n, l in enumerate(lines, 1):
         if MARKER_BAD.match(l):
             out.append((n, "marker", "`// 0xADDR` must be alone on its line (put the description on the next line)"))
+        if MARKER.match(l):
+            other = marker_names_other(lines, n - 1)
+            if other:
+                out.append((n, "markname", "the first code after this marker is `%s`: tools/port_link.py would bind the address to it; move it above the marker" % other[:60]))
         s = re.sub(r"//.*", "", l)
         # src/port/ maps Wii addresses to host memory on purpose (docs/port_runtime.md).
         if not rel.startswith("src/port/") and re.search(r"\((?:u32|s32|BOOL|int|u16)\)\s*\(?\s*uintptr_t\)?", s) and "uintptr_t" in s:

@@ -10,13 +10,13 @@ void fn_801B4EA4(u8* arg0, u8* arg1);           // 0x801B4EA4
 void fn_801B75AC(void* p);                      // 0x801B75AC
 
 void fn_801B512C(u8* ent, f32 dt);
+void EntityTick(void* e, f32 dt);   // world_update.cpp
 
 // 0x801B512C
 // Steps the children of an entity (list at +0xB0: nodes {+0x04 entity, +0x08 next}). A child whose
 // record flags (+0x20) have bit 0 or bit 1 set gets the frame time at +0x24 and its clock at +0x28
 // advanced, and its node is refreshed (fn_801B75AC); with bit 0 set its own step (vtable +0x20)
 // runs as well.
-void EntityTick(void* e, f32 dt);   // world_update.cpp
 void fn_801B512C(u8* ent, f32 dt) {
     typedef void (*ChildStepFn)(u8* self, s32 arg, f32 dt);
     for (u8* node = *(u8**)(ent + 0xB0); node != NULL; node = *(u8**)(node + 0x8)) {
