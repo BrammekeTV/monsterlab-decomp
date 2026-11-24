@@ -83,6 +83,7 @@ void PortStubCall(const char* name) {
 
 static void PrintMissing(void);
 static u32 sPeek[8];
+static s32 sShotAt[64], sShotAtCount;   // --shot-at frames
 static int sPeekCount;
 static void PrintSummary(void) {
     char buf[256];
@@ -282,6 +283,14 @@ void PortFrameDone(void) {
         static DWORD benchStart;
         if (!benchStart) benchStart = GetTickCount();
         else if (GetTickCount() - benchStart >= 20000) PortStop(0, "benchmark finished (20 s of real time)");
+    }
+    for (s32 i = 0; i < sShotAtCount; i++) {          // --shot-at: extra pictures during the run
+        if (sShotAt[i] != sFrames || !gPortOptions.screenshot) continue;
+        char path[512];
+        const char* dot = strrchr(gPortOptions.screenshot, '.');
+        s32 stem = dot ? (s32)(dot - gPortOptions.screenshot) : (s32)strlen(gPortOptions.screenshot);
+        snprintf(path, sizeof(path), "%.*s_%d.png", stem, gPortOptions.screenshot, sFrames);
+        if (PortGfxSaveScreenshot(path)) fprintf(stderr, "[port] screenshot: %s\n", path);
     }
     if (gPortOptions.frameLimit && sFrames >= gPortOptions.frameLimit) {
         PortStop(0, "frame limit reached (%d frames)", sFrames);
@@ -1002,6 +1011,13 @@ struct PortBoot {
             else if (!strcmp(a, "--watch") && i + 1 < __argc) sWatch = strtoul(__argv[++i], NULL, 16);
             else if (!strcmp(a, "--show-texture") && i + 1 < __argc) gPortOptions.showTexture = atoi(__argv[++i]);
             else if (!strcmp(a, "--screenshot") && i + 1 < __argc) gPortOptions.screenshot = __argv[++i];
+            else if (!strcmp(a, "--shot-at") && i + 1 < __argc) {   // F,F,...: also save <screenshot>_<F>.png at these frames
+                for (const char* v = __argv[++i]; *v && sShotAtCount < 64; ) {
+                    sShotAt[sShotAtCount++] = atoi(v);
+                    while (*v && *v != ',') v++;
+                    if (*v == ',') v++;
+                }
+            }
             else if (!strcmp(a, "--capture-at") && i + 1 < __argc) gPortOptions.captureAt = atoi(__argv[++i]);
             else if (!strcmp(a, "--stats")) gPortOverlayOn = TRUE;
             else if (!strcmp(a, "--mods") && i + 1 < __argc) PortModsSetDir(__argv[++i]);

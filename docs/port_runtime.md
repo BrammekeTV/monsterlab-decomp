@@ -32,6 +32,7 @@ build\pc\monsterlab.exe                        # runs main() with your own disc 
 | `--no-audio` | never open the sound device (it is only opened with `--window`) |
 | `--no-movies` | do not play the Bink cutscenes (the game skips them, as it does when a movie cannot be opened) |
 | `--screenshot FILE` | write the last picture shown as a PNG when the run stops (works without `--window`) |
+| `--shot-at F,F,...` | also write `FILE_<F>.png` (from `--screenshot FILE`) at each of these frames, up to 64: one headless run gives a whole sequence |
 | `--stats` | start with the stats overlay on (top-right; F3 turns it on and off in the window): frames per second, frame time split into game, render and wait, draw calls, GX vertices, frame-buffer copies, textures, audio voices, output size |
 | `--screenshot-stats` | draw the stats overlay into the `--screenshot` picture too (it is left out otherwise) |
 | `--capture-at N` | take the F12 capture at game frame N (headless tests; needs `--screenshot FILE` or `--window` so the renderer runs) |

@@ -1842,6 +1842,7 @@ BOOL PortGfxCapture(const char* prefix) {
 
 BOOL PortGfxSaveScreenshot(const char* path) {
     if (!sStarted || !sShown) return FALSE;
+    std::lock_guard<std::recursive_mutex> lk(sGfxLock);   // also called mid-run (--shot-at) while the render thread draws
     return SavePng(sOutTex, sOutW, sOutH, path);
 }
 
