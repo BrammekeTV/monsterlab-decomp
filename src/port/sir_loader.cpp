@@ -2766,6 +2766,18 @@ static SirError ImagePlanBuild(ImagePlan* plan, const u8* hdr, u8* image, u32 im
     return PlanFinish(plan) ? SIR_OK : SIR_ERR_OVERLAP;
 }
 
+void (*gSirTextureNote)(const void* pixels, const char* name) = NULL;
+
+// Tells the port which pixel data belongs to which texture name (called after the header is converted).
+static void TextureNote(const u8* p, const u8* end) {
+    if (gSirTextureNote == NULL || p + 0x36 > end) return;
+    const void* pixels;
+    memcpy(&pixels, p + 0x1C, sizeof(pixels));
+    const u8* e = p + 0x35;
+    while (e < end && *e) e++;
+    if (pixels != NULL && e < end && e > p + 0x35) gSirTextureNote(pixels, (const char*)(p + 0x35));
+}
+
 static void ImagePlanConvert(const ImagePlan* plan, SirReloc* r, u8* image, u32 imageSize) {
     for (u32 i = 0; i < plan->count; i++) {
         const Region* g = &plan->regions[i];
@@ -2774,7 +2786,7 @@ static void ImagePlanConvert(const ImagePlan* plan, SirReloc* r, u8* image, u32 
         case REGION_INPUT_TABLE:  InputTableConvert(r, p); break;
         case REGION_INPUT_STEP:   InputStepConvert(r, p, g->size); break;
         case REGION_TEXTURE_LIST: SirConvertRecord(r, p, g->size, kTextureListFields, COUNTOF(kTextureListFields)); break;
-        case REGION_TEXTURE:      SirConvertRecord(r, p, g->size, kTextureFields, COUNTOF(kTextureFields)); break;
+        case REGION_TEXTURE:      SirConvertRecord(r, p, g->size, kTextureFields, COUNTOF(kTextureFields)); TextureNote(p, image + imageSize); break;
         case REGION_STRING_TABLE: SirConvertRecord(r, p, g->size, kStringTableFields, COUNTOF(kStringTableFields)); break;
         case REGION_ACTION_TABLE: SirConvertRecord(r, p, g->size, kActionTableFields, COUNTOF(kActionTableFields)); break;
         case REGION_UI_SLIDER:    SirConvertRecord(r, p, g->size, kUiSliderFields, COUNTOF(kUiSliderFields)); break;

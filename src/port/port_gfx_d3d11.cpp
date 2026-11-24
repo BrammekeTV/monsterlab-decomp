@@ -580,9 +580,10 @@ static ID3D11ShaderResourceView* GetTexture(const PortGx* g, u32 map) {
     ID3D11ShaderResourceView* made = NULL;
     if (PortModsTexturesWanted()) {
         u64 content = PortModsTextureHash(data, bytes, tlut, pal ? (fmt == 8 ? 32 : fmt == 9 ? 512 : 0x8000) : 0, w, h, fmt);
-        PortModsDumpTexture(content, rgba.data(), w, h, fmt);
+        const char* tname = PortModsTextureName(data);
+        PortModsDumpTexture(content, tname, rgba.data(), w, h, fmt);
         u32 rw = 0, rh = 0;
-        u32* png = PortModsTexture(content, &rw, &rh);
+        u32* png = PortModsTexture(content, tname, &rw, &rh);
         if (png) { made = MakeTexture(png, rw, rh); free(png); }
     }
     if (!made) made = MakeTexture(rgba.data(), w, h);

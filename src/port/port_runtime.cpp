@@ -1035,8 +1035,8 @@ struct PortBoot {
             int on = 0;
             for (int i = 0; i < gPortModCount; i++) if (gPortMods[i].enabled && gPortMods[i].present) on++;
             if (on) fprintf(stderr, "[port] mods: %d on, from %s\n", on, PortModsDir());
-        }
-        PortLockEnter();                         // the main thread is the first game thread
+        } else PortModsRefreshTextures();        // also hooks the texture names (--dump-textures with --no-mods)
+        PortLockEnter();                     // the main thread is the first game thread
 
         // A file is the player's disc image, read as it is (--iso FILE; --data and MONSTERLAB_DATA take one too).
         // Asked for on the command line or in MONSTERLAB_DATA, else the choice kept in monsterlab.ini, else

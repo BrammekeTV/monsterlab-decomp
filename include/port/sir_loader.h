@@ -282,6 +282,9 @@ typedef struct SirTexture {
     char  name[1];        // 0x35: NUL-terminated, can run past 0x54
 } SirTexture;
 #define SIR_TEXTURE_HEADER 0x54
+// Optional: called for every texture the loader converts (global_binary.sir, level materials), with its
+// pixel data and the name in its header. The renderer uses it to name textures for mods.
+extern void (*gSirTextureNote)(const void* pixels, const char* name);
 #define SIR_TEXTURE_NODE   0x28
 
 typedef struct SirTextureList {   // at image +4 (typed from the data only)
