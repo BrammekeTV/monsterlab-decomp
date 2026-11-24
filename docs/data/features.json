@@ -99,6 +99,11 @@
  "changelog": [
   {
    "date": "2026-11-24",
+   "time": "12:38",
+   "text": "Further into the game on Windows (PR #169): after the village intro, the exploration map works, and walking to the next spot opens the conversation with Mayor Neidervoten. Also, the faint ghost image over the main menu is gone (PR #168). The game's glow effect makes half-size copies of the screen, and the PC version had been making them full size, so an old picture showed through."
+  },
+  {
+   "date": "2026-11-24",
    "time": "12:25",
    "text": "Mods can now change the game's text (PR #166): a JSON file in a mod overrides entries of the game's text table, checked when it loads, and --dump-data exports the original table from your own disc to start from. Also, arrow keys and the D-pad now work on the Options screen (PR #167); its sliders, rumble, volume and saving were checked and already worked."
   },
