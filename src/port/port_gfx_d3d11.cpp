@@ -1764,7 +1764,7 @@ static void CopyEfb(const PortGx* g, u32 control) {
         if (sPicW != sOutW || sPicH != sOutH) sCtx->ClearRenderTargetView(sOutRtv, black);
         Blit(sEfbSrv, sOutRtv, sPicX, sPicY, sPicW, sPicH, su0, sv0, sdu, sdv, NULL);
         sShown = TRUE;
-        sDrawThread = GetCurrentThreadId();
+        sDrawThread = PortGxDrawThread();               // the game's thread that hands over the commands (it waits in PortGfxIdle)
         // The overlay goes over the window's picture only, or with --screenshot-stats into the output picture itself.
         PortFrameStats stats;
         FrameStats(&stats);
@@ -1960,6 +1960,7 @@ BOOL PortGfxSaveTexture(ID3D11Device* dev, ID3D11DeviceContext* ctx, ID3D11Textu
 
 // F12 capture (port_capture.cpp): the frame buffer and the output picture now, the back buffer at the next present.
 BOOL PortGfxCapture(const char* prefix) {
+    PortGxSync();                                       // the GP thread has drawn what it was given
     if (!sStarted || !sShown) return FALSE;
     char p[420];
     snprintf(p, sizeof(p), "%s_efb.png", prefix);
@@ -1971,6 +1972,7 @@ BOOL PortGfxCapture(const char* prefix) {
 }
 
 BOOL PortGfxSaveScreenshot(const char* path) {
+    PortGxSync();
     if (!sStarted || !sShown) return FALSE;
     return SavePng(sOutTex, sOutW, sOutH, path);
 }

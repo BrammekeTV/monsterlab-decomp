@@ -47,6 +47,13 @@ typedef struct PortGxBackend {
     void (*loadTlut)(const PortGx* g, u32 source, u32 dest);
 } PortGxBackend;
 void PortGxSetBackend(const PortGxBackend* backend);
+// The GP thread (port_gx.cpp): wait until it has run everything handed to it; hand over the FIFO first and wait
+// (from the game's drawing thread); it has work; the thread whose commands it runs (or the caller's own).
+void PortGxSync(void);
+void PortGxFinish(void);
+BOOL PortGxBusy(void);
+unsigned long PortGxDrawThread(void);
+void PortGxThreadCpu(double* drawMs, double* gpMs);   // CPU time so far of the game's drawing thread and the GP thread
 
 typedef struct PortGxStats {
     u32 lists, bp, cp, xf, xfIndexed, calls, draws, vertices, copies, tluts, drawDone, tokens;

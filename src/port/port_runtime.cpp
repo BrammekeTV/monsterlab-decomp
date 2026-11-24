@@ -792,24 +792,34 @@ void PortRestoreInterrupts(u32 state) {
 
 struct Queued { void (*fn)(void*); void* arg; };
 static Queued sQueue[256];
-static u32    sQueueHead, sQueueTail;      // touched only with the lock held
+static u32    sQueueHead, sQueueTail;      // under sQueueLock (the GX thread queues without the big lock)
+static SRWLOCK sQueueLock = SRWLOCK_INIT;
+BOOL PortGxBusy(void);                     // port_gx.cpp: the GP thread has work
 
 void PortQueueInterrupt(void (*fn)(void*), void* arg) {
+    AcquireSRWLockExclusive(&sQueueLock);
     sQueue[sQueueTail++ % 256] = {fn, arg};
+    ReleaseSRWLockExclusive(&sQueueLock);
+    if (sIdleEvent) SetEvent(sIdleEvent);  // the interrupt thread delivers it now
+}
+static BOOL PopInterrupt(Queued* q) {
+    AcquireSRWLockExclusive(&sQueueLock);
+    BOOL any = sQueueHead != sQueueTail;
+    if (any) *q = sQueue[sQueueHead++ % 256];
+    ReleaseSRWLockExclusive(&sQueueLock);
+    return any;
 }
 
 static DWORD WINAPI InterruptThread(void*) {
     for (;;) {
-        if (PortFastActive()) WaitForSingleObject(sIdleEvent, 1);   // fast-forward: woken as soon as every game thread waits
-        else Sleep(1);
+        WaitForSingleObject(sIdleEvent, 1);  // woken by a queued interrupt, and in fast-forward as soon as every game thread waits
         PortLockEnter();
         if (sIntrEnabled) {
-            while (sQueueHead != sQueueTail) {
-                Queued q = sQueue[sQueueHead++ % 256];
-                q.fn(q.arg);
-            }
-            // Fast-forward: nothing is queued and every game thread waits, so game time jumps to the next event.
-            if (sQueueHead == sQueueTail) PortClockAdvanceIfIdle();
+            Queued q;
+            while (PopInterrupt(&q)) q.fn(q.arg);
+            // Fast-forward: nothing is queued, the GP thread has nothing to do and every game thread waits, so game
+            // time jumps to the next event.
+            if (!PortGxBusy()) { AcquireSRWLockShared(&sQueueLock); BOOL none = sQueueHead == sQueueTail; ReleaseSRWLockShared(&sQueueLock); if (none) PortClockAdvanceIfIdle(); }
             PortOsTick();
             PortViTick();
             PortAudioTick();

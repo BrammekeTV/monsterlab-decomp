@@ -2,6 +2,7 @@
 // One CSV row per shown frame, a summary at the end. No original code here.
 #include "port/port.h"
 #include "port/port_overlay.h"
+#include "port/port_gx.h"
 #include <algorithm>
 #include <cstdio>
 #include <cstring>
@@ -12,6 +13,7 @@ static const char*       sPath;
 static std::vector<f32>  sTimes;        // wall ms of the frames that count (real time; all frames without --bench)
 static s32               sBenchStart;   // real-time frames began at this presented frame (-1: not yet)
 static f64               sSumGame, sSumRender, sSumWait, sSumPresent, sSumDraws, sSumVerts;
+static f64               sCpu0[2];      // CPU ms of the drawing and GP threads at the first real-time frame
 
 void PortPerfOpen(const char* path) {
     sPath = path;
@@ -32,6 +34,7 @@ void PortPerfFrame(const PortFrameStats* s, f32 presentMs) {
             s->draws, s->verts, s->efbCopies, s->textures, s->outW, s->outH);
     // The summary covers real-time frames only when the run fast-forwarded first (a benchmark); the first one has no frame time yet.
     if (fast || s->frameMs <= 0.0f) return;
+    if (sTimes.empty()) PortGxThreadCpu(&sCpu0[0], &sCpu0[1]);
     sTimes.push_back(s->frameMs);
     sSumGame += s->gameMs; sSumRender += s->renderMs; sSumWait += s->waitMs; sSumPresent += presentMs; sSumDraws += s->draws; sSumVerts += s->verts;
 }
@@ -47,15 +50,19 @@ void PortPerfFinish(void) {
     f64 sum = 0;
     for (f32 t : v) sum += t;
     auto pct = [&](f64 p) { return v[std::min(n - 1, (size_t)(p * n))]; };
+    f64 cpu[2];
+    PortGxThreadCpu(&cpu[0], &cpu[1]);
     f64 avg = sum / n;
     char sumPath[512];
     snprintf(sumPath, sizeof(sumPath), "%s.summary.txt", sPath);
     char text[1024];
     snprintf(text, sizeof(text),
              "frames %zu  average %.2f ms (%.1f fps)  p50 %.2f  p95 %.2f  p99 %.2f  worst %.2f ms\n"
-             "per frame: game %.2f ms  render %.2f ms  wait %.2f ms  present %.2f ms  draws %.0f  vertices %.0f\n",
+             "per frame: game %.2f ms  render %.2f ms  wait %.2f ms  present %.2f ms  draws %.0f  vertices %.0f\n"
+             "CPU per frame: game's drawing thread %.2f ms, GP thread %.2f ms\n",
              n, avg, 1000.0 / avg, pct(0.50), pct(0.95), pct(0.99), v.back(),
-             sSumGame / n, sSumRender / n, sSumWait / n, sSumPresent / n, sSumDraws / n, sSumVerts / n);
+             sSumGame / n, sSumRender / n, sSumWait / n, sSumPresent / n, sSumDraws / n, sSumVerts / n,
+             (cpu[0] - sCpu0[0]) / n, (cpu[1] - sCpu0[1]) / n);
     FILE* f = fopen(sumPath, "w");
     if (f) { fputs(text, f); fclose(f); }
     PortLog("perf: %s", text);

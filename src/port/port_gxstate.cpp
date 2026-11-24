@@ -674,7 +674,7 @@ void GXSetDrawSync(u16 token) {
     Bp(0x47000000u | token);
 }
 // GXReadDrawSync: the last token the processor passed
-s32 GXReadDrawSync(void) { return sDrawToken; }
+s32 GXReadDrawSync(void) { PortGxFinish(); return sDrawToken; }   // (the token the GP passed: once it has caught up, the last one set)
 
 // ---- projection
 void PortGxWriteF32(f32 v);

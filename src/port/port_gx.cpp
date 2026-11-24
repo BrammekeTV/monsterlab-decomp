@@ -12,7 +12,10 @@
 // interrupts where the stream asks for them, and hands draws and frame-buffer copies to the
 // renderer (PortGxBackend, none yet: they are counted).
 #ifdef _WIN32
+#include <windows.h>
+#include <intrin.h>
 #include <stdio.h>
+#include <stdlib.h>
 #include <string.h>
 
 #include "port/port.h"
@@ -44,12 +47,17 @@ static char sError[160];               // first malformed command
 // to learn how many bytes the display list it is recording holds (fn_8015BA30: register minus the
 // list's base), and moves on to the next list when this one is nearly full.
 #define PI_FIFO_WRITE_PTR (*(volatile u32*)(uintptr_t)(PORT_HW_BASE + 0x3014))
+static void Drain(void);
+static BOOL sGpOn;                     // the GP thread runs (below)
+static u32 sPutCount;                  // bytes put into the GP's FIFO since the last hand-over
+static const u32 kGpPiece = 16384;     // hand the main FIFO over every this many bytes
 static inline void Put(u8 b) {
     PortFifo* f = sCpu;
     if (!f || !f->base) { sLostBytes++; return; }
     *f->wr++ = b;
     if (f->wr >= f->base + f->size) f->wr = f->base;       // the hardware wraps too
     PI_FIFO_WRITE_PTR = (u32)(uintptr_t)f->wr;
+    if (sGpOn && f == sGp && ++sPutCount >= kGpPiece) Drain();   // the GP thread starts on what is there
 }
 extern "C" void PortGxFlushState(void);            // port_gxstate.cpp
 extern "C" void PortGxWrite8(u8 v) { Put(v); }
@@ -190,25 +198,31 @@ static void BpWrite(PortGx* g, u32 word) {
     }
 }
 
+// A command cut off at the end of the bytes: an error inside a display list; in a piece of the main FIFO handed to
+// the GP thread (sPartial) the rest comes with the next piece, so Run stops before it (sStopAt).
+static BOOL sPartial;
+static const u8* sStopAt;
+#define TRUNC(msg, at) { if (!depth && sPartial) { sStopAt = (at); return; } Fail(msg, op, at, start); return; }
 static void Run(PortGx* g, const u8* p, const u8* end, int depth) {
     const u8* start = p;
     while (p < end && !sError[0]) {
         u32 op = *p++;
         if (op == 0x00) continue;                           // NOP (padding)
         if (op == 0x08) {                                   // CP register
-            if (end - p < 5) { Fail("truncated CP load", op, p - 1, start); return; }
+            if (end - p < 5) { TRUNC("truncated CP load", p - 1); }
             g->cp[p[0]] = Be32(p + 1);
             p += 5;
             sStats.cp++;
         } else if (op == 0x10) {                            // XF registers / memory
-            if (end - p < 4) { Fail("truncated XF load", op, p - 1, start); return; }
+            if (end - p < 4) { TRUNC("truncated XF load", p - 1); }
             u32 n = Be16(p) + 1, addr = Be16(p + 2);
             p += 4;
-            if (n > 16 || (u32)(end - p) < n * 4) { Fail("bad XF load length", op, p - 5, start); return; }
+            if (n > 16) { Fail("bad XF load length", op, p - 5, start); return; }
+            if ((u32)(end - p) < n * 4) TRUNC("truncated XF load", p - 5);
             for (u32 i = 0; i < n; i++, p += 4) XfWrite(g, addr + i, Be32(p));
             sStats.xf++;
         } else if (op == 0x20 || op == 0x28 || op == 0x30 || op == 0x38) {   // XF load from an array
-            if (end - p < 4) { Fail("truncated indexed XF load", op, p - 1, start); return; }
+            if (end - p < 4) { TRUNC("truncated indexed XF load", p - 1); }
             u32 index = Be16(p), spec = Be16(p + 2);
             p += 4;
             u32 n = (spec >> 12) + 1, addr = spec & 0xFFF;
@@ -220,7 +234,7 @@ static void Run(PortGx* g, const u8* p, const u8* end, int depth) {
             }
             sStats.xfIndexed++;
         } else if (op == 0x40) {                            // call a display list
-            if (end - p < 8) { Fail("truncated display-list call", op, p - 1, start); return; }
+            if (end - p < 8) { TRUNC("truncated display-list call", p - 1); }
             u32 addr = Be32(p), size = Be32(p + 4);
             p += 8;
             const u8* dl = PortGxHostPtr(addr);
@@ -229,16 +243,17 @@ static void Run(PortGx* g, const u8* p, const u8* end, int depth) {
             if (depth < 4) Run(g, dl, dl + size, depth + 1);
         } else if (op == 0x48) {                            // invalidate the vertex cache
         } else if (op == 0x61) {                            // BP register
-            if (end - p < 4) { Fail("truncated BP load", op, p - 1, start); return; }
+            if (end - p < 4) { TRUNC("truncated BP load", p - 1); }
             BpWrite(g, Be32(p));
             p += 4;
         } else if (op >= 0x80 && op < 0xC0) {               // draw
-            if (end - p < 2) { Fail("truncated draw", op, p - 1, start); return; }
+            if (end - p < 2) { TRUNC("truncated draw", p - 1); }
             u32 count = Be16(p);
             p += 2;
             PortGxLayout layout;
             PortGxVertexLayout(g, op & 7, &layout);
-            if (layout.size == 0 || (u32)(end - p) < count * layout.size) { Fail("draw runs past the end of the list", op, p - 3, start); return; }
+            if (layout.size == 0) { Fail("draw with an empty vertex format", op, p - 3, start); return; }
+            if ((u32)(end - p) < count * layout.size) TRUNC("draw runs past the end of the list", p - 3);
             sStats.draws++;
             sStats.vertices += count;
             if (sBackend && sBackend->draw) sBackend->draw(g, op & 0xF8, &layout, count, p);
@@ -250,10 +265,110 @@ static void Run(PortGx* g, const u8* p, const u8* end, int depth) {
     }
 }
 
-// Runs what the GP's FIFO holds between its read and write pointers.
+// ------------------------------------------------------------------ the GP thread
+// On the console the graphics processor works through the FIFO while the CPU goes on writing to it. With a renderer
+// the port does the same: the bytes the GP is given (Drain) are copied into a queue, and a thread of its own runs the
+// interpreter and the renderer over them while the game goes on. The main FIFO is handed over in pieces as it fills
+// (Put), not only at a flush, so the GP works while the frame is being made. What the game waits for comes from that
+// thread when it gets there, as on the console: the draw-done and token interrupts, GXGetGPStatus idle. Memory the
+// commands point at (display lists, vertex arrays, textures) is read when the thread reaches them; the game already
+// keeps it alive for the GP until then (it does on the console). GXReadDrawSync and the screenshot wait until the
+// thread has caught up (PortGxSync). PORT_GX_SYNC=1 runs everything on the CPU's thread at each flush instead.
+static DWORD sGpThreadId, sGpProducer; // the GP thread; the thread that hands it work (the game's drawing thread)
+static SRWLOCK sGpLock = SRWLOCK_INIT;
+static CONDITION_VARIABLE sGpWork = CONDITION_VARIABLE_INIT, sGpIdle = CONDITION_VARIABLE_INIT;
+struct GpChunk { u8* p; u32 n, cap; };
+static GpChunk sGpQueue[64];           // the pieces waiting (a ring)
+static u32 sGpHead, sGpTail;
+static BOOL sGpBusy;                   // a piece is being run
+
+static void RunPiece(const u8* p, u32 n) {
+    static u8* carry; static u32 carryN, carryCap;     // a command cut off at the end of the last piece
+    const u8* run = p; u32 len = n;
+    if (carryN) {
+        if (carryN + n > carryCap) { carryCap = (carryN + n) * 2; carry = (u8*)realloc(carry, carryCap); }
+        memcpy(carry + carryN, p, n); carryN += n;
+        run = carry; len = carryN;
+    }
+    sPartial = TRUE; sStopAt = NULL;
+    Run(&gPortGxRegs, run, run + len, 0);
+    sPartial = FALSE;
+    const u32 used = sStopAt ? (u32)(sStopAt - run) : len;
+    if (used < len) {
+        const u32 rest = len - used;
+        if (rest > carryCap) { carryCap = rest * 2; carry = (u8*)realloc(carry, carryCap); }
+        memmove(carry, run + used, rest);
+        carryN = rest;
+    } else carryN = 0;
+}
+static DWORD WINAPI GpThread(void*) {
+    for (;;) {
+        AcquireSRWLockExclusive(&sGpLock);
+        while (sGpHead == sGpTail) SleepConditionVariableSRW(&sGpWork, &sGpLock, INFINITE, 0);
+        GpChunk c = sGpQueue[sGpHead % 64];
+        sGpBusy = TRUE;
+        ReleaseSRWLockExclusive(&sGpLock);
+        RunPiece(c.p, c.n);
+        AcquireSRWLockExclusive(&sGpLock);
+        sGpQueue[sGpHead % 64].n = 0;                  // (the buffer stays with the slot)
+        sGpHead++;
+        sGpBusy = FALSE;
+        if (sGpHead == sGpTail) WakeAllConditionVariable(&sGpIdle);
+        WakeAllConditionVariable(&sGpWork);            // a producer waiting for a free slot
+        ReleaseSRWLockExclusive(&sGpLock);
+    }
+}
+static void Submit(const u8* a, u32 an, const u8* b, u32 bn) {
+    AcquireSRWLockExclusive(&sGpLock);
+    while (sGpTail - sGpHead >= 64) SleepConditionVariableSRW(&sGpWork, &sGpLock, INFINITE, 0);   // the GP is far behind
+    GpChunk& c = sGpQueue[sGpTail % 64];
+    if (an + bn > c.cap) { c.cap = an + bn > 2 * kGpPiece ? an + bn : 2 * kGpPiece; c.p = (u8*)realloc(c.p, c.cap); }
+    memcpy(c.p, a, an); if (bn) memcpy(c.p + an, b, bn);
+    c.n = an + bn;
+    sGpTail++;
+    WakeAllConditionVariable(&sGpWork);
+    ReleaseSRWLockExclusive(&sGpLock);
+}
+static void GpStart(void) {
+    static BOOL tried;
+    if (tried) return;
+    tried = TRUE;
+    if (!sBackend || getenv("PORT_GX_SYNC")) return;
+    HANDLE h = CreateThread(NULL, 0, GpThread, NULL, 0, &sGpThreadId);
+    if (!h) return;
+    CloseHandle(h);
+    sGpOn = TRUE;
+    PortLog("GX: commands run on a thread of their own (PORT_GX_SYNC=1: at each flush on the CPU's thread)");
+}
+static BOOL GpIdle(void) {
+    AcquireSRWLockShared(&sGpLock);
+    BOOL idle = sGpHead == sGpTail && !sGpBusy;
+    ReleaseSRWLockShared(&sGpLock);
+    return idle;
+}
+void PortGxSync(void) {
+    if (!sGpOn || GetCurrentThreadId() == sGpThreadId) return;
+    AcquireSRWLockExclusive(&sGpLock);
+    while (sGpHead != sGpTail || sGpBusy) SleepConditionVariableSRW(&sGpIdle, &sGpLock, INFINITE, 0);
+    ReleaseSRWLockExclusive(&sGpLock);
+}
+BOOL PortGxBusy(void) { return sGpOn && !GpIdle(); }
+DWORD PortGxDrawThread(void) { return sGpOn && GetCurrentThreadId() == sGpThreadId ? sGpProducer : GetCurrentThreadId(); }
+
+// Runs (or hands to the GP thread) what the GP's FIFO holds between its read and write pointers.
 static void Drain(void) {
     PortFifo* f = sGp;
+    sPutCount = 0;
     if (!f || !f->base || f->rd == f->wr) return;
+    GpStart();
+    sGpProducer = GetCurrentThreadId();
+    if (sGpOn) {
+        if (f->wr >= f->rd) Submit(f->rd, (u32)(f->wr - f->rd), NULL, 0);
+        else Submit(f->rd, (u32)(f->base + f->size - f->rd), f->base, (u32)(f->wr - f->base));
+        f->rd = f->wr;
+        sStats.lists++;
+        return;
+    }
     if (f->wr >= f->rd) {
         Run(&gPortGxRegs, f->rd, f->wr, 0);
     } else {                                                // wrapped: only the main FIFO does
@@ -311,8 +426,12 @@ void GXSetGPFifo(GXFifoObj* fifo) {
 }
 void GXGetGPStatus(u8* overhi, u8* underlow, u8* readIdle, u8* cmdIdle, u8* brkpt) {
     *overhi = *underlow = *brkpt = 0;
-    *readIdle = *cmdIdle = 1;                    // the interpreter has always caught up
+    if (sGpOn && sCpu == sGp) Drain();           // (the console's GP reads the FIFO as it fills)
+    *readIdle = *cmdIdle = sGpOn ? (u8)GpIdle() : 1;   // without the GP thread the interpreter has always caught up
+    if (!*readIdle) YieldProcessor();            // (the game polls this in a loop)
 }
+// Hands the FIFO to the GP and waits until it has run everything (GXReadDrawSync, screenshots).
+extern "C++" void PortGxFinish(void) { if (sGpOn && sCpu == sGp && GetCurrentThreadId() == sGpProducer) Drain(); PortGxSync(); }
 void GXFlush(void) { PortGxFlushState(); if (sCpu == sGp) Drain(); }
 
 // GXDrawDone: sends the draw-done token and waits for the graphics processor to reach it
@@ -331,6 +450,27 @@ void* fn_8024B50C(void* cb) { void* old = (void*)sDrawSyncCb; sDrawSyncCb = (GXD
 
 void PortGxSetBackend(const PortGxBackend* backend) { sBackend = backend; }
 const PortGxStats* PortGxGetStats(void) { return &sStats; }
+
+// CPU time so far (ms) of the game's drawing thread (the one that hands over the commands) and of the GP thread (0
+// without one), for the benchmark summary.
+static f64 ThreadMs(DWORD id) {
+    if (!id) return 0;
+    HANDLE h = OpenThread(THREAD_QUERY_LIMITED_INFORMATION, FALSE, id);
+    if (!h) return 0;
+    // (cycles, as milliseconds at the time-stamp counter's rate: measured once against the performance counter)
+    static f64 cyclesPerMs;
+    if (!cyclesPerMs) {
+        LARGE_INTEGER f, a, b; QueryPerformanceFrequency(&f); QueryPerformanceCounter(&a);
+        u64 t0 = __rdtsc();
+        do QueryPerformanceCounter(&b); while ((b.QuadPart - a.QuadPart) * 1000 < f.QuadPart * 20);
+        cyclesPerMs = (f64)(__rdtsc() - t0) * f.QuadPart / ((f64)(b.QuadPart - a.QuadPart) * 1000.0);
+    }
+    ULONG64 cyc = 0;
+    QueryThreadCycleTime(h, &cyc);
+    CloseHandle(h);
+    return (f64)cyc / cyclesPerMs;
+}
+void PortGxThreadCpu(f64* drawMs, f64* gpMs) { *drawMs = ThreadMs(sGpProducer); *gpMs = sGpOn ? ThreadMs(sGpThreadId) : 0; }
 
 const char* PortGxStatsText(char* buf, u32 n) {
     int k = snprintf(buf, n, "%u command list(s): %u BP, %u CP, %u XF (+%u indexed) loads, %u list call(s), %u draw(s) with %u vertices, "
@@ -400,6 +540,7 @@ int PortSelfTestGx(void) {
 
     GXSetGPFifo(&list);                                     // run it
     GXSetGPFifo(&sMainFifo);
+    PortGxSync();                                           // (the GP thread, when it runs, has got there)
     CHECK(!sError[0]);
     CHECK(sTestDraws == 1 && sTestVerts == 4 && sTestSize == 17);
     CHECK(gPortGxRegs.bp[0x41] == 0x1234EF);                // the mask kept the upper 16 bits
@@ -412,6 +553,7 @@ int PortSelfTestGx(void) {
     GXWGFifo._u8 = 0x61; GXWGFifo._u32 = 0x22000777;
     CHECK(gPortGxRegs.bp[0x22] != 0x777);
     GXFlush();
+    PortGxSync();
     CHECK(gPortGxRegs.bp[0x22] == 0x777);
 
     // A malformed list is reported, not followed.
