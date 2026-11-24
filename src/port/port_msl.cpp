@@ -18,6 +18,9 @@ void __register_global_object(void* obj, void (*dtor)(void*), void* handle) {}
 // Compiler helper: unsigned 64-bit integer to float.
 f32 __cvt_ull_flt(u64 v) { return (f32)v; }
 
+// The integer abs(); symbols.txt names it __cvt_fp2signed.
+s32 __cvt_fp2signed(s32 v) { return v < 0 ? -v : v; }
+
 f64 ceil_(f64 x) { return ceil(x); }
 
 // __construct_array: runs a constructor over an array in place. The original passes 1 as the
