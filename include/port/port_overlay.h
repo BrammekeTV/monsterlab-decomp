@@ -22,6 +22,11 @@ typedef struct PortFrameStats {
     BOOL wide;
 } PortFrameStats;
 
+void PortPerfOpen(const char* path);                       // --perf-log (port_perf.cpp)
+BOOL PortPerfActive(void);
+void PortPerfFrame(const PortFrameStats* s, f32 presentMs);
+void PortPerfFinish(void);
+
 extern BOOL gPortOverlayOn;   // F3, --stats
 extern BOOL gPortGuiOpen;     // the settings screen (F1 or Esc, --settings): it has the keyboard and mouse, the game does not
 extern int  gPortGuiPage;     // the page to open on (0 display, 1 audio, 2 controls), then -1

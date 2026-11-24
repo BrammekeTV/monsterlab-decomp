@@ -43,6 +43,7 @@ static LONG      sStopping;
 static s32       sSkippedCtors, sRunCtors;
 static HANDLE    sMainThread;
 
+void PortSamplerStart();
 void PortLog(const char* fmt, ...) {
     char line[1024];
     va_list ap;
@@ -128,6 +129,7 @@ void PortStop(int exitCode, const char* fmt, ...) {
     vsnprintf(line, sizeof(line), fmt, ap);
     va_end(ap);
     fflush(stdout);
+    PortPerfFinish();
     if (gPortOptions.screenshot) {
         if (PortGfxSaveScreenshot(gPortOptions.screenshot)) fprintf(stderr, "[port] screenshot: %s\n", gPortOptions.screenshot);
         else fprintf(stderr, "[port] no screenshot: nothing was shown\n");
@@ -263,6 +265,11 @@ void PortFrameDone(void) {
         if (cur) PortLog("cursor: %.1f %.1f", *(f32*)(cur + 0x68), *(f32*)(cur + 0x6C));
     }
     if (!gPortOptions.fastAll && sFrames >= gPortOptions.fastForward) PortFastEnd();
+    if (gPortOptions.bench && !PortFastActive()) {      // the benchmark's 20 s of real time
+        static DWORD benchStart;
+        if (!benchStart) benchStart = GetTickCount();
+        else if (GetTickCount() - benchStart >= 20000) PortStop(0, "benchmark finished (20 s of real time)");
+    }
     if (gPortOptions.frameLimit && sFrames >= gPortOptions.frameLimit) {
         PortStop(0, "frame limit reached (%d frames)", sFrames);
     }
@@ -966,6 +973,12 @@ struct PortBoot {
             else if (!strcmp(a, "--fast-forward") && i + 1 < __argc) gPortOptions.fastForward = atoi(__argv[++i]);
             else if (!strcmp(a, "--fast")) gPortOptions.fastAll = TRUE;
             else if (!strcmp(a, "--to-menu")) gPortOptions.toMenu = TRUE;
+            else if (!strcmp(a, "--perf-log") && i + 1 < __argc) gPortOptions.perfLog = __argv[++i];
+            else if (!strcmp(a, "--bench") && i + 1 < __argc) {
+                const char* v = __argv[++i];
+                gPortOptions.bench = !strcmp(v, "menu") ? 1 : !strcmp(v, "village") ? 2 : 0;
+                if (!gPortOptions.bench) fprintf(stderr, "[port] --bench %s: expected menu or village\n", v);
+            }
             else if (!strcmp(a, "--seconds") && i + 1 < __argc) { gPortOptions.secondsLimit = atoi(__argv[++i]); sawSeconds = TRUE; }
             else if ((!strcmp(a, "--data") || !strcmp(a, "--iso")) && i + 1 < __argc) asked = __argv[++i];
             else if (!strcmp(a, "--window")) gPortOptions.window = TRUE;
@@ -976,6 +989,7 @@ struct PortBoot {
             else if (!strcmp(a, "--watch") && i + 1 < __argc) sWatch = strtoul(__argv[++i], NULL, 16);
             else if (!strcmp(a, "--show-texture") && i + 1 < __argc) gPortOptions.showTexture = atoi(__argv[++i]);
             else if (!strcmp(a, "--screenshot") && i + 1 < __argc) gPortOptions.screenshot = __argv[++i];
+            else if (!strcmp(a, "--capture-at") && i + 1 < __argc) gPortOptions.captureAt = atoi(__argv[++i]);
             else if (!strcmp(a, "--stats")) gPortOverlayOn = TRUE;
             else if (!strcmp(a, "--mods") && i + 1 < __argc) PortModsSetDir(__argv[++i]);
             else if (!strcmp(a, "--no-mods")) noMods = TRUE;
@@ -1041,6 +1055,18 @@ struct PortBoot {
             }
         }
 
+        if (gPortOptions.bench) {                 // --bench: the scripted run of docs/port_runtime.md; 20 s of real time after the fast-forward
+            gPortOptions.toMenu = TRUE;
+            gPortOptions.noMovies = TRUE;
+            if (gPortOptions.bench == 2) {        // village: title, new game conversation, the village map (idle from about frame 4710)
+                static const char* const kPresses[] = {"A@3000-3006", "A@3600-3610", "A@4000-4006", "A@4200-4206"};
+                for (const char* p : kPresses) PortInputAddPress(p);
+                PortInputAddPointer("663,200@3500");
+                if (gPortOptions.fastForward < 4800) gPortOptions.fastForward = 4800;
+            }
+            if (!gPortOptions.perfLog) gPortOptions.perfLog = "build/pc/bench.csv";
+        }
+        if (gPortOptions.perfLog) PortPerfOpen(gPortOptions.perfLog);
         if (gPortOptions.toMenu) {                // --to-menu: unpaced to the title, A, on to the main menu, then real time
             // Frames as counted by PortFrameDone (the title is up from about frame 2400; the menu from about 3100).
             if (gPortOptions.fastForward < kMenuFrame) gPortOptions.fastForward = kMenuFrame;
@@ -1171,6 +1197,7 @@ static void __cdecl PortPreMain(void) {
     }
     PortStartInterrupts();
     if (gPortOptions.haveData && !gPortOptions.selfTest && (gPortOptions.window || gPortOptions.screenshot || gPortOptions.showTexture >= 0))
+        PortSamplerStart();                                 // PORT_SAMPLE=1: instruction-pointer sampler (src/port/port_sampler.cpp)
         PortGfxStart(gPortOptions.window);
     PortRunStaticInit();
 }

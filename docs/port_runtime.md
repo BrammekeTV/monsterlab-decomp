@@ -34,6 +34,8 @@ build\pc\monsterlab.exe                        # runs main() with your own disc 
 | `--screenshot FILE` | write the last picture shown as a PNG when the run stops (works without `--window`) |
 | `--stats` | start with the stats overlay on (top-right; F3 turns it on and off in the window): frames per second, frame time split into game, render and wait, draw calls, GX vertices, frame-buffer copies, textures, audio voices, output size |
 | `--screenshot-stats` | draw the stats overlay into the `--screenshot` picture too (it is left out otherwise) |
+| `--capture-at N` | take the F12 capture at game frame N (headless tests; needs `--screenshot FILE` or `--window` so the renderer runs) |
+| F12 (in the window) | **capture** for picture problems that show on one machine: into `captures/` next to the exe, with a timestamped name: `capture_<stamp>_movie.png` (the decoded frame of the movie on show, BT.601 studio range, before any upload or draw), `_efb.png` (the frame buffer at the render resolution), `_picture.png` (the output picture), `_backbuffer.png` (the window's back buffer as presented, with the overlay) and `_settings.txt` (every setting, the window's client size, window size, DPI and monitor). Send the folder when reporting a rendering problem. Never commit captures (`captures/` is in `.gitignore`). `port_capture.cpp` |
 | `--settings [display\|audio\|controls\|game\|mods]` | open the settings screen at the start (F1 or Esc opens and closes it in the window); with `--screenshot-stats` it is drawn into the screenshot |
 | `--vsync`, `--fullscreen` | vertical sync; borderless fullscreen (both also in the settings screen) |
 | `--no-ini` | do not read `monsterlab.ini` (next to the exe: display, audio and the key bindings, written by the settings screen; the command line wins over it) |
@@ -508,3 +510,21 @@ MSVC only for now (absolute symbols, `/alternatename`, structured exception hand
 6. **Initialised data**: add `port_data.txt` entries where a mixed struct is read wrongly (the
    seven `GXRenderModeObj` tables are in).
 7. **GX**: draw (OpenGL). Until then a "frame" is only a VI flip.
+
+## Benchmark and frame-time log
+
+`--perf-log FILE` writes one CSV row per shown frame (`frame, fast, wall_ms, game_ms, render_ms, wait_ms, present_ms, draws, vertices, copies,
+textures, out_w, out_h`; `fast` is 1 while fast-forwarding) and, when the run ends, `FILE.summary.txt` with the real-time frames' average, p50,
+p95, p99 and worst frame time, fps and the average split. `--bench menu|village` is a fixed scenario: unpaced to the main menu (or, for
+`village`, through the new-game conversation to the village map), then 20 s of real time, then the exit; the log goes to `build/pc/bench.csv`
+unless `--perf-log` says otherwise. Same settings (`--res`, `--msaa`, `--render-scale`, `--vsync`, `--fps-cap`) give comparable runs.
+
+On a PC with a monitor, run from the repository folder (the disc in `orig/` as usual), one scenario after the other with nothing else running:
+
+```powershell
+build\pc\monsterlab.exe --window --res 1920x1080 --bench menu --perf-log bench_menu_1080.csv
+build\pc\monsterlab.exe --window --res 1920x1080 --bench village --perf-log bench_village_1080.csv
+```
+
+The window opens, the game fast-forwards (about 30 s for the menu, 60 s for the village), plays 20 s in real time and closes by itself. Send
+`bench_*.csv` and `bench_*.csv.summary.txt`. Add `--msaa 4`, `--render-scale 1.5` or `--res 2560x1440` for the other settings.

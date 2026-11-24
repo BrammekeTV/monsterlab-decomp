@@ -903,6 +903,17 @@ struct ZoneDump {
             for (u32 i = 0; i < clips; i++) Clip(*(const u8**)(list + i * 4));
         }
     }
+    void PartTable(const LevelZoneRoots* roots, u32 zoneBase) {
+    // The part resource table (header +0x44, count +0x48): 0x10-byte entries.
+    if (roots->partCount != 0 && In(z->image + (roots->partTable - zoneBase), roots->partCount * 4)) {
+        const u32* t = (const u32*)(z->image + (roots->partTable - zoneBase));
+        for (u32 i = 0; i < roots->partCount; i++) {
+            const u8* e = *(const u8**)(t + i);
+            if (!In(e, 0x10)) continue;
+            printf("partentry %u %08x %08x %08x %08x\n", i, *(const u32*)e, *(const u32*)(e + 4), *(const u32*)(e + 8), *(const u32*)(e + 12));
+        }
+    }
+    }
     // The slots' placed effects (slot +0x80, count +0x9C), then the slots' objects (slot +0xA8):
     // the list, and of each object the type fn_8012FD0C reads.
     void SlotObjects(const LevelZoneRoots* roots, u32 zoneBase) {
@@ -1676,6 +1687,7 @@ static int DumpLevel(const char* path) {
     zd.Entities();
     zd.Records(&roots, zoneBase);
     if (hudInZone) DumpMachines(&z, hud, *(const u8**)(hud + 0x434), true, &zd.machines);
+    zd.PartTable(&roots, zoneBase);
     LevelZoneRootsFree(&roots);
     // Zone 1, as the port converts it when the game loads it: zone 0 is in memory, converted.
     if (f.zone1 != NULL) {
@@ -2897,10 +2909,10 @@ static void LevelSelfTest(void) {
     CHECK(holder == zone + L_HOLDER && *(const u8**)holder == list && *(const u8**)(holder + 4) == NULL);
     const u8* child = *(const u8**)(ent + 0xB0);
     CHECK(child == zone + L_CHILD && *(const u8**)(child + 4) == NULL && child[0] == 0x7F);
-    // The slot's objects as fn_8012FD0C walks them (the type picks the class; the hash at +4 has no
-    // reader yet and stays), and its placed effects as WorldOnZoneLoaded reads them.
+    // The slot's objects as fn_8012FD0C walks them (the type picks the class; the hash at +4 is read by
+    // StopUsingAnimatedCamera), and its placed effects as WorldOnZoneLoaded reads them.
     const u8* obj = **(const u8***)(s0 + 0xA8);
-    CHECK(obj == zone + L_OBJ && *(const u32*)(obj + 8) == 15 && obj[4] == 0xCC && obj[7] == 0x21);
+    CHECK(obj == zone + L_OBJ && *(const u32*)(obj + 8) == 15 && *(const u32*)(obj + 4) == 0xCC05AC21u);
     CHECK(*(const u32*)(obj + 0x14) == 1 && *(const u8* const*)(obj + 0x10) == NULL && *(const f32*)(obj + 0x40) == 3.0f);
     CHECK(*(const u32*)(obj + 0x58) == 0x80090020 && *(const u32*)(obj + 0x5C) == 0x94F99D89 && obj[0x54] == 0x7F);
     const u8* fx = **(const u8***)(s0 + 0x80);
