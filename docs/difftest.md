@@ -117,3 +117,10 @@ mismatch"; with `--calls` most crashes are callees that need game state the test
 - No paired-single arithmetic, no byte-reversed loads, at most 8 integer and 8 float arguments, no structs
   by value, no member functions.
 - A function that only writes through its own stack frame and returns nothing is compared on memory alone.
+
+## Known harness limits
+
+`tools/difftest/known_limits.txt` lists functions whose mismatch or crash is a limit of the harness (a static that lives at another
+address in the PC build, host-order node references and u64 flags, a leftover `r3`, random input outside the real range). The report
+counts them as `KNOWN` instead of `MISMATCH`/`CRASH`; `--show-known` lists them and `--strict` ignores the file. Add a line
+(`0xADDR reason`) only after the asm shows the C++ is right.

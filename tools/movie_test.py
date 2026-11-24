@@ -5,7 +5,7 @@
 Runs the exe unpaced with --wav to the end of the first movie, takes screenshots at a few frame counts inside it
 and checks that the log says the movie was opened, that the pictures are not black, that they differ from each
 other, and that the audio has sound while the movie runs. Output (PNGs, WAV) stays in build/movie_test/ (game
-content: never commit it). Needs the game (orig/RM7P4F or --iso). Also runs once with --no-movies.
+content: never commit it). Needs the game (orig/RM7P4F or --iso). Also runs once with --no-movies and once pressing A at frame 2700 (the skip).
 """
 import os, subprocess, sys, wave
 import numpy as np
@@ -48,6 +48,11 @@ def main():
     loud = float(np.sqrt((d[-w.getframerate() * 2 * 20:] ** 2).mean()))   # the last 20 s of the run
     print(f"audio: {w.getnframes() / w.getframerate():.1f} s, rms of the last 20 s {loud:.0f}")
     ok &= loud > 200
+    # A button skips a movie after the game's own 3 seconds: the picture at 3000 is then not the movie's any more.
+    log, png, wav = run(data + ["--press", "A@2700-2710"], "skip", 3000)
+    skipped = png_stats(png).mean() < shots[1].mean() / 2 and "frame limit reached" in log
+    print(f"skip with A after 3 s: {skipped}")
+    ok &= skipped
     log, png, wav = run(data + ["--no-movies"], "nomovies", 3000)
     quiet = "Bink: " not in log and "frame limit reached" in log
     print(f"--no-movies: no movie opened and the run goes on: {quiet}")

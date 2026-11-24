@@ -1,6 +1,6 @@
 """Compare the PC Bink decoder (src/port/port_bink_codec.cpp) with FFmpeg on a movie from your disc.
 
-    python tools/bink_check.py [file.bik] [--ffmpeg PATH]
+    python tools/bink_check.py [file.bik] [--ffmpeg PATH] [--all]   (--all: also decode every movie next to it, all audio tracks)
 
 Builds tests/bink_test.cpp, decodes a few frames and the audio of track 0, decodes the same with ffmpeg
 (needs ffmpeg.exe on PATH; used only as a reference, not shipped) and compares. Output stays in build/bink_test/.
@@ -12,7 +12,7 @@ sys.path.insert(0, HERE)
 import check
 
 def main():
-    argv = sys.argv[1:]
+    argv = [a for a in sys.argv[1:] if a != "--all"]
     ff = "ffmpeg"
     if "--ffmpeg" in argv:
         i = argv.index("--ffmpeg"); ff = argv[i + 1]; del argv[i:i + 2]
@@ -50,6 +50,12 @@ def main():
     err = np.abs(a[:n] - b[:n]).max() if n else 1e9
     print(f"audio: {a.size} vs {b.size} samples, max abs error {err:.3g} (peak {np.abs(b).max():.3g})")
     ok &= n > 0 and err < 1e-3
+    if "--all" in sys.argv:
+        root = os.path.dirname(path)
+        for d in sorted({os.path.join(os.path.dirname(root), "fmv"), root, os.path.join(os.path.dirname(root), "fmv_PAL")}):
+            for f in sorted(os.listdir(d) if os.path.isdir(d) else []):
+                if f.lower().endswith(".bik"):
+                    r = subprocess.run([exe, "all", os.path.join(d, f)], capture_output=True, text=True); print(r.stdout.strip()); ok &= r.returncode == 0
     print("BINK CHECK OK" if ok else "BINK CHECK FAIL")
     sys.exit(0 if ok else 1)
 main()

@@ -116,6 +116,9 @@ u64 fn_8032FB38(u32 /*unused*/, f32 secs) {
     return (u64)(s64)x;
 }
 
+// __shr2u (0x8032F9C4): a 64-bit logical shift right of {hi, lo} by 0..63 (srw/slw give 0 for counts of 32 and up).
+u64 __shr2u(s32 hi, s32 lo, s32 n) { return (((u64)(u32)hi << 32) | (u32)lo) >> (n & 63); }
+
 // MSL qsort.
 void fn_80336FE0(void* base, s32 n, s32 size, void* cmp) {
     qsort(base, (size_t)n, (size_t)size, (int (__cdecl*)(const void*, const void*))cmp);

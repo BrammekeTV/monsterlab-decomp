@@ -300,7 +300,7 @@ u8* fn_801B4334(u8* arg0, s32 layer, u8* ent, s32 reset) {
         *(u8**)(arg0 + 0x4) = ent;
         if (reset != 0) {
             *(u8*)(ent + 0x34) = (u8)layer;
-            *(s32*)(*(u8**)(arg0 + 0x4) + 0x1C) = 1 << layer;
+            *(s32*)(*(u8**)(arg0 + 0x4) + 0x1C) = (s32)PpcSlw(1u, layer);
             *(s32*)(*(u8**)(arg0 + 0x4) + 0x20) = 0;
             u8* d = *(u8**)(arg0 + 0x4);
             *(f32*)(d + 0x0) = 0.0f;

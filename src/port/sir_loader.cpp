@@ -203,6 +203,7 @@ extern "C" const char* SirErrorText(SirError e) {
     case SIR_ERR_LEVEL:          return "level header block not recognised (zone slot table)";
     case SIR_ERR_ZONE_RECORD:    return "zone record of a level zone not recognised (list that leaves the zone or loops, bad animation player)";
     case SIR_ERR_ENTITY:         return "entity of a level zone not recognised (part list outside the zone, child list that loops)";
+    case SIR_ERR_SOUND:          return "voice line is not a .dsp header with samples (format, sample rate)";
     case SIR_ERR_OVERLAP:        return "two objects of the image share bytes";
     case SIR_ERR_IO:             return "cannot read file";
     }
@@ -1195,7 +1196,8 @@ static SirError HudPlan(ImagePlan* plan, const u8* image, u32 imageSize, u32 add
     return SIR_OK;
 }
 
-static const SirField kPoolTableEntryFields[4] = {
+static const SirField kPoolTableEntryFields[5] = {
+    { 0x00, SIR_U32, 1 },     // code: the pool's name hash (HashTableFind: SpawnHelper finds its template by it)
     { 0x04, SIR_PTR, 1 },     // code: pool (fn_801DB1AC -> fn_801EBC74, fn_801EBBE0)
     { 0x0C, SIR_U32, 1 },     // code: s32 script function index, -1 for none
     { 0x10, SIR_U32, 1 },     // code: s32 index of the script function run when the zone is unloaded (fn_801DB248)
@@ -1698,6 +1700,8 @@ static const SirField kEntityPartFields[] = {
 #define ENTITY_PART_DEF_USED 0x28
 
 #define ENTITY_DEPTH_MAX 64
+#define MAP_PATH_SIZE     0x1AC
+#define MAP_JUNCTION_SIZE 0xDC
 
 // In a level zone a pointer may lead into another zone's image, which is not in memory when this
 // one is converted. Such an object is skipped (its pointer is still converted); 1 = inside.
@@ -1899,6 +1903,7 @@ static SirError SceneItemDrawPlan(ImagePlan* plan, const u8* image, u32 imageSiz
     return SIR_OK;
 }
 
+<<<<<<< HEAD
 // Effect library: header +0x7C records, array at +0x80 (fn_8012FFA4 hands it to the manager lbl_8047C730; SpawnEffectAt
 // binary-searches it by the key when the sorted flag at +0x84 is set). A record (0xEC bytes): +0x00 the effect's name hash,
 // +0x04 the number of emitters (up to 8), from +0x0C the emitters (0x1C bytes: a pointer to the emitter descriptor, six floats).
@@ -1925,6 +1930,42 @@ static SirError FxEffectLibraryPlan(ImagePlan* plan, const u8* image, u32 imageS
             u32 it;
             if (te == SIR_OK && LevelSpan(Be32(image + o + 0x1D8), 0xC4, imageSize, &it)) te = SceneItemDrawPlan(plan, image, imageSize, it);
             if (te != SIR_OK) return te;
+=======
+// A collision tree (fn_8016CA24): +0x00 a version word (0x43), +0x04 how many vertices, +0x08
+// triangles, +0x0C flag words, +0x10 nodes, +0x14 the size of the node buffer, +0x18 the vertices
+// (three floats), +0x1C the flag words (one per surface; a triangle names its own), +0x20 the node
+// buffer. A node is 0x20 bytes: box minimum, link, box maximum, a word. With bit 31 of the link
+// clear it has two children, at the offsets `link` and the word; with it set it is a leaf of
+// `word` triangles at the offset `link & 0x7FFFFFFF`: four u16 each (three vertices, the flag word).
+#define COLLISION_TREE_USED 0x24
+static SirError CollisionTreePlan(ImagePlan* plan, const u8* image, u32 imageSize, u32 addr) {
+    u32 off, verts, flags, nodes;
+    if (!LevelSpan(addr, COLLISION_TREE_USED, imageSize, &off) || PlanHas(plan, off, REGION_U32_ARRAY)) return SIR_OK;
+    if (!PlanAdd(plan, off, 0x18, REGION_U32_ARRAY) || !PlanAdd(plan, off + 0x18, 0xC, REGION_PTR_ARRAY)) return SIR_ERR_ENTITY;
+    u32 vertCount = Be32(image + off + 4), flagCount = Be32(image + off + 0xC), size = Be32(image + off + 0x14);
+    if (vertCount > imageSize / 12 || flagCount > imageSize / 4 || size > imageSize) return SIR_ERR_ENTITY;
+    if (vertCount != 0 && (!LevelSpan(Be32(image + off + 0x18), (u64)vertCount * 12, imageSize, &verts) ||
+                           !PlanAdd(plan, verts, vertCount * 12, REGION_U32_ARRAY))) return SIR_ERR_ENTITY;
+    if (flagCount != 0 && (!LevelSpan(Be32(image + off + 0x1C), (u64)flagCount * 4, imageSize, &flags) ||
+                           !PlanAdd(plan, flags, flagCount * 4, REGION_U32_ARRAY))) return SIR_ERR_ENTITY;
+    if (size < 0x20 || Be32(image + off + 8) == 0) return SIR_OK;
+    if (!LevelSpan(Be32(image + off + 0x20), size, imageSize, &nodes)) return SIR_ERR_ENTITY;
+    u32 stack[64], depth = 0, at = 0, guard = size / 0x20 + 1;
+    for (;;) {
+        if (guard-- == 0 || (u64)at + 0x20 > size) return SIR_ERR_ENTITY;
+        if (!PlanAdd(plan, nodes + at, 0x20, REGION_U32_ARRAY)) return SIR_ERR_ENTITY;      // a node reached twice is an overlap
+        u32 link = Be32(image + nodes + at + 0xC), word = Be32(image + nodes + at + 0x1C);
+        if (link & 0x80000000u) {
+            u32 tris = link & 0x7FFFFFFFu;
+            if (word > size / 8 || (u64)tris + (u64)word * 8 > size) return SIR_ERR_ENTITY;
+            if (word != 0 && !PlanAdd(plan, nodes + tris, word * 8, REGION_U16_ARRAY)) return SIR_ERR_ENTITY;
+            if (depth == 0) break;
+            at = stack[--depth];
+        } else {
+            if (depth == 64) return SIR_ERR_ENTITY;
+            stack[depth++] = word;
+            at = link;
+>>>>>>> origin/master
         }
     }
     return SIR_OK;
@@ -1941,6 +1982,9 @@ static SirError SceneObjectPlan(ImagePlan* plan, const u8* image, u32 imageSize,
         if (PlanHas(plan, o + 4, REGION_PTR_ARRAY)) return SIR_OK;                     // two objects with one list
         if (!PlanAdd(plan, o + 4, 8, REGION_PTR_ARRAY) || !PlanAdd(plan, o + 0xC, 4, REGION_U32_ARRAY) ||
             !PlanAdd(plan, o + 0x38, 4, REGION_U32_ARRAY)) return SIR_ERR_ENTITY;
+        // The collision tree of the zone's ground (+0x1C; fn_80139684 hands it to fn_8016CA24).
+        if (!PlanAdd(plan, o + 0x1C, 4, REGION_PTR_ARRAY)) return SIR_ERR_ENTITY;
+        { SirError te = CollisionTreePlan(plan, image, imageSize, Be32(image + o + 0x1C)); if (te != SIR_OK) return te; }
         // The list's lights (+0x10, +0x14, count +0x18).
         if (!PlanAdd(plan, o + 0x10, 8, REGION_PTR_ARRAY) || !PlanAdd(plan, o + 0x18, 4, REGION_U32_ARRAY)) return SIR_ERR_ENTITY;
         u32 lightNode = Be32(image + o + 0x10), light, lights = 0;
@@ -2911,6 +2955,7 @@ static const SirField kLevelHeaderFields[] = {
     { 0x030, SIR_U32, 1 },    // code: its count
     { 0x038, SIR_PTR, 1 },    // code: second object list
     { 0x03C, SIR_U32, 1 },    // code: its count
+    { 0x074, SIR_PTR, 2 },    // code: the objects projectiles are spawned from (SpawnCoffinProjectile +0x74, FireRocketAtEntity +0x78)
     { 0x07C, SIR_U32, 1 },    // code: fn_8012FFA4 copies +0x7C..+0x90 to the manager lbl_8047C730: count,
     { 0x080, SIR_PTR, 1 },    //       entries, (u8 flag at +0x84),
     { 0x088, SIR_U32, 1 },    //       count,
@@ -3217,8 +3262,16 @@ extern "C" BOOL LevelZoneRootsCollect(const u8* hdr, u32 hdrSize, const u8* zone
     if (ok) out->hud = ZoneAddr(hdr + 0x1F4, zoneHost, zoneSize, zoneWiiBase);
     if (ok && Host32(hdr + 0x24) != 0 && (out->locators = ZoneAddr(hdr + 0x28, zoneHost, zoneSize, zoneWiiBase)) != 0)
         out->locatorCount = Host32(hdr + 0x24);
+<<<<<<< HEAD
     if (ok && Host32(hdr + 0x7C) != 0 && (out->effectLibrary = ZoneAddr(hdr + 0x80, zoneHost, zoneSize, zoneWiiBase)) != 0)
         out->effectLibraryCount = Host32(hdr + 0x7C);
+=======
+    for (u32 k = 0; ok && k < 2; k++) out->spawnOwners[k] = ZoneAddr(hdr + 0x74 + k * 4, zoneHost, zoneSize, zoneWiiBase);
+    if (ok && Host32(hdr + 0x30) != 0 && (out->paths = ZoneAddr(hdr + 0x2C, zoneHost, zoneSize, zoneWiiBase)) != 0)
+        out->pathCount = Host32(hdr + 0x30);
+    if (ok && Host32(hdr + 0x3C) != 0 && (out->junctions = ZoneAddr(hdr + 0x38, zoneHost, zoneSize, zoneWiiBase)) != 0)
+        out->junctionCount = Host32(hdr + 0x3C);
+>>>>>>> origin/master
     for (u32 t = 0; ok && t < 2; t++) {                          // scene objects: the tables at +0x1B0 and +0x1BC
         const u8* table = HeaderTable(hdr, hdrSize, hdr + kLevelBlockTables[t], &entries);
         for (u32 k = 0; ok && table != NULL && k < entries; k++)
@@ -3276,6 +3329,8 @@ extern "C" BOOL LevelZoneRootsCollect(const u8* hdr, u32 hdrSize, const u8* zone
 // A zone slot's objects (slot +0xA8, count in the byte at +0xAC): pointers to objects whose type
 // word at +0x08 picks the class fn_8012FD0C sets up again when the zone starts (types 0 to 5, 8,
 // 9 and 15 to 18). That is all that is typed of them so far.
+#define CAMERA_BASE_USED 0x64
+#define CAMERA_NODE_SIZE 0x14
 #define CAMERA_TRACK_TYPE 15
 #define CAMERA_TRACK_USED 0x60
 #define CAMERA_AIM_TYPE 16
@@ -3287,6 +3342,23 @@ static SirError SlotObjectsPlan(ImagePlan* plan, const u8* image, u32 imageSize,
     for (u32 i = 0; i < count; i++) {
         if (!LevelSpan(Be32(image + off + i * 4), 0x0C, imageSize, &o) || PlanHas(plan, o + 8, REGION_U32_ARRAY)) continue;
         if (!PlanAdd(plan, o + 8, 4, REGION_U32_ARRAY)) return SIR_ERR_LEVEL;
+        // What every type starts with (fn_800DECD8, fn_800DE678): +0x0C how many boundary nodes, +0x10
+        // the nodes (0x14 bytes: a word, a position, a float), +0x14 how many segments, +0x18 the
+        // segments (two node indices, bytes), +0x34..+0x53 eight floats (angle, timers, blend), +0x54
+        // four bytes. Type 1 follows the object at +0x58 (fn_800E3040); type 2 has a position there.
+        {
+            u32 t, type = Be32(image + o + 8), nodes;
+            if (LevelSpan(Be32(image + off + i * 4), CAMERA_BASE_USED, imageSize, &t) && !PlanHas(plan, t + 0x0C, REGION_U32_ARRAY)) {
+                if (!PlanAdd(plan, t + 0x0C, 4, REGION_U32_ARRAY) || !PlanAdd(plan, t + 0x10, 4, REGION_PTR_ARRAY) ||
+                    !PlanAdd(plan, t + 0x14, 4, REGION_U32_ARRAY) || !PlanAdd(plan, t + 0x18, 4, REGION_PTR_ARRAY) ||
+                    !PlanAdd(plan, t + 0x34, 0x20, REGION_U32_ARRAY)) return SIR_ERR_LEVEL;
+                if (type == 1 && !PlanAdd(plan, t + 0x58, 4, REGION_PTR_ARRAY)) return SIR_ERR_LEVEL;
+                if (type == 2 && !PlanAdd(plan, t + 0x58, 12, REGION_U32_ARRAY)) return SIR_ERR_LEVEL;
+                u32 count = Be32(image + t + 0x0C);
+                if (count != 0 && count <= imageSize / CAMERA_NODE_SIZE && LevelSpan(Be32(image + t + 0x10), (u64)count * CAMERA_NODE_SIZE, imageSize, &nodes) &&
+                    !PlanHas(plan, nodes, REGION_U32_ARRAY) && !PlanAdd(plan, nodes, count * CAMERA_NODE_SIZE, REGION_U32_ARRAY)) return SIR_ERR_LEVEL;
+            }
+        }
         // Type 15 is an animated camera track (vtable lbl_803601B8, fn_800E43BC): +0x58 is the handle of
         // the entity whose animation is the camera path and +0x5C the hash of its clip. Without them
         // the camera never finds its entity and the menu camera stays where the follow state puts it.
@@ -3431,6 +3503,33 @@ extern "C" SirError LevelZoneConvert(SirReloc* r, u8* image, u32 imageSize, u32 
         if (roots->locatorCount > imageSize / LOCATOR_SIZE || !LevelSpan(roots->locators, (u64)roots->locatorCount * LOCATOR_SIZE, imageSize, &l) ||
             !PlanAdd(&plan, l, roots->locatorCount * LOCATOR_SIZE, REGION_LOCATORS)) e = SIR_ERR_LEVEL;
     }
+    // The objects projectiles are spawned from (header +0x74, +0x78): SpawnHelper compares the type
+    // id at +0x00 with 0x37645F52. Nothing else of them is typed yet.
+    for (u32 k = 0; k < 2 && e == SIR_OK; k++) {
+        u32 o;
+        if (LevelSpan(roots->spawnOwners[k], 4, imageSize, &o) && !PlanHas(&plan, o, REGION_U32_ARRAY) && !PlanAdd(&plan, o, 4, REGION_U32_ARRAY)) e = SIR_ERR_LEVEL;
+    }
+    // The exploration map (header +0x2C / +0x38): fn_8013006C copies every path record (0x1AC bytes,
+    // fn_800D4DE8: words, but for the bytes at +0x64 and +0x9C) and every junction record (0xDC
+    // bytes, fn_800D5008: six words, up to twelve entries of three floats and a byte from +0x18,
+    // their count at +0xD8) into the object database.
+    for (u32 t = 0; t < 2 && e == SIR_OK; t++) {
+        u32 list = t == 0 ? roots->paths : roots->junctions, count = t == 0 ? roots->pathCount : roots->junctionCount, l, rec;
+        if (count == 0) continue;
+        if (count > imageSize / 4 || !LevelSpan(list, (u64)count * 4, imageSize, &l) || !PlanAdd(&plan, l, count * 4, REGION_PTR_ARRAY)) { e = SIR_ERR_LEVEL; break; }
+        for (u32 i = 0; i < count && e == SIR_OK; i++) {
+            if (!LevelSpan(Be32(image + l + i * 4), t == 0 ? MAP_PATH_SIZE : MAP_JUNCTION_SIZE, imageSize, &rec)) continue;
+            bool ok;
+            if (t == 0) {
+                ok = PlanAdd(&plan, rec, 0x64, REGION_U32_ARRAY) && PlanAdd(&plan, rec + 0x68, 0x34, REGION_U32_ARRAY) &&
+                     PlanAdd(&plan, rec + 0xA0, MAP_PATH_SIZE - 0xA0, REGION_U32_ARRAY);
+            } else {
+                ok = PlanAdd(&plan, rec, 0x18, REGION_U32_ARRAY) && PlanAdd(&plan, rec + 0xD8, 4, REGION_U32_ARRAY);
+                for (u32 k = 0; ok && k < 12; k++) ok = PlanAdd(&plan, rec + 0x18 + k * 0x10, 0xC, REGION_U32_ARRAY);
+            }
+            if (!ok) e = SIR_ERR_LEVEL;
+        }
+    }
     // A zone's action table is laid out like the one of global_binary.sir, and its records are
     // programs for the same interpreter (TriggerDoAction -> fn_801E1BD4).
     for (u32 i = 0; i < roots->actionTableCount && e == SIR_OK; i++) {
@@ -3513,6 +3612,19 @@ extern "C" SirError TextureStreamConvert(u8* data, u32 size) {
     Swap32(data + TEXTURE_STREAM_RECORD);
     Swap16(data + q);
     Swap16(data + q + 2);
+    return SIR_OK;
+}
+
+// A voice line of shared_voice.sir: the first 0x60 bytes of a .dsp file (format 0 ADPCM, 0x0A
+// 16-bit, 0x19 8-bit: fn_80203340 accepts no other) with the samples behind them, which stay as
+// they are. Nothing is changed when the header is not one (SIR_ERR_SOUND).
+extern "C" SirError VoiceStreamConvert(u8* data, u32 size) {
+    if (size < DSP_HEADER_SIZE) return SIR_ERR_SOUND;
+    u32 format = (u32)((data[0xE] << 8) | data[0xF]), rate = Be32(data + 8);
+    if ((format != 0 && format != 0x0A && format != 0x19) || rate == 0 || rate > 96000) return SIR_ERR_SOUND;
+    SirReloc r;
+    SirRelocInit(&r, NULL, NULL);
+    SirConvertRecord(&r, data, DSP_HEADER_SIZE, kDspHeaderFields, COUNTOF(kDspHeaderFields));
     return SIR_OK;
 }
 
