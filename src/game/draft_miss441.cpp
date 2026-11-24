@@ -526,7 +526,7 @@ void EntityTick(void* e, f32 dt);   // world_update.cpp
 void fn_8004BE38(u8* c, s32 team, f32 dt) {
     typedef u8* (*GetFn)(void*);
     typedef u8** (*GetTableFn)(void*);
-    typedef void (*UpdateFn)(void*, s32, f32);
+    typedef void (*BodyUpdateFn)(void*, f32);
     typedef void (*TickFn)(void*, s32, f32);
 
     if (!(*(u32*)(*(u8**)(c + 4) + 0x20) & 0x200000)) return;
@@ -572,7 +572,12 @@ void fn_8004BE38(u8* c, s32 team, f32 dt) {
         if (part != NULL) PartSetFlags(part, 1);
     }
 
-    (*(UpdateFn*)(*(u8**)c + 0xF8))(c, team, dt);
+    // Base body update, vtable slot 0xF8 (fn_8004B56C / fn_8004CB18, tail calls into fn_8005DC04 /
+    // fn_80053C2C): the PowerPC passes (this, r4 = team, f1 = dt) and the targets read only this and f1.
+    // Arguments are positional here, so the call is made with the targets' (this, dt) signature;
+    // with (this, team, dt) they got dt = 0: no turning towards the walk direction, no animation step.
+    (void)team;
+    (*(BodyUpdateFn*)(*(u8**)c + 0xF8))(c, dt);
 
     // Active part: slot 1 if present, else slot 4.
     s32 idx = 4;
