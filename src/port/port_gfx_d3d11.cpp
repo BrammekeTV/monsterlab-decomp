@@ -19,6 +19,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include <map>
+#include <mutex>
 #include <unordered_map>
 #include <string>
 #include <vector>
@@ -1134,10 +1135,64 @@ static BOOL FastProgress(void) {
     if (getenv("PORT_FAST_LOG")) PortLog("fast-forward progress: present + title \"%s\" at %lu ms", t, now);
     return TRUE;
 }
+// ---- frame rate (Settings > Display) ----
+// The game logic runs at the console's 50/60 Hz retrace (PortViTick) whatever is set here: the setting only
+// decides how often the picture is shown. With a cap (30, 60, 120, 144...), "display" or "uncapped" the game
+// thread, while it waits for the next retrace, shows the last picture again (PortGfxIdle) at that rate, so the
+// overlay and the settings screen stay smooth; a cap below the game's rate skips pictures. Off: one picture per
+// game frame, with the Vertical sync setting as before.
+static std::recursive_mutex    sGfxLock;        // the draw thread and the idle presents share the device context
+static s64                     sNextPresent;    // QueryPerformanceCounter ticks: when the next picture may be shown
+static DWORD                   sDrawThread;     // the thread that makes the game's pictures: the only one that shows them again
+static u32                     sExtraPictures;  // pictures shown again while waiting for a retrace
+static u32 DisplayHz(void) {
+    DEVMODEA dm = {}; dm.dmSize = sizeof(dm);
+    return EnumDisplaySettingsA(NULL, ENUM_CURRENT_SETTINGS, &dm) && dm.dmDisplayFrequency > 1 ? dm.dmDisplayFrequency : 60;
+}
+static s64 PresentInterval(void) {          // ticks between pictures; 0 = no limit
+    s32 cap = gPortSettings.fpsCap;
+    if (cap > 0) return Ticks_freq() / cap;
+    if (cap == PORT_FPS_DISPLAY) return Ticks_freq() / DisplayHz();
+    return 0;
+}
 static void PresentOut(BOOL fast) {
     Blit(sOutSrv, sBackRtv, 0, 0, sOutW, sOutH, 0, 0, 1, 1);
     if (!gPortOptions.screenshotStats) PortOverlayDraw(sBackRtv, sOutW, sOutH);
-    sSwap->Present(gPortSettings.vsync && !fast ? 1 : 0, 0);
+    s32 cap = gPortSettings.fpsCap;
+    BOOL sync = cap == 0 ? gPortSettings.vsync != 0 : cap == PORT_FPS_DISPLAY;
+    if (sSwap) sSwap->Present(sync && !fast ? 1 : 0, 0);
+}
+// A picture of the game: with a cap below the game's rate some are skipped.
+static BOOL GamePresentDue(void) {
+    s64 iv = PresentInterval();
+    if (!iv || gPortSettings.fpsCap == PORT_FPS_DISPLAY || PortFastActive()) return TRUE;
+    s64 now = Ticks();
+    if (now + iv / 4 < sNextPresent) return FALSE;
+    sNextPresent = std::max(sNextPresent + iv, now - iv);
+    return TRUE;
+}
+BOOL PortGfxIdle(void) {
+    s32 cap = gPortSettings.fpsCap;
+    if (!cap || !sStarted || !sShown || PortFastActive() || GetCurrentThreadId() != sDrawThread) return FALSE;
+    s64 iv = PresentInterval();
+    s64 retrace = PortViNextTicks();
+    if (retrace && PortTicks() >= retrace) return FALSE;
+    PortLockLeave();                                    // the interrupt and audio threads run meanwhile
+    BOOL bail = FALSE;
+    while (iv && Ticks() < sNextPresent) {
+        s64 r = PortViNextTicks();
+        if (r && PortTicks() >= r) { bail = TRUE; break; }
+        if ((sNextPresent - Ticks()) * 1000 / Ticks_freq() > 2) Sleep(1); else YieldProcessor();
+    }
+    if (!bail) {
+        std::lock_guard<std::recursive_mutex> lk(sGfxLock);
+        s64 now = Ticks();
+        if (iv) sNextPresent = std::max(sNextPresent + iv, now - iv);
+        PresentOut(FALSE);
+        sExtraPictures++;
+    }
+    PortLockEnter();
+    return !bail;
 }
 
 static void CopyEfb(const PortGx* g, u32 control) {
@@ -1177,6 +1232,7 @@ static void CopyEfb(const PortGx* g, u32 control) {
         if (sPicW != sOutW || sPicH != sOutH) sCtx->ClearRenderTargetView(sOutRtv, black);
         Blit(sEfbSrv, sOutRtv, sPicX, sPicY, sPicW, sPicH, su0, sv0, sdu, sdv);
         sShown = TRUE;
+        sDrawThread = GetCurrentThreadId();
         // The overlay goes over the window's picture only, or with --screenshot-stats into the output picture itself.
         PortFrameStats stats;
         FrameStats(&stats);
@@ -1184,7 +1240,7 @@ static void CopyEfb(const PortGx* g, u32 control) {
         if (gPortOptions.screenshotStats) PortOverlayDraw(sOutRtv, sOutW, sOutH);
         // Fast-forward: the window gets a picture only four times a second, with the progress in the title bar.
         BOOL fast = PortFastActive();
-        if (FastProgress()) PresentOut(fast);
+        if (FastProgress() && GamePresentDue()) PresentOut(fast);
         sGfxStats.presents++;
         if (sTraceFrom > 1 && sGfxStats.presents >= sTraceFrom) sTrace = TRUE;
     } else {                                                // into a texture, kept at the frame buffer's resolution
@@ -1354,12 +1410,14 @@ static u32 sFastSkipped;
 static BOOL FastDropping(void) { return PortFastActive() && !gPortOptions.fastAll && gPortOptions.fastForward > 0 && PortFrameCount() < gPortOptions.fastForward - kFastDrawn; }
 static void Draw(const PortGx* g, u32 prim, const PortGxLayout* L, u32 count, const u8* data) {
     if (FastDropping()) { sFastSkipped++; return; }
+    std::lock_guard<std::recursive_mutex> lk(sGfxLock);
     s64 t = Ticks();
     DrawPrims(g, prim, L, count, data);
     sFrame.renderTicks += Ticks() - t;
     sTotalDraw += Ticks() - t;
 }
 static void Copy(const PortGx* g, u32 control) {
+    std::lock_guard<std::recursive_mutex> lk(sGfxLock);
     if (FastDropping()) {                        // nothing was drawn: a copy would only move an old picture
         if ((control & 0x4000) && FastProgress()) PresentOut(TRUE);      // but the window still gets its progress
         return;
@@ -1418,6 +1476,10 @@ BOOL PortGfxStart(BOOL window) {
     d.Width = sOutW; d.Height = sOutH; d.MipLevels = 1; d.ArraySize = 1; d.Format = DXGI_FORMAT_R8G8B8A8_UNORM;
     d.SampleDesc.Count = 1; d.BindFlags = D3D11_BIND_RENDER_TARGET | D3D11_BIND_SHADER_RESOURCE;
     sDev->CreateTexture2D(&d, NULL, &sOutTex);
+    if (!sSwap) {                                           // no window: a stand-in back buffer, so that the idle pictures cost what they would
+        ID3D11Texture2D* back = NULL;
+        if (SUCCEEDED(sDev->CreateTexture2D(&d, NULL, &back))) { sDev->CreateRenderTargetView(back, NULL, &sBackRtv); back->Release(); }
+    }
     sDev->CreateRenderTargetView(sOutTex, NULL, &sOutRtv);
     sDev->CreateShaderResourceView(sOutTex, NULL, &sOutSrv);
     d.Width = sEfbPw; d.Height = sEfbPh;
@@ -1483,8 +1545,8 @@ BOOL PortGfxStart(BOOL window) {
 
 const char* PortGfxStatsText(char* buf, u32 n) {
     if (!sStarted) { snprintf(buf, n, "no renderer (run with --window or --screenshot FILE)"); return buf; }
-    snprintf(buf, n, "%u draw(s), %u triangle(s), %u picture(s) shown, %u copy(ies) to a texture, %u texture(s) decoded, %u shader(s), %u draw(s) skipped; backend time: draws %.1f s, copies %.1f s, %u draw(s) dropped by fast-forward",
-             sGfxStats.draws, sGfxStats.tris, sGfxStats.presents, sGfxStats.texCopies, sGfxStats.textures, sGfxStats.shaders, sGfxStats.skipped,
+    snprintf(buf, n, "%u draw(s), %u triangle(s), %u picture(s) shown (+%u again while waiting for a retrace), %u copy(ies) to a texture, %u texture(s) decoded, %u shader(s), %u draw(s) skipped; backend time: draws %.1f s, copies %.1f s, %u draw(s) dropped by fast-forward",
+             sGfxStats.draws, sGfxStats.tris, sGfxStats.presents, sExtraPictures, sGfxStats.texCopies, sGfxStats.textures, sGfxStats.shaders, sGfxStats.skipped,
              sTotalDraw / (double)Ticks_freq(), sTotalCopy / (double)Ticks_freq(), sFastSkipped);
     return buf;
 }

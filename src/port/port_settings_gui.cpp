@@ -154,6 +154,25 @@ static void PageDisplay(void) {
     if (ImGui::Checkbox("Stretch the 2D layer over the whole width (16:9)", &b)) sEdit.stretchUi = gPortSettings.stretchUi = b;
     b = sEdit.vsync != 0;
     if (ImGui::Checkbox("Vertical sync", &b)) sEdit.vsync = gPortSettings.vsync = b;
+    static const struct { int cap; const char* name; const char* what; } kRates[] = {
+        {0, "Off (game rate)", "One picture per game frame (50 or 60 a second); Vertical sync decides whether it waits for the monitor."},
+        {30, "30", "Shows every second picture: half the game's smoothness, for slow machines."},
+        {60, "60", "At most 60 pictures a second."},
+        {120, "120", "Shows the last picture again between game frames; the game itself keeps its own speed. Menus and overlays update at 120."},
+        {144, "144", "As 120, for a 144 Hz monitor."},
+        {PORT_FPS_DISPLAY, "Display's refresh rate", "Shows pictures in step with the monitor, whatever its rate (like Vertical sync, but between game frames too)."},
+        {PORT_FPS_UNCAPPED, "Uncapped", "Shows pictures as fast as the graphics card allows, without waiting for the monitor (may tear, uses a lot of power). The game keeps its own speed: it does not run faster."},
+    };
+    int cur = 0;
+    for (int k = 0; k < 7; k++) if (kRates[k].cap == sEdit.fpsCap) cur = k;
+    if (ImGui::BeginCombo("Frame rate", kRates[cur].name)) {
+        for (int k = 0; k < 7; k++)
+            if (ImGui::Selectable(kRates[k].name, k == cur)) sEdit.fpsCap = gPortSettings.fpsCap = kRates[k].cap;
+        ImGui::EndCombo();
+    }
+    ImGui::PushTextWrapPos(0.0f);
+    ImGui::TextDisabled("%s", kRates[cur].what);
+    ImGui::PopTextWrapPos();
     b = sEdit.fullscreen != 0;
     if (ImGui::Checkbox("Fullscreen (borderless)", &b)) { sEdit.fullscreen = gPortSettings.fullscreen = b; PortGfxSetFullscreen(b); }
     int rs = sEdit.renderScale;
