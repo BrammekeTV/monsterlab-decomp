@@ -158,9 +158,14 @@ void PortGfxSetFullscreen(BOOL on) {
 
 // Window position (0..1 across and down) -> the console pointer's -1..1, through the picture's
 // place in the window and the narrowed 2D layer of widescreen.
+static const f32 PORT_POINTER_Y_SCALE = 1.25f;
 void PortGfxPointer(f32 wx, f32 wy, f32* px, f32* py) {
     f32 x = (wx * sOutW - sPicX) / sPicW * 2.0f - 1.0f, y = (wy * sOutH - sPicY) / sPicH * 2.0f - 1.0f;
     if (gPortSettings.wide && !gPortSettings.stretchUi) x /= 0.75f;
+    // The 2D layer scales the pointer's y by 1.25 (fn_8018CA38 reads it from the pointer block, +0xB4): the
+    // remote's y runs -0.8..0.8 over the picture's height, x -1..1 over its width (the cursor sits at
+    // 240 + 240 * 1.25 * y of 480 lines). Without this the cursor drifts away from the mouse towards the top and bottom.
+    y /= PORT_POINTER_Y_SCALE;
     *px = x; *py = y;
 }
 
