@@ -99,6 +99,11 @@
  "changelog": [
   {
    "date": "2026-11-24",
+   "time": "10:12",
+   "text": "Characters in the first level now come to life (PR #149). Professor Fuseless and the other characters were never woken up, because their wake-up events weren't converted to PC byte order. And the graphics command buffer never rolled over when full, so drawing an animated character overwrote nearby memory. The Command Room now runs up to the professor's first voice line. Also new: a Bink video decoder for the game's cutscenes, built from FFmpeg's open-source decoder (LGPL) and matching it exactly on the intro movie; it gets hooked into the game next (PR #147). And more differential-test fixes: bit shifts, the Lab inventory layout and how monster parts are copied (PR #146)."
+  },
+  {
+   "date": "2026-11-24",
    "time": "09:37",
    "text": "The differential tests found their first real mistakes (PR #144): 7 decompiled functions gave different results from the original Wii code, among them float range checks the wrong way round, a wrong constant and a wrong return value. All 7 now match the original."
   },
