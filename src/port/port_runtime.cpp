@@ -566,9 +566,12 @@ static BOOL DolRead(FILE* f, u32 off, void* dst, u32 size) {
     return fseek(f, (long)off, SEEK_SET) == 0 && fread(dst, 1, size, f) == size;
 }
 
+static char sDolPath[MAX_PATH + 32];     // the main.dol that was loaded ("" = from the disc image)
+
 static BOOL LoadDol(const char* path) {
     FILE* f = path ? fopen(path, "rb") : NULL;
     if (path && !f) return FALSE;
+    snprintf(sDolPath, sizeof(sDolPath), "%s", path ? path : "");
     u8 hdr[0x100];
     if (!DolRead(f, 0, hdr, sizeof(hdr))) { if (f) fclose(f); return FALSE; }
     sDataEnd = Be32(hdr + 0xD8) + Be32(hdr + 0xDC);          // bss
@@ -584,6 +587,24 @@ static BOOL LoadDol(const char* path) {
     }
     if (f) fclose(f);
     return TRUE;
+}
+
+// Every section of main.dol as it is on the disc (big-endian, code included), at dst + (address - lo):
+// the differential tests run the original code from it (port_difftest.cpp). Nothing is converted.
+BOOL PortDolImage(u8* dst, u32 lo, u32 hi, u32* secAddr, u32* secSize) {
+    if (!gPortOptions.haveData) return FALSE;
+    FILE* f = sDolPath[0] ? fopen(sDolPath, "rb") : NULL;
+    if (sDolPath[0] && !f) return FALSE;
+    u8 hdr[0x100];
+    BOOL ok = DolRead(f, 0, hdr, sizeof(hdr));
+    for (s32 i = 0; i < 18 && ok; i++) {
+        u32 off = Be32(hdr + i * 4), addr = Be32(hdr + 0x48 + i * 4), size = Be32(hdr + 0x90 + i * 4);
+        secAddr[i] = addr; secSize[i] = size;
+        if (!size) continue;
+        ok = addr >= lo && addr + size <= hi && DolRead(f, off, dst + (addr - lo), size);
+    }
+    if (f) fclose(f);
+    return ok;
 }
 
 u32 PortArenaLoMEM1(void) {
@@ -885,6 +906,7 @@ struct PortBoot {
             else if (!strcmp(a, "--stats")) gPortOverlayOn = TRUE;
             else if (!strcmp(a, "--mods") && i + 1 < __argc) PortModsSetDir(__argv[++i]);
             else if (!strcmp(a, "--no-mods")) noMods = TRUE;
+            else if (!strcmp(a, "--difftest") && i + 1 < __argc) gPortOptions.diffTest = __argv[++i];
             else if (!strcmp(a, "--dump-textures") && i + 1 < __argc) gPortOptions.dumpTextures = __argv[++i];
             else if (!strcmp(a, "--picker-screenshot") && i + 1 < __argc) gPortOptions.pickerShot = __argv[++i];
             else if (!strcmp(a, "--no-ini")) {}
@@ -1066,8 +1088,13 @@ static PortBoot sBoot;
 // allocator calls SysInit itself when the heaps do not exist yet, so this must not wait for
 // main. It runs after every C++ static initialiser of the PC build (.CRT$XCY).
 extern "C" void PortRunStaticInit(void);
+void PortDiffTestRun(const char* jobsPath);   // port_difftest.cpp
 static void __cdecl PortPreMain(void) {
     PortOsStart();
+    if (gPortOptions.diffTest && gPortOptions.haveData && !gPortOptions.selfTest) {   // tools/difftest.py: no interrupts, no window
+        PortRunStaticInit();
+        PortDiffTestRun(gPortOptions.diffTest);
+    }
     PortStartInterrupts();
     if (gPortOptions.haveData && !gPortOptions.selfTest && (gPortOptions.window || gPortOptions.screenshot || gPortOptions.showTexture >= 0))
         PortGfxStart(gPortOptions.window);

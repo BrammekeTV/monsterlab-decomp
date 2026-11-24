@@ -89,6 +89,9 @@ a PC port. Read this whole file before making changes. Human contributors: see
 - `python tools/mod_test.py [--iso PATH] [--keep]`: texture-mod test (`docs/modding.md`): dumps the menu's textures to a temporary folder outside
   the repository, makes a mod with one tinted red, runs headless again and compares the screenshots. Run it after changes to
   `src/port/port_mods.cpp`, `port_png.cpp` or the texture cache in `port_gfx_d3d11.cpp`.
+- `python tools/difftest.py --fn <name|0xADDR>` / `--batch N` / `--all [--calls]`: differential test (`docs/difftest.md`): runs the original
+  PowerPC code of a function (from your disc, in an interpreter inside the exe) and the C++ on the same inputs and compares return value
+  and memory. Run `--fn` on a function after decompiling or changing it; a `MISMATCH` prints the command that repeats the failing case.
 - `python tools/progress.py`: progress numbers.
 - `python tools/changelog_add.py "text"`: add a progress-site changelog entry stamped with the real time (maintainer only).
 
