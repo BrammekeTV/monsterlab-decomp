@@ -121,6 +121,8 @@ typedef struct PortOptions {
     BOOL toMenu;              // --to-menu: fast-forward to the title, press A, go on to the main menu
     s32  showTexture;         // development aid (port_demo.cpp): -1, or a texture of global_binary.sir
     s32  captureAt;           // --capture-at N: take the F12 capture at frame N (tests; 0 = off)
+    s32  captureTo;           // --capture-at FROM-TO/N: the last frame of a series of captures,
+    s32  captureEvery;        //   and the frames between two of them (0 = one capture)
 } PortOptions;
 extern PortOptions gPortOptions;
 

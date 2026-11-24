@@ -366,7 +366,7 @@ enum RegionKind {
     REGION_UI_TREE_NODE, REGION_UI_LIST, REGION_UI_WIDGET, REGION_UI_EVENT, REGION_UI_GRID, REGION_UI_FIXED,
     REGION_UI_SET, REGION_UI_SCREEN, REGION_UI_GRAPHIC, REGION_UI_TEXT,
     REGION_LOCATORS, REGION_UI_SLIDER,
-    REGION_ZONE_EFFECT, REGION_ANIM_SET, REGION_ANIM_DEFS, REGION_U16_ARRAY, REGION_ANIM_OBJ, REGION_SKELETON, REGION_BONE_OPS,
+    REGION_ZONE_EFFECT, REGION_ANIM_SET, REGION_ANIM_DEFS, REGION_ANIM_EVENTS, REGION_U16_ARRAY, REGION_ANIM_OBJ, REGION_SKELETON, REGION_BONE_OPS,
     REGION_ATTACH_POINTS, REGION_SCENE_LIGHT, REGION_GX_STATE,
     REGION_UI_ANIM, REGION_UI_ANIM_TRACK, REGION_UI_ANIM_EVENTS, REGION_UI_ANIM_KEYS, REGION_UI_ANIM_ENTRIES,
     REGION_ZONE_SYSTEM, REGION_ANIM_PLAYER, REGION_ANIM_ELEM, REGION_ANIM_TRACK, REGION_ANIM_KEYS, REGION_F32_ARRAY,
@@ -1576,6 +1576,10 @@ static const SirField kEntityFields[] = {
     { 0x0B8, SIR_U32, 1 },    // code: flags; UpdateZoneEntities updates an entity without bit 0
     { 0x0C8, SIR_F32, 3 },    // code: a position: EntityRefreshLinks tests it against the loaded zones' boxes before it
                               //       wakes an entity (vtable slot 0x30); a prop's: fn_8006A764
+    { 0x0D4, SIR_F32, 3 },    // code: its rotation as Euler angles. Every entity that starts through fn_80062DC4 (characters,
+                              //       props, trigger volumes) gets its record's position from +0xC8 and its quaternion from
+                              //       these (fn_801B5BD8). Unconverted they read as 0: the enemy of a battle, turned half a
+                              //       circle in the arena file, stood with its back to the player
     { 0x0EC, SIR_U32, 3 },    // code: the event that wakes a sleeping entity (fn_801B9F14; WorldTick compares it with
                               //       0x6C938971), two event ids (EventMgrFlushFor)
     { 0x158, SIR_F32, 1 },    // code: fn_800690D4
@@ -1617,7 +1621,6 @@ static const SirField kPropFields[] = {
     { 0x038, SIR_U32, 3 },    // code: action words (fn_8006A2D0)
     { 0x048, SIR_U32, 4 },    // code: action words (fn_800696C4, fn_8006BDF4, fn_80069638)
     { 0x068, SIR_U32, 1 },    // code: action word (fn_80069180)
-    { 0x0D4, SIR_F32, 3 },    // code: its rotation as Euler angles (fn_801B5BD8 builds the record's quaternion from them)
     { 0x15C, SIR_U32, 1 },    // code: flags (fn_80069180, fn_8006A764, fn_8006A2D0)
     { 0x1A0, SIR_PTR, 1 },    // code: the prop's states: +0x1A4 pointers to definitions (fn_800699E4)
 };
@@ -1637,20 +1640,32 @@ static const SirField kPropDefFields[] = {
 //   table:  +0x04 how many entries, one u16 per group (fn_801AC184; there is one group: fn_8000E488
 //           sets the count lbl_805FB698 points at to 1), +0x0C the entries, +0x10 two lists of
 //           clips, picked by the two u16 keys at +0x18, +0x1C how many clips a list has (fn_801AC460)
-//   entry:  0x44 bytes: +0x2C handle (fn_801AC184), +0x34 its table and +0x38 the clip's index in
-//           the lists (fn_801AC460)
+//   entry:  0x44 bytes: +0x10 its events and +0x14 how many, +0x2C handle (fn_801AC184), +0x34 its
+//           table and +0x38 the clip's index in the lists (fn_801AC460)
+//   event:  0x1C bytes: +0x00 kind (0xA83AFCFD: an action), +0x04 a condition (action word, 0x0003FFFF
+//           = none), +0x08 / +0x0C the time window in seconds, +0x18 the action word to run. The
+//           entity's update (draft_pz3e.cpp) asks fn_801ABF0C / fn_801AC024 for the events of the
+//           playing animation whose window holds the current time (fn_801ABD84) and hands +0x18 to
+//           TriggerDoAction. These are an attack's camera moves (PlayCameraAnimation), particle
+//           effects and sounds, and every other animation's timed actions.
 // The clips themselves are not converted yet. The table and the lists may lie in different zones.
 static const SirField kAnimSetFields[] = {
     { 0x04, SIR_PTR, 1 }, { 0x0C, SIR_PTR, 3 }, { 0x18, SIR_U16, 2 }, { 0x1C, SIR_U32, 1 },
 };
 static const SirField kAnimDefFields[] = {
-    { 0x00, SIR_U32, 11 },    // code: speed (+0x00, fn_801AC51C), flags (+0x0C), floats (+0x1C, +0x20) handed to fn_8018B2CC
+    { 0x00, SIR_U32, 4 },     // code: speed (+0x00, fn_801AC51C), flags (+0x0C)
+    { 0x10, SIR_PTR, 1 },     // code: events (fn_801ABF0C, fn_801AC024),
+    { 0x14, SIR_U32, 6 },     //       their count; floats (+0x1C, +0x20) handed to fn_8018B2CC
     { 0x2C, SIR_U32, 2 }, { 0x34, SIR_PTR, 1 }, { 0x38, SIR_U32, 1 },
     { 0x3C, SIR_U32, 2 },
 };
 #define ANIM_SET_USED 0x20
 #define ENTITY_DEF_USED 0x4C   // of the definition of an entity that is not a prop (entity +0x9C): id +0x08, animation set +0x48
 #define ANIM_DEF_SIZE 0x44
+static const SirField kAnimEventFields[] = {
+    { 0x00, SIR_U32, 2 }, { 0x08, SIR_F32, 2 }, { 0x10, SIR_U32, 3 },
+};
+#define ANIM_EVENT_SIZE 0x1C
 // A character definition (entity +0x9C of types 5 and 13) is 0x250 bytes, laid out one after the other: +0x08 id, +0x1C flags,
 // +0x24 a float, +0x34 and +0x40..+0x4C objects, +0x48 the animation set, +0x60 a hash and 20 action words (0x0003FFFF = none),
 // +0xB8 the animation speed (fn_80053C2C multiplies the tick by it), then floats (0x7F800001 = unset) up to +0x1F8, flags at +0x240.
@@ -1675,7 +1690,16 @@ static SirError AnimSetPlan(ImagePlan* plan, const u8* image, u32 imageSize, u32
         u32 total = AnyWord(image, &counts, 0, 2);
         if (!AnyAdd(plan, &counts, 2, REGION_U16_ARRAY)) return SIR_ERR_ENTITY;
         AnyObj defs = AnyFind(plan, imageSize, AnyPtr(image, imageSize, &set, 0x0C), total * ANIM_DEF_SIZE, REGION_ANIM_DEFS);
+        bool defsDone = defs.done;
         if (total != 0 && (!defs.found || !AnyAdd(plan, &defs, total * ANIM_DEF_SIZE, REGION_ANIM_DEFS))) return SIR_ERR_ENTITY;
+        // Each entry's events (entries that are converted already have had their turn).
+        for (u32 i = 0; defs.found && !defsDone && i < total; i++) {
+            u32 n = AnyWord(image, &defs, i * ANIM_DEF_SIZE + 0x14, 4);
+            if (n == 0) continue;
+            if (n > imageSize / ANIM_EVENT_SIZE) return SIR_ERR_ENTITY;
+            AnyObj events = AnyFind(plan, imageSize, AnyPtr(image, imageSize, &defs, i * ANIM_DEF_SIZE + 0x10), n * ANIM_EVENT_SIZE, REGION_ANIM_EVENTS);
+            if (events.found && !AnyAdd(plan, &events, n * ANIM_EVENT_SIZE, REGION_ANIM_EVENTS)) return SIR_ERR_ENTITY;
+        }
     }
     u32 clips = AnyWord(image, &set, 0x1C, 4);
     if (clips > imageSize / 4) return SIR_ERR_ENTITY;
@@ -2901,6 +2925,7 @@ static void ImagePlanConvert(const ImagePlan* plan, SirReloc* r, u8* image, u32 
         case REGION_SCENE_LIGHT:  SirConvertRecord(r, p, g->size, kSceneLightFields, COUNTOF(kSceneLightFields)); break;
         case REGION_ATTACH_POINTS: ConvertRecords(r, p, g->size, ATTACH_POINT_SIZE, kAttachPointFields, COUNTOF(kAttachPointFields)); break;
         case REGION_ANIM_DEFS:    ConvertRecords(r, p, g->size, ANIM_DEF_SIZE, kAnimDefFields, COUNTOF(kAnimDefFields)); break;
+        case REGION_ANIM_EVENTS:  ConvertRecords(r, p, g->size, ANIM_EVENT_SIZE, kAnimEventFields, COUNTOF(kAnimEventFields)); break;
         case REGION_U16_ARRAY:
             for (u32 k = 0; k + 2 <= g->size; k += 2) { Swap16(p + k); r->fieldsSwapped++; }
             break;

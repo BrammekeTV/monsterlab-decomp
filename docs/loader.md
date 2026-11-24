@@ -658,6 +658,7 @@ installs the vtable for the entity's type and prepares what hangs off it. The lo
 | `0x094`, `0x098` | words the base constructor clears | `fn_801B4334` |
 | `0x09C` | object whose `+0x08` is an id, for a type 6 entity. For the other types it is the definition: `+0x08` id, `+0x48` animation set, converted like a prop's (`fn_800526E4` -> `fn_801AC6B4` reads its entries when the entity wakes) | `fn_8012F8B8` |
 | `0x0EC` | the event that wakes the entity while it sleeps (record state `0x100`): `EventSend` to it with this id sets `0x200` (`fn_801B9F14`); `0x6C938971` is the plain wake-up. `0x0F0`, `0x0F4`: two event ids `EventMgrFlushFor` compares. Converted for every entity type: without it no character or effect entity ever wakes | `fn_801B9F14`, `WorldTick`, `EventMgrFlushFor` |
+| `0x0C8`, `0x0D4` | start position and rotation (Euler angles, three floats each). An entity that starts through `fn_80062DC4` (characters, props, trigger volumes) copies the position to its record and builds the record's quaternion from the angles. Converted for every entity type: without the angles a character turned in the level file (a battle's enemy) faces the default way | `fn_801B5BD8`, `EntityRefreshLinks` |
 | `0x0A4` | state machine holder `{machine, object}`; the machine's definition goes to `fn_801BC574` | `fn_8012F8B8` |
 | `0x0B0` | child list: nodes `{+0x04 entity, +0x08 next}` | `fn_8012F8B8` |
 | `0x158` | float | `fn_800690D4` |
@@ -777,7 +778,8 @@ A prop definition's `+0x48` points at its animation table (`fn_800699E4`). The t
 |---|---|---|
 | table | `+0x04` pointer to the entry counts (one `u16` per group; there is one group), `+0x0C` the entries | `fn_801AC184` |
 | | `+0x10` two lists of clips, `+0x18` the two `u16` keys that pick a list, `+0x1C` clips per list | `fn_801AC460` |
-| entry (0x44 bytes) | `+0x00` playback speed, `+0x0C` flags, `+0x1C`, `+0x20` blend floats, `+0x2C` handle, `+0x34` its table, `+0x38` the clip's index (all 32-bit words; `+0x00..+0x30` and `+0x3C..+0x40` are converted) | `fn_801AC184`, `fn_801AC460`, `fn_801AC51C` |
+| entry (0x44 bytes) | `+0x00` playback speed, `+0x0C` flags, `+0x10` its events and `+0x14` how many, `+0x1C`, `+0x20` blend floats, `+0x2C` handle, `+0x34` its table, `+0x38` the clip's index (all 32-bit words; `+0x00..+0x30` and `+0x3C..+0x40` are converted) | `fn_801AC184`, `fn_801AC460`, `fn_801AC51C` |
+| event (0x1C bytes) | `+0x00` kind (`0xA83AFCFD`: run an action), `+0x04` a condition (action word, `0x0003FFFF` = none), `+0x08`, `+0x0C` the time window in seconds, `+0x18` the action word. While the animation plays, the entity's update runs the action of every event whose window holds the current time: an attack's camera move (`PlayCameraAnimation`), particle effects and sounds in the part files, and other animations' timed actions. Unconverted, no event ever fired | `fn_801ABF0C`, `fn_801AC024`, `fn_801ABD84` |
 | entity record | `+0x32` (`u16`): the key handed to `fn_801AC460` | `fn_800699E4` |
 
 The 34 level files have 189 tables. Their clips are converted as described next.
