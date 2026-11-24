@@ -778,7 +778,7 @@ A prop definition's `+0x48` points at its animation table (`fn_800699E4`). The t
 |---|---|---|
 | table | `+0x04` pointer to the entry counts (one `u16` per group; there is one group), `+0x0C` the entries | `fn_801AC184` |
 | | `+0x10` two lists of clips, `+0x18` the two `u16` keys that pick a list, `+0x1C` clips per list | `fn_801AC460` |
-| entry (0x44 bytes) | `+0x2C` handle, `+0x34` its table, `+0x38` the clip's index | `fn_801AC184`, `fn_801AC460` |
+| entry (0x44 bytes) | `+0x00` playback speed, `+0x0C` flags, `+0x1C`, `+0x20` blend floats, `+0x2C` handle, `+0x34` its table, `+0x38` the clip's index (all 32-bit words; `+0x00..+0x30` and `+0x3C..+0x40` are converted) | `fn_801AC184`, `fn_801AC460`, `fn_801AC51C` |
 | entity record | `+0x32` (`u16`): the key handed to `fn_801AC460` | `fn_800699E4` |
 
 The 34 level files have 189 tables. Their clips are converted as described next.
