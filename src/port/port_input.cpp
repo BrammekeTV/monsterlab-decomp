@@ -133,6 +133,16 @@ static BOOL ReadPad(XINPUT_STATE* st) {
     return FALSE;
 }
 
+// The buttons of the first connected pad held now, as PortBinding.pad bits (the settings screen's capture).
+u32 PortInputPadBits(void) {
+    XINPUT_STATE st;
+    if (!ReadPad(&st)) return 0;
+    u32 bits = st.Gamepad.wButtons;
+    if (st.Gamepad.bLeftTrigger > XINPUT_GAMEPAD_TRIGGER_THRESHOLD) bits |= PAD_LT;
+    if (st.Gamepad.bRightTrigger > XINPUT_GAMEPAD_TRIGGER_THRESHOLD) bits |= PAD_RT;
+    return bits;
+}
+
 static f32 Axis(SHORT v, SHORT dead) {
     if (v > -dead && v < dead) return 0.0f;
     f32 f = (v < 0) ? (v + dead) / (32768.0f - dead) : (v - dead) / (32767.0f - dead);

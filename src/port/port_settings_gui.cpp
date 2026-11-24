@@ -119,8 +119,36 @@ static const char* KeyName(int vk, char* buf, int n) {
 }
 
 // Press-a-key: the first key that goes down after the capture began becomes the binding; Esc cancels.
+static u32 sPadHeld;                   // pad buttons that were down when a gamepad capture began: ignored until released
+static BOOL sEscHeld;
+
+static const char* PadName(u32 bits, char* buf, int n) {
+    static const struct { u32 bit; const char* name; } kPad[] = {
+        {0x1000, "A"}, {0x2000, "B"}, {0x4000, "X"}, {0x8000, "Y"}, {0x100, "LB"}, {0x200, "RB"}, {0x10000, "LT"}, {0x20000, "RT"},
+        {0x10, "Start"}, {0x20, "Back"}, {0x40, "Left stick click"}, {0x80, "Right stick click"},
+        {0x1, "D-pad up"}, {0x2, "D-pad down"}, {0x4, "D-pad left"}, {0x8, "D-pad right"}};
+    buf[0] = 0;
+    for (const auto& p : kPad)
+        if (bits & p.bit) snprintf(buf + strlen(buf), n - (int)strlen(buf), "%s%s", buf[0] ? " / " : "", p.name);
+    if (!buf[0]) snprintf(buf, n, "-");
+    return buf;
+}
+
+// Press-a-button: the first pad button that goes down after the capture began becomes the binding; Esc cancels.
+static void CapturePadStep(void) {
+    BOOL esc = Down(VK_ESCAPE);
+    if (esc && !sEscHeld) { sCapture = -1; return; }
+    sEscHeld = esc;
+    u32 now = PortInputPadBits(), fresh = now & ~sPadHeld;
+    sPadHeld &= now;
+    if (!fresh) return;
+    gPortBindings[sCapture].pad = fresh & (~fresh + 1);        // the lowest of the buttons that went down together
+    sCapture = -1;
+}
+
 static void CaptureStep(void) {
     if (sCapture < 0 || !Focused()) return;
+    if (sCaptureSlot == 2) { CapturePadStep(); return; }
     for (int vk = 8; vk < 255; vk++) {
         if (vk >= VK_SHIFT && vk <= VK_MENU) continue;     // the left/right codes are taken instead
         if (!Down(vk)) { sCaptureHeld[vk] = 0; continue; }
@@ -198,12 +226,13 @@ static void PageAudio(void) {
 }
 
 static void PageControls(void) {
-    ImGui::TextDisabled(sCapture >= 0 ? "Press a key (Esc cancels)..." : "Click a key to change it. Right-click clears it.");
-    if (!ImGui::BeginTable("bindings", 4, ImGuiTableFlags_RowBg | ImGuiTableFlags_BordersInnerH | ImGuiTableFlags_ScrollY)) return;
+    ImGui::TextDisabled(sCapture >= 0 ? (sCaptureSlot == 2 ? "Press a gamepad button (Esc cancels)..." : "Press a key (Esc cancels)...") : "Click a key or gamepad button to change it. Right-click clears it.");
+    if (!ImGui::BeginTable("bindings", 5, ImGuiTableFlags_RowBg | ImGuiTableFlags_BordersInnerH | ImGuiTableFlags_ScrollY)) return;
     ImGui::TableSetupColumn("Wii Remote / Nunchuk");
     ImGui::TableSetupColumn("Key 1");
     ImGui::TableSetupColumn("Key 2");
     ImGui::TableSetupColumn("Mouse");
+    ImGui::TableSetupColumn("Gamepad");
     ImGui::TableSetupScrollFreeze(0, 1);
     ImGui::TableHeadersRow();
     for (int i = 0; i < gPortBindingCount; i++) {
@@ -233,6 +262,17 @@ static void PageControls(void) {
             for (int m = 0; m < 3; m++)
                 if (ImGui::Selectable(kMouse[m], bind->mouse == m)) bind->mouse = m;
             ImGui::EndCombo();
+        }
+        ImGui::TableNextColumn();
+        {
+            char name[96], label[128];
+            BOOL waiting = sCapture == i && sCaptureSlot == 2;
+            snprintf(label, sizeof(label), "%s###pad", waiting ? "press a button" : PadName(bind->pad, name, sizeof(name)));
+            if (ImGui::Button(label, ImVec2(-FLT_MIN, 0)) && sCapture < 0) {
+                sCapture = i; sCaptureSlot = 2;
+                sPadHeld = PortInputPadBits(); sEscHeld = Down(VK_ESCAPE);
+            }
+            if (ImGui::IsItemClicked(ImGuiMouseButton_Right) && sCapture < 0) bind->pad = 0;
         }
         ImGui::PopID();
     }
