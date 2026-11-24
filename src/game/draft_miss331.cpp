@@ -250,7 +250,9 @@ u8* fn_800D02C0(u8* self) {
 // 0x08 keep, 0x10 follow the endpoints and spawn the beam entry, 0x20 follow the endpoints with a
 // periodic re-spawn (and a hit on the target), 0x40 remove the entry, 0x80/other finished.
 // Returns 2 (keep updating) or 3 (finished).
-s32 fn_800ED944(u8* p, f32 dt) {
+// The pool calls it as (entry, owner, dt) (dt in f1 on the Wii). The owner argument must be in the
+// signature: without it `dt` reads the owner pointer on x86 and the respawn timer never advances.
+s32 fn_800ED944(u8* p, void* /*owner*/, f32 dt) {
     switch (*(u8*)(p + 0x7F)) {
     case 0x08:
         return 2;
