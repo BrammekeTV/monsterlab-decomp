@@ -2909,7 +2909,7 @@ static void LevelSelfTest(void) {
     // The slot's pool table, as fn_801DB1AC reads it, and the pool as fn_801EBBE0 walks it.
     const u8* pt = *(const u8**)(s0 + 0xE4);
     const u8* pool = *(const u8**)(pt + 4);
-    CHECK(*(s32*)(s0 + 0xE8) == 1 && pt == zone + L_POOLTAB && pt[0] == 0xBE && *(const s32*)(pt + 0xC) == LEVEL_FIXUP_FSM);
+    CHECK(*(s32*)(s0 + 0xE8) == 1 && pt == zone + L_POOLTAB && pt[3] == 0xBE && *(const s32*)(pt + 0xC) == LEVEL_FIXUP_FSM);
     CHECK(pool == zone + L_POOL && *(const s32*)pool == 2 && *(const s32*)(pool + 0x28) == -2);
     const u8* used = *(const u8**)(pool + 0x14);
     CHECK(used == zone + L_POOLBLK + 0x08 && *(const u8**)(used + 4) == NULL && *(const u8**)(used + 8) == list);

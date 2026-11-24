@@ -1196,7 +1196,8 @@ static SirError HudPlan(ImagePlan* plan, const u8* image, u32 imageSize, u32 add
     return SIR_OK;
 }
 
-static const SirField kPoolTableEntryFields[4] = {
+static const SirField kPoolTableEntryFields[5] = {
+    { 0x00, SIR_U32, 1 },     // code: the pool's name hash (HashTableFind: SpawnHelper finds its template by it)
     { 0x04, SIR_PTR, 1 },     // code: pool (fn_801DB1AC -> fn_801EBC74, fn_801EBBE0)
     { 0x0C, SIR_U32, 1 },     // code: s32 script function index, -1 for none
     { 0x10, SIR_U32, 1 },     // code: s32 index of the script function run when the zone is unloaded (fn_801DB248)
