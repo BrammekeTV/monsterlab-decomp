@@ -162,7 +162,7 @@ static void CameraOffset(u8* p, f32* q, f32* v) {
 f32 fn_800734B4(u8* cam, f32* pos) {
     f32 mtx[3][4];
     f32 pt[3];
-    f32 uv[2];
+    f32 uv[3];                                       // fn_8016F854 writes three ratios
     f32 a[3];
     f32 b[3];
 

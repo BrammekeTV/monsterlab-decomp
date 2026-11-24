@@ -775,7 +775,7 @@ void fn_80125970(u8* self, f32 dt) {  // dt unused
             pos[2] = lbl_805FEE9C + *(f32*)(e + 0x20);
             rad = lbl_805FEEA0;
         }
-        f32 sp[2];
+        f32 sp[3];                                   // fn_8016F854 writes three ratios
         fn_8016F854(sp, view, pos);
         if (sp[0] < lbl_805FEE98) continue;
         if (sp[1] < lbl_805FEE98) continue;
@@ -786,7 +786,7 @@ void fn_80125970(u8* self, f32 dt) {  // dt unused
         Vec3 n = Vec3Normalized(Vec3{dir[0], dir[1], dir[2]});
         f32 off[3] = {n.x * rad, n.y * rad, n.z * rad};
         f32 pos2[3] = {pos[0] + off[0], pos[1] + off[1], pos[2] + off[2]};
-        f32 sp2[2];
+        f32 sp2[3];
         fn_8016F854(sp2, view, pos2);
         f32 w = (f32)gScreenWidth;
         f32 h = (f32)gScreenHeight;
