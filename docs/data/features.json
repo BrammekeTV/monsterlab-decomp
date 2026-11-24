@@ -99,6 +99,11 @@
  "changelog": [
   {
    "date": "2026-11-24",
+   "time": "17:42",
+   "text": "After the village fly-over the camera now cuts to the normal map view while the coffin falls, as on the Wii (PR #184). Rendering the village takes a little less work per frame (PR #185)."
+  },
+  {
+   "date": "2026-11-24",
    "time": "16:53",
    "text": "Your monster appears on the village map on Windows (PR #180): it stands on the map spot and walks to the next one. The level's table of monster parts was still in the Wii's byte order, so the game couldn't build the monster."
   },
