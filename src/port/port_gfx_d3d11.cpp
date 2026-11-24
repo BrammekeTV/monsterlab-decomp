@@ -1291,9 +1291,36 @@ static void DrawPrims(const PortGx* g, u32 prim, const PortGxLayout* L, u32 coun
         PortLog("gfx trace: draw %02X x%u stages %u gens %u chans %u tex %02X bm %04X zm %02X cull %u vp %.0f,%.0f,%.0f,%.0f v0 pos %.2f %.2f %.2f %.2f col %.2f %.2f %.2f %.2f tc0 %.2f %.2f clipoff %u img0 %06X addr %08X",
                 prim, count, ((g->bp[0] >> 10) & 15) + 1, numGens, numChans, texUsed, g->bp[0x41] & 0xFFFF, g->bp[0x40] & 0x1F, (g->bp[0] >> 14) & 3,
                 vp[0], vp[1], vp[3], vp[4], v.pos[0], v.pos[1], v.pos[2], v.pos[3], v.col[0][0], v.col[0][1], v.col[0][2], v.col[0][3], v.tc[0][0], v.tc[0][1], g->xf[0x05] & 1, g->bp[0x88], (g->bp[0x94] & 0xFFFFFF) << 5);
+        PortLog("gfx trace:   chan ctrl %04X %04X alpha %04X %04X mat %08X %08X amb %08X %08X tev c0 %d %d %d %d c1 %d %d %d %d c2 %d %d %d %d", g->xf[0x0E], g->xf[0x0F], g->xf[0x10], g->xf[0x11],
+                g->xf[0x0C], g->xf[0x0D], g->xf[0x0A], g->xf[0x0B], g->tevReg[1][0], g->tevReg[1][1], g->tevReg[1][2], g->tevReg[1][3],
+                g->tevReg[2][0], g->tevReg[2][1], g->tevReg[2][2], g->tevReg[2][3], g->tevReg[3][0], g->tevReg[3][1], g->tevReg[3][2], g->tevReg[3][3]);
+        if (lit) {   // the lights the colour channels use
+            u32 used = 0;
+            for (u32 c = 0; c < numChans && c < 2; c++) for (u32 k = 0; k < 2; k++) {
+                u32 cc = g->xf[0x0E + c + k * 2];
+                if (cc & 2) used |= ((cc >> 2) & 15) | ((cc >> 11) & 15) << 4;
+            }
+            for (u32 i = 0; i < 8; i++) if (used & (1u << i)) {
+                const f32* l = &g->xfMem[0x600 + i * 0x10]; u32 lc; memcpy(&lc, &l[3], 4);
+                PortLog("gfx trace:   light %u col %08X cos %g %g %g dist %g %g %g pos %g %g %g dir %g %g %g", i, lc, l[4], l[5], l[6], l[7], l[8], l[9],
+                        l[10], l[11], l[12], l[13], l[14], l[15]);
+            }
+        }
+        for (u32 t = 0; t < numGens; t++) {
+            u32 mi = t < 4 ? (midx[0] >> (6 + t * 6)) & 63 : (midx[1] >> ((t - 4) * 6)) & 63;
+            const f32* m = &g->xfMem[mi * 4]; const f32* q = &g->xfMem[0x500 + (g->xf[0x50 + t] & 63) * 4];
+            PortLog("gfx trace:   texgen %u %08X post %08X mtx %u [%g %g %g %g | %g %g %g %g | %g %g %g %g] post [%g %g %g %g | %g %g %g %g | %g %g %g %g]", t, g->xf[0x40 + t], g->xf[0x50 + t], mi,
+                    m[0], m[1], m[2], m[3], m[4], m[5], m[6], m[7], m[8], m[9], m[10], m[11], q[0], q[1], q[2], q[3], q[4], q[5], q[6], q[7], q[8], q[9], q[10], q[11]);
+        }
+        PortLog("gfx trace:   konst %d %d %d %d | %d %d %d %d | %d %d %d %d | %d %d %d %d", g->tevKonst[0][0], g->tevKonst[0][1], g->tevKonst[0][2], g->tevKonst[0][3],
+                g->tevKonst[1][0], g->tevKonst[1][1], g->tevKonst[1][2], g->tevKonst[1][3], g->tevKonst[2][0], g->tevKonst[2][1], g->tevKonst[2][2], g->tevKonst[2][3],
+                g->tevKonst[3][0], g->tevKonst[3][1], g->tevKonst[3][2], g->tevKonst[3][3]);
+        for (u32 n = 0; n < ((g->bp[0] >> 10) & 15) + 1u; n++)
+            PortLog("gfx trace:   stage %u colour %06X alpha %06X order %03X ksel %03X", n, g->bp[0xC0 + n * 2] & 0xFFFFFF, g->bp[0xC1 + n * 2] & 0xFFFFFF,
+                    g->bp[0x28 + n / 2] >> ((n & 1) ? 12 : 0) & 0xFFF, g->bp[0xF6 + n / 2] >> ((n & 1) ? 14 : 4) & 0x3FF);
         for (u32 m = 0; m < 8; m++) if (texUsed & (1u << m)) {
             u32 base = (m < 4 ? 0x80 : 0xA0) + (m & 3);
-            PortLog("gfx trace:   map %u: %ux%u format %u at %08X%s; stage 0 colour %06X alpha %06X order %03X", m, (g->bp[base + 8] & 0x3FF) + 1,
+            PortLog("gfx trace:   map %u mode %06X: %ux%u format %u at %08X%s; stage 0 colour %06X alpha %06X order %03X", m, g->bp[base] & 0xFFFFFF, (g->bp[base + 8] & 0x3FF) + 1,
                     ((g->bp[base + 8] >> 10) & 0x3FF) + 1, (g->bp[base + 8] >> 20) & 15, (g->bp[base + 0x14] & 0xFFFFFF) << 5,
                     sEfbCopies.count((g->bp[base + 0x14] & 0xFFFFFF) << 5) ? " (a frame-buffer copy)" : "", g->bp[0xC0], g->bp[0xC1], g->bp[0x28] & 0xFFF);
         }
