@@ -1,0 +1,135 @@
+fn_80199574 Stub_80199574  # shape: only returns nothing
+fn_8019B880 Stub_8019B880  # shape: only returns nothing
+fn_8019CBE4 Stub_8019CBE4  # shape: only returns nothing
+fn_8019CE50 Stub_8019CE50  # shape: only returns nothing
+fn_801A2538 Stub_801A2538  # shape: only returns nothing
+fn_801A2540 Stub_801A2540  # shape: only returns nothing
+fn_801A2E84 Stub_801A2E84  # shape: only returns nothing
+fn_801A2E8C Stub_801A2E8C  # shape: only returns nothing
+fn_801A3908 Stub_801A3908  # shape: only returns nothing
+fn_801A511C Stub_801A511C  # shape: only returns nothing
+fn_801A81D8 Stub_801A81D8  # shape: only returns nothing
+fn_801A8AF4 Stub_801A8AF4  # shape: only returns nothing
+fn_801A9E28 Stub_801A9E28  # shape: only returns nothing
+fn_801AA1D4 Stub_801AA1D4  # shape: only returns nothing
+fn_801ACCEC Stub_801ACCEC  # shape: only returns nothing
+fn_801ACCF0 Stub_801ACCF0  # shape: only returns nothing
+fn_801ACCF8 Stub_801ACCF8  # shape: only returns nothing
+fn_801ACD00 Stub_801ACD00  # shape: only returns nothing
+fn_801B01A0 Stub_801B01A0  # shape: only returns nothing
+fn_801B0E2C Stub_801B0E2C  # shape: only returns nothing
+fn_801B2480 Stub_801B2480  # shape: only returns nothing
+fn_801B2484 Stub_801B2484  # shape: only returns nothing
+fn_801B2E04 Stub_801B2E04  # shape: only returns nothing
+fn_801B2E08 Stub_801B2E08  # shape: only returns nothing
+fn_801B2E0C Stub_801B2E0C  # shape: only returns nothing
+fn_801B3738 Stub_801B3738  # shape: only returns nothing
+fn_801B4028 Stub_801B4028  # shape: only returns nothing
+fn_801B5334 Stub_801B5334  # shape: only returns nothing
+fn_801B62D4 Stub_801B62D4  # shape: only returns nothing
+fn_801B6420 Stub_801B6420  # shape: only returns nothing
+fn_801B6424 Stub_801B6424  # shape: only returns nothing
+fn_801B6428 Stub_801B6428  # shape: only returns nothing
+fn_801B642C Stub_801B642C  # shape: only returns nothing
+fn_801B6430 Stub_801B6430  # shape: only returns nothing
+fn_801B6434 Stub_801B6434  # shape: only returns nothing
+fn_801B6438 Stub_801B6438  # shape: only returns nothing
+fn_801B643C Stub_801B643C  # shape: only returns nothing
+fn_801B6440 Stub_801B6440  # shape: only returns nothing
+fn_801B6E8C Stub_801B6E8C  # shape: only returns nothing
+fn_801BA9BC Stub_801BA9BC  # shape: only returns nothing
+fn_801BBE38 Stub_801BBE38  # shape: only returns nothing
+fn_801BBE3C Stub_801BBE3C  # shape: only returns nothing
+fn_801BBEDC Stub_801BBEDC  # shape: only returns nothing
+fn_801BC788 Stub_801BC788  # shape: only returns nothing
+fn_801BC78C Stub_801BC78C  # shape: only returns nothing
+fn_801BC798 Stub_801BC798  # shape: only returns nothing
+fn_801BC79C Stub_801BC79C  # shape: only returns nothing
+fn_801BC7A0 Stub_801BC7A0  # shape: only returns nothing
+fn_801CB940 Stub_801CB940  # shape: only returns nothing
+fn_801CC8E0 Stub_801CC8E0  # shape: only returns nothing
+fn_801D0C00 Stub_801D0C00  # shape: only returns nothing
+fn_801D55F0 Stub_801D55F0  # shape: only returns nothing
+fn_801D55F4 Stub_801D55F4  # shape: only returns nothing
+fn_801D5D08 Stub_801D5D08  # shape: only returns nothing
+fn_801D8BB0 Stub_801D8BB0  # shape: only returns nothing
+fn_801D8D7C Stub_801D8D7C  # shape: only returns nothing
+fn_801D9024 Stub_801D9024  # shape: only returns nothing
+fn_801D9160 Stub_801D9160  # shape: only returns nothing
+fn_801D9648 Stub_801D9648  # shape: only returns nothing
+fn_801DA8CC Stub_801DA8CC  # shape: only returns nothing
+fn_801E28DC Stub_801E28DC  # shape: only returns nothing
+fn_801EFB44 Stub_801EFB44  # shape: only returns nothing
+fn_801EFC28 Stub_801EFC28  # shape: only returns nothing
+fn_801F004C Stub_801F004C  # shape: only returns nothing
+fn_801F0560 Stub_801F0560  # shape: only returns nothing
+fn_801F31A4 Stub_801F31A4  # shape: only returns nothing
+fn_801F3384 Stub_801F3384  # shape: only returns nothing
+fn_801F3578 Stub_801F3578  # shape: only returns nothing
+fn_801F43A8 Stub_801F43A8  # shape: only returns nothing
+fn_801F4874 Stub_801F4874  # shape: only returns nothing
+fn_801F521C Stub_801F521C  # shape: only returns nothing
+fn_801F5524 Stub_801F5524  # shape: only returns nothing
+fn_801F5790 Stub_801F5790  # shape: only returns nothing
+fn_801F5E3C Stub_801F5E3C  # shape: only returns nothing
+fn_801F5E44 Stub_801F5E44  # shape: only returns nothing
+fn_801F5E48 Stub_801F5E48  # shape: only returns nothing
+fn_801F5E4C Stub_801F5E4C  # shape: only returns nothing
+fn_80202CA8 Stub_80202CA8  # shape: only returns nothing
+fn_802044B4 Stub_802044B4  # shape: only returns nothing
+fn_80207A28 Stub_80207A28  # shape: only returns nothing
+fn_80208324 Stub_80208324  # shape: only returns nothing
+fn_80208328 Stub_80208328  # shape: only returns nothing
+fn_80208A34 Stub_80208A34  # shape: only returns nothing
+fn_80208CA4 Stub_80208CA4  # shape: only returns nothing
+fn_80208CD0 Stub_80208CD0  # shape: only returns nothing
+fn_80208CD4 Stub_80208CD4  # shape: only returns nothing
+fn_80208CD8 Stub_80208CD8  # shape: only returns nothing
+fn_80209810 Stub_80209810  # shape: only returns nothing
+fn_8020E30C Stub_8020E30C  # shape: only returns nothing
+fn_8020E710 Stub_8020E710  # shape: only returns nothing
+fn_8020F2F4 Stub_8020F2F4  # shape: only returns nothing
+fn_8020F2FC Stub_8020F2FC  # shape: only returns nothing
+fn_8020F304 Stub_8020F304  # shape: only returns nothing
+fn_8020F308 Stub_8020F308  # shape: only returns nothing
+fn_8020F35C Stub_8020F35C  # shape: only returns nothing
+fn_8020F360 Stub_8020F360  # shape: only returns nothing
+fn_8020F364 Stub_8020F364  # shape: only returns nothing
+fn_8020F494 Stub_8020F494  # shape: only returns nothing
+fn_8020F560 Stub_8020F560  # shape: only returns nothing
+fn_8021FB28 Stub_8021FB28  # shape: only returns nothing
+fn_802209CC Thunk_memset  # shape: tail-calls memset
+fn_80220A2C Stub_80220A2C  # shape: only returns nothing
+fn_8022123C Thunk_RngNext  # shape: tail-calls RngNext
+fn_8022E3D8 Thunk_StrCopy  # shape: tail-calls StrCopy
+fn_8022E3DC Stub_8022E3DC  # shape: only returns nothing
+fn_80235DAC Thunk_vprintf  # shape: tail-calls vprintf
+fn_8023A87C Thunk_OSInitThreadQueue  # shape: tail-calls OSInitThreadQueue
+fn_8023A95C Thunk_OSWakeupThread  # shape: tail-calls OSWakeupThread
+fn_8023BEC4 Stub_8023BEC4  # shape: only returns nothing
+fn_8024D4B0 Stub_8024D4B0  # shape: only returns nothing
+fn_8024F814 Stub_8024F814  # shape: only returns nothing
+fn_80254228 Stub_80254228  # shape: only returns nothing
+fn_80254230 Stub_80254230  # shape: only returns nothing
+fn_802576B4 Stub_802576B4  # shape: only returns nothing
+fn_80259414 Stub_80259414  # shape: only returns nothing
+fn_802597D8 Stub_802597D8  # shape: only returns nothing
+fn_80259F40 Stub_80259F40  # shape: only returns nothing
+fn_80260710 Stub_80260710  # shape: only returns nothing
+fn_8026BC28 Stub_8026BC28  # shape: only returns nothing
+fn_8026BDBC Stub_8026BDBC  # shape: only returns nothing
+fn_8026F2EC Thunk_IOS_Close  # shape: tail-calls IOS_Close
+fn_802715D8 Thunk_WUDStartSyncSimple  # shape: tail-calls WUDStartSyncSimple
+fn_802715DC Thunk_WUDStopSyncSimple  # shape: tail-calls WUDStopSyncSimple
+fn_802715E0 Thunk_WUDSetSyncSimpleCallback  # shape: tail-calls WUDSetSyncSimpleCallback
+fn_802715E8 Thunk_WUDGetStatus  # shape: tail-calls WUDGetStatus
+fn_8027B598 Stub_8027B598  # shape: only returns nothing
+fn_8027C174 Stub_8027C174  # shape: only returns nothing
+fn_802808D4 Stub_802808D4  # shape: only returns nothing
+fn_8028675C Stub_8028675C  # shape: only returns nothing
+fn_80288288 Stub_80288288  # shape: only returns nothing
+fn_8028828C Stub_8028828C  # shape: only returns nothing
+fn_80288290 Stub_80288290  # shape: only returns nothing
+fn_80288294 Stub_80288294  # shape: only returns nothing
+fn_802883AC Stub_802883AC  # shape: only returns nothing
+fn_802883DC Thunk_App_MEMfree  # shape: tail-calls App_MEMfree
