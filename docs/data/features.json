@@ -99,6 +99,11 @@
  "changelog": [
   {
    "date": "2026-11-24",
+   "time": "20:41",
+   "text": "On the village map the camera follows your monster and pans to the enemies after the Mayor, matching the Wii (checked in PR #207, which also adds frame-sequence screenshots for tests). 17 more functions have names (PRs #208, #209)."
+  },
+  {
+   "date": "2026-11-24",
    "time": "20:17",
    "text": "All 3D drawing now runs on the graphics card, so scenes cost less per frame (PRs #205). Differential tests now cover more of the battle and camera code and caught 4 small mistakes in our decompiled code (PR #200). About 540 more functions have names, by exact behaviour or by their simple shape (PRs #196-#204)."
   },
