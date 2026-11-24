@@ -99,6 +99,16 @@
  "changelog": [
   {
    "date": "2026-11-24",
+   "time": "13:53",
+   "text": "Characters animate in the game on Windows (PR #173): Professor Fuseless and the other characters stood still because the animation speed in their definitions was still in the Wii's byte order, which made every animation step almost zero. Now they move. More of the character definitions still needs converting."
+  },
+  {
+   "date": "2026-11-24",
+   "time": "13:33",
+   "text": "Lightning flashes on the main menu again (PR #172): the lightning's timer handler got its arguments in the wrong order on PC, so the frame time was lost and the bolts never came back after the first one. The thunder sound is next. The F3 overlay now shows both the game's frame rate and how many pictures are shown per second (PR #171)."
+  },
+  {
+   "date": "2026-11-24",
    "time": "12:49",
    "text": "Fixed the game stopping on the main menu after a while (PR #170). When the Wii Remote's rumble timer fired, our decompiled handler didn't receive its timer, and the function it needed wasn't in the PC version yet. Both are fixed, checked against the original game code."
   },
