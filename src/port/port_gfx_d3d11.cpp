@@ -121,6 +121,8 @@ static LRESULT CALLBACK WndProc(HWND w, UINT m, WPARAM wp, LPARAM lp) {
     if (m == WM_PORT_TITLE) { SetWindowTextA(w, sTitleText); return 0; }
     if (m == WM_CLOSE) { PortStop(0, "window closed"); return 0; }
     if (m == WM_MOUSEWHEEL) { InterlockedExchangeAdd(&sWheel, (LONG)GET_WHEEL_DELTA_WPARAM(wp)); return 0; }
+    // The game draws its own pointer (the hand): no Windows cursor over the picture, except while the settings screen is open.
+    if (m == WM_SETCURSOR && LOWORD(lp) == HTCLIENT) { SetCursor(gPortGuiOpen ? LoadCursor(NULL, IDC_ARROW) : NULL); return TRUE; }
     return DefWindowProcA(w, m, wp, lp);
 }
 static DWORD WINAPI WindowThread(void*) {
@@ -167,6 +169,8 @@ void PortGfxSetFullscreen(BOOL on) {
 // Window position (0..1 across and down) -> the console pointer's -1..1, through the picture's
 // place in the window and the narrowed 2D layer of widescreen.
 static const f32 PORT_POINTER_Y_SCALE = 1.25f;
+static u32 sShownLines = 480;          // the height of the last frame-buffer copy to the display, in console lines
+f32 PortGfxPixelsPerLine(void) { return (f32)sPicH / (f32)(sShownLines ? sShownLines : 480); }   // output pixels per console line
 void PortGfxPointer(f32 wx, f32 wy, f32* px, f32* py) {
     f32 x = (wx * sOutW - sPicX) / sPicW * 2.0f - 1.0f, y = (wy * sOutH - sPicY) / sPicH * 2.0f - 1.0f;
     if (gPortSettings.wide && !gPortSettings.stretchUi) x /= 0.75f;
@@ -1763,6 +1767,7 @@ static void CopyEfb(const PortGx* g, u32 control) {
         f32 black[4] = {0, 0, 0, 1};
         if (sPicW != sOutW || sPicH != sOutH) sCtx->ClearRenderTargetView(sOutRtv, black);
         Blit(sEfbSrv, sOutRtv, sPicX, sPicY, sPicW, sPicH, su0, sv0, sdu, sdv, NULL);
+        sShownLines = h;
         sShown = TRUE;
         sDrawThread = GetCurrentThreadId();
         // The overlay goes over the window's picture only, or with --screenshot-stats into the output picture itself.

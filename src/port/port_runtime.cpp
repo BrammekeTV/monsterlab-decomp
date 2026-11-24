@@ -259,7 +259,33 @@ static void PortStateLog(void) {
             (int)sFrames, now[0], now[1], now[2], now[3], now[4], now[5], now[6], now[7], now[8], now[9], now[10], now[11], 10);
 }
 
+// The game's pointer (the "Cursor" widget, ScreenSets +0x7C) is drawn at the true size of its texture, 64 x 64 output
+// pixels, at every resolution: its scale (+0x74) is divided by the picture's pixels per console line. A scale the game
+// writes itself (an animation) becomes the new base; fn_8019C348 rebuilds the widget's transforms.
+extern "C" void fn_8019C348(u8* widget);
+static void PortCursorTrueScale(void) {
+    static u8* sWidget;
+    static f32 sBase[3], sMine[3];
+    u8* cur = gScreenSets ? *(u8**)((u8*)gScreenSets + 0x7C) : NULL;
+    if (!cur) { sWidget = NULL; return; }
+    f32* s = (f32*)(cur + 0x74);
+    if (cur != sWidget || s[0] != sMine[0] || s[1] != sMine[1] || s[2] != sMine[2]) {
+        sWidget = cur;
+        memcpy(sBase, s, sizeof(sBase));
+    }
+    f32 ppl = PortGfxPixelsPerLine();
+    if (!(ppl > 0.0f)) return;
+    f32 k = 1.0f / ppl;
+    f32 want[3] = { sBase[0] * k, sBase[1] * k, sBase[2] };
+    memcpy(sMine, want, sizeof(sMine));
+    if (memcmp(s, want, sizeof(want))) {
+        memcpy(s, want, sizeof(want));
+        fn_8019C348(cur);
+    }
+}
+
 void PortFrameDone(void) {
+    PortCursorTrueScale();
     if (sFrames == 1 && getenv("PORT_SCRIPT_TRACE")) InstallScriptTrace();
     sFrames++;
     PortStateLog();

@@ -57,6 +57,7 @@ int  PortSelfTestGx(void);            // 0 = ok
 
 // The Direct3D 11 renderer (port_gfx_d3d11.cpp). `window` FALSE renders off screen.
 BOOL PortGfxStart(BOOL window);
+f32  PortGfxPixelsPerLine(void);   // output pixels per console line (the picture's vertical scale)
 void PortGfxPointer(f32 wx, f32 wy, f32* px, f32* py);   // window position 0..1 -> pointer -1..1
 // Writes the last presented picture as a PNG; FALSE if nothing was presented.
 BOOL PortGfxSaveScreenshot(const char* path);
