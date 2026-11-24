@@ -1,16 +1,17 @@
-"""Texture-mod test for the PC port: headless, in a temporary folder outside the repository.
+"""Mod test for the PC port: headless, in a temporary folder outside the repository.
 
     python tools/mod_test.py [--iso PATH] [--keep]
 
 1. Runs to the main menu with --dump-textures and takes a screenshot (no mods).
 2. Makes a mod there with one dumped texture tinted red (the 128x128 texture that changes the most
    of the picture is not known in advance, so it tries the largest few until the picture changes).
-3. Runs again with that mod and compares the screenshots.
+3. Runs again with that mod and compares the screenshots; then the same texture by its name, and a data mod
+   (--dump-data, a strings.json that changes menu text, a broken one).
 Passes when the log names the replaced texture and the picture got redder. Needs Pillow and the game
 data (orig/RM7P4F or --iso). Nothing is written into the repository; --keep leaves the temporary
 folder (dump, mod, before.png, after.png) and prints where it is.
 """
-import os, re, shutil, subprocess, sys, tempfile
+import json, os, re, shutil, subprocess, sys, tempfile
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 EXE = os.path.join(ROOT, "build", "pc", "monsterlab.exe")
 
@@ -46,6 +47,40 @@ def by_name(tmp, dump, names, data):
     good, out = run(["--mods", mods, "--screenshot", os.path.join(tmp, "byname.png")] + data, os.path.join(tmp, "byname.log"))
     if not good or f"comes from ByName by name" not in out or f"texture {name} (" not in out:
         return f"{name}: the texture was not replaced by its name"
+    return ""
+
+
+def data_test(tmp, base_png, data):
+    """--dump-data writes the text table; a mod's data/strings.json changes menu text; a broken file is reported and ignored.
+    Returns an error text or ''."""
+    from PIL import Image, ImageChops
+    ddir = os.path.join(tmp, "data")
+    p = subprocess.run([EXE, "--no-audio", "--no-ini", "--dump-data", ddir] + data, cwd=ROOT, capture_output=True, text=True, errors="replace")
+    path = os.path.join(ddir, "strings.json")
+    if not os.path.exists(path):
+        return "--dump-data wrote no strings.json"
+    table = json.load(open(path, encoding="utf-8"))
+    strings = table["strings"]
+    if table.get("count") != len(strings) or len(strings) < 1000:
+        return f"the dumped text table looks wrong ({len(strings)} strings)"
+    ids = [k for k, v in strings.items() if v in ("New Game", "Continue", "Options")]
+    if len(ids) < 2:
+        return "the menu strings were not found in the dump"
+    mods = os.path.join(tmp, "mods3")
+    shutil.rmtree(mods, ignore_errors=True)
+    os.makedirs(os.path.join(mods, "Words", "data"))
+    mod = os.path.join(mods, "Words", "data", "strings.json")
+    json.dump({"format": 1, "strings": {k: "Zork " + strings[k] for k in ids}}, open(mod, "w"))
+    shot = os.path.join(tmp, "words.png")
+    good, out = run(["--mods", mods, "--screenshot", shot] + data, os.path.join(tmp, "words.log"))
+    if not good or f"mods: Words changes {len(ids)} strings" not in out:
+        return "the run failed or the strings were not changed"
+    if ImageChops.difference(Image.open(shot).convert("RGB"), Image.open(base_png).convert("RGB")).getbbox() is None:
+        return "the strings were changed but the menu picture did not"
+    open(mod, "w").write('{"strings": {"99999": "x"}}')           # a mistake: reported with its place, the file ignored
+    good, out = run(["--mods", mods] + data, os.path.join(tmp, "bad.log"))
+    if not good or "line 1, column" not in out or "does not exist" not in out or "the file is ignored" not in out:
+        return "a broken strings.json was not reported with its place"
     return ""
 
 
@@ -85,6 +120,11 @@ def main():
                     ok, verdict = False, bad
                     return 1
                 verdict += "; by name ok"
+                bad = data_test(tmp, before, data)
+                if bad:
+                    ok, verdict = False, bad
+                    return 1
+                verdict += "; data ok"
                 return 0
         verdict = "textures were replaced but the picture did not get redder"
         return 1
