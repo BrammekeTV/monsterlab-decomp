@@ -280,7 +280,7 @@ void fn_801EC080(u8* arg0, u8* arg1) {
 
                 rec = *(u8**)(arg0 + 4) + off;
                 f32 q[4];
-                f32 out[4];
+                f32 out[12];   // fn_801C9DF0 writes a 3x4 basis
                 q[0] = *(f32*)(rec + 0x44);
                 q[1] = *(f32*)(rec + 0x48);
                 q[2] = *(f32*)(rec + 0x4C);
