@@ -150,6 +150,11 @@ u8*  SirRelocToHost(const SirReloc* r, u32 wiiAddr);
 // Converts the fields `fields[0..n)` of the record at `rec` (recSize bytes). FALSE (and nothing
 // changed) if a field lies outside the record.
 BOOL SirConvertRecord(SirReloc* r, u8* rec, u32 recSize, const SirField* fields, s32 n);
+// What the four bytes at `off` of a type 1 material's record (a GX state of SIR_GX_STATE_SIZE bytes)
+// hold: a word, four single bytes, the material pointer, {u8, u8, u16} or {u16, u8, u8}.
+#define SIR_GX_STATE_SIZE 0xD20
+enum { SIR_GX_WORD, SIR_GX_BYTES, SIR_GX_PTR, SIR_GX_BYTES_U16, SIR_GX_U16_BYTES };
+u8 SirGxStateSlot(u32 off);
 
 // ---------------------------------------------------------------------------------------------
 // global_binary.sir

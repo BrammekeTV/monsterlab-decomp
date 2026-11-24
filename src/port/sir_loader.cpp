@@ -366,7 +366,7 @@ enum RegionKind {
     REGION_UI_SET, REGION_UI_SCREEN, REGION_UI_GRAPHIC, REGION_UI_TEXT,
     REGION_LOCATORS, REGION_UI_SLIDER,
     REGION_ZONE_EFFECT, REGION_ANIM_SET, REGION_ANIM_DEFS, REGION_U16_ARRAY, REGION_ANIM_OBJ, REGION_SKELETON, REGION_BONE_OPS,
-    REGION_ATTACH_POINTS, REGION_SCENE_LIGHT,
+    REGION_ATTACH_POINTS, REGION_SCENE_LIGHT, REGION_GX_STATE,
     REGION_UI_ANIM, REGION_UI_ANIM_TRACK, REGION_UI_ANIM_EVENTS, REGION_UI_ANIM_KEYS, REGION_UI_ANIM_ENTRIES,
     REGION_ZONE_SYSTEM, REGION_ANIM_PLAYER, REGION_ANIM_ELEM, REGION_ANIM_TRACK, REGION_ANIM_KEYS, REGION_F32_ARRAY,
     REGION_SOUND, REGION_SOUND_INFO, REGION_DSP_HEADER,
@@ -438,7 +438,7 @@ static bool PlanFinish(ImagePlan* plan) {
         const Region* prev = &plan->regions[n - 1];
         const Region* g = &plan->regions[i];
         if (g->off == prev->off && g->size == prev->size && g->kind == prev->kind) continue;
-        if (g->off < prev->off + prev->size) return false;   // the ones kept so far are disjoint, so the last one ends last
+        if (g->off < prev->off + prev->size) { if (getenv("SIR_DEBUG_OVERLAP")) fprintf(stderr, "OVERLAP %x+%x kind %d with %x+%x kind %d\n", prev->off, prev->size, prev->kind, g->off, g->size, g->kind); return false; }   // the ones kept so far are disjoint, so the last one ends last
         plan->regions[n++] = *g;
     }
     plan->count = n;
@@ -1665,6 +1665,41 @@ static int LevelSpan(u32 addr, u64 size, u32 imageSize, u32* off) {
 #define MATERIAL_TAG    0x53
 #define MATERIAL_USED   0x40
 #define MATERIAL_REC0   0x68
+//   material, type 1 (fn_80181DE0 before the batch, fn_80181F80 after it): +0x1C eight textures
+//     and +0x3C eight 3x4 float matrices, one per texture unit (fn_8017B9BC)
+//   record, type 1: the GX state fn_8017B9BC sends when it differs from the last one sent
+//     (lbl_80412B10[pass]), SIR_GX_STATE_SIZE bytes of words except where SirGxStateSlot says:
+//     +0x04 colour channels, +0x08 tex-gens, +0x0C TEV stages, +0x10 indirect stages, +0x14 two
+//     colour channels {light enable and address twice, two 0x1C-byte channel blocks}, +0xA4 eight
+//     0x24-byte texture units, +0x1C4 eight 0x34-byte tex-gens, +0x364 three TEV colours and
+//     +0x3A0 four constant colours {mode, four floats}, +0x3F0 four swap tables, +0x430 sixteen
+//     0x68-byte TEV stages, +0xAB0 four indirect stages, +0xAF0 sixteen 0x20-byte indirect
+//     settings of the stages, +0xCF0 a float and the alpha, depth and cull settings.
+extern "C" u8 SirGxStateSlot(u32 off) {
+    if (off == 0) return SIR_GX_PTR;
+    if (off == 0x14 || off == 0x1C || off == 0x24 || off == 0x40 || off == 0x5C || off == 0x64 || off == 0x6C || off == 0x88) return SIR_GX_BYTES;
+    if (off >= 0xA4 && off < 0x1C4) { u32 f = (off - 0xA4) % 0x24; return f == 0x14 || f == 0x1C ? SIR_GX_BYTES : SIR_GX_WORD; }
+    if (off >= 0x1C4 && off < 0x364) {
+        u32 f = (off - 0x1C4) % 0x34;
+        return f == 0 ? SIR_GX_BYTES_U16 : f == 4 ? SIR_GX_U16_BYTES : f == 0xC || f == 0x2C ? SIR_GX_BYTES : SIR_GX_WORD;
+    }
+    if (off >= 0x430 && off < 0xAB0) { u32 f = (off - 0x430) % 0x68; return f == 0 || f == 0x38 || f == 0x5C ? SIR_GX_BYTES : SIR_GX_WORD; }
+    if (off >= 0xAF0 && off < 0xCF0) return (off - 0xAF0) % 0x20 == 0x18 ? SIR_GX_BYTES : SIR_GX_WORD;
+    if (off == 0xCFC || off == 0xD10 || off == 0xD1C) return SIR_GX_BYTES;
+    return SIR_GX_WORD;
+}
+
+static void ConvertGxState(SirReloc* r, u8* p, u32 size) {
+    for (u32 off = 0; off + 4 <= size && off < SIR_GX_STATE_SIZE; off += 4) {
+        switch (SirGxStateSlot(off)) {
+        case SIR_GX_WORD:      Swap32(p + off); r->fieldsSwapped++; break;
+        case SIR_GX_PTR:       ConvertPtr(r, p + off); break;
+        case SIR_GX_BYTES_U16: Swap16(p + off + 2); r->fieldsSwapped++; break;
+        case SIR_GX_U16_BYTES: Swap16(p + off); r->fieldsSwapped++; break;
+        default: break;
+        }
+    }
+}
 
 static SirError MaterialTexturePlan(ImagePlan* plan, const u8* image, u32 imageSize, u32 addr) {
     u32 t, d;
@@ -1682,10 +1717,24 @@ static SirError MaterialPlan(ImagePlan* plan, const u8* image, u32 imageSize, u3
     if (!LevelSpan(addr, MATERIAL_USED, imageSize, &m) || PlanHas(plan, m, REGION_U32_ARRAY)) return SIR_OK;
     const u8* mat = image + m;
     if (Be32(mat) != MATERIAL_TAG || mat[0x0C] > 1) return SIR_ERR_ENTITY;
-    if (!PlanAdd(plan, m, 8, REGION_U32_ARRAY) || !PlanAdd(plan, m + 0x08, 4, REGION_PTR_ARRAY) ||
-        !PlanAdd(plan, m + 0x1C, 8, REGION_PTR_ARRAY) || !PlanAdd(plan, m + 0x3C, 4, REGION_PTR_ARRAY)) return SIR_ERR_ENTITY;
     u32 matrix;
     SirError e;
+    if (mat[0x0C] == 1) {
+        // The same regions as ZoneListPlan, which walks the materials that have animated matrices (+0x5C: their players).
+        if (!LevelSpan(addr, 0x80, imageSize, &m) || !PlanAdd(plan, m, 8, REGION_U32_ARRAY) || !PlanAdd(plan, m + 0x08, 4, REGION_PTR_ARRAY) ||
+            !PlanAdd(plan, m + 0x1C, 0x20, REGION_PTR_ARRAY) || !PlanAdd(plan, m + 0x3C, 4, REGION_PTR_ARRAY) ||
+            !PlanAdd(plan, m + 0x40, 0x40, REGION_PTR_ARRAY)) return SIR_ERR_ENTITY;
+        for (u32 i = 0; i < 8; i++) {
+            if ((e = MaterialTexturePlan(plan, image, imageSize, Be32(mat + 0x1C + i * 4))) != SIR_OK) return e;
+            if (LevelSpan(Be32(mat + 0x3C + i * 4), 0x30, imageSize, &matrix) && !PlanHas(plan, matrix, REGION_F32_ARRAY) &&
+                !PlanAdd(plan, matrix, 0x30, REGION_F32_ARRAY)) return SIR_ERR_ENTITY;
+        }
+        if (!LevelSpan(Be32(mat + 0x08), SIR_GX_STATE_SIZE, imageSize, &r)) return SIR_OK;
+        if (Be32(image + r) != addr) return SIR_ERR_ENTITY;                               // the record names its material
+        return PlanAdd(plan, r, SIR_GX_STATE_SIZE, REGION_GX_STATE) ? SIR_OK : SIR_ERR_ENTITY;
+    }
+    if (!PlanAdd(plan, m, 8, REGION_U32_ARRAY) || !PlanAdd(plan, m + 0x08, 4, REGION_PTR_ARRAY) ||
+        !PlanAdd(plan, m + 0x1C, 8, REGION_PTR_ARRAY) || !PlanAdd(plan, m + 0x3C, 4, REGION_PTR_ARRAY)) return SIR_ERR_ENTITY;
     if (LevelSpan(Be32(mat + 0x3C), 0x30, imageSize, &matrix) && !PlanHas(plan, matrix, REGION_F32_ARRAY) &&
         !PlanAdd(plan, matrix, 0x30, REGION_F32_ARRAY)) return SIR_ERR_ENTITY;
     if ((e = MaterialTexturePlan(plan, image, imageSize, Be32(mat + 0x1C))) != SIR_OK ||
@@ -2629,6 +2678,7 @@ static void ImagePlanConvert(const ImagePlan* plan, SirReloc* r, u8* image, u32 
             break;
         case REGION_ANIM_OBJ:     SirConvertRecord(r, p, g->size, kAnimObjFields, COUNTOF(kAnimObjFields)); break;
         case REGION_ANIM_SET:     SirConvertRecord(r, p, g->size, kAnimSetFields, COUNTOF(kAnimSetFields)); break;
+        case REGION_GX_STATE:     ConvertGxState(r, p, g->size); break;
         case REGION_SCENE_LIGHT:  SirConvertRecord(r, p, g->size, kSceneLightFields, COUNTOF(kSceneLightFields)); break;
         case REGION_ATTACH_POINTS: ConvertRecords(r, p, g->size, ATTACH_POINT_SIZE, kAttachPointFields, COUNTOF(kAttachPointFields)); break;
         case REGION_ANIM_DEFS:    ConvertRecords(r, p, g->size, ANIM_DEF_SIZE, kAnimDefFields, COUNTOF(kAnimDefFields)); break;

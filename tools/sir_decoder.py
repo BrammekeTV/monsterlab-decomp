@@ -627,6 +627,20 @@ def texture_stream_dump(path):
             d[0x14:end].decode('ascii'), d[p], d[p + 1], d[p + 2], d[p + 3], w, h, q + 4))
     return L
 
+GX_STATE_SIZE = 0xD20
+def gx_state_slot(off):
+    # What the four bytes at off of a type 1 material's record hold (SirGxStateSlot): 0 word, 1 bytes,
+    # 2 the material pointer, 3 {u8, u8, u16}, 4 {u16, u8, u8}.
+    if off == 0: return 2
+    if off in (0x14, 0x1C, 0x24, 0x40, 0x5C, 0x64, 0x6C, 0x88, 0xCFC, 0xD10, 0xD1C): return 1
+    if 0xA4 <= off < 0x1C4: return 1 if (off - 0xA4) % 0x24 in (0x14, 0x1C) else 0
+    if 0x1C4 <= off < 0x364:
+        f = (off - 0x1C4) % 0x34
+        return 3 if f == 0 else 4 if f == 4 else 1 if f in (0xC, 0x2C) else 0
+    if 0x430 <= off < 0xAB0: return 1 if (off - 0x430) % 0x68 in (0, 0x38, 0x5C) else 0
+    if 0xAF0 <= off < 0xCF0: return 1 if (off - 0xAF0) % 0x20 == 0x18 else 0
+    return 0
+
 def level_dump(path):
     global OTHER_ZONE
     version, secs = read_archive(path)
@@ -1262,6 +1276,24 @@ def zone_dump(L, sec, base, hud, roots, scene_roots, pooltabs, records=(), lists
         mat_texture(u(o + 0x1C))
         mat_texture(u(o + 0x20))
         x, r = u(o + 0x3C), u(o + 8)
+        if sec[o + 0xC] == 1 and inz(a, 0x5C):
+            # Type 1 (fn_80181DE0 -> fn_8017B9BC): eight textures, eight matrices, the record is a GX state.
+            L.append('material1 %s tex %s matrices %s' % (ptr(a), ' '.join(ptr(u(o + 0x1C + k * 4)) for k in range(8)),
+                ' '.join(ptr(u(o + 0x3C + k * 4)) for k in range(8))))
+            for k in range(2, 8): mat_texture(u(o + 0x1C + k * 4))
+            for k in range(1, 8):
+                xk = u(o + 0x3C + k * 4)
+                if inz(xk, 0x30): L.append('matmatrix %s %s' % (ptr(xk), ws(off(xk), 12)))
+            if inz(r, GX_STATE_SIZE):
+                q = off(r)
+                sums = [0, 0, 0]
+                for f in range(4, GX_STATE_SIZE, 4):
+                    kind = gx_state_slot(f)
+                    if kind == 0: sums[0] = (sums[0] + u(q + f)) & 0xFFFFFFFF
+                    elif kind == 1: sums[1] = (sums[1] + u(q + f)) & 0xFFFFFFFF
+                    elif kind == 3: sums[2] = (sums[2] + sec[q + f] * 256 + sec[q + f + 1] + h16(q + f + 2) * 3) & 0xFFFFFFFF
+                    else: sums[2] = (sums[2] + h16(q + f) * 5 + sec[q + f + 2] * 256 + sec[q + f + 3]) & 0xFFFFFFFF
+                L.append('matstate %s back %s counts %s words %08x bytes %08x halves %08x' % (ptr(r), ptr(u(q)), ws(q + 4, 4), sums[0], sums[1], sums[2]))
         if inz(x, 0x30): L.append('matmatrix %s %s' % (ptr(x), ws(off(x), 12)))
         if sec[o + 0xC] == 0 and inz(r, 0x68):
             q = off(r)

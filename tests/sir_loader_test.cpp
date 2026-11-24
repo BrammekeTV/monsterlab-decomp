@@ -1114,6 +1114,29 @@ struct ZoneDump {
         MatTexture(*(const u8**)(mat + 0x20));
         const u8* x = *(const u8**)(mat + 0x3C);
         const u8* r = *(const u8**)(mat + 8);
+        if (mat[0x0C] == 1 && In(mat, 0x5C)) {
+            // Type 1 (fn_80181DE0 -> fn_8017B9BC): eight textures, eight matrices, the record is a GX state.
+            printf("material1 "); Val(mat); printf(" tex "); Ptrs(mat + 0x1C, 8); printf(" matrices "); Ptrs(mat + 0x3C, 8); printf("\n");
+            for (u32 k = 2; k < 8; k++) MatTexture(*(const u8**)(mat + 0x1C + k * 4));
+            for (u32 k = 1; k < 8; k++) {
+                const u8* xk = *(const u8**)(mat + 0x3C + k * 4);
+                if (In(xk, 0x30)) { printf("matmatrix "); Val(xk); printf(" "); Floats(xk, 12); printf("\n"); }
+            }
+            if (In(r, SIR_GX_STATE_SIZE)) {
+                u32 words = 0, bytes = 0, halves = 0;
+                for (u32 f = 4; f < SIR_GX_STATE_SIZE; f += 4) {
+                    const u8* q = r + f;
+                    switch (SirGxStateSlot(f)) {
+                    case SIR_GX_WORD:      words += *(const u32*)q; break;
+                    case SIR_GX_BYTES:     bytes += (u32)q[0] << 24 | (u32)q[1] << 16 | (u32)q[2] << 8 | q[3]; break;
+                    case SIR_GX_BYTES_U16: halves += q[0] * 256u + q[1] + *(const u16*)(q + 2) * 3u; break;
+                    default:               halves += *(const u16*)q * 5u + q[2] * 256u + q[3]; break;
+                    }
+                }
+                printf("matstate "); Val(r); printf(" back "); Ptr(r); printf(" counts "); Words(r + 4, 4);
+                printf(" words %08x bytes %08x halves %08x\n", words, bytes, halves);
+            }
+        }
         if (In(x, 0x30)) { printf("matmatrix "); Val(x); printf(" "); Floats(x, 12); printf("\n"); }
         if (mat[0x0C] == 0 && In(r, 0x68)) {
             printf("matrec "); Val(r); printf(" back "); Ptr(r); printf(" b4 "); Hex(r + 4, 4); printf(" floats "); Floats(r + 8, 16);
