@@ -50,14 +50,9 @@ static void PrintPtr(const u8* slot, const GlobalBinaryFile* f) {
 
 // The sound objects the calls of a converted action program (n words) name, as PlaySoundAt,
 // fn_801FE52C and fn_80203340 read them. An operand is the object's Wii address.
-static void DumpSounds(const GlobalBinaryFile* f, u32 wiiBase, const u32* pc, u32 n) {
-    for (u32 k = 0; k < n; k += (pc[k] & 0xFF) <= 0x1B ? (pc[k] >> 8) & 0xFF : 1) {
-        u32 len = (pc[k] >> 8) & 0xFF, mask = 0;
-        if ((pc[k] & 0xFF) != 0x16) continue;
-        for (u32 c = 0; c < SIR_SOUND_CALLS; c++) if (kSirSoundCalls[c].func == ((pc[k] >> 16) & 0xFFF)) mask = kSirSoundCalls[c].argMask;
-        for (u32 a = 0; mask != 0 && a + 1 < len; a++) {
-            u32 snd = pc[k + 1 + a];
-            if (!(mask >> a & 1) || snd < wiiBase || (u64)(snd - wiiBase) + 0x30 > f->imageSize) continue;
+#define LEVEL_ZONE1_WII_BASE 0x90980000u   // where the game loads a level's zone 1
+static std::vector<u32> sFarSounds;   // sounds of the other zone that zone 0's action records name (Wii addresses)
+static void DumpSound(const GlobalBinaryFile* f, u32 wiiBase, u32 snd) {
             const u8* first = f->image + (snd - wiiBase);
             for (u32 i = 0; i < (first[4] != 0 ? first[4] : 1u); i++) {
                 const u8* e = first + i * 0x30;
@@ -78,6 +73,22 @@ static void DumpSounds(const GlobalBinaryFile* f, u32 wiiBase, const u32* pc, u3
                     }
                 }
                 printf("\n");
+            }
+}
+
+static void DumpSounds(const GlobalBinaryFile* f, u32 wiiBase, const u32* pc, u32 n) {
+    for (u32 k = 0; k < n; k += (pc[k] & 0xFF) <= 0x1B ? (pc[k] >> 8) & 0xFF : 1) {
+        u32 len = (pc[k] >> 8) & 0xFF, mask = 0;
+        if ((pc[k] & 0xFF) != 0x16) continue;
+        for (u32 c = 0; c < SIR_SOUND_CALLS; c++) if (kSirSoundCalls[c].func == ((pc[k] >> 16) & 0xFFF)) mask = kSirSoundCalls[c].argMask;
+        for (u32 a = 0; mask != 0 && a + 1 < len; a++) {
+            u32 snd = pc[k + 1 + a];
+            if (!(mask >> a & 1)) continue;
+            if (snd >= wiiBase && (u64)(snd - wiiBase) + 0x30 <= f->imageSize) { DumpSound(f, wiiBase, snd); continue; }
+            if (sOtherZoneNumber == 1 && sOtherZone != NULL && snd >= LEVEL_ZONE1_WII_BASE && (u64)(snd - LEVEL_ZONE1_WII_BASE) + 0x30 <= sOtherZoneSize) {
+                bool seen = false;
+                for (u32 v : sFarSounds) seen = seen || v == snd;
+                if (!seen) sFarSounds.push_back(snd);
             }
         }
     }
@@ -730,7 +741,6 @@ static int Dump(const char* path) {
 
 // Zone 1's address: gZoneBase[1] = zone 0's address plus its memory budget (world_alloc.cpp).
 // It is not in the level file; the port takes it from where the game reads the image to.
-#define LEVEL_ZONE1_WII_BASE 0x90980000u
 
 struct LevelFile {
     u8* hdr;  u32 hdrSize;      // header block (the world state), converted
@@ -1681,6 +1691,7 @@ static int DumpLevel(const char* path) {
         }
         sOtherZone = f.zone; sOtherZoneSize = f.zoneSize; sOtherZoneNumber = 0;
         GlobalBinaryFile z1 = { NULL, f.zone1, f.zone1Size };
+        for (u32 snd : sFarSounds) DumpSound(&z1, LEVEL_ZONE1_WII_BASE, snd);   // the ones zone 0's action records name
         ZoneDump zd1;
         zd1.z = &z1;
         for (u32 i = 0; i < roots1.entityCount; i++) zd1.Add(zd1.ents, f.zone1 + (roots1.entities[i] - LEVEL_ZONE1_WII_BASE));

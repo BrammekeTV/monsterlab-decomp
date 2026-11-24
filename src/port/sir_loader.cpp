@@ -1153,10 +1153,10 @@ static SirError OtherFsmValuesPlan(ImagePlan* plan, const u8* image, u32 imageSi
         if (g->kind != REGION_FSM || g->size < FSM_USED) continue;
         const u8* values;
         memcpy(&values, sOtherImage + g->off + 0x54, sizeof(values));
-        if (values < image || values >= image + imageSize) continue;
-        u32 off = (u32)(values - image);
+        // A converted pointer leads into this image where it is now, or is the address it will have (AnyPtr).
+        u32 addr = values >= image && values < image + imageSize ? sImageBase + (u32)(values - image) : (u32)(uintptr_t)values, off;
+        if (!ImageSpan(addr, 4, imageSize, &off)) continue;
         if (PlanHas(plan, off, REGION_U32_ARRAY)) continue;        // two machines with one table
-        if ((u64)off + 4 > imageSize) return SIR_ERR_SCREENS;
         u32 count = Be32(image + off);
         if ((u64)off + 4 + (u64)count * 4 > imageSize || !PlanAdd(plan, off, 4 + count * 4, REGION_U32_ARRAY)) return SIR_ERR_SCREENS;
     }
@@ -1221,7 +1221,7 @@ static void ConvertRecords(SirReloc* r, u8* p, u32 size, u32 recSize, const SirF
 //   instruction word, not words. The shipped file has no such call.
 // - arguments of type 0xB and 0xD are pointers into the image (42 in the shipped file). They are
 //   converted as words, which is right only while the image sits at its original address, as it
-//   does in the PC build. The objects they point at are not converted.
+//   does in the PC build. The objects they point at are sound objects (kSirSoundCalls below).
 #define ACTION_OP_HEADER    0x01   // fn_801E2368: a record that does not start with it is not run
 #define ACTION_OP_JUMP_MIN  0x04   // 4 jump, 5 jump if the result is zero, 6-17 compare and jump
 #define ACTION_OP_JUMP_MAX  0x11
@@ -1249,7 +1249,8 @@ static u32 ActionInstructionWords(u32 word) {
 
 // ---- sound objects (what a sound argument of a script call points at)
 //
-// A script function whose signature has an argument of type 0xB gets a pointer to a sound object:
+// A script function whose signature has an argument of type 0xB or 0xD (a voice line: PlayVoiceSFX
+// and LT_SetTutorialText hand it to PlaySoundAt) gets a pointer to a sound object:
 // one or more 0x30-byte variations (PlaySoundAt picks one at random; the count is the byte at +0x04
 // of the first, 0 meaning one). A variation names its sample by a pointer to a sound info, which
 // names a DSP header (the layout of the first 0x60 bytes of a .dsp file) with the sample data behind
@@ -1266,6 +1267,7 @@ extern "C" const SirSoundCall kSirSoundCalls[SIR_SOUND_CALLS] = {
     {   48, 0x1, "PlayGlobalSound" },        {   49, 0x1, "PlayGlobalSoundSynced" },  {   50, 0x1, "PlayGlobalSoundWithEffect" },
     {   51, 0x2, "PlayLoopingSoundFX" },     {   52, 0x2, "PlayLoopingSoundFXWithEffect" },
     {   55, 0x2, "PlaySoundFX" },            {   56, 0x2, "PlaySoundFXWithEffect" },
+    {   59, 0x1, "PlayVoiceSFX" },           {  103, 0x1, "StopVoiceSFX" },           { 1015, 0x2, "LT_SetTutorialText" },
     { 1216, 0x3, "PlayBackgroundSFX" },      { 1217, 0x3, "PlayBackgroundSFXWithEffect" },
     { 1238, 0x1, "PlaySoundEffect" },        { 1239, 0x1, "PlaySoundEffectWithEffect" },
     { 1297, 0x2, "QueueSoundFX" },           { 1330, 0x2, "RegisterExperimentSound" }, { 1332, 0x1, "RegisterMidiLoop" },
@@ -3309,6 +3311,47 @@ static SirError PoolTablePlan(ImagePlan* plan, const u8* image, u32 imageSize, u
     return SIR_OK;
 }
 
+// An object of zone 0 (converted) by a pointer read from it: where it is now, or the address it will have.
+static bool OtherOff(const u8* p, u64 size, u32* off) {
+    if (p >= sOtherImage && p < sOtherImage + sOtherSize) *off = (u32)(p - sOtherImage);
+    else if ((u32)(uintptr_t)p >= sOtherBase && (u32)(uintptr_t)p - sOtherBase < sOtherSize) *off = (u32)(uintptr_t)p - sOtherBase;
+    else return false;
+    return (u64)*off + size <= sOtherSize;
+}
+
+// The sound objects of the zone being converted that the action records of zone 0 name (a level's
+// voice lines: the quest machines of zone 0 call PlayVoiceSFX with sounds of zone 1). Zone 0's
+// tables and records are converted: host words, and the operand is the sound's address.
+static SirError OtherActionSoundsPlan(ImagePlan* plan, const u8* image, u32 imageSize) {
+    for (u32 t = 0; sOtherDone != NULL && t < sOtherDone->count; t++) {
+        const Region* g = &sOtherDone->regions[t];
+        if (g->kind != REGION_ACTION_TABLE || g->size < ACTION_TABLE_SIZE) continue;
+        u32 count = Host32(sOtherImage + g->off), array;
+        const u8* p;
+        memcpy(&p, sOtherImage + g->off + 4, sizeof(p));
+        if (!OtherOff(p, (u64)count * 4, &array)) continue;
+        for (u32 i = 0; i < count; i++) {
+            u32 rec;
+            memcpy(&p, sOtherImage + array + i * 4, sizeof(p));
+            if (p == NULL || !OtherOff(p, 4, &rec) || ActionOp(Host32(sOtherImage + rec)) != ACTION_OP_HEADER) continue;
+            for (u32 k = 0; (u64)rec + ((u64)k + 1) * 4 <= sOtherSize;) {
+                u32 word = Host32(sOtherImage + rec + k * 4), n = ActionInstructionWords(word);
+                if (ActionOp(word) == ACTION_OP_END || n == 0 || (u64)rec + ((u64)k + n) * 4 > sOtherSize) break;
+                for (u32 c = 0; ActionOp(word) == ACTION_OP_CALL && c < SIR_SOUND_CALLS; c++) {
+                    if (kSirSoundCalls[c].func != ActionJump(word)) continue;
+                    for (u32 a = 0; a + 1 < ActionLen(word); a++) {
+                        if (!(kSirSoundCalls[c].argMask >> a & 1)) continue;
+                        SirError e = SoundPlan(plan, image, imageSize, Host32(sOtherImage + rec + (k + 1 + a) * 4));
+                        if (e != SIR_OK) return e;
+                    }
+                }
+                k += n;
+            }
+        }
+    }
+    return SIR_OK;
+}
+
 extern "C" SirError LevelZoneConvert(SirReloc* r, u8* image, u32 imageSize, u32 wiiBase, const LevelZoneRoots* roots,
                                      LevelZoneDone* done, const LevelZoneOther* other) {
     ImagePlan plan = { NULL, 0, 0 }, merged = { NULL, 0, 0 };
@@ -3349,6 +3392,7 @@ extern "C" SirError LevelZoneConvert(SirReloc* r, u8* image, u32 imageSize, u32 
         e = SIR_ERR_LEVEL;
     if (e == SIR_OK && roots->screenSet != 0) e = ScreenSetPlan(&plan, image, imageSize, roots->screenSet);
     if (e == SIR_OK && other != NULL) e = OtherFsmValuesPlan(&plan, image, imageSize);
+    if (e == SIR_OK && other != NULL) e = OtherActionSoundsPlan(&plan, image, imageSize);
     if (e == SIR_OK && !PlanFinish(&plan)) e = SIR_ERR_OVERLAP;
     // What this zone adds in zone 0: disjoint among itself and from what is converted there.
     if (e == SIR_OK && !PlanFinish(&sOtherNew)) e = SIR_ERR_OVERLAP;
