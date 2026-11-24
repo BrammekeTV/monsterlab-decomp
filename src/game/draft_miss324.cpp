@@ -2,6 +2,7 @@
 #include "types.h"
 #include "game/part.h"
 
+extern "C" void PortSoundLogRecord(const void* snd, s32 result);   // PC port (port_sound_log.cpp)
 extern "C" {
 u64   __shl2i(s32, s32, s32);                                   // 0x8032F9A0
 u64   __shr2u(s32, s32, s32);                                   // 0x8032F9C4
@@ -364,6 +365,7 @@ void fn_8020B5E8(u8* arg0, f32 farg0, f32 farg1) {
                     } else {
                         *(s32*)(v + 0x14) = fn_801FE52C(gAudio, &d, 0);
                     }
+                    PortSoundLogRecord(snd, *(s32*)(v + 0x14));   // PC port: PORT_SOUND_LOG
                 }
             }
             s32 h = *(s32*)(v + 0x14);
