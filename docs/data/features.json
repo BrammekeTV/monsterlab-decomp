@@ -99,6 +99,11 @@
  "changelog": [
   {
    "date": "2026-11-24",
+   "time": "21:58",
+   "text": "The game's pointing hand no longer shrinks after switching cursors, and a new setting shows the Windows mouse cursor over the game for anyone who wants it (PR #218)."
+  },
+  {
+   "date": "2026-11-24",
    "time": "21:44",
    "text": "The first battle now plays to the end on Windows (PR #216): you win, see the results and the reward, return to the village, and the Field Repair minigame starts."
   },
