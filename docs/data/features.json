@@ -99,6 +99,11 @@
  "changelog": [
   {
    "date": "2026-11-24",
+   "time": "22:57",
+   "text": "Battle shows both monsters' real names, Gorbok and Mongor, instead of 'Not found' (PR #221). After Field Repair the game returns to the village map and you can walk on to the next spot (PR #222)."
+  },
+  {
+   "date": "2026-11-24",
    "time": "22:41",
    "text": "On the village map your monster now faces the way it walks (PR #219). The main menu's sky and sea move again, and so do other scrolling textures (PR #220)."
   },
