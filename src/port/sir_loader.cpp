@@ -362,7 +362,7 @@ enum RegionKind {
     REGION_FSM_TRANSITION, REGION_FSM_SHARED_TRANSITION, REGION_HUD, REGION_LEVEL_HUD,
     REGION_FX_BOLTS, REGION_FX_TRAILS, REGION_POOL, REGION_POOL_BLOCK,
     REGION_ENTITY, REGION_ENTITY_RECORD, REGION_ENTITY_PART, REGION_PTR_COUNT, REGION_COUNT_PTR, REGION_POOL_TABLE,
-    REGION_ENTITY_PROP, REGION_PROP_DEF, REGION_KEY_PTR,
+    REGION_ENTITY_PROP, REGION_PROP_DEF, REGION_KEY_PTR, REGION_ENTITY_TIMED,
     REGION_UI_TREE_NODE, REGION_UI_LIST, REGION_UI_WIDGET, REGION_UI_EVENT, REGION_UI_GRID, REGION_UI_FIXED,
     REGION_UI_SET, REGION_UI_SCREEN, REGION_UI_GRAPHIC, REGION_UI_TEXT,
     REGION_LOCATORS, REGION_UI_SLIDER,
@@ -1563,6 +1563,8 @@ static const SirField kEntityFields[] = {
     { 0x02C, SIR_U32, 2 },    // code: id, which fn_800D8724 compares for every entity of a zone's tables; +0x30 (fn_801B6444)
     { 0x080, SIR_U32, 1 },    // code: fn_801260C8 tests its bits 0x78000000 (0x0003FFFF in the files)
     { 0x084, SIR_PTR, 1 },    // code: a table fn_801B6AD4 searches (the table itself is not converted)
+    { 0x014, SIR_F32, 1 },    // code: a prop's anchor height (fn_8006AADC); for every type the camera's sensor radius (fn_800DECD8
+                              //       passes the camera target's +0x14 to the volume test: unconverted it made every camera volume apply)
     { 0x08C, SIR_PTR, 2 },    // code: part container (fn_8012F6B0), sub-object (fn_8012F8B8)
     { 0x094, SIR_U32, 1 },    // code: how many attach points the entity has (fn_801EC080; fn_801B4334 clears it),
     { 0x098, SIR_PTR, 1 },    //       the attach points (kAttachPointFields)
@@ -1580,6 +1582,14 @@ static const SirField kEntityFields[] = {
     { 0x194, SIR_PTR, 1 },    // code: more part containers (fn_8012F8B8),
     { 0x1A4, SIR_U32, 2 },    //       their count; +0x1A8 (fn_800690D4)
     { 0x1B0, SIR_U32, 1 },    // code: flags (fn_8012F8B8)
+};
+// What a type 9 entity (trigger_timed_script, fn_8006F6BC) has on top of kEntityFields: the action words at +0x50 / +0x54 (the
+// thunder script of the castle is the first) and the time-outs
+// SetTimeoutFromProperty (fn_8006E9D8) reads, base values +0x15C / +0x160 and the spread +0x170 / +0x174 (+0x158 is
+// converted with every entity).
+static const SirField kTimedFields[] = {
+    { 0x050, SIR_U32, 2 },    // code: the activate / deactivate action words (CallActivateHandler, CallDeactivateHandler)
+    { 0x15C, SIR_F32, 2 }, { 0x170, SIR_F32, 2 },
 };
 // An entity's attach points (+0x98, count +0x94): where effects hang on it. fn_801EC080 updates
 // them every frame: +0x00 the point's name hash (fn_801EC880 finds a point by it), +0x04 the bone
@@ -1603,7 +1613,6 @@ static const SirField kEntityRecordFields[] = {
 // methods of that vtable read. The level's player object is one of these. Action words are the
 // ones TriggerDoAction gets the address of; the words between them have no reader yet.
 static const SirField kPropFields[] = {
-    { 0x014, SIR_F32, 1 },    // code: fn_8006AADC (height of the anchor point)
     { 0x028, SIR_F32, 1 },    // code: fn_8006BDF4
     { 0x038, SIR_U32, 3 },    // code: action words (fn_8006A2D0)
     { 0x048, SIR_U32, 4 },    // code: action words (fn_800696C4, fn_8006BDF4, fn_80069638)
@@ -1642,12 +1651,14 @@ static const SirField kAnimDefFields[] = {
 #define ANIM_SET_USED 0x20
 #define ENTITY_DEF_USED 0x4C   // of the definition of an entity that is not a prop (entity +0x9C): id +0x08, animation set +0x48
 #define ANIM_DEF_SIZE 0x44
-// The animation speed of a character definition (+0xB8, with the two floats after it): fn_80053C2C multiplies the
-// tick by it. Unconverted it read as ~0 and every character stood still. Told from the other objects an entity
-// can point at by its default hash at +0x60. Only these three words are known to be floats here: the rest of
-// the definition is not converted, and definitions of types 5 and 13 lie too close to each other to take more.
+// A character definition (entity +0x9C of types 5 and 13) is 0x250 bytes, laid out one after the other: +0x08 id, +0x1C flags,
+// +0x24 a float, +0x34 and +0x40..+0x4C objects, +0x48 the animation set, +0x60 a hash and 20 action words (0x0003FFFF = none),
+// +0xB8 the animation speed (fn_80053C2C multiplies the tick by it), then floats (0x7F800001 = unset) up to +0x1F8, flags at +0x240.
+// Every field is a 32-bit word. Told from the other objects an entity can point at by the default hash at +0x60.
+#define CHAR_DEF_SIZE 0x250
+
 static bool CharDefLooksFull(const u8* image, u32 imageSize, u32 o) {
-    return (u64)o + 0xC4 <= imageSize && Be32(image + o + 0x60) == 0xDC1BFEC5u;
+    return (u64)o + CHAR_DEF_SIZE <= imageSize && Be32(image + o + 0x60) == 0xDC1BFEC5u;
 }
 
 static SirError AnimClipPlan(ImagePlan* plan, const u8* image, u32 imageSize, u32 addr);
@@ -2076,7 +2087,7 @@ static SirError EntityContainerPlan(ImagePlan* plan, const u8* image, u32 imageS
 static u32 sPooledEntityType;   // set while PoolTablePlan walks a pool of entities, else 0
 static SirError EntityPlan(ImagePlan* plan, const u8* image, u32 imageSize, u32 addr, u32 depth) {
     u32 off, o;
-    if (!LevelSpan(addr, ENTITY_USED, imageSize, &off) || PlanHas(plan, off, REGION_ENTITY) || PlanHas(plan, off, REGION_ENTITY_PROP))
+    if (!LevelSpan(addr, ENTITY_USED, imageSize, &off) || PlanHas(plan, off, REGION_ENTITY) || PlanHas(plan, off, REGION_ENTITY_PROP) || PlanHas(plan, off, REGION_ENTITY_TIMED))
         return SIR_OK;
     const u8* ent = image + off;
     // The type is the byte at +0x34 of the record (fn_8012F8B8 picks the constructor by it).
@@ -2091,7 +2102,7 @@ static SirError EntityPlan(ImagePlan* plan, const u8* image, u32 imageSize, u32 
     // challenge projector, fn_8006CFA4) derive from the prop: same layout and definition.
     bool prop = kind == ENTITY_TYPE_PROP || kind == 0x0F || kind == 0x10;
     if (recordOther && !OtherAdd(otherRec, ENTITY_RECORD_SIZE, REGION_ENTITY_RECORD)) return SIR_ERR_ENTITY;
-    if (depth > ENTITY_DEPTH_MAX || !PlanAdd(plan, off, ENTITY_USED, prop ? REGION_ENTITY_PROP : REGION_ENTITY)) return SIR_ERR_ENTITY;
+    if (depth > ENTITY_DEPTH_MAX || !PlanAdd(plan, off, ENTITY_USED, prop ? REGION_ENTITY_PROP : kind == 9 ? REGION_ENTITY_TIMED : REGION_ENTITY)) return SIR_ERR_ENTITY;
     SirError e;
 
     if (LevelSpan(Be32(ent + 0x04), ENTITY_RECORD_SIZE, imageSize, &o) && !PlanAdd(plan, o, ENTITY_RECORD_SIZE, REGION_ENTITY_RECORD))
@@ -2122,11 +2133,11 @@ static SirError EntityPlan(ImagePlan* plan, const u8* image, u32 imageSize, u32 
         if (!PlanAdd(plan, o + 8, 4, REGION_U32_ARRAY)) return SIR_ERR_ENTITY;
         // +0x48: the definition's animation set (fn_8005BEC8 looks a conversation's clip up in it).
         if ((u64)o + ENTITY_DEF_USED <= imageSize && !PlanAdd(plan, o + 0x48, 4, REGION_PTR_ARRAY)) return SIR_ERR_ENTITY;
-        if ((kind == 5 || kind == 13) && CharDefLooksFull(image, imageSize, o) && !PlanAdd(plan, o + 0xB8, 0x0C, REGION_U32_ARRAY)) return SIR_ERR_ENTITY;
+        if ((kind == 5 || kind == 13) && CharDefLooksFull(image, imageSize, o) && (!PlanAdd(plan, o + 0x0C, 0x3C, REGION_U32_ARRAY) || !PlanAdd(plan, o + 0x4C, CHAR_DEF_SIZE - 0x4C, REGION_U32_ARRAY))) return SIR_ERR_ENTITY;
     } else if (OtherSpan(Be32(ent + 0x9C), 0xC, &q)) {
         if (!OtherAdd(q + 8, 4, REGION_U32_ARRAY)) return SIR_ERR_ENTITY;
         if ((u64)q + ENTITY_DEF_USED <= sOtherSize && !OtherAdd(q + 0x48, 4, REGION_PTR_ARRAY)) return SIR_ERR_ENTITY;
-        if ((kind == 5 || kind == 13) && CharDefLooksFull(sOtherImage, sOtherSize, q) && !OtherAdd(q + 0xB8, 0x0C, REGION_U32_ARRAY)) return SIR_ERR_ENTITY;
+        if ((kind == 5 || kind == 13) && CharDefLooksFull(sOtherImage, sOtherSize, q) && (!OtherAdd(q + 0x0C, 0x3C, REGION_U32_ARRAY) || !OtherAdd(q + 0x4C, CHAR_DEF_SIZE - 0x4C, REGION_U32_ARRAY))) return SIR_ERR_ENTITY;
     }
     if (!prop && Be32(ent + 0x9C) != 0) {
         // The animation set itself (fn_800526E4 -> fn_801AC6B4 reads its entries when the entity wakes).
@@ -2854,6 +2865,8 @@ static void ImagePlanConvert(const ImagePlan* plan, SirReloc* r, u8* image, u32 
         case REGION_ENTITY:       SirConvertRecord(r, p, g->size, kEntityFields, COUNTOF(kEntityFields)); break;
         case REGION_ENTITY_PROP:  SirConvertRecord(r, p, g->size, kEntityFields, COUNTOF(kEntityFields));
                                   SirConvertRecord(r, p, g->size, kPropFields, COUNTOF(kPropFields)); break;
+        case REGION_ENTITY_TIMED: SirConvertRecord(r, p, g->size, kEntityFields, COUNTOF(kEntityFields));
+                                  SirConvertRecord(r, p, g->size, kTimedFields, COUNTOF(kTimedFields)); break;
         case REGION_ZONE_SYSTEM:  SirConvertRecord(r, p, g->size, kZoneSystemFields, COUNTOF(kZoneSystemFields)); break;
         case REGION_ANIM_PLAYER:  SirConvertRecord(r, p, g->size, kAnimPlayerFields, COUNTOF(kAnimPlayerFields)); break;
         case REGION_ANIM_ELEM:    SirConvertRecord(r, p, g->size, kAnimElemFields, COUNTOF(kAnimElemFields)); break;

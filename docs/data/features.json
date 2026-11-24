@@ -99,6 +99,21 @@
  "changelog": [
   {
    "date": "2026-11-24",
+   "time": "16:11",
+   "text": "Faster rendering on Windows (PR #177): the screen copies the game makes for its effects now reuse a pool of textures instead of creating new ones, which cut the time spent on copies on the main menu from 24 seconds to 0.4 seconds over a 3,900-frame test run."
+  },
+  {
+   "date": "2026-11-24",
+   "time": "15:37",
+   "text": "More of the game converted (PRs 175 176): the whole character definition is now converted to PC byte order, not just the animation speed (#175); and the village map camera no longer goes wrong after a conversation, because the player's camera sensor radius was unconverted and every camera zone applied at once (#176)."
+  },
+  {
+   "date": "2026-11-24",
+   "time": "15:07",
+   "text": "Thunder rolls on the main menu (PR #174): a thunder clap every 3 to 5 seconds, as in the real game. The timed triggers that play it were converted without their actions and time-outs, so they never fired."
+  },
+  {
+   "date": "2026-11-24",
    "time": "13:53",
    "text": "Characters animate in the game on Windows (PR #173): Professor Fuseless and the other characters stood still because the animation speed in their definitions was still in the Wii's byte order, which made every animation step almost zero. Now they move. More of the character definitions still needs converting."
   },
