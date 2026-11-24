@@ -1924,6 +1924,9 @@ static SirError SceneObjectPlan(ImagePlan* plan, const u8* image, u32 imageSize,
         u32 count = Be32(image + off + 0x54), array = Be32(image + off + 0x58);
         if (!ImageSpan(addr, 0x60, imageSize, &off) || !PlanAdd(plan, off + 0x48, 4, REGION_PTR_ARRAY) ||
             !PlanAdd(plan, off + 0x50, 4, REGION_U32_ARRAY) || !PlanAdd(plan, off + 0x5C, 4, REGION_PTR_ARRAY)) return SIR_ERR_ENTITY;
+        // The key-track record (fn_801D90A0 resets it, fn_801DA34C reads it every frame): flags, two quads, +0x38..+0x44 the
+        // tint the items take (1.0 in the files; unconverted it reads as 0 and the item is invisible).
+        if (!PlanAdd(plan, off + 0x08, 0x40, REGION_U32_ARRAY)) return SIR_ERR_ENTITY;
         if (count != 0 && array != 0) {
             if (!ImageSpan(array, (u64)count * 4, imageSize, &o) || !PlanAdd(plan, o, count * 4, REGION_PTR_ARRAY)) return SIR_ERR_ENTITY;
             // The entries: the flags and the list link of each.
