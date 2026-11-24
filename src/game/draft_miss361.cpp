@@ -62,13 +62,14 @@ void fn_801CEC30(u8* v, u8* s) {
 }
 
 // 0x801D0084
-// Returns 1 if all four floats of v are strictly inside (lbl_805FFE38, lbl_805FFE50), i.e. near zero.
+// Returns 1 if all four floats of v are in [lbl_805FFE50, lbl_805FFE38], i.e. near zero
+// (each is tested "<= lbl_805FFE38" and then ">= lbl_805FFE50"; a failed test returns 0).
 s32 fn_801D0084(u8* v) {
     s32 i;
 
     for (i = 0; i < 4; i++) {
         f32 x = *(f32*)(v + i * 4);
-        if (x <= lbl_805FFE38 || x >= lbl_805FFE50) {
+        if (!(x <= lbl_805FFE38) || !(x >= lbl_805FFE50)) {
             return 0;
         }
     }

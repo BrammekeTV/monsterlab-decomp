@@ -245,10 +245,11 @@ s32 fn_80064568(void* fxMgr, u32 effect, const f32* v, u8** out) {
 }
 
 // 0x80065CB0
-// Returns 1 if all three components of the vector lie strictly between lbl_805FD48C and lbl_805FD490.
+// Returns 1 if all three components of the vector lie in [lbl_805FD490, lbl_805FD48C] (near zero):
+// each is tested "<= lbl_805FD48C" and then ">= lbl_805FD490" (fcmpo + cror), and a failed test returns 0.
 s32 fn_80065CB0(const f32* v) {
     for (s32 i = 0; i < 3; ++i) {
-        if (v[i] <= lbl_805FD48C || v[i] >= lbl_805FD490) return 0;
+        if (!(v[i] <= lbl_805FD48C) || !(v[i] >= lbl_805FD490)) return 0;
     }
     return 1;
 }
@@ -269,10 +270,10 @@ void fn_80065EC8(u8* p, f32 t) {
 }
 
 // 0x800677A0
-// Returns 1 if the x component of the vector lies strictly between lbl_805FD48C and lbl_805FD490.
+// Returns 1 if the x component of the vector lies in [lbl_805FD490, lbl_805FD48C] (near zero).
 s32 fn_800677A0(const f32* v) {
     f32 x = v[0];
-    if (x <= lbl_805FD48C || x >= lbl_805FD490) return 0;
+    if (!(x <= lbl_805FD48C) || !(x >= lbl_805FD490)) return 0;
     return 1;
 }
 

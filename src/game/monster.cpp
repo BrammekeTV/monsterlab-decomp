@@ -229,7 +229,7 @@ s32 MonsterGetName(u8* m, char* out, s32 size) {
     s32 i = 0;
     for (; i < n; i++) out[i] = (char)(MONSTER_NAME(m)[i] + 0x20);
     out[i] = 0;
-    return i;
+    return n;                                    // the clamped length, also when it is negative (size 0)
 }
 
 // 0x8021CA88

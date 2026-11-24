@@ -122,10 +122,11 @@ void fn_801CCFE0(void) {
 s32 fn_801CD648(f32* a, f32* b) {
     f32 d = *a - *b;
 
-    if (d <= lbl_805FFDB8) {
+    // 1 when the difference is in [lbl_805FFDBC, lbl_805FFDB8]: "<= lbl_805FFDB8", then ">= lbl_805FFDBC".
+    if (!(d <= lbl_805FFDB8)) {
         return 0;
     }
-    if (d >= lbl_805FFDBC) {
+    if (!(d >= lbl_805FFDBC)) {
         return 0;
     }
     return 1;
