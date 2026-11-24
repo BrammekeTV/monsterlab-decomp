@@ -1039,6 +1039,11 @@ Read when the first map level (`village_level.sir`) starts:
   holds the part. `fn_8003DB78` finds a part by hash, claims the entry and asks for its zone
   (`ZoneLoadAsync`); a battle's "Loading" screen waits until every part zone of both monsters is loaded
   (`IsPlayerLoaded` -> `CombatPartZonesAreLoaded`).
+- **Record arrays** (slot `+0x8C` statics, `+0x90` dynamics; capacity at slot `+0x124` / `+0x130`): the 0x40-byte entity
+  records `fn_8012E420` hands out with a table slot. Every record up to the capacity is converted, not only the ones an entity
+  in the file points at: a pooled projectile (the coffin of the village intro) gets an unused one, its spawn sets position and
+  rotation and ORs its flags into the file's `0x7F800001` words at `+0x1C` / `+0x20`. Unconverted, those flags came out
+  wrong and the coffin model was not drawn. Records that overlap anything already planned are left alone.
 - **Spawn owners** (header `+0x74`, `+0x78`): the projectile definitions `SpawnCoffinProjectile` and
   `FireRocketAtEntity` spawn from (0x170 bytes; a spawned projectile's `+0x228`). `SpawnHelper` compares
   the type id at `+0x00` with `0x37645F52`. Converted: `+0x08` id, `+0x0C` four words (`+0x10` animation
