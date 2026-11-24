@@ -218,14 +218,18 @@ struct PsConst {
     f32 fogC[4];            // fog colour
 };
 
+static ID3D11Texture2D* sMovTex; static ID3D11RenderTargetView* sMovRtv; static ID3D11ShaderResourceView* sMovSrv;   // the movie's own 640x480 target
+static ID3D11BlendState* sBlitBlend;   // Blit: the blend state to composite with (NULL: opaque)
+static bool sMovieOff;                 // PORT_NO_MOVIE_TARGET=1: draw movies straight into the frame buffer (to compare)
 // Draws queued by DrawPrims that share all their state, uploaded and drawn together by FlushDraws.
-struct PendingState { u32 ngen; PsConst pc; OutKey out; ID3D11PixelShader* ps; ID3D11ShaderResourceView* srv[8]; ID3D11SamplerState* smp[8]; };
+struct PendingState { bool movie; u32 ngen; PsConst pc; OutKey out; ID3D11PixelShader* ps; ID3D11ShaderResourceView* srv[8]; ID3D11SamplerState* smp[8]; };
 static PendingState sPend;
 static u32 sPendCount;                                      // GX draws queued
 static std::vector<u8> sBV;                                 // the queued vertices: position, two colours and ngen texture coordinates each
 static u32 sBVCount;
 static std::vector<u16> sBI;
 static void FlushDraws();
+static void Blit(ID3D11ShaderResourceView* src, ID3D11RenderTargetView* dst, u32 dstX, u32 dstY, u32 dstW, u32 dstH, f32 u0, f32 v0, f32 du, f32 dv, const f32* pick);
 
 static const char* const kColorIn[16] = {"prev.rgb", "prev.aaa", "c0.rgb", "c0.aaa", "c1.rgb", "c1.aaa", "c2.rgb", "c2.aaa",
                                          "tex.rgb", "tex.aaa", "ras.rgb", "ras.aaa", "float3(1,1,1)", "float3(0.5,0.5,0.5)", "kc", "float3(0,0,0)"};
@@ -943,6 +947,16 @@ static void DrawPrims(const PortGx* g, u32 prim, const PortGxLayout* L, u32 coun
     // they are: those that show a copy of the frame buffer (glow, blur, the banded frame), and
     // those that reach from edge to edge without a picture on them (fades, bars, backdrops: no
     // texture, or a small one). A full-screen picture (320 texels wide or more) is narrowed.
+    // A movie frame (MoviePlay, fn_80205894): one full-screen quad through three indirect stages that undo the 8x4 tiling of the
+    // planes. That only works when a pixel is a texel (the offset table and the plane are read for the same console pixel), which
+    // is lost at any other size: a pixel centre that lies on the edge of a block of 8 reads a texel off, a thin line. It is drawn
+    // at the console's size, 640x480, and the picture is scaled into the frame buffer.
+    bool movie = false;
+    if (ortho && prim == 0x80 && count == 4 && ((g->bp[0x00] >> 16) & 7) >= 3) {
+        f32 lox = sVerts[0].pos[0], hix = lox, loy = sVerts[0].pos[1], hiy = loy;
+        for (u32 n = 1; n < 4; n++) { lox = std::min(lox, sVerts[n].pos[0]); hix = std::max(hix, sVerts[n].pos[0]); loy = std::min(loy, sVerts[n].pos[1]); hiy = std::max(hiy, sVerts[n].pos[1]); }
+        movie = lox <= -0.98f && hix >= 0.98f && loy <= -0.98f && hiy >= 0.98f && !sMovieOff;
+    }
     f32 squeeze = 1.0f;
     if (ortho && gPortSettings.wide && !gPortSettings.stretchUi && count) {
         BOOL whole = FALSE, picture = FALSE;
@@ -1037,10 +1051,10 @@ static void DrawPrims(const PortGx* g, u32 prim, const PortGxLayout* L, u32 coun
     for (u32 i = 0; i < 8; i++) { srv[i] = (texUsed & (1u << i)) ? GetTexture(g, i) : sWhite; smp[i] = (texUsed & (1u << i)) ? GetSampler(g, i) : sLinearClamp; }
 
     // Draws that need exactly the same state as the ones queued before are added to them: one upload and one draw call for the lot.
-    if (sPendCount && (sPend.ps != ps || sBVCount + count > VB_VERTS || sPend.ngen != numGens || memcmp(&sPend.out, &ok, sizeof(ok)) || memcmp(sPend.srv, srv, sizeof(srv)) ||
+    if (sPendCount && (sPend.ps != ps || sBVCount + count > VB_VERTS || sPend.ngen != numGens || sPend.movie != movie || memcmp(&sPend.out, &ok, sizeof(ok)) || memcmp(sPend.srv, srv, sizeof(srv)) ||
                        memcmp(sPend.smp, smp, sizeof(smp)) || memcmp(&sPend.pc, &pc, sizeof(pc))))
         FlushDraws();
-    if (!sPendCount) { sPend.ngen = numGens > 8 ? 8 : numGens; sPend.ps = ps; sPend.out = ok; memcpy(sPend.srv, srv, sizeof(srv)); memcpy(sPend.smp, smp, sizeof(smp)); sPend.pc = pc; }
+    if (!sPendCount) { sPend.movie = movie; sPend.ngen = numGens > 8 ? 8 : numGens; sPend.ps = ps; sPend.out = ok; memcpy(sPend.srv, srv, sizeof(srv)); memcpy(sPend.smp, smp, sizeof(smp)); sPend.pc = pc; }
     u16 base = (u16)sBVCount;
     {
         u32 stride = 48 + 12 * sPend.ngen;
@@ -1076,6 +1090,7 @@ static void DrawPrims(const PortGx* g, u32 prim, const PortGxLayout* L, u32 coun
     sPendCount++;
     sGfxStats.draws++;
     sFrame.draws++; sFrame.verts += count;
+    if (movie) FlushDraws();                                // drawn at once: it has its own target
 }
 
 // Uploads and draws what DrawPrims has queued.
@@ -1126,11 +1141,40 @@ static void FlushDraws() {
     }
     if (!sDrawBound || sPend.ps != lastPs) { sCtx->PSSetShader(sPend.ps, NULL, 0); lastPs = sPend.ps; }
     sDrawBound = TRUE;
+    if (sPend.movie) {
+        if (!sMovTex) {
+            D3D11_TEXTURE2D_DESC d = {};
+            d.Width = 640; d.Height = 480; d.MipLevels = 1; d.ArraySize = 1; d.Format = DXGI_FORMAT_R8G8B8A8_UNORM;
+            d.SampleDesc.Count = 1; d.BindFlags = D3D11_BIND_SHADER_RESOURCE | D3D11_BIND_RENDER_TARGET;
+            if (SUCCEEDED(sDev->CreateTexture2D(&d, NULL, &sMovTex))) { sDev->CreateRenderTargetView(sMovTex, NULL, &sMovRtv); sDev->CreateShaderResourceView(sMovTex, NULL, &sMovSrv); }
+        }
+        if (sMovRtv && sMovSrv) {
+            UINT nv = 1; D3D11_VIEWPORT ov = {};
+            sCtx->RSGetViewports(&nv, &ov);                 // the draw's own, as SetOutputState left it
+            ID3D11BlendState* keep = NULL; FLOAT bf[4]; UINT sm;
+            sCtx->OMGetBlendState(&keep, bf, &sm);
+            f32 sq = sPend.out.squeeze;
+            sCtx->OMSetRenderTargets(1, &sMovRtv, NULL);
+            D3D11_VIEWPORT v = {-(640.0f / sq - 640.0f) / 2.0f, 0, 640.0f / sq, 480.0f, 0, 1};   // a narrowed quad fills the 640 again
+            D3D11_RECT sc = {0, 0, 640, 480};
+            sCtx->RSSetViewports(1, &v);
+            sCtx->RSSetScissorRects(1, &sc);
+            sCtx->OMSetBlendState(NULL, NULL, 0xFFFFFFFF);  // the target keeps the colour and alpha the TEV made
+            sCtx->DrawIndexed(ni, ifirst, 0);
+            static const f32 kKeepAlpha[4] = {0, 0, 0, -1};
+            sBlitBlend = keep;
+            Blit(sMovSrv, sEfbRtv, (u32)lroundf(ov.TopLeftX + ov.Width * (1.0f - sq) / 2.0f), (u32)lroundf(ov.TopLeftY),
+                 (u32)lroundf(ov.Width * sq), (u32)lroundf(ov.Height), 0, 0, 1, 1, kKeepAlpha);
+            sBlitBlend = NULL;
+            if (keep) keep->Release();
+            return;
+        }
+    }
     sCtx->DrawIndexed(ni, ifirst, 0);
 }
 
 // ------------------------------------------------------------------ frame-buffer copies
-static void Blit(ID3D11ShaderResourceView* src, ID3D11RenderTargetView* dst, u32 dstX, u32 dstY, u32 dstW, u32 dstH, f32 u0, f32 v0, f32 du, f32 dv, const f32* pick = NULL) {
+static void Blit(ID3D11ShaderResourceView* src, ID3D11RenderTargetView* dst, u32 dstX, u32 dstY, u32 dstW, u32 dstH, f32 u0, f32 v0, f32 du, f32 dv, const f32* pick) {
     sDrawBound = FALSE;
     ID3D11ShaderResourceView* none[8] = {};
     f32 rect[8] = {u0, v0, du, dv, 0, 0, 0, 0};
@@ -1141,7 +1185,7 @@ static void Blit(ID3D11ShaderResourceView* src, ID3D11RenderTargetView* dst, u32
     D3D11_RECT sc = {(LONG)dstX, (LONG)dstY, (LONG)(dstX + dstW), (LONG)(dstY + dstH)};
     sCtx->RSSetViewports(1, &v);
     sCtx->RSSetScissorRects(1, &sc);
-    sCtx->OMSetBlendState(NULL, NULL, 0xFFFFFFFF);
+    sCtx->OMSetBlendState(sBlitBlend, NULL, 0xFFFFFFFF);
     sCtx->OMSetDepthStencilState(NULL, 0);
     sCtx->RSSetState(NULL);
     sCtx->IASetInputLayout(NULL);
@@ -1248,7 +1292,7 @@ static char sCapPrefix[400];
 static BOOL sCapBack;
 static void PresentOut(BOOL fast) {
     sShownCount++;
-    Blit(sOutSrv, sBackRtv, 0, 0, sOutW, sOutH, 0, 0, 1, 1);
+    Blit(sOutSrv, sBackRtv, 0, 0, sOutW, sOutH, 0, 0, 1, 1, NULL);
     if (!gPortOptions.screenshotStats) PortOverlayDraw(sBackRtv, sOutW, sOutH);
     if (sCapBack && sSwap) {                                // F12: the back buffer as it is about to be shown
         sCapBack = FALSE;
@@ -1338,7 +1382,7 @@ static void CopyEfb(const PortGx* g, u32 control) {
     if (control & 0x4000) {                                 // to the display: the picture's part of the output
         f32 black[4] = {0, 0, 0, 1};
         if (sPicW != sOutW || sPicH != sOutH) sCtx->ClearRenderTargetView(sOutRtv, black);
-        Blit(sEfbSrv, sOutRtv, sPicX, sPicY, sPicW, sPicH, su0, sv0, sdu, sdv);
+        Blit(sEfbSrv, sOutRtv, sPicX, sPicY, sPicW, sPicH, su0, sv0, sdu, sdv, NULL);
         sShown = TRUE;
         sDrawThread = GetCurrentThreadId();
         // The overlay goes over the window's picture only, or with --screenshot-stats into the output picture itself.
@@ -1582,6 +1626,7 @@ static const PortGxBackend kBackend = {Draw, Copy, LoadTlut};
 
 BOOL PortGfxStart(BOOL window) {
     if (sStarted) return TRUE;
+    sMovieOff = getenv("PORT_NO_MOVIE_TARGET") != NULL;
     // The picture is the largest 16:9 or 4:3 part of the output, centred (black bars beside it).
     sOutW = (u32)std::min(std::max(gPortSettings.width, 320), 8192); sOutH = (u32)std::min(std::max(gPortSettings.height, 240), 8192);
     u32 an = gPortSettings.wide ? 16 : 4, ad = gPortSettings.wide ? 9 : 3;
