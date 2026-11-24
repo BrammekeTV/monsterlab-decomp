@@ -399,6 +399,7 @@ void MysticBrewProjectile_PositionToHide(void* a0) {
 // 0x8001D2D0
 // Adds the character at a0 to the name entry (NameAppendChar rules).
 void NameAddLetter(const char* a0) {
+    if (lbl_805FAF78 == NULL) return;  // the character is only read once the name entry exists
     NameAppendChar(*(u8*)a0);
 }
 
