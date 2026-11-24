@@ -450,6 +450,8 @@ typedef struct LevelZoneRoots {
     u32  slotEffectCount;
     u32* actionTables;       // every slot's action table (+0xD4)
     u32  actionTableCount;
+    u32* soundGroups;        // every slot's chain of sound groups (+0x110), PlaySound
+    u32  soundGroupCount;
     u32  locators;           // header +0x28: the level's locators (0x20 bytes each), or 0 when they are in another zone
     u32  locatorCount;       // header +0x24
     u32* zoneRecords;        // every slot's +0xFC: the zone record WorldTick walks

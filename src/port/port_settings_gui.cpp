@@ -40,7 +40,7 @@ static void PageGame(void) {
     ImGui::PopTextWrapPos();
     ImGui::Spacing();
     int pick = 0;
-    if (ImGui::Button("Change game disc (.iso)...")) pick = 1;
+    if (ImGui::Button("Change game disc (.iso, .wbfs, .rvz)...")) pick = 1;
     ImGui::SameLine();
     if (ImGui::Button("Choose extracted folder...")) pick = 2;
     if (pick) {

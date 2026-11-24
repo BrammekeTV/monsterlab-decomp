@@ -105,7 +105,7 @@ BOOL PortSettingsSave(const char* path, const PortSettings* s) {
     snprintf(cap, sizeof(cap), "%d", s->fpsCap);
     fprintf(f, "; fps_cap: off (a picture per game frame), 30, 60, 120, 144 or any rate, display (the monitor's rate), uncapped\nfps_cap = %s\n\n",
             s->fpsCap > 0 ? cap : s->fpsCap == PORT_FPS_UNCAPPED ? "uncapped" : s->fpsCap == PORT_FPS_DISPLAY ? "display" : "off");
-    if (s->gamePath[0]) fprintf(f, "; your Monster Lab disc image (.iso) or extracted folder\n[game]\npath = %s\n\n", s->gamePath);
+    if (s->gamePath[0]) fprintf(f, "; your Monster Lab disc image (.iso, .wbfs, .rvz) or extracted folder\n[game]\npath = %s\n\n", s->gamePath);
     fprintf(f, "[audio]\nvolume = %d\nmute = %d\n\n", s->volume, s->mute ? 1 : 0);
     fprintf(f, "; NAME = key 1, key 2, mouse button (1 left, 2 right), gamepad bits (hex); keys are Windows virtual-key codes\n[controls]\n");
     for (int i = 0; i < gPortBindingCount; i++) {
