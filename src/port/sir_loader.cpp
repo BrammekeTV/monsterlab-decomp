@@ -2018,12 +2018,6 @@ static SirError EntityPlan(ImagePlan* plan, const u8* image, u32 imageSize, u32 
         if (!OtherAdd(q + 8, 4, REGION_U32_ARRAY)) return SIR_ERR_ENTITY;
         if ((u64)q + ENTITY_DEF_USED <= sOtherSize && !OtherAdd(q + 0x48, 4, REGION_PTR_ARRAY)) return SIR_ERR_ENTITY;
     }
-    // Attached effects (fn_801EC080): +0x94 how many, +0x98 the records (0xC8 bytes of 32-bit words: key hash,
-    // bone, local matrix, world matrix, effect ids; the instances behind them are runtime).
-    u32 fxCount = Be32(ent + 0x94);
-    if (fxCount != 0 && fxCount <= 64 && LevelSpan(Be32(ent + 0x98), (u64)fxCount * 0xC8, imageSize, &o)) {
-        if (!PlanAdd(plan, o, fxCount * 0xC8, REGION_U32_ARRAY)) return SIR_ERR_ENTITY;
-    }
     // State machine holder: {machine, object}; fn_8012F8B8 hands the machine's definition to fn_801BC574.
     if (LevelSpan(Be32(ent + 0xA4), 8, imageSize, &o)) {
         if (!PlanAdd(plan, o, 8, REGION_PTR_ARRAY)) return SIR_ERR_ENTITY;
