@@ -12,6 +12,7 @@
 #include <windows.h>
 #include <stdio.h>
 #include <string.h>
+#include <stdlib.h>
 
 #include "port/port.h"
 
@@ -47,7 +48,29 @@ static void WriteSettings(const char* path, const char* stamp) {
     fclose(f);
 }
 
+BOOL PortGfxSaveScreenshot(const char* path);
+
+// --shots F1,F2,...: saves the picture at each listed frame next to the --screenshot file (or shot.png),
+// named <name>_f<N>.png: a series of pictures from one headless run (animation checks).
+static void SaveListedShots(void) {
+    static const char* next;
+    if (!gPortOptions.shots) return;
+    if (!next) next = gPortOptions.shots;
+    if (!*next) return;
+    long want = strtol(next, NULL, 10);
+    if (PortFrameCount() < want) return;
+    char base[MAX_PATH], path[MAX_PATH + 32];
+    snprintf(base, sizeof(base), "%s", gPortOptions.screenshot ? gPortOptions.screenshot : "shot.png");
+    char* dot = strrchr(base, '.');
+    if (dot) *dot = 0;
+    snprintf(path, sizeof(path), "%s_f%d.png", base, (int)PortFrameCount());
+    if (PortGfxSaveScreenshot(path)) PortLog("shot: %s", path);
+    const char* comma = strchr(next, ',');
+    next = comma ? comma + 1 : "";
+}
+
 void PortCaptureFrame(void) {
+    SaveListedShots();
     static BOOL wasDown, doneAt;
     HWND wnd = PortGfxWindow();
     BOOL down = wnd && GetForegroundWindow() == wnd && (GetAsyncKeyState(VK_F12) & 0x8000);
