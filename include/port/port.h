@@ -111,6 +111,7 @@ typedef struct PortOptions {
     BOOL noMods;              // --no-mods: the mods list is kept (and saved) but no mod is used
     BOOL screenshotStats;     // draw the stats overlay into that picture too (--screenshot-stats)
     const char* wav;          // write everything the mixer produces to this WAV file
+    BOOL noMovies;            // --no-movies: Bink movies are not played (the game skips them)
     BOOL noAudio;             // never open the sound device
     s32  fastForward;         // run the first N presented frames unpaced (--fast-forward N)
     BOOL fastAll;             // never pace (--fast)
@@ -171,6 +172,9 @@ void PortDemoMain(void);              // port_demo.cpp
 void PortStop(int exitCode, const char* fmt, ...);
 void PortAudioTick(void);     // port_audio.cpp: run the AX frames that are due (interrupt thread)
 const char* PortAudioStats(char* buf, u32 n);
+void PortAudioMoviePush(const float* stereo, u32 frames, int rate);   // a Bink movie's sound (port_bink.cpp)
+void PortAudioMovieStop(void);
+void PortAudioMovieVolume(float v);
 u32  PortAudioVoices(u32* outOf); // voices the mixer is playing now
 extern s64 gPortWaitTicks;    // QueryPerformanceCounter ticks spent asleep in VIWaitForRetrace (port_sdk.cpp)
 int  PortSelfTestAudio(void);

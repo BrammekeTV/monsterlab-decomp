@@ -19,6 +19,8 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <mutex>
+#include <deque>
 
 #include "port/port.h"
 
@@ -409,6 +411,48 @@ static s32 DecoderNext(Decoder* d) {
     return s;
 }
 
+// ------------------------------------------------------------------ movie sound
+// The decoded sound of a Bink movie (port_bink.cpp): interleaved stereo float samples at the movie's
+// rate, mixed into every AX frame on top of the voices. Underrun is silence.
+static std::mutex         sMovLock;
+static std::deque<float>  sMovQ;                 // left, right, left, right...
+static int                sMovRate = 44100;
+static float              sMovVol = 1.0f;
+static double             sMovFrac = 0;
+static float              sMovS0[2], sMovS1[2];
+
+void PortAudioMoviePush(const float* st, u32 frames, int rate) {
+    std::lock_guard<std::mutex> g(sMovLock);
+    sMovRate = rate;
+    sMovQ.insert(sMovQ.end(), st, st + (size_t)frames * 2);
+}
+void PortAudioMovieStop() {
+    std::lock_guard<std::mutex> g(sMovLock);
+    sMovQ.clear();
+    sMovFrac = 0;
+}
+void PortAudioMovieVolume(float v) { sMovVol = v; }
+
+static void MixMovie(s32* acc) {
+    std::lock_guard<std::mutex> g(sMovLock);
+    if (sMovQ.empty() && sMovFrac < 1.0) return;
+    double step = (double)sMovRate / AX_RATE;
+    for (int n = 0; n < AX_FRAME; n++) {
+        while (sMovFrac >= 1.0) {
+            if (sMovQ.size() < 2) { sMovFrac = 1.0; return; }
+            sMovS0[0] = sMovS1[0]; sMovS0[1] = sMovS1[1];
+            sMovS1[0] = sMovQ[0]; sMovS1[1] = sMovQ[1];
+            sMovQ.pop_front(); sMovQ.pop_front();
+            sMovFrac -= 1.0;
+        }
+        for (int c = 0; c < 2; c++) {
+            float v = sMovS0[c] + (float)((sMovS1[c] - sMovS0[c]) * sMovFrac);
+            acc[n * 2 + c] += (s32)(v * 32767.0f * sMovVol);
+        }
+        sMovFrac += step;
+    }
+}
+
 // Mixes one AX frame of every running voice into out (interleaved left, right).
 static void MixFrame(s16* out) {
     s32 acc[AX_FRAME * 2];
@@ -444,6 +488,7 @@ static void MixFrame(s16* out) {
         DecoderStore(&d);
         if (d.stopped) r->running = FALSE;
     }
+    MixMovie(acc);
     for (int n = 0; n < AX_FRAME * 2; n++) {
         s32 s = acc[n];
         s = s < -32768 ? -32768 : s > 32767 ? 32767 : s;

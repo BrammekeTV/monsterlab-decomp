@@ -30,6 +30,7 @@ build\pc\monsterlab.exe                        # runs main() with your own disc 
 | `--window` | open a window and draw into it |
 | `--wav FILE` | write everything the audio mixer produces to a WAV file (32 kHz stereo); works headless |
 | `--no-audio` | never open the sound device (it is only opened with `--window`) |
+| `--no-movies` | do not play the Bink cutscenes (the game skips them, as it does when a movie cannot be opened) |
 | `--screenshot FILE` | write the last picture shown as a PNG when the run stops (works without `--window`) |
 | `--stats` | start with the stats overlay on (top-right; F3 turns it on and off in the window): frames per second, frame time split into game, render and wait, draw calls, GX vertices, frame-buffer copies, textures, audio voices, output size |
 | `--screenshot-stats` | draw the stats overlay into the `--screenshot` picture too (it is left out otherwise) |
