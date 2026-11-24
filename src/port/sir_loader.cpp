@@ -203,6 +203,7 @@ extern "C" const char* SirErrorText(SirError e) {
     case SIR_ERR_LEVEL:          return "level header block not recognised (zone slot table)";
     case SIR_ERR_ZONE_RECORD:    return "zone record of a level zone not recognised (list that leaves the zone or loops, bad animation player)";
     case SIR_ERR_ENTITY:         return "entity of a level zone not recognised (part list outside the zone, child list that loops)";
+    case SIR_ERR_SOUND:          return "voice line is not a .dsp header with samples (format, sample rate)";
     case SIR_ERR_OVERLAP:        return "two objects of the image share bytes";
     case SIR_ERR_IO:             return "cannot read file";
     }
@@ -3476,6 +3477,19 @@ extern "C" SirError TextureStreamConvert(u8* data, u32 size) {
     Swap32(data + TEXTURE_STREAM_RECORD);
     Swap16(data + q);
     Swap16(data + q + 2);
+    return SIR_OK;
+}
+
+// A voice line of shared_voice.sir: the first 0x60 bytes of a .dsp file (format 0 ADPCM, 0x0A
+// 16-bit, 0x19 8-bit: fn_80203340 accepts no other) with the samples behind them, which stay as
+// they are. Nothing is changed when the header is not one (SIR_ERR_SOUND).
+extern "C" SirError VoiceStreamConvert(u8* data, u32 size) {
+    if (size < DSP_HEADER_SIZE) return SIR_ERR_SOUND;
+    u32 format = (u32)((data[0xE] << 8) | data[0xF]), rate = Be32(data + 8);
+    if ((format != 0 && format != 0x0A && format != 0x19) || rate == 0 || rate > 96000) return SIR_ERR_SOUND;
+    SirReloc r;
+    SirRelocInit(&r, NULL, NULL);
+    SirConvertRecord(&r, data, DSP_HEADER_SIZE, kDspHeaderFields, COUNTOF(kDspHeaderFields));
     return SIR_OK;
 }
 
