@@ -362,7 +362,7 @@ enum RegionKind {
     REGION_FSM_TRANSITION, REGION_FSM_SHARED_TRANSITION, REGION_HUD, REGION_LEVEL_HUD,
     REGION_FX_BOLTS, REGION_FX_TRAILS, REGION_POOL, REGION_POOL_BLOCK,
     REGION_ENTITY, REGION_ENTITY_RECORD, REGION_ENTITY_PART, REGION_PTR_COUNT, REGION_COUNT_PTR, REGION_POOL_TABLE,
-    REGION_ENTITY_PROP, REGION_PROP_DEF, REGION_KEY_PTR,
+    REGION_ENTITY_PROP, REGION_PROP_DEF, REGION_KEY_PTR, REGION_ENTITY_TIMED,
     REGION_UI_TREE_NODE, REGION_UI_LIST, REGION_UI_WIDGET, REGION_UI_EVENT, REGION_UI_GRID, REGION_UI_FIXED,
     REGION_UI_SET, REGION_UI_SCREEN, REGION_UI_GRAPHIC, REGION_UI_TEXT,
     REGION_LOCATORS, REGION_UI_SLIDER,
@@ -1581,6 +1581,14 @@ static const SirField kEntityFields[] = {
     { 0x1A4, SIR_U32, 2 },    //       their count; +0x1A8 (fn_800690D4)
     { 0x1B0, SIR_U32, 1 },    // code: flags (fn_8012F8B8)
 };
+// What a type 9 entity (trigger_timed_script, fn_8006F6BC) has on top of kEntityFields: the action words at +0x50 / +0x54 (the
+// thunder script of the castle is the first) and the time-outs
+// SetTimeoutFromProperty (fn_8006E9D8) reads, base values +0x15C / +0x160 and the spread +0x170 / +0x174 (+0x158 is
+// converted with every entity).
+static const SirField kTimedFields[] = {
+    { 0x050, SIR_U32, 2 },    // code: the activate / deactivate action words (CallActivateHandler, CallDeactivateHandler)
+    { 0x15C, SIR_F32, 2 }, { 0x170, SIR_F32, 2 },
+};
 // An entity's attach points (+0x98, count +0x94): where effects hang on it. fn_801EC080 updates
 // them every frame: +0x00 the point's name hash (fn_801EC880 finds a point by it), +0x04 the bone
 // it follows (-1: the entity itself), +0x08 its matrix on that bone, +0x38 the resulting world
@@ -2076,7 +2084,7 @@ static SirError EntityContainerPlan(ImagePlan* plan, const u8* image, u32 imageS
 static u32 sPooledEntityType;   // set while PoolTablePlan walks a pool of entities, else 0
 static SirError EntityPlan(ImagePlan* plan, const u8* image, u32 imageSize, u32 addr, u32 depth) {
     u32 off, o;
-    if (!LevelSpan(addr, ENTITY_USED, imageSize, &off) || PlanHas(plan, off, REGION_ENTITY) || PlanHas(plan, off, REGION_ENTITY_PROP))
+    if (!LevelSpan(addr, ENTITY_USED, imageSize, &off) || PlanHas(plan, off, REGION_ENTITY) || PlanHas(plan, off, REGION_ENTITY_PROP) || PlanHas(plan, off, REGION_ENTITY_TIMED))
         return SIR_OK;
     const u8* ent = image + off;
     // The type is the byte at +0x34 of the record (fn_8012F8B8 picks the constructor by it).
@@ -2091,7 +2099,7 @@ static SirError EntityPlan(ImagePlan* plan, const u8* image, u32 imageSize, u32 
     // challenge projector, fn_8006CFA4) derive from the prop: same layout and definition.
     bool prop = kind == ENTITY_TYPE_PROP || kind == 0x0F || kind == 0x10;
     if (recordOther && !OtherAdd(otherRec, ENTITY_RECORD_SIZE, REGION_ENTITY_RECORD)) return SIR_ERR_ENTITY;
-    if (depth > ENTITY_DEPTH_MAX || !PlanAdd(plan, off, ENTITY_USED, prop ? REGION_ENTITY_PROP : REGION_ENTITY)) return SIR_ERR_ENTITY;
+    if (depth > ENTITY_DEPTH_MAX || !PlanAdd(plan, off, ENTITY_USED, prop ? REGION_ENTITY_PROP : kind == 9 ? REGION_ENTITY_TIMED : REGION_ENTITY)) return SIR_ERR_ENTITY;
     SirError e;
 
     if (LevelSpan(Be32(ent + 0x04), ENTITY_RECORD_SIZE, imageSize, &o) && !PlanAdd(plan, o, ENTITY_RECORD_SIZE, REGION_ENTITY_RECORD))
@@ -2854,6 +2862,8 @@ static void ImagePlanConvert(const ImagePlan* plan, SirReloc* r, u8* image, u32 
         case REGION_ENTITY:       SirConvertRecord(r, p, g->size, kEntityFields, COUNTOF(kEntityFields)); break;
         case REGION_ENTITY_PROP:  SirConvertRecord(r, p, g->size, kEntityFields, COUNTOF(kEntityFields));
                                   SirConvertRecord(r, p, g->size, kPropFields, COUNTOF(kPropFields)); break;
+        case REGION_ENTITY_TIMED: SirConvertRecord(r, p, g->size, kEntityFields, COUNTOF(kEntityFields));
+                                  SirConvertRecord(r, p, g->size, kTimedFields, COUNTOF(kTimedFields)); break;
         case REGION_ZONE_SYSTEM:  SirConvertRecord(r, p, g->size, kZoneSystemFields, COUNTOF(kZoneSystemFields)); break;
         case REGION_ANIM_PLAYER:  SirConvertRecord(r, p, g->size, kAnimPlayerFields, COUNTOF(kAnimPlayerFields)); break;
         case REGION_ANIM_ELEM:    SirConvertRecord(r, p, g->size, kAnimElemFields, COUNTOF(kAnimElemFields)); break;
