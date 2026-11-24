@@ -274,8 +274,8 @@ void fn_801B01A8(u8* obj, s32 snap) {
     *(f32*)(obj + 0x24) = *(f32*)(obj + 0x18);
     *(f32*)(obj + 0x28) = *(f32*)(obj + 0x1C);
     f32 B[12];
-    // f1/f2 are leftover caller values here: pass 0
-    fn_801ACD08(obj, *(u8**)(obj + 0x8) + 0xC, (u8*)B, 0.0f, 0.0f);
+    // f1/f2 are the +0x18/+0x14 values loaded for the copy above and still live at the call
+    fn_801ACD08(obj, *(u8**)(obj + 0x8) + 0xC, (u8*)B, *(f32*)(obj + 0x18), *(f32*)(obj + 0x14));
     u8* def = *(u8**)(obj + 0x8);
     *(f32*)(obj + 0x14) = B[9];
     *(f32*)(obj + 0x18) = B[10];

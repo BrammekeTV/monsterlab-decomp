@@ -99,7 +99,7 @@ void fn_80170C28(u8* arg0, u8* arg1, s32 arg2) {
             *(f32*)(lbl_80400FF0 + 0x4) = *(f32*)(arg0 + 0x28);
             *(f32*)(lbl_80400FF0 + 0x8) = *(f32*)(arg0 + 0x2C);
         } else {
-            fn_801561C0(1.0f);  // scale is a leftover f1 in the asm; 1.0 assumed
+            fn_801561C0(scale);  // f1 still holds arg1+0x54 here (no call in between)
         }
     }
     fn_80173438(arg1, arg2, (s32)(intptr_t)var_r31, arg0 + 0x3C);  // lint:ok pointer passed as a flag

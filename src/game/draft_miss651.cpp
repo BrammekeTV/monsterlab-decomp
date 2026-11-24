@@ -666,9 +666,9 @@ void fn_8005628C(u8* arg0, u8* arg1) {
         RayHitInit(h1);
         u32 filter = 0x7F20C9C6u;
         if (PhysicsBodyGet(*(void**)fn_80053410(arg0)) == NULL) filter = 0xF62113D5u;
-        fn_8005334C(arg0);
-        // f1 (limit) is not set before this call in the asm: leftover, passed as 0
-        if (fn_801B1DD4(*(u8**)(arg0 + 0x8C), filter, *(u8**)(arg1 + 0x8C), 0x4C7ED036u, h0, h1, 0.0f) != 0) {
+        // f1 (limit) is the f32 return value of fn_8005334C, passed straight through
+        f32 limit = fn_8005334C(arg0);
+        if (fn_801B1DD4(*(u8**)(arg0 + 0x8C), filter, *(u8**)(arg1 + 0x8C), 0x4C7ED036u, h0, h1, limit) != 0) {
             (*(ObjFn*)(*(u8**)arg1 + 0xBC))(arg1, h1);
         }
     }
