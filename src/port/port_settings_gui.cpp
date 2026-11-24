@@ -236,6 +236,8 @@ static void PageDisplay(void) {
         ImGui::TextDisabled("Resolution and aspect change when the game is started again.");
     bool b = sEdit.stretchUi != 0;
     if (ImGui::Checkbox("Stretch the 2D layer over the whole width (16:9)", &b)) sEdit.stretchUi = gPortSettings.stretchUi = b;
+    b = sEdit.windowsCursor != 0;
+    if (ImGui::Checkbox("Show the Windows mouse cursor over the game", &b)) sEdit.windowsCursor = gPortSettings.windowsCursor = b;
     b = sEdit.vsync != 0;
     if (ImGui::Checkbox("Vertical sync", &b)) sEdit.vsync = gPortSettings.vsync = b;
     static const struct { int cap; const char* name; const char* what; } kRates[] = {
