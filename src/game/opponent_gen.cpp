@@ -47,9 +47,15 @@ extern "C" {
 
 // 0x8021B730
 // The definition in slot `index` (wrapping), or the next non-empty one; -1 if the pool is empty.
+// The original first copies the 26 definitions to the stack in this scrambled order (the slot
+// number indexes the copy, not the pool): slot k reads pool word kSlotWord[k].
 s32 PartPoolGet(void* builder, const PartPool* pool, s32 index) {
+    static const u8 kSlotWord[POOL_SIZE] = {
+        1, 3, 5, 7, 9, 11, 13, 15, 17, 16, 21, 14, 25, 12, 24, 10, 26, 8, 18, 6, 23, 4, 20, 2, 22, 19,
+    };
     s32 i = index % POOL_SIZE;
-    if (pool->defs[i] != -1) return pool->defs[i];
+    s32 v = ((const s32*)pool)[kSlotWord[i]];
+    if (v != -1) return v;
     BOOL empty = TRUE;
     for (s32 k = 0; k < POOL_SIZE; k++) {
         if (pool->defs[k] != -1) {

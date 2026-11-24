@@ -63,7 +63,8 @@ struct PartInstance {
     s32 unk20;                  // 0x20
     s32 unk24;                  // 0x24
     s32 health;                 // 0x28
-    s32 unk2C;                  // 0x2C
+    u8  unk2C;                  // 0x2C: in-use flag (the original reads and writes one byte)
+    u8  pad2D[3];
 };
 
 // Game database (global_binary.sir header slot 0xDC8).

@@ -28,6 +28,11 @@ typedef intptr_t ScriptValue;
 #define FALSE 0
 #endif
 
+// PowerPC slw/srw: the shift amount is its low 6 bits; 32..63 gives 0 (not undefined like C).
+static inline u32 PpcSlw(u32 v, u32 n) { return (n & 0x20) ? 0u : v << (n & 0x1F); }
+static inline u32 PpcSrw(u32 v, u32 n) { return (n & 0x20) ? 0u : v >> (n & 0x1F); }
+static inline s32 PpcSraw(s32 v, u32 n) { return (n & 0x20) ? (v < 0 ? -1 : 0) : v >> (n & 0x1F); }
+
 // Marks the original address of a decompiled function / variable.
 #define ORIG(addr)
 

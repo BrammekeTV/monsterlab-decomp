@@ -18,7 +18,7 @@ extern "C" {
 // 0x801CBCF8
 // Returns bit `bit` of the flags word at p.
 s32 fn_801CBCF8(u8* p, s32 bit) {
-    return (s32)((*(u32*)p & (1u << bit)) >> bit);
+    return (s32)PpcSrw(*(u32*)p & PpcSlw(1u, bit), bit);
 }
 
 // 0x801CB988
