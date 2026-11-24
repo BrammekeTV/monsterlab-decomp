@@ -2897,10 +2897,10 @@ static void LevelSelfTest(void) {
     CHECK(holder == zone + L_HOLDER && *(const u8**)holder == list && *(const u8**)(holder + 4) == NULL);
     const u8* child = *(const u8**)(ent + 0xB0);
     CHECK(child == zone + L_CHILD && *(const u8**)(child + 4) == NULL && child[0] == 0x7F);
-    // The slot's objects as fn_8012FD0C walks them (the type picks the class; the hash at +4 has no
-    // reader yet and stays), and its placed effects as WorldOnZoneLoaded reads them.
+    // The slot's objects as fn_8012FD0C walks them (the type picks the class; the hash at +4 is read by
+    // StopUsingAnimatedCamera), and its placed effects as WorldOnZoneLoaded reads them.
     const u8* obj = **(const u8***)(s0 + 0xA8);
-    CHECK(obj == zone + L_OBJ && *(const u32*)(obj + 8) == 15 && obj[4] == 0xCC && obj[7] == 0x21);
+    CHECK(obj == zone + L_OBJ && *(const u32*)(obj + 8) == 15 && *(const u32*)(obj + 4) == 0xCC05AC21u);
     CHECK(*(const u32*)(obj + 0x14) == 1 && *(const u8* const*)(obj + 0x10) == NULL && *(const f32*)(obj + 0x40) == 3.0f);
     CHECK(*(const u32*)(obj + 0x58) == 0x80090020 && *(const u32*)(obj + 0x5C) == 0x94F99D89 && obj[0x54] == 0x7F);
     const u8* fx = **(const u8***)(s0 + 0x80);
