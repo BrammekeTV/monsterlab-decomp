@@ -99,6 +99,11 @@
  "changelog": [
   {
    "date": "2026-11-24",
+   "time": "05:42",
+   "text": "A new game's story starts on Windows (PR #140): after Join Now!, the arrival event plays and the conversation with Professor Fuseless opens. It stops a few frames later for now. The quest's state data and voice lines are now converted to PC byte order. New differential tests (PR #143): tools/difftest.py runs each function's original Wii code next to our C++ on the same inputs and compares the results. Of 5,523 functions tested so far, 5,364 match exactly; the rest are being checked. Also, 175 mid-size functions were checked against the original by hand and had no mistakes (PR #141)."
+  },
+  {
+   "date": "2026-11-24",
    "time": "05:11",
    "text": "The projector machine on the main menu now wakes up (PR #139): its data, animations, size and angles are converted to PC byte order, and objects in general now get their real size instead of almost zero. It doesn't show on screen yet; finding where it's drawn is next."
   },
