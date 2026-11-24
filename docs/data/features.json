@@ -99,6 +99,11 @@
  "changelog": [
   {
    "date": "2026-11-24",
+   "time": "23:11",
+   "text": "Behind the scenes: our decompiled code's function declarations now all match their definitions, and the check tool catches mismatches like the one behind the Field Repair crash (PR #223)."
+  },
+  {
+   "date": "2026-11-24",
    "time": "22:57",
    "text": "Battle shows both monsters' real names, Gorbok and Mongor, instead of 'Not found' (PR #221). After Field Repair the game returns to the village map and you can walk on to the next spot (PR #222)."
   },
