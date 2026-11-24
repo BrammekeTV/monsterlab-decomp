@@ -1351,7 +1351,7 @@ def zone_dump(L, sec, base, hud, roots, scene_roots, pooltabs, records=(), lists
             meshes.add(m)
             q = off(m)
             n = u(q + 0x6C)
-            L.append('mesh %s sphere %s v48 %s extra %s parts %d' % (ptr(m), ws(q + 0x20, 4), ws(q + 0x48, 4), ptr(u(q + 0x64)), n))
+            L.append('mesh %s sphere %s v48 %s extra %s parts %d kind %d' % (ptr(m), ws(q + 0x20, 4), ws(q + 0x48, 4), ptr(u(q + 0x64)), n, u(q + 0x60)))
             for k in range(n):
                 mat, b = u(q + 0x70 + k * 8), u(q + 0x74 + k * 8)
                 L.append('meshpart %s material %s batch %s flags %s' % (ptr(m), ptr(mat), ptr(b), '%08x' % u(off(b) + 0xC) if inz(b, 0x10) else '-'))

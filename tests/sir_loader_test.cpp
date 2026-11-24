@@ -1172,7 +1172,7 @@ struct ZoneDump {
         meshes.push_back(m);
         u32 parts = *(const u32*)(m + 0x6C);
         printf("mesh "); Val(m); printf(" sphere "); Floats(m + 0x20, 4); printf(" v48 "); Floats(m + 0x48, 4);
-        printf(" extra "); Ptr(m + 0x64); printf(" parts %u\n", parts);
+        printf(" extra "); Ptr(m + 0x64); printf(" parts %u kind %u\n", parts, *(const u32*)(m + 0x60));
         for (u32 k = 0; k < parts; k++) {
             const u8* b = *(const u8**)(m + 0x74 + k * 8);
             printf("meshpart "); Val(m); printf(" material "); Ptr(m + 0x70 + k * 8); printf(" batch "); Ptr(m + 0x74 + k * 8);
