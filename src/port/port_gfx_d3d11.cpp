@@ -54,6 +54,12 @@ static ID3D11ShaderResourceView* sOutSrv;
 static BOOL                    sShown;          // a display copy has happened
 static ID3D11VertexShader*     sVs[9];                       // by the number of texture coordinates a draw has
 static ID3D11InputLayout*      sLayouts[9];
+static ID3D11VertexShader*     sVsG[9];                      // the GPU vertex path, by the number of texture coordinate attributes uploaded
+static ID3D11InputLayout*      sLayoutsG[9];
+static ID3D11Buffer*           sRecBuf;                      // the GPU vertex path's per-draw records (see GpuVtx)
+static ID3D11ShaderResourceView* sRecSrv;
+static BOOL                    sGpuVerts;                    // the GPU vertex path is on (PORT_CPU_VERTS=1 turns it off)
+#define REC_U4 (1u << 20)                                    // uint4s in sRecBuf (16 MB)
 static ID3D11VertexShader*     sBlitVs;
 static ID3D11PixelShader*      sBlitPs;
 static ID3D11Buffer*           sVb;
@@ -83,7 +89,7 @@ static BOOL                    sStarted;
 static BOOL                    sDrawBound;                  // the pipeline state is still what FlushDraws left (Blit and copies clear it)
 struct OutKey { u32 bm, zm, alpha, cull, vp[6], sc0, sc1; f32 squeeze; s32 offX, offY; };
 
-static struct { u32 draws, tris, presents, texCopies, textures, shaders, skipped; } sGfxStats;
+static struct { u32 draws, tris, presents, texCopies, textures, shaders, skipped, gpuDraws, flushes; u64 verts, gpuVerts; } sGfxStats;
 // This frame so far (reset at each display copy): time inside this backend, draws, GX vertices, copies.
 static s64 sTotalDraw, sTotalCopy, sTotalFlush, sTRes, sTBlit, sTMk, sTDisp, sTPres, sTNew, sTRtv; static u32 sNewTex; static std::vector<ID3D11Texture2D*> sTexPool;     // time inside the backend over the whole run (the boot summary)
 static struct { s64 renderTicks; u32 draws, verts, copies; } sFrame;
@@ -93,9 +99,11 @@ static u8 sTlutMem[0x80000];           // the palette half of the console's text
 
 struct Vtx { f32 pos[4]; f32 col[2][4]; f32 tc[8][3]; };
 static u32  sTraceFrom;
+static inline u32 VStride(u32 vfmt) { return vfmt >= 16 ? 40 + 8 * (vfmt - 16) : 48 + 12 * vfmt; }   // vertex format: CPU 0-8 coordinates, GPU 16 + attributes
 static BOOL sTrace;                    // PORT_GFX_TRACE: log every draw and copy, save the frame buffer at each copy
 static BOOL SavePng(ID3D11Texture2D* tex, u32 w, u32 h, const char* path);
-#define VB_VERTS 65536
+#define VB_VERTS 65536                                      // per batch (16-bit indices)
+#define VB_BYTES (32u << 20)                                // the vertex buffer, for all queued batches
 #define IB_IDXS (1u << 20)
 
 // ------------------------------------------------------------------ window
@@ -198,6 +206,84 @@ static std::string VsSource(u32 ngen) {
         + body + " return o; }\n";
 }
 
+// ---- GPU vertex path. Perspective draws whose matrices are the same for every vertex hand the vertex shader the
+// decoded attributes; it does the transform, lighting and texture-coordinate generation that DrawPrims does on the
+// CPU for the other draws, with the same arithmetic. What it needs from the XF registers is in a "record" per draw in
+// a buffer (sRecBuf, uint4s; floats as their bits), found through the vertex's record index:
+//   0-2 position matrix rows, 3-5 normal matrix rows, 6 projection 0-3, 7 projection 4-5, light block, counts,
+//   8 colour/alpha channel controls (0x100E-0x1011), 9 material/ambient registers (0x100C-D, 0x100A-B),
+//   10-11 texgen words (0x1040+), 12-13 post-matrix words (0x1050+), 14 + 6t texgen t: its matrix rows, post matrix rows.
+//   Counts (row 7 w): channels, texgens << 4, post matrices on << 8.
+// The light block (shared while the lights do not change): per light colour, position + a0, direction + a1, a2 k0 k1 k2.
+struct GpuVtx { f32 pos[3]; u32 rec; f32 nrm[3]; u32 flags; u32 c0, c1; f32 tc[8][2]; };   // flags: 1 normal, 2/4 colours, 8 << t coordinate t, bit 31 no position
+static const char kVsGpuBody[] =
+    "Buffer<uint4> R : register(t0);\n"
+    "float4 F(uint i) { return asfloat(R.Load(i)); }\n"
+    "float3 M34(uint b, float4 v) { return float3(dot(F(b), v), dot(F(b + 1), v), dot(F(b + 2), v)); }\n"
+    "float4 U8(uint c) { return float4(c >> 24, (c >> 16) & 255, (c >> 8) & 255, c & 255) * (1.0 / 255.0); }\n"
+    "float4 Lit(uint ctrl, float4 mat, float4 amb, float3 pos, float3 nrm, uint lb) {\n"
+    "  if (!(ctrl & 2)) return mat;\n"
+    "  float4 sum = amb; uint mask = ((ctrl >> 2) & 15) | (((ctrl >> 11) & 15) << 4), diff = (ctrl >> 7) & 3, attn = (ctrl >> 9) & 3;\n"
+    "  [loop] for (uint i = 0; i < 8; i++) { if (!(mask & (1u << i))) continue;\n"
+    "    uint b = lb + i * 4; float4 P = F(b + 1);\n"
+    "    float3 d = P.xyz - pos; float dist2 = dot(d, d), dist = sqrt(dist2); if (dist > 0) d *= 1.0 / dist;\n"
+    "    float a = 1.0;\n"
+    "    if (attn == 3) { float4 D = F(b + 2), K = F(b + 3); float c = max(-dot(d, D.xyz), 0.0);\n"
+    "      float num = P.w + c * (D.w + c * K.x), den = K.y + dist * K.z + dist2 * K.w; a = den != 0 ? max(num, 0.0) / den : 0.0; }\n"
+    "    float nd = dot(nrm, d); float k = diff == 0 ? 1.0 : diff == 1 ? nd : max(nd, 0.0);\n"
+    "    sum += F(b) * a * k; }\n"
+    "  return mat * saturate(sum);\n"
+    "}\n"
+    "VO main(VI i) {\n"
+    "  VO o; o.pos = 0; o.c0 = 0; o.c1 = 0; float3 tc[8]; [unroll] for (uint z = 0; z < 8; z++) { tc[z] = float3(0, 0, 1); o.tc[z] = 0; }\n"
+    "  float2 tin[8] = { TIN };\n"
+    "  float3 ipos = i.pw.xyz, inrm = i.nw.xyz; uint irec = asuint(i.pw.w), ifl = asuint(i.nw.w);\n"
+    "  if (ifl & 0x80000000u) return o;\n"   // a vertex without a position: all zero
+    "  uint rb = irec; uint4 h7 = R.Load(rb + 7);\n"
+    "  float3 pos = M34(rb, float4(ipos, 1)); float3 nrm = float3(0, 0, 1);\n"
+    "  if (ifl & 1) { float3 n = float3(dot(F(rb + 3).xyz, inrm), dot(F(rb + 4).xyz, inrm), dot(F(rb + 5).xyz, inrm));\n"
+    "    float len = length(n); if (len > 0) n /= len; nrm = n; }\n"
+    "  float4 p6 = F(rb + 6); float2 p7 = asfloat(h7.xy); float w = -pos.z;\n"
+    "  o.pos = float4(p6.x * pos.x + p6.y * pos.z, p6.z * pos.y + p6.w * pos.z, (p7.x * pos.z + p7.y) + w, w);\n"
+    "  uint lb = h7.z, nc = h7.w & 15, ng = (h7.w >> 4) & 15, postOn = (h7.w >> 8) & 1;\n"
+    "  uint4 cw = R.Load(rb + 8), rg = R.Load(rb + 9);\n"
+    "  float4 col[2]; col[0] = nc == 0 ? float4(1, 1, 1, 1) : float4(0, 0, 0, 0); col[1] = float4(0, 0, 0, 0);\n"
+    "  [unroll] for (uint c = 0; c < 2; c++) { if (c >= nc) continue;\n"
+    "    float4 vc = (ifl & (2u << c)) ? (c == 0 ? i.c0 : i.c1) : float4(1, 1, 1, 1);\n"
+    "    uint cc = c == 0 ? cw.x : cw.y, ac = c == 0 ? cw.z : cw.w; float4 mr = U8(c == 0 ? rg.x : rg.y), ar = U8(c == 0 ? rg.z : rg.w);\n"
+    "    float3 rgb = Lit(cc, (cc & 1) ? vc : mr, (cc & 0x40) ? vc : ar, pos, nrm, lb).rgb;\n"
+    "    float al = Lit(ac, (ac & 1) ? vc : mr, (ac & 0x40) ? vc : ar, pos, nrm, lb).a;\n"
+    "    col[c] = float4(rgb, al); }\n"
+    "  o.c0 = col[0]; o.c1 = col[1];\n"
+    "  uint4 g0 = R.Load(rb + 10), g1 = R.Load(rb + 11), q0 = R.Load(rb + 12), q1 = R.Load(rb + 13);\n"
+    "  uint gens[8] = {g0.x, g0.y, g0.z, g0.w, g1.x, g1.y, g1.z, g1.w}, posts[8] = {q0.x, q0.y, q0.z, q0.w, q1.x, q1.y, q1.z, q1.w};\n"
+    "  [loop] for (uint t = 0; t < ng && t < 8; t++) {\n"
+    "    uint gen = gens[t], type = (gen >> 4) & 7, row = (gen >> 7) & 31;\n"
+    "    if (type == 2 || type == 3) { tc[t] = float3(col[type - 2].xy, 1); continue; }\n"
+    "    float4 src = float4(0, 0, 1, 1);\n"
+    "    if (row == 0) src.xyz = ipos; else if (row == 1) { if (ifl & 1) src.xyz = inrm; }\n"
+    "    else if (row >= 5 && row <= 12) { if (ifl & (8u << (row - 5))) src.xy = tin[row - 5]; }\n"
+    "    uint mb = rb + 14 + t * 6;\n"
+    "    float3 r = M34(mb, src); if (!(gen & 2)) r.z = 1.0;\n"
+    "    if (postOn) { float3 v = r; if (posts[t] & 0x100) { float l = length(v); if (l > 0) v /= l; } r = M34(mb + 3, float4(v, 1)); }\n"
+    "    tc[t] = float3(r.xy, r.z != 0 ? r.z : 1.0); }\n"
+    "  [unroll] for (uint u = 0; u < 8; u++) o.tc[u] = tc[u];\n"
+    "  return o;\n"
+    "}\n";
+static std::string VsGpuSource(u32 ntc) {
+    std::string in = "struct VI { float4 pw : POSITION; float4 nw : NORMAL; float4 c0 : COLOR0; float4 c1 : COLOR1;";
+    std::string tin;
+    for (u32 t = 0; t < 8; t++) {
+        char b[64];
+        if (t < ntc) { snprintf(b, sizeof(b), " float4 t%u : TEXCOORD%u;", t, t); in += b; snprintf(b, sizeof(b), "%si.t%u.xy", t ? ", " : "", t); }
+        else snprintf(b, sizeof(b), "%sfloat2(0, 0)", t ? ", " : "");
+        tin += b;
+    }
+    std::string body = kVsGpuBody;
+    body.replace(body.find("TIN"), 3, tin);
+    return in + " };\nstruct VO { float4 pos : SV_Position; float4 c0 : COLOR0; float4 c1 : COLOR1; float3 tc[8] : TEXCOORD0; };\n" + body;
+}
+
 static const char kBlitSrc[] =
     "cbuffer C : register(b0) { float4 rect; float4 pick; };\n"   // u0, v0, u size, v size; channel weights for an intensity copy
     "Texture2D tex : register(t0); SamplerState smp : register(s0);\n"
@@ -222,14 +308,24 @@ static ID3D11Texture2D* sMovTex; static ID3D11RenderTargetView* sMovRtv; static 
 static ID3D11BlendState* sBlitBlend;   // Blit: the blend state to composite with (NULL: opaque)
 static bool sMovieOff;                 // PORT_NO_MOVIE_TARGET=1: draw movies straight into the frame buffer (to compare)
 // Draws queued by DrawPrims that share all their state, uploaded and drawn together by FlushDraws.
-struct PendingState { bool movie; u32 ngen; PsConst pc; OutKey out; ID3D11PixelShader* ps; ID3D11ShaderResourceView* srv[8]; ID3D11SamplerState* smp[8]; };
+struct PendingState { bool movie; u32 vfmt, pcSerial; PsConst pc; OutKey out; ID3D11PixelShader* ps; ID3D11ShaderResourceView* srv[8]; ID3D11SamplerState* smp[8]; };
 static PendingState sPend;
 static u32 sPendCount;                                      // GX draws queued
 static std::vector<u8> sBV;                                 // the queued vertices: position, two colours and ngen texture coordinates each
-static u32 sBVCount;
-static std::vector<u16> sBI;
+static u32 sBVCount;                                        // vertices in the open batch
+static std::vector<u16> sBI;                                // the queued indices (each batch's from 0)
+static u32 sBatchVb, sBatchIdx;                             // where the open batch starts in sBV and sBI
+// Batches closed but not drawn yet: FlushDraws uploads all their vertices, indices and records with one Map each
+// (a Map costs more than the draws of a small batch) and then draws them in order.
+struct Batch { PendingState st; u32 vb, idx, ni; };
+static std::vector<Batch> sBatches;
 static void FlushDraws();
 static void Blit(ID3D11ShaderResourceView* src, ID3D11RenderTargetView* dst, u32 dstX, u32 dstY, u32 dstW, u32 dstH, f32 u0, f32 v0, f32 du, f32 dv, const f32* pick);
+static void CloseBatch() {
+    if (!sPendCount) return;
+    sPendCount = 0;
+    sBatches.push_back({sPend, sBatchVb, sBatchIdx, (u32)sBI.size() - sBatchIdx});
+}
 
 static const char* const kColorIn[16] = {"prev.rgb", "prev.aaa", "c0.rgb", "c0.aaa", "c1.rgb", "c1.aaa", "c2.rgb", "c2.aaa",
                                          "tex.rgb", "tex.aaa", "ras.rgb", "ras.aaa", "float3(1,1,1)", "float3(0.5,0.5,0.5)", "kc", "float3(0,0,0)"};
@@ -747,7 +843,7 @@ static f32 Component(const u8* p, u32 fmt, u32 shift, BOOL be) {
     }
 }
 
-static void Colour(const u8* p, u32 fmt, BOOL be, f32* out) {
+static u32 ColourU32(const u8* p, u32 fmt, BOOL be) {    // r, g, b, a in the bytes from low to high
     u32 r, g, b, a = 255;
     if (fmt == 0 || fmt == 3) {
         u32 c = be ? Be16(p) : *(const u16*)p;
@@ -760,8 +856,12 @@ static void Colour(const u8* p, u32 fmt, BOOL be, f32* out) {
         u32 c = be ? ((u32)p[0] << 24 | (u32)p[1] << 16 | (u32)p[2] << 8 | p[3]) : *(const u32*)p;
         r = c >> 24; g = (c >> 16) & 255; b = (c >> 8) & 255; a = fmt == 2 ? 255 : (c & 255);
     }
+    return r | g << 8 | b << 16 | a << 24;
+}
+static void Colour(const u8* p, u32 fmt, BOOL be, f32* out) {
+    u32 c = ColourU32(p, fmt, be);
     const f32 k = 1.0f / 255.0f;
-    out[0] = r * k; out[1] = g * k; out[2] = b * k; out[3] = a * k;
+    out[0] = (c & 255) * k; out[1] = ((c >> 8) & 255) * k; out[2] = ((c >> 16) & 255) * k; out[3] = (c >> 24) * k;
 }
 
 static inline void Mul34(const f32* m, const f32* v, f32* out) {
@@ -834,11 +934,87 @@ static void LightChannel2(const PortGx* g, const f32 (*lightCol)[4], u32 cc, u32
 
 static std::vector<Vtx> sVerts;
 
+// GPU vertex path: the records the queued draws use (uint4s, 4 words each), uploaded with them by FlushDraws. Indices
+// are absolute positions in sRecBuf; when it is full the queue is drawn and the buffer starts over.
+static std::vector<u32> sRec;
+static u32  sRecUsed;                                       // uint4s in sRecBuf before those in sRec
+static BOOL sRecDiscard = TRUE;                             // the next upload starts the buffer over
+static u32  sRecLights = ~0u, sRecLast = ~0u, sRecLastN;    // the last light block and record (reused while unchanged)
+static u32  sRecLightGen;                                   // PortGx::xfLightGen when the light block was made
+static u32  sRecLastW[4 * (14 + 6 * 8)];
+static void RecReserve(u32 n) {
+    if (sRecUsed + (u32)sRec.size() / 4 + n <= REC_U4) return;
+    FlushDraws();
+    sRec.clear(); sRecUsed = 0; sRecDiscard = TRUE; sRecLights = sRecLast = ~0u;
+}
+static u32 RecAlloc(u32 n) { u32 at = sRecUsed + (u32)sRec.size() / 4; sRec.resize(sRec.size() + (size_t)n * 4); return at; }
+
+// The record of a GPU draw (layout above GpuVtx): its matrices and the XF registers the vertex shader reads.
+static u32 GpuRecord(const PortGx* g, BOOL lit, u32 numChans, u32 numGens, const f32* proj, const u32* midx) {
+    const u32 n = 14 + 6 * numGens;
+    RecReserve(32 + n);
+    u32 lb = 0;
+    if (lit) {
+        if (sRecLights == ~0u || sRecLightGen != g->xfLightGen) {
+            sRecLightGen = g->xfLightGen;
+            sRecLights = RecAlloc(32);
+            u32* w = &sRec[sRec.size() - 128];
+            for (u32 i = 0; i < 8; i++) {
+                const f32* l = &g->xfMem[0x600 + i * 0x10];
+                u32 lc; memcpy(&lc, &l[3], 4);
+                f32 q[16];
+                RegColour(lc, q);
+                q[4] = l[10]; q[5] = l[11]; q[6] = l[12]; q[7] = l[4];
+                q[8] = l[13]; q[9] = l[14]; q[10] = l[15]; q[11] = l[5];
+                q[12] = l[6]; q[13] = l[7]; q[14] = l[8]; q[15] = l[9];
+                memcpy(w + i * 16, q, sizeof(q));
+            }
+        }
+        lb = sRecLights;
+    }
+    u32 r[4 * (14 + 6 * 8)];
+    memset(r, 0, (size_t)n * 16);
+    const u32 pm = midx[0] & 63;
+    memcpy(r, &g->xfMem[pm * 4], 48);
+    const f32* nm = &g->xfMem[0x400 + pm % 32 * 3];
+    for (u32 k = 0; k < 3; k++) memcpy(r + 12 + k * 4, nm + k * 3, 12);
+    memcpy(r + 24, proj, 24);
+    r[30] = lb; r[31] = numChans | numGens << 4 | (g->xf[0x12] & 1) << 8;
+    r[32] = g->xf[0x0E]; r[33] = g->xf[0x0F]; r[34] = g->xf[0x10]; r[35] = g->xf[0x11];
+    r[36] = g->xf[0x0C]; r[37] = g->xf[0x0D]; r[38] = g->xf[0x0A]; r[39] = g->xf[0x0B];
+    for (u32 t = 0; t < 8; t++) { r[40 + t] = g->xf[0x40 + t]; r[48 + t] = g->xf[0x50 + t]; }
+    for (u32 t = 0; t < numGens; t++) {
+        u32 mi = t < 4 ? (midx[0] >> (6 + t * 6)) & 63 : (midx[1] >> ((t - 4) * 6)) & 63;
+        memcpy(r + (14 + 6 * t) * 4, &g->xfMem[mi * 4], 48);
+        memcpy(r + (17 + 6 * t) * 4, &g->xfMem[0x500 + (g->xf[0x50 + t] & 63) * 4], 48);
+    }
+    if (sRecLast != ~0u && sRecLastN == n && !memcmp(sRecLastW, r, (size_t)n * 16)) return sRecLast;
+    sRecLast = RecAlloc(n);
+    memcpy(&sRec[sRec.size() - (size_t)n * 4], r, (size_t)n * 16);
+    memcpy(sRecLastW, r, (size_t)n * 16); sRecLastN = n;
+    return sRecLast;
+}
+static inline f32 CompScaled(const u8* p, u32 fmt, f32 scale, BOOL be) {   // Component() with the scale worked out per draw
+    switch (fmt) {
+    case 0: return (f32)p[0] * scale;
+    case 1: return (f32)(s8)p[0] * scale;
+    case 2: return (f32)(be ? Be16(p) : *(const u16*)p) * scale;
+    case 3: return (f32)(s16)(be ? Be16(p) : *(const u16*)p) * scale;
+    default: if (be) return BeF32(p); { f32 f; memcpy(&f, p, 4); return f; }
+    }
+}
+
 static void DrawPrims(const PortGx* g, u32 prim, const PortGxLayout* L, u32 count, const u8* data) {
     if (!sStarted || count == 0) return;
     if (prim >= 0xA8) { sGfxStats.skipped++; return; }     // lines and points: not drawn yet
+    // What only the BP registers (TEV, textures, blending) decide is kept from the draw before while none was written
+    // and the frame is the same (textures are looked at again once a frame): the pixel shader, constants, textures.
+    static u32 cBpGen = ~0u, cTexGen; static ID3D11PixelShader* cPs; static u32 cTexUsed;
+    static ID3D11ShaderResourceView* cSrv[8]; static ID3D11SamplerState* cSmp[8];
+    const BOOL sameBp = g->bpGen == cBpGen && sTexGen == cTexGen;
     u32 texUsed;
-    ID3D11PixelShader* ps = GetPixelShader(g, &texUsed);
+    ID3D11PixelShader* ps = sameBp ? cPs : GetPixelShader(g, &texUsed);
+    if (sameBp) texUsed = cTexUsed;
     if (!ps) { sGfxStats.skipped++; return; }
     f32 proj[7]; memcpy(proj, &g->xf[0x20], 24);
     BOOL ortho = g->xf[0x26] & 1;
@@ -849,9 +1025,20 @@ static void DrawPrims(const PortGx* g, u32 prim, const PortGxLayout* L, u32 coun
     f32 lightCol[8][4];
     BOOL lit = FALSE;                                       // some colour or alpha channel uses lights: otherwise their colours are not needed
     for (u32 c = 0; c < numChans && c < 2; c++) lit |= ((g->xf[0x0E + c] | g->xf[0x10 + c]) & 2) != 0;
-    if (lit) for (u32 i = 0; i < 8; i++) { u32 lc; memcpy(&lc, &g->xfMem[0x600 + i * 0x10 + 3], 4); RegColour(lc, lightCol[i]); }
-
-    sVerts.resize(count);
+    // to a triangle list (indices into the vertices, which are uploaded once; written into the batch below)
+    if (!(prim == 0x80 ? count >= 4 : (prim == 0x90 || prim == 0x98 || prim == 0xA0) && count >= 3) || count > VB_VERTS) { sGfxStats.skipped++; return; }
+    // Perspective draws with one set of matrices for all their vertices are transformed and lit by the vertex shader; 2D
+    // (orthographic) draws stay on the CPU, which needs their final positions for widescreen, and so do draws that pick
+    // matrices per vertex.
+    BOOL gpu = sGpuVerts && !ortho && numGens <= 8 && !L->attr[0].mode;
+    for (u32 t = 0; gpu && t < numGens; t++) if (L->attr[1 + t].mode) gpu = FALSE;
+    u32 rec = 0, ntc = 0;
+    if (gpu) {
+        for (u32 t = 0; t < 8; t++) if (L->attr[13 + t].mode) ntc = t + 1;
+    } else {
+        if (lit) for (u32 i = 0; i < 8; i++) { u32 lc; memcpy(&lc, &g->xfMem[0x600 + i * 0x10 + 3], 4); RegColour(lc, lightCol[i]); }
+        sVerts.resize(count);
+    }
     // Per draw, not per vertex: where each array attribute's data is, and the attributes the vertex format has.
     const u8* arrBase[21] = {}; u32 arrStride[21] = {}; BOOL arrBe[21] = {};
     u32 active[12], nActive = 0;
@@ -865,8 +1052,8 @@ static void DrawPrims(const PortGx* g, u32 prim, const PortGxLayout* L, u32 coun
         }
         active[nActive++] = a;
     }
+    if (!gpu)
     for (u32 n = 0; n < count; n++, data += L->size) {
-        Vtx& o = sVerts[n];
         f32 in[21][4];                                      // position, normal, colours, texture coordinates as given (read only where has[])
         BOOL has[21];
         for (u32 a = 9; a < 21; a++) has[a] = FALSE;
@@ -887,6 +1074,7 @@ static void DrawPrims(const PortGx* g, u32 prim, const PortGxLayout* L, u32 coun
             if (a >= 13) in[a][2] = 1;
             for (u32 k = 0; k < comps; k++) in[a][k] = Component(p + k * at.elem, at.fmt, a == 10 ? (at.fmt == 1 ? 6 : at.fmt == 3 ? 14 : 0) : at.shift, be);
         }
+        Vtx& o = sVerts[n];
         if (!has[9]) { memset(&o, 0, sizeof(o)); continue; }
         // position and normal into view space
         u32 pm = L->attr[0].mode ? data[L->attr[0].offset] : (midx[0] & 63);
@@ -976,10 +1164,10 @@ static void DrawPrims(const PortGx* g, u32 prim, const PortGxLayout* L, u32 coun
             for (u32 n = 0; n < count; n++) sVerts[n].pos[0] *= squeeze;
         }
     }
-    // to a triangle list (indices into the vertices, which are uploaded once; written into the batch below)
-    if (!(prim == 0x80 ? count >= 4 : (prim == 0x90 || prim == 0x98 || prim == 0xA0) && count >= 3) || count > VB_VERTS) { sGfxStats.skipped++; return; }
+    if (gpu) rec = GpuRecord(g, lit, numChans, numGens, proj, midx);
     if (sTrace) {
-        const Vtx& v = sVerts[0];
+        static const Vtx kNone = {};
+        const Vtx& v = gpu ? kNone : sVerts[0];             // (a GPU draw's vertices are made by the vertex shader: logged as zero)
         f32 vp[6]; memcpy(vp, &g->xf[0x1A], sizeof(vp));
         PortLog("gfx trace: draw %02X x%u stages %u gens %u chans %u tex %02X bm %04X zm %02X cull %u vp %.0f,%.0f,%.0f,%.0f v0 pos %.2f %.2f %.2f %.2f col %.2f %.2f %.2f %.2f tc0 %.2f %.2f clipoff %u img0 %06X addr %08X",
                 prim, count, ((g->bp[0] >> 10) & 15) + 1, numGens, numChans, texUsed, g->bp[0x41] & 0xFFFF, g->bp[0x40] & 0x1F, (g->bp[0] >> 14) & 3,
@@ -991,7 +1179,7 @@ static void DrawPrims(const PortGx* g, u32 prim, const PortGxLayout* L, u32 coun
                     sEfbCopies.count((g->bp[base + 0x14] & 0xFFFFFF) << 5) ? " (a frame-buffer copy)" : "", g->bp[0xC0], g->bp[0xC1], g->bp[0x28] & 0xFFF);
         }
     }
-    if (sTrace && getenv("PORT_GFX_VERTS")) {
+    if (sTrace && !gpu && getenv("PORT_GFX_VERTS")) {
         for (u32 i = 0; i < count && i < 6; i++)
             PortLog("gfx trace:   v%u pos %.3f %.3f %.3f %.3f col %.2f %.2f %.2f %.2f tc0 %.3f %.3f %.3f tc1 %.3f %.3f", i, sVerts[i].pos[0], sVerts[i].pos[1], sVerts[i].pos[2],
                     sVerts[i].pos[3], sVerts[i].col[0][0], sVerts[i].col[0][1], sVerts[i].col[0][2], sVerts[i].col[0][3], sVerts[i].tc[0][0], sVerts[i].tc[0][1], sVerts[i].tc[0][2],
@@ -1001,10 +1189,10 @@ static void DrawPrims(const PortGx* g, u32 prim, const PortGxLayout* L, u32 coun
     memset(&pc, 0, sizeof(pc));
     // The constants only change now and then: rebuild them when one of the registers they come from did.
     struct PcSrc { s16 reg[16], konst[16]; u32 bp[8 + 9 + 5 + 2 + 1]; };
-    static PcSrc lastSrc; static PsConst lastPcVal; static BOOL haveLast;
+    static PcSrc lastSrc; static PsConst lastPcVal; static BOOL haveLast; static u32 pcSerial;
     PcSrc src;
+    if (!sameBp) {
     memcpy(src.reg, g->tevReg, sizeof(src.reg)); memcpy(src.konst, g->tevKonst, sizeof(src.konst));
-    {
         u32 n = 0;
         for (u32 m = 0; m < 8; m++) src.bp[n++] = g->bp[(m < 4 ? 0x80 : 0xA0) + (m & 3) + 8];
         for (u32 i = 0x06; i < 0x0F; i++) src.bp[n++] = g->bp[i];
@@ -1012,7 +1200,7 @@ static void DrawPrims(const PortGx* g, u32 prim, const PortGxLayout* L, u32 coun
         src.bp[n++] = g->bp[0x25]; src.bp[n++] = g->bp[0x26];
         src.bp[n++] = g->bp[0xF3];
     }
-    if (haveLast && !memcmp(&src, &lastSrc, sizeof(src))) pc = lastPcVal;
+    if (haveLast && (sameBp || !memcmp(&src, &lastSrc, sizeof(src)))) pc = lastPcVal;
     else {
     for (int i = 0; i < 4; i++) for (int k = 0; k < 4; k++) { pc.reg[i][k] = g->tevReg[i][k] / 255.0f; pc.konst[i][k] = g->tevKonst[i][k] / 255.0f; }
         pc.alphaRef[0] = (g->bp[0xF3] & 255) / 255.0f; pc.alphaRef[1] = ((g->bp[0xF3] >> 8) & 255) / 255.0f; pc.alphaRef[2] = pc.alphaRef[3] = 0;
@@ -1044,23 +1232,72 @@ static void DrawPrims(const PortGx* g, u32 prim, const PortGxLayout* L, u32 coun
             u32 sc = g->bp[0x25 + i / 2] >> ((i & 1) * 8);
             pc.indScale[i][0] = 1.0f / (f32)(1u << (sc & 15)); pc.indScale[i][1] = 1.0f / (f32)(1u << ((sc >> 4) & 15)); pc.indScale[i][2] = pc.indScale[i][3] = 0;
         }
-        lastSrc = src; lastPcVal = pc; haveLast = TRUE;
+        lastSrc = src; lastPcVal = pc; haveLast = TRUE; pcSerial++;
     }
     OutKey ok = MakeOutKey(g, squeeze);
     ID3D11ShaderResourceView* srv[8]; ID3D11SamplerState* smp[8];
-    for (u32 i = 0; i < 8; i++) { srv[i] = (texUsed & (1u << i)) ? GetTexture(g, i) : sWhite; smp[i] = (texUsed & (1u << i)) ? GetSampler(g, i) : sLinearClamp; }
+    if (sameBp) { memcpy(srv, cSrv, sizeof(srv)); memcpy(smp, cSmp, sizeof(smp)); }
+    else {
+        for (u32 i = 0; i < 8; i++) { srv[i] = (texUsed & (1u << i)) ? GetTexture(g, i) : sWhite; smp[i] = (texUsed & (1u << i)) ? GetSampler(g, i) : sLinearClamp; }
+        memcpy(cSrv, srv, sizeof(srv)); memcpy(cSmp, smp, sizeof(smp)); cPs = ps; cTexUsed = texUsed; cBpGen = g->bpGen; cTexGen = sTexGen;
+    }
 
     // Draws that need exactly the same state as the ones queued before are added to them: one upload and one draw call for the lot.
-    if (sPendCount && (sPend.ps != ps || sBVCount + count > VB_VERTS || sPend.ngen != numGens || sPend.movie != movie || memcmp(&sPend.out, &ok, sizeof(ok)) || memcmp(sPend.srv, srv, sizeof(srv)) ||
-                       memcmp(sPend.smp, smp, sizeof(smp)) || memcmp(&sPend.pc, &pc, sizeof(pc))))
-        FlushDraws();
-    if (!sPendCount) { sPend.movie = movie; sPend.ngen = numGens > 8 ? 8 : numGens; sPend.ps = ps; sPend.out = ok; memcpy(sPend.srv, srv, sizeof(srv)); memcpy(sPend.smp, smp, sizeof(smp)); sPend.pc = pc; }
+    const u32 vfmt = gpu ? 16 + ntc : (numGens > 8 ? 8 : numGens);
+    const u32 stride = VStride(vfmt);
+    // The queue is uploaded at once (FlushDraws); it has to fit the buffers.
+    if (sBV.size() + (size_t)count * stride > VB_BYTES || sBI.size() + (size_t)count * 3 > IB_IDXS) FlushDraws();
+    if (sPendCount && (sPend.ps != ps || sBVCount + count > VB_VERTS || sPend.vfmt != vfmt || sPend.movie != movie || memcmp(&sPend.out, &ok, sizeof(ok)) || memcmp(sPend.srv, srv, sizeof(srv)) ||
+                       memcmp(sPend.smp, smp, sizeof(smp)) || (sPend.pcSerial != pcSerial && memcmp(&sPend.pc, &pc, sizeof(pc)))))
+        CloseBatch();
+    if (!sPendCount) {
+        sPend.movie = movie; sPend.vfmt = vfmt; sPend.pcSerial = pcSerial; sPend.ps = ps; sPend.out = ok; memcpy(sPend.srv, srv, sizeof(srv)); memcpy(sPend.smp, smp, sizeof(smp)); sPend.pc = pc;
+        sBatchVb = (u32)sBV.size(); sBatchIdx = (u32)sBI.size(); sBVCount = 0;
+    }
     u16 base = (u16)sBVCount;
     {
-        u32 stride = 48 + 12 * sPend.ngen;
         size_t at = sBV.size();
         sBV.resize(at + (size_t)count * stride);
-        for (u32 n = 0; n < count; n++) memcpy(&sBV[at + (size_t)n * stride], &sVerts[n], stride);
+        if (gpu) {
+            // The vertex shader does the rest: the attributes go into the queue as they are given (GpuVtx).
+            u8* dst = &sBV[at];
+            struct AP { const u8* base; u32 arrStride, off, mode, fmt, comps, elem, dst; BOOL be; f32 scale; };
+            AP ap[12];
+            u32 nap = 0, fl = 0;
+            BOOL hasPos = FALSE;
+            for (u32 ai = 0; ai < nActive; ai++) {
+                const u32 a = active[ai];
+                const PortGxAttr& ga = L->attr[a];
+                AP& q = ap[nap++];
+                q.base = arrBase[a]; q.arrStride = arrStride[a]; q.be = ga.mode >= 2 ? arrBe[a] : TRUE;
+                q.off = ga.offset; q.mode = ga.mode; q.fmt = ga.fmt; q.elem = ga.elem;
+                u32 shift = ga.shift;
+                if (a == 9) { q.dst = 0; q.comps = ga.comps > 3 ? 3 : ga.comps; hasPos = TRUE; }
+                else if (a == 10) { q.dst = 16; q.comps = 3; shift = ga.fmt == 1 ? 6 : ga.fmt == 3 ? 14 : 0; fl |= 1; }
+                else if (a <= 12) { q.dst = 32 + (a - 11) * 4; q.comps = 0; fl |= 2u << (a - 11); }
+                else { q.dst = 40 + (a - 13) * 8; q.comps = ga.comps > 2 ? 2 : ga.comps; fl |= 8u << (a - 13); }
+                q.scale = 1.0f / (f32)(1u << (shift & 31));
+            }
+            u8* o = dst;
+            memset(o, 0, (size_t)count * stride);
+            if (!hasPos) {                                      // no position: nothing is drawn (as on the CPU path)
+                const u32 none = 0x80000000u;
+                for (u32 n = 0; n < count; n++) memcpy(o + (size_t)n * stride + 28, &none, 4);
+            } else {
+                for (u32 n = 0; n < count; n++, data += L->size, o += stride) {
+                    memcpy(o + 12, &rec, 4); memcpy(o + 28, &fl, 4);
+                    for (u32 k = 0; k < nap; k++) {
+                        const AP& q = ap[k];
+                        const u8* p = data + q.off;
+                        BOOL be = TRUE;
+                        if (q.mode >= 2) { u32 index = q.mode == 2 ? p[0] : Be16(p); p = q.base + index * q.arrStride; be = q.be; }
+                        if (!q.comps) { u32 c = ColourU32(p, q.fmt, be); memcpy(o + q.dst, &c, 4); continue; }
+                        f32* d = (f32*)(o + q.dst);
+                        for (u32 c = 0; c < q.comps; c++) d[c] = CompScaled(p + c * q.elem, q.fmt, q.scale, be);
+                    }
+                }
+            }
+        } else for (u32 n = 0; n < count; n++) memcpy(&sBV[at + (size_t)n * stride], &sVerts[n], stride);
         sBVCount += count;
     }
     const size_t nIdxBefore = sBI.size();
@@ -1088,89 +1325,102 @@ static void DrawPrims(const PortGx* g, u32 prim, const PortGxLayout* L, u32 coun
     }
     sGfxStats.tris += (u32)(sBI.size() - nIdxBefore) / 3;
     sPendCount++;
-    sGfxStats.draws++;
+    sGfxStats.draws++; sGfxStats.verts += count;
+    if (gpu) { sGfxStats.gpuDraws++; sGfxStats.gpuVerts += count; }
     sFrame.draws++; sFrame.verts += count;
     if (movie) FlushDraws();                                // drawn at once: it has its own target
 }
 
 // Uploads and draws what DrawPrims has queued.
 static void FlushDraws() {
-    if (!sPendCount) return;
-    sPendCount = 0;
-    // The vertices go behind those of the earlier flushes; the buffer (9 MB) is only replaced when
-    // it is full. Replacing it for every draw made a scene of a few thousand small draws crawl.
+    CloseBatch();
+    if (sBatches.empty()) return;
+    sGfxStats.flushes += (u32)sBatches.size();
+    if (!sRec.empty()) {                                    // the GPU path's records, behind those already in the buffer
+        D3D11_MAPPED_SUBRESOURCE rm;
+        if (SUCCEEDED(sCtx->Map(sRecBuf, 0, sRecDiscard ? D3D11_MAP_WRITE_DISCARD : D3D11_MAP_WRITE_NO_OVERWRITE, 0, &rm))) {
+            memcpy((u8*)rm.pData + (size_t)sRecUsed * 16, sRec.data(), sRec.size() * 4);
+            sCtx->Unmap(sRecBuf, 0);
+        }
+        sRecUsed += (u32)sRec.size() / 4; sRec.clear(); sRecDiscard = FALSE;
+    }
+    // The vertices go behind those of the earlier flushes; the buffer is only replaced when it is full. Replacing it
+    // for every draw made a scene of a few thousand small draws crawl.
     static u32 sVbUsed, sIbUsed;                            // in bytes and indices
-    const u32 stride = 48 + 12 * sPend.ngen;
-    u32 bytes = (u32)sBV.size(), ni = (u32)sBI.size();
-    u32 first = sVbUsed, ifirst = sIbUsed;
-    first = (first + stride - 1) / stride * stride;           // a whole number of vertices from the start of the buffer
+    const u32 bytes = (u32)sBV.size(), ni = (u32)sBI.size();
+    u32 first = (sVbUsed + 15) & ~15u, ifirst = sIbUsed;
     D3D11_MAPPED_SUBRESOURCE map;
     D3D11_MAP how = D3D11_MAP_WRITE_NO_OVERWRITE;
-    if (first + bytes > VB_VERTS * sizeof(Vtx)) { first = 0; how = D3D11_MAP_WRITE_DISCARD; }
-    if (FAILED(sCtx->Map(sVb, 0, how, 0, &map))) { sBV.clear(); sBI.clear(); sBVCount = 0; return; }
-    memcpy((u8*)map.pData + first, sBV.data(), bytes);
-    sCtx->Unmap(sVb, 0);
+    BOOL ok = TRUE;
+    if (first + bytes > VB_BYTES) { first = 0; how = D3D11_MAP_WRITE_DISCARD; }
+    if (SUCCEEDED(sCtx->Map(sVb, 0, how, 0, &map))) { memcpy((u8*)map.pData + first, sBV.data(), bytes); sCtx->Unmap(sVb, 0); } else ok = FALSE;
     sVbUsed = first + bytes;
     how = D3D11_MAP_WRITE_NO_OVERWRITE;
     if (ifirst + ni > IB_IDXS) { ifirst = 0; how = D3D11_MAP_WRITE_DISCARD; }
-    if (FAILED(sCtx->Map(sIb, 0, how, 0, &map))) { sBV.clear(); sBI.clear(); sBVCount = 0; return; }
-    memcpy((u16*)map.pData + ifirst, sBI.data(), ni * sizeof(u16));
-    sCtx->Unmap(sIb, 0);
+    if (SUCCEEDED(sCtx->Map(sIb, 0, how, 0, &map))) { memcpy((u16*)map.pData + ifirst, sBI.data(), ni * sizeof(u16)); sCtx->Unmap(sIb, 0); } else ok = FALSE;
     sIbUsed = ifirst + ni;
     sBV.clear(); sBI.clear(); sBVCount = 0;
 
     static PsConst lastPc; static OutKey lastOut;
-    if (!sDrawBound || memcmp(&sPend.pc, &lastPc, sizeof(lastPc))) { sCtx->UpdateSubresource(sPsConst, 0, NULL, &sPend.pc, 0, 0); lastPc = sPend.pc; }
-    if (!sDrawBound) sCtx->OMSetRenderTargets(1, &sEfbRtv, sEfbDsv);
-    if (!sDrawBound || memcmp(&sPend.out, &lastOut, sizeof(lastOut))) { SetOutputState(sPend.out); lastOut = sPend.out; }
     static ID3D11ShaderResourceView* lastSrv[8]; static ID3D11SamplerState* lastSmp[8]; static ID3D11PixelShader* lastPs;
-    if (!sDrawBound || memcmp(sPend.srv, lastSrv, sizeof(lastSrv))) { sCtx->PSSetShaderResources(0, 8, sPend.srv); memcpy(lastSrv, sPend.srv, sizeof(lastSrv)); }
-    if (!sDrawBound || memcmp(sPend.smp, lastSmp, sizeof(lastSmp))) { sCtx->PSSetSamplers(0, 8, sPend.smp); memcpy(lastSmp, sPend.smp, sizeof(lastSmp)); }
-    static u32 lastNgen = ~0u;
-    UINT vbStride = stride, vbOffset = first;
-    sCtx->IASetVertexBuffers(0, 1, &sVb, &vbStride, &vbOffset);
-    if (!sDrawBound || lastNgen != sPend.ngen) {
-        sCtx->IASetInputLayout(sLayouts[sPend.ngen]);
-        sCtx->VSSetShader(sVs[sPend.ngen], NULL, 0);
-        lastNgen = sPend.ngen;
-    }
-    if (!sDrawBound) {
-        sCtx->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
-        sCtx->PSSetConstantBuffers(0, 1, &sPsConst);
-        sCtx->IASetIndexBuffer(sIb, DXGI_FORMAT_R16_UINT, 0);
-    }
-    if (!sDrawBound || sPend.ps != lastPs) { sCtx->PSSetShader(sPend.ps, NULL, 0); lastPs = sPend.ps; }
-    sDrawBound = TRUE;
-    if (sPend.movie) {
-        if (!sMovTex) {
-            D3D11_TEXTURE2D_DESC d = {};
-            d.Width = 640; d.Height = 480; d.MipLevels = 1; d.ArraySize = 1; d.Format = DXGI_FORMAT_R8G8B8A8_UNORM;
-            d.SampleDesc.Count = 1; d.BindFlags = D3D11_BIND_SHADER_RESOURCE | D3D11_BIND_RENDER_TARGET;
-            if (SUCCEEDED(sDev->CreateTexture2D(&d, NULL, &sMovTex))) { sDev->CreateRenderTargetView(sMovTex, NULL, &sMovRtv); sDev->CreateShaderResourceView(sMovTex, NULL, &sMovSrv); }
+    static u32 lastVfmt = ~0u, lastPcSerial;
+    for (size_t bi = 0; ok && bi < sBatches.size(); bi++) {
+        const Batch& b = sBatches[bi];
+        const PendingState& st = b.st;
+        if (!sDrawBound || (lastPcSerial != st.pcSerial && memcmp(&st.pc, &lastPc, sizeof(lastPc)))) { sCtx->UpdateSubresource(sPsConst, 0, NULL, &st.pc, 0, 0); lastPc = st.pc; }
+        lastPcSerial = st.pcSerial;
+        if (!sDrawBound) sCtx->OMSetRenderTargets(1, &sEfbRtv, sEfbDsv);
+        if (!sDrawBound || memcmp(&st.out, &lastOut, sizeof(lastOut))) { SetOutputState(st.out); lastOut = st.out; }
+        if (!sDrawBound || memcmp(st.srv, lastSrv, sizeof(lastSrv))) { sCtx->PSSetShaderResources(0, 8, st.srv); memcpy(lastSrv, st.srv, sizeof(lastSrv)); }
+        if (!sDrawBound || memcmp(st.smp, lastSmp, sizeof(lastSmp))) { sCtx->PSSetSamplers(0, 8, st.smp); memcpy(lastSmp, st.smp, sizeof(lastSmp)); }
+        UINT vbStride = VStride(st.vfmt), vbOffset = first + b.vb;
+        sCtx->IASetVertexBuffers(0, 1, &sVb, &vbStride, &vbOffset);
+        if (!sDrawBound || lastVfmt != st.vfmt) {
+            const BOOL gv = st.vfmt >= 16;
+            sCtx->IASetInputLayout(gv ? sLayoutsG[st.vfmt - 16] : sLayouts[st.vfmt]);
+            sCtx->VSSetShader(gv ? sVsG[st.vfmt - 16] : sVs[st.vfmt], NULL, 0);
+            if (gv) sCtx->VSSetShaderResources(0, 1, &sRecSrv);
+            lastVfmt = st.vfmt;
         }
-        if (sMovRtv && sMovSrv) {
-            UINT nv = 1; D3D11_VIEWPORT ov = {};
-            sCtx->RSGetViewports(&nv, &ov);                 // the draw's own, as SetOutputState left it
-            ID3D11BlendState* keep = NULL; FLOAT bf[4]; UINT sm;
-            sCtx->OMGetBlendState(&keep, bf, &sm);
-            f32 sq = sPend.out.squeeze;
-            sCtx->OMSetRenderTargets(1, &sMovRtv, NULL);
-            D3D11_VIEWPORT v = {-(640.0f / sq - 640.0f) / 2.0f, 0, 640.0f / sq, 480.0f, 0, 1};   // a narrowed quad fills the 640 again
-            D3D11_RECT sc = {0, 0, 640, 480};
-            sCtx->RSSetViewports(1, &v);
-            sCtx->RSSetScissorRects(1, &sc);
-            sCtx->OMSetBlendState(NULL, NULL, 0xFFFFFFFF);  // the target keeps the colour and alpha the TEV made
-            sCtx->DrawIndexed(ni, ifirst, 0);
-            static const f32 kKeepAlpha[4] = {0, 0, 0, -1};
-            sBlitBlend = keep;
-            Blit(sMovSrv, sEfbRtv, (u32)lroundf(ov.TopLeftX + ov.Width * (1.0f - sq) / 2.0f), (u32)lroundf(ov.TopLeftY),
-                 (u32)lroundf(ov.Width * sq), (u32)lroundf(ov.Height), 0, 0, 1, 1, kKeepAlpha);
-            sBlitBlend = NULL;
-            if (keep) keep->Release();
-            return;
+        if (!sDrawBound) {
+            sCtx->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
+            sCtx->PSSetConstantBuffers(0, 1, &sPsConst);
+            sCtx->IASetIndexBuffer(sIb, DXGI_FORMAT_R16_UINT, 0);
         }
+        if (!sDrawBound || st.ps != lastPs) { sCtx->PSSetShader(st.ps, NULL, 0); lastPs = st.ps; }
+        sDrawBound = TRUE;
+        if (st.movie) {
+            if (!sMovTex) {
+                D3D11_TEXTURE2D_DESC d = {};
+                d.Width = 640; d.Height = 480; d.MipLevels = 1; d.ArraySize = 1; d.Format = DXGI_FORMAT_R8G8B8A8_UNORM;
+                d.SampleDesc.Count = 1; d.BindFlags = D3D11_BIND_SHADER_RESOURCE | D3D11_BIND_RENDER_TARGET;
+                if (SUCCEEDED(sDev->CreateTexture2D(&d, NULL, &sMovTex))) { sDev->CreateRenderTargetView(sMovTex, NULL, &sMovRtv); sDev->CreateShaderResourceView(sMovTex, NULL, &sMovSrv); }
+            }
+            if (sMovRtv && sMovSrv) {
+                UINT nv = 1; D3D11_VIEWPORT ov = {};
+                sCtx->RSGetViewports(&nv, &ov);             // the draw's own, as SetOutputState left it
+                ID3D11BlendState* keep = NULL; FLOAT bf[4]; UINT sm;
+                sCtx->OMGetBlendState(&keep, bf, &sm);
+                f32 sq = st.out.squeeze;
+                sCtx->OMSetRenderTargets(1, &sMovRtv, NULL);
+                D3D11_VIEWPORT v = {-(640.0f / sq - 640.0f) / 2.0f, 0, 640.0f / sq, 480.0f, 0, 1};   // a narrowed quad fills the 640 again
+                D3D11_RECT sc = {0, 0, 640, 480};
+                sCtx->RSSetViewports(1, &v);
+                sCtx->RSSetScissorRects(1, &sc);
+                sCtx->OMSetBlendState(NULL, NULL, 0xFFFFFFFF);  // the target keeps the colour and alpha the TEV made
+                sCtx->DrawIndexed(b.ni, ifirst + b.idx, 0);
+                static const f32 kKeepAlpha[4] = {0, 0, 0, -1};
+                sBlitBlend = keep;
+                Blit(sMovSrv, sEfbRtv, (u32)lroundf(ov.TopLeftX + ov.Width * (1.0f - sq) / 2.0f), (u32)lroundf(ov.TopLeftY),
+                     (u32)lroundf(ov.Width * sq), (u32)lroundf(ov.Height), 0, 0, 1, 1, kKeepAlpha);   // (Blit leaves sDrawBound FALSE: the next batch binds everything again)
+                sBlitBlend = NULL;
+                if (keep) keep->Release();
+                continue;
+            }
+        }
+        sCtx->DrawIndexed(b.ni, ifirst + b.idx, 0);
     }
-    sCtx->DrawIndexed(ni, ifirst, 0);
+    sBatches.clear();
 }
 
 // ------------------------------------------------------------------ frame-buffer copies
@@ -1731,9 +1981,37 @@ BOOL PortGfxStart(BOOL window) {
         vs->Release();
     }
     bvs->Release(); bps->Release();
+    // The GPU vertex path: needs records the shader reads that can be appended to while earlier draws still use them.
+    {
+        D3D11_FEATURE_DATA_D3D11_OPTIONS opt = {};
+        BOOL ok = SUCCEEDED(sDev->CheckFeatureSupport(D3D11_FEATURE_D3D11_OPTIONS, &opt, sizeof(opt))) && opt.MapNoOverwriteOnDynamicBufferSRV && !getenv("PORT_CPU_VERTS");
+        D3D11_INPUT_ELEMENT_DESC eg[12] = {
+            {"POSITION", 0, DXGI_FORMAT_R32G32B32A32_FLOAT, 0, 0, D3D11_INPUT_PER_VERTEX_DATA, 0},      // w: the record index (bits)
+            {"NORMAL", 0, DXGI_FORMAT_R32G32B32A32_FLOAT, 0, 16, D3D11_INPUT_PER_VERTEX_DATA, 0},        // w: the flags (bits)
+            {"COLOR", 0, DXGI_FORMAT_R8G8B8A8_UNORM, 0, 32, D3D11_INPUT_PER_VERTEX_DATA, 0},
+            {"COLOR", 1, DXGI_FORMAT_R8G8B8A8_UNORM, 0, 36, D3D11_INPUT_PER_VERTEX_DATA, 0},
+        };
+        for (UINT i = 0; i < 8; i++) eg[4 + i] = {"TEXCOORD", i, DXGI_FORMAT_R32G32_FLOAT, 0, 40 + i * 8, D3D11_INPUT_PER_VERTEX_DATA, 0};
+        for (u32 n = 0; ok && n <= 8; n++) {
+            std::string src = VsGpuSource(n);
+            ID3DBlob* vs = Compile(src.c_str(), "main", "vs_4_0");
+            if (!vs || FAILED(sDev->CreateVertexShader(vs->GetBufferPointer(), vs->GetBufferSize(), NULL, &sVsG[n])) ||
+                FAILED(sDev->CreateInputLayout(eg, 4 + n, vs->GetBufferPointer(), vs->GetBufferSize(), &sLayoutsG[n]))) ok = FALSE;
+            if (vs) vs->Release();
+        }
+        if (ok) {
+            D3D11_BUFFER_DESC rd = {};
+            rd.ByteWidth = REC_U4 * 16; rd.Usage = D3D11_USAGE_DYNAMIC; rd.BindFlags = D3D11_BIND_SHADER_RESOURCE; rd.CPUAccessFlags = D3D11_CPU_ACCESS_WRITE;
+            D3D11_SHADER_RESOURCE_VIEW_DESC sv = {};
+            sv.Format = DXGI_FORMAT_R32G32B32A32_UINT; sv.ViewDimension = D3D11_SRV_DIMENSION_BUFFER; sv.Buffer.FirstElement = 0; sv.Buffer.NumElements = REC_U4;
+            ok = SUCCEEDED(sDev->CreateBuffer(&rd, NULL, &sRecBuf)) && SUCCEEDED(sDev->CreateShaderResourceView(sRecBuf, &sv, &sRecSrv));
+        }
+        sGpuVerts = ok;
+        PortLog("gfx: vertex transform and lighting on the %s", ok ? "GPU (perspective draws)" : "CPU");
+    }
 
     D3D11_BUFFER_DESC bd = {};
-    bd.ByteWidth = VB_VERTS * sizeof(Vtx); bd.Usage = D3D11_USAGE_DYNAMIC; bd.BindFlags = D3D11_BIND_VERTEX_BUFFER; bd.CPUAccessFlags = D3D11_CPU_ACCESS_WRITE;
+    bd.ByteWidth = VB_BYTES; bd.Usage = D3D11_USAGE_DYNAMIC; bd.BindFlags = D3D11_BIND_VERTEX_BUFFER; bd.CPUAccessFlags = D3D11_CPU_ACCESS_WRITE;
     sDev->CreateBuffer(&bd, NULL, &sVb);
     bd.ByteWidth = IB_IDXS * 2; bd.BindFlags = D3D11_BIND_INDEX_BUFFER;
     sDev->CreateBuffer(&bd, NULL, &sIb);
@@ -1760,6 +2038,8 @@ BOOL PortGfxStart(BOOL window) {
 
 const char* PortGfxStatsText(char* buf, u32 n) {
     if (sStarted) PortLog("gfx copy time: flush %.1f s, resolve %.1f s, blit %.1f s", sTotalFlush / (double)Ticks_freq(), sTRes / (double)Ticks_freq(), sTBlit / (double)Ticks_freq()); if (sStarted) PortLog("gfx new textures %u: %.1f s, rtv %.1f s", sNewTex, sTNew / (double)Ticks_freq(), sTRtv / (double)Ticks_freq()); PortLog("gfx tex/display part %.1f s, clear+present %.1f s; disp %.1f", sTMk / (double)Ticks_freq(), sTPres / (double)Ticks_freq(), sTDisp / (double)Ticks_freq(), sTPres / (double)Ticks_freq());
+    if (sStarted) PortLog("gfx vertices: %u of %u draws (%llu of %llu vertices) transformed on the GPU; %u batches drawn", sGfxStats.gpuDraws, sGfxStats.draws,
+                          (unsigned long long)sGfxStats.gpuVerts, (unsigned long long)sGfxStats.verts, sGfxStats.flushes);
     if (!sStarted) { snprintf(buf, n, "no renderer (run with --window or --screenshot FILE)"); return buf; }
     snprintf(buf, n, "%u draw(s), %u triangle(s), %u picture(s) shown (+%u again while waiting for a retrace), %u copy(ies) to a texture, %u texture(s) decoded, %u shader(s), %u draw(s) skipped; backend time: draws %.1f s, copies %.1f s, %u draw(s) dropped by fast-forward",
              sGfxStats.draws, sGfxStats.tris, sGfxStats.presents, sExtraPictures, sGfxStats.texCopies, sGfxStats.textures, sGfxStats.shaders, sGfxStats.skipped,

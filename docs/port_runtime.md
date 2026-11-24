@@ -359,8 +359,15 @@ What it does:
 - **Vertices.** Decoded from the stream (or from the arrays a draw indexes), then transformed,
   lit and given their texture coordinates on the CPU from the XF registers and matrix memory:
   position and normal matrices, projection, the colour channels with their lights, the
-  texture-coordinate generators with their matrices. That is the console's transform unit; the
-  vertex shader only passes the results on.
+  texture-coordinate generators with their matrices. That is the console's transform unit.
+  Perspective draws with one set of matrices for all their vertices do this in the vertex shader
+  instead: the CPU only decodes the attributes, and the matrices, registers and lights the shader
+  needs go into a per-draw record in a buffer the shader reads (the vertex carries the record's
+  index; a record is reused while nothing changed, the lights are a block of their own). 2D
+  (orthographic) draws stay on the CPU because widescreen needs their final positions, and so do
+  draws that pick matrices per vertex (skinned meshes). `PORT_CPU_VERTS=1` puts everything back on
+  the CPU (for comparisons). Draws are queued in batches of equal state, and the batches are
+  uploaded with one Map per buffer at each frame-buffer copy or display, not one per batch.
 - **TEV.** The pixel shader is generated from the TEV registers (stage count, order, colour and
   alpha combiners with bias, scale, clamp and compare modes, constant colour selection, swap
   tables, alpha test) and cached by those registers. Register and constant colours are shader
