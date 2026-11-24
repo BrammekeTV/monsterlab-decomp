@@ -32,6 +32,7 @@ struct LabInventory {
     u8*           monsters[MAX_MONSTERS];   // 0x000
     PartInstance* parts[MAX_PARTS];         // 0x028
     Material      materials[MATERIALS];     // 0x1B8
+    s32           unk6A4;                   // 0x6A4 (the 105 material records end here)
     s32           unk6A8[4];                // 0x6A8
     s32           monsterCount;             // 0x6B8
     s32           partCount;                // 0x6BC

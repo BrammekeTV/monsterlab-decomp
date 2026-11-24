@@ -100,13 +100,13 @@ void SaveSetQuestIntBits(u8* s, s32 q, s32 which, s32 v) {
     if (q < 0 || q >= QUESTS) return;
     s32 sh = which * 2;
     QuestRecord* r = Quest(s, (u32)q);
-    r->value = (r->value & ~(3 << sh)) | (v << sh);
+    r->value = (r->value & ~PpcSlw(3, sh)) | PpcSlw(v, sh);
 }
 
 // 0x80222F58
 s32 SaveGetQuestIntBits(u8* s, s32 q, s32 which) {
     if (q < 0 || q >= QUESTS) return 0;
-    return (Quest(s, (u32)q)->value >> (which * 2)) & 3;
+    return PpcSraw(Quest(s, (u32)q)->value, which * 2) & 3;
 }
 
 // 0x80222F8C

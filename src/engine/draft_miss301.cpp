@@ -80,16 +80,14 @@ void fn_801BB374(s32 size) {
 // 0x801CC8C8
 s32 fn_801CC8C8(u8* node, s32 bit) {
     u32 flags = *(u32*)(node + 0x98);
-    u32 mask = ((u32)bit < 32u) ? (1u << bit) : 0u;
-    return (s32)((flags & mask) >> (((u32)bit < 32u) ? bit : 0));
+    return (s32)PpcSrw(flags & PpcSlw(1u, bit), bit);
 }
 
 // Bit test on the flags word at +0x1A8 of an object: returns the bit as 0 or 1.
 // 0x801CC8F4
 s32 fn_801CC8F4(u8* obj, s32 bit) {
     u32 flags = *(u32*)(obj + 0x1A8);
-    u32 mask = ((u32)bit < 32u) ? (1u << bit) : 0u;
-    return (s32)((flags & mask) >> (((u32)bit < 32u) ? bit : 0));
+    return (s32)PpcSrw(flags & PpcSlw(1u, bit), bit);
 }
 
 // Starts a new vertex batch at the current end of the temp buffer.
@@ -154,17 +152,12 @@ f32 fn_801D0354(u32 bits) {
 }
 
 // Extracts a bit field: width bits starting at bit shift, moved down to bit 0.
-// A shift of 32 or more gives 0, as the PowerPC shifts do.
+// Shift amounts use the PowerPC rules (low 6 bits, 32..63 gives 0).
 // 0x801E2380
 u32 fn_801E2380(u32 value, u32 width, u32 shift) {
-    u32 ones = (width < 32u) ? ((1u << width) - 1u) : 0xFFFFFFFFu;
-    u32 mask;
-
-    if (shift >= 32u) {
-        return 0;
-    }
-    mask = ones << shift;
-    return (value & mask) >> shift;
+    u32 mask = (PpcSlw(1u, width) - 1u);
+    mask = PpcSlw(mask, shift);
+    return PpcSrw(value & mask, shift);
 }
 
 // Type of a script table entry; 0 when the index is -1 (no entry).

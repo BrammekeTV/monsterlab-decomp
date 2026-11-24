@@ -228,7 +228,7 @@ void fn_801CE330(u8* arg0, u8* arg1) {
 
 // 0x801CE3B0
 void fn_801CE3B0(u8* arg0, s32 arg1) {
-    *(s32*)(arg0 + 0x98) = *(s32*)(arg0 + 0x98) | (s32)(1u << arg1);
+    *(s32*)(arg0 + 0x98) = *(s32*)(arg0 + 0x98) | (s32)PpcSlw(1u, arg1);
 }
 
 // 0x801CE3D0

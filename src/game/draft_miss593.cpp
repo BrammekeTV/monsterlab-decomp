@@ -53,8 +53,8 @@ void fn_801E73C8(void) {
 }
 
 // 0x8020EA20
-// Returns entry arg1 of the pointer table at lbl_80388D70 (4-byte entries).
-void* fn_8020EA20(s32 arg1) {
+// Returns entry arg1 (the second argument; the first is unused) of the pointer table at lbl_80388D70.
+void* fn_8020EA20(s32 unused, s32 arg1) {
     return *(void**)(lbl_80388D70 + arg1 * 4);
 }
 

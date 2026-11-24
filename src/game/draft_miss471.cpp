@@ -302,7 +302,7 @@ void fn_801AFA0C(u8* p, s32 del) {
 void fn_801B2FF0(u8* p, f32 a) {
     f32 cur = *(f32*)(p + 0xC);
     if (cur != a) {
-        if (*(s32*)(p + 0x10) != 0) {
+        if (*(u8*)(p + 0x10) != 0) {
             if (cur == lbl_805FFAF4) {
                 WPADControlMotor(*(s32*)(p + 0x4), 0);
                 u32 clk = OSGetBusClock();
