@@ -42,6 +42,8 @@ static ID3D11DeviceContext*    sCtx;
 static IDXGISwapChain*         sSwap;
 static ID3D11RenderTargetView* sBackRtv;
 static ID3D11Texture2D*        sEfbTex;
+static ID3D11Texture2D*        sEfbMs;          // multisampled frame buffer when MSAA is on (drawn into; sEfbTex gets the resolved picture)
+static u32                     sSamples = 1;
 static ID3D11RenderTargetView* sEfbRtv;
 static ID3D11ShaderResourceView* sEfbSrv;
 static ID3D11DepthStencilView* sEfbDsv;
@@ -1199,6 +1201,7 @@ static void CopyEfb(const PortGx* g, u32 control) {
     if (!sStarted) return;
     FlushDraws();
     sDrawBound = FALSE;
+    if (sEfbMs) sCtx->ResolveSubresource(sEfbTex, 0, sEfbMs, 0, DXGI_FORMAT_R8G8B8A8_UNORM);   // every copy reads the resolved picture
     if (sTrace) {
         static int n;
         char path[64];
@@ -1484,13 +1487,32 @@ BOOL PortGfxStart(BOOL window) {
     sDev->CreateShaderResourceView(sOutTex, NULL, &sOutSrv);
     d.Width = sEfbPw; d.Height = sEfbPh;
     sDev->CreateTexture2D(&d, NULL, &sEfbTex);
-    sDev->CreateRenderTargetView(sEfbTex, NULL, &sEfbRtv);
     sDev->CreateShaderResourceView(sEfbTex, NULL, &sEfbSrv);
+    // MSAA: draw into a multisampled copy of the frame buffer (and depth) and resolve into sEfbTex at each
+    // frame-buffer copy: the copies, the display and every read of the picture only ever see sEfbTex.
+    sSamples = (u32)std::max(gPortSettings.msaa, 0) >= 2 ? (u32)gPortSettings.msaa : 1;
+    while (sSamples > 1) {
+        UINT qc = 0, qd = 0;
+        sDev->CheckMultisampleQualityLevels(DXGI_FORMAT_R8G8B8A8_UNORM, sSamples, &qc);
+        sDev->CheckMultisampleQualityLevels(DXGI_FORMAT_D24_UNORM_S8_UINT, sSamples, &qd);
+        if (qc && qd) break;
+        sSamples /= 2;
+    }
+    if (sSamples != (u32)gPortSettings.msaa && gPortSettings.msaa) PortLog("gfx: MSAA %dx is not available on this card, using %ux", gPortSettings.msaa, sSamples);
+    d.SampleDesc.Count = sSamples;
+    if (sSamples > 1 && SUCCEEDED(sDev->CreateTexture2D(&d, NULL, &sEfbMs))) {
+        D3D11_RENDER_TARGET_VIEW_DESC rd = {}; rd.Format = d.Format; rd.ViewDimension = D3D11_RTV_DIMENSION_TEXTURE2DMS;
+        sDev->CreateRenderTargetView(sEfbMs, &rd, &sEfbRtv);
+    } else {
+        sSamples = 1; d.SampleDesc.Count = 1;
+        sDev->CreateRenderTargetView(sEfbTex, NULL, &sEfbRtv);
+    }
     d.Format = DXGI_FORMAT_D24_UNORM_S8_UINT; d.BindFlags = D3D11_BIND_DEPTH_STENCIL;
     ID3D11Texture2D* depth = NULL;
     sDev->CreateTexture2D(&d, NULL, &depth);
     sDev->CreateDepthStencilView(depth, NULL, &sEfbDsv);
     depth->Release();
+    PortLog("gfx: frame buffer %ux%u, %ux multisampled", sEfbPw, sEfbPh, sSamples);
     f32 black[4] = {0, 0, 0, 1};
     sCtx->ClearRenderTargetView(sOutRtv, black);
     sCtx->ClearRenderTargetView(sEfbRtv, black);

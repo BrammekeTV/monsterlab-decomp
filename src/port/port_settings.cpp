@@ -62,6 +62,10 @@ BOOL PortSettingsLoad(const char* path, PortSettings* s) {
             else if (!strcmp(key, "vsync")) s->vsync = atoi(val) != 0;
             else if (!strcmp(key, "fullscreen")) s->fullscreen = atoi(val) != 0;
             else if (!strcmp(key, "render_scale")) s->renderScale = Clamp(atoi(val), 50, 200);
+            else if (!strcmp(key, "msaa")) {
+                int n = atoi(val);
+                s->msaa = n >= 8 ? 8 : n >= 4 ? 4 : n >= 2 ? 2 : 0;
+            }
             else if (!strcmp(key, "fps_cap")) {
                 if (!_stricmp(val, "off")) s->fpsCap = 0;
                 else if (!_stricmp(val, "uncapped")) s->fpsCap = PORT_FPS_UNCAPPED;
@@ -101,6 +105,7 @@ BOOL PortSettingsSave(const char* path, const PortSettings* s) {
             s->width, s->height, s->wide ? "16:9" : "4:3", s->stretchUi ? 1 : 0, s->vsync ? 1 : 0, s->fullscreen ? 1 : 0);
     fprintf(f, "; internal frame buffer size, percent of the output picture (50-200); texture_filter: game, nearest, bilinear, 2x, 4x, 8x, 16x (anisotropic)\nrender_scale = %d\ntexture_filter = %s\n\n",
             s->renderScale, kPortFilterNames[s->texFilter >= 0 && s->texFilter < PORT_FILTER_COUNT ? s->texFilter : 0]);
+    fprintf(f, "; msaa: off, 2, 4 or 8 samples on the frame buffer (applies at start)\nmsaa = %d\n", s->msaa);
     char cap[16];
     snprintf(cap, sizeof(cap), "%d", s->fpsCap);
     fprintf(f, "; fps_cap: off (a picture per game frame), 30, 60, 120, 144 or any rate, display (the monitor's rate), uncapped\nfps_cap = %s\n\n",
@@ -128,18 +133,18 @@ int PortSelfTestSettings(void) {
 
     PortSettings want = {};
     want.width = 2560; want.height = 1440; want.wide = FALSE; want.stretchUi = TRUE; want.vsync = TRUE; want.fullscreen = TRUE;
-    want.volume = 37; want.mute = TRUE; want.renderScale = 150; want.texFilter = PORT_FILTER_AF8; want.fpsCap = PORT_FPS_UNCAPPED;
+    want.volume = 37; want.mute = TRUE; want.renderScale = 150; want.texFilter = PORT_FILTER_AF8; want.fpsCap = PORT_FPS_UNCAPPED; want.msaa = 4;
     strcpy(want.gamePath, "D:\\My games\\Monster Lab (disc).iso");
     gPortBindings[0].key[0] = 'K'; gPortBindings[0].key[1] = 0; gPortBindings[0].mouse = 2; gPortBindings[0].pad = 0x20100;
     PortBinding changed = gPortBindings[0];
     if (!PortSettingsSave(path, &want)) { PortLog("selftest settings: cannot write %s", path); fails++; }
     memcpy(gPortBindings, keep, sizeof(PortBinding) * count);
 
-    PortSettings got = {1920, 1080, TRUE, FALSE, FALSE, FALSE, 100, FALSE, "", 100, PORT_FILTER_GAME, 0};
+    PortSettings got = {1920, 1080, TRUE, FALSE, FALSE, FALSE, 100, FALSE, "", 100, PORT_FILTER_GAME, 0, 0};
     if (!fails && !PortSettingsLoad(path, &got)) { PortLog("selftest settings: cannot read %s", path); fails++; }
     if (!fails) {
         if (got.width != want.width || got.height != want.height || got.wide != want.wide || got.stretchUi != want.stretchUi ||
-            got.vsync != want.vsync || got.fullscreen != want.fullscreen || got.volume != want.volume || got.mute != want.mute || got.renderScale != want.renderScale || got.texFilter != want.texFilter || got.fpsCap != want.fpsCap || strcmp(got.gamePath, want.gamePath)) {
+            got.vsync != want.vsync || got.fullscreen != want.fullscreen || got.volume != want.volume || got.mute != want.mute || got.renderScale != want.renderScale || got.texFilter != want.texFilter || got.fpsCap != want.fpsCap || got.msaa != want.msaa || strcmp(got.gamePath, want.gamePath)) {
             PortLog("selftest settings: read back %dx%d wide %d stretch %d vsync %d fullscreen %d volume %d mute %d",
                     got.width, got.height, got.wide, got.stretchUi, got.vsync, got.fullscreen, got.volume, got.mute);
             fails++;
@@ -155,7 +160,7 @@ int PortSelfTestSettings(void) {
     // A missing file changes nothing, and values out of range are brought into range.
     FILE* f = fopen(path, "w");
     if (f) { fputs("[display]\nwidth = 5\nheight = 99999\nrender_scale = 900\n[audio]\nvolume = 250\n", f); fclose(f); }
-    PortSettings odd = {1920, 1080, TRUE, FALSE, FALSE, FALSE, 100, FALSE, "", 100, PORT_FILTER_GAME, 0};
+    PortSettings odd = {1920, 1080, TRUE, FALSE, FALSE, FALSE, 100, FALSE, "", 100, PORT_FILTER_GAME, 0, 0};
     PortSettingsLoad(path, &odd);
     if (odd.width != 320 || odd.height != 8192 || odd.volume != 100 || odd.renderScale != 200) { PortLog("selftest settings: out-of-range values gave %dx%d volume %d", odd.width, odd.height, odd.volume); fails++; }
     DeleteFileA(path);

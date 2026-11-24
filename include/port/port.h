@@ -135,6 +135,7 @@ typedef struct PortSettings {
     s32  renderScale;         // internal frame buffer size in percent of the output picture, 50-200 (--render-scale; applies at start)
     s32  texFilter;           // PORT_FILTER_*: how textures are sampled (--filter)
     s32  fpsCap;              // pictures per second: 0 off (one per game frame), N Hz, PORT_FPS_UNCAPPED, PORT_FPS_DISPLAY (--fps-cap)
+    s32  msaa;                // samples of the frame buffer: 0 off, 2, 4 or 8 (--msaa; applies at start)
 } PortSettings;
 extern PortSettings gPortSettings;
 // monsterlab.ini next to the exe (port_settings.cpp): display, audio and the input bindings.

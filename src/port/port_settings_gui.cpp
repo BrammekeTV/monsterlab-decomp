@@ -178,6 +178,20 @@ static void PageDisplay(void) {
     int rs = sEdit.renderScale;
     if (ImGui::SliderInt("Render scale", &rs, 50, 200, "%d%%")) sEdit.renderScale = rs;
     ImGui::TextDisabled("Size of the internal frame buffer relative to the picture: below 100%% is faster and softer, above is supersampled. Applies when the game is started again.");
+    static const int kMsaa[4] = {0, 2, 4, 8};
+    int mi = sEdit.msaa >= 8 ? 3 : sEdit.msaa >= 4 ? 2 : sEdit.msaa >= 2 ? 1 : 0;
+    char mlabel[16];
+    snprintf(mlabel, sizeof(mlabel), kMsaa[mi] ? "%dx" : "Off", kMsaa[mi]);
+    if (ImGui::BeginCombo("Anti-aliasing (MSAA)", mlabel)) {
+        for (int k = 0; k < 4; k++) {
+            snprintf(mlabel, sizeof(mlabel), kMsaa[k] ? "%dx" : "Off", kMsaa[k]);
+            if (ImGui::Selectable(mlabel, k == mi)) sEdit.msaa = kMsaa[k];
+        }
+        ImGui::EndCombo();
+    }
+    ImGui::PushTextWrapPos(0.0f);
+    ImGui::TextDisabled("Smooths the edges of 3D shapes (not cut-out textures such as grass). Costs speed; the graphics card may offer fewer samples than chosen. Applies when the game is started again.");
+    ImGui::PopTextWrapPos();
     static const char* const kFilter[PORT_FILTER_COUNT] = {"Game's own", "Nearest (sharp pixels)", "Bilinear (smooth, mip-mapped)",
                                                            "Anisotropic 2x", "Anisotropic 4x", "Anisotropic 8x", "Anisotropic 16x"};
     if (ImGui::BeginCombo("Texture filtering", kFilter[sEdit.texFilter])) {
