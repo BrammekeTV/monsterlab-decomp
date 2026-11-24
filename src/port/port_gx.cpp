@@ -148,7 +148,7 @@ static void Fail(const char* what, u32 op, const u8* at, const u8* start) {
 }
 
 static void XfWrite(PortGx* g, u32 addr, u32 value) {
-    if (addr < 0x800) { memcpy(&g->xfMem[addr], &value, 4); return; }      // matrices and lights: raw float bits
+    if (addr < 0x800) { memcpy(&g->xfMem[addr], &value, 4); if (addr >= 0x600 && addr < 0x680) g->xfLightGen++; return; }   // matrices and lights: raw float bits
     if (addr >= 0x1000 && addr < 0x1058) g->xf[addr - 0x1000] = value;
 }
 
@@ -160,6 +160,7 @@ static void BpWrite(PortGx* g, u32 word) {
     if (reg == 0xFE) { g->bpMask = value; return; }
     value = (g->bp[reg] & ~mask) | (value & mask);
     g->bp[reg] = value;
+    g->bpGen++;
     if (reg >= 0xE0 && reg < 0xE8) {                        // TEV colour register or constant colour
         s16 (*dst)[4] = (value & 0x800000) ? g->tevKonst : g->tevReg;
         u32 i = (reg - 0xE0) >> 1;

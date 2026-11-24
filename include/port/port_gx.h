@@ -14,6 +14,8 @@ typedef struct PortGx {
     // registers (previous, 0, 1, 2) and the four constant colours. r, g, b, a; 11-bit signed.
     s16 tevReg[4][4];
     s16 tevKonst[4][4];
+    u32 bpGen;            // counts BP register writes (the renderer keeps what it made of them while it does not move)
+    u32 xfLightGen;       // counts writes to the lights (XF memory 0x600-0x67F); the renderer rebuilds what it keeps of them when it moves
 } PortGx;
 extern PortGx gPortGxRegs;
 
