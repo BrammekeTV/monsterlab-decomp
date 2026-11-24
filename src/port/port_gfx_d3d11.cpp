@@ -1197,10 +1197,22 @@ f32 PortGfxDisplayFps(void) {
     if (dt * 2 >= Ticks_freq()) { rate = (f32)(sShownCount - n0) * (f32)Ticks_freq() / (f32)dt; t0 = now; n0 = sShownCount; }
     return rate;
 }
+static char sCapPrefix[400];
+static BOOL sCapBack;
 static void PresentOut(BOOL fast) {
     sShownCount++;
     Blit(sOutSrv, sBackRtv, 0, 0, sOutW, sOutH, 0, 0, 1, 1);
     if (!gPortOptions.screenshotStats) PortOverlayDraw(sBackRtv, sOutW, sOutH);
+    if (sCapBack && sSwap) {                                // F12: the back buffer as it is about to be shown
+        sCapBack = FALSE;
+        ID3D11Texture2D* bb = NULL;
+        if (SUCCEEDED(sSwap->GetBuffer(0, __uuidof(ID3D11Texture2D), (void**)&bb)) && bb) {
+            char p[420];
+            snprintf(p, sizeof(p), "%s_backbuffer.png", sCapPrefix);
+            SavePng(bb, sOutW, sOutH, p);
+            bb->Release();
+        }
+    }
     s32 cap = gPortSettings.fpsCap;
     BOOL sync = cap == 0 ? gPortSettings.vsync != 0 : cap == PORT_FPS_DISPLAY;
     if (sSwap) sSwap->Present(sync && !fast ? 1 : 0, 0);
@@ -1286,6 +1298,7 @@ static void CopyEfb(const PortGx* g, u32 control) {
         PortFrameStats stats;
         FrameStats(&stats);
         PortOverlayFrame(&stats);
+        PortCaptureFrame();
         if (gPortOptions.screenshotStats) PortOverlayDraw(sOutRtv, sOutW, sOutH);
         // Fast-forward: the window gets a picture only four times a second, with the progress in the title bar.
         BOOL fast = PortFastActive();
@@ -1470,6 +1483,18 @@ BOOL PortGfxSaveTexture(ID3D11Device* dev, ID3D11DeviceContext* ctx, ID3D11Textu
     BOOL ok = SavePng(tex, w, h, path);
     sDev = keepDev; sCtx = keepCtx;
     return ok;
+}
+
+// F12 capture (port_capture.cpp): the frame buffer and the output picture now, the back buffer at the next present.
+BOOL PortGfxCapture(const char* prefix) {
+    if (!sStarted || !sShown) return FALSE;
+    char p[420];
+    snprintf(p, sizeof(p), "%s_efb.png", prefix);
+    SavePng(sEfbTex, sEfbPw, sEfbPh, p);
+    snprintf(p, sizeof(p), "%s_picture.png", prefix);
+    SavePng(sOutTex, sOutW, sOutH, p);
+    if (sSwap) { snprintf(sCapPrefix, sizeof(sCapPrefix), "%s", prefix); sCapBack = TRUE; }
+    return TRUE;
 }
 
 BOOL PortGfxSaveScreenshot(const char* path) {
