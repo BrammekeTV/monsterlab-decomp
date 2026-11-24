@@ -2462,6 +2462,8 @@ static const SirField kUiGridFields[] = {
 // (fn_8018E8D8); what the nodes of the other three point at is not typed yet. +0x40..+0x60 is the
 // stack of screens, which the game fills.
 static const SirField kUiSetFields[] = {
+    { 0x00, SIR_U32, 1 },     // code: the set's name hash (ShowSelectionHUD and SetPartSelected compare it with "UI_MSA_Combat_HUD",
+                              //       GameSessionUpdate with "UI_MSA_Loading")
     { 0x04, SIR_U32, 1 },     // code: the set's zone (fn_80198438)
     { 0x08, SIR_U32, 2 },     // code: draw list: capacity and count (fn_80199CE8, fn_801985BC),
     { 0x10, SIR_PTR, 1 },     //       and its entries, which the game writes (fn_8019B860)

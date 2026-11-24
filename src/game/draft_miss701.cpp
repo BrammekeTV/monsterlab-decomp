@@ -293,8 +293,7 @@ void fn_800403E4(u8* p) {
         ShowSelectionHUD();
         return;
     }
-    fn_80040550(); /* r3 (p) is unused by the callee */
-    fn_8004012C(0); // asm passes fn_80040550's leftover r3 (stale register)
+    fn_8004012C(fn_80040550());   // the stick's direction picks the part (asm: r3 goes from one call to the next)
     if (fn_8018DEE0((u8*)gScreenSets) == 0) {
         ScreenSetsActivate(gScreenSets, 0x7A1060A7);
     }
