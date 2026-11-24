@@ -99,6 +99,11 @@
  "changelog": [
   {
    "date": "2026-11-24",
+   "time": "16:53",
+   "text": "Your monster appears on the village map on Windows (PR #180): it stands on the map spot and walks to the next one. The level's table of monster parts was still in the Wii's byte order, so the game couldn't build the monster."
+  },
+  {
+   "date": "2026-11-24",
    "time": "16:50",
    "text": "New F12 capture key on Windows (PR #179): it saves the decoded movie frame, the game's internal picture and the final window picture, plus the current settings, into a captures folder next to the game. It's for tracking down picture problems that only show on some setups."
   },
