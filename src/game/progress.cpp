@@ -48,7 +48,7 @@ struct SaveProgress {
     u32    fieldRepairRecord;       // 0x9DC
 };
 
-extern "C" void NoticePosted(SaveProgress* s);   // 0x8022DF3C
+extern "C" void NoticePosted(u8* p, s32 idx);    // 0x8022DF3C (idx: the entry just queued)
 extern SaveProgress* gSaveSystem;                // 0x805FBBE0
 
 static inline u8* Db(void) { return gGameDb->data; }
@@ -62,7 +62,7 @@ static void PushNotice(SaveProgress* s, s32 type, s32 value) {
     n->unk14 = -1;
     n->seq = ++s->noticeSeq;
     s->noticeCount++;
-    NoticePosted(s);
+    NoticePosted((u8*)s, s->noticeCount - 1);
 }
 
 // Add MSP (experience) to a save and post a notice for every rank gained.
@@ -231,7 +231,7 @@ static void PostNotice6(SaveProgress* s, s32 type, s32 a, s32 b) {
     n->unk14 = -1;
     n->seq = ++s->noticeSeq;
     s->noticeCount++;
-    NoticePosted(s);
+    NoticePosted((u8*)s, s->noticeCount - 1);
 }
 
 // Reward record (0x3C bytes): +0x18 MSP, +0x1C key ingredient, +0x24 secondary ingredient,
