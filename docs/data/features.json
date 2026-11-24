@@ -99,6 +99,11 @@
  "changelog": [
   {
    "date": "2026-11-24",
+   "time": "05:11",
+   "text": "The projector machine on the main menu now wakes up (PR #139): its data, animations, size and angles are converted to PC byte order, and objects in general now get their real size instead of almost zero. It doesn't show on screen yet; finding where it's drawn is next."
+  },
+  {
+   "date": "2026-11-24",
    "time": "04:42",
    "text": "Mod support for the Windows version (PR #138, which includes the work of #135 and #137). Put a mod in mods/<name>/ next to the game to replace any file from the disc. PNG images can replace game textures, and --dump-textures exports the originals from your own disc to start from. The settings screen has a Mods page to turn mods on and off and set their order. docs/modding.md has a worked example. Separately, 4 more mistakes in our decompiled code were fixed after checking the remaining game functions against the original (PR #136)."
   },
