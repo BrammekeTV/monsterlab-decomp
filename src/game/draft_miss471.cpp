@@ -8,7 +8,7 @@ void  CatchMinigame_UpdateLane(void* g, void* lane, BOOL active, f32 dt);      /
 void  OSReport(const char* fmt, ...);
 u32   OSGetBusClock(void);                                                     // reads 0x800000F8
 void  OSSetAlarm(void* alarm, s64 tick, void (*handler)(void));
-void  fn_801B2E10(void);                                                       // alarm handler (0x801B2E10)
+void  fn_801B2E10(u8* alarm, void* context);                                                       // alarm handler (0x801B2E10)
 u64   fn_8032FB38(u32 clk, f32 secs);                                          // 0x8032FB38
 u32   RandomU32(void);
 s32   TriggerDoAction(void* action, void* a1, void* a2);
@@ -307,7 +307,7 @@ void fn_801B2FF0(u8* p, f32 a) {
                 WPADControlMotor(*(s32*)(p + 0x4), 0);
                 u32 clk = OSGetBusClock();
                 u64 tick = fn_8032FB38(clk, a * (f32)(clk >> 2));
-                OSSetAlarm(p + 0x18, tick, fn_801B2E10);
+                OSSetAlarm(p + 0x18, tick, (void (*)(void))fn_801B2E10);
             } else if (a == lbl_805FFAF4) {
                 fn_80234418(p + 0x18);
                 WPADControlMotor(*(s32*)(p + 0x4), 1);

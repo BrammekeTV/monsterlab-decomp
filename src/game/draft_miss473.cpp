@@ -24,7 +24,7 @@ s32 fn_8019CE58(u8* p, void* arg);                          // 0x8019CE58 (alarm
 void  fn_801B5D94(u8* obj, u8* event);
 void  fn_801B7020(u8* p);
 void* fn_801B7198(void* anim, s32 a);
-u8*   fn_80234848(void);                          // 0x80234848
+u8*   fn_80234848(u8* alarm);                     // 0x80234848 OSGetAlarmUserData
 u64   fn_8032FB38(u32 clock, f32 scale);          // 0x8032FB38
 void  OSSetAlarm(void* alarm, u64 tick, void (*handler)(void));
 extern const f32 lbl_803460C8[];
@@ -281,8 +281,8 @@ void fn_8011A5FC(u8* arg0, s32 arg1) {
 // 0x801B2E10
 // Controller rumble alarm: toggles the motor state byte at +0x48, drives WPADControlMotor and
 // re-arms its alarm (at +0x18) with a period from the bus clock.
-void fn_801B2E10(void) {
-    u8* p = fn_80234848();
+void fn_801B2E10(u8* alarm, void* context) {   // r3 = the alarm (OSAlarmHandler)
+    u8* p = fn_80234848(alarm);
     f32 scale;
     if (*(u8*)(p + 0x48) != 0) {
         WPADControlMotor(*(s32*)(p + 0x4), 0);
@@ -295,7 +295,7 @@ void fn_801B2E10(void) {
     }
     u32 clock = *(u32*)0x800000F8;
     u64 tick = fn_8032FB38(clock, scale * (f32)(clock >> 2));
-    OSSetAlarm(p + 0x18, tick, fn_801B2E10);   // r4 is only EABI padding for the 64-bit tick
+    OSSetAlarm(p + 0x18, tick, (void (*)(void))fn_801B2E10);   // r4 is only EABI padding for the 64-bit tick
 }
 
 // 0x801D90A0

@@ -508,6 +508,8 @@ static PortAlarm* FindAlarm(u8* alarm, BOOL create) {
 
 // OSSetAlarmUserData / the SDK keeps it at +0x28 of the alarm, where the game's handlers read it.
 void fn_80234840(u8* alarm, u8* data) { *(u8**)(alarm + 0x28) = data; }
+// OSGetAlarmUserData (0x80234848: lwz r3,0x28(r3)).
+u8* fn_80234848(u8* alarm) { return *(u8**)(alarm + 0x28); }
 
 void OSCreateAlarm(u8* alarm) {
     PortAlarm* a = FindAlarm(alarm, TRUE);
