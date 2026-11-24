@@ -143,14 +143,14 @@ extern "C" u8* fn_800567A4(u8* p, s32 del) {
 }
 
 // 0x80056834
-// Returns 1 when flag 0x200 at obj+0x1B0 is set and the value at obj+0x1C0 is greater
-// than lbl_805FD300 (NaN counts as greater), else 0.
+// Returns 1 when flag 0x200 at obj+0x1B0 is set and the value at obj+0x1C0 is at most
+// lbl_805FD300 (fcmpo, cror eq = lt|eq, bne skips the "1"), else 0.
 extern "C" BOOL fn_80056834(u8* obj) {
     s32 result = 0;
     u32 flags = *(u32*)(obj + 0x1B0);
     if ((flags & 0x200) != 0) {
         f32 v = *(f32*)(obj + 0x1C0);
-        if (!(v <= lbl_805FD300)) result = 1;
+        if (v <= lbl_805FD300) result = 1;
     }
     return result;
 }

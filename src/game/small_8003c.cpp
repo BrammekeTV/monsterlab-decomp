@@ -12,6 +12,7 @@ extern f32  lbl_805FCF44;            // 0x805FCF44 (float constant)
 extern f32  lbl_805FCF80;            // 0x805FCF80 (float constant)
 extern f32  lbl_805FD070;            // 0x805FD070 (float constant)
 extern f32  lbl_805FD074;            // 0x805FD074 (float constant)
+extern f32  lbl_805FD088;            // 0x805FD088 (float constant)
 extern f32  lbl_805FD07C;            // 0x805FD07C (float constant)
 extern f32  lbl_805FD080;            // 0x805FD080 (float constant)
 extern f32  lbl_805FD084;            // 0x805FD084 (float constant)
@@ -233,13 +234,14 @@ extern "C" void fn_8003CA78(u8* p) {
 
 // 0x8003CD7C
 // Initialises the state block at r3: clears the flags, sets the float fields to their constants and
-// the state word at +0x1C to 1. (Floats at +0x20/+0x24 are written twice in the original; the final values are kept.)
+// the state word at +0x1C to 1. (Floats at +0x20/+0x24/+0x30 are written twice in the original; the final values are kept:
+// +0x30 first gets lbl_805FD074, then lbl_805FD088.)
 void fn_8003CD7C(u8* p) {
     *(f32*)(p + 0x4) = lbl_805FD070;
     *(f32*)(p + 0x20) = lbl_805FD080;
     *(f32*)(p + 0x24) = lbl_805FD084;
     *(f32*)(p + 0x28) = lbl_805FD07C;
-    *(f32*)(p + 0x30) = lbl_805FD074;
+    *(f32*)(p + 0x30) = lbl_805FD088;
     *(u8*)(p + 0x0) = 0;
     *(s32*)(p + 0x18) = 0;
     *(s32*)(p + 0x1C) = 1;
