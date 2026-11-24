@@ -75,7 +75,7 @@ extern "C" {
 // offset. Writes the bounding quad of the last segment into lbl_80413390 and returns it.
 // The scale is the last parameter here, as in the function-pointer type its caller uses
 // (FnSpawn in draft_miss664.cpp: fn_8019578C calls this through slot 0x8 of the font object).
-f32* fn_801971F0(u8* ctx, u8* text, u32 width, u32* colors, s32 count, s32 mode, s32 vmode,
+f32* UIRfFont_DrawText(u8* ctx, u8* text, u32 width, u32* colors, s32 count, s32 mode, s32 vmode,
                  f32 scale) {
     if (lbl_805FB668 == 0) {
         for (int i = 0; i < 12; i++) lbl_80413390[i] = 0.0f;
