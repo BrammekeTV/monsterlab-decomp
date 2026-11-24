@@ -1018,7 +1018,12 @@ struct PortBoot {
                     if (*v == ',') v++;
                 }
             }
-            else if (!strcmp(a, "--capture-at") && i + 1 < __argc) gPortOptions.captureAt = atoi(__argv[++i]);
+            else if (!strcmp(a, "--capture-at") && i + 1 < __argc) {   // N, or FROM-TO/N for a series
+                int from = 0, to = 0, every = 0;
+                int got = sscanf(__argv[++i], "%d-%d/%d", &from, &to, &every);
+                gPortOptions.captureAt = from;
+                if (got == 3 && every > 0) { gPortOptions.captureTo = to; gPortOptions.captureEvery = every; }
+            }
             else if (!strcmp(a, "--stats")) gPortOverlayOn = TRUE;
             else if (!strcmp(a, "--mods") && i + 1 < __argc) PortModsSetDir(__argv[++i]);
             else if (!strcmp(a, "--no-mods")) noMods = TRUE;

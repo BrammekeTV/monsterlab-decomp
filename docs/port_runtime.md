@@ -35,7 +35,7 @@ build\pc\monsterlab.exe                        # runs main() with your own disc 
 | `--shot-at F,F,...` | also write `FILE_<F>.png` (from `--screenshot FILE`) at each of these frames, up to 64: one headless run gives a whole sequence |
 | `--stats` | start with the stats overlay on (top-right; F3 turns it on and off in the window): frames per second, frame time split into game, render and wait, draw calls, GX vertices, frame-buffer copies, textures, audio voices, output size |
 | `--screenshot-stats` | draw the stats overlay into the `--screenshot` picture too (it is left out otherwise) |
-| `--capture-at N` | take the F12 capture at game frame N (headless tests; needs `--screenshot FILE` or `--window` so the renderer runs) |
+| `--capture-at N` | take the F12 capture at game frame N (headless tests; needs `--screenshot FILE` or `--window` so the renderer runs). `--capture-at FROM-TO/N` takes one every N frames from FROM to TO |
 | F12 (in the window) | **capture** for picture problems that show on one machine: into `captures/` next to the exe, with a timestamped name: `capture_<stamp>_movie.png` (the decoded frame of the movie on show, BT.601 studio range, before any upload or draw), `_efb.png` (the frame buffer at the render resolution), `_picture.png` (the output picture), `_backbuffer.png` (the window's back buffer as presented, with the overlay) and `_settings.txt` (every setting, the window's client size, window size, DPI and monitor). Send the folder when reporting a rendering problem. Never commit captures (`captures/` is in `.gitignore`). `port_capture.cpp` |
 | `PORT_NO_MOVIE_TARGET=1` (environment) | draw Bink movie frames straight into the frame buffer instead of through their own 640x480 target (to compare: at some output sizes thin vertical lines appear there, where a pixel centre lies on a block edge of the movie's tiling undo) |
 | `--settings [display\|audio\|controls\|game\|mods]` | open the settings screen at the start (F1 or Esc opens and closes it in the window); with `--screenshot-stats` it is drawn into the screenshot |
@@ -61,7 +61,10 @@ that header's address finds the writer);
 `PORT_SCRIPT_TRACE=1` in the environment logs every call the script engine makes to a registered
 script function, by name; `PORT_STATE_LOG=1` prints a line whenever the game mode, the session state, the world's
 load fields, the zone queue or the combat part zones change (what a "Loading" screen that stays is waiting
-for); `PORT_GFX_TRACE=1` logs draws and copies.
+for); `PORT_GFX_TRACE=1` logs draws and copies; `PORT_SOUND_LOG=1` logs every sound request (`PlaySound` by
+group hash, `PlaySoundAt` by sound object, voice records as `record`) with the frame, whether it was found, the sample
+name and zone, and the audio slot it started or why it did not (`port_sound_log.cpp`); add `PORT_AUDIO_TRACE=1` to see
+the mixer's voice starts after each one.
 
 The run ends with a boot summary: what was reached and when, disc files opened, SDK calls that
 do nothing yet, and the stop reason. Exit codes: 0 frame limit or the game asked to exit,
@@ -361,13 +364,16 @@ What it does:
   lit and given their texture coordinates on the CPU from the XF registers and matrix memory:
   position and normal matrices, projection, the colour channels with their lights, the
   texture-coordinate generators with their matrices. That is the console's transform unit.
-  Perspective draws with one set of matrices for all their vertices do this in the vertex shader
-  instead: the CPU only decodes the attributes, and the matrices, registers and lights the shader
-  needs go into a per-draw record in a buffer the shader reads (the vertex carries the record's
-  index; a record is reused while nothing changed, the lights are a block of their own). 2D
-  (orthographic) draws stay on the CPU because widescreen needs their final positions, and so do
-  draws that pick matrices per vertex (skinned meshes). `PORT_CPU_VERTS=1` puts everything back on
-  the CPU (for comparisons). Draws are queued in batches of equal state, and the batches are
+  Draws do this in the vertex shader instead: the CPU only decodes the attributes (with a decoder
+  picked per format, component count and byte order), and the matrices, registers and lights the
+  shader needs go into a per-draw record in a buffer the shader reads (the vertex carries the
+  record's index; a record is reused while no XF register or memory was written, the lights are a
+  block of their own). Draws that pick a position matrix per vertex (skinned meshes) or a texture
+  matrix per vertex (texgens 0-2) get a matrix block with all position, texture and normal
+  matrices, and the vertex carries the indices. 2D (orthographic) draws are drawn the same way; for
+  the widescreen and movie decisions the CPU works out only where their positions land. A draw with
+  a texture matrix per vertex for texgen 3-7 would stay on the CPU. `PORT_CPU_VERTS=1` puts
+  everything back on the CPU (for comparisons). Draws are queued in batches of equal state, and the batches are
   uploaded with one Map per buffer at each frame-buffer copy or display, not one per batch.
 - **TEV.** The pixel shader is generated from the TEV registers (stage count, order, colour and
   alpha combiners with bias, scale, clamp and compare modes, constant colour selection, swap
