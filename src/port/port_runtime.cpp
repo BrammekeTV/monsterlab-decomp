@@ -19,6 +19,7 @@
 #include "port/port_overlay.h"
 extern "C" { s32 SaveManager_SelectFirstEmptySlot(void); void SaveManager_ResetCurrentData(void); void SaveManager_SaveData(void); u32 SaveManager_CanLoadGame(void); }
 extern u8* lbl_805FBBE0;
+extern "C++" void* gScreenSets;
 extern "C" void fn_8022E3D8(void* save, const unsigned char* name);   // src/game/draft_miss37.cpp, draft_miss46.cpp
 
 // This file's start-up object must be built before every other static object: game code may
@@ -209,6 +210,10 @@ void PortFrameDone(void) {
         fn_8022E3D8(lbl_805FBBE0, (const unsigned char*)"Player");   // the name is what marks the slot as used
         SaveManager_SaveData();
         PortLog("profile: can load %u", (unsigned)SaveManager_CanLoadGame());
+    }
+    if (getenv("PORT_CURSOR_LOG") && sFrames == 3500) {   // where the game put its cursor widget (screen units, 640 x 480)
+        u8* cur = *(u8**)((u8*)gScreenSets + 0x7C);
+        if (cur) PortLog("cursor: %.1f %.1f", *(f32*)(cur + 0x68), *(f32*)(cur + 0x6C));
     }
     if (!gPortOptions.fastAll && sFrames >= gPortOptions.fastForward) PortFastEnd();
     if (gPortOptions.frameLimit && sFrames >= gPortOptions.frameLimit) {
