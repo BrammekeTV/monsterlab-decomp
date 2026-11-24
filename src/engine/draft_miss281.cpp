@@ -6,10 +6,10 @@ char* fn_80338BC0(char* s, const char* sub);                    // 0x80338BC0 (s
 u32   strlen(const char* s);
 s32   WPADControlSpeaker(s32 chan, s32 a, void* cb);                   // 0x802737A8
 s32   fn_801F2118(u8* task, f32 dt);                                   // 0x801F2118
-s32   fn_8025E014(void);                                        // 0x8025E014
-s32   fn_8025D7D0(void);                                        // 0x8025D7D0
-s32   fn_8025F284(void);                                        // 0x8025F284
-s32   fn_8025E7F8(void);                                        // 0x8025E7F8
+void  fn_8025E014(void* data, u8* ctx);                         // 0x8025E014
+void  fn_8025D7D0(void* data, u8* ctx);                         // 0x8025D7D0
+void  fn_8025F284(void* data, u8* ctx);                         // 0x8025F284
+void  fn_8025E7F8(void* data, u8* ctx);                         // 0x8025E7F8
 
 extern u8   lbl_80348F38[];     // 0x80348F38 (dispatch table)
 extern u8   lbl_8051E680[];     // 0x8051E680 (0x28-byte records)
@@ -91,19 +91,23 @@ s32 fn_801F2018(u8* task, f32 dt) {
 }
 
 // 0x801FCD9C
-s32 fn_801FCD9C(void) {
+// Aux bus callback of the delay effect (AX passes the three bus buffers and the effect record).
+void fn_801FCD9C(void* data, u8* ctx) {
     if (lbl_805FBA9C == 2) {
-        return fn_8025E014();
+        fn_8025E014(data, ctx);
+        return;
     }
-    return fn_8025D7D0();
+    fn_8025D7D0(data, ctx);
 }
 
 // 0x801FCDCC
-s32 fn_801FCDCC(void) {
+// Aux bus callback of the chorus effect.
+void fn_801FCDCC(void* data, u8* ctx) {
     if (lbl_805FBA9C == 2) {
-        return fn_8025F284();
+        fn_8025F284(data, ctx);
+        return;
     }
-    return fn_8025E7F8();
+    fn_8025E7F8(data, ctx);
 }
 
 // 0x80202E24
