@@ -99,6 +99,11 @@
  "changelog": [
   {
    "date": "2026-11-24",
+   "time": "01:21",
+   "text": "Frame-rate settings on Windows (PR #129): a frame-rate cap, your display's own rate, or uncapped, in the settings screen and monsterlab.ini. The game logic keeps its normal speed; only drawing goes faster."
+  },
+  {
+   "date": "2026-11-24",
    "time": "01:19",
    "text": "Checked about 165 larger engine functions (rendering, effects, animation, the UI engine, sound) against the original game code and fixed 5 mistakes in our decompiled code (PR #131). Audited functions are listed in docs/audit_log.txt."
   },
