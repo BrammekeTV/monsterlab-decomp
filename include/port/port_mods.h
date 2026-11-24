@@ -1,6 +1,7 @@
 // PC port: mods (port_mods.cpp, docs/modding.md). A mod is a folder mods/<name>/ next to the exe:
 //   mods/<name>/files/<disc path>    replaces that file of the disc (for a disc image and an extracted folder alike)
 //   mods/<name>/textures/..._<16 hex digits>.png   replaces the game texture with that content hash
+//   mods/<name>/data/strings.json                   changes entries of the game's text table (port_moddata.cpp)
 //   mods/<name>/textures/<texture name>.png         replaces the game texture of that name in the game's data (wins over a hash)
 // The list and its order are kept in monsterlab.ini, [mods]: one "name = 1" (on) or "name = 0" (off)
 // line per mod. Where two mods hold the same file, the one later in the list wins.
@@ -55,6 +56,14 @@ u32  PortModsDumpCount(void);
 // ---- PNG (port_png.cpp): RGBA8, red in the low byte ----
 BOOL PortPngWrite(const char* path, const u32* rgba, u32 w, u32 h);
 u32* PortPngRead(const char* path, u32* w, u32* h, const char** why);   // malloc; NULL and the reason
+
+// ---- data (port_moddata.cpp) ----
+// Called when global_binary.sir is converted (hdr: its converted header block). With --dump-data DIR it writes the
+// original text table as DIR\strings.json and exits; otherwise each enabled mod's data/strings.json changes strings.
+void PortModsApplyData(u8* globalHdr);
+// Applies one strings.json (text) to a table of `count` string pointers: the number of strings changed, or -1 with the
+// reason (line and column) in err and nothing changed.
+int  PortModsApplyStrings(const char* json, const char** strings, u32 count, char* err, u32 errSize);
 
 int  PortSelfTestMods(void);
 

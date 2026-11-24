@@ -404,6 +404,20 @@ int PortSelfTestMods(void) {
         for (const char* f : kTexFiles) { snprintf(path, sizeof(path), "%s\\%s", base, f); DeleteFileA(path); }
         for (int i = 2; i >= 0; i--) { snprintf(path, sizeof(path), "%s%s", base, kTexDirs[i]); RemoveDirectoryA(path); }
     }
+    // Text table: a JSON file changes strings; a mistake is reported with its place and changes nothing.
+    {
+        const char* table[4] = {"a", "b", "c", "d"};
+        char err[256];
+        int n = PortModsApplyStrings("{\"format\": 1, \"strings\": {\"1\": \"B\\u00E9\\n\", \"3\": \"D\\u00E9\"}}", table, 4, err, sizeof(err));
+        MOD_CHECK(n == 2 && !strcmp(table[0], "a") && !strcmp(table[1], "B\xE9\n") && !strcmp(table[3], "D\xE9"), "strings.json was not applied (%d, %s)", n, err);
+        MOD_CHECK(PortModsApplyStrings("{\"strings\": {\"0\": \"x\",\n \"4\": \"y\"}}", table, 4, err, sizeof(err)) < 0 && strstr(err, "line 2") && strstr(err, "does not exist") && !strcmp(table[0], "a"),
+                  "a string number out of range was accepted or not placed (%s)", err);
+        MOD_CHECK(PortModsApplyStrings("{\"strings\": {\"0\": \"\\u0416\"}}", table, 4, err, sizeof(err)) < 0 && strstr(err, "U+0416"), "a character outside U+00FF was accepted (%s)", err);
+        MOD_CHECK(PortModsApplyStrings("{\"strings\": {\"0\": \"x\"", table, 4, err, sizeof(err)) < 0, "a file that stops early was accepted");
+        MOD_CHECK(PortModsApplyStrings("{\"strngs\": {}}", table, 4, err, sizeof(err)) < 0 && strstr(err, "unknown key"), "an unknown key was accepted (%s)", err);
+        MOD_CHECK(PortModsApplyStrings("{\"strings\": {\"zero\": \"x\"}}", table, 4, err, sizeof(err)) < 0, "a string number that is no number was accepted");
+        MOD_CHECK(!strcmp(table[0], "a") && !strcmp(table[2], "c"), "a broken file changed a string");
+    }
 #undef MOD_CHECK
     for (const char* f : kFiles) { snprintf(path, sizeof(path), "%s\\%s", base, f); DeleteFileA(path); }
     for (int i = (int)(sizeof(kDirs) / sizeof(kDirs[0])) - 1; i >= 0; i--) { snprintf(path, sizeof(path), "%s%s", base, kDirs[i]); RemoveDirectoryA(path); }
@@ -412,7 +426,7 @@ int PortSelfTestMods(void) {
     strcpy(sDir, keepDir);
     gPortOptions.noMods = keepOff;
     PortModsRefreshTextures();
-    if (!fails) PortLog("selftest mods: ok (file lookup, order, moving, switched off, PNG textures)");
+    if (!fails) PortLog("selftest mods: ok (file lookup, order, moving, switched off, PNG textures, text table)");
     return fails;
 }
 #endif

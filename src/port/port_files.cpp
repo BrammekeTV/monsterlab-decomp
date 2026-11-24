@@ -9,6 +9,7 @@
 
 #include "port/port.h"
 #include "port/sir_loader.h"
+#include "port/port_mods.h"
 
 // A copy of the catalog's two tables (the game's buffer is reused for the next file).
 static SirCatalogEntry* sEntries;
@@ -213,6 +214,7 @@ static void ConvertSection(const char* name, const SirCatalogFile* file, const S
             SirRelocInit(&reloc, NULL, NULL);
             SirError err = GlobalBinaryConvert(&reloc, sGlobalHdr, dst, e->size, &failTable);
             if (err != SIR_OK) PortStop(8, "global_binary.sir: %s (table %d)", SirErrorText(err), failTable);
+            PortModsApplyData(sGlobalHdr);
             sConverted++;
             static char line[128];   // the milestone list keeps the pointer
             snprintf(line, sizeof(line), "global_binary.sir converted: %u pointers, %u fields", reloc.ptrImage, reloc.fieldsSwapped);

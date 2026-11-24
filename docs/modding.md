@@ -11,6 +11,8 @@ mods\
     files\                  replaces files of the disc, by their disc path
       catalog.sir
       streams\...
+    data\                   JSON that changes game data (the text table)
+      strings.json
     textures\               PNG pictures that replace game textures
       sky_4962D17B32AB899E.png
 ```
@@ -68,6 +70,42 @@ Rules for a replacement:
 With `--verbose` the log says `mods: texture <hash> comes from <mod>` the first time a replacement is
 used. A replacement found by name is logged as `mods: texture <name> (<hash>) comes from <mod> by name`. A PNG that cannot be read is reported and the game's own texture is drawn.
 
+## Changing the game's text with JSON
+
+`mods\<mod name>\data\strings.json` changes entries of the game's text table (4,274 strings: menu and
+HUD text, part and monster names, descriptions). The game reads a string by its number, so a file lists the
+numbers it changes:
+
+```json
+{
+  "strings": {
+    "1552": "Start Game",
+    "1404": "Resume"
+  }
+}
+```
+
+Get the original text from your own disc (this writes one file and exits; it is the game's own text, do not
+share it and never commit it):
+
+```
+monsterlab.exe --dump-data C:\MonsterLabData
+```
+
+`C:\MonsterLabData\strings.json` has the form above with every string (`"format": 1`, `"table": "strings"`,
+`"count"` and `"strings"`). Keep only the lines you change in your mod's file, or copy the whole file; both work.
+
+Rules, checked when the game loads `global_binary.sir`:
+
+- Keys are string numbers in quotes, `0` to `count - 1`; values are text. Standard JSON escapes work
+  (`\n`, `\"`, `\u00E9`). The text is single-byte: characters up to U+00FF only, as the game's font has them.
+  Special codes of the game stay as they are in the dump (for example `$newline`).
+- Unknown keys, a string number that does not exist, a character above U+00FF or a syntax error make the
+  **whole file ignored**, with a message that names the file, the line and the column:
+  `mods: MyMod: ...\strings.json: line 3, column 5: string 99999 does not exist (the game has 4274: 0-4273); the file is ignored`.
+- With several mods the later one in the load order wins per string.
+- The text is read when the game starts: restart after a change.
+
 ## Load order, switching mods on and off
 
 `monsterlab.ini` keeps the list:
@@ -100,6 +138,7 @@ at once.
 |---|---|
 | `--mods DIR` | use `DIR` as the mods folder instead of `mods` next to the exe |
 | `--no-mods` | run without mods |
+| `--dump-data DIR` | write the game's text table to `DIR\strings.json` and exit (from your own disc) |
 | `--dump-textures DIR` | write every texture the game draws with to `DIR` as a PNG named by its name (where known) and hash |
 | `--verbose` | lists, at the start, every file each mod replaces and which mod wins where two have the same file; logs `mods: <file> comes from <mod>` each time the game opens a replaced file |
 
@@ -137,8 +176,15 @@ at once.
 
 5. Open the settings screen (F1), page Mods, and untick RedSky: the sky is the game's own again.
 
-`python tools/mod_test.py` does the same steps by itself in a temporary folder (dump, tint one texture
-red, run, compare the screenshots); it is the test for this feature.
+## Worked example: rename the menu
+
+1. `monsterlab.exe --dump-data C:\MonsterLabData`, then look up the menu words in `strings.json`: `"1552": "New Game"`.
+2. Make `mods\Words\data\strings.json` with just `{"strings": {"1552": "New Monster"}}`.
+3. Start the game with `--verbose`: `mods: Words changes 1 string (data/strings.json)`. The main menu says
+   "New Monster".
+
+`python tools/mod_test.py` does these steps by itself in a temporary folder (dump, tint one texture red, run,
+compare the screenshots; the same by name; dump the text, change menu text, a broken file); it is the test for this feature.
 
 ### The same by name
 

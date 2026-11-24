@@ -106,6 +106,7 @@ typedef struct PortOptions {
     BOOL window;              // open a window and draw into it
     const char* screenshot;   // write the last shown picture to this PNG when the run stops
     const char* pickerShot;   // --picker-screenshot FILE: draw the first-run screen into this PNG and stop (tests)
+    const char* dumpData;     // --dump-data DIR: the game's text table as JSON, then exit (port_moddata.cpp)
     const char* dumpTextures; // --dump-textures DIR: every texture the game draws with, as a PNG (port_mods.cpp)
     const char* diffTest;     // --difftest FILE: run the differential tests of that jobs file and stop (port_difftest.cpp)
     BOOL noMods;              // --no-mods: the mods list is kept (and saved) but no mod is used
