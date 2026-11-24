@@ -148,10 +148,11 @@ struct SoundDesc {
     f32 maxDist;
 };
 
+static s32 PlaySoundAtBody(u8* arg0, s32 arg1, u8* arg2, s32 arg3);
+
 // 0x80209ABC
 // Picks a random variant from a sound table (entries of 0x30 bytes), randomizes volume
 // and submits it to the audio manager (positional by handle, by object, or global).
-static s32 PlaySoundAtBody(u8* arg0, s32 arg1, u8* arg2, s32 arg3);
 s32 PlaySoundAt(u8* arg0, s32 arg1, u8* arg2, s32 arg3) {
     s32 r = PlaySoundAtBody(arg0, arg1, arg2, arg3);
     PortSoundLogPlay(arg0, r);   // PC port: PORT_SOUND_LOG

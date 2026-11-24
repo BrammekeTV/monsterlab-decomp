@@ -196,10 +196,11 @@ extern "C" void fn_8015B7D4(void) {
     }
 }
 
+typedef void (*DispatchFn)(u32);
+
 // 0x8015D23C
 // Dispatches arg: the byte at bits 8..15 selects every entry of the table whose key matches, and
 // the handler is called with the low byte.
-typedef void (*DispatchFn)(u32);
 void fn_8015D23C(u32 arg) {
     u32 key = (arg >> 8) & 0xff;
     u32 param = arg & 0xff;
