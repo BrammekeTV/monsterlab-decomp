@@ -99,6 +99,11 @@
  "changelog": [
   {
    "date": "2026-11-24",
+   "time": "12:25",
+   "text": "Mods can now change the game's text (PR #166): a JSON file in a mod overrides entries of the game's text table, checked when it loads, and --dump-data exports the original table from your own disc to start from. Also, arrow keys and the D-pad now work on the Options screen (PR #167); its sliders, rumble, volume and saving were checked and already worked."
+  },
+  {
+   "date": "2026-11-24",
    "time": "12:01",
    "text": "Big step on Windows (PRs #161 to #165). The village intro cutscene finishes: the coffin lands and the exploration map shows. The main menu now has its rain and the projector's light cone with the menu text inside. The sound mixer now has the game's reverb, echo, chorus and delay effects, and the Wii Remote speaker's sounds play through your PC speakers, with a setting to turn that off. Mods can now replace textures by their name in the game's data instead of a hash."
   },
