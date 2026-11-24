@@ -43,6 +43,7 @@ static LONG      sStopping;
 static s32       sSkippedCtors, sRunCtors;
 static HANDLE    sMainThread;
 
+void PortSamplerStart();
 void PortLog(const char* fmt, ...) {
     char line[1024];
     va_list ap;
@@ -1125,6 +1126,7 @@ static void __cdecl PortPreMain(void) {
     }
     PortStartInterrupts();
     if (gPortOptions.haveData && !gPortOptions.selfTest && (gPortOptions.window || gPortOptions.screenshot || gPortOptions.showTexture >= 0))
+        PortSamplerStart();                                 // PORT_SAMPLE=1: instruction-pointer sampler (src/port/port_sampler.cpp)
         PortGfxStart(gPortOptions.window);
     PortRunStaticInit();
 }
