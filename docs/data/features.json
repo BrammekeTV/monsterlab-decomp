@@ -99,6 +99,11 @@
  "changelog": [
   {
    "date": "2026-11-24",
+   "time": "20:02",
+   "text": "Battle attack and hit sounds now play: they were triggered by the animation events fixed in PR #189. A new sound log (PR #191) shows every sound the game asks for and whether it played. 89 more functions have real names (PRs #192, #193, #195)."
+  },
+  {
+   "date": "2026-11-24",
    "time": "19:54",
    "text": "In the first battle the enemy now faces your monster, and the attack camera moves and animation events play (PR #189)."
   },
