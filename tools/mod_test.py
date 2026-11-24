@@ -10,7 +10,7 @@ Passes when the log names the replaced texture and the picture got redder. Needs
 data (orig/RM7P4F or --iso). Nothing is written into the repository; --keep leaves the temporary
 folder (dump, mod, before.png, after.png) and prints where it is.
 """
-import os, shutil, subprocess, sys, tempfile
+import os, re, shutil, subprocess, sys, tempfile
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 EXE = os.path.join(ROOT, "build", "pc", "monsterlab.exe")
 
@@ -29,6 +29,24 @@ def redness(im):
     hr, hg, hb = r.histogram(), g.histogram(), b.histogram()
     s = lambda h: sum(i * n for i, n in enumerate(h))
     return s(hr) - (s(hg) + s(hb)) / 2.0
+
+
+def by_name(tmp, dump, names, data):
+    """A texture whose name the dump gives (tex_WxH_fF_<name>_<hash>.png) is replaced by <name>.png. Returns an error text or ''."""
+    from PIL import Image
+    pat = re.compile(r"^tex_\d+x\d+_f\d+_(.+)_[0-9A-F]{16}\.png$")
+    named = [(n, pat.match(n).group(1)) for n in names if pat.match(n)]
+    if not named:
+        return "the dump has no texture with a name"
+    n, name = named[0]
+    mods = os.path.join(tmp, "mods2")
+    shutil.rmtree(mods, ignore_errors=True)
+    os.makedirs(os.path.join(mods, "ByName", "textures", "sub"))
+    Image.open(os.path.join(dump, n)).convert("RGBA").save(os.path.join(mods, "ByName", "textures", "sub", name + ".png"))
+    good, out = run(["--mods", mods, "--screenshot", os.path.join(tmp, "byname.png")] + data, os.path.join(tmp, "byname.log"))
+    if not good or f"comes from ByName by name" not in out or f"texture {name} (" not in out:
+        return f"{name}: the texture was not replaced by its name"
+    return ""
 
 
 def main():
@@ -62,6 +80,11 @@ def main():
             gain = (redness(Image.open(after)) - base) / pixels
             if gain > 1.0:                                   # on average more than one level redder per pixel
                 ok, verdict = True, f"{n} replaced, picture redder by {gain:.1f} per pixel ({len(names)} textures dumped)"
+                bad = by_name(tmp, dump, names, data)
+                if bad:
+                    ok, verdict = False, bad
+                    return 1
+                verdict += "; by name ok"
                 return 0
         verdict = "textures were replaced but the picture did not get redder"
         return 1
