@@ -15,6 +15,7 @@
 #include "port/port.h"
 #include "port/port_input.h"
 #include "port/port_gx.h"
+#include "port/port_mods.h"
 #include "port/port_overlay.h"
 
 // This file's start-up object must be built before every other static object: game code may
@@ -813,6 +814,7 @@ static int SelfTest(void) {
     fails += PortSelfTestOverlay();
     fails += PortSelfTestDisc();
     fails += PortSelfTestPicker();
+    fails += PortSelfTestMods();
     fails += PortSelfTestSettings();
 #undef CHECK
     PortLog("self-test: %u functions, %u linked; %s", gPortFuncCount, linked, fails ? "FAILED" : "ok");
@@ -857,7 +859,7 @@ struct PortBoot {
         gPortOptions.showTexture = -1;
         gPortOptions.secondsLimit = 60;
         const char* asked = getenv("MONSTERLAB_DATA");
-        BOOL sawFrames = FALSE, sawSeconds = FALSE;
+        BOOL sawFrames = FALSE, sawSeconds = FALSE, noMods = FALSE;
         // monsterlab.ini first, so the command line wins; the self-test runs without it.
         BOOL ini = TRUE;
         for (int i = 1; i < __argc && __argv; i++) if (!strcmp(__argv[i], "--selftest") || !strcmp(__argv[i], "--no-ini")) ini = FALSE;
@@ -881,13 +883,16 @@ struct PortBoot {
             else if (!strcmp(a, "--show-texture") && i + 1 < __argc) gPortOptions.showTexture = atoi(__argv[++i]);
             else if (!strcmp(a, "--screenshot") && i + 1 < __argc) gPortOptions.screenshot = __argv[++i];
             else if (!strcmp(a, "--stats")) gPortOverlayOn = TRUE;
+            else if (!strcmp(a, "--mods") && i + 1 < __argc) PortModsSetDir(__argv[++i]);
+            else if (!strcmp(a, "--no-mods")) noMods = TRUE;
+            else if (!strcmp(a, "--dump-textures") && i + 1 < __argc) gPortOptions.dumpTextures = __argv[++i];
             else if (!strcmp(a, "--picker-screenshot") && i + 1 < __argc) gPortOptions.pickerShot = __argv[++i];
             else if (!strcmp(a, "--no-ini")) {}
             else if (!strcmp(a, "--settings")) {                // open the settings screen at the start, optionally on a page
                 PortGuiSetOpen(TRUE);
                 if (i + 1 < __argc && __argv[i + 1][0] != '-') {
                     const char* page = __argv[++i];
-                    gPortGuiPage = !strcmp(page, "audio") ? 1 : !strcmp(page, "controls") ? 2 : !strcmp(page, "game") ? 3 : 0;
+                    gPortGuiPage = !strcmp(page, "audio") ? 1 : !strcmp(page, "controls") ? 2 : !strcmp(page, "game") ? 3 : !strcmp(page, "mods") ? 4 : 0;
                 }
             }
             else if (!strcmp(a, "--vsync")) gPortSettings.vsync = TRUE;
@@ -974,6 +979,14 @@ struct PortBoot {
             HANDLE h = CreateThread(NULL, 0, WatchArm, sMainThread, 0, NULL);
             if (h) { WaitForSingleObject(h, INFINITE); CloseHandle(h); }
         }
+        // The mods folder: the mods of monsterlab.ini in their order, then folders it does not list yet.
+        gPortOptions.noMods = noMods;
+        if (!noMods && !gPortOptions.selfTest) {
+            PortModsScan();
+            int on = 0;
+            for (int i = 0; i < gPortModCount; i++) if (gPortMods[i].enabled && gPortMods[i].present) on++;
+            if (on) fprintf(stderr, "[port] mods: %d on, from %s\n", on, PortModsDir());
+        }
         PortLockEnter();                         // the main thread is the first game thread
 
         // A file is the player's disc image, read as it is (--iso FILE; --data and MONSTERLAB_DATA take one too).
@@ -1042,6 +1055,7 @@ struct PortBoot {
             ExitProcess(2);
         }
         PortLog("game data: %s", dir);
+        if (gPortOptions.verbose) PortModsLogOverrides();
         PortMilestone("main.dol data loaded at the original addresses");
     }
 };

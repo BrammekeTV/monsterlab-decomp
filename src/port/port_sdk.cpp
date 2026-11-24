@@ -14,6 +14,7 @@
 #include <algorithm>
 
 #include "port/port.h"
+#include "port/port_mods.h"
 #include "revolution.h"
 
 int PortSelfTestOs(void);
@@ -64,7 +65,12 @@ s32 DVDOpen(char* path, u8* infoBytes) {
     u64 discOff = 0;
     u32 discSize = 0;
     FILE* f = NULL;
-    if (PortDiscIsOpen() ? !PortDiscFind(rel, &discOff, &discSize) : !(f = fopen(host, "rb"))) {
+    // A mod's file of this path comes first (mods/<name>/files/...), for a disc image and a folder alike.
+    char modHost[MAX_PATH];
+    const char* mod = NULL;
+    if (PortModsFindFile(rel, modHost, sizeof(modHost), &mod) && (f = fopen(modHost, "rb")) != NULL) {
+        PortLog("mods: %s comes from %s", rel, mod);
+    } else if (PortDiscIsOpen() ? !PortDiscFind(rel, &discOff, &discSize) : !(f = fopen(host, "rb"))) {
         sDvdMisses++;
         PortLog("disc: %s not found", path);
         return 0;

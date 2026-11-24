@@ -5,6 +5,7 @@
 //   [display]   width, height, aspect (16:9 or 4:3), stretch_ui, vsync, fullscreen, render_scale, texture_filter
 //   [game]      path: the player's disc image or extracted folder
 //   [audio]     volume (0-100), mute
+//   [mods]      NAME = 1 or 0, in load order (port_mods.cpp)
 //   [controls]  NAME = key 1, key 2, mouse button, gamepad bits   (Windows virtual-key codes; 0 = none)
 #ifdef _WIN32
 #include <windows.h>
@@ -14,6 +15,7 @@
 
 #include "port/port.h"
 #include "port/port_input.h"
+#include "port/port_mods.h"
 
 const char* PortSettingsPath(void) {
     static char path[MAX_PATH + 16];
@@ -75,6 +77,8 @@ BOOL PortSettingsLoad(const char* path, PortSettings* s) {
             else if (!strcmp(key, "texture_filter")) {
                 for (int k = 0; k < PORT_FILTER_COUNT; k++) if (!_stricmp(val, kPortFilterNames[k])) s->texFilter = k;
             }
+        } else if (!strcmp(section, "mods")) {
+            PortModsAdd(key, atoi(val) != 0);                  // the order of the lines is the load order
         } else if (!strcmp(section, "game")) {
             if (!strcmp(key, "path")) snprintf(s->gamePath, sizeof(s->gamePath), "%s", val);
         } else if (!strcmp(section, "audio")) {
@@ -117,6 +121,8 @@ BOOL PortSettingsSave(const char* path, const PortSettings* s) {
         const PortBinding* b = &gPortBindings[i];
         fprintf(f, "%s = %d, %d, %d, %X\n", b->name, b->key[0], b->key[1], b->mouse, b->pad);
     }
+    if (gPortModCount) fprintf(f, "\n; the mods folder's mods in load order (a later one wins); 1 = on, 0 = off\n[mods]\n");
+    for (int i = 0; i < gPortModCount; i++) fprintf(f, "%s = %d\n", gPortMods[i].name, gPortMods[i].enabled ? 1 : 0);
     return fclose(f) == 0;
 }
 

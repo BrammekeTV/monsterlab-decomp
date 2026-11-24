@@ -33,11 +33,13 @@ build\pc\monsterlab.exe                        # runs main() with your own disc 
 | `--screenshot FILE` | write the last picture shown as a PNG when the run stops (works without `--window`) |
 | `--stats` | start with the stats overlay on (top-right; F3 turns it on and off in the window): frames per second, frame time split into game, render and wait, draw calls, GX vertices, frame-buffer copies, textures, audio voices, output size |
 | `--screenshot-stats` | draw the stats overlay into the `--screenshot` picture too (it is left out otherwise) |
-| `--settings [display\|audio\|controls]` | open the settings screen at the start (F1 or Esc opens and closes it in the window); with `--screenshot-stats` it is drawn into the screenshot |
+| `--settings [display\|audio\|controls\|game\|mods]` | open the settings screen at the start (F1 or Esc opens and closes it in the window); with `--screenshot-stats` it is drawn into the screenshot |
 | `--vsync`, `--fullscreen` | vertical sync; borderless fullscreen (both also in the settings screen) |
 | `--no-ini` | do not read `monsterlab.ini` (next to the exe: display, audio and the key bindings, written by the settings screen; the command line wins over it) |
 | `--iso FILE` | the game data is your own Monster Lab disc image (.iso, .wbfs or .rvz, RM7P4F), read as it is: nothing is extracted. A .wbfs is read through its block map (first disc only; split .wbf1 files are not joined). A .rvz (zstd, the Dolphin default; bzip2/LZMA are refused with a message) is read group by group: partition data is stored decrypted there, so no AES is used; RVZ-packed junk (disc padding) reads as zeros. Reading tested on synthetic images only. `--data` and `MONSTERLAB_DATA` take an image too. Another game or region is refused with a message |
 | `--picker-screenshot FILE` | draw the first-run "choose your disc" screen into a PNG and stop (tests; with `--iso FILE` it shows the verdict for that file) |
+| `--dump-textures DIR` | write every texture the game draws with to `DIR` as `tex_<w>x<h>_f<format>_<hash>.png`, for texture mods (`docs/modding.md`); the output is game data, keep it out of the repository |
+| `--mods DIR`, `--no-mods` | use another mods folder than `mods` next to the exe; run without mods. With `--verbose` every file each mod replaces is listed (see `docs/modding.md`) |
 | `--res WxH` | output size (default 1920x1080) |
 | `--aspect 4:3\|16:9` | picture shape and the console's widescreen setting (default 16:9) |
 | `--stretch-ui` | 16:9: stretch the 2D layer over the whole width, as the console does |
