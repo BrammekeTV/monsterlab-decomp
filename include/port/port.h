@@ -118,10 +118,15 @@ typedef struct PortOptions {
     BOOL fastAll;             // never pace (--fast)
     BOOL toMenu;              // --to-menu: fast-forward to the title, press A, go on to the main menu
     s32  showTexture;         // development aid (port_demo.cpp): -1, or a texture of global_binary.sir
+    s32  captureAt;           // --capture-at N: take the F12 capture at frame N (tests; 0 = off)
 } PortOptions;
 extern PortOptions gPortOptions;
 
 enum { PORT_FPS_UNCAPPED = -1, PORT_FPS_DISPLAY = -2 };
+// F12 capture (port_capture.cpp): called by the renderer at each display copy, with the picture just drawn.
+void PortCaptureFrame(void);
+BOOL PortBinkSaveFrame(const char* path);   // the movie on show, decoded and converted to RGB as a PNG; FALSE when none plays (port_bink.cpp)
+BOOL PortGfxCapture(const char* prefix);    // frame buffer, output picture and (once presented) the back buffer as PNGs prefix_*.png
 BOOL PortGfxIdle(void);            // the drawing thread waits: show the last picture again if the frame rate asks for it (lock held)
 enum { PORT_FILTER_GAME, PORT_FILTER_NEAREST, PORT_FILTER_BILINEAR, PORT_FILTER_AF2, PORT_FILTER_AF4, PORT_FILTER_AF8, PORT_FILTER_AF16, PORT_FILTER_COUNT };
 extern const char* const kPortFilterNames[PORT_FILTER_COUNT];   // ini / command-line spelling

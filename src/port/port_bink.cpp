@@ -19,6 +19,7 @@
 
 #include "port/port.h"
 #include "port/port_bink_codec.h"
+#include "port/port_mods.h"
 #include "revolution.h"
 
 extern "C" {
@@ -54,6 +55,7 @@ struct BinkHandle {
     std::vector<u8> buf;
 };
 
+BinkHandle* gPlaying = nullptr;   // the movie on show (F12 capture)
 s32 gTrackId = 0;          // BinkSetSoundTrack: the track (language) the next BinkOpen plays
 
 bool ReadAt(BinkHandle* h, u32 off, void* dst, u32 len) {
@@ -99,6 +101,28 @@ bool DecodeFrame(BinkHandle* h, u32 n, bool wantAudio) {
 
 }  // namespace
 
+// F12 capture: the last decoded frame of the movie on show as a PNG, from the decoder's planes (before any
+// upload or draw). BT.601, studio range: for comparing positions of seams and blocks, not exact colours.
+BOOL PortBinkSaveFrame(const char* path) {
+    BinkHandle* h = gPlaying;
+    if (!h || h->decoded < 0) return FALSE;
+    bink::Image im = h->video.GetImage();
+    u32 w = h->width, hgt = h->height;
+    if (!im.plane[0] || !im.plane[1] || !im.plane[2]) return FALSE;
+    std::vector<u32> rgba((size_t)w * hgt);
+    for (u32 y = 0; y < hgt; y++)
+        for (u32 x = 0; x < w; x++) {
+            int Y = im.plane[0][(size_t)y * im.stride[0] + x];
+            int cb = im.plane[1][(size_t)(y / 2) * im.stride[1] + x / 2] - 128;
+            int cr = im.plane[2][(size_t)(y / 2) * im.stride[2] + x / 2] - 128;
+            int c = (Y - 16) * 298;
+            int r = (c + 409 * cr + 128) >> 8, g = (c - 100 * cb - 208 * cr + 128) >> 8, b = (c + 516 * cb + 128) >> 8;
+            r = r < 0 ? 0 : r > 255 ? 255 : r; g = g < 0 ? 0 : g > 255 ? 255 : g; b = b < 0 ? 0 : b > 255 ? 255 : b;
+            rgba[(size_t)y * w + x] = (u32)r | (u32)g << 8 | (u32)b << 16 | 0xFF000000u;
+        }
+    return PortPngWrite(path, rgba.data(), w, hgt);
+}
+
 extern "C" {
 
 // fn_802B47A0: BinkSetSoundTrack(total, tracks): the next BinkOpen plays this audio track.
@@ -136,6 +160,7 @@ u8* fn_802B4B30(const char* path, u32 flags) {
     PortAudioMovieStop();
     PortLog("Bink: %s: %ux%u, %u frames, %.2f fps, audio track %d%s", path, h->width, h->height, h->frames,
             (double)h->rate / h->rateDiv, gTrackId, h->haveAudio ? "" : " (none)");
+    gPlaying = h;
     return (u8*)h;
 }
 
@@ -244,6 +269,7 @@ s32 fn_802B6950(u8* bink) {
 s32 fn_802B6798(u8* bink) {
     BinkHandle* h = (BinkHandle*)bink;
     if (!h) return 0;
+    if (gPlaying == h) gPlaying = nullptr;
     PortAudioMovieStop();
     DVDClose(h->fileInfo);
     delete h;

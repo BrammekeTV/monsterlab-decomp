@@ -17,3 +17,6 @@ compile_commands.json
 
 out/
 tools/m2c/
+
+# F12 captures (port_capture.cpp): game pictures, never committed
+captures/
