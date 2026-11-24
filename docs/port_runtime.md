@@ -36,7 +36,7 @@ build\pc\monsterlab.exe                        # runs main() with your own disc 
 | `--settings [display\|audio\|controls]` | open the settings screen at the start (F1 or Esc opens and closes it in the window); with `--screenshot-stats` it is drawn into the screenshot |
 | `--vsync`, `--fullscreen` | vertical sync; borderless fullscreen (both also in the settings screen) |
 | `--no-ini` | do not read `monsterlab.ini` (next to the exe: display, audio and the key bindings, written by the settings screen; the command line wins over it) |
-| `--iso FILE` | the game data is your own Monster Lab disc image (.iso, RM7P4F), read as it is: nothing is extracted. `--data` and `MONSTERLAB_DATA` take an image too. Another game or region is refused with a message |
+| `--iso FILE` | the game data is your own Monster Lab disc image (.iso or .wbfs, RM7P4F), read as it is: nothing is extracted. A .wbfs is read through its block map (first disc only; split .wbf1 files are not joined). `--data` and `MONSTERLAB_DATA` take an image too. Another game or region is refused with a message |
 | `--picker-screenshot FILE` | draw the first-run "choose your disc" screen into a PNG and stop (tests; with `--iso FILE` it shows the verdict for that file) |
 | `--res WxH` | output size (default 1920x1080) |
 | `--aspect 4:3\|16:9` | picture shape and the console's widescreen setting (default 16:9) |
