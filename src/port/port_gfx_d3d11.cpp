@@ -26,6 +26,7 @@
 
 #include "port/port.h"
 #include "port/port_gx.h"
+#include "port/port_mods.h"
 #include "port/port_overlay.h"
 
 #pragma comment(lib, "d3d11.lib")
@@ -570,7 +571,17 @@ static ID3D11ShaderResourceView* GetTexture(const PortGx* g, u32 map) {
         return sWhite;
     }
     if (it != sTextures.end() && it->second.srv) { FlushDraws(); it->second.srv->Release(); }
-    TexEntry e = {MakeTexture(rgba.data(), w, h), hash, w, h, fmt, sTexGen};
+    // Mods: a PNG with this texture's content hash replaces it, at the PNG's own size (--dump-textures writes the originals).
+    ID3D11ShaderResourceView* made = NULL;
+    if (PortModsTexturesWanted()) {
+        u64 content = PortModsTextureHash(data, bytes, tlut, pal ? (fmt == 8 ? 32 : fmt == 9 ? 512 : 0x8000) : 0, w, h, fmt);
+        PortModsDumpTexture(content, rgba.data(), w, h, fmt);
+        u32 rw = 0, rh = 0;
+        u32* png = PortModsTexture(content, &rw, &rh);
+        if (png) { made = MakeTexture(png, rw, rh); free(png); }
+    }
+    if (!made) made = MakeTexture(rgba.data(), w, h);
+    TexEntry e = {made, hash, w, h, fmt, sTexGen};
     sTextures[key] = e;
     sGfxStats.textures++;
     return e.srv ? e.srv : sWhite;

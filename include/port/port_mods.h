@@ -1,5 +1,6 @@
 // PC port: mods (port_mods.cpp, docs/modding.md). A mod is a folder mods/<name>/ next to the exe:
 //   mods/<name>/files/<disc path>    replaces that file of the disc (for a disc image and an extracted folder alike)
+//   mods/<name>/textures/..._<16 hex digits>.png   replaces the game texture with that content hash
 // The list and its order are kept in monsterlab.ini, [mods]: one "name = 1" (on) or "name = 0" (off)
 // line per mod. Where two mods hold the same file, the one later in the list wins.
 #ifndef PORT_MODS_H
@@ -14,6 +15,7 @@ typedef struct PortMod {
     BOOL enabled;
     BOOL present;             // the folder is there (a mod listed in the ini may be gone)
     u32  fileCount;           // disc files under its files folder (counted by the scan)
+    u32  textureCount;        // PNGs with a texture hash in their name under its textures folder
 } PortMod;
 
 extern PortMod gPortMods[PORT_MAX_MODS];   // in load order
@@ -31,6 +33,25 @@ BOOL PortModsMove(int index, int dir);
 BOOL PortModsFindFile(const char* discPath, char* host, u32 n, const char** modName);
 // Logs every file each enabled mod replaces (--verbose).
 void PortModsLogOverrides(void);
+
+// ---- textures ----
+// The table of replacement PNGs, from the enabled mods in load order (the scan builds it; call it again
+// after switching a mod or changing the order).
+void PortModsRefreshTextures(void);
+// TRUE when the renderer should hash the textures it decodes: a mod has textures, or --dump-textures.
+BOOL PortModsTexturesWanted(void);
+// The content hash of a game texture: size, GX format, the pixel data as the game holds it, the palette.
+u64  PortModsTextureHash(const u8* data, u32 bytes, const u8* palette, u32 paletteBytes, u32 w, u32 h, u32 fmt);
+// The replacement for that texture as RGBA8 from malloc (any size; the caller frees it), or NULL.
+u32* PortModsTexture(u64 hash, u32* w, u32* h);
+// --dump-textures DIR: writes the decoded texture as DIR\tex_<w>x<h>_f<format>_<hash>.png, once per hash.
+void PortModsDumpTexture(u64 hash, const u32* rgba, u32 w, u32 h, u32 fmt);
+u32  PortModsDumpCount(void);
+
+// ---- PNG (port_png.cpp): RGBA8, red in the low byte ----
+BOOL PortPngWrite(const char* path, const u32* rgba, u32 w, u32 h);
+u32* PortPngRead(const char* path, u32* w, u32* h, const char** why);   // malloc; NULL and the reason
+
 int  PortSelfTestMods(void);
 
 #endif

@@ -71,7 +71,7 @@ static void PageMods(void) {
     ImGui::Text("Mods folder: %s", PortModsDir());
     if (gPortOptions.noMods) ImGui::TextColored(ImVec4(1.0f, 0.7f, 0.3f, 1.0f), "Started with --no-mods: no mod is used in this run.");
     ImGui::PopTextWrapPos();
-    if (ImGui::Button("Look again")) PortModsScan();
+    if (ImGui::Button("Look again")) { PortModsScan(); PortGfxApplySettings(); }
     ImGui::SameLine();
     ImGui::TextDisabled("A mod lower in the list wins over the ones above it.");
     if (!gPortModCount) { ImGui::Spacing(); ImGui::TextDisabled("No mods. Put a mod's folder into the mods folder (docs/modding.md)."); return; }
@@ -96,7 +96,7 @@ static void PageMods(void) {
             if (m->present) ImGui::TextUnformatted(m->name);
             else ImGui::TextDisabled("%s (folder not found)", m->name);
             ImGui::TableNextColumn();
-            if (m->present) ImGui::Text("%u file%s", m->fileCount, m->fileCount == 1 ? "" : "s");
+            if (m->present) ImGui::Text("%u file%s, %u texture%s", m->fileCount, m->fileCount == 1 ? "" : "s", m->textureCount, m->textureCount == 1 ? "" : "s");
             ImGui::TableNextColumn();
             ImGui::BeginDisabled(i == 0);
             if (ImGui::ArrowButton("##up", ImGuiDir_Up)) { move = i; dir = -1; }
@@ -110,7 +110,11 @@ static void PageMods(void) {
         ImGui::EndTable();
     }
     if (move >= 0 && PortModsMove(move, dir)) changed = TRUE;
-    if (changed) Save();
+    if (changed) {
+        PortModsRefreshTextures();
+        PortGfxApplySettings();                // textures are decoded again, with the new list's replacements
+        Save();
+    }
 }
 
 static void Save(void) {

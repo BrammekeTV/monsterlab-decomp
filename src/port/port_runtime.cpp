@@ -885,6 +885,7 @@ struct PortBoot {
             else if (!strcmp(a, "--stats")) gPortOverlayOn = TRUE;
             else if (!strcmp(a, "--mods") && i + 1 < __argc) PortModsSetDir(__argv[++i]);
             else if (!strcmp(a, "--no-mods")) noMods = TRUE;
+            else if (!strcmp(a, "--dump-textures") && i + 1 < __argc) gPortOptions.dumpTextures = __argv[++i];
             else if (!strcmp(a, "--picker-screenshot") && i + 1 < __argc) gPortOptions.pickerShot = __argv[++i];
             else if (!strcmp(a, "--no-ini")) {}
             else if (!strcmp(a, "--settings")) {                // open the settings screen at the start, optionally on a page
