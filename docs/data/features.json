@@ -99,6 +99,11 @@
  "changelog": [
   {
    "date": "2026-11-24",
+   "time": "19:54",
+   "text": "In the first battle the enemy now faces your monster, and the attack camera moves and animation events play (PR #189)."
+  },
+  {
+   "date": "2026-11-24",
    "time": "18:59",
    "text": "The first battle now plays on Windows (PR #187): attacks play out, the enemy takes its turn, and the fight runs for two rounds. The 3D scenes are now drawn on the graphics card, so the village takes about 40% less work per frame (PR #188)."
   },
