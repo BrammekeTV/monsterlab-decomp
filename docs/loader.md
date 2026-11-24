@@ -1025,6 +1025,9 @@ Read when the first map level (`village_level.sir`) starts:
   bytes at `+0x64` and `+0x9C`) and every junction record (0xDC bytes, `fn_800D5008`: six words,
   up to twelve entries of three floats and a byte from `+0x18`, their count at `+0xD8`) into the
   object database.
+- **Enter actions** (header `+0x94`, `+0x98`, `+0x9C`): three action words `GameSessionUpdate` runs with
+  `TriggerDoAction` when the level is entered. The village's first one is its set-up program (action 2027:
+  junction states, locked paths, `SpawnDatabaseMonsterAtNode` for the quest's enemies).
 - **Spawn owners** (header `+0x74`, `+0x78`): the projectile definitions `SpawnCoffinProjectile` and
   `FireRocketAtEntity` spawn from (0x170 bytes; a spawned projectile's `+0x228`). `SpawnHelper` compares
   the type id at `+0x00` with `0x37645F52`. Converted: `+0x08` id, `+0x0C` four words (`+0x10` animation
@@ -1033,7 +1036,7 @@ Read when the first map level (`village_level.sir`) starts:
   pool its model comes from (`fn_80063D6C` looks it up in zone 0's pool table: `coffin`), `+0x108..+0x118`
   five sound objects, `+0x148` flags, `+0x14C` an object (not typed), `+0x150` four floats and a duration.
   Not converted: the pointers at `+0x4C` and `+0x54` (no reader found yet).
-- **Entity types** (the byte at `+0x34` of the record): types `0x0F` (`fn_8006CCC4`) and `0x10` derive from
+- **Entity types** (the byte at `+0x34` of the record): types `0x0C` (`fn_8004E684`, arena props), `0x0F` (`fn_8006CCC4`) and `0x10` derive from
   the prop and are converted like one. A pooled entity has no record in the file; its type is the pool
   table entry's `+0x1C`. Every entity's position at `+0xC8` and the record's `+0x28` are converted:
   `EntityRefreshLinks` wakes a sleeping entity (vtable slot 0x30) only when `+0x28 > 0` and the position

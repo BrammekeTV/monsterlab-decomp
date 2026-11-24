@@ -2805,7 +2805,7 @@ static void LevelSelfTest(void) {
     LevelZoneDoneFree(&done0);
 
     // The world state, read the way fn_8013006C, fn_8012FD0C and HudReload do.
-    CHECK(*(s32*)(hdr + 4) == 1 && hdr[0x97] == 0xFF && hdr[0x94] == 0x00);       // +0x94: no reader, untouched
+    CHECK(*(s32*)(hdr + 4) == 1 && hdr[0x94] == 0xFF && hdr[0x97] == 0x00);       // +0x94: the first enter action, a word
     u8* slots = *(u8**)(hdr + 0x1A4);
     CHECK(slots == hdr + L_SLOT0 && *(s32*)(hdr + 0x1A8) == 2 && *(u8**)(hdr + 0x1D4) == hdr + L_T1D4);
     CHECK(*(u8**)(hdr + 0x1F4) == zone + L_HUD && *(f32*)(hdr + 0x1F8) == 0.2f && *(f32*)(hdr + 0x1A84) == 1.0f);
