@@ -99,6 +99,11 @@
  "changelog": [
   {
    "date": "2026-11-24",
+   "time": "01:18",
+   "text": "More of the PC version works (PRs #123, #124, #125, #130). On the main menu, pointing at Options and pressing A opens the Options screen. The game can also read .wbfs disc images, and the settings screen has render scale (50 to 200%) and texture filtering (nearest, bilinear or anisotropic). Two mistakes in our decompiled code were fixed: the scan reticle wrote three numbers into room for two, and a badge notice used the wrong queue index. The first level now runs for about 1,250 frames."
+  },
+  {
+   "date": "2026-11-24",
    "time": "01:12",
    "text": "The first level loads and draws on Windows (PR #128): after Join Now! on the main menu, castle_communication now loads instead of crashing. Attach points, the aim object, scene lights and one more material type are converted to PC byte order. The main menu's camera also flies in to the wide shot of the castle, as on the Wii, now that animation entries are converted (PR #127). And the game can read .rvz disc images, Dolphin's compressed format (PR #126)."
   },
