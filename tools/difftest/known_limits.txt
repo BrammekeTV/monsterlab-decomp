@@ -44,3 +44,7 @@
 0x80084C18 table index from RaySceneTest on random input
 0x8016AFE8 original returns leftover r3
 0x801499F8 original returns leftover r3
+0x8005484C squares of huge random floats overflow to inf/NaN (frsqrte path)
+0x800D41F4 asm checked equal; differs only in a callee's writes when the random records overlap
+0x80184490 asm checked equal; differs only in the list callees when the random nodes overlap
+0x801C9178 asm checked equal; differs only in fn_801EBDF0's writes when the random list nodes overlap

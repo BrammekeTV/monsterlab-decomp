@@ -9,7 +9,7 @@
 // 64-bit float slots on the interpreter's own stack keep the console's word order (the compiler's
 // int <-> float conversions store two words and load a double).
 // No original code. The jobs file is written by tools/difftest.py:
-//   seed N | calls 0/1 | only CASE | verbose 1 | job ADDR SIG CASES     (SIG: return ':' arguments, see ParseSig)
+//   seed N | calls 0/1 | globals 0/1 | only CASE | verbose 1 | job ADDR SIG CASES     (SIG: return ':' arguments, see ParseSig)
 #ifdef _WIN32
 #define NOMINMAX
 #include <windows.h>
@@ -30,7 +30,7 @@ namespace {
 
 const u32 kGameLo = 0x80006B40u, kGameHi = 0x8022FEC4u;
 const u32 kSentinel = 0xFFFF0000u;         // the return address of the function under test
-const u32 kPoolBufs = 8, kBufSize = 0x800, kBufMid = 0x200;
+const u32 kPoolBufs = 8, kBufSize = 0x2000, kBufMid = 0x400;
 const u32 kStackSize = 0x10000;
 const u32 kBudget = 400000;                // instructions per case
 
@@ -56,6 +56,7 @@ std::vector<Read> sReads;
 char sWhy[160];                            // why the interpreter stopped (unsupported, or this case is skipped)
 BOOL sUnsupported;
 BOOL sCalls;
+BOOL sGlobals;                             // some cases point zero globals at the test's buffers
 u64 sInsns;
 
 u32 Be32(const u8* p) { return (u32)p[0] << 24 | (u32)p[1] << 16 | (u32)p[2] << 8 | p[3]; }
@@ -64,6 +65,8 @@ BOOL In(u32 a, u32 n, u32 lo, u32 size) { return a >= lo && a - lo < size && n <
 BOOL InPool(u32 a, u32 n)  { return In(a, n, (u32)(uintptr_t)sPool, kPoolBufs * kBufSize); }
 BOOL InStack(u32 a, u32 n) { return In(a, n, (u32)(uintptr_t)sStack, kStackSize); }
 BOOL InData(u32 a, u32 n)  { return In(a, n, sDataLo, sDataHi - sDataLo); }
+
+static u32 sPc;                            // the instruction being run, for the reasons
 
 BOOL Stop(BOOL unsupported, const char* fmt, ...) {
     va_list ap;
@@ -91,14 +94,14 @@ BOOL MemRead(u32 a, u32 n, void* out) {
         for (u32 i = 0; i < n; i++) o[i] = p[n - 1 - i];
         return TRUE;
     }
-    if (!InPool(a, n) && !InStack(a, n) && !InData(a, n)) return Stop(FALSE, "reads 0x%08X, outside the test's memory", a);
+    if (!InPool(a, n) && !InStack(a, n) && !InData(a, n)) return Stop(FALSE, "reads 0x%08X, outside the test's memory (at 0x%08X)", a, sPc);
     memcpy(out, (void*)(uintptr_t)a, n);
     if (InPool(a, n) && sReads.size() < 4096) { Read rd = {a, n, 0}; memcpy(&rd.value, out, n < 4 ? n : 4); sReads.push_back(rd); }
     return TRUE;
 }
 
 BOOL MemWrite(u32 a, u32 n, const void* in, BOOL isFloat) {
-    if (!InPool(a, n) && !InStack(a, n) && !InData(a, n)) return Stop(FALSE, "writes 0x%08X, outside the test's memory", a);
+    if (!InPool(a, n) && !InStack(a, n) && !InData(a, n)) return Stop(FALSE, "writes 0x%08X, outside the test's memory (at 0x%08X)", a, sPc);
     if (!InStack(a, n)) {
         Write w = {a, n, {0}, isFloat};
         memcpy(w.old, (void*)(uintptr_t)a, n);
@@ -165,6 +168,7 @@ BOOL Run(Cpu& c, u32 entry) {
         if (c.pc < PORT_TEXT_LO || c.pc + 4 > sDolHi || (c.pc & 3)) return Stop(FALSE, "jumps to 0x%08X", c.pc);
         u32 op = Be32(&sDol[c.pc - PORT_TEXT_LO]);
         u32 pc = c.pc, next = pc + 4;
+        sPc = pc;
         u32 opc = op >> 26, rd = (op >> 21) & 31, ra = (op >> 16) & 31, rb = (op >> 11) & 31, rc = (op >> 6) & 31;
         s32 simm = (s16)op;
         u32 uimm = op & 0xFFFF;
@@ -405,6 +409,17 @@ u8* Buf(u32 i) { return sPool + (i % kPoolBufs) * kBufSize; }
 u32 RandomWord(Rng& g, u32 style) {
     u32 k = g.Next() % 100;
     if (style == 0) return g.Next() % 17;                    // small numbers only
+    if (style == 3) {                                        // mostly pointers to the other buffers: for code that follows chains of records
+        if (k < 1) return 0;
+        if (k < 94) return (u32)(uintptr_t)Buf(g.Next()) + kBufMid + (g.Next() % 16) * 4;
+        if (k < 97) return g.Next() % 9;
+        f32 f = kFloats[g.Next() % 12] * (f32)((g.Next() % 7) + 1); u32 v; memcpy(&v, &f, 4); return v;
+    }
+    if (style == 4) {                                        // half pointers, half indices and counts 0..3: records that hold both
+        if (k < 48) return (u32)(uintptr_t)Buf(g.Next()) + kBufMid + (g.Next() % 16) * 4;
+        if (k < 95) return g.Next() % 4;
+        return 0;
+    }
     if (style == 2) {                                        // floats, zeros and pointers: for code that reads float fields
         if (k < 20) return 0;
         if (k < 40) return (u32)(uintptr_t)Buf(g.Next()) + kBufMid + (g.Next() % 16) * 4;
@@ -428,7 +443,7 @@ BOOL MakeCase(const Sig& sig, u32 index, u64 seed, Case* cs) {
     memset(cs, 0, sizeof(*cs));
     memset(sPool, 0, kPoolBufs * kBufSize);
     if (index >= 6) {
-        u32 style = index < 12 ? 0 : (index % 3 == 2) ? 2 : 1;
+        u32 style = index < 12 ? 0 : (index % 3 == 0) ? 3 : (index % 5 == 4) ? 4 : (index % 3 == 2) ? 2 : 1;
         for (u32 i = 0; i < kPoolBufs * kBufSize; i += 4) { u32 v = RandomWord(g, style); memcpy(sPool + i, &v, 4); }
     }
     u32 nextBuf = 0;
@@ -507,7 +522,50 @@ void RestoreData(void) {
 }
 
 // One case: FALSE when it could not be judged (sWhy says why), else *match says whether both sides agree.
+// Globals the function (and the game functions it calls, two levels deep) loads from the executable's data
+// that are still zero (no level, no battle object): some cases point them at the test's buffers, so the
+// code behind them can run. The same value goes to both sides, and into the snapshot, so it is no difference.
+void ScanLoads(u32 addr, u32 depth, std::vector<u32>& out, std::vector<u32>& seen) {
+    if (addr < kGameLo || addr >= kGameHi || std::find(seen.begin(), seen.end(), addr) != seen.end() || seen.size() > 40) return;
+    seen.push_back(addr);
+    const PortFunc* fn = FuncAt(addr);
+    if (!fn || fn->addr != addr || !fn->size) return;
+    u32 lis[32] = {0};
+    for (u32 pc = addr; pc < addr + fn->size && pc + 4 <= sDolHi; pc += 4) {
+        u32 w = Be32(&sDol[pc - PORT_TEXT_LO]), op = w >> 26, rd = (w >> 21) & 31, ra = (w >> 16) & 31;
+        s32 imm = (s16)w;
+        u32 ea = 0;
+        if (op == 15 && ra == 0) lis[rd] = (u32)imm << 16;
+        else if (op == 14 && ra && lis[ra]) lis[rd] = lis[ra] + imm;
+        else if (op == 32 && ra == 13) ea = sR13 + imm;
+        else if (op == 32 && ra && lis[ra]) ea = lis[ra] + imm;
+        else if (op == 18 && (w & 1) && !(w & 2) && depth) {
+            s32 off = (s32)(w & 0x03FFFFFC); if (off & 0x02000000) off |= 0xFC000000;
+            ScanLoads(pc + off, depth - 1, out, seen);
+        }
+        if (ea && !(ea & 3) && InData(ea, 4) && std::find(out.begin(), out.end(), ea) == out.end() && out.size() < 24) out.push_back(ea);
+    }
+}
+
+BOOL RunCaseInner(const PortFunc* f, const Sig& sig, u32 index, u64 seed, BOOL verbose, BOOL* match);
+
 BOOL RunCase(const PortFunc* f, const Sig& sig, u32 index, u64 seed, BOOL verbose, BOOL* match) {
+    std::vector<u32> globals, seen;
+    if (sGlobals && index >= 6 && index % 2 == 0) ScanLoads(f->addr, 2, globals, seen);
+    std::vector<u32> set;
+    for (u32 a : globals) {
+        u32 cur; memcpy(&cur, (void*)(uintptr_t)a, 4);
+        if (cur) continue;
+        u32 v = (u32)(uintptr_t)Buf(index + (u32)set.size()) + kBufMid + 0x40;
+        memcpy((void*)(uintptr_t)a, &v, 4); memcpy(&sSnap[a - sDataLo], &v, 4);
+        set.push_back(a);
+    }
+    BOOL r = RunCaseInner(f, sig, index, seed, verbose, match);
+    for (u32 a : set) { u32 z = 0; memcpy((void*)(uintptr_t)a, &z, 4); memcpy(&sSnap[a - sDataLo], &z, 4); }
+    return r;
+}
+
+BOOL RunCaseInner(const PortFunc* f, const Sig& sig, u32 index, u64 seed, BOOL verbose, BOOL* match) {
     Case cs;
     if (!MakeCase(sig, index, seed, &cs)) return Stop(TRUE, "more than 8 integer or 8 float arguments");
     std::vector<u8> input(sPool, sPool + kPoolBufs * kBufSize);
@@ -656,6 +714,7 @@ void PortDiffTestRun(const char* jobsPath) {
         unsigned long long v = 0;
         if (sscanf(line, "seed %llu", &v) == 1) { seed = v; continue; }
         if (sscanf(line, "calls %llu", &v) == 1) { sCalls = v != 0; continue; }
+        if (sscanf(line, "globals %llu", &v) == 1) { sGlobals = v != 0; continue; }
         if (sscanf(line, "only %llu", &v) == 1) { only = (s32)v; continue; }
         if (sscanf(line, "verbose %llu", &v) == 1) { verbose = v != 0; continue; }
         if (sscanf(line, "job %x %63s %u", &addr, sigText, &cases) != 3) continue;
