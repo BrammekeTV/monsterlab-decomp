@@ -21,7 +21,42 @@ static std::vector<uint8_t> ReadAll(const char* path) {
     return v;
 }
 
+// "all" mode: decode every frame and every audio track; report errors and whether each track's sound length
+// matches the picture's.
+static int DecodeAll(const char* path) {
+    std::vector<uint8_t> file = ReadAll(path);
+    bink::Header h;
+    if (!bink::ParseHeader(file.data(), file.size(), h)) { printf("%s: bad header\n", path); return 1; }
+    bink::VideoDecoder vd;
+    if (!vd.Open(h.revision, h.videoFlags, h.width, h.height)) { printf("%s: video init failed\n", path); return 1; }
+    std::vector<bink::AudioDecoder> ad(h.tracks.size());
+    std::vector<double> samples(h.tracks.size(), 0);
+    for (size_t t = 0; t < h.tracks.size(); t++)
+        if (!ad[t].Open(h.tracks[t].sampleRate, h.tracks[t].channels, h.tracks[t].dct, h.revision)) { printf("%s: audio init failed\n", path); return 1; }
+    for (uint32_t n = 0; n < h.frames; n++) {
+        uint32_t off = h.frameOffset[n], size = h.frameOffset[n + 1] - off;
+        bink::FrameSplit fs;
+        if (off + size > file.size() || !bink::SplitFrame(h, file.data() + off, size, fs)) { printf("%s: frame %u: bad split\n", path, n); return 1; }
+        for (size_t t = 0; t < h.tracks.size(); t++) {
+            if (fs.audio[t].second < 4) continue;
+            std::vector<float> pcm;
+            if (!ad[t].DecodeAudio(fs.audio[t].first, fs.audio[t].second, pcm)) { printf("%s: frame %u track %zu: audio error\n", path, n, t); return 1; }
+            samples[t] += (double)pcm.size() / h.tracks[t].channels;
+        }
+        if (!vd.Decode(fs.video, fs.videoSize)) { printf("%s: frame %u: video error\n", path, n); return 1; }
+    }
+    double secs = (double)h.frames * h.fpsDen / h.fpsNum, worst = 0;
+    for (size_t t = 0; t < h.tracks.size(); t++) {
+        double d = samples[t] / h.tracks[t].sampleRate - secs;
+        if (d < 0) d = -d;
+        if (d > worst) worst = d;
+    }
+    printf("%s: ok, %u frames (%.1f s), %zu tracks, worst sound/picture length difference %.2f s\n", path, h.frames, secs, h.tracks.size(), worst);
+    return worst > 1.0 ? 1 : 0;
+}
+
 int main(int argc, char** argv) {
+    if (argc == 3 && std::string(argv[1]) == "all") return DecodeAll(argv[2]);
     if (argc < 5) { printf("usage: bink_test file.bik track outDir frame...\n"); return 2; }
     std::vector<uint8_t> file = ReadAll(argv[1]);
     int track = atoi(argv[2]);
