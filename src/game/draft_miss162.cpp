@@ -130,6 +130,7 @@ typedef s32 (*WidgetVFn)(u8* w, s32 a);
 typedef void* (*ObjGetFn)(u8* obj);
 
 extern "C" {
+void PortSoundLogGroup(u32 hash, const void* group);   // PC port (port_sound_log.cpp)
 
 // 0x80143460
 // Mersenne Twister (MT19937 variant seeded with the 69069 LCG): returns the next tempered word,
@@ -238,6 +239,7 @@ s32 PlaySound(u32 hash, s32 a, const void* pos, s32 b, s32 unused, s32 vol) {
             }
         }
     }
+    PortSoundLogGroup(hash, grp);   // PC port: PORT_SOUND_LOG
     if (grp == NULL) return -1;
     u32 cnt = *(u32*)(grp + 0x2c);
     u8* snd;
