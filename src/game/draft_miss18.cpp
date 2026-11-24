@@ -28,7 +28,7 @@ void   __destroy_arr(void* arr, void (*dtor)(void*, s32), u32 size, u32 count); 
 void   PartDestroy(PartInstance* p, s32 del);                        // 0x8021D374
 void   operator_delete(void* p);                                     // 0x801D426C
 u8*    fn_80021750(void);                                            // 0x80021750
-s32    fn_800217A8(void);                                            // 0x800217A8
+s32    fn_800217A8(u8* challenge);                                   // 0x800217A8
 void   fn_80021BE4(void);                                            // 0x80021BE4
 void   fn_8003DCE0(u8* p);                                           // 0x8003DCE0
 void   fn_8004C718(u8* p, s32 idx, void* elem);                      // 0x8004C718
@@ -367,8 +367,8 @@ void* DefectGetTexture(s32 arg0) {
 void DeinitChallenge(void) {
     u8* obj = *(u8**)(gGame + 0xD614);
     if (obj != NULL && (*(s32*)(*(u8**)(obj + 0x4) + 0x1C) & 0x2000)) {
-        fn_80021750();
-        if (fn_800217A8() != 8) {
+        // The challenge object comes back in r3 and goes straight into the state getter.
+        if (fn_800217A8(fn_80021750()) != 8) {
             u8* path = *(u8**)(obj + 0xA00);
             if (path != NULL) {
                 SessionDisableFor(gGame + 0x5C8, PathGetNodeId((PathFollower*)path), 65.0f);
