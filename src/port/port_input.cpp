@@ -140,6 +140,7 @@ static f32 Axis(SHORT v, SHORT dead) {
 }
 
 // ------------------------------------------------------------------ the remote's state
+extern "C" BOOL PortUiNavigate(int dx, int dy, f32* px, f32* py);
 struct RemoteState { u32 hold; f32 sx, sy; f32 px, py; BOOL pointerValid; };
 static f32  sPadPx, sPadPy;          // the pointer moved by the right stick
 static BOOL sPadPointer;
@@ -210,6 +211,18 @@ static void Sample(RemoteState* r) {
             sPadPx += rx * 0.03f; sPadPy -= ry * 0.03f;
             sPadPx = sPadPx < -1.0f ? -1.0f : sPadPx > 1.0f ? 1.0f : sPadPx;
             sPadPy = sPadPy < -1.0f ? -1.0f : sPadPy > 1.0f ? 1.0f : sPadPy;
+        }
+    }
+
+    // The d-pad / arrow keys step the pointer from item to item on screens without a selection grid.
+    {
+        static u32 lastHold;
+        u32 edge = r->hold & ~lastHold;
+        lastHold = r->hold;
+        int dx = (edge & W_RIGHT) ? 1 : (edge & W_LEFT) ? -1 : 0, dy = (edge & W_DOWN) ? 1 : (edge & W_UP) ? -1 : 0;
+        f32 nx, ny;
+        if ((dx || dy) && PortUiNavigate(dx, dy, &nx, &ny)) {
+            sPadPx = nx; sPadPy = ny; sPadPointer = TRUE;
         }
     }
 
