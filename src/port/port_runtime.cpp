@@ -209,6 +209,7 @@ void PortFrameDone(void) {
         SaveManager_ResetCurrentData();
         fn_8022E3D8(lbl_805FBBE0, (const unsigned char*)"Player");   // the name is what marks the slot as used
         SaveManager_SaveData();
+        SaveManager_SaveData();   // the first save of a new file leaves the continue slot at -1 (asm 0x80123B78); the second one sets it
         PortLog("profile: can load %u", (unsigned)SaveManager_CanLoadGame());
     }
     if (getenv("PORT_CURSOR_LOG") && sFrames == 3500) {   // where the game put its cursor widget (screen units, 640 x 480)
