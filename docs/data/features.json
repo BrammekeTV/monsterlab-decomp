@@ -99,6 +99,11 @@
  "changelog": [
   {
    "date": "2026-11-24",
+   "time": "21:44",
+   "text": "The first battle now plays to the end on Windows (PR #216): you win, see the results and the reward, return to the village, and the Field Repair minigame starts."
+  },
+  {
+   "date": "2026-11-24",
    "time": "21:41",
    "text": "The Windows mouse cursor no longer shows over the game, and the game's pointing hand is drawn at its true 64x64 size at every resolution (PR #215)."
   },
