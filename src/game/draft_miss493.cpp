@@ -23,7 +23,7 @@ void  fn_8018D4CC(void* p);                                             // 0x801
 u8*   fn_801B3308(void);                                                // 0x801B3308
 void  fn_801B3378(u8* p, u8* key);                                      // 0x801B3378
 BOOL  fn_801B50B0(void* unused, u8* obj);                               // 0x801B50B0
-void  fn_801B2E10(void);                                                // 0x801B2E10 (alarm handler)
+void  fn_801B2E10(u8* alarm, void* context);                                                // 0x801B2E10 (alarm handler)
 s32   fn_801DA780(u8* a3);                                              // 0x801DA780
 u8*   fn_801DA788(u8* a3, s32 i);                                       // 0x801DA788
 u8*   fn_801F6238(u8* p, s32 del);                                      // 0x801F6238
@@ -207,7 +207,7 @@ void fn_801B2F10(u8* arg0) {
         if (secs > lbl_805FFAF4) {
             u32 clk = *(u32*)0x800000F8;
             u64 tick = fn_8032FB38(clk, secs * (f32)(clk >> 2));
-            OSSetAlarm(arg0 + 0x18, tick, fn_801B2E10);
+            OSSetAlarm(arg0 + 0x18, tick, (void (*)(void))fn_801B2E10);
         }
         *(u8*)(arg0 + 0x48) = 1;
         WPADControlMotor(*(s32*)(arg0 + 0x4), 1);
