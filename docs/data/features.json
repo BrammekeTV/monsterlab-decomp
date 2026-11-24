@@ -83,7 +83,7 @@
   {
    "title": "Mod support",
    "detail": "Mods folder overriding any game file, plus new content in open formats: monster parts as glTF models, PNG textures and JSON/text stats, with no .sir editing needed.",
-   "status": "todo"
+   "status": "in_progress"
   },
   {
    "title": "Playable",
@@ -97,6 +97,11 @@
   }
  ],
  "changelog": [
+  {
+   "date": "2026-11-24",
+   "time": "04:42",
+   "text": "Mod support for the Windows version (PR #138, which includes the work of #135 and #137). Put a mod in mods/<name>/ next to the game to replace any file from the disc. PNG images can replace game textures, and --dump-textures exports the originals from your own disc to start from. The settings screen has a Mods page to turn mods on and off and set their order. docs/modding.md has a worked example. Separately, 4 more mistakes in our decompiled code were fixed after checking the remaining game functions against the original (PR #136)."
+  },
   {
    "date": "2026-11-24",
    "time": "04:19",
