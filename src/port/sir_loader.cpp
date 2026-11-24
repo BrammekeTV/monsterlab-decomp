@@ -3246,6 +3246,7 @@ extern "C" void LevelZoneRootsFree(LevelZoneRoots* roots) {
     free(roots->poolTables);
     free(roots->slotObjects);
     free(roots->slotEffects);
+    free(roots->recordArrays);
     free(roots->actionTables);
     free(roots->soundGroups);
     free(roots->zoneRecords);
@@ -3331,7 +3332,7 @@ extern "C" BOOL LevelZoneRootsCollect(const u8* hdr, u32 hdrSize, const u8* zone
                                       const LevelZoneOther* other, LevelZoneRoots* out) {
     memset(out, 0, sizeof(*out));
     RootList entities = { NULL, 0, 0 }, scene = { NULL, 0, 0 }, pools = { NULL, 0, 0 }, records = { NULL, 0, 0 }, lists = { NULL, 0, 0 };
-    RootList objects = { NULL, 0, 0 }, effects = { NULL, 0, 0 }, actions = { NULL, 0, 0 }, groups = { NULL, 0, 0 };
+    RootList objects = { NULL, 0, 0 }, effects = { NULL, 0, 0 }, actions = { NULL, 0, 0 }, groups = { NULL, 0, 0 }, recArrays = { NULL, 0, 0 };
     bool ok = hdrSize >= LEVEL_HEADER_SLOTS + 0x118;
     u32 count = ok ? Host32(hdr + 0x1A8) : 0, stride = LEVEL_SLOT_MIN_SIZE, entries, addr;
     const u8* slots = hdr + LEVEL_HEADER_SLOTS;
@@ -3392,12 +3393,20 @@ extern "C" BOOL LevelZoneRootsCollect(const u8* hdr, u32 hdrSize, const u8* zone
         // The slot's action table at +0xD4 (TriggerDoAction, kind 2).
         if (ok && (addr = ZoneAddr(slot + 0xD4, zoneHost, zoneSize, zoneWiiBase)) != 0) ok = RootAdd(&actions, addr);
         if (ok && (addr = ZoneAddr(slot + 0x110, zoneHost, zoneSize, zoneWiiBase)) != 0) ok = RootAdd(&groups, addr);
+        // The slot's two arrays of entity records (+0x8C statics, +0x90 dynamics; capacity at +0x124 / +0x130, as
+        // fn_8012E420 hands them out). Records of pooled entities that no entity points at yet are converted too:
+        // a projectile taken from the pool gets one of them and its spawn only sets some fields (the rest stay the
+        // file's 0x7F800001, which the game then combines its flags with).
+        for (u32 t = 0; ok && t < 2; t++)
+            if ((addr = ZoneAddr(slot + 0x8C + t * 4, zoneHost, zoneSize, zoneWiiBase)) != 0)
+                ok = RootAdd(&recArrays, addr) && RootAdd(&recArrays, Host32(slot + (t == 0 ? 0x124 : 0x130)));
         // The slot's placed effects at +0x80, as many as the word at +0x9C says.
         if (ok && Host32(slot + 0x9C) != 0 && (addr = ZoneAddr(slot + 0x80, zoneHost, zoneSize, zoneWiiBase)) != 0)
             ok = RootAdd(&effects, addr) && RootAdd(&effects, Host32(slot + 0x9C));
     }
     out->slotObjects = objects.items;       out->slotObjectCount = objects.count / 2;
     out->slotEffects = effects.items;       out->slotEffectCount = effects.count / 2;
+    out->recordArrays = recArrays.items;    out->recordArrayCount = recArrays.count / 2;
     out->actionTables = actions.items;      out->actionTableCount = actions.count;
     out->soundGroups = groups.items;        out->soundGroupCount = groups.count;
     out->entities = entities.items;         out->entityCount = entities.count;
@@ -3686,6 +3695,17 @@ extern "C" SirError LevelZoneConvert(SirReloc* r, u8* image, u32 imageSize, u32 
         e = SlotEffectsPlan(&plan, image, imageSize, roots->slotEffects[i * 2], roots->slotEffects[i * 2 + 1]);
     for (u32 i = 0; i < roots->slotObjectCount && e == SIR_OK; i++)
         e = SlotObjectsPlan(&plan, image, imageSize, roots->slotObjects[i * 2], roots->slotObjects[i * 2 + 1]);
+    for (u32 i = 0; i < roots->recordArrayCount && e == SIR_OK; i++) {
+        u32 addr = roots->recordArrays[i * 2], cap = roots->recordArrays[i * 2 + 1], o;
+        if (cap > imageSize / ENTITY_RECORD_SIZE) { e = SIR_ERR_LEVEL; break; }
+        for (u32 k = 0; k < cap; k++) {
+            if (!LevelSpan(addr + k * ENTITY_RECORD_SIZE, ENTITY_RECORD_SIZE, imageSize, &o)) break;
+            bool taken = false;                  // a record some entity leads to is planned already; others overlap nothing
+            for (u32 j = 0; j < plan.count && !taken; j++)
+                taken = plan.regions[j].off < o + ENTITY_RECORD_SIZE && o < plan.regions[j].off + plan.regions[j].size;
+            if (!taken && !PlanAdd(&plan, o, ENTITY_RECORD_SIZE, REGION_ENTITY_RECORD)) { e = SIR_ERR_LEVEL; break; }
+        }
+    }
     for (u32 i = 0; i < roots->zoneRecordCount && e == SIR_OK; i++) e = ZoneRecordPlan(&plan, image, imageSize, roots->zoneRecords[i]);
     for (u32 i = 0; i < roots->zoneListCount && e == SIR_OK; i++) e = ZoneListPlan(&plan, image, imageSize, roots->zoneLists[i]);
     // A shared zone: the slot copy at the start (converted below, by the slot's own field table) and its screen set.
