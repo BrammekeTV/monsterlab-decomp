@@ -353,4 +353,10 @@ void fn_8022F50C(u8* snap) {
     for (s32 i = 0; i < 0x69; i++) b[0x51C + i] = lbl_805FBBE0[0xBF0 + i * 0xC];
 }
 
+// 0x80225664
+// The 64-bit value at save +0x900 (high word) / +0x904 (low word).
+u64 fn_80225664(u8* s) {
+    return ((u64)*(u32*)(s + 0x900) << 32) | *(u32*)(s + 0x904);
+}
+
 }  // extern "C"

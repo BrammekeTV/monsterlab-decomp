@@ -14,7 +14,7 @@ void  PropPlayAnim(void* prop, int a, int b, BOOL once);        // 0x80069350
 s32   RaySceneTest(void* ray);                                  // 0x80070458
 void  fn_8003DA7C(void);                                        // 0x8003DA7C
 void  fn_800CD020(u8* obj);                                     // 0x800CD020
-void  fn_800D3D50(void);                                        // 0x800D3D50
+void  fn_800D3D50(void* db);                                    // 0x800D3D50 (clears three counters of the object database)
 void  PathCheckFullyConnected(void* db);                                    // 0x800D3D6C
 void  fn_800D41F4(void* db, u8* p);                             // 0x800D41F4
 void  fn_800D424C(void* db, u8* p);                             // 0x800D424C
@@ -435,7 +435,7 @@ void fn_8013006C(u8* self) {
     }
     fn_801070B0(0);
     if (gObjDb != NULL && *(s32*)(gGame + 0xFE0) == 0) {
-        fn_800D3D50();
+        fn_800D3D50(gObjDb);
         for (i = 0; i < *(s32*)(*(u8**)self + 0x30); i++) {
             fn_800D424C(gObjDb, *(u8**)(*(u8**)(*(u8**)self + 0x2C) + i * 4));
         }

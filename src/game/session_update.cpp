@@ -63,7 +63,7 @@ void   fn_801F357C(void);  void fn_801F3BB8(void);  void fn_801F401C(void);  voi
 s32 fn_801FCA38(f32 x, f32 y);
 void   AudioSetPaused(void* audio, int paused);          // 0x801FF708
 void   SaveAddPlayTime(void* save, s64 seconds);         // 0x80225674
-void   fn_80225C10(void* save, s64 v);
+void   fn_80225C10(void* save, s32 unused, s32 hi, s32 lo);   // 0x80225C10 (64-bit value at save +0x140: the Wii passes it in r5:r6)
 void   fn_8022624C(void* save);
 s32    WPADProbe(s32 chan, u32* out);
 s32    fn_80272B64(s32 chan, u8* out);
@@ -380,7 +380,7 @@ void GameSessionUpdate(GameSession* s, f32 a, f32 dt) {
             s->playTimer += dt;
             if (s->playTimer > (f32)lbl_805F81A0) {
                 SaveAddPlayTime(gSaveSystem, lbl_805F81A0);
-                fn_80225C10(gSaveSystem, 0);
+                fn_80225C10(gSaveSystem, 0, 0, 0);
                 s->playTimer = 0.0f;
             }
         }

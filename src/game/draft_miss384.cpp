@@ -18,7 +18,7 @@ void fn_80146328(u32* state, u32 seed);                                       //
 void fn_80149B4C(void* a, void* b, void* c, s32 w, s32 h, const char* name);  // 0x80149B4C
 void fn_8014E3EC(s32 n);                                                      // 0x8014E3EC
 void fn_80151E38(s32 quads, void* verts);                                     // 0x80151E38
-void fn_801499F8(u8* target, s32 w, s32 h, s32 fmt, s32 a, s32 b, const char* name);   // 0x801499F8
+s32  fn_801499F8(u8* target, s32 w, s32 h, s32 fmt, s32 a, s32 b, const char* name);   // 0x801499F8
 void fn_801646E8(u8* arg0, u8* arg1);                                         // 0x801646E8
 u32* fn_80156F70(s32 table, s32 enable);                                      // 0x80156F70 (returns the colour table)
 void fn_80157320(void);                                                       // 0x80157320 (empty; the original calls pass 0..2 in r3, ignored)

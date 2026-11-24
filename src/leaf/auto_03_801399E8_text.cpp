@@ -7,8 +7,6 @@
 
 extern u8 lbl_803F0CF0[];
 extern u8 lbl_805FB340;
-extern s32 lbl_805FB348;
-extern s32 lbl_805FB34C;
 extern "C" void UIGroup_DisableHitTest(u32);
 extern "C" void UIGroup_EnableHitTest(u32);
 
@@ -33,13 +31,6 @@ extern "C" u32 fn_80139FF0(void) {
     u32 t1 = (u32)(t0) - 1u;
     u32 t2 = (u32)(t1 == 0);
     return (u32)(t2);
-}
-
-// 0x8013A004
-extern "C" s32 fn_8013A004(void) {
-    s32 t0 = *(s32*)((u8*)&lbl_805FB348);
-    s32 t1 = *(s32*)((u8*)&lbl_805FB34C);
-    return (s32)(t0);
 }
 
 // 0x8013A010

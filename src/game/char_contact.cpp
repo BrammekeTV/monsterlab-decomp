@@ -41,7 +41,7 @@ void   CharacterSetFallTimer(u8* c, f32 t);                      // 0x800584C8
 void   CharacterResetGroundState(u8* c, s32 a, s32 b);           // 0x8005BAD4
 void*  PhysicsBodyGet(void* handle);                             // 0x801B1840
 void   RayQueryInit(u8* q);                                      // 0x801B11DC
-void   RayQueryDestroy(u8* q, s32 del);                          // 0x80055C80
+u8*    RayQueryDestroy(u8* q, s32 del);                          // 0x80055C80
 void   RayHitInit(u8* hit);                                      // 0x80055CD8
 void   RayQuerySetStart(u8* q, const Vec3* p);                   // 0x80055D64
 void   RayQuerySetDir(u8* q, const Vec3* d);                     // 0x80055D80

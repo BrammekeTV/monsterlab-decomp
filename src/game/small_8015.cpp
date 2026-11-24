@@ -4,7 +4,7 @@
 
 extern "C" {
 void     fn_8014DE68(void);                                                        // 0x8014DE68
-void     fn_80152D84(u32 a, u32 b, s32 c, u32 d, u8* e, u32 f, u32 g, u32 h);      // 0x80152D84
+void     fn_80152D84(u32 a, u32 b, s32 c, u32 d, u8* e);                           // 0x80152D84
 s32      fn_8015BA30(void* p);                                                     // 0x8015BA30
 void     fn_8015AB70(u8* p, s32 level);                                                       // 0x8015AB70
 void     fn_8015BBC0(s32 a);                                                       // 0x8015BBC0
@@ -107,11 +107,11 @@ void fn_801584E8(u8* p, u32 idx) {
 
 // 0x80158870
 // Calls fn_80152D84 for 17 consecutive 0x300-byte blocks starting at p.
-// r5-r7 are not forwarded (r5 and r7 are set per call, r6 is always 0x40); r8-r10 pass through.
+// r5-r7 are not forwarded (r5 and r7 are set per call, r6 is always 0x40); fn_80152D84 reads five arguments.
 void fn_80158870(u8* p, s32 a4, s32 unused5, s32 unused6, s32 unused7, s32 a8, s32 a9, s32 a10) {
     (void)unused5; (void)unused6; (void)unused7;
     for (s32 i = 0; i < 0x11; i++) {
-        fn_80152D84(0x98, 0x40, a4, 0x40, p + i * 0x300, a8, a9, a10);
+        fn_80152D84(0x98, 0x40, a4, 0x40, p + i * 0x300);
     }
 }
 

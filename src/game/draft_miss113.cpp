@@ -67,7 +67,7 @@ void UIEngine_ShowCursor(void* sets, s32 a);                             // 0x80
 s32 fn_80198A8C(void* set, void* widget);                       // 0x80198A8C
 BOOL fn_80198C34(void* set, void* w);                            // 0x80198C34
 ScriptValue fn_801A1208(u8* el);                                 // 0x801A1208 (image element -> texture)
-s32 fn_800ED944(u8* p, f32 dt);                                          // 0x800ED944 (lightning callback)
+s32 fn_800ED944(u8* p, void* owner, f32 dt);                             // 0x800ED944 (lightning callback)
 void fn_801B55F4(u8* obj, u8* out, s32 idx);                     // 0x801B55F4
 void fn_801B9C94(u8* mgr);                                       // 0x801B9C94
 void fn_801B9CA8(u8* mgr);                                       // 0x801B9CA8

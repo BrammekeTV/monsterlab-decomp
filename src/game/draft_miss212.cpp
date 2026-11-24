@@ -64,7 +64,7 @@ void ScopedLockDtor(ScopedLock* l, s32 flags);                   // 0x801F53B0
 s32 RaySceneTest(void* ray);                                     // 0x80070458 (ignores its argument)
 s32 fn_800CD490(u8* t, s32 v);                                   // 0x800CD490
 void fn_800C8E54(u8* obj, u8* dst, s32 idx);                     // 0x800C8E54
-s32 fn_800CDC9C(u8* p);                                          // 0x800CDC9C
+void fn_800CDC9C(u8* list, u8* obj);                             // 0x800CDC9C (appends obj to the 9-entry list: count at +0, entries from +4)
 void fn_800C75E8(u8* a, u8* b);                                  // 0x800C75E8
 void fn_800CD9F0(u8* a, f32* b);                                 // 0x800CD9F0
 s32 fn_800CC854(u8* obj, u8* b);                                 // 0x800CC854
@@ -980,7 +980,7 @@ void fn_800CF7E8(u8* p) {
                 break;
             case 0x7E1D3A03u:
                 *(u32*)(obj + 0x15C) = *(u32*)(obj + 0x15C) | 0x400000u;
-                fn_800CDC9C(p + 0xA8);
+                fn_800CDC9C(p + 0xA8, obj);
                 break;
             default:
                 break;

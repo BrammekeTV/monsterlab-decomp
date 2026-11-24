@@ -57,7 +57,7 @@ void fn_80158870(u8* p, s32 a4, s32 unused5, s32 unused6, s32 unused7, s32 a8, s
 u32 fn_80159058(void);                                                  // 0x80159058
 u32 fn_80159084(s32 a3, u8* a4);                                        // 0x80159084
 void fn_801590A0(void);                                                 // 0x801590A0
-void fn_80152D84(u32 a, u32 b, s32 c, u32 d, u8* e, u32 f, u32 g, u32 h);  // 0x80152D84
+void fn_80152D84(u32 a, u32 b, s32 c, u32 d, u8* e);                      // 0x80152D84
 void fn_80159258(void);                                                 // 0x80159258
 void fn_801578D8(u8* p, u32 a, s32 mode);                               // 0x801578D8
 void fn_80157B28(u8* p, u32 a, s32 mode);                               // 0x80157B28
@@ -200,7 +200,7 @@ static void RenderCaptureLayers(void) {
                         (f32)*(u16*)(rec + 0x0) / (f32)*(u16*)(rec + 0x4),
                         (f32)*(u16*)(rec + 0x2) / (f32)*(u16*)(rec + 0x6));
             for (s32 k = 0; k < 0x11; k++) {
-                fn_80152D84(0x98, 0x40, bufSize, 0x40, buf + k * 0x300, 0, 0, 0);
+                fn_80152D84(0x98, 0x40, bufSize, 0x40, buf + k * 0x300);
             }
             GxBpWrite(0xFE000001);
             GxBpWrite(0x41000000);

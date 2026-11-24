@@ -11,10 +11,10 @@
 extern "C" {
 void  SysRequestExit(int mode);                 // 0x80142DE8
 void  fn_8020B194(f32);                         // 0x8020B194
-void  SetCallback_80146800(void (*cb)(void));   // 0x80146800: stores to 0x805FB470
-void  SetCallback_80207164(void (*cb)(void));   // 0x80207164: stores to 0x805FBB24
-void  fn_80010F64(void);
-void  fn_80010F88(void);
+void  SetCallback_80146800(s32 (*cb)(void));    // 0x80146800: stores to 0x805FB470
+void  SetCallback_80207164(s32 (*cb)(s32 err)); // 0x80207164: stores to 0x805FBB24
+s32   fn_80010F64(void);
+s32   fn_80010F88(s32 error);
 void  RendSetCallbackA(BOOL (*cb)(void));       // 0x8014DD74: stores to 0x805FB4F0
 void  RendSetCallbackB(u8 (*cb)(void));       // 0x8014DD7C
 BOOL  fn_8000CFA8(void);
