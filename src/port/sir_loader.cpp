@@ -1536,6 +1536,7 @@ static void PoolConvert(SirReloc* r, u8* image, u8* pool, u32 imageSize) {
 static const SirField kEntityFields[] = {
     { 0x000, SIR_U32, 1 },    // build-time vtable address; the constructor for the type stores the real one
     { 0x004, SIR_PTR, 1 },    // code: the entity's record (fn_8012F8B8, fn_801B4334)
+    { 0x008, SIR_F32, 3 },    // code: scale; EntitySyncTransform hands +0x08 to the scene object's transform
     { 0x02C, SIR_U32, 2 },    // code: id, which fn_800D8724 compares for every entity of a zone's tables; +0x30 (fn_801B6444)
     { 0x080, SIR_U32, 1 },    // code: fn_801260C8 tests its bits 0x78000000 (0x0003FFFF in the files)
     { 0x084, SIR_PTR, 1 },    // code: a table fn_801B6AD4 searches (the table itself is not converted)
@@ -1580,6 +1581,7 @@ static const SirField kPropFields[] = {
     { 0x048, SIR_U32, 4 },    // code: action words (fn_800696C4, fn_8006BDF4, fn_80069638)
     { 0x068, SIR_U32, 1 },    // code: action word (fn_80069180)
     { 0x0C8, SIR_F32, 3 },    // code: a position (fn_8006A764)
+    { 0x0D4, SIR_F32, 3 },    // code: its rotation as Euler angles (fn_801B5BD8 builds the record's quaternion from them)
     { 0x0EC, SIR_U32, 1 },    // code: fn_800696C4
     { 0x15C, SIR_U32, 1 },    // code: flags (fn_80069180, fn_8006A764, fn_8006A2D0)
     { 0x1A0, SIR_PTR, 1 },    // code: the prop's states: +0x1A4 pointers to definitions (fn_800699E4)
@@ -1955,7 +1957,9 @@ static SirError EntityPlan(ImagePlan* plan, const u8* image, u32 imageSize, u32 
     u32 otherRec = 0, q;
     bool recordHere = LevelSpan(Be32(ent + 0x04), ENTITY_RECORD_SIZE, imageSize, &o) != 0;
     bool recordOther = !recordHere && OtherSpan(Be32(ent + 0x04), ENTITY_RECORD_SIZE, &otherRec);
-    bool prop = (recordHere && image[o + 0x34] == ENTITY_TYPE_PROP) || (recordOther && sOtherImage[otherRec + 0x34] == ENTITY_TYPE_PROP);
+    u32 kind = recordHere ? image[o + 0x34] : recordOther ? sOtherImage[otherRec + 0x34] : 0;
+    // Type 0x10 (the challenge projector, fn_8006CFA4) derives from the prop: same layout and definition.
+    bool prop = kind == ENTITY_TYPE_PROP || kind == 0x10;
     if (recordOther && !OtherAdd(otherRec, ENTITY_RECORD_SIZE, REGION_ENTITY_RECORD)) return SIR_ERR_ENTITY;
     if (depth > ENTITY_DEPTH_MAX || !PlanAdd(plan, off, ENTITY_USED, prop ? REGION_ENTITY_PROP : REGION_ENTITY)) return SIR_ERR_ENTITY;
     SirError e;
@@ -1987,6 +1991,12 @@ static SirError EntityPlan(ImagePlan* plan, const u8* image, u32 imageSize, u32 
     } else if (LevelSpan(Be32(ent + 0x9C), 0xC, imageSize, &o)) {
         if (!PlanAdd(plan, o + 8, 4, REGION_U32_ARRAY)) return SIR_ERR_ENTITY;
     } else if (OtherSpan(Be32(ent + 0x9C), 0xC, &q) && !OtherAdd(q + 8, 4, REGION_U32_ARRAY)) return SIR_ERR_ENTITY;
+    // Attached effects (fn_801EC080): +0x94 how many, +0x98 the records (0xC8 bytes of 32-bit words: key hash,
+    // bone, local matrix, world matrix, effect ids; the instances behind them are runtime).
+    u32 fxCount = Be32(ent + 0x94);
+    if (fxCount != 0 && fxCount <= 64 && LevelSpan(Be32(ent + 0x98), (u64)fxCount * 0xC8, imageSize, &o)) {
+        if (!PlanAdd(plan, o, fxCount * 0xC8, REGION_U32_ARRAY)) return SIR_ERR_ENTITY;
+    }
     // State machine holder: {machine, object}; fn_8012F8B8 hands the machine's definition to fn_801BC574.
     if (LevelSpan(Be32(ent + 0xA4), 8, imageSize, &o)) {
         if (!PlanAdd(plan, o, 8, REGION_PTR_ARRAY)) return SIR_ERR_ENTITY;
