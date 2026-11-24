@@ -1242,7 +1242,8 @@ def zone_dump(L, sec, base, hud, roots, scene_roots, pooltabs, records=(), lists
         parts(u(o + 0x8C))
         add(scene, u(o + 0x90), 8)
         dl = loc(u(o + 0x9C), 0xC)
-        if dl: L.append('entobj9c %s id %08x' % (ptr(u(o + 0x9C)), U(dl[0], dl[1] + 8)))
+        ds = None if prop else loc(u(o + 0x9C), 0x4C)
+        if dl: L.append('entobj9c %s id %08x' % (ptr(u(o + 0x9C)), U(dl[0], dl[1] + 8)) + (' set %s' % ptr(U(ds[0], ds[1] + 0x48)) if ds else ''))
         dl = loc(u(o + 0x9C), 0xC0)
         if prop and dl:
             img, q = dl

@@ -1448,7 +1448,11 @@ struct ZoneDump {
             Parts(*(const u8**)(e + 0x8C));
             Add(scene, *(const u8**)(e + 0x90), 8);
             const u8* o9c = *(const u8**)(e + 0x9C);
-            if (InAny(o9c, 0xC)) { printf("entobj9c "); Val(o9c); printf(" id %08x\n", *(const u32*)(o9c + 8)); }
+            if (InAny(o9c, 0xC)) {
+                printf("entobj9c "); Val(o9c); printf(" id %08x", *(const u32*)(o9c + 8));
+                if (!prop && InAny(o9c, 0x4C)) { printf(" set "); Ptr(o9c + 0x48); }
+                printf("\n");
+            }
             if (prop && InAny(o9c, PROP_DEF_USED)) {
                 printf("entdef "); Val(o9c); printf(" f24 %08x w2c %08x acts", Bits(*(const f32*)(o9c + 0x24)), *(const u32*)(o9c + 0x2C));
                 for (u32 k = 0; k < 3; k++) printf(" %08x", *(const u32*)(o9c + 0x68 + k * 4));

@@ -382,10 +382,8 @@ tables of the running PC build:
   that.
 
 The 42 objects those operands point at lie between the records (`0xDF2E0`, `0xE1AD0`,
-`0xECE30`, ...). The three looked at have the same shape: a pointer to a second part 0x30 bytes
-further on, a flag word, floats (1.0, -3.0), a hash, and in the second part of one a name
-(`Generic_Timer_Countdown_Mo_01`). They are **not** converted: the functions that read them are
-not decompiled far enough to type the fields.
+`0xECE30`, ...). They are sound objects (next section): type `0xD` is a voice line, which
+`PlayVoiceSFX` and `LT_SetTutorialText` hand to `PlaySoundAt` like any other sound.
 
 ### Sound objects
 
@@ -1065,3 +1063,23 @@ In the order the boot path needs them:
 3. **`shared_texture.sir`**: the texture header schema here should apply as it is.
 4. **Save files**: written from memory by the Wii build, so big-endian too.
 5. **`shared_parts.sir`** and the level and arena files: models, skeletons, textures.
+
+## What one zone of a level keeps in another
+
+A level's zone 0 (the `c` file) is converted first, a later zone when the game loads it. Three
+things of zone 0 point into the later zone, and are converted with that zone
+(`LevelZoneConvert` with zone 0 as `other`):
+
+| in zone 0 | in the later zone | converted by |
+|---|---|---|
+| a state machine's value table pointer (`+0x54`) | the table `{count, action words}`; a choice node's action word of type 3 is an index into it (`fn_801BC20C`) | `OtherFsmValuesPlan` |
+| a sound operand of an action record (`PlayVoiceSFX` and the other calls of `kSirSoundCalls`) | the sound object, its info and DSP header | `OtherActionSoundsPlan` |
+| the definition of an entity of the later zone (entity `+0x9C`) | - | `+0x08` id and `+0x48` animation set pointer are added to zone 0's plan |
+
+Without the value tables every choice node of a level's quest machines takes its first way out:
+the quest of a new game then starts in a state that has no handler for the arrival event, and the
+room stays idle.
+
+An entity's own fields: `+0x08` three floats, its scale (`EntitySyncTransform`, 0x801B4F4C, hands
+them to the model with the record's rotation). A non-prop entity's definition (`+0x9C`): `+0x08`
+id, `+0x48` its animation set (`fn_8005BEC8` looks a conversation's clip up in it).

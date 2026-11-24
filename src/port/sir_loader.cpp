@@ -1635,6 +1635,7 @@ static const SirField kAnimDefFields[] = {
     { 0x3C, SIR_U32, 2 },
 };
 #define ANIM_SET_USED 0x20
+#define ENTITY_DEF_USED 0x4C   // of the definition of an entity that is not a prop (entity +0x9C): id +0x08, animation set +0x48
 #define ANIM_DEF_SIZE 0x44
 
 static SirError AnimClipPlan(ImagePlan* plan, const u8* image, u32 imageSize, u32 addr);
@@ -2011,7 +2012,12 @@ static SirError EntityPlan(ImagePlan* plan, const u8* image, u32 imageSize, u32 
         }
     } else if (LevelSpan(Be32(ent + 0x9C), 0xC, imageSize, &o)) {
         if (!PlanAdd(plan, o + 8, 4, REGION_U32_ARRAY)) return SIR_ERR_ENTITY;
-    } else if (OtherSpan(Be32(ent + 0x9C), 0xC, &q) && !OtherAdd(q + 8, 4, REGION_U32_ARRAY)) return SIR_ERR_ENTITY;
+        // +0x48: the definition's animation set (fn_8005BEC8 looks a conversation's clip up in it).
+        if ((u64)o + ENTITY_DEF_USED <= imageSize && !PlanAdd(plan, o + 0x48, 4, REGION_PTR_ARRAY)) return SIR_ERR_ENTITY;
+    } else if (OtherSpan(Be32(ent + 0x9C), 0xC, &q)) {
+        if (!OtherAdd(q + 8, 4, REGION_U32_ARRAY)) return SIR_ERR_ENTITY;
+        if ((u64)q + ENTITY_DEF_USED <= sOtherSize && !OtherAdd(q + 0x48, 4, REGION_PTR_ARRAY)) return SIR_ERR_ENTITY;
+    }
     // Attached effects (fn_801EC080): +0x94 how many, +0x98 the records (0xC8 bytes of 32-bit words: key hash,
     // bone, local matrix, world matrix, effect ids; the instances behind them are runtime).
     u32 fxCount = Be32(ent + 0x94);
