@@ -99,6 +99,11 @@
  "changelog": [
   {
    "date": "2026-11-24",
+   "time": "15:37",
+   "text": "More of the game converted (PRs 175 176): the whole character definition is now converted to PC byte order, not just the animation speed (#175); and the village map camera no longer goes wrong after a conversation, because the player's camera sensor radius was unconverted and every camera zone applied at once (#176)."
+  },
+  {
+   "date": "2026-11-24",
    "time": "15:07",
    "text": "Thunder rolls on the main menu (PR #174): a thunder clap every 3 to 5 seconds, as in the real game. The timed triggers that play it were converted without their actions and time-outs, so they never fired."
   },
