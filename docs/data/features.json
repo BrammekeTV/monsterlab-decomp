@@ -99,6 +99,11 @@
  "changelog": [
   {
    "date": "2026-11-24",
+   "time": "18:59",
+   "text": "The first battle now plays on Windows (PR #187): attacks play out, the enemy takes its turn, and the fight runs for two rounds. The 3D scenes are now drawn on the graphics card, so the village takes about 40% less work per frame (PR #188)."
+  },
+  {
+   "date": "2026-11-24",
    "time": "18:18",
    "text": "The first battle now loads and starts on Windows (PR #183): the arena, the intro camera, the combat tutorial and choosing a part with the stick. Cutscene movies no longer show thin vertical lines at other window sizes (PR #186)."
   },
