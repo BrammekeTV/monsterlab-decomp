@@ -99,6 +99,11 @@
  "changelog": [
   {
    "date": "2026-11-24",
+   "time": "16:15",
+   "text": "The first battle triggers on Windows (PR #178): walking to the monsters blocking the village path now starts the battle, and the arena level begins loading. It stays on the loading screen for now; that's next."
+  },
+  {
+   "date": "2026-11-24",
    "time": "16:11",
    "text": "Faster rendering on Windows (PR #177): the screen copies the game makes for its effects now reuse a pool of textures instead of creating new ones, which cut the time spent on copies on the main menu from 24 seconds to 0.4 seconds over a 3,900-frame test run."
   },
