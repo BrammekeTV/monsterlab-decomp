@@ -165,10 +165,6 @@ const char* PortSoftSdk(u32 addr) {
         {0x80264EE8, "audio: mixer init (fn_80264EE8)"},
         {0x80264F70, "audio: sequencer init (fn_80264F70)"},
         {0x8027FF24, "KPADReset (fn_8027FF24)"},
-        // The effects on AX's aux buses (the game's set-up is fn_80203E8C): not mixed on PC.
-        {0x8025D2E0, "audio: AXFX effect init (fn_8025D2E0)"},
-        {0x8025E3E4, "audio: AXFX effect init (fn_8025E3E4)"},
-        {0x8025B4C0, "audio: AXFX effect init (AXFXReverbHiExpInit)"},
         // OSSetPeriodicAlarm: its only caller so far is the audio tick (fn_80202CAC), which needs AX.
         {0x80234394, "OSSetPeriodicAlarm for the audio tick (OSSetPeriodicAlarm): not started"},
         // The SDK's HOME-button menu library (HBM), used by HomeButtonInit and the game's

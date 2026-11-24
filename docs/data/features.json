@@ -99,6 +99,11 @@
  "changelog": [
   {
    "date": "2026-11-24",
+   "time": "12:01",
+   "text": "Big step on Windows (PRs #161 to #165). The village intro cutscene finishes: the coffin lands and the exploration map shows. The main menu now has its rain and the projector's light cone with the menu text inside. The sound mixer now has the game's reverb, echo, chorus and delay effects, and the Wii Remote speaker's sounds play through your PC speakers, with a setting to turn that off. Mods can now replace textures by their name in the game's data instead of a hash."
+  },
+  {
+   "date": "2026-11-24",
    "time": "11:02",
    "text": "Continue on the main menu now loads your saved game on Windows (PR #159), and selecting a profile works. The differential tests now report every small self-contained function as matching the original Wii code, apart from 18 listed cases the test harness can't run yet. That came with one more fix in our decompiled code (PR #158)."
   },

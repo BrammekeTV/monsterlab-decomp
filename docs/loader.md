@@ -756,7 +756,7 @@ an item is follows from the function:
 | 652 | `FixUpEntityPartCallback` | an entity |
 | 653 | `FixUpPooledEntityCallback` | a slot holding an entity |
 | 654 | `FixUpProjectileEntityCallback` | an entity with a part pointer at `+0x22C` |
-| 655 | `FixUpRenderObjectCallback` | a slot holding a render object (`fn_8012F818`; the object is not typed yet) |
+| 655 | `FixUpRenderObjectCallback` | a slot holding a render object (`fn_8012F818` sets it up by its type at `+0x04`): a scene object, converted like the scene objects of the entities |
 | 656 | `FixupFSMPoolCallback` | a slot holding a state machine |
 
 The index is the function's place in `gScriptFuncs`, which depends on the registration order.
@@ -1025,9 +1025,14 @@ Read when the first map level (`village_level.sir`) starts:
   bytes at `+0x64` and `+0x9C`) and every junction record (0xDC bytes, `fn_800D5008`: six words,
   up to twelve entries of three floats and a byte from `+0x18`, their count at `+0xD8`) into the
   object database.
-- **Spawn owners** (header `+0x74`, `+0x78`): the objects `SpawnCoffinProjectile` and
-  `FireRocketAtEntity` spawn from. `SpawnHelper` compares the type id at their `+0x00` with
-  `0x37645F52`; only the two pointers and that word are converted so far.
+- **Spawn owners** (header `+0x74`, `+0x78`): the projectile definitions `SpawnCoffinProjectile` and
+  `FireRocketAtEntity` spawn from (0x170 bytes; a spawned projectile's `+0x228`). `SpawnHelper` compares
+  the type id at `+0x00` with `0x37645F52`. Converted: `+0x08` id, `+0x0C` four words (`+0x10` animation
+  id), `+0x60` a hash and 20 action words (`0x0003FFFF` = none), `+0xB4` a word, `+0xB8..+0xEC` floats
+  (but `+0xE8`: hash of the collision entry), `+0xF0..+0x100` effect hashes, `+0x104` name hash of the
+  pool its model comes from (`fn_80063D6C` looks it up in zone 0's pool table: `coffin`), `+0x108..+0x118`
+  five sound objects, `+0x148` flags, `+0x14C` an object (not typed), `+0x150` four floats and a duration.
+  Not converted: the pointers at `+0x4C` and `+0x54` (no reader found yet).
 - **Camera objects** (a slot's objects, `+0xA8`): every type starts the same way (`fn_800DECD8`,
   `fn_800DE678`): `+0x0C` how many boundary nodes, `+0x10` the nodes (0x14 bytes: a word, a
   position, a float), `+0x14` how many segments, `+0x18` the segments (two node indices, bytes),

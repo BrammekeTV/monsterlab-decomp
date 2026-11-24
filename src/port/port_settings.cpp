@@ -4,7 +4,7 @@
 //
 //   [display]   width, height, aspect (16:9 or 4:3), stretch_ui, vsync, fullscreen, render_scale, texture_filter
 //   [game]      path: the player's disc image or extracted folder
-//   [audio]     volume (0-100), mute
+//   [audio]     volume (0-100), mute, remote_speaker (play the Wii Remote speaker sounds)
 //   [mods]      NAME = 1 or 0, in load order (port_mods.cpp)
 //   [controls]  NAME = key 1, key 2, mouse button, gamepad bits   (Windows virtual-key codes; 0 = none)
 #ifdef _WIN32
@@ -84,6 +84,7 @@ BOOL PortSettingsLoad(const char* path, PortSettings* s) {
         } else if (!strcmp(section, "audio")) {
             if (!strcmp(key, "volume")) s->volume = Clamp(atoi(val), 0, 100);
             else if (!strcmp(key, "mute")) s->mute = atoi(val) != 0;
+            else if (!strcmp(key, "remote_speaker")) s->remoteSpeaker = atoi(val) != 0;
         } else if (!strcmp(section, "controls")) {
             for (int i = 0; i < gPortBindingCount; i++) {
                 PortBinding* b = &gPortBindings[i];
@@ -115,7 +116,7 @@ BOOL PortSettingsSave(const char* path, const PortSettings* s) {
     fprintf(f, "; fps_cap: off (a picture per game frame), 30, 60, 120, 144 or any rate, display (the monitor's rate), uncapped\nfps_cap = %s\n\n",
             s->fpsCap > 0 ? cap : s->fpsCap == PORT_FPS_UNCAPPED ? "uncapped" : s->fpsCap == PORT_FPS_DISPLAY ? "display" : "off");
     if (s->gamePath[0]) fprintf(f, "; your Monster Lab disc image (.iso, .wbfs, .rvz) or extracted folder\n[game]\npath = %s\n\n", s->gamePath);
-    fprintf(f, "[audio]\nvolume = %d\nmute = %d\n\n", s->volume, s->mute ? 1 : 0);
+    fprintf(f, "[audio]\nvolume = %d\nmute = %d\n; remote_speaker: also play the sounds the console sends to the Wii Remote's speaker\nremote_speaker = %d\n\n", s->volume, s->mute ? 1 : 0, s->remoteSpeaker ? 1 : 0);
     fprintf(f, "; NAME = key 1, key 2, mouse button (1 left, 2 right), gamepad bits (hex); keys are Windows virtual-key codes\n[controls]\n");
     for (int i = 0; i < gPortBindingCount; i++) {
         const PortBinding* b = &gPortBindings[i];
@@ -139,18 +140,18 @@ int PortSelfTestSettings(void) {
 
     PortSettings want = {};
     want.width = 2560; want.height = 1440; want.wide = FALSE; want.stretchUi = TRUE; want.vsync = TRUE; want.fullscreen = TRUE;
-    want.volume = 37; want.mute = TRUE; want.renderScale = 150; want.texFilter = PORT_FILTER_AF8; want.fpsCap = PORT_FPS_UNCAPPED; want.msaa = 4;
+    want.volume = 37; want.mute = TRUE; want.renderScale = 150; want.texFilter = PORT_FILTER_AF8; want.fpsCap = PORT_FPS_UNCAPPED; want.msaa = 4; want.remoteSpeaker = FALSE;
     strcpy(want.gamePath, "D:\\My games\\Monster Lab (disc).iso");
     gPortBindings[0].key[0] = 'K'; gPortBindings[0].key[1] = 0; gPortBindings[0].mouse = 2; gPortBindings[0].pad = 0x20100;
     PortBinding changed = gPortBindings[0];
     if (!PortSettingsSave(path, &want)) { PortLog("selftest settings: cannot write %s", path); fails++; }
     memcpy(gPortBindings, keep, sizeof(PortBinding) * count);
 
-    PortSettings got = {1920, 1080, TRUE, FALSE, FALSE, FALSE, 100, FALSE, "", 100, PORT_FILTER_GAME, 0, 0};
+    PortSettings got = {1920, 1080, TRUE, FALSE, FALSE, FALSE, 100, FALSE, "", 100, PORT_FILTER_GAME, 0, 0, TRUE};
     if (!fails && !PortSettingsLoad(path, &got)) { PortLog("selftest settings: cannot read %s", path); fails++; }
     if (!fails) {
         if (got.width != want.width || got.height != want.height || got.wide != want.wide || got.stretchUi != want.stretchUi ||
-            got.vsync != want.vsync || got.fullscreen != want.fullscreen || got.volume != want.volume || got.mute != want.mute || got.renderScale != want.renderScale || got.texFilter != want.texFilter || got.fpsCap != want.fpsCap || got.msaa != want.msaa || strcmp(got.gamePath, want.gamePath)) {
+            got.vsync != want.vsync || got.fullscreen != want.fullscreen || got.volume != want.volume || got.mute != want.mute || got.renderScale != want.renderScale || got.texFilter != want.texFilter || got.fpsCap != want.fpsCap || got.msaa != want.msaa || got.remoteSpeaker != want.remoteSpeaker || strcmp(got.gamePath, want.gamePath)) {
             PortLog("selftest settings: read back %dx%d wide %d stretch %d vsync %d fullscreen %d volume %d mute %d",
                     got.width, got.height, got.wide, got.stretchUi, got.vsync, got.fullscreen, got.volume, got.mute);
             fails++;
@@ -166,7 +167,7 @@ int PortSelfTestSettings(void) {
     // A missing file changes nothing, and values out of range are brought into range.
     FILE* f = fopen(path, "w");
     if (f) { fputs("[display]\nwidth = 5\nheight = 99999\nrender_scale = 900\n[audio]\nvolume = 250\n", f); fclose(f); }
-    PortSettings odd = {1920, 1080, TRUE, FALSE, FALSE, FALSE, 100, FALSE, "", 100, PORT_FILTER_GAME, 0, 0};
+    PortSettings odd = {1920, 1080, TRUE, FALSE, FALSE, FALSE, 100, FALSE, "", 100, PORT_FILTER_GAME, 0, 0, TRUE};
     PortSettingsLoad(path, &odd);
     if (odd.width != 320 || odd.height != 8192 || odd.volume != 100 || odd.renderScale != 200) { PortLog("selftest settings: out-of-range values gave %dx%d volume %d", odd.width, odd.height, odd.volume); fails++; }
     DeleteFileA(path);
