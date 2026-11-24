@@ -1232,11 +1232,11 @@ def zone_dump(L, sec, base, hud, roots, scene_roots, pooltabs, records=(), lists
             L.append('entrecord %s floats %s w1c %08x %08x f24 %08x w2c %d h30 %d %d bytes %s' % (
                 ptr(r), W(img, q, 7), U(img, q + 0x1C), U(img, q + 0x20), U(img, q + 0x24), struct.unpack_from('>i', img, q + 0x2C)[0],
                 struct.unpack_from('>H', img, q + 0x30)[0], struct.unpack_from('>H', img, q + 0x32)[0], img[q + 0x34:q + 0x3E].hex()))
-        L.append('entbase %s id %08x w30 %08x w80 %08x p84 %s wac %08x' % (ptr(a), u(o + 0x2C), u(o + 0x30), u(o + 0x80), ptr(u(o + 0x84)), u(o + 0xAC)))
+        L.append('entbase %s f14 %08x id %08x w30 %08x w80 %08x p84 %s wac %08x' % (ptr(a), u(o + 0x14), u(o + 0x2C), u(o + 0x30), u(o + 0x80), ptr(u(o + 0x84)), u(o + 0xAC)))
         prop = rl and rl[0][rl[1] + 0x34] == 6
         if prop:
-            L.append('entprop %s f14 %08x f28 %08x acts %s %s %08x actor %s fc8 %s wec %08x w15c %08x states %s' % (
-                ptr(a), u(o + 0x14), u(o + 0x28), ws(o + 0x38, 3), ws(o + 0x48, 4), u(o + 0x68), ptr(u(o + 0xA0)), ws(o + 0xC8, 3),
+            L.append('entprop %s f28 %08x acts %s %s %08x actor %s fc8 %s wec %08x w15c %08x states %s' % (
+                ptr(a), u(o + 0x28), ws(o + 0x38, 3), ws(o + 0x48, 4), u(o + 0x68), ptr(u(o + 0xA0)), ws(o + 0xC8, 3),
                 u(o + 0xEC), u(o + 0x15C), ptr(u(o + 0x1A0))))
         anim_obj(u(o + 0xA0))
         parts(u(o + 0x8C))

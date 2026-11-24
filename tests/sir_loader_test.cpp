@@ -1433,11 +1433,11 @@ struct ZoneDump {
                 PrintRaw(r + 0x34, 10);
                 printf("\n");
             }
-            printf("entbase "); Val(e); printf(" id %08x w30 %08x w80 %08x p84 ", *(const u32*)(e + 0x2C), *(const u32*)(e + 0x30), *(const u32*)(e + 0x80)); Ptr(e + 0x84);
+            printf("entbase "); Val(e); printf(" f14 %08x id %08x w30 %08x w80 %08x p84 ", *(const u32*)(e + 0x14), *(const u32*)(e + 0x2C), *(const u32*)(e + 0x30), *(const u32*)(e + 0x80)); Ptr(e + 0x84);
             printf(" wac %08x\n", *(const u32*)(e + 0xAC));
             bool prop = InAny(r, ENTITY_RECORD_SIZE) && r[0x34] == ENTITY_TYPE_PROP;
             if (prop) {
-                printf("entprop "); Val(e); printf(" f14 %08x f28 %08x acts", Bits(*(const f32*)(e + 0x14)), Bits(*(const f32*)(e + 0x28)));
+                printf("entprop "); Val(e); printf(" f28 %08x acts", Bits(*(const f32*)(e + 0x28)));
                 for (u32 k = 0; k < 3; k++) printf(" %08x", *(const u32*)(e + 0x38 + k * 4));
                 for (u32 k = 0; k < 4; k++) printf(" %08x", *(const u32*)(e + 0x48 + k * 4));
                 printf(" %08x actor ", *(const u32*)(e + 0x68)); Ptr(e + 0xA0); printf(" fc8");
