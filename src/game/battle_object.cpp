@@ -500,7 +500,8 @@ void BattleUpdate(u8* b, f32 dt) {
     }
     case 6:
     case 7:
-        if (VCall(*(void**)(b + 0xA38), 0x14) == 1) BattleAdvance(b);
+        // The presenter's tick (fn_8004B3E0) takes the frame time: the asm leaves dt in f1 from the entry.
+        if ((*(TickFn*)(**(u8***)(b + 0xA38) + 0x14))(*(void**)(b + 0xA38), dt) == 1) BattleAdvance(b);
         break;
     case 8:
         if (VCall(*(void**)(b + 0xA34), 0x10) == 1 && *(u32*)(b + 0xA18) != 0) BattleAdvance(b);

@@ -178,13 +178,12 @@ void fn_80044098(u8* p) {
 }
 
 // 0x80044498
-// Clears the flag byte at +0x44, copies the float at +0x4D0 to +0x4CC, then calls two helpers.
+// Clears the flag byte at +0x44, copies the float at +0x4D0 to +0x4CC, then adds the member at +0x48 to the global list.
 void fn_80044498(u8* p) {
     f32 v = *(f32*)(p + 0x4d0);
     *(u8*)(p + 0x44) = 0;
     *(f32*)(p + 0x4cc) = v;
-    fn_801B3308();
-    fn_801B3310(p, p + 0x48);
+    fn_801B3310(fn_801B3308(), p + 0x48);   // adds the member at +0x48 to the global list (asm: r3 goes from one call to the next)
 }
 
 // 0x800444FC

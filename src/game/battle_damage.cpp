@@ -66,6 +66,7 @@ struct Battle {
     u8       pad000[0x9F2];
     u8       blocking[SIDES];       // 0x9F2
     s32      blockAmount[SIDES];    // 0x9F4
+    u8       pad09FC[4];            // 0x9FC: two per-side flag bytes (battle_core.cpp)
     Fighter* fighters[SIDES];       // 0xA00
     s32      attacker;              // 0xA08
     Round*   round;                 // 0xA0C
@@ -94,6 +95,10 @@ struct Battle {
     f32      fixedDamage[SIDES];    // 0xADC: > 0 overrides the damage (fraction of max HP left)
     s32      protect[SIDES];        // 0xAE4: limbs can't drop below 1 HP this attack
 };
+
+static_assert(offsetof(Battle, fighters) == 0xA00 && offsetof(Battle, log) == 0xA44 && offsetof(Battle, torsoBonus) == 0xA5D, "Battle layout");
+static_assert(offsetof(Battle, abilityMul) == 0xA68 && offsetof(Battle, torsoMul) == 0xAB4 && offsetof(Battle, mode) == 0xAD0 && offsetof(Battle, protect) == 0xAE4, "Battle layout");
+static_assert(offsetof(Fighter, stats) == 0x20 && offsetof(FighterStats, side) == 0x24 && offsetof(BattlePart, status) == 0x28, "fighter layout");
 
 struct AbilityDef    { u8 pad[0x14]; s16 percent; u8 pad16[0xE]; };   // 0x24, db +0x3610
 struct ResistanceDef { u8 pad[0x10]; s16 percent; u8 pad12[0xE]; };   // 0x20, db +0x31E8
