@@ -853,7 +853,38 @@ words, so both walks add them and the plan drops the duplicates.
 | type 0 record | `+0x00` the material (checked), `+0x04`, `+0x05` bytes, `+0x08`..`+0x44` sixteen floats, `+0x4C`, `+0x50` floats, `+0x54` word, `+0x58`..`+0x5A` and `+0x64`..`+0x67` bytes, `+0x5C`, `+0x60` words | `fn_80176E20`, `fn_80177940` |
 
 Not converted: `+0x10`, `+0x14`, `+0x18` of a type 0 material, `+0x48` of its record and its bytes
-`+0x06`, `+0x07` (no reader); type 1 records and the extra pointers of a type 1 material.
+`+0x06`, `+0x07` (no reader).
+
+A type 1 material (`fn_80181DE0` before the batch, `fn_80181F80` after it) has eight textures at
+`+0x1C` and eight matrix pointers at `+0x3C`, one per texture unit. Its record is a GX state of
+0xD20 bytes that `fn_8017B9BC` compares with the last state sent (`lbl_80412B10[pass]`) and sends
+where it differs. It is words (and floats) except where `SirGxStateSlot` says bytes or halves:
+
+| Offset | What |
+|---|---|
+| `+0x00` | the material (checked) |
+| `+0x04`..`+0x10` | number of colour channels, tex-gens, TEV stages, indirect stages |
+| `+0x14`..`+0xA3` | two colour channels: light enable byte and address word twice, then two 0x1C-byte channel blocks (two bytes, four words) |
+| `+0xA4` | eight 0x24-byte texture units (bytes at `+0x14`, `+0x1C`) |
+| `+0x1C4` | eight 0x34-byte tex-gens (`+0x00` byte, `+0x02`, `+0x04` halves, `+0x0C`..`+0x0F` and `+0x2C` bytes) |
+| `+0x364`, `+0x3A0` | three TEV colours, four constant colours: `{mode, four floats}` |
+| `+0x3F0` | four swap tables of four words |
+| `+0x430` | sixteen 0x68-byte TEV stages (bytes at `+0x00`, `+0x38`, `+0x5C`) |
+| `+0xAB0`, `+0xAF0` | four indirect stages; sixteen 0x20-byte indirect settings (bytes at `+0x18`, `+0x19`) |
+| `+0xCF0`..`+0xD1F` | a float, a word, then alpha compare, depth and cull settings (bytes at `+0xCFC`, `+0xCFD`, `+0xD10`..`+0xD12`, `+0xD1C`) |
+
+### Lights, attach points and the aim object
+
+- A type 2 scene object's list object also heads the zone's lights (`+0x10` head, `+0x14` tail, `+0x18`
+  count; a light is linked through its `+0x04`). The draw picks the three best lights of every visible
+  item (`fn_80185988`). Of a light, 0x60 bytes are converted: `+0x04` next, previous and list, `+0x10`
+  kind and `+0x12` flags (halves), `+0x14`..`+0x5F` floats (factor, position, attenuation, direction,
+  colours). The name behind them is text.
+- An entity's attach points (`+0x98`, count `+0x94`) are 0xC8-byte records that `fn_801EC080` updates
+  every frame: `+0x00` name hash, `+0x04` bone index (-1: the entity), `+0x08` local matrix, `+0x38`
+  world matrix, `+0x68` eight effect ids, `+0x88` the running effects, `+0xA8` started flags.
+- Slot object type 16 (`fn_800E5550`, vtable `lbl_80360200`) aims between locators: its four
+  reference words at `+0xA8`..`+0xB7` are converted (`fn_800E5684` resolves them with `fn_801ED684`).
 
 ### Batches of mesh parts
 

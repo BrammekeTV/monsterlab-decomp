@@ -438,7 +438,7 @@ static bool PlanFinish(ImagePlan* plan) {
         const Region* prev = &plan->regions[n - 1];
         const Region* g = &plan->regions[i];
         if (g->off == prev->off && g->size == prev->size && g->kind == prev->kind) continue;
-        if (g->off < prev->off + prev->size) { if (getenv("SIR_DEBUG_OVERLAP")) fprintf(stderr, "OVERLAP %x+%x kind %d with %x+%x kind %d\n", prev->off, prev->size, prev->kind, g->off, g->size, g->kind); return false; }   // the ones kept so far are disjoint, so the last one ends last
+        if (g->off < prev->off + prev->size) return false;   // the ones kept so far are disjoint, so the last one ends last
         plan->regions[n++] = *g;
     }
     plan->count = n;
