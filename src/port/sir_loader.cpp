@@ -1576,7 +1576,9 @@ static const SirField kAnimSetFields[] = {
     { 0x04, SIR_PTR, 1 }, { 0x0C, SIR_PTR, 3 }, { 0x18, SIR_U16, 2 }, { 0x1C, SIR_U32, 1 },
 };
 static const SirField kAnimDefFields[] = {
-    { 0x2C, SIR_U32, 1 }, { 0x34, SIR_PTR, 1 }, { 0x38, SIR_U32, 1 },
+    { 0x00, SIR_U32, 11 },    // code: speed (+0x00, fn_801AC51C), flags (+0x0C), floats (+0x1C, +0x20) handed to fn_8018B2CC
+    { 0x2C, SIR_U32, 2 }, { 0x34, SIR_PTR, 1 }, { 0x38, SIR_U32, 1 },
+    { 0x3C, SIR_U32, 2 },
 };
 #define ANIM_SET_USED 0x20
 #define ANIM_DEF_SIZE 0x44
