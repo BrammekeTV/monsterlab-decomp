@@ -99,6 +99,11 @@
  "changelog": [
   {
    "date": "2026-11-24",
+   "time": "16:50",
+   "text": "New F12 capture key on Windows (PR #179): it saves the decoded movie frame, the game's internal picture and the final window picture, plus the current settings, into a captures folder next to the game. It's for tracking down picture problems that only show on some setups."
+  },
+  {
+   "date": "2026-11-24",
    "time": "16:15",
    "text": "The first battle triggers on Windows (PR #178): walking to the monsters blocking the village path now starts the battle, and the arena level begins loading. It stays on the loading screen for now; that's next."
   },
