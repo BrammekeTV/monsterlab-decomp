@@ -1310,6 +1310,14 @@ def zone_dump(L, sec, base, hud, roots, scene_roots, pooltabs, records=(), lists
         if t == 2 and inz(u(o + 0x4C), 0x3C):
             l = off(u(o + 0x4C))
             L.append('scenelist %s head %s tail %s count %d flagged %d' % (ptr(u(o + 0x4C)), ptr(u(l + 4)), ptr(u(l + 8)), i32(l + 0xC), i32(l + 0x38)))
+            L.append('scenelights %s head %s tail %s count %d' % (ptr(u(o + 0x4C)), ptr(u(l + 0x10)), ptr(u(l + 0x14)), i32(l + 0x18)))
+            node, seen = u(l + 0x10), set()
+            while node >= base + 4 and inz(node - 4, 0x60) and node not in seen:
+                seen.add(node)
+                q = off(node) - 4
+                L.append('scenelight %s w0 %08x %s kind %d flags %04x floats %s' % (ptr(node), u(q), link(q + 4),
+                    struct.unpack_from('>H', sec, q + 0x10)[0], struct.unpack_from('>H', sec, q + 0x12)[0], ws(q + 0x14, 19)))
+                node = u(off(node))
             node, seen = u(l + 4), set()
             while node >= base + 0xAC and inz(node - 0xAC, 0xB8) and node not in seen:
                 seen.add(node)

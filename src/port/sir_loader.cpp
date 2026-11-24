@@ -366,7 +366,7 @@ enum RegionKind {
     REGION_UI_SET, REGION_UI_SCREEN, REGION_UI_GRAPHIC, REGION_UI_TEXT,
     REGION_LOCATORS, REGION_UI_SLIDER,
     REGION_ZONE_EFFECT, REGION_ANIM_SET, REGION_ANIM_DEFS, REGION_U16_ARRAY, REGION_ANIM_OBJ, REGION_SKELETON, REGION_BONE_OPS,
-    REGION_ATTACH_POINTS,
+    REGION_ATTACH_POINTS, REGION_SCENE_LIGHT,
     REGION_UI_ANIM, REGION_UI_ANIM_TRACK, REGION_UI_ANIM_EVENTS, REGION_UI_ANIM_KEYS, REGION_UI_ANIM_ENTRIES,
     REGION_ZONE_SYSTEM, REGION_ANIM_PLAYER, REGION_ANIM_ELEM, REGION_ANIM_TRACK, REGION_ANIM_KEYS, REGION_F32_ARRAY,
     REGION_SOUND, REGION_SOUND_INFO, REGION_DSP_HEADER,
@@ -1709,6 +1709,16 @@ static SirError MaterialPlan(ImagePlan* plan, const u8* image, u32 imageSize, u3
 //           +0x48 the entity that uses the object (fn_801DA344 stores it), +0x50 which entry is
 //           current (fn_801DA750), +0x5C one pointer per entry to its 3x4 float matrix
 //           (fn_801DA798 returns matrix[current]; fn_801D9164 fills it)
+// A light of a type 2 object's list object (+0x10 head, +0x14 tail, +0x18 count: the same list
+// as the items', linked through the light's +0x04). The draw picks the three best lights of
+// every visible item from it (fn_80185988: fn_80185200 for a point light, fn_8018542C for kind 2):
+// +0x04 next, previous and the list, +0x10 kind (1 point, 3 ambient in the files) and +0x12
+// flags, +0x14 a factor, +0x20 position, +0x2C three attenuation coefficients, +0x38 direction
+// and colours up to +0x60 (fn_80184604). The name behind them is text.
+static const SirField kSceneLightFields[] = {
+    { 0x00, SIR_U32, 1 }, { 0x04, SIR_PTR, 3 }, { 0x10, SIR_U16, 2 }, { 0x14, SIR_F32, 19 },
+};
+#define SCENE_LIGHT_USED 0x60
 static const SirField kCountPtrFields[] = {
     { 0x00, SIR_U32, 1 }, { 0x04, SIR_PTR, 1 },
 };
@@ -1796,6 +1806,14 @@ static SirError SceneObjectPlan(ImagePlan* plan, const u8* image, u32 imageSize,
         if (PlanHas(plan, o + 4, REGION_PTR_ARRAY)) return SIR_OK;                     // two objects with one list
         if (!PlanAdd(plan, o + 4, 8, REGION_PTR_ARRAY) || !PlanAdd(plan, o + 0xC, 4, REGION_U32_ARRAY) ||
             !PlanAdd(plan, o + 0x38, 4, REGION_U32_ARRAY)) return SIR_ERR_ENTITY;
+        // The list's lights (+0x10, +0x14, count +0x18).
+        if (!PlanAdd(plan, o + 0x10, 8, REGION_PTR_ARRAY) || !PlanAdd(plan, o + 0x18, 4, REGION_U32_ARRAY)) return SIR_ERR_ENTITY;
+        u32 lightNode = Be32(image + o + 0x10), light, lights = 0;
+        while (lightNode != 0) {
+            if (lightNode < sImageBase + 4 || !ImageSpan(lightNode - 4, SCENE_LIGHT_USED, imageSize, &light) || PlanHas(plan, light, REGION_SCENE_LIGHT)) break;
+            if (!PlanAdd(plan, light, SCENE_LIGHT_USED, REGION_SCENE_LIGHT) || ++lights > REGION_MAX / 2) return SIR_ERR_ENTITY;
+            lightNode = Be32(image + light + 4);
+        }
         // The nodes can also be entries of a type 3 object: the same words, found twice.
         u32 node = Be32(image + o + 4), guard = imageSize / 4 + 1, seen = 0;
         while (node != 0) {
@@ -2611,6 +2629,7 @@ static void ImagePlanConvert(const ImagePlan* plan, SirReloc* r, u8* image, u32 
             break;
         case REGION_ANIM_OBJ:     SirConvertRecord(r, p, g->size, kAnimObjFields, COUNTOF(kAnimObjFields)); break;
         case REGION_ANIM_SET:     SirConvertRecord(r, p, g->size, kAnimSetFields, COUNTOF(kAnimSetFields)); break;
+        case REGION_SCENE_LIGHT:  SirConvertRecord(r, p, g->size, kSceneLightFields, COUNTOF(kSceneLightFields)); break;
         case REGION_ATTACH_POINTS: ConvertRecords(r, p, g->size, ATTACH_POINT_SIZE, kAttachPointFields, COUNTOF(kAttachPointFields)); break;
         case REGION_ANIM_DEFS:    ConvertRecords(r, p, g->size, ANIM_DEF_SIZE, kAnimDefFields, COUNTOF(kAnimDefFields)); break;
         case REGION_U16_ARRAY:

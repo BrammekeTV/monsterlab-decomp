@@ -1450,6 +1450,17 @@ struct ZoneDump {
             if (In(list, 0x3C)) {
                 printf("scenelist "); Val(list); printf(" head "); Ptr(list + 4); printf(" tail "); Ptr(list + 8);
                 printf(" count %d flagged %d\n", *(const s32*)(list + 0xC), *(const s32*)(list + 0x38));
+                printf("scenelights "); Val(list); printf(" head "); Ptr(list + 0x10); printf(" tail "); Ptr(list + 0x14);
+                printf(" count %d\n", *(const s32*)(list + 0x18));
+                std::vector<const u8*> seenLights;
+                for (const u8* node = *(const u8**)(list + 0x10); node != NULL && In(node - 4, 0x60) && std::find(seenLights.begin(), seenLights.end(), node) == seenLights.end();
+                     node = *(const u8**)node) {
+                    seenLights.push_back(node);
+                    const u8* q = node - 4;
+                    printf("scenelight "); Val(node); printf(" w0 %08x next ", *(const u32*)q); Ptr(q + 4); printf(" prev "); Ptr(q + 8);
+                    printf(" owner "); Ptr(q + 0xC); printf(" kind %u flags %04x floats ", *(const u16*)(q + 0x10), *(const u16*)(q + 0x12));
+                    Words(q + 0x14, 19); printf("\n");
+                }
                 std::vector<const u8*> seen;
                 for (const u8* node = *(const u8**)(list + 4); node != NULL && In(node - 0xAC, 0xB8) && std::find(seen.begin(), seen.end(), node) == seen.end();
                      node = *(const u8**)node) {
