@@ -662,7 +662,7 @@ void fn_80043D84(u8* obj, s32 dir) {
 // 0x8004D968
 // Sets up a monster from a preset index: attack timer (one of two constants depending on flag
 // 0x4000 of the class record), builds the preset into the monster at +0x898, sets the display
-// name from the preset's name hash, and for flag 0x200000 returns fn_8004DAF8(obj, 0, arg2).
+// name from the preset's name hash (row +4), and for flag 0x200000 returns fn_8004DAF8(obj, 0, arg2).
 void* fn_8004D968(u8* obj, s32 preset, s32 arg2) {
     if (!(*(u32*)(*(u8**)(obj + 0x4) + 0x1C) & 0x4000)) {
         *(f32*)(obj + 0x9F4) = lbl_805FD25C;
@@ -672,7 +672,7 @@ void* fn_8004D968(u8* obj, s32 preset, s32 arg2) {
     MonsterBuildPreset(obj + 0x898, preset);
     *(u8*)(obj + 0xC84) = 1;
     u8* spec = *(u8**)(gGameDb->data + 0x9180) + preset * 0x48;
-    s32 id = TextIdFromHash(*(u32*)(spec + 0x8));
+    s32 id = TextIdFromHash(*(u32*)(spec + 0x4));
     const char* name;
     if (id == -1) {
         name = lbl_80354800;
