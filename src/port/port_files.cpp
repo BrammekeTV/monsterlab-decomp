@@ -301,6 +301,13 @@ static void ConvertSection(const char* name, const SirCatalogFile* file, const S
         sConverted++;
         return;
     }
+    // Voice lines (shared_voice.sir): one .dsp header and its samples per section.
+    if (n >= 16 && _stricmp(name + n - 16, "shared_voice.sir") == 0) {
+        SirError err = VoiceStreamConvert(dst, e->size);
+        if (err != SIR_OK) PortStop(8, "%s section %08x: %s", name, (u32)e->type, SirErrorText(err));
+        sConverted++;
+        return;
+    }
     // Shared zones (shared_ui.sir, shared_parts.sir): section type N is the image of zone N. It
     // starts with a copy of the zone's slot, which fn_80135BC0 copies into the header block.
     bool shared = (n >= 13 && _stricmp(name + n - 13, "shared_ui.sir") == 0) || (n >= 16 && _stricmp(name + n - 16, "shared_parts.sir") == 0);

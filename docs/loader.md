@@ -1009,6 +1009,38 @@ reads one texture record:
 The loader converts the tags, the size, the width and the height. Pixel data and palette stay in
 GX layout. The two words at `+0x08` and `+0x0C` have no reader.
 
+### Voice lines of `shared_voice.sir`
+
+A section's type is the hash of the line's name (`VoiceLoadShared`); the section is the first
+0x60 bytes of a `.dsp` file with the samples behind them, read into the shared voice buffer.
+`fn_80203340` reads the header (sample rate, loop flag, format, addresses, coefficients):
+`VoiceStreamConvert` converts it and leaves the samples as they are.
+
+### The exploration map, camera objects and the ground's collision tree
+
+Read when the first map level (`village_level.sir`) starts:
+
+- **Paths and junctions** (header `+0x2C` / `+0x38`, counts `+0x30` / `+0x3C`): lists of pointers in
+  a zone. `fn_8013006C` copies every path record (0x1AC bytes, `fn_800D4DE8`: words, but for the
+  bytes at `+0x64` and `+0x9C`) and every junction record (0xDC bytes, `fn_800D5008`: six words,
+  up to twelve entries of three floats and a byte from `+0x18`, their count at `+0xD8`) into the
+  object database.
+- **Spawn owners** (header `+0x74`, `+0x78`): the objects `SpawnCoffinProjectile` and
+  `FireRocketAtEntity` spawn from. `SpawnHelper` compares the type id at their `+0x00` with
+  `0x37645F52`; only the two pointers and that word are converted so far.
+- **Camera objects** (a slot's objects, `+0xA8`): every type starts the same way (`fn_800DECD8`,
+  `fn_800DE678`): `+0x0C` how many boundary nodes, `+0x10` the nodes (0x14 bytes: a word, a
+  position, a float), `+0x14` how many segments, `+0x18` the segments (two node indices, bytes),
+  `+0x34..+0x53` eight floats, `+0x54` four bytes. Type 1 follows the object at `+0x58`
+  (`fn_800E3040`); type 2 has a position there.
+- **Collision tree** (`+0x1C` of a type 2 scene object's list holder; `fn_80139684` hands it to
+  `fn_8016CA24`): `+0x00` version (0x43), `+0x04` vertices, `+0x08` triangles, `+0x0C` flag words,
+  `+0x10` nodes, `+0x14` size of the node buffer, `+0x18` vertices (three floats each), `+0x1C`
+  flag words, `+0x20` node buffer. A node is 0x20 bytes: box minimum, link, box maximum, a word.
+  Bit 31 of the link clear: two children at the offsets `link` and the word. Set: a leaf of
+  `word` triangles at offset `link & 0x7FFFFFFF`, four `u16` each (three vertices, the flag
+  word). The loader walks the tree to tell nodes from triangles.
+
 ### Not converted yet in level files
 
 | What | Where | Next reader |
