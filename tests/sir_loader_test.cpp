@@ -2401,6 +2401,8 @@ static void BuildLevel(u8* hdr, u8* zone) {
     Put32(zone + L_OBJLIST, L_ZONE + L_OBJ);
     Put32(zone + L_OBJ + 0x00, 0x804B25D0); Put32(zone + L_OBJ + 0x04, 0xCC05AC21); Put32(zone + L_OBJ + 0x08, 15);
     Put32(zone + L_OBJ + 0x58, 0x80090020); Put32(zone + L_OBJ + 0x5C, 0x94F99D89);   // a camera track: entity handle, clip hash
+    Put32(zone + L_OBJ + 0x0C, 0); Put32(zone + L_OBJ + 0x10, 0); Put32(zone + L_OBJ + 0x14, 1); Put32(zone + L_OBJ + 0x18, 0);   // no boundary nodes
+    Put32(zone + L_OBJ + 0x40, 0x40400000);                    // one of the eight floats every camera object has
     Put32(s0 + 0x080, L_ZONE + L_FXLIST); Put32(s0 + 0x09C, 1);
     Put32(zone + L_FXLIST, L_ZONE + L_FX);
     Put32(zone + L_FX + 0x00, 0xCA1557FC); Put32(zone + L_FX + 0x04, 0x40000000); Put32(zone + L_FX + 0x08, 0);
@@ -2899,6 +2901,7 @@ static void LevelSelfTest(void) {
     // reader yet and stays), and its placed effects as WorldOnZoneLoaded reads them.
     const u8* obj = **(const u8***)(s0 + 0xA8);
     CHECK(obj == zone + L_OBJ && *(const u32*)(obj + 8) == 15 && obj[4] == 0xCC && obj[7] == 0x21);
+    CHECK(*(const u32*)(obj + 0x14) == 1 && *(const u8* const*)(obj + 0x10) == NULL && *(const f32*)(obj + 0x40) == 3.0f);
     CHECK(*(const u32*)(obj + 0x58) == 0x80090020 && *(const u32*)(obj + 0x5C) == 0x94F99D89 && obj[0x54] == 0x7F);
     const u8* fx = **(const u8***)(s0 + 0x80);
     CHECK(*(const u32*)(s0 + 0x9C) == 1 && fx == zone + L_FX && *(const u32*)fx == 0xCA1557FC && *(const f32*)(fx + 4) == 2.0f);
@@ -2906,7 +2909,7 @@ static void LevelSelfTest(void) {
     // The slot's pool table, as fn_801DB1AC reads it, and the pool as fn_801EBBE0 walks it.
     const u8* pt = *(const u8**)(s0 + 0xE4);
     const u8* pool = *(const u8**)(pt + 4);
-    CHECK(*(s32*)(s0 + 0xE8) == 1 && pt == zone + L_POOLTAB && pt[0] == 0xBE && *(const s32*)(pt + 0xC) == LEVEL_FIXUP_FSM);
+    CHECK(*(s32*)(s0 + 0xE8) == 1 && pt == zone + L_POOLTAB && pt[3] == 0xBE && *(const s32*)(pt + 0xC) == LEVEL_FIXUP_FSM);
     CHECK(pool == zone + L_POOL && *(const s32*)pool == 2 && *(const s32*)(pool + 0x28) == -2);
     const u8* used = *(const u8**)(pool + 0x14);
     CHECK(used == zone + L_POOLBLK + 0x08 && *(const u8**)(used + 4) == NULL && *(const u8**)(used + 8) == list);

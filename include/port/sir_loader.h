@@ -30,6 +30,7 @@ typedef enum SirError {
     SIR_ERR_LEVEL,            // level file header block: zone slot table not laid out as fn_80129CC8 does
     SIR_ERR_ENTITY,           // entity of a level zone: part list outside the zone, child list that loops
     SIR_ERR_ZONE_RECORD,      // zone record of a level zone: list that leaves the zone or loops, bad animation player
+    SIR_ERR_SOUND,            // voice line of shared_voice.sir: not a .dsp header (format, sample rate)
     SIR_ERR_OVERLAP,          // two of the objects above share bytes
     SIR_ERR_IO
 } SirError;
@@ -459,6 +460,11 @@ typedef struct LevelZoneRoots {
     u32  soundGroupCount;
     u32  locators;           // header +0x28: the level's locators (0x20 bytes each), or 0 when they are in another zone
     u32  locatorCount;       // header +0x24
+    u32  paths;              // header +0x2C: pointers to the map's path records, or 0 when the list is in another zone
+    u32  pathCount;          // header +0x30
+    u32  junctions;          // header +0x38: pointers to the map's junction records
+    u32  junctionCount;      // header +0x3C
+    u32  spawnOwners[2];     // header +0x74, +0x78: the objects projectiles are spawned from, or 0 when in another zone
     u32* zoneRecords;        // every slot's +0xFC: the zone record WorldTick walks
     u32  zoneRecordCount;
     u32* zoneLists;          // first node of the list (+0x10) of each record that lies in the other image
@@ -474,6 +480,11 @@ typedef struct LevelZoneRoots {
 // pixel data stays in GX layout. Nothing is changed when a check fails (SIR_ERR_TEXTURE).
 #define TEXTURE_STREAM_RECORD 0x10   // the record's place: fn_8016B724 skips two more words after the tags
 SirError TextureStreamConvert(u8* data, u32 size);
+
+// A voice line section of shared_voice.sir (the section type is the hash of the line's name): a
+// .dsp header of 0x60 bytes, which fn_80203340 reads, and the samples. Converts the header in
+// place; the samples stay in console order (the mixer reads them that way).
+SirError VoiceStreamConvert(u8* data, u32 size);
 
 // Size of one zone slot of a converted header block (the game's gZoneResourceSize), or 0.
 u32 LevelSlotSize(const u8* hdr, u32 hdrSize);
