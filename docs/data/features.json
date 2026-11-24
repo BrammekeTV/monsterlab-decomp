@@ -99,6 +99,11 @@
  "changelog": [
   {
    "date": "2026-11-24",
+   "time": "22:01",
+   "text": "In the Field Repair minigame the wheel now turns when you swing and the round ends (PR #217)."
+  },
+  {
+   "date": "2026-11-24",
    "time": "21:58",
    "text": "The game's pointing hand no longer shrinks after switching cursors, and a new setting shows the Windows mouse cursor over the game for anyone who wants it (PR #218)."
   },
