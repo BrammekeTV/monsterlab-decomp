@@ -3435,6 +3435,9 @@ static SirError SlotObjectsPlan(ImagePlan* plan, const u8* image, u32 imageSize,
     for (u32 i = 0; i < count; i++) {
         if (!LevelSpan(Be32(image + off + i * 4), 0x0C, imageSize, &o) || PlanHas(plan, o + 8, REGION_U32_ARRAY)) continue;
         if (!PlanAdd(plan, o + 8, 4, REGION_U32_ARRAY)) return SIR_ERR_LEVEL;
+        // +0x04 is the class hash (0xCC05AC21 "CIAnimatedProp" on the animated camera prop): StopUsingAnimatedCamera
+        // (fn_800F6774) looks for it, and without it never hands the camera back after the village fly-over.
+        if (!PlanAdd(plan, o + 4, 4, REGION_U32_ARRAY)) return SIR_ERR_LEVEL;
         // What every type starts with (fn_800DECD8, fn_800DE678): +0x0C how many boundary nodes, +0x10
         // the nodes (0x14 bytes: a word, a position, a float), +0x14 how many segments, +0x18 the
         // segments (two node indices, bytes), +0x34..+0x53 eight floats (angle, timers, blend), +0x54
