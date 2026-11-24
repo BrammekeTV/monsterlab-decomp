@@ -1,6 +1,6 @@
 // PC platform layer: the first-run screen that asks for the player's own Monster Lab disc. It runs
 // before the game starts, when no game data was found: a small window of its own, drawn with Dear
-// ImGui, with Windows' file and folder dialogs. The player picks a disc image (.iso, .wbfs) or a folder
+// ImGui, with Windows' file and folder dialogs. The player picks a disc image (.iso, .wbfs, .rvz) or a folder
 // with the extracted disc; the header is checked (port_disc.cpp) and the verdict is shown in words.
 // The choice is kept in monsterlab.ini ([game] path). The settings screen's "Game" page uses the
 // same dialogs and the same check. Nothing of the disc is copied.
@@ -53,7 +53,7 @@ BOOL PortPickFile(HWND owner, char* out, u32 n) {
     OPENFILENAMEA o = {};
     o.lStructSize = sizeof(o);
     o.hwndOwner = owner;
-    o.lpstrFilter = "Wii disc images (*.iso, *.wbfs)\0*.iso;*.wbfs\0All files\0*.*\0";
+    o.lpstrFilter = "Wii disc images (*.iso, *.wbfs, *.rvz)\0*.iso;*.wbfs;*.rvz\0All files\0*.*\0";
     o.lpstrFile = out;
     o.nMaxFile = n;
     o.lpstrTitle = "Choose your Monster Lab disc image";
@@ -104,11 +104,11 @@ static void Build(Picker* p, f32 w, f32 h) {
     ImGui::Spacing();
     ImGui::PushTextWrapPos(0.0f);
     ImGui::TextUnformatted("To play, this port needs your own copy of Monster Lab for Wii (the European release, RM7P4F). "
-                           "Choose your disc image (.iso or .wbfs), or the folder of a disc you extracted. "
+                           "Choose your disc image (.iso, .wbfs or .rvz), or the folder of a disc you extracted. "
                            "Nothing is copied or changed; the choice is remembered in monsterlab.ini.");
     ImGui::PopTextWrapPos();
     ImGui::Spacing(); ImGui::Spacing();
-    if (ImGui::Button("Choose disc image (.iso, .wbfs)...")) Choose(p, FALSE);
+    if (ImGui::Button("Choose disc image (.iso, .wbfs, .rvz)...")) Choose(p, FALSE);
     ImGui::SameLine();
     if (ImGui::Button("Choose extracted folder...")) Choose(p, TRUE);
     ImGui::Spacing(); ImGui::Spacing();
