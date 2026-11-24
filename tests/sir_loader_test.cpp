@@ -905,9 +905,9 @@ struct ZoneDump {
     }
     void PartTable(const LevelZoneRoots* roots, u32 zoneBase) {
     // The part resource table (header +0x44, count +0x48): 0x10-byte entries.
-    if (roots->partCount != 0 && In(z->image + (roots->partTable - zoneBase), roots->partCount * 4)) {
-        const u32* t = (const u32*)(z->image + (roots->partTable - zoneBase));
-        for (u32 i = 0; i < roots->partCount; i++) {
+    if (roots->partListCount != 0 && In(z->image + (roots->partList - zoneBase), roots->partListCount * 4)) {
+        const u32* t = (const u32*)(z->image + (roots->partList - zoneBase));
+        for (u32 i = 0; i < roots->partListCount; i++) {
             const u8* e = *(const u8**)(t + i);
             if (!In(e, 0x10)) continue;
             printf("partentry %u %08x %08x %08x %08x\n", i, *(const u32*)e, *(const u32*)(e + 4), *(const u32*)(e + 8), *(const u32*)(e + 12));
