@@ -1903,7 +1903,6 @@ static SirError SceneItemDrawPlan(ImagePlan* plan, const u8* image, u32 imageSiz
     return SIR_OK;
 }
 
-<<<<<<< HEAD
 // Effect library: header +0x7C records, array at +0x80 (fn_8012FFA4 hands it to the manager lbl_8047C730; SpawnEffectAt
 // binary-searches it by the key when the sorted flag at +0x84 is set). A record (0xEC bytes): +0x00 the effect's name hash,
 // +0x04 the number of emitters (up to 8), from +0x0C the emitters (0x1C bytes: a pointer to the emitter descriptor, six floats).
@@ -1930,7 +1929,11 @@ static SirError FxEffectLibraryPlan(ImagePlan* plan, const u8* image, u32 imageS
             u32 it;
             if (te == SIR_OK && LevelSpan(Be32(image + o + 0x1D8), 0xC4, imageSize, &it)) te = SceneItemDrawPlan(plan, image, imageSize, it);
             if (te != SIR_OK) return te;
-=======
+        }
+    }
+    return SIR_OK;
+}
+
 // A collision tree (fn_8016CA24): +0x00 a version word (0x43), +0x04 how many vertices, +0x08
 // triangles, +0x0C flag words, +0x10 nodes, +0x14 the size of the node buffer, +0x18 the vertices
 // (three floats), +0x1C the flag words (one per surface; a triangle names its own), +0x20 the node
@@ -1965,7 +1968,6 @@ static SirError CollisionTreePlan(ImagePlan* plan, const u8* image, u32 imageSiz
             if (depth == 64) return SIR_ERR_ENTITY;
             stack[depth++] = word;
             at = link;
->>>>>>> origin/master
         }
     }
     return SIR_OK;
@@ -3262,16 +3264,13 @@ extern "C" BOOL LevelZoneRootsCollect(const u8* hdr, u32 hdrSize, const u8* zone
     if (ok) out->hud = ZoneAddr(hdr + 0x1F4, zoneHost, zoneSize, zoneWiiBase);
     if (ok && Host32(hdr + 0x24) != 0 && (out->locators = ZoneAddr(hdr + 0x28, zoneHost, zoneSize, zoneWiiBase)) != 0)
         out->locatorCount = Host32(hdr + 0x24);
-<<<<<<< HEAD
     if (ok && Host32(hdr + 0x7C) != 0 && (out->effectLibrary = ZoneAddr(hdr + 0x80, zoneHost, zoneSize, zoneWiiBase)) != 0)
         out->effectLibraryCount = Host32(hdr + 0x7C);
-=======
     for (u32 k = 0; ok && k < 2; k++) out->spawnOwners[k] = ZoneAddr(hdr + 0x74 + k * 4, zoneHost, zoneSize, zoneWiiBase);
     if (ok && Host32(hdr + 0x30) != 0 && (out->paths = ZoneAddr(hdr + 0x2C, zoneHost, zoneSize, zoneWiiBase)) != 0)
         out->pathCount = Host32(hdr + 0x30);
     if (ok && Host32(hdr + 0x3C) != 0 && (out->junctions = ZoneAddr(hdr + 0x38, zoneHost, zoneSize, zoneWiiBase)) != 0)
         out->junctionCount = Host32(hdr + 0x3C);
->>>>>>> origin/master
     for (u32 t = 0; ok && t < 2; t++) {                          // scene objects: the tables at +0x1B0 and +0x1BC
         const u8* table = HeaderTable(hdr, hdrSize, hdr + kLevelBlockTables[t], &entries);
         for (u32 k = 0; ok && table != NULL && k < entries; k++)
