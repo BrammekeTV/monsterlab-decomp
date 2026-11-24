@@ -207,6 +207,7 @@ extern u8 gWorldState[];   // 0x803E6D00
 extern u8 gScriptCtx[];    // 0x803C4298
 extern u8 sWorldReady;     // 0x805FB2F0
 extern "C" { extern u8 gGame[]; }   // 0x803B53A0
+extern "C" { extern u8* gBattle; }  // 0x805FBBB8
 extern "C" { extern s32 lbl_803C4E28[]; extern s32 lbl_805FB038; extern s32 lbl_805FB034; }   // combat part zones: loaded flags, wanted, requested
 static void PortStateLog(void) {
     static s32 on = -1;
@@ -238,6 +239,18 @@ static void PortStateLog(void) {
     if (memcmp(fsm, lastFsm, sizeof(fsm))) {
         memcpy(lastFsm, fsm, sizeof(fsm));
         fprintf(stderr, "[state] frame %d: hud machine %08X (depth %u) state %d key %08X%c", (int)sFrames, fsm[1], fsm[0], (s32)fsm[2], fsm[3], 10);
+    }
+    // The battle (gBattle, only while its HUD machine runs): phase (+0xA18), round counter (+0xA10), the
+    // listeners (+0xA30 count, +0xA2C done flags) and the two fighters' pending choice (fighter +0x38).
+    static s32 lastBat[6];
+    if (fsm[1] != 0 && gBattle != NULL) {
+        u8* b = gBattle;
+        s32 bat[6] = { *(s32*)(b + 0xA18), *(s32*)(b + 0xA10), *(s32*)(b + 0xA30), *(s32*)(b + 0xA2C), -1, -1 };
+        for (s32 i = 0; i < 2; i++) if (*(u8**)(b + 0xA00 + i * 4) != NULL) bat[4 + i] = *(s32*)(*(u8**)(b + 0xA00 + i * 4) + 0x38);
+        if (memcmp(bat, lastBat, sizeof(bat))) {
+            memcpy(lastBat, bat, sizeof(bat));
+            fprintf(stderr, "[state] frame %d: battle phase %d round %d listeners %d done %08X choices %X %X%c", (int)sFrames, bat[0], bat[1], bat[2], (u32)bat[3], bat[4], bat[5], 10);
+        }
     }
     if (!memcmp(now, last, sizeof(now))) return;
     memcpy(last, now, sizeof(now));

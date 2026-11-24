@@ -62,8 +62,8 @@ HWND PortGfxWindow(void);
 s32  PortFrameCount(void);
 
 // ------------------------------------------------------------------ scripted presses (--press)
-struct ScriptedPress { u32 bits; s32 from, to; f32 sx, sy; };
-static ScriptedPress sPress[32];
+struct ScriptedPress { u32 bits; s32 from, to, period; f32 sx, sy; };
+static ScriptedPress sPress[128];
 static int sPressCount;
 
 static const PortBinding* FindBinding(const char* name, size_t len) {
@@ -74,14 +74,15 @@ static const PortBinding* FindBinding(const char* name, size_t len) {
 
 BOOL PortInputAddPress(const char* spec) {
     const char* at = strchr(spec, '@');
-    if (!at || sPressCount >= 32) return FALSE;
+    if (!at || sPressCount >= 128) return FALSE;
     const PortBinding* b = FindBinding(spec, (size_t)(at - spec));
     if (!b) return FALSE;
     ScriptedPress& p = sPress[sPressCount];
     memset(&p, 0, sizeof(p));
     char* end;
     p.from = strtol(at + 1, &end, 10);
-    p.to = (*end == '-') ? strtol(end + 1, NULL, 10) : p.from + 5;     // a press lasts 6 frames by default
+    p.to = (*end == '-') ? strtol(end + 1, &end, 10) : p.from + 5;     // a press lasts 6 frames by default
+    if (*end == '/') p.period = strtol(end + 1, NULL, 10);             // FROM-TO/N: a 6-frame press every N frames
     switch (b->action) {
     case PORT_IN_BUTTON:      p.bits = b->wiiBits; break;
     case PORT_IN_STICK_UP:    p.sy = 1.0f; break;
@@ -160,6 +161,7 @@ static void Sample(RemoteState* r) {
     s32 frame = PortFrameCount();
     for (int i = 0; i < sPressCount; i++) {
         if (frame < sPress[i].from || frame > sPress[i].to) continue;
+        if (sPress[i].period > 0 && (frame - sPress[i].from) % sPress[i].period >= 6) continue;
         r->hold |= sPress[i].bits;
         if (sPress[i].sx) r->sx = sPress[i].sx;
         if (sPress[i].sy) r->sy = sPress[i].sy;
