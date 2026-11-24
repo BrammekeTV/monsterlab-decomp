@@ -99,6 +99,11 @@
  "changelog": [
   {
    "date": "2026-11-24",
+   "time": "22:41",
+   "text": "On the village map your monster now faces the way it walks (PR #219). The main menu's sky and sea move again, and so do other scrolling textures (PR #220)."
+  },
+  {
+   "date": "2026-11-24",
    "time": "22:01",
    "text": "In the Field Repair minigame the wheel now turns when you swing and the round ends (PR #217)."
   },
