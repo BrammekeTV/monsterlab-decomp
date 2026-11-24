@@ -99,6 +99,11 @@
  "changelog": [
   {
    "date": "2026-11-24",
+   "time": "23:25",
+   "text": "The main menu's lightning bolts now branch and fork like on the Wii instead of looking wrong (PR #224)."
+  },
+  {
+   "date": "2026-11-24",
    "time": "23:11",
    "text": "Behind the scenes: our decompiled code's function declarations now all match their definitions, and the check tool catches mismatches like the one behind the Field Repair crash (PR #223)."
   },
