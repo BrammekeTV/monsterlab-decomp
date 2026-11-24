@@ -477,14 +477,13 @@ def fnv(b):
 
 # Script functions with a sound argument (index in gScriptFuncs: mask of the sound arguments), as
 # kSirSoundCalls in src/port/sir_loader.cpp.
-SOUND_CALLS = {48: 1, 49: 1, 50: 1, 51: 2, 52: 2, 55: 2, 56: 2, 1216: 3, 1217: 3, 1238: 1, 1239: 1, 1297: 2, 1330: 2,
+SOUND_CALLS = {48: 1, 49: 1, 50: 1, 51: 2, 52: 2, 55: 2, 56: 2, 59: 1, 103: 1, 1015: 2, 1216: 3, 1217: 3, 1238: 1, 1239: 1, 1297: 2, 1330: 2,
                1332: 1, 1684: 3, 1693: 1}
 
 def sound_dump(L, sec, base, o, n, ptr):
     """The sound objects the calls of the action program at offset o (n words) name: every
     variation (0x30 bytes), its sound info and the info's DSP header."""
     u = lambda q: struct.unpack_from('>I', sec, q)[0]
-    h = lambda q: struct.unpack_from('>H', sec, q)[0]
     inz = lambda v, size: base <= v and v + size <= base + len(sec)
     k = 0
     while k < n:
@@ -493,7 +492,19 @@ def sound_dump(L, sec, base, o, n, ptr):
         mask = SOUND_CALLS.get((w >> 16) & 0xFFF, 0) if op == 0x16 else 0
         for a in range(ln - 1 if mask else 0):
             snd = u(o + (k + 1 + a) * 4)
-            if not (mask >> a & 1) or not snd or not inz(snd, 0x30): continue
+            if not (mask >> a & 1) or not snd: continue
+            if inz(snd, 0x30): sound_lines(L, sec, base, snd, ptr)
+            elif OTHER_ZONE and OTHER_ZONE[1] == 1 and OTHER_ZONE[0] <= snd and snd + 0x30 <= OTHER_ZONE[0] + len(OTHER_ZONE[2]):
+                if snd not in FAR_SOUNDS: FAR_SOUNDS.append(snd)
+        k += ln if op <= 0x1B else 1
+
+def sound_lines(L, sec, base, snd, ptr):
+    """One sound object at address snd: every variation, its sound info and the info's DSP header."""
+    u = lambda q: struct.unpack_from('>I', sec, q)[0]
+    h = lambda q: struct.unpack_from('>H', sec, q)[0]
+    inz = lambda v, size: base <= v and v + size <= base + len(sec)
+    if True:
+        if True:
             q = snd - base
             for i in range(sec[q + 4] or 1):
                 e = q + i * 0x30
@@ -509,7 +520,6 @@ def sound_dump(L, sec, base, o, n, ptr):
                         line += ' | samples %d rate %d loop %d format %d ends %d %d sum %04x' % (u(d), u(d + 8), h(d + 0xC), h(d + 0xE),
                             u(d + 0x10), u(d + 0x14), sum(h(d + 0x1C + j * 2) for j in range(34)) & 0xFFFF)
                 L.append(line)
-        k += ln if op <= 0x1B else 1
 
 def machines_dump(L, sec, base, hud_addr, list_addr, level=False, extra=()):
     """Appends the dump of a HUD and its state machines (global_binary.sir, or a level zone: there
@@ -547,6 +557,8 @@ def machines_dump(L, sec, base, hud_addr, list_addr, level=False, extra=()):
         if v and base <= v < base + len(sec):       # in a level file the table can lie in another zone
             n = u(off(v))
             L.append('fsmvalues %s count %d sum %08x' % (ptr(v), n, fnv(sec[off(v) + 4:off(v) + 4 + n * 4])))
+        elif v and OTHER_ZONE and OTHER_ZONE[1] == 1 and OTHER_ZONE[0] <= v and v + 4 <= OTHER_ZONE[0] + len(OTHER_ZONE[2]):
+            if v - OTHER_ZONE[0] not in FAR_VALUES: FAR_VALUES.append(v - OTHER_ZONE[0])
         if u(o) and u(o) not in defs: defs.append(u(o))
     for d in defs:
         o = off(d)
@@ -604,6 +616,8 @@ def machines_dump(L, sec, base, hud_addr, list_addr, level=False, extra=()):
 # game code reads, straight from the big-endian bytes. See docs/loader.md, "Level files".
 LEVEL_SLOTS = 0x21E0
 
+FAR_SOUNDS = []     # sounds of the level's other zone that zone 0's action records name (addresses)
+FAR_VALUES = []     # value tables of zone 0's machines that lie in the level's other zone (offsets there)
 OTHER_ZONE = None   # while a level zone is dumped: (address, zone number, image) of the level's other zone image
 
 def other_ptr(v):
@@ -643,6 +657,8 @@ def gx_state_slot(off):
 
 def level_dump(path):
     global OTHER_ZONE
+    del FAR_VALUES[:]
+    del FAR_SOUNDS[:]
     version, secs = read_archive(path)
     zone1 = [x['data'] for x in secs if x['type'] == 1]
     OTHER_ZONE = (LEVEL_ZONE1_BASE, 1, zone1[0]) if zone1 else None
@@ -930,7 +946,17 @@ LEVEL_ZONE1_BASE = 0x90980000   # gZoneBase[1] = zone 0's address + its memory b
 
 def level_zone_dump(L, zn, zone0, zbase, u, base, count, stride, zone0_image, zbase0, hdr_bytes):
     """What the header block names in one zone (image `zone0` at `zbase`), then the zone's dump."""
-    if zn: L.append('zone %d size 0x%x' % (zn, len(zone0)))
+    if zn:
+        L.append('zone %d size 0x%x' % (zn, len(zone0)))
+        for v in FAR_VALUES:                        # converted with this zone (the loader's OtherFsmValuesPlan)
+            n = struct.unpack_from('>I', zone0, v)[0]
+            L.append('fsmfarvalues zone%d+0x%x count %d sum %08x' % (zn, v, n, fnv(zone0[v + 4:v + 4 + n * 4])))
+        def far_ptr(v):
+            if v == 0: return 'null'
+            if zbase <= v <= zbase + len(zone0): return 'img+0x%x' % (v - zbase)
+            return other_ptr(v) or 'wii:%08x' % v
+        for snd in FAR_SOUNDS:                      # the loader's OtherActionSoundsPlan
+            sound_lines(L, zone0, zbase, snd, far_ptr)
     inz = lambda v: zbase <= v < zbase + len(zone0)
     roots, scene, pooltabs, records, lists, slotobjs, sloteffects, actiontabs = [], [], [], [], [], [], [], []
     def table_entries(o):
@@ -1216,7 +1242,8 @@ def zone_dump(L, sec, base, hud, roots, scene_roots, pooltabs, records=(), lists
         parts(u(o + 0x8C))
         add(scene, u(o + 0x90), 8)
         dl = loc(u(o + 0x9C), 0xC)
-        if dl: L.append('entobj9c %s id %08x' % (ptr(u(o + 0x9C)), U(dl[0], dl[1] + 8)))
+        ds = None if prop else loc(u(o + 0x9C), 0x4C)
+        if dl: L.append('entobj9c %s id %08x' % (ptr(u(o + 0x9C)), U(dl[0], dl[1] + 8)) + (' set %s' % ptr(U(ds[0], ds[1] + 0x48)) if ds else ''))
         dl = loc(u(o + 0x9C), 0xC0)
         if prop and dl:
             img, q = dl

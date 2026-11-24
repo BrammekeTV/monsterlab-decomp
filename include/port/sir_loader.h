@@ -426,12 +426,12 @@ enum {
     LEVEL_FIXUP_FSM           = 656    // FixupFSMPoolCallback: a slot holding a state machine
 };
 
-// The script functions with a sound argument (signature argument type 0xB), by their index in
+// The script functions with a sound argument (signature argument type 0xB, or 0xD: a voice line), by their index in
 // gScriptFuncs: the loader converts the sound objects their calls in action records point at.
 // As with the pool functions above, the indices are those of the retail build and the port checks
 // them against the live table. Bit n of argMask: argument n is a sound.
 typedef struct SirSoundCall { u16 func; u8 argMask; const char* name; } SirSoundCall;
-#define SIR_SOUND_CALLS 16
+#define SIR_SOUND_CALLS 19
 #ifdef __cplusplus
 extern "C" {
 #endif

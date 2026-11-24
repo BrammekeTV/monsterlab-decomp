@@ -36,6 +36,7 @@ static u32 Bits(f32 f) {
 static const u8* sOtherZone = NULL;
 static u32 sOtherZoneSize = 0;
 static int sOtherZoneNumber = 0;
+static std::vector<const u32*> sFarValues;   // value tables of zone 0's machines that lie in another zone
 static bool InOtherZone(const u8* p, u32 n) { return sOtherZone != NULL && p >= sOtherZone && p + n <= sOtherZone + sOtherZoneSize; }
 
 static void PrintPtr(const u8* slot, const GlobalBinaryFile* f) {
@@ -49,14 +50,9 @@ static void PrintPtr(const u8* slot, const GlobalBinaryFile* f) {
 
 // The sound objects the calls of a converted action program (n words) name, as PlaySoundAt,
 // fn_801FE52C and fn_80203340 read them. An operand is the object's Wii address.
-static void DumpSounds(const GlobalBinaryFile* f, u32 wiiBase, const u32* pc, u32 n) {
-    for (u32 k = 0; k < n; k += (pc[k] & 0xFF) <= 0x1B ? (pc[k] >> 8) & 0xFF : 1) {
-        u32 len = (pc[k] >> 8) & 0xFF, mask = 0;
-        if ((pc[k] & 0xFF) != 0x16) continue;
-        for (u32 c = 0; c < SIR_SOUND_CALLS; c++) if (kSirSoundCalls[c].func == ((pc[k] >> 16) & 0xFFF)) mask = kSirSoundCalls[c].argMask;
-        for (u32 a = 0; mask != 0 && a + 1 < len; a++) {
-            u32 snd = pc[k + 1 + a];
-            if (!(mask >> a & 1) || snd < wiiBase || (u64)(snd - wiiBase) + 0x30 > f->imageSize) continue;
+#define LEVEL_ZONE1_WII_BASE 0x90980000u   // where the game loads a level's zone 1
+static std::vector<u32> sFarSounds;   // sounds of the other zone that zone 0's action records name (Wii addresses)
+static void DumpSound(const GlobalBinaryFile* f, u32 wiiBase, u32 snd) {
             const u8* first = f->image + (snd - wiiBase);
             for (u32 i = 0; i < (first[4] != 0 ? first[4] : 1u); i++) {
                 const u8* e = first + i * 0x30;
@@ -77,6 +73,22 @@ static void DumpSounds(const GlobalBinaryFile* f, u32 wiiBase, const u32* pc, u3
                     }
                 }
                 printf("\n");
+            }
+}
+
+static void DumpSounds(const GlobalBinaryFile* f, u32 wiiBase, const u32* pc, u32 n) {
+    for (u32 k = 0; k < n; k += (pc[k] & 0xFF) <= 0x1B ? (pc[k] >> 8) & 0xFF : 1) {
+        u32 len = (pc[k] >> 8) & 0xFF, mask = 0;
+        if ((pc[k] & 0xFF) != 0x16) continue;
+        for (u32 c = 0; c < SIR_SOUND_CALLS; c++) if (kSirSoundCalls[c].func == ((pc[k] >> 16) & 0xFFF)) mask = kSirSoundCalls[c].argMask;
+        for (u32 a = 0; mask != 0 && a + 1 < len; a++) {
+            u32 snd = pc[k + 1 + a];
+            if (!(mask >> a & 1)) continue;
+            if (snd >= wiiBase && (u64)(snd - wiiBase) + 0x30 <= f->imageSize) { DumpSound(f, wiiBase, snd); continue; }
+            if (sOtherZoneNumber == 1 && sOtherZone != NULL && snd >= LEVEL_ZONE1_WII_BASE && (u64)(snd - LEVEL_ZONE1_WII_BASE) + 0x30 <= sOtherZoneSize) {
+                bool seen = false;
+                for (u32 v : sFarSounds) seen = seen || v == snd;
+                if (!seen) sFarSounds.push_back(snd);
             }
         }
     }
@@ -409,6 +421,10 @@ static void DumpMachines(const GlobalBinaryFile* f, const u8* hud, const u8* lis
             printf("fsmvalues ");
             PrintPtr((const u8*)&values, f);
             printf(" count %u sum %08x\n", values[0], h);
+        } else if (values != NULL && InOtherZone((const u8*)values, 4)) {
+            bool seen = false;
+            for (const u32* v : sFarValues) seen = seen || v == values;
+            if (!seen) sFarValues.push_back(values);
         }
         AddUnique(defs, *(const u8**)m);
     }
@@ -725,7 +741,6 @@ static int Dump(const char* path) {
 
 // Zone 1's address: gZoneBase[1] = zone 0's address plus its memory budget (world_alloc.cpp).
 // It is not in the level file; the port takes it from where the game reads the image to.
-#define LEVEL_ZONE1_WII_BASE 0x90980000u
 
 struct LevelFile {
     u8* hdr;  u32 hdrSize;      // header block (the world state), converted
@@ -1433,7 +1448,11 @@ struct ZoneDump {
             Parts(*(const u8**)(e + 0x8C));
             Add(scene, *(const u8**)(e + 0x90), 8);
             const u8* o9c = *(const u8**)(e + 0x9C);
-            if (InAny(o9c, 0xC)) { printf("entobj9c "); Val(o9c); printf(" id %08x\n", *(const u32*)(o9c + 8)); }
+            if (InAny(o9c, 0xC)) {
+                printf("entobj9c "); Val(o9c); printf(" id %08x", *(const u32*)(o9c + 8));
+                if (!prop && InAny(o9c, 0x4C)) { printf(" set "); Ptr(o9c + 0x48); }
+                printf("\n");
+            }
             if (prop && InAny(o9c, PROP_DEF_USED)) {
                 printf("entdef "); Val(o9c); printf(" f24 %08x w2c %08x acts", Bits(*(const f32*)(o9c + 0x24)), *(const u32*)(o9c + 0x2C));
                 for (u32 k = 0; k < 3; k++) printf(" %08x", *(const u32*)(o9c + 0x68 + k * 4));
@@ -1667,8 +1686,16 @@ static int DumpLevel(const char* path) {
         if (e == SIR_OK) e = LevelZoneConvert(&r, f.zone1, f.zone1Size, LEVEL_ZONE1_WII_BASE, &roots1, NULL, &other);
         if (e != SIR_OK) { fprintf(stderr, "%s zone 1: %s\n", path, SirErrorText(e)); return 1; }
         printf("zone 1 size 0x%x\n", f.zone1Size);
+        // The value tables zone 0's machines keep here, converted with this zone.
+        for (const u32* values : sFarValues) {
+            u32 h = 0x811C9DC5u;
+            for (u32 i = 1; i <= values[0]; i++)
+                for (s32 shift = 24; shift >= 0; shift -= 8) h = (h ^ ((values[i] >> shift) & 0xFF)) * 0x01000193u;
+            printf("fsmfarvalues zone1+0x%x count %u sum %08x\n", (u32)((const u8*)values - f.zone1), values[0], h);
+        }
         sOtherZone = f.zone; sOtherZoneSize = f.zoneSize; sOtherZoneNumber = 0;
         GlobalBinaryFile z1 = { NULL, f.zone1, f.zone1Size };
+        for (u32 snd : sFarSounds) DumpSound(&z1, LEVEL_ZONE1_WII_BASE, snd);   // the ones zone 0's action records name
         ZoneDump zd1;
         zd1.z = &z1;
         for (u32 i = 0; i < roots1.entityCount; i++) zd1.Add(zd1.ents, f.zone1 + (roots1.entities[i] - LEVEL_ZONE1_WII_BASE));
