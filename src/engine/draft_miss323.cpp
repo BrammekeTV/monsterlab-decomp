@@ -26,7 +26,6 @@ s32    VideoGetHeight(RendVideo* video);
 s32    VideoGetWidth(RendVideo* video);
 u8*    fn_80142500(void* p);                                   // 0x80142500
 f32    TimerReset(u8* timer);                                  // 0x80142744
-                                      // 0x80142970
 void   fn_80142ED0(u8* base, s32 size);                        // 0x80142ED0
 s32    fn_80146808(u8* file, const char* name, const char* mode);
 s32    fn_80146930(u8* file, void* buf, s32 size);

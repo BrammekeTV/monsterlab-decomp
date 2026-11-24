@@ -382,9 +382,10 @@ void EffectExpire(u8* e) {
 
 }  // extern "C"
 
+struct ActionDisplay { u32 key; u8 show[4]; };
+
 // 0x802165E8
 // Which stat rows the combat HUD shows for an action kind (table at db + 0x2148).
-struct ActionDisplay { u32 key; u8 show[4]; };
 extern "C" ActionDisplay PartDbGetActionDisplay(GameDb* db, u32 key) {
     const ActionDisplay* t = *(const ActionDisplay**)(db->data + 0x2148);
     s32 n = *(s32*)(db->data + 0x214C);
