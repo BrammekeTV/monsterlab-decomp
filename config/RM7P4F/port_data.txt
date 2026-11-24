@@ -24,3 +24,8 @@ gLevelFlags 4 4 4 4 4 4 1x8
 # The input mapping list fn_801472A8 walks (lbl_805F91F0, 0x56 entries): pairs of u16 register
 # numbers, source then target (0x1087 -> register 0 and so on)
 lbl_80348268 2
+# Field Repair tuning: five floats, then its strings ("fr_paper_doll_sparks_particle_%d", FSM value names):
+# symbols.txt hints the whole block as float
+lbl_80357748 4 4 4 4 4 1x252
+# HOME menu: 16 pointers, then the names "arc", "back_01", "back_00", "back_02" (hinted 4byte as a whole)
+lbl_803A9FD8 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 1x32

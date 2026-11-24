@@ -55,6 +55,8 @@ PortBinding gPortBindings[] = {
     {"STICK_DOWN",  PORT_IN_STICK_DOWN,  0, 'S', 0, 0, 0},
     {"STICK_LEFT",  PORT_IN_STICK_LEFT,  0, 'A', 0, 0, 0},
     {"STICK_RIGHT", PORT_IN_STICK_RIGHT, 0, 'D', 0, 0, 0},
+    // Motion: held, the remote's accelerometer reads as a steady swing in circles (the wheel of Field Repair).
+    {"SWING",       PORT_IN_SWING,       0, 'R', 0, 0, XINPUT_GAMEPAD_RIGHT_THUMB},
 };
 const int gPortBindingCount = sizeof(gPortBindings) / sizeof(gPortBindings[0]);
 
@@ -62,7 +64,7 @@ HWND PortGfxWindow(void);
 s32  PortFrameCount(void);
 
 // ------------------------------------------------------------------ scripted presses (--press)
-struct ScriptedPress { u32 bits; s32 from, to, period; f32 sx, sy; };
+struct ScriptedPress { u32 bits; s32 from, to, period; f32 sx, sy; BOOL swing; };
 static ScriptedPress sPress[128];
 static int sPressCount;
 
@@ -89,6 +91,7 @@ BOOL PortInputAddPress(const char* spec) {
     case PORT_IN_STICK_DOWN:  p.sy = -1.0f; break;
     case PORT_IN_STICK_LEFT:  p.sx = -1.0f; break;
     case PORT_IN_STICK_RIGHT: p.sx = 1.0f; break;
+    case PORT_IN_SWING:       p.swing = TRUE; break;
     }
     sPressCount++;
     return TRUE;
@@ -152,7 +155,7 @@ static f32 Axis(SHORT v, SHORT dead) {
 
 // ------------------------------------------------------------------ the remote's state
 extern "C" BOOL PortUiNavigate(int dx, int dy, f32* px, f32* py);
-struct RemoteState { u32 hold; f32 sx, sy; f32 px, py; BOOL pointerValid; };
+struct RemoteState { u32 hold; f32 sx, sy; f32 px, py; BOOL pointerValid; BOOL swing; };
 static f32  sPadPx, sPadPy;          // the pointer moved by the right stick
 static BOOL sPadPointer;
 
@@ -165,6 +168,7 @@ static void Sample(RemoteState* r) {
         r->hold |= sPress[i].bits;
         if (sPress[i].sx) r->sx = sPress[i].sx;
         if (sPress[i].sy) r->sy = sPress[i].sy;
+        if (sPress[i].swing) r->swing = TRUE;
     }
 
     {
@@ -205,6 +209,7 @@ static void Sample(RemoteState* r) {
         case PORT_IN_STICK_DOWN:  ky -= 1.0f; break;
         case PORT_IN_STICK_LEFT:  kx -= 1.0f; break;
         case PORT_IN_STICK_RIGHT: kx += 1.0f; break;
+        case PORT_IN_SWING:       r->swing = TRUE; break;
         }
     }
     if (kx || ky) {
@@ -277,6 +282,24 @@ s32 KPADRead(s32 chan, u8* buf, s32 count) {
     sLastHold = r.hold;
     *(f32*)(buf + 0x10) = -1.0f;        // acc.y: gravity
     *(f32*)(buf + 0x18) = 1.0f;         // its length
+    // SWING held: the acceleration goes round in the remote's x-y plane, three turns a second at 60
+    // samples, 2 g around gravity. The game's swing detectors (fn_801FA304, fn_801F95F0) follow the
+    // accelerometer from sample to sample across the axis planes; +0x1C is how far it moved.
+    {
+        static f32 sSwingAngle, sLastX, sLastY = -1.0f;
+        f32 ax = 0.0f, ay = -1.0f;
+        if (r.swing) {
+            sSwingAngle += 0.314159265f;
+            if (sSwingAngle > 6.2831853f) sSwingAngle -= 6.2831853f;
+            ax = 2.0f * cosf(sSwingAngle);
+            ay = -1.0f + 2.0f * sinf(sSwingAngle);
+        }
+        *(f32*)(buf + 0x0C) = ax;
+        *(f32*)(buf + 0x10) = ay;
+        *(f32*)(buf + 0x18) = sqrtf(ax * ax + ay * ay);
+        *(f32*)(buf + 0x1C) = sqrtf((ax - sLastX) * (ax - sLastX) + (ay - sLastY) * (ay - sLastY));
+        sLastX = ax; sLastY = ay;
+    }
     if (r.pointerValid) {
         *(f32*)(buf + 0x20) = r.px;
         *(f32*)(buf + 0x24) = r.py;

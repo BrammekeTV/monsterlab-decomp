@@ -50,7 +50,7 @@ build\pc\monsterlab.exe                        # runs main() with your own disc 
 | `--stretch-ui` | 16:9: stretch the 2D layer over the whole width, as the console does |
 | `--peek ADDR` | print four words of Wii memory (hex address) when the run stops |
 | `--watch ADDR` | report every write of the game's threads to four bytes of Wii memory (hex address): writer, new value, stack |
-| `--press BUTTON@FRAME[-FRAME]` | hold a Wii Remote button (a name from the binding table: `A`, `B`, `PLUS`, `STICK_UP`...) during those frames; a press without an end lasts 6 frames; `A@FROM-TO/N` is a 6-frame press every N frames in that range. For headless tests; can be given up to 128 times |
+| `--press BUTTON@FRAME[-FRAME]` | hold a Wii Remote button (a name from the binding table: `A`, `B`, `PLUS`, `STICK_UP`, `SWING`...) during those frames; a press without an end lasts 6 frames; `A@FROM-TO/N` is a 6-frame press every N frames in that range. For headless tests; can be given up to 128 times |
 | `--show-texture N` | development aid: when the boot stops, draw texture N of `global_binary.sir` through the engine's draw path instead of ending (see "GX: the renderer") |
 
 Debugging aids: `--peek ADDR` (up to eight) prints four words of Wii memory at the stop;
@@ -289,6 +289,9 @@ Default bindings (`gPortBindings` in `port_input.cpp`; the game sees a Wii Remot
 | Z / C (Nunchuk) | left Shift or E / left Ctrl or Q | right / left shoulder or trigger |
 | Nunchuk stick | W A S D | left stick |
 | pointer | the mouse inside the window | right stick moves it |
+| swing the remote in circles (`SWING`) | R (held) | right stick click (held) |
+
+`SWING` is the first motion input: while it is held the accelerometer sample goes round in the remote's x-y plane (2 g around gravity, three turns a second), which is what the Field Repair wheel follows (`fn_801FA304`). Other gestures (shake, thrust) have no binding yet.
 
 The game turns the remote's buttons into its own input registers through a static list of
 register pairs (`lbl_80348268`, walked by `fn_801472A8`); that list is u16 data

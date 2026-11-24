@@ -113,8 +113,8 @@ extern u8* lbl_805FBBE0;
 
 // Finds the zone object whose name hash (+0x9C -> +8) equals `hash`; stores the last match in *out.
 static void FindZoneObj(u8** out, u32 hash) {
-    u8* rec = *(u8**)(gWorldState + 0x1A4) + (gZoneResourceSize * 2 - gZoneResourceSize);
-    for (s32 i = 0; i < *(s32*)(gWorldState + 4); i++) {
+    u8* rec = *(u8**)(*(u8**)gWorldState + 0x1A4) + (gZoneResourceSize * 2 - gZoneResourceSize);
+    for (s32 i = 0; i < *(s32*)(*(u8**)gWorldState + 4); i++) {
         for (s32 j = 0; j < *(s32*)(rec + 0x98); j++) {
             u8* obj = (*(u8***)(rec + 0x12C))[j];
             u8* nm = *(u8**)(obj + 0x9C);
@@ -294,8 +294,8 @@ u8* fn_80028038(u8* p) {
     *(s32*)(p + 0xD4) = 1;
     *(s32*)(p + 0xD8) = 0x14;
     {
-        u8* rec = *(u8**)(gWorldState + 0x1A4) + (gZoneResourceSize * 2 - gZoneResourceSize);
-        for (s32 i = 0; i < *(s32*)(gWorldState + 4); i++) {
+        u8* rec = *(u8**)(*(u8**)gWorldState + 0x1A4) + (gZoneResourceSize * 2 - gZoneResourceSize);
+        for (s32 i = 0; i < *(s32*)(*(u8**)gWorldState + 4); i++) {
             for (s32 j = 0; j < *(s32*)(rec + 0x98); j++) {
                 u8* obj = (*(u8***)(rec + 0x12C))[j];
                 u8* nm = *(u8**)(obj + 0x9C);

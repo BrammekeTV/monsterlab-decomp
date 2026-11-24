@@ -11,6 +11,7 @@ enum PortInputAction {
     PORT_IN_STICK_DOWN,
     PORT_IN_STICK_LEFT,
     PORT_IN_STICK_RIGHT,
+    PORT_IN_SWING,          // swings the Wii Remote in circles while held (accelerometer)
 };
 
 typedef struct PortBinding {
