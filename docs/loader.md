@@ -1033,6 +1033,14 @@ Read when the first map level (`village_level.sir`) starts:
   pool its model comes from (`fn_80063D6C` looks it up in zone 0's pool table: `coffin`), `+0x108..+0x118`
   five sound objects, `+0x148` flags, `+0x14C` an object (not typed), `+0x150` four floats and a duration.
   Not converted: the pointers at `+0x4C` and `+0x54` (no reader found yet).
+- **Entity types** (the byte at `+0x34` of the record): types `0x0F` (`fn_8006CCC4`) and `0x10` derive from
+  the prop and are converted like one. A pooled entity has no record in the file; its type is the pool
+  table entry's `+0x1C`. Every entity's position at `+0xC8` and the record's `+0x28` are converted:
+  `EntityRefreshLinks` wakes a sleeping entity (vtable slot 0x30) only when `+0x28 > 0` and the position
+  lies in a loaded zone's box. Types 8 (`fn_8006D2D0`, trigger volume) and 9 (`fn_8006F6BC`) have fields
+  behind the common part: `+0x1BC` a float, `+0x1C4` four action words, `+0x1FE` a u16, `+0x204` a filter
+  (`fn_801B7A4C`: `+0x00` list of ids, `+0x04` / `+0x08` its length as entity or definition ids, `+0x0C`
+  flags), `+0x208` a word.
 - **Camera objects** (a slot's objects, `+0xA8`): every type starts the same way (`fn_800DECD8`,
   `fn_800DE678`): `+0x0C` how many boundary nodes, `+0x10` the nodes (0x14 bytes: a word, a
   position, a float), `+0x14` how many segments, `+0x18` the segments (two node indices, bytes),

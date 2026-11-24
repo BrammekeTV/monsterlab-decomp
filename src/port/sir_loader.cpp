@@ -1572,6 +1572,8 @@ static const SirField kEntityFields[] = {
     { 0x0AC, SIR_U32, 1 },    // code: fn_801B6554, fn_801B66EC
     { 0x0B0, SIR_PTR, 1 },    // code: list of child entities (fn_8012F8B8)
     { 0x0B8, SIR_U32, 1 },    // code: flags; UpdateZoneEntities updates an entity without bit 0
+    { 0x0C8, SIR_F32, 3 },    // code: a position: EntityRefreshLinks tests it against the loaded zones' boxes before it
+                              //       wakes an entity (vtable slot 0x30); a prop's: fn_8006A764
     { 0x0EC, SIR_U32, 3 },    // code: the event that wakes a sleeping entity (fn_801B9F14; WorldTick compares it with
                               //       0x6C938971), two event ids (EventMgrFlushFor)
     { 0x158, SIR_F32, 1 },    // code: fn_800690D4
@@ -1593,6 +1595,7 @@ static const SirField kEntityRecordFields[] = {
     { 0x00, SIR_F32, 7 },     // code: fn_801B4334 (two vectors of three, then 1.0)
     { 0x1C, SIR_U32, 2 },     // code: layer mask and flags (fn_8012F8B8, fn_801B4334)
     { 0x24, SIR_F32, 1 },     // code: fn_800690D4
+    { 0x28, SIR_U32, 1 },     // code: s32; EntityRefreshLinks leaves an entity asleep when it is <= 0
     { 0x2C, SIR_U32, 1 },     // code: fn_801B4334
     { 0x30, SIR_U16, 2 },     // code: fn_801B4334; +0x32 picks the clip list of an animation table (fn_800699E4)
 };
@@ -1605,7 +1608,6 @@ static const SirField kPropFields[] = {
     { 0x038, SIR_U32, 3 },    // code: action words (fn_8006A2D0)
     { 0x048, SIR_U32, 4 },    // code: action words (fn_800696C4, fn_8006BDF4, fn_80069638)
     { 0x068, SIR_U32, 1 },    // code: action word (fn_80069180)
-    { 0x0C8, SIR_F32, 3 },    // code: a position (fn_8006A764)
     { 0x0D4, SIR_F32, 3 },    // code: its rotation as Euler angles (fn_801B5BD8 builds the record's quaternion from them)
     { 0x15C, SIR_U32, 1 },    // code: flags (fn_80069180, fn_8006A764, fn_8006A2D0)
     { 0x1A0, SIR_PTR, 1 },    // code: the prop's states: +0x1A4 pointers to definitions (fn_800699E4)
@@ -2064,6 +2066,7 @@ static SirError EntityContainerPlan(ImagePlan* plan, const u8* image, u32 imageS
     return SIR_OK;
 }
 
+static u32 sPooledEntityType;   // set while PoolTablePlan walks a pool of entities, else 0
 static SirError EntityPlan(ImagePlan* plan, const u8* image, u32 imageSize, u32 addr, u32 depth) {
     u32 off, o;
     if (!LevelSpan(addr, ENTITY_USED, imageSize, &off) || PlanHas(plan, off, REGION_ENTITY) || PlanHas(plan, off, REGION_ENTITY_PROP))
@@ -2074,9 +2077,12 @@ static SirError EntityPlan(ImagePlan* plan, const u8* image, u32 imageSize, u32 
     u32 otherRec = 0, q;
     bool recordHere = LevelSpan(Be32(ent + 0x04), ENTITY_RECORD_SIZE, imageSize, &o) != 0;
     bool recordOther = !recordHere && OtherSpan(Be32(ent + 0x04), ENTITY_RECORD_SIZE, &otherRec);
-    u32 kind = recordHere ? image[o + 0x34] : recordOther ? sOtherImage[otherRec + 0x34] : 0;
-    // Type 0x10 (the challenge projector, fn_8006CFA4) derives from the prop: same layout and definition.
-    bool prop = kind == ENTITY_TYPE_PROP || kind == 0x10;
+    // A pooled entity has no record in the file (fn_8012E420 gives it one when it is spawned): its
+    // type is the one its pool table entry names (+0x1C, which FixUpEntityCallback hands to fn_8012F8B8).
+    u32 kind = recordHere ? image[o + 0x34] : recordOther ? sOtherImage[otherRec + 0x34] : sPooledEntityType;
+    // Types 0x0F (fn_8006CCC4; its vtable slot 0x30, fn_8006CD24, is the prop's fn_80069180) and 0x10 (the
+    // challenge projector, fn_8006CFA4) derive from the prop: same layout and definition.
+    bool prop = kind == ENTITY_TYPE_PROP || kind == 0x0F || kind == 0x10;
     if (recordOther && !OtherAdd(otherRec, ENTITY_RECORD_SIZE, REGION_ENTITY_RECORD)) return SIR_ERR_ENTITY;
     if (depth > ENTITY_DEPTH_MAX || !PlanAdd(plan, off, ENTITY_USED, prop ? REGION_ENTITY_PROP : REGION_ENTITY)) return SIR_ERR_ENTITY;
     SirError e;
@@ -2123,6 +2129,20 @@ static SirError EntityPlan(ImagePlan* plan, const u8* image, u32 imageSize, u32 
         if (!PlanAdd(plan, o, 8, REGION_PTR_ARRAY)) return SIR_ERR_ENTITY;
         u32 machine = Be32(image + o), m;
         if (LevelSpan(machine, FSM_USED, imageSize, &m) && (e = FsmPlan(plan, image, imageSize, machine)) != SIR_OK) return e;
+    }
+    // Type 8 (fn_8006D2D0, a trigger volume) and type 9 (fn_8006F6BC, derived from it) have more behind the common part: +0x1BC a float, +0x1C4 four
+    // action words, +0x1FE a u16, +0x204 a filter and +0x208 a word. The filter (fn_801B7A4C): +0x00 a list
+    // of ids, +0x04 how many entity ids it holds or +0x08 how many definition ids, +0x0C flags.
+    if ((kind == 8 || kind == 9) && (u64)off + 0x20C <= imageSize) {
+        if (!PlanAdd(plan, off + 0x1BC, 4, REGION_U32_ARRAY) || !PlanAdd(plan, off + 0x1C4, 0x10, REGION_U32_ARRAY) ||
+            !PlanAdd(plan, off + 0x1FE, 2, REGION_U16_ARRAY) || !PlanAdd(plan, off + 0x204, 4, REGION_PTR_ARRAY) ||
+            !PlanAdd(plan, off + 0x208, 4, REGION_U32_ARRAY)) return SIR_ERR_ENTITY;
+        if (LevelSpan(Be32(ent + 0x204), 0x10, imageSize, &o) && !PlanHas(plan, o, REGION_PTR_ARRAY)) {
+            u32 ids = Be32(image + o + 4) != 0 ? Be32(image + o + 4) : Be32(image + o + 8), list;
+            if (!PlanAdd(plan, o, 4, REGION_PTR_ARRAY) || !PlanAdd(plan, o + 4, 12, REGION_U32_ARRAY)) return SIR_ERR_ENTITY;
+            if (ids != 0 && ids <= imageSize / 4 && LevelSpan(Be32(image + o), (u64)ids * 4, imageSize, &list) &&
+                !PlanHas(plan, list, REGION_U32_ARRAY) && !PlanAdd(plan, list, ids * 4, REGION_U32_ARRAY)) return SIR_ERR_ENTITY;
+        }
     }
     // More part containers.
     u32 extra = Be32(ent + 0x1A4);
@@ -3458,6 +3478,10 @@ static SirError PoolTablePlan(ImagePlan* plan, const u8* image, u32 imageSize, u
             u32 item = sImageBase + itemOff;
             switch (fixUp) {
             case LEVEL_FIXUP_ENTITY:
+                sPooledEntityType = Be32(entry + 0x1C) < 0x20 ? Be32(entry + 0x1C) : 0;
+                e = EntityPlan(plan, image, imageSize, item, 0);
+                sPooledEntityType = 0;
+                break;
             case LEVEL_FIXUP_ENTITY_PART:
                 e = EntityPlan(plan, image, imageSize, item, 0);
                 break;
