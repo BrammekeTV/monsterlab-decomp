@@ -1,0 +1,9 @@
+fn_801CD648 FloatDiffInBounds          # returns 1 when a - b lies strictly between two float bounds
+fn_801EDA4C RecordKind                 # record kind: high bit of byte 0 -> 1, else low nibble
+fn_801EBDF0 ListMoveNodeToTail         # unlinks node (arg1 - 8) and re-links it at the tail of the list
+fn_801B4160 FreeNodeList               # walks list at +4 and frees each node through fn_801EBA20
+fn_801C383C ResetListBuffers           # clears 12 bytes at +0x18, frees and reallocates two list buffers
+fn_801C3924 DrainNodeLists             # drains the node lists of each entry (flag at +0x4C picks list)
+fn_801BB57C QueuePopNext               # pops next entry off queue, restarts step counter at 1
+fn_801C5444 TrailEffectUpdate          # per-frame update of trail/ribbon effect: ages timers, fades alpha, scrolls UVs
+fn_801EAFA4 WaypointFollowerSetupTasks # sets up vector/rotation interpolation tasks for waypoint path follower
