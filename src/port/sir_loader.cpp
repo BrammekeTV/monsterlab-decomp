@@ -1642,6 +1642,13 @@ static const SirField kAnimDefFields[] = {
 #define ANIM_SET_USED 0x20
 #define ENTITY_DEF_USED 0x4C   // of the definition of an entity that is not a prop (entity +0x9C): id +0x08, animation set +0x48
 #define ANIM_DEF_SIZE 0x44
+// The animation speed of a character definition (+0xB8, with the two floats after it): fn_80053C2C multiplies the
+// tick by it. Unconverted it read as ~0 and every character stood still. Told from the other objects an entity
+// can point at by its default hash at +0x60. Only these three words are known to be floats here: the rest of
+// the definition is not converted, and definitions of types 5 and 13 lie too close to each other to take more.
+static bool CharDefLooksFull(const u8* image, u32 imageSize, u32 o) {
+    return (u64)o + 0xC4 <= imageSize && Be32(image + o + 0x60) == 0xDC1BFEC5u;
+}
 
 static SirError AnimClipPlan(ImagePlan* plan, const u8* image, u32 imageSize, u32 addr);
 static SirError AnimObjPlan(ImagePlan* plan, const u8* image, u32 imageSize, u32 addr);
@@ -2115,9 +2122,11 @@ static SirError EntityPlan(ImagePlan* plan, const u8* image, u32 imageSize, u32 
         if (!PlanAdd(plan, o + 8, 4, REGION_U32_ARRAY)) return SIR_ERR_ENTITY;
         // +0x48: the definition's animation set (fn_8005BEC8 looks a conversation's clip up in it).
         if ((u64)o + ENTITY_DEF_USED <= imageSize && !PlanAdd(plan, o + 0x48, 4, REGION_PTR_ARRAY)) return SIR_ERR_ENTITY;
+        if ((kind == 5 || kind == 13) && CharDefLooksFull(image, imageSize, o) && !PlanAdd(plan, o + 0xB8, 0x0C, REGION_U32_ARRAY)) return SIR_ERR_ENTITY;
     } else if (OtherSpan(Be32(ent + 0x9C), 0xC, &q)) {
         if (!OtherAdd(q + 8, 4, REGION_U32_ARRAY)) return SIR_ERR_ENTITY;
         if ((u64)q + ENTITY_DEF_USED <= sOtherSize && !OtherAdd(q + 0x48, 4, REGION_PTR_ARRAY)) return SIR_ERR_ENTITY;
+        if ((kind == 5 || kind == 13) && CharDefLooksFull(sOtherImage, sOtherSize, q) && !OtherAdd(q + 0xB8, 0x0C, REGION_U32_ARRAY)) return SIR_ERR_ENTITY;
     }
     if (!prop && Be32(ent + 0x9C) != 0) {
         // The animation set itself (fn_800526E4 -> fn_801AC6B4 reads its entries when the entity wakes).
