@@ -72,8 +72,8 @@
   },
   {
    "title": "Settings GUI",
-   "detail": "In-game settings screen (F1 or Esc) built with Dear ImGui, saved to monsterlab.ini: resolution, aspect, stretched menus, V-sync, borderless fullscreen, stats overlay, volume and key rebinding (PR #105), plus an F3 stats overlay (PR #104). Still to add: FPS cap, render scale, MSAA, texture filtering and gamepad rebinding.",
-   "status": "in_progress"
+   "detail": "In-game settings screen (F1 or Esc, Dear ImGui) saved to monsterlab.ini: resolution, aspect, stretched menus, V-sync, borderless fullscreen, frame-rate cap or uncapped, render scale, MSAA, texture filtering, volume, keyboard and gamepad rebinding, the game disc, plus an F3 stats overlay (PRs #104, #105, #111, #124, #129, #132, #133).",
+   "status": "done"
   },
   {
    "title": "Own-disc setup (ISO picker)",
