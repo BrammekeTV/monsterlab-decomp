@@ -117,7 +117,7 @@ typedef struct PortOptions {
 extern PortOptions gPortOptions;
 
 enum { PORT_FPS_UNCAPPED = -1, PORT_FPS_DISPLAY = -2 };
-BOOL PortGfxIdle(void);            // the game thread waits for the next retrace: show the last picture again if the frame rate asks for it (lock held)
+BOOL PortGfxIdle(void);            // the drawing thread waits: show the last picture again if the frame rate asks for it (lock held)
 enum { PORT_FILTER_GAME, PORT_FILTER_NEAREST, PORT_FILTER_BILINEAR, PORT_FILTER_AF2, PORT_FILTER_AF4, PORT_FILTER_AF8, PORT_FILTER_AF16, PORT_FILTER_COUNT };
 extern const char* const kPortFilterNames[PORT_FILTER_COUNT];   // ini / command-line spelling
 void PortGfxApplySettings(void);   // texture filtering changed: textures and samplers are rebuilt at the next picture

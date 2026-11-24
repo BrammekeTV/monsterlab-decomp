@@ -98,6 +98,11 @@
  ],
  "changelog": [
   {
+   "date": "2026-11-24",
+   "time": "01:12",
+   "text": "The first level loads and draws on Windows (PR #128): after Join Now! on the main menu, castle_communication now loads instead of crashing. Attach points, the aim object, scene lights and one more material type are converted to PC byte order. The main menu's camera also flies in to the wide shot of the castle, as on the Wii, now that animation entries are converted (PR #127). And the game can read .rvz disc images, Dolphin's compressed format (PR #126)."
+  },
+  {
    "date": "2026-11-23",
    "time": "23:50",
    "text": "The main-menu camera now follows the level's own camera path (PR #122): three data-conversion errors kept it fixed in place. It isn't yet the wide shot of the castle you see on the Wii. The Options screen's sliders are now fully converted too (PR #121), a step towards opening Options from the menu."

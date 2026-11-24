@@ -99,7 +99,7 @@ BOOL PortSettingsSave(const char* path, const PortSettings* s) {
     fprintf(f, "; Monster Lab PC port settings (written by the settings screen: F1 in the game)\n");
     fprintf(f, "[display]\nwidth = %d\nheight = %d\naspect = %s\nstretch_ui = %d\nvsync = %d\nfullscreen = %d\n",
             s->width, s->height, s->wide ? "16:9" : "4:3", s->stretchUi ? 1 : 0, s->vsync ? 1 : 0, s->fullscreen ? 1 : 0);
-    fprintf(f, "; internal frame buffer size, percent of the output picture (50-200); texture_filter: game, nearest, bilinear, 2x, 4x, 8x, 16x (anisotropic)\nrender_scale = %d\ntexture_filter = %s\n",
+    fprintf(f, "; internal frame buffer size, percent of the output picture (50-200); texture_filter: game, nearest, bilinear, 2x, 4x, 8x, 16x (anisotropic)\nrender_scale = %d\ntexture_filter = %s\n\n",
             s->renderScale, kPortFilterNames[s->texFilter >= 0 && s->texFilter < PORT_FILTER_COUNT ? s->texFilter : 0]);
     char cap[16];
     snprintf(cap, sizeof(cap), "%d", s->fpsCap);
@@ -155,7 +155,7 @@ int PortSelfTestSettings(void) {
     // A missing file changes nothing, and values out of range are brought into range.
     FILE* f = fopen(path, "w");
     if (f) { fputs("[display]\nwidth = 5\nheight = 99999\nrender_scale = 900\n[audio]\nvolume = 250\n", f); fclose(f); }
-    PortSettings odd = {1920, 1080, TRUE, FALSE, FALSE, FALSE, 100, FALSE, "", 100, PORT_FILTER_GAME};
+    PortSettings odd = {1920, 1080, TRUE, FALSE, FALSE, FALSE, 100, FALSE, "", 100, PORT_FILTER_GAME, 0};
     PortSettingsLoad(path, &odd);
     if (odd.width != 320 || odd.height != 8192 || odd.volume != 100 || odd.renderScale != 200) { PortLog("selftest settings: out-of-range values gave %dx%d volume %d", odd.width, odd.height, odd.volume); fails++; }
     DeleteFileA(path);
