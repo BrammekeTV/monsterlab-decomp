@@ -30,9 +30,18 @@ console data; the port converts it after reading, as it does for the disc's own)
 
 ## Replacing a texture with a PNG
 
-A PNG under `mods\<mod name>	extures\` (sub-folders are fine) replaces one game texture. Which one is
-told by the **last 16 characters of the file name**, the texture's hash: `sky_4962D17B32AB899E.png` and
-`tex_256x256_f14_4962D17B32AB899E.png` replace the same texture; what stands before the hash is yours.
+A PNG under `mods\<mod name>\textures\` (sub-folders are fine) replaces one game texture. Which one is
+told in one of two ways:
+
+- **By name** (stable, the better choice): the file is called after the texture's name in the game's data,
+  `MonsterLab_Logo.png` (case does not matter). `--dump-textures` writes the name into the file name when it
+  knows it: `tex_256x128_f6_MonsterLab_Logo_FF636077E97CEA31.png`; rename it to `MonsterLab_Logo.png`.
+- **By hash**: the **last 16 characters of the file name** are the texture's hash: `sky_4962D17B32AB899E.png`
+  and `tex_256x256_f14_4962D17B32AB899E.png` replace the same texture; what stands before the hash is yours.
+  The hash is the fallback: a texture without a name, or whose name no mod has, is looked up by hash.
+
+When both match, the name wins. Names are known for the textures of `global_binary.sir` and of the level
+files; textures of other files have a hash only, for now.
 
 To get the originals with their hashes, export them from your own disc:
 
@@ -41,7 +50,7 @@ monsterlab.exe --dump-textures C:\MonsterLabTextures
 ```
 
 Every texture the game draws with while it runs is written there once, as
-`tex_<width>x<height>_f<format>_<hash>.png`. Only what was on screen gets dumped: play through the
+`tex_<width>x<height>_f<format>_<name>_<hash>.png` (without `_<name>` where the name is not known). Only what was on screen gets dumped: play through the
 places you want to change. The dumped pictures are the game's own art: use them to work from, do not
 share them, and never put them into this repository.
 
@@ -55,10 +64,9 @@ Rules for a replacement:
   for every state and cannot be replaced this way.
 - The game still lights, tints and fogs the texture as before: a replacement on a dark, tinted surface
   comes out dark and tinted too.
-- Matching is by hash only for now, not by the texture's name inside the game's files.
 
 With `--verbose` the log says `mods: texture <hash> comes from <mod>` the first time a replacement is
-used. A PNG that cannot be read is reported and the game's own texture is drawn.
+used. A replacement found by name is logged as `mods: texture <name> (<hash>) comes from <mod> by name`. A PNG that cannot be read is reported and the game's own texture is drawn.
 
 ## Load order, switching mods on and off
 
@@ -92,7 +100,7 @@ at once.
 |---|---|
 | `--mods DIR` | use `DIR` as the mods folder instead of `mods` next to the exe |
 | `--no-mods` | run without mods |
-| `--dump-textures DIR` | write every texture the game draws with to `DIR` as a PNG named by its hash |
+| `--dump-textures DIR` | write every texture the game draws with to `DIR` as a PNG named by its name (where known) and hash |
 | `--verbose` | lists, at the start, every file each mod replaces and which mod wins where two have the same file; logs `mods: <file> comes from <mod>` each time the game opens a replaced file |
 
 ## Worked example: replace one file
@@ -118,7 +126,7 @@ at once.
 
 2. Find the night sky in `C:\MonsterLabTextures`: `tex_256x256_f14_4962D17B32AB899E.png`.
 3. Open it in a paint program, tint it red, and save it as
-   `mods\RedSky	extures\sky_4962D17B32AB899E.png` next to `monsterlab.exe` (keep the 16 characters
+   `mods\RedSky\textures\sky_4962D17B32AB899E.png` next to `monsterlab.exe` (keep the 16 characters
    before `.png`).
 4. Start the game. The sky behind the main menu is red; `--verbose` logs
 
@@ -131,5 +139,11 @@ at once.
 
 `python tools/mod_test.py` does the same steps by itself in a temporary folder (dump, tint one texture
 red, run, compare the screenshots); it is the test for this feature.
+
+### The same by name
+
+If the dump gave the texture a name (`tex_256x128_f6_MonsterLab_Logo_FF636077E97CEA31.png`), save your
+version as `mods\MyMod\textures\MonsterLab_Logo.png` instead. `--verbose` logs
+`mods: texture MonsterLab_Logo (FF636077E97CEA31) comes from MyMod by name`. `tools/mod_test.py` checks this too.
 
 Do not share files of the game itself: a mod should hold only what you made or changed.
