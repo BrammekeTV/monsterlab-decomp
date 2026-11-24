@@ -1,0 +1,42 @@
+# Names from draft descriptions in src/ (behaviour checked against the asm) and string/SDK evidence.
+# Range 0x801994E0-0x80289368 (names pass, batch 1).
+fn_801C0830 PointInBox                 # returns 1 if point lies inside box (centre, half extents)
+fn_801C08CC BoxesOverlap               # two axis-aligned boxes overlap test
+fn_801C098C OrientedBoxesOverlap       # separating-axis test of two oriented boxes
+fn_801C065C BoxSignedDistance          # negative inside (largest penetration), else distance to box
+fn_801C1960 RaySlabClip                # narrows ray parameter range by one slab constraint
+fn_801C1E04 RayBoxIntersect            # ray vs axis-aligned box, up to 2 hits
+fn_801C3170 RaySphereIntersect         # ray vs sphere, 0/1/2 hits
+fn_801C2B40 PointNearSegment           # point within radius of segment
+fn_801C3074 PointNearRay               # point within radius of ray, t >= 0
+fn_801C34CC ProjectPointOnLine         # projects point onto infinite line, writes t
+fn_801C3624 ClosestPointOnSegment      # closest point on segment, clamped to ends
+fn_801D0340 F32ToBits                  # float to its 32-bit pattern (no conversion)
+fn_801D0354 BitsToF32                  # 32-bit pattern to float (no conversion)
+fn_801E2380 ExtractBits                # bit field: width bits at shift, moved to bit 0
+fn_801E23B0 ScriptEntryType            # type of a script table entry, 0 when index is -1
+fn_801DC9B0 ScriptTableFindIndex       # index of the script table entry whose hash matches, else -1
+fn_801BB2F8 TempBufferReserve          # reserves a 32-byte aligned block of the temp buffer
+fn_801BB374 TempBufferCommit           # takes a block reserved by TempBufferReserve off the free area
+fn_801CCDC4 VertexBatchBegin           # starts a vertex batch at the end of the temp buffer
+fn_801CCFE0 VertexBatchEnd             # commits the vertices written since VertexBatchBegin
+fn_801CC8C8 GetNodeFlagBit             # bit of the node flags word at +0x98, as 0 or 1
+fn_801CC8F4 GetObjFlagBit              # bit of the object flags word at +0x1A8, as 0 or 1
+fn_801CD6A8 AngleSinCos                # cosine and sine of angle * scale constant
+fn_801BA6E4 FontGlyphIndex             # glyph index of a 16-bit char code (font table at +8)
+fn_801BA6F4 FontDecodeString           # decodes byte string to 16-bit chars (0xFF = two-byte char)
+fn_801C6C80 ZoneListPickNext           # next zone reference from a zone list, by selection mode
+fn_801B8040 MoveEntityTask_Init        # string "MoveEntityTask"; initialises the task record
+fn_801B7D5C FadeToOverlayAlphaTask_Init # string "FadeToOverlayAlphaTask"; initialises the task record
+fn_801B7B60 BounceOverlayAlphaTask_Init # string "BounceOverlayAlphaTask"; initialises the task record
+fn_801B8DDC AddCompoundTask            # string "CompoundTask"; spawns the compound effect (cf. AddMoveEntityTask)
+fn_801E6EB8 ZlibInflateAll             # calls inflateInit_/inflate/inflateEnd: one-shot inflate
+fn_801E6F08 ZlibInflateStep            # calls inflateInit_/inflate/inflateEnd: one streamed step
+fn_801F2EE4 NetErrorManagerReset       # string "NetErrorManager"; allocates buffers, sets up semaphores
+fn_801EE394 LoadFileIntoBuffer         # opens file ("rb"), reads it into a new buffer
+fn_801FCFB4 AudioSystemInit            # calls AIInit, AXInit, MIXInit
+fn_802005EC PlaySoundByHash            # maps a name hash to voice group and index, then starts it
+fn_80206E40 TextureCacheFetch          # looks up cached texture by name, copies data into dst
+fn_8020B548 VoiceRecordCompare         # comparator of two voice records (flag, then float at +0x18)
+fn_801E1BD4 RunScriptHook              # string "Hook Parameters failed NULL check for HOOK%03d"
+fn_801D8D80 BuildWiiTextureFileName    # appends ".texture.wii" to a texture path
