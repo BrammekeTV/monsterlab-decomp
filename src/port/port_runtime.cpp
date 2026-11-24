@@ -17,6 +17,8 @@
 #include "port/port_gx.h"
 #include "port/port_mods.h"
 #include "port/port_overlay.h"
+extern "C++" { s32 SaveManager_SelectFirstEmptySlot(void); void SaveManager_ResetCurrentData(void); void SaveManager_SaveData(void); u32 SaveManager_CanLoadGame(void); extern u8* lbl_805FBBE0; }
+extern "C" void fn_8022E3D8(void* save, const unsigned char* name);   // src/game/draft_miss37.cpp, draft_miss46.cpp
 
 // This file's start-up object must be built before every other static object: game code may
 // touch globals that live in the mapped address space from its own static initialisers.
@@ -197,6 +199,16 @@ s32 PortFrameCount(void) { return sFrames; }
 void PortFrameDone(void) {
     if (sFrames == 1 && getenv("PORT_SCRIPT_TRACE")) InstallScriptTrace();
     sFrames++;
+    // PORT_MAKE_PROFILE=<frame>: creates a profile in the first free slot and saves it (a test aid until
+    // the game saves one itself: the save point in the first level is not reachable yet).
+    static s32 sMakeProfile = getenv("PORT_MAKE_PROFILE") ? atoi(getenv("PORT_MAKE_PROFILE")) : 0;
+    if (sMakeProfile && sFrames == sMakeProfile) {
+        PortLog("profile: slot %d selected", (int)SaveManager_SelectFirstEmptySlot());
+        SaveManager_ResetCurrentData();
+        fn_8022E3D8(lbl_805FBBE0, (const unsigned char*)"Player");   // the name is what marks the slot as used
+        SaveManager_SaveData();
+        PortLog("profile: can load %u", (unsigned)SaveManager_CanLoadGame());
+    }
     if (!gPortOptions.fastAll && sFrames >= gPortOptions.fastForward) PortFastEnd();
     if (gPortOptions.frameLimit && sFrames >= gPortOptions.frameLimit) {
         PortStop(0, "frame limit reached (%d frames)", sFrames);
