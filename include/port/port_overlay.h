@@ -41,7 +41,8 @@ void PortOverlayFrame(const PortFrameStats* s);
 // With the overlay on, draws the last recorded frame's numbers into target (w x h pixels).
 void PortOverlayDraw(ID3D11RenderTargetView* target, u32 w, u32 h);
 // The text of the overlay for these numbers (also what the self-test checks).
-int  PortOverlayText(const PortFrameStats* s, f32 fps, f32 avgFps, char* buf, u32 n);
+int  PortOverlayText(const PortFrameStats* s, f32 fps, f32 avgFps, f32 displayFps, char* buf, u32 n);
+f32  PortGfxDisplayFps(void);   // pictures shown per second, repeats included (port_gfx_d3d11.cpp)
 int  PortSelfTestOverlay(void);
 
 #endif

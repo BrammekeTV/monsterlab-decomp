@@ -1174,7 +1174,18 @@ static s64 PresentInterval(void) {          // ticks between pictures; 0 = no li
     if (cap == PORT_FPS_DISPLAY) return Ticks_freq() / DisplayHz();
     return 0;
 }
+// Pictures shown per second, new or repeated (the overlay's display rate), measured over about half a second.
+static volatile LONG sShownCount;
+f32 PortGfxDisplayFps(void) {
+    static s64 t0; static LONG n0; static f32 rate;
+    s64 now = Ticks();
+    if (!t0) { t0 = now; n0 = sShownCount; }
+    s64 dt = now - t0;
+    if (dt * 2 >= Ticks_freq()) { rate = (f32)(sShownCount - n0) * (f32)Ticks_freq() / (f32)dt; t0 = now; n0 = sShownCount; }
+    return rate;
+}
 static void PresentOut(BOOL fast) {
+    sShownCount++;
     Blit(sOutSrv, sBackRtv, 0, 0, sOutW, sOutH, 0, 0, 1, 1);
     if (!gPortOptions.screenshotStats) PortOverlayDraw(sBackRtv, sOutW, sOutH);
     s32 cap = gPortSettings.fpsCap;
