@@ -963,10 +963,26 @@ static u32  sRecLights = ~0u, sRecLast = ~0u, sRecLastN;    // the last light bl
 static u32  sRecLightGen;                                   // PortGx::xfLightGen when the light block was made
 static u32  sRecMtx = ~0u, sRecMtxGen;                      // the last matrix block (draws with a matrix per vertex) and PortGx::xfMtxGen then
 static u32  sRecLastW[4 * (14 + 6 * 8)];
+// The big dynamic buffers (records, vertices, indices) are used as rings of four segments, always mapped with
+// NO_OVERWRITE: starting the buffer over with DISCARD made the driver find a new 16-32 MB buffer, a frame several times
+// as long every few frames. Leaving a segment marks the point in the command stream (an event query); a segment is
+// written again once the GPU has passed the mark made when it was left the time before (a lap earlier: no wait).
+struct Ring { ID3D11Query* q[4]; BOOL pend[4]; u32 seg; };
+static Ring sRecRing, sVbRing, sIbRing;
+static u32 RingNext(Ring& r) {
+    if (!r.q[r.seg]) { D3D11_QUERY_DESC qd = {D3D11_QUERY_EVENT, 0}; sDev->CreateQuery(&qd, &r.q[r.seg]); }
+    if (r.q[r.seg]) { sCtx->End(r.q[r.seg]); r.pend[r.seg] = TRUE; }
+    r.seg = (r.seg + 1) & 3;
+    if (r.pend[r.seg]) { while (sCtx->GetData(r.q[r.seg], NULL, 0, 0) == S_FALSE) YieldProcessor(); r.pend[r.seg] = FALSE; }
+    return r.seg;
+}
+// Records never cross a segment: the draws that use a segment's records are all drawn before it is left, and what is
+// reused (lights, matrices, the last record) starts again in each segment.
 static void RecReserve(u32 n) {
-    if (sRecUsed + (u32)sRec.size() / 4 + n <= REC_U4) return;
+    const u32 seg = REC_U4 / 4, pos = sRecUsed + (u32)sRec.size() / 4;
+    if (pos / seg == (pos + n) / seg || (pos + n) % seg == 0) return;
     FlushDraws();
-    sRec.clear(); sRecUsed = 0; sRecDiscard = TRUE; sRecLights = sRecLast = sRecMtx = ~0u;
+    sRec.clear(); sRecUsed = RingNext(sRecRing) * seg; sRecLights = sRecLast = sRecMtx = ~0u;
 }
 static u32 RecAlloc(u32 n) { u32 at = sRecUsed + (u32)sRec.size() / 4; sRec.resize(sRec.size() + (size_t)n * 4); return at; }
 
@@ -1345,7 +1361,7 @@ static void DrawPrims(const PortGx* g, u32 prim, const PortGxLayout* L, u32 coun
     const u32 vfmt = gpu ? 16 + ntc : (numGens > 8 ? 8 : numGens);
     const u32 stride = VStride(vfmt);
     // The queue is uploaded at once (FlushDraws); it has to fit the buffers.
-    if (sBV.size() + (size_t)count * stride > VB_BYTES || sBI.size() + (size_t)count * 3 > IB_IDXS) FlushDraws();
+    if (sBV.size() + (size_t)count * stride > VB_BYTES / 4 - 16 || sBI.size() + (size_t)count * 3 > IB_IDXS / 4) FlushDraws();
     if (sPendCount && (sPend.ps != ps || sBVCount + count > VB_VERTS || sPend.vfmt != vfmt || sPend.movie != movie || memcmp(&sPend.out, &ok, sizeof(ok)) || memcmp(sPend.srv, srv, sizeof(srv)) ||
                        memcmp(sPend.smp, smp, sizeof(smp)) || (sPend.pcSerial != pcSerial && memcmp(&sPend.pc, &pc, sizeof(pc)))))
         CloseBatch();
@@ -1460,16 +1476,18 @@ static void FlushDraws() {
     // for every draw made a scene of a few thousand small draws crawl.
     static u32 sVbUsed, sIbUsed;                            // in bytes and indices
     const u32 bytes = (u32)sBV.size(), ni = (u32)sBI.size();
+    // (a queue fits a segment: DrawPrims flushes before it would not)
+    static BOOL started;
     u32 first = (sVbUsed + 15) & ~15u, ifirst = sIbUsed;
     D3D11_MAPPED_SUBRESOURCE map;
-    D3D11_MAP how = D3D11_MAP_WRITE_NO_OVERWRITE;
+    D3D11_MAP how = started ? D3D11_MAP_WRITE_NO_OVERWRITE : D3D11_MAP_WRITE_DISCARD;
     BOOL ok = TRUE;
-    if (first + bytes > VB_BYTES) { first = 0; how = D3D11_MAP_WRITE_DISCARD; }
+    if (first + bytes > (sVbRing.seg + 1) * (VB_BYTES / 4)) first = RingNext(sVbRing) * (VB_BYTES / 4);
     if (SUCCEEDED(sCtx->Map(sVb, 0, how, 0, &map))) { memcpy((u8*)map.pData + first, sBV.data(), bytes); sCtx->Unmap(sVb, 0); } else ok = FALSE;
     sVbUsed = first + bytes;
-    how = D3D11_MAP_WRITE_NO_OVERWRITE;
-    if (ifirst + ni > IB_IDXS) { ifirst = 0; how = D3D11_MAP_WRITE_DISCARD; }
+    if (ifirst + ni > (sIbRing.seg + 1) * (IB_IDXS / 4)) ifirst = RingNext(sIbRing) * (IB_IDXS / 4);
     if (SUCCEEDED(sCtx->Map(sIb, 0, how, 0, &map))) { memcpy((u16*)map.pData + ifirst, sBI.data(), ni * sizeof(u16)); sCtx->Unmap(sIb, 0); } else ok = FALSE;
+    started = TRUE;
     sIbUsed = ifirst + ni;
     sBV.clear(); sBI.clear(); sBVCount = 0;
 
