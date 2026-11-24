@@ -99,6 +99,11 @@
  "changelog": [
   {
    "date": "2026-11-24",
+   "time": "11:02",
+   "text": "Continue on the main menu now loads your saved game on Windows (PR #159), and selecting a profile works. The differential tests now report every small self-contained function as matching the original Wii code, apart from 18 listed cases the test harness can't run yet. That came with one more fix in our decompiled code (PR #158)."
+  },
+  {
+   "date": "2026-11-24",
    "time": "10:43",
    "text": "Every cutscene on the disc now decodes correctly on Windows (PR #154): all 78 movies, with picture and all five audio tracks, sound within 0.04 s of the picture. Skipping a cutscene with a button is now tested too (PR #157). In the village intro the coffin's template is now found, because a name lookup table is converted to PC byte order (PR #156); the cutscene still waits at the same picture for now. And more differential-test fixes in our decompiled code (PR #155)."
   },
