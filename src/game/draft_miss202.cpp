@@ -323,7 +323,7 @@ u8* fn_80028038(u8* p) {
 
 // 0x8002C83C
 // Constructor of a controller object (hash 0xE718CB83): clears a table of 5 entries (stride 0x28),
-// finds the zone object with name hash 0x954D0F3A, copies two float vectors and sets defaults.
+// finds the zone object with name hash 0x954E0F3A ("field_repairA"), copies two float vectors and sets defaults.
 u8* fn_8002C83C(u8* p) {
     fn_80021594(p, 8, 0xE718CB83);
     *(s32*)(p + 0x9C) = 0;
@@ -358,7 +358,7 @@ u8* fn_8002C83C(u8* p) {
     *(f32*)(p + 0xBC) = 15.0f;
     *(f32*)(p + 0xB8) = 3.0f;
     *(f32*)(p + 0xC0) = 1.5f;
-    FindZoneObj(&found, 0x954D0F3Au);
+    FindZoneObj(&found, 0x954E0F3Au);
     *(u8**)(p + 0x9C) = found;
     *(s32*)(p + 0x1C0) = 0;
     *(s32*)(p + 0x1C4) = 0;
