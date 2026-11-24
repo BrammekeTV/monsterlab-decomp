@@ -26,6 +26,7 @@ extern PortBinding gPortBindings[];
 extern const int   gPortBindingCount;
 
 // --press BUTTON@FRAME[-FRAME]: hold a binding's input during those frames (tests, headless runs).
+u32  PortInputPadBits(void);                    // gamepad buttons held now (PortBinding.pad bits; 0 without a pad)
 BOOL PortInputAddPress(const char* spec);
 BOOL PortInputAddPointer(const char* spec);     // --pointer X,Y@FRAME (output pixels)
 
