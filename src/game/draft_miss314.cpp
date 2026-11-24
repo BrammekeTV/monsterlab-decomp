@@ -402,7 +402,7 @@ void fn_801D79D4(u8* arg0, u8* arg1, u8* arg2, u32 color, s32 mode, f32 scale, f
         Vec3SetUnitZ(&tmp);
     } else if (ax > ay && ax > az) {
         fn_800C09C0(&tmp);
-    } else if (ax > ay && ay > az) {
+    } else if (ay > ax && ay > az) {
         Vec3SetUnitZ(&tmp);
     } else if (az > ax && az > ay) {
         fn_80149094(&tmp);
