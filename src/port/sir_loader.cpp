@@ -3288,6 +3288,39 @@ extern "C" BOOL LevelZoneRootsCollect(const u8* hdr, u32 hdrSize, const u8* zone
     return ok ? TRUE : FALSE;
 }
 
+// A projectile definition (level header +0x74 / +0x78; a spawned projectile's +0x228 and +0x9C), 0x170 bytes.
+// SpawnHelper compares the type id at +0x00 with 0x37645F52. What the projectile code reads:
+//   +0x08 id, +0x0C four words (+0x10: animation id, fn_80065200)
+//   +0x60 a hash and 20 action words (+0x78: 0x10000005 for the coffin; the others are 0x0003FFFF, none)
+//   +0xB4 a word (fn_80065D1C), +0xB8..+0xEC floats (speed, sizes, timers: fn_80063D6C, fn_800645C8,
+//         fn_80065FF0, fn_80066E54, fn_800637AC), but +0xE8: the hash of its collision entry (fn_800637AC)
+//   +0xF0..+0x100 effect hashes (spawn, trail, three kinds of hit: fn_80063D6C, fn_80066E54)
+//   +0x104 name hash of the pool its model comes from (fn_80063D6C: HashTableFind in zone 0's pool table)
+//   +0x108..+0x118 five sound objects (fn_80065200, fn_80065FF0, fn_80066E54)
+//   +0x148 flags (fn_80063D6C), +0x14C an object (fn_80066E54 reads its s16 at +0x54; not typed),
+//   +0x150 four floats and a duration (fn_80063D6C)
+// Planned field by field: a definition may also be an entity's +0x9C, whose id at +0x08 is planned there.
+#define PROJECTILE_DEF_SIZE 0x170
+static SirError ProjectileDefPlan(ImagePlan* plan, const u8* image, u32 imageSize, u32 addr) {
+    static const struct { u16 off, size; u8 kind; } kParts[] = {
+        { 0x000, 0x04, REGION_U32_ARRAY }, { 0x008, 0x04, REGION_U32_ARRAY }, { 0x00C, 0x10, REGION_U32_ARRAY },
+        { 0x060, 0xA8, REGION_U32_ARRAY }, { 0x108, 0x14, REGION_PTR_ARRAY }, { 0x148, 0x04, REGION_U32_ARRAY },
+        { 0x14C, 0x04, REGION_PTR_ARRAY }, { 0x150, 0x14, REGION_U32_ARRAY },
+    };
+    u32 o;
+    if (!LevelSpan(addr, PROJECTILE_DEF_SIZE, imageSize, &o)) return SIR_OK;   // none, or in another zone
+    if (PlanHas(plan, o + 0x060, REGION_U32_ARRAY)) return SIR_OK;
+    for (u32 i = 0; i < COUNTOF(kParts); i++) {
+        if (PlanHas(plan, o + kParts[i].off, kParts[i].kind)) continue;
+        if (!PlanAdd(plan, o + kParts[i].off, kParts[i].size, kParts[i].kind)) return SIR_ERR_LEVEL;
+    }
+    for (u32 i = 0; i < 5; i++) {
+        SirError e = SoundPlan(plan, image, imageSize, Be32(image + o + 0x108 + i * 4));
+        if (e != SIR_OK) return e;
+    }
+    return SIR_OK;
+}
+
 // A zone slot's pool table (slot +0xE4, count +0xE8): 0x2C-byte entries {+0x04 pool, +0x0C index
 // of a script function} (kPoolTableEntryFields). fn_801DB1AC runs that function over the pool's
 // items at level start.
@@ -3391,8 +3424,9 @@ static SirError PoolTablePlan(ImagePlan* plan, const u8* image, u32 imageSize, u
                 if (!PlanAdd(plan, itemOff, 4, REGION_PTR_ARRAY)) return SIR_ERR_ENTITY;
                 e = EntityPlan(plan, image, imageSize, Be32(image + itemOff), 0);
                 break;
-            case LEVEL_FIXUP_RENDER_OBJECT:    // a slot holding an object fn_8012F818 sets up (not typed yet)
+            case LEVEL_FIXUP_RENDER_OBJECT:    // a slot holding a scene object, which fn_8012F818 sets up by its type
                 if (!PlanAdd(plan, itemOff, 4, REGION_PTR_ARRAY)) return SIR_ERR_ENTITY;
+                e = SceneObjectPlan(plan, image, imageSize, Be32(image + itemOff));
                 break;
             case LEVEL_FIXUP_FSM:              // a slot holding a state machine
                 if (!PlanAdd(plan, itemOff, 4, REGION_PTR_ARRAY)) return SIR_ERR_ENTITY;
@@ -3468,12 +3502,8 @@ extern "C" SirError LevelZoneConvert(SirReloc* r, u8* image, u32 imageSize, u32 
         if (roots->locatorCount > imageSize / LOCATOR_SIZE || !LevelSpan(roots->locators, (u64)roots->locatorCount * LOCATOR_SIZE, imageSize, &l) ||
             !PlanAdd(&plan, l, roots->locatorCount * LOCATOR_SIZE, REGION_LOCATORS)) e = SIR_ERR_LEVEL;
     }
-    // The objects projectiles are spawned from (header +0x74, +0x78): SpawnHelper compares the type
-    // id at +0x00 with 0x37645F52. Nothing else of them is typed yet.
-    for (u32 k = 0; k < 2 && e == SIR_OK; k++) {
-        u32 o;
-        if (LevelSpan(roots->spawnOwners[k], 4, imageSize, &o) && !PlanHas(&plan, o, REGION_U32_ARRAY) && !PlanAdd(&plan, o, 4, REGION_U32_ARRAY)) e = SIR_ERR_LEVEL;
-    }
+    // The objects projectiles are spawned from (header +0x74, +0x78): projectile definitions.
+    for (u32 k = 0; k < 2 && e == SIR_OK; k++) e = ProjectileDefPlan(&plan, image, imageSize, roots->spawnOwners[k]);
     // The exploration map (header +0x2C / +0x38): fn_8013006C copies every path record (0x1AC bytes,
     // fn_800D4DE8: words, but for the bytes at +0x64 and +0x9C) and every junction record (0xDC
     // bytes, fn_800D5008: six words, up to twelve entries of three floats and a byte from +0x18,
