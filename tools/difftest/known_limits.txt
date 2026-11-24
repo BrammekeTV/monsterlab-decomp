@@ -1,0 +1,46 @@
+# Functions whose difftest mismatch/crash is a limit of the harness, not a decompile mistake.
+# Format: 0xADDR reason. The report counts them as KNOWN instead of MISMATCH/CRASH (--show-known lists them).
+0x80011BC0 writes a static that lives at another address in the PC build
+0x80044F20 writes a static that lives at another address in the PC build
+0x80044FA4 writes a static that lives at another address in the PC build
+0x80142DE8 writes a static that lives at another address in the PC build (sExitMode)
+0x801D2B4C writes a static that lives at another address in the PC build
+0x800F0D20 writes a static that lives at another address in the PC build
+0x800494D4 writes a static that lives at another address in the PC build
+0x8021D320 uid counter is a static at another address
+0x801DBA3C callee writes a static at another address
+0x801DBA84 callee writes a static at another address
+0x801DBAD8 callee writes a static at another address
+0x800CAA00 only differs for infinity/NaN input
+0x8014B1A8 packed colour: the C++ returns the big-endian word, the harness reads host order
+0x801ED2FC node reference read as a host-order word by design
+0x801ED314 node reference read as a host-order word by design
+0x801ED34C node reference read as a host-order word by design
+0x801ED624 node reference read as a host-order word by design
+0x801ED368 node reference read as a host-order word by design
+0x8021B730 only differs for a negative index
+0x8000CE48 original returns leftover r3 of a void tail call
+0x8004EA38 original returns leftover r3
+0x8005DB68 original returns leftover r3
+0x8001011C uninitialised stack out-parameters
+0x80037FB4 indexes a table out of range on random input
+0x8010CD1C generated dispatcher reads the function table first
+0x801E03AC generated dispatcher reads the function table first
+0x800D1C8C callee dereferences null game state
+0x800D1CD0 callee dereferences null game state
+0x802227A4 u64 flags stored in host word order by design
+0x802228EC u64 flags stored in host word order by design
+0x80223134 u64 flags stored in host word order by design
+0x802231A0 u64 flags stored in host word order by design
+0x80223308 u64 flags stored in host word order by design
+0x802237AC u64 flags stored in host word order by design
+0x80225C90 u64 flags stored in host word order by design
+0x80225CFC u64 flags stored in host word order by design
+0x80225DF8 u64 flags stored in host word order by design
+0x80225E64 u64 flags stored in host word order by design
+0x801ED788 node reference read as a host-order word by design
+0x80219908 random monster count far above the 10 slots overlaps the count field itself
+0x80168440 consumes the packed colour of fn_8014B1A8 (see there)
+0x80084C18 table index from RaySceneTest on random input
+0x8016AFE8 original returns leftover r3
+0x801499F8 original returns leftover r3
