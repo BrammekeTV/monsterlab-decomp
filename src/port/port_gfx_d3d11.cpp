@@ -768,35 +768,64 @@ static inline void RegColour(u32 c, f32* out) {
     out[0] = (c >> 24) * k; out[1] = ((c >> 16) & 255) * k; out[2] = ((c >> 8) & 255) * k; out[3] = (c & 255) * k;
 }
 
-// One colour channel's control word applied to a vertex (XF 0x100E-0x1011).
-static void LightChannel(const PortGx* g, const f32 (*lightCol)[4], u32 ctrl, const f32* mat, const f32* amb, const f32* pos, const f32* nrm, int first, int count, f32* out) {
-    if (!(ctrl & 2)) { for (int k = first; k < first + count; k++) out[k] = mat[k]; return; }
-    f32 sum[4] = {amb[0], amb[1], amb[2], amb[3]};
-    u32 mask = ((ctrl >> 2) & 15) | ((ctrl >> 11) & 15) << 4;
-    u32 diff = (ctrl >> 7) & 3, attn = (ctrl >> 9) & 3;
+// The direction and distance from the vertex to each light, worked out once per vertex however many colour or alpha
+// channel evaluations use the light.
+struct LightGeo { u32 done; f32 d[8][3], dist[8], dist2[8]; };
+
+// Both halves of a colour channel at once (RGB from `cc`, alpha from `ac`): the lights' directions and attenuation are
+// worked out once and the same arithmetic as two LightChannel calls gives the same colours.
+static void LightChannel2(const PortGx* g, const f32 (*lightCol)[4], u32 cc, u32 ac, const f32* matC, const f32* ambC, const f32* matA, const f32* ambA,
+                          const f32* pos, const f32* nrm, f32* out, LightGeo* geo) {
+    const BOOL litC = (cc & 2) != 0, litA = (ac & 2) != 0;
+    if (!litC && !litA) { out[0] = matC[0]; out[1] = matC[1]; out[2] = matC[2]; out[3] = matA[3]; return; }
+    f32 sumC[3] = {ambC[0], ambC[1], ambC[2]}, sumA = ambA[3];
+    u32 maskC = litC ? ((cc >> 2) & 15) | ((cc >> 11) & 15) << 4 : 0, maskA = litA ? ((ac >> 2) & 15) | ((ac >> 11) & 15) << 4 : 0;
+    const u32 diffC = (cc >> 7) & 3, attnC = (cc >> 9) & 3, diffA = (ac >> 7) & 3, attnA = (ac >> 9) & 3;
+    const BOOL same = diffC == diffA && attnC == attnA;
     for (u32 i = 0; i < 8; i++) {
-        if (!(mask & (1u << i))) continue;
+        const u32 bit = 1u << i;
+        if (!((maskC | maskA) & bit)) continue;
         const f32* l = &g->xfMem[0x600 + i * 0x10];
         const f32* col = lightCol[i];
-        f32 d[3] = {l[10] - pos[0], l[11] - pos[1], l[12] - pos[2]};
-        f32 dist2 = d[0] * d[0] + d[1] * d[1] + d[2] * d[2], dist = sqrtf(dist2);
-        if (dist > 0) { f32 inv = 1.0f / dist; d[0] *= inv; d[1] *= inv; d[2] *= inv; }
-        f32 a = 1.0f;
-        if (attn & 1) {
-            if (attn & 2) {                                 // spot light
+        if (!(geo->done & bit)) {
+            f32* gd = geo->d[i];
+            gd[0] = l[10] - pos[0]; gd[1] = l[11] - pos[1]; gd[2] = l[12] - pos[2];
+            f32 dd2 = gd[0] * gd[0] + gd[1] * gd[1] + gd[2] * gd[2], dd = sqrtf(dd2);
+            if (dd > 0) { f32 inv = 1.0f / dd; gd[0] *= inv; gd[1] *= inv; gd[2] *= inv; }
+            geo->dist2[i] = dd2; geo->dist[i] = dd;
+            geo->done |= bit;
+        }
+        const f32* d = geo->d[i];
+        const f32 dist2 = geo->dist2[i], dist = geo->dist[i];
+        const f32 nd = nrm[0] * d[0] + nrm[1] * d[1] + nrm[2] * d[2];
+        f32 aC = 1.0f, kC = 0;
+        if (maskC & bit) {
+            if ((attnC & 1) && (attnC & 2)) {               // spot light (specular: left as full strength)
                 f32 c = -(d[0] * l[13] + d[1] * l[14] + d[2] * l[15]);
                 if (c < 0) c = 0;
                 f32 num = l[4] + c * (l[5] + c * l[6]), den = l[7] + dist * l[8] + dist2 * l[9];
-                a = den != 0 ? std::max(num, 0.0f) / den : 0;
-            } else {                                        // specular: left as full strength
-                a = 1.0f;
+                aC = den != 0 ? std::max(num, 0.0f) / den : 0;
             }
+            kC = diffC == 0 ? 1.0f : diffC == 1 ? nd : std::max(nd, 0.0f);
+            sumC[0] += col[0] * aC * kC; sumC[1] += col[1] * aC * kC; sumC[2] += col[2] * aC * kC;
         }
-        f32 nd = nrm[0] * d[0] + nrm[1] * d[1] + nrm[2] * d[2];
-        f32 k = diff == 0 ? 1.0f : diff == 1 ? nd : std::max(nd, 0.0f);
-        for (int c = first; c < first + count; c++) sum[c] += col[c] * a * k;
+        if (maskA & bit) {
+            f32 aA = aC, kA = kC;
+            if (!((maskC & bit) && same)) {
+                aA = 1.0f;
+                if ((attnA & 1) && (attnA & 2)) {
+                    f32 c = -(d[0] * l[13] + d[1] * l[14] + d[2] * l[15]);
+                    if (c < 0) c = 0;
+                    f32 num = l[4] + c * (l[5] + c * l[6]), den = l[7] + dist * l[8] + dist2 * l[9];
+                    aA = den != 0 ? std::max(num, 0.0f) / den : 0;
+                }
+                kA = diffA == 0 ? 1.0f : diffA == 1 ? nd : std::max(nd, 0.0f);
+            }
+            sumA += col[3] * aA * kA;
+        }
     }
-    for (int k = first; k < first + count; k++) out[k] = mat[k] * std::min(std::max(sum[k], 0.0f), 1.0f);
+    for (int k = 0; k < 3; k++) out[k] = litC ? matC[k] * std::min(std::max(sumC[k], 0.0f), 1.0f) : matC[k];
+    out[3] = litA ? matA[3] * std::min(std::max(sumA, 0.0f), 1.0f) : matA[3];
 }
 
 static std::vector<Vtx> sVerts;
@@ -814,7 +843,9 @@ static void DrawPrims(const PortGx* g, u32 prim, const PortGxLayout* L, u32 coun
     for (int c = 0; c < 2; c++) { RegColour(g->xf[0x0A + c], ambReg[c]); RegColour(g->xf[0x0C + c], matReg[c]); }
     u32 midx[2] = {g->cp[0x30], g->cp[0x40]};
     f32 lightCol[8][4];
-    for (u32 i = 0; i < 8; i++) { u32 lc; memcpy(&lc, &g->xfMem[0x600 + i * 0x10 + 3], 4); RegColour(lc, lightCol[i]); }
+    BOOL lit = FALSE;                                       // some colour or alpha channel uses lights: otherwise their colours are not needed
+    for (u32 c = 0; c < numChans && c < 2; c++) lit |= ((g->xf[0x0E + c] | g->xf[0x10 + c]) & 2) != 0;
+    if (lit) for (u32 i = 0; i < 8; i++) { u32 lc; memcpy(&lc, &g->xfMem[0x600 + i * 0x10 + 3], 4); RegColour(lc, lightCol[i]); }
 
     sVerts.resize(count);
     // Per draw, not per vertex: where each array attribute's data is, and the attributes the vertex format has.
@@ -870,12 +901,12 @@ static void DrawPrims(const PortGx* g, u32 prim, const PortGxLayout* L, u32 coun
         o.pos[2] = cz + o.pos[3];
         // colour channels
         static const f32 kWhite[4] = {1, 1, 1, 1};
+        LightGeo geo; geo.done = 0;
         for (u32 c = 0; c < 2; c++) {
             if (c >= numChans) { o.col[c][0] = o.col[c][1] = o.col[c][2] = 0; o.col[c][3] = 0; if (c == 0 && numChans == 0) memcpy(o.col[0], kWhite, 16); continue; }
             const f32* vc = has[11 + c] ? in[11 + c] : kWhite;
             u32 cc = g->xf[0x0E + c], ac = g->xf[0x10 + c];
-            LightChannel(g, lightCol, cc, (cc & 1) ? vc : matReg[c], (cc & 0x40) ? vc : ambReg[c], pos, nrm, 0, 3, o.col[c]);
-            LightChannel(g, lightCol, ac, (ac & 1) ? vc : matReg[c], (ac & 0x40) ? vc : ambReg[c], pos, nrm, 3, 1, o.col[c]);
+            LightChannel2(g, lightCol, cc, ac, (cc & 1) ? vc : matReg[c], (cc & 0x40) ? vc : ambReg[c], (ac & 1) ? vc : matReg[c], (ac & 0x40) ? vc : ambReg[c], pos, nrm, o.col[c], &geo);
         }
         // texture coordinate generation
         for (u32 t = 0; t < numGens && t < 8; t++) {      // (a draw only uploads the coordinates it makes)
@@ -931,16 +962,10 @@ static void DrawPrims(const PortGx* g, u32 prim, const PortGxLayout* L, u32 coun
             for (u32 n = 0; n < count; n++) sVerts[n].pos[0] *= squeeze;
         }
     }
-    // to a triangle list: indices into the vertices, which are uploaded once
-    static std::vector<u16> idx;
-    idx.clear();
-    if (prim == 0x80) { for (u32 i = 0; i + 3 < count; i += 4) { u16 q = (u16)i; idx.insert(idx.end(), {q, (u16)(q + 1), (u16)(q + 2), q, (u16)(q + 2), (u16)(q + 3)}); } }
-    else if (prim == 0x90) { for (u32 i = 0; i + 2 < count; i += 3) { u16 q = (u16)i; idx.insert(idx.end(), {q, (u16)(q + 1), (u16)(q + 2)}); } }
-    else if (prim == 0x98) { for (u32 i = 0; i + 2 < count; i++) { idx.push_back((u16)i); idx.push_back((u16)(i + 1 + (i & 1))); idx.push_back((u16)(i + 2 - (i & 1))); } }
-    else if (prim == 0xA0) { for (u32 i = 1; i + 1 < count; i++) { idx.push_back(0); idx.push_back((u16)i); idx.push_back((u16)(i + 1)); } }
-    if (idx.empty() || count > VB_VERTS) { sGfxStats.skipped++; return; }
+    // to a triangle list (indices into the vertices, which are uploaded once; written into the batch below)
+    if (!(prim == 0x80 ? count >= 4 : (prim == 0x90 || prim == 0x98 || prim == 0xA0) && count >= 3) || count > VB_VERTS) { sGfxStats.skipped++; return; }
     if (sTrace) {
-        const Vtx& v = sVerts[idx[0]];
+        const Vtx& v = sVerts[0];
         f32 vp[6]; memcpy(vp, &g->xf[0x1A], sizeof(vp));
         PortLog("gfx trace: draw %02X x%u stages %u gens %u chans %u tex %02X bm %04X zm %02X cull %u vp %.0f,%.0f,%.0f,%.0f v0 pos %.2f %.2f %.2f %.2f col %.2f %.2f %.2f %.2f tc0 %.2f %.2f clipoff %u img0 %06X addr %08X",
                 prim, count, ((g->bp[0] >> 10) & 15) + 1, numGens, numChans, texUsed, g->bp[0x41] & 0xFFFF, g->bp[0x40] & 0x1F, (g->bp[0] >> 14) & 3,
@@ -1024,11 +1049,33 @@ static void DrawPrims(const PortGx* g, u32 prim, const PortGxLayout* L, u32 coun
         for (u32 n = 0; n < count; n++) memcpy(&sBV[at + (size_t)n * stride], &sVerts[n], stride);
         sBVCount += count;
     }
-    for (size_t i = 0; i < idx.size(); i++) sBI.push_back((u16)(idx[i] + base));
+    const size_t nIdxBefore = sBI.size();
+    {
+        size_t n = sBI.size();
+        if (prim == 0x80) {
+            u32 quads = count / 4;
+            sBI.resize(n + (size_t)quads * 6);
+            u16* o = &sBI[n];
+            for (u32 i = 0; i < quads * 4; i += 4, o += 6) { u16 q = (u16)(base + i); o[0] = q; o[1] = (u16)(q + 1); o[2] = (u16)(q + 2); o[3] = q; o[4] = (u16)(q + 2); o[5] = (u16)(q + 3); }
+        } else if (prim == 0x90) {
+            u32 tris = count / 3;
+            sBI.resize(n + (size_t)tris * 3);
+            u16* o = &sBI[n];
+            for (u32 i = 0; i < tris * 3; i++) o[i] = (u16)(base + i);
+        } else if (prim == 0x98) {
+            sBI.resize(n + (size_t)(count - 2) * 3);
+            u16* o = &sBI[n];
+            for (u32 i = 0; i + 2 < count; i++, o += 3) { o[0] = (u16)(base + i); o[1] = (u16)(base + i + 1 + (i & 1)); o[2] = (u16)(base + i + 2 - (i & 1)); }
+        } else {
+            sBI.resize(n + (size_t)(count - 2) * 3);
+            u16* o = &sBI[n];
+            for (u32 i = 1; i + 1 < count; i++, o += 3) { o[0] = base; o[1] = (u16)(base + i); o[2] = (u16)(base + i + 1); }
+        }
+    }
+    sGfxStats.tris += (u32)(sBI.size() - nIdxBefore) / 3;
     sPendCount++;
     sGfxStats.draws++;
     sFrame.draws++; sFrame.verts += count;
-    sGfxStats.tris += (u32)idx.size() / 3;
 }
 
 // Uploads and draws what DrawPrims has queued.
