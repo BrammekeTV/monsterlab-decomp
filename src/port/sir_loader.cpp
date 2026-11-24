@@ -3012,6 +3012,8 @@ static const SirField kLevelHeaderFields[] = {
     { 0x030, SIR_U32, 1 },    // code: its count
     { 0x038, SIR_PTR, 1 },    // code: second object list
     { 0x03C, SIR_U32, 1 },    // code: its count
+    { 0x044, SIR_PTR, 1 },    // code: the part list (fn_8003DB78, fn_8003DA7C, fn_8003DCE0): pointers to 0x10-byte entries,
+    { 0x048, SIR_U32, 1 },    //       and how many (PartListPlan)
     { 0x074, SIR_PTR, 2 },    // code: the objects projectiles are spawned from (SpawnCoffinProjectile +0x74, FireRocketAtEntity +0x78)
     { 0x07C, SIR_U32, 1 },    // code: fn_8012FFA4 copies +0x7C..+0x90 to the manager lbl_8047C730: count,
     { 0x080, SIR_PTR, 1 },    //       entries, (u8 flag at +0x84),
@@ -3324,6 +3326,8 @@ extern "C" BOOL LevelZoneRootsCollect(const u8* hdr, u32 hdrSize, const u8* zone
     if (ok && Host32(hdr + 0x7C) != 0 && (out->effectLibrary = ZoneAddr(hdr + 0x80, zoneHost, zoneSize, zoneWiiBase)) != 0)
         out->effectLibraryCount = Host32(hdr + 0x7C);
     for (u32 k = 0; ok && k < 2; k++) out->spawnOwners[k] = ZoneAddr(hdr + 0x74 + k * 4, zoneHost, zoneSize, zoneWiiBase);
+    if (ok && Host32(hdr + 0x48) != 0 && (out->partList = ZoneAddr(hdr + 0x44, zoneHost, zoneSize, zoneWiiBase)) != 0)
+        out->partListCount = Host32(hdr + 0x48);
     if (ok && Host32(hdr + 0x30) != 0 && (out->paths = ZoneAddr(hdr + 0x2C, zoneHost, zoneSize, zoneWiiBase)) != 0)
         out->pathCount = Host32(hdr + 0x30);
     if (ok && Host32(hdr + 0x3C) != 0 && (out->junctions = ZoneAddr(hdr + 0x38, zoneHost, zoneSize, zoneWiiBase)) != 0)
@@ -3407,6 +3411,26 @@ static SirError ProjectileDefPlan(ImagePlan* plan, const u8* image, u32 imageSiz
     for (u32 i = 0; i < 5; i++) {
         SirError e = SoundPlan(plan, image, imageSize, Be32(image + o + 0x108 + i * 4));
         if (e != SIR_OK) return e;
+    }
+    return SIR_OK;
+}
+
+// The part list (level header +0x44, count +0x48): pointers to 0x10-byte entries, one per monster part model and
+// player: {+0x00 use count, +0x04 name hash of the part's geometry ("p_hd_sha001_geoA"), +0x08 the part's object
+// (a placeholder in the file; fn_8003DA7C stores the zone's resource index + 1), +0x0C the zone that holds the part}.
+// fn_8003DB78 looks a part up by hash, claims the entry and asks for its zone (ZoneLoadAsync).
+#define PART_LIST_ENTRY_SIZE 0x10
+static SirError PartListPlan(ImagePlan* plan, const u8* image, u32 imageSize, u32 addr, u32 count) {
+    u32 t;
+    if (count == 0) return SIR_OK;
+    if (count > imageSize / 4 || !LevelSpan(addr, (u64)count * 4, imageSize, &t)) return SIR_ERR_LEVEL;
+    if (PlanHas(plan, t, REGION_PTR_ARRAY)) return SIR_OK;
+    if (!PlanAdd(plan, t, count * 4, REGION_PTR_ARRAY)) return SIR_ERR_LEVEL;
+    for (u32 i = 0; i < count; i++) {
+        u32 o;
+        if (!LevelSpan(Be32(image + t + i * 4), PART_LIST_ENTRY_SIZE, imageSize, &o)) continue;   // none, or in another zone
+        if (PlanHas(plan, o, REGION_U32_ARRAY)) continue;
+        if (!PlanAdd(plan, o, PART_LIST_ENTRY_SIZE, REGION_U32_ARRAY)) return SIR_ERR_LEVEL;
     }
     return SIR_OK;
 }
@@ -3599,6 +3623,7 @@ extern "C" SirError LevelZoneConvert(SirReloc* r, u8* image, u32 imageSize, u32 
     }
     // The objects projectiles are spawned from (header +0x74, +0x78): projectile definitions.
     for (u32 k = 0; k < 2 && e == SIR_OK; k++) e = ProjectileDefPlan(&plan, image, imageSize, roots->spawnOwners[k]);
+    if (e == SIR_OK) e = PartListPlan(&plan, image, imageSize, roots->partList, roots->partListCount);
     // The exploration map (header +0x2C / +0x38): fn_8013006C copies every path record (0x1AC bytes,
     // fn_800D4DE8: words, but for the bytes at +0x64 and +0x9C) and every junction record (0xDC
     // bytes, fn_800D5008: six words, up to twelve entries of three floats and a byte from +0x18,
@@ -3636,6 +3661,13 @@ extern "C" SirError LevelZoneConvert(SirReloc* r, u8* image, u32 imageSize, u32 
     // A shared zone: the slot copy at the start (converted below, by the slot's own field table) and its screen set.
     if (e == SIR_OK && roots->slotCopySize != 0 && (roots->slotCopySize > imageSize || !PlanAdd(&plan, 0, roots->slotCopySize, REGION_RUNTIME)))
         e = SIR_ERR_LEVEL;
+    // Its two entity tables (slot +0x120, +0x12C), when they lie in the image: a part zone's second table holds the
+    // part's entity (fn_8012FD0C runs fn_8012F8B8 over both when the zone starts).
+    for (u32 t = 0; e == SIR_OK && roots->slotCopySize != 0 && t < 2; t++) {
+        u32 entries = Be32(image + kLevelSlotTables[t] + 4), o;
+        if (entries == 0 || entries > imageSize / 4 || !LevelSpan(Be32(image + kLevelSlotTables[t]), (u64)entries * 4, imageSize, &o)) continue;
+        if (!PlanHas(&plan, o, REGION_PTR_ARRAY) && !PlanAdd(&plan, o, entries * 4, REGION_PTR_ARRAY)) e = SIR_ERR_LEVEL;
+    }
     if (e == SIR_OK && roots->screenSet != 0) e = ScreenSetPlan(&plan, image, imageSize, roots->screenSet);
     if (e == SIR_OK && other != NULL) e = OtherFsmValuesPlan(&plan, image, imageSize);
     if (e == SIR_OK && other != NULL) e = OtherActionSoundsPlan(&plan, image, imageSize);

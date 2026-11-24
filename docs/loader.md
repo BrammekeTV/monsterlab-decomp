@@ -1028,6 +1028,13 @@ Read when the first map level (`village_level.sir`) starts:
 - **Enter actions** (header `+0x94`, `+0x98`, `+0x9C`): three action words `GameSessionUpdate` runs with
   `TriggerDoAction` when the level is entered. The village's first one is its set-up program (action 2027:
   junction states, locked paths, `SpawnDatabaseMonsterAtNode` for the quest's enemies).
+- **Part list** (header `+0x44`, count `+0x48`): pointers to 0x10-byte entries, one per monster part model
+  and player (432 in the arena): `+0x00` use count, `+0x04` name hash of the part's geometry
+  (`p_hd_sha001_geoA`, `..._lr_geoA` for the map's low-detail parts), `+0x08` the part's object (a
+  placeholder in the file; `fn_8003DA7C` stores the zone's resource index + 1), `+0x0C` the zone that
+  holds the part. `fn_8003DB78` finds a part by hash, claims the entry and asks for its zone
+  (`ZoneLoadAsync`); a battle's "Loading" screen waits until every part zone of both monsters is loaded
+  (`IsPlayerLoaded` -> `CombatPartZonesAreLoaded`).
 - **Spawn owners** (header `+0x74`, `+0x78`): the projectile definitions `SpawnCoffinProjectile` and
   `FireRocketAtEntity` spawn from (0x170 bytes; a spawned projectile's `+0x228`). `SpawnHelper` compares
   the type id at `+0x00` with `0x37645F52`. Converted: `+0x08` id, `+0x0C` four words (`+0x10` animation
