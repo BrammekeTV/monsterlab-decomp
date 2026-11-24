@@ -2558,7 +2558,8 @@ static void LevelSelfTest(void) {
     // A shared zone: the image starts with a copy of its zone slot, which names a screen set; the
     // set's table leads to a tree of two nodes, a widget and its one child.
     {
-        const u32 SH = 0x924C0000u, SH_SIZE = 0xAC0u;
+        const u32 SH = 0x924C0000u, SH_SIZE = 0xB00u;
+        const u32 SOUND = 0xAC0;                               // the sound object of the entry of kind 3 (no sound info)
         const u32 TEXT = 0x8A0, TBUF = 0xAA0;                  // a text (kind 1) and its characters
         // An animation in the set's table at +0x20: one track with two keys, and one event entry.
         const u32 ATABLE = 0x720, ANODE = 0x730, ANIM = 0x750, TRACK = 0x780, TLIST = 0x7A0, KEYS = 0x7C0;
@@ -2595,7 +2596,8 @@ static void LevelSelfTest(void) {
         Put32(sh + EVENTS + 0x04, SH + ELIST); Put32(sh + EVENTS + 0x08, 0xFFFFFFFF);
         Put32(sh + ELIST + 0x00, 1); Put32(sh + ELIST + 0x04, 1); Put32(sh + ELIST + 0x08, 0x30); Put32(sh + ELIST + 0x10, SH + ENTRIES);
         memset(sh + ENTRIES, 0, 0x30);
-        Put32(sh + ENTRIES + 0x00, 0x3E000000); Put32(sh + ENTRIES + 0x10, SH + NAMED); Put32(sh + ENTRIES + 0x24, 3);
+        Put32(sh + ENTRIES + 0x00, 0x3E000000); Put32(sh + ENTRIES + 0x10, SH + SOUND); Put32(sh + ENTRIES + 0x24, 3);
+        memset(sh + SOUND, 0, 0x30);
         Put32(sh + TABLE + 0, SH + NODE_A); Put32(sh + TABLE + 4, SH + NODE_B); Put32(sh + TABLE + 8, SH + NODE_A);
         Put32(sh + NODE_A + 0x00, 0x80000000); Put32(sh + NODE_A + 0x04, SH + WIDGET);
         Put32(sh + NODE_A + 0x0C, SH + NODE_B); Put32(sh + NODE_A + 0x10, 0);
@@ -2690,7 +2692,7 @@ static void LevelSelfTest(void) {
         CHECK(*(const f32*)(keys + 0x30) == 1.0f && *(const f32*)(keys + 0x40) == 2.0f);
         const u8* entry = *(const u8**)(*(const u8**)(sh + EVENTS + 4) + 0x10);
         CHECK(*(const s32*)(sh + EVENTS + 8) == -1 && entry == sh + ENTRIES && *(const f32*)entry == 0.125f);
-        CHECK(*(const s32*)(entry + 0x24) == 3 && *(const u8**)(entry + 0x10) == sh + NAMED);
+        CHECK(*(const s32*)(entry + 0x24) == 3 && *(const u8**)(entry + 0x10) == sh + SOUND);
         const u8* ev = *(const u8**)(child + 4);
         CHECK(ev == sh + EVENT && *(const u8**)ev == NULL && *(const u32*)(ev + 4) == 0x705598E1 && *(const u32*)(ev + 8) == 0x17140061);
         // The child's kind, as fn_8019914C reads it, and its list as fn_8019555C / fn_8019552C do.
