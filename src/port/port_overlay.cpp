@@ -89,16 +89,17 @@ static f32  sMs[HISTORY];              // frame times, a ring
 static u32  sMsCount, sMsNext;
 static f32  sFps;                      // smoothed over about ten frames
 
-int PortOverlayText(const PortFrameStats* s, f32 fps, f32 avgFps, char* buf, u32 n) {
+int PortOverlayText(const PortFrameStats* s, f32 fps, f32 avgFps, f32 displayFps, char* buf, u32 n) {
     return snprintf(buf, n,
-        "%.1f fps (average %.1f)  %.2f ms\n"
+        "game %.1f fps (average %.1f)  %.2f ms per game frame\n"
+        "display %.1f pictures/s (repeats included)\n"
         "game %.2f ms  render %.2f ms  wait %.2f ms\n"
         "%u draw calls  %u vertices\n"
         "%u frame-buffer copies\n"
         "%u textures\n"
         "%u of %u voices\n"
         "%ux%u %s  picture %ux%u",
-        fps, avgFps, s->frameMs, s->gameMs, s->renderMs, s->waitMs, s->draws, s->verts, s->efbCopies, s->textures,
+        fps, avgFps, s->frameMs, displayFps, s->gameMs, s->renderMs, s->waitMs, s->draws, s->verts, s->efbCopies, s->textures,
         s->voices, s->voiceCount, s->outW, s->outH, s->wide ? "16:9" : "4:3", s->picW, s->picH);
 }
 
@@ -163,7 +164,7 @@ void PortOverlayDraw(ID3D11RenderTargetView* target, u32 w, u32 h) {
     f32 total = 0.0f, worst = 0.0f;
     for (u32 i = 0; i < sMsCount; i++) { total += sMs[i]; if (sMs[i] > worst) worst = sMs[i]; }
     char text[512];
-    PortOverlayText(&sLast, sFps, total > 0.0f ? sMsCount * 1000.0f / total : 0.0f, text, sizeof(text));
+    PortOverlayText(&sLast, sFps, total > 0.0f ? sMsCount * 1000.0f / total : 0.0f, PortGfxDisplayFps(), text, sizeof(text));
 
     ImGuiIO& io = ImGui::GetIO();
     io.DisplaySize = ImVec2((f32)w, (f32)h);
@@ -200,8 +201,8 @@ int PortSelfTestOverlay(void) {
     s.draws = 312; s.verts = 15234; s.efbCopies = 3; s.textures = 215; s.voices = 5; s.voiceCount = 64;
     s.outW = s.picW = 1920; s.outH = s.picH = 1080; s.wide = TRUE;
     char text[512];
-    PortOverlayText(&s, 50.0f, 48.2f, text, sizeof(text));
-    static const char* const kWant[] = {"50.0 fps (average 48.2)  20.00 ms", "game 12.50 ms  render 5.00 ms  wait 2.50 ms",
+    PortOverlayText(&s, 50.0f, 48.2f, 144.0f, text, sizeof(text));
+    static const char* const kWant[] = {"game 50.0 fps (average 48.2)  20.00 ms per game frame", "display 144.0 pictures/s (repeats included)", "game 12.50 ms  render 5.00 ms  wait 2.50 ms",
                                         "312 draw calls  15234 vertices", "3 frame-buffer copies", "215 textures", "5 of 64 voices",
                                         "1920x1080 16:9  picture 1920x1080"};
     for (const char* want : kWant)

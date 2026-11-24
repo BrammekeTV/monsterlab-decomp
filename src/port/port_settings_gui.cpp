@@ -245,7 +245,7 @@ static void PageDisplay(void) {
         {120, "120", "Shows the last picture again between game frames; the game itself keeps its own speed. Menus and overlays update at 120."},
         {144, "144", "As 120, for a 144 Hz monitor."},
         {PORT_FPS_DISPLAY, "Display's refresh rate", "Shows pictures in step with the monitor, whatever its rate (like Vertical sync, but between game frames too)."},
-        {PORT_FPS_UNCAPPED, "Uncapped", "Shows pictures as fast as the graphics card allows, without waiting for the monitor (may tear, uses a lot of power). The game keeps its own speed: it does not run faster."},
+        {PORT_FPS_UNCAPPED, "Uncapped", "Shows pictures as fast as the graphics card allows, without waiting for the monitor (may tear, uses a lot of power). The game itself still runs at 60 and does not run faster: only the last picture is shown again between game frames."},
     };
     int cur = 0;
     for (int k = 0; k < 7; k++) if (kRates[k].cap == sEdit.fpsCap) cur = k;
