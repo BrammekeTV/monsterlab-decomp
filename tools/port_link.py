@@ -358,7 +358,7 @@ def main():
     for addr, name in markers.items():
         by_addr_fn.setdefault(addr, (name, 0))
     for addr, (name, size) in by_addr_fn.items():
-        for cand in (markers.get(addr), name):
+        for cand in (markers.get(addr), name, f"fn_{addr:08X}"):   # also a definition still under its fn_ name after symbols.txt renamed it
             if cand and cand in by_base and len(by_base[cand]) == 1:
                 s = by_base[cand][0]
                 if not s.startswith("?") or base_name(s)[1]:
