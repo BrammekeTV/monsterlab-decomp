@@ -2100,7 +2100,8 @@ static SirError EntityPlan(ImagePlan* plan, const u8* image, u32 imageSize, u32 
     u32 kind = recordHere ? image[o + 0x34] : recordOther ? sOtherImage[otherRec + 0x34] : sPooledEntityType;
     // Types 0x0F (fn_8006CCC4; its vtable slot 0x30, fn_8006CD24, is the prop's fn_80069180) and 0x10 (the
     // challenge projector, fn_8006CFA4) derive from the prop: same layout and definition.
-    bool prop = kind == ENTITY_TYPE_PROP || kind == 0x0F || kind == 0x10;
+    // So does type 0x0C (fn_8004E684 calls the prop's constructor fn_800690D4; arena props).
+    bool prop = kind == ENTITY_TYPE_PROP || kind == 0x0C || kind == 0x0F || kind == 0x10;
     if (recordOther && !OtherAdd(otherRec, ENTITY_RECORD_SIZE, REGION_ENTITY_RECORD)) return SIR_ERR_ENTITY;
     if (depth > ENTITY_DEPTH_MAX || !PlanAdd(plan, off, ENTITY_USED, prop ? REGION_ENTITY_PROP : kind == 9 ? REGION_ENTITY_TIMED : REGION_ENTITY)) return SIR_ERR_ENTITY;
     SirError e;
@@ -3016,6 +3017,8 @@ static const SirField kLevelHeaderFields[] = {
     { 0x080, SIR_PTR, 1 },    //       entries, (u8 flag at +0x84),
     { 0x088, SIR_U32, 1 },    //       count,
     { 0x08C, SIR_PTR, 1 },    //       0x1F4-byte entries (u8 flag at +0x90)
+    { 0x094, SIR_U32, 3 },    // code: three action words GameSessionUpdate runs when the level is entered (TriggerDoAction):
+                              //       the level's set-up program (junction states, locked paths, enemy spawns by quest)
     { 0x1A4, SIR_PTR, 1 }, { 0x1A8, SIR_U32, 2 },   // code: zone slots, count, used (fn_80129CC8 sets all five tables)
     { 0x1B0, SIR_PTR, 1 }, { 0x1B4, SIR_U32, 2 },
     { 0x1BC, SIR_PTR, 1 }, { 0x1C0, SIR_U32, 2 },
