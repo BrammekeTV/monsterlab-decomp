@@ -99,6 +99,11 @@
  "changelog": [
   {
    "date": "2026-11-24",
+   "time": "21:09",
+   "text": "The village intro's coffin now falls at the Wii's speed and its model is drawn (PRs #211, #214): game objects were being updated twice per frame. The village holds 60 fps in our test runs (PR #213). Renamed functions no longer break the build (PR #210)."
+  },
+  {
+   "date": "2026-11-24",
    "time": "20:41",
    "text": "On the village map the camera follows your monster and pans to the enemies after the Mayor, matching the Wii (checked in PR #207, which also adds frame-sequence screenshots for tests). 17 more functions have names (PRs #208, #209)."
   },
