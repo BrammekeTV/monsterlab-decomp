@@ -547,6 +547,8 @@ def machines_dump(L, sec, base, hud_addr, list_addr, level=False, extra=()):
         if v and base <= v < base + len(sec):       # in a level file the table can lie in another zone
             n = u(off(v))
             L.append('fsmvalues %s count %d sum %08x' % (ptr(v), n, fnv(sec[off(v) + 4:off(v) + 4 + n * 4])))
+        elif v and OTHER_ZONE and OTHER_ZONE[1] == 1 and OTHER_ZONE[0] <= v and v + 4 <= OTHER_ZONE[0] + len(OTHER_ZONE[2]):
+            if v - OTHER_ZONE[0] not in FAR_VALUES: FAR_VALUES.append(v - OTHER_ZONE[0])
         if u(o) and u(o) not in defs: defs.append(u(o))
     for d in defs:
         o = off(d)
@@ -604,6 +606,7 @@ def machines_dump(L, sec, base, hud_addr, list_addr, level=False, extra=()):
 # game code reads, straight from the big-endian bytes. See docs/loader.md, "Level files".
 LEVEL_SLOTS = 0x21E0
 
+FAR_VALUES = []     # value tables of zone 0's machines that lie in the level's other zone (offsets there)
 OTHER_ZONE = None   # while a level zone is dumped: (address, zone number, image) of the level's other zone image
 
 def other_ptr(v):
@@ -643,6 +646,7 @@ def gx_state_slot(off):
 
 def level_dump(path):
     global OTHER_ZONE
+    del FAR_VALUES[:]
     version, secs = read_archive(path)
     zone1 = [x['data'] for x in secs if x['type'] == 1]
     OTHER_ZONE = (LEVEL_ZONE1_BASE, 1, zone1[0]) if zone1 else None
@@ -930,7 +934,11 @@ LEVEL_ZONE1_BASE = 0x90980000   # gZoneBase[1] = zone 0's address + its memory b
 
 def level_zone_dump(L, zn, zone0, zbase, u, base, count, stride, zone0_image, zbase0, hdr_bytes):
     """What the header block names in one zone (image `zone0` at `zbase`), then the zone's dump."""
-    if zn: L.append('zone %d size 0x%x' % (zn, len(zone0)))
+    if zn:
+        L.append('zone %d size 0x%x' % (zn, len(zone0)))
+        for v in FAR_VALUES:                        # converted with this zone (the loader's OtherFsmValuesPlan)
+            n = struct.unpack_from('>I', zone0, v)[0]
+            L.append('fsmfarvalues zone%d+0x%x count %d sum %08x' % (zn, v, n, fnv(zone0[v + 4:v + 4 + n * 4])))
     inz = lambda v: zbase <= v < zbase + len(zone0)
     roots, scene, pooltabs, records, lists, slotobjs, sloteffects, actiontabs = [], [], [], [], [], [], [], []
     def table_entries(o):

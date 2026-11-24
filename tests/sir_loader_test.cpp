@@ -36,6 +36,7 @@ static u32 Bits(f32 f) {
 static const u8* sOtherZone = NULL;
 static u32 sOtherZoneSize = 0;
 static int sOtherZoneNumber = 0;
+static std::vector<const u32*> sFarValues;   // value tables of zone 0's machines that lie in another zone
 static bool InOtherZone(const u8* p, u32 n) { return sOtherZone != NULL && p >= sOtherZone && p + n <= sOtherZone + sOtherZoneSize; }
 
 static void PrintPtr(const u8* slot, const GlobalBinaryFile* f) {
@@ -409,6 +410,10 @@ static void DumpMachines(const GlobalBinaryFile* f, const u8* hud, const u8* lis
             printf("fsmvalues ");
             PrintPtr((const u8*)&values, f);
             printf(" count %u sum %08x\n", values[0], h);
+        } else if (values != NULL && InOtherZone((const u8*)values, 4)) {
+            bool seen = false;
+            for (const u32* v : sFarValues) seen = seen || v == values;
+            if (!seen) sFarValues.push_back(values);
         }
         AddUnique(defs, *(const u8**)m);
     }
@@ -1667,6 +1672,13 @@ static int DumpLevel(const char* path) {
         if (e == SIR_OK) e = LevelZoneConvert(&r, f.zone1, f.zone1Size, LEVEL_ZONE1_WII_BASE, &roots1, NULL, &other);
         if (e != SIR_OK) { fprintf(stderr, "%s zone 1: %s\n", path, SirErrorText(e)); return 1; }
         printf("zone 1 size 0x%x\n", f.zone1Size);
+        // The value tables zone 0's machines keep here, converted with this zone.
+        for (const u32* values : sFarValues) {
+            u32 h = 0x811C9DC5u;
+            for (u32 i = 1; i <= values[0]; i++)
+                for (s32 shift = 24; shift >= 0; shift -= 8) h = (h ^ ((values[i] >> shift) & 0xFF)) * 0x01000193u;
+            printf("fsmfarvalues zone1+0x%x count %u sum %08x\n", (u32)((const u8*)values - f.zone1), values[0], h);
+        }
         sOtherZone = f.zone; sOtherZoneSize = f.zoneSize; sOtherZoneNumber = 0;
         GlobalBinaryFile z1 = { NULL, f.zone1, f.zone1Size };
         ZoneDump zd1;

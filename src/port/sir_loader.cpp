@@ -1133,7 +1133,7 @@ static SirError FsmPlan(ImagePlan* plan, const u8* image, u32 imageSize, u32 add
     u32 values = Be32(fsm + 0x54), valuesOff;
     if (values != 0 && sLevelZone && !ImageSpan(values, 4, imageSize, &valuesOff)) {
         // A level's machines keep their value tables in another zone's image: the pointer is
-        // converted, the table is not (it is not in memory when zone 0 is read).
+        // converted here, the table when that zone is (OtherFsmValuesPlan).
     } else if (values != 0) {
         if (!ImageSpan(values, 4, imageSize, &valuesOff)) return SIR_ERR_SCREENS;
         u32 count = Be32(image + valuesOff);
@@ -1142,6 +1142,25 @@ static SirError FsmPlan(ImagePlan* plan, const u8* image, u32 imageSize, u32 add
     }
     u32 def = Be32(fsm + 0x00);
     return def == 0 ? SIR_OK : FsmDefPlan(plan, image, imageSize, def);
+}
+
+// The value tables that zone 0's machines keep in the zone being converted ({count, action words}:
+// a choice node's or a state's action word of type 3 is an index into it, fn_801BC20C). Zone 0 is
+// converted, so the machine's pointer at +0x54 is a host pointer.
+static SirError OtherFsmValuesPlan(ImagePlan* plan, const u8* image, u32 imageSize) {
+    for (u32 i = 0; sOtherDone != NULL && i < sOtherDone->count; i++) {
+        const Region* g = &sOtherDone->regions[i];
+        if (g->kind != REGION_FSM || g->size < FSM_USED) continue;
+        const u8* values;
+        memcpy(&values, sOtherImage + g->off + 0x54, sizeof(values));
+        if (values < image || values >= image + imageSize) continue;
+        u32 off = (u32)(values - image);
+        if (PlanHas(plan, off, REGION_U32_ARRAY)) continue;        // two machines with one table
+        if ((u64)off + 4 > imageSize) return SIR_ERR_SCREENS;
+        u32 count = Be32(image + off);
+        if ((u64)off + 4 + (u64)count * 4 > imageSize || !PlanAdd(plan, off, 4 + count * 4, REGION_U32_ARRAY)) return SIR_ERR_SCREENS;
+    }
+    return SIR_OK;
 }
 
 // `level`: the HUD of a level file. It carries the screen-list slot itself, at +0x434, and +0x24
@@ -3329,6 +3348,7 @@ extern "C" SirError LevelZoneConvert(SirReloc* r, u8* image, u32 imageSize, u32 
     if (e == SIR_OK && roots->slotCopySize != 0 && (roots->slotCopySize > imageSize || !PlanAdd(&plan, 0, roots->slotCopySize, REGION_RUNTIME)))
         e = SIR_ERR_LEVEL;
     if (e == SIR_OK && roots->screenSet != 0) e = ScreenSetPlan(&plan, image, imageSize, roots->screenSet);
+    if (e == SIR_OK && other != NULL) e = OtherFsmValuesPlan(&plan, image, imageSize);
     if (e == SIR_OK && !PlanFinish(&plan)) e = SIR_ERR_OVERLAP;
     // What this zone adds in zone 0: disjoint among itself and from what is converted there.
     if (e == SIR_OK && !PlanFinish(&sOtherNew)) e = SIR_ERR_OVERLAP;
