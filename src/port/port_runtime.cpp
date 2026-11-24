@@ -26,7 +26,7 @@
 extern "C" u32 _ctors[];      // 0x80345AE0, resolved by port_gen.obj like every other Wii global
 
 PortOptions gPortOptions;
-PortSettings gPortSettings = {1920, 1080, TRUE, FALSE, FALSE, FALSE, 100, FALSE, "", 100, PORT_FILTER_GAME, 0};
+PortSettings gPortSettings = {1920, 1080, TRUE, FALSE, FALSE, FALSE, 100, FALSE, "", 100, PORT_FILTER_GAME, 0, 0};
 
 // ------------------------------------------------------------------ log and boot summary
 struct Milestone { const char* what; u32 count; u32 ms; BOOL stub; };
@@ -903,6 +903,12 @@ struct PortBoot {
                 if (pct > 0 && pct < 10) pct = (int)(atof(__argv[i]) * 100 + 0.5);
                 if (pct >= 50 && pct <= 200) gPortSettings.renderScale = pct;
                 else fprintf(stderr, "[port] --render-scale %s: expected 50-200 (percent) or 0.5-2\n", __argv[i]);
+            }
+            else if (!strcmp(a, "--msaa") && i + 1 < __argc) {
+                const char* v = __argv[++i];
+                int n = !_stricmp(v, "off") ? 0 : atoi(v);
+                if (n == 0 || n == 2 || n == 4 || n == 8) gPortSettings.msaa = n;
+                else fprintf(stderr, "[port] --msaa %s: expected off, 2, 4 or 8\n", v);
             }
             else if (!strcmp(a, "--fps-cap") && i + 1 < __argc) {
                 const char* v = __argv[++i];
