@@ -194,10 +194,6 @@ const char* PortSoftSdk(u32 addr) {
         // Registers a function and calls it with two words (from fn_80204478, argument fn_802B7DDC,
         // SDK code). What library this starts is not known yet.
         {0x802B4140, "library start through fn_802B4140 (fn_802B7DDC): not started"},
-        // Bink (RAD Video Tools) is not ported yet: the open fails (returns NULL), so MoviePlay
-        // gives up after its retries and the movie is skipped.
-        {0x802B47A0, "Bink: sound track selection (fn_802B47A0)"},
-        {0x802B4B30, "Bink: open (fn_802B4B30): no movie yet, it is skipped"},
     };
     for (const auto& e : kSoft) if (e.addr == addr) return e.what;
     return NULL;

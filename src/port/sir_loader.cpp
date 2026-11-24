@@ -1570,6 +1570,8 @@ static const SirField kEntityFields[] = {
     { 0x0AC, SIR_U32, 1 },    // code: fn_801B6554, fn_801B66EC
     { 0x0B0, SIR_PTR, 1 },    // code: list of child entities (fn_8012F8B8)
     { 0x0B8, SIR_U32, 1 },    // code: flags; UpdateZoneEntities updates an entity without bit 0
+    { 0x0EC, SIR_U32, 3 },    // code: the event that wakes a sleeping entity (fn_801B9F14; WorldTick compares it with
+                              //       0x6C938971), two event ids (EventMgrFlushFor)
     { 0x158, SIR_F32, 1 },    // code: fn_800690D4
     { 0x194, SIR_PTR, 1 },    // code: more part containers (fn_8012F8B8),
     { 0x1A4, SIR_U32, 2 },    //       their count; +0x1A8 (fn_800690D4)
@@ -1603,7 +1605,6 @@ static const SirField kPropFields[] = {
     { 0x068, SIR_U32, 1 },    // code: action word (fn_80069180)
     { 0x0C8, SIR_F32, 3 },    // code: a position (fn_8006A764)
     { 0x0D4, SIR_F32, 3 },    // code: its rotation as Euler angles (fn_801B5BD8 builds the record's quaternion from them)
-    { 0x0EC, SIR_U32, 1 },    // code: fn_800696C4
     { 0x15C, SIR_U32, 1 },    // code: flags (fn_80069180, fn_8006A764, fn_8006A2D0)
     { 0x1A0, SIR_PTR, 1 },    // code: the prop's states: +0x1A4 pointers to definitions (fn_800699E4)
 };
@@ -1683,11 +1684,18 @@ static SirError PropDefPlan(ImagePlan* plan, const u8* image, u32 imageSize, u32
 static const SirField kPtrCountFields[] = {
     { 0x00, SIR_PTR, 1 }, { 0x04, SIR_U32, 1 },
 };
-// A part (fn_8012F6B0): vtable slot, a word the function clears, and at +0x0C the kind that
-// picks the vtable.
+// A part (fn_8012F6B0) is a collision shape: vtable slot, a word the function clears, +0x08 its
+// definition, +0x0C the kind that picks the vtable, +0x10 the entity, +0x14 and +0x20 its position
+// now and before (fn_801AD050), +0x2C the group key, +0x30 a bone's name hash and +0x34 the bone's
+// index (-1: not looked up yet, fn_801ACD08), +0x3C the radius. The fields a kind adds after
+// +0x40 are not converted yet (only kind 0, the sphere, is in the first levels).
+// The definition: +0x00 kind, +0x04 key, +0x08 bone hash, +0x0C offset on the bone (3 floats),
+// +0x24 radius.
 static const SirField kEntityPartFields[] = {
-    { 0x00, SIR_U32, 2 }, { 0x0C, SIR_U32, 1 },
+    { 0x00, SIR_U32, 2 }, { 0x08, SIR_PTR, 1 }, { 0x0C, SIR_U32, 1 }, { 0x10, SIR_PTR, 1 }, { 0x14, SIR_U32, 11 },
 };
+#define ENTITY_PART_USED 0x40
+#define ENTITY_PART_DEF_USED 0x28
 
 #define ENTITY_DEPTH_MAX 64
 
@@ -1924,6 +1932,9 @@ static SirError SceneObjectPlan(ImagePlan* plan, const u8* image, u32 imageSize,
         u32 count = Be32(image + off + 0x54), array = Be32(image + off + 0x58);
         if (!ImageSpan(addr, 0x60, imageSize, &off) || !PlanAdd(plan, off + 0x48, 4, REGION_PTR_ARRAY) ||
             !PlanAdd(plan, off + 0x50, 4, REGION_U32_ARRAY) || !PlanAdd(plan, off + 0x5C, 4, REGION_PTR_ARRAY)) return SIR_ERR_ENTITY;
+        // The key-track record (fn_801D90A0 resets it, fn_801DA34C reads it every frame): flags, two quads, +0x38..+0x44 the
+        // tint the items take (1.0 in the files; unconverted it reads as 0 and the item is invisible).
+        if (!PlanAdd(plan, off + 0x08, 0x40, REGION_U32_ARRAY)) return SIR_ERR_ENTITY;
         if (count != 0 && array != 0) {
             if (!ImageSpan(array, (u64)count * 4, imageSize, &o) || !PlanAdd(plan, o, count * 4, REGION_PTR_ARRAY)) return SIR_ERR_ENTITY;
             // The entries: the flags and the list link of each.
@@ -1948,6 +1959,7 @@ static SirError EntityContainerPlan(ImagePlan* plan, const u8* image, u32 imageS
     u32 off, itemsOff, partsOff, partOff;
     if (!LevelSpan(addr, 0x14, imageSize, &off) || PlanHas(plan, off + 0x0C, REGION_PTR_COUNT)) return SIR_OK;
     if (!PlanAdd(plan, off + 0x0C, 8, REGION_PTR_COUNT)) return SIR_ERR_ENTITY;
+    if (!PlanAdd(plan, off + 8, 4, REGION_PTR_ARRAY)) return SIR_ERR_ENTITY;          // the entity it belongs to (fn_801B1778)
     u32 items = Be32(image + off + 0x10);
     if (items == 0) return SIR_OK;
     if (!ImageSpan(Be32(image + off + 0x0C), (u64)items * 4, imageSize, &itemsOff) ||
@@ -1957,13 +1969,19 @@ static SirError EntityContainerPlan(ImagePlan* plan, const u8* image, u32 imageS
         if (!LevelSpan(Be32(image + itemsOff + i * 4), 0x2C, imageSize, &itemOff)) continue;
         if (PlanHas(plan, itemOff + 0x24, REGION_PTR_COUNT)) continue;
         if (!PlanAdd(plan, itemOff + 0x24, 8, REGION_PTR_COUNT)) return SIR_ERR_ENTITY;
+        // +0x04 the container, +0x08 the group's key (fn_801B154C), +0x20 flags (fn_801B1778).
+        if (!PlanAdd(plan, itemOff + 4, 4, REGION_PTR_ARRAY) || !PlanAdd(plan, itemOff + 8, 4, REGION_U32_ARRAY) ||
+            !PlanAdd(plan, itemOff + 0x20, 4, REGION_U32_ARRAY)) return SIR_ERR_ENTITY;
         u32 parts = Be32(image + itemOff + 0x28);
         if (parts == 0) continue;
         if (!ImageSpan(Be32(image + itemOff + 0x24), (u64)parts * 4, imageSize, &partsOff) ||
             !PlanAdd(plan, partsOff, parts * 4, REGION_PTR_ARRAY)) return SIR_ERR_ENTITY;
         for (u32 k = 0; k < parts; k++) {
-            if (!LevelSpan(Be32(image + partsOff + k * 4), 0x10, imageSize, &partOff)) continue;
-            if (!PlanAdd(plan, partOff, 0x10, REGION_ENTITY_PART)) return SIR_ERR_ENTITY;
+            if (!LevelSpan(Be32(image + partsOff + k * 4), ENTITY_PART_USED, imageSize, &partOff)) continue;
+            if (!PlanAdd(plan, partOff, ENTITY_PART_USED, REGION_ENTITY_PART)) return SIR_ERR_ENTITY;
+            // The shape's definition (+0x08), often in zone 0.
+            AnyObj def = AnyFind(plan, imageSize, Be32(image + partOff + 8), ENTITY_PART_DEF_USED, REGION_U32_ARRAY);
+            if (def.found && !AnyAdd(plan, &def, ENTITY_PART_DEF_USED, REGION_U32_ARRAY)) return SIR_ERR_ENTITY;
         }
     }
     return SIR_OK;
@@ -2017,6 +2035,11 @@ static SirError EntityPlan(ImagePlan* plan, const u8* image, u32 imageSize, u32 
     } else if (OtherSpan(Be32(ent + 0x9C), 0xC, &q)) {
         if (!OtherAdd(q + 8, 4, REGION_U32_ARRAY)) return SIR_ERR_ENTITY;
         if ((u64)q + ENTITY_DEF_USED <= sOtherSize && !OtherAdd(q + 0x48, 4, REGION_PTR_ARRAY)) return SIR_ERR_ENTITY;
+    }
+    if (!prop && Be32(ent + 0x9C) != 0) {
+        // The animation set itself (fn_800526E4 -> fn_801AC6B4 reads its entries when the entity wakes).
+        AnyObj setPtr = AnyFind(plan, imageSize, Be32(ent + 0x9C) + 0x48, 4, REGION_PTR_ARRAY);
+        if (setPtr.found && (e = AnimSetPlan(plan, image, imageSize, AnyPtr(image, imageSize, &setPtr, 0))) != SIR_OK) return e;
     }
     // State machine holder: {machine, object}; fn_8012F8B8 hands the machine's definition to fn_801BC574.
     if (LevelSpan(Be32(ent + 0xA4), 8, imageSize, &o)) {

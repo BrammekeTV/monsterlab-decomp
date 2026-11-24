@@ -92,6 +92,9 @@ a PC port. Read this whole file before making changes. Human contributors: see
 - `python tools/difftest.py --fn <name|0xADDR>` / `--batch N` / `--all [--calls]`: differential test (`docs/difftest.md`): runs the original
   PowerPC code of a function (from your disc, in an interpreter inside the exe) and the C++ on the same inputs and compares return value
   and memory. Run `--fn` on a function after decompiling or changing it; a `MISMATCH` prints the command that repeats the failing case.
+- `python tools/movie_test.py [--iso PATH]`: headless test of the Bink cutscene player: the first movie plays (screenshots at three frame counts, `--wav` sound, `--no-movies`). Run it after changes to `src/port/port_bink*.cpp` or the GX layer.
+- `python tools/bink_check.py [file.bik]`: builds the PC Bink decoder (`src/port/port_bink_codec.cpp`, derived from FFmpeg, LGPL: `third_party/bink/`) and compares
+  frames and audio of a movie from your disc with `ffmpeg.exe` (reference only, never shipped). Run it after changing the decoder.
 - `python tools/progress.py`: progress numbers.
 - `python tools/changelog_add.py "text"`: add a progress-site changelog entry stamped with the real time (maintainer only).
 

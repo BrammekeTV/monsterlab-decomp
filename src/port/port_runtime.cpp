@@ -17,6 +17,10 @@
 #include "port/port_gx.h"
 #include "port/port_mods.h"
 #include "port/port_overlay.h"
+extern "C" { s32 SaveManager_SelectFirstEmptySlot(void); void SaveManager_ResetCurrentData(void); void SaveManager_SaveData(void); u32 SaveManager_CanLoadGame(void); }
+extern u8* lbl_805FBBE0;
+extern "C++" void* gScreenSets;
+extern "C" void fn_8022E3D8(void* save, const unsigned char* name);   // src/game/draft_miss37.cpp, draft_miss46.cpp
 
 // This file's start-up object must be built before every other static object: game code may
 // touch globals that live in the mapped address space from its own static initialisers.
@@ -197,6 +201,20 @@ s32 PortFrameCount(void) { return sFrames; }
 void PortFrameDone(void) {
     if (sFrames == 1 && getenv("PORT_SCRIPT_TRACE")) InstallScriptTrace();
     sFrames++;
+    // PORT_MAKE_PROFILE=<frame>: creates a profile in the first free slot and saves it (a test aid until
+    // the game saves one itself: the save point in the first level is not reachable yet).
+    static s32 sMakeProfile = getenv("PORT_MAKE_PROFILE") ? atoi(getenv("PORT_MAKE_PROFILE")) : 0;
+    if (sMakeProfile && sFrames == sMakeProfile) {
+        PortLog("profile: slot %d selected", (int)SaveManager_SelectFirstEmptySlot());
+        SaveManager_ResetCurrentData();
+        fn_8022E3D8(lbl_805FBBE0, (const unsigned char*)"Player");   // the name is what marks the slot as used
+        SaveManager_SaveData();
+        PortLog("profile: can load %u", (unsigned)SaveManager_CanLoadGame());
+    }
+    if (getenv("PORT_CURSOR_LOG") && sFrames == 3500) {   // where the game put its cursor widget (screen units, 640 x 480)
+        u8* cur = *(u8**)((u8*)gScreenSets + 0x7C);
+        if (cur) PortLog("cursor: %.1f %.1f", *(f32*)(cur + 0x68), *(f32*)(cur + 0x6C));
+    }
     if (!gPortOptions.fastAll && sFrames >= gPortOptions.fastForward) PortFastEnd();
     if (gPortOptions.frameLimit && sFrames >= gPortOptions.frameLimit) {
         PortStop(0, "frame limit reached (%d frames)", sFrames);
@@ -397,7 +415,7 @@ static BOOL DemoRedirect(CONTEXT* c, BOOL onMainThread) {
     return TRUE;
 }
 
-// --watch ADDR: a hardware write breakpoint on four bytes of Wii memory, on the main thread only.
+// --watch ADDR: a hardware write breakpoint on four bytes of Wii memory, on the game's threads.
 // Each write is reported with the function that made it, the new value and the stack.
 static u32 sWatch;
 static DWORD WINAPI WatchArm(void* thread) {
@@ -411,6 +429,13 @@ static DWORD WINAPI WatchArm(void* thread) {
     }
     ResumeThread((HANDLE)thread);
     return 0;
+}
+
+// The watch covers the game's other threads too: OSCreateThread arms each one it starts.
+extern "C" void PortWatchArmThread(void* thread) {
+    if (!sWatch) return;
+    HANDLE h = CreateThread(NULL, 0, WatchArm, thread, 0, NULL);
+    if (h) { WaitForSingleObject(h, INFINITE); CloseHandle(h); }
 }
 
 static LONG CALLBACK TrapHandler(EXCEPTION_POINTERS* e) {
@@ -899,6 +924,7 @@ struct PortBoot {
             else if (!strcmp(a, "--window")) gPortOptions.window = TRUE;
             else if (!strcmp(a, "--wav") && i + 1 < __argc) gPortOptions.wav = __argv[++i];
             else if (!strcmp(a, "--no-audio")) gPortOptions.noAudio = TRUE;
+            else if (!strcmp(a, "--no-movies")) gPortOptions.noMovies = TRUE;
             else if (!strcmp(a, "--peek") && i + 1 < __argc && sPeekCount < 8) sPeek[sPeekCount++] = strtoul(__argv[++i], NULL, 16);
             else if (!strcmp(a, "--watch") && i + 1 < __argc) sWatch = strtoul(__argv[++i], NULL, 16);
             else if (!strcmp(a, "--show-texture") && i + 1 < __argc) gPortOptions.showTexture = atoi(__argv[++i]);

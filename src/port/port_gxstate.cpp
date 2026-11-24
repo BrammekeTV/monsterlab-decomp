@@ -537,5 +537,170 @@ void GXSetIndTexCoordScale(s32 stage, s32 scaleS, s32 scaleT) {
     Bp(*r);
 }
 
+
+// ---- texture objects (GXTexObj, 0x20 bytes: mode0, mode1, image0, image3 as BP words, then our own fields)
+// GXInitTexObj(obj, image, width, height, format, wrap s, wrap t, mipmap)
+void GXInitTexObj(u8* obj, void* image, u16 width, u16 height, s32 fmt, s32 wrapS, s32 wrapT, s32 mipmap) {
+    u32* t = (u32*)obj;
+    u32 mode0 = ((u32)wrapS & 3) | (((u32)wrapT & 3) << 2) | (1u << 4);   // mag filter linear
+    mode0 |= (mipmap ? 6u : 1u) << 5;                                       // min filter
+    mode0 |= 1u << 8;                                                       // edge LOD
+    t[0] = mode0 | (0x80u << 24);
+    t[1] = 0xFF00u | (0x84u << 24);                                         // LOD 0..15.9375
+    t[2] = ((u32)(width - 1) & 0x3FF) | (((u32)(height - 1) & 0x3FF) << 10) | (((u32)fmt & 15) << 20) | (0x88u << 24);
+    t[3] = (((u32)(uintptr_t)image & 0x3FFFFFFF) >> 5) | (0x94u << 24);
+    t[4] = 0; t[5] = (u32)fmt; t[6] = 0xFFFFFFFFu; t[7] = mipmap ? 1 : 0;
+}
+// GXInitTexObjLOD(obj, min filter, mag filter, bias clamp, edge LOD, max anisotropy, min LOD, max LOD, LOD bias):
+// the integers come first as the callers declare it (the floats travel in their own registers on the console)
+void GXInitTexObjLOD(u8* obj, s32 minFilt, s32 magFilt, s32 biasClamp, s32 edgeLod, s32 aniso, f32 minLod, f32 maxLod, f32 bias) {
+    static const u8 kMin[6] = {0, 2, 4, 1, 3, 5};
+    u32* t = (u32*)obj;
+    s32 b = (s32)(32.0f * bias);
+    b = b < -128 ? -128 : b > 127 ? 127 : b;
+    u32 m0 = t[0] & ~(0x1u << 4) & ~(7u << 5) & ~(1u << 8) & ~(0xFFu << 9) & ~(3u << 19) & ~(1u << 21);
+    m0 |= ((u32)(magFilt == 1) << 4) | ((u32)kMin[(u32)minFilt % 6] << 5) | ((u32)(edgeLod ? 0 : 1) << 8) |
+          (((u32)b & 0xFF) << 9) | (((u32)aniso & 3) << 19) | ((u32)(biasClamp != 0) << 21);
+    t[0] = m0;
+    f32 lo = minLod < 0 ? 0 : minLod > 10 ? 10 : minLod, hi = maxLod < 0 ? 0 : maxLod > 10 ? 10 : maxLod;
+    t[1] = ((u32)(16.0f * lo) & 0xFF) | (((u32)(16.0f * hi) & 0xFF) << 8) | (0x84u << 24);
+}
+// GXLoadTexObj(obj, map): the object's four BP registers for that texture map
+void GXLoadTexObj(u8* obj, s32 map) {
+    Init();
+    const u32* t = (const u32*)obj;
+    u32 id = (u32)map & 7, base = id < 4 ? 0x80 : 0xA0, n = id & 3;
+    Bp((t[0] & 0xFFFFFFu) | ((base + n) << 24));
+    Bp((t[1] & 0xFFFFFFu) | ((base + 4 + n) << 24));
+    Bp((t[2] & 0xFFFFFFu) | ((base + 8 + n) << 24));
+    Bp((t[3] & 0xFFFFFFu) | ((base + 0x14 + n) << 24));
+}
+
+
+// ---- TEV inputs and operations (the SDK's GXSetTevColorIn / AlphaIn / ColorOp / AlphaOp, under their unnamed symbols)
+// fn_8024D59C: GXSetTevColorIn(stage, a, b, c, d)
+void fn_8024D59C(s32 stage, s32 a, s32 b, s32 c, s32 d) {
+    Init();
+    u32 i = (u32)stage & 15;
+    u32 r = (sh.tevc[i] & ~0xFFFFu) | (((u32)a & 15) << 12) | (((u32)b & 15) << 8) | (((u32)c & 15) << 4) | ((u32)d & 15);
+    sh.tevc[i] = r;
+    Bp(r);
+}
+// fn_8024D5DC: GXSetTevAlphaIn(stage, a, b, c, d); the low four bits are the swap tables
+void fn_8024D5DC(s32 stage, s32 a, s32 b, s32 c, s32 d) {
+    Init();
+    u32 i = (u32)stage & 15;
+    u32 r = (sh.teva[i] & ~0xFFF0u) | (((u32)a & 7) << 13) | (((u32)b & 7) << 10) | (((u32)c & 7) << 7) | (((u32)d & 7) << 4);
+    sh.teva[i] = r;
+    Bp(r);
+}
+static u32 TevOp(u32 r, s32 op, s32 bias, s32 scale, s32 clamp, s32 out) {
+    r = (r & ~(1u << 18)) | (((u32)op & 1) << 18);
+    r = (r & ~(3u << 16)) | (((op <= 1) ? (u32)bias : 3u) << 16);
+    r = (r & ~(3u << 20)) | (((op <= 1) ? (u32)scale : (((u32)op >> 1) & 3)) << 20);
+    r = (r & ~(1u << 19)) | (((u32)clamp & 1) << 19);
+    r = (r & ~(3u << 22)) | (((u32)out & 3) << 22);
+    return r;
+}
+// fn_8024D61C: GXSetTevColorOp(stage, op, bias, scale, clamp, output register)
+void fn_8024D61C(s32 stage, s32 op, s32 bias, s32 scale, s32 clamp, s32 out) {
+    Init();
+    u32 i = (u32)stage & 15;
+    sh.tevc[i] = TevOp(sh.tevc[i], op, bias, scale, clamp, out);
+    Bp(sh.tevc[i]);
+}
+// fn_8024D674: GXSetTevAlphaOp
+void fn_8024D674(s32 stage, s32 op, s32 bias, s32 scale, s32 clamp, s32 out) {
+    Init();
+    u32 i = (u32)stage & 15;
+    sh.teva[i] = TevOp(sh.teva[i], op, bias, scale, clamp, out);
+    Bp(sh.teva[i]);
+}
+// fn_8024D72C: GXSetTevColorS10(register, four signed 16-bit values r, g, b, a)
+void fn_8024D72C(s32 reg, s16* c) {
+    Init();
+    u32 id = (u32)reg & 3;
+    Bp(((u32)c[0] & 0x7FF) | (((u32)c[3] & 0x7FF) << 12) | ((0xE0u + id * 2) << 24));
+    u32 bg = ((u32)c[2] & 0x7FF) | (((u32)c[1] & 0x7FF) << 12) | ((0xE1u + id * 2) << 24);
+    Bp(bg); Bp(bg); Bp(bg);
+}
+// GXSetTevKColor(id, colour bytes r, g, b, a): the constant colour registers share the addresses of the
+// colour registers, the type bit (23) tells them apart
+void GXSetTevKColor(s32 id, u8* c) {
+    Init();
+    u32 n = (u32)id & 3;
+    Bp((u32)c[0] | ((u32)c[3] << 12) | (8u << 20) | ((0xE0u + n * 2) << 24));
+    u32 bg = (u32)c[2] | ((u32)c[1] << 12) | (8u << 20) | ((0xE1u + n * 2) << 24);
+    Bp(bg); Bp(bg); Bp(bg);
+}
+
+// ---- indirect texturing
+// GXSetIndTexOrder(indirect stage, texture coordinate, texture map): BP 0x27
+static u32 sIref;
+void GXSetIndTexOrder(s32 stage, s32 coord, s32 map) {
+    Init();
+    u32 sh6 = ((u32)stage & 3) * 6;
+    sIref = (sIref & ~(7u << sh6) & ~(7u << (sh6 + 3))) | (((u32)map & 7) << sh6) | (((u32)coord & 7) << (sh6 + 3));
+    Bp((sIref & 0xFFFFFFu) | (0x27u << 24));
+    sh.dirty |= 2;
+}
+// GXSetTevIndirect(tev stage, indirect stage, format, bias, matrix, wrap s, wrap t, add previous, use LOD, alpha select)
+void GXSetTevIndirect(s32 tev, s32 ind, s32 fmt, s32 bias, s32 mtx, s32 wrapS, s32 wrapT, s32 addPrev, s32 lod, s32 alpha) {
+    Init();
+    u32 r = ((u32)ind & 3) | (((u32)fmt & 3) << 2) | (((u32)bias & 7) << 4) | (((u32)alpha & 3) << 7) |
+            (((u32)mtx & 15) << 9) | (((u32)wrapS & 7) << 13) | (((u32)wrapT & 7) << 16) |
+            (((u32)lod & 1) << 19) | (((u32)addPrev & 1) << 20) | ((0x10u + (u32)tev) << 24);
+    Bp(r);
+}
+// GXSetIndTexMtx(matrix id 1..3 (or 5..7, 9..11), 2x3 matrix, scale exponent)
+void GXSetIndTexMtx(s32 id, f32* m, s32 scaleExp) {
+    Init();
+    u32 n = id == 1 || id == 5 || id == 9 ? 0 : id == 2 || id == 6 || id == 10 ? 1 : 2;
+    u32 e = (u32)(scaleExp + 17);
+    auto q = [](f32 v) { return (u32)(s32)(1024.0f * v) & 0x7FF; };
+    for (u32 k = 0; k < 3; k++) {
+        u32 r = q(m[k]) | (q(m[3 + k]) << 11) | (((e >> (2 * k)) & 3) << 22) | ((6u + n * 3 + k) << 24);
+        Bp(r);
+    }
+}
+
+// ---- draw sync
+static u16 sDrawToken;
+// GXSetDrawSync(token): the token goes through the pipe and interrupts when the processor reaches it
+void GXSetDrawSync(u16 token) {
+    Init();
+    sDrawToken = token;
+    Bp(0x48000000u | token);
+    Bp(0x47000000u | token);
+}
+// GXReadDrawSync: the last token the processor passed
+s32 GXReadDrawSync(void) { return sDrawToken; }
+
+// ---- projection
+void PortGxWriteF32(f32 v);
+// GXSetProjection(4x4 matrix, type: 0 perspective, 1 orthographic): XF registers 0x1020..0x1026
+void GXSetProjection(f32* m, s32 type) {
+    Init();
+    PortGxWrite8(0x10);
+    PortGxWrite32((6u << 16) | 0x1020);
+    PortGxWriteF32(m[0]);
+    PortGxWriteF32(type == 1 ? m[3] : m[2]);
+    PortGxWriteF32(m[5]);
+    PortGxWriteF32(type == 1 ? m[7] : m[6]);
+    PortGxWriteF32(m[10]);
+    PortGxWriteF32(m[11]);
+    PortGxWrite32((u32)type);
+}
+// C_MTXOrtho(matrix, top, bottom, left, right, near, far)
+void C_MTXOrtho(f32* m, f32 t, f32 b, f32 l, f32 r, f32 n, f32 f) {
+    f32 tmp = 1.0f / (r - l);
+    m[0] = 2.0f * tmp; m[1] = 0; m[2] = 0; m[3] = -(r + l) * tmp;
+    tmp = 1.0f / (t - b);
+    m[4] = 0; m[5] = 2.0f * tmp; m[6] = 0; m[7] = -(t + b) * tmp;
+    tmp = 1.0f / (f - n);
+    m[8] = 0; m[9] = 0; m[10] = -tmp; m[11] = -f * tmp;
+    m[12] = 0; m[13] = 0; m[14] = 0; m[15] = 1.0f;
+}
+
 }  // extern "C"
 #endif

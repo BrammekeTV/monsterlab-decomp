@@ -7,6 +7,7 @@
 #ifdef _WIN32
 #define WIN32_LEAN_AND_MEAN
 #define NOMINMAX
+#include <stdlib.h>
 #include <windows.h>
 #include <stdarg.h>
 #include <stdio.h>
@@ -36,6 +37,7 @@ struct Heap {
     u32    allocCount;
     u32    reserved;
 };
+extern "C" void PortWatchArmThread(void* thread);    // port_runtime.cpp
 static const u32 kHeapMagic = 0x50484550;
 static const u32 kHeadSize = sizeof(Block);
 
@@ -55,7 +57,29 @@ static Heap* HeapCreate(void* start, void* end) {
     return h;
 }
 
+// Debugging aid (PORT_HEAP_CHECK=1): walks the block list before every allocation and free and
+// stops at the first block whose header was overwritten, naming the block in front of it.
+static int sHeapCheck = -1;
+static void HeapCheck(Heap* h) {
+    if (sHeapCheck < 0) sHeapCheck = getenv("PORT_HEAP_CHECK") != NULL;
+    if (!sHeapCheck) return;
+    Block* prev = NULL;
+    for (Block* b = h->first; b; prev = b, b = b->next) {
+        u8* end = (u8*)b + b->size;
+        BOOL ok = b->used <= 1 && b->prev == prev && end <= h->end && (b->next ? (u8*)b->next == end : TRUE);
+        if (ok) continue;
+        PortLog("heap check: block %p is damaged (size %08X used %08X prev %p next %p)", b, b->size, b->used, b->prev, b->next);
+        if (prev) {
+            u32* w = (u32*)(prev + 1);
+            PortLog("heap check: the block in front is %p, size 0x%X, used %u: %08X %08X %08X %08X %08X %08X %08X %08X", prev + 1,
+                    prev->size - kHeadSize, prev->used, w[0], w[1], w[2], w[3], w[4], w[5], w[6], w[7]);
+        }
+        *(volatile int*)1 = 0;
+    }
+}
+
 static void* HeapAlloc_(Heap* h, u32 size, s32 align) {
+    HeapCheck(h);
     BOOL fromEnd = align < 0;                    // MEM: a negative alignment allocates from the top
     u32 a = (u32)(align < 0 ? -align : align);
     if (a < 4) a = 4;
@@ -113,6 +137,7 @@ static void* HeapAlloc_(Heap* h, u32 size, s32 align) {
 
 static void HeapFree_(Heap* h, void* ptr) {
     if (!ptr) return;
+    HeapCheck(h);
     Block* b = (Block*)((u8*)ptr - kHeadSize);
     if ((u8*)b < h->start || (u8*)b >= h->end || b->used != 1) {
         PortLog("free of a block that is not allocated: %p (ignored)", ptr);
@@ -363,6 +388,7 @@ void OSShutdownSystem(void) { PortStop(0, "the game asked to shut down"); }
 void OSReturnToDataManager(void) { PortStop(0, "the game asked to open the Wii data manager"); }
 
 void DCFlushRange(void* addr, u32 size) {}
+void DCStoreRange(void* addr, u32 size) {}
 void DCInvalidateRange(void* addr, u32 size) {}
 
 void OSInit(void) {
@@ -434,6 +460,7 @@ s32 OSResumeThread(OSThread* thread) {
         // The game's own stack block is not used: PC frames are larger than PowerPC ones.
         PortGameThreads(1);
         pt->handle = CreateThread(NULL, 0x100000, ThreadEntry, pt, 0, NULL);
+        PortWatchArmThread(pt->handle);
         return 1;
     }
     return 0;
