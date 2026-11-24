@@ -1563,6 +1563,8 @@ static const SirField kEntityFields[] = {
     { 0x02C, SIR_U32, 2 },    // code: id, which fn_800D8724 compares for every entity of a zone's tables; +0x30 (fn_801B6444)
     { 0x080, SIR_U32, 1 },    // code: fn_801260C8 tests its bits 0x78000000 (0x0003FFFF in the files)
     { 0x084, SIR_PTR, 1 },    // code: a table fn_801B6AD4 searches (the table itself is not converted)
+    { 0x014, SIR_F32, 1 },    // code: a prop's anchor height (fn_8006AADC); for every type the camera's sensor radius (fn_800DECD8
+                              //       passes the camera target's +0x14 to the volume test: unconverted it made every camera volume apply)
     { 0x08C, SIR_PTR, 2 },    // code: part container (fn_8012F6B0), sub-object (fn_8012F8B8)
     { 0x094, SIR_U32, 1 },    // code: how many attach points the entity has (fn_801EC080; fn_801B4334 clears it),
     { 0x098, SIR_PTR, 1 },    //       the attach points (kAttachPointFields)
@@ -1611,7 +1613,6 @@ static const SirField kEntityRecordFields[] = {
 // methods of that vtable read. The level's player object is one of these. Action words are the
 // ones TriggerDoAction gets the address of; the words between them have no reader yet.
 static const SirField kPropFields[] = {
-    { 0x014, SIR_F32, 1 },    // code: fn_8006AADC (height of the anchor point)
     { 0x028, SIR_F32, 1 },    // code: fn_8006BDF4
     { 0x038, SIR_U32, 3 },    // code: action words (fn_8006A2D0)
     { 0x048, SIR_U32, 4 },    // code: action words (fn_800696C4, fn_8006BDF4, fn_80069638)
