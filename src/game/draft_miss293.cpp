@@ -9,7 +9,7 @@ s32   DVDGetDriveStatus(void);                                                  
 u32   OSGetBusClock(void);
 s32   OSSignalSemaphore(OSSemaphore* sem);
 s32   OSWaitSemaphore(OSSemaphore* sem);
-void  fn_80146B18(void);                                                             // 0x80146B18 (read-done callback)
+void  fn_80146B18(s32 result);                                                       // 0x80146B18 (read-done callback)
 void  fn_8015A5A4(u8* p, const char* name);                                          // 0x8015A5A4
 void  OSSleepTicks(s32 hi, u32 lo);                                                   // 0x8023D3C8 (sleep ticks)
 

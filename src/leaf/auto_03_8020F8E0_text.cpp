@@ -452,13 +452,6 @@ extern "C" void SaveSetNextRegion(u8* a3, s32 a4) {
     *(u32*)(((u8*)(uintptr_t)(a3)) + 272) = (u32)((u32)(uintptr_t)(a4));
 }
 
-// 0x80225664
-extern "C" s32 fn_80225664(u8* a3) {
-    s32 t0 = *(s32*)(((u8*)(uintptr_t)(a3)) + 2304);
-    s32 t1 = *(s32*)(((u8*)(uintptr_t)(a3)) + 2308);
-    return (s32)(t0);
-}
-
 // 0x80225C10
 extern "C" void fn_80225C10(u8* a3, s32 a4, s32 a5, s32 a6) {
     *(u32*)(((u8*)(uintptr_t)(a3)) + 324) = (u32)((u32)(uintptr_t)(a6));

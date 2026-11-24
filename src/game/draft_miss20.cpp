@@ -528,4 +528,10 @@ ScriptValue FriendsListIsBuddy(void) {
     return (ScriptValue)buddy;
 }
 
+// 0x8013A004
+// The verified friend code as one 64-bit value (the Wii returns the high word in r3, the low word in r4).
+u64 fn_8013A004(void) {
+    return ((u64)(u32)lbl_805FB348 << 32) | (u32)lbl_805FB34C;
+}
+
 }  // extern "C"

@@ -65,7 +65,10 @@ a PC port. Read this whole file before making changes. Human contributors: see
   (file:line; `lint:ok` comment suppresses an intentional one). `tools/check.py` runs it after compiling.
 - `python tools/check_protos.py [names]`: reports functions declared with different return types,
   parameter counts or C/C++ linkage across `src/` and `include/` (run it before pushing; all game
-  functions use C linkage). Pointer-returning script callbacks return `ScriptValue`.
+  functions use C linkage). Pointer-returning script callbacks return `ScriptValue`. It also compares
+  declarations with the generated definitions in `src/leaf/`: fewer parameters than the definition reads
+  (on x86 the callee then reads stray stack words), or a struct/float/64-bit return against another kind,
+  is a conflict; more parameters is harmless and only counted (`-v` lists them).
 - `python tools/link_check.py` then `python tools/missing_symbols.py`: compile (Win32) and link every object;
   the linker output becomes the to-do list: `docs/data/missing.json` plus a summary of unresolved game
   functions (most-referenced first, with address and size), library functions by SDK region, globals,

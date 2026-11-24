@@ -45,8 +45,8 @@ u8*    fn_8021F32C(u8* p);                                            // 0x8021F
 u8*    fn_8021F368(u8* p, u8* seq);                                   // 0x8021F368
 u32    fn_8021F7C0(u8* p);                                            // 0x8021F7C0
 u32    fn_8021F7E8(u8* p);                                            // 0x8021F7E8
-void   fn_8021FAA8(void);                                             // 0x8021FAA8
-void   fn_8021FAFC(void);                                             // 0x8021FAFC
+s32    fn_8021FAA8(u8* p);                                           // 0x8021FAA8
+s32    fn_8021FAFC(u8* p);                                           // 0x8021FAFC
 void   fn_8021FB28(void);                                             // 0x8021FB28
 u8*    fn_8021FFA4(u8* p, u8* seq, s32 idx, void* cbA, void* cbB, f32 f);  // 0x8021FFA4
 void   KPADSetPosParam(s32 a, f32 b, f32 c);                              // 0x8027D270

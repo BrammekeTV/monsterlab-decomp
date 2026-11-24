@@ -78,8 +78,8 @@ void fn_800980F8(u8* p, s32 b);                                       // 0x80098
 void fn_800712B4(void);                                               // 0x800712B4
 void fn_800712B8(void);                                               // 0x800712B8
 void fn_80070FD8(u8* obj);                                            // 0x80070FD8
-Quat fn_8008C104(u8* obj);                                            // 0x8008C104 (returns the quat at +0x26C)
-Vec3 fn_8008C128(u8* obj);                                            // 0x8008C128 (returns the node position)
+void fn_8008C104(Quat* out, u8* obj);                                 // 0x8008C104 (copies the quat at +0x26C to out)
+void fn_8008C128(Vec3* out, u8* obj);                                 // 0x8008C128 (copies the node position to out)
 s32  LabExperimentGrade(u8* lab);
 
 u8* fn_80077D1C(u8* p);   // 0x80077D1C
@@ -827,7 +827,8 @@ void fn_8008DF44(u8* arg0, f32 dt) {
     // (the original also normalised the node position into dead locals here)
 
     u8* target = *(u8**)(arg0 + 0x280);
-    Quat q = fn_8008C104(target);
+    Quat q;
+    fn_8008C104(&q, target);
     Vec3 axis0 = QuatGetAxisY(&q);
     Vec3 axis1;
     fn_801455E0(&axis1.x, (u8*)&q);
@@ -840,7 +841,8 @@ void fn_8008DF44(u8* arg0, f32 dt) {
     off.x = ax.x * radius;
     off.y = ax.y * radius;
     off.z = ax.z * radius;
-    Vec3 tp = fn_8008C128(*(u8**)(arg0 + 0x280));
+    Vec3 tp;
+    fn_8008C128(&tp, *(u8**)(arg0 + 0x280));
     u8* node = *(u8**)(arg0 + 0x4);
     f32 nx = *(f32*)(node + 0x0);
     f32 ny = *(f32*)(node + 0x4);

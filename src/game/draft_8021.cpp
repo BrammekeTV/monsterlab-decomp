@@ -16,9 +16,9 @@ u8*   fn_8021F350(u8* p, s32 idx);                                   // 0x8021F3
 u16   fn_8021F448(u8* seqData);                                      // 0x8021F448
 u32   fn_8021F454(u8* seqData);                                      // 0x8021F454
 u8*   fn_8021F464(u8* seqData, s32 track);                           // 0x8021F464
-void  fn_8021FA50(void);                                             // 0x8021FA50
-void  fn_8021FA80(void);                                             // 0x8021FA80
-void  fn_8021FAD4(void);                                             // 0x8021FAD4
+void  fn_8021FA50(u8* p);                                           // 0x8021FA50
+s32   fn_8021FA80(u8* p);                                           // 0x8021FA80
+s32   fn_8021FAD4(u8* p);                                           // 0x8021FAD4
 void  fn_8021FB28(void);                                             // 0x8021FB28
 void* fn_8021FEFC(u8* p, u8* seqData, s32 idx, void* cb, s32 arg);   // 0x8021FEFC
 void  fn_8021FF9C(u8* p, u8* q);                                     // 0x8021FF9C

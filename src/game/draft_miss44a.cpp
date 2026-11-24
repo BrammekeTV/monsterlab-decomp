@@ -20,7 +20,7 @@ void*       ScreenSetsFind(void* sets, s32 zone);                 // 0x8018D1EC
 void*       ScreenSetFindWidget(void* set, u32 hash);             // 0x80198E34
 void*       UIWidgetFindChild(void* widget, u32 hash);            // 0x80199AEC
 ScriptValue fn_801A1208(u8* el);                                  // 0x801A1208
-void        fn_801FBE38(s32 n, void* a, void* b, s32 c, void* d); // 0x801FBE38
+void        fn_801FBE38(ScriptValue a0, s32 n, void* a, void* b, s32 c, void* d); // 0x801FBE38 (r3: what fn_801A1208 returned)
 void        fn_80042B0C(void);                                    // 0x80042B0C
 void        fn_80042B30(void);                                    // 0x80042B30
 void        fn_80042BE8(void);                                    // 0x80042BE8
@@ -93,8 +93,7 @@ void SetupVictoryScreenShot(s32 a0) {
         void* child = UIWidgetFindChild(widget, 0x1B49766Fu);
         if (child == NULL) continue;
         if (fn_801A1208((u8*)child) == 0) return;
-        fn_801A1208((u8*)child);
-        fn_801FBE38(0x14, (void*)fn_80042B0C, (void*)fn_80042B30, 0, (void*)fn_80042BE8);
+        fn_801FBE38(fn_801A1208((u8*)child), 0x14, (void*)fn_80042B0C, (void*)fn_80042B30, 0, (void*)fn_80042BE8);
         GameFlowSignal(0xDED2B2, 0, 0);
         lbl_805FB068 = 1;
         lbl_805FB06A = 0;

@@ -14,7 +14,7 @@ typedef void (*UIColorFn)(void*, s32, f32, f32, f32, f32);   // element vtable (
 typedef void (*UIVisFn)(void*, s32);                         // element vtable (+0x138) +0x30
 
 extern "C" {
-void  fn_801499F8(u8* target, s32 w, s32 h, s32 fmt, s32 a, s32 b, const char* name);  // 0x801499F8
+s32   fn_801499F8(u8* target, s32 w, s32 h, s32 fmt, s32 a, s32 b, const char* name);  // 0x801499F8
 void fn_8015A144(u8* arg0, u8** arg1);                                           // 0x8015A144
 void  fn_8015DE58(void* video, f32* a, f32* b, f32* c, f32* d);                       // 0x8015DE58
 u8* fn_80169770(u8* arg0, const char* name);                                           // 0x80169770
