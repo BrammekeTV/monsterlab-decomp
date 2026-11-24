@@ -99,6 +99,11 @@
  "changelog": [
   {
    "date": "2026-11-24",
+   "time": "21:41",
+   "text": "The Windows mouse cursor no longer shows over the game, and the game's pointing hand is drawn at its true 64x64 size at every resolution (PR #215)."
+  },
+  {
+   "date": "2026-11-24",
    "time": "21:09",
    "text": "The village intro's coffin now falls at the Wii's speed and its model is drawn (PRs #211, #214): game objects were being updated twice per frame. The village holds 60 fps in our test runs (PR #213). Renamed functions no longer break the build (PR #210)."
   },
