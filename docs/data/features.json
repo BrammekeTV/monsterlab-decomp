@@ -99,6 +99,11 @@
  "changelog": [
   {
    "date": "2026-11-24",
+   "time": "20:17",
+   "text": "All 3D drawing now runs on the graphics card, so scenes cost less per frame (PRs #205). Differential tests now cover more of the battle and camera code and caught 4 small mistakes in our decompiled code (PR #200). About 540 more functions have names, by exact behaviour or by their simple shape (PRs #196-#204)."
+  },
+  {
+   "date": "2026-11-24",
    "time": "20:02",
    "text": "Battle attack and hit sounds now play: they were triggered by the animation events fixed in PR #189. A new sound log (PR #191) shows every sound the game asks for and whether it played. 89 more functions have real names (PRs #192, #193, #195)."
   },
