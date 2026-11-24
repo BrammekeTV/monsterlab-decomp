@@ -99,6 +99,11 @@
  "changelog": [
   {
    "date": "2026-11-24",
+   "time": "12:49",
+   "text": "Fixed the game stopping on the main menu after a while (PR #170). When the Wii Remote's rumble timer fired, our decompiled handler didn't receive its timer, and the function it needed wasn't in the PC version yet. Both are fixed, checked against the original game code."
+  },
+  {
+   "date": "2026-11-24",
    "time": "12:38",
    "text": "Further into the game on Windows (PR #169): after the village intro, the exploration map works, and walking to the next spot opens the conversation with Mayor Neidervoten. Also, the faint ghost image over the main menu is gone (PR #168). The game's glow effect makes half-size copies of the screen, and the PC version had been making them full size, so an old picture showed through."
   },
