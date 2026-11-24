@@ -289,7 +289,7 @@ void fn_800410AC(u8* arg0, f32 farg0) {
                 (*(MtxFn*)(*(u8**)obj + 0x38))(obj, mtx);
                 CameraSetMatrix(lbl_8047C640, (const f32(*)[4])mtx);
                 fn_80009840(lbl_803C4298);
-                f32 pos[2];
+                f32 pos[3];                         // fn_8016F854 writes three ratios
                 fn_8016F854(pos, (u8*)lbl_805FB5F8, (const f32*)(arg0 + i * 0x3C + j * 0xC + 0x40C));
                 s32 sx = (s32)((f32)gScreenWidth * pos[0]);
                 s32 sy = (s32)((f32)gScreenHeight * pos[1]) - (s32)(lbl_805FD124 * rise);

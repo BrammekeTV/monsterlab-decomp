@@ -258,7 +258,7 @@ void SetFinalExperimentScore(s32 a0) {
 // Converts a normalised screen position to pixels: *arg2 = width * x, *arg3 = height * y.
 // With arg0 == NULL it first refreshes the camera matrix from the camera object (vtable slot 0x38).
 void fn_80073A7C(void* arg0, s32 arg1, f32* arg2, f32* arg3) {
-    f32 pos[2];
+    f32 pos[3];                                      // fn_8016F854 writes three ratios
     f32 mtx[3][4];
     if (arg0 == NULL) {
         u8* cam = *(u8**)(lbl_803C4298 + 4);

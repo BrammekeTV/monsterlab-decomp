@@ -154,6 +154,7 @@ void fn_801FD730(u8* arg0) {
     if (lbl_805F98C0 != 0 && *(s32*)(lbl_8051DAD0 + 0xB4) != 0) {
         fn_80203DE8(gAudio, lbl_8051DAD0);
         while (*(volatile s32*)(lbl_8051DAD0 + 0xB4) != 0) {
+            WAIT_FOR_INTERRUPT();
         }
     }
     s32 saved2 = lbl_805FBAE0;

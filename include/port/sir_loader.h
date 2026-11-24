@@ -150,6 +150,11 @@ u8*  SirRelocToHost(const SirReloc* r, u32 wiiAddr);
 // Converts the fields `fields[0..n)` of the record at `rec` (recSize bytes). FALSE (and nothing
 // changed) if a field lies outside the record.
 BOOL SirConvertRecord(SirReloc* r, u8* rec, u32 recSize, const SirField* fields, s32 n);
+// What the four bytes at `off` of a type 1 material's record (a GX state of SIR_GX_STATE_SIZE bytes)
+// hold: a word, four single bytes, the material pointer, {u8, u8, u16} or {u16, u8, u8}.
+#define SIR_GX_STATE_SIZE 0xD20
+enum { SIR_GX_WORD, SIR_GX_BYTES, SIR_GX_PTR, SIR_GX_BYTES_U16, SIR_GX_U16_BYTES };
+u8 SirGxStateSlot(u32 off);
 
 // ---------------------------------------------------------------------------------------------
 // global_binary.sir
@@ -421,6 +426,20 @@ enum {
     LEVEL_FIXUP_FSM           = 656    // FixupFSMPoolCallback: a slot holding a state machine
 };
 
+// The script functions with a sound argument (signature argument type 0xB), by their index in
+// gScriptFuncs: the loader converts the sound objects their calls in action records point at.
+// As with the pool functions above, the indices are those of the retail build and the port checks
+// them against the live table. Bit n of argMask: argument n is a sound.
+typedef struct SirSoundCall { u16 func; u8 argMask; const char* name; } SirSoundCall;
+#define SIR_SOUND_CALLS 16
+#ifdef __cplusplus
+extern "C" {
+#endif
+extern const SirSoundCall kSirSoundCalls[SIR_SOUND_CALLS];
+#ifdef __cplusplus
+}
+#endif
+
 // What a converted header block names in one zone (Wii addresses).
 typedef struct LevelZoneRoots {
     u32  hud;                // header +0x1F4, or 0 when the HUD is in another zone
@@ -436,6 +455,8 @@ typedef struct LevelZoneRoots {
     u32  slotEffectCount;
     u32* actionTables;       // every slot's action table (+0xD4)
     u32  actionTableCount;
+    u32* soundGroups;        // every slot's chain of sound groups (+0x110), PlaySound
+    u32  soundGroupCount;
     u32  locators;           // header +0x28: the level's locators (0x20 bytes each), or 0 when they are in another zone
     u32  locatorCount;       // header +0x24
     u32* zoneRecords;        // every slot's +0xFC: the zone record WorldTick walks

@@ -6,7 +6,7 @@
 #include "types.h"
 
 // 0x80076B9C
-extern "C" u8 fn_80076B9C(u8* a3) {
+extern "C" u32 fn_80076B9C(u8* a3) {
     u8 t0 = *(u8*)(((u8*)(uintptr_t)(a3)) + 620);
     return (u8)(t0);
 }

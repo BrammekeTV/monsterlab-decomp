@@ -100,6 +100,19 @@ f64 fn_8033F204(f64 x) { return log(x); }                   // log
 f64 fn_8033F20C(f64 x, f64 y) { return pow(x, y); }         // pow
 f64 fn_8033F45C(f64 x) { return sqrt(x); }                  // sqrt
 
+// __cvt_dbl_ll (0x8032FB38): a double to a signed 64-bit integer, truncated toward zero, 0 below 1 in
+// magnitude, saturated at +-2^63 (and for NaN by its sign). The game's callers pass the f32 as the
+// second argument and a clock they do not use in the first (r3 is not read by the original).
+u64 fn_8032FB38(u32 /*unused*/, f32 secs) {
+    f64 x = (f64)secs;
+    bool neg = signbit(x) != 0;
+    if (x != x) return neg ? 0x8000000000000000ull : 0x7FFFFFFFFFFFFFFFull;
+    if (fabs(x) < 1.0) return 0;
+    if (x >= 9223372036854775808.0) return 0x7FFFFFFFFFFFFFFFull;
+    if (x <= -9223372036854775808.0) return 0x8000000000000000ull;
+    return (u64)(s64)x;
+}
+
 // MSL qsort.
 void fn_80336FE0(void* base, s32 n, s32 size, void* cmp) {
     qsort(base, (size_t)n, (size_t)size, (int (__cdecl*)(const void*, const void*))cmp);

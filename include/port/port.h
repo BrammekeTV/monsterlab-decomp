@@ -116,6 +116,12 @@ typedef struct PortOptions {
 } PortOptions;
 extern PortOptions gPortOptions;
 
+enum { PORT_FPS_UNCAPPED = -1, PORT_FPS_DISPLAY = -2 };
+BOOL PortGfxIdle(void);            // the drawing thread waits: show the last picture again if the frame rate asks for it (lock held)
+enum { PORT_FILTER_GAME, PORT_FILTER_NEAREST, PORT_FILTER_BILINEAR, PORT_FILTER_AF2, PORT_FILTER_AF4, PORT_FILTER_AF8, PORT_FILTER_AF16, PORT_FILTER_COUNT };
+extern const char* const kPortFilterNames[PORT_FILTER_COUNT];   // ini / command-line spelling
+void PortGfxApplySettings(void);   // texture filtering changed: textures and samplers are rebuilt at the next picture
+
 // What the player can change (the settings screen edits this; the command line fills it for now).
 typedef struct PortSettings {
     s32  width, height;       // output size in pixels (--res WxH, default 1920x1080)
@@ -126,6 +132,10 @@ typedef struct PortSettings {
     s32  volume;              // 0-100, of the sound device's output
     BOOL mute;
     char gamePath[260];       // the player's disc image or extracted folder ([game] path; chosen in the first-run screen)
+    s32  renderScale;         // internal frame buffer size in percent of the output picture, 50-200 (--render-scale; applies at start)
+    s32  texFilter;           // PORT_FILTER_*: how textures are sampled (--filter)
+    s32  fpsCap;              // pictures per second: 0 off (one per game frame), N Hz, PORT_FPS_UNCAPPED, PORT_FPS_DISPLAY (--fps-cap)
+    s32  msaa;                // samples of the frame buffer: 0 off, 2, 4 or 8 (--msaa; applies at start)
 } PortSettings;
 extern PortSettings gPortSettings;
 // monsterlab.ini next to the exe (port_settings.cpp): display, audio and the input bindings.

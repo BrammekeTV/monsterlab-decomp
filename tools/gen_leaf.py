@@ -654,6 +654,9 @@ def gen_function(name, items, sig, cb, sigs, protos, hnames):
         ts = {("u8*" if g.args.get(t[4:]) == "ptr" else "s32") if t.startswith("ARG") else t for t in ts}
         ts = {"u8*" if any(e in g.ptrs for e, _ in ret3) else t for t in ts}
         rett = next(iter(ts)) if len(ts) == 1 else next((t for t in ("u8*", "u32", "s32") if t in ts), "s32")
+        # r3 holds the whole register on the PPC (lbz/lhz zero-extend, lha/extsb sign-extend) and callers read
+        # all of it: a u8/u16 return leaves the upper bits undefined once the compiler optimises.
+        rett = {"u8": "u32", "u16": "u32", "s8": "s32", "s16": "s32"}.get(rett, rett)
     elif retf:
         rett = "f32" if all(t in ("f32", "FARG") for _, t in retf) else "f64"
     else:

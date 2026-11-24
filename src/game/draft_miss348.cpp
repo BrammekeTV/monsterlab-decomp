@@ -614,6 +614,7 @@ s32 MusicLoad(u8* arg0, u8* arg1) {
     if (lbl_805FBAA4 != 0 && *(s32*)(lbl_8051DAD0 + 0x174) != 0) {
         fn_80203DE8(arg0, lbl_8051DAD0 + 0xC0);
         while (*(volatile s32*)(lbl_8051DAD0 + 0x174) != 0) {
+            WAIT_FOR_INTERRUPT();
         }
     }
     GameLog(1, 2, (const char*)(lbl_803865F0 + 0x5C8), buf);

@@ -27,7 +27,7 @@
 extern "C" u32 _ctors[];      // 0x80345AE0, resolved by port_gen.obj like every other Wii global
 
 PortOptions gPortOptions;
-PortSettings gPortSettings = {1920, 1080, TRUE, FALSE, FALSE, FALSE, 100, FALSE};
+PortSettings gPortSettings = {1920, 1080, TRUE, FALSE, FALSE, FALSE, 100, FALSE, "", 100, PORT_FILTER_GAME, 0, 0};
 
 // ------------------------------------------------------------------ log and boot summary
 struct Milestone { const char* what; u32 count; u32 ms; BOOL stub; };
@@ -643,6 +643,7 @@ extern volatile LONG gPortIdleWaiters;  // port_os.cpp: waiters registered at th
 static HANDLE sIdleEvent;                                    // fast-forward: wakes the interrupt thread when all threads wait
 
 void PortWaitChange(void) {
+    if (PortGfxIdle()) return;                   // the drawing thread waits: it showed the last picture again (the caller checks its condition again)
     u32 gen = sChangeGen;
     AcquireSRWLockExclusive(&sChangeLock);
     if (sChangeGen == gen) {                     // a signal clears the count: every waiter wakes and registers again
@@ -900,6 +901,33 @@ struct PortBoot {
                 int w = 0, h = 0;
                 if (sscanf(__argv[++i], "%dx%d", &w, &h) == 2 && w >= 320 && h >= 240 && w <= 8192 && h <= 8192) { gPortSettings.width = w; gPortSettings.height = h; }
                 else fprintf(stderr, "[port] --res %s: expected WxH, e.g. 1920x1080\n", __argv[i]);
+            }
+            else if (!strcmp(a, "--render-scale") && i + 1 < __argc) {
+                int pct = atoi(__argv[++i]);                    // 50..200 percent; 0.5..2 is taken as a factor
+                if (pct > 0 && pct < 10) pct = (int)(atof(__argv[i]) * 100 + 0.5);
+                if (pct >= 50 && pct <= 200) gPortSettings.renderScale = pct;
+                else fprintf(stderr, "[port] --render-scale %s: expected 50-200 (percent) or 0.5-2\n", __argv[i]);
+            }
+            else if (!strcmp(a, "--msaa") && i + 1 < __argc) {
+                const char* v = __argv[++i];
+                int n = !_stricmp(v, "off") ? 0 : atoi(v);
+                if (n == 0 || n == 2 || n == 4 || n == 8) gPortSettings.msaa = n;
+                else fprintf(stderr, "[port] --msaa %s: expected off, 2, 4 or 8\n", v);
+            }
+            else if (!strcmp(a, "--fps-cap") && i + 1 < __argc) {
+                const char* v = __argv[++i];
+                if (!_stricmp(v, "off")) gPortSettings.fpsCap = 0;
+                else if (!_stricmp(v, "uncapped")) gPortSettings.fpsCap = PORT_FPS_UNCAPPED;
+                else if (!_stricmp(v, "display")) gPortSettings.fpsCap = PORT_FPS_DISPLAY;
+                else if (atoi(v) >= 10 && atoi(v) <= 1000) gPortSettings.fpsCap = atoi(v);
+                else fprintf(stderr, "[port] --fps-cap %s: expected off, uncapped, display or a rate (30, 60, 120, 144...)\n", v);
+            }
+            else if (!strcmp(a, "--filter") && i + 1 < __argc) {
+                int f = -1;
+                for (int k = 0; k < PORT_FILTER_COUNT; k++) if (!_stricmp(__argv[i + 1], kPortFilterNames[k])) f = k;
+                if (f >= 0) gPortSettings.texFilter = f;
+                else fprintf(stderr, "[port] --filter %s: expected game, nearest, bilinear, 2x, 4x, 8x or 16x\n", __argv[i + 1]);
+                i++;
             }
             else if (!strcmp(a, "--stretch-ui")) gPortSettings.stretchUi = TRUE;
             else if (!strcmp(a, "--aspect") && i + 1 < __argc) {

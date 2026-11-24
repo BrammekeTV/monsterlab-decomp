@@ -36,7 +36,7 @@ build\pc\monsterlab.exe                        # runs main() with your own disc 
 | `--settings [display\|audio\|controls]` | open the settings screen at the start (F1 or Esc opens and closes it in the window); with `--screenshot-stats` it is drawn into the screenshot |
 | `--vsync`, `--fullscreen` | vertical sync; borderless fullscreen (both also in the settings screen) |
 | `--no-ini` | do not read `monsterlab.ini` (next to the exe: display, audio and the key bindings, written by the settings screen; the command line wins over it) |
-| `--iso FILE` | the game data is your own Monster Lab disc image (.iso, RM7P4F), read as it is: nothing is extracted. `--data` and `MONSTERLAB_DATA` take an image too. Another game or region is refused with a message |
+| `--iso FILE` | the game data is your own Monster Lab disc image (.iso, .wbfs or .rvz, RM7P4F), read as it is: nothing is extracted. A .wbfs is read through its block map (first disc only; split .wbf1 files are not joined). A .rvz (zstd, the Dolphin default; bzip2/LZMA are refused with a message) is read group by group: partition data is stored decrypted there, so no AES is used; RVZ-packed junk (disc padding) reads as zeros. Reading tested on synthetic images only. `--data` and `MONSTERLAB_DATA` take an image too. Another game or region is refused with a message |
 | `--picker-screenshot FILE` | draw the first-run "choose your disc" screen into a PNG and stop (tests; with `--iso FILE` it shows the verdict for that file) |
 | `--mods DIR`, `--no-mods` | use another mods folder than `mods` next to the exe; run without mods. With `--verbose` every file each mod replaces is listed (see `docs/modding.md`) |
 | `--res WxH` | output size (default 1920x1080) |
@@ -409,8 +409,10 @@ semaphore, and in `OSGetTime` (busy-wait loops call it). One more thread deliver
 interrupts, also under the lock, about once per millisecond. So an "interrupt" never preempts
 game code in the middle of an update, which is stricter than the console.
 
-A loop that waits for an interrupt to change memory without calling any SDK function would hang.
-The time limit then reports where the main thread is.
+A loop that waits for an interrupt to change memory without calling any SDK function would hang
+(the time limit then reports where the main thread is). Such a loop gets `WAIT_FOR_INTERRUPT()`
+(`types.h`) as its body: it lets the interrupt thread in and moves game time on while
+fast-forwarding. Two so far, both waiting for a music stream to stop (`fn_801FD730`, `draft_miss348.cpp`).
 
 ### The game clock and fast-forward
 
@@ -428,7 +430,9 @@ offset, so game time continues without a jump. Presenting to the window and writ
 skipped while fast (the mixer still runs, so game callbacks and `--wav` are the same); drawing is not skipped:
 copies and screenshots stay right.
 
-In a window, a fast-forward still shows a picture four times a second (real time) with "Fast-forwarding... frame N / M" in the title bar; the window thread has its own message pump, so it stays responsive. A white window for a long time is the renderer, not a hang: the menu's 3D scene costs about 50 ms a frame (CPU vertex transform in the backend), so `--to-menu` takes about 110 s at 1080p even on a graphics card. `PORT_HIDDEN=1` in the environment creates the window hidden (for tests).
+In a window, a fast-forward still shows a picture four times a second (real time) with "Fast-forwarding... frame N / M" in the title bar; the window thread has its own message pump, so it stays responsive. A white window for a long time is the renderer, not a hang: the menu's 3D scene costs about 50 ms a frame (CPU vertex transform in the backend), so `--to-menu` takes about 110 s at 1080p even on a graphics card. `PORT_HIDDEN=1` in the environment creates the window hidden, `PORT_OFFSCREEN=1` visible but at -32000,-32000 (the real code path, off every monitor), `PORT_FAST_LOG=1` logs each progress picture. The title is set from the window's own thread (a posted message), and the progress also runs for the frames whose draws and copies are dropped.
+
+With a frame target (`--fast-forward N`, `--to-menu`) the backend drops all draws and texture copies except in the last 30 frames before the target: the engine redraws and recopies everything each frame, so only the final frames matter, and the GX interpreter still decodes the dropped ones (state and copies go on). `--fast` has no target and draws everything. Hidden window, 1080p, graphics card: 3200 frames to the menu took 112-134 s before and 28 s after; the menu screenshot differs only by a few levels (animated text fade). The boot summary's `drawn:` line shows the backend time in draws and copies and the number of draws dropped.
 
 Frames at the same count show the same screen (title at 2500, main menu at 3200 with `--press A@2600-2610`), but
 effects that run on time (the title's sparks, the menu's scene) are in another phase from a paced run, and

@@ -16,13 +16,13 @@ extern "C" s32 fn_80074D48(void) {
 }
 
 // 0x80074D50
-extern "C" u8 fn_80074D50(void) {
+extern "C" u32 fn_80074D50(void) {
     u8 t0 = *(u8*)((u8*)&lbl_805FB131);
     return (u8)(t0);
 }
 
 // 0x80074D58
-extern "C" u8 fn_80074D58(void) {
+extern "C" u32 fn_80074D58(void) {
     u8 t0 = *(u8*)((u8*)&lbl_805FB130);
     return (u8)(t0);
 }

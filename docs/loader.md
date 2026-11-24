@@ -24,7 +24,7 @@ Code: `include/port/sir_loader.h`, `src/port/sir_loader.cpp`. Test: `tests/sir_l
 | `global_binary.sir` UI root, fonts and the objects of slots `0xDB4`-`0xDBC` | the fields the code reads are converted, and the glyph data of the four fonts |
 | `global_binary.sir` effect definitions (slots `0x82C`-`0x840`: 27 + 70 entries) and the two object pools of slots `0x10`, `0x418` | converted; fields typed from the effect and pool code |
 | `global_binary.sir` screen set database (header slot `0xDC0`) | the lookup table and each record's zone are converted: see "Screen set database" |
-| `global_binary.sir` sound objects named by action records | not converted: see "Not converted yet" |
+| sound objects named by action records (`global_binary.sir` and zone action tables) | converted: variation, sound info and DSP header; see "Sound objects" |
 | Level files (`*_level.sir`, arenas, castle rooms): header block (the world state, 493 zone slots); in zone 0 the HUD and state machines, the first layer of every entity, scene objects, pool tables and their pools | the fields the level start reads are converted; the rest of an entity and of the zone images is not: see "Level files" |
 | Hook into the game's `SirLoad` | not wired (the port has no file layer yet) |
 
@@ -387,6 +387,21 @@ further on, a flag word, floats (1.0, -3.0), a hash, and in the second part of o
 (`Generic_Timer_Countdown_Mo_01`). They are **not** converted: the functions that read them are
 not decompiled far enough to type the fields.
 
+### Sound objects
+
+A script function whose signature has an argument of type `0xB` gets a pointer to a sound object.
+The loader knows the 16 functions by their index in `gScriptFuncs` (`kSirSoundCalls` in
+`sir_loader.cpp`; the port checks the indices against the live table before it converts a zone)
+and converts what their calls in action records point at:
+
+| Object | Bytes | Fields |
+|---|---|---|
+| variation | 0x30 each | `+0x00` sound info, `+0x04` count of variations (byte, 0 = one; `PlaySoundAt` picks one), `+0x06` volume, `+0x07` volume spread, `+0x08` pitch, `+0x10` float, `+0x14` kind, `+0x15`/`+0x16` distances, `+0x2D`/`+0x2E` flags. `+0x0C`, `+0x18`..`+0x2B` have no reader yet (words: 0, a hash, zeros) |
+| sound info | 0x18 + name | `+0x00` word and `+0x04` DSP header (`fn_801FE52C`), `+0x08` size, `+0x0C` u16 (`PlaySoundAt`), `+0x0E` zone (`fn_801FF154`), `+0x18` name |
+| DSP header | 0x60 | as the start of a `.dsp` file (`fn_80203340`); the samples behind it are bytes |
+
+Arguments of type `0xD` (`LT_SetTutorialText`, `PlayVoiceSFX`, `StopVoiceSFX`) are still not converted.
+
 ### Screen state machines (header slots `0xD98`, `0xD9C`)
 
 `UiInit` hands slot `0xD98` (the screen list) to `fn_801BC574` and slot `0xD9C` (the HUD) to
@@ -584,9 +599,8 @@ which gives the address. Pointers in it go into the block itself or into the zon
 | `0x1A4`, `0x1B0`, `0x1BC`, `0x1C8`, `0x1D4` | five tables `{pointer, capacity, used}`: the zone slots, three tables of one pointer per zone, one of 12-byte entries | `fn_80129CC8` |
 | `0x1E0`-`0x1F0` | words and a byte | `GameSessionUpdate`, `PlayFootStepEffect`, `fn_800D7FF0`, `WorldPostUpdate` |
 | `0x1F4` | the level's HUD, in zone 0 | `HudReload`, `fn_800D8100` |
-| `0x1F8`-`0x20C` | floats | `fn_8003E560`, `fn_8006C3FC` |
+| `0x1F8` | three light records of 0x82C bytes (`0x1A7C` of them in use): six colour floats, two angles at `+0x18`, up to 512 definition ids from `+0x24`, their count at `+0x824`, flags at `+0x828` | `EntityUpdate`, `fn_8003E560`, `fn_8006C3FC` |
 | `0x1A80` | the level's picture settings (0xA0 bytes): two flag bytes, then 39 floats at `0x1A84`: brightness, contrast, gamma and the colour rows the colour tables are built from | `fn_8012A79C` copies them to `lbl_8040D500`, `fn_8015F4CC` builds the tables; `SetOptionsBrightness` |
-| `0xA20`, `0x1A7C` | words | `fn_8003E560`, `EntityUpdate` |
 | `0x21E0` | 493 zone slots | below |
 
 A zone slot is `0x148 + 0x54 * n` bytes (`gZoneResourceSize`; 0x19C in the shipped files). The
@@ -764,7 +778,7 @@ A prop definition's `+0x48` points at its animation table (`fn_800699E4`). The t
 |---|---|---|
 | table | `+0x04` pointer to the entry counts (one `u16` per group; there is one group), `+0x0C` the entries | `fn_801AC184` |
 | | `+0x10` two lists of clips, `+0x18` the two `u16` keys that pick a list, `+0x1C` clips per list | `fn_801AC460` |
-| entry (0x44 bytes) | `+0x2C` handle, `+0x34` its table, `+0x38` the clip's index | `fn_801AC184`, `fn_801AC460` |
+| entry (0x44 bytes) | `+0x00` playback speed, `+0x0C` flags, `+0x1C`, `+0x20` blend floats, `+0x2C` handle, `+0x34` its table, `+0x38` the clip's index (all 32-bit words; `+0x00..+0x30` and `+0x3C..+0x40` are converted) | `fn_801AC184`, `fn_801AC460`, `fn_801AC51C` |
 | entity record | `+0x32` (`u16`): the key handed to `fn_801AC460` | `fn_800699E4` |
 
 The 34 level files have 189 tables. Their clips are converted as described next.
@@ -839,7 +853,38 @@ words, so both walks add them and the plan drops the duplicates.
 | type 0 record | `+0x00` the material (checked), `+0x04`, `+0x05` bytes, `+0x08`..`+0x44` sixteen floats, `+0x4C`, `+0x50` floats, `+0x54` word, `+0x58`..`+0x5A` and `+0x64`..`+0x67` bytes, `+0x5C`, `+0x60` words | `fn_80176E20`, `fn_80177940` |
 
 Not converted: `+0x10`, `+0x14`, `+0x18` of a type 0 material, `+0x48` of its record and its bytes
-`+0x06`, `+0x07` (no reader); type 1 records and the extra pointers of a type 1 material.
+`+0x06`, `+0x07` (no reader).
+
+A type 1 material (`fn_80181DE0` before the batch, `fn_80181F80` after it) has eight textures at
+`+0x1C` and eight matrix pointers at `+0x3C`, one per texture unit. Its record is a GX state of
+0xD20 bytes that `fn_8017B9BC` compares with the last state sent (`lbl_80412B10[pass]`) and sends
+where it differs. It is words (and floats) except where `SirGxStateSlot` says bytes or halves:
+
+| Offset | What |
+|---|---|
+| `+0x00` | the material (checked) |
+| `+0x04`..`+0x10` | number of colour channels, tex-gens, TEV stages, indirect stages |
+| `+0x14`..`+0xA3` | two colour channels: light enable byte and address word twice, then two 0x1C-byte channel blocks (two bytes, four words) |
+| `+0xA4` | eight 0x24-byte texture units (bytes at `+0x14`, `+0x1C`) |
+| `+0x1C4` | eight 0x34-byte tex-gens (`+0x00` byte, `+0x02`, `+0x04` halves, `+0x0C`..`+0x0F` and `+0x2C` bytes) |
+| `+0x364`, `+0x3A0` | three TEV colours, four constant colours: `{mode, four floats}` |
+| `+0x3F0` | four swap tables of four words |
+| `+0x430` | sixteen 0x68-byte TEV stages (bytes at `+0x00`, `+0x38`, `+0x5C`) |
+| `+0xAB0`, `+0xAF0` | four indirect stages; sixteen 0x20-byte indirect settings (bytes at `+0x18`, `+0x19`) |
+| `+0xCF0`..`+0xD1F` | a float, a word, then alpha compare, depth and cull settings (bytes at `+0xCFC`, `+0xCFD`, `+0xD10`..`+0xD12`, `+0xD1C`) |
+
+### Lights, attach points and the aim object
+
+- A type 2 scene object's list object also heads the zone's lights (`+0x10` head, `+0x14` tail, `+0x18`
+  count; a light is linked through its `+0x04`). The draw picks the three best lights of every visible
+  item (`fn_80185988`). Of a light, 0x60 bytes are converted: `+0x04` next, previous and list, `+0x10`
+  kind and `+0x12` flags (halves), `+0x14`..`+0x5F` floats (factor, position, attenuation, direction,
+  colours). The name behind them is text.
+- An entity's attach points (`+0x98`, count `+0x94`) are 0xC8-byte records that `fn_801EC080` updates
+  every frame: `+0x00` name hash, `+0x04` bone index (-1: the entity), `+0x08` local matrix, `+0x38`
+  world matrix, `+0x68` eight effect ids, `+0x88` the running effects, `+0xA8` started flags.
+- Slot object type 16 (`fn_800E5550`, vtable `lbl_80360200`) aims between locators: its four
+  reference words at `+0xA8`..`+0xB7` are converted (`fn_800E5684` resolves them with `fn_801ED684`).
 
 ### Batches of mesh parts
 

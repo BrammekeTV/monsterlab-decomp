@@ -475,6 +475,42 @@ def fnv(b):
         h = ((h ^ c) * 0x01000193) & 0xFFFFFFFF
     return h
 
+# Script functions with a sound argument (index in gScriptFuncs: mask of the sound arguments), as
+# kSirSoundCalls in src/port/sir_loader.cpp.
+SOUND_CALLS = {48: 1, 49: 1, 50: 1, 51: 2, 52: 2, 55: 2, 56: 2, 1216: 3, 1217: 3, 1238: 1, 1239: 1, 1297: 2, 1330: 2,
+               1332: 1, 1684: 3, 1693: 1}
+
+def sound_dump(L, sec, base, o, n, ptr):
+    """The sound objects the calls of the action program at offset o (n words) name: every
+    variation (0x30 bytes), its sound info and the info's DSP header."""
+    u = lambda q: struct.unpack_from('>I', sec, q)[0]
+    h = lambda q: struct.unpack_from('>H', sec, q)[0]
+    inz = lambda v, size: base <= v and v + size <= base + len(sec)
+    k = 0
+    while k < n:
+        w = u(o + k * 4)
+        op, ln = w & 0xFF, (w >> 8) & 0xFF
+        mask = SOUND_CALLS.get((w >> 16) & 0xFFF, 0) if op == 0x16 else 0
+        for a in range(ln - 1 if mask else 0):
+            snd = u(o + (k + 1 + a) * 4)
+            if not (mask >> a & 1) or not snd or not inz(snd, 0x30): continue
+            q = snd - base
+            for i in range(sec[q + 4] or 1):
+                e = q + i * 0x30
+                info = u(e)
+                line = 'sound img+0x%x %d info %s bytes %s pitch %08x f10 %08x words %s' % (q, i, ptr(info), sec[e + 4:e + 8].hex(),
+                    u(e + 8), u(e + 0x10), ' '.join('%08x' % u(e + 0x18 + j * 4) for j in range(5)))
+                if info and inz(info, 0x18):
+                    f = info - base
+                    dsp = u(f + 4)
+                    line += ' | %s %s size %d flag %d zone %d' % (ptr(u(f)), ptr(dsp), u(f + 8), h(f + 0xC), h(f + 0xE))
+                    if dsp and inz(dsp, 0x60):
+                        d = dsp - base
+                        line += ' | samples %d rate %d loop %d format %d ends %d %d sum %04x' % (u(d), u(d + 8), h(d + 0xC), h(d + 0xE),
+                            u(d + 0x10), u(d + 0x14), sum(h(d + 0x1C + j * 2) for j in range(34)) & 0xFFFF)
+                L.append(line)
+        k += ln if op <= 0x1B else 1
+
 def machines_dump(L, sec, base, hud_addr, list_addr, level=False, extra=()):
     """Appends the dump of a HUD and its state machines (global_binary.sir, or a level zone: there
     the HUD carries the screen-list slot at +0x434 and points at it from +0x24)."""
@@ -591,6 +627,20 @@ def texture_stream_dump(path):
             d[0x14:end].decode('ascii'), d[p], d[p + 1], d[p + 2], d[p + 3], w, h, q + 4))
     return L
 
+GX_STATE_SIZE = 0xD20
+def gx_state_slot(off):
+    # What the four bytes at off of a type 1 material's record hold (SirGxStateSlot): 0 word, 1 bytes,
+    # 2 the material pointer, 3 {u8, u8, u16}, 4 {u16, u8, u8}.
+    if off == 0: return 2
+    if off in (0x14, 0x1C, 0x24, 0x40, 0x5C, 0x64, 0x6C, 0x88, 0xCFC, 0xD10, 0xD1C): return 1
+    if 0xA4 <= off < 0x1C4: return 1 if (off - 0xA4) % 0x24 in (0x14, 0x1C) else 0
+    if 0x1C4 <= off < 0x364:
+        f = (off - 0x1C4) % 0x34
+        return 3 if f == 0 else 4 if f == 4 else 1 if f in (0xC, 0x2C) else 0
+    if 0x430 <= off < 0xAB0: return 1 if (off - 0x430) % 0x68 in (0, 0x38, 0x5C) else 0
+    if 0xAF0 <= off < 0xCF0: return 1 if (off - 0xAF0) % 0x20 == 0x18 else 0
+    return 0
+
 def level_dump(path):
     global OTHER_ZONE
     version, secs = read_archive(path)
@@ -623,6 +673,11 @@ def level_dump(path):
          'leveltables %s | %s | %s | %s | %s' % tuple(tab(o) for o in (0x1A4, 0x1B0, 0x1BC, 0x1C8, 0x1D4)),
          'levelstate %s b1ec %d w1f0 %d hud %s floats %s wa20 %d w1a7c %d floats %s' % (
             ws(0x1E0, 3), hdr[0x1EC], i32(0x1F0), ptr(u(0x1F4)), ws(0x1F8, 6), i32(0xA20), i32(0x1A7C), ws(0x1A84, 2)),
+         ] + [
+         # The three light records (0x1F8, 0x82C bytes each), as EntityUpdate reads them.
+         'levellight %d floats %s w20 %08x ids %d sum %08x flags %08x' % (k, ws(o, 8), u(o + 0x20), i32(o + 0x824),
+            sum(u(o + 0x24 + i * 4) for i in range(512)) & 0xFFFFFFFF, u(o + 0x828)) for k, o in enumerate((0x1F8, 0xA24, 0x1250))
+         ] + [
          'levelpicture %d %d floats %s' % (hdr[0x1A80], hdr[0x1A81], ws(0x1A84, 39)),
          'levellocators %d %s' % (u(0x24), ptr(u(0x28)))]
     for t in (0x1B0, 0x1BC):
@@ -681,7 +736,7 @@ def shared_zone_dump(L, zn, sec, slot_size, zone0, zbase0):
     if zbase0 <= rec and rec + 0x14 <= zbase0 + len(zone0):
         head = struct.unpack_from('>I', zone0, rec - zbase0 + 0x10)[0]
         if inz(head): lists.append(head)
-    zone_dump(L, sec, base, 0, roots, [], pooltabs, [], lists)
+    zone_dump(L, sec, base, 0, roots, [], pooltabs, [], lists, actiontabs=[u(0xD4)] if inz(u(0xD4), 8) else [])
     ss = u(0x100)
     if not inz(ss, 0x2C): return
     table = u(ss - base + 0x28)
@@ -1012,6 +1067,7 @@ def zone_dump(L, sec, base, hud, roots, scene_roots, pooltabs, records=(), lists
         n, bones, ops = u(o + 8), u(o + 4), u(o + 0xC)
         bsum = sum(u(off(bones) + i * 4) for i in range(n * 12)) & 0xFFFFFFFF if n and inz(bones, n * 0x30) else 0
         opl = ' '.join('%d' % u(off(ops) + i * 8 + 4) for i in range(n)) if n and inz(ops, n * 8) else '-'
+        if n and inz(ops, n * 8): opl += ' names ' + ' '.join('%08x' % u(off(ops) + i * 8) for i in range(n))
         am = u(o)
         asum = sum(u(off(am) + i * 4) for i in range(n * 12)) & 0xFFFFFFFF if n and inz(am, n * 0x30) else 0
         L.append('skeleton %s bones %s %d sum %08x ops %s : %s player %s block %s root %s a %s sum %08x' % (
@@ -1058,6 +1114,7 @@ def zone_dump(L, sec, base, hud, roots, scene_roots, pooltabs, records=(), lists
                 jumps += 4 <= op <= 0x11
                 n += ln if op <= 0x1B else 1
             L.append('zoneaction %d %s words %d calls %d jumps %d sum %08x' % (i, ptr(p), n + 1, calls, jumps, fnv(sec[o:o + (n + 1) * 4])))
+            sound_dump(L, sec, base, o, n, ptr)
     # The slots' placed effects (slot +0x80, count +0x9C), as WorldOnZoneLoaded reads them.
     seen_fx = set()
     for addr, n in sloteffects:
@@ -1077,7 +1134,13 @@ def zone_dump(L, sec, base, hud, roots, scene_roots, pooltabs, records=(), lists
         for v in items:
             if inz(v, 0xC) and v not in seen_objs:
                 seen_objs.add(v)
-                L.append('slotobject %s type %d' % (ptr(v), u(off(v) + 8)))
+                t = u(off(v) + 8)
+                if t == 15 and inz(v, 0x60):
+                    L.append('slotobject %s type %d track %08x %08x' % (ptr(v), t, u(off(v) + 0x58), u(off(v) + 0x5C)))
+                elif t == 16 and inz(v, 0xB8):
+                    L.append('slotobject %s type %d aim %s' % (ptr(v), t, ws(off(v) + 0xA8, 4)))
+                else:
+                    L.append('slotobject %s type %d' % (ptr(v), t))
     for addr, n in pooltabs:
         for i in range(n):
             e = off(addr) + i * 0x2C
@@ -1119,9 +1182,16 @@ def zone_dump(L, sec, base, hud, roots, scene_roots, pooltabs, records=(), lists
         a = ents[i]; i += 1
         if not inz(a, 0x1B4): continue
         o = off(a)
-        L.append('entity %s vtable %08x record %s parts %s scene %s w94 %d %d obj9c %s holder %s children %s f158 %08x more %s %d w1a8 %d flags %08x' % (
-            ptr(a), u(o), ptr(u(o + 4)), ptr(u(o + 0x8C)), ptr(u(o + 0x90)), i32(o + 0x94), i32(o + 0x98), ptr(u(o + 0x9C)), ptr(u(o + 0xA4)),
-            ptr(u(o + 0xB0)), u(o + 0x158), ptr(u(o + 0x194)), i32(o + 0x1A4), i32(o + 0x1A8), u(o + 0x1B0)))
+        L.append('entity %s vtable %08x record %s parts %s scene %s attach %d %s obj9c %s holder %s children %s f158 %08x more %s %d w1a8 %d flags %08x wb8 %08x' % (
+            ptr(a), u(o), ptr(u(o + 4)), ptr(u(o + 0x8C)), ptr(u(o + 0x90)), i32(o + 0x94), ptr(u(o + 0x98)), ptr(u(o + 0x9C)), ptr(u(o + 0xA4)),
+            ptr(u(o + 0xB0)), u(o + 0x158), ptr(u(o + 0x194)), i32(o + 0x1A4), i32(o + 0x1A8), u(o + 0x1B0), u(o + 0xB8)))
+        # The entity's attach points (+0x98, count +0x94), as fn_801EC080 reads them.
+        if u(o + 0x94) and inz(u(o + 0x98), u(o + 0x94) * 0xC8):
+            for k in range(u(o + 0x94)):
+                q = off(u(o + 0x98)) + k * 0xC8
+                L.append('entattach %s %d name %08x bone %d local %s world %s ids %s running %s started %s' % (
+                    ptr(a), k, u(q), i32(q + 4), ws(q + 8, 12), ws(q + 0x38, 12), ws(q + 0x68, 8),
+                    ' '.join(ptr(u(q + 0x88 + i * 4)) for i in range(8)), ws(q + 0xA8, 8)))
         r = u(o + 4)
         # The record of an entity outside zone 0 lies in zone 0's image, and so does its definition.
         def loc(v, n):
@@ -1206,6 +1276,24 @@ def zone_dump(L, sec, base, hud, roots, scene_roots, pooltabs, records=(), lists
         mat_texture(u(o + 0x1C))
         mat_texture(u(o + 0x20))
         x, r = u(o + 0x3C), u(o + 8)
+        if sec[o + 0xC] == 1 and inz(a, 0x5C):
+            # Type 1 (fn_80181DE0 -> fn_8017B9BC): eight textures, eight matrices, the record is a GX state.
+            L.append('material1 %s tex %s matrices %s' % (ptr(a), ' '.join(ptr(u(o + 0x1C + k * 4)) for k in range(8)),
+                ' '.join(ptr(u(o + 0x3C + k * 4)) for k in range(8))))
+            for k in range(2, 8): mat_texture(u(o + 0x1C + k * 4))
+            for k in range(1, 8):
+                xk = u(o + 0x3C + k * 4)
+                if inz(xk, 0x30): L.append('matmatrix %s %s' % (ptr(xk), ws(off(xk), 12)))
+            if inz(r, GX_STATE_SIZE):
+                q = off(r)
+                sums = [0, 0, 0]
+                for f in range(4, GX_STATE_SIZE, 4):
+                    kind = gx_state_slot(f)
+                    if kind == 0: sums[0] = (sums[0] + u(q + f)) & 0xFFFFFFFF
+                    elif kind == 1: sums[1] = (sums[1] + u(q + f)) & 0xFFFFFFFF
+                    elif kind == 3: sums[2] = (sums[2] + sec[q + f] * 256 + sec[q + f + 1] + h16(q + f + 2) * 3) & 0xFFFFFFFF
+                    else: sums[2] = (sums[2] + h16(q + f) * 5 + sec[q + f + 2] * 256 + sec[q + f + 3]) & 0xFFFFFFFF
+                L.append('matstate %s back %s counts %s words %08x bytes %08x halves %08x' % (ptr(r), ptr(u(q)), ws(q + 4, 4), sums[0], sums[1], sums[2]))
         if inz(x, 0x30): L.append('matmatrix %s %s' % (ptr(x), ws(off(x), 12)))
         if sec[o + 0xC] == 0 and inz(r, 0x68):
             q = off(r)
@@ -1254,6 +1342,14 @@ def zone_dump(L, sec, base, hud, roots, scene_roots, pooltabs, records=(), lists
         if t == 2 and inz(u(o + 0x4C), 0x3C):
             l = off(u(o + 0x4C))
             L.append('scenelist %s head %s tail %s count %d flagged %d' % (ptr(u(o + 0x4C)), ptr(u(l + 4)), ptr(u(l + 8)), i32(l + 0xC), i32(l + 0x38)))
+            L.append('scenelights %s head %s tail %s count %d' % (ptr(u(o + 0x4C)), ptr(u(l + 0x10)), ptr(u(l + 0x14)), i32(l + 0x18)))
+            node, seen = u(l + 0x10), set()
+            while node >= base + 4 and inz(node - 4, 0x60) and node not in seen:
+                seen.add(node)
+                q = off(node) - 4
+                L.append('scenelight %s w0 %08x %s kind %d flags %04x floats %s' % (ptr(node), u(q), link(q + 4),
+                    struct.unpack_from('>H', sec, q + 0x10)[0], struct.unpack_from('>H', sec, q + 0x12)[0], ws(q + 0x14, 19)))
+                node = u(off(node))
             node, seen = u(l + 4), set()
             while node >= base + 0xAC and inz(node - 0xAC, 0xB8) and node not in seen:
                 seen.add(node)
@@ -1372,6 +1468,7 @@ def image_dump(path):
             jumps += 4 <= op <= 0x11
             n += ln if op <= 0x1B else 1
         L.append('actionprog %d %s words %d calls %d jumps %d sum %08x' % (i, ptr(p), n + 1, calls, jumps, fnv(sec[o:o + (n + 1) * 4])))
+        sound_dump(L, sec, GB_BASE, o, n, ptr)
 
     # UI root (slot 0xDB0), its fonts and the objects of slots 0xDB4, 0xDB8, 0xDBC. Only the fields
     # the game code reads are decoded (docs/loader.md lists what is left).

@@ -47,6 +47,41 @@ static void PrintPtr(const u8* slot, const GlobalBinaryFile* f) {
     else printf("wii:%08x", *(const u32*)slot);
 }
 
+// The sound objects the calls of a converted action program (n words) name, as PlaySoundAt,
+// fn_801FE52C and fn_80203340 read them. An operand is the object's Wii address.
+static void DumpSounds(const GlobalBinaryFile* f, u32 wiiBase, const u32* pc, u32 n) {
+    for (u32 k = 0; k < n; k += (pc[k] & 0xFF) <= 0x1B ? (pc[k] >> 8) & 0xFF : 1) {
+        u32 len = (pc[k] >> 8) & 0xFF, mask = 0;
+        if ((pc[k] & 0xFF) != 0x16) continue;
+        for (u32 c = 0; c < SIR_SOUND_CALLS; c++) if (kSirSoundCalls[c].func == ((pc[k] >> 16) & 0xFFF)) mask = kSirSoundCalls[c].argMask;
+        for (u32 a = 0; mask != 0 && a + 1 < len; a++) {
+            u32 snd = pc[k + 1 + a];
+            if (!(mask >> a & 1) || snd < wiiBase || (u64)(snd - wiiBase) + 0x30 > f->imageSize) continue;
+            const u8* first = f->image + (snd - wiiBase);
+            for (u32 i = 0; i < (first[4] != 0 ? first[4] : 1u); i++) {
+                const u8* e = first + i * 0x30;
+                const u8* info = *(const u8**)e;
+                printf("sound img+0x%x %u info ", snd - wiiBase, i);
+                PrintPtr(e, f);
+                printf(" bytes %02x%02x%02x%02x pitch %08x f10 %08x words", e[4], e[5], e[6], e[7], *(const u32*)(e + 8), *(const u32*)(e + 0x10));
+                for (u32 j = 0; j < 5; j++) printf(" %08x", *(const u32*)(e + 0x18 + j * 4));
+                if (info >= f->image && info + 0x18 <= f->image + f->imageSize) {
+                    const u8* dsp = *(const u8**)(info + 4);
+                    printf(" | "); PrintPtr(info, f); printf(" "); PrintPtr(info + 4, f);
+                    printf(" size %u flag %u zone %u", *(const u32*)(info + 8), *(const u16*)(info + 0xC), *(const u16*)(info + 0xE));
+                    if (dsp >= f->image && dsp + 0x60 <= f->image + f->imageSize) {
+                        u32 sum = 0;
+                        for (u32 j = 0; j < 34; j++) sum += *(const u16*)(dsp + 0x1C + j * 2);
+                        printf(" | samples %u rate %u loop %u format %u ends %u %u sum %04x", *(const u32*)dsp, *(const u32*)(dsp + 8),
+                               *(const u16*)(dsp + 0xC), *(const u16*)(dsp + 0xE), *(const u32*)(dsp + 0x10), *(const u32*)(dsp + 0x14), sum & 0xFFFF);
+                    }
+                }
+                printf("\n");
+            }
+        }
+    }
+}
+
 static u32 Fnv(const u8* p, u32 n) {
     u32 h = 0x811C9DC5u;
     for (u32 i = 0; i < n; i++) h = (h ^ p[i]) * 0x01000193u;
@@ -194,6 +229,7 @@ static void DumpImage(const GlobalBinaryFile* f) {
         printf("actionprog %u ", i);
         PrintPtr((const u8*)&at->records[i], f);
         printf(" words %u calls %u jumps %u sum %08x\n", n + 1, calls, jumps, h);
+        DumpSounds(f, GLOBAL_BINARY_WII_BASE, pc, n);
     }
 }
 
@@ -797,7 +833,11 @@ struct ZoneDump {
         bool haveBones = n != 0 && In(bones, n * 0x30);
         for (u32 i = 0; haveBones && i < n * 12; i++) sum += *(const u32*)(bones + i * 4);
         printf("skeleton "); Val(s); printf(" bones "); Ptr(s + 4); printf(" %u sum %08x ops ", n, sum); Ptr(s + 0xC); printf(" :");
-        if (n != 0 && In(ops, n * 8)) { for (u32 i = 0; i < n; i++) printf(" %u", *(const u32*)(ops + i * 8 + 4)); }
+        if (n != 0 && In(ops, n * 8)) {
+            for (u32 i = 0; i < n; i++) printf(" %u", *(const u32*)(ops + i * 8 + 4));
+            printf(" names");
+            for (u32 i = 0; i < n; i++) printf(" %08x", *(const u32*)(ops + i * 8));
+        }
         else printf(" -");
         printf(" player "); Ptr(s + 0x14); printf(" block "); Ptr(s + 0x18); printf(" root "); Ptr(s + 0x1C); printf(" a "); Ptr(s);
         u32 asum = 0;
@@ -883,6 +923,7 @@ struct ZoneDump {
                 for (u32 k = 0; k <= n; k++)
                     for (s32 shift = 24; shift >= 0; shift -= 8) h = (h ^ ((pc[k] >> shift) & 0xFF)) * 0x01000193u;
                 printf(" words %u calls %u jumps %u sum %08x\n", n + 1, calls, jumps, h);
+                DumpSounds(z, zoneBase, pc, n);
             }
         }
         for (u32 t = 0; t < roots->slotEffectCount; t++) {
@@ -912,7 +953,10 @@ struct ZoneDump {
                 const u8* o = *(const u8**)(list + i * 4);
                 if (!In(o, 0xC) || std::find(seen.begin(), seen.end(), o) != seen.end()) continue;
                 seen.push_back(o);
-                printf("slotobject "); Val(o); printf(" type %u\n", *(const u32*)(o + 8));
+                printf("slotobject "); Val(o); printf(" type %u", *(const u32*)(o + 8));
+                if (*(const u32*)(o + 8) == 15 && In(o, 0x60)) printf(" track %08x %08x", *(const u32*)(o + 0x58), *(const u32*)(o + 0x5C));
+                if (*(const u32*)(o + 8) == 16 && In(o, 0xB8)) { printf(" aim "); Words(o + 0xA8, 4); }
+                printf("\n");
             }
         }
     }
@@ -1070,6 +1114,29 @@ struct ZoneDump {
         MatTexture(*(const u8**)(mat + 0x20));
         const u8* x = *(const u8**)(mat + 0x3C);
         const u8* r = *(const u8**)(mat + 8);
+        if (mat[0x0C] == 1 && In(mat, 0x5C)) {
+            // Type 1 (fn_80181DE0 -> fn_8017B9BC): eight textures, eight matrices, the record is a GX state.
+            printf("material1 "); Val(mat); printf(" tex "); Ptrs(mat + 0x1C, 8); printf(" matrices "); Ptrs(mat + 0x3C, 8); printf("\n");
+            for (u32 k = 2; k < 8; k++) MatTexture(*(const u8**)(mat + 0x1C + k * 4));
+            for (u32 k = 1; k < 8; k++) {
+                const u8* xk = *(const u8**)(mat + 0x3C + k * 4);
+                if (In(xk, 0x30)) { printf("matmatrix "); Val(xk); printf(" "); Floats(xk, 12); printf("\n"); }
+            }
+            if (In(r, SIR_GX_STATE_SIZE)) {
+                u32 words = 0, bytes = 0, halves = 0;
+                for (u32 f = 4; f < SIR_GX_STATE_SIZE; f += 4) {
+                    const u8* q = r + f;
+                    switch (SirGxStateSlot(f)) {
+                    case SIR_GX_WORD:      words += *(const u32*)q; break;
+                    case SIR_GX_BYTES:     bytes += (u32)q[0] << 24 | (u32)q[1] << 16 | (u32)q[2] << 8 | q[3]; break;
+                    case SIR_GX_BYTES_U16: halves += q[0] * 256u + q[1] + *(const u16*)(q + 2) * 3u; break;
+                    default:               halves += *(const u16*)q * 5u + q[2] * 256u + q[3]; break;
+                    }
+                }
+                printf("matstate "); Val(r); printf(" back "); Ptr(r); printf(" counts "); Words(r + 4, 4);
+                printf(" words %08x bytes %08x halves %08x\n", words, bytes, halves);
+            }
+        }
         if (In(x, 0x30)) { printf("matmatrix "); Val(x); printf(" "); Floats(x, 12); printf("\n"); }
         if (mat[0x0C] == 0 && In(r, 0x68)) {
             printf("matrec "); Val(r); printf(" back "); Ptr(r); printf(" b4 "); Hex(r + 4, 4); printf(" floats "); Floats(r + 8, 16);
@@ -1331,10 +1398,17 @@ struct ZoneDump {
             if (!In(e, ENTITY_USED)) continue;
             printf("entity "); Val(e); printf(" vtable %08x record ", *(const u32*)e); Ptr(e + 4);
             printf(" parts "); Ptr(e + 0x8C); printf(" scene "); Ptr(e + 0x90);
-            printf(" w94 %d %d obj9c ", *(const s32*)(e + 0x94), *(const s32*)(e + 0x98)); Ptr(e + 0x9C);
+            printf(" attach %d ", *(const s32*)(e + 0x94)); Ptr(e + 0x98); printf(" obj9c "); Ptr(e + 0x9C);
             printf(" holder "); Ptr(e + 0xA4); printf(" children "); Ptr(e + 0xB0);
             printf(" f158 %08x more ", Bits(*(const f32*)(e + 0x158))); Ptr(e + 0x194);
-            printf(" %d w1a8 %d flags %08x\n", *(const s32*)(e + 0x1A4), *(const s32*)(e + 0x1A8), *(const u32*)(e + 0x1B0));
+            printf(" %d w1a8 %d flags %08x wb8 %08x\n", *(const s32*)(e + 0x1A4), *(const s32*)(e + 0x1A8), *(const u32*)(e + 0x1B0), *(const u32*)(e + 0xB8));
+            const u8* points = *(const u8**)(e + 0x98);
+            for (u32 k = 0; *(const u32*)(e + 0x94) != 0 && In(points, *(const u32*)(e + 0x94) * 0xC8) && k < *(const u32*)(e + 0x94); k++) {
+                const u8* q = points + k * 0xC8;
+                printf("entattach "); Val(e); printf(" %u name %08x bone %d local ", k, *(const u32*)q, *(const s32*)(q + 4)); Words(q + 8, 12);
+                printf(" world "); Words(q + 0x38, 12); printf(" ids "); Words(q + 0x68, 8); printf(" running "); Ptrs(q + 0x88, 8);
+                printf(" started "); Words(q + 0xA8, 8); printf("\n");
+            }
             const u8* r = *(const u8**)(e + 4);
             if (InAny(r, ENTITY_RECORD_SIZE)) {
                 printf("entrecord "); Val(r); printf(" floats");
@@ -1399,6 +1473,17 @@ struct ZoneDump {
             if (In(list, 0x3C)) {
                 printf("scenelist "); Val(list); printf(" head "); Ptr(list + 4); printf(" tail "); Ptr(list + 8);
                 printf(" count %d flagged %d\n", *(const s32*)(list + 0xC), *(const s32*)(list + 0x38));
+                printf("scenelights "); Val(list); printf(" head "); Ptr(list + 0x10); printf(" tail "); Ptr(list + 0x14);
+                printf(" count %d\n", *(const s32*)(list + 0x18));
+                std::vector<const u8*> seenLights;
+                for (const u8* node = *(const u8**)(list + 0x10); node != NULL && In(node - 4, 0x60) && std::find(seenLights.begin(), seenLights.end(), node) == seenLights.end();
+                     node = *(const u8**)node) {
+                    seenLights.push_back(node);
+                    const u8* q = node - 4;
+                    printf("scenelight "); Val(node); printf(" w0 %08x next ", *(const u32*)q); Ptr(q + 4); printf(" prev "); Ptr(q + 8);
+                    printf(" owner "); Ptr(q + 0xC); printf(" kind %u flags %04x floats ", *(const u16*)(q + 0x10), *(const u16*)(q + 0x12));
+                    Words(q + 0x14, 19); printf("\n");
+                }
                 std::vector<const u8*> seen;
                 for (const u8* node = *(const u8**)(list + 4); node != NULL && In(node - 0xAC, 0xB8) && std::find(seen.begin(), seen.end(), node) == seen.end();
                      node = *(const u8**)node) {
@@ -1500,6 +1585,15 @@ static int DumpLevel(const char* path) {
     for (u32 k = 0; k < 6; k++) printf(" %08x", Bits(*(const f32*)(h + 0x1F8 + k * 4)));
     printf(" wa20 %d w1a7c %d floats %08x %08x\n", *(const s32*)(h + 0xA20), *(const s32*)(h + 0x1A7C), Bits(*(const f32*)(h + 0x1A84)),
            Bits(*(const f32*)(h + 0x1A88)));
+    // The three light records (0x1F8, 0x82C bytes each), as EntityUpdate reads them.
+    for (u32 k = 0; k < 3; k++) {
+        const u8* rec = h + 0x1F8 + k * 0x82C;
+        u32 sum = 0;
+        for (u32 i = 0; i < 512; i++) sum += *(const u32*)(rec + 0x24 + i * 4);
+        printf("levellight %u floats", k);
+        for (u32 i = 0; i < 8; i++) printf(" %08x", Bits(*(const f32*)(rec + i * 4)));
+        printf(" w20 %08x ids %d sum %08x flags %08x\n", *(const u32*)(rec + 0x20), *(const s32*)(rec + 0x824), sum, *(const u32*)(rec + 0x828));
+    }
     printf("levelpicture %u %u floats", h[0x1A80], h[0x1A81]);
     for (u32 k = 0; k < 39; k++) printf(" %08x", Bits(*(const f32*)(h + 0x1A84 + k * 4)));
     printf("\n");
@@ -1631,6 +1725,7 @@ static int DumpLevel(const char* path) {
             const u8* setHost = set >= sbase && set - sbase <= sec.size ? img + (set - sbase) : NULL;
             printf(" screens "); if (setHost != NULL) printf("img+0x%x\n", set - sbase); else if (set == 0) printf("null\n"); else printf("wii:%08x\n", set);
             for (u32 k = 0; k < sroots.entityCount; k++) sd.Add(sd.ents, img + (sroots.entities[k] - sbase));
+            sd.SlotObjects(&sroots, sbase);                      // the zone's action table
             sd.PoolTables(&sroots, sbase);
             sd.Entities();
             sd.Records(&sroots, sbase);
@@ -2225,7 +2320,7 @@ static SirError ConvertBuilt(u8* hdr, u8* img, SirReloc* r, s32* failTable) {
 #define L_MESH     0xCC0u                     // the entry's mesh: one part at +0x70; the matrix's second half ends here
 #define L_BATCH    0xF40u                     // the part's batch, 0x28 used: counts, flags, the display list's offset and size
 #define L_OBJLIST  0xD60u                     // slot 0's objects: one pointer
-#define L_OBJ      0xD70u                     // the object: type word at +0x08
+#define L_OBJ      0xFC0u                     // the object: type word at +0x08, a camera track (type 15): handle +0x58, clip hash +0x5C
 #define L_FXLIST   0xD80u                     // slot 0's placed effects: one pointer
 #define L_FX       0xD90u                     // the effect, 0x20
 #define L_MAT      0xDC0u                     // the part's material (type 0, pass 1): 0x60 used
@@ -2234,7 +2329,7 @@ static SirError ConvertBuilt(u8* hdr, u8* img, SirReloc* r, s32* failTable) {
 #define L_MTEX     0xEC0u                     // its texture: header 0x54, pixel data 0x20 behind it
 #define L_MTEXD    0xF20u
 #define L_BATCHDL  0xF80u                     // its display list, 0x20
-#define L_ZONE_SIZE 0xFC0u
+#define L_ZONE_SIZE 0x1040u
 #define L_ZONE1    0x90980000u                // Wii address of zone 1: an entity at 0x10, a list object at 0x200
 #define L_ENT1     0x10u                      // the entity slot 1's second table names
 #define L_ZONE1_SIZE 0x300u
@@ -2278,6 +2373,7 @@ static void BuildLevel(u8* hdr, u8* zone) {
     Put32(s0 + 0x0A8, L_ZONE + L_OBJLIST); s0[0xAC] = 1;
     Put32(zone + L_OBJLIST, L_ZONE + L_OBJ);
     Put32(zone + L_OBJ + 0x00, 0x804B25D0); Put32(zone + L_OBJ + 0x04, 0xCC05AC21); Put32(zone + L_OBJ + 0x08, 15);
+    Put32(zone + L_OBJ + 0x58, 0x80090020); Put32(zone + L_OBJ + 0x5C, 0x94F99D89);   // a camera track: entity handle, clip hash
     Put32(s0 + 0x080, L_ZONE + L_FXLIST); Put32(s0 + 0x09C, 1);
     Put32(zone + L_FXLIST, L_ZONE + L_FX);
     Put32(zone + L_FX + 0x00, 0xCA1557FC); Put32(zone + L_FX + 0x04, 0x40000000); Put32(zone + L_FX + 0x08, 0);
@@ -2504,7 +2600,8 @@ static void LevelSelfTest(void) {
     // A shared zone: the image starts with a copy of its zone slot, which names a screen set; the
     // set's table leads to a tree of two nodes, a widget and its one child.
     {
-        const u32 SH = 0x924C0000u, SH_SIZE = 0xAC0u;
+        const u32 SH = 0x924C0000u, SH_SIZE = 0xB00u;
+        const u32 SOUND = 0xAC0;                               // the sound object of the entry of kind 3 (no sound info)
         const u32 TEXT = 0x8A0, TBUF = 0xAA0;                  // a text (kind 1) and its characters
         // An animation in the set's table at +0x20: one track with two keys, and one event entry.
         const u32 ATABLE = 0x720, ANODE = 0x730, ANIM = 0x750, TRACK = 0x780, TLIST = 0x7A0, KEYS = 0x7C0;
@@ -2541,7 +2638,8 @@ static void LevelSelfTest(void) {
         Put32(sh + EVENTS + 0x04, SH + ELIST); Put32(sh + EVENTS + 0x08, 0xFFFFFFFF);
         Put32(sh + ELIST + 0x00, 1); Put32(sh + ELIST + 0x04, 1); Put32(sh + ELIST + 0x08, 0x30); Put32(sh + ELIST + 0x10, SH + ENTRIES);
         memset(sh + ENTRIES, 0, 0x30);
-        Put32(sh + ENTRIES + 0x00, 0x3E000000); Put32(sh + ENTRIES + 0x10, SH + NAMED); Put32(sh + ENTRIES + 0x24, 3);
+        Put32(sh + ENTRIES + 0x00, 0x3E000000); Put32(sh + ENTRIES + 0x10, SH + SOUND); Put32(sh + ENTRIES + 0x24, 3);
+        memset(sh + SOUND, 0, 0x30);
         Put32(sh + TABLE + 0, SH + NODE_A); Put32(sh + TABLE + 4, SH + NODE_B); Put32(sh + TABLE + 8, SH + NODE_A);
         Put32(sh + NODE_A + 0x00, 0x80000000); Put32(sh + NODE_A + 0x04, SH + WIDGET);
         Put32(sh + NODE_A + 0x0C, SH + NODE_B); Put32(sh + NODE_A + 0x10, 0);
@@ -2573,7 +2671,7 @@ static void LevelSelfTest(void) {
         Put32(sh + CHILD + 0x074, 0x44200000); Put32(sh + CHILD + 0x0A8, 0x0003FFFF); Put32(sh + CHILD + 0x0AC, 0x0003FFFF);
         Put32(sh + CHILD + 0x0C0, 0x3F800000); Put32(sh + CHILD + 0x11C, 0x3F800000); Put32(sh + CHILD + 0x128, SH + WIDGET);
         Put32(sh + CHILD + 0x060, 3); Put32(sh + CHILD + 0x13C, 1);
-        Put32(sh + CHILD + 0x15C, SH + LIST);
+        Put32(sh + CHILD + 0x15C, SH + LIST); Put32(sh + CHILD + 0x160, 0);                       // its fill picture: none
         Put32(sh + LIST + 0x00, 1); Put32(sh + LIST + 0x04, 2); Put32(sh + LIST + 0x08, 4); Put32(sh + LIST + 0x10, SH + ITEMS);
         Put32(sh + ITEMS, SH + WIDGET);
         SirReloc rs;
@@ -2636,7 +2734,7 @@ static void LevelSelfTest(void) {
         CHECK(*(const f32*)(keys + 0x30) == 1.0f && *(const f32*)(keys + 0x40) == 2.0f);
         const u8* entry = *(const u8**)(*(const u8**)(sh + EVENTS + 4) + 0x10);
         CHECK(*(const s32*)(sh + EVENTS + 8) == -1 && entry == sh + ENTRIES && *(const f32*)entry == 0.125f);
-        CHECK(*(const s32*)(entry + 0x24) == 3 && *(const u8**)(entry + 0x10) == sh + NAMED);
+        CHECK(*(const s32*)(entry + 0x24) == 3 && *(const u8**)(entry + 0x10) == sh + SOUND);
         const u8* ev = *(const u8**)(child + 4);
         CHECK(ev == sh + EVENT && *(const u8**)ev == NULL && *(const u32*)(ev + 4) == 0x705598E1 && *(const u32*)(ev + 8) == 0x17140061);
         // The child's kind, as fn_8019914C reads it, and its list as fn_8019555C / fn_8019552C do.
@@ -2774,6 +2872,7 @@ static void LevelSelfTest(void) {
     // reader yet and stays), and its placed effects as WorldOnZoneLoaded reads them.
     const u8* obj = **(const u8***)(s0 + 0xA8);
     CHECK(obj == zone + L_OBJ && *(const u32*)(obj + 8) == 15 && obj[4] == 0xCC && obj[7] == 0x21);
+    CHECK(*(const u32*)(obj + 0x58) == 0x80090020 && *(const u32*)(obj + 0x5C) == 0x94F99D89 && obj[0x54] == 0x7F);
     const u8* fx = **(const u8***)(s0 + 0x80);
     CHECK(*(const u32*)(s0 + 0x9C) == 1 && fx == zone + L_FX && *(const u32*)fx == 0xCA1557FC && *(const f32*)(fx + 4) == 2.0f);
     CHECK(*(const f32*)(fx + 0x18) == 1.0f && *(const u8**)(fx + 0x1C) == NULL);

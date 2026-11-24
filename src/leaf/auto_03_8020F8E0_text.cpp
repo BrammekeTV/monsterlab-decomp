@@ -160,13 +160,13 @@ extern "C" void LabOnDiscoveryReward(u8* a3, s32 a4, s32 a5) {
 }
 
 // 0x8021D310
-extern "C" u8 fn_8021D310(u8* a3) {
+extern "C" u32 fn_8021D310(u8* a3) {
     u8 t0 = *(u8*)(((u8*)(uintptr_t)(a3)) + 73);
     return (u8)(t0);
 }
 
 // 0x8021D318
-extern "C" u8 fn_8021D318(u8* a3) {
+extern "C" u32 fn_8021D318(u8* a3) {
     u8 t0 = *(u8*)(((u8*)(uintptr_t)(a3)) + 72);
     return (u8)(t0);
 }
@@ -182,7 +182,7 @@ extern "C" void PartSetEnhancement(u8* a3, s32 a4) {
 }
 
 // 0x8021EE94
-extern "C" u8 fn_8021EE94(u8* a3) {
+extern "C" u32 fn_8021EE94(u8* a3) {
     u8 t0 = *(u8*)(((u8*)(uintptr_t)(a3)) + 44);
     return (u8)(t0);
 }
@@ -194,7 +194,7 @@ extern "C" s32 PartGetCurrentHealth(u8* a3) {
 }
 
 // 0x8021EF70
-extern "C" u8 fn_8021EF70(u8* a3) {
+extern "C" u32 fn_8021EF70(u8* a3) {
     u8 t0 = *(u8*)(((u8*)(uintptr_t)(a3)) + 17);
     u32 t1 = (u32)(t0) + (u32)(uintptr_t)(a3);
     u8 t2 = *(u8*)((u8*)(uintptr_t)(t1) + 17);
@@ -202,7 +202,7 @@ extern "C" u8 fn_8021EF70(u8* a3) {
 }
 
 // 0x8021EFE8
-extern "C" u8 fn_8021EFE8(u8* a3) {
+extern "C" u32 fn_8021EFE8(u8* a3) {
     u8 t0 = *(u8*)(((u8*)(uintptr_t)(a3)) + 31);
     return (u8)(t0);
 }
@@ -218,7 +218,7 @@ extern "C" void fn_8021F35C(u8* a3) {
 }
 
 // 0x8021F448
-extern "C" u16 fn_8021F448(u8* a3) {
+extern "C" u32 fn_8021F448(u8* a3) {
     u8* t0 = *(u8**)(((u8*)(uintptr_t)(a3)) + 4);
     u16 t1 = *(u16*)(t0 + 10);
     return (u16)(t1);
@@ -337,7 +337,7 @@ extern "C" u32 fn_8022014C(s32 a3, s32 a4) {
 }
 
 // 0x8022015C
-extern "C" u8 fn_8022015C(u8* a3) {
+extern "C" u32 fn_8022015C(u8* a3) {
     u8* t0 = *(u8**)(((u8*)(uintptr_t)(a3)) + 80);
     u8 t1 = *(u8*)(t0 + 28);
     return (u8)(t1);
@@ -386,7 +386,7 @@ extern "C" void fn_80220A0C(s32 a3) {
 }
 
 // 0x80220A14
-extern "C" u8 fn_80220A14(void) {
+extern "C" u32 fn_80220A14(void) {
     u8 t0 = *(u8*)((u8*)&lbl_805FBBD8);
     return (u8)(t0);
 }
@@ -397,7 +397,7 @@ extern "C" void fn_80220A1C(s32 a3) {
 }
 
 // 0x80220A24
-extern "C" u8 IsOnlineBattle(void) {
+extern "C" u32 IsOnlineBattle(void) {
     u8 t0 = *(u8*)((u8*)&lbl_805FBBD9);
     return (u8)(t0);
 }
@@ -466,7 +466,7 @@ extern "C" void fn_80225C10(u8* a3, s32 a4, s32 a5, s32 a6) {
 }
 
 // 0x80225F60
-extern "C" u8 SaveIsVerticalSlice(u8* a3) {
+extern "C" u32 SaveIsVerticalSlice(u8* a3) {
     u8 t0 = *(u8*)(((u8*)(uintptr_t)(a3)) + 2596);
     return (u8)(t0);
 }
