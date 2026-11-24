@@ -979,6 +979,13 @@ def level_zone_dump(L, zn, zone0, zbase, u, base, count, stride, zone0_image, zb
     hud = u(0x1F4)
     locators = (u(0x28), u(0x24)) if u(0x24) and inz(u(0x28)) else None
     zone_dump(L, zone0, zbase, hud if inz(hud) else 0, roots, scene, pooltabs, records, lists, slotobjs, sloteffects, actiontabs, locators)
+    # The part resource table (header +0x44 pointer array, +0x48 count): 0x10-byte entries {users, name hash, object, zone}.
+    pt, pn = u(0x44), u(0x48)
+    if pn and inz(pt) and inz(pt + pn * 4 - 1):
+        zu = lambda o: struct.unpack_from('>I', zone0, o - zbase)[0]
+        for i in range(pn):
+            e = zu(pt + i * 4)
+            if inz(e) and inz(e + 15): L.append('partentry %d %08x %08x %08x %08x' % (i, zu(e), zu(e + 4), zu(e + 8), zu(e + 12)))
 
 FIXUP_ENTITY, FIXUP_PART, FIXUP_POOLED, FIXUP_PROJECTILE, FIXUP_RENDER, FIXUP_FSM = 651, 652, 653, 654, 655, 656
 
