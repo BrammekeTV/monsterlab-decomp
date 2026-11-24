@@ -388,6 +388,7 @@ void OSShutdownSystem(void) { PortStop(0, "the game asked to shut down"); }
 void OSReturnToDataManager(void) { PortStop(0, "the game asked to open the Wii data manager"); }
 
 void DCFlushRange(void* addr, u32 size) {}
+void DCStoreRange(void* addr, u32 size) {}
 void DCInvalidateRange(void* addr, u32 size) {}
 
 void OSInit(void) {

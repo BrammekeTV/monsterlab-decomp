@@ -924,6 +924,7 @@ struct PortBoot {
             else if (!strcmp(a, "--window")) gPortOptions.window = TRUE;
             else if (!strcmp(a, "--wav") && i + 1 < __argc) gPortOptions.wav = __argv[++i];
             else if (!strcmp(a, "--no-audio")) gPortOptions.noAudio = TRUE;
+            else if (!strcmp(a, "--no-movies")) gPortOptions.noMovies = TRUE;
             else if (!strcmp(a, "--peek") && i + 1 < __argc && sPeekCount < 8) sPeek[sPeekCount++] = strtoul(__argv[++i], NULL, 16);
             else if (!strcmp(a, "--watch") && i + 1 < __argc) sWatch = strtoul(__argv[++i], NULL, 16);
             else if (!strcmp(a, "--show-texture") && i + 1 < __argc) gPortOptions.showTexture = atoi(__argv[++i]);
