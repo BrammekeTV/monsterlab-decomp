@@ -7,6 +7,9 @@
              --cases N      inputs per function (default 40)       --seed N   (default 1)
              --audited / --unaudited   only functions in / not in docs/audit_log.txt
              --show-known / --strict   list / ignore tools/difftest/known_limits.txt (harness limits)
+             --globals      some cases point zero global pointers (gBattle, ...) at the test's buffers (more functions run; the
+                            C++ must keep that global at its original address, else a false MISMATCH)
+             --files S      only functions whose source file path contains S (comma-separated)
              --no-leaf      leave out the generated src/leaf functions
              --iso PATH     the game disc (default: orig/RM7P4F)   --no-build
 
@@ -92,7 +95,7 @@ def main():
     aud = sigs.audited()
     seed, cases = int(opt(argv, "--seed", "1")), int(opt(argv, "--cases", "40"))
     data = ["--iso", opt(argv, "--iso")] if "--iso" in argv else []
-    header = f"seed {seed}\ncalls {1 if '--calls' in argv else 0}\n"
+    header = f"seed {seed}\ncalls {1 if '--calls' in argv else 0}\nglobals {1 if '--globals' in argv else 0}\n"
     one = opt(argv, "--fn")
     if one:
         key = one.lower()
@@ -105,6 +108,9 @@ def main():
             header += f"only {int(opt(argv, '--case'))}\n"
     else:
         pick = funcs
+        if "--files" in argv:
+            keys = opt(argv, "--files").split(",")
+            pick = [f for f in pick if any(k in f["file"] for k in keys)]
         if "--no-leaf" in argv:
             pick = [f for f in pick if not f["generated"]]
         if "--audited" in argv:

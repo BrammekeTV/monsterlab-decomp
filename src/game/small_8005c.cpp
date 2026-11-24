@@ -201,14 +201,14 @@ extern "C" void fn_800598E8(u8* self, s32 flag) {
 }
 
 // 0x8005A200
-// Returns 1 when the float at (obj+4)->+0x24 is greater than lbl_805FD300 and either
+// Returns 1 when the float at (obj+4)->+0x24 is at most lbl_805FD300 and either
 // flag 0x20 at (obj+4)->+0x1C is clear and the flag 0x80 at obj+0x838 is set, or flag
 // 0x20 at (obj+4)->+0x1C is set. Otherwise 0.
 extern "C" BOOL fn_8005A200(u8* obj) {
     s32 result = 0;
     u8* p = *(u8**)(obj + 0x4);
     f32 t = *(f32*)(p + 0x24);
-    if (!(t <= lbl_805FD300)) {
+    if (t <= lbl_805FD300) {   // cror eq, lt, eq; bne skips
         u32 flags = *(u32*)(p + 0x1C);
         if ((flags & 0x20) != 0) {
             result = 1;

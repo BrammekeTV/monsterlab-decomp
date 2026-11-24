@@ -115,7 +115,7 @@ u8* fn_8011F570(u8* arg0, s32 arg1) {
 void fn_8021F94C(u8* arg0, f32 farg0) {
     u32 v = fn_8021F454(*(u8**)arg0) & 0xFFFFu;
     f32 prod = farg0 * (f32)v;
-    *(u32*)(arg0 + 0x10) = (u32)prod;
+    *(u32*)(arg0 + 0x10) = prod < 0.0f ? 0u : prod >= 4294967296.0f ? 0xFFFFFFFFu : (u32)prod;   // __cvt_fp2unsigned clamps
 }
 
 // 0x80029CA0

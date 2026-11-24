@@ -745,7 +745,7 @@ void BattleOnListenerDone(u8* b, u32 who) {
     BOOL all = TRUE;
     for (s32 i = 0; i < *(s32*)(b + 0xA30); i++) {
         if (*(u32*)(b + 0xA1C + i * 4) == who) b[0xA2C + i] = 1;
-        all = all && b[0xA2C + i] != 0;
+        all = (all & b[0xA2C + i]) != 0;                 // bit 0 only (and r5, r8, r0)
     }
     if (!all) return;
     if (b[0xACC] == 0) {
