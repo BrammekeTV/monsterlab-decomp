@@ -6,6 +6,7 @@
     options: --calls        also functions that call decompiled game functions (default: leaf functions only)
              --cases N      inputs per function (default 40)       --seed N   (default 1)
              --audited / --unaudited   only functions in / not in docs/audit_log.txt
+             --show-known / --strict   list / ignore tools/difftest/known_limits.txt (harness limits)
              --no-leaf      leave out the generated src/leaf functions
              --iso PATH     the game disc (default: orig/RM7P4F)   --no-build
 
@@ -132,14 +133,21 @@ def main():
             print(f"  {min(i + CHUNK, len(jobs))}/{len(jobs)}", file=sys.stderr, flush=True)
 
     # Report.
-    order = ["MATCH", "MISMATCH", "CRASH", "HANG", "UNTESTED", "UNSUPPORTED", "NOIMPL", "ERROR"]
+    order = ["MATCH", "KNOWN", "MISMATCH", "CRASH", "HANG", "UNTESTED", "UNSUPPORTED", "NOIMPL", "ERROR"]
+    known = {}
+    for l in open(os.path.join(ROOT, "tools", "difftest", "known_limits.txt")):
+        if l.strip() and not l.startswith("#"):
+            a, _, why = l.strip().partition(" ")
+            known[int(a, 16)] = why
     rows, lines = [], []
     count = {s: [0, 0] for s in order}
     for f in pick:
         r = results.get(f["addr"], {"status": "ERROR", "why": "no result", "detail": []})
+        if r["status"] in ("MISMATCH", "CRASH", "HANG") and f["addr"] in known and "--strict" not in argv:
+            r = dict(r, status="KNOWN", why=known[f["addr"]])
         count.setdefault(r["status"], [0, 0])[0 if f["addr"] in aud else 1] += 1
         rows.append({"addr": f"0x{f['addr']:08X}", "name": f["name"], "file": f["file"], "sig": f["sig"], "audited": f["addr"] in aud, **r})
-    bad = [r for r in rows if r["status"] in ("MISMATCH", "CRASH", "HANG")]
+    bad = [r for r in rows if r["status"] in ("MISMATCH", "CRASH", "HANG") or (r["status"] == "KNOWN" and "--show-known" in argv)]
     for r in bad:
         lines.append(f"{r['status']} {r['name']} ({r['addr']}, {r['file']}{', audited' if r['audited'] else ''}): {r.get('why', '')}")
         lines += ["    " + d for d in r["detail"]]

@@ -325,7 +325,7 @@ s32 fn_801E2470(u32* arg0, u32 arg1, u32 arg2, void* arg3, void* arg4) {
 
     if ((u8)arg2 != 0) {
         for (u32 i = 0; i < arg1; i++) {
-            if (arg2 & (1u << i)) {
+            if (arg2 & PpcSlw(1u, i)) {
                 u32 h = slots[i];
                 s32 isNull = 0;
                 if (h == kHashThis) {
