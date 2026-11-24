@@ -955,6 +955,7 @@ struct ZoneDump {
                 seen.push_back(o);
                 printf("slotobject "); Val(o); printf(" type %u", *(const u32*)(o + 8));
                 if (*(const u32*)(o + 8) == 15 && In(o, 0x60)) printf(" track %08x %08x", *(const u32*)(o + 0x58), *(const u32*)(o + 0x5C));
+                if (*(const u32*)(o + 8) == 16 && In(o, 0xB8)) { printf(" aim "); Words(o + 0xA8, 4); }
                 printf("\n");
             }
         }
@@ -1113,6 +1114,29 @@ struct ZoneDump {
         MatTexture(*(const u8**)(mat + 0x20));
         const u8* x = *(const u8**)(mat + 0x3C);
         const u8* r = *(const u8**)(mat + 8);
+        if (mat[0x0C] == 1 && In(mat, 0x5C)) {
+            // Type 1 (fn_80181DE0 -> fn_8017B9BC): eight textures, eight matrices, the record is a GX state.
+            printf("material1 "); Val(mat); printf(" tex "); Ptrs(mat + 0x1C, 8); printf(" matrices "); Ptrs(mat + 0x3C, 8); printf("\n");
+            for (u32 k = 2; k < 8; k++) MatTexture(*(const u8**)(mat + 0x1C + k * 4));
+            for (u32 k = 1; k < 8; k++) {
+                const u8* xk = *(const u8**)(mat + 0x3C + k * 4);
+                if (In(xk, 0x30)) { printf("matmatrix "); Val(xk); printf(" "); Floats(xk, 12); printf("\n"); }
+            }
+            if (In(r, SIR_GX_STATE_SIZE)) {
+                u32 words = 0, bytes = 0, halves = 0;
+                for (u32 f = 4; f < SIR_GX_STATE_SIZE; f += 4) {
+                    const u8* q = r + f;
+                    switch (SirGxStateSlot(f)) {
+                    case SIR_GX_WORD:      words += *(const u32*)q; break;
+                    case SIR_GX_BYTES:     bytes += (u32)q[0] << 24 | (u32)q[1] << 16 | (u32)q[2] << 8 | q[3]; break;
+                    case SIR_GX_BYTES_U16: halves += q[0] * 256u + q[1] + *(const u16*)(q + 2) * 3u; break;
+                    default:               halves += *(const u16*)q * 5u + q[2] * 256u + q[3]; break;
+                    }
+                }
+                printf("matstate "); Val(r); printf(" back "); Ptr(r); printf(" counts "); Words(r + 4, 4);
+                printf(" words %08x bytes %08x halves %08x\n", words, bytes, halves);
+            }
+        }
         if (In(x, 0x30)) { printf("matmatrix "); Val(x); printf(" "); Floats(x, 12); printf("\n"); }
         if (mat[0x0C] == 0 && In(r, 0x68)) {
             printf("matrec "); Val(r); printf(" back "); Ptr(r); printf(" b4 "); Hex(r + 4, 4); printf(" floats "); Floats(r + 8, 16);
@@ -1374,10 +1398,17 @@ struct ZoneDump {
             if (!In(e, ENTITY_USED)) continue;
             printf("entity "); Val(e); printf(" vtable %08x record ", *(const u32*)e); Ptr(e + 4);
             printf(" parts "); Ptr(e + 0x8C); printf(" scene "); Ptr(e + 0x90);
-            printf(" w94 %d %d obj9c ", *(const s32*)(e + 0x94), *(const s32*)(e + 0x98)); Ptr(e + 0x9C);
+            printf(" attach %d ", *(const s32*)(e + 0x94)); Ptr(e + 0x98); printf(" obj9c "); Ptr(e + 0x9C);
             printf(" holder "); Ptr(e + 0xA4); printf(" children "); Ptr(e + 0xB0);
             printf(" f158 %08x more ", Bits(*(const f32*)(e + 0x158))); Ptr(e + 0x194);
             printf(" %d w1a8 %d flags %08x wb8 %08x\n", *(const s32*)(e + 0x1A4), *(const s32*)(e + 0x1A8), *(const u32*)(e + 0x1B0), *(const u32*)(e + 0xB8));
+            const u8* points = *(const u8**)(e + 0x98);
+            for (u32 k = 0; *(const u32*)(e + 0x94) != 0 && In(points, *(const u32*)(e + 0x94) * 0xC8) && k < *(const u32*)(e + 0x94); k++) {
+                const u8* q = points + k * 0xC8;
+                printf("entattach "); Val(e); printf(" %u name %08x bone %d local ", k, *(const u32*)q, *(const s32*)(q + 4)); Words(q + 8, 12);
+                printf(" world "); Words(q + 0x38, 12); printf(" ids "); Words(q + 0x68, 8); printf(" running "); Ptrs(q + 0x88, 8);
+                printf(" started "); Words(q + 0xA8, 8); printf("\n");
+            }
             const u8* r = *(const u8**)(e + 4);
             if (InAny(r, ENTITY_RECORD_SIZE)) {
                 printf("entrecord "); Val(r); printf(" floats");
@@ -1442,6 +1473,17 @@ struct ZoneDump {
             if (In(list, 0x3C)) {
                 printf("scenelist "); Val(list); printf(" head "); Ptr(list + 4); printf(" tail "); Ptr(list + 8);
                 printf(" count %d flagged %d\n", *(const s32*)(list + 0xC), *(const s32*)(list + 0x38));
+                printf("scenelights "); Val(list); printf(" head "); Ptr(list + 0x10); printf(" tail "); Ptr(list + 0x14);
+                printf(" count %d\n", *(const s32*)(list + 0x18));
+                std::vector<const u8*> seenLights;
+                for (const u8* node = *(const u8**)(list + 0x10); node != NULL && In(node - 4, 0x60) && std::find(seenLights.begin(), seenLights.end(), node) == seenLights.end();
+                     node = *(const u8**)node) {
+                    seenLights.push_back(node);
+                    const u8* q = node - 4;
+                    printf("scenelight "); Val(node); printf(" w0 %08x next ", *(const u32*)q); Ptr(q + 4); printf(" prev "); Ptr(q + 8);
+                    printf(" owner "); Ptr(q + 0xC); printf(" kind %u flags %04x floats ", *(const u16*)(q + 0x10), *(const u16*)(q + 0x12));
+                    Words(q + 0x14, 19); printf("\n");
+                }
                 std::vector<const u8*> seen;
                 for (const u8* node = *(const u8**)(list + 4); node != NULL && In(node - 0xAC, 0xB8) && std::find(seen.begin(), seen.end(), node) == seen.end();
                      node = *(const u8**)node) {

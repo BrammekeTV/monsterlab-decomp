@@ -366,6 +366,7 @@ enum RegionKind {
     REGION_UI_SET, REGION_UI_SCREEN, REGION_UI_GRAPHIC, REGION_UI_TEXT,
     REGION_LOCATORS, REGION_UI_SLIDER,
     REGION_ZONE_EFFECT, REGION_ANIM_SET, REGION_ANIM_DEFS, REGION_U16_ARRAY, REGION_ANIM_OBJ, REGION_SKELETON, REGION_BONE_OPS,
+    REGION_ATTACH_POINTS, REGION_SCENE_LIGHT, REGION_GX_STATE,
     REGION_UI_ANIM, REGION_UI_ANIM_TRACK, REGION_UI_ANIM_EVENTS, REGION_UI_ANIM_KEYS, REGION_UI_ANIM_ENTRIES,
     REGION_ZONE_SYSTEM, REGION_ANIM_PLAYER, REGION_ANIM_ELEM, REGION_ANIM_TRACK, REGION_ANIM_KEYS, REGION_F32_ARRAY,
     REGION_SOUND_GROUP, REGION_SOUND, REGION_SOUND_INFO, REGION_DSP_HEADER,
@@ -1539,7 +1540,8 @@ static const SirField kEntityFields[] = {
     { 0x080, SIR_U32, 1 },    // code: fn_801260C8 tests its bits 0x78000000 (0x0003FFFF in the files)
     { 0x084, SIR_PTR, 1 },    // code: a table fn_801B6AD4 searches (the table itself is not converted)
     { 0x08C, SIR_PTR, 2 },    // code: part container (fn_8012F6B0), sub-object (fn_8012F8B8)
-    { 0x094, SIR_U32, 2 },    // code: fn_801B4334 clears them
+    { 0x094, SIR_U32, 1 },    // code: how many attach points the entity has (fn_801EC080; fn_801B4334 clears it),
+    { 0x098, SIR_PTR, 1 },    //       the attach points (kAttachPointFields)
     { 0x09C, SIR_PTR, 1 },    // code: fn_8012F8B8 reads the id at +8 of it for type 6
     { 0x0A0, SIR_PTR, 1 },    // code: animation object (fn_801B4520 frees it; a prop's: fn_80069180, fn_8006A764)
     { 0x0A4, SIR_PTR, 1 },    // code: state machine holder (fn_8012F8B8)
@@ -1551,6 +1553,14 @@ static const SirField kEntityFields[] = {
     { 0x1A4, SIR_U32, 2 },    //       their count; +0x1A8 (fn_800690D4)
     { 0x1B0, SIR_U32, 1 },    // code: flags (fn_8012F8B8)
 };
+// An entity's attach points (+0x98, count +0x94): where effects hang on it. fn_801EC080 updates
+// them every frame: +0x00 the point's name hash (fn_801EC880 finds a point by it), +0x04 the bone
+// it follows (-1: the entity itself), +0x08 its matrix on that bone, +0x38 the resulting world
+// matrix, +0x68 eight effect ids, +0x88 the eight running effects, +0xA8 eight started flags.
+static const SirField kAttachPointFields[] = {
+    { 0x00, SIR_U32, 2 }, { 0x08, SIR_F32, 24 }, { 0x68, SIR_U32, 8 }, { 0x88, SIR_PTR, 8 }, { 0xA8, SIR_U32, 8 },
+};
+#define ATTACH_POINT_SIZE 0xC8
 // The record an entity points at (0x40 bytes): position, rotation, scale, layer and flags.
 // fn_801B4334 resets all of it; the bytes at +0x34..+0x3D need no conversion.
 static const SirField kEntityRecordFields[] = {
@@ -1678,6 +1688,41 @@ static int LevelSpan(u32 addr, u64 size, u32 imageSize, u32* off) {
 #define MATERIAL_TAG    0x53
 #define MATERIAL_USED   0x40
 #define MATERIAL_REC0   0x68
+//   material, type 1 (fn_80181DE0 before the batch, fn_80181F80 after it): +0x1C eight textures
+//     and +0x3C eight 3x4 float matrices, one per texture unit (fn_8017B9BC)
+//   record, type 1: the GX state fn_8017B9BC sends when it differs from the last one sent
+//     (lbl_80412B10[pass]), SIR_GX_STATE_SIZE bytes of words except where SirGxStateSlot says:
+//     +0x04 colour channels, +0x08 tex-gens, +0x0C TEV stages, +0x10 indirect stages, +0x14 two
+//     colour channels {light enable and address twice, two 0x1C-byte channel blocks}, +0xA4 eight
+//     0x24-byte texture units, +0x1C4 eight 0x34-byte tex-gens, +0x364 three TEV colours and
+//     +0x3A0 four constant colours {mode, four floats}, +0x3F0 four swap tables, +0x430 sixteen
+//     0x68-byte TEV stages, +0xAB0 four indirect stages, +0xAF0 sixteen 0x20-byte indirect
+//     settings of the stages, +0xCF0 a float and the alpha, depth and cull settings.
+extern "C" u8 SirGxStateSlot(u32 off) {
+    if (off == 0) return SIR_GX_PTR;
+    if (off == 0x14 || off == 0x1C || off == 0x24 || off == 0x40 || off == 0x5C || off == 0x64 || off == 0x6C || off == 0x88) return SIR_GX_BYTES;
+    if (off >= 0xA4 && off < 0x1C4) { u32 f = (off - 0xA4) % 0x24; return f == 0x14 || f == 0x1C ? SIR_GX_BYTES : SIR_GX_WORD; }
+    if (off >= 0x1C4 && off < 0x364) {
+        u32 f = (off - 0x1C4) % 0x34;
+        return f == 0 ? SIR_GX_BYTES_U16 : f == 4 ? SIR_GX_U16_BYTES : f == 0xC || f == 0x2C ? SIR_GX_BYTES : SIR_GX_WORD;
+    }
+    if (off >= 0x430 && off < 0xAB0) { u32 f = (off - 0x430) % 0x68; return f == 0 || f == 0x38 || f == 0x5C ? SIR_GX_BYTES : SIR_GX_WORD; }
+    if (off >= 0xAF0 && off < 0xCF0) return (off - 0xAF0) % 0x20 == 0x18 ? SIR_GX_BYTES : SIR_GX_WORD;
+    if (off == 0xCFC || off == 0xD10 || off == 0xD1C) return SIR_GX_BYTES;
+    return SIR_GX_WORD;
+}
+
+static void ConvertGxState(SirReloc* r, u8* p, u32 size) {
+    for (u32 off = 0; off + 4 <= size && off < SIR_GX_STATE_SIZE; off += 4) {
+        switch (SirGxStateSlot(off)) {
+        case SIR_GX_WORD:      Swap32(p + off); r->fieldsSwapped++; break;
+        case SIR_GX_PTR:       ConvertPtr(r, p + off); break;
+        case SIR_GX_BYTES_U16: Swap16(p + off + 2); r->fieldsSwapped++; break;
+        case SIR_GX_U16_BYTES: Swap16(p + off); r->fieldsSwapped++; break;
+        default: break;
+        }
+    }
+}
 
 static SirError MaterialTexturePlan(ImagePlan* plan, const u8* image, u32 imageSize, u32 addr) {
     u32 t, d;
@@ -1695,10 +1740,24 @@ static SirError MaterialPlan(ImagePlan* plan, const u8* image, u32 imageSize, u3
     if (!LevelSpan(addr, MATERIAL_USED, imageSize, &m) || PlanHas(plan, m, REGION_U32_ARRAY)) return SIR_OK;
     const u8* mat = image + m;
     if (Be32(mat) != MATERIAL_TAG || mat[0x0C] > 1) return SIR_ERR_ENTITY;
-    if (!PlanAdd(plan, m, 8, REGION_U32_ARRAY) || !PlanAdd(plan, m + 0x08, 4, REGION_PTR_ARRAY) ||
-        !PlanAdd(plan, m + 0x1C, 8, REGION_PTR_ARRAY) || !PlanAdd(plan, m + 0x3C, 4, REGION_PTR_ARRAY)) return SIR_ERR_ENTITY;
     u32 matrix;
     SirError e;
+    if (mat[0x0C] == 1) {
+        // The same regions as ZoneListPlan, which walks the materials that have animated matrices (+0x5C: their players).
+        if (!LevelSpan(addr, 0x80, imageSize, &m) || !PlanAdd(plan, m, 8, REGION_U32_ARRAY) || !PlanAdd(plan, m + 0x08, 4, REGION_PTR_ARRAY) ||
+            !PlanAdd(plan, m + 0x1C, 0x20, REGION_PTR_ARRAY) || !PlanAdd(plan, m + 0x3C, 4, REGION_PTR_ARRAY) ||
+            !PlanAdd(plan, m + 0x40, 0x40, REGION_PTR_ARRAY)) return SIR_ERR_ENTITY;
+        for (u32 i = 0; i < 8; i++) {
+            if ((e = MaterialTexturePlan(plan, image, imageSize, Be32(mat + 0x1C + i * 4))) != SIR_OK) return e;
+            if (LevelSpan(Be32(mat + 0x3C + i * 4), 0x30, imageSize, &matrix) && !PlanHas(plan, matrix, REGION_F32_ARRAY) &&
+                !PlanAdd(plan, matrix, 0x30, REGION_F32_ARRAY)) return SIR_ERR_ENTITY;
+        }
+        if (!LevelSpan(Be32(mat + 0x08), SIR_GX_STATE_SIZE, imageSize, &r)) return SIR_OK;
+        if (Be32(image + r) != addr) return SIR_ERR_ENTITY;                               // the record names its material
+        return PlanAdd(plan, r, SIR_GX_STATE_SIZE, REGION_GX_STATE) ? SIR_OK : SIR_ERR_ENTITY;
+    }
+    if (!PlanAdd(plan, m, 8, REGION_U32_ARRAY) || !PlanAdd(plan, m + 0x08, 4, REGION_PTR_ARRAY) ||
+        !PlanAdd(plan, m + 0x1C, 8, REGION_PTR_ARRAY) || !PlanAdd(plan, m + 0x3C, 4, REGION_PTR_ARRAY)) return SIR_ERR_ENTITY;
     if (LevelSpan(Be32(mat + 0x3C), 0x30, imageSize, &matrix) && !PlanHas(plan, matrix, REGION_F32_ARRAY) &&
         !PlanAdd(plan, matrix, 0x30, REGION_F32_ARRAY)) return SIR_ERR_ENTITY;
     if ((e = MaterialTexturePlan(plan, image, imageSize, Be32(mat + 0x1C))) != SIR_OK ||
@@ -1722,6 +1781,16 @@ static SirError MaterialPlan(ImagePlan* plan, const u8* image, u32 imageSize, u3
 //           +0x48 the entity that uses the object (fn_801DA344 stores it), +0x50 which entry is
 //           current (fn_801DA750), +0x5C one pointer per entry to its 3x4 float matrix
 //           (fn_801DA798 returns matrix[current]; fn_801D9164 fills it)
+// A light of a type 2 object's list object (+0x10 head, +0x14 tail, +0x18 count: the same list
+// as the items', linked through the light's +0x04). The draw picks the three best lights of
+// every visible item from it (fn_80185988: fn_80185200 for a point light, fn_8018542C for kind 2):
+// +0x04 next, previous and the list, +0x10 kind (1 point, 3 ambient in the files) and +0x12
+// flags, +0x14 a factor, +0x20 position, +0x2C three attenuation coefficients, +0x38 direction
+// and colours up to +0x60 (fn_80184604). The name behind them is text.
+static const SirField kSceneLightFields[] = {
+    { 0x00, SIR_U32, 1 }, { 0x04, SIR_PTR, 3 }, { 0x10, SIR_U16, 2 }, { 0x14, SIR_F32, 19 },
+};
+#define SCENE_LIGHT_USED 0x60
 static const SirField kCountPtrFields[] = {
     { 0x00, SIR_U32, 1 }, { 0x04, SIR_PTR, 1 },
 };
@@ -1809,6 +1878,14 @@ static SirError SceneObjectPlan(ImagePlan* plan, const u8* image, u32 imageSize,
         if (PlanHas(plan, o + 4, REGION_PTR_ARRAY)) return SIR_OK;                     // two objects with one list
         if (!PlanAdd(plan, o + 4, 8, REGION_PTR_ARRAY) || !PlanAdd(plan, o + 0xC, 4, REGION_U32_ARRAY) ||
             !PlanAdd(plan, o + 0x38, 4, REGION_U32_ARRAY)) return SIR_ERR_ENTITY;
+        // The list's lights (+0x10, +0x14, count +0x18).
+        if (!PlanAdd(plan, o + 0x10, 8, REGION_PTR_ARRAY) || !PlanAdd(plan, o + 0x18, 4, REGION_U32_ARRAY)) return SIR_ERR_ENTITY;
+        u32 lightNode = Be32(image + o + 0x10), light, lights = 0;
+        while (lightNode != 0) {
+            if (lightNode < sImageBase + 4 || !ImageSpan(lightNode - 4, SCENE_LIGHT_USED, imageSize, &light) || PlanHas(plan, light, REGION_SCENE_LIGHT)) break;
+            if (!PlanAdd(plan, light, SCENE_LIGHT_USED, REGION_SCENE_LIGHT) || ++lights > REGION_MAX / 2) return SIR_ERR_ENTITY;
+            lightNode = Be32(image + light + 4);
+        }
         // The nodes can also be entries of a type 3 object: the same words, found twice.
         u32 node = Be32(image + o + 4), guard = imageSize / 4 + 1, seen = 0;
         while (node != 0) {
@@ -1888,6 +1965,10 @@ static SirError EntityPlan(ImagePlan* plan, const u8* image, u32 imageSize, u32 
     if ((e = EntityContainerPlan(plan, image, imageSize, Be32(ent + 0x8C))) != SIR_OK) return e;
     // Scene object (+0x90). Object at +0x9C: fn_8012F8B8 reads the id at +8 for a type 6 entity.
     if ((e = SceneObjectPlan(plan, image, imageSize, Be32(ent + 0x90))) != SIR_OK) return e;
+    // The entity's attach points (+0x98, count +0x94).
+    u32 points = Be32(ent + 0x94);
+    if (points != 0 && points <= imageSize / ATTACH_POINT_SIZE && LevelSpan(Be32(ent + 0x98), (u64)points * ATTACH_POINT_SIZE, imageSize, &o) &&
+        !PlanHas(plan, o, REGION_ATTACH_POINTS) && !PlanAdd(plan, o, points * ATTACH_POINT_SIZE, REGION_ATTACH_POINTS)) return SIR_ERR_ENTITY;
     // The entity's animation object (+0xA0).
     if ((e = AnimObjPlan(plan, image, imageSize, Be32(ent + 0xA0))) != SIR_OK) return e;
     // For a prop it is the prop's definition.
@@ -2628,6 +2709,9 @@ static void ImagePlanConvert(const ImagePlan* plan, SirReloc* r, u8* image, u32 
             break;
         case REGION_ANIM_OBJ:     SirConvertRecord(r, p, g->size, kAnimObjFields, COUNTOF(kAnimObjFields)); break;
         case REGION_ANIM_SET:     SirConvertRecord(r, p, g->size, kAnimSetFields, COUNTOF(kAnimSetFields)); break;
+        case REGION_GX_STATE:     ConvertGxState(r, p, g->size); break;
+        case REGION_SCENE_LIGHT:  SirConvertRecord(r, p, g->size, kSceneLightFields, COUNTOF(kSceneLightFields)); break;
+        case REGION_ATTACH_POINTS: ConvertRecords(r, p, g->size, ATTACH_POINT_SIZE, kAttachPointFields, COUNTOF(kAttachPointFields)); break;
         case REGION_ANIM_DEFS:    ConvertRecords(r, p, g->size, ANIM_DEF_SIZE, kAnimDefFields, COUNTOF(kAnimDefFields)); break;
         case REGION_U16_ARRAY:
             for (u32 k = 0; k + 2 <= g->size; k += 2) { Swap16(p + k); r->fieldsSwapped++; }
@@ -3107,6 +3191,8 @@ extern "C" BOOL LevelZoneRootsCollect(const u8* hdr, u32 hdrSize, const u8* zone
 // 9 and 15 to 18). That is all that is typed of them so far.
 #define CAMERA_TRACK_TYPE 15
 #define CAMERA_TRACK_USED 0x60
+#define CAMERA_AIM_TYPE 16
+#define CAMERA_AIM_USED 0xB8
 static SirError SlotObjectsPlan(ImagePlan* plan, const u8* image, u32 imageSize, u32 addr, u32 count) {
     u32 off, o;
     if (count == 0) return SIR_OK;
@@ -3121,6 +3207,15 @@ static SirError SlotObjectsPlan(ImagePlan* plan, const u8* image, u32 imageSize,
             u32 t;
             if (LevelSpan(Be32(image + off + i * 4), CAMERA_TRACK_USED, imageSize, &t) && !PlanHas(plan, t + 0x58, REGION_U32_ARRAY) &&
                 !PlanAdd(plan, t + 0x58, 8, REGION_U32_ARRAY))
+                return SIR_ERR_LEVEL;
+        }
+        // Type 16 (vtable lbl_80360200, fn_800E5550) aims between locators: +0xA8 / +0xAC the two
+        // it looks from and to, +0xB0 / +0xB4 two whose vectors it copies (fn_800E5684 resolves the
+        // four reference words with fn_801ED684). The constructor resets the rest.
+        if (Be32(image + o + 8) == CAMERA_AIM_TYPE) {
+            u32 t;
+            if (LevelSpan(Be32(image + off + i * 4), CAMERA_AIM_USED, imageSize, &t) && !PlanHas(plan, t + 0xA8, REGION_U32_ARRAY) &&
+                !PlanAdd(plan, t + 0xA8, 16, REGION_U32_ARRAY))
                 return SIR_ERR_LEVEL;
         }
     }
