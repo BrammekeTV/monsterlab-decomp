@@ -1130,7 +1130,7 @@ static void FrameStats(PortFrameStats* s) {
     s->voices = PortAudioVoices(&s->voiceCount);
     s->outW = sOutW; s->outH = sOutH; s->picW = sPicW; s->picH = sPicH; s->wide = gPortSettings.wide;
     // PORT_PERF_LOG=1: average split of every 300 shown frames on stderr (headless profiling without screenshots).
-    static int perfOn = -1, perfN, perfCalls; if (++perfCalls == 50) PortLog("perf: 50 calls, frameMs %.2f", s->frameMs);
+    static int perfOn = -1, perfN;
     static f64 perfSum[7];
     if (perfOn < 0) { const char* e = getenv("PORT_PERF_LOG"); perfOn = e && *e == '1'; }
     if (perfOn && last && s->frameMs > 0.0f) {
@@ -1290,7 +1290,9 @@ static void CopyEfb(const PortGx* g, u32 control) {
         // Fast-forward: the window gets a picture only four times a second, with the progress in the title bar.
         BOOL fast = PortFastActive();
         s64 tp = Ticks();
+        s64 tPres = Ticks();
         if (FastProgress() && GamePresentDue()) PresentOut(fast);
+        if (PortPerfActive()) PortPerfFrame(&stats, (f32)((Ticks() - tPres) * 1000.0 / (f64)Ticks_freq()));
         sTPres += Ticks() - tp;
         sGfxStats.presents++;
         if (sTraceFrom > 1 && sGfxStats.presents >= sTraceFrom) sTrace = TRUE;
