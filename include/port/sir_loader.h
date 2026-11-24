@@ -460,6 +460,10 @@ typedef struct LevelZoneRoots {
     u32  soundGroupCount;
     u32  locators;           // header +0x28: the level's locators (0x20 bytes each), or 0 when they are in another zone
     u32  locatorCount;       // header +0x24
+    u32  paths;              // header +0x2C: pointers to the map's path records, or 0 when the list is in another zone
+    u32  pathCount;          // header +0x30
+    u32  junctions;          // header +0x38: pointers to the map's junction records
+    u32  junctionCount;      // header +0x3C
     u32* zoneRecords;        // every slot's +0xFC: the zone record WorldTick walks
     u32  zoneRecordCount;
     u32* zoneLists;          // first node of the list (+0x10) of each record that lies in the other image

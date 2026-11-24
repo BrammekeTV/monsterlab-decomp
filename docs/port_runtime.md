@@ -257,7 +257,7 @@ so in a comment. When an SDK function is renamed with `tools/rename.py`, the def
 | SC | fixed answers: 16:9, English, 60 Hz on, progressive off |
 | GX | nothing is drawn. The state calls (about 80 so far: viewport, scissor, copy filter, matrices, blend, depth, vertex formats...) are recorded in `gPortGx` (`port.h`) for a later renderer. A display list handed to the graphics processor (`GXSetGPFifo`) is answered with the draw-done interrupt; its commands are not executed and draw-sync tokens are not delivered |
 | MTX | `PSMTXIdentity` |
-| Hardware registers | `0xCC000000`-`0xCC00FFFF` is plain memory: generated code writes the GX write-gather pipe (`0xCC008000`) and reads PI/VI registers by address. Writes are lost |
+| Hardware registers | `0xCC000000`-`0xCC00FFFF` is plain memory: generated code writes the GX write-gather pipe (`0xCC008000`) and reads PI/VI registers by address. Writes are lost. One register is kept up to date: the FIFO write pointer at `0xCC003014` follows the pipe (`port_gx.cpp`), because the game reads it to see how full the display list it is recording is (`fn_8015BA30`) and moves on to the next list when it is nearly full |
 | WPAD, KPAD | `KPADRead` / `WPADProbe` (`port_input.cpp`): a Wii Remote with a Nunchuk on channel 0, nothing on 1 to 3. Keyboard and mouse (while the window has the focus), the first XInput pad (only with a window) and `--press` give the buttons, the Nunchuk stick and the pointer; the bindings are one table, `gPortBindings` (`include/port/port_input.h`) |
 | AI, AX | stubs |
 | MSL | `__register_global_object`, array construction helpers, `ceil_`; the standard C functions come from the Windows C runtime |
