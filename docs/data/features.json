@@ -99,6 +99,11 @@
  "changelog": [
   {
    "date": "2026-11-24",
+   "time": "10:43",
+   "text": "Every cutscene on the disc now decodes correctly on Windows (PR #154): all 78 movies, with picture and all five audio tracks, sound within 0.04 s of the picture. Skipping a cutscene with a button is now tested too (PR #157). In the village intro the coffin's template is now found, because a name lookup table is converted to PC byte order (PR #156); the cutscene still waits at the same picture for now. And more differential-test fixes in our decompiled code (PR #155)."
+  },
+  {
+   "date": "2026-11-24",
    "time": "10:30",
    "text": "Further into the game on Windows (PR #153, which includes #152). The opening conversation with Professor Fuseless plays, with voice lines, and advances with A, and the village map level loads and its intro cutscene starts. The cutscene doesn't finish yet: the coffin never lands. On the main menu, the projector machine now draws (PR #151), and the mouse cursor now stays under the mouse at the top and bottom of the screen (PR #148)."
   },
