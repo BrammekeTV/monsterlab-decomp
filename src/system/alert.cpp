@@ -29,6 +29,7 @@ enum AlertKind {
     ALERT_NAMED_WORD,   // same, index gAlertPlayerWord, skipped when 0x40
     ALERT_TIMED,        // title is "<text> <seconds>", body differs on PAL / NTSC
     ALERT_TIMED_OPT,    // same, seconds left out when 0
+    ALERT_NAMED_WORD_RAW,   // like ALERT_NAMED_WORD but without the 0x40 check
 };
 
 struct AlertDef {
@@ -79,7 +80,7 @@ static const AlertDef kAlerts[] = {
     { 0xE6C761FE, ALERT_PLAIN     , 0x060F, 0x060F, 0x5F0,  1 },
     { 0xEB4BCABF, ALERT_TIMED     , 0x1077, 0x1077, 0x5A5,  2 },
     { 0xEB7746BD, ALERT_PLAIN     , 0x0604, 0x0604, 0x68C,  1 },
-    { 0xF08D5746, ALERT_NAMED_WORD, 0x061F, 0x068C, 0x68C,  1 },
+    { 0xF08D5746, ALERT_NAMED_WORD_RAW, 0x061F, 0x068C, 0x68C,  1 },
     { 0xF177C7E8, ALERT_NAMED     , 0x0638, 0x05F0, 0x5F0,  1 },
     { 0xF4B22FF2, ALERT_PLAIN     , 0x057B, 0x057B, 0x65B,  5 },
 };
@@ -119,6 +120,10 @@ void ShowAlertBox(u32 hash) {
     case ALERT_NAMED_WORD:
         body[0] = 0;
         if (gAlertPlayerWord != 0x40) SysSprintf(body, GetText(a->body), PlayerName(gAlertPlayerWord));
+        AlertShowScreen(GetText(a->title), body, a->style);
+        break;
+    case ALERT_NAMED_WORD_RAW:
+        SysSprintf(body, GetText(a->body), PlayerName(gAlertPlayerWord));
         AlertShowScreen(GetText(a->title), body, a->style);
         break;
     case ALERT_TIMED:

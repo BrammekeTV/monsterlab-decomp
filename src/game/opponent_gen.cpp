@@ -211,7 +211,8 @@ void MonsterGenerateOpponent(void* builder, s32 tmplIndex) {
         }
         for (s32 rerolls = 0; (power < minP || power > maxP) && rerolls < TRIES; ) {
             rerolls++;
-            power = MonsterSpecReroll(builder, spec, (s16)minP, (s16)maxP, power) ? SpecPower(spec) : -1;
+            if (!MonsterSpecReroll(builder, spec, (s16)minP, (s16)maxP, power)) { power = -1; break; }  // 0x8021A72C: failure leaves the reroll loop
+            power = SpecPower(spec);
         }
     }
 

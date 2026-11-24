@@ -278,7 +278,7 @@ void fn_801BDB6C(u8* obj, f32 dt) {
     *(f32*)(obj + 0x34) = len;
 
     fn_801BC970(obj, 0, n - 1, *(f32*)(def + 0x48));
-    if (fabsf(*(f32*)(*(u8**)obj + 0x5C)) > 0.01f) fn_801BD828(obj, fabsf(*(f32*)(*(u8**)obj + 0x5C)));
+    if (fabsf(*(f32*)(*(u8**)obj + 0x5C)) > 0.01f) fn_801BD828(obj, *(f32*)(*(u8**)obj + 0x5C));   // f1 is the signed value; only the test uses fabs
 
     // Camera right/up axes, normalised.
     u8* cam = fn_801D6D78();

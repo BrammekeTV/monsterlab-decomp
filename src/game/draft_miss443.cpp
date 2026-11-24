@@ -546,8 +546,8 @@ void fn_800B387C(u8* arg0, s32 arg1) {
 
     if (fn_800B9A78(*(u8**)(rec + 0xa8)) != 0 || fn_800B964C(*(u8**)(rec + 0xa8)) == 1) {
         s32 sp8 = 0;
-        fn_800B68B8(*(u8**)(arg0 + 0x94));
-        s32 have = fn_800B4070(arg0, &sp8, 0.0f /* f1 left over in the original */);
+        f32 t = fn_800B68B8(*(u8**)(arg0 + 0x94));   // f1 is passed straight through to fn_800B4070
+        s32 have = fn_800B4070(arg0, &sp8, t);
         if (have != 0) sp8 += half;
         s32 freeCount = 0;
         for (s32 i = 0; i < slots; i++) {
