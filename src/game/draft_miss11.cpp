@@ -177,7 +177,7 @@ void AddPlayerMonsterFromDatabase(u32 /*0x44*/ a0) {
 
     // The preset record (0x48 bytes) holds the name text hash at +8.
     u8* spec = *(u8**)(gGameDb->data + 0x9180) + a0 * 0x48;
-    s32 id = TextIdFromHash(*(u32*)(spec + 8));
+    s32 id = TextIdFromHash(*(u32*)(spec + 4));
     const char* name;
     if (id == -1) {
         name = lbl_80354800;
