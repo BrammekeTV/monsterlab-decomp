@@ -99,6 +99,11 @@
  "changelog": [
   {
    "date": "2026-11-24",
+   "time": "18:18",
+   "text": "The first battle now loads and starts on Windows (PR #183): the arena, the intro camera, the combat tutorial and choosing a part with the stick. Cutscene movies no longer show thin vertical lines at other window sizes (PR #186)."
+  },
+  {
+   "date": "2026-11-24",
    "time": "17:42",
    "text": "After the village fly-over the camera now cuts to the normal map view while the coffin falls, as on the Wii (PR #184). Rendering the village takes a little less work per frame (PR #185)."
   },
