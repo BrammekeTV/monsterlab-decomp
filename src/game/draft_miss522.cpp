@@ -165,7 +165,10 @@ u8* fn_801292D4(u8* p, s32 del) {
 // 0x8003F700
 // Per-frame battle update: runs the battle update and the two fn_8003E560 calls while a battle
 // exists, and the camera update when the battle camera object is set.
-void fn_8003F700(f32 farg0) {
+// Virtual (CombatContext vtable lbl_803584A0, slot 0xC; called as (context, dt) by fn at draft_miss192.cpp): the
+// PowerPC code never reads r3, but the context pointer is an argument all the same.
+void fn_8003F700(void* context, f32 farg0) {
+    (void)context;
     if (gBattle != NULL) {
         BattleUpdate(gBattle, farg0);
         fn_8003E560(0);

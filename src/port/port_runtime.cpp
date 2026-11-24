@@ -204,6 +204,7 @@ s32 PortFrameCount(void) { return sFrames; }
 extern u8 gWorldState[];   // 0x803E6D00
 extern u8 gScriptCtx[];    // 0x803C4298
 extern u8 sWorldReady;     // 0x805FB2F0
+extern "C" { extern u8 gGame[]; }   // 0x803B53A0
 extern "C" { extern s32 lbl_803C4E28[]; extern s32 lbl_805FB038; extern s32 lbl_805FB034; }   // combat part zones: loaded flags, wanted, requested
 static void PortStateLog(void) {
     static s32 on = -1;
@@ -215,6 +216,27 @@ static void PortStateLog(void) {
     s32 now[12] = { gGameMode, sModeTable[0].sub, sModeTable[0].unkC, *(s32*)(gScriptCtx + 0x18), *(s32*)(gScriptCtx + 0x3C),
                    *(s32*)(gWorldState + 0x114), *(s32*)(gWorldState + 0x1A8), sWorldReady,
                     *(s32*)(gWorldState + 0x290), lbl_805FB038, lbl_805FB034, loaded };
+    // The HUD's current state machine (HudShowConversation: hud +0x24 -> slot -> machine; +0x00 the stack depth):
+    // the machine's key (definition +0x30), its state (machine +0x04) and that state's key (state +0x04).
+    static u32 lastFsm[4];
+    u32 fsm[4] = { 0, 0, 0, 0 };
+    u8* hud = *(u8**)(gGame + 0xD5F0 + 0x44);
+    // Only while a level runs: the pointers are stale while one loads (this runs on the render thread).
+    if (*(s32*)(gScriptCtx + 0x18) == 5 && sWorldReady && hud != NULL && *(u8***)(hud + 0x24) != NULL && **(u8***)(hud + 0x24) != NULL) {
+        u8* m = **(u8***)(hud + 0x24);
+        u8* def = *(u8**)m;
+        s32 st = *(s32*)(m + 4);
+        fsm[0] = (u32)*(s32*)hud;
+        if (def != NULL) {
+            fsm[1] = *(u32*)(def + 0x30);
+            fsm[2] = (u32)st;
+            if (st >= 0 && st < *(s32*)(def + 4)) fsm[3] = *(u32*)(*(u8**)def + st * 0x30 + 4);
+        }
+    }
+    if (memcmp(fsm, lastFsm, sizeof(fsm))) {
+        memcpy(lastFsm, fsm, sizeof(fsm));
+        fprintf(stderr, "[state] frame %d: hud machine %08X (depth %u) state %d key %08X%c", (int)sFrames, fsm[1], fsm[0], (s32)fsm[2], fsm[3], 10);
+    }
     if (!memcmp(now, last, sizeof(now))) return;
     memcpy(last, now, sizeof(now));
     fprintf(stderr, "[state] frame %d: mode %d sub %d flags %X, session state %d flags %X, world loading %d zone %d ready %d queue %d, part zones wanted %d asked %d loaded %X%c",
