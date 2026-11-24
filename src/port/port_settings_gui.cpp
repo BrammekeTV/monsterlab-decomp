@@ -293,6 +293,9 @@ static void PageAudio(void) {
     if (ImGui::SliderInt("Volume", &v, 0, 100, "%d%%")) sEdit.volume = gPortSettings.volume = v;
     bool b = sEdit.mute != 0;
     if (ImGui::Checkbox("Mute", &b)) sEdit.mute = gPortSettings.mute = b;
+    b = sEdit.remoteSpeaker != 0;
+    if (ImGui::Checkbox("Wii Remote speaker sounds", &b)) sEdit.remoteSpeaker = gPortSettings.remoteSpeaker = b;
+    ImGui::TextDisabled("The console plays some sounds from the Wii Remote's speaker; this plays them through your speakers too.");
 }
 
 static void PageControls(void) {
