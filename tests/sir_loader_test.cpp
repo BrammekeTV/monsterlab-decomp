@@ -3200,7 +3200,7 @@ static int SelfTest(void) {
         CHECK(*(const u32*)(hdr + 0x82C) == 1 && b == img + T_FXBOLT && hdr[0x834] == 1);
         CHECK(*(const u32*)b == 0x02212CFE && b[4] == 0xCC && b[7] == 0x7F && strcmp((const char*)b + 8, "bolt_test") == 0);
         CHECK(*(const u8**)(b + 0x28) == img + T_TEX0 && *(const u32*)(b + 0x2C) == 2 && *(const u32*)(b + 0x30) == 5);
-        CHECK(b[0x3B] == 2 && b[0x5B] == 1);                                       // +0x38, +0x58: no reader, untouched
+        CHECK(*(const u32*)(b + 0x38) == 2 && b[0x5B] == 1);                      // +0x38: branch depth (fn_801BEDBC); +0x58: untouched
         CHECK(*(const f32*)(b + 0x48) == 0.2f && *(const f32*)(b + 0x4C) == 1.0f && *(const f32*)(b + 0x54) == 0.25f);
         CHECK(*(const u32*)(b + 0x64) == T_VTABLE && *(const u8**)(b + 0x68) == img + T_FXPOOLS && *(const u8**)(b + 0x6C) == NULL);
         CHECK(img[T_FXPOOLS] == 0x7F && img[T_FXPOOLS + 3] == 0x01);               // pool memory: the game fills it in

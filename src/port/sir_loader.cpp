@@ -1414,11 +1414,13 @@ static SirError ActionRecordsPlan(ImagePlan* plan, const u8* image, u32 imageSiz
 // instance keeps its definition at +0, so the fields are read as *(*(node) + off).
 
 // Entry of the first table (0x70 bytes; "lightning_scrying", ...). The name at +0x08 is text.
-// +0x04, +0x38, +0x58 and +0x60 have no reader in the decompiled code and are left.
+// +0x04 is read byte by byte (the colour, fn_801BEDBC) and is left; +0x58 and +0x60 have no reader
+// that cares about their order (+0x60 is only tested against 0) and are left.
 static const SirField kFxBoltFields[] = {
     { 0x00, SIR_U32, 1 },     // code: name hash, the search key (FindRecord in draft_miss346.cpp; sorted when the flag is set)
     { 0x28, SIR_PTR, 1 },     // code: texture (fn_801BF714)
     { 0x2C, SIR_U32, 3 },     // code: draw mode (fn_801BF714 -> fn_801CA7B0), +0x30, +0x34 (fn_801BDB6C)
+    { 0x38, SIR_U32, 1 },     // code: deepest level that still gets branches (fn_801BEDBC; 2 for lightning_boss)
     { 0x3C, SIR_U32, 2 },     // code: fn_801BDB6C
     { 0x44, SIR_F32, 4 },     // code: fn_801BDB6C (+0x44, +0x48, +0x50), fn_801BD278, fn_801BE620, fn_801BCD88 (+0x48, +0x4C)
     { 0x54, SIR_F32, 1 },     // code: fn_801BF4B8
