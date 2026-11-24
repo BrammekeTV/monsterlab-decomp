@@ -26,7 +26,7 @@ s32     fn_8019555C(u8* list);                                  // 0x8019555C (l
 u8*      fn_8019552C(u8* list, s32 index);                       // 0x8019552C (leaf)
 f32     fn_801AA728(u8* entry);                                 // 0x801AA728 (leaf)
 s32 fn_801B7F40(u8* arg0, u8* arg1, f32 farg0);                        // 0x801B7F40 (return type unknown)
-void    fn_801C9260(u8* node);                                  // 0x801C9260
+void    fn_801C9260(u8* node, u8* owner, f32 dt);               // 0x801C9260
 s32 fn_801EE394(u8* arg0, const char* name);                                  // 0x801EE394 (return type unknown)
 void    BufferFree(void* p);                                    // 0x801D4980
 void    operator_delete(void* p);                               // 0x801D426C
@@ -144,7 +144,7 @@ void fn_801C9B60(u8* arg0, f32 farg0) {
         u8* link = *(u8**)(node - 4);
         u8* next = (link != NULL) ? link + 8 : NULL;
         if (*(s32*)(arg0 + 0x24) == *(s32*)(node + 0x7C)) {
-            fn_801C9260(node);
+            fn_801C9260(node, arg0, farg0);
         }
         node = next;
     }

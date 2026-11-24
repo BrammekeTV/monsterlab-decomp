@@ -344,8 +344,8 @@ void fn_801C4338(u8* arg0) {
 // +0x40 and +0x30 unless the def offsets at +0x3C..0x48 are all near zero), scales the spawn count
 // by how far the emitter moved against def+0x1E0, clamps it to 100 and the def cap (+0x1AC), spawns
 // that many particles with fn_801C85F0 and latches the current position/direction as the previous.
-// The original also received (owner, t) but never reads them.
-void fn_801C9260(u8* arg0) {
+// arg1 (owner / fxMgr) is forwarded to fn_801C85F0; farg0 (dt) is unused.
+void fn_801C9260(u8* arg0, u8* arg1, f32 farg0) {
     u32 flags = *(u32*)arg0;
     if (flags & 4) return;
     f32 t = *(f32*)(arg0 + 0x4);
@@ -418,7 +418,7 @@ void fn_801C9260(u8* arg0) {
     }
     if (cnt > 0x64) cnt = 0x64;
     if (cnt < 0) cnt = 0;
-    if (cnt > 0) fn_801C85F0(arg0, cnt, NULL);  // 3rd arg (fxMgr) is a leftover register in the asm
+    if (cnt > 0) fn_801C85F0(arg0, cnt, arg1);  // arg1 (owner / fxMgr) is passed through unchanged
 
     f32 px = *(f32*)(arg0 + 0x10);
     *(f32*)(arg0 + 0x20) = px;
