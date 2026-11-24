@@ -81,7 +81,7 @@ u8* fn_8002C040(u8* p, s32 del) {
 void fn_8003DA7C(void) {
     s32 i = 0;
     s32 off = 0;
-    u8* list = *(u8**)(fn_801F06FC() + 0x8);
+    u8* list = **(u8***)(fn_801F06FC() + 0x8);   // the level header: part list at +0x44, count +0x48
     while (i < *(s32*)(list + 0x48) && *(s32*)(*(u8**)(list + 0x44) + off) != 0) {
         u32 id = *(u32*)(*(u8**)(*(u8**)(list + 0x44) + off) + 0xC) & 0xFFFF;
         if (*(s32*)(GetGlobalSettings() + 0x68) + 1 <= (s32)id) {
