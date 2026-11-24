@@ -26,7 +26,7 @@
 extern "C" u32 _ctors[];      // 0x80345AE0, resolved by port_gen.obj like every other Wii global
 
 PortOptions gPortOptions;
-PortSettings gPortSettings = {1920, 1080, TRUE, FALSE, FALSE, FALSE, 100, FALSE, "", 100, PORT_FILTER_GAME};
+PortSettings gPortSettings = {1920, 1080, TRUE, FALSE, FALSE, FALSE, 100, FALSE, "", 100, PORT_FILTER_GAME, 0};
 
 // ------------------------------------------------------------------ log and boot summary
 struct Milestone { const char* what; u32 count; u32 ms; BOOL stub; };
@@ -642,6 +642,7 @@ extern volatile LONG gPortIdleWaiters;  // port_os.cpp: waiters registered at th
 static HANDLE sIdleEvent;                                    // fast-forward: wakes the interrupt thread when all threads wait
 
 void PortWaitChange(void) {
+    if (PortGfxIdle()) return;                   // the drawing thread waits: it showed the last picture again (the caller checks its condition again)
     u32 gen = sChangeGen;
     AcquireSRWLockExclusive(&sChangeLock);
     if (sChangeGen == gen) {                     // a signal clears the count: every waiter wakes and registers again
@@ -902,6 +903,14 @@ struct PortBoot {
                 if (pct > 0 && pct < 10) pct = (int)(atof(__argv[i]) * 100 + 0.5);
                 if (pct >= 50 && pct <= 200) gPortSettings.renderScale = pct;
                 else fprintf(stderr, "[port] --render-scale %s: expected 50-200 (percent) or 0.5-2\n", __argv[i]);
+            }
+            else if (!strcmp(a, "--fps-cap") && i + 1 < __argc) {
+                const char* v = __argv[++i];
+                if (!_stricmp(v, "off")) gPortSettings.fpsCap = 0;
+                else if (!_stricmp(v, "uncapped")) gPortSettings.fpsCap = PORT_FPS_UNCAPPED;
+                else if (!_stricmp(v, "display")) gPortSettings.fpsCap = PORT_FPS_DISPLAY;
+                else if (atoi(v) >= 10 && atoi(v) <= 1000) gPortSettings.fpsCap = atoi(v);
+                else fprintf(stderr, "[port] --fps-cap %s: expected off, uncapped, display or a rate (30, 60, 120, 144...)\n", v);
             }
             else if (!strcmp(a, "--filter") && i + 1 < __argc) {
                 int f = -1;
