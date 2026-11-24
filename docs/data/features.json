@@ -99,6 +99,11 @@
  "changelog": [
   {
    "date": "2026-11-24",
+   "time": "01:19",
+   "text": "Checked about 165 larger engine functions (rendering, effects, animation, the UI engine, sound) against the original game code and fixed 5 mistakes in our decompiled code (PR #131). Audited functions are listed in docs/audit_log.txt."
+  },
+  {
+   "date": "2026-11-24",
    "time": "01:18",
    "text": "More of the PC version works (PRs #123, #124, #125, #130). On the main menu, pointing at Options and pressing A opens the Options screen. The game can also read .wbfs disc images, and the settings screen has render scale (50 to 200%) and texture filtering (nearest, bilinear or anisotropic). Two mistakes in our decompiled code were fixed: the scan reticle wrote three numbers into room for two, and a badge notice used the wrong queue index. The first level now runs for about 1,250 frames."
   },
