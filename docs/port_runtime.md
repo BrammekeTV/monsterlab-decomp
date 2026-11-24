@@ -508,3 +508,21 @@ MSVC only for now (absolute symbols, `/alternatename`, structured exception hand
 6. **Initialised data**: add `port_data.txt` entries where a mixed struct is read wrongly (the
    seven `GXRenderModeObj` tables are in).
 7. **GX**: draw (OpenGL). Until then a "frame" is only a VI flip.
+
+## Benchmark and frame-time log
+
+`--perf-log FILE` writes one CSV row per shown frame (`frame, fast, wall_ms, game_ms, render_ms, wait_ms, present_ms, draws, vertices, copies,
+textures, out_w, out_h`; `fast` is 1 while fast-forwarding) and, when the run ends, `FILE.summary.txt` with the real-time frames' average, p50,
+p95, p99 and worst frame time, fps and the average split. `--bench menu|village` is a fixed scenario: unpaced to the main menu (or, for
+`village`, through the new-game conversation to the village map), then 20 s of real time, then the exit; the log goes to `build/pc/bench.csv`
+unless `--perf-log` says otherwise. Same settings (`--res`, `--msaa`, `--render-scale`, `--vsync`, `--fps-cap`) give comparable runs.
+
+On a PC with a monitor, run from the repository folder (the disc in `orig/` as usual), one scenario after the other with nothing else running:
+
+```powershell
+build\pc\monsterlab.exe --window --res 1920x1080 --bench menu --perf-log bench_menu_1080.csv
+build\pc\monsterlab.exe --window --res 1920x1080 --bench village --perf-log bench_village_1080.csv
+```
+
+The window opens, the game fast-forwards (about 30 s for the menu, 60 s for the village), plays 20 s in real time and closes by itself. Send
+`bench_*.csv` and `bench_*.csv.summary.txt`. Add `--msaa 4`, `--render-scale 1.5` or `--res 2560x1440` for the other settings.
