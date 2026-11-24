@@ -277,6 +277,12 @@ GXFifoObj* GXInit(void* base, u32 size) {
     gPortGxRegs.bpMask = 0x00FFFFFF;
     GXInitFifoBase(&sMainFifo, base, size);
     sCpu = sGp = (PortFifo*)&sMainFifo;
+    // The register writes at the end of __GXInitRevisionBits (0x802487B8): XF 0x1000 = 0x3F, XF 0x1012 = 1
+    // (post-texgen "dual" matrices on: the game loads its animated texture matrices there, XF 0x500) and
+    // BP 0x58 = 0xF.
+    PortGxWrite8(0x10); PortGxWrite32(0x1000); PortGxWrite32(0x3F);
+    PortGxWrite8(0x10); PortGxWrite32(0x1012); PortGxWrite32(1);
+    PortGxWrite8(0x61); PortGxWrite32(0x5800000F);
     return &sMainFifo;
 }
 void GXInitFifoBase(GXFifoObj* fifo, void* base, u32 size) {
