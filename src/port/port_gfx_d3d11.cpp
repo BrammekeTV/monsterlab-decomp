@@ -85,7 +85,7 @@ struct OutKey { u32 bm, zm, alpha, cull, vp[6], sc0, sc1; f32 squeeze; s32 offX,
 
 static struct { u32 draws, tris, presents, texCopies, textures, shaders, skipped; } sGfxStats;
 // This frame so far (reset at each display copy): time inside this backend, draws, GX vertices, copies.
-static s64 sTotalDraw, sTotalCopy;     // time inside the backend over the whole run (the boot summary)
+static s64 sTotalDraw, sTotalCopy, sTotalFlush, sTRes, sTBlit, sTMk, sTDisp, sTPres, sTNew, sTRtv; static u32 sNewTex; static std::vector<ID3D11Texture2D*> sTexPool;     // time inside the backend over the whole run (the boot summary)
 static struct { s64 renderTicks; u32 draws, verts, copies; } sFrame;
 static inline s64 Ticks_freq(void) { LARGE_INTEGER f; QueryPerformanceFrequency(&f); return f.QuadPart; }
 static inline s64 Ticks(void) { LARGE_INTEGER t; QueryPerformanceCounter(&t); return t.QuadPart; }
@@ -1129,6 +1129,19 @@ static void FrameStats(PortFrameStats* s) {
     s->textures = (u32)(sTextures.size() + sEfbCopies.size());
     s->voices = PortAudioVoices(&s->voiceCount);
     s->outW = sOutW; s->outH = sOutH; s->picW = sPicW; s->picH = sPicH; s->wide = gPortSettings.wide;
+    // PORT_PERF_LOG=1: average split of every 300 shown frames on stderr (headless profiling without screenshots).
+    static int perfOn = -1, perfN, perfCalls; if (++perfCalls == 50) PortLog("perf: 50 calls, frameMs %.2f", s->frameMs);
+    static f64 perfSum[7];
+    if (perfOn < 0) { const char* e = getenv("PORT_PERF_LOG"); perfOn = e && *e == '1'; }
+    if (perfOn && last && s->frameMs > 0.0f) {
+        f64 v[7] = { s->frameMs, s->gameMs, s->renderMs, s->waitMs, (f64)sFrame.draws, (f64)sFrame.verts, (f64)sFrame.copies };
+        for (int i = 0; i < 7; i++) perfSum[i] += v[i];
+        if (++perfN == 300) {
+            PortLog("perf: frame %.2f ms  game %.2f  render %.2f  wait %.2f  draws %.0f  verts %.0f  copies %.1f\n",
+                    perfSum[0] / perfN, perfSum[1] / perfN, perfSum[2] / perfN, perfSum[3] / perfN, perfSum[4] / perfN, perfSum[5] / perfN, perfSum[6] / perfN);
+            memset(perfSum, 0, sizeof(perfSum)); perfN = 0;
+        }
+    }
     sFrame.renderTicks = 0; sFrame.draws = sFrame.verts = sFrame.copies = 0;
 }
 
@@ -1227,9 +1240,13 @@ BOOL PortGfxIdle(void) {
 
 static void CopyEfb(const PortGx* g, u32 control) {
     if (!sStarted) return;
+    s64 tf = Ticks();
     FlushDraws();
+    sTotalFlush += Ticks() - tf;
     sDrawBound = FALSE;
+    s64 tr = Ticks();
     if (sEfbMs) sCtx->ResolveSubresource(sEfbTex, 0, sEfbMs, 0, DXGI_FORMAT_R8G8B8A8_UNORM);   // every copy reads the resolved picture
+    sTRes += Ticks() - tr;
     if (sTrace) {
         static int n;
         char path[64];
@@ -1258,6 +1275,7 @@ static void CopyEfb(const PortGx* g, u32 control) {
         for (auto& sm : sSamplers) if (sm) { sm->Release(); sm = NULL; }
         sDrawBound = FALSE;
     }
+    s64 td0 = Ticks();
     if (control & 0x4000) {                                 // to the display: the picture's part of the output
         f32 black[4] = {0, 0, 0, 1};
         if (sPicW != sOutW || sPicH != sOutH) sCtx->ClearRenderTargetView(sOutRtv, black);
@@ -1271,9 +1289,12 @@ static void CopyEfb(const PortGx* g, u32 control) {
         if (gPortOptions.screenshotStats) PortOverlayDraw(sOutRtv, sOutW, sOutH);
         // Fast-forward: the window gets a picture only four times a second, with the progress in the title bar.
         BOOL fast = PortFastActive();
+        s64 tp = Ticks();
         if (FastProgress() && GamePresentDue()) PresentOut(fast);
+        sTPres += Ticks() - tp;
         sGfxStats.presents++;
         if (sTraceFrom > 1 && sGfxStats.presents >= sTraceFrom) sTrace = TRUE;
+        sTDisp += Ticks() - td0;
     } else {                                                // into a texture, kept at the frame buffer's resolution
         // The copy's format (bits 3-6, low bit = the second half of the list) says which
         // channels it takes: 8 red, 9 green, 10 blue, 7 alpha as an intensity texture; the others
@@ -1331,30 +1352,51 @@ static void CopyEfb(const PortGx* g, u32 control) {
             D3D11_TEXTURE2D_DESC d = {};
             d.Width = dw; d.Height = needH; d.MipLevels = 1; d.ArraySize = 1; d.Format = DXGI_FORMAT_R8G8B8A8_UNORM;
             d.SampleDesc.Count = 1; d.BindFlags = D3D11_BIND_SHADER_RESOURCE | D3D11_BIND_RENDER_TARGET;
-            if (SUCCEEDED(sDev->CreateTexture2D(&d, NULL, &t))) {
+            // A copy texture that was replaced goes into a small pool: the blur chain of the menu makes a taller texture
+            // out of the same address every band and frame, and CreateTexture2D took about 0.8 ms each at 1080p. A pooled
+            // texture of the same size is completely overwritten (blit, or copy of the rows below) before it is read.
+            sNewTex++; s64 tn = Ticks();
+            for (size_t i = 0; i < sTexPool.size(); i++) {
+                D3D11_TEXTURE2D_DESC pd;
+                sTexPool[i]->GetDesc(&pd);
+                if (pd.Width == d.Width && pd.Height == d.Height) { t = sTexPool[i]; sTexPool.erase(sTexPool.begin() + i); break; }
+            }
+            if (t || SUCCEEDED(sDev->CreateTexture2D(&d, NULL, &t))) {
                 if (under) { D3D11_BOX all = {0, 0, 0, ud.Width, ud.Height, 1}; sCtx->CopySubresourceRegion(t, 0, 0, 0, 0, under, 0, &all); }
                 ID3D11ShaderResourceView*& slot = sEfbCopies[addr];
-                if (slot) slot->Release();
+                if (slot) {
+                    ID3D11Resource* res = NULL;
+                    slot->GetResource(&res);
+                    ID3D11Texture2D* ot = NULL;
+                    if (res) { res->QueryInterface(__uuidof(ID3D11Texture2D), (void**)&ot); res->Release(); }
+                    if (ot && sTexPool.size() < 16) sTexPool.push_back(ot);
+                    else if (ot) ot->Release();
+                    slot->Release();
+                }
                 slot = NULL;
                 sDev->CreateShaderResourceView(t, NULL, &slot);
             }
+            sTNew += Ticks() - tn;
             if (under) under->Release();
         }
         if (t) {
             ID3D11RenderTargetView* rtv = NULL;
-            sDev->CreateRenderTargetView(t, NULL, &rtv);
-            if (rtv) { Blit(sEfbSrv, rtv, 0, (u32)PxY(row), dw, dh, su0, sv0, sdu, sdv, pick); rtv->Release(); }
+            s64 tv = Ticks(); sDev->CreateRenderTargetView(t, NULL, &rtv); sTRtv += Ticks() - tv;
+            if (rtv) { s64 tb = Ticks(); Blit(sEfbSrv, rtv, 0, (u32)PxY(row), dw, dh, su0, sv0, sdu, sdv, pick); sTBlit += Ticks() - tb; rtv->Release(); }
             if (!row || !sEfbCopyRowBytes.count(addr)) sEfbCopyRowBytes[addr] = rowBytes;
             t->Release();
         }
         sGfxStats.texCopies++;
         sFrame.copies++;
     }
+    sTMk += Ticks() - td0;
+    s64 tcl = Ticks();
     if (control & 0x800) {                                  // clear afterwards (BP 0x4F alpha/red, 0x50 green/blue, 0x51 depth)
         f32 c[4] = {(g->bp[0x4F] & 255) / 255.0f, ((g->bp[0x50] >> 8) & 255) / 255.0f, (g->bp[0x50] & 255) / 255.0f, ((g->bp[0x4F] >> 8) & 255) / 255.0f};
         if (g->bp[0x41] & 0x18) sCtx->ClearRenderTargetView(sEfbRtv, c);
         if (g->bp[0x40] & 0x10) sCtx->ClearDepthStencilView(sEfbDsv, D3D11_CLEAR_DEPTH, (g->bp[0x51] & 0xFFFFFF) / 16777215.0f, 0);
     }
+    sTPres += Ticks() - tcl;
 }
 
 // ------------------------------------------------------------------ PNG (stored, no compression)
@@ -1598,6 +1640,7 @@ BOOL PortGfxStart(BOOL window) {
 }
 
 const char* PortGfxStatsText(char* buf, u32 n) {
+    if (sStarted) PortLog("gfx copy time: flush %.1f s, resolve %.1f s, blit %.1f s", sTotalFlush / (double)Ticks_freq(), sTRes / (double)Ticks_freq(), sTBlit / (double)Ticks_freq()); if (sStarted) PortLog("gfx new textures %u: %.1f s, rtv %.1f s", sNewTex, sTNew / (double)Ticks_freq(), sTRtv / (double)Ticks_freq()); PortLog("gfx tex/display part %.1f s, clear+present %.1f s; disp %.1f", sTMk / (double)Ticks_freq(), sTPres / (double)Ticks_freq(), sTDisp / (double)Ticks_freq(), sTPres / (double)Ticks_freq());
     if (!sStarted) { snprintf(buf, n, "no renderer (run with --window or --screenshot FILE)"); return buf; }
     snprintf(buf, n, "%u draw(s), %u triangle(s), %u picture(s) shown (+%u again while waiting for a retrace), %u copy(ies) to a texture, %u texture(s) decoded, %u shader(s), %u draw(s) skipped; backend time: draws %.1f s, copies %.1f s, %u draw(s) dropped by fast-forward",
              sGfxStats.draws, sGfxStats.tris, sGfxStats.presents, sExtraPictures, sGfxStats.texCopies, sGfxStats.textures, sGfxStats.shaders, sGfxStats.skipped,
