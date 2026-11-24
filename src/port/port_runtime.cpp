@@ -397,7 +397,7 @@ static BOOL DemoRedirect(CONTEXT* c, BOOL onMainThread) {
     return TRUE;
 }
 
-// --watch ADDR: a hardware write breakpoint on four bytes of Wii memory, on the main thread only.
+// --watch ADDR: a hardware write breakpoint on four bytes of Wii memory, on the game's threads.
 // Each write is reported with the function that made it, the new value and the stack.
 static u32 sWatch;
 static DWORD WINAPI WatchArm(void* thread) {
@@ -411,6 +411,13 @@ static DWORD WINAPI WatchArm(void* thread) {
     }
     ResumeThread((HANDLE)thread);
     return 0;
+}
+
+// The watch covers the game's other threads too: OSCreateThread arms each one it starts.
+extern "C" void PortWatchArmThread(void* thread) {
+    if (!sWatch) return;
+    HANDLE h = CreateThread(NULL, 0, WatchArm, thread, 0, NULL);
+    if (h) { WaitForSingleObject(h, INFINITE); CloseHandle(h); }
 }
 
 static LONG CALLBACK TrapHandler(EXCEPTION_POINTERS* e) {

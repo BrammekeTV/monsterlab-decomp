@@ -40,11 +40,16 @@ static u32 sLostBytes;                 // written with no CPU FIFO attached
 static char sError[160];               // first malformed command
 
 // ------------------------------------------------------------------ the pipe
+// The processor interface's FIFO write pointer (0xCC003014). The game reads the register itself
+// to learn how many bytes the display list it is recording holds (fn_8015BA30: register minus the
+// list's base), and moves on to the next list when this one is nearly full.
+#define PI_FIFO_WRITE_PTR (*(volatile u32*)(uintptr_t)(PORT_HW_BASE + 0x3014))
 static inline void Put(u8 b) {
     PortFifo* f = sCpu;
     if (!f || !f->base) { sLostBytes++; return; }
     *f->wr++ = b;
     if (f->wr >= f->base + f->size) f->wr = f->base;       // the hardware wraps too
+    PI_FIFO_WRITE_PTR = (u32)(uintptr_t)f->wr;
 }
 extern "C" void PortGxFlushState(void);            // port_gxstate.cpp
 extern "C" void PortGxWrite8(u8 v) { Put(v); }
@@ -281,6 +286,7 @@ void GXInitFifoPtrs(GXFifoObj* fifo, void* readPtr, void* writePtr) {
     PortFifo* f = (PortFifo*)fifo;
     f->rd = (u8*)readPtr;
     f->wr = (u8*)writePtr;
+    if (f == sCpu) PI_FIFO_WRITE_PTR = (u32)(uintptr_t)f->wr;
 }
 void GXGetFifoPtrs(GXFifoObj* fifo, void** readPtr, void** writePtr) {
     PortFifo* f = (PortFifo*)fifo;
@@ -294,6 +300,7 @@ void GXSaveGPFifo(GXFifoObj* fifo) { (void)fifo; }
 void GXSetCPUFifo(GXFifoObj* fifo) {
     if (sCpu == sGp) Drain();
     sCpu = (PortFifo*)fifo;
+    PI_FIFO_WRITE_PTR = (u32)(uintptr_t)sCpu->wr;
 }
 // Attaching the GP to a FIFO runs the commands in it: this is where a display list executes.
 void GXSetGPFifo(GXFifoObj* fifo) {

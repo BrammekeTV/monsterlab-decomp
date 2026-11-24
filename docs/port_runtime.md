@@ -44,11 +44,14 @@ build\pc\monsterlab.exe                        # runs main() with your own disc 
 | `--aspect 4:3\|16:9` | picture shape and the console's widescreen setting (default 16:9) |
 | `--stretch-ui` | 16:9: stretch the 2D layer over the whole width, as the console does |
 | `--peek ADDR` | print four words of Wii memory (hex address) when the run stops |
-| `--watch ADDR` | report every write of the main thread to four bytes of Wii memory (hex address): writer, new value, stack |
+| `--watch ADDR` | report every write of the game's threads to four bytes of Wii memory (hex address): writer, new value, stack |
 | `--press BUTTON@FRAME[-FRAME]` | hold a Wii Remote button (a name from the binding table: `A`, `B`, `PLUS`, `STICK_UP`...) during those frames; a press without an end lasts 6 frames. For headless tests; can be given up to 32 times |
 | `--show-texture N` | development aid: when the boot stops, draw texture N of `global_binary.sir` through the engine's draw path instead of ending (see "GX: the renderer") |
 
 Debugging aids: `--peek ADDR` (up to eight) prints four words of Wii memory at the stop;
+`PORT_HEAP_CHECK=1` in the environment checks the heap's block list before every allocation and free
+and stops at the first damaged block header, naming the block in front of it (then `--watch` on
+that header's address finds the writer);
 `PORT_SCRIPT_TRACE=1` in the environment logs every call the script engine makes to a registered
 script function, by name; `PORT_GFX_TRACE=1` logs draws and copies.
 

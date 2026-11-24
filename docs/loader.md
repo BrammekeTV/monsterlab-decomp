@@ -653,10 +653,11 @@ installs the vtable for the entity's type and prepares what hangs off it. The lo
 |---|---|---|
 | `0x000` | vtable slot (build-time address; the constructor for the type stores the real one) | `fn_801B4334`, `fn_8006F61C`, `fn_800690D4`, ... |
 | `0x004` | record (below) | `fn_8012F8B8`, `fn_801B4334` |
-| `0x08C` | part container: `{+0x0C items, +0x10 count}`; an item has `{+0x24 parts, +0x28 count}`; a part is `{vtable slot, word, -, kind}` and gets its vtable by kind | `fn_8012F6B0` |
+| `0x08C` | part container: `{+0x08 entity, +0x0C items, +0x10 count}`; an item (group) has `{+0x04 container, +0x08 key, +0x20 flags, +0x24 parts, +0x28 count}`; a part is a collision shape of 0x40 bytes and gets its vtable by kind: `{vtable slot, word, +0x08 definition, +0x0C kind, +0x10 entity, +0x14 / +0x20 position now and before, +0x2C key, +0x30 bone hash, +0x34 bone index, +0x3C radius}`; its definition (often in zone 0) is `{kind, key, bone hash, +0x0C offset (3 floats), +0x24 radius}`. What a kind adds after +0x40 is not converted (only kind 0, the sphere, is used in the first levels) | `fn_8012F6B0`, `fn_801B1778`, `fn_801AD050`, `fn_801ACD08` |
 | `0x090` | scene object (below) | `fn_8012F8B8` |
 | `0x094`, `0x098` | words the base constructor clears | `fn_801B4334` |
-| `0x09C` | object whose `+0x08` is an id, for a type 6 entity | `fn_8012F8B8` |
+| `0x09C` | object whose `+0x08` is an id, for a type 6 entity. For the other types it is the definition: `+0x08` id, `+0x48` animation set, converted like a prop's (`fn_800526E4` -> `fn_801AC6B4` reads its entries when the entity wakes) | `fn_8012F8B8` |
+| `0x0EC` | the event that wakes the entity while it sleeps (record state `0x100`): `EventSend` to it with this id sets `0x200` (`fn_801B9F14`); `0x6C938971` is the plain wake-up. `0x0F0`, `0x0F4`: two event ids `EventMgrFlushFor` compares. Converted for every entity type: without it no character or effect entity ever wakes | `fn_801B9F14`, `WorldTick`, `EventMgrFlushFor` |
 | `0x0A4` | state machine holder `{machine, object}`; the machine's definition goes to `fn_801BC574` | `fn_8012F8B8` |
 | `0x0B0` | child list: nodes `{+0x04 entity, +0x08 next}` | `fn_8012F8B8` |
 | `0x158` | float | `fn_800690D4` |
