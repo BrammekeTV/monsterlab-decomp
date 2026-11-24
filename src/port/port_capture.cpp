@@ -5,7 +5,8 @@
 //   capture_<stamp>_picture.png      the output picture (what the display copy produced, at the output size)
 //   capture_<stamp>_backbuffer.png   the window's back buffer as presented (with the overlay), windowed runs only
 //   capture_<stamp>_settings.txt     every setting, the options of the run and the window's size and DPI
-// Captures are never committed (the folder is in .gitignore). --capture-at N takes one at frame N (tests).
+// Captures are never committed (the folder is in .gitignore). --capture-at N takes one at frame N (tests);
+// --capture-at FROM-TO/N takes one every N frames from FROM to TO (a camera move or an attack, frame by frame).
 #ifdef _WIN32
 #define WIN32_LEAN_AND_MEAN
 #define NOMINMAX
@@ -48,13 +49,18 @@ static void WriteSettings(const char* path, const char* stamp) {
 }
 
 void PortCaptureFrame(void) {
-    static BOOL wasDown, doneAt;
+    static BOOL wasDown;
+    static s32 nextAt;
     HWND wnd = PortGfxWindow();
     BOOL down = wnd && GetForegroundWindow() == wnd && (GetAsyncKeyState(VK_F12) & 0x8000);
-    BOOL take = (down && !wasDown) || (gPortOptions.captureAt > 0 && !doneAt && PortFrameCount() >= gPortOptions.captureAt);
+    if (nextAt == 0) nextAt = gPortOptions.captureAt;
+    BOOL timed = nextAt > 0 && (s32)PortFrameCount() >= nextAt;
+    BOOL take = (down && !wasDown) || timed;
     wasDown = down;
     if (!take) return;
-    doneAt = TRUE;
+    if (timed) {   // the next one of a series, or none
+        nextAt = (gPortOptions.captureEvery > 0 && nextAt + gPortOptions.captureEvery <= gPortOptions.captureTo) ? nextAt + gPortOptions.captureEvery : -1;
+    }
     char dir[MAX_PATH + 16], prefix[MAX_PATH + 80], path[MAX_PATH + 100], stamp[64];
     ExeDir(dir, sizeof(dir));
     strcat(dir, "captures");
