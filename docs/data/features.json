@@ -99,6 +99,11 @@
  "changelog": [
   {
    "date": "2026-11-24",
+   "time": "10:30",
+   "text": "Further into the game on Windows (PR #153, which includes #152). The opening conversation with Professor Fuseless plays, with voice lines, and advances with A, and the village map level loads and its intro cutscene starts. The cutscene doesn't finish yet: the coffin never lands. On the main menu, the projector machine now draws (PR #151), and the mouse cursor now stays under the mouse at the top and bottom of the screen (PR #148)."
+  },
+  {
+   "date": "2026-11-24",
    "time": "10:19",
    "text": "Cutscenes play on Windows (PR #150): the game's Bink movies now show with picture and sound, starting with the intro movie, through the game's own drawing code. --no-movies skips them."
   },
