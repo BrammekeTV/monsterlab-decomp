@@ -1025,6 +1025,9 @@ Read when the first map level (`village_level.sir`) starts:
   bytes at `+0x64` and `+0x9C`) and every junction record (0xDC bytes, `fn_800D5008`: six words,
   up to twelve entries of three floats and a byte from `+0x18`, their count at `+0xD8`) into the
   object database.
+- **Spawn owners** (header `+0x74`, `+0x78`): the objects `SpawnCoffinProjectile` and
+  `FireRocketAtEntity` spawn from. `SpawnHelper` compares the type id at their `+0x00` with
+  `0x37645F52`; only the two pointers and that word are converted so far.
 - **Camera objects** (a slot's objects, `+0xA8`): every type starts the same way (`fn_800DECD8`,
   `fn_800DE678`): `+0x0C` how many boundary nodes, `+0x10` the nodes (0x14 bytes: a word, a
   position, a float), `+0x14` how many segments, `+0x18` the segments (two node indices, bytes),

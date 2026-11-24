@@ -464,6 +464,7 @@ typedef struct LevelZoneRoots {
     u32  pathCount;          // header +0x30
     u32  junctions;          // header +0x38: pointers to the map's junction records
     u32  junctionCount;      // header +0x3C
+    u32  spawnOwners[2];     // header +0x74, +0x78: the objects projectiles are spawned from, or 0 when in another zone
     u32* zoneRecords;        // every slot's +0xFC: the zone record WorldTick walks
     u32  zoneRecordCount;
     u32* zoneLists;          // first node of the list (+0x10) of each record that lies in the other image

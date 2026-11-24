@@ -2922,6 +2922,7 @@ static const SirField kLevelHeaderFields[] = {
     { 0x030, SIR_U32, 1 },    // code: its count
     { 0x038, SIR_PTR, 1 },    // code: second object list
     { 0x03C, SIR_U32, 1 },    // code: its count
+    { 0x074, SIR_PTR, 2 },    // code: the objects projectiles are spawned from (SpawnCoffinProjectile +0x74, FireRocketAtEntity +0x78)
     { 0x07C, SIR_U32, 1 },    // code: fn_8012FFA4 copies +0x7C..+0x90 to the manager lbl_8047C730: count,
     { 0x080, SIR_PTR, 1 },    //       entries, (u8 flag at +0x84),
     { 0x088, SIR_U32, 1 },    //       count,
@@ -3228,6 +3229,7 @@ extern "C" BOOL LevelZoneRootsCollect(const u8* hdr, u32 hdrSize, const u8* zone
     if (ok) out->hud = ZoneAddr(hdr + 0x1F4, zoneHost, zoneSize, zoneWiiBase);
     if (ok && Host32(hdr + 0x24) != 0 && (out->locators = ZoneAddr(hdr + 0x28, zoneHost, zoneSize, zoneWiiBase)) != 0)
         out->locatorCount = Host32(hdr + 0x24);
+    for (u32 k = 0; ok && k < 2; k++) out->spawnOwners[k] = ZoneAddr(hdr + 0x74 + k * 4, zoneHost, zoneSize, zoneWiiBase);
     if (ok && Host32(hdr + 0x30) != 0 && (out->paths = ZoneAddr(hdr + 0x2C, zoneHost, zoneSize, zoneWiiBase)) != 0)
         out->pathCount = Host32(hdr + 0x30);
     if (ok && Host32(hdr + 0x3C) != 0 && (out->junctions = ZoneAddr(hdr + 0x38, zoneHost, zoneSize, zoneWiiBase)) != 0)
@@ -3461,6 +3463,12 @@ extern "C" SirError LevelZoneConvert(SirReloc* r, u8* image, u32 imageSize, u32 
         u32 l;
         if (roots->locatorCount > imageSize / LOCATOR_SIZE || !LevelSpan(roots->locators, (u64)roots->locatorCount * LOCATOR_SIZE, imageSize, &l) ||
             !PlanAdd(&plan, l, roots->locatorCount * LOCATOR_SIZE, REGION_LOCATORS)) e = SIR_ERR_LEVEL;
+    }
+    // The objects projectiles are spawned from (header +0x74, +0x78): SpawnHelper compares the type
+    // id at +0x00 with 0x37645F52. Nothing else of them is typed yet.
+    for (u32 k = 0; k < 2 && e == SIR_OK; k++) {
+        u32 o;
+        if (LevelSpan(roots->spawnOwners[k], 4, imageSize, &o) && !PlanHas(&plan, o, REGION_U32_ARRAY) && !PlanAdd(&plan, o, 4, REGION_U32_ARRAY)) e = SIR_ERR_LEVEL;
     }
     // The exploration map (header +0x2C / +0x38): fn_8013006C copies every path record (0x1AC bytes,
     // fn_800D4DE8: words, but for the bytes at +0x64 and +0x9C) and every junction record (0xDC
