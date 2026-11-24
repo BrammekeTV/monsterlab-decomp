@@ -156,6 +156,17 @@ static void PageDisplay(void) {
     if (ImGui::Checkbox("Vertical sync", &b)) sEdit.vsync = gPortSettings.vsync = b;
     b = sEdit.fullscreen != 0;
     if (ImGui::Checkbox("Fullscreen (borderless)", &b)) { sEdit.fullscreen = gPortSettings.fullscreen = b; PortGfxSetFullscreen(b); }
+    int rs = sEdit.renderScale;
+    if (ImGui::SliderInt("Render scale", &rs, 50, 200, "%d%%")) sEdit.renderScale = rs;
+    ImGui::TextDisabled("Size of the internal frame buffer relative to the picture: below 100%% is faster and softer, above is supersampled. Applies when the game is started again.");
+    static const char* const kFilter[PORT_FILTER_COUNT] = {"Game's own", "Nearest (sharp pixels)", "Bilinear (smooth, mip-mapped)",
+                                                           "Anisotropic 2x", "Anisotropic 4x", "Anisotropic 8x", "Anisotropic 16x"};
+    if (ImGui::BeginCombo("Texture filtering", kFilter[sEdit.texFilter])) {
+        for (int k = 0; k < PORT_FILTER_COUNT; k++)
+            if (ImGui::Selectable(kFilter[k], k == sEdit.texFilter)) { sEdit.texFilter = gPortSettings.texFilter = k; PortGfxApplySettings(); }
+        ImGui::EndCombo();
+    }
+    ImGui::TextDisabled("Anisotropic keeps textures sharp on surfaces seen at a slant; the others change how close-up and distant textures are smoothed.");
     b = gPortOverlayOn != 0;
     if (ImGui::Checkbox("Stats overlay (F3)", &b)) gPortOverlayOn = b;
 }
