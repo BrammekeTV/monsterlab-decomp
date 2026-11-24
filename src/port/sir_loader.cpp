@@ -1899,6 +1899,37 @@ static SirError SceneItemDrawPlan(ImagePlan* plan, const u8* image, u32 imageSiz
     return SIR_OK;
 }
 
+// Effect library: header +0x7C records, array at +0x80 (fn_8012FFA4 hands it to the manager lbl_8047C730; SpawnEffectAt
+// binary-searches it by the key when the sorted flag at +0x84 is set). A record (0xEC bytes): +0x00 the effect's name hash,
+// +0x04 the number of emitters (up to 8), from +0x0C the emitters (0x1C bytes: a pointer to the emitter descriptor, six floats).
+// A descriptor (0x1F4 bytes, found by the stride between them) is all words: hashes and floats, no pointers.
+#define FX_EFFECT_SIZE 0xEC
+#define FX_EMITTER_SIZE 0x1C
+#define FX_EMITTER_DESC_SIZE 0x1F4
+static SirError FxEffectLibraryPlan(ImagePlan* plan, const u8* image, u32 imageSize, u32 addr, u32 count) {
+    u32 off, o;
+    if (count == 0 || addr == 0) return SIR_OK;
+    if (count > 0x10000 || !ImageSpan(addr, (u64)count * FX_EFFECT_SIZE, imageSize, &off)) return SIR_ERR_EFFECTS;
+    for (u32 i = 0; i < count; i++) {
+        u32 rec = off + i * FX_EFFECT_SIZE, emitters = Be32(image + rec + 4);
+        if (emitters > 8 || !PlanAdd(plan, rec, 8, REGION_U32_ARRAY)) return SIR_ERR_EFFECTS;
+        for (u32 k = 0; k < emitters; k++) {
+            u32 e = rec + 0x0C + k * FX_EMITTER_SIZE;
+            if (!PlanAdd(plan, e, 4, REGION_PTR_ARRAY) || !PlanAdd(plan, e + 4, FX_EMITTER_SIZE - 4, REGION_U32_ARRAY)) return SIR_ERR_EFFECTS;
+            if (!ImageSpan(Be32(image + e), FX_EMITTER_DESC_SIZE, imageSize, &o)) return SIR_ERR_EFFECTS;
+            if (PlanHas(plan, o, REGION_U32_ARRAY)) continue;
+            // +0x1D4 a texture record (a sprite emitter), +0x1D8 a scene item whose mesh is the particle (fn_801CBD40).
+            if (!PlanAdd(plan, o, 0x1D4, REGION_U32_ARRAY) || !PlanAdd(plan, o + 0x1D4, 8, REGION_PTR_ARRAY) ||
+                !PlanAdd(plan, o + 0x1DC, FX_EMITTER_DESC_SIZE - 0x1DC, REGION_U32_ARRAY)) return SIR_ERR_EFFECTS;
+            SirError te = MaterialTexturePlan(plan, image, imageSize, Be32(image + o + 0x1D4));
+            u32 it;
+            if (te == SIR_OK && LevelSpan(Be32(image + o + 0x1D8), 0xC4, imageSize, &it)) te = SceneItemDrawPlan(plan, image, imageSize, it);
+            if (te != SIR_OK) return te;
+        }
+    }
+    return SIR_OK;
+}
+
 static SirError SceneObjectPlan(ImagePlan* plan, const u8* image, u32 imageSize, u32 addr) {
     u32 off, o;
     if (!LevelSpan(addr, 8, imageSize, &off) || PlanHas(plan, off + 4, REGION_U32_ARRAY)) return SIR_OK;
@@ -3186,6 +3217,8 @@ extern "C" BOOL LevelZoneRootsCollect(const u8* hdr, u32 hdrSize, const u8* zone
     if (ok) out->hud = ZoneAddr(hdr + 0x1F4, zoneHost, zoneSize, zoneWiiBase);
     if (ok && Host32(hdr + 0x24) != 0 && (out->locators = ZoneAddr(hdr + 0x28, zoneHost, zoneSize, zoneWiiBase)) != 0)
         out->locatorCount = Host32(hdr + 0x24);
+    if (ok && Host32(hdr + 0x7C) != 0 && (out->effectLibrary = ZoneAddr(hdr + 0x80, zoneHost, zoneSize, zoneWiiBase)) != 0)
+        out->effectLibraryCount = Host32(hdr + 0x7C);
     for (u32 t = 0; ok && t < 2; t++) {                          // scene objects: the tables at +0x1B0 and +0x1BC
         const u8* table = HeaderTable(hdr, hdrSize, hdr + kLevelBlockTables[t], &entries);
         for (u32 k = 0; ok && table != NULL && k < entries; k++)
@@ -3390,6 +3423,7 @@ extern "C" SirError LevelZoneConvert(SirReloc* r, u8* image, u32 imageSize, u32 
     if (roots->hud != 0) e = HudPlan(&plan, image, imageSize, roots->hud, true);
     for (u32 i = 0; i < roots->entityCount && e == SIR_OK; i++) e = EntityPlan(&plan, image, imageSize, roots->entities[i], 0);
     for (u32 i = 0; i < roots->sceneObjectCount && e == SIR_OK; i++) e = SceneObjectPlan(&plan, image, imageSize, roots->sceneObjects[i]);
+    if (e == SIR_OK && roots->effectLibraryCount != 0) e = FxEffectLibraryPlan(&plan, image, imageSize, roots->effectLibrary, roots->effectLibraryCount);
     for (u32 i = 0; i < roots->poolTableCount && e == SIR_OK; i++)
         e = PoolTablePlan(&plan, image, imageSize, roots->poolTables[i * 2], roots->poolTables[i * 2 + 1]);
     if (e == SIR_OK && roots->locatorCount != 0) {
