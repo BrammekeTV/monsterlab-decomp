@@ -87,7 +87,7 @@ BOOL PortSettingsSave(const char* path, const PortSettings* s) {
     fprintf(f, "; Monster Lab PC port settings (written by the settings screen: F1 in the game)\n");
     fprintf(f, "[display]\nwidth = %d\nheight = %d\naspect = %s\nstretch_ui = %d\nvsync = %d\nfullscreen = %d\n\n",
             s->width, s->height, s->wide ? "16:9" : "4:3", s->stretchUi ? 1 : 0, s->vsync ? 1 : 0, s->fullscreen ? 1 : 0);
-    if (s->gamePath[0]) fprintf(f, "; your Monster Lab disc image (.iso) or extracted folder\n[game]\npath = %s\n\n", s->gamePath);
+    if (s->gamePath[0]) fprintf(f, "; your Monster Lab disc image (.iso, .wbfs, .rvz) or extracted folder\n[game]\npath = %s\n\n", s->gamePath);
     fprintf(f, "[audio]\nvolume = %d\nmute = %d\n\n", s->volume, s->mute ? 1 : 0);
     fprintf(f, "; NAME = key 1, key 2, mouse button (1 left, 2 right), gamepad bits (hex); keys are Windows virtual-key codes\n[controls]\n");
     for (int i = 0; i < gPortBindingCount; i++) {
