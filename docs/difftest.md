@@ -17,6 +17,8 @@ python tools/difftest.py --all                         every function with a // 
 | `--cases N` | inputs per function (default 40) |
 | `--seed N` | another set of random inputs (default 1); a report line names seed and case, so every result can be repeated |
 | `--audited`, `--unaudited` | only functions in / not in `docs/audit_log.txt` |
+| `--globals` | some cases point global pointers that are still zero (`gBattle`, `gGameDb`, ...) at the test's buffers, found by scanning the function and its callees; the C++ must keep those globals at their original address, so a false MISMATCH can come from a global that does not |
+| `--files S` | only functions whose source path contains S (comma-separated list) |
 | `--no-leaf` | leave out the generated `src/leaf` functions |
 | `--iso PATH` | the game disc (default: `orig/RM7P4F`) |
 | `--no-build` | do not run `tools/build_pc.py` first |
@@ -35,7 +37,7 @@ names, statuses and the differing values of failing cases, and `build/` is not c
   types into argument kinds (integer widths, pointer, float, double). Integer arguments go to `r3`..., floats
   to `f1`...; the C++ function is called with the same values.
 - **Inputs:** case 0 is all zeros, case 1 all ones, 2-5 edge values (`-1`, `0x7FFFFFFF`, `0x80000000`, ...)
-  with empty memory, the rest random. Every pointer argument points into its own 2 KB buffer; the buffers
+  with empty memory, the rest random. Every pointer argument points into its own 8 KB buffer; the buffers
   are filled with small numbers, or with a mix of zeros, small numbers, floats, edge values and pointers to
   the other buffers. The simple cases come first, so the first failing case is usually the smallest one.
 - **Running the original:** the interpreter may touch the test buffers, its own stack and the executable's
@@ -124,3 +126,7 @@ mismatch"; with `--calls` most crashes are callees that need game state the test
 address in the PC build, host-order node references and u64 flags, a leftover `r3`, random input outside the real range). The report
 counts them as `KNOWN` instead of `MISMATCH`/`CRASH`; `--show-known` lists them and `--strict` ignores the file. Add a line
 (`0xADDR reason`) only after the asm shows the C++ is right.
+
+`--globals --calls --files battle,attack_sequence,character_states,camera,anim` covers 119 of the 166 functions of those files
+(111 without `--globals`), all matching; the rest need heap objects or library callees. Some random fills are mostly pointers or
+half pointers, half small counts, for code that follows chains of records; buffers are 8 KB so records up to 7 KB can be tested.
