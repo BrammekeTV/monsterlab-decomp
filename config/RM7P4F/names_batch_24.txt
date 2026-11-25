@@ -1,0 +1,10 @@
+fn_801EBE74 UI_801EBE74  # all callers are in the UI area (UIEngine_LoadUIScreenSet)
+fn_801EE134 Thunk_MemAllocDefault_801EE134  # tail-calls MemAllocDefault
+fn_801EE138 Thunk_BufferFree_801EE138  # tail-calls BufferFree
+fn_801EE13C Thunk_MemAllocDefault_801EE13C  # tail-calls MemAllocDefault
+fn_801EE38C GetObj_8_801EE38C  # returns the field at +8 of its object
+fn_801EE4FC GetObj_4_801EE4FC  # returns the field at +4 of its object
+fn_801EE504 GetObj_8_801EE504  # returns the field at +8 of its object
+fn_801EE7A4 Heap_801EE7A4  # all callers are in the Heap area (fn_801EEB20)
+fn_801F487C Session_801F487C  # all callers are in the Session area (GameSessionUpdate)
+fn_801F5484 Session_801F5484  # all callers are in the Session area (SessionStart)
