@@ -1,0 +1,5 @@
+fn_801B3938 GetObj_64_801B3938  # returns the field at +64 of its object
+fn_801B6ACC SetObj_88_801B6ACC  # stores its 2nd argument into the field at +88 of its object
+fn_801B6E7C GetObj_90_801B6E7C  # returns the field at +90 of its object
+fn_801B6E84 GetObj_A0_801B6E84  # returns the field at +A0 of its object
+fn_801BBFC8 GetObj_10_801BBFC8  # returns the field at +10 of its object
