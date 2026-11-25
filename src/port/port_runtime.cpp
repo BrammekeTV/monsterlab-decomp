@@ -211,6 +211,15 @@ extern u8 sWorldReady;     // 0x805FB2F0
 extern "C" { extern u8 gGame[]; }   // 0x803B53A0
 extern "C" { extern u8* gBattle; }  // 0x805FBBB8
 extern "C" { extern s32 lbl_803C4E28[]; extern s32 lbl_805FB038; extern s32 lbl_805FB034; }   // combat part zones: loaded flags, wanted, requested
+extern "C" {
+s32  PathGetNodeId(u8* p);        // 0x800D56F8
+s32  PathGetNodeType(u8* p);      // 0x800D5944
+u32  PathGetExits(u8* p, int a);  // 0x800D5850
+BOOL PathAtWaypoint(u8* p);       // 0x800D56E0
+BOOL PathIsAtJunction(u8* p);     // 0x800D5924
+u32  PathGetChallengeId(u8* p);   // 0x800D5984
+s32  PathGetNodeText(u8* p);      // 0x800D581C
+}
 static void PortStateLog(void) {
     static s32 on = -1;
     static s32 last[12];
@@ -252,6 +261,20 @@ static void PortStateLog(void) {
         if (memcmp(bat, lastBat, sizeof(bat))) {
             memcpy(lastBat, bat, sizeof(bat));
             fprintf(stderr, "[state] frame %d: battle phase %d round %d listeners %d done %08X choices %X %X%c", (int)sFrames, bat[0], bat[1], bat[2], (u32)bat[3], bat[4], bat[5], 10);
+        }
+    }
+    // The player on the map (Character +0xA00 path follower), only while exploring: node id, node type, usable exits (bit 0 up, 1 right,
+    // 2 down, 3 left on screen), standing on a node, junction, challenge name hash, prompt text id.
+    static s32 lastMap[7];
+    u8* player = *(u8**)(gGame + 0xD614);
+    if (fsm[1] == 0x090B84CE && player != NULL && *(u8**)(player + 0xA00) != NULL) {   // the exploration HUD machine runs
+        u8* path = *(u8**)(player + 0xA00);
+        s32 map[7] = { PathGetNodeId(path), PathGetNodeType(path), (s32)PathGetExits(path, 0), PathAtWaypoint(path),
+                       PathIsAtJunction(path), (s32)PathGetChallengeId(path), PathGetNodeText(path) };
+        if (memcmp(map, lastMap, sizeof(map))) {
+            memcpy(lastMap, map, sizeof(map));
+            fprintf(stderr, "[state] frame %d: map node %d type %d exits %X on node %d junction %d challenge %08X text %X%c", (int)sFrames,
+                    map[0], map[1], (u32)map[2], map[3], map[4], (u32)map[5], (u32)map[6], 10);
         }
     }
     if (!memcmp(now, last, sizeof(now))) return;
