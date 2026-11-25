@@ -1,0 +1,3 @@
+fn_8018C8F4 UI_8018C8F4  # all callers are in the UI area (UiInit)
+fn_8018CE64 Session_8018CE64  # all callers are in the Session area (GameSessionUpdate)
+fn_8018D524 UI_8018D524  # all callers are in the UI area (OnZoneScreensLoaded)
