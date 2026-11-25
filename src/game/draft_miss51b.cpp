@@ -39,7 +39,8 @@ s32 fn_80062EA8(u8* obj, s32 a);                                             // 
 s32 fn_8006FBB8(void);                                                       // 0x8006FBB8
 s32 fn_80021770(void);                                                       // 0x80021770
 s32 fn_8012EB74(u8* world, u32 arg, s32 a, s32 b, s32 c, s32 d);             // 0x8012EB74
-void fn_80062D38(u8* obj, s32 unused);                                       // 0x80062D38
+void fn_80062D38(u8* obj, f32 dt);                                             // 0x80062D38
+void fn_8006F67C(u8* p, f32 dt);                                               // 0x8006F67C
 }
 
 // Virtual method in vtable slot 0xB8 that returns a u8* (the draft's unkB8).
@@ -85,10 +86,9 @@ void fn_800596F0(u8* arg0, s32 arg1) {
 
 // 0x8005CB40
 void fn_8005CB40(u8* arg0, f32 farg0, s32 arg1) {
-    // farg0 (f1) is forwarded to fn_80062D38 by the original; that function does not read it.
     if (*(u32*)(*(u8**)(arg0 + 0x4) + 0x20) & 1) {
         fn_801EC080(arg0 + 0x94, arg0);
-        fn_80062D38(arg0, 0);
+        fn_80062D38(arg0, farg0);  // fmr f1, f31
     }
 }
 
@@ -208,9 +208,17 @@ s32 fn_800629E8(u8* arg0) {
     return !(dot > 0.0f) ? 1 : 0;
 }
 
+// 0x8006F67C
+// Entity update (vtable slot 0x20): runs fn_80062D38 while bit 0 of the node's flags is set.
+void fn_8006F67C(u8* p, f32 dt) {
+    if (*(u32*)(*(u8**)(p + 0x4) + 0x20) & 1) {
+        fn_80062D38(p, dt);  // tail call, f1 untouched
+    }
+}
+
 // 0x80062D38
-void fn_80062D38(u8* obj, s32 unused) {
-    fn_801B4C6C(obj, 0);
+void fn_80062D38(u8* obj, f32 dt) {
+    fn_801B4C6C(obj, dt);  // f1 passes through untouched (li r4, 0 is not an argument)
     u8* t = (*(VFnB8*)(*(u8**)obj + 0xB8))(obj);
     if (t != NULL) {
         *(u32*)(t + 0x20) = *(u32*)(t + 0x00);

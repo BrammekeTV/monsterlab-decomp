@@ -31,7 +31,7 @@ BOOL   PropIncrementState(void* prop);                           // 0x80069FDC
 void   fn_8006A764(u8* prop, f32 t);                             // 0x8006A764
 void   fn_8006B244(u8* prop);                                    // 0x8006B244
 void   fn_8006C068(u8* prop, f32 t);                             // 0x8006C068
-void   fn_8006F67C(u8* p, f32 t, s32 flag);                      // 0x8006F67C
+void   fn_8006F67C(u8* p, f32 t);                             // 0x8006F67C
 void fn_800D5C48(u8* arg0, s32 arg1);                              // 0x800D5C48
 void   fn_80126808(void);                                        // 0x80126808
 s32    fn_801478C8(u8* table, s32 idx);                          // 0x801478C8
@@ -287,7 +287,7 @@ void fn_8006AADC(u8* arg0, f32 dt) {
         *(f32*)(arg0 + 0x18) = x;
         *(f32*)(arg0 + 0x1C) = y;
         *(f32*)(arg0 + 0x20) = z;
-        fn_8006F67C(arg0, dt, 0);
+        fn_8006F67C(arg0, dt);
         fn_801EC080(arg0 + 0x94, arg0);
         return;
     }
@@ -338,7 +338,7 @@ void fn_8006AADC(u8* arg0, f32 dt) {
     *(f32*)(arg0 + 0x1C) = y;
     *(f32*)(arg0 + 0x20) = z;
     fn_801EC080(arg0 + 0x94, arg0);
-    fn_8006F67C(arg0, dt, 0);
+    fn_8006F67C(arg0, dt);
     *(s32*)(arg0 + 0x1A8) = 0;
 }
 

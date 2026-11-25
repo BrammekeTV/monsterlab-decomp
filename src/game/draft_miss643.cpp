@@ -210,7 +210,7 @@ void fn_8006E1A0(u8* p, f32 dt) {
 
     *(u32*)(p + 0x20C) += 1;
     for (s32 i = 0; i < 2; i++) {
-        if (*(s32*)(p + 0x17C + i * 4) != 0) fn_8006EF78(p, NULL /* leftover r4 in the original */);
+        if (*(s32*)(p + 0x17C + i * 4) != 0) fn_8006EF78(p, *(u8**)(p + 0x17C + i * 4));  // r4 = the slot just tested
     }
     if (*(u32*)(*(u8**)(p + 0x4) + 0x20) & 0x04000000) return;
 

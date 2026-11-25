@@ -72,12 +72,15 @@ static const u32 kHashFollowWaypointPath = 0x80B4120Fu;   // "FollowWaypointPath
 // Records the final challenge score: shows the battle result, then, if the challenge flag is set
 // in the world and the save has a reward slot, stores the challenge id and runs the reward hook.
 void SetFinalChallengeScore(void) {
-    u8 result = lbl_805FAF9B;
+    // The 0x14-byte battle result: +0 won, +4 and +0xC zero, +0x10 the score (never negative).
+    u8 result[0x14] = {0};
+    result[0] = lbl_805FAF9B;
     if (lbl_805FB134 != NULL) {
-        fn_80022608();   // score value is not used by the caller
+        s32 score = fn_80022608();                       // stw r3, 0x18(r1): result +0x10
+        *(s32*)(result + 0x10) = score < 0 ? 0 : score;  // bge, else stw r31 (0)
     }
-    LabShowBattleResult(gLab, &result);
-    if (result != 0 && *(s32*)(*(u8**)gWorldState + 0x1E0) == 2) {
+    LabShowBattleResult(gLab, result);
+    if (result[0] != 0 && *(s32*)(*(u8**)gWorldState + 0x1E0) == 2) {
         s32 flag = *(s32*)(*(u8**)(gGame + 0xD614) + 0xA00);
         if (flag != 0) {
             s32 mode = *(s32*)((u8*)gLab + 0x4C);
