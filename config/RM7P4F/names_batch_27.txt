@@ -1,0 +1,8 @@
+fn_8022C7E8 GetObj_9F8_8022C7E8  # returns the field at +9F8 of its object
+fn_8022CD2C GetObj_9FC_8022CD2C  # returns the field at +9FC of its object
+fn_8022CF24 Lab_8022CF24  # all callers are in the Lab area (LabShowBattleResult)
+fn_8022DE78 Lab_8022DE78  # all callers are in the Lab area (LabShowBattleResult)
+fn_8022DE84 GetObj_9D0_8022DE84  # returns the field at +9D0 of its object
+fn_8022E430 GetObj_740_8022E430  # returns the field at +740 of its object
+fn_8022E438 GetObj_73C_8022E438  # returns the field at +73C of its object
+fn_8022EC08 LabBooks_8022EC08  # all callers are in the LabBooks area (fn_8011C168)
