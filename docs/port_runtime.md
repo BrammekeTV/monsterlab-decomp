@@ -28,6 +28,7 @@ build\pc\monsterlab.exe                        # runs main() with your own disc 
 | `--keep-going` | a missing function returns 0 instead of stopping, and a semaphore nobody signals is passed after 0.5 s: a survey of what the boot path still needs. After the first one the run is no longer what the game does. |
 | `--verbose` | log every skipped static initialiser and every SDK stub call |
 | `--window` | open a window and draw into it |
+| `--gpu` | draw on the graphics card without a window too (also `PORT_GPU=1`). Headless runs otherwise use the software rasteriser (WARP), so many test runs at once cannot make the display driver reset; `--bench` and `--perf-log` always use the card |
 | `--wav FILE` | write everything the audio mixer produces to a WAV file (32 kHz stereo); works headless |
 | `--no-audio` | never open the sound device (it is only opened with `--window`) |
 | `--no-movies` | do not play the Bink cutscenes (the game skips them, as it does when a movie cannot be opened) |

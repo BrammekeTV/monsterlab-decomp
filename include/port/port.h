@@ -104,6 +104,7 @@ typedef struct PortOptions {
     BOOL keepGoing;           // a missing function returns 0 instead of stopping (to survey the boot path)
     BOOL haveData;            // main.dol was found and loaded
     BOOL window;              // open a window and draw into it
+    BOOL gpu;                 // --gpu (or PORT_GPU=1): draw on the graphics card without a window too (headless runs use WARP)
     const char* screenshot;   // write the last shown picture to this PNG when the run stops
     const char* pickerShot;   // --picker-screenshot FILE: draw the first-run screen into this PNG and stop (tests)
     const char* dumpData;     // --dump-data DIR: the game's text table as JSON, then exit (port_moddata.cpp)
