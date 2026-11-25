@@ -39,9 +39,10 @@ s32 fn_801A2E60(u8* arg0) {
 }
 
 // 0x801A46B4
-// Calls fn_801A3798 with r3/f1 never set in this function (stale), so both are passed as 0.
-s32 fn_801A46B4(void) {
-    fn_801A3798((u8*)0, 0.0f);
+// A method (vtable lbl_80383278 +0x10): passes its object (r3) and float (f1) through to fn_801A3798
+// untouched, then returns 0.
+s32 fn_801A46B4(u8* self, f32 f) {
+    fn_801A3798(self, f);
     return 0;
 }
 

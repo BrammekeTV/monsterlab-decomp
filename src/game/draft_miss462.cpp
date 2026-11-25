@@ -178,9 +178,10 @@ void fn_8007649C(u8* arg0) {
 // Creates the scene object: takes the position from the prop at fn_800E4D7C, sets four state flags
 // on its sub-object, syncs its transform, sets up the sub-object at +0x94 and stores a random
 // phase (fmod of 0 and 2*pi) at +0x2B4.
-u8* fn_8009B69C(void) {
-    // fn_800C2618 gets a stale r3 (pass 0); its r3 result is passed on to fn_800C2028 as the object.
-    u8* obj = fn_800C2028((u8*)(uintptr_t)fn_800C2618(0, 0));
+u8* fn_8009B69C(u8* self) {
+    // A method (AstralTileSetPool vtable lbl_8035CAC0 +0x14): r3 is the pool, passed on untouched to
+    // fn_800C2618, whose r3 result (the pool's first entry) is passed on to fn_800C2028 as the object.
+    u8* obj = fn_800C2028((u8*)(uintptr_t)fn_800C2618(self, 0));
     f32 pos[3];
     s32 sp8;
     u8* prop = fn_800E4D7C(fn_8006FBDC());

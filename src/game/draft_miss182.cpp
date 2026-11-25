@@ -842,15 +842,15 @@ u32 /*0x06*/ GameNetDistributeChunkCallback(u32 /*0x18*/ a0) {
     case 9:
         return 1;
     case 50:
-        fn_8010A49C(msg + 4, 0);  // r4 stale in asm
+        fn_8010A49C(msg + 4, (s32)type);  // r4 still holds the type in the asm
         return 1;
     case 51:
-        fn_8010A49C(msg + 4, 0);  // r4 stale in asm
+        fn_8010A49C(msg + 4, (s32)type);  // r4 still holds the type in the asm
         if (gBattle != NULL) fn_80220A8C(gBattle + 4, *(s32*)(msg + 4 + 0x2C));
         return 1;
     case 52: {
         u8* q = msg + 4;
-        fn_8010A49C(q, 0);  // r4 stale in asm
+        fn_8010A49C(q, (s32)type);  // r4 still holds the type in the asm
         if (gBattle != NULL) {
             u8* base = *(u8**)(gBattle + 0xA04);
             if (base != NULL) {
@@ -865,7 +865,7 @@ u32 /*0x06*/ GameNetDistributeChunkCallback(u32 /*0x18*/ a0) {
     }
     case 53: {
         u8* q = msg + 4;
-        fn_8010A49C(q, 0);  // r4 stale in asm
+        fn_8010A49C(q, (s32)type);  // r4 still holds the type in the asm
         if (gBattle != NULL) {
             u8* o = *(u8**)(gBattle + 0xA58);
             if (o != NULL) (*(MsgFn*)(*(u8**)o + 0x14))(o, q);

@@ -210,11 +210,12 @@ void fn_8006BFF8(u8* obj, u8* ev) {
 }
 
 // 0x8006C66C
-// Sets the byte at +0x220 to 1, stores a1 at +0x224, then calls fn_8006C6C0(obj) and fn_8006C3FC(obj).
-void fn_8006C66C(u8* obj, void* a1) {
-    *(void**)(obj + 0x224) = a1;
+// Sets the byte at +0x220 to 1, stores the state at +0x224, then picks the state's tint colours
+// (fn_8006C6C0: r4 still holds the state) and refreshes the object (fn_8006C3FC).
+void fn_8006C66C(u8* obj, s32 state) {
+    *(s32*)(obj + 0x224) = state;
     *(u8*)(obj + 0x220) = 1;
-    fn_8006C6C0(obj, 0);  // r4 stale in asm
+    fn_8006C6C0(obj, (u32)state);
     fn_8006C3FC(obj);
 }
 
