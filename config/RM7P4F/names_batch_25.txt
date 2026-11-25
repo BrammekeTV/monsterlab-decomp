@@ -1,0 +1,3 @@
+fn_80204470 Thunk_MemAllocDefault_80204470  # tail-calls MemAllocDefault
+fn_80204474 Thunk_BufferFree_80204474  # tail-calls BufferFree
+fn_8020A680 Session_8020A680  # all callers are in the Session area (GameUpdate)
