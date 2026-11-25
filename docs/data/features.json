@@ -99,6 +99,11 @@
  "changelog": [
   {
    "date": "2026-11-25",
+   "time": "19:11",
+   "text": "The Windows renderer no longer freezes forever if the graphics card fails to report back; it waits at most 2 seconds and logs what happened (PR #263)."
+  },
+  {
+   "date": "2026-11-25",
    "time": "18:41",
    "text": "Back at the castle, the screen where you name your scientist now opens instead of hanging (PR #262)."
   },
