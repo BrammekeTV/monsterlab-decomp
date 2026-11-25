@@ -42,19 +42,19 @@ void  fn_8009E818(u8* p);                                             // 0x8009E
 u8*   fn_800D00B4(u8* p);                                             // 0x800D00B4
 void  fn_8012F8B8(u8* p, s32 a1, s32 a2);                             // 0x8012F8B8
 void  fn_801DB1AC(u8* p);                                             // 0x801DB1AC
-u8*   fn_8006F61C(u8* p);                                             // 0x8006F61C
-u8*   fn_8005CA88(u8* p);                                             // 0x8005CA88
+u8*   fn_8006F61C(u8* p, s32 type, u8* rec, s32 reset);                                             // 0x8006F61C
+u8*   fn_8005CA88(u8* p, s32 type, u8* rec, s32 reset);                                             // 0x8005CA88
 u8*   fn_80052530(u8* p, s32 type, void* a, s32 b);                   // 0x80052530
-void  fn_8004B604(u8* p);                                             // 0x8004B604
-u8*   fn_8004B498(u8* p);                                             // 0x8004B498
+void  fn_8004B604(u8* p, s32 type, u8* rec, s32 reset);                                             // 0x8004B604
+u8*   fn_8004B498(u8* p, s32 type, u8* rec, s32 reset);                                             // 0x8004B498
 u8*   fn_8004E684(u8* p, s32 type, void* a, s32 b);                   // 0x8004E684
 u8*   fn_8006CCC4(u8* p, s32 type, void* a, s32 b);                  // 0x8006CCC4
 u8*   fn_8006CFA4(u8* p, s32 type, void* a, s32 b);                   // 0x8006CFA4
 u8*   fn_8005CC30(u8* p, s32 type, void* a, s32 b);                   // 0x8005CC30
 void  fn_800690D4(u8* p, s32 type, void* a, s32 b);                   // 0x800690D4
-u8*   fn_800636BC(u8* p);                                             // 0x800636BC
-u8*   fn_8006D2D0(u8* p);                                             // 0x8006D2D0
-u8*   fn_8006307C(u8* p);                                             // 0x8006307C
+u8*   fn_800636BC(u8* p, s32 type, u8* rec, s32 reset);                                             // 0x800636BC
+u8*   fn_8006D2D0(u8* p, s32 type, u8* rec, s32 reset);                                             // 0x8006D2D0
+u8*   fn_8006307C(u8* p, s32 type, u8* rec, s32 reset);                                             // 0x8006307C
 u8*   fn_801B4334(u8* p, s32 type, void* a, s32 b);                   // 0x801B4334
 
 // 0x8007532C
@@ -297,19 +297,19 @@ s32 fn_8012E420(u8* ctx, u8* obj, s32 type, s32 zone) {
     if (obj != NULL) {
         void* rec = *(void**)(obj + 4);
         switch (type) {
-        case 2:  fn_8006F61C(obj); break;
-        case 3:  fn_8005CA88(obj); break;
+        case 2:  fn_8006F61C(obj, type, (u8*)rec, 1); break;
+        case 3:  fn_8005CA88(obj, type, (u8*)rec, 1); break;
         case 4:  fn_80052530(obj, type, rec, 1); break;
-        case 13: fn_8004B604(obj); break;
-        case 14: fn_8004B498(obj); break;
+        case 13: fn_8004B604(obj, type, (u8*)rec, 1); break;
+        case 14: fn_8004B498(obj, type, (u8*)rec, 1); break;
         case 12: fn_8004E684(obj, type, rec, 1); break;
         case 15: fn_8006CCC4(obj, type, rec, 1); break;
         case 16: fn_8006CFA4(obj, type, rec, 1); break;
         case 5:  fn_8005CC30(obj, type, rec, 1); break;
         case 6:  fn_800690D4(obj, type, rec, 1); break;
-        case 7:  fn_800636BC(obj); break;
-        case 8:  fn_8006D2D0(obj); break;
-        case 10: fn_8006307C(obj); break;
+        case 7:  fn_800636BC(obj, type, (u8*)rec, 1); break;
+        case 8:  fn_8006D2D0(obj, type, (u8*)rec, 1); break;
+        case 10: fn_8006307C(obj, type, (u8*)rec, 1); break;
         default: fn_801B4334(obj, type, rec, 1); break;
         }
     }

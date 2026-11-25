@@ -37,7 +37,7 @@ s32   fn_801098DC(s32 id);                       // 0x801098DC
 s32   NANDInit(void);                            // 0x802675BC
 s32   fn_802078E8(void);                         // 0x802078E8
 s32   fn_80207DCC(void);                         // 0x80207DCC
-void* fn_80207734(s32 arg0, s32 arg1);               // 0x80207734
+void* fn_80207734(s32 user, s32 arg1, s32 arg2);     // 0x80207734
 void  fn_802E49B8(s32 a, const char* name, s32 b, void* cb0, void* cb1, f32 timeout);  // 0x802E49B8
 void  fn_802E4D98(s32 id);                       // 0x802E4D98
 

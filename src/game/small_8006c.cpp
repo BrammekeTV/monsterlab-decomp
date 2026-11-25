@@ -31,7 +31,7 @@ extern "C" {
 u32   RandomU32(void);                                       // 0x80143460
 void  ScopedLockCtor(ScopedLock* l);                         // 0x801F5384
 void  ScopedLockDtor(ScopedLock* l, s32 flags);              // 0x801F53B0
-void  fn_80062F58(u8* p);                                    // 0x80062F58 (small_8006.cpp)
+void  fn_80062F58(u8* p, s32 mode);   // 0x80062F58
 void  fn_80068B50(u8* p, s32 a1);                            // 0x80068B50
 void  fn_801B4520(u8* p);                                    // 0x801B4520
 void  fn_8012F8B8(u8* p, s32 a1, s32 a2);                    // 0x8012F8B8
@@ -94,7 +94,7 @@ void fn_80068AE0(u8* obj, s32 flag) {
     ScopedLock lock;
     ScopedLockCtor(&lock);
     if (flag != 0) fn_80068B50(obj, 1);
-    if (flag == 0) fn_80062F58(obj);
+    if (flag == 0) fn_80062F58(obj, 0);
     ScopedLockDtor(&lock, -1);
 }
 

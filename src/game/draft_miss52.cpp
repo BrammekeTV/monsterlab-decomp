@@ -77,7 +77,7 @@ u8*   fn_801C668C(u8* key);                                             // 0x801
 void  fn_801ED554(u8* out, u8* color);                                  // 0x801ED554
 void  fn_800699E4(u8* prop, u32 state, f32 t);                          // 0x800699E4
 void  fn_80062DC4(u8* p, s32 a, s32 b);                                 // 0x80062DC4
-void  fn_80062F58(u8* p);                                               // 0x80062F58 (small_8006.cpp)
+void  fn_80062F58(u8* p, s32 mode);   // 0x80062F58
 void  fn_801C4B90(u8* obj, f32* a, f32* b, s32 c, s32 d, u8* e);        // 0x801C4B90
 void  fn_801C3E7C(u8* tbl, u8* obj);                                    // 0x801C3E7C
 s32   fn_801C3E88(u8* tbl, void* handle);                                 // 0x801C3E88
@@ -1176,7 +1176,7 @@ void fn_80068B50(u8* p, s32 notify) {
         fn_8020A398(*(s32*)(p + 0x250));
         *(s32*)(p + 0x250) = -1;
     }
-    fn_80062F58(p);
+    fn_80062F58(p, 0);
     fn_801E839C(p + 0xfc);
     u8* q = *(u8**)(p + 0x228);
     if (q != NULL) {
@@ -1263,7 +1263,7 @@ void fn_800696C4(u8* p, s32 mode) {
     *(f32*)(p + 0x16c) = 0.0f;
     *(f32*)(p + 0x170) = 0.0f;
     *(f32*)(p + 0x174) = 0.0f;
-    fn_80062F58(p);
+    fn_80062F58(p, mode);
     u8* def = *(u8**)(p + 0x9c);
     if (def != NULL && ((*(u32*)(def + 0x84) >> 27) & 0xF)) TriggerDoAction(def + 0x84, p, NULL);
     if ((*(u32*)(p + 0x54) >> 27) & 0xF) TriggerDoAction(p + 0x54, p, NULL);

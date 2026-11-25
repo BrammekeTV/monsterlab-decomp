@@ -29,7 +29,7 @@ void SetPlayerLineID(s32 a3);
 void set_conversation_reg(s32 idx, s32 value);
 void SetPlayerOption(s32 a0, u32 a1);
 s32  Conversation_reg_eq(s32 idx, s32 value);
-void ShowConversationPopup(s32 textId);
+void ShowConversationPopup(u32 character, s32 textId);
 u8   IsConversationPopupVisible(void);
 void ShowEventPopup(s32 unusedR3, u32 a1);
 BOOL IsEventPopupVisible(void);

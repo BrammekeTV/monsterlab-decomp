@@ -14,7 +14,7 @@ int    SysSprintf(char* buf, const char* fmt, ...);   // 0x80142EF8
 s32    TriggerDoAction(void* action, void* a1, void* a2);   // 0x801E0054
 char*  fn_80040EFC(s32 idx, u8* buf);
 void   fn_80036B90(u8* self, f32* pos);   // 0x80036B90
-void   fn_80062F58(u8* p);   // 0x80062F58 (asm also forwards the caller's r4 as the mode)
+void   fn_80062F58(u8* p, s32 mode);   // 0x80062F58
 void   fn_800D7394(u8* arg);   // 0x800D7394
 void   fn_801B381C(u8* menu, const char* name, void* a, void* b, void* c, void* d, void* e, void* user);   // 0x801B381C
 void   fn_801B38BC(u8* p);   // 0x801B38BC
@@ -176,7 +176,7 @@ void fn_8005382C(u8* p, s32 mode) {
     u8* owner = *(u8**)(p + 0x9C);
     if (owner != NULL && ((*(u32*)(owner + 0x84) >> 27) & 0xF)) TriggerDoAction(owner + 0x84, p, NULL);
     if ((*(u32*)(p + 0x54) >> 27) & 0xF) TriggerDoAction(p + 0x54, p, NULL);
-    fn_80062F58(p);
+    fn_80062F58(p, mode);
     if (mode == 0) return;
     u8* owner2 = *(u8**)(p + 0x9C);
     for (s32 i = 0; i < *(s32*)(owner2 + 0x114); i++) {

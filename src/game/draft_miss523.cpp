@@ -20,7 +20,7 @@ u8* fn_8006D34C(u8* p, s32 arg1);
 void fn_8020E864(u8* p, s32 del);
 void operator_delete(void* p);
 void fn_800A7D88(u8* obj, u32 hash);
-s32 fn_800AEFEC(u8* p, s32 unusedR4, s32 mode);
+s32 fn_800AEFEC(u8* p, u8* sphere, f32* contact);
 void fn_800CD010(u8* p);
 void* fn_801ACCA0(u8* arg0, s32 arg1);
 u8* fn_800DE5E4(u8* p, s32 del);
@@ -56,11 +56,10 @@ u8* fn_8009E888(u8* arg0, s32 arg1) {
 }
 
 // 0x800AEEA8
-s32 fn_800AEEA8(u8* arg0) {
+s32 fn_800AEEA8(u8* arg0, u8* sphere) {
     s32 temp_r3;
 
-    // r4 is not set in the asm before this call, so it is passed as 0.
-    temp_r3 = fn_800AEFEC(arg0 + 0x27C, 0, 0);
+    temp_r3 = fn_800AEFEC(arg0 + 0x27C, sphere, 0);
     if ((u32)temp_r3 + 0x10000u != 0xFFFFu) {
         fn_800A7D88(arg0, (u32)temp_r3);
         return (s32)0xAA9BD49F;

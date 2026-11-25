@@ -312,9 +312,9 @@ void CheckpointMCReceivedCallback(u32 a0) {
 }
 
 // 0x800EFF24
-// Returns 1 when the value at +0xC0 of the minigame object is 0 (rock crushed).
+// Returns 1 when the value at +0xC0 of the minigame object has run out (rock crushed).
 s32 CheckRockCrushed(void) {
-    return *(s32*)(fn_80021750() + 0xC0) == 0;
+    return *(s32*)(fn_80021750() + 0xC0) <= 0;   // cntlzw + rlwnm: zero or negative
 }
 
 // 0x800F8AA4

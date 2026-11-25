@@ -45,7 +45,7 @@ void*  UIWidgetFindChild(void* widget, u32 hash);                               
 s32    WorldGetPhase(void* world);                                                              // 0x800D83A8
 void   WorldSendEvent(void* world, s32 id, int a, int b, int c);                                // 0x800D87EC
 BOOL   ZoneIsLoaded(void* world, s32 zone);                                                     // 0x8012F408
-u8*    fn_80062C80(u8* p);                                                                      // 0x80062C80 (base ctor, returns this)
+u8*    fn_80062C80(u8* p, s32 type, u8* rec, s32 reset);                                                                      // 0x80062C80 (base ctor, returns this)
 s32    fn_8012E7B0(u8* world, u8* obj, s32 a);                                                  // 0x8012E7B0
 BOOL   fn_8013E464(void);                                                                       // 0x8013E464
 void   fn_8016964C(u8* mgr, u8* tex);                                                           // 0x8016964C
@@ -154,8 +154,8 @@ void fn_8004DE74(void* mon, s32 kind) {
 // 0x8005CA88
 // Constructor: runs the base constructor, installs the vtable and, if the object has a
 // definition at +4, sets flag 8 in its +0x1C and byte 3 at +0x34.
-u8* fn_8005CA88(u8* p) {
-    fn_80062C80(p);
+u8* fn_8005CA88(u8* p, s32 type, u8* rec, s32 reset) {
+    fn_80062C80(p, type, rec, reset);
     u8* def = *(u8**)(p + 0x4);
     *(void**)p = lbl_80359A28;
     if (def != NULL) {

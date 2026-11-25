@@ -261,8 +261,8 @@ void fn_80046F5C(void) {
 
 // 0x8004B604
 // Initialises the entity block: vtable, sub-object at +0xC48, zeroed fields and, for a valid +0x4 link, flags it.
-void fn_8004B604(u8* arg0) {
-    fn_8005CC30(arg0, 0, NULL, 0);  // r4-r6 stale in asm
+void fn_8004B604(u8* arg0, s32 type, u8* rec, s32 reset) {
+    fn_8005CC30(arg0, type, rec, reset);
     fn_8020EA34(arg0 + 0xC48);
     u8* temp6 = *(u8**)(arg0 + 0x4);
     *(u8**)(arg0 + 0x0) = (u8*)lbl_80359038;

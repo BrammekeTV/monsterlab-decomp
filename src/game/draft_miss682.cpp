@@ -17,9 +17,9 @@ s32  fn_8016195C(void* p, s32 a, s32 b, void* c);  // 0x8016195C
 void fn_800BB658(u8* p, f32 dt);           // 0x800BB658
 s32  fn_800BC050(u8* p);                   // 0x800BC050
 s32  fn_800C2628(s32 a, s32 b);            // 0x800C2628 (a = word at obj+0x60, b = node value)
-s32  fn_800AEEA8(u8* a);            // 0x800AEEA8
+s32  fn_800AEEA8(u8* a, u8* sphere);            // 0x800AEEA8
 s32  fn_800B2054(u8* p, u8* a);            // 0x800B2054
-s32  fn_800B1A20(u8* p);            // 0x800B1A20
+s32  fn_800B1A20(u8* p, u8* sphere);            // 0x800B1A20
 s32  fn_800AD340(u8* p, u8* a);            // 0x800AD340
 s32  fn_800AC850(u8* p, u8* a);            // 0x800AC850
 void fn_800AC390(u8* p, f32* a, f32 dt);  // 0x800AC390
@@ -185,7 +185,7 @@ u32 fn_800AA9D4(u8* arg0, u8* arg1) {
     s32 ret;
 
     for (i = 0; i < 7; i++) {
-        ret = fn_800AEEA8(*(u8**)(arg0 + i * 4 + 0x118)); /* r4 (arg1) is unused by the callee */
+        ret = fn_800AEEA8(*(u8**)(arg0 + i * 4 + 0x118), arg1);
         if (ret != -1) {
             return (u32)ret;
         }
@@ -194,7 +194,7 @@ u32 fn_800AA9D4(u8* arg0, u8* arg1) {
     if (ret != -1) {
         return (u32)ret;
     }
-    ret = fn_800B1A20(*(u8**)(arg0 + 0x94)); /* r4 (arg1) is unused by the callee */
+    ret = fn_800B1A20(*(u8**)(arg0 + 0x94), arg1);
     if (ret != -1) {
         return (u32)ret;
     }

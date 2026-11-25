@@ -30,10 +30,9 @@ void  fn_8008378C(u8* a3);                                        // 0x8008378C
 u8*   fn_801B161C(u8* p, u32 key);                                // 0x801B161C
 
 // 0x80081A04
-// Freebie duration (f32) for the RaySceneTest-selected entry. Named with the address because
-// BrainTossFreebieDuration is already defined at 0x80083B18 in small_8008.cpp.
-f32 BrainTossFreebieDuration_80081A04(void* ray) {
-    s32 idx = RaySceneTest(ray);  // the original forwards its incoming r3 unchanged
+// Script callback: the brain toss freebie duration for the entry RaySceneTest selects.
+f32 BrainTossFreebieDuration(void) {
+    s32 idx = RaySceneTest(0);  // the original forwards its incoming r3 unchanged; RaySceneTest ignores it
     return ((f32*)lbl_803466B0)[idx];
 }
 

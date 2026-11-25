@@ -181,7 +181,7 @@ void* fn_8004FFB4(u8* arg0, u8* arg1) {
 }
 
 // 0x80051834
-void ShowConversationPopup(s32 textId) {
+void ShowConversationPopup(u32 /*character*/, s32 textId) {   // script signature 0x73; the original reads only r4
     if (WorldGetPhase(gGame + 0xD5F0) == 2) {
         PauseAllExplorationCharacters();
     }

@@ -145,7 +145,8 @@ s32 IsValidName(void) {
 
 // 0x800E8720
 s32 IsEntityOfType(void* a0, u32 a1) {
-    return a1 < 32 && (*(u32*)(*(u8**)((u8*)a0 + 0x4) + 0x1C) & (1U << a1)) != 0;   // slw by 32+ gives 0
+    u32 n = a1 & 63;   // slw takes six bits of the shift amount; 32..63 give 0
+    return n < 32 && (*(u32*)(*(u8**)((u8*)a0 + 0x4) + 0x1C) & (1U << n)) != 0;
 }
 
 // 0x800EFDBC

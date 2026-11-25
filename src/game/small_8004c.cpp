@@ -11,7 +11,7 @@ void  operator_delete(void* p);                                 // 0x801D426C
 void  fn_8020F23C(u8* p, s32 del);                              // 0x8020F23C
 void  fn_8020F30C(u8* p);                                       // 0x8020F30C
 void  fn_8020F31C(u8* p, s32 del);                              // 0x8020F31C
-void  fn_8004B604(u8* p);                                       // 0x8004B604
+void  fn_8004B604(u8* p, s32 type, u8* rec, s32 reset);                                       // 0x8004B604
 u8* fn_8004B754(u8* arg0, s32 arg1);                              // 0x8004B754
 void  fn_8020EB44(u8* p, s32 del);                              // 0x8020EB44
 u8* fn_8005CAE8(u8* arg0, s32 arg1);                              // 0x8005CAE8
@@ -79,8 +79,8 @@ u8* fn_8004ACCC(u8* p, s32 del) {
 // 0x8004B498
 // Constructor: runs fn_8004B604, sets the vtable and the secondary vtable at +0xC48, and if an
 // attached object is present sets its 0x4000 flag and byte 0xE at +0x34.
-u8* fn_8004B498(u8* p) {
-    fn_8004B604(p);
+u8* fn_8004B498(u8* p, s32 type, u8* rec, s32 reset) {
+    fn_8004B604(p, type, rec, reset);
     u8* obj = *(u8**)(p + 0x4);
     *(void**)p         = lbl_80358D80;
     *(void**)(p + 0xc48) = lbl_80358D80 + 0xdc;

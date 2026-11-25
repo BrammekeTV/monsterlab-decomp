@@ -6,7 +6,7 @@
 extern "C" {
 void  fn_800690D4(u8* p, s32 a, void* params, s32 b);   // 0x800690D4 (base ctor)
 void  fn_8020EA84(u8* a3);                              // 0x8020EA84
-u8*   fn_8006F61C(u8* arg0);                            // 0x8006F61C (base ctor)
+u8*   fn_8006F61C(u8* p, s32 type, u8* rec, s32 reset);                            // 0x8006F61C (base ctor)
 u32   fn_8016A768(u8* a3);                              // 0x8016A768
 s32   fn_8019555C(u8* a3);                              // 0x8019555C
 s32   fn_801AAEE4(u8* a3, u8* a4);                      // 0x801AAEE4
@@ -100,8 +100,8 @@ void fn_8005484C(f32* q) {
 // 0x8006D2D0
 // Init: runs the base init fn_8006F61C, sets the vtable, clears the state bytes and,
 // if the child at +4 exists, sets bit 0x100 on it and its state byte to 8.
-u8* fn_8006D2D0(u8* p) {
-    fn_8006F61C(p);
+u8* fn_8006D2D0(u8* p, s32 type, u8* rec, s32 reset) {
+    fn_8006F61C(p, type, rec, 0);
     *(void**)(p + 0x0) = lbl_8035A3C8;
     *(u16*)(p + 0x1FE) = 0xFFFF;
     *(u8*)(p + 0x1FD) = 0;
@@ -116,8 +116,8 @@ u8* fn_8006D2D0(u8* p) {
 // 0x8006F6BC
 // Init: runs fn_8006D2D0, sets the vtable, and if the child at +4 exists, sets bit 0x200 on it
 // and its state byte to 9.
-u8* fn_8006F6BC(u8* p) {
-    fn_8006D2D0(p);
+u8* fn_8006F6BC(u8* p, s32 type, u8* rec, s32 reset) {
+    fn_8006D2D0(p, type, rec, reset);
     *(void**)(p + 0x0) = lbl_8035A588;
     if (*(u8**)(p + 0x4) != NULL) {
         *(s32*)(*(u8**)(p + 0x4) + 0x1C) |= 0x200;

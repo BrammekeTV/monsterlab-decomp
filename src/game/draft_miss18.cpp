@@ -36,7 +36,7 @@ void* fn_8004D2C8(u8* arg0, const char* arg1, s32 arg2, s32 arg3);         // 0x
 void   fn_8004D39C(u8* p);                                           // 0x8004D39C
 void   fn_8001D718(u8* mgr, s32 idx, u8* slot);                      // 0x8001D718
 void   fn_8005230C(void);                                            // 0x8005230C
-u8*   fn_8005CA88(u8* p);                                           // 0x8005CA88
+u8*   fn_8005CA88(u8* p, s32 type, u8* rec, s32 reset);                                           // 0x8005CA88
 void*  fn_80060A28(u8* p);                                            // 0x80060A28
 void   fn_800D83B8(u8* a3, s32 a4);                                  // 0x800D83B8
 void*  TextureLoadShared(const char* name);                                // 0x80109330 (texture lookup by name)
@@ -162,7 +162,7 @@ void CreateEmptyMonster(void) {
 u32 /*0x06*/ CreateProjectileEntityCallback(u32 /*0x08*/ a0, u32 /*0x08*/ a1) {
     u8* obj = (u8*)(uintptr_t)a0;
     if (obj != NULL) {
-        fn_8005CA88(obj);
+        fn_8005CA88(obj, 7, NULL, 0);
         u8* child = *(u8**)(obj + 0x4);
         *(void**)obj = lbl_80359ED8;
         if (child != NULL) {

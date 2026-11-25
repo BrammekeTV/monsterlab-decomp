@@ -38,7 +38,7 @@ u8*    fn_8001B044(u8* hud, u32 key);                                     // 0x8
 void   fn_8001B128(void* hud);                                            // 0x8001B128
 void   fn_8001B164(u8* hud);                                              // 0x8001B164
 s32 fn_8004EED0(u8* arg0, u32 arg1, s32 arg2);                    // 0x8004EED0
-u8*    fn_80062C80(u8* p);                                                // 0x80062C80
+u8*    fn_80062C80(u8* p, s32 type, u8* rec, s32 reset);                                                // 0x80062C80
 s32    fn_80063D6C(u8* self, u8* a, void* pos, u8* b, s32 c, s32 d, s32 e);   // 0x80063D6C
 void   fn_800645C8(u8* self, void* pos);                                  // 0x800645C8
 void   ProjectileAnimate(u8* self, s32 a, s32 b, s32 c);                        // 0x800653F4
@@ -244,8 +244,8 @@ void fn_8006C3FC(u8* arg0) {
 // 0x8006F61C
 // Constructor: base constructor, sets the vtable and, if the child at +4 exists, flags it (|4) and
 // sets its state byte to 2. Returns the object.
-u8* fn_8006F61C(u8* arg0) {
-    fn_80062C80(arg0);
+u8* fn_8006F61C(u8* arg0, s32 type, u8* rec, s32 reset) {
+    fn_80062C80(arg0, type, rec, reset);
     u8* child = *(u8**)(arg0 + 0x4);
     *(void**)arg0 = lbl_8035A4C8;
     if (child != NULL) {

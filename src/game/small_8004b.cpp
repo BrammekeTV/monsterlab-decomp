@@ -56,11 +56,11 @@ extern const char lbl_805F85B8[];                               // 0x805F85B8 (t
 extern const char lbl_805F85C0[];                               // 0x805F85C0 (text)
 
 // Globals owned by this file (first referenced here).
-s32   lbl_803C5268[13] ORIG(0x803C5268);     // part-slot entries (10 used), reset to -1
-s32   lbl_805FB090     ORIG(0x805FB090);     // call counter for fn_80044F54
-void* lbl_805FB094     ORIG(0x805FB094);     // cached pointer for fn_80044F54
-u8    lbl_805FB098     ORIG(0x805FB098); // set once the part selection is locked
-u8    lbl_8047C730[0x30] ORIG(0x8047C730);  // combat results state; +0x20 is set by CombatResultsPauseGame
+s32   lbl_803C5268[13]; ORIG(0x803C5268)     // part-slot entries (10 used), reset to -1
+s32   lbl_805FB090;     ORIG(0x805FB090)     // call counter for fn_80044F54
+void* lbl_805FB094;     ORIG(0x805FB094)     // cached pointer for fn_80044F54
+u8    lbl_805FB098;     ORIG(0x805FB098) // set once the part selection is locked
+u8    lbl_8047C730[0x30]; ORIG(0x8047C730)  // combat results state; +0x20 is set by CombatResultsPauseGame
 
 extern "C" {
 
