@@ -1,0 +1,3 @@
+fn_80149D88 Rend_80149D88  # all callers are in the Rend area (fn_80149E98)
+fn_80149E1C Rend_80149E1C  # all callers are in the Rend area (fn_80149E98)
+fn_8015E9D8 Rend_8015E9D8  # all callers are in the Rend area (RendBeginFrame)
