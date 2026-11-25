@@ -1,6 +1,6 @@
 """Headless playthrough test of the PC port: run it before opening a PR that changes gameplay.
 
-    python tools/playthrough.py [--iso PATH] [--no-build] [--stop-after STAGE] [--seconds N] [--retries N]
+    python tools/playthrough.py [--iso PATH] [--no-build] [--stop-after STAGE] [--seconds N] [--retries N] [--gpu]
     python tools/playthrough.py --list
     python tools/playthrough.py --check-log FILE          (judge a saved log, run nothing)
 
@@ -10,8 +10,8 @@ save folder) from boot to the free village map after the first battle, with scri
 --pointer input. A stage passes when its game-state markers show up in the log (script calls,
 level loads and PORT_STATE_LOG lines, never pixels) before the stage's deadline frame. The game
 is stopped at the first missed deadline, crash or stall, and as soon as the last marker is seen.
-A stall (hang) is retried once and named in the verdict: current master hangs now and then in the
-renderer (docs/playthrough.md).
+A stall (hang) is retried once and named in the verdict: the renderer is known to hang now and then
+on the graphics card (docs/playthrough.md).
 Prints one line per stage and a verdict; exits 0/1. The log is build/playthrough/run.log.
 Needs the game in orig/RM7P4F, MONSTERLAB_DATA or --iso PATH.
 
@@ -22,10 +22,11 @@ import argparse, os, queue, re, shutil, subprocess, sys, threading, time
 
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 PC = os.path.join(ROOT, "build", "pc")
-OUT = os.path.join(ROOT, "build", "playthrough")      # the exe is copied here: its `save` folder is beside it
+OUT = os.path.join(ROOT, "build", "playthrough")      # the exe copy, its empty save folder and the log
 # Its own name: a `taskkill /IM monsterlab.exe` meant for another run must not end this one.
 EXE = os.path.join(OUT, "ml_playthrough.exe")
 LOG = os.path.join(OUT, "run.log")
+WIDTH, HEIGHT = 640, 360                              # small: headless runs draw in software (WARP)
 STALL = 90                                            # wall seconds without a new frame number
 
 FRAME = re.compile(r"^\[script\] .*frame (\d+)\)|^\[state\] frame (\d+):")
@@ -56,7 +57,8 @@ class Stage:
 
 
 # Frames are PortFrameDone counts. The timeline repeats (fixed seed); the deadlines leave a few hundred
-# frames for small changes. Pointer positions are output pixels at 1920x1080 (the default with --no-ini).
+# frames for small changes. Pointer positions are given in pixels of
+# a 1920x1080 picture and scaled to the size the game renders at (WIDTH x HEIGHT).
 # A on the map is "interact": no stray A presses there.
 STAGES = [
     Stage("boot", "boot to the splash screens", 2300,
@@ -190,23 +192,27 @@ def build():
     return True
 
 
-def run(stages, iso, seconds):
+def run(stages, iso, seconds, gpu=False):
     judge = Judge(stages)
     os.makedirs(OUT, exist_ok=True)
     shutil.rmtree(os.path.join(OUT, "save"), ignore_errors=True)    # a save would add "Continue" and move the menu
     shutil.copy2(os.path.join(PC, "monsterlab.exe"), EXE)
     shutil.copy2(os.path.join(PC, "monsterlab.map"), os.path.splitext(EXE)[0] + ".map")   # names in crash reports
     cmd = [EXE, "--to-menu", "--fast", "--no-audio", "--no-movies", "--no-ini", "--no-mods",
-           "--frames", str(stages[-1].deadline + 1), "--seconds", str(seconds)]
+           "--res", f"{WIDTH}x{HEIGHT}", "--frames", str(stages[-1].deadline + 1), "--seconds", str(seconds)]
     for st in stages:
         for p in st.press:
             cmd += ["--press", p]
         for p in st.pointer:
-            cmd += ["--pointer", p]
+            xy, at = p.split("@")
+            x, y = (int(v) for v in xy.split(","))
+            cmd += ["--pointer", f"{round(x * WIDTH / 1920)},{round(y * HEIGHT / 1080)}@{at}"]
     if iso:
         cmd += ["--iso", iso]
+    if gpu:
+        cmd += ["--gpu"]
     env = {k: v for k, v in os.environ.items() if not k.startswith("PORT_")}
-    env.update(PORT_SCRIPT_TRACE="1", PORT_STATE_LOG="1")
+    env.update(PORT_SCRIPT_TRACE="1", PORT_STATE_LOG="1", MONSTERLAB_SAVE=os.path.join(OUT, "save"))
     proc = subprocess.Popen(cmd, cwd=ROOT, env=env, stdout=subprocess.PIPE, stderr=subprocess.STDOUT,
                             text=True, errors="replace")
     lines = queue.Queue(maxsize=10000)
@@ -260,6 +266,7 @@ def main():
     ap.add_argument("--stop-after", metavar="STAGE", help="end the test after this stage")
     ap.add_argument("--seconds", type=int, default=1500, help="wall-clock limit of the game run (default 1500)")
     ap.add_argument("--retries", type=int, default=1, help="runs to repeat after a stall (default 1; crashes are never retried)")
+    ap.add_argument("--gpu", action="store_true", help="draw on the graphics card instead of in software (faster)")
     ap.add_argument("--list", action="store_true", help="list the stages")
     ap.add_argument("--check-log", metavar="FILE", help="judge a saved log instead of running the game")
     a = ap.parse_args()
@@ -287,7 +294,7 @@ def main():
         print(f"PLAYTHROUGH FAIL: {len(stubs)} game function(s) linked as stubs (build/pc/port_link.txt):\n    "
               + "\n    ".join(stubs[:15]))
         return 1
-    judge, why = run(stages, a.iso, a.seconds)
+    judge, why = run(stages, a.iso, a.seconds, a.gpu)
     note = ""
     for n in range(a.retries):
         if not (why and why.startswith("stalled")):
@@ -296,7 +303,7 @@ def main():
         shutil.copy2(LOG, kept)
         note = f"; NOTE: the first run hung at frame {judge.frame} ({os.path.relpath(kept, ROOT)}), this is a retry"
         print(f"  {why} at frame {judge.frame}; retrying", flush=True)
-        judge, why = run(stages, a.iso, a.seconds)
+        judge, why = run(stages, a.iso, a.seconds, a.gpu)
     code = judge.report(why, time.time() - t0, note)
     if code:
         print(f"    full log: {os.path.relpath(LOG, ROOT)}")

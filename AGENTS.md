@@ -92,7 +92,7 @@ a PC port. Read this whole file before making changes. Human contributors: see
 - `python tools/playthrough.py [--iso PATH] [--stop-after STAGE]`: **required before every gameplay PR** (anything that touches `src/game`, `src/engine`,
   `src/system`, `src/leaf`, `include/`, the loader or runtime in `src/port`, or `config/RM7P4F/`), after `smoke.py`; CI has no game data and cannot run it.
   Fails at once if a game function is only a link stub, then plays headless from boot through Join Now, the village intro, the Mayor, the first battle,
-  rewards and Field Repair to the free village map, checking game-state log markers stage by stage (about 5 minutes). `PLAYTHROUGH FAIL` names the stage,
+  rewards and Field Repair to the free village map, checking game-state log markers stage by stage (about 9 minutes; run it in the background). `PLAYTHROUGH FAIL` names the stage,
   the missing marker and the last stage passed. If you extend gameplay, add a stage (`docs/playthrough.md`).
 - `python tools/mod_test.py [--iso PATH] [--keep]`: mod test (textures by hash and name, JSON text; `docs/modding.md`): dumps the menu's textures to a temporary folder outside
   the repository, makes a mod with one tinted red, runs headless again and compares the screenshots. Run it after changes to
