@@ -129,7 +129,13 @@ STAGES = [
            call("StartConversationID", 28100), call("GotoCastleLocation", 28100),
            level("castle_communication", 28100), call("HandleReturnToCastle", 28100), call("StartQuest", 28100)],
           press=("LEFT@27500-27550", "A@28100", "A@28250-28700/150")),
-    # Later stages go here (a deadline after 29400, frames counted from the run's start).
+    # In the castle Fuseless talks; his last line needs A. The pointer leaves the place of the name entry's confirm
+    # button first, so the A presses that come after the screen opened do not confirm an empty name.
+    Stage("name", "Fuseless in the castle, the scientist name entry screen opens", 30200,
+          [call("EnterName_Init", 28500), call("MPNameInput", 28500),
+           state("name entry HUD state", r"hud machine 96773521 \(depth 1\) state 20 ", 28500)],
+          press=("A@29000-29900/150",), pointer=("960,1040@28900",)),
+    # Later stages go here (a deadline after 30200, frames counted from the run's start).
 ]
 
 

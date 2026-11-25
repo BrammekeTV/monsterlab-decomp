@@ -47,6 +47,7 @@ load messages, never from pictures.
 | won2 | battle phase 8, results screen |
 | awards | Combat Awards screen, `village_level` again, the next monster is spawned, exploration HUD |
 | thanks | the Mayor's node, his conversation, `GotoCastleLocation`, the castle level, `HandleReturnToCastle`, the next `StartQuest` |
+| name | Fuseless's lines in the castle, `EnterName_Init`: the scientist name entry screen (the first screen with a grid widget) |
 
 `python tools/playthrough.py --list` prints the markers and deadlines.
 
