@@ -1,0 +1,16 @@
+fn_801D096C SetObj_98_801D096C  # stores its 2nd argument into the field at +98 of its object
+fn_801D0998 GetObj_1E8_801D0998  # returns the field at +1E8 of its object
+fn_801D09A0 SetObj_90_801D09A0  # stores its 2nd argument into the field at +90 of its object
+fn_801D09A8 GetObj_1EC_801D09A8  # returns the field at +1EC of its object
+fn_801D7270 Camera_801D7270  # all callers are in the Camera area (fn_800D91A8)
+fn_801D87B4 Camera_801D87B4  # all callers are in the Camera area (fn_800D9C24)
+fn_801DA344 SetObj_48_801DA344  # stores its 2nd argument into the field at +48 of its object
+fn_801DA750 SetObj_50_801DA750  # stores its 2nd argument into the field at +50 of its object
+fn_801DA780 GetObj_54_801DA780  # returns the field at +54 of its object
+fn_801DA7C0 GetObj_4C_801DA7C0  # returns the field at +4C of its object
+fn_801DC870 Script_801DC870  # all callers are in the Script area (fn_8010F794)
+fn_801E0318 Script_801E0318  # all callers are in the Script area (fn_8010F794)
+fn_801E0320 Script_801E0320  # all callers are in the Script area (fn_8010F794)
+fn_801E0328 Script_801E0328  # all callers are in the Script area (fn_8010F794)
+fn_801E5478 SetObj_24_801E5478  # stores its 2nd argument into the field at +24 of its object
+fn_801E5480 SetObj_28_801E5480  # stores its 2nd argument into the field at +28 of its object
