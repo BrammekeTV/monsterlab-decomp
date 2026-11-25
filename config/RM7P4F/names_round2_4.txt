@@ -1,0 +1,177 @@
+fn_80299F50 btm_80299F50  # all known callers use the btm library prefix (decompiled callers in src/)
+fn_8029B3DC BTA_8029B3DC  # all known callers use the BTA library prefix (decompiled callers in src/)
+fn_8029B408 BTA_8029B408  # all known callers use the BTA library prefix (decompiled callers in src/)
+fn_8029C794 BTM_8029C794  # all known callers use the BTM library prefix (BTM_CancelInquiry)
+fn_8029CA1C btm_8029CA1C  # all known callers use the btm library prefix (btm_sco_chk_pend_unpark)
+fn_8029CAA8 btm_8029CAA8  # all known callers use the btm library prefix (decompiled callers in src/)
+fn_8029CB08 btm_8029CB08  # all known callers use the btm library prefix (decompiled callers in src/)
+fn_8029CB64 btm_8029CB64  # all known callers use the btm library prefix (btm_sec_link_key_request)
+fn_8029CD04 btm_8029CD04  # all known callers use the btm library prefix (btm_sec_link_key_request)
+fn_8029CF88 btm_8029CF88  # all known callers use the btm library prefix (btm_sec_pin_code_request_timeout)
+fn_8029D028 btm_8029D028  # all known callers use the btm library prefix (decompiled callers in src/)
+fn_8029D0B8 btm_8029D0B8  # all known callers use the btm library prefix (decompiled callers in src/)
+fn_8029D134 btm_8029D134  # all known callers use the btm library prefix (decompiled callers in src/)
+fn_8029D1C0 BTM_8029D1C0  # all known callers use the BTM library prefix (decompiled callers in src/)
+fn_8029D298 BTM_8029D298  # all known callers use the BTM library prefix (BTM_CancelRemoteDeviceName)
+fn_8029D4AC btm_8029D4AC  # all known callers use the btm library prefix (btm_sco_chk_pend_unpark)
+fn_8029D5A8 btm_8029D5A8  # all known callers use the btm library prefix (decompiled callers in src/)
+fn_8029D690 btm_8029D690  # all known callers use the btm library prefix (decompiled callers in src/)
+fn_8029D6F0 btm_8029D6F0  # all known callers use the btm library prefix (decompiled callers in src/)
+fn_8029D7A4 btm_8029D7A4  # all known callers use the btm library prefix (decompiled callers in src/)
+fn_8029D870 btm_8029D870  # all known callers use the btm library prefix (decompiled callers in src/)
+fn_8029D8F4 btm_8029D8F4  # all known callers use the btm library prefix (decompiled callers in src/)
+fn_8029D9A8 btm_8029D9A8  # all known callers use the btm library prefix (decompiled callers in src/)
+fn_8029DB70 btm_8029DB70  # all known callers use the btm library prefix (btm_reset_complete)
+fn_8029DBCC BTM_8029DBCC  # all known callers use the BTM library prefix (decompiled callers in src/)
+fn_8029DDFC BTM_8029DDFC  # all known callers use the BTM library prefix (BTM_ReadStoredLinkKey)
+fn_8029DE5C BTM_8029DE5C  # all known callers use the BTM library prefix (BTM_WriteStoredLinkKey)
+fn_8029E01C BTM_8029E01C  # all known callers use the BTM library prefix (BTM_DeleteStoredLinkKey)
+fn_8029E0CC btm_8029E0CC  # all known callers use the btm library prefix (btm_reset_complete)
+fn_8029E20C BTM_8029E20C  # all known callers use the BTM library prefix (BTM_WritePageTimeout)
+fn_8029E244 BTM_8029E244  # all known callers use the BTM library prefix (BTM_SetConnectability, BTM_SetDiscoverability)
+fn_8029E274 BTM_8029E274  # all known callers use the BTM library prefix (BTM_SetConnectability)
+fn_8029E2B8 BTM_8029E2B8  # all known callers use the BTM library prefix (BTM_SetDiscoverability)
+fn_8029E2FC btm_8029E2FC  # all known callers use the btm library prefix (btm_sec_connected)
+fn_8029E5BC BTM_8029E5BC  # all known callers use the BTM library prefix (BTM_SetDiscoverability)
+fn_8029E6E8 btm_8029E6E8  # all known callers use the btm library prefix (btm_reset_complete)
+fn_8029E770 BTM_8029E770  # all known callers use the BTM library prefix (BTM_ReadLinkQuality)
+fn_8029E7EC BTM_8029E7EC  # all known callers use the BTM library prefix (BTM_ReadRSSI)
+fn_8029ED14 BTM_8029ED14  # all known callers use the BTM library prefix (BTM_VendorSpecificCommand)
+fn_8029F374 bta_8029F374  # all known callers use the bta library prefix (bta_hh_start_sdp)
+fn_8029F88C bta_8029F88C  # all known callers use the bta library prefix (decompiled callers in src/)
+fn_8029F8D0 bta_8029F8D0  # all known callers use the bta library prefix (decompiled callers in src/)
+fn_8029F94C bta_8029F94C  # all known callers use the bta library prefix (decompiled callers in src/)
+fn_8029FA30 bta_8029FA30  # all known callers use the bta library prefix (bta_hh_start_sdp)
+fn_8029FBC0 bta_8029FBC0  # all known callers use the bta library prefix (bta_hh_sdp_cmpl)
+fn_8029FC88 bta_8029FC88  # all known callers use the bta library prefix (bta_hh_sdp_cmpl)
+fn_8029FCEC bta_8029FCEC  # all known callers use the bta library prefix (bta_hh_write_dev_act)
+fn_8029FECC bta_8029FECC  # all known callers use the bta library prefix (bta_hh_sdp_cmpl)
+fn_802A00F4 bta_802A00F4  # all known callers use the bta library prefix (decompiled callers in src/)
+fn_802A024C bta_802A024C  # all known callers use the bta library prefix (decompiled callers in src/)
+fn_802A1D70 bta_802A1D70  # all known callers use the bta library prefix (decompiled callers in src/)
+fn_802A200C bta_802A200C  # all known callers use the bta library prefix (decompiled callers in src/)
+fn_802A2134 bta_802A2134  # all known callers use the bta library prefix (decompiled callers in src/)
+fn_802A2D4C l2c_802A2D4C  # all known callers use the l2c library prefix (l2c_csm_execute)
+fn_802A2FE0 l2c_802A2FE0  # all known callers use the l2c library prefix (l2c_csm_execute)
+fn_802A3150 l2c_802A3150  # all known callers use the l2c library prefix (l2c_csm_execute)
+fn_802A32B8 l2c_802A32B8  # all known callers use the l2c library prefix (l2c_csm_execute)
+fn_802A34FC l2c_802A34FC  # all known callers use the l2c library prefix (l2c_csm_execute)
+fn_802A36D4 l2c_802A36D4  # all known callers use the l2c library prefix (l2c_csm_execute)
+fn_802A3A9C l2c_802A3A9C  # all known callers use the l2c library prefix (l2c_csm_execute)
+fn_802A3CF8 l2c_802A3CF8  # all known callers use the l2c library prefix (l2c_csm_execute)
+fn_802A3EDC l2c_802A3EDC  # all known callers use the l2c library prefix (l2c_csm_execute)
+fn_802A4038 l2c_802A4038  # all known callers use the l2c library prefix (decompiled callers in src/)
+fn_802A49C4 l2c_802A49C4  # all known callers use the l2c library prefix (decompiled callers in src/)
+fn_802A5368 BTA_802A5368  # all known callers use the BTA library prefix (decompiled callers in src/)
+fn_802A6398 btm_802A6398  # all known callers use the btm library prefix (decompiled callers in src/)
+fn_802A6854 l2c_802A6854  # all known callers use the l2c library prefix (decompiled callers in src/)
+fn_802A6918 l2c_802A6918  # all known callers use the l2c library prefix (decompiled callers in src/)
+fn_802A6AB0 l2c_802A6AB0  # all known callers use the l2c library prefix (decompiled callers in src/)
+fn_802A6DA8 l2c_802A6DA8  # all known callers use the l2c library prefix (decompiled callers in src/)
+fn_802A7254 l2c_802A7254  # all known callers use the l2c library prefix (decompiled callers in src/)
+fn_802A7328 l2c_802A7328  # all known callers use the l2c library prefix (decompiled callers in src/)
+fn_802A78A4 l2c_802A78A4  # all known callers use the l2c library prefix (decompiled callers in src/)
+fn_802A7AA4 bta_802A7AA4  # all known callers use the bta library prefix (decompiled callers in src/)
+fn_802A7BB8 l2c_802A7BB8  # all known callers use the l2c library prefix (decompiled callers in src/)
+fn_802A7D00 l2c_802A7D00  # all known callers use the l2c library prefix (decompiled callers in src/)
+fn_802A7D40 l2c_802A7D40  # all known callers use the l2c library prefix (decompiled callers in src/)
+fn_802A7E50 l2c_802A7E50  # all known callers use the l2c library prefix (decompiled callers in src/)
+fn_802A7E90 btm_802A7E90  # all known callers use the btm library prefix (btm_reset_complete)
+fn_802A941C PORT_802A941C  # all known callers use the PORT library prefix (PORT_ControlCnf, PORT_ControlInd, PORT_FlowInd)
+fn_802A9954 PORT_802A9954  # all known callers use the PORT library prefix (PORT_DlcEstablishInd, PORT_ParNegInd, PORT_PortNegInd)
+fn_802A99DC PORT_802A99DC  # all known callers use the PORT library prefix (PORT_FlowInd)
+fn_802A9AB4 PORT_802A9AB4  # all known callers use the PORT library prefix (PORT_DataInd)
+fn_802AA598 rfc_802AA598  # all known callers use the rfc library prefix (rfc_mx_sm_state_disc_wait_ua)
+fn_802AA5F8 rfc_802AA5F8  # all known callers use the rfc library prefix (rfc_mx_sm_execute)
+fn_802AA80C rfc_802AA80C  # all known callers use the rfc library prefix (rfc_mx_sm_execute)
+fn_802AA9C8 rfc_802AA9C8  # all known callers use the rfc library prefix (rfc_mx_sm_execute)
+fn_802AAAF0 rfc_802AAAF0  # all known callers use the rfc library prefix (rfc_mx_sm_execute)
+fn_802AC49C PORT_802AC49C  # all known callers use the PORT library prefix (PORT_StartCnf)
+fn_802AC5A4 PORT_802AC5A4  # all known callers use the PORT library prefix (PORT_DlcEstablishCnf)
+fn_802AC724 PORT_802AC724  # all known callers use the PORT library prefix (decompiled callers in src/)
+fn_802AC7C8 PORT_802AC7C8  # all known callers use the PORT library prefix (PORT_DataInd)
+fn_802AC8C4 rfc_802AC8C4  # all known callers use the rfc library prefix (rfc_mx_conf_cnf, rfc_mx_conf_ind)
+fn_802AC974 rfc_802AC974  # all known callers use the rfc library prefix (rfc_mx_sm_state_connected, rfc_mx_sm_state_disc_wait_ua, rfc_mx_sm_state_wait_sabme)
+fn_802ACAE8 rfc_802ACAE8  # all known callers use the rfc library prefix (rfc_mx_sm_state_connected)
+fn_802AD2B4 PORT_802AD2B4  # all known callers use the PORT library prefix (decompiled callers in src/)
+fn_802AE170 rfc_802AE170  # all known callers use the rfc library prefix (rfc_mx_sm_state_connected)
+fn_802AEA64 bta_802AEA64  # all known callers use the bta library prefix (decompiled callers in src/)
+fn_802AF530 BTA_802AF530  # all known callers use the BTA library prefix (BTA_Init)
+fn_802AFFE4 SDP_802AFFE4  # all known callers use the SDP library prefix (SDP_AddAttribute)
+fn_802B1498 BTA_802B1498  # all known callers use the BTA library prefix (decompiled callers in src/)
+fn_802B1D10 bta_802B1D10  # all known callers use the bta library prefix (decompiled callers in src/)
+fn_802B2DA4 bta_802B2DA4  # all known callers use the bta library prefix (decompiled callers in src/)
+fn_802B2E18 bta_802B2E18  # all known callers use the bta library prefix (decompiled callers in src/)
+fn_802B3D04 SDP_802B3D04  # all known callers use the SDP library prefix (SDP_InitDiscoveryDb)
+fn_802C6898 GetObj_24_802C6898  # returns the field at +24 of its object
+fn_802C6C88 SetObj_24_802C6C88  # stores its 2nd argument into the field at +24 of its object
+fn_802DF4A8 GetObj_54_802DF4A8  # returns the field at +54 of its object
+fn_802E498C DWC_802E498C  # all known callers use the DWC library prefix (DWC_ConnectToFriendsAsync, DWC_UpdateServersAsync)
+fn_802E612C DWC_802E612C  # all known callers use the DWC library prefix (DWC_ConnectToFriendsAsync)
+fn_802E6A54 DWC_802E6A54  # all known callers use the DWC library prefix (DWC_UpdateServersAsync)
+fn_802E6DAC DWC_802E6DAC  # all known callers use the DWC library prefix (DWC_ConnectToFriendsAsync)
+fn_802E6E34 DWCi_802E6E34  # all known callers use the DWCi library prefix (DWCi_RestartFromCancel)
+fn_802E6F3C DWCi_802E6F3C  # all known callers use the DWCi library prefix (DWCi_RestartFromCancel)
+fn_802E7054 DWC_802E7054  # all known callers use the DWC library prefix (DWC_ShutdownFriendsMatch)
+fn_802E8208 DWC_802E8208  # all known callers use the DWC library prefix (DWC_ShutdownFriendsMatch)
+fn_802E8214 DWC_802E8214  # all known callers use the DWC library prefix (DWC_ShutdownFriendsMatch)
+fn_802E85DC DWC_802E85DC  # all known callers use the DWC library prefix (DWC_ShutdownFriendsMatch)
+fn_802EB518 DWC_802EB518  # all known callers use the DWC library prefix (DWC_ShutdownFriendsMatch)
+fn_802EB8E8 DWC_802EB8E8  # all known callers use the DWC library prefix (DWC_ConnectToFriendsAsync)
+fn_802EE180 DWC_802EE180  # all known callers use the DWC library prefix (DWC_ShutdownFriendsMatch)
+fn_802EE650 DWCi_802EE650  # all known callers use the DWCi library prefix (DWCi_RestartFromCancel)
+fn_802F7F08 DWC_802F7F08  # all known callers use the DWC library prefix (DWC_ShutdownFriendsMatch)
+fn_802F8E04 DWC_802F8E04  # all known callers use the DWC library prefix (decompiled callers in src/)
+fn_8030EB44 Thunk_gti2AcceptConnection_8030EB44  # tail-calls gti2AcceptConnection
+fn_8030EB48 Thunk_gti2RejectConnection_8030EB48  # tail-calls gti2RejectConnection
+fn_8030EE04 DWC_8030EE04  # all known callers use the DWC library prefix (gti2SocketError, gti2SocketSend)
+fn_8030EE4C GetObj_0_8030EE4C  # returns the field at +0 of its object
+fn_8030EE5C GetObj_4_8030EE5C  # returns the field at +4 of its object
+fn_8030EE7C GetObj_54_8030EE7C  # returns the field at +54 of its object
+fn_8030EE94 GetObj_0_8030EE94  # returns the field at +0 of its object
+fn_803122F4 SetObj_20_803122F4  # stores its 2nd argument into the field at +20 of its object
+fn_8031916C DWC_8031916C  # all known callers use the DWC library prefix (decompiled callers in src/)
+fn_8031B27C SetObj_28_8031B27C  # stores its 2nd argument into the field at +28 of its object
+fn_8031BE1C GetObj_0_8031BE1C  # returns the field at +0 of its object
+fn_8031BE6C GetObj_8_8031BE6C  # returns the field at +8 of its object
+fn_8031BE7C SetObj_24_8031BE7C  # stores its 2nd argument into the field at +24 of its object
+fn_8031BE84 GetObj_24_8031BE84  # returns the field at +24 of its object
+fn_8031C680 SetObj_10_8031C680  # stores its 2nd argument into the field at +10 of its object
+fn_8031CC48 DWCi_8031CC48  # all known callers use the DWCi library prefix (decompiled callers in src/)
+fn_8031CEB8 GetObj_6F0_8031CEB8  # returns the field at +6F0 of its object
+fn_80321E98 Stub_80321E98  # only returns nothing (blr)
+fn_803224EC Stub_803224EC  # only returns nothing (blr)
+fn_80325110 Stub_80325110  # only returns nothing (blr)
+fn_8032511C Stub_8032511C  # only returns nothing (blr)
+fn_80325EBC SetObj_7D8_80325EBC  # stores its 2nd argument into the field at +7D8 of its object
+fn_80325EC4 SetObj_7D4_80325EC4  # stores its 2nd argument into the field at +7D4 of its object
+fn_80325ECC GetObj_7D4_80325ECC  # returns the field at +7D4 of its object
+fn_80326720 Stub_80326720  # only returns nothing (blr)
+fn_80326724 Thunk_OSLockMutex_80326724  # tail-calls OSLockMutex
+fn_80326728 Thunk_OSUnlockMutex_80326728  # tail-calls OSUnlockMutex
+fn_80328418 Thunk_memcpy_80328418  # tail-calls memcpy
+fn_8032841C Thunk_strlen_8032841C  # tail-calls strlen
+fn_80328420 Thunk_strcmp_80328420  # tail-calls strcmp
+fn_80328DA4 GetObj_348_80328DA4  # returns the field at +348 of its object
+fn_8032B72C BTM_8032B72C  # all known callers use the BTM library prefix (BTM_WriteEIR)
+fn_8032D034 BTM_8032D034  # all known callers use the BTM library prefix (decompiled callers in src/)
+fn_8032D09C Stub_8032D09C  # only returns nothing (blr)
+fn_8032D0A8 BTM_8032D0A8  # all known callers use the BTM library prefix (decompiled callers in src/)
+fn_8032D5C0 DWC_8032D5C0  # all known callers use the DWC library prefix (decompiled callers in src/)
+fn_8032EED8 Thunk_OSInitMutex_8032EED8  # tail-calls OSInitMutex
+fn_8032EEDC Thunk_OSLockMutex_8032EEDC  # tail-calls OSLockMutex
+fn_8032EEE0 Thunk_OSUnlockMutex_8032EEE0  # tail-calls OSUnlockMutex
+fn_80334290 Thunk__ftell_80334290  # tail-calls 
+fn_80334458 Thunk__fseek_80334458  # tail-calls 
+fn_8033AF2C Thunk_fwide_8033AF2C  # tail-calls fwide
+fn_8033F1F4 Thunk___ieee754_acos_8033F1F4  # tail-calls 
+fn_8033F1FC Thunk___ieee754_atan2_8033F1FC  # tail-calls 
+fn_8033F200 Thunk___ieee754_fmod_8033F200  # tail-calls 
+fn_8033F204 Thunk___ieee754_log_8033F204  # tail-calls 
+fn_8033F208 Thunk___ieee754_log10_8033F208  # tail-calls 
+fn_8033F458 Stub_8033F458  # only returns nothing (blr)
+fn_8033F45C Thunk___ieee754_sqrt_8033F45C  # tail-calls 
+fn_80344F74 GetObj_10_80344F74  # returns the field at +10 of its object
+fn_80344FD0 Stub_80344FD0  # only returns nothing (blr)
+fn_80345384 Stub_80345384  # only returns nothing (blr)
+fn_80345388 Stub_80345388  # only returns nothing (blr)
