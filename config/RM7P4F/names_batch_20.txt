@@ -1,0 +1,9 @@
+fn_8019DC48 GetObj_1EC_8019DC48  # returns the field at +1EC of its object
+fn_8019DC50 GetObj_1E8_8019DC50  # returns the field at +1E8 of its object
+fn_8019EA7C UI_8019EA7C  # all callers are in the UI area (UiInit)
+fn_801A7DB8 GetObj_1B4_801A7DB8  # returns the field at +1B4 of its object
+fn_801AA784 GetObj_10_801AA784  # returns the field at +10 of its object
+fn_801AA78C GetObj_10_801AA78C  # returns the field at +10 of its object
+fn_801AA794 GetObj_10_801AA794  # returns the field at +10 of its object
+fn_801AB7E8 GetObj_1C_801AB7E8  # returns the field at +1C of its object
+fn_801ABA2C UI_801ABA2C  # all callers are in the UI area (UiInit)
