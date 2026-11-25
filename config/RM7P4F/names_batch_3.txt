@@ -1,0 +1,3 @@
+fn_8003D4B0 Session_8003D4B0  # all callers are in the Session area (GameSessionUpdate)
+fn_8003D580 Session_8003D580  # all callers are in the Session area (GameSessionUpdate)
+fn_8003E354 Session_8003E354  # all callers are in the Session area (GameSessionUpdate)
