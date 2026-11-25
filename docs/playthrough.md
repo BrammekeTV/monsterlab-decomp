@@ -16,7 +16,9 @@ python tools/playthrough.py
 ```
 
 The game is found as for any run (`orig/RM7P4F`, `MONSTERLAB_DATA` or `--iso PATH`). About 9 minutes, longer when other copies of the game
-are running on the same machine (`--gpu` draws on the graphics card instead and takes about 6).
+are running on the same machine.
+Leave the rendering in software: parallel runs on the graphics card can crash the display driver. `--gpu` is only for
+problems that need the card.
 
 ## What it checks
 

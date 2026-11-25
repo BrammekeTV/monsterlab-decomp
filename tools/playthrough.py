@@ -266,7 +266,7 @@ def main():
     ap.add_argument("--stop-after", metavar="STAGE", help="end the test after this stage")
     ap.add_argument("--seconds", type=int, default=1500, help="wall-clock limit of the game run (default 1500)")
     ap.add_argument("--retries", type=int, default=1, help="runs to repeat after a stall (default 1; crashes are never retried)")
-    ap.add_argument("--gpu", action="store_true", help="draw on the graphics card instead of in software (faster)")
+    ap.add_argument("--gpu", action="store_true", help="draw on the graphics card; only for problems that need it (parallel runs can crash the driver)")
     ap.add_argument("--list", action="store_true", help="list the stages")
     ap.add_argument("--check-log", metavar="FILE", help="judge a saved log instead of running the game")
     a = ap.parse_args()
