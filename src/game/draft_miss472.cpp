@@ -77,7 +77,7 @@ void fn_8002F7EC(u8* arg0, f32 farg0) {
 
 // 0x8007A1D0
 // Transforms the point at +0x24 (plus a scaled offset from a table entry) into the output vec3 at +0x4.
-void fn_8007A1D0(u8* arg0) {
+void fn_8007A1D0(u8* arg0, f32 dt) {
     u8* e;
     u8* dst;
     f32 t;
@@ -85,7 +85,7 @@ void fn_8007A1D0(u8* arg0) {
     f32 y;
     f32 z;
 
-    fn_800D9044(arg0, 0.0f);  // f1 is stale in the asm
+    fn_800D9044(arg0, dt);  // f1 passes through untouched (vtable slot 0x98 callers load it)
     e = *(u8**)(arg0 + 0x8) + *(s32*)(arg0 + 0x10) * 0x1C;
     t = *(f32*)(arg0 + 0x14) / *(f32*)(e + 0x18);
     x = *(f32*)(e + 0x0) + *(f32*)(e + 0xC) * t + *(f32*)(arg0 + 0x24);

@@ -161,8 +161,8 @@ u8* fn_800AAF7C(u8* arg0, s32 arg1) {
 // 0x800D90D4
 // Maps the point at +0x4 along the segment record selected by index +0x10 (stride 0x1C) of the table at +0x8,
 // scaled by the ratio of the float at +0x14 to the segment's length at +0x18.
-void fn_800D90D4(u8* arg0) {
-    fn_800D9044(arg0, 0.0f);  // f1 is not set before the call in the asm (stale): pass 0
+void fn_800D90D4(u8* arg0, f32 dt) {
+    fn_800D9044(arg0, dt);  // f1 passes through untouched (vtable slot 0x98 callers load it)
 
     u8* out = *(u8**)(arg0 + 0x4);
     u8* e = *(u8**)(arg0 + 0x8) + *(s32*)(arg0 + 0x10) * 0x1C;
