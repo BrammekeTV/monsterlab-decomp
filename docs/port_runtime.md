@@ -62,7 +62,8 @@ that header's address finds the writer);
 `PORT_SCRIPT_TRACE=1` in the environment logs every call the script engine makes to a registered
 script function, by name; `PORT_STATE_LOG=1` prints a line whenever the game mode, the session state, the world's
 load fields, the zone queue or the combat part zones change (what a "Loading" screen that stays is waiting
-for); `PORT_GFX_TRACE=1` logs draws and copies; `PORT_SOUND_LOG=1` logs every sound request (`PlaySound` by
+for), and while the player explores a map, the node they stand on (id, type, usable exits, challenge);
+`PORT_GFX_TRACE=1` logs draws and copies; `PORT_SOUND_LOG=1` logs every sound request (`PlaySound` by
 group hash, `PlaySoundAt` by sound object, voice records as `record`) with the frame, whether it was found, the sample
 name and zone, and the audio slot it started or why it did not (`port_sound_log.cpp`); add `PORT_AUDIO_TRACE=1` to see
 the mixer's voice starts after each one.

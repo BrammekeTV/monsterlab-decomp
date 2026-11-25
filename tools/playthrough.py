@@ -6,7 +6,7 @@
 
 Builds incrementally (tools/build_pc.py), fails at once if a game function is only a link stub,
 then plays one continuous, unpaced run (no window, no sound, no movies, fixed random seed, empty
-save folder) from boot to the free village map after the first battle, with scripted --press and
+save folder) from boot through both village battles to the return to the castle, with scripted --press and
 --pointer input. A stage passes when its game-state markers show up in the log (script calls,
 level loads and PORT_STATE_LOG lines, never pixels) before the stage's deadline frame. The game
 is stopped at the first missed deadline, crash or stall, and as soon as the last marker is seen.
@@ -100,12 +100,36 @@ STAGES = [
     Stage("repaired", "Field Repair played to time-up, health handed back", 19300,
           [call("DeinitChallenge", 18500), call("AssignFieldRepairHealthPointsToPlayer", 18500)],
           press=("STICK_UP@18000-18300", "SWING@18300-19000")),
-    Stage("freemap", "free on the village map: conversation closed, a walk works", 20400,
+    Stage("freemap", "free on the village map: conversation closed, a walk works", 19900,
           [call("StopConversation", 19100),
            state("exploration HUD", r"hud machine 090B84CE \(depth 1\) state 0 ", 19100),
-           call("target_node_changed", 20000), call("character_exploration_idle_entry", 20040)],
-          press=("A@19150-19320/150", "DOWN@20000-20050")),
-    # Later stages go here (a deadline after 20400, frames counted from the run's start).
+           call("target_node_changed", 19500), call("character_exploration_idle_entry", 19600),
+           state("on the node right of the battle node", r"map node -1238753613 ", 19500)],
+          press=("A@19150-19320/150", "RIGHT@19500-19550")),
+    Stage("battle2", "walk up into the second monster, arena and combat HUD up", 20600,
+          [call("CombatPlaceholderEntry", 19800), level("village_arena", 19800), call("UpdateCombatHUD", 19800),
+           state("battle round 1", r"battle phase \d+ round 1 ", 19900)],
+          press=("UP@19800-19850",)),
+    # The second fight's length differs between runs (2300 to 4200 frames seen), so its input goes on until 26500:
+    # A presses on the Victory screen with the pointer off its arrow do nothing. The screens after it start at 26700.
+    Stage("won2", "second battle won, Victory screen", 26600,
+          [state("battle phase 8 (enemy defeated)", r"battle phase 8 ", 20600),
+           call("SetUpCombatResultsScreen", 20600)],
+          press=("A@20550-26500/150", "STICK_UP@20450-21350", "STICK_UP@21650-22550", "STICK_UP@22850-23750",
+                 "STICK_UP@24050-24950", "STICK_UP@25250-26150"),
+          pointer=("1380,720@20400",)),
+    Stage("awards", "results continue, Combat Awards, back on the map with the next quest step", 27800,
+          [call("SetUpCombatRewardsScreen", 26700), level("village_level", 26900),
+           call("SpawnDatabaseMonsterAtNode", 26900),
+           state("exploration HUD", r"hud machine 090B84CE \(depth 1\) state 0 ", 26900)],
+          press=("A@26800", "A@27150"),                                 # the awards' arrow is not where the results' is
+          pointer=("1430,940@26700", "1350,855@27050")),
+    Stage("thanks", "walk to the Mayor, his thanks, the game returns to the castle", 29400,
+          [state("on the Mayor's node", r"map node -369066522 ", 27500),
+           call("StartConversationID", 28100), call("GotoCastleLocation", 28100),
+           level("castle_communication", 28100), call("HandleReturnToCastle", 28100), call("StartQuest", 28100)],
+          press=("LEFT@27500-27550", "A@28100", "A@28250-28700/150")),
+    # Later stages go here (a deadline after 29400, frames counted from the run's start).
 ]
 
 

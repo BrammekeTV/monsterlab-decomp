@@ -15,7 +15,7 @@ It is a local step, not a CI job: it needs the game data, which is never uploade
 python tools/playthrough.py
 ```
 
-The game is found as for any run (`orig/RM7P4F`, `MONSTERLAB_DATA` or `--iso PATH`). About 9 minutes, longer when other copies of the game
+The game is found as for any run (`orig/RM7P4F`, `MONSTERLAB_DATA` or `--iso PATH`). About 14 minutes, longer when other copies of the game
 are running on the same machine.
 Leave the rendering in software: parallel runs on the graphics card can crash the display driver. `--gpu` is only for
 problems that need the card.
@@ -42,7 +42,11 @@ load messages, never from pictures.
 | rewards | rewards screen |
 | repair | back in the village, `StartChallenge`, `LoadChallengeUI` |
 | repaired | time-up, `DeinitChallenge`, health handed back |
-| freemap | conversation closed, exploration HUD, a walk to the next node and arrival |
+| freemap | conversation closed, exploration HUD, a walk to the next node and arrival (the `map node` line of `PORT_STATE_LOG`) |
+| battle2 | the walk up meets the second monster: `CombatPlaceholderEntry`, `village_arena`, combat HUD, battle round 1 |
+| won2 | battle phase 8, results screen |
+| awards | Combat Awards screen, `village_level` again, the next monster is spawned, exploration HUD |
+| thanks | the Mayor's node, his conversation, `GotoCastleLocation`, the castle level, `HandleReturnToCastle`, the next `StartQuest` |
 
 `python tools/playthrough.py --list` prints the markers and deadlines.
 
