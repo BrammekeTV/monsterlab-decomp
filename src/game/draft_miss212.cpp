@@ -221,7 +221,7 @@ void fn_80037FB4(u8* p) {
     if (*(s32*)(p + 0x9A8) == 3) {
         for (s32 k = 0; k < 3; k++) {
             s32 v = lbl_80347698[k];
-            if (v < count) fn_800381B8(p, v, 0)/*r5 leftover in asm*/;
+            if (v < count) fn_800381B8(p, v, v);  // mr r5, r4
         }
     }
 }

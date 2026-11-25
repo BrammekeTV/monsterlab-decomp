@@ -158,7 +158,7 @@ void increment_deathcount(ScriptCtx* ctx) {
 void do_trigger_action(ScriptCtx* ctx) {
     Prop* p = PROP(ctx);
     if (p == NULL || !(p->def->flags & 0x100)) return;
-    TriggerDoAction(p->action, (void*)(intptr_t)p->actionParam, 0);  // r5 not set by the original
+    TriggerDoAction(p->action, p, (void*)(intptr_t)p->actionParam);  // r4 = the prop, lwz r5, 0x1ac(r4)
 }
 
 // Waypoint-follow parameters built on the stack (4 bytes).

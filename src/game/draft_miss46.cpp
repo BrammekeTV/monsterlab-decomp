@@ -1147,7 +1147,7 @@ void SirLoaderShutdown(u8* a0) {
     *(void**)(a0 + 0x7B4) = NULL;
     for (s32 i = 0; i < *(s32*)(a0 + 0x7AC); i++) {
         if (*(s32*)(*(u8**)(a0 + 0x7A8) + i * 4) != 0) {
-            sp8 = fn_801E4E20(lbl_8048A8B4, 0 /* leftover r4 */);
+            sp8 = fn_801E4E20(lbl_8048A8B4, *(s32*)(*(u8**)(a0 + 0x7A8) + i * 4));  // lwzx r4: the entry just tested
             fn_801E5220(lbl_8048A8B4, &sp8);
         }
     }

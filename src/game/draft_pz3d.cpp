@@ -525,7 +525,7 @@ s32 fn_801AC944(u8* clip, s32 a, u8* b, s32 c, u8* obj) {
             }
         }
     } else {
-        u8* e = fn_8018C48C(b, 0 /* leftover r4 key */);
+        u8* e = fn_8018C48C(b, (u32)a);  // r4 is still this function's own a
         if (e != NULL) {
             void* payload = *(void**)(e + 4);
             if (payload != NULL) fn_8017493C(payload);

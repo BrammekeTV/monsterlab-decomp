@@ -649,11 +649,11 @@ void fn_80085CF8(u8* arg0) {
 // and spawns +0x3AC items, in mode 1 re-arms +0x3A8 and adds to the burst counter +0x3B0 (voice
 // SFX), and fires queued items (+0x3B0) every 0.05 s. Sets state +0x4A8 = 5 when idle.
 void fn_8008853C(u8* arg0, f32 dt) {
-    typedef void (*Fn64)(u8*);
+    typedef f32 (*Fn64)(u8*);
 
     fn_8008CABC();   // the asm passes arg0[0x350] in r3, the callee ignores it
-    (*(Fn64*)(*(u8**)(arg0 + 0x4) + 0x64))(arg0);
-    fn_8008CAC0(*(u8**)(arg0 + 0x350), 0.0f);   // f1 is leftover after the virtual call
+    f32 level = (*(Fn64*)(*(u8**)(arg0 + 0x4) + 0x64))(arg0);
+    fn_8008CAC0(*(u8**)(arg0 + 0x350), level);  // f1 = the virtual call's result, not reloaded
     fn_8008BA14(*(u8**)(arg0 + 0x354));
     for (s32 i = 0; i < 0x96; i++) {
         u8* h = *(u8**)(arg0 + 0xF8 + i * 4);

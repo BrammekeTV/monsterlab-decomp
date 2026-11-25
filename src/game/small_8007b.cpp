@@ -134,7 +134,7 @@ void fn_80076B5C(u8* p, void* a, f32 f) {
     *(f32*)(p + 0x264) = f;
     *(f32*)(p + 0x268) = lbl_805FD668;
     *(u8*)(p + 0x26C) = 1;
-    EventSend(gEventMgr, p, NULL, 0x4608BB44u, 0, 0, 0, 0);
+    EventSend(gEventMgr, p, NULL, 0x4608BB44u, 0, 0, 1, 0);  // li r9, 1
 }
 
 // 0x80077544

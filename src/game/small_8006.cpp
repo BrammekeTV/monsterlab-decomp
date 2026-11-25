@@ -24,7 +24,7 @@ u8* fn_801B4334(u8* arg0, s32 layer, u8* ent, s32 reset);                       
 void fn_801B4944(u8* obj, s32 mode);                                                    // 0x801B4944
 void     fn_80122B00(void* a, u8* b);                                           // 0x80122B00
 u8* fn_8006F61C(u8* p, s32 type, u8* rec, s32 reset);                                                    // 0x8006F61C
-void     fn_8006F67C(u8* p, f32 t, s32 flag);                                   // 0x8006F67C (leaf version takes only p)
+void     fn_8006F67C(u8* p, f32 t);                                             // 0x8006F67C
 u8*     fn_8005CA88(u8* p, s32 type, u8* rec, s32 reset);                                                    // 0x8005CA88
 void     fn_8005CB40(u8* p, f32 t, s32 flag);                                   // 0x8005CB40
 void fn_800655D8(u8* arg0, f32 dt);                                                    // 0x800655D8
@@ -174,12 +174,12 @@ u8* fn_800630E0(u8* p, s32 del) {
 
 // 0x80063318
 // Per-frame update of the object at +4: when bit 0 of its word at +0x20 is set, calls fn_801D9B34 with the
-// object at +0x90 and the world's float at gWorldState+0xC, then fn_8006F67C(p, t, 0).
+// object at +0x90 and the world's float at gWorldState+0xC, then fn_8006F67C(p, t).
 void fn_80063318(u8* p, f32 t) {
     u8* child = *(u8**)(p + 0x4);
     if (*(u32*)(child + 0x20) & 1) {
         fn_801D9B34(*(void**)(p + 0x90), *(f32*)(gWorldState + 0xC));
-        fn_8006F67C(p, t, 0);
+        fn_8006F67C(p, t);
     }
 }
 

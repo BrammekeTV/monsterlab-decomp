@@ -63,6 +63,9 @@ a PC port. Read this whole file before making changes. Human contributors: see
 - `python tools/lint_decomp.py [files|--all]`: flags pointer-truncating casts, dropped tail-call return values,
   base-constructor argument pass-through, `// 0xADDR` markers not alone on their line and scratch files
   (file:line; `lint:ok` comment suppresses an intentional one). `tools/check.py` runs it after compiling.
+- `python tools/dropped_values.py [param zero const ret] [--boot] [--files SUBSTR]`: finds values the original passes or returns that the C dropped:
+  argument registers the asm reads without a C parameter, literal 0 / other constants where the asm holds something else, and ignored or `void` results
+  the asm uses. Needs the asm in `build/RM7P4F/asm`. Candidates only: check each one; harmless ones go in `tools/dropped_values_ok.txt` with the reason.
 - `python tools/check_protos.py [names]`: reports functions declared with different return types,
   parameter counts or C/C++ linkage across `src/` and `include/` (run it before pushing; all game
   functions use C linkage). Pointer-returning script callbacks return `ScriptValue`. It also compares

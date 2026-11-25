@@ -172,7 +172,7 @@ void fn_8007B20C(u8* self) {
         for (s32 j = 0; j < *(s32*)(ZoneRes(z) + 0x98); j++) {
             u8* obj = ((u8**)*(u8**)(ZoneRes(z) + 0x12C))[j];
             if (hash == *(u32*)(obj + 0x2C)) {
-                fn_8007A4B4(self + 0x264, NULL);  // r4 leftover in asm
+                fn_8007A4B4(self + 0x264, obj);  // lwzx r4: r4 is the matched object at the bl
                 found = 1;
                 break;
             }

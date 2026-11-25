@@ -1,0 +1,11 @@
+# Candidates of tools/dropped_values.py checked against the asm and found harmless: kind address key
+param 801FCD9C r5+r7+r8+r9    # tail calls the two aux-effect callbacks; they are AX callbacks taking (data, ctx)
+param 8015E5D0 r5             # r3 is unused in the original; the C drops it and its callers match
+param 8005DC04 r4             # r4 is only forwarded to fn_80053C2C, which does not read it
+ret 8008CE44 RandomU32:r3     # the result is spilled to the stack and overwritten before any read
+ret 8007AC80 fn_8007C5D8:r3   # copied to a stack vector that is never read
+ret 80221B8C SaveIsRegionReached:r3  # false match: the C uses the result of the call that matters
+zero 800C4364 fn_8010B5A0:r4  # the NULL path of an inlined getter (the original reads address 0x2A0)
+zero 80058CEC EventSend:r8    # (u32)0.0f: the original converts a 0.0f constant at run time
+zero 80122F30 fn_801B94F8:r3  # r3 is fn_800E6228's result, 0 on this branch
+zero 8012304C fn_801B94F8:r3  # r3 is fn_800E6228's result, 0 on this branch
