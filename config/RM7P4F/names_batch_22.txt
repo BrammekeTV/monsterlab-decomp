@@ -1,0 +1,8 @@
+fn_801BC790 GetObj_C_801BC790  # returns the field at +C of its object
+fn_801CBD38 GetObj_1D4_801CBD38  # returns the field at +1D4 of its object
+fn_801CC8A4 GetObj_60_801CC8A4  # returns the field at +60 of its object
+fn_801CCDBC GetObj_1A0_801CCDBC  # returns the field at +1A0 of its object
+fn_801CE328 GetObj_90_801CE328  # returns the field at +90 of its object
+fn_801CE380 GetObj_94_801CE380  # returns the field at +94 of its object
+fn_801D0040 GetObj_198_801D0040  # returns the field at +198 of its object
+fn_801D0390 GetObj_19C_801D0390  # returns the field at +19C of its object
