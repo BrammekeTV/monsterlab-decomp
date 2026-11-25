@@ -1,0 +1,5 @@
+fn_8007AFC4 Entity_8007AFC4  # all callers are in the Entity area (CreateEntityByType)
+fn_80081AF4 Entity_80081AF4  # all callers are in the Entity area (CreateEntityByType)
+fn_80083A6C Entity_80083A6C  # all callers are in the Entity area (CreateEntityByType)
+fn_80085AD8 Entity_80085AD8  # all callers are in the Entity area (CreateEntityByType)
+fn_80086780 Entity_80086780  # all callers are in the Entity area (CreateEntityByType)
