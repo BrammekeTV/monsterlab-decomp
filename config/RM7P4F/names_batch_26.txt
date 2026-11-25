@@ -1,0 +1,35 @@
+fn_80212E50 Reaction_80212E50  # all callers are in the Reaction area (ReactionBuildInjure, ReactionBuildRecover)
+fn_80213150 SetObj_A34_80213150  # stores its 2nd argument into the field at +A34 of its object
+fn_80213810 SetObj_A38_80213810  # stores its 2nd argument into the field at +A38 of its object
+fn_802171A0 Lab_802171A0  # all callers are in the Lab area (fn_80216C80, fn_80217094, fn_802170E8)
+fn_802172C4 Lab_802172C4  # all callers are in the Lab area (fn_80216C80)
+fn_80217468 Lab_80217468  # all callers are in the Lab area (fn_80216C80)
+fn_80217908 Lab_80217908  # all callers are in the Lab area (fn_80216C80)
+fn_80217E90 Lab_80217E90  # all callers are in the Lab area (fn_80216C80, fn_802172C4, fn_80217468)
+fn_80217F20 Lab_80217F20  # all callers are in the Lab area (fn_80216C80, fn_802172C4, fn_80217468)
+fn_80218060 Lab_80218060  # all callers are in the Lab area (fn_80217F20)
+fn_802180EC Lab_802180EC  # all callers are in the Lab area (fn_80216C80, fn_802172C4)
+fn_802186D0 SetObj_54_802186D0  # stores its 2nd argument into the field at +54 of its object
+fn_802189E0 Progress_802189E0  # all callers are in the Progress area (SaveRewardExperiment)
+fn_8021EFB0 Battle_8021EFB0  # all callers are in the Battle area (LimbStatusInit)
+fn_8021F9B8 GetObj_10_8021F9B8  # returns the field at +10 of its object
+fn_8021FF94 SetObj_14_8021FF94  # stores its 2nd argument into the field at +14 of its object
+fn_8021FF9C SetObj_18_8021FF9C  # stores its 2nd argument into the field at +18 of its object
+fn_80220170 GetObj_5070_80220170  # returns the field at +5070 of its object
+fn_802209F4 Battle_802209F4  # all callers are in the Battle area (BattleTickFighters)
+fn_80220A14 Battle_80220A14  # all callers are in the Battle area (BattleSpeedRoll)
+fn_80222994 GetObj_6AC_80222994  # returns the field at +6AC of its object
+fn_802239C8 GetObj_11C_802239C8  # returns the field at +11C of its object
+fn_8022515C Progress_8022515C  # all callers are in the Progress area (SaveRewardExperiment)
+fn_80225C10 Session_80225C10  # all callers are in the Session area (GameSessionUpdate)
+fn_80226C24 GetObj_6B4_80226C24  # returns the field at +6B4 of its object
+fn_80226C2C GetObj_6B8_80226C2C  # returns the field at +6B8 of its object
+fn_802276F4 Lab_802276F4  # all callers are in the Lab area (LabShowBattleResult)
+fn_802285FC GetObj_A00_802285FC  # returns the field at +A00 of its object
+fn_80229028 GetObj_9D4_80229028  # returns the field at +9D4 of its object
+fn_80229544 GetObj_9D8_80229544  # returns the field at +9D8 of its object
+fn_8022A904 GetObj_9E0_8022A904  # returns the field at +9E0 of its object
+fn_8022AE68 GetObj_9E4_8022AE68  # returns the field at +9E4 of its object
+fn_8022B384 GetObj_9E8_8022B384  # returns the field at +9E8 of its object
+fn_8022B8A0 GetObj_9EC_8022B8A0  # returns the field at +9EC of its object
+fn_8022BDD4 GetObj_9F0_8022BDD4  # returns the field at +9F0 of its object
