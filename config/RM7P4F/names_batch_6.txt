@@ -1,0 +1,8 @@
+fn_8006F5A0 Camera_8006F5A0  # all callers are in the Camera area (RegisterScriptFunctions)
+fn_8006FD18 Session_8006FD18  # all callers are in the Session area (GameSessionUpdate)
+fn_8007015C Session_8007015C  # all callers are in the Session area (GameSessionUpdate)
+fn_80074D50 Minigame_80074D50  # all callers are in the Minigame area (minigame_gameflow_control_failure_outro_entry, minigame_gameflow_control_failure_outro_exit, minigame_gameflow_control_gameplay_entry)
+fn_80074D60 UI_80074D60  # all callers are in the UI area (GameFlowSetControlFlowActive)
+fn_80074D74 Minigame_80074D74  # all callers are in the Minigame area (minigame_gameflow_control_failure_outro_entry, minigame_gameflow_control_failure_outro_exit, minigame_gameflow_control_gameplay_entry)
+fn_80074D80 Camera_80074D80  # all callers are in the Camera area (RegisterScriptFunctions)
+fn_80076AB8 Entity_80076AB8  # all callers are in the Entity area (CreateEntityByType)
