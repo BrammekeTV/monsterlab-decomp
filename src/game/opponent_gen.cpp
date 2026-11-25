@@ -45,14 +45,16 @@ static inline const PartPool* Pool(s32 index) {
 
 extern "C" {
 
+// Slot k of the pool reads pool word kSlotWord[k].
+static const u8 kSlotWord[POOL_SIZE] = {
+    1, 3, 5, 7, 9, 11, 13, 15, 17, 16, 21, 14, 25, 12, 24, 10, 26, 8, 18, 6, 23, 4, 20, 2, 22, 19,
+};
+
 // 0x8021B730
 // The definition in slot `index` (wrapping), or the next non-empty one; -1 if the pool is empty.
-// The original first copies the 26 definitions to the stack in this scrambled order (the slot
-// number indexes the copy, not the pool): slot k reads pool word kSlotWord[k].
+// The original first copies the 26 definitions to the stack in a scrambled order (the slot
+// number indexes the copy, not the pool).
 s32 PartPoolGet(void* builder, const PartPool* pool, s32 index) {
-    static const u8 kSlotWord[POOL_SIZE] = {
-        1, 3, 5, 7, 9, 11, 13, 15, 17, 16, 21, 14, 25, 12, 24, 10, 26, 8, 18, 6, 23, 4, 20, 2, 22, 19,
-    };
     s32 i = index % POOL_SIZE;
     s32 v = ((const s32*)pool)[kSlotWord[i]];
     if (v != -1) return v;
@@ -68,14 +70,18 @@ s32 PartPoolGet(void* builder, const PartPool* pool, s32 index) {
 }
 
 // 0x8021B8D4
-// Weighted random slot (slots with no part are skipped; 0 if nothing matched).
+// Weighted random slot (slots with no part are skipped; 0 if nothing matched). The slot numbers are
+// those of PartPoolGet's scrambled copy; the weights are copied in an order of their own.
 s32 PartPoolPick(void* builder, const PartPool* pool) {
+    static const u8 kSlotWeight[POOL_SIZE] = {
+        20, 16, 12, 8, 4, 18, 0, 24, 10, 1, 22, 2, 6, 5, 3, 14, 7, 9, 11, 13, 15, 17, 19, 21, 23, 25,
+    };
     s32 cum[POOL_SIZE + 1];
     cum[0] = 0;
-    for (s32 i = 0; i < POOL_SIZE; i++) cum[i + 1] = cum[i] + pool->weights[i];
-    s32 r = RandomRoll() % cum[POOL_SIZE];
+    for (s32 i = 0; i < POOL_SIZE; i++) cum[i + 1] = cum[i] + pool->weights[kSlotWeight[i]];
+    s32 r = (s32)((u32)RandomRoll() % (u32)cum[POOL_SIZE]);   // divwu: the roll is unsigned
     for (s32 i = 0; i < POOL_SIZE; i++)
-        if (r >= cum[i] && r < cum[i + 1] && pool->defs[i] != -1) return i;
+        if (r >= cum[i] && r < cum[i + 1] && ((const s32*)pool)[kSlotWord[i]] != -1) return i;
     return 0;
 }
 

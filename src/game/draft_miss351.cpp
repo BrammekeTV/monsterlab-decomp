@@ -158,20 +158,25 @@ void* fn_801EBD2C(void* node) {
         if (*(u8*)(n + 0x20) == 0) return NULL;
         fn_801EBAB8(n);
     }
-    u8* x = *(u8**)arg0;
-    if (x != NULL) {
+    // the fields are read again after each store, as the original does
+    if (*(u8**)arg0 != NULL) {
+        u8* x = *(u8**)arg0;
         *(void**)x = *(void**)(*(u8**)(arg0 + 0x4) + 0x10);
     }
     n = *(u8**)(arg0 + 0x4);
+    u8* x = *(u8**)arg0;
     u8* nx = *(u8**)(n + 0x10);
     u8* old = *(u8**)(nx + 0x4);
     *(void**)(nx + 0x4) = x;
-    *(void**)arg0 = nx;
+    n = *(u8**)(arg0 + 0x4);
+    *(void**)arg0 = *(void**)(n + 0x10);
     *(void**)(n + 0x10) = old;
-    if (old != NULL) {
-        *(void**)old = NULL;
+    void* head = *(void**)(*(u8**)(arg0 + 0x4) + 0x10);
+    if (head != NULL) {
+        *(void**)head = NULL;
     }
-    return nx != NULL ? nx + 8 : NULL;
+    u8* first = *(u8**)arg0;
+    return first != NULL ? first + 8 : NULL;
 }
 
 }  // extern "C"

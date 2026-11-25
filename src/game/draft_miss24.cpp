@@ -80,24 +80,28 @@ void fn_800A7D88(void* obj, u32 hash) {
 // Unlinks node from its intrusive list (prev at +0, next at +4, owner list head at +8) and clears it.
 void fn_801731C8(void* p) {
     u8* a = (u8*)p;
-    u8* pa = *(u8**)(a + 0x0);
-    u8* pb = *(u8**)(a + 0x4);
-    u8* pc = *(u8**)(a + 0x8);
+    u8** prev = (u8**)(a + 0x0);   // the fields are read again after each store, as the original does
+    u8** next = (u8**)(a + 0x4);
+    u8** list = (u8**)(a + 0x8);
+    u8* pc = *list;
     if (pc == NULL) return;
-    if (pb != NULL) {
-        *(u8**)pb = pa;
+    if (*next != NULL) {
+        *(u8**)*next = *prev;
     } else {
-        *(u8**)pc = pa;
+        *(u8**)pc = *prev;
     }
-    if (pa != NULL) {
-        *(u8**)(pa + 0x4) = pb;
+    if (*prev != NULL) {
+        u8* n = *next;
+        *(u8**)(*prev + 0x4) = n;
     } else {
-        *(u8**)(pc + 0x4) = pb;
+        u8* n = *next;
+        *(u8**)(*list + 0x4) = n;
     }
-    *(s32*)(pc + 0x8) = *(s32*)(pc + 0x8) - 1;
-    *(u8**)(a + 0x0) = NULL;
-    *(u8**)(a + 0x4) = NULL;
-    *(u8**)(a + 0x8) = NULL;
+    u8* owner = *list;
+    *(s32*)(owner + 0x8) = *(s32*)(owner + 0x8) - 1;
+    *prev = NULL;
+    *next = NULL;
+    *list = NULL;
 }
 
 // 0x8001E854

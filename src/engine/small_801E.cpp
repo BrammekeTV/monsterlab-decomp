@@ -83,12 +83,11 @@ BOOL fn_801E4B2C(u8* obj, u32* handle) {
 // Finds the first free 0x164-byte record (flag byte at +0 is zero) in the pool at *p, out of 64.
 // Marks it used and returns it, or NULL when the pool is full.
 u8* fn_801E4B98(u8* p) {
-    u8* base = *(u8**)p;
     for (u32 i = 0; i < 0x40; i++) {
-        u8* rec = base + i * 0x164;
+        u8* rec = *(u8**)p + i * 0x164;   // the original re-reads the pool pointer
         if (*rec == 0) {
             *rec = 1;
-            return rec;
+            return *(u8**)p + i * 0x164;
         }
     }
     return NULL;

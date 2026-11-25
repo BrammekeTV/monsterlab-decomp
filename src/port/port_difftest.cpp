@@ -18,7 +18,9 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <time.h>
 #include <algorithm>
+#include <string>
 #include <map>
 #include <vector>
 
@@ -146,7 +148,8 @@ inline double Single(double v) { return (double)(float)v; }
 // The C++ side calls the PC's own versions, so only the original side needs them. Float results are compared
 // with a tolerance, which covers the small differences between the two math libraries.
 enum Lib { kNotLib, kMemcpy, kMemset, kStrlen, kStrcpy, kStrncpy, kStrcat, kStrcmp, kStrchr, kStrstr,
-           kCosf, kSinf, kTan, kFloor, kCeil, kAcos, kAsin, kAtan, kAtan2, kFmod, kLog, kLog10, kPow, kSqrt };
+           kCosf, kSinf, kTan, kFloor, kCeil, kAcos, kAsin, kAtan, kAtan2, kFmod, kLog, kLog10, kPow, kSqrt,
+           kSprintf, kSnprintf, kVsprintf, kVsnprintf, kStrncmp, kLocaltime, kConstructArray, kNop, kZero };
 Lib LibAt(u32 a) {
     switch (a) {
     case 0x80004338: case 0x80334594: return kMemcpy;          // memcpy, memmove
@@ -171,6 +174,16 @@ Lib LibAt(u32 a) {
     case 0x8033F208: case 0x8033C0C4: return kLog10;
     case 0x8033F20C: case 0x8033C1D8: return kPow;
     case 0x8033F45C: case 0x8033F210: return kSqrt;
+    case 0x80336F10: return kSprintf;
+    case 0x80336E38: return kSnprintf;
+    case 0x80336DB8: return kVsprintf;
+    case 0x80336D34: return kVsnprintf;
+    case 0x80338A2C: return kStrncmp;
+    case 0x8033AE04: return kLocaltime;
+    case 0x8032F1E8: return kConstructArray;
+    case 0x802350B4: case 0x802350E0: case 0x80235110: case 0x80235140:       // data cache maintenance
+    case 0x80235D20: case 0x802393EC: return kNop;           // OSReport, OSRestoreInterrupts
+    case 0x802393C4: return kZero;                              // OSDisableInterrupts
     default:
         const PortFunc* f = FuncAt(a);
         return f && f->addr == a && !strcmp(PortFuncName(f), "ceil_") ? kCeil : kNotLib;
@@ -199,11 +212,129 @@ BOOL LibStore(u32 dst, const u8* src, u32 n) {
     return TRUE;
 }
 
+// printf: the variable arguments come from the registers and stack (sprintf, snprintf) or from a PowerPC va_list
+// { u8 gpr, u8 fpr, u16, overflow area, register save area } (vsprintf, vsnprintf).
+struct VaArgs {
+    const Cpu* c;                   // NULL: a va_list
+    u32 gpr, fpr, overflow, regSave;
+    BOOL Int(u32* v) {
+        if (gpr < 8) { if (c) *v = c->r[3 + gpr]; else if (!MemRead(regSave + gpr * 4, 4, v)) return FALSE; gpr++; return TRUE; }
+        if (!MemRead(overflow, 4, v)) return FALSE;
+        overflow += 4;
+        return TRUE;
+    }
+    BOOL Double(double* v) {
+        if (fpr < 8) { if (c) *v = c->f[1 + fpr].d; else if (!ReadF64(regSave + 32 + fpr * 8, (u64*)v)) return FALSE; fpr++; return TRUE; }
+        overflow = (overflow + 7) & ~7u;
+        if (!ReadF64(overflow, (u64*)v)) return FALSE;
+        overflow += 8;
+        return TRUE;
+    }
+};
+
+BOOL LibFormat(u32 fmtAt, VaArgs& args, std::vector<u8>& out) {
+    std::vector<u8> fmt, str;
+    if (!LibString(fmtAt, fmt)) return FALSE;
+    fmt.push_back(0);
+    out.clear();
+    char buf[1024];
+    for (const char* p = (const char*)fmt.data(); *p;) {
+        if (*p != '%') { out.push_back((u8)*p++); continue; }
+        std::string spec(1, *p++);
+        while (*p && strchr("-+ #0123456789.*", *p)) {
+            if (*p == '*') { u32 w; if (!args.Int(&w)) return FALSE; spec += std::to_string((s32)w); p++; }
+            else spec += *p++;
+        }
+        BOOL wide = FALSE, longLong = FALSE;
+        while (*p == 'h' || *p == 'l') { if (p[0] == 'l' && p[1] == 'l') longLong = TRUE; if (*p == 'l') wide = TRUE; spec += *p++; }
+        char k = *p ? *p++ : 0;
+        spec += k;
+        if (strchr("fFeEgG", k) && k) { double d; if (!args.Double(&d)) return FALSE; snprintf(buf, sizeof(buf), spec.c_str(), d); }
+        else if (k == '%') strcpy(buf, "%");
+        else if (longLong || (k == 's' && wide) || k == 'S') return Stop(FALSE, "formats a 64-bit or wide argument");
+        else {
+            u32 v;
+            if (!strchr("diuxXoscp", k) || !k) return Stop(FALSE, "an unknown format");
+            if (!args.Int(&v)) return FALSE;
+            if (k == 's') {
+                if (!LibString(v, str)) return FALSE;
+                str.push_back(0);
+                snprintf(buf, sizeof(buf), spec.c_str(), (const char*)str.data());
+            } else if (k == 'p') snprintf(buf, sizeof(buf), "%08x", v);
+            else snprintf(buf, sizeof(buf), spec.c_str(), v);
+        }
+        buf[sizeof(buf) - 1] = 0;
+        out.insert(out.end(), buf, buf + strlen(buf));
+        if (out.size() > kLibMax) return Stop(FALSE, "formats more than %u bytes", kLibMax);
+    }
+    return TRUE;
+}
+
+BOOL RunPrintf(Cpu& c, Lib lib) {
+    BOOL sized = lib == kSnprintf || lib == kVsnprintf;
+    u32 dst = c.r[3], size = sized ? c.r[4] : 0xFFFFFFFFu, fmtAt = c.r[sized ? 5 : 4], next = sized ? 3 : 2;
+    VaArgs args = {&c, next, 0, c.r[1] + 8, 0};
+    if (lib == kVsprintf || lib == kVsnprintf) {
+        u32 va = c.r[3 + next], counts;
+        args.c = NULL;
+        if (!MemRead(va, 4, &counts) || !MemRead(va + 4, 4, &args.overflow) || !MemRead(va + 8, 4, &args.regSave)) return FALSE;
+        args.gpr = counts >> 24; args.fpr = (counts >> 16) & 0xFF;
+    }
+    std::vector<u8> out;
+    if (!LibFormat(fmtAt, args, out)) return FALSE;
+    c.r[3] = (u32)out.size();
+    if (!size) return TRUE;
+    if (out.size() >= size) out.resize(size - 1);
+    out.push_back(0);
+    return LibStore(dst, out.data(), (u32)out.size());
+}
+
+BOOL MayEnter(u32 target, u32 self);
+BOOL Run(Cpu& c, u32 entry);
+
 BOOL RunLib(Cpu& c, Lib lib) {
     u32 a = c.r[3], b = c.r[4], n = c.r[5];
     double x = c.f[1].d, y = c.f[2].d;
     std::vector<u8> s, t;
     switch (lib) {
+    case kSprintf: case kSnprintf: case kVsprintf: case kVsnprintf: return RunPrintf(c, lib);
+    case kStrncmp: {
+        for (u32 i = 0; i < n && i < kLibMax; i++) {
+            u8 x1, x2;
+            if (!MemRead(a + i, 1, &x1) || !MemRead(b + i, 1, &x2)) return FALSE;
+            if (x1 != x2 || !x1) { c.r[3] = (u32)((s32)x1 - (s32)x2); return TRUE; }
+        }
+        c.r[3] = 0;
+        return TRUE;
+    }
+    case kLocaltime: {                                      // into the library's static struct tm
+        const u32 kTm = 0x805F5CA8;
+        s32 v[9] = {0, 0, 0, 1, 0, 0, 1, 0, 0};
+        if (a) {
+            u32 seconds;
+            if (!MemRead(a, 4, &seconds)) return FALSE;
+            time_t when = (time_t)seconds;
+            struct tm* r = gmtime(&when);
+            if (!r) return Stop(FALSE, "a time out of range");
+            s32 w[9] = {r->tm_sec, r->tm_min, r->tm_hour, r->tm_mday, r->tm_mon, r->tm_year, r->tm_wday, r->tm_yday, 0};
+            memcpy(v, w, sizeof(v));
+        }
+        c.r[3] = kTm;
+        return LibStore(kTm, (const u8*)v, sizeof(v));
+    }
+    case kConstructArray: {                                 // __construct_array(array, ctor, dtor, size, count)
+        u32 size = c.r[6], count = c.r[7];
+        if (count > 256) return Stop(FALSE, "constructs more than 256 elements");
+        for (u32 i = 0; i < count && b; i++) {
+            if (!MayEnter(b, 0)) return FALSE;
+            Cpu sub = c;
+            sub.r[1] -= 0x100; sub.r[3] = a + i * size; sub.r[4] = 1;
+            if (!Run(sub, b)) return FALSE;
+        }
+        return TRUE;
+    }
+    case kNop: return TRUE;
+    case kZero: c.r[3] = 0; return TRUE;
     case kMemcpy:
         if (n > kLibMax) return Stop(FALSE, "copies more than %u bytes", kLibMax);
         s.resize(n);
@@ -649,7 +780,7 @@ void RestoreData(void) {
 // that are still zero (no level, no battle object): some cases point them at the test's buffers, so the
 // code behind them can run. The same value goes to both sides, and into the snapshot, so it is no difference.
 void ScanLoads(u32 addr, u32 depth, std::vector<u32>& out, std::vector<u32>& seen) {
-    if (addr < kGameLo || addr >= kGameHi || std::find(seen.begin(), seen.end(), addr) != seen.end() || seen.size() > 40) return;
+    if (addr < kGameLo || addr >= kGameHi || std::find(seen.begin(), seen.end(), addr) != seen.end() || seen.size() > 160) return;
     seen.push_back(addr);
     const PortFunc* fn = FuncAt(addr);
     if (!fn || fn->addr != addr || !fn->size) return;
@@ -666,7 +797,7 @@ void ScanLoads(u32 addr, u32 depth, std::vector<u32>& out, std::vector<u32>& see
             s32 off = (s32)(w & 0x03FFFFFC); if (off & 0x02000000) off |= 0xFC000000;
             ScanLoads(pc + off, depth - 1, out, seen);
         }
-        if (ea && !(ea & 3) && InData(ea, 4) && std::find(out.begin(), out.end(), ea) == out.end() && out.size() < 24) out.push_back(ea);
+        if (ea && !(ea & 3) && InData(ea, 4) && std::find(out.begin(), out.end(), ea) == out.end() && out.size() < 64) out.push_back(ea);
     }
 }
 
@@ -674,7 +805,7 @@ BOOL RunCaseInner(const PortFunc* f, const Sig& sig, u32 index, u64 seed, BOOL v
 
 BOOL RunCase(const PortFunc* f, const Sig& sig, u32 index, u64 seed, BOOL verbose, BOOL* match) {
     std::vector<u32> globals, seen;
-    if (sGlobals && index >= 6 && index % 2 == 0) ScanLoads(f->addr, 2, globals, seen);
+    if (sGlobals && index >= 6 && index % 2 == 0) ScanLoads(f->addr, 4, globals, seen);
     std::vector<u32> set;
     for (u32 a : globals) {
         u32 cur; memcpy(&cur, (void*)(uintptr_t)a, 4);
@@ -825,6 +956,7 @@ void PortDiffTestRun(const char* jobsPath) {
     sDataHi = PortArenaLoMEM1() - 0x10000;
     sPool = (u8*)VirtualAlloc(NULL, kPoolBufs * kBufSize, MEM_COMMIT | MEM_RESERVE, PAGE_READWRITE);
     sStack = (u8*)VirtualAlloc(NULL, kStackSize, MEM_COMMIT | MEM_RESERVE, PAGE_READWRITE);
+    *(u32*)(uintptr_t)0x805FB468 = 0x12345678;               // RandomU32's seed: otherwise taken from an uninitialised stack word
     sSnap.assign((u8*)(uintptr_t)sDataLo, (u8*)(uintptr_t)sDataHi);
 
     u64 seed = 1;

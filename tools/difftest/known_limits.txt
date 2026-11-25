@@ -89,3 +89,28 @@
 0x80222010 u64 flags stored in host word order by design
 0x801B8734 callee fn_801E8D74, same random overlap
 0x8021947C part table indexed out of range on random input
+0x8001B20C constructor uid counter (sNextPartUid) is a static the harness cannot restore
+0x8004B498 constructor uid counter (sNextPartUid) is a static the harness cannot restore
+0x80052530 constructor uid counter (sNextPartUid) is a static the harness cannot restore
+0x8005CC30 constructor uid counter (sNextPartUid) is a static the harness cannot restore
+0x8020EAD4 constructor uid counter (sNextPartUid) is a static the harness cannot restore
+0x801E86FC asm checked equal; differs only when the random task records overlap the template
+0x80074C10 callee GameSetNextMode reads the game settings pointer (a static in the PC build)
+0x801073DC callee GameSetNextMode reads the game settings pointer (a static in the PC build)
+0x80206B6C OSReport formats a random string pointer (the original side skips OSReport)
+0x800F99B4 reads a static query pointer (part_query.cpp) at another address in the PC build
+0x800FA358 reads a static query pointer (part_query.cpp) at another address in the PC build
+0x80221B64 u64 flags stored in host word order by design
+0x800544D8 shift by 32 or more from a random bit number
+0x8011D930 halfword read of a game-db word after a struct copy (host order)
+0x8004B604 constructor uid counter (sNextPartUid) is a static the harness cannot restore
+0x80052054 byte read of a game-db word (host order)
+0x8007DD7C NaN result from random floats
+0x80156CDC buffer index out of range on random input
+0x801AA218 uninitialised local on an invalid interpolation type
+0x801AAC08 log message prints a leftover register
+0x801AA7D8 callee UIAnimTrack_Evaluate logs a leftover register
+0x8019AA3C log message prints a leftover register
+0x8020ECB0 differs only when a random source part overlaps the destination
+0x801B5BD8 callee fn_801E8D74, same random overlap
+0x8015BA4C differs only when the random writer, record and buffer overlap
