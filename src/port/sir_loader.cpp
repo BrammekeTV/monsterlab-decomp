@@ -2636,6 +2636,27 @@ static SirError UiSlideshowPlan(ImagePlan* plan, const u8* image, u32 imageSize,
     return SIR_OK;
 }
 
+// A grid (kind 4, update fn_801A4994): what it has from +0x13C on besides the two widget pointers.
+//   +0x13C rows, +0x140 columns, +0x144 / +0x148 the rows and columns shown (fn_801A72EC), +0x14C / +0x150 the
+//   selected cell, +0x154 / +0x158 floats, +0x15C / +0x160 the scroll offset, +0x164 a flag (11 words);
+//   +0x170 / +0x174 floats (the fade timer, fn_801A4994); +0x180 / +0x184 the cell size and the floats up to
+//   +0x1B0 (fn_801A6D7C); +0x1B8 a list with one record of floats per row (0x34 bytes; fn_801A6D7C reads
+//   the first through fn_8019552C).
+// +0x168 and +0x16C hold stray bytes in the file, +0x178..+0x17C are bytes: those are left alone.
+static SirError UiGridFieldsPlan(ImagePlan* plan, const u8* image, u32 imageSize, u32 o) {
+    u32 l, d;
+    if (!PlanAdd(plan, o + 0x13C, 0x2C, REGION_U32_ARRAY) || !PlanAdd(plan, o + 0x170, 8, REGION_F32_ARRAY) ||
+        !PlanAdd(plan, o + 0x180, 0x34, REGION_F32_ARRAY) || !PlanAdd(plan, o + 0x1B8, 4, REGION_PTR_ARRAY)) return SIR_ERR_SCREENS;
+    if (!LevelSpan(Be32(image + o + 0x1B8), 0x14, imageSize, &l) || PlanHas(plan, l, REGION_UI_LIST)) return SIR_OK;
+    if (!PlanAdd(plan, l, 0x14, REGION_UI_LIST)) return SIR_ERR_SCREENS;
+    u32 count = Be32(image + l), capacity = Be32(image + l + 4), size = Be32(image + l + 8);
+    if (count == 0) return SIR_OK;
+    if ((size & 3) || size == 0 || count > capacity || (u64)count * size > imageSize ||
+        !LevelSpan(Be32(image + l + 0x10), (u64)count * size, imageSize, &d) ||
+        !PlanAdd(plan, d, count * size, REGION_F32_ARRAY)) return SIR_ERR_SCREENS;
+    return SIR_OK;
+}
+
 // What fn_8019914C reads of a widget to install the vtable for its kind: +0x60 the kind; for kinds
 // 2 and 3 the sub-kind at +0x13C; kind 3 a list at +0x15C (its entries only get a vtable); kind 4
 // a widget at +0x1B4 and a list of widgets at +0x1BC; kind 5 a widget at +0x190; kind 6 its
@@ -2657,6 +2678,7 @@ static SirError UiFixupPlan(ImagePlan* plan, const u8* image, u32 imageSize, u32
         e = UiListPlan(plan, image, imageSize, Be32(image + o + 0x15C), UI_LIST_WIDGETS, depth);
     } else if (kind == 4) {
         if (!PlanAdd(plan, o + 0x1B4, 4, REGION_PTR_ARRAY) || !PlanAdd(plan, o + 0x1BC, 4, REGION_PTR_ARRAY)) return SIR_ERR_SCREENS;
+        if ((e = UiGridFieldsPlan(plan, image, imageSize, o)) != SIR_OK) return e;
         if ((e = UiFixupPlan(plan, image, imageSize, Be32(image + o + 0x1B4), depth + 1)) != SIR_OK) return e;
         e = UiListPlan(plan, image, imageSize, Be32(image + o + 0x1BC), UI_LIST_FIXUP, depth);
     } else if (kind == 5) {
