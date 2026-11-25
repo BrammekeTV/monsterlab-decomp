@@ -11,10 +11,10 @@ extern f32 lbl_803C6984[];         // 0x803C6984 (3 floats)
 extern f32 lbl_803C699C[];         // 0x803C699C (3 floats)
 extern f32 lbl_803C6990[];         // 0x803C6990 (3 floats)
 extern u8  lbl_803465C0[];         // 0x803465C0 (s32 table indexed by RaySceneTest)
-extern u8  lbl_803466B0[];         // 0x803466B0 (f32 table indexed by RaySceneTest)
 extern u8  lbl_80347D88[];         // 0x80347D88 (s32 table of prop states)
 extern u8  lbl_8035B268[];         // 0x8035B268 (vtable)
 extern u8  lbl_8035B638[];         // 0x8035B638 (vtable)
+extern u8  lbl_803464C8[];         // 0x803464C8 (f32 scale table indexed by RaySceneTest)
 extern f32 lbl_805FD770;           // 0x805FD770 (float constant)
 extern f32 lbl_805FD788;           // 0x805FD788 (float constant)
 extern f32 lbl_805FD800;           // 0x805FD800 (float constant)
@@ -24,6 +24,8 @@ extern f32 lbl_805FD878;           // 0x805FD878 (float constant)
 extern f32 lbl_805FD8D0;           // 0x805FD8D0 (float constant)
 
 extern "C" {
+void  fn_80083770(u8* a3, s32 a4);                                // 0x80083770
+u8*   fn_801B161C(u8* p, u32 key);                                // 0x801B161C
 void  operator_delete(void* p);                                   // 0x801D426C
 u8*   fn_8006FBDC(void);                                          // 0x8006FBDC
 void  fn_8006FA44(u8* a3, s32 a4, s32 a5, s32 a6, s32 a7, s32 a8); // 0x8006FA44
@@ -171,10 +173,21 @@ void* fn_80083AC0(void* obj, s32 del) {
 }
 
 // 0x80083B18
-// Returns the brain toss freebie duration (f32) for the RaySceneTest-selected entry.
-f32 BrainTossFreebieDuration(void) {
-    s32 idx = RaySceneTest(0);  // the original reads no argument; RaySceneTest ignores it
-    return ((f32*)lbl_803466B0)[idx];
+// Brain toss power-up "freebie": runs the shared start (fn_80083770 with the incoming value), takes
+// the new time from the object's virtual slot 0x10 (+0xB0) and scales the +0x24 value of the child
+// object 0x17C7F120's transform by a table entry picked by RaySceneTest.
+void fn_80083B18(u8* p, s32 value) {
+    fn_80083770(p, value);
+    p[0x284] = 0;
+    u8* info = (*(u8* (**)(u8*))(*(u8**)p + 0x10))(p);
+    if (info != NULL) *(f32*)(p + 0x288) = *(f32*)(info + 0xB0);
+
+    u8* holder = *(u8**)(p + 0x8C);
+    u8* first = *(u32*)(holder + 0x10) == 0 ? NULL : **(u8***)(holder + 0xC);
+    u8* child = fn_801B161C(first, 0x17C7F120u);
+    s32 idx = RaySceneTest(0);  // the original passes the child on; RaySceneTest ignores it
+    *(f32*)(*(u8**)(child + 8) + 0x24) *= ((f32*)lbl_803464C8)[idx];
+    p[0x28C] = 0;
 }
 
 // 0x80084E94

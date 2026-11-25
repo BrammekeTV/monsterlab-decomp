@@ -174,10 +174,10 @@ s32 fn_801A26BC(void* obj) {
 
 // 0x801A270C
 // Stores the result of fn_8019B008 (looked up from the current screen set's +0x10 entry) at +0x140. Returns 0.
-s32 fn_801A270C(void* obj) {
+s32 fn_801A270C(void* obj, char* name, u32 arg) {
     u8* sets = (u8*)gScreenSets;
     void* sub = *(void**)(sets + 0x10);
-    *(void**)((u8*)obj + 0x140) = fn_8019B008(sub, 0, 0);  // r4/r5 are not set by the original; unused leftovers
+    *(void**)((u8*)obj + 0x140) = fn_8019B008(sub, name, arg);
     return 0;
 }
 

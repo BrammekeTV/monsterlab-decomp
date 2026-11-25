@@ -20,7 +20,7 @@ void*  ScreenSetsCurrent(void* sets);                            // 0x8018D1E4
 void   SysInit(void);
 void*  SysAllocMEM2Block(u32 size);                              // 0x801FAEB0
 BOOL   ZoneIsLoaded(void* world, s32 zone);                      // 0x8012F408
-u8* fn_8006F61C(u8* arg0);                                       // 0x8006F61C
+u8* fn_8006F61C(u8* p, s32 type, u8* rec, s32 reset);                                       // 0x8006F61C
 void   fn_8008CE28(u8* vec, f32 v);                              // 0x8008CE28
 void   fn_8018D2B8(const char* fmt, ...);                        // 0x8018D2B8 (debug log)
 void   fn_8018D370(const char* fmt, ...);                        // 0x8018D370 (debug log)
@@ -210,9 +210,8 @@ void BufferFree(void* p) {
 // 0x800690D4
 // Constructor (returns p in r3, not used by callers): runs the base constructor, installs the vtable, flags the child at +4 (bit 0x40,
 // state 6), and resets the child's fields from this object when both extra arguments are set.
-void fn_800690D4(u8* p, s32 unused, u8* a2, s32 a3) {
-    (void)unused;
-    fn_8006F61C(p);
+void fn_800690D4(u8* p, s32 type, u8* a2, s32 a3) {
+    fn_8006F61C(p, type, a2, a3);
     u8* child = *(u8**)(p + 0x4);
     *(void**)(p + 0x0) = lbl_8035A0B4;
     if (child != NULL) {

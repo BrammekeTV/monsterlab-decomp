@@ -60,7 +60,7 @@ s32 fn_800508D0(void);                                          // 0x800508D0
 void fn_800508EC(void);                                         // 0x800508EC
 void fn_80050EB0(f32 a0);                                       // 0x80050EB0
 u8* fn_8004EDD0(u8* obj, s32 flag, s32 a2);                     // 0x8004EDD0
-u8* fn_8005CA88(u8* p);                                         // 0x8005CA88
+u8* fn_8005CA88(u8* p, s32 type, u8* rec, s32 reset);                                         // 0x8005CA88
 void* fn_800E60BC(void);                                        // 0x800E60BC
 void* QuestFormatIconName(s8 arg0);                                          // 0x8011ECCC
 void fn_801265F4(void);                                         // 0x801265F4
@@ -953,7 +953,7 @@ void fn_80051940(f32 dt) {
 // Constructor of the experiment machine object: runs the base constructor, installs the
 // vtable, clears state, and optionally snapshots the transform position into +0x74C.
 u8* fn_80052530(u8* p, s32 a1, u8* a2, s32 a3) {
-    fn_8005CA88(p);
+    fn_8005CA88(p, a1, a2, a3);
     *(void**)(p + 0x0) = lbl_803598A0;
     *(s32*)(p + 0x87C) = 0;
     *(s32*)(p + 0x880) = 0;

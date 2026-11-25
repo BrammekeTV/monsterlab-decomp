@@ -17,7 +17,7 @@ s32   RaySceneTest(void* ray);                                                  
 void  ScopedLockCtor(ScopedLock* l);                                                          // 0x801F5384
 void  ScopedLockDtor(ScopedLock* l, s32 flags);                                               // 0x801F53B0
 s32   TriggerDoAction(void* action, void* a1, void* a2);                                     // 0x801E0054
-void  fn_80062F58(u8* p);                                                                     // 0x80062F58
+void  fn_80062F58(u8* p, s32 mode);   // 0x80062F58
 void  fn_8007B560(u8* p, u8* pos);                                                            // 0x8007B560
 void  fn_800943CC(u8* self);                                                                  // 0x800943CC
 void  fn_80094C0C(u8* p);                                                                     // 0x80094C0C
@@ -96,7 +96,7 @@ void fn_8006D83C(u8* arg0, s32 arg1) {
         *(u8**)(arg0 + 0x178) = NULL;
         ScopedLockDtor(&lock, -1);
     }
-    fn_80062F58(arg0);  // asm also forwards arg1 (r4), which fn_80062F58 ignores
+    fn_80062F58(arg0, arg1);
 }
 
 // 0x8007810C

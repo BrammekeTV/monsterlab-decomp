@@ -399,12 +399,11 @@ void fn_800A6304(u8* arg0) {
 // 0x800B1A20
 // Adds the table value for the current ray result (lbl_80346BD0 / lbl_805FE0B8) to the float at
 // +0x268, clamps it to [lbl_805FE0B0, lbl_805FE0BC], then runs the two follow-up calls.
-s32 fn_800B1A20(u8* arg0) {
+s32 fn_800B1A20(u8* arg0, u8* sphere) {
     u8* t;
     f32 v;
 
-    // r4 is never set before the call in the asm (stale), so it is passed as 0.
-    t = (u8*)(intptr_t)fn_800B1AD0(arg0, NULL, NULL); // lint:ok (returns 0/1; RaySceneTest ignores its argument)
+    t = (u8*)(intptr_t)fn_800B1AD0(arg0, sphere, NULL); // lint:ok (returns 0/1)
     if (t != NULL) {
         v = *(f32*)(arg0 + 0x268) + (lbl_80346BD0[RaySceneTest(t)] / lbl_805FE0B8);
         if (v < lbl_805FE0B0) {

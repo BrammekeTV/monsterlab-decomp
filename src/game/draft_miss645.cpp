@@ -441,9 +441,8 @@ void fn_80121508(char* text, s32 x, s32 y, s32 a, s32 b, s32 c, f32 d, f32 e) {
 // multiplies the base colour at +0x80 by the render object's tint into +0x270, quantises it to
 // 8 bits per channel and applies the same colour to all four vertices, then hides slot 0x20 via
 // the second vtable.
-s32 fn_801A0200(u8* arg0) {
-    // fn_8019AF88's name/arg parameters (r4/r5) are leftovers here; pass 0.
-    u8** entry = (u8**)fn_8019AF88(*(void**)((u8*)gScreenSets + 0x10), NULL, 0);
+s32 fn_801A0200(u8* arg0, char* name, u32 arg) {
+    u8** entry = (u8**)fn_8019AF88(*(void**)((u8*)gScreenSets + 0x10), name, arg);
     *(u8***)(arg0 + 0x140) = entry;
     u8* tex = *entry;
     if (tex != NULL) {

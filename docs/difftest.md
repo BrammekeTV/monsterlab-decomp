@@ -13,7 +13,7 @@ python tools/difftest.py --all                         every function with a // 
 
 | Option | Effect |
 |---|---|
-| `--calls` | also test functions that call other decompiled game functions (default: leaf functions only) |
+| `--calls` | also test functions that call other decompiled game functions (default: leaf functions only); memory, string and math library calls then run natively on the original side |
 | `--cases N` | inputs per function (default 40) |
 | `--seed N` | another set of random inputs (default 1); a report line names seed and case, so every result can be repeated |
 | `--audited`, `--unaudited` | only functions in / not in `docs/audit_log.txt` |
@@ -50,7 +50,8 @@ names, statuses and the differing values of failing cases, and `build/` is not c
 - **Calls:** in a leaf run a call ends the test as "unsupported" (register save/restore helpers are
   followed). With `--calls` the interpreter follows calls into game functions that are decompiled, and the
   compiler's 64-bit helpers; the C++ side calls its own callees. A mismatch can then be in a callee.
-  Library calls (`memset`, `strlen`, `cosf`, heap, SDK) are not followed yet.
+  With `--calls` the interpreter also runs `memcpy`, `memmove`, `memset`, the string functions and the math
+  library (`sinf`, `cosf`, `atan2`, `acos`, `sqrt`, `pow`, ...) natively. Heap and SDK calls are not followed.
 - **Crashes:** if the C++ crashes, hangs or stops, the script charges it to the function that was running
   and goes on with the next one.
 
@@ -110,12 +111,18 @@ Of the functions in `docs/audit_log.txt` (886): leaf run 176 match, 1 mismatch, 
 350 match, 8 mismatch, 12 crash. The flagged functions are not all decompile mistakes: see "Reading a
 mismatch"; with `--calls` most crashes are callees that need game state the test does not set up.
 
+## Finding dropped arguments
+
+A difftest only passes the arguments the C++ definition declares, so a missing parameter shows up only when
+it changes memory. The recurring mistake: a function forwards r4-r6 untouched into its first call (a base
+constructor, a hit test, a virtual handler) and the C++ declares fewer parameters and passes zeros. Check the
+asm: an argument register read, or still unwritten at a call whose callee reads it, is a parameter.
+
 ## Limits and next steps
 
 - Globals are in the state after the static initialisers: no level, no heap objects. Functions that follow
   a global pointer are `UNTESTED` (1,877 with `--calls`). Next: let a test allocate what a global points at.
-- Library callees are not followed (`memset`, `strlen`, `strcpy`, `vsprintf`, `cosf`: about 700 functions).
-  Next: run those natively on both sides.
+- `vsprintf`, `__construct_array`, the heap and the SDK are not followed (about 400 functions need `vsprintf`).
 - No paired-single arithmetic, no byte-reversed loads, at most 8 integer and 8 float arguments, no structs
   by value, no member functions.
 - A function that only writes through its own stack frame and returns nothing is compared on memory alone.

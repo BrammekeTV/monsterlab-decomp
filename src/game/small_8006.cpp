@@ -23,9 +23,9 @@ u8*     fn_801B44AC(u8* p, s32 del);                                           /
 u8* fn_801B4334(u8* arg0, s32 layer, u8* ent, s32 reset);                                                    // 0x801B4334 (base ctor)
 void fn_801B4944(u8* obj, s32 mode);                                                    // 0x801B4944
 void     fn_80122B00(void* a, u8* b);                                           // 0x80122B00
-u8* fn_8006F61C(u8* arg0);                                                    // 0x8006F61C
+u8* fn_8006F61C(u8* p, s32 type, u8* rec, s32 reset);                                                    // 0x8006F61C
 void     fn_8006F67C(u8* p, f32 t, s32 flag);                                   // 0x8006F67C (leaf version takes only p)
-u8*     fn_8005CA88(u8* p);                                                    // 0x8005CA88
+u8*     fn_8005CA88(u8* p, s32 type, u8* rec, s32 reset);                                                    // 0x8005CA88
 void     fn_8005CB40(u8* p, f32 t, s32 flag);                                   // 0x8005CB40
 void fn_800655D8(u8* arg0, f32 dt);                                                    // 0x800655D8
 void     fn_8032F1E8(u8* obj, void (*cb)(void), s32 a, s32 b, s32 c);    // 0x8032F1E8
@@ -125,8 +125,8 @@ void fn_80062C40(void) {
 
 // 0x80062C80
 // Base constructor: calls fn_801B4334, sets the vtable and marks the child at +4 with bits 0x2, state 1.
-u8* fn_80062C80(u8* p) {
-    fn_801B4334(p, 0, NULL, 0);  // r4-r6 forwarded from caller in asm
+u8* fn_80062C80(u8* p, s32 type, u8* rec, s32 reset) {
+    fn_801B4334(p, type, rec, reset);
     *(void**)p = lbl_80359BC8;
     SetChildStateBits(p, 0x2, 1);
     return p;
@@ -145,8 +145,8 @@ u8* fn_80062CE0(u8* p, s32 del) {
 
 // 0x80062F58
 // Calls the object's virtual slot 0xB8; if it returns a non-null object, calls fn_80122B00 with it and p.
-void fn_80062F58(u8* p) {
-    fn_801B4944(p, 0 /* leftover r4 mode */);
+void fn_80062F58(u8* p, s32 mode) {
+    fn_801B4944(p, mode);
     void* result = (*(VirtFnSelfPtr*)(*(u8**)p + 0xB8))(p);
     if (result != NULL) {
         fn_80122B00(result, p);
@@ -155,8 +155,8 @@ void fn_80062F58(u8* p) {
 
 // 0x8006307C
 // Base constructor: calls fn_8006F61C, sets the vtable and marks the child at +4 with bits 0x400, state 0xA.
-u8* fn_8006307C(u8* p) {
-    fn_8006F61C(p);
+u8* fn_8006307C(u8* p, s32 type, u8* rec, s32 reset) {
+    fn_8006F61C(p, type, rec, 0);
     *(void**)p = lbl_80359C94;
     SetChildStateBits(p, 0x400, 0xA);
     return p;
@@ -228,8 +228,8 @@ u8* fn_80063624(u8* p, s32 del) {
 
 // 0x800636BC
 // Base constructor: calls fn_8005CA88, sets the vtable and marks the child at +4 with bits 0x80, state 7.
-u8* fn_800636BC(u8* p) {
-    fn_8005CA88(p);
+u8* fn_800636BC(u8* p, s32 type, u8* rec, s32 reset) {
+    fn_8005CA88(p, type, rec, reset);
     *(void**)p = lbl_80359ED8;
     SetChildStateBits(p, 0x80, 7);
     return p;

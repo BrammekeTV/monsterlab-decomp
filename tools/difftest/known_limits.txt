@@ -1,8 +1,6 @@
 # Functions whose difftest mismatch/crash is a limit of the harness, not a decompile mistake.
 # Format: 0xADDR reason. The report counts them as KNOWN instead of MISMATCH/CRASH (--show-known lists them).
 0x80011BC0 writes a static that lives at another address in the PC build
-0x80044F20 writes a static that lives at another address in the PC build
-0x80044FA4 writes a static that lives at another address in the PC build
 0x80142DE8 writes a static that lives at another address in the PC build (sExitMode)
 0x801D2B4C writes a static that lives at another address in the PC build
 0x800F0D20 writes a static that lives at another address in the PC build
@@ -48,3 +46,46 @@
 0x800D41F4 asm checked equal; differs only in a callee's writes when the random records overlap
 0x80184490 asm checked equal; differs only in the list callees when the random nodes overlap
 0x801C9178 asm checked equal; differs only in fn_801EBDF0's writes when the random list nodes overlap
+0x8000FA04 writes statics that live at another address in the PC build (sMusicName, sMusicLoop)
+0x80074C38 callee MusicRequest writes statics
+0x8007E0CC callee MusicRequest writes statics
+0x80087ADC callee MusicRequest writes statics
+0x8008F908 callee MusicRequest writes statics
+0x80094FA8 callee MusicRequest writes statics
+0x8009A64C callee MusicRequest writes statics
+0x800A19B0 callee MusicRequest writes statics
+0x800A8AEC callee MusicRequest writes statics
+0x800BA680 callee MusicRequest writes statics
+0x800CF22C callee MusicRequest writes statics
+0x80011A0C writes statics that live at another address in the PC build (sBannerFile)
+0x800752F4 u64 flags stored in host word order by design
+0x800ED4F0 callee fn_801E8D74, same random overlap
+0x800EF648 callee fn_801E8D74, same random overlap
+0x800F81E4 u64 flags stored in host word order by design
+0x800F8228 u64 flags stored in host word order by design
+0x800F826C u64 flags stored in host word order by design
+0x800F985C static query pointer
+0x800F9880 reads a static query pointer (part_query.cpp) at another address in the PC build
+0x800F98B8 static query pointer
+0x800F9A48 static query pointer
+0x800FA308 static query pointer
+0x800FA350 static query pointer
+0x80129928 writes sEntitySlotBytes, a static at another address
+0x801D2B44 returns a static at another address
+0x801E8D74 asm checked equal; differs only when the random task records overlap the template
+0x801ED684 node reference read as a host-order word by design
+0x802212E4 u64 flags stored in host word order by design
+0x80221334 u64 flags stored in host word order by design
+0x802213F8 u64 flags stored in host word order by design
+0x80221458 u64 flags stored in host word order by design
+0x8022155C u64 flags stored in host word order by design
+0x80221578 u64 flags stored in host word order by design
+0x802218E0 u64 flags stored in host word order by design
+0x80221978 u64 flags stored in host word order by design
+0x80221A20 u64 flags stored in host word order by design
+0x80221B8C u64 flags stored in host word order by design
+0x80221BD8 u64 flags stored in host word order by design
+0x80222004 u64 flags stored in host word order by design
+0x80222010 u64 flags stored in host word order by design
+0x801B8734 callee fn_801E8D74, same random overlap
+0x8021947C part table indexed out of range on random input

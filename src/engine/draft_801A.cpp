@@ -55,7 +55,7 @@ extern s32 lbl_805F9478;            // 0x805F9478
 extern u8 lbl_805F9212;             // 0x805F9212 (copy filter value)
 extern u8 lbl_805FB50C;             // 0x805FB50C (GX shadow flags byte)
 extern void* lbl_805FB658;          // 0x805FB658 (global render object)
-char lbl_805F94A8[8] ORIG(0x805F94A8);
+char lbl_805F94A8[8]; ORIG(0x805F94A8)
 
 // 0x801A0D04
 // Draws the element's model through fn_80195A58 with GX flag bit 3 cleared, bracketed by BP

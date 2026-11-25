@@ -320,9 +320,9 @@ void fn_801B2FF0(u8* p, f32 a) {
 // 0x80207734
 // Runs fn_801EF6E8 on lbl_80556AE0 under the lock at lbl_80556A98 and reports a debug message on
 // failure. Returns the result of fn_801EF6E8.
-void* fn_80207734(s32 arg0, s32 arg1) {
+void* fn_80207734(s32 /*user*/, s32 arg1, s32 arg2) {
     OSLockMutex(lbl_80556A98);
-    void* r = fn_801EF6E8(lbl_80556AE0, arg1, arg0);
+    void* r = fn_801EF6E8(lbl_80556AE0, arg2, arg1);
     OSUnlockMutex(lbl_80556A98);
     if (r == NULL) {
         OSReport(lbl_80387380);

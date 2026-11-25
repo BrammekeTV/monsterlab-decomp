@@ -142,6 +142,121 @@ inline void SetCr(Cpu& c, u32 field, u32 bits) { u32 sh = (7 - field) * 4; c.cr 
 inline void Cr0(Cpu& c, u32 v) { SetCr(c, 0, (s32)v < 0 ? 8 : v ? 4 : 2); }
 inline double Single(double v) { return (double)(float)v; }
 
+// ---- library functions the interpreter runs natively (--calls) ----
+// The C++ side calls the PC's own versions, so only the original side needs them. Float results are compared
+// with a tolerance, which covers the small differences between the two math libraries.
+enum Lib { kNotLib, kMemcpy, kMemset, kStrlen, kStrcpy, kStrncpy, kStrcat, kStrcmp, kStrchr, kStrstr,
+           kCosf, kSinf, kTan, kFloor, kCeil, kAcos, kAsin, kAtan, kAtan2, kFmod, kLog, kLog10, kPow, kSqrt };
+Lib LibAt(u32 a) {
+    switch (a) {
+    case 0x80004338: case 0x80334594: return kMemcpy;          // memcpy, memmove
+    case 0x8000443C: case 0x80004388: return kMemset;          // memset, __fill_mem
+    case 0x8032EEE4: return kStrlen;
+    case 0x80338794: return kStrcpy;
+    case 0x80338854: return kStrncpy;
+    case 0x80338898: return kStrcat;
+    case 0x80338910: return kStrcmp;
+    case 0x80338A6C: return kStrchr;
+    case 0x80338BC0: return kStrstr;
+    case 0x8033EC98: return kCosf;
+    case 0x8033F0A4: return kSinf;
+    case 0x8033F17C: return kTan;
+    case 0x8033ED6C: return kFloor;
+    case 0x8033F1F4: case 0x8033B314: return kAcos;            // the w_*.c thunks and what they jump to
+    case 0x8033F1F8: case 0x8033B5D8: return kAsin;
+    case 0x8033E8EC: return kAtan;
+    case 0x8033F1FC: case 0x8033B870: return kAtan2;
+    case 0x8033F200: case 0x8033BAE0: return kFmod;
+    case 0x8033F204: case 0x8033BE10: return kLog;
+    case 0x8033F208: case 0x8033C0C4: return kLog10;
+    case 0x8033F20C: case 0x8033C1D8: return kPow;
+    case 0x8033F45C: case 0x8033F210: return kSqrt;
+    default:
+        const PortFunc* f = FuncAt(a);
+        return f && f->addr == a && !strcmp(PortFuncName(f), "ceil_") ? kCeil : kNotLib;
+    }
+}
+
+const u32 kLibMax = 0x4000;                // longest block or string a case may touch
+
+BOOL LibString(u32 a, std::vector<u8>& out) {
+    out.clear();
+    for (u32 i = 0; i < kLibMax; i++) {
+        u8 b;
+        if (!MemRead(a + i, 1, &b)) return FALSE;
+        if (!b) return TRUE;
+        out.push_back(b);
+    }
+    return Stop(FALSE, "a string longer than %u bytes", kLibMax);
+}
+
+BOOL LibStore(u32 dst, const u8* src, u32 n) {
+    for (u32 i = 0; i < n;) {
+        u32 k = (n - i >= 4 && !((dst + i) & 3)) ? 4 : 1;
+        if (!MemWrite(dst + i, k, src + i, FALSE)) return FALSE;
+        i += k;
+    }
+    return TRUE;
+}
+
+BOOL RunLib(Cpu& c, Lib lib) {
+    u32 a = c.r[3], b = c.r[4], n = c.r[5];
+    double x = c.f[1].d, y = c.f[2].d;
+    std::vector<u8> s, t;
+    switch (lib) {
+    case kMemcpy:
+        if (n > kLibMax) return Stop(FALSE, "copies more than %u bytes", kLibMax);
+        s.resize(n);
+        for (u32 i = 0; i < n; i++) if (!MemRead(b + i, 1, &s[i])) return FALSE;
+        return !n || LibStore(a, s.data(), n);
+    case kMemset:
+        if (n > kLibMax) return Stop(FALSE, "fills more than %u bytes", kLibMax);
+        s.assign(n, (u8)b);
+        return !n || LibStore(a, s.data(), n);
+    case kStrlen:  if (!LibString(a, s)) return FALSE; c.r[3] = (u32)s.size(); return TRUE;
+    case kStrcpy:  if (!LibString(b, s)) return FALSE; s.push_back(0); return LibStore(a, s.data(), (u32)s.size());
+    case kStrncpy:
+        if (n > kLibMax) return Stop(FALSE, "copies more than %u bytes", kLibMax);
+        for (u32 i = 0; i < n; i++) { u8 ch; if (!MemRead(b + i, 1, &ch)) return FALSE; if (!ch) break; s.push_back(ch); }
+        s.resize(n, 0);
+        return !n || LibStore(a, s.data(), n);
+    case kStrcat:  if (!LibString(a, t) || !LibString(b, s)) return FALSE; s.push_back(0); return LibStore(a + (u32)t.size(), s.data(), (u32)s.size());
+    case kStrcmp: {
+        if (!LibString(a, s) || !LibString(b, t)) return FALSE;
+        c.r[3] = s < t ? (u32)-1 : t < s ? 1 : 0;
+        return TRUE;
+    }
+    case kStrchr:
+        if (!LibString(a, s)) return FALSE;
+        s.push_back(0);
+        for (u32 i = 0; i < s.size(); i++) if (s[i] == (u8)b) { c.r[3] = a + i; return TRUE; }
+        c.r[3] = 0;
+        return TRUE;
+    case kStrstr: {
+        if (!LibString(a, s) || !LibString(b, t)) return FALSE;
+        std::vector<u8>::iterator hit = std::search(s.begin(), s.end(), t.begin(), t.end());
+        c.r[3] = t.empty() ? a : hit == s.end() ? 0 : a + (u32)(hit - s.begin());
+        return TRUE;
+    }
+    case kCosf:  c.f[1].d = cosf((f32)x); break;
+    case kSinf:  c.f[1].d = sinf((f32)x); break;
+    case kTan:   c.f[1].d = tan(x); break;
+    case kFloor: c.f[1].d = floor(x); break;
+    case kCeil:  c.f[1].d = ceil(x); break;
+    case kAcos:  c.f[1].d = acos(x); break;
+    case kAsin:  c.f[1].d = asin(x); break;
+    case kAtan:  c.f[1].d = atan(x); break;
+    case kAtan2: c.f[1].d = atan2(x, y); break;
+    case kFmod:  c.f[1].d = fmod(x, y); break;
+    case kLog:   c.f[1].d = log(x); break;
+    case kLog10: c.f[1].d = log10(x); break;
+    case kPow:   c.f[1].d = pow(x, y); break;
+    case kSqrt:  c.f[1].d = sqrt(x); break;
+    default: return FALSE;
+    }
+    return c.f[1].d == c.f[1].d ? TRUE : Stop(FALSE, "a math function returns NaN");
+}
+
 // A call or a jump to another function: may the interpreter follow it?
 BOOL MayEnter(u32 target, u32 self) {
     const PortFunc* f = FuncAt(target);
@@ -221,6 +336,14 @@ BOOL Run(Cpu& c, u32 entry) {
             if (!isBranch) break;
             if (link) c.lr = pc + 4;
             if (!take) break;
+            if (target != kSentinel && sCalls) {
+                Lib lib = LibAt(target);
+                if (lib != kNotLib) {
+                    if (!RunLib(c, lib)) return FALSE;
+                    if (!link) next = c.lr;                          // a tail call: back to the caller
+                    break;
+                }
+            }
             if (target != kSentinel) {
                 const PortFunc* from = FuncAt(pc);
                 BOOL ret = opc == 19 && ((op >> 1) & 0x3FF) == 16;      // blr: back into a caller we already entered
