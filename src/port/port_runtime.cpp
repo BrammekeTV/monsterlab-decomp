@@ -18,7 +18,7 @@
 #include "port/port_gx.h"
 #include "port/port_mods.h"
 #include "port/port_overlay.h"
-extern "C" { s32 SaveManager_SelectFirstEmptySlot(void); void SaveManager_ResetCurrentData(void); void SaveManager_SaveData(void); u32 SaveManager_CanLoadGame(void); }
+extern "C" { void SaveManager_SaveData(void); u32 SaveManager_CanLoadGame(void); s32 SaveManager_GetCurrentSlot(void); s32 SaveManager_GetContinueSlot(void); u8* fn_8022E3DC(u8* s); }
 extern u8* lbl_805FBBE0;
 extern "C++" void* gScreenSets;
 extern "C" void fn_8022E3D8(void* save, const unsigned char* name);   // src/game/draft_miss37.cpp, draft_miss46.cpp
@@ -297,16 +297,16 @@ void PortFrameDone(void) {
     if (sFrames == 1 && getenv("PORT_SCRIPT_TRACE")) InstallScriptTrace();
     sFrames++;
     PortStateLog();
-    // PORT_MAKE_PROFILE=<frame>: creates a profile in the first free slot and saves it (a test aid until
-    // the game saves one itself: the save point in the first level is not reachable yet).
-    static s32 sMakeProfile = getenv("PORT_MAKE_PROFILE") ? atoi(getenv("PORT_MAKE_PROFILE")) : 0;
-    if (sMakeProfile && sFrames == sMakeProfile) {
-        PortLog("profile: slot %d selected", (int)SaveManager_SelectFirstEmptySlot());
-        SaveManager_ResetCurrentData();
-        fn_8022E3D8(lbl_805FBBE0, (const unsigned char*)"Player");   // the name is what marks the slot as used
+    // PORT_SAVE_AT=<frame>: saves the running game into its profile slot at that frame, as the game's own
+    // save does (SaveManager_SaveData). A test aid: Join Now picks the slot but asks for no name, and the
+    // first save of the story (after the scientist's name entry) comes after the village map the port
+    // reaches. A slot is in use when it has a name, so an unnamed profile is saved as "Player".
+    static s32 sSaveAt = getenv("PORT_SAVE_AT") ? atoi(getenv("PORT_SAVE_AT")) : 0;
+    if (sSaveAt && sFrames == sSaveAt) {
+        if (!*fn_8022E3DC(lbl_805FBBE0)) fn_8022E3D8(lbl_805FBBE0, (const unsigned char*)"Player");
         SaveManager_SaveData();
-        SaveManager_SaveData();   // the first save of a new file leaves the continue slot at -1 (asm 0x80123B78); the second one sets it
-        PortLog("profile: can load %u", (unsigned)SaveManager_CanLoadGame());
+        PortLog("save: slot %d saved, can load %u, continue slot %d", (int)SaveManager_GetCurrentSlot(),
+                (unsigned)SaveManager_CanLoadGame(), (int)SaveManager_GetContinueSlot());
     }
     if (getenv("PORT_CURSOR_LOG") && sFrames == 3500) {   // where the game put its cursor widget (screen units, 640 x 480)
         u8* cur = *(u8**)((u8*)gScreenSets + 0x7C);

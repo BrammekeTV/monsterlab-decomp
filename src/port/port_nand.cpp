@@ -1,5 +1,5 @@
 // PC platform layer: NAND, the console's internal flash, where the game keeps its save files.
-// On PC it is a folder: `save` beside the executable. No original code.
+// On PC it is a folder (EnsureRoot: `save` beside the executable by default). No original code.
 //
 // The functions carry the names the game calls them by; the comment says which SDK function
 // each one is (identified from the SDK's code at that address and from how the game uses it).
@@ -9,6 +9,7 @@
 #include <windows.h>
 #include <direct.h>
 #include <stdio.h>
+#include <stdlib.h>
 #include <string.h>
 
 #include "port/port.h"
@@ -20,13 +21,59 @@ static char sCwd[128] = "/";           // current directory inside it, with a tr
 static const char kHome[] = "/title/00010000/524d3750/data";
 static FILE* sOpen[16];
 
+// Creates a host folder and the folders above it.
+static BOOL MakeDirs(const char* dir) {
+    char p[MAX_PATH];
+    snprintf(p, sizeof(p), "%s", dir);
+    for (char* c = p; *c; c++) {
+        if ((*c == '\\' || *c == '/') && c > p && c[-1] != ':') {
+            char keep = *c;
+            *c = 0;
+            _mkdir(p);
+            *c = keep;
+        }
+    }
+    _mkdir(p);
+    DWORD a = GetFileAttributesA(p);
+    return a != INVALID_FILE_ATTRIBUTES && (a & FILE_ATTRIBUTE_DIRECTORY);
+}
+
+// TRUE when a file can be created in the folder (it is not read-only, as Program Files is).
+static BOOL Writable(const char* dir) {
+    char probe[MAX_PATH];
+    snprintf(probe, sizeof(probe), "%s\\.write_test", dir);
+    FILE* f = fopen(probe, "wb");
+    if (!f) return FALSE;
+    fclose(f);
+    DeleteFileA(probe);
+    return TRUE;
+}
+
+// The save folder: MONSTERLAB_SAVE if set, else `save` beside the executable (next to
+// monsterlab.ini and mods), else, when that folder cannot be written, %APPDATA%\MonsterLab\save.
+// It also holds `tmp`, the NAND's scratch directory: the SDK writes the save banner to
+// /tmp/banner.bin first and then moves it into the data directory.
 static void EnsureRoot(void) {
     if (sRoot[0]) return;
-    GetModuleFileNameA(NULL, sRoot, MAX_PATH);
-    char* slash = strrchr(sRoot, '\\');
-    if (slash) *slash = 0;
-    strncat(sRoot, "\\save", MAX_PATH - strlen(sRoot) - 1);
-    _mkdir(sRoot);
+    const char* env = getenv("MONSTERLAB_SAVE");
+    if (env && env[0]) {
+        snprintf(sRoot, sizeof(sRoot), "%s", env);
+        for (char* c = sRoot; *c; c++) if (*c == '/') *c = '\\';
+        size_t len = strlen(sRoot);
+        if (len > 3 && sRoot[len - 1] == '\\') sRoot[len - 1] = 0;
+    } else {
+        GetModuleFileNameA(NULL, sRoot, MAX_PATH);
+        char* slash = strrchr(sRoot, '\\');
+        if (slash) *slash = 0;
+        strncat(sRoot, "\\save", MAX_PATH - strlen(sRoot) - 1);
+        const char* appdata = getenv("APPDATA");
+        if ((!MakeDirs(sRoot) || !Writable(sRoot)) && appdata && appdata[0])
+            snprintf(sRoot, sizeof(sRoot), "%s\\MonsterLab\\save", appdata);
+    }
+    MakeDirs(sRoot);
+    char tmp[MAX_PATH];
+    snprintf(tmp, sizeof(tmp), "%s\\tmp", sRoot);
+    _mkdir(tmp);
     PortLog("nand: save files are in %s", sRoot);
 }
 

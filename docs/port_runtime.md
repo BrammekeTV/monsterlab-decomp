@@ -420,10 +420,46 @@ calls to bind its texture, `fn_80154290`, is empty in this build.)
 
 ### NAND: save files
 
-`port_nand.cpp` maps the console's flash file system to the folder `save` beside the executable:
-home directory, change/create directory, create, delete, open, close, read, write, length, type,
-move, free space, and the banner header. The functions are defined under the names the game
-calls (`fn_80266BA4` is `NANDOpen`, ...); each comment says which SDK function it is.
+`port_nand.cpp` maps the console's flash file system to a folder on the PC: home directory,
+change/create directory, create, delete, open, close, read, write, length, type, move, free space,
+and the banner header. The functions are defined under the names the game calls (`fn_80266BA4` is
+`NANDOpen`, ...); each comment says which SDK function it is.
+
+Where the save folder is (the log says it: `[port] nand: save files are in ...`):
+
+1. `MONSTERLAB_SAVE=<folder>` in the environment, if set (tests use it so they never touch your saves);
+2. else `save` beside the executable, next to `monsterlab.ini` and `mods` (a portable install);
+3. else, when that folder cannot be written (the game installed under Program Files),
+   `%APPDATA%\MonsterLab\save`.
+
+The title's data directory (`/title/00010000/524d3750/data`) is the folder itself; the NAND's
+scratch directory `/tmp` is its subfolder `tmp`. What the game keeps there:
+
+| File | What |
+|---|---|
+| `game.msa` | the save: 0x31E0 bytes, a CRC-32 word then the 0x31C0-byte block (options at +0xB80, four 0x988-byte profile slots at +0xB98; a slot is in use when its name, slot +0x268, is not empty). Written by `SaveManager_SaveData` (the game's own save points and autosaves) and `SaveManager_SaveOptions` (Join Now, the options screen) |
+| `banner.bin` | the Wii menu's save banner; written to `tmp` first and moved up. Its CRC and length are kept in `game.msa` (+0xB8C, +0xB90) and checked at boot (`SaveManager_IsSaveDataCorrupted`) |
+
+The data is written in the PC's byte order (little-endian): saves from a Wii do not load on PC
+and the other way round. Delete the folder to start with no profiles.
+
+Join Now picks the first free slot and writes only the options (`SaveManager_SaveOptions`); the
+slot gets its name and its first `SaveManager_SaveData` later in the story (the scientist's name
+entry), past the village map the port reaches now. Until then, `PORT_SAVE_AT=<frame>` in the
+environment saves the running game into its slot at that frame as the game would (an unnamed
+profile is called "Player"). A slot holds the progress (quests, badges, battle counts, monsters,
+parts, items, play time) but not the map position: Continue loads it and the game's scripts
+start in the castle's Grand Hall.
+
+Round trip, headless (the press sequence of the first battle and Field Repair is in PR #222):
+
+```
+set MONSTERLAB_SAVE=build\shots\save_rt
+set PORT_SAVE_AT=20300
+build\pc\monsterlab.exe <first battle press sequence> --frames 20400
+set PORT_SAVE_AT=
+build\pc\monsterlab.exe --to-menu --fast --no-audio --no-movies --pointer 665,295@3400 --press A@3500-3506 --frames 5500 --screenshot build\shots\continue.png
+```
 
 ### Threads and interrupts
 
