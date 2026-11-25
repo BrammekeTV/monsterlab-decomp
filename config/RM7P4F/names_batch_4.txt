@@ -1,0 +1,2 @@
+fn_80050F88 Battle_80050F88  # all callers are in the Battle area (PlayerInCombatRange)
+fn_800512D0 Session_800512D0  # all callers are in the Session area (GameSessionUpdate)
