@@ -10,8 +10,7 @@ save folder) from boot through both village battles to the return to the castle,
 --pointer input. A stage passes when its game-state markers show up in the log (script calls,
 level loads and PORT_STATE_LOG lines, never pixels) before the stage's deadline frame. The game
 is stopped at the first missed deadline, crash or stall, and as soon as the last marker is seen.
-A stall (hang) is retried once and named in the verdict: the renderer is known to hang now and then
-on the graphics card (docs/playthrough.md).
+A stall (hang) fails the test; --retries N repeats a stalled run and names it in the verdict.
 Prints one line per stage and a verdict; exits 0/1. The log is build/playthrough/run.log.
 Needs the game in orig/RM7P4F, MONSTERLAB_DATA or --iso PATH.
 
@@ -295,7 +294,7 @@ def main():
     ap.add_argument("--no-build", action="store_true", help="use the exe in build/pc as it is")
     ap.add_argument("--stop-after", metavar="STAGE", help="end the test after this stage")
     ap.add_argument("--seconds", type=int, default=1500, help="wall-clock limit of the game run (default 1500)")
-    ap.add_argument("--retries", type=int, default=1, help="runs to repeat after a stall (default 1; crashes are never retried)")
+    ap.add_argument("--retries", type=int, default=0, help="runs to repeat after a stall (default 0; crashes are never retried)")
     ap.add_argument("--gpu", action="store_true", help="draw on the graphics card; only for problems that need it (parallel runs can crash the driver)")
     ap.add_argument("--list", action="store_true", help="list the stages")
     ap.add_argument("--check-log", metavar="FILE", help="judge a saved log instead of running the game")

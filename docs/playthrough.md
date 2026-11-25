@@ -65,12 +65,24 @@ log), `game stopped` (a `[port] STOP:` line: missing function, abort), `stalled`
 `--stop-after STAGE` ends the run after that stage while you work on it. `--check-log FILE` judges a saved log again,
 which is the quick way to try new markers.
 
-### Known hang
+### The hang on the graphics card (worked around)
 
-On the graphics card (every headless run before WARP became the default; now `--gpu`) about one run in four stopped during the first battle (seen at frames 7947, 8627 and 10160) with one core busy: the
-render thread waits in `RingNext` (`src/port/port_gfx_d3d11.cpp`) for a Direct3D event query that never signals. Until
-that is fixed, a stalled run is repeated once (`--retries`, only stalls; crashes and missed stages never are) and the
-verdict says so, with the hung run's log in `build/playthrough/stall.log`. A hang in your change shows up as two stalls. No stall was seen in the few runs made with WARP.
+Before WARP became the headless default, about 4 of 12 runs stopped during the first battle (frames 7947, 8627, 10160)
+with one core busy: `RingNext` (`src/port/port_gfx_d3d11.cpp`) waited without limit for a Direct3D event query that was
+not reported. All of those runs shared an AMD card (RX 6800) with other running games.
+
+The root cause is not established. The renderer's use of Direct3D was checked and no fault found: every use of the
+device context during a run is serialised (`sGfxLock`), and a query is ended again only after it has signalled. With the
+game alone on the card, 21 runs had no wait over 2 s. A driver problem under a shared card is the likely explanation, but
+it was not reproduced: parallel runs on the card can crash the display driver.
+
+The wait is now limited to 2 s. After that the buffer is mapped with DISCARD, which is safe whatever the GPU still
+reads, and the run goes on. The log then has a line starting `gfx: no GPU mark for the`, with the query's result
+(`0x00000001` = still not signalled) and the device state (`GetDeviceRemovedReason`, `0x00000000` = not removed). If you
+see it, keep the log: those two values are what is missing to name the cause.
+
+A stalled run therefore fails the test. `--retries N` still repeats one if you ask for it (the first run's log is then
+in `build/playthrough/stall.log`).
 
 ## Adding a stage
 

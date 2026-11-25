@@ -967,17 +967,40 @@ static u32  sRecLights = ~0u, sRecLast = ~0u, sRecLastN;    // the last light bl
 static u32  sRecLightGen;                                   // PortGx::xfLightGen when the light block was made
 static u32  sRecMtx = ~0u, sRecMtxGen;                      // the last matrix block (draws with a matrix per vertex) and PortGx::xfMtxGen then
 static u32  sRecLastW[4 * (14 + 6 * 8)];
-// The big dynamic buffers (records, vertices, indices) are used as rings of four segments, always mapped with
-// NO_OVERWRITE: starting the buffer over with DISCARD made the driver find a new 16-32 MB buffer, a frame several times
-// as long every few frames. Leaving a segment marks the point in the command stream (an event query); a segment is
-// written again once the GPU has passed the mark made when it was left the time before (a lap earlier: no wait).
-struct Ring { ID3D11Query* q[4]; BOOL pend[4]; u32 seg; };
+// The big dynamic buffers (records, vertices, indices) are used as rings of four segments, mapped with NO_OVERWRITE:
+// starting the buffer over with DISCARD made the driver find a new 16-32 MB buffer, a frame several times as long
+// every few frames. Leaving a segment marks the point in the command stream (an event query); a segment is written
+// again once the GPU has passed the mark made when it was left the time before (a lap earlier: no wait).
+// The wait is limited: on an AMD card shared by several running games the mark was sometimes never reported, and the
+// game spun here for good (docs/playthrough.md). After RING_WAIT_MS the buffer is mapped with DISCARD instead, which
+// is safe whatever the GPU still reads, and the ring starts again with new queries.
+#define RING_WAIT_MS 2000
+struct Ring { ID3D11Query* q[4]; BOOL pend[4]; u32 seg; BOOL discard; };   // discard: the next Map of the buffer must be DISCARD
 static Ring sRecRing, sVbRing, sIbRing;
+static void RingWait(Ring& r) {
+    const s64 start = Ticks(), ms = Ticks_freq() / 1000;
+    HRESULT hr;
+    while ((hr = sCtx->GetData(r.q[r.seg], NULL, 0, 0)) == S_FALSE) {
+        const s64 waited = Ticks() - start;
+        if (waited >= RING_WAIT_MS * ms) break;
+        if (waited < 2 * ms) YieldProcessor(); else Sleep(1);
+    }
+    r.pend[r.seg] = FALSE;
+    if (hr == S_OK) return;
+    static u32 reports;
+    if (reports < 8) {
+        reports++;
+        PortLog("gfx: no GPU mark for the %s buffer after %d ms (query 0x%08lX, device 0x%08lX); the buffer is replaced",
+                &r == &sRecRing ? "record" : &r == &sVbRing ? "vertex" : "index", (int)((Ticks() - start) / ms), hr, sDev->GetDeviceRemovedReason());
+    }
+    for (u32 i = 0; i < 4; i++) { if (r.q[i]) { r.q[i]->Release(); r.q[i] = NULL; } r.pend[i] = FALSE; }
+    r.discard = TRUE;
+}
 static u32 RingNext(Ring& r) {
     if (!r.q[r.seg]) { D3D11_QUERY_DESC qd = {D3D11_QUERY_EVENT, 0}; sDev->CreateQuery(&qd, &r.q[r.seg]); }
     if (r.q[r.seg]) { sCtx->End(r.q[r.seg]); r.pend[r.seg] = TRUE; }
     r.seg = (r.seg + 1) & 3;
-    if (r.pend[r.seg]) { while (sCtx->GetData(r.q[r.seg], NULL, 0, 0) == S_FALSE) YieldProcessor(); r.pend[r.seg] = FALSE; }
+    if (r.pend[r.seg]) RingWait(r);
     return r.seg;
 }
 // Records never cross a segment: the draws that use a segment's records are all drawn before it is left, and what is
@@ -987,6 +1010,7 @@ static void RecReserve(u32 n) {
     if (pos / seg == (pos + n) / seg || (pos + n) % seg == 0) return;
     FlushDraws();
     sRec.clear(); sRecUsed = RingNext(sRecRing) * seg; sRecLights = sRecLast = sRecMtx = ~0u;
+    if (sRecRing.discard) { sRecDiscard = TRUE; sRecRing.discard = FALSE; }
 }
 static u32 RecAlloc(u32 n) { u32 at = sRecUsed + (u32)sRec.size() / 4; sRec.resize(sRec.size() + (size_t)n * 4); return at; }
 
@@ -1484,12 +1508,15 @@ static void FlushDraws() {
     static BOOL started;
     u32 first = (sVbUsed + 15) & ~15u, ifirst = sIbUsed;
     D3D11_MAPPED_SUBRESOURCE map;
-    D3D11_MAP how = started ? D3D11_MAP_WRITE_NO_OVERWRITE : D3D11_MAP_WRITE_DISCARD;
     BOOL ok = TRUE;
     if (first + bytes > (sVbRing.seg + 1) * (VB_BYTES / 4)) first = RingNext(sVbRing) * (VB_BYTES / 4);
+    D3D11_MAP how = !started || sVbRing.discard ? D3D11_MAP_WRITE_DISCARD : D3D11_MAP_WRITE_NO_OVERWRITE;
+    sVbRing.discard = FALSE;
     if (SUCCEEDED(sCtx->Map(sVb, 0, how, 0, &map))) { memcpy((u8*)map.pData + first, sBV.data(), bytes); sCtx->Unmap(sVb, 0); } else ok = FALSE;
     sVbUsed = first + bytes;
     if (ifirst + ni > (sIbRing.seg + 1) * (IB_IDXS / 4)) ifirst = RingNext(sIbRing) * (IB_IDXS / 4);
+    how = !started || sIbRing.discard ? D3D11_MAP_WRITE_DISCARD : D3D11_MAP_WRITE_NO_OVERWRITE;
+    sIbRing.discard = FALSE;
     if (SUCCEEDED(sCtx->Map(sIb, 0, how, 0, &map))) { memcpy((u16*)map.pData + ifirst, sBI.data(), ni * sizeof(u16)); sCtx->Unmap(sIb, 0); } else ok = FALSE;
     started = TRUE;
     sIbUsed = ifirst + ni;
