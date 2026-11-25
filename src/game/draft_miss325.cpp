@@ -282,7 +282,9 @@ void fn_8022F50C(u8* snap) {
     *(s32*)(snap + 0x74) = *(s32*)(lbl_805FBBE0 + 0x8F8);
     *(s32*)(snap + 0x78) = *(s32*)(lbl_805FBBE0 + 0x908);
     *(s32*)(snap + 0x7C) = *(s32*)(lbl_805FBBE0 + 0x90C);
-    *(u64*)(snap + 0x50) = fn_80225664(lbl_805FBBE0);
+    u64 v50 = fn_80225664(lbl_805FBBE0);   // r3:r4 = high:low, stored high word first (fn_8022EDD8 reads them back that way)
+    *(u32*)(snap + 0x50) = (u32)(v50 >> 32);
+    *(u32*)(snap + 0x54) = (u32)v50;
     *(s32*)(snap + 0x88) = fn_80222994(lbl_805FBBE0);
     *(s32*)(snap + 0x80) = *(s32*)(lbl_805FBBE0 + 0x6A8);
     if (fn_80222994(lbl_805FBBE0) != -1) {

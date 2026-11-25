@@ -231,13 +231,14 @@ void SetEntityPositionCallback(u32 a0, u32 a1, u32 a2) {
 // 0x80206AA4
 // Builds the save-banner path from the save name (NANDGetHomeDir) and checks it with fn_802665B0.
 // Returns 1 when the path lookup finds nothing, 0 otherwise; returns 0 early if fn_8020703C fails.
-// The original never reads the title/sub/out arguments.
+// The title, subtitle and size pointer go on to fn_8020703C untouched (r3-r5 are not changed before
+// the call), which writes the banner to /tmp and stores its length in *out.
 s32 SaveSetBanner(const char* title, const char* sub, s32* out) {
     u32  name[16];
     char path[0x40];
     s32  i;
 
-    if (fn_8020703C(NULL, NULL, NULL /* leftover regs in the original */) == 0) {
+    if (fn_8020703C(title, sub, (u32*)out) == 0) {
         return 0;
     }
     for (i = 0; i < 16; i++) {
