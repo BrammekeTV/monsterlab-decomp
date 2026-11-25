@@ -99,6 +99,11 @@
  "changelog": [
   {
    "date": "2026-11-25",
+   "time": "15:14",
+   "text": "11 more places in our decompiled code now pass the values the original game passes instead of 0, and a new checker finds this kind of mistake automatically (PR #259)."
+  },
+  {
+   "date": "2026-11-25",
    "time": "14:41",
    "text": "A new automatic playthrough test plays from boot through the first battle and Field Repair to the free village map and reports how far it gets, so changes that break the game are caught before they are merged (PR #258)."
   },
