@@ -89,6 +89,11 @@ a PC port. Read this whole file before making changes. Human contributors: see
   then runs headless: `--selftest`, `--to-menu` to frame 3300 and the title at frame 2600. Passes when each run reaches its frame limit
   without a crash, the menu scripts ran (`UIScreen_Push`) and neither screenshot is blank or black (`build/smoke/*.png`). One verdict line
   with timings (about 50 s); `SMOKE FAIL` lists the reasons and keeps the logs in `build/smoke/`. Needs the game data (`orig/RM7P4F` or `--iso`).
+- `python tools/playthrough.py [--iso PATH] [--stop-after STAGE]`: **required before every gameplay PR** (anything that touches `src/game`, `src/engine`,
+  `src/system`, `src/leaf`, `include/`, the loader or runtime in `src/port`, or `config/RM7P4F/`), after `smoke.py`; CI has no game data and cannot run it.
+  Fails at once if a game function is only a link stub, then plays headless from boot through Join Now, the village intro, the Mayor, the first battle,
+  rewards and Field Repair to the free village map, checking game-state log markers stage by stage (about 5 minutes). `PLAYTHROUGH FAIL` names the stage,
+  the missing marker and the last stage passed. If you extend gameplay, add a stage (`docs/playthrough.md`).
 - `python tools/mod_test.py [--iso PATH] [--keep]`: mod test (textures by hash and name, JSON text; `docs/modding.md`): dumps the menu's textures to a temporary folder outside
   the repository, makes a mod with one tinted red, runs headless again and compares the screenshots. Run it after changes to
   `src/port/port_mods.cpp`, `port_png.cpp` or the texture cache in `port_gfx_d3d11.cpp`.
