@@ -99,6 +99,11 @@
  "changelog": [
   {
    "date": "2026-11-25",
+   "time": "14:11",
+   "text": "The part you select in the battle now gets its highlight tint like on the Wii, and a few other calls in our decompiled code pass the values the original passes (PR #256)."
+  },
+  {
+   "date": "2026-11-25",
    "time": "13:47",
    "text": "Test runs without a window now draw in software, so they no longer load the graphics card next to a running game (PR #257)."
   },
