@@ -99,6 +99,11 @@
  "changelog": [
   {
    "date": "2026-11-25",
+   "time": "14:41",
+   "text": "A new automatic playthrough test plays from boot through the first battle and Field Repair to the free village map and reports how far it gets, so changes that break the game are caught before they are merged (PR #258)."
+  },
+  {
+   "date": "2026-11-25",
    "time": "14:11",
    "text": "The part you select in the battle now gets its highlight tint like on the Wii, and a few other calls in our decompiled code pass the values the original passes (PR #256)."
   },
