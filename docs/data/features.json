@@ -99,6 +99,11 @@
  "changelog": [
   {
    "date": "2026-11-25",
+   "time": "15:27",
+   "text": "Differential tests now check 516 more functions against the original game; they fixed how opponents pick their parts and a few other small mistakes in our decompiled code (PR #260)."
+  },
+  {
+   "date": "2026-11-25",
    "time": "15:14",
    "text": "11 more places in our decompiled code now pass the values the original game passes instead of 0, and a new checker finds this kind of mistake automatically (PR #259)."
   },
