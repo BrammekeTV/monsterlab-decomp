@@ -2035,7 +2035,12 @@ BOOL PortGfxStart(BOOL window) {
     static const D3D_DRIVER_TYPE kDrivers[2] = {D3D_DRIVER_TYPE_HARDWARE, D3D_DRIVER_TYPE_WARP};
     static const D3D_FEATURE_LEVEL kLevels[2] = {D3D_FEATURE_LEVEL_11_0, D3D_FEATURE_LEVEL_10_0};
     HRESULT hr = E_FAIL;
-    for (int i = 0; i < 2 && FAILED(hr); i++) {
+    // Without a window the game draws with the software rasteriser (WARP) unless --gpu, PORT_GPU=1, --bench or
+    // --perf-log asks for the graphics card: many headless test runs at once next to a windowed game could make the
+    // display driver time out and reset.
+    const char* envGpu = getenv("PORT_GPU");
+    BOOL useGpu = window || gPortOptions.gpu || (envGpu && *envGpu && *envGpu != '0') || gPortOptions.bench != 0 || gPortOptions.perfLog != NULL;
+    for (int i = useGpu ? 0 : 1; i < 2 && FAILED(hr); i++) {
         if (window) {
             DXGI_SWAP_CHAIN_DESC sd = {};
             sd.BufferCount = 2; sd.BufferDesc.Width = sOutW; sd.BufferDesc.Height = sOutH; sd.BufferDesc.Format = DXGI_FORMAT_R8G8B8A8_UNORM;
