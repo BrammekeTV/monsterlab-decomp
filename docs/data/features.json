@@ -99,6 +99,11 @@
  "changelog": [
   {
    "date": "2026-11-25",
+   "time": "13:47",
+   "text": "Test runs without a window now draw in software, so they no longer load the graphics card next to a running game (PR #257)."
+  },
+  {
+   "date": "2026-11-25",
    "time": "13:21",
    "text": "777 more functions have names: game functions named after the part of the game they belong to, and the Bluetooth and online library code (PRs #252-#255)."
   },
