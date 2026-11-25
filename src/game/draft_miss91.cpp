@@ -167,7 +167,7 @@ void fn_8017323C(u8* list, u8* node) {
     *(s32*)(list + 0x8) = *(s32*)(list + 0x8) + 1;
     if (tail != NULL) {
         *(u8**)tail = node;
-        *(u8**)(node + 0x4) = tail;
+        *(u8**)(node + 0x4) = *(u8**)(list + 0x4);   // read again, as the original does
         *(u8**)(list + 0x4) = node;
         return;
     }

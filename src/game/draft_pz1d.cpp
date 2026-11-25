@@ -233,7 +233,7 @@ void* UIAssetMgr_BuildPath(void* obj, s32 kind, char* name, char* arg) {
         if (arg != NULL) {
             SysSprintf(buf, "%s\\%s", arg, name);
         } else {
-            SysSprintf(buf, "%s");
+            SysSprintf(buf, "%s", name);   // r5 still holds name
         }
         fn_8018D2B8(lbl_803828C8 + 0xCC, buf);
         fn_8018D370(lbl_803828C8 + 0xF4);
@@ -242,7 +242,7 @@ void* UIAssetMgr_BuildPath(void* obj, s32 kind, char* name, char* arg) {
         result = fn_80196D04(lbl_805FB658, name, arg);
         break;
     default:
-        fn_8018D370(lbl_803828C8 + 0xA8);
+        fn_8018D370(lbl_803828C8 + 0xA8, kind);
         break;
     }
     return result;

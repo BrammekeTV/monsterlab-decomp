@@ -51,7 +51,9 @@ names, statuses and the differing values of failing cases, and `build/` is not c
   followed). With `--calls` the interpreter follows calls into game functions that are decompiled, and the
   compiler's 64-bit helpers; the C++ side calls its own callees. A mismatch can then be in a callee.
   With `--calls` the interpreter also runs `memcpy`, `memmove`, `memset`, the string functions and the math
-  library (`sinf`, `cosf`, `atan2`, `acos`, `sqrt`, `pow`, ...) natively. Heap and SDK calls are not followed.
+  library (`sinf`, `cosf`, `atan2`, `acos`, `sqrt`, `pow`, ...) natively, as well as `sprintf`, `snprintf`,
+  `vsprintf`, `vsnprintf` (not 64-bit or wide arguments), `strncmp`, `localtime` and `__construct_array`;
+  `OSReport`, the data cache functions and interrupt disable/restore do nothing. The heap and the rest of the SDK are not followed.
 - **Crashes:** if the C++ crashes, hangs or stops, the script charges it to the function that was running
   and goes on with the next one.
 
@@ -107,6 +109,9 @@ mistakes (a comparison the wrong way round, a wrong constant, a missing store), 
 | leaf functions | 3,663 | 3,621 | 29 | 13 | 845 | 4,037 |
 | with `--calls` | 5,523 | 5,364 | 62 | 97 | 2,120 | 902 |
 
+With the library calls above (2026-11-25, `--calls --globals --cases 160`): 6,581 tested, 6,531 match, 107 known
+limits, 49 crashes (random game state), 1,461 untested, 396 unsupported.
+
 Of the functions in `docs/audit_log.txt` (886): leaf run 176 match, 1 mismatch, 2 crash; with `--calls`
 350 match, 8 mismatch, 12 crash. The flagged functions are not all decompile mistakes: see "Reading a
 mismatch"; with `--calls` most crashes are callees that need game state the test does not set up.
@@ -122,7 +127,11 @@ asm: an argument register read, or still unwritten at a call whose callee reads 
 
 - Globals are in the state after the static initialisers: no level, no heap objects. Functions that follow
   a global pointer are `UNTESTED` (1,877 with `--calls`). Next: let a test allocate what a global points at.
-- `vsprintf`, `__construct_array`, the heap and the SDK are not followed (about 400 functions need `vsprintf`).
+- The heap, NAND and the rest of the SDK are not followed: save code that allocates or touches files stays untested.
+- `RandomU32` gets a fixed seed in the harness (its own seed is an uninitialised stack word).
+- More inputs (`--cases 160`) reach many UI functions that follow several pointers before doing anything.
+- A log call whose format has more specifiers than the original passes arguments prints leftover registers; only the
+  format buffer differs.
 - No paired-single arithmetic, no byte-reversed loads, at most 8 integer and 8 float arguments, no structs
   by value, no member functions.
 - A function that only writes through its own stack frame and returns nothing is compared on memory alone.

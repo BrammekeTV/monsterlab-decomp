@@ -115,7 +115,8 @@ u32 fn_801203C0(u8* p) {
     s32 count = *(s32*)(p + 0xA644);
     if (idx >= count) return 0;
     u8* entry = *(u8**)(p + 0x9264 + idx * 4);
-    return (u32)*(f32*)(entry + 0x38);
+    f32 v = *(f32*)(entry + 0x38);
+    return v > 0.0f ? (u32)v : 0;   // the console's conversion gives 0 for negative values
 }
 
 // 0x80120DC0

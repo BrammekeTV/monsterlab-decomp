@@ -63,7 +63,7 @@ void fn_8003056C(u8* p) {
 
 // Advances the 4-frame cycle counter at +0x24 and swaps the image at +0x4 to the texture for the new frame.
 static void CycleImageFrame(u8* p, u32 texHash) {
-    s32 frame = (*(s32*)(p + 0x24) + 1) & 3;
+    s32 frame = (*(s32*)(p + 0x24) + 1) % 4;   // signed remainder, as the original
     *(s32*)(p + 0x24) = frame;
     BOOL tex = UITextureList_GetTexture(texHash, frame);
     if (tex != 0) {

@@ -182,7 +182,7 @@ u8* UIGridItem_FindGroupType(u8* arg0, s32 arg1) {
         p = next;
     }
     if (arg1 != *(s32*)(p + 0x60)) {
-        fn_8018D2B8(lbl_80383760);
+        fn_8018D2B8(lbl_80383760, arg1);
         return NULL;
     }
     return p;
