@@ -1,0 +1,5 @@
+fn_800C8C8C Entity_800C8C8C  # all callers are in the Entity area (CreateEntityByType)
+fn_800CC108 Entity_800CC108  # all callers are in the Entity area (CreateEntityByType)
+fn_800CC1C8 Entity_800CC1C8  # all callers are in the Entity area (CreateEntityByType)
+fn_800CC71C Entity_800CC71C  # all callers are in the Entity area (CreateEntityByType)
+fn_800CD8EC Entity_800CD8EC  # all callers are in the Entity area (CreateEntityByType)
