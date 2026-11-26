@@ -77,6 +77,7 @@ load messages, never from pictures.
 | mechlab | the orange door: `castle_mechlab`, Fuseless's talk, `StartIngredientsSelection`: I.G.O.R.'s Select Ingredients page |
 | ingredients | Select Ingredients: a key and a secondary ingredient go into the slots (`SelectKeyIngredient`, `SelectSecondaryIngredient`), the tick confirms (`ConfirmIngredientSelection`), `castle_welding` (the Weld-O-Tron) loads |
 | weld | the Weld-O-Tron level starts (`RegisterExperimentSound`), its screens load (`LoadExperimentUI`), the instructions open (`SetInstructionsHeaderString`) and the right arrow turns to page 2 of 2 (`GetNextInstructionsString`, `IsLastPage`) |
+| weldgun | the button after the instructions (`InstructionsExitted`): the experiment's screen is pushed (`PushExperimentUI`), the gun swings in (`UpdateWeldingGunIntroPos`, `InterpolateGunFromIntroPosition`) and gameplay begins with the gun off (`minigame_gameflow_control_gameplay_entry`, `WeldingGunOffUpdate`) |
 
 `python tools/playthrough.py --list` prints the markers and deadlines.
 
