@@ -63,9 +63,14 @@ u32  PortModLevelBytes(u32 dxgi, u32 w, u32 h, u32 level, u32* pitch);
 BOOL PortDdsRead(const char* path, PortModImage* out, const char** why);   // FALSE and the reason
 // The name the game's data gives the texture whose pixel data is at `pixels`, or NULL (not every file is loaded by the port's loader yet).
 const char* PortModsTextureName(const void* pixels);
-// --dump-textures DIR: writes the decoded texture as DIR\tex_<w>x<h>_f<format>_<hash>.png, once per hash.
+// Texture dumping (--dump-textures DIR, or Settings > Mods > Dump textures): writes the decoded texture as
+// DIR\tex_<w>x<h>_f<format>_<hash>.png, once per hash; a file that is there already is left as it is.
 void PortModsDumpTexture(u64 hash, const char* name, const u32* rgba, u32 w, u32 h, u32 fmt);
-u32  PortModsDumpCount(void);
+const char* PortModsDumpDir(void);             // where textures are dumped now, NULL when dumping is off
+const char* PortModsDumpFolder(void);          // the folder of the settings (the default when none is set)
+u32  PortModsDumpCount(void);                  // PNGs written in this run (to the present folder)
+u32  PortModsDumpPresent(void);                // textures drawn whose PNG was there already
+u32  PortModsDumpFailed(void);                 // PNGs that could not be written
 
 // ---- PNG (port_png.cpp): RGBA8, red in the low byte ----
 BOOL PortPngWrite(const char* path, const u32* rgba, u32 w, u32 h);

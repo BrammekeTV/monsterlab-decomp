@@ -167,7 +167,8 @@ static TexState& Tex(void) { static TexState* t = new TexState; return *t; }
 #define sTexMods   Tex().mods
 #define sTexDumped Tex().dumped
 #define sTexLogged Tex().logged
-static BOOL sDumpDirMade;
+static char sDumpingTo[MAX_PATH];                 // the folder sTexDumped is about
+static u32 sDumpWritten, sDumpThere, sDumpFailed;
 
 static std::string Lower(const char* s) {
     std::string r = s;
@@ -275,7 +276,7 @@ void PortModsRefreshTextures(void) {
     }
 }
 
-BOOL PortModsTexturesWanted(void) { return !sTexFiles.empty() || !Tex().byName.empty() || gPortOptions.dumpTextures != NULL; }
+BOOL PortModsTexturesWanted(void) { return !sTexFiles.empty() || !Tex().byName.empty() || PortModsDumpDir() != NULL; }
 
 BOOL PortModsTexture(u64 hash, const char* name, PortModImage* out) {
     const std::string* file = NULL;
@@ -311,22 +312,57 @@ BOOL PortModsTexture(u64 hash, const char* name, PortModImage* out) {
     return out->data != NULL;
 }
 
+const char* PortModsDumpFolder(void) {
+    static char folder[MAX_PATH];
+    const char* set = gPortSettings.dumpDir;
+    if (set[0] && (set[0] == '\\' || set[0] == '/' || set[1] == ':')) return set;
+    DWORD n = GetModuleFileNameA(NULL, folder, MAX_PATH);    // none set, or a relative one: from the exe's folder
+    char* slash = n && n < MAX_PATH ? strrchr(folder, '\\') : NULL;
+    size_t at = slash ? (size_t)(slash + 1 - folder) : 0;
+    snprintf(folder + at, sizeof(folder) - at, "%s", set[0] ? set : "dump\\textures");
+    return folder;
+}
+
+const char* PortModsDumpDir(void) {
+    if (gPortOptions.dumpTextures) return gPortOptions.dumpTextures;   // the command line wins
+    return gPortSettings.dumpTextures ? PortModsDumpFolder() : NULL;
+}
+
+// Makes the folder and those above it.
+static void MakeFolders(const char* dir) {
+    char path[MAX_PATH];
+    snprintf(path, sizeof(path), "%s", dir);
+    for (char* c = path + 1; *c; c++)
+        if ((*c == '\\' || *c == '/') && c[-1] != ':') { char keep = *c; *c = 0; CreateDirectoryA(path, NULL); *c = keep; }
+    CreateDirectoryA(path, NULL);
+}
+
 void PortModsDumpTexture(u64 hash, const char* name, const u32* rgba, u32 w, u32 h, u32 fmt) {
-    const char* dir = gPortOptions.dumpTextures;
-    if (!dir || !sTexDumped.insert(hash).second) return;
-    if (!sDumpDirMade) { sDumpDirMade = TRUE; CreateDirectoryA(dir, NULL); }
-    char path[MAX_PATH + 64];
+    const char* dir = PortModsDumpDir();
+    if (!dir) return;
+    if (strcmp(dir, sDumpingTo)) {                           // another folder: it gets every texture drawn from now on
+        snprintf(sDumpingTo, sizeof(sDumpingTo), "%s", dir);
+        sTexDumped.clear();
+        sDumpWritten = sDumpThere = sDumpFailed = 0;
+    }
+    if (!sTexDumped.insert(hash).second) return;
+    char path[MAX_PATH + 160];
     if (name && *name) {                                     // tex_<w>x<h>_f<fmt>_<name>_<hash>.png: works by hash as it is; rename it to <name>.png to match by name
         char clean[96];
         snprintf(clean, sizeof(clean), "%s", name);
         for (char* c = clean; *c; c++) if (strchr("\\/:*?\"<>|", *c) || (u8)*c < 32) *c = '_';
         snprintf(path, sizeof(path), "%s\\tex_%ux%u_f%u_%s_%016llX.png", dir, w, h, fmt, clean, hash);
     } else
-    snprintf(path, sizeof(path), "%s\\tex_%ux%u_f%u_%016llX.png", dir, w, h, fmt, hash);
-    if (!PortPngWrite(path, rgba, w, h) && sTexDumped.size() == 1) fprintf(stderr, "[port] --dump-textures: cannot write %s\n", path);
+        snprintf(path, sizeof(path), "%s\\tex_%ux%u_f%u_%016llX.png", dir, w, h, fmt, hash);
+    if (GetFileAttributesA(path) != INVALID_FILE_ATTRIBUTES) { sDumpThere++; return; }
+    MakeFolders(dir);
+    if (PortPngWrite(path, rgba, w, h)) sDumpWritten++;
+    else if (!sDumpFailed++) fprintf(stderr, "[port] texture dumping: cannot write %s\n", path);
 }
 
-u32 PortModsDumpCount(void) { return (u32)sTexDumped.size(); }
+u32 PortModsDumpCount(void) { return sDumpWritten; }
+u32 PortModsDumpPresent(void) { return sDumpThere; }
+u32 PortModsDumpFailed(void) { return sDumpFailed; }
 
 // Two mods made in a temporary folder (no game data): order, switching off, missing files.
 int PortSelfTestMods(void) {
@@ -453,6 +489,39 @@ int PortSelfTestMods(void) {
         for (const char* f : kTexFiles) { snprintf(path, sizeof(path), "%s\\%s", base, f); DeleteFileA(path); }
         for (int i = 2; i >= 0; i--) { snprintf(path, sizeof(path), "%s%s", base, kTexDirs[i]); RemoveDirectoryA(path); }
     }
+    // Dumping: off by default; switched on in the settings it writes each texture once into the folder.
+    {
+        const char* keepCli = gPortOptions.dumpTextures;
+        PortSettings keepSet = gPortSettings;
+        gPortOptions.dumpTextures = NULL;
+        gPortSettings.dumpTextures = FALSE;
+        MOD_CHECK(!PortModsDumpDir(), "textures are dumped while it is off");
+        gPortSettings.dumpTextures = TRUE;
+        gPortSettings.dumpDir[0] = 0;
+        MOD_CHECK(PortModsDumpDir() && strstr(PortModsDumpDir(), "\\dump\\textures"), "the default dump folder is wrong");
+        snprintf(gPortSettings.dumpDir, sizeof(gPortSettings.dumpDir), "%s\\dumps\\sub", base);
+        const u32 one[4] = {1, 2, 3, 4};
+        PortModsDumpTexture(0x11, NULL, one, 2, 2, 6);
+        PortModsDumpTexture(0x11, NULL, one, 2, 2, 6);
+        PortModsDumpTexture(0x12, "name", one, 2, 2, 6);
+        MOD_CHECK(PortModsDumpCount() == 2 && !PortModsDumpFailed(), "%u textures were dumped, %u failed", PortModsDumpCount(), PortModsDumpFailed());
+        sDumpingTo[0] = 0;                                   // as in a later run: the files are there
+        PortModsDumpTexture(0x11, NULL, one, 2, 2, 6);
+        MOD_CHECK(PortModsDumpCount() == 0 && PortModsDumpPresent() == 1, "a dumped file was written again");
+        for (const char* file : {"dumps\\sub\\tex_2x2_f6_0000000000000011.png", "dumps\\sub\\tex_2x2_f6_name_0000000000000012.png"}) {
+            snprintf(path, sizeof(path), "%s\\%s", base, file);
+            MOD_CHECK(DeleteFileA(path), "%s was not written", file);
+        }
+        snprintf(path, sizeof(path), "%s\\dumps\\sub", base);
+        RemoveDirectoryA(path);
+        snprintf(path, sizeof(path), "%s\\dumps", base);
+        RemoveDirectoryA(path);
+        gPortOptions.dumpTextures = keepCli;
+        gPortSettings = keepSet;
+        sTexDumped.clear();
+        sDumpingTo[0] = 0;
+        sDumpWritten = sDumpThere = sDumpFailed = 0;
+    }
     // Text table: a JSON file changes strings; a mistake is reported with its place and changes nothing.
     {
         const char* table[4] = {"a", "b", "c", "d"};
@@ -475,7 +544,7 @@ int PortSelfTestMods(void) {
     strcpy(sDir, keepDir);
     gPortOptions.noMods = keepOff;
     PortModsRefreshTextures();
-    if (!fails) PortLog("selftest mods: ok (file lookup, order, moving, switched off, PNG and DDS textures, text table)");
+    if (!fails) PortLog("selftest mods: ok (file lookup, order, moving, switched off, PNG and DDS textures, dumping, text table)");
     return fails;
 }
 #endif

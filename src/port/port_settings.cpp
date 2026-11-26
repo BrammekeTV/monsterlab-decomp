@@ -6,6 +6,7 @@
 //   [game]      path: the player's disc image or extracted folder
 //   [audio]     volume (0-100), mute, remote_speaker (play the Wii Remote speaker sounds)
 //   [mods]      NAME = 1 or 0, in load order (port_mods.cpp)
+//   [textures]  dump (1: save every texture drawn), folder (empty: dump\textures next to the exe)
 //   [controls]  NAME = key 1, key 2, mouse button, gamepad bits   (Windows virtual-key codes; 0 = none)
 #ifdef _WIN32
 #include <windows.h>
@@ -80,6 +81,9 @@ BOOL PortSettingsLoad(const char* path, PortSettings* s) {
             }
         } else if (!strcmp(section, "mods")) {
             PortModsAdd(key, atoi(val) != 0);                  // the order of the lines is the load order
+        } else if (!strcmp(section, "textures")) {
+            if (!strcmp(key, "dump")) s->dumpTextures = atoi(val) != 0;
+            else if (!strcmp(key, "folder")) snprintf(s->dumpDir, sizeof(s->dumpDir), "%s", val);
         } else if (!strcmp(section, "game")) {
             if (!strcmp(key, "path")) snprintf(s->gamePath, sizeof(s->gamePath), "%s", val);
         } else if (!strcmp(section, "audio")) {
@@ -119,6 +123,7 @@ BOOL PortSettingsSave(const char* path, const PortSettings* s) {
             s->fpsCap > 0 ? cap : s->fpsCap == PORT_FPS_UNCAPPED ? "uncapped" : s->fpsCap == PORT_FPS_DISPLAY ? "display" : "off");
     if (s->gamePath[0]) fprintf(f, "; your Monster Lab disc image (.iso, .wbfs, .rvz) or extracted folder\n[game]\npath = %s\n\n", s->gamePath);
     fprintf(f, "[audio]\nvolume = %d\nmute = %d\n; remote_speaker: also play the sounds the console sends to the Wii Remote's speaker\nremote_speaker = %d\n\n", s->volume, s->mute ? 1 : 0, s->remoteSpeaker ? 1 : 0);
+    fprintf(f, "; dump: save every texture the game draws with as a PNG; folder: where (empty: dump\\textures next to the exe)\n[textures]\ndump = %d\nfolder = %s\n\n", s->dumpTextures ? 1 : 0, s->dumpDir);
     fprintf(f, "; NAME = key 1, key 2, mouse button (1 left, 2 right), gamepad bits (hex); keys are Windows virtual-key codes\n[controls]\n");
     for (int i = 0; i < gPortBindingCount; i++) {
         const PortBinding* b = &gPortBindings[i];
@@ -144,6 +149,8 @@ int PortSelfTestSettings(void) {
     want.width = 2560; want.height = 1440; want.wide = FALSE; want.stretchUi = TRUE; want.vsync = TRUE; want.fullscreen = TRUE;
     want.volume = 37; want.mute = TRUE; want.renderScale = 150; want.texFilter = PORT_FILTER_AF8; want.fpsCap = PORT_FPS_UNCAPPED; want.msaa = 4; want.remoteSpeaker = FALSE;
     strcpy(want.gamePath, "D:\\My games\\Monster Lab (disc).iso");
+    want.dumpTextures = TRUE;
+    strcpy(want.dumpDir, "D:\\My dumps");
     gPortBindings[0].key[0] = 'K'; gPortBindings[0].key[1] = 0; gPortBindings[0].mouse = 2; gPortBindings[0].pad = 0x20100;
     PortBinding changed = gPortBindings[0];
     if (!PortSettingsSave(path, &want)) { PortLog("selftest settings: cannot write %s", path); fails++; }
@@ -153,7 +160,7 @@ int PortSelfTestSettings(void) {
     if (!fails && !PortSettingsLoad(path, &got)) { PortLog("selftest settings: cannot read %s", path); fails++; }
     if (!fails) {
         if (got.width != want.width || got.height != want.height || got.wide != want.wide || got.stretchUi != want.stretchUi ||
-            got.vsync != want.vsync || got.fullscreen != want.fullscreen || got.volume != want.volume || got.mute != want.mute || got.renderScale != want.renderScale || got.texFilter != want.texFilter || got.fpsCap != want.fpsCap || got.msaa != want.msaa || got.remoteSpeaker != want.remoteSpeaker || strcmp(got.gamePath, want.gamePath)) {
+            got.vsync != want.vsync || got.fullscreen != want.fullscreen || got.volume != want.volume || got.mute != want.mute || got.renderScale != want.renderScale || got.texFilter != want.texFilter || got.fpsCap != want.fpsCap || got.msaa != want.msaa || got.remoteSpeaker != want.remoteSpeaker || strcmp(got.gamePath, want.gamePath) || got.dumpTextures != want.dumpTextures || strcmp(got.dumpDir, want.dumpDir)) {
             PortLog("selftest settings: read back %dx%d wide %d stretch %d vsync %d fullscreen %d volume %d mute %d",
                     got.width, got.height, got.wide, got.stretchUi, got.vsync, got.fullscreen, got.volume, got.mute);
             fails++;

@@ -51,7 +51,15 @@ To get the originals with their hashes, export them from your own disc:
 monsterlab.exe --dump-textures C:\MonsterLabTextures
 ```
 
-Every texture the game draws with while it runs is written there once, as
+Or switch it on while you play: the settings screen (F1 or Esc), page **Mods**, tick **Dump textures**.
+From then on every texture the game draws with is saved, including the ones on screen at that moment, and
+the page counts them. They go to `dump\textures` next to `monsterlab.exe`, or to the folder typed or chosen
+there. Untick it to stop. Both are kept in `monsterlab.ini` (`[textures] dump` and `folder`), so dumping
+stays on at the next start until you untick it. Dumping can make the game hitch when many new textures
+appear at once.
+
+Every texture the game draws with while it runs is written there once (a file that is there already is not
+written again), as
 `tex_<width>x<height>_f<format>_<name>_<hash>.png` (without `_<name>` where the name is not known). Only what was on screen gets dumped: play through the
 places you want to change. The dumped pictures are the game's own art: use them to work from, do not
 share them, and never put them into this repository.
@@ -174,7 +182,7 @@ at once.
 | `--mods DIR` | use `DIR` as the mods folder instead of `mods` next to the exe |
 | `--no-mods` | run without mods |
 | `--dump-data DIR` | write the game's text table to `DIR\strings.json` and exit (from your own disc) |
-| `--dump-textures DIR` | write every texture the game draws with to `DIR` as a PNG named by its name (where known) and hash |
+| `--dump-textures DIR` | write every texture the game draws with to `DIR` as a PNG named by its name (where known) and hash (the same as *Dump textures* in the settings, for this run) |
 | `--verbose` | lists, at the start, every file each mod replaces and which mod wins where two have the same file; logs `mods: <file> comes from <mod>` each time the game opens a replaced file |
 
 ## Worked example: replace one file
