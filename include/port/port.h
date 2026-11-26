@@ -153,6 +153,8 @@ typedef struct PortSettings {
     s32  msaa;                // samples of the frame buffer: 0 off, 2, 4 or 8 (--msaa; applies at start)
     BOOL remoteSpeaker;       // play the sounds the console sends to the Wii Remote's speaker through the PC output ([audio] remote_speaker)
     BOOL windowsCursor;       // show the Windows mouse cursor over the picture too ([display] windows_cursor; the game draws its own pointer)
+    BOOL dumpTextures;        // save every texture the game draws with as a PNG ([textures] dump; Settings > Mods)
+    char dumpDir[260];        // where to; empty: dump\textures next to the exe ([textures] folder)
 } PortSettings;
 extern PortSettings gPortSettings;
 // monsterlab.ini next to the exe (port_settings.cpp): display, audio and the input bindings.
