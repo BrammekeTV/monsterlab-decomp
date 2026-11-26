@@ -432,7 +432,11 @@ template <class T> struct RawBuf {
         n = m;
     }
 };
-static RawBuf<u8> sBV;                                      // the queued vertices: position, two colours and ngen texture coordinates each
+// The queued vertices (position, two colours and the texture coordinates each) are written straight into the vertex
+// ring, which stays mapped from the first vertex of a queue until FlushDraws draws it (VbReserve, VbClose). The mapped
+// memory is write-combined: it is only written, vertex after vertex, and never read.
+static u8* sVbMap;                                          // the mapped buffer while a queue is open, else NULL
+static u32 sVbFirst, sVbLen, sVbRoom;                       // the open queue: where it starts, its bytes, how many it may take
 static u32 sBVCount;                                        // vertices in the open batch
 static RawBuf<u16> sBI;                                      // the queued indices (each batch's from 0)
 static u32 sBatchVb, sBatchIdx;                             // where the open batch starts in sBV and sBI
@@ -670,7 +674,7 @@ static inline u32 E5(u32 v) { return (v << 3) | (v >> 2); }
 static inline u32 E6(u32 v) { return (v << 2) | (v >> 4); }
 static inline u32 E4(u32 v) { return (v << 4) | v; }
 static inline u32 E3(u32 v) { return (v << 5) | (v << 2) | (v >> 1); }
-static inline u32 Be16(const u8* p) { return (u32)p[0] << 8 | p[1]; }
+static inline u32 Be16(const u8* p) { u16 v; memcpy(&v, p, 2); return _byteswap_ushort(v); }
 static u32 From565(u32 c) { return Rgba(E5(c >> 11), E6((c >> 5) & 63), E5(c & 31), 255); }
 static u32 From5A3(u32 c) {
     if (c & 0x8000) return Rgba(E5((c >> 10) & 31), E5((c >> 5) & 31), E5(c & 31), 255);
@@ -1077,7 +1081,7 @@ static void SetOutputState(const OutKey& k) {
 
 // ------------------------------------------------------------------ vertices: decode, transform, light
 static inline f64 Pow2(s32 n) { u64 b = (u64)(n + 1023) << 52; f64 d; memcpy(&d, &b, 8); return d; }   // ldexp(1.0, n) for -1022 <= n <= 1023
-static inline f32 BeF32(const u8* p) { u32 u = (u32)p[0] << 24 | (u32)p[1] << 16 | (u32)p[2] << 8 | p[3]; f32 f; memcpy(&f, &u, 4); return f; }
+static inline f32 BeF32(const u8* p) { u32 u; memcpy(&u, p, 4); u = _byteswap_ulong(u); f32 f; memcpy(&f, &u, 4); return f; }
 
 // One component of a position, normal or texture coordinate. `be`: from the command stream
 // (console byte order); otherwise from an array in memory (host order).
@@ -1377,6 +1381,77 @@ static u32 ResolveArrays(const PortGx* g, const PortGxLayout* L, const u8** arrB
     return nActive;
 }
 
+static void MapOverrun(const char* what, size_t at, size_t bytes, size_t size);
+// Bytes of the open queue that `bytes` more would not fit: the caller then draws it first (FlushDraws).
+static BOOL VbFull(size_t bytes) { return sVbMap ? sVbLen + bytes > sVbRoom : bytes > VB_BYTES / 4 - 16; }
+static BOOL sVbStarted, sVbLost;                            // the buffer has been mapped once; the open queue could not be mapped
+static u32  sVbUsed;                                        // bytes of sVb behind the queues drawn so far
+static RawBuf<u8> sVbSpare;                                 // where a queue goes when mapping fails (its draws are lost)
+// Room for `bytes` more vertex data (VbFull has been asked): opens the queue, in the next ring segment when this one
+// has no room for it, and returns where to write.
+static u8* VbReserve(u32 bytes) {
+    if (!sVbMap) {
+        u32 first = (sVbUsed + 15) & ~15u;
+        if (first + bytes > (sVbRing.seg + 1) * (VB_BYTES / 4)) first = RingNext(sVbRing) * (VB_BYTES / 4);
+        const D3D11_MAP how = !sVbStarted || sVbRing.discard ? D3D11_MAP_WRITE_DISCARD : D3D11_MAP_WRITE_NO_OVERWRITE;
+        sVbRing.discard = FALSE;
+        D3D11_MAPPED_SUBRESOURCE map;
+        sVbFirst = first; sVbLen = 0;
+        sVbRoom = (sVbRing.seg + 1) * (VB_BYTES / 4) - first;
+        sVbLost = !((size_t)first + bytes <= VB_BYTES && SUCCEEDED(sCtx->Map(sVb, 0, how, 0, &map)));
+        if (sVbLost) {
+            MapOverrun("vertex", first, bytes, VB_BYTES);
+            sVbSpare.resize(VB_BYTES / 4);
+            sVbMap = sVbSpare.data() - first;
+        } else { sVbMap = (u8*)map.pData; sVbStarted = TRUE; }
+    }
+    u8* at = sVbMap + sVbFirst + sVbLen;
+    sVbLen += bytes;
+    return at;
+}
+// Ends the open queue before it is drawn; FALSE when its vertices are lost.
+static BOOL VbClose(void) {
+    if (!sVbMap) return FALSE;
+    if (!sVbLost) sCtx->Unmap(sVb, 0);
+    sVbMap = NULL;
+    sVbUsed = sVbFirst + sVbLen;
+    return !sVbLost;
+}
+
+// The attributes of a GPU draw's vertex, worked out once per vertex layout (it rarely changes from draw to draw).
+struct DecAttr { const u8* base; u32 arrStride, off, mode, dst, arr; f32 scale; DecFn fn, fnBe, fnLe; };
+struct DecPlan {
+    PortGxLayout layout;
+    DecAttr ap[12];
+    u32 nap, flags, pmOff;
+    u8 zero[16];                                            // places in the vertex no decoder fills that must read 0
+    u32 nzero;
+    BOOL made, hasPos;
+};
+static DecPlan sPlan;
+static void MakePlan(const PortGxLayout* L, const u32* active, u32 nActive) {
+    DecPlan& p = sPlan;
+    p.layout = *L; p.made = TRUE; p.nap = 0; p.flags = 0; p.hasPos = FALSE; p.nzero = 0;
+    p.pmOff = L->attr[0].mode ? L->attr[0].offset : ~0u;
+    // (`active` leaves out array attributes with no array: those are in the layout but not in the vertex)
+    for (u32 ai = 0; ai < nActive; ai++) {
+        const u32 a = active[ai];
+        const PortGxAttr& ga = L->attr[a];
+        DecAttr& q = p.ap[p.nap++];
+        q.arr = a; q.off = ga.offset; q.mode = ga.mode;
+        u32 shift = ga.shift, comps;
+        if (a == 9) { q.dst = 0; comps = ga.comps > 3 ? 3 : ga.comps; p.hasPos = TRUE; }
+        else if (a == 10) { q.dst = 16; comps = 3; shift = ga.fmt == 1 ? 6 : ga.fmt == 3 ? 14 : 0; p.flags |= 1; }
+        else if (a <= 12) { q.dst = 32 + (a - 11) * 4; comps = 0; p.flags |= 2u << (a - 11); }
+        else { q.dst = 40 + (a - 13) * 8; comps = ga.comps > 2 ? 2 : ga.comps; p.flags |= 8u << (a - 13); }
+        q.scale = 1.0f / (f32)(1u << (shift & 31));
+        q.fnBe = DecPick(ga.fmt, comps, TRUE); q.fnLe = DecPick(ga.fmt, comps, FALSE);
+        // a position with two components gets z = 0, a texture coordinate with one t = 0
+        const u32 want = q.dst == 0 ? 3 : q.dst >= 40 ? 2 : comps;
+        for (u32 c = comps; c < want && p.nzero < 16; c++) p.zero[p.nzero++] = (u8)(q.dst + c * 4);
+    }
+}
+
 // The vertices and indices of one GX draw, added to the open batch (DrawPrims has set that up or found it unchanged).
 struct DrawSrc { const PortGxLayout* L; const u8* data; const u8* const* arrBase; const u32* arrStride; const BOOL* arrBe; const u32* active; u32 nActive; };
 static void AppendDraw(const DrawSrc& d, u32 prim, u32 count, BOOL gpu, u32 rec, u32 tmVtx, u32 stride) {
@@ -1387,43 +1462,27 @@ static void AppendDraw(const DrawSrc& d, u32 prim, u32 count, BOOL gpu, u32 rec,
     u16 base = (u16)sBVCount;
     {
         const u64 tscVerts = Tsc();
-        size_t at = sBV.size();
-        sBV.resize(at + (size_t)count * stride);
+        u8* o = VbReserve(count * stride);
         if (gpu) {
             // The vertex shader does the rest: the attributes go into the queue as they are given (GpuVtx).
-            u8* dst = &sBV[at];
-            struct AP { const u8* base; u32 arrStride, off, mode, fmt, comps, elem, dst; BOOL be; f32 scale; DecFn fn; };
-            AP ap[12];
-            u32 nap = 0, fl = 0;
-            BOOL hasPos = FALSE;
-            for (u32 ai = 0; ai < nActive; ai++) {
-                const u32 a = active[ai];
-                const PortGxAttr& ga = L->attr[a];
-                AP& q = ap[nap++];
-                q.base = arrBase[a]; q.arrStride = arrStride[a]; q.be = ga.mode >= 2 ? arrBe[a] : TRUE;
-                q.off = ga.offset; q.mode = ga.mode; q.fmt = ga.fmt; q.elem = ga.elem;
-                u32 shift = ga.shift;
-                if (a == 9) { q.dst = 0; q.comps = ga.comps > 3 ? 3 : ga.comps; hasPos = TRUE; }
-                else if (a == 10) { q.dst = 16; q.comps = 3; shift = ga.fmt == 1 ? 6 : ga.fmt == 3 ? 14 : 0; fl |= 1; }
-                else if (a <= 12) { q.dst = 32 + (a - 11) * 4; q.comps = 0; fl |= 2u << (a - 11); }
-                else { q.dst = 40 + (a - 13) * 8; q.comps = ga.comps > 2 ? 2 : ga.comps; fl |= 8u << (a - 13); }
-                q.scale = 1.0f / (f32)(1u << (shift & 31));
-                q.fn = DecPick(q.fmt, q.comps, q.be);
+            u32 present = 0;                                    // (the same layout may lack an array one time and not the next)
+            for (u32 ai = 0; ai < nActive; ai++) present |= 1u << active[ai];
+            static u32 sPresent;
+            if (!sPlan.made || present != sPresent || memcmp(&sPlan.layout, L, sizeof(*L))) { MakePlan(L, active, nActive); sPresent = present; }
+            DecPlan& plan = sPlan;
+            const u32 nap = plan.nap;
+            for (u32 k = 0; k < nap; k++) {                     // where the arrays are this time, and their byte order
+                DecAttr& q = plan.ap[k];
+                q.base = arrBase[q.arr]; q.arrStride = arrStride[q.arr];
+                q.fn = q.mode >= 2 && !arrBe[q.arr] ? q.fnLe : q.fnBe;
             }
-            u8* o = dst;
-            if (!hasPos) {                                      // no position: nothing is drawn (as on the CPU path)
+            // The shader reads only what the flags say is there: the rest of a vertex is not written.
+            if (!plan.hasPos) {                                 // no position: nothing is drawn (as on the CPU path)
                 memset(o, 0, (size_t)count * stride);
                 const u32 none = 0x80000000u;
                 for (u32 n = 0; n < count; n++) memcpy(o + (size_t)n * stride + 28, &none, 4);
             } else {
-                // (the shader reads only what the flags say is there: the rest is not cleared; a position with two
-                // components gets z = 0, a texture coordinate with one t = 0)
-                for (u32 k = 0; k < nap; k++) {
-                    const AP& q = ap[k];
-                    const u32 want = q.dst == 0 ? 3 : q.dst >= 40 ? 2 : q.comps;
-                    for (u32 c = q.comps; c < want; c++) for (u32 n = 0; n < count; n++) memset(o + (size_t)n * stride + q.dst + c * 4, 0, 4);
-                }
-                const u32 pmOff = L->attr[0].mode ? L->attr[0].offset : ~0u;
+                const u32 pmOff = plan.pmOff, fl = plan.flags, nzero = plan.nzero;
                 for (u32 n = 0; n < count; n++, data += L->size, o += stride) {
                     u32 vfl = pmOff != ~0u ? fl | (data[pmOff] & 63u) << 16 : fl, vrec = rec;
                     if (tmVtx) {
@@ -1433,15 +1492,15 @@ static void AppendDraw(const DrawSrc& d, u32 prim, u32 count, BOOL gpu, u32 rec,
                     }
                     memcpy(o + 12, &vrec, 4); memcpy(o + 28, &vfl, 4);
                     for (u32 k = 0; k < nap; k++) {
-                        const AP& q = ap[k];
+                        const DecAttr& q = plan.ap[k];
                         const u8* p = data + q.off;
-                        BOOL be = TRUE;
-                        if (q.mode >= 2) { u32 index = q.mode == 2 ? p[0] : Be16(p); p = q.base + index * q.arrStride; be = q.be; }
+                        if (q.mode >= 2) { const u32 index = q.mode == 2 ? p[0] : Be16(p); p = q.base + index * q.arrStride; }
                         q.fn(p, q.scale, o + q.dst);
                     }
+                    for (u32 z = 0; z < nzero; z++) memset(o + plan.zero[z], 0, 4);
                 }
             }
-        } else for (u32 n = 0; n < count; n++) memcpy(&sBV[at + (size_t)n * stride], &sVerts[n], stride);
+        } else for (u32 n = 0; n < count; n++, o += stride) memcpy(o, &sVerts[n], stride);
         sFrame.decodeTsc += Tsc() - tscVerts;
         sBVCount += count;
     }
@@ -1486,7 +1545,7 @@ static BOOL FastDraw(const PortGx* g, u32 prim, const PortGxLayout* L, u32 count
         g->cp[0x30] != sFast.midx0 || g->cp[0x40] != sFast.midx1) return FALSE;
     if (!(prim == 0x80 ? count >= 4 : (prim == 0x90 || prim == 0x98 || prim == 0xA0) && count >= 3) || sBVCount + count > VB_VERTS) return FALSE;
     const u32 stride = sFast.stride;                        // (the queue has to fit the buffers: otherwise the long way flushes it)
-    if (sBV.size() + (size_t)count * stride > VB_BYTES / 4 - 16 || sBI.size() + (size_t)count * 3 > IB_IDXS / 4) return FALSE;
+    if (VbFull((size_t)count * stride) || sBI.size() + (size_t)count * 3 > IB_IDXS / 4) return FALSE;
     if (memcmp(L, &sFast.layout, sizeof(*L))) return FALSE;
     const u8* arrBase[21] = {}; u32 arrStride[21] = {}; BOOL arrBe[21] = {};
     u32 active[12];
@@ -1766,13 +1825,13 @@ static void DrawPrims(const PortGx* g, u32 prim, const PortGxLayout* L, u32 coun
     const u32 stride = VStride(vfmt);
     // The queue is uploaded at once (FlushDraws); it has to fit the buffers.
     if ((size_t)count * stride > VB_BYTES / 4 - 16) { sGfxStats.skipped++; return; }   // larger than a ring segment
-    if (sBV.size() + (size_t)count * stride > VB_BYTES / 4 - 16 || sBI.size() + (size_t)count * 3 > IB_IDXS / 4) FlushDraws();
+    if (VbFull((size_t)count * stride) || sBI.size() + (size_t)count * 3 > IB_IDXS / 4) FlushDraws();
     if (sPendCount && (sPend.ps != ps || sBVCount + count > VB_VERTS || sPend.vfmt != vfmt || sPend.movie != movie || memcmp(&sPend.out, &ok, sizeof(ok)) || memcmp(sPend.srv, srv, sizeof(srv)) ||
                        memcmp(sPend.smp, smp, sizeof(smp)) || (sPend.pcSerial != pcSerial && memcmp(&sPend.pc, &pc, sizeof(pc)))))
         CloseBatch();
     if (!sPendCount) {
         sPend.movie = movie; sPend.vfmt = vfmt; sPend.pcSerial = pcSerial; sPend.ps = ps; sPend.out = ok; memcpy(sPend.srv, srv, sizeof(srv)); memcpy(sPend.smp, smp, sizeof(smp)); sPend.pc = pc;
-        sBatchVb = (u32)sBV.size(); sBatchIdx = (u32)sBI.size(); sBVCount = 0;
+        sBatchVb = sVbMap ? sVbLen : 0; sBatchIdx = (u32)sBI.size(); sBVCount = 0;
     }
     const DrawSrc src2 = {L, data, arrBase, arrStride, arrBe, active, nActive};
     AppendDraw(src2, prim, count, gpu, rec, tmVtx, stride);
@@ -1811,21 +1870,16 @@ static void FlushQueued() {
         }
         sRecUsed += (u32)sRec.size() / 4; sRec.clear(); sRecDiscard = FALSE;
     }
-    // The vertices go behind those of the earlier flushes; the buffer is only replaced when it is full. Replacing it
-    // for every draw made a scene of a few thousand small draws crawl.
-    static u32 sVbUsed, sIbUsed;                            // in bytes and indices
-    const u32 bytes = (u32)sBV.size(), ni = (u32)sBI.size();
-    // (a queue fits a segment: DrawPrims flushes before it would not)
+    // The vertices are in the ring already (VbReserve). Indices go behind those of the earlier flushes; the buffers are
+    // only replaced when they are full. Replacing them for every draw made a scene of a few thousand small draws crawl.
+    static u32 sIbUsed;                                     // in indices
     static BOOL started;
-    u32 first = (sVbUsed + 15) & ~15u, ifirst = sIbUsed;
+    const u32 ni = (u32)sBI.size();
+    u32 ifirst = sIbUsed;
     D3D11_MAPPED_SUBRESOURCE map;
-    BOOL ok = TRUE;
-    if (first + bytes > (sVbRing.seg + 1) * (VB_BYTES / 4)) first = RingNext(sVbRing) * (VB_BYTES / 4);
-    D3D11_MAP how = !started || sVbRing.discard ? D3D11_MAP_WRITE_DISCARD : D3D11_MAP_WRITE_NO_OVERWRITE;
-    sVbRing.discard = FALSE;
-    if ((size_t)first + bytes > VB_BYTES) { MapOverrun("vertex", first, bytes, VB_BYTES); ok = FALSE; }
-    else if (SUCCEEDED(sCtx->Map(sVb, 0, how, 0, &map))) { memcpy((u8*)map.pData + first, sBV.data(), bytes); sCtx->Unmap(sVb, 0); } else ok = FALSE;
-    sVbUsed = first + bytes;
+    D3D11_MAP how;
+    const u32 first = sVbFirst;
+    BOOL ok = VbClose();
     if (ifirst + ni > (sIbRing.seg + 1) * (IB_IDXS / 4)) ifirst = RingNext(sIbRing) * (IB_IDXS / 4);
     how = !started || sIbRing.discard ? D3D11_MAP_WRITE_DISCARD : D3D11_MAP_WRITE_NO_OVERWRITE;
     sIbRing.discard = FALSE;
@@ -1833,7 +1887,7 @@ static void FlushQueued() {
     else if (SUCCEEDED(sCtx->Map(sIb, 0, how, 0, &map))) { memcpy((u16*)map.pData + ifirst, sBI.data(), ni * sizeof(u16)); sCtx->Unmap(sIb, 0); } else ok = FALSE;
     started = TRUE;
     sIbUsed = ifirst + ni;
-    sBV.clear(); sBI.clear(); sBVCount = 0;
+    sBI.clear(); sBVCount = 0;
 
     static PsConst lastPc; static OutKey lastOut;
     static ID3D11ShaderResourceView* lastSrv[8]; static ID3D11SamplerState* lastSmp[8]; static ID3D11PixelShader* lastPs;
@@ -2203,6 +2257,7 @@ BOOL PortGfxIdle(void) {
         std::lock_guard<std::recursive_mutex> lk(sGfxLock);
         s64 now = Ticks();
         if (iv) sNextPresent = std::max(sNextPresent + iv, now - iv);
+        FlushDraws();                                   // (nothing may draw while the vertex ring is mapped)
         PresentOut(FALSE);
         sExtraPictures++;
     }
