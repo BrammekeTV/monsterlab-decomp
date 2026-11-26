@@ -2,15 +2,15 @@
 //
 // A new part is a new row of the part table whose model is a "template" part of the player's own disc with
 // the mod's geometry and pictures written over it in memory:
-//   - the row is a copy of the template's row with its own model number (so its model key is new) and names;
+//   - the row and the names come from the mod's patches/*.json (the part "<mod>:head", port_modpatch.cpp): a
+//     copy of the template's row with its own model number, so its model key is new;
 //   - the level's part list gets two entries for the new key (one per fighter) that name the template's zones;
 //   - when a template zone is in memory and the new part is the one in use there, the mod's blocks are
 //     written over the zone and the zone's name hash becomes the new key's; when the template itself is in
 //     use again, the bytes that were there are put back. A zone is read from disc only when another one took
 //     its place, so this is checked every frame and not only at the read;
-//   - the names get new text ids behind the game's string table;
-//   - with PORT_MODPART_GIVE=1 (tests) a game that has no such part in its inventory gets one. Not by default:
-//     the row number is not save-safe yet, so nothing here may reach a save.
+//   - with PORT_MODPART_GIVE=1 (tests) a game that has no such part in its inventory gets one. Not by default
+//     (owning the part is not decided yet; its row is save-safe).
 // Nothing here runs unless an enabled mod has a parts folder.
 #ifdef _WIN32
 #include <windows.h>
@@ -20,12 +20,9 @@
 #include <vector>
 
 #include "port/port.h"
+#include "port/port_modpatch.h"
 #include "port/port_mods.h"
-#include "port/sir_loader.h"
 #include "game/part.h"
-
-struct StringTable;
-extern StringTable* gStringTable;                                  // 0x805FB910: SirStringTable (header slot 0xDA8 of global_binary.sir)
 
 extern "C" {
 u8*  fn_801F06FC(void);                                            // 0x801F06FC: the world's parameter block; **(+8) is the level header
@@ -40,11 +37,9 @@ struct Block { u32 kind, off, size; const u8* data; };
 struct Pack {                       // one .part file (host memory: read again by every run)
     char key[32];
     char mod[64];
-    u32  templateRow, modelNumber, templateHash, zone[2], zoneSize, defIdOff;
-    char name[PART_TIERS][48];
+    u32  templateHash, zone[2], zoneSize, defIdOff;
     std::vector<Block> blocks;
     u32  hash;                      // of "<key>_geoA": what the part list and the zone are asked for
-    u32  nameHash[PART_TIERS];
     u8*  backup[2];                 // the template's bytes under the blocks, per fighter zone
 };
 std::vector<Pack> sPacks;
@@ -54,11 +49,10 @@ struct ListEntry { s32 users; u32 hash; u32 obj; s32 zone; };      // an entry o
 
 }  // namespace
 
-// What a savestate must hold: the tables the game now points at lie in PortHostAlloc memory, these say so.
+// What a savestate must hold: the list the game now points at lies in PortHostAlloc memory, these say so.
 PORT_SAVED_BEGIN
 #define MAX_PACKS 8
-static s32        sRow[MAX_PACKS];            // the new row's index in the part table, 0 = not added yet
-static s32        sTextBase[MAX_PACKS];       // text id of the first tier name, 0 = none
+static s32        sRow[MAX_PACKS];            // the part's row in the part table, 0 = it has none
 static ListEntry* sEntries[MAX_PACKS];        // the pack's two list entries
 static u8**       sListCopy;                  // the level's list with our entries behind it
 static u32        sListCap;
@@ -83,9 +77,8 @@ BOOL LoadPack(const char* mod, const char* path) {
     if (ok) {
         memcpy(p.key, d + 8, 31);
         snprintf(p.mod, sizeof(p.mod), "%s", mod);
-        p.templateRow = Rd32(d + 0x28); p.modelNumber = Rd32(d + 0x2C); p.templateHash = Rd32(d + 0x30);
+        p.templateHash = Rd32(d + 0x30);   // +0x28, +0x2C and the names at +0x44 are not used: patches/*.json has them
         p.zone[0] = Rd32(d + 0x34); p.zone[1] = Rd32(d + 0x38); p.zoneSize = Rd32(d + 0x3C); p.defIdOff = Rd32(d + 0x40);
-        for (int i = 0; i < PART_TIERS; i++) memcpy(p.name[i], d + 0x44 + i * 48, 47);
         u32 count = Rd32(d + 0x104), o = 0x108;
         for (u32 i = 0; ok && i < count; i++) {
             if (o + 12 > (u32)n) { ok = FALSE; break; }
@@ -103,9 +96,8 @@ BOOL LoadPack(const char* mod, const char* path) {
     char name[64];
     snprintf(name, sizeof(name), "%s_geoA", p.key);
     p.hash = StringHash(name);
-    for (int i = 0; i < PART_TIERS; i++) { snprintf(name, sizeof(name), "MOD_%s_TIER%d", p.key, i + 1); p.nameHash[i] = StringHash(name); }
     sPacks.push_back(p);
-    PortLog("mods: %s adds the part %s (\"%s\"; drawn over the zones %u and %u of shared_parts.sir)", mod, p.key, p.name[0], p.zone[0], p.zone[1]);
+    PortLog("mods: %s draws the part %s over the zones %u and %u of shared_parts.sir", mod, p.key, p.zone[0], p.zone[1]);
     return TRUE;
 }
 
@@ -188,30 +180,6 @@ void SetIdentity(Pack& p, int pi, int k, BOOL mod) {
     PortLog("mods: %s: zone %u now holds %s", p.mod, p.zone[k], mod ? p.key : "its own part");
 }
 
-// The part table (table 22 of the game database) with one more row.
-void AddRow(Pack& p, int pi) {
-    u8* db = gGameDb ? gGameDb->data : NULL;
-    if (!db) return;
-    PartDef* rows; u32 count;
-    memcpy(&rows, db + 0x5B78, sizeof(rows));
-    memcpy(&count, db + 0x5B7C, 4);
-    if (!rows || p.templateRow >= count) return;
-    PartDef* grown = (PartDef*)PortHostAlloc((count + 1) * sizeof(PartDef));
-    if (!grown) return;
-    memcpy(grown, rows, count * sizeof(PartDef));
-    PartDef* d = &grown[count];
-    *d = grown[p.templateRow];
-    d->index = (s32)count;
-    d->unk48[2] = (u8)p.modelNumber;
-    for (int i = 0; i < PART_TIERS; i++) d->tierName[i] = p.nameHash[i];
-    u32 n = count + 1;
-    memcpy(db + 0x5B78, &grown, sizeof(grown));
-    memcpy(db + 0x5B7C, &n, 4);
-    memcpy(db + 0x5B8C, &n, 4);                                     // the table's second count
-    sRow[pi] = (s32)count;
-    PortLog("mods: %s: part %s is row %u of the part table (copied from row %u)", p.mod, p.key, count, p.templateRow);
-}
-
 // While a level is being read its header can name a list that is not in memory or not converted yet, so every
 // pointer is checked to be readable before it is followed (the last region asked about is remembered: the
 // entries lie together).
@@ -281,8 +249,7 @@ void AddToList(Pack& p, int pi) {
 }
 
 // PORT_MODPART_GIVE=1 (tests only): a game without the part gets one, tier 1, full quality. (Parts on a monster
-// stay in the inventory's list.) Off by default: the row number is not save-safe yet, and a part given here
-// would be written into the player's save.
+// stay in the inventory's list.)
 void AddToInventory(int pi) {
     static int on = -1;
     if (on < 0) on = getenv("PORT_MODPART_GIVE") != NULL;
@@ -298,35 +265,10 @@ void AddToInventory(int pi) {
 
 }  // namespace
 
-// The names of a new part go behind the game's string table (the game reads strings[id] for id < count).
-static void AddNames(int pi) {
-    SirStringTable* t = (SirStringTable*)gStringTable;
-    if (!t || !t->strings || !t->count) return;
-    const char** grown = (const char**)PortHostAlloc((t->count + PART_TIERS) * sizeof(char*));
-    char* text = (char*)PortHostAlloc(PART_TIERS * 48);
-    if (!grown || !text) return;
-    memcpy(grown, t->strings, t->count * sizeof(char*));
-    for (int i = 0; i < PART_TIERS; i++) {
-        memcpy(text + i * 48, sPacks[pi].name[i], 48);
-        grown[t->count + i] = text + i * 48;
-    }
-    sTextBase[pi] = (s32)t->count;
-    t->strings = grown;
-    t->count += PART_TIERS;
-}
-
 // The game database is converted: the mods' part files are read now, so the log names them at the start.
 void PortModPartsApplyData(u8* globalHdr) {
     (void)globalHdr;
     Scan();
-}
-
-// The text id of a key the game's own table does not have: -1, or a mod part's tier name.
-extern "C" s32 PortModPartsTextId(u32 hash) {
-    for (size_t pi = 0; pi < sPacks.size(); pi++)
-        for (int i = 0; i < PART_TIERS; i++)
-            if (sPacks[pi].nameHash[i] == hash && sTextBase[pi]) return sTextBase[pi] + i;
-    return -1;
 }
 
 // A zone of shared_parts.sir was read to `zone` and converted.
@@ -357,10 +299,14 @@ void PortModPartsZoneRead(s32 number, u8* zone, u32 size) {
 void PortModPartsFrame(void) {
     Scan();
     for (size_t pi = 0; pi < sPacks.size(); pi++) {
-        if (!sTextBase[pi]) AddNames((int)pi);
-        if (!sTextBase[pi]) continue;
-        if (sRow[pi] <= 0) AddRow(sPacks[pi], (int)pi);
-        if (sRow[pi] <= 0) continue;
+        if (sRow[pi] <= 0) {                         // known once the game database is patched
+            char id[96];
+            snprintf(id, sizeof(id), "%s:head", sPacks[pi].mod);
+            s32 row = PortModPartIndex(id);
+            if (row < 0) continue;
+            sRow[pi] = row;
+        }
+        if (!gGameDb || !gGameDb->data) continue;   // the row is known before the game has its database pointer
         AddToList(sPacks[pi], (int)pi);
         AddToInventory((int)pi);
     }

@@ -6,6 +6,8 @@ Writes <MODS_DIR>/SampleMod (default: build/pc/mods, where the port looks):
   mod.ini                          name, description, priority, enabled
   data/strings.json                changes the main menu's "New Game" (string 1552) to words of our own
   textures/MonsterLab_Logo.png     a striped picture drawn by this script, in place of the logo
+  patches/parts.json               a table patch: adds the part "Sample Head" (a copy of vanilla head 73,
+                                   not given to the player)
   files/text/str_en.txt            only with --data: a copy of that file from YOUR extracted disc with
                                    one empty line added, to see a disc file being replaced. It is the
                                    game's own text: do not share it.
@@ -21,7 +23,7 @@ ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
 MOD_INI = """[mod]
 name = Sample mod
-description = Renames New Game and paints a striped logo. Made by tools/make_sample_mod.py.
+description = Renames New Game, paints a striped logo, adds a part. Made by tools/make_sample_mod.py.
 author = Monster Lab PC port
 version = 1.0
 ; where a new mod goes in the list (a higher number is later, and wins); the Mods page changes it after that
@@ -29,6 +31,10 @@ priority = 0
 ; 0: a new mod starts switched off
 enabled = 1
 """
+
+
+PARTS = {"parts": [{"id": "sample_head", "copy": 73,
+                    "names": ["Sample Head 1", "Sample Head 2", "Sample Head 3", "Sample Head 4"]}]}
 
 
 def png(path, w, h, pixel):
@@ -63,6 +69,9 @@ def main():
     with open(os.path.join(mod, "data", "strings.json"), "w", encoding="utf-8") as f:
         json.dump({"format": 1, "strings": {"1552": "Modded Game"}}, f, indent=2)
     png(os.path.join(mod, "textures", "MonsterLab_Logo.png"), 256, 128, stripes)
+    os.makedirs(os.path.join(mod, "patches"), exist_ok=True)
+    with open(os.path.join(mod, "patches", "parts.json"), "w", encoding="utf-8") as f:
+        json.dump(PARTS, f, indent=2)
     if data:
         src = os.path.join(data, "files", "text", "str_en.txt")
         if not os.path.isfile(src):

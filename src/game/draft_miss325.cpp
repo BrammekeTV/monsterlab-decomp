@@ -7,6 +7,7 @@
 #include "game/part.h"
 
 extern "C" {
+void PortModPartEnsureRow(s32 def);   // src/port/port_modpatch.cpp
 void NoticePosted(u8* s, s32 idx);                              // 0x8022DF3C
 u32  SaveHasBadge(u8* s, u32 badge);                            // 0x80223308
 void SaveAddBadge(u8* s, s32 badge);                            // 0x802233D4
@@ -198,6 +199,7 @@ void fn_8022EDD8(u8* snap) {
         const u8* rec = b + i * 8;
         s32 def = rec[0x1FE];
         if (def == 0xFF) def = -1;
+        PortModPartEnsureRow(def);   // PC port: a row mods added (nothing for the game's own parts)
         PartInstance* p = PartInventoryAlloc(lbl_805FBBE0 + 0xA30);
         if (p != NULL) PartSetDef(p, def);
         s32 enh = rec[0x201];

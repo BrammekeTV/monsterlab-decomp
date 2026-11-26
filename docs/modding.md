@@ -14,6 +14,7 @@ mods\
       streams\...
     data\                   JSON that changes game data (the text table)
       strings.json
+    patches\*.json          changes to the game's tables, new parts
     textures\               PNG or DDS pictures that replace game textures
       sky_4962D17B32AB899E.png
 ```
@@ -25,7 +26,8 @@ python tools/make_sample_mod.py
 ```
 
 writes `SampleMod` into `build\pc\mods` (`--out DIR` for another mods folder): a `mod.ini`, a
-`data\strings.json` that renames *New Game* to *Modded Game*, and a striped picture in place of the logo.
+`data\strings.json` that renames *New Game* to *Modded Game*, a striped picture in place of the logo, and a
+`patches\parts.json` that adds a part called *Sample Head* (see [table patches](#changing-and-adding-game-data-table-patches)).
 Everything in it is made by the script. With `--data <your extracted disc>` it also copies
 `files\text\str_en.txt` from your disc into the mod (one empty line added), to show a disc file being
 replaced: that copy is the game's own text, so do not share it.
@@ -231,17 +233,18 @@ Rules, checked when the game loads `global_binary.sir`:
 - With several mods the later one in the load order wins per string.
 - The text is read when the game starts: restart after a change.
 
-## Adding a part
+## Adding a part with its own model
 
-A mod can add a monster part: `mods\<mod name>\parts\<model key>.part`. The file holds the mod's own model
-and pictures and names a part of your disc as its template: the new part gets a row of its own in the part
-table (a copy of the template's, with its own model number and names), and while it is on a monster the port
-draws the mod's model in place of the template's, in memory. Skeleton, animations and material are the
-template's. Nobody is given the part yet: that waits for part ids that are safe in a save.
+A new part is a table patch (see [Adding a part](#adding-a-part) below): that gives it a row, names and saves.
+Its model needs more. For a head there is one way so far: `mods/<mod name>/parts/<model key>.part` holds the
+mod's own vertices and pictures and names a part of your disc as its template. While the new part is on a
+monster the port draws them in place of the template's, in memory; skeleton, animations and material are the
+template's. The mod's patch must add that part with the id `head`. Nobody is given the part yet.
 
 `tools/mods/blackhole` is the worked example (a black hole head): `make_assets.py` draws the pictures and
-the model, `build_mod.py` writes the `.part` file (its header describes the format) and the README says how
-a part is stored and what does not work yet (no icon of its own, no model on the exploration map).
+the model, `build_mod.py` writes the `.part` file (its header describes the format) and the patch, and the
+README says how a part is stored and what does not work yet (no icon of its own, no model on the exploration
+map).
 
 ## Load order, switching mods on and off
 
@@ -331,34 +334,75 @@ If the dump gave the texture a name (`tex_256x128_f6_MonsterLab_Logo_FF636077E97
 version as `mods\MyMod\textures\MonsterLab_Logo.png` instead. `--verbose` logs
 `mods: texture MonsterLab_Logo (FF636077E97CEA31) comes from MyMod by name`. `tools/mod_test.py` checks this too.
 
-## Not built yet: mods that add things
+## Changing and adding game data: table patches
 
-The goal is that a mod can later add something new, for example a head part with its own model, textures
-and inventory icon that is always unlocked. Two rules for whatever gets built:
+`mods\<mod name>\patches\*.json` changes the game database (the 42 tables of `global_binary.sir`: parts,
+actions, tuning and more) in memory, after the game has loaded it from your disc. A mod holds only its own
+entries, never the file, and two mods can add to the same table.
 
-A first piece exists: a head part drawn over a template of the disc ("Adding a part" above). Its part-table row
-and names are a stand-in for the table patches described here; icon and map model are missing.
+```json
+{
+  "tables": [
+    {"table": 22, "row": 73, "set": {"@0x4A": 2}},
+    {"table": 5, "append": true, "copy": 3, "set": {"#1": 40}}
+  ],
+  "parts": [
+    {"id": "head", "copy": 73,
+     "set": {"@0x4A": 77},
+     "names": ["Black Hole", "Dark Hole", "Deep Hole", "Singularity"],
+     "data": {"model": "parts/hole.part"}}
+  ]
+}
+```
 
-- **New files.** A mod ships its own files beside replacements. `files\` already serves a path the disc does
-  not have, but the game only opens it if something tells it to: the new data has to name it.
-- **Tables are patched, never shipped whole.** A mod holds only its own entries or a change list that the
-  port applies after loading the original from the player's disc, so no mod (and never this repository)
-  carries game data, and two mods can add to one table.
+- `table` and `row` are numbers from 0. A column in `set` is `"#<column number>"`, `"@<byte offset in the
+  row>"` or the column's own name (the tables store a hash of each name). Values are numbers; for a hash
+  column a string is hashed as the game does it.
+- `append` adds a row that starts as a copy of row `copy`. Appended rows get their numbers from the load
+  order, so use them only for things a save does not remember. Parts are refused here: use `parts`.
+- Mods apply in load order, every mod's `tables` before any `parts`, so a new part copies the patched row.
+  Later changes win.
+- An entry with a mistake (unknown column, a value that does not fit) is ignored as a whole; a file that is
+  not valid is ignored as a whole. The log says why, with line and column for the file.
+- Changes need a restart.
 
-Where the hooks would go:
+### Adding a part
 
-| What | Where |
+Each entry of `parts` is a new row of the part table (table 22, `PartDef` in `include/game/part.h`):
+
+| Key | Meaning |
 |---|---|
-| Applying a mod's data | `PortModsApplyData` (`src/port/port_moddata.cpp`), called from `port_files.cpp` once `global_binary.sir` is converted; today it only handles `data\strings.json` |
-| Text of a new thing | `strings.json` changes existing numbers only, and part names are looked up by text-key hash: appending entries and their keys is needed |
-| The part itself | the `PartDef` table (`include/game/part.h`): 186 rows, none spare (180-185 are boss parts), so it has to be grown, and a save holds a row number in one byte (at most 254 rows); a `data\parts.json` would append records. Mods must not rely on a fixed index: saves store the part's index, so the port has to keep a stable mod part -> index mapping and cope with a mod that was removed |
-| Model, textures, icon | not investigated: how a part finds its model in `shared_parts.sir` and its icon in the UI data, and adding entries to those at load time (`port_files.cpp`, `sir_loader.cpp`) |
-| Always unlocked | not investigated: where the owned and discovered parts of a save are filled (`src/game/progress.cpp`); grant the part after a save is loaded or created |
+| `id` | letters, digits, `_` and `-`. The part's permanent key is `<mod folder>:<id>`: do not rename either |
+| `copy` | the vanilla part (0-185) it starts from, and what it looks like to a player without the mod |
+| `set` | columns to change, as above |
+| `names` | up to four names, one per tier; tiers without one keep the copied part's |
+| `data` | anything the port's own code for this part wants; the table patcher only passes it on |
+
+A new part is only a definition: this does not give it to the player, or give it a model or an icon. Code
+that does asks `include/port/port_modpatch.h` (`PortModPartIndex("Mod:head")`, `PortModPartAt`,
+`PortModPartData`).
+
+### Saves and `save.modparts`
+
+A save remembers a part as its row number, in one byte. So a modded part keeps its row for good, and the
+save format is unchanged: `save.modparts` in the save folder (next to the save) lists
+`row|vanilla row|mod:id`. A new part takes the next free row from 186 on; the line is only ever added, never
+changed or removed. Reordering mods, adding mods and removing mods therefore never moves a part.
+
+While a part's mod is off or gone, its row holds the vanilla part it was copied from: the player keeps the
+part, it behaves as that vanilla part, it is saved under its own number again, and it is the mod's part
+once the mod is back. Keep `save.modparts` with the saves when you move them. Without it a save with modded
+parts still loads (unknown rows show as vanilla part 0), but the parts can then be matched to the wrong mod.
+There is room for 69 modded parts per save folder (rows 186-254).
+
+Not covered by table patches: level part lists and zones, models and icons (they are not in the game
+database), and new text other than a part's names (`strings.json` changes existing strings).
 
 ## Testing
 
-`monsterlab.exe --selftest` checks the lookup, the load order, `mod.ini` and a mod's file opened through the
-game's own disc functions (no game data needed). `python tools/smoke.py` runs the menu with the sample mod
-and fails unless the game took its text and, with an extracted disc, its file.
+`monsterlab.exe --selftest` checks the lookup, the load order, `mod.ini`, a mod's file opened through the
+game's own disc functions, and table patches, added parts and `save.modparts` across adding, removing and
+reordering mods (no game data needed). `python tools/smoke.py` runs the menu with the sample mod
+and fails unless the game took its text, its new part and, with an extracted disc, its file.
 
 Do not share files of the game itself: a mod should hold only what you made or changed.

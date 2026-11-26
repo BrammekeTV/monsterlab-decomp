@@ -28,10 +28,10 @@ vertices follow); the hull's radius is 1.6 times the core's.
 
 The port's side is `src/port/port_mod_parts.cpp` (see also `docs/modding.md`, "Adding a part"):
 
-- **Definition.** The part table (table 22 of the game database, `PartDef`, 0x50 bytes, 186 rows) gets row
-  186: a copy of the row of a plain head of the player's disc, the "template" `p_hd_sha002` (row 73), with
-  model number 77. `PartAnimKey` builds the model key from the animation set and that number, so the key is
-  `p_hd_sha077` and every head animation is reused.
+- **Definition.** `patches/head.json` (written by `build_mod.py`) adds the part `BlackHoleHead:head` with a
+  table patch (docs/modding.md): a copy of the row of a plain head of the player's disc, the "template"
+  `p_hd_sha002` (row 73), with model number 77 and the four names. Its row (186 or later) is kept per save
+  folder in `save.modparts`.
 - **Model.** The level's part list (level header `+0x44`, entries `{users, name hash, object, zone}`, two per
   part: one per fighter) gets two entries for `p_hd_sha077_geoA` that name the template's zones (23 and 24 of
   `shared_parts.sir`). While the black hole is the part in use in such a zone, the port writes the mod's
@@ -41,8 +41,7 @@ The port's side is `src/port/port_mod_parts.cpp` (see also `docs/modding.md`, "A
 - **Names.** Four new text ids behind the game's string table; `TextIdFromHash` asks the port for keys it
   does not know.
 - **Owning it.** Not by default. With `PORT_MODPART_GIVE=1` (tests) a game whose inventory has no such part
-  gets one; that is off for players because the row number 186 is a stand-in and a part given now would be
-  written into their save. It comes on when the save-safe part ids are in.
+  gets one. The row number is save-safe now; switching the gift on for players is still to be done.
 
 What the model keeps of the template: its skeleton and animations, its material (lit, environment map, rim
 light), the matrix commands of its display list. The hull is drawn by that same material with the usual
@@ -74,13 +73,11 @@ game: that is what the put-back of the template's bytes is for.
   the two (template or mod) a zone must show, not only at the read.
 - 186 is fixed in two places: `PART_DEFS` in `src/game/battle_core.cpp` (stepping to the next part of
   the same limb: it never reaches row 186) and `fn_8020E438` (a name per row, with a fallback for
-  other rows). A save stores a part's row in one byte (0xFF = none), so row 186 fits. A save made with the
-  mod has a part of row 186: load it without the mod and that row does not exist.
+  other rows). A save stores a part's row in one byte (0xFF = none), so row 186 fits. Without the mod the
+  row of a saved black hole shows as the template head (`save.modparts`).
 
 ## What is left
 
-- **The row and the names** in `port_mod_parts.cpp` (`AddRow`, `AddNames`, `PortModPartsTextId`) are stand-ins:
-  the mod-support work replaces them with table patches from a mod file and save-safe part ids.
 - **Icon.** The two icon pictures are made, but the game still shows its placeholder: the icon is a section
   of `shared_texture.sir` found through the catalog, and the port cannot add a section yet.
 - **Map model.** No low-detail entry (`_lr`): on the exploration map the game falls back to head 001 and logs

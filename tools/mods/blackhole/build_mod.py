@@ -3,7 +3,8 @@
     python tools/mods/blackhole/make_assets.py
     python tools/mods/blackhole/build_mod.py [--assets DIR] [--out MODS_DIR]
 
-Writes MODS_DIR/BlackHoleHead/parts/p_hd_sha077.part (default MODS_DIR: build/pc/mods, never committed).
+Writes MODS_DIR/BlackHoleHead/parts/p_hd_sha077.part and patches/head.json (default MODS_DIR: build/pc/mods,
+never committed). The patch adds the part "BlackHoleHead:head": its row of the part table and its names.
 Needs numpy and Pillow. Nothing of the game is read and nothing of the game is in the pack: it holds this
 mod's own vertices, draw commands and pictures, and says where in the zone of a head of the player's own
 disc (the "template", p_hd_sha002) the port writes them when that zone is in memory for the black hole.
@@ -14,11 +15,11 @@ the matrix commands at the start of its display list and its one vertex colour.
 The .part file (little-endian; src/port/port_mod_parts.cpp reads it):
   "MLP1", u32 version (1)
   char key[32]                  model key (p_hd_sha077)
-  u32 templateRow, modelNumber  part definition row that is copied, the new row's model number
+  u32 templateRow, modelNumber  not read any more (patches/head.json)
   u32 templateHash              name hash of the template's model, as it stands in its zone
   u32 zone[2], zoneSize         the template's two zones of shared_parts.sir (one per fighter) and their size
   u32 defIdOffset               where the zone holds that hash
-  char name[4][48]              the names of the four tiers
+  char name[4][48]              not read any more (patches/head.json)
   u32 blockCount, then blocks {u32 kind, u32 offset, u32 size, data padded to 4 bytes}
      kind 0: bytes written at zone + offset (vertex arrays, draw commands and texture data, in the console's layout)
      kind 1: pairs {u32 where, u32 target}: the big-endian word at zone + where becomes the address of zone + target
@@ -163,6 +164,11 @@ def main():
     path = os.path.join(out, KEY + ".part")
     with open(path, "wb") as f:
         f.write(head + b"".join(blocks))
+    patches = os.path.join(a.out, "BlackHoleHead", "patches")
+    os.makedirs(patches, exist_ok=True)
+    with open(os.path.join(patches, "head.json"), "w") as f:
+        # a copy of the template's row; the byte at +0x4A is the model number of its name (p_hd_sha077)
+        json.dump({"parts": [{"id": "head", "copy": TEMPLATE_ROW, "set": {"@0x4A": MODEL_NUMBER}, "names": list(NAMES)}]}, f, indent=2)
     print("black hole head: %d vertices, %d strip vertices, %d bytes -> %s" % (n, count, os.path.getsize(path), path))
 
 
