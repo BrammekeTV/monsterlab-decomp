@@ -15,8 +15,10 @@ int z_inflate(void* strm, int flush);
 int z_inflateEnd(void* strm);
 }
 
-void* zcalloc(void* opaque, unsigned items, unsigned size);   // zl_zutil.cpp
-void  zcfree(void* opaque, void* ptr);
+// A stream's state comes from the port's fixed heap, so a savestate made while a packed section is being
+// read holds it.
+static void* ZAlloc(void* opaque, unsigned items, unsigned size) { (void)opaque; return PortHostAlloc(items * size); }
+static void  ZFree(void* opaque, void* ptr) { (void)opaque; PortHostFree(ptr); }
 
 namespace {
 struct ZStreamHead { const u8* nextIn; u32 availIn, totalIn; u8* nextOut; u32 availOut, totalOut; };   // z_stream, first six fields
@@ -28,7 +30,7 @@ s32 inflateInit_(void* strm, const char* version, s32 size) {
     PortFileInflateDrop(strm);
     // The game leaves zalloc/zfree/opaque at 0 (zlib's default allocator); built with Z_SOLO the caller supplies it.
     u32* w = (u32*)strm;
-    if (w[8] == 0) { w[8] = (u32)(uintptr_t)zcalloc; w[9] = (u32)(uintptr_t)zcfree; w[10] = 0; }
+    if (w[8] == 0) { w[8] = (u32)(uintptr_t)ZAlloc; w[9] = (u32)(uintptr_t)ZFree; w[10] = 0; }
     return z_inflateInit_(strm, version, size);
 }
 

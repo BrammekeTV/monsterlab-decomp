@@ -1,6 +1,8 @@
 """Headless playthrough test of the PC port: run it before opening a PR that changes gameplay.
 
     python tools/playthrough.py [--iso PATH] [--no-build] [--stop-after STAGE] [--seconds N] [--retries N] [--gpu]
+    python tools/playthrough.py --from STAGE [--stop-after STAGE]      (start at a stage, from a savestate)
+    python tools/playthrough.py --refresh                              (one full run that makes the savestates again)
     python tools/playthrough.py --list
     python tools/playthrough.py --check-log FILE          (judge a saved log, run nothing)
 
@@ -14,10 +16,15 @@ A stall (hang) fails the test; --retries N repeats a stalled run and names it in
 Prints one line per stage and a verdict; exits 0/1. The log is build/playthrough/run.log.
 Needs the game in orig/RM7P4F, MONSTERLAB_DATA or --iso PATH.
 
+Savestates (docs/savestates.md): a run from boot writes a state every 500 frames into build/pc/states and,
+at its end, keeps the one each stage needs (index.json lists them). --from STAGE loads the newest state
+before that stage and plays on from there with the same input: seconds instead of minutes. A state only
+loads into the exe that wrote it, so after a rebuild --from says so and asks for --refresh (or any full run).
+
 Adding a later stage: append a Stage to STAGES with the input it needs (absolute frame numbers)
 and one or more markers. See docs/playthrough.md.
 """
-import argparse, os, queue, re, shutil, subprocess, sys, threading, time
+import argparse, glob, json, os, queue, re, shutil, subprocess, sys, threading, time, zlib
 
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 PC = os.path.join(ROOT, "build", "pc")
@@ -27,6 +34,9 @@ EXE = os.path.join(OUT, "ml_playthrough.exe")
 LOG = os.path.join(OUT, "run.log")
 WIDTH, HEIGHT = 640, 360                              # small: headless runs draw in software (WARP)
 STALL = 90                                            # wall seconds without a new frame number
+STATES = os.path.join(PC, "states")                   # savestates of the last run from boot (never committed)
+INDEX = os.path.join(STATES, "index.json")
+STATE_EVERY = 500                                     # a run from boot writes a state every this many frames
 
 FRAME = re.compile(r"^\[script\] .*frame (\d+)\)|^\[state\] frame (\d+):")
 
@@ -145,11 +155,13 @@ STAGES = [
 
 
 class Judge:
-    """Reads log lines and tracks the stages. `failed` holds the reason once the run is lost."""
-    def __init__(self, stages):
-        self.stages, self.stage, self.frame = stages, 0, 0
-        self.missing = list(stages[0].markers)  # the current stage's markers not seen yet
-        self.done = []                          # frame at which each passed stage was complete
+    """Reads log lines and tracks the stages. `failed` holds the reason once the run is lost.
+    `skipped` stages were passed by the run that made the savestate this run starts from (their frames in `done`)."""
+    def __init__(self, stages, done=(), frame=0):
+        self.stages, self.stage, self.frame = stages, len(done), frame
+        self.skipped = len(done)
+        self.missing = list(stages[self.stage].markers)   # the current stage's markers not seen yet
+        self.done = list(done)                  # frame at which each passed stage was complete
         self.failed = None
         self.tail = []                          # the last lines that are not script trace
 
@@ -185,7 +197,9 @@ class Judge:
 
     def report(self, why, seconds, note=""):
         for i, st in enumerate(self.stages):
-            if i < len(self.done):
+            if i < self.skipped:
+                print(f"  (ok)  {st.key:9} frame {self.done[i]:>6}  {st.what}  [in the savestate]")
+            elif i < len(self.done):
                 print(f"  PASS  {st.key:9} frame {self.done[i]:>6}  {st.what}")
             elif i == len(self.done):
                 print(f"  FAIL  {st.key:9} {'':12}  {st.what}")
@@ -227,14 +241,84 @@ def build():
     return True
 
 
-def run(stages, iso, seconds, gpu=False):
-    judge = Judge(stages)
+def exe_build(path=None):
+    """The exe's identity as a savestate records it: the CRC-32 of the file, and when it was linked."""
+    with open(path or os.path.join(PC, "monsterlab.exe"), "rb") as f:
+        data = f.read()
+    pe = int.from_bytes(data[0x3C:0x40], "little")
+    stamp = int.from_bytes(data[pe + 8:pe + 12], "little")
+    return f"{zlib.crc32(data) & 0xFFFFFFFF:08X}", time.strftime("%Y-%m-%d %H:%M:%S", time.localtime(stamp))
+
+
+def read_index():
+    try:
+        with open(INDEX, encoding="utf-8") as f:
+            return json.load(f)
+    except (OSError, ValueError):
+        return None
+
+
+def state_for(stages, first):
+    """The savestate to start stage number `first` from -> (path, frame, frames the earlier stages passed at),
+    or a message that says why there is none."""
+    index = read_index()
+    build, built = exe_build()
+    if not index:
+        return f"no savestates in {os.path.relpath(STATES, ROOT)}: run `python tools/playthrough.py --refresh` once (a full run)"
+    if index.get("build") != build:
+        return (f"the savestates are older than this build: they were made by build {index.get('build')} (linked {index.get('built')}), "
+                f"the exe is build {build} (linked {built}). A state only loads into the exe that wrote it: "
+                f"run `python tools/playthrough.py --refresh` (a full run)")
+    done = []
+    for st in stages[:first]:
+        if st.key not in index["done"]:
+            return (f"the run that made the savestates did not pass stage '{st.key}', so there is no state to start "
+                    f"'{stages[first].key}' from: fix that stage first, or start at an earlier one")
+        done.append(index["done"][st.key])
+    frames = [f for f in index["states"] if f <= done[-1]]
+    if not frames:
+        return f"no savestate before stage '{stages[first].key}' (it starts at frame {done[-1]})"
+    path = os.path.join(STATES, f"f{max(frames):06d}.mlst")
+    if not os.path.exists(path):
+        return f"{os.path.relpath(path, ROOT)} is gone: run `python tools/playthrough.py --refresh`"
+    return path, max(frames), done
+
+
+def write_index(stages, judge):
+    """After a run from boot: keep, for every stage, the newest state before it started; list them."""
+    build, built = exe_build(EXE)                             # the copy that ran: build/pc may have been rebuilt meanwhile
+    done = {st.key: judge.done[i] for i, st in enumerate(stages) if i < len(judge.done)}
+    have = sorted(int(os.path.basename(p)[1:7]) for p in glob.glob(os.path.join(STATES, "f??????.mlst")))
+    keep = set()
+    for frame in list(done.values()) + [judge.frame]:        # the last one: where a failed stage can be tried again from
+        before = [f for f in have if f <= frame]
+        if before:
+            keep.add(max(before))
+    for f in have:
+        if f not in keep:
+            os.remove(os.path.join(STATES, f"f{f:06d}.mlst"))
+    with open(INDEX, "w", encoding="utf-8") as f:
+        json.dump({"build": build, "built": built, "made": time.strftime("%Y-%m-%d %H:%M:%S"),
+                   "done": done, "states": sorted(keep)}, f, indent=1)
+
+
+def run(stages, iso, seconds, gpu=False, start=None):
+    """start: (state file, its frame, frames the stages before passed at) to go on from a savestate; None plays from boot
+    and writes the savestates."""
+    judge = Judge(stages, start[2], start[1]) if start else Judge(stages)
     os.makedirs(OUT, exist_ok=True)
     shutil.rmtree(os.path.join(OUT, "save"), ignore_errors=True)    # a save would add "Continue" and move the menu
     shutil.copy2(os.path.join(PC, "monsterlab.exe"), EXE)
     shutil.copy2(os.path.join(PC, "monsterlab.map"), os.path.splitext(EXE)[0] + ".map")   # names in crash reports
     cmd = [EXE, "--to-menu", "--fast", "--no-audio", "--no-movies", "--no-ini", "--no-mods",
            "--res", f"{WIDTH}x{HEIGHT}", "--frames", str(stages[-1].deadline + 1), "--seconds", str(seconds)]
+    if start:
+        cmd += ["--load-state", start[0]]
+    else:
+        shutil.rmtree(STATES, ignore_errors=True)                   # states of an older build are of no use
+        os.makedirs(STATES)
+        for frame in range(STATE_EVERY, stages[-1].deadline, STATE_EVERY):
+            cmd += ["--save-state", os.path.join(STATES, f"f{frame:06d}.mlst") + f"@{frame}"]
     for st in stages:
         for p in st.press:
             cmd += ["--press", p]
@@ -291,6 +375,8 @@ def run(stages, iso, seconds, gpu=False):
         why = judge.failed or "markers not seen before the frame limit"
     elif not judge.finished and why is None:
         why = judge.failed or f"the game ended early with exit code {code} (no crash report: killed, or MSVC's stack check)"
+    if not start:
+        write_index(stages, judge)
     return judge, why
 
 
@@ -302,6 +388,8 @@ def main():
     ap.add_argument("--seconds", type=int, default=1500, help="wall-clock limit of the game run (default 1500)")
     ap.add_argument("--retries", type=int, default=0, help="runs to repeat after a stall (default 0; crashes are never retried)")
     ap.add_argument("--gpu", action="store_true", help="draw on the graphics card; only for problems that need it (parallel runs can crash the driver)")
+    ap.add_argument("--from", dest="start", metavar="STAGE", help="start at this stage from a savestate of the last full run (build/pc/states)")
+    ap.add_argument("--refresh", action="store_true", help="play from boot and make the savestates again (what a run without --from does anyway)")
     ap.add_argument("--list", action="store_true", help="list the stages")
     ap.add_argument("--check-log", metavar="FILE", help="judge a saved log instead of running the game")
     a = ap.parse_args()
@@ -329,7 +417,18 @@ def main():
         print(f"PLAYTHROUGH FAIL: {len(stubs)} game function(s) linked as stubs (build/pc/port_link.txt):\n    "
               + "\n    ".join(stubs[:15]))
         return 1
-    judge, why = run(stages, a.iso, a.seconds, a.gpu)
+    start = None
+    if a.start and not a.refresh:
+        keys = [s.key for s in stages]
+        if a.start not in keys:
+            ap.error(f"unknown stage {a.start}; stages: {', '.join(keys)}")
+        if keys.index(a.start) > 0:
+            start = state_for(stages, keys.index(a.start))
+            if isinstance(start, str):
+                print(f"PLAYTHROUGH FAIL: {start}")
+                return 1
+            print(f"  from the savestate of frame {start[1]} ({os.path.relpath(start[0], ROOT)})", flush=True)
+    judge, why = run(stages, a.iso, a.seconds, a.gpu, start)
     note = ""
     for n in range(a.retries):
         if not (why and why.startswith("stalled")):
@@ -338,7 +437,7 @@ def main():
         shutil.copy2(LOG, kept)
         note = f"; NOTE: the first run hung at frame {judge.frame} ({os.path.relpath(kept, ROOT)}), this is a retry"
         print(f"  {why} at frame {judge.frame}; retrying", flush=True)
-        judge, why = run(stages, a.iso, a.seconds, a.gpu)
+        judge, why = run(stages, a.iso, a.seconds, a.gpu, start)
     code = judge.report(why, time.time() - t0, note)
     if code:
         print(f"    full log: {os.path.relpath(LOG, ROOT)}")

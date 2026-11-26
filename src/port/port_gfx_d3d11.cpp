@@ -96,6 +96,7 @@ static struct { s64 renderTicks; u32 draws, verts, copies; } sFrame;
 static inline s64 Ticks_freq(void) { LARGE_INTEGER f; QueryPerformanceFrequency(&f); return f.QuadPart; }
 static inline s64 Ticks(void) { LARGE_INTEGER t; QueryPerformanceCounter(&t); return t.QuadPart; }
 static u8 sTlutMem[0x80000];           // the palette half of the console's texture memory
+static struct TlutStateHook { TlutStateHook() { PortStateBlob("tlut", sTlutMem, sizeof(sTlutMem)); } } sTlutStateHook;   // part of a savestate
 
 struct Vtx { f32 pos[4]; f32 col[2][4]; f32 tc[8][3]; };
 static u32  sTraceFrom;
@@ -2315,4 +2316,104 @@ const char* PortGfxStatsText(char* buf, u32 n) {
              sTotalDraw / (double)Ticks_freq(), sTotalCopy / (double)Ticks_freq(), sFastSkipped);
     return buf;
 }
+// ------------------------------------------------------------------ savestates (port_state.cpp)
+// What the renderer holds that the next frame is made from: the frame buffer's picture (a game that does not
+// clear it draws over the last frame) and the frame-buffer copies (feedback effects read the last frame's).
+// Textures, shaders and buffers are made again when used. The depth buffer is not kept: the game clears it.
+static bool ReadTexture(ID3D11Texture2D* t, std::vector<u8>& out, u32* w, u32* h) {
+    D3D11_TEXTURE2D_DESC d;
+    t->GetDesc(&d);
+    if (d.Format != DXGI_FORMAT_R8G8B8A8_UNORM || d.SampleDesc.Count != 1) return false;
+    D3D11_TEXTURE2D_DESC sd = d;
+    sd.Usage = D3D11_USAGE_STAGING; sd.BindFlags = 0; sd.CPUAccessFlags = D3D11_CPU_ACCESS_READ; sd.MiscFlags = 0;
+    ID3D11Texture2D* st = NULL;
+    if (FAILED(sDev->CreateTexture2D(&sd, NULL, &st))) return false;
+    sCtx->CopyResource(st, t);
+    D3D11_MAPPED_SUBRESOURCE m;
+    if (FAILED(sCtx->Map(st, 0, D3D11_MAP_READ, 0, &m))) { st->Release(); return false; }
+    size_t at = out.size();
+    out.resize(at + (size_t)d.Width * d.Height * 4);
+    for (u32 y = 0; y < d.Height; y++) memcpy(&out[at + (size_t)y * d.Width * 4], (const u8*)m.pData + (size_t)y * m.RowPitch, (size_t)d.Width * 4);
+    sCtx->Unmap(st, 0);
+    st->Release();
+    *w = d.Width; *h = d.Height;
+    return true;
+}
+static void Put32(std::vector<u8>& out, u32 v) { out.insert(out.end(), (u8*)&v, (u8*)&v + 4); }
+
+// The block a state stores (malloc'd; 0 when no renderer runs).
+u32 PortGfxStateSave(u8** block) {
+    *block = NULL;
+    if (!sStarted || !sDev) return 0;
+    std::lock_guard<std::recursive_mutex> lk(sGfxLock);
+    FlushDraws();
+    std::vector<u8> out;
+    Put32(out, 0x31584647);                                  // "GFX1"
+    Put32(out, sEfbPw); Put32(out, sEfbPh); Put32(out, sEfbMs ? 1 : 0); Put32(out, sShownLines);
+    u32 w = 0, h = 0;
+    if (sEfbMs || !ReadTexture(sEfbTex, out, &w, &h)) out.resize(out.size() + (size_t)sEfbPw * sEfbPh * 4);
+    size_t countAt = out.size();
+    Put32(out, 0);
+    u32 count = 0;
+    for (auto& e : sEfbCopies) {
+        if (!e.second) continue;
+        ID3D11Resource* res = NULL;
+        e.second->GetResource(&res);
+        ID3D11Texture2D* t = NULL;
+        if (res) { res->QueryInterface(__uuidof(ID3D11Texture2D), (void**)&t); res->Release(); }
+        if (!t) continue;
+        D3D11_TEXTURE2D_DESC d;
+        t->GetDesc(&d);
+        auto rb = sEfbCopyRowBytes.find(e.first);
+        size_t head = out.size();
+        Put32(out, e.first); Put32(out, rb != sEfbCopyRowBytes.end() ? rb->second : 0); Put32(out, d.Width); Put32(out, d.Height);
+        if (ReadTexture(t, out, &w, &h)) count++; else out.resize(head);
+        t->Release();
+    }
+    memcpy(&out[countAt], &count, 4);
+    *block = (u8*)malloc(out.size());
+    if (!*block) return 0;
+    memcpy(*block, out.data(), out.size());
+    return (u32)out.size();
+}
+
+void PortGfxStateLoad(const u8* p, u32 n) {
+    if (!sStarted || !sDev || n < 24) return;
+    std::lock_guard<std::recursive_mutex> lk(sGfxLock);
+    const u32* hd = (const u32*)p;
+    if (hd[0] != 0x31584647) return;
+    if (hd[1] != sEfbPw || hd[2] != sEfbPh || hd[3] != (sEfbMs ? 1u : 0u)) {
+        PortLog("state: the pictures in the state are %ux%u%s, this run draws %ux%u%s: the first frames are drawn without the last frame's pictures",
+                hd[1], hd[2], hd[3] ? " multisampled" : "", sEfbPw, sEfbPh, sEfbMs ? " multisampled" : "");
+        return;
+    }
+    sShownLines = hd[4];
+    const u8* q = p + 20;
+    const u8* end = p + n;
+    size_t efbBytes = (size_t)sEfbPw * sEfbPh * 4;
+    if (q + efbBytes + 4 > end) return;
+    if (!sEfbMs) sCtx->UpdateSubresource(sEfbTex, 0, NULL, q, sEfbPw * 4, 0);
+    q += efbBytes;
+    u32 count; memcpy(&count, q, 4); q += 4;
+    for (u32 i = 0; i < count && q + 16 <= end; i++) {
+        u32 rec[4]; memcpy(rec, q, 16); q += 16;
+        size_t bytes = (size_t)rec[2] * rec[3] * 4;
+        if (q + bytes > end) return;
+        D3D11_TEXTURE2D_DESC d = {};
+        d.Width = rec[2]; d.Height = rec[3]; d.MipLevels = 1; d.ArraySize = 1; d.Format = DXGI_FORMAT_R8G8B8A8_UNORM;
+        d.SampleDesc.Count = 1; d.BindFlags = D3D11_BIND_SHADER_RESOURCE | D3D11_BIND_RENDER_TARGET;
+        D3D11_SUBRESOURCE_DATA init = {q, rec[2] * 4, 0};
+        ID3D11Texture2D* t = NULL;
+        if (SUCCEEDED(sDev->CreateTexture2D(&d, &init, &t))) {
+            ID3D11ShaderResourceView*& slot = sEfbCopies[rec[0]];
+            if (slot) slot->Release();
+            slot = NULL;
+            sDev->CreateShaderResourceView(t, NULL, &slot);
+            t->Release();
+            if (rec[1]) sEfbCopyRowBytes[rec[0]] = rec[1];
+        }
+        q += bytes;
+    }
+}
+
 #endif

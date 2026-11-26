@@ -505,6 +505,8 @@ typedef struct LevelZoneDone {
     u32   capacity;
 } LevelZoneDone;
 void LevelZoneDoneFree(LevelZoneDone* done);
+// The heap the conversion's object lists (LevelZoneDone among them) come from; malloc and free unless set.
+void SirLoaderSetAllocator(void* (*alloc)(size_t), void (*release)(void*));
 
 // Zone 0's image, already converted, for the conversion of another zone: the records and
 // definitions of that zone's entities, and every zone's record, lie in zone 0.

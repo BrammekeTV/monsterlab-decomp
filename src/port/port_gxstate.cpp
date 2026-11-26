@@ -15,6 +15,8 @@
 #include "port/port_gx.h"
 #include "revolution.h"
 
+PORT_SAVED_BEGIN   // the emulated console state of this file goes into a savestate (docs/savestates.md)
+
 extern "C" {
 void PortGxWrite8(u8 v);
 void PortGxWrite16(u16 v);
@@ -703,4 +705,6 @@ void C_MTXOrtho(f32* m, f32 t, f32 b, f32 l, f32 r, f32 n, f32 f) {
 }
 
 }  // extern "C"
+PORT_SAVED_END
+
 #endif

@@ -20,6 +20,29 @@ are running on the same machine.
 Leave the rendering in software: parallel runs on the graphics card can crash the display driver. `--gpu` is only for
 problems that need the card.
 
+## Starting in the middle: savestates
+
+A run from boot writes a savestate every 500 frames into `build/pc/states` and keeps, at its end, the newest one before
+each stage (`index.json` lists them and the frame each stage passed at). Then:
+
+```powershell
+python tools/playthrough.py --from name                      # load the state before 'name', play to the end
+python tools/playthrough.py --from attack --stop-after won    # only the first fight
+```
+
+The stages before the one named are shown as `(ok) ... [in the savestate]`. The run gets the same input list as a full run,
+so from the state on it is the same run: unpaced runs repeat exactly (`docs/savestates.md`).
+
+A state only loads into the exe that wrote it. After a rebuild `--from` stops with
+
+```
+PLAYTHROUGH FAIL: the savestates are older than this build: they were made by build 0DA8704A (linked ...), the exe is build ...
+```
+
+and `python tools/playthrough.py --refresh` (a full run; any run without `--from` does the same) makes them again. Use
+`--from` while you work out a stage's input and markers or repeat a test; run the whole test with the final exe before the PR.
+The states are 10 to 27 MB each (a full run writes about 60 and keeps under 20) and are never committed (`build/` is ignored).
+
 ## What it checks
 
 First the link report: any game function linked as a stub (`build/pc/port_link.txt`) fails the test before the game

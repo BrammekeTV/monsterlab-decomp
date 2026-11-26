@@ -23,6 +23,23 @@ static_assert(sizeof(void*) == 4, "build for 32-bit (cmake -A Win32); see README
 // (string, texture, buffer). Pointer-sized so a 64-bit build does not truncate it.
 typedef intptr_t ScriptValue;
 
+// PC port savestates (docs/savestates.md): the statics of every source that does not include port/port.h
+// (the decompiled game code) go into two sections of their own, which a state saves and restores whole.
+// Globals moved to their original address (ORIG) live in the mapped Wii memory and are saved with it.
+#if defined(_MSC_VER) && defined(_M_IX86)
+#pragma bss_seg(".savb")
+#pragma data_seg(".savd")
+#endif
+
+// rand() and srand() are the original's: one generator for the whole game with its state in game memory
+// (0x805FAE38; src/port/port_msl.cpp). The C runtime's keeps a state per thread, outside what a savestate holds,
+// and its sequence differs. A macro, because the C runtime's own names cannot be defined again.
+#include <stdlib.h>   // first: the macros below must not rename the C runtime's own declarations
+extern "C" int  PortRand(void);
+extern "C" void PortSrand(unsigned int seed);
+#define rand  PortRand
+#define srand PortSrand
+
 #ifndef TRUE
 #define TRUE 1
 #define FALSE 0

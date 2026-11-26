@@ -288,4 +288,6 @@ void* fn_802BE160(s32 size, s32 unused) {
 void fn_802BE220(void* p) { if (p) fn_80330E20(p); }
 
 }  // extern "C"
+BOOL PortBinkPlaying(void) { return gPlaying != nullptr; }
+
 #endif
