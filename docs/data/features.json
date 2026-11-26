@@ -99,6 +99,11 @@
  "changelog": [
   {
    "date": "2026-11-26",
+   "time": "10:14",
+   "text": "New lighting option, on by default: lit 3D scenes are no longer clipped to white, so the overexposed professor talk looks natural; the original look stays selectable in F1 (PR #268). The scientist name entry's letter keys now respond to the pointer (PR #271)."
+  },
+  {
+   "date": "2026-11-26",
    "time": "09:43",
    "text": "The settings screen (F1) has a Dump textures switch with a folder setting, so textures can be dumped at any moment (PR #266). Texture packs load in the background, so big packs no longer stall the game (PR #267)."
   },

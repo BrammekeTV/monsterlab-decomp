@@ -144,7 +144,13 @@ STAGES = [
           [call("EnterName_Init", 28500), call("MPNameInput", 28500),
            state("name entry HUD state", r"hud machine 96773521 \(depth 1\) state 20 ", 28500)],
           press=("A@29000-29900/150",), pointer=("960,1040@28900",)),
-    # Later stages go here (a deadline after 30200, frames counted from the run's start).
+    # The letter keys are the cells of a grid widget: point at one, A types it. Then the green tick confirms.
+    Stage("named", "type a name on the letter keys, confirm, Fuseless's welcome", 31300,
+          [call("EnterName_AddLetter", 30300), call("EnterName_SaveNameToPlayerName", 30700),
+           call("EnterName_Destroy", 30700), call("StartConversationID", 30800)],
+          press=("A@30400", "A@30600", "A@30850"),
+          pointer=("445,325@30300", "520,325@30500", "1370,880@30750")),
+    # Later stages go here (a deadline after 31300, frames counted from the run's start).
 ]
 
 

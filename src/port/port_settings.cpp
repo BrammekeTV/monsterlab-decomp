@@ -79,6 +79,9 @@ BOOL PortSettingsLoad(const char* path, PortSettings* s) {
             else if (!strcmp(key, "texture_filter")) {
                 for (int k = 0; k < PORT_FILTER_COUNT; k++) if (!_stricmp(val, kPortFilterNames[k])) s->texFilter = k;
             }
+        } else if (!strcmp(section, "graphics")) {
+            if (!strcmp(key, "lighting")) s->lighting = !_stricmp(val, "original") ? PORT_LIGHTING_ORIGINAL : PORT_LIGHTING_IMPROVED;
+            else if (!strcmp(key, "exposure")) s->exposure = Clamp(atoi(val), 50, 150);
         } else if (!strcmp(section, "mods")) {
             PortModsAdd(key, atoi(val) != 0);                  // the order of the lines is the load order
         } else if (!strcmp(section, "textures")) {
@@ -121,6 +124,8 @@ BOOL PortSettingsSave(const char* path, const PortSettings* s) {
     snprintf(cap, sizeof(cap), "%d", s->fpsCap);
     fprintf(f, "; fps_cap: off (a picture per game frame), 30, 60, 120, 144 or any rate, display (the monitor's rate), uncapped\nfps_cap = %s\n\n",
             s->fpsCap > 0 ? cap : s->fpsCap == PORT_FPS_UNCAPPED ? "uncapped" : s->fpsCap == PORT_FPS_DISPLAY ? "display" : "off");
+    fprintf(f, "[graphics]\n; lighting: improved (lit 3D draws without early clipping, tone-mapped) or original (exactly as the Wii)\nlighting = %s\n"
+               "; exposure: improved lighting only, percent (50-150)\nexposure = %d\n\n", s->lighting == PORT_LIGHTING_ORIGINAL ? "original" : "improved", s->exposure);
     if (s->gamePath[0]) fprintf(f, "; your Monster Lab disc image (.iso, .wbfs, .rvz) or extracted folder\n[game]\npath = %s\n\n", s->gamePath);
     fprintf(f, "[audio]\nvolume = %d\nmute = %d\n; remote_speaker: also play the sounds the console sends to the Wii Remote's speaker\nremote_speaker = %d\n\n", s->volume, s->mute ? 1 : 0, s->remoteSpeaker ? 1 : 0);
     fprintf(f, "; dump: save every texture the game draws with as a PNG; folder: where (empty: dump\\textures next to the exe)\n[textures]\ndump = %d\nfolder = %s\n\n", s->dumpTextures ? 1 : 0, s->dumpDir);
@@ -147,7 +152,7 @@ int PortSelfTestSettings(void) {
 
     PortSettings want = {};
     want.width = 2560; want.height = 1440; want.wide = FALSE; want.stretchUi = TRUE; want.vsync = TRUE; want.fullscreen = TRUE;
-    want.volume = 37; want.mute = TRUE; want.renderScale = 150; want.texFilter = PORT_FILTER_AF8; want.fpsCap = PORT_FPS_UNCAPPED; want.msaa = 4; want.remoteSpeaker = FALSE;
+    want.volume = 37; want.mute = TRUE; want.renderScale = 150; want.texFilter = PORT_FILTER_AF8; want.fpsCap = PORT_FPS_UNCAPPED; want.msaa = 4; want.remoteSpeaker = FALSE; want.lighting = PORT_LIGHTING_ORIGINAL; want.exposure = 120;
     strcpy(want.gamePath, "D:\\My games\\Monster Lab (disc).iso");
     want.dumpTextures = TRUE;
     strcpy(want.dumpDir, "D:\\My dumps");
@@ -156,11 +161,12 @@ int PortSelfTestSettings(void) {
     if (!PortSettingsSave(path, &want)) { PortLog("selftest settings: cannot write %s", path); fails++; }
     memcpy(gPortBindings, keep, sizeof(PortBinding) * count);
 
-    PortSettings got = {1920, 1080, TRUE, FALSE, FALSE, FALSE, 100, FALSE, "", 100, PORT_FILTER_GAME, 0, 0, TRUE};
+    PortSettings got = {1920, 1080, TRUE, FALSE, FALSE, FALSE, 100, FALSE, "", 100, PORT_FILTER_GAME, 0, 0, TRUE, FALSE, FALSE, "", PORT_LIGHTING_IMPROVED, 100};
     if (!fails && !PortSettingsLoad(path, &got)) { PortLog("selftest settings: cannot read %s", path); fails++; }
     if (!fails) {
         if (got.width != want.width || got.height != want.height || got.wide != want.wide || got.stretchUi != want.stretchUi ||
-            got.vsync != want.vsync || got.fullscreen != want.fullscreen || got.volume != want.volume || got.mute != want.mute || got.renderScale != want.renderScale || got.texFilter != want.texFilter || got.fpsCap != want.fpsCap || got.msaa != want.msaa || got.remoteSpeaker != want.remoteSpeaker || strcmp(got.gamePath, want.gamePath) || got.dumpTextures != want.dumpTextures || strcmp(got.dumpDir, want.dumpDir)) {
+            got.vsync != want.vsync || got.fullscreen != want.fullscreen || got.volume != want.volume || got.mute != want.mute || got.renderScale != want.renderScale || got.texFilter != want.texFilter || got.fpsCap != want.fpsCap || got.msaa != want.msaa || got.remoteSpeaker != want.remoteSpeaker || strcmp(got.gamePath, want.gamePath) || got.dumpTextures != want.dumpTextures || strcmp(got.dumpDir, want.dumpDir) ||
+            got.lighting != want.lighting || got.exposure != want.exposure) {
             PortLog("selftest settings: read back %dx%d wide %d stretch %d vsync %d fullscreen %d volume %d mute %d",
                     got.width, got.height, got.wide, got.stretchUi, got.vsync, got.fullscreen, got.volume, got.mute);
             fails++;
