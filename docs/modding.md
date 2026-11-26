@@ -110,6 +110,16 @@ DDS files from other tools (for example `texconv`) work too. Accepted: a 2D text
 are (none are made for a DDS, whatever the filter setting). sRGB variants are read as plain ones. BC7
 needs a Direct3D 11 graphics card.
 
+### Big packs
+
+The files are read and unpacked in the background, so the game does not stop while a pack loads: a texture
+shows the game's own picture for the moment it takes to read its replacement. What has been read is kept in
+memory (up to 256 MB, the longest unused goes first), and from the start of the game the pack is read
+ahead until that is nearly full. At most about 24 MB of new pictures are handed to the graphics
+card per frame. DDS files are by far the quickest to read, since nothing has to be unpacked.
+
+A file edited while the game runs is read again after **Look again** on the Mods page.
+
 With `--verbose` the log says `mods: texture <hash> comes from <mod>` the first time a replacement is
 used. A replacement found by name is logged as `mods: texture <name> (<hash>) comes from <mod> by name`. A PNG or DDS that cannot be read is reported and the game's own texture is drawn.
 

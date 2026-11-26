@@ -8,6 +8,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <deque>
 #include <map>
 #include <set>
 #include <string>
@@ -256,7 +257,184 @@ static void TexTree(const PortMod* m, const char* dir, BOOL add, std::set<std::s
     FindClose(h);
 }
 
+// ---- reading the files ----
+// A pack can hold hundreds of large pictures, so they are read and unpacked by worker threads, never by the
+// renderer: it draws the game's own texture until the replacement is there. What was read stays in memory up
+// to a budget (the one used longest ago goes first), so a level that comes back costs no reading, and from
+// the first texture the game draws the pack is read ahead until the budget is near.
+#define TEX_CACHE_BYTES (256u << 20)           // a 32-bit process has no room for much more
+#define TEX_AHEAD_BYTES (TEX_CACHE_BYTES / 4 * 3)
+
+enum { LOAD_QUEUED, LOAD_BUSY, LOAD_READY, LOAD_FAILED };
+struct Loaded {
+    int state = LOAD_QUEUED;
+    PortModImage im = {};
+    const char* why = NULL;
+    u32 bytes = 0;
+    u64 used = 0;
+};
+struct Loader {
+    SRWLOCK lock = SRWLOCK_INIT;
+    CONDITION_VARIABLE wake = CONDITION_VARIABLE_INIT;
+    std::map<std::string, Loaded> cache;       // by file path
+    std::deque<std::string> wanted, ahead;     // asked for by the renderer; read ahead when there is nothing else
+    u32 bytes = 0, epoch = 0;                  // epoch: the table was rebuilt, what is being read is thrown away
+    u64 clock = 0;
+    BOOL started = FALSE, aheadDone = FALSE;
+};
+static Loader& Load(void) { static Loader* l = new Loader; return *l; }
+
+// The smaller levels of a PNG (2x2 box), after the picture itself, so the renderer has nothing to compute.
+static void AddMips(PortModImage* im) {
+    u32 levels = 1, total = 0;
+    while (levels < 16 && ((im->w >> levels) || (im->h >> levels))) levels++;
+    for (u32 i = 0; i < levels; i++) total += PortModLevelBytes(0, im->w, im->h, i, NULL);
+    u8* data = (u8*)realloc(im->data, total);
+    if (!data) return;                         // the picture alone
+    im->data = data;
+    u32 *src = (u32*)data, sw = im->w, sh = im->h;
+    for (u32 level = 1; level < levels; level++) {
+        u32 nw = sw > 1 ? sw / 2 : 1, nh = sh > 1 ? sh / 2 : 1;
+        u32* dst = src + (size_t)sw * sh;
+        for (u32 y = 0; y < nh; y++) {
+            const u32* top = src + (size_t)(y * 2 < sh ? y * 2 : sh - 1) * sw;
+            const u32* bottom = src + (size_t)(y * 2 + 1 < sh ? y * 2 + 1 : sh - 1) * sw;
+            for (u32 x = 0; x < nw; x++) {
+                u32 x0 = x * 2 < sw ? x * 2 : sw - 1, x1 = x * 2 + 1 < sw ? x * 2 + 1 : sw - 1;
+                u32 a = top[x0], b = top[x1], c = bottom[x0], d = bottom[x1];
+                u32 even = ((a & 0x00FF00FF) + (b & 0x00FF00FF) + (c & 0x00FF00FF) + (d & 0x00FF00FF) + 0x00020002) >> 2 & 0x00FF00FF;
+                u32 odd = ((a >> 8 & 0x00FF00FF) + (b >> 8 & 0x00FF00FF) + (c >> 8 & 0x00FF00FF) + (d >> 8 & 0x00FF00FF) + 0x00020002) >> 2 & 0x00FF00FF;
+                dst[(size_t)y * nw + x] = even | odd << 8;
+            }
+        }
+        src = dst; sw = nw; sh = nh;
+    }
+    im->levels = levels;
+}
+
+static BOOL ReadImage(const char* path, PortModImage* im, const char** why) {
+    memset(im, 0, sizeof(*im));
+    if (IsExt(path, ".dds")) return PortDdsRead(path, im, why);
+    im->data = (u8*)PortPngRead(path, &im->w, &im->h, why);
+    if (!im->data) return FALSE;
+    im->levels = 1;
+    AddMips(im);
+    return TRUE;
+}
+
+static u32 ImageBytes(const PortModImage* im) {
+    u32 total = 0;
+    for (u32 i = 0; i < im->levels; i++) total += PortModLevelBytes(im->dxgi, im->w, im->h, i, NULL);
+    return total;
+}
+
+static DWORD WINAPI LoadThread(void*) {
+    Loader& l = Load();
+    AcquireSRWLockExclusive(&l.lock);
+    for (;;) {
+        std::string path;
+        if (!l.wanted.empty()) { path = l.wanted.front(); l.wanted.pop_front(); }
+        else if (!l.ahead.empty() && l.bytes < TEX_AHEAD_BYTES) { path = l.ahead.front(); l.ahead.pop_front(); l.cache[path]; }
+        else { SleepConditionVariableSRW(&l.wake, &l.lock, INFINITE, 0); continue; }
+        auto it = l.cache.find(path);
+        if (it == l.cache.end() || it->second.state != LOAD_QUEUED) continue;     // read already, or thrown away
+        it->second.state = LOAD_BUSY;
+        u32 epoch = l.epoch;
+        ReleaseSRWLockExclusive(&l.lock);
+        PortModImage im;
+        const char* why = NULL;
+        BOOL ok = ReadImage(path.c_str(), &im, &why);
+        AcquireSRWLockExclusive(&l.lock);
+        it = l.cache.find(path);
+        if (epoch != l.epoch || it == l.cache.end() || it->second.state != LOAD_BUSY) { free(im.data); continue; }
+        Loaded& e = it->second;
+        e.state = ok ? LOAD_READY : LOAD_FAILED;
+        e.im = im;
+        e.why = why;
+        e.bytes = ok ? ImageBytes(&im) : 0;
+        e.used = ++l.clock;
+        l.bytes += e.bytes;
+    }
+}
+
+// Empties the cache: the mods changed, or their files may have.
+static void ForgetLoaded(void) {
+    Loader& l = Load();
+    AcquireSRWLockExclusive(&l.lock);
+    for (auto& e : l.cache) free(e.second.im.data);
+    l.cache.clear();
+    l.wanted.clear();
+    l.ahead.clear();
+    l.bytes = 0;
+    l.epoch++;
+    l.aheadDone = FALSE;
+    ReleaseSRWLockExclusive(&l.lock);
+}
+
+// Starts the workers, and has them read the pack ahead: at the first texture the game draws after the mods
+// were (re)read, so what is needed later is mostly there already.
+static void ReadAhead(void) {
+    Loader& l = Load();
+    AcquireSRWLockExclusive(&l.lock);
+    if (!l.started) {
+        l.started = TRUE;
+        SYSTEM_INFO si;
+        GetSystemInfo(&si);
+        u32 threads = si.dwNumberOfProcessors >= 8 ? 3 : si.dwNumberOfProcessors > 2 ? 2 : 1;
+        for (u32 i = 0; i < threads; i++) {
+            HANDLE t = CreateThread(NULL, 0, LoadThread, NULL, 0, NULL);
+            if (t) CloseHandle(t);
+        }
+    }
+    if (!l.aheadDone) {
+        l.aheadDone = TRUE;
+        for (auto& f : Tex().byName) l.ahead.push_back(f.second);
+        for (auto& f : sTexFiles) l.ahead.push_back(f.second);
+        WakeAllConditionVariable(&l.wake);
+    }
+    ReleaseSRWLockExclusive(&l.lock);
+}
+
+// The state of a file, queued for reading if it is new. Only the renderer's thread calls this, and only here
+// are pictures dropped, so the one handed out stays until the next call.
+static int Request(const std::string& path, const PortModImage** image, const char** why) {
+    Loader& l = Load();
+    AcquireSRWLockExclusive(&l.lock);
+    int state;
+    auto it = l.cache.find(path);
+    if (it == l.cache.end()) {
+        l.cache[path];
+        l.wanted.push_back(path);
+        state = LOAD_QUEUED;
+    } else {
+        Loaded& e = it->second;
+        state = e.state;
+        if (state == LOAD_READY) {
+            e.used = ++l.clock;
+            *image = &e.im;
+            while (l.bytes > TEX_CACHE_BYTES) {
+                auto old = l.cache.end();
+                for (auto o = l.cache.begin(); o != l.cache.end(); ++o)
+                    if (o->second.state == LOAD_READY && o != it && (old == l.cache.end() || o->second.used < old->second.used)) old = o;
+                if (old == l.cache.end()) break;
+                l.bytes -= old->second.bytes;
+                free(old->second.im.data);
+                l.cache.erase(old);
+            }
+        } else if (state == LOAD_FAILED) *why = e.why;
+        else if (state == LOAD_QUEUED) {                     // read ahead but not asked for until now: to the front
+            BOOL queued = FALSE;
+            for (auto& w : l.wanted) queued |= w == path;
+            if (!queued) l.wanted.push_back(path);
+        }
+    }
+    ReleaseSRWLockExclusive(&l.lock);
+    WakeAllConditionVariable(&l.wake);
+    return state;
+}
+
 void PortModsRefreshTextures(void) {
+    ForgetLoaded();
     sTexFiles.clear();
     sTexMods.clear();
     sTexLogged.clear();
@@ -278,10 +456,11 @@ void PortModsRefreshTextures(void) {
 
 BOOL PortModsTexturesWanted(void) { return !sTexFiles.empty() || !Tex().byName.empty() || PortModsDumpDir() != NULL; }
 
-BOOL PortModsTexture(u64 hash, const char* name, PortModImage* out) {
+// The file that replaces a texture (and the mod it is from), NULL for none. `key` is the name it was found by.
+static const std::string* FindTexture(u64 hash, const char* name, const std::string** modOut, std::string& key) {
     const std::string* file = NULL;
     const std::string* mod = NULL;
-    std::string key;
+    key.clear();
     if (name) {                                              // by the name in the game's data first, the hash is the fallback
         key = Lower(name);
         auto n = Tex().byName.find(key);
@@ -289,27 +468,62 @@ BOOL PortModsTexture(u64 hash, const char* name, PortModImage* out) {
     }
     if (!file) {
         auto it = sTexFiles.find(hash);
-        if (it == sTexFiles.end()) return FALSE;
+        if (it == sTexFiles.end()) return NULL;
         file = &it->second;
         mod = &sTexMods[hash];
         key.clear();
     }
+    *modOut = mod;
+    return file;
+}
+
+int PortModsTexture(u64 hash, const char* name, const PortModImage** image) {
+    if (sTexFiles.empty() && Tex().byName.empty()) return PORT_MODTEX_NONE;
+    ReadAhead();
+    std::string key;
+    const std::string* mod = NULL;
+    const std::string* file = FindTexture(hash, name, &mod, key);
+    if (!file) return PORT_MODTEX_NONE;
     const char* why = NULL;
-    memset(out, 0, sizeof(*out));
-    if (IsExt(file->c_str(), ".dds")) PortDdsRead(file->c_str(), out, &why);
-    else {
-        out->data = (u8*)PortPngRead(file->c_str(), &out->w, &out->h, &why);
-        out->levels = 1;
-    }
+    int state = Request(*file, image, &why);
+    if (state == LOAD_QUEUED || state == LOAD_BUSY) return PORT_MODTEX_WAIT;
     BOOL first = key.empty() ? sTexLogged.insert(hash).second : Tex().loggedNames.insert(key).second;   // once per texture: the game decodes some again and again
     if (first) {
-        char kind[48] = "";
-        if (out->dxgi) snprintf(kind, sizeof(kind), ", %s, %u mip level%s", out->dxgi == PORT_DXGI_BC1 ? "BC1" : out->dxgi == PORT_DXGI_BC3 ? "BC3" : "BC7", out->levels, out->levels == 1 ? "" : "s");
-        if (out->data && key.empty()) PortLog("mods: texture %016llX comes from %s (%ux%u%s, %s)", hash, mod->c_str(), out->w, out->h, kind, file->c_str());
-        else if (out->data) PortLog("mods: texture %s (%016llX) comes from %s by name (%ux%u%s, %s)", name, hash, mod->c_str(), out->w, out->h, kind, file->c_str());
-        else fprintf(stderr, "[port] mods: %s %s; the game's texture is used\n", file->c_str(), why ? why : "cannot be read");
+        if (state == LOAD_FAILED) fprintf(stderr, "[port] mods: %s %s; the game's texture is used\n", file->c_str(), why ? why : "cannot be read");
+        else {
+            const PortModImage* im = *image;
+            char kind[48] = "";
+            if (im->dxgi) snprintf(kind, sizeof(kind), ", %s, %u mip level%s", im->dxgi == PORT_DXGI_BC1 ? "BC1" : im->dxgi == PORT_DXGI_BC3 ? "BC3" : "BC7", im->levels, im->levels == 1 ? "" : "s");
+            if (key.empty()) PortLog("mods: texture %016llX comes from %s (%ux%u%s, %s)", hash, mod->c_str(), im->w, im->h, kind, file->c_str());
+            else PortLog("mods: texture %s (%016llX) comes from %s by name (%ux%u%s, %s)", name, hash, mod->c_str(), im->w, im->h, kind, file->c_str());
+        }
     }
-    return out->data != NULL;
+    return state == LOAD_READY ? PORT_MODTEX_READY : PORT_MODTEX_NONE;
+}
+
+const char* PortModsDumpFolder(void) {
+    static char folder[MAX_PATH];
+    const char* set = gPortSettings.dumpDir;
+    if (set[0] && (set[0] == '\\' || set[0] == '/' || set[1] == ':')) return set;
+    DWORD n = GetModuleFileNameA(NULL, folder, MAX_PATH);    // none set, or a relative one: from the exe's folder
+    char* slash = n && n < MAX_PATH ? strrchr(folder, '\\') : NULL;
+    size_t at = slash ? (size_t)(slash + 1 - folder) : 0;
+    snprintf(folder + at, sizeof(folder) - at, "%s", set[0] ? set : "dump\\textures");
+    return folder;
+}
+
+const char* PortModsDumpDir(void) {
+    if (gPortOptions.dumpTextures) return gPortOptions.dumpTextures;   // the command line wins
+    return gPortSettings.dumpTextures ? PortModsDumpFolder() : NULL;
+}
+
+// Makes the folder and those above it.
+static void MakeFolders(const char* dir) {
+    char path[MAX_PATH];
+    snprintf(path, sizeof(path), "%s", dir);
+    for (char* c = path + 1; *c; c++)
+        if ((*c == '\\' || *c == '/') && c[-1] != ':') { char keep = *c; *c = 0; CreateDirectoryA(path, NULL); *c = keep; }
+    CreateDirectoryA(path, NULL);
 }
 
 const char* PortModsDumpFolder(void) {
@@ -431,16 +645,27 @@ int PortSelfTestMods(void) {
         PortModsRefreshTextures();
         u32 tw = 0, th = 0;
         // The RGBA picture of a replacement, as the checks below want it.
-        auto read = [](u64 hash, const char* name, u32* pw, u32* ph) -> u32* {
-            PortModImage im;
-            if (!PortModsTexture(hash, name, &im)) return NULL;
-            *pw = im.w; *ph = im.h;
-            return (u32*)im.data;
+        auto wait = [](u64 hash, const char* name, const PortModImage** im) -> BOOL {
+            int r = PORT_MODTEX_WAIT;
+            for (int tries = 0; tries < 5000 && (r = PortModsTexture(hash, name, im)) == PORT_MODTEX_WAIT; tries++) Sleep(1);
+            return r == PORT_MODTEX_READY;
+        };
+        auto read = [&wait](u64 hash, const char* name, u32* pw, u32* ph) -> u32* {
+            const PortModImage* im;
+            if (!wait(hash, name, &im)) return NULL;
+            *pw = im->w; *ph = im->h;
+            u32* copy = (u32*)malloc((size_t)im->w * im->h * 4);
+            if (copy) memcpy(copy, im->data, (size_t)im->w * im->h * 4);
+            return copy;
         };
         u32* px = read(0xABull, NULL, &tw, &th);
         MOD_CHECK(px && tw == 5 && th == 3 && !memcmp(px, kWant, sizeof(kWant)), "a deflated PNG was not read right (%ux%u)", tw, th);
         free(px);
         MOD_CHECK(sTexMods.count(0xAB) && sTexMods[0xAB] == "second", "the later mod's texture did not win");
+        {
+            const PortModImage* im = NULL;                   // the PNG's smaller levels come with it: 5x3, 2x1, 1x1
+            MOD_CHECK(wait(0xABull, NULL, &im) && im->levels == 3 && !im->dxgi, "a PNG came without its mip levels");
+        }
         px = read(0xCDull, NULL, &tw, &th);
         MOD_CHECK(px && tw == 3 && th == 2 && !memcmp(px, own, sizeof(own)), "the PNG writer's file was not read back");
         free(px);
@@ -473,19 +698,20 @@ int PortSelfTestMods(void) {
                 if (fp) { fwrite(dds, 1, i ? sizeof(dds) - 1 : sizeof(dds), fp); fclose(fp); } else fails++;
             }
             PortModsRefreshTextures();
-            PortModImage im;
-            BOOL ok = PortModsTexture(0xABull, NULL, &im);
-            MOD_CHECK(ok && im.dxgi == PORT_DXGI_BC1 && im.w == 8 && im.h == 4 && im.levels == 2 && !memcmp(im.data, dds + 128, 24),
-                      "a DDS was not read or did not win over a PNG (%ux%u, format %u)", im.w, im.h, im.dxgi);
-            if (ok) free(im.data);
-            MOD_CHECK(!PortModsTexture(0x1234ull, "cut", &im), "a DDS that is cut short was accepted");
+            const PortModImage* im = NULL;
+            BOOL ok = wait(0xABull, NULL, &im);
+            MOD_CHECK(ok && im->dxgi == PORT_DXGI_BC1 && im->w == 8 && im->h == 4 && im->levels == 2 && !memcmp(im->data, dds + 128, 24),
+                      "a DDS was not read or did not win over a PNG");
+            MOD_CHECK(!wait(0x1234ull, "cut", &im), "a DDS that is cut short was accepted");
             MOD_CHECK(gPortMods[0].textureCount == 2, "a PNG and a DDS of one texture were counted as %u", gPortMods[0].textureCount);
+            Sleep(100);                                      // the workers may be reading ahead
             for (const char* f : kDds) { snprintf(path, sizeof(path), "%s\\%s", base, f); DeleteFileA(path); }
             PortModsRefreshTextures();
         }
         const u8 bytes[4] = {1, 2, 3, 4};
         MOD_CHECK(PortModsTextureHash(bytes, 4, NULL, 0, 8, 8, 6) != PortModsTextureHash(bytes, 4, NULL, 0, 8, 4, 6) &&
                   PortModsTextureHash(bytes, 4, bytes, 2, 8, 8, 9) != PortModsTextureHash(bytes, 4, bytes, 3, 8, 8, 9), "the texture hash ignores the size or the palette");
+        Sleep(100);
         for (const char* f : kTexFiles) { snprintf(path, sizeof(path), "%s\\%s", base, f); DeleteFileA(path); }
         for (int i = 2; i >= 0; i--) { snprintf(path, sizeof(path), "%s%s", base, kTexDirs[i]); RemoveDirectoryA(path); }
     }

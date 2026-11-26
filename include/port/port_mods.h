@@ -44,8 +44,8 @@ void PortModsRefreshTextures(void);
 BOOL PortModsTexturesWanted(void);
 // The content hash of a game texture: size, GX format, the pixel data as the game holds it, the palette.
 u64  PortModsTextureHash(const u8* data, u32 bytes, const u8* palette, u32 paletteBytes, u32 w, u32 h, u32 fmt);
-// A replacement picture: RGBA8 from a PNG (dxgi 0, one level) or the compressed blocks of a DDS, level
-// after level. `data` is from malloc; the caller frees it.
+// A replacement picture: RGBA8 from a PNG (dxgi 0, with the smaller levels made here) or the compressed
+// blocks of a DDS, level after level. `data` is from malloc.
 #define PORT_DXGI_BC1 71
 #define PORT_DXGI_BC3 77
 #define PORT_DXGI_BC7 98
@@ -54,9 +54,14 @@ typedef struct PortModImage {
     u32 dxgi;                 // 0 (RGBA8) or PORT_DXGI_*
     u8* data;
 } PortModImage;
-// The replacement for that texture, FALSE for none. `name` is the texture's name in the game's data (or NULL):
-// a file called <name>.png or <name>.dds wins over one found by hash.
-BOOL PortModsTexture(u64 hash, const char* name, PortModImage* out);
+// The replacement for that texture. `name` is the texture's name in the game's data (or NULL): a file called
+// <name>.png or <name>.dds wins over one found by hash. The files are read by worker threads, so the first
+// answer is usually PORT_MODTEX_WAIT: ask again at a later picture. With PORT_MODTEX_READY, *image belongs
+// to the cache and is good until the next call of this function or of PortModsRefreshTextures.
+#define PORT_MODTEX_NONE  0    // no mod replaces it (or the file cannot be read)
+#define PORT_MODTEX_WAIT  1    // being read
+#define PORT_MODTEX_READY 2
+int  PortModsTexture(u64 hash, const char* name, const PortModImage** image);
 // The bytes of mip level `level` of such a picture, and the bytes of one row of it (of blocks) in *pitch.
 u32  PortModLevelBytes(u32 dxgi, u32 w, u32 h, u32 level, u32* pitch);
 // ---- DDS (port_dds.cpp): BC1, BC3 or BC7 with mip levels ----
