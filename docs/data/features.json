@@ -99,6 +99,11 @@
  "changelog": [
   {
    "date": "2026-11-26",
+   "time": "18:41",
+   "text": "Drawing is about 1.2 ms cheaper per frame in the village and in battles: repeated draws that need no new setup now skip straight to adding their vertices, which is 95% of all draws. On an idle PC the village, battles and the castle all hold 60 fps at 1080p, and the picture is unchanged."
+  },
+  {
+   "date": "2026-11-26",
    "time": "18:11",
    "text": "The Weld-O-Tron experiment is playable: its screen shows the seam, the welding gun, the meter and the heat gauge, the gun swings in, and holding B welds. If the gun overheats, the experiment fails and you return to the castle without a crash. Next: welding well enough to pass."
   },
