@@ -229,15 +229,27 @@ extern "C" {
 void fn_8025D2E0(u8* r) { DelayCreate(r); }
 void fn_8025D5A4(u8* r) { DelayCreate(r); }
 void fn_8025D724(u8* r) { FxDestroy(r); }
-void fn_8025D7D0(void* data, u8* r) { auto it = sFx.find(r); if (it != sFx.end()) it->second->Process((s32**)data); }
+void fn_8025D7D0(void* data, u8* r) {
+    auto it = sFx.find(r);
+    if (it == sFx.end() && PortStateLoaded()) { DelayCreate(r); it = sFx.find(r); }   // a loaded state: the effect starts again from silence
+    if (it != sFx.end()) it->second->Process((s32**)data);
+}
 void fn_8025E3E4(u8* r) { ChorusCreate(r); }
 void fn_8025E640(u8* r) { ChorusCreate(r); }
 void fn_8025E768(u8* r) { FxDestroy(r); }
-void fn_8025E7F8(void* data, u8* r) { auto it = sFx.find(r); if (it != sFx.end()) it->second->Process((s32**)data); }
+void fn_8025E7F8(void* data, u8* r) {
+    auto it = sFx.find(r);
+    if (it == sFx.end() && PortStateLoaded()) { ChorusCreate(r); it = sFx.find(r); }   // a loaded state: the effect starts again from silence
+    if (it != sFx.end()) it->second->Process((s32**)data);
+}
 void AXFXReverbHiExpInit(u8* r) { ReverbCreate(r); }
 void fn_8025B65C(void* r) { ReverbCreate((u8*)r); }
 void AXFXReverbHiExpShutdown(void* r) { FxDestroy((u8*)r); }
-void fn_8025B780(void* data, u8* r) { auto it = sFx.find(r); if (it != sFx.end()) it->second->Process((s32**)data); }
+void fn_8025B780(void* data, u8* r) {
+    auto it = sFx.find(r);
+    if (it == sFx.end() && PortStateLoaded()) { ReverbCreate(r); it = sFx.find(r); }   // a loaded state: the effect starts again from silence
+    if (it != sFx.end()) it->second->Process((s32**)data);
+}
 }
 
 // ---------------------------------------------------------------- self-test

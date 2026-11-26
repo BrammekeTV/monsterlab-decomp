@@ -23,6 +23,14 @@ static_assert(sizeof(void*) == 4, "build for 32-bit (cmake -A Win32); see README
 // (string, texture, buffer). Pointer-sized so a 64-bit build does not truncate it.
 typedef intptr_t ScriptValue;
 
+// PC port savestates (docs/savestates.md): the statics of every source that does not include port/port.h
+// (the decompiled game code) go into two sections of their own, which a state saves and restores whole.
+// Globals moved to their original address (ORIG) live in the mapped Wii memory and are saved with it.
+#if defined(_MSC_VER) && defined(_M_IX86)
+#pragma bss_seg(".savb")
+#pragma data_seg(".savd")
+#endif
+
 #ifndef TRUE
 #define TRUE 1
 #define FALSE 0

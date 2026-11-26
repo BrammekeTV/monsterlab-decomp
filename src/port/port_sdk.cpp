@@ -22,6 +22,8 @@ int PortSelfTestInput(void);
 
 #define STUB(name) PortStubCall(#name)
 
+PORT_SAVED_BEGIN                                 // the emulated drive, video interface and GX state go into a savestate
+
 extern "C" {
 
 // ------------------------------------------------------------------ DVD
@@ -54,23 +56,33 @@ s32 DVDGetDriveStatus(void) {
     return 0;                                    // idle, no error
 }
 
-// DVDOpen
-s32 DVDOpen(char* path, u8* infoBytes) {
-    DVDFileInfo* info = (DVDFileInfo*)infoBytes;
+// Where a disc file's bytes are on this PC: a mod's file, the extracted disc, or a range of the disc image.
+static BOOL DvdFind(const char* rel, FILE** file, u64* discOff, u32* discSize, BOOL log) {
     char host[MAX_PATH + 160];
-    const char* rel = path;
-    while (*rel == '/' || *rel == '\\') rel++;
     snprintf(host, sizeof(host), "%s\\files\\%s", gPortOptions.dataDir ? gPortOptions.dataDir : ".", rel);
     for (char* c = host; *c; c++) if (*c == '/') *c = '\\';
-    u64 discOff = 0;
-    u32 discSize = 0;
     FILE* f = NULL;
     // A mod's file of this path comes first (mods/<name>/files/...), for a disc image and a folder alike.
     char modHost[MAX_PATH];
     const char* mod = NULL;
     if (PortModsFindFile(rel, modHost, sizeof(modHost), &mod) && (f = fopen(modHost, "rb")) != NULL) {
-        PortLog("mods: %s comes from %s", rel, mod);
-    } else if (PortDiscIsOpen() ? !PortDiscFind(rel, &discOff, &discSize) : !(f = fopen(host, "rb"))) {
+        if (log) PortLog("mods: %s comes from %s", rel, mod);
+    } else if (PortDiscIsOpen() ? !PortDiscFind(rel, discOff, discSize) : !(f = fopen(host, "rb"))) {
+        return FALSE;
+    }
+    *file = f;
+    return TRUE;
+}
+
+// DVDOpen
+s32 DVDOpen(char* path, u8* infoBytes) {
+    DVDFileInfo* info = (DVDFileInfo*)infoBytes;
+    const char* rel = path;
+    while (*rel == '/' || *rel == '\\') rel++;
+    u64 discOff = 0;
+    u32 discSize = 0;
+    FILE* f = NULL;
+    if (!DvdFind(rel, &f, &discOff, &discSize, TRUE)) {
         sDvdMisses++;
         PortLog("disc: %s not found", path);
         return 0;
@@ -107,6 +119,17 @@ void DVDClose(u8* infoBytes) {
     d->used = FALSE;
     info->startAddr = 0;
 }
+
+// A state was loaded: the files the game has open are opened again in this process.
+static void DvdAfterLoad(void) {
+    for (DvdFile& d : sDvdFiles) {
+        if (!d.used) continue;
+        d.f = NULL;
+        u32 size = 0;
+        if (!DvdFind(d.path, &d.f, &d.discOff, &size, FALSE)) PortLog("state: the open disc file %s is not there any more", d.path);
+    }
+}
+static struct DvdStateHook { DvdStateHook() { PortStateOnLoad(DvdAfterLoad); } } sDvdStateHook;
 
 struct DvdDone { DVDFileInfo* info; s32 result; DVDCallback cb; };
 static DvdDone sDvdDone[64];
@@ -563,5 +586,7 @@ int PortSelfTestSdk(void) {
 #undef CHECK
     return fails;
 }
+
+PORT_SAVED_END
 
 #endif  // _WIN32

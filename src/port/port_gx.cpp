@@ -19,6 +19,8 @@
 #include "port/port_gx.h"
 #include "revolution.h"
 
+PORT_SAVED_BEGIN   // the emulated console state of this file goes into a savestate (docs/savestates.md)
+
 struct PortFifo { u8* base; u32 size; u8* rd; u8* wr; };
 static_assert(sizeof(PortFifo) <= sizeof(GXFifoObj), "FIFO state must fit in GXFifoObj");
 
@@ -435,4 +437,6 @@ int PortSelfTestGx(void) {
     sLostBytes = 0;
     return 0;
 }
+PORT_SAVED_END
+
 #endif

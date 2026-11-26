@@ -24,6 +24,8 @@
 
 #include "port/port.h"
 
+PORT_SAVED_BEGIN   // the emulated console state of this file goes into a savestate (docs/savestates.md)
+
 #define AX_VOICES        64
 #define AX_FRAME         96          // samples per AX frame
 #define AX_RATE          32000
@@ -436,12 +438,14 @@ static s32 DecoderNext(Decoder* d) {
 // ------------------------------------------------------------------ movie sound
 // The decoded sound of a Bink movie (port_bink.cpp): interleaved stereo float samples at the movie's
 // rate, mixed into every AX frame on top of the voices. Underrun is silence.
+PORT_HOST_BEGIN                                   // a movie's sound: a state is not written while a movie plays
 static std::mutex         sMovLock;
 static std::deque<float>  sMovQ;                 // left, right, left, right...
 static int                sMovRate = 44100;
 static float              sMovVol = 1.0f;
 static double             sMovFrac = 0;
 static float              sMovS0[2], sMovS1[2];
+PORT_HOST_END
 
 void PortAudioMoviePush(const float* st, u32 frames, int rate) {
     std::lock_guard<std::mutex> g(sMovLock);
@@ -563,6 +567,7 @@ static void MixFrame(s16* out) {
 #define OUT_BLOCK_FRAMES 4                               // AX frames per block handed to the device (12 ms)
 #define RING_SAMPLES     32768                           // about a second, a power of two
 #define RING_TARGET      (AX_RATE * 6 / 100)             // the mixer runs 60 ms ahead of the clock
+PORT_HOST_BEGIN                                   // the sound device and --wav file of this process
 static HWAVEOUT sWave;
 static WAVEHDR  sHdr[OUT_BLOCKS];
 static s16      sBlock[OUT_BLOCKS][OUT_BLOCK_FRAMES * AX_FRAME * 2];
@@ -570,9 +575,11 @@ static s16      sRing[RING_SAMPLES * 2];
 static volatile LONG sRingWrite, sRingRead;              // in samples, never wrapped: index = value % RING_SAMPLES
 static FILE*    sWav;
 static u32      sWavSamples;
+static BOOL     sStarted;
+PORT_HOST_END
 static s64      sClockStart;                             // game clock (port.h) when the audio started
 static u64      sFramesDone;                             // AX frames since sClockStart
-static BOOL     sStarted;
+static BOOL     sClockSet;
 
 static void WavHeader(void) {
     u32 bytes = sWavSamples * 4;
@@ -620,7 +627,7 @@ static DWORD WINAPI OutputThread(void*) {
 
 static void Start(void) {
     sStarted = TRUE;
-    sClockStart = PortTicks();
+    if (!sClockSet) { sClockSet = TRUE; sClockStart = PortTicks(); }   // a loaded state goes on counting from its own start
     if (gPortOptions.wav) {
         sWav = fopen(gPortOptions.wav, "wb");
         if (sWav) WavHeader(); else PortLog("audio: cannot write %s", gPortOptions.wav);
@@ -643,7 +650,7 @@ static int FramesDue(void) {
 }
 
 s64 PortAudioNextTicks(void) {
-    if (!sStarted) return 0;
+    if (!sClockSet) return 0;
     s64 lead = RING_TARGET / AX_FRAME;
     return sClockStart + ((s64)sFramesDone + 1 - lead) * FrameTicks();
 }
@@ -786,5 +793,7 @@ int PortSelfTestAudio(void) {
     memset(&sStats, 0, sizeof(sStats));
     return fails;
 }
+
+PORT_SAVED_END
 
 #endif

@@ -11,6 +11,8 @@
 #include "port/sir_loader.h"
 #include "port/port_mods.h"
 
+PORT_SAVED_BEGIN   // which sections are loaded and converted is part of a savestate; the copies live in the port's fixed heap
+
 // A copy of the catalog's two tables (the game's buffer is reused for the next file).
 static SirCatalogEntry* sEntries;
 static u32              sEntryCount;
@@ -19,6 +21,10 @@ static u32              sFileCount;
 
 static u8* sGlobalHdr;                 // header section of global_binary.sir, once read
 static u32 sConverted, sUnconverted;
+
+// The loader's object lists live between two reads of a level: they come from the port's fixed heap too.
+static void* LoaderAlloc(size_t n) { return PortHostAlloc((u32)n); }
+static struct LoaderHeapHook { LoaderHeapHook() { SirLoaderSetAllocator(LoaderAlloc, PortHostFree); } } sLoaderHeapHook;
 
 static const char* BaseName(const char* path) {
     const char* b = path;
@@ -159,9 +165,9 @@ void PortFileRead(const char* path, u32 offset, u8* dst, u32 len) {
         SirCatalog cat;
         SirError err = SirCatalogConvert(dst, len, &cat);
         if (err != SIR_OK) PortStop(8, "catalog.sir: %s", SirErrorText(err));
-        free(sEntries); free(sFiles);
-        sEntries = (SirCatalogEntry*)malloc(sizeof(SirCatalogEntry) * (cat.entryCount + 1));
-        sFiles = (SirCatalogFile*)malloc(sizeof(SirCatalogFile) * (cat.fileCount + 1));
+        PortHostFree(sEntries); PortHostFree(sFiles);
+        sEntries = (SirCatalogEntry*)PortHostAlloc(sizeof(SirCatalogEntry) * (cat.entryCount + 1));
+        sFiles = (SirCatalogFile*)PortHostAlloc(sizeof(SirCatalogFile) * (cat.fileCount + 1));
         memcpy(sEntries, cat.entries, sizeof(SirCatalogEntry) * cat.entryCount);
         memcpy(sFiles, cat.files, sizeof(SirCatalogFile) * cat.fileCount);
         sEntryCount = cat.entryCount;
@@ -241,13 +247,13 @@ static void ConvertSection(const char* name, const SirCatalogFile* file, const S
             // The header points into itself and into the zones. The zones are read later, to
             // the addresses the console uses (MEM2 is mapped at its original address).
             u8* place = LevelFinalPlace(-1, dst);
-            free(levelHdrCopy);
+            PortHostFree(levelHdrCopy);
             levelHdrCopy = NULL;
             if (place != dst) {
                 // The zones are converted before the game has copied this header to the world
                 // block, so what they need of it is read from a copy whose pointers lead into itself.
                 static SirReloc own;
-                levelHdrCopy = (u8*)malloc(e->size);
+                levelHdrCopy = (u8*)PortHostAlloc(e->size);
                 if (!levelHdrCopy) PortStop(8, "%s: out of memory", name);
                 memcpy(levelHdrCopy, dst, e->size);
                 SirRelocInit(&own, NULL, NULL);
@@ -337,4 +343,6 @@ const char* PortFileStats(char* buf, u32 n) {
     snprintf(buf, n, "%u section(s) converted, %u kind(s) of section left big-endian", sConverted, sUnconverted);
     return buf;
 }
+PORT_SAVED_END
+
 #endif
