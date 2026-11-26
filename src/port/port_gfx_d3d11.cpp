@@ -785,6 +785,7 @@ static ID3D11ShaderResourceView* GetTexture(const PortGx* g, u32 map) {
     BOOL waiting = FALSE;
     if (PortModsTexturesWanted()) {
         content = PortModsTextureHash(data, bytes, tlut, pal ? (fmt == 8 ? 32 : fmt == 9 ? 512 : 0x8000) : 0, w, h, fmt);
+        PortModsDolphinName(content, data, bytes, tlut, w, h, fmt);
         const char* tname = PortModsTextureName(data);
         PortModsDumpTexture(content, tname, rgba.data(), w, h, fmt);
         made = ModTexture(content, tname, levels > 1, &waiting);

@@ -64,6 +64,12 @@ typedef struct PortModImage {
 int  PortModsTexture(u64 hash, const char* name, const PortModImage** image);
 // The bytes of mip level `level` of such a picture, and the bytes of one row of it (of blocks) in *pitch.
 u32  PortModLevelBytes(u32 dxgi, u32 w, u32 h, u32 level, u32* pitch);
+// Dolphin texture packs: a file called tex1_<W>x<H>[_m]_<hash>[_<palette hash>]_<format>.png or .dds replaces the
+// texture Dolphin would give that name. The renderer calls this for each texture it decodes, after
+// PortModsTextureHash (`content`); it does nothing unless a mod has such files. `data`: level 0 as the game
+// holds it (`bytes` long); `palette`: the whole palette of a paletted format.
+void PortModsDolphinName(u64 content, const u8* data, u32 bytes, const u8* palette, u32 w, u32 h, u32 fmt);
+u64  PortXxh64(const u8* p, size_t n);        // XXH64, seed 0 (the hash in those names)
 // ---- DDS (port_dds.cpp): BC1, BC3 or BC7 with mip levels ----
 BOOL PortDdsRead(const char* path, PortModImage* out, const char** why);   // FALSE and the reason
 // The name the game's data gives the texture whose pixel data is at `pixels`, or NULL (not every file is loaded by the port's loader yet).

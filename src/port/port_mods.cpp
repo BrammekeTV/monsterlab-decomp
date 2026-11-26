@@ -12,6 +12,7 @@
 #include <map>
 #include <set>
 #include <string>
+#include <vector>
 
 #include "port/port.h"
 #include "port/port_mods.h"
@@ -162,6 +163,9 @@ struct TexState {
     std::map<std::string, std::string> nameMods; // lower-case name -> that mod's name
     std::map<uintptr_t, std::string> names;      // pixel data of a texture the loader converted -> its name
     std::set<std::string> loggedNames;
+    std::map<std::string, std::string> dolphin;       // "tex1_WxH_hash[_tlut]_fmt" (no _m) -> file
+    std::map<std::string, std::string> dolphinMods;   // that key -> mod
+    std::map<u64, std::string> aliases;               // content hash of a drawn texture -> its key in `dolphin`
 };
 static TexState& Tex(void) { static TexState* t = new TexState; return *t; }
 #define sTexFiles  Tex().files
@@ -200,6 +204,59 @@ static BOOL IsExt(const char* name, const char* ext) {
     return n > 4 && !_stricmp(name + n - 4, ext);
 }
 
+// XXH64 (Yann Collet's xxHash, public specification), seed 0: what Dolphin puts into texture names.
+u64 PortXxh64(const u8* p, size_t n) {
+    static const u64 P1 = 11400714785074694791ull, P2 = 14029467366897019727ull, P3 = 1609587929392839161ull,
+                     P4 = 9650029242287828579ull, P5 = 2870177450012600261ull;
+    auto rot = [](u64 v, int r) { return v << r | v >> (64 - r); };
+    auto read = [](const u8* q, int bytes) { u64 v = 0; memcpy(&v, q, bytes); return v; };
+    auto round = [&](u64 acc, u64 v) { return rot(acc + v * P2, 31) * P1; };
+    const u8* end = p + n;
+    u64 h;
+    if (n >= 32) {
+        u64 v[4] = {P1 + P2, P2, 0, 0 - P1};
+        for (; end - p >= 32; p += 32)
+            for (int i = 0; i < 4; i++) v[i] = round(v[i], read(p + i * 8, 8));
+        h = rot(v[0], 1) + rot(v[1], 7) + rot(v[2], 12) + rot(v[3], 18);
+        for (int i = 0; i < 4; i++) h = (h ^ round(0, v[i])) * P1 + P4;
+    } else h = P5;
+    h += (u64)n;
+    for (; end - p >= 8; p += 8) h = rot(h ^ round(0, read(p, 8)), 27) * P1 + P4;
+    if (end - p >= 4) { h = rot(h ^ read(p, 4) * P1, 23) * P2 + P3; p += 4; }
+    for (; p < end; p++) h = rot(h ^ *p * P5, 11) * P1;
+    h = (h ^ h >> 33) * P2;
+    h = (h ^ h >> 29) * P3;
+    return h ^ h >> 32;
+}
+
+void PortModsDolphinName(u64 content, const u8* data, u32 bytes, const u8* palette, u32 w, u32 h, u32 fmt) {
+    if (Tex().dolphin.empty()) return;
+    char tex[24], tlut[24] = "", key[96];
+    snprintf(tex, sizeof(tex), "%016llx", PortXxh64(data, bytes));
+    if (fmt >= 8 && fmt <= 10) {                             // the palette's hash covers only the entries the texture uses
+        u32 low = 0xFFFF, high = 0;
+        for (u32 i = 0; i < bytes; i++) {
+            u32 a, b;
+            if (fmt == 8) { a = data[i] & 15; b = data[i] >> 4; }
+            else if (fmt == 9) a = b = data[i];
+            else { a = b = ((u32)data[i] << 8 | data[i + 1]) & 0x3FFF; i++; }
+            if (a < low) low = a;
+            if (b < low) low = b;
+            if (a > high) high = a;
+            if (b > high) high = b;
+        }
+        if (low > high) return;
+        snprintf(tlut, sizeof(tlut), "%016llx", PortXxh64(palette + 2 * low, 2 * (high + 1 - low)));
+    }
+    // The texture's own name, then the forms with "$" for any palette or any pixels.
+    for (int form = 0; form < (tlut[0] ? 3 : 1); form++) {
+        snprintf(key, sizeof(key), "tex1_%ux%u_%s%s%s_%u", w, h, form == 2 ? "$" : tex, tlut[0] ? "_" : "", form == 1 ? "$" : tlut, fmt);
+        if (!Tex().dolphin.count(key)) continue;
+        Tex().aliases[content] = key;
+        return;
+    }
+}
+
 // The hash a texture file's name ends in ("..._0123456789abcdef.png" or ".dds"), FALSE for another name.
 static BOOL NameHash(const char* name, u64* hash) {
     size_t n = strlen(name);
@@ -228,6 +285,30 @@ static void TexAdd(std::map<K, std::string>& files, std::map<K, std::string>& mo
     mods[key] = m->name;
 }
 
+// A Dolphin pack's file name, "tex1_64x64_m_0123456789abcdef_fedcba9876543210_9.png" (the palette hash only for
+// paletted formats, "$" for any), as the key textures are looked up by: lower case, without "_m" and the
+// extension. FALSE for another name, and for the files of single smaller levels ("..._mip1").
+static BOOL DolphinKey(const char* file, std::string& key) {
+    std::string s = Lower(file);
+    if (s.compare(0, 5, "tex1_")) return FALSE;
+    s.resize(s.size() - 4);
+    std::vector<std::string> part;
+    for (size_t at = 5;;) {
+        size_t u = s.find('_', at);
+        part.push_back(s.substr(at, u == std::string::npos ? u : u - at));
+        if (u == std::string::npos) break;
+        at = u + 1;
+    }
+    if (part.size() > 1 && part[1] == "m") part.erase(part.begin() + 1);
+    if (part.size() < 3 || part.size() > 4 || part[0].find('x') == std::string::npos) return FALSE;
+    for (size_t i = 1; i + 1 < part.size(); i++)
+        if (part[i] != "$" && (part[i].size() != 16 || part[i].find_first_not_of("0123456789abcdef") != std::string::npos)) return FALSE;
+    if (part.back().empty() || part.back().find_first_not_of("0123456789") != std::string::npos) return FALSE;
+    key = "tex1";
+    for (auto& p : part) key += "_" + p;
+    return TRUE;
+}
+
 // Every PNG and DDS under dir goes into the table. `seen` collects the textures this mod replaces.
 static void TexTree(const PortMod* m, const char* dir, BOOL add, std::set<std::string>& seen) {
     char pattern[MAX_PATH + 8];
@@ -242,7 +323,11 @@ static void TexTree(const PortMod* m, const char* dir, BOOL add, std::set<std::s
         if (fd.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY) { TexTree(m, sub, add, seen); continue; }
         if (!IsExt(fd.cFileName, ".png") && !IsExt(fd.cFileName, ".dds")) continue;
         u64 hash;
-        if (NameHash(fd.cFileName, &hash)) {
+        std::string dolphin;
+        if (DolphinKey(fd.cFileName, dolphin)) {             // before NameHash: such a name can end in 16 hex digits too
+            seen.insert(dolphin);
+            if (add) TexAdd(Tex().dolphin, Tex().dolphinMods, dolphin, sub, m, dolphin.c_str());
+        } else if (NameHash(fd.cFileName, &hash)) {
             char what[24];
             snprintf(what, sizeof(what), "%016llX", hash);
             seen.insert(what);
@@ -390,6 +475,7 @@ static void ReadAhead(void) {
         l.aheadDone = TRUE;
         for (auto& f : Tex().byName) l.ahead.push_back(f.second);
         for (auto& f : sTexFiles) l.ahead.push_back(f.second);
+        for (auto& f : Tex().dolphin) l.ahead.push_back(f.second);
         WakeAllConditionVariable(&l.wake);
     }
     ReleaseSRWLockExclusive(&l.lock);
@@ -437,6 +523,9 @@ void PortModsRefreshTextures(void) {
     ForgetLoaded();
     sTexFiles.clear();
     sTexMods.clear();
+    Tex().dolphin.clear();
+    Tex().dolphinMods.clear();
+    Tex().aliases.clear();
     sTexLogged.clear();
     Tex().byName.clear();
     Tex().nameMods.clear();
@@ -454,7 +543,8 @@ void PortModsRefreshTextures(void) {
     }
 }
 
-BOOL PortModsTexturesWanted(void) { return !sTexFiles.empty() || !Tex().byName.empty() || PortModsDumpDir() != NULL; }
+static BOOL HaveTextures(void) { return !sTexFiles.empty() || !Tex().byName.empty() || !Tex().dolphin.empty(); }
+BOOL PortModsTexturesWanted(void) { return HaveTextures() || PortModsDumpDir() != NULL; }
 
 // The file that replaces a texture (and the mod it is from), NULL for none. `key` is the name it was found by.
 static const std::string* FindTexture(u64 hash, const char* name, const std::string** modOut, std::string& key) {
@@ -468,9 +558,15 @@ static const std::string* FindTexture(u64 hash, const char* name, const std::str
     }
     if (!file) {
         auto it = sTexFiles.find(hash);
-        if (it == sTexFiles.end()) return NULL;
-        file = &it->second;
-        mod = &sTexMods[hash];
+        if (it != sTexFiles.end()) {
+            file = &it->second;
+            mod = &sTexMods[hash];
+        } else {                                             // last: the name a Dolphin pack gives it
+            auto a = Tex().aliases.find(hash);
+            if (a == Tex().aliases.end()) return NULL;
+            file = &Tex().dolphin[a->second];
+            mod = &Tex().dolphinMods[a->second];
+        }
         key.clear();
     }
     *modOut = mod;
@@ -478,7 +574,7 @@ static const std::string* FindTexture(u64 hash, const char* name, const std::str
 }
 
 int PortModsTexture(u64 hash, const char* name, const PortModImage** image) {
-    if (sTexFiles.empty() && Tex().byName.empty()) return PORT_MODTEX_NONE;
+    if (!HaveTextures()) return PORT_MODTEX_NONE;
     ReadAhead();
     std::string key;
     const std::string* mod = NULL;
@@ -683,6 +779,28 @@ int PortSelfTestMods(void) {
             for (const char* f : kDds) { snprintf(path, sizeof(path), "%s\\%s", base, f); DeleteFileA(path); }
             PortModsRefreshTextures();
         }
+        // Dolphin names: the published XXH64 values, then a paletted texture found by its pixel and used-palette hashes.
+        {
+            MOD_CHECK(PortXxh64((const u8*)"", 0) == 0xEF46DB3751D8E999ull && PortXxh64((const u8*)"abc", 3) == 0x44BC2CF5AD770999ull &&
+                      PortXxh64((const u8*)"Nobody inspects the spammish repetition", 39) == 0xFBCEA83C8A378BF1ull, "XXH64 is wrong");
+            u8 pix[32], pal[512];
+            for (int i = 0; i < 32; i++) pix[i] = (u8)(3 + i % 5);             // C8, entries 3-7
+            for (int i = 0; i < 512; i++) pal[i] = (u8)(i * 7);
+            char name[128];
+            snprintf(name, sizeof(name), "first\\textures\\tex1_8x4_m_%016llx_%016llx_9.png", PortXxh64(pix, 32), PortXxh64(pal + 6, 10));
+            snprintf(path, sizeof(path), "%s\\%s", base, name);
+            PortPngWrite(path, own, 3, 2);
+            PortModsRefreshTextures();
+            PortModsDolphinName(0x99, pix, 32, pal, 8, 4, 9);
+            u32* got = read(0x99ull, NULL, &tw, &th);
+            MOD_CHECK(got && tw == 3 && th == 2, "a texture was not found by its Dolphin name");
+            free(got);
+            PortModsDolphinName(0x98, pix, 32, pal, 8, 8, 9);
+            MOD_CHECK(!read(0x98ull, NULL, &tw, &th), "a Dolphin name matched a texture of another size");
+            Sleep(100);
+            DeleteFileA(path);
+            PortModsRefreshTextures();
+        }
         const u8 bytes[4] = {1, 2, 3, 4};
         MOD_CHECK(PortModsTextureHash(bytes, 4, NULL, 0, 8, 8, 6) != PortModsTextureHash(bytes, 4, NULL, 0, 8, 4, 6) &&
                   PortModsTextureHash(bytes, 4, bytes, 2, 8, 8, 9) != PortModsTextureHash(bytes, 4, bytes, 3, 8, 8, 9), "the texture hash ignores the size or the palette");
@@ -745,7 +863,7 @@ int PortSelfTestMods(void) {
     strcpy(sDir, keepDir);
     gPortOptions.noMods = keepOff;
     PortModsRefreshTextures();
-    if (!fails) PortLog("selftest mods: ok (file lookup, order, moving, switched off, PNG and DDS textures, dumping, text table)");
+    if (!fails) PortLog("selftest mods: ok (file lookup, order, moving, switched off, PNG and DDS textures, Dolphin names, dumping, text table)");
     return fails;
 }
 #endif
