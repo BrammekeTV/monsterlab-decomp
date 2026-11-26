@@ -14,6 +14,7 @@
 #include <string.h>
 
 #include "port/port.h"
+#include "port/port_stateslots.h"
 #include "port/port_input.h"
 #include "port/port_gx.h"
 #include "port/port_mods.h"
@@ -379,6 +380,7 @@ void PortFrameDone(void) {
         if (PortGfxSaveScreenshot(path)) fprintf(stderr, "[port] screenshot: %s\n", path);
     }
     PortStateFrame(sFrames);                          // --save-state: a run that loads the state goes on from here
+    PortStateSlotsFrame(sFrames);                     // F5/F8 and the settings screen's slots (port_stateslots.cpp)
     if (gPortOptions.frameLimit && sFrames >= gPortOptions.frameLimit) {
         PortStop(0, "frame limit reached (%d frames)", sFrames);
     }
@@ -1259,7 +1261,7 @@ struct PortBoot {
                 PortGuiSetOpen(TRUE);
                 if (i + 1 < __argc && __argv[i + 1][0] != '-') {
                     const char* page = __argv[++i];
-                    gPortGuiPage = !strcmp(page, "audio") ? 1 : !strcmp(page, "controls") ? 2 : !strcmp(page, "game") ? 3 : !strcmp(page, "mods") ? 4 : 0;
+                    gPortGuiPage = !strcmp(page, "audio") ? 1 : !strcmp(page, "controls") ? 2 : !strcmp(page, "game") ? 3 : !strcmp(page, "mods") ? 4 : !strcmp(page, "savestates") ? 5 : 0;
                 }
             }
             else if (!strcmp(a, "--vsync")) gPortSettings.vsync = TRUE;
@@ -1317,6 +1319,9 @@ struct PortBoot {
                 else fprintf(stderr, "[port] --aspect %s: expected 4:3 or 16:9\n", v);
             }
             else if ((!strcmp(a, "--save-state") || !strcmp(a, "--load-state")) && i + 1 < __argc) { PortStateAddArg(a, __argv[i + 1]); i++; }
+            else if (!strcmp(a, "--state-key") && i + 1 < __argc) {
+                if (!PortStateAddKeyArg(__argv[++i])) fprintf(stderr, "[port] --state-key %s: expected save, load, prev or next@FRAME\n", __argv[i]);
+            }
             else if (!strcmp(a, "--pointer") && i + 1 < __argc) {
                 if (!PortInputAddPointer(__argv[++i])) fprintf(stderr, "[port] --pointer %s: expected X,Y@FRAME\n", __argv[i]);
             }

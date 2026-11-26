@@ -110,6 +110,8 @@ a PC port. Read this whole file before making changes. Human contributors: see
 - `python tools/savestate_test.py [--at N,N] [--more M]`: run it after changing `src/port/port_state.cpp`, the scheduler in `port_runtime.cpp`
   or what a state holds: saves at each point, loads each in a new process and compares the log and the picture M frames later with the
   straight run (they must be identical).
+- `python tools/state_slot_test.py`: run it after changing the player's savestate slots (`src/port/port_stateslots.cpp`): F5/F8 path headless, load in a
+  new process, another build's state refused.
 - `python tools/mod_test.py [--iso PATH] [--keep]`: mod test (textures by hash and name, JSON text; `docs/modding.md`): dumps the menu's textures to a temporary folder outside
   the repository, makes a mod with one tinted red, runs headless again and compares the screenshots. Run it after changes to
   `src/port/port_mods.cpp`, `port_png.cpp` or the texture cache in `port_gfx_d3d11.cpp`.
