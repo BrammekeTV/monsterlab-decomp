@@ -631,7 +631,8 @@ static u32 Fnv(const u8* p, u32 n, u32 h) {
     return h;
 }
 
-struct TexEntry { ID3D11ShaderResourceView* srv; u32 hash, w, h, fmt, gen, levels; };
+struct TexEntry { ID3D11ShaderResourceView* srv; u32 hash, w, h, fmt, gen, levels; u64 content; BOOL waiting; };   // waiting: a mod's file is still being read
+static u32 sModBytes;                                      // mod pictures handed to the graphics card in this frame
 static u32 sTexGen = 1;                                    // bumped each frame and on a palette load: textures are re-hashed once per generation
 static std::map<u64, TexEntry> sTextures;                   // by address and palette slot
 static std::map<u32, ID3D11ShaderResourceView*> sEfbCopies; // frame-buffer copies, by destination address
@@ -696,30 +697,43 @@ static ID3D11ShaderResourceView* MakeTexture(const u32* rgba, u32 w, u32 h, cons
     return srv;
 }
 
-// A mod's replacement: a PNG's pixels like a game texture, a DDS's compressed levels as the file has them.
-static ID3D11ShaderResourceView* MakeModTexture(const PortModImage& im) {
-    if (!im.dxgi) return MakeTexture((const u32*)im.data, im.w, im.h);
+// A mod's replacement, with the levels the file has (a PNG's smaller ones only when the filter setting or the
+// game's own sampler mode uses mip levels).
+static ID3D11ShaderResourceView* MakeModTexture(const PortModImage& im, BOOL mips) {
     D3D11_SUBRESOURCE_DATA init[16] = {};
     const u8* at = im.data;
-    u32 levels = im.levels < 16 ? im.levels : 16;
+    u32 levels = !im.dxgi && !mips && !WantMips() ? 1 : im.levels < 16 ? im.levels : 16;
     for (u32 i = 0; i < levels; i++) {
         u32 pitch = 0, bytes = PortModLevelBytes(im.dxgi, im.w, im.h, i, &pitch);
         init[i].pSysMem = at;
         init[i].SysMemPitch = pitch;
         at += bytes;
     }
+    sModBytes += (u32)(at - im.data);
     D3D11_TEXTURE2D_DESC d = {};
-    d.Width = im.w; d.Height = im.h; d.MipLevels = levels; d.ArraySize = 1; d.Format = (DXGI_FORMAT)im.dxgi;
+    d.Width = im.w; d.Height = im.h; d.MipLevels = levels; d.ArraySize = 1;
+    d.Format = im.dxgi ? (DXGI_FORMAT)im.dxgi : DXGI_FORMAT_R8G8B8A8_UNORM;
     d.SampleDesc.Count = 1; d.Usage = D3D11_USAGE_IMMUTABLE; d.BindFlags = D3D11_BIND_SHADER_RESOURCE;
     ID3D11Texture2D* t = NULL; ID3D11ShaderResourceView* srv = NULL;
     if (FAILED(sDev->CreateTexture2D(&d, init, &t))) {         // BC7 needs a Direct3D 11 card; or out of video memory
         static BOOL told;
-        if (!told) { told = TRUE; PortLog("mods: the graphics device cannot make a %ux%u compressed texture; the game's texture is used", im.w, im.h); }
+        if (!told) { told = TRUE; PortLog("mods: the graphics device cannot make a %ux%u texture; the game's texture is used", im.w, im.h); }
         return NULL;
     }
     sDev->CreateShaderResourceView(t, NULL, &srv);
     t->Release();
     return srv;
+}
+
+// The replacement of a texture if its file has been read; *waiting says to ask again at a later picture. At most
+// some 24 MB go to the graphics card per frame, so a screen full of large pictures does not stall one.
+static ID3D11ShaderResourceView* ModTexture(u64 content, const char* name, BOOL mips, BOOL* waiting) {
+    const PortModImage* im = NULL;
+    *waiting = FALSE;
+    if (sModBytes >= (24u << 20)) { *waiting = TRUE; return NULL; }
+    int r = PortModsTexture(content, name, &im);
+    *waiting = r == PORT_MODTEX_WAIT;
+    return r == PORT_MODTEX_READY ? MakeModTexture(*im, mips) : NULL;
 }
 
 static ID3D11ShaderResourceView* GetTexture(const PortGx* g, u32 map) {
@@ -740,7 +754,15 @@ static ID3D11ShaderResourceView* GetTexture(const PortGx* g, u32 map) {
     u32 bytes = TextureBytes(w, h, fmt);
     u32 hash = Fnv(data, bytes, 2166136261u ^ w ^ h << 12 ^ fmt << 24);
     if (pal) hash = Fnv(tlut, fmt == 8 ? 32 : fmt == 9 ? 512 : 0x8000, hash ^ tl);
-    if (it != sTextures.end() && it->second.hash == hash) { it->second.gen = sTexGen; it->second.w = w; it->second.h = h; it->second.fmt = fmt; return it->second.srv; }
+    if (it != sTextures.end() && it->second.hash == hash) {
+        TexEntry& e = it->second;
+        e.gen = sTexGen; e.w = w; e.h = h; e.fmt = fmt;
+        if (e.waiting) {
+            ID3D11ShaderResourceView* got = ModTexture(e.content, PortModsTextureName(data), e.levels > 1, &e.waiting);
+            if (got) { FlushDraws(); if (e.srv) e.srv->Release(); e.srv = got; }
+        }
+        return e.srv ? e.srv : sWhite;
+    }
     std::vector<u32> rgba(w * h);
     if (!DecodeTexture(data, w, h, fmt, tlut, (tl >> 10) & 3, rgba.data())) {
         static u32 warned;
@@ -750,12 +772,13 @@ static ID3D11ShaderResourceView* GetTexture(const PortGx* g, u32 map) {
     if (it != sTextures.end() && it->second.srv) { FlushDraws(); it->second.srv->Release(); }
     // Mods: a PNG or DDS with this texture's content hash replaces it, at the file's own size (--dump-textures writes the originals).
     ID3D11ShaderResourceView* made = NULL;
+    u64 content = 0;
+    BOOL waiting = FALSE;
     if (PortModsTexturesWanted()) {
-        u64 content = PortModsTextureHash(data, bytes, tlut, pal ? (fmt == 8 ? 32 : fmt == 9 ? 512 : 0x8000) : 0, w, h, fmt);
+        content = PortModsTextureHash(data, bytes, tlut, pal ? (fmt == 8 ? 32 : fmt == 9 ? 512 : 0x8000) : 0, w, h, fmt);
         const char* tname = PortModsTextureName(data);
         PortModsDumpTexture(content, tname, rgba.data(), w, h, fmt);
-        PortModImage im;
-        if (PortModsTexture(content, tname, &im)) { made = MakeModTexture(im); free(im.data); }
+        made = ModTexture(content, tname, levels > 1, &waiting);
     }
     if (!made) {
         std::vector<std::vector<u32>> mips;
@@ -769,7 +792,7 @@ static ID3D11ShaderResourceView* GetTexture(const PortGx* g, u32 map) {
         }
         made = MakeTexture(rgba.data(), w, h, &mips);
     }
-    TexEntry e = {made, hash, w, h, fmt, sTexGen, levels};
+    TexEntry e = {made, hash, w, h, fmt, sTexGen, levels, content, waiting};
     sTextures[key] = e;
     sGfxStats.textures++;
     return e.srv ? e.srv : sWhite;
@@ -1692,6 +1715,7 @@ static void FrameStats(PortFrameStats* s) {
     }
     last = now; lastWait = wait;
     sTexGen++;
+    sModBytes = 0;
     s->draws = sFrame.draws; s->verts = sFrame.verts; s->efbCopies = sFrame.copies;
     s->textures = (u32)(sTextures.size() + sEfbCopies.size());
     s->voices = PortAudioVoices(&s->voiceCount);
