@@ -140,7 +140,14 @@ STAGES = [
            call("EnterName_Destroy", 30700), call("StartConversationID", 30800)],
           press=("A@30400", "A@30600", "A@30850"),
           pointer=("445,325@30300", "520,325@30500", "1370,880@30750")),
-    # Later stages go here (a deadline after 31300, frames counted from the run's start).
+    # A carries Fuseless's welcome, the first look at I.G.O.R. (the lab book opens on its ingredients page and
+    # closes again) and his second talk; then the Command Room is free.
+    Stage("igor", "Fuseless's welcome, I.G.O.R. opens and closes, free in the Command Room", 32900,
+          [call("InitLabBooks", 31300), call("LabBooks_Ingredients_RenderList_Generate", 31300), call("CloseBooks", 31300),
+           call("DestroyLabBooks", 31300), call("SetCastleAccess", 31900), call("StopConversation", 32000),
+           state("castle HUD free", r"hud machine 96773521 \(depth 1\) state 1 ", 32000)],
+          press=("A@31000-32400/150",)),
+    # Later stages go here (a deadline after 32900, frames counted from the run's start).
 ]
 
 

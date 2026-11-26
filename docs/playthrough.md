@@ -49,6 +49,7 @@ load messages, never from pictures.
 | thanks | the Mayor's node, his conversation, `GotoCastleLocation`, the castle level, `HandleReturnToCastle`, the next `StartQuest` |
 | name | Fuseless's lines in the castle, `EnterName_Init`: the scientist name entry screen (the first screen with a grid widget) |
 | named | two letters typed on the keys (`EnterName_AddLetter`), the tick confirms: `EnterName_SaveNameToPlayerName`, `EnterName_Destroy`, Fuseless's welcome |
+| igor | Fuseless's welcome, I.G.O.R. opens on its ingredients page and closes (`InitLabBooks`, `CloseBooks`, `DestroyLabBooks`), his second talk, `SetCastleAccess`, the castle HUD is free in the Command Room |
 
 `python tools/playthrough.py --list` prints the markers and deadlines.
 
