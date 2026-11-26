@@ -28,6 +28,7 @@
 #include "port/port_gx.h"
 #include "port/port_mods.h"
 #include "port/port_overlay.h"
+#include "port/port_stateslots.h"
 
 #pragma comment(lib, "d3d11.lib")
 #pragma comment(lib, "d3dcompiler.lib")
@@ -113,6 +114,7 @@ static volatile LONG sWheel;           // mouse wheel movement the settings scre
 f32 PortGfxTakeWheel(void) { return (f32)InterlockedExchange(&sWheel, 0) / WHEEL_DELTA; }
 #define WM_PORT_TITLE (WM_APP + 1)     // the game thread posts it; the title is set here, on the window's own thread
 static char sTitleText[96];
+static BOOL sHandoff, sShowFull;       // a window waiting for a loaded state (PortGfxShowWindow)
 static void PostTitle(const char* t) {
     if (!sWnd) return;
     snprintf(sTitleText, sizeof(sTitleText), "%s", t);
@@ -137,7 +139,12 @@ static DWORD WINAPI WindowThread(void*) {
     AdjustWindowRect(&r, WS_OVERLAPPEDWINDOW, FALSE);
     // PORT_HIDDEN=1: not visible. PORT_OFFSCREEN=1: visible (the real code path) but far outside every monitor. For tests.
     BOOL offscreen = getenv("PORT_OFFSCREEN") != NULL;
-    sWnd = CreateWindowA(wc.lpszClassName, "Monster Lab (PC port)", WS_OVERLAPPEDWINDOW | (getenv("PORT_HIDDEN") ? 0 : WS_VISIBLE), offscreen ? -32000 : CW_USEDEFAULT, offscreen ? -32000 : CW_USEDEFAULT,
+    // Started by a savestate load: the window takes the old one's place and stays hidden until the state runs.
+    const char* place = getenv("MONSTERLAB_STATE_RECT");
+    int px = 0, py = 0, full = 0;
+    sHandoff = place && sscanf(place, "%d,%d,%d", &px, &py, &full) == 3;
+    sShowFull = sHandoff && full;
+    sWnd = CreateWindowA(wc.lpszClassName, "Monster Lab (PC port)", WS_OVERLAPPEDWINDOW | (getenv("PORT_HIDDEN") || sHandoff ? 0 : WS_VISIBLE), sHandoff ? px : offscreen ? -32000 : CW_USEDEFAULT, sHandoff ? py : offscreen ? -32000 : CW_USEDEFAULT,
                          r.right - r.left, r.bottom - r.top, NULL, NULL, wc.hInstance, NULL);
     SetEvent(sWndReady);
     MSG msg;
@@ -146,11 +153,26 @@ static DWORD WINAPI WindowThread(void*) {
 }
 
 HWND PortGfxWindow(void) { return sWnd; }
+static RECT sBeforeFull;
+static BOOL sFull;
+BOOL PortGfxIsFullscreen(void) { return sFull; }
+BOOL PortGfxWindowPlace(RECT* r) {
+    if (!sWnd) return FALSE;
+    if (sFull) { *r = sBeforeFull; return TRUE; }
+    return GetWindowRect(sWnd, r);
+}
+void PortGfxShowWindow(void) {
+    if (!sWnd || !sHandoff) return;
+    sHandoff = FALSE;
+    if (!getenv("PORT_HIDDEN")) ShowWindow(sWnd, SW_SHOW);
+    if (sShowFull) PortGfxSetFullscreen(TRUE);
+    SetForegroundWindow(sWnd);
+}
 
 // Fullscreen is the same window without a border over its whole monitor; the picture is stretched to it.
 void PortGfxSetFullscreen(BOOL on) {
-    static RECT saved;
-    static BOOL full;
+    RECT& saved = sBeforeFull;
+    BOOL& full = sFull;
     if (!sWnd || on == full) return;
     full = on;
     if (on) {
@@ -2298,6 +2320,31 @@ BOOL PortGfxSaveScreenshot(const char* path) {
     return SavePng(sOutTex, sOutW, sOutH, path);
 }
 
+// The shown picture without the overlay, scaled down (a savestate slot's picture).
+BOOL PortGfxThumbnail(u32 w, u32 h, u8* rgba) {
+    if (!sStarted || !sShown) return FALSE;
+    std::lock_guard<std::recursive_mutex> lk(sGfxLock);
+    D3D11_TEXTURE2D_DESC d;
+    sOutTex->GetDesc(&d);
+    d.Usage = D3D11_USAGE_STAGING; d.BindFlags = 0; d.CPUAccessFlags = D3D11_CPU_ACCESS_READ;
+    ID3D11Texture2D* st = NULL;
+    if (FAILED(sDev->CreateTexture2D(&d, NULL, &st))) return FALSE;
+    sCtx->CopyResource(st, sOutTex);
+    D3D11_MAPPED_SUBRESOURCE map;
+    if (FAILED(sCtx->Map(st, 0, D3D11_MAP_READ, 0, &map))) { st->Release(); return FALSE; }
+    for (u32 y = 0; y < h; y++) {
+        const u8* s = (const u8*)map.pData + (size_t)(sPicY + (y * 2 + 1) * sPicH / (h * 2)) * map.RowPitch;
+        for (u32 x = 0; x < w; x++) {
+            const u8* p = s + (sPicX + (x * 2 + 1) * sPicW / (w * 2)) * 4;
+            u8* o = rgba + (y * w + x) * 4;
+            o[0] = p[0]; o[1] = p[1]; o[2] = p[2]; o[3] = 255;
+        }
+    }
+    sCtx->Unmap(st, 0);
+    st->Release();
+    return TRUE;
+}
+
 // ------------------------------------------------------------------ start
 // Fast-forward with a frame target: draws only matter through the copies of the frame buffer that later
 // frames use (the engine redraws and recopies everything each frame) and the picture at the target, so the
@@ -2347,7 +2394,7 @@ BOOL PortGfxStart(BOOL window) {
         CloseHandle(CreateThread(NULL, 0, WindowThread, NULL, 0, NULL));
         WaitForSingleObject(sWndReady, 5000);
         if (!sWnd) window = FALSE;
-        else if (gPortSettings.fullscreen) PortGfxSetFullscreen(TRUE);
+        else if (gPortSettings.fullscreen && !sHandoff) PortGfxSetFullscreen(TRUE);
     }
     static const D3D_DRIVER_TYPE kDrivers[2] = {D3D_DRIVER_TYPE_HARDWARE, D3D_DRIVER_TYPE_WARP};
     static const D3D_FEATURE_LEVEL kLevels[2] = {D3D_FEATURE_LEVEL_11_0, D3D_FEATURE_LEVEL_10_0};
