@@ -129,7 +129,7 @@ void fn_801AC8A0(u8* arg0, s32 arg1, u8* arg2) {
 // State update: if vfunc 0x24 on arg0 returns 0, switches the active child (slots at +0x8, index at
 // +0x18, enabled byte at +0x1C) to the index returned by vfunc 0x1C(arg1), with enter/exit calls.
 void fn_8011D3A0(u8* arg0, s32 arg1) {
-    if (((s32(*)(u8*))(*(void**)(*(u8**)arg0 + 0x24)))(arg0) != 0) {
+    if (((s32(*)(u8*, s32))(*(void**)(*(u8**)arg0 + 0x24)))(arg0, arg1) != 0) {   // the name stays in r4
         return;
     }
     s32 cur = *(s32*)(arg0 + 0x18);
