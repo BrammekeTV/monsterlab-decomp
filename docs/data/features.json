@@ -99,6 +99,11 @@
  "changelog": [
   {
    "date": "2026-11-26",
+   "time": "10:43",
+   "text": "Savestates: tests can now start in the middle of the game (--save-state / --load-state, playthrough --from), and test runs repeat exactly (PR #270). New soft shadows option, on by default: the game's hard black shadows are blurred and see-through (PR #269). Texture packs: wider art for full-screen pictures fills a 16:9 screen (PR #272), and Dolphin texture packs with tex1_ names work (PR #273)."
+  },
+  {
+   "date": "2026-11-26",
    "time": "10:14",
    "text": "New lighting option, on by default: lit 3D scenes are no longer clipped to white, so the overexposed professor talk looks natural; the original look stays selectable in F1 (PR #268). The scientist name entry's letter keys now respond to the pointer (PR #271)."
   },
