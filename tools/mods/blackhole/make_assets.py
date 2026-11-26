@@ -11,10 +11,13 @@ Writes (default DIR: build/mods/BlackHoleHead, never committed):
   model/blackhole.json         the same as arrays (positions, normals, uvs, triangles per group) for the zone builder
 Needs numpy and Pillow.
 
+The look: a black ball inside a larger amber ball that is turned inside out (an "inverted hull"), so only the
+far inner side of the amber ball is drawn and the black ball gets a glowing, streaky rim from every side.
+
 The sheet's layout (u right, v down, 0..1):
-  top half             the accretion disc: u runs once around the hole, v from the inner to the outer edge
-  bottom left quarter  the core (black) with the photon ring at its rim
-  bottom right quarter the stabilizer: brushed dark metal, an amber emitter cap, the field cone
+  top half             the hull: u runs around its axis (wraps), v from pole to pole
+  bottom left quarter  the core (black)
+  bottom right quarter the stabilizer: brushed dark metal with an amber emitter cap
 """
 import argparse
 import json
@@ -57,90 +60,71 @@ def amber(t):
     return stops[i[..., 0]] * (1 - f) + stops[i[..., 0] + 1] * f
 
 
-def disc_strip(w, h):
-    """The disc unrolled: long streaks along u (sheared, so they swirl), brightest at the inner edge."""
+def hull_strip(w, h):
+    """The glowing hull unrolled: u runs once around its axis, v from pole to pole. Long streaks along u,
+    sheared so they swirl, hot pale lanes on deep orange, a little darker towards the poles."""
     v = np.linspace(0, 1, h)[:, None]
-    u = np.linspace(0, 1, w, endpoint=False)[None, :]
     streak = np.zeros((h, w))
-    for k, (rows, seed) in enumerate(((24, 1), (48, 2), (96, 3))):
+    for k, (rows, seed) in enumerate(((20, 1), (40, 2), (80, 3))):
         n = noise((rows, w // 8), seed, octaves=3)
         img = np.asarray(Image.fromarray((n * 255).astype(np.uint8)).resize((w, h), Image.BICUBIC)) / 255.0
-        shift = (v[:, 0] * w * (0.35 + 0.2 * k)).astype(int)            # shear: the outer matter trails behind
+        shift = (v[:, 0] * w * (1 + k)).astype(int)                      # shear by whole turns: the streaks wind around the hole and still tile
         img = np.stack([np.roll(img[y], shift[y]) for y in range(h)])
         streak += img / (k + 1)
-    streak /= streak.max()
+    streak = (streak - streak.min()) / (streak.max() - streak.min())
     clumps = noise((h, w), 7, octaves=3)
-    heat = (1 - v) ** 1.3 * 0.75 + 0.25                                  # hot inside, cooler outside
-    edge = np.clip(v / 0.06, 0, 1) * np.clip((1 - v) / 0.25, 0, 1)        # soft inner rim, ragged fade outside
-    t = (0.25 + 0.95 * streak ** 1.6) * heat * (0.75 + 0.35 * clumps) * edge + 0 * u
-    rgb = amber(t)
-    alpha = np.clip(edge * (0.35 + streak) * 1.6, 0, 1)
-    return rgb, alpha
+    belt = 0.55 + 0.45 * np.sin(v * math.pi) ** 0.8                       # brightest around the equator
+    t = (0.30 + 0.80 * streak ** 1.5) * belt * (0.80 + 0.30 * clumps)
+    return amber(t)
 
 
 def sheet(size=256):
     half = size // 2
     rgb = np.zeros((size, size, 3))
     spec = np.zeros((size, size))
-    d_rgb, _ = disc_strip(size, half)
-    rgb[:half] = d_rgb
-    # Core: a disc of darkness, a hair of deep blue towards the rim, the photon ring at the rim.
-    y, x = np.mgrid[0:half, 0:half]
-    r = np.hypot(x - half / 2 + 0.5, y - half / 2 + 0.5) / (half / 2)
-    core = np.zeros((half, half, 3))
-    core += np.clip((r - 0.55) / 0.4, 0, 1)[..., None] ** 2 * np.array([0.0, 0.10, 0.16])
-    ring = np.exp(-((r - 0.93) / 0.035) ** 2)
-    core += amber(ring * 0.95) * ring[..., None]
-    rgb[half:, :half] = np.clip(core, 0, 1)
-    # Stabilizer: dark gunmetal with a brushed grain, an amber cap (top band), the field cone (right strip).
+    rgb[:half] = hull_strip(size, half)
+    # Core: black. Nothing else: the hull behind it gives the rim.
+    # Stabilizer: dark gunmetal with a brushed grain, an amber cap (top band), two grooves, no bolts.
     grain = noise((half, half), 11, octaves=4, wrap_x=True)
     metal = (0.16 + 0.10 * grain)[..., None] * np.array([0.85, 0.92, 1.0])
     vy = np.linspace(0, 1, half)[:, None] + 0 * grain
     cap = np.clip(1 - vy / 0.22, 0, 1)
     metal = metal * (1 - cap[..., None]) + amber(0.45 + 0.5 * cap) * cap[..., None]
-    for band in (0.45, 0.72):                                            # two grooves, no bolts
+    for band in (0.45, 0.72):
         metal *= (1 - 0.6 * np.exp(-((vy - band) / 0.02) ** 2))[..., None]
-    ux = np.linspace(0, 1, half)[None, :] + 0 * grain
-    cone = np.clip((ux - 0.75) / 0.25, 0, 1) > 0
-    beam = amber(0.35 + 0.6 * (1 - vy) * (0.6 + 0.4 * grain))
-    metal = np.where(cone[..., None], beam, metal)
     rgb[half:, half:] = np.clip(metal, 0, 1)
-    spec[half:, half:] = np.where(cone, 0.0, 0.55 + 0.35 * grain)
+    spec[half:, half:] = (0.55 + 0.35 * grain) * (1 - cap)
     return rgb, spec
 
 
 def icon(size):
-    """The hole seen as in the reference: tilted disc in front, its light bent over the top and under the core."""
+    """The hole as it looks in game: a black ball, the swirling amber hull as a halo around it, the emitter below."""
     ss = 4
     n = size * ss
     y, x = np.mgrid[0:n, 0:n]
     x = (x + 0.5) / n * 2 - 1
-    y = (y + 0.5) / n * 2 - 1
-    tilt = math.radians(-14)
-    xr = x * math.cos(tilt) - y * math.sin(tilt)
-    yr = x * math.sin(tilt) + y * math.cos(tilt)
-    r = np.hypot(xr, yr)
-    ang = np.arctan2(yr, xr)
+    y = (y + 0.5) / n * 2 - 1 + 0.16                                      # the hole sits a little above the middle
+    r = np.hypot(x, y)
+    ang = np.arctan2(y, x)
     swirl = noise((n, n), 5, octaves=4, wrap_x=False)
-    streaks = 0.5 + 0.5 * np.sin(ang * 9 + r * 26 + swirl * 5)
-    col = np.zeros((n, n, 3))
-    a = np.zeros((n, n))
-    # The lensed light: a thick halo over the top, a thinner one below.
-    for rad, wid, mask in ((0.50, 0.12, yr < 0.05), (0.42, 0.07, yr > -0.05)):
-        halo = np.exp(-((r - rad) / wid) ** 2) * mask
-        col += amber(halo * (0.55 + 0.45 * streaks)) * halo[..., None]
-        a = np.maximum(a, halo)
-    core = r < 0.30
-    col[core] = 0
-    a = np.maximum(a, np.clip((0.31 - r) / 0.02, 0, 1))
-    ring = np.exp(-((r - 0.305) / 0.012) ** 2)
-    col += amber(ring)[...] * ring[..., None] * 0.9
-    # The disc in front: a thin, long ellipse across the middle.
-    band = np.exp(-(yr / 0.055) ** 2) * np.clip((0.98 - np.abs(xr)) / 0.25, 0, 1)
-    lane = 0.6 + 0.4 * np.sin(xr * 30 + swirl * 6)
-    front = amber(band * (0.5 + 0.5 * lane) * 1.05)
-    col = col * (1 - band[..., None]) + front * band[..., None]
-    a = np.maximum(a, np.clip(band * 1.4, 0, 1))
+    rc, rh = 0.46, 0.70                                                  # core and hull radius
+    # Inside of a sphere seen from the front: the streaks crowd together towards the rim.
+    depth = np.sqrt(np.clip(1 - (r / rh) ** 2, 0, 1))
+    streaks = 0.5 + 0.5 * np.sin(ang * 7 + depth * 9 + swirl * 6)
+    t = (0.35 + 0.65 * streaks ** 1.4) * (0.75 + 0.3 * swirl)
+    col = amber(t)
+    a = np.clip((rh - r) / 0.02, 0, 1)
+    core = np.clip((rc - r) / 0.015, 0, 1)
+    col *= (1 - core)[..., None]
+    # Emitter: a small dark column with an amber cap under the hole.
+    ey = y - 0.16
+    body = (np.abs(x) < 0.16 - 0.05 * np.clip((ey - 0.70) / 0.2, 0, 1)) & (ey > 0.62) & (ey < 0.98)
+    capm = (np.abs(x) < 0.13) & (ey > 0.62) & (ey < 0.70)
+    free = (a < 0.5)[..., None]
+    metal = np.array([0.15, 0.17, 0.20]) * (0.8 + 0.5 * swirl)[..., None]
+    col = np.where(body[..., None] & free, metal, col)
+    col = np.where(capm[..., None] & free, amber(0.6 + 0.3 * swirl), col)
+    a = np.maximum(a, body.astype(float))
     rgba = np.dstack([np.clip(col, 0, 1), np.clip(a, 0, 1)])
     img = Image.fromarray((rgba * 255).astype(np.uint8), "RGBA")
     return img.resize((size, size), Image.LANCZOS)
@@ -161,71 +145,45 @@ class Mesh:
         self.groups.setdefault(group, []).extend([[a, b, c], [a, c, d]])
 
 
+HULL_GROUP = "hull"
+
+
 def build_model():
     """Part space: origin at the neck socket, +y up, +z to the front; units as the game's heads (about 0.5 across).
 
-    core       dark sphere, radius R, centre C
-    photon     thin ring hugging the core, facing the front
-    disc       flat ring around the core, tilted like the reference
-    lens_top / lens_bottom   the disc's light bent over and under the core: half rings standing upright behind it
-    emitter    the stabilizer on the neck: a tapered column with an amber cap
-    field      an open cone of light from the cap up to the core
-    The uvs point into the sheet of make_assets.sheet(). disc, lens_*, photon and field are meant to be drawn
-    additive and unlit; core and emitter are ordinary lit surfaces.
+    core       black sphere, radius R, centre C
+    hull       a larger sphere around it that carries the amber picture, turned inside out: its triangles are
+               wound the other way and its normals point at the centre, so with the usual back-face culling only
+               the far inner side is drawn: a glowing rim around the core from every direction
+    emitter    the stabilizer on the neck: a tapered column with an amber cap pointing up at the hole
+    The triangles of core and emitter are counter-clockwise seen from outside (as in an .obj); the hull's are
+    clockwise. The uvs point into the sheet of make_assets.sheet().
     """
     m = Mesh()
     R = 0.13
-    C = np.array([0.0, 0.34, 0.0])
-    # core: 12 x 8 sphere, planar uv into the bottom left quarter (centre = black)
-    seg, rings = 12, 8
-    grid = []
-    for j in range(rings + 1):
-        th = math.pi * j / rings
-        row = []
-        for i in range(seg + 1):
-            ph = 2 * math.pi * i / seg
-            n = np.array([math.sin(th) * math.sin(ph), math.cos(th), math.sin(th) * math.cos(ph)])
-            row.append(m.vert(C + R * n, n, (0.25 + 0.2 * n[0], 0.75 - 0.2 * n[1])))
-        grid.append(row)
-    for j in range(rings):
-        for i in range(seg):
-            m.quad("core", grid[j][i], grid[j + 1][i], grid[j + 1][i + 1], grid[j][i + 1])
+    C = np.array([0.0, 0.36, 0.0])
 
-    def ring(group, r0, r1, a0, a1, segs, frame, v0, v1, u0=0.0, u1=1.0, lift=0.0):
-        """A flat band between radii r0 and r1 from angle a0 to a1 in the plane frame = (x axis, y axis, normal)."""
-        ex, ey, en = (np.array(v, float) for v in frame)
-        prev = None
-        for i in range(segs + 1):
-            t = i / segs
-            a = a0 + (a1 - a0) * t
-            d = ex * math.cos(a) + ey * math.sin(a)
-            u = u0 + (u1 - u0) * t
-            cur = (m.vert(C + d * r0 + en * lift, en, (u, v0)), m.vert(C + d * r1 + en * lift, en, (u, v1)))
-            if prev:
-                m.quad(group, prev[0], prev[1], cur[1], cur[0])
-            prev = cur
+    def sphere(group, radius, seg, rings, axis_tilt, uv, inside_out):
+        ct, st = math.cos(axis_tilt), math.sin(axis_tilt)
+        grid = []
+        for j in range(rings + 1):
+            th = math.pi * j / rings
+            row = []
+            for i in range(seg + 1):
+                ph = 2 * math.pi * i / seg
+                n = np.array([math.sin(th) * math.sin(ph), math.cos(th), math.sin(th) * math.cos(ph)])
+                n = np.array([n[0] * ct + n[1] * st, -n[0] * st + n[1] * ct, n[2]])     # lean the axis sideways
+                row.append(m.vert(C + radius * n, -n if inside_out else n, uv(i / seg, j / rings)))
+            grid.append(row)
+        for j in range(rings):
+            for i in range(seg):
+                q = (grid[j][i], grid[j + 1][i], grid[j + 1][i + 1], grid[j][i + 1])
+                m.quad(group, *(q[::-1] if inside_out else q))
 
-    tilt = math.radians(14)
-    dx = (math.cos(tilt), -math.sin(tilt), 0.0)             # the disc dips to the right, as in the reference
-    dz = (0.0, 0.0, 1.0)
-    dn = (math.sin(tilt), math.cos(tilt), 0.0)
-    ring("disc", R * 1.25, R * 3.1, 0, 2 * math.pi, 24, (dx, dz, dn), 0.02, 0.48)
-    up = (math.sin(tilt), math.cos(tilt), 0.0)
-    front = (0.0, 0.0, 1.0)
-    ring("lens_top", R * 1.08, R * 1.95, 0, math.pi, 14, (dx, up, front), 0.02, 0.34, 0.0, 0.5, lift=-0.01)
-    ring("lens_bottom", R * 1.08, R * 1.55, math.pi, 2 * math.pi, 14, (dx, up, front), 0.02, 0.22, 0.5, 1.0, lift=-0.01)
-    # photon ring: uv along the bright rim of the core picture
-    ex, ey = np.array(dx), np.array(up)
-    prev = None
-    for i in range(25):
-        a = 2 * math.pi * i / 24
-        d = ex * math.cos(a) + ey * math.sin(a)
-        uvc = np.array([0.25 + 0.232 * math.cos(a), 0.75 - 0.232 * math.sin(a)])
-        cur = (m.vert(C + d * R * 1.0 + np.array(front) * 0.005, front, uvc * 0.985 + np.array([0.25, 0.75]) * 0.015),
-               m.vert(C + d * R * 1.09 + np.array(front) * 0.005, front, uvc))
-        if prev:
-            m.quad("photon", prev[0], prev[1], cur[1], cur[0])
-        prev = cur
+    # core: everything maps to one black spot of the bottom left quarter
+    sphere("core", R, 12, 8, 0.0, lambda u, v: (0.25 + 0.1 * (u - 0.5), 0.75 + 0.1 * (v - 0.5)), False)
+    # hull: the top half of the sheet, twice around (the streaks repeat on the far side), axis leaning 14 degrees
+    sphere(HULL_GROUP, R * 1.42, 16, 10, math.radians(14), lambda u, v: (2.0 * u, 0.008 + 0.484 * v), True)
 
     def lathe(group, profile, segs, u0, u1):
         """Turns a profile [(radius, y, v)] around the y axis; u runs across [u0, u1] of the right quarter."""
@@ -245,8 +203,7 @@ def build_model():
                 m.quad(group, cols[i][k], cols[i][k + 1], cols[i + 1][k + 1], cols[i + 1][k])
 
     lathe("emitter", [(0.060, 0.000, 1.00), (0.070, 0.020, 0.90), (0.050, 0.045, 0.72), (0.050, 0.075, 0.55),
-                      (0.066, 0.095, 0.45), (0.066, 0.110, 0.24), (0.040, 0.125, 0.10), (0.0, 0.125, 0.0)], 10, 0.0, 0.72)
-    lathe("field", [(0.036, 0.126, 1.0), (0.085, C[1] - R * 0.75, 0.0)], 10, 0.78, 0.98)
+                      (0.066, 0.095, 0.45), (0.066, 0.110, 0.24), (0.040, 0.125, 0.10), (0.0, 0.125, 0.0)], 10, 0.0, 1.0)
     return m
 
 
@@ -279,10 +236,12 @@ def main():
     icon(256).save(os.path.join(a.out, "icons", MODEL_KEY + "_h.png"))
     m = build_model()
     write_obj(m, os.path.join(a.out, "model", "blackhole.obj"))
-    additive = ["disc", "lens_top", "lens_bottom", "photon", "field"]
     with open(os.path.join(a.out, "model", "blackhole.json"), "w") as f:
         json.dump({"key": MODEL_KEY, "positions": m.pos, "normals": m.nrm, "uvs": m.uv, "groups": m.groups,
-                   "additive": additive, "spin": {"group": "disc", "axis": "normal", "turns_per_second": 0.15}}, f)
+                   "winding": "ccw-outside",
+                   "inverted": [HULL_GROUP],       # wound inside out: draw with back-face culling as everything else
+                   "unlit": [HULL_GROUP],          # full bright if the material allows
+                   "spin": {"group": HULL_GROUP, "by": "texture scroll along u", "turns_per_second": 0.08}}, f)
     tris = sum(len(t) for t in m.groups.values())
     print("black hole head: %d vertices, %d triangles, groups %s -> %s" % (len(m.pos), tris, ", ".join(m.groups), a.out))
 
