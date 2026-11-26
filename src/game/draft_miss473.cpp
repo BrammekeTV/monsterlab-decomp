@@ -261,7 +261,7 @@ void fn_800B1F94(u8* arg0, f32 farg0) {
 // Switches the active child: if the virtual test at vtable +0x24 returns 0, releases the
 // current child (vtable +0x10), picks a new index from vtable +0x1C and enters that child (+0xC).
 void fn_8011A5FC(u8* arg0, s32 arg1) {
-    if (((s32 (*)(u8*))(*(void**)(*(u8**)arg0 + 0x24)))(arg0) == 0) {
+    if (((s32 (*)(u8*, s32))(*(void**)(*(u8**)arg0 + 0x24)))(arg0, arg1) == 0) {   // the name stays in r4
         s32 cur = *(s32*)(arg0 + 0x18);
         *(u8**)(arg0 + 0x4) = NULL;
         if (cur != -1) {
