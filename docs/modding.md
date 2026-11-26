@@ -337,6 +337,9 @@ version as `mods\MyMod\textures\MonsterLab_Logo.png` instead. `--verbose` logs
 The goal is that a mod can later add something new, for example a head part with its own model, textures
 and inventory icon that is always unlocked. Two rules for whatever gets built:
 
+A first piece exists: a head part drawn over a template of the disc ("Adding a part" above). Its part-table row
+and names are a stand-in for the table patches described here; icon and map model are missing.
+
 - **New files.** A mod ships its own files beside replacements. `files\` already serves a path the disc does
   not have, but the game only opens it if something tells it to: the new data has to name it.
 - **Tables are patched, never shipped whole.** A mod holds only its own entries or a change list that the
