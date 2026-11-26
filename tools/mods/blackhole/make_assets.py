@@ -8,7 +8,7 @@ Writes (default DIR: build/mods/BlackHoleHead, never committed):
   icons/p_hd_sha077.png        64x64 part icon      (the game's part icons: 64x64, and 256x256 for "_h")
   icons/p_hd_sha077_h.png      256x256 part icon
   model/blackhole.obj          the model, for a look in any viewer
-  model/blackhole.json         the same as arrays (positions, normals, uvs, triangles per group) for the zone builder
+  model/blackhole.json         the same as arrays (positions, normals, uvs, triangles and strips per group) for build_mod.py
 Needs numpy and Pillow.
 
 The look: a black ball inside a larger amber ball that is turned inside out (an "inverted hull"), so only the
@@ -132,7 +132,7 @@ def icon(size):
 
 class Mesh:
     def __init__(self):
-        self.pos, self.nrm, self.uv, self.groups = [], [], [], {}
+        self.pos, self.nrm, self.uv, self.groups, self.strips = [], [], [], {}, {}
 
     def vert(self, p, n, uv):
         self.pos.append([round(float(c), 5) for c in p])
@@ -143,6 +143,10 @@ class Mesh:
 
     def quad(self, group, a, b, c, d):
         self.groups.setdefault(group, []).extend([[a, b, c], [a, c, d]])
+
+    def strip(self, group, xs, ys):
+        """The same surface as a triangle strip x0 y0 x1 y1 ...: its first triangle (x0, y0, x1) is wound like the quads."""
+        self.strips.setdefault(group, []).append([i for pair in zip(xs, ys) for i in pair])
 
 
 HULL_GROUP = "hull"
@@ -179,6 +183,7 @@ def build_model():
             for i in range(seg):
                 q = (grid[j][i], grid[j + 1][i], grid[j + 1][i + 1], grid[j][i + 1])
                 m.quad(group, *(q[::-1] if inside_out else q))
+            m.strip(group, *((grid[j + 1], grid[j]) if inside_out else (grid[j], grid[j + 1])))
 
     # core: everything maps to one black spot of the bottom left quarter
     sphere("core", R, 12, 8, 0.0, lambda u, v: (0.25 + 0.1 * (u - 0.5), 0.75 + 0.1 * (v - 0.5)), False)
@@ -201,6 +206,7 @@ def build_model():
         for i in range(segs):
             for k in range(len(profile) - 1):
                 m.quad(group, cols[i][k], cols[i][k + 1], cols[i + 1][k + 1], cols[i + 1][k])
+            m.strip(group, cols[i + 1], cols[i])
 
     lathe("emitter", [(0.060, 0.000, 1.00), (0.070, 0.020, 0.90), (0.050, 0.045, 0.72), (0.050, 0.075, 0.55),
                       (0.066, 0.095, 0.45), (0.066, 0.110, 0.24), (0.040, 0.125, 0.10), (0.0, 0.125, 0.0)], 10, 0.0, 1.0)
@@ -237,7 +243,7 @@ def main():
     m = build_model()
     write_obj(m, os.path.join(a.out, "model", "blackhole.obj"))
     with open(os.path.join(a.out, "model", "blackhole.json"), "w") as f:
-        json.dump({"key": MODEL_KEY, "positions": m.pos, "normals": m.nrm, "uvs": m.uv, "groups": m.groups,
+        json.dump({"key": MODEL_KEY, "positions": m.pos, "normals": m.nrm, "uvs": m.uv, "groups": m.groups, "strips": m.strips,
                    "winding": "ccw-outside",
                    "inverted": [HULL_GROUP],       # wound inside out: draw with back-face culling as everything else
                    "unlit": [HULL_GROUP],          # full bright if the material allows

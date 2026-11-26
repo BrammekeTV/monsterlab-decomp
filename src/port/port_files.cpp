@@ -221,6 +221,7 @@ static void ConvertSection(const char* name, const SirCatalogFile* file, const S
             SirError err = GlobalBinaryConvert(&reloc, sGlobalHdr, dst, e->size, &failTable);
             if (err != SIR_OK) PortStop(8, "global_binary.sir: %s (table %d)", SirErrorText(err), failTable);
             PortModsApplyData(sGlobalHdr);
+            PortModPartsApplyData(sGlobalHdr);
             sConverted++;
             static char line[128];   // the milestone list keeps the pointer
             snprintf(line, sizeof(line), "global_binary.sir converted: %u pointers, %u fields", reloc.ptrImage, reloc.fieldsSwapped);
@@ -332,6 +333,7 @@ static void ConvertSection(const char* name, const SirCatalogFile* file, const S
         LevelZoneRootsFree(&roots);
         if (err != SIR_OK) PortStop(8, "%s zone %d: %s", name, e->type, SirErrorText(err));
         sConverted++;
+        PortModPartsZoneRead(e->type, dst, e->size);
         PortLog("%s zone %d: slot copy, zone objects, the screen set and the common part of its widgets converted (%u pointers, %u fields); the rest of the zone is not",
                 name, e->type, reloc.ptrImage, reloc.fieldsSwapped);
         return;

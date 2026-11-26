@@ -185,6 +185,19 @@ Rules, checked when the game loads `global_binary.sir`:
 - With several mods the later one in the load order wins per string.
 - The text is read when the game starts: restart after a change.
 
+## Adding a part
+
+A mod can add a monster part: `mods\<mod name>\parts\<model key>.part`. The file holds the mod's own model
+and pictures and names a part of your disc as its template: the new part gets a row of its own in the part
+table (a copy of the template's, with its own model number and names), and while it is on a monster the port
+draws the mod's model in place of the template's, in memory. Skeleton, animations and material are the
+template's. Every game gets one such part in its inventory.
+
+`tools/mods/blackhole` is the worked example (a black hole head): `make_assets.py` draws the pictures and
+the model, `build_mod.py` writes the `.part` file (its header describes the format) and the README says how
+a part is stored and what does not work yet (no icon of its own, no model on the exploration map). A save
+made with such a mod holds a part that does not exist without it.
+
 ## Load order, switching mods on and off
 
 `monsterlab.ini` keeps the list:

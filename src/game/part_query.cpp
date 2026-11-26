@@ -24,6 +24,8 @@ static void*         sQueryTexture;           ORIG(0x805FB200)
 struct TextKey { u32 hash; s32 id; };
 extern const TextKey sTextKeys[0x10B2];       ORIG(0x8036D370)
 
+extern "C" s32 PortModPartsTextId(u32 hash);   // src/port/port_mod_parts.cpp
+
 // 0x80120D34
 // Binary search of the text-key table.
 extern "C" s32 TextIdFromHash(u32 hash) {
@@ -36,7 +38,7 @@ extern "C" s32 TextIdFromHash(u32 hash) {
         else               return sTextKeys[mid].id;
         mid = lo + (hi - lo) / 2;
     }
-    return -1;
+    return PortModPartsTextId(hash);   // PC port: -1 as in the original, or the name of a part a mod added
 }
 
 // 0x80216838
