@@ -434,7 +434,7 @@ template <class T> struct RawBuf {
 };
 // The queued vertices (position, two colours and the texture coordinates each) are written straight into the vertex
 // ring, which stays mapped from the first vertex of a queue until FlushDraws draws it (VbReserve, VbClose). The mapped
-// memory is write-combined: it is only written, a whole vertex after the other, and never read.
+// memory is write-combined: it is only written, vertex after vertex, and never read.
 static u8* sVbMap;                                          // the mapped buffer while a queue is open, else NULL
 static u32 sVbFirst, sVbLen, sVbRoom;                       // the open queue: where it starts, its bytes, how many it may take
 static u32 sBVCount;                                        // vertices in the open batch
@@ -1424,12 +1424,14 @@ struct DecPlan {
     PortGxLayout layout;
     DecAttr ap[12];
     u32 nap, flags, pmOff;
+    u8 zero[16];                                            // places in the vertex no decoder fills that must read 0
+    u32 nzero;
     BOOL made, hasPos;
 };
 static DecPlan sPlan;
 static void MakePlan(const PortGxLayout* L, const u32* active, u32 nActive) {
     DecPlan& p = sPlan;
-    p.layout = *L; p.made = TRUE; p.nap = 0; p.flags = 0; p.hasPos = FALSE;
+    p.layout = *L; p.made = TRUE; p.nap = 0; p.flags = 0; p.hasPos = FALSE; p.nzero = 0;
     p.pmOff = L->attr[0].mode ? L->attr[0].offset : ~0u;
     // (`active` leaves out array attributes with no array: those are in the layout but not in the vertex)
     for (u32 ai = 0; ai < nActive; ai++) {
@@ -1444,6 +1446,9 @@ static void MakePlan(const PortGxLayout* L, const u32* active, u32 nActive) {
         else { q.dst = 40 + (a - 13) * 8; comps = ga.comps > 2 ? 2 : ga.comps; p.flags |= 8u << (a - 13); }
         q.scale = 1.0f / (f32)(1u << (shift & 31));
         q.fnBe = DecPick(ga.fmt, comps, TRUE); q.fnLe = DecPick(ga.fmt, comps, FALSE);
+        // a position with two components gets z = 0, a texture coordinate with one t = 0
+        const u32 want = q.dst == 0 ? 3 : q.dst >= 40 ? 2 : comps;
+        for (u32 c = comps; c < want && p.nzero < 16; c++) p.zero[p.nzero++] = (u8)(q.dst + c * 4);
     }
 }
 
@@ -1471,18 +1476,13 @@ static void AppendDraw(const DrawSrc& d, u32 prim, u32 count, BOOL gpu, u32 rec,
                 q.base = arrBase[q.arr]; q.arrStride = arrStride[q.arr];
                 q.fn = q.mode >= 2 && !arrBe[q.arr] ? q.fnLe : q.fnBe;
             }
-            // A vertex is put together here and written out in one piece. The shader reads only what the flags say is
-            // there, so the rest is whatever it is; a position with two components gets z = 0, a texture coordinate with
-            // one t = 0 (the decoders leave those places alone).
-            alignas(16) u8 v[40 + 8 * 8];
+            // The shader reads only what the flags say is there: the rest of a vertex is not written.
             if (!plan.hasPos) {                                 // no position: nothing is drawn (as on the CPU path)
-                memset(v, 0, sizeof(v));
+                memset(o, 0, (size_t)count * stride);
                 const u32 none = 0x80000000u;
-                memcpy(v + 28, &none, 4);
-                for (u32 n = 0; n < count; n++, o += stride) memcpy(o, v, stride);
+                for (u32 n = 0; n < count; n++) memcpy(o + (size_t)n * stride + 28, &none, 4);
             } else {
-                memset(v, 0, sizeof(v));
-                const u32 pmOff = plan.pmOff, fl = plan.flags;
+                const u32 pmOff = plan.pmOff, fl = plan.flags, nzero = plan.nzero;
                 for (u32 n = 0; n < count; n++, data += L->size, o += stride) {
                     u32 vfl = pmOff != ~0u ? fl | (data[pmOff] & 63u) << 16 : fl, vrec = rec;
                     if (tmVtx) {
@@ -1490,14 +1490,14 @@ static void AppendDraw(const DrawSrc& d, u32 prim, u32 count, BOOL gpu, u32 rec,
                         if (tmVtx & 2) vrec |= (data[L->attr[2].offset] & 63u) << 26;
                         if (tmVtx & 4) vfl |= (data[L->attr[3].offset] & 63u) << 22;
                     }
-                    memcpy(v + 12, &vrec, 4); memcpy(v + 28, &vfl, 4);
+                    memcpy(o + 12, &vrec, 4); memcpy(o + 28, &vfl, 4);
                     for (u32 k = 0; k < nap; k++) {
                         const DecAttr& q = plan.ap[k];
                         const u8* p = data + q.off;
                         if (q.mode >= 2) { const u32 index = q.mode == 2 ? p[0] : Be16(p); p = q.base + index * q.arrStride; }
-                        q.fn(p, q.scale, v + q.dst);
+                        q.fn(p, q.scale, o + q.dst);
                     }
-                    memcpy(o, v, stride);
+                    for (u32 z = 0; z < nzero; z++) memset(o + plan.zero[z], 0, 4);
                 }
             }
         } else for (u32 n = 0; n < count; n++, o += stride) memcpy(o, &sVerts[n], stride);
