@@ -99,6 +99,11 @@
  "changelog": [
   {
    "date": "2026-11-26",
+   "time": "19:41",
+   "text": "Mods can now add brand-new monster parts and change the game's tables when it loads, without containing any game files. Modded parts keep a fixed number, recorded in a small file next to your saves, so turning a mod off or changing the mod order never mixes up your parts. The black hole head now uses this. Also, the last speed-up is in: vertices go straight to the graphics card, so drawing the village now takes 6.2 ms instead of 8.6 ms before the four performance steps, with an unchanged picture."
+  },
+  {
+   "date": "2026-11-26",
    "time": "19:11",
    "text": "Black hole head mod, part 2: the game can now draw a brand-new head part from a mod (seen in a battle with a test switch), packed from the mod's own model and textures. It isn't in normal play yet; that waits for the save-safe part numbers. Its look is also still being reworked to match the reference: a tilted glowing disc with light bending over and under the black hole."
   },
