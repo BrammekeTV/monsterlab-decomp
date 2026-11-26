@@ -99,6 +99,11 @@
  "changelog": [
   {
    "date": "2026-11-26",
+   "time": "12:03",
+   "text": "Badges are no longer awarded at random: four award paths set the wrong badge on Windows. A playthrough now earns only Flyweight, at the first win, and every award is logged (PR #277)."
+  },
+  {
+   "date": "2026-11-26",
    "time": "11:58",
    "text": "Fixed a renderer bug that wrote past the end of a graphics buffer, a likely cause of the AMD driver crashes; every write into the graphics card's buffers is now bounds-checked, the soft-shadow pass uses valid settings, and --d3d-debug turns on Direct3D's checking mode (PR #276)."
   },
