@@ -419,10 +419,13 @@ void TurretSetMuzzle(void* a0, u32 /*0x30*/ a1) {
 }  // extern "C"
 
 // ---- achievement counters in the save block ----
-// Flags: 256-bit set at save + 0x20 (four big-endian u64 words, highest 64 ids first).
-static u64 SaveFlagWord(const u8* s, u32 base) {
-    return ((u64) * (const u32*)(s + base) << 32) | *(const u32*)(s + base + 4);
-}
+extern "C" void BadgeWhy(const char* fmt, ...);   // port: badge award log (progress.cpp)
+extern "C" void BadgeLogAward(s32 id);
+// Flags: 256-bit set at save + 0x20 (four u64 words, highest 64 ids first). The words are read
+// as native u64s, the same way as SaveHasBadge / SaveAddBadge (progress.cpp): on the Wii that is
+// the asm's high-word-first pair, on the PC reading them as two halves would swap them and set
+// badge `id ^ 32` instead.
+static u64 SaveFlagWord(const u8* s, u32 base) { return *(const u64*)(s + base); }
 
 static u32 SaveFlagBase(u32 i) {
     return i < 0x40 ? 0x38 : i < 0x80 ? 0x30 : i < 0xC0 ? 0x28 : 0x20;
@@ -436,9 +439,7 @@ static BOOL SaveFlagGet(const u8* s, s32 id) {
 static void SaveFlagSet(u8* s, s32 id) {
     u32 i = (u8)id;
     u32 base = SaveFlagBase(i);
-    u64 v = SaveFlagWord(s, base) | ((u64)1 << (i & 0x3F));
-    *(u32*)(s + base) = (u32)(v >> 32);
-    *(u32*)(s + base + 4) = (u32)v;
+    *(u64*)(s + base) = SaveFlagWord(s, base) | ((u64)1 << (i & 0x3F));
 }
 
 // Notice queue (save + 0x744, 15 entries of 0x1C; count +0x8E8, sequence +0x910).
@@ -464,6 +465,8 @@ static void SaveAchievementCheck(u8* s, s32 id, s32 thr, s32 total) {
     if (id == -1) return;
     *(s32*)(s + 0x120) += 1;
     SaveFlagSet(s, id);
+    BadgeWhy("counter = %d >= tuning row 0x%X (%d)", total, thr, (s32)*(const f32*)(t + 4));
+    BadgeLogAward(id);
     SavePostNotice(s, 4, id);
     const u8* e = *(u8**)(gGameDb->data + 0x10A8) + id * 0x18;
     u32 score = *(u32*)(gSaveSystem + 0x12C) + (u32)*(const f32*)(e + 0x10);

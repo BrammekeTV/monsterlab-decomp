@@ -475,6 +475,7 @@ BOOL PortDiscFind(const char* path, u64* offset, u32* size) {
     while (*path == '/' || *path == '\\') path++;
     for (;;) {
         size_t len = strcspn(path, "/\\");
+        if (len == 1 && path[0] == '.' && path[1]) { path += 2; continue; }   // "./fmv/x.bik": a "." step stays in this directory
         BOOL last = path[len] == 0;
         BOOL found = FALSE;
         while (i < end) {
@@ -548,6 +549,7 @@ int PortSelfTestDisc(void) {
         u64 off = 0; u32 size = 0;
         u8 got[FILE_SIZE];
         DISC_CHECK(PortDiscFind("/DATA/Test.bin", &off, &size) && off == FILE_AT && size == FILE_SIZE, "data/test.bin: offset %llX size %X", off, size);
+        DISC_CHECK(PortDiscFind("./data/./test.bin", &off, &size) && off == FILE_AT && size == FILE_SIZE, "./data/./test.bin: offset %llX size %X", off, size);
         DISC_CHECK(PortDiscRead(FILE_AT, got, FILE_SIZE) && !memcmp(got, plain + FILE_AT, FILE_SIZE), "the file read across two clusters is wrong");
         DISC_CHECK(!PortDiscFind("data/none.bin", &off, &size) && !PortDiscFind("data", &off, &size) && !PortDiscFind("test.bin", &off, &size), "a file that is not there was found");
         DISC_CHECK(PortDiscDolOffset() == 0x800, "executable offset %llX", PortDiscDolOffset());

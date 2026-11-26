@@ -225,9 +225,9 @@ BOOL LabAddMaterial(LabInventory* inv, s32 index, s32 kind, s32 amount, BOOL not
             s32 owned = 0;
             for (s32 i = 0; i < MATERIALS_A; i++)
                 if (inv->materials[i].count != 0) owned++;
-            static const s32 kIds[3] = { 0x89, 0x8A, 0x8B };         // 0x803497D8
-            static const s32 kThresholds[3] = { 0x7D, 0x7E, 0x7F };   // 0x803497E4
-            SaveAddTieredBadges(gSaveSystem, owned, 3, kIds, kThresholds);
+            static const s32 kRows[3] = { 0x89, 0x8A, 0x8B };     // 0x803497D8: tuning rows (r6)
+            static const s32 kBadges[3] = { 0x7D, 0x7E, 0x7F };   // 0x803497E4: badge ids (r7)
+            SaveAddTieredBadges(gSaveSystem, owned, 3, kRows, kBadges);
         } else if (kind == 1) {
             s32 g1 = 0, g2 = 0, g3 = 0;
             for (s32 i = MATERIALS_A; i < MATERIALS; i++) {

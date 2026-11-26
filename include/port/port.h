@@ -163,6 +163,7 @@ typedef struct PortOptions {
     BOOL haveData;            // main.dol was found and loaded
     BOOL window;              // open a window and draw into it
     BOOL gpu;                 // --gpu (or PORT_GPU=1): draw on the graphics card without a window too (headless runs use WARP)
+    BOOL d3dDebug;            // --d3d-debug: Direct3D 11 debug layer; its messages go to the log (needs the Windows Graphics Tools)
     const char* screenshot;   // write the last shown picture to this PNG when the run stops
     const char* pickerShot;   // --picker-screenshot FILE: draw the first-run screen into this PNG and stop (tests)
     const char* dumpData;     // --dump-data DIR: the game's text table as JSON, then exit (port_moddata.cpp)

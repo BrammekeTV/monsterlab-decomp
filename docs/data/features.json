@@ -99,6 +99,31 @@
  "changelog": [
   {
    "date": "2026-11-26",
+   "time": "12:41",
+   "text": "The lab book (I.G.O.R.) finds its sections again, so your ingredients show up and the first experiment can be started; the game now plays on to the Weld-O-Tron experiment (PR #278)."
+  },
+  {
+   "date": "2026-11-26",
+   "time": "12:03",
+   "text": "Badges are no longer awarded at random: four award paths set the wrong badge on Windows. A playthrough now earns only Flyweight, at the first win, and every award is logged (PR #277)."
+  },
+  {
+   "date": "2026-11-26",
+   "time": "11:58",
+   "text": "Fixed a renderer bug that wrote past the end of a graphics buffer, a likely cause of the AMD driver crashes; every write into the graphics card's buffers is now bounds-checked, the soft-shadow pass uses valid settings, and --d3d-debug turns on Direct3D's checking mode (PR #276)."
+  },
+  {
+   "date": "2026-11-26",
+   "time": "11:13",
+   "text": "The game now plays further at the castle: after naming your scientist, Fuseless welcomes you, I.G.O.R. the lab book opens, and you walk through the Grand Hall into the Mechanical Lab to start your first experiment. The playthrough test covers it (21 stages, PR #275)."
+  },
+  {
+   "date": "2026-11-26",
+   "time": "11:04",
+   "text": "Cutscene movies play again when the game runs from the disc image (ISO, WBFS, RVZ) instead of an extracted folder (PR #274)."
+  },
+  {
+   "date": "2026-11-26",
    "time": "10:43",
    "text": "Savestates: tests can now start in the middle of the game (--save-state / --load-state, playthrough --from), and test runs repeat exactly (PR #270). New soft shadows option, on by default: the game's hard black shadows are blurred and see-through (PR #269). Texture packs: wider art for full-screen pictures fills a 16:9 screen (PR #272), and Dolphin texture packs with tex1_ names work (PR #273)."
   },
