@@ -125,13 +125,13 @@ void fn_80336FE0(void* base, s32 n, s32 size, void* cmp) {
 }
 
 // MSL rand and srand (0x80337150, 0x80337170): one generator for the whole game, its state at 0x805FAE38.
-// The C runtime's keeps a state per thread and outside the game's memory.
+// The C runtime's keeps a state per thread and outside the game's memory. types.h maps rand/srand to these.
 #define sRandNext (*(u32*)(uintptr_t)0x805FAE38)
-int rand(void) {
+int PortRand(void) {
     sRandNext = sRandNext * 0x41C64E6D + 0x3039;
     return (int)((sRandNext >> 16) & 0x7FFF);
 }
-void srand(unsigned seed) { sRandNext = seed; }
+void PortSrand(unsigned int seed) { sRandNext = seed; }
 
 // MSL time: seconds; also stored through the argument when it is not NULL. An unpaced run (headless tests)
 // tells the time by the game clock, so that it repeats: the game seeds its random numbers with this.

@@ -104,7 +104,7 @@ only works in paced runs.
 Two more sources of difference between runs were removed:
 
 - `rand()`/`srand()` were the C runtime's, which keeps one state per thread and outside the game's memory.
-  They are now the original's (one generator, state at 0x805FAE38, `port_msl.cpp`).
+  They are now the original's (one generator, state at 0x805FAE38: `PortRand`/`PortSrand` in `port_msl.cpp`, which `types.h` maps `rand`/`srand` to).
 - The game seeds it from `time()`. In an unpaced run `time()` is a fixed date plus the game clock.
 
 Paced runs (a window, real time) are as before: real time decides when the interrupt thread gets in.
