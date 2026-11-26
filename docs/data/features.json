@@ -99,6 +99,11 @@
  "changelog": [
   {
    "date": "2026-11-26",
+   "time": "19:11",
+   "text": "Black hole head mod, part 2: the game can now draw a brand-new head part from a mod (seen in a battle with a test switch), packed from the mod's own model and textures. It isn't in normal play yet; that waits for the save-safe part numbers. Its look is also still being reworked to match the reference: a tilted glowing disc with light bending over and under the black hole."
+  },
+  {
+   "date": "2026-11-26",
    "time": "18:41",
    "text": "Drawing is about 1.2 ms cheaper per frame in the village and in battles: repeated draws that need no new setup now skip straight to adding their vertices, which is 95% of all draws. On an idle PC the village, battles and the castle all hold 60 fps at 1080p, and the picture is unchanged."
   },
