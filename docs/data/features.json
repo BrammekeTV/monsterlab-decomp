@@ -99,6 +99,11 @@
  "changelog": [
   {
    "date": "2026-11-26",
+   "time": "11:13",
+   "text": "The game now plays further at the castle: after naming your scientist, Fuseless welcomes you, I.G.O.R. the lab book opens, and you walk through the Grand Hall into the Mechanical Lab to start your first experiment. The playthrough test covers it (21 stages, PR #275)."
+  },
+  {
+   "date": "2026-11-26",
    "time": "11:04",
    "text": "Cutscene movies play again when the game runs from the disc image (ISO, WBFS, RVZ) instead of an extracted folder (PR #274)."
   },
