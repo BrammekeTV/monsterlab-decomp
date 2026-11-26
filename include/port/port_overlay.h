@@ -38,6 +38,7 @@ void PortGuiInput(u32 w, u32 h);
 void PortGuiBuild(u32 w, u32 h);
 // Renderer hooks the settings screen uses (port_gfx_d3d11.cpp).
 void PortGfxSetFullscreen(BOOL on);
+void* PortOverlayThumb(int slot, unsigned long long stamp);   // port_overlay.cpp: a savestate slot's picture, or NULL
 f32  PortGfxTakeWheel(void);  // mouse wheel notches since the last call
 
 void PortOverlayStart(ID3D11Device* dev, ID3D11DeviceContext* ctx);

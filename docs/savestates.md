@@ -18,6 +18,31 @@ Give a run that loads a state the same input options as the run that saved it (t
 `--pointer` list): input is by frame number and is not part of the state. The tests do this by passing the
 whole list every time.
 
+## Slots for the player
+
+| Key | |
+|---|---|
+| F5 | save to the current slot |
+| F8 | load the current slot |
+| F6 / F7 | previous / next slot (1 to 10) |
+
+The settings screen (F1) has a Savestates page with a save and a load button for each slot, when it was saved
+and a small picture. A short line at the bottom of the picture says what happened ("State 3 saved",
+"Incompatible state (different build)"). The files are `states\slotN.mlst` (and `slotN.thumb`) beside the exe,
+so `build\pc\states\`; `MONSTERLAB_STATES` names another folder. The keys are `[savestates]` in
+`monsterlab.ini` (`save_key`, `load_key`, `prev_key`, `next_key`: Windows virtual-key codes, 0 for none).
+
+Code: `src/port/port_stateslots.cpp`. A save or load happens in `PortFrameDone`, between two game frames. A
+save that falls on a frame that cannot be written (see below) is tried again for a few seconds. A load starts
+the exe again with the same command line and `--load-state`; the old process keeps its window until the new one
+has run a frame of the state, then ends. Audio voices, a playing movie and everything else outside the state so
+start fresh, and a state that cannot be loaded leaves the running game as it was. The game's save files on disk
+are not changed by a load (see the table below). No state can be saved while a movie plays.
+
+Test: `python tools/state_slot_test.py` (headless; `--state-key save|load|prev|next@FRAME` takes the same path
+as the keys). The window itself (key presses, the hand-over from the old window to the new one, fullscreen) has
+no automatic test.
+
 ## A state belongs to one exe
 
 **A state loads only into the exe that wrote it.** The file holds the game threads' stacks and the statics
@@ -147,5 +172,5 @@ file that is no state are refused with a message.
   `tools/port_link.py` could point address-taken functions there), game statics and string literals at stable
   addresses, and threads that restart from a known point instead of a saved stack.
 - The audio effects' delay lines and the depth buffer are not in the file (see above).
-- Loading into a window (`--window --load-state`) is written (the clock goes on from the state's game time
+- Loading into a window (`--window --load-state`, also what F8 does) is written (the clock goes on from the state's game time
   in real time) but was not tested: the tests run headless.

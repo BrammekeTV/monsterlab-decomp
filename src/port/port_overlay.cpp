@@ -15,6 +15,7 @@
 #include "backends/imgui_impl_dx11.h"
 #include "port/port.h"
 #include "port/port_overlay.h"
+#include "port/port_stateslots.h"
 
 HWND PortGfxWindow(void);
 
@@ -103,6 +104,28 @@ int PortOverlayText(const PortFrameStats* s, f32 fps, f32 avgFps, f32 displayFps
         s->voices, s->voiceCount, s->outW, s->outH, s->wide ? "16:9" : "4:3", s->picW, s->picH);
 }
 
+static ID3D11Device* sDev;
+
+// The savestate slots' pictures as textures for ImGui; made again when a slot's file changes.
+void* PortOverlayThumb(int slot, unsigned long long stamp) {
+    static struct { unsigned long long stamp; ID3D11ShaderResourceView* view; } thumbs[PORT_STATE_SLOTS];
+    auto& t = thumbs[slot - 1];
+    if (t.stamp == stamp) return t.view;
+    if (t.view) { t.view->Release(); t.view = NULL; }
+    t.stamp = stamp;
+    static u8 rgba[PORT_THUMB_W * PORT_THUMB_H * 4];
+    if (!sDev || !PortStateSlotThumb(slot, rgba)) return NULL;
+    D3D11_TEXTURE2D_DESC d = {};
+    d.Width = PORT_THUMB_W; d.Height = PORT_THUMB_H; d.MipLevels = d.ArraySize = 1; d.Format = DXGI_FORMAT_R8G8B8A8_UNORM;
+    d.SampleDesc.Count = 1; d.Usage = D3D11_USAGE_IMMUTABLE; d.BindFlags = D3D11_BIND_SHADER_RESOURCE;
+    D3D11_SUBRESOURCE_DATA init = {rgba, PORT_THUMB_W * 4, 0};
+    ID3D11Texture2D* tex = NULL;
+    if (FAILED(sDev->CreateTexture2D(&d, &init, &tex))) return NULL;
+    sDev->CreateShaderResourceView(tex, NULL, &t.view);
+    tex->Release();
+    return t.view;
+}
+
 void PortOverlayStart(ID3D11Device* dev, ID3D11DeviceContext* ctx) {
     if (sReady) return;
     IMGUI_CHECKVERSION();
@@ -123,6 +146,7 @@ void PortOverlayStart(ID3D11Device* dev, ID3D11DeviceContext* ctx) {
     ImGui::GetStyle().WindowRounding = 4.0f;
     ImGui_ImplDX11_Init(dev, ctx);
     sCtx = ctx;
+    sDev = dev;
     sReady = TRUE;
 }
 
@@ -160,7 +184,8 @@ void PortOverlayFrame(const PortFrameStats* s) {
 }
 
 void PortOverlayDraw(ID3D11RenderTargetView* target, u32 w, u32 h) {
-    if ((!gPortOverlayOn && !gPortGuiOpen) || !sReady || !target) return;
+    const char* message = PortStateMessage();
+    if ((!gPortOverlayOn && !gPortGuiOpen && !message) || !sReady || !target) return;
     f32 total = 0.0f, worst = 0.0f;
     for (u32 i = 0; i < sMsCount; i++) { total += sMs[i]; if (sMs[i] > worst) worst = sMs[i]; }
     char text[512];
@@ -173,6 +198,14 @@ void PortOverlayDraw(ID3D11RenderTargetView* target, u32 w, u32 h) {
     ImGui_ImplDX11_NewFrame();
     ImGui::NewFrame();
     PortGuiBuild(w, h);
+    if (message) {                       // a savestate was saved, loaded or refused: a line at the bottom
+        ImGui::SetNextWindowPos(ImVec2(w * 0.5f, h - h / 30.0f), ImGuiCond_Always, ImVec2(0.5f, 1.0f));
+        ImGui::SetNextWindowBgAlpha(0.75f);
+        ImGui::Begin("message", NULL, ImGuiWindowFlags_NoDecoration | ImGuiWindowFlags_AlwaysAutoResize | ImGuiWindowFlags_NoSavedSettings |
+                                      ImGuiWindowFlags_NoFocusOnAppearing | ImGuiWindowFlags_NoNav | ImGuiWindowFlags_NoInputs | ImGuiWindowFlags_NoMove);
+        ImGui::TextUnformatted(message);
+        ImGui::End();
+    }
     if (gPortOverlayOn) {
     f32 pad = h / 90.0f;
     ImGui::SetNextWindowPos(ImVec2((f32)w - pad, pad), ImGuiCond_Always, ImVec2(1.0f, 0.0f));

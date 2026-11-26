@@ -342,8 +342,10 @@ def run(stages, iso, seconds, gpu=False, start=None):
     if start:
         cmd += ["--load-state", start[0]]
     else:
-        shutil.rmtree(STATES, ignore_errors=True)                   # states of an older build are of no use
-        os.makedirs(STATES)
+        os.makedirs(STATES, exist_ok=True)
+        # States of an older build are of no use. Only this tool's files go: the folder also has the player's slots.
+        for old in glob.glob(os.path.join(STATES, "f??????.mlst")) + glob.glob(INDEX):
+            os.remove(old)
         for frame in range(STATE_EVERY, stages[-1].deadline, STATE_EVERY):
             cmd += ["--save-state", os.path.join(STATES, f"f{frame:06d}.mlst") + f"@{frame}"]
     for st in stages:
