@@ -90,7 +90,7 @@ a PC port. Read this whole file before making changes. Human contributors: see
   conflicts. See `docs/port_runtime.md`.
 - `python tools/smoke.py [--iso PATH]`: **required before every PR that touches `src/` or `include/`** (port and game code). Builds incrementally,
   then runs headless: `--selftest`, `--to-menu` to frame 3300 and the title at frame 2600. Passes when each run reaches its frame limit
-  without a crash, the menu scripts ran (`UIScreen_Push`) and neither screenshot is blank or black (`build/smoke/*.png`). One verdict line
+  without a crash, the menu scripts ran (`UIScreen_Push`), the sample mod (`tools/make_sample_mod.py`) was picked up and neither screenshot is blank or black (`build/smoke/*.png`). One verdict line
   with timings (about 50 s); `SMOKE FAIL` lists the reasons and keeps the logs in `build/smoke/`. Needs the game data (`orig/RM7P4F` or `--iso`).
 - `python tools/playthrough.py [--iso PATH] [--stop-after STAGE]`: **required before every gameplay PR** (anything that touches `src/game`, `src/engine`,
   `src/system`, `src/leaf`, `include/`, the loader or runtime in `src/port`, or `config/RM7P4F/`), after `smoke.py`; CI has no game data and cannot run it.
