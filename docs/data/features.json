@@ -99,6 +99,11 @@
  "changelog": [
   {
    "date": "2026-11-26",
+   "time": "18:11",
+   "text": "The Weld-O-Tron experiment is playable: its screen shows the seam, the welding gun, the meter and the heat gauge, the gun swings in, and holding B welds. If the gun overheats, the experiment fails and you return to the castle without a crash. Next: welding well enough to pass."
+  },
+  {
+   "date": "2026-11-26",
    "time": "17:41",
    "text": "The first experiment, the Weld-O-Tron, now starts: its level loads, its screens appear and the two pages of instructions open (the arc welder and the seam's sparks were being read in the Wii's byte order). The button after the instructions still crashes; that's next. Also, the stutter when a level loads is about a third of what it was: compiled shaders are now kept on disk (the Command Room's worst frame went from about 120 ms to 40 ms)."
   },
