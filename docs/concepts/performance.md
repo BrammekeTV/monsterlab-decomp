@@ -62,6 +62,21 @@ each. Other sessions were still running playthroughs on the PC.
 Noise: village avg 23.19-27.20 (one run had a 142 ms frame), battle 22.45-22.65, castle held 60 fps in all runs. The render split
 shows decode and per-draw set-up about equal (each 5.5-6 ms in village and battle), flush about 2.4 ms.
 
+## After tasks 1 to 4
+
+Idle PC, 1920x1080, `--bench`, median of 3, the task 1 build and the final build alternating. Times in ms.
+
+| Scene | render before | render after | decode | set-up | flush | frame p95 before / after |
+|---|---|---|---|---|---|---|
+| village | 8.58 | 6.19 | 3.51 -> 2.97 | 3.00 -> 1.93 | 1.43 -> 0.64 | 18.04 / 18.03 |
+| battle | 8.88 | 6.35 | 3.42 -> 2.86 | 3.19 -> 2.13 | 1.63 -> 0.71 | 18.05 / 18.00 |
+| castle | 4.89 | 3.79 | 1.86 -> 1.71 | 1.56 -> 1.11 | 1.15 -> 0.64 | 18.03 / 18.02 |
+
+All three held 60 fps before and after on the idle PC; the gain is head room. With other programs loading the PC, render times
+were about 1.5 times these and village and battle missed 60 fps before task 3 (20.9 and 19.6 ms a frame). The level-change
+hitch (task 2) went from 113-133 ms to about 40 ms in the Command Room and from about 70 to 38 ms in the village. What is
+left there is first-time texture decoding. Task 5 (display-list cache) has not been started.
+
 ## How to verify every task
 
 1. Idle PC (no other builds or sessions). Three runs each of village and battle, before and after. Compare the median average, p95 and worst.
