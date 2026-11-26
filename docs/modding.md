@@ -336,7 +336,7 @@ Where the hooks would go:
 |---|---|
 | Applying a mod's data | `PortModsApplyData` (`src/port/port_moddata.cpp`), called from `port_files.cpp` once `global_binary.sir` is converted; today it only handles `data\strings.json` |
 | Text of a new thing | `strings.json` changes existing numbers only, and part names are looked up by text-key hash: appending entries and their keys is needed |
-| The part itself | the `PartDef` table (`include/game/part.h`, which notes spare slots 180-185 and that the table can be grown); a `data\parts.json` would append records. Mods must not rely on a fixed index: saves store the part's index, so the port has to keep a stable mod part -> index mapping and cope with a mod that was removed |
+| The part itself | the `PartDef` table (`include/game/part.h`): 186 rows, none spare (180-185 are boss parts), so it has to be grown, and a save holds a row number in one byte (at most 254 rows); a `data\parts.json` would append records. Mods must not rely on a fixed index: saves store the part's index, so the port has to keep a stable mod part -> index mapping and cope with a mod that was removed |
 | Model, textures, icon | not investigated: how a part finds its model in `shared_parts.sir` and its icon in the UI data, and adding entries to those at load time (`port_files.cpp`, `sir_loader.cpp`) |
 | Always unlocked | not investigated: where the owned and discovered parts of a save are filled (`src/game/progress.cpp`); grant the part after a save is loaded or created |
 
