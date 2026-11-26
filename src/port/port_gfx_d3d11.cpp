@@ -644,7 +644,7 @@ static u32 Fnv(const u8* p, u32 n, u32 h) {
     return h;
 }
 
-struct TexEntry { ID3D11ShaderResourceView* srv; u32 hash, w, h, fmt, gen, levels; u64 content; BOOL waiting; };   // waiting: a mod's file is still being read
+struct TexEntry { ID3D11ShaderResourceView* srv; u32 hash, w, h, fmt, gen, levels; u64 content; BOOL waiting, wideArt; };   // waiting: a mod's file is still being read; wideArt: its picture is wider than the game's
 static u32 sModBytes;                                      // mod pictures handed to the graphics card in this frame
 static u32 sTexGen = 1;                                    // bumped each frame and on a palette load: textures are re-hashed once per generation
 static std::map<u64, TexEntry> sTextures;                   // by address and palette slot
@@ -740,13 +740,28 @@ static ID3D11ShaderResourceView* MakeModTexture(const PortModImage& im, BOOL mip
 
 // The replacement of a texture if its file has been read; *waiting says to ask again at a later picture. At most
 // some 24 MB go to the graphics card per frame, so a screen full of large pictures does not stall one.
-static ID3D11ShaderResourceView* ModTexture(u64 content, const char* name, BOOL mips, BOOL* waiting) {
+// *wide: the replacement is at least a fifth wider for its height than the game's w x h texture (4:3 art redrawn
+// at 16:9 is a third wider).
+static ID3D11ShaderResourceView* ModTexture(u64 content, const char* name, BOOL mips, u32 w, u32 h, BOOL* waiting, BOOL* wide) {
     const PortModImage* im = NULL;
     *waiting = FALSE;
     if (sModBytes >= (24u << 20)) { *waiting = TRUE; return NULL; }
     int r = PortModsTexture(content, name, &im);
     *waiting = r == PORT_MODTEX_WAIT;
-    return r == PORT_MODTEX_READY ? MakeModTexture(*im, mips) : NULL;
+    ID3D11ShaderResourceView* srv = r == PORT_MODTEX_READY ? MakeModTexture(*im, mips) : NULL;
+    if (srv) *wide = (u64)im->w * h * 5 >= (u64)w * im->h * 6;
+    return srv;
+}
+
+// TRUE when texture map `map` was last drawn with wide replacement art (ModTexture), for the widescreen decision,
+// which comes before the textures are bound: the first picture a new replacement is in still has the old shape.
+static BOOL WideArt(const PortGx* g, u32 map) {
+    u32 base = (map < 4 ? 0x80 : 0xA0) + (map & 3);
+    u32 img0 = g->bp[base + 8], addr = (g->bp[base + 0x14] & 0xFFFFFF) << 5, tl = g->bp[base + 0x18];
+    u32 w = (img0 & 0x3FF) + 1, h = ((img0 >> 10) & 0x3FF) + 1, fmt = (img0 >> 20) & 15;
+    BOOL pal = fmt == 8 || fmt == 9 || fmt == 10;
+    auto it = sTextures.find((u64)addr << 16 | (pal ? (tl & 0xFFF) : 0xFFFF));
+    return it != sTextures.end() && it->second.wideArt && it->second.w == w && it->second.h == h && it->second.fmt == fmt;
 }
 
 static ID3D11ShaderResourceView* GetTexture(const PortGx* g, u32 map) {
@@ -771,7 +786,7 @@ static ID3D11ShaderResourceView* GetTexture(const PortGx* g, u32 map) {
         TexEntry& e = it->second;
         e.gen = sTexGen; e.w = w; e.h = h; e.fmt = fmt;
         if (e.waiting) {
-            ID3D11ShaderResourceView* got = ModTexture(e.content, PortModsTextureName(data), e.levels > 1, &e.waiting);
+            ID3D11ShaderResourceView* got = ModTexture(e.content, PortModsTextureName(data), e.levels > 1, w, h, &e.waiting, &e.wideArt);
             if (got) { FlushDraws(); if (e.srv) e.srv->Release(); e.srv = got; }
         }
         return e.srv ? e.srv : sWhite;
@@ -786,12 +801,12 @@ static ID3D11ShaderResourceView* GetTexture(const PortGx* g, u32 map) {
     // Mods: a PNG or DDS with this texture's content hash replaces it, at the file's own size (--dump-textures writes the originals).
     ID3D11ShaderResourceView* made = NULL;
     u64 content = 0;
-    BOOL waiting = FALSE;
+    BOOL waiting = FALSE, wideArt = FALSE;
     if (PortModsTexturesWanted()) {
         content = PortModsTextureHash(data, bytes, tlut, pal ? (fmt == 8 ? 32 : fmt == 9 ? 512 : 0x8000) : 0, w, h, fmt);
         const char* tname = PortModsTextureName(data);
         PortModsDumpTexture(content, tname, rgba.data(), w, h, fmt);
-        made = ModTexture(content, tname, levels > 1, &waiting);
+        made = ModTexture(content, tname, levels > 1, w, h, &waiting, &wideArt);
     }
     if (!made) {
         std::vector<std::vector<u32>> mips;
@@ -805,7 +820,7 @@ static ID3D11ShaderResourceView* GetTexture(const PortGx* g, u32 map) {
         }
         made = MakeTexture(rgba.data(), w, h, &mips);
     }
-    TexEntry e = {made, hash, w, h, fmt, sTexGen, levels, content, waiting};
+    TexEntry e = {made, hash, w, h, fmt, sTexGen, levels, content, waiting, wideArt};
     sTextures[key] = e;
     sGfxStats.textures++;
     return e.srv ? e.srv : sWhite;
@@ -1389,7 +1404,9 @@ static void DrawPrims(const PortGx* g, u32 prim, const PortGxLayout* L, u32 coun
     // stay centred instead: x is narrowed by 3/4. Layers that belong to the whole screen stay as
     // they are: those that show a copy of the frame buffer (glow, blur, the banded frame), and
     // those that reach from edge to edge without a picture on them (fades, bars, backdrops: no
-    // texture, or a small one). A full-screen picture (320 texels wide or more) is narrowed.
+    // texture, or a small one). A full-screen picture (320 texels wide or more) is narrowed, unless a
+    // mod replaced it with wider art (ModTexture) and the draw covers the whole screen: that art is
+    // made for 16:9 and fills it (docs/modding.md).
     // A movie frame (MoviePlay, fn_80205894): one full-screen quad through three indirect stages that undo the 8x4 tiling of the
     // planes. That only works when a pixel is a texel (the offset table and the plane are read for the same console pixel), which
     // is lost at any other size: a pixel centre that lies on the edge of a block of 8 reads a texel off, a thin line. It is drawn
@@ -1404,14 +1421,15 @@ static void DrawPrims(const PortGx* g, u32 prim, const PortGxLayout* L, u32 coun
     bool movie = movieShape && bnd[0] <= -0.98f && bnd[1] >= 0.98f && bnd[2] <= -0.98f && bnd[3] >= 0.98f && !sMovieOff;
     f32 squeeze = 1.0f;
     if (wideCheck) {
-        BOOL whole = FALSE, picture = FALSE;
+        BOOL whole = FALSE, picture = FALSE, art = FALSE;
         for (u32 m = 0; m < 8; m++) {
             if (!(texUsed & (1u << m))) continue;
             u32 base = (m < 4 ? 0x80 : 0xA0) + (m & 3);
             if (sEfbCopies.count((g->bp[base + 0x14] & 0xFFFFFF) << 5)) whole = TRUE;
-            else if ((g->bp[base + 8] & 0x3FF) + 1 >= 320) picture = TRUE;
+            else if ((g->bp[base + 8] & 0x3FF) + 1 >= 320) { picture = TRUE; art |= WideArt(g, m); }
         }
         if (!whole && !picture && bnd[0] <= -0.98f && bnd[1] >= 0.98f) whole = TRUE;
+        if (!whole && art && bnd[0] <= -0.98f && bnd[1] >= 0.98f && bnd[2] <= -0.98f && bnd[3] >= 0.98f) whole = TRUE;
         if (!whole) {
             squeeze = 0.75f;
             if (!gpu) for (u32 n = 0; n < count; n++) sVerts[n].pos[0] *= squeeze;

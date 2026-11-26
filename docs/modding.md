@@ -110,6 +110,25 @@ DDS files from other tools (for example `texconv`) work too. Accepted: a 2D text
 are (none are made for a DDS, whatever the filter setting). sRGB variants are read as plain ones. BC7
 needs a Direct3D 11 graphics card.
 
+### 16:9 art for backgrounds and loading screens
+
+The game draws its 2D layer for a 4:3 screen. When the port runs at 16:9 it keeps 2D pictures in their
+shape, in the middle of the screen. A replacement can be painted wider instead, and then fills the screen.
+The rule: the quad is widened to the full width when **all** of these hold:
+
+1. the game runs at 16:9 (and *Stretch the 2D layer* is off; with it on everything is stretched anyway);
+2. the picture is drawn flat (2D) over the **whole screen**, edge to edge in both directions;
+3. the game's own texture is **320 pixels wide or more** (smaller full-screen textures are stretched to the
+   width already);
+4. the replacement's width : height is **at least 1.2 times** the original's. For example 1.333 times for 4:3
+   art redrawn at 16:9: a 640x480 original (4:3) replaced by 2560x1440 (16:9), or a 512x512 original by a
+   picture with a 4:3 shape.
+
+So paint the original's content in the **middle three quarters** of the new width and add scenery at the
+sides: buttons and figures drawn on top of the background stay where they were. A picture that the game
+builds from several tiles, or draws over part of the screen only, is not widened. At 4:3 the same file is
+squeezed back into the 4:3 picture.
+
 ### Big packs
 
 The files are read and unpacked in the background, so the game does not stop while a pack loads: a texture
