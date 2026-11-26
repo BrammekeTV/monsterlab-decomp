@@ -177,7 +177,7 @@ typedef struct PortOptions {
     s32  fastForward;         // run the first N presented frames unpaced (--fast-forward N)
     BOOL fastAll;             // never pace (--fast)
     const char* perfLog;      // --perf-log FILE: one CSV row per shown frame, summary at the end (port_perf.cpp)
-    s32  bench;               // --bench menu (1) | village (2): fixed scenario, 20 s of real time, then exit
+    s32  bench;               // --bench menu (1) | village (2) | battle (3) | castle (4): fixed scenario, 1200 frames measured, then exit
     BOOL toMenu;              // --to-menu: fast-forward to the title, press A, go on to the main menu
     s32  showTexture;         // development aid (port_demo.cpp): -1, or a texture of global_binary.sir
     s32  captureAt;           // --capture-at N: take the F12 capture at frame N (tests; 0 = off)
