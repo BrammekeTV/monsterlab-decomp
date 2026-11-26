@@ -99,6 +99,11 @@
  "changelog": [
   {
    "date": "2026-11-26",
+   "time": "12:41",
+   "text": "The lab book (I.G.O.R.) finds its sections again, so your ingredients show up and the first experiment can be started; the game now plays on to the Weld-O-Tron experiment (PR #278)."
+  },
+  {
+   "date": "2026-11-26",
    "time": "12:03",
    "text": "Badges are no longer awarded at random: four award paths set the wrong badge on Windows. A playthrough now earns only Flyweight, at the first win, and every award is logged (PR #277)."
   },
