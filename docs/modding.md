@@ -33,7 +33,7 @@ console data; the port converts it after reading, as it does for the disc's own)
 ## Replacing a texture with a PNG or DDS
 
 A PNG (or a [DDS](#dds-for-big-packs)) under `mods\<mod name>\textures\` (sub-folders are fine) replaces one game texture. Which one is
-told in one of two ways:
+told in one of three ways:
 
 - **By name** (stable, the better choice): the file is called after the texture's name in the game's data,
   `MonsterLab_Logo.png` (case does not matter). `--dump-textures` writes the name into the file name when it
@@ -42,7 +42,14 @@ told in one of two ways:
   and `tex_256x256_f14_4962D17B32AB899E.png` replace the same texture; what stands before the hash is yours.
   The hash is the fallback: a texture without a name, or whose name no mod has, is looked up by hash.
 
-When both match, the name wins. Names are known for the textures of `global_binary.sir` and of the level
+- **By a Dolphin pack's name**: `tex1_<width>x<height>[_m]_<hash>[_<palette hash>]_<format>.png` (or `.dds`),
+  the names of Dolphin's custom texture packs, so a pack made for this game in Dolphin can be copied into
+  `mods\MyMod\textures\`. `_m` is ignored, `$` stands for any palette (or any pixels, for paletted textures).
+  Separate mip files (`..._mip1`) are not read: use a DDS with mip levels. The names follow Dolphin's current
+  scheme; it has been checked against the scheme's description, not yet against a pack dumped from Dolphin.
+  Dolphin's older `GAMEID_...` names are not understood.
+
+When more than one matches, the name wins, then the 16-character hash, then the Dolphin name. Names are known for the textures of `global_binary.sir` and of the level
 files; textures of other files have a hash only, for now.
 
 To get the originals with their hashes, export them from your own disc:
