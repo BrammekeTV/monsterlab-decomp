@@ -12,7 +12,7 @@ typedef void (*Fn_PP)(void* out, void* in);              // slot 0x24: (out, in)
 typedef void (*Fn_OPP)(u8* self, void* a, void* b);      // slot 0x2C: (self, a, b)
 typedef void (*Fn_OP)(u8* self, void* a);                // slot 0x1C: (self, a)
 typedef void (*Fn_Of)(u8* self, f32 f);                  // slot 0x98: (self, f)
-typedef s32 (*Fn_Obj38)(u8* self, s32 zero, f64 a, f64 b); // slot 0x38: (self, 0, x, y)
+typedef s32 (*Fn_Obj38)(u8* self, s32 zero, f32 a, f32 b); // slot 0x38: (self, 0, x, y)
 
 extern "C" {
 s32  RaySceneTest(void* ray);
@@ -251,20 +251,23 @@ s32 fn_8019F810(u8* arg0, s32 arg1, f32 farg0, f32 farg1) {
 }
 
 // 0x801AA028
-// Tests whether the point (farg0, farg1) hits the attached object at +0x128 (flag 0x02000000)
-// or any object in the +0x120 chain (flag 2, +0x8C > 0) through its slot 0x38.
-s32 fn_801AA028(u8* arg0, f64 farg0, f64 farg1) {
+// Hit test of a grid cell (slot 0x44, called by the grid's own hit test fn_801A820C with the pointer
+// position). When the grid it sits in (+0x128) has flag 0x02000000, the point is taken into the
+// cell's own space (matrix +0xC0) and hits inside the unit square: 0 <= X < 1 and 0 <= Y <= 1.
+// Otherwise any visible child (flag 2, +0x8C > 0) that is hit through its slot 0x38 counts.
+// The callers pass single floats.
+s32 fn_801AA028(u8* arg0, f32 farg0, f32 farg1) {
     u8* t = *(u8**)(arg0 + 0x128);
     u8* cur = *(u8**)(arg0 + 0x120);
     if (t != NULL && (*(s32*)(t + 0x64) & 0x02000000)) {
-        f32 x = (f32)farg0;
-        f32 y = (f32)farg1;
+        f32 x = farg0;
+        f32 y = farg1;
         f32 X = *(f32*)(arg0 + 0xE4) + ((*(f32*)(arg0 + 0xD8) * lbl_805FFA74) + ((*(f32*)(arg0 + 0xC0) * x) + (*(f32*)(arg0 + 0xCC) * y)));
         f32 Y = *(f32*)(arg0 + 0xE8) + ((*(f32*)(arg0 + 0xDC) * lbl_805FFA74) + ((*(f32*)(arg0 + 0xC4) * x) + (*(f32*)(arg0 + 0xD0) * y)));
-        if (X >= lbl_805FFA74) return 0;
-        if (X >= lbl_805FFA70) return 0;
-        if (Y >= lbl_805FFA74) return 0;
-        if (Y <= lbl_805FFA70) return 0;
+        if (!(X >= lbl_805FFA74)) return 0;   // 0.0f
+        if (X >= lbl_805FFA70) return 0;      // 1.0f
+        if (!(Y >= lbl_805FFA74)) return 0;
+        if (!(Y <= lbl_805FFA70)) return 0;
         return 1;
     }
     while (cur != NULL) {
