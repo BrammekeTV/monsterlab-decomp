@@ -2,7 +2,7 @@
 #include "types.h"
 
 // Virtual slot helpers: each UI page object has a vtable; these are the slots used here.
-typedef s32  (*SelIndexFn)(u8* obj);   // slot 0x1C: current selection index (-1 = none)
+typedef s32  (*SelIndexFn)(u8* obj, u32 hash);   // slot 0x1C: the index of the section named by the hash (-1 = none)
 typedef void (*VoidFn)(u8* obj);       // slot 0x10: deactivate
 
 // SysSprintf is defined in engine.cpp with C++ linkage.
@@ -29,16 +29,18 @@ s32  fn_8020E4E8(s32 a);               // 0x8020E4E8 (return type assumed)
 extern "C" {
 
 // 0x8011A6BC
-// True when the page's current selection (slot 0x1C) equals the cached index at +0x18.
-s32 fn_8011A6BC(u8* p) {
-    s32 cur = (*(SelIndexFn*)(*(u8**)p + 0x1C))(p);
+// True when the section named by `hash` (slot 0x1C maps the name to an index) is the open one (+0x18).
+// The hash stays in r4 from the caller through to slot 0x1C.
+s32 fn_8011A6BC(u8* p, u32 hash) {
+    s32 cur = (*(SelIndexFn*)(*(u8**)p + 0x1C))(p, hash);
     return *(s32*)(p + 0x18) == cur;
 }
 
 // 0x8011A704
-// Returns the child entry at the current selection index, or NULL when nothing is selected.
-u8* fn_8011A704(u8* p) {
-    s32 idx = (*(SelIndexFn*)(*(u8**)p + 0x1C))(p);
+// Returns the book's section named by `hash` (slot 0x1C maps the name to an index), or NULL for an
+// unknown name. The hash stays in r4 from the caller through to slot 0x1C.
+u8* fn_8011A704(u8* p, u32 hash) {
+    s32 idx = (*(SelIndexFn*)(*(u8**)p + 0x1C))(p, hash);
     if (idx < 0) return NULL;
     return *(u8**)(p + idx * 4 + 8);
 }
@@ -215,17 +217,19 @@ s32 fn_8011D490(u8* p, s32 key) {
 }
 
 // 0x8011D508
-// Returns the child entry at the current selection index, or NULL when nothing is selected.
-u8* fn_8011D508(u8* p) {
-    s32 idx = (*(SelIndexFn*)(*(u8**)p + 0x1C))(p);
+// Returns the book's section named by `hash` (slot 0x1C maps the name to an index), or NULL for an
+// unknown name. The hash stays in r4 from the caller through to slot 0x1C.
+u8* fn_8011D508(u8* p, u32 hash) {
+    s32 idx = (*(SelIndexFn*)(*(u8**)p + 0x1C))(p, hash);
     if (idx < 0) return NULL;
     return *(u8**)(p + idx * 4 + 8);
 }
 
 // 0x8011D55C
-// True when the page's current selection (slot 0x1C) equals the cached index at +0x18.
-s32 fn_8011D55C(u8* p) {
-    s32 cur = (*(SelIndexFn*)(*(u8**)p + 0x1C))(p);
+// True when the section named by `hash` (slot 0x1C maps the name to an index) is the open one (+0x18).
+// The hash stays in r4 from the caller through to slot 0x1C.
+s32 fn_8011D55C(u8* p, u32 hash) {
+    s32 cur = (*(SelIndexFn*)(*(u8**)p + 0x1C))(p, hash);
     return *(s32*)(p + 0x18) == cur;
 }
 
