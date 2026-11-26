@@ -50,13 +50,13 @@ build\pc\monsterlab.exe                        # runs main() with your own disc 
 | `--res WxH` | output size (default 1920x1080) |
 | `--aspect 4:3\|16:9` | picture shape and the console's widescreen setting (default 16:9) |
 | `--stretch-ui` | 16:9: stretch the 2D layer over the whole width, as the console does |
-| `--peek ADDR` | print four words of Wii memory (hex address) when the run stops |
+| `--peek ADDR[:WORDS]` | print four words (or WORDS, up to 1024) of memory at a hex address when the run stops or crashes: Wii memory, or a game thread's stack (the crash report gives `esp`). Up to 16 |
 | `--watch ADDR` | report every write of the game's threads to four bytes of Wii memory (hex address): writer, new value, stack |
 | `--press BUTTON@FRAME[-FRAME]` | hold a Wii Remote button (a name from the binding table: `A`, `B`, `PLUS`, `STICK_UP`, `SWING`...) during those frames; a press without an end lasts 6 frames; `A@FROM-TO/N` is a 6-frame press every N frames in that range. For headless tests; can be given up to 128 times |
 | `--save-state FILE@FRAME`, `--load-state FILE` | savestates (`docs/savestates.md`): write the whole running game at the end of that frame (repeatable); start from a state instead of booting. A state loads only into the exe that wrote it |
 | `--show-texture N` | development aid: when the boot stops, draw texture N of `global_binary.sir` through the engine's draw path instead of ending (see "GX: the renderer") |
 
-Debugging aids: `--peek ADDR` (up to eight) prints four words of Wii memory at the stop;
+Debugging aids: `--peek ADDR[:WORDS]` (up to 16) prints memory at the stop (unpaced runs repeat exactly, so the addresses of one run hold in the next);
 `PORT_HEAP_CHECK=1` in the environment checks the heap's block list before every allocation and free
 and stops at the first damaged block header, naming the block in front of it (then `--watch` on
 that header's address finds the writer);
@@ -578,10 +578,12 @@ MSVC only for now (absolute symbols, `/alternatename`, structured exception hand
 ## Benchmark and frame-time log
 
 `--perf-log FILE` writes one CSV row per shown frame (`frame, fast, wall_ms, game_ms, render_ms, wait_ms, present_ms, draws, vertices, copies,
-textures, out_w, out_h, decode_ms, setup_ms, flush_ms, copy_ms`; `fast` is 1 while fast-forwarding) and, when the run ends, `FILE.summary.txt` with
+textures, out_w, out_h, decode_ms, setup_ms, flush_ms, copy_ms,
+shader_ms, texture_ms`; `fast` is 1 while fast-forwarding) and, when the run ends, `FILE.summary.txt` with
 the real-time frames' average, p50, p95, p99 and worst frame time, fps and the average split. The last four columns split `render_ms`: vertex
 decode, the rest of the work per GX draw, batch upload and draw calls, and frame-buffer copies (the display copy's own time counts in the next
-frame). `--bench menu|village|battle|castle` is a fixed scenario: unpaced to the start of the scene, then 1200 frames of real time, then the
+frame). `shader_ms` and `texture_ms` are the time of a frame spent on pixel shaders and textures seen for the first time.
+Compiled shaders are kept in `shadercache` beside the executable (`build\pc\shadercache`, safe to delete; `PORT_NO_SHADER_CACHE=1` turns it off). `--bench menu|village|battle|castle` is a fixed scenario: unpaced to the start of the scene, then 1200 frames of real time, then the
 exit; the log goes to `build/pc/bench.csv` unless `--perf-log` says otherwise.
 
 | Scenario | Measured frames |
