@@ -7,7 +7,8 @@
    of the picture is not known in advance, so it tries the largest few until the picture changes).
    The same tinted texture is then converted with tools/png2dds.py (BC7, BC3, BC1) and must redden the menu as well.
 3. Runs again with that mod and compares the screenshots; then the same texture by its name, and a data mod
-   (--dump-data, a strings.json that changes menu text, a broken one).
+   (--dump-data, a strings.json that changes menu text, a broken one). In between: the 16:9 art rule on the
+   640x480 screen the game starts with.
 Passes when the log names the replaced texture and the picture got redder. Needs Pillow and the game
 data (orig/RM7P4F or --iso). Nothing is written into the repository; --keep leaves the temporary
 folder (dump, mod, before.png, after.png) and prints where it is.
@@ -81,6 +82,37 @@ def dds_test(tmp, tinted, base, pixels, png_gain, data):
     return ""
 
 
+def wide_test(tmp, data):
+    """A wider replacement of a full-screen 2D picture (the 640x480 wrist-strap screen at the start) fills a 16:9
+    screen; one of the original's shape stays 4:3 in the middle. Returns an error text or ''."""
+    from PIL import Image
+    def start(args, log):
+        p = subprocess.run([EXE, "--frames", "120", "--no-audio", "--no-ini", "--res", "640x360", "--seconds", "60", "--verbose"] + args + data,
+                           cwd=ROOT, capture_output=True, text=True, errors="replace")
+        open(os.path.join(tmp, log), "w", errors="replace").write(p.stdout + p.stderr)
+        return p.stdout + p.stderr
+    dump = os.path.join(tmp, "dumpwide")
+    start(["--no-mods", "--dump-textures", dump], "dumpwide.log")
+    screens = [n for n in os.listdir(dump) if n.startswith("tex_640x480_")] if os.path.isdir(dump) else []
+    if not screens:
+        return "no 640x480 start screen was dumped"
+    for width, edge in ((854, (255, 0, 255)), (640, (0, 0, 0))):
+        mods = os.path.join(tmp, "mods5")
+        shutil.rmtree(mods, ignore_errors=True)
+        os.makedirs(os.path.join(mods, "Wide", "textures"))
+        for n in screens:                                    # magenta all over: only where it lands matters
+            Image.new("RGB", (width, 480), (255, 0, 255)).save(os.path.join(mods, "Wide", "textures", n))
+        shot = os.path.join(tmp, f"wide{width}.png")
+        out = start(["--mods", mods, "--screenshot", shot], f"wide{width}.log")
+        if "comes from Wide" not in out or not os.path.exists(shot):
+            return f"the {width}x480 start screen was not replaced"
+        im = Image.open(shot).convert("RGB")
+        left, middle = im.getpixel((20, 180)), im.getpixel((320, 180))
+        if middle != (255, 0, 255) or left != edge:
+            return f"{width}x480 start screen: the left edge is {left} (expected {edge}), the middle {middle}"
+    return ""
+
+
 def data_test(tmp, base_png, data):
     """--dump-data writes the text table; a mod's data/strings.json changes menu text; a broken file is reported and ignored.
     Returns an error text or ''."""
@@ -151,6 +183,11 @@ def main():
                     ok, verdict = False, bad
                     return 1
                 verdict += "; dds ok"
+                bad = wide_test(tmp, data)
+                if bad:
+                    ok, verdict = False, bad
+                    return 1
+                verdict += "; 16:9 art ok"
                 bad = by_name(tmp, dump, names, data)
                 if bad:
                     ok, verdict = False, bad
