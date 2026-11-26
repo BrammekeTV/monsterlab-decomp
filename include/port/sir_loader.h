@@ -457,6 +457,8 @@ typedef struct LevelZoneRoots {
     u32  slotObjectCount;
     u32* slotEffects;        // pairs {address, entry count}: every slot's placed effects (+0x80, +0x9C)
     u32  slotEffectCount;
+    u32* slotRopes;          // pairs {address, entry count}: every slot's particle systems (+0xA0, byte +0xA4)
+    u32  slotRopeCount;
     u32* recordArrays;       // pairs {address, capacity}: every slot's two arrays of 0x40-byte entity records (+0x8C, +0x90)
     u32  recordArrayCount;
     u32* actionTables;       // every slot's action table (+0xD4)

@@ -48,7 +48,7 @@ The states are 10 to 27 MB each (a full run writes about 60 and keeps under 20) 
 First the link report: any game function linked as a stub (`build/pc/port_link.txt`) fails the test before the game
 starts. Then one continuous run with `--to-menu --fast --no-audio --no-movies --no-ini --no-mods` and an empty save folder
 (`MONSTERLAB_SAVE` points into `build/playthrough/`, so your own saves are neither read nor written; the exe is copied
-there as `ml_playthrough.exe`, so that stopping other runs by the name `monsterlab.exe` does not end it). Rendering is
+there as `ml_playthrough_<checkout folder>.exe`, so that stopping other runs by name, also another worktree's playthrough, does not end it). Rendering is
 the headless default (WARP, the software rasteriser) at 640x360. Markers come from `PORT_SCRIPT_TRACE=1` (script calls), `PORT_STATE_LOG=1` (`[state]` lines) and the level
 load messages, never from pictures.
 
@@ -76,6 +76,7 @@ load messages, never from pictures.
 | hall | the Command Room's exit button: `castle_atrium` (the Grand Hall), the Dat-O-Saver talk opens and closes, the castle HUD is free |
 | mechlab | the orange door: `castle_mechlab`, Fuseless's talk, `StartIngredientsSelection`: I.G.O.R.'s Select Ingredients page |
 | ingredients | Select Ingredients: a key and a secondary ingredient go into the slots (`SelectKeyIngredient`, `SelectSecondaryIngredient`), the tick confirms (`ConfirmIngredientSelection`), `castle_welding` (the Weld-O-Tron) loads |
+| weld | the Weld-O-Tron level starts (`RegisterExperimentSound`), its screens load (`LoadExperimentUI`), the instructions open (`SetInstructionsHeaderString`) and the right arrow turns to page 2 of 2 (`GetNextInstructionsString`, `IsLastPage`) |
 
 `python tools/playthrough.py --list` prints the markers and deadlines.
 

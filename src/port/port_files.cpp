@@ -284,6 +284,12 @@ static void ConvertSection(const char* name, const SirCatalogFile* file, const S
             SirRelocAddRange(&reloc, 0x90000000u, 0x04000000u, (u8*)(uintptr_t)0x90000000u);
             CheckFixUpIndices(name);
             LevelZoneRoots roots;
+            // Zone 0 was converted where it was read. When that was a buffer, the game's copy thread (fn_801E6F78)
+            // has moved it to its place by the time a zone is read straight to its own place (castle_welding.sir:
+            // only the preloaded start of the file goes through the buffer); from then on the definitions this zone's
+            // entities use are converted there, not in the buffer the game no longer reads. A zone that is itself
+            // still in the buffer (castle_sea.sir) finds zone 0 there too, unless the copy has been made already.
+            if (e->type > 0 && zone0Read != zone0 && (place == dst || memcmp(zone0, zone0Read, zone0Size) == 0)) zone0Read = zone0;
             LevelZoneOther other = { zone0Read, zone0Size, (u32)(uintptr_t)zone0, &zone0Done };
             const LevelZoneOther* in0 = e->type > 0 ? &other : NULL;
             // The header block's tables have been laid out by fn_80129CC8 by now (in the copy they
