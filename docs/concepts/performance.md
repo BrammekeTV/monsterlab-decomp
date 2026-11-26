@@ -48,6 +48,20 @@ because the built-in sampler is not usable for this (see task 1).
 | Frame-buffer copies | Already pooled (#177), small | none | - | - |
 | Game thread and render run in series | Tried in #212, no gain: the game waits for draw-done. Do not repeat | none | - | - |
 
+## Before numbers (task 1 done)
+
+`--bench` runs at 1920x1080, headless on the GPU, `--no-ini --no-mods --no-audio`, empty save folder. Median of 3 runs; 1200 frames
+each. Other sessions were still running playthroughs on the PC.
+
+| Scene | avg | p95 | worst | render | decode | set-up | flush | copy |
+|---|---|---|---|---|---|---|---|---|
+| `--bench village` | 23.85 | 28.18 | 37.18 | 14.90 | 6.11 | 5.47 | 2.36 | 0.17 |
+| `--bench battle` | 22.57 | 27.29 | 33.05 | 14.86 | 5.84 | 5.67 | 2.43 | 0.16 |
+| `--bench castle` | 16.67 | 18.16 | 22.42 | 7.89 | 3.11 | 2.77 | 1.53 | 0.15 |
+
+Noise: village avg 23.19-27.20 (one run had a 142 ms frame), battle 22.45-22.65, castle held 60 fps in all runs. The render split
+shows decode and per-draw set-up about equal (each 5.5-6 ms in village and battle), flush about 2.4 ms.
+
 ## How to verify every task
 
 1. Idle PC (no other builds or sessions). Three runs each of village and battle, before and after. Compare the median average, p95 and worst.
