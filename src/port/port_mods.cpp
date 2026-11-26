@@ -1,6 +1,6 @@
 // PC platform layer: mods. A folder mods/<name>/ next to the exe is a mod; what is under its
 // files/ folder replaces the disc file of the same path, whether the game runs from a disc image or
-// from an extracted folder (DVDOpen asks here first); a PNG under its textures/ folder replaces a
+// from an extracted folder (DVDOpen asks here first); a PNG or DDS under its textures/ folder replaces a
 // game texture, matched by content hash (the renderer asks here when it decodes one). The list, its order and which mods are on are
 // kept in monsterlab.ini ([mods]); a later mod wins over an earlier one. See docs/modding.md.
 #ifdef _WIN32
@@ -148,13 +148,13 @@ void PortModsLogOverrides(void) {
 }
 
 // ------------------------------------------------------------------ textures
-// A PNG under mods/<name>/textures/ (any depth of folders) replaces the game texture whose content
-// hash is the last 16 characters of its name: "anything_0123456789ABCDEF.png", the name --dump-textures
+// A PNG or DDS under mods/<name>/textures/ (any depth of folders) replaces the game texture whose content
+// hash is the last 16 characters of its name (before the extension): "anything_0123456789ABCDEF.png", the name --dump-textures
 // gives it. The hash is over the texture as the game holds it (size, format, pixel data, palette),
 // so it is the same on every disc of this game and no game data is needed to tell which is which.
 // Made at first use: the mods are scanned before this file's static objects are built (port_runtime.cpp).
 struct TexState {
-    std::map<u64, std::string> files;            // hash -> PNG, from the last enabled mod that has it
+    std::map<u64, std::string> files;            // hash -> PNG or DDS, from the last enabled mod that has it
     std::map<u64, std::string> mods;             // hash -> that mod's name
     std::set<u64> dumped, logged;
     std::map<std::string, std::string> byName;   // lower-case texture name -> PNG (a file whose name has no hash)
@@ -193,10 +193,15 @@ u64 PortModsTextureHash(const u8* data, u32 bytes, const u8* palette, u32 palett
     return hash;
 }
 
-// The hash a texture file's name ends in ("..._0123456789abcdef.png"), FALSE for another name.
+static BOOL IsExt(const char* name, const char* ext) {
+    size_t n = strlen(name);
+    return n > 4 && !_stricmp(name + n - 4, ext);
+}
+
+// The hash a texture file's name ends in ("..._0123456789abcdef.png" or ".dds"), FALSE for another name.
 static BOOL NameHash(const char* name, u64* hash) {
     size_t n = strlen(name);
-    if (n < 20 || _stricmp(name + n - 4, ".png")) return FALSE;
+    if (n < 20) return FALSE;
     u64 v = 0;
     for (size_t i = n - 20; i < n - 4; i++) {
         char c = name[i];
@@ -208,42 +213,46 @@ static BOOL NameHash(const char* name, u64* hash) {
     return TRUE;
 }
 
-// Every PNG under dir with a hash in its name goes into the table (a later mod overwrites an earlier one).
-static u32 TexTree(const PortMod* m, const char* dir, BOOL add) {
+// Puts a file into the table under `key`. A later mod overwrites an earlier one; within one mod a DDS
+// wins over a PNG of the same texture.
+template <class K>
+static void TexAdd(std::map<K, std::string>& files, std::map<K, std::string>& mods, const K& key, const char* path, const PortMod* m, const char* what) {
+    auto old = mods.find(key);
+    if (old != mods.end()) {
+        if (_stricmp(old->second.c_str(), m->name)) PortLog("mods: %s and %s both replace texture %s: %s comes later and wins", old->second.c_str(), m->name, what, m->name);
+        else if (IsExt(files[key].c_str(), ".dds") && !IsExt(path, ".dds")) return;
+    }
+    files[key] = path;
+    mods[key] = m->name;
+}
+
+// Every PNG and DDS under dir goes into the table. `seen` collects the textures this mod replaces.
+static void TexTree(const PortMod* m, const char* dir, BOOL add, std::set<std::string>& seen) {
     char pattern[MAX_PATH + 8];
-    if ((u32)snprintf(pattern, sizeof(pattern), "%s\\*", dir) >= sizeof(pattern)) return 0;
+    if ((u32)snprintf(pattern, sizeof(pattern), "%s\\*", dir) >= sizeof(pattern)) return;
     WIN32_FIND_DATAA fd;
     HANDLE h = FindFirstFileA(pattern, &fd);
-    if (h == INVALID_HANDLE_VALUE) return 0;
-    u32 count = 0;
+    if (h == INVALID_HANDLE_VALUE) return;
     do {
         if (!strcmp(fd.cFileName, ".") || !strcmp(fd.cFileName, "..")) continue;
         char sub[MAX_PATH];
         if ((u32)snprintf(sub, sizeof(sub), "%s\\%s", dir, fd.cFileName) >= sizeof(sub)) continue;
-        if (fd.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY) { count += TexTree(m, sub, add); continue; }
+        if (fd.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY) { TexTree(m, sub, add, seen); continue; }
+        if (!IsExt(fd.cFileName, ".png") && !IsExt(fd.cFileName, ".dds")) continue;
         u64 hash;
-        if (!NameHash(fd.cFileName, &hash)) {
-            size_t n = strlen(fd.cFileName);
-            if (n > 4 && !_stricmp(fd.cFileName + n - 4, ".png")) {      // no hash: the name of the texture in the game's data
-                count++;
-                if (!add) continue;
-                std::string key = Lower(fd.cFileName).substr(0, n - 4);
-                auto old = Tex().nameMods.find(key);
-                if (old != Tex().nameMods.end() && _stricmp(old->second.c_str(), m->name)) PortLog("mods: %s and %s both replace texture %s: %s comes later and wins", old->second.c_str(), m->name, key.c_str(), m->name);
-                Tex().byName[key] = sub;
-                Tex().nameMods[key] = m->name;
-            }
-            continue;
+        if (NameHash(fd.cFileName, &hash)) {
+            char what[24];
+            snprintf(what, sizeof(what), "%016llX", hash);
+            seen.insert(what);
+            if (add) TexAdd(sTexFiles, sTexMods, hash, sub, m, what);
+        } else {                                             // no hash: the name of the texture in the game's data
+            std::string key = Lower(fd.cFileName);
+            key.resize(key.size() - 4);
+            seen.insert(key);
+            if (add) TexAdd(Tex().byName, Tex().nameMods, key, sub, m, key.c_str());
         }
-        count++;
-        if (!add) continue;
-        auto old = sTexMods.find(hash);
-        if (old != sTexMods.end() && _stricmp(old->second.c_str(), m->name)) PortLog("mods: %s and %s both replace texture %016llX: %s comes later and wins", old->second.c_str(), m->name, hash, m->name);
-        sTexFiles[hash] = sub;
-        sTexMods[hash] = m->name;
     } while (FindNextFileA(h, &fd));
     FindClose(h);
-    return count;
 }
 
 void PortModsRefreshTextures(void) {
@@ -260,13 +269,15 @@ void PortModsRefreshTextures(void) {
         if (!m->present) continue;
         char dir[MAX_PATH];
         if ((u32)snprintf(dir, sizeof(dir), "%s\\%s\\textures", PortModsDir(), m->name) >= sizeof(dir)) continue;
-        m->textureCount = TexTree(m, dir, m->enabled && !gPortOptions.noMods);
+        std::set<std::string> seen;
+        TexTree(m, dir, m->enabled && !gPortOptions.noMods, seen);
+        m->textureCount = (u32)seen.size();
     }
 }
 
 BOOL PortModsTexturesWanted(void) { return !sTexFiles.empty() || !Tex().byName.empty() || gPortOptions.dumpTextures != NULL; }
 
-u32* PortModsTexture(u64 hash, const char* name, u32* w, u32* h) {
+BOOL PortModsTexture(u64 hash, const char* name, PortModImage* out) {
     const std::string* file = NULL;
     const std::string* mod = NULL;
     std::string key;
@@ -277,20 +288,27 @@ u32* PortModsTexture(u64 hash, const char* name, u32* w, u32* h) {
     }
     if (!file) {
         auto it = sTexFiles.find(hash);
-        if (it == sTexFiles.end()) return NULL;
+        if (it == sTexFiles.end()) return FALSE;
         file = &it->second;
         mod = &sTexMods[hash];
         key.clear();
     }
     const char* why = NULL;
-    u32* rgba = PortPngRead(file->c_str(), w, h, &why);
+    memset(out, 0, sizeof(*out));
+    if (IsExt(file->c_str(), ".dds")) PortDdsRead(file->c_str(), out, &why);
+    else {
+        out->data = (u8*)PortPngRead(file->c_str(), &out->w, &out->h, &why);
+        out->levels = 1;
+    }
     BOOL first = key.empty() ? sTexLogged.insert(hash).second : Tex().loggedNames.insert(key).second;   // once per texture: the game decodes some again and again
     if (first) {
-        if (rgba && key.empty()) PortLog("mods: texture %016llX comes from %s (%ux%u, %s)", hash, mod->c_str(), *w, *h, file->c_str());
-        else if (rgba) PortLog("mods: texture %s (%016llX) comes from %s by name (%ux%u, %s)", name, hash, mod->c_str(), *w, *h, file->c_str());
+        char kind[48] = "";
+        if (out->dxgi) snprintf(kind, sizeof(kind), ", %s, %u mip level%s", out->dxgi == PORT_DXGI_BC1 ? "BC1" : out->dxgi == PORT_DXGI_BC3 ? "BC3" : "BC7", out->levels, out->levels == 1 ? "" : "s");
+        if (out->data && key.empty()) PortLog("mods: texture %016llX comes from %s (%ux%u%s, %s)", hash, mod->c_str(), out->w, out->h, kind, file->c_str());
+        else if (out->data) PortLog("mods: texture %s (%016llX) comes from %s by name (%ux%u%s, %s)", name, hash, mod->c_str(), out->w, out->h, kind, file->c_str());
         else fprintf(stderr, "[port] mods: %s %s; the game's texture is used\n", file->c_str(), why ? why : "cannot be read");
     }
-    return rgba;
+    return out->data != NULL;
 }
 
 void PortModsDumpTexture(u64 hash, const char* name, const u32* rgba, u32 w, u32 h, u32 fmt) {
@@ -376,28 +394,59 @@ int PortSelfTestMods(void) {
         gPortMods[0].enabled = gPortMods[1].enabled = gPortMods[2].enabled = TRUE;   // order now: first, second, gone
         PortModsRefreshTextures();
         u32 tw = 0, th = 0;
-        u32* px = PortModsTexture(0xABull, NULL, &tw, &th);
+        // The RGBA picture of a replacement, as the checks below want it.
+        auto read = [](u64 hash, const char* name, u32* pw, u32* ph) -> u32* {
+            PortModImage im;
+            if (!PortModsTexture(hash, name, &im)) return NULL;
+            *pw = im.w; *ph = im.h;
+            return (u32*)im.data;
+        };
+        u32* px = read(0xABull, NULL, &tw, &th);
         MOD_CHECK(px && tw == 5 && th == 3 && !memcmp(px, kWant, sizeof(kWant)), "a deflated PNG was not read right (%ux%u)", tw, th);
         free(px);
         MOD_CHECK(sTexMods.count(0xAB) && sTexMods[0xAB] == "second", "the later mod's texture did not win");
-        px = PortModsTexture(0xCDull, NULL, &tw, &th);
+        px = read(0xCDull, NULL, &tw, &th);
         MOD_CHECK(px && tw == 3 && th == 2 && !memcmp(px, own, sizeof(own)), "the PNG writer's file was not read back");
         free(px);
         MOD_CHECK(gPortMods[0].textureCount == 1 && gPortMods[1].textureCount == 3 && sTexFiles.size() == 2, "the texture scan found %u and %u", gPortMods[0].textureCount, gPortMods[1].textureCount);
         // By name: noname.png has no hash, so it replaces the texture called "NoName" (any case); the name wins over the hash.
-        px = PortModsTexture(0x1234ull, "NoName", &tw, &th);
+        px = read(0x1234ull, "NoName", &tw, &th);
         MOD_CHECK(px && tw == 3 && th == 2 && !memcmp(px, own, sizeof(own)), "a texture was not found by its name");
         free(px);
-        MOD_CHECK(!PortModsTexture(0x1234ull, "Other", &tw, &th) && PortModsTexturesWanted(), "a texture was found by the wrong name");
-        px = PortModsTexture(0xABull, "NoName", &tw, &th);
+        MOD_CHECK(!read(0x1234ull, "Other", &tw, &th) && PortModsTexturesWanted(), "a texture was found by the wrong name");
+        px = read(0xABull, "NoName", &tw, &th);
         MOD_CHECK(px && tw == 3, "the name did not win over the hash");
         free(px);
-        px = PortModsTexture(0xABull, "Other", &tw, &th);
+        px = read(0xABull, "Other", &tw, &th);
         MOD_CHECK(px && tw == 5, "the hash is not the fallback for a name no mod has");
         free(px);
         gPortMods[1].enabled = FALSE;
         PortModsRefreshTextures();
-        MOD_CHECK(sTexMods.count(0xAB) && sTexMods[0xAB] == "first" && !PortModsTexture(0xCDull, NULL, &tw, &th), "a texture of a mod switched off is used");
+        MOD_CHECK(sTexMods.count(0xAB) && sTexMods[0xAB] == "first" && !read(0xCDull, NULL, &tw, &th), "a texture of a mod switched off is used");
+        // DDS: an 8x4 BC1 file with two mip levels wins over the PNG of the same hash in its mod; a cut one is refused.
+        {
+            u8 dds[128 + 16 + 8] = {'D', 'D', 'S', ' ', 124};
+            dds[12] = 4; dds[16] = 8; dds[28] = 2; dds[76] = 32; dds[80] = 4;
+            memcpy(dds + 84, "DXT1", 4);
+            for (int i = 128; i < (int)sizeof(dds); i++) dds[i] = (u8)i;
+            static const char* const kDds[] = {"first\\textures\\logo_00000000000000AB.dds", "first\\textures\\cut.dds", "first\\textures\\logo_00000000000000AB.png"};
+            for (int i = 0; i < 3; i++) {
+                snprintf(path, sizeof(path), "%s\\%s", base, kDds[i]);
+                if (i == 2) { PortPngWrite(path, own, 3, 2); continue; }
+                FILE* fp = fopen(path, "wb");
+                if (fp) { fwrite(dds, 1, i ? sizeof(dds) - 1 : sizeof(dds), fp); fclose(fp); } else fails++;
+            }
+            PortModsRefreshTextures();
+            PortModImage im;
+            BOOL ok = PortModsTexture(0xABull, NULL, &im);
+            MOD_CHECK(ok && im.dxgi == PORT_DXGI_BC1 && im.w == 8 && im.h == 4 && im.levels == 2 && !memcmp(im.data, dds + 128, 24),
+                      "a DDS was not read or did not win over a PNG (%ux%u, format %u)", im.w, im.h, im.dxgi);
+            if (ok) free(im.data);
+            MOD_CHECK(!PortModsTexture(0x1234ull, "cut", &im), "a DDS that is cut short was accepted");
+            MOD_CHECK(gPortMods[0].textureCount == 2, "a PNG and a DDS of one texture were counted as %u", gPortMods[0].textureCount);
+            for (const char* f : kDds) { snprintf(path, sizeof(path), "%s\\%s", base, f); DeleteFileA(path); }
+            PortModsRefreshTextures();
+        }
         const u8 bytes[4] = {1, 2, 3, 4};
         MOD_CHECK(PortModsTextureHash(bytes, 4, NULL, 0, 8, 8, 6) != PortModsTextureHash(bytes, 4, NULL, 0, 8, 4, 6) &&
                   PortModsTextureHash(bytes, 4, bytes, 2, 8, 8, 9) != PortModsTextureHash(bytes, 4, bytes, 3, 8, 8, 9), "the texture hash ignores the size or the palette");
@@ -426,7 +475,7 @@ int PortSelfTestMods(void) {
     strcpy(sDir, keepDir);
     gPortOptions.noMods = keepOff;
     PortModsRefreshTextures();
-    if (!fails) PortLog("selftest mods: ok (file lookup, order, moving, switched off, PNG textures, text table)");
+    if (!fails) PortLog("selftest mods: ok (file lookup, order, moving, switched off, PNG and DDS textures, text table)");
     return fails;
 }
 #endif

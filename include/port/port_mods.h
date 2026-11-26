@@ -1,6 +1,6 @@
 // PC port: mods (port_mods.cpp, docs/modding.md). A mod is a folder mods/<name>/ next to the exe:
 //   mods/<name>/files/<disc path>    replaces that file of the disc (for a disc image and an extracted folder alike)
-//   mods/<name>/textures/..._<16 hex digits>.png   replaces the game texture with that content hash
+//   mods/<name>/textures/..._<16 hex digits>.png   replaces the game texture with that content hash (or .dds)
 //   mods/<name>/data/strings.json                   changes entries of the game's text table (port_moddata.cpp)
 //   mods/<name>/textures/<texture name>.png         replaces the game texture of that name in the game's data (wins over a hash)
 // The list and its order are kept in monsterlab.ini, [mods]: one "name = 1" (on) or "name = 0" (off)
@@ -44,9 +44,23 @@ void PortModsRefreshTextures(void);
 BOOL PortModsTexturesWanted(void);
 // The content hash of a game texture: size, GX format, the pixel data as the game holds it, the palette.
 u64  PortModsTextureHash(const u8* data, u32 bytes, const u8* palette, u32 paletteBytes, u32 w, u32 h, u32 fmt);
-// The replacement for that texture as RGBA8 from malloc (any size; the caller frees it), or NULL.
-// `name` is the texture's name in the game's data (or NULL): a PNG called <name>.png wins over one found by hash.
-u32* PortModsTexture(u64 hash, const char* name, u32* w, u32* h);
+// A replacement picture: RGBA8 from a PNG (dxgi 0, one level) or the compressed blocks of a DDS, level
+// after level. `data` is from malloc; the caller frees it.
+#define PORT_DXGI_BC1 71
+#define PORT_DXGI_BC3 77
+#define PORT_DXGI_BC7 98
+typedef struct PortModImage {
+    u32 w, h, levels;
+    u32 dxgi;                 // 0 (RGBA8) or PORT_DXGI_*
+    u8* data;
+} PortModImage;
+// The replacement for that texture, FALSE for none. `name` is the texture's name in the game's data (or NULL):
+// a file called <name>.png or <name>.dds wins over one found by hash.
+BOOL PortModsTexture(u64 hash, const char* name, PortModImage* out);
+// The bytes of mip level `level` of such a picture, and the bytes of one row of it (of blocks) in *pitch.
+u32  PortModLevelBytes(u32 dxgi, u32 w, u32 h, u32 level, u32* pitch);
+// ---- DDS (port_dds.cpp): BC1, BC3 or BC7 with mip levels ----
+BOOL PortDdsRead(const char* path, PortModImage* out, const char** why);   // FALSE and the reason
 // The name the game's data gives the texture whose pixel data is at `pixels`, or NULL (not every file is loaded by the port's loader yet).
 const char* PortModsTextureName(const void* pixels);
 // --dump-textures DIR: writes the decoded texture as DIR\tex_<w>x<h>_f<format>_<hash>.png, once per hash.
