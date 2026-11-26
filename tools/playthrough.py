@@ -169,7 +169,15 @@ STAGES = [
           [call("PreloadLevel", 33650), level("castle_mechlab", 33700), call("StopConversation", 34600),
            call("StartIngredientsSelection", 34600), call("InitLabBooks", 34600), call("UpdateSelectedIngredientsRecipe", 34600)],
           press=("A@33700", "A@34050-34650/150"), pointer=("570,765@33600",)),
-    # Later stages go here (a deadline after 35000, frames counted from the run's start).
+    # Select Ingredients: the first slot opens the Key Ingredient list (the two starting items), its first cell
+    # goes into the slot; the same for the second slot; the tick confirms and the experiment's level loads.
+    Stage("ingredients", "pick a key and a secondary ingredient, confirm: the Weld-O-Tron level loads", 36700,
+          [call("SelectKeyIngredient", 35000), call("LabBooks_Ingredients_RenderList_Generate", 35000),
+           call("SelectSecondaryIngredient", 35600), call("ConfirmIngredientSelection", 36200),
+           call("EndIngredientsSelection", 36200), level("castle_welding", 36300)],
+          press=("A@35100", "A@35400", "A@35700", "A@36000", "A@36300"),
+          pointer=("591,615@35000", "660,480@35300", "900,615@35600", "660,480@35900", "1305,921@36200")),
+    # Later stages go here (a deadline after 36700, frames counted from the run's start).
 ]
 
 

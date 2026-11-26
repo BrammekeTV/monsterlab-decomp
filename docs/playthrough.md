@@ -75,6 +75,7 @@ load messages, never from pictures.
 | igor | Fuseless's welcome, I.G.O.R. opens on its ingredients page and closes (`InitLabBooks`, `CloseBooks`, `DestroyLabBooks`), his second talk, `SetCastleAccess`, the castle HUD is free in the Command Room |
 | hall | the Command Room's exit button: `castle_atrium` (the Grand Hall), the Dat-O-Saver talk opens and closes, the castle HUD is free |
 | mechlab | the orange door: `castle_mechlab`, Fuseless's talk, `StartIngredientsSelection`: I.G.O.R.'s Select Ingredients page |
+| ingredients | Select Ingredients: a key and a secondary ingredient go into the slots (`SelectKeyIngredient`, `SelectSecondaryIngredient`), the tick confirms (`ConfirmIngredientSelection`), `castle_welding` (the Weld-O-Tron) loads |
 
 `python tools/playthrough.py --list` prints the markers and deadlines.
 
