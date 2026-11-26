@@ -526,31 +526,6 @@ static void MakeFolders(const char* dir) {
     CreateDirectoryA(path, NULL);
 }
 
-const char* PortModsDumpFolder(void) {
-    static char folder[MAX_PATH];
-    const char* set = gPortSettings.dumpDir;
-    if (set[0] && (set[0] == '\\' || set[0] == '/' || set[1] == ':')) return set;
-    DWORD n = GetModuleFileNameA(NULL, folder, MAX_PATH);    // none set, or a relative one: from the exe's folder
-    char* slash = n && n < MAX_PATH ? strrchr(folder, '\\') : NULL;
-    size_t at = slash ? (size_t)(slash + 1 - folder) : 0;
-    snprintf(folder + at, sizeof(folder) - at, "%s", set[0] ? set : "dump\\textures");
-    return folder;
-}
-
-const char* PortModsDumpDir(void) {
-    if (gPortOptions.dumpTextures) return gPortOptions.dumpTextures;   // the command line wins
-    return gPortSettings.dumpTextures ? PortModsDumpFolder() : NULL;
-}
-
-// Makes the folder and those above it.
-static void MakeFolders(const char* dir) {
-    char path[MAX_PATH];
-    snprintf(path, sizeof(path), "%s", dir);
-    for (char* c = path + 1; *c; c++)
-        if ((*c == '\\' || *c == '/') && c[-1] != ':') { char keep = *c; *c = 0; CreateDirectoryA(path, NULL); *c = keep; }
-    CreateDirectoryA(path, NULL);
-}
-
 void PortModsDumpTexture(u64 hash, const char* name, const u32* rgba, u32 w, u32 h, u32 fmt) {
     const char* dir = PortModsDumpDir();
     if (!dir) return;
