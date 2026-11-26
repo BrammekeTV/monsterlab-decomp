@@ -1132,10 +1132,16 @@ static u32 RingNext(Ring& r) {
 }
 // Records never cross a segment: the draws that use a segment's records are all drawn before it is left, and what is
 // reused (lights, matrices, the last record) starts again in each segment.
+// The test is against the ring's own segment: with pos / seg alone, a record that ended exactly on a boundary let the
+// next one start in the following segment without RingNext (no wait for the GPU), and at the end of the buffer
+// (pos == REC_U4) it was written past the end of the mapped buffer, into the driver's memory.
+static u32 sRecExactFits, sRecWraps;
 static void RecReserve(u32 n) {
     const u32 seg = REC_U4 / 4, pos = sRecUsed + (u32)sRec.size() / 4;
-    if (pos / seg == (pos + n) / seg || (pos + n) % seg == 0) return;
+    if (pos == (sRecRing.seg + 1) * seg) sRecExactFits++;   // the case the old test got wrong (counted for the run summary)
+    if (pos >= sRecRing.seg * seg && pos + n <= (sRecRing.seg + 1) * seg) return;
     FlushDraws();
+    sRecWraps++;
     sRec.clear(); sRecUsed = RingNext(sRecRing) * seg; sRecLights = sRecLast = sRecMtx = ~0u;
     if (sRecRing.discard) { sRecDiscard = TRUE; sRecRing.discard = FALSE; }
 }
@@ -1528,6 +1534,7 @@ static void DrawPrims(const PortGx* g, u32 prim, const PortGxLayout* L, u32 coun
     const u32 vfmt = gpu ? 16 + ntc : (numGens > 8 ? 8 : numGens);
     const u32 stride = VStride(vfmt);
     // The queue is uploaded at once (FlushDraws); it has to fit the buffers.
+    if ((size_t)count * stride > VB_BYTES / 4 - 16) { sGfxStats.skipped++; return; }   // larger than a ring segment
     if (sBV.size() + (size_t)count * stride > VB_BYTES / 4 - 16 || sBI.size() + (size_t)count * 3 > IB_IDXS / 4) FlushDraws();
     if (sPendCount && (sPend.ps != ps || sBVCount + count > VB_VERTS || sPend.vfmt != vfmt || sPend.movie != movie || memcmp(&sPend.out, &ok, sizeof(ok)) || memcmp(sPend.srv, srv, sizeof(srv)) ||
                        memcmp(sPend.smp, smp, sizeof(smp)) || (sPend.pcSerial != pcSerial && memcmp(&sPend.pc, &pc, sizeof(pc)))))
@@ -1626,6 +1633,12 @@ static void DrawPrims(const PortGx* g, u32 prim, const PortGxLayout* L, u32 coun
     if (movie) FlushDraws();                                // drawn at once: it has its own target
 }
 
+// A write into a mapped buffer that would not fit: skipped (the draws of that flush are lost) and logged, never written.
+static void MapOverrun(const char* what, size_t at, size_t bytes, size_t size) {
+    static u32 reports;
+    if (reports++ < 8) PortLog("gfx: BUG: %s buffer write of %zu bytes at %zu would pass its end (%zu); skipped", what, bytes, at, size);
+}
+
 // Uploads and draws what DrawPrims has queued.
 static void FlushDraws() {
     CloseBatch();
@@ -1633,7 +1646,9 @@ static void FlushDraws() {
     sGfxStats.flushes += (u32)sBatches.size();
     if (!sRec.empty()) {                                    // the GPU path's records, behind those already in the buffer
         D3D11_MAPPED_SUBRESOURCE rm;
-        if (SUCCEEDED(sCtx->Map(sRecBuf, 0, sRecDiscard ? D3D11_MAP_WRITE_DISCARD : D3D11_MAP_WRITE_NO_OVERWRITE, 0, &rm))) {
+        if ((size_t)sRecUsed * 16 + sRec.size() * 4 > (size_t)REC_U4 * 16) {   // never past the buffer (MapOverrun logs it)
+            MapOverrun("record", (size_t)sRecUsed * 16, sRec.size() * 4, (size_t)REC_U4 * 16);
+        } else if (SUCCEEDED(sCtx->Map(sRecBuf, 0, sRecDiscard ? D3D11_MAP_WRITE_DISCARD : D3D11_MAP_WRITE_NO_OVERWRITE, 0, &rm))) {
             memcpy((u8*)rm.pData + (size_t)sRecUsed * 16, sRec.data(), sRec.size() * 4);
             sCtx->Unmap(sRecBuf, 0);
         }
@@ -1651,12 +1666,14 @@ static void FlushDraws() {
     if (first + bytes > (sVbRing.seg + 1) * (VB_BYTES / 4)) first = RingNext(sVbRing) * (VB_BYTES / 4);
     D3D11_MAP how = !started || sVbRing.discard ? D3D11_MAP_WRITE_DISCARD : D3D11_MAP_WRITE_NO_OVERWRITE;
     sVbRing.discard = FALSE;
-    if (SUCCEEDED(sCtx->Map(sVb, 0, how, 0, &map))) { memcpy((u8*)map.pData + first, sBV.data(), bytes); sCtx->Unmap(sVb, 0); } else ok = FALSE;
+    if ((size_t)first + bytes > VB_BYTES) { MapOverrun("vertex", first, bytes, VB_BYTES); ok = FALSE; }
+    else if (SUCCEEDED(sCtx->Map(sVb, 0, how, 0, &map))) { memcpy((u8*)map.pData + first, sBV.data(), bytes); sCtx->Unmap(sVb, 0); } else ok = FALSE;
     sVbUsed = first + bytes;
     if (ifirst + ni > (sIbRing.seg + 1) * (IB_IDXS / 4)) ifirst = RingNext(sIbRing) * (IB_IDXS / 4);
     how = !started || sIbRing.discard ? D3D11_MAP_WRITE_DISCARD : D3D11_MAP_WRITE_NO_OVERWRITE;
     sIbRing.discard = FALSE;
-    if (SUCCEEDED(sCtx->Map(sIb, 0, how, 0, &map))) { memcpy((u16*)map.pData + ifirst, sBI.data(), ni * sizeof(u16)); sCtx->Unmap(sIb, 0); } else ok = FALSE;
+    if (((size_t)ifirst + ni) * 2 > (size_t)IB_IDXS * 2) { MapOverrun("index", (size_t)ifirst * 2, (size_t)ni * 2, (size_t)IB_IDXS * 2); ok = FALSE; }
+    else if (SUCCEEDED(sCtx->Map(sIb, 0, how, 0, &map))) { memcpy((u16*)map.pData + ifirst, sBI.data(), ni * sizeof(u16)); sCtx->Unmap(sIb, 0); } else ok = FALSE;
     started = TRUE;
     sIbUsed = ifirst + ni;
     sBV.clear(); sBI.clear(); sBVCount = 0;
@@ -2484,6 +2501,7 @@ BOOL PortGfxStart(BOOL window) {
 }
 
 const char* PortGfxStatsText(char* buf, u32 n) {
+    if (sStarted) PortLog("gfx record ring: %u segment changes, %u records started exactly at a segment end (each was a write without a GPU wait, or past the buffer, before the fix)", sRecWraps, sRecExactFits);
     if (sStarted) PortLog("gfx soft shadows: %u composites, %u shown frames", sShadowComposites, sGfxStats.presents);
     if (sStarted) PortLog("gfx copy time: flush %.1f s, resolve %.1f s, blit %.1f s", sTotalFlush / (double)Ticks_freq(), sTRes / (double)Ticks_freq(), sTBlit / (double)Ticks_freq()); if (sStarted) PortLog("gfx new textures %u: %.1f s, rtv %.1f s", sNewTex, sTNew / (double)Ticks_freq(), sTRtv / (double)Ticks_freq()); PortLog("gfx tex/display part %.1f s, clear+present %.1f s; disp %.1f", sTMk / (double)Ticks_freq(), sTPres / (double)Ticks_freq(), sTDisp / (double)Ticks_freq(), sTPres / (double)Ticks_freq());
     if (sStarted) PortLog("gfx vertices: %u of %u draws (%llu of %llu vertices) transformed on the GPU; %u batches drawn", sGfxStats.gpuDraws, sGfxStats.draws,
