@@ -1,10 +1,14 @@
 // Player progress in the save: achievements, experience and rank, and the notification queue
 // the HUD pops messages from.
 // Original: fn_8022954C / fn_80229554 (auto_03_80221E1C_text.s area)
+#include <stdarg.h>
+#include <stdio.h>
 #include <string.h>
+#include <intrin.h>
 
 #include "types.h"
 #include "game/part.h"
+#include "port/port.h"
 
 #define MAX_RANK        49
 #define MAX_MSP         99999999u
@@ -53,6 +57,47 @@ extern SaveProgress* gSaveSystem;                // 0x805FBBE0
 
 static inline u8* Db(void) { return gGameDb->data; }
 
+// ---------------------------------------------------------------- badge award log (port only)
+// Every badge award logs "badge award: id 0xNN "name" frame F why=... caller=+0xRVA". `why` is
+// the counter or condition the award site set with BadgeWhy() just before (empty for script
+// awards); `caller` is the return address relative to the exe base (look it up in monsterlab.map).
+
+struct StringTable { const char** strings; u8 pad[8]; u32 count; };
+extern "C++" StringTable* gStringTable;      // 0x805FB910
+extern "C++" StringTable* gStringTable2;     // 0x805FB90C
+extern "C" char __ImageBase;
+
+static char sBadgeWhy[128];
+
+extern "C" void BadgeWhy(const char* fmt, ...) {
+    va_list ap;
+    va_start(ap, fmt);
+    vsnprintf(sBadgeWhy, sizeof(sBadgeWhy), fmt, ap);
+    va_end(ap);
+}
+
+static const char* BadgeName(s32 id) {
+    const u8* db = Db();
+    if (id < 0 || id >= *(const s32*)(db + 0x10AC)) return "(out of range)";
+    s32 text = TextIdFromHash(*(const u32*)(*(u8**)(db + 0x10A8) + id * 0x18 + 4));
+    if (text == -1) return "?";
+    const StringTable* t = gStringTable;
+    if ((text & 0x80000000) && gStringTable2 != NULL) { t = gStringTable2; text &= 0x7FFFFFFF; }
+    if (t == NULL || t->strings == NULL || (u32)text >= t->count) return "?";
+    return t->strings[text];
+}
+
+static void LogBadgeAward(s32 id, void* caller);
+
+// For the award paths that set the badge bit themselves instead of calling SaveAddBadge.
+extern "C" void BadgeLogAward(s32 id) { LogBadgeAward(id, _ReturnAddress()); }
+
+static void LogBadgeAward(s32 id, void* caller) {
+    PortLog("badge award: id 0x%02X \"%s\" frame %d why=%s caller=+0x%X", id, BadgeName(id),
+            PortFrameCount(), sBadgeWhy[0] ? sBadgeWhy : "-", (u32)((char*)caller - &__ImageBase));
+    sBadgeWhy[0] = 0;
+}
+
 static void PushNotice(SaveProgress* s, s32 type, s32 value) {
     if (s->noticeCount >= MAX_NOTICES) return;
     Notice* n = &s->notices[s->noticeCount];
@@ -87,6 +132,7 @@ static void Unlock(SaveProgress* s, s32 id) {
     if (s->achievements & bit) return;
     s->achievements |= bit;
     s->achievementCount++;
+    LogBadgeAward(id, _ReturnAddress());
     PushNotice(s, NOTICE_ACHIEVEMENT, id);
     const AchievementDef* defs = *(AchievementDef**)(Db() + 0x10A8);
     AddMSP((u32)defs[id].xp);
@@ -101,6 +147,7 @@ u32 SaveGetFieldRepairRecord(SaveProgress* s) {
 // New best for repair points left after a battle; unlocks the three field-repair achievements.
 void SaveSetFieldRepairRecord(SaveProgress* s, u32 points) {
     s->fieldRepairRecord = points;
+    BadgeWhy("field repair record %u", points);
     const f32* t = (const f32*)(*(u8**)(Db() + 0x99D0) + 0x328);
     if (points >= (u32)t[5]) {
         Unlock(s, ACH_FIELD_REPAIR_1);
@@ -152,6 +199,7 @@ void SaveAddBadge(SaveProgress* s, s32 badge) {
     if (BitGet(raw, BADGES_BASE, (u8)badge)) return;
     s->achievementCount++;
     BitSet(raw, BADGES_BASE, (u8)badge);
+    LogBadgeAward(badge, _ReturnAddress());
     PushNotice(s, NOTICE_ACHIEVEMENT, badge);
     const AchievementDef* defs = *(AchievementDef**)(Db() + 0x10A8);
     AddMSP((u32)defs[badge].xp);
@@ -644,6 +692,7 @@ void SaveDiscoverPart(u8* s, s32 type, u8 tier) {
         if (SaveHasBadge(s, badge)) continue;
         const u8* row = *(u8**)(Db() + 0x99D0) + kDiscoverBadgeRow[i] * 8;
         if (count < (s32)*(const f32*)(row + 4)) continue;
+        BadgeWhy("discovered part tiers %d >= %d", count, (s32)*(const f32*)(row + 4));
         SaveAddBadge(sp, (s32)badge);
     }
 }
@@ -740,6 +789,8 @@ static void CountAndAward(u8* s, u32 ofs, s32 amount, const u32* rows, const u32
     for (s32 i = n - 1; i >= 0; i--) {
         if (SaveHasBadge(s, badges[i])) continue;
         if (total < (s32)*(const f32*)(*(u8**)(Db() + 0x99D0) + rows[i] * 8 + 4)) continue;
+        BadgeWhy("counter +0x%X = %d (+%d) >= %d", ofs, total, amount,
+                 (s32)*(const f32*)(*(u8**)(Db() + 0x99D0) + rows[i] * 8 + 4));
         SaveAddBadge((SaveProgress*)s, (s32)badges[i]);
     }
 }
@@ -779,6 +830,7 @@ void fn_80227C20(u8* s, s32 idx, s32 amount) {
     *c += amount;
     u32 thr = (u32)*(const f32*)(*(u8**)(Db() + 0x99D0) + 0x284);
     if (*c < thr) return;
+    BadgeWhy("counter +0x%X = %u (+%d) >= %u", 0x958 + idx * 4, *c, amount, thr);
     SaveAddBadge((SaveProgress*)s, badges[idx]);
 }
 
@@ -791,6 +843,7 @@ void fn_8022D460(u8* s, s32 idx, s32 value) {
     u32* c = (u32*)(s + 0x980 + idx * 4);
     *c = value;
     if (*c < TuningThreshold(rows[idx])) return;
+    BadgeWhy("record +0x%X = %u >= %u", 0x980 + idx * 4, *c, TuningThreshold(rows[idx]));
     SaveAddBadge((SaveProgress*)s, badges[idx]);
 }
 
@@ -808,10 +861,12 @@ void fn_8022CD54(u8* s, s32 idx, u32 value) {
     *(u32*)(s + 0x928 + idx * 4) = value;
     SaveProgress* sp = (SaveProgress*)s;
     const s32* b = badges + idx * 4;
-    if (value >= TuningThreshold(0xA2)) { for (s32 k = 0; k < 4; k++) SaveAddBadge(sp, b[k]); }
-    if (value >= TuningThreshold(0x4F)) { for (s32 k = 0; k < 3; k++) SaveAddBadge(sp, b[k]); return; }
-    if (value >= TuningThreshold(0x4E)) { for (s32 k = 0; k < 2; k++) SaveAddBadge(sp, b[k]); return; }
-    if (value >= TuningThreshold(0x4D)) SaveAddBadge(sp, b[0]);
+#define WHY928() BadgeWhy("record +0x%X = %u (thresholds %u %u %u %u)", 0x928 + idx * 4, value,         TuningThreshold(0x4D), TuningThreshold(0x4E), TuningThreshold(0x4F), TuningThreshold(0xA2))
+    if (value >= TuningThreshold(0xA2)) { for (s32 k = 0; k < 4; k++) { WHY928(); SaveAddBadge(sp, b[k]); } }
+    if (value >= TuningThreshold(0x4F)) { for (s32 k = 0; k < 3; k++) { WHY928(); SaveAddBadge(sp, b[k]); } return; }
+    if (value >= TuningThreshold(0x4E)) { for (s32 k = 0; k < 2; k++) { WHY928(); SaveAddBadge(sp, b[k]); } return; }
+    if (value >= TuningThreshold(0x4D)) { WHY928(); SaveAddBadge(sp, b[0]); }
+#undef WHY928
 }
 
 }  // extern "C"

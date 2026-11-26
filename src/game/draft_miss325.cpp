@@ -79,12 +79,15 @@ u8*  fn_8022E3DC(u8* s);                                        // 0x8022E3DC
 
 extern u8* lbl_805FBBE0;    // 0x805FBBE0 (the save)
 
+extern "C" void BadgeWhy(const char* fmt, ...);   // port: badge award log (progress.cpp)
+
 // Counter-driven badges: unlock `id` once the counter reaches the threshold in the tuning table
 // (8-byte entries at game db + 0x99D0, float threshold at +4).
 static void CheckCounterBadge(u8* s, s32 id, s32 tuning, s32 count) {
     if (SaveHasBadge(s, (u8)id)) return;
     s32 need = (s32)*(f32*)(*(u8**)(gGameDb->data + 0x99D0) + tuning * 8 + 4);
     if (count < need || id == -1) return;
+    BadgeWhy("counter = %d >= tuning row 0x%X (%d)", count, tuning, need);
     SaveAddBadge(s, id);
 }
 

@@ -74,6 +74,9 @@ static inline u8* GameDbData(void) { return *(u8**)(gGameDb + 0xC); }
 
 // The 256-bit flag set at obj+0x20 is four big-endian 64-bit words, highest bit group first:
 // ids 0..63 at +0x38, 64..127 at +0x30, 128..191 at +0x28, 192..255 at +0x20.
+extern "C" void BadgeWhy(const char* fmt, ...);   // port: badge award log (progress.cpp)
+extern "C" void BadgeLogAward(s32 id);
+
 static inline u32 FlagWordOffset(u32 id) {
     if (id < 0x40) return 0x38;
     if (id < 0x80) return 0x30;
@@ -83,15 +86,13 @@ static inline u32 FlagWordOffset(u32 id) {
 
 static inline bool FlagTest(u8* obj, u32 id) {
     u32 off = FlagWordOffset(id);
-    u64 v = ((u64)*(u32*)(obj + off) << 32) | *(u32*)(obj + off + 4);
+    u64 v = *(u64*)(obj + off);           // native u64, as SaveHasBadge (progress.cpp)
     return ((v >> (id & 0x3F)) & 1) != 0;
 }
 
 static inline void FlagSet(u8* obj, u32 id) {
     u32 off = FlagWordOffset(id);
-    u64 bit = (u64)1 << (id & 0x3F);
-    *(u32*)(obj + off)     |= (u32)(bit >> 32);
-    *(u32*)(obj + off + 4) |= (u32)bit;
+    *(u64*)(obj + off) |= (u64)1 << (id & 0x3F);   // native u64, as SaveAddBadge (progress.cpp)
 }
 
 // float -> u32 conversion with saturation (__cvt_fp2unsigned).
@@ -564,6 +565,8 @@ void fn_8022C7F0(u8* obj, s32 delta) {
 
         *(s32*)(obj + 0x120) = *(s32*)(obj + 0x120) + 1;
         FlagSet(obj, id & 0xFF);
+        BadgeWhy("counter +0x9FC = %d (+%d) >= %d", total, delta, thr);
+        BadgeLogAward(id);
         PostNotice(obj, 4, id);
 
         u8* reward = *(u8**)(GameDbData() + 0x10A8) + id * 0x18;

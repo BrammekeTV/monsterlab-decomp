@@ -57,6 +57,9 @@ extern u8   lbl_805FBBB3;                                       // 0x805FBBB3 (m
 }
 extern "C++" u8* gSaveSystem;                                   // 0x805FBBE0
 
+extern "C" void BadgeWhy(const char* fmt, ...);   // port: badge award log (progress.cpp)
+extern "C" void BadgeLogAward(s32 id);
+
 // Bit `id` (0..255) of the 256-bit flag set at p+0x20: four big-endian 64-bit groups, the highest
 // ids first (ids 0..63 at +0x38, 64..127 at +0x30, 128..191 at +0x28, 192..255 at +0x20).
 static inline u8* FlagGroup(u8* p, u32 id, u32* shift) {
@@ -70,15 +73,13 @@ static inline u8* FlagGroup(u8* p, u32 id, u32* shift) {
 static inline bool FlagTest(u8* p, u32 id) {
     u32 sh;
     u8* g = FlagGroup(p, id, &sh);
-    return (__shr2u(*(s32*)g, *(s32*)(g + 4), (s32)sh) & 1) != 0;
+    return ((*(u64*)g >> sh) & 1) != 0;   // native u64, as SaveHasBadge (progress.cpp)
 }
 
 static inline void FlagSet(u8* p, u32 id) {
     u32 sh;
     u8* g = FlagGroup(p, id, &sh);
-    u64 m = __shl2i(0, 1, (s32)sh);
-    *(s32*)g = (s32)(*(u32*)g | (u32)(m >> 32));
-    *(s32*)(g + 4) = (s32)(*(u32*)(g + 4) | (u32)m);
+    *(u64*)g |= (u64)1 << sh;             // native u64, as SaveAddBadge (progress.cpp)
 }
 
 // Queues a notice record (up to 15) of the given type and id, then calls NoticePosted.
@@ -404,6 +405,8 @@ void fn_80228AFC(u8* arg0, s32 delta) {
         if (FlagTest(arg0, (u8)id)) continue;
         *(s32*)(arg0 + 0x120) = *(s32*)(arg0 + 0x120) + 1;
         FlagSet(arg0, (u8)id);
+        BadgeWhy("counter +0x9D4 = %d (+%d) >= %d", progress, delta, (s32)lim);
+        BadgeLogAward(id);
         PostNotice(arg0, 4, id);
 
         u8* reward = *(u8**)(gGameDb->data + 0x10A8) + id * 0x18;
