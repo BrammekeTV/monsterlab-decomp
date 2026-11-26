@@ -32,7 +32,7 @@ extern "C" void fn_8022E3D8(void* save, const unsigned char* name);   // src/gam
 extern "C" u32 _ctors[];      // 0x80345AE0, resolved by port_gen.obj like every other Wii global
 
 PortOptions gPortOptions;
-PortSettings gPortSettings = {1920, 1080, TRUE, FALSE, FALSE, FALSE, 100, FALSE, "", 100, PORT_FILTER_GAME, 0, 0, TRUE};
+PortSettings gPortSettings = {1920, 1080, TRUE, FALSE, FALSE, FALSE, 100, FALSE, "", 100, PORT_FILTER_GAME, 0, 0, TRUE, FALSE, FALSE, "", PORT_LIGHTING_IMPROVED, 100};
 
 // ------------------------------------------------------------------ log and boot summary
 struct Milestone { const char* what; u32 count; u32 ms; BOOL stub; };
@@ -1131,6 +1131,12 @@ struct PortBoot {
                 if (f >= 0) gPortSettings.texFilter = f;
                 else fprintf(stderr, "[port] --filter %s: expected game, nearest, bilinear, 2x, 4x, 8x or 16x\n", __argv[i + 1]);
                 i++;
+            }
+            else if (!strcmp(a, "--lighting") && i + 1 < __argc) {
+                const char* v = __argv[++i];
+                if (!_stricmp(v, "original")) gPortSettings.lighting = PORT_LIGHTING_ORIGINAL;
+                else if (!_stricmp(v, "improved")) gPortSettings.lighting = PORT_LIGHTING_IMPROVED;
+                else fprintf(stderr, "[port] --lighting %s: expected original or improved\n", v);
             }
             else if (!strcmp(a, "--stretch-ui")) gPortSettings.stretchUi = TRUE;
             else if (!strcmp(a, "--aspect") && i + 1 < __argc) {
