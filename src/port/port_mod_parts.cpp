@@ -306,6 +306,7 @@ void PortModPartsFrame(void) {
             if (row < 0) continue;
             sRow[pi] = row;
         }
+        if (!gGameDb || !gGameDb->data) continue;   // the row is known before the game has its database pointer
         AddToList(sPacks[pi], (int)pi);
         AddToInventory((int)pi);
     }
