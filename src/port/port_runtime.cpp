@@ -32,7 +32,7 @@ extern "C" void fn_8022E3D8(void* save, const unsigned char* name);   // src/gam
 extern "C" u32 _ctors[];      // 0x80345AE0, resolved by port_gen.obj like every other Wii global
 
 PortOptions gPortOptions;
-PortSettings gPortSettings = {1920, 1080, TRUE, FALSE, FALSE, FALSE, 100, FALSE, "", 100, PORT_FILTER_GAME, 0, 0, TRUE, FALSE, FALSE, "", PORT_LIGHTING_IMPROVED, 100};
+PortSettings gPortSettings = {1920, 1080, TRUE, FALSE, FALSE, FALSE, 100, FALSE, "", 100, PORT_FILTER_GAME, 0, 0, TRUE, FALSE, FALSE, "", PORT_LIGHTING_IMPROVED, 100, PORT_SHADOWS_SOFT, 70};
 
 // ------------------------------------------------------------------ log and boot summary
 struct Milestone { const char* what; u32 count; u32 ms; BOOL stub; };
@@ -1301,6 +1301,12 @@ struct PortBoot {
                 if (!_stricmp(v, "original")) gPortSettings.lighting = PORT_LIGHTING_ORIGINAL;
                 else if (!_stricmp(v, "improved")) gPortSettings.lighting = PORT_LIGHTING_IMPROVED;
                 else fprintf(stderr, "[port] --lighting %s: expected original or improved\n", v);
+            }
+            else if (!strcmp(a, "--shadows") && i + 1 < __argc) {
+                const char* v = __argv[++i];
+                if (!_stricmp(v, "original")) gPortSettings.shadows = PORT_SHADOWS_ORIGINAL;
+                else if (!_stricmp(v, "soft")) gPortSettings.shadows = PORT_SHADOWS_SOFT;
+                else fprintf(stderr, "[port] --shadows %s: expected original or soft\n", v);
             }
             else if (!strcmp(a, "--stretch-ui")) gPortSettings.stretchUi = TRUE;
             else if (!strcmp(a, "--aspect") && i + 1 < __argc) {

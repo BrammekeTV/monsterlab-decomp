@@ -87,7 +87,7 @@ static inline void ScissorOffset(const PortGx* g, s32* offX, s32* offY) {
 }
 static BOOL                    sStarted;
 static BOOL                    sDrawBound;                  // the pipeline state is still what FlushDraws left (Blit and copies clear it)
-struct OutKey { u32 bm, zm, alpha, cull, vp[6], sc0, sc1; f32 squeeze; s32 offX, offY; };
+struct OutKey { u32 bm, zm, alpha, cull, vp[6], sc0, sc1; f32 squeeze; s32 offX, offY; u32 shadow; };   // shadow: SHADOW_* (soft shadows)
 
 static struct { u32 draws, tris, presents, texCopies, textures, shaders, skipped, gpuDraws, flushes; u64 verts, gpuVerts; } sGfxStats;
 // This frame so far (reset at each display copy): time inside this backend, draws, GX vertices, copies.
@@ -345,6 +345,9 @@ static u32 sBatchVb, sBatchIdx;                             // where the open ba
 struct Batch { PendingState st; u32 vb, idx, ni; };
 static std::vector<Batch> sBatches;
 static void FlushDraws();
+static BOOL sShadowDirty;              // soft shadows: shadow pixels are marked in the stencil and not in the picture yet
+static BOOL IsShadowPass(const PortGx* g);
+static void ShadowComposite();
 static void Blit(ID3D11ShaderResourceView* src, ID3D11RenderTargetView* dst, u32 dstX, u32 dstY, u32 dstW, u32 dstH, f32 u0, f32 v0, f32 du, f32 dv, const f32* pick);
 static void CloseBatch() {
     if (!sPendCount) return;
@@ -848,6 +851,7 @@ static void LoadTlut(const PortGx* g, u32 source, u32 dest) {
 }
 
 // ------------------------------------------------------------------ fixed pipeline state
+enum { SHADOW_OFF = 0, SHADOW_COVER = 1, SHADOW_DRAW = 2 };   // OutKey::shadow: soft shadows off; a draw that clears the mark; a shadow draw
 static std::map<u32, ID3D11BlendState*> sBlends;
 static std::map<u32, ID3D11DepthStencilState*> sDepths;
 static ID3D11RasterizerState* sRaster[8];
@@ -866,7 +870,7 @@ static OutKey MakeOutKey(const PortGx* g, f32 squeeze) {
 static void SetOutputState(const OutKey& k) {
     f32 squeeze = k.squeeze;
     u32 bm = k.bm, zm = k.zm, hasAlpha = k.alpha == 1;
-    u32 bkey = bm | hasAlpha << 16;
+    u32 bkey = bm | hasAlpha << 16 | (k.shadow == SHADOW_DRAW ? 1u << 17 : 0);
     ID3D11BlendState*& bs = sBlends[bkey];
     if (!bs) {
         static const D3D11_BLEND kSrc[8] = {D3D11_BLEND_ZERO, D3D11_BLEND_ONE, D3D11_BLEND_DEST_COLOR, D3D11_BLEND_INV_DEST_COLOR,
@@ -891,18 +895,25 @@ static void SetOutputState(const OutKey& k) {
             rt.BlendOp = rt.BlendOpAlpha = D3D11_BLEND_OP_REV_SUBTRACT;
         }
         rt.RenderTargetWriteMask = (UINT8)(((bm & 8) ? 7 : 0) | ((bm & 0x10) ? 8 : 0));
+        if (k.shadow == SHADOW_DRAW) rt.RenderTargetWriteMask = 0;   // soft shadows: only the stencil mark (ShadowComposite darkens later)
         sDev->CreateBlendState(&d, &bs);
     }
     sCtx->OMSetBlendState(bs, NULL, 0xFFFFFFFF);
-    ID3D11DepthStencilState*& ds = sDepths[zm];
+    ID3D11DepthStencilState*& ds = sDepths[zm | k.shadow << 5];
     if (!ds) {
         D3D11_DEPTH_STENCIL_DESC d = {};
         d.DepthEnable = zm & 1;
         d.DepthFunc = (D3D11_COMPARISON_FUNC)(((zm >> 1) & 7) + 1);
         d.DepthWriteMask = (zm & 1) && (zm & 0x10) ? D3D11_DEPTH_WRITE_MASK_ALL : D3D11_DEPTH_WRITE_MASK_ZERO;
+        if (k.shadow) {                                     // soft shadows: stencil 1 where a shadow is the surface seen, 0 where a draw covered it since
+            d.StencilEnable = TRUE; d.StencilReadMask = d.StencilWriteMask = 1;
+            d.FrontFace.StencilFunc = D3D11_COMPARISON_ALWAYS; d.FrontFace.StencilPassOp = D3D11_STENCIL_OP_REPLACE;
+            d.FrontFace.StencilFailOp = d.FrontFace.StencilDepthFailOp = D3D11_STENCIL_OP_KEEP;
+            d.BackFace = d.FrontFace;
+        }
         sDev->CreateDepthStencilState(&d, &ds);
     }
-    sCtx->OMSetDepthStencilState(ds, 0);
+    sCtx->OMSetDepthStencilState(ds, k.shadow == SHADOW_DRAW ? 1 : 0);
     // XF 0x1005 bit 0: clipping off. Depth is then clamped instead of clipped, as on the console.
     u32 cull = k.cull;
     if (!sRaster[cull]) {
@@ -1478,6 +1489,13 @@ static void DrawPrims(const PortGx* g, u32 prim, const PortGxLayout* L, u32 coun
         lastSrc = src; lastPcVal = pc; haveLast = TRUE; pcSerial++;
     }
     OutKey ok = MakeOutKey(g, squeeze);
+    if (gPortSettings.shadows == PORT_SHADOWS_SOFT && !movie) {
+        ok.shadow = IsShadowPass(g) ? SHADOW_DRAW : SHADOW_COVER;
+        // A draw that does not write depth (see-through effects, the 2D layer) is blended over the picture as it is: the
+        // shadows drawn so far are put in first, so it is neither cut out of them nor darkened by them.
+        if (ok.shadow == SHADOW_COVER && sShadowDirty && !((ok.zm & 1) && (ok.zm & 0x10))) { FlushDraws(); ShadowComposite(); }
+        if (ok.shadow == SHADOW_DRAW) sShadowDirty = TRUE;
+    }
     ID3D11ShaderResourceView* srv[8]; ID3D11SamplerState* smp[8];
     if (sameBp) { memcpy(srv, cSrv, sizeof(srv)); memcpy(smp, cSmp, sizeof(smp)); }
     else {
@@ -1684,6 +1702,104 @@ static void FlushDraws() {
     sBatches.clear();
 }
 
+// ------------------------------------------------------------------ soft shadows
+// The game draws its shadows as a second, flattened copy of each model whose TEV gets one more stage that outputs opaque
+// black (fn_8003EA7C appends it: colour a, b, c, d all zero, alpha d = konst 1.0; fn_8003F1B8 battle, fn_8003ED08 field).
+// With soft shadows such a draw writes only depth (as on the console) and stencil bit 0 = 1; every other draw sets it
+// back to 0 where it draws. ShadowComposite then turns the marked pixels into a mask, blurs it (a Gaussian, sigma 2.5
+// console pixels) and darkens the picture by it: shadow darkness * mask, so overlapping shadows darken only once.
+static BOOL IsShadowPass(const PortGx* g) {
+    u32 n = (g->bp[0x00] >> 10) & 15;                      // the last stage
+    if (n == 0 || !(g->bp[0x41] & 1)) return FALSE;         // an added stage, drawn with blending
+    u32 cc = g->bp[0xC0 + n * 2], ac = g->bp[0xC1 + n * 2];
+    u32 ksel = g->bp[0xF6 + n / 2] >> ((n & 1) ? 14 : 4) & 0x3FF;
+    return (cc & 0xFFFF) == 0xFFFF && ((cc >> 16) & 0xF7) == 0 &&                                      // colour: zero, no bias/subtract/scale, dest prev
+           ((ac >> 4) & 0xFFF) == ((7u << 9) | (7u << 6) | (7u << 3) | 6u) && ((ac >> 16) & 0xF7) == 0 && // alpha: konst
+           ((ksel >> 5) & 31) == 0;                                                                     // konst alpha 1.0
+}
+static ID3D11Texture2D* sShTex[3]; static ID3D11RenderTargetView* sShRtv[3]; static ID3D11ShaderResourceView* sShSrv[3];   // marked (multisampled, MSAA only), mask, blurred across
+static ID3D11PixelShader *sShFillPs, *sShBlurPs; static ID3D11DepthStencilState* sShMarked; static ID3D11BlendState* sShMul;
+static u32 sShW, sShH;
+static const char kShadowSrc[] =
+    "cbuffer C : register(b0) { float4 rect; float4 pick; };\n"   // pick: step (uv), darkness, 1 = darken the picture
+    "Texture2D tex : register(t0); SamplerState smp : register(s0);\n"
+    "struct VO { float4 pos : SV_Position; float2 uv : TEXCOORD0; };\n"
+    "float4 fill(VO i) : SV_Target { return float4(1, 1, 1, 1); }\n"
+    "float4 blur(VO i) : SV_Target { float v = 0, ws = 0;\n"
+    "  [unroll] for (int k = -6; k <= 6; k++) { float w = exp(-k * k / 8.0); v += w * tex.SampleLevel(smp, i.uv + pick.xy * k, 0).r; ws += w; }\n"
+    "  v /= ws; return pick.w > 0 ? float4((1.0 - pick.z * v).xxx, 1) : float4(v, v, v, v); }\n";
+static void ShadowPass(ID3D11PixelShader* ps, ID3D11RenderTargetView* rtv, ID3D11DepthStencilView* dsv, ID3D11DepthStencilState* dss,
+                       ID3D11BlendState* bs, ID3D11ShaderResourceView* src, const f32* pick) {
+    f32 c[8] = {0, 0, 1, 1, pick[0], pick[1], pick[2], pick[3]};
+    sCtx->UpdateSubresource(sBlitConst, 0, NULL, c, 0, 0);
+    sCtx->OMSetRenderTargets(1, &rtv, dsv);
+    D3D11_VIEWPORT v = {0, 0, (f32)sEfbPw, (f32)sEfbPh, 0, 1};
+    D3D11_RECT sc = {0, 0, (LONG)sEfbPw, (LONG)sEfbPh};
+    sCtx->RSSetViewports(1, &v); sCtx->RSSetScissorRects(1, &sc);
+    sCtx->OMSetBlendState(bs, NULL, 0xFFFFFFFF);
+    sCtx->OMSetDepthStencilState(dss, 1);
+    sCtx->RSSetState(NULL);
+    sCtx->IASetInputLayout(NULL);
+    sCtx->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
+    sCtx->VSSetShader(sBlitVs, NULL, 0); sCtx->PSSetShader(ps, NULL, 0);
+    sCtx->VSSetConstantBuffers(0, 1, &sBlitConst); sCtx->PSSetConstantBuffers(0, 1, &sBlitConst);
+    sCtx->PSSetShaderResources(0, 1, &src); sCtx->PSSetSamplers(0, 1, &sLinearClamp);
+    sCtx->Draw(3, 0);
+    ID3D11ShaderResourceView* none = NULL;
+    sCtx->PSSetShaderResources(0, 1, &none);
+    sCtx->OMSetRenderTargets(0, NULL, NULL);
+}
+static void ShadowComposite() {
+    sShadowDirty = FALSE;
+    sDrawBound = FALSE;
+    if (!sShFillPs) {
+        ID3DBlob* a = Compile(kShadowSrc, "fill", "ps_4_0"); ID3DBlob* b = Compile(kShadowSrc, "blur", "ps_4_0");
+        if (a) { sDev->CreatePixelShader(a->GetBufferPointer(), a->GetBufferSize(), NULL, &sShFillPs); a->Release(); }
+        if (b) { sDev->CreatePixelShader(b->GetBufferPointer(), b->GetBufferSize(), NULL, &sShBlurPs); b->Release(); }
+        D3D11_DEPTH_STENCIL_DESC d = {};
+        d.StencilEnable = TRUE; d.StencilReadMask = 1; d.StencilWriteMask = 0;
+        d.FrontFace.StencilFunc = D3D11_COMPARISON_EQUAL;
+        d.FrontFace.StencilPassOp = d.FrontFace.StencilFailOp = d.FrontFace.StencilDepthFailOp = D3D11_STENCIL_OP_KEEP;
+        d.BackFace = d.FrontFace;
+        sDev->CreateDepthStencilState(&d, &sShMarked);
+        D3D11_BLEND_DESC bd = {};
+        D3D11_RENDER_TARGET_BLEND_DESC& rt = bd.RenderTarget[0];
+        rt.BlendEnable = TRUE; rt.SrcBlend = D3D11_BLEND_ZERO; rt.DestBlend = D3D11_BLEND_SRC_COLOR; rt.BlendOp = D3D11_BLEND_OP_ADD;
+        rt.SrcBlendAlpha = D3D11_BLEND_ZERO; rt.DestBlendAlpha = D3D11_BLEND_ONE; rt.BlendOpAlpha = D3D11_BLEND_OP_ADD;
+        rt.RenderTargetWriteMask = 7;                       // the colour only: frame-buffer alpha stays the game's
+        sDev->CreateBlendState(&bd, &sShMul);
+    }
+    if (sShW != sEfbPw || sShH != sEfbPh) {
+        for (int i = 0; i < 3; i++) {
+            if (sShSrv[i]) sShSrv[i]->Release();
+            if (sShRtv[i]) sShRtv[i]->Release();
+            if (sShTex[i]) sShTex[i]->Release();
+            sShSrv[i] = NULL; sShRtv[i] = NULL; sShTex[i] = NULL;
+            if (i == 0 && sSamples == 1) continue;          // without MSAA the marks go straight into [1]
+            D3D11_TEXTURE2D_DESC d = {};
+            d.Width = sEfbPw; d.Height = sEfbPh; d.MipLevels = d.ArraySize = 1; d.Format = DXGI_FORMAT_R8_UNORM;
+            d.SampleDesc.Count = i == 0 ? sSamples : 1; d.Usage = D3D11_USAGE_DEFAULT;
+            d.BindFlags = D3D11_BIND_RENDER_TARGET | (d.SampleDesc.Count == 1 ? D3D11_BIND_SHADER_RESOURCE : 0);
+            sDev->CreateTexture2D(&d, NULL, &sShTex[i]);
+            if (sShTex[i]) sDev->CreateRenderTargetView(sShTex[i], NULL, &sShRtv[i]);
+            if (sShTex[i] && d.SampleDesc.Count == 1) sDev->CreateShaderResourceView(sShTex[i], NULL, &sShSrv[i]);
+        }
+        sShW = sEfbPw; sShH = sEfbPh;
+    }
+    if (!sShFillPs || !sShBlurPs || !sShMarked || !sShMul || !sShSrv[1] || !sShSrv[2]) return;
+    const f32 zero[4] = {0, 0, 0, 0};
+    ID3D11RenderTargetView* marked = sShRtv[0] ? sShRtv[0] : sShRtv[1];
+    sCtx->ClearRenderTargetView(marked, zero);
+    ShadowPass(sShFillPs, marked, sEfbDsv, sShMarked, NULL, NULL, zero);
+    if (marked == sShRtv[0]) sCtx->ResolveSubresource(sShTex[1], 0, sShTex[0], 0, DXGI_FORMAT_R8_UNORM);
+    const f32 sigma = 2.5f * (f32)sEfbPw / 640.0f, step = sigma / 2.0f;   // 13 taps over +-3 sigma
+    const f32 h[4] = {step / sEfbPw, 0, 0, 0};
+    ShadowPass(sShBlurPs, sShRtv[2], NULL, NULL, NULL, sShSrv[1], h);
+    const f32 v[4] = {0, step / sEfbPh, gPortSettings.shadowDark / 100.0f, 1};
+    ShadowPass(sShBlurPs, sEfbRtv, NULL, NULL, sShMul, sShSrv[2], v);
+    sCtx->ClearDepthStencilView(sEfbDsv, D3D11_CLEAR_STENCIL, 1.0f, 0);
+}
+
 // ------------------------------------------------------------------ frame-buffer copies
 static void Blit(ID3D11ShaderResourceView* src, ID3D11RenderTargetView* dst, u32 dstX, u32 dstY, u32 dstW, u32 dstH, f32 u0, f32 v0, f32 du, f32 dv, const f32* pick) {
     sDrawBound = FALSE;
@@ -1857,6 +1973,7 @@ static void CopyEfb(const PortGx* g, u32 control) {
     if (!sStarted) return;
     s64 tf = Ticks();
     FlushDraws();
+    if (sShadowDirty) ShadowComposite();                    // soft shadows: into the picture before it is copied
     sTotalFlush += Ticks() - tf;
     sDrawBound = FALSE;
     s64 tr = Ticks();

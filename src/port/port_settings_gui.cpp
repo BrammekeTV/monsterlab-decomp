@@ -335,6 +335,17 @@ static void PageDisplay(void) {
     ImGui::PushTextWrapPos(0.0f);
     ImGui::TextDisabled("Improved keeps the colour of bright, lit 3D surfaces (the Wii clips them to white) and rolls highlights off smoothly; exposure brightens or darkens them. The 2D layer is never changed.");
     ImGui::PopTextWrapPos();
+    static const char* const kShadows[2] = {"Original (hard, black)", "Soft (blurred, see-through)"};
+    int si = sEdit.shadows == PORT_SHADOWS_ORIGINAL ? 0 : 1;
+    if (ImGui::BeginCombo("Shadows", kShadows[si])) {
+        for (int k = 0; k < 2; k++)
+            if (ImGui::Selectable(kShadows[k], k == si)) sEdit.shadows = gPortSettings.shadows = k ? PORT_SHADOWS_SOFT : PORT_SHADOWS_ORIGINAL;
+        ImGui::EndCombo();
+    }
+    if (sEdit.shadows == PORT_SHADOWS_SOFT) {
+        int sd = sEdit.shadowDark;
+        if (ImGui::SliderInt("Shadow darkness", &sd, 20, 100, "%d%%")) sEdit.shadowDark = gPortSettings.shadowDark = sd;
+    }
     b = gPortOverlayOn != 0;
     if (ImGui::Checkbox("Stats overlay (F3)", &b)) gPortOverlayOn = b;
 }
