@@ -123,6 +123,20 @@ void PortGxVertexLayout(const PortGx* g, u32 vat, PortGxLayout* out) {
     out->size = off;
 }
 
+// The layout of vertex format `vat`, kept while the five registers it is made from stay the same (the game draws
+// thousands of times per frame with a handful of them).
+static const PortGxLayout& CachedLayout(const PortGx* g, u32 vat) {
+    static struct { u32 reg[5]; BOOL made; PortGxLayout layout; } sCache[8];
+    auto& c = sCache[vat];
+    const u32 reg[5] = {g->cp[0x50], g->cp[0x60], g->cp[0x70 + vat], g->cp[0x80 + vat], g->cp[0x90 + vat]};
+    if (!c.made || memcmp(reg, c.reg, sizeof(reg))) {
+        PortGxVertexLayout(g, vat, &c.layout);
+        memcpy(c.reg, reg, sizeof(reg));
+        c.made = TRUE;
+    }
+    return c.layout;
+}
+
 // ------------------------------------------------------------------ interpreter
 static inline u32 Be16(const u8* p) { return (u32)p[0] << 8 | p[1]; }
 static inline u32 Be32(const u8* p) { return (u32)p[0] << 24 | (u32)p[1] << 16 | (u32)p[2] << 8 | p[3]; }
@@ -238,8 +252,7 @@ static void Run(PortGx* g, const u8* p, const u8* end, int depth) {
             if (end - p < 2) { Fail("truncated draw", op, p - 1, start); return; }
             u32 count = Be16(p);
             p += 2;
-            PortGxLayout layout;
-            PortGxVertexLayout(g, op & 7, &layout);
+            const PortGxLayout& layout = CachedLayout(g, op & 7);
             if (layout.size == 0 || (u32)(end - p) < count * layout.size) { Fail("draw runs past the end of the list", op, p - 3, start); return; }
             sStats.draws++;
             sStats.vertices += count;
