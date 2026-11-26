@@ -14,6 +14,7 @@ typedef struct PortFrameStats {
     f32 renderMs;             // inside the Direct3D backend (draws and copies)
     f32 waitMs;               // asleep in VIWaitForRetrace
     f32 gameMs;               // the rest: game logic and the GX command stream
+    f32 decodeMs, setupMs, flushMs, copyMs;   // renderMs split, with --perf-log only: vertex decode, the rest of each draw, batch upload and draw calls, frame-buffer copies
     u32 draws, verts;         // draw calls and GX vertices
     u32 efbCopies;            // frame-buffer copies to a texture
     u32 textures;             // decoded textures alive, plus the frame-buffer copy textures

@@ -99,7 +99,7 @@ BOOL PortInputAddPress(const char* spec) {
 
 // --pointer X,Y@FRAME: from that frame on the pointer is at output pixel X,Y (mapped exactly as the mouse;
 // a later entry moves it), for headless tests.
-struct ScriptedPointer { s32 from; f32 wx, wy; };
+struct ScriptedPointer { s32 from; f32 wx, wy; BOOL console; };    // console: wx, wy are the console pointer itself
 static ScriptedPointer sPointer[32];
 static int sPointerCount;
 
@@ -114,7 +114,16 @@ BOOL PortInputAddPointer(const char* spec) {
     ScriptedPointer& p = sPointer[sPointerCount++];
     p.from = atoi(at + 1);
     p.wx = x; p.wy = y;      // output pixels; divided by the output size when sampled (--res may follow)
+    p.console = FALSE;
     return TRUE;
+}
+
+// A scripted pointer given as the console's own pointer values (-1..1, as PortGfxPointer makes them): it hits the
+// same widget at any window size and aspect (--bench).
+void PortInputAddConsolePointer(f32 px, f32 py, s32 frame) {
+    if (sPointerCount >= 32) return;
+    ScriptedPointer& p = sPointer[sPointerCount++];
+    p.from = frame; p.wx = px; p.wy = py; p.console = TRUE;
 }
 
 // ------------------------------------------------------------------ XInput (loaded on demand)
@@ -180,7 +189,8 @@ static void Sample(RemoteState* r) {
         for (int i = 0; i < sPointerCount; i++)
             if (frame >= sPointer[i].from && (best < 0 || sPointer[i].from >= sPointer[best].from)) best = i;
         if (best >= 0) {
-            PortGfxPointer(sPointer[best].wx / (gPortSettings.width > 0 ? gPortSettings.width : 1920), sPointer[best].wy / (gPortSettings.height > 0 ? gPortSettings.height : 1080), &r->px, &r->py);
+            if (sPointer[best].console) { r->px = sPointer[best].wx; r->py = sPointer[best].wy; }
+            else PortGfxPointer(sPointer[best].wx / (gPortSettings.width > 0 ? gPortSettings.width : 1920), sPointer[best].wy / (gPortSettings.height > 0 ? gPortSettings.height : 1080), &r->px, &r->py);
             r->pointerValid = TRUE;
         }
     }
