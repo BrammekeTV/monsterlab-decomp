@@ -1353,9 +1353,155 @@ static DecFn DecPick(u32 fmt, u32 comps, BOOL be) {
     if (!comps) return kCol[be ? 1 : 0][fmt > 5 ? 5 : fmt];
     return kTab[fmt > 4 ? 4 : fmt][be ? 1 : 0][comps > 3 ? 2 : comps - 1];
 }
+// Per draw, not per vertex: where each array attribute's data is, and the attributes the vertex format has (their
+// numbers go into `active`; returns how many).
+static u32 ResolveArrays(const PortGx* g, const PortGxLayout* L, const u8** arrBase, u32* arrStride, BOOL* arrBe, u32* active) {
+    u32 nActive = 0;
+    static u32 cArrAddr[21], cArrEpoch[21]; static const u8* cArrPtr[21]; static BOOL cArrBe[21];   // the last lookup per array (once a frame)
+    for (u32 a = 9; a < 21; a++) {
+        if (!L->attr[a].mode) continue;
+        if (L->attr[a].mode >= 2) {
+            const u32 addr = g->cp[0xA0 + (a - 9)];
+            if (cArrEpoch[a] != sTexGen || cArrAddr[a] != addr) {
+                cArrEpoch[a] = sTexGen; cArrAddr[a] = addr;
+                cArrPtr[a] = PortGxHostPtr(addr);
+                cArrBe[a] = cArrPtr[a] && PortIsSectionData(cArrPtr[a]);   // a mesh's arrays are file data; arrays the game builds are in host order
+            }
+            arrBase[a] = cArrPtr[a];
+            if (!arrBase[a]) continue;
+            arrStride[a] = g->cp[0xB0 + (a - 9)] & 0xFF;
+            arrBe[a] = cArrBe[a];
+        }
+        active[nActive++] = a;
+    }
+    return nActive;
+}
+
+// The vertices and indices of one GX draw, added to the open batch (DrawPrims has set that up or found it unchanged).
+struct DrawSrc { const PortGxLayout* L; const u8* data; const u8* const* arrBase; const u32* arrStride; const BOOL* arrBe; const u32* active; u32 nActive; };
+static void AppendDraw(const DrawSrc& d, u32 prim, u32 count, BOOL gpu, u32 rec, u32 tmVtx, u32 stride) {
+    const PortGxLayout* L = d.L;
+    const u8* data = d.data;
+    const u8* const* arrBase = d.arrBase; const u32* arrStride = d.arrStride; const BOOL* arrBe = d.arrBe; const u32* active = d.active;
+    const u32 nActive = d.nActive;
+    u16 base = (u16)sBVCount;
+    {
+        const u64 tscVerts = Tsc();
+        size_t at = sBV.size();
+        sBV.resize(at + (size_t)count * stride);
+        if (gpu) {
+            // The vertex shader does the rest: the attributes go into the queue as they are given (GpuVtx).
+            u8* dst = &sBV[at];
+            struct AP { const u8* base; u32 arrStride, off, mode, fmt, comps, elem, dst; BOOL be; f32 scale; DecFn fn; };
+            AP ap[12];
+            u32 nap = 0, fl = 0;
+            BOOL hasPos = FALSE;
+            for (u32 ai = 0; ai < nActive; ai++) {
+                const u32 a = active[ai];
+                const PortGxAttr& ga = L->attr[a];
+                AP& q = ap[nap++];
+                q.base = arrBase[a]; q.arrStride = arrStride[a]; q.be = ga.mode >= 2 ? arrBe[a] : TRUE;
+                q.off = ga.offset; q.mode = ga.mode; q.fmt = ga.fmt; q.elem = ga.elem;
+                u32 shift = ga.shift;
+                if (a == 9) { q.dst = 0; q.comps = ga.comps > 3 ? 3 : ga.comps; hasPos = TRUE; }
+                else if (a == 10) { q.dst = 16; q.comps = 3; shift = ga.fmt == 1 ? 6 : ga.fmt == 3 ? 14 : 0; fl |= 1; }
+                else if (a <= 12) { q.dst = 32 + (a - 11) * 4; q.comps = 0; fl |= 2u << (a - 11); }
+                else { q.dst = 40 + (a - 13) * 8; q.comps = ga.comps > 2 ? 2 : ga.comps; fl |= 8u << (a - 13); }
+                q.scale = 1.0f / (f32)(1u << (shift & 31));
+                q.fn = DecPick(q.fmt, q.comps, q.be);
+            }
+            u8* o = dst;
+            if (!hasPos) {                                      // no position: nothing is drawn (as on the CPU path)
+                memset(o, 0, (size_t)count * stride);
+                const u32 none = 0x80000000u;
+                for (u32 n = 0; n < count; n++) memcpy(o + (size_t)n * stride + 28, &none, 4);
+            } else {
+                // (the shader reads only what the flags say is there: the rest is not cleared; a position with two
+                // components gets z = 0, a texture coordinate with one t = 0)
+                for (u32 k = 0; k < nap; k++) {
+                    const AP& q = ap[k];
+                    const u32 want = q.dst == 0 ? 3 : q.dst >= 40 ? 2 : q.comps;
+                    for (u32 c = q.comps; c < want; c++) for (u32 n = 0; n < count; n++) memset(o + (size_t)n * stride + q.dst + c * 4, 0, 4);
+                }
+                const u32 pmOff = L->attr[0].mode ? L->attr[0].offset : ~0u;
+                for (u32 n = 0; n < count; n++, data += L->size, o += stride) {
+                    u32 vfl = pmOff != ~0u ? fl | (data[pmOff] & 63u) << 16 : fl, vrec = rec;
+                    if (tmVtx) {
+                        if (tmVtx & 1) vrec |= (data[L->attr[1].offset] & 63u) << 20;
+                        if (tmVtx & 2) vrec |= (data[L->attr[2].offset] & 63u) << 26;
+                        if (tmVtx & 4) vfl |= (data[L->attr[3].offset] & 63u) << 22;
+                    }
+                    memcpy(o + 12, &vrec, 4); memcpy(o + 28, &vfl, 4);
+                    for (u32 k = 0; k < nap; k++) {
+                        const AP& q = ap[k];
+                        const u8* p = data + q.off;
+                        BOOL be = TRUE;
+                        if (q.mode >= 2) { u32 index = q.mode == 2 ? p[0] : Be16(p); p = q.base + index * q.arrStride; be = q.be; }
+                        q.fn(p, q.scale, o + q.dst);
+                    }
+                }
+            }
+        } else for (u32 n = 0; n < count; n++) memcpy(&sBV[at + (size_t)n * stride], &sVerts[n], stride);
+        sFrame.decodeTsc += Tsc() - tscVerts;
+        sBVCount += count;
+    }
+    const size_t nIdxBefore = sBI.size();
+    {
+        size_t n = sBI.size();
+        if (prim == 0x80) {
+            u32 quads = count / 4;
+            sBI.resize(n + (size_t)quads * 6);
+            u16* o = &sBI[n];
+            for (u32 i = 0; i < quads * 4; i += 4, o += 6) { u16 q = (u16)(base + i); o[0] = q; o[1] = (u16)(q + 1); o[2] = (u16)(q + 2); o[3] = q; o[4] = (u16)(q + 2); o[5] = (u16)(q + 3); }
+        } else if (prim == 0x90) {
+            u32 tris = count / 3;
+            sBI.resize(n + (size_t)tris * 3);
+            u16* o = &sBI[n];
+            for (u32 i = 0; i < tris * 3; i++) o[i] = (u16)(base + i);
+        } else if (prim == 0x98) {
+            sBI.resize(n + (size_t)(count - 2) * 3);
+            u16* o = &sBI[n];
+            for (u32 i = 0; i + 2 < count; i++, o += 3) { o[0] = (u16)(base + i); o[1] = (u16)(base + i + 1 + (i & 1)); o[2] = (u16)(base + i + 2 - (i & 1)); }
+        } else {
+            sBI.resize(n + (size_t)(count - 2) * 3);
+            u16* o = &sBI[n];
+            for (u32 i = 1; i + 1 < count; i++, o += 3) { o[0] = base; o[1] = (u16)(base + i); o[2] = (u16)(base + i + 1); }
+        }
+    }
+    sGfxStats.tris += (u32)(sBI.size() - nIdxBefore) / 3;
+    sPendCount++;
+    sGfxStats.draws++; sGfxStats.verts += count;
+    if (gpu) { sGfxStats.gpuDraws++; sGfxStats.gpuVerts += count; }
+    sFrame.draws++; sFrame.verts += count;
+}
+
+// The fast path: most GX draws (about 19 in 20 in the village and in battle) are the next piece of the same mesh, with no
+// register written since the draw before. Such a draw needs the same shader, constants, textures, output state and
+// record as that one, which is still the open batch, so only its vertices and indices are added. Kept for 3D draws
+// of the GPU vertex path only (a 2D draw is placed by its own bounds). PORT_NO_FASTPATH=1 turns it off.
+static struct { BOOL on; u32 bpGen, xfGen, texGen, midx0, midx1, rec, tmVtx, stride; PortGxLayout layout; } sFast;
+static u32 sFastHits;
+static BOOL FastDraw(const PortGx* g, u32 prim, const PortGxLayout* L, u32 count, const u8* data) {
+    if (!sFast.on || !sPendCount || g->bpGen != sFast.bpGen || g->xfGen != sFast.xfGen || sTexGen != sFast.texGen ||
+        g->cp[0x30] != sFast.midx0 || g->cp[0x40] != sFast.midx1) return FALSE;
+    if (!(prim == 0x80 ? count >= 4 : (prim == 0x90 || prim == 0x98 || prim == 0xA0) && count >= 3) || sBVCount + count > VB_VERTS) return FALSE;
+    const u32 stride = sFast.stride;                        // (the queue has to fit the buffers: otherwise the long way flushes it)
+    if (sBV.size() + (size_t)count * stride > VB_BYTES / 4 - 16 || sBI.size() + (size_t)count * 3 > IB_IDXS / 4) return FALSE;
+    if (memcmp(L, &sFast.layout, sizeof(*L))) return FALSE;
+    const u8* arrBase[21] = {}; u32 arrStride[21] = {}; BOOL arrBe[21] = {};
+    u32 active[12];
+    const u32 nActive = ResolveArrays(g, L, arrBase, arrStride, arrBe, active);
+    const DrawSrc src = {L, data, arrBase, arrStride, arrBe, active, nActive};
+    AppendDraw(src, prim, count, TRUE, sFast.rec, sFast.tmVtx, stride);
+    sFastHits++;
+    return TRUE;
+}
+
 static void DrawPrims(const PortGx* g, u32 prim, const PortGxLayout* L, u32 count, const u8* data) {
     if (!sStarted || count == 0) return;
     if (prim >= 0xA8) { sGfxStats.skipped++; return; }     // lines and points: not drawn yet
+    if (!sTrace && FastDraw(g, prim, L, count, data)) return;
+    sFast.on = FALSE;
     // What only the BP registers (TEV, textures, blending) decide is kept from the draw before while none was written
     // and the frame is the same (textures are looked at again once a frame): the pixel shader, constants, textures.
     static u32 cBpGen = ~0u, cTexGen, cHdr; static ID3D11PixelShader* cPs; static u32 cTexUsed;
@@ -1390,26 +1536,9 @@ static void DrawPrims(const PortGx* g, u32 prim, const PortGxLayout* L, u32 coun
         if (lit) for (u32 i = 0; i < 8; i++) { u32 lc; memcpy(&lc, &g->xfMem[0x600 + i * 0x10 + 3], 4); RegColour(lc, lightCol[i]); }
         sVerts.resize(count);
     }
-    // Per draw, not per vertex: where each array attribute's data is, and the attributes the vertex format has.
     const u8* arrBase[21] = {}; u32 arrStride[21] = {}; BOOL arrBe[21] = {};
-    u32 active[12], nActive = 0;
-    static u32 cArrAddr[21], cArrEpoch[21]; static const u8* cArrPtr[21]; static BOOL cArrBe[21];   // the last lookup per array (once a frame)
-    for (u32 a = 9; a < 21; a++) {
-        if (!L->attr[a].mode) continue;
-        if (L->attr[a].mode >= 2) {
-            const u32 addr = g->cp[0xA0 + (a - 9)];
-            if (cArrEpoch[a] != sTexGen || cArrAddr[a] != addr) {
-                cArrEpoch[a] = sTexGen; cArrAddr[a] = addr;
-                cArrPtr[a] = PortGxHostPtr(addr);
-                cArrBe[a] = cArrPtr[a] && PortIsSectionData(cArrPtr[a]);   // a mesh's arrays are file data; arrays the game builds are in host order
-            }
-            arrBase[a] = cArrPtr[a];
-            if (!arrBase[a]) continue;
-            arrStride[a] = g->cp[0xB0 + (a - 9)] & 0xFF;
-            arrBe[a] = cArrBe[a];
-        }
-        active[nActive++] = a;
-    }
+    u32 active[12];
+    const u32 nActive = ResolveArrays(g, L, arrBase, arrStride, arrBe, active);
     const u64 tscDecode = Tsc();                            // perf: the vertex loops of both paths count as decode
     // Where a 2D draw lands on the screen (clip x, y), for the widescreen and movie decisions below: worked out from the
     // positions alone for a GPU draw.
@@ -1645,95 +1774,13 @@ static void DrawPrims(const PortGx* g, u32 prim, const PortGxLayout* L, u32 coun
         sPend.movie = movie; sPend.vfmt = vfmt; sPend.pcSerial = pcSerial; sPend.ps = ps; sPend.out = ok; memcpy(sPend.srv, srv, sizeof(srv)); memcpy(sPend.smp, smp, sizeof(smp)); sPend.pc = pc;
         sBatchVb = (u32)sBV.size(); sBatchIdx = (u32)sBI.size(); sBVCount = 0;
     }
-    u16 base = (u16)sBVCount;
-    {
-        const u64 tscVerts = Tsc();
-        size_t at = sBV.size();
-        sBV.resize(at + (size_t)count * stride);
-        if (gpu) {
-            // The vertex shader does the rest: the attributes go into the queue as they are given (GpuVtx).
-            u8* dst = &sBV[at];
-            struct AP { const u8* base; u32 arrStride, off, mode, fmt, comps, elem, dst; BOOL be; f32 scale; DecFn fn; };
-            AP ap[12];
-            u32 nap = 0, fl = 0;
-            BOOL hasPos = FALSE;
-            for (u32 ai = 0; ai < nActive; ai++) {
-                const u32 a = active[ai];
-                const PortGxAttr& ga = L->attr[a];
-                AP& q = ap[nap++];
-                q.base = arrBase[a]; q.arrStride = arrStride[a]; q.be = ga.mode >= 2 ? arrBe[a] : TRUE;
-                q.off = ga.offset; q.mode = ga.mode; q.fmt = ga.fmt; q.elem = ga.elem;
-                u32 shift = ga.shift;
-                if (a == 9) { q.dst = 0; q.comps = ga.comps > 3 ? 3 : ga.comps; hasPos = TRUE; }
-                else if (a == 10) { q.dst = 16; q.comps = 3; shift = ga.fmt == 1 ? 6 : ga.fmt == 3 ? 14 : 0; fl |= 1; }
-                else if (a <= 12) { q.dst = 32 + (a - 11) * 4; q.comps = 0; fl |= 2u << (a - 11); }
-                else { q.dst = 40 + (a - 13) * 8; q.comps = ga.comps > 2 ? 2 : ga.comps; fl |= 8u << (a - 13); }
-                q.scale = 1.0f / (f32)(1u << (shift & 31));
-                q.fn = DecPick(q.fmt, q.comps, q.be);
-            }
-            u8* o = dst;
-            if (!hasPos) {                                      // no position: nothing is drawn (as on the CPU path)
-                memset(o, 0, (size_t)count * stride);
-                const u32 none = 0x80000000u;
-                for (u32 n = 0; n < count; n++) memcpy(o + (size_t)n * stride + 28, &none, 4);
-            } else {
-                // (the shader reads only what the flags say is there: the rest is not cleared; a position with two
-                // components gets z = 0, a texture coordinate with one t = 0)
-                for (u32 k = 0; k < nap; k++) {
-                    const AP& q = ap[k];
-                    const u32 want = q.dst == 0 ? 3 : q.dst >= 40 ? 2 : q.comps;
-                    for (u32 c = q.comps; c < want; c++) for (u32 n = 0; n < count; n++) memset(o + (size_t)n * stride + q.dst + c * 4, 0, 4);
-                }
-                const u32 pmOff = L->attr[0].mode ? L->attr[0].offset : ~0u;
-                for (u32 n = 0; n < count; n++, data += L->size, o += stride) {
-                    u32 vfl = pmOff != ~0u ? fl | (data[pmOff] & 63u) << 16 : fl, vrec = rec;
-                    if (tmVtx) {
-                        if (tmVtx & 1) vrec |= (data[L->attr[1].offset] & 63u) << 20;
-                        if (tmVtx & 2) vrec |= (data[L->attr[2].offset] & 63u) << 26;
-                        if (tmVtx & 4) vfl |= (data[L->attr[3].offset] & 63u) << 22;
-                    }
-                    memcpy(o + 12, &vrec, 4); memcpy(o + 28, &vfl, 4);
-                    for (u32 k = 0; k < nap; k++) {
-                        const AP& q = ap[k];
-                        const u8* p = data + q.off;
-                        BOOL be = TRUE;
-                        if (q.mode >= 2) { u32 index = q.mode == 2 ? p[0] : Be16(p); p = q.base + index * q.arrStride; be = q.be; }
-                        q.fn(p, q.scale, o + q.dst);
-                    }
-                }
-            }
-        } else for (u32 n = 0; n < count; n++) memcpy(&sBV[at + (size_t)n * stride], &sVerts[n], stride);
-        sFrame.decodeTsc += Tsc() - tscVerts;
-        sBVCount += count;
+    const DrawSrc src2 = {L, data, arrBase, arrStride, arrBe, active, nActive};
+    AppendDraw(src2, prim, count, gpu, rec, tmVtx, stride);
+    static const BOOL noFast = getenv("PORT_NO_FASTPATH") != NULL;
+    if (gpu && !ortho && !noFast) {
+        sFast.on = TRUE; sFast.bpGen = g->bpGen; sFast.xfGen = g->xfGen; sFast.texGen = sTexGen; sFast.midx0 = midx[0]; sFast.midx1 = midx[1];
+        sFast.rec = rec; sFast.tmVtx = tmVtx; sFast.stride = stride; sFast.layout = *L;
     }
-    const size_t nIdxBefore = sBI.size();
-    {
-        size_t n = sBI.size();
-        if (prim == 0x80) {
-            u32 quads = count / 4;
-            sBI.resize(n + (size_t)quads * 6);
-            u16* o = &sBI[n];
-            for (u32 i = 0; i < quads * 4; i += 4, o += 6) { u16 q = (u16)(base + i); o[0] = q; o[1] = (u16)(q + 1); o[2] = (u16)(q + 2); o[3] = q; o[4] = (u16)(q + 2); o[5] = (u16)(q + 3); }
-        } else if (prim == 0x90) {
-            u32 tris = count / 3;
-            sBI.resize(n + (size_t)tris * 3);
-            u16* o = &sBI[n];
-            for (u32 i = 0; i < tris * 3; i++) o[i] = (u16)(base + i);
-        } else if (prim == 0x98) {
-            sBI.resize(n + (size_t)(count - 2) * 3);
-            u16* o = &sBI[n];
-            for (u32 i = 0; i + 2 < count; i++, o += 3) { o[0] = (u16)(base + i); o[1] = (u16)(base + i + 1 + (i & 1)); o[2] = (u16)(base + i + 2 - (i & 1)); }
-        } else {
-            sBI.resize(n + (size_t)(count - 2) * 3);
-            u16* o = &sBI[n];
-            for (u32 i = 1; i + 1 < count; i++, o += 3) { o[0] = base; o[1] = (u16)(base + i); o[2] = (u16)(base + i + 1); }
-        }
-    }
-    sGfxStats.tris += (u32)(sBI.size() - nIdxBefore) / 3;
-    sPendCount++;
-    sGfxStats.draws++; sGfxStats.verts += count;
-    if (gpu) { sGfxStats.gpuDraws++; sGfxStats.gpuVerts += count; }
-    sFrame.draws++; sFrame.verts += count;
     if (movie) FlushDraws();                                // drawn at once: it has its own target
 }
 
@@ -2659,6 +2706,7 @@ BOOL PortGfxStart(BOOL window) {
 }
 
 const char* PortGfxStatsText(char* buf, u32 n) {
+    if (sStarted) PortLog("gfx draws on the fast path (no register written since the draw before): %u", sFastHits);
     if (sStarted) PortLog("gfx shaders: %u compiled, %u read from the cache on disk", sShaderCompiles, sShaderHits);
     if (sStarted) PortLog("gfx record ring: %u segment changes, %u records started exactly at a segment end (each was a write without a GPU wait, or past the buffer, before the fix)", sRecWraps, sRecExactFits);
     if (sStarted) PortLog("gfx soft shadows: %u composites, %u shown frames", sShadowComposites, sGfxStats.presents);
