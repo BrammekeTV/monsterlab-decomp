@@ -150,7 +150,26 @@ STAGES = [
            call("EnterName_Destroy", 30700), call("StartConversationID", 30800)],
           press=("A@30400", "A@30600", "A@30850"),
           pointer=("445,325@30300", "520,325@30500", "1370,880@30750")),
-    # Later stages go here (a deadline after 31300, frames counted from the run's start).
+    # A carries Fuseless's welcome, the first look at I.G.O.R. (the lab book opens on its ingredients page and
+    # closes again) and his second talk; then the Command Room is free.
+    Stage("igor", "Fuseless's welcome, I.G.O.R. opens and closes, free in the Command Room", 32900,
+          [call("InitLabBooks", 31300), call("LabBooks_Ingredients_RenderList_Generate", 31300), call("CloseBooks", 31300),
+           call("DestroyLabBooks", 31300), call("SetCastleAccess", 31900), call("StopConversation", 32000),
+           state("castle HUD free", r"hud machine 96773521 \(depth 1\) state 1 ", 32000)],
+          press=("A@31000-32400/150",)),
+    # The arrow in the Command Room points at its exit button (bottom left): the Grand Hall, where Fuseless
+    # explains the Dat-O-Saver.
+    Stage("hall", "leave the Command Room: the Grand Hall, the Dat-O-Saver talk", 33800,
+          [level("castle_atrium", 32600), call("SetCurrentLocation", 32600), call("StartConversationID", 32700),
+           call("StopConversation", 33200), state("castle HUD free", r"hud machine 96773521 \(depth 1\) state 1 ", 33350)],
+          press=("A@32700", "A@33300"), pointer=("330,900@32600",)),
+    # The orange door is the only one open (the green and the pink one answer IsCastleAccessBlocked). In the
+    # Mechanical Lab Fuseless talks, then the experiment's "Select Ingredients" page of I.G.O.R. opens by itself.
+    Stage("mechlab", "the orange door: the Mechanical Lab, Fuseless, Select Ingredients opens", 35000,
+          [call("PreloadLevel", 33650), level("castle_mechlab", 33700), call("StopConversation", 34600),
+           call("StartIngredientsSelection", 34600), call("InitLabBooks", 34600), call("UpdateSelectedIngredientsRecipe", 34600)],
+          press=("A@33700", "A@34050-34650/150"), pointer=("570,765@33600",)),
+    # Later stages go here (a deadline after 35000, frames counted from the run's start).
 ]
 
 
