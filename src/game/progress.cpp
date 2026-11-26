@@ -62,9 +62,9 @@ static inline u8* Db(void) { return gGameDb->data; }
 // the counter or condition the award site set with BadgeWhy() just before (empty for script
 // awards); `caller` is the return address relative to the exe base (look it up in monsterlab.map).
 
-struct BadgeStringTable { const char** strings; u8 pad[8]; u32 count; };
-extern "C++" BadgeStringTable* gStringTable;      // 0x805FB910
-extern "C++" BadgeStringTable* gStringTable2;     // 0x805FB90C
+struct StringTable { const char** strings; u8 pad[8]; u32 count; };
+extern "C++" StringTable* gStringTable;      // 0x805FB910
+extern "C++" StringTable* gStringTable2;     // 0x805FB90C
 extern "C" char __ImageBase;
 
 static char sBadgeWhy[128];
@@ -81,7 +81,7 @@ static const char* BadgeName(s32 id) {
     if (id < 0 || id >= *(const s32*)(db + 0x10AC)) return "(out of range)";
     s32 text = TextIdFromHash(*(const u32*)(*(u8**)(db + 0x10A8) + id * 0x18 + 4));
     if (text == -1) return "?";
-    const BadgeStringTable* t = gStringTable;
+    const StringTable* t = gStringTable;
     if ((text & 0x80000000) && gStringTable2 != NULL) { t = gStringTable2; text &= 0x7FFFFFFF; }
     if (t == NULL || t->strings == NULL || (u32)text >= t->count) return "?";
     return t->strings[text];
