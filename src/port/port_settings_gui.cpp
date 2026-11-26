@@ -321,6 +321,20 @@ static void PageDisplay(void) {
         ImGui::EndCombo();
     }
     ImGui::TextDisabled("Anisotropic keeps textures sharp on surfaces seen at a slant; the others change how close-up and distant textures are smoothed.");
+    static const char* const kLighting[2] = {"Original (as on the Wii)", "Improved (no clipped highlights)"};
+    int li = sEdit.lighting == PORT_LIGHTING_ORIGINAL ? 0 : 1;
+    if (ImGui::BeginCombo("Lighting", kLighting[li])) {
+        for (int k = 0; k < 2; k++)
+            if (ImGui::Selectable(kLighting[k], k == li)) sEdit.lighting = gPortSettings.lighting = k ? PORT_LIGHTING_IMPROVED : PORT_LIGHTING_ORIGINAL;
+        ImGui::EndCombo();
+    }
+    if (sEdit.lighting == PORT_LIGHTING_IMPROVED) {
+        int ex = sEdit.exposure;
+        if (ImGui::SliderInt("Exposure", &ex, 50, 150, "%d%%")) sEdit.exposure = gPortSettings.exposure = ex;
+    }
+    ImGui::PushTextWrapPos(0.0f);
+    ImGui::TextDisabled("Improved keeps the colour of bright, lit 3D surfaces (the Wii clips them to white) and rolls highlights off smoothly; exposure brightens or darkens them. The 2D layer is never changed.");
+    ImGui::PopTextWrapPos();
     b = gPortOverlayOn != 0;
     if (ImGui::Checkbox("Stats overlay (F3)", &b)) gPortOverlayOn = b;
 }

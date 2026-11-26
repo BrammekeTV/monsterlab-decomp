@@ -378,7 +378,7 @@ static std::string KonstAlpha(u32 sel) {
 }
 
 static u32 sUnsupported;               // bit 0: an indirect matrix kind that is not implemented
-static const std::string& TevKey(const PortGx* g, u32* texUsed) {
+static const std::string& TevKey(const PortGx* g, u32* texUsed, u32 hdr) {
     u32 stages = ((g->bp[0x00] >> 10) & 15) + 1;
     static std::string key;                                 // reused: no allocation per draw
     key.assign((const char*)&stages, 4);
@@ -390,18 +390,23 @@ static const std::string& TevKey(const PortGx* g, u32* texUsed) {
         key.append((const char*)words, 20);
         if (order & 0x40) *texUsed |= 1u << (order & 7);
     }
-    u32 tail[12];
+    u32 tail[13];
     for (u32 i = 0; i < 8; i++) tail[i] = g->bp[0xF6 + i] & 0xF;       // swap tables
     tail[8] = g->bp[0xF3] & 0xFF0000;                                    // alpha compare functions
     tail[9] = (g->bp[0x00] >> 16) & 7;                                   // indirect stages
     tail[10] = g->bp[0x27] & 0xFFFFFF;                                   // their texture maps and coordinates
     tail[11] = (g->bp[0xF1] >> 20) & 15;                                 // fog: projection (bit 3) and kind
+    tail[12] = hdr;                                                      // improved lighting (TevSource)
     for (u32 i = 0; i < tail[9]; i++) *texUsed |= 1u << ((g->bp[0x27] >> (i * 6)) & 7);
     key.append((const char*)tail, sizeof(tail));
     return key;
 }
 
-static std::string TevSource(const PortGx* g) {
+// hdr (the improved lighting, lit 3D draws only): colour results are not clipped to 1 between the stages (only kept
+// at 0..16; a register used as a lerp weight still is), and the end colour is scaled by the exposure (alphaRef.z)
+// and tone-mapped: below 0.8 unchanged, above it compressed smoothly towards 1, the brightest channel deciding so
+// the hue stays. Without it the code is exactly the GX arithmetic.
+static std::string TevSource(const PortGx* g, u32 hdr) {
     u32 stages = ((g->bp[0x00] >> 10) & 15) + 1;
     std::string s =
         "cbuffer C : register(b0) { float4 reg[4]; float4 konst[4]; float4 alphaRef; float4 texSize[8]; float4 indRow[6]; float4 indScale[4]; float4 fogP; float4 fogC; };\n"
@@ -471,9 +476,10 @@ static std::string TevSource(const PortGx* g) {
         u32 cd = cc & 15, ccn = (cc >> 4) & 15, cb = (cc >> 8) & 15, ca = (cc >> 12) & 15;
         u32 bias = (cc >> 16) & 3, sub = (cc >> 18) & 1, clamp = (cc >> 19) & 1, scale = (cc >> 20) & 3, dest = (cc >> 22) & 3;
         if (bias != 3) {
+            std::string w = hdr && ccn < 8 ? std::string("saturate(") + kColorIn[ccn] + ")" : kColorIn[ccn];
             snprintf(b, sizeof(b), "  { float3 r = (%s %s lerp(%s, %s, %s)%s) * %s; %s.rgb = %s; }\n", kColorIn[cd], sub ? "-" : "+",
-                     kColorIn[ca], kColorIn[cb], kColorIn[ccn], kBias[bias], kScale[scale], kRegName[dest],
-                     clamp ? "saturate(r)" : "clamp(r, -4.0, 4.0)");
+                     kColorIn[ca], kColorIn[cb], w.c_str(), kBias[bias], kScale[scale], kRegName[dest],
+                     clamp ? (hdr ? "clamp(r, 0.0, 16.0)" : "saturate(r)") : (hdr ? "clamp(r, -4.0, 16.0)" : "clamp(r, -4.0, 4.0)"));
         } else {                                            // compare: d + (a op b ? c : 0); the red channel, or per channel
             const char* cmp = sub ? "abs(a.r - b.r) < 0.002" : "a.r > b.r";
             if (scale == 3) cmp = sub ? "abs(a - b) < 0.002" : "a > b";
@@ -500,6 +506,9 @@ static std::string TevSource(const PortGx* g) {
         lastA = dest;
     }
     snprintf(b, sizeof(b), "  float4 o = saturate(float4(%s.rgb, %s.a));\n", kRegName[lastC], kRegName[lastA]);
+    if (hdr) snprintf(b, sizeof(b), "  float4 o = float4(max(%s.rgb, 0.0) * alphaRef.z, saturate(%s.a));\n"
+                                    "  { float m = max(o.r, max(o.g, o.b)); if (m > 0.8) o.rgb *= (0.8 + 0.2 * (1.0 - exp(-(m - 0.8) * 5.0))) / m; }\n",
+                      kRegName[lastC], kRegName[lastA]);
     s += b;
     u32 at = g->bp[0xF3];
     u32 f0 = (at >> 16) & 7, f1 = (at >> 19) & 7, logic = (at >> 22) & 3;
@@ -528,8 +537,8 @@ static std::string TevSource(const PortGx* g) {
 }
 
 static std::unordered_map<u64, ID3D11PixelShader*> sPsCache;
-static ID3D11PixelShader* GetPixelShader(const PortGx* g, u32* texUsed) {
-    const std::string& key = TevKey(g, texUsed);
+static ID3D11PixelShader* GetPixelShader(const PortGx* g, u32* texUsed, u32 hdr) {
+    const std::string& key = TevKey(g, texUsed, hdr);
     static std::string lastKey; static ID3D11PixelShader* lastPs; static u32 lastTex;
     if (lastPs && key == lastKey) { *texUsed = lastTex; return lastPs; }   // the draw before had the same TEV set-up
     u64 h = 1469598103934665603ull;
@@ -538,7 +547,7 @@ static ID3D11PixelShader* GetPixelShader(const PortGx* g, u32* texUsed) {
     auto it = sPsCache.find(h);
     if (it != sPsCache.end()) { lastKey = key; lastPs = it->second; lastTex = *texUsed; return lastPs; }
     ID3D11PixelShader* ps = NULL;
-    std::string src = TevSource(g);
+    std::string src = TevSource(g, hdr);
     ID3DBlob* code = Compile(src.c_str(), "main", "ps_4_0");
     if (code) {
         sDev->CreatePixelShader(code->GetBufferPointer(), code->GetBufferSize(), NULL, &ps);
@@ -1213,22 +1222,23 @@ static void DrawPrims(const PortGx* g, u32 prim, const PortGxLayout* L, u32 coun
     if (prim >= 0xA8) { sGfxStats.skipped++; return; }     // lines and points: not drawn yet
     // What only the BP registers (TEV, textures, blending) decide is kept from the draw before while none was written
     // and the frame is the same (textures are looked at again once a frame): the pixel shader, constants, textures.
-    static u32 cBpGen = ~0u, cTexGen; static ID3D11PixelShader* cPs; static u32 cTexUsed;
+    static u32 cBpGen = ~0u, cTexGen, cHdr; static ID3D11PixelShader* cPs; static u32 cTexUsed;
     static ID3D11ShaderResourceView* cSrv[8]; static ID3D11SamplerState* cSmp[8];
-    const BOOL sameBp = g->bpGen == cBpGen && sTexGen == cTexGen;
+    u32 numChans = g->xf[0x09] & 3, numGens = g->xf[0x3F] & 15;
+    BOOL lit = FALSE;                                       // some colour or alpha channel uses lights: otherwise their colours are not needed
+    for (u32 c = 0; c < numChans && c < 2; c++) lit |= ((g->xf[0x0E + c] | g->xf[0x10 + c]) & 2) != 0;
+    const u32 hdr = lit && gPortSettings.lighting == PORT_LIGHTING_IMPROVED;   // improved lighting: lit 3D draws only, never the 2D layer
+    const BOOL sameBp = g->bpGen == cBpGen && sTexGen == cTexGen && hdr == cHdr;
     u32 texUsed;
-    ID3D11PixelShader* ps = sameBp ? cPs : GetPixelShader(g, &texUsed);
+    ID3D11PixelShader* ps = sameBp ? cPs : GetPixelShader(g, &texUsed, hdr);
     if (sameBp) texUsed = cTexUsed;
     if (!ps) { sGfxStats.skipped++; return; }
     f32 proj[7]; memcpy(proj, &g->xf[0x20], 24);
     BOOL ortho = g->xf[0x26] & 1;
-    u32 numChans = g->xf[0x09] & 3, numGens = g->xf[0x3F] & 15;
     f32 ambReg[2][4], matReg[2][4];
     for (int c = 0; c < 2; c++) { RegColour(g->xf[0x0A + c], ambReg[c]); RegColour(g->xf[0x0C + c], matReg[c]); }
     u32 midx[2] = {g->cp[0x30], g->cp[0x40]};
     f32 lightCol[8][4];
-    BOOL lit = FALSE;                                       // some colour or alpha channel uses lights: otherwise their colours are not needed
-    for (u32 c = 0; c < numChans && c < 2; c++) lit |= ((g->xf[0x0E + c] | g->xf[0x10 + c]) & 2) != 0;
     // to a triangle list (indices into the vertices, which are uploaded once; written into the batch below)
     if (!(prim == 0x80 ? count >= 4 : (prim == 0x90 || prim == 0x98 || prim == 0xA0) && count >= 3) || count > VB_VERTS) { sGfxStats.skipped++; return; }
     // Draws are transformed and lit by the vertex shader, also those with a position matrix per vertex (skinned meshes;
@@ -1419,7 +1429,7 @@ static void DrawPrims(const PortGx* g, u32 prim, const PortGxLayout* L, u32 coun
     PsConst pc;
     memset(&pc, 0, sizeof(pc));
     // The constants only change now and then: rebuild them when one of the registers they come from did.
-    struct PcSrc { s16 reg[16], konst[16]; u32 bp[8 + 9 + 5 + 2 + 1]; };
+    struct PcSrc { s16 reg[16], konst[16]; u32 bp[8 + 9 + 5 + 2 + 1 + 1]; };
     static PcSrc lastSrc; static PsConst lastPcVal; static BOOL haveLast; static u32 pcSerial;
     PcSrc src;
     if (!sameBp) {
@@ -1430,11 +1440,12 @@ static void DrawPrims(const PortGx* g, u32 prim, const PortGxLayout* L, u32 coun
         for (u32 i = 0xEE; i < 0xF3; i++) src.bp[n++] = g->bp[i];
         src.bp[n++] = g->bp[0x25]; src.bp[n++] = g->bp[0x26];
         src.bp[n++] = g->bp[0xF3];
+        src.bp[n++] = hdr ? (u32)gPortSettings.exposure : 0;        // alphaRef.z: the exposure of the improved lighting
     }
     if (haveLast && (sameBp || !memcmp(&src, &lastSrc, sizeof(src)))) pc = lastPcVal;
     else {
     for (int i = 0; i < 4; i++) for (int k = 0; k < 4; k++) { pc.reg[i][k] = g->tevReg[i][k] / 255.0f; pc.konst[i][k] = g->tevKonst[i][k] / 255.0f; }
-        pc.alphaRef[0] = (g->bp[0xF3] & 255) / 255.0f; pc.alphaRef[1] = ((g->bp[0xF3] >> 8) & 255) / 255.0f; pc.alphaRef[2] = pc.alphaRef[3] = 0;
+        pc.alphaRef[0] = (g->bp[0xF3] & 255) / 255.0f; pc.alphaRef[1] = ((g->bp[0xF3] >> 8) & 255) / 255.0f; pc.alphaRef[2] = hdr ? gPortSettings.exposure / 100.0f : 1.0f; pc.alphaRef[3] = 0;
         for (u32 m = 0; m < 8; m++) {
             u32 img0 = g->bp[(m < 4 ? 0x80 : 0xA0) + (m & 3) + 8];
             pc.texSize[m][0] = (f32)((img0 & 0x3FF) + 1); pc.texSize[m][1] = (f32)(((img0 >> 10) & 0x3FF) + 1); pc.texSize[m][2] = pc.texSize[m][3] = 0;
@@ -1470,7 +1481,7 @@ static void DrawPrims(const PortGx* g, u32 prim, const PortGxLayout* L, u32 coun
     if (sameBp) { memcpy(srv, cSrv, sizeof(srv)); memcpy(smp, cSmp, sizeof(smp)); }
     else {
         for (u32 i = 0; i < 8; i++) { srv[i] = (texUsed & (1u << i)) ? GetTexture(g, i) : sWhite; smp[i] = (texUsed & (1u << i)) ? GetSampler(g, i) : sLinearClamp; }
-        memcpy(cSrv, srv, sizeof(srv)); memcpy(cSmp, smp, sizeof(smp)); cPs = ps; cTexUsed = texUsed; cBpGen = g->bpGen; cTexGen = sTexGen;
+        memcpy(cSrv, srv, sizeof(srv)); memcpy(cSmp, smp, sizeof(smp)); cPs = ps; cTexUsed = texUsed; cBpGen = g->bpGen; cTexGen = sTexGen; cHdr = hdr;
     }
 
     // Draws that need exactly the same state as the ones queued before are added to them: one upload and one draw call for the lot.

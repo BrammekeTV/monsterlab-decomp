@@ -155,7 +155,10 @@ typedef struct PortSettings {
     BOOL windowsCursor;       // show the Windows mouse cursor over the picture too ([display] windows_cursor; the game draws its own pointer)
     BOOL dumpTextures;        // save every texture the game draws with as a PNG ([textures] dump; Settings > Mods)
     char dumpDir[260];        // where to; empty: dump\textures next to the exe ([textures] folder)
+    s32  lighting;            // PORT_LIGHTING_*: lit 3D draws as GX gives them, or without early clipping and tone-mapped ([graphics] lighting, --lighting)
+    s32  exposure;            // improved lighting only: brightness of lit 3D draws before tone mapping, percent 50-150 ([graphics] exposure)
 } PortSettings;
+enum { PORT_LIGHTING_ORIGINAL = 0, PORT_LIGHTING_IMPROVED = 1 };
 extern PortSettings gPortSettings;
 // monsterlab.ini next to the exe (port_settings.cpp): display, audio and the input bindings.
 const char* PortSettingsPath(void);
