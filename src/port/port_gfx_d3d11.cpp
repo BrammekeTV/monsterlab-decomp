@@ -95,6 +95,7 @@ static struct { u32 draws, tris, presents, texCopies, textures, shaders, skipped
 // This frame so far (reset at each display copy): time inside this backend, draws, GX vertices, copies.
 static s64 sTotalDraw, sTotalCopy, sTotalFlush, sTRes, sTBlit, sTMk, sTDisp, sTPres, sTNew, sTRtv; static u32 sNewTex; static std::vector<ID3D11Texture2D*> sTexPool;     // time inside the backend over the whole run (the boot summary)
 static struct { s64 renderTicks; u32 draws, verts, copies; u64 drawTsc, drawFlushTsc, copyTsc, flushTsc, decodeTsc; } sFrame;
+static s64 sShaderTicks, sTextureTicks;   // this frame: making new pixel shaders and new textures (level changes)
 static u64 sCopyStart;                 // time-stamp counter after a copy flushed the queued draws
 static BOOL sSplit;                    // --perf-log or PORT_PERF_LOG: time the parts of the backend (time-stamp counter)
 static inline u64 Tsc(void) { return sSplit ? __rdtsc() : 0; }
@@ -210,15 +211,83 @@ void PortGfxPointer(f32 wx, f32 wy, f32* px, f32* py) {
 }
 
 // ------------------------------------------------------------------ shaders
+// Compiled shaders are kept on disk, in `shadercache` beside the executable (build\pc\shadercache): D3DCompile takes
+// milliseconds per TEV set-up, which showed as a hitch where a level brings new ones. The file name is a hash of
+// everything the byte code is made from (source, entry point, target, flags, compiler version), so a changed
+// generator or compiler simply misses; old files are never read again. A file is { magic, size, hash of the byte
+// code, byte code }: a damaged one is compiled again. PORT_NO_SHADER_CACHE=1 turns the cache off.
+static const UINT kCompileFlags = D3DCOMPILE_OPTIMIZATION_LEVEL1;
+static const u32 kCacheMagic = 0x31435348;                  // "HSC1"
+static u32 sShaderHits, sShaderCompiles;
+static u64 Fnv64(const void* p, size_t n, u64 h) {
+    const u8* b = (const u8*)p;
+    for (size_t i = 0; i < n; i++) h = (h ^ b[i]) * 1099511628211ull;
+    return h;
+}
+static BOOL ShaderCachePath(const char* src, const char* entry, const char* target, char* path, size_t size) {
+    static char dir[MAX_PATH];
+    static int on = -1;
+    if (on < 0) {
+        const char* off = getenv("PORT_NO_SHADER_CACHE");
+        on = !(off && *off && *off != '0');
+        DWORD n = GetModuleFileNameA(NULL, dir, MAX_PATH);
+        char* slash = n && n < MAX_PATH ? strrchr(dir, '\\') : NULL;
+        if (!slash || (size_t)(slash - dir) + 16 >= MAX_PATH) on = 0;
+        else {
+            strcpy_s(slash + 1, MAX_PATH - (slash + 1 - dir), "shadercache");
+            CreateDirectoryA(dir, NULL);
+        }
+    }
+    if (!on) return FALSE;
+    u64 h = Fnv64(src, strlen(src) + 1, 1469598103934665603ull);
+    h = Fnv64(entry, strlen(entry) + 1, h);
+    h = Fnv64(target, strlen(target) + 1, h);
+    const u32 how[2] = {kCompileFlags, D3D_COMPILER_VERSION};
+    h = Fnv64(how, sizeof(how), h);
+    snprintf(path, size, "%s\\%016llX.cso", dir, (unsigned long long)h);
+    return TRUE;
+}
+static ID3DBlob* ShaderCacheRead(const char* path) {
+    FILE* f = fopen(path, "rb");
+    if (!f) return NULL;
+    u32 head[4];                                            // magic, size, hash (64 bits)
+    ID3DBlob* code = NULL;
+    if (fread(head, 1, sizeof(head), f) == sizeof(head) && head[0] == kCacheMagic && head[1] && head[1] < (1u << 22) &&
+        SUCCEEDED(D3DCreateBlob(head[1], &code))) {
+        u64 want; memcpy(&want, &head[2], 8);
+        if (fread(code->GetBufferPointer(), 1, head[1], f) != head[1] || Fnv64(code->GetBufferPointer(), head[1], 1469598103934665603ull) != want) {
+            code->Release();
+            code = NULL;
+        }
+    }
+    fclose(f);
+    return code;
+}
+static void ShaderCacheWrite(const char* path, ID3DBlob* code) {
+    char tmp[MAX_PATH + 32];                                // written aside, then renamed: runs at the same time never read half a file
+    snprintf(tmp, sizeof(tmp), "%s.%lu.tmp", path, GetCurrentProcessId());
+    FILE* f = fopen(tmp, "wb");
+    if (!f) return;
+    const u32 size = (u32)code->GetBufferSize(), head[2] = {kCacheMagic, size};
+    const u64 hash = Fnv64(code->GetBufferPointer(), size, 1469598103934665603ull);
+    BOOL ok = fwrite(head, 1, sizeof(head), f) == sizeof(head) && fwrite(&hash, 1, 8, f) == 8 && fwrite(code->GetBufferPointer(), 1, size, f) == size;
+    ok = fclose(f) == 0 && ok;
+    if (!ok || !MoveFileExA(tmp, path, MOVEFILE_REPLACE_EXISTING)) DeleteFileA(tmp);
+}
 static ID3DBlob* Compile(const char* src, const char* entry, const char* target) {
     ID3DBlob* code = NULL; ID3DBlob* err = NULL;
-    HRESULT hr = D3DCompile(src, strlen(src), NULL, NULL, NULL, entry, target, D3DCOMPILE_OPTIMIZATION_LEVEL1, 0, &code, &err);
+    char path[MAX_PATH + 32];
+    const BOOL cache = ShaderCachePath(src, entry, target, path, sizeof(path));
+    if (cache && (code = ShaderCacheRead(path)) != NULL) { sShaderHits++; return code; }
+    sShaderCompiles++;
+    HRESULT hr = D3DCompile(src, strlen(src), NULL, NULL, NULL, entry, target, kCompileFlags, 0, &code, &err);
     if (FAILED(hr)) {
         PortLog("gfx: shader compile failed: %s", err ? (const char*)err->GetBufferPointer() : "?");
         if (err) err->Release();
         return NULL;
     }
     if (err) err->Release();
+    if (cache) ShaderCacheWrite(path, code);
     return code;
 }
 
@@ -580,6 +649,7 @@ static ID3D11PixelShader* GetPixelShader(const PortGx* g, u32* texUsed, u32 hdr)
     auto it = sPsCache.find(h);
     if (it != sPsCache.end()) { lastKey = key; lastPs = it->second; lastTex = *texUsed; return lastPs; }
     ID3D11PixelShader* ps = NULL;
+    const s64 t0 = Ticks();
     std::string src = TevSource(g, hdr);
     ID3DBlob* code = Compile(src.c_str(), "main", "ps_4_0");
     if (code) {
@@ -589,6 +659,7 @@ static ID3D11PixelShader* GetPixelShader(const PortGx* g, u32* texUsed, u32 hdr)
         PortLog("gfx: the shader source was:\n%s", src.c_str());
     }
     sPsCache[h] = ps;
+    sShaderTicks += Ticks() - t0;
     sGfxStats.shaders++;
     return ps;
 }
@@ -820,6 +891,7 @@ static ID3D11ShaderResourceView* GetTexture(const PortGx* g, u32 map) {
         }
         return e.srv ? e.srv : sWhite;
     }
+    const s64 t0 = Ticks();
     std::vector<u32> rgba(w * h);
     if (!DecodeTexture(data, w, h, fmt, tlut, (tl >> 10) & 3, rgba.data())) {
         static u32 warned;
@@ -852,6 +924,7 @@ static ID3D11ShaderResourceView* GetTexture(const PortGx* g, u32 map) {
     }
     TexEntry e = {made, hash, w, h, fmt, sTexGen, levels, content, waiting, wideArt};
     sTextures[key] = e;
+    sTextureTicks += Ticks() - t0;
     sGfxStats.textures++;
     return e.srv ? e.srv : sWhite;
 }
@@ -1940,6 +2013,9 @@ static void FrameStats(PortFrameStats* s) {
         s->copyMs = (f32)(sFrame.copyTsc * perTick);
     }
     lastTsc = tsc;
+    s->shaderMs = (f32)(sShaderTicks * ms);
+    s->textureMs = (f32)(sTextureTicks * ms);
+    sShaderTicks = sTextureTicks = 0;
     last = now; lastWait = wait;
     sTexGen++;
     sModBytes = 0;
@@ -2583,6 +2659,7 @@ BOOL PortGfxStart(BOOL window) {
 }
 
 const char* PortGfxStatsText(char* buf, u32 n) {
+    if (sStarted) PortLog("gfx shaders: %u compiled, %u read from the cache on disk", sShaderCompiles, sShaderHits);
     if (sStarted) PortLog("gfx record ring: %u segment changes, %u records started exactly at a segment end (each was a write without a GPU wait, or past the buffer, before the fix)", sRecWraps, sRecExactFits);
     if (sStarted) PortLog("gfx soft shadows: %u composites, %u shown frames", sShadowComposites, sGfxStats.presents);
     if (sStarted) PortLog("gfx copy time: flush %.1f s, resolve %.1f s, blit %.1f s", sTotalFlush / (double)Ticks_freq(), sTRes / (double)Ticks_freq(), sTBlit / (double)Ticks_freq()); if (sStarted) PortLog("gfx new textures %u: %.1f s, rtv %.1f s", sNewTex, sTNew / (double)Ticks_freq(), sTRtv / (double)Ticks_freq()); PortLog("gfx tex/display part %.1f s, clear+present %.1f s; disp %.1f", sTMk / (double)Ticks_freq(), sTPres / (double)Ticks_freq(), sTDisp / (double)Ticks_freq(), sTPres / (double)Ticks_freq());

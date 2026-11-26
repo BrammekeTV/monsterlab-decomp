@@ -578,10 +578,12 @@ MSVC only for now (absolute symbols, `/alternatename`, structured exception hand
 ## Benchmark and frame-time log
 
 `--perf-log FILE` writes one CSV row per shown frame (`frame, fast, wall_ms, game_ms, render_ms, wait_ms, present_ms, draws, vertices, copies,
-textures, out_w, out_h, decode_ms, setup_ms, flush_ms, copy_ms`; `fast` is 1 while fast-forwarding) and, when the run ends, `FILE.summary.txt` with
+textures, out_w, out_h, decode_ms, setup_ms, flush_ms, copy_ms,
+shader_ms, texture_ms`; `fast` is 1 while fast-forwarding) and, when the run ends, `FILE.summary.txt` with
 the real-time frames' average, p50, p95, p99 and worst frame time, fps and the average split. The last four columns split `render_ms`: vertex
 decode, the rest of the work per GX draw, batch upload and draw calls, and frame-buffer copies (the display copy's own time counts in the next
-frame). `--bench menu|village|battle|castle` is a fixed scenario: unpaced to the start of the scene, then 1200 frames of real time, then the
+frame). `shader_ms` and `texture_ms` are the time of a frame spent on pixel shaders and textures seen for the first time.
+Compiled shaders are kept in `shadercache` beside the executable (`build\pc\shadercache`, safe to delete; `PORT_NO_SHADER_CACHE=1` turns it off). `--bench menu|village|battle|castle` is a fixed scenario: unpaced to the start of the scene, then 1200 frames of real time, then the
 exit; the log goes to `build/pc/bench.csv` unless `--perf-log` says otherwise.
 
 | Scenario | Measured frames |

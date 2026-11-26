@@ -15,6 +15,7 @@ typedef struct PortFrameStats {
     f32 waitMs;               // asleep in VIWaitForRetrace
     f32 gameMs;               // the rest: game logic and the GX command stream
     f32 decodeMs, setupMs, flushMs, copyMs;   // renderMs split, with --perf-log only: vertex decode, the rest of each draw, batch upload and draw calls, frame-buffer copies
+    f32 shaderMs, textureMs;  // part of renderMs: new pixel shaders (source, compile or disk cache, create) and new textures (decode, upload)
     u32 draws, verts;         // draw calls and GX vertices
     u32 efbCopies;            // frame-buffer copies to a texture
     u32 textures;             // decoded textures alive, plus the frame-buffer copy textures

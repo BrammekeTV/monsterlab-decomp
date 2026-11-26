@@ -18,7 +18,7 @@ void PortPerfOpen(const char* path) {
     sPath = path;
     sCsv = fopen(path, "w");
     if (!sCsv) { PortLog("perf: cannot write %s", path); return; }
-    fprintf(sCsv, "frame,fast,wall_ms,game_ms,render_ms,wait_ms,present_ms,draws,vertices,copies,textures,out_w,out_h,decode_ms,setup_ms,flush_ms,copy_ms\n");
+    fprintf(sCsv, "frame,fast,wall_ms,game_ms,render_ms,wait_ms,present_ms,draws,vertices,copies,textures,out_w,out_h,decode_ms,setup_ms,flush_ms,copy_ms,shader_ms,texture_ms\n");
     sBenchStart = -1;
 }
 
@@ -29,8 +29,8 @@ void PortPerfFrame(const PortFrameStats* s, f32 presentMs) {
     if (!sCsv) return;
     BOOL fast = PortFastActive();
     s32 frame = PortFrameCount();
-    fprintf(sCsv, "%d,%d,%.3f,%.3f,%.3f,%.3f,%.3f,%u,%u,%u,%u,%u,%u,%.3f,%.3f,%.3f,%.3f\n", frame, fast ? 1 : 0, s->frameMs, s->gameMs, s->renderMs, s->waitMs, presentMs,
-            s->draws, s->verts, s->efbCopies, s->textures, s->outW, s->outH, s->decodeMs, s->setupMs, s->flushMs, s->copyMs);
+    fprintf(sCsv, "%d,%d,%.3f,%.3f,%.3f,%.3f,%.3f,%u,%u,%u,%u,%u,%u,%.3f,%.3f,%.3f,%.3f,%.3f,%.3f\n", frame, fast ? 1 : 0, s->frameMs, s->gameMs, s->renderMs, s->waitMs, presentMs,
+            s->draws, s->verts, s->efbCopies, s->textures, s->outW, s->outH, s->decodeMs, s->setupMs, s->flushMs, s->copyMs, s->shaderMs, s->textureMs);
     // The summary covers real-time frames only when the run fast-forwarded first (a benchmark); the first one has no frame time yet.
     if (fast || s->frameMs <= 0.0f) return;
     sTimes.push_back(s->frameMs);
