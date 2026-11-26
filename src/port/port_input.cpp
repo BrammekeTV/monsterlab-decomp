@@ -156,8 +156,12 @@ static f32 Axis(SHORT v, SHORT dead) {
 // ------------------------------------------------------------------ the remote's state
 extern "C" BOOL PortUiNavigate(int dx, int dy, f32* px, f32* py);
 struct RemoteState { u32 hold; f32 sx, sy; f32 px, py; BOOL pointerValid; BOOL swing; };
+PORT_SAVED_BEGIN                     // what the game was last told about the controller goes into a savestate
 static f32  sPadPx, sPadPy;          // the pointer moved by the right stick
 static BOOL sPadPointer;
+static u32  sNavLastHold, sLastHold;
+static f32  sSwingAngle, sLastX, sLastY = -1.0f;
+PORT_SAVED_END
 
 static void Sample(RemoteState* r) {
     memset(r, 0, sizeof(*r));
@@ -233,9 +237,8 @@ static void Sample(RemoteState* r) {
 
     // The d-pad / arrow keys step the pointer from item to item on screens without a selection grid.
     {
-        static u32 lastHold;
-        u32 edge = r->hold & ~lastHold;
-        lastHold = r->hold;
+        u32 edge = r->hold & ~sNavLastHold;
+        sNavLastHold = r->hold;
         int dx = (edge & W_RIGHT) ? 1 : (edge & W_LEFT) ? -1 : 0, dy = (edge & W_DOWN) ? 1 : (edge & W_UP) ? -1 : 0;
         f32 nx, ny;
         if ((dx || dy) && PortUiNavigate(dx, dy, &nx, &ny)) {
@@ -270,7 +273,6 @@ extern "C" {
 // -1 = no controller), the pointer-valid flag at +0x5E, then the Nunchuk's stick (+0x60) and
 // accelerometer (+0x68) with its length (+0x74). Channels 1 to 3 have nothing connected.
 s32 KPADRead(s32 chan, u8* buf, s32 count) {
-    static u32 sLastHold;
     if (!buf || count < 1) return 0;
     memset(buf, 0, 0x84);
     if (chan != 0) { buf[0x5C] = 253; buf[0x5D] = 0xFF; return 0; }
@@ -286,7 +288,6 @@ s32 KPADRead(s32 chan, u8* buf, s32 count) {
     // samples, 2 g around gravity. The game's swing detectors (fn_801FA304, fn_801F95F0) follow the
     // accelerometer from sample to sample across the axis planes; +0x1C is how far it moved.
     {
-        static f32 sSwingAngle, sLastX, sLastY = -1.0f;
         f32 ax = 0.0f, ay = -1.0f;
         if (r.swing) {
             sSwingAngle += 0.314159265f;

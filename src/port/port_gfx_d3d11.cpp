@@ -87,7 +87,7 @@ static inline void ScissorOffset(const PortGx* g, s32* offX, s32* offY) {
 }
 static BOOL                    sStarted;
 static BOOL                    sDrawBound;                  // the pipeline state is still what FlushDraws left (Blit and copies clear it)
-struct OutKey { u32 bm, zm, alpha, cull, vp[6], sc0, sc1; f32 squeeze; s32 offX, offY; };
+struct OutKey { u32 bm, zm, alpha, cull, vp[6], sc0, sc1; f32 squeeze; s32 offX, offY; u32 shadow; };   // shadow: SHADOW_* (soft shadows)
 
 static struct { u32 draws, tris, presents, texCopies, textures, shaders, skipped, gpuDraws, flushes; u64 verts, gpuVerts; } sGfxStats;
 // This frame so far (reset at each display copy): time inside this backend, draws, GX vertices, copies.
@@ -96,6 +96,7 @@ static struct { s64 renderTicks; u32 draws, verts, copies; } sFrame;
 static inline s64 Ticks_freq(void) { LARGE_INTEGER f; QueryPerformanceFrequency(&f); return f.QuadPart; }
 static inline s64 Ticks(void) { LARGE_INTEGER t; QueryPerformanceCounter(&t); return t.QuadPart; }
 static u8 sTlutMem[0x80000];           // the palette half of the console's texture memory
+static struct TlutStateHook { TlutStateHook() { PortStateBlob("tlut", sTlutMem, sizeof(sTlutMem)); } } sTlutStateHook;   // part of a savestate
 
 struct Vtx { f32 pos[4]; f32 col[2][4]; f32 tc[8][3]; };
 static u32  sTraceFrom;
@@ -344,6 +345,9 @@ static u32 sBatchVb, sBatchIdx;                             // where the open ba
 struct Batch { PendingState st; u32 vb, idx, ni; };
 static std::vector<Batch> sBatches;
 static void FlushDraws();
+static BOOL sShadowDirty;              // soft shadows: shadow pixels are marked in the stencil and not in the picture yet
+static BOOL IsShadowPass(const PortGx* g);
+static void ShadowComposite();
 static void Blit(ID3D11ShaderResourceView* src, ID3D11RenderTargetView* dst, u32 dstX, u32 dstY, u32 dstW, u32 dstH, f32 u0, f32 v0, f32 du, f32 dv, const f32* pick);
 static void CloseBatch() {
     if (!sPendCount) return;
@@ -378,7 +382,7 @@ static std::string KonstAlpha(u32 sel) {
 }
 
 static u32 sUnsupported;               // bit 0: an indirect matrix kind that is not implemented
-static const std::string& TevKey(const PortGx* g, u32* texUsed) {
+static const std::string& TevKey(const PortGx* g, u32* texUsed, u32 hdr) {
     u32 stages = ((g->bp[0x00] >> 10) & 15) + 1;
     static std::string key;                                 // reused: no allocation per draw
     key.assign((const char*)&stages, 4);
@@ -390,18 +394,23 @@ static const std::string& TevKey(const PortGx* g, u32* texUsed) {
         key.append((const char*)words, 20);
         if (order & 0x40) *texUsed |= 1u << (order & 7);
     }
-    u32 tail[12];
+    u32 tail[13];
     for (u32 i = 0; i < 8; i++) tail[i] = g->bp[0xF6 + i] & 0xF;       // swap tables
     tail[8] = g->bp[0xF3] & 0xFF0000;                                    // alpha compare functions
     tail[9] = (g->bp[0x00] >> 16) & 7;                                   // indirect stages
     tail[10] = g->bp[0x27] & 0xFFFFFF;                                   // their texture maps and coordinates
     tail[11] = (g->bp[0xF1] >> 20) & 15;                                 // fog: projection (bit 3) and kind
+    tail[12] = hdr;                                                      // improved lighting (TevSource)
     for (u32 i = 0; i < tail[9]; i++) *texUsed |= 1u << ((g->bp[0x27] >> (i * 6)) & 7);
     key.append((const char*)tail, sizeof(tail));
     return key;
 }
 
-static std::string TevSource(const PortGx* g) {
+// hdr (the improved lighting, lit 3D draws only): colour results are not clipped to 1 between the stages (only kept
+// at 0..16; a register used as a lerp weight still is), and the end colour is scaled by the exposure (alphaRef.z)
+// and tone-mapped: below 0.8 unchanged, above it compressed smoothly towards 1, the brightest channel deciding so
+// the hue stays. Without it the code is exactly the GX arithmetic.
+static std::string TevSource(const PortGx* g, u32 hdr) {
     u32 stages = ((g->bp[0x00] >> 10) & 15) + 1;
     std::string s =
         "cbuffer C : register(b0) { float4 reg[4]; float4 konst[4]; float4 alphaRef; float4 texSize[8]; float4 indRow[6]; float4 indScale[4]; float4 fogP; float4 fogC; };\n"
@@ -471,9 +480,10 @@ static std::string TevSource(const PortGx* g) {
         u32 cd = cc & 15, ccn = (cc >> 4) & 15, cb = (cc >> 8) & 15, ca = (cc >> 12) & 15;
         u32 bias = (cc >> 16) & 3, sub = (cc >> 18) & 1, clamp = (cc >> 19) & 1, scale = (cc >> 20) & 3, dest = (cc >> 22) & 3;
         if (bias != 3) {
+            std::string w = hdr && ccn < 8 ? std::string("saturate(") + kColorIn[ccn] + ")" : kColorIn[ccn];
             snprintf(b, sizeof(b), "  { float3 r = (%s %s lerp(%s, %s, %s)%s) * %s; %s.rgb = %s; }\n", kColorIn[cd], sub ? "-" : "+",
-                     kColorIn[ca], kColorIn[cb], kColorIn[ccn], kBias[bias], kScale[scale], kRegName[dest],
-                     clamp ? "saturate(r)" : "clamp(r, -4.0, 4.0)");
+                     kColorIn[ca], kColorIn[cb], w.c_str(), kBias[bias], kScale[scale], kRegName[dest],
+                     clamp ? (hdr ? "clamp(r, 0.0, 16.0)" : "saturate(r)") : (hdr ? "clamp(r, -4.0, 16.0)" : "clamp(r, -4.0, 4.0)"));
         } else {                                            // compare: d + (a op b ? c : 0); the red channel, or per channel
             const char* cmp = sub ? "abs(a.r - b.r) < 0.002" : "a.r > b.r";
             if (scale == 3) cmp = sub ? "abs(a - b) < 0.002" : "a > b";
@@ -500,6 +510,9 @@ static std::string TevSource(const PortGx* g) {
         lastA = dest;
     }
     snprintf(b, sizeof(b), "  float4 o = saturate(float4(%s.rgb, %s.a));\n", kRegName[lastC], kRegName[lastA]);
+    if (hdr) snprintf(b, sizeof(b), "  float4 o = float4(max(%s.rgb, 0.0) * alphaRef.z, saturate(%s.a));\n"
+                                    "  { float m = max(o.r, max(o.g, o.b)); if (m > 0.8) o.rgb *= (0.8 + 0.2 * (1.0 - exp(-(m - 0.8) * 5.0))) / m; }\n",
+                      kRegName[lastC], kRegName[lastA]);
     s += b;
     u32 at = g->bp[0xF3];
     u32 f0 = (at >> 16) & 7, f1 = (at >> 19) & 7, logic = (at >> 22) & 3;
@@ -528,8 +541,8 @@ static std::string TevSource(const PortGx* g) {
 }
 
 static std::unordered_map<u64, ID3D11PixelShader*> sPsCache;
-static ID3D11PixelShader* GetPixelShader(const PortGx* g, u32* texUsed) {
-    const std::string& key = TevKey(g, texUsed);
+static ID3D11PixelShader* GetPixelShader(const PortGx* g, u32* texUsed, u32 hdr) {
+    const std::string& key = TevKey(g, texUsed, hdr);
     static std::string lastKey; static ID3D11PixelShader* lastPs; static u32 lastTex;
     if (lastPs && key == lastKey) { *texUsed = lastTex; return lastPs; }   // the draw before had the same TEV set-up
     u64 h = 1469598103934665603ull;
@@ -538,7 +551,7 @@ static ID3D11PixelShader* GetPixelShader(const PortGx* g, u32* texUsed) {
     auto it = sPsCache.find(h);
     if (it != sPsCache.end()) { lastKey = key; lastPs = it->second; lastTex = *texUsed; return lastPs; }
     ID3D11PixelShader* ps = NULL;
-    std::string src = TevSource(g);
+    std::string src = TevSource(g, hdr);
     ID3DBlob* code = Compile(src.c_str(), "main", "ps_4_0");
     if (code) {
         sDev->CreatePixelShader(code->GetBufferPointer(), code->GetBufferSize(), NULL, &ps);
@@ -631,7 +644,8 @@ static u32 Fnv(const u8* p, u32 n, u32 h) {
     return h;
 }
 
-struct TexEntry { ID3D11ShaderResourceView* srv; u32 hash, w, h, fmt, gen; };
+struct TexEntry { ID3D11ShaderResourceView* srv; u32 hash, w, h, fmt, gen, levels; u64 content; BOOL waiting, wideArt; };   // waiting: a mod's file is still being read; wideArt: its picture is wider than the game's
+static u32 sModBytes;                                      // mod pictures handed to the graphics card in this frame
 static u32 sTexGen = 1;                                    // bumped each frame and on a palette load: textures are re-hashed once per generation
 static std::map<u64, TexEntry> sTextures;                   // by address and palette slot
 static std::map<u32, ID3D11ShaderResourceView*> sEfbCopies; // frame-buffer copies, by destination address
@@ -643,12 +657,32 @@ static BOOL sFilterDirty;
 static BOOL WantMips(void) { return gPortSettings.texFilter >= PORT_FILTER_BILINEAR; }
 void PortGfxApplySettings(void) { sFilterDirty = TRUE; }
 
-static ID3D11ShaderResourceView* MakeTexture(const u32* rgba, u32 w, u32 h) {
+// The mip levels the game samples (GXInitTexObjLOD): a mip min filter (mode 0 bits 5-7 >= 2) and a
+// max LOD (mode 1 bits 8-15, 4.4 fixed point) above 0. The smaller levels follow level 0 in memory,
+// each padded to whole tiles. The console picks the level from the screen-space size of the texels,
+// so a texture on a thin quad (the menu's 8x32 raindrop on a 1-2 pixel wide strip) is drawn from a
+// small, averaged level: fainter and smeared along its length.
+static u32 GameMipLevels(const PortGx* g, u32 map, u32 w, u32 h) {
+    u32 mode0 = g->bp[(map < 4 ? 0x80 : 0xA0) + (map & 3)], mode1 = g->bp[(map < 4 ? 0x84 : 0xA4) + (map & 3)];
+    if (((mode0 >> 5) & 7) < 2) return 1;
+    u32 levels = 1 + (((mode1 >> 8) & 0xFF) + 15) / 16;
+    u32 full = 1;
+    for (u32 m = w > h ? w : h; m > 1; m >>= 1) full++;
+    return levels < full ? levels : full;
+}
+
+// game: the levels below level 0 from the game's data (GameMipLevels), or NULL.
+static ID3D11ShaderResourceView* MakeTexture(const u32* rgba, u32 w, u32 h, const std::vector<std::vector<u32>>* game = NULL) {
     D3D11_TEXTURE2D_DESC d = {};
     std::vector<std::vector<u32>> chain;            // the smaller levels (box filter)
     D3D11_SUBRESOURCE_DATA init[16] = {{rgba, w * 4, 0}};
     u32 levels = 1;
-    if (WantMips() && w > 1 && h > 1) {
+    if (game && !game->empty()) {
+        for (u32 i = 0; i < game->size() && levels < 16; i++) {
+            u32 lw = w >> levels ? w >> levels : 1;
+            init[levels++] = {(*game)[i].data(), lw * 4, 0};
+        }
+    } else if (WantMips() && w > 1 && h > 1) {
         const u32* src = rgba; u32 sw = w, sh = h;
         while ((sw > 1 || sh > 1) && levels < 16) {
             u32 nw = sw > 1 ? sw / 2 : 1, nh = sh > 1 ? sh / 2 : 1;
@@ -676,6 +710,60 @@ static ID3D11ShaderResourceView* MakeTexture(const u32* rgba, u32 w, u32 h) {
     return srv;
 }
 
+// A mod's replacement, with the levels the file has (a PNG's smaller ones only when the filter setting or the
+// game's own sampler mode uses mip levels).
+static ID3D11ShaderResourceView* MakeModTexture(const PortModImage& im, BOOL mips) {
+    D3D11_SUBRESOURCE_DATA init[16] = {};
+    const u8* at = im.data;
+    u32 levels = !im.dxgi && !mips && !WantMips() ? 1 : im.levels < 16 ? im.levels : 16;
+    for (u32 i = 0; i < levels; i++) {
+        u32 pitch = 0, bytes = PortModLevelBytes(im.dxgi, im.w, im.h, i, &pitch);
+        init[i].pSysMem = at;
+        init[i].SysMemPitch = pitch;
+        at += bytes;
+    }
+    sModBytes += (u32)(at - im.data);
+    D3D11_TEXTURE2D_DESC d = {};
+    d.Width = im.w; d.Height = im.h; d.MipLevels = levels; d.ArraySize = 1;
+    d.Format = im.dxgi ? (DXGI_FORMAT)im.dxgi : DXGI_FORMAT_R8G8B8A8_UNORM;
+    d.SampleDesc.Count = 1; d.Usage = D3D11_USAGE_IMMUTABLE; d.BindFlags = D3D11_BIND_SHADER_RESOURCE;
+    ID3D11Texture2D* t = NULL; ID3D11ShaderResourceView* srv = NULL;
+    if (FAILED(sDev->CreateTexture2D(&d, init, &t))) {         // BC7 needs a Direct3D 11 card; or out of video memory
+        static BOOL told;
+        if (!told) { told = TRUE; PortLog("mods: the graphics device cannot make a %ux%u texture; the game's texture is used", im.w, im.h); }
+        return NULL;
+    }
+    sDev->CreateShaderResourceView(t, NULL, &srv);
+    t->Release();
+    return srv;
+}
+
+// The replacement of a texture if its file has been read; *waiting says to ask again at a later picture. At most
+// some 24 MB go to the graphics card per frame, so a screen full of large pictures does not stall one.
+// *wide: the replacement is at least a fifth wider for its height than the game's w x h texture (4:3 art redrawn
+// at 16:9 is a third wider).
+static ID3D11ShaderResourceView* ModTexture(u64 content, const char* name, BOOL mips, u32 w, u32 h, BOOL* waiting, BOOL* wide) {
+    const PortModImage* im = NULL;
+    *waiting = FALSE;
+    if (sModBytes >= (24u << 20)) { *waiting = TRUE; return NULL; }
+    int r = PortModsTexture(content, name, &im);
+    *waiting = r == PORT_MODTEX_WAIT;
+    ID3D11ShaderResourceView* srv = r == PORT_MODTEX_READY ? MakeModTexture(*im, mips) : NULL;
+    if (srv) *wide = (u64)im->w * h * 5 >= (u64)w * im->h * 6;
+    return srv;
+}
+
+// TRUE when texture map `map` was last drawn with wide replacement art (ModTexture), for the widescreen decision,
+// which comes before the textures are bound: the first picture a new replacement is in still has the old shape.
+static BOOL WideArt(const PortGx* g, u32 map) {
+    u32 base = (map < 4 ? 0x80 : 0xA0) + (map & 3);
+    u32 img0 = g->bp[base + 8], addr = (g->bp[base + 0x14] & 0xFFFFFF) << 5, tl = g->bp[base + 0x18];
+    u32 w = (img0 & 0x3FF) + 1, h = ((img0 >> 10) & 0x3FF) + 1, fmt = (img0 >> 20) & 15;
+    BOOL pal = fmt == 8 || fmt == 9 || fmt == 10;
+    auto it = sTextures.find((u64)addr << 16 | (pal ? (tl & 0xFFF) : 0xFFFF));
+    return it != sTextures.end() && it->second.wideArt && it->second.w == w && it->second.h == h && it->second.fmt == fmt;
+}
+
 static ID3D11ShaderResourceView* GetTexture(const PortGx* g, u32 map) {
     u32 base = (map < 4 ? 0x80 : 0xA0) + (map & 3);
     u32 img0 = g->bp[base + 8], addr = (g->bp[base + 0x14] & 0xFFFFFF) << 5, tl = g->bp[base + 0x18];
@@ -688,11 +776,21 @@ static ID3D11ShaderResourceView* GetTexture(const PortGx* g, u32 map) {
     BOOL pal = fmt == 8 || fmt == 9 || fmt == 10;
     u64 key = (u64)addr << 16 | (pal ? (tl & 0xFFF) : 0xFFFF);
     auto it = sTextures.find(key);
-    if (it != sTextures.end() && it->second.gen == sTexGen && it->second.w == w && it->second.h == h && it->second.fmt == fmt && it->second.srv) return it->second.srv;
+    u32 levels = GameMipLevels(g, map, w, h);
+    if (it != sTextures.end() && it->second.levels != levels) it->second.hash = 0;   // decode again with the other number of levels
+    if (it != sTextures.end() && it->second.gen == sTexGen && it->second.w == w && it->second.h == h && it->second.fmt == fmt && it->second.levels == levels && it->second.srv) return it->second.srv;
     u32 bytes = TextureBytes(w, h, fmt);
     u32 hash = Fnv(data, bytes, 2166136261u ^ w ^ h << 12 ^ fmt << 24);
     if (pal) hash = Fnv(tlut, fmt == 8 ? 32 : fmt == 9 ? 512 : 0x8000, hash ^ tl);
-    if (it != sTextures.end() && it->second.hash == hash) { it->second.gen = sTexGen; it->second.w = w; it->second.h = h; it->second.fmt = fmt; return it->second.srv; }
+    if (it != sTextures.end() && it->second.hash == hash) {
+        TexEntry& e = it->second;
+        e.gen = sTexGen; e.w = w; e.h = h; e.fmt = fmt;
+        if (e.waiting) {
+            ID3D11ShaderResourceView* got = ModTexture(e.content, PortModsTextureName(data), e.levels > 1, w, h, &e.waiting, &e.wideArt);
+            if (got) { FlushDraws(); if (e.srv) e.srv->Release(); e.srv = got; }
+        }
+        return e.srv ? e.srv : sWhite;
+    }
     std::vector<u32> rgba(w * h);
     if (!DecodeTexture(data, w, h, fmt, tlut, (tl >> 10) & 3, rgba.data())) {
         static u32 warned;
@@ -700,33 +798,48 @@ static ID3D11ShaderResourceView* GetTexture(const PortGx* g, u32 map) {
         return sWhite;
     }
     if (it != sTextures.end() && it->second.srv) { FlushDraws(); it->second.srv->Release(); }
-    // Mods: a PNG with this texture's content hash replaces it, at the PNG's own size (--dump-textures writes the originals).
+    // Mods: a PNG or DDS with this texture's content hash replaces it, at the file's own size (--dump-textures writes the originals).
     ID3D11ShaderResourceView* made = NULL;
+    u64 content = 0;
+    BOOL waiting = FALSE, wideArt = FALSE;
     if (PortModsTexturesWanted()) {
-        u64 content = PortModsTextureHash(data, bytes, tlut, pal ? (fmt == 8 ? 32 : fmt == 9 ? 512 : 0x8000) : 0, w, h, fmt);
+        content = PortModsTextureHash(data, bytes, tlut, pal ? (fmt == 8 ? 32 : fmt == 9 ? 512 : 0x8000) : 0, w, h, fmt);
+        PortModsDolphinName(content, data, bytes, tlut, w, h, fmt);
         const char* tname = PortModsTextureName(data);
         PortModsDumpTexture(content, tname, rgba.data(), w, h, fmt);
-        u32 rw = 0, rh = 0;
-        u32* png = PortModsTexture(content, tname, &rw, &rh);
-        if (png) { made = MakeTexture(png, rw, rh); free(png); }
+        made = ModTexture(content, tname, levels > 1, w, h, &waiting, &wideArt);
     }
-    if (!made) made = MakeTexture(rgba.data(), w, h);
-    TexEntry e = {made, hash, w, h, fmt, sTexGen};
+    if (!made) {
+        std::vector<std::vector<u32>> mips;
+        const u8* at = data;
+        for (u32 i = 1; i < levels; i++) {
+            u32 pw = w >> (i - 1) ? w >> (i - 1) : 1, ph = h >> (i - 1) ? h >> (i - 1) : 1;
+            at += TextureBytes(pw, ph, fmt);
+            u32 lw = w >> i ? w >> i : 1, lh = h >> i ? h >> i : 1;
+            mips.emplace_back(lw * lh);
+            if (!DecodeTexture(at, lw, lh, fmt, tlut, (tl >> 10) & 3, mips.back().data())) { mips.clear(); break; }
+        }
+        made = MakeTexture(rgba.data(), w, h, &mips);
+    }
+    TexEntry e = {made, hash, w, h, fmt, sTexGen, levels, content, waiting, wideArt};
     sTextures[key] = e;
     sGfxStats.textures++;
     return e.srv ? e.srv : sWhite;
 }
 
-static ID3D11SamplerState* sSamplers[256];
+static std::map<u64, ID3D11SamplerState*> sSamplers;   // by mode 0 bits 0-16 (wrap, filters, LOD bias) and mode 1 (LOD range)
 static ID3D11SamplerState* GetSampler(const PortGx* g, u32 map) {
-    u32 mode = g->bp[(map < 4 ? 0x80 : 0xA0) + (map & 3)] & 0xFF;
-    if (sSamplers[mode]) return sSamplers[mode];
+    u32 mode0 = g->bp[(map < 4 ? 0x80 : 0xA0) + (map & 3)], mode1 = g->bp[(map < 4 ? 0x84 : 0xA4) + (map & 3)];
+    u32 mode = mode0 & 0xFF; u64 key = (mode0 & 0x1FFFF) | (u64)(mode1 & 0xFFFF) << 17;
+    auto found = sSamplers.find(key);
+    if (found != sSamplers.end()) return found->second;
     static const D3D11_TEXTURE_ADDRESS_MODE kWrap[4] = {D3D11_TEXTURE_ADDRESS_CLAMP, D3D11_TEXTURE_ADDRESS_WRAP, D3D11_TEXTURE_ADDRESS_MIRROR,
                                                         D3D11_TEXTURE_ADDRESS_WRAP};
     D3D11_SAMPLER_DESC d = {};
-    BOOL mag = (mode >> 4) & 1, min = ((mode >> 5) & 7) & 4 ? TRUE : ((mode >> 5) & 7) == 1;
-    d.Filter = mag && min ? D3D11_FILTER_MIN_MAG_LINEAR_MIP_POINT : mag ? D3D11_FILTER_MIN_POINT_MAG_LINEAR_MIP_POINT
-             : min ? D3D11_FILTER_MIN_LINEAR_MAG_MIP_POINT : D3D11_FILTER_MIN_MAG_MIP_POINT;
+    // GX min filter: 0 near, 1 linear, 2 near/mip near, 3 linear/mip near, 4 near/mip linear, 5 linear/mip linear.
+    u32 gmin = (mode >> 5) & 7;
+    BOOL mag = (mode >> 4) & 1, min = gmin == 1 || gmin == 3 || gmin == 5, mip = gmin == 4 || gmin == 5;
+    d.Filter = (D3D11_FILTER)((min ? 0x10 : 0) | (mag ? 0x4 : 0) | (mip ? 0x1 : 0));
     u32 tf = (u32)gPortSettings.texFilter;
     if (tf == PORT_FILTER_NEAREST) d.Filter = D3D11_FILTER_MIN_MAG_MIP_POINT;
     else if (tf == PORT_FILTER_BILINEAR) d.Filter = D3D11_FILTER_MIN_MAG_MIP_LINEAR;
@@ -734,9 +847,13 @@ static ID3D11SamplerState* GetSampler(const PortGx* g, u32 map) {
     d.MaxAnisotropy = d.MaxAnisotropy ? d.MaxAnisotropy : 1;
     d.AddressU = kWrap[mode & 3]; d.AddressV = kWrap[(mode >> 2) & 3]; d.AddressW = D3D11_TEXTURE_ADDRESS_CLAMP;
     d.MaxLOD = D3D11_FLOAT32_MAX; d.ComparisonFunc = D3D11_COMPARISON_NEVER;
+    if (tf == PORT_FILTER_GAME && gmin >= 2) {          // the game's LOD range and bias (4.4 fixed point; bias s2.5)
+        d.MinLOD = (f32)(mode1 & 0xFF) / 16.0f; d.MaxLOD = (f32)((mode1 >> 8) & 0xFF) / 16.0f;
+        d.MipLODBias = (f32)(s8)((mode0 >> 9) & 0xFF) / 32.0f;
+    }
     ID3D11SamplerState* s = NULL;
     sDev->CreateSamplerState(&d, &s);
-    sSamplers[mode] = s;
+    sSamplers[key] = s;
     return s;
 }
 
@@ -750,6 +867,7 @@ static void LoadTlut(const PortGx* g, u32 source, u32 dest) {
 }
 
 // ------------------------------------------------------------------ fixed pipeline state
+enum { SHADOW_OFF = 0, SHADOW_COVER = 1, SHADOW_DRAW = 2 };   // OutKey::shadow: soft shadows off; a draw that clears the mark; a shadow draw
 static std::map<u32, ID3D11BlendState*> sBlends;
 static std::map<u32, ID3D11DepthStencilState*> sDepths;
 static ID3D11RasterizerState* sRaster[8];
@@ -768,7 +886,7 @@ static OutKey MakeOutKey(const PortGx* g, f32 squeeze) {
 static void SetOutputState(const OutKey& k) {
     f32 squeeze = k.squeeze;
     u32 bm = k.bm, zm = k.zm, hasAlpha = k.alpha == 1;
-    u32 bkey = bm | hasAlpha << 16;
+    u32 bkey = bm | hasAlpha << 16 | (k.shadow == SHADOW_DRAW ? 1u << 17 : 0);
     ID3D11BlendState*& bs = sBlends[bkey];
     if (!bs) {
         static const D3D11_BLEND kSrc[8] = {D3D11_BLEND_ZERO, D3D11_BLEND_ONE, D3D11_BLEND_DEST_COLOR, D3D11_BLEND_INV_DEST_COLOR,
@@ -793,18 +911,25 @@ static void SetOutputState(const OutKey& k) {
             rt.BlendOp = rt.BlendOpAlpha = D3D11_BLEND_OP_REV_SUBTRACT;
         }
         rt.RenderTargetWriteMask = (UINT8)(((bm & 8) ? 7 : 0) | ((bm & 0x10) ? 8 : 0));
+        if (k.shadow == SHADOW_DRAW) rt.RenderTargetWriteMask = 0;   // soft shadows: only the stencil mark (ShadowComposite darkens later)
         sDev->CreateBlendState(&d, &bs);
     }
     sCtx->OMSetBlendState(bs, NULL, 0xFFFFFFFF);
-    ID3D11DepthStencilState*& ds = sDepths[zm];
+    ID3D11DepthStencilState*& ds = sDepths[zm | k.shadow << 5];
     if (!ds) {
         D3D11_DEPTH_STENCIL_DESC d = {};
         d.DepthEnable = zm & 1;
         d.DepthFunc = (D3D11_COMPARISON_FUNC)(((zm >> 1) & 7) + 1);
         d.DepthWriteMask = (zm & 1) && (zm & 0x10) ? D3D11_DEPTH_WRITE_MASK_ALL : D3D11_DEPTH_WRITE_MASK_ZERO;
+        if (k.shadow) {                                     // soft shadows: stencil 1 where a shadow is the surface seen, 0 where a draw covered it since
+            d.StencilEnable = TRUE; d.StencilReadMask = d.StencilWriteMask = 1;
+            d.FrontFace.StencilFunc = D3D11_COMPARISON_ALWAYS; d.FrontFace.StencilPassOp = D3D11_STENCIL_OP_REPLACE;
+            d.FrontFace.StencilFailOp = d.FrontFace.StencilDepthFailOp = D3D11_STENCIL_OP_KEEP;
+            d.BackFace = d.FrontFace;
+        }
         sDev->CreateDepthStencilState(&d, &ds);
     }
-    sCtx->OMSetDepthStencilState(ds, 0);
+    sCtx->OMSetDepthStencilState(ds, k.shadow == SHADOW_DRAW ? 1 : 0);
     // XF 0x1005 bit 0: clipping off. Depth is then clamped instead of clipped, as on the console.
     u32 cull = k.cull;
     if (!sRaster[cull]) {
@@ -1125,22 +1250,23 @@ static void DrawPrims(const PortGx* g, u32 prim, const PortGxLayout* L, u32 coun
     if (prim >= 0xA8) { sGfxStats.skipped++; return; }     // lines and points: not drawn yet
     // What only the BP registers (TEV, textures, blending) decide is kept from the draw before while none was written
     // and the frame is the same (textures are looked at again once a frame): the pixel shader, constants, textures.
-    static u32 cBpGen = ~0u, cTexGen; static ID3D11PixelShader* cPs; static u32 cTexUsed;
+    static u32 cBpGen = ~0u, cTexGen, cHdr; static ID3D11PixelShader* cPs; static u32 cTexUsed;
     static ID3D11ShaderResourceView* cSrv[8]; static ID3D11SamplerState* cSmp[8];
-    const BOOL sameBp = g->bpGen == cBpGen && sTexGen == cTexGen;
+    u32 numChans = g->xf[0x09] & 3, numGens = g->xf[0x3F] & 15;
+    BOOL lit = FALSE;                                       // some colour or alpha channel uses lights: otherwise their colours are not needed
+    for (u32 c = 0; c < numChans && c < 2; c++) lit |= ((g->xf[0x0E + c] | g->xf[0x10 + c]) & 2) != 0;
+    const u32 hdr = lit && gPortSettings.lighting == PORT_LIGHTING_IMPROVED;   // improved lighting: lit 3D draws only, never the 2D layer
+    const BOOL sameBp = g->bpGen == cBpGen && sTexGen == cTexGen && hdr == cHdr;
     u32 texUsed;
-    ID3D11PixelShader* ps = sameBp ? cPs : GetPixelShader(g, &texUsed);
+    ID3D11PixelShader* ps = sameBp ? cPs : GetPixelShader(g, &texUsed, hdr);
     if (sameBp) texUsed = cTexUsed;
     if (!ps) { sGfxStats.skipped++; return; }
     f32 proj[7]; memcpy(proj, &g->xf[0x20], 24);
     BOOL ortho = g->xf[0x26] & 1;
-    u32 numChans = g->xf[0x09] & 3, numGens = g->xf[0x3F] & 15;
     f32 ambReg[2][4], matReg[2][4];
     for (int c = 0; c < 2; c++) { RegColour(g->xf[0x0A + c], ambReg[c]); RegColour(g->xf[0x0C + c], matReg[c]); }
     u32 midx[2] = {g->cp[0x30], g->cp[0x40]};
     f32 lightCol[8][4];
-    BOOL lit = FALSE;                                       // some colour or alpha channel uses lights: otherwise their colours are not needed
-    for (u32 c = 0; c < numChans && c < 2; c++) lit |= ((g->xf[0x0E + c] | g->xf[0x10 + c]) & 2) != 0;
     // to a triangle list (indices into the vertices, which are uploaded once; written into the batch below)
     if (!(prim == 0x80 ? count >= 4 : (prim == 0x90 || prim == 0x98 || prim == 0xA0) && count >= 3) || count > VB_VERTS) { sGfxStats.skipped++; return; }
     // Draws are transformed and lit by the vertex shader, also those with a position matrix per vertex (skinned meshes;
@@ -1279,7 +1405,9 @@ static void DrawPrims(const PortGx* g, u32 prim, const PortGxLayout* L, u32 coun
     // stay centred instead: x is narrowed by 3/4. Layers that belong to the whole screen stay as
     // they are: those that show a copy of the frame buffer (glow, blur, the banded frame), and
     // those that reach from edge to edge without a picture on them (fades, bars, backdrops: no
-    // texture, or a small one). A full-screen picture (320 texels wide or more) is narrowed.
+    // texture, or a small one). A full-screen picture (320 texels wide or more) is narrowed, unless a
+    // mod replaced it with wider art (ModTexture) and the draw covers the whole screen: that art is
+    // made for 16:9 and fills it (docs/modding.md).
     // A movie frame (MoviePlay, fn_80205894): one full-screen quad through three indirect stages that undo the 8x4 tiling of the
     // planes. That only works when a pixel is a texel (the offset table and the plane are read for the same console pixel), which
     // is lost at any other size: a pixel centre that lies on the edge of a block of 8 reads a texel off, a thin line. It is drawn
@@ -1294,14 +1422,15 @@ static void DrawPrims(const PortGx* g, u32 prim, const PortGxLayout* L, u32 coun
     bool movie = movieShape && bnd[0] <= -0.98f && bnd[1] >= 0.98f && bnd[2] <= -0.98f && bnd[3] >= 0.98f && !sMovieOff;
     f32 squeeze = 1.0f;
     if (wideCheck) {
-        BOOL whole = FALSE, picture = FALSE;
+        BOOL whole = FALSE, picture = FALSE, art = FALSE;
         for (u32 m = 0; m < 8; m++) {
             if (!(texUsed & (1u << m))) continue;
             u32 base = (m < 4 ? 0x80 : 0xA0) + (m & 3);
             if (sEfbCopies.count((g->bp[base + 0x14] & 0xFFFFFF) << 5)) whole = TRUE;
-            else if ((g->bp[base + 8] & 0x3FF) + 1 >= 320) picture = TRUE;
+            else if ((g->bp[base + 8] & 0x3FF) + 1 >= 320) { picture = TRUE; art |= WideArt(g, m); }
         }
         if (!whole && !picture && bnd[0] <= -0.98f && bnd[1] >= 0.98f) whole = TRUE;
+        if (!whole && art && bnd[0] <= -0.98f && bnd[1] >= 0.98f && bnd[2] <= -0.98f && bnd[3] >= 0.98f) whole = TRUE;
         if (!whole) {
             squeeze = 0.75f;
             if (!gpu) for (u32 n = 0; n < count; n++) sVerts[n].pos[0] *= squeeze;
@@ -1331,7 +1460,7 @@ static void DrawPrims(const PortGx* g, u32 prim, const PortGxLayout* L, u32 coun
     PsConst pc;
     memset(&pc, 0, sizeof(pc));
     // The constants only change now and then: rebuild them when one of the registers they come from did.
-    struct PcSrc { s16 reg[16], konst[16]; u32 bp[8 + 9 + 5 + 2 + 1]; };
+    struct PcSrc { s16 reg[16], konst[16]; u32 bp[8 + 9 + 5 + 2 + 1 + 1]; };
     static PcSrc lastSrc; static PsConst lastPcVal; static BOOL haveLast; static u32 pcSerial;
     PcSrc src;
     if (!sameBp) {
@@ -1342,11 +1471,12 @@ static void DrawPrims(const PortGx* g, u32 prim, const PortGxLayout* L, u32 coun
         for (u32 i = 0xEE; i < 0xF3; i++) src.bp[n++] = g->bp[i];
         src.bp[n++] = g->bp[0x25]; src.bp[n++] = g->bp[0x26];
         src.bp[n++] = g->bp[0xF3];
+        src.bp[n++] = hdr ? (u32)gPortSettings.exposure : 0;        // alphaRef.z: the exposure of the improved lighting
     }
     if (haveLast && (sameBp || !memcmp(&src, &lastSrc, sizeof(src)))) pc = lastPcVal;
     else {
     for (int i = 0; i < 4; i++) for (int k = 0; k < 4; k++) { pc.reg[i][k] = g->tevReg[i][k] / 255.0f; pc.konst[i][k] = g->tevKonst[i][k] / 255.0f; }
-        pc.alphaRef[0] = (g->bp[0xF3] & 255) / 255.0f; pc.alphaRef[1] = ((g->bp[0xF3] >> 8) & 255) / 255.0f; pc.alphaRef[2] = pc.alphaRef[3] = 0;
+        pc.alphaRef[0] = (g->bp[0xF3] & 255) / 255.0f; pc.alphaRef[1] = ((g->bp[0xF3] >> 8) & 255) / 255.0f; pc.alphaRef[2] = hdr ? gPortSettings.exposure / 100.0f : 1.0f; pc.alphaRef[3] = 0;
         for (u32 m = 0; m < 8; m++) {
             u32 img0 = g->bp[(m < 4 ? 0x80 : 0xA0) + (m & 3) + 8];
             pc.texSize[m][0] = (f32)((img0 & 0x3FF) + 1); pc.texSize[m][1] = (f32)(((img0 >> 10) & 0x3FF) + 1); pc.texSize[m][2] = pc.texSize[m][3] = 0;
@@ -1378,11 +1508,18 @@ static void DrawPrims(const PortGx* g, u32 prim, const PortGxLayout* L, u32 coun
         lastSrc = src; lastPcVal = pc; haveLast = TRUE; pcSerial++;
     }
     OutKey ok = MakeOutKey(g, squeeze);
+    if (gPortSettings.shadows == PORT_SHADOWS_SOFT && !movie) {
+        ok.shadow = IsShadowPass(g) ? SHADOW_DRAW : SHADOW_COVER;
+        // A draw that does not write depth (see-through effects, the 2D layer) is blended over the picture as it is: the
+        // shadows drawn so far are put in first, so it is neither cut out of them nor darkened by them.
+        if (ok.shadow == SHADOW_COVER && sShadowDirty && !((ok.zm & 1) && (ok.zm & 0x10))) { FlushDraws(); ShadowComposite(); }
+        if (ok.shadow == SHADOW_DRAW) sShadowDirty = TRUE;
+    }
     ID3D11ShaderResourceView* srv[8]; ID3D11SamplerState* smp[8];
     if (sameBp) { memcpy(srv, cSrv, sizeof(srv)); memcpy(smp, cSmp, sizeof(smp)); }
     else {
         for (u32 i = 0; i < 8; i++) { srv[i] = (texUsed & (1u << i)) ? GetTexture(g, i) : sWhite; smp[i] = (texUsed & (1u << i)) ? GetSampler(g, i) : sLinearClamp; }
-        memcpy(cSrv, srv, sizeof(srv)); memcpy(cSmp, smp, sizeof(smp)); cPs = ps; cTexUsed = texUsed; cBpGen = g->bpGen; cTexGen = sTexGen;
+        memcpy(cSrv, srv, sizeof(srv)); memcpy(cSmp, smp, sizeof(smp)); cPs = ps; cTexUsed = texUsed; cBpGen = g->bpGen; cTexGen = sTexGen; cHdr = hdr;
     }
 
     // Draws that need exactly the same state as the ones queued before are added to them: one upload and one draw call for the lot.
@@ -1584,6 +1721,104 @@ static void FlushDraws() {
     sBatches.clear();
 }
 
+// ------------------------------------------------------------------ soft shadows
+// The game draws its shadows as a second, flattened copy of each model whose TEV gets one more stage that outputs opaque
+// black (fn_8003EA7C appends it: colour a, b, c, d all zero, alpha d = konst 1.0; fn_8003F1B8 battle, fn_8003ED08 field).
+// With soft shadows such a draw writes only depth (as on the console) and stencil bit 0 = 1; every other draw sets it
+// back to 0 where it draws. ShadowComposite then turns the marked pixels into a mask, blurs it (a Gaussian, sigma 2.5
+// console pixels) and darkens the picture by it: shadow darkness * mask, so overlapping shadows darken only once.
+static BOOL IsShadowPass(const PortGx* g) {
+    u32 n = (g->bp[0x00] >> 10) & 15;                      // the last stage
+    if (n == 0 || !(g->bp[0x41] & 1)) return FALSE;         // an added stage, drawn with blending
+    u32 cc = g->bp[0xC0 + n * 2], ac = g->bp[0xC1 + n * 2];
+    u32 ksel = g->bp[0xF6 + n / 2] >> ((n & 1) ? 14 : 4) & 0x3FF;
+    return (cc & 0xFFFF) == 0xFFFF && ((cc >> 16) & 0xF7) == 0 &&                                      // colour: zero, no bias/subtract/scale, dest prev
+           ((ac >> 4) & 0xFFF) == ((7u << 9) | (7u << 6) | (7u << 3) | 6u) && ((ac >> 16) & 0xF7) == 0 && // alpha: konst
+           ((ksel >> 5) & 31) == 0;                                                                     // konst alpha 1.0
+}
+static ID3D11Texture2D* sShTex[3]; static ID3D11RenderTargetView* sShRtv[3]; static ID3D11ShaderResourceView* sShSrv[3];   // marked (multisampled, MSAA only), mask, blurred across
+static ID3D11PixelShader *sShFillPs, *sShBlurPs; static ID3D11DepthStencilState* sShMarked; static ID3D11BlendState* sShMul;
+static u32 sShW, sShH;
+static const char kShadowSrc[] =
+    "cbuffer C : register(b0) { float4 rect; float4 pick; };\n"   // pick: step (uv), darkness, 1 = darken the picture
+    "Texture2D tex : register(t0); SamplerState smp : register(s0);\n"
+    "struct VO { float4 pos : SV_Position; float2 uv : TEXCOORD0; };\n"
+    "float4 fill(VO i) : SV_Target { return float4(1, 1, 1, 1); }\n"
+    "float4 blur(VO i) : SV_Target { float v = 0, ws = 0;\n"
+    "  [unroll] for (int k = -6; k <= 6; k++) { float w = exp(-k * k / 8.0); v += w * tex.SampleLevel(smp, i.uv + pick.xy * k, 0).r; ws += w; }\n"
+    "  v /= ws; return pick.w > 0 ? float4((1.0 - pick.z * v).xxx, 1) : float4(v, v, v, v); }\n";
+static void ShadowPass(ID3D11PixelShader* ps, ID3D11RenderTargetView* rtv, ID3D11DepthStencilView* dsv, ID3D11DepthStencilState* dss,
+                       ID3D11BlendState* bs, ID3D11ShaderResourceView* src, const f32* pick) {
+    f32 c[8] = {0, 0, 1, 1, pick[0], pick[1], pick[2], pick[3]};
+    sCtx->UpdateSubresource(sBlitConst, 0, NULL, c, 0, 0);
+    sCtx->OMSetRenderTargets(1, &rtv, dsv);
+    D3D11_VIEWPORT v = {0, 0, (f32)sEfbPw, (f32)sEfbPh, 0, 1};
+    D3D11_RECT sc = {0, 0, (LONG)sEfbPw, (LONG)sEfbPh};
+    sCtx->RSSetViewports(1, &v); sCtx->RSSetScissorRects(1, &sc);
+    sCtx->OMSetBlendState(bs, NULL, 0xFFFFFFFF);
+    sCtx->OMSetDepthStencilState(dss, 1);
+    sCtx->RSSetState(NULL);
+    sCtx->IASetInputLayout(NULL);
+    sCtx->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
+    sCtx->VSSetShader(sBlitVs, NULL, 0); sCtx->PSSetShader(ps, NULL, 0);
+    sCtx->VSSetConstantBuffers(0, 1, &sBlitConst); sCtx->PSSetConstantBuffers(0, 1, &sBlitConst);
+    sCtx->PSSetShaderResources(0, 1, &src); sCtx->PSSetSamplers(0, 1, &sLinearClamp);
+    sCtx->Draw(3, 0);
+    ID3D11ShaderResourceView* none = NULL;
+    sCtx->PSSetShaderResources(0, 1, &none);
+    sCtx->OMSetRenderTargets(0, NULL, NULL);
+}
+static void ShadowComposite() {
+    sShadowDirty = FALSE;
+    sDrawBound = FALSE;
+    if (!sShFillPs) {
+        ID3DBlob* a = Compile(kShadowSrc, "fill", "ps_4_0"); ID3DBlob* b = Compile(kShadowSrc, "blur", "ps_4_0");
+        if (a) { sDev->CreatePixelShader(a->GetBufferPointer(), a->GetBufferSize(), NULL, &sShFillPs); a->Release(); }
+        if (b) { sDev->CreatePixelShader(b->GetBufferPointer(), b->GetBufferSize(), NULL, &sShBlurPs); b->Release(); }
+        D3D11_DEPTH_STENCIL_DESC d = {};
+        d.StencilEnable = TRUE; d.StencilReadMask = 1; d.StencilWriteMask = 0;
+        d.FrontFace.StencilFunc = D3D11_COMPARISON_EQUAL;
+        d.FrontFace.StencilPassOp = d.FrontFace.StencilFailOp = d.FrontFace.StencilDepthFailOp = D3D11_STENCIL_OP_KEEP;
+        d.BackFace = d.FrontFace;
+        sDev->CreateDepthStencilState(&d, &sShMarked);
+        D3D11_BLEND_DESC bd = {};
+        D3D11_RENDER_TARGET_BLEND_DESC& rt = bd.RenderTarget[0];
+        rt.BlendEnable = TRUE; rt.SrcBlend = D3D11_BLEND_ZERO; rt.DestBlend = D3D11_BLEND_SRC_COLOR; rt.BlendOp = D3D11_BLEND_OP_ADD;
+        rt.SrcBlendAlpha = D3D11_BLEND_ZERO; rt.DestBlendAlpha = D3D11_BLEND_ONE; rt.BlendOpAlpha = D3D11_BLEND_OP_ADD;
+        rt.RenderTargetWriteMask = 7;                       // the colour only: frame-buffer alpha stays the game's
+        sDev->CreateBlendState(&bd, &sShMul);
+    }
+    if (sShW != sEfbPw || sShH != sEfbPh) {
+        for (int i = 0; i < 3; i++) {
+            if (sShSrv[i]) sShSrv[i]->Release();
+            if (sShRtv[i]) sShRtv[i]->Release();
+            if (sShTex[i]) sShTex[i]->Release();
+            sShSrv[i] = NULL; sShRtv[i] = NULL; sShTex[i] = NULL;
+            if (i == 0 && sSamples == 1) continue;          // without MSAA the marks go straight into [1]
+            D3D11_TEXTURE2D_DESC d = {};
+            d.Width = sEfbPw; d.Height = sEfbPh; d.MipLevels = d.ArraySize = 1; d.Format = DXGI_FORMAT_R8_UNORM;
+            d.SampleDesc.Count = i == 0 ? sSamples : 1; d.Usage = D3D11_USAGE_DEFAULT;
+            d.BindFlags = D3D11_BIND_RENDER_TARGET | (d.SampleDesc.Count == 1 ? D3D11_BIND_SHADER_RESOURCE : 0);
+            sDev->CreateTexture2D(&d, NULL, &sShTex[i]);
+            if (sShTex[i]) sDev->CreateRenderTargetView(sShTex[i], NULL, &sShRtv[i]);
+            if (sShTex[i] && d.SampleDesc.Count == 1) sDev->CreateShaderResourceView(sShTex[i], NULL, &sShSrv[i]);
+        }
+        sShW = sEfbPw; sShH = sEfbPh;
+    }
+    if (!sShFillPs || !sShBlurPs || !sShMarked || !sShMul || !sShSrv[1] || !sShSrv[2]) return;
+    const f32 zero[4] = {0, 0, 0, 0};
+    ID3D11RenderTargetView* marked = sShRtv[0] ? sShRtv[0] : sShRtv[1];
+    sCtx->ClearRenderTargetView(marked, zero);
+    ShadowPass(sShFillPs, marked, sEfbDsv, sShMarked, NULL, NULL, zero);
+    if (marked == sShRtv[0]) sCtx->ResolveSubresource(sShTex[1], 0, sShTex[0], 0, DXGI_FORMAT_R8_UNORM);
+    const f32 sigma = 2.5f * (f32)sEfbPw / 640.0f, step = sigma / 2.0f;   // 13 taps over +-3 sigma
+    const f32 h[4] = {step / sEfbPw, 0, 0, 0};
+    ShadowPass(sShBlurPs, sShRtv[2], NULL, NULL, NULL, sShSrv[1], h);
+    const f32 v[4] = {0, step / sEfbPh, gPortSettings.shadowDark / 100.0f, 1};
+    ShadowPass(sShBlurPs, sEfbRtv, NULL, NULL, sShMul, sShSrv[2], v);
+    sCtx->ClearDepthStencilView(sEfbDsv, D3D11_CLEAR_STENCIL, 1.0f, 0);
+}
+
 // ------------------------------------------------------------------ frame-buffer copies
 static void Blit(ID3D11ShaderResourceView* src, ID3D11RenderTargetView* dst, u32 dstX, u32 dstY, u32 dstW, u32 dstH, f32 u0, f32 v0, f32 du, f32 dv, const f32* pick) {
     sDrawBound = FALSE;
@@ -1627,6 +1862,7 @@ static void FrameStats(PortFrameStats* s) {
     }
     last = now; lastWait = wait;
     sTexGen++;
+    sModBytes = 0;
     s->draws = sFrame.draws; s->verts = sFrame.verts; s->efbCopies = sFrame.copies;
     s->textures = (u32)(sTextures.size() + sEfbCopies.size());
     s->voices = PortAudioVoices(&s->voiceCount);
@@ -1756,6 +1992,7 @@ static void CopyEfb(const PortGx* g, u32 control) {
     if (!sStarted) return;
     s64 tf = Ticks();
     FlushDraws();
+    if (sShadowDirty) ShadowComposite();                    // soft shadows: into the picture before it is copied
     sTotalFlush += Ticks() - tf;
     sDrawBound = FALSE;
     s64 tr = Ticks();
@@ -1786,7 +2023,8 @@ static void CopyEfb(const PortGx* g, u32 control) {
         sFilterDirty = FALSE;
         for (auto& e : sTextures) if (e.second.srv) e.second.srv->Release();
         sTextures.clear();
-        for (auto& sm : sSamplers) if (sm) { sm->Release(); sm = NULL; }
+        for (auto& sm : sSamplers) if (sm.second) sm.second->Release();
+        sSamplers.clear();
         sDrawBound = FALSE;
     }
     s64 td0 = Ticks();
@@ -2214,4 +2452,104 @@ const char* PortGfxStatsText(char* buf, u32 n) {
              sTotalDraw / (double)Ticks_freq(), sTotalCopy / (double)Ticks_freq(), sFastSkipped);
     return buf;
 }
+// ------------------------------------------------------------------ savestates (port_state.cpp)
+// What the renderer holds that the next frame is made from: the frame buffer's picture (a game that does not
+// clear it draws over the last frame) and the frame-buffer copies (feedback effects read the last frame's).
+// Textures, shaders and buffers are made again when used. The depth buffer is not kept: the game clears it.
+static bool ReadTexture(ID3D11Texture2D* t, std::vector<u8>& out, u32* w, u32* h) {
+    D3D11_TEXTURE2D_DESC d;
+    t->GetDesc(&d);
+    if (d.Format != DXGI_FORMAT_R8G8B8A8_UNORM || d.SampleDesc.Count != 1) return false;
+    D3D11_TEXTURE2D_DESC sd = d;
+    sd.Usage = D3D11_USAGE_STAGING; sd.BindFlags = 0; sd.CPUAccessFlags = D3D11_CPU_ACCESS_READ; sd.MiscFlags = 0;
+    ID3D11Texture2D* st = NULL;
+    if (FAILED(sDev->CreateTexture2D(&sd, NULL, &st))) return false;
+    sCtx->CopyResource(st, t);
+    D3D11_MAPPED_SUBRESOURCE m;
+    if (FAILED(sCtx->Map(st, 0, D3D11_MAP_READ, 0, &m))) { st->Release(); return false; }
+    size_t at = out.size();
+    out.resize(at + (size_t)d.Width * d.Height * 4);
+    for (u32 y = 0; y < d.Height; y++) memcpy(&out[at + (size_t)y * d.Width * 4], (const u8*)m.pData + (size_t)y * m.RowPitch, (size_t)d.Width * 4);
+    sCtx->Unmap(st, 0);
+    st->Release();
+    *w = d.Width; *h = d.Height;
+    return true;
+}
+static void Put32(std::vector<u8>& out, u32 v) { out.insert(out.end(), (u8*)&v, (u8*)&v + 4); }
+
+// The block a state stores (malloc'd; 0 when no renderer runs).
+u32 PortGfxStateSave(u8** block) {
+    *block = NULL;
+    if (!sStarted || !sDev) return 0;
+    std::lock_guard<std::recursive_mutex> lk(sGfxLock);
+    FlushDraws();
+    std::vector<u8> out;
+    Put32(out, 0x31584647);                                  // "GFX1"
+    Put32(out, sEfbPw); Put32(out, sEfbPh); Put32(out, sEfbMs ? 1 : 0); Put32(out, sShownLines);
+    u32 w = 0, h = 0;
+    if (sEfbMs || !ReadTexture(sEfbTex, out, &w, &h)) out.resize(out.size() + (size_t)sEfbPw * sEfbPh * 4);
+    size_t countAt = out.size();
+    Put32(out, 0);
+    u32 count = 0;
+    for (auto& e : sEfbCopies) {
+        if (!e.second) continue;
+        ID3D11Resource* res = NULL;
+        e.second->GetResource(&res);
+        ID3D11Texture2D* t = NULL;
+        if (res) { res->QueryInterface(__uuidof(ID3D11Texture2D), (void**)&t); res->Release(); }
+        if (!t) continue;
+        D3D11_TEXTURE2D_DESC d;
+        t->GetDesc(&d);
+        auto rb = sEfbCopyRowBytes.find(e.first);
+        size_t head = out.size();
+        Put32(out, e.first); Put32(out, rb != sEfbCopyRowBytes.end() ? rb->second : 0); Put32(out, d.Width); Put32(out, d.Height);
+        if (ReadTexture(t, out, &w, &h)) count++; else out.resize(head);
+        t->Release();
+    }
+    memcpy(&out[countAt], &count, 4);
+    *block = (u8*)malloc(out.size());
+    if (!*block) return 0;
+    memcpy(*block, out.data(), out.size());
+    return (u32)out.size();
+}
+
+void PortGfxStateLoad(const u8* p, u32 n) {
+    if (!sStarted || !sDev || n < 24) return;
+    std::lock_guard<std::recursive_mutex> lk(sGfxLock);
+    const u32* hd = (const u32*)p;
+    if (hd[0] != 0x31584647) return;
+    if (hd[1] != sEfbPw || hd[2] != sEfbPh || hd[3] != (sEfbMs ? 1u : 0u)) {
+        PortLog("state: the pictures in the state are %ux%u%s, this run draws %ux%u%s: the first frames are drawn without the last frame's pictures",
+                hd[1], hd[2], hd[3] ? " multisampled" : "", sEfbPw, sEfbPh, sEfbMs ? " multisampled" : "");
+        return;
+    }
+    sShownLines = hd[4];
+    const u8* q = p + 20;
+    const u8* end = p + n;
+    size_t efbBytes = (size_t)sEfbPw * sEfbPh * 4;
+    if (q + efbBytes + 4 > end) return;
+    if (!sEfbMs) sCtx->UpdateSubresource(sEfbTex, 0, NULL, q, sEfbPw * 4, 0);
+    q += efbBytes;
+    u32 count; memcpy(&count, q, 4); q += 4;
+    for (u32 i = 0; i < count && q + 16 <= end; i++) {
+        u32 rec[4]; memcpy(rec, q, 16); q += 16;
+        size_t bytes = (size_t)rec[2] * rec[3] * 4;
+        if (q + bytes > end) return;
+        D3D11_TEXTURE2D_DESC d = {};
+        d.Width = rec[2]; d.Height = rec[3]; d.MipLevels = 1; d.ArraySize = 1; d.Format = DXGI_FORMAT_R8G8B8A8_UNORM;
+        d.SampleDesc.Count = 1; d.BindFlags = D3D11_BIND_SHADER_RESOURCE | D3D11_BIND_RENDER_TARGET;
+        D3D11_SUBRESOURCE_DATA init = {q, rec[2] * 4, 0};
+        ID3D11Texture2D* t = NULL;
+        if (SUCCEEDED(sDev->CreateTexture2D(&d, &init, &t))) {
+            ID3D11ShaderResourceView*& slot = sEfbCopies[rec[0]];
+            if (slot) slot->Release();
+            slot = NULL;
+            sDev->CreateShaderResourceView(t, NULL, &slot);
+            t->Release();
+            if (rec[1]) sEfbCopyRowBytes[rec[0]] = rec[1];
+        }
+        q += bytes;
+    }
+}
+
 #endif

@@ -18,6 +18,10 @@
 
 extern "C" void PortStartInterrupts(void);
 
+// The emulated console's state: all of it goes into a savestate (docs/savestates.md), except what is marked
+// as this process's own.
+PORT_SAVED_BEGIN
+
 // ------------------------------------------------------------------ heaps
 // One block list per heap, kept inside the heap's own memory (as on the Wii), so every pointer
 // the game gets is a Wii address. Blocks are in address order and cover the heap.
@@ -174,6 +178,24 @@ static Heap* HeapOf(void* handle) {
     return h && PortIsWiiAddr((u32)(uintptr_t)h) && h->magic == kHeapMagic ? h : NULL;
 }
 
+// ---- the port's own heap ----
+// Buffers of the port that a state must hold (the catalog copy, zlib streams): a heap at a fixed address,
+// saved whole, so pointers into it stay good.
+static Heap* sHostHeap;
+void* PortHostAlloc(u32 size) {
+    if (!sHostHeap) sHostHeap = HeapCreate((void*)(uintptr_t)PORT_HOSTMEM_BASE, (void*)(uintptr_t)(PORT_HOSTMEM_BASE + PORT_HOSTMEM_SIZE));
+    void* p = HeapAlloc_(sHostHeap, size, 16);
+    if (!p) PortStop(7, "the port's fixed heap is full (%u bytes asked)", size);
+    memset(p, 0, size);
+    return p;
+}
+void PortHostFree(void* p) {
+    if (!p || !sHostHeap) return;
+    Block* b = (Block*)((u8*)p - kHeadSize);
+    if (b->used == 1) memset(p, 0, b->size - kHeadSize);     // free memory stays zero: it takes no space in a state
+    HeapFree_(sHostHeap, p);
+}
+
 // ---- arenas ----
 static u8 *sArena1Lo, *sArena1Hi, *sArena2Lo, *sArena2Hi;
 
@@ -278,7 +300,9 @@ void MEMFreeToAllocator(MEMAllocator* a, void* block) {
 }
 
 // ------------------------------------------------------------------ time
+PORT_HOST_BEGIN
 static LARGE_INTEGER sQpcFreq, sQpcStart;
+PORT_HOST_END
 
 u32 OSGetBusClock(void) { return *(u32*)(uintptr_t)0x800000F8; }
 
@@ -287,10 +311,10 @@ u32 OSGetBusClock(void) { return *(u32*)(uintptr_t)0x800000F8; }
 // The game clock (see port.h). Paced: the real clock plus sOffset. Fast-forwarding: sVirt, which
 // moves only when the interrupt thread finds every game thread waiting (or a game thread polls
 // OSGetTime, which then costs a few microseconds of game time so that a busy-wait ends).
-static volatile BOOL sFast;
+PORT_HOST_BEGIN
+static volatile BOOL sFast;                      // this run's choice (--fast, --fast-forward), not the state's
+PORT_HOST_END
 static s64 sVirt, sOffset, sNextWake;
-static volatile LONG sGameThreads = 1;           // the main thread
-volatile LONG gPortIdleWaiters;              // game threads waiting in PortWaitChange (port_runtime.cpp)
 static const s64 kPollTicks = 100;               // game time per OSGetTime call while fast-forwarding
 
 static s64 RealTicks(void) {
@@ -308,13 +332,19 @@ void PortFastEnd(void) {
     sOffset = sVirt - RealTicks();               // the same game time, now moving with the real clock
     sFast = FALSE;
 }
-void PortGameThreads(s32 delta) { InterlockedAdd(&sGameThreads, delta); }
+void PortGameThreads(s32 delta) {}
 void PortClockWakeAt(s64 t) { if (!sNextWake || t < sNextWake) sNextWake = t; }
+// A state holds game time as sVirt; the process that loads it goes on from there, paced or not.
+void PortClockFreeze(void) { sVirt = PortTicks(); }
+static void ClockAfterLoad(void) { if (!sFast) sOffset = sVirt - RealTicks(); }
 
-// Interrupt thread, lock held. Every game thread waits and nothing is queued: nothing can happen
-// before the next event, so jump to it.
+// The time of day of an unpaced run: a fixed date plus the game clock (MSL time(), port_msl.cpp).
+extern "C" s32 PortUnpacedSeconds(void) { return sFast ? (s32)(1230768000 + sVirt / (OSGetBusClock() / 4)) : -1; }
+
+// Unpaced, every game thread waits and nothing is queued (PortWaitChange): nothing can happen before the
+// next event, so jump to it.
 BOOL PortClockAdvanceIfIdle(void) {
-    if (!sFast || gPortIdleWaiters < sGameThreads) return FALSE;
+    if (!sFast) return FALSE;
     s64 next = 0;
     s64 cand[4] = {PortViNextTicks(), PortAudioNextTicks(), PortOsNextAlarm(), sNextWake};
     for (s64 c : cand) if (c && (!next || c < next)) next = c;
@@ -399,14 +429,20 @@ void OSInit(void) {
 }
 
 // ------------------------------------------------------------------ threads and semaphores
+PORT_HOST_BEGIN
+static BOOL sThreadResumePending[32];
+PORT_HOST_END
+// Game thread i runs on stack slot i + 1 (slot 0 is the main thread): a stack at a fixed address, which a
+// state can hold. The game's own stack block is not used: PC frames are larger than PowerPC ones.
 struct PortThread {
     OSThread*    key;
     OSThreadFunc func;
     void*        arg;
-    HANDLE       handle;
+    HANDLE       handle;      // of this process; made again when a state is loaded
     BOOL         done;
 };
 static PortThread sThreads[32];
+static const u32 kThreadStack = 0x100000;
 
 // For the watchdog: the handle of game thread i, or NULL.
 void* PortThreadHandle(int i, void** entry) {
@@ -425,14 +461,27 @@ static PortThread* FindThread(OSThread* t, BOOL create) {
     return NULL;
 }
 
-static DWORD WINAPI ThreadEntry(void* p) {
+static void __cdecl ThreadBody(void* p) {
     PortThread* pt = (PortThread*)p;
-    PortLockEnter();
+    s32 slot = (s32)(pt - sThreads) + 1;
+    PortSchedStart(slot);                        // the creator queued this thread; wait for its turn
     pt->func(pt->arg);
     pt->done = TRUE;
-    PortGameThreads(-1);
     PortSignalChange();
-    PortLockLeave();
+}
+
+static DWORD WINAPI ThreadEntry(void* p) {
+    PortThread* pt = (PortThread*)p;
+    s32 slot = (s32)(pt - sThreads) + 1;
+    PortSchedBind(slot);
+    const PortCtx* resume = sThreadResumePending[slot - 1] ? PortStateCtx(slot) : NULL;
+    if (resume) {
+        sThreadResumePending[slot - 1] = FALSE;
+        PortStackResume(slot, resume);           // a loaded state: go on where the saved thread waited; returns when it ends
+    } else {
+        PortStackEnter(slot, kThreadStack, ThreadBody, pt);
+    }
+    PortSchedExit(slot);                         // back on this thread's own stack: the slot's stack is free for a new thread
     return 0;
 }
 
@@ -444,6 +493,7 @@ s32 OSIsThreadTerminated(OSThread* thread) {
 
 BOOL OSCreateThread(OSThread* thread, OSThreadFunc func, void* param, void* stackTop, u32 stackSize, s32 priority, u16 attr) {
     PortThread* pt = FindThread(thread, TRUE);
+    if (pt->handle && !pt->done) PortLog("OSCreateThread: thread record %p is reused while its thread still runs", (void*)thread);
     pt->func = func;
     pt->arg = param;
     pt->handle = NULL;
@@ -457,13 +507,25 @@ s32 OSResumeThread(OSThread* thread) {
     PortThread* pt = FindThread(thread, FALSE);
     if (!pt) return 0;
     if (!pt->handle) {
-        // The game's own stack block is not used: PC frames are larger than PowerPC ones.
-        PortGameThreads(1);
-        pt->handle = CreateThread(NULL, 0x100000, ThreadEntry, pt, 0, NULL);
+        PortSchedAdd((s32)(pt - sThreads) + 1);
+        pt->handle = CreateThread(NULL, 0x10000, ThreadEntry, pt, 0, NULL);
         PortWatchArmThread(pt->handle);
         return 1;
     }
     return 0;
+}
+
+// A state was loaded: the clock goes on from the saved game time, and every game thread that was running
+// gets a Windows thread again, which continues on the saved stack.
+extern "C++" void PortOsAfterLoad(void) {
+    ClockAfterLoad();
+    for (int i = 0; i < 32; i++) {
+        PortThread* pt = &sThreads[i];
+        if (!PortSchedAlive(i + 1)) continue;
+        sThreadResumePending[i] = TRUE;
+        pt->handle = CreateThread(NULL, 0x10000, ThreadEntry, pt, 0, NULL);
+        PortWatchArmThread(pt->handle);
+    }
 }
 
 void OSInitSemaphore(OSSemaphore* sem, s32 count) {
@@ -565,6 +627,7 @@ void PortOsStart(void) {
     QueryPerformanceFrequency(&sQpcFreq);
     QueryPerformanceCounter(&sQpcStart);
     sFast = gPortOptions.fastAll || gPortOptions.fastForward > 0 || gPortOptions.toMenu;
+    if (PortStateLoadPath() && !gPortOptions.fastAll) sFast = gPortOptions.fastForward > 0;
     // MEM1: from the end of the executable's data to just under the top; MEM2: as on a retail console.
     sArena1Lo = (u8*)(uintptr_t)PortArenaLoMEM1();
     sArena1Hi = (u8*)(uintptr_t)(PORT_MEM1_BASE + PORT_MEM1_SIZE - 0x20000);
@@ -631,5 +694,7 @@ int PortSelfTestOs(void) {
 #undef CHECK
     return fails;
 }
+
+PORT_SAVED_END
 
 #endif  // _WIN32

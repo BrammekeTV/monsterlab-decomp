@@ -97,6 +97,19 @@ a PC port. Read this whole file before making changes. Human contributors: see
   Fails at once if a game function is only a link stub, then plays headless from boot through Join Now, the village intro, the Mayor, the first battle,
   rewards and Field Repair to the free village map, checking game-state log markers stage by stage (about 9 minutes; run it in the background). `PLAYTHROUGH FAIL` names the stage,
   the missing marker and the last stage passed. If you extend gameplay, add a stage (`docs/playthrough.md`).
+  **While you work on one stage, do not replay from boot each time:** a run from boot leaves savestates in `build/pc/states`, and
+  `python tools/playthrough.py --from STAGE [--stop-after STAGE]` loads the newest one before that stage and plays on (seconds instead of
+  minutes; e.g. `--from name --stop-after name` to try new input for the name entry). A state only loads into the exe that wrote it:
+  after a rebuild `--from` fails with "the savestates are older than this build" and `--refresh` (one full run) makes them again. So
+  use `--from` to iterate on a stage's input and markers and to repeat a test, and make one full run with the final exe before the PR.
+- Savestates by hand (`docs/savestates.md`): `--save-state FILE@FRAME` (repeatable) writes the whole running game at the end of that
+  frame, `--load-state FILE` starts from it; pass the same `--press`/`--pointer` list as the run that saved. Use them to look at one
+  moment again with other debug options (`PORT_SOUND_LOG`, `--screenshot`, `--peek`). Keep state files under `build/` (never committed).
+  Unpaced runs (`--fast`) now repeat exactly: the same input gives the same frames, logs and pictures, so a difference between two runs
+  is a real change. New port statics the game's behaviour depends on go between `PORT_SAVED_BEGIN`/`PORT_SAVED_END`, or states lose them.
+- `python tools/savestate_test.py [--at N,N] [--more M]`: run it after changing `src/port/port_state.cpp`, the scheduler in `port_runtime.cpp`
+  or what a state holds: saves at each point, loads each in a new process and compares the log and the picture M frames later with the
+  straight run (they must be identical).
 - `python tools/mod_test.py [--iso PATH] [--keep]`: mod test (textures by hash and name, JSON text; `docs/modding.md`): dumps the menu's textures to a temporary folder outside
   the repository, makes a mod with one tinted red, runs headless again and compares the screenshots. Run it after changes to
   `src/port/port_mods.cpp`, `port_png.cpp` or the texture cache in `port_gfx_d3d11.cpp`.

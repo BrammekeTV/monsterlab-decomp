@@ -32,14 +32,16 @@ extern "C" void fn_8022E3D8(void* save, const unsigned char* name);   // src/gam
 extern "C" u32 _ctors[];      // 0x80345AE0, resolved by port_gen.obj like every other Wii global
 
 PortOptions gPortOptions;
-PortSettings gPortSettings = {1920, 1080, TRUE, FALSE, FALSE, FALSE, 100, FALSE, "", 100, PORT_FILTER_GAME, 0, 0, TRUE};
+PortSettings gPortSettings = {1920, 1080, TRUE, FALSE, FALSE, FALSE, 100, FALSE, "", 100, PORT_FILTER_GAME, 0, 0, TRUE, FALSE, FALSE, "", PORT_LIGHTING_IMPROVED, 100, PORT_SHADOWS_SOFT, 70};
 
 // ------------------------------------------------------------------ log and boot summary
 struct Milestone { const char* what; u32 count; u32 ms; BOOL stub; };
 static Milestone sMilestones[512];
 static s32       sMilestoneCount;
 static DWORD     sStartTick;
+PORT_SAVED_BEGIN
 static s32       sFrames;
+PORT_SAVED_END
 static LONG      sStopping;
 static s32       sSkippedCtors, sRunCtors;
 static HANDLE    sMainThread;
@@ -161,10 +163,15 @@ static u32 PortFpuDepth(void) {
 }
 static void PortFpuClear(void) { __asm { emms } }
 
-static void* sScriptReal[0x880];
+PORT_SAVED_BEGIN
+static void* sScriptReal[0x880];            // the functions behind the trace thunks (a state made with the trace on has the thunks in its table)
+static u32   sScriptTraced;
+static u32   sTraceLast = ~0u, sTraceRepeats, sTraceBefore = ~0u;
+PORT_SAVED_END
+static u8* const kTraceCode = (u8*)(uintptr_t)(PORT_STACK_BASE - 0x100000);   // fixed, so a state's table stays right
 static void __cdecl ScriptTraceLog(u32 index) {
-    static u32 last = ~0u, repeats;
-    static u32 before = ~0u;                // the script function called before this one
+    u32& last = sTraceLast; u32& repeats = sTraceRepeats;
+    u32& before = sTraceBefore;             // the script function called before this one
     u32 depth = PortFpuDepth();
     if (depth && before != ~0u) {
         char who[160], who2[160];
@@ -182,12 +189,13 @@ static void __cdecl ScriptTraceLog(u32 index) {
 static void InstallScriptTrace(void) {
     struct Entry { u32 type; void* fn; u32 hash; };
     Entry* table = (Entry*)(uintptr_t)0x80484230;
-    u8* code = (u8*)VirtualAlloc(NULL, 0x880 * 24, MEM_COMMIT | MEM_RESERVE, PAGE_EXECUTE_READWRITE);
+    u8* code = (u8*)VirtualAlloc(kTraceCode, 0x880 * 24, MEM_COMMIT | MEM_RESERVE, PAGE_EXECUTE_READWRITE);
     if (!code) return;
     u32 n = 0;
     for (u32 i = 0; i < 0x880; i++) {
         if (!table[i].fn) continue;
-        sScriptReal[i] = table[i].fn;
+        if (!sScriptTraced) sScriptReal[i] = table[i].fn;
+        table[i].fn = sScriptReal[i];
         u8* t = code + i * 24;
         t[0] = 0x68; memcpy(t + 1, &i, 4);                                   // push index
         t[5] = 0xE8; s32 rel = (s32)((u8*)ScriptTraceLog - (t + 10)); memcpy(t + 6, &rel, 4);   // call logger
@@ -196,7 +204,18 @@ static void InstallScriptTrace(void) {
         table[i].fn = t;
         n++;
     }
-    PortLog("script trace: %u script functions wrapped", n);
+    if (!sScriptTraced) PortLog("script trace: %u script functions wrapped", n);
+    sScriptTraced = 1;
+}
+// A state was loaded. Its script table has the trace thunks when it was saved with the trace on: make them
+// again (they are code of this process), or take them out when this run does not trace.
+static void ScriptTraceAfterLoad(void) {
+    struct Entry { u32 type; void* fn; u32 hash; };
+    Entry* table = (Entry*)(uintptr_t)0x80484230;
+    if (getenv("PORT_SCRIPT_TRACE")) { InstallScriptTrace(); return; }
+    if (!sScriptTraced) return;
+    for (u32 i = 0; i < 0x880; i++) if (sScriptReal[i]) table[i].fn = sScriptReal[i];
+    sScriptTraced = 0;
 }
 
 s64 gPortWaitTicks;
@@ -220,9 +239,15 @@ BOOL PathIsAtJunction(u8* p);     // 0x800D5924
 u32  PathGetChallengeId(u8* p);   // 0x800D5984
 s32  PathGetNodeText(u8* p);      // 0x800D581C
 }
+PORT_SAVED_BEGIN
+static s32 sLogLast[12];
+static u32 sLogLastFsm[4];
+static s32 sLogLastBat[6];
+static s32 sLogLastMap[7];
+PORT_SAVED_END
 static void PortStateLog(void) {
     static s32 on = -1;
-    static s32 last[12];
+    s32* last = sLogLast;
     if (on < 0) on = getenv("PORT_STATE_LOG") != NULL;
     if (!on) return;
     s32 loaded = 0;
@@ -232,7 +257,7 @@ static void PortStateLog(void) {
                     *(s32*)(gWorldState + 0x290), lbl_805FB038, lbl_805FB034, loaded };
     // The HUD's current state machine (HudShowConversation: hud +0x24 -> slot -> machine; +0x00 the stack depth):
     // the machine's key (definition +0x30), its state (machine +0x04) and that state's key (state +0x04).
-    static u32 lastFsm[4];
+    u32* lastFsm = sLogLastFsm;
     u32 fsm[4] = { 0, 0, 0, 0 };
     u8* hud = *(u8**)(gGame + 0xD5F0 + 0x44);
     // Only while a level runs: the pointers are stale while one loads (this runs on the render thread).
@@ -253,7 +278,7 @@ static void PortStateLog(void) {
     }
     // The battle (gBattle, only while its HUD machine runs): phase (+0xA18), round counter (+0xA10), the
     // listeners (+0xA30 count, +0xA2C done flags) and the two fighters' pending choice (fighter +0x38).
-    static s32 lastBat[6];
+    s32* lastBat = sLogLastBat;
     if (fsm[1] != 0 && gBattle != NULL) {
         u8* b = gBattle;
         s32 bat[6] = { *(s32*)(b + 0xA18), *(s32*)(b + 0xA10), *(s32*)(b + 0xA30), *(s32*)(b + 0xA2C), -1, -1 };
@@ -265,7 +290,7 @@ static void PortStateLog(void) {
     }
     // The player on the map (Character +0xA00 path follower), only while exploring: node id, node type, usable exits (bit 0 up, 1 right,
     // 2 down, 3 left on screen), standing on a node, junction, challenge name hash, prompt text id.
-    static s32 lastMap[7];
+    s32* lastMap = sLogLastMap;
     u8* player = *(u8**)(gGame + 0xD614);
     if (fsm[1] == 0x090B84CE && player != NULL && *(u8**)(player + 0xA00) != NULL) {   // the exploration HUD machine runs
         u8* path = *(u8**)(player + 0xA00);
@@ -288,10 +313,14 @@ static void PortStateLog(void) {
 // console line. Every cursor widget keeps its own record of the game's scale and of the value written here, so
 // switching cursors and back never shrinks one twice; fn_8019C348 rebuilds the widget's transforms.
 extern "C" void fn_8019C348(u8* widget);
+struct CursorRec { u8* w; f32 base[3], mine[3]; };
+PORT_SAVED_BEGIN
+static CursorRec sCursorRec[16];
+static int sCursorRecs;
+PORT_SAVED_END
 static void PortCursorTrueScale(void) {
-    struct Rec { u8* w; f32 base[3], mine[3]; };
-    static Rec sRec[16];
-    static int sRecs;
+    typedef CursorRec Rec;
+    Rec* sRec = sCursorRec; int& sRecs = sCursorRecs;
     u8* cur = gScreenSets ? *(u8**)((u8*)gScreenSets + 0x7C) : NULL;
     if (!cur) return;
     f32* s = (f32*)(cur + 0x74);
@@ -349,6 +378,7 @@ void PortFrameDone(void) {
         snprintf(path, sizeof(path), "%.*s_%d.png", stem, gPortOptions.screenshot, sFrames);
         if (PortGfxSaveScreenshot(path)) fprintf(stderr, "[port] screenshot: %s\n", path);
     }
+    PortStateFrame(sFrames);                          // --save-state: a run that loads the state goes on from here
     if (gPortOptions.frameLimit && sFrames >= gPortOptions.frameLimit) {
         PortStop(0, "frame limit reached (%d frames)", sFrames);
     }
@@ -726,12 +756,16 @@ static BOOL DolRead(FILE* f, u32 off, void* dst, u32 size) {
 
 static char sDolPath[MAX_PATH + 32];     // the main.dol that was loaded ("" = from the disc image)
 
+u32 PortCrc32(u32 crc, const u8* p, size_t n);   // port_state.cpp
+static u32 sDolHash;
+u32 PortDataHash(void) { return sDolHash; }
 static BOOL LoadDol(const char* path) {
     FILE* f = path ? fopen(path, "rb") : NULL;
     if (path && !f) return FALSE;
     snprintf(sDolPath, sizeof(sDolPath), "%s", path ? path : "");
     u8 hdr[0x100];
     if (!DolRead(f, 0, hdr, sizeof(hdr))) { if (f) fclose(f); return FALSE; }
+    sDolHash = PortCrc32(0, hdr, sizeof(hdr));
     sDataEnd = Be32(hdr + 0xD8) + Be32(hdr + 0xDC);          // bss
     for (s32 i = 7; i < 18; i++) {                           // data sections only; code is not used
         u32 off = Be32(hdr + i * 4), addr = Be32(hdr + 0x48 + i * 4), size = Be32(hdr + 0x90 + i * 4);
@@ -740,6 +774,7 @@ static BOOL LoadDol(const char* path) {
         if (addr >= PORT_TEXT_LO && addr < PORT_TEXT_HI) continue;       // exception tables inside the code range
         if (!DolRead(f, off, (void*)(uintptr_t)addr, size)) { if (f) fclose(f); return FALSE; }
         if (addr + size > sDataEnd) sDataEnd = addr + size;
+        sDolHash = PortCrc32(sDolHash, (const u8*)(uintptr_t)addr, size);
         if (addr == (u32)(uintptr_t)_ctors) Swap((u8*)(uintptr_t)addr, size, 4);     // .ctors has no symbols
         SwapData((u8*)(uintptr_t)addr, addr, gPortData, gPortDataCount, addr, addr + size);
     }
@@ -788,61 +823,163 @@ extern "C" void PortRunStaticInit(void) {
 }
 
 // ------------------------------------------------------------------ the big lock
-static SRWLOCK            sLock = SRWLOCK_INIT;
-static CONDITION_VARIABLE sLockCv = CONDITION_VARIABLE_INIT;
-static u32                sNextTicket, sServing;      // FIFO: the holder is the thread with ticket sServing
-static SRWLOCK            sChangeLock = SRWLOCK_INIT;
-static CONDITION_VARIABLE sChangeCv = CONDITION_VARIABLE_INIT;
-static u32                sChangeGen;
-static u32                sIntrEnabled = 1;
+// One game thread runs at a time. The lock is handed on in a fixed order: a queue of the threads that want
+// it, changed only by the thread that holds it. Unpaced runs (--fast, --fast-forward) have no other input:
+// "interrupts" are delivered by the running thread itself where it polls or waits (PortInterruptPass), and
+// game time moves when every thread waits. So two unpaced runs with the same input do the same thing, and
+// a state can hold the whole schedule. Paced runs add the interrupt thread, which asks for the lock about
+// once a millisecond of real time.
+enum { SLOT_INTR = PORT_STACK_SLOTS - 1 };
+struct Queued { void (*fn)(void*); void* arg; };
+PORT_SAVED_BEGIN
+static volatile s32 sOwner = -1;                    // the slot that holds the lock
+static u8      sReady[PORT_STACK_SLOTS + 1];        // slots that want it, first come first
+static u32     sReadyN;
+static u8      sWaiting[PORT_STACK_SLOTS + 1];      // slots in PortWaitChange, in the order they began to wait
+static u32     sWaitN;
+static u8      sAlive[PORT_STACK_SLOTS] = {1};      // game threads (slot 0 is the main thread)
+static PortCtx sCtx[PORT_STACK_SLOTS];              // where each waits (for a state)
+static u32     sChangeGen;
+static u32     sIntrEnabled = 1;
+static u32     sInPass;                             // delivering interrupts: no thread switch inside
+static Queued  sQueue[256];
+static u32     sQueueHead, sQueueTail;              // touched only with the lock held
+PORT_SAVED_END
+static SRWLOCK sSched = SRWLOCK_INIT;
+static HANDLE  sWake[PORT_STACK_SLOTS];
+static DWORD   sTls = TLS_OUT_OF_INDEXES;
+static volatile LONG sParked[PORT_STACK_SLOTS];     // the slot's thread is inside Block, its registers captured
+
+static void SchedInit(void) {
+    if (sTls != TLS_OUT_OF_INDEXES) return;
+    sTls = TlsAlloc();
+    for (HANDLE& h : sWake) h = CreateEventA(NULL, FALSE, FALSE, NULL);
+}
+static s32 Self(void) { return (s32)(intptr_t)TlsGetValue(sTls); }
+void PortSchedBind(s32 slot) { TlsSetValue(sTls, (void*)(intptr_t)slot); }
+
+// The three below: sSched held.
+static void Push(s32 slot) {
+    for (u32 i = 0; i < sReadyN; i++) if (sReady[i] == slot) return;
+    sReady[sReadyN++] = (u8)slot;
+}
+static void Grant(void) {
+    if (sOwner >= 0 || !sReadyN) return;
+    s32 slot = sReady[0];
+    memmove(sReady, sReady + 1, --sReadyN);
+    sOwner = slot;
+    SetEvent(sWake[slot]);
+}
+static BOOL StopWaiting(s32 slot) {
+    for (u32 i = 0; i < sWaitN; i++) {
+        if (sWaiting[i] != slot) continue;
+        memmove(sWaiting + i, sWaiting + i + 1, --sWaitN - i);
+        return TRUE;
+    }
+    return FALSE;
+}
+
+// Sleeps until the lock is this slot's. A state continues a waiting thread from the capture here: in the new
+// process the thread goes on waiting in the same place.
+__declspec(noinline) static void Block(s32 slot, BOOL timed) {
+    if (slot != SLOT_INTR) PortCtxCapture(&sCtx[slot]);
+    sParked[slot] = 1;
+    while (sOwner != slot) {
+        DWORD r = WaitForSingleObject(sWake[slot], timed ? 20 : INFINITE);
+        // Paced: a waiter looks again every 20 ms, as a change nobody signalled would otherwise be missed.
+        if (r == WAIT_TIMEOUT && sOwner != slot && (!PortFastActive() || gPortOptions.keepGoing)) {   // (--keep-going counts these looks)
+            AcquireSRWLockExclusive(&sSched);
+            if (StopWaiting(slot)) { Push(slot); Grant(); }
+            ReleaseSRWLockExclusive(&sSched);
+        }
+    }
+    sParked[slot] = 0;
+}
 
 void PortLockEnter(void) {
-    AcquireSRWLockExclusive(&sLock);
-    u32 mine = sNextTicket++;
-    while (mine != sServing) SleepConditionVariableSRW(&sLockCv, &sLock, INFINITE, 0);
-    ReleaseSRWLockExclusive(&sLock);
+    s32 slot = Self();
+    AcquireSRWLockExclusive(&sSched);
+    Push(slot);
+    Grant();
+    ReleaseSRWLockExclusive(&sSched);
+    Block(slot, FALSE);
 }
 
 void PortLockLeave(void) {
-    AcquireSRWLockExclusive(&sLock);
-    sServing++;
-    ReleaseSRWLockExclusive(&sLock);
-    WakeAllConditionVariable(&sLockCv);
+    AcquireSRWLockExclusive(&sSched);
+    sOwner = -1;
+    Grant();
+    ReleaseSRWLockExclusive(&sSched);
+}
+
+void PortSchedAdd(s32 slot) {
+    AcquireSRWLockExclusive(&sSched);
+    sAlive[slot] = 1;
+    Push(slot);
+    ReleaseSRWLockExclusive(&sSched);
+}
+void PortSchedStart(s32 slot) { Block(slot, FALSE); }
+void PortSchedExit(s32 slot) {
+    AcquireSRWLockExclusive(&sSched);
+    sAlive[slot] = 0;
+    sOwner = -1;
+    Grant();
+    ReleaseSRWLockExclusive(&sSched);
+}
+
+void PortInterruptPass(void) {
+    if (!sIntrEnabled || sInPass) return;
+    sInPass = 1;
+    while (sQueueHead != sQueueTail) {
+        Queued q = sQueue[sQueueHead++ % 256];
+        q.fn(q.arg);
+    }
+    PortOsTick();
+    PortViTick();
+    PortAudioTick();
+    sInPass = 0;
 }
 
 void PortYield(void) {
-    if (!sIntrEnabled) return;
-    if (sNextTicket - sServing > 1) {            // someone is waiting
-        PortLockLeave();
-        PortLockEnter();
-    }
+    if (!sIntrEnabled || sInPass) return;
+    if (PortFastActive()) PortInterruptPass();   // unpaced: what is due arrives here, between two instructions of this thread
+    if (!sReadyN) return;                        // nobody is waiting
+    s32 slot = Self();
+    AcquireSRWLockExclusive(&sSched);
+    Push(slot);
+    sOwner = -1;
+    Grant();
+    ReleaseSRWLockExclusive(&sSched);
+    Block(slot, FALSE);
 }
-
-extern volatile LONG gPortIdleWaiters;  // port_os.cpp: waiters registered at the current generation
-static HANDLE sIdleEvent;                                    // fast-forward: wakes the interrupt thread when all threads wait
 
 void PortWaitChange(void) {
     if (PortGfxIdle()) return;                   // the drawing thread waits: it showed the last picture again (the caller checks its condition again)
-    u32 gen = sChangeGen;
-    AcquireSRWLockExclusive(&sChangeLock);
-    if (sChangeGen == gen) {                     // a signal clears the count: every waiter wakes and registers again
-        gPortIdleWaiters++;
-        if (sIdleEvent && PortFastActive()) SetEvent(sIdleEvent);
+    s32 slot = Self();
+    AcquireSRWLockExclusive(&sSched);
+    sWaiting[sWaitN++] = (u8)slot;
+    ReleaseSRWLockExclusive(&sSched);
+    // Unpaced, and no other thread wants to run: nothing can happen before the next event. This thread
+    // moves game time to it and delivers it, until that made some thread (maybe this one) ready.
+    while (PortFastActive() && !sReadyN && sIntrEnabled && !sInPass) {
+        BOOL moved = sQueueHead == sQueueTail && PortClockAdvanceIfIdle();
+        PortInterruptPass();
+        if (!moved && !sReadyN) Sleep(1);        // waiting for something outside the game clock
     }
-    ReleaseSRWLockExclusive(&sChangeLock);
-    PortLockLeave();
-    AcquireSRWLockExclusive(&sChangeLock);
-    while (sChangeGen == gen) SleepConditionVariableSRW(&sChangeCv, &sChangeLock, 20, 0);
-    ReleaseSRWLockExclusive(&sChangeLock);
-    PortLockEnter();
+    AcquireSRWLockExclusive(&sSched);
+    sOwner = -1;
+    Grant();
+    ReleaseSRWLockExclusive(&sSched);
+    Block(slot, TRUE);
 }
 
 void PortSignalChange(void) {
-    AcquireSRWLockExclusive(&sChangeLock);
+    AcquireSRWLockExclusive(&sSched);
     sChangeGen++;
-    gPortIdleWaiters = 0;
-    ReleaseSRWLockExclusive(&sChangeLock);
-    WakeAllConditionVariable(&sChangeCv);
+    for (u32 i = 0; i < sWaitN; i++) Push(sWaiting[i]);
+    sWaitN = 0;
+    Grant();
+    ReleaseSRWLockExclusive(&sSched);
 }
 
 u32 PortDisableInterrupts(void) {
@@ -856,30 +993,42 @@ void PortRestoreInterrupts(u32 state) {
     if (state) PortYield();
 }
 
-struct Queued { void (*fn)(void*); void* arg; };
-static Queued sQueue[256];
-static u32    sQueueHead, sQueueTail;      // touched only with the lock held
-
 void PortQueueInterrupt(void (*fn)(void*), void* arg) {
     sQueue[sQueueTail++ % 256] = {fn, arg};
 }
 
+// For a state: every slot's register set and whether a game thread lives there. Returns the caller's slot,
+// or -1 when the caller has no stack a state can hold (the interrupt thread of a paced run).
+s32 PortSchedSave(PortCtx** ctx, u8* active) {
+    s32 self = Self();
+    if (self == SLOT_INTR || sOwner != self) return -1;
+    for (int i = 0; i < PORT_STACK_SLOTS; i++) {
+        ctx[i] = &sCtx[i];
+        active[i] = sAlive[i];
+        // A thread that just handed the lock on, or was just created, may not have reached its waiting place
+        // yet: its registers are only good once it has.
+        while (active[i] && i != self && !sParked[i]) Sleep(0);
+    }
+    return self;
+}
+BOOL PortSchedAlive(s32 slot) { return sAlive[slot] != 0; }
+// A state was loaded: the interrupt thread of the process that saved is not part of it.
+void PortSchedAfterLoad(void) {
+    StopWaiting(SLOT_INTR);
+    for (u32 i = 0; i < sReadyN; i++) {
+        if (sReady[i] != SLOT_INTR) continue;
+        memmove(sReady + i, sReady + i + 1, --sReadyN - i);
+        break;
+    }
+}
+
 static DWORD WINAPI InterruptThread(void*) {
+    PortSchedBind(SLOT_INTR);
     for (;;) {
-        if (PortFastActive()) WaitForSingleObject(sIdleEvent, 1);   // fast-forward: woken as soon as every game thread waits
-        else Sleep(1);
+        Sleep(1);
+        if (PortFastActive()) continue;          // unpaced: the game threads deliver interrupts themselves
         PortLockEnter();
-        if (sIntrEnabled) {
-            while (sQueueHead != sQueueTail) {
-                Queued q = sQueue[sQueueHead++ % 256];
-                q.fn(q.arg);
-            }
-            // Fast-forward: nothing is queued and every game thread waits, so game time jumps to the next event.
-            if (sQueueHead == sQueueTail) PortClockAdvanceIfIdle();
-            PortOsTick();
-            PortViTick();
-            PortAudioTick();
-        }
+        if (!PortFastActive()) PortInterruptPass();
         PortLockLeave();
     }
 }
@@ -927,7 +1076,6 @@ extern "C" void PortStartInterrupts(void) {
     if (started) return;
     started = TRUE;
     timeBeginPeriod(1);
-    sIdleEvent = CreateEventA(NULL, FALSE, FALSE, NULL);
     CloseHandle(CreateThread(NULL, 0x40000, InterruptThread, NULL, 0, NULL));
     if (gPortOptions.secondsLimit > 0) CloseHandle(CreateThread(NULL, 0x10000, WatchdogThread, NULL, 0, NULL));
 }
@@ -1031,9 +1179,25 @@ static const char* FindDataDir(const char* asked) {
 
 static const s32 kMenuFrame = 3200;           // --to-menu: fast-forward this many frames
 
+// Stack frames hold MSVC's buffer-overrun cookie, and a state's stacks are continued by another process, so
+// the cookie is the same in every run. It has to be in place before the C runtime starts (the runtime also
+// encodes pointers with it): the exe's entry point sets it and goes on to the runtime's own entry, which
+// keeps a cookie that is already set.
+extern "C" { extern uintptr_t __security_cookie; extern uintptr_t __security_cookie_complement; int mainCRTStartup(void); }
+extern "C" __declspec(naked) void PortEntry(void) {
+    __asm {
+        mov dword ptr [__security_cookie], 0x5A17C00C
+        mov dword ptr [__security_cookie_complement], 0xA5E83FF3
+        jmp mainCRTStartup
+    }
+}
+#pragma comment(linker, "/ENTRY:PortEntry")
+
 struct PortBoot {
     PortBoot() {
         sStartTick = GetTickCount();
+        PortStateInit();
+        SchedInit();
         gPortOptions.frameLimit = 300;
         gPortOptions.showTexture = -1;
         gPortOptions.secondsLimit = 60;
@@ -1132,6 +1296,18 @@ struct PortBoot {
                 else fprintf(stderr, "[port] --filter %s: expected game, nearest, bilinear, 2x, 4x, 8x or 16x\n", __argv[i + 1]);
                 i++;
             }
+            else if (!strcmp(a, "--lighting") && i + 1 < __argc) {
+                const char* v = __argv[++i];
+                if (!_stricmp(v, "original")) gPortSettings.lighting = PORT_LIGHTING_ORIGINAL;
+                else if (!_stricmp(v, "improved")) gPortSettings.lighting = PORT_LIGHTING_IMPROVED;
+                else fprintf(stderr, "[port] --lighting %s: expected original or improved\n", v);
+            }
+            else if (!strcmp(a, "--shadows") && i + 1 < __argc) {
+                const char* v = __argv[++i];
+                if (!_stricmp(v, "original")) gPortSettings.shadows = PORT_SHADOWS_ORIGINAL;
+                else if (!_stricmp(v, "soft")) gPortSettings.shadows = PORT_SHADOWS_SOFT;
+                else fprintf(stderr, "[port] --shadows %s: expected original or soft\n", v);
+            }
             else if (!strcmp(a, "--stretch-ui")) gPortSettings.stretchUi = TRUE;
             else if (!strcmp(a, "--aspect") && i + 1 < __argc) {
                 const char* v = __argv[++i];
@@ -1139,6 +1315,7 @@ struct PortBoot {
                 else if (!strcmp(v, "4:3")) gPortSettings.wide = FALSE;
                 else fprintf(stderr, "[port] --aspect %s: expected 4:3 or 16:9\n", v);
             }
+            else if ((!strcmp(a, "--save-state") || !strcmp(a, "--load-state")) && i + 1 < __argc) { PortStateAddArg(a, __argv[i + 1]); i++; }
             else if (!strcmp(a, "--pointer") && i + 1 < __argc) {
                 if (!PortInputAddPointer(__argv[++i])) fprintf(stderr, "[port] --pointer %s: expected X,Y@FRAME\n", __argv[i]);
             }
@@ -1281,17 +1458,28 @@ static PortBoot sBoot;
 // main. It runs after every C++ static initialiser of the PC build (.CRT$XCY).
 extern "C" void PortRunStaticInit(void);
 void PortDiffTestRun(const char* jobsPath);   // port_difftest.cpp
+int main(int argc, char** argv);
+static void __cdecl MainOnGameStack(void*) { exit(main(__argc, __argv)); }
 static void __cdecl PortPreMain(void) {
     PortOsStart();
     if (gPortOptions.diffTest && gPortOptions.haveData && !gPortOptions.selfTest) {   // tools/difftest.py: no interrupts, no window
         PortRunStaticInit();
         PortDiffTestRun(gPortOptions.diffTest);
     }
-    PortStartInterrupts();
+    BOOL load = PortStateLoadPath() && gPortOptions.haveData && !gPortOptions.selfTest;
+    if (!load) PortStartInterrupts();                       // a state's memory is put back before anything else runs
     if (gPortOptions.haveData && !gPortOptions.selfTest && (gPortOptions.window || gPortOptions.screenshot || gPortOptions.showTexture >= 0))
         PortSamplerStart();                                 // PORT_SAMPLE=1: instruction-pointer sampler (src/port/port_sampler.cpp)
         PortGfxStart(gPortOptions.window);
+    if (load) {
+        PortStateOnLoad(ScriptTraceAfterLoad);
+        PortStateOnLoad(PortStartInterrupts);
+        PortStateLoad();                                    // continues the saved main thread; does not come back
+    }
     PortRunStaticInit();
+    // The game's main() runs on a stack at a fixed address, as every game thread does, so that a state can
+    // hold it. It never comes back here: the run ends in PortStop, or in exit() when main returns.
+    if (gPortOptions.haveData && !gPortOptions.selfTest) PortStackEnter(0, 0x400000, MainOnGameStack, NULL);
 }
 #pragma section(".CRT$XCY", read)
 __declspec(allocate(".CRT$XCY")) static void (__cdecl* const sPreMain)(void) = PortPreMain;

@@ -124,9 +124,21 @@ void fn_80336FE0(void* base, s32 n, s32 size, void* cmp) {
     qsort(base, (size_t)n, (size_t)size, (int (__cdecl*)(const void*, const void*))cmp);
 }
 
-// MSL time: seconds; also stored through the argument when it is not NULL.
+// MSL rand and srand (0x80337150, 0x80337170): one generator for the whole game, its state at 0x805FAE38.
+// The C runtime's keeps a state per thread and outside the game's memory. types.h maps rand/srand to these.
+#define sRandNext (*(u32*)(uintptr_t)0x805FAE38)
+int PortRand(void) {
+    sRandNext = sRandNext * 0x41C64E6D + 0x3039;
+    return (int)((sRandNext >> 16) & 0x7FFF);
+}
+void PortSrand(unsigned int seed) { sRandNext = seed; }
+
+// MSL time: seconds; also stored through the argument when it is not NULL. An unpaced run (headless tests)
+// tells the time by the game clock, so that it repeats: the game seeds its random numbers with this.
+s32 PortUnpacedSeconds(void);    // port_os.cpp: -1 in a paced run
 s32 fn_8033ADCC(s32* out) {
-    s32 t = (s32)time(NULL);
+    s32 t = PortUnpacedSeconds();
+    if (t < 0) t = (s32)time(NULL);
     if (out) *out = t;
     return t;
 }

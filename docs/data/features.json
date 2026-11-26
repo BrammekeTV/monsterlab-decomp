@@ -98,6 +98,26 @@
  ],
  "changelog": [
   {
+   "date": "2026-11-26",
+   "time": "10:43",
+   "text": "Savestates: tests can now start in the middle of the game (--save-state / --load-state, playthrough --from), and test runs repeat exactly (PR #270). New soft shadows option, on by default: the game's hard black shadows are blurred and see-through (PR #269). Texture packs: wider art for full-screen pictures fills a 16:9 screen (PR #272), and Dolphin texture packs with tex1_ names work (PR #273)."
+  },
+  {
+   "date": "2026-11-26",
+   "time": "10:14",
+   "text": "New lighting option, on by default: lit 3D scenes are no longer clipped to white, so the overexposed professor talk looks natural; the original look stays selectable in F1 (PR #268). The scientist name entry's letter keys now respond to the pointer (PR #271)."
+  },
+  {
+   "date": "2026-11-26",
+   "time": "09:43",
+   "text": "The settings screen (F1) has a Dump textures switch with a folder setting, so textures can be dumped at any moment (PR #266). Texture packs load in the background, so big packs no longer stall the game (PR #267)."
+  },
+  {
+   "date": "2026-11-26",
+   "time": "09:11",
+   "text": "Texture packs can use compressed DDS files (BC1/BC3/BC7 with mipmaps), and tools/png2dds.py converts a pack's PNGs (PR #264). The main menu rain is no longer saturated cyan: the renderer now uses the game's own smaller texture versions for distant drops (PR #265)."
+  },
+  {
    "date": "2026-11-25",
    "time": "19:11",
    "text": "The Windows renderer no longer freezes forever if the graphics card fails to report back; it waits at most 2 seconds and logs what happened (PR #263)."

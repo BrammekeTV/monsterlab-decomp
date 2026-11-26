@@ -3,6 +3,64 @@
 // decompiled yet, and the "interrupt" scheduling the SDK layer needs. Design: docs/port_runtime.md.
 #include "types.h"
 
+// ---- savestates (port_state.cpp, docs/savestates.md) ----
+// A state holds the mapped Wii memory, the game threads' stacks and every static in the sections .savd/.savb.
+// types.h puts the game code's statics there. Port sources (they include this header) are host state by
+// default: nothing of theirs is saved unless it stands between PORT_SAVED_BEGIN and PORT_SAVED_END. A port
+// source whose state is nearly all the game's opens with PORT_SAVED_BEGIN after its includes and puts what
+// belongs to this process (handles, FILE*, pointers into the C heap, options) between PORT_HOST_BEGIN/END.
+#if defined(_MSC_VER) && defined(_M_IX86)
+#pragma bss_seg()
+#pragma data_seg()
+#define PORT_SAVED_BEGIN __pragma(bss_seg(push, ".savb")) __pragma(data_seg(push, ".savd"))
+#define PORT_SAVED_END   __pragma(bss_seg(pop)) __pragma(data_seg(pop))
+#define PORT_HOST_BEGIN  __pragma(bss_seg(push)) __pragma(data_seg(push)) __pragma(bss_seg()) __pragma(data_seg())
+#define PORT_HOST_END    __pragma(bss_seg(pop)) __pragma(data_seg(pop))
+#else
+#define PORT_SAVED_BEGIN
+#define PORT_SAVED_END
+#define PORT_HOST_BEGIN
+#define PORT_HOST_END
+#endif
+#define PORT_STACK_BASE  0xA0000000u   // game thread stacks at fixed addresses, so a state can hold them
+#define PORT_STACK_SLOT  0x00500000u   // per thread: 1 MB never mapped, then up to 4 MB of stack
+#define PORT_STACK_SLOTS 34            // 0 the main thread, 1-32 OSCreateThread threads, 33 unused
+#define PORT_HOSTMEM_BASE 0xB0000000u  // PortHostAlloc: port-side buffers a state must hold (catalog copy, the loader's lists, zlib streams)
+#define PORT_HOSTMEM_SIZE 0x04000000u
+void* PortHostAlloc(u32 size);         // zeroed; a fixed-address heap that states save whole (port_os.cpp)
+void  PortHostFree(void* p);
+// A saved register set of a thread that waits (or of the thread that saves). Capture returns 0; when a loaded
+// state resumes the thread, the same call returns 1 in the new process.
+typedef struct PortCtx { u32 esp, ebp, ebx, esi, edi, eip, seh, fcw, mxcsr; } PortCtx;
+extern "C" int  __cdecl PortCtxCapture(PortCtx* c);
+extern "C" void __cdecl PortCtxResume(const PortCtx* c);
+void  PortStackEnter(s32 slot, u32 size, void (__cdecl* fn)(void*), void* arg);   // run fn on the slot's stack; returns when fn does
+void  PortStackResume(s32 slot, const PortCtx* c);    // a new thread of a loaded state: go on where the saved one waited
+u32   PortStackTop(s32 slot);
+void  PortStateInit(void);             // reserves the stacks and the host heap (before anything else runs)
+void  PortStateAddArg(const char* opt, const char* value);   // --save-state FILE@FRAME, --load-state FILE
+const char* PortStateLoadPath(void);   // the state to start from, or NULL
+void  PortStateFrame(s32 frame);       // PortFrameDone: writes the states due at this frame
+void  PortStateLoad(void);             // PortPreMain: reads the state and continues its main thread; does not return
+// A block of host memory outside the saved sections that a state must hold (the renderer's palette memory).
+void  PortStateBlob(const char* name, void* p, u32 size);
+// Called in the new process after a state's memory is back and before its threads run: reopen files, fix clocks.
+void  PortStateOnLoad(void (*fn)(void));
+BOOL  PortStateLoaded(void);           // this run started from a state
+s32   PortSchedSave(PortCtx** ctx, u8* active);        // port_runtime.cpp: per stack slot, its register set and whether it lives; returns the caller's slot
+const PortCtx* PortStateCtx(s32 slot);                 // loaded state: the registers of that slot's thread, or NULL
+BOOL  PortSchedAlive(s32 slot);        // a game thread lives on that stack slot
+void  PortSchedAdd(s32 slot);          // a new game thread: it runs when its turn comes (the creator holds the lock)
+void  PortSchedBind(s32 slot);         // the calling Windows thread is that game thread
+void  PortSchedStart(s32 slot);        // wait for the first turn
+void  PortSchedExit(s32 slot);         // the game thread ended: give the lock up for good
+void  PortSchedAfterLoad(void);
+void  PortOsAfterLoad(void);           // port_os.cpp: starts the saved threads again
+void  PortInterruptPass(void);         // deliver what is due (queued interrupts, alarms, retrace, AX frames); lock held
+void  PortClockFreeze(void);           // before a state is written: the game time as one number
+u32   PortDataHash(void);              // CRC-32 of the main.dol in use
+BOOL  PortBinkPlaying(void);
+
 // ---- Wii address space (mapped at the original addresses) ----
 #define PORT_MEM1_BASE   0x80000000u
 #define PORT_MEM1_SIZE   0x01800000u
@@ -153,7 +211,15 @@ typedef struct PortSettings {
     s32  msaa;                // samples of the frame buffer: 0 off, 2, 4 or 8 (--msaa; applies at start)
     BOOL remoteSpeaker;       // play the sounds the console sends to the Wii Remote's speaker through the PC output ([audio] remote_speaker)
     BOOL windowsCursor;       // show the Windows mouse cursor over the picture too ([display] windows_cursor; the game draws its own pointer)
+    BOOL dumpTextures;        // save every texture the game draws with as a PNG ([textures] dump; Settings > Mods)
+    char dumpDir[260];        // where to; empty: dump\textures next to the exe ([textures] folder)
+    s32  lighting;            // PORT_LIGHTING_*: lit 3D draws as GX gives them, or without early clipping and tone-mapped ([graphics] lighting, --lighting)
+    s32  exposure;            // improved lighting only: brightness of lit 3D draws before tone mapping, percent 50-150 ([graphics] exposure)
+    s32  shadows;             // PORT_SHADOWS_*: the game's hard black shadows, or soft see-through ones ([graphics] shadows, --shadows)
+    s32  shadowDark;          // soft shadows only: how much they darken, percent 20-100 ([graphics] shadow_darkness)
 } PortSettings;
+enum { PORT_LIGHTING_ORIGINAL = 0, PORT_LIGHTING_IMPROVED = 1 };
+enum { PORT_SHADOWS_ORIGINAL = 0, PORT_SHADOWS_SOFT = 1 };
 extern PortSettings gPortSettings;
 // monsterlab.ini next to the exe (port_settings.cpp): display, audio and the input bindings.
 const char* PortSettingsPath(void);

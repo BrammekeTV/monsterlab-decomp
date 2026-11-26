@@ -13,7 +13,7 @@ mods\
       streams\...
     data\                   JSON that changes game data (the text table)
       strings.json
-    textures\               PNG pictures that replace game textures
+    textures\               PNG or DDS pictures that replace game textures
       sky_4962D17B32AB899E.png
 ```
 
@@ -30,10 +30,10 @@ read through this and cannot be replaced.
 A replacement must be in the format the game expects for that file (a `.sir` file is still big-endian
 console data; the port converts it after reading, as it does for the disc's own).
 
-## Replacing a texture with a PNG
+## Replacing a texture with a PNG or DDS
 
-A PNG under `mods\<mod name>\textures\` (sub-folders are fine) replaces one game texture. Which one is
-told in one of two ways:
+A PNG (or a [DDS](#dds-for-big-packs)) under `mods\<mod name>\textures\` (sub-folders are fine) replaces one game texture. Which one is
+told in one of three ways:
 
 - **By name** (stable, the better choice): the file is called after the texture's name in the game's data,
   `MonsterLab_Logo.png` (case does not matter). `--dump-textures` writes the name into the file name when it
@@ -42,7 +42,14 @@ told in one of two ways:
   and `tex_256x256_f14_4962D17B32AB899E.png` replace the same texture; what stands before the hash is yours.
   The hash is the fallback: a texture without a name, or whose name no mod has, is looked up by hash.
 
-When both match, the name wins. Names are known for the textures of `global_binary.sir` and of the level
+- **By a Dolphin pack's name**: `tex1_<width>x<height>[_m]_<hash>[_<palette hash>]_<format>.png` (or `.dds`),
+  the names of Dolphin's custom texture packs, so a pack made for this game in Dolphin can be copied into
+  `mods\MyMod\textures\`. `_m` is ignored, `$` stands for any palette (or any pixels, for paletted textures).
+  Separate mip files (`..._mip1`) are not read: use a DDS with mip levels. The names follow Dolphin's current
+  scheme; it has been checked against the scheme's description, not yet against a pack dumped from Dolphin.
+  Dolphin's older `GAMEID_...` names are not understood.
+
+When more than one matches, the name wins, then the 16-character hash, then the Dolphin name. Names are known for the textures of `global_binary.sir` and of the level
 files; textures of other files have a hash only, for now.
 
 To get the originals with their hashes, export them from your own disc:
@@ -51,7 +58,15 @@ To get the originals with their hashes, export them from your own disc:
 monsterlab.exe --dump-textures C:\MonsterLabTextures
 ```
 
-Every texture the game draws with while it runs is written there once, as
+Or switch it on while you play: the settings screen (F1 or Esc), page **Mods**, tick **Dump textures**.
+From then on every texture the game draws with is saved, including the ones on screen at that moment, and
+the page counts them. They go to `dump\textures` next to `monsterlab.exe`, or to the folder typed or chosen
+there. Untick it to stop. Both are kept in `monsterlab.ini` (`[textures] dump` and `folder`), so dumping
+stays on at the next start until you untick it. Dumping can make the game hitch when many new textures
+appear at once.
+
+Every texture the game draws with while it runs is written there once (a file that is there already is not
+written again), as
 `tex_<width>x<height>_f<format>_<name>_<hash>.png` (without `_<name>` where the name is not known). Only what was on screen gets dumped: play through the
 places you want to change. The dumped pictures are the game's own art: use them to work from, do not
 share them, and never put them into this repository.
@@ -67,8 +82,72 @@ Rules for a replacement:
 - The game still lights, tints and fogs the texture as before: a replacement on a dark, tinted surface
   comes out dark and tinted too.
 
+### DDS, for big packs
+
+A `.dds` file works wherever a `.png` does: `mods\MyMod\textures\MonsterLab_Logo.dds` or
+`sky_4962D17B32AB899E.dds`, matched by the same name or hash rules. When one mod has both a `.png` and a
+`.dds` for a texture, the `.dds` is used.
+
+A PNG has to be unpacked and takes 4 bytes per pixel of video memory. A DDS holds the picture already
+compressed the way the graphics card reads it: it loads much faster, takes 0.5 byte (BC1) or 1 byte (BC7,
+BC3) per pixel of video memory, and carries smaller versions of itself (mip levels) that keep it from
+shimmering at a distance. (On disk a DDS is not necessarily smaller than the PNG; a zipped pack shrinks
+well.) For a pack with many large pictures, ship DDS.
+
+Convert a pack with the tool in this repository (Python with `numpy` and `Pillow`):
+
+```
+python tools/png2dds.py C:\path\to\mods\MyMod
+```
+
+It writes `name.dds` next to every `name.png`, with all mip levels: **BC7** where the picture has
+transparency, **BC1** where it is opaque. Keep the PNGs as your originals (the game ignores a PNG that has
+a DDS beside it); run the tool again after editing and only the changed pictures are converted.
+
+| Option | Effect |
+|---|---|
+| `--format bc7` | BC7 for everything: better than BC1 on gradients and dark skies, twice the size (also `bc3`, `bc1`) |
+| `--out DIR` | write the DDS files under `DIR` (same sub-folders), for a release folder without PNGs |
+| `--delete-png` | delete each PNG once its DDS is written |
+| `--force` | convert again even if the DDS is newer |
+| `--no-mips` | the full-size picture only |
+
+DDS files from other tools (for example `texconv`) work too. Accepted: a 2D texture in BC1 (DXT1), BC3
+(DXT5) or BC7, width and height multiples of 4, up to 8192. The mip levels in the file are used as they
+are (none are made for a DDS, whatever the filter setting). sRGB variants are read as plain ones. BC7
+needs a Direct3D 11 graphics card.
+
+### 16:9 art for backgrounds and loading screens
+
+The game draws its 2D layer for a 4:3 screen. When the port runs at 16:9 it keeps 2D pictures in their
+shape, in the middle of the screen. A replacement can be painted wider instead, and then fills the screen.
+The rule: the quad is widened to the full width when **all** of these hold:
+
+1. the game runs at 16:9 (and *Stretch the 2D layer* is off; with it on everything is stretched anyway);
+2. the picture is drawn flat (2D) over the **whole screen**, edge to edge in both directions;
+3. the game's own texture is **320 pixels wide or more** (smaller full-screen textures are stretched to the
+   width already);
+4. the replacement's width : height is **at least 1.2 times** the original's. For example 1.333 times for 4:3
+   art redrawn at 16:9: a 640x480 original (4:3) replaced by 2560x1440 (16:9), or a 512x512 original by a
+   picture with a 4:3 shape.
+
+So paint the original's content in the **middle three quarters** of the new width and add scenery at the
+sides: buttons and figures drawn on top of the background stay where they were. A picture that the game
+builds from several tiles, or draws over part of the screen only, is not widened. At 4:3 the same file is
+squeezed back into the 4:3 picture.
+
+### Big packs
+
+The files are read and unpacked in the background, so the game does not stop while a pack loads: a texture
+shows the game's own picture for the moment it takes to read its replacement. What has been read is kept in
+memory (up to 256 MB, the longest unused goes first), and from the start of the game the pack is read
+ahead until that is nearly full. At most about 24 MB of new pictures are handed to the graphics
+card per frame. DDS files are by far the quickest to read, since nothing has to be unpacked.
+
+A file edited while the game runs is read again after **Look again** on the Mods page.
+
 With `--verbose` the log says `mods: texture <hash> comes from <mod>` the first time a replacement is
-used. A replacement found by name is logged as `mods: texture <name> (<hash>) comes from <mod> by name`. A PNG that cannot be read is reported and the game's own texture is drawn.
+used. A replacement found by name is logged as `mods: texture <name> (<hash>) comes from <mod> by name`. A PNG or DDS that cannot be read is reported and the game's own texture is drawn.
 
 ## Changing the game's text with JSON
 
@@ -139,7 +218,7 @@ at once.
 | `--mods DIR` | use `DIR` as the mods folder instead of `mods` next to the exe |
 | `--no-mods` | run without mods |
 | `--dump-data DIR` | write the game's text table to `DIR\strings.json` and exit (from your own disc) |
-| `--dump-textures DIR` | write every texture the game draws with to `DIR` as a PNG named by its name (where known) and hash |
+| `--dump-textures DIR` | write every texture the game draws with to `DIR` as a PNG named by its name (where known) and hash (the same as *Dump textures* in the settings, for this run) |
 | `--verbose` | lists, at the start, every file each mod replaces and which mod wins where two have the same file; logs `mods: <file> comes from <mod>` each time the game opens a replaced file |
 
 ## Worked example: replace one file

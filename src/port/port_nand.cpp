@@ -17,7 +17,9 @@
 enum { NAND_OK = 0, NAND_EXISTS = -6, NAND_INVALID = -8, NAND_NOEXISTS = -12, NAND_UNKNOWN = -64 };
 
 static char sRoot[MAX_PATH];           // host folder that stands for the title's data directory
+PORT_SAVED_BEGIN
 static char sCwd[128] = "/";           // current directory inside it, with a trailing '/'
+PORT_SAVED_END
 static const char kHome[] = "/title/00010000/524d3750/data";
 static FILE* sOpen[16];
 
@@ -251,4 +253,19 @@ s32 NANDInitBanner(u8* banner, s32 flags, s16* title, s16* comment) {
 }
 
 }  // extern "C"
+
+// The save folder, for a savestate: its files are part of the console's state. Only a folder named by
+// MONSTERLAB_SAVE (tests) is ever written back from a state; a player's own saves are left alone.
+const char* PortNandRoot(BOOL* isTestFolder) {
+    EnsureRoot();
+    const char* env = getenv("MONSTERLAB_SAVE");
+    *isTestFolder = env && env[0];
+    return sRoot;
+}
+
+// A state is not written while the game has a save file open (it opens, reads or writes and closes at once).
+BOOL PortNandBusy(void) {
+    for (FILE* f : sOpen) if (f) return TRUE;
+    return FALSE;
+}
 #endif

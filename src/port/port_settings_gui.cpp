@@ -62,6 +62,39 @@ static void PageGame(void) {
     ImGui::PopTextWrapPos();
 }
 
+// Dump textures: on or off, the folder, and how many were written. Saved at once.
+static void PageDump(void) {
+    bool on = sEdit.dumpTextures || gPortOptions.dumpTextures;
+    if (ImGui::Checkbox("Dump textures", &on)) {
+        gPortOptions.dumpTextures = NULL;                    // from here on the settings decide, not --dump-textures
+        sEdit.dumpTextures = gPortSettings.dumpTextures = on;
+        PortGfxApplySettings();                              // what is on screen is decoded again, and so saved
+        Save();
+    }
+    ImGui::SameLine();
+    u32 there = PortModsDumpPresent(), failed = PortModsDumpFailed();
+    ImGui::Text("%u written", PortModsDumpCount());
+    if (there) { ImGui::SameLine(); ImGui::TextDisabled("(%u were there already)", there); }
+    if (failed) { ImGui::SameLine(); ImGui::TextColored(ImVec4(1.0f, 0.7f, 0.3f, 1.0f), "%u could not be written", failed); }
+    ImGui::SetNextItemWidth(ImGui::GetContentRegionAvail().x * 0.7f);
+    ImGui::InputTextWithHint("##dumpdir", "dump\\textures next to the game", sEdit.dumpDir, sizeof(sEdit.dumpDir));
+    if (ImGui::IsItemDeactivatedAfterEdit()) { memcpy(gPortSettings.dumpDir, sEdit.dumpDir, sizeof(sEdit.dumpDir)); PortGfxApplySettings(); Save(); }
+    ImGui::SameLine();
+    if (ImGui::Button("Choose folder...")) {
+        char path[MAX_PATH];
+        if (PortPickFolder(PortGfxWindow(), path, sizeof(path))) {
+            snprintf(sEdit.dumpDir, sizeof(sEdit.dumpDir), "%s", path);
+            memcpy(gPortSettings.dumpDir, sEdit.dumpDir, sizeof(sEdit.dumpDir));
+            PortGfxApplySettings();
+            Save();
+        }
+    }
+    ImGui::PushTextWrapPos(0.0f);
+    ImGui::TextDisabled("While on, every texture the game draws with is saved as a PNG in %s. These are the game's own art: do not share them.",
+                        gPortOptions.dumpTextures ? gPortOptions.dumpTextures : PortModsDumpFolder());
+    ImGui::PopTextWrapPos();
+}
+
 // The mods folder's mods in load order: switch one on or off, move it up or down. Saved at once; a
 // file the game opens from now on comes from the new list (what is loaded already stays until it is loaded again).
 static void PageMods(void) {
@@ -71,6 +104,8 @@ static void PageMods(void) {
     ImGui::Text("Mods folder: %s", PortModsDir());
     if (gPortOptions.noMods) ImGui::TextColored(ImVec4(1.0f, 0.7f, 0.3f, 1.0f), "Started with --no-mods: no mod is used in this run.");
     ImGui::PopTextWrapPos();
+    PageDump();
+    ImGui::Separator();
     if (ImGui::Button("Look again")) { PortModsScan(); PortGfxApplySettings(); }
     ImGui::SameLine();
     ImGui::TextDisabled("A mod lower in the list wins over the ones above it.");
@@ -286,6 +321,31 @@ static void PageDisplay(void) {
         ImGui::EndCombo();
     }
     ImGui::TextDisabled("Anisotropic keeps textures sharp on surfaces seen at a slant; the others change how close-up and distant textures are smoothed.");
+    static const char* const kLighting[2] = {"Original (as on the Wii)", "Improved (no clipped highlights)"};
+    int li = sEdit.lighting == PORT_LIGHTING_ORIGINAL ? 0 : 1;
+    if (ImGui::BeginCombo("Lighting", kLighting[li])) {
+        for (int k = 0; k < 2; k++)
+            if (ImGui::Selectable(kLighting[k], k == li)) sEdit.lighting = gPortSettings.lighting = k ? PORT_LIGHTING_IMPROVED : PORT_LIGHTING_ORIGINAL;
+        ImGui::EndCombo();
+    }
+    if (sEdit.lighting == PORT_LIGHTING_IMPROVED) {
+        int ex = sEdit.exposure;
+        if (ImGui::SliderInt("Exposure", &ex, 50, 150, "%d%%")) sEdit.exposure = gPortSettings.exposure = ex;
+    }
+    ImGui::PushTextWrapPos(0.0f);
+    ImGui::TextDisabled("Improved keeps the colour of bright, lit 3D surfaces (the Wii clips them to white) and rolls highlights off smoothly; exposure brightens or darkens them. The 2D layer is never changed.");
+    ImGui::PopTextWrapPos();
+    static const char* const kShadows[2] = {"Original (hard, black)", "Soft (blurred, see-through)"};
+    int si = sEdit.shadows == PORT_SHADOWS_ORIGINAL ? 0 : 1;
+    if (ImGui::BeginCombo("Shadows", kShadows[si])) {
+        for (int k = 0; k < 2; k++)
+            if (ImGui::Selectable(kShadows[k], k == si)) sEdit.shadows = gPortSettings.shadows = k ? PORT_SHADOWS_SOFT : PORT_SHADOWS_ORIGINAL;
+        ImGui::EndCombo();
+    }
+    if (sEdit.shadows == PORT_SHADOWS_SOFT) {
+        int sd = sEdit.shadowDark;
+        if (ImGui::SliderInt("Shadow darkness", &sd, 20, 100, "%d%%")) sEdit.shadowDark = gPortSettings.shadowDark = sd;
+    }
     b = gPortOverlayOn != 0;
     if (ImGui::Checkbox("Stats overlay (F3)", &b)) gPortOverlayOn = b;
 }

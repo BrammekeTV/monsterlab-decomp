@@ -391,12 +391,20 @@ struct ImagePlan {
     u32     capacity;
 };
 
+// Where the lists come from. The game's port sets its own heap (SirLoaderSetAllocator): a list is kept between
+// two reads of a level (LevelZoneDone), and a savestate has to hold it.
+static void* (*sPlanAlloc)(size_t) = malloc;
+static void  (*sPlanFree)(void*) = free;
+extern "C" void SirLoaderSetAllocator(void* (*alloc)(size_t), void (*release)(void*)) { sPlanAlloc = alloc; sPlanFree = release; }
+
 static bool PlanAdd(ImagePlan* plan, u32 off, u32 size, u8 kind) {
     if (plan->count == plan->capacity) {
         u32 cap = plan->capacity ? plan->capacity * 2 : 1024;
         if (cap > REGION_MAX) return false;
-        Region* grown = (Region*)realloc(plan->regions, (size_t)cap * sizeof(Region));
+        Region* grown = (Region*)sPlanAlloc((size_t)cap * sizeof(Region));
         if (grown == NULL) return false;
+        if (plan->count) memcpy(grown, plan->regions, (size_t)plan->count * sizeof(Region));
+        sPlanFree(plan->regions);
         plan->regions = grown;
         plan->capacity = cap;
     }
@@ -408,7 +416,7 @@ static bool PlanAdd(ImagePlan* plan, u32 off, u32 size, u8 kind) {
 }
 
 static void PlanFree(ImagePlan* plan) {
-    free(plan->regions);
+    sPlanFree(plan->regions);
     plan->regions = NULL;
     plan->count = plan->capacity = 0;
 }
@@ -3348,7 +3356,7 @@ extern "C" BOOL LevelSharedZoneRootsCollect(const u8* image, u32 imageSize, u32 
 }
 
 extern "C" void LevelZoneDoneFree(LevelZoneDone* done) {
-    free(done->regions);
+    sPlanFree(done->regions);
     memset(done, 0, sizeof(*done));
 }
 

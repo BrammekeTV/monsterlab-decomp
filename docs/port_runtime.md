@@ -53,6 +53,7 @@ build\pc\monsterlab.exe                        # runs main() with your own disc 
 | `--peek ADDR` | print four words of Wii memory (hex address) when the run stops |
 | `--watch ADDR` | report every write of the game's threads to four bytes of Wii memory (hex address): writer, new value, stack |
 | `--press BUTTON@FRAME[-FRAME]` | hold a Wii Remote button (a name from the binding table: `A`, `B`, `PLUS`, `STICK_UP`, `SWING`...) during those frames; a press without an end lasts 6 frames; `A@FROM-TO/N` is a 6-frame press every N frames in that range. For headless tests; can be given up to 128 times |
+| `--save-state FILE@FRAME`, `--load-state FILE` | savestates (`docs/savestates.md`): write the whole running game at the end of that frame (repeatable); start from a state instead of booting. A state loads only into the exe that wrote it |
 | `--show-texture N` | development aid: when the boot stops, draw texture N of `global_binary.sir` through the engine's draw path instead of ending (see "GX: the renderer") |
 
 Debugging aids: `--peek ADDR` (up to eight) prints four words of Wii memory at the stop;
@@ -469,11 +470,18 @@ The Wii has one core. Game threads never run at the same time, and interrupts (v
 disc read completion, alarms) arrive between instructions. The decompiled code relies on that:
 it has no locks of its own.
 
-On PC every game thread is a Windows thread that runs only while it holds one lock, handed over
-in arrival order. A thread gives the lock up only where it would block or poll: waiting on a
-semaphore, and in `OSGetTime` (busy-wait loops call it). One more thread delivers the
-interrupts, also under the lock, about once per millisecond. So an "interrupt" never preempts
-game code in the middle of an update, which is stricter than the console.
+On PC every game thread is a Windows thread that runs only while it holds one lock. The lock is handed on
+through a queue that only its holder changes, so the order is a matter of game state, not of timing. A
+thread gives the lock up only where it would block or poll: waiting on a semaphore, and in `OSGetTime`
+(busy-wait loops call it). Each game thread runs on a stack at a fixed address (`PORT_STACK_BASE`), which is
+what lets a savestate hold it (`docs/savestates.md`).
+
+Interrupts are delivered between those points, under the lock, by `PortInterruptPass` (queued disc
+completions, alarms, the retrace, AX frames). In a paced run a thread of its own does that about once per
+millisecond of real time. In an unpaced run (`--fast`, `--fast-forward`) the running game thread does it
+itself wherever it polls or waits, and no other thread takes part: two unpaced runs with the same input are
+identical, frame for frame and pixel for pixel. Either way an "interrupt" never preempts game code in the
+middle of an update, which is stricter than the console.
 
 A loop that waits for an interrupt to change memory without calling any SDK function would hang
 (the time limit then reports where the main thread is). Such a loop gets `WAIT_FOR_INTERRUPT()`
@@ -486,23 +494,23 @@ Game time (`PortTicks`, `port_os.cpp`) is a virtual clock in `OSTime` ticks. `OS
 (`PortViTick`), alarms, `OSSleepTicks` and the 3 ms AX frame (`PortAudioTick`) all read it. Paced, it is the real
 clock; the retrace is exactly 1,215,000 ticks (50 Hz) or 1,012,500 (60 Hz).
 
-While fast-forwarding the clock stands still while game code runs. The interrupt thread keeps a count of game
-threads (the main thread and every `OSResumeThread` thread) and of those waiting in `PortWaitChange` (semaphores,
-`VIWaitForRetrace`, `OSSleepTicks`); a signal resets the count. When all of them wait and no interrupt is queued,
-nothing can happen before the next event, and time jumps to the earliest of: next retrace, next AX frame, an alarm,
-a sleep deadline. A game thread that polls `OSGetTime` in a busy loop advances the clock 100 ticks per call so the
-loop ends. When the frame counter reaches the `--fast-forward` count the clock switches to the real one with an
-offset, so game time continues without a jump. Presenting to the window and writing to the sound device are
-skipped while fast (the mixer still runs, so game callbacks and `--wav` are the same); drawing is not skipped:
-copies and screenshots stay right.
+While fast-forwarding the clock stands still while game code runs. When the last running game thread starts to
+wait (`PortWaitChange`: semaphores, `VIWaitForRetrace`, `OSSleepTicks`) and no thread is ready and no interrupt is
+queued, nothing can happen before the next event, and time jumps to the earliest of: next retrace, next AX frame, an
+alarm, a sleep deadline; that thread then delivers the event. A game thread that polls `OSGetTime` in a busy loop
+advances the clock 100 ticks per call so the loop ends. When the frame counter reaches the `--fast-forward` count the
+clock switches to the real one with an offset, so game time continues without a jump. Presenting to the window and
+writing to the sound device are skipped while fast (the mixer still runs, so game callbacks and `--wav` are the same);
+drawing is not skipped: copies and screenshots stay right. While unpaced, the C library's `time()` as the game sees it
+is a fixed date plus the game clock, and `rand()` is the original's single generator in game memory (`port_msl.cpp`).
 
 In a window, a fast-forward still shows a picture four times a second (real time) with "Fast-forwarding... frame N / M" in the title bar; the window thread has its own message pump, so it stays responsive. A white window for a long time is the renderer, not a hang: the menu's 3D scene costs about 50 ms a frame (CPU vertex transform in the backend), so `--to-menu` takes about 110 s at 1080p even on a graphics card. `PORT_HIDDEN=1` in the environment creates the window hidden, `PORT_OFFSCREEN=1` visible but at -32000,-32000 (the real code path, off every monitor), `PORT_FAST_LOG=1` logs each progress picture. The title is set from the window's own thread (a posted message), and the progress also runs for the frames whose draws and copies are dropped.
 
 With a frame target (`--fast-forward N`, `--to-menu`) the backend drops all draws and texture copies except in the last 30 frames before the target: the engine redraws and recopies everything each frame, so only the final frames matter, and the GX interpreter still decodes the dropped ones (state and copies go on). `--fast` has no target and draws everything. Hidden window, 1080p, graphics card: 3200 frames to the menu took 112-134 s before and 28 s after; the menu screenshot differs only by a few levels (animated text fade). The boot summary's `drawn:` line shows the backend time in draws and copies and the number of draws dropped.
 
 Frames at the same count show the same screen (title at 2500, main menu at 3200 with `--press A@2600-2610`), but
-effects that run on time (the title's sparks, the menu's scene) are in another phase from a paced run, and
-two runs are not pixel-identical even when both are paced (thread timing). Measured (this machine, headless, 3200 frames):
+effects that run on time (the title's sparks, the menu's scene) are in another phase from a paced run. Two unpaced
+runs are identical; two paced runs are not pixel-identical (real time decides when interrupts arrive). Measured (this machine, headless, 3200 frames):
 paced about 64 s to the menu; `--to-menu` without a renderer 22 s (about 145 frames per second); with
 `--screenshot` the renderer (Direct3D WARP, software) is the cost: 640x480 about 60 s, so use `--res 640x480`
 for screenshot checks and a window (GPU) for the rest.
