@@ -1085,6 +1085,8 @@ void* MemRealloc(void* ptr, u32 size, u32 flags) {
     return out;
 }
 
+extern "C" void BadgeWhy(const char* fmt, ...);   // port: badge award log (progress.cpp)
+
 // 0x80228604
 // Awards the tiered badges `badges[0..n-1]`: a badge is given when it is not yet owned and `value`
 // has reached the threshold in row `rows[i]` of the tuning table at gGameDb->data + 0x99D0 (8-byte
@@ -1096,6 +1098,7 @@ void SaveAddTieredBadges(u8* save, s32 value, s32 n, const s32* rows, const s32*
         s32 threshold = (s32)*(f32*)(*(u8**)(gGameDb->data + 0x99D0) + rows[i] * 8 + 4);
         if (value < threshold) continue;
         if (badge == -1) continue;
+        BadgeWhy("value %d >= tuning row 0x%X (%d)", value, rows[i], threshold);
         SaveAddBadge(save, badge);
     }
 }
