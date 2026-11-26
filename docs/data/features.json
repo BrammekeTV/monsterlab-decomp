@@ -99,6 +99,11 @@
  "changelog": [
   {
    "date": "2026-11-26",
+   "time": "15:11",
+   "text": "Two plans written: one for a steady frame rate at 1080p (measure properly, remove the stutter when a level loads, then cheaper drawing) and one for the 49 crashes in the function-comparison tests, grouped by cause, starting with a float-to-number conversion mistake in our own code."
+  },
+  {
+   "date": "2026-11-26",
    "time": "14:36",
    "text": "Black hole head mod, part 1: a script now draws the new head's model, textures and part icons from scratch (a dark core with a glowing, swirling disc on a small projector), and notes how the game stores a part. The head isn't in the game yet; the next step adds it to the parts list."
   },
