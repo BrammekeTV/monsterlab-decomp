@@ -9,7 +9,8 @@
 //     use again, the bytes that were there are put back. A zone is read from disc only when another one took
 //     its place, so this is checked every frame and not only at the read;
 //   - the names get new text ids behind the game's string table;
-//   - a game that has no such part in its inventory gets one (new games and loaded saves).
+//   - with PORT_MODPART_GIVE=1 (tests) a game that has no such part in its inventory gets one. Not by default:
+//     the row number is not save-safe yet, so nothing here may reach a save.
 // Nothing here runs unless an enabled mod has a parts folder.
 #ifdef _WIN32
 #include <windows.h>
@@ -279,9 +280,13 @@ void AddToList(Pack& p, int pi) {
     }
 }
 
-// A game without the part gets one: tier 1, full quality. (Parts on a monster stay in the inventory's list.)
+// PORT_MODPART_GIVE=1 (tests only): a game without the part gets one, tier 1, full quality. (Parts on a monster
+// stay in the inventory's list.) Off by default: the row number is not save-safe yet, and a part given here
+// would be written into the player's save.
 void AddToInventory(int pi) {
-    if (!gSaveSystem || sRow[pi] <= 0) return;
+    static int on = -1;
+    if (on < 0) on = getenv("PORT_MODPART_GIVE") != NULL;
+    if (!on || !gSaveSystem || sRow[pi] <= 0) return;
     u8* inv = gSaveSystem + 0xA30;
     PartInstance** parts = (PartInstance**)(inv + 0x28);
     s32 n = *(s32*)(inv + 0x6BC);

@@ -12,8 +12,8 @@ python tools/mods/blackhole/build_mod.py       # the mod folder       -> build/p
 
 Needs `numpy` and `Pillow`. Nothing of the game is read and nothing of the game is in the mod: pictures,
 model and draw commands are made by these scripts. Copy `BlackHoleHead` into the `mods` folder next to
-`monsterlab.exe` (a build's own folder is `build/pc/mods`). The part is then in the inventory of every game,
-new or loaded, as "Black Hole" (tier 1, the higher tiers are named too).
+`monsterlab.exe` (a build's own folder is `build/pc/mods`). The part then exists in the game ("Black Hole",
+four tiers), but **nobody is given one yet**: see "Owning it".
 
 | File | What |
 |---|---|
@@ -40,7 +40,9 @@ The port's side is `src/port/port_mod_parts.cpp` (see also `docs/modding.md`, "A
   in use again, the bytes are put back.
 - **Names.** Four new text ids behind the game's string table; `TextIdFromHash` asks the port for keys it
   does not know.
-- **Owning it.** A game whose inventory has no such part gets one.
+- **Owning it.** Not by default. With `PORT_MODPART_GIVE=1` (tests) a game whose inventory has no such part
+  gets one; that is off for players because the row number 186 is a stand-in and a part given now would be
+  written into their save. It comes on when the save-safe part ids are in.
 
 What the model keeps of the template: its skeleton and animations, its material (lit, environment map, rim
 light), the matrix commands of its display list. The hull is drawn by that same material with the usual
@@ -53,7 +55,7 @@ look without a second material.
 Headless, from a savestate of the playthrough's first battle, with the mod on:
 
 - the row is added (`part p_hd_sha077 is row 186`), the two list entries are added in the village and again in
-  the arena level, and the inventory gets the part (6 parts instead of 5);
+  the arena level; with `PORT_MODPART_GIVE=1` the inventory gets the part (6 parts instead of 5);
 - with `PORT_MODPART_SHOW=1` (a test switch: the new model is drawn wherever the template is in use) the
   monster that wears the template head in that fight shows the black hole: a black core with a glowing amber
   rim, and the fight goes on through the tutorial and the first attacks without a crash.
