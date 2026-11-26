@@ -611,6 +611,7 @@ loader takes the size from the block: each slot's first table points at `slot + 
 | `0x50` | resource | `fn_8013006C` |
 | `0x8C`, `0x90` | two pointers; `0x94`, `0x98`: how many entries of the two entity tables are in use | `SessionBegin`, `CharacterFind`, `fn_8012FD0C` |
 | `0x80`, `0x9C` | the zone's placed effects: pointers to 0x20-byte records {name hash, position, direction, running instance} and their count | `WorldOnZoneLoaded` |
+| `0xA0`, byte `0xA4` | the zone's particle systems (0x4C bytes each): points (0x28 bytes, nine floats and a flag byte), links (0x24 bytes), a third list of 0x0C-byte entries, the name hash at `+0x2C`, flags at `+0x30`. The Weld-O-Tron's seam tiles are found among them by name | `fn_800098F4`, `fn_8010A76C`, `fn_801D0C04`, `fn_800784EC` |
 | `0xA8`, byte `0xAC` | the zone's objects: pointers and their count; of an object the type word at `+0x08` is converted, the rest is not typed yet | `fn_8012FD0C` |
 | `0xA0`, `0xBC`, `0xCC`, `0xD0`, `0x100`, `0x10C` | words read with `lwz`; pointer or number not known yet (bytes at `0xA4`, `0xC0`) | `fn_800098F4`, `fn_801C668C`, `fn_801C6BCC`, `OnZoneScreensLoaded`, `fn_8004DAF8` |
 | `0xD4` | the zone's action table (`TriggerDoAction`, zone id other than 0x1FF) | `TriggerDoAction` |
@@ -1148,3 +1149,15 @@ room stays idle.
 An entity's own fields: `+0x08` three floats, its scale (`EntitySyncTransform`, 0x801B4F4C, hands
 them to the model with the record's rotation). A non-prop entity's definition (`+0x9C`): `+0x08`
 id, `+0x48` its animation set (`fn_8005BEC8` looks a conversation's clip up in it).
+
+## Finding a field that is converted twice or not at all
+
+`PORT_LOADER_WATCH=<hex Wii address>` in the environment makes the level loader log every object it converts
+within 0x200 bytes of that address: which zone's pass, where the bytes were when they were converted, the
+size and the kind. A value that reads byte-swapped in the game (use `--peek`) with no line here was never
+planned; two lines mean two passes took it.
+
+Zone 0 can be read to a buffer first and copied to its place by the game later (a preloaded level). What a
+later zone adds to zone 0 (the definitions its entities use) is converted where zone 0 is at that moment:
+in the buffer while this zone is in the buffer too, at zone 0's place once the game reads zones straight to
+their places (`ConvertSection` in `port_files.cpp`). castle_welding.sir is the first level where that differs.

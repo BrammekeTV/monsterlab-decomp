@@ -29,8 +29,9 @@ import argparse, glob, json, os, queue, re, shutil, subprocess, sys, threading, 
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 PC = os.path.join(ROOT, "build", "pc")
 OUT = os.path.join(ROOT, "build", "playthrough")      # the exe copy, its empty save folder and the log
-# Its own name: a `taskkill /IM monsterlab.exe` meant for another run must not end this one.
-EXE = os.path.join(OUT, "ml_playthrough.exe")
+# Its own name, with the checkout's folder in it: a `taskkill /IM monsterlab.exe` meant for another run, or for
+# the playthrough of another worktree, must not end this one.
+EXE = os.path.join(OUT, "ml_playthrough_" + re.sub(r"[^A-Za-z0-9]+", "_", os.path.basename(ROOT))[-24:] + ".exe")
 LOG = os.path.join(OUT, "run.log")
 WIDTH, HEIGHT = 640, 360                              # small: headless runs draw in software (WARP)
 STALL = 90                                            # wall seconds without a new frame number
@@ -177,7 +178,13 @@ STAGES = [
            call("EndIngredientsSelection", 36200), level("castle_welding", 36300)],
           press=("A@35100", "A@35400", "A@35700", "A@36000", "A@36300"),
           pointer=("591,615@35000", "660,480@35300", "900,615@35600", "660,480@35900", "1305,921@36200")),
-    # Later stages go here (a deadline after 36700, frames counted from the run's start).
+    # The experiment's level starts (the arc welder prop, the seam's tiles), its screens load and the
+    # instructions open: the right arrow turns to page 2 of 2. (The button after it starts the experiment.)
+    Stage("weld", "the Weld-O-Tron level starts, its instructions open, page 2", 37200,
+          [call("RegisterExperimentSound", 36400), call("LoadExperimentUI", 36400), call("SetInstructionsHeaderString", 36400),
+           call("GetNextInstructionsString", 36750), call("IsLastPage", 36750)],
+          press=("A@36800",), pointer=("1146,954@36700",)),
+    # Later stages go here (a deadline after 37200, frames counted from the run's start).
 ]
 
 

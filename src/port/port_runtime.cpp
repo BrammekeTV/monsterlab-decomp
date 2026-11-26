@@ -86,7 +86,16 @@ void PortStubCall(const char* name) {
 }
 
 static void PrintMissing(void);
-static u32 sPeek[8];
+static u32 sPeek[16], sPeekWords[16];
+// Whether `bytes` at `addr` can be read (Wii memory, a game thread's stack, anything committed).
+static BOOL PeekReadable(u32 addr, u32 bytes) {
+    MEMORY_BASIC_INFORMATION mi;
+    for (u32 a = addr; a < addr + bytes; a = (u32)(uintptr_t)mi.BaseAddress + (u32)mi.RegionSize) {
+        if (!VirtualQuery((const void*)(uintptr_t)a, &mi, sizeof(mi)) || mi.State != MEM_COMMIT ||
+            (mi.Protect & (PAGE_NOACCESS | PAGE_GUARD)) || mi.Protect == 0) return FALSE;
+    }
+    return TRUE;
+}
 static s32 sShotAt[64], sShotAtCount;   // --shot-at frames
 static int sPeekCount;
 static void PrintSummary(void) {
@@ -100,9 +109,14 @@ static void PrintSummary(void) {
     fprintf(stderr, "audio: %s\n", PortAudioStats(buf, sizeof(buf)));
     { char gx[512]; fprintf(stderr, "GX: %s\n", PortGxStatsText(gx, sizeof(gx))); }
     { char gfx[256]; fprintf(stderr, "drawn: %s\n", PortGfxStatsText(gfx, sizeof(gfx))); }
-    for (int i = 0; i < sPeekCount; i++) {       // --peek ADDR: four words of Wii memory at the stop
+    for (int i = 0; i < sPeekCount; i++) {       // --peek ADDR[:WORDS]: words of memory at the stop (four unless WORDS is given)
         const u32* p = (const u32*)(uintptr_t)(sPeek[i] & ~3u);
-        if (PortIsWiiAddr(sPeek[i])) fprintf(stderr, "peek 0x%08X: %08X %08X %08X %08X\n", sPeek[i] & ~3u, p[0], p[1], p[2], p[3]);
+        if (!PeekReadable(sPeek[i] & ~3u, sPeekWords[i] * 4)) { fprintf(stderr, "peek 0x%08X: not readable\n", sPeek[i] & ~3u); continue; }
+        for (u32 w = 0; w < sPeekWords[i]; w += 4) {
+            fprintf(stderr, "peek 0x%08X:", (sPeek[i] & ~3u) + w * 4);
+            for (u32 k = w; k < w + 4 && k < sPeekWords[i]; k++) fprintf(stderr, " %08X", p[k]);
+            fprintf(stderr, "\n");
+        }
     }
     fprintf(stderr, "reached, in order:\n");
     for (s32 i = 0; i < sMilestoneCount; i++) {
@@ -1227,7 +1241,12 @@ struct PortBoot {
             else if (!strcmp(a, "--wav") && i + 1 < __argc) gPortOptions.wav = __argv[++i];
             else if (!strcmp(a, "--no-audio")) gPortOptions.noAudio = TRUE;
             else if (!strcmp(a, "--no-movies")) gPortOptions.noMovies = TRUE;
-            else if (!strcmp(a, "--peek") && i + 1 < __argc && sPeekCount < 8) sPeek[sPeekCount++] = strtoul(__argv[++i], NULL, 16);
+            else if (!strcmp(a, "--peek") && i + 1 < __argc && sPeekCount < 16) {
+                char* end;
+                sPeek[sPeekCount] = strtoul(__argv[++i], &end, 16);
+                u32 words = *end == ':' ? strtoul(end + 1, NULL, 0) : 4;
+                sPeekWords[sPeekCount++] = words < 1 ? 1 : words > 1024 ? 1024 : words;
+            }
             else if (!strcmp(a, "--watch") && i + 1 < __argc) sWatch = strtoul(__argv[++i], NULL, 16);
             else if (!strcmp(a, "--show-texture") && i + 1 < __argc) gPortOptions.showTexture = atoi(__argv[++i]);
             else if (!strcmp(a, "--screenshot") && i + 1 < __argc) gPortOptions.screenshot = __argv[++i];

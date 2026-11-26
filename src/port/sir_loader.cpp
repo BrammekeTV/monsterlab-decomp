@@ -454,6 +454,15 @@ static bool PlanFinish(ImagePlan* plan) {
     return true;
 }
 
+// PORT_LOADER_WATCH=<hex Wii address>: log every object the level loader converts within 0x200 bytes of it
+// (which zone's pass, where, how long, which kind), to find a field that is converted twice or not at all.
+static u32 sWatchAddr = 0, sConvertBase = 0;
+static u32 LoaderWatch(void) {
+    const char* v = getenv("PORT_LOADER_WATCH");     // read every time: a savestate brings this file's statics back
+    sWatchAddr = v != NULL ? (u32)strtoul(v, NULL, 16) : 0;
+    return sWatchAddr;
+}
+
 // Wii address of the image being checked and converted: global_binary.sir's, or a level zone's
 // while LevelZoneConvert runs. (One file is converted at a time, on the thread that read it.)
 static u32 sImageBase = GLOBAL_BINARY_WII_BASE;
@@ -1730,6 +1739,9 @@ static SirError AnimSetPlan(ImagePlan* plan, const u8* image, u32 imageSize, u32
 // A prop's definition, in this image or in zone 0's, and its animation table.
 static SirError PropDefPlan(ImagePlan* plan, const u8* image, u32 imageSize, u32 addr) {
     AnyObj def = AnyFind(plan, imageSize, addr, PROP_DEF_USED, REGION_PROP_DEF);
+    if (LoaderWatch() != 0 && addr - sWatchAddr < 0x200)
+        fprintf(stderr, "[loader watch] prop definition 0x%08X: found %d, in zone 0 %d, done %d (zone 0 at 0x%08X size 0x%X, this image at 0x%08X size 0x%X)\n",
+                addr, def.found, def.other, def.done, sOtherBase, sOtherSize, sImageBase, imageSize);
     if (!def.found) return SIR_OK;
     if (!AnyAdd(plan, &def, PROP_DEF_USED, REGION_PROP_DEF)) return SIR_ERR_ENTITY;
     return AnimSetPlan(plan, image, imageSize, AnyPtr(image, imageSize, &def, 0x48));
@@ -2881,6 +2893,8 @@ static void ImagePlanConvert(const ImagePlan* plan, SirReloc* r, u8* image, u32 
     for (u32 i = 0; i < plan->count; i++) {
         const Region* g = &plan->regions[i];
         u8* p = image + g->off;
+        if (LoaderWatch() != 0 && sConvertBase != 0 && sConvertBase + g->off < sWatchAddr + 0x200 && sConvertBase + g->off + g->size + 0x200 > sWatchAddr)
+            fprintf(stderr, "[loader watch] 0x%08X size 0x%X kind %u (image at 0x%08X, converted at %p)\n", sConvertBase + g->off, g->size, g->kind, sConvertBase, image);
         switch (g->kind) {
         case REGION_INPUT_TABLE:  InputTableConvert(r, p); break;
         case REGION_INPUT_STEP:   InputStepConvert(r, p, g->size); break;
@@ -3116,7 +3130,7 @@ static const SirField kLevelSlotFields[] = {
     { 0x08C, SIR_PTR, 2 },    // code: SessionBegin, SessionRestoreZoneObjects (two pointers in every slot of the file)
     { 0x094, SIR_U32, 2 },    // code: CharacterFind, SessionBegin
     { 0x09C, SIR_U32, 1 },    // code: how many placed effects (WorldOnZoneLoaded)
-    { 0x0A0, SIR_U32, 1 },    // word: fn_800098F4 (u8 at +0xA4)
+    { 0x0A0, SIR_PTR, 1 },    // code: the zone's particle systems (0x4C bytes each, SlotRopesPlan), their count in the byte at +0xA4 (fn_800098F4)
     { 0x0A8, SIR_PTR, 1 },    // code: pointers to the zone's objects, their count in the byte at +0xAC (fn_8012FD0C)
     { 0x0BC, SIR_U32, 1 },    // word: fn_801C668C (u8 at +0xC0: fn_8005E1B8)
     { 0x0CC, SIR_U32, 2 },    // word: fn_801C6BCC, fn_801C6C80
@@ -3278,6 +3292,7 @@ extern "C" void LevelZoneRootsFree(LevelZoneRoots* roots) {
     free(roots->poolTables);
     free(roots->slotObjects);
     free(roots->slotEffects);
+    free(roots->slotRopes);
     free(roots->recordArrays);
     free(roots->actionTables);
     free(roots->soundGroups);
@@ -3364,6 +3379,7 @@ extern "C" BOOL LevelZoneRootsCollect(const u8* hdr, u32 hdrSize, const u8* zone
                                       const LevelZoneOther* other, LevelZoneRoots* out) {
     memset(out, 0, sizeof(*out));
     RootList entities = { NULL, 0, 0 }, scene = { NULL, 0, 0 }, pools = { NULL, 0, 0 }, records = { NULL, 0, 0 }, lists = { NULL, 0, 0 };
+    RootList ropes = { NULL, 0, 0 };
     RootList objects = { NULL, 0, 0 }, effects = { NULL, 0, 0 }, actions = { NULL, 0, 0 }, groups = { NULL, 0, 0 }, recArrays = { NULL, 0, 0 };
     bool ok = hdrSize >= LEVEL_HEADER_SLOTS + 0x118;
     u32 count = ok ? Host32(hdr + 0x1A8) : 0, stride = LEVEL_SLOT_MIN_SIZE, entries, addr;
@@ -3432,12 +3448,16 @@ extern "C" BOOL LevelZoneRootsCollect(const u8* hdr, u32 hdrSize, const u8* zone
         for (u32 t = 0; ok && t < 2; t++)
             if ((addr = ZoneAddr(slot + 0x8C + t * 4, zoneHost, zoneSize, zoneWiiBase)) != 0)
                 ok = RootAdd(&recArrays, addr) && RootAdd(&recArrays, Host32(slot + (t == 0 ? 0x124 : 0x130)));
+        // The slot's particle systems at +0xA0, as many as the byte at +0xA4 says.
+        if (ok && slot[0xA4] != 0 && (addr = ZoneAddr(slot + 0xA0, zoneHost, zoneSize, zoneWiiBase)) != 0)
+            ok = RootAdd(&ropes, addr) && RootAdd(&ropes, slot[0xA4]);
         // The slot's placed effects at +0x80, as many as the word at +0x9C says.
         if (ok && Host32(slot + 0x9C) != 0 && (addr = ZoneAddr(slot + 0x80, zoneHost, zoneSize, zoneWiiBase)) != 0)
             ok = RootAdd(&effects, addr) && RootAdd(&effects, Host32(slot + 0x9C));
     }
     out->slotObjects = objects.items;       out->slotObjectCount = objects.count / 2;
     out->slotEffects = effects.items;       out->slotEffectCount = effects.count / 2;
+    out->slotRopes = ropes.items;           out->slotRopeCount = ropes.count / 2;
     out->recordArrays = recArrays.items;    out->recordArrayCount = recArrays.count / 2;
     out->actionTables = actions.items;      out->actionTableCount = actions.count;
     out->soundGroups = groups.items;        out->soundGroupCount = groups.count;
@@ -3577,6 +3597,45 @@ static SirError SlotEffectsPlan(ImagePlan* plan, const u8* image, u32 imageSize,
     return SIR_OK;
 }
 
+// A zone slot's particle systems (slot +0xA0, count in the byte at +0xA4), 0x4C bytes each: chains of points held
+// together by links, which the game steps every frame (fn_800098F4 -> fn_8010A76C -> fn_801D0C04, fn_801D0DDC)
+// and finds by name (fn_800784EC: the Weld-O-Tron's "tile_start_cm", "tile%d%d_%s_cm"; fn_800C4118, fn_8006FC04).
+//   +0x00 the points and +0x04 how many: 0x28 bytes each, nine floats (position before, position now, push) and at
+//         +0x24 the "held in place" byte with three more bytes, left as they are
+//   +0x08 the links and +0x0C how many: 0x24 bytes, nine words (two point numbers, the kind, then floats)
+//   +0x10 how many passes over the links, +0x14 a push on every point (three floats)
+//   +0x20 a third list and +0x24 how many: 0x0C bytes {word, four colour bytes, float}; +0x28 a word
+//   +0x2C the hash of the name, +0x30 flags (bit 0: switched off, bit 1: shakes), +0x34..+0x44 floats (+0x3C the
+//         size of a shake, +0x44 the time to the next one); +0x48 four bytes
+#define ROPE_SIZE       0x4C
+#define ROPE_POINT_SIZE 0x28
+#define ROPE_LINK_SIZE  0x24
+#define ROPE_NODE_SIZE  0x0C
+static SirError SlotRopesPlan(ImagePlan* plan, const u8* image, u32 imageSize, u32 addr, u32 count) {
+    u32 off, o;
+    if (count == 0 || !LevelSpan(addr, (u64)count * ROPE_SIZE, imageSize, &off) || PlanHas(plan, off, REGION_PTR_ARRAY)) return SIR_OK;
+    for (u32 i = 0; i < count; i++) {
+        u32 r = off + i * ROPE_SIZE;
+        const u8* rec = image + r;
+        if (!PlanAdd(plan, r, 4, REGION_PTR_ARRAY) || !PlanAdd(plan, r + 0x04, 4, REGION_U32_ARRAY) ||
+            !PlanAdd(plan, r + 0x08, 4, REGION_PTR_ARRAY) || !PlanAdd(plan, r + 0x0C, 0x14, REGION_U32_ARRAY) ||
+            !PlanAdd(plan, r + 0x20, 4, REGION_PTR_ARRAY) || !PlanAdd(plan, r + 0x24, 0x24, REGION_U32_ARRAY)) return SIR_ERR_LEVEL;
+        u32 points = Be32(rec + 0x04), links = Be32(rec + 0x0C), nodes = Be32(rec + 0x24);
+        if (points > imageSize / ROPE_POINT_SIZE || links > imageSize / ROPE_LINK_SIZE || nodes > imageSize / ROPE_NODE_SIZE) return SIR_ERR_LEVEL;
+        if (points != 0 && LevelSpan(Be32(rec), (u64)points * ROPE_POINT_SIZE, imageSize, &o) && !PlanHas(plan, o, REGION_F32_ARRAY)) {
+            for (u32 k = 0; k < points; k++)
+                if (!PlanAdd(plan, o + k * ROPE_POINT_SIZE, 0x24, REGION_F32_ARRAY)) return SIR_ERR_LEVEL;
+        }
+        if (links != 0 && LevelSpan(Be32(rec + 0x08), (u64)links * ROPE_LINK_SIZE, imageSize, &o) && !PlanHas(plan, o, REGION_U32_ARRAY) &&
+            !PlanAdd(plan, o, links * ROPE_LINK_SIZE, REGION_U32_ARRAY)) return SIR_ERR_LEVEL;
+        if (nodes != 0 && LevelSpan(Be32(rec + 0x20), (u64)nodes * ROPE_NODE_SIZE, imageSize, &o) && !PlanHas(plan, o, REGION_U32_ARRAY)) {
+            for (u32 k = 0; k < nodes; k++)
+                if (!PlanAdd(plan, o + k * ROPE_NODE_SIZE, 4, REGION_U32_ARRAY) || !PlanAdd(plan, o + k * ROPE_NODE_SIZE + 8, 4, REGION_F32_ARRAY)) return SIR_ERR_LEVEL;
+        }
+    }
+    return SIR_OK;
+}
+
 static SirError PoolTablePlan(ImagePlan* plan, const u8* image, u32 imageSize, u32 addr, u32 count) {
     u32 off;
     if (count == 0) return SIR_OK;
@@ -3672,6 +3731,9 @@ static SirError OtherActionSoundsPlan(ImagePlan* plan, const u8* image, u32 imag
 extern "C" SirError LevelZoneConvert(SirReloc* r, u8* image, u32 imageSize, u32 wiiBase, const LevelZoneRoots* roots,
                                      LevelZoneDone* done, const LevelZoneOther* other) {
     ImagePlan plan = { NULL, 0, 0 }, merged = { NULL, 0, 0 };
+    if (LoaderWatch() != 0)
+        fprintf(stderr, "[loader watch] zone image at 0x%08X size 0x%X (converted at %p); zone 0 at 0x%08X size 0x%X (%p)%c",
+                wiiBase, imageSize, image, other != NULL ? other->wiiBase : 0, other != NULL ? other->imageSize : 0, other != NULL ? other->image : NULL, 10);
     sImageBase = wiiBase;
     sLevelZone = true;
     if (other != NULL) {
@@ -3725,6 +3787,8 @@ extern "C" SirError LevelZoneConvert(SirReloc* r, u8* image, u32 imageSize, u32 
     for (u32 i = 0; i < roots->soundGroupCount && e == SIR_OK; i++) e = SoundGroupPlan(&plan, image, imageSize, roots->soundGroups[i]);
     for (u32 i = 0; i < roots->slotEffectCount && e == SIR_OK; i++)
         e = SlotEffectsPlan(&plan, image, imageSize, roots->slotEffects[i * 2], roots->slotEffects[i * 2 + 1]);
+    for (u32 i = 0; i < roots->slotRopeCount && e == SIR_OK; i++)
+        e = SlotRopesPlan(&plan, image, imageSize, roots->slotRopes[i * 2], roots->slotRopes[i * 2 + 1]);
     for (u32 i = 0; i < roots->slotObjectCount && e == SIR_OK; i++)
         e = SlotObjectsPlan(&plan, image, imageSize, roots->slotObjects[i * 2], roots->slotObjects[i * 2 + 1]);
     for (u32 i = 0; i < roots->recordArrayCount && e == SIR_OK; i++) {
@@ -3764,9 +3828,12 @@ extern "C" SirError LevelZoneConvert(SirReloc* r, u8* image, u32 imageSize, u32 
         if (e == SIR_OK && !PlanFinish(&merged)) e = SIR_ERR_OVERLAP;
     }
     if (e == SIR_OK) {
+        sConvertBase = sImageBase;
         ImagePlanConvert(&plan, r, image, imageSize);
         if (roots->slotCopySize != 0) SirConvertRecord(r, image, roots->slotCopySize, kLevelSlotFields, COUNTOF(kLevelSlotFields));
+        sConvertBase = sOtherBase;
         if (other != NULL) ImagePlanConvert(&sOtherNew, r, other->image, other->imageSize);
+        sConvertBase = 0;
         if (merged.count != 0) {                                 // zone 0's list of converted objects grows
             LevelZoneDoneFree(other->done);
             other->done->regions = merged.regions;
