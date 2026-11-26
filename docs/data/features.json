@@ -99,6 +99,11 @@
  "changelog": [
   {
    "date": "2026-11-26",
+   "time": "13:26",
+   "text": "Choosing ingredients for the first experiment works and leads into the Weld-O-Tron level; the playthrough test covers it (22 stages, PR #279)."
+  },
+  {
+   "date": "2026-11-26",
    "time": "12:41",
    "text": "The lab book (I.G.O.R.) finds its sections again, so your ingredients show up and the first experiment can be started; the game now plays on to the Weld-O-Tron experiment (PR #278)."
   },
