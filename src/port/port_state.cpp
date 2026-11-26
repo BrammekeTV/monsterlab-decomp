@@ -25,6 +25,7 @@
 #include "port/port.h"
 
 #pragma comment(lib, "cabinet.lib")
+#pragma warning(disable : 4733)   // fs:[0] is set on purpose: a thread continues the exception chain of its saved stack
 
 BOOL PortNandBusy(void);   // port_nand.cpp
 const char* PortNandRoot(BOOL* isTestFolder);

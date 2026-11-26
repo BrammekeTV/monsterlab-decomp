@@ -34,6 +34,7 @@ typedef intptr_t ScriptValue;
 // rand() and srand() are the original's: one generator for the whole game with its state in game memory
 // (0x805FAE38; src/port/port_msl.cpp). The C runtime's keeps a state per thread, outside what a savestate holds,
 // and its sequence differs. A macro, because the C runtime's own names cannot be defined again.
+#include <stdlib.h>   // first: the macros below must not rename the C runtime's own declarations
 extern "C" int  PortRand(void);
 extern "C" void PortSrand(unsigned int seed);
 #define rand  PortRand
