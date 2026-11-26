@@ -73,6 +73,8 @@ load messages, never from pictures.
 | name | Fuseless's lines in the castle, `EnterName_Init`: the scientist name entry screen (the first screen with a grid widget) |
 | named | two letters typed on the keys (`EnterName_AddLetter`), the tick confirms: `EnterName_SaveNameToPlayerName`, `EnterName_Destroy`, Fuseless's welcome |
 | igor | Fuseless's welcome, I.G.O.R. opens on its ingredients page and closes (`InitLabBooks`, `CloseBooks`, `DestroyLabBooks`), his second talk, `SetCastleAccess`, the castle HUD is free in the Command Room |
+| hall | the Command Room's exit button: `castle_atrium` (the Grand Hall), the Dat-O-Saver talk opens and closes, the castle HUD is free |
+| mechlab | the orange door: `castle_mechlab`, Fuseless's talk, `StartIngredientsSelection`: I.G.O.R.'s Select Ingredients page |
 
 `python tools/playthrough.py --list` prints the markers and deadlines.
 
