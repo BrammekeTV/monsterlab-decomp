@@ -9,6 +9,7 @@
 
 #include "port/port.h"
 #include "port/sir_loader.h"
+#include "port/port_modpatch.h"
 #include "port/port_mods.h"
 
 PORT_SAVED_BEGIN   // which sections are loaded and converted is part of a savestate; the copies live in the port's fixed heap
@@ -221,6 +222,7 @@ static void ConvertSection(const char* name, const SirCatalogFile* file, const S
             SirError err = GlobalBinaryConvert(&reloc, sGlobalHdr, dst, e->size, &failTable);
             if (err != SIR_OK) PortStop(8, "global_binary.sir: %s (table %d)", SirErrorText(err), failTable);
             PortModsApplyData(sGlobalHdr);
+            PortModPatchApply(sGlobalHdr);
             sConverted++;
             static char line[128];   // the milestone list keeps the pointer
             snprintf(line, sizeof(line), "global_binary.sir converted: %u pointers, %u fields", reloc.ptrImage, reloc.fieldsSwapped);

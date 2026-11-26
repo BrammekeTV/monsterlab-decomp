@@ -17,6 +17,7 @@
 #include "port/port_stateslots.h"
 #include "port/port_input.h"
 #include "port/port_gx.h"
+#include "port/port_modpatch.h"
 #include "port/port_mods.h"
 #include "port/port_overlay.h"
 extern "C" { void SaveManager_SaveData(void); u32 SaveManager_CanLoadGame(void); s32 SaveManager_GetCurrentSlot(void); s32 SaveManager_GetContinueSlot(void); u8* fn_8022E3DC(u8* s); }
@@ -347,6 +348,7 @@ static void PortCursorTrueScale(void) {
 
 void PortFrameDone(void) {
     PortCursorTrueScale();
+    PortModPatchFrame();
     if (sFrames == 1 && getenv("PORT_SCRIPT_TRACE")) InstallScriptTrace();
     sFrames++;
     PortStateLog();
@@ -1139,6 +1141,7 @@ static int SelfTest(void) {
     fails += PortSelfTestDisc();
     fails += PortSelfTestPicker();
     fails += PortSelfTestMods();
+    fails += PortSelfTestModPatch();
     fails += PortSelfTestSettings();
 #undef CHECK
     PortLog("self-test: %u functions, %u linked; %s", gPortFuncCount, linked, fails ? "FAILED" : "ok");

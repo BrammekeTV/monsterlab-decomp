@@ -95,6 +95,8 @@ static BOOL HostPath(const char* path, char* out, size_t n) {
     return TRUE;
 }
 
+const char* PortSaveDir(void) { EnsureRoot(); return sRoot; }
+
 static DWORD Attr(const char* host) { return GetFileAttributesA(host); }
 
 extern "C" {

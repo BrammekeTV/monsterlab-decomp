@@ -27,6 +27,7 @@
 #define PORT_STACK_SLOTS 34            // 0 the main thread, 1-32 OSCreateThread threads, 33 unused
 #define PORT_HOSTMEM_BASE 0xB0000000u  // PortHostAlloc: port-side buffers a state must hold (catalog copy, the loader's lists, zlib streams)
 #define PORT_HOSTMEM_SIZE 0x04000000u
+const char* PortSaveDir(void);         // the folder of the save files (port_nand.cpp)
 void* PortHostAlloc(u32 size);         // zeroed; a fixed-address heap that states save whole (port_os.cpp)
 void  PortHostFree(void* p);
 // A saved register set of a thread that waits (or of the thread that saves). Capture returns 0; when a loaded

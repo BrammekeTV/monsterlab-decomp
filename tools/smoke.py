@@ -54,7 +54,10 @@ def main():
     for p in (menu_png, title_png):
         if os.path.exists(p):
             os.remove(p)
-    env = dict(os.environ, PORT_SCRIPT_TRACE="1")
+    # Its own empty save folder: the sample mod's part is written to save.modparts there, not to anyone's saves.
+    save = os.path.join(OUT, "save")
+    shutil.rmtree(save, ignore_errors=True)
+    env = dict(os.environ, PORT_SCRIPT_TRACE="1", MONSTERLAB_SAVE=save)
     # The sample mod, for the menu run. Its file override is a copy of a text file of the extracted disc.
     mods = os.path.join(OUT, "mods")
     shutil.rmtree(mods, ignore_errors=True)
@@ -81,6 +84,8 @@ def main():
         fails.append("menu scripts did not run (no UIScreen_Push)")
     if "mods: SampleMod changes 1 string" not in outs["menu"]:
         fails.append("the sample mod's strings.json was not applied")
+    if "mods: part SampleMod:sample_head is row 186" not in outs["menu"]:
+        fails.append("the sample mod's table patch did not add its part")
     if extracted and "[port] mod: SampleMod overrides TEXT/STR_EN.TXT" not in outs["menu"]:
         fails.append("the sample mod's file did not replace the disc's")
     for name, png in (("menu", menu_png), ("title", title_png)):
@@ -94,7 +99,7 @@ def main():
             open(os.path.join(OUT, n + ".log"), "w", errors="replace").write(o)
         print(f"SMOKE FAIL ({total:.0f}s: {timing}): " + "; ".join(fails) + f"  [logs: build/smoke/*.log]")
         return 1
-    what = "text and file override" if extracted else "text"
+    what = "text, part and file override" if extracted else "text and part"
     print(f"SMOKE OK ({total:.0f}s: {timing}); mod {what} picked up")
     return 0
 
