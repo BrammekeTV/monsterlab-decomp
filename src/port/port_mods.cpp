@@ -1,10 +1,11 @@
 // PC platform layer: mods. A folder mods/<name>/ next to the exe is a mod; what is under its
 // files/ folder replaces the disc file of the same path, whether the game runs from a disc image or
-// from an extracted folder (DVDOpen asks here first); a PNG or DDS under its textures/ folder replaces a
+// from an extracted folder (DVDOpen asks here first); its mod.ini says what the mod is; a PNG or DDS under its textures/ folder replaces a
 // game texture, matched by content hash (the renderer asks here when it decodes one). The list, its order and which mods are on are
 // kept in monsterlab.ini ([mods]); a later mod wins over an earlier one. See docs/modding.md.
 #ifdef _WIN32
 #include <windows.h>
+#include <algorithm>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -61,27 +62,99 @@ PortMod* PortModsAdd(const char* name, BOOL enabled) {
 static u32 WalkTree(const PortMod* m, const char* dir, const char* rel);
 void PortModsRefreshTextures(void);
 
+// mod.ini: "key = value" lines, with or without a [mod] header; ';' and '#' start a comment line.
+static void ReadModIni(PortMod* m, BOOL* enabled) {
+    m->title[0] = m->about[0] = m->author[0] = m->version[0] = 0;
+    m->priority = 0;
+    *enabled = TRUE;
+    char path[MAX_PATH];
+    if ((u32)snprintf(path, sizeof(path), "%s\\%s\\mod.ini", PortModsDir(), m->name) >= sizeof(path)) return;
+    FILE* f = fopen(path, "r");
+    if (!f) return;
+    char line[512];
+    BOOL first = TRUE, other = FALSE;
+    while (fgets(line, sizeof(line), f)) {
+        char* p = line;
+        if (first && !strncmp(p, "\xEF\xBB\xBF", 3)) p += 3;      // Notepad's byte order mark
+        first = FALSE;
+        while (*p == ' ' || *p == '\t') p++;
+        char* end = p + strlen(p);
+        while (end > p && (u8)end[-1] <= ' ') *--end = 0;
+        if (*p == '[') { other = _stricmp(p, "[mod]") != 0; continue; }
+        char* eq = strchr(p, '=');
+        if (other || !eq || *p == ';' || *p == '#') continue;
+        char* k = eq;
+        while (k > p && (k[-1] == ' ' || k[-1] == '\t')) k--;
+        *k = 0;
+        const char* v = eq + 1;
+        while (*v == ' ' || *v == '\t') v++;
+        if (!_stricmp(p, "name")) snprintf(m->title, sizeof(m->title), "%s", v);
+        else if (!_stricmp(p, "description")) snprintf(m->about, sizeof(m->about), "%s", v);
+        else if (!_stricmp(p, "author")) snprintf(m->author, sizeof(m->author), "%s", v);
+        else if (!_stricmp(p, "version")) snprintf(m->version, sizeof(m->version), "%s", v);
+        else if (!_stricmp(p, "priority")) m->priority = atoi(v);
+        else if (!_stricmp(p, "enabled")) *enabled = atoi(v) != 0;
+    }
+    fclose(f);
+}
+
+// A mod whose folder is there: what its mod.ini says and how many disc files it has.
+static void Look(PortMod* m, BOOL* enabled) {
+    m->present = TRUE;
+    ReadModIni(m, enabled);
+    char dir[MAX_PATH];
+    m->fileCount = (u32)snprintf(dir, sizeof(dir), "%s\\%s\\files", PortModsDir(), m->name) < sizeof(dir) ? WalkTree(NULL, dir, "") : 0;
+}
+
 void PortModsScan(void) {
-    for (int i = 0; i < gPortModCount; i++) { gPortMods[i].present = FALSE; gPortMods[i].fileCount = 0; }
+    for (int i = 0; i < gPortModCount; i++) {
+        PortMod* m = &gPortMods[i];
+        m->present = FALSE;
+        m->fileCount = 0;
+        m->title[0] = m->about[0] = m->author[0] = m->version[0] = 0;
+        m->priority = 0;
+    }
     char pattern[MAX_PATH + 8];
     snprintf(pattern, sizeof(pattern), "%s\\*", PortModsDir());
     WIN32_FIND_DATAA fd;
     HANDLE h = FindFirstFileA(pattern, &fd);
     if (h == INVALID_HANDLE_VALUE) { PortModsRefreshTextures(); return; }
+    std::vector<PortMod> added;                  // folders the list does not have yet
     do {
         if (!(fd.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY) || !GoodName(fd.cFileName)) continue;
         PortMod* m = NULL;
         for (int i = 0; i < gPortModCount && !m; i++)
             if (!_stricmp(gPortMods[i].name, fd.cFileName)) m = &gPortMods[i];
-        if (!m) m = PortModsAdd(fd.cFileName, TRUE);       // a folder dropped in is on until switched off
-        if (m) {
-            m->present = TRUE;
-            char dir[MAX_PATH];
-            m->fileCount = (u32)snprintf(dir, sizeof(dir), "%s\\%s\\files", PortModsDir(), m->name) < sizeof(dir) ? WalkTree(NULL, dir, "") : 0;
-        }
+        BOOL on;
+        if (m) { Look(m, &on); continue; }
+        PortMod fresh = {};
+        strcpy(fresh.name, fd.cFileName);
+        Look(&fresh, &on);
+        fresh.enabled = on;
+        added.push_back(fresh);
     } while (FindNextFileA(h, &fd));
     FindClose(h);
+    // Lowest priority first; mods of the same priority keep the folder listing's order.
+    std::stable_sort(added.begin(), added.end(), [](const PortMod& a, const PortMod& b) { return a.priority < b.priority; });
+    for (const PortMod& fresh : added) {
+        if (gPortModCount >= PORT_MAX_MODS) break;
+        int at = 0;
+        while (at < gPortModCount && gPortMods[at].priority <= fresh.priority) at++;
+        memmove(&gPortMods[at + 1], &gPortMods[at], (size_t)(gPortModCount - at) * sizeof(PortMod));
+        gPortMods[at] = fresh;
+        gPortModCount++;
+    }
     PortModsRefreshTextures();
+}
+
+BOOL PortModsNoteOverride(const char* modName, const char* discPath) {
+    static std::set<std::string>* seen = new std::set<std::string>;   // made at first use, as Tex() is
+    while (*discPath == '/' || *discPath == '\\') discPath++;
+    std::string key = std::string(modName) + "|" + discPath;
+    for (char& ch : key) ch = ch == '\\' ? '/' : ch >= 'A' && ch <= 'Z' ? (char)(ch + 32) : ch;
+    if (!seen->insert(key).second) return FALSE;
+    PortLog("mod: %s overrides %s", modName, discPath);
+    return TRUE;
 }
 
 BOOL PortModsMove(int index, int dir) {
@@ -693,6 +766,35 @@ int PortSelfTestMods(void) {
     MOD_CHECK(PortModsMove(2, -1) && PortModsMove(1, -1) && !PortModsMove(0, -1) && !strcmp(gPortMods[0].name, "first") &&
               PortModsFindFile("Streams/a.sir", host, sizeof(host), &who) && !strcmp(who, "second"), "moving a mod up did not change who wins");
     MOD_CHECK(!PortModsAdd("..\\outside", TRUE) && !PortModsAdd("", TRUE), "a name that is no folder name was accepted");
+    // mod.ini: the description, and for a folder new to the list its priority and whether it starts on.
+    {
+        auto put = [&](const char* file, const char* text) {
+            snprintf(path, sizeof(path), "%s\\%s", base, file);
+            FILE* fp = fopen(path, "wb");
+            if (fp) { fputs(text, fp); fclose(fp); } else fails++;
+        };
+        put("first\\mod.ini", "\xEF\xBB\xBF[mod]\r\nname = The First \r\n; priority = 9\r\ndescription=a = b\r\nauthor = me\r\nversion = 1.2\r\npriority = 5\r\nenabled = 0\r\n");
+        put("second\\mod.ini", "priority = -1\n");
+        gPortModCount = 0;
+        PortModsScan();
+        MOD_CHECK(gPortModCount == 2 && !strcmp(gPortMods[0].name, "second") && gPortMods[0].enabled && !strcmp(gPortMods[1].name, "first") &&
+                  !gPortMods[1].enabled, "priority and enabled of mod.ini were not used for new mods");
+        MOD_CHECK(!strcmp(gPortMods[1].title, "The First") && !strcmp(gPortMods[1].about, "a = b") && !strcmp(gPortMods[1].author, "me") &&
+                  !strcmp(gPortMods[1].version, "1.2") && gPortMods[1].priority == 5, "mod.ini was not read ('%s', '%s')", gPortMods[1].title, gPortMods[1].about);
+        gPortModCount = 0;
+        PortModsAdd("first", TRUE);                  // the player's list wins over mod.ini
+        PortModsScan();
+        MOD_CHECK(gPortModCount == 2 && !strcmp(gPortMods[0].name, "second") && !strcmp(gPortMods[1].name, "first") && gPortMods[1].enabled,
+                  "mod.ini changed what the list already had, or a new mod of a lower priority did not go in front");
+        MOD_CHECK(PortModsNoteOverride("first", "/Streams/a.sir") && !PortModsNoteOverride("first", "streams\\A.SIR") &&
+                  PortModsNoteOverride("second", "Streams/a.sir"), "an override was not logged once per file and mod");
+        for (const char* f : {"first\\mod.ini", "second\\mod.ini"}) { snprintf(path, sizeof(path), "%s\\%s", base, f); DeleteFileA(path); }
+        gPortModCount = 0;                           // the list as the moves left it, for the checks below
+        PortModsAdd("first", TRUE);
+        PortModsAdd("second", TRUE);
+        PortModsAdd("gone", TRUE);
+        PortModsScan();
+    }
 
     // Textures: a real PNG (deflated, three row filters, a transparent colour), the writer's own output, the name rule.
     {
@@ -863,7 +965,7 @@ int PortSelfTestMods(void) {
     strcpy(sDir, keepDir);
     gPortOptions.noMods = keepOff;
     PortModsRefreshTextures();
-    if (!fails) PortLog("selftest mods: ok (file lookup, order, moving, switched off, PNG and DDS textures, Dolphin names, dumping, text table)");
+    if (!fails) PortLog("selftest mods: ok (file lookup, order, moving, switched off, mod.ini, override log, PNG and DDS textures, Dolphin names, dumping, text table)");
     return fails;
 }
 #endif

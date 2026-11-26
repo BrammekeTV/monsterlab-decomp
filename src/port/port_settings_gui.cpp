@@ -128,8 +128,21 @@ static void PageMods(void) {
             if (ImGui::Checkbox("##on", &on)) { m->enabled = on; changed = TRUE; }
             ImGui::TableNextColumn();
             ImGui::AlignTextToFramePadding();
-            if (m->present) ImGui::TextUnformatted(m->name);
-            else ImGui::TextDisabled("%s (folder not found)", m->name);
+            if (!m->present) ImGui::TextDisabled("%s (folder not found)", m->name);
+            else {
+                // mod.ini's name, version and author, the description under them; the folder in the tooltip.
+                ImGui::TextUnformatted(m->title[0] ? m->title : m->name);
+                if (ImGui::IsItemHovered()) ImGui::SetTooltip("Folder: %s", m->name);
+                if (m->version[0] || m->author[0]) {
+                    ImGui::SameLine();
+                    ImGui::TextDisabled("%s%s%s%s", m->version, m->version[0] && m->author[0] ? " " : "", m->author[0] ? "by " : "", m->author);
+                }
+                if (m->about[0]) {
+                    ImGui::PushTextWrapPos(0.0f);
+                    ImGui::TextDisabled("%s", m->about);
+                    ImGui::PopTextWrapPos();
+                }
+            }
             ImGui::TableNextColumn();
             if (m->present) ImGui::Text("%u file%s, %u texture%s", m->fileCount, m->fileCount == 1 ? "" : "s", m->textureCount, m->textureCount == 1 ? "" : "s");
             ImGui::TableNextColumn();
