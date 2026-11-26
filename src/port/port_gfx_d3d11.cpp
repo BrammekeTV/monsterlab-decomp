@@ -631,7 +631,7 @@ static u32 Fnv(const u8* p, u32 n, u32 h) {
     return h;
 }
 
-struct TexEntry { ID3D11ShaderResourceView* srv; u32 hash, w, h, fmt, gen; };
+struct TexEntry { ID3D11ShaderResourceView* srv; u32 hash, w, h, fmt, gen, levels; };
 static u32 sTexGen = 1;                                    // bumped each frame and on a palette load: textures are re-hashed once per generation
 static std::map<u64, TexEntry> sTextures;                   // by address and palette slot
 static std::map<u32, ID3D11ShaderResourceView*> sEfbCopies; // frame-buffer copies, by destination address
@@ -643,12 +643,32 @@ static BOOL sFilterDirty;
 static BOOL WantMips(void) { return gPortSettings.texFilter >= PORT_FILTER_BILINEAR; }
 void PortGfxApplySettings(void) { sFilterDirty = TRUE; }
 
-static ID3D11ShaderResourceView* MakeTexture(const u32* rgba, u32 w, u32 h) {
+// The mip levels the game samples (GXInitTexObjLOD): a mip min filter (mode 0 bits 5-7 >= 2) and a
+// max LOD (mode 1 bits 8-15, 4.4 fixed point) above 0. The smaller levels follow level 0 in memory,
+// each padded to whole tiles. The console picks the level from the screen-space size of the texels,
+// so a texture on a thin quad (the menu's 8x32 raindrop on a 1-2 pixel wide strip) is drawn from a
+// small, averaged level: fainter and smeared along its length.
+static u32 GameMipLevels(const PortGx* g, u32 map, u32 w, u32 h) {
+    u32 mode0 = g->bp[(map < 4 ? 0x80 : 0xA0) + (map & 3)], mode1 = g->bp[(map < 4 ? 0x84 : 0xA4) + (map & 3)];
+    if (((mode0 >> 5) & 7) < 2) return 1;
+    u32 levels = 1 + (((mode1 >> 8) & 0xFF) + 15) / 16;
+    u32 full = 1;
+    for (u32 m = w > h ? w : h; m > 1; m >>= 1) full++;
+    return levels < full ? levels : full;
+}
+
+// game: the levels below level 0 from the game's data (GameMipLevels), or NULL.
+static ID3D11ShaderResourceView* MakeTexture(const u32* rgba, u32 w, u32 h, const std::vector<std::vector<u32>>* game = NULL) {
     D3D11_TEXTURE2D_DESC d = {};
     std::vector<std::vector<u32>> chain;            // the smaller levels (box filter)
     D3D11_SUBRESOURCE_DATA init[16] = {{rgba, w * 4, 0}};
     u32 levels = 1;
-    if (WantMips() && w > 1 && h > 1) {
+    if (game && !game->empty()) {
+        for (u32 i = 0; i < game->size() && levels < 16; i++) {
+            u32 lw = w >> levels ? w >> levels : 1;
+            init[levels++] = {(*game)[i].data(), lw * 4, 0};
+        }
+    } else if (WantMips() && w > 1 && h > 1) {
         const u32* src = rgba; u32 sw = w, sh = h;
         while ((sw > 1 || sh > 1) && levels < 16) {
             u32 nw = sw > 1 ? sw / 2 : 1, nh = sh > 1 ? sh / 2 : 1;
@@ -714,7 +734,9 @@ static ID3D11ShaderResourceView* GetTexture(const PortGx* g, u32 map) {
     BOOL pal = fmt == 8 || fmt == 9 || fmt == 10;
     u64 key = (u64)addr << 16 | (pal ? (tl & 0xFFF) : 0xFFFF);
     auto it = sTextures.find(key);
-    if (it != sTextures.end() && it->second.gen == sTexGen && it->second.w == w && it->second.h == h && it->second.fmt == fmt && it->second.srv) return it->second.srv;
+    u32 levels = GameMipLevels(g, map, w, h);
+    if (it != sTextures.end() && it->second.levels != levels) it->second.hash = 0;   // decode again with the other number of levels
+    if (it != sTextures.end() && it->second.gen == sTexGen && it->second.w == w && it->second.h == h && it->second.fmt == fmt && it->second.levels == levels && it->second.srv) return it->second.srv;
     u32 bytes = TextureBytes(w, h, fmt);
     u32 hash = Fnv(data, bytes, 2166136261u ^ w ^ h << 12 ^ fmt << 24);
     if (pal) hash = Fnv(tlut, fmt == 8 ? 32 : fmt == 9 ? 512 : 0x8000, hash ^ tl);
@@ -735,23 +757,37 @@ static ID3D11ShaderResourceView* GetTexture(const PortGx* g, u32 map) {
         PortModImage im;
         if (PortModsTexture(content, tname, &im)) { made = MakeModTexture(im); free(im.data); }
     }
-    if (!made) made = MakeTexture(rgba.data(), w, h);
-    TexEntry e = {made, hash, w, h, fmt, sTexGen};
+    if (!made) {
+        std::vector<std::vector<u32>> mips;
+        const u8* at = data;
+        for (u32 i = 1; i < levels; i++) {
+            u32 pw = w >> (i - 1) ? w >> (i - 1) : 1, ph = h >> (i - 1) ? h >> (i - 1) : 1;
+            at += TextureBytes(pw, ph, fmt);
+            u32 lw = w >> i ? w >> i : 1, lh = h >> i ? h >> i : 1;
+            mips.emplace_back(lw * lh);
+            if (!DecodeTexture(at, lw, lh, fmt, tlut, (tl >> 10) & 3, mips.back().data())) { mips.clear(); break; }
+        }
+        made = MakeTexture(rgba.data(), w, h, &mips);
+    }
+    TexEntry e = {made, hash, w, h, fmt, sTexGen, levels};
     sTextures[key] = e;
     sGfxStats.textures++;
     return e.srv ? e.srv : sWhite;
 }
 
-static ID3D11SamplerState* sSamplers[256];
+static std::map<u64, ID3D11SamplerState*> sSamplers;   // by mode 0 bits 0-16 (wrap, filters, LOD bias) and mode 1 (LOD range)
 static ID3D11SamplerState* GetSampler(const PortGx* g, u32 map) {
-    u32 mode = g->bp[(map < 4 ? 0x80 : 0xA0) + (map & 3)] & 0xFF;
-    if (sSamplers[mode]) return sSamplers[mode];
+    u32 mode0 = g->bp[(map < 4 ? 0x80 : 0xA0) + (map & 3)], mode1 = g->bp[(map < 4 ? 0x84 : 0xA4) + (map & 3)];
+    u32 mode = mode0 & 0xFF; u64 key = (mode0 & 0x1FFFF) | (u64)(mode1 & 0xFFFF) << 17;
+    auto found = sSamplers.find(key);
+    if (found != sSamplers.end()) return found->second;
     static const D3D11_TEXTURE_ADDRESS_MODE kWrap[4] = {D3D11_TEXTURE_ADDRESS_CLAMP, D3D11_TEXTURE_ADDRESS_WRAP, D3D11_TEXTURE_ADDRESS_MIRROR,
                                                         D3D11_TEXTURE_ADDRESS_WRAP};
     D3D11_SAMPLER_DESC d = {};
-    BOOL mag = (mode >> 4) & 1, min = ((mode >> 5) & 7) & 4 ? TRUE : ((mode >> 5) & 7) == 1;
-    d.Filter = mag && min ? D3D11_FILTER_MIN_MAG_LINEAR_MIP_POINT : mag ? D3D11_FILTER_MIN_POINT_MAG_LINEAR_MIP_POINT
-             : min ? D3D11_FILTER_MIN_LINEAR_MAG_MIP_POINT : D3D11_FILTER_MIN_MAG_MIP_POINT;
+    // GX min filter: 0 near, 1 linear, 2 near/mip near, 3 linear/mip near, 4 near/mip linear, 5 linear/mip linear.
+    u32 gmin = (mode >> 5) & 7;
+    BOOL mag = (mode >> 4) & 1, min = gmin == 1 || gmin == 3 || gmin == 5, mip = gmin == 4 || gmin == 5;
+    d.Filter = (D3D11_FILTER)((min ? 0x10 : 0) | (mag ? 0x4 : 0) | (mip ? 0x1 : 0));
     u32 tf = (u32)gPortSettings.texFilter;
     if (tf == PORT_FILTER_NEAREST) d.Filter = D3D11_FILTER_MIN_MAG_MIP_POINT;
     else if (tf == PORT_FILTER_BILINEAR) d.Filter = D3D11_FILTER_MIN_MAG_MIP_LINEAR;
@@ -759,9 +795,13 @@ static ID3D11SamplerState* GetSampler(const PortGx* g, u32 map) {
     d.MaxAnisotropy = d.MaxAnisotropy ? d.MaxAnisotropy : 1;
     d.AddressU = kWrap[mode & 3]; d.AddressV = kWrap[(mode >> 2) & 3]; d.AddressW = D3D11_TEXTURE_ADDRESS_CLAMP;
     d.MaxLOD = D3D11_FLOAT32_MAX; d.ComparisonFunc = D3D11_COMPARISON_NEVER;
+    if (tf == PORT_FILTER_GAME && gmin >= 2) {          // the game's LOD range and bias (4.4 fixed point; bias s2.5)
+        d.MinLOD = (f32)(mode1 & 0xFF) / 16.0f; d.MaxLOD = (f32)((mode1 >> 8) & 0xFF) / 16.0f;
+        d.MipLODBias = (f32)(s8)((mode0 >> 9) & 0xFF) / 32.0f;
+    }
     ID3D11SamplerState* s = NULL;
     sDev->CreateSamplerState(&d, &s);
-    sSamplers[mode] = s;
+    sSamplers[key] = s;
     return s;
 }
 
@@ -1811,7 +1851,8 @@ static void CopyEfb(const PortGx* g, u32 control) {
         sFilterDirty = FALSE;
         for (auto& e : sTextures) if (e.second.srv) e.second.srv->Release();
         sTextures.clear();
-        for (auto& sm : sSamplers) if (sm) { sm->Release(); sm = NULL; }
+        for (auto& sm : sSamplers) if (sm.second) sm.second->Release();
+        sSamplers.clear();
         sDrawBound = FALSE;
     }
     s64 td0 = Ticks();
