@@ -184,7 +184,14 @@ STAGES = [
           [call("RegisterExperimentSound", 36400), call("LoadExperimentUI", 36400), call("SetInstructionsHeaderString", 36400),
            call("GetNextInstructionsString", 36750), call("IsLastPage", 36750)],
           press=("A@36800",), pointer=("1146,954@36700",)),
-    # Later stages go here (a deadline after 37200, frames counted from the run's start).
+    # The button right of the arrows leaves the instructions: the experiment's own screen (with the welding
+    # meter, a 3D model widget) is pushed, the gun swings in and the gameplay state begins (gun off, B not held).
+    Stage("weldgun", "leave the instructions: the experiment's screen, the gun swings in, gameplay begins", 37500,
+          [call("InstructionsExitted", 37000), call("PushExperimentUI", 37000), call("UpdateWeldingGunIntroPos", 37000),
+           call("InterpolateGunFromIntroPosition", 37000), call("minigame_gameflow_control_gameplay_entry", 37000),
+           call("WeldingGunOffUpdate", 37000)],
+          press=("A@37050",), pointer=("1380,954@36950",)),
+    # Later stages go here (a deadline after 37500, frames counted from the run's start).
 ]
 
 

@@ -2629,6 +2629,18 @@ static SirError UiBasePlan(ImagePlan* plan, const u8* image, u32 imageSize, u32 
         if (LevelSpan(Be32(image + o + 0x140), 4, imageSize, &t)) (void)MaterialTexturePlan(plan, image, imageSize, Be32(image + t));
         (void)MaterialTexturePlan(plan, image, imageSize, Be32(image + o + 0x144));
     }
+    // A model (kind 2, sub-kind 2; vtable lbl_80382F1C): +0x140 points at the word of a model asset of the set
+    // (fn_8019B008: the asset's +0xCC) that holds the model, a scene item with its matrix, mesh and materials.
+    // fn_801A2764 gives the item the widget's colour (+0x3C) and matrix, fn_801A2D10 draws it (fn_801719DC).
+    // The widget's own matrix (+0x148) and colour (+0x178) are written before they are read.
+    if (Be32(image + o + 0x60) == 2 && (u64)o + 0x144 <= imageSize && Be32(image + o + 0x13C) == 2) {
+        u32 t, item;
+        if (!PlanAdd(plan, o + 0x140, 4, REGION_PTR_ARRAY)) return SIR_ERR_SCREENS;
+        if (LevelSpan(Be32(image + o + 0x140), 4, imageSize, &t)) {
+            if (!PlanHas(plan, t, REGION_PTR_ARRAY) && !PlanAdd(plan, t, 4, REGION_PTR_ARRAY)) return SIR_ERR_SCREENS;
+            if (LevelSpan(Be32(image + t), 0xB4, imageSize, &item) && SceneItemDrawPlan(plan, image, imageSize, item) != SIR_OK) return SIR_ERR_SCREENS;
+        }
+    }
     if (Be32(image + o + 0x60) == 1 && (u64)o + UI_TEXT_AT + UI_TEXT_SIZE <= imageSize &&
         !PlanAdd(plan, o + UI_TEXT_AT, UI_TEXT_SIZE, REGION_UI_TEXT)) return SIR_ERR_SCREENS;
     return UiBasePlan(plan, image, imageSize, Be32(image + o + 0x130), depth + 1);

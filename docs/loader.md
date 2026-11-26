@@ -959,6 +959,7 @@ converted:
 | | `+0x120` first child, `+0x124` next sibling, `+0x128` parent | `fn_8019BFF8`, `fn_8019C348` |
 | | `+0x130` a widget drawn before this one | `fn_801985BC` |
 | picture (kind 2, sub-kind 0) | `+0x140` pointer to the word that holds its texture, `+0x144` a texture set by a script (it wins) | `fn_801A0D04`, `fn_801A1208` |
+| model (kind 2, sub-kind 2; vtable `lbl_80382F1C`) | `+0x140` pointer to the word of a model asset of the set that holds the model: a scene item (matrix, mesh, materials), converted as a level's scene items are. The Weld-O-Tron's welding meter | `fn_801A2764`, `fn_801A2D10` |
 | | `+0x148` width and height | `fn_801A0DF0`, `fn_801A0DF8` |
 | | `+0x180` texture coordinates of the four corners | `fn_801A1238` |
 | animation (value of a node of the table at `+0x20`) | `+0x04` five tracks (position, scale, colour, rotation, pivot), `+0x18` its events, `+0x1C` flags, `+0x20` length, `+0x24` start position, `+0x28` speed, `+0x2C` a word | `fn_801ABAF4`, `fn_801AB4C4`, `fn_801AB820` |
