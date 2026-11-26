@@ -319,6 +319,27 @@ If the dump gave the texture a name (`tex_256x128_f6_MonsterLab_Logo_FF636077E97
 version as `mods\MyMod\textures\MonsterLab_Logo.png` instead. `--verbose` logs
 `mods: texture MonsterLab_Logo (FF636077E97CEA31) comes from MyMod by name`. `tools/mod_test.py` checks this too.
 
+## Not built yet: mods that add things
+
+The goal is that a mod can later add something new, for example a head part with its own model, textures
+and inventory icon that is always unlocked. Two rules for whatever gets built:
+
+- **New files.** A mod ships its own files beside replacements. `files\` already serves a path the disc does
+  not have, but the game only opens it if something tells it to: the new data has to name it.
+- **Tables are patched, never shipped whole.** A mod holds only its own entries or a change list that the
+  port applies after loading the original from the player's disc, so no mod (and never this repository)
+  carries game data, and two mods can add to one table.
+
+Where the hooks would go:
+
+| What | Where |
+|---|---|
+| Applying a mod's data | `PortModsApplyData` (`src/port/port_moddata.cpp`), called from `port_files.cpp` once `global_binary.sir` is converted; today it only handles `data\strings.json` |
+| Text of a new thing | `strings.json` changes existing numbers only, and part names are looked up by text-key hash: appending entries and their keys is needed |
+| The part itself | the `PartDef` table (`include/game/part.h`, which notes spare slots 180-185 and that the table can be grown); a `data\parts.json` would append records. Mods must not rely on a fixed index: saves store the part's index, so the port has to keep a stable mod part -> index mapping and cope with a mod that was removed |
+| Model, textures, icon | not investigated: how a part finds its model in `shared_parts.sir` and its icon in the UI data, and adding entries to those at load time (`port_files.cpp`, `sir_loader.cpp`) |
+| Always unlocked | not investigated: where the owned and discovered parts of a save are filled (`src/game/progress.cpp`); grant the part after a save is loaded or created |
+
 ## Testing
 
 `monsterlab.exe --selftest` checks the lookup, the load order, `mod.ini` and a mod's file opened through the
