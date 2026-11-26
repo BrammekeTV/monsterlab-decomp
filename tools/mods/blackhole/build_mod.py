@@ -50,8 +50,8 @@ LIST_DRAWS = 0x1C487
 LIST_END = 0x1F200
 TEX_COLOUR, TEX_GLOSS, TEX_BYTES = 0xD00, 0xE340, 0xAAC0   # 256x256 CMPR, 7 levels each
 BONE, TEX_MTX = 9, 39           # matrix numbers a vertex names: the template's skull (position, and its environment map)
-SCALE = 2.6                     # model units -> the head's units
-OFFSET = (0.0, -0.05, 0.0)
+SCALE = 2.4                     # model units -> the head's units
+OFFSET = (0.0, 0.6, 0.0)    # lifts the emitter out of the body
 
 
 def string_hash(s):
