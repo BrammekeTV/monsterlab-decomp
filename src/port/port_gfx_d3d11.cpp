@@ -345,9 +345,11 @@ static u32 sBatchVb, sBatchIdx;                             // where the open ba
 struct Batch { PendingState st; u32 vb, idx, ni; };
 static std::vector<Batch> sBatches;
 static void FlushDraws();
+static BOOL sShadowBroken;             // soft shadows could not be set up: drawn as the game does
 static BOOL sShadowDirty;              // soft shadows: shadow pixels are marked in the stencil and not in the picture yet
 static BOOL IsShadowPass(const PortGx* g);
 static void ShadowComposite();
+static void DebugMessages(const char* where);
 static void Blit(ID3D11ShaderResourceView* src, ID3D11RenderTargetView* dst, u32 dstX, u32 dstY, u32 dstW, u32 dstH, f32 u0, f32 v0, f32 du, f32 dv, const f32* pick);
 static void CloseBatch() {
     if (!sPendCount) return;
@@ -1130,10 +1132,16 @@ static u32 RingNext(Ring& r) {
 }
 // Records never cross a segment: the draws that use a segment's records are all drawn before it is left, and what is
 // reused (lights, matrices, the last record) starts again in each segment.
+// The test is against the ring's own segment: with pos / seg alone, a record that ended exactly on a boundary let the
+// next one start in the following segment without RingNext (no wait for the GPU), and at the end of the buffer
+// (pos == REC_U4) it was written past the end of the mapped buffer, into the driver's memory.
+static u32 sRecExactFits, sRecWraps;
 static void RecReserve(u32 n) {
     const u32 seg = REC_U4 / 4, pos = sRecUsed + (u32)sRec.size() / 4;
-    if (pos / seg == (pos + n) / seg || (pos + n) % seg == 0) return;
+    if (pos == (sRecRing.seg + 1) * seg) sRecExactFits++;   // the case the old test got wrong (counted for the run summary)
+    if (pos >= sRecRing.seg * seg && pos + n <= (sRecRing.seg + 1) * seg) return;
     FlushDraws();
+    sRecWraps++;
     sRec.clear(); sRecUsed = RingNext(sRecRing) * seg; sRecLights = sRecLast = sRecMtx = ~0u;
     if (sRecRing.discard) { sRecDiscard = TRUE; sRecRing.discard = FALSE; }
 }
@@ -1508,7 +1516,7 @@ static void DrawPrims(const PortGx* g, u32 prim, const PortGxLayout* L, u32 coun
         lastSrc = src; lastPcVal = pc; haveLast = TRUE; pcSerial++;
     }
     OutKey ok = MakeOutKey(g, squeeze);
-    if (gPortSettings.shadows == PORT_SHADOWS_SOFT && !movie) {
+    if (gPortSettings.shadows == PORT_SHADOWS_SOFT && !movie && !sShadowBroken) {
         ok.shadow = IsShadowPass(g) ? SHADOW_DRAW : SHADOW_COVER;
         // A draw that does not write depth (see-through effects, the 2D layer) is blended over the picture as it is: the
         // shadows drawn so far are put in first, so it is neither cut out of them nor darkened by them.
@@ -1526,6 +1534,7 @@ static void DrawPrims(const PortGx* g, u32 prim, const PortGxLayout* L, u32 coun
     const u32 vfmt = gpu ? 16 + ntc : (numGens > 8 ? 8 : numGens);
     const u32 stride = VStride(vfmt);
     // The queue is uploaded at once (FlushDraws); it has to fit the buffers.
+    if ((size_t)count * stride > VB_BYTES / 4 - 16) { sGfxStats.skipped++; return; }   // larger than a ring segment
     if (sBV.size() + (size_t)count * stride > VB_BYTES / 4 - 16 || sBI.size() + (size_t)count * 3 > IB_IDXS / 4) FlushDraws();
     if (sPendCount && (sPend.ps != ps || sBVCount + count > VB_VERTS || sPend.vfmt != vfmt || sPend.movie != movie || memcmp(&sPend.out, &ok, sizeof(ok)) || memcmp(sPend.srv, srv, sizeof(srv)) ||
                        memcmp(sPend.smp, smp, sizeof(smp)) || (sPend.pcSerial != pcSerial && memcmp(&sPend.pc, &pc, sizeof(pc)))))
@@ -1624,6 +1633,12 @@ static void DrawPrims(const PortGx* g, u32 prim, const PortGxLayout* L, u32 coun
     if (movie) FlushDraws();                                // drawn at once: it has its own target
 }
 
+// A write into a mapped buffer that would not fit: skipped (the draws of that flush are lost) and logged, never written.
+static void MapOverrun(const char* what, size_t at, size_t bytes, size_t size) {
+    static u32 reports;
+    if (reports++ < 8) PortLog("gfx: BUG: %s buffer write of %zu bytes at %zu would pass its end (%zu); skipped", what, bytes, at, size);
+}
+
 // Uploads and draws what DrawPrims has queued.
 static void FlushDraws() {
     CloseBatch();
@@ -1631,7 +1646,9 @@ static void FlushDraws() {
     sGfxStats.flushes += (u32)sBatches.size();
     if (!sRec.empty()) {                                    // the GPU path's records, behind those already in the buffer
         D3D11_MAPPED_SUBRESOURCE rm;
-        if (SUCCEEDED(sCtx->Map(sRecBuf, 0, sRecDiscard ? D3D11_MAP_WRITE_DISCARD : D3D11_MAP_WRITE_NO_OVERWRITE, 0, &rm))) {
+        if ((size_t)sRecUsed * 16 + sRec.size() * 4 > (size_t)REC_U4 * 16) {   // never past the buffer (MapOverrun logs it)
+            MapOverrun("record", (size_t)sRecUsed * 16, sRec.size() * 4, (size_t)REC_U4 * 16);
+        } else if (SUCCEEDED(sCtx->Map(sRecBuf, 0, sRecDiscard ? D3D11_MAP_WRITE_DISCARD : D3D11_MAP_WRITE_NO_OVERWRITE, 0, &rm))) {
             memcpy((u8*)rm.pData + (size_t)sRecUsed * 16, sRec.data(), sRec.size() * 4);
             sCtx->Unmap(sRecBuf, 0);
         }
@@ -1649,12 +1666,14 @@ static void FlushDraws() {
     if (first + bytes > (sVbRing.seg + 1) * (VB_BYTES / 4)) first = RingNext(sVbRing) * (VB_BYTES / 4);
     D3D11_MAP how = !started || sVbRing.discard ? D3D11_MAP_WRITE_DISCARD : D3D11_MAP_WRITE_NO_OVERWRITE;
     sVbRing.discard = FALSE;
-    if (SUCCEEDED(sCtx->Map(sVb, 0, how, 0, &map))) { memcpy((u8*)map.pData + first, sBV.data(), bytes); sCtx->Unmap(sVb, 0); } else ok = FALSE;
+    if ((size_t)first + bytes > VB_BYTES) { MapOverrun("vertex", first, bytes, VB_BYTES); ok = FALSE; }
+    else if (SUCCEEDED(sCtx->Map(sVb, 0, how, 0, &map))) { memcpy((u8*)map.pData + first, sBV.data(), bytes); sCtx->Unmap(sVb, 0); } else ok = FALSE;
     sVbUsed = first + bytes;
     if (ifirst + ni > (sIbRing.seg + 1) * (IB_IDXS / 4)) ifirst = RingNext(sIbRing) * (IB_IDXS / 4);
     how = !started || sIbRing.discard ? D3D11_MAP_WRITE_DISCARD : D3D11_MAP_WRITE_NO_OVERWRITE;
     sIbRing.discard = FALSE;
-    if (SUCCEEDED(sCtx->Map(sIb, 0, how, 0, &map))) { memcpy((u16*)map.pData + ifirst, sBI.data(), ni * sizeof(u16)); sCtx->Unmap(sIb, 0); } else ok = FALSE;
+    if (((size_t)ifirst + ni) * 2 > (size_t)IB_IDXS * 2) { MapOverrun("index", (size_t)ifirst * 2, (size_t)ni * 2, (size_t)IB_IDXS * 2); ok = FALSE; }
+    else if (SUCCEEDED(sCtx->Map(sIb, 0, how, 0, &map))) { memcpy((u16*)map.pData + ifirst, sBI.data(), ni * sizeof(u16)); sCtx->Unmap(sIb, 0); } else ok = FALSE;
     started = TRUE;
     sIbUsed = ifirst + ni;
     sBV.clear(); sBI.clear(); sBVCount = 0;
@@ -1768,14 +1787,19 @@ static void ShadowPass(ID3D11PixelShader* ps, ID3D11RenderTargetView* rtv, ID3D1
     sCtx->PSSetShaderResources(0, 1, &none);
     sCtx->OMSetRenderTargets(0, NULL, NULL);
 }
+static u32 sShadowComposites;                           // for the summary at the end of a run
 static void ShadowComposite() {
     sShadowDirty = FALSE;
+    sShadowComposites++;
     sDrawBound = FALSE;
     if (!sShFillPs) {
         ID3DBlob* a = Compile(kShadowSrc, "fill", "ps_4_0"); ID3DBlob* b = Compile(kShadowSrc, "blur", "ps_4_0");
         if (a) { sDev->CreatePixelShader(a->GetBufferPointer(), a->GetBufferSize(), NULL, &sShFillPs); a->Release(); }
         if (b) { sDev->CreatePixelShader(b->GetBufferPointer(), b->GetBufferSize(), NULL, &sShBlurPs); b->Release(); }
+        // Every field valid, also those of the disabled depth test: a zero DepthFunc is not a comparison (WARP takes it,
+        // a hardware driver need not).
         D3D11_DEPTH_STENCIL_DESC d = {};
+        d.DepthEnable = FALSE; d.DepthWriteMask = D3D11_DEPTH_WRITE_MASK_ZERO; d.DepthFunc = D3D11_COMPARISON_ALWAYS;
         d.StencilEnable = TRUE; d.StencilReadMask = 1; d.StencilWriteMask = 0;
         d.FrontFace.StencilFunc = D3D11_COMPARISON_EQUAL;
         d.FrontFace.StencilPassOp = d.FrontFace.StencilFailOp = d.FrontFace.StencilDepthFailOp = D3D11_STENCIL_OP_KEEP;
@@ -1805,7 +1829,14 @@ static void ShadowComposite() {
         }
         sShW = sEfbPw; sShH = sEfbPh;
     }
-    if (!sShFillPs || !sShBlurPs || !sShMarked || !sShMul || !sShSrv[1] || !sShSrv[2]) return;
+    // Anything missing (with MSAA the marks need a target of the frame buffer's sample count, like the depth buffer they
+    // are tested against): soft shadows are switched off for this run and the shadow passes are drawn as the game does.
+    if (!sShFillPs || !sShBlurPs || !sShMarked || !sShMul || !sShRtv[1] || !sShSrv[1] || !sShRtv[2] || !sShSrv[2] || (sSamples > 1 && !sShRtv[0])) {
+        if (!sShadowBroken) PortLog("gfx: soft shadows are not available (a resource could not be made); the game's own shadows are drawn");
+        sShadowBroken = TRUE;
+        sCtx->ClearDepthStencilView(sEfbDsv, D3D11_CLEAR_STENCIL, 1.0f, 0);
+        return;
+    }
     const f32 zero[4] = {0, 0, 0, 0};
     ID3D11RenderTargetView* marked = sShRtv[0] ? sShRtv[0] : sShRtv[1];
     sCtx->ClearRenderTargetView(marked, zero);
@@ -1817,6 +1848,7 @@ static void ShadowComposite() {
     const f32 v[4] = {0, step / sEfbPh, gPortSettings.shadowDark / 100.0f, 1};
     ShadowPass(sShBlurPs, sEfbRtv, NULL, NULL, sShMul, sShSrv[2], v);
     sCtx->ClearDepthStencilView(sEfbDsv, D3D11_CLEAR_STENCIL, 1.0f, 0);
+    DebugMessages("soft shadows");
 }
 
 // ------------------------------------------------------------------ frame-buffer copies
@@ -1937,7 +1969,26 @@ f32 PortGfxDisplayFps(void) {
 }
 static char sCapPrefix[400];
 static BOOL sCapBack;
+// --d3d-debug: the debug layer's new messages into the log (each different text only its first 20 times).
+static ID3D11InfoQueue* sInfoQ;
+static void DebugMessages(const char* where) {
+    if (!sInfoQ) return;
+    static std::map<std::string, u32> seen;
+    UINT64 n = sInfoQ->GetNumStoredMessages();
+    for (UINT64 i = 0; i < n; i++) {
+        SIZE_T len = 0;
+        if (FAILED(sInfoQ->GetMessage(i, NULL, &len)) || !len) continue;
+        std::vector<u8> buf; buf.resize(len);
+        D3D11_MESSAGE* m = (D3D11_MESSAGE*)buf.data();
+        if (FAILED(sInfoQ->GetMessage(i, m, &len)) || m->Severity > D3D11_MESSAGE_SEVERITY_WARNING) continue;
+        std::string text(m->pDescription, m->DescriptionByteLength ? m->DescriptionByteLength - 1 : 0);
+        if (++seen[text] <= 20) PortLog("d3d11 %s (%s): %s", m->Severity <= D3D11_MESSAGE_SEVERITY_ERROR ? "ERROR" : "warning", where, text.c_str());
+    }
+    sInfoQ->ClearStoredMessages();
+}
+
 static void PresentOut(BOOL fast) {
+    DebugMessages("frame");
     sShownCount++;
     Blit(sOutSrv, sBackRtv, 0, 0, sOutW, sOutH, 0, 0, 1, 1, NULL);
     if (!gPortOptions.screenshotStats) PortOverlayDraw(sBackRtv, sOutW, sOutH);
@@ -1992,6 +2043,7 @@ static void CopyEfb(const PortGx* g, u32 control) {
     if (!sStarted) return;
     s64 tf = Ticks();
     FlushDraws();
+    DebugMessages("draws");
     if (sShadowDirty) ShadowComposite();                    // soft shadows: into the picture before it is copied
     sTotalFlush += Ticks() - tf;
     sDrawBound = FALSE;
@@ -2305,19 +2357,25 @@ BOOL PortGfxStart(BOOL window) {
     // display driver time out and reset.
     const char* envGpu = getenv("PORT_GPU");
     BOOL useGpu = window || gPortOptions.gpu || (envGpu && *envGpu && *envGpu != '0') || gPortOptions.bench != 0 || gPortOptions.perfLog != NULL;
+    UINT flags = gPortOptions.d3dDebug ? D3D11_CREATE_DEVICE_DEBUG : 0;
     for (int i = useGpu ? 0 : 1; i < 2 && FAILED(hr); i++) {
         if (window) {
             DXGI_SWAP_CHAIN_DESC sd = {};
             sd.BufferCount = 2; sd.BufferDesc.Width = sOutW; sd.BufferDesc.Height = sOutH; sd.BufferDesc.Format = DXGI_FORMAT_R8G8B8A8_UNORM;
             sd.BufferUsage = DXGI_USAGE_RENDER_TARGET_OUTPUT; sd.OutputWindow = sWnd; sd.SampleDesc.Count = 1; sd.Windowed = TRUE;
-            hr = D3D11CreateDeviceAndSwapChain(NULL, kDrivers[i], NULL, 0, kLevels, 2, D3D11_SDK_VERSION, &sd, &sSwap, &sDev, NULL, &sCtx);
+            hr = D3D11CreateDeviceAndSwapChain(NULL, kDrivers[i], NULL, flags, kLevels, 2, D3D11_SDK_VERSION, &sd, &sSwap, &sDev, NULL, &sCtx);
         } else {
-            hr = D3D11CreateDevice(NULL, kDrivers[i], NULL, 0, kLevels, 2, D3D11_SDK_VERSION, &sDev, NULL, &sCtx);
+            hr = D3D11CreateDevice(NULL, kDrivers[i], NULL, flags, kLevels, 2, D3D11_SDK_VERSION, &sDev, NULL, &sCtx);
+        }
+        if (FAILED(hr) && flags) {                        // no debug layer installed (Windows optional feature "Graphics Tools")
+            PortLog("gfx: --d3d-debug: the Direct3D debug layer is not available (0x%08lX); going on without it", hr);
+            flags = 0; i--; continue;
         }
         if (SUCCEEDED(hr)) PortLog("gfx: Direct3D 11 on %s, output %ux%u, picture %ux%u (%s), frame buffer %ux%u (render scale %d%%)%s", i == 0 ? "the graphics card" : "the software rasteriser (WARP)",
                                    sOutW, sOutH, sPicW, sPicH, gPortSettings.wide ? "16:9" : "4:3", sEfbPw, sEfbPh, gPortSettings.renderScale, window ? "" : ", no window");
     }
     if (FAILED(hr)) { PortLog("gfx: no Direct3D 11 device (0x%08lX); nothing will be drawn", hr); return FALSE; }
+    if (flags) sDev->QueryInterface(__uuidof(ID3D11InfoQueue), (void**)&sInfoQ);
     if (sSwap) {
         ID3D11Texture2D* back = NULL;
         sSwap->GetBuffer(0, __uuidof(ID3D11Texture2D), (void**)&back);
@@ -2443,6 +2501,8 @@ BOOL PortGfxStart(BOOL window) {
 }
 
 const char* PortGfxStatsText(char* buf, u32 n) {
+    if (sStarted) PortLog("gfx record ring: %u segment changes, %u records started exactly at a segment end (each was a write without a GPU wait, or past the buffer, before the fix)", sRecWraps, sRecExactFits);
+    if (sStarted) PortLog("gfx soft shadows: %u composites, %u shown frames", sShadowComposites, sGfxStats.presents);
     if (sStarted) PortLog("gfx copy time: flush %.1f s, resolve %.1f s, blit %.1f s", sTotalFlush / (double)Ticks_freq(), sTRes / (double)Ticks_freq(), sTBlit / (double)Ticks_freq()); if (sStarted) PortLog("gfx new textures %u: %.1f s, rtv %.1f s", sNewTex, sTNew / (double)Ticks_freq(), sTRtv / (double)Ticks_freq()); PortLog("gfx tex/display part %.1f s, clear+present %.1f s; disp %.1f", sTMk / (double)Ticks_freq(), sTPres / (double)Ticks_freq(), sTDisp / (double)Ticks_freq(), sTPres / (double)Ticks_freq());
     if (sStarted) PortLog("gfx vertices: %u of %u draws (%llu of %llu vertices) transformed on the GPU; %u batches drawn", sGfxStats.gpuDraws, sGfxStats.draws,
                           (unsigned long long)sGfxStats.gpuVerts, (unsigned long long)sGfxStats.verts, sGfxStats.flushes);

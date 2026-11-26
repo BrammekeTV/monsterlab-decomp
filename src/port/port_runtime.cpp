@@ -1226,6 +1226,7 @@ struct PortBoot {
             else if ((!strcmp(a, "--data") || !strcmp(a, "--iso")) && i + 1 < __argc) asked = __argv[++i];
             else if (!strcmp(a, "--window")) gPortOptions.window = TRUE;
             else if (!strcmp(a, "--gpu")) gPortOptions.gpu = TRUE;
+            else if (!strcmp(a, "--d3d-debug")) gPortOptions.d3dDebug = TRUE;
             else if (!strcmp(a, "--wav") && i + 1 < __argc) gPortOptions.wav = __argv[++i];
             else if (!strcmp(a, "--no-audio")) gPortOptions.noAudio = TRUE;
             else if (!strcmp(a, "--no-movies")) gPortOptions.noMovies = TRUE;
