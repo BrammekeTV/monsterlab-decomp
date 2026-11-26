@@ -15,6 +15,7 @@
 #include <string.h>
 
 #include "port/port.h"
+#include "port/port_stateslots.h"
 #include "port/port_input.h"
 #include "port/port_mods.h"
 
@@ -95,6 +96,9 @@ BOOL PortSettingsLoad(const char* path, PortSettings* s) {
             if (!strcmp(key, "volume")) s->volume = Clamp(atoi(val), 0, 100);
             else if (!strcmp(key, "mute")) s->mute = atoi(val) != 0;
             else if (!strcmp(key, "remote_speaker")) s->remoteSpeaker = atoi(val) != 0;
+        } else if (!strcmp(section, "savestates")) {
+            for (int k = 0; k < PORT_STATEKEY_COUNT; k++)
+                if (!_stricmp(key, kPortStateKeyNames[k])) gPortStateKeys[k] = Clamp(atoi(val), 0, 255);
         } else if (!strcmp(section, "controls")) {
             for (int i = 0; i < gPortBindingCount; i++) {
                 PortBinding* b = &gPortBindings[i];
@@ -133,6 +137,9 @@ BOOL PortSettingsSave(const char* path, const PortSettings* s) {
     if (s->gamePath[0]) fprintf(f, "; your Monster Lab disc image (.iso, .wbfs, .rvz) or extracted folder\n[game]\npath = %s\n\n", s->gamePath);
     fprintf(f, "[audio]\nvolume = %d\nmute = %d\n; remote_speaker: also play the sounds the console sends to the Wii Remote's speaker\nremote_speaker = %d\n\n", s->volume, s->mute ? 1 : 0, s->remoteSpeaker ? 1 : 0);
     fprintf(f, "; dump: save every texture the game draws with as a PNG; folder: where (empty: dump\\textures next to the exe)\n[textures]\ndump = %d\nfolder = %s\n\n", s->dumpTextures ? 1 : 0, s->dumpDir);
+    fprintf(f, "; savestate keys, Windows virtual-key codes (F1 = 112 ... F12 = 123), 0 = none: save and load the current slot, previous and next slot\n[savestates]\n");
+    for (int k = 0; k < PORT_STATEKEY_COUNT; k++) fprintf(f, "%s = %d\n", kPortStateKeyNames[k], gPortStateKeys[k]);
+    fprintf(f, "\n");
     fprintf(f, "; NAME = key 1, key 2, mouse button (1 left, 2 right), gamepad bits (hex); keys are Windows virtual-key codes\n[controls]\n");
     for (int i = 0; i < gPortBindingCount; i++) {
         const PortBinding* b = &gPortBindings[i];

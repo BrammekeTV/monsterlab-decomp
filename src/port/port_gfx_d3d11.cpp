@@ -12,6 +12,7 @@
 #define WIN32_LEAN_AND_MEAN
 #define NOMINMAX
 #include <windows.h>
+#include <intrin.h>
 #include <d3d11.h>
 #include <d3dcompiler.h>
 #include <math.h>
@@ -28,6 +29,7 @@
 #include "port/port_gx.h"
 #include "port/port_mods.h"
 #include "port/port_overlay.h"
+#include "port/port_stateslots.h"
 
 #pragma comment(lib, "d3d11.lib")
 #pragma comment(lib, "d3dcompiler.lib")
@@ -92,7 +94,11 @@ struct OutKey { u32 bm, zm, alpha, cull, vp[6], sc0, sc1; f32 squeeze; s32 offX,
 static struct { u32 draws, tris, presents, texCopies, textures, shaders, skipped, gpuDraws, flushes; u64 verts, gpuVerts; } sGfxStats;
 // This frame so far (reset at each display copy): time inside this backend, draws, GX vertices, copies.
 static s64 sTotalDraw, sTotalCopy, sTotalFlush, sTRes, sTBlit, sTMk, sTDisp, sTPres, sTNew, sTRtv; static u32 sNewTex; static std::vector<ID3D11Texture2D*> sTexPool;     // time inside the backend over the whole run (the boot summary)
-static struct { s64 renderTicks; u32 draws, verts, copies; } sFrame;
+static struct { s64 renderTicks; u32 draws, verts, copies; u64 drawTsc, drawFlushTsc, copyTsc, flushTsc, decodeTsc; } sFrame;
+static u64 sCopyStart;                 // time-stamp counter after a copy flushed the queued draws
+static BOOL sSplit;                    // --perf-log or PORT_PERF_LOG: time the parts of the backend (time-stamp counter)
+static inline u64 Tsc(void) { return sSplit ? __rdtsc() : 0; }
+void PortSamplerThread(DWORD id);      // port_sampler.cpp
 static inline s64 Ticks_freq(void) { LARGE_INTEGER f; QueryPerformanceFrequency(&f); return f.QuadPart; }
 static inline s64 Ticks(void) { LARGE_INTEGER t; QueryPerformanceCounter(&t); return t.QuadPart; }
 static u8 sTlutMem[0x80000];           // the palette half of the console's texture memory
@@ -113,6 +119,7 @@ static volatile LONG sWheel;           // mouse wheel movement the settings scre
 f32 PortGfxTakeWheel(void) { return (f32)InterlockedExchange(&sWheel, 0) / WHEEL_DELTA; }
 #define WM_PORT_TITLE (WM_APP + 1)     // the game thread posts it; the title is set here, on the window's own thread
 static char sTitleText[96];
+static BOOL sHandoff, sShowFull;       // a window waiting for a loaded state (PortGfxShowWindow)
 static void PostTitle(const char* t) {
     if (!sWnd) return;
     snprintf(sTitleText, sizeof(sTitleText), "%s", t);
@@ -137,7 +144,12 @@ static DWORD WINAPI WindowThread(void*) {
     AdjustWindowRect(&r, WS_OVERLAPPEDWINDOW, FALSE);
     // PORT_HIDDEN=1: not visible. PORT_OFFSCREEN=1: visible (the real code path) but far outside every monitor. For tests.
     BOOL offscreen = getenv("PORT_OFFSCREEN") != NULL;
-    sWnd = CreateWindowA(wc.lpszClassName, "Monster Lab (PC port)", WS_OVERLAPPEDWINDOW | (getenv("PORT_HIDDEN") ? 0 : WS_VISIBLE), offscreen ? -32000 : CW_USEDEFAULT, offscreen ? -32000 : CW_USEDEFAULT,
+    // Started by a savestate load: the window takes the old one's place and stays hidden until the state runs.
+    const char* place = getenv("MONSTERLAB_STATE_RECT");
+    int px = 0, py = 0, full = 0;
+    sHandoff = place && sscanf(place, "%d,%d,%d", &px, &py, &full) == 3;
+    sShowFull = sHandoff && full;
+    sWnd = CreateWindowA(wc.lpszClassName, "Monster Lab (PC port)", WS_OVERLAPPEDWINDOW | (getenv("PORT_HIDDEN") || sHandoff ? 0 : WS_VISIBLE), sHandoff ? px : offscreen ? -32000 : CW_USEDEFAULT, sHandoff ? py : offscreen ? -32000 : CW_USEDEFAULT,
                          r.right - r.left, r.bottom - r.top, NULL, NULL, wc.hInstance, NULL);
     SetEvent(sWndReady);
     MSG msg;
@@ -146,11 +158,26 @@ static DWORD WINAPI WindowThread(void*) {
 }
 
 HWND PortGfxWindow(void) { return sWnd; }
+static RECT sBeforeFull;
+static BOOL sFull;
+BOOL PortGfxIsFullscreen(void) { return sFull; }
+BOOL PortGfxWindowPlace(RECT* r) {
+    if (!sWnd) return FALSE;
+    if (sFull) { *r = sBeforeFull; return TRUE; }
+    return GetWindowRect(sWnd, r);
+}
+void PortGfxShowWindow(void) {
+    if (!sWnd || !sHandoff) return;
+    sHandoff = FALSE;
+    if (!getenv("PORT_HIDDEN")) ShowWindow(sWnd, SW_SHOW);
+    if (sShowFull) PortGfxSetFullscreen(TRUE);
+    SetForegroundWindow(sWnd);
+}
 
 // Fullscreen is the same window without a border over its whole monitor; the picture is stretched to it.
 void PortGfxSetFullscreen(BOOL on) {
-    static RECT saved;
-    static BOOL full;
+    RECT& saved = sBeforeFull;
+    BOOL& full = sFull;
     if (!sWnd || on == full) return;
     full = on;
     if (on) {
@@ -1310,6 +1337,7 @@ static void DrawPrims(const PortGx* g, u32 prim, const PortGxLayout* L, u32 coun
         }
         active[nActive++] = a;
     }
+    const u64 tscDecode = Tsc();                            // perf: the vertex loops of both paths count as decode
     // Where a 2D draw lands on the screen (clip x, y), for the widescreen and movie decisions below: worked out from the
     // positions alone for a GPU draw.
     f32 bnd[4] = {0, 0, 0, 0};                              // lowest x, highest x, lowest y, highest y
@@ -1408,6 +1436,7 @@ static void DrawPrims(const PortGx* g, u32 prim, const PortGxLayout* L, u32 coun
         }
     }
 
+    sFrame.decodeTsc += Tsc() - tscDecode;
     // Widescreen. The game gives its 3D views a 16:9 projection, but lays out everything 2D
     // (orthographic) for 640x480 and lets the TV stretch it. Here 2D draws keep their shape and
     // stay centred instead: x is narrowed by 3/4. Layers that belong to the whole screen stay as
@@ -1545,6 +1574,7 @@ static void DrawPrims(const PortGx* g, u32 prim, const PortGxLayout* L, u32 coun
     }
     u16 base = (u16)sBVCount;
     {
+        const u64 tscVerts = Tsc();
         size_t at = sBV.size();
         sBV.resize(at + (size_t)count * stride);
         if (gpu) {
@@ -1600,6 +1630,7 @@ static void DrawPrims(const PortGx* g, u32 prim, const PortGxLayout* L, u32 coun
                 }
             }
         } else for (u32 n = 0; n < count; n++) memcpy(&sBV[at + (size_t)n * stride], &sVerts[n], stride);
+        sFrame.decodeTsc += Tsc() - tscVerts;
         sBVCount += count;
     }
     const size_t nIdxBefore = sBI.size();
@@ -1640,9 +1671,15 @@ static void MapOverrun(const char* what, size_t at, size_t bytes, size_t size) {
 }
 
 // Uploads and draws what DrawPrims has queued.
+static void FlushQueued();
 static void FlushDraws() {
     CloseBatch();
     if (sBatches.empty()) return;
+    const u64 tsc = Tsc();
+    FlushQueued();
+    sFrame.flushTsc += Tsc() - tsc;
+}
+static void FlushQueued() {
     sGfxStats.flushes += (u32)sBatches.size();
     if (!sRec.empty()) {                                    // the GPU path's records, behind those already in the buffer
         D3D11_MAPPED_SUBRESOURCE rm;
@@ -1892,6 +1929,17 @@ static void FrameStats(PortFrameStats* s) {
         s->waitMs = (f32)((wait - lastWait) * ms);
         s->gameMs = std::max(s->frameMs - s->renderMs - s->waitMs, 0.0f);
     }
+    static u64 lastTsc;
+    const u64 tsc = Tsc();
+    if (last && lastTsc && tsc > lastTsc && s->frameMs > 0.0f) {
+        const f64 perTick = s->frameMs / (f64)(tsc - lastTsc);   // ms per time-stamp tick, from this frame itself
+        const u64 other = sFrame.decodeTsc + sFrame.drawFlushTsc;
+        s->decodeMs = (f32)(sFrame.decodeTsc * perTick);
+        s->setupMs = (f32)((sFrame.drawTsc > other ? sFrame.drawTsc - other : 0) * perTick);
+        s->flushMs = (f32)(sFrame.flushTsc * perTick);
+        s->copyMs = (f32)(sFrame.copyTsc * perTick);
+    }
+    lastTsc = tsc;
     last = now; lastWait = wait;
     sTexGen++;
     sModBytes = 0;
@@ -1912,7 +1960,7 @@ static void FrameStats(PortFrameStats* s) {
             memset(perfSum, 0, sizeof(perfSum)); perfN = 0;
         }
     }
-    sFrame.renderTicks = 0; sFrame.draws = sFrame.verts = sFrame.copies = 0;
+    memset(&sFrame, 0, sizeof(sFrame));
 }
 
 // Whether the window should get a picture now. Paced: always. Fast-forwarding: four times a second,
@@ -2043,6 +2091,7 @@ static void CopyEfb(const PortGx* g, u32 control) {
     if (!sStarted) return;
     s64 tf = Ticks();
     FlushDraws();
+    sCopyStart = Tsc();
     DebugMessages("draws");
     if (sShadowDirty) ShadowComposite();                    // soft shadows: into the picture before it is copied
     sTotalFlush += Ticks() - tf;
@@ -2087,6 +2136,7 @@ static void CopyEfb(const PortGx* g, u32 control) {
         sShownLines = h;
         sShown = TRUE;
         sDrawThread = GetCurrentThreadId();
+        PortSamplerThread(sDrawThread);
         // The overlay goes over the window's picture only, or with --screenshot-stats into the output picture itself.
         PortFrameStats stats;
         FrameStats(&stats);
@@ -2298,6 +2348,31 @@ BOOL PortGfxSaveScreenshot(const char* path) {
     return SavePng(sOutTex, sOutW, sOutH, path);
 }
 
+// The shown picture without the overlay, scaled down (a savestate slot's picture).
+BOOL PortGfxThumbnail(u32 w, u32 h, u8* rgba) {
+    if (!sStarted || !sShown) return FALSE;
+    std::lock_guard<std::recursive_mutex> lk(sGfxLock);
+    D3D11_TEXTURE2D_DESC d;
+    sOutTex->GetDesc(&d);
+    d.Usage = D3D11_USAGE_STAGING; d.BindFlags = 0; d.CPUAccessFlags = D3D11_CPU_ACCESS_READ;
+    ID3D11Texture2D* st = NULL;
+    if (FAILED(sDev->CreateTexture2D(&d, NULL, &st))) return FALSE;
+    sCtx->CopyResource(st, sOutTex);
+    D3D11_MAPPED_SUBRESOURCE map;
+    if (FAILED(sCtx->Map(st, 0, D3D11_MAP_READ, 0, &map))) { st->Release(); return FALSE; }
+    for (u32 y = 0; y < h; y++) {
+        const u8* s = (const u8*)map.pData + (size_t)(sPicY + (y * 2 + 1) * sPicH / (h * 2)) * map.RowPitch;
+        for (u32 x = 0; x < w; x++) {
+            const u8* p = s + (sPicX + (x * 2 + 1) * sPicW / (w * 2)) * 4;
+            u8* o = rgba + (y * w + x) * 4;
+            o[0] = p[0]; o[1] = p[1]; o[2] = p[2]; o[3] = 255;
+        }
+    }
+    sCtx->Unmap(st, 0);
+    st->Release();
+    return TRUE;
+}
+
 // ------------------------------------------------------------------ start
 // Fast-forward with a frame target: draws only matter through the copies of the frame buffer that later
 // frames use (the engine redraws and recopies everything each frame) and the picture at the target, so the
@@ -2310,7 +2385,10 @@ static void Draw(const PortGx* g, u32 prim, const PortGxLayout* L, u32 count, co
     if (FastDropping()) { sFastSkipped++; return; }
     std::lock_guard<std::recursive_mutex> lk(sGfxLock);
     s64 t = Ticks();
+    const u64 tsc = Tsc(), flushed = sFrame.flushTsc;
     DrawPrims(g, prim, L, count, data);
+    sFrame.drawTsc += Tsc() - tsc;
+    sFrame.drawFlushTsc += sFrame.flushTsc - flushed;
     sFrame.renderTicks += Ticks() - t;
     sTotalDraw += Ticks() - t;
 }
@@ -2321,7 +2399,9 @@ static void Copy(const PortGx* g, u32 control) {
         return;
     }
     s64 t = Ticks();
-    CopyEfb(g, control);
+    sCopyStart = 0;
+    CopyEfb(g, control);                        // (a display copy ends the frame: its own time goes into the next one)
+    if (sCopyStart) sFrame.copyTsc += Tsc() - sCopyStart;
     sFrame.renderTicks += Ticks() - t;
     sTotalCopy += Ticks() - t;
 }
@@ -2347,7 +2427,7 @@ BOOL PortGfxStart(BOOL window) {
         CloseHandle(CreateThread(NULL, 0, WindowThread, NULL, 0, NULL));
         WaitForSingleObject(sWndReady, 5000);
         if (!sWnd) window = FALSE;
-        else if (gPortSettings.fullscreen) PortGfxSetFullscreen(TRUE);
+        else if (gPortSettings.fullscreen && !sHandoff) PortGfxSetFullscreen(TRUE);
     }
     static const D3D_DRIVER_TYPE kDrivers[2] = {D3D_DRIVER_TYPE_HARDWARE, D3D_DRIVER_TYPE_WARP};
     static const D3D_FEATURE_LEVEL kLevels[2] = {D3D_FEATURE_LEVEL_11_0, D3D_FEATURE_LEVEL_10_0};
@@ -2495,6 +2575,8 @@ BOOL PortGfxStart(BOOL window) {
     sTraceFrom = getenv("PORT_GFX_TRACE") ? (u32)atoi(getenv("PORT_GFX_TRACE")) : 0;
     sTrace = getenv("PORT_GFX_TRACE") != NULL && sTraceFrom <= 1;
     PortOverlayStart(sDev, sCtx);
+    const char* perfEnv = getenv("PORT_PERF_LOG");
+    sSplit = gPortOptions.perfLog != NULL || (perfEnv && *perfEnv == '1');
     sStarted = TRUE;
     PortGxSetBackend(&kBackend);
     return TRUE;

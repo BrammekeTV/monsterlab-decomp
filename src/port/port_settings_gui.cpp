@@ -12,6 +12,7 @@
 #include "port/port_input.h"
 #include "port/port_mods.h"
 #include "port/port_overlay.h"
+#include "port/port_stateslots.h"
 
 HWND PortGfxWindow(void);
 
@@ -128,8 +129,21 @@ static void PageMods(void) {
             if (ImGui::Checkbox("##on", &on)) { m->enabled = on; changed = TRUE; }
             ImGui::TableNextColumn();
             ImGui::AlignTextToFramePadding();
-            if (m->present) ImGui::TextUnformatted(m->name);
-            else ImGui::TextDisabled("%s (folder not found)", m->name);
+            if (!m->present) ImGui::TextDisabled("%s (folder not found)", m->name);
+            else {
+                // mod.ini's name, version and author, the description under them; the folder in the tooltip.
+                ImGui::TextUnformatted(m->title[0] ? m->title : m->name);
+                if (ImGui::IsItemHovered()) ImGui::SetTooltip("Folder: %s", m->name);
+                if (m->version[0] || m->author[0]) {
+                    ImGui::SameLine();
+                    ImGui::TextDisabled("%s%s%s%s", m->version, m->version[0] && m->author[0] ? " " : "", m->author[0] ? "by " : "", m->author);
+                }
+                if (m->about[0]) {
+                    ImGui::PushTextWrapPos(0.0f);
+                    ImGui::TextDisabled("%s", m->about);
+                    ImGui::PopTextWrapPos();
+                }
+            }
             ImGui::TableNextColumn();
             if (m->present) ImGui::Text("%u file%s, %u texture%s", m->fileCount, m->fileCount == 1 ? "" : "s", m->textureCount, m->textureCount == 1 ? "" : "s");
             ImGui::TableNextColumn();
@@ -414,6 +428,56 @@ static void PageControls(void) {
     ImGui::EndTable();
 }
 
+// Ten slots: when each was saved, its picture, save and load. The game goes on behind the screen; a save or
+// load happens at its next frame end.
+static void PageStates(void) {
+    static PortStateSlotFile files[PORT_STATE_SLOTS];
+    static BOOL there[PORT_STATE_SLOTS];
+    static DWORD looked;
+    if (!looked || GetTickCount() - looked >= 500) {
+        looked = GetTickCount();
+        for (int i = 0; i < PORT_STATE_SLOTS; i++) there[i] = PortStateSlotInfo(i + 1, &files[i]);
+    }
+    char k[PORT_STATEKEY_COUNT][64];
+    ImGui::PushTextWrapPos(0.0f);
+    ImGui::TextDisabled("%s saves and %s loads the current slot; %s / %s pick the slot (keys: [savestates] in monsterlab.ini). A state only loads into the build that saved it.",
+                        KeyName(gPortStateKeys[PORT_STATEKEY_SAVE], k[0], 64), KeyName(gPortStateKeys[PORT_STATEKEY_LOAD], k[1], 64),
+                        KeyName(gPortStateKeys[PORT_STATEKEY_PREV], k[2], 64), KeyName(gPortStateKeys[PORT_STATEKEY_NEXT], k[3], 64));
+    ImGui::PopTextWrapPos();
+    if (!ImGui::BeginTable("states", 4, ImGuiTableFlags_RowBg | ImGuiTableFlags_BordersInnerH | ImGuiTableFlags_ScrollY)) return;
+    ImGui::TableSetupColumn("Slot", ImGuiTableColumnFlags_WidthFixed);
+    ImGui::TableSetupColumn("Picture", ImGuiTableColumnFlags_WidthFixed);
+    ImGui::TableSetupColumn("Saved", ImGuiTableColumnFlags_WidthStretch);
+    ImGui::TableSetupColumn("##do", ImGuiTableColumnFlags_WidthFixed);
+    ImGui::TableSetupScrollFreeze(0, 1);
+    ImGui::TableHeadersRow();
+    ImVec2 size(ImGui::GetFontSize() * 5.0f, ImGui::GetFontSize() * 5.0f * PORT_THUMB_H / PORT_THUMB_W);
+    for (int i = 0; i < PORT_STATE_SLOTS; i++) {
+        ImGui::PushID(i);
+        ImGui::TableNextRow();
+        ImGui::TableNextColumn();
+        ImGui::Text("%d%s", i + 1, PortStateSlot() == i + 1 ? " *" : "");
+        ImGui::TableNextColumn();
+        void* thumb = there[i] ? PortOverlayThumb(i + 1, files[i].stamp) : NULL;
+        if (thumb) ImGui::Image((ImTextureID)(intptr_t)thumb, size);
+        else ImGui::Dummy(size);
+        ImGui::TableNextColumn();
+        if (!there[i]) ImGui::TextDisabled("empty");
+        else {
+            ImGui::TextUnformatted(files[i].when);
+            if (files[i].problem) ImGui::TextColored(ImVec4(1.0f, 0.7f, 0.3f, 1.0f), "%s", files[i].problem);
+        }
+        ImGui::TableNextColumn();
+        if (ImGui::Button("Save")) { PortStateRequest(PORT_STATEKEY_SAVE, i + 1); looked = 0; }
+        ImGui::SameLine();
+        ImGui::BeginDisabled(!there[i] || files[i].problem);
+        if (ImGui::Button("Load")) { PortStateRequest(PORT_STATEKEY_LOAD, i + 1); PortGuiSetOpen(FALSE); }
+        ImGui::EndDisabled();
+        ImGui::PopID();
+    }
+    ImGui::EndTable();
+}
+
 // Called between ImGui::NewFrame and ImGui::Render.
 void PortGuiBuild(u32 w, u32 h) {
     if (!gPortGuiOpen) return;
@@ -433,6 +497,7 @@ void PortGuiBuild(u32 w, u32 h) {
                 if (ImGui::BeginTabItem("Controls", NULL, page == 2 ? ImGuiTabItemFlags_SetSelected : 0)) { PageControls(); ImGui::EndTabItem(); }
                 if (ImGui::BeginTabItem("Game", NULL, page == 3 ? ImGuiTabItemFlags_SetSelected : 0)) { PageGame(); ImGui::EndTabItem(); }
                 if (ImGui::BeginTabItem("Mods", NULL, page == 4 ? ImGuiTabItemFlags_SetSelected : 0)) { PageMods(); ImGui::EndTabItem(); }
+                if (ImGui::BeginTabItem("Savestates", NULL, page == 5 ? ImGuiTabItemFlags_SetSelected : 0)) { PageStates(); ImGui::EndTabItem(); }
                 ImGui::EndTabBar();
             }
         }

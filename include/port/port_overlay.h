@@ -14,6 +14,7 @@ typedef struct PortFrameStats {
     f32 renderMs;             // inside the Direct3D backend (draws and copies)
     f32 waitMs;               // asleep in VIWaitForRetrace
     f32 gameMs;               // the rest: game logic and the GX command stream
+    f32 decodeMs, setupMs, flushMs, copyMs;   // renderMs split, with --perf-log only: vertex decode, the rest of each draw, batch upload and draw calls, frame-buffer copies
     u32 draws, verts;         // draw calls and GX vertices
     u32 efbCopies;            // frame-buffer copies to a texture
     u32 textures;             // decoded textures alive, plus the frame-buffer copy textures
@@ -38,6 +39,7 @@ void PortGuiInput(u32 w, u32 h);
 void PortGuiBuild(u32 w, u32 h);
 // Renderer hooks the settings screen uses (port_gfx_d3d11.cpp).
 void PortGfxSetFullscreen(BOOL on);
+void* PortOverlayThumb(int slot, unsigned long long stamp);   // port_overlay.cpp: a savestate slot's picture, or NULL
 f32  PortGfxTakeWheel(void);  // mouse wheel notches since the last call
 
 void PortOverlayStart(ID3D11Device* dev, ID3D11DeviceContext* ctx);

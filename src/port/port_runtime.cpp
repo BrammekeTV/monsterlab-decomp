@@ -14,6 +14,7 @@
 #include <string.h>
 
 #include "port/port.h"
+#include "port/port_stateslots.h"
 #include "port/port_input.h"
 #include "port/port_gx.h"
 #include "port/port_mods.h"
@@ -366,11 +367,6 @@ void PortFrameDone(void) {
         if (cur) PortLog("cursor: %.1f %.1f", *(f32*)(cur + 0x68), *(f32*)(cur + 0x6C));
     }
     if (!gPortOptions.fastAll && sFrames >= gPortOptions.fastForward) PortFastEnd();
-    if (gPortOptions.bench && !PortFastActive()) {      // the benchmark's 20 s of real time
-        static DWORD benchStart;
-        if (!benchStart) benchStart = GetTickCount();
-        else if (GetTickCount() - benchStart >= 20000) PortStop(0, "benchmark finished (20 s of real time)");
-    }
     for (s32 i = 0; i < sShotAtCount; i++) {          // --shot-at: extra pictures during the run
         if (sShotAt[i] != sFrames || !gPortOptions.screenshot) continue;
         char path[512];
@@ -380,6 +376,7 @@ void PortFrameDone(void) {
         if (PortGfxSaveScreenshot(path)) fprintf(stderr, "[port] screenshot: %s\n", path);
     }
     PortStateFrame(sFrames);                          // --save-state: a run that loads the state goes on from here
+    PortStateSlotsFrame(sFrames);                     // F5/F8 and the settings screen's slots (port_stateslots.cpp)
     if (gPortOptions.frameLimit && sFrames >= gPortOptions.frameLimit) {
         PortStop(0, "frame limit reached (%d frames)", sFrames);
     }
@@ -1220,8 +1217,8 @@ struct PortBoot {
             else if (!strcmp(a, "--perf-log") && i + 1 < __argc) gPortOptions.perfLog = __argv[++i];
             else if (!strcmp(a, "--bench") && i + 1 < __argc) {
                 const char* v = __argv[++i];
-                gPortOptions.bench = !strcmp(v, "menu") ? 1 : !strcmp(v, "village") ? 2 : 0;
-                if (!gPortOptions.bench) fprintf(stderr, "[port] --bench %s: expected menu or village\n", v);
+                gPortOptions.bench = !strcmp(v, "menu") ? 1 : !strcmp(v, "village") ? 2 : !strcmp(v, "battle") ? 3 : !strcmp(v, "castle") ? 4 : 0;
+                if (!gPortOptions.bench) fprintf(stderr, "[port] --bench %s: expected menu, village, battle or castle\n", v);
             }
             else if (!strcmp(a, "--seconds") && i + 1 < __argc) { gPortOptions.secondsLimit = atoi(__argv[++i]); sawSeconds = TRUE; }
             else if ((!strcmp(a, "--data") || !strcmp(a, "--iso")) && i + 1 < __argc) asked = __argv[++i];
@@ -1260,7 +1257,7 @@ struct PortBoot {
                 PortGuiSetOpen(TRUE);
                 if (i + 1 < __argc && __argv[i + 1][0] != '-') {
                     const char* page = __argv[++i];
-                    gPortGuiPage = !strcmp(page, "audio") ? 1 : !strcmp(page, "controls") ? 2 : !strcmp(page, "game") ? 3 : !strcmp(page, "mods") ? 4 : 0;
+                    gPortGuiPage = !strcmp(page, "audio") ? 1 : !strcmp(page, "controls") ? 2 : !strcmp(page, "game") ? 3 : !strcmp(page, "mods") ? 4 : !strcmp(page, "savestates") ? 5 : 0;
                 }
             }
             else if (!strcmp(a, "--vsync")) gPortSettings.vsync = TRUE;
@@ -1318,6 +1315,9 @@ struct PortBoot {
                 else fprintf(stderr, "[port] --aspect %s: expected 4:3 or 16:9\n", v);
             }
             else if ((!strcmp(a, "--save-state") || !strcmp(a, "--load-state")) && i + 1 < __argc) { PortStateAddArg(a, __argv[i + 1]); i++; }
+            else if (!strcmp(a, "--state-key") && i + 1 < __argc) {
+                if (!PortStateAddKeyArg(__argv[++i])) fprintf(stderr, "[port] --state-key %s: expected save, load, prev or next@FRAME\n", __argv[i]);
+            }
             else if (!strcmp(a, "--pointer") && i + 1 < __argc) {
                 if (!PortInputAddPointer(__argv[++i])) fprintf(stderr, "[port] --pointer %s: expected X,Y@FRAME\n", __argv[i]);
             }
@@ -1326,14 +1326,23 @@ struct PortBoot {
             }
         }
 
-        if (gPortOptions.bench) {                 // --bench: the scripted run of docs/port_runtime.md; 20 s of real time after the fast-forward
+        if (gPortOptions.bench) {                 // --bench: the scripted runs of docs/port_runtime.md, measured after the fast-forward
             gPortOptions.toMenu = TRUE;
             gPortOptions.noMovies = TRUE;
-            if (gPortOptions.bench == 2) {        // village: title, new game conversation, the village map (idle from about frame 4710)
-                static const char* const kPresses[] = {"A@3000-3006", "A@3600-3610", "A@4000-4006", "A@4200-4206"};
-                for (const char* p : kPresses) PortInputAddPress(p);
-                PortInputAddPointer("663,200@3500");
-                if (gPortOptions.fastForward < 4800) gPortOptions.fastForward = 4800;
+            // The inputs are those of tools/playthrough.py. Join Now is pointed at in the console's own pointer values,
+            // so the runs reach the same place at every window size and aspect.
+            static const char* const kVillage[] = {"A@3000-3006", "A@3600-3610", "A@4000-4006", "A@4200-4206", NULL};
+            static const char* const kBattle[] = {"A@3000-3006", "A@3600-3610", "A@4000-4006", "A@4200-4206",
+                "A@5300-5306", "A@5500-5506", "LEFT@5650-5700", "A@6000-6006", "A@6200-6206", "A@6400-6406", "A@6600-6606",
+                "UP@7250-7300", "UP@7450-7500", "A@8500-9250/150", "STICK_UP@9450-13300", NULL};
+            static const char* const kCastle[] = {"A@3000-3006", "A@3600-3610", NULL};   // the Command Room, Fuseless waiting
+            const char* const* presses = gPortOptions.bench == 2 ? kVillage : gPortOptions.bench == 3 ? kBattle : gPortOptions.bench == 4 ? kCastle : NULL;
+            if (presses) {
+                for (; *presses; presses++) PortInputAddPress(*presses);
+                PortInputAddConsolePointer(-0.4125f, -0.5037f, 3500);     // Join Now
+                // village: the map is idle from about frame 4710; battle: the first fight, its HUD is up by 8100
+                const s32 from = gPortOptions.bench == 2 ? 4800 : gPortOptions.bench == 3 ? 8300 : 3900;
+                if (gPortOptions.fastForward < from) gPortOptions.fastForward = from;
             }
             if (!gPortOptions.perfLog) gPortOptions.perfLog = "build/pc/bench.csv";
         }
@@ -1344,6 +1353,8 @@ struct PortBoot {
             PortInputAddPress("A@2600-2610");
             if (!sawFrames) gPortOptions.frameLimit = 0;
             if (!sawSeconds) gPortOptions.secondsLimit = 0;
+            // A benchmark measures 1200 frames (20 s at 60 fps) after the fast-forward: the same frames however fast they run.
+            if (gPortOptions.bench && !sawFrames) gPortOptions.frameLimit = gPortOptions.fastForward + 1200;
         }
         // The Wii's two memory blocks at their original addresses. The code range must be executable.
         void* m1 = VirtualAlloc((void*)(uintptr_t)PORT_MEM1_BASE, PORT_MEM1_SIZE, MEM_RESERVE | MEM_COMMIT, PAGE_READWRITE);
@@ -1470,9 +1481,9 @@ static void __cdecl PortPreMain(void) {
     }
     BOOL load = PortStateLoadPath() && gPortOptions.haveData && !gPortOptions.selfTest;
     if (!load) PortStartInterrupts();                       // a state's memory is put back before anything else runs
-    if (gPortOptions.haveData && !gPortOptions.selfTest && (gPortOptions.window || gPortOptions.screenshot || gPortOptions.showTexture >= 0))
-        PortSamplerStart();                                 // PORT_SAMPLE=1: instruction-pointer sampler (src/port/port_sampler.cpp)
-        PortGfxStart(gPortOptions.window);
+    PortSamplerStart();                                     // PORT_SAMPLE=1: instruction-pointer sampler (src/port/port_sampler.cpp)
+    // Every run of the game renders, headless ones too (in software unless --gpu): the tests rely on that.
+    PortGfxStart(gPortOptions.window);
     if (load) {
         PortStateOnLoad(ScriptTraceAfterLoad);
         PortStateOnLoad(PortStartInterrupts);

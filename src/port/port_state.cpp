@@ -23,6 +23,7 @@
 #include <time.h>
 
 #include "port/port.h"
+#include "port/port_stateslots.h"
 
 #pragma comment(lib, "cabinet.lib")
 #pragma warning(disable : 4733)   // fs:[0] is set on purpose: a thread continues the exception chain of its saved stack
@@ -333,9 +334,9 @@ static void ClearSaveFiles(const char* root) {
     }
 }
 
-static BOOL Save(const char* path, s32 frame) {
-    if (PortBinkPlaying()) { PortLog("state: %s not written: a movie is playing (frame %d); run with --no-movies", path, frame); return FALSE; }
-    if (PortNandBusy()) { PortLog("state: %s not written: the game has a save file open (frame %d)", path, frame); return FALSE; }
+s32 PortStateWrite(const char* path, s32 frame) {
+    if (PortBinkPlaying()) { PortLog("state: %s not written: a movie is playing (frame %d); run with --no-movies", path, frame); return PORT_STATE_MOVIE; }
+    if (PortNandBusy()) { PortLog("state: %s not written: the game has a save file open (frame %d)", path, frame); return PORT_STATE_LATER; }
     Header h = {};
     h.magic = kMagic;
     h.version = kVersion;
@@ -348,19 +349,19 @@ static BOOL Save(const char* path, s32 frame) {
     PortClockFreeze();
     PortCtx* ctx[PORT_STACK_SLOTS] = {};
     s32 self = PortSchedSave(ctx, h.active);
-    if (self < 0) { PortLog("state: %s not written: frame %d ended inside an interrupt of a real-time run; save in a --fast run", path, frame); return FALSE; }
+    if (self < 0) { PortLog("state: %s not written: frame %d ended inside an interrupt of a real-time run; save in a --fast run", path, frame); return PORT_STATE_LATER; }
     // The saving thread's own registers. In a process that loads the state this call returns 1.
     volatile const char* resumedPath = path;
     if (PortCtxCapture(ctx[self])) {
         (void)resumedPath;
-        return TRUE;                                   // the loaded process continues here, in PortStateFrame
+        return PORT_STATE_RESUMED;                     // the loaded process continues here, in the caller
     }
     for (int i = 0; i < PORT_STACK_SLOTS; i++) if (h.active[i]) h.ctx[i] = *ctx[i];
 
     char tmp[420];
     snprintf(tmp, sizeof(tmp), "%s.tmp", path);
     FILE* f = fopen(tmp, "wb");
-    if (!f) { PortLog("state: cannot write %s", path); return FALSE; }
+    if (!f) { PortLog("state: cannot write %s", path); return PORT_STATE_FAILED; }
     if (!sPack) {
         CreateCompressor(COMPRESS_ALGORITHM_XPRESS_HUFF, NULL, &sPack);
         sPackBuf = (u8*)malloc(kPiece + 0x10000);
@@ -397,16 +398,31 @@ static BOOL Save(const char* path, s32 frame) {
     long bytes = ftell(f);
     ok = fclose(f) == 0 && ok;
     if (ok) ok = MoveFileExA(tmp, path, MOVEFILE_REPLACE_EXISTING);
-    if (!ok) { PortLog("state: writing %s failed", path); DeleteFileA(tmp); return FALSE; }
+    if (!ok) { PortLog("state: writing %s failed", path); DeleteFileA(tmp); return PORT_STATE_FAILED; }
     PortLog("state: saved frame %d to %s (%.1f MB, build %08X of %s)", frame, path, bytes / 1048576.0, h.buildHash, h.built);
-    return TRUE;
+    return PORT_STATE_SAVED;
 }
 
 void PortStateFrame(s32 frame) {
-    for (s32 i = 0; i < sSaveCount; i++) if (sSave[i].frame == frame) Save(sSave[i].path, frame);
+    for (s32 i = 0; i < sSaveCount; i++) if (sSave[i].frame == frame) PortStateWrite(sSave[i].path, frame);
 }
 
 // ------------------------------------------------------------------ reading
+BOOL PortStateBusy(void) { return PortNandBusy(); }
+
+// What PortStateLoad would refuse by the header, in the words the player is shown.
+const char* PortStateCheck(const char* path) {
+    FILE* f = fopen(path, "rb");
+    if (!f) return "No state in this slot";
+    Header h;
+    BOOL got = fread(&h, sizeof(h), 1, f) == 1;
+    fclose(f);
+    if (!got || h.magic != kMagic) return "Not a savestate file";
+    if (h.version != kVersion || h.buildHash != BuildHash(NULL, 0)) return "Incompatible state (different build)";
+    if (h.dataHash != PortDataHash()) return "Incompatible state (other game data)";
+    return NULL;
+}
+
 static void Refuse(const char* fmt, ...) {
     va_list ap;
     va_start(ap, fmt);

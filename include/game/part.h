@@ -3,8 +3,8 @@
 // player owns). See tools/parts.py to dump the definition table from the disc.
 //
 // Modding note: a mod part is a PartDef (plus model/texture assets). The PC port's importer
-// fills PartDef records from part.json and appends them after the original 180 (the table has
-// spare slots 180-185, and can be grown), so every query below works unchanged.
+// fills PartDef records from part.json and appends them after the original 186 (rows 180-185 are
+// boss parts, so the table has to be grown), so every query below works unchanged.
 #include "types.h"
 
 #define PART_TIERS 4

@@ -578,10 +578,22 @@ MSVC only for now (absolute symbols, `/alternatename`, structured exception hand
 ## Benchmark and frame-time log
 
 `--perf-log FILE` writes one CSV row per shown frame (`frame, fast, wall_ms, game_ms, render_ms, wait_ms, present_ms, draws, vertices, copies,
-textures, out_w, out_h`; `fast` is 1 while fast-forwarding) and, when the run ends, `FILE.summary.txt` with the real-time frames' average, p50,
-p95, p99 and worst frame time, fps and the average split. `--bench menu|village` is a fixed scenario: unpaced to the main menu (or, for
-`village`, through the new-game conversation to the village map), then 20 s of real time, then the exit; the log goes to `build/pc/bench.csv`
-unless `--perf-log` says otherwise. Same settings (`--res`, `--msaa`, `--render-scale`, `--vsync`, `--fps-cap`) give comparable runs.
+textures, out_w, out_h, decode_ms, setup_ms, flush_ms, copy_ms`; `fast` is 1 while fast-forwarding) and, when the run ends, `FILE.summary.txt` with
+the real-time frames' average, p50, p95, p99 and worst frame time, fps and the average split. The last four columns split `render_ms`: vertex
+decode, the rest of the work per GX draw, batch upload and draw calls, and frame-buffer copies (the display copy's own time counts in the next
+frame). `--bench menu|village|battle|castle` is a fixed scenario: unpaced to the start of the scene, then 1200 frames of real time, then the
+exit; the log goes to `build/pc/bench.csv` unless `--perf-log` says otherwise.
+
+| Scenario | Measured frames |
+|---|---|
+| `menu` | from 3200: the main menu |
+| `village` | from 4800: through the new-game conversation, idle on the village map |
+| `battle` | from 8300: the first fight (the input of `tools/playthrough.py` up to the first attacks) |
+| `castle` | from 3900: the Command Room after Join Now |
+
+Same settings (`--res`, `--msaa`, `--render-scale`, `--vsync`, `--fps-cap`) give comparable runs; add `--no-ini --no-mods --no-audio` and an
+empty `MONSTERLAB_SAVE` folder to keep the player's settings and saves out of it. `PORT_SAMPLE=1` samples the instruction pointer of the game
+thread (`tools/sample_report.py`).
 
 On a PC with a monitor, run from the repository folder (the disc in `orig/` as usual), one scenario after the other with nothing else running:
 
@@ -590,5 +602,5 @@ build\pc\monsterlab.exe --window --res 1920x1080 --bench menu --perf-log bench_m
 build\pc\monsterlab.exe --window --res 1920x1080 --bench village --perf-log bench_village_1080.csv
 ```
 
-The window opens, the game fast-forwards (about 30 s for the menu, 60 s for the village), plays 20 s in real time and closes by itself. Send
+The window opens, the game fast-forwards (about 30 s for the menu, 60 s for the village), plays 1200 frames in real time and closes by itself. Send
 `bench_*.csv` and `bench_*.csv.summary.txt`. Add `--msaa 4`, `--render-scale 1.5` or `--res 2560x1440` for the other settings.

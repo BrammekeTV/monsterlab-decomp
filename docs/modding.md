@@ -8,6 +8,7 @@ monsterlab.exe
 monsterlab.ini
 mods\
   MyMod\
+    mod.ini                 name, description, priority (optional)
     files\                  replaces files of the disc, by their disc path
       catalog.sir
       streams\...
@@ -16,6 +17,43 @@ mods\
     textures\               PNG or DDS pictures that replace game textures
       sky_4962D17B32AB899E.png
 ```
+
+## Start with the sample mod
+
+```
+python tools/make_sample_mod.py
+```
+
+writes `SampleMod` into `build\pc\mods` (`--out DIR` for another mods folder): a `mod.ini`, a
+`data\strings.json` that renames *New Game* to *Modded Game*, and a striped picture in place of the logo.
+Everything in it is made by the script. With `--data <your extracted disc>` it also copies
+`files\text\str_en.txt` from your disc into the mod (one empty line added), to show a disc file being
+replaced: that copy is the game's own text, so do not share it.
+
+## Describing a mod: mod.ini
+
+`mods\<mod name>\mod.ini` is optional, and so is every line in it:
+
+```ini
+[mod]
+name = Sharper castle
+description = New stone textures for the castle rooms.
+author = Your name
+version = 1.2
+priority = 10
+enabled = 1
+```
+
+| Key | Meaning |
+|---|---|
+| `name` | shown on the Mods page instead of the folder's name |
+| `description`, `author`, `version` | shown with it |
+| `priority` | where the mod goes in the load order when it is **new**: a higher number is later in the list, and wins. Default 0 |
+| `enabled` | `0`: a new mod starts switched off. Default 1 |
+
+`priority` and `enabled` only count the first time the game sees the folder. After that the player's own list
+(below) decides, so an update of a mod never switches it back on or moves it. The folder's name is what
+identifies a mod: renaming the folder makes it a new mod.
 
 ## Replacing a game file
 
@@ -26,6 +64,14 @@ folder. Upper and lower case in the path do not matter.
 The disc's paths are the ones under `files\` of an extracted disc (for example with Dolphin: right-click
 the game, Properties, Filesystem, Extract Entire Disc). `main.dol` and the other system files are not
 read through this and cannot be replaced.
+
+This covers every file the game reads from the disc: level and data files (`.sir`), music and voices
+(`.dsp`, `.pcm` and the voice banks), movies (`fmv\*.bik`) and the text files. A mod may also hold a file the
+disc does not have. The log has one line for every file replaced, the first time the game opens it:
+
+```
+[port] mod: MyMod overrides Streams/global_binary.sir
+```
 
 A replacement must be in the format the game expects for that file (a `.sir` file is still big-endian
 console data; the port converts it after reading, as it does for the disc's own).
@@ -212,7 +258,9 @@ OldMod = 0
 - One line per mod: `1` is on, `0` is off.
 - The order of the lines is the load order. When two mods replace the same file, the one **later** in the
   list wins.
-- A folder that is not in the list yet is added at the end, switched on, the next time the game starts.
+- A folder that is not in the list yet is added the next time the game starts: in front of the first mod
+  with a higher `priority` in its `mod.ini` (without priorities: at the end), switched on unless its
+  `mod.ini` says `enabled = 0`.
 - A mod in the list whose folder is gone is skipped.
 - Textures follow the same order: when two mods replace the same texture, the later one wins.
 
@@ -232,7 +280,7 @@ at once.
 | `--no-mods` | run without mods |
 | `--dump-data DIR` | write the game's text table to `DIR\strings.json` and exit (from your own disc) |
 | `--dump-textures DIR` | write every texture the game draws with to `DIR` as a PNG named by its name (where known) and hash (the same as *Dump textures* in the settings, for this run) |
-| `--verbose` | lists, at the start, every file each mod replaces and which mod wins where two have the same file; logs `mods: <file> comes from <mod>` each time the game opens a replaced file |
+| `--verbose` | lists, at the start, every file each mod replaces and which mod wins where two have the same file |
 
 ## Worked example: replace one file
 
@@ -244,7 +292,7 @@ at once.
    ```
    [port] mods: 1 on, from ...\mods
    [port] mods: MyMod replaces catalog.sir
-   [port] mods: catalog.sir comes from MyMod
+   [port] mod: MyMod overrides catalog.sir
    ```
 
 ## Worked example: a red sky
@@ -283,5 +331,32 @@ compare the screenshots; the same by name; dump the text, change menu text, a br
 If the dump gave the texture a name (`tex_256x128_f6_MonsterLab_Logo_FF636077E97CEA31.png`), save your
 version as `mods\MyMod\textures\MonsterLab_Logo.png` instead. `--verbose` logs
 `mods: texture MonsterLab_Logo (FF636077E97CEA31) comes from MyMod by name`. `tools/mod_test.py` checks this too.
+
+## Not built yet: mods that add things
+
+The goal is that a mod can later add something new, for example a head part with its own model, textures
+and inventory icon that is always unlocked. Two rules for whatever gets built:
+
+- **New files.** A mod ships its own files beside replacements. `files\` already serves a path the disc does
+  not have, but the game only opens it if something tells it to: the new data has to name it.
+- **Tables are patched, never shipped whole.** A mod holds only its own entries or a change list that the
+  port applies after loading the original from the player's disc, so no mod (and never this repository)
+  carries game data, and two mods can add to one table.
+
+Where the hooks would go:
+
+| What | Where |
+|---|---|
+| Applying a mod's data | `PortModsApplyData` (`src/port/port_moddata.cpp`), called from `port_files.cpp` once `global_binary.sir` is converted; today it only handles `data\strings.json` |
+| Text of a new thing | `strings.json` changes existing numbers only, and part names are looked up by text-key hash: appending entries and their keys is needed |
+| The part itself | the `PartDef` table (`include/game/part.h`): 186 rows, none spare (180-185 are boss parts), so it has to be grown, and a save holds a row number in one byte (at most 254 rows); a `data\parts.json` would append records. Mods must not rely on a fixed index: saves store the part's index, so the port has to keep a stable mod part -> index mapping and cope with a mod that was removed |
+| Model, textures, icon | not investigated: how a part finds its model in `shared_parts.sir` and its icon in the UI data, and adding entries to those at load time (`port_files.cpp`, `sir_loader.cpp`) |
+| Always unlocked | not investigated: where the owned and discovered parts of a save are filled (`src/game/progress.cpp`); grant the part after a save is loaded or created |
+
+## Testing
+
+`monsterlab.exe --selftest` checks the lookup, the load order, `mod.ini` and a mod's file opened through the
+game's own disc functions (no game data needed). `python tools/smoke.py` runs the menu with the sample mod
+and fails unless the game took its text and, with an extracted disc, its file.
 
 Do not share files of the game itself: a mod should hold only what you made or changed.

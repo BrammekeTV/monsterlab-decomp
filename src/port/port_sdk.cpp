@@ -66,7 +66,7 @@ static BOOL DvdFind(const char* rel, FILE** file, u64* discOff, u32* discSize, B
     char modHost[MAX_PATH];
     const char* mod = NULL;
     if (PortModsFindFile(rel, modHost, sizeof(modHost), &mod) && (f = fopen(modHost, "rb")) != NULL) {
-        if (log) PortLog("mods: %s comes from %s", rel, mod);
+        if (log) PortModsNoteOverride(mod, rel);
     } else if (PortDiscIsOpen() ? !PortDiscFind(rel, discOff, discSize) : !(f = fopen(host, "rb"))) {
         return FALSE;
     }
@@ -570,6 +570,36 @@ int PortSelfTestSdk(void) {
         CHECK(sTestResult == 0x100 && dst[0] == 0 && dst[0xFF] == 0xFF && *(s32*)(info + 0x0C) == 0);
         DVDClose(info);
         CHECK(DVDOpen((char*)"/missing.bin", info) == 0);
+        // A mod's file comes instead of the disc's, found by DVDOpen itself; a mod may add a file too.
+        static PortMod keepMods[PORT_MAX_MODS];
+        memcpy(keepMods, gPortMods, sizeof(keepMods));
+        int keepCount = gPortModCount;
+        BOOL keepOff = gPortOptions.noMods;
+        char keepDir[MAX_PATH], mods[MAX_PATH + 64], p[MAX_PATH + 128];
+        snprintf(keepDir, sizeof(keepDir), "%s", PortModsDir());
+        snprintf(mods, sizeof(mods), "%s\\mods", sub);
+        for (const char* d : {"", "\\Selftest", "\\Selftest\\files"}) { snprintf(p, sizeof(p), "%s%s", mods, d); CreateDirectoryA(p, NULL); }
+        for (const char* n : {"test.bin", "added.bin"}) {
+            snprintf(p, sizeof(p), "%s\\Selftest\\files\\%s", mods, n);
+            FILE* m = fopen(p, "wb");
+            if (m) { fputs("modded!", m); fclose(m); }
+        }
+        gPortModCount = 0;
+        gPortOptions.noMods = FALSE;
+        PortModsSetDir(mods);
+        PortModsScan();
+        for (const char* n : {"/TEST.BIN", "/added.bin"}) {
+            BOOL open = DVDOpen((char*)n, info) == 1;
+            CHECK(open && *(u32*)(info + 0x34) == 7);
+            if (open) DVDClose(info);
+        }
+        for (const char* n : {"\\Selftest\\files\\test.bin", "\\Selftest\\files\\added.bin"}) { snprintf(p, sizeof(p), "%s%s", mods, n); DeleteFileA(p); }
+        for (const char* d : {"\\Selftest\\files", "\\Selftest", ""}) { snprintf(p, sizeof(p), "%s%s", mods, d); RemoveDirectoryA(p); }
+        memcpy(gPortMods, keepMods, sizeof(keepMods));
+        gPortModCount = keepCount;
+        gPortOptions.noMods = keepOff;
+        PortModsSetDir(keepDir);
+        PortModsRefreshTextures();
         gPortOptions.dataDir = savedDir;
         DeleteFileA(file);
         snprintf(file, sizeof(file), "%s\\files", sub);
