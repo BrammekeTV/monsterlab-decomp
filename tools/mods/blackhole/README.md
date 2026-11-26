@@ -21,6 +21,9 @@ new or loaded, as "Black Hole" (tier 1, the higher tiers are named too).
 | `build_mod.py` | packs model and sheets into `parts/p_hd_sha077.part` (the format is in its header) |
 | `sirlib.py` | small reader for the game's `.sir` containers, for looking at a template |
 
+The model is placed and sized for the template's skeleton in `build_mod.py` (`SCALE`, `OFFSET`, the bone its
+vertices follow); the hull's radius is 1.6 times the core's.
+
 ## How it gets into the game
 
 The port's side is `src/port/port_mod_parts.cpp` (see also `docs/modding.md`, "Adding a part"):
@@ -45,6 +48,23 @@ back-face culling (the material's GX state record ends with depth and cull setti
 is 2, back, and there is one record per material, not per group): its triangles are wound the other way and its normals point inward, which gives the inside-out
 look without a second material.
 
+## Checked in the game
+
+Headless, from a savestate of the playthrough's first battle, with the mod on:
+
+- the row is added (`part p_hd_sha077 is row 186`), the two list entries are added in the village and again in
+  the arena level, and the inventory gets the part (6 parts instead of 5);
+- with `PORT_MODPART_SHOW=1` (a test switch: the new model is drawn wherever the template is in use) the
+  monster that wears the template head in that fight shows the black hole: a black core with a glowing amber
+  rim, and the fight goes on through the tutorial and the first attacks without a crash.
+
+Not checked: putting the part on a monster in the lab (the playthrough does not get that far with a head
+choice), so the path "the game claims the new list entry" is exercised only up to the list and the inventory;
+the name in the parts list on screen; a save and load with the part.
+
+The template, `p_hd_sha002`, is the head of a monster of the first battle, so template and mod do meet in one
+game: that is what the put-back of the template's bytes is for.
+
 ## Found on the way
 
 - A part's zone is read from disc only when another zone took its place in memory (one address per limb and
@@ -57,6 +77,8 @@ look without a second material.
 
 ## What is left
 
+- **The row and the names** in `port_mod_parts.cpp` (`AddRow`, `AddNames`, `PortModPartsTextId`) are stand-ins:
+  the mod-support work replaces them with table patches from a mod file and save-safe part ids.
 - **Icon.** The two icon pictures are made, but the game still shows its placeholder: the icon is a section
   of `shared_texture.sir` found through the catalog, and the port cannot add a section yet.
 - **Map model.** No low-detail entry (`_lr`): on the exploration map the game falls back to head 001 and logs

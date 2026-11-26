@@ -150,6 +150,14 @@ void TakeBackup(Pack& p, int k, const u8* zone) {
     for (const Block& b : p.blocks) EachRange(b, [&](u32 off, u32 size, const u8*) { memcpy(out, zone + off, size); out += size; });
 }
 
+// PORT_MODPART_SHOW=1 (tests): the new part's model is drawn wherever its template is in use, so a savestate
+// of a fight with the template shows it without a visit to the lab. The zone keeps the template's name.
+BOOL TestShow(void) {
+    static int on = -1;
+    if (on < 0) on = getenv("PORT_MODPART_SHOW") != NULL;
+    return on;
+}
+
 void SetIdentity(Pack& p, int pi, int k, BOOL mod) {
     u8* zone = sZoneAt[pi][k];
     if (!zone || sZoneIsMod[pi][k] == (u8)mod) return;
@@ -168,7 +176,7 @@ void SetIdentity(Pack& p, int pi, int k, BOOL mod) {
                 w[0] = (u8)(a >> 24); w[1] = (u8)(a >> 16); w[2] = (u8)(a >> 8); w[3] = (u8)a;
             }
         }
-        memcpy(zone + p.defIdOff, &p.hash, 4);
+        if (!TestShow()) memcpy(zone + p.defIdOff, &p.hash, 4);
     } else {
         const u8* in = p.backup[k];
         if (!in) { PortLog("mods: %s: the template of %s cannot be put back in zone %u (loaded from a state); it shows the mod's model until the zone is read again", p.mod, p.key, p.zone[k]); return; }
@@ -203,15 +211,31 @@ void AddRow(Pack& p, int pi) {
     PortLog("mods: %s: part %s is row %u of the part table (copied from row %u)", p.mod, p.key, count, p.templateRow);
 }
 
+// While a level is being read its header can name a list that is not in memory or not converted yet, so every
+// pointer is checked to be readable before it is followed (the last region asked about is remembered: the
+// entries lie together).
+BOOL InMemory(const void* p, u32 size) {
+    static uintptr_t lo, hi;
+    uintptr_t a = (uintptr_t)p;
+    if (!p || a + size < a) return FALSE;
+    if (a >= lo && a + size <= hi) return TRUE;
+    MEMORY_BASIC_INFORMATION mbi;
+    if (!VirtualQuery(p, &mbi, sizeof(mbi)) || mbi.State != MEM_COMMIT || (mbi.Protect & (PAGE_NOACCESS | PAGE_GUARD)) || !mbi.Protect) return FALSE;
+    lo = (uintptr_t)mbi.BaseAddress; hi = lo + mbi.RegionSize;
+    return a + size <= hi;
+}
+
 // The level's part list: {users, name hash, object, zone} by pointer, at +0x44 of the level header, count at +0x48.
 void AddToList(Pack& p, int pi) {
     u8* params = fn_801F06FC();
     u8** pp = params ? *(u8***)(params + 8) : NULL;
-    u8* level = pp ? *pp : NULL;
-    if (!level) return;
+    u8* level = pp && InMemory(pp, 4) ? *pp : NULL;
+    if (!level || !InMemory(level, 0x4C)) return;
     ListEntry** list = *(ListEntry***)(level + 0x44);
     s32 count = *(s32*)(level + 0x48);
-    if (!list || count <= 0 || count > 4000) return;
+    if (!list || count <= 0 || count > 4000 || !InMemory(list, (u32)count * 4)) return;
+    for (s32 i = 0; i < count; i++) if (list[i] && !InMemory(list[i], sizeof(ListEntry))) return;
+    if (!list[0] || list[count - 1] == NULL || (u32)list[0]->zone > 0xFFFF || (u32)list[0]->users > 0xFFFF) return;   // not converted yet
     s32 tmpl = -1, mine = -1;
     for (s32 i = 0; i < count; i++) {
         if (!list[i]) continue;
@@ -250,7 +274,7 @@ void AddToList(Pack& p, int pi) {
     // Which of the two the zone must show now.
     for (int k = 0; k < 2; k++) {
         if (!sEntries[pi] || !sZoneAt[pi][k]) continue;
-        if (sEntries[pi][k].users > 0) SetIdentity(p, pi, k, TRUE);
+        if (sEntries[pi][k].users > 0 || (TestShow() && list[tmpl + k]->users > 0)) SetIdentity(p, pi, k, TRUE);
         else if (list[tmpl + k]->users > 0) SetIdentity(p, pi, k, FALSE);
     }
 }
@@ -265,24 +289,6 @@ void AddToInventory(int pi) {
     for (s32 i = 0; i < n; i++) if (parts[i] && parts[i]->defIndex == sRow[pi]) return;
     AddPartToPlayerInventory((u32)sRow[pi], 1, 100);
     PortLog("mods: part %s added to the inventory (%d parts now)", sPacks[pi].key, *(s32*)(inv + 0x6BC));
-}
-
-// PORT_MODPART_EQUIP=1 (tests): the head of the player's first monster becomes the new part, so the next level
-// or battle that is loaded shows it without a visit to the lab.
-void TestEquip(int pi) {
-    static int on = -1;
-    if (on < 0) on = getenv("PORT_MODPART_EQUIP") != NULL;
-    if (!on || !gSaveSystem || sRow[pi] <= 0 || !gGameDb || !gGameDb->data) return;
-    u8* inv = gSaveSystem + 0xA30;
-    u8* monster = *(s32*)(inv + 0x6B8) > 0 ? *(u8**)inv : NULL;
-    if (!monster) return;
-    const PartDef* rows = *(PartDef**)(gGameDb->data + 0x5B78);
-    for (int k = 0; k < 5; k++) {
-        PartInstance* part = ((PartInstance**)(monster + 4))[k];
-        if (!part || part->defIndex < 0 || part->defIndex == sRow[pi] || rows[part->defIndex].slot != PART_SLOT_HEAD) continue;
-        PortLog("mods: test: the first monster's head (part row %d) becomes %s", part->defIndex, sPacks[pi].key);
-        part->defIndex = sRow[pi];
-    }
 }
 
 }  // namespace
@@ -324,9 +330,15 @@ void PortModPartsZoneRead(s32 number, u8* zone, u32 size) {
     for (size_t pi = 0; pi < sPacks.size(); pi++) {
         Pack& p = sPacks[pi];
         for (int k = 0; k < 2; k++) {
-            if (number == (s32)p.zone[k] && size == p.zoneSize) {
+            if (number == (s32)p.zone[k]) {
+                if (size < p.zoneSize) {                            // the blocks were checked against the size the pack names
+                    PortLog("mods: %s: zone %d is %u bytes, the template of %s has %u; the part is not drawn", p.mod, number, size, p.key, p.zoneSize);
+                    continue;
+                }
                 sZoneAt[pi][k] = zone;
                 sZoneIsMod[pi][k] = 0;
+                PortLog("mods: %s: zone %d read to %p (%u bytes), %s in use there", p.mod, number, zone, size,
+                        sEntries[pi] && sEntries[pi][k].users > 0 ? p.key : "the template");
                 if (sEntries[pi] && sEntries[pi][k].users > 0) SetIdentity(p, (int)pi, k, TRUE);
             } else if (sZoneAt[pi][k] && zone < sZoneAt[pi][k] + p.zoneSize && sZoneAt[pi][k] < zone + size) {
                 sZoneAt[pi][k] = NULL;                              // another part's zone took its place
@@ -346,7 +358,6 @@ void PortModPartsFrame(void) {
         if (sRow[pi] <= 0) continue;
         AddToList(sPacks[pi], (int)pi);
         AddToInventory((int)pi);
-        TestEquip((int)pi);
     }
 }
 #endif

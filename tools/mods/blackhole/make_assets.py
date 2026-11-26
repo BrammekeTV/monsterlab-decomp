@@ -188,7 +188,7 @@ def build_model():
     # core: everything maps to one black spot of the bottom left quarter
     sphere("core", R, 12, 8, 0.0, lambda u, v: (0.25 + 0.1 * (u - 0.5), 0.75 + 0.1 * (v - 0.5)), False)
     # hull: the top half of the sheet, twice around (the streaks repeat on the far side), axis leaning 14 degrees
-    sphere(HULL_GROUP, R * 1.42, 16, 10, math.radians(14), lambda u, v: (2.0 * u, 0.008 + 0.484 * v), True)
+    sphere(HULL_GROUP, R * 1.6, 16, 10, math.radians(14), lambda u, v: (2.0 * u, 0.008 + 0.484 * v), True)
 
     def lathe(group, profile, segs, u0, u1):
         """Turns a profile [(radius, y, v)] around the y axis; u runs across [u0, u1] of the right quarter."""
