@@ -4,13 +4,15 @@
 
 Builds incrementally (tools/build_pc.py), then runs headless (no window, no sound):
   1. --selftest
-  2. --to-menu to frame 3300, with a screenshot (the main menu) and the script trace
+  2. --to-menu to frame 3300, with a screenshot (the main menu) and the script trace, with the sample
+     mod (tools/make_sample_mod.py) made afresh in build/smoke/mods
   3. --fast-forward 2600 to frame 2600, with a screenshot (the title)
 Passes when each run stops at its frame limit with exit code 0, the menu scripts ran
-(UIScreen_Push seen) and neither screenshot is blank or black. Prints one verdict line with
+(UIScreen_Push seen), the game took the sample mod's text (and, from an extracted
+disc, its file in place of the disc's) and neither screenshot is blank or black. Prints one verdict line with
 timings and exits 0/1. Needs the game in orig/RM7P4F (or --iso PATH); the self-test needs none.
 """
-import os, subprocess, sys, time
+import os, shutil, subprocess, sys, time
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 EXE = os.path.join(ROOT, "build", "pc", "monsterlab.exe")
 OUT = os.path.join(ROOT, "build", "smoke")
@@ -53,8 +55,18 @@ def main():
         if os.path.exists(p):
             os.remove(p)
     env = dict(os.environ, PORT_SCRIPT_TRACE="1")
-    runs = {"menu": ([EXE, "--to-menu", "--frames", "3300", "--screenshot", menu_png] + common, env, 3300),
-            "title": ([EXE, "--fast-forward", "2600", "--frames", "2600", "--screenshot", title_png] + common, None, 2600)}
+    # The sample mod, for the menu run. Its file override is a copy of a text file of the extracted disc.
+    mods = os.path.join(OUT, "mods")
+    shutil.rmtree(mods, ignore_errors=True)
+    extracted = None if iso else os.environ.get("MONSTERLAB_DATA") or os.path.join(ROOT, "orig", "RM7P4F")
+    if extracted and not os.path.isfile(os.path.join(extracted, "files", "text", "str_en.txt")):
+        extracted = None                                     # a disc image: nothing to copy the file from
+    r = subprocess.run([sys.executable, os.path.join(ROOT, "tools", "make_sample_mod.py"), "--out", mods]
+                       + (["--data", extracted] if extracted else []), cwd=ROOT, capture_output=True, text=True)
+    if r.returncode:
+        fails.append("make_sample_mod.py")
+    runs = {"menu": ([EXE, "--to-menu", "--frames", "3300", "--screenshot", menu_png, "--mods", mods] + common, env, 3300),
+            "title": ([EXE, "--fast-forward", "2600", "--frames", "2600", "--screenshot", title_png, "--no-mods"] + common, None, 2600)}
     outs = {}
     for name, (cmd, e, frames) in runs.items():          # one after the other: in parallel the two renderers only slow each other down
         t = time.time()
@@ -67,6 +79,10 @@ def main():
             fails.append(f"{name}: frame limit not reached")
     if "UIScreen_Push" not in outs["menu"]:
         fails.append("menu scripts did not run (no UIScreen_Push)")
+    if "mods: SampleMod changes 1 string" not in outs["menu"]:
+        fails.append("the sample mod's strings.json was not applied")
+    if extracted and "[port] mod: SampleMod overrides TEXT/STR_EN.TXT" not in outs["menu"]:
+        fails.append("the sample mod's file did not replace the disc's")
     for name, png in (("menu", menu_png), ("title", title_png)):
         f = lit(png) if os.path.exists(png) else None
         if f is None or f < 0.005:
@@ -78,7 +94,8 @@ def main():
             open(os.path.join(OUT, n + ".log"), "w", errors="replace").write(o)
         print(f"SMOKE FAIL ({total:.0f}s: {timing}): " + "; ".join(fails) + f"  [logs: build/smoke/*.log]")
         return 1
-    print(f"SMOKE OK ({total:.0f}s: {timing})")
+    what = "text and file override" if extracted else "text"
+    print(f"SMOKE OK ({total:.0f}s: {timing}); mod {what} picked up")
     return 0
 
 
