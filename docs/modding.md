@@ -13,7 +13,7 @@ mods\
       streams\...
     data\                   JSON that changes game data (the text table)
       strings.json
-    textures\               PNG pictures that replace game textures
+    textures\               PNG or DDS pictures that replace game textures
       sky_4962D17B32AB899E.png
 ```
 
@@ -30,9 +30,9 @@ read through this and cannot be replaced.
 A replacement must be in the format the game expects for that file (a `.sir` file is still big-endian
 console data; the port converts it after reading, as it does for the disc's own).
 
-## Replacing a texture with a PNG
+## Replacing a texture with a PNG or DDS
 
-A PNG under `mods\<mod name>\textures\` (sub-folders are fine) replaces one game texture. Which one is
+A PNG (or a [DDS](#dds-for-big-packs)) under `mods\<mod name>\textures\` (sub-folders are fine) replaces one game texture. Which one is
 told in one of two ways:
 
 - **By name** (stable, the better choice): the file is called after the texture's name in the game's data,
@@ -67,8 +67,43 @@ Rules for a replacement:
 - The game still lights, tints and fogs the texture as before: a replacement on a dark, tinted surface
   comes out dark and tinted too.
 
+### DDS, for big packs
+
+A `.dds` file works wherever a `.png` does: `mods\MyMod\textures\MonsterLab_Logo.dds` or
+`sky_4962D17B32AB899E.dds`, matched by the same name or hash rules. When one mod has both a `.png` and a
+`.dds` for a texture, the `.dds` is used.
+
+A PNG has to be unpacked and takes 4 bytes per pixel of video memory. A DDS holds the picture already
+compressed the way the graphics card reads it: it loads much faster, takes 0.5 byte (BC1) or 1 byte (BC7,
+BC3) per pixel of video memory, and carries smaller versions of itself (mip levels) that keep it from
+shimmering at a distance. (On disk a DDS is not necessarily smaller than the PNG; a zipped pack shrinks
+well.) For a pack with many large pictures, ship DDS.
+
+Convert a pack with the tool in this repository (Python with `numpy` and `Pillow`):
+
+```
+python tools/png2dds.py C:\path\to\mods\MyMod
+```
+
+It writes `name.dds` next to every `name.png`, with all mip levels: **BC7** where the picture has
+transparency, **BC1** where it is opaque. Keep the PNGs as your originals (the game ignores a PNG that has
+a DDS beside it); run the tool again after editing and only the changed pictures are converted.
+
+| Option | Effect |
+|---|---|
+| `--format bc7` | BC7 for everything: better than BC1 on gradients and dark skies, twice the size (also `bc3`, `bc1`) |
+| `--out DIR` | write the DDS files under `DIR` (same sub-folders), for a release folder without PNGs |
+| `--delete-png` | delete each PNG once its DDS is written |
+| `--force` | convert again even if the DDS is newer |
+| `--no-mips` | the full-size picture only |
+
+DDS files from other tools (for example `texconv`) work too. Accepted: a 2D texture in BC1 (DXT1), BC3
+(DXT5) or BC7, width and height multiples of 4, up to 8192. The mip levels in the file are used as they
+are (none are made for a DDS, whatever the filter setting). sRGB variants are read as plain ones. BC7
+needs a Direct3D 11 graphics card.
+
 With `--verbose` the log says `mods: texture <hash> comes from <mod>` the first time a replacement is
-used. A replacement found by name is logged as `mods: texture <name> (<hash>) comes from <mod> by name`. A PNG that cannot be read is reported and the game's own texture is drawn.
+used. A replacement found by name is logged as `mods: texture <name> (<hash>) comes from <mod> by name`. A PNG or DDS that cannot be read is reported and the game's own texture is drawn.
 
 ## Changing the game's text with JSON
 

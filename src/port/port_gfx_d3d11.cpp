@@ -676,6 +676,32 @@ static ID3D11ShaderResourceView* MakeTexture(const u32* rgba, u32 w, u32 h) {
     return srv;
 }
 
+// A mod's replacement: a PNG's pixels like a game texture, a DDS's compressed levels as the file has them.
+static ID3D11ShaderResourceView* MakeModTexture(const PortModImage& im) {
+    if (!im.dxgi) return MakeTexture((const u32*)im.data, im.w, im.h);
+    D3D11_SUBRESOURCE_DATA init[16] = {};
+    const u8* at = im.data;
+    u32 levels = im.levels < 16 ? im.levels : 16;
+    for (u32 i = 0; i < levels; i++) {
+        u32 pitch = 0, bytes = PortModLevelBytes(im.dxgi, im.w, im.h, i, &pitch);
+        init[i].pSysMem = at;
+        init[i].SysMemPitch = pitch;
+        at += bytes;
+    }
+    D3D11_TEXTURE2D_DESC d = {};
+    d.Width = im.w; d.Height = im.h; d.MipLevels = levels; d.ArraySize = 1; d.Format = (DXGI_FORMAT)im.dxgi;
+    d.SampleDesc.Count = 1; d.Usage = D3D11_USAGE_IMMUTABLE; d.BindFlags = D3D11_BIND_SHADER_RESOURCE;
+    ID3D11Texture2D* t = NULL; ID3D11ShaderResourceView* srv = NULL;
+    if (FAILED(sDev->CreateTexture2D(&d, init, &t))) {         // BC7 needs a Direct3D 11 card; or out of video memory
+        static BOOL told;
+        if (!told) { told = TRUE; PortLog("mods: the graphics device cannot make a %ux%u compressed texture; the game's texture is used", im.w, im.h); }
+        return NULL;
+    }
+    sDev->CreateShaderResourceView(t, NULL, &srv);
+    t->Release();
+    return srv;
+}
+
 static ID3D11ShaderResourceView* GetTexture(const PortGx* g, u32 map) {
     u32 base = (map < 4 ? 0x80 : 0xA0) + (map & 3);
     u32 img0 = g->bp[base + 8], addr = (g->bp[base + 0x14] & 0xFFFFFF) << 5, tl = g->bp[base + 0x18];
@@ -700,15 +726,14 @@ static ID3D11ShaderResourceView* GetTexture(const PortGx* g, u32 map) {
         return sWhite;
     }
     if (it != sTextures.end() && it->second.srv) { FlushDraws(); it->second.srv->Release(); }
-    // Mods: a PNG with this texture's content hash replaces it, at the PNG's own size (--dump-textures writes the originals).
+    // Mods: a PNG or DDS with this texture's content hash replaces it, at the file's own size (--dump-textures writes the originals).
     ID3D11ShaderResourceView* made = NULL;
     if (PortModsTexturesWanted()) {
         u64 content = PortModsTextureHash(data, bytes, tlut, pal ? (fmt == 8 ? 32 : fmt == 9 ? 512 : 0x8000) : 0, w, h, fmt);
         const char* tname = PortModsTextureName(data);
         PortModsDumpTexture(content, tname, rgba.data(), w, h, fmt);
-        u32 rw = 0, rh = 0;
-        u32* png = PortModsTexture(content, tname, &rw, &rh);
-        if (png) { made = MakeTexture(png, rw, rh); free(png); }
+        PortModImage im;
+        if (PortModsTexture(content, tname, &im)) { made = MakeModTexture(im); free(im.data); }
     }
     if (!made) made = MakeTexture(rgba.data(), w, h);
     TexEntry e = {made, hash, w, h, fmt, sTexGen};

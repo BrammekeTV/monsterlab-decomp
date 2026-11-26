@@ -5,6 +5,7 @@
 1. Runs to the main menu with --dump-textures and takes a screenshot (no mods).
 2. Makes a mod there with one dumped texture tinted red (the 128x128 texture that changes the most
    of the picture is not known in advance, so it tries the largest few until the picture changes).
+   The same tinted texture is then converted with tools/png2dds.py (BC7, BC3, BC1) and must redden the menu as well.
 3. Runs again with that mod and compares the screenshots; then the same texture by its name, and a data mod
    (--dump-data, a strings.json that changes menu text, a broken one).
 Passes when the log names the replaced texture and the picture got redder. Needs Pillow and the game
@@ -47,6 +48,36 @@ def by_name(tmp, dump, names, data):
     good, out = run(["--mods", mods, "--screenshot", os.path.join(tmp, "byname.png")] + data, os.path.join(tmp, "byname.log"))
     if not good or f"comes from ByName by name" not in out or f"texture {name} (" not in out:
         return f"{name}: the texture was not replaced by its name"
+    return ""
+
+
+def dds_test(tmp, tinted, base, pixels, png_gain, data):
+    """The red picture as DDS (tools/png2dds.py: automatic, BC7, BC3, BC1) holds the same colours and reddens the menu as the PNG did.
+    Returns an error text or ''."""
+    from PIL import Image, ImageChops, ImageStat
+    opaque = Image.open(tinted).convert("RGBA").getchannel("A").getextrema()[0] == 255
+    mods = os.path.join(tmp, "mods4")
+    for fmt in ["auto", "bc7", "bc3"] + (["bc1"] if opaque else []):
+        shutil.rmtree(mods, ignore_errors=True)
+        folder = os.path.join(mods, "Dds", "textures")
+        os.makedirs(folder)
+        shutil.copy(tinted, folder)
+        p = subprocess.run([sys.executable, os.path.join(ROOT, "tools", "png2dds.py"), folder, "--format", fmt, "--delete-png"],
+                           capture_output=True, text=True, errors="replace")
+        if p.returncode or os.listdir(folder) != [os.path.basename(tinted)[:-4] + ".dds"]:
+            return f"png2dds --format {fmt} failed: {p.stdout}{p.stderr}"
+        decoded = Image.open(os.path.join(folder, os.listdir(folder)[0])).convert("RGBA")     # Pillow's own decoder
+        off = max(ImageStat.Stat(ImageChops.difference(decoded, Image.open(tinted).convert("RGBA"))).mean)
+        if off > 4.0:
+            return f"png2dds --format {fmt}: the DDS differs from the PNG by {off:.1f} per pixel"
+        shot = os.path.join(tmp, f"dds_{fmt}.png")
+        good, out = run(["--mods", mods, "--screenshot", shot] + data, os.path.join(tmp, f"dds_{fmt}.log"))
+        want = {"auto": "BC1" if opaque else "BC7"}.get(fmt, fmt.upper())
+        if not good or f"comes from Dds (" not in out or f", {want}, " not in out:
+            return f"DDS {fmt}: the texture was not replaced"
+        gain = (redness(Image.open(shot)) - base) / pixels     # the menu's rain and lightning differ from run to run
+        if gain < png_gain / 2:
+            return f"DDS {fmt}: the picture is only {gain:.1f} per pixel redder (PNG: {png_gain:.1f})"
     return ""
 
 
@@ -115,6 +146,11 @@ def main():
             gain = (redness(Image.open(after)) - base) / pixels
             if gain > 1.0:                                   # on average more than one level redder per pixel
                 ok, verdict = True, f"{n} replaced, picture redder by {gain:.1f} per pixel ({len(names)} textures dumped)"
+                bad = dds_test(tmp, os.path.join(mods, "RedTint", "textures", "red_" + n[-20:]), base, pixels, gain, data)
+                if bad:
+                    ok, verdict = False, bad
+                    return 1
+                verdict += "; dds ok"
                 bad = by_name(tmp, dump, names, data)
                 if bad:
                     ok, verdict = False, bad
