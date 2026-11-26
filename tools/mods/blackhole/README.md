@@ -1,54 +1,90 @@
-# Black hole head (mod, work in progress)
+# Black hole head (mod)
 
-A new head part for the PC port: a dark core, a streaky amber accretion disc whose light bends over and
-under the core, a thin photon ring, and a stabilizer on the neck that projects the hole. No bolts, no lab
+A new head part for the PC port: a black ball inside a larger amber ball that is turned inside out (an
+"inverted hull"), so only the far inner side of the amber ball is drawn and the black ball has a glowing,
+streaky rim from every side. Under it, on the neck, a small stabilizer with an amber cap. No bolts, no lab
 parts on the hole itself.
 
-**State: the art is made; it is not in the game yet.** The port has no way to add a part so far. What is
-here, and what is missing, is listed below.
+```
+python tools/mods/blackhole/make_assets.py     # pictures and model   -> build/mods/BlackHoleHead
+python tools/mods/blackhole/build_mod.py       # the mod folder       -> build/pc/mods/BlackHoleHead
+```
 
-## What is here
+Needs `numpy` and `Pillow`. Nothing of the game is read and nothing of the game is in the mod: pictures,
+model and draw commands are made by these scripts. Copy `BlackHoleHead` into the `mods` folder next to
+`monsterlab.exe` (a build's own folder is `build/pc/mods`). The part then exists in the game ("Black Hole",
+four tiers), but **nobody is given one yet**: see "Owning it".
 
 | File | What |
 |---|---|
-| `make_assets.py` | draws everything from code: the 256x256 colour and gloss sheets, the 64x64 and 256x256 part icons, the model (387 vertices, 504 triangles, 7 groups) as `.obj` and `.json` |
-| `sirlib.py` | small reader for the game's `.sir` containers, for the zone builder that comes next |
+| `make_assets.py` | draws everything from code: the 256x256 colour and gloss sheets, the 64x64 and 256x256 part icons, the model (392 vertices, 652 triangles: core, hull, emitter) as `.obj` and `.json` |
+| `build_mod.py` | packs model and sheets into `parts/p_hd_sha077.part` (the format is in its header) |
+| `sirlib.py` | small reader for the game's `.sir` containers, for looking at a template |
 
-```
-python tools/mods/blackhole/make_assets.py          # -> build/mods/BlackHoleHead (not committed)
-```
+The model is placed and sized for the template's skeleton in `build_mod.py` (`SCALE`, `OFFSET`, the bone its
+vertices follow); the hull's radius is 1.6 times the core's.
 
-Needs `numpy` and `Pillow`. Nothing of the game is read: the pictures and the model are original.
-The sizes follow the game's heads: one 256x256 sheet plus a gloss sheet, icons of 64x64 and 256x256
-(`ui/msa_parts/<key>` and `<key>_h`), about the triangle count of a simple head.
+## How it gets into the game
 
-## How a part is stored (found for this mod)
+The port's side is `src/port/port_mod_parts.cpp` (see also `docs/modding.md`, "Adding a part"):
 
-- **Definition**: row of table 22 of the game database (`PartDef`, 0x50 bytes, 186 rows; heads are rows
-  72-113, slot 0). Columns that matter: four tier names (text key hashes), actions, slot, discipline,
-  the animation set (column 13; 8 = `sha`, the shared head animations) and the model number (the byte at
-  `+0x4A`).
-- **Model key**: `PartAnimKey` builds `p_hd_<set>_<NNN>` from those two. A new head with set `sha` and an
-  unused number (this mod: 077) reuses every head animation and gets the key `p_hd_sha077`.
-- **Model**: the hash of `<key>_geoA` is looked up in the level's part list (level header `+0x44`, 648
-  entries of `{users, hash, object, zone}` in the village). Every part has two entries (one per fighter)
-  that name two zones of `shared_parts.sir` (zones 21-452, about 660 KB each: mesh, materials, three
-  textures), and one `_lr` entry for the small model on the map. A key that is not in the list falls back
-  to head 001 (the game logs "The part list is missing a part it should have").
-- **Icon**: `TextureLoadShared("ui/msa_parts/<key>")` and `..._h`: sections of `shared_texture.sir`, by
-  name hash; a missing one falls back to `ui/msa_parts/placeholder`.
-- **Owning it**: `AddPartToPlayerInventory(def, tier, quality)` adds a part to the save's inventory.
+- **Definition.** The part table (table 22 of the game database, `PartDef`, 0x50 bytes, 186 rows) gets row
+  186: a copy of the row of a plain head of the player's disc, the "template" `p_hd_sha002` (row 73), with
+  model number 77. `PartAnimKey` builds the model key from the animation set and that number, so the key is
+  `p_hd_sha077` and every head animation is reused.
+- **Model.** The level's part list (level header `+0x44`, entries `{users, name hash, object, zone}`, two per
+  part: one per fighter) gets two entries for `p_hd_sha077_geoA` that name the template's zones (23 and 24 of
+  `shared_parts.sir`). While the black hole is the part in use in such a zone, the port writes the mod's
+  vertex arrays, draw commands and the two CMPR sheets over the template's in memory and sets the zone's name
+  hash to the new key's (the game finds the list entry to release by that hash). When the template itself is
+  in use again, the bytes are put back.
+- **Names.** Four new text ids behind the game's string table; `TextIdFromHash` asks the port for keys it
+  does not know.
+- **Owning it.** Not by default. With `PORT_MODPART_GIVE=1` (tests) a game whose inventory has no such part
+  gets one; that is off for players because the row number 186 is a stand-in and a part given now would be
+  written into their save. It comes on when the save-safe part ids are in.
 
-## What is missing
+What the model keeps of the template: its skeleton and animations, its material (lit, environment map, rim
+light), the matrix commands of its display list. The hull is drawn by that same material with the usual
+back-face culling (the material's GX state record ends with depth and cull settings; the word at `+0xD18`
+is 2, back, and there is one record per material, not per group): its triangles are wound the other way and its normals point inward, which gives the inside-out
+look without a second material.
 
-1. **A hook in the port that adds a part** (`mods/<mod>/parts/...`): append the `PartDef` row, add the
-   two part-list entries, give the names a text id, serve the two icon textures, and put the part into
-   the inventory of a new game and of a loaded save.
-2. **The zone builder**: turn `blackhole.json` and the sheets into a part zone. The plan is to patch at
-   load time: the new entries name the zone of a plain, unskinned head of the player's own disc, and when
-   the game reads that zone for the black hole the port writes this mod's vertices, display list and
-   CMPR textures over the template's and sets the definition id to the new key's hash. Nothing of the
-   template is shipped.
-3. Additive, unlit drawing of the disc, the bent light, the photon ring and the field (the groups named
-   in `"additive"`), and the disc's spin.
-4. All checks in the game: parts list, on a monster, in a battle.
+## Checked in the game
+
+Headless, from a savestate of the playthrough's first battle, with the mod on:
+
+- the row is added (`part p_hd_sha077 is row 186`), the two list entries are added in the village and again in
+  the arena level; with `PORT_MODPART_GIVE=1` the inventory gets the part (6 parts instead of 5);
+- with `PORT_MODPART_SHOW=1` (a test switch: the new model is drawn wherever the template is in use) the
+  monster that wears the template head in that fight shows the black hole: a black core with a glowing amber
+  rim, and the fight goes on through the tutorial and the first attacks without a crash.
+
+Not checked: putting the part on a monster in the lab (the playthrough does not get that far with a head
+choice), so the path "the game claims the new list entry" is exercised only up to the list and the inventory;
+the name in the parts list on screen; a save and load with the part.
+
+The template, `p_hd_sha002`, is the head of a monster of the first battle, so template and mod do meet in one
+game: that is what the put-back of the template's bytes is for.
+
+## Found on the way
+
+- A part's zone is read from disc only when another zone took its place in memory (one address per limb and
+  fighter): putting on the same part again does not read it again. So the port checks every frame which of
+  the two (template or mod) a zone must show, not only at the read.
+- 186 is fixed in two places: `PART_DEFS` in `src/game/battle_core.cpp` (stepping to the next part of
+  the same limb: it never reaches row 186) and `fn_8020E438` (a name per row, with a fallback for
+  other rows). A save stores a part's row in one byte (0xFF = none), so row 186 fits. A save made with the
+  mod has a part of row 186: load it without the mod and that row does not exist.
+
+## What is left
+
+- **The row and the names** in `port_mod_parts.cpp` (`AddRow`, `AddNames`, `PortModPartsTextId`) are stand-ins:
+  the mod-support work replaces them with table patches from a mod file and save-safe part ids.
+- **Icon.** The two icon pictures are made, but the game still shows its placeholder: the icon is a section
+  of `shared_texture.sir` found through the catalog, and the port cannot add a section yet.
+- **Map model.** No low-detail entry (`_lr`): on the exploration map the game falls back to head 001 and logs
+  "The part list is missing a part it should have".
+- **Unlit, additive, spin.** The hull is lit like the rest (one material). A second material, or a material
+  of the mod's own, would make it full bright and let its picture scroll.
+- **Description text** and a place in the shop or as a reward: it is only given to the inventory.

@@ -108,4 +108,9 @@ int  PortModsApplyStrings(const char* json, const char** strings, u32 count, cha
 
 int  PortSelfTestMods(void);
 
+// ---- parts (port_mod_parts.cpp): mods\<mod>\parts\*.part add a monster part, see docs/modding.md ----
+void PortModPartsApplyData(u8* globalHdr);                 // the game database is converted: reads the part files
+void PortModPartsZoneRead(s32 number, u8* zone, u32 size); // a zone of shared_parts.sir was read and converted
+void PortModPartsFrame(void);                              // once per frame: part table, part list, inventory, which model a zone shows
+
 #endif

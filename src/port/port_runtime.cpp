@@ -361,6 +361,7 @@ static void PortCursorTrueScale(void) {
 
 void PortFrameDone(void) {
     PortCursorTrueScale();
+    PortModPartsFrame();
     if (sFrames == 1 && getenv("PORT_SCRIPT_TRACE")) InstallScriptTrace();
     sFrames++;
     PortStateLog();
