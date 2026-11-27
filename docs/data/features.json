@@ -99,6 +99,11 @@
  "changelog": [
   {
    "date": "2026-11-27",
+   "time": "17:11",
+   "text": "Modding tool, step 2a: a texture gallery and viewer for any .sir file, with export to PNG or DDS, plus the game's strings for mod makers."
+  },
+  {
+   "date": "2026-11-27",
    "time": "16:41",
    "text": "First piece of the modding tool: a separate ml_modtool.exe that opens the game's .sir data files and shows their contents as a browsable tree, using the game's own loader so everything reads exactly as the game sees it. Texture and 3D model viewers follow next."
   },
