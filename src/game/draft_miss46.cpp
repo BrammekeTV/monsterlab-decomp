@@ -657,6 +657,8 @@ u32 SaveManager_IsSaveDataCorrupted(void) {
     return 0;
 }
 
+extern "C" void PortModGrantSaved(void);   // src/port/port_modgrant.cpp
+
 // 0x80123B78
 // Writes the current profile slot (lbl_805FB2C8) into the save file (loading the existing file
 // first if there is one); writes a second time with the previous slot when the save block has no
@@ -676,6 +678,7 @@ void SaveManager_SaveData(void) {
         fn_80123954(lbl_805FB2CC, save);
         SaveGameWrite("save", save, 0x31C0);
     }
+    PortModGrantSaved();   // PC port: record the mod parts this save holds
     lbl_805FB2CC = lbl_805FB2C8;
     fn_80142870(1);
     __destroy_arr(slots, (void (*)(void*, s32))fn_8022ED98, 0x988, 4);

@@ -232,6 +232,8 @@ void SaveManager_FreeTmpData(void) {
     lbl_805FB2D0 = NULL;
 }
 
+extern "C" void PortModGrantLoaded(void);   // src/port/port_modgrant.cpp
+
 // 0x80123C94
 // Loads the save file into a local buffer and copies the current slot's data into the game state.
 void SaveManager_LoadData(void) {
@@ -242,6 +244,7 @@ void SaveManager_LoadData(void) {
     fn_8032F1E8(buf + 0xB98, SAVE_SLOT_CTOR, SAVE_SLOT_DTOR, 0x988, 4);
     SaveGameRead(lbl_805F8FD8, buf, 0x31C0);
     fn_8022EDD8(buf + 0xB98 + lbl_805FB2C8 * 0x988);
+    PortModGrantLoaded();   // PC port: parts that mods add
     t = *(s32*)(lbl_805FBBE0 + 0x6A8);
     if (t != 0) {
         *(s32*)(gGame + 0xD5F0) = t;

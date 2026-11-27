@@ -6,7 +6,9 @@
 // full quality, and a notice names them. The same happens when a save that already has a monster is loaded and a
 // new mod was added since. save.modparts (beside the saves) records each part given:
 //     given|<save slot>|<scientist name>|<mod:id>
-// so it is never given twice, also not after the player sold or scrapped it. Lines of this kind are ignored by the
+// so it is never given twice, also not after the player sold or scrapped it. The line is written when the game
+// saves, not when the part is given: until then the part is only in memory, and a player who loads or quits without
+// saving gets it again. Lines of this kind are ignored by the
 // part-number reader (port_modpatch.cpp), which only takes "row|vanilla row|mod:id".
 // [modparts] give = 0 in monsterlab.ini turns it off. PORT_MODPART_GIVE=1 (tests) gives the parts at once, also to
 // a profile without a monster.
@@ -100,7 +102,15 @@ std::string NoticeName(const char* name, s32 slot) {
 }
 
 std::string sProfile;                // the profile the list below is for
-std::vector<std::string> sGiven;
+std::vector<std::string> sGiven;     // recorded in the file
+std::vector<std::string> sUnsaved;   // given since the last load, not recorded yet (the game has not saved)
+
+// The profile in memory changed (a load, a new game): what it was given is whatever its save says.
+void Forget() {
+    sProfile.clear();
+    sGiven.clear();
+    sUnsaved.clear();
+}
 s32 sChecked = -1000;                // frame of the last look (once a second is plenty)
 
 }  // namespace
@@ -109,7 +119,8 @@ void PortModGrantFrame(void) {
     static int test = -1;
     if (test < 0) test = getenv("PORT_MODPART_GIVE") != NULL;
     if (!gPortSettings.giveModParts && !test) return;
-    if (!PortModPartCount() || !gSaveSystem || !gSaveSystem[0]) return;      // no mod part, or no profile yet
+    if (!PortModPartCount() || !gSaveSystem) return;
+    if (!gSaveSystem[0]) { Forget(); return; }                                // no profile yet
     const s32 frame = PortFrameCount();
     if (frame - sChecked < 50 && frame >= sChecked) return;
     sChecked = frame;
@@ -128,7 +139,7 @@ void PortModGrantFrame(void) {
                                     p->key, profile.c_str(), Owned(p->defIndex) ? "yes" : "no");
             continue;
         }
-        if (!Owned(p->defIndex)) {
+        if (!Has(sUnsaved, p->key) && !Owned(p->defIndex)) {
             if (*(s32*)(gSaveSystem + 0xA30 + 0x6BC) >= 100) continue;       // inventory full: try again later
             AddPartToPlayerInventory((u32)p->defIndex, 1, 100);
             if (!names.empty()) names += ", ";
@@ -136,13 +147,32 @@ void PortModGrantFrame(void) {
             PartDbGetDef(&def, gGameDb, p->defIndex);
             names += NoticeName(PortModPartName(i), def.slot);
             given++;
+            sUnsaved.push_back(p->key);
+            PortLog("mods: part %s (row %d) given to profile %s", p->key, p->defIndex, profile.c_str());
         }
-        // Recorded also when it was owned already, so it is not given again once it is gone.
-        if (!AppendGiven(path, profile, p->key)) PortLog("mods: cannot write %s", path);
-        sGiven.push_back(p->key);
-        PortLog("mods: part %s (row %d) given to profile %s", p->key, p->defIndex, profile.c_str());
     }
     if (given) PortNotice(given == 1 ? "New part unlocked from mods" : "New parts unlocked from mods", names.c_str(), 400);
+}
+
+extern "C" void PortModGrantLoaded(void) {
+    Forget();
+    sChecked = -1000;
+}
+
+extern "C" void PortModGrantSaved(void) {
+    if (!PortModPartCount() || !gSaveSystem || !gSaveSystem[0]) return;
+    const char* path = PortModPartsSidecar();
+    const std::string profile = ProfileKey(SaveManager_GetCurrentSlot(), (const char*)gSaveSystem);
+    std::vector<std::string> have = ReadGiven(path, profile);
+    for (int i = 0; i < PortModPartCount(); i++) {
+        const PortModPart* p = PortModPartAt(i);
+        if (!p || p->defIndex < PORT_VANILLA_PARTS || Has(have, p->key)) continue;
+        // Also a part that was sold again before this save, and one the save owns without a record.
+        if (!Has(sUnsaved, p->key) && !Owned(p->defIndex)) continue;
+        if (!AppendGiven(path, profile, p->key)) { PortLog("mods: cannot write %s", path); continue; }
+        PortLog("mods: part %s recorded as given to profile %s (the game saved)", p->key, profile.c_str());
+    }
+    Forget();                                    // read the file again at the next look
 }
 
 // The record: written for one profile, read back for it only, other lines left alone.
