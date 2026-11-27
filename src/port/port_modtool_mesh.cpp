@@ -62,6 +62,8 @@ struct Decoder {
     const u8* z;
     u32 size, base;
     u32 cp[256];
+    const std::vector<MtLight>* lights = NULL;               // draws in these ranges go to lightOut[k]
+    std::vector<std::vector<MtVert>>* lightOut = NULL;
 
     // The bytes of array `n`'s element `idx`, or NULL outside the zone.
     const u8* Elem(u32 n, u32 idx, u32 bytes) const {
@@ -153,7 +155,14 @@ struct Decoder {
             if (op == 0x10) { if (p + 4 > end) return false; u32 n = Be16(p) + 1u; p += 4 + 4 * n; continue; }
             if (op == 0x20 || op == 0x28 || op == 0x30 || op == 0x38 || op == 0x61) { p += 4; continue; }
             if (op == 0x40) { p += 8; continue; }
-            if (op >= 0x80 && op < 0xC0) { if (!Draw(op, p, end, out, skipped)) return false; continue; }
+            if (op >= 0x80 && op < 0xC0) {
+                u32 at = (u32)(p - 1 - z);
+                std::vector<MtVert>* to = out;
+                for (size_t k = 0; lights && k < lights->size(); k++)
+                    if (at >= (*lights)[k].first && at < (*lights)[k].end) to = &(*lightOut)[k];
+                if (!Draw(op, p, end, to, skipped)) return false;
+                continue;
+            }
             return false;
         }
         return true;
@@ -169,7 +178,7 @@ bool LooksLikeList(const u8* z, u32 size, u32 l) {
 
 }  // namespace
 
-bool MtZoneScan(const u8* z, u32 size, MtZone* out) {
+bool MtZoneScan(const u8* z, u32 size, MtZone* out, const std::vector<MtLight>* lights) {
     *out = MtZone();
     // Batches: a record whose +0x18 leads to a list of the zone and +0x24 is its size (32-byte multiples, as GX wants).
     std::unordered_map<u32, std::pair<u32, u32>> at;          // list -> batch, size
@@ -220,6 +229,9 @@ bool MtZoneScan(const u8* z, u32 size, MtZone* out) {
     }
     Decoder dec;
     dec.z = z; dec.size = size; dec.base = out->base;
+    std::vector<std::vector<MtVert>> lightVerts(lights ? lights->size() : 0);
+    dec.lights = lights;
+    dec.lightOut = &lightVerts;
     std::vector<std::pair<u32, std::pair<u32, u32>>> lists(at.begin(), at.end());
     std::sort(lists.begin(), lists.end());
     for (auto& kv : lists) {
@@ -232,16 +244,34 @@ bool MtZoneScan(const u8* z, u32 size, MtZone* out) {
             u32 t = Be32(z + b.material + 0x1C) - out->base;
             if (t + 0x24 <= size) b.texture = t;
         }
+        b.light = -1;
         b.first = (u32)out->verts.size();
+        for (auto& lv : lightVerts) lv.clear();
         if (!dec.List(b.list, b.size, &out->verts, &b.skipped)) out->verts.resize(b.first);   // not a list after all
         b.count = (u32)out->verts.size() - b.first;
-        if (b.count) out->batches.push_back(b);
+        if (!b.count) continue;
+        out->batches.push_back(b);
+        u32 parent = (u32)out->batches.size() - 1;
+        for (size_t k = 0; k < lightVerts.size(); k++) {       // its draws of light, as batches of their own
+            if (lightVerts[k].empty()) continue;
+            MtBatch l = b;
+            l.light = (int)k;
+            l.parent = parent;
+            l.texture = ~0u;                                    // `texture` is where the pixels lie: find the header that has them
+            for (u32 q = 0x1C; q + 8 <= size && l.texture == ~0u; q += 4)
+                if (Be32(z + q) == out->base + (*lights)[k].texture && Be16(z + q - 0x1C + 8) && Be16(z + q - 0x1C + 8) <= 4096) l.texture = q - 0x1C;
+            l.first = (u32)out->verts.size();
+            out->verts.insert(out->verts.end(), lightVerts[k].begin(), lightVerts[k].end());
+            l.count = (u32)lightVerts[k].size();
+            out->batches.push_back(l);
+        }
     }
     if (out->batches.empty()) { out->error = "no display list could be read"; return false; }
+    if (lights) for (const MtLight& l : *lights) out->lightScroll.push_back({l.scroll[0], l.scroll[1]});
     // Scene items: an item points at its mesh (+0x10) and its matrix (+0x04: nine floats of rotation and scale, then
     // the position; fn_80171228); the mesh lists its parts {material, batch} (+0x6C count, +0x70) and a scale (+0x54).
     std::unordered_map<u32, size_t> batchIndex;
-    for (size_t i = 0; i < out->batches.size(); i++) batchIndex[out->batches[i].batch] = i;
+    for (size_t i = 0; i < out->batches.size(); i++) if (out->batches[i].light < 0) batchIndex[out->batches[i].batch] = i;
     std::unordered_set<u32> meshes;
     for (u32 e : partAt)
         for (u32 i = 0; i < 64 && e >= 0x70 + 8 * i; i++) {
@@ -285,11 +315,27 @@ bool MtZoneScan(const u8* z, u32 size, MtZone* out) {
             }
             out->draws.push_back(dr);
             placed[bi] = true;
+            for (size_t li = bi + 1; li < out->batches.size() && out->batches[li].light >= 0 && out->batches[li].parent == bi; li++) {
+                const MtBatch& lb = out->batches[li];
+                MtDraw ld = {(u32)li, (u32)out->verts.size(), lb.count};
+                for (u32 j = lb.first; j < lb.first + lb.count; j++) {
+                    MtVert v = out->verts[j];
+                    f32 x = v.p[0] * scale, y = v.p[1] * scale, zz = v.p[2] * scale;
+                    v.p[0] = x * r[0] + y * r[3] + zz * r[6] + r[9];
+                    v.p[1] = x * r[1] + y * r[4] + zz * r[7] + r[10];
+                    v.p[2] = x * r[2] + y * r[5] + zz * r[8] + r[11];
+                    out->verts.push_back(v);
+                }
+                out->draws.push_back(ld);
+                placed[li] = true;
+            }
         }
         out->items++;
     }
     for (size_t i = 0; i < out->batches.size(); i++)          // not placed by an item: as it is
         if (!placed[i]) out->draws.push_back(MtDraw{(u32)i, out->batches[i].first, out->batches[i].count});
+    std::stable_sort(out->draws.begin(), out->draws.end(), [&](const MtDraw& a, const MtDraw& b) {
+        return (out->batches[a.batch].light >= 0 ? 1 : 0) < (out->batches[b.batch].light >= 0 ? 1 : 0); });   // light after the solid things
     (void)local;
     for (int k = 0; k < 3; k++) { out->lo[k] = 1e30f; out->hi[k] = -1e30f; }
     for (const MtDraw& dr : out->draws)
@@ -301,10 +347,15 @@ bool MtZoneScan(const u8* z, u32 size, MtZone* out) {
 }
 
 bool MtBatchTexture(const u8* z, u32 size, const MtZone& zn, const MtBatch& b, std::vector<u32>* rgba, u32* w, u32* h) {
-    if (b.texture == ~0u) return false;
-    const u8* t = z + b.texture;                                // a texture header (docs/loader.md, SirTexture)
+    return MtTextureAt(z, size, zn.base, b.texture, rgba, w, h);
+}
+
+bool MtTextureAt(const u8* z, u32 size, u32 base, u32 texture, std::vector<u32>* rgba, u32* w, u32* h) {
+    if (texture == ~0u || texture + 0x24 > size) return false;
+    const u8* t = z + texture;                                  // a texture header (docs/loader.md, SirTexture)
     u32 tw = Be16(t + 8), th = Be16(t + 10), fmt = t[0x14], tl = t[0x15] & 3;
-    u32 data = Be32(t + 0x1C) - zn.base, pal = Be32(t + 0x20);
+    u32 data = Be32(t + 0x1C) - base, pal = Be32(t + 0x20);
+    struct { u32 base; } zn = {base};
     u32 bytes = PortGxTextureBytes(tw, th, fmt);
     if (!tw || !th || tw > 4096 || th > 4096 || data >= size || bytes > size - data) return false;
     const u8* tlut = NULL;
@@ -336,6 +387,8 @@ struct MtView {
     ID3D11RasterizerState* solid = NULL;
     ID3D11RasterizerState* wire = NULL;
     ID3D11DepthStencilState* depth = NULL;
+    ID3D11DepthStencilState* depthTest = NULL;              // light: tested, not written
+    ID3D11BlendState* add = NULL;
     ID3D11SamplerState* sampler = NULL;
     ID3D11Texture2D* color = NULL;
     ID3D11RenderTargetView* rtv = NULL;
@@ -350,22 +403,23 @@ struct MtView {
 namespace {
 
 const char* kShader = R"(
-cbuffer C : register(b0) { row_major float4x4 mvp; float4 eye; float4 flags; };
+cbuffer C : register(b0) { row_major float4x4 mvp; float4 eye; float4 flags; float4 uvOff; };
 Texture2D tex : register(t0);
 SamplerState smp : register(s0);
 struct VI { float3 p : POSITION; float3 n : NORMAL; float2 uv : TEXCOORD; float4 c : COLOR; };
 struct VO { float4 p : SV_Position; float3 n : NORMAL; float2 uv : TEXCOORD; float4 c : COLOR; float3 w : POS; };
-VO vs(VI i) { VO o; o.p = mul(float4(i.p, 1), mvp); o.n = i.n; o.uv = i.uv; o.c = i.c; o.w = i.p; return o; }
+VO vs(VI i) { VO o; o.p = mul(float4(i.p, 1), mvp); o.n = i.n; o.uv = i.uv + uvOff.xy; o.c = i.c; o.w = i.p; return o; }
 float4 ps(VO i) : SV_Target {
     float3 l = normalize(eye.xyz - i.w);
     float lit = 0.35 + 0.65 * abs(dot(normalize(i.n), l));
     float4 t = flags.x > 0.5 ? tex.Sample(smp, i.uv) : float4(1, 1, 1, 1);
     if (flags.y > 0.5) return float4(0.9, 0.9, 0.95, 1);
+    if (flags.z > 0.5) return float4(t.rgb * i.c.rgb * 2, 1);    // light: picture x vertex colour x 2, added
     return float4(t.rgb * i.c.rgb * lit, 1);
 }
 )";
 
-struct Consts { f32 mvp[16]; f32 eye[4]; f32 flags[4]; };
+struct Consts { f32 mvp[16]; f32 eye[4]; f32 flags[4]; f32 uvOff[4]; };
 
 void Release(IUnknown* p) { if (p) p->Release(); }
 
@@ -411,6 +465,16 @@ MtView* MtViewCreate(ID3D11Device* dev) {
     D3D11_DEPTH_STENCIL_DESC dd = {};
     dd.DepthEnable = TRUE; dd.DepthWriteMask = D3D11_DEPTH_WRITE_MASK_ALL; dd.DepthFunc = D3D11_COMPARISON_LESS;
     dev->CreateDepthStencilState(&dd, &v->depth);
+    dd.DepthWriteMask = D3D11_DEPTH_WRITE_MASK_ZERO;
+    dev->CreateDepthStencilState(&dd, &v->depthTest);
+    D3D11_BLEND_DESC bl = {};
+    bl.RenderTarget[0].BlendEnable = TRUE;
+    bl.RenderTarget[0].SrcBlend = bl.RenderTarget[0].DestBlend = D3D11_BLEND_ONE;
+    bl.RenderTarget[0].BlendOp = D3D11_BLEND_OP_ADD;
+    bl.RenderTarget[0].SrcBlendAlpha = bl.RenderTarget[0].DestBlendAlpha = D3D11_BLEND_ONE;
+    bl.RenderTarget[0].BlendOpAlpha = D3D11_BLEND_OP_ADD;
+    bl.RenderTarget[0].RenderTargetWriteMask = D3D11_COLOR_WRITE_ENABLE_ALL;
+    dev->CreateBlendState(&bl, &v->add);
     D3D11_SAMPLER_DESC sd = {};
     sd.Filter = D3D11_FILTER_MIN_MAG_MIP_LINEAR; sd.AddressU = sd.AddressV = sd.AddressW = D3D11_TEXTURE_ADDRESS_WRAP; sd.MaxLOD = D3D11_FLOAT32_MAX;
     dev->CreateSamplerState(&sd, &v->sampler);
@@ -433,7 +497,7 @@ void MtViewDestroy(MtView* v) {
     DropTarget(v);
     DropTextures(v);
     Release(v->vs); Release(v->ps); Release(v->layout); Release(v->cb); Release(v->vb);
-    Release(v->solid); Release(v->wire); Release(v->depth); Release(v->sampler);
+    Release(v->solid); Release(v->wire); Release(v->depth); Release(v->depthTest); Release(v->add); Release(v->sampler);
     delete v;
 }
 
@@ -534,15 +598,25 @@ ID3D11ShaderResourceView* MtViewDraw(MtView* v, ID3D11DeviceContext* ctx, const 
     ctx->PSSetConstantBuffers(0, 1, &v->cb);
     ctx->PSSetSamplers(0, 1, &v->sampler);
     for (const MtDraw& b : what) {
-        ID3D11ShaderResourceView* pic = cam.textured ? Picture(v, z, size, zn, zn.batches[b.batch]) : NULL;
+        const MtBatch& mb = zn.batches[b.batch];
+        ID3D11ShaderResourceView* pic = cam.textured ? Picture(v, z, size, zn, mb) : NULL;
         c.flags[0] = pic ? 1.0f : 0.0f;
         c.flags[1] = cam.wire ? 1.0f : 0.0f;
+        c.flags[2] = mb.light >= 0 && !cam.wire ? 1.0f : 0.0f;
+        c.uvOff[0] = c.uvOff[1] = 0;
+        if (mb.light >= 0 && zn.lightScroll.size() > (size_t)mb.light) {
+            c.uvOff[0] = fmodf(zn.lightScroll[mb.light].first * cam.time, 1.0f);
+            c.uvOff[1] = fmodf(zn.lightScroll[mb.light].second * cam.time, 1.0f);
+        }
+        ctx->OMSetBlendState(c.flags[2] > 0 ? v->add : NULL, NULL, 0xFFFFFFFFu);
+        ctx->OMSetDepthStencilState(c.flags[2] > 0 ? v->depthTest : v->depth, 0);
         if (SUCCEEDED(ctx->Map(v->cb, 0, D3D11_MAP_WRITE_DISCARD, 0, &ms))) { memcpy(ms.pData, &c, sizeof(c)); ctx->Unmap(v->cb, 0); }
         ctx->PSSetShaderResources(0, 1, &pic);
         ctx->Draw(b.count, b.first);
     }
     ID3D11ShaderResourceView* none = NULL;
     ctx->PSSetShaderResources(0, 1, &none);
+    ctx->OMSetBlendState(NULL, NULL, 0xFFFFFFFFu);
     ctx->OMSetRenderTargets(0, NULL, NULL);
     return v->out;
 }

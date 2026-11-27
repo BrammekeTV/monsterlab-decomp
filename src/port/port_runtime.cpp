@@ -1493,7 +1493,7 @@ struct PortBoot {
         if (sModTool && !gPortOptions.selfTest) {          // the mod tool runs instead of the game
             if (!gPortOptions.haveData) { fprintf(stderr, "[modtool] no game data: pass --iso <your disc> or --data <extracted disc>\n"); ExitProcess(2); }
             fflush(stderr);
-            ExitProcess(sModToolTest ? PortModToolTest() : PortModToolRun(sModToolOpen, sModToolSelect, sModToolRow, sModToolShot));
+            ExitProcess(sModToolTest ? PortModToolTest(sModToolOpen) : PortModToolRun(sModToolOpen, sModToolSelect, sModToolRow, sModToolShot));
         }
         // Console globals the SDK keeps in low memory (host byte order).
         *(u32*)(uintptr_t)0x80000028 = PORT_MEM1_SIZE;       // physical memory size

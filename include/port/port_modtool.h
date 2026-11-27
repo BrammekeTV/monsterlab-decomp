@@ -24,6 +24,16 @@ struct MtBatch {
     u32 texture;              // offset of the material's first texture, or ~0u
     u32 first, count;         // its triangles' vertices in MtZone::verts
     u32 skipped;              // draws of points and lines (not shown)
+    int light;                // -1, or the MtLight its draws are (a .part's draws of light)
+    u32 parent;               // a light: the batch whose list holds its draws
+};
+
+// A .part's draws of light (port_mod_parts.cpp, kind 2): the draws of [first, end) of the zone are drawn added
+// to the picture, unlit, with the picture at `texture` scrolling.
+struct MtLight {
+    u32 first, end, texture;
+    f32 scroll[2];
+    bool billboard;
 };
 
 struct MtDraw { u32 batch, first, count; };   // a batch as a scene item places it (or as it is)
@@ -33,21 +43,23 @@ struct MtZone {
     std::vector<MtBatch> batches;
     std::vector<MtDraw> draws; // the whole zone: every batch where its scene items put it
     u32 items = 0;            // scene items found
+    std::vector<std::pair<f32, f32>> lightScroll;   // per MtLight: turns of the picture per second
     std::vector<MtVert> verts;
     f32 lo[3] = {0, 0, 0}, hi[3] = {0, 0, 0};
     std::string error;
 };
 
 // FALSE (and why in out->error) when the image holds no display list the tool can read.
-bool MtZoneScan(const u8* zone, u32 size, MtZone* out);
+bool MtZoneScan(const u8* zone, u32 size, MtZone* out, const std::vector<MtLight>* lights = NULL);
 // The texture a batch's material draws with, as RGBA8 (the renderer's decoder).
 bool MtBatchTexture(const u8* zone, u32 size, const MtZone& z, const MtBatch& b, std::vector<u32>* rgba, u32* w, u32* h);
+bool MtTextureAt(const u8* zone, u32 size, u32 base, u32 texture, std::vector<u32>* rgba, u32* w, u32* h);
 
 // An off-screen view: orbit camera around the zone's (or one batch's) box.
 struct MtView;
 MtView* MtViewCreate(ID3D11Device* dev);
 void    MtViewDestroy(MtView* v);
-struct MtCamera { f32 yaw = 0.6f, pitch = 0.35f, dist = 2.2f; bool textured = true, wire = false; };
+struct MtCamera { f32 yaw = 0.6f, pitch = 0.35f, dist = 2.2f; bool textured = true, wire = false; f32 time = 0; };
 // Draws the zone (only == -1) or one batch into a w x h picture; the picture to show, or NULL.
 ID3D11ShaderResourceView* MtViewDraw(MtView* v, ID3D11DeviceContext* ctx, const void* key, const u8* zone, u32 size, const MtZone& z,
                                      int only, u32 w, u32 h, const MtCamera& cam);

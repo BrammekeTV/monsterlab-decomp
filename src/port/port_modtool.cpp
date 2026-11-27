@@ -91,7 +91,7 @@ std::string HashText(u32 h) {
 }
 
 // ---------------------------------------------------------------------------------------- document
-enum Kind { K_FILE, K_CONTAINER, K_SECTIONS, K_SECTION, K_HDR, K_SLOT, K_DB, K_TABLE, K_TEXLIST, K_TEX, K_STRINGS, K_STEX };   // K_STEX: a texture section (shared_texture.sir)
+enum Kind { K_FILE, K_CONTAINER, K_SECTIONS, K_SECTION, K_HDR, K_SLOT, K_DB, K_TABLE, K_TEXLIST, K_TEX, K_STRINGS, K_STEX, K_PART, K_PBLOCK, K_PLIGHT };   // K_STEX: a texture section (shared_texture.sir)
 
 struct Node {
     std::string label;
@@ -112,6 +112,11 @@ struct GameDbView { u8 pad00[0xC]; u8* data; };   // include/game/part.h GameDb
 struct Doc {
     std::string path, from, error;
     BOOL zones = FALSE;               // the sections are zone images (levels, arenas, rooms, shared_parts, shared_ui)
+    // a .part file: its template zone of shared_parts.sir with the part's blocks written over it
+    BOOL part = FALSE;
+    std::vector<u8> zone;
+    std::vector<MtLight> lights;
+    u32 zoneNum = 0;
     std::vector<u8> raw;              // the file as on the disc
     std::vector<Node> nodes;          // [0] is the file
     std::vector<SirSection> secs;
@@ -441,6 +446,76 @@ void BuildGlobalBinary(Doc* d, int root) {
     } else d->strings = NULL;
 }
 
+BOOL ReadDiscFile(const std::string& discPath, std::vector<u8>* out, std::string* from);
+u32 Le32(const u8* p) { u32 v; memcpy(&v, p, 4); return v; }
+f32 LeF(const u8* p) { f32 v; memcpy(&v, p, 4); return v; }
+
+// A mod's .part (tools/mods/blackhole/build_mod.py, read by port_mod_parts.cpp): the template zone of the player's
+// shared_parts.sir, then the part's blocks written over it as the port does: kind 0 bytes, kind 1 the address of
+// zone + target in a big-endian word, kind 2 draws of light.
+void BuildPart(Doc* d, int root) {
+    const u8* f = d->raw.data();
+    u32 n = (u32)d->raw.size();
+    if (n < 0x108 || memcmp(f, "MLP1", 4) || (Le32(f + 4) != 1 && Le32(f + 4) != 2)) { d->error = "not a .part file (MLP1, version 1 or 2)"; return; }
+    char key[33];
+    memcpy(key, f + 8, 32);
+    key[32] = 0;
+    u32 zoneSize = Le32(f + 0x3C);
+    d->zoneNum = Le32(f + 0x34);
+    Add(d, root, K_PART, std::string("part ") + key, 0, 0x108);
+    u32 count = Le32(f + 0x104), o = 0x108;
+    char b[160];
+    snprintf(b, sizeof(b), "blocks (%u)", count);
+    int bn = Add(d, root, K_SECTIONS, b, 0x104, 4);
+    struct Blk { u32 kind, off, size, at; };
+    std::vector<Blk> blocks;
+    for (u32 i = 0; i < count; i++) {
+        if (o + 12 > n) { d->error = "the blocks run past the end of the file"; return; }
+        Blk k = {Le32(f + o), Le32(f + o + 4), Le32(f + o + 8), o + 12};
+        if (k.at + k.size > n || k.kind > 2) { d->error = "a block runs past the end of the file, or has an unknown kind"; return; }
+        if (k.kind == 2 && k.size == 56) {
+            const u8* l = f + k.at;
+            MtLight ml = {Le32(l), Le32(l + 4), Le32(l + 12), {LeF(l + 44), LeF(l + 48)}, (Le32(l + 8) & 1) != 0};
+            snprintf(b, sizeof(b), "light %u: draws %06X-%06X, picture at %06X%s", (u32)d->lights.size(), ml.first, ml.end, ml.texture,
+                     ml.billboard ? ", billboard" : "");
+            Add(d, bn, K_PLIGHT, b, o, 12 + k.size, (int)d->lights.size());
+            d->lights.push_back(ml);
+        } else {
+            snprintf(b, sizeof(b), k.kind == 0 ? "bytes: 0x%X at zone +%06X" : "addresses: %u words", k.kind == 0 ? k.size : k.size / 8, k.off);
+            Add(d, bn, K_PBLOCK, b, o, 12 + k.size, (int)blocks.size());
+        }
+        blocks.push_back(k);
+        o = k.at + ((k.size + 3) & ~3u);
+    }
+    // The template, from the disc (or a mod's shared_parts.sir).
+    std::vector<u8> sp;
+    std::string from;
+    if (!ReadDiscFile("streams/shared_parts.sir", &sp, &from)) { d->error = "cannot read shared_parts.sir"; return; }
+    s32 secs = SirContainerSectionCount(sp.data(), (u32)sp.size());
+    SirSection sec = {};
+    BOOL found = FALSE;
+    for (s32 i = 0; i < secs && !found; i++) found = SirContainerSection(sp.data(), (u32)sp.size(), i, &sec) && sec.type == (s32)d->zoneNum;
+    if (!found) { snprintf(b, sizeof(b), "shared_parts.sir has no zone %u", d->zoneNum); d->error = b; return; }
+    if (sec.size != zoneSize) {
+        snprintf(b, sizeof(b), "the template zone %u is 0x%X bytes, the part expects 0x%X (another disc version?)", d->zoneNum, sec.size, zoneSize);
+        d->error = b;
+        return;
+    }
+    d->zone.assign(sp.begin() + sec.offset, sp.begin() + sec.offset + sec.size);
+    MtZone tz;
+    if (!MtZoneScan(d->zone.data(), zoneSize, &tz)) { d->error = "the template zone has no model: " + tz.error; d->zone.clear(); return; }
+    for (const Blk& k : blocks) {
+        if (k.kind == 0 && k.off <= zoneSize && k.size <= zoneSize - k.off) memcpy(&d->zone[k.off], f + k.at, k.size);
+        for (u32 j = 0; k.kind == 1 && j + 8 <= k.size; j += 8) {
+            u32 where = Le32(f + k.at + j), target = Le32(f + k.at + j + 4), a = tz.base + target;
+            if (where + 4 > zoneSize || target >= zoneSize) continue;
+            u8* w = &d->zone[where];
+            w[0] = (u8)(a >> 24); w[1] = (u8)(a >> 16); w[2] = (u8)(a >> 8); w[3] = (u8)a;
+        }
+    }
+    d->part = TRUE;
+}
+
 Doc* BuildDoc(const std::string& path, const std::string& from, std::vector<u8>&& bytes) {
     Doc* d = new Doc;
     d->path = path;
@@ -450,6 +525,7 @@ Doc* BuildDoc(const std::string& path, const std::string& from, std::vector<u8>&
     const char* base = strrchr(path.c_str(), '/');
     base = base ? base + 1 : path.c_str();
     int root = Add(d, -1, K_FILE, base, 0, n);
+    if (strlen(base) > 5 && !_stricmp(base + strlen(base) - 5, ".part")) { BuildPart(d, root); return d; }
     s32 count = SirContainerSectionCount(d->raw.data(), n);
     if (count < 0) { d->error = "not a .sir container (no PNP0 header)"; return d; }
     DictScan(d->raw.data(), d->raw.size());
@@ -485,6 +561,12 @@ Doc* BuildDoc(const std::string& path, const std::string& from, std::vector<u8>&
 }
 
 // ---------------------------------------------------------------------------------------- files
+u64 FileTime(const char* path) {
+    WIN32_FILE_ATTRIBUTE_DATA a;
+    if (!GetFileAttributesExA(path, GetFileExInfoStandard, &a)) return 0;
+    return (u64)a.ftLastWriteTime.dwHighDateTime << 32 | a.ftLastWriteTime.dwLowDateTime | (u64)a.nFileSizeLow << 1;
+}
+
 std::string Lower(std::string s) { for (char& c : s) c = (char)tolower((u8)c); return s; }
 
 BOOL ReadHost(const char* path, std::vector<u8>* out) {
@@ -550,6 +632,9 @@ struct Tool {
     int zoneNode = -1;
     int batch = -1;                   // -1: the whole zone
     MtCamera cam;
+    std::string openPath;
+    u64 openTime = 0;                 // a file from outside the disc: its time, to reload it when it changes
+    int reloads = 0;
 };
 
 ID3D11ShaderResourceView* MakeSrv(ID3D11Device* dev, const TexRef& r) {
@@ -586,6 +671,25 @@ void ListFiles(Tool* t) {
             }
     }
     t->files.push_back("catalog.sir");
+    // The parts of every mod folder (their own files: shown and watched, never written).
+    WIN32_FIND_DATAA fd, pd;
+    std::string mods = PortModsDir();
+    HANDLE h = FindFirstFileA((mods + "\\*").c_str(), &fd);
+    if (h != INVALID_HANDLE_VALUE) {
+        do {
+            if (!(fd.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY) || fd.cFileName[0] == '.') continue;
+            std::string dir = mods + "\\" + fd.cFileName + "\\parts\\";
+            HANDLE q = FindFirstFileA((dir + "*.part").c_str(), &pd);
+            if (q == INVALID_HANDLE_VALUE) continue;
+            do {
+                std::string full = dir + pd.cFileName;
+                for (char& c : full) if (c == '\\') c = '/';
+                t->files.push_back(full);
+            } while (FindNextFileA(q, &pd));
+            FindClose(q);
+        } while (FindNextFileA(h, &fd));
+        FindClose(h);
+    }
 }
 
 void OpenDoc(Tool* t, const std::string& path) {
@@ -602,6 +706,30 @@ void OpenDoc(Tool* t, const std::string& path) {
     t->sel = 0;
     t->row = -1;
     t->status = t->doc->error;
+    t->openPath = path;
+    t->openTime = from == "file" ? FileTime(path.c_str()) : 0;
+}
+
+// A .part (or any file opened from outside the disc) changed on disk: open it again where it was.
+void ReloadIfChanged(Tool* t) {
+    if (!t->openTime) return;
+    u64 now = FileTime(t->openPath.c_str());
+    if (!now || now == t->openTime) return;
+    std::string label = t->doc ? t->doc->nodes[t->sel].label : "";
+    int batch = t->batch;
+    MtCamera cam = t->cam;
+    OpenDoc(t, t->openPath);
+    if (!t->doc) return;
+    for (size_t i = 0; i < t->doc->nodes.size(); i++) if (t->doc->nodes[i].label == label) { t->sel = (int)i; break; }
+    t->zoneDoc = NULL;
+    t->batch = batch;
+    t->cam = cam;
+    t->reloads++;
+    SYSTEMTIME st;
+    GetLocalTime(&st);
+    char b[96];
+    snprintf(b, sizeof(b), "reloaded at %02d:%02d:%02d (%d times)", st.wHour, st.wMinute, st.wSecond, t->reloads);
+    if (t->doc->error.empty()) t->status = b;
 }
 
 // Picks the first node whose label starts with `what` (headless runs, --modtool-select).
@@ -744,6 +872,35 @@ void NodeFields(const Tool* t, std::vector<Field>* f) {
                 Push(f, "pixels", "GX", Int(r.bytes) + " bytes", n.off + q + 4, r.bytes);
                 Push(f, "texture pack name", "", PackName(r), 0, 0);
             }
+            break;
+        }
+        case K_PART: {
+            Push(f, "magic, version", "", std::string("MLP1, ") + Int(Le32(raw + 4)), 0, 8);
+            Push(f, "key", "char[32]", (const char*)raw + 8, 8, 32);
+            Push(f, "template", "hash", HashText(Le32(raw + 0x30)), 0x30, 4);
+            Push(f, "zones", "u32[2]", Int(Le32(raw + 0x34)) + ", " + Int(Le32(raw + 0x38)) + " of shared_parts.sir", 0x34, 8);
+            Push(f, "zone size", "u32", Hex32(Le32(raw + 0x3C)), 0x3C, 4);
+            Push(f, "name hash at", "u32", Hex32(Le32(raw + 0x40)), 0x40, 4);
+            for (int k = 0; k < 4; k++) Push(f, ("name " + Int(k + 1)).c_str(), "char[48]", std::string((const char*)raw + 0x44 + 48 * k, strnlen((const char*)raw + 0x44 + 48 * k, 48)), 0x44 + 48 * k, 48);
+            break;
+        }
+        case K_PBLOCK:
+            Push(f, "kind", "u32", Le32(raw + n.off) == 0 ? "0: bytes" : "1: addresses", n.off, 4);
+            Push(f, "zone offset", "u32", Hex32(Le32(raw + n.off + 4)), n.off + 4, 4);
+            Push(f, "size", "u32", Hex32(Le32(raw + n.off + 8)), n.off + 8, 4);
+            break;
+        case K_PLIGHT: {
+            const u8* l = raw + n.off + 12;
+            u32 o = n.off + 12;
+            Push(f, "first", "u32", Hex32(Le32(l)), o, 4);
+            Push(f, "end", "u32", Hex32(Le32(l + 4)), o + 4, 4);
+            Push(f, "flags", "u32", Le32(l + 8) & 1 ? "1: billboard" : "0", o + 8, 4);
+            Push(f, "picture", "u32", Hex32(Le32(l + 12)), o + 12, 4);
+            Push(f, "matrix", "u32", Int(Le32(l + 16)), o + 16, 4);
+            Push(f, "centre", "f32[3]", Num("%g", LeF(l + 20)) + " " + Num("%g", LeF(l + 24)) + " " + Num("%g", LeF(l + 28)), o + 20, 12);
+            Push(f, "axis", "f32[3]", Num("%g", LeF(l + 32)) + " " + Num("%g", LeF(l + 36)) + " " + Num("%g", LeF(l + 40)), o + 32, 12);
+            Push(f, "scroll", "f32[2]", Num("%g", LeF(l + 44)) + " " + Num("%g", LeF(l + 48)) + " turns/s", o + 44, 8);
+            Push(f, "gain", "f32", Num("%g", LeF(l + 52)) + " (not used yet)", o + 52, 4);
             break;
         }
         case K_STRINGS:
@@ -970,11 +1127,15 @@ void DrawTexture(Tool* t) {
 void DrawModel(Tool* t) {
     const Doc* d = t->doc;
     const Node& n = d->nodes[t->sel];
-    if (t->zoneDoc != d || t->zoneNode != t->sel) {
+    const u8* zb = d->part ? d->zone.data() : d->raw.data() + n.off;
+    u32 zs = d->part ? (u32)d->zone.size() : n.size;
+    int key = d->part ? -1 : t->sel;
+    if (t->zoneDoc != d || t->zoneNode != key) {
         t->zoneDoc = d;
-        t->zoneNode = t->sel;
-        t->batch = -1;
-        MtZoneScan(d->raw.data() + n.off, n.size, &t->zone);
+        t->zoneNode = key;
+        if (!d->part) t->batch = -1;
+        MtZoneScan(zb, zs, &t->zone, d->part ? &d->lights : NULL);
+        if (t->batch >= (int)t->zone.batches.size()) t->batch = -1;
     }
     const MtZone& z = t->zone;
     if (z.batches.empty()) { ImGui::TextDisabled("No model here: %s.", z.error.c_str()); return; }
@@ -987,7 +1148,8 @@ void DrawModel(Tool* t) {
         for (int i = clip.DisplayStart; i < clip.DisplayEnd; i++) {
             const MtBatch& b = z.batches[i];
             char lb[96];
-            snprintf(lb, sizeof(lb), "list %06X  %u tris%s", b.list, b.count / 3, b.texture != ~0u ? "" : "  (no texture)");
+            if (b.light >= 0) snprintf(lb, sizeof(lb), "  light %d  %u tris", b.light, b.count / 3);
+            else snprintf(lb, sizeof(lb), "list %06X  %u tris%s", b.list, b.count / 3, b.texture != ~0u ? "" : "  (no texture)");
             if (ImGui::Selectable(lb, t->batch == i)) t->batch = i;
         }
     ImGui::EndChild();
@@ -1005,7 +1167,7 @@ void DrawModel(Tool* t) {
     ImVec2 avail = ImGui::GetContentRegionAvail();
     u32 w = avail.x > 64 ? (u32)avail.x : 64, h = avail.y > 64 ? (u32)avail.y : 64;
     if (!t->view && t->dev) t->view = MtViewCreate(t->dev);
-    ID3D11ShaderResourceView* pic = t->view ? MtViewDraw(t->view, t->ctx, &t->zone, d->raw.data() + n.off, n.size, z, t->batch, w, h, t->cam) : NULL;
+    ID3D11ShaderResourceView* pic = t->view ? MtViewDraw(t->view, t->ctx, &t->zone, zb, zs, z, t->batch, w, h, t->cam) : NULL;
     if (pic) {
         ImGui::Image((ImTextureID)(uintptr_t)pic, ImVec2((f32)w, (f32)h));
         if (ImGui::IsItemHovered()) {
@@ -1063,7 +1225,7 @@ void Build(Tool* t, f32 w, f32 h) {
         std::vector<Field> fields;
         NodeFields(t, &fields);
         BOOL list = n.kind == K_TABLE || n.kind == K_STRINGS, tex = n.kind == K_TEX || n.kind == K_STEX;
-        if (n.kind == K_SECTION && t->doc->zones && t->doc->secs[n.a].type >= 0) {
+        if (t->doc->part || (n.kind == K_SECTION && t->doc->zones && t->doc->secs[n.a].type >= 0)) {
             ImGui::BeginChild("model", ImVec2(0, ImGui::GetContentRegionAvail().y * 0.62f), ImGuiChildFlags_Borders);
             DrawModel(t);
             ImGui::EndChild();
@@ -1233,6 +1395,8 @@ int PortModToolRun(const char* open, const char* select, int row, const char* sh
             }
             ImGui_ImplDX11_NewFrame();
             ImGui::NewFrame();
+            t.cam.time = t.wnd ? (f32)ImGui::GetTime() : 0.25f;
+            if (t.wnd && frame % 20 == 0) ReloadIfChanged(&t);
             Build(&t, io.DisplaySize.x, io.DisplaySize.y);
             ImGui::Render();
             ctx->OMSetRenderTargets(1, &rtv, NULL);
@@ -1266,7 +1430,7 @@ int PortModToolRun(const char* open, const char* select, int row, const char* sh
 }
 
 // With the player's disc (tools/modtool_test.py): opens a few files and checks what the tree holds.
-int PortModToolTest(void) {
+int PortModToolTest(const char* part) {
     int fails = 0;
     DictScanDol();
     Tool t;
@@ -1367,6 +1531,34 @@ int PortModToolTest(void) {
         DeleteFileA((base + ".png").c_str());
         DeleteFileA((base + ".dds").c_str());
         RemoveDirectoryA(dir);
+    }
+    // A mod's .part (tools/modtool_test.py builds the black hole head into %TEMP%): over its template, with its lights,
+    // and opened again when the file changes.
+    if (part) {
+        char copy[MAX_PATH + 64];
+        DWORD n = GetTempPathA(MAX_PATH, copy);
+        snprintf(copy + n, sizeof(copy) - n, "modtool_test_%lu.part", GetCurrentProcessId());
+        std::vector<u8> bytes;
+        BOOL read = ReadHost(part, &bytes);
+        FILE* f = read ? fopen(copy, "wb") : NULL;
+        if (f) { fwrite(bytes.data(), 1, bytes.size(), f); fclose(f); }
+        OpenDoc(&t, copy);
+        MtZone z;
+        bool ok = f && t.doc->part && MtZoneScan(t.doc->zone.data(), (u32)t.doc->zone.size(), &z, &t.doc->lights);
+        u32 lightTris = 0, solidTris = 0;
+        for (const MtBatch& b : z.batches) (b.light >= 0 ? lightTris : solidTris) += b.count / 3;
+        fprintf(stderr, "[modtool] test: %s: zone %u, %u lights, %u solid and %u light triangles%s%s\n", part, t.doc->zoneNum,
+                (u32)t.doc->lights.size(), solidTris, lightTris, t.doc->error.empty() ? "" : ": ", t.doc->error.c_str());
+        if (!ok || !solidTris || (t.doc->lights.size() && !lightTris)) fails++;
+        // Change the file (one byte of a name) and look again, as the window does every 20 frames.
+        Sleep(20);
+        bytes[0x44] ^= 1;
+        f = fopen(copy, "wb");
+        if (f) { fwrite(bytes.data(), 1, bytes.size(), f); fclose(f); }
+        ReloadIfChanged(&t);
+        fprintf(stderr, "[modtool] test: changed on disk: %s\n", t.reloads == 1 ? "opened again" : "NOT SEEN");
+        if (t.reloads != 1) fails++;
+        DeleteFileA(copy);
     }
     delete t.doc;
     fprintf(stderr, fails ? "MODTOOL FAIL (%d)\n" : "MODTOOL OK\n", fails);
