@@ -99,6 +99,11 @@
  "changelog": [
   {
    "date": "2026-11-27",
+   "time": "19:41",
+   "text": "Monsters that patrol the village now turn to face the way they walk; their character settings were being read in the Wii's byte order."
+  },
+  {
+   "date": "2026-11-27",
    "time": "19:11",
    "text": "The Weld-O-Tron's weld is visible now: the arc flash, the sparks and the glowing weld bead appear behind the gun (the script passed its effect settings in the Wii's byte order, so no effect ever started; this also fixes other script effects like shots and lightning). And the story goes on: you build your first monster in the Monster Constructor, name and charge it, visit the Command Room, and the Trouble-Scope sends it to Cobbleshire. The quest-complete popup now shows the right MSP reward (16000 instead of a garbage number). The playthrough test covers 39 stages."
   },
