@@ -20,6 +20,7 @@ DISPATCHERS = [
      "engine signatures 0x00 - 0x8F"),
 ]
 ALIAS = "r9"
+COPY_TYPES = {}   # argument type -> signatures that pass it by pointer to a copy
 RESULT = 0xA8
 
 
@@ -113,7 +114,7 @@ def generate(d, sigs):
         gprs = sorted((r for r, v in args.items() if r.startswith("r") and v[0] in ("arg", "ptr")),
                       key=lambda r: int(r[1:]))
         fprs = sorted((r for r in args if r.startswith("f")), key=lambda r: int(r[1:]))
-        params, vals = [], []
+        params, vals, ptr_types = [], [], []
         # order: walk the signature; int-like args take the next GPR, floats the next FPR
         argc = len(sigs.get(sig, (0, []))[1])
         gi = fi = 0
@@ -137,6 +138,8 @@ def generate(d, sigs):
                     vals.append(f"args[{v}]")
                 else:
                     params.append("u32*")
+                    ptr_types.append(t)
+                    COPY_TYPES.setdefault(t, set()).add(sig)
                     vals.append(f"&copy[{len([x for x in vals if x.startswith('&copy')])}]")
                 gi += 1
         if not ok or gi != len(gprs) or fi != len(fprs):
@@ -145,7 +148,12 @@ def generate(d, sigs):
         copies = [slot[s] for s in sorted(slot)]
         body = []
         if copies:
-            body.append("u32 copy[] = { " + ", ".join(f"args[{c}]" for c in copies) + " };")
+            # A type 0x30 argument (a child of the entity: u16 flags, u8 locator or effect slot index, u8)
+            # is a struct the callee reads by field; the loader converted the script's operand as one
+            # big-endian word, so the copy is rebuilt field by field (ScriptChildSpec).
+            inits = [f"ScriptChildSpec(args[{c}])" if k < len(ptr_types) and ptr_types[k] == 0x30 else f"args[{c}]"
+                     for k, c in enumerate(copies)]
+            body.append("u32 copy[] = { " + ", ".join(inits) + " };")
         call = f"(({ret} (*)({', '.join(params) or 'void'}))fn)({', '.join(vals)})"
         if ret == "u32":
             body.append(f"out = {call};")
@@ -191,11 +199,25 @@ def main():
             "",
             "static inline f32 AsF32(u32 v) { f32 f; memcpy(&f, &v, 4); return f; }",
             "static inline u32 AsU32(f32 f) { u32 v; memcpy(&v, &f, 4); return v; }",
+            "",
+            "// A child of the entity (argument type 0x30: u16 flags, bit 0 a locator index, bit 1 an effect slot",
+            "// index; u8 that index; u8) arrives as the script operand, one big-endian word the loader made native.",
+            "// The callee reads the struct by field (SpawnOneParticleAtChild, FireShot, ...), so build it in memory.",
+            "static inline u32 ScriptChildSpec(u32 word) {",
+            "    u32 v;",
+            "    u8* b = (u8*)&v;",
+            "    *(u16*)b = (u16)(word >> 16);",
+            "    b[2] = (u8)(word >> 8);",
+            "    b[3] = (u8)word;",
+            "    return v;",
+            "}",
             ""]
     body = []
     for d in DISPATCHERS:
         body += generate(d, sigs)
     open("src/game/script_dispatch.cpp", "w", encoding="utf-8").write("\n".join(head + body))
+    for t in sorted(COPY_TYPES):
+        print(f"argument type 0x{t:X} passed by copy in signatures " + " ".join(f"0x{x:X}" for x in sorted(COPY_TYPES[t])))
 
 
 if __name__ == "__main__":

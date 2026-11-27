@@ -99,6 +99,46 @@
  "changelog": [
   {
    "date": "2026-11-27",
+   "time": "20:41",
+   "text": "Back in Cobbleshire with your first monster: you walk to the town gate, the Mayor talks to you and the quest log opens with the next task. The playthrough test now covers 40 stages."
+  },
+  {
+   "date": "2026-11-27",
+   "time": "19:41",
+   "text": "Monsters that patrol the village now turn to face the way they walk; their character settings were being read in the Wii's byte order."
+  },
+  {
+   "date": "2026-11-27",
+   "time": "19:11",
+   "text": "The Weld-O-Tron's weld is visible now: the arc flash, the sparks and the glowing weld bead appear behind the gun (the script passed its effect settings in the Wii's byte order, so no effect ever started; this also fixes other script effects like shots and lightning). And the story goes on: you build your first monster in the Monster Constructor, name and charge it, visit the Command Room, and the Trouble-Scope sends it to Cobbleshire. The quest-complete popup now shows the right MSP reward (16000 instead of a garbage number). The playthrough test covers 39 stages."
+  },
+  {
+   "date": "2026-11-27",
+   "time": "18:41",
+   "text": "Monster parts on the Monster Constructor are textured and shaded again instead of plain white: one light's direction was being read in the Wii's byte order, which made it an invalid number. Also a speed-up: calls to the game's tiniest functions no longer go through a slow CPU exception each time (about 150 a frame in the village), so the village frame drops from 23.0 to 20.2 ms."
+  },
+  {
+   "date": "2026-11-27",
+   "time": "18:11",
+   "text": "Modding tool, step 3: a viewer for mod parts (.part files) that reloads by itself whenever the file changes, so part makers see their edits right away."
+  },
+  {
+   "date": "2026-11-27",
+   "time": "17:41",
+   "text": "Modding tool, step 2b: a 3D view of the meshes in levels and in the shared monster parts, with an orbit camera, drawn the way the game draws them."
+  },
+  {
+   "date": "2026-11-27",
+   "time": "17:11",
+   "text": "Modding tool, step 2a: a texture gallery and viewer for any .sir file, with export to PNG or DDS, plus the game's strings for mod makers."
+  },
+  {
+   "date": "2026-11-27",
+   "time": "16:41",
+   "text": "First piece of the modding tool: a separate ml_modtool.exe that opens the game's .sir data files and shows their contents as a browsable tree, using the game's own loader so everything reads exactly as the game sees it. Texture and 3D model viewers follow next."
+  },
+  {
+   "date": "2026-11-27",
    "time": "15:37",
    "text": "The story plays on past the Weld-O-Tron to the Lightning Tower without any new fixes needed; the playthrough test now covers 30 stages."
   },

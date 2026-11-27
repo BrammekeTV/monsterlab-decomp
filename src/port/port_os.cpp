@@ -417,8 +417,27 @@ void OSReturnToMenu(void) { PortStop(0, "the game asked to return to the Wii Men
 void OSShutdownSystem(void) { PortStop(0, "the game asked to shut down"); }
 void OSReturnToDataManager(void) { PortStop(0, "the game asked to open the Wii data manager"); }
 
-void DCFlushRange(void* addr, u32 size) {}
-void DCStoreRange(void* addr, u32 size) {}
+// The flush stamps of MEM1 and MEM2 (port.h). Not part of a savestate: after a load every texture is new anyway.
+static u32 sFlushStamp[(PORT_MEM1_SIZE + PORT_MEM2_SIZE) >> PORT_FLUSH_SHIFT];
+static volatile u32 sFlushCount;
+static u32 FlushBlock(u32 phys) {
+    phys &= 0x3FFFFFFF;
+    if (phys < PORT_MEM1_SIZE) return phys >> PORT_FLUSH_SHIFT;
+    if (phys >= 0x10000000 && phys < 0x10000000 + PORT_MEM2_SIZE) return (PORT_MEM1_SIZE + phys - 0x10000000) >> PORT_FLUSH_SHIFT;
+    return ~0u;
+}
+static void FlushStamp(void* addr, u32 size) {
+    if (!size) return;
+    u32 a = (u32)(uintptr_t)addr, first = FlushBlock(a), last = FlushBlock(a + size - 1);
+    if (first == ~0u || last == ~0u || last < first) return;
+    u32 n = ++sFlushCount;
+    for (u32 b = first; b <= last; b++) sFlushStamp[b] = n;
+}
+u32 PortFlushStamp(u32 phys) { u32 b = FlushBlock(phys); return b == ~0u ? 0 : sFlushStamp[b]; }
+u32 PortFlushCount(void) { return sFlushCount; }
+
+void DCFlushRange(void* addr, u32 size) { FlushStamp(addr, size); }
+void DCStoreRange(void* addr, u32 size) { FlushStamp(addr, size); }
 void DCInvalidateRange(void* addr, u32 size) {}
 
 void OSInit(void) {

@@ -98,6 +98,11 @@ static BOOL PeekReadable(u32 addr, u32 bytes) {
     return TRUE;
 }
 static s32 sShotAt[64], sShotAtCount;   // --shot-at frames
+// --poke ADDR|BITS@FRAME / ADDR&~BITS@FRAME / ADDR=VALUE@FRAME (hex): a debugging aid that sets, clears or writes a
+// memory word at the end of every frame from FRAME on (e.g. to show an object the game keeps hidden).
+struct PortPoke { u32 addr, bits; char op; s32 from; };
+static PortPoke sPoke[16];
+static int sPokeCount;
 static int sPeekCount;
 static void PrintSummary(void) {
     char buf[256];
@@ -308,7 +313,11 @@ static void PortStateLog(void) {
     // 2 down, 3 left on screen), standing on a node, junction, challenge name hash, prompt text id.
     s32* lastMap = sLogLastMap;
     u8* player = *(u8**)(gGame + 0xD614);
-    if (fsm[1] == 0x090B84CE && player != NULL && *(u8**)(player + 0xA00) != NULL) {   // the exploration HUD machine runs
+    // While the exploration HUD machine runs (the first visit) or, on later visits (another HUD machine), while a level
+    // runs in the world's explore phase (gGame + 0xD5F0 + 0x28 == 2, what target_node_selected checks).
+    BOOL exploring = fsm[1] == 0x090B84CE ||
+                     (*(s32*)(gScriptCtx + 0x18) == 5 && sWorldReady && *(s32*)(gGame + 0xD5F0 + 0x28) == 2);
+    if (exploring && player != NULL && *(u8**)(player + 0xA00) != NULL) {
         u8* path = *(u8**)(player + 0xA00);
         s32 map[7] = { PathGetNodeId(path), PathGetNodeType(path), (s32)PathGetExits(path, 0), PathAtWaypoint(path),
                        PathIsAtJunction(path), (s32)PathGetChallengeId(path), PathGetNodeText(path) };
@@ -384,6 +393,12 @@ void PortFrameDone(void) {
         if (cur) PortLog("cursor: %.1f %.1f", *(f32*)(cur + 0x68), *(f32*)(cur + 0x6C));
     }
     if (!gPortOptions.fastAll && sFrames >= gPortOptions.fastForward) PortFastEnd();
+    for (int i = 0; i < sPokeCount; i++) {
+        const PortPoke& k = sPoke[i];
+        if (sFrames < k.from || !PeekReadable(k.addr & ~3u, 4)) continue;
+        u32* w = (u32*)(uintptr_t)(k.addr & ~3u);
+        *w = k.op == '|' ? *w | k.bits : k.op == '&' ? *w & ~k.bits : k.bits;
+    }
     for (s32 i = 0; i < sShotAtCount; i++) {          // --shot-at: extra pictures during the run
         if (sShotAt[i] != sFrames || !gPortOptions.screenshot) continue;
         char path[512];
@@ -705,11 +720,22 @@ static LONG CALLBACK TrapHandler(EXCEPTION_POINTERS* e) {
     return EXCEPTION_CONTINUE_SEARCH;
 }
 
+static u32 sShortJumps;                         // functions reached by a short jump (BuildCodeRange)
 // Fills the original code range: a jump to the PC function where one is linked, a trap elsewhere.
 static void BuildCodeRange(void) {
     u8* p = (u8*)(uintptr_t)PORT_TEXT_LO;
     for (u32 i = 0; i < PORT_TEXT_HI - PORT_TEXT_LO; i += 2) { p[i] = 0x0F; p[i + 1] = 0x0B; }   // ud2
     sByPc = (PcFunc*)malloc(sizeof(PcFunc) * (gPortFuncCount + 1));
+    // Bytes that hold a jump (one bit each): what is left of a function after its jump is never run as x86.
+    static u8 used[(PORT_TEXT_HI - PORT_TEXT_LO + 7) / 8];
+    auto isUsed = [](u32 a) { a -= PORT_TEXT_LO; return (used[a >> 3] >> (a & 7)) & 1; };
+    auto setUsed = [](u32 a, u32 n) { for (a -= PORT_TEXT_LO; n--; a++) used[a >> 3] |= (u8)(1u << (a & 7)); };
+    auto jump = [](u32 at, const void* to) {
+        u8* p = (u8*)(uintptr_t)at;
+        p[0] = 0xE9;                             // jmp rel32
+        s32 rel = (s32)((u32)(uintptr_t)to - (at + 5));
+        memcpy(p + 1, &rel, 4);
+    };
     for (u32 i = 0; i < gPortFuncCount; i++) {
         const PortFunc* f = &gPortFuncs[i];
         if (!f->impl) continue;
@@ -717,10 +743,31 @@ static void BuildCodeRange(void) {
         sByPc[sByPcCount++].f = f;
         u32 room = (i + 1 < gPortFuncCount ? gPortFuncs[i + 1].addr : PORT_TEXT_HI) - f->addr;
         if (f->addr < PORT_TEXT_LO || f->addr >= PORT_TEXT_HI || room < 5) continue;
-        u8* at = (u8*)(uintptr_t)f->addr;
-        at[0] = 0xE9;                            // jmp rel32
-        s32 rel = (s32)((u32)(uintptr_t)f->impl - (f->addr + 5));
-        memcpy(at + 1, &rel, 4);
+        jump(f->addr, f->impl);
+        setUsed(f->addr, 5);
+    }
+    // A function too short for the jump (most are 4 bytes: one PowerPC instruction) gets a short jump back to
+    // five free bytes in the dead part of a function before it, which hold the jump. Without one, a call
+    // through its original address traps (TrapHandler sends it on): an exception for each call, and some
+    // are called through tables of the game data many times a frame.
+    auto isEntry = [](u32 a) { const PortFunc* g = PortFindFunc(a); return g && g->addr == a; };
+    for (u32 i = 0; i < gPortFuncCount; i++) {
+        const PortFunc* f = &gPortFuncs[i];
+        u32 room = (i + 1 < gPortFuncCount ? gPortFuncs[i + 1].addr : PORT_TEXT_HI) - f->addr;
+        if (!f->impl || f->addr < PORT_TEXT_LO + 128 || f->addr >= PORT_TEXT_HI || room >= 5 || room < 2 || isUsed(f->addr)) continue;
+        for (u32 t = f->addr - 5; t + 126 >= f->addr; t--) {      // rel8 reaches back to 126 bytes before the next instruction
+            BOOL room5 = TRUE;
+            for (u32 k = 0; k < 5 && room5; k++) room5 = !isUsed(t + k) && !isEntry(t + k);
+            if (!room5) continue;
+            jump(t, f->impl);
+            setUsed(t, 5);
+            u8* p = (u8*)(uintptr_t)f->addr;
+            p[0] = 0xEB;                         // jmp rel8
+            p[1] = (u8)(s8)((s32)t - (s32)(f->addr + 2));
+            setUsed(f->addr, 2);
+            sShortJumps++;
+            break;
+        }
     }
     qsort(sByPc, sByPcCount, sizeof(PcFunc), ComparePc);
 }
@@ -1156,6 +1203,7 @@ static int SelfTest(void) {
     fails += PortSelfTestOverlay();
     fails += PortSelfTestDisc();
     fails += PortSelfTestPicker();
+    fails += PortSelfTestModTool();
     fails += PortSelfTestMods();
     fails += PortSelfTestModPatch();
     fails += PortSelfTestModGrant();
@@ -1210,8 +1258,23 @@ extern "C" __declspec(naked) void PortEntry(void) {
 }
 #pragma comment(linker, "/ENTRY:PortEntry")
 
+// The mod tool (ml_modtool.exe is this exe under another name; docs/concepts/mod-tools.md).
+static BOOL sModTool, sModToolTest;
+static const char* sModToolOpen;
+static const char* sModToolSelect;
+static const char* sModToolShot;
+static int sModToolRow = -1;
+static BOOL StartedAsModTool(void) {
+    char exe[MAX_PATH];
+    DWORD n = GetModuleFileNameA(NULL, exe, MAX_PATH);
+    if (!n || n >= MAX_PATH) return FALSE;
+    const char* base = strrchr(exe, '\\');
+    return _strnicmp(base ? base + 1 : exe, "ml_modtool", 10) == 0;
+}
+
 struct PortBoot {
     PortBoot() {
+        sModTool = StartedAsModTool();
         sStartTick = GetTickCount();
         PortStateInit();
         SchedInit();
@@ -1253,6 +1316,17 @@ struct PortBoot {
                 u32 words = *end == ':' ? strtoul(end + 1, NULL, 0) : 4;
                 sPeekWords[sPeekCount++] = words < 1 ? 1 : words > 1024 ? 1024 : words;
             }
+            else if (!strcmp(a, "--poke") && i + 1 < __argc && sPokeCount < 16) {
+                char* end;
+                PortPoke k = {};
+                k.addr = strtoul(__argv[++i], &end, 16);
+                k.op = *end;
+                if (k.op == '&' && end[1] == '~') end++;
+                k.bits = strtoul(end + 1, &end, 16);
+                k.from = *end == '@' ? atoi(end + 1) : 0;
+                if (k.op == '|' || k.op == '&' || k.op == '=') sPoke[sPokeCount++] = k;
+                else fprintf(stderr, "[port] --poke %s: expected ADDR|BITS@FRAME, ADDR&~BITS@FRAME or ADDR=VALUE@FRAME\n", __argv[i]);
+            }
             else if (!strcmp(a, "--watch") && i + 1 < __argc) sWatch = strtoul(__argv[++i], NULL, 16);
             else if (!strcmp(a, "--show-texture") && i + 1 < __argc) gPortOptions.showTexture = atoi(__argv[++i]);
             else if (!strcmp(a, "--screenshot") && i + 1 < __argc) gPortOptions.screenshot = __argv[++i];
@@ -1276,6 +1350,12 @@ struct PortBoot {
             else if (!strcmp(a, "--dump-data") && i + 1 < __argc) gPortOptions.dumpData = __argv[++i];
             else if (!strcmp(a, "--dump-textures") && i + 1 < __argc) gPortOptions.dumpTextures = __argv[++i];
             else if (!strcmp(a, "--picker-screenshot") && i + 1 < __argc) gPortOptions.pickerShot = __argv[++i];
+            else if (!strcmp(a, "--modtool")) sModTool = TRUE;                       // the mod tool (port_modtool.cpp)
+            else if (!strcmp(a, "--modtool-test")) sModTool = sModToolTest = TRUE;
+            else if (!strcmp(a, "--modtool-open") && i + 1 < __argc) { sModTool = TRUE; sModToolOpen = __argv[++i]; }
+            else if (!strcmp(a, "--modtool-select") && i + 1 < __argc) sModToolSelect = __argv[++i];
+            else if (!strcmp(a, "--modtool-row") && i + 1 < __argc) sModToolRow = atoi(__argv[++i]);
+            else if (!strcmp(a, "--modtool-shot") && i + 1 < __argc) { sModTool = TRUE; sModToolShot = __argv[++i]; }
             else if (!strcmp(a, "--no-ini")) {}
             else if (!strcmp(a, "--settings")) {                // open the settings screen at the start, optionally on a page
                 PortGuiSetOpen(TRUE);
@@ -1403,6 +1483,7 @@ struct PortBoot {
         sImageHi = sImageLo + *(const u32*)(pe + *(const u32*)(pe + 0x3C) + 0x50);    // SizeOfImage
 
         BuildCodeRange();
+        if (gPortOptions.verbose) PortLog("code range: %u functions too short for a jump reached by a short jump", sShortJumps);
         AddVectoredExceptionHandler(1, TrapHandler);
         DuplicateHandle(GetCurrentProcess(), GetCurrentThread(), GetCurrentProcess(), &sMainThread, 0, FALSE, DUPLICATE_SAME_ACCESS);
         sMainThreadId = GetCurrentThreadId();
@@ -1469,6 +1550,11 @@ struct PortBoot {
             }
             gPortOptions.dataDir = dir;
             gPortOptions.haveData = TRUE;
+        }
+        if (sModTool && !gPortOptions.selfTest) {          // the mod tool runs instead of the game
+            if (!gPortOptions.haveData) { fprintf(stderr, "[modtool] no game data: pass --iso <your disc> or --data <extracted disc>\n"); ExitProcess(2); }
+            fflush(stderr);
+            ExitProcess(sModToolTest ? PortModToolTest(sModToolOpen) : PortModToolRun(sModToolOpen, sModToolSelect, sModToolRow, sModToolShot));
         }
         // Console globals the SDK keeps in low memory (host byte order).
         *(u32*)(uintptr_t)0x80000028 = PORT_MEM1_SIZE;       // physical memory size

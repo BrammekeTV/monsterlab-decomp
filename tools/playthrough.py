@@ -224,7 +224,57 @@ STAGES = [
           [call("IsCastleAccessBlocked", 43100), level("castle_operating_theatre", 43100), call("StartConversationID", 43300),
            call("StopConversation", 44400), call("SetGameProgressBitFlag", 44400)],
           press=("A@43150", "A@43600-44500/150"), pointer=("951,540@43100",)),
-    # Later stages go here (a deadline after 44700, frames counted from the run's start).
+    # From here on the pointer follows tools/playthrough_cobbleshire_path.txt (a path keeps the --pointer list short).
+    # The hologram in the middle of the Lightning Tower opens the Monster Constructor; Fuseless's tutorial starts.
+    Stage("constructor", "the hologram: the Monster Constructor opens with an empty monster, Fuseless's tutorial", 45000,
+          [call("InitializeOperatingTable", 44650), call("CreateEmptyMonster", 44650), call("LT_SetTutorialText", 44800)],
+          press=("A@44700-44706",), path="playthrough_cobbleshire_path.txt"),
+    # The stick tutorial: each body area is picked with the stick (up head, down legs, left/right arms).
+    Stage("sticks", "the stick tutorial: every body area picked with the stick", 48300,
+          [call("LT_AllPartsForStickTutorialSelected", 45400), call("LT_ForceSelectPart", 46900),
+           call("LT_MarkCurrentBodyPart", 47900)],
+          press=("A@44900-46106/200", "STICK_UP@46400-46420", "STICK_DOWN@46600-46620", "STICK_LEFT@46800-46820",
+                 "STICK_RIGHT@47000-47020", "A@47200-49006/200")),
+    # The head goes first ("Whoops. I want you to choose a head."): stick up held while the arrow is clicked.
+    Stage("head", "stick up and the arrow: a head on the monster", 51800,
+          [call("IncrementOption", 51600), call("LT_ForceSelectPart", 51600)],
+          press=("A@49400-49406", "A@49800-49806", "STICK_UP@49900-50600", "A@50100-50106", "STICK_UP@50750-51250",
+                 "A@50900-50906", "A@51350-51356", "STICK_UP@51450-52050", "A@51650-51656")),
+    # The arms (stick right / left), the legs (stick down) and the torso (no stick), then Charge Monster.
+    Stage("parts", "arms, legs and torso go on, Charge Monster asks for a name", 55700,
+          [call("LT_PartSelectionMatches", 53200), call("LT_ForceSelectPart", 54800), call("LT_SetTutorialText", 54800)],
+          press=("A@52200-52606/200", "A@52900-52906", "STICK_RIGHT@53100-53500", "A@53300-53306",
+                 "STICK_LEFT@53600-54000", "A@53800-53806", "STICK_DOWN@54100-54500", "A@54300-54306",
+                 "A@54850-54856", "A@55200-55206", "A@55400-55406", "A@55600-55606")),
+    # The "New Monster" banner opens the name keyboard: two letters and the tick. The monster is charged and saved.
+    Stage("charged", "the monster's name typed, the monster charged and saved", 57300,
+          [call("MPNameInput", 56100), call("NameAddLetter", 56500), call("IsValidName", 56900),
+           call("LightningTowerChargeMonster", 56900), call("SaveMonster", 56900)],
+          press=("A@56100-56106", "A@56300-56306", "A@56600-56606", "A@56800-56806", "A@57000-57006")),
+    # Fuseless: "head down to the Command Room"; the quest ends and the next one starts.
+    Stage("deploy", "Fuseless sends the player to the Command Room: quest complete, a new quest", 58800,
+          [call("EndQuest", 57800), call("StartQuest", 58000), call("AddPlayerQuestReward", 58200)],
+          press=("A@57700-58706/200",)),
+    # Back button to the Grand Hall, the floor disc down to the Command Room: Fuseless explains the Trouble-Scope.
+    Stage("command", "the Grand Hall's floor disc: the Command Room, Fuseless's talk, the castle free", 63300,
+          [level("castle_atrium", 59100), level("castle_communication", 59800), call("StartConversationID", 59900),
+           call("SetCastleAccess", 61400)],
+          press=("A@59100-59106", "A@59800-59806", "A@60700-63106/200")),
+    # The left monitor is the Trouble-Scope: the region map, Cobbleshire, the monster to send, the launch button.
+    Stage("scope", "the Trouble-Scope: the region map, Cobbleshire, the monster chosen", 65000,
+          [level("trouble_scope_map", 63500), call("SetNextRegion", 64500), call("Troublescope_Init", 64500)],
+          press=("A@63550-63556", "A@64400-64406")),
+    Stage("cobbleshire", "the launch button: the monster lands in Cobbleshire", 66500,
+          [call("Troublescope_SetCurrentMonster", 65300), level("village_level", 65300), call("ExplorationInit", 65300)],
+          press=("A@65350-65356",)),
+    # Cobbleshire again. The D-pad walks from node to node (a key held 100 frames); the town gate's node starts the
+    # Mayor's talk about the stranger, then I.G.O.R.'s quest log opens; MINUS closes it.
+    Stage("mayor2", "the walk to the town gate: the Mayor's talk, the quest log", 71800,
+          [state("on the town gate's node", r"map node 954463866 ", 68700), call("StartConversationID", 68700),
+           call("QuestLog_HasQuest", 69600), call("CloseBooks", 71500)],
+          press=("LEFT@66650-66750", "UP@67050-67150", "RIGHT@67450-67550", "UP@67850-67950", "LEFT@68250-68350",
+                 "UP@68700-68800", "A@69200-71100/150", "MINUS@71600-71606")),
+    # Later stages go here (a deadline after 71800, frames counted from the run's start).
 ]
 
 
@@ -253,6 +303,9 @@ class Judge:
             return
         if "crash: exception" in s:
             self.failed = f"crash at frame {self.frame}"
+            return
+        if s.startswith(("[port] --press ", "[port] --pointer ")):   # an input the exe refused (or had no room for)
+            self.failed = f"input refused: {s.strip()[:200]}"
             return
         if s.startswith("[port] STOP:") and "frame limit reached" not in s:
             self.failed = f"game stopped at frame {self.frame}: {s[len('[port] STOP: '):].strip()[:300]}"
