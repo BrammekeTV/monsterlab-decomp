@@ -1,6 +1,6 @@
 # Mod tools: `.sir` editor and `.part` viewer (design)
 
-Status: step 1 (browse) and step 2a (textures, strings) built; 3D view, `.part` viewer, editing and the guide to come.
+Status: step 1 (browse), step 2a (textures, strings) and 2b (model view) built; `.part` viewer, editing and the guide to come.
 
 ## Goal
 
@@ -80,8 +80,14 @@ else as `#index` / hex, the same spellings the patch format accepts.
 - **Textures**: decoded by the renderer's own decoder (`DecodeTexture`, all GX formats, palettes),
   zoom and mip level, export to PNG (`port_png.cpp`) or DDS (`port_dds.cpp`), with the file name
   a texture pack expects (`<name>_<hash>.png`).
-- **3D**: a mesh, scene item or zone drawn into an off-screen target through the GX layer with its
-  material's GX state, orbit camera (drag to turn, wheel to zoom), wireframe and texture toggles.
+- **3D** (`port_modtool_mesh.cpp`): the meshes of a zone image (a level zone, a part of `shared_parts.sir`).
+  Every display list of the game starts with the CP writes of its own vertex format and array addresses, so
+  the tool reads a list on its own, as the GX pipe does: batches are found by their list pointer (+0x18) and
+  size (+0x24), the zone's address by the mesh parts that point at them, scene items place the meshes. Drawn
+  into an off-screen target with the first texture of each batch's material, lit from the camera, orbit camera
+  (drag to turn, wheel to zoom), wireframe and texture toggles. Not yet: the skeleton (a skinned part shows
+  its pieces in their bones' spaces) and the full TEV setup of a material (the game's own draw does that;
+  feeding the lists through the port's GX layer is the way to it).
 - **Strings**: the string table with ids, search, and the JSON key a `data/strings.json` uses.
 
 ## `.part` viewer (step 3)
