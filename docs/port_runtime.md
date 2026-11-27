@@ -208,7 +208,12 @@ size, name, and the PC implementation if one is linked: 6,900 today).
   function pointer stored by a static initialiser) land in the original code range
   `0x80004000`-`0x80345AE0`. The runtime fills it at start-up: at the address of every function
   with a PC implementation, a 5-byte jump to it; everywhere else `ud2`. No pointer in the data is
-  patched, so nothing is misread as a pointer.
+  patched, so nothing is misread as a pointer. A function too short for the jump (548 of them, most
+  one PowerPC instruction: 4 bytes) gets a 2-byte short jump back to five free bytes in the dead part
+  of a function before it, where the 5-byte jump goes. Before, a call to one trapped and the
+  exception handler sent it on: about 150 exceptions a frame in the village (`Stub_801B62D4`,
+  `fn_801DA208`, the body updates `fn_8004CB18` / `fn_8004B56C`), about 3 ms of a 23 ms frame. The trap
+  is still there for any that finds no room (`--verbose` logs how many got the short jump).
 - **Functions that are not decompiled yet** (and SDK functions without a PC implementation) get
   a generated stub, `mov eax, <original address>; jmp eax`, which lands on a `ud2`. The
   exception handler looks the address up and reports name, address, size, region and the caller,
