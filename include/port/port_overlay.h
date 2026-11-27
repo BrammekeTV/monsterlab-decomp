@@ -24,6 +24,10 @@ typedef struct PortFrameStats {
     BOOL wide;
 } PortFrameStats;
 
+// A short notice for the player in a box at the top of the picture (mod parts given, port_modgrant.cpp): `title` on
+// its own line, then `text`; shown for `frames` game frames. Also written to the log.
+void PortNotice(const char* title, const char* text, s32 frames);
+
 void PortPerfOpen(const char* path);                       // --perf-log (port_perf.cpp)
 BOOL PortPerfActive(void);
 void PortPerfFrame(const PortFrameStats* s, f32 presentMs);

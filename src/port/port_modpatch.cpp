@@ -484,6 +484,16 @@ s32 PortModPartIndex(const char* key) {
     return -1;
 }
 
+const char* PortModPartName(int i) {
+    const PortModPart* at = PortModPartAt(i);
+    if (!at) return NULL;
+    for (const PartPatch& p : S().parts)
+        if (p.key == at->key && !p.names.empty() && !p.names[0].empty()) return p.names[0].c_str();
+    return at->key;
+}
+
+const char* PortModPartsSidecar(void) { return SidecarPath(); }
+
 const char* PortModPartData(int i, const char* name) {
     const PortModPart* at = PortModPartAt(i);
     if (!at) return NULL;

@@ -231,6 +231,7 @@ typedef struct PortSettings {
     s32  exposure;            // improved lighting only: brightness of lit 3D draws before tone mapping, percent 50-150 ([graphics] exposure)
     s32  shadows;             // PORT_SHADOWS_*: the game's hard black shadows, or soft see-through ones ([graphics] shadows, --shadows)
     s32  shadowDark;          // soft shadows only: how much they darken, percent 20-100 ([graphics] shadow_darkness)
+    BOOL giveModParts;        // parts added by mods are given to the player once they have a monster ([modparts] give; port_modgrant.cpp)
 } PortSettings;
 enum { PORT_LIGHTING_ORIGINAL = 0, PORT_LIGHTING_IMPROVED = 1 };
 enum { PORT_SHADOWS_ORIGINAL = 0, PORT_SHADOWS_SOFT = 1 };

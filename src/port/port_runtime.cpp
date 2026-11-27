@@ -34,7 +34,7 @@ extern "C" void fn_8022E3D8(void* save, const unsigned char* name);   // src/gam
 extern "C" u32 _ctors[];      // 0x80345AE0, resolved by port_gen.obj like every other Wii global
 
 PortOptions gPortOptions;
-PortSettings gPortSettings = {1920, 1080, TRUE, FALSE, FALSE, FALSE, 100, FALSE, "", 100, PORT_FILTER_GAME, 0, 0, TRUE, FALSE, FALSE, "", PORT_LIGHTING_IMPROVED, 100, PORT_SHADOWS_SOFT, 70};
+PortSettings gPortSettings = {1920, 1080, TRUE, FALSE, FALSE, FALSE, 100, FALSE, "", 100, PORT_FILTER_GAME, 0, 0, TRUE, FALSE, FALSE, "", PORT_LIGHTING_IMPROVED, 100, PORT_SHADOWS_SOFT, 70, TRUE};
 
 // ------------------------------------------------------------------ log and boot summary
 struct Milestone { const char* what; u32 count; u32 ms; BOOL stub; };
@@ -373,6 +373,7 @@ void PortFrameDone(void) {
     PortCursorTrueScale();
     PortModPatchFrame();
     PortModPartsFrame();
+    PortModGrantFrame();
     if (sFrames == 1 && getenv("PORT_SCRIPT_TRACE")) InstallScriptTrace();
     sFrames++;
     PortStateLog();
@@ -1205,6 +1206,7 @@ static int SelfTest(void) {
     fails += PortSelfTestModTool();
     fails += PortSelfTestMods();
     fails += PortSelfTestModPatch();
+    fails += PortSelfTestModGrant();
     fails += PortSelfTestSettings();
 #undef CHECK
     PortLog("self-test: %u functions, %u linked; %s", gPortFuncCount, linked, fails ? "FAILED" : "ok");
