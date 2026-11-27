@@ -98,6 +98,11 @@
  ],
  "changelog": [
   {
+   "date": "2026-11-28",
+   "time": "00:40",
+   "text": "Parts added by mods are now given to you right after you build your first monster, with a notice at the top of the screen (for example 'New part unlocked from mods: Black Hole Head'). A part is only recorded as given once the game saves, so it can't be lost, and it's never given twice. You can turn this off in monsterlab.ini."
+  },
+  {
    "date": "2026-11-27",
    "time": "20:41",
    "text": "Back in Cobbleshire with your first monster: you walk to the town gate, the Mayor talks to you and the quest log opens with the next task. The playthrough test now covers 40 stages."
