@@ -24,6 +24,11 @@
 #include "port/port_mods.h"
 #include "port/sir_loader.h"
 
+BOOL PortGxDecodeTexture(const u8* src, u32 w, u32 h, u32 fmt, const u8* tlut, u32 tlutFmt, u32* out);   // port_gfx_d3d11.cpp
+u32  PortGxTextureBytes(u32 w, u32 h, u32 fmt);
+BOOL PortPngWrite(const char* path, const u32* rgba, u32 w, u32 h);   // port_png.cpp
+u32* PortPngRead(const char* path, u32* outW, u32* outH, const char** why);
+
 #pragma comment(lib, "d3d11.lib")
 
 extern IMGUI_IMPL_API LRESULT ImGui_ImplWin32_WndProcHandler(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam);
@@ -85,7 +90,7 @@ std::string HashText(u32 h) {
 }
 
 // ---------------------------------------------------------------------------------------- document
-enum Kind { K_FILE, K_CONTAINER, K_SECTIONS, K_SECTION, K_HDR, K_SLOT, K_DB, K_TABLE, K_TEXLIST, K_TEX, K_STRINGS };
+enum Kind { K_FILE, K_CONTAINER, K_SECTIONS, K_SECTION, K_HDR, K_SLOT, K_DB, K_TABLE, K_TEXLIST, K_TEX, K_STRINGS, K_STEX };   // K_STEX: a texture section (shared_texture.sir)
 
 struct Node {
     std::string label;
@@ -169,6 +174,192 @@ const char* TableName(int t) {
 const char* kGxFormat(u32 f) {
     static const char* const k[] = {"I4", "I8", "IA4", "IA8", "RGB565", "RGB5A3", "RGBA8", "?7", "C4", "C8", "C14X2"};
     return f < 11 ? k[f] : f == 14 ? "CMPR" : "?";
+}
+
+// A texture stream section (sir_loader.cpp TextureStreamDims, fn_801840E4): {"SG21" "WI00", two words, u32 size,
+// name, format byte and three more, padding to 4, u16 width, u16 height, pixels, palette}.
+u32 StreamTexFormatAt(const u8* d, u32 size) {            // offset of the format byte, or 0
+    u32 end = 0x10 + Be32(d + 0x10), p = 0x14;
+    if (end > size) return 0;
+    while (p < end && d[p]) p++;
+    return p + 1 < end ? p + 1 : 0;
+}
+u32 StreamTexDims(const u8* d, u32 size) {                 // offset of the width, or 0
+    if (size < 0x20) return 0;
+    u32 rec = Be32(d + 0x10);
+    if (rec < 12 || rec > size - 0x10) return 0;
+    u32 p = StreamTexFormatAt(d, size);
+    if (!p) return 0;
+    u32 q = (p + 7) & ~3u;                                   // as fn_801840E4 rounds the cursor (p - 1 + 8)
+    return q + 4 <= 0x10 + rec ? q : 0;
+}
+
+// ---------------------------------------------------------------------------------------- textures
+struct TexRef {
+    std::string name;
+    u32 w = 0, h = 0, fmt = 0, tlutFmt = 0, mips = 1;
+    const u8* data = NULL;            // level 0 in GX layout, as on the disc
+    const u8* tlut = NULL;            // big-endian palette entries, or NULL
+    u32 bytes = 0;                    // of level 0
+    std::vector<u8> tlutCopy;         // a stream texture's palette, padded to the whole GX palette
+};
+
+BOOL IsPaletted(u32 fmt) { return fmt == 8 || fmt == 9 || fmt == 10; }
+u32 PaletteBytes(u32 fmt) { return fmt == 8 ? 32 : fmt == 9 ? 512 : fmt == 10 ? 0x8000 : 0; }
+
+// A texture stream record as the game builds its header from it: fn_801840E4 reads {engine format, palette
+// kind, flags, ...}; fn_801499F8 gives the palette size, fn_8015A5A4 the GX format, the palette format, the
+// sizes rounded to powers of two and the mip levels when flag 4 is set. Pixels of every level, then the palette.
+BOOL StreamTex(const u8* sec, u32 size, TexRef* t) {
+    u32 q = StreamTexDims(sec, size), p = StreamTexFormatAt(sec, size);
+    if (!q) return FALSE;
+    u32 engine = sec[p], pal = sec[p + 1], flags = sec[p + 2];
+    u32 w = (u32)(sec[q] << 8 | sec[q + 1]), h = (u32)(sec[q + 2] << 8 | sec[q + 3]);
+    u32 entries = engine == 4 || engine == 11 ? 16 : engine == 5 ? 256 : engine == 12 ? 32 : engine == 13 ? 8 : 0;
+    if (entries) {
+        t->fmt = engine == 11 ? 8 : 9;
+        t->tlutFmt = pal == 4 ? 0 : pal == 6 ? 2 : 1;
+    } else {
+        switch (engine) {
+            case 8: t->fmt = 14; break;  case 15: t->fmt = 0; break;  case 16: t->fmt = 2; break;
+            case 17: t->fmt = 1; break;  case 18: t->fmt = 3; break;  case 19: t->fmt = 4; break;
+            case 23: t->fmt = 5; break;  default: t->fmt = 6; break;
+        }
+    }
+    u32 levels = 1, total = 0;
+    if (flags & 4) {                                         // mip-mapped: powers of two
+        u32 lw = 0, lh = 0;
+        for (s32 v = (s32)w - 1; v > 0; v >>= 1) lw++;
+        for (s32 v = (s32)h - 1; v > 0; v >>= 1) lh++;
+        w = 1u << lw; h = 1u << lh;
+        levels = (lw < lh ? lw : lh) + 1;
+        if (engine == 8) levels = levels >= 3 ? levels - 2 : 1;
+    }
+    for (u32 i = 0; i < levels; i++) total += PortGxTextureBytes(w >> i ? w >> i : 1, h >> i ? h >> i : 1, t->fmt);
+    t->name = (const char*)sec + 0x14;
+    t->w = w; t->h = h; t->mips = levels;
+    t->data = sec + q + 4;
+    t->bytes = PortGxTextureBytes(w, h, t->fmt);
+    u32 palBytes = entries * (pal == 3 ? 4 : 2);
+    if (q + 4 + total + palBytes > size) return FALSE;
+    if (entries) {                                           // the renderer reads a whole C4/C8 palette: pad a short one
+        t->tlutCopy.assign(t->data + total, t->data + total + palBytes);
+        t->tlutCopy.resize(PaletteBytes(t->fmt) > palBytes ? PaletteBytes(t->fmt) : palBytes, 0);
+        t->tlut = t->tlutCopy.data();
+    }
+    return TRUE;
+}
+
+BOOL TexOf(const Doc* d, const Node& n, TexRef* t) {
+    if (n.kind == K_TEX) {
+        const SirTexture* tx = (const SirTexture*)(d->image.data() + n.a);
+        t->name = tx->name; t->w = tx->size[0]; t->h = tx->size[1]; t->fmt = tx->format;
+        t->tlutFmt = tx->tlutFormat & 3; t->mips = tx->mipCount ? tx->mipCount : 1;
+        t->data = tx->data; t->tlut = IsPaletted(t->fmt) ? tx->palette : NULL;
+        if (d->Off(tx->data) == ~0u || (t->tlut && d->Off(t->tlut) == ~0u)) return FALSE;
+        t->bytes = PortGxTextureBytes(t->w, t->h, t->fmt);
+    } else if (n.kind == K_STEX) {
+        if (!StreamTex(d->raw.data() + n.off, n.size, t)) return FALSE;
+    } else return FALSE;
+    return t->w && t->h && t->w <= 4096 && t->h <= 4096 && (!IsPaletted(t->fmt) || t->tlut);
+}
+
+BOOL Decode(const TexRef& t, std::vector<u32>* rgba) {
+    rgba->assign((size_t)t.w * t.h, 0);
+    return PortGxDecodeTexture(t.data, t.w, t.h, t.fmt, t.tlut, t.tlutFmt, rgba->data());
+}
+
+// The name --dump-textures gives it (PortModsDumpTexture): a mod's textures folder matches the content hash in
+// it, or <name>.png once renamed.
+std::string PackName(const TexRef& t) {
+    u64 hash = PortModsTextureHash(t.data, t.bytes, t.tlut, t.tlut ? PaletteBytes(t.fmt) : 0, t.w, t.h, t.fmt);
+    std::string clean = t.name;
+    for (char& c : clean) if (strchr("\\/:*?\"<>|", c) || (u8)c < 32) c = '_';
+    char b[200];
+    if (clean.empty()) snprintf(b, sizeof(b), "tex_%ux%u_f%u_%016llX", t.w, t.h, t.fmt, (unsigned long long)hash);
+    else snprintf(b, sizeof(b), "tex_%ux%u_f%u_%.80s_%016llX", t.w, t.h, t.fmt, clean.c_str(), (unsigned long long)hash);
+    return b;
+}
+
+// BC1 (opaque) or BC3 (with alpha) DDS of one level, which port_dds.cpp reads. Plain end points: the box of the
+// block's colours, then the nearest of the steps. Width and height must be multiples of 4.
+u16 To565(u32 c) { return (u16)(((c & 0xF8) << 8) | ((c >> 5) & 0x7E0) | ((c >> 19) & 0x1F)); }
+u32 From565x(u16 v) {
+    u32 r = v >> 11, g = v >> 5 & 63, b = v & 31;
+    return (r << 3 | r >> 2) | (g << 2 | g >> 4) << 8 | (b << 3 | b >> 2) << 16;
+}
+void Bc1Block(const u32* px, u8* out) {
+    u32 lo[3] = {255, 255, 255}, hi[3] = {0, 0, 0};
+    for (int i = 0; i < 16; i++)
+        for (int k = 0; k < 3; k++) { u32 v = px[i] >> (k * 8) & 255; if (v < lo[k]) lo[k] = v; if (v > hi[k]) hi[k] = v; }
+    u16 c0 = To565(hi[0] | hi[1] << 8 | hi[2] << 16), c1 = To565(lo[0] | lo[1] << 8 | lo[2] << 16);
+    if (c0 < c1) { u16 x = c0; c0 = c1; c1 = x; }
+    u32 pal[4] = {From565x(c0), From565x(c1), 0, 0};
+    for (int k = 0; k < 3; k++) {
+        u32 a = pal[0] >> (k * 8) & 255, b = pal[1] >> (k * 8) & 255;
+        pal[2] |= ((2 * a + b) / 3) << (k * 8);
+        pal[3] |= ((a + 2 * b) / 3) << (k * 8);
+    }
+    u32 idx = 0;
+    for (int i = 0; i < 16; i++) {
+        int best = 0, bestD = 1 << 30;
+        for (int j = 0; j < (c0 == c1 ? 1 : 4); j++) {
+            int dd = 0;
+            for (int k = 0; k < 3; k++) { int e = (int)(px[i] >> (k * 8) & 255) - (int)(pal[j] >> (k * 8) & 255); dd += e * e; }
+            if (dd < bestD) { bestD = dd; best = j; }
+        }
+        idx |= (u32)best << (i * 2);
+    }
+    out[0] = (u8)c0; out[1] = (u8)(c0 >> 8); out[2] = (u8)c1; out[3] = (u8)(c1 >> 8);
+    memcpy(out + 4, &idx, 4);
+}
+void AlphaBlock(const u32* px, u8* out) {
+    static const u8 kCode[8] = {0, 2, 3, 4, 5, 6, 7, 1};    // step 0 is a0, step 7 is a1
+    u32 lo = 255, hi = 0;
+    for (int i = 0; i < 16; i++) { u32 a = px[i] >> 24; if (a < lo) lo = a; if (a > hi) hi = a; }
+    out[0] = (u8)hi; out[1] = (u8)lo;
+    u64 bits = 0;
+    for (int i = 0; i < 16; i++) {
+        u32 a = px[i] >> 24, step = hi == lo ? 0 : ((hi - a) * 7 + (hi - lo) / 2) / (hi - lo);
+        bits |= (u64)kCode[step] << (i * 3);
+    }
+    for (int k = 0; k < 6; k++) out[2 + k] = (u8)(bits >> (k * 8));
+}
+BOOL WriteDds(const char* path, const u32* rgba, u32 w, u32 h) {
+    if (!w || !h || (w & 3) || (h & 3)) return FALSE;
+    BOOL alpha = FALSE;
+    for (u32 i = 0; i < w * h && !alpha; i++) alpha = (rgba[i] >> 24) != 255;
+    u32 blockBytes = alpha ? 16 : 8;
+    std::vector<u8> data((size_t)(w / 4) * (h / 4) * blockBytes);
+    u8* o = data.data();
+    for (u32 by = 0; by < h; by += 4)
+        for (u32 bx = 0; bx < w; bx += 4, o += blockBytes) {
+            u32 px[16];
+            for (u32 y = 0; y < 4; y++) for (u32 x = 0; x < 4; x++) px[y * 4 + x] = rgba[(by + y) * w + bx + x];
+            if (alpha) { AlphaBlock(px, o); Bc1Block(px, o + 8); }
+            else Bc1Block(px, o);
+        }
+    u8 head[128] = {};
+    auto le = [&](u32 off, u32 v) { memcpy(head + off, &v, 4); };
+    memcpy(head, "DDS ", 4);
+    le(4, 124); le(8, 0x1 | 0x2 | 0x4 | 0x1000 | 0x80000); le(12, h); le(16, w); le(20, (u32)data.size()); le(28, 1);
+    le(76, 32); le(80, 4); memcpy(head + 84, alpha ? "DXT5" : "DXT1", 4); le(108, 0x1000);
+    FILE* f = fopen(path, "wb");
+    if (!f) return FALSE;
+    BOOL ok = fwrite(head, 1, 128, f) == 128 && fwrite(data.data(), 1, data.size(), f) == data.size();
+    fclose(f);
+    return ok;
+}
+
+// Writes <dir>\<pack name>.png (and .dds when it can); the message for the status line.
+std::string ExportTexture(const TexRef& t, const char* dir, BOOL dds) {
+    std::vector<u32> rgba;
+    if (!Decode(t, &rgba)) return "this texture format is not decoded";
+    CreateDirectoryA(dir, NULL);
+    std::string base = std::string(dir) + "\\" + PackName(t);
+    if (!PortPngWrite((base + ".png").c_str(), rgba.data(), t.w, t.h)) return "cannot write " + base + ".png";
+    if (dds && !WriteDds((base + ".dds").c_str(), rgba.data(), t.w, t.h)) return "wrote " + base + ".png (no DDS: the size is not a multiple of 4)";
+    return "wrote " + base + (dds ? ".png and .dds" : ".png");
 }
 
 std::string SectionLabel(int i, const SirSection& s, BOOL level) {
@@ -269,7 +460,19 @@ Doc* BuildDoc(const std::string& path, const std::string& from, std::vector<u8>&
         SirSection s = {};
         if (!SirContainerSection(d->raw.data(), n, i, &s)) { d->error = "a section lies outside the file"; s.offset = s.size = 0; }
         d->secs.push_back(s);
-        Add(d, sn, K_SECTION, SectionLabel(i, s, level), s.offset, s.size, i);
+        std::string label = SectionLabel(i, s, level);
+        int kind = K_SECTION;
+        const u8* sec = d->raw.data() + s.offset;
+        u32 q = s.size >= 0x20 && !memcmp(sec, "SG21WI00", 8) ? StreamTexDims(sec, s.size) : 0;
+        if (q) {                                             // a texture of its own: name, size, format
+            char lb[160];
+            TexRef r;
+            if (StreamTex(sec, s.size, &r)) snprintf(lb, sizeof(lb), "%.60s  %ux%u %s", r.name.c_str(), r.w, r.h, kGxFormat(r.fmt));
+            else snprintf(lb, sizeof(lb), "%.60s  (texture record not understood)", (const char*)sec + 0x14);
+            label = lb;
+            kind = K_STEX;
+        }
+        Add(d, sn, kind, label, s.offset, s.size, i);
     }
     if (!strcmp(base, "global_binary.sir") && count == 2 && d->secs[0].type == -1 && d->secs[0].size == GLOBAL_BINARY_HDR_SIZE &&
         d->secs[1].type == 0 && d->secs[1].size)
@@ -326,7 +529,34 @@ struct Tool {
     HWND wnd = NULL;
     BOOL quit = FALSE;
     u32 resizeW = 0, resizeH = 0;
+    // texture view
+    ID3D11Device* dev = NULL;
+    ID3D11ShaderResourceView* srv = NULL;
+    const Doc* texDoc = NULL;
+    int texNode = -1;
+    u32 texW = 0, texH = 0;
+    f32 zoom = 0;                     // 0: fit
+    char exportDir[MAX_PATH] = "";
+    std::unordered_map<int, ID3D11ShaderResourceView*> thumbs;   // node -> picture, for the gallery of the open file
 };
+
+ID3D11ShaderResourceView* MakeSrv(ID3D11Device* dev, const TexRef& r) {
+    std::vector<u32> rgba;
+    if (!dev || !Decode(r, &rgba)) return NULL;
+    D3D11_TEXTURE2D_DESC td = {};
+    td.Width = r.w; td.Height = r.h; td.MipLevels = 1; td.ArraySize = 1; td.Format = DXGI_FORMAT_R8G8B8A8_UNORM;
+    td.SampleDesc.Count = 1; td.Usage = D3D11_USAGE_IMMUTABLE; td.BindFlags = D3D11_BIND_SHADER_RESOURCE;
+    D3D11_SUBRESOURCE_DATA sd = {rgba.data(), r.w * 4, 0};
+    ID3D11Texture2D* tx = NULL;
+    ID3D11ShaderResourceView* srv = NULL;
+    if (SUCCEEDED(dev->CreateTexture2D(&td, &sd, &tx))) {
+        dev->CreateShaderResourceView(tx, NULL, &srv);
+        tx->Release();
+    }
+    return srv;
+}
+
+void DropThumbs(struct Tool* t);
 Tool* sTool;
 
 void ListFiles(Tool* t) {
@@ -354,6 +584,7 @@ void OpenDoc(Tool* t, const std::string& path) {
     if (!ok) { t->status = "cannot read " + path; return; }
     std::string p = path;
     for (char& c : p) if (c == '\\') c = '/';
+    DropThumbs(t);
     delete t->doc;
     t->doc = BuildDoc(p, from, std::move(bytes));
     t->sel = 0;
@@ -477,6 +708,30 @@ void NodeFields(const Tool* t, std::vector<Field>* f) {
             Push(f, "data size", "u32", Hex32(tx->dataSize), o + 0x18, 4);
             Push(f, "data", "pointer", Hex32(d->Off(tx->data)), o + 0x1C, 4);
             Push(f, "palette", "pointer", tx->palette ? Hex32(d->Off(tx->palette)) : "none", o + 0x20, 4);
+            TexRef r;
+            if (TexOf(d, n, &r)) Push(f, "texture pack name", "", PackName(r), 0, 0);
+            break;
+        }
+        case K_STEX: {
+            const u8* sec = raw + n.off;
+            u32 q = StreamTexDims(sec, n.size), p = StreamTexFormatAt(sec, n.size);
+            Push(f, "tags", "char[8]", "SG21 WI00", n.off, 8);
+            Push(f, "record size", "u32", Hex32(Be32(sec + 0x10)), n.off + 0x10, 4);
+            Push(f, "name", "char[]", (const char*)sec + 0x14, n.off + 0x14, p - 0x14);
+            TexRef g;
+            BOOL ok = StreamTex(sec, n.size, &g);
+            Push(f, "engine format", "u8", Int(sec[p]) + (ok ? std::string(" (GX ") + kGxFormat(g.fmt) + ")" : ""), n.off + p, 1);
+            Push(f, "palette kind", "u8", Int(sec[p + 1]), n.off + p + 1, 1);
+            Push(f, "flags", "u8", Int(sec[p + 2]) + (sec[p + 2] & 4 ? " (mip-mapped)" : ""), n.off + p + 2, 1);
+            Push(f, "+3", "u8", Int(sec[p + 3]), n.off + p + 3, 1);
+            if (ok && g.mips > 1) Push(f, "mip levels", "", Int(g.mips), 0, 0);
+            Push(f, "width", "u16", Int(sec[q] << 8 | sec[q + 1]), n.off + q, 2);
+            Push(f, "height", "u16", Int(sec[q + 2] << 8 | sec[q + 3]), n.off + q + 2, 2);
+            TexRef r;
+            if (TexOf(d, n, &r)) {
+                Push(f, "pixels", "GX", Int(r.bytes) + " bytes", n.off + q + 4, r.bytes);
+                Push(f, "texture pack name", "", PackName(r), 0, 0);
+            }
             break;
         }
         case K_STRINGS:
@@ -484,6 +739,13 @@ void NodeFields(const Tool* t, std::vector<Field>* f) {
             if (t->row >= 0 && (u32)t->row < d->strings->count) {
                 const char* s = d->strings->strings[t->row];
                 Push(f, ("string " + Int(t->row)).c_str(), "char[]", s, d->Off(s), (u32)strlen(s) + 1);
+                std::string json = "\"" + Int(t->row) + "\": \"";          // the line a mod's data/strings.json takes
+                for (const char* c = s; *c; c++) {
+                    if (*c == '"' || *c == '\\') json += '\\';
+                    if (*c == '\n') { json += "\\n"; continue; }
+                    json += *c;
+                }
+                Push(f, "in strings.json", "", json + "\"", 0, 0);
             }
             break;
     }
@@ -573,6 +835,9 @@ void DrawList(Tool* t) {
         for (u32 i = 0; i < d->strings->count; i++)
             if (!find[0] || strstr(Lower(d->strings->strings[i]).c_str(), Lower(find).c_str())) hits.push_back((int)i);
         ImGui::BeginChild("strings", ImVec2(0, 0), ImGuiChildFlags_Borders);
+        if (t->openFrames && t->row >= 0)                     // bring the picked string into view
+            for (size_t k = 0; k < hits.size(); k++)
+                if (hits[k] == t->row) { ImGui::SetScrollY(k * ImGui::GetTextLineHeightWithSpacing()); break; }
         ImGuiListClipper clip;
         clip.Begin((int)hits.size());
         while (clip.Step())
@@ -584,6 +849,109 @@ void DrawList(Tool* t) {
             }
         ImGui::EndChild();
     }
+}
+
+// The picked texture, decoded as the renderer does, with zoom and export.
+void DropThumbs(Tool* t) {
+    for (auto& kv : t->thumbs) if (kv.second) kv.second->Release();
+    t->thumbs.clear();
+}
+
+// Every texture under the picked node as a picture; a click opens it.
+void DrawGallery(Tool* t) {
+    const Doc* d = t->doc;
+    std::vector<int> kids;
+    for (int k : d->nodes[t->sel].kids) if (d->nodes[k].kind == K_TEX || d->nodes[k].kind == K_STEX) kids.push_back(k);
+    const f32 cell = 112;
+    int cols = (int)(ImGui::GetContentRegionAvail().x / (cell + 8));
+    if (cols < 1) cols = 1;
+    int rows = ((int)kids.size() + cols - 1) / cols;
+    ImGuiListClipper clip;
+    clip.Begin(rows, cell + 30);
+    int pick = -1;
+    while (clip.Step())
+        for (int r = clip.DisplayStart; r < clip.DisplayEnd; r++)
+            for (int c = 0; c < cols; c++) {
+                int i = r * cols + c;
+                if (i >= (int)kids.size()) break;
+                int k = kids[i];
+                auto it = t->thumbs.find(k);
+                if (it == t->thumbs.end()) {
+                    TexRef ref;
+                    it = t->thumbs.emplace(k, TexOf(d, d->nodes[k], &ref) ? MakeSrv(t->dev, ref) : NULL).first;
+                }
+                if (c) ImGui::SameLine();
+                ImGui::BeginGroup();
+                ImGui::PushID(k);
+                if (it->second) {
+                    if (ImGui::ImageButton("t", (ImTextureID)(uintptr_t)it->second, ImVec2(cell, cell))) pick = k;
+                } else if (ImGui::Button("?", ImVec2(cell + 6, cell + 6))) pick = k;
+                ImGui::PopID();
+                const std::string& lb = d->nodes[k].label;
+                ImGui::PushTextWrapPos(ImGui::GetCursorPosX() + cell);
+                ImGui::TextDisabled("%.18s", lb.substr(0, lb.find("  ")).c_str());
+                ImGui::PopTextWrapPos();
+                ImGui::EndGroup();
+            }
+    if (pick >= 0) { t->sel = pick; t->openFrames = 2; }
+}
+
+void DrawTexture(Tool* t) {
+    const Doc* d = t->doc;
+    if (t->texDoc != d || t->texNode != t->sel) {          // decode it into a D3D texture once
+        if (t->srv) { t->srv->Release(); t->srv = NULL; }
+        t->texDoc = d;
+        t->texNode = t->sel;
+        t->texW = t->texH = 0;
+        TexRef r;
+        std::vector<u32> rgba;
+        if (t->dev && TexOf(d, d->nodes[t->sel], &r) && Decode(r, &rgba)) {
+            D3D11_TEXTURE2D_DESC td = {};
+            td.Width = r.w; td.Height = r.h; td.MipLevels = 1; td.ArraySize = 1; td.Format = DXGI_FORMAT_R8G8B8A8_UNORM;
+            td.SampleDesc.Count = 1; td.Usage = D3D11_USAGE_IMMUTABLE; td.BindFlags = D3D11_BIND_SHADER_RESOURCE;
+            D3D11_SUBRESOURCE_DATA sd = {rgba.data(), r.w * 4, 0};
+            ID3D11Texture2D* tx = NULL;
+            if (SUCCEEDED(t->dev->CreateTexture2D(&td, &sd, &tx))) {
+                t->dev->CreateShaderResourceView(tx, NULL, &t->srv);
+                tx->Release();
+                t->texW = r.w; t->texH = r.h;
+            }
+        }
+    }
+    if (!t->srv) { ImGui::TextDisabled("This texture cannot be decoded."); return; }
+    if (ImGui::Button("Fit")) t->zoom = 0;
+    for (int z : {1, 2, 4}) {
+        ImGui::SameLine();
+        char b[8];
+        snprintf(b, sizeof(b), "%dx", z);
+        if (ImGui::Button(b)) t->zoom = (f32)z;
+    }
+    ImGui::SameLine();
+    ImGui::TextDisabled("  %ux%u", t->texW, t->texH);
+    ImGui::SameLine();
+    ImGui::SetNextItemWidth(320);
+    ImGui::InputText("##dir", t->exportDir, sizeof(t->exportDir));
+    ImGui::SameLine();
+    TexRef r;
+    BOOL have = TexOf(d, d->nodes[t->sel], &r);
+    if (ImGui::Button("Export PNG") && have) t->status = ExportTexture(r, t->exportDir, FALSE);
+    ImGui::SameLine();
+    if (ImGui::Button("PNG + DDS") && have) t->status = ExportTexture(r, t->exportDir, TRUE);
+    ImVec2 avail = ImGui::GetContentRegionAvail();
+    f32 z = t->zoom;
+    if (z <= 0) {
+        z = avail.x / t->texW < avail.y / t->texH ? avail.x / t->texW : avail.y / t->texH;
+        if (z > 8) z = 8;
+    }
+    ImGui::BeginChild("pic", ImVec2(0, 0), 0, ImGuiWindowFlags_HorizontalScrollbar);
+    ImVec2 at = ImGui::GetCursorScreenPos(), size(t->texW * z, t->texH * z);
+    ImDrawList* dl = ImGui::GetWindowDrawList();
+    for (f32 y = 0; y < size.y; y += 16)                     // a checkerboard behind see-through pixels
+        for (f32 x = 0; x < size.x; x += 16)
+            dl->AddRectFilled(ImVec2(at.x + x, at.y + y), ImVec2(at.x + (x + 16 < size.x ? x + 16 : size.x), at.y + (y + 16 < size.y ? y + 16 : size.y)),
+                              ((int)(x / 16) + (int)(y / 16)) & 1 ? IM_COL32(70, 70, 76, 255) : IM_COL32(48, 48, 52, 255));
+    ImGui::Image((ImTextureID)(uintptr_t)t->srv, size);
+    ImGui::EndChild();
 }
 
 void Build(Tool* t, f32 w, f32 h) {
@@ -626,11 +994,19 @@ void Build(Tool* t, f32 w, f32 h) {
         const Node& n = t->doc->nodes[t->sel];
         std::vector<Field> fields;
         NodeFields(t, &fields);
-        BOOL list = n.kind == K_TABLE || n.kind == K_STRINGS;
+        BOOL list = n.kind == K_TABLE || n.kind == K_STRINGS, tex = n.kind == K_TEX || n.kind == K_STEX;
+        BOOL gallery = FALSE;
+        for (int k : n.kids) gallery |= t->doc->nodes[k].kind == K_TEX || t->doc->nodes[k].kind == K_STEX;
+        if (gallery) {
+            ImGui::BeginChild("gallery", ImVec2(0, ImGui::GetContentRegionAvail().y * 0.7f), ImGuiChildFlags_Borders);
+            DrawGallery(t);
+            ImGui::EndChild();
+        }
         f32 top = ImGui::GetContentRegionAvail().y;
-        if (list) {
-            ImGui::BeginChild("list", ImVec2(0, top * 0.38f), ImGuiChildFlags_Borders);
-            DrawList(t);
+        if (list || tex) {
+            ImGui::BeginChild("list", ImVec2(0, top * (tex ? 0.55f : 0.38f)), ImGuiChildFlags_Borders);
+            if (tex) DrawTexture(t);
+            else DrawList(t);
             ImGui::EndChild();
         }
         ImGui::BeginChild("fields", ImVec2(ImGui::GetContentRegionAvail().x - 560, 0), ImGuiChildFlags_Borders);
@@ -649,7 +1025,7 @@ void Build(Tool* t, f32 w, f32 h) {
                 if (fd.size) {
                     ImGui::Selectable(fd.name.c_str(), false, ImGuiSelectableFlags_SpanAllColumns);
                     if (ImGui::IsItemHovered()) t->hover = (int)i;
-                }
+                } else ImGui::TextDisabled("%s", fd.name.c_str());
                 ImGui::TableNextColumn(); ImGui::TextDisabled("%s", fd.type.c_str());
                 ImGui::TableNextColumn(); ImGui::TextUnformatted(fd.value.c_str());
                 ImGui::TableNextColumn(); if (fd.size) ImGui::TextDisabled("%08X", fd.off);
@@ -686,12 +1062,22 @@ LRESULT CALLBACK ToolProc(HWND w, UINT m, WPARAM wp, LPARAM lp) {
 
 }  // namespace
 
+// Exports go next to the exe (export	extures), never into the game data.
+static void DefaultExportDir(Tool* t) {
+    char exe[MAX_PATH];
+    DWORD n = GetModuleFileNameA(NULL, exe, MAX_PATH);
+    char* slash = n && n < MAX_PATH ? strrchr(exe, '\\') : NULL;
+    if (slash) *slash = 0;
+    snprintf(t->exportDir, sizeof(t->exportDir), "%s\\export", slash ? exe : ".");
+}
+
 // The tool: a window until it is closed, or with `shot` one picture into that PNG. `open` is a disc path
 // ("streams/global_binary.sir") or a file, `select` the start of a tree label, `row` a row or string to pick.
 int PortModToolRun(const char* open, const char* select, int row, const char* shot) {
     u32 W = 1600, H = 900;
     Tool t;
     sTool = &t;
+    DefaultExportDir(&t);
     DictScanDol();
     ListFiles(&t);
     if (open) OpenDoc(&t, open);
@@ -753,6 +1139,7 @@ int PortModToolRun(const char* open, const char* select, int row, const char* sh
         ImGui::StyleColorsDark();
         if (t.wnd) ImGui_ImplWin32_Init(t.wnd);
         ImGui_ImplDX11_Init(dev, ctx);
+        t.dev = dev;
         f32 clear[4] = {0.06f, 0.06f, 0.07f, 1.0f};
         for (int frame = 0; !t.quit; frame++) {
             if (t.wnd) {
@@ -796,6 +1183,8 @@ int PortModToolRun(const char* open, const char* select, int row, const char* sh
     if (ctx) ctx->Release();
     if (dev) dev->Release();
     if (t.wnd) { DestroyWindow(t.wnd); UnregisterClassA("MonsterLabModTool", GetModuleHandleA(NULL)); }
+    if (t.srv) t.srv->Release();
+    DropThumbs(&t);
     delete t.doc;
     sTool = NULL;
     return result;
@@ -828,6 +1217,14 @@ int PortModToolTest(void) {
                 if (t.doc->Table(k)->count) RowFields(t.doc, k, 0, &f);
             fprintf(stderr, "[modtool] test: global_binary.sir: %d tables, %d textures, %d header slots, %u strings, first row %u fields\n",
                     tables, textures, slots, t.doc->strings ? t.doc->strings->count : 0, (u32)f.size());
+            int decoded = 0;
+            for (const Node& n : t.doc->nodes) {
+                TexRef r;
+                std::vector<u32> rgba;
+                decoded += n.kind == K_TEX && TexOf(t.doc, n, &r) && Decode(r, &rgba);
+            }
+            fprintf(stderr, "[modtool] test: global_binary.sir: %d of %d textures decoded\n", decoded, textures);
+            if (decoded != textures) fails++;
             if (!t.doc->converted || tables != GAMEDB_TABLE_COUNT || textures < 10 || slots < 10 || !t.doc->strings || f.empty() || !parts) fails++;
             // The typed bytes of a field are the disc bytes the loader converted: a 4-byte int column read
             // big-endian from the raw copy must give the value of the converted row.
@@ -835,6 +1232,44 @@ int PortModToolTest(void) {
                 if (x.size == 4 && x.type == "int" && x.value.find("->") == std::string::npos &&
                     (s32)Be32(&t.doc->raw[x.off]) != atoi(x.value.c_str())) { fprintf(stderr, "[modtool] test: %s at %08X differs\n", x.name.c_str(), x.off); fails++; }
         }
+    }
+    // Every texture of shared_texture.sir decodes; one goes out as PNG and DDS and comes back the same.
+    OpenDoc(&t, "streams/shared_texture.sir");
+    int texTotal = 0, texDecoded = 0;
+    const Node* first = NULL;
+    for (const Node& n : t.doc->nodes) {
+        if (n.kind != K_STEX) continue;
+        texTotal++;
+        TexRef r;
+        std::vector<u32> rgba;
+        if (TexOf(t.doc, n, &r) && Decode(r, &rgba)) { texDecoded++; if (!first && !(r.w & 3) && !(r.h & 3)) first = &n; }
+    }
+    fprintf(stderr, "[modtool] test: shared_texture.sir: %d of %d textures decoded\n", texDecoded, texTotal);
+    if (texTotal < 500 || texDecoded != texTotal || !first) fails++;
+    else {
+        char dir[MAX_PATH + 64];
+        DWORD n = GetTempPathA(MAX_PATH, dir);
+        snprintf(dir + n, sizeof(dir) - n, "modtool_test_%lu", GetCurrentProcessId());
+        TexRef r;
+        std::vector<u32> rgba;
+        TexOf(t.doc, *first, &r);
+        Decode(r, &rgba);
+        std::string msg = ExportTexture(r, dir, TRUE);
+        std::string base = std::string(dir) + "\\" + PackName(r);
+        u32 w = 0, h = 0;
+        const char* why = NULL;
+        u32* back = PortPngRead((base + ".png").c_str(), &w, &h, &why);
+        PortModImage dds = {};
+        BOOL ddsOk = PortDdsRead((base + ".dds").c_str(), &dds, &why);
+        BOOL same = back && w == r.w && h == r.h && !memcmp(back, rgba.data(), rgba.size() * 4);
+        fprintf(stderr, "[modtool] test: export %s: %s; PNG %s, DDS %s\n", r.name.c_str(), msg.c_str(), same ? "same pixels" : "DIFFERS",
+                ddsOk && dds.w == r.w && dds.h == r.h ? "read back" : "NOT READ");
+        if (!same || !ddsOk || dds.w != r.w) fails++;
+        free(back);
+        free(dds.data);
+        DeleteFileA((base + ".png").c_str());
+        DeleteFileA((base + ".dds").c_str());
+        RemoveDirectoryA(dir);
     }
     delete t.doc;
     fprintf(stderr, fails ? "MODTOOL FAIL (%d)\n" : "MODTOOL OK\n", fails);
