@@ -93,6 +93,7 @@ load messages, never from pictures.
 | command | the Lightning Tower's back button (`castle_atrium`), the floor disc (`castle_communication`, the Command Room), Fuseless's talk, `SetCastleAccess` |
 | scope | the left monitor (the Trouble-Scope): `trouble_scope_map`, Cobbleshire picked (`SetNextRegion`), the monster to send (`Troublescope_Init`) |
 | cobbleshire | the launch button: `Troublescope_SetCurrentMonster`, `village_level`, `ExplorationInit` |
+| mayor2 | Cobbleshire again: the D-pad walks node to node (a key held 100 frames) to the town gate (`map node 954463866`): the Mayor's talk, I.G.O.R.'s quest log (`QuestLog_HasQuest`), MINUS closes it (`CloseBooks`) |
 
 `python tools/playthrough.py --list` prints the markers and deadlines.
 

@@ -65,7 +65,7 @@ s32  PortFrameCount(void);
 
 // ------------------------------------------------------------------ scripted presses (--press)
 struct ScriptedPress { u32 bits; s32 from, to, period; f32 sx, sy; BOOL swing; };
-static ScriptedPress sPress[128];
+static ScriptedPress sPress[512];          // the playthrough passes well over 128
 static int sPressCount;
 
 static const PortBinding* FindBinding(const char* name, size_t len) {
@@ -76,7 +76,7 @@ static const PortBinding* FindBinding(const char* name, size_t len) {
 
 BOOL PortInputAddPress(const char* spec) {
     const char* at = strchr(spec, '@');
-    if (!at || sPressCount >= 128) return FALSE;
+    if (!at || sPressCount >= (int)(sizeof(sPress) / sizeof(sPress[0]))) return FALSE;
     const PortBinding* b = FindBinding(spec, (size_t)(at - spec));
     if (!b) return FALSE;
     ScriptedPress& p = sPress[sPressCount];
@@ -100,12 +100,12 @@ BOOL PortInputAddPress(const char* spec) {
 // --pointer X,Y@FRAME: from that frame on the pointer is at output pixel X,Y (mapped exactly as the mouse;
 // a later entry moves it), for headless tests.
 struct ScriptedPointer { s32 from; f32 wx, wy; BOOL console; };    // console: wx, wy are the console pointer itself
-static ScriptedPointer sPointer[32];
+static ScriptedPointer sPointer[128];
 static int sPointerCount;
 
 BOOL PortInputAddPointer(const char* spec) {
     const char* at = strchr(spec, '@');
-    if (!at || sPointerCount >= 32) return FALSE;
+    if (!at || sPointerCount >= (int)(sizeof(sPointer) / sizeof(sPointer[0]))) return FALSE;
     char* e1; char* e2;
     f32 x = (f32)strtod(spec, &e1);
     if (*e1 != ',') return FALSE;

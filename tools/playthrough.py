@@ -224,7 +224,7 @@ STAGES = [
           [call("IsCastleAccessBlocked", 43100), level("castle_operating_theatre", 43100), call("StartConversationID", 43300),
            call("StopConversation", 44400), call("SetGameProgressBitFlag", 44400)],
           press=("A@43150", "A@43600-44500/150"), pointer=("951,540@43100",)),
-    # From here on the pointer follows tools/playthrough_cobbleshire_path.txt (the --pointer list holds 32 entries).
+    # From here on the pointer follows tools/playthrough_cobbleshire_path.txt (a path keeps the --pointer list short).
     # The hologram in the middle of the Lightning Tower opens the Monster Constructor; Fuseless's tutorial starts.
     Stage("constructor", "the hologram: the Monster Constructor opens with an empty monster, Fuseless's tutorial", 45000,
           [call("InitializeOperatingTable", 44650), call("CreateEmptyMonster", 44650), call("LT_SetTutorialText", 44800)],
@@ -267,7 +267,14 @@ STAGES = [
     Stage("cobbleshire", "the launch button: the monster lands in Cobbleshire", 66500,
           [call("Troublescope_SetCurrentMonster", 65300), level("village_level", 65300), call("ExplorationInit", 65300)],
           press=("A@65350-65356",)),
-    # Later stages go here (a deadline after 66500, frames counted from the run's start).
+    # Cobbleshire again. The D-pad walks from node to node (a key held 100 frames); the town gate's node starts the
+    # Mayor's talk about the stranger, then I.G.O.R.'s quest log opens; MINUS closes it.
+    Stage("mayor2", "the walk to the town gate: the Mayor's talk, the quest log", 71800,
+          [state("on the town gate's node", r"map node 954463866 ", 68700), call("StartConversationID", 68700),
+           call("QuestLog_HasQuest", 69600), call("CloseBooks", 71500)],
+          press=("LEFT@66650-66750", "UP@67050-67150", "RIGHT@67450-67550", "UP@67850-67950", "LEFT@68250-68350",
+                 "UP@68700-68800", "A@69200-71100/150", "MINUS@71600-71606")),
+    # Later stages go here (a deadline after 71800, frames counted from the run's start).
 ]
 
 
@@ -296,6 +303,9 @@ class Judge:
             return
         if "crash: exception" in s:
             self.failed = f"crash at frame {self.frame}"
+            return
+        if s.startswith(("[port] --press ", "[port] --pointer ")):   # an input the exe refused (or had no room for)
+            self.failed = f"input refused: {s.strip()[:200]}"
             return
         if s.startswith("[port] STOP:") and "frame limit reached" not in s:
             self.failed = f"game stopped at frame {self.frame}: {s[len('[port] STOP: '):].strip()[:300]}"
