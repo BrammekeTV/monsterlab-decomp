@@ -99,6 +99,11 @@
  "changelog": [
   {
    "date": "2026-11-27",
+   "time": "18:41",
+   "text": "Monster parts on the Monster Constructor are textured and shaded again instead of plain white: one light's direction was being read in the Wii's byte order, which made it an invalid number. Also a speed-up: calls to the game's tiniest functions no longer go through a slow CPU exception each time (about 150 a frame in the village), so the village frame drops from 23.0 to 20.2 ms."
+  },
+  {
+   "date": "2026-11-27",
    "time": "18:11",
    "text": "Modding tool, step 3: a viewer for mod parts (.part files) that reloads by itself whenever the file changes, so part makers see their edits right away."
   },
