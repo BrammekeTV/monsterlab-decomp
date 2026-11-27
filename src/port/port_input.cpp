@@ -126,6 +126,50 @@ void PortInputAddConsolePointer(f32 px, f32 py, s32 frame) {
     p.from = frame; p.wx = px; p.wy = py; p.console = TRUE;
 }
 
+// --pointer-path FILE: a moving pointer for headless tests (the Weld-O-Tron's seam). Each line is "FRAME X Y", X and Y
+// in pixels of a 1920x1080 picture; between two lines of one file the pointer moves in a straight line, and from a
+// file's first frame to its last it replaces the --pointer entries. Lines starting with # are skipped.
+struct PathKey { s32 frame; f32 x, y; s32 file; };
+static PathKey* sPath;
+static int sPathCount, sPathCap, sPathFiles;
+
+BOOL PortInputAddPointerPath(const char* file) {
+    FILE* f = fopen(file, "r");
+    if (!f) return FALSE;
+    char line[128];
+    int added = 0;
+    while (fgets(line, sizeof line, f)) {
+        int frame; float x, y;
+        if (line[0] == '#' || sscanf(line, "%d %f %f", &frame, &x, &y) != 3) continue;
+        if (sPathCount == sPathCap) {
+            int cap = sPathCap ? sPathCap * 2 : 1024;
+            PathKey* grown = (PathKey*)realloc(sPath, cap * sizeof(PathKey));
+            if (!grown) break;
+            sPath = grown; sPathCap = cap;
+        }
+        if (added && frame <= sPath[sPathCount - 1].frame) continue;      // frames must rise within a file
+        PathKey k = { frame, x, y, sPathFiles };
+        sPath[sPathCount++] = k; added++;
+    }
+    fclose(f);
+    sPathFiles++;
+    return added > 0;
+}
+
+// The path's pointer at this frame, as a place in the 1920x1080 picture (0..1 each way).
+static BOOL PathPointer(s32 frame, f32* wx, f32* wy) {
+    for (int i = 0; i < sPathCount; i++) {
+        const PathKey& a = sPath[i];
+        BOOL last = i + 1 == sPathCount || sPath[i + 1].file != a.file;
+        if (frame < a.frame || (!last && frame >= sPath[i + 1].frame) || (last && frame != a.frame)) continue;
+        f32 t = last ? 0.0f : (f32)(frame - a.frame) / (f32)(sPath[i + 1].frame - a.frame);
+        *wx = (a.x + (last ? 0.0f : (sPath[i + 1].x - a.x) * t)) / 1920.0f;
+        *wy = (a.y + (last ? 0.0f : (sPath[i + 1].y - a.y) * t)) / 1080.0f;
+        return TRUE;
+    }
+    return FALSE;
+}
+
 // ------------------------------------------------------------------ XInput (loaded on demand)
 typedef DWORD (WINAPI* XInputGetStateFn)(DWORD, XINPUT_STATE*);
 static XInputGetStateFn sXInputGetState;
@@ -191,6 +235,11 @@ static void Sample(RemoteState* r) {
         if (best >= 0) {
             if (sPointer[best].console) { r->px = sPointer[best].wx; r->py = sPointer[best].wy; }
             else PortGfxPointer(sPointer[best].wx / (gPortSettings.width > 0 ? gPortSettings.width : 1920), sPointer[best].wy / (gPortSettings.height > 0 ? gPortSettings.height : 1080), &r->px, &r->py);
+            r->pointerValid = TRUE;
+        }
+        f32 wx, wy;
+        if (PathPointer(frame, &wx, &wy)) {
+            PortGfxPointer(wx, wy, &r->px, &r->py);
             r->pointerValid = TRUE;
         }
     }

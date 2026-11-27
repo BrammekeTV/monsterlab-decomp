@@ -78,6 +78,8 @@ load messages, never from pictures.
 | ingredients | Select Ingredients: a key and a secondary ingredient go into the slots (`SelectKeyIngredient`, `SelectSecondaryIngredient`), the tick confirms (`ConfirmIngredientSelection`), `castle_welding` (the Weld-O-Tron) loads |
 | weld | the Weld-O-Tron level starts (`RegisterExperimentSound`), its screens load (`LoadExperimentUI`), the instructions open (`SetInstructionsHeaderString`) and the right arrow turns to page 2 of 2 (`GetNextInstructionsString`, `IsLastPage`) |
 | weldgun | the button after the instructions (`InstructionsExitted`): the experiment's screen is pushed (`PushExperimentUI`), the gun swings in (`UpdateWeldingGunIntroPos`, `InterpolateGunFromIntroPosition`) and gameplay begins with the gun off (`minigame_gameflow_control_gameplay_entry`, `WeldingGunOffUpdate`) |
+| weldpass | the weld: B held from the moment the brush is over the trench (`WeldingGunOnUpdate`, `WeldingOverTrench`), the pointer follows `tools/playthrough_weld_path.txt` along the 64 seconds of seam, the experiment ends with SUCCESS! (`minigame_gameflow_control_success_outro_entry`, `SetFinalExperimentScore`) |
+| weldback | A on the SUCCESS! screen (`GameFlowQuitGameDone`): the Mechanical Lab loads again (`LoadLevel`) and knows the experiment was won (`GetWonLastMinigame`, `SendConversationSignal`) |
 
 `python tools/playthrough.py --list` prints the markers and deadlines.
 
@@ -126,6 +128,11 @@ Stage("lab", "walk back to the castle", 23000,                  # key, text, dea
 
 - Frame numbers count from the start of the run; `--press` / `--pointer` syntax is in `docs/port_runtime.md`.
   Pointer positions are pixels of a 1920x1080 picture (the script scales them).
+- A stage whose pointer must move takes `path="file"`: a file in `tools/` with `FRAME X Y` lines (1920x1080 pixels), given to the
+  exe as `--pointer-path`; the pointer moves in straight lines between them. The Weld-O-Tron's file was computed from the seam
+  tiles' cell maps: the brush (0.8 x 0.8 world units, placed at the camera's centre by the pointer at 1020,516) sweeps across
+  the trench's width every 28 frames. Welds must cover about two thirds of the trench cells or the meter runs out, and the
+  gun heats up while its brush is over plate, so B is only held once the brush has reached the trench.
 - Markers: `call(name, after)`, `level(name, after)`, `state(label, regex, after)`. Give an `after` frame so that an
   earlier occurrence does not count. Many script functions (`target_node_selected`, `GetPerformFieldRepair`,
   `character_exploration_move_update`...) are polled every frame and prove nothing; check with `--check-log` on a run

@@ -53,6 +53,7 @@ build\pc\monsterlab.exe                        # runs main() with your own disc 
 | `--peek ADDR[:WORDS]` | print four words (or WORDS, up to 1024) of memory at a hex address when the run stops or crashes: Wii memory, or a game thread's stack (the crash report gives `esp`). Up to 16 |
 | `--watch ADDR` | report every write of the game's threads to four bytes of Wii memory (hex address): writer, new value, stack |
 | `--press BUTTON@FRAME[-FRAME]` | hold a Wii Remote button (a name from the binding table: `A`, `B`, `PLUS`, `STICK_UP`, `SWING`...) during those frames; a press without an end lasts 6 frames; `A@FROM-TO/N` is a 6-frame press every N frames in that range. For headless tests; can be given up to 128 times |
+| `--pointer-path FILE` | a pointer that moves: each line of the file is `FRAME X Y` (pixels of a 1920x1080 picture, `#` lines skipped); between two lines the pointer goes in a straight line, and from the file's first frame to its last it replaces `--pointer`. Repeatable (`port_input.cpp`) |
 | `--save-state FILE@FRAME`, `--load-state FILE` | savestates (`docs/savestates.md`): write the whole running game at the end of that frame (repeatable); start from a state instead of booting. A state loads only into the exe that wrote it |
 | `--show-texture N` | development aid: when the boot stops, draw texture N of `global_binary.sir` through the engine's draw path instead of ending (see "GX: the renderer") |
 

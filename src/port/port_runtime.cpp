@@ -1343,6 +1343,9 @@ struct PortBoot {
             else if (!strcmp(a, "--pointer") && i + 1 < __argc) {
                 if (!PortInputAddPointer(__argv[++i])) fprintf(stderr, "[port] --pointer %s: expected X,Y@FRAME\n", __argv[i]);
             }
+            else if (!strcmp(a, "--pointer-path") && i + 1 < __argc) {
+                if (!PortInputAddPointerPath(__argv[++i])) fprintf(stderr, "[port] --pointer-path %s: no \"FRAME X Y\" lines read\n", __argv[i]);
+            }
             else if (!strcmp(a, "--press") && i + 1 < __argc) {
                 if (!PortInputAddPress(__argv[++i])) fprintf(stderr, "[port] --press %s: expected BUTTON@FRAME[-FRAME]\n", __argv[i]);
             }

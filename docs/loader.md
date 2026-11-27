@@ -689,7 +689,7 @@ What the draw passes read of an item and of the mesh it draws:
 |---|---|---|
 | item | `+0x04` its matrix, `+0x08` scale, `+0x10` its mesh, `+0x14` seven floats (two positions and a radius, written by `fn_80171ABC`), `+0x30` callback and `+0x34` its argument, `+0x3C` four floats the culling pass writes, `+0x58` float, `+0xB0` pointer (non-null: `fn_801704F8`) | `fn_80184C18` (culling), `fn_80171ABC`, `fn_80171228` |
 | matrix | twelve floats, and twelve more behind them that `fn_80171228` writes (the matrix scaled and turned to the camera) | `fn_80171ABC`, `fn_80171228` |
-| mesh | `+0x20` centre and radius, `+0x48` three floats, `+0x54` scale, `+0x64` a pointer (null in every level file), `+0x6C` number of parts, `+0x70` the parts: `{material, batch}` | `fn_80171ABC`, `fn_80171228` |
+| mesh | `+0x20` centre and radius, `+0x30` the bounding box (lowest corner, highest corner; the Weld-O-Tron places its seam tiles from it, `fn_8007C958`), `+0x48` three floats, `+0x54` scale, `+0x64` a pointer (null in every level file), `+0x6C` number of parts, `+0x70` the parts: `{material, batch}` | `fn_80171ABC`, `fn_80171228` |
 | batch | `+0x0C` flags | `fn_80171228` |
 
 The callback at `+0x30` is a build-time address in the file (0x802C5280 or 0x802C6FD4, neither

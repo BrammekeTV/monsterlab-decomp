@@ -60,10 +60,11 @@ def state(what, pattern, after=0):
 
 
 class Stage:
-    def __init__(self, key, what, deadline, markers, press=(), pointer=()):
+    def __init__(self, key, what, deadline, markers, press=(), pointer=(), path=None):
         self.key, self.what, self.deadline = key, what, deadline
         self.markers = markers                  # all must be seen (in any order; one log line counts once)
         self.press, self.pointer = press, pointer
+        self.path = path                        # a file in tools/ for --pointer-path: a pointer that moves ("FRAME X Y" lines)
 
 
 # Frames are PortFrameDone counts. The timeline repeats (fixed seed); the deadlines leave a few hundred
@@ -191,7 +192,19 @@ STAGES = [
            call("InterpolateGunFromIntroPosition", 37000), call("minigame_gameflow_control_gameplay_entry", 37000),
            call("WeldingGunOffUpdate", 37000)],
           press=("A@37050",), pointer=("1380,954@36950",)),
-    # Later stages go here (a deadline after 37500, frames counted from the run's start).
+    # The weld itself. B is held from the moment the brush is over the trench (over plate the gun heats up and breaks);
+    # the pointer follows tools/playthrough_weld_path.txt, which sweeps the brush across the trench's width as the view
+    # travels the 64 seconds of seam (welds must cover about two thirds of the trench or the meter runs out).
+    Stage("weldpass", "the Weld-O-Tron: weld the whole seam, SUCCESS!", 41400,
+          [call("WeldingGunOnUpdate", 37380), call("WeldingOverTrench", 40000),
+           call("minigame_gameflow_control_success_outro_entry", 40900), call("SetFinalExperimentScore", 41200)],
+          press=("B@37385-41300",), path="playthrough_weld_path.txt"),
+    # A on the SUCCESS! screen: back to the Mechanical Lab, which knows the experiment was won.
+    Stage("weldback", "A leaves the experiment: the Mechanical Lab again, the experiment counted as won", 41650,
+          [call("GameFlowQuitGameDone", 41450), call("LoadLevel", 41450), call("GetWonLastMinigame", 41500),
+           call("SendConversationSignal", 41550)],
+          press=("A@41450-41456",)),
+    # Later stages go here (a deadline after 41650, frames counted from the run's start).
 ]
 
 
@@ -369,6 +382,8 @@ def run(stages, iso, seconds, gpu=False, start=None):
             xy, at = p.split("@")
             x, y = (int(v) for v in xy.split(","))
             cmd += ["--pointer", f"{round(x * WIDTH / 1920)},{round(y * HEIGHT / 1080)}@{at}"]
+        if st.path:
+            cmd += ["--pointer-path", os.path.join(ROOT, "tools", st.path)]
     if iso:
         cmd += ["--iso", iso]
     if gpu:
