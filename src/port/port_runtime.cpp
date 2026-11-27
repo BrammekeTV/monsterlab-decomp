@@ -1155,6 +1155,7 @@ static int SelfTest(void) {
     fails += PortSelfTestOverlay();
     fails += PortSelfTestDisc();
     fails += PortSelfTestPicker();
+    fails += PortSelfTestModTool();
     fails += PortSelfTestMods();
     fails += PortSelfTestModPatch();
     fails += PortSelfTestSettings();
@@ -1208,8 +1209,23 @@ extern "C" __declspec(naked) void PortEntry(void) {
 }
 #pragma comment(linker, "/ENTRY:PortEntry")
 
+// The mod tool (ml_modtool.exe is this exe under another name; docs/concepts/mod-tools.md).
+static BOOL sModTool, sModToolTest;
+static const char* sModToolOpen;
+static const char* sModToolSelect;
+static const char* sModToolShot;
+static int sModToolRow = -1;
+static BOOL StartedAsModTool(void) {
+    char exe[MAX_PATH];
+    DWORD n = GetModuleFileNameA(NULL, exe, MAX_PATH);
+    if (!n || n >= MAX_PATH) return FALSE;
+    const char* base = strrchr(exe, '\\');
+    return _strnicmp(base ? base + 1 : exe, "ml_modtool", 10) == 0;
+}
+
 struct PortBoot {
     PortBoot() {
+        sModTool = StartedAsModTool();
         sStartTick = GetTickCount();
         PortStateInit();
         SchedInit();
@@ -1274,6 +1290,12 @@ struct PortBoot {
             else if (!strcmp(a, "--dump-data") && i + 1 < __argc) gPortOptions.dumpData = __argv[++i];
             else if (!strcmp(a, "--dump-textures") && i + 1 < __argc) gPortOptions.dumpTextures = __argv[++i];
             else if (!strcmp(a, "--picker-screenshot") && i + 1 < __argc) gPortOptions.pickerShot = __argv[++i];
+            else if (!strcmp(a, "--modtool")) sModTool = TRUE;                       // the mod tool (port_modtool.cpp)
+            else if (!strcmp(a, "--modtool-test")) sModTool = sModToolTest = TRUE;
+            else if (!strcmp(a, "--modtool-open") && i + 1 < __argc) { sModTool = TRUE; sModToolOpen = __argv[++i]; }
+            else if (!strcmp(a, "--modtool-select") && i + 1 < __argc) sModToolSelect = __argv[++i];
+            else if (!strcmp(a, "--modtool-row") && i + 1 < __argc) sModToolRow = atoi(__argv[++i]);
+            else if (!strcmp(a, "--modtool-shot") && i + 1 < __argc) { sModTool = TRUE; sModToolShot = __argv[++i]; }
             else if (!strcmp(a, "--no-ini")) {}
             else if (!strcmp(a, "--settings")) {                // open the settings screen at the start, optionally on a page
                 PortGuiSetOpen(TRUE);
@@ -1467,6 +1489,11 @@ struct PortBoot {
             }
             gPortOptions.dataDir = dir;
             gPortOptions.haveData = TRUE;
+        }
+        if (sModTool && !gPortOptions.selfTest) {          // the mod tool runs instead of the game
+            if (!gPortOptions.haveData) { fprintf(stderr, "[modtool] no game data: pass --iso <your disc> or --data <extracted disc>\n"); ExitProcess(2); }
+            fflush(stderr);
+            ExitProcess(sModToolTest ? PortModToolTest() : PortModToolRun(sModToolOpen, sModToolSelect, sModToolRow, sModToolShot));
         }
         // Console globals the SDK keeps in low memory (host byte order).
         *(u32*)(uintptr_t)0x80000028 = PORT_MEM1_SIZE;       // physical memory size
