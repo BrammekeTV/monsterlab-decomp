@@ -23,6 +23,7 @@
 #include "port/port.h"
 #include "port/port_mods.h"
 #include "port/sir_loader.h"
+#include "port/port_modtool.h"
 
 BOOL PortGxDecodeTexture(const u8* src, u32 w, u32 h, u32 fmt, const u8* tlut, u32 tlutFmt, u32* out);   // port_gfx_d3d11.cpp
 u32  PortGxTextureBytes(u32 w, u32 h, u32 fmt);
@@ -110,6 +111,7 @@ struct GameDbView { u8 pad00[0xC]; u8* data; };   // include/game/part.h GameDb
 
 struct Doc {
     std::string path, from, error;
+    BOOL zones = FALSE;               // the sections are zone images (levels, arenas, rooms, shared_parts, shared_ui)
     std::vector<u8> raw;              // the file as on the disc
     std::vector<Node> nodes;          // [0] is the file
     std::vector<SirSection> secs;
@@ -452,7 +454,9 @@ Doc* BuildDoc(const std::string& path, const std::string& from, std::vector<u8>&
     if (count < 0) { d->error = "not a .sir container (no PNP0 header)"; return d; }
     DictScan(d->raw.data(), d->raw.size());
     Add(d, root, K_CONTAINER, "container header", 0, SIR_SECTION_TABLE);
-    BOOL level = strstr(base, "_level") || strstr(base, "_arena") || strstr(base, "castle_") || strstr(base, "trouble_scope");
+    BOOL level = strstr(base, "_level") || strstr(base, "_arena") || strstr(base, "castle_") || strstr(base, "trouble_scope") ||
+                 strstr(base, "shared_parts") || strstr(base, "shared_ui");
+    d->zones = level;
     char b[64];
     snprintf(b, sizeof(b), "sections (%d)", count);
     int sn = Add(d, root, K_SECTIONS, b, SIR_SECTION_TABLE, (u32)count * SIR_SECTION_ENTRY);
@@ -538,6 +542,14 @@ struct Tool {
     f32 zoom = 0;                     // 0: fit
     char exportDir[MAX_PATH] = "";
     std::unordered_map<int, ID3D11ShaderResourceView*> thumbs;   // node -> picture, for the gallery of the open file
+    // model view
+    ID3D11DeviceContext* ctx = NULL;
+    MtView* view = NULL;
+    MtZone zone;
+    const Doc* zoneDoc = NULL;
+    int zoneNode = -1;
+    int batch = -1;                   // -1: the whole zone
+    MtCamera cam;
 };
 
 ID3D11ShaderResourceView* MakeSrv(ID3D11Device* dev, const TexRef& r) {
@@ -954,6 +966,62 @@ void DrawTexture(Tool* t) {
     ImGui::EndChild();
 }
 
+// The meshes of a zone image: the list of batches and the picture, turned with the mouse.
+void DrawModel(Tool* t) {
+    const Doc* d = t->doc;
+    const Node& n = d->nodes[t->sel];
+    if (t->zoneDoc != d || t->zoneNode != t->sel) {
+        t->zoneDoc = d;
+        t->zoneNode = t->sel;
+        t->batch = -1;
+        MtZoneScan(d->raw.data() + n.off, n.size, &t->zone);
+    }
+    const MtZone& z = t->zone;
+    if (z.batches.empty()) { ImGui::TextDisabled("No model here: %s.", z.error.c_str()); return; }
+    ImGui::BeginChild("batches", ImVec2(230, 0), ImGuiChildFlags_Borders);
+    ImGui::TextDisabled("zone at 0x%08X", z.base);
+    if (ImGui::Selectable("whole zone", t->batch < 0)) t->batch = -1;
+    ImGuiListClipper clip;
+    clip.Begin((int)z.batches.size());
+    while (clip.Step())
+        for (int i = clip.DisplayStart; i < clip.DisplayEnd; i++) {
+            const MtBatch& b = z.batches[i];
+            char lb[96];
+            snprintf(lb, sizeof(lb), "list %06X  %u tris%s", b.list, b.count / 3, b.texture != ~0u ? "" : "  (no texture)");
+            if (ImGui::Selectable(lb, t->batch == i)) t->batch = i;
+        }
+    ImGui::EndChild();
+    ImGui::SameLine();
+    ImGui::BeginGroup();
+    bool tex = t->cam.textured, wire = t->cam.wire;
+    ImGui::Checkbox("textures", &tex);
+    ImGui::SameLine();
+    ImGui::Checkbox("wireframe", &wire);
+    ImGui::SameLine();
+    if (ImGui::Button("reset view")) { MtCamera c; c.textured = tex; c.wire = wire; t->cam = c; }
+    t->cam.textured = tex; t->cam.wire = wire;
+    ImGui::SameLine();
+    ImGui::TextDisabled("  drag to turn, wheel to zoom; drawn without the skeleton");
+    ImVec2 avail = ImGui::GetContentRegionAvail();
+    u32 w = avail.x > 64 ? (u32)avail.x : 64, h = avail.y > 64 ? (u32)avail.y : 64;
+    if (!t->view && t->dev) t->view = MtViewCreate(t->dev);
+    ID3D11ShaderResourceView* pic = t->view ? MtViewDraw(t->view, t->ctx, &t->zone, d->raw.data() + n.off, n.size, z, t->batch, w, h, t->cam) : NULL;
+    if (pic) {
+        ImGui::Image((ImTextureID)(uintptr_t)pic, ImVec2((f32)w, (f32)h));
+        if (ImGui::IsItemHovered()) {
+            ImGuiIO& io = ImGui::GetIO();
+            if (ImGui::IsMouseDragging(ImGuiMouseButton_Left)) {
+                t->cam.yaw -= io.MouseDelta.x * 0.01f;
+                t->cam.pitch += io.MouseDelta.y * 0.01f;
+                if (t->cam.pitch > 1.5f) t->cam.pitch = 1.5f;
+                if (t->cam.pitch < -1.5f) t->cam.pitch = -1.5f;
+            }
+            if (io.MouseWheel) t->cam.dist *= io.MouseWheel > 0 ? 0.9f : 1.1f;
+        }
+    }
+    ImGui::EndGroup();
+}
+
 void Build(Tool* t, f32 w, f32 h) {
     ImGui::SetNextWindowPos(ImVec2(0, 0));
     ImGui::SetNextWindowSize(ImVec2(w, h));
@@ -995,6 +1063,11 @@ void Build(Tool* t, f32 w, f32 h) {
         std::vector<Field> fields;
         NodeFields(t, &fields);
         BOOL list = n.kind == K_TABLE || n.kind == K_STRINGS, tex = n.kind == K_TEX || n.kind == K_STEX;
+        if (n.kind == K_SECTION && t->doc->zones && t->doc->secs[n.a].type >= 0) {
+            ImGui::BeginChild("model", ImVec2(0, ImGui::GetContentRegionAvail().y * 0.62f), ImGuiChildFlags_Borders);
+            DrawModel(t);
+            ImGui::EndChild();
+        }
         BOOL gallery = FALSE;
         for (int k : n.kids) gallery |= t->doc->nodes[k].kind == K_TEX || t->doc->nodes[k].kind == K_STEX;
         if (gallery) {
@@ -1140,6 +1213,7 @@ int PortModToolRun(const char* open, const char* select, int row, const char* sh
         if (t.wnd) ImGui_ImplWin32_Init(t.wnd);
         ImGui_ImplDX11_Init(dev, ctx);
         t.dev = dev;
+        t.ctx = ctx;
         f32 clear[4] = {0.06f, 0.06f, 0.07f, 1.0f};
         for (int frame = 0; !t.quit; frame++) {
             if (t.wnd) {
@@ -1184,6 +1258,7 @@ int PortModToolRun(const char* open, const char* select, int row, const char* sh
     if (dev) dev->Release();
     if (t.wnd) { DestroyWindow(t.wnd); UnregisterClassA("MonsterLabModTool", GetModuleHandleA(NULL)); }
     if (t.srv) t.srv->Release();
+    MtViewDestroy(t.view);
     DropThumbs(&t);
     delete t.doc;
     sTool = NULL;
@@ -1232,6 +1307,28 @@ int PortModToolTest(void) {
                 if (x.size == 4 && x.type == "int" && x.value.find("->") == std::string::npos &&
                     (s32)Be32(&t.doc->raw[x.off]) != atoi(x.value.c_str())) { fprintf(stderr, "[modtool] test: %s at %08X differs\n", x.name.c_str(), x.off); fails++; }
         }
+    }
+    // Models: the black hole's template head (shared_parts.sir zone 23) and the village's own zone.
+    struct WantModel { const char* path; s32 zone; u32 minTris; } models[] = {{"streams/shared_parts.sir", 23, 300}, {"streams/village_level.sir", 1, 20000}};
+    for (const WantModel& m : models) {
+        OpenDoc(&t, m.path);
+        BOOL found = FALSE;
+        for (const Node& n : t.doc->nodes) {
+            if (n.kind != K_SECTION || t.doc->secs[n.a].type != m.zone) continue;
+            found = TRUE;
+            MtZone z;
+            bool ok = MtZoneScan(t.doc->raw.data() + n.off, n.size, &z);
+            u32 textured = 0;
+            for (const MtBatch& b : z.batches) {
+                std::vector<u32> rgba;
+                u32 w, h;
+                textured += MtBatchTexture(t.doc->raw.data() + n.off, n.size, z, b, &rgba, &w, &h) ? 1 : 0;
+            }
+            fprintf(stderr, "[modtool] test: %s zone %d: base %08X, %u display lists (%u with a texture), %u triangles%s%s\n", m.path, m.zone, z.base,
+                    (u32)z.batches.size(), textured, (u32)z.verts.size() / 3, ok ? "" : ": ", z.error.c_str());
+            if (!ok || z.verts.size() / 3 < m.minTris || !textured) fails++;
+        }
+        if (!found) { fprintf(stderr, "[modtool] test: %s has no zone %d\n", m.path, m.zone); fails++; }
     }
     // Every texture of shared_texture.sir decodes; one goes out as PNG and DDS and comes back the same.
     OpenDoc(&t, "streams/shared_texture.sir");
