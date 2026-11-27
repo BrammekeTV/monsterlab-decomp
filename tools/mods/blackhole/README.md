@@ -1,9 +1,11 @@
 # Black hole head (mod)
 
-A new head part for the PC port: a black ball inside a larger amber ball that is turned inside out (an
-"inverted hull"), so only the far inner side of the amber ball is drawn and the black ball has a glowing,
-streaky rim from every side. Under it, on the neck, a small stabilizer with an amber cap. No bolts, no lab
-parts on the hole itself.
+A new head part for the PC port: a black hole as films draw it. A black ball; a thin, tilted, glowing disc of
+streaky amber gas around it that crosses in front of the ball; the disc's light bent over the top of the ball
+and under it (a wide arc and a thinner one, which always face the camera); a thin bright photon ring at the
+ball's edge. Under it, on the neck, the only machine part: a small projector with an amber lens and a faint
+beam up to the hole. No bolts, no lab parts on the hole itself. Disc, arcs, ring and beam glow (they are added
+to the picture, not lit) and the gas turns.
 
 ```
 python tools/mods/blackhole/make_assets.py     # pictures and model   -> build/mods/BlackHoleHead
@@ -17,12 +19,12 @@ four tiers), but **nobody is given one yet**: see "Owning it".
 
 | File | What |
 |---|---|
-| `make_assets.py` | draws everything from code: the 256x256 colour and gloss sheets, the 64x64 and 256x256 part icons, the model (392 vertices, 652 triangles: core, hull, emitter) as `.obj` and `.json` |
+| `make_assets.py` | draws everything from code: the 256x256 colour and gloss sheets, the 64x64 and 256x256 part icons, the model (523 vertices, 704 triangles: core, projector, disc, beam, halo) as `.obj` and `.json` |
 | `build_mod.py` | packs model and sheets into `parts/p_hd_sha077.part` (the format is in its header) |
 | `sirlib.py` | small reader for the game's `.sir` containers, for looking at a template |
 
 The model is placed and sized for the template's skeleton in `build_mod.py` (`SCALE`, `OFFSET`, the bone its
-vertices follow); the hull's radius is 1.6 times the core's.
+vertices follow); the disc reaches from 1.35 to 3 core radii, the arc over the top to 1.9.
 
 ## How it gets into the game
 
@@ -44,10 +46,29 @@ The port's side is `src/port/port_mod_parts.cpp` (see also `docs/modding.md`, "A
   gets one. The row number is save-safe now; switching the gift on for players is still to be done.
 
 What the model keeps of the template: its skeleton and animations, its material (lit, environment map, rim
-light), the matrix commands of its display list. The hull is drawn by that same material with the usual
-back-face culling (the material's GX state record ends with depth and cull settings; the word at `+0xD18`
-is 2, back, and there is one record per material, not per group): its triangles are wound the other way and its normals point inward, which gives the inside-out
-look without a second material.
+light) for the core and the projector, the matrix commands of its display list.
+
+## The glow
+
+The template has one material, and it is lit. So the port draws the glowing groups itself
+(`port_mod_parts.cpp`, "draws of light"): the `.part` file names the range of the display list their draw
+commands lie in (a block of kind 2 per light: disc with beam, and halo). When the game runs the list, those
+draws are taken out of the stream and kept with a copy of the graphics registers; when the scene is complete
+(just before the game copies the frame buffer, which it does once per scene pass) they are drawn with that copy
+changed to: one stage, sheet x vertex colour x 2, added to the picture, no lights, no fog, both sides, depth
+tested but not written. Drawn last, the glow is in front of what is behind it and hidden by what is in front,
+whatever the order of the monster's parts. The game draws a model twice per scene; the second time the light
+draws are dropped.
+
+- **Brightness** is a colour per vertex (the disc is brighter on the side that turns towards the viewer, the
+  arcs fade towards the disc). The template's one colour stays colour 0, for the lit groups.
+- **Spin**: the sheet scrolls along u through a post-transform matrix (`scroll`, turns per second).
+- **Billboard** (disc and halo): their vertices are offsets around the core's centre, x right, y up on the
+  screen and z towards the eye. The port gives them a matrix that keeps the bone's place and size and faces the
+  eye. So the hole shows every camera the same side: the disc seen from 14 degrees above its plane, its left
+  end up by 13 degrees, the wide arc over it. A disc fixed to the head was tried first: the fight's cameras look
+  up at the head, and it showed as a wide flat ring with nothing of the film look.
+- **Checked**: with a quarter turn more scroll the same frame differs only in the streaks of disc and halo.
 
 ## Checked in the game
 
@@ -56,8 +77,8 @@ Headless, from a savestate of the playthrough's first battle, with the mod on:
 - the row is added (`part p_hd_sha077 is row 186`), the two list entries are added in the village and again in
   the arena level; with `PORT_MODPART_GIVE=1` the inventory gets the part (6 parts instead of 5);
 - with `PORT_MODPART_SHOW=1` (a test switch: the new model is drawn wherever the template is in use) the
-  monster that wears the template head in that fight shows the black hole: a black core with a glowing amber
-  rim, and the fight goes on through the tutorial and the first attacks without a crash.
+  monster that wears the template head in that fight shows the black hole: black core, photon ring, the arcs, the tilted disc across it, glowing and
+  turning, and the fight goes on through the tutorial to the first attack choice (frame 10400) without a crash.
 
 Not checked: putting the part on a monster in the lab (the playthrough does not get that far with a head
 choice), so the path "the game claims the new list entry" is exercised only up to the list and the inventory;
@@ -82,6 +103,4 @@ game: that is what the put-back of the template's bytes is for.
   of `shared_texture.sir` found through the catalog, and the port cannot add a section yet.
 - **Map model.** No low-detail entry (`_lr`): on the exploration map the game falls back to head 001 and logs
   "The part list is missing a part it should have".
-- **Unlit, additive, spin.** The hull is lit like the rest (one material). A second material, or a material
-  of the mod's own, would make it full bright and let its picture scroll.
 - **Description text** and a place in the shop or as a reward: it is only given to the inventory.

@@ -47,6 +47,15 @@ typedef struct PortGxBackend {
     void (*loadTlut)(const PortGx* g, u32 source, u32 dest);
 } PortGxBackend;
 void PortGxSetBackend(const PortGxBackend* backend);
+// Draws the port makes itself (mods: port_mod_parts.cpp). `take` sees every draw of the stream before the renderer
+// and returns TRUE to keep it from it; `beforeCopy` runs before each frame-buffer copy (the scene is complete);
+// PortGxDraw hands the renderer a draw with registers of the caller's own.
+typedef struct PortGxFilter {
+    BOOL (*take)(const PortGx* g, u32 prim, const PortGxLayout* layout, u32 count, const u8* data);
+    void (*beforeCopy)(void);
+} PortGxFilter;
+void PortGxSetFilter(const PortGxFilter* filter);      // NULL: none
+void PortGxDraw(const PortGx* g, u32 prim, const PortGxLayout* layout, u32 count, const u8* data);
 
 typedef struct PortGxStats {
     u32 lists, bp, cp, xf, xfIndexed, calls, draws, vertices, copies, tluts, drawDone, tokens;

@@ -31,6 +31,9 @@ static GXFifoObj sMainFifo;
 static PortFifo* sCpu;                 // where pipe writes go
 static PortFifo* sGp;                  // what the "graphics processor" executes
 static const PortGxBackend* sBackend;
+PORT_SAVED_END
+static const PortGxFilter* sFilter;    // draws the port takes out of the stream (mods), NULL: none. Not part of a savestate:
+PORT_SAVED_BEGIN                       // a state made without mods is loaded with them, and the other way round
 
 typedef void (*GXDrawDoneCallback)(void);
 typedef void (*GXDrawSyncCallback)(u16 token);
@@ -196,6 +199,7 @@ static void BpWrite(PortGx* g, u32 word) {
         break;
     case 0x52:                                              // copy the frame buffer (to a texture or to the display)
         sStats.copies++;
+        if (sFilter && sFilter->beforeCopy) sFilter->beforeCopy();
         if (sBackend && sBackend->copy) sBackend->copy(g, value);
         break;
     case 0x64: case 0x65:                                   // load a palette
@@ -256,7 +260,8 @@ static void Run(PortGx* g, const u8* p, const u8* end, int depth) {
             if (layout.size == 0 || (u32)(end - p) < count * layout.size) { Fail("draw runs past the end of the list", op, p - 3, start); return; }
             sStats.draws++;
             sStats.vertices += count;
-            if (sBackend && sBackend->draw) sBackend->draw(g, op & 0xF8, &layout, count, p);
+            if (sFilter && sFilter->take(g, op & 0xF8, &layout, count, p)) { /* drawn later by the port */ }
+            else if (sBackend && sBackend->draw) sBackend->draw(g, op & 0xF8, &layout, count, p);
             p += count * layout.size;
         } else {
             Fail("unknown GX command", op, p - 1, start);
@@ -351,6 +356,10 @@ void* fn_8024B50C(void* cb) { void* old = (void*)sDrawSyncCb; sDrawSyncCb = (GXD
 }  // extern "C"
 
 void PortGxSetBackend(const PortGxBackend* backend) { sBackend = backend; }
+void PortGxSetFilter(const PortGxFilter* filter) { sFilter = filter; }
+void PortGxDraw(const PortGx* g, u32 prim, const PortGxLayout* layout, u32 count, const u8* data) {
+    if (sBackend && sBackend->draw) sBackend->draw(g, prim, layout, count, data);
+}
 const PortGxStats* PortGxGetStats(void) { return &sStats; }
 
 const char* PortGxStatsText(char* buf, u32 n) {

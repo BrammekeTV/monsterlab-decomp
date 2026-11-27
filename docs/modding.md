@@ -240,6 +240,8 @@ Its model needs more. For a head there is one way so far: `mods/<mod name>/parts
 mod's own vertices and pictures and names a part of your disc as its template. While the new part is on a
 monster the port draws them in place of the template's, in memory; skeleton, animations and material are the
 template's. The mod's patch must add that part with the id `head`. Nobody is given the part yet.
+A `.part` file can also mark some of its draws as light (glow, beams): the port draws those itself, added to the
+picture, unlit, after the solid things of the scene, with a scrolling picture, and turned to the camera if asked.
 
 `tools/mods/blackhole` is the worked example (a black hole head): `make_assets.py` draws the pictures and
 the model, `build_mod.py` writes the `.part` file (its header describes the format) and the patch, and the
