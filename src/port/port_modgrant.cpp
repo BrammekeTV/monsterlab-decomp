@@ -87,6 +87,18 @@ BOOL Owned(s32 def) {
     return FALSE;
 }
 
+// The part's name with the body slot it fills, as the notice says it: "Black Hole" -> "Black Hole Head". A mod's
+// names are the game's names for the tiers, which leave the slot out.
+std::string NoticeName(const char* name, s32 slot) {
+    const char* word = slot == PART_SLOT_HEAD ? "Head" : slot == PART_SLOT_LEGS ? "Legs" :
+                       slot == PART_SLOT_ARM ? "Arm" : slot == PART_SLOT_TORSO ? "Torso" : NULL;
+    std::string n = name;
+    if (!word) return n;
+    const size_t len = strlen(word);
+    if (n.size() >= len && !_stricmp(n.c_str() + n.size() - len, word)) return n;
+    return n + " " + word;
+}
+
 std::string sProfile;                // the profile the list below is for
 std::vector<std::string> sGiven;
 s32 sChecked = -1000;                // frame of the last look (once a second is plenty)
@@ -104,17 +116,25 @@ void PortModGrantFrame(void) {
     if (*(s32*)(gSaveSystem + 0x10E8) < 1 && !test) return;                    // no monster of their own yet
     const char* path = PortModPartsSidecar();
     const std::string profile = ProfileKey(SaveManager_GetCurrentSlot(), (const char*)gSaveSystem);
-    if (profile != sProfile) { sProfile = profile; sGiven = ReadGiven(path, profile); }
+    const BOOL newProfile = profile != sProfile;
+    if (newProfile) { sProfile = profile; sGiven = ReadGiven(path, profile); }
     std::string names;
     int given = 0;
     for (int i = 0; i < PortModPartCount(); i++) {
         const PortModPart* p = PortModPartAt(i);
-        if (!p || p->defIndex < PORT_VANILLA_PARTS || Has(sGiven, p->key)) continue;
+        if (!p || p->defIndex < PORT_VANILLA_PARTS) continue;
+        if (Has(sGiven, p->key)) {
+            if (newProfile) PortLog("mods: part %s was given to profile %s before (in the inventory: %s)",
+                                    p->key, profile.c_str(), Owned(p->defIndex) ? "yes" : "no");
+            continue;
+        }
         if (!Owned(p->defIndex)) {
             if (*(s32*)(gSaveSystem + 0xA30 + 0x6BC) >= 100) continue;       // inventory full: try again later
             AddPartToPlayerInventory((u32)p->defIndex, 1, 100);
             if (!names.empty()) names += ", ";
-            names += PortModPartName(i);
+            PartDef def;
+            PartDbGetDef(&def, gGameDb, p->defIndex);
+            names += NoticeName(PortModPartName(i), def.slot);
             given++;
         }
         // Recorded also when it was owned already, so it is not given again once it is gone.
@@ -143,6 +163,10 @@ int PortSelfTestModGrant(void) {
         fails++;
     }
     DeleteFileA(path);
+    if (NoticeName("Black Hole", PART_SLOT_HEAD) != "Black Hole Head" || NoticeName("Iron arm", PART_SLOT_ARM) != "Iron arm" ||
+        NoticeName("Spider", 3) != "Spider") {
+        PortLog("selftest modgrant: notice names"); fails++;
+    }
     if (!fails) PortLog("selftest modgrant: ok (given parts recorded per profile in save.modparts)");
     return fails;
 }
