@@ -1,6 +1,6 @@
 # Mod tools: `.sir` editor and `.part` viewer (design)
 
-Status: design, step 1 under way. The modder's guide is `docs/modding.md`.
+Status: step 1 (browse) and step 2a (textures, strings) built; 3D view, `.part` viewer, editing and the guide to come.
 
 ## Goal
 

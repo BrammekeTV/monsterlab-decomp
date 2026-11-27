@@ -742,6 +742,12 @@ static u32 TextureBytes(u32 w, u32 h, u32 fmt) {
     return tiles * (fmt == 6 ? 64 : 32);
 }
 
+// For the mod tool (port_modtool.cpp): the same decoder and sizes the renderer uses.
+BOOL PortGxDecodeTexture(const u8* src, u32 w, u32 h, u32 fmt, const u8* tlut, u32 tlutFmt, u32* out) {
+    return DecodeTexture(src, w, h, fmt, tlut, tlutFmt, out);
+}
+u32 PortGxTextureBytes(u32 w, u32 h, u32 fmt) { return TextureBytes(w, h, fmt); }
+
 static u32 Fnv(const u8* p, u32 n, u32 h) {
     u32 step = n > 4096 ? n / 2048 : 1;
     for (u32 i = 0; i < n; i += step) h = (h ^ p[i]) * 16777619u;
