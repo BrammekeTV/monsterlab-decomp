@@ -1,9 +1,14 @@
 # Black hole head (mod)
 
-A new head part for the PC port: a black ball inside a larger amber ball that is turned inside out (an
-"inverted hull"), so only the far inner side of the amber ball is drawn and the black ball has a glowing,
-streaky rim from every side. Under it, on the neck, a small stabilizer with an amber cap. No bolts, no lab
-parts on the hole itself.
+A new head part for the PC port, after the user's concept: a black horizon, a streaky accretion disc around
+it that leans towards the front, the disc's far side bent into a wide arc over the top and a thin arc under
+the hole, a thin bright photon ring at the horizon's edge, and a soft corona behind (a larger sphere turned
+inside out, so only its far inner wall is drawn). Under it, on the neck, a small stabilizer with an amber cap.
+
+**The concept design (2026-11-27) has not been run in the game.** What was checked in a battle (below) is the
+earlier look (core, inverted hull, emitter); the hook and the file format are the same. In the concept the arcs
+and the ring always face the camera and the glow is added to the picture; the head's one material is opaque
+and lit, so here they face the front of the head, are drawn from both sides and fade to dark red.
 
 ```
 python tools/mods/blackhole/make_assets.py     # pictures and model   -> build/mods/BlackHoleHead
@@ -17,12 +22,12 @@ four tiers), but **nobody is given one yet**: see "Owning it".
 
 | File | What |
 |---|---|
-| `make_assets.py` | draws everything from code: the 256x256 colour and gloss sheets, the 64x64 and 256x256 part icons, the model (392 vertices, 652 triangles: core, hull, emitter) as `.obj` and `.json` |
+| `make_assets.py` | draws everything from code: the 256x256 colour and gloss sheets, the 64x64 and 256x256 part icons, the model (475 positions, 864 triangles: horizon, corona, disc, two arcs, photon ring, emitter) as `.obj` and `.json` |
 | `build_mod.py` | packs model and sheets into `parts/p_hd_sha077.part` (the format is in its header) |
 | `sirlib.py` | small reader for the game's `.sir` containers, for looking at a template |
 
 The model is placed and sized for the template's skeleton in `build_mod.py` (`SCALE`, `OFFSET`, the bone its
-vertices follow); the hull's radius is 1.6 times the core's.
+vertices follow).
 
 ## How it gets into the game
 
@@ -45,7 +50,7 @@ The port's side is `src/port/port_mod_parts.cpp` (see also `docs/modding.md`, "A
   written into their save. It comes on when the save-safe part ids are in.
 
 What the model keeps of the template: its skeleton and animations, its material (lit, environment map, rim
-light), the matrix commands of its display list. The hull is drawn by that same material with the usual
+light), the matrix commands of its display list. The corona is drawn by that same material with the usual
 back-face culling (the material's GX state record ends with depth and cull settings; the word at `+0xD18`
 is 2, back, and there is one record per material, not per group): its triangles are wound the other way and its normals point inward, which gives the inside-out
 look without a second material.
@@ -85,6 +90,7 @@ game: that is what the put-back of the template's bytes is for.
   of `shared_texture.sir` found through the catalog, and the port cannot add a section yet.
 - **Map model.** No low-detail entry (`_lr`): on the exploration map the game falls back to head 001 and logs
   "The part list is missing a part it should have".
-- **Unlit, additive, spin.** The hull is lit like the rest (one material). A second material, or a material
+- **Unlit, additive, spin, facing the camera.** Everything is lit and opaque like the rest (one material), and
+  the arcs and the ring face the front of the head, not the camera. A second material, or a material
   of the mod's own, would make it full bright and let its picture scroll.
 - **Description text** and a place in the shop or as a reward: it is only given to the inventory.

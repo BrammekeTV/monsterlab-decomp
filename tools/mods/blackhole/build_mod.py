@@ -42,7 +42,7 @@ DEF_ID = 0x1A8
 NAMES = ("Black Hole", "Dense Black Hole", "Massive Black Hole", "Supermassive Black Hole")   # tiers 1 to 4
 
 # The template's layout (PAL RM7P4F, zones 23 and 24 are the same apart from addresses).
-POS, NRM, UV = 0x1AB20, 0x1B450, 0x1BA28     # arrays: ours start where the template's start (uv: the same place)
+POS, UV = 0x1AB20, 0x1BA28                   # arrays: ours start where the template's start (uv: the same place)
 ARRAY_END = (0x1BA24, 0x1BA24, 0x1C400)      # positions and normals end before the colour, uvs before the list
 LIST = 0x1C400                               # display list: 0x42 bytes of array and format commands,
 LIST_SETUP = 0x42                            # then 0x45 bytes of matrix commands (kept), then the draws
@@ -111,7 +111,6 @@ def main():
     ap.add_argument("--out", default=os.path.join(root, "build", "pc", "mods"))
     a = ap.parse_args()
     m = json.load(open(os.path.join(a.assets, "model", "blackhole.json")))
-    n = len(m["positions"])
     pos = (np.array(m["positions"]) * SCALE + np.array(OFFSET))
     assert np.abs(pos).max() < 1.99, "the model does not fit the position format (s16, 14 fraction bits)"
     pos_b = b"".join(struct.pack(">3h", *(int(round(c * 16384)) for c in p)) for p in pos)
@@ -119,7 +118,8 @@ def main():
     uv = np.array(m["uvs"])
     assert uv.min() >= 0 and uv.max() < 255
     uv_b = b"".join(struct.pack(">2H", *(int(round(c * 256)) for c in t)) for t in uv)
-    assert POS + len(pos_b) <= NRM and NRM + len(nrm_b) <= ARRAY_END[1] and UV + len(uv_b) <= ARRAY_END[2], "arrays too big for the template"
+    NRM = (POS + len(pos_b) + 3) & ~3                 # the normals follow the positions
+    assert NRM + len(nrm_b) <= ARRAY_END[1] and UV + len(uv_b) <= ARRAY_END[2], "arrays too big for the template"
 
     # The start of the display list: where the arrays are, what a vertex is made of, the formats.
     # A vertex: position matrix, texture matrix 1 (bytes), position, normal (16-bit indices), colour (8-bit), uv (16-bit).
@@ -137,11 +137,11 @@ def main():
     draws = bytearray()
     count = 0
     for group, strips in m["strips"].items():
-        for s in strips:
-            draws += struct.pack(">BH", 0x9A, len(s))
-            for i in s:
-                draws += struct.pack(">BBHHBH", BONE, TEX_MTX, i, i, 0, i)
-            count += len(s)
+        for st in strips:
+            draws += struct.pack(">BH", 0x9A, len(st))
+            for pi, ni, ti in st:
+                draws += struct.pack(">BBHHBH", BONE, TEX_MTX, pi, ni, 0, ti)
+            count += len(st)
     assert LIST_DRAWS + len(draws) <= LIST_END, "display list too big for the template"
     draws += b"\0" * (LIST_END - LIST_DRAWS - len(draws))              # GX no-ops to the end of the template's list
 
@@ -163,7 +163,7 @@ def main():
     path = os.path.join(out, KEY + ".part")
     with open(path, "wb") as f:
         f.write(head + b"".join(blocks))
-    print("black hole head: %d vertices, %d strip vertices, %d bytes -> %s" % (n, count, os.path.getsize(path), path))
+    print("black hole head: %d positions, %d strip vertices, %d bytes -> %s" % (len(pos), count, os.path.getsize(path), path))
 
 
 if __name__ == "__main__":
