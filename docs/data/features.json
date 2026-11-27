@@ -99,6 +99,11 @@
  "changelog": [
   {
    "date": "2026-11-27",
+   "time": "15:37",
+   "text": "The story plays on past the Weld-O-Tron to the Lightning Tower without any new fixes needed; the playthrough test now covers 30 stages."
+  },
+  {
+   "date": "2026-11-27",
    "time": "14:15",
    "text": "The Weld-O-Tron can be won: welds now register on the seam (its tiles' size data was being read in the Wii's byte order), the meter fills to 100, SUCCESS! appears and you return to the Mechanical Lab. The welded seam isn't drawn on screen yet. Also, the black hole head mod now looks like the reference: a black core with a thin, tilted, spinning disc of glowing amber gas, its light bending over the top and under the bottom, a bright ring at the edge, and a small projector on the neck."
   },
