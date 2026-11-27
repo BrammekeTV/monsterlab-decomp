@@ -29,6 +29,16 @@ int  PortModPartCount(void);
 const PortModPart* PortModPartAt(int i);
 s32  PortModPartIndex(const char* key);                  // the row, or -1 when no enabled mod has that part
 const char* PortModPartData(int i, const char* name);    // an entry of the part's "data" object, or NULL
+const char* PortModPartName(int i);                      // the part's first name ("names" of its patch), else its key
+const char* PortModPartsSidecar(void);                   // <save folder>/save.modparts
+
+// ---- giving the parts to the player (port_modgrant.cpp) ----
+// Once a profile has a monster of its own (the first one is made in the Lightning Tower), every part of the enabled
+// mods that this profile was not given yet goes into its inventory, a notice names them, and save.modparts records
+// "given|<slot>|<scientist name>|<mod:id>" so a part is never given twice (also not after it was sold).
+// [modparts] give = 0 in monsterlab.ini turns this off; PORT_MODPART_GIVE=1 (tests) gives them without a monster.
+void PortModGrantFrame(void);
+int  PortSelfTestModGrant(void);
 
 // ---- hooks ----
 void PortModPatchApply(u8* globalHdr);                   // global_binary.sir was converted

@@ -42,8 +42,9 @@ The port's side is `src/port/port_mod_parts.cpp` (see also `docs/modding.md`, "A
   in use again, the bytes are put back.
 - **Names.** Four new text ids behind the game's string table; `TextIdFromHash` asks the port for keys it
   does not know.
-- **Owning it.** Not by default. With `PORT_MODPART_GIVE=1` (tests) a game whose inventory has no such part
-  gets one. The row number is save-safe now; switching the gift on for players is still to be done.
+- **Owning it.** The port gives it to the player once their first monster is made, with a notice
+  (docs/modding.md, "Getting the parts"; `[modparts] give = 0` turns it off). With `PORT_MODPART_GIVE=1` (tests)
+  a game gets it at once, also without a monster.
 
 What the model keeps of the template: its skeleton and animations, its material (lit, environment map, rim
 light) for the core and the projector, the matrix commands of its display list.

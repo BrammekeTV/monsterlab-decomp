@@ -397,6 +397,16 @@ once the mod is back. Keep `save.modparts` with the saves when you move them. Wi
 parts still loads (unknown rows show as vanilla part 0), but the parts can then be matched to the wrong mod.
 There is room for 69 modded parts per save folder (rows 186-254).
 
+### Getting the parts
+
+Nothing in the game hands a modded part out, so the port gives it: once a profile has a monster of its own
+(the first one is made in the Lightning Tower, after the Weld-O-Tron), each part of the enabled mods goes into
+its inventory once (tier 1, full quality) and a notice at the top of the picture names them ("New part unlocked
+from mods: Black Hole Head"). A save that already has a monster gets a new mod's parts when it is loaded.
+`save.modparts` records each part given as `given|<save slot>|<scientist name>|mod:id`, so a part is never given
+to that profile twice, also not after it was sold or scrapped. `[modparts] give = 0` in `monsterlab.ini` turns
+this off. `PORT_MODPART_GIVE=1` (tests) gives the parts at once, also to a profile without a monster.
+
 Not covered by table patches: level part lists and zones, models and icons (they are not in the game
 database), and new text other than a part's names (`strings.json` changes existing strings).
 

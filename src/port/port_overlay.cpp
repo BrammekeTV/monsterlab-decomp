@@ -183,9 +183,20 @@ void PortOverlayFrame(const PortFrameStats* s) {
     PortGuiKeys();
 }
 
+static char sNoticeTitle[96], sNoticeText[512];
+static s32 sNoticeUntil;
+
+void PortNotice(const char* title, const char* text, s32 frames) {
+    snprintf(sNoticeTitle, sizeof(sNoticeTitle), "%s", title);
+    snprintf(sNoticeText, sizeof(sNoticeText), "%s", text);
+    sNoticeUntil = PortFrameCount() + frames;
+    PortLog("notice: %s: %s (frame %d)", title, text, PortFrameCount());
+}
+
 void PortOverlayDraw(ID3D11RenderTargetView* target, u32 w, u32 h) {
     const char* message = PortStateMessage();
-    if ((!gPortOverlayOn && !gPortGuiOpen && !message) || !sReady || !target) return;
+    const BOOL notice = sNoticeText[0] && PortFrameCount() < sNoticeUntil;
+    if ((!gPortOverlayOn && !gPortGuiOpen && !message && !notice) || !sReady || !target) return;
     f32 total = 0.0f, worst = 0.0f;
     for (u32 i = 0; i < sMsCount; i++) { total += sMs[i]; if (sMs[i] > worst) worst = sMs[i]; }
     char text[512];
@@ -205,6 +216,24 @@ void PortOverlayDraw(ID3D11RenderTargetView* target, u32 w, u32 h) {
                                       ImGuiWindowFlags_NoFocusOnAppearing | ImGuiWindowFlags_NoNav | ImGuiWindowFlags_NoInputs | ImGuiWindowFlags_NoMove);
         ImGui::TextUnformatted(message);
         ImGui::End();
+    }
+    if (notice) {                        // a notice: a box at the top centre, the title in the game's gold, fading out at the end
+        const s32 left = sNoticeUntil - PortFrameCount();
+        const f32 fade = left < 50 ? left / 50.0f : 1.0f;
+        ImGui::SetNextWindowPos(ImVec2(w * 0.5f, h / 12.0f), ImGuiCond_Always, ImVec2(0.5f, 0.0f));
+        ImGui::SetNextWindowBgAlpha(0.85f * fade);
+        ImGui::PushStyleVar(ImGuiStyleVar_Alpha, fade);
+        ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, ImVec2(h / 45.0f, h / 60.0f));
+        ImGui::PushStyleVar(ImGuiStyleVar_WindowBorderSize, 2.0f);
+        ImGui::PushStyleColor(ImGuiCol_WindowBg, ImVec4(0.17f, 0.12f, 0.08f, 1.0f));
+        ImGui::PushStyleColor(ImGuiCol_Border, ImVec4(0.62f, 0.45f, 0.22f, 1.0f));
+        ImGui::Begin("notice", NULL, ImGuiWindowFlags_NoDecoration | ImGuiWindowFlags_AlwaysAutoResize | ImGuiWindowFlags_NoSavedSettings |
+                                     ImGuiWindowFlags_NoFocusOnAppearing | ImGuiWindowFlags_NoNav | ImGuiWindowFlags_NoInputs | ImGuiWindowFlags_NoMove);
+        ImGui::TextColored(ImVec4(1.0f, 0.82f, 0.35f, 1.0f), "%s", sNoticeTitle);
+        ImGui::TextUnformatted(sNoticeText);
+        ImGui::End();
+        ImGui::PopStyleColor(2);
+        ImGui::PopStyleVar(3);
     }
     if (gPortOverlayOn) {
     f32 pad = h / 90.0f;

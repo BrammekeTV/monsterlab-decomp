@@ -6,6 +6,7 @@
 //   [game]      path: the player's disc image or extracted folder
 //   [audio]     volume (0-100), mute, remote_speaker (play the Wii Remote speaker sounds)
 //   [mods]      NAME = 1 or 0, in load order (port_mods.cpp)
+//   [modparts]  give (1: parts added by mods are given to the player after their first monster, port_modgrant.cpp)
 //   [textures]  dump (1: save every texture drawn), folder (empty: dump\textures next to the exe)
 //   [controls]  NAME = key 1, key 2, mouse button, gamepad bits   (Windows virtual-key codes; 0 = none)
 #ifdef _WIN32
@@ -87,6 +88,8 @@ BOOL PortSettingsLoad(const char* path, PortSettings* s) {
             else if (!strcmp(key, "shadow_darkness")) s->shadowDark = Clamp(atoi(val), 20, 100);
         } else if (!strcmp(section, "mods")) {
             PortModsAdd(key, atoi(val) != 0);                  // the order of the lines is the load order
+        } else if (!strcmp(section, "modparts")) {
+            if (!strcmp(key, "give")) s->giveModParts = atoi(val) != 0;
         } else if (!strcmp(section, "textures")) {
             if (!strcmp(key, "dump")) s->dumpTextures = atoi(val) != 0;
             else if (!strcmp(key, "folder")) snprintf(s->dumpDir, sizeof(s->dumpDir), "%s", val);
@@ -136,6 +139,7 @@ BOOL PortSettingsSave(const char* path, const PortSettings* s) {
             s->lighting == PORT_LIGHTING_ORIGINAL ? "original" : "improved", s->exposure, s->shadows == PORT_SHADOWS_ORIGINAL ? "original" : "soft", s->shadowDark);
     if (s->gamePath[0]) fprintf(f, "; your Monster Lab disc image (.iso, .wbfs, .rvz) or extracted folder\n[game]\npath = %s\n\n", s->gamePath);
     fprintf(f, "[audio]\nvolume = %d\nmute = %d\n; remote_speaker: also play the sounds the console sends to the Wii Remote's speaker\nremote_speaker = %d\n\n", s->volume, s->mute ? 1 : 0, s->remoteSpeaker ? 1 : 0);
+    fprintf(f, "; give: 1 gives you the parts that mods add (once, after your first monster), 0 leaves them out\n[modparts]\ngive = %d\n\n", s->giveModParts ? 1 : 0);
     fprintf(f, "; dump: save every texture the game draws with as a PNG; folder: where (empty: dump\\textures next to the exe)\n[textures]\ndump = %d\nfolder = %s\n\n", s->dumpTextures ? 1 : 0, s->dumpDir);
     fprintf(f, "; savestate keys, Windows virtual-key codes (F1 = 112 ... F12 = 123), 0 = none: save and load the current slot, previous and next slot\n[savestates]\n");
     for (int k = 0; k < PORT_STATEKEY_COUNT; k++) fprintf(f, "%s = %d\n", kPortStateKeyNames[k], gPortStateKeys[k]);
@@ -163,7 +167,7 @@ int PortSelfTestSettings(void) {
 
     PortSettings want = {};
     want.width = 2560; want.height = 1440; want.wide = FALSE; want.stretchUi = TRUE; want.vsync = TRUE; want.fullscreen = TRUE;
-    want.volume = 37; want.mute = TRUE; want.renderScale = 150; want.texFilter = PORT_FILTER_AF8; want.fpsCap = PORT_FPS_UNCAPPED; want.msaa = 4; want.remoteSpeaker = FALSE; want.lighting = PORT_LIGHTING_ORIGINAL; want.exposure = 120; want.shadows = PORT_SHADOWS_ORIGINAL; want.shadowDark = 45;
+    want.volume = 37; want.mute = TRUE; want.renderScale = 150; want.texFilter = PORT_FILTER_AF8; want.fpsCap = PORT_FPS_UNCAPPED; want.msaa = 4; want.remoteSpeaker = FALSE; want.lighting = PORT_LIGHTING_ORIGINAL; want.exposure = 120; want.shadows = PORT_SHADOWS_ORIGINAL; want.shadowDark = 45; want.giveModParts = FALSE;
     strcpy(want.gamePath, "D:\\My games\\Monster Lab (disc).iso");
     want.dumpTextures = TRUE;
     strcpy(want.dumpDir, "D:\\My dumps");
@@ -177,7 +181,7 @@ int PortSelfTestSettings(void) {
     if (!fails) {
         if (got.width != want.width || got.height != want.height || got.wide != want.wide || got.stretchUi != want.stretchUi ||
             got.vsync != want.vsync || got.fullscreen != want.fullscreen || got.volume != want.volume || got.mute != want.mute || got.renderScale != want.renderScale || got.texFilter != want.texFilter || got.fpsCap != want.fpsCap || got.msaa != want.msaa || got.remoteSpeaker != want.remoteSpeaker || strcmp(got.gamePath, want.gamePath) || got.dumpTextures != want.dumpTextures || strcmp(got.dumpDir, want.dumpDir) ||
-            got.lighting != want.lighting || got.exposure != want.exposure || got.shadows != want.shadows || got.shadowDark != want.shadowDark) {
+            got.lighting != want.lighting || got.exposure != want.exposure || got.shadows != want.shadows || got.shadowDark != want.shadowDark || got.giveModParts != want.giveModParts) {
             PortLog("selftest settings: read back %dx%d wide %d stretch %d vsync %d fullscreen %d volume %d mute %d",
                     got.width, got.height, got.wide, got.stretchUi, got.vsync, got.fullscreen, got.volume, got.mute);
             fails++;

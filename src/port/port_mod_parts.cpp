@@ -9,8 +9,7 @@
 //     written over the zone and the zone's name hash becomes the new key's; when the template itself is in
 //     use again, the bytes that were there are put back. A zone is read from disc only when another one took
 //     its place, so this is checked every frame and not only at the read;
-//   - with PORT_MODPART_GIVE=1 (tests) a game that has no such part in its inventory gets one. Not by default
-//     (owning the part is not decided yet; its row is save-safe).
+//   - the player is given the part after their first monster (port_modgrant.cpp);
 //   - a part can have draws of light (glowing gas, beams): the port draws those itself, see "draws of light" below.
 // Nothing here runs unless an enabled mod has a parts folder.
 #ifdef _WIN32
@@ -30,8 +29,6 @@
 extern "C" {
 u8*  fn_801F06FC(void);                                            // 0x801F06FC: the world's parameter block; **(+8) is the level header
 u32  StringHash(const char* s);                                    // 0x80347E68 table: CRC-32 of the upper-cased name
-void AddPartToPlayerInventory(u32 def, s32 tier, s32 quality);     // 0x802215FC
-extern u8* gSaveSystem;                                            // 0x805FBBE0
 }
 
 namespace {
@@ -269,22 +266,6 @@ void AddToList(Pack& p, int pi) {
     }
 }
 
-// PORT_MODPART_GIVE=1 (tests only): a game without the part gets one, tier 1, full quality. (Parts on a monster
-// stay in the inventory's list.)
-void AddToInventory(int pi) {
-    static int on = -1;
-    if (on < 0) on = getenv("PORT_MODPART_GIVE") != NULL;
-    if (!on || !gSaveSystem || sRow[pi] <= 0) return;
-    u8* inv = gSaveSystem + 0xA30;
-    PartInstance** parts = (PartInstance**)(inv + 0x28);
-    s32 n = *(s32*)(inv + 0x6BC);
-    if (n < 0 || n >= 100) return;                                  // full: no room
-    for (s32 i = 0; i < n; i++) if (parts[i] && parts[i]->defIndex == sRow[pi]) return;
-    AddPartToPlayerInventory((u32)sRow[pi], 1, 100);
-    PortLog("mods: part %s added to the inventory (%d parts now)", sPacks[pi].key, *(s32*)(inv + 0x6BC));
-}
-
-
 // ------------------------------------------------------------------ draws of light
 // A pack's blocks of kind 2 name draw commands of its display list that are light and not a surface (the black
 // hole's disc, halo and beam). The game would draw them with the template's material; the port takes them out of
@@ -453,7 +434,6 @@ void PortModPartsFrame(void) {
         }
         if (!gGameDb || !gGameDb->data) continue;   // the row is known before the game has its database pointer
         AddToList(sPacks[pi], (int)pi);
-        AddToInventory((int)pi);
     }
 }
 #endif
