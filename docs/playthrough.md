@@ -84,6 +84,15 @@ load messages, never from pictures.
 | towercall | Fuseless sends the player to the Lightning Tower: his talk closes (`StopConversation`), `AddJournalEntry`, the castle HUD is free in the Workshop |
 | hall2 | the Workshop's back button: `castle_atrium` (the Grand Hall) again, `SpawnRandomLightningBetweenNodes` |
 | tower | the door on the Grand Hall's balcony (`IsCastleAccessBlocked`): `castle_operating_theatre` (the Lightning Tower), Fuseless's talk opens and closes, `SetGameProgressBitFlag` |
+| constructor | the hologram in the Lightning Tower: `InitializeOperatingTable`, `CreateEmptyMonster` (the Monster Constructor), Fuseless's tutorial (`LT_SetTutorialText`); from here the pointer follows `tools/playthrough_cobbleshire_path.txt` |
+| sticks | the stick tutorial: every body area picked with the stick (`LT_AllPartsForStickTutorialSelected`), `LT_ForceSelectPart`, `LT_MarkCurrentBodyPart` |
+| head | the head first: stick up held while the arrow is clicked (`IncrementOption`, `LT_ForceSelectPart`) |
+| parts | arms (stick right / left), legs (stick down) and torso (`LT_PartSelectionMatches`), Charge Monster: Fuseless asks for a name |
+| charged | the "New Monster" banner: the name keyboard (`MPNameInput`), letters (`NameAddLetter`), the tick (`IsValidName`), `LightningTowerChargeMonster`, `SaveMonster` |
+| deploy | Fuseless sends the player to the Command Room: `EndQuest`, `StartQuest`, `AddPlayerQuestReward` |
+| command | the Lightning Tower's back button (`castle_atrium`), the floor disc (`castle_communication`, the Command Room), Fuseless's talk, `SetCastleAccess` |
+| scope | the left monitor (the Trouble-Scope): `trouble_scope_map`, Cobbleshire picked (`SetNextRegion`), the monster to send (`Troublescope_Init`) |
+| cobbleshire | the launch button: `Troublescope_SetCurrentMonster`, `village_level`, `ExplorationInit` |
 
 `python tools/playthrough.py --list` prints the markers and deadlines.
 
