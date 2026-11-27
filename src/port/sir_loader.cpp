@@ -1685,11 +1685,15 @@ static const SirField kAnimEventFields[] = {
     { 0x00, SIR_U32, 2 }, { 0x08, SIR_F32, 2 }, { 0x10, SIR_U32, 3 },
 };
 #define ANIM_EVENT_SIZE 0x1C
-// A character definition (entity +0x9C of types 5 and 13) is 0x250 bytes, laid out one after the other: +0x08 id, +0x1C flags,
+// A character definition (entity +0x9C of types 5, 13 and 14) is 0x250 bytes, laid out one after the other: +0x08 id, +0x1C flags,
 // +0x24 a float, +0x34 and +0x40..+0x4C objects, +0x48 the animation set, +0x60 a hash and 20 action words (0x0003FFFF = none),
 // +0xB8 the animation speed (fn_80053C2C multiplies the tick by it), then floats (0x7F800001 = unset) up to +0x1F8, flags at +0x240.
 // Every field is a 32-bit word. Told from the other objects an entity can point at by the default hash at +0x60.
 #define CHAR_DEF_SIZE 0x250
+
+// Type 14: the monsters that patrol a level (the village's walk between its nodes). Their definitions were left
+// unconverted, so the animation speed at +0xB8 read as 4.6e-41: no animation step and no turn towards the walk.
+static bool CharDefKind(u32 kind) { return kind == 5 || kind == 13 || kind == 14; }
 
 static bool CharDefLooksFull(const u8* image, u32 imageSize, u32 o) {
     return (u64)o + CHAR_DEF_SIZE <= imageSize && Be32(image + o + 0x60) == 0xDC1BFEC5u;
@@ -2183,11 +2187,11 @@ static SirError EntityPlan(ImagePlan* plan, const u8* image, u32 imageSize, u32 
         if (!PlanAdd(plan, o + 8, 4, REGION_U32_ARRAY)) return SIR_ERR_ENTITY;
         // +0x48: the definition's animation set (fn_8005BEC8 looks a conversation's clip up in it).
         if ((u64)o + ENTITY_DEF_USED <= imageSize && !PlanAdd(plan, o + 0x48, 4, REGION_PTR_ARRAY)) return SIR_ERR_ENTITY;
-        if ((kind == 5 || kind == 13) && CharDefLooksFull(image, imageSize, o) && (!PlanAdd(plan, o + 0x0C, 0x3C, REGION_U32_ARRAY) || !PlanAdd(plan, o + 0x4C, CHAR_DEF_SIZE - 0x4C, REGION_U32_ARRAY))) return SIR_ERR_ENTITY;
+        if (CharDefKind(kind) && CharDefLooksFull(image, imageSize, o) && (!PlanAdd(plan, o + 0x0C, 0x3C, REGION_U32_ARRAY) || !PlanAdd(plan, o + 0x4C, CHAR_DEF_SIZE - 0x4C, REGION_U32_ARRAY))) return SIR_ERR_ENTITY;
     } else if (OtherSpan(Be32(ent + 0x9C), 0xC, &q)) {
         if (!OtherAdd(q + 8, 4, REGION_U32_ARRAY)) return SIR_ERR_ENTITY;
         if ((u64)q + ENTITY_DEF_USED <= sOtherSize && !OtherAdd(q + 0x48, 4, REGION_PTR_ARRAY)) return SIR_ERR_ENTITY;
-        if ((kind == 5 || kind == 13) && CharDefLooksFull(sOtherImage, sOtherSize, q) && (!OtherAdd(q + 0x0C, 0x3C, REGION_U32_ARRAY) || !OtherAdd(q + 0x4C, CHAR_DEF_SIZE - 0x4C, REGION_U32_ARRAY))) return SIR_ERR_ENTITY;
+        if (CharDefKind(kind) && CharDefLooksFull(sOtherImage, sOtherSize, q) && (!OtherAdd(q + 0x0C, 0x3C, REGION_U32_ARRAY) || !OtherAdd(q + 0x4C, CHAR_DEF_SIZE - 0x4C, REGION_U32_ARRAY))) return SIR_ERR_ENTITY;
     }
     if (!prop && Be32(ent + 0x9C) != 0) {
         // The animation set itself (fn_800526E4 -> fn_801AC6B4 reads its entries when the entity wakes).
