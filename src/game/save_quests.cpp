@@ -162,7 +162,7 @@ void SaveEndQuest(u8* s, BOOL abandon) {
                 const u8* reward = *(u8**)(gGameDb_data() + 0x8D58) + i * 0x3C;
                 if (*(const s32*)(reward + 0xC) != q) continue;
                 SaveUnlockReward(s, reward, TRUE);
-                PostNotice(s, 3, q, *(const s32*)(reward + 0x18), 0, 0, -1);
+                PostNotice(s, 3, q, (s32)*(const f32*)(reward + 0x18), 0, 0, -1);   // the MSP is a float
             }
             PostNotice(s, 2, 0, 0, msp, 0, 0);
             Quest(s, (u32)*(s32*)(s + 0x6AC))->level = 0xFF;
