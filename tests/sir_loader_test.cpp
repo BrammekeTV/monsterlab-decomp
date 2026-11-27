@@ -1174,7 +1174,7 @@ struct ZoneDump {
         printf("itemdraw "); Val(it); printf(" xf "); Ptr(it + 4); printf(" scale %08x mesh ", Bits(*(const f32*)(it + 8))); Ptr(it + 0x10);
         printf(" out "); Floats(it + 0x14, 7); printf(" cb %08x arg ", *(const u32*)(it + 0x30)); Ptr(it + 0x34);
         printf(" clip "); Floats(it + 0x3C, 4); printf(" w58 %08x skin ", Bits(*(const f32*)(it + 0x58))); Ptr(it + 0xB0);
-        printf(" buf4c "); Words(it + 0x4C, 3); printf(" w9c %08x pa0 ", *(const u32*)(it + 0x9C)); Ptr(it + 0xA0); printf("\n");
+        printf(" buf4c "); Words(it + 0x4C, 3); printf(" w9c %08x pa0 ", *(const u32*)(it + 0x9C)); Ptr(it + 0xA0); printf(" light "); Floats(it + 0xA4, 3); printf("\n");
         Skeleton(*(const u8**)(it + 0xB0));
         const u8* x = *(const u8**)(it + 4);
         const u8* m = *(const u8**)(it + 0x10);
