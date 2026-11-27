@@ -306,13 +306,26 @@ void fn_800A81A8(u8* p) {
 
 // One of the 16-bit palette entries is either RGB5 (bit 15 set) or RGB4A3. Sets / clears one color
 // channel group of an entry: mask5 applies in RGB5 form, mask4 in RGB4A3 form.
+// The palette is the console's own data (the graphics chip reads it): its entries stay big-endian
+// in memory on every machine, so they are read and written a byte at a time.
+static inline u16 PalGet(const u16* e) {
+    const u8* b = (const u8*)e;
+    return (u16)((b[0] << 8) | b[1]);
+}
+static inline void PalPut(u16* e, u16 v) {
+    u8* b = (u8*)e;
+    b[0] = (u8)(v >> 8);
+    b[1] = (u8)v;
+}
 static inline void PalSet(u16* e, u16 mask5, u16 mask4) {
-    if (((*e >> 15) & 1) == 1) *e = (u16)(*e | mask5);
-    else *e = (u16)(*e | mask4);
+    u16 v = PalGet(e);
+    if (((v >> 15) & 1) == 1) PalPut(e, (u16)(v | mask5));
+    else PalPut(e, (u16)(v | mask4));
 }
 static inline void PalClear(u16* e, u16 mask5, u16 mask4) {
-    if (((*e >> 15) & 1) == 1) *e = (u16)(*e & ~mask5);
-    else *e = (u16)(*e & ~mask4);
+    u16 v = PalGet(e);
+    if (((v >> 15) & 1) == 1) PalPut(e, (u16)(v & ~mask5));
+    else PalPut(e, (u16)(v & ~mask4));
 }
 // Entry k of the corner palette: 'on' bits select which of R, G, B are saturated.
 static inline void PalCorner(u16* e, bool r, bool g, bool b) {
@@ -337,7 +350,7 @@ s32 fn_80079440(u8* p) {
     for (s32 i = 0; i < n; i++) {
         u8 cls;
         bool done = false;
-        u16 e = pal != NULL ? pal[i] : 0;
+        u16 e = pal != NULL ? PalGet(&pal[i]) : 0;
         if (pal != NULL) {
             u8 alpha = ((e >> 15) & 1) ? 7 : (u8)((e >> 12) & 7);
             if (alpha == 0) {
@@ -366,13 +379,13 @@ s32 fn_80079440(u8* p) {
         table[i] = cls;
     }
     if (pal != NULL) {
-        if (neg == 0) pal[0] = (u16)(pal[0] | 0x8000);
-        else pal[0] = (u16)(pal[0] & 0x0FFF);
+        if (neg == 0) PalPut(&pal[0], (u16)(PalGet(&pal[0]) | 0x8000));
+        else PalPut(&pal[0], (u16)(PalGet(&pal[0]) & 0x0FFF));
         PalClear(&pal[0], 0x7C00, 0xF00);
         PalClear(&pal[0], 0x03E0, 0x00F0);
         PalClear(&pal[0], 0x001F, 0x000F);
         for (s32 k = 1; k < 8; k++) {
-            pal[k] = (u16)(pal[k] | 0x8000);
+            PalPut(&pal[k], (u16)(PalGet(&pal[k]) | 0x8000));
             PalCorner(&pal[k], (k & 1) != 0, (k & 2) != 0, (k & 4) != 0);
         }
     }

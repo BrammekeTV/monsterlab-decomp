@@ -1907,7 +1907,8 @@ static const SirField kCountPtrFields[] = {
 //   (fn_80176E20: eight floats at buf +0x00..+0x1C, the last four are used when the material's
 //   record is disabled), so +0x4C..+0x57 are floats too (the file has 1.0 at +0x4C);
 //   +0x9C a float and +0xA0 a texture pointer that overrides the material's (buf +0x60 / +0x64)
-// and of the mesh: +0x20 centre and radius, +0x48 three floats, +0x54 scale, +0x60 the kind (3 = a particle mesh, fn_801CBD40), +0x64 a pointer,
+// and of the mesh: +0x20 centre and radius, +0x30 the bounding box (lowest and highest corner; the Weld-O-Tron's seam tiles take
+// their place on the table from it, fn_8007C958), +0x48 three floats, +0x54 scale, +0x60 the kind (3 = a particle mesh, fn_801CBD40), +0x64 a pointer,
 // +0x6C the number of parts, +0x70 the parts {material, batch}; of a batch the flags at +0x0C.
 static SirError SkeletonPlan(ImagePlan* plan, const u8* image, u32 imageSize, u32 addr);
 
@@ -1958,7 +1959,7 @@ static SirError SceneItemDrawPlan(ImagePlan* plan, const u8* image, u32 imageSiz
     if (!LevelSpan(Be32(image + item + 0x10), 0x70, imageSize, &m) || PlanHas(plan, m + 0x6C, REGION_U32_ARRAY)) return SIR_OK;
     u32 parts = Be32(image + m + 0x6C);
     if (parts > imageSize / 8 || (u64)m + 0x70 + (u64)parts * 8 > imageSize) return SIR_ERR_ENTITY;
-    if (!PlanAdd(plan, m + 0x20, 0x10, REGION_U32_ARRAY) || !PlanAdd(plan, m + 0x48, 0x10, REGION_U32_ARRAY) ||
+    if (!PlanAdd(plan, m + 0x20, 0x10, REGION_U32_ARRAY) || !PlanAdd(plan, m + 0x30, 0x18, REGION_U32_ARRAY) || !PlanAdd(plan, m + 0x48, 0x10, REGION_U32_ARRAY) ||
         !PlanAdd(plan, m + 0x60, 4, REGION_U32_ARRAY) || !PlanAdd(plan, m + 0x64, 4, REGION_PTR_ARRAY) || !PlanAdd(plan, m + 0x6C, 4, REGION_U32_ARRAY) ||
         (parts != 0 && !PlanAdd(plan, m + 0x70, parts * 8, REGION_PTR_ARRAY))) return SIR_ERR_ENTITY;
     for (u32 i = 0; i < parts; i++) {
