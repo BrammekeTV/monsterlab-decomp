@@ -99,6 +99,11 @@
  "changelog": [
   {
    "date": "2026-11-27",
+   "time": "17:41",
+   "text": "Modding tool, step 2b: a 3D view of the meshes in levels and in the shared monster parts, with an orbit camera, drawn the way the game draws them."
+  },
+  {
+   "date": "2026-11-27",
    "time": "17:11",
    "text": "Modding tool, step 2a: a texture gallery and viewer for any .sir file, with export to PNG or DDS, plus the game's strings for mod makers."
   },
