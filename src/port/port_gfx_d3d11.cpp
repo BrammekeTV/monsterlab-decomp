@@ -748,7 +748,7 @@ static u32 Fnv(const u8* p, u32 n, u32 h) {
     return h;
 }
 
-struct TexEntry { ID3D11ShaderResourceView* srv; u32 hash, w, h, fmt, gen, levels; u64 content; BOOL waiting, wideArt; };   // waiting: a mod's file is still being read; wideArt: its picture is wider than the game's
+struct TexEntry { ID3D11ShaderResourceView* srv; u32 hash, w, h, fmt, gen, levels; u64 content; BOOL waiting, wideArt; u32 flushSeen; };   // flushSeen: PortFlushCount when it was last read   // waiting: a mod's file is still being read; wideArt: its picture is wider than the game's
 static u32 sModBytes;                                      // mod pictures handed to the graphics card in this frame
 static u32 sTexGen = 1;                                    // bumped each frame and on a palette load: textures are re-hashed once per generation
 static std::map<u64, TexEntry> sTextures;                   // by address and palette slot
@@ -884,6 +884,12 @@ static ID3D11ShaderResourceView* GetTexture(const PortGx* g, u32 map) {
     if (it != sTextures.end() && it->second.levels != levels) it->second.hash = 0;   // decode again with the other number of levels
     if (it != sTextures.end() && it->second.gen == sTexGen && it->second.w == w && it->second.h == h && it->second.fmt == fmt && it->second.levels == levels && it->second.srv) return it->second.srv;
     u32 bytes = TextureBytes(w, h, fmt);
+    const u32 flushNow = PortFlushCount();
+    if (it != sTextures.end()) {      // the game flushed part of it since it was read (a picture it draws into): read it again
+        for (u32 at = addr & ~((1u << PORT_FLUSH_SHIFT) - 1); at < addr + bytes; at += 1u << PORT_FLUSH_SHIFT)
+            if (PortFlushStamp(at) > it->second.flushSeen) { it->second.hash = 0; break; }
+        it->second.flushSeen = flushNow;
+    }
     u32 hash = Fnv(data, bytes, 2166136261u ^ w ^ h << 12 ^ fmt << 24);
     if (pal) hash = Fnv(tlut, fmt == 8 ? 32 : fmt == 9 ? 512 : 0x8000, hash ^ tl);
     if (it != sTextures.end() && it->second.hash == hash) {
@@ -926,7 +932,7 @@ static ID3D11ShaderResourceView* GetTexture(const PortGx* g, u32 map) {
         }
         made = MakeTexture(rgba.data(), w, h, &mips);
     }
-    TexEntry e = {made, hash, w, h, fmt, sTexGen, levels, content, waiting, wideArt};
+    TexEntry e = {made, hash, w, h, fmt, sTexGen, levels, content, waiting, wideArt, flushNow};
     sTextures[key] = e;
     sTextureTicks += Ticks() - t0;
     sGfxStats.textures++;

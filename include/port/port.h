@@ -67,6 +67,12 @@ BOOL  PortBinkPlaying(void);
 #define PORT_MEM1_SIZE   0x01800000u
 #define PORT_MEM2_BASE   0x90000000u
 #define PORT_MEM2_SIZE   0x04000000u
+// Cache flushes (DCFlushRange / DCStoreRange) stamp the 512-byte blocks they cover: on the console a flush is how
+// the CPU's writes reach the graphics chip, so the texture cache re-reads a texture whose blocks were stamped since it
+// last looked (its hash samples only a few bytes of a big texture: a painted weld seam left it unchanged).
+#define PORT_FLUSH_SHIFT 9
+extern "C" u32 PortFlushStamp(u32 phys);       // the flush count when the block of this physical address was last flushed (0: never)
+extern "C" u32 PortFlushCount(void);          // flushes so far
 #define PORT_HW_BASE     0xCC000000u   // hardware registers; plain memory on PC
 #define PORT_HW_SIZE     0x00010000u
 #define PORT_TEXT_LO     0x80004000u   // .init + .text of main.dol: holds jumps and traps on PC
