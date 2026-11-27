@@ -308,7 +308,11 @@ static void PortStateLog(void) {
     // 2 down, 3 left on screen), standing on a node, junction, challenge name hash, prompt text id.
     s32* lastMap = sLogLastMap;
     u8* player = *(u8**)(gGame + 0xD614);
-    if (fsm[1] == 0x090B84CE && player != NULL && *(u8**)(player + 0xA00) != NULL) {   // the exploration HUD machine runs
+    // While the exploration HUD machine runs (the first visit) or, on later visits (another HUD machine), while a level
+    // runs in the world's explore phase (gGame + 0xD5F0 + 0x28 == 2, what target_node_selected checks).
+    BOOL exploring = fsm[1] == 0x090B84CE ||
+                     (*(s32*)(gScriptCtx + 0x18) == 5 && sWorldReady && *(s32*)(gGame + 0xD5F0 + 0x28) == 2);
+    if (exploring && player != NULL && *(u8**)(player + 0xA00) != NULL) {
         u8* path = *(u8**)(player + 0xA00);
         s32 map[7] = { PathGetNodeId(path), PathGetNodeType(path), (s32)PathGetExits(path, 0), PathAtWaypoint(path),
                        PathIsAtJunction(path), (s32)PathGetChallengeId(path), PathGetNodeText(path) };
