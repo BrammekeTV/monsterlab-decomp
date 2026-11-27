@@ -98,6 +98,11 @@
  ],
  "changelog": [
   {
+   "date": "2026-11-27",
+   "time": "14:15",
+   "text": "The Weld-O-Tron can be won: welds now register on the seam (its tiles' size data was being read in the Wii's byte order), the meter fills to 100, SUCCESS! appears and you return to the Mechanical Lab. The welded seam isn't drawn on screen yet. Also, the black hole head mod now looks like the reference: a black core with a thin, tilted, spinning disc of glowing amber gas, its light bending over the top and under the bottom, a bright ring at the edge, and a small projector on the neck."
+  },
+  {
    "date": "2026-11-26",
    "time": "19:41",
    "text": "Mods can now add brand-new monster parts and change the game's tables when it loads, without containing any game files. Modded parts keep a fixed number, recorded in a small file next to your saves, so turning a mod off or changing the mod order never mixes up your parts. The black hole head now uses this. Also, the last speed-up is in: vertices go straight to the graphics card, so drawing the village now takes 6.2 ms instead of 8.6 ms before the four performance steps, with an unchanged picture."
