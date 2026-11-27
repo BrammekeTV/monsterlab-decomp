@@ -79,7 +79,11 @@ load messages, never from pictures.
 | weld | the Weld-O-Tron level starts (`RegisterExperimentSound`), its screens load (`LoadExperimentUI`), the instructions open (`SetInstructionsHeaderString`) and the right arrow turns to page 2 of 2 (`GetNextInstructionsString`, `IsLastPage`) |
 | weldgun | the button after the instructions (`InstructionsExitted`): the experiment's screen is pushed (`PushExperimentUI`), the gun swings in (`UpdateWeldingGunIntroPos`, `InterpolateGunFromIntroPosition`) and gameplay begins with the gun off (`minigame_gameflow_control_gameplay_entry`, `WeldingGunOffUpdate`) |
 | weldpass | the weld: B held from the moment the brush is over the trench (`WeldingGunOnUpdate`, `WeldingOverTrench`), the pointer follows `tools/playthrough_weld_path.txt` along the 64 seconds of seam, the experiment ends with SUCCESS! (`minigame_gameflow_control_success_outro_entry`, `SetFinalExperimentScore`) |
-| weldback | A on the SUCCESS! screen (`GameFlowQuitGameDone`): the Mechanical Lab loads again (`LoadLevel`) and knows the experiment was won (`GetWonLastMinigame`, `SendConversationSignal`) |
+| weldback | A on the SUCCESS! screen (`GameFlowQuitGameDone`): the Mechanical Lab loads again (`LoadLevel`) and knows the experiment was won (`GetWonLastMinigame`, `GetRewardedItemId`) |
+| reward | the results: the quality meter counts up (`minigame_gameflow_control_result_animate_quality_exit`), I.G.O.R. shows the part received, its arrow closes the book (`DestroyLabBooks`), a movie (`PlayMovie`, skipped) and Fuseless's talk (`StartConversationID`) |
+| towercall | Fuseless sends the player to the Lightning Tower: his talk closes (`StopConversation`), `AddJournalEntry`, the castle HUD is free in the Workshop |
+| hall2 | the Workshop's back button: `castle_atrium` (the Grand Hall) again, `SpawnRandomLightningBetweenNodes` |
+| tower | the door on the Grand Hall's balcony (`IsCastleAccessBlocked`): `castle_operating_theatre` (the Lightning Tower), Fuseless's talk opens and closes, `SetGameProgressBitFlag` |
 
 `python tools/playthrough.py --list` prints the markers and deadlines.
 

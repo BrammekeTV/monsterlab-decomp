@@ -202,9 +202,29 @@ STAGES = [
     # A on the SUCCESS! screen: back to the Mechanical Lab, which knows the experiment was won.
     Stage("weldback", "A leaves the experiment: the Mechanical Lab again, the experiment counted as won", 41650,
           [call("GameFlowQuitGameDone", 41450), call("LoadLevel", 41450), call("GetWonLastMinigame", 41500),
-           call("SendConversationSignal", 41550)],
+           call("GetRewardedItemId", 41500)],
           press=("A@41450-41456",)),
-    # Later stages go here (a deadline after 41650, frames counted from the run's start).
+    # The results: the quality meter counts up, then I.G.O.R. shows the part received (the Buckler Shield); its arrow
+    # closes the lab book, a movie plays (skipped here) and Fuseless talks.
+    Stage("reward", "the experiment's results, Part Received, its arrow: a movie and Fuseless's talk", 42200,
+          [call("minigame_gameflow_control_result_animate_quality_exit", 41700), call("DestroyLabBooks", 42000),
+           call("PlayMovie", 42000), call("StartConversationID", 42000)],
+          press=("A@42000",), pointer=("1380,909@41950",)),
+    # Fuseless: "Meet me in the Lightning Tower!" A carries his lines; then a journal entry and the Workshop is free.
+    Stage("towercall", "Fuseless sends the player to the Lightning Tower, free in the Workshop", 42700,
+          [call("StopConversation", 42300), call("AddJournalEntry", 42300),
+           state("castle HUD free", r"hud machine 96773521 \(depth 1\) state 1 ", 42600)],
+          press=("A@42300-42600/150",)),
+    # The Workshop's back button (bottom left): the Grand Hall again.
+    Stage("hall2", "the Workshop's back button: the Grand Hall", 42950,
+          [level("castle_atrium", 42700), call("SpawnRandomLightningBetweenNodes", 42700)],
+          press=("A@42700",), pointer=("354,894@42650",)),
+    # The door up on the balcony (between the chandelier's arms) is the Lightning Tower's: Fuseless waits there.
+    Stage("tower", "the balcony door: the Lightning Tower, Fuseless's talk, a journal entry", 44700,
+          [call("IsCastleAccessBlocked", 43100), level("castle_operating_theatre", 43100), call("StartConversationID", 43300),
+           call("StopConversation", 44400), call("SetGameProgressBitFlag", 44400)],
+          press=("A@43150", "A@43600-44500/150"), pointer=("951,540@43100",)),
+    # Later stages go here (a deadline after 44700, frames counted from the run's start).
 ]
 
 
