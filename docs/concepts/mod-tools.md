@@ -1,6 +1,6 @@
 # Mod tools: `.sir` editor and `.part` viewer (design)
 
-Status: step 1 (browse), step 2a (textures, strings) and 2b (model view) built; `.part` viewer, editing and the guide to come.
+Status: step 1 (browse), step 2a (textures, strings) and 2b (model view) and 3 (`.part` viewer) built; editing and the guide to come.
 
 ## Goal
 
@@ -92,11 +92,17 @@ else as `#index` / hex, the same spellings the patch format accepts.
 
 ## `.part` viewer (step 3)
 
-Loads `mods/<mod>/parts/*.part` (version 2, the format of `tools/mods/blackhole/build_mod.py` and
-`port_mod_parts.cpp`): mesh, colour sheet and the blocks of light draws. Shown alone or attached to
-a template monster's slot, with the light draws' glow and spin animated by the tool's clock. The
-file is watched (`FindFirstChangeNotification` on its folder) and reloaded when it changes, so
-`build_mod.py` and the view form a loop of seconds.
+Loads `mods/<mod>/parts/*.part` (versions 1 and 2, the format of `tools/mods/blackhole/build_mod.py` and
+`port_mod_parts.cpp`; every mod folder's parts are in the file list). The template zone comes from the
+player's `shared_parts.sir` and the part's blocks are written over a copy of it as the port does (kind 0
+bytes, kind 1 addresses with the zone's address, kind 2 draws of light); then the model view draws it.
+The draws of light are split out of the display list by their byte range and drawn after the solid ones,
+added to the picture, unlit, with their sheet scrolling by the tool's clock. The file's time is checked
+every 20 frames and the part is opened again when it changes (same node, same camera), so `build_mod.py`
+and the view form a loop of seconds.
+
+Not yet: the part attached to a whole monster (needs the skeleton and the other parts' zones), and a
+billboard light turned to the camera (it is drawn as it lies in the file).
 
 ## Editing and saving as a mod (step 4)
 
