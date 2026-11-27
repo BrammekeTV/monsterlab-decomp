@@ -12,6 +12,18 @@ extern ScriptFunc gScriptFuncs[];                       // 0x80484230
 static inline f32 AsF32(u32 v) { f32 f; memcpy(&f, &v, 4); return f; }
 static inline u32 AsU32(f32 f) { u32 v; memcpy(&v, &f, 4); return v; }
 
+// A child of the entity (argument type 0x30: u16 flags, bit 0 a locator index, bit 1 an effect slot
+// index; u8 that index; u8) arrives as the script operand, one big-endian word the loader made native.
+// The callee reads the struct by field (SpawnOneParticleAtChild, FireShot, ...), so build it in memory.
+static inline u32 ScriptChildSpec(u32 word) {
+    u32 v;
+    u8* b = (u8*)&v;
+    *(u16*)b = (u16)(word >> 16);
+    b[2] = (u8)(word >> 8);
+    b[3] = (u8)word;
+    return v;
+}
+
 // 0x8010CD1C
 // game signatures 0x91 - 0x187. args[0] is the 'this' slot; script arguments start at args[1]. Returns FALSE
 // for signatures this dispatcher doesn't handle.
@@ -438,52 +450,52 @@ extern "C" BOOL ScriptDispatch(s32 func, u32 sig, u32* args, u32* result) {
         break;
     }
     case 0xF8: {
-        u32 copy[] = { args[2] };
+        u32 copy[] = { ScriptChildSpec(args[2]) };
         ((void (*)(u32, u32*))fn)(args[1], &copy[0]);
         break;
     }
     case 0xF9: {
-        u32 copy[] = { args[2], args[3] };
+        u32 copy[] = { ScriptChildSpec(args[2]), ScriptChildSpec(args[3]) };
         ((void (*)(u32, u32*, u32*, f32, u32, u32))fn)(args[1], &copy[0], &copy[1], AsF32(args[4]), args[5], args[6]);
         break;
     }
     case 0xFA: {
-        u32 copy[] = { args[2] };
+        u32 copy[] = { ScriptChildSpec(args[2]) };
         ((void (*)(u32, u32*, u32, f32, f32))fn)(args[1], &copy[0], args[3], AsF32(args[4]), AsF32(args[5]));
         break;
     }
     case 0xFB: {
-        u32 copy[] = { args[2] };
+        u32 copy[] = { ScriptChildSpec(args[2]) };
         ((void (*)(u32, u32*, u32, u32))fn)(args[1], &copy[0], args[3], args[4]);
         break;
     }
     case 0xFC: {
-        u32 copy[] = { args[2], args[3] };
+        u32 copy[] = { ScriptChildSpec(args[2]), args[3] };
         ((void (*)(u32, u32*, u32*, f32, u32, u32))fn)(args[1], &copy[0], &copy[1], AsF32(args[4]), args[5], args[6]);
         break;
     }
     case 0xFD: {
-        u32 copy[] = { args[2] };
+        u32 copy[] = { ScriptChildSpec(args[2]) };
         ((void (*)(u32, u32*, f32))fn)(args[1], &copy[0], AsF32(args[3]));
         break;
     }
     case 0xFE: {
-        u32 copy[] = { args[2] };
+        u32 copy[] = { ScriptChildSpec(args[2]) };
         ((void (*)(u32, u32*, u32))fn)(args[1], &copy[0], args[3]);
         break;
     }
     case 0xFF: {
-        u32 copy[] = { args[2], args[7] };
+        u32 copy[] = { ScriptChildSpec(args[2]), args[7] };
         ((void (*)(u32, u32*, u32, u32, f32, f32, u32*))fn)(args[1], &copy[0], args[3], args[4], AsF32(args[5]), AsF32(args[6]), &copy[1]);
         break;
     }
     case 0x100: {
-        u32 copy[] = { args[2] };
+        u32 copy[] = { ScriptChildSpec(args[2]) };
         ((void (*)(u32, u32*, u32, u32))fn)(args[1], &copy[0], args[3], args[4]);
         break;
     }
     case 0x101: {
-        u32 copy[] = { args[2] };
+        u32 copy[] = { ScriptChildSpec(args[2]) };
         ((void (*)(u32, u32*, u32, u32))fn)(args[1], &copy[0], args[3], args[4]);
         break;
     }
@@ -492,7 +504,7 @@ extern "C" BOOL ScriptDispatch(s32 func, u32 sig, u32* args, u32* result) {
         break;
     }
     case 0x103: {
-        u32 copy[] = { args[4] };
+        u32 copy[] = { ScriptChildSpec(args[4]) };
         ((void (*)(u32, u32, u32, u32*, f32))fn)(args[1], args[2], args[3], &copy[0], AsF32(args[5]));
         break;
     }
@@ -550,7 +562,7 @@ extern "C" BOOL ScriptDispatch(s32 func, u32 sig, u32* args, u32* result) {
         break;
     }
     case 0x111: {
-        u32 copy[] = { args[3] };
+        u32 copy[] = { ScriptChildSpec(args[3]) };
         ((void (*)(u32, u32, u32*, u32))fn)(args[1], args[2], &copy[0], args[4]);
         break;
     }
@@ -567,17 +579,17 @@ extern "C" BOOL ScriptDispatch(s32 func, u32 sig, u32* args, u32* result) {
         break;
     }
     case 0x115: {
-        u32 copy[] = { args[2] };
+        u32 copy[] = { ScriptChildSpec(args[2]) };
         ((void (*)(u32, u32*))fn)(args[1], &copy[0]);
         break;
     }
     case 0x116: {
-        u32 copy[] = { args[2] };
+        u32 copy[] = { ScriptChildSpec(args[2]) };
         ((void (*)(u32, u32*, f32))fn)(args[1], &copy[0], AsF32(args[3]));
         break;
     }
     case 0x117: {
-        u32 copy[] = { args[2] };
+        u32 copy[] = { ScriptChildSpec(args[2]) };
         ((void (*)(u32, u32*, u32, u32, f32, f32))fn)(args[1], &copy[0], args[3], args[4], AsF32(args[5]), AsF32(args[6]));
         break;
     }
@@ -590,7 +602,7 @@ extern "C" BOOL ScriptDispatch(s32 func, u32 sig, u32* args, u32* result) {
         break;
     }
     case 0x11A: {
-        u32 copy[] = { args[3] };
+        u32 copy[] = { ScriptChildSpec(args[3]) };
         ((void (*)(u32, u32, u32*, f32))fn)(args[1], args[2], &copy[0], AsF32(args[4]));
         break;
     }
@@ -654,7 +666,7 @@ extern "C" BOOL ScriptDispatch(s32 func, u32 sig, u32* args, u32* result) {
         break;
     }
     case 0x129: {
-        u32 copy[] = { args[2] };
+        u32 copy[] = { ScriptChildSpec(args[2]) };
         ((void (*)(u32, u32*, u32, u32, f32, f32))fn)(args[1], &copy[0], args[3], args[4], AsF32(args[5]), AsF32(args[6]));
         break;
     }
@@ -663,12 +675,12 @@ extern "C" BOOL ScriptDispatch(s32 func, u32 sig, u32* args, u32* result) {
         break;
     }
     case 0x12B: {
-        u32 copy[] = { args[3] };
+        u32 copy[] = { ScriptChildSpec(args[3]) };
         ((void (*)(u32, u32, u32*))fn)(args[1], args[2], &copy[0]);
         break;
     }
     case 0x12C: {
-        u32 copy[] = { args[3] };
+        u32 copy[] = { ScriptChildSpec(args[3]) };
         ((void (*)(u32, u32, u32*, f32))fn)(args[1], args[2], &copy[0], AsF32(args[4]));
         break;
     }
