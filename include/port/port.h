@@ -159,6 +159,12 @@ BOOL PortPickFolder(HWND__* owner, char* out, u32 n);
 BOOL PortPickerRun(const char* note, const char* path, char* out, u32 n, const char* shot);
 int  PortSelfTestPicker(void);
 
+// ---- mod tool (port_modtool.cpp, docs/concepts/mod-tools.md): ml_modtool.exe, or --modtool ----
+// Runs instead of the game once the disc is open; with shot it draws one picture into that PNG. Exit code.
+int  PortModToolRun(const char* open, const char* select, int row, const char* shot);
+int  PortModToolTest(const char* part);  // --modtool-test [--modtool-open X.part]: opens a few files of the player's disc (and a mod's .part) and checks them
+int  PortSelfTestModTool(void);
+
 // ---- runtime (port_runtime.cpp) ----
 typedef struct PortOptions {
     const char* dataDir;      // extracted disc: <dataDir>/sys/main.dol and <dataDir>/files/; or the disc image itself (PortDiscIsOpen)

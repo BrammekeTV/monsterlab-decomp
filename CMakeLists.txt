@@ -53,6 +53,10 @@ if(MSVC AND Python3_FOUND)
   set_target_properties(monsterlab PROPERTIES LINKER_LANGUAGE CXX)
   target_link_options(monsterlab PRIVATE /NOLOGO /FIXED /BASE:0x400000 /DYNAMICBASE:NO
     /LARGEADDRESSAWARE /STACK:0x400000 /INCREMENTAL:NO /MAP)
+  # The mod tool is the same program under another name (docs/concepts/mod-tools.md).
+  add_custom_command(TARGET monsterlab POST_BUILD
+    COMMAND ${CMAKE_COMMAND} -E copy $<TARGET_FILE:monsterlab> $<TARGET_FILE_DIR:monsterlab>/ml_modtool.exe
+    VERBATIM)
 endif()
 
 # PC port loader test (tests/sir_loader_test.cpp): `--selftest` needs no game data and runs in CI;

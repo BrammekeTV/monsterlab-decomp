@@ -3,7 +3,7 @@
     python tools/build_pc.py [--debug] [--noopt] [--clean] [--run [args...]]
 
 Compiles every source (32-bit, the flags of tools/check.py), generates the link glue with
-tools/port_link.py and links build/pc/monsterlab.exe. See docs/port_runtime.md.
+tools/port_link.py and links build/pc/monsterlab.exe (and its copy ml_modtool.exe, the mod tool). See docs/port_runtime.md.
   --debug   keep debug information (/Z7, /DEBUG)
   --noopt   build without optimisation (/Od everywhere), for stepping through code in a debugger
   --clean   recompile everything (otherwise only sources newer than their object are recompiled)
@@ -19,7 +19,7 @@ because some of it broke when optimised; tools/opt_bisect.py found them (3 calle
 with a 2-float buffer for its 12 bytes, and generated leaf functions returning u8/u16 that callers
 read as int). CI cannot boot the game (no game data), so use tools/opt_bisect.py test ALL locally.
 """
-import glob, hashlib, json, os, subprocess, sys
+import glob, hashlib, json, os, shutil, subprocess, sys
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 import check
 
@@ -119,6 +119,13 @@ def main():
 
 
 def finish(exe, run_args):
+    # ml_modtool.exe is the same program: started under that name it runs the mod tool (docs/concepts/mod-tools.md).
+    tool = os.path.join(os.path.dirname(exe), "ml_modtool.exe")
+    if not os.path.exists(tool) or os.path.getmtime(tool) < os.path.getmtime(exe):
+        try:
+            shutil.copy2(exe, tool)
+        except OSError as e:
+            print("cannot write", tool, e)
     if run_args is not None:
         sys.exit(subprocess.run([exe] + run_args, cwd=ROOT).returncode)
 
