@@ -98,6 +98,11 @@ static BOOL PeekReadable(u32 addr, u32 bytes) {
     return TRUE;
 }
 static s32 sShotAt[64], sShotAtCount;   // --shot-at frames
+// --poke ADDR|BITS@FRAME / ADDR&~BITS@FRAME / ADDR=VALUE@FRAME (hex): a debugging aid that sets, clears or writes a
+// memory word at the end of every frame from FRAME on (e.g. to show an object the game keeps hidden).
+struct PortPoke { u32 addr, bits; char op; s32 from; };
+static PortPoke sPoke[16];
+static int sPokeCount;
 static int sPeekCount;
 static void PrintSummary(void) {
     char buf[256];
@@ -387,6 +392,12 @@ void PortFrameDone(void) {
         if (cur) PortLog("cursor: %.1f %.1f", *(f32*)(cur + 0x68), *(f32*)(cur + 0x6C));
     }
     if (!gPortOptions.fastAll && sFrames >= gPortOptions.fastForward) PortFastEnd();
+    for (int i = 0; i < sPokeCount; i++) {
+        const PortPoke& k = sPoke[i];
+        if (sFrames < k.from || !PeekReadable(k.addr & ~3u, 4)) continue;
+        u32* w = (u32*)(uintptr_t)(k.addr & ~3u);
+        *w = k.op == '|' ? *w | k.bits : k.op == '&' ? *w & ~k.bits : k.bits;
+    }
     for (s32 i = 0; i < sShotAtCount; i++) {          // --shot-at: extra pictures during the run
         if (sShotAt[i] != sFrames || !gPortOptions.screenshot) continue;
         char path[512];
@@ -1302,6 +1313,17 @@ struct PortBoot {
                 sPeek[sPeekCount] = strtoul(__argv[++i], &end, 16);
                 u32 words = *end == ':' ? strtoul(end + 1, NULL, 0) : 4;
                 sPeekWords[sPeekCount++] = words < 1 ? 1 : words > 1024 ? 1024 : words;
+            }
+            else if (!strcmp(a, "--poke") && i + 1 < __argc && sPokeCount < 16) {
+                char* end;
+                PortPoke k = {};
+                k.addr = strtoul(__argv[++i], &end, 16);
+                k.op = *end;
+                if (k.op == '&' && end[1] == '~') end++;
+                k.bits = strtoul(end + 1, &end, 16);
+                k.from = *end == '@' ? atoi(end + 1) : 0;
+                if (k.op == '|' || k.op == '&' || k.op == '=') sPoke[sPokeCount++] = k;
+                else fprintf(stderr, "[port] --poke %s: expected ADDR|BITS@FRAME, ADDR&~BITS@FRAME or ADDR=VALUE@FRAME\n", __argv[i]);
             }
             else if (!strcmp(a, "--watch") && i + 1 < __argc) sWatch = strtoul(__argv[++i], NULL, 16);
             else if (!strcmp(a, "--show-texture") && i + 1 < __argc) gPortOptions.showTexture = atoi(__argv[++i]);
