@@ -30,6 +30,7 @@ extern const int   gPortBindingCount;
 u32  PortInputPadBits(void);                    // gamepad buttons held now (PortBinding.pad bits; 0 without a pad)
 BOOL PortInputAddPress(const char* spec);
 BOOL PortInputAddPointer(const char* spec);     // --pointer X,Y@FRAME (output pixels)
+BOOL PortInputAddPointerPath(const char* file); // --pointer-path FILE (lines "FRAME X Y" in 1920x1080 pixels, straight lines between them)
 void PortInputAddConsolePointer(f32 px, f32 py, s32 frame);   // the same in console pointer values (--bench)
 
 #endif

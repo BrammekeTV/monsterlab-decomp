@@ -91,6 +91,20 @@ void* fn_8033AE04(u32* seconds) {
 // MSL strtok.
 char* fn_80338A9C(char* s, const char* delims) { return strtok(s, delims); }
 
+// MSL itoa (0x8033B310, a branch to 0x803340F8): the number in the given radix, capital letters above 9, a minus
+// sign for a negative one. The game prints counts with it (the experiment's rewards, save blocks).
+void fn_8033B310(s32 value, u8* buf, s32 radix) {
+    u32 v = value < 0 ? (u32)(-value) : (u32)value, n = 0;
+    do {
+        u32 d = v % (u32)radix;
+        buf[n++] = (u8)(d > 9 ? d + 0x37 : d + 0x30);
+        v /= (u32)radix;
+    } while (v != 0);
+    if (value < 0) buf[n++] = '-';
+    buf[n] = 0;
+    for (u32 i = 0, j = n - 1; i < j; i++, j--) { u8 t = buf[i]; buf[i] = buf[j]; buf[j] = t; }
+}
+
 // MSL math (fdlibm). The parameter types are the ones the game's callers declare.
 f64 fn_8033E8EC(f64 x) { return atan(x); }                  // atan
 f64 fn_8033ED6C(f64 x) { return floor(x); }                 // floor
